@@ -207,14 +207,24 @@ capability, needs its own design pass first).
   the move left behind ($id URLs, `ui/`'s own pin, one `ui/` test) and a
   tried-and-reverted attempt to drop the Stack's hand-written `stack/ts/`
   mirrors in favor of codegen - see `docs/dev.md`'s `spec-v0.1.1` entry.
-- [ ] **S** Home pins `spec` and removes the workspace, moving its
+- [x] **S** Home pins `spec` and removes the workspace, moving its
   `check.sh` "spec: standards gen/ presence" block here, and moving
   `home/spec/tests/ts/package-bronze.test.ts` into `home`'s own test
   suite (imports `PackageManifest`/`lintSpeechTemplate` from
   `@maipai/spec` instead of a relative `gen/ts`/`voice/ts` path - left
   behind by the `spec-v0.1.0` move above, still sitting unchanged at
-  that path today). Exit check: `home/scripts/check.sh`.
-- [ ] **S** Catalog deletes `catalog/schema/` and
+  that path today). Exit check: `home/scripts/check.sh`. Landed
+  `home` commit `afd2abe0` (`SPEC_PIN` at `0.1.1`); a second sweep
+  (`join(import.meta.dir, "..", "..", "..", "spec", "llm", ...)`
+  path-segment reads the first grep missed) found and fixed four more
+  broken corpus loaders, factored into one `backend/src/lib/specDir.ts`
+  reused by seven call sites - `home/docs/dev.md`'s own entry has the
+  full account.
+- [x] **S** Catalog deletes `catalog/schema/` and
   `scripts/refresh-schema.sh`, pins `@maipai/spec`, and its lint reads
   the resolved schemas from the pinned package. Exit check:
-  `catalog/scripts/check.sh`.
+  `catalog/scripts/check.sh`. Landed `catalog` commit `e554bf7`
+  (`SPEC_PIN` at `0.1.1`, CI gained a `getmaipai/shared` checkout at
+  `spec-v0.1.1` - `catalog/docs/dev.md`'s own entry has the full
+  account, including a code-review-caught CI path bug fixed and
+  verified locally before landing).
