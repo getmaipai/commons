@@ -6,6 +6,10 @@ pinned by tag rather than copied. Decided 2026-09-20 (see
 layer and its reconciled kit, plus the helpers Home and the Stack had each
 grown their own copy of, needed one home instead of two.
 
+Public (2026-09-20): every product (`home`, `stack`, `bot`, `go`) and
+every `catalog` package pins a tag here by checking it out, no
+credential required.
+
 ## Workspaces and their current tags
 
 | Workspace | Package | Current tag | Consumers |
