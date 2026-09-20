@@ -218,20 +218,6 @@
     ]
   },
   {
-    "key": "engines.stack.url",
-    "scope": "household",
-    "selector": "text",
-    "default": "",
-    "label": "MaiPai Stack address",
-    "help": "Empty uses Home's own built-in engines. Set once a MaiPai Stack is installed on this machine to route chat, embeddings and voice through it instead.",
-    "level": "expert",
-    "secret": false,
-    "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
-  },
-  {
     "key": "home.access_token",
     "scope": "household",
     "selector": "text",
@@ -346,6 +332,58 @@
     "selector": "boolean",
     "default": false,
     "label": "Telegram me when backups start failing",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "notifications.engines.problem.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when a Stack engine reports an open warning or critical problem",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "notifications.engines.update_applied.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when a Stack engine updates",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "notifications.engines.update_available.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when a Stack engine has an update available",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "notifications.engines.update_failed.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when a Stack engine fails to update",
     "level": "basic",
     "secret": false,
     "lives_in": "person.notifications",

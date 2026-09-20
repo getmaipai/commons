@@ -5,6 +5,24 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.4] - 2026-09-20
+
+### Added
+- Four `notifications.engines.*.telegram` settings keys (person scope,
+  boolean, default `false`): one per Stack engine notification type from
+  `home`'s HOME-STACK-03 event bridge (`engines.update_available`,
+  `engines.update_applied`, `engines.update_failed`, `engines.problem`).
+  Regenerated `settings/keys.json` from `home/backend/src/settings/
+  notificationKeys.ts` via `bun run gen:settings`.
+
+## [spec-v0.1.3] - 2026-09-20
+
+### Added
+- `engines.stack.url` settings key (household scope, text, default empty):
+  the Stack base URL Home routes chat, embeddings and voice through when a
+  MaiPai Stack is installed on the machine. Regenerated `settings/keys.json`
+  from `home/backend/src/settings/coreKeys.ts` via `bun run gen:settings`.
+
 ## [spec-v0.1.2] - 2026-09-20
 
 ### Added
