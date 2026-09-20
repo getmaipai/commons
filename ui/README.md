@@ -16,3 +16,14 @@ already use: a consumer imports the real file path under `src/`, e.g.
 `@/kit/*` -> `./src/*` alias is internal to this workspace only; a
 consumer's own `paths` entry (or none, since `file:` installs this as a
 real package) resolves `@maipai/ui/src/*` directly.
+
+## Lint
+
+The kit ships its own ESLint flat config as `@maipai/ui/eslint-config`
+(exported from `eslint.config.js`): jsx-a11y recommended, the
+better-tailwindcss correctness rules with the token entry pointed at
+`src/tokens.css`, and the kit's own import rules (lucide only through
+`getIcon`/`icons`, `@radix-ui/*` only under `src/ui/`, no other component
+library) plus no raw colors in JSX `style` attributes. A consumer extends
+it in its own config with `... (await import("@maipai/ui/eslint-config"))
+.default` and gets the same gate its CI must pass.

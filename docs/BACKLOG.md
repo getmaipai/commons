@@ -95,13 +95,16 @@ capability, needs its own design pass first).
   repeated-pattern drift, as `hitArea` in `ui/src/utils.ts`. Verified at
   this commit. Exit check: `ui/scripts/check.sh` green, no
   behavior change (same computed insets, one definition).
-- [ ] **S** `ui`'s own a11y gate: `package.json`'s `"lint"` is
+- [x] **S** `ui`'s own a11y gate: `package.json`'s `"lint"` is
   `tsc --noEmit` only, not the ESLint config docs/UI.md says the kit
   ships to every repo and catalog CI run, and the kit has no
   touch-target/type-floor sweep of its own - Home's
   `scripts/screenshot.ts` is the only thing proving `ui-v0.1.1`'s floor
   today. Matters once `bot`/`go` adopt the kit without Home's gate.
   Exit check: `ui/scripts/check.sh` green with the new lint/sweep wired.
+  Verified at this commit (the ESLint flat config shipped as
+  `@maipai/ui/eslint-config` and enforced by `ui/scripts/check.sh`; the
+  touch-target/type-floor sweep remains open).
 - [ ] **M** Home adopts `ui`: pin the tag, replace `@/kit` and
   `shell/Shell.tsx` with `@maipai/ui` across its 45 consumer files, wiring
   Home's `ProfileSwitcher`, `NotificationBell`, search providers and

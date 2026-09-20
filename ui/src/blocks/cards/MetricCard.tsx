@@ -25,7 +25,7 @@ export function MetricCard({ icon, hue, count, label, state, stateHref, classNam
           <Icon className="size-5" aria-hidden="true" />
         </div>
         <div className="min-w-0">
-          <p className="text-metric font-metric tabular-nums leading-none">{count}</p>
+          <p className="text-[var(--font-size-metric)] font-semibold tabular-nums leading-none">{count}</p>
           <p className="mt-1 truncate text-sm text-muted-foreground">{label}</p>
         </div>
       </div>
