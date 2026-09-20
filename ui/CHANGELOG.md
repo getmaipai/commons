@@ -4,6 +4,43 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.3.3] - ui-v0.3.3
+
+Four more real bugs, found by `home`'s screenshot-pipeline a11y gate on
+the Apps page's first real run against `ThingsTable`/`FilterColumn`/
+`ListRow`/`ChipRow` - none of these four files had ever been exercised
+by a running page, or had a single test, before this.
+
+### Fixed
+- `ListRow`'s status text and dot (`blocks/phone/ListRow.tsx`) used
+  raw, non-theme-aware Tailwind classes (`text-emerald-600`,
+  `bg-emerald-500`, etc.) instead of the kit's own hue system - axe
+  caught `emerald-600` failing WCAG AA on the phone list's light-theme
+  background. Each `tone` now maps to a `--hue-*` var through the
+  already-tested `hueTextColor()`.
+- `ChipRow`'s chips (`blocks/phone/ChipRow.tsx`) were `min-h-11` (44px),
+  4px under docs/UI.md's 48px touch-target floor. `min-h-12` (48px) - a
+  visible-box fix, not `hitArea()`, since the chip's own box is meant to
+  be the full target.
+- `ThingsTable`'s sortable column header button (`blocks/things-table/
+  ThingsTable.tsx`) had no touch-target treatment at all (as small as
+  51x16px). A first fix attempt applied `hitArea(3)` alone - a review
+  caught the math: `hitArea(3)` is a fixed +24px, so a 16px box only
+  reaches 40px, still short of 48. `py-1` (+8px) brings the box to the
+  24px `hitArea(3)`'s own doc comment assumes (16+8+24=48).
+- `FilterColumn`'s group collapse/expand toggle (206x20px) and "Clear
+  filters" link (84x36px) (`blocks/filter-column/FilterColumn.tsx`) had
+  no touch-target treatment either - the same review caught the same
+  math gap on both: the toggle needed `py-1` alongside `hitArea(3)`
+  (20+8+24=52), and "Clear filters" needed `hitArea(2)`, not `(1)`
+  (36+16=52, where 36+8=44 still missed the floor). Fixing the toggle's
+  own box also surfaced a second bug the same review caught: an
+  expanded group's toggle overhangs 12px below its own edge, and the
+  8px `mt-2` gap before the first filter option left 4px of that
+  overhang landing on the option's own clickable row (a tap there
+  toggled the group instead of selecting the option) - `mt-3` (12px)
+  exactly cancels it.
+
 ## [0.3.2] - ui-v0.3.2
 
 Wiring the Apps page (HOME-UI-02, a things-table page) into real kit
