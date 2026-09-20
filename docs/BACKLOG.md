@@ -86,13 +86,14 @@ capability, needs its own design pass first).
   consumer (`bot`, `go`) doesn't have to rediscover and repeat that
   workaround. Exit check: `ui/scripts/check.sh` green, `bun install` in
   a consumer still resolves one `react-router-dom` instance.
-- [ ] **S** A shared helper for the touch-target hit-area technique
+- [x] **S** A shared helper for the touch-target hit-area technique
   (`relative` + `before:`/`after:-inset-N`): hand-derived independently
   at every call site across `button.tsx`, `toggle.tsx`, `checkbox.tsx`
   (a code review on `ui-v0.1.1` flagged this - "a second copy of
-  anything is wrong even when it is faster," org CLAUDE.md). Mirror
+  anything is wrong even when it is faster," org CLAUDE.md). Mirrored
   `utils.ts`'s `FOCUS_RING` constant, created for exactly this kind of
-  repeated-pattern drift. Exit check: `ui/scripts/check.sh` green, no
+  repeated-pattern drift, as `hitArea` in `ui/src/utils.ts`. Verified at
+  this commit. Exit check: `ui/scripts/check.sh` green, no
   behavior change (same computed insets, one definition).
 - [ ] **S** `ui`'s own a11y gate: `package.json`'s `"lint"` is
   `tsc --noEmit` only, not the ESLint config docs/UI.md says the kit

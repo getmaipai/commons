@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/kit/utils"
+import { cn, hitArea } from "@/kit/utils"
 import { Toggle as TogglePrimitive } from "radix-ui"
 
 const toggleVariants = cva(
@@ -20,8 +20,8 @@ const toggleVariants = cva(
       // but keep the same 48px hit area via a transparent pseudo-element.
       size: {
         default: "h-12 min-w-12 px-2 text-base",
-        sm: "relative h-8 min-w-8 px-1.5 before:absolute before:-inset-2 before:content-['']",
-        lg: "relative h-10 min-w-10 px-2.5 before:absolute before:-inset-1 before:content-['']",
+        sm: `h-8 min-w-8 px-1.5 ${hitArea(2)}`,
+        lg: `h-10 min-w-10 px-2.5 ${hitArea(1)}`,
       },
     },
     defaultVariants: {

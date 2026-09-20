@@ -1,7 +1,7 @@
 // Copied by the shadcn registry for MaiPai Stack dashboard.
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/kit/utils"
+import { cn, hitArea } from "@/kit/utils"
 import { Slot } from "radix-ui"
 
 const buttonVariants = cva(
@@ -34,13 +34,13 @@ const buttonVariants = cva(
         // button too short for 16px text - a caller choosing "xs" over
         // "default" (already text-base) is asking for the compact option
         // on purpose.
-        xs: "relative h-6 gap-1 px-2 text-xs before:absolute before:-inset-3 before:content-[''] has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "relative h-8 gap-1.5 px-3 before:absolute before:-inset-2 before:content-[''] has-[>svg]:px-2.5",
+        xs: `h-6 gap-1 px-2 text-xs ${hitArea(3)} has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3`,
+        sm: `h-8 gap-1.5 px-3 ${hitArea(2)} has-[>svg]:px-2.5`,
         lg: "h-14 px-6 text-lg has-[>svg]:px-4",
         icon: "size-12",
-        "icon-xs": "relative size-6 before:absolute before:-inset-3 before:content-[''] [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "relative size-8 before:absolute before:-inset-2 before:content-['']",
-        "icon-lg": "relative size-10 before:absolute before:-inset-1 before:content-['']",
+        "icon-xs": `size-6 ${hitArea(3)} [&_svg:not([class*='size-'])]:size-3`,
+        "icon-sm": `size-8 ${hitArea(2)}`,
+        "icon-lg": `size-10 ${hitArea(1)}`,
       },
     },
     defaultVariants: {

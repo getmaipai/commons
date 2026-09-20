@@ -24,3 +24,20 @@ export const FOCUS_RING =
  * separates them from the background (inputs, selects). */
 export const FOCUS_RING_INSET =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]";
+
+// docs/UI.md's 48 px touch-target floor: a control whose visible box is
+// smaller than 48 px extends its hit area with a transparent pseudo-element
+// that overhangs the box. The overhang in steps of the kit's inset scale is
+// what this returns; a control picks the step that brings its visible box to
+// 48 px (a 24 px box needs 3, 32 px needs 2, 40 px needs 1).
+//
+// Written as three full literal strings (not a template with a variable
+// inside the class name) so Tailwind's scanner sees them.
+export function hitArea(insetStep: 1 | 2 | 3): string {
+  const steps: Record<1 | 2 | 3, string> = {
+    1: "relative before:absolute before:-inset-1 before:content-['']",
+    2: "relative before:absolute before:-inset-2 before:content-['']",
+    3: "relative before:absolute before:-inset-3 before:content-['']",
+  };
+  return steps[insetStep];
+}
