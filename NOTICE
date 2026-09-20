@@ -2,6 +2,16 @@ MaiPai Shared
 Third-Party Licenses and Attributions
 
 This repo holds the org's shared libraries (ui, core, spec), extracted
-from Home and the Stack. It carries no third-party attributions of its
-own yet; each workspace's dependencies are added here as they land,
-per docs/PACKAGES.md in getmaipai/.github.
+from Home and the Stack. Attributions below are added as each
+workspace's own dependencies land, per docs/PACKAGES.md in
+getmaipai/.github.
+
+## core
+
+- Hono (MIT) - https://hono.dev (`openapi.ts`'s router; `secretThrottle.ts`'s
+  connection-info lookup)
+- @hono/zod-openapi (MIT) - https://github.com/honojs/middleware
+  (`openapi.ts`'s route/schema scaffolding)
+- Zod (MIT) - https://zod.dev (`openapi.ts`'s schemas)
+
+When another component lands, its attribution goes here.

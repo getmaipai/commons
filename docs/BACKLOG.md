@@ -15,19 +15,16 @@ capability, needs its own design pass first).
 
 ## `core`
 
-- [ ] **M** `core-v0.1.0`: extract `log`, `withTimeout`, `paths`,
-  `archive`, `diagnostics`, `hardware`, `openapi`, `secretThrottle` from
-  `home/backend/src/lib` and `stack/backend/src/lib` (read-only; `stack`
-  is Session A's), taking the better side or rewriting, carrying the
-  tests that describe caller-visible behavior. Add Home's `hlc`, `id`,
-  `secrets`, `keystore`, `rateLimiter`, `singleflight`, `ssrfGuard` and
-  backup crypto with their tests. Nothing in `core` may import a product
-  or read a product's config. Mirror: `home/backend/src/lib/*.ts` and
-  their `*.test.ts` files for test shape and structure. Acceptance: every
-  carried behavior has a passing test in `core/`, `bun run lint` and
-  `bun test` green in `core/`, tag `core-v0.1.0` (annotated) pushed. Out
-  of scope: adopting it in Home or the Stack (separate items below). Exit
-  check: `bash scripts/check.sh`.
+- [x] **M** `core-v0.1.0`: sixteen modules landed - `log`, `withTimeout`,
+  `paths`, `archive`, `zip` (`diagnostics`'s one generic piece),
+  `hardware`, `openapi`, `secretThrottle`, `hlc`, `id`, `secrets`,
+  `keystore`, `rateLimiter`, `singleflight`, `ssrfGuard`, `backupCrypto`,
+  plus two internal helpers (`aesGcm`, `boundedMap`) a code review found
+  were needed to avoid `secrets`/`backupCrypto` and
+  `rateLimiter`/`secretThrottle` each duplicating the same logic. 126
+  tests passing. `file:` decided over `link:` for the pin form (tested;
+  see dev.md). See dev.md's "Workspace status" for what each module
+  replaced and why.
 - [ ] **S** Home adopts `core`: pin the tag, replace every import of the
   eight/fifteen helpers, delete the copies in `home/backend/src/lib`.
   Acceptance: `home`'s full `scripts/check.sh` green, one commit. Exit

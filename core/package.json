@@ -1,6 +1,6 @@
 {
   "name": "@maipai/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "MaiPai's product-agnostic helpers: logging, timeouts, paths, archives, identity, secrets, rate limiting, hardware, backup crypto. See ../docs/dev.md.",
   "license": "AGPL-3.0",
@@ -8,6 +8,11 @@
   "scripts": {
     "test": "bun test",
     "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.6.3",
+    "hono": "^4.10.7",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/bun": "^1.4.1",

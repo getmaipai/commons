@@ -48,11 +48,31 @@ version doesn't match the stated pin, the same honesty-of-the-pin
 contract the standards core already uses; nothing here verifies the tag
 automatically.
 
-`file:` vs `link:` is decided per the core-v0.1.0 tag message, on one
-test: a consumer must end with exactly one React instance and one copy of
-each `core` module, since a duplicated React breaks hooks across two
-copies. That decision and its proof land in this file when core-v0.1.0
-ships.
+**Decided at `core-v0.1.0`: `file:`, not `link:`.** Tested directly
+(a throwaway consumer package in each form, `bun install` then a real
+import): `link:` requires the target to already be registered globally
+via `bun link` first - it fails outright on a plain relative or absolute
+path ("Package is not linked"), which is incompatible with "no registry,
+just a sibling checkout" (a fresh clone would need someone to manually
+`bun link` the package before anything else could install). `file:`
+works directly with no extra step: `bun install` copies the package into
+the consumer's `node_modules/@maipai/core` as a real, self-contained
+directory (a distinct inode from the source; editing the source
+afterward does not change the installed copy without a fresh
+`bun install`) that carries its OWN `node_modules` (hono, zod,
+@hono/zod-openapi), so `core`'s own dependencies resolve against its own
+installed versions rather than needing the consumer to also declare
+them - exactly "one copy of each `core` module," self-contained. `core`
+has no React dependency, so the one-React-instance test named above
+doesn't apply to it; `ui-v0.1.0`'s own tag message repeats this test
+against a real React consumer, since that's where a duplicated React
+would actually break hooks.
+
+A consumer's own dependency entry is therefore `"@maipai/core":
+"file:../../shared/core"` (adjusted for the consumer's own depth - e.g.
+`home/backend/package.json` is two levels below the org root, so
+`../../shared/core`), re-resolved with a plain `bun install` whenever the
+pinned tag changes.
 
 ## Workspace status
 
@@ -63,13 +83,85 @@ ships.
   `schema/` and `settings/` (the ones that already render `@maipai/spec`'s
   declaration format), per the kit-placement plan in the session-b work
   order's ready report.
-- `core/`: skeleton only (this commit). Content lands at `core-v0.1.0`:
-  the eight files that exist in both `home/backend/src/lib` and
-  `stack/backend/src/lib` today (`log`, `withTimeout`, `paths`, `archive`,
-  `diagnostics`, `hardware`, `openapi`, `secretThrottle`), each taken from
-  whichever side is better or rewritten, plus Home's `hlc`, `id`,
-  `secrets`, `keystore`, `rateLimiter`, `singleflight`, `ssrfGuard` and
-  backup crypto.
+- `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
+  `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
+  both had one, taken from whichever side was better or rewritten fresh:
+  - `withTimeout`, `archive`, `singleflight`, `ssrfGuard`: identical or
+    near-identical in both/only one side; carried with light comment
+    cleanup.
+  - `log`: rewritten as `createLogger(dir, name, options)` - a factory,
+    not a global singleton, so nothing in `core` hardcodes a product's
+    log file name or reads a product's `paths` module. Adopts the
+    Stack's secret-redaction feature (`registerSecret`/`redact`) Home's
+    own version explicitly lacked, keeps Home's `process.exit(1)` after
+    a fatal error (Stack's own version didn't exit, which leaves a
+    corrupted process running).
+  - `paths`: only `ensureDataDir` and `statMtimeMs` moved in - every
+    other export in both products' `paths.ts` is that product's own data
+    layout (`PACKAGES_DIR`, `backupDir`, `STACK_DATA_DIR`'s `dataDir`,
+    ...), which stays where it is.
+  - `diagnostics`: neither product's report is generic (each reads its
+    own DB, health list, or settings), so nothing named `diagnostics`
+    moved. The one reusable piece buried in the Stack's version - a
+    dependency-free stored-ZIP writer - moved in as `zip.ts`
+    (`createZipArchive`), since that's what it actually is.
+  - `hardware`: the Stack's version was the superset (disk stats, OS
+    version, computer name, an injectable clock for deterministic cache
+    tests) and became the base; `detectHardware()` takes an optional
+    `diskPath` rather than importing a product's `paths.dataDir`.
+  - `openapi`: identical in both; `apiRouter()` is now generic over the
+    caller's own Hono `Env` type parameter instead of importing a
+    product's `AppEnv`.
+  - `secretThrottle`: rewritten as `createThrottle(options)` (a factory,
+    so two UNRELATED callers never share bucket state) plus a standalone
+    `getClientIp(c, { trustProxy })` - neither product's version could
+    move as-is, since each read a product-specific trust-proxy flag.
+    **Adoption note (a code review caught the real trap here):** Home's
+    own sign-in throttle today is one module-level map shared across
+    every sign-in route (`totp.ts`, `passkeys.ts`, `auth.ts`,
+    `middleware/auth.ts`, ...), deliberately global so one host can't
+    hammer every sign-in surface in parallel for a combined budget
+    larger than 20 fails/15 min. Home's adoption commit must create
+    exactly ONE `createThrottle()` for that whole budget and share the
+    same instance across every one of those route files - calling
+    `createThrottle()` once per route file (mirroring today's per-file
+    imports) silently multiplies the allowed attempts by the number of
+    routes. `secretThrottle.ts`'s own doc comment on `createThrottle`
+    states this rule now.
+  - `hlc`, `rateLimiter`: Home's version, rewritten as factories
+    (`createHlcClock(nodeId)`, `createRateLimiter()`) for the same
+    "no shared global state across unrelated callers" reason; `hlc`'s own
+    `seedHlcFromDatabase()`/`HLC_BEARING_TABLES` (Home's own 19 DB
+    tables) stayed in Home.
+  - `id`: only `randomSuffix` moved in (plus a small `newPrefixedId`
+    helper) - every `newXId()` function in Home's version names a
+    Home/spec record type and stays there.
+  - `secrets`, `keystore`, `backupCrypto`: Home's versions, each now
+    takes its dependency explicitly (`keystore.ts`'s `createKeystore
+    ({ keysDir, appId })` instead of reading `@/lib/paths`'s `dataDir`
+    and a hardcoded `"maipai-home"` account/service namespace;
+    `secrets.ts`/`backupCrypto.ts` take a `Keystore` instance rather than
+    importing `keystore.ts`'s module functions directly). A Windows DPAPI
+    protection failure in `keystore.ts` now throws
+    `KeystoreProtectionFailedError` instead of silently writing the raw
+    hex key to disk unprotected (a code review on this same commit caught
+    the original carried-over Home behavior doing that).
+  Two small internal helpers exist only because two of the above modules
+  would otherwise duplicate each other: `aesGcm.ts`
+  (`aesGcmEncrypt`/`aesGcmDecrypt`, the one AES-256-GCM call `secrets.ts`
+  and `backupCrypto.ts` both build their own serialization on top of) and
+  `boundedMap.ts` (`evictStaleIfFull`, the one "cap the map, sweep stale
+  entries when full" shape `rateLimiter.ts` and `secretThrottle.ts` both
+  need). `hlc.ts`'s `compareHlc` also now uses a plain ordinal comparison
+  instead of `localeCompare` (locale/ICU-dependent otherwise, which two
+  replicas could resolve differently) and `parseHlc` splits only on the
+  first two colons so a colon-bearing nodeId (a MAC-derived id) survives
+  whole instead of being truncated. `hardware.ts`'s cache is keyed by
+  `diskPath`, not time alone, so two calls with different `diskPath`
+  options within the TTL never return each other's disk figures.
+  Every module's tests are carried or (where nothing existed, or the
+  API changed) written fresh against the new shape; `bun test` is 126
+  passing across the 18 modules (16 extracted + the 2 internal helpers).
 - `spec/`: not moved. A README points at `home/spec`, still the source of
   truth until `spec-v0.1.0` (step 0c) moves it here whole.
 
