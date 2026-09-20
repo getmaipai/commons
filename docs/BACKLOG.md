@@ -24,7 +24,9 @@ capability, needs its own design pass first).
   "Simplify: centralize and reuse... A second copy of anything is wrong
   even when it is faster"). Wrap it as one composite action - inputs:
   the pins to resolve (workspace/tag pairs); does the `getmaipai/shared`
-  checkout with `fetch-tags: true`, the nested-checkout-then-symlink
+  checkout with `fetch-depth: 0` (a live PR proved `fetch-tags: true`
+  alone leaves a tag's ref resolvable but not its commit - catalog's
+  own `docs/dev.md` has the run), the nested-checkout-then-symlink
   trick (`actions/checkout@v4` refuses a `path` outside
   `$GITHUB_WORKSPACE`), and calls `ensure-tag.sh` per pin, exporting
   `MAIPAI_SHARED_DIR` and the resolved worktree paths - so a consumer's
@@ -35,6 +37,32 @@ capability, needs its own design pass first).
   to consume; check that rule before picking. Exit check: `catalog`'s
   `check.yml` shrinks to one `uses:` step for the shared checkout +
   pin resolution, a live PR run still green.
+
+## Standards
+
+- [ ] **`std-` tags need the same per-tag worktree treatment as
+  `commons`, or a fresh cut** (owner's call on which) - found live
+  during SHARED-PIN-01's CI verification (`catalog/docs/dev.md`):
+  every consumer's `check.sh` states a pin like `std-v0.2.0`, but
+  every LOCAL gate run resolves `@maipai/standards` from a plain
+  sibling `../.github` checkout, not a per-tag worktree - on this
+  machine that checkout sat on `main`, 113 commits ahead of
+  `std-v0.2.0` (`git describe --tags` -> `std-v0.2.0-113-gb67acef`),
+  so every local `scripts/check.sh` run this session enforced
+  whatever `main` happened to be, not the tag it claimed to pin. CI
+  catches the gap because its own `.github` checkout is genuinely
+  pinned to the tag (a real difference in behavior, not just a
+  slower path) - it correctly failed prose-lint on real exclamation
+  points local runs never saw. Two honest fixes, either resolves it:
+  extend `ensure-tag.sh`'s pattern (or a twin script) to
+  `getmaipai/.github` so a `std-` pin resolves to its own immutable
+  worktree the same way `commons` pins do; or cut `std-v0.3.0` from
+  the current `main` and have every repo bump its pin, accepting that
+  the underlying mutable-checkout gap remains unless the first option
+  also lands. Exit check: a local `scripts/check.sh` run in any
+  consumer repo enforces the SAME content a correctly-pinned CI run
+  does, proven by deliberately drifting the local `.github` checkout
+  and confirming the gate still catches what CI would.
 
 ## `core`
 
