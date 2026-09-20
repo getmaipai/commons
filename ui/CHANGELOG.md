@@ -4,6 +4,21 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.1.5] - ui-v0.1.5
+
+### Added
+- `ui/eslint.config.js`, exported as `@maipai/ui/eslint-config`: the
+  kit's own a11y/style gate (`jsx-a11y`, `better-tailwindcss` on
+  `src/tokens.css`, lucide-only-via-`icons.ts`, radix-only-under-`src/
+  ui`, no other component library, no raw color in a `style` attribute).
+  `"lint"` is now `tsc --noEmit && eslint src`, not typecheck alone.
+
+### Changed
+- `utils.ts` gained `hitArea(1 | 2 | 3)`, one definition for the
+  touch-target hit-area extension (`relative` + `before:-inset-N`)
+  previously hand-derived independently at each call site; `button.tsx`
+  and `toggle.tsx` now call it instead of repeating the pattern.
+
 ## [0.1.4] - ui-v0.1.4
 
 ### Fixed

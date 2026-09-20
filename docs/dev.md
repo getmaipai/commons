@@ -364,6 +364,38 @@ pinned tag changes.
       and primary-accent side
       of this same adoption (Home's own color overrides, not a kit
       change).
+  - **`ui-v0.1.5` (2026-09-20): two token-free-lane items, landed by
+    cherry-pick.** Both built by the household's local coding model
+    (Qwen3.8-27B, the `coordinate` skill's lane 1b) in its own worktree
+    (`shared-c`, branch `c/82-ui-eslint`, based on `ui-v0.1.3`), reviewed
+    and reported ready by COORDINATOR, then cherry-picked onto `main`
+    here (`git cherry-pick eb96371 34107e5`, both applied clean, no
+    conflicts).
+    - **One `hitArea` helper for the touch-target extension.** A code
+      review on `ui-v0.1.1` had flagged the `relative` +
+      `before:-inset-N` hit-area pattern as hand-derived independently
+      at `button.tsx`, `toggle.tsx`, and other call sites - "a second
+      copy of anything is wrong even when it is faster" (org CLAUDE.md).
+      `utils.ts` gained `hitArea(1 | 2 | 3)`, one definition mirroring
+      the same file's own `FOCUS_RING` constant; `button.tsx` and
+      `toggle.tsx` now call it. Same computed insets, no behavior
+      change - a regression test (`hitArea.test.tsx`) asserts each step
+      against its own known-good class string.
+    - **The kit's own ESLint config, shipped and enforced.**
+      `ui/eslint.config.js`, exported as `@maipai/ui/eslint-config` so a
+      future consumer (`bot`, `go`) can extend it rather than
+      reinventing the same rules: `jsx-a11y`, `better-tailwindcss`
+      pointed at `src/tokens.css`, lucide-only-via-`icons.ts`,
+      radix-only-under-`src/ui`, no other component library, no raw
+      color in a `style` attribute. `package.json`'s `"lint"` is now
+      `tsc --noEmit && eslint src`, closing the gap `docs/BACKLOG.md`
+      had tracked since `ui-v0.1.0` (typecheck alone, no a11y/style
+      gate of its own - Home's `scripts/screenshot.ts` was the only
+      thing actually proving the kit's own floor). Two pre-existing
+      lint findings fixed as part of landing it clean (`MetricCard.tsx`,
+      `sonner.tsx`).
+    - 296 tests passing (292 plus `hitArea.test.tsx`'s four). Full gate
+      green, including the new `eslint src` step.
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:
