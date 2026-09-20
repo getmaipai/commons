@@ -1,4 +1,4 @@
-# getmaipai/shared
+# getmaipai/commons
 
 The org's libraries: code every MaiPai product imports, published once and
 pinned by tag rather than copied. Decided 2026-09-20 (see
@@ -6,27 +6,30 @@ pinned by tag rather than copied. Decided 2026-09-20 (see
 layer and its reconciled kit, plus the helpers Home and the Stack had each
 grown their own copy of, needed one home instead of two.
 
-Public (2026-09-20): every product (`home`, `stack`, `bot`, `go`) and
-every `catalog` package pins a tag here by checking it out, no
-credential required.
+Public (2026-09-20): every product (`home`, `stack`, `bot`, `go`) and every
+`catalog` package pins a tag here, no credential required. The repo was named
+`shared` until 2026-09-20; the old address redirects.
 
 ## Workspaces and their current tags
 
 | Workspace | Package | Current tag | Consumers |
 |---|---|---|---|
-| `ui/` | `@maipai/ui` | `ui-v0.2.4` | Home (Go and catalog packages later) |
+| `ui/` | `@maipai/ui` | `ui-v0.4.0` | Home (Go and catalog packages later) |
 | `core/` | `@maipai/core` | `core-v0.1.0` | Home, Stack |
-| `spec/` | `@maipai/spec` | `spec-v0.1.1` | Home, Stack, Catalog, Bot, Go |
+| `spec/` | `@maipai/spec` | `spec-v0.1.2` | Home, Stack, Catalog (Bot and Go later) |
 
-A consumer pins one of these tags and states it in its own dev docs; bumping is
-a checkout of the sibling at the new tag plus `bun install` (the
-`@maipai/standards` pattern, no registry).
+A consumer pins one of these tags and states it in its own dev docs. Bumping is two edits in the consumer: the tag in its
+`scripts/check.sh` and the matching `file:` path in its
+`package.json`, then `bun install --force`; the consumer's gate calls
+`scripts/ensure-tag.sh <workspace> <tag>` here, which creates a read-only
+worktree of that tag beside this checkout the first time and reuses it after
+(the `@maipai/standards` pattern, no registry).
 
-Nothing in `shared` imports a product. A consuming repo resolves each
-workspace from a sibling checkout (`MAIPAI_SHARED_DIR` overrides
-`../shared`) and states the tag it pins in its own dev docs; see
-[docs/dev.md](docs/dev.md) for the pin mechanics and why there is no
-registry.
+Nothing in `commons` imports a product. A consuming repo resolves each
+workspace from the per-tag worktree, never from this working checkout
+(`MAIPAI_SHARED_DIR` tells a consumer where this repo is; the default is the
+sibling folder); see [docs/dev.md](docs/dev.md) for the pin mechanics,
+SHARED-PIN-01, and why there is no registry.
 
 Org standards apply and are auto-loaded from the parent directory
 `CLAUDE.md` (source: [getmaipai/.github](https://github.com/getmaipai/.github)).
