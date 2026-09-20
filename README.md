@@ -10,7 +10,7 @@ grown their own copy of, needed one home instead of two.
 
 | Workspace | Package | Current tag | Consumers |
 |---|---|---|---|
-| `ui/` | `@maipai/ui` | `ui-v0.2.2` | Home (Go and catalog packages later) |
+| `ui/` | `@maipai/ui` | `ui-v0.2.4` | Home (Go and catalog packages later) |
 | `core/` | `@maipai/core` | `core-v0.1.0` | Home, Stack |
 | `spec/` | `@maipai/spec` | not yet tagged (moves from home/spec at 0c) | Home, Stack, Catalog, Bot, Go |
 
