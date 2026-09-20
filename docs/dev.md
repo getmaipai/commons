@@ -627,8 +627,71 @@ pinned tag changes.
   Every module's tests are carried or (where nothing existed, or the
   API changed) written fresh against the new shape; `bun test` is 126
   passing across the 18 modules (16 extracted + the 2 internal helpers).
-- `spec/`: not moved. A README points at `home/spec`, still the source of
-  truth until `spec-v0.1.0` (step 0c) moves it here whole.
+- `spec/`: `spec-v0.1.0` landed. Moved whole from `home/spec` (234 tracked
+  files: `schemas/`, `fixtures/`, `gen/ts` and `gen/py`, `errors/`,
+  `settings/`, `vocab/`, `ui/` schema, `records/`, `interpreters/`,
+  `emulators/`, `safety/`, `voice/`, `tests/`, `pyproject.toml`,
+  `package.json`, `uv.lock`) by plain copy, no shared git history - the
+  same precedent as `ui-v0.1.0`'s extraction from the Stack (a `file:`
+  workspace pinned by tag, not a subtree, needs no history). `README.md`
+  and `CHANGELOG.md` updated in place (title, the pin sections mirroring
+  `core`'s and `ui`'s, `home`/`shared` references throughout); every
+  other file byte-identical to `home/spec`. `spec`'s own `check.sh`
+  branch (already wired: `bun install && bun run lint && bun test`,
+  then `uv run ruff check . && ruff format --check .` and
+  `uv run pytest tests/py -q`) all green: 496 TS tests across 15 files,
+  237 Python tests, `tsc --noEmit` clean, ruff clean. No script or
+  `$ref` needed a path change - `scripts/gen-ts.ts` and
+  `scripts/bundle-schemas.ts` resolve the standards checkout as
+  `import.meta.dir/../../../.github`, three levels up from `spec/scripts/`
+  regardless of whether the parent directory is named `home` or `shared`.
+  - **RF-05b folded in the same tag**: the Stack's wire shapes, moved
+    read-only from `stack/backend/src/spec/` on `origin/main` (`git show`,
+    never a checkout of `stack/` - the hard boundary held) into a new
+    `spec/stack/` domain folder (`stack/README.md`, `stack/ts/*.ts` -
+    nine hand-written Zod mirrors: role request/reply headers, the
+    stack-event envelope, health-item, stack-setting, precious-state,
+    stack-job, and the two STT session types that mirror
+    `spec/voice/ts/sttTypes.ts`). Their nine schemas landed flat in
+    `spec/schemas/` (27 → 36) and their fixtures flat in
+    `spec/fixtures/<shape-name>/` (`valid-*`/`invalid-*` pairs, a
+    convention new to this workspace - the existing `fixtures/records/`
+    holds one valid example per schema, no invalid cases) because both
+    the schemas' own `$id` (`https://getmaipai.github.io/shared/spec/
+    schemas/<name>.schema.json`) and the test's own path construction
+    already fixed those two locations; only the `ts/` mirror's location
+    was an open choice, decided as a `stack/` domain folder to match the
+    existing convention (`records/ts`, `safety/ts`, `voice/ts` - each a
+    named domain, not a flat top-level `ts/`) rather than inventing a
+    flat one to match Stack's own temporary layout literally. The test,
+    `stack/backend/tests/spec.test.ts`, moved to
+    `spec/tests/ts/stack-fixtures.test.ts` with its nine imports
+    repointed from `@/spec/ts/*` (Stack's own backend alias) to
+    `../../stack/ts/*`; behavior otherwise unchanged (Ajv 2020 against
+    each schema, the Zod mirror, both required to agree with the
+    fixture's own `valid-`/`invalid-` name). None of the nine schemas
+    `$ref` anything and none of the nine Zod mirrors import anything but
+    `zod`, so the copy needed no schema or type wiring. The Stack's own
+    backend still carries its temporary copy and still imports it as
+    `@/spec/*` - repointing it to `@maipai/spec` and deleting the
+    temporary copy is Session A's own later item, per RF-05b; this move
+    only lands the shapes here.
+  - **One test left behind, on purpose**:
+    `spec/tests/ts/package-bronze.test.ts` (home/spec's bronze
+    completeness check against `docs/PACKAGES.md`) reads
+    `home`'s own `backend/packages/` directory by a relative path that
+    only resolved because `spec/` used to live inside `home/`. Copying
+    it broke that path outright (`shared/backend/packages` does not
+    exist), which is the symptom of a real design defect the test's own
+    top comment already flagged as a risk: a workspace `shared` imports
+    no product (`docs/dev.md`, "Dependency direction") cannot also carry
+    a test whose only job is reading a specific product's bundled
+    content - the coupling is structural, not just a broken path. Left
+    out of this tag rather than patched; it belongs in `home`'s own test
+    suite instead, importing `PackageManifest`/`lintSpeechTemplate` from
+    `@maipai/spec` once pinned. That move is scoped into the next step
+    (Home pins `spec-v0.1.0`), not this one - the file still exists,
+    unchanged, at `home/spec/tests/ts/package-bronze.test.ts` today.
 
 ## Tooling
 

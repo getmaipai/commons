@@ -180,14 +180,26 @@ capability, needs its own design pass first).
 
 ## `spec`
 
-- [ ] **M** `spec-v0.1.0`: move `home/spec` whole (`pyproject.toml`, the
+- [x] **M** `spec-v0.1.0`: move `home/spec` whole (`pyproject.toml`, the
   Python package, `gen/`, `schemas.resolved/`, fixtures, tests, `uv.lock`)
   into `spec/` here. Acceptance: `bun test` and
   `uv run pytest tests/py -q` green inside `shared/check.sh`, tag
-  `spec-v0.1.0` pushed. Exit check: `bash scripts/check.sh`.
+  `spec-v0.1.0` pushed. Exit check: `bash scripts/check.sh`. RF-05b
+  folded into the same tag: the Stack's wire shapes moved read-only from
+  `stack/backend/src/spec/` (`origin/main`) into `spec/stack/`, their
+  schemas and fixtures into `spec/schemas/` and `spec/fixtures/`. One
+  test left behind on purpose (`spec/tests/ts/package-bronze.test.ts` -
+  reads a product's bundled packages directory, structurally belongs in
+  `home`, not a product-agnostic library); tracked in the next item
+  below, not a new one. `docs/dev.md`, "Workspace status", has the full
+  writeup.
 - [ ] **S** Home pins `spec` and removes the workspace, moving its
-  `check.sh` "spec: standards gen/ presence" block here. Exit check:
-  `home/scripts/check.sh`.
+  `check.sh` "spec: standards gen/ presence" block here, and moving
+  `home/spec/tests/ts/package-bronze.test.ts` into `home`'s own test
+  suite (imports `PackageManifest`/`lintSpeechTemplate` from
+  `@maipai/spec` instead of a relative `gen/ts`/`voice/ts` path - left
+  behind by the `spec-v0.1.0` move above, still sitting unchanged at
+  that path today). Exit check: `home/scripts/check.sh`.
 - [ ] **S** Catalog deletes `catalog/schema/` and
   `scripts/refresh-schema.sh`, pins `@maipai/spec`, and its lint reads
   the resolved schemas from the pinned package. Exit check:

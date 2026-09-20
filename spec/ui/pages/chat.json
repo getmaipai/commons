@@ -1,0 +1,10 @@
+{
+  "type": "page",
+  "id": "chat",
+  "title": "Chat",
+  "body": [
+    {
+      "type": "message_thread"
+    }
+  ]
+}
