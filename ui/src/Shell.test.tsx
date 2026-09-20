@@ -82,6 +82,23 @@ describe("Shell", () => {
     expect(queryByRole("dialog")).not.toBeInTheDocument();
   });
 
+  test("without a search config, no header search button exists either", () => {
+    const { queryByRole } = renderShell();
+    expect(queryByRole("button", { name: "Search" })).not.toBeInTheDocument();
+  });
+
+  // A phone has no Cmd+K - without a real button, search would exist on
+  // desktop and vanish on phone (owner ruling, 2026-09-20, on Home's own
+  // adoption: "one product, every screen" forbids exactly that).
+  test("with a search config, clicking the header search button opens the palette", () => {
+    const { getByRole, queryByRole } = renderShell({
+      search: { groups: [], query: "", onQueryChange: () => {}, onSelect: () => {} },
+    });
+    expect(queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(getByRole("button", { name: "Search" }));
+    expect(getByRole("dialog")).toBeInTheDocument();
+  });
+
   test("with a search config, Cmd+K opens the command palette", () => {
     const { getByRole } = renderShell({
       search: {

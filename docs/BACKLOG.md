@@ -49,10 +49,14 @@ capability, needs its own design pass first).
 - [x] **S** `ui-v0.1.1`: ported docs/UI.md's 48px touch-target/16px type
   floor into the primitives that shipped unhardened (they came through
   the Stack path rather than Home's own already-audited kit copy) -
-  found mid-Home-adoption comparing the two kits directly. 279 tests
+  found mid-Home-adoption comparing the two kits directly. 281 tests
   passing, plus a second review pass that caught and fixed five real
   overlap bugs the port introduced or exposed (see dev.md). See dev.md's
   "Workspace status" for the full file-by-file inventory.
+- [x] **S** `ui-v0.1.2`: `Shell`'s command palette gained a real header
+  search button (owner ruling, 2026-09-20: no button meant search
+  existed on desktop's Cmd/Ctrl+K and vanished on phone, which "one
+  product, every screen" forbids). 283 tests passing.
 - [ ] **S** A shared helper for the touch-target hit-area technique
   (`relative` + `before:`/`after:-inset-N`): hand-derived independently
   at every call site across `button.tsx`, `toggle.tsx`, `checkbox.tsx`

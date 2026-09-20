@@ -4,6 +4,18 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.1.2] - ui-v0.1.2
+
+### Added
+- `Shell`'s header now renders a real search button whenever `search` is
+  configured (opens the same command palette Cmd/Ctrl+K does). Owner
+  ruling, 2026-09-20, on Home's own adoption: a phone has no keyboard
+  shortcut, so without a visible trigger, search would exist on desktop
+  and vanish on phone - exactly what "one product, every screen"
+  forbids. The palette's open state stays internal to `Shell`; no new
+  prop, since the button already covers the one thing that needed to
+  open it.
+
 ## [0.1.1] - ui-v0.1.1
 
 ### Fixed

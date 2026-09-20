@@ -266,9 +266,24 @@ pinned tag changes.
       hit-target numbers (44px toggle, 40-44px header controls, 36px
       footer item) predate this floor and don't govern the kit.
     - Regression coverage: `ui/src/ui/touch-target-floor.test.tsx`,
-      class-level assertions per fixed primitive (11 tests). The
+      class-level assertions per fixed primitive (13 tests, two more
+      added with the dropdown-menu-item and toggle-group fixes). The
       rendered-geometry proof stays Home's `scripts/screenshot.ts` gate.
-      279 tests passing across 43 files.
+      281 tests passing across 43 files.
+  - **`ui-v0.1.2` (2026-09-20): a real search button.** Owner ruling on
+    Home's own step-5 adoption: `Shell`'s command palette had a Cmd/Ctrl+K
+    listener and no visible way to open it - fine on desktop, but a phone
+    has no keyboard shortcut, so search existed on one surface and not
+    the other, which "one product, every screen" rules out. `Shell.tsx`
+    now renders a real header search button (`Button`/`icon`, 48px,
+    already floor-compliant from ui-v0.1.1) whenever `search` is
+    configured, right of `headerTitle` and left of `headerActions`,
+    calling the same internal `setPaletteOpen` the keyboard shortcut
+    already used. No new prop: the palette's open state stays internal to
+    `Shell`, since this button is the only thing that ever needed to
+    trigger it. Two new tests (`Shell.test.tsx`): no button renders
+    without a `search` config, and clicking it with one opens the
+    dialog. 283 tests passing across 43 files.
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:

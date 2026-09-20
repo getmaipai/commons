@@ -24,7 +24,13 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
     <div data-nav-mode="pinned" className="flex min-h-0 flex-1 flex-col">
       {groups.map((group) => (
         <SidebarGroup key={group.label} className="group/nav p-0">
-          <SidebarGroupLabel className="mt-4 mb-2 h-4 px-2 text-xs font-semibold tracking-wide text-sidebar-foreground/60 uppercase group-data-[collapsible=icon]:hidden">{group.label}</SidebarGroupLabel>
+          {/* text-base, not text-xs, and h-auto, not the h-4 that fit only
+              the old size: the type floor (docs/UI.md) applies to this
+              real section heading - a call-site className override on
+              SidebarGroupLabel had silently defeated the primitive's own
+              fixed default (the same class of bug a code review caught in
+              PropertyPanel/KeyValueList's own size overrides). */}
+          <SidebarGroupLabel className="mt-4 mb-2 h-auto px-2 font-semibold tracking-wide text-sidebar-foreground/60 uppercase group-data-[collapsible=icon]:hidden">{group.label}</SidebarGroupLabel>
           <SidebarMenu className="gap-0">
             {group.items.map((item) => {
               const Icon = item.icon ? getIcon(item.icon) : null;
