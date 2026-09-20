@@ -15,6 +15,10 @@ capability, needs its own design pass first).
 
 ## `core`
 
+- [x] **core's own ESLint gate** (S): `core/eslint.config.js`,
+  typescript-eslint recommended plus "core imports no product"; verified
+  at this commit.
+
 - [x] **M** `core-v0.1.0`: sixteen modules landed - `log`, `withTimeout`,
   `paths`, `archive`, `zip` (`diagnostics`'s one generic piece),
   `hardware`, `openapi`, `secretThrottle`, `hlc`, `id`, `secrets`,

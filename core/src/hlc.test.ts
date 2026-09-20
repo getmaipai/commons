@@ -88,7 +88,7 @@ describe("createHlcClock().seed()", () => {
 
   test("seeding with the same wall_ms but a LOWER counter is a no-op, not a regression", () => {
     const clock = createHlcClock("abc123");
-    const first = clock.next();
+    clock.next();
     const second = clock.next();
     const [wallMs] = second.split(":");
     clock.seed(`${wallMs}:0:zzzzzz`); // strictly lower counter at the identical wall_ms
