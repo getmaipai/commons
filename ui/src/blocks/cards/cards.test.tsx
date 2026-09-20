@@ -27,6 +27,15 @@ test("MetricCard renders the count, label and a linked state", () => {
   expect(document.querySelector('a[href="/settings/updates"]')?.textContent).toBe("2 updates available");
 });
 
+// Regression for the touch-target half of the bug contrast.test.ts's
+// own "MetricCard state-link" block covers the color half of (a review
+// caught this exact link at 79x17, under the 48px floor).
+test("MetricCard's state link carries a touch-target extension", () => {
+  render(<MemoryRouter><MetricCard icon="wrench" hue="--hue-orange" count={1} label="Repairs" state="View repairs" stateHref="/settings/repairs" /></MemoryRouter>);
+  const link = document.querySelector('a[href="/settings/repairs"]');
+  expect(link?.className).toContain("before:-inset-3");
+});
+
 test("Sparkline renders a polyline that skips null samples as gaps", () => {
   const points = [
     { at: "2026-09-20T00:00:00Z", value: 10 },

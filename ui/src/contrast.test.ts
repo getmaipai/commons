@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { STATE_LINK_HUE_MIX } from "@/kit/blocks/cards/MetricCard";
 
 const css = readFileSync(resolve(import.meta.dir, "tokens.css"), "utf8");
 
@@ -40,6 +41,21 @@ const themes: Theme[] = [
 ];
 
 const secondaryText: Record<string, string> = { light: readVar(lightRoot, "--muted-foreground"), dark: readVar(darkRoot, "--muted-foreground") };
+
+// The six named hues (spec section 1) live in the unconditional `@theme`
+// block, not `:root`/`.dark` - blue is `--primary` itself, which IS
+// theme-varying (it's the one hue token with a real light/dark pair),
+// so it reads from each theme's own root block; the other five are
+// fixed across themes, read once.
+const themeBlock = block(css, "@theme {", "}");
+const HUES: Record<string, string> = {
+  violet: readVar(themeBlock, "--hue-violet"),
+  teal: readVar(themeBlock, "--hue-teal"),
+  orange: readVar(themeBlock, "--hue-orange"),
+  pink: readVar(themeBlock, "--hue-pink"),
+  red: readVar(themeBlock, "--hue-red"),
+};
+const blueByTheme: Record<string, string> = { light: readVar(lightRoot, "--primary"), dark: readVar(darkRoot, "--primary") };
 
 // Linear-RGB alpha blend, not the OKLab `color-mix()` Tailwind's own
 // opacity modifiers actually use in the browser - a reasonable
@@ -93,6 +109,25 @@ describe("WCAG AA contrast over the spec's surfaces (both themes)", () => {
         const floor = surfaceName === "raised panel" ? 3.0 : 4.5;
         if (surfaceName === "raised panel" && ratio < 4.5) console.log(`${theme.name} secondary-on-raised-panel: ${ratio.toFixed(2)}:1 (below 4.5, the 12px-supporting-text exception applies)`);
         expect(ratio).toBeGreaterThanOrEqual(floor);
+      });
+    }
+  }
+});
+
+// A regression test for the bug a review caught live: MetricCard's
+// state-link color (a hue mixed toward --foreground, MetricCard.tsx's
+// own STATE_LINK_HUE_MIX) read as low as 2.35:1 for a raw hue, and
+// still 3.93:1 for teal specifically at an earlier 60/40 mix - every
+// named hue, both themes, against the panel surface the card actually
+// renders on.
+describe("WCAG AA contrast for MetricCard's state-link hue blend (both themes)", () => {
+  for (const theme of themes) {
+    const hues: Record<string, string> = { blue: blueByTheme[theme.name]!, ...HUES };
+    for (const [hueName, hueHex] of Object.entries(hues)) {
+      test(`${theme.name}: ${hueName} state link on panel clears 4.5`, () => {
+        const blended = blendedHex(hueHex, theme.primaryText, STATE_LINK_HUE_MIX);
+        const ratio = contrastRatio(blended, theme.surfaces.panel!);
+        expect(ratio).toBeGreaterThanOrEqual(4.5);
       });
     }
   }

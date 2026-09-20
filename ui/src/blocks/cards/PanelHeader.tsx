@@ -37,7 +37,12 @@ export function PanelHeader({ icon, hue, title, linkLabel, linkAriaLabel, linkHr
     <div className={cn("flex items-center justify-between gap-3 border-b border-[var(--border)] pb-3", className)}>
       <div className="flex min-w-0 items-center gap-3">
         <IconTile icon={icon} hue={hue} size="sm" />
-        <h3 className="truncate text-base font-semibold sm:text-lg">{title}</h3>
+        {/* h2, not h3: the page's own fixed destination title is the
+            page's one h1 (spec "Current destination header rule") - a
+            panel header is the next real heading down, not a third
+            level, or axe's own heading-order check (a real gate finding,
+            not a style nit) flags the skipped h2. */}
+        <h2 className="truncate text-base font-semibold sm:text-lg">{title}</h2>
       </div>
       {/* py-0.5 (real box growth, the text-sm content's 20px line-height
           to 24px) plus hitArea(3)'s +24px overhang reaches the 48px

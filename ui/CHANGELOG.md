@@ -4,6 +4,28 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.3.1] - ui-v0.3.1
+
+Two real bugs `ui-v0.3.0`'s own live verification hadn't caught, found by
+`home`'s screenshot-pipeline a11y gate on its first post-merge run.
+
+### Fixed
+- `MetricCard`'s state link (`stateHref`, e.g. "View repairs") measured
+  as low as 2.35:1 color contrast on the light theme (a raw hue color
+  on white) and a 79x17px touch target, both under the kit's own
+  floors. Fixed: the link's color mixes the hue 50/50 with the theme's
+  own `--foreground` (`STATE_LINK_HUE_MIX`, exported so the new
+  `contrast.test.ts` check tests the exact number the component uses,
+  not a second copy); `hitArea(3)` plus real padding for the touch
+  target. A first attempt at 60/40 still left teal under 4.5:1 (3.93:1)
+  - `contrast.test.ts` now checks every named hue, both themes, against
+    the panel surface, so the next ratio change is caught here instead
+    of live.
+- `PanelHeader`'s title rendered as an `<h3>` directly under a page's
+  own fixed `<h1>`, an axe heading-order violation (no h2 in between).
+  Fixed to `<h2>` - the panel header is the next real heading down from
+  a destination's own title, not a third level.
+
 ## [0.3.0] - ui-v0.3.0
 
 Home's shell and dashboard, to the owner's ruling on "Home's pages under
