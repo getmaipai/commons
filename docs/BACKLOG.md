@@ -76,6 +76,17 @@ capability, needs its own design pass first).
   already did). A new `contrast.test.ts` regression test guards the
   sidebar label's own opacity against this bug class going forward. 292
   tests passing.
+- [x] **S** `ui-v0.1.6`: `ui-v0.1.5`'s `package.json` `"exports"` field
+  (added for a `"./eslint-config"` alias) broke every OTHER subpath
+  import the moment it installed externally - `exports`, once present
+  at all, blocks every subpath not explicitly listed, and `shared`'s own
+  gate never exercises the package through an external `node_modules`
+  boundary the way Home does, so nothing here caught it. Found
+  re-pinning Home (`bun test`: "Cannot find module
+  '@maipai/ui/src/primitives/Page'" everywhere). Fixed by dropping
+  `exports` entirely; the ESLint config is importable at its real file
+  path instead (`@maipai/ui/eslint.config.js`). `ui-v0.1.5` is not
+  retagged (never move a pushed tag). 296 tests passing, unchanged.
 - [ ] **S** `react-router-dom` as a peer, not direct, dependency of
   `ui` (matching `react`/`react-dom` already are): found live in Home's
   own step-5 adoption - a direct dependency meant two separate
@@ -103,8 +114,9 @@ capability, needs its own design pass first).
   today. Matters once `bot`/`go` adopt the kit without Home's gate.
   Exit check: `ui/scripts/check.sh` green with the new lint/sweep wired.
   Verified at this commit (the ESLint flat config shipped as
-  `@maipai/ui/eslint-config` and enforced by `ui/scripts/check.sh`; the
-  touch-target/type-floor sweep remains open).
+  `ui/eslint.config.js`, importable by a consumer at
+  `@maipai/ui/eslint.config.js`, and enforced by `ui/scripts/check.sh`;
+  the touch-target/type-floor sweep remains open).
 - [ ] **M** Home adopts `ui`: pin the tag, replace `@/kit` and
   `shell/Shell.tsx` with `@maipai/ui` across its 45 consumer files, wiring
   Home's `ProfileSwitcher`, `NotificationBell`, search providers and

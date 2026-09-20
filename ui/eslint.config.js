@@ -1,7 +1,9 @@
 // The kit's own ESLint gate (docs/UI.md > The kit: "the kit ships the ESLint
 // config every repo and catalog CI run: no other component libraries, no
 // raw colors, no inline layout outside the primitives, icons only from
-// lucide by name"). A consumer extends it as `@maipai/ui/eslint-config`.
+// lucide by name"). A consumer extends it as `@maipai/ui/eslint.config.js`
+// (the real file path - this package ships no `exports` field, so no
+// subpath is ever accidentally blocked for a future consumer).
 import tseslint from "typescript-eslint";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";

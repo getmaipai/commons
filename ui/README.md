@@ -19,11 +19,14 @@ real package) resolves `@maipai/ui/src/*` directly.
 
 ## Lint
 
-The kit ships its own ESLint flat config as `@maipai/ui/eslint-config`
-(exported from `eslint.config.js`): jsx-a11y recommended, the
-better-tailwindcss correctness rules with the token entry pointed at
-`src/tokens.css`, and the kit's own import rules (lucide only through
-`getIcon`/`icons`, `@radix-ui/*` only under `src/ui/`, no other component
-library) plus no raw colors in JSX `style` attributes. A consumer extends
-it in its own config with `... (await import("@maipai/ui/eslint-config"))
-.default` and gets the same gate its CI must pass.
+The kit ships its own ESLint flat config as `eslint.config.js`: jsx-a11y
+recommended, the better-tailwindcss correctness rules with the token
+entry pointed at `src/tokens.css`, and the kit's own import rules
+(lucide only through `getIcon`/`icons`, `@radix-ui/*` only under
+`src/ui/`, no other component library) plus no raw colors in JSX
+`style` attributes. A consumer extends it in its own config with
+`... (await import("@maipai/ui/eslint.config.js")).default` (the real
+file path, matching this package's own no-barrel convention above - no
+`exports` field means no subpath is ever accidentally blocked for
+`bot`/`go`/any future consumer) and gets the same gate its CI must
+pass.

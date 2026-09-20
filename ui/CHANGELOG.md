@@ -4,6 +4,22 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.1.6] - ui-v0.1.6
+
+### Fixed
+- `ui-v0.1.5`'s `"./eslint-config"` alias came bundled with a
+  `package.json` `"exports"` field - which, once present at all, blocks
+  every subpath Node/bun module resolution doesn't explicitly list,
+  breaking every `@maipai/ui/src/*` import across Home (and any future
+  `bot`/`go` consumer) the moment it installed. Found live re-pinning
+  Home to `ui-v0.1.5` (`bun test` failing on "Cannot find module
+  '@maipai/ui/src/primitives/Page'" everywhere). Fixed by dropping
+  `"exports"` entirely - the ESLint config is importable at its real
+  file path, `@maipai/ui/eslint.config.js`, matching this package's own
+  no-barrel convention (`README.md`) instead of adding a second,
+  competing subpath convention. `ui-v0.1.5` itself is not retagged
+  (never move a pushed tag); Home pins `ui-v0.1.6`.
+
 ## [0.1.5] - ui-v0.1.5
 
 ### Added
@@ -12,6 +28,7 @@ tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
   `src/tokens.css`, lucide-only-via-`icons.ts`, radix-only-under-`src/
   ui`, no other component library, no raw color in a `style` attribute).
   `"lint"` is now `tsc --noEmit && eslint src`, not typecheck alone.
+  **Broken for any external consumer - see `ui-v0.1.6` above.**
 
 ### Changed
 - `utils.ts` gained `hitArea(1 | 2 | 3)`, one definition for the

@@ -395,7 +395,30 @@ pinned tag changes.
       lint findings fixed as part of landing it clean (`MetricCard.tsx`,
       `sonner.tsx`).
     - 296 tests passing (292 plus `hitArea.test.tsx`'s four). Full gate
-      green, including the new `eslint src` step.
+      green, including the new `eslint src` step - `shared`'s own gate
+      never exercises an EXTERNAL consumer's subpath resolution, which
+      is exactly what this tag broke; see `ui-v0.1.6` immediately below.
+  - **`ui-v0.1.6` (2026-09-20): `ui-v0.1.5`'s `exports` field broke
+    every external subpath import, found re-pinning Home.** The
+    `"./eslint-config"` alias `ui-v0.1.5` shipped came bundled with a
+    `package.json` `"exports"` field - but ANY `exports` field, once
+    present, switches Node/bun module resolution to strict mode for the
+    whole package: every subpath not explicitly listed stops resolving.
+    `@maipai/ui/src/primitives/Page`, `@maipai/ui/src/ui/button`, and
+    every other real subpath import Home's entire step-5 adoption
+    depends on broke the moment `ui-v0.1.5` installed ("Cannot find
+    module" on nearly every `bun test` file in Home's own suite) -
+    invisible from inside `shared`'s own gate, since nothing here
+    consumes the package through its own `node_modules` boundary the
+    way an external consumer does. Fixed by dropping `"exports"`
+    entirely rather than trying to enumerate every subpath in it - the
+    ESLint config is importable at its real file path instead
+    (`@maipai/ui/eslint.config.js`), matching this package's own
+    established no-barrel convention (`README.md`) rather than adding a
+    second, competing one. `ui-v0.1.5` itself is not retagged (never
+    move a pushed tag, org CLAUDE.md); Home pins `ui-v0.1.6`. Verified
+    against the real external break: Home's own full `scripts/check.sh`
+    (below), not just `shared`'s own gate.
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:
