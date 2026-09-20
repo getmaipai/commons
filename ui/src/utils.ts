@@ -41,3 +41,36 @@ export function hitArea(insetStep: 1 | 2 | 3): string {
   };
   return steps[insetStep];
 }
+
+// A raw `var(--hue-*)` text color fails WCAG AA on every hue against
+// both a plain panel and a 15%-tinted pill of the same hue, in both
+// themes (found live on MetricCard's state link, 2.35:1 orange on
+// white; found again by contrast math, before shipping, on StatusPill
+// and TypeBadge's pill background - every hue failed 4.5:1 in light
+// theme, several in dark). Mixed 50/50 with the theme's own
+// `--foreground` clears 4.5:1 for all six hues, both themes, against
+// every background this kit blends a hue text color onto (contrast.test.ts's
+// "hue text mix" block is the proof); 60/40 hue-leaning was tried first
+// and still left teal under 4.5:1 (3.93:1). One ratio, so a future
+// change is caught in the one test that checks it, not live.
+export const HUE_TEXT_MIX = 0.5;
+
+/** `color-mix(in srgb, ...)` for text in a hue color, legible on any
+ * surface this kit tints with the same hue (see `HUE_TEXT_MIX`). */
+export function hueTextColor(hue: string): string {
+  return `color-mix(in srgb, var(${hue}) ${HUE_TEXT_MIX * 100}%, var(--foreground) ${100 - HUE_TEXT_MIX * 100}%)`;
+}
+
+// Spec section 1 ("Pills and badges"): a status pill or type badge's
+// background is the hue at 15% over the panel. One number, shared by
+// StatusPill and TypeBadge, after a review found the literal `15`
+// living separately in both (plus a third copy in contrast.test.ts) -
+// exactly the kind of drift HUE_TEXT_MIX's own history (60/40 to 50/50)
+// already showed this file's ratios are prone to.
+export const HUE_PILL_TINT = 0.15;
+
+/** `color-mix(in srgb, ...)` for a pill/badge's own tinted background
+ * (see `HUE_PILL_TINT`). */
+export function hueTintBackground(hue: string): string {
+  return `color-mix(in srgb, var(${hue}) ${HUE_PILL_TINT * 100}%, transparent)`;
+}

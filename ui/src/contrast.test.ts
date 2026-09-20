@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { STATE_LINK_HUE_MIX } from "@/kit/blocks/cards/MetricCard";
+import { HUE_PILL_TINT, HUE_TEXT_MIX } from "@/kit/utils";
 
 const css = readFileSync(resolve(import.meta.dir, "tokens.css"), "utf8");
 
@@ -115,18 +115,39 @@ describe("WCAG AA contrast over the spec's surfaces (both themes)", () => {
 });
 
 // A regression test for the bug a review caught live: MetricCard's
-// state-link color (a hue mixed toward --foreground, MetricCard.tsx's
-// own STATE_LINK_HUE_MIX) read as low as 2.35:1 for a raw hue, and
-// still 3.93:1 for teal specifically at an earlier 60/40 mix - every
-// named hue, both themes, against the panel surface the card actually
-// renders on.
-describe("WCAG AA contrast for MetricCard's state-link hue blend (both themes)", () => {
+// state-link color (a hue mixed toward --foreground, kit/utils.ts's own
+// HUE_TEXT_MIX) read as low as 2.35:1 for a raw hue, and still 3.93:1
+// for teal specifically at an earlier 60/40 mix - every named hue, both
+// themes, against the panel surface the card actually renders on.
+describe("WCAG AA contrast for the kit's hue-text-mix (both themes)", () => {
   for (const theme of themes) {
     const hues: Record<string, string> = { blue: blueByTheme[theme.name]!, ...HUES };
     for (const [hueName, hueHex] of Object.entries(hues)) {
       test(`${theme.name}: ${hueName} state link on panel clears 4.5`, () => {
-        const blended = blendedHex(hueHex, theme.primaryText, STATE_LINK_HUE_MIX);
+        const blended = blendedHex(hueHex, theme.primaryText, HUE_TEXT_MIX);
         const ratio = contrastRatio(blended, theme.surfaces.panel!);
+        expect(ratio).toBeGreaterThanOrEqual(4.5);
+      });
+    }
+  }
+});
+
+// A second, worse-case regression test found before shipping (not live):
+// StatusPill and TypeBadge tint their own pill background with the same
+// hue at 15% (spec section 1's "Pills and badges") and set the text to
+// the hue color - checked by hand, every named hue failed 4.5:1 in light
+// theme (as low as 1.51:1 for teal), several in dark. The same
+// HUE_TEXT_MIX fix clears every hue, both themes, against that 15%-tinted
+// background too (worse contrast to start than a plain panel, since the
+// tint pulls the background toward the hue itself).
+describe("WCAG AA contrast for the kit's hue-text-mix on a 15%-tinted pill (both themes)", () => {
+  for (const theme of themes) {
+    const hues: Record<string, string> = { blue: blueByTheme[theme.name]!, ...HUES };
+    for (const [hueName, hueHex] of Object.entries(hues)) {
+      test(`${theme.name}: ${hueName} pill text on its own 15% tint clears 4.5`, () => {
+        const pillBackground = blendedHex(hueHex, theme.surfaces.panel!, HUE_PILL_TINT);
+        const text = blendedHex(hueHex, theme.primaryText, HUE_TEXT_MIX);
+        const ratio = contrastRatio(text, pillBackground);
         expect(ratio).toBeGreaterThanOrEqual(4.5);
       });
     }

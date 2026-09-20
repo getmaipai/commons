@@ -4,6 +4,63 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.3.2] - ui-v0.3.2
+
+Wiring the Apps page (HOME-UI-02, a things-table page) into real kit
+components found three things the kit had never actually been exercised
+against: two real bugs and one real gap.
+
+### Added
+- `TypeBadge` (`src/blocks/cards/TypeBadge.tsx`): spec section 1's "same
+  shape as a status pill, without the dot" badge (App, Plugin, Person,
+  Memory, Engine in Home) - `{label, hue}`, shares `StatusPill`'s
+  15%-tint-plus-`hueTextColor` styling.
+- `HUE_PILL_TINT`/`hueTintBackground()` (`src/utils.ts`): the shared 15%
+  hue-tint-over-panel background `StatusPill` and `TypeBadge` both
+  render, one definition after a review found each writing its own
+  literal `15%` (plus a third copy in `contrast.test.ts`).
+- `DetailsPaneAction.confirmLabel`: an optional confirm/cancel step for
+  a destructive pane action (`onClick` widened to `() => void |
+  Promise<void>` so the pane can actually await it). The pane fired
+  every destructive action immediately with no confirmation at all,
+  unlike `ThingsTable`'s own row actions - found wiring a real Remove.
+  Async-safe by construction (a review pointed at the exact bug the
+  schema renderer's own `ConfirmDialog` was built to avoid, 2026-09-05:
+  Radix's default confirm closes on click before an async action
+  settles): a `busy` state disables Cancel/Confirm/every action button
+  and the pane's own Close/Escape until the confirmed `onClick` settles,
+  and a `useEffect` keyed on `identifier`/`open` clears a pending
+  confirm the instant the pane is re-rendered for a different item or
+  closes, so a stale confirm can never fire against the wrong one.
+
+### Fixed
+- `StatusPill` rendered with no background tint or text color at all - a
+  plain bordered span, missing spec section 1's "tinted with the status
+  color at 15 percent and text in the color" entirely. It had zero real
+  consumers until `DetailsPane`'s pane header got one (this same
+  release), so nothing had ever caught it live. Its "muted" statuses
+  (stopped/loading/disabled/unavailable, no real hue token) use the
+  kit's own muted surface pair instead.
+- The same contrast bug `ui-v0.3.1` fixed on `MetricCard`'s state link
+  also existed, unshipped, on `StatusPill`'s and `TypeBadge`'s own pill
+  background: a raw hue text color on a 15%-tinted pill fails 4.5:1 for
+  every named hue in light theme (as low as 1.51:1 for teal), several in
+  dark - worse than a plain panel, since the tint pulls the background
+  toward the hue itself. `HUE_TEXT_MIX`/`hueTextColor()` (was
+  `MetricCard`'s own local `STATE_LINK_HUE_MIX`, promoted here to
+  `src/utils.ts` as the one shared ratio) fixes it; `contrast.test.ts`
+  gained a block checking every hue, both themes, against this exact
+  15%-tinted background.
+- `PhoneModeContext` existed with no product ever providing it, so a
+  page's `usePhoneMode()` call (`ThingsTable`/`ThingsPage`'s own phone
+  layout switch) read `false` unconditionally, forever, regardless of
+  actual viewport width. `Shell` now provides it, tracked with the same
+  `useBreakpoint().tier === "phone"` (720px) `SidebarProvider` already
+  uses for the rail's own mobile switch - a first version tracked its
+  own separate 640px constant instead, caught by review as a second
+  breakpoint that would have disagreed with the rail between 640 and
+  719px.
+
 ## [0.3.1] - ui-v0.3.1
 
 Two real bugs `ui-v0.3.0`'s own live verification hadn't caught, found by

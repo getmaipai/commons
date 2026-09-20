@@ -3,6 +3,7 @@ import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { Shell } from "./Shell";
 import type { NavEntry } from "./nav";
+import { usePhoneMode } from "@/kit/blocks/phone/PhoneMode";
 
 afterEach(() => {
   cleanup();
@@ -126,6 +127,29 @@ describe("Shell", () => {
       fireEvent.keyDown(window, { key: "k", metaKey: true });
     });
     expect(queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  // Regression: PhoneModeContext existed with no product ever providing
+  // it - a page's usePhoneMode() call (things-page/ThingsTable's own
+  // phone layout switch) read `false` unconditionally on every screen
+  // size, found wiring the Apps page before it shipped.
+  test("provides PhoneModeContext to children, live across a resize", () => {
+    function Probe() {
+      const phone = usePhoneMode();
+      return <p>phone: {String(phone)}</p>;
+    }
+    Object.defineProperty(window, "innerWidth", { value: 1440, configurable: true });
+    const { getByText } = render(
+      <MemoryRouter>
+        <Shell nav={ENTRIES} brand={<span>Brand</span>}><Probe /></Shell>
+      </MemoryRouter>,
+    );
+    expect(getByText("phone: false")).toBeInTheDocument();
+    act(() => {
+      Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+      window.dispatchEvent(new Event("resize"));
+    });
+    expect(getByText("phone: true")).toBeInTheDocument();
   });
 
   test("selecting a search result calls onSelect and closes the palette", () => {

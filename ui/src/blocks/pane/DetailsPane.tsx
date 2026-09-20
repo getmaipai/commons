@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getIcon, type IconName } from "@/kit/icons";
 import { Button } from "@/kit/ui/button";
 import { Sheet, SheetContent } from "@/kit/ui/sheet";
@@ -12,9 +12,16 @@ const CloseIcon = getIcon("x");
 export interface DetailsPaneAction {
   label: string;
   icon?: IconName;
-  onClick: () => void;
+  onClick: () => void | Promise<void>;
   destructive?: boolean;
   disabledReason?: string;
+  /** A destructive action with no confirmLabel fires immediately on
+   * click, the same as any other action - only a destructive action
+   * that actually needs one (uninstalling a package, not merely
+   * restarting it) should set this. ThingsTable's own row/group
+   * actions already confirm this way; this pane had no confirm step
+   * at all until a Home page found the gap wiring a real Remove. */
+  confirmLabel?: string;
 }
 
 export interface DetailsPaneTab {
@@ -44,15 +51,59 @@ export interface DetailsPaneProps {
 export function DetailsPane({ open, onClose, icon, hue, name, identifier, status, tabs = [], actions = [] }: DetailsPaneProps) {
   const Icon = getIcon(icon);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const [confirming, setConfirming] = useState<DetailsPaneAction | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  // A confirm pending for one item must never survive onto a different
+  // one, or a still-open pane re-rendered for a new selection: a review
+  // caught this exact gap live - the parent swaps `identifier` as the
+  // selected row changes (the pane's own master-detail contract), and
+  // with no reset here a stale confirm banner (and its captured
+  // `onClick` closure) stayed armed for the item that was open when the
+  // user clicked, invisibly, under the new item's name.
+  useEffect(() => {
+    setConfirming(null);
+    setBusy(false);
+  }, [identifier, open]);
+
+  function runAction(action: DetailsPaneAction) {
+    if (action.confirmLabel) setConfirming(action);
+    else void action.onClick();
+  }
+
+  // Radix's own AlertDialogAction closes on click before an async
+  // action settles - the exact bug ConfirmDialog.tsx (the schema
+  // renderer's own confirm) was built to avoid (2026-09-05: a batch
+  // action that failed partway showed no error, the dialog already
+  // gone). This confirm is a plain inline block, not that dialog (a
+  // pane's own action rail, not a schema-driven `PendingConfirm`), but
+  // the same rule applies: only `onClick` settling is allowed to close
+  // it, `busy` blocks Cancel and the pane's own Close/Escape too.
+  async function confirmAction() {
+    if (!confirming) return;
+    setBusy(true);
+    try {
+      await confirming.onClick();
+    } finally {
+      setBusy(false);
+      setConfirming(null);
+    }
+  }
+
+  function requestClose() {
+    if (busy) return;
+    onClose();
+  }
 
   return (
-    <Sheet open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
+    <Sheet open={open} onOpenChange={(next) => { if (!next) requestClose(); }}>
       <SheetContent
         showCloseButton={false}
         side="right"
         role="complementary"
         aria-label={`${name} details`}
         onOpenAutoFocus={(event) => { event.preventDefault(); headingRef.current?.focus(); }}
+        onEscapeKeyDown={(event) => { if (busy) event.preventDefault(); }}
         className={cn(
           "inset-y-4 right-4 h-auto w-[560px] min-w-[480px] max-w-[640px] rounded-2xl border border-[var(--primary)]/40 bg-[var(--surface-card)] shadow-[var(--shadow-panel)]",
           "duration-200 data-[state=closed]:duration-150 data-[state=closed]:slide-out-to-right-6 data-[state=open]:slide-in-from-right-6",
@@ -70,7 +121,7 @@ export function DetailsPane({ open, onClose, icon, hue, name, identifier, status
             <p className="truncate text-xs text-muted-foreground">{identifier}</p>
           </div>
           <StatusPill status={status} />
-          <Button type="button" variant="ghost" size="icon-sm" aria-label="Close" onClick={onClose} className="max-[719px]:order-first"><CloseIcon className="size-4" aria-hidden="true" /></Button>
+          <Button type="button" variant="ghost" size="icon-sm" aria-label="Close" disabled={busy} onClick={requestClose} className="max-[719px]:order-first"><CloseIcon className="size-4" aria-hidden="true" /></Button>
         </div>
 
         {tabs.length > 0 && (
@@ -83,16 +134,27 @@ export function DetailsPane({ open, onClose, icon, hue, name, identifier, status
         )}
 
         {actions.length > 0 && (
-          <div className="mt-auto flex flex-wrap gap-4 border-t p-4 max-[719px]:sticky max-[719px]:bottom-0 max-[719px]:bg-[var(--surface-card)]">
-            {actions.map((action) => {
-              const ActionIcon = action.icon ? getIcon(action.icon) : null;
-              return (
-                <Button key={action.label} type="button" variant={action.destructive ? "destructive" : "outline"} size="sm" disabled={!!action.disabledReason} title={action.disabledReason} onClick={action.onClick} className={cn(action.destructive && "ml-auto")}>
-                  {ActionIcon && <ActionIcon className="size-4" aria-hidden="true" />}
-                  {action.label}
-                </Button>
-              );
-            })}
+          <div className="mt-auto border-t p-4 max-[719px]:sticky max-[719px]:bottom-0 max-[719px]:bg-[var(--surface-card)]">
+            <div className="flex flex-wrap gap-4">
+              {actions.map((action) => {
+                const ActionIcon = action.icon ? getIcon(action.icon) : null;
+                return (
+                  <Button key={action.label} type="button" variant={action.destructive ? "destructive" : "outline"} size="sm" disabled={!!action.disabledReason || busy} title={action.disabledReason} onClick={() => runAction(action)} className={cn(action.destructive && "ml-auto")}>
+                    {ActionIcon && <ActionIcon className="size-4" aria-hidden="true" />}
+                    {action.label}
+                  </Button>
+                );
+              })}
+            </div>
+            {confirming && (
+              <div className="mt-3 space-y-2 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
+                <p>{confirming.confirmLabel}</p>
+                <div className="flex justify-end gap-3">
+                  <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={() => setConfirming(null)}>Cancel</Button>
+                  <Button type="button" variant="destructive" size="sm" disabled={busy} onClick={() => void confirmAction()}>{busy ? "Working…" : "Confirm"}</Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </SheetContent>

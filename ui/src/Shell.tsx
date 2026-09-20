@@ -7,6 +7,8 @@ import { CommandPalette } from "@/kit/search/CommandPalette";
 import type { SearchGroup, SearchResultItem } from "@/kit/search/types";
 import type { NavEntry } from "@/kit/nav";
 import { HeaderSearchField } from "@/kit/blocks/dashboard/components/HeaderSearchField";
+import { PhoneModeContext } from "@/kit/blocks/phone/PhoneMode";
+import { useBreakpoint } from "@/kit/hooks/useBreakpoint";
 import { cn } from "@/kit/utils";
 
 function readRailPreference(storageKey: string): boolean | null {
@@ -110,6 +112,16 @@ function flatEntries(nav: readonly NavEntry[] | NavGroup[]): NavEntry[] {
 export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, search, railStorageKey = "maipai:shell-rail", footer, children }: ShellProps) {
   const [railOpen, setRailOpen] = useState<boolean>(() => readRailPreference(railStorageKey) ?? defaultRailOpen());
   const [paletteOpen, setPaletteOpen] = useState(false);
+  // The same tier `SidebarProvider` (ui/sidebar.tsx) already derives its
+  // own `isMobile` from - a second, disagreeing breakpoint constant here
+  // (there was one: a plain 640px check) would put the rail and
+  // `PhoneModeContext` at odds in the gap between the two numbers.
+  // `PhoneModeContext` existed with no product ever providing it (found
+  // wiring the Apps page's things-table: it silently never rendered its
+  // phone layout, home had no provider), so a page asking
+  // `usePhoneMode()` got `false` unconditionally, forever, on every
+  // screen size.
+  const phone = useBreakpoint().tier === "phone";
 
   useEffect(() => {
     if (readRailPreference(railStorageKey) !== null) return;
@@ -154,7 +166,7 @@ export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, s
           ) : null}
           <div className="flex flex-1 items-center justify-end gap-2">{headerActions}</div>
         </header>
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-16 sm:pb-0">{children}</div>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-16 sm:pb-0"><PhoneModeContext.Provider value={phone}>{children}</PhoneModeContext.Provider></div>
         {footer ? <div className="hidden h-10 shrink-0 items-center border-t border-border/60 sm:flex">{footer}</div> : null}
         <PhoneNav entries={entries} />
       </SidebarInset>
