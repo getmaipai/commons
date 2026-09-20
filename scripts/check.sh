@@ -35,6 +35,25 @@ if [ "$DOCS_ONLY" = 0 ]; then
     echo "== spec: pytest"
     (cd spec && uv run pytest tests/py -q)
   fi
+
+  # ensure-tag.sh: proves it creates a worktree for an existing tag and
+  # reuses it on a second call (SHARED-PIN-01), and refuses an unknown
+  # tag. core-v0.1.0 always exists in this repo's history, so it's a
+  # stable fixture. Leaves the resulting ../shared-tags/core-core-v0.1.0
+  # worktree in place afterward on purpose - that cache is meant to be
+  # reused by real consumer pins, not torn down by the gate that proved
+  # it works.
+  echo "== ensure-tag.sh: create, reuse, refuse-unknown"
+  FIRST_PATH="$(bash scripts/ensure-tag.sh core core-v0.1.0)"
+  SECOND_PATH="$(bash scripts/ensure-tag.sh core core-v0.1.0)"
+  if [ "$FIRST_PATH" != "$SECOND_PATH" ] || [ ! -d "$FIRST_PATH" ]; then
+    echo "ensure-tag.sh did not reuse the worktree it just created ($FIRST_PATH vs $SECOND_PATH)"
+    exit 1
+  fi
+  if bash scripts/ensure-tag.sh core this-tag-does-not-exist >/dev/null 2>&1; then
+    echo "ensure-tag.sh accepted an unknown tag; it must refuse"
+    exit 1
+  fi
 fi
 
 if [ "$DOCS_ONLY" = 0 ] && [ -d spec/schemas ]; then

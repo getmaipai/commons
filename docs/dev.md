@@ -40,13 +40,25 @@ reused by.
 
 Mirrors `@maipai/standards` (`../.github/standards/README.md`, "Why
 shell, not an npm package"): no registry, no publish step. A consumer
-resolves the package from the sibling checkout, `MAIPAI_SHARED_DIR`
-overriding `../shared`, and states the tag it targets (e.g. `core-v0.1.0`)
-in its own dev docs and `package.json` dependency. Its `check.sh` fails
-loud when the sibling is missing or the workspace's `package.json`
-version doesn't match the stated pin, the same honesty-of-the-pin
-contract the standards core already uses; nothing here verifies the tag
-automatically.
+does not resolve the package from the `shared` working checkout itself -
+that checkout is one mutable directory that any session on the machine
+can `git checkout` a different tag into, and a consumer reading it
+directly would silently detach underneath whoever else was relying on
+it (SHARED-PIN-01, 2026-09-20: exactly this happened - a session gating
+Home at `ui-v0.2.4` checked that tag out in `../shared` under every
+other consumer and session on the box). Instead, a consumer states the
+tag it targets (e.g. `core-v0.1.0`) in its own dev docs and
+`package.json` dependency, and its `check.sh` calls
+[`scripts/ensure-tag.sh`](../scripts/ensure-tag.sh) `<workspace> <tag>`
+before installing. That script creates `../shared-tags/<workspace>-<tag>`
+as a `git worktree add --detach` checkout of that tag the first time
+it's asked for, and reuses it - unchanged - on every call after: an
+immutable, per-tag directory nothing else on the machine can move out
+from under a consumer, instead of a shared mutable one. It refuses a
+tag this repo doesn't have rather than guessing. `check.sh` fails loud
+when the repo is missing entirely or the resolved worktree's
+`package.json` version doesn't match the stated pin, the same
+honesty-of-the-pin contract the standards core already uses.
 
 **Decided at `core-v0.1.0`: `file:`, not `link:`.** Tested directly
 (a throwaway consumer package in each form, `bun install` then a real
@@ -69,10 +81,15 @@ against a real React consumer, since that's where a duplicated React
 would actually break hooks.
 
 A consumer's own dependency entry is therefore `"@maipai/core":
-"file:../../shared/core"` (adjusted for the consumer's own depth - e.g.
-`home/backend/package.json` is two levels below the org root, so
-`../../shared/core`), re-resolved with a plain `bun install` whenever the
-pinned tag changes.
+"file:../../shared-tags/core-core-v0.1.0/core"` (adjusted for the
+consumer's own depth - e.g. `home/backend/package.json` is two levels
+below the org root, so `../../shared-tags/<workspace>-<tag>/<workspace>`),
+re-resolved with `bun install --force` (not a plain `bun install` - see
+the gotcha below) whenever the pinned tag changes. Bumping a pin is now
+"edit the tag in `package.json` and in `check.sh`, run `check.sh`": the
+gate calls `ensure-tag.sh` for the new tag, creating its worktree if
+this is the first consumer to ask for it, and the version compare reads
+that worktree rather than the old shared sibling checkout.
 
 ## Workspace status
 
@@ -799,3 +816,34 @@ collapsed, not just that the label span carries the hiding class.
 `shell-rail-{expanded,collapsed}-desktop-{light,dark}.png`; opened and
 judged: the collapsed rail shows icons only, no stray letters, in
 both themes.
+
+## Pins moved to per-tag worktrees (SHARED-PIN-01, 2026-09-20)
+
+Found live: every consumer's `file:../../shared/<workspace>` dependency
+and `check.sh` pin check read whatever the sibling `shared/` checkout
+happened to have checked out - one mutable directory shared by every
+session on the machine. A session gating Home at `ui-v0.2.4` ran `git
+checkout ui-v0.2.4` in `../shared`, which detached every other
+consumer and session reading that same directory underneath it,
+surfacing as an unexplained checkout change nobody in that other
+session had made.
+
+Fixed by resolving a pin to an immutable per-tag `git worktree` instead
+of the shared working checkout: `scripts/ensure-tag.sh <workspace>
+<tag>` creates `../shared-tags/<workspace>-<tag>` (`git worktree add
+--detach <tag>`) the first time it's asked for a tag, reuses it
+unchanged on every later call, and refuses a tag this repo doesn't
+have. See "How a consumer pins a workspace" above for the full shape;
+`shared`'s own `check.sh` proves create/reuse/refuse against the
+`core-v0.1.0` fixture tag on every run.
+
+Landed here first (this workspace needs no tag of its own for a shell
+script - a plain commit on `main`), then `home` and `catalog` move their
+`check.sh` and `package.json` `file:` paths onto the new worktree layout
+in their own commits, referencing this entry.
+
+**Verification**: `shared`'s own `scripts/check.sh` green, ensure-tag.sh's
+new create/reuse/refuse-unknown step included. Manually exercised
+end to end first (create, reuse from a second call, unknown-tag
+refusal, `git worktree list` confirming a single reusable entry), same
+behavior the gate step now checks on every run.
