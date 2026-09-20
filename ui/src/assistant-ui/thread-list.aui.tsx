@@ -69,7 +69,12 @@ export const ThreadListSearch = forwardRef<
         onChange={(event) => onValueChange(event.target.value)}
         aria-label="Search chats"
         placeholder="Search chats"
-        className={cn("h-8 ps-8 text-sm", className)}
+        // `h-8`/`text-sm` (found live, Home's step 5b - the persistent
+        // desktop thread-list column made this always-visible instead
+        // of behind a toggle) silently defeated Input's own h-12/
+        // text-base touch-target floor, the same call-site-override
+        // bug class this session found repeatedly elsewhere.
+        className={cn("ps-8", className)}
         {...props}
       />
     </div>
@@ -185,7 +190,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
     return (
       <div
         data-slot="aui_thread-list-empty"
-        className="text-muted-foreground px-2.5 py-4 text-sm"
+        className="text-muted-foreground px-2.5 py-4 text-base"
       >
         No chats found
       </div>
@@ -234,8 +239,15 @@ export const ThreadListNew = forwardRef<
         ref={ref}
         variant="ghost"
         data-slot="aui_thread-list-new"
+        // Found live, Home's step 5b (the persistent desktop
+        // thread-list column made this always-visible): `h-8`/`text-sm`
+        // silently defeated Button's own h-12/text-base touch-target
+        // floor, the same call-site-override bug class this session
+        // found repeatedly elsewhere. A caller wanting the compact
+        // header icon-only variant already overrides size/className at
+        // its own call site (AppShell/ChatPage), not here.
         className={cn(
-          "hover:bg-muted data-active:bg-muted h-8 justify-start gap-2 rounded-md px-2.5 text-sm font-normal",
+          "hover:bg-muted data-active:bg-muted justify-start gap-2 rounded-md px-2.5 font-normal",
           className,
         )}
         {...props}
@@ -270,7 +282,9 @@ const ThreadListSkeleton: FC = () => {
           role="status"
           aria-label="Loading threads"
           data-slot="aui_thread-list-skeleton-wrapper"
-          className="flex h-8 items-center px-2.5"
+          // h-12, matching the real row height above - otherwise the
+          // real list jumps taller the moment it loads.
+          className="flex h-12 items-center px-2.5"
         >
           <Skeleton
             data-slot="aui_thread-list-skeleton"
@@ -307,7 +321,11 @@ export const ThreadListItem: FC = () => {
   return (
     <ThreadListItemPrimitive.Root
       data-slot="aui_thread-list-item"
-      className="group hover:bg-muted focus-visible:bg-muted data-active:bg-muted has-focus-visible:bg-muted has-data-[state=open]:bg-muted relative flex h-8 items-center rounded-md transition-colors focus-visible:outline-none"
+      // h-12, not h-8 (found live, Home's step 5b - the persistent
+      // desktop thread-list column made every row always-visible
+      // instead of behind a toggle): docs/UI.md's 48px touch-target
+      // floor, one real thread per row.
+      className="group hover:bg-muted focus-visible:bg-muted data-active:bg-muted has-focus-visible:bg-muted has-data-[state=open]:bg-muted relative flex h-12 items-center rounded-md transition-colors focus-visible:outline-none"
     >
       {isRenaming ? (
         <ThreadListItemRename
@@ -320,7 +338,14 @@ export const ThreadListItem: FC = () => {
         <ThreadListItemPrimitive.Trigger
           ref={triggerRef}
           data-slot="aui_thread-list-item-trigger"
-          className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 focus-visible:ring-1"
+          // pe-11 (44px), not pe-9 (36px): a code review caught that
+          // switching the "More options" trigger to icon-xs (above)
+          // grows its own invisible hitArea(3) reach to 42px from the
+          // row's end (end-1.5 + the visual 24px + a 12px overhang),
+          // which pe-9's own 36px no longer clears - a real click in
+          // that 6px band would have hit the invisible more-button
+          // instead of this trigger.
+          className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-base outline-none group-hover:pe-11 group-has-focus-visible:pe-11 group-has-data-[state=open]:pe-11 group-data-active:pe-11 focus-visible:ring-1"
         >
           {isRunning && (
             <Loader2Icon
@@ -399,7 +424,14 @@ const ThreadListItemRename: FC<{
       data-slot="aui_thread-list-item-rename"
       aria-label="Rename thread"
       value={value}
-      className="h-7 min-w-0 flex-1 ps-2.5 pe-9 text-sm"
+      // Same call-site-override bug as the row and its own "More
+      // options" trigger above (`h-7`/`text-sm` defeating Input's own
+      // h-12/text-base floor) - fixed the same way, found live while
+      // fixing those. pe-11 (44px), not pe-9: the same reserved-space
+      // fix the row's own Trigger needed, so a caret placed at the end
+      // of a rename in progress doesn't land on the more-button's own
+      // now-larger invisible hitArea(3) reach instead.
+      className="min-w-0 flex-1 ps-2.5 pe-11"
       onChange={(event) => setValue(event.target.value)}
       onBlur={() => commit(false)}
       onKeyDown={(event) => {
@@ -421,9 +453,16 @@ const ThreadListItemMore: FC<{ onRename: () => void; onDelete: () => void }> = (
       <ThreadListItemMorePrimitive.Trigger asChild>
         <Button
           variant="ghost"
-          size="icon"
+          // `icon-xs`, not `icon` + a `size-6` override (found live,
+          // Home's step 5b - the persistent desktop thread-list column
+          // made this always-visible): the override was silently
+          // shrinking Button's own 48px `icon` size to 24px with no
+          // touch-target extension at all. `icon-xs` is the same 24px
+          // visual size this row's compact layout needs, but carries
+          // its own hitArea() extension to the real 48px floor.
+          size="icon-xs"
           data-slot="aui_thread-list-item-more"
-          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100"
+          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100"
         >
           <MoreHorizontalIcon className="size-3.5" />
           <span className="sr-only">More options</span>
@@ -436,9 +475,14 @@ const ThreadListItemMore: FC<{ onRename: () => void; onDelete: () => void }> = (
         data-slot="aui_thread-list-item-more-content"
         className="bg-popover text-popover-foreground data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:animate-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 overflow-hidden rounded-xl border p-1.5"
       >
+        {/* min-h-12/text-base, not the assistant-ui registry's own py-
+            1.5/text-sm (found live, Home's step 5b, the same
+            touch-target/type floor sweep as the rest of this file -
+            this menu is @assistant-ui/react's own primitive, not the
+            kit's DropdownMenuItem, so it never inherited that fix). */}
         <ThreadListItemMorePrimitive.Item
           data-slot="aui_thread-list-item-more-item"
-          className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none"
+          className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex min-h-12 cursor-pointer items-center gap-2 rounded-lg px-2.5 text-base outline-none select-none"
           onSelect={onRename}
         >
           <PencilIcon className="size-4" />
@@ -447,7 +491,13 @@ const ThreadListItemMore: FC<{ onRename: () => void; onDelete: () => void }> = (
           <ThreadListItemMorePrimitive.Item
             data-slot="aui_thread-list-item-more-item"
             onSelect={onDelete}
-            className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none"
+            // dark:hover:/dark:focus: bg-destructive/20, not just the
+            // light-mode /10 (a code review caught this): the kit's own
+            // DropdownMenuItem destructive variant (dropdown-menu.tsx)
+            // bumps the same tint in dark mode for contrast, and this
+            // menu (assistant-ui's own primitive, not that component)
+            // never inherited it.
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive dark:hover:bg-destructive/20 dark:focus:bg-destructive/20 flex min-h-12 cursor-pointer items-center gap-2 rounded-lg px-2.5 text-base outline-none select-none"
           >
             <TrashIcon className="size-4" />
             Delete

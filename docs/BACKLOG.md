@@ -146,6 +146,30 @@ capability, needs its own design pass first).
   popover), and `SourcesCard`'s row links gained `rel="noopener"` and
   an explicit `referrerPolicy` (Home's own pre-adoption copy had both;
   the port had only `rel="noreferrer"`). 307 tests passing.
+- [x] **S** `ui-v0.2.2`: `thread-list.aui.tsx`'s own call-site overrides
+  silently defeated every primitive's touch-target/type floor,
+  invisible until Home's step 5b made the thread list a persistent,
+  always-visible desktop column instead of a toggled drawer -
+  `ThreadListSearch`, `ThreadListNew`, `ThreadListItem`'s own row and
+  rename input, and the "More options" trigger (an `icon` size with a
+  `size-6` override and no touch-target extension) all bumped to their
+  primitive's own real default or `icon-xs`. A review before landing
+  caught two more: `icon-xs`'s own larger invisible hit area needed the
+  row's `pe-9` reserved space bumped to `pe-11` (or a real click could
+  land on the more-button instead of the title/rename field), and the
+  Delete item's hand-copied destructive hover was missing the kit's
+  own dark-mode contrast bump. 307 tests passing.
+- [ ] **S** `ThreadListItemMorePrimitive.Item`'s own Rename/Delete rows
+  hand-copy `DropdownMenuItem`'s base layout/floor classes
+  (`min-h-12`/`text-base`/hover-focus tokens) verbatim (found by a
+  ui-v0.2.2 review): assistant-ui's own menu primitive isn't the kit's
+  `DropdownMenuItem`, so it can't just reuse that component, but the
+  class LIST could still be one definition instead of two hand-kept
+  copies - export it from `dropdown-menu.tsx` as a constant, the same
+  `MARKDOWN_LINK_CLASS`/`FOCUS_RING` pattern `utils.ts` and
+  `markdown-text.tsx` already use for exactly this. Exit check:
+  `ui/scripts/check.sh` green, no visual change (same computed classes,
+  one definition).
 - [ ] **M** TV-focusable navigation in `Shell.tsx`: `ui-v0.1.0`'s shell
   has no `@noriginmedia/norigin-spatial-navigation` rail the way Home's
   old `Shell.tsx` did (real arrow-key/remote focus on the `far` surface).

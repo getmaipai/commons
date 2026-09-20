@@ -505,6 +505,49 @@ pinned tag changes.
       belt-and-suspenders form, caught by re-reading the file being
       replaced rather than assuming the new one already matched it.
     - 307 tests passing (a new `chat.test.tsx` case for each fix).
+  - **`ui-v0.2.2` (2026-09-20): `thread-list.aui.tsx`'s own touch-target
+    floor, found by the FULL a11y sweep for the first time.** Home's
+    step 5b turned the desktop thread list from a toggled drawer (never
+    open during a crawl, so never measured) into a persistent,
+    always-visible column - the exact same "the fast gate never
+    actually exercised this" pattern that found `ui-v0.1.3`'s
+    `nav-main.tsx` overrides. Every one of these was a call-site
+    className collapsing a primitive's own already-floor-compliant
+    default:
+    - `ThreadListSearch` (`Input`, `h-8`/`text-sm` → the primitive's own
+      `h-12`/`text-base`).
+    - `ThreadListNew` (`Button`, same `h-8`/`text-sm` override).
+    - `ThreadListItem`'s own row (`h-8` → `h-12`, `text-sm` → `text-base`
+      on its trigger) and its rename `Input` (`h-7`/`text-sm`), plus the
+      loading skeleton bumped to match so the list doesn't jump taller
+      the moment it loads.
+    - The "More options" trigger: `size="icon"` (48px) with a `size-6`
+      override and no touch-target extension at all - switched to
+      `size="icon-xs"`, the same 24px visual size this row's compact
+      layout needs, but with its own `hitArea()` extension to the real
+      floor instead of a bare, unextended shrink.
+    - Found live in the same pass, not yet flagged by the crawl itself
+      (the dropdown menu content isn't rendered during a snapshot): the
+      "More options" menu's own Rename/Delete items
+      (`ThreadListItemMorePrimitive.Item`, a different primitive than
+      the kit's own `DropdownMenuItem`, so it never inherited that
+      fix) and the "No chats found" empty state, both `text-sm`.
+    - A review before landing caught two more, both real: growing the
+      "More options" trigger's own invisible `hitArea(3)` reach to 42px
+      from the row's end needed the row's own reserved end-padding
+      bumped from `pe-9` (36px) to `pe-11` (44px), or a real click in
+      that 6px band would have landed on the invisible more-button
+      instead of the thread title or the rename field beneath it; and
+      the Delete item's hand-copied destructive hover was missing
+      `dropdown-menu.tsx`'s own `dark:...:focus:bg-destructive/20`
+      dark-mode contrast bump, carrying only the light-mode `/10`.
+      `DropdownMenuItem`'s hand-copied shape here (not reusable as-is,
+      since `ThreadListItemMorePrimitive.Item` is a different primitive)
+      is a new BACKLOG item: one shared class-list constant instead of
+      two kept-in-sync copies.
+    - 307 tests passing, unchanged - every fix here is a class-string
+      edit with no new behavior to assert, the same shape ui-v0.1.3's
+      own call-site-override fixes were.
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:

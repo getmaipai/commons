@@ -4,6 +4,30 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.2.2] - ui-v0.2.2
+
+### Fixed
+- `thread-list.aui.tsx`'s own call-site overrides silently defeated
+  every primitive's touch-target/type floor - invisible until Home's
+  step 5b made the thread list a persistent, always-visible desktop
+  column instead of a toggled drawer, when the full a11y sweep finally
+  measured it for the first time. `ThreadListSearch` (`h-8`/`text-sm`
+  on `Input`), `ThreadListNew` (`h-8`/`text-sm` on `Button`),
+  `ThreadListItem`'s own row and rename `Input` (`h-8`/`h-7`,
+  `text-sm`), and the "More options" trigger (`icon` + a `size-6`
+  override, with no touch-target extension) all bumped to their
+  primitive's own real default (or `icon-xs`, which keeps the same
+  24px visual size but carries its own `hitArea()` extension). The
+  loading skeleton row and the "More options" menu's own Rename/Delete
+  items and the "No chats found" empty state got the same floor for
+  consistency, found live in the same file. A review before landing
+  caught two more: the trigger's own larger invisible hit area needed
+  the row's reserved end-padding bumped from `pe-9` to `pe-11` (a real
+  click near the row's end could otherwise land on the invisible
+  more-button instead of the title or the rename field), and the
+  Delete item's hand-copied destructive hover was missing the kit's own
+  `DropdownMenuItem` dark-mode contrast bump.
+
 ## [0.2.1] - ui-v0.2.1
 
 ### Added
