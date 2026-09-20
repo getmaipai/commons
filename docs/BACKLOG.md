@@ -121,15 +121,24 @@ capability, needs its own design pass first).
   `ui/eslint.config.js`, importable by a consumer at
   `@maipai/ui/eslint.config.js`, and enforced by `ui/scripts/check.sh`;
   the touch-target/type-floor sweep remains open).
-- [ ] **M** Home adopts `ui`: pin the tag, replace `@/kit` and
-  `shell/Shell.tsx` with `@maipai/ui` across its 45 consumer files, wiring
-  Home's `ProfileSwitcher`, `NotificationBell`, search providers and
-  `PhoneNav` data into the new kit slots; delete the older kit and shell;
-  keep `assistant-ui/` and whatever else the ready report placed in Home.
-  Acceptance: screenshots taken before and after (`PORT=8990`,
-  headless), opened and judged for the shell and two apps at desktop and
-  phone, differences described in `dev.md`; full gate green. Exit check:
-  `home/scripts/check.sh`.
+- [x] **M** Home adopts `ui` (step 5, 2026-09-20): pinned, `@/kit` and
+  `shell/Shell.tsx` replaced with `@maipai/ui` across its consumer
+  files, `ProfileSwitcher`/`NotificationBell`/search providers/`PhoneNav`
+  data wired into the new kit slots, the older kit and shell deleted
+  (`assistant-ui/` and its own local dependencies kept in Home through
+  step 5, moved into the kit itself at `ui-v0.2.0`, below). Screenshots
+  taken before and after (headless), opened and judged for the shell
+  and two apps at desktop and phone, differences described in Home's
+  own `dev.md`; full gate green. Step 5a (same day) followed with the
+  kit's own `tokens.css` as Home's base instead of a second palette.
+  Exit check: `home/scripts/check.sh` - passing.
+- [x] **M** `ui-v0.2.0`: the kit's chat pattern (`docs/spec.md`'s new
+  "Chat" section and section 7's "One product on every screen" opening
+  paragraph), four new components (`SensesDock`, `ChildBand`,
+  `SourcesCard`, `MemoryChip` in `src/blocks/chat/`), and the
+  `@assistant-ui/react` wrappers moved in from Home's own
+  `frontend/src/kit/assistant-ui` (unchanged except imports) - Home's
+  own step-5b chat rebuild consumes this. 305 tests passing.
 - [ ] **M** TV-focusable navigation in `Shell.tsx`: `ui-v0.1.0`'s shell
   has no `@noriginmedia/norigin-spatial-navigation` rail the way Home's
   old `Shell.tsx` did (real arrow-key/remote focus on the `far` surface).

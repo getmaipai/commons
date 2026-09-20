@@ -4,6 +4,35 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.2.0] - ui-v0.2.0
+
+### Added
+- The kit's chat pattern (`docs/spec.md`'s new "Chat" section, section
+  7's own new "One product on every screen" opening paragraph): layout,
+  turn anatomy, sources card, memory chip, document pane, actions, turn
+  stats at Developer disclosure, reasoning, the senses dock, the model
+  picker in the header picker slot, the child band, the three states,
+  the phone, and the acceptance screenshot set.
+- Four new components in `src/blocks/chat/`, shaped by the spec's own
+  paragraphs, data through props: `SensesDock`, `ChildBand`,
+  `SourcesCard`, `MemoryChip`.
+- `src/assistant-ui/`: the `@assistant-ui/react` wrappers, moved here
+  from Home's own `frontend/src/kit/assistant-ui` unchanged except
+  imports (self-references repointed from the external `@maipai/ui/
+  src/*` package path to the internal `@/kit/*` alias). `src/ui/
+  textarea.tsx` moved alongside it (its only local dependency, never
+  migrated at `ui-v0.1.0`). New dependencies: `@assistant-ui/react`,
+  `@assistant-ui/react-markdown`, `remark-gfm`.
+
+### Changed
+- `eslint.config.js` gained a `src/assistant-ui/**/*.tsx` override
+  (vendored registry code, not hand-authored kit primitives): the same
+  exemption class Home's own pre-adoption config gave this exact
+  directory (`no-restricted-imports`, the `aui-*`/`shimmer` CSS-module
+  class names `better-tailwindcss/no-unknown-classes` can't resolve,
+  and the handful of a11y-nuance rules markdown-text's passthrough
+  renderers and thread-list's rename-input autofocus need off).
+
 ## [0.1.6] - ui-v0.1.6
 
 ### Fixed

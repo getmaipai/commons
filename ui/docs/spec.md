@@ -167,6 +167,22 @@ compatibility/rollback context.
 
 ## 7. Responsive, accessibility and future consistency
 
+**One product on every screen.** The phone is not a second design. A
+page on a phone is the same page as on the desktop: the same tokens,
+type scale, icons, wording, order of content and actions, and the same
+states, so a person who knows the desktop already knows the phone.
+What changes is only what the small screen forces: one column instead
+of three, the rail collapses to the phone tab bar with the rest under
+More, a table becomes labeled rows with the same fields in the same
+order, a side pane becomes a sheet, hover actions become a long press,
+targets grow to 48 px and body type never drops below 16 px. Nothing
+that matters on the desktop is hidden on the phone; a field the desktop
+shows in a secondary column moves into the row's detail, it does not
+disappear. The screenshot matrix captures every page at both widths,
+and the review judges each pair as one design: a phone capture that
+would not be recognized as the desktop page is a failure, and so is a
+wide screen left empty by a page designed phone-first.
+
 This spec's own hit-target numbers below (44 px toggle, 40 to 44 px
 header icon-controls, 36 px footer item) predate the kit's org-wide
 floor and are lower than it. `docs/UI.md`'s 48 px touch-target and 16 px
@@ -588,6 +604,119 @@ while allowing the MaiPai theme to remain distinct.
   templates, and state conventions. A one-off implementation is
   acceptable only when documented with its reason, accessibility
   behavior, responsive behavior, and expected reuse boundary.
+
+## Chat (added 2026-09-20)
+
+The kit's chat pattern. Home's chat app is its first consumer; the
+robot's phone view is its second. Everything below uses the
+foundations in section 1 by token role (canvas, panel, raised panel,
+border, primary and secondary text, the accent by kind), never a hex,
+so a person's generated theme applies to chat the same as to every
+other page. What is here is layout, density and behavior; the
+components themselves are `@assistant-ui/react` parts wrapped by the
+kit (`assistant-ui/` in `@maipai/ui`), never a second chat
+implementation.
+
+### Layout
+
+Three regions on desktop, two on the phone.
+
+- **Thread list** (desktop: a 280 px left column inside the page,
+  under the shell's rail; phone: a sheet opened from the header's
+  list icon). Rows are the things-table row pattern: title, one line
+  of the last message in secondary text, relative time right-aligned.
+  Today's threads first, then a day divider per earlier day. "New
+  chat" is the one primary action, pinned at the top of the column.
+- **Thread** (the center, fills the page canvas). Messages are a
+  single column, max width 760 px, centered, 24 px page gutter. No
+  bubbles for the assistant: its turns sit on the canvas with the
+  companion's avatar (24 px) and name at the left, body text at 15 px
+  regular with 1.6 line height, markdown rendered by the kit's
+  markdown text. The person's turns are a raised panel (12 px radius,
+  16 px inner padding) right-aligned at 70 percent max width. 20 px
+  between turns, 8 px between a turn and its own attachments. A day
+  divider (hairline, centered date in secondary text) between days.
+- **Composer** (the bottom, sticky, sits on the canvas with a top
+  hairline). One raised panel: a growing text area (up to six lines,
+  then scrolls), attach at the left, send at the right, both 40 px
+  targets. Placeholder is the companion's name and an invitation
+  ("Ask Nova anything"). Enter sends, Shift+Enter breaks a line; on
+  the phone the keyboard's send does it. While a reply streams the
+  send control becomes stop.
+
+### Inside a turn
+
+- **Sources** (when a turn used a lookup): a compact card under the
+  reply, panel background, one row per source with a favicon-sized
+  glyph, the title, the host in secondary text; collapsed to one
+  "Sources (3)" line by default, expanded on tap. Citations in the
+  body are superscript numbers that scroll the card open and
+  highlight the row.
+- **Memory** (when a turn wrote or used a memory): one chip at the
+  end of the reply, violet accent, "Remembered" or "From memory",
+  tap opens the memory actions (keep, edit, forget) in a popover.
+  Never a modal.
+- **Attachments**: images as 160 px thumbnails in a row, tap to open
+  the kit's image viewer; documents as a file row (icon, name, size).
+  A document the reply is reading opens in the **document pane**, a
+  right pane 400 px wide on desktop (the browser-and-pane pattern),
+  full-screen sheet on the phone.
+- **Actions** on hover (desktop) or long press (phone): copy, edit
+  (person's turn), regenerate (assistant's turn), thumbs up and down.
+  Icon-only, 32 px targets, secondary text color until hover.
+- **Turn stats** (engine, model, tokens, seconds) are a developer
+  disclosure: one secondary-text line shown only when the person's
+  disclosure level is Developer (settings standard, three levels).
+  Never in a kid's or a parent's view.
+- **Reasoning** (a model's thinking) is collapsed by default under a
+  "Thinking" line; expanded on tap; hidden entirely for a child
+  profile.
+
+### The senses dock and the model picker
+
+- The **senses dock** (listening, speaking, the wake word toggle,
+  the camera when vision is on) is one pill row above the composer,
+  right-aligned: each sense is a 32 px icon with a state color (teal
+  when active, secondary when idle, red when refused), the wake word
+  toggle is a switch with its label. It never covers the composer.
+- The **model picker** is not a chat control. It lives in the header
+  picker slot (the same picker chrome as the profile switcher) and
+  shows the companion's current model only at the Developer
+  disclosure level; parents and kids see the companion, never a
+  model name.
+- The **child band**: when a child profile is chatting, a one-line
+  band under the header in the panel color says who is talking and
+  that a parent can see this chat. Always on for a child, never
+  dismissable, part of the safety architecture.
+
+### Empty, loading, error
+
+- Empty thread: the companion's avatar at 64 px, its name, one line
+  of what it can do, and three suggestion chips (the follow-up
+  suggestions component) in a row, wrapping on the phone.
+- Streaming: the reply text appears as it arrives with a 2 px teal
+  caret at the end; no skeleton, no spinner.
+- Engine not ready (the Stack's chat role is not `ready`): the
+  composer is disabled with the health item's one-sentence reason as
+  its placeholder and its fix as a button beside it; the thread stays
+  readable. Never a blank page and never a toast.
+
+### Phone
+
+Header: list icon left, companion name center, senses dock collapsed
+to one icon right (expands to the pill row). Thread fills the screen;
+the composer sits above the phone tab bar, both sticky. Person's
+turns at 85 percent max width. The thread list and the document pane
+are sheets. Long press for turn actions. Type never below 15 px in
+the thread.
+
+### Acceptance for an implementation
+
+A screenshot set at 1440 and 390, light and dark, of: an empty thread
+with suggestions; a thread with a sources card open, a memory chip,
+and an image attachment; a streaming reply; the engine-not-ready
+state; the thread list open on the phone. Each opened and judged
+against this section before the item is ticked.
 
 ## What is Stack-only and not in the kit
 

@@ -419,6 +419,65 @@ pinned tag changes.
     move a pushed tag, org CLAUDE.md); Home pins `ui-v0.1.6`. Verified
     against the real external break: Home's own full `scripts/check.sh`
     (below), not just `shared`'s own gate.
+  - **`ui-v0.2.0` (2026-09-20): the kit's chat pattern - Home's step
+    5b.** Two files handed off from COORDINATOR's own scratchpad, copied
+    verbatim into this commit so nothing here depends on it again:
+    `docs/spec.md` gained a new "Chat" section (layout, turn anatomy,
+    sources card, memory chip, document pane, actions, turn stats at
+    Developer disclosure, reasoning, the senses dock, the model picker
+    in the header picker slot, the child band, the three states, the
+    phone, and the acceptance screenshot set) and section 7 gained its
+    new opening paragraph, "One product on every screen" (the same text
+    already in org `docs/UI.md`).
+    - **Four new components** in `src/blocks/chat/`, shaped by the
+      spec's own paragraphs, data through props, no direct dependency on
+      Home's own API or app state: `SensesDock` (the pill row above the
+      composer - listening/speaking/vision icons colored by state, the
+      wake word `Switch`), `ChildBand` (the always-on, never-dismissable
+      one-line band for a child profile chatting), `SourcesCard` (a
+      `Collapsible` disclosure of lookup sources, `open`/`onOpenChange`
+      exposed for a citation click to control it externally), and
+      `MemoryChip` (a violet chip opening a `Popover` - never a modal -
+      with keep/edit/forget, closing itself after any action fires).
+      `icons.ts` gained `camera` (the vision sense; nothing else the
+      spec named was missing). 9 new tests (`blocks/chat/chat.test.tsx`).
+    - **The `@assistant-ui/react` wrappers moved in from Home's own
+      `frontend/src/kit/assistant-ui`**, unchanged except imports:
+      self-references repointed from the external `@maipai/ui/src/*`
+      package path (valid only from OUTSIDE this package) to the
+      internal `@/kit/*` alias (both repos share the same convention,
+      so most cross-references between these files needed no change at
+      all - `@/kit/assistant-ui/tool-fallback.aui` already resolves to
+      the same physical file in its new home). `src/ui/textarea.tsx`
+      moved alongside it - Home's own `docs/dev.md` had called it
+      "assistant-ui's only remaining local dependency" at step 5; it's
+      real kit surface now that assistant-ui itself lives here. Three
+      new dependencies (`@assistant-ui/react`, `@assistant-ui/react-
+      markdown`, `remark-gfm`) match Home's own pinned versions exactly.
+      Of the twelve wrapper files, only `thread.aui.tsx` (895 lines) has
+      real Home-specific business-logic imports (14 of them - citations,
+      turn activity, continuation/edit-supersedes state, feedback
+      buttons, its own now-superseded sources-card/memory-chip) and did
+      **not** move; Home's own step 5b commit (below) is where that
+      file's generic-vs-product split actually happens.
+    - **`eslint.config.js` gained a `src/assistant-ui/**/*.tsx`
+      override**: vendored registry code, not hand-authored kit
+      primitives, the exact same exemption class Home's own
+      pre-adoption config had already carved out for this directory
+      (`no-restricted-imports` off, the library's own `aui-*`/`shimmer`
+      CSS-module class names exempted from `better-tailwindcss/no-
+      unknown-classes`, and the handful of a11y-nuance rules markdown-
+      text's passthrough renderers and thread-list's intentional rename-
+      input autofocus need off).
+    - 305 tests passing, full gate green including the new `eslint src`
+      step. Cherry-picked alongside this tag: `9a0b7b8` "core: the
+      workspace's ESLint gate" (`core/eslint.config.js`, typescript-
+      eslint recommended plus "core imports no product", one unused
+      assignment fixed in `hlc.test.ts`) from `codex/154-core-eslint`
+      (`shared-codex` worktree, based on the old `34107e5` lane tip) -
+      a second token-free-lane item COORDINATOR handed off, unrelated to
+      chat but landed at the same shared boundary. Worktree removed,
+      branch deleted, its content verified present on `main` first.
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:

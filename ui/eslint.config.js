@@ -126,4 +126,31 @@ export default [
       "no-restricted-imports": "off",
     },
   },
+  {
+    // The @assistant-ui/react wrappers (moved here from Home's own
+    // src/kit/assistant-ui at ui-v0.2.0, unchanged except imports):
+    // generated/vendored registry code, not hand-authored kit primitives
+    // - the same exemption class Home's own pre-adoption config gave this
+    // exact directory. `aui-*`/`shimmer` are @assistant-ui/react-markdown's
+    // own CSS-module class names (its own stylesheet, not a Tailwind
+    // utility, imported directly as `@assistant-ui/react-markdown/styles/
+    // dot.css`), tool-fallback/reasoning/tool-group use raw `radix-ui` and
+    // `lucide-react` the same way src/ui's own primitives do,
+    // thread-list.aui.tsx's autoFocus on its own rename input is
+    // intentional (opening a rename immediately puts focus in it), and
+    // the remaining a11y-nuance rules are exactly what Home's own
+    // pre-adoption config exempted for this same directory (input-group's
+    // click-to-focus convenience handler, markdown-text's passthrough
+    // heading/anchor renderers).
+    files: ["src/assistant-ui/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": "off",
+      "better-tailwindcss/no-unknown-classes": "off",
+      "jsx-a11y/no-autofocus": "off",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+      "jsx-a11y/heading-has-content": "off",
+      "jsx-a11y/anchor-has-content": "off",
+    },
+  },
 ];
