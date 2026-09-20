@@ -30,3 +30,7 @@ file path, matching this package's own no-barrel convention above - no
 `exports` field means no subpath is ever accidentally blocked for
 `bot`/`go`/any future consumer) and gets the same gate its CI must
 pass.
+
+## Pinning this workspace
+
+A consumer adds `"@maipai/ui": "file:../../shared/ui"` to its `package.json` (adjusted for its own depth), checks out this repo at the tag it wants, and runs `bun install`; `bun` copies a self-contained package, so a bump is a new checkout plus `bun install`. The pinned tag is stated in the consumer's own dev docs and checked by its `check.sh` against this workspace's `package.json` version. There is no registry; this is the `@maipai/standards` pattern.
