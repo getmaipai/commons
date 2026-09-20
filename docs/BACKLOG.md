@@ -13,6 +13,29 @@ capability, needs its own design pass first).
   `docs/BACKLOG.md`, `docs/dev.md`, a `CHANGELOG.md` per workspace. No
   push-triggered Actions. See [dev.md](dev.md).
 
+## Tooling
+
+- [ ] **S** A composite GitHub Action for a consumer's own CI pin
+  resolution: found live during Catalog's SHARED-PIN-01 adoption
+  (`catalog/docs/dev.md`) - `catalog/.github/workflows/check.yml`
+  reimplements the checkout-shared-with-tags-then-`ensure-tag.sh`-per-pin
+  dance directly, and `home`'s own CI (if/when it gets any) would need
+  the identical steps, duplicated rather than shared (org rule 1:
+  "Simplify: centralize and reuse... A second copy of anything is wrong
+  even when it is faster"). Wrap it as one composite action - inputs:
+  the pins to resolve (workspace/tag pairs); does the `getmaipai/shared`
+  checkout with `fetch-tags: true`, the nested-checkout-then-symlink
+  trick (`actions/checkout@v4` refuses a `path` outside
+  `$GITHUB_WORKSPACE`), and calls `ensure-tag.sh` per pin, exporting
+  `MAIPAI_SHARED_DIR` and the resolved worktree paths - so a consumer's
+  own workflow becomes one `uses:` line instead of the multi-step
+  dance. Published from `getmaipai/.github` (its own composite actions
+  precedent) or `shared` itself - whichever the org's "no push-triggered
+  Actions in private repos" rule allows for a public repo like `catalog`
+  to consume; check that rule before picking. Exit check: `catalog`'s
+  `check.yml` shrinks to one `uses:` step for the shared checkout +
+  pin resolution, a live PR run still green.
+
 ## `core`
 
 - [x] **core's own ESLint gate** (S): `core/eslint.config.js`,
