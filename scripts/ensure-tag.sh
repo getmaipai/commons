@@ -2,7 +2,7 @@
 # Resolves a consumer's pin to an immutable per-tag worktree instead of
 # this repo's own working checkout. Before this script existed, every
 # consumer's file: dependency and check.sh pin read whatever was checked
-# out in the sibling `shared/` directory - a single mutable checkout
+# out in the sibling `commons/` directory - a single mutable checkout
 # shared by every session on the machine, so one session gating Home at
 # ui-v0.2.4 (`git checkout ui-v0.2.4` there) silently detached every
 # other consumer's install underneath it. See docs/dev.md, "How a
@@ -10,7 +10,7 @@
 #
 # Usage: scripts/ensure-tag.sh <workspace> <tag>
 # Prints the worktree path on stdout. Creates
-# ../shared-tags/<workspace>-<tag> as a detached worktree of <tag> if it
+# ../commons-tags/<workspace>-<tag> as a detached worktree of <tag> if it
 # doesn't already exist there; reuses it otherwise. Refuses a tag this
 # repo doesn't have.
 set -euo pipefail
@@ -30,7 +30,7 @@ if ! git -C "$REPO_ROOT" rev-parse -q --verify "refs/tags/$TAG^{commit}" >/dev/n
 fi
 EXPECTED_HEAD="$(git -C "$REPO_ROOT" rev-parse "refs/tags/$TAG^{commit}")"
 
-TAGS_DIR="$(cd "$REPO_ROOT/.." && pwd)/shared-tags"
+TAGS_DIR="$(cd "$REPO_ROOT/.." && pwd)/commons-tags"
 WORKTREE_PATH="$TAGS_DIR/$WORKSPACE-$TAG"
 
 # Checks the candidate is registered as one of this repo's worktrees

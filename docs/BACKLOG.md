@@ -1,6 +1,6 @@
 # Backlog
 
-What's built and what's missing in `shared`. Scannable, not narrative -
+What's built and what's missing in `commons`. Scannable, not narrative -
 reasoning and decision history live in [dev.md](dev.md). Size tags: **S**
 (a session or less), **M** (a real slice, days), **L** (a platform-level
 capability, needs its own design pass first).
@@ -18,24 +18,24 @@ capability, needs its own design pass first).
 - [ ] **S** A composite GitHub Action for a consumer's own CI pin
   resolution: found live during Catalog's SHARED-PIN-01 adoption
   (`catalog/docs/dev.md`) - `catalog/.github/workflows/check.yml`
-  reimplements the checkout-shared-with-tags-then-`ensure-tag.sh`-per-pin
+  reimplements the checkout-commons-with-tags-then-`ensure-tag.sh`-per-pin
   dance directly, and `home`'s own CI (if/when it gets any) would need
   the identical steps, duplicated rather than shared (org rule 1:
   "Simplify: centralize and reuse... A second copy of anything is wrong
   even when it is faster"). Wrap it as one composite action - inputs:
-  the pins to resolve (workspace/tag pairs); does the `getmaipai/shared`
+  the pins to resolve (workspace/tag pairs); does the `getmaipai/commons`
   checkout with `fetch-depth: 0` (a live PR proved `fetch-tags: true`
   alone leaves a tag's ref resolvable but not its commit - catalog's
   own `docs/dev.md` has the run), the nested-checkout-then-symlink
   trick (`actions/checkout@v4` refuses a `path` outside
   `$GITHUB_WORKSPACE`), and calls `ensure-tag.sh` per pin, exporting
-  `MAIPAI_SHARED_DIR` and the resolved worktree paths - so a consumer's
+  `MAIPAI_COMMONS_DIR` and the resolved worktree paths - so a consumer's
   own workflow becomes one `uses:` line instead of the multi-step
   dance. Published from `getmaipai/.github` (its own composite actions
-  precedent) or `shared` itself - whichever the org's "no push-triggered
+  precedent) or `commons` itself - whichever the org's "no push-triggered
   Actions in private repos" rule allows for a public repo like `catalog`
   to consume; check that rule before picking. Exit check: `catalog`'s
-  `check.yml` shrinks to one `uses:` step for the shared checkout +
+  `check.yml` shrinks to one `uses:` step for the commons checkout +
   pin resolution, a live PR run still green.
 
 ## Standards
@@ -255,7 +255,7 @@ capability, needs its own design pass first).
 - [ ] **S** `ui` pins `spec` by tag: `ui/package.json`'s own
   `"@maipai/spec": "file:../spec"` (a bare relative path, resolved from
   wherever `ui`'s worktree happens to be) becomes the same per-tag form
-  consumers use (`"file:../shared-tags/spec-<tag>/spec"` or equivalent),
+  consumers use (`"file:../commons-tags/spec-<tag>/spec"` or equivalent),
   so a kit tag names the exact `spec` version it was built against.
   Found by a code review during Home's SHARED-PIN-01 adoption
   (`home/docs/dev.md`, "Pins moved to per-tag worktrees"): before
@@ -268,7 +268,7 @@ capability, needs its own design pass first).
   one docs-only file, so no live break yet, but nothing stops one). Add
   a check (in `ui`'s own `check.sh` or the standards core) that a
   consumer's `spec` pin must match `spec` version `ui`'s tag names, or
-  install refuses. Exit check: `shared/scripts/check.sh` green, a new
+  install refuses. Exit check: `commons/scripts/check.sh` green, a new
   `ui` tag with an intentionally mismatched nested `spec` shown to fail
   the added check.
 

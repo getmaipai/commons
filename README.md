@@ -27,7 +27,7 @@ worktree of that tag beside this checkout the first time and reuses it after
 
 Nothing in `commons` imports a product. A consuming repo resolves each
 workspace from the per-tag worktree, never from this working checkout
-(`MAIPAI_SHARED_DIR` tells a consumer where this repo is; the default is the
+(`MAIPAI_COMMONS_DIR` tells a consumer where this repo is; the default is the
 sibling folder); see [docs/dev.md](docs/dev.md) for the pin mechanics,
 SHARED-PIN-01, and why there is no registry.
 

@@ -39,7 +39,7 @@ if [ "$DOCS_ONLY" = 0 ]; then
   # ensure-tag.sh: proves it creates a worktree for an existing tag and
   # reuses it on a second call (SHARED-PIN-01), and refuses an unknown
   # tag. core-v0.1.0 always exists in this repo's history, so it's a
-  # stable fixture. Leaves the resulting ../shared-tags/core-core-v0.1.0
+  # stable fixture. Leaves the resulting ../commons-tags/core-core-v0.1.0
   # worktree in place afterward on purpose - that cache is meant to be
   # reused by real consumer pins, not torn down by the gate that proved
   # it works.
