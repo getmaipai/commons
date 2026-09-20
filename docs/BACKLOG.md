@@ -188,6 +188,25 @@ capability, needs its own design pass first).
   the pattern. Needs a design pass on how it composes with `Shell.tsx`'s
   own generic `NavGroup`/`NavEntry` props first. Exit check:
   `bash scripts/check.sh` plus a real TV-surface screenshot judged.
+- [ ] **S** `ui` pins `spec` by tag: `ui/package.json`'s own
+  `"@maipai/spec": "file:../spec"` (a bare relative path, resolved from
+  wherever `ui`'s worktree happens to be) becomes the same per-tag form
+  consumers use (`"file:../shared-tags/spec-<tag>/spec"` or equivalent),
+  so a kit tag names the exact `spec` version it was built against.
+  Found by a code review during Home's SHARED-PIN-01 adoption
+  (`home/docs/dev.md`, "Pins moved to per-tag worktrees"): before
+  per-tag worktrees, `ui` and `spec` were always read from the one
+  mutable `shared/` checkout, so `ui`'s nested `@maipai/spec` and a
+  consumer's own direct `@maipai/spec` pin were mechanically guaranteed
+  to be the same commit; now they resolve from two independently-pinned
+  tags with nothing keeping them in sync (checked live: `ui-v0.3.3`'s
+  nested `spec` and `spec-v0.1.1` currently match byte-for-byte except
+  one docs-only file, so no live break yet, but nothing stops one). Add
+  a check (in `ui`'s own `check.sh` or the standards core) that a
+  consumer's `spec` pin must match `spec` version `ui`'s tag names, or
+  install refuses. Exit check: `shared/scripts/check.sh` green, a new
+  `ui` tag with an intentionally mismatched nested `spec` shown to fail
+  the added check.
 
 ## `spec`
 
