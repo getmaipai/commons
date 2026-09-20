@@ -4,6 +4,19 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.2.4] - ui-v0.2.4
+
+### Fixed
+- `ui-v0.2.3`'s own fix (below) shipped a regression: hiding a
+  collapsed nav item's label span left the link with no accessible
+  name at all (the icon carries no text, and `SidebarMenuButton`'s
+  `tooltip` is hover/focus-only, never wired to `aria-label`) - a
+  tablet-width a11y sweep caught every nav link failing axe's
+  `link-name` check the moment the rail's own default-collapsed
+  breakpoint (`defaultRailOpen()`, <1280px) applied. Fixed by adding
+  `aria-label={item.title}` to the link itself, independent of the
+  label span's own visibility.
+
 ## [0.2.3] - ui-v0.2.3
 
 ### Fixed

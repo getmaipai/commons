@@ -49,8 +49,18 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                     sweep - the first thing to actually measure this nav
                     row's real rendered size). */}
                 <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="px-3 data-[active=true]:bg-[var(--hue-violet)] data-[active=true]:text-white data-[active=true]:hover:bg-[var(--hue-violet)] data-[active=true]:hover:text-white">
-                  <NavLink to={item.url}>
-                    {Icon && <Icon />}
+                  {/* aria-label, not just the visible span below: a
+                      collapsed rail (tablet defaults to collapsed,
+                      defaultRailOpen()'s own <1280px threshold) hides
+                      that span entirely, and the icon alone (no
+                      aria-hidden, no text) carries no accessible name -
+                      SidebarMenuButton's own `tooltip` prop is a
+                      hover/focus-only visual, never wired to aria-label,
+                      so it does not cover this. A real a11y regression
+                      the fix below introduced and the tablet sweep
+                      caught before this line was corrected. */}
+                  <NavLink to={item.url} aria-label={item.title}>
+                    {Icon && <Icon aria-hidden />}
                     {/* group-data-[collapsible=icon]:hidden, matching
                         SidebarGroupLabel's own class two lines up - found
                         live (a real household report, 2026-09-20): without

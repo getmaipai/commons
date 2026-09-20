@@ -98,9 +98,9 @@ describe("AppSidebar", () => {
   // layout (no CSS engine), so this can only assert the class is present,
   // not that the text is actually invisible on screen - the real visual
   // check is scripts/screenshot.ts's own captureShellRail, home/.
-  test("a nav item's label carries the collapsed-rail hidden class", () => {
+  test("a nav item's label carries the collapsed-rail hidden class, and the link keeps a real accessible name", () => {
     const groups = ungroupedNav([{ to: "/", icon: "home", label: "Home" }]);
-    const { getByText } = render(
+    const { getByText, getByRole } = render(
       <MemoryRouter>
         <SidebarProvider open={false}>
           <AppSidebar groups={groups} brand={<span>Brand</span>} />
@@ -108,5 +108,12 @@ describe("AppSidebar", () => {
       </MemoryRouter>,
     );
     expect(getByText("Home")).toHaveClass("group-data-[collapsible=icon]:hidden");
+    // The first fix (hiding the label span) shipped its own regression:
+    // the icon alone carries no text, and SidebarMenuButton's `tooltip`
+    // is hover/focus-only, never wired to aria-label - a real household
+    // sweep at tablet width (which defaults to collapsed,
+    // defaultRailOpen()'s own <1280px threshold) caught every nav link
+    // with no discernible name before `aria-label` was added below.
+    expect(getByRole("link", { name: "Home" })).toBeInTheDocument();
   });
 });

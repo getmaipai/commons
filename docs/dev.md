@@ -663,9 +663,25 @@ on screen - `home/scripts/screenshot.ts`'s own `captureShellRail`,
 added the same day, is the real visual check, expanded and collapsed,
 both themes).
 
-**Verification**: `shared`'s own `scripts/check.sh` green at `ui-v0.2.3`.
-Home's full `scripts/check.sh` green with `UI_PIN=0.2.3`. Home's
+**`ui-v0.2.3` shipped its own regression, caught before the restart
+verification finished, not after**: hiding the label span left the
+link with no accessible name at all once collapsed - the icon carries
+no text, and `SidebarMenuButton`'s own `tooltip` prop is a hover/
+focus-only visual, never wired to `aria-label`. Home's full route
+matrix runs a real accessibility scan at every viewport, and tablet
+(820px) defaults to collapsed (`defaultRailOpen()`'s own <1280px
+threshold, desktop and far don't), so every nav link failed axe's
+`link-name` check there the moment `UI_PIN` moved to `0.2.3` - caught
+by that same gate, not shipped past it. Fixed as `ui-v0.2.4`:
+`aria-label={item.title}` on the link itself, independent of the
+label span's own visibility. `app-sidebar.test.tsx`'s regression test
+extended to assert the link still resolves by accessible name once
+collapsed, not just that the label span carries the hiding class.
+
+**Verification**: `shared`'s own `scripts/check.sh` green at
+`ui-v0.2.4`. Home's full `scripts/check.sh` green with `UI_PIN=0.2.4`
+(136-page matrix, 0 violations). Home's
 `bun run scripts/screenshot.ts --shell-rail-review` re-captured
 `shell-rail-{expanded,collapsed}-desktop-{light,dark}.png`; opened and
-judged: the collapsed rail now shows icons only, no stray letters, in
+judged: the collapsed rail shows icons only, no stray letters, in
 both themes.
