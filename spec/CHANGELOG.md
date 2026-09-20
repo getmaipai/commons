@@ -5,6 +5,16 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.2] - 2026-09-20
+
+### Added
+- `ui.look` settings key (person scope, `select`, options `studio`/
+  `calm`, default `studio`): the owner's "Two looks, one setting"
+  ruling - Home's `useLook.ts` reads it to choose between the
+  reference-matching Studio look and the softer Calm look that shipped
+  first. Regenerated `settings/keys.json` from `home/backend/src/
+  settings/uiKeys.ts` via `bun run gen:settings`.
+
 ## [spec-v0.1.0] - 2026-09-20
 
 ### Added

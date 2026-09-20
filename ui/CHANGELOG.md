@@ -4,6 +4,50 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.0] - ui-v0.4.0
+
+"Two looks, one setting" (owner ruling, 2026-09-20): Home shipped one
+look, judged "nice, not a match" against the reference; this adds a
+second, Studio, that matches it, and fixes the collapsed rail in both
+(owner finding, same day).
+
+### Added
+- `[data-look]` on `<html>` as a second theme dimension alongside
+  light/dark: a `studio:` Tailwind variant (`tokens.css`'s
+  `@custom-variant studio`), a `--tile-radius` token (999px/circle at
+  the zero-attribute default, 12px rounded square under
+  `[data-look="studio"]`), a `--canvas-background` token, and plain
+  attribute-selector CSS (against the kit's own stable `data-slot`/
+  `data-collapsible`/`data-active` attributes) for the rail's own
+  look-conditional group-label size, group divider and active-item
+  radius/gradient-vs-flat - not Tailwind utility classes for those
+  three, after `studio:`/`group-data-` stacked with certain bracketed
+  arbitrary values turned out to depend on a fully fresh `bun install
+  --force` of this package in every consumer to compile at all; see
+  `tokens.css`'s own comment.
+- `IconTile` and Home's own product-mark tile draw their radius through
+  `--tile-radius` instead of a fixed `rounded-xl`.
+- `ActionTile` and `MetricCard`'s label no longer truncate (owner
+  finding: "nothing inside a card ever truncates" - found live as
+  "Add a pers…"/"Open Repa…" on the dashboard's own quick actions).
+
+### Fixed
+- The collapsed rail (owner finding, "The collapsed rail," both looks):
+  removed the second in-rail expand/collapse toggle (`rail-toggle.tsx`,
+  deleted - the header's own `SidebarTrigger` is the only one now);
+  `SIDEBAR_WIDTH_ICON` 72px → 64px; every collapsed nav row a real
+  40x40 centered target (was 48px, off-center, `[&>svg]` bumped to
+  20px) with its real touch target still floored at 48px via an
+  unconditional `hitArea(1)`-style pseudo-element on the shared
+  `sidebarMenuButtonVariants`, not a collapsed-only one (which silently
+  failed to compile the same way the other stacked-variant attempts
+  did); the active item's collapsed fill exactly 40x40, gradient in
+  Studio and flat violet in Calm (a `background-image` layered over a
+  `background-color`, so Studio's gradient always paints over Calm's
+  flat color with nothing to override); `HubCard`'s collapsed state a
+  40px tile with the hub icon and the status dot at its corner plus a
+  real tooltip, not a lone dot in a circle.
+
 ## [0.3.3] - ui-v0.3.3
 
 Four more real bugs, found by `home`'s screenshot-pipeline a11y gate on

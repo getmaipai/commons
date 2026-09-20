@@ -63,14 +63,14 @@ describe("Shell", () => {
   test("toggling the rail persists the new state to its own storage key", () => {
     const { getByRole } = renderShell({ railStorageKey: "test:rail" });
     expect(localStorage.getItem("test:rail")).toBeNull();
-    fireEvent.click(getByRole("button", { name: "Toggle Sidebar" }));
+    fireEvent.click(getByRole("button", { name: /collapse navigation|expand navigation/i }));
     const stored = localStorage.getItem("test:rail");
     expect(stored === "expanded" || stored === "collapsed").toBe(true);
   });
 
   test("two shells with different storage keys never share a rail preference", () => {
     const { getByRole, unmount } = renderShell({ railStorageKey: "test:rail-a" });
-    fireEvent.click(getByRole("button", { name: "Toggle Sidebar" }));
+    fireEvent.click(getByRole("button", { name: /collapse navigation|expand navigation/i }));
     unmount();
     expect(localStorage.getItem("test:rail-b")).toBeNull();
   });

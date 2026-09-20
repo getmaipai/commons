@@ -14,8 +14,13 @@ test("HubCard shows the name, subtitle and status label, and fires onClick", () 
   expect(clicked).toBe(true);
 });
 
-test("HubCard collapses to its status dot alone", () => {
+// Owner finding, "The collapsed rail," 2026-09-20: this used to shrink
+// to a lone status dot with no hub icon - fixed to a 40px tile with
+// both the hub icon and the status dot at its corner.
+test("HubCard collapses to a tile with the hub icon and the status dot, not the name", () => {
   render(<HubCard collapsed name="Jesses-MBP" subtitle="macOS 27" status="warning" statusLabel="2 repairs open" onClick={() => {}} />);
   expect(document.body.textContent).not.toContain("Jesses-MBP");
-  expect(document.querySelector('button[aria-label="Jesses-MBP: 2 repairs open"]')).toBeTruthy();
+  const button = document.querySelector('button[aria-label="Jesses-MBP: 2 repairs open"]');
+  expect(button).toBeTruthy();
+  expect(button!.querySelector("svg")).toBeTruthy();
 });

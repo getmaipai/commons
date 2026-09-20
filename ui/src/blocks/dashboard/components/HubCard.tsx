@@ -1,5 +1,6 @@
 import { getIcon } from "@/kit/icons";
 import { cn, FOCUS_RING_INSET, hitArea } from "@/kit/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/kit/ui/tooltip";
 
 export type HubCardStatus = "ok" | "warning" | "error";
 
@@ -28,12 +29,39 @@ export interface HubCardProps {
 export function HubCard({ collapsed = false, name, subtitle, status, statusLabel, onClick }: HubCardProps) {
   const MonitorIcon = getIcon("monitor");
   if (collapsed) {
-    // hitArea(1) on this 40px (size-10) box: docs/UI.md's 48px touch-
-    // target floor, the same step button.tsx's own `icon-lg` uses.
+    // Owner finding, "The collapsed rail," 2026-09-20: this used to
+    // shrink to a lone status dot with no hub icon at all - "the hub
+    // card becomes its status dot" (the original spec line) read too
+    // literally. The rule now: "a 40px tile with the hub icon and the
+    // status dot at its corner" - the same `--tile-radius` token every
+    // other tile in the rail draws through, the dot at the corner with
+    // the same `right-0 bottom-0`/`ring-2` geometry `ui/avatar.tsx`'s
+    // own `AvatarBadge` uses (not that component directly - its sizing
+    // is scoped to a `group/avatar` ancestor this tile doesn't have,
+    // a real generalization for another day, not just a drop-in swap),
+    // its ring in the rail's own surface color rather than
+    // `AvatarBadge`'s generic page-background one, since that's what
+    // actually sits behind this tile. hitArea(1) on this 40px box:
+    // docs/UI.md's 48px touch-target floor, the same step button.tsx's
+    // own `icon-lg` uses.
     return (
-      <button type="button" onClick={onClick} aria-label={`${name}: ${statusLabel}`} className={cn("mx-auto flex size-10 items-center justify-center rounded-xl border bg-[var(--surface-card)] hover:bg-[var(--surface-pane)]", FOCUS_RING_INSET, hitArea(1))}>
-        <span aria-hidden className={cn("size-2.5 rounded-full", STATUS_DOT_CLASS[status])} />
-      </button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={onClick}
+              aria-label={`${name}: ${statusLabel}`}
+              className={cn("relative mx-auto flex size-10 items-center justify-center border bg-[var(--surface-card)] hover:bg-[var(--surface-pane)]", FOCUS_RING_INSET, hitArea(1))}
+              style={{ borderRadius: "var(--tile-radius)" }}
+            >
+              <MonitorIcon className="size-4 text-muted-foreground" aria-hidden="true" />
+              <span aria-hidden className={cn("absolute right-0 bottom-0 size-2.5 rounded-full ring-2 ring-[var(--surface-sidebar)]", STATUS_DOT_CLASS[status])} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right">{statusLabel}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   }
   const ChevronIcon = getIcon("chevron-right");

@@ -24,12 +24,18 @@ const ICON_SIZE_CLASS: Record<NonNullable<IconTileProps["size"]>, string> = { md
 // of the same accent at 35%, the icon in the accent at full strength, a
 // soft outer glow. One definition so the four numbers never drift
 // between call sites (implementation reuse standards).
+//
+// `--tile-radius` (tokens.css), not a fixed `rounded-xl`: "Two looks,
+// one setting" (owner ruling, 2026-09-20) draws the same tile as a
+// circle in Calm and a 12px rounded square in Studio - a token swap, not
+// a second component.
 export function IconTile({ icon, hue, size = "md", glow = true, className }: IconTileProps) {
   const Icon = getIcon(icon);
   return (
     <div
-      className={cn("flex shrink-0 items-center justify-center rounded-xl border", SIZE_CLASS[size], className)}
+      className={cn("flex shrink-0 items-center justify-center border", SIZE_CLASS[size], className)}
       style={{
+        borderRadius: "var(--tile-radius)",
         backgroundColor: `color-mix(in srgb, var(${hue}) 18%, transparent)`,
         borderColor: `color-mix(in srgb, var(${hue}) 35%, transparent)`,
         color: `var(${hue})`,

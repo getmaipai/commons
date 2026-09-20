@@ -20,6 +20,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* "Two looks, one setting" (owner ruling, 2026-09-20): a second
+ * dimension alongside light/dark, applied the same way - a `data-look`
+ * attribute on `<html>` (Home's own `useLook.ts`, the `useAppearance.ts`
+ * hook's own pattern), a `studio:` Tailwind variant for markup that
+ * differs, and look-scoped token overrides below for the rest. No
+ * attribute (every other kit consumer - Stack, Catalog, and anything
+ * not yet wired to `data-look`) renders exactly what already shipped:
+ * "Calm" is the zero-attribute default at the token level so adopting
+ * this costs nothing for a product that never sets it. Home's own hook
+ * applies `data-look="studio"` immediately (the hub's own default per
+ * the ruling), Calm only when a person picks it in Settings. */
+@custom-variant studio (&:is([data-look="studio"] *));
+
 @theme {
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -80,6 +93,87 @@
   --cat-extensions: var(--hue-teal);
   --cat-training: var(--hue-violet);
   --cat-system: var(--hue-teal);
+}
+
+/* Look tokens (owner ruling, "Two looks, one setting"): independent of
+ * light/dark, so a person's Calm/Studio choice and their light/dark
+ * choice combine freely. Calm at the zero-attribute default (IconTile's
+ * emergent circle: --radius-xl on a 40px/32px tile already rounds past
+ * half the box - kept as a literal value here instead so a caller never
+ * has to know that math); Studio's rounded square is the reference's own
+ * 12px. */
+:root {
+  --tile-radius: 999px;
+  --canvas-background: var(--surface-page);
+}
+
+[data-look="studio"] {
+  --tile-radius: 12px;
+  /* The reference's own subtle radial wash (top-left, fading to the
+   * canvas color) - a gradient, not a flat fill, applied by Home's
+   * dashboard to its page background only (the one route Studio's
+   * acceptance judges), not every route's surface-page token itself. */
+  --canvas-background: radial-gradient(ellipse 1200px 800px at 0% 0%, color-mix(in srgb, var(--hue-blue) 8%, var(--surface-page)), var(--surface-page) 60%);
+}
+
+/* Rail look/collapsed-state rules, as plain attribute-selector CSS
+ * against the kit's own stable `data-slot`/`data-collapsible`/
+ * `data-active` attributes (sidebar.tsx's own DOM), not Tailwind
+ * utility classes (owner ruling "Two looks, one setting" and finding
+ * "The collapsed rail," both 2026-09-20). Not a Tailwind bug: these
+ * classes (`studio:rounded-[10px]`, `studio:text-[11px]`, `studio:mt-2
+ * studio:border-t ...`) looked like they were compiling to nothing
+ * mid-session, but the real cause was this repo's own `file:` link to
+ * `shared` - `bun install --force` snapshots that package's source into
+ * bun's content-addressed store at install time (AGENTS.md's own
+ * "Pinning" note), so every edit made to shared's tokens.css/nav-
+ * main.tsx after the last install was silently invisible to the build
+ * until reinstalled. Kept here anyway once diagnosed and fixed,
+ * because it sidesteps that whole class of gap for anyone developing
+ * this kit against a live consumer: no dependency on remembering to
+ * reinstall before trusting what a build shows. `nav-main.tsx`'s own
+ * className props keep only `studio:mx-1` (the reference's own inset)
+ * and the plain size/justify/icon-size swaps. */
+[data-look="studio"] [data-slot="sidebar-group-label"] {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+[data-look="studio"] [data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type) {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--sidebar-border);
+}
+[data-look="studio"] [data-slot="sidebar-menu-button"][data-active="true"] {
+  border-radius: 10px;
+}
+/* Collapsed active square: a flat `background-color` under everything,
+ * a Studio-only gradient `background-image` layered over it - two
+ * different CSS properties, so Studio's gradient always paints over
+ * the flat color with nothing to override, and Calm is left flat once
+ * the layer covering it is gone (the same background-image-over-
+ * background-color trick the removed Tailwind attempt was already
+ * using, just written directly). */
+[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"][data-active="true"] {
+  /* Clears the unconditional `data-[active=true]:bg-gradient-to-br`
+   * Tailwind class (nav-main.tsx) still painting its background-image
+   * here - that class has no look/collapsed gate of its own (Calm's
+   * expanded gradient is meant to stay unconditional), so collapsed
+   * mode has to explicitly turn it back off before Calm can go flat. */
+  background-color: var(--hue-violet);
+  background-image: none;
+}
+[data-look="studio"] [data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"][data-active="true"] {
+  background-image: linear-gradient(to bottom right, var(--hue-violet), var(--hue-violet-deep));
+}
+/* Lets the collapsed row's hit-area pseudo-element (sidebar.tsx's own
+ * `hitArea(1)`) actually extend the real, hit-testable click region
+ * past the 40px box - `overflow-hidden` on the same element (kept for
+ * the expanded row's own label truncation) clips it otherwise, so the
+ * touch-target floor this was meant to satisfy was never really met
+ * (a review caught this live). Not a Tailwind class here: sidebar.tsx's
+ * own comment on this rule has why. */
+[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"] {
+  overflow: visible;
 }
 
 :root {

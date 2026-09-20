@@ -562,6 +562,26 @@
     ]
   },
   {
+    "key": "ui.look",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "studio",
+        "calm"
+      ]
+    },
+    "default": "studio",
+    "label": "Look",
+    "help": "Studio matches the reference design exactly. Calm is the softer look Home shipped first.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "profile.appearance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "ui.pinned_apps",
     "scope": "person",
     "selector": "text",

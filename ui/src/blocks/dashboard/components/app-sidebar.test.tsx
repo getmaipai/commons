@@ -81,8 +81,8 @@ describe("AppSidebar", () => {
       </MemoryRouter>,
     );
     act(() => {
-      fireEvent.pointerDown(getByRole("button", { name: "Toggle Sidebar" }), { button: 0, pointerId: 1 });
-      fireEvent.click(getByRole("button", { name: "Toggle Sidebar" }));
+      fireEvent.pointerDown(getByRole("button", { name: /collapse navigation|expand navigation/i }), { button: 0, pointerId: 1 });
+      fireEvent.click(getByRole("button", { name: /collapse navigation|expand navigation/i }));
     });
     const nav = document.body.querySelector('[data-slot="sidebar"]');
     expect(nav).toHaveAttribute("role", "navigation");

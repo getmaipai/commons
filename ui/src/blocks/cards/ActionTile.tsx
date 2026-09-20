@@ -12,14 +12,19 @@ export interface ActionTileProps {
 }
 
 // Quick Actions tiles (spec section 3): the icon tile, direct-verb
-// label, one supporting line.
+// label, one supporting line. Neither line truncates (owner ruling,
+// "Two looks, one setting": "nothing inside a card ever truncates... a
+// tile that cannot fit its label at the current width drops to the next
+// row" - found live as "Add a pers..." and "Open Repa..." on the
+// dashboard's own quick actions, a defect in both looks, fixed in both):
+// the label wraps instead of clipping, and the tile grows to fit it.
 export function ActionTile({ icon, hue = "--hue-blue", label, subtitle, onClick }: ActionTileProps) {
   return (
     <button type="button" onClick={onClick} className="flex items-center gap-3 rounded-xl border bg-[var(--surface-card)] p-3 text-left hover:bg-[var(--surface-pane)]">
       <IconTile icon={icon} hue={hue} size="sm" />
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium">{label}</p>
-        <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
       </div>
     </button>
   );

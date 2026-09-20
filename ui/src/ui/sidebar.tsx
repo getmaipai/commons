@@ -1,7 +1,7 @@
 // Copied by the shadcn registry for MaiPai Stack dashboard.
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/kit/utils"
+import { cn, hitArea } from "@/kit/utils"
 import { PanelLeftIcon } from "lucide-react"
 import { Slot } from "radix-ui"
 
@@ -27,12 +27,14 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-// 252/72: the spec's rail widths (docs/plans/ui-spec-2026-09-19/spec.md,
-// "Left navigation rail"). The Stack's one SidebarProvider drives its open
-// state as a controlled prop backed by localStorage, not this cookie.
+// 252/64: the spec's rail widths (docs/plans/ui-spec-2026-09-19/spec.md,
+// "Left navigation rail"; the collapsed width corrected from 72px to the
+// owner's own 64px, "The collapsed rail" finding, 2026-09-20). The
+// Stack's one SidebarProvider drives its open state as a controlled prop
+// backed by localStorage, not this cookie.
 const SIDEBAR_WIDTH = "252px"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "72px"
+const SIDEBAR_WIDTH_ICON = "64px"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContextProps = {
@@ -298,7 +300,17 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, state } = useSidebar()
+  // Owner finding, "The collapsed rail," 2026-09-20, made this the
+  // rail's one and only toggle (rail-toggle.tsx, deleted, used to hold
+  // a second one inside the rail itself). A review caught that deleted
+  // component taking its own `aria-expanded`/state-aware label with
+  // it - this static "Toggle Sidebar" carried neither, so the sole
+  // remaining control announced the same thing regardless of current
+  // or resulting state. Restored here instead of on the header's own
+  // call site, since this is the one place `state` is already read.
+  const expanded = state === "expanded"
+  const label = expanded ? "Collapse navigation" : "Expand navigation"
 
   return (
     <Button
@@ -314,6 +326,8 @@ function SidebarTrigger({
       // target hit-area extension "icon"'s own smaller siblings use.
       size="icon-sm"
       className={className}
+      aria-expanded={expanded}
+      aria-label={label}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -321,7 +335,7 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">{label}</span>
     </Button>
   )
 }
@@ -533,8 +547,50 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
   )
 }
 
+// Collapsed-rail sizing (owner finding, "The collapsed rail," 2026-09-20,
+// both looks): a 40x40 centered target (size-10, not the 48px size-12
+// this used to force) with its icon centered - `justify-center` only
+// applies `group-data-[collapsible=icon]`, so the expanded row's own
+// left-aligned icon+label layout is untouched. docs/UI.md's 48px
+// touch-target floor still holds: `hitArea(1)` (kit/utils.ts, the same
+// helper button.tsx/toggle.tsx/HubCard.tsx already call, not a hand-
+// copy of its three classes) stretches the real hit region 4px past
+// the 40px box on every side - 48px exactly, matching two adjacent
+// items' own 48px vertical rhythm with no overlap between them. The
+// icon itself grows to the reference's own 20px collapsed (size-5),
+// same real component as the row's 16px expanded icon.
+//
+// The collapsed row's `overflow: visible` (a review caught this base
+// class's own `overflow-hidden`, kept for the expanded row's `[&>span:
+// last-child]:truncate`, clipping hitArea(1)'s `::before` at the SAME
+// element's own border box - the invisible region painted outside the
+// box but was never actually hit-testable there, so the floor this
+// was meant to satisfy was never really met) is tokens.css's plain CSS
+// rule against this button's own `data-slot` under a collapsed
+// `data-collapsible="icon"` ancestor, not a `group-data-[collapsible=
+// icon]:overflow-visible` class here: added that way first, and it
+// still failed to reach the built CSS after a fresh reinstall - by
+// elimination, this component's own callers merging its classes
+// through `cn()` (tailwind-merge), which collapses same-utility
+// conflicts and may not read `group-data-[collapsible=icon]:` as
+// scoping `overflow-visible` away from the base `overflow-hidden`
+// it would otherwise conflict with. Not chased further: plain CSS
+// never goes through that merge, so it sidesteps the question
+// entirely rather than depending on the answer.
+//
+// hitArea(1) unconditional, not `group-data-[collapsible=icon]:`-
+// gated: stacking that variant onto `before:` silently produced no CSS
+// at all mid-session - not a real Tailwind bug (found afterward: this
+// package is a `file:` link, and `bun install --force` snapshots its
+// source into bun's content-addressed store at install time, so a
+// consumer's build silently keeps building an older snapshot until
+// reinstalled - several edits landed between installs). Kept
+// unconditional anyway: it costs nothing on the expanded 48px row
+// (already at the floor; the extra 4px hit-area is inert there, not a
+// new overlap - the row's own 8px+ gaps to its neighbors stay clear of
+// it) and sidesteps needing that stacked variant to compile at all.
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-base ring-sidebar-ring outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-12! group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  `peer/menu-button relative flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-base ring-sidebar-ring outline-hidden transition-[width,height,padding] ${hitArea(1)} group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:[&>svg]:size-5`,
   {
     variants: {
       variant: {

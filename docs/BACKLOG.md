@@ -193,6 +193,19 @@ capability, needs its own design pass first).
   (`--hue-violet-deep`). Rebased onto spec-v0.1.1 (B's RF-05b fix): 319
   tests passing, all green. See `CHANGELOG.md` for the full
   component-by-component list.
+- [x] **M** `ui-v0.4.0`: "Two looks, one setting" (owner ruling,
+  2026-09-20, HOME-UI-02c) - `data-look` on `<html>` as a second theme
+  dimension next to light/dark (`studio:` variant, `--tile-radius`,
+  `--canvas-background`), Studio matching the reference exactly and
+  Calm the softer look that shipped first, a person's choice via the
+  new `ui.look` settings key (spec-v0.1.2). Same commit fixes the
+  collapsed rail in both looks (owner finding, same day): one toggle
+  (`rail-toggle.tsx` deleted, `SidebarTrigger` the sole control with a
+  real state-aware label), 64px rail, every collapsed row a true 40x40
+  centered target with its touch target still floored at 48px, the
+  active item's collapsed fill gradient in Studio and flat in Calm,
+  `HubCard`'s collapsed state a real icon tile instead of a lone dot.
+  See `CHANGELOG.md` for the full list.
 - [ ] **S** `ThreadListItemMorePrimitive.Item`'s own Rename/Delete rows
   hand-copy `DropdownMenuItem`'s base layout/floor classes
   (`min-h-12`/`text-base`/hover-focus tokens) verbatim (found by a
@@ -270,3 +283,8 @@ capability, needs its own design pass first).
   `spec-v0.1.1` - `catalog/docs/dev.md`'s own entry has the full
   account, including a code-review-caught CI path bug fixed and
   verified locally before landing).
+- [x] **S** `spec-v0.1.2`: adds the `ui.look` settings key ("Two looks,
+  one setting," `ui-v0.4.0`, HOME-UI-02c) - regenerated
+  `settings/keys.json` from `home/backend/src/settings/uiKeys.ts` via
+  `bun run gen:settings`, additive only (diffed against the previous
+  tag to confirm). Exit check: `bash scripts/check.sh`.

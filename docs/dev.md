@@ -847,3 +847,54 @@ new create/reuse/refuse-unknown step included. Manually exercised
 end to end first (create, reuse from a second call, unknown-tag
 refusal, `git worktree list` confirming a single reusable entry), same
 behavior the gate step now checks on every run.
+
+## Two looks, one setting, and the collapsed rail (ui-v0.4.0, 2026-09-20)
+
+The owner placed Home beside the reference and judged it "nice, not a
+match" (docs record in `home/docs/design/home-pages-2026-09-20.md`'s
+own "Two looks, one setting" section, full ruling there). This
+workspace's half: `[data-look]` on `<html>` as a second theme
+dimension next to light/dark, a `studio:` custom variant, a
+`--tile-radius` token, and a `--canvas-background` token - Home's own
+`useLook.ts` sets the attribute from the new `ui.look` settings key
+(`spec-v0.1.2`), defaulting to Studio before the read even resolves
+(the hub's own default). Same day, a second owner finding covered the
+collapsed rail in both looks (see this repo's own CHANGELOG for the
+full list): one toggle, 64px rail, 40x40 centered targets, the active
+item's collapsed fill gradient in Studio and flat in Calm, the hub
+card a real icon tile instead of a lone dot.
+
+**A real gap, not a Tailwind bug, cost real time here**: several
+`studio:`/`group-data-[collapsible=icon]:` classes appeared to compile
+to nothing mid-session (confirmed missing from the built `dist/assets/
+*.css`, present neighbors on the same class string). The actual cause
+was this repo's own `file:` link - Home's `bun install --force`
+snapshots this package's source into bun's content-addressed store at
+install time (see "How a consumer pins a workspace" above), so edits
+made here after the last install are invisible to a consumer's build
+until it reinstalls, and several rounds of edits happened between
+installs. Fixed once diagnosed by reinstalling before trusting a
+build; a handful of the trickiest rail rules (the collapsed active
+item's flat-vs-gradient split, the group label's Studio size, the
+expanded divider) stayed as plain attribute-selector CSS afterward
+anyway, since that path never depends on a consumer's install being
+fresh at all - a real robustness win for anyone else developing this
+kit against a live `file:` consumer, independent of what actually
+caused the confusion this time.
+
+**Verification**: this workspace's own `bun test` (358 pass) and
+`bun run lint` (`tsc --noEmit && eslint src`) green. Home's frontend
+`tsc --noEmit`, `eslint`, and full `bun test` (493 pass) green against
+a `shared-a`-pinned install. Home's `bun run scripts/screenshot.ts
+--shell-rail-review` run twice - once with a household forced to
+`ui.look: calm` (removed before commit, Studio is the real default),
+once at the real default - both runs 180 pages checked, 0 violations,
+0 overflow; `shell-rail-{expanded,collapsed}-desktop-{light,dark}.png`
+opened and judged both times against the owner's own checklist:
+rounded-square tiles and gradient product tile in Studio, circles in
+Calm; the reference's own larger title and 11px small-cap group
+labels with dividers in Studio; no dead side margins on the dashboard
+in Studio; the quick-action tiles' truncation fixed in both; the
+collapsed rail's one toggle, 64px width, centered 40x40 targets, and
+the active item's gradient-in-Studio/flat-in-Calm collapsed fill, in
+both looks and both themes.

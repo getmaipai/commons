@@ -33,7 +33,10 @@ export function MetricCard({ icon, hue, count, label, state, stateHref, classNam
         <IconTile icon={icon} hue={hue} />
         <div className="min-w-0">
           <p className="text-[var(--font-size-metric)] font-semibold tabular-nums leading-none">{count}</p>
-          <p className="mt-1 truncate text-sm text-muted-foreground">{label}</p>
+          {/* No truncate (owner ruling, "Two looks, one setting":
+              "nothing inside a card ever truncates") - the label wraps
+              instead of clipping. */}
+          <p className="mt-1 text-sm text-muted-foreground">{label}</p>
         </div>
       </div>
       {stateLine && <div className="mt-2">{stateLine}</div>}

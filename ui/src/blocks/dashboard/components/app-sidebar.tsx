@@ -2,7 +2,6 @@ import type { ComponentProps, ReactNode } from "react";
 import type { IconName } from "@/kit/icons";
 import { useLocation } from "react-router-dom";
 import { NavMain, type NavGroup } from "@/kit/blocks/dashboard/components/nav-main";
-import { RailToggle } from "@/kit/blocks/dashboard/components/rail-toggle";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/kit/ui/sidebar";
 import { isActiveNavPath, type NavEntry } from "@/kit/nav";
 
@@ -47,15 +46,18 @@ export function AppSidebar({ groups, brand, footer, ...props }: AppSidebarProps)
     // generated file) - every nav link inside otherwise sits outside any
     // landmark, an axe `region` failure found by the far/TV a11y sweep.
     <Sidebar collapsible="icon" role="navigation" aria-label="Main navigation" className="bg-[var(--surface-sidebar)] p-1.5 pb-2" {...props}>
+      {/* One toggle for the rail, the header's own SidebarTrigger
+          (Shell.tsx) - owner finding, "The collapsed rail," 2026-09-20:
+          a second one lived here (RailToggle, now deleted) forcing the
+          brand row into a two-line stack to fit both; gone, the brand
+          row is just the brand, centered on the same axis as every nav
+          item below it once collapsed. */}
       <SidebarHeader className="p-0">
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center justify-between gap-2 px-1.5 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
-              <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1! flex-1 gap-1 group-data-[collapsible=icon]:flex-none">
-                {brand}
-              </SidebarMenuButton>
-              <RailToggle />
-            </div>
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1! gap-1 px-1.5 py-1">
+              {brand}
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
