@@ -72,9 +72,24 @@ export function NotificationPopover({
       }}
     >
       <PopoverTrigger asChild data-notifications-trigger aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}>
-        <Button variant="ghost" size="icon-sm" className="relative overflow-visible">
-          <BellIcon className="size-4" />
-          {unreadCount > 0 ? <Badge className="absolute right-0 top-0 size-4 min-w-4 rounded-full px-1 py-0 text-[10px]">{unreadCount}</Badge> : null}
+        <Button variant="ghost" size="icon-sm" className="overflow-visible">
+          {/* Owner finding, 2026-09-20 17:40 ("The rail geometry,
+           * exactly"): the badge used to anchor to `icon-sm`'s own 32px
+           * button box (`absolute right-0 top-0` on the Button itself),
+           * 8px off the 16px icon it actually sits over (icon-sm centers
+           * a size-4 icon inside a size-8 button) - far enough to read
+           * as "floating above the bell" and reach into a neighboring
+           * header control. This wrapper is sized to the icon, not the
+           * button, so the badge's own corner is the icon's own corner
+           * regardless of the button's padding. */}
+          <span className="relative inline-flex size-4">
+            <BellIcon className="size-4" />
+            {unreadCount > 0 ? (
+              <Badge className="absolute -top-1.5 -right-1.5 size-4 min-w-4 justify-center rounded-full p-0 text-[10px] font-semibold">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </Badge>
+            ) : null}
+          </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0">

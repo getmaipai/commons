@@ -4,6 +4,39 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.1] - ui-v0.4.1
+
+Home's own HOME-UI-02d (phone dashboard, Conversations folds into
+Chat, the rail's navigation correction): three real, previously-
+unshipped kit gaps the phone tab bar and the rail's own reference-exact
+geometry found.
+
+### Added
+- `PhoneNav`'s `max` prop (default 5, the existing behavior): a product
+  can pin a smaller primary set before folding the rest under "More" -
+  Home's own three-destination phone tab bar (Home, Chat, Apps) needed
+  four slots total, not five. `Shell`'s own `phoneNavMax` threads it
+  through.
+- The rail's exact Studio geometry (owner findings, "The Studio look,
+  the numbers," 2026-09-20 18:15 - a page built to reproduce the
+  reference's own geometry, superseding an earlier, rougher "The rail
+  geometry, exactly" pass the same day): the collapsed rail's own
+  width (72px, was 64px), item padding/radius/gaps, the active item's
+  exact gradient stops plus a 1px inset ring and a soft glow, the
+  divider and group-label colors/inset, all `studio:`-scoped so Calm
+  is unaffected.
+
+### Fixed
+- The active nav item's inset pills ran edge to edge, cut off at the
+  rail's own right edge - `NavMain`'s items now carry a real margin
+  against a flush rail (`app-sidebar.tsx`'s own side padding removed
+  in favor of each item carrying its own inset), both looks.
+- `NotificationPopover`'s unread-count badge anchored to the header
+  button's own 32px box, not the 16px bell icon centered inside it -
+  8px off on each axis, easily read as "floating above the bell" or
+  overlapping a neighboring header control. Anchored to the icon's own
+  wrapper instead; counts above 9 now show "9+".
+
 ## [0.4.0] - ui-v0.4.0
 
 "Two looks, one setting" (owner ruling, 2026-09-20): Home shipped one

@@ -8,13 +8,26 @@ import { isActiveNavPath, type NavEntry } from "@/kit/nav";
 const BOTTOM_BAR_MAX = 5;
 
 // docs/UI.md's per-surface phone rule: "the sidebar collapses to a
-// five-entry bottom bar... with the rest under More."
-export function PhoneNav({ entries }: { entries: readonly NavEntry[] }) {
+// five-entry bottom bar... with the rest under More." `max` lets a
+// product pin a smaller, deliberate primary set instead (Home's own
+// "Home, Chat, Apps, More" - owner ruling, "Navigation, corrected,"
+// 2026-09-20: three real destinations, not four, before More) without
+// changing the default every other consumer's own tests and behavior
+// already rely on.
+export function PhoneNav({ entries, max = BOTTOM_BAR_MAX }: { entries: readonly NavEntry[]; max?: number }) {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
-  const overflowing = entries.length > BOTTOM_BAR_MAX;
-  const shown = overflowing ? entries.slice(0, BOTTOM_BAR_MAX - 1) : entries;
-  const overflowEntries = overflowing ? entries.slice(BOTTOM_BAR_MAX - 1) : [];
+  // A code review (2026-09-20) caught `max <= 0`: `entries.slice(0, max
+  // - 1)` would then pass a negative end index, which
+  // Array.prototype.slice counts from the array's END, not "zero
+  // items" - the tab bar would show almost every entry directly
+  // instead of folding them all under More, the opposite of what a
+  // caller passing max=0 means. Clamped to 1 (More alone, nothing
+  // shown directly) as the lowest sane value.
+  const safeMax = Math.max(1, max);
+  const overflowing = entries.length > safeMax;
+  const shown = overflowing ? entries.slice(0, safeMax - 1) : entries;
+  const overflowEntries = overflowing ? entries.slice(safeMax - 1) : [];
   const MoreIcon = getIcon("more-horizontal");
 
   return (

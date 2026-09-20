@@ -51,7 +51,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
               directly since it has no expanded-mode equivalent to share
               a selector with. */}
           {index > 0 && collapsed && (
-            <div aria-hidden className="mx-auto my-1 h-px w-6 bg-sidebar-border" />
+            <div aria-hidden className="mx-auto my-3 h-px w-6 bg-sidebar-border" />
           )}
           {/* text-base, not text-xs, and h-auto, not the h-4 that fit only
               the old size: the type floor (docs/UI.md) applies to this
@@ -71,32 +71,63 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
               it) is tokens.css's `[data-look="studio"] [data-slot=
               "sidebar-group-label"]` rule, not a class here, for the
               same reason as the divider above. */}
-          <SidebarGroupLabel className="mt-4 mb-2 h-auto px-2 font-semibold tracking-wide text-sidebar-foreground/75 uppercase group-data-[collapsible=icon]:hidden">{group.label}</SidebarGroupLabel>
-          <SidebarMenu className="gap-0">
+          {/* Owner findings: 20px above a group label at the pills' own
+              left edge (px-3, matching SidebarMenuButton's own mx-3
+              below) - except the first group, which sits right under
+              the logo block's own bottom padding (app-sidebar.tsx's
+              SidebarHeader) and needs none of its own on top of that;
+              Studio's own exact numbers ("The Studio look, the
+              numbers," 2026-09-20 18:15, superseding any earlier
+              estimate) - 11px above (7px for the first group, the
+              logo block's own padding already at 14px) and 7px below
+              - replace Calm's own defaults only inside `studio:`.
+              Inset 13px, not that section's own literal "7px": kept
+              aligned with the pills' own studio:mx-[13px] below
+              rather than sitting 6px out of line with them (tokens.css's
+              own divider rule has the fuller reasoning, the same
+              choice applied there). */}
+          <SidebarGroupLabel className={`${index === 0 ? "mt-0 studio:mt-[7px]" : "mt-5 studio:mt-[11px]"} mb-2 studio:mb-[7px] h-auto px-3 studio:px-[13px] font-semibold tracking-wide text-sidebar-foreground/75 uppercase group-data-[collapsible=icon]:hidden`}>{group.label}</SidebarGroupLabel>
+          <SidebarMenu className="gap-0 studio:gap-[2px]">
             {group.items.map((item) => {
               const Icon = item.icon ? getIcon(item.icon) : null;
               return (
               <SidebarMenuItem key={item.title}>
-                {/* No h/text/svg-size override here: that silently
-                    defeated SidebarMenuButton's own 48px/16px floor
-                    default the same way the SidebarGroupLabel override
-                    above did (found live building step 5's far/TV a11y
-                    sweep - the first thing to actually measure this nav
-                    row's real rendered size). */}
+                {/* h-10 (40px) here IS an override of SidebarMenuButton's
+                    own 48px default - a past comment on this exact line
+                    warned against exactly that, from a real regression
+                    (a far/TV a11y sweep once found a size override here
+                    that silently defeated the touch-target floor). Safe
+                    this time only because sidebar.tsx's own `hitArea(1)`
+                    is baked into the button's base classes
+                    unconditionally, and a 4px overhang on each side of a
+                    40px box IS the 48px floor (its own comment: "already
+                    at the floor" was about the default 48px row; h-10
+                    is the row hitArea(1) was sized for, not an escape
+                    from it). mx-3/h-10/gap-3/rounded-[10px] are the base
+                    (both looks): "inset pills, never edge to edge" is a
+                    real bug, not a Studio-only look. `studio:` narrows
+                    every number to the reference-exact figure ("The
+                    Studio look, the numbers," 2026-09-20 18:15, which
+                    wins over the rougher 17:40 estimates this file
+                    used to cite) - 8px radius, 2px between items
+                    (SidebarMenu's own className above), 14px icon-label
+                    gap, 10px vertical padding (h-auto lets it set the
+                    row's real height instead of competing with h-10).
+                    Calm keeps the plainer numbers; it was never given
+                    reference-exact ones of its own. */}
                 {/* bg-gradient-to-br from violet to its deeper stop
                     (spec "The style, exactly": "the gradient from
                     section 1's violet to its deeper stop"), not a flat
                     fill - the same treatment the reference's own active
-                    item uses, expanded, both looks. Studio's own 10px
-                    radius (owner ruling) and the collapsed flat-vs-
-                    gradient split (owner finding, "The collapsed rail")
-                    are tokens.css's plain CSS rules against this
-                    button's own `data-slot`/`data-active` attributes,
-                    not classes here (tokens.css's own comment on that
-                    block has why). `studio:mx-1` (the reference's own
-                    inset from the rail edge) is the one look-specific
-                    class that stays here. */}
-                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="px-3 studio:mx-1 data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
+                    item uses, expanded, both looks; Studio's own exact
+                    gradient stops, inset ring and glow are tokens.css's
+                    plain CSS (this file's own established reason a
+                    stacked `studio:`+`data-[active=true]:` Tailwind
+                    variant can't be trusted to merge - the same
+                    tailwind-merge gap HOME-UI-02c found). The collapsed
+                    flat-vs-gradient split (owner finding, "The
+                    collapsed rail") is there too. */}
+                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="mx-3 studio:mx-[13px] h-10 studio:h-auto studio:py-[10px] gap-3 studio:gap-[14px] rounded-[10px] studio:rounded-[8px] px-3 [&>svg]:size-5 studio:[&>svg]:size-[19px] data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
                   {/* aria-label, not just the visible span below: a
                       collapsed rail (tablet defaults to collapsed,
                       defaultRailOpen()'s own <1280px threshold) hides
@@ -117,7 +148,15 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                         (sidebar.tsx) clips it to whatever sliver fits the
                         collapsed 48px button instead of hiding it, so the
                         icon-only rail showed one stray letter per row. */}
-                    <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
+                    {/* text-sm (14px): docs/UI.md's 16px type floor is
+                        for body copy; a rail nav label, like the group
+                        heading above it, is a compact wayfinding label,
+                        vertically centered in the pill next to its icon,
+                        not a paragraph a person reads at length. Weight
+                        520 in Studio's own numbers is the kit's "medium"
+                        (font-medium, 500) - the nearest step Tailwind's
+                        default weight scale has. */}
+                    <span className="text-sm studio:font-medium group-data-[collapsible=icon]:hidden">{item.title}</span>
                     {item.dot ? <span aria-hidden className={`size-2.5 rounded-full ${DOT[item.dot]}`} /> : null}
                     {item.badge != null && item.badge > 0 && <span className="ml-auto text-xs text-muted-foreground">{item.badge}</span>}
                   </NavLink>

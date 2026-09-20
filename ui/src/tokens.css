@@ -131,20 +131,59 @@
  * until reinstalled. Kept here anyway once diagnosed and fixed,
  * because it sidesteps that whole class of gap for anyone developing
  * this kit against a live consumer: no dependency on remembering to
- * reinstall before trusting what a build shows. `nav-main.tsx`'s own
- * className props keep only `studio:mx-1` (the reference's own inset)
- * and the plain size/justify/icon-size swaps. */
+ * reinstall before trusting what a build shows. The pill's own radius
+ * and inset moved to a plain `rounded-[10px] mx-3` class in nav-
+ * main.tsx once the rail geometry findings (2026-09-20 17:40) made
+ * them shape rules for every item, both looks, not a Studio-only
+ * active-state one - what's left here is genuinely look-scoped: the
+ * group label's own small-caps size and the expanded divider. */
+/* 10px uppercase, 0.08em tracking, in secondary text (owner findings,
+ * "The Studio look, the numbers," 2026-09-20 18:15 - a page built to
+ * reproduce the reference's own geometry; this wins over the rougher
+ * 11px/17:40 estimate this rule used to carry). No `color` override:
+ * a code review (2026-09-13, this same rule's own SidebarGroupLabel
+ * call site) already measured the light theme's own --sidebar tokens
+ * to land the primitive's default text-sidebar-foreground/75 at
+ * 4.48:1, under WCAG AA - #A9BED7 (the reference's own dark-theme
+ * secondary text color) was flagged for exactly this, 3.86:1 against
+ * the light theme's own panel, by axe's own color-contrast check the
+ * first time this ran at `far`/light. The default already carries its
+ * own light/dark derivation; this rule only ever needed the size. */
 [data-look="studio"] [data-slot="sidebar-group-label"] {
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
+/* 1px `#24405F`, 12px above and below (owner findings, "The Studio
+ * look, the numbers," 2026-09-20 18:15). Inset 13px, not that
+ * section's own literal "7px": the rail itself is flush (no
+ * horizontal padding, app-sidebar.tsx's own comment on why), so this
+ * margin is the divider's full inset from the true rail edge - kept
+ * aligned with the pills' own studio:mx-[13px] and the group label's
+ * own studio:px-[13px] (nav-main.tsx) rather than sitting 6px out of
+ * line with both, which is what the literal 7px would have done here
+ * once every other inset in the rail was reconciled to the same
+ * "Padding... 13px sides" figure the same section gives for the rail
+ * overall. */
 [data-look="studio"] [data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type) {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--sidebar-border);
+  margin-top: 12px;
+  padding-top: 12px;
+  margin-inline: 13px;
+  border-top: 1px solid #24405F;
 }
+/* The active item's exact reference colors (owner findings, "The
+ * Studio look, the numbers," 2026-09-20 18:15): the gradient
+ * (`#3E1BB2` to `#311893`), a 1px inset ring `#6E3DF8`, and a soft
+ * violet glow - plain CSS, not a stacked `studio:`+
+ * `data-[active=true]:` Tailwind variant (this file's own established
+ * reason: a stacked custom-variant-plus-attribute-selector combo
+ * isn't reliably resolved by `cn()`'s tailwind-merge, the same gap
+ * HOME-UI-02c found). Layered over nav-main.tsx's own unconditional
+ * `data-[active=true]:bg-gradient-to-br ... from-[var(--hue-violet)]
+ * ...` class, which supplies Calm's own (different, untouched)
+ * gradient. */
 [data-look="studio"] [data-slot="sidebar-menu-button"][data-active="true"] {
-  border-radius: 10px;
+  background-image: linear-gradient(135deg, #3E1BB2, #311893);
+  box-shadow: inset 0 0 0 1px #6E3DF8, 0 0 12px color-mix(in srgb, #6E3DF8 35%, transparent);
 }
 /* Collapsed active square: a flat `background-color` under everything,
  * a Studio-only gradient `background-image` layered over it - two
@@ -161,18 +200,27 @@
    * mode has to explicitly turn it back off before Calm can go flat. */
   background-color: var(--hue-violet);
   background-image: none;
+  box-shadow: none;
 }
 [data-look="studio"] [data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"][data-active="true"] {
-  background-image: linear-gradient(to bottom right, var(--hue-violet), var(--hue-violet-deep));
+  background-image: linear-gradient(135deg, #3E1BB2, #311893);
+  box-shadow: inset 0 0 0 1px #6E3DF8, 0 0 12px color-mix(in srgb, #6E3DF8 35%, transparent);
 }
-/* Lets the collapsed row's hit-area pseudo-element (sidebar.tsx's own
+/* Lets the row's hit-area pseudo-element (sidebar.tsx's own
  * `hitArea(1)`) actually extend the real, hit-testable click region
- * past the 40px box - `overflow-hidden` on the same element (kept for
- * the expanded row's own label truncation) clips it otherwise, so the
- * touch-target floor this was meant to satisfy was never really met
- * (a review caught this live). Not a Tailwind class here: sidebar.tsx's
- * own comment on this rule has why. */
-[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"] {
+ * past its own box - `overflow-hidden` (the button's own base class)
+ * clips it otherwise, so the touch-target floor this was meant to
+ * satisfy was never really met (a review caught this live, collapsed
+ * mode only, at the time - the original version of this rule was
+ * gated on `[data-collapsible="icon"]`). Ungated now that the
+ * expanded row is also 40px (owner findings, "The rail geometry,
+ * exactly," 2026-09-20 17:40: nav-main.tsx's own `h-10`), which makes
+ * hitArea(1)'s overhang load-bearing there too, not just collapsed -
+ * safe to widen because the label's own truncation lives on the span
+ * itself (`[&>span:last-child]:truncate`, sidebar.tsx), never
+ * depended on the button's own overflow. Not a Tailwind class here:
+ * sidebar.tsx's own comment on this rule has why. */
+[data-slot="sidebar-menu-button"] {
   overflow: visible;
 }
 

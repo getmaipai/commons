@@ -54,6 +54,35 @@ describe("Shell", () => {
     expect(getByText("page content")).toBeInTheDocument();
   });
 
+  // A code review (2026-09-20) caught this prop's own threading as
+  // uncovered: PhoneNav.test.tsx only ever exercises `max` by
+  // rendering PhoneNav directly, never through Shell, so a later
+  // Shell.tsx edit that dropped `max={phoneNavMax}` from its own
+  // <PhoneNav> call would pass PhoneNav's own suite while silently
+  // reverting every Shell consumer's phone tab bar to the default
+  // five-entry cut.
+  test("phoneNavMax reaches the phone tab bar's own max, not just PhoneNav's own default", () => {
+    const fiveEntries: NavEntry[] = [
+      { to: "/", icon: "home", label: "Home" },
+      { to: "/chat", icon: "message-circle", label: "Chat" },
+      { to: "/apps", icon: "layout-grid", label: "Apps" },
+      { to: "/people", icon: "users", label: "People" },
+      { to: "/settings", icon: "settings", label: "Settings" },
+    ];
+    const { container } = renderShell({ nav: fiveEntries, phoneNavMax: 4 });
+    // Scoped to the phone tab bar itself, not the whole document: the
+    // desktop rail (always in the DOM alongside it, per the first test
+    // above's own comment) renders every entry regardless of
+    // phoneNavMax, so an unscoped query would find "People" there even
+    // if the phone bar's own max were broken.
+    const phoneNav = container.querySelector('nav[aria-label="Primary"]')!;
+    // max=4 folds the last two of five under More - People, the fourth
+    // real entry, is the one that tips over (shown = first 3, plus
+    // More in the fourth slot).
+    expect(phoneNav.textContent).not.toContain("People");
+    expect(phoneNav.textContent).toContain("More");
+  });
+
   test("renders headerTitle and headerActions where given", () => {
     const { getByText } = renderShell({ headerTitle: <span>Overview</span>, headerActions: <button type="button">Notifications</button> });
     expect(getByText("Overview")).toBeInTheDocument();

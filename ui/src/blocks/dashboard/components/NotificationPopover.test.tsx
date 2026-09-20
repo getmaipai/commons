@@ -33,6 +33,25 @@ describe("NotificationPopover", () => {
     expect(getByRole("button", { name: "Notifications" })).toBeInTheDocument();
   });
 
+  // Owner finding, 2026-09-20 17:40 ("The rail geometry, exactly"):
+  // "counts above 9 show '9+'" - a real unread count can pile up past
+  // what a 16px circle can show as digits.
+  test("shows 9+ once the unread count passes nine, not the literal number", () => {
+    const many: NotificationPopoverItem[] = Array.from({ length: 24 }, (_, i) => ({
+      id: `n${i}`,
+      title: `Notification ${i}`,
+      at: "2026-09-20T00:00:00.000Z",
+      read: false,
+    }));
+    const { getByText, getByRole } = render(
+      <MemoryRouter>
+        <NotificationPopover items={many} open={false} onOpenChange={() => {}} onDismiss={() => {}} />
+      </MemoryRouter>,
+    );
+    expect(getByText("9+")).toBeInTheDocument();
+    expect(getByRole("button", { name: /24 unread/ })).toBeInTheDocument();
+  });
+
   test("opening shows every item and an empty message when there are none", () => {
     const { getByRole, getByText } = render(
       <MemoryRouter>

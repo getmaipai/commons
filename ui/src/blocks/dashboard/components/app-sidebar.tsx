@@ -45,17 +45,43 @@ export function AppSidebar({ groups, brand, footer, ...props }: AppSidebarProps)
     // fix belongs at the one real call site, not a hand-patch of the
     // generated file) - every nav link inside otherwise sits outside any
     // landmark, an axe `region` failure found by the far/TV a11y sweep.
-    <Sidebar collapsible="icon" role="navigation" aria-label="Main navigation" className="bg-[var(--surface-sidebar)] p-1.5 pb-2" {...props}>
+    // No horizontal padding on the rail itself: every item carries its
+    // own inset directly (nav-main.tsx's pill margin and group-label
+    // padding, the brand button's own left padding below), so a
+    // container-level px- here would double-count against those. The
+    // rail's own top/bottom padding has no per-item carrier the same
+    // way, so it lives here: Studio's exact 17px top / 14px bottom
+    // (owner findings, "The Studio look, the numbers," 2026-09-20
+    // 18:15) over Calm's own plainer pb-3.
+    <Sidebar collapsible="icon" role="navigation" aria-label="Main navigation" className="bg-[var(--surface-sidebar)] pb-3 studio:pt-[17px] studio:pb-[14px]" {...props}>
       {/* One toggle for the rail, the header's own SidebarTrigger
           (Shell.tsx) - owner finding, "The collapsed rail," 2026-09-20:
           a second one lived here (RailToggle, now deleted) forcing the
           brand row into a two-line stack to fit both; gone, the brand
           row is just the brand, centered on the same axis as every nav
           item below it once collapsed. */}
-      <SidebarHeader className="p-0">
+      {/* pt-5 (20px, "20px above it") pb-6 (24px, "then 24px of space
+          before the first group label" - nav-main.tsx's own first
+          group label carries none of its own on top of this, so the
+          two don't stack into something bigger than the reference).
+          Studio's own exact brand row is 62px tall with 14px below it
+          (owner findings, "The Studio look, the numbers," 2026-09-20
+          18:15) - h-[62px] replaces the plain pt-/pb- pair, and the
+          rail's own studio:pt-[17px] above already supplies the row's
+          own top inset, so this only needs the 14px below. */}
+      <SidebarHeader className="pt-5 pb-6 studio:h-[62px] studio:pt-0 studio:pb-[14px]">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1! gap-1 px-1.5 py-1">
+            {/* pl-3 (12px): "the tile's left edge sits at the same x
+                as the item pills' left edge" (owner's own clarifying
+                parenthetical, trusted over the isolated "16px" figure
+                earlier in the same sentence, since alignment with the
+                pills below it is the unambiguous constraint and pl-3
+                matches their own mx-3 exactly). Studio's own exact
+                13px (owner findings, "The Studio look, the numbers,"
+                2026-09-20 18:15) keeps the same alignment, matching
+                the pills' own studio:mx-[13px]. */}
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1! gap-1 pl-3! studio:pl-[13px]! studio:h-full studio:items-center">
               {brand}
             </SidebarMenuButton>
           </SidebarMenuItem>

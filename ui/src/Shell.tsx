@@ -67,6 +67,12 @@ export interface ShellProps {
    * Namespaced by the caller so two products on one browser profile
    * never share a rail preference. */
   railStorageKey?: string;
+  /** Total tab-bar slots, entries plus More, before folding the rest
+   * under More (`PhoneNav.tsx`'s own `max`, default 5 - shows 4 plus
+   * More). Home passes 4 for its own "Home, Chat, Apps, More" - three
+   * real destinations, not four, before More (owner ruling,
+   * "Navigation, corrected," 2026-09-20). */
+  phoneNavMax?: number;
   /** The fixed 40px status bar between the content region and the
    * phone tab bar (spec "Fixed footer"/"Footer summary reference") -
    * a product's own `FooterBar`, or nothing for a product with no
@@ -109,7 +115,7 @@ function flatEntries(nav: readonly NavEntry[] | NavGroup[]): NavEntry[] {
  * TV-focusable navigation (the norigin spatial-navigation rail) is not
  * yet part of this shell - tracked as a follow-up, not silently
  * dropped. */
-export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, search, railStorageKey = "maipai:shell-rail", footer, children }: ShellProps) {
+export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, search, railStorageKey = "maipai:shell-rail", phoneNavMax, footer, children }: ShellProps) {
   const [railOpen, setRailOpen] = useState<boolean>(() => readRailPreference(railStorageKey) ?? defaultRailOpen());
   const [paletteOpen, setPaletteOpen] = useState(false);
   // The same tier `SidebarProvider` (ui/sidebar.tsx) already derives its
@@ -168,7 +174,7 @@ export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, s
         </header>
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-16 sm:pb-0"><PhoneModeContext.Provider value={phone}>{children}</PhoneModeContext.Provider></div>
         {footer ? <div className="hidden h-10 shrink-0 items-center border-t border-border/60 sm:flex">{footer}</div> : null}
-        <PhoneNav entries={entries} />
+        <PhoneNav entries={entries} max={phoneNavMax} />
       </SidebarInset>
       {search ? (
         <CommandPalette

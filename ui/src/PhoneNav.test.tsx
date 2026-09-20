@@ -54,6 +54,46 @@ describe("PhoneNav", () => {
     expect(getByRole("link", { name: /Privacy/ })).toBeInTheDocument();
   });
 
+  // Home's own "Home, Chat, Apps, More" (owner ruling, "Navigation,
+  // corrected," 2026-09-20): three real destinations, not the kit's
+  // own default four, before folding the rest under More.
+  test("a caller-supplied max shrinks the shown count, without changing the default for anyone else", () => {
+    const { getByText, queryByText } = render(
+      <MemoryRouter>
+        <PhoneNav entries={FIVE_ENTRIES} max={4} />
+      </MemoryRouter>,
+    );
+    for (const entry of FIVE_ENTRIES.slice(0, 3)) expect(getByText(entry.label)).toBeInTheDocument();
+    expect(getByText("More")).toBeInTheDocument();
+    expect(queryByText("People")).not.toBeInTheDocument();
+  });
+
+  // A code review (2026-09-20) caught `max <= 0` as reachable and
+  // wrong before this test existed: `entries.slice(0, max - 1)` with a
+  // negative end index counts from the array's END, not "zero items" -
+  // max=0 would have shown almost everything directly instead of
+  // folding it all under More. Clamped to 1 (PhoneNav.tsx's own
+  // `safeMax`).
+  test("a max of zero or less clamps to showing nothing directly, everything under More", () => {
+    const { queryByText, getByText } = render(
+      <MemoryRouter>
+        <PhoneNav entries={FIVE_ENTRIES} max={0} />
+      </MemoryRouter>,
+    );
+    for (const entry of FIVE_ENTRIES) expect(queryByText(entry.label)).not.toBeInTheDocument();
+    expect(getByText("More")).toBeInTheDocument();
+  });
+
+  test("a max at or above the entry count shows everything directly, no More button", () => {
+    const { getByText, queryByText } = render(
+      <MemoryRouter>
+        <PhoneNav entries={FIVE_ENTRIES} max={5} />
+      </MemoryRouter>,
+    );
+    for (const entry of FIVE_ENTRIES) expect(getByText(entry.label)).toBeInTheDocument();
+    expect(queryByText("More")).not.toBeInTheDocument();
+  });
+
   test("marks the active entry with aria-current", () => {
     const { getByRole } = render(
       <MemoryRouter initialEntries={["/apps"]}>

@@ -34,7 +34,13 @@ const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 // backed by localStorage, not this cookie.
 const SIDEBAR_WIDTH = "252px"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "64px"
+// 72px (owner findings, "The Studio look, the numbers," 2026-09-20
+// 18:15 - a page built to reproduce the reference's own geometry;
+// this number wins over any earlier estimate): the collapsed rail
+// stays wide enough for a centered 40px pill (nav-main.tsx's own
+// group-data-[collapsible=icon]:size-10) plus real breathing room,
+// not the bare 48px icon-button width shadcn's own default assumed.
+const SIDEBAR_WIDTH_ICON = "72px"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContextProps = {
