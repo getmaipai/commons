@@ -6,11 +6,17 @@ pinned by tag rather than copied. Decided 2026-09-20 (see
 layer and its reconciled kit, plus the helpers Home and the Stack had each
 grown their own copy of, needed one home instead of two.
 
-| Workspace | Package | Contents | Consumers |
+## Workspaces and their current tags
+
+| Workspace | Package | Current tag | Consumers |
 |---|---|---|---|
-| `ui/` | `@maipai/ui` | The kit, tokens, icons, shell, settings and permission renderers, the kit's ESLint config | Home, Go, catalog packages |
-| `core/` | `@maipai/core` | Logging, timeouts, paths, archives, IDs, secrets and the keystore, rate limiting, the hardware probe, backup crypto | Home, Stack, Bot |
-| `spec/` | `@maipai/spec` | The household's record shapes, schemas, the settings declaration format, the UI schema, errors, safety, streaming and voice | Home, Stack, Catalog, Bot, Go |
+| `ui/` | `@maipai/ui` | `ui-v0.2.2` | Home (Go and catalog packages later) |
+| `core/` | `@maipai/core` | `core-v0.1.0` | Home, Stack |
+| `spec/` | `@maipai/spec` | not yet tagged (moves from home/spec at 0c) | Home, Stack, Catalog, Bot, Go |
+
+A consumer pins one of these tags and states it in its own dev docs; bumping is
+a checkout of the sibling at the new tag plus `bun install` (the
+`@maipai/standards` pattern, no registry).
 
 Nothing in `shared` imports a product. A consuming repo resolves each
 workspace from a sibling checkout (`MAIPAI_SHARED_DIR` overrides
