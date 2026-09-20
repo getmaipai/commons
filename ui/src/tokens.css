@@ -63,6 +63,11 @@
    * blue. */
   --hue-blue: var(--primary);
   --hue-violet: #a434ff;
+  /* The active nav item's gradient stop (spec "The style, exactly": "the
+   * gradient from section 1's violet to its deeper stop"), not derived at
+   * render time - a fixed color, same in both themes, like --hue-violet
+   * itself. */
+  --hue-violet-deep: #7a1fd6;
   --hue-teal: #00e3ae;
   --hue-orange: #ff8a35;
   --hue-pink: #ff3e9a;

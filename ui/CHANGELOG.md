@@ -4,6 +4,50 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.3.0] - ui-v0.3.0
+
+Home's shell and dashboard, to the owner's ruling on "Home's pages under
+the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
+
+### Added
+- `IconTile` (`src/primitives/IconTile.tsx`): the one icon tile every
+  card, row, nav group heading and panel header draws through (spec
+  section 1: 18% fill, 35% border, a soft glow, `md`/`sm` sizes).
+- `PanelHeader` (`src/blocks/cards/PanelHeader.tsx`): a panel's header
+  row - the icon tile, the title, a right-aligned "View all"/"Browse
+  all" link with an arrow, a hairline underneath. `linkAriaLabel` lets
+  two panels on one page share the same visible label with distinct
+  accessible names.
+- `HubCard` (`src/blocks/dashboard/components/HubCard.tsx`): the rail's
+  bottom hub card (name, OS/version, a status dot and label), collapsing
+  to its status dot alone when the rail is collapsed.
+- `FooterBar` (`src/blocks/dashboard/components/FooterBar.tsx`): the
+  fixed 40px status bar (version, linked operational counts, aggregate
+  health) - rendered by a product into `Shell`'s new `footer` slot.
+- `HeaderSearchField` (`src/blocks/dashboard/components/HeaderSearchField.tsx`):
+  the header's real search field (a raised-panel input, the search icon,
+  the ⌘K pill), icon-only under `sm`. `Shell`'s header now renders this
+  in place of the old bare icon button when `search` is given.
+- `arrow-right` and `calendar` added to `icons.ts`.
+- `--hue-violet-deep` token (`tokens.css`): the active nav item's
+  gradient stop (spec: "the gradient from section 1's violet to its
+  deeper stop").
+
+### Changed
+- `Shell`: new `footer?: ReactNode` prop, rendered as a fixed row
+  between the scrollable content and the phone tab bar (hidden on the
+  phone). The header's three regions (title, search, actions) are now
+  real flex siblings so the search field centers between the title and
+  the header actions, instead of sitting flush right beside them.
+- `MetricCard`, `CategoryTile`, `ActionTile`: restyled onto `IconTile`
+  (18%/35%/glow, replacing each one's own inline hand-rolled tile).
+  `CategoryTile` gained an optional `state` string (a caller's own state
+  text, not just an installed count). `ActionTile` gained an optional
+  `hue` (default blue, matching the reference's uniform Quick Actions
+  tiles).
+- `nav-main.tsx`: the active item's fill is now the violet-to-`--hue-
+  violet-deep` gradient, not a flat color.
+
 ## [0.2.4] - ui-v0.2.4
 
 ### Fixed

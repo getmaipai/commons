@@ -48,7 +48,12 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                     above did (found live building step 5's far/TV a11y
                     sweep - the first thing to actually measure this nav
                     row's real rendered size). */}
-                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="px-3 data-[active=true]:bg-[var(--hue-violet)] data-[active=true]:text-white data-[active=true]:hover:bg-[var(--hue-violet)] data-[active=true]:hover:text-white">
+                {/* bg-gradient-to-br from violet to its deeper stop
+                    (spec "The style, exactly": "the gradient from
+                    section 1's violet to its deeper stop"), not a flat
+                    fill - the same treatment the reference's own active
+                    item uses. */}
+                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="px-3 data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
                   {/* aria-label, not just the visible span below: a
                       collapsed rail (tablet defaults to collapsed,
                       defaultRailOpen()'s own <1280px threshold) hides

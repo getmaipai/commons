@@ -6,8 +6,7 @@ import { PhoneNav } from "@/kit/PhoneNav";
 import { CommandPalette } from "@/kit/search/CommandPalette";
 import type { SearchGroup, SearchResultItem } from "@/kit/search/types";
 import type { NavEntry } from "@/kit/nav";
-import { Button } from "@/kit/ui/button";
-import { getIcon } from "@/kit/icons";
+import { HeaderSearchField } from "@/kit/blocks/dashboard/components/HeaderSearchField";
 import { cn } from "@/kit/utils";
 
 function readRailPreference(storageKey: string): boolean | null {
@@ -66,6 +65,12 @@ export interface ShellProps {
    * Namespaced by the caller so two products on one browser profile
    * never share a rail preference. */
   railStorageKey?: string;
+  /** The fixed 40px status bar between the content region and the
+   * phone tab bar (spec "Fixed footer"/"Footer summary reference") -
+   * a product's own `FooterBar`, or nothing for a product with no
+   * operational summary to show. Hidden on the phone: the tab bar
+   * takes that edge. */
+  footer?: ReactNode;
   children: ReactNode;
 }
 
@@ -102,7 +107,7 @@ function flatEntries(nav: readonly NavEntry[] | NavGroup[]): NavEntry[] {
  * TV-focusable navigation (the norigin spatial-navigation rail) is not
  * yet part of this shell - tracked as a follow-up, not silently
  * dropped. */
-export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, search, railStorageKey = "maipai:shell-rail", children }: ShellProps) {
+export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, search, railStorageKey = "maipai:shell-rail", footer, children }: ShellProps) {
   const [railOpen, setRailOpen] = useState<boolean>(() => readRailPreference(railStorageKey) ?? defaultRailOpen());
   const [paletteOpen, setPaletteOpen] = useState(false);
 
@@ -132,27 +137,25 @@ export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, s
 
   const groups = toNavGroups(nav);
   const entries = flatEntries(nav);
-  const SearchIcon = getIcon("search");
 
   return (
     <SidebarProvider open={railOpen} onOpenChange={handleRailOpenChange}>
       <AppSidebar groups={groups} brand={brand} footer={sidebarFooter} className="hidden sm:flex" />
       <SidebarInset className={cn("h-svh overflow-hidden bg-[var(--surface-page)]")}>
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/60 px-4">
-          <div className="flex min-w-0 items-center gap-3">
+        <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border/60 px-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <SidebarTrigger className="hidden sm:inline-flex" />
             {headerTitle}
           </div>
-          <div className="flex items-center gap-1">
-            {search ? (
-              <Button type="button" variant="ghost" size="icon" aria-label="Search" onClick={() => setPaletteOpen(true)}>
-                <SearchIcon aria-hidden />
-              </Button>
-            ) : null}
-            {headerActions}
-          </div>
+          {search ? (
+            <div className="flex shrink-0 items-center justify-center">
+              <HeaderSearchField placeholder={search.placeholder ?? "Search..."} onOpen={() => setPaletteOpen(true)} />
+            </div>
+          ) : null}
+          <div className="flex flex-1 items-center justify-end gap-2">{headerActions}</div>
         </header>
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-16 sm:pb-0">{children}</div>
+        {footer ? <div className="hidden h-10 shrink-0 items-center border-t border-border/60 sm:flex">{footer}</div> : null}
         <PhoneNav entries={entries} />
       </SidebarInset>
       {search ? (

@@ -95,7 +95,7 @@ describe("Shell", () => {
       search: { groups: [], query: "", onQueryChange: () => {}, onSelect: () => {} },
     });
     expect(queryByRole("dialog")).not.toBeInTheDocument();
-    fireEvent.click(getByRole("button", { name: "Search" }));
+    fireEvent.click(getByRole("button", { name: "Search..." }));
     expect(getByRole("dialog")).toBeInTheDocument();
   });
 

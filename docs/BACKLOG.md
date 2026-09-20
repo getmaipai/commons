@@ -159,6 +159,17 @@ capability, needs its own design pass first).
   land on the more-button instead of the title/rename field), and the
   Delete item's hand-copied destructive hover was missing the kit's
   own dark-mode contrast bump. 307 tests passing.
+- [x] **M** `ui-v0.3.0`: Home's shell and dashboard, to the owner's
+  ruling on "Home's pages under the kit"
+  (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01). Five new
+  components (`IconTile`, `PanelHeader`, `HubCard`, `FooterBar`,
+  `HeaderSearchField`), `Shell`'s new `footer` slot and a real centered
+  header search field replacing the old bare icon button,
+  `MetricCard`/`CategoryTile`/`ActionTile` restyled onto `IconTile`, the
+  active nav item's flat violet swapped for the spec's gradient
+  (`--hue-violet-deep`). Rebased onto spec-v0.1.1 (B's RF-05b fix): 319
+  tests passing, all green. See `CHANGELOG.md` for the full
+  component-by-component list.
 - [ ] **S** `ThreadListItemMorePrimitive.Item`'s own Rename/Delete rows
   hand-copy `DropdownMenuItem`'s base layout/floor classes
   (`min-h-12`/`text-base`/hover-focus tokens) verbatim (found by a
