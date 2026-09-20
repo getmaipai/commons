@@ -336,6 +336,34 @@ pinned tag changes.
       (every route, every viewport including `far`/TV, both themes)
       actually passing clean, not just the two-combo `--a11y-only` fast
       pass. 290 tests passing across 44 files.
+  - **`ui-v0.1.4` (2026-09-20): two opacity-contrast bugs, found by
+    Home's own step 5a (adopting `@maipai/ui`'s real `tokens.css` as its
+    base instead of a second, hand-picked palette beside it - the switch
+    that finally let the approved light theme's own surfaces reach a
+    real render). Both were opacity-reduced foreground colors that had
+    simply never been measured against the kit's own light theme before
+    (Home's own, different neutral scale had happened to still pass).
+    - `nav-main.tsx`'s own call-site override of `SidebarGroupLabel`
+      (`/60`, the one actually rendered on every page's "Navigation"/
+      "Favorites" heading) measured 4.49:1 against `--sidebar`, under
+      WCAG AA's 4.5:1 floor. Bumped to `/75`, along with the primitive's
+      own `/70` default one line up - defensively, not because the
+      default was independently proven to fail (nothing renders it
+      un-overridden today), so a future call site is never the one that
+      has to raise it.
+    - `TabsTrigger`'s inactive state (`text-foreground/60`, light theme
+      only) measured 4.42:1 against `--muted`. Switched to
+      `text-muted-foreground` (5.4:1, already an audited token for
+      exactly this "quiet secondary text" role) for both themes, one
+      rule instead of the light/dark split the opacity approach needed.
+    - `contrast.test.ts` (below) gained a real regression test for this
+      bug class - opacity-blended text, which its existing solid-color
+      checks never evaluated - guarding `SidebarGroupLabel`'s own `/75`
+      against the surfaces it actually renders on. 292 tests passing.
+      Home's own `docs/dev.md` step 5a section has the destructive-token
+      and primary-accent side
+      of this same adoption (Home's own color overrides, not a kit
+      change).
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:

@@ -29,8 +29,14 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
               real section heading - a call-site className override on
               SidebarGroupLabel had silently defeated the primitive's own
               fixed default (the same class of bug a code review caught in
-              PropertyPanel/KeyValueList's own size overrides). */}
-          <SidebarGroupLabel className="mt-4 mb-2 h-auto px-2 font-semibold tracking-wide text-sidebar-foreground/60 uppercase group-data-[collapsible=icon]:hidden">{group.label}</SidebarGroupLabel>
+              PropertyPanel/KeyValueList's own size overrides). /75, not
+              /60: the same override also silently reduced the
+              primitive's own contrast-safe opacity (Home step 5a,
+              2026-09-20 - the approved light theme's own --sidebar
+              measured this call site's rendered color at 4.48:1, under
+              WCAG AA's 4.5:1 floor; /75 matches sidebar.tsx's own bumped
+              default and clears it with real margin). */}
+          <SidebarGroupLabel className="mt-4 mb-2 h-auto px-2 font-semibold tracking-wide text-sidebar-foreground/75 uppercase group-data-[collapsible=icon]:hidden">{group.label}</SidebarGroupLabel>
           <SidebarMenu className="gap-0">
             {group.items.map((item) => {
               const Icon = item.icon ? getIcon(item.icon) : null;

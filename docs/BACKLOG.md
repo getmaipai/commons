@@ -63,6 +63,19 @@ capability, needs its own design pass first).
   `className` overrides defeating `ui-v0.1.1`'s own floor fix, and a
   `CommandDialog` landmark bug - found live finishing Home's step-5
   adoption. 290 tests passing.
+- [x] **S** `ui-v0.1.4`: two opacity-contrast bugs found by Home's step
+  5a (adopting the kit's real `tokens.css` as its base instead of a
+  second, hand-picked palette) - `nav-main.tsx`'s own `/60` call-site
+  override of `SidebarGroupLabel` (the one actually rendered on every
+  page's "Navigation"/"Favorites" heading) measured 4.49:1 against the
+  approved light theme's `--sidebar`, under WCAG AA's 4.5:1 floor (both
+  it and the primitive's own `/70` default bumped to `/75`, the
+  primitive defensively since it wasn't independently proven to fail on
+  its own), and `TabsTrigger`'s inactive `/60` measured 4.42:1 against
+  `--muted` (switched to `--muted-foreground`, matching what dark mode
+  already did). A new `contrast.test.ts` regression test guards the
+  sidebar label's own opacity against this bug class going forward. 292
+  tests passing.
 - [ ] **S** `react-router-dom` as a peer, not direct, dependency of
   `ui` (matching `react`/`react-dom` already are): found live in Home's
   own step-5 adoption - a direct dependency meant two separate

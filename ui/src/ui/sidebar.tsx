@@ -457,8 +457,15 @@ function SidebarGroupLabel({
       data-sidebar="group-label"
       className={cn(
         // text-base, not text-xs: the type floor (docs/UI.md) - a real
-        // section heading, not a badge or a token.
-        "flex h-8 shrink-0 items-center rounded-md px-2 text-base font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        // section heading, not a badge or a token. /75, not shadcn's own
+        // /70 default: a call site's own /60 override of this same class
+        // measured 4.48:1 against the approved light theme's own
+        // --sidebar (Home step 5a, 2026-09-20), under WCAG AA's 4.5:1
+        // floor - bumped here too, defensively, so the primitive's own
+        // default is never the thing a future call site has to raise
+        // (more opaque only ever raises contrast toward the full
+        // foreground/background pair, never lowers it).
+        "flex h-8 shrink-0 items-center rounded-md px-2 text-base font-medium text-sidebar-foreground/75 ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
         className
       )}

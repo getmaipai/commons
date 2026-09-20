@@ -83,7 +83,17 @@ function TabsTrigger({
         // vertical tabs stack top to bottom, so only X would) - extending
         // both axes would overlap into the next trigger, since the default
         // TabsList variant has no gap between triggers.
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all before:absolute before:content-[''] group-data-[orientation=horizontal]/tabs:before:-inset-y-3.5 group-data-[orientation=vertical]/tabs:before:-inset-x-3.5 group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        //
+        // text-muted-foreground, not shadcn's own text-foreground/60: an
+        // inactive trigger's opacity-reduced foreground measured only
+        // 4.42:1 against the approved light theme's own --muted (Home
+        // step 5a, 2026-09-20), under WCAG AA's 4.5:1 floor - the same
+        // class of bug as sidebar.tsx's own SidebarGroupLabel opacity.
+        // --muted-foreground is a real, already-audited token for exactly
+        // this "quiet secondary text" role (5.4:1 against --muted) and
+        // matches what this component's own dark mode already does one
+        // line down, so light and dark now share one rule instead of two.
+        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all before:absolute before:content-[''] group-data-[orientation=horizontal]/tabs:before:-inset-y-3.5 group-data-[orientation=vertical]/tabs:before:-inset-x-3.5 group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:border-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
         "data-[state=active]:bg-background data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 dark:data-[state=active]:text-foreground",
         "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",

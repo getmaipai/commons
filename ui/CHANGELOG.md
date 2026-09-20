@@ -4,6 +4,26 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.1.4] - ui-v0.1.4
+
+### Fixed
+- `SidebarGroupLabel`'s opacity-reduced text at `nav-main.tsx`'s own
+  call site (`text-sidebar-foreground/60` - the one actually rendered on
+  every page's "Navigation"/"Favorites" heading) measured 4.49:1 against
+  the approved light theme's own `--sidebar`, under WCAG AA's 4.5:1
+  floor. Bumped to `/75`, along with the primitive's own `/70` default
+  (defensively, not because it was independently proven to fail on its
+  own).
+- `TabsTrigger`'s inactive-state text (`text-foreground/60`, light theme
+  only - dark already had its own `dark:text-muted-foreground`) measured
+  4.42:1 against the approved light theme's own `--muted`. Switched to
+  `text-muted-foreground` for both themes (5.4:1), one rule instead of
+  two.
+- Found live by Home's own step 5a (adopting the kit's tokens.css as its
+  base instead of a second, hand-picked palette beside it) - both bugs
+  were opacity blends that had simply never been checked against the
+  kit's own real light theme before.
+
 ## [0.1.3] - ui-v0.1.3
 
 ### Fixed

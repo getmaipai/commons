@@ -41,6 +41,46 @@ const themes: Theme[] = [
 
 const secondaryText: Record<string, string> = { light: readVar(lightRoot, "--muted-foreground"), dark: readVar(darkRoot, "--muted-foreground") };
 
+// Linear-RGB alpha blend, not the OKLab `color-mix()` Tailwind's own
+// opacity modifiers actually use in the browser - a reasonable
+// approximation, not a guarantee (ui-v0.1.4, getmaipai/home's own step
+// 5a: the real axe-measured contrast for a `/60`-opacity class differed
+// from a hand blend at the SAME opacity, though this suite's own author
+// never established which direction that drift runs in general). Treat
+// a passing number here as a useful regression guard against ever
+// reintroducing the exact bug this test was written for (an opacity too
+// low to clear AA against the kit's own light surfaces), not as proof a
+// NEW opacity value is safe - re-verify any new one against the real
+// a11y matrix (`home`'s `bun run a11y`), the way this one was.
+function blendedHex(fgHex: string, bgHex: string, alpha: number): string {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+  const mix = (i: number) => Math.round(channel(fgHex, i) * alpha + channel(bgHex, i) * (1 - alpha));
+  return `#${[0, 1, 2].map((i) => mix(i).toString(16).padStart(2, "0")).join("")}`;
+}
+
+describe("WCAG AA contrast for the kit's opacity-reduced text (both themes)", () => {
+  // SidebarGroupLabel's own default and nav-main.tsx's call-site override
+  // both render at this opacity today (sidebar.tsx, nav-main.tsx) - a
+  // regression test for the bug ui-v0.1.4 fixed (nav-main.tsx's own
+  // then-`/60` override measured 4.49:1 against the light theme's real
+  // `--sidebar`, under the 4.5:1 floor).
+  const SIDEBAR_GROUP_LABEL_OPACITY = 0.75;
+  const sidebarThemes = [
+    { name: "light", block: lightRoot },
+    { name: "dark", block: darkRoot },
+  ];
+
+  for (const theme of sidebarThemes) {
+    const sidebar = readVar(theme.block, "--sidebar");
+    const sidebarForeground = readVar(theme.block, "--sidebar-foreground");
+
+    test(`${theme.name}: SidebarGroupLabel's own opacity clears 4.5 against --sidebar`, () => {
+      const ratio = contrastRatio(blendedHex(sidebarForeground, sidebar, SIDEBAR_GROUP_LABEL_OPACITY), sidebar);
+      expect(ratio).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+});
+
 describe("WCAG AA contrast over the spec's surfaces (both themes)", () => {
   for (const theme of themes) {
     for (const [surfaceName, surfaceHex] of Object.entries(theme.surfaces)) {
