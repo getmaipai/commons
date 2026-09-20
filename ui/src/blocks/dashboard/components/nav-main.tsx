@@ -114,7 +114,18 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                     gap, 10px vertical padding (h-auto lets it set the
                     row's real height instead of competing with h-10).
                     Calm keeps the plainer numbers; it was never given
-                    reference-exact ones of its own. */}
+                    reference-exact ones of its own. `w-auto` (a code
+                    review, 2026-09-20): SidebarMenuButton's own base
+                    class sets `w-full`, and `width: 100%` plus a
+                    non-auto `margin-left` AND `margin-right` (mx-3 sets
+                    both) is CSS's classic over-constrained block box -
+                    the spec drops `margin-right` to make it fit, not
+                    the width, so the pill's right edge overflowed the
+                    rail's own right edge by exactly its own right
+                    margin. `w-auto` overrides the base `w-full`, letting
+                    the browser compute the real width as "100% minus
+                    both margins," the only value that keeps the box
+                    correctly constrained. */}
                 {/* bg-gradient-to-br from violet to its deeper stop
                     (spec "The style, exactly": "the gradient from
                     section 1's violet to its deeper stop"), not a flat
@@ -127,7 +138,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                     tailwind-merge gap HOME-UI-02c found). The collapsed
                     flat-vs-gradient split (owner finding, "The
                     collapsed rail") is there too. */}
-                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="mx-3 studio:mx-[13px] h-10 studio:h-auto studio:py-[10px] gap-3 studio:gap-[14px] rounded-[10px] studio:rounded-[8px] px-3 [&>svg]:size-5 studio:[&>svg]:size-[19px] data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
+                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="mx-3 studio:mx-[13px] w-auto h-10 studio:h-auto studio:py-[10px] gap-3 studio:gap-[14px] rounded-[10px] studio:rounded-[8px] px-3 [&>svg]:size-5 studio:[&>svg]:size-[19px] data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
                   {/* aria-label, not just the visible span below: a
                       collapsed rail (tablet defaults to collapsed,
                       defaultRailOpen()'s own <1280px threshold) hides

@@ -68,8 +68,17 @@ export function AppSidebar({ groups, brand, footer, ...props }: AppSidebarProps)
           (owner findings, "The Studio look, the numbers," 2026-09-20
           18:15) - h-[62px] replaces the plain pt-/pb- pair, and the
           rail's own studio:pt-[17px] above already supplies the row's
-          own top inset, so this only needs the 14px below. */}
-      <SidebarHeader className="pt-5 pb-6 studio:h-[62px] studio:pt-0 studio:pb-[14px]">
+          own top inset, so this only needs the 14px below. px-0: the
+          primitive's own base class carries its own p-2 (8px each
+          side, kit/ui/sidebar.tsx's SidebarHeader) - left alone, it
+          stacked with the brand button's own pl-3!/studio:pl-[13px]!
+          below for a 20px/21px true left inset while the pills sat at
+          12px/13px (a code review, 2026-09-20, caught the resulting
+          8px visible misalignment, directly contradicting this same
+          file's own "same x as the item pills" comment two lines
+          down). Zeroed here so the brand button's own padding is the
+          only source of horizontal inset, same as the pills. */}
+      <SidebarHeader className="px-0 pt-5 pb-6 studio:h-[62px] studio:pt-0 studio:pb-[14px]">
         <SidebarMenu>
           <SidebarMenuItem>
             {/* pl-3 (12px): "the tile's left edge sits at the same x

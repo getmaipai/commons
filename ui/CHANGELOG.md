@@ -4,6 +4,36 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.2] - ui-v0.4.2
+
+A code review of `ui-v0.4.1` caught four real box-model bugs in the
+same day's rail geometry before this shipped further.
+
+### Fixed
+- The nav pill's own `w-full` (the primitive's own base class) plus a
+  non-auto margin on both sides (`mx-3`) is CSS's classic over-
+  constrained block box - the spec drops `margin-right` to make it
+  fit, so the pill's right edge overflowed the rail's own right edge
+  by exactly its own right margin. `w-auto` overrides the base
+  `w-full`, letting the browser compute the true width from the
+  margins instead.
+- The brand tile sat 8px further right than the nav pills below it:
+  `SidebarHeader`'s own base `p-2` was stacking with the brand
+  button's own left padding, while the pills had no container padding
+  above them at all. Zeroed on the header so the brand button's own
+  padding is the only source of inset, same as the pills.
+- The Studio divider's own inset (`margin-inline: 13px`) was applied
+  to the whole group container, shifting that group's own child pills
+  and labels an extra 13px past what the first group had. Redrawn as
+  a `::before` pseudo-element carrying its own independent inset,
+  leaving the group's own box at zero margin.
+- A stale comment still named the collapsed rail's own width as "the
+  owner's own 64px," contradicting `0.4.1`'s own 72px - the "fixed
+  shell" dimensions (rail 252/72, header 96, footer 40) are explicitly
+  look-independent per the owner's own framing, unlike the rest of
+  that finding's numbers; the changelog's own "all `studio:`-scoped"
+  claim was corrected to match.
+
 ## [0.4.1] - ui-v0.4.1
 
 Home's own HOME-UI-02d (phone dashboard, Conversations folds into
@@ -20,11 +50,13 @@ geometry found.
 - The rail's exact Studio geometry (owner findings, "The Studio look,
   the numbers," 2026-09-20 18:15 - a page built to reproduce the
   reference's own geometry, superseding an earlier, rougher "The rail
-  geometry, exactly" pass the same day): the collapsed rail's own
-  width (72px, was 64px), item padding/radius/gaps, the active item's
-  exact gradient stops plus a 1px inset ring and a soft glow, the
-  divider and group-label colors/inset, all `studio:`-scoped so Calm
-  is unaffected.
+  geometry, exactly" pass the same day): item padding/radius/gaps, the
+  active item's exact gradient stops plus a 1px inset ring and a soft
+  glow, the divider and group-label colors, all `studio:`-scoped so
+  Calm is unaffected. The collapsed rail's own width (72px, was 64px)
+  is unscoped - that same finding names the fixed shell's own
+  dimensions as look-independent, unlike the rest of its numbers, so
+  both looks get the wider column.
 
 ### Fixed
 - The active nav item's inset pills ran edge to edge, cut off at the

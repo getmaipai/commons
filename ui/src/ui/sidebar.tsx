@@ -27,19 +27,19 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-// 252/64: the spec's rail widths (docs/plans/ui-spec-2026-09-19/spec.md,
-// "Left navigation rail"; the collapsed width corrected from 72px to the
-// owner's own 64px, "The collapsed rail" finding, 2026-09-20). The
-// Stack's one SidebarProvider drives its open state as a controlled prop
-// backed by localStorage, not this cookie.
+// 252/72: the fixed shell's own rail widths (owner findings, "The
+// Studio look, the numbers," 2026-09-20 18:15 - a page built to
+// reproduce the reference's own geometry, explicitly named
+// look-independent alongside the header/footer heights and the
+// content-scroll padding, unlike the rest of that same finding's own
+// rail-geometry numbers). Supersedes "The collapsed rail" finding's
+// own 64px correction earlier the same day - a stale copy of that
+// number survived in this comment past the point it stopped being
+// true; a code review caught the contradiction. The Stack's one
+// SidebarProvider drives its open state as a controlled prop backed
+// by localStorage, not this cookie.
 const SIDEBAR_WIDTH = "252px"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-// 72px (owner findings, "The Studio look, the numbers," 2026-09-20
-// 18:15 - a page built to reproduce the reference's own geometry;
-// this number wins over any earlier estimate): the collapsed rail
-// stays wide enough for a centered 40px pill (nav-main.tsx's own
-// group-data-[collapsible=icon]:size-10) plus real breathing room,
-// not the bare 48px icon-button width shadcn's own default assumed.
 const SIDEBAR_WIDTH_ICON = "72px"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 

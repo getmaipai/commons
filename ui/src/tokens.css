@@ -164,11 +164,29 @@
  * once every other inset in the rail was reconciled to the same
  * "Padding... 13px sides" figure the same section gives for the rail
  * overall. */
+/* A `::before` line, not `margin-inline` on the group container
+ * itself: a code review (2026-09-20) caught the group-level margin
+ * shifting the GROUP's own content too, not just the divider - every
+ * pill and label inside a non-first group ended up inset 13px (its
+ * own studio:mx-[13px]/studio:px-[13px]) PLUS this group's own 13px
+ * margin, 26px total, visibly out of line with the first group's own
+ * 13px. The pseudo-element keeps the group's own box at zero margin
+ * (so its children's own insets are the only ones that apply, same as
+ * the first group) while still positioning the line itself 13px in
+ * from each edge. */
 [data-look="studio"] [data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type) {
   margin-top: 12px;
   padding-top: 12px;
-  margin-inline: 13px;
-  border-top: 1px solid #24405F;
+  position: relative;
+}
+[data-look="studio"] [data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 13px;
+  right: 13px;
+  height: 1px;
+  background: #24405F;
 }
 /* The active item's exact reference colors (owner findings, "The
  * Studio look, the numbers," 2026-09-20 18:15): the gradient
