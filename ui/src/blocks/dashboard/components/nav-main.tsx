@@ -36,7 +36,13 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
               const Icon = item.icon ? getIcon(item.icon) : null;
               return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="h-10 px-3 text-[15px] [&>svg]:size-[18px]! data-[active=true]:bg-[var(--hue-violet)] data-[active=true]:text-white data-[active=true]:hover:bg-[var(--hue-violet)] data-[active=true]:hover:text-white">
+                {/* No h/text/svg-size override here: that silently
+                    defeated SidebarMenuButton's own 48px/16px floor
+                    default the same way the SidebarGroupLabel override
+                    above did (found live building step 5's far/TV a11y
+                    sweep - the first thing to actually measure this nav
+                    row's real rendered size). */}
+                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="px-3 data-[active=true]:bg-[var(--hue-violet)] data-[active=true]:text-white data-[active=true]:hover:bg-[var(--hue-violet)] data-[active=true]:hover:text-white">
                   <NavLink to={item.url}>
                     {Icon && <Icon />}
                     <span>{item.title}</span>

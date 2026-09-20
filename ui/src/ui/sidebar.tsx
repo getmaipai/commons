@@ -6,6 +6,7 @@ import { PanelLeftIcon } from "lucide-react"
 import { Slot } from "radix-ui"
 
 import { useBreakpoint } from "@/kit/hooks/useBreakpoint"
+import { useVisualViewportHeight } from "@/kit/hooks/useVisualViewportHeight"
 import { Button } from "@/kit/ui/button"
 import { Input } from "@/kit/ui/input"
 import { Separator } from "@/kit/ui/separator"
@@ -69,6 +70,7 @@ function SidebarProvider({
   onOpenChange?: (open: boolean) => void
 }) {
   const isMobile = useBreakpoint().tier === "phone"
+  const visualViewportHeight = useVisualViewportHeight()
   const [openMobile, setOpenMobile] = React.useState(false)
 
   // This is the internal state of the sidebar.
@@ -137,11 +139,37 @@ function SidebarProvider({
             {
               "--sidebar-width": SIDEBAR_WIDTH,
               "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+              // `h-svh` alone is a layout-viewport unit: iOS Safari never
+              // shrinks it for the on-screen keyboard, so a phone's
+              // composer opened the keyboard, the wrapper stayed full
+              // height, and an app's own top-anchor scroll math (which
+              // reads this chain's `clientHeight`) placed content where
+              // the *unobscured* viewport would end - behind the
+              // keyboard, invisible until a manual scroll. When the
+              // keyboard is open, an inline pixel height from
+              // `visualViewport` overrides `h-svh` and tracks the
+              // keyboard; offsetTop positions the shell below any address
+              // bar that may have appeared. The fallback (`h-svh` +
+              // `top-0`) applies on desktop, `far`/TV, when the keyboard
+              // is closed, or when the API doesn't exist.
+              ...(visualViewportHeight
+                ? {
+                    height: visualViewportHeight.height,
+                    top: visualViewportHeight.offsetTop,
+                  }
+                : {}),
               ...style,
             } as React.CSSProperties
           }
           className={cn(
-            "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar",
+            // `h-svh`, not a *minimum* height: a minimum lets any child
+            // grow the wrapper past the viewport instead of activating
+            // its own internal scroll - the rest of the shell's own
+            // `flex-1 min-h-0` chain (`SidebarInset`, every page) is
+            // built assuming this is a hard height. Keep the shell
+            // anchored like a phone nav bar when keyboard focus pans the
+            // document; pages own their own internal scrolling.
+            "group/sidebar-wrapper fixed inset-x-0 top-0 flex h-svh w-full overflow-visible has-data-[variant=inset]:bg-sidebar",
             className
           )}
           {...props}
@@ -184,12 +212,22 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      // `{...props}` (role, aria-label, any other div-ish prop the
+      // caller passed) goes on SheetContent, not Sheet: Sheet is
+      // SheetPrimitive.Root (Radix's Dialog.Root), a context-only
+      // component with no DOM output of its own, so anything spread
+      // onto it - the landmark role/label app-sidebar.tsx passes down
+      // included - was silently lost on every phone-width render (the
+      // same "props on a Root instead of its Content" bug class as
+      // CommandDialog's own sr-only header). `className` was dropped
+      // here too, unmerged with the caller's own; both fixed together.
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
         <SheetContent
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          className={cn("w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden", className)}
+          {...props}
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -267,8 +305,15 @@ function SidebarTrigger({
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
-      size="icon"
-      className={cn("size-7", className)}
+      // "icon-sm", not size="icon" with a raw "size-7" override: the
+      // override silently defeated "icon"'s own 48px floor default (the
+      // same class of bug as SidebarMenuButton's and SidebarGroupLabel's
+      // own call-site overrides, found the same way - the far/TV a11y
+      // sweep actually measuring this button for the first time).
+      // "icon-sm" keeps the same compact painted size with the touch-
+      // target hit-area extension "icon"'s own smaller siblings use.
+      size="icon-sm"
+      className={className}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -311,7 +356,11 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "relative flex w-full flex-1 flex-col bg-background",
+        // `min-w-0`: this flex item (a sibling of Sidebar in the outer
+        // row) otherwise never shrinks below its content's own unwrapped
+        // min-content width - found live once a page's own content had a
+        // long enough unwrapped string to expose it.
+        "relative flex w-full min-w-0 flex-1 flex-col bg-background",
         "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className
       )}

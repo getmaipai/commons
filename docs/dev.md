@@ -284,6 +284,58 @@ pinned tag changes.
     trigger it. Two new tests (`Shell.test.tsx`): no button renders
     without a `search` config, and clicking it with one opens the
     dialog. 283 tests passing across 43 files.
+  - **`ui-v0.1.3` (2026-09-20): the sidebar's own keyboard-avoidance and
+    layout fixes, plus a second review pass.** `ui-v0.1.0`'s
+    `sidebar.tsx` came from Stack's own reconciled kit, which had never
+    needed three fixes Home's own pre-adoption copy had already earned
+    in production - found live finishing Home's own step-5 adoption,
+    after `ui-v0.1.1`/`0.1.2` had already landed and been consumed.
+    - The shell wrapper wasn't `position: fixed`: a phone's on-screen
+      keyboard panning the document dragged the whole shell down with
+      it instead of staying anchored. `useVisualViewportHeight`
+      (`ui/src/hooks/`, moved in from Home - it had become dead code
+      there the moment `Shell.tsx` was deleted, and is a real kit-level
+      concern now that the wrapper needs it, not a Home-specific one)
+      drives an inline height/offsetTop override on the wrapper's own
+      `h-svh`, the same technique Home's own copy used.
+    - `SidebarInset` was missing `min-w-0`: a long unwrapped string
+      could stretch a page past the viewport.
+    - Three more call-site `className` overrides silently defeated
+      their own primitive's `ui-v0.1.1` floor fix, the exact bug class
+      that fix's own code review already caught twice elsewhere:
+      `nav-main.tsx`'s nav row (`h-10 text-[15px]`, found by the far/TV
+      a11y sweep actually rendering it for the first time),
+      `SidebarTrigger`'s `size-7`, and `RailToggle` (a hand-rolled,
+      never-audited `<button>` with no touch-target extension at all -
+      now routed through the kit's own `Button`, `icon-sm`).
+    - `CommandDialog`'s sr-only title/description rendered as a sibling
+      of `DialogContent`, not a child - `Dialog` is a context provider
+      with no DOM output of its own, so this sat outside every landmark
+      on every page mounting a `CommandDialog`, closed or open, the
+      exact axe `region` bug Home's own `command.tsx` had already found
+      and fixed once. `command-input-wrapper` also needed `h-[49px]`
+      (its own `border-b` eating 1px off the real input's `h-full`),
+      found the same way ui-v0.1.1's own "50px, not an even 48px"
+      `InputGroup` finding was: a real Command usage outside
+      `CommandDialog` (`HomePage`'s own inline prompt box).
+    - A second code review (before this landed) caught two more real
+      bugs the fixes above introduced: `CommandDialog`'s own `<Command>`
+      still carried a competing `**:data-[slot=command-input-wrapper]:
+      h-12`, fighting the new `h-[49px]` base fix at equal specificity
+      (removed rather than reconciled - one definition); and `Sidebar`'s
+      mobile (`Sheet`) branch spread the caller's `role`/`aria-label`/
+      `className` onto `Sheet` (Radix's `Dialog.Root`, no DOM output of
+      its own) instead of the real rendered `SheetContent`, silently
+      losing the landmark fix - and `className` itself, a pre-existing
+      drop fixed as a drive-by - on every phone-width render.
+    - New regression coverage: a `CommandDialog`-exercising test
+      (nothing had before) and a phone-width `Sidebar` test that opens
+      the real mobile `Sheet` and checks the landmark reaches
+      `document.body` (nothing had exercised that open state before
+      either). Verified end to end by Home's own full screenshot matrix
+      (every route, every viewport including `far`/TV, both themes)
+      actually passing clean, not just the two-combo `--a11y-only` fast
+      pass. 290 tests passing across 44 files.
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:

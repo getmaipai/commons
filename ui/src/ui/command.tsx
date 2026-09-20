@@ -44,15 +44,32 @@ function CommandDialog({
 }) {
   return (
     <Dialog {...props}>
-      <DialogHeader className="sr-only">
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>{description}</DialogDescription>
-      </DialogHeader>
+      {/* Inside DialogContent, not a sibling of it: `Dialog` (Radix's
+          `Dialog.Root`) is a bare context provider with no DOM output of
+          its own, so a child that isn't `DialogContent` (or wrapped in
+          `DialogPortal`) renders directly, always, in place, regardless
+          of `open` - the stock shadcn/ui registry output for this file.
+          That sat this sr-only header outside every landmark on every
+          page that mounts a `CommandDialog`, closed or open - an axe
+          `region` violation found by the far/TV a11y sweep. */}
       <DialogContent
         className={cn("overflow-hidden p-0", className)}
         showCloseButton={showCloseButton}
       >
-        <Command className="**:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+        <DialogHeader className="sr-only">
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        {/* No competing `h-12` on `[data-slot=command-input-wrapper]` or
+            `[cmdk-input]` here: CommandInput's own base classes already
+            set the wrapper to `h-[49px]` and the input to `h-full`
+            (the 49px, not-an-even-48px fix so the wrapper's own
+            border-b doesn't eat a px off the real tappable input) - a
+            second, competing `h-12` at equal specificity here would
+            fight that fix in every CommandDialog/CommandPalette usage,
+            landing the real input back under the floor depending on
+            which declaration won the cascade (found by review). */}
+        <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}
         </Command>
       </DialogContent>
@@ -67,9 +84,15 @@ function CommandInput({
   return (
     <div
       data-slot="command-input-wrapper"
-      // h-12, not h-9: docs/UI.md's 48px target and 16px type floor apply
-      // to the search box exactly as they do to any other input.
-      className="flex h-12 items-center gap-2 border-b px-3"
+      // h-[49px], not an even h-12 (48px): this wrapper's own border-b
+      // (1px, border-box sizing) would otherwise eat into the CHILD
+      // input's `h-full` (100% of the wrapper's own content box), landing
+      // the actual input element - what a person taps, not just this
+      // wrapper - at 47px, a real docs/UI.md floor violation found by the
+      // far/TV a11y sweep measuring a real Command usage outside
+      // CommandDialog (HomePage's own inline prompt box) for the first
+      // time. 49px keeps the interior a full 48px.
+      className="flex h-[49px] items-center gap-2 border-b px-3"
     >
       <SearchIcon className="size-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input

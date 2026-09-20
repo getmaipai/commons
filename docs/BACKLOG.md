@@ -57,6 +57,22 @@ capability, needs its own design pass first).
   search button (owner ruling, 2026-09-20: no button meant search
   existed on desktop's Cmd/Ctrl+K and vanished on phone, which "one
   product, every screen" forbids). 283 tests passing.
+- [x] **S** `ui-v0.1.3`: the sidebar's own keyboard-avoidance/layout
+  fixes ported from Home's pre-adoption copy (`position: fixed` +
+  `useVisualViewportHeight`, `min-w-0`), three more call-site
+  `className` overrides defeating `ui-v0.1.1`'s own floor fix, and a
+  `CommandDialog` landmark bug - found live finishing Home's step-5
+  adoption. 290 tests passing.
+- [ ] **S** `react-router-dom` as a peer, not direct, dependency of
+  `ui` (matching `react`/`react-dom` already are): found live in Home's
+  own step-5 adoption - a direct dependency meant two separate
+  `react-router-dom` module instances could get bundled across a lazy
+  `import()` chunk boundary, breaking `useLocation()`/`Shell`'s own
+  `SidebarProvider` context sharing. Home's own `vite.config.ts` works
+  around it with `resolve.dedupe`; the real fix is here, so every future
+  consumer (`bot`, `go`) doesn't have to rediscover and repeat that
+  workaround. Exit check: `ui/scripts/check.sh` green, `bun install` in
+  a consumer still resolves one `react-router-dom` instance.
 - [ ] **S** A shared helper for the touch-target hit-area technique
   (`relative` + `before:`/`after:-inset-N`): hand-derived independently
   at every call site across `button.tsx`, `toggle.tsx`, `checkbox.tsx`

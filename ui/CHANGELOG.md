@@ -4,6 +4,38 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.1.3] - ui-v0.1.3
+
+### Fixed
+- `sidebar.tsx`'s shell wrapper carries back the keyboard-avoidance
+  fix Home's own pre-adoption copy had (`position: fixed`, an inline
+  height/offsetTop from a new `useVisualViewportHeight` hook moved in
+  from Home, since a phone's on-screen keyboard panning the document
+  otherwise dragged the whole shell down with it) and a missing
+  `min-w-0` on `SidebarInset` (a long unwrapped string could stretch a
+  page past the viewport).
+- Three more call-site `className` overrides found silently defeating
+  their own primitive's `ui-v0.1.1` floor fix: `nav-main.tsx`'s nav row
+  (`h-10 text-[15px]`), `SidebarTrigger`'s `size-7`, and `RailToggle`'s
+  hand-rolled, never-audited `<button>` (now routed through the kit's
+  own `Button`, `icon-sm`).
+- `CommandDialog`'s sr-only title/description rendered as a sibling of
+  `DialogContent` instead of a child (`Dialog` is a context provider
+  with no DOM output of its own), sitting outside every landmark on
+  every page that mounts it, closed or open - the exact axe `region`
+  bug Home's own `command.tsx` had already found and fixed once.
+- `command-input-wrapper`'s height corrected to `h-[49px]` (its own
+  `border-b`, border-box sizing, was eating 1px off the real input's
+  `h-full`, landing it at 47px) - and a competing `h-12` on the same
+  element inside `CommandDialog` specifically, which would have fought
+  that fix at equal specificity, removed rather than reconciled.
+- `Sidebar`'s mobile (`Sheet`) branch spread the caller's `role`/
+  `aria-label`/`className` onto `Sheet` (Radix's `Dialog.Root`, no DOM
+  output of its own) instead of the actual rendered `SheetContent`,
+  silently losing the `ui-v0.1.3` landmark fix above - and `className`
+  itself - on every phone-width render. Found by review before this
+  landed.
+
 ## [0.1.2] - ui-v0.1.2
 
 ### Added

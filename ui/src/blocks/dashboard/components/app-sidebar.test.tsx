@@ -1,11 +1,14 @@
 import { describe, expect, test, afterEach } from "bun:test";
-import { cleanup, render } from "@testing-library/react";
+import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { AppSidebar, ungroupedNav } from "./app-sidebar";
-import { SidebarProvider } from "@/kit/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/kit/ui/sidebar";
 import type { NavEntry } from "@/kit/nav";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  Object.defineProperty(window, "innerWidth", { value: 1440, configurable: true });
+});
 
 describe("ungroupedNav", () => {
   test("wraps a flat entry list under one label, resolving each entry's icon", () => {
@@ -58,5 +61,31 @@ describe("AppSidebar", () => {
       </MemoryRouter>,
     );
     expect(queryByText("Footer content")).toBeInTheDocument();
+  });
+
+  // `Sidebar`'s isMobile branch renders through `Sheet` (Radix
+  // Dialog.Root, no DOM output of its own) wrapping `SheetContent` - a
+  // code review caught the landmark role/aria-label AppSidebar passes
+  // down being spread onto `Sheet` instead of `SheetContent`, silently
+  // lost on every phone-width render. Exercising the actual mobile
+  // Sheet open state (nothing did before) so this can't slip back.
+  test("the landmark role/label still reach the real DOM on phone width", () => {
+    Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+    const groups = ungroupedNav([{ to: "/", icon: "home", label: "Home" }]);
+    const { getByRole } = render(
+      <MemoryRouter>
+        <SidebarProvider>
+          <SidebarTrigger />
+          <AppSidebar groups={groups} brand={<span>Brand</span>} />
+        </SidebarProvider>
+      </MemoryRouter>,
+    );
+    act(() => {
+      fireEvent.pointerDown(getByRole("button", { name: "Toggle Sidebar" }), { button: 0, pointerId: 1 });
+      fireEvent.click(getByRole("button", { name: "Toggle Sidebar" }));
+    });
+    const nav = document.body.querySelector('[data-slot="sidebar"]');
+    expect(nav).toHaveAttribute("role", "navigation");
+    expect(nav).toHaveAttribute("aria-label", "Main navigation");
   });
 });

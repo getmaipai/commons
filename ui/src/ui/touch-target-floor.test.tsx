@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/kit/ui/table";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem } from "@/kit/ui/breadcrumb";
 import { Tabs, TabsList, TabsTrigger } from "@/kit/ui/tabs";
 import { Select, SelectTrigger, SelectValue } from "@/kit/ui/select";
-import { Command, CommandInput, CommandItem } from "@/kit/ui/command";
+import { Command, CommandDialog, CommandInput, CommandItem } from "@/kit/ui/command";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/kit/ui/dropdown-menu";
 import { ToggleGroup, ToggleGroupItem } from "@/kit/ui/toggle-group";
 
@@ -122,7 +122,7 @@ describe("touch-target and type floor (docs/UI.md)", () => {
   });
 
   test("Command's search box and items read at the type floor", () => {
-    const { getByRole } = render(
+    const { getByRole, container } = render(
       <Command>
         <CommandInput placeholder="Search" />
         <CommandItem>Result</CommandItem>
@@ -131,6 +131,28 @@ describe("touch-target and type floor (docs/UI.md)", () => {
     expect(getByRole("combobox").className).toContain("text-base");
     expect(getByRole("option").className).toContain("min-h-12");
     expect(getByRole("option").className).toContain("text-base");
+    // The wrapper is 49px, not an even 48px: its own border-b would
+    // otherwise eat 1px off the input's own `h-full`, landing the real
+    // tappable element (not just this wrapper) under the floor.
+    expect(container.querySelector('[data-slot="command-input-wrapper"]')?.className).toContain("h-[49px]");
+  });
+
+  test("CommandDialog's own Command doesn't reintroduce a competing height on the input wrapper", () => {
+    // A code review caught CommandDialog's own <Command> still carrying
+    // a `**:data-[slot=command-input-wrapper]:h-12` override that fought
+    // CommandInput's base h-[49px] fix at equal specificity - exercising
+    // CommandDialog itself (nothing did before) so this can't slip back.
+    render(
+      <CommandDialog open title="Search" description="Search for a command to run">
+        <CommandInput placeholder="Search" />
+        <CommandItem>Result</CommandItem>
+      </CommandDialog>,
+    );
+    // CommandDialog renders through a Dialog portal, outside this
+    // render's own container - document.body is where Radix mounts it.
+    const wrapper = document.body.querySelector('[data-slot="command-input-wrapper"]');
+    expect(wrapper?.className).toContain("h-[49px]");
+    expect(wrapper?.className).not.toContain("h-12");
   });
 
   test("DropdownMenuItem clears the floor, not just DropdownMenuLabel", () => {

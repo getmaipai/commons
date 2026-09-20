@@ -41,7 +41,12 @@ export function AppSidebar({ groups, brand, footer, ...props }: AppSidebarProps)
     items: group.items.map((item) => ({ ...item, isActive: item.isActive ?? isActiveNavPath(location.pathname, item.url) })),
   }));
   return (
-    <Sidebar collapsible="icon" className="bg-[var(--surface-sidebar)] p-1.5 pb-2" {...props}>
+    // role/aria-label here, not on Sidebar itself: shadcn's own generated
+    // primitive renders a plain div with no landmark role by design (the
+    // fix belongs at the one real call site, not a hand-patch of the
+    // generated file) - every nav link inside otherwise sits outside any
+    // landmark, an axe `region` failure found by the far/TV a11y sweep.
+    <Sidebar collapsible="icon" role="navigation" aria-label="Main navigation" className="bg-[var(--surface-sidebar)] p-1.5 pb-2" {...props}>
       <SidebarHeader className="p-0">
         <SidebarMenu>
           <SidebarMenuItem>
