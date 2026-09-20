@@ -40,8 +40,8 @@ capability, needs its own design pass first).
 
 ## Standards
 
-- [ ] **`std-` tags need the same per-tag worktree treatment as
-  `commons`, or a fresh cut** (owner's call on which) - found live
+- [x] **`std-` tags get the same per-tag worktree treatment as
+  `commons`** - found live
   during SHARED-PIN-01's CI verification (`catalog/docs/dev.md`):
   every consumer's `check.sh` states a pin like `std-v0.2.0`, but
   every LOCAL gate run resolves `@maipai/standards` from a plain
@@ -54,15 +54,19 @@ capability, needs its own design pass first).
   pinned to the tag (a real difference in behavior, not just a
   slower path) - it correctly failed prose-lint on real exclamation
   points local runs never saw. Two honest fixes, either resolves it:
-  extend `ensure-tag.sh`'s pattern (or a twin script) to
-  `getmaipai/.github` so a `std-` pin resolves to its own immutable
-  worktree the same way `commons` pins do; or cut `std-v0.3.0` from
-  the current `main` and have every repo bump its pin, accepting that
-  the underlying mutable-checkout gap remains unless the first option
-  also lands. Exit check: a local `scripts/check.sh` run in any
-  consumer repo enforces the SAME content a correctly-pinned CI run
-  does, proven by deliberately drifting the local `.github` checkout
-  and confirming the gate still catches what CI would.
+  extended `ensure-tag.sh`'s pattern to `getmaipai/.github`
+  (`standards/bin/ensure-tag.sh`): `scripts/check.sh` here resolves
+  `std-v0.3.0` through `../.github-tags/std-v0.3.0`, the same
+  immutable-per-tag shape `commons-tags` already gives `core`/`ui`/
+  `spec` consumers, landed the same way in `bot`, `home`, `stack` and
+  `catalog`. The standards pin resolves through a per-tag worktree,
+  std-v0.3.0 (verified at this commit). Same commit fixed a real
+  ordering defect this pass found live: the workspace loop installed,
+  linted and tested one workspace at a time in `core`/`ui`/`spec`
+  order, so `ui`'s own `tsc` - following a raw relative import into
+  `spec/gen/ts/*.ts`, which imports `zod` - failed on `spec`'s not-yet-
+  installed `node_modules` in a fresh worktree. Installing every
+  workspace first, then linting and testing each, fixed it.
 
 ## `core`
 

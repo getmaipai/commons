@@ -8,18 +8,31 @@ cd "$(dirname "$0")/.."
 
 DOCS_ONLY=0; if [ "${1:-}" = "--docs" ]; then DOCS_ONLY=1; fi
 
-STANDARDS_DIR="${MAIPAI_STANDARDS_DIR:-../.github}"
-if [ ! -d "$STANDARDS_DIR/standards" ]; then
-  echo "missing @maipai/standards checkout at $STANDARDS_DIR (pin std-v0.2.0)"
+STANDARDS_REPO="${MAIPAI_STANDARDS_DIR:-../.github}"
+STD_TAG="std-v0.3.0"
+STANDARDS_DIR="$(bash "$STANDARDS_REPO/standards/bin/ensure-tag.sh" "$STD_TAG")"
+if [ "$(cat "$STANDARDS_DIR/standards/VERSION")" != "${STD_TAG#std-v}" ]; then
+  echo "@maipai/standards at $STANDARDS_DIR is $(cat "$STANDARDS_DIR/standards/VERSION"), but the tag is $STD_TAG"
   exit 1
 fi
 
 if [ "$DOCS_ONLY" = 0 ]; then
+  # Installed first, every workspace, before any workspace lints: ui's
+  # own tsc follows a raw relative import into spec/gen/ts/*.ts (spec's
+  # source, not the installed @maipai/spec package), which itself
+  # imports zod - found live in a fresh worktree's gate run, "ui: lint"
+  # failing on spec's missing node_modules because the old single loop
+  # installed, linted and tested one workspace at a time in the same
+  # core/ui/spec order lint itself needs to already be satisfied for.
   for workspace in core ui spec; do
     if [ -f "$workspace/package.json" ]; then
       echo "== $workspace: install"
       (cd "$workspace" && bun install --silent)
+    fi
+  done
 
+  for workspace in core ui spec; do
+    if [ -f "$workspace/package.json" ]; then
       echo "== $workspace: lint"
       (cd "$workspace" && bun run lint)
 
@@ -85,7 +98,7 @@ if [ "$DOCS_ONLY" = 0 ] && [ -d spec/schemas ]; then
   fi
 fi
 
-echo "== standards core (std-v0.2.0)"
+echo "== standards core ($STD_TAG)"
 bash "$STANDARDS_DIR/standards/bin/check-core.sh" "$(pwd)"
 
 echo "== all checks passed"

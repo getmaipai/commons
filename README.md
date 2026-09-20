@@ -35,7 +35,8 @@ Org standards apply and are auto-loaded from the parent directory
 `CLAUDE.md` (source: [getmaipai/.github](https://github.com/getmaipai/.github)).
 
 `bash scripts/check.sh` from the repo root is the pre-commit gate: each
-workspace's own lint and tests, then the pinned `@maipai/standards` core.
+workspace's own lint and tests, then the pinned `@maipai/standards` core
+(std-v0.3.0, resolved through a per-tag worktree beside this checkout).
 
 License: AGPL-3.0, see [LICENSE](LICENSE). MaiPai is open-source software
 for personal, self-hosted, non-commercial use by you and your household;
