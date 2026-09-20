@@ -1,0 +1,7 @@
+MaiPai Shared
+Third-Party Licenses and Attributions
+
+This repo holds the org's shared libraries (ui, core, spec), extracted
+from Home and the Stack. It carries no third-party attributions of its
+own yet; each workspace's dependencies are added here as they land,
+per docs/PACKAGES.md in getmaipai/.github.
