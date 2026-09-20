@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/recipe.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/recipe.schema.json",
   "title": "Recipe",
   "description": "A Tier 0 declarative package body, interpreted natively by the TS and Python interpreters in spec/interpreters/. See platform plan 5.2. A recipe is a named set of inputs plus a list of steps; each step is one of the primitives below.",
   "type": "object",

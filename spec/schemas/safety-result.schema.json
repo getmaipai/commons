@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/safety-result.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/safety-result.schema.json",
   "title": "SafetyResult",
   "description": "The safety layer's verdict on one piece of text (a turn, or a generation prompt), before any model runs and again on every streamed sentence. See platform plan 4.3. Deliberately abstract: `matched_signals` names which detectors fired, never the text that triggered them, so a SafetyResult can be logged and used in a notification without ever carrying a transcript (4.3: \"logged with the fact, never the transcript\").",
   "type": "object",

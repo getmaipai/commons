@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/settings-key.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/settings-key.schema.json",
   "title": "SettingsKey",
   "description": "One entry in the settings registry (spec/settings/keys.json) or a package manifest's config[]. See platform plan 3.2 and .github's docs/SETTINGS.md.",
   "type": "object",

@@ -6,6 +6,18 @@
 // whole from stack/backend/src/spec/ (schemas, fixtures, ts mirrors, and
 // this test, adapted from stack/backend/tests/spec.test.ts) so the Stack
 // imports @maipai/spec instead of carrying its own temporary copy.
+//
+// The mirrors stay hand-written on purpose, not by oversight: dropping
+// them in favor of `gen:ts`'s own output (tried once, spec-v0.1.1) broke
+// three `stack-event` fixtures - `json-schema-to-zod` doesn't preserve
+// the per-branch `required` fields inside this schema's `allOf`/`if`/
+// `then` conditionals (`role.state`'s data needs different required
+// fields than `job.progress`'s), the exact class of gap
+// `spec/records/ts/validate.ts`'s own header already documents for
+// JSON Schema conditionals generally ("neither generator preserves
+// them"). `gen-ts.ts`/`bundle-schemas.ts` exclude these nine schemas
+// from their sweep for the same reason - see `STACK_SCHEMA_NAMES`
+// there.
 import { describe, expect, test } from "bun:test";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";

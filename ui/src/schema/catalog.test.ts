@@ -12,12 +12,9 @@ import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 // NodeRenderer.test.tsx), and - here - the two sources of truth
 // (spec/ui/schema.json's $defs and kit/schema/types.ts's NODE_TYPES)
 // never silently drift apart.
-// spec hasn't moved into this repo yet (spec-v0.1.0, step 0c): until
-// then this reaches across to home/spec/ directly, the temporary
-// sibling-checkout layout every getmaipai repo is in right now.
-// MAIPAI_SPEC_DIR overrides it; once spec-v0.1.0 lands this becomes
-// "../../../spec" (this repo's own spec/ workspace) instead.
-const SPEC_DIR = process.env.MAIPAI_SPEC_DIR ?? fileURLToPath(new URL("../../../../home/spec", import.meta.url));
+// spec-v0.1.0 moved spec/ into this repo as its own workspace.
+// MAIPAI_SPEC_DIR overrides the default.
+const SPEC_DIR = process.env.MAIPAI_SPEC_DIR ?? fileURLToPath(new URL("../../../spec", import.meta.url));
 
 describe("catalog/schema agreement", () => {
   test("every schema.json $def with a `type` const is listed in NODE_TYPES", () => {

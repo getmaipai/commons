@@ -192,7 +192,10 @@ capability, needs its own design pass first).
   reads a product's bundled packages directory, structurally belongs in
   `home`, not a product-agnostic library); tracked in the next item
   below, not a new one. `docs/dev.md`, "Workspace status", has the full
-  writeup.
+  writeup. Bumped to `spec-v0.1.1` same day: stale `home/spec` references
+  the move left behind ($id URLs, `ui/`'s own pin, one `ui/` test) and a
+  tried-and-reverted attempt to drop the Stack's hand-written `stack/ts/`
+  mirrors in favor of codegen - see `docs/dev.md`'s `spec-v0.1.1` entry.
 - [ ] **S** Home pins `spec` and removes the workspace, moving its
   `check.sh` "spec: standards gen/ presence" block here, and moving
   `home/spec/tests/ts/package-bronze.test.ts` into `home`'s own test

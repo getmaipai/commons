@@ -22,6 +22,7 @@ import { join, basename } from "node:path";
 import $RefParser from "@apidevtools/json-schema-ref-parser";
 import { jsonSchemaToZod } from "json-schema-to-zod";
 import prettier from "prettier";
+import { STACK_SCHEMA_NAMES } from "./stackSchemaNames.js";
 
 const SCHEMAS_DIR = join(import.meta.dir, "..", "schemas");
 const OUT_DIR = join(import.meta.dir, "..", "gen", "ts");
@@ -33,7 +34,7 @@ const OUT_DIR = join(import.meta.dir, "..", "gen", "ts");
 // anything is actually published there). manifest.schema.json's
 // data_sources[] $refs the standards-owned PrivacyRow shape cross-repo, the
 // same way settings-key.schema.json is $ref'd within this repo.
-const LOCAL_ID_BASE = "https://getmaipai.github.io/home/spec/schemas/";
+const LOCAL_ID_BASE = "https://getmaipai.github.io/shared/spec/schemas/";
 const STANDARDS_ID_BASE = "https://getmaipai.github.io/.github/standards/schemas/";
 const STANDARDS_DIR = join(
   process.env.MAIPAI_STANDARDS_DIR ?? join(import.meta.dir, "..", "..", "..", ".github"),
@@ -77,7 +78,7 @@ async function writeFileAtomic(outPath: string, content: string): Promise<void> 
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
-  const files = (await readdir(SCHEMAS_DIR)).filter((f) => f.endsWith(".schema.json"));
+  const files = (await readdir(SCHEMAS_DIR)).filter((f) => f.endsWith(".schema.json") && !STACK_SCHEMA_NAMES.has(f));
   const generated: { fileBase: string; typeName: string }[] = [];
   const writtenFileNames = new Set<string>();
 

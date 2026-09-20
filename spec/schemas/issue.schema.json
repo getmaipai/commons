@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/issue.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/issue.schema.json",
   "title": "Issue",
   "description": "One row on the Health/Repairs surface (platform plan 4.11-4.12, session-f-platform-and-trust.md step 1). Raised by `lib/issues.ts`'s `raiseIssue({ source, key, severity, title, detail, fix? })`, upserted by the `(source, key)` pair so a still-broken thing does not pile up duplicate rows every time its owner re-checks, and cleared by `resolveIssue(source, key)` the moment the owner sees it fixed. `source` names the subsystem that raised it (a sidecar id, a package id, `backup`, `engine`, ...); `key` is that source's own stable name for the specific problem (so one source can hold several open issues at once, each with its own key). Carries `hlc` from the first record this platform stamps with one (docs/plans/wave-2.md: 'F lays the pieces the link needs that are also useful now... HLC on every table') even though Issues are hub-local and never sync - the field costs nothing here and proves the shape out before a synced record needs it for real.",
   "type": "object",

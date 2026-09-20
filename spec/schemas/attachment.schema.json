@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/attachment.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/attachment.schema.json",
   "title": "Attachment",
   "description": "One immutable record for a file a person sent in chat. The bytes live below the household data directory; this record carries only their per-person ownership, turn provenance, integrity and retention policy.",
   "type": "object",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/setting-value.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/setting-value.schema.json",
   "title": "SettingValue",
   "description": "One row per (scope, key). Per-field last-writer-wins on the oplog via hlc. See platform plan 3.1, 3.2, and docs/SETTINGS.md in .github.",
   "type": "object",

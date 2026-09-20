@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/turn-signal.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/turn-signal.schema.json",
   "title": "TurnSignal",
   "description": "SPEC-01 (dev.md section 12, 'The act and the emotion of a turn, and the register they drive'). What kind of turn a person just made and how it felt, computed once by classifyTurnSignal() before the model runs and frozen on the turn (never recomputed later, so the judge and REVIEW-01 read what the engine believed at the time). A value shape, not its own synced row: it is carried on conversation-turn.schema.json's own `signal` field, the one record the hub and the robot both sync. `expressed_emotion` is named for exactly what it is - what the words express - because the engine never states an inferred feeling back to the person as if it knew their inner state.",
   "type": "object",

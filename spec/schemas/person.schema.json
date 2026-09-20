@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/person.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/person.schema.json",
   "title": "Person",
   "description": "A household member or guest. Core holds the birthdate; packages only ever see age_range, derived server-side and never stored on the record a package can read. See platform plan 3.1 and 4.2.",
   "type": "object",

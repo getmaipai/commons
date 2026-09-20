@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/conversation.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/conversation.schema.json",
   "title": "Conversation",
   "description": "One chat thread, per person and per surface (platform plan 4.14). Its turns live separately (hub-internal, conversation_turns); this record is the thread itself: title, rolling summary, and lifecycle. See session-a-intelligence.md step 3.",
   "type": "object",

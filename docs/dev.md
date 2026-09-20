@@ -693,6 +693,57 @@ pinned tag changes.
     (Home pins `spec-v0.1.0`), not this one - the file still exists,
     unchanged, at `home/spec/tests/ts/package-bronze.test.ts` today.
 
+- `spec-v0.1.1` (same day): four fixes found running the drift check
+  (`shared`'s own `check.sh`) for real, for the first time, against the
+  moved workspace - the exact kind of thing a plain copy can't catch on
+  its own.
+  - **Every schema's `$id` and `gen-ts.ts`'s `LOCAL_ID_BASE` still said
+    `home/spec`** after the move - a stale published identity, not a
+    functional break (nothing $refs another *local* schema by full
+    URL, so `$RefParser` resolution kept working), but wrong, and
+    inconsistent with the nine RF-05b schemas that already correctly
+    said `shared/spec`. Bulk-fixed across all 27 original schemas plus
+    `spec/ui/schema.json` and the one script constant.
+  - **Two consumers still pointed at the now-deleted `home/spec`
+    directly**, both missed by the `grep` sweep of `home`'s own repo
+    (correctly scoped there, but `shared/ui` reaches across too):
+    `ui/package.json`'s `@maipai/spec` dependency was
+    `file:../../home/spec` (broke `ui`'s own `tsc`, three files
+    couldn't resolve the package at all) and
+    `ui/src/schema/catalog.test.ts`'s `SPEC_DIR` default pointed at
+    `../../../../home/spec` (broke one test with `ENOENT`) - its own
+    comment had already named the exact fix in advance, written before
+    the move ever landed, and just needed applying.
+  - **A same-tag detour, tried and reverted**: with the `$id` fix in,
+    the regenerate-and-diff drift check surfaced that `gen:ts` globs
+    every file in `schemas/`, no exclusion list - so it was already
+    silently generating Zod for the RF-05b nine, alongside their
+    hand-written `stack/ts/` mirrors. Since a generated version existed
+    for free, tried deleting the hand-written mirrors and pointing
+    `stack-fixtures.test.ts` at `gen/ts/` instead - `bun test` caught
+    the reason not to before it shipped: three `stack-event` fixtures
+    that should fail validation passed against the generated Zod,
+    because `json-schema-to-zod` doesn't preserve the per-branch
+    `required` fields inside that schema's `allOf`/`if`/`then`
+    conditionals (`role.state`'s `data` needs different required
+    fields than `job.progress`'s). This is the exact class of gap
+    `spec/records/ts/validate.ts`'s own header already documents
+    neither generator preserves, for a different set of schemas -
+    the RF-05b nine just hit it live, for the first time, because
+    nothing had ever pointed a generator at them before. Reverted:
+    `stack/ts/` restored from the `spec-v0.1.0` commit, and both
+    `gen-ts.ts` and `bundle-schemas.ts` (the Python codegen's own
+    input prep) gained an explicit `STACK_SCHEMA_NAMES` exclusion set,
+    so a future `gen:ts`/`gen-py.sh` run can't silently overwrite the
+    hand-written mirrors with a weaker generated version again. No
+    Pydantic equivalent exists for these nine either (the Stack has no
+    Python body); excluded, not replaced.
+  - **Verification**: `shared`'s own `scripts/check.sh` green end to
+    end (496 spec TS tests, 237 Python, `core` 126, `ui` 308, standards
+    core clean) with the drift check actually exercised for real this
+    time - `spec/package.json` and `pyproject.toml` bumped to `0.1.1`,
+    tagged and pushed.
+
 ## Tooling
 
 `scripts/check.sh` runs each populated workspace's own `lint` and `test`

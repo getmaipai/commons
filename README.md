@@ -12,7 +12,7 @@ grown their own copy of, needed one home instead of two.
 |---|---|---|---|
 | `ui/` | `@maipai/ui` | `ui-v0.2.4` | Home (Go and catalog packages later) |
 | `core/` | `@maipai/core` | `core-v0.1.0` | Home, Stack |
-| `spec/` | `@maipai/spec` | `spec-v0.1.0` | Home, Stack, Catalog, Bot, Go |
+| `spec/` | `@maipai/spec` | `spec-v0.1.1` | Home, Stack, Catalog, Bot, Go |
 
 A consumer pins one of these tags and states it in its own dev docs; bumping is
 a checkout of the sibling at the new tag plus `bun install` (the

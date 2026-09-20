@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/ui/schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/ui/schema.json",
   "title": "UiNode",
   "description": "The declared UI schema (platform plan 6.2): a page is a tree of these nodes, rendered natively by React (web shell, PWA) today and by SwiftUI (iPhone, Apple TV) later. Session B step 5 adds List, CardGrid, MediaShelf, DetailPane and SplitView (platform plan 6.2's named generic primitives) alongside v0's Chat-only set; see docs/dev.md's 'A2UI' entry for exactly which pages this session converted to real schema pages and which stayed hand-written React, and why.",
   "type": "object",

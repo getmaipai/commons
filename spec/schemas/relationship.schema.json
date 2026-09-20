@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/relationship.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/relationship.schema.json",
   "title": "Relationship",
   "description": "A typed, directed edge between two entities: who is whose parent, who owns the dog, who lives where, who works where. One mechanism for every kind of connection, so ownership, residence, employment and family are not four systems.\n\nTwo axes, deliberately not collapsed into one (Jesse, 2026-09-05, from two real examples). `valid_from`/`valid_to` answer whether the relationship holds AT ALL: a former job has valid_to set. `status` answers what KIND of true it is: an estranged daughter has valid_to null, because she is still his daughter, and status `estranged`. Fold those together and you get either an 'ex-daughter' or a former job that still reads as current.\n\nThe payoff is not the data, it is that a renderer can say 'Jesse's former job at Acme' rather than 'Jesse's job at Acme', and never says 'your boyfriend Alex' three weeks after a breakup. Free-text memory cannot reliably supply that tense today.\n\nThis is NOT an authorization edge. See grant.schema.json.",
   "type": "object",

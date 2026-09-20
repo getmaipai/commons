@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/subject-ref.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/subject-ref.schema.json",
   "title": "SubjectRef",
   "description": "SPEC-01, folded in from ASK-01 and CHAT-13's own design by the coherence review, 2026-09-14 (dev.md section 3 part 1, section 4's CHAT-13 amendment, 'Coherence review' question 1). One shape for what a conversation is about, shared by the hub, the robot and Go: a household reference (an authoritative entity_id - a world subject never becomes a household entity, on any path), a world reference (a real-world thing the household does not own an entity for: a film, an album, a place that is not the household's own), or an unresolved reference (a name the turn could not resolve yet). `TurnContext.subjects: SubjectRef[]` is the stack CHAT-13 keeps (depth two to start); `carried_question` is meaningful only on a stack entry, not on a SubjectRef embedded elsewhere (a TurnSignal clause's `subject`, MEM-06's grounding), where it is always null.",
   "oneOf": [

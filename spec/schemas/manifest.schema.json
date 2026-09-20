@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/manifest.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/manifest.schema.json",
   "title": "PackageManifest",
   "description": "One manifest format for every package kind (plugin, skill, app, companion, integration, model, wakeword, voice, theme, module). See platform plan 5.1 and .github's docs/PACKAGES.md.",
   "type": "object",

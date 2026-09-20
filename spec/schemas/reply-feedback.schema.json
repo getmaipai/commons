@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/reply-feedback.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/reply-feedback.schema.json",
   "title": "ReplyFeedback",
   "description": "FEED-01: one person's rating of one assistant reply, kept as a human label for the review program. This record joins the conversation turn by turn_id and is per person, so a rating is never a hidden aggregate and never changes the reply it describes. The reason is a one-tap optional label for a down rating; the engine and classifier remain the only writers of reply content.",
   "type": "object",

@@ -69,10 +69,10 @@ see "Cross-repo schemas" below. The populated error catalogue itself
 | `interpreters/ts/`, `interpreters/py/` | The Tier 0 recipe interpreter, one per language, kept behaviorally identical | hand-written |
 | `emulators/ts/`, `emulators/py/` | A deterministic offline stand-in for the `host.*` RPC surface (4.9), one per language | hand-written |
 | `safety/ts/`, `safety/corpus/` | The deterministic multi-signal safety classifier (4.3), TS only for now (see `safety/README.md`); the labelled corpus it's tested against | hand-written |
-| `stack/ts/` | The Stack's wire shapes (role request/reply headers, the event feed, health, settings, precious-state, the STT session types, the job) - hand-written Zod, not codegen'd; see `stack/README.md` | hand-written |
 | `fixtures/records/` | One valid example per record schema, round-tripped through both generated model sets | hand-written |
 | `fixtures/recipes/` | Recipe + inputs + expected result, run through both interpreters to prove they agree | hand-written |
-| `fixtures/<stack-shape-name>/` | `valid-*.json`/`invalid-*.json` pairs for each `stack/` shape, round-tripped through both its JSON Schema and its Zod mirror | hand-written |
+| `stack/ts/` | The Stack's nine wire shapes (role request/reply headers, the event feed, health, settings, precious-state, the STT session types, the job) - hand-written Zod, excluded from `gen:ts`/`bundle-schemas.ts` (their schemas' `allOf`/`if`/`then` conditionals aren't reliably preserved by either generator; see "Moved from `home/spec`" below) | hand-written |
+| `fixtures/<stack-shape-name>/` | `valid-*.json`/`invalid-*.json` pairs for each `stack/` shape, round-tripped through both its JSON Schema and its hand-written Zod mirror | hand-written |
 | `tests/ts/`, `tests/py/` | The tests that make every proof above real, not asserted | hand-written |
 
 ## Generating
@@ -130,7 +130,8 @@ resolve without re-checking `recipe.ts`'s `steps` field afterward.
 
 This means `standards/gen/ts/` and `standards/gen/py/` (in the sibling
 `.github` checkout) need to already be generated before `shared`'s codegen
-runs; `shared`'s `check.sh` doesn't currently verify that for you.
+runs; `shared`'s `check.sh` verifies that for you ("spec: standards gen/
+presence") before regenerating and diff-checking `gen/`.
 
 ## Moved from `home/spec` (spec-v0.1.0)
 
@@ -141,8 +142,23 @@ for everything built here before the move - that history is still the
 real design record for Person, Setting, Memory/Entity/Episode, the
 package shapes and the rest, only the location changed. `home`'s own
 `spec/` workspace is gone; Home pins this one (see "Pinning this
-workspace" below). RF-05b folded in the Stack's wire shapes (`stack/`,
-above) the same tag, moved whole from `stack/backend/src/spec/`.
+workspace" below). RF-05b folded in the Stack's nine wire shapes
+(role request/reply headers, the event feed, health, settings,
+precious-state, the STT session types, the job) into `schemas/`,
+`fixtures/` and `stack/` the same tag, moved whole from
+`stack/backend/src/spec/`. Their schemas run through the standards
+gen/presence and drift checks like every other schema here, but their
+Zod (and Python) models stay hand-written in `stack/ts/`, excluded from
+`gen:ts`/`bundle-schemas.ts`'s own sweep - tried the other way first
+in `spec-v0.1.1`, reverted the same tag when the generated Zod silently
+lost three `stack-event` fixtures' required-field checks (an `allOf`/
+`if`/`then` conditional, the same class of gap `records/ts/validate.ts`
+already documents neither generator preserves). `spec-v0.1.1` also
+fixed every schema's `$id` and `gen-ts.ts`'s `LOCAL_ID_BASE`, still
+saying `home/spec` after the move, plus two consumers (`ui/`'s own
+`@maipai/spec` pin, `ui/src/schema/catalog.test.ts`) still pointing at
+the now-deleted `home/spec` directly - see `docs/dev.md`'s correction
+entry for the full account.
 
 ## Pinning this workspace
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/reply-constraint.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/reply-constraint.schema.json",
   "title": "ReplyConstraint",
   "description": "CONS-01, dev.md section 16 part 9 rule 2: a live constraint the turn engine sets on the hub's next reply in a given conversation. kind banned_phrase: the hub must never say the value's phrase. kind shape: the reply must take the value's shape token. kind length: the reply must stay within the value's positive-integer character budget, carried as a string.",
   "type": "object",

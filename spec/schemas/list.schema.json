@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/list.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/list.schema.json",
   "title": "List",
   "description": "A household or person's own list: the shopping list, a to-do list, or a custom one (session-d-packages-and-store.md step 8). The frozen D-to-E contract (docs/plans/wave-2.md, 'D to E: the store, widgets, lists'): `{ id, person, scope, kind, title, items: [{ id, text, done, due_at?, created_at }], hlc }`. One hlc for the whole list, not one per item: two people editing the same list concurrently resolve at whole-list granularity, a real, deliberate v1 tradeoff (docs/dev/session-d.md's step 8 entry) rather than a per-item oplog this step doesn't build.",
   "type": "object",

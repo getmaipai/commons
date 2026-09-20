@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/turn-artifact.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/turn-artifact.schema.json",
   "title": "TurnArtifact",
   "description": "COMP-01's immutable details document for one assistant turn. The section is built from retained typed outcomes, not model prose. A changed evidence version creates a new revision; an existing revision is never edited in place.",
   "type": "object",

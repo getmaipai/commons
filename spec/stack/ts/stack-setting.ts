@@ -1,5 +1,5 @@
 // Hand-written Zod mirror of ../schemas/stack-setting.schema.json: a
-// SettingsKey (home/spec) restricted to the Stack, plus the value half.
+// SettingsKey (spec/schemas/settings-key.schema.json) restricted to the Stack, plus the value half.
 import { z } from "zod";
 
 export const StackSetting = z.object({

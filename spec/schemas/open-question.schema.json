@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/open-question.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/open-question.schema.json",
   "title": "OpenQuestion",
   "description": "SPEC-01, folded in by the coherence review, 2026-09-14 (question 1, 'Four ask slots'): one of four ask mechanisms named across the design pass, the only one that needed its own record. `PendingAsk` (turnEngine.ts) is consumed by the very next utterance and stays a hub-internal field, not this. This is the OTHER kind: a question the hub wants to ask a specific person, not necessarily right now and not necessarily in the conversation that raised it - the judge's own open question about an unconfirmed inference (ASK-01 part 4), a `relay` queued for a household adult by AGE-01's `defer` move, a `clarify_fact` from a contradiction (CRED-01). Keyed by person, asked once at the end of that person's next reply on ANY conversation, then cleared - spec-shaped because the robot asks the same questions the hub queues. Replaces the earlier conversations.open_question column design (ASK-01's own draft), which this record supersedes before that column is ever built.",
   "type": "object",

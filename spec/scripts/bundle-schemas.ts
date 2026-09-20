@@ -13,6 +13,7 @@
 // datamodel-code-generator sees exactly what it saw before this existed.
 import { readdir, mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { join, basename } from "node:path";
+import { STACK_SCHEMA_NAMES } from "./stackSchemaNames.js";
 
 const SCHEMAS_DIR = join(import.meta.dir, "..", "schemas");
 const OUT_DIR = join(import.meta.dir, "..", "schemas.resolved");
@@ -27,7 +28,7 @@ async function main() {
   await rm(OUT_DIR, { recursive: true, force: true });
   await mkdir(OUT_DIR, { recursive: true });
 
-  const files = (await readdir(SCHEMAS_DIR)).filter((f) => f.endsWith(".schema.json"));
+  const files = (await readdir(SCHEMAS_DIR)).filter((f) => f.endsWith(".schema.json") && !STACK_SCHEMA_NAMES.has(f));
   const neededStandardsSchemas = new Set<string>();
 
   for (const file of files) {

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/entity.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/entity.schema.json",
   "title": "Entity",
   "description": "Anything the household knows about and can refer to: a person, a pet, a place, an organization, a thing. One table, one id space, discriminated by `kind`, so a relationship can point at any two of them without a polymorphic join.\n\nAn Entity is NOT an account. A Person record (person.schema.json) is the account-bearing half of a `kind: person` entity, linked by `account_person_id`: grandma who is only ever mentioned in conversation and grandma who signs in are the same entity at different stages, which is the whole reason this shape exists.\n\nThis also replaces the free-text `record_kind: entity` memory record as the household's notion of a named thing. That record kept a name and a description in one `text` field by convention ('Name: description'), recovered by splitting on the first colon, which lib/memory.ts documents as an approximation. Memory stays narrative ('Bramble likes trains'); entities and the facts joining them live here, structured.",
   "type": "object",

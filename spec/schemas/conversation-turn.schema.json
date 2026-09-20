@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://getmaipai.github.io/home/spec/schemas/conversation-turn.schema.json",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/conversation-turn.schema.json",
   "title": "ConversationTurn",
   "description": "SPEC-01 (dev.md section 12, 'What exists today': 'conversation_turns is hub-internal while the conversation spec says robot turns sync through the hub: a shared turn record is a debt this item pays, because the signal has to live on it'). One completed turn, spec-shaped so the hub and the robot agree on its fields (backend/src/db/schema.ts's own conversationTurns table stays the hub's storage; this is the shape a sync payload and a fixture agree on, additive to what that table already carries - the fields this migration adds are signal, plan, subjects, outcomes typed, document, review_id and notice_ids; ACT-01 onward writes them, no writer yet). `signal` is required (ACT-01 computes it for every turn, package and command turns included, before routing); `plan`, `subjects`, `outcomes`, `document`, `review_id` and `notice_ids` stay null until the items that write them (ACT-03, CHAT-13, existing package handling, COMP-01, REVIEW-01, AGE-02) land.",
   "type": "object",
