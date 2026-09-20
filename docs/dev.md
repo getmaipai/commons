@@ -164,6 +164,111 @@ pinned tag changes.
     `groupSettings()` both take an explicit `honouredBy` parameter now.
     NOTICE was also missing the ~17 new runtime dependencies this
     workspace added; fixed. 268 tests passing across 42 files.
+  - **`ui-v0.1.1` (2026-09-20): the accessibility floor gap.** Comparing
+    Home's own `kit/ui/*.tsx` against ui-v0.1.0's primitives (mid-Home-
+    adoption, step 5) found that everything on the Stack path (`button`,
+    `input`, `checkbox`, `select`, `tabs`, `dropdown-menu`, `command`,
+    plus `dialog`/`sheet`'s icon close button, `toggle`, `label`,
+    `table`, `breadcrumb`, and `sidebar`'s own menu button) shipped
+    without docs/UI.md's 48px touch-target and 16px type floors, while
+    `switch`, `slider` and `sidebar`'s resize rail (which came in through
+    Home's own pieces) already carried them - a half-merge, not a design
+    choice. `design-resolver` confirmed the floor is the kit's own
+    property (docs/UI.md:180-182 names the kit, not the product, as the
+    thing that "refuses to go below" it), so the fix landed here rather
+    than as a Home-side re-patch, which would have been the "second copy
+    of anything is wrong" case (org CLAUDE.md) and would have broken for
+    `bot`/`go` too.
+    - Ported (geometry and type only, not Home's own visual language -
+      its `rounded-lg`, `bg-clip-padding`, tinted `destructive`, and
+      `color-mix` hovers stay Home's, a separate visual-language question
+      for `spec.md`): `button.tsx`'s `default`/`lg`/`icon` sizes now hit
+      the floor directly with `text-base`; `xs`/`sm`/`icon-xs`/`icon-sm`/
+      `icon-lg` keep their painted size with a `before:` pseudo-element
+      hit-area extension, the inset recomputed for shared's own (not
+      Home's) compact scale. Same pattern for `toggle.tsx`. `input.tsx`
+      drops its `md:text-sm` demotion (16px now holds at every width).
+      `checkbox.tsx` gets the `after:-inset-4` tap-area stretch.
+      `select.tsx`'s trigger/item/label, `dropdown-menu.tsx`'s label/item/
+      checkbox-item/radio-item/sub-trigger (min-h-12, not just text-base -
+      a code review caught the first pass fixing only the label, leaving
+      every actual menu row at `text-sm` with no min-height despite
+      `dev.md` and `CHANGELOG.md` both already claiming `dropdown-menu`
+      as hardened), and `command.tsx`'s search box/empty-state/group-
+      heading/item all move onto `min-h-12`/`text-base`. `tabs.tsx` gets
+      the axis-only
+      `before:` extension plus `data-touch-target-exempt` on `TabsList`
+      (Radix's roving `tabIndex` sits on the wrapper, not a real target).
+      `dialog.tsx`/`sheet.tsx`'s icon-only close routes through the kit's
+      own `Button` (`ghost`/`icon-sm`) instead of an unsized
+      `Primitive.Close`. `sidebar.tsx`'s `SidebarMenuButton` default
+      moves from `h-8`/`text-sm` to `h-12`/`text-base` (the sidebar's
+      primary, most-tapped row); `sm` stays a declared exception.
+      `label.tsx`, `table.tsx`'s cell text, and `breadcrumb.tsx`'s trail
+      move to `text-base` (breadcrumb's touch target stays the WCAG
+      2.5.5 inline-link exception rather than an inset, which would
+      overlap adjacent crumbs the way an unguarded `TabsTrigger`
+      extension once did).
+    - Left alone, with a comment: `badge.tsx`, `tooltip.tsx`, `command.tsx`'s
+      shortcut token, `dropdown-menu.tsx`'s shortcut token - already at
+      `text-xs`/`sm` on both sides, a declared type-floor exception
+      (a chip, a transient label, a keyboard token, none of them body
+      text). `marker.tsx` (chat annotation line, the same "Description"
+      category as Card's/Dialog's own secondary text) likewise stays
+      small with a named exception rather than a guessed fix, since the
+      chat kit itself is still ahead in step 5b. `avatar.tsx`'s fallback
+      initials and `chart.tsx`'s axis/legend/tooltip text stay small
+      (decorative or industry-standard dense data typography, not body
+      text a person reads for content).
+    - **A second review pass, before this landed, found five real
+      overlap/regression bugs the first pass introduced or missed** (the
+      dropdown-menu item gap above was one of them):
+      `toggle-group.tsx` inherits `toggle.tsx`'s `sm`/`lg` hit-area
+      extension, but `ToggleGroup`'s own default `spacing` is 0 - edge-
+      to-edge, sharing a border - so the all-sides extension reached
+      into the next item exactly the way `TabsTrigger`'s extension had to
+      become axis-only to avoid; fixed by cancelling the extension
+      (`before:content-none`) for grouped items rather than misfiring
+      onto the wrong one (no consumer uses `sm`/`lg` through a group yet,
+      so nothing regresses; `default` size is unaffected and safe as-is).
+      `appearance-control.tsx`'s System/Light/Dark segmented control
+      packs three `icon-sm` buttons at `gap-0.5` (2px) - the worst case
+      of the same bug - fixed the same way. `NotificationPopover.tsx`'s
+      "Clear all"/"See all" and its outer row, `PropertyPanel.tsx`'s
+      action-icon row and its Cancel/Confirm row, and `DetailsPane.tsx`'s
+      action-button row all put adjacent `size="sm"` controls at
+      `gap-1`/`gap-2`, letting each button's `-inset-2` extension fully
+      cover and outrun the gap into its neighbor; fixed by widening every
+      one of those gaps to `gap-4` (16px clears two 8px extensions with
+      margin, the same math `tabs.tsx`'s own `gap-2`→`gap-4` fix used).
+      `PropertyPanel.tsx` and `KeyValueList.tsx` each had a `<Button
+      size="icon">` with an explicit `className="size-9"`/`"size-7"`
+      override - since `cn()` uses `tailwind-merge`, the explicit class
+      won and silently kept the button at its old, pre-fix size; fixed by
+      switching to the matching named size (`icon-sm`), which now
+      carries the floor itself, instead of hand-sizing. `FilterColumn.tsx`
+      got two fixes: its search icon was centered for the old 36px
+      `Input` (`top-2.5`) and needed `top-4` for the new 48px one; and its
+      per-option `<label>` rows (space-y-1, ~30px tall) let `Checkbox`'s
+      new `after:-inset-4` (48px) spill into neighboring rows, fixed by
+      giving each row `min-h-12` so the checkbox's extension exactly
+      fills its own row with the real 4px gap as margin, not overflow.
+      A universal claim needs an inventory (org CLAUDE.md): every other
+      `size="sm"`/`"icon-sm"`/`"icon-xs"` consumer in `blocks/` was
+      checked and had either a safe gap or no adjacent compact sibling.
+    - Two follow-ups noted, not blockers: `package.json`'s `"lint": "tsc
+      --noEmit"` doesn't yet ship the ESLint config docs/UI.md says the
+      kit provides to every repo and catalog CI run; and `shared/ui` has
+      no a11y gate of its own yet, so Home's `scripts/screenshot.ts`
+      touch-target sweep (which now measures the shared kit directly) is
+      the only thing proving this floor until `bot`/`go` exist.
+    - `docs/spec.md` section 7 gets a one-line note that its own smaller
+      hit-target numbers (44px toggle, 40-44px header controls, 36px
+      footer item) predate this floor and don't govern the kit.
+    - Regression coverage: `ui/src/ui/touch-target-floor.test.tsx`,
+      class-level assertions per fixed primitive (11 tests). The
+      rendered-geometry proof stays Home's `scripts/screenshot.ts` gate.
+      279 tests passing across 43 files.
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:

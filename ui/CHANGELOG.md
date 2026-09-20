@@ -4,6 +4,21 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.1.1] - ui-v0.1.1
+
+### Fixed
+- `docs/UI.md`'s 48px touch-target and 16px type floors, ported from
+  Home's own hardened kit copy into the primitives that came through the
+  Stack path unhardened: `button`, `input`, `checkbox`, `select`,
+  `tabs`, `dropdown-menu`, `command`, `dialog`, `sheet`, `toggle`,
+  `label`, `table`, `breadcrumb`, and `sidebar`'s menu button. The kit's
+  `switch`, `slider` and `sidebar` rail already carried this fix, which
+  made the gap a half-merge rather than a design choice. See
+  `../docs/dev.md` for the file-by-file inventory and the reasoning kept
+  out (Home's own visual language stays in Home). `docs/spec.md` section
+  7 gets a one-line note that its own smaller hit-target numbers predate
+  this floor.
+
 ## [0.1.0] - ui-v0.1.0
 
 ### Added

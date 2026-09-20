@@ -20,15 +20,27 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
       },
+      // 48px is the kit's hard minimum touch target (docs/UI.md); "default",
+      // "lg" and "icon" clear it directly, with text-base to also clear the
+      // 16px type floor. "xs"/"sm"/"icon-xs"/"icon-sm"/"icon-lg" stay
+      // visually compact (desktop/mouse-only, never the only way to reach
+      // an action a touch or TV surface must also use) but keep the same
+      // 48px hit area with a transparent pseudo-element, the technique the
+      // accessibility audit established for Switch's track: the target and
+      // the artwork are different things.
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        xs: "h-6 gap-1 px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 px-6 has-[>svg]:px-4",
-        icon: "size-9",
-        "icon-xs": "size-6 [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "size-8",
-        "icon-lg": "size-10",
+        default: "h-12 px-4 py-2 text-base has-[>svg]:px-3",
+        // Deliberate type-floor exception (docs/UI.md): a fixed h-6 (24px)
+        // button too short for 16px text - a caller choosing "xs" over
+        // "default" (already text-base) is asking for the compact option
+        // on purpose.
+        xs: "relative h-6 gap-1 px-2 text-xs before:absolute before:-inset-3 before:content-[''] has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "relative h-8 gap-1.5 px-3 before:absolute before:-inset-2 before:content-[''] has-[>svg]:px-2.5",
+        lg: "h-14 px-6 text-lg has-[>svg]:px-4",
+        icon: "size-12",
+        "icon-xs": "relative size-6 before:absolute before:-inset-3 before:content-[''] [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "relative size-8 before:absolute before:-inset-2 before:content-['']",
+        "icon-lg": "relative size-10 before:absolute before:-inset-1 before:content-['']",
       },
     },
     defaultVariants: {

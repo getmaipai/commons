@@ -94,11 +94,15 @@ export function NotificationPopover({
           ))}
           {visible.length === 0 ? <p className="p-6 text-sm text-muted-foreground">{emptyMessage}</p> : null}
         </div>
-        <div className="flex items-center justify-between gap-2 border-t p-3">
+        <div className="flex items-center justify-between gap-4 border-t p-3">
           <Button size="sm" variant="ghost" disabled={unreadCount === 0 || !onMarkAllRead} onClick={onMarkAllRead}>
             Mark all read
           </Button>
-          <div className="flex items-center gap-2">
+          {/* gap-4, not gap-2: each size="sm" Button carries a 48px
+              touch-target extension via before:-inset-2 (8px); gap-4
+              (16px) clears both extensions without them overlapping into
+              each other, the same reasoning Tabs' own gap uses. */}
+          <div className="flex items-center gap-4">
             <Button size="sm" variant="ghost" disabled={items.length === 0 || !onClearAll} onClick={onClearAll}>
               Clear all
             </Button>

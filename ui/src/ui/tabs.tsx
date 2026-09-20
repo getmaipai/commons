@@ -17,7 +17,12 @@ function Tabs({
       data-orientation={orientation}
       orientation={orientation}
       className={cn(
-        "group/tabs flex gap-2 data-[orientation=horizontal]:flex-col",
+        // gap-4, not gap-2: TabsTrigger's own 48px touch-target hit-area
+        // extension (`before:-inset-*-3.5`, 14px) reaches past a smaller
+        // gap into TabsContent's own top edge - a tap on the first few
+        // pixels of a tab's content could activate the trigger instead.
+        // 16px clears the 14px extension with a real margin.
+        "group/tabs flex gap-4 data-[orientation=horizontal]:flex-col",
         className
       )}
       {...props}
@@ -50,6 +55,13 @@ function TabsList({
     <TabsPrimitive.List
       data-slot="tabs-list"
       data-variant={variant}
+      // Deliberate touch-target-floor exception (docs/UI.md): Radix's own
+      // RovingFocusGroup puts a real, roving `tabIndex` on this LIST
+      // wrapper itself, not just on each trigger, so a touch-target sweep
+      // catches the wrapper as if it were its own click target. It isn't
+      // one: its two real targets are the TabsTrigger buttons inside, each
+      // already cleared to 48px on its own.
+      data-touch-target-exempt
       className={cn(tabsListVariants({ variant }), className)}
       {...props}
     />
@@ -64,7 +76,14 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // docs/UI.md's 48px touch-target floor: a transparent `::before`
+        // extends the real tappable area past the compact painted trigger
+        // rather than growing the tab bar itself. Only the CROSS axis
+        // (horizontal tabs sit side by side, so only Y needs the credit;
+        // vertical tabs stack top to bottom, so only X would) - extending
+        // both axes would overlap into the next trigger, since the default
+        // TabsList variant has no gap between triggers.
+        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all before:absolute before:content-[''] group-data-[orientation=horizontal]/tabs:before:-inset-y-3.5 group-data-[orientation=vertical]/tabs:before:-inset-x-3.5 group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:border-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
         "data-[state=active]:bg-background data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 dark:data-[state=active]:text-foreground",
         "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",

@@ -46,6 +46,28 @@ capability, needs its own design pass first).
   unedited. See dev.md's "Workspace status" for the full inventory.
   Known gap, tracked not dropped: no TV-focusable nav yet (not one of
   the five protected features).
+- [x] **S** `ui-v0.1.1`: ported docs/UI.md's 48px touch-target/16px type
+  floor into the primitives that shipped unhardened (they came through
+  the Stack path rather than Home's own already-audited kit copy) -
+  found mid-Home-adoption comparing the two kits directly. 279 tests
+  passing, plus a second review pass that caught and fixed five real
+  overlap bugs the port introduced or exposed (see dev.md). See dev.md's
+  "Workspace status" for the full file-by-file inventory.
+- [ ] **S** A shared helper for the touch-target hit-area technique
+  (`relative` + `before:`/`after:-inset-N`): hand-derived independently
+  at every call site across `button.tsx`, `toggle.tsx`, `checkbox.tsx`
+  (a code review on `ui-v0.1.1` flagged this - "a second copy of
+  anything is wrong even when it is faster," org CLAUDE.md). Mirror
+  `utils.ts`'s `FOCUS_RING` constant, created for exactly this kind of
+  repeated-pattern drift. Exit check: `ui/scripts/check.sh` green, no
+  behavior change (same computed insets, one definition).
+- [ ] **S** `ui`'s own a11y gate: `package.json`'s `"lint"` is
+  `tsc --noEmit` only, not the ESLint config docs/UI.md says the kit
+  ships to every repo and catalog CI run, and the kit has no
+  touch-target/type-floor sweep of its own - Home's
+  `scripts/screenshot.ts` is the only thing proving `ui-v0.1.1`'s floor
+  today. Matters once `bot`/`go` adopt the kit without Home's gate.
+  Exit check: `ui/scripts/check.sh` green with the new lint/sweep wired.
 - [ ] **M** Home adopts `ui`: pin the tag, replace `@/kit` and
   `shell/Shell.tsx` with `@maipai/ui` across its 45 consumer files, wiring
   Home's `ProfileSwitcher`, `NotificationBell`, search providers and

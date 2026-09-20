@@ -12,8 +12,13 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
   return (
     <ol
       data-slot="breadcrumb-list"
+      // text-base, not text-sm: the type floor (docs/UI.md). Touch-target
+      // sizing is left to WCAG 2.5.5's inline-link exception (each crumb is
+      // a text link inside a sentence-like trail, not a standalone
+      // control) rather than an inset extension, which would overlap
+      // adjacent crumbs the way an unguarded TabsTrigger extension did.
       className={cn(
-        "flex flex-wrap items-center gap-1.5 text-sm break-words text-muted-foreground sm:gap-2.5",
+        "flex flex-wrap items-center gap-1.5 text-base break-words text-muted-foreground sm:gap-2.5",
         className
       )}
       {...props}

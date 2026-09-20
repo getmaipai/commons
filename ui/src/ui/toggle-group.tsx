@@ -63,12 +63,21 @@ function ToggleGroupItem({
       data-variant={context.variant || variant}
       data-size={context.size || size}
       data-spacing={context.spacing}
+      // Inherits toggleVariants' 48px floor. "default" size clears it
+      // directly with real height/width, so it is safe edge-to-edge.
+      // "sm"/"lg" carry a hit-area pseudo-element sized for a STANDALONE
+      // toggle; ToggleGroup's own default spacing is 0 (edge-to-edge,
+      // sharing a border), where that all-sides extension would reach
+      // into the next item - the same overlap TabsTrigger's extension
+      // had to avoid. Cancelled here rather than misfiring onto the
+      // wrong item; "sm"/"lg" through a group are a compact, real-
+      // spacing-required option, not a touch/TV target on their own.
       className={cn(
         toggleVariants({
           variant: context.variant || variant,
           size: context.size || size,
         }),
-        "w-auto min-w-0 shrink-0 px-3 focus:z-10 focus-visible:z-10",
+        "w-auto min-w-0 shrink-0 px-3 before:content-none focus:z-10 focus-visible:z-10",
         "data-[spacing=0]:rounded-none data-[spacing=0]:shadow-none data-[spacing=0]:first:rounded-l-md data-[spacing=0]:last:rounded-r-md data-[spacing=0]:data-[variant=outline]:border-l-0 data-[spacing=0]:data-[variant=outline]:first:border-l",
         className
       )}

@@ -167,6 +167,14 @@ compatibility/rollback context.
 
 ## 7. Responsive, accessibility and future consistency
 
+This spec's own hit-target numbers below (44 px toggle, 40 to 44 px
+header icon-controls, 36 px footer item) predate the kit's org-wide
+floor and are lower than it. `docs/UI.md`'s 48 px touch-target and 16 px
+type minimums govern the kit's actual primitives; a repo's own standard
+never weakens a platform standard (org CLAUDE.md). Treat this section's
+numbers as this document's original console-specific intent, not the
+kit's sizing authority.
+
 At 1280 px and wider: preserve sidebar and dashboard grid. 960 to 1279
 px: reduce card columns and hide secondary table fields. 720 to 959 px:
 icon rail or drawer; stack metrics and move the resource summary before

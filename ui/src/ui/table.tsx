@@ -10,7 +10,9 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     >
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        // text-base, not text-sm: the type floor (docs/UI.md) - a table's
+        // cells are the primary content a person reads, not a caption.
+        className={cn("w-full caption-bottom text-base", className)}
         {...props}
       />
     </div>

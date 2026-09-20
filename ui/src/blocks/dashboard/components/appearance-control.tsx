@@ -27,6 +27,10 @@ export function AppearanceControl() {
           aria-pressed={theme === option.value}
           title={option.label}
           onClick={() => setTheme(option.value)}
+          // icon-sm's own 48px hit-area extension would overlap the next
+          // segment in this tightly-packed (gap-0.5) segmented control -
+          // cancelled here rather than misfiring onto the wrong option.
+          className="before:content-none"
         >
           {option.value === "dark" ? <MoonIcon className="size-4" /> : option.value === "light" ? <SunIcon className="size-4" /> : <MonitorIcon className="size-4" />}
         </Button>

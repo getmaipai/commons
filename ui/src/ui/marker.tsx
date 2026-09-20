@@ -4,6 +4,9 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/kit/utils"
 import { Slot } from "radix-ui"
 
+// Declared type-floor exception (docs/UI.md): a supplementary annotation
+// line (a timestamp, a status note), the same category as Card's and
+// Dialog's own Description, not primary body text.
 const markerVariants = cva(
   "group/marker relative flex min-h-4 w-full items-center gap-2 text-left text-sm text-muted-foreground [&_svg:not([class*='size-'])]:size-4 [a]:underline [a]:underline-offset-3 [a]:hover:text-foreground",
   {

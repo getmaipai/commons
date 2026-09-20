@@ -15,10 +15,13 @@ const toggleVariants = cva(
         outline:
           "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
       },
+      // 48px floor (docs/UI.md), the same rule as Button's sizes: "default"
+      // clears it directly with text-base; "sm"/"lg" stay visually compact
+      // but keep the same 48px hit area via a transparent pseudo-element.
       size: {
-        default: "h-9 min-w-9 px-2",
-        sm: "h-8 min-w-8 px-1.5",
-        lg: "h-10 min-w-10 px-2.5",
+        default: "h-12 min-w-12 px-2 text-base",
+        sm: "relative h-8 min-w-8 px-1.5 before:absolute before:-inset-2 before:content-['']",
+        lg: "relative h-10 min-w-10 px-2.5 before:absolute before:-inset-1 before:content-['']",
       },
     },
     defaultVariants: {

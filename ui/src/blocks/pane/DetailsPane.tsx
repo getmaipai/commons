@@ -83,7 +83,7 @@ export function DetailsPane({ open, onClose, icon, hue, name, identifier, status
         )}
 
         {actions.length > 0 && (
-          <div className="mt-auto flex flex-wrap gap-2 border-t p-4 max-[719px]:sticky max-[719px]:bottom-0 max-[719px]:bg-[var(--surface-card)]">
+          <div className="mt-auto flex flex-wrap gap-4 border-t p-4 max-[719px]:sticky max-[719px]:bottom-0 max-[719px]:bg-[var(--surface-card)]">
             {actions.map((action) => {
               const ActionIcon = action.icon ? getIcon(action.icon) : null;
               return (
