@@ -1,23 +1,22 @@
 # Session B handoff (2026-09-20, end of context)
 
 Written per COORDINATOR's standing rule: past 60% of this session's
-context budget, hand off at the next stop point rather than start the
-next step cold. Step 6 (the spec move, all three legs) just landed and
-was accepted; this is a natural boundary. This note supersedes the
-previous one (step 5b's handoff) - that work is long since landed and
-accepted, no longer relevant to what's next.
+context budget (this session ended near 80%), hand off at the next
+stop point rather than start the next step cold. SHARED-PIN-01 (all
+three legs, plus its CI verification) just landed and was accepted;
+this is a natural boundary. This note supersedes the previous one
+(step 6, the spec move) - that work is long since landed and accepted,
+no longer relevant to what's next. The file itself is still named
+`session-b.md` under `shared/`; the folder rename to `commons/` is
+part of the next assignment below, not done yet.
 
 ## Identity and the hard boundary
 
-"Session B" in the multi-session refocus effort. Assignment per
-`stack/docs/plans/session-b-shared-2026-09-20.md` and
-`stack/docs/plans/refocus-work-order-2026-09-20.md` (steps 0b/0c):
-create `getmaipai/shared`, land `core-v0.1.0` and `ui-v0.1.0`, adopt
-both in Home, move `home/spec` to `shared/spec`, make Home and Catalog
-pin it. **Hard boundary, still in force: never touch `stack/`.**
-Session A owns `stack/`; it never touches `shared/`, `home/`, or
-`catalog/`. Reading stack's own plan docs for context is fine; editing
-anything under `stack/` is not.
+"Session B" in the multi-session refocus effort. **Hard boundary,
+still in force: never touch `stack/`.** Session A owns `stack/`; it
+never touches `shared/`/`commons/`, `home/`, or `catalog/`. Reading
+stack's own plan docs for context is fine; editing anything under
+`stack/` is not.
 
 COORDINATOR directs sessions via cross-session messages (`SendMessage`/
 `ListAgents`, she shows as `COORDINATOR`). Reporting contract: `ready`
@@ -29,73 +28,85 @@ waiting."
 
 ## What's landed (all pushed, all reported, all accepted)
 
-Everything from the previous handoff (steps 0b/0c: `core-v0.1.0`,
-`ui-v0.1.0` through the chat rebuild) plus, this session:
+**SHARED-PIN-01** (shared's own pins moved from a mutable shared
+checkout to immutable per-tag `git worktree`s, adopted in `home` and
+`catalog`, verified live via two throwaway CI PRs):
 
-**`spec-v0.1.0` + `spec-v0.1.1`** (`shared`, commits `2c87009` then
-`1aee790`): `home/spec` moved whole into `shared/spec` by plain copy
-(no shared git history, matching `ui-v0.1.0`'s own precedent). RF-05b
-folded in the same tag: the Stack's nine wire shapes moved read-only
-from `stack/backend/src/spec/` on `origin/main` (never touched the
-`stack/` checkout itself) into `spec/schemas/` (flat), `spec/fixtures/
-<shape-name>/` (flat), and a new `spec/stack/ts/` domain folder for
-their hand-written Zod mirrors. **Those mirrors stay hand-written on
-purpose** - a same-tag detour tried generating them via `gen:ts`
-instead and `bun test` caught three `stack-event` fixtures silently
-losing their required-field checks (an `allOf`/`if`/`then` conditional
-neither generator preserves, the same class of gap
-`spec/records/ts/validate.ts` already documents). `gen-ts.ts` and
-`bundle-schemas.ts` now share one `spec/scripts/stackSchemaNames.ts`
-exclusion list so a future codegen run can't silently overwrite them
-again. `spec-v0.1.1` also fixed every schema's `$id` (still said
-`home/spec` after the move) and two consumers still pointing at the
-deleted `home/spec` directly (`shared/ui`'s own pin, one `ui/` test).
-Full account: `shared/docs/dev.md`'s "Workspace status" `spec/` entry
-and its `spec-v0.1.1` correction entry right after.
-
-**`home` pins it** (`afd2abe0`): `SPEC_PIN=0.1.1`. Nearly free since 64
-of 65 spec-importing files already used the `@maipai/spec/...` package
-form (Home's `package.json` already had it as a Bun workspace member).
-A second sweep - only caught by actually running the full backend
-suite, not by grepping for quoted relative-path strings - found four
-more files reading `spec/llm/*.json` corpora via `join(import.meta.dir,
-"..", "..", "..", "spec", "llm", ...)` (a separate `join()` argument,
-missed by the first grep). Fixed through one new
-`backend/src/lib/specDir.ts`, reused by seven call sites. Full account:
-`home/docs/dev.md`'s "Home pins @maipai/spec" entry.
-
-**`catalog` pins it** (`e554bf7`): deleted the maintainer-refreshed
-`schema/` mirror and `refresh-schema.sh`; `tools/` pins `@maipai/spec`
-directly, `lint.ts` reads schemas from the installed package with every
-schema's own accurate `$id` doing the cross-repo `$ref` resolution
-automatically. CI needed a `getmaipai/shared` checkout too (a `file:`
-dependency is a real filesystem path, not an env-var override) - first
-attempt (`path: ../shared`) was wrong, a code review caught it
-(`actions/checkout@v4` rejects any path escaping `$GITHUB_WORKSPACE`,
-confirmed against its own source), fixed with a nested checkout plus a
-symlink step and verified locally (reproduced the exact layout,
-ran a real `bun install` through it) before landing. Full account:
-`catalog/docs/dev.md`'s Step 0 status, the `schema/` deleted bullet.
-
-**Cherry-pick, COORDINATOR's own request, no reply needed at the
-time**: `1d817ad` (`codex/181-home-wrappers-test`, `home-codex`
-worktree) onto `home` main as `bac07c93`, branch deleted, the
-`home-codex` worktree left detached at `origin/main` (never removed -
-Codex's fixed folder).
-
-**`bot`'s own pin**: raised as a possible gap, resolved by
-COORDINATOR - it's docs-only until the robot has a real Python project
-to install into (`codex-177` already names the new
-`getmaipai/shared@spec-v0.1.1` URL form in `bot`'s own `AGENTS.md`), so
-there's no code-side item waiting here.
+- **`shared`**: `45c137f` (`scripts/ensure-tag.sh` + docs/dev.md - the
+  core mechanism: `<workspace> <tag>` resolves to
+  `../shared-tags/<workspace>-<tag>`, created once via `git worktree
+  add --detach`, reused after, refuses an unknown tag, verifies a
+  reused worktree's HEAD still matches the tag rather than trusting a
+  directory that merely exists), `57fd32f` (backlog: `ui` should pin
+  `spec` by an exact tag, not a bare relative path - they can drift
+  now that they're independently pinned), `7529331` (backlog: a
+  composite CI action so every consumer's workflow doesn't
+  reimplement the checkout-then-`ensure-tag.sh` dance), `5690a4d`
+  (README: the repo is public), `6ebd6c6` (backlog: the `std-` pin has
+  the identical mutable-checkout gap, found live - see gotchas below).
+- **`home`**: `fe8b790e` - `backend`/`frontend` `package.json` `file:`
+  paths name the worktree directly, `scripts/check.sh` resolves each
+  pin via `ensure-tag.sh` with a version-vs-tag sanity check,
+  `scripts/screenshot.ts`'s stub-server import moved from a static
+  path into the mutable checkout to a dynamic one resolved from
+  `backend/package.json`'s own pin, `AGENTS.md` rewritten. A review
+  caught the settings-registry drift check writing straight into the
+  shared `spec` worktree (a cache every consumer shares) -  fixed to
+  use a private `mktemp` scratch dir instead, verified live
+  (`git status` in the worktree stayed clean through a full gate run).
+- **`catalog`**: `53684fb` (pin adoption, plus a check.sh cross-check
+  that `tools/package.json`'s `file:` path names the same tag as the
+  script's own `SPEC_TAG` - a review caught they could silently
+  drift), `80fa810` (`permission-diff` job was missing the `shared`
+  checkout entirely - a pre-existing gap, found live in the first
+  throwaway PR - plus the `getmaipai/commons` rename mid-flight),
+  `ce643fb` (`fetch-tags: true` at shallow depth left a tag's ref
+  resolvable but not its commit, proven live; `fetch-depth: 0` is what
+  actually works), `63bffd6` (`permission-diff` was ALSO missing the
+  `@maipai/standards` checkout - same class of gap, same job), `24f7b31`
+  (docs: the real CI outcome, replacing "unverified").
+- **CI verification, for real**: two throwaway PRs
+  (`ci-verify/shared-pin`, `ci-verify/shared-pin-2`), both closed
+  unmerged, both branches deleted. PR 1 hit a genuine pre-existing
+  blocker unrelated to this item's own mechanics - `getmaipai/shared`
+  was private and `catalog`'s CI had no cross-repo credential
+  (confirmed via `gh api`/`gh secret list`, not assumed). Reported to
+  COORDINATOR rather than provisioning a token unilaterally
+  (credentials are Jesse's call); his decision was to make the repo
+  public instead, now `getmaipai/commons`. PR 2 then found and fixed,
+  live, the two `permission-diff` gaps and the `fetch-tags` limit
+  above. Final state: `permission-diff` fully green; `check` gets all
+  the way through `tools/` install/typecheck/tests/7-of-7-package
+  scorecard - the pin/worktree mechanics this item is about are
+  confirmed working end to end - and only fails on a real,
+  pre-existing prose-lint violation unrelated to this item (below).
 
 ## Standing gotchas for whoever picks this up
 
-- **`bun install --force` after every `shared` edit.** A `file:`
-  dependency resolves into a content-addressed store, a snapshot taken
-  at install time, not a live link - a plain `bun install` will not see
-  a `shared` source change. Every pin bump in a consumer's `check.sh`
-  needs this in that workspace.
+- **This session's own local `.github` checkout was NOT pinned to
+  `std-v0.2.0`** - it sat on `main`, 113 commits ahead
+  (`git describe --tags` -> `std-v0.2.0-113-gb67acef`), the whole
+  session. Every local `scripts/check.sh` run in `shared`/`home`/
+  `catalog` this session therefore enforced whatever `main` happened
+  to be, not the tag it claims to pin - caught only because a
+  correctly-pinned CI run (checking out the real `std-v0.2.0` tag)
+  failed prose-lint on real exclamation points in `catalog`'s
+  `CLAUDE.md`/`README.md`/six package READMEs that local runs never
+  saw. Do not assume a green local `check.sh` proves what a correctly-
+  pinned CI run would show for the standards-core step specifically,
+  until this is fixed (filed: `shared/docs/BACKLOG.md`, "Standards").
+  Do NOT `git checkout std-v0.2.0` in the local `../.github` sibling
+  yourself to "fix" this locally - it is a machine-shared checkout
+  other sessions rely on staying on `main` for their own work; that's
+  exactly the class of mutable-shared-checkout bug SHARED-PIN-01 fixed
+  for `commons`, don't reintroduce it for standards.
+- **`getmaipai/shared` is now `getmaipai/commons`, public.** GitHub's
+  redirect works (old clone URLs and `gh api repos/getmaipai/shared`
+  both still resolve), but don't rely on it going forward - see
+  COMMONS-RENAME-01 below.
+- **`bun install --force` after every `commons`/`shared` edit.** A
+  `file:` dependency resolves into a content-addressed store, a
+  snapshot taken at install time, not a live link.
 - **Code review is budgeted**: low effort for an S item or a
   docs-and-config change, medium for an M item or a route/guard/wire
   change. One pass per commit; after fixes, re-review the fix hunks
@@ -104,45 +115,65 @@ there's no code-side item waiting here.
 - **Context percentage goes in every done report too.** Past 60%, hand
   off at the next stop point - a note like this one, then COORDINATOR
   hands it to Jesse for a fresh session.
-- **A `git add` with multiple pathspecs aborts entirely if ANY one of
-  them doesn't match** (e.g. a deleted directory already staged from an
-  earlier `git rm`) - it doesn't just skip the bad one. This session hit
-  it live: a catalog commit landed with only half its intended diff
-  because of exactly this, caught by reading `git show --stat HEAD`
-  right after committing, before pushing. Always read that output
-  before `git push`, not just before `git commit`.
 - **`actions/checkout@v4` refuses any `path` that resolves outside
-  `$GITHUB_WORKSPACE`** - checked directly against its own source this
-  session, not assumed. A sibling-repo checkout for a real filesystem
-  `file:` dependency (as opposed to an env-var-driven path like
-  `MAIPAI_STANDARDS_DIR`) needs a nested checkout plus a plain `ln -s`
-  shell step to fake the sibling relationship, not `path: ../other-repo`
-  directly.
-- **When a JSON Schema uses `allOf`/`if`/`then` conditionals, don't
-  trust either `json-schema-to-zod` or `datamodel-code-generator` to
-  preserve per-branch `required` fields without a fixture round-trip
-  proving it** - `spec/records/ts/validate.ts` documented this for one
-  set of schemas; RF-05b's `stack-event` hit it live for another. The
-  fixture test that catches this (Ajv against the raw schema, the Zod
-  mirror, both required to agree) is the actual proof, not a read of
-  the generator's docs.
+  `$GITHUB_WORKSPACE`** - a nested checkout plus a plain `ln -s` shell
+  step is the workaround, not `path: ../other-repo` directly.
+  **`fetch-tags: true` at the default shallow depth is NOT enough**
+  for a later `git worktree add` against that tag to work - proven
+  live, not assumed; `fetch-depth: 0` (full history) is the version
+  that actually leaves a tag's commit fetchable, at the cost of a full
+  clone every run (the composite-action backlog item is the eventual
+  fix for the cost, not this).
 - **The live app on this laptop** (`home/data/local-app`, `bun start`/
   `stop`/`restart` from the `home/` root) is Jesse's own real household
   data on port 8787 - never sign in with his real PIN.
 - **This laptop runs low on free memory under concurrent sessions** - a
   `check.sh` gate or a large test suite got noticeably flaky under load
-  this session too (a few backend tests failed once under the full
-  3143-test run, passed clean every time run in isolation or alone).
-  Ask COORDINATOR to clear a "gate slot" before a retry if a failure
-  looks like resource contention rather than a real regression - don't
-  just blind-retry, but don't chase a phantom bug either.
+  in an earlier session. Ask COORDINATOR to clear a "gate slot" before
+  a retry if a failure looks like resource contention rather than a
+  real regression.
 
-## What's next
+## What's next: COMMONS-RENAME-01
 
-Step 6 (the spec move) is the last item from this session's original
-assignment (`session-b-shared-2026-09-20.md`) that was still open. No
-queued next step from that work order remains unstarted. Whoever picks
-this up should check with COORDINATOR for the next assignment rather
-than assuming one - the `bot` pin gap above is one candidate, otherwise
-check `shared/docs/BACKLOG.md` and `home/docs/BACKLOG.md` for anything
-added since this note was written.
+GitHub has already renamed `getmaipai/shared` to `getmaipai/commons`
+(public). This item is the local and cross-repo follow-through:
+
+- **Local folder**: `shared` -> `commons` on this machine, then
+  `git worktree repair` for every worktree that still points at the
+  old path - `shared-a` (another session's worktree; coordinate before
+  touching it) and every `../shared-tags/<workspace>-<tag>` worktree
+  (`core-core-v0.1.0`, `spec-spec-v0.1.1`, `spec-spec-v0.1.2`,
+  `ui-ui-v0.3.3`, `ui-ui-v0.4.0` as of this note), which themselves
+  become `commons-tags/<workspace>-<tag>`.
+- **Every consumer** (`home`, `catalog`, `stack`): every `../shared`,
+  `../../shared-tags`, and `MAIPAI_SHARED_DIR` reference (in
+  `scripts/check.sh`, `package.json` `file:` paths, `AGENTS.md`,
+  `.github/workflows/check.yml`, dev docs) becomes `../commons`,
+  `../../commons-tags`, `MAIPAI_COMMONS_DIR` respectively.
+  `catalog/.github/workflows/check.yml` already points its
+  `repository:` fields at `getmaipai/commons` (done this session,
+  `80fa810`); its step names/comments still say "shared" and need the
+  same sweep as everything else.
+- **`commons`'s own scripts and docs**: `scripts/ensure-tag.sh`,
+  `scripts/check.sh`, `docs/dev.md`, `docs/BACKLOG.md`, `README.md`
+  (already has one line about being public, `5690a4d`) - every
+  internal "shared"/"`shared-tags`" reference becomes "commons"/
+  "`commons-tags`".
+- **Org-wide**: `getmaipai/.github/CLAUDE.md`'s product table (the
+  `shared` row) and a `docs/DECISIONS.md` line recording commons is
+  public and why.
+- **Coordinate with `stack`'s own lane**: `stack`'s half of this is
+  tracked in that lane's `c-94` item - check with COORDINATOR before
+  touching anything under `stack/` (still off-limits directly; the
+  lane handles its own repo).
+- Exit check for the whole item: every repo's `scripts/check.sh` green
+  with no remaining `shared`/`shared-tags` string outside historical
+  dev-doc entries (those stay - they're describing what was true when
+  written), a fresh `git worktree list` in `commons/` showing the
+  repaired paths, and (per the standing gotcha above) a live check
+  that a correctly-pinned `std-v0.2.0` is what local gates actually
+  enforce, not a side effect to assume.
+
+Whoever picks this up should get the brief from COORDINATOR rather
+than starting from this note alone - this is a summary of state, not
+the work order itself.
