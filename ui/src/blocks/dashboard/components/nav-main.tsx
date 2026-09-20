@@ -51,7 +51,15 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                 <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="px-3 data-[active=true]:bg-[var(--hue-violet)] data-[active=true]:text-white data-[active=true]:hover:bg-[var(--hue-violet)] data-[active=true]:hover:text-white">
                   <NavLink to={item.url}>
                     {Icon && <Icon />}
-                    <span>{item.title}</span>
+                    {/* group-data-[collapsible=icon]:hidden, matching
+                        SidebarGroupLabel's own class two lines up - found
+                        live (a real household report, 2026-09-20): without
+                        it this span stays in the accessibility tree and
+                        SidebarMenuButton's own `[&>span:last-child]:truncate`
+                        (sidebar.tsx) clips it to whatever sliver fits the
+                        collapsed 48px button instead of hiding it, so the
+                        icon-only rail showed one stray letter per row. */}
+                    <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                     {item.dot ? <span aria-hidden className={`size-2.5 rounded-full ${DOT[item.dot]}`} /> : null}
                     {item.badge != null && item.badge > 0 && <span className="ml-auto text-xs text-muted-foreground">{item.badge}</span>}
                   </NavLink>

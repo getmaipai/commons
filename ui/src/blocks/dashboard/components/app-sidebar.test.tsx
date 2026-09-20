@@ -88,4 +88,25 @@ describe("AppSidebar", () => {
     expect(nav).toHaveAttribute("role", "navigation");
     expect(nav).toHaveAttribute("aria-label", "Main navigation");
   });
+
+  // Found live (a real household's own report, 2026-09-20, step 5b's
+  // restart verification): a collapsed rail showed one stray letter per
+  // row instead of an icon-only look - nav-main.tsx's own title `<span>`
+  // had no `group-data-[collapsible=icon]:hidden`, so sidebar.tsx's own
+  // `[&>span:last-child]:truncate` clipped it to whatever sliver fit the
+  // collapsed button instead of hiding it. happy-dom never computes real
+  // layout (no CSS engine), so this can only assert the class is present,
+  // not that the text is actually invisible on screen - the real visual
+  // check is scripts/screenshot.ts's own captureShellRail, home/.
+  test("a nav item's label carries the collapsed-rail hidden class", () => {
+    const groups = ungroupedNav([{ to: "/", icon: "home", label: "Home" }]);
+    const { getByText } = render(
+      <MemoryRouter>
+        <SidebarProvider open={false}>
+          <AppSidebar groups={groups} brand={<span>Brand</span>} />
+        </SidebarProvider>
+      </MemoryRouter>,
+    );
+    expect(getByText("Home")).toHaveClass("group-data-[collapsible=icon]:hidden");
+  });
 });

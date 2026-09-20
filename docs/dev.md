@@ -639,3 +639,33 @@ No workspace here uses a separate formatter (`eslint`/`tsc` are the lint
 step, matching every other `getmaipai` repo; none uses `prettier` as a
 gate either, only as an occasional editor tool) so there's no separate
 format-check command to wire in beyond that.
+
+## The collapsed rail showed a stray letter per row (ui-v0.2.3, 2026-09-20)
+
+Found live during Home's step 5b restart verification, against a real
+household's own report that the left rail "is a disaster with its
+collapsed state and its toggle." `nav-main.tsx`'s nav item `<span>`
+carrying the title text had no `group-data-[collapsible=icon]:hidden` -
+`SidebarGroupLabel` two lines above it in the same file already had the
+right class, this one just never got it. `sidebar.tsx`'s own
+`SidebarMenuButton` styling (`[&>span:last-child]:truncate`) doesn't
+unmount or fully hide an un-hidden label when the rail collapses to its
+48px icon-only width; it clips it to whatever sliver of the first
+letter fits, which is exactly the "disaster" a screenshot confirmed.
+Home's own `AppShell.tsx` `FooterNavItem` (Privacy/Settings) had the
+identical bug, its own `<span>` copied from the same pattern before this
+fix existed to copy - fixed there too, same commit.
+
+Fixed by adding the missing class to both spans. `app-sidebar.test.tsx`
+gained a regression test asserting the class is present (happy-dom has
+no real CSS engine, so it can't assert the text is actually invisible
+on screen - `home/scripts/screenshot.ts`'s own `captureShellRail`,
+added the same day, is the real visual check, expanded and collapsed,
+both themes).
+
+**Verification**: `shared`'s own `scripts/check.sh` green at `ui-v0.2.3`.
+Home's full `scripts/check.sh` green with `UI_PIN=0.2.3`. Home's
+`bun run scripts/screenshot.ts --shell-rail-review` re-captured
+`shell-rail-{expanded,collapsed}-desktop-{light,dark}.png`; opened and
+judged: the collapsed rail now shows icons only, no stray letters, in
+both themes.

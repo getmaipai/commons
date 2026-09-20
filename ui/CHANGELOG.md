@@ -4,6 +4,18 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.2.3] - ui-v0.2.3
+
+### Fixed
+- `nav-main.tsx`'s nav item label had no `group-data-[collapsible=icon]:hidden`
+  (`SidebarGroupLabel`, two lines above it in the same file, already
+  had the right class) - sidebar.tsx's own `[&>span:last-child]:truncate`
+  clipped the label to whatever sliver fit the collapsed 48px button
+  instead of hiding it, so every row in a collapsed rail showed one
+  stray letter next to its icon. Found live, step 5b's Home restart
+  verification, against a real household's own report of the left rail
+  looking broken. `app-sidebar.test.tsx` gained a regression test.
+
 ## [0.2.2] - ui-v0.2.2
 
 ### Fixed
