@@ -16,8 +16,9 @@
     "noEmit": true,
     "types": ["bun"],
     "paths": {
+      "@/kit/*": ["./src/*"],
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "tests"]
 }

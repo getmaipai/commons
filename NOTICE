@@ -14,4 +14,33 @@ getmaipai/.github.
   (`openapi.ts`'s route/schema scaffolding)
 - Zod (MIT) - https://zod.dev (`openapi.ts`'s schemas)
 
+## ui
+
+- React, React DOM (MIT) - https://react.dev (peer dependencies)
+- Radix UI: react-popover, and the consolidated `radix-ui` package (MIT) -
+  https://www.radix-ui.com
+- lucide-react (ISC) - https://lucide.dev
+- clsx (MIT) - https://github.com/lukeed/clsx
+- tailwind-merge (MIT) - https://github.com/dcastil/tailwind-merge
+- class-variance-authority (Apache-2.0) - https://cva.style
+- tw-animate-css (MIT) - https://github.com/Wombosvideo/tw-animate-css
+- cmdk (MIT) - https://cmdk.paco.me (the command palette primitive
+  behind `ui/command.tsx`)
+- sonner (MIT) - https://sonner.emilkowal.ski (the kit's one toast
+  primitive, `ui/sonner.tsx`)
+- next-themes (MIT) - https://github.com/pacocoursey/next-themes
+  (`AppearanceControl`'s light/dark/system switching)
+- vaul (MIT) - https://vaul.emilkowal.ski (`ui/drawer.tsx`)
+- @tanstack/react-query (MIT) - https://tanstack.com/query
+  (the settings and UI-schema renderers' data layer)
+- react-router-dom (MIT) - https://reactrouter.com (the shell's nav,
+  `PhoneNav`, `NotificationPopover`'s history link)
+- recharts (MIT) - https://recharts.org (`ui/chart.tsx`)
+- @noriginmedia/norigin-spatial-navigation (MIT) -
+  https://github.com/NoriginMedia/Norigin-Spatial-Navigation
+  (`tvNav.ts`, the far/TV surface's arrow-key focus)
+- usehooks-ts (MIT) - https://usehooks-ts.com (`useSurface.ts`'s media
+  query hooks)
+- Zod (MIT) - https://zod.dev (the UI-schema types)
+
 When another component lands, its attribution goes here.

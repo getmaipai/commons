@@ -76,13 +76,94 @@ pinned tag changes.
 
 ## Workspace status
 
-- `ui/`: skeleton only (this commit). Content lands at `ui-v0.1.0`,
-  extracted read-only from the Stack's committed tree at commit `5ec0f57`
-  (the 2026-09-19 UI reconciliation), generalized to drop every import
-  that only the Stack console needed, plus Home's `primitives/`,
-  `schema/` and `settings/` (the ones that already render `@maipai/spec`'s
-  declaration format), per the kit-placement plan in the session-b work
-  order's ready report.
+- `ui/`: `ui-v0.1.0` landed. The kit, extracted read-only from the
+  Stack's committed tree at commit `5ec0f57` (the 2026-09-19 UI
+  reconciliation - the design record now lives at
+  [docs/spec.md](../ui/docs/spec.md), copied verbatim with a preface and
+  a closing "what's Stack-only" list; never edit its body), plus Home's
+  `primitives/`, `schema/` and `settings/` (the ones that already render
+  `@maipai/spec`'s declaration format).
+  - Carried as-is: `blocks/{browser,cards,states,phone,property-panel,
+    things-page,things-table,filter-column,pane}`, every `hooks/*`,
+    `icons.ts`, `tokens.css`, the `ui/*` shadcn wrappers (minus four
+    orphaned chat primitives with no consumer - `message`, `bubble`,
+    `attachment`, `message-scroller` - `assistant-ui/` stays Home's).
+  - Generalized: `StatusPill`/`ResourceRow` (their `@/lib/status` and
+    `@/lib/format` helpers moved in as `status.ts`/`format.ts`);
+    `site-header.tsx`'s pieces split into a generic `AppearanceControl`
+    and a new `AppSidebar` (taxonomy groups replaced by `NavGroup[]`/
+    `NavEntry[]` props, `ungroupedNav()` for a flat list); Stack's
+    `machine-selector.tsx` chrome generalized into `HeaderPicker`; its
+    `notifications-popover.tsx` into `NotificationPopover` (data via
+    props, no `@/lib/api` import); Home's `CommandPalette`/
+    `SearchResultGroups`/`PhoneNav` generalized (search groups and nav
+    entries injected, not Home's own providers/catalog) into `search/`
+    and `PhoneNav.tsx`; `@/hooks/use-mobile` folded into
+    `useBreakpoint().tier === "phone"`.
+  - New: `Shell.tsx` - the layout/nav contract (docs/UI.md): a desktop
+    rail, a phone bottom bar, a header with `headerTitle`/`headerActions`
+    slots, rail-open persistence (`railStorageKey`, namespaced per
+    product), and the Cmd/Ctrl+K command palette when a `search` config
+    is given. Imports no product page; routed content is `children`.
+  - `http.ts` (`request`/`ApiError`, Home's own generic fetch client -
+    zero product coupling, moved in whole) backs the schema interpreter
+    (`schema/actions.ts`, `binding.ts`, `NodeRenderer.tsx`'s widget
+    fetches) and `settings/SettingsRenderer.tsx` (which calls the
+    platform's own standardized `/api/settings/*` contract directly,
+    per docs/SETTINGS.md's "one declaration, one implementation" -
+    verified against Home's real routes, not guessed). `widgets.ts` and
+    `settings/resolvedSetting.ts` hold two provisional hand-typed
+    shapes (`WidgetDescriptor`/`WidgetItem`/`WidgetData`,
+    `ResolvedSetting`) until `@maipai/spec` grows real generated ones.
+  - Known gap, not silently dropped: `Shell.tsx` itself has no
+    TV-focusable rail yet (the arrow-key/remote nav Home's own old
+    Shell.tsx had) - tracked in `docs/BACKLOG.md`, not one of the five
+    features the owner's ruling protected. A code review caught that
+    `primitives/Card.tsx`/`List.tsx` already call `useFocusable()`
+    unconditionally on their far-surface variant with nothing in the new
+    tree ever calling the library's required `init()` first - a real
+    crash waiting for the first `far={true}` caller. Fixed: `tvNav.ts`
+    (`ensureTvNavInit`, `pauseTvNavForOverlay`) moved in from Home's
+    `shell/tvNav.ts` (unchanged, zero product coupling), and
+    `HeaderPicker`/`NotificationPopover` now call `pauseTvNavForOverlay`
+    on open-change, matching Home's original `ProfileSwitcher`/
+    `NotificationBell` behavior. The primitive is safe now; the rail
+    itself is still the tracked follow-up.
+  - Found and flagged for `.github` (Session A owns org-doc edits):
+    org `UI.md` states breakpoints as "phone under 640, tablet to 1024,
+    desktop above," but the actual reconciled `tokens.css`
+    (owner-approved 2026-09-19) pins `sm:640, md:720, lg:960, xl:1280` -
+    `responsive.ts`'s `SURFACE_MIN_WIDTH_PX.desktop` now matches the
+    real tokens.css (960), not UI.md's stale prose.
+  - No barrel export - a consumer subpath-imports the real file, e.g.
+    `@maipai/ui/src/Shell` (the same convention `@maipai/spec` and
+    `@maipai/core` already use). See `ui/README.md`'s "Importing".
+  - A medium code review found and fixed six more real issues before
+    this landed: `schema/NodeRenderer.tsx`'s form submit handler cleared
+    its own `submitting` flag synchronously right after firing the
+    dispatched action instead of waiting for it, letting a double-click
+    fire the request twice (now uses `dispatch`'s own `onSettled`);
+    `http.ts` reported ANY `AbortError` as a timeout, including a
+    caller's own unrelated cancellation signal (now only the internal
+    timeout controller's own abort counts, via a `didTimeOut()` flag and
+    `AbortSignal.any` to merge both signals); `Shell.tsx`'s
+    `flatEntries()` hardcoded every phone-nav icon to the generic "box"
+    fallback when the caller passed grouped `NavGroup[]` nav instead of
+    flat `NavEntry[]` (fixed by making `nav-main.tsx`'s own `NavItem.icon`
+    a name, resolved once in `NavMain`, instead of a pre-resolved
+    component - `flatEntries()` now carries it through); `PhoneNav.tsx`'s
+    and `app-sidebar.tsx`'s own separately hand-rolled `isActivePath`
+    used a bare string-prefix check (`/media` matched `/media-library`) -
+    consolidated into one `isActiveNavPath()` in `nav.ts` with a real
+    segment boundary; `SearchResultGroups.tsx` rendered a completely
+    blank list for a real query matching nothing when the product had no
+    `onAsk` (no chat feature) - now shows "No results."; and
+    `settings/groupSettings.ts` hardcoded the literal `"home"` when
+    filtering a registry key's `honoured_by`, even though this is now
+    shared kit chrome any product renders - `SettingsRenderer` and
+    `groupSettings()` both take an explicit `honouredBy` parameter now.
+    NOTICE was also missing the ~17 new runtime dependencies this
+    workspace added; fixed. 268 tests passing across 42 files.
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:
