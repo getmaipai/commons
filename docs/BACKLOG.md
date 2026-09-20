@@ -139,6 +139,13 @@ capability, needs its own design pass first).
   `@assistant-ui/react` wrappers moved in from Home's own
   `frontend/src/kit/assistant-ui` (unchanged except imports) - Home's
   own step-5b chat rebuild consumes this. 305 tests passing.
+- [x] **S** `ui-v0.2.1`: found live finishing Home's step-5b chat
+  rebuild - `MemoryChip` gained a third `"failed"` kind (a save that
+  never completed has nothing to keep/edit/forget, spec section 4's
+  state table: a red label plus one recovery action, not a mismatched
+  popover), and `SourcesCard`'s row links gained `rel="noopener"` and
+  an explicit `referrerPolicy` (Home's own pre-adoption copy had both;
+  the port had only `rel="noreferrer"`). 307 tests passing.
 - [ ] **M** TV-focusable navigation in `Shell.tsx`: `ui-v0.1.0`'s shell
   has no `@noriginmedia/norigin-spatial-navigation` rail the way Home's
   old `Shell.tsx` did (real arrow-key/remote focus on the `far` surface).

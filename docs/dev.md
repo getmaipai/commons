@@ -478,6 +478,33 @@ pinned tag changes.
       a second token-free-lane item COORDINATOR handed off, unrelated to
       chat but landed at the same shared boundary. Worktree removed,
       branch deleted, its content verified present on `main` first.
+  - **`ui-v0.2.1` (2026-09-20): two more real gaps, found live finishing
+    Home's step-5b chat rebuild** (the same pattern as every prior patch
+    this session - land the kit, then let a real consumer actually using
+    it surface what a review alone didn't):
+    - **`MemoryChip` gained a third kind, `"failed"`.** Home's own
+      pre-adoption `chatMemoryChip.tsx` had a real third state (a save
+      that errored, "Memory wasn't saved") the spec's own two kinds
+      ("remembered"/"recalled") never named - dropping it would have
+      lost a real capability, and a Home-local one-off would have split
+      this component's own shape across two files for no good reason
+      once `bot`/`go` adopt it too. `onOpenMemory` is new; `onKeep`/
+      `onEdit`/`onForget` are now optional (this kind ignores them) -
+      it renders as a plain destructive-tinted button straight to
+      `onOpenMemory`, no popover (nothing to keep/edit/forget on a
+      memory that was never saved), matching spec section 4's own state
+      table for an error: a red label plus one recovery action.
+    - **`SourcesCard`'s row links were missing `rel="noopener"` and an
+      explicit `referrerPolicy`.** Home's own pre-adoption `SourcesCard`
+      had carried both since the day it was written (the org privacy
+      architecture's own promise: a cited site learns nothing from the
+      click but the click) - the port only carried `rel="noreferrer"`.
+      `noreferrer` alone already strips the real Referer header in
+      every actual browser, so this was never a live privacy leak, but
+      it was a real regression from Home's own already-audited,
+      belt-and-suspenders form, caught by re-reading the file being
+      replaced rather than assuming the new one already matched it.
+    - 307 tests passing (a new `chat.test.tsx` case for each fix).
 - `core/`: `core-v0.1.0` landed. Sixteen modules, each read from both
   `home/backend/src/lib` and `stack/backend/src/lib` (read-only) where
   both had one, taken from whichever side was better or rewritten fresh:

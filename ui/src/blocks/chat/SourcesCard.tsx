@@ -25,7 +25,10 @@ const ChevronDownIcon = getIcon("chevron-down");
  * turn"), collapsed to one "Sources (N)" line by default. `open`/
  * `onOpenChange` are optional - a caller wanting a citation click to
  * scroll this open and highlight a row controls it; otherwise it's a
- * plain uncontrolled disclosure. */
+ * plain uncontrolled disclosure. Every row link carries
+ * `rel="noopener noreferrer"` plus an explicit `referrerPolicy` (org
+ * privacy architecture: a cited site learns nothing from the click but
+ * the click itself). */
 export function SourcesCard({ sources, open, onOpenChange, className }: SourcesCardProps) {
   if (sources.length === 0) return null;
   return (
@@ -41,7 +44,8 @@ export function SourcesCard({ sources, open, onOpenChange, className }: SourcesC
               <a
                 href={source.href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                referrerPolicy="no-referrer"
                 data-slot="chat-source-row"
                 data-source-id={source.id}
                 className="flex min-h-12 items-center gap-2 px-3 py-2 hover:bg-accent"

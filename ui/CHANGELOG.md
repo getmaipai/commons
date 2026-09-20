@@ -4,6 +4,27 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.2.1] - ui-v0.2.1
+
+### Added
+- `MemoryChip` gains a third kind, `"failed"`: a save that never
+  completed has nothing to keep, edit, or forget, so it renders as a
+  plain destructive-tinted button straight to `onOpenMemory`, no
+  popover - spec section 4's state table ("a red label plus a recovery
+  action"), not a second, mismatched shape forced into the success
+  chip's own popover pattern. `onKeep`/`onEdit`/`onForget` are now
+  optional (unused by this kind); `onOpenMemory` is new.
+
+### Fixed
+- `SourcesCard`'s row links were missing `rel="noopener"` and an
+  explicit `referrerPolicy` (only `rel="noreferrer"`) - found live
+  adopting this component in Home, whose own pre-adoption `SourcesCard`
+  carried both (the org privacy architecture's own promise: a cited
+  site learns nothing from the click but the click). `noreferrer` alone
+  already strips the request's own Referer header in every real
+  browser; the explicit pair matches Home's own already-audited,
+  belt-and-suspenders form instead of a narrower one.
+
 ## [0.2.0] - ui-v0.2.0
 
 ### Added

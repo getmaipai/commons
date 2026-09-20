@@ -87,6 +87,19 @@ describe("SourcesCard", () => {
     expect(getByText("weather.example.com")).toBeInTheDocument();
   });
 
+  test("every row link opens in a new tab with no referrer (org privacy architecture)", () => {
+    const { getByText, getAllByRole } = render(<SourcesCard sources={sources} />);
+    fireEvent.click(getByText("Sources (2)"));
+    const links = getAllByRole("link");
+    expect(links).toHaveLength(2);
+    for (const [i, link] of links.entries()) {
+      expect(link).toHaveAttribute("href", sources[i]!.href);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      expect(link).toHaveAttribute("referrerpolicy", "no-referrer");
+    }
+  });
+
   test("open/onOpenChange lets a caller control the disclosure (a citation click scrolling it open)", () => {
     const onOpenChange = mock(() => {});
     const { getByText } = render(<SourcesCard sources={sources} open={false} onOpenChange={onOpenChange} />);
@@ -126,5 +139,14 @@ describe("MemoryChip", () => {
     openTrigger(getByRole("button", { name: /Remembered/ }));
     fireEvent.click(actionButton("Forget"));
     expect(onForget).toHaveBeenCalledTimes(1);
+  });
+
+  test("a failed save renders a plain button (no popover) that goes straight to onOpenMemory", () => {
+    const onOpenMemory = mock(() => {});
+    const { getByRole } = render(<MemoryChip kind="failed" onOpenMemory={onOpenMemory} />);
+    const chip = getByRole("button", { name: /Memory wasn't saved/ });
+    fireEvent.click(chip);
+    expect(onOpenMemory).toHaveBeenCalledTimes(1);
+    expect(document.querySelector('[data-slot="popover-content"]')).toBeNull();
   });
 });
