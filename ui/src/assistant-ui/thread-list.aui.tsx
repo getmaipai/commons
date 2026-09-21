@@ -8,6 +8,7 @@ import { Checkbox } from "@/kit/ui/checkbox";
 import { Input } from "@/kit/ui/input";
 import { Skeleton } from "@/kit/ui/skeleton";
 import { cn, hitArea } from "@/kit/utils";
+import { computeThreadListGroups } from "@/assistant-ui/thread-list-groups";
 import {
   AuiIf,
   ThreadListItemMorePrimitive,
@@ -87,6 +88,15 @@ export const ThreadList: FC<{
    * caller whose adapter doesn't should leave this false (the default)
    * rather than ship a pin control that always fails. */
   pinnable?: boolean;
+  /** False when this list isn't the caller's own - a code review
+   * (ui-v0.4.x) caught that "New chat" had no such gate at all: clicking
+   * it while an admin was looking at someone else's list created the new
+   * conversation under the admin (the adapter's own `initialize()` has
+   * no target-person concept), spliced it into what the screen still
+   * labeled as the other person's list until the next real reload
+   * quietly dropped it again. Defaults true (today's behavior, every
+   * list is the caller's own) so an existing caller is unaffected. */
+  newChatEnabled?: boolean;
   /** Debounced (300ms) as the search box changes. When provided, the
    * list is trusted to already be server-filtered for this query (Home's
    * own adapter re-fetches on query change, message bodies included, not
@@ -94,7 +104,7 @@ export const ThreadList: FC<{
    * that, which would otherwise hide a message-body-only match. Omit for
    * the previous client-side, title-only behavior. */
   onSearchQueryChange?: (query: string) => void;
-}> = ({ actions, pinnable = false, onSearchQueryChange }) => {
+}> = ({ actions, pinnable = false, newChatEnabled = true, onSearchQueryChange }) => {
   const [search, setSearch] = useState("");
   const hasThreads = useAuiState((s) => s.threads.threadIds.length > 0);
   const serverSearch = onSearchQueryChange !== undefined;
@@ -155,7 +165,7 @@ export const ThreadList: FC<{
     <ThreadListSelectionContext.Provider value={selection}>
       <ThreadListRoot>
         <div data-slot="aui_thread-list-toolbar" className="flex items-center gap-1">
-          <ThreadListNew className="flex-1" />
+          {newChatEnabled && <ThreadListNew className="flex-1" />}
           {actions && (
             <ThreadListSelectModeToggle
               active={selectMode}
@@ -177,7 +187,7 @@ export const ThreadList: FC<{
         ) : (
           actions?.clearAll && <ThreadListClearAll clearAll={actions.clearAll} />
         )}
-        <ThreadListItems searchQuery={search} skipFilter={serverSearch} />
+        <ThreadListItems searchQuery={search} skipFilter={serverSearch} pinnable={pinnable} />
       </ThreadListRoot>
     </ThreadListSelectionContext.Provider>
   );
@@ -402,9 +412,16 @@ export const ThreadListRoot: FC<
   );
 };
 
+/** A caller reaching for this directly instead of `<ThreadList>` (both
+ * exported) owns making its own `pinnable` agree with whatever actually
+ * renders the row-level pin controls (`ThreadListItem` reads
+ * `pinnable` from `ThreadListSelectionContext`, populated only by
+ * `<ThreadList>`'s own Provider) - passing `pinnable` here with no
+ * `<ThreadList>` wrapper produces a "Pinned" section heading with no
+ * pin/unpin control anywhere on the page to explain it. */
 export const ThreadListItems: FC<
-  ComponentPropsWithoutRef<"div"> & { searchQuery?: string; skipFilter?: boolean }
-> = ({ className, searchQuery = "", skipFilter, ...props }) => {
+  ComponentPropsWithoutRef<"div"> & { searchQuery?: string; skipFilter?: boolean; pinnable?: boolean }
+> = ({ className, searchQuery = "", skipFilter, pinnable, ...props }) => {
   return (
     <div
       data-slot="aui_thread-list-items"
@@ -415,92 +432,35 @@ export const ThreadListItems: FC<
         <ThreadListSkeleton />
       </AuiIf>
       <AuiIf condition={(s) => !s.threads.isLoading}>
-        <ThreadListItemGroups searchQuery={searchQuery} skipFilter={skipFilter} />
+        <ThreadListItemGroups searchQuery={searchQuery} skipFilter={skipFilter} pinnable={pinnable} />
       </AuiIf>
     </div>
   );
 };
 
-const DAY_IN_MS = 86_400_000;
+export type { ThreadListGroup, ThreadListGroupableItem } from "@/assistant-ui/thread-list-groups";
 
-const dateGroupLabel = (
-  date: Date | undefined,
-  startOfToday: number,
-): string => {
-  if (!date || date.getTime() >= startOfToday) return "Today";
-  if (date.getTime() >= startOfToday - DAY_IN_MS) return "Yesterday";
-  return "Earlier";
-};
-
-export type ThreadListGroup = { label: string; indices: number[] };
-
-/**
- * Filters the thread list by title and buckets the matches by last activity
- * (Today, Yesterday, Earlier). `groups` is null when no thread carries a
- * date, in which case `filteredIndices` keeps the runtime order.
- *
- * `skipFilter` (a caller whose adapter already re-fetches server-side for
- * the same query, message bodies included): keeps every loaded thread and
- * only groups by date - filtering by title on top of an already-server-
- * filtered set would hide a message-body-only match whose title never
- * contained the query. The `query && filteredIndices.length === 0` "no
- * chats found" check below still reads correctly in this mode, since it's
- * then reporting the server's own empty result, not a client re-filter.
- */
-export const useThreadListGroups = (searchQuery = "", skipFilter = false) => {
+/** Wraps `computeThreadListGroups` (thread-list-groups.ts - a separate,
+ * dependency-free module on purpose, so it's unit-testable without a real
+ * assistant-ui runtime) in the live `useAuiState` subscription and a
+ * `useMemo`. */
+export const useThreadListGroups = (searchQuery = "", skipFilter = false, pinnable = false) => {
   const threadIds = useAuiState((s) => s.threads.threadIds);
   const threadItems = useAuiState((s) => s.threads.threadItems);
 
-  const query = searchQuery.trim().toLowerCase();
-
   return useMemo(() => {
     const itemsById = new Map(threadItems.map((item) => [item.id, item]));
-    const dates = threadIds.map((id) => itemsById.get(id)?.lastMessageAt);
-    const filteredIndices = threadIds
-      .map((id, index) => ({ id, index }))
-      .filter(
-        ({ id }) =>
-          skipFilter ||
-          !query ||
-          (itemsById.get(id)?.title || "New Chat")
-            .toLowerCase()
-            .includes(query),
-      )
-      .map(({ index }) => index);
-    if (!filteredIndices.some((index) => dates[index])) {
-      return { threadIds, filteredIndices, groups: null };
-    }
-
-    const now = new Date();
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    ).getTime();
-    const time = (index: number) =>
-      dates[index]?.getTime() ?? Number.MAX_SAFE_INTEGER;
-    const sorted = [...filteredIndices].sort((a, b) => time(b) - time(a));
-
-    const result: ThreadListGroup[] = [];
-    for (const index of sorted) {
-      const label = dateGroupLabel(dates[index], startOfToday);
-      const lastGroup = result[result.length - 1];
-      if (lastGroup?.label === label) {
-        lastGroup.indices.push(index);
-      } else {
-        result.push({ label, indices: [index] });
-      }
-    }
-    return { threadIds, filteredIndices, groups: result };
-  }, [threadIds, threadItems, query, skipFilter]);
+    return computeThreadListGroups(threadIds, itemsById, searchQuery, skipFilter, pinnable);
+  }, [threadIds, threadItems, searchQuery, skipFilter, pinnable]);
 };
 
-const ThreadListItemGroups: FC<{ searchQuery?: string; skipFilter?: boolean }> = ({
+const ThreadListItemGroups: FC<{ searchQuery?: string; skipFilter?: boolean; pinnable?: boolean }> = ({
   searchQuery = "",
   skipFilter = false,
+  pinnable = false,
 }) => {
   const { threadIds, filteredIndices, groups } =
-    useThreadListGroups(searchQuery, skipFilter);
+    useThreadListGroups(searchQuery, skipFilter, pinnable);
   const query = searchQuery.trim();
 
   if (query && filteredIndices.length === 0) {

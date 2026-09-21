@@ -4,6 +4,43 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.7] - ui-v0.4.7
+
+Follow-up to `ui-v0.4.6`'s own thread-list restoration, after a review
+of Home's own consumer traced real runtime behavior end to end.
+
+### Fixed
+- `useThreadListGroups` sorted pinned threads into their own group but
+  never actually applied it - pinning round-tripped through
+  `updateCustom()` but had no visible effect on ordering. Fixed, then
+  fixed again: the first attempt dropped every unpinned, dateless
+  thread from the list the moment anything was pinned (an early-return
+  branch that only ever carried the Pinned group forward); rewritten as
+  a single pass that partitions pinned/unpinned and always groups both.
+- The pinned partition now respects the `pinnable` prop, matching every
+  other pin affordance in this file - previously it read `custom.pinned`
+  unconditionally, so a `pinnable=false` caller with stale or shared
+  pinned data would get an unexplained "Pinned" section with no control
+  anywhere to undo it.
+- `ThreadListNew` ("+ New chat") had no gate for a caller viewing
+  someone else's list - a new `newChatEnabled` prop (default `true`)
+  hides it, closing the same cross-person-splice gap `pinnable`/
+  `actions` already closed for the other controls.
+- The grouping logic's own sort comparator re-fetched each thread's
+  data on every comparison instead of reusing what the single scan
+  already computed.
+
+### Added
+- The pure grouping logic moved to its own dependency-free module
+  (`thread-list-groups.ts`, no React or `@assistant-ui/react` imports)
+  specifically so it's unit-testable without a real assistant-ui
+  runtime - importing it from `thread-list.aui.tsx` directly dragged in
+  that file's own heavy transitive imports and broke under `bun:test`.
+  A new test file covers the pin-ordering, the drop-bug scenario, the
+  `pinnable=false` gate, the null-groups case, title search, and
+  `skipFilter` - the first regression coverage this grouping logic has
+  ever had.
+
 ## [0.4.6] - ui-v0.4.6
 
 Restores ConversationsPage's own real functions into the thread list
