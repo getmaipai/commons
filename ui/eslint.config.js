@@ -46,10 +46,14 @@ export default [
       "react-hooks": reactHooks,
     },
     settings: {
-      // The kit's token set is declared in src/tokens.css; the Tailwind
-      // entry points there so `no-unknown-classes` can resolve kit classes
-      // (bg-primary, text-foreground, ...) against it.
-      "better-tailwindcss": { entryPoint: "src/tokens.css" },
+      // src/tokens.css stopped being its own Tailwind root in
+      // HOME-UI-04e (dashboard/css/globals.css is the one root now,
+      // tokens.css's own header comment has why) -
+      // src/lint-entry.css mirrors what a real consumer imports (both,
+      // in the same order) so `no-unknown-classes` still resolves kit
+      // classes (bg-primary, text-foreground, studio:*, ...) against
+      // the real merged token set, not a stale single-file view.
+      "better-tailwindcss": { entryPoint: "src/lint-entry.css" },
     },
     rules: {
       ...jsxA11y.flatConfigs.recommended.rules,

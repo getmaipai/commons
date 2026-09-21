@@ -1,0 +1,14 @@
+/* Not shipped, not imported by any real consumer - exists only so
+ * `eslint-plugin-better-tailwindcss` (eslint.config.js's own
+ * `entryPoint` setting) has one file that resolves `@import
+ * "tailwindcss"` and every custom-variant/utility this workspace's own
+ * className usages can reach, the same way a real consumer does.
+ *
+ * `tokens.css` stopped being its own Tailwind root in HOME-UI-04e
+ * (its own header comment has why): `dashboard/css/globals.css` is the
+ * one root now, and every real consumer imports both together (Home's
+ * `shell/tokens.css` does, in this same order) rather than either
+ * alone. Mirrored here so this workspace's own lint sees exactly what
+ * production sees, not a stale subset. */
+@import "./dashboard/css/globals.css";
+@import "./tokens.css";

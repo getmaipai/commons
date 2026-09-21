@@ -13,10 +13,28 @@
  * directly (in Tailwind's `[var(--x)]` arbitrary-value form or, on
  * shadcn's generated components, the plain `bg-primary`/`text-foreground`
  * utilities `@theme inline` below wires up), never `hsl(var(--x))`. */
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "tw-shimmer";
+
+/* No `@import "tailwindcss"` here (HOME-UI-04e, 2026-09-21): this file
+ * used to be its own Tailwind root, and `dashboard/css/globals.css`
+ * (the vendored template's own entry, also `@import "tailwindcss"`)
+ * was a second one - two independent roots in one Vite build each
+ * generate their own copy of every utility class, and Tailwind's
+ * cross-root dedup places each one wherever it happens to land,
+ * loaded-order deciding ties (found live: every `sm:`/`md:`/`lg:`/
+ * `xl:` responsive variant on every /next page, not just the sidebar
+ * special case a narrower HOME-UI-04b fix scoped around). This file is
+ * now a plain `@import`ed partial: its own `@theme`/`@custom-variant`/
+ * `@layer` blocks below still apply, because whichever consumer
+ * imports this file (Home's `shell/tokens.css`) also imports
+ * `globals.css` in the same cascade, and Tailwind v4 processes
+ * `@theme`/`@custom-variant`/`@layer` wherever they appear in the
+ * whole `@import` graph reachable from the one file that does
+ * `@import "tailwindcss"` - `tw-animate-css`, `shadcn/tailwind.css`
+ * and `tw-shimmer` move to `globals.css`, the new single root, for the
+ * same reason (a plugin `@import` only registers once per root). Any
+ * consumer of this file that isn't ALSO importing `globals.css` (the
+ * old shell's own `shell/tokens.css`, before this item) needs to start
+ * doing so, or its own utilities silently stop generating. */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -284,30 +302,19 @@
   display: none;
 }
 
-/* Matches the inset sidebar to the template's own upstream demo in dark
- * mode (owner ruling, HOME-UI-04b, 2026-09-21: "single border, it is
- * supposed to be identical to the source"). Sidebar.tsx (both upstream's
- * and this kit's, byte-identical - checked directly) ships
- * `**:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:
- * border-border`, and FullLayout's own `SidebarInset` outline is
- * likewise identical to upstream's - the structure was never the
- * difference. Cloned upstream at its pinned commit
- * (6f99c0b04b7169f9ef12dc99946bc4faaeb40b9b) and ran its own dev
- * server to compare directly: its dashboard in dark shows one flush
- * panel, no visible line around the sidebar, because its own dark
- * theme's `--border` is `oklch(1 0 0 / 10%)` - a translucent white
- * overlay, nearly invisible against its near-black `--background` -
- * not because the border isn't there. Home's own dark palette uses an
- * opaque `--border: #294563` (tokens.css, both the `.dark` class and
- * the `prefers-color-scheme` media block), which reads as a real
- * visible line against Home's own navy background - a real color
- * choice, not a structural bug, but not what "identical to the
- * source" asked for. Scoped to the sidebar-inner subtree only (never
- * `--border` globally, which every bordered element in both shells
- * reads) so the rest of the app's borders are untouched. */
-.dark .sidebar-box [data-slot="sidebar-inner"] {
-  --border: oklch(1 0 0 / 10%);
-}
+/* The inset-sidebar single-border fix (HOME-UI-04b, 2026-09-21) used to
+ * live here, scoped to `.sidebar-box [data-slot="sidebar-inner"]` only:
+ * Home's own dark palette had an opaque `--border` (#294563) where
+ * upstream's is a translucent `oklch(1 0 0 / 10%)`, and this rule
+ * patched just the one subtree the finding measured. Superseded
+ * (HOME-UI-04e): /next's default palette (`dashboard/css/globals.css`)
+ * is now upstream's own values, byte-for-byte, including this exact
+ * translucent border, everywhere - not just the sidebar. The scoped
+ * override is gone rather than kept as a no-op: a person who picks the
+ * "navy" preset (globals.css's own name for Home's former default,
+ * carrying the original opaque `--border`) gets navy's own border
+ * treatment on the sidebar-inner too, which this rule would have
+ * silently fought. */
 
 :root {
   /* The light root: the same hues as the dark reference, on light

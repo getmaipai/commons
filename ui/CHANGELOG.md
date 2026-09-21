@@ -4,6 +4,44 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.12] - ui-v0.5.12
+
+HOME-UI-04e ("one Tailwind root, the source's own default palette"):
+two fixes in one item, tokens only, no structural change beyond the
+CSS entry points themselves.
+
+Root cause of a real, wide bug found comparing `/next/people` to the
+shadcndashboard demo's own user-profile side by side at 1440px (ours
+rendered the phone layout - hero stacked, cards full-width - while
+upstream rendered a row and two columns): `tokens.css` and `dashboard/
+css/globals.css` were each their own `@import "tailwindcss"` root in
+the same Vite build. Two roots generate each unique utility class name
+independently, and Tailwind's cross-root dedup places every colliding
+class wherever load order puts it - here, `globals.css`'s lazy /next
+chunk re-emitted every base utility (`.flex-col`, every `sm:`/`md:`/
+`lg:`/`xl:` responsive variant among them) after `tokens.css`'s own
+entry-loaded copy, winning every tie site-wide. `tokens.css` stops
+being a root (its `@import "tailwindcss"`/`tw-animate-css`/`shadcn/
+tailwind.css`/`tw-shimmer` move to `globals.css`, the one root left);
+a consumer imports both under one entry now, `globals.css` first so
+its `@import "tailwindcss"` leads, then `tokens.css` (Home's own
+`shell/tokens.css` does exactly this). The narrower HOME-UI-04b
+sidebar symptom rule this bug used to hide behind is retired, the
+general fix covering it.
+
+Second, Jesse's own side-by-side also found the wrong colors: the
+vendored snapshot's default `:root`/`.dark` in `globals.css` had been
+replaced with Home's own navy hex palette rather than the template's
+own shipped one (its translucent `--border`/`--sidebar-border`/
+`--input` among the casualties - the HOME-UI-04b border fix patched
+one symptom of this, scoped to the sidebar only). Owner ruling
+("identical to the source", the same standing ruling as HOME-UI-04b's
+single border): the default palette is now the source's own, byte-
+for-byte from its pinned commit, oklch throughout; Home's former
+default survives as its own preset, `navy` (spec-v0.1.14 adds it to
+`ui.look`'s enum), on the same mechanism as the seven shadcn base-
+color presets already there.
+
 ## [0.5.11] - ui-v0.5.11
 
 HOME-UI-04d ("one theme writer on /next"): tokens.css's two `@media

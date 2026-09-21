@@ -1,5 +1,13 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* `shadcn/tailwind.css` and `tw-shimmer` moved here from `../../
+ * tokens.css` (HOME-UI-04e): this file is the app's one Tailwind root
+ * now (tokens.css's own header comment has why), and a plugin
+ * `@import` only registers once per root - it has to live wherever
+ * `@import "tailwindcss"` itself does, not in a file that gets
+ * `@import`ed into this one. */
+@import "shadcn/tailwind.css";
+@import "tw-shimmer";
 
 @utility no-scrollbar {
   -ms-overflow-style: none;
@@ -81,11 +89,105 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
-/* Palette: docs/design/home-pages-2026-09-20.md's navy dark reference and
- * derived light theme (the same hex values already shipped in the kit's
- * own tokens.css, ui-v0.4.x) - one palette for both looks, Studio and
- * Calm (below) only vary geometry on top of it. */
+/* Palette (owner ruling, HOME-UI-04e, 2026-09-21: "identical to the
+ * source" - the same standing ruling HOME-UI-04b applied to the
+ * sidebar's single border, generalized here to the whole default
+ * palette). Jesse compared /next/people to the demo's own user-profile
+ * side by side in dark and found ours reading as stacked lit panels
+ * where the source reads as one dark sheet with faint lines - traced to
+ * this block: the vendored snapshot had replaced the template's own
+ * default `:root`/`.dark` with Home's navy hex set (kept below as its
+ * own preset, `.style-navy`, so nothing already shipped is lost). These
+ * are the upstream template's own values, transcribed byte-for-byte
+ * from its `src/css/globals.css` at the pinned commit
+ * (6f99c0b04b7169f9ef12dc99946bc4faaeb40b9b, the same one HOME-UI-04b's
+ * border finding cloned and ran) - oklch throughout, matching the
+ * source's own units, not converted to hex. Studio and Calm (below)
+ * still vary geometry only, not color, so both now render the source's
+ * own palette; a kit consumer that never sets a `.style-<name>` class
+ * at all (the "zero attribute" default, docs/UI.md) gets it too, same
+ * as before this item. `--radius` and `--destructive-foreground` stay
+ * Home's own (the kit's own tokens.css comment has why: radius is a
+ * deliberate Home design choice unrelated to color, and shadcn's own
+ * generated CSS doesn't vary destructive-foreground per base color) -
+ * only the tokens the source itself varies are replaced here. */
 :root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: #07111f;
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 1rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: #07111f;
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Home's own former default (displaced by the source's own palette
+ * above, HOME-UI-04e) - kept as an explicit preset on the same
+ * mechanism as the seven shadcn base colors below, so nobody loses it:
+ * `ui.look = "navy"` (spec-v0.1.14) renders exactly what every look
+ * rendered before this item, byte-identical hex values, both themes. */
+.style-navy {
   --background: #f4f7fb;
   --foreground: #0b1730;
   --card: #ffffff;
@@ -101,7 +203,6 @@
   --accent: #e3eaf3;
   --accent-foreground: #0b1730;
   --destructive: #ff4b62;
-  --destructive-foreground: #07111f;
   --border: #c9d6e6;
   --input: #c9d6e6;
   --ring: #21a6ff;
@@ -110,7 +211,6 @@
   --chart-3: #00e3ae;
   --chart-4: #ff8a35;
   --chart-5: #ff3e9a;
-  --radius: 1rem;
   --sidebar: #eaf0f7;
   --sidebar-foreground: #0b1730;
   --sidebar-primary: #21a6ff;
@@ -120,8 +220,7 @@
   --sidebar-border: #c9d6e6;
   --sidebar-ring: #21a6ff;
 }
-
-.dark {
+.dark .style-navy {
   --background: #07111f;
   --foreground: #f4f8ff;
   --card: #102238;
@@ -137,7 +236,6 @@
   --accent: #142a43;
   --accent-foreground: #f4f8ff;
   --destructive: #ff4b62;
-  --destructive-foreground: #07111f;
   --border: #294563;
   --input: #294563;
   --ring: #21a6ff;
@@ -818,60 +916,10 @@ html[data-card-shadow="false"] [data-slot="card"] {
 
 }
 
-/* A real bug, found live capturing the stand-up's own acceptance
- * screenshots: two separate `@import "tailwindcss"` roots in one Vite
- * build (this file, and the kit's own tokens.css) generate each unique
- * utility class name once, wherever Tailwind's cross-root
- * deduplication happens to place it - here, `.hidden`/`.md:flex`
- * (sidebar.tsx's own `data-slot="sidebar-container"` classes) landed
- * in the kit's entry stylesheet, loaded once at boot. This file's own
- * lazy chunk (loaded later, when /next is first visited) still
- * generates its OWN `.hidden{display:none}` for the same class name
- * (used elsewhere in this same file's own component tree too) -
- * loaded after the entry stylesheet, so it wins the tie for every
- * `.hidden` element site-wide, unconditionally, overriding the
- * entry's `@media (width>=768px) { .md\:flex }` rule that was
- * supposed to show the sidebar back on desktop.
- *
- * Scoped to `sidebar.tsx`'s own desktop-fixed branch only (the one
- * `[data-variant]` attribute it sets that the other two branches
- * never do), after a review caught the first version of this fix as a
- * bare `[data-slot="sidebar"]` selector - unlayered CSS beats
- * Tailwind's own layered utilities regardless of source order, so an
- * unscoped version also force-hid the mobile branch's `Sheet` (its own
- * `data-slot="sidebar"` on `SheetContent`, shown by the Sheet's own
- * open state, never by `hidden`/`md:block`) and the `collapsible=
- * "none"` branch (a plain, always-visible div with no responsive
- * classes at all) - the very sidebar copies this was never meant to
- * touch, on any page that uses either. `data-mobile="true"` is the
- * Sheet branch's own marker, excluded the same way for the same
- * reason, kept as a second guard in case a future edit adds a
- * `data-variant` there too. Plain, unlayered CSS (Tailwind wraps its
- * own generated utilities in `@layer`) is still the right fix
- * regardless of which root "wins" the dedup: it doesn't touch the
- * vendored sidebar.tsx primitive, just restates its own documented
- * default (a fixed, `md:flex` sidebar rail) as CSS the cross-root
- * collision can't shadow.
- *
- * This kit vendors the same shadcn sidebar primitive three times
- * (`src/ui/`, `src/elements/ui/`, this one) - accepted, bounded
- * duplication per the migration plan's own ruling. The scoping above
- * only ever matches sidebar.tsx's own desktop-fixed markup regardless
- * of which copy renders it, so it is not new risk this fix adds; a
- * page that renders two different copies' desktop sidebars at once
- * would already need to reconcile them, not something this file
- * changes either way. */
-[data-slot="sidebar"][data-variant]:not([data-mobile="true"]) {
-  display: none;
-}
-[data-slot="sidebar-container"] {
-  display: none;
-}
-@media (width >= 768px) {
-  [data-slot="sidebar"][data-variant]:not([data-mobile="true"]) {
-    display: block;
-  }
-  [data-slot="sidebar-container"] {
-    display: flex;
-  }
-}
+/* The two-Tailwind-root symptom rule that used to live here (a bare
+ * `.hidden`/`.md:flex` restatement, scoped to `sidebar.tsx`'s desktop-
+ * fixed branch) is gone (HOME-UI-04e): this file is the app's only
+ * Tailwind root now (its own header comment has why), so the cross-
+ * root collision it patched - one narrow symptom of a bug that broke
+ * every `sm:`/`md:`/`lg:`/`xl:` responsive variant on every /next page
+ * - no longer exists to patch. */
