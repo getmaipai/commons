@@ -5,6 +5,34 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.9] - 2026-09-21
+
+### Added
+- `artifact` recipe op (`schemas/recipe.schema.json`'s 18th step),
+  implemented identically in both interpreters (ARTIFACT-02, the
+  sanctioned way a Tier 0 recipe writes a live chat artifact - the same
+  role `remember` plays for `host.memory.remember`): `title`/`kind`/
+  `body` interpolate normally, `id_from` names a scope variable read
+  directly (not through `interpolate()`) whose presence is the create-
+  vs-update discriminator. `Host.artifact.create`/`update` on both
+  emulators (`host-emulator.ts`/`host_emulator.py`), throwing existing
+  `not_found`/`invalid_input` codes rather than a new one. New
+  `artifact:write` permission (`vocab/permissions.json`). Five new
+  conformance fixtures (create, update, not_found, invalid_input, and
+  an explicit-JSON-`null` `id_from` case a code review caught the two
+  interpreters disagreeing on before it shipped).
+
+### Fixed
+- `spec-v0.1.8` was tagged with `spec/package.json`'s own version field
+  still reading `0.1.7` - caught by a consumer's own pin-honesty check
+  (`home/scripts/check.sh`'s `ensure_pin()`), the same class of mistake
+  `docs/BACKLOG.md`'s "spec's settings registry" item records for
+  `spec-v0.1.4`/`spec-v0.1.5`. `v0.1.8` retires unused in this same
+  session: the one checkout that had pinned it (`home-b`, mid-work when
+  the bad tag was caught) moves to `v0.1.9` in the same change, before
+  it lands anywhere else - same precedent as `v0.1.4`, cut the next tag
+  rather than rewrite a pushed one.
+
 ## [spec-v0.1.7] - 2026-09-21
 
 ### Added
