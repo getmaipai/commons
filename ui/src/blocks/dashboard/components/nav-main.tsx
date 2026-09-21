@@ -71,22 +71,29 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
               it) is tokens.css's `[data-look="studio"] [data-slot=
               "sidebar-group-label"]` rule, not a class here, for the
               same reason as the divider above. */}
-          {/* Owner findings: 20px above a group label at the pills' own
-              left edge (px-3, matching SidebarMenuButton's own mx-3
-              below) - except the first group, which sits right under
-              the logo block's own bottom padding (app-sidebar.tsx's
-              SidebarHeader) and needs none of its own on top of that;
-              Studio's own exact numbers ("The Studio look, the
-              numbers," 2026-09-20 18:15, superseding any earlier
-              estimate) - 11px above (7px for the first group, the
-              logo block's own padding already at 14px) and 7px below
-              - replace Calm's own defaults only inside `studio:`.
-              Inset 13px, not that section's own literal "7px": kept
-              aligned with the pills' own studio:mx-[13px] below
-              rather than sitting 6px out of line with them (tokens.css's
-              own divider rule has the fuller reasoning, the same
-              choice applied there). */}
-          <SidebarGroupLabel className={`${index === 0 ? "mt-0 studio:mt-[7px]" : "mt-5 studio:mt-[11px]"} mb-2 studio:mb-[7px] h-auto px-3 studio:px-[13px] font-semibold tracking-wide text-sidebar-foreground/75 uppercase group-data-[collapsible=icon]:hidden`}>{group.label}</SidebarGroupLabel>
+          {/* Owner findings: 20px above a group label, 8px below, at a
+              7px inset from the rail's own edge (px-[7px], both looks,
+              unconditional - owner ruling, ui-v0.4.3, restating "the
+              rail geometry, exactly" 2026-09-20 17:40's own literal
+              number, not the pills' own 12px/mx-3, which an earlier
+              reconciliation had wrongly used here instead). The label
+              sitting ~5px left of the pill below it (its own inset is
+              narrower than theirs) is that same restated number taken
+              literally, not a leftover misalignment: a code review
+              flagged the gap between the two as worth confirming
+              rather than assuming, given this file's own history of
+              mis-deriving this exact number - the owner's restated
+              figure is trusted here because it followed directly from
+              measuring the capture the prior reconciliation shipped
+              in wrong, not from re-deriving it again. The first group
+              carries none of its own top margin: it sits right under
+              the logo block's own pb-6 (app-sidebar.tsx's
+              SidebarHeader), which already supplies the stated 24px.
+              Studio's own 7px below ("The Studio look, the numbers,"
+              2026-09-20 18:15) stays; its own extra top-margin number
+              for the first group is gone along with it, superseded by
+              the same unconditional mt-0 every look now uses there. */}
+          <SidebarGroupLabel className={`${index === 0 ? "mt-0" : "mt-5 studio:mt-[11px]"} mb-2 studio:mb-[7px] h-auto px-[7px] font-semibold tracking-wide text-sidebar-foreground/75 uppercase group-data-[collapsible=icon]:hidden`}>{group.label}</SidebarGroupLabel>
           <SidebarMenu className="gap-0 studio:gap-[2px]">
             {group.items.map((item) => {
               const Icon = item.icon ? getIcon(item.icon) : null;

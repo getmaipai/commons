@@ -160,7 +160,17 @@ export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, s
     <SidebarProvider open={railOpen} onOpenChange={handleRailOpenChange}>
       <AppSidebar groups={groups} brand={brand} footer={sidebarFooter} className="hidden sm:flex" />
       <SidebarInset className={cn("h-svh overflow-hidden bg-[var(--surface-page)]")}>
-        <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border/60 px-4">
+        {/* py-4 (16px), not h-16: owner ruling, ui-v0.4.3 - "the title
+            block gets 16px top padding and 16px below the subtitle
+            before the header's bottom border." A fixed h-16 centered
+            the title/subtitle block instead of giving it its own
+            top/bottom inset, so the subtitle touched the border
+            directly regardless of look (COORDINATOR's own pixel
+            measurement, 2026-09-20). items-center still centers the
+            search field and header actions on the row's own height,
+            which now grows to fit the title block instead of the
+            other way around. */}
+        <header className="flex shrink-0 items-center gap-3 border-b border-border/60 px-4 py-4">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <SidebarTrigger className="hidden sm:inline-flex" />
             {headerTitle}
@@ -172,7 +182,9 @@ export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, s
           ) : null}
           <div className="flex flex-1 items-center justify-end gap-2">{headerActions}</div>
         </header>
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-16 sm:pb-0"><PhoneModeContext.Provider value={phone}>{children}</PhoneModeContext.Provider></div>
+        {/* pt-6 (24px): owner ruling, ui-v0.4.3 - "the content column
+            starts 24px under that border." */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pt-6 pb-16 sm:pb-0"><PhoneModeContext.Provider value={phone}>{children}</PhoneModeContext.Provider></div>
         {footer ? <div className="hidden h-10 shrink-0 items-center border-t border-border/60 sm:flex">{footer}</div> : null}
         <PhoneNav entries={entries} max={phoneNavMax} />
       </SidebarInset>

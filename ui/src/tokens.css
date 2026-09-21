@@ -154,26 +154,24 @@
   letter-spacing: 0.08em;
 }
 /* 1px `#24405F`, 12px above and below (owner findings, "The Studio
- * look, the numbers," 2026-09-20 18:15). Inset 13px, not that
- * section's own literal "7px": the rail itself is flush (no
- * horizontal padding, app-sidebar.tsx's own comment on why), so this
- * margin is the divider's full inset from the true rail edge - kept
- * aligned with the pills' own studio:mx-[13px] and the group label's
- * own studio:px-[13px] (nav-main.tsx) rather than sitting 6px out of
- * line with both, which is what the literal 7px would have done here
- * once every other inset in the rail was reconciled to the same
- * "Padding... 13px sides" figure the same section gives for the rail
- * overall. */
+ * look, the numbers," 2026-09-20 18:15), inset 7px from the rail's
+ * own true edge - owner ruling, ui-v0.4.3, restating "the rail
+ * geometry, exactly" 2026-09-20 17:40's own literal number for this
+ * element, matching the group label's own px-[7px] (nav-main.tsx).
+ * The earlier 13px here came from reconciling this figure to the
+ * pills' own inset instead of trusting the owner's own restated
+ * number directly; that reconciliation shipped in the capture
+ * COORDINATOR's own pixel measurement rejected. */
 /* A `::before` line, not `margin-inline` on the group container
  * itself: a code review (2026-09-20) caught the group-level margin
  * shifting the GROUP's own content too, not just the divider - every
- * pill and label inside a non-first group ended up inset 13px (its
- * own studio:mx-[13px]/studio:px-[13px]) PLUS this group's own 13px
- * margin, 26px total, visibly out of line with the first group's own
- * 13px. The pseudo-element keeps the group's own box at zero margin
+ * pill and label inside a non-first group would end up inset at its
+ * own value (nav-main.tsx's own mx-3/studio:mx-[13px]) PLUS this
+ * group's own margin, stacking to more than the first group's own
+ * inset. The pseudo-element keeps the group's own box at zero margin
  * (so its children's own insets are the only ones that apply, same as
- * the first group) while still positioning the line itself 13px in
- * from each edge. */
+ * the first group) while still positioning the line itself at its own
+ * 7px, independent of them. */
 [data-look="studio"] [data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type) {
   margin-top: 12px;
   padding-top: 12px;
@@ -183,8 +181,8 @@
   content: "";
   position: absolute;
   top: 0;
-  left: 13px;
-  right: 13px;
+  left: 7px;
+  right: 7px;
   height: 1px;
   background: #24405F;
 }

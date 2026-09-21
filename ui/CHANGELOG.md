@@ -4,6 +4,34 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.3] - ui-v0.4.3
+
+`ui-v0.4.2`'s own committed capture still didn't match the reference:
+COORDINATOR's own pixel measurement (2026-09-20) found the active pill
+running the rail's full width (not inset), the brand tile clipped at
+x 0 (not positioned in), and the group label sitting directly under
+the tagline (no gap before it) - a visual scan of the capture had
+missed all three. This release restates the owner's own literal
+numbers for each, rather than the prior reconciliation to a single
+"13px everywhere" figure that shipped in `0.4.2` without producing
+them.
+
+### Fixed
+- Brand row: 16px left inset (own literal number, not the pills' own
+  12px) and 20px top, both looks, unconditional - `app-sidebar.tsx`'s
+  `SidebarHeader` and its brand `SidebarMenuButton`.
+- 24px from the brand row to the first group label, one unconditional
+  number (`SidebarHeader`'s own `pb-6`) instead of a look-split pair
+  that could stack with the first group's own top margin.
+- Group label and divider inset restated at 7px, both looks - the
+  owner's own literal number for "the rail geometry, exactly," not the
+  13px this shipped with after reconciling it to the pills' own inset.
+- The page header (`Shell.tsx`): 16px top padding and 16px below the
+  subtitle before the header's own bottom border (a fixed `h-16`
+  centered the title block instead, so the subtitle touched the
+  border directly); the content column now starts 24px under that
+  border.
+
 ## [0.4.2] - ui-v0.4.2
 
 A code review of `ui-v0.4.1` caught four real box-model bugs in the
