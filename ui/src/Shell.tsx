@@ -62,6 +62,33 @@ export interface ShellProps {
    * popover, a profile/header picker. The kit renders none of these on
    * its own; a product assembles them from the kit's own primitives. */
   headerActions?: ReactNode;
+  /** Phone-only replacement for `headerTitle` (owner reference, "The
+   * phone composition," 2026-09-20: "the product wordmark at the
+   * left... a small version pill beside it"). Omitted: phone keeps
+   * rendering `headerTitle`, same as before this prop existed - a
+   * product that hasn't adopted the phone fold (Stack, Catalog) sees
+   * no change. Given: the phone header shows this instead of
+   * `headerTitle`, `search`, and `headerActions` are hidden on phone
+   * too (see `phoneHeaderActions`), matching the reference's own
+   * "avatar at the right; nothing else." */
+  phoneHeaderTitle?: ReactNode;
+  /** Phone-only replacement for `headerActions` and the visible
+   * `search` field, both hidden on phone once this is given (folded
+   * into whatever this renders - the reference's own avatar menu).
+   * A render prop, not a bare node: the palette's open state lives in
+   * this component, so the product's own menu (a "Search" row, say)
+   * needs a way to open it without the kit lifting that state to a
+   * controlled prop only this one caller would ever use. Ignored
+   * unless `phoneHeaderTitle` is also given.
+   *
+   * `openSearch` only does something when `search` is also given - it
+   * opens the same `<CommandPalette>` `search` configures, which isn't
+   * mounted at all without it (a code review, 2026-09-20: a caller
+   * that wires a "Search" row here but never passes `search` gets a
+   * button that's visibly there and does nothing, no error either -
+   * dev-only console warning below, since nothing in the types can
+   * require the two together). */
+  phoneHeaderActions?: (openSearch: () => void) => ReactNode;
   search?: ShellSearchConfig;
   /** localStorage key for the desktop rail's collapsed/expanded choice.
    * Namespaced by the caller so two products on one browser profile
@@ -115,7 +142,7 @@ function flatEntries(nav: readonly NavEntry[] | NavGroup[]): NavEntry[] {
  * TV-focusable navigation (the norigin spatial-navigation rail) is not
  * yet part of this shell - tracked as a follow-up, not silently
  * dropped. */
-export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, search, railStorageKey = "maipai:shell-rail", phoneNavMax, footer, children }: ShellProps) {
+export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, phoneHeaderTitle, phoneHeaderActions, search, railStorageKey = "maipai:shell-rail", phoneNavMax, footer, children }: ShellProps) {
   const [railOpen, setRailOpen] = useState<boolean>(() => readRailPreference(railStorageKey) ?? defaultRailOpen());
   const [paletteOpen, setPaletteOpen] = useState(false);
   // The same tier `SidebarProvider` (ui/sidebar.tsx) already derives its
@@ -148,6 +175,39 @@ export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, s
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [search]);
 
+  // A fix-hunk re-review caught two problems with the first version of
+  // this check: it warned even when `phoneHeaderActions` was given
+  // alone (`phoneHeaderTitle` omitted) - documented as inert, since
+  // `phoneHeaderActions` is then never invoked and `openSearch` is
+  // never reachable at all, so "openSearch will have nothing to open"
+  // described a problem that can't occur for that caller; and it
+  // depended on `phoneHeaderActions`/`search` by reference, so a
+  // caller passing either as an inline literal (every test in this
+  // file does, and any real consumer's `search` config is almost
+  // always a fresh object each render) re-ran the effect, and could
+  // re-warn, on every render rather than once per real presence
+  // change. Booleans of "is this given" as the dependencies fix both:
+  // stable across an inline closure's or object's own changing
+  // identity, and true only in the one combination where
+  // `phoneHeaderActions` actually runs.
+  const hasPhoneHeaderActions = phoneHeaderActions !== undefined;
+  const hasPhoneHeaderTitle = phoneHeaderTitle !== undefined;
+  const hasSearch = search !== undefined;
+  useEffect(() => {
+    // `phoneHeaderActions`'s own `openSearch` opens the very
+    // `<CommandPalette>` below that only mounts when `search` is given
+    // - a caller that wires a menu row to it without also configuring
+    // `search` gets a button that silently does nothing. Not gated
+    // behind a dev-only check (there's no reliable one across every
+    // bundler a consumer might use, and an unguarded check is the one
+    // this kit's own test suite can actually verify) - one
+    // `console.warn` per real presence change is cheap enough to leave
+    // in production too.
+    if (hasPhoneHeaderActions && hasPhoneHeaderTitle && !hasSearch) {
+      console.warn("Shell: phoneHeaderActions is given without search - openSearch will have nothing to open.");
+    }
+  }, [hasPhoneHeaderActions, hasPhoneHeaderTitle, hasSearch]);
+
   function handleRailOpenChange(next: boolean): void {
     setRailOpen(next);
     writeRailPreference(railStorageKey, next);
@@ -155,6 +215,12 @@ export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, s
 
   const groups = toNavGroups(nav);
   const entries = flatEntries(nav);
+  const openSearch = () => setPaletteOpen(true);
+  // Both given: the phone fold (docs/UI.md's shell contract, extended
+  // 2026-09-20 for the reference's own phone header). Either omitted:
+  // today's header on every screen size, so a product that hasn't
+  // adopted the fold sees no change.
+  const showPhoneHeader = phone && phoneHeaderTitle !== undefined && phoneHeaderActions !== undefined;
 
   return (
     <SidebarProvider open={railOpen} onOpenChange={handleRailOpenChange}>
@@ -171,16 +237,38 @@ export function Shell({ nav, brand, sidebarFooter, headerTitle, headerActions, s
             which now grows to fit the title block instead of the
             other way around. */}
         <header className="flex shrink-0 items-center gap-3 border-b border-border/60 px-4 py-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <SidebarTrigger className="hidden sm:inline-flex" />
-            {headerTitle}
-          </div>
-          {search ? (
-            <div className="flex shrink-0 items-center justify-center">
-              <HeaderSearchField placeholder={search.placeholder ?? "Search..."} onOpen={() => setPaletteOpen(true)} />
-            </div>
-          ) : null}
-          <div className="flex flex-1 items-center justify-end gap-2">{headerActions}</div>
+          {showPhoneHeader ? (
+            <>
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                {/* A code review, 2026-09-20: this branch's own gate is
+                    the JS `phone` tier (width < 720, useBreakpoint.ts),
+                    but this button's visibility is the CSS `sm:` break
+                    (640px) - a pre-existing gap between the two (this
+                    file's own comment above `phone`), previously just
+                    logically inconsistent since both branches used to
+                    be the same JSX. Rendering the trigger in both
+                    branches, gated only by its own CSS class either
+                    way, keeps a 640-719px viewport able to toggle the
+                    rail regardless of which header branch renders. */}
+                <SidebarTrigger className="hidden sm:inline-flex" />
+                {phoneHeaderTitle}
+              </div>
+              <div className="flex shrink-0 items-center gap-2">{phoneHeaderActions!(openSearch)}</div>
+            </>
+          ) : (
+            <>
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <SidebarTrigger className="hidden sm:inline-flex" />
+                {headerTitle}
+              </div>
+              {search ? (
+                <div className="flex shrink-0 items-center justify-center">
+                  <HeaderSearchField placeholder={search.placeholder ?? "Search..."} onOpen={openSearch} />
+                </div>
+              ) : null}
+              <div className="flex flex-1 items-center justify-end gap-2">{headerActions}</div>
+            </>
+          )}
         </header>
         {/* pt-6 (24px): owner ruling, ui-v0.4.3 - "the content column
             starts 24px under that border." */}

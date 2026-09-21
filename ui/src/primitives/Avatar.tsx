@@ -1,9 +1,16 @@
-import { Avatar as AvatarRoot, AvatarFallback } from "@/kit/ui/avatar";
+import { Avatar as AvatarRoot, AvatarFallback, AvatarBadge } from "@/kit/ui/avatar";
 import { cn } from "@/kit/utils";
 
 interface AvatarProps {
   name: string;
   className?: string;
+  /** A small filled dot on the avatar's own corner - the phone header
+   * fold's own stand-in for a separate notification badge (owner
+   * reference, "The phone composition," 2026-09-20: "the bell's count
+   * shows as a dot on the avatar"). Deliberately not the count itself:
+   * the reference's own header has no room for a number, and the
+   * avatar menu it opens already shows the real count. */
+  dot?: boolean;
 }
 
 // 3.1's real avatar rendering (DiceBear SVG, PNG rasterization,
@@ -16,7 +23,7 @@ interface AvatarProps {
 // A pattern component on top of `kit/ui/avatar.tsx` (name-to-initial is
 // product logic, not something a generic Avatar primitive knows), the
 // same relationship Card and Select have to their generated bases.
-export function Avatar({ name, className }: AvatarProps) {
+export function Avatar({ name, className, dot }: AvatarProps) {
   const initial = name.trim().charAt(0).toUpperCase() || "?";
   return (
     <AvatarRoot
@@ -45,6 +52,10 @@ export function Avatar({ name, className }: AvatarProps) {
       <AvatarFallback aria-hidden delayMs={0} className="bg-transparent text-[length:inherit] text-primary-foreground">
         {initial}
       </AvatarFallback>
+      {/* aria-hidden: same reasoning as the initial above - the dot
+          stands in for a count the menu this avatar opens already
+          shows in real text, not new information of its own. */}
+      {dot ? <AvatarBadge aria-hidden /> : null}
     </AvatarRoot>
   );
 }

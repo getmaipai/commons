@@ -4,6 +4,44 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.9] - ui-v0.4.9
+
+The phone header fold (owner reference, "The phone composition,"
+2026-09-20): on phone, search, theme and notifications move under the
+avatar's own menu and into the command palette instead of sitting as
+three separate header icons, and the bell's unread count becomes a dot
+on the avatar rather than its own badge.
+
+### Added
+- `Shell.tsx` gains two new optional props: `phoneHeaderTitle` (a
+  phone-only replacement for `headerTitle` - a product's own compact
+  wordmark) and `phoneHeaderActions` (a phone-only replacement for
+  `headerActions` and the visible search field - a render prop, since
+  the product's own phone menu needs a way to open the kit's command
+  palette without its open state becoming a controlled prop). Both
+  omitted: the header renders exactly as before this version, so
+  Stack and Catalog see no change until they adopt the fold.
+- `primitives/Avatar.tsx` gains an optional `dot` prop, reusing the
+  vendored shadcn `AvatarBadge` rather than a hand-rolled badge.
+
+### Fixed (found across two review rounds on this same branch)
+- The phone fold's own dev warning (misconfigured `phoneHeaderActions`
+  with no `search`) fired even when `phoneHeaderActions` was given
+  alone - a documented-inert combination where it's never invoked at
+  all - and re-fired on every render for a render prop or search
+  config passed as a fresh inline value, instead of once per real
+  presence change. Fixed by gating on `phoneHeaderTitle` too and
+  keying the effect on booleans, not references.
+- `SidebarTrigger` disappeared entirely for a 640-719px viewport once
+  a consumer adopted the fold: the fold's own gate is the JS phone
+  breakpoint (under 720px), but the trigger's own visibility was the
+  Tailwind `sm:` breakpoint (640px) - a pre-existing, previously
+  inert mismatch this diff was the first to make an element vanish
+  over. Fixed by rendering the trigger in both header branches; its
+  own CSS class handles visibility correctly either way.
+- A stray future-dated comment (2026-09-21, everything else in the
+  same diff 2026-09-20) normalized for consistency.
+
 ## [0.4.8] - ui-v0.4.8
 
 Follow-up to `ui-v0.4.7`, fixing a kit-internal import path that broke

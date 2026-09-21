@@ -26,4 +26,22 @@ describe("Avatar", () => {
     const { findByText } = render(<Avatar name="Sage" />);
     expect(await findByText("S")).toHaveAttribute("aria-hidden", "true");
   });
+
+  // The phone header fold's own stand-in for a separate notification
+  // badge (owner reference, "The phone composition," 2026-09-20) - the
+  // menu this avatar opens already shows the real count in text, so the
+  // dot itself is aria-hidden, same reasoning as the initial above.
+  test("dot renders a badge on the avatar, hidden from assistive tech", async () => {
+    const { container, findByText } = render(<Avatar name="Sage" dot />);
+    await findByText("S");
+    const badge = container.querySelector('[data-slot="avatar-badge"]');
+    expect(badge).not.toBeNull();
+    expect(badge).toHaveAttribute("aria-hidden", "true");
+  });
+
+  test("without dot, no badge renders", async () => {
+    const { container, findByText } = render(<Avatar name="Sage" />);
+    await findByText("S");
+    expect(container.querySelector('[data-slot="avatar-badge"]')).toBeNull();
+  });
 });

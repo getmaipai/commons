@@ -181,6 +181,174 @@ describe("Shell", () => {
     expect(getByText("phone: true")).toBeInTheDocument();
   });
 
+  // The phone header fold (owner reference, "The phone composition,"
+  // 2026-09-20): given both phone-only props, phone width hides the
+  // regular header entirely - the desktop title, the header actions,
+  // and the visible search field - in favor of whatever the two new
+  // props render.
+  test("at phone width, phoneHeaderTitle/phoneHeaderActions replace headerTitle/headerActions/search", () => {
+    Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+    const { getByText, queryByText, queryByRole } = renderShell({
+      headerTitle: <span>Overview</span>,
+      headerActions: <button type="button">Notifications</button>,
+      phoneHeaderTitle: <span>Phone wordmark</span>,
+      phoneHeaderActions: () => <button type="button">Avatar menu</button>,
+      search: { groups: [], query: "", onQueryChange: () => {}, onSelect: () => {} },
+    });
+    expect(getByText("Phone wordmark")).toBeInTheDocument();
+    expect(getByText("Avatar menu")).toBeInTheDocument();
+    expect(queryByText("Overview")).not.toBeInTheDocument();
+    expect(queryByText("Notifications")).not.toBeInTheDocument();
+    expect(queryByRole("button", { name: "Search..." })).not.toBeInTheDocument();
+  });
+
+  // A phone still has no Cmd+K, and the visible search field this
+  // widget replaces is gone - the render prop's own openSearch is the
+  // only way left to reach the palette on phone, so it has to actually
+  // work, not just exist.
+  test("the phone header's own openSearch actually opens the command palette", () => {
+    Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+    const { getByRole, getByText, queryByRole } = renderShell({
+      phoneHeaderTitle: <span>Phone wordmark</span>,
+      phoneHeaderActions: (openSearch) => (
+        <button type="button" onClick={openSearch}>
+          Search
+        </button>
+      ),
+      search: { groups: [], query: "", onQueryChange: () => {}, onSelect: () => {} },
+    });
+    expect(queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(getByText("Search"));
+    expect(getByRole("dialog")).toBeInTheDocument();
+  });
+
+  // Given only one of the pair, or neither, the fold never half-applies
+  // - a product mid-migration (or one that hasn't adopted it at all)
+  // keeps today's header on every screen size rather than getting a
+  // phone title with no way to reach headerActions, or vice versa.
+  test("giving only one of phoneHeaderTitle/phoneHeaderActions falls back to the regular header on phone", () => {
+    Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+    const { getByText, queryByText } = renderShell({
+      headerTitle: <span>Overview</span>,
+      headerActions: <button type="button">Notifications</button>,
+      phoneHeaderTitle: <span>Phone wordmark</span>,
+    });
+    expect(getByText("Overview")).toBeInTheDocument();
+    expect(getByText("Notifications")).toBeInTheDocument();
+    expect(queryByText("Phone wordmark")).not.toBeInTheDocument();
+  });
+
+  // A code review: openSearch only does anything once search is also
+  // given (it opens the same CommandPalette search configures, which
+  // isn't even mounted without it) - a caller that wires a menu row to
+  // it without search gets a silent no-op, so this warns instead.
+  test("phoneHeaderActions without search warns; with search, it doesn't", () => {
+    Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+    const warn = mock(() => {});
+    const original = console.warn;
+    console.warn = warn;
+    try {
+      renderShell({ phoneHeaderTitle: <span>Phone wordmark</span>, phoneHeaderActions: () => <button type="button">Avatar menu</button> });
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("openSearch will have nothing to open"));
+      warn.mockClear();
+      cleanup();
+      renderShell({
+        phoneHeaderTitle: <span>Phone wordmark</span>,
+        phoneHeaderActions: () => <button type="button">Avatar menu</button>,
+        search: { groups: [], query: "", onQueryChange: () => {}, onSelect: () => {} },
+      });
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      console.warn = original;
+    }
+  });
+
+  // A fix-hunk re-review: phoneHeaderActions given alone (phoneHeaderTitle
+  // omitted) is the documented-inert case - phoneHeaderActions is never
+  // invoked, openSearch is never reachable, so the warning above
+  // describing a problem with openSearch doesn't apply here at all.
+  test("phoneHeaderActions given alone (no phoneHeaderTitle) never warns", () => {
+    Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+    const warn = mock(() => {});
+    const original = console.warn;
+    console.warn = warn;
+    try {
+      renderShell({ phoneHeaderActions: () => <button type="button">Avatar menu</button> });
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      console.warn = original;
+    }
+  });
+
+  // A fix-hunk re-review: a render prop is almost always passed as a
+  // fresh inline closure, and a real `search` config is almost always a
+  // fresh object literal too - depending on either by reference would
+  // re-run the warning effect (and risk re-warning) on every render, not
+  // once per real presence change.
+  test("a parent re-render with new phoneHeaderActions/search identities doesn't re-warn", () => {
+    Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+    const warn = mock(() => {});
+    const original = console.warn;
+    console.warn = warn;
+    try {
+      const { rerender } = renderShell({
+        phoneHeaderTitle: <span>Phone wordmark</span>,
+        phoneHeaderActions: () => <button type="button">Avatar menu one</button>,
+        search: { groups: [], query: "", onQueryChange: () => {}, onSelect: () => {} },
+      });
+      expect(warn).not.toHaveBeenCalled();
+      rerender(
+        <MemoryRouter>
+          <Shell
+            nav={ENTRIES}
+            brand={<span>Brand</span>}
+            phoneHeaderTitle={<span>Phone wordmark</span>}
+            phoneHeaderActions={() => <button type="button">Avatar menu two</button>}
+            search={{ groups: [], query: "new query", onQueryChange: () => {}, onSelect: () => {} }}
+          >
+            <p>page content</p>
+          </Shell>
+        </MemoryRouter>,
+      );
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      console.warn = original;
+    }
+  });
+
+  // A code review: the phone branch's own gate (the JS `phone` tier,
+  // width < 720) and this button's own visibility (the CSS `sm:` break,
+  // 640px) disagree in the 640-719px range - rendering it in both
+  // header branches, gated only by its own CSS class either way, keeps
+  // a viewport in that gap able to toggle the rail regardless of which
+  // branch renders (happy-dom doesn't apply layout, so this checks the
+  // button exists in the DOM, the same way the phone-bar test above
+  // already does for the same reason).
+  test("the rail toggle exists in the phone header branch too, not just the regular one", () => {
+    Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
+    const { getByRole } = renderShell({
+      phoneHeaderTitle: <span>Phone wordmark</span>,
+      phoneHeaderActions: () => <button type="button">Avatar menu</button>,
+    });
+    expect(getByRole("button", { name: /collapse navigation|expand navigation/i })).toBeInTheDocument();
+  });
+
+  // At desktop width, the phone-only props are inert even when given -
+  // the fold is phone-only by design, not a general header override.
+  test("at desktop width, phoneHeaderTitle/phoneHeaderActions are ignored even if given", () => {
+    Object.defineProperty(window, "innerWidth", { value: 1440, configurable: true });
+    const { getByText, queryByText } = renderShell({
+      headerTitle: <span>Overview</span>,
+      headerActions: <button type="button">Notifications</button>,
+      phoneHeaderTitle: <span>Phone wordmark</span>,
+      phoneHeaderActions: () => <button type="button">Avatar menu</button>,
+    });
+    expect(getByText("Overview")).toBeInTheDocument();
+    expect(getByText("Notifications")).toBeInTheDocument();
+    expect(queryByText("Phone wordmark")).not.toBeInTheDocument();
+    expect(queryByText("Avatar menu")).not.toBeInTheDocument();
+  });
+
   test("selecting a search result calls onSelect and closes the palette", () => {
     const onSelect = mock(() => {});
     const { getByRole, getByText, queryByRole } = renderShell({
