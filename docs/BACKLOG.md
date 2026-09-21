@@ -334,3 +334,14 @@ capability, needs its own design pass first).
   `settings/keys.json` from `home/backend/src/settings/uiKeys.ts` via
   `bun run gen:settings`, additive only (diffed against the previous
   tag to confirm). Exit check: `bash scripts/check.sh`.
+- [x] **M** `spec-v0.1.7`: the `Artifact` record (the chat program's
+  generated-document experience, `artifact.schema.json`) - one
+  immutable version per row, chained by `parent_version` (conversation-
+  turn's `parent_turn_id` convention, not `TurnArtifact`'s bare
+  `revision` counter, since the wire needs a version's own id -
+  rationale in the schema's own description). `records/ts/validate.ts`
+  and `records/py/validate.py` gain `validateArtifact`/`validate_artifact`
+  (self-chain and version/parent_version pairing), with cases added to
+  `fixtures/validation/cross-field.json` proving both languages agree.
+  Two fixtures (`artifact.v1`, `artifact.v2`) prove the chain round-trips.
+  Exit check: `bash scripts/check.sh`.

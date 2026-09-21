@@ -27,6 +27,7 @@ import type { TurnSignal } from "../../gen/ts/turn-signal.js";
 import type { OpenQuestion } from "../../gen/ts/open-question.js";
 import type { ReplyConstraint } from "../../gen/ts/reply-constraint.js";
 import type { SubjectRef } from "../../gen/ts/subject-ref.js";
+import type { Artifact } from "../../gen/ts/artifact.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -497,6 +498,24 @@ export function validateList(list: List): Problems {
     for (const item of list.items) {
       if (item.due_at) problems.push(`due_at is only meaningful on a todo list item, not a ${list.kind} one ("${item.text}")`);
     }
+  }
+  return problems;
+}
+
+// Same self-reference guard as validateEntity's parent_id check above: a
+// chain that loops back on itself is a copy-paste bug (or a corrupted
+// write) the schema's own regex can't catch, since id and parent_version
+// independently match the identical pattern.
+export function validateArtifact(artifact: Artifact): Problems {
+  const problems: Problems = [];
+  if (artifact.parent_version && artifact.parent_version === artifact.id) {
+    problems.push("an artifact version cannot chain to itself");
+  }
+  if (artifact.version === 1 && artifact.parent_version !== null) {
+    problems.push("version 1 must have no parent_version");
+  }
+  if (artifact.version > 1 && artifact.parent_version === null) {
+    problems.push(`version ${artifact.version} must chain to a parent_version`);
   }
   return problems;
 }

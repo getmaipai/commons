@@ -11,6 +11,7 @@ import pytest
 from _standards import load_standards_module
 from pydantic import ValidationError
 
+from gen.py.artifact_schema import Artifact
 from gen.py.attachment_schema import Attachment
 from gen.py.content_ceiling_schema import ContentCeiling
 from gen.py.conversation_schema import Conversation
@@ -204,6 +205,17 @@ def test_reply_constraint_fixture():
 
 def test_reply_feedback_fixture():
     ReplyFeedback.model_validate(load_fixture("reply-feedback.example.json"))
+
+
+@pytest.mark.parametrize("kind", ["v1", "v2"])
+def test_artifact_fixtures(kind: str):
+    Artifact.model_validate(load_fixture(f"artifact.{kind}.example.json"))
+
+
+def test_artifact_second_version_chains_to_the_first_by_id():
+    v1 = load_fixture("artifact.v1.example.json")
+    v2 = load_fixture("artifact.v2.example.json")
+    assert v2["parent_version"] == v1["id"]
 
 
 def test_person_missing_required_field_is_rejected():

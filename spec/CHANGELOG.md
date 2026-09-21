@@ -5,6 +5,21 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.7] - 2026-09-21
+
+### Added
+- `Artifact` record (`schemas/artifact.schema.json`): one immutable
+  version of a generated markdown/code/html document (the chat
+  program's artifact-card/canvas-split experience), chained by
+  `parent_version` (conversation-turn's `parent_turn_id` convention,
+  not TurnArtifact's bare `revision` counter - rationale in the
+  schema's own description). `validateArtifact`/`validate_artifact`
+  added to `records/ts/validate.ts`/`records/py/validate.py` (self-
+  chain guard, version/parent_version pairing), proven identical across
+  both languages by new cases in `fixtures/validation/cross-field.json`.
+  Two new fixtures, `artifact.v1`/`artifact.v2`, cover a first version
+  and a chained edit.
+
 ## [spec-v0.1.6] - 2026-09-21
 
 ### Added

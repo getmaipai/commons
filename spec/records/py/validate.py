@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from gen.py.artifact_schema import Artifact
 from gen.py.entity_schema import Entity
 from gen.py.grant_schema import Grant
 from gen.py.list_schema import List
@@ -280,6 +281,17 @@ def validate_list(lst: List) -> Problems:
                 problems.append(
                     f'due_at is only meaningful on a todo list item, not a {lst.kind} one ("{item.text}")'
                 )
+    return problems
+
+
+def validate_artifact(artifact: Artifact) -> Problems:
+    problems: Problems = []
+    if artifact.parent_version and artifact.parent_version == artifact.id:
+        problems.append("an artifact version cannot chain to itself")
+    if artifact.version == 1 and artifact.parent_version is not None:
+        problems.append("version 1 must have no parent_version")
+    if artifact.version > 1 and artifact.parent_version is None:
+        problems.append(f"version {artifact.version} must chain to a parent_version")
     return problems
 
 

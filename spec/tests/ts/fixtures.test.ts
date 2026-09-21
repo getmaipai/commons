@@ -29,6 +29,7 @@ import { OpenQuestion } from "../../gen/ts/open-question.js";
 import { ReplyFeedback } from "../../gen/ts/reply-feedback.js";
 import { TurnArtifact } from "../../gen/ts/turn-artifact.js";
 import { Attachment } from "../../gen/ts/attachment.js";
+import { Artifact } from "../../gen/ts/artifact.js";
 // ErrorEntry is standards-owned (std-v0.2.0), not generated here; the error
 // catalogue's shape is imported from the sibling .github checkout, the same
 // way spec/schemas/manifest.schema.json imports PrivacyRow by $ref.
@@ -190,6 +191,18 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("attachment.example.json", () => {
     expect(() => Attachment.parse(loadFixture("attachment.example.json"))).not.toThrow();
+  });
+
+  for (const kind of ["v1", "v2"]) {
+    test(`artifact.${kind}.example.json`, () => {
+      expect(() => Artifact.parse(loadFixture(`artifact.${kind}.example.json`))).not.toThrow();
+    });
+  }
+
+  test("an artifact's second version chains to the first by id", () => {
+    const v1 = loadFixture("artifact.v1.example.json") as { id: string };
+    const v2 = loadFixture("artifact.v2.example.json") as { parent_version: string };
+    expect(v2.parent_version).toBe(v1.id);
   });
 
   test("error catalogue entries", () => {

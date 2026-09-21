@@ -1,0 +1,14 @@
+{
+  "id": "art-a1b2c3",
+  "conversation_id": "conv-a1b2c3",
+  "turn_id": "turn-a1b2c3",
+  "kind": "markdown",
+  "title": "Bramble's packing list",
+  "body": "# Packing list\n\n- Tent\n- Sleeping bag\n- Headlamp\n",
+  "version": 1,
+  "parent_version": null,
+  "created_by": "person-a1b2c3",
+  "provenance": "artifact-tool:turn-a1b2c3",
+  "created_at": "2026-09-21T02:05:00Z",
+  "hlc": "1789963500000:0:hub001"
+}

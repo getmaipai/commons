@@ -20,6 +20,7 @@ import {
   validateOpenQuestion,
   validateReplyConstraint,
   validateSubjectRef,
+  validateArtifact,
   inverseRelationship,
 } from "../../records/ts/validate.js";
 import type { Entity } from "../../gen/ts/entity.js";
@@ -36,6 +37,7 @@ import { TurnSignal as TurnSignalSchema } from "../../gen/ts/turn-signal.js";
 import { OpenQuestion as OpenQuestionSchema } from "../../gen/ts/open-question.js";
 import { ReplyConstraint as ReplyConstraintSchema } from "../../gen/ts/reply-constraint.js";
 import { SubjectRef as SubjectRefSchema } from "../../gen/ts/subject-ref.js";
+import { Artifact as ArtifactSchema } from "../../gen/ts/artifact.js";
 
 const FIXTURES = join(import.meta.dir, "..", "..", "fixtures", "records");
 const load = <T>(name: string): T => JSON.parse(readFileSync(join(FIXTURES, name), "utf-8")) as T;
@@ -286,7 +288,7 @@ describe("shared cross-language validation conformance", () => {
         else if (fixture.kind === "subject") {
           const subject = SubjectRefSchema.parse(raw);
           problems = validateSubjectRef(subject);
-        }
+        } else if (fixture.kind === "artifact") problems = validateArtifact(ArtifactSchema.parse(raw));
       } catch {
         schemaRefused = true;
       }

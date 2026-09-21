@@ -10,6 +10,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from gen.py.artifact_schema import Artifact
 from gen.py.entity_schema import Entity
 from gen.py.grant_schema import Grant
 from gen.py.list_schema import List
@@ -21,6 +22,7 @@ from gen.py.subject_ref_schema import Household, Unresolved, World
 from gen.py.turn_signal_schema import TurnSignal
 from records.py.validate import (
     inverse_relationship,
+    validate_artifact,
     validate_entity,
     validate_grant,
     validate_list,
@@ -751,6 +753,8 @@ def test_shared_cross_language_validation_conformance():
                 )
             elif case["kind"] == "subject":
                 problems = validate_subject_ref(World.model_validate(raw))
+            elif case["kind"] == "artifact":
+                problems = validate_artifact(Artifact.model_validate(raw))
         except ValidationError:
             schema_refused = True
         if case["expected"] == "accept":

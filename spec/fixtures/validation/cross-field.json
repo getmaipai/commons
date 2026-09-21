@@ -29,6 +29,11 @@
     {"name":"constraint-valid","kind":"constraint","base":"reply-constraint.example.json","expected":"accept"},
     {"name":"shape-unknown-value","kind":"constraint","base":"reply-constraint.example.json","overrides":{"kind":"shape","value":"table"},"expected":"refuse","rule":"must name a reply shape"},
     {"name":"length-not-a-number","kind":"constraint","base":"reply-constraint.example.json","overrides":{"kind":"length","value":"short"},"expected":"refuse","rule":"positive integer character budget"},
-    {"name":"length-zero","kind":"constraint","base":"reply-constraint.example.json","overrides":{"kind":"length","value":"0"},"expected":"refuse","rule":"positive integer character budget"}
+    {"name":"length-zero","kind":"constraint","base":"reply-constraint.example.json","overrides":{"kind":"length","value":"0"},"expected":"refuse","rule":"positive integer character budget"},
+    {"name":"artifact-v1-valid","kind":"artifact","base":"artifact.v1.example.json","expected":"accept"},
+    {"name":"artifact-v2-valid","kind":"artifact","base":"artifact.v2.example.json","expected":"accept"},
+    {"name":"artifact-self-chain","kind":"artifact","base":"artifact.v1.example.json","overrides":{"parent_version":"art-a1b2c3"},"expected":"refuse","rule":"cannot chain to itself"},
+    {"name":"artifact-v1-with-parent","kind":"artifact","base":"artifact.v1.example.json","overrides":{"parent_version":"art-d4e5f6"},"expected":"refuse","rule":"version 1 must have no parent_version"},
+    {"name":"artifact-v2-without-parent","kind":"artifact","base":"artifact.v2.example.json","overrides":{"parent_version":null},"expected":"refuse","rule":"must chain to a parent_version"}
   ]
 }
