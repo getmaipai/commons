@@ -9,6 +9,8 @@ cd "$(dirname "$0")/.."
 DOCS_ONLY=0; if [ "${1:-}" = "--docs" ]; then DOCS_ONLY=1; fi
 
 STANDARDS_REPO="${MAIPAI_STANDARDS_DIR:-../.github}"
+STANDARDS_REPO="$(cd "$STANDARDS_REPO" && pwd)"
+export MAIPAI_STANDARDS_DIR="$STANDARDS_REPO"
 STD_TAG="std-v0.3.0"
 if [ ! -x "$STANDARDS_REPO/standards/bin/ensure-tag.sh" ]; then
   echo "getmaipai/.github is missing at $STANDARDS_REPO or older than std-v0.3.0 (set MAIPAI_STANDARDS_DIR to a checkout that has standards/bin/ensure-tag.sh)"
