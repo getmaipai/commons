@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, request } from "@/kit/http";
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
@@ -26,6 +26,14 @@ interface SettingsRendererProps {
    * match inside a folded advanced key surfaces it directly rather than
    * leaving it hidden behind "Show N advanced settings". */
   filter?: string;
+  /** Restricts rendering to only these group ids (`SettingsGroup.id`,
+   * the registry key's own `lives_in`) - HOME-UI-03: a card-grid
+   * settings page renders several `SettingsRenderer` instances on one
+   * screen, each scoped to a different card, so "every group for this
+   * scope" (the only mode this component had before) is too broad for
+   * any one of them. Omitted: every eligible group renders, unchanged
+   * from before this prop existed. */
+  groupIds?: readonly string[];
 }
 
 // The registry (unlike a scope's values) never varies by which
@@ -47,7 +55,7 @@ const REGISTRY_QUERY_KEY = ["settings-registry"];
 // (SettingsPage.tsx: household, then person, 2026-09-04) - the central
 // Household/Profile lists Rule 2 describes as a further, still-missing
 // render site for the same component.
-export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: SettingsRendererProps) {
+export function SettingsRenderer({ scope, scopeValue, honouredBy, filter, groupIds }: SettingsRendererProps) {
   const queryClient = useQueryClient();
   const registryQuery = useQuery<SettingsKey[]>({
     queryKey: REGISTRY_QUERY_KEY,
@@ -118,6 +126,31 @@ export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: Sett
   const data =
     registryQuery.data && valuesQuery.data ? { registry: registryQuery.data, values: valuesQuery.data } : undefined;
 
+  // Computed once at the top level, not inside AsyncState's own render
+  // prop: a fix-hunk re-review caught the first version of this doing
+  // both the computation AND the warning below inside that render prop,
+  // which React (and React.StrictMode's own double-invoke) calls on
+  // every re-render - a keystroke in the lifted search box, a pending-
+  // write state change, a window-focus refetch - turning one intended
+  // "this card is misconfigured" signal into a console flood for as
+  // long as the misconfigured screen stayed mounted.
+  const allGroups: SettingsGroup[] = data ? groupSettings(data.registry, data.values, scope, honouredBy) : [];
+  const groups = groupIds ? allGroups.filter((g) => groupIds.includes(g.id)) : allGroups;
+  const groupsMismatch = Boolean(data && groupIds && groupIds.length > 0 && groups.length === 0);
+  // `groupIds?.join(",")`, not `groupIds` itself, as the dependency:
+  // the same render-prop-vs-effect lesson Shell.tsx's own
+  // phoneHeaderActions fix already learned this session - a caller
+  // passing a fresh array literal each render (the normal shape of an
+  // inline groupIds={[...]} prop) would otherwise re-run this effect,
+  // and could re-warn, on every render regardless of whether anything
+  // real changed.
+  useEffect(() => {
+    if (groupsMismatch) {
+      console.warn(`SettingsRenderer: groupIds ${JSON.stringify(groupIds)} matched no group for scope "${scope}" - check for a typo or a drifted id.`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- groupIds itself is read only inside the warning string; the join() below is the real, stable dependency.
+  }, [groupsMismatch, scope, groupIds?.join(",")]);
+
   // Found live in the browser (2026-09-05, while checking that the new
   // persona.active_id setting actually renders): `flex-1 overflow-y-auto`
   // here turns this component into its own independently-scrolling
@@ -152,8 +185,9 @@ export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: Sett
         errorMessage="Could not load settings."
         loadingLabel="Loading settings"
       >
-        {({ registry, values }) => {
-          const groups: SettingsGroup[] = groupSettings(registry, values, scope, honouredBy);
+        {() => {
+          // `groups` (and the mismatch warning) are computed once above,
+          // outside this render prop - see the comment there.
           const needle = filter?.trim().toLowerCase();
           const matches = (s: MergedSetting) =>
             !needle || s.def.label.toLowerCase().includes(needle) || (s.def.help?.toLowerCase().includes(needle) ?? false);

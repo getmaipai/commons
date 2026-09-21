@@ -4,6 +4,36 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.10] - ui-v0.4.10
+
+HOME-UI-03's own kit-side need: a Settings page built from several
+small cards, each wanting only a subset of one scope's settings groups
+- `SettingsRenderer` had no way to show less than every eligible group.
+
+### Added
+- `SettingsRenderer` gains an optional `groupIds?: readonly string[]`
+  prop, filtering rendered groups to only those ids; omitted, behavior
+  is unchanged from every version before this one. A new
+  `SettingsRenderer.test.tsx` (this component had no test file before)
+  covers the filter, the unchanged default, and the empty-match case.
+
+### Fixed (found across two review rounds on this same branch)
+- The first version's own "groupIds matched nothing" dev signal had no
+  warning at all - a typo or a drifted `lives_in` id silently rendered
+  the same "No settings yet." as a genuinely empty scope, with nothing
+  anywhere flagging that a whole card had gone missing. Fixed with a
+  `console.warn`.
+- The fix-hunk re-review then found that warning ran inside a render
+  prop, re-firing on every re-render (a parent's search box changing
+  `filter`, `React.StrictMode`'s own double-invoke) instead of once per
+  real misconfiguration. Moved the computation and the warning to the
+  component's own top level in a `useEffect`, keyed on a stable
+  `groupIds?.join(",")` rather than the array reference itself (the
+  same lesson `ui-v0.4.9`'s own `phoneHeaderActions` warning already
+  learned this session). A new regression test proves a re-render with
+  the same mismatched `groupIds` (a fresh array reference, the normal
+  shape of an inline prop) warns once, not once per render.
+
 ## [0.4.9] - ui-v0.4.9
 
 The phone header fold (owner reference, "The phone composition,"
