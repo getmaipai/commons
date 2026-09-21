@@ -4,6 +4,40 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.8] - ui-v0.4.8
+
+Follow-up to `ui-v0.4.7`, fixing a kit-internal import path that broke
+every downstream consumer the moment the tag was actually pinned.
+
+### Fixed
+- `thread-list.aui.tsx` imported the new `thread-list-groups` module via
+  a bare `@/assistant-ui/thread-list-groups` alias. Every other
+  cross-file import inside this kit uses the `@/kit/...` prefix - bare
+  `@/` resolves to the CONSUMING project's own src root once this
+  package is installed as a `file:` dependency, not this kit's own src
+  root. The mismatch type-checked cleanly inside this workspace's own dev
+  environment and only surfaced as `Cannot find module` when Home's own
+  `tsc --noEmit` processed the pinned `ui-v0.4.7`. Fixed in both the
+  import and the re-export in `thread-list.aui.tsx`, and in
+  `thread-list-groups.test.ts`'s own import.
+
+### Added
+- A lint guardrail against a third occurrence of this exact bug class
+  (a code review: nothing caught it the first two times). `eslint.config.js`
+  now bans any bare `@/...` import that isn't `@/kit/...` inside the
+  kit's own `src/`, including in `src/ui/**` and `src/assistant-ui/**`
+  where the lucide/radix path restrictions are otherwise off. The
+  pattern is one shared constant (`NO_BARE_KIT_IMPORT`) with
+  `caseSensitive: true` reused across all three rule blocks, not
+  copy-pasted three times - a fix-hunk re-review caught both that the
+  first draft omitted `caseSensitive` (ESLint matches a bare regex
+  case-insensitively, so `@/Kit/...` would have slipped past the same
+  guardrail meant to catch it) and that the duplication itself risked a
+  future edit landing in only one of the three copies. Verified by
+  temporarily reintroducing both the lowercase and the cased-typo forms
+  of the broken import and confirming `eslint` flags each, then
+  restoring the fix.
+
 ## [0.4.7] - ui-v0.4.7
 
 Follow-up to `ui-v0.4.6`'s own thread-list restoration, after a review

@@ -8,7 +8,7 @@ import { Checkbox } from "@/kit/ui/checkbox";
 import { Input } from "@/kit/ui/input";
 import { Skeleton } from "@/kit/ui/skeleton";
 import { cn, hitArea } from "@/kit/utils";
-import { computeThreadListGroups } from "@/assistant-ui/thread-list-groups";
+import { computeThreadListGroups } from "@/kit/assistant-ui/thread-list-groups";
 import {
   AuiIf,
   ThreadListItemMorePrimitive,
@@ -438,7 +438,7 @@ export const ThreadListItems: FC<
   );
 };
 
-export type { ThreadListGroup, ThreadListGroupableItem } from "@/assistant-ui/thread-list-groups";
+export type { ThreadListGroup, ThreadListGroupableItem } from "@/kit/assistant-ui/thread-list-groups";
 
 /** Wraps `computeThreadListGroups` (thread-list-groups.ts - a separate,
  * dependency-free module on purpose, so it's unit-testable without a real

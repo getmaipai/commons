@@ -6,7 +6,7 @@
 // sibling grouping function. No assistant-ui runtime needed: this
 // function takes plain data in and returns plain data out.
 import { describe, expect, test } from "bun:test";
-import { computeThreadListGroups, type ThreadListGroupableItem } from "@/assistant-ui/thread-list-groups";
+import { computeThreadListGroups, type ThreadListGroupableItem } from "@/kit/assistant-ui/thread-list-groups";
 
 function items(entries: Record<string, ThreadListGroupableItem>): Map<string, ThreadListGroupableItem> {
   return new Map(Object.entries(entries));

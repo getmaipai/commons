@@ -14,6 +14,25 @@ import reactHooks from "eslint-plugin-react-hooks";
 // config exempts for `src/kit/ui/**`. The restricted-import rules below are
 // for everything that builds on top of the primitives, so src/ui is
 // exempted by file override, not by an inline disable.
+
+// A bare `@/...` import inside the kit's own src/ resolves to the
+// CONSUMING project's own src root once this package is installed as a
+// `file:` dependency, not back into this kit - tsconfig.json maps both
+// `@/kit/*` and `@/*` to `./src/*`, so the mistake type-checks fine here
+// and only breaks a downstream consumer's own `tsc`. Caught this shape
+// twice now (ui-v0.4.7, ui-v0.4.8): every cross-file import within this
+// kit's own src/ must go through the `@/kit/...` prefix. `caseSensitive`
+// matters here - without it ESLint matches the regex case-insensitively,
+// letting a typo like `@/Kit/...` slip past the same as the bug this
+// guards against. One shared definition, reused by every override below
+// that lifts the lucide/radix path bans, so a future edit can't drift out
+// of sync in one of three copies.
+const NO_BARE_KIT_IMPORT = {
+  regex: "^@/(?!kit/)",
+  caseSensitive: true,
+  message: "Cross-file imports inside the kit's own src/ use @/kit/..., not bare @/... - see the comment above this constant in eslint.config.js.",
+};
+
 export default [
   {
     ignores: ["dist/**", "node_modules/**"],
@@ -84,6 +103,7 @@ export default [
               message: "one component library: the kit's shadcn primitives",
             },
           ],
+          patterns: [NO_BARE_KIT_IMPORT],
         },
       ],
       // A JSX `style` attribute with a raw color literal (#, rgb(, hsl(,
@@ -123,7 +143,10 @@ export default [
     // design too.
     files: ["src/ui/**/*.tsx", "src/icons.ts"],
     rules: {
-      "no-restricted-imports": "off",
+      // Only the lucide/radix path bans lift here - the bare-`@/` pattern
+      // ban above still applies, so this override restates it rather than
+      // going fully "off" (which would drop both).
+      "no-restricted-imports": ["error", { patterns: [NO_BARE_KIT_IMPORT] }],
     },
   },
   {
@@ -144,7 +167,11 @@ export default [
     // heading/anchor renderers).
     files: ["src/assistant-ui/**/*.tsx"],
     rules: {
-      "no-restricted-imports": "off",
+      // Only the lucide/radix path bans lift here - the bare-`@/` pattern
+      // ban above still applies (this directory is exactly where it broke
+      // twice), so this override restates it rather than going fully
+      // "off" (which would drop both).
+      "no-restricted-imports": ["error", { patterns: [NO_BARE_KIT_IMPORT] }],
       "better-tailwindcss/no-unknown-classes": "off",
       "jsx-a11y/no-autofocus": "off",
       "jsx-a11y/click-events-have-key-events": "off",
