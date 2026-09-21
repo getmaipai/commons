@@ -607,7 +607,16 @@ body {
 @custom-variant data-unchecked (&:where([data-state="unchecked"], [data-unchecked]:not([data-unchecked="false"])));
 
 /* The owner's ruling, 2026-09-21 ("still too many lines, tone it down,"
- * said twice, HOME-UI-04f): the template's own hairline-grid pattern
+ * said twice, then widened with a reference picture, HOME-UI-04f):
+ * shadcn's own dashboard-01 block (ui.shadcn.com/blocks, dark) is the
+ * density he wants - the same inset-sidebar layout as ours with exactly
+ * three lines fewer. Three fills go transparent below, kit-side, no
+ * vendored file touched: the hairline-grid wrapper fill (this rule),
+ * the sidebar panel's own box border, and the main panel's outline.
+ * Every card keeps its own `ring-1 ring-foreground/10`; the header
+ * keeps its `border-b` - nothing else changes.
+ *
+ * This rule: the template's own hairline-grid pattern
  * (`dashboard/views/dashboards/modern/index.tsx` and three other views -
  * `p-px gap-px bg-border` on a wrapper `grid`, `bg-border` at
  * `oklch(1 0 0 / 0.1)`) wraps rounded `.cn-card` children that already
@@ -617,12 +626,11 @@ body {
  * fill peeks past each card's rounded corners since the fill itself has
  * no radius. Fix: the wrapper's fill goes transparent wherever this
  * exact combination appears, leaving each card's own ring as the only
- * line - kit-side, no vendored file touched, the same "un-layered plain
- * CSS, scoped by what's actually there" shape the sidebar-menu-button
- * rule above already uses. `~=` matches a whole space-separated
- * Tailwind class token (never a substring), so this only ever matches
- * the real hairline-grid combination, nothing else that happens to use
- * `bg-border` alone.
+ * line - the same "un-layered plain CSS, scoped by what's actually
+ * there" shape the sidebar-menu-button rule above already uses. `~=`
+ * matches a whole space-separated Tailwind class token (never a
+ * substring), so this only ever matches the real hairline-grid
+ * combination, nothing else that happens to use `bg-border` alone.
  *
  * A review named the real trade-off: this selector has no ancestor or
  * component scope, only the class-pair match itself, so any FUTURE
@@ -637,4 +645,27 @@ body {
 [class~="bg-border"][class~="p-px"],
 [class~="bg-border"][class~="gap-px"] {
   background-color: transparent;
+}
+
+/* Second of the three (see the block comment above): the sidebar
+ * panel's own box border. `Sidebar.tsx`'s `.sidebar-box` wrapper sets
+ * `**:data-[slot=sidebar-inner]:border border-border` on the inner
+ * panel (`sidebar.tsx`'s own `data-slot="sidebar-inner"` div) - a full
+ * 1px box around the whole sidebar, on top of the page's own
+ * background. Transparent border-color leaves the sidebar sitting
+ * directly on the page background, no box, matching dashboard-01;
+ * `border` (the width) is untouched, so there's no layout shift. */
+[data-slot="sidebar-inner"] {
+  border-color: transparent;
+}
+
+/* Third of the three: the main content panel's own outline.
+ * `FullLayout.tsx` sets `outline outline-border` on `SidebarInset`
+ * (`sidebar.tsx`'s `data-slot="sidebar-inset"` `<main>`) - a full-
+ * perimeter 1px outline around the inset content panel, on top of its
+ * own `shadow-sm`. Transparent outline-color leaves the panel as a
+ * plain rounded sheet carrying only its shadow, matching dashboard-01;
+ * `outline` (the width) is untouched. */
+[data-slot="sidebar-inset"] {
+  outline-color: transparent;
 }

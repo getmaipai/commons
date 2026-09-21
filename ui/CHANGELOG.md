@@ -4,6 +4,19 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.16] - ui-v0.5.16
+
+HOME-UI-04f widened: the owner's ruling with a reference picture -
+shadcn's own dashboard-01 block (dark) is the density he wants, the
+same inset-sidebar layout as ours with exactly three lines fewer. Two
+more fills go transparent (`tokens.css`, on top of ui-v0.5.15's
+hairline-grid fill): the sidebar panel's own box border
+(`[data-slot="sidebar-inner"]`'s border-color) and the main content
+panel's own outline (`[data-slot="sidebar-inset"]`'s outline-color).
+Widths are untouched (no layout shift); every card keeps its own
+`ring-1 ring-foreground/10` and the header keeps its `border-b`. No
+vendored file edited.
+
 ## [0.5.15] - ui-v0.5.15
 
 The owner's ruling, 2026-09-21 ("still too many lines, tone it down,"
