@@ -19,7 +19,7 @@ export interface SettingsGroup {
 // spec/settings/keys.json omit it), so `lives_in` is the only grouping
 // key available today; a real `section.order`/`collapsed` sort is a real,
 // separate gap for whenever a key actually declares one.
-const SECTION_TITLES: Record<string, string> = {
+export const SECTION_TITLES: Record<string, string> = {
   "household.system": "System",
   "person.voice": "Voice",
   "person.persona": "Personality",
@@ -32,6 +32,7 @@ const SECTION_TITLES: Record<string, string> = {
   "household.ai": "AI model tuning",
   "household.integrations": "Integrations",
   "household.notifications": "Notifications",
+  "household.storage": "Storage",
   // Deliberately NOT the same string as "household.notifications": a
   // design review (2026-09-05) found both sections rendering as
   // "Notifications" back to back (SettingsPage.tsx stacks a household-
@@ -43,6 +44,7 @@ const SECTION_TITLES: Record<string, string> = {
   // review, 2026-09-05, same class of bug `household.ai` above was
   // already caught for once.
   "profile.appearance": "Appearance",
+  "person.allowance": "Allowance",
 };
 
 export function sectionTitle(id: string): string {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { groupSettings, sectionTitle } from "@/kit/settings/groupSettings";
+import { groupSettings, SECTION_TITLES, sectionTitle } from "@/kit/settings/groupSettings";
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
 import type { ResolvedSetting } from "@/kit/settings/resolvedSetting";
 
@@ -119,5 +119,14 @@ describe("sectionTitle", () => {
 
   test("unknown section ids fall back to the raw id", () => {
     expect(sectionTitle("some.new.package")).toBe("some.new.package");
+  });
+
+  test("every known section id has a friendly title (SET-TITLES-01)", () => {
+    for (const [id, title] of Object.entries(SECTION_TITLES)) {
+      expect(sectionTitle(id)).not.toBe(id);
+      expect(title).not.toBe(id);
+    }
+    expect(sectionTitle("household.storage")).toBe("Storage");
+    expect(sectionTitle("person.allowance")).toBe("Allowance");
   });
 });
