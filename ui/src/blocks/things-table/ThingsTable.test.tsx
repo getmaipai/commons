@@ -33,3 +33,40 @@ test("a sortable column header button carries a real touch-target extension", ()
   expect(header.className).toContain("before:-inset-3");
   expect(header.className).toContain("py-1");
 });
+
+// Regression: rowActions' own "More actions" kebab was a bare size-8
+// (32px) button with no touch-target extension at all, and its column
+// header carried only an aria-label with no visible or sr-only text -
+// both caught live by home-b's own a11y check on the first real
+// rowActions consumer (Settings > Updates, HOME-STACK-05), since no
+// earlier page had exercised this prop. DataTable.tsx's own "Actions"
+// header (an sr-only span, no aria-label) is the pattern this now
+// matches, so the fix is one definition, not a second convention.
+test("rowActions' Actions header carries visible-to-assistive-tech text, not just an aria-label", () => {
+  render(
+    <ThingsTable<Row>
+      columns={[{ key: "name", header: "Package", render: (row) => row.name }]}
+      rows={rows}
+      getKey={(row) => row.id}
+      rowActions={() => [{ label: "Remove", onClick: () => {} }]}
+      empty="No packages"
+    />,
+  );
+  const header = document.querySelector("th.w-10")!;
+  expect(header.textContent).toBe("Actions");
+  expect(header.querySelector(".sr-only")).not.toBeNull();
+});
+
+test("rowActions' \"More actions\" button carries a real touch-target extension", () => {
+  render(
+    <ThingsTable<Row>
+      columns={[{ key: "name", header: "Package", render: (row) => row.name }]}
+      rows={rows}
+      getKey={(row) => row.id}
+      rowActions={() => [{ label: "Remove", onClick: () => {} }]}
+      empty="No packages"
+    />,
+  );
+  const button = document.querySelector("button[aria-label='More actions']")!;
+  expect(button.className).toContain("before:-inset-3");
+});

@@ -4,6 +4,28 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.5] - ui-v0.4.5
+
+`ThingsTable`'s `rowActions`/`groupActions` prop had never had a real
+consumer until home-b's Settings > Updates page (HOME-STACK-05), which
+is how its a11y check caught two latent bugs no earlier page had
+exercised: the "More actions" kebab button was a bare `size-8` (32px)
+box with no touch-target extension (under docs/UI.md's 48px floor,
+same class of gap the sortable header button had before `ui-v0.4.0`'s
+own fix), and the Actions column header carried only an
+`aria-label="Actions"` with no visible or assistive-tech-visible text
+at all - `DataTable.tsx`'s own "Actions" header (an `sr-only` span, no
+aria-label) already had the right pattern, so this now matches it
+instead of inventing a second convention.
+
+### Fixed
+- The row and group "More actions" buttons both gain `hitArea(3)`,
+  matching the sortable header button's own established fix.
+- The Actions column header drops the bare `aria-label` for a visible
+  (`sr-only`) "Actions" span.
+- Two new regression tests in `ThingsTable.test.tsx` assert both fixes
+  directly, since no test exercised `rowActions` at all before this.
+
 ## [0.4.4] - ui-v0.4.4
 
 `ui-v0.4.3`'s own fix restated the brand row's 16px left inset as
