@@ -98,7 +98,7 @@ uv run pytest tests/py -q       # Python: the same four, mirrored
 uv run ruff check . && uv run ruff format --check .
 ```
 
-All of this runs from `shared`'s `scripts/check.sh`.
+All of this runs from `commons`'s `scripts/check.sh`.
 
 ## Cross-repo schemas: how `@maipai/standards` gets imported
 
@@ -130,8 +130,8 @@ this in more detail; don't "simplify" either script back to a blanket
 resolve without re-checking `recipe.ts`'s `steps` field afterward.
 
 This means `standards/gen/ts/` and `standards/gen/py/` (in the sibling
-`.github` checkout) need to already be generated before `shared`'s codegen
-runs; `shared`'s `check.sh` verifies that for you ("spec: standards gen/
+`.github` checkout) need to already be generated before `commons`'s codegen
+runs; `commons`'s `check.sh` verifies that for you ("spec: standards gen/
 presence") before regenerating and diff-checking `gen/`.
 
 ## Moved from `home/spec` (spec-v0.1.0)
