@@ -94,6 +94,21 @@ it ships" rule.
 
 ## assistant-ui Elements (`ui/src/elements/`)
 
+**A named gap for whoever wires these in (found in review, not yet a
+real break since nothing imports `@/elements/*` from outside this
+folder yet):** these files use `@/elements/...` self-references (the
+registry's own convention, matching `dashboard/**`'s `@/dashboard/...`
+style). Home's `frontend/vite.config.ts` only special-cases `@/kit/*`
+(`kitAliasPlugin`, redirecting it into `@maipai/ui`'s own source); any
+other bare `@/...` import - including `@/elements/...` - falls through
+to the generic `resolve.alias` there and resolves against **Home's
+own** `frontend/src/`, not this package's `src/`. `home/frontend/src/
+elements/` doesn't exist, so the first real Home import of anything
+under `ui/src/elements/` will fail to resolve until `kitAliasPlugin`
+(or an equivalent) is extended to cover `@/elements/*` too - CHAT-SDK-01's
+own problem to solve when it wires the chat onto these Elements, not
+fixed here.
+
 Installed from the default registry flavor on 2026-09-21:
 
 ```text

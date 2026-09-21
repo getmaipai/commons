@@ -4,6 +4,37 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.10] - ui-v0.5.10
+
+HOME-UI-04b's theme-preset item, two parts:
+
+- Seven new style-variant presets (`.style-neutral`/`stone`/`zinc`/
+  `mauve`/`olive`/`mist`/`taupe`, light and dark each) join Studio and
+  Calm, transcribed from ui.shadcn.com/create's own generated output
+  for each base color (a real browser session, not reconstructed) -
+  ui.shadcn.com/docs/theming's own current base-color list, not the
+  five-color set this item started from.
+- The inset sidebar's own double-border (owner finding, "single
+  border, it is supposed to be identical to the source"): cloned
+  shadcndashboard at its pinned commit and ran its own dev server to
+  compare directly. Structure is byte-identical to ours (Sidebar.tsx's
+  `**:data-[slot=sidebar-inner]:border-border`, FullLayout's
+  `SidebarInset` outline - checked both). The difference is upstream's
+  own dark theme's `--border: oklch(1 0 0 / 10%)`, a translucent
+  overlay nearly invisible against its near-black background; Home's
+  dark palette uses an opaque `#294563`, which reads as a real visible
+  line against Home's navy. Matched with a scoped override
+  (`.dark .sidebar-box [data-slot="sidebar-inner"] { --border: oklch(1
+  0 0 / 10%) }`) rather than touching the global `--border` every
+  bordered element in both shells reads.
+
+Also folds in a code-review finding from the ui-v0.5.9 Elements
+install: `ui/src/elements/*` uses `@/elements/...` self-imports, which
+Home's `vite.config.ts` doesn't special-case the way it does `@/kit/*`
+- recorded as a named gap in dashboard-upstream.md for CHAT-SDK-01,
+not fixed here (nothing outside `ui/src/elements` imports it yet).
+
+
 ## [0.5.9] - ui-v0.5.9
 
 The remaining 99 assistant-ui Elements (131 files total under

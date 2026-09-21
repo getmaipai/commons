@@ -284,6 +284,31 @@
   display: none;
 }
 
+/* Matches the inset sidebar to the template's own upstream demo in dark
+ * mode (owner ruling, HOME-UI-04b, 2026-09-21: "single border, it is
+ * supposed to be identical to the source"). Sidebar.tsx (both upstream's
+ * and this kit's, byte-identical - checked directly) ships
+ * `**:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:
+ * border-border`, and FullLayout's own `SidebarInset` outline is
+ * likewise identical to upstream's - the structure was never the
+ * difference. Cloned upstream at its pinned commit
+ * (6f99c0b04b7169f9ef12dc99946bc4faaeb40b9b) and ran its own dev
+ * server to compare directly: its dashboard in dark shows one flush
+ * panel, no visible line around the sidebar, because its own dark
+ * theme's `--border` is `oklch(1 0 0 / 10%)` - a translucent white
+ * overlay, nearly invisible against its near-black `--background` -
+ * not because the border isn't there. Home's own dark palette uses an
+ * opaque `--border: #294563` (tokens.css, both the `.dark` class and
+ * the `prefers-color-scheme` media block), which reads as a real
+ * visible line against Home's own navy background - a real color
+ * choice, not a structural bug, but not what "identical to the
+ * source" asked for. Scoped to the sidebar-inner subtree only (never
+ * `--border` globally, which every bordered element in both shells
+ * reads) so the rest of the app's borders are untouched. */
+.dark .sidebar-box [data-slot="sidebar-inner"] {
+  --border: oklch(1 0 0 / 10%);
+}
+
 :root {
   /* The light root: the same hues as the dark reference, on light
    * surfaces (spec section 1, program decision 5). Dark is the default
