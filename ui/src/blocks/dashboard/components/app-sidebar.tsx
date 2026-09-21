@@ -92,8 +92,33 @@ export function AppSidebar({ groups, brand, footer, ...props }: AppSidebarProps)
                 studio:h-[62px] - that fixed height is gone in favor of
                 the plain pt-5/pb-6 pair above, so the ancestor chain
                 this button's height would resolve a percentage against
-                is auto all the way up, making h-full inert. */}
-            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1! gap-1 pl-4!">
+                is auto all the way up, making h-full inert. py-1!/pr-1!/
+                pl-4! (ui-v0.4.4), not p-1! + pl-4!: both were
+                `!important`, but a code review's own compiled-CSS check
+                found the real mechanism was specificity, not source
+                order - `data-[slot=sidebar-menu-button]:p-1!` compiles
+                to the compound selector `.data-\[slot\=sidebar-menu-
+                button\]\:p-1\![data-slot="sidebar-menu-button"]`
+                (specificity 0,2,0), which deterministically beats the
+                plain `.pl-4\!` (0,1,0) regardless of which rule the
+                stylesheet emits first - not a tie ever in question. The
+                tile rendered clipped at the rail's true x 0 in both
+                `ui-v0.4.2` and `ui-v0.4.3`'s own committed captures
+                despite this line naming a 16px inset the whole time -
+                found by pixel-measuring `ui-v0.4.3`'s own capture
+                rather than trusting the visual scan that had missed it
+                twice already. Three longhand sides, no shorthand,
+                removes the specificity mismatch outright: nothing here
+                targets padding-left except `pl-4!` itself. The added
+                `group-data-[collapsible=icon]:p-2!` restates the
+                primitive's own identical collapsed-row rule; a second
+                review's own compiled check found `cn()`'s `twMerge`
+                already dedupes that exact class+modifier pair before
+                any CSS exists, so this is a documentation choice (this
+                button's own full padding is stated in one place,
+                self-contained), not a fix for a second collision - the
+                dedup makes one impossible here. */}
+            <SidebarMenuButton asChild className="py-1! pr-1! pl-4! group-data-[collapsible=icon]:p-2! gap-1">
               {brand}
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -116,4 +116,42 @@ describe("AppSidebar", () => {
     // with no discernible name before `aria-label` was added below.
     expect(getByRole("link", { name: "Home" })).toBeInTheDocument();
   });
+
+  // ui-v0.4.4: the brand button's own `pl-4!` (16px, "the tile's left
+  // edge sits at x 16") lost silently to `data-[slot=sidebar-menu-
+  // button]:p-1!`, a shorthand also on the button - both `!important`,
+  // but a code review's own compiled-CSS check found the real
+  // mechanism was specificity, not source order: the variant form
+  // compiles to a compound selector (specificity 0,2,0) that
+  // deterministically beats the plain `pl-4!` (0,1,0), so the tile
+  // rendered clipped at x 0 in two shipped captures (ui-v0.4.2,
+  // ui-v0.4.3) before a live pixel measurement caught it. happy-dom
+  // computes no real cascade, so the only thing worth asserting here is
+  // the fact that actually matters: the button's own padding tokens are
+  // exactly the four this fix intends (three longhand sides for the
+  // expanded row, the one deliberate collapsed-row override) and
+  // nothing else - any OTHER padding-shorthand token, bare or under a
+  // variant (`p-1!`, `data-[slot=...]:p-1!`, `px-2!`, and so on),
+  // reintroduces exactly this bug and fails this test before it ships
+  // to another live capture, whether or not it happens to share a name
+  // with the deliberate collapsed override.
+  test("the brand button's own padding is exactly the four intended tokens, no shorthand fighting pl-4!", () => {
+    const groups = ungroupedNav([{ to: "/", icon: "home", label: "Home" }]);
+    const { getByText } = render(
+      <MemoryRouter>
+        <SidebarProvider>
+          <AppSidebar groups={groups} brand={<span>Brand</span>} />
+        </SidebarProvider>
+      </MemoryRouter>,
+    );
+    const brandButton = getByText("Brand");
+    // Only `!important` padding tokens matter here: a plain (non-
+    // important) shorthand like the primitive's own base `p-2` always
+    // loses to an `!important` longhand regardless of specificity, so
+    // it's not part of the bug class this test guards - only two
+    // `!important` rules both targeting the same side can collide the
+    // way the old `data-[slot=...]:p-1!` and `pl-4!` did.
+    const importantPaddingTokens = brandButton.className.split(/\s+/).filter((c) => /(^|:)p[trblxy]?-\d+!$/.test(c));
+    expect(new Set(importantPaddingTokens)).toEqual(new Set(["py-1!", "pr-1!", "pl-4!", "group-data-[collapsible=icon]:p-2!"]));
+  });
 });

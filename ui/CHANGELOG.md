@@ -4,6 +4,27 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.4] - ui-v0.4.4
+
+`ui-v0.4.3`'s own fix restated the brand row's 16px left inset as
+`pl-4!`, but a live pixel measurement of the built capture still found
+the tile clipped at x 0: `data-[slot=sidebar-menu-button]:p-1!`, a
+leftover all-sides padding override on the same button, compiles to a
+higher-specificity compound selector than the plain `pl-4!` (0,2,0 vs
+0,1,0), so it deterministically won regardless of either rule's
+position in the class list or the stylesheet - not the source-order tie
+an earlier version of this fix's own comment first assumed.
+
+### Fixed
+- The brand button's padding is now three non-overlapping longhand
+  sides (`py-1! pr-1! pl-4!`) plus an explicit collapsed-row override
+  (`group-data-[collapsible=icon]:p-2!`, restating the primitive's own
+  identical rule) - nothing here shares a side with anything else, so
+  there is no specificity contest left to win or lose.
+- A new regression test (`app-sidebar.test.tsx`) asserts the button's
+  own `!important` padding tokens are exactly these four; verified live
+  to fail against the original bug pattern and pass against the fix.
+
 ## [0.4.3] - ui-v0.4.3
 
 `ui-v0.4.2`'s own committed capture still didn't match the reference:
