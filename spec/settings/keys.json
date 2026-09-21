@@ -667,12 +667,13 @@
         "mauve",
         "olive",
         "mist",
-        "taupe"
+        "taupe",
+        "navy"
       ]
     },
     "default": "studio",
     "label": "Look",
-    "help": "Studio matches the reference design exactly. Calm is the softer look Home shipped first. The rest are shadcn's own color presets.",
+    "help": "Studio matches the reference design exactly. Calm is the same look, rounder tiles. Navy is Home's own blue-black set. The rest are shadcn's own color presets.",
     "level": "basic",
     "secret": false,
     "lives_in": "profile.appearance",

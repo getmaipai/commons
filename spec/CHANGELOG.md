@@ -5,6 +5,16 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.14] - 2026-09-21
+
+### Changed
+- `ui.look`'s enum grows from nine values to ten, adding `navy`: Home's
+  own former default palette, displaced from the zero-attribute default
+  by HOME-UI-04e's "identical to the source" ruling (the default now
+  renders the shadcndashboard template's own palette, byte-for-byte),
+  kept as its own named preset (`commons-a/ui/src/dashboard/css/
+  globals.css`'s `.style-navy`) so nobody loses it.
+
 ## [spec-v0.1.13] - 2026-09-21
 
 ### Added
