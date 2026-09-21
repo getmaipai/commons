@@ -4,6 +4,28 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.13] - ui-v0.5.13
+
+Found live re-verifying ui-v0.5.12 in a real browser, not just by scripted
+diff: `/next` still rendered Home's old navy hex, not the source's own
+palette ui-v0.5.12 just swapped in. `.style-calm`/`.style-studio` carried
+no color of their own (only `--tile-radius`), so they'd always inherited
+from the bare `:root`/`.dark` above - correct back when this file's bare
+default WAS Home's navy, wrong the moment ui-v0.5.12 made that bare
+default the source's palette instead, because `@maipai/ui`'s own
+`tokens.css` (deliberately still navy on its own bare `:root`/`.dark`,
+"so the old shell does not shift") ties with this file's bare selectors
+at equal specificity once a real consumer imports both under one root,
+and whichever file is imported second wins - Home's own `shell/
+tokens.css` imports `tokens.css` second, so its navy silently beat this
+file's palette on every page, /next included. Both classes get full
+palette blocks now (light and dark), matching the seven shadcn presets'
+own shape, so /next's `useNextLook.ts` - which always puts one
+`.style-<look>` class on `<body>`, never none - never depends on winning
+that tie again. Verified live this time: a real Playwright session
+against a running build, `getComputedStyle` on body/card, not a values
+diff against source text alone.
+
 ## [0.5.12] - ui-v0.5.12
 
 HOME-UI-04e ("one Tailwind root, the source's own default palette"):
