@@ -1,6 +1,6 @@
 {
   "name": "@maipai/ui",
-  "version": "0.5.10",
+  "version": "0.5.11",
   "private": true,
   "description": "MaiPai's shell contract and kit: tokens, layout primitives, settings and permission renderers, pattern components. See ../docs/dev.md.",
   "license": "AGPL-3.0",

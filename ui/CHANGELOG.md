@@ -4,6 +4,23 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.11] - ui-v0.5.11
+
+HOME-UI-04d ("one theme writer on /next"): tokens.css's two `@media
+(prefers-color-scheme: dark)` blocks (the theme tokens, and the
+old shell's `brand-logo-*` swap) now guard with `:not(.dark)`
+alongside the existing `:not(.light)` - every real writer of the
+class (`useAppearance.ts` for the old shell, the vendored
+`ThemeProvider` for /next, mounted this same item) now always sets
+an explicit `.dark` or `.light` on mount, `"system"` included, so
+the media query is only ever the fallback before that first effect
+runs. Without the guard, a person whose setting disagreed with the
+OS (light chosen, OS dark, or the reverse) got this block's values
+from the OS query while the `.dark`-scoped block stayed off - the
+kit's own variables and the template's class-driven `dark:*`
+utilities (the /next header's logo swap among them) split into two
+different modes on the same page.
+
 ## [0.5.10] - ui-v0.5.10
 
 HOME-UI-04b's theme-preset item, two parts:
