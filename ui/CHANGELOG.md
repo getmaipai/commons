@@ -4,6 +4,21 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.15] - ui-v0.5.15
+
+The owner's ruling, 2026-09-21 ("still too many lines, tone it down,"
+said twice, HOME-UI-04f): the template's own hairline-grid pattern
+(`p-px gap-px bg-border` on a wrapper `grid`, used across the modern
+dashboard, tables, form-layouts and user-profile views) wraps rounded
+`.cn-card` children that already carry their own `ring-1
+ring-foreground/10` - measured live on 8787, every card was lined
+twice (its own ring plus the wrapper's fill bleeding through the
+hairline gap), and the square wrapper fill peeked past each card's
+rounded corners. `tokens.css` gains one rule, scoped to that exact
+class combination via `~=` attribute selectors (never a vendored file
+edited): the wrapper's fill goes transparent, leaving each card's own
+ring as the only line.
+
 ## [0.5.13] - ui-v0.5.13
 
 Found live re-verifying ui-v0.5.12 in a real browser, not just by scripted

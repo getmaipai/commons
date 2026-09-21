@@ -605,3 +605,36 @@ body {
 @custom-variant data-checked (&:where([data-state="checked"], [data-checked]:not([data-checked="false"])));
 
 @custom-variant data-unchecked (&:where([data-state="unchecked"], [data-unchecked]:not([data-unchecked="false"])));
+
+/* The owner's ruling, 2026-09-21 ("still too many lines, tone it down,"
+ * said twice, HOME-UI-04f): the template's own hairline-grid pattern
+ * (`dashboard/views/dashboards/modern/index.tsx` and three other views -
+ * `p-px gap-px bg-border` on a wrapper `grid`, `bg-border` at
+ * `oklch(1 0 0 / 0.1)`) wraps rounded `.cn-card` children that already
+ * carry their own `ring-1 ring-foreground/10` - measured live on 8787:
+ * every card was lined TWICE (its own ring, plus the wrapper's fill
+ * bleeding through the `p-px`/`gap-px` hairline), and the square wrapper
+ * fill peeks past each card's rounded corners since the fill itself has
+ * no radius. Fix: the wrapper's fill goes transparent wherever this
+ * exact combination appears, leaving each card's own ring as the only
+ * line - kit-side, no vendored file touched, the same "un-layered plain
+ * CSS, scoped by what's actually there" shape the sidebar-menu-button
+ * rule above already uses. `~=` matches a whole space-separated
+ * Tailwind class token (never a substring), so this only ever matches
+ * the real hairline-grid combination, nothing else that happens to use
+ * `bg-border` alone.
+ *
+ * A review named the real trade-off: this selector has no ancestor or
+ * component scope, only the class-pair match itself, so any FUTURE
+ * element combining `bg-border` with `p-px`/`gap-px` for an unrelated
+ * reason would also lose its fill silently. Accepted rather than
+ * inventing a new wrapper class on a vendored file to scope against
+ * (which this rule exists specifically to avoid) - today this exact
+ * pair appears nowhere in the kit except the four hairline-grid views
+ * above, and it is an unusual enough combination (a 1px gap plus a
+ * border-color fill together) that a genuine future collision is
+ * unlikely; if one shows up, scope this rule down then. */
+[class~="bg-border"][class~="p-px"],
+[class~="bg-border"][class~="gap-px"] {
+  background-color: transparent;
+}
