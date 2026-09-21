@@ -280,6 +280,25 @@
   display: none;
 }
 
+/* CHAT-UI-01 (getmaipai/home, 2026-09-21), owner-ruled: the
+ * template's own section-heading renderer (`dashboard/layouts/full/
+ * vertical/sidebar/nav-collapse/index.tsx`) draws a literal "..." in
+ * icon-collapsed mode and swaps it for the full heading text on
+ * `group-hover`/`group-data-[state=expanded]` - found live, and ruled
+ * out on sight ("I should not see ... for sections or be able to
+ * hover and see the label"), the same class of owner call as the
+ * "fewer lines" kit rules a few sections up. No `hide-menu` class on
+ * the span itself (unlike the main nav row's own labels just above)
+ * for this fix to key on, so this targets the exact utility-class
+ * combination nav-collapse's own heading `<span>` renders with -
+ * specific enough not to catch anything else in this subtree, and
+ * kept here rather than added to the vendored file itself: the
+ * component keeps rendering exactly what it always has, this file is
+ * what decides none of it paints. */
+[data-slot="sidebar"][data-collapsible="icon"] .text-xs.uppercase.font-semibold.text-muted-foreground.mb-2 {
+  display: none;
+}
+
 /* The inset-sidebar single-border fix (HOME-UI-04b, 2026-09-21) used to
  * live here, scoped to `.sidebar-box [data-slot="sidebar-inner"]` only:
  * Home's own dark palette had an opaque `--border` (#294563) where

@@ -4,6 +4,18 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.22] - ui-v0.5.22
+
+CHAT-UI-01, owner-ruled: the section-heading renderer in the vertical
+sidebar's `nav-collapse` draws a literal `"..."` in icon-collapsed
+mode and reveals the full heading text on hover - ruled out on sight
+("I should not see ... for sections or be able to hover and see the
+label"), the same class of owner call as the "fewer lines" kit rules.
+`tokens.css` hides the heading `<span>` entirely in collapsed mode
+(scoped by its own exact utility-class combination, the only hook
+available without touching the vendored component itself); nothing
+about the component's own markup changed.
+
 ## [0.5.21] - ui-v0.5.21
 
 BRAND-01: `FullLogo`'s and `Logo`'s own asset imports (`darklogo.svg`,
