@@ -1,15 +1,14 @@
-# Session B handoff (2026-09-21, end of context)
+# Session B handoff (2026-09-21, end of session)
 
-Written per COORDINATOR's standing rule: HOME-STACK-04a and HOME-STACK-01
-(stack-side and home-side, both accepted and pushed) are a natural stop
-point - no precise context-percent readout was available this session,
-but the honest assessment given the scope below (two full items, dozens
-of large tool outputs, several full-gate runs, multiple live builds and
-verification cycles) was "very likely past 60%," so handing off rather
-than starting the chat-program backend item (a different, large,
-multi-part task) cold. This note replaces the previous one in this file
-(HOME-STACK-05 and the HOME-STACK-01 design paragraph) - both landed
-and accepted, no longer relevant to what's next.
+Written on the coordinator's own call, not a context-percent guess:
+"given the size and your session's length: stop here the right way."
+Tonight's chat-program work (items 1-3 of `home/docs/plans/shell-on-
+shadcndashboard-2026-09-21.md`, plus part of item 4) is landed and
+pushed; ARTIFACT-02 is fully designed and approved but has zero code -
+a fresh session builds it cold from the design below and in
+`home/docs/dev.md`/`home/docs/BACKLOG.md`. This note replaces the
+previous one (HOME-STACK-04a/HOME-STACK-01) - both landed and accepted,
+no longer relevant to what's next.
 
 ## Restart line
 
@@ -18,162 +17,212 @@ cd /Users/jessetorres/Developer/github.com/getmaipai/home-b && claude --dangerou
 ```
 
 That worktree is on branch `b/home-stack-02b` (the name is stale, it
-tracks `main` directly), already pushed and even with `origin/main` at
-`4856f6be`. No uncommitted state, no stash, nothing to recover. There is
-also a `stack-b` worktree at `/Users/jessetorres/Developer/github.com/getmaipai/stack-b`
-(branch `b/home-stack-01-installer`, also tracks `main` directly, even
-with `origin/main` at `233bc4f`) - needed again only if a future Stack-
-side change is asked for; nothing pending there either.
+tracks `main` directly), pushed and even with `origin/main` at
+`cf18d7ed`. No uncommitted state, no stash, nothing to recover.
+`commons-b` (branch `b/artifact-spec`, same tracking-main shape) is
+even with `origin/main` at `aae7606` - also clean, nothing pending.
+`stack-b` (`/Users/jessetorres/Developer/github.com/getmaipai/stack-b`,
+branch `b/home-stack-01-installer`) is untouched since the last
+handoff, even with `origin/main` at `233bc4f` - needed again only if a
+future Stack-side change is asked for.
 
 ## What landed this session (all pushed, all reported, all accepted)
 
-- **`home` `1337e8d3` (HOME-STACK-04a, the Engines API)**: twelve
-  `createRoute()`/`.openapi()` routes at `/api/engines` (roles/engines/
-  budget, hardware, per-engine actions, models, per-model actions,
-  health, health-item fix, and the update-state/check/apply/rollback
-  trio delegating to `lib/stackUpdates.ts`'s existing functions rather
-  than a second call path), owner/admin gated like `repairs.ts`. One
-  `classifyStackError()` maps every `StackError` kind to its real
-  status. A real routing bug found live (a two-segment dynamic
-  catch-all registered before two same-shaped literal paths swallowed
-  both) fixed by registration order. `tests/enginesRoutes.test.ts`, 23
-  tests. One minor drift finding from the medium review (ROLE_IDS
-  hand-copied from `stack/types.ts`, out of this item's file scope)
-  filed as `getmaipai/home#127`, not fixed here.
-- **`stack` `b1f40da` then `233bc4f` (HOME-STACK-01, the Stack's own
-  half): the compiled binary.** `scripts/build-binary.sh` compiles
-  `maipai-stack` via `bun build --compile`, ships `migrations/` (a real
-  bug: `import.meta.dir` is a virtual `/$bunfs/root` path inside a
-  compiled binary, invisible to drizzle's migrator's plain `node:fs` -
-  fixed via `lib/paths.ts`'s new `isCompiledBinary`) and `backend-src/`
-  (a real, dereferenced copy of `backend/`) as required siblings. The
-  `stt` role needed a real fix, not a documented gap: a compiled binary
-  can never load `sherpa-onnx-node`'s native binding once the same
-  binary also contains the daemon's own graph - a genuine Bun bundler
-  bug, minimal repro filed at `getmaipai/stack#8` (left open on
-  COORDINATOR's instruction: it describes a real, still-unfixed Bun
-  defect, not something this repo's own workaround resolves). Fixed by
-  running the `stt` worker through a real `bun` (`STACK_BUN_BIN`)
-  against `backend-src/` instead of a re-invocation of the compiled
-  binary - `lib/supervisor.ts`'s `speechWorkerCommand()` picks the
-  shape. `233bc4f` is a follow-up fix: `build-binary.sh`'s own
-  `OUT_DIR` handling silently broke on an absolute path (which Home's
-  installer always passes), found wiring the home-side install.sh into
-  it for real.
-- **`home` `4856f6be` (HOME-STACK-01, the home-side half): `install.sh`
-  places the Stack** (fetches `getmaipai/stack@$STACK_TAG`, builds via
-  that repo's own `build-binary.sh`, runs as the console user rather
-  than root, waits for `/healthz`, writes `engines.stack.url` last,
-  only when it's still empty or a previous local write);
-  **`uninstall.sh` removes it** inside the existing single "DELETE MY
-  DATA" confirmation; the upgrade branch stops, rebuilds and restarts
-  it, clearing the setting if the rebuild fails. `--dry-run` covers the
-  Stack section only (a stated scope boundary, not a retrofit of
-  Home's pre-existing flow). **Two review rounds found eight real bugs,
-  all fixed** - the full list, and why each mattered, is in
-  `home/docs/dev.md`'s own "The Stack inside Home's installer, built"
-  entry and `home/docs/BACKLOG.md`'s HOME-STACK-01 line; the two worth
-  repeating here because they're general, not just this item's own:
-  - **`main()` silently never ran under this script's own documented
-    `curl -fsSL ... | bash` usage** - `[[ "${BASH_SOURCE[0]}" ==
-    "${0}" ]]` is false for piped execution (`BASH_SOURCE[0]` empty,
-    `$0` is `"bash"`); fixed with the portable `(return 0 2>/dev/null)`
-    "am I sourced" test instead, which is correct for direct execution,
-    piped execution, and `bash script.sh` alike. **Any script in this
-    repo meant to be both `source`-able (for its own tests, or by a
-    sibling script wanting to reuse its functions) and directly
-    runnable needs this exact idiom, not a `$0`/`BASH_SOURCE` comparison.**
-  - **macOS ships bash 3.2.57 as `/usr/bin/env bash`'s own system
-    default** (Apple has not shipped a newer one in years, GPLv3
-    licensing) **and this installer's shebang resolves to exactly
-    that on an unmodified Mac - its own primary target.** `mapfile`/
-    `readarray` (bash 4+) do not exist there; found live by running a
-    fix under `/bin/bash` directly and watching `mapfile: command not
-    found`, not by reading a compatibility table. **Every function in
-    `install.sh`/`uninstall.sh`, and any future installer-adjacent
-    script in this repo meant to run on a bare Mac, needs to stay
-    bash-3.2-compatible: no `mapfile`/`readarray`, no `declare -A`, no
-    `${var,,}`/`${var^^}`.** Arrays, `+=`, `[[ ]]`, and process
-    substitution are all fine - only the bash-4-and-later builtins are
-    the trap. The fix pattern: `while IFS= read -r line; do arr+=("$line"); done < <(...)`.
-  - The other six (dry-run overwriting `engines.stack.url`
-    unconditionally, a failed upgrade rebuild leaving it stale,
-    `find_console_user()` accepting `root`, `uninstall.sh` silently
-    orphaning `stack/data` when the binary was missing,
-    `ensure_service_user_linux()`'s own recursive chown clobbering the
-    Stack's ownership on Linux, and `--dry-run` making a real loopback
-    network call) are specific to this item - full detail in
-    `docs/dev.md`, not repeated here.
-  - Verified live on this MacBook, explicitly under `/bin/bash` the
-    final time (not a dev shell's `PATH`-preferred bash), never Home's
-    own root-level service: `install-service`, `/healthz`, `status`
-    showing every env var actually baked into the running LaunchAgent,
-    `uninstall-service --remove-data`, `launchctl list | grep maipai`
-    empty afterward, the data directory gone.
-  - **Stated gap, not run this session: a real clean-account install
-    and the entire Linux path** (`systemd --user`, `loginctl
-    enable-linger`, `find_console_user()`'s `logname` branch, and the
-    `ensure_service_user_linux()` chown-ordering fix) - no Linux box
-    available. The render functions are unit-tested and
-    `service/systemd.ts`'s own tests on the `stack` side cover the
-    unit content, but none of the Linux-specific behavior above has
-    run for real.
+- **`commons` `08824d7` / tag `spec-v0.1.7` (the Artifact record)**:
+  `spec/schemas/artifact.schema.json` - one immutable version of a
+  generated markdown/code/html document, chained by `parent_version`
+  naming the prior version's own `id` (conversation-turn's
+  `parent_turn_id` convention, deliberately not `TurnArtifact`'s bare
+  `revision` counter - the wire needs a version's own id). TS+Python
+  generated, two fixtures (a first version, a chained edit),
+  `validateArtifact`/`validate_artifact` in both `records/ts/
+  validate.ts` and `records/py/validate.py` (a self-chain guard plus
+  version/parent_version pairing - a medium review on the pre-rebase
+  commit found the self-chain gap unguarded, same class as
+  `validateEntity`'s own `parent_id` check) with matching
+  `fixtures/validation/cross-field.json` cases proving both languages
+  agree.
+- **`home` `af0af0aa` (the artifact data layer + weather/almanac
+  structured parts)**: `backend/src/db/schema.ts`'s `artifacts` table
+  (migration `0053`) - `artifactKey` and `isCurrent` are Home-internal
+  bookkeeping the spec record has no concept of, a partial unique index
+  keeps exactly one current row per `artifactKey`. `lib/artifacts.ts`:
+  `createArtifact`/`updateArtifact` (refuses updating a superseded
+  version, 409), `getArtifactRow`/`currentArtifactRow`,
+  `visibleArtifactRow()` (a child sees an artifact only from their own
+  turn and only when that turn's `safetyAction !== "refuse"`, extending
+  `canAccessPerson()` rather than a content-stripping projection -
+  there is no field to strip here, the whole version is visible or it
+  isn't). `routes/artifacts.ts`: `GET /api/artifacts/:id` and
+  `GET /api/artifacts/:id/export` (a slugged download, content type by
+  `kind`) - both real `createRoute()`/`.openapi()` routes (the medium
+  review's one finding: the export route was a plain Hono `.get()`
+  first, missing from `docs/api/openapi.json` - fixed, re-reviewed, 131
+  paths now). `TurnValue.artifact?: {id, version}` added additively,
+  no writer until ARTIFACT-02. `wire.ts`'s new `StructuredPart` type
+  (`spec_sheet` kind, matching assistant-ui's spec-sheet prop shape
+  exactly) and `TurnValue.structured_part`: `composer.ts`'s
+  `structuredPartForOutcomes()` maps weather's and almanac-date's own
+  `result.data` onto it (first known producer wins, same precedent
+  `buildDocument()` sets), hooked into `turnEngine.ts`'s
+  `logTurnSafely()` beside `document_available`/`rung` - one line, no
+  new dispatch. `almanac-date/handler.ts` gained a `data: {date,
+  weekday}` field (Tier 1 handlers already pass `data` through, no
+  plumbing change needed). Forgot `artifacts` in `lib/hlc.ts`'s
+  `HLC_BEARING_TABLES` on the first pass - the full suite's own
+  `tests/hlc.test.ts` caught it before landing.
+- **`home` `cf18d7ed` (docs only): ARTIFACT-02's design**, written up
+  in full below and in `home/docs/dev.md`/`home/docs/BACKLOG.md` -
+  approved by the coordinator with one addition (provenance). No code.
+
+Also landed, folded into `af0af0aa`'s own commit and doc sections but
+worth naming separately since they're decisions, not just code: item
+1's **"The wire the Elements expect"** table (every assistant-ui
+Element on this session's row, its exact part shape against Home's
+wire today - fed/rename/gap) and the **approval-card/guardrail-notice
+resolution** (two kinds of approval kept: a same-turn `approval-card`
+on the live tool call for the requester's own action, Home's existing
+async `approvals.ts` queue for a cross-person decision, surfacing as
+`approval-card` only on the parent's side; guardrail-notice stays a
+named gap for a later spec bump) - both in `home/docs/plans/shell-on-
+shadcndashboard-2026-09-21.md`.
+
+## ARTIFACT-02: the next item, build this design, don't re-derive it
+
+Full writeup in `home/docs/dev.md`'s "ARTIFACT-02, designed" section
+and `home/docs/BACKLOG.md`'s ARTIFACT-02 item (identical content, the
+checklist form) - read one of those two in full before writing any
+code. The short version, so this note is self-contained enough to
+start from:
+
+**Why**: every check in `turnEngine.ts`'s `resolveToolCallsInOrder()`
+reads a real `PackageManifest` (`rankedById.get(c.tool)!.manifest`); a
+Tier 1 `handler.ts` has zero DB access (an isolated Deno subprocess).
+The sanctioned way a package writes a real record live is a recipe
+primitive, `remember`'s own `"op": "remember"` precedent.
+
+**The design (coordinator-approved, build as written)**: an 18th
+recipe op, `{"op": "artifact", "as": "result", "title": "{title}",
+"kind": "{kind}", "body": "{body}", "id_from": "artifact_id"}`, in
+`recipe.schema.json`, both interpreters (`interpreters/ts/recipe-
+interpreter.ts` and `interpreters/py/recipe_interpreter.py`, byte-for-
+byte behaviorally identical, proven by new conformance fixtures in
+`fixtures/recipes/`). `title`/`kind`/`body` interpolate normally,
+always required even on an update. `id_from` names a scope variable to
+read directly (`scope[step.id_from]`, no `{}` - `pick`'s own `"from"`
+convention), because `interpolate()` leaves an unresolved `{name}` as
+the literal string rather than `undefined`, and `artifact_id`'s
+presence-or-absence IS the create-vs-update discriminator (the recipe
+language has no conditional to express that another way). `Host.
+artifact` (`host-emulator.ts`): `create({title, kind, body}): {id,
+version}`, `update({artifact_id, title, body}): {id, version}`,
+throwing `HostError` with an EXISTING `errors/errors.json` code
+(`not_found`, `invalid_input`), not a new one - plus a deterministic
+in-memory emulator implementation (both `host-emulator.ts` and
+`emulators/py/host_emulator.py`) for the fixtures to run against. New
+permission `artifact:write` in `vocab/permissions.json`.
+
+**Provenance (the coordinator's one addition)**: `host.artifact.
+create`/`update`'s real implementation (`packageHost.ts`) sets
+`provenance` with the SAME expression `remember()` already uses for
+`source` - `turnId ?? \`package:${manifest.id}\`` - not a bespoke
+string. `packageHost.ts` resolves `conversation_id` by looking up the
+bound `turnId`'s own row before calling `lib/artifacts.ts`'s
+`createArtifact`/`updateArtifact` directly.
+
+**Wiring back**: the op binds two flat scope keys,
+`scope.artifact_id`/`scope.artifact_version` (never nested -
+`interpolate()` has no dot-path support). The bundled `documents`
+package (`backend/packages/documents/`, ranked and consequential like
+any action package): the `artifact` step, then a `format` step with
+`data: {"artifact_id": "{artifact_id}", "artifact_version":
+"{artifact_version}"}` - the exact shape `structuredPartForOutcomes()`
+already reads weather's/almanac-date's own data from, so
+`TurnValue.artifact` gets its writer the identical way. Tool name
+`write_document` - what artifact-card's own frontend toolkit already
+binds to, nothing extra to register there.
+
+**Review**: high (spans `commons/spec`'s two interpreters plus a real
+Home host implementation and a new package - real behavioral-parity
+risk between languages, the exact class of bug the conformance
+fixtures exist to catch). One pass covering the whole diff is right
+here, not the usual medium - do not under-scope it to save time.
+
+**Acceptance**: a model-driven live chat creates then edits an
+artifact, `TurnValue.artifact` set from the real tool call, TS/Python
+conformance fixtures agree. Out of scope: any other package gaining
+`artifact:write` by default.
+
+## Then REASONING-01 (after ARTIFACT-02, not before)
+
+Also in `home/docs/BACKLOG.md` under "The chat program: assistant-ui
+Elements." The `reasoning` Element's stream event
+(`{type: "reasoning", text, status?}`) is real but genuinely entangled:
+`wellFormed.ts`'s `thinkingPrefix()`/`visibleText()` already split a
+model's `<think>` block from the visible reply, but the extracted
+prefix gets REATTACHED to the raw text at several points deep in
+`turnEngine.ts`'s streaming buffer and sentence-splitting logic
+(`composeBlocking`, the retry-token machinery, the mid-stream `<think>`
+handling around line 5654) for reasons a read-only pass didn't fully
+explain. Understand why that reattachment exists - and prove whatever
+it protects still holds - before extracting reasoning as its own
+stream event. Checked and deliberately NOT attempted this session
+rather than risking a rushed edit to that machinery.
+
+Image generation's own part sequence is NOT this session's or the next
+one's item - no image-generation feature exists in Home at all yet
+("image" is a role id in the Engines API's list, nothing else). It's
+`CHAT-MEDIA-01`'s own item; that item already has a one-line pointer to
+the `image-generation` Element's contract and its missing numeric-
+progress prop.
 
 ## Standing gotchas for whoever picks this up
 
-- **The two bash idioms above** (the sourced-vs-executed guard, and
-  bash-3.2 compatibility) apply to any bash script this org's
-  installers touch, not just `install.sh`/`uninstall.sh` - worth a
-  second look before assuming a bash-4+ convenience is safe to use
-  anywhere in `getmaipai/home` or `getmaipai/stack`'s own scripts.
+- **The chat program's design record is
+  `home/docs/plans/shell-on-shadcndashboard-2026-09-21.md`** - "The
+  wire the Elements expect" table, the artifact record section, and the
+  turn-engine tool section (superseded in detail by ARTIFACT-02's own
+  design above, but still the right place to see how this fits the
+  whole chat program). Read it before touching any Element-adjacent
+  wire shape, not just before ARTIFACT-02.
 - **`bun install --force`, not a plain `bun install`,** in `backend/`
-  and `frontend/` after any `commons`/`stack` pin bump - a `file:`
-  dependency resolves into bun's content-addressed store, a snapshot
-  taken at install time, not a live link.
-- **`scripts/check.sh`'s API-docs drift check diffs the working tree
-  against the *index*, not `HEAD`.** Regenerate, then stage the
-  result, before running the gate.
-- **Code review is budgeted**: low for an S item or docs/config,
-  medium for an M item or a route/guard/wire change, high only if
-  named. One pass per commit; after fixes, the re-review covers the
-  fix hunks only; a second pass finding real defects is reported (this
-  session's HOME-STACK-01 fix-hunk re-review found two more real bugs,
-  reported and fixed, not chased with a third pass).
+  after any `commons` pin bump - a `file:` dependency resolves into
+  bun's content-addressed store, a snapshot taken at install time, not
+  a live link. Iterate against a local `file:../../commons-b/spec` pin
+  while a tag isn't cut yet if needed, but never commit that path -
+  flip to the real `commons-tags/spec-spec-vX.Y.Z/spec` tag worktree
+  before the final commit.
+- **`scripts/check.sh`'s API-docs and settings-registry drift checks
+  diff the working tree against the *index*, not `HEAD`.** Regenerate,
+  then stage the result, before running the gate - this session hit
+  this twice (once for `gen:api-docs`, once for `gen:settings`) and
+  both were the same "index, not HEAD" gotcha the previous handoff note
+  already named.
+- **Code review is budgeted**: low for an S item or docs/config, medium
+  for an M item, high only when named (ARTIFACT-02 is named high
+  above - don't default it to medium because everything else tonight
+  was medium). One pass per commit; after fixes, the re-review covers
+  the fix hunks only.
+- **Two full gates on this machine at once produces real, misleading
+  test flakes** - this session's own backend suite failed a different,
+  unrelated test on two separate full runs (once while another
+  session's gate was also running) and came back 100% clean on a third
+  run alone. Before trusting a failure as a real regression, check
+  whether another session is gating at the same time, and re-run alone
+  if so.
+- **A shared `commons` origin/main moves fast under multiple sessions
+  cutting spec/ui tags in the same evening** - rebase `commons-b`
+  immediately before starting new work, not just once at session start;
+  this session rebased three times as `spec-v0.1.6`, then `ui-v0.5.0`/
+  `spec-v0.1.7`, then `ui-v0.5.2` landed from other sessions in
+  between.
 - **Never touch the real household app on this machine** - `home/`'s
   own checkout at the repo root (not a worktree), port 8787, Jesse's
-  real data. This session's Stack live-verification runs all used
-  scratch data directories under `home-b/data-scratch-b/` (git-ignored)
-  and scratch ports, never the real install.
-- **This laptop runs low on free memory under concurrent sessions** -
-  ask COORDINATOR to clear a gate slot before a full-repo run.
-- **A rebase across concurrent lanes is usually mechanical** but worth
-  a sanity re-run of the full gate after, not just trusting a clean
-  `rebase --continue` - both of this session's pushes rebased cleanly
-  onto commits another session landed in between (04a onto HOME-UI-02f,
-  the final home-side HOME-STACK-01 push onto Session A's design/
-  hand-off docs).
+  real data.
 
 ## What's next
 
-**The backend half of the chat program's shell-on-shadcndashboard
-work** (`home/docs/plans/shell-on-shadcndashboard-2026-09-21.md` -
-read it first) - COORDINATOR's brief, not repeated in full here since
-it should come fresh rather than be summarized stale, but the shape:
-read assistant-ui's Elements wiring pages
-(https://www.assistant-ui.com/elements) and write "The wire the
-Elements expect" into the program record; design and land a commons
-spec `artifact` record (fixtures, a Home table/migration, versions as
-rows with a current pointer, the child projection, an export route);
-the turn-engine tool to create/update an artifact and the stream shape
-that carries it; the generative-UI rule (a tool's result renders as
-the Element-matched structured part, never narrated prose, never
-hand-drawn), wired for weather/almanac first. Backend and spec only,
-no frontend - Session A is vendoring the Elements into the kit in
-parallel. Two owner rules named as binding for tonight's work:
-`.github` commits `da28bdc` and `919881b` ("no hand-built UI, Elements
-as shipped") - worth reading those two commits directly before
-starting, not just trusting this summary of them.
-
-Whoever picks this up should get the actual full brief from COORDINATOR
-rather than starting from this note alone - this is a summary of state,
-not the work order itself.
+**ARTIFACT-02** (design above and in `home/docs/dev.md`/
+`home/docs/BACKLOG.md`), high review. Then **REASONING-01**. Get the
+actual work order from COORDINATOR before starting either - this note
+is state, not the work order itself.
