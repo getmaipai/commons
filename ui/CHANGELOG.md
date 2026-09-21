@@ -4,6 +4,42 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.5] - ui-v0.5.5
+
+A real bug, found live capturing the stand-up's own acceptance
+screenshots (docs/plans/shell-on-shadcndashboard-2026-09-21.md, step
+1): the desktop sidebar rail never showed - the dashboard's KPI
+content rendered fine, but `FullLayout`'s own `Sidebar` was invisible
+at every desktop capture. Root cause: two separate `@import
+"tailwindcss"` roots in one Vite build (this file's `globals.css`, and
+the kit's own `tokens.css`) generate each unique utility class name
+once, wherever Tailwind's cross-root deduplication happens to place
+it - `.hidden`/`.md:flex` (`sidebar.tsx`'s own `data-slot="sidebar"`/
+`"sidebar-container"` classes) landed in the kit's entry stylesheet,
+loaded once at boot; this file's own lazy chunk (loaded later, when
+`/next` is first visited) still generates its own `.hidden{display:
+none}` for the same class name (used elsewhere in its own component
+tree too), which - loaded after the entry stylesheet - wins the tie
+for every `.hidden` element site-wide, overriding the entry's
+`@media (width>=768px) { .md\:flex }` rule that was supposed to bring
+the sidebar back on desktop.
+
+### Fixed
+- `css/globals.css` gains a small, plain (unlayered) CSS override
+  restating `sidebar.tsx`'s own documented default (hidden below
+  768px, visible at and above it) as CSS the cross-root collision
+  can't shadow - Tailwind wraps its own generated utilities in
+  `@layer`, and unlayered CSS always wins over layered CSS regardless
+  of source order, so this doesn't depend on which root "wins" the
+  dedup. Scoped to `[data-slot="sidebar"][data-variant]:not([data-
+  mobile="true"])` and `[data-slot="sidebar-container"]` - a first,
+  bare `[data-slot="sidebar"]` version (caught by review before this
+  landed) also force-hid `sidebar.tsx`'s mobile `Sheet` branch (shown
+  by its own open state, never by `hidden`/`md:block`) and its
+  `collapsible="none"` branch (a plain, always-visible div with no
+  responsive classes at all); `[data-variant]` is the one attribute
+  only the desktop-fixed branch this fix targets ever sets.
+
 ## [0.5.4] - ui-v0.5.4 (reverts 0.5.1 and 0.5.3; the actual conclusion)
 
 `0.5.3`'s bump broke something `0.5.1` didn't even reach: this package
