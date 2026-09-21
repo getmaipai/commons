@@ -10,13 +10,13 @@ Public (2026-09-20): every product (`home`, `stack`, `bot`, `go`) and every
 `catalog` package pins a tag here, no credential required. The repo was named
 `shared` until 2026-09-20; the old address redirects.
 
-## Workspaces and their current tags
+## Workspaces and their tags
 
-| Workspace | Package | Current tag | Consumers |
-|---|---|---|---|
-| `ui/` | `@maipai/ui` | `ui-v0.4.0` | Home (Go and catalog packages later) |
-| `core/` | `@maipai/core` | `core-v0.1.0` | Home, Stack |
-| `spec/` | `@maipai/spec` | `spec-v0.1.2` | Home, Stack, Catalog (Bot and Go later) |
+| Workspace | Package | Consumers |
+|---|---|---|
+| `ui/` | `@maipai/ui` | Home (Go and catalog packages later) |
+| `core/` | `@maipai/core` | Home, Stack |
+| `spec/` | `@maipai/spec` | Home, Stack, Catalog (Bot and Go later) |
 
 A consumer pins one of these tags and states it in its own dev docs. Bumping is two edits in the consumer: the tag in its
 `scripts/check.sh` and the matching `file:` path in its
@@ -24,6 +24,12 @@ A consumer pins one of these tags and states it in its own dev docs. Bumping is 
 `scripts/ensure-tag.sh <workspace> <tag>` here, which creates a read-only
 worktree of that tag beside this checkout the first time and reuses it after
 (the `@maipai/standards` pattern, no registry).
+
+The current tag of each workspace is `git tag --list '<workspace>-v*' --sort=-v:refname |
+head -1` and the top entry of that workspace's `CHANGELOG.md`; each
+consumer's pin is the tag string in its own `scripts/check.sh` (Home
+pins ui-v0.5.16 and spec-v0.1.14 at the time of writing, the Stack
+spec-v0.1.11), never copied here.
 
 Nothing in `commons` imports a product. A consuming repo resolves each
 workspace from the per-tag worktree, never from this working checkout
