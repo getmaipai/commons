@@ -43,4 +43,42 @@ getmaipai/.github.
   query hooks)
 - Zod (MIT) - https://zod.dev (the UI-schema types)
 
+### `ui/src/dashboard/` - vendored from shadcndashboard
+
+shadcndashboard (MIT) - https://github.com/shadcndashboard/shadcndashboard,
+commit `6f99c0b04b7169f9ef12dc99946bc4faaeb40b9b` - see
+`ui/docs/dashboard-upstream.md` for what was vendored and stripped. Its
+own dependencies added here:
+
+- @base-ui/react (MIT) - https://base-ui.com (the template's primitives)
+- @tanstack/react-table (MIT) - https://tanstack.com/table (`DataTable`)
+- embla-carousel-react (MIT) - https://www.embla-carousel.com
+  (`ui/carousel.tsx`)
+- input-otp (MIT) - https://github.com/guilhermerodz/input-otp
+  (`ui/input-otp.tsx`)
+- lodash (MIT) - https://lodash.com (`sidebaritems.ts`'s `uniqueId`)
+- motion (MIT) - https://motion.dev (the sidebar nav item's hover
+  animation)
+- react-day-picker (MIT) - https://daypicker.dev (`ui/calendar.tsx`)
+- react-resizable-panels (MIT) - https://github.com/bvaughn/react-
+  resizable-panels (`ui/resizable.tsx`)
+- react-router (MIT) - https://reactrouter.com (the template's own import
+  path; Home's shell keeps `react-router-dom`, same library and major)
+- simplebar-react (MIT) - https://github.com/Grsmto/simplebar
+  (the sidebar's scroll area)
+- uuid (MIT) - https://github.com/uuidjs/uuid (`recent-orders.tsx`)
+
+### `ui/src/elements/` - vendored from assistant-ui's Elements
+
+assistant-ui (MIT) - https://github.com/assistant-ui/assistant-ui,
+`apps/registry` at commit `039c3c32822632f2a564164f089f538926886124` -
+see `ui/docs/dashboard-upstream.md` for the install command and the
+CLI/registry path mismatch fixed by hand. Its own dependencies added
+here:
+
+- cn (MIT) - https://github.com/lukeed/cn (the Elements' class-name
+  helper, used directly rather than a local `lib/utils.ts` copy)
+- tw-shimmer (MIT) - https://github.com/assistant-ui/assistant-ui
+  (the loading-shimmer utility a couple of Elements use)
+
 When another component lands, its attribution goes here.

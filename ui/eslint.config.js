@@ -180,4 +180,50 @@ export default [
       "jsx-a11y/anchor-has-content": "off",
     },
   },
+  {
+    // shadcndashboard, vendored (ui/docs/dashboard-upstream.md): "used
+    // exactly as it ships" means this kit's own bespoke rules don't apply
+    // to it either - the template's shadcn/Base UI primitives import
+    // lucide-react and @base-ui/react by design, and use the template's
+    // own `cn-*` marker classes (hooks for a style-variant CSS file this
+    // vendoring doesn't carry, harmless no-ops without it) that
+    // `no-unknown-classes` can't resolve against this kit's own
+    // tokens.css. No `@/...` imports remain here (rewritten to relative
+    // paths at vendoring time - see the upstream note), so the bare-`@/`
+    // ban isn't restated.
+    files: ["src/dashboard/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": "off",
+      "better-tailwindcss/no-unknown-classes": "off",
+      "better-tailwindcss/no-restricted-classes": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "jsx-a11y/label-has-associated-control": "off",
+      "jsx-a11y/alt-text": "off",
+      "jsx-a11y/img-redundant-alt": "off",
+      "jsx-a11y/anchor-is-valid": "off",
+      "jsx-a11y/anchor-has-content": "off",
+      "jsx-a11y/heading-has-content": "off",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-static-element-interactions": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+    },
+  },
+  {
+    // assistant-ui's Elements registry, vendored the same way
+    // (ui/docs/dashboard-upstream.md): its own shadcn/Radix primitives
+    // (src/elements/ui/**) and higher-level Elements both import
+    // lucide-react, radix-ui and the `cn` package by design. No `@/...`
+    // imports remain here either (rewritten to relative paths at
+    // vendoring time, the same reason as the dashboard).
+    files: ["src/elements/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": "off",
+      "better-tailwindcss/no-unknown-classes": "off",
+      "jsx-a11y/no-autofocus": "off",
+      "jsx-a11y/heading-has-content": "off",
+      "jsx-a11y/anchor-has-content": "off",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+    },
+  },
 ];

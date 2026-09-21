@@ -4,6 +4,29 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.0] - ui-v0.5.0
+
+Step 1 of the shell-on-shadcndashboard program (`home/docs/plans/
+shell-on-shadcndashboard-2026-09-21.md`): the vendored snapshots the
+program's visual stand-up builds on, not yet wired into any product.
+
+### Added
+- `src/dashboard/`: shadcndashboard (MIT, commit `6f99c0b0`), the shell,
+  layouts, pages and 55 shadcn/Base UI primitives the stand-up's `/next`
+  routes mount - demo apps, MSW, Tiptap, the "Buy Now" upsell and
+  `isPro` badge, and one of its two icon systems stripped at vendoring.
+  See `docs/dashboard-upstream.md`.
+- `src/elements/`: assistant-ui's Elements registry (MIT), the chat
+  building blocks (thread, thread-list-sidebar, composer, reasoning,
+  tool-call, sources, artifact-card, canvas-split, the voice orb,
+  read-aloud) for the stand-up's `/next/chat` route.
+- `globals.css`'s (in `src/dashboard/css/`) two style presets, `.style-
+  calm`/`.style-studio`, on the template's own body-class mechanism -
+  the palette from `home/docs/design/home-pages-2026-09-20.md`, shared
+  by both looks; only `--tile-radius` differs so far.
+- `NOTICE` and `docs/dashboard-upstream.md` carry both snapshots'
+  attributions and what was stripped or fixed at vendoring.
+
 ## [0.4.9] - ui-v0.4.9
 
 The phone header fold (owner reference, "The phone composition,"

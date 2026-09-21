@@ -1,0 +1,345 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@custom-variant dark (&:is(.dark *));
+
+/* The template's own style-variant mechanism (a body class, layered under
+ * light/dark): Home's two looks, Studio and Calm, ship as named presets on
+ * it. Both read the same palette below (docs/design/home-pages-2026-09-20.md:
+ * "Both are the same components" - the looks differ in geometry, not
+ * color), so the preset blocks near the bottom only override the handful
+ * of tokens that actually differ (tile radius today; more as later wiring
+ * rows need them), never redefine the palette. */
+@custom-variant style-studio (&:where(.style-studio *));
+@custom-variant style-calm (&:where(.style-calm *));
+
+
+/* The template ships Geist via local @font-face files this vendored
+ * snapshot doesn't carry (no font binaries tracked in the kit - see
+ * NOTICE/PACKAGES.md). The kit's own approved stack (tokens.css) stands
+ * in instead of a 404'ing @font-face. */
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --shadow-md: 0 1px 4px rgba(133, 146, 173, 0.2);
+  --shadow-btn-shadow: 0 9px 17.5px rgba(0, 0, 0, 0.05);
+  --radius-lg: 7px;
+  --margin-30: 30px;
+  --text-40: 40px;
+
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* Palette: docs/design/home-pages-2026-09-20.md's navy dark reference and
+ * derived light theme (the same hex values already shipped in the kit's
+ * own tokens.css, ui-v0.4.x) - one palette for both looks, Studio and
+ * Calm (below) only vary geometry on top of it. */
+:root {
+  --background: #f4f7fb;
+  --foreground: #0b1730;
+  --card: #ffffff;
+  --card-foreground: #0b1730;
+  --popover: #e3eaf3;
+  --popover-foreground: #0b1730;
+  --primary: #21a6ff;
+  --primary-foreground: #07111f;
+  --secondary: #e3eaf3;
+  --secondary-foreground: #0b1730;
+  --muted: #e3eaf3;
+  --muted-foreground: #4a5f7a;
+  --accent: #e3eaf3;
+  --accent-foreground: #0b1730;
+  --destructive: #ff4b62;
+  --destructive-foreground: #07111f;
+  --border: #c9d6e6;
+  --input: #c9d6e6;
+  --ring: #21a6ff;
+  --chart-1: #21a6ff;
+  --chart-2: #a434ff;
+  --chart-3: #00e3ae;
+  --chart-4: #ff8a35;
+  --chart-5: #ff3e9a;
+  --radius: 1rem;
+  --sidebar: #eaf0f7;
+  --sidebar-foreground: #0b1730;
+  --sidebar-primary: #21a6ff;
+  --sidebar-primary-foreground: #07111f;
+  --sidebar-accent: #e3eaf3;
+  --sidebar-accent-foreground: #0b1730;
+  --sidebar-border: #c9d6e6;
+  --sidebar-ring: #21a6ff;
+}
+
+.dark {
+  --background: #07111f;
+  --foreground: #f4f8ff;
+  --card: #102238;
+  --card-foreground: #f4f8ff;
+  --popover: #142a43;
+  --popover-foreground: #f4f8ff;
+  --primary: #21a6ff;
+  --primary-foreground: #07111f;
+  --secondary: #142a43;
+  --secondary-foreground: #f4f8ff;
+  --muted: #142a43;
+  --muted-foreground: #a9bed7;
+  --accent: #142a43;
+  --accent-foreground: #f4f8ff;
+  --destructive: #ff4b62;
+  --destructive-foreground: #07111f;
+  --border: #294563;
+  --input: #294563;
+  --ring: #21a6ff;
+  --chart-1: #21a6ff;
+  --chart-2: #a434ff;
+  --chart-3: #00e3ae;
+  --chart-4: #ff8a35;
+  --chart-5: #ff3e9a;
+  --sidebar: #0a1a2e;
+  --sidebar-foreground: #f4f8ff;
+  --sidebar-primary: #21a6ff;
+  --sidebar-primary-foreground: #07111f;
+  --sidebar-accent: #142a43;
+  --sidebar-accent-foreground: #f4f8ff;
+  --sidebar-border: #294563;
+  --sidebar-ring: #21a6ff;
+}
+
+/* Look tokens (owner ruling "Two looks, one setting", 2026-09-20): the
+ * body-class form of the same mechanism the kit's [data-look] version
+ * uses. Calm is the circle tile that already shipped; Studio is the
+ * reference's rounded square (12px, "The Studio look, the numbers",
+ * 2026-09-20 18:15). */
+.style-calm {
+  --tile-radius: 999px;
+}
+.style-studio {
+  --tile-radius: 12px;
+}
+
+
+
+@utility frontend-page {
+  & .container {
+    @apply max-w-[1410px];
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  /*heading text color*/
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold;
+  }
+
+  input[type="radio"]:focus {
+    @apply !ring-primary;
+  }
+
+  input[type="radio"]:checked {
+    @apply bg-primary;
+  }
+}
+
+@utility btn-circle-hover {
+  @apply h-9 w-9 flex justify-center items-center rounded-full hover:bg-primary/5 hover:text-primary cursor-pointer bg-transparent;
+}
+
+/* Card Shadow Control via Data Attribute */
+html[data-card-shadow="true"] [data-slot="card"] {
+  @apply shadow-md ring-0;
+}
+
+html[data-card-shadow="false"] [data-slot="card"] {
+  @apply border shadow-none ring-0;
+}
+
+[data-slot="checkbox"] {
+  /* @apply data-checked:bg-primary data-hover:bg-primary data-checked:border-primary data-checked:text-white; */
+}
+
+[data-slot="input"] {
+  @apply focus-visible:border-primary focus-visible:ring-[0px];
+}
+
+[data-slot="textarea"] {
+  @apply focus-visible:border-primary focus-visible:ring-[0px];
+}
+
+/*for sidebar */
+
+[data-sidebar-type="true"] {
+  /* Only apply the icon-only + hover-preview behavior while the sidebar
+     is actually in its real collapsed ("icon") state. When it's expanded
+     (data-collapsible is empty), labels render normally with no overrides. */
+  [data-slot="sidebar"][data-collapsible="icon"] {
+    .sidebar-box .hide-menu {
+      @apply hidden;
+    }
+
+    .sidebar-box:hover {
+      width: 250px !important;
+      @apply transition-all duration-300;
+
+      [data-slot="sidebar-container"],
+      [data-sidebar="sidebar"],
+      [data-sidebar="sidebar-inner"] {
+        width: 250px !important;
+        transition: width 0.3s ease-in-out !important;
+      }
+
+      .hide-menu {
+        display: flex !important;
+      }
+
+      div.hide-menu {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      span.hide-menu {
+        display: inline-block !important;
+        white-space: nowrap !important;
+      }
+
+      /* Powerfully override Shadcn's internal button restrictions on hover */
+      [data-slot="sidebar-menu-button"],
+      [data-sidebar="menu-button"] {
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+
+        overflow: visible !important;
+        justify-content: flex-start !important;
+      }
+
+
+
+      /* Inner alignment for NavUser and NavSecondary to match standard items */
+      [data-sidebar="menu-button"] .flex.items-center {
+        padding: 8px 12px !important;
+        width: 100% !important;
+        gap: 12px !important;
+      }
+
+
+
+
+    }
+
+    .sidebar-box:not(:hover) {
+
+      /* Ensure icons are perfectly centered in mini mode */
+      [data-sidebar="menu-button"] {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 0 !important;
+        width: 100% !important;
+      }
+
+      [data-sidebar="menu-button"] .flex.items-center {
+        justify-content: center !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        width: 100% !important;
+      }
+
+
+
+    }
+  }
+}
+
+
+[data-slot="chart"] {
+  @apply h-72 w-full;
+}
+
+@utility frontend-page {
+  & .container {
+    @apply max-w-[1410px];
+  }
+}
+
+@utility container {
+  @apply max-w-[1367px] mx-auto;
+}
+
+@theme inline {
+  --animate-scroll: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
+
+  @keyframes scroll {
+    to {
+      transform: translate(calc(-50% - 0.5rem));
+    }
+  }
+
+
+}
