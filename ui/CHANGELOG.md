@@ -4,6 +4,26 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.18] - ui-v0.5.18
+
+LOOK-01's own follow-up: ui-v0.5.17 retired `.style-studio`/`.style-
+calm` (the /next body-class mechanism) but missed the OLD SHELL's own,
+separate `data-look="studio"` mechanism - a real, live styling system
+(the main nav rail's pill margin/height/padding/gap/radius/icon-size/
+font-weight in `blocks/dashboard/components/nav-main.tsx`, plus
+`tokens.css`'s own tile-radius/canvas-background/group-label/divider/
+active-gradient rules), not vendored, not the /next template's own
+convention. Since `data-look` can now never be "studio" again, every
+one of those rules had gone permanently dead the moment ui-v0.5.17
+landed, silently reverting the old shell to whatever Calm's own
+plainer fallback was - and since Studio was the registry default
+every fresh person already saw, that's a real, if belated, regression
+for most people, not a cosmetic one. Fixed the same way as
+ui-v0.5.17: Studio's own values promoted to the unconditional
+selector, Calm's own fallback (where one existed) retired alongside
+it, verified against each rule's own built CSS before promoting it -
+so what's on screen doesn't move for anyone already on the default.
+
 ## [0.5.17] - ui-v0.5.17
 
 LOOK-01 (owner ruling: "I like the black as the default, same as the

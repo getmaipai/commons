@@ -38,18 +38,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* "Two looks, one setting" (owner ruling, 2026-09-20): a second
- * dimension alongside light/dark, applied the same way - a `data-look`
- * attribute on `<html>` (Home's own `useLook.ts`, the `useAppearance.ts`
- * hook's own pattern), a `studio:` Tailwind variant for markup that
- * differs, and look-scoped token overrides below for the rest. No
- * attribute (every other kit consumer - Stack, Catalog, and anything
- * not yet wired to `data-look`) renders exactly what already shipped:
- * "Calm" is the zero-attribute default at the token level so adopting
- * this costs nothing for a product that never sets it. Home's own hook
- * applies `data-look="studio"` immediately (the hub's own default per
- * the ruling), Calm only when a person picks it in Settings. */
-@custom-variant studio (&:is([data-look="studio"] *));
+/* The `studio:` Tailwind variant this declared (a second dimension
+ * alongside light/dark, `data-look="studio"` on `<html>`, "Two looks,
+ * one setting," 2026-09-20) retired with Calm and Studio themselves
+ * (LOOK-01, 2026-09-21) - checked live, nothing in Home's own source
+ * used it as a Tailwind prefix (`studio:size-12` and its siblings in
+ * `AppShell.tsx` were the last ones, promoted to plain unconditional
+ * classes in that same item, since Studio's own values are what the
+ * old shell has always rendered by default in practice). The plain-
+ * CSS `[data-look="studio"]` selectors below lost their own attribute
+ * gate the same way, for the identical reason - see the Look tokens
+ * comment just below. */
 
 @theme {
   --font-sans:
@@ -113,61 +112,57 @@
   --cat-system: var(--hue-teal);
 }
 
-/* Look tokens (owner ruling, "Two looks, one setting"): independent of
- * light/dark, so a person's Calm/Studio choice and their light/dark
- * choice combine freely. Calm at the zero-attribute default (IconTile's
- * emergent circle: --radius-xl on a 40px/32px tile already rounds past
- * half the box - kept as a literal value here instead so a caller never
- * has to know that math); Studio's rounded square is the reference's own
- * 12px. */
+/* Look tokens. LOOK-01 (2026-09-21, owner ruling: "the default is a
+ * named shadcn theme, not a Home name that hides what it is") retired
+ * Calm and Studio from `ui.look`'s own enum - the old shell's
+ * `data-look` attribute (`@/shell/useLook.ts`) can now only ever be
+ * one of the eight surviving values, never "studio" again, so every
+ * `[data-look="studio"]` rule below would otherwise go permanently
+ * unreachable and silently regress the old shell back to Calm's own
+ * plainer geometry (found live reviewing this same item: the rail's
+ * own group-label size, group dividers and active-item gradient all
+ * live here too, not just the tile). Studio's own values move to the
+ * bare, unconditional selector instead of Calm's - the owner's own
+ * reasoning already says why ("the circle tile retires with the old
+ * shell," "the reference design exactly" is the standing look ruling),
+ * and Studio was already the registry default every fresh person saw,
+ * so this is what "unchanged for anyone already on the default" (this
+ * item's own Home-side acceptance) requires here too, not a new
+ * design choice. The reference's own 12px square, not the emergent
+ * circle `--radius-xl` on a 40px/32px tile used to produce. */
 :root {
-  --tile-radius: 999px;
-  --canvas-background: var(--surface-page);
-}
-
-[data-look="studio"] {
   --tile-radius: 12px;
   /* The reference's own subtle radial wash (top-left, fading to the
    * canvas color) - a gradient, not a flat fill, applied by Home's
-   * dashboard to its page background only (the one route Studio's
-   * acceptance judges), not every route's surface-page token itself. */
+   * dashboard to its page background only (the one route Studio's own
+   * acceptance judged), not every route's surface-page token itself. */
   --canvas-background: radial-gradient(ellipse 1200px 800px at 0% 0%, color-mix(in srgb, var(--hue-blue) 8%, var(--surface-page)), var(--surface-page) 60%);
 }
 
-/* Rail look/collapsed-state rules, as plain attribute-selector CSS
- * against the kit's own stable `data-slot`/`data-collapsible`/
- * `data-active` attributes (sidebar.tsx's own DOM), not Tailwind
- * utility classes (owner ruling "Two looks, one setting" and finding
- * "The collapsed rail," both 2026-09-20). Not a Tailwind bug: these
- * classes (`studio:rounded-[10px]`, `studio:text-[11px]`, `studio:mt-2
- * studio:border-t ...`) looked like they were compiling to nothing
- * mid-session, but the real cause was this repo's own `file:` link to
- * `shared` - `bun install --force` snapshots that package's source into
- * bun's content-addressed store at install time (AGENTS.md's own
- * "Pinning" note), so every edit made to shared's tokens.css/nav-
- * main.tsx after the last install was silently invisible to the build
- * until reinstalled. Kept here anyway once diagnosed and fixed,
- * because it sidesteps that whole class of gap for anyone developing
- * this kit against a live consumer: no dependency on remembering to
- * reinstall before trusting what a build shows. The pill's own radius
- * and inset moved to a plain `rounded-[10px] mx-3` class in nav-
- * main.tsx once the rail geometry findings (2026-09-20 17:40) made
- * them shape rules for every item, both looks, not a Studio-only
- * active-state one - what's left here is genuinely look-scoped: the
- * group label's own small-caps size and the expanded divider. */
+/* Rail rules, as plain attribute-selector CSS against the kit's own
+ * stable `data-slot`/`data-collapsible`/`data-active` attributes
+ * (sidebar.tsx's own DOM), not Tailwind utility classes (owner ruling
+ * "Two looks, one setting" and finding "The collapsed rail," both
+ * 2026-09-20). Unconditional since LOOK-01 (2026-09-21): every rule
+ * below used to gate on `[data-look="studio"]`, promoted to plain
+ * selectors the same way `:root`'s own tile-radius/canvas-background
+ * were above (that comment has the full reasoning) - these are the
+ * group label's own small-caps size, the expanded divider, and the
+ * active item's gradient, previously the only genuinely look-scoped
+ * rail rules left once the pill's own radius/inset moved to a plain
+ * class in nav-main.tsx (2026-09-20 17:40's rail geometry findings). */
 /* 10px uppercase, 0.08em tracking, in secondary text (owner findings,
  * "The Studio look, the numbers," 2026-09-20 18:15 - a page built to
- * reproduce the reference's own geometry; this wins over the rougher
- * 11px/17:40 estimate this rule used to carry). No `color` override:
- * a code review (2026-09-13, this same rule's own SidebarGroupLabel
- * call site) already measured the light theme's own --sidebar tokens
- * to land the primitive's default text-sidebar-foreground/75 at
- * 4.48:1, under WCAG AA - #A9BED7 (the reference's own dark-theme
- * secondary text color) was flagged for exactly this, 3.86:1 against
- * the light theme's own panel, by axe's own color-contrast check the
- * first time this ran at `far`/light. The default already carries its
- * own light/dark derivation; this rule only ever needed the size. */
-[data-look="studio"] [data-slot="sidebar-group-label"] {
+ * reproduce the reference's own geometry). No `color` override: a
+ * code review (2026-09-13, this same rule's own SidebarGroupLabel call
+ * site) already measured the light theme's own --sidebar tokens to
+ * land the primitive's default text-sidebar-foreground/75 at 4.48:1,
+ * under WCAG AA - #A9BED7 (the reference's own dark-theme secondary
+ * text color) was flagged for exactly this, 3.86:1 against the light
+ * theme's own panel, by axe's own color-contrast check the first time
+ * this ran at `far`/light. The default already carries its own
+ * light/dark derivation; this rule only ever needed the size. */
+[data-slot="sidebar-group-label"] {
   font-size: 10px;
   letter-spacing: 0.08em;
 }
@@ -175,27 +170,23 @@
  * look, the numbers," 2026-09-20 18:15), inset 7px from the rail's
  * own true edge - owner ruling, ui-v0.4.3, restating "the rail
  * geometry, exactly" 2026-09-20 17:40's own literal number for this
- * element, matching the group label's own px-[7px] (nav-main.tsx).
- * The earlier 13px here came from reconciling this figure to the
- * pills' own inset instead of trusting the owner's own restated
- * number directly; that reconciliation shipped in the capture
- * COORDINATOR's own pixel measurement rejected. */
+ * element, matching the group label's own px-[7px] (nav-main.tsx). */
 /* A `::before` line, not `margin-inline` on the group container
  * itself: a code review (2026-09-20) caught the group-level margin
  * shifting the GROUP's own content too, not just the divider - every
  * pill and label inside a non-first group would end up inset at its
- * own value (nav-main.tsx's own mx-3/studio:mx-[13px]) PLUS this
- * group's own margin, stacking to more than the first group's own
- * inset. The pseudo-element keeps the group's own box at zero margin
- * (so its children's own insets are the only ones that apply, same as
- * the first group) while still positioning the line itself at its own
- * 7px, independent of them. */
-[data-look="studio"] [data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type) {
+ * own value (nav-main.tsx's own `mx-[13px]`) PLUS this group's own margin,
+ * stacking to more than the first group's own inset. The pseudo-
+ * element keeps the group's own box at zero margin (so its children's
+ * own insets are the only ones that apply, same as the first group)
+ * while still positioning the line itself at its own 7px, independent
+ * of them. */
+[data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type) {
   margin-top: 12px;
   padding-top: 12px;
   position: relative;
 }
-[data-look="studio"] [data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type)::before {
+[data-slot="sidebar"]:not([data-collapsible="icon"]) [data-slot="sidebar-group"]:not(:first-of-type)::before {
   content: "";
   position: absolute;
   top: 0;
@@ -207,38 +198,25 @@
 /* The active item's exact reference colors (owner findings, "The
  * Studio look, the numbers," 2026-09-20 18:15): the gradient
  * (`#3E1BB2` to `#311893`), a 1px inset ring `#6E3DF8`, and a soft
- * violet glow - plain CSS, not a stacked `studio:`+
- * `data-[active=true]:` Tailwind variant (this file's own established
- * reason: a stacked custom-variant-plus-attribute-selector combo
- * isn't reliably resolved by `cn()`'s tailwind-merge, the same gap
- * HOME-UI-02c found). Layered over nav-main.tsx's own unconditional
- * `data-[active=true]:bg-gradient-to-br ... from-[var(--hue-violet)]
- * ...` class, which supplies Calm's own (different, untouched)
- * gradient. */
-[data-look="studio"] [data-slot="sidebar-menu-button"][data-active="true"] {
-  background-image: linear-gradient(135deg, #3E1BB2, #311893);
-  box-shadow: inset 0 0 0 1px #6E3DF8, 0 0 12px color-mix(in srgb, #6E3DF8 35%, transparent);
-}
-/* Collapsed active square: a flat `background-color` under everything,
- * a Studio-only gradient `background-image` layered over it - two
- * different CSS properties, so Studio's gradient always paints over
- * the flat color with nothing to override, and Calm is left flat once
- * the layer covering it is gone (the same background-image-over-
- * background-color trick the removed Tailwind attempt was already
- * using, just written directly). */
+ * violet glow - plain CSS, not a `data-[active=true]:` Tailwind
+ * variant (this file's own established reason: a stacked custom-
+ * variant-plus-attribute-selector combo isn't reliably resolved by
+ * `cn()`'s tailwind-merge, the same gap HOME-UI-02c found). Layered
+ * over nav-main.tsx's own unconditional `data-[active=true]:bg-
+ * gradient-to-br ... from-[var(--hue-violet)] ...` class - dead
+ * weight since LOOK-01 (it painted Calm's own, now-unreachable
+ * gradient), unlayered plain CSS beats it regardless either way, so
+ * removing that class is a follow-up cleanup, not required here.
+ * Expanded and collapsed share the identical gradient/shadow, layered
+ * over the collapsed square's own flat `background-color` fallback
+ * (kept as the paint-order base, never visible under the gradient). */
+[data-slot="sidebar-menu-button"][data-active="true"],
 [data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"][data-active="true"] {
-  /* Clears the unconditional `data-[active=true]:bg-gradient-to-br`
-   * Tailwind class (nav-main.tsx) still painting its background-image
-   * here - that class has no look/collapsed gate of its own (Calm's
-   * expanded gradient is meant to stay unconditional), so collapsed
-   * mode has to explicitly turn it back off before Calm can go flat. */
-  background-color: var(--hue-violet);
-  background-image: none;
-  box-shadow: none;
-}
-[data-look="studio"] [data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"][data-active="true"] {
   background-image: linear-gradient(135deg, #3E1BB2, #311893);
   box-shadow: inset 0 0 0 1px #6E3DF8, 0 0 12px color-mix(in srgb, #6E3DF8 35%, transparent);
+}
+[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"][data-active="true"] {
+  background-color: var(--hue-violet);
 }
 /* Lets the row's hit-area pseudo-element (sidebar.tsx's own
  * `hitArea(1)`) actually extend the real, hit-testable click region

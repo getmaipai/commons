@@ -25,10 +25,12 @@ const ICON_SIZE_CLASS: Record<NonNullable<IconTileProps["size"]>, string> = { md
 // soft outer glow. One definition so the four numbers never drift
 // between call sites (implementation reuse standards).
 //
-// `--tile-radius` (tokens.css), not a fixed `rounded-xl`: "Two looks,
-// one setting" (owner ruling, 2026-09-20) draws the same tile as a
-// circle in Calm and a 12px rounded square in Studio - a token swap, not
-// a second component.
+// `--tile-radius` (tokens.css), not a fixed `rounded-xl`: a token, not
+// a second component, the same reason IconTile has stayed one
+// definition since "Two looks, one setting" (owner ruling,
+// 2026-09-20). Unconditionally the reference's own 12px rounded
+// square since LOOK-01 (2026-09-21) - Calm's own circle retired with
+// the look that drew it.
 export function IconTile({ icon, hue, size = "md", glow = true, className }: IconTileProps) {
   const Icon = getIcon(icon);
   return (

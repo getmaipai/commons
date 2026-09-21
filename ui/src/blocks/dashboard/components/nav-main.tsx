@@ -39,14 +39,12 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
     <div data-nav-mode="pinned" className="flex min-h-0 flex-1 flex-col">
       {groups.map((group, index) => (
         <SidebarGroup key={group.label} className="group/nav p-0">
-          {/* The expanded Studio divider (owner ruling, "Two looks, one
+          {/* The expanded divider (owner ruling, "Two looks, one
               setting": "a hairline divider above each group") is plain
-              CSS in tokens.css (`[data-look="studio"] [data-slot=
-              "sidebar"]:not([data-collapsible="icon"]) [data-slot=
-              "sidebar-group"]:not(:first-of-type)`), not a class here -
-              `studio:mt-2 studio:border-t ...` silently compiled to
-              nothing (tokens.css's own comment on that rule has why).
-              Collapsed (owner finding, "The collapsed rail," both
+              CSS in tokens.css (`[data-slot="sidebar"]:not([data-
+              collapsible="icon"]) [data-slot="sidebar-group"]:not(:
+              first-of-type)`, unconditional since LOOK-01), not a class
+              here. Collapsed (owner finding, "The collapsed rail," both
               looks): a short, centered 24px hairline instead, rendered
               directly since it has no expanded-mode equivalent to share
               a selector with. */}
@@ -64,88 +62,73 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
               2026-09-20 - the approved light theme's own --sidebar
               measured this call site's rendered color at 4.48:1, under
               WCAG AA's 4.5:1 floor; /75 matches sidebar.tsx's own bumped
-              default and clears it with real margin).
-              Studio's own 11px small-cap override (owner ruling,
-              2026-09-20 - a knowing exception past this floor, Calm's
-              own default size is the escape hatch for anyone who needs
-              it) is tokens.css's `[data-look="studio"] [data-slot=
-              "sidebar-group-label"]` rule, not a class here, for the
-              same reason as the divider above. */}
-          {/* Owner findings: 20px above a group label, 8px below, at a
-              7px inset from the rail's own edge (px-[7px], both looks,
-              unconditional - owner ruling, ui-v0.4.3, restating "the
-              rail geometry, exactly" 2026-09-20 17:40's own literal
-              number, not the pills' own 12px/mx-3, which an earlier
-              reconciliation had wrongly used here instead). The label
-              sitting ~5px left of the pill below it (its own inset is
-              narrower than theirs) is that same restated number taken
-              literally, not a leftover misalignment: a code review
-              flagged the gap between the two as worth confirming
-              rather than assuming, given this file's own history of
-              mis-deriving this exact number - the owner's restated
-              figure is trusted here because it followed directly from
-              measuring the capture the prior reconciliation shipped
-              in wrong, not from re-deriving it again. The first group
-              carries none of its own top margin: it sits right under
-              the logo block's own pb-6 (app-sidebar.tsx's
-              SidebarHeader), which already supplies the stated 24px.
-              Studio's own 7px below ("The Studio look, the numbers,"
-              2026-09-20 18:15) stays; its own extra top-margin number
-              for the first group is gone along with it, superseded by
-              the same unconditional mt-0 every look now uses there. */}
-          <SidebarGroupLabel className={`${index === 0 ? "mt-0" : "mt-5 studio:mt-[11px]"} mb-2 studio:mb-[7px] h-auto px-[7px] font-semibold tracking-wide text-sidebar-foreground/75 uppercase group-data-[collapsible=icon]:hidden`}>{group.label}</SidebarGroupLabel>
-          <SidebarMenu className="gap-0 studio:gap-[2px]">
+              default and clears it with real margin). font-size stays
+              10px in `[data-slot="sidebar-group-label"]` (tokens.css,
+              unconditional since LOOK-01 - see its own comment), a
+              knowing exception past the type floor (owner ruling,
+              2026-09-20) for this small-cap heading specifically. */}
+          {/* Owner findings: 11px above a non-first group label
+              (mt-[11px]), 7px below (mb-[7px]), at a 7px inset from the
+              rail's own edge (px-[7px], unconditional - owner ruling,
+              ui-v0.4.3, restating "the rail geometry, exactly"
+              2026-09-20 17:40's own literal number, not the pills' own
+              13px/mx-[13px]). The first group carries none of its own
+              top margin: it sits right under the logo block's own
+              pb-6 (app-sidebar.tsx's SidebarHeader), which already
+              supplies the stated 24px. LOOK-01 (2026-09-21): these were
+              the reference's own exact figures, gated behind `studio:`
+              and layered over plainer Calm-only numbers - Calm retired,
+              so the reference's own figures are the only ones left and
+              the gate is gone. */}
+          <SidebarGroupLabel className={`${index === 0 ? "mt-0" : "mt-[11px]"} mb-[7px] h-auto px-[7px] font-semibold tracking-wide text-sidebar-foreground/75 uppercase group-data-[collapsible=icon]:hidden`}>{group.label}</SidebarGroupLabel>
+          <SidebarMenu className="gap-[2px]">
             {group.items.map((item) => {
               const Icon = item.icon ? getIcon(item.icon) : null;
               return (
               <SidebarMenuItem key={item.title}>
-                {/* h-10 (40px) here IS an override of SidebarMenuButton's
-                    own 48px default - a past comment on this exact line
-                    warned against exactly that, from a real regression
-                    (a far/TV a11y sweep once found a size override here
-                    that silently defeated the touch-target floor). Safe
-                    this time only because sidebar.tsx's own `hitArea(1)`
-                    is baked into the button's base classes
-                    unconditionally, and a 4px overhang on each side of a
-                    40px box IS the 48px floor (its own comment: "already
-                    at the floor" was about the default 48px row; h-10
-                    is the row hitArea(1) was sized for, not an escape
-                    from it). mx-3/h-10/gap-3/rounded-[10px] are the base
-                    (both looks): "inset pills, never edge to edge" is a
-                    real bug, not a Studio-only look. `studio:` narrows
-                    every number to the reference-exact figure ("The
-                    Studio look, the numbers," 2026-09-20 18:15, which
-                    wins over the rougher 17:40 estimates this file
-                    used to cite) - 8px radius, 2px between items
-                    (SidebarMenu's own className above), 14px icon-label
-                    gap, 10px vertical padding (h-auto lets it set the
-                    row's real height instead of competing with h-10).
-                    Calm keeps the plainer numbers; it was never given
-                    reference-exact ones of its own. `w-auto` (a code
-                    review, 2026-09-20): SidebarMenuButton's own base
-                    class sets `w-full`, and `width: 100%` plus a
-                    non-auto `margin-left` AND `margin-right` (mx-3 sets
-                    both) is CSS's classic over-constrained block box -
-                    the spec drops `margin-right` to make it fit, not
-                    the width, so the pill's right edge overflowed the
-                    rail's own right edge by exactly its own right
-                    margin. `w-auto` overrides the base `w-full`, letting
-                    the browser compute the real width as "100% minus
-                    both margins," the only value that keeps the box
-                    correctly constrained. */}
+                {/* h-auto (letting the reference's own 10px vertical
+                    padding set the row's real height) here IS an
+                    override of SidebarMenuButton's own 48px default -
+                    a past comment on this exact line warned against
+                    exactly that, from a real regression (a far/TV a11y
+                    sweep once found a size override here that silently
+                    defeated the touch-target floor). Safe only because
+                    sidebar.tsx's own `hitArea(1)` is baked into the
+                    button's base classes unconditionally, and a 4px
+                    overhang on each side of the resulting 40px box IS
+                    the 48px floor. mx-[13px]/rounded-[8px]/gap-[14px]/
+                    py-[10px]/[&>svg]:size-[19px] are the reference's
+                    own exact figures ("The Studio look, the numbers,"
+                    2026-09-20 18:15) - unconditional since LOOK-01
+                    (2026-09-21) retired the `studio:` gate these used
+                    to sit behind, and the plainer Calm-only numbers
+                    they used to override. `w-auto` (a code review,
+                    2026-09-20): SidebarMenuButton's own base class sets
+                    `w-full`, and `width: 100%` plus a non-auto `margin-
+                    left` AND `margin-right` (mx-[13px] sets both) is
+                    CSS's classic over-constrained block box - the spec
+                    drops `margin-right` to make it fit, not the width,
+                    so the pill's right edge overflowed the rail's own
+                    right edge by exactly its own right margin. `w-auto`
+                    overrides the base `w-full`, letting the browser
+                    compute the real width as "100% minus both margins,"
+                    the only value that keeps the box correctly
+                    constrained. */}
                 {/* bg-gradient-to-br from violet to its deeper stop
                     (spec "The style, exactly": "the gradient from
                     section 1's violet to its deeper stop"), not a flat
                     fill - the same treatment the reference's own active
-                    item uses, expanded, both looks; Studio's own exact
+                    item uses, expanded. The reference's own exact
                     gradient stops, inset ring and glow are tokens.css's
-                    plain CSS (this file's own established reason a
-                    stacked `studio:`+`data-[active=true]:` Tailwind
-                    variant can't be trusted to merge - the same
-                    tailwind-merge gap HOME-UI-02c found). The collapsed
-                    flat-vs-gradient split (owner finding, "The
-                    collapsed rail") is there too. */}
-                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="mx-3 studio:mx-[13px] w-auto h-10 studio:h-auto studio:py-[10px] gap-3 studio:gap-[14px] rounded-[10px] studio:rounded-[8px] px-3 [&>svg]:size-5 studio:[&>svg]:size-[19px] data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
+                    plain CSS (unconditional since LOOK-01; this file's
+                    own established reason a stacked `studio:`+`data-
+                    [active=true]:` Tailwind variant couldn't be trusted
+                    to merge - the same tailwind-merge gap HOME-UI-02c
+                    found - no longer applies once there's nothing left
+                    to stack `studio:` with). The collapsed flat-vs-
+                    gradient split (owner finding, "The collapsed rail")
+                    is there too. */}
+                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="mx-[13px] w-auto h-auto py-[10px] gap-[14px] rounded-[8px] px-3 [&>svg]:size-[19px] data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
                   {/* aria-label, not just the visible span below: a
                       collapsed rail (tablet defaults to collapsed,
                       defaultRailOpen()'s own <1280px threshold) hides
@@ -170,11 +153,11 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                         for body copy; a rail nav label, like the group
                         heading above it, is a compact wayfinding label,
                         vertically centered in the pill next to its icon,
-                        not a paragraph a person reads at length. Weight
-                        520 in Studio's own numbers is the kit's "medium"
-                        (font-medium, 500) - the nearest step Tailwind's
-                        default weight scale has. */}
-                    <span className="text-sm studio:font-medium group-data-[collapsible=icon]:hidden">{item.title}</span>
+                        not a paragraph a person reads at length.
+                        font-medium (500, the nearest Tailwind step to
+                        the reference's own 520) is unconditional since
+                        LOOK-01 - previously gated behind `studio:`. */}
+                    <span className="text-sm font-medium group-data-[collapsible=icon]:hidden">{item.title}</span>
                     {item.dot ? <span aria-hidden className={`size-2.5 rounded-full ${DOT[item.dot]}`} /> : null}
                     {item.badge != null && item.badge > 0 && <span className="ml-auto text-xs text-muted-foreground">{item.badge}</span>}
                   </NavLink>
