@@ -5,6 +5,22 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.15] - 2026-09-21
+
+### Changed
+- `ui.look`'s enum drops `studio` and `calm` and shrinks from ten
+  values to eight; the default moves from `studio` to `neutral` (owner
+  ruling, LOOK-01: "the default is a named shadcn theme, not a Home
+  name that hides what it is" - `neutral` is the exact palette
+  `studio` always rendered, so nothing on screen moves for anyone
+  already on the default). `studio`/`calm` were geometry presets over
+  the shared palette; the template's own default geometry already
+  matches what `studio` set, so neither needs a preset anymore. A
+  stored `studio` or `calm` value migrates to `neutral` in the
+  consuming app (getmaipai/home's own
+  `db/migrations/0057_look_studio_calm_to_neutral.sql`), not here -
+  this workspace holds no data of its own to migrate.
+
 ## [spec-v0.1.14] - 2026-09-21
 
 ### Changed

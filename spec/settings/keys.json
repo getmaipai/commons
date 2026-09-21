@@ -659,8 +659,6 @@
     "selector": "select",
     "range": {
       "options": [
-        "studio",
-        "calm",
         "neutral",
         "stone",
         "zinc",
@@ -671,9 +669,9 @@
         "navy"
       ]
     },
-    "default": "studio",
+    "default": "neutral",
     "label": "Look",
-    "help": "Studio matches the reference design exactly. Calm is the same look, rounder tiles. Navy is Home's own blue-black set. The rest are shadcn's own color presets.",
+    "help": "Neutral is the standard black-and-white theme, the same as shadcn's own dashboard; the rest are shadcn's other color sets; Navy is MaiPai's own.",
     "level": "basic",
     "secret": false,
     "lives_in": "profile.appearance",
