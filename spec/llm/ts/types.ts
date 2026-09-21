@@ -59,6 +59,12 @@ export interface ChatMessage {
   /** An assistant message in a request may carry the tool calls it made, so
    * a following `role: "tool"` message can answer each call by id. */
   tool_calls?: ToolCallWire[];
+  /** REASONING-01: only ever present on a RESPONSE message (never sent in
+   * a request) - llama.cpp's own `--reasoning-format deepseek`/`auto`
+   * split for a non-streaming completion, the identical separation
+   * `ChatCompletionChunkDelta.reasoning_content` carries per-chunk for a
+   * streamed one, confirmed live against the pinned b10797 build. */
+  reasoning_content?: string | null;
 }
 
 export function isToolResultMessage(m: ChatMessage): m is ChatMessage & { role: "tool"; tool_call_id: string } {
@@ -208,6 +214,15 @@ export interface ToolCallDelta {
 export interface ChatCompletionChunkDelta {
   role?: ChatRole;
   content?: string | null;
+  /** REASONING-01: llama.cpp's own `--reasoning-format deepseek`/`auto`
+   * split (confirmed live against the pinned b10797 build, 2026-09-21:
+   * a real `enable_thinking: true` request streams reasoning ONLY here,
+   * `content` empty until it's done, no `<think>` tags in either
+   * field) - `chatCompleteStream()` synthesizes the identical
+   * `<think>...</think>` shape `wellFormed.ts`'s whole pipeline already
+   * expects around it, so a caller never needs to know which engine
+   * behavior produced the tags. */
+  reasoning_content?: string | null;
   tool_calls?: ToolCallDelta[];
 }
 

@@ -164,7 +164,13 @@ export class LlamaServerClient {
    * regardless of what the request asked for. Confirmed live against a
    * real llama-server: SSE `data: {...}` lines, a final `data: [DONE]`
    * with no JSON to parse. Works unmodified against stubServer.ts's
-   * canned streaming reply too - both speak the identical line shape. */
+   * canned streaming reply too - both speak the identical line shape.
+   * REASONING-01: a `delta.reasoning_content` (llama.cpp's own
+   * `--reasoning-format deepseek`/`auto` split, confirmed live against
+   * the pinned b10797 build) is synthesized into the same yielded
+   * string as a `<think>...</think>` span, matching what a template
+   * that leaks the tags into `content` already produces - one uniform
+   * shape either way, for wellFormed.ts's whole downstream contract. */
   /** `externalSignal` (COR-7, code review, 2026-09-06): lets a caller
    * cancel generation from OUTSIDE this generator's own control flow - a
    * disconnected HTTP client's ReadableStream.cancel(), say. Calling
@@ -264,6 +270,22 @@ export class LlamaServerClient {
         : [...toolCallsByIndex.entries()]
             .sort(([a], [b]) => a - b)
             .map(([, call]) => ({ id: call.id, type: "function" as const, function: { name: call.name, arguments: call.args } }));
+    // REASONING-01: confirmed live against the pinned b10797 build
+    // (2026-09-21) that a real `enable_thinking: true` request streams
+    // reasoning ONLY through `delta.reasoning_content`, `content` empty
+    // and no `<think>` tags anywhere, until reasoning ends. Synthesizing
+    // the identical `<think>...</think>` shape the whole downstream
+    // pipeline already expects (wellFormed.ts's own contract, built for
+    // a template that leaks the tags into `content` instead) means every
+    // caller of this method keeps working unchanged regardless of which
+    // of the two engine behaviors actually produced the split - an
+    // engine/template that never populates `reasoning_content` (never
+    // sets `reasoningOpen`) yields byte-identical output to before this
+    // change. An open tag with no closing content (a generation that
+    // stops mid-reasoning) is deliberately left unclosed: OPEN_THINK_RE
+    // already treats that as "no visible text yet," the identical shape
+    // a truncated tag-embedded think block already produces.
+    let reasoningOpen = false;
     try {
       for await (const line of readTextLines(reader)) {
         armIdleTimer(); // real activity - push the deadline back out
@@ -303,8 +325,22 @@ export class LlamaServerClient {
         // instead of skipping the one frame, unlike the malformed-JSON
         // case two lines up, which already degrades gracefully.
         const delta = chunk.choices?.[0]?.delta;
+        const reasoning = delta?.reasoning_content;
+        if (reasoning) {
+          if (!reasoningOpen) {
+            yield "<think>";
+            reasoningOpen = true;
+          }
+          yield reasoning;
+        }
         const content = delta?.content;
-        if (content) yield content;
+        if (content) {
+          if (reasoningOpen) {
+            yield "</think>";
+            reasoningOpen = false;
+          }
+          yield content;
+        }
         for (const fragment of delta?.tool_calls ?? []) {
           const existing = toolCallsByIndex.get(fragment.index) ?? { id: "", name: "", args: "" };
           if (fragment.id) existing.id = fragment.id;

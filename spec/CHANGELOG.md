@@ -5,6 +5,22 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.11] - 2026-09-21
+
+### Added
+- `llm/ts/types.ts`'s `ChatCompletionChunkDelta`/`ChatMessage` gain
+  `reasoning_content?: string | null` (REASONING-01): llama.cpp's own
+  `--reasoning-format deepseek`/`auto` split, confirmed live against the
+  pinned b10797 build (a real `enable_thinking: true` request streams
+  reasoning ONLY in this field, `content` empty until it's done, no
+  `<think>` tags anywhere). `llm/ts/client.ts`'s `chatCompleteStream()`
+  synthesizes it into the identical `<think>...</think>` shape
+  `wellFormed.ts`'s whole downstream pipeline already expects around a
+  template that leaks the tags into `content` instead - one uniform
+  shape either way, no caller needs to know which engine behavior
+  produced it. `stubServer.ts` gained `scriptedReasoning` so a test can
+  script either shape.
+
 ## [spec-v0.1.10] - 2026-09-21
 
 ### Fixed

@@ -135,6 +135,56 @@ describe("LlamaServerClient against the stub server", () => {
     expect(streamed).toBe(buffered.choices[0]?.message.content);
   });
 
+  // REASONING-01: confirmed live against the pinned b10797 build
+  // (docs/dev.md's "one thing worth checking before implementation")
+  // that `--reasoning-format`'s default `auto` really does separate
+  // reasoning into `delta.reasoning_content`, `content` empty until
+  // reasoning ends, no `<think>` tags anywhere on the wire - this proves
+  // chatCompleteStream() synthesizes the identical `<think>...</think>`
+  // shape wellFormed.ts's whole downstream pipeline already expects,
+  // whichever engine behavior actually produced the split.
+  test("chatCompleteStream synthesizes <think>...</think> from a scripted reasoning_content", async () => {
+    handle = startStubLlmServer(0, { scriptedReasoning: () => "carry the two", scriptedChatReply: () => "17 times 24 is 408." });
+    const client = new LlamaServerClient(handle.url);
+    const deltas: string[] = [];
+    for await (const delta of client.chatCompleteStream({ model: "chat", messages: [{ role: "user", content: "what's 17 times 24" }] })) {
+      deltas.push(delta);
+    }
+    expect(deltas.join("")).toBe("<think>carry the two</think>17 times 24 is 408.");
+  });
+
+  test("chatCompleteStream with no scripted reasoning yields plain content unchanged (an engine/template that never separates it)", async () => {
+    handle = startStubLlmServer(0, { scriptedChatReply: () => "17 times 24 is 408." });
+    const client = new LlamaServerClient(handle.url);
+    const deltas: string[] = [];
+    for await (const delta of client.chatCompleteStream({ model: "chat", messages: [{ role: "user", content: "what's 17 times 24" }] })) {
+      deltas.push(delta);
+    }
+    expect(deltas.join("")).toBe("17 times 24 is 408.");
+  });
+
+  test("chatCompleteStream leaves an open <think> when reasoning arrives with no content (a truncated generation)", async () => {
+    handle = startStubLlmServer(0, { scriptedReasoning: () => "carry the two" });
+    const client = new LlamaServerClient(handle.url);
+    const deltas: string[] = [];
+    for await (const delta of client.chatCompleteStream({ model: "chat", messages: [{ role: "user", content: "what's 17 times 24" }] })) {
+      deltas.push(delta);
+    }
+    expect(deltas.join("")).toBe("<think>carry the two");
+  });
+
+  // chatComplete() itself is a raw passthrough (no synthesis - that's
+  // chatCompleteStream()'s own job, above): this proves the field
+  // reaches a caller intact, which is what backend's own llm.ts
+  // withSynthesizedThink() (its non-streaming twin) synthesizes from.
+  test("chatComplete (non-streaming) passes reasoning_content through separately from content", async () => {
+    handle = startStubLlmServer(0, { scriptedReasoning: () => "carry the two", scriptedChatReply: () => "17 times 24 is 408." });
+    const client = new LlamaServerClient(handle.url);
+    const response = await client.chatComplete({ model: "chat", messages: [{ role: "user", content: "what's 17 times 24" }] });
+    expect(response.choices[0]?.message.reasoning_content).toBe("carry the two");
+    expect(response.choices[0]?.message.content).toBe("17 times 24 is 408.");
+  });
+
   test("chatCompleteStream throws LlmClientError when the server is unreachable", async () => {
     const client = new LlamaServerClient("http://127.0.0.1:1");
     const drain = async () => {

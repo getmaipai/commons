@@ -51,8 +51,20 @@ function handleChatCompletion(request: ChatCompletionRequest): ChatCompletionRes
  * own output-safety-gate tests, which need a MODEL reply that differs
  * from the input - the default echo can't ever produce that by
  * construction) can override it with any string. */
-function streamChatCompletion(request: ChatCompletionRequest, text: string = stubReplyText(request), stats?: { usage?: ChatCompletionUsage; timings?: ChatCompletionTimings }): ReadableStream<Uint8Array> {
-  const words = text.split(" ");
+/** REASONING-01: `reasoning` (undefined when the request didn't script
+ * one) streams as `delta.reasoning_content` word-by-word BEFORE `text`'s
+ * own `delta.content` words - the exact separated shape confirmed live
+ * against the pinned b10797 build (`--reasoning-format`'s `deepseek`/
+ * `auto` split), never `<think>` tags in either field: this stub proves
+ * client.ts's own synthesis of those tags from `reasoning_content`,
+ * never a template that leaks them into `content` instead (a fixture
+ * fixed string can already cover that fallback case directly). An empty
+ * `text` with a non-empty `reasoning` (a generation that stops before
+ * any visible content) streams reasoning only, then `[DONE]` - the
+ * truncated-think-block case. */
+function streamChatCompletion(request: ChatCompletionRequest, text: string = stubReplyText(request), stats?: { usage?: ChatCompletionUsage; timings?: ChatCompletionTimings }, reasoning?: string): ReadableStream<Uint8Array> {
+  const reasoningWords = reasoning ? reasoning.split(" ") : [];
+  const words = text ? text.split(" ") : [];
   const id = `stub-${Date.now()}`;
   const model = request.model || "stub-chat";
   const encoder = new TextEncoder();
@@ -62,6 +74,10 @@ function streamChatCompletion(request: ChatCompletionRequest, text: string = stu
   return new ReadableStream<Uint8Array>({
     start(controller) {
       controller.enqueue(sseLine({ index: 0, delta: { role: "assistant" }, finish_reason: null }));
+      reasoningWords.forEach((word, i) => {
+        const reasoning_content = i === 0 ? word : ` ${word}`;
+        controller.enqueue(sseLine({ index: 0, delta: { reasoning_content }, finish_reason: null }));
+      });
       words.forEach((word, i) => {
         const content = i === 0 ? word : ` ${word}`;
         controller.enqueue(sseLine({ index: 0, delta: { content }, finish_reason: null }));
@@ -83,7 +99,14 @@ function streamChatCompletion(request: ChatCompletionRequest, text: string = stu
  * accumulation logic under test doesn't care how many pieces arrived,
  * only that they're in order per index. `content` stays empty
  * throughout, the same as a real tool-calling reply. */
-function streamToolCallsCompletion(request: ChatCompletionRequest, toolCalls: ToolCallWire[]): ReadableStream<Uint8Array> {
+// REASONING-01: `reasoning`, when given, streams as `delta.reasoning_content`
+// word-by-word BEFORE the tool-call fragments - a model may think before
+// deciding to call a tool, the real shape a review found broken
+// (turnEngine.ts's peekAndHandle() briefly mistook the reasoning-only
+// prefix for "the model answered in prose, not a tool call"). `content`
+// stays empty throughout either way, the same as a real tool-calling
+// reply with or without reasoning.
+function streamToolCallsCompletion(request: ChatCompletionRequest, toolCalls: ToolCallWire[], reasoning?: string): ReadableStream<Uint8Array> {
   const id = `stub-${Date.now()}`;
   const model = request.model || "stub-chat";
   const encoder = new TextEncoder();
@@ -93,6 +116,10 @@ function streamToolCallsCompletion(request: ChatCompletionRequest, toolCalls: To
   return new ReadableStream<Uint8Array>({
     start(controller) {
       controller.enqueue(sseLine({ index: 0, delta: { role: "assistant", content: null }, finish_reason: null }));
+      (reasoning ? reasoning.split(" ") : []).forEach((word, i) => {
+        const reasoning_content = i === 0 ? word : ` ${word}`;
+        controller.enqueue(sseLine({ index: 0, delta: { reasoning_content }, finish_reason: null }));
+      });
       toolCalls.forEach((call, index) => {
         controller.enqueue(
           sseLine({
@@ -212,6 +239,15 @@ export interface StubLlmServerOptions {
    * that only cares about ordinary replies never has to know this
    * option exists. */
   scriptedToolCalls?: (request: ChatCompletionRequest) => ToolCallWire[] | undefined;
+  /** REASONING-01: a scripted `reasoning_content`, separate from
+   * `scriptedChatReply`'s own `content` - checked on every request
+   * (streaming and non-streaming both), returning `undefined` (or
+   * omitting this option) behaves exactly as before, no reasoning field
+   * anywhere, unaffected. Returning a non-empty string alongside an
+   * empty/`undefined` `scriptedChatReply` result streams reasoning only
+   * (the truncated-think-block case: a generation that stops before any
+   * visible content). */
+  scriptedReasoning?: (request: ChatCompletionRequest) => string | undefined;
 }
 
 /** port 0 lets the OS assign a free port, avoiding a fixed-port clash
@@ -241,15 +277,16 @@ export function startStubLlmServer(port = 0, opts: StubLlmServerOptions = {}): S
         requests.push(body);
         const toolCalls = opts.scriptedToolCalls?.(body);
         if (toolCalls && toolCalls.length > 0) {
+          const toolCallReasoning = opts.scriptedReasoning?.(body);
           if (body.stream) {
-            return new Response(streamToolCallsCompletion(body, toolCalls), {
+            return new Response(streamToolCallsCompletion(body, toolCalls, toolCallReasoning), {
               headers: { "content-type": "text/event-stream" },
             });
           }
           return Response.json({
             id: `stub-${Date.now()}`,
             model: body.model || "stub-chat",
-            choices: [{ index: 0, message: { role: "assistant", content: "", tool_calls: toolCalls }, finish_reason: "tool_calls" }],
+            choices: [{ index: 0, message: { role: "assistant", content: "", ...(toolCallReasoning !== undefined ? { reasoning_content: toolCallReasoning } : {}), tool_calls: toolCalls }, finish_reason: "tool_calls" }],
             usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
           });
         }
@@ -257,16 +294,22 @@ export function startStubLlmServer(port = 0, opts: StubLlmServerOptions = {}): S
         if (req.signal.aborted) abortedRequests += 1;
         activeRequests -= 1;
         const scriptedContent = scripted !== undefined ? (typeof scripted === "string" ? scripted : JSON.stringify(scripted)) : undefined;
+        // REASONING-01: a scripted reasoning with no scripted content
+        // defaults content to "" (a truncated-think-block reply, never
+        // the default echo, which would falsely give it visible text no
+        // real truncated generation would have produced).
+        const reasoningContent = opts.scriptedReasoning?.(body);
         if (body.stream) {
-          return new Response(streamChatCompletion(body, scriptedContent, opts.chatStats), {
+          const text = scriptedContent !== undefined ? scriptedContent : reasoningContent !== undefined ? "" : undefined;
+          return new Response(streamChatCompletion(body, text, opts.chatStats, reasoningContent), {
             headers: { "content-type": "text/event-stream" },
           });
         }
-        if (scriptedContent !== undefined) {
+        if (scriptedContent !== undefined || reasoningContent !== undefined) {
           return Response.json({
             id: `stub-${Date.now()}`,
             model: body.model || "stub-chat",
-            choices: [{ index: 0, message: { role: "assistant", content: scriptedContent }, finish_reason: "stop" }],
+            choices: [{ index: 0, message: { role: "assistant", content: scriptedContent ?? "", ...(reasoningContent !== undefined ? { reasoning_content: reasoningContent } : {}) }, finish_reason: "stop" }],
             usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
           });
         }
