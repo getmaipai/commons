@@ -79,6 +79,19 @@ token already validated as differing (`--tile-radius`: 999px circle vs
 12px square); later wiring rows add more as the design doc's other
 per-look rules (rail, header, cards, type) get built for real.
 
+**Dead CSS upstream, found live (HOME-UI-04b, ui-v0.5.8)**:
+`css/globals.css`'s every `.hide-menu` rule (the main nav row's own way
+of hiding its label/badge/chevron in icon-collapsed mode,
+`layouts/full/vertical/sidebar/nav-items/index.tsx`) lives inside a
+`[data-sidebar-type="true"]` gate that nothing in the template itself,
+or anywhere in this kit, ever sets - unreachable in the vendored file
+as shipped, not something adopting it here turned off. The working
+substitute (`[data-collapsible="icon"] .hide-menu { display: none }`,
+on the real `data-collapsible` state every consumer already sets) lives
+kit-side in `tokens.css`, never in `globals.css` - the vendored file
+stays exactly as upstream ships it, per this doc's own "used exactly as
+it ships" rule.
+
 ## assistant-ui Elements (`ui/src/elements/`)
 
 - Source: `assistant-ui/assistant-ui`'s registry app (`apps/registry`),
