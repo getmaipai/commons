@@ -4,7 +4,31 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
-## [0.5.2] - ui-v0.5.2
+## [0.5.3] - ui-v0.5.3 (supersedes 0.5.2 as well)
+
+`0.5.2`'s fix (adding `@assistant-ui/core` as a sibling dependency,
+leaving `react` at `0.15.18`) only worked in *this* package's own
+install: bun's isolated linker (the default for a workspace, which
+`ui` on its own isn't but every real consumer of it is) gives
+`@assistant-ui/react` its own private, hash-pinned copy of its
+declared `@assistant-ui/core` dependency regardless of what a sibling
+package.json entry says - the same isolation the linker is *for*, just
+working against this particular fix. A sibling declaration can only
+ever affect what a bare `import "@assistant-ui/core"` elsewhere
+resolves to, never what `@assistant-ui/react`'s own internals resolve
+to. There is no way to reach that without `react` itself declaring the
+newer `core` - so `0.5.1`'s original diagnosis (bump `react`) was
+right after all; what was missing was isolating the one *real*
+consumer that couldn't tolerate the side effect (see
+`home`'s own commit pinning `backend`'s `zod` to an exact version for
+its own, matching fix on that side).
+
+### Changed
+- `@assistant-ui/react`: `0.15.18` -> `0.15.21` again (as `0.5.1` did).
+  `@assistant-ui/core` is no longer a direct dependency of this
+  package - `react`'s own `^0.3.20` range covers it without one.
+
+## [0.5.2] - ui-v0.5.2 (superseded by 0.5.3, do not use)
 
 Corrects `0.5.1`: bumping `@assistant-ui/react` to `0.15.21` (to reach a
 newer `@assistant-ui/core`) also bumped that release's own `zod`
