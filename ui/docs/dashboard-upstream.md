@@ -40,8 +40,7 @@ data below never does); one of the two icon systems - `@iconify/react`
 goes, `lucide-react` stays (see "Icon substitutions"); `css/pages/app.css`
 (calendar/demo-page rules, none of it reached by the kept views) and
 `css/styles/style-lyra.css` (a demo-only component-class variant, not a
-palette - Home's own Studio/Calm presets use the same body-class
-mechanism with the design doc's own values, see globals.css); the
+palette); the
 template's local `@font-face` Geist files (no font binaries are tracked -
 `docs/PACKAGES.md` - the kit's existing system-font stack stands in).
 
@@ -69,15 +68,7 @@ navigation. A later wiring row can split the data out of the vendored
 folder if that becomes friction; for now the component's own hardcoded
 import path is the reason it lives here.
 
-**Style presets**: `globals.css` keeps the template's `dark`/`style-<name>`
-custom-variant mechanism. `:root`/`.dark` carry the navy/light palette
-from `docs/design/home-pages-2026-09-20.md` (the same hex values already
-shipped in `ui/tokens.css`, ui-v0.4.x) - one palette for both looks, since
-the design doc's own ruling is "the same components", not a color
-difference. `.style-calm`/`.style-studio` currently override the one
-token already validated as differing (`--tile-radius`: 999px circle vs
-12px square); later wiring rows add more as the design doc's other
-per-look rules (rail, header, cards, type) get built for real.
+**Style presets**: `globals.css` keeps the template's `dark`/`style-<name>` custom-variant mechanism. Since ui-v0.5.13 `:root`/`.dark` carry the template's OWN palette, byte-for-byte from the pinned upstream commit (light and dark, translucent borders included), per the org decision of 2026-09-21 ("the template's own palette is the default look"). `.style-studio` and `.style-calm` are full palette blocks equal to that default and differ only in `--tile-radius` (12px square, 999px circle); `.style-navy` is Home's former navy set from `docs/design/home-pages-2026-09-20.md`, kept as a preset; the seven shadcn base colors are transcribed from ui.shadcn.com. `ui.look` selects among them by body class.
 
 **Dead CSS upstream, found live (HOME-UI-04b, ui-v0.5.8)**:
 `css/globals.css`'s every `.hide-menu` rule (the main nav row's own way
@@ -305,3 +296,5 @@ named gap: `home`'s `/next/chat` row (docs/plans/shell-on-
 shadcndashboard-2026-09-21.md's wiring table) is blocked on it, not on
 anything wrong in `home` itself. See `CHANGELOG.md`'s `0.5.1` through
 `0.5.4` entries for the full trail.
+
+**Kit-side departures from the source (owner-ruled, 2026-09-21).** Three rules in `ui/src/tokens.css`, the kit's own layer, make fills transparent that the template draws: the hairline-grid wrappers (`bg-border` with `p-px`/`gap-px`, ui-v0.5.15), the sidebar panel's border (`[data-slot="sidebar-inner"]`) and the content panel's outline (`[data-slot="sidebar-inset"]`, both ui-v0.5.16). No vendored file is edited; each card keeps its own ring and the header its bottom border. The owner ruled it on a measured side-by-side with shadcndashboard's demo and shadcn's dashboard-01 block ("fewer lines"); the record is `.github/docs/DECISIONS.md`, 2026-09-21. An upstream merge keeps these rules and re-checks them against the new snapshot.
