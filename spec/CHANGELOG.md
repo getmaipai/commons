@@ -5,6 +5,19 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.10] - 2026-09-21
+
+### Fixed
+- `ui.shell.next`'s `level` corrected from `"expert"` to `"advanced"`
+  (COORDINATOR finding): the settings renderer
+  (`commons/ui/src/settings/groupSettings.ts` line 74) drops `"expert"`
+  keys entirely from every group it builds, so nothing ever revealed an
+  `"expert"` key in Settings, at any account level - `ui.shell.next` was
+  unreachable there since it was declared. `"advanced"` surfaces it
+  behind "Show N advanced settings" in the System group instead. No
+  other field changed (`home/backend/scripts/gen-settings-registry.ts`
+  regeneration confirmed as a one-line diff to this file).
+
 ## [spec-v0.1.9] - 2026-09-21
 
 ### Added

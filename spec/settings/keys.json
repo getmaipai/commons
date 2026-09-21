@@ -668,7 +668,7 @@
     "default": false,
     "label": "New shell (preview)",
     "help": "Try the shell and chat on the new design at /next before it becomes the default for everyone in this household.",
-    "level": "expert",
+    "level": "advanced",
     "secret": false,
     "lives_in": "household.system",
     "honoured_by": [
