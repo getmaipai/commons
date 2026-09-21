@@ -4,6 +4,26 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.7] - ui-v0.5.7
+
+Fixes HOME-UI-04b's collapsed-rail finding: the dashboard template's
+collapsed sidebar rendered as a full sidebar cropped to ~60px with
+clipped labels ("Ho", "Cha", "Peo") instead of icon-only. Root cause
+was not missing Tailwind scanning (`home`'s built CSS already carried
+every `group-data-[collapsible=icon]:*` utility `dashboard/components/
+ui/sidebar.tsx` needs) - it was `tokens.css`'s own `[data-slot=
+"sidebar-menu-button"] { overflow: visible; }`, written for this
+file's pre-shadcndashboard `ui/sidebar.tsx` (its `hitArea(1)` overhang)
+but matching the template's identically-`data-slot`'d
+`SidebarMenuButton` too, since this file is imported globally. An
+unlayered plain-CSS rule beats any Tailwind-layered utility regardless
+of source order, so it silently defeated the template's own
+`overflow-hidden`. Scoped with `:not(.sidebar-box ...)` - `.sidebar-box`
+exists only on the template's own sidebar root
+(`dashboard/layouts/full/vertical/sidebar/Sidebar.tsx`), so the
+exclusion targets exactly the component the original rule was written
+for and leaves it untouched.
+
 ## [0.5.6] - ui-v0.5.6
 
 The "Buy Now" upsell shipped in two places, not one - `0.5.0`'s own
