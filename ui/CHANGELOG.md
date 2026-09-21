@@ -4,6 +4,23 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.9] - ui-v0.5.9
+
+The remaining 99 assistant-ui Elements (131 files total under
+`ui/src/elements/`), installed from the default registry flavor
+(dashboard-upstream.md has the full list) - Codex's work
+(`codex/241-all-elements`), taken in as a patch since its own sandbox
+couldn't complete the commons gate (can't copy `file:` deps). `tsc`
+clean, `eslint src` 0 errors (6 pre-existing warnings, all
+`react-hooks/exhaustive-deps` or unused-disable, none new), `bun test`
+382/382, independently re-verified here rather than taken on Codex's
+report alone. One fix on the way in: `ui/src/elements/ui/tooltip.tsx`
+lost its `"use client"` directive somewhere in the install - restored
+for consistency with its sibling Radix-based files (inert in this
+Vite build either way, never a runtime difference, but the vendored
+files should read the same as everywhere else that carries the
+directive).
+
 ## [0.5.8] - ui-v0.5.8
 
 `0.5.7`'s fix only covered the sidebar footer (Help Center,
