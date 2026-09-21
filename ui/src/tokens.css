@@ -235,8 +235,28 @@
  * safe to widen because the label's own truncation lives on the span
  * itself (`[&>span:last-child]:truncate`, sidebar.tsx), never
  * depended on the button's own overflow. Not a Tailwind class here:
- * sidebar.tsx's own comment on this rule has why. */
-[data-slot="sidebar-menu-button"] {
+ * sidebar.tsx's own comment on this rule has why.
+ *
+ * Scoped OFF `.sidebar-box` (HOME-UI-04b, 2026-09-21): this bare
+ * `[data-slot="sidebar-menu-button"]` selector was written for this
+ * file's own `ui/sidebar.tsx` (the pre-shadcndashboard kit sidebar,
+ * hitArea(1) and all), but this file is imported globally by every
+ * consumer of the kit's tokens, and the shadcndashboard template's OWN
+ * SidebarMenuButton (`dashboard/components/ui/sidebar.tsx`) renders
+ * the identical `data-slot="sidebar-menu-button"` - it has no
+ * hitArea(1) and never asked for this. Un-layered plain CSS beats a
+ * Tailwind-layered `overflow-hidden` utility regardless of source
+ * order (CSS cascade layers: any unlayered rule always wins over a
+ * layered one), so this rule silently broke the template's own
+ * collapsed ("icon") sidebar - found live: labels bled past their
+ * 32px icon-only buttons instead of clipping, `home`'s own
+ * `dist/assets/*.css` proving the `group-data-[collapsible=icon]:*`
+ * utilities were present and correct all along; the override was the
+ * only thing wrong. `.sidebar-box` (`dashboard/layouts/full/vertical/
+ * sidebar/Sidebar.tsx`) exists only on the template's own sidebar
+ * root, never on this file's, so excluding it targets exactly the
+ * component this rule was written for. */
+[data-slot="sidebar-menu-button"]:not(.sidebar-box [data-slot="sidebar-menu-button"]) {
   overflow: visible;
 }
 
