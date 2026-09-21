@@ -4,6 +4,16 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.21] - ui-v0.5.21
+
+BRAND-01: `FullLogo`'s and `Logo`'s own asset imports (`darklogo.svg`,
+`whitelogo.svg`, `logoicon.svg`, `logoicon-dark.svg`) now carry MaiPai
+Home's real logo and icon mark instead of the template's own "Shadcn
+Dashboard" wordmark - branding data, not component logic, the same
+class as `sidebaritems.ts`; the components themselves are unchanged.
+The sidebar header's hardcoded `V.1.0` `Badge` (demo content) is
+stripped - a version number belongs to the product showing it.
+
 ## [0.5.20] - ui-v0.5.20
 
 Settings: the person.storage section title (SET-TITLES-01, the

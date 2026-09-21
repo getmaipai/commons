@@ -11,7 +11,6 @@ import {
   SidebarHeader,
 } from '../../../../components/ui/sidebar';
 import { NavUser } from './NavUser';
-import { Badge } from '../../../../components/ui/badge';
 import sidebaritems from './sidebaritems';
 
 const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
@@ -28,7 +27,6 @@ const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
         >
             <SidebarHeader className="p-3 group-data-[state=collapsed]:px-2.5 flex flex-row items-center justify-between border-b border-border">
                 <FullLogo />
-                <Badge className="group-data-[state=collapsed]:hidden" variant={"secondary"}>V.1.0</Badge>
             </SidebarHeader>
 
             <SidebarContent>

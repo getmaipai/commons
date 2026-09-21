@@ -36,7 +36,11 @@ initial vendoring and found live in this stand-up's own acceptance
 captures - a real screenshot caught it, exactly what "every screenshot
 gets looked at" is for); the `isPro` nav badge rendering (the field stays possible
 on `ChildItem`/`MenuItem` only insofar as nothing sets it - the sidebar
-data below never does); one of the two icon systems - `@iconify/react`
+data below never does); the sidebar header's `V.1.0` `Badge`
+(`layouts/full/vertical/sidebar/Sidebar.tsx`, ui-v0.5.21) - a version
+number belongs to the product showing it, and Home's real one already
+has a page (`/next/updates`), not a second, hardcoded, always-stale copy
+in the rail; one of the two icon systems - `@iconify/react`
 goes, `lucide-react` stays (see "Icon substitutions"); `css/pages/app.css`
 (calendar/demo-page rules, none of it reached by the kept views) and
 `css/styles/style-lyra.css` (a demo-only component-class variant, not a
@@ -67,6 +71,27 @@ Manage: Engines, Updates, Repairs, Backups) - not the template's demo
 navigation. A later wiring row can split the data out of the vendored
 folder if that becomes friction; for now the component's own hardcoded
 import path is the reason it lives here.
+
+**Brand assets** (ui-v0.5.21): `assets/images/logos/darklogo.svg`,
+`whitelogo.svg`, `logoicon.svg` and `logoicon-dark.svg` - the four
+files `FullLogo.tsx`'s and `Logo.tsx`'s own import paths point at,
+unmodified - now carry MaiPai Home's real logo and icon mark (from
+`getmaipai/.github/brand/maipai-home-logo-{light,dark}.png` and
+`maipai-home-icon-{light,dark}.png`, resized for a header logo and
+wrapped as an SVG `<image>` so the raster art still fits `FullLogo.tsx`'s
+own `width={100} height={32}` unchanged) instead of the template's own
+"Shadcn Dashboard" wordmark, the same branding-data-not-component-logic
+class `sidebaritems.ts` below already is - never redrawn, per
+`docs/LICENSING.md`'s "third-party assets, download don't vendor" rule
+read the other way: these are MaiPai's own, so the org's usual asset
+pipeline (a release's own logo files, tracked here since the kit is
+what every product's shell reads them through) applies, not a
+substitution needing an upstream-note "stripped" entry. `FullLogo.tsx`
+and `Logo.tsx` stay byte-for-byte. `logoicon.svg`/`logoicon-dark.svg`
+have no current consumer inside `home`'s own `/next` tree (`Logo.tsx`
+itself is never imported there, only by the vendored demo auth forms) -
+swapped anyway so no vendored file under `assets/` still carries the
+template's own branding, in case a later row wires `Logo.tsx` in.
 
 **Style presets**: `globals.css` keeps the template's `dark`/`style-<name>` custom-variant mechanism. Since ui-v0.5.13 `:root`/`.dark` carry the template's OWN palette, byte-for-byte from the pinned upstream commit (light and dark, translucent borders included), per the org decision of 2026-09-21 ("the template's own palette is the default look"). `.style-studio` and `.style-calm` are full palette blocks equal to that default and differ only in `--tile-radius` (12px square, 999px circle); `.style-navy` is Home's former navy set from `docs/design/home-pages-2026-09-20.md`, kept as a preset; the seven shadcn base colors are transcribed from ui.shadcn.com. `ui.look` selects among them by body class.
 
