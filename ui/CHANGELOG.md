@@ -4,6 +4,24 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.17] - ui-v0.5.17
+
+LOOK-01 (owner ruling: "I like the black as the default, same as the
+shadcn dashboard example, but we should be using themes and have a
+black theme as our default" - the default is a named shadcn theme,
+not a Home name that hides what it is). `.style-studio`/`.style-calm`
+(and their `.dark` pairs) retire from `dashboard/css/globals.css`:
+both were geometry-only presets over the exact palette the file's own
+bare `:root`/`.dark` already carries - `neutral` is that identical
+palette, byte-for-byte, so `ui.look`'s new default renders it with no
+preset needed, and the template's own default tile geometry already
+matches what `studio` set. Their now-dead `@custom-variant style-
+studio`/`style-calm` declarations retire alongside them (checked
+live: neither was ever used as a `studio:`/`calm:`-style Tailwind
+prefix in this kit's own source). `ui.look`'s own enum change (spec-
+v0.1.15) and Home's own data migration for stored `studio`/`calm`
+values land in the matching Home-side item, not here.
+
 ## [0.5.16] - ui-v0.5.16
 
 HOME-UI-04f widened: the owner's ruling with a reference picture -

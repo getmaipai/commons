@@ -20,15 +20,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* The template's own style-variant mechanism (a body class, layered under
- * light/dark): Home's two looks, Studio and Calm, ship as named presets on
- * it. Both read the same palette below (docs/design/home-pages-2026-09-20.md:
- * "Both are the same components" - the looks differ in geometry, not
- * color), so the preset blocks near the bottom only override the handful
- * of tokens that actually differ (tile radius today; more as later wiring
- * rows need them), never redefine the palette. */
-@custom-variant style-studio (&:where(.style-studio *));
-@custom-variant style-calm (&:where(.style-calm *));
+/* The template's own style-variant mechanism (a body class, layered
+ * under light/dark): `ui.look`'s eight shadcn-named presets ship this
+ * way (below). `style-studio`/`style-calm` (Tailwind custom variants
+ * for markup that once needed to differ by look) retired with the
+ * enum values themselves (LOOK-01) - checked live first, nothing in
+ * this kit's own source ever used either as a `studio:`/`calm:`-style
+ * utility prefix, only the classes' own CSS custom properties, which
+ * this file's `.style-<name>` blocks below still carry. */
 
 
 /* The template ships Geist via local @font-face files this vendored
@@ -254,177 +253,28 @@
   --sidebar-ring: #21a6ff;
 }
 
-/* Look tokens (owner ruling "Two looks, one setting", 2026-09-20): the
- * body-class form of the same mechanism the kit's [data-look] version
- * uses. Calm is the circle tile that already shipped; Studio is the
- * reference's rounded square (12px, "The Studio look, the numbers",
- * 2026-09-20 18:15).
- *
- * Full palette blocks, not tile-radius alone (found live, HOME-UI-04e:
- * /next rendered Home's old navy hex regardless of the bare `:root`/
- * `.dark` swap above). `@maipai/ui`'s own `tokens.css` carries its OWN
- * bare `:root`/`.dark` (the old shell's default, deliberately still
- * navy - "so the old shell does not shift") and, once a real consumer
- * imports both files under one root (HOME-UI-04e's own point), the two
- * files' same-specificity `:root`/`.dark` rules tie on every shared
- * property; whichever is imported second wins regardless of which
- * file's comment says what "the default" is - Home's `shell/tokens.css`
- * imports `tokens.css` second (its own overrides, further down that
- * file, have to win that same tie), so tokens.css's navy silently beat
- * this file's own upstream swap above on every page, /next included.
- * Every other preset below (neutral through navy) already carries a
- * full block for exactly this reason - it was only Calm and Studio,
- * the two with no color of their own to state, that stayed on the
- * ambient default and inherited this collision. `useNextLook.ts`
- * always puts one `.style-<look>` class on `<body>`, never none, so
- * /next never actually depends on winning the bare-selector tie once
- * these two have their own values - only a true zero-attribute
- * consumer (Stack, Catalog, anything not yet wired to `ui.look`) still
- * reads the bare `:root`/`.dark` swap above. */
-.style-calm {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --tile-radius: 999px;
-}
-.style-studio {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --tile-radius: 12px;
-}
-.dark .style-calm {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-.dark .style-studio {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
+/* `.style-studio`/`.style-calm` (and `.dark` pairs) retired here
+ * (LOOK-01, owner ruling: "the default is a named shadcn theme, not a
+ * Home name that hides what it is"). Both were geometry-only presets
+ * (a 12px tile vs. a circle) layered over the exact palette this
+ * file's own bare `:root`/`.dark` above already carries - `neutral`
+ * (below) is that identical palette, byte-for-byte, so `ui.look`'s new
+ * default renders it with no preset needed at all, and the template's
+ * own default tile geometry already matches what `studio` set. Home's
+ * `frontend/src/shell/useLook.ts` and `next/useNextLook.ts` drop both
+ * names from their own `LOOKS` list in the same item; a stored
+ * `studio`/`calm` value migrates to `neutral` in Home's own database
+ * (`db/migrations/0057_look_studio_calm_to_neutral.sql`), not here -
+ * this file has no data of its own to migrate, only the CSS a value
+ * that no longer exists would have selected. */
 
 /* The seven shadcn base-color presets (ui.shadcn.com/docs/theming's own
  * list, 2026-09-21: Neutral, Stone, Zinc, Mauve, Olive, Mist, Taupe -
  * transcribed from ui.shadcn.com/create's own generated :root/.dark
- * output for each, via a real browser session, not reconstructed) join
- * Studio and Calm on the same style-variant mechanism. Unlike Studio/
- * Calm (geometry only, one shared palette), each of these swaps the full
- * shadcn semantic set - background through sidebar-ring - light and dark
- * both. --radius and --destructive-foreground stay Home's own (radius is
- * a deliberate Home design choice unrelated to color choice; shadcn's own
+ * output for each, via a real browser session, not reconstructed), each
+ * on the same style-variant mechanism. --radius and --destructive-
+ * foreground stay Home's own (radius is a deliberate Home design choice
+ * unrelated to color choice; shadcn's own
  * generated CSS doesn't vary destructive-foreground per base color) - only
  * the tokens shadcn itself varies per base color are set here. */
 .style-neutral {
