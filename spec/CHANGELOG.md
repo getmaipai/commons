@@ -5,6 +5,19 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.13] - 2026-09-21
+
+### Added
+- `settings/keys.json` gains two `notifications.memory.*.telegram`
+  toggle keys, following the `notifications.engines.*.telegram` four
+  keys' own pattern: `memory.updated` (`lib/notificationTypes.ts`) had
+  been `configurable: true` and triggered since getmaipai/home#64 but
+  never had a real settings key, so nobody could opt it into Telegram;
+  `memory.judge_failed` is a new sibling type for the judge's other
+  terminal outcome (the poison guard giving up after repeated
+  extraction failures), the 1:1 backend counterpart to
+  chatMemoryChip.tsx's own pre-existing "failed" chip state.
+
 ## [spec-v0.1.12] - 2026-09-21
 
 ### Changed

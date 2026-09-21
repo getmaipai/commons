@@ -406,6 +406,32 @@
     ]
   },
   {
+    "key": "notifications.memory.judge_failed.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when I have trouble remembering something from our conversation",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "notifications.memory.updated.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when I remember something from our conversation",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "notifications.model.download_failed.telegram",
     "scope": "person",
     "selector": "boolean",
