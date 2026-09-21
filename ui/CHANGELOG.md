@@ -4,6 +4,25 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.1] - ui-v0.5.1
+
+Fixes a version-skew bug the stand-up's own /next/chat wiring found live:
+the vendored Elements (`src/elements/thread.aui.tsx`) are written against
+assistant-ui's current SDK (`ThreadMessage.metadata.modality`, added
+after 0.15.18), which the kit's own pinned `@assistant-ui/react@0.15.18`
+predates. Because `@maipai/ui` is subpath-imported directly with no dist
+build, a consumer's own bundler resolves `@assistant-ui/react` from
+*this* package's own `node_modules` for every file under `src/`
+(including `src/elements/`) - a consumer bumping its own pin doesn't
+reach it, only this package's own pin does.
+
+### Changed
+- `@assistant-ui/react`: `0.15.18` -> `0.15.21`, which brings its own
+  `@assistant-ui/core`/`assistant-cloud` peers forward to the versions
+  the Elements actually type-check and build against (`0.3.20`/`0.2.2`).
+  `@assistant-ui/react-markdown`'s existing `^0.14.14` range already
+  covers the matching `0.14.16`.
+
 ## [0.5.0] - ui-v0.5.0
 
 Step 1 of the shell-on-shadcndashboard program (`home/docs/plans/

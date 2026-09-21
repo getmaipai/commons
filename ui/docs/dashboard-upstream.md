@@ -121,12 +121,21 @@ it from `@assistant-ui/react`'s own `useLocalRuntime` plus a canned
 `ChatModelAdapter`, which is data/glue Home writes itself, not a
 component.
 
-**Known integration risk for the wiring step**: `ui`'s own `tsconfig.json`
-already carries a dual meaning for `@/kit/*` (its own source vs. Home's
-residual kit - see the long comment in `frontend/vite.config.ts` and
-`frontend/tsconfig.json`) because `@maipai/ui` is subpath-imported
-directly with no dist build. `@/elements/*` and `@/dashboard/*` are the
-same class of alias and need the same "who's asking" resolution
-(`resolveHomeKitFile`-style) added to Home's `vite.config.ts` /
-`tsconfig.json` before `/next` routes can import from either - not yet
-done as of this commit.
+**The `@/kit/*` alias risk didn't apply here** - both `src/dashboard/`
+and `src/elements/` were rewritten to plain relative imports at
+vendoring time (see "A CLI/registry mismatch" above and the dashboard's
+own import-path edits), so neither ever used the kit's own `@/*` alias
+in the first place. No change was needed in Home's `vite.config.ts` or
+`tsconfig.json` for this.
+
+**A real version-skew risk did surface, and is what ui-v0.5.1 fixes**:
+`@maipai/ui` is subpath-imported directly with no dist build, so a
+consuming app's bundler resolves bare-package imports inside `src/`
+(`@assistant-ui/react`, `lucide-react`, and so on) starting from *this
+package's own* `node_modules`, not the consumer's - the same reason
+`@/kit/*` needs its "who's asking" resolution, one level further out.
+Concretely: `src/elements/thread.aui.tsx` reads
+`message.metadata.modality`, a field assistant-ui's SDK added after the
+`0.15.18` this kit had pinned; bumping the pin in a *consuming* app's
+own `package.json` did nothing; only bumping it here, in `ui`'s own
+`package.json`, reached the file. See `CHANGELOG.md`'s `0.5.1` entry.
