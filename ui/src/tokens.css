@@ -260,6 +260,30 @@
   overflow: visible;
 }
 
+/* The dashboard template's own main-nav row (`dashboard/layouts/full/
+ * vertical/sidebar/nav-items/index.tsx`) doesn't use SidebarMenuButton
+ * at all - it's a hand-rolled row whose label, badge and chevron all
+ * carry the template's own `hide-menu` class, meant to disappear in
+ * icon-collapsed mode. But every `.hide-menu` rule in the template's
+ * own globals.css lives inside a `[data-sidebar-type="true"]` gate
+ * (`dashboard/css/globals.css`) that nothing in this template, or in
+ * this repo, ever sets on any element - dead, unreachable CSS in the
+ * vendored file itself, not something Home turned off. Found live
+ * (HOME-UI-04b): the main nav's labels rendered in full next to their
+ * icons in icon-collapsed mode, spilling well past the button's own
+ * width, while the sidebar footer's two SidebarMenuButton-based links
+ * (Help Center, Documentation) collapsed correctly once the rule
+ * above was scoped - two independent components, two independent
+ * gaps. This rule supplies the missing base behavior on the real,
+ * working gate (`[data-collapsible="icon"]`) instead of the phantom
+ * `data-sidebar-type` attribute - icon-only, matching the template's
+ * own intended collapsed state; the hover-to-expand mini-sidebar the
+ * gated block also describes is a separate, optional embellishment
+ * nothing asked for and this fix does not add. */
+[data-slot="sidebar"][data-collapsible="icon"] .hide-menu {
+  display: none;
+}
+
 :root {
   /* The light root: the same hues as the dark reference, on light
    * surfaces (spec section 1, program decision 5). Dark is the default

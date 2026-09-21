@@ -4,6 +4,22 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.8] - ui-v0.5.8
+
+`0.5.7`'s fix only covered the sidebar footer (Help Center,
+Documentation - real `SidebarMenuButton` rows). The main nav
+(`dashboard/layouts/full/vertical/sidebar/nav-items/index.tsx`) is a
+different, hand-rolled row that never uses `SidebarMenuButton` at all:
+its label, badge and chevron carry the template's own `hide-menu`
+class, and every rule that would hide `.hide-menu` in `globals.css`
+lives inside a `[data-sidebar-type="true"]` gate nothing in the
+template or this repo ever sets - dead CSS in the vendored file
+itself. Adds the missing base rule on the real, working gate
+(`[data-collapsible="icon"] .hide-menu { display: none; }`) instead of
+the phantom attribute. Icon-only, matching the template's own intended
+collapsed state; does not add the hover-to-expand mini-sidebar the
+same gated block also describes, since nothing asked for that.
+
 ## [0.5.7] - ui-v0.5.7
 
 Fixes HOME-UI-04b's collapsed-rail finding: the dashboard template's
