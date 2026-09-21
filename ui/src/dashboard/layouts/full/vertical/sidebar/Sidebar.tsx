@@ -10,7 +10,6 @@ import {
   SidebarGroup,
   SidebarHeader,
 } from '../../../../components/ui/sidebar';
-import { NavSecondary } from './NavSecondary';
 import { NavUser } from './NavUser';
 import { Badge } from '../../../../components/ui/badge';
 import sidebaritems from './sidebaritems';
@@ -44,7 +43,6 @@ const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
 
             <SidebarFooter className="p-4">
                 <div className="hide-menu flex flex-col gap-2">
-                    <NavSecondary />
                     <NavUser />
                 </div>
             </SidebarFooter>

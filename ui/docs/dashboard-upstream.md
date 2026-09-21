@@ -28,9 +28,13 @@ auth icons) under `assets/`.
 
 **Stripped at vendoring** (not carried into the kit): the three demo apps
 (Blog, Notes, Tickets) and their contexts/routes; Tiptap; MSW and the
-`api/mocks` tree; the fake-data generator (`chance`); the "Buy Now" upsell
-card and its banner image, including the promo footer inside the header's
-profile sheet; the `isPro` nav badge rendering (the field stays possible
+`api/mocks` tree; the fake-data generator (`chance`); the "Buy Now" upsell,
+in both places it shipped - the promo footer inside the header's profile
+sheet, and `NavSecondary.tsx` (the sidebar footer's fake "Basic Plan" usage
+meter and "Upgrade" link to the template's own pricing page, missed at the
+initial vendoring and found live in this stand-up's own acceptance
+captures - a real screenshot caught it, exactly what "every screenshot
+gets looked at" is for); the `isPro` nav badge rendering (the field stays possible
 on `ChildItem`/`MenuItem` only insofar as nothing sets it - the sidebar
 data below never does); one of the two icon systems - `@iconify/react`
 goes, `lucide-react` stays (see "Icon substitutions"); `css/pages/app.css`

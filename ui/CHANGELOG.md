@@ -4,6 +4,21 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.6] - ui-v0.5.6
+
+The "Buy Now" upsell shipped in two places, not one - `0.5.0`'s own
+strip only caught the promo footer inside the header's profile sheet.
+Found live judging this stand-up's own acceptance screenshots (the
+sidebar footer's own "Basic Plan / 70% / 68/100 monthly limit used /
+Upgrade" card, linking to the template's own pricing page): exactly
+the same class of content principle 6 already names, missed the first
+time because it wasn't named `buy-now` like the other one.
+
+### Removed
+- `layouts/full/vertical/sidebar/NavSecondary.tsx` (the sidebar
+  footer's fake usage meter and upgrade link) and its one call site in
+  `Sidebar.tsx`. The sidebar footer now holds only `NavUser`.
+
 ## [0.5.5] - ui-v0.5.5
 
 A real bug, found live capturing the stand-up's own acceptance
