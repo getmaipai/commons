@@ -4,9 +4,10 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/kit/ui/dialog";
 import { DestructiveConfirm } from "@/kit/primitives/DestructiveConfirm";
 import { Button } from "@/kit/ui/button";
+import { Checkbox } from "@/kit/ui/checkbox";
 import { Input } from "@/kit/ui/input";
 import { Skeleton } from "@/kit/ui/skeleton";
-import { cn } from "@/kit/utils";
+import { cn, hitArea } from "@/kit/utils";
 import {
   AuiIf,
   ThreadListItemMorePrimitive,
@@ -19,13 +20,19 @@ import {
   Loader2Icon,
   MoreHorizontalIcon,
   PencilIcon,
+  PinIcon,
+  PinOffIcon,
   PlusIcon,
   SearchIcon,
+  SquareCheckIcon,
   TrashIcon,
+  XIcon,
 } from "lucide-react";
 import {
+  createContext,
   forwardRef,
   Fragment,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -34,18 +41,318 @@ import {
   type FC,
 } from "react";
 
-export const ThreadList: FC = () => {
+/** MaiPai-specific bulk actions this kit component has no native concept
+ * of (assistant-ui's own `RemoteThreadListAdapter` has per-thread
+ * `delete()`, nothing list-wide) - a caller that wants multi-select and
+ * "clear all" supplies these; a caller that doesn't (Stack, Catalog)
+ * leaves `actions` undefined and gets today's single-thread-only rows,
+ * same as before this existed. `clearAll` is separately optional so a
+ * caller can offer batch-delete without a destructive "everything"
+ * button (Home's own case when an admin is viewing someone else's list -
+ * the household's own `clearConversations()` only ever touches the
+ * actor's own threads regardless, so this is belt-and-suspenders UI
+ * gating on top of a hard server-side rule, not the only thing standing
+ * between a click and a cross-person delete). */
+export interface ThreadListActions {
+  batchDelete: (remoteIds: string[]) => Promise<void>;
+  clearAll?: () => Promise<void>;
+}
+
+interface ThreadListSelectionState {
+  selectMode: boolean;
+  selected: ReadonlySet<string>;
+  setSelectMode: (value: boolean) => void;
+  toggleSelected: (remoteId: string) => void;
+  /** Whether this list's adapter actually implements `updateCustom` -
+   * gates the pin button and the More menu's own Pin/Unpin item.
+   * `RemoteThreadListAdapter.updateCustom` is optional in
+   * `@assistant-ui/core`'s own types; without this flag every caller of
+   * this shared component would get a pin control that always throws
+   * (a code review, ui-v0.4.x: "any adapter that doesn't implement
+   * updateCustom gets a pin control that always throws... on every
+   * click, forever"). */
+  pinnable: boolean;
+}
+
+const ThreadListSelectionContext = createContext<ThreadListSelectionState | null>(null);
+
+function useThreadListSelection(): ThreadListSelectionState | null {
+  return useContext(ThreadListSelectionContext);
+}
+
+export const ThreadList: FC<{
+  actions?: ThreadListActions;
+  /** Whether this list's own adapter supports pin/unpin (implements
+   * `updateCustom`) - Home's own `chatThreadListAdapter.ts` does; a
+   * caller whose adapter doesn't should leave this false (the default)
+   * rather than ship a pin control that always fails. */
+  pinnable?: boolean;
+  /** Debounced (300ms) as the search box changes. When provided, the
+   * list is trusted to already be server-filtered for this query (Home's
+   * own adapter re-fetches on query change, message bodies included, not
+   * just titles) - this component stops re-filtering by title on top of
+   * that, which would otherwise hide a message-body-only match. Omit for
+   * the previous client-side, title-only behavior. */
+  onSearchQueryChange?: (query: string) => void;
+}> = ({ actions, pinnable = false, onSearchQueryChange }) => {
   const [search, setSearch] = useState("");
   const hasThreads = useAuiState((s) => s.threads.threadIds.length > 0);
+  const serverSearch = onSearchQueryChange !== undefined;
+
+  // A ref for the latest callback, not a `useEffect` dependency on the
+  // callback itself (a code review, ui-v0.4.x): a typical inline caller
+  // (`onSearchQueryChange={(q) => setQuery(q)}`) creates a new function
+  // every render, which would restart this 300ms timer on every parent
+  // re-render regardless of whether the search text itself changed -
+  // under a fast-enough re-render source (Home's own SSE-fed
+  // notifications, for one), a typed query could go arbitrarily long
+  // without ever reaching the server. `didMountRef` skips the debounced
+  // call that would otherwise fire once on mount with the empty string
+  // every list starts with, a redundant round-trip no keystroke asked for.
+  const onSearchQueryChangeRef = useRef(onSearchQueryChange);
+  onSearchQueryChangeRef.current = onSearchQueryChange;
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    // The mount-skip check comes first, unconditionally (a second code
+    // review pass caught this ordered after the "no callback" check
+    // instead): a caller whose own `onSearchQueryChange` starts
+    // undefined and only becomes real later would never have set
+    // `didMountRef` true on its own actual mount, so the first search
+    // after the callback appeared would have been silently swallowed
+    // as if it were the initial mount call instead of a real one.
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    if (!onSearchQueryChangeRef.current) return;
+    const handle = setTimeout(() => onSearchQueryChangeRef.current?.(search), 300);
+    return () => clearTimeout(handle);
+  }, [search]);
+
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  const selection = useMemo<ThreadListSelectionState>(
+    () => ({
+      selectMode,
+      selected,
+      setSelectMode: (value) => {
+        setSelectMode(value);
+        if (!value) setSelected(new Set());
+      },
+      toggleSelected: (remoteId) =>
+        setSelected((prev) => {
+          const next = new Set(prev);
+          if (next.has(remoteId)) next.delete(remoteId);
+          else next.add(remoteId);
+          return next;
+        }),
+      pinnable,
+    }),
+    [selectMode, selected, pinnable],
+  );
 
   return (
-    <ThreadListRoot>
-      <ThreadListNew />
-      {hasThreads && (
-        <ThreadListSearch value={search} onValueChange={setSearch} />
-      )}
-      <ThreadListItems searchQuery={hasThreads ? search : ""} />
-    </ThreadListRoot>
+    <ThreadListSelectionContext.Provider value={selection}>
+      <ThreadListRoot>
+        <div data-slot="aui_thread-list-toolbar" className="flex items-center gap-1">
+          <ThreadListNew className="flex-1" />
+          {actions && (
+            <ThreadListSelectModeToggle
+              active={selectMode}
+              onToggle={() => selection.setSelectMode(!selectMode)}
+            />
+          )}
+        </div>
+        {/* serverSearch stays visible regardless of the live thread
+            count (a code review, ui-v0.4.x): gating on `hasThreads`
+            alone let the box unmount mid-edit whenever a server-search
+            query's own debounced refetch briefly landed on zero
+            results, dropping focus for the ~300ms until the next
+            (cleared) query's own results came back. */}
+        {(hasThreads || search || serverSearch) && (
+          <ThreadListSearch value={search} onValueChange={setSearch} />
+        )}
+        {actions && selectMode ? (
+          <ThreadListBatchBar actions={actions} onDeleted={() => selection.setSelectMode(false)} />
+        ) : (
+          actions?.clearAll && <ThreadListClearAll clearAll={actions.clearAll} />
+        )}
+        <ThreadListItems searchQuery={search} skipFilter={serverSearch} />
+      </ThreadListRoot>
+    </ThreadListSelectionContext.Provider>
+  );
+};
+
+const ThreadListSelectModeToggle: FC<{ active: boolean; onToggle: () => void }> = ({ active, onToggle }) => {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon-sm"
+      data-slot="aui_thread-list-select-toggle"
+      aria-pressed={active}
+      aria-label={active ? "Exit select mode" : "Select chats"}
+      onClick={onToggle}
+      className="shrink-0"
+    >
+      {active ? <XIcon className="size-4" /> : <SquareCheckIcon className="size-4" />}
+    </Button>
+  );
+};
+
+/** The Dialog/DialogContent/title/description/DestructiveConfirm shape,
+ * pulled out of three call sites in this file (BatchBar's own delete,
+ * ClearAll, and ThreadListItem's own per-thread delete) - `DestructiveConfirm`
+ * itself already exists to kill exactly this duplication (its own header
+ * comment names "ConversationsPage.tsx's batch delete and clear-all" as
+ * two of the four places this shape used to be hand-copied), but that
+ * extraction only ever covered the inner message/buttons, not the outer
+ * Dialog wrapper around it - a code review, ui-v0.4.x, caught this file
+ * re-growing the same duplication it was restoring functions from. */
+const ThreadListConfirmDialog: FC<{
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  message: string;
+  confirmLabel: string;
+  busyLabel: string;
+  busy: boolean;
+  onConfirm: () => void;
+}> = ({ open, onOpenChange, title, description, message, confirmLabel, busyLabel, busy, onConfirm }) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogTitle>{title}</DialogTitle>
+        <DialogDescription>{description}</DialogDescription>
+        <DestructiveConfirm
+          message={message}
+          confirmLabel={confirmLabel}
+          busyLabel={busyLabel}
+          busy={busy}
+          onConfirm={onConfirm}
+          onCancel={() => onOpenChange(false)}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const ThreadListBatchBar: FC<{ actions: ThreadListActions; onDeleted: () => void }> = ({ actions, onDeleted }) => {
+  const aui = useAui();
+  const selection = useThreadListSelection();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const count = selection?.selected.size ?? 0;
+
+  async function handleDelete() {
+    if (!selection) return;
+    setBusy(true);
+    // The delete itself and the post-delete refresh are reported
+    // separately (a code review, ui-v0.4.x): a shared try/catch around
+    // both told a person their chats were still there ("could not
+    // delete") on any reload hiccup after a delete that had already
+    // succeeded - the opposite of true.
+    try {
+      await actions.batchDelete([...selection.selected]);
+    } catch {
+      toast.error("Could not delete the selected chats. Try again.");
+      setBusy(false);
+      return;
+    }
+    setConfirming(false);
+    onDeleted();
+    setBusy(false);
+    try {
+      await aui.threads().reload();
+    } catch {
+      toast.error("Chats were deleted, but the list couldn't refresh. Reload to see the change.");
+    }
+  }
+
+  return (
+    <div
+      data-slot="aui_thread-list-batch-bar"
+      className="flex min-h-12 items-center justify-between gap-2 px-2.5 text-base"
+    >
+      <span data-slot="aui_thread-list-batch-count" className="text-muted-foreground">
+        {count} selected
+      </span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        disabled={count === 0}
+        data-slot="aui_thread-list-batch-delete"
+        onClick={() => setConfirming(true)}
+        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+      >
+        <TrashIcon className="size-4" />
+        Delete selected
+      </Button>
+      <ThreadListConfirmDialog
+        open={confirming}
+        onOpenChange={setConfirming}
+        title={`Delete ${count} chat${count === 1 ? "" : "s"}`}
+        description="This removes the messages in each selected chat. Saved memories remain."
+        message={`Delete ${count} chat${count === 1 ? "" : "s"}?`}
+        confirmLabel="Delete chats"
+        busyLabel="Deleting…"
+        busy={busy}
+        onConfirm={() => void handleDelete()}
+      />
+    </div>
+  );
+};
+
+const ThreadListClearAll: FC<{ clearAll: () => Promise<void> }> = ({ clearAll }) => {
+  const aui = useAui();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function handleClear() {
+    setBusy(true);
+    try {
+      await clearAll();
+    } catch {
+      toast.error("Could not clear your chats. Try again.");
+      setBusy(false);
+      return;
+    }
+    setConfirming(false);
+    setBusy(false);
+    try {
+      await aui.threads().reload();
+    } catch {
+      toast.error("Chats were cleared, but the list couldn't refresh. Reload to see the change.");
+    }
+  }
+
+  return (
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        data-slot="aui_thread-list-clear-all"
+        onClick={() => setConfirming(true)}
+        className="text-destructive hover:bg-destructive/10 hover:text-destructive justify-start gap-2 px-2.5 font-normal"
+      >
+        <TrashIcon className="size-4" />
+        Clear all chats
+      </Button>
+      <ThreadListConfirmDialog
+        open={confirming}
+        onOpenChange={setConfirming}
+        title="Clear all chats"
+        description="This removes every chat's messages. Saved memories remain."
+        message="Clear all chats?"
+        confirmLabel="Clear all"
+        busyLabel="Clearing…"
+        busy={busy}
+        onConfirm={() => void handleClear()}
+      />
+    </>
   );
 };
 
@@ -96,8 +403,8 @@ export const ThreadListRoot: FC<
 };
 
 export const ThreadListItems: FC<
-  ComponentPropsWithoutRef<"div"> & { searchQuery?: string }
-> = ({ className, searchQuery = "", ...props }) => {
+  ComponentPropsWithoutRef<"div"> & { searchQuery?: string; skipFilter?: boolean }
+> = ({ className, searchQuery = "", skipFilter, ...props }) => {
   return (
     <div
       data-slot="aui_thread-list-items"
@@ -108,7 +415,7 @@ export const ThreadListItems: FC<
         <ThreadListSkeleton />
       </AuiIf>
       <AuiIf condition={(s) => !s.threads.isLoading}>
-        <ThreadListItemGroups searchQuery={searchQuery} />
+        <ThreadListItemGroups searchQuery={searchQuery} skipFilter={skipFilter} />
       </AuiIf>
     </div>
   );
@@ -131,8 +438,16 @@ export type ThreadListGroup = { label: string; indices: number[] };
  * Filters the thread list by title and buckets the matches by last activity
  * (Today, Yesterday, Earlier). `groups` is null when no thread carries a
  * date, in which case `filteredIndices` keeps the runtime order.
+ *
+ * `skipFilter` (a caller whose adapter already re-fetches server-side for
+ * the same query, message bodies included): keeps every loaded thread and
+ * only groups by date - filtering by title on top of an already-server-
+ * filtered set would hide a message-body-only match whose title never
+ * contained the query. The `query && filteredIndices.length === 0` "no
+ * chats found" check below still reads correctly in this mode, since it's
+ * then reporting the server's own empty result, not a client re-filter.
  */
-export const useThreadListGroups = (searchQuery = "") => {
+export const useThreadListGroups = (searchQuery = "", skipFilter = false) => {
   const threadIds = useAuiState((s) => s.threads.threadIds);
   const threadItems = useAuiState((s) => s.threads.threadItems);
 
@@ -145,6 +460,7 @@ export const useThreadListGroups = (searchQuery = "") => {
       .map((id, index) => ({ id, index }))
       .filter(
         ({ id }) =>
+          skipFilter ||
           !query ||
           (itemsById.get(id)?.title || "New Chat")
             .toLowerCase()
@@ -176,14 +492,15 @@ export const useThreadListGroups = (searchQuery = "") => {
       }
     }
     return { threadIds, filteredIndices, groups: result };
-  }, [threadIds, threadItems, query]);
+  }, [threadIds, threadItems, query, skipFilter]);
 };
 
-const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
+const ThreadListItemGroups: FC<{ searchQuery?: string; skipFilter?: boolean }> = ({
   searchQuery = "",
+  skipFilter = false,
 }) => {
   const { threadIds, filteredIndices, groups } =
-    useThreadListGroups(searchQuery);
+    useThreadListGroups(searchQuery, skipFilter);
   const query = searchQuery.trim();
 
   if (query && filteredIndices.length === 0) {
@@ -298,16 +615,32 @@ const ThreadListSkeleton: FC = () => {
 
 export const ThreadListItem: FC = () => {
   const isRunning = useAuiState((s) => s.threadListItem.isRunning);
+  // `custom` is `RemoteThreadListAdapter`'s own sanctioned extension
+  // point for per-thread metadata the standard shape has no field for
+  // (types.d.ts: `RemoteThreadMetadata.custom?: Record<string,
+  // unknown>`, `ThreadListItemRuntime.updateCustom()`) - Home's own
+  // adapter reads/writes `custom.pinned` there; this kit component only
+  // ever reads the one key it also writes, generic to any caller that
+  // wants the same convention.
+  const pinned = useAuiState((s) => s.threadListItem.custom?.pinned === true);
+  const remoteId = useAuiState((s) => s.threadListItem.remoteId);
   const [isRenaming, setIsRenaming] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const aui = useAui();
   const title = useAuiState((s) => s.threadListItem.title) ?? "New chat";
+  const selection = useThreadListSelection();
+  const checked = remoteId !== undefined && (selection?.selected.has(remoteId) ?? false);
+
   async function deleteThread() {
     setDeleting(true);
     try { await aui.threadListItem().delete(); setConfirmDelete(false); }
     catch { toast.error("Could not delete this chat. Try again."); }
     finally { setDeleting(false); }
+  }
+  async function togglePin() {
+    try { await aui.threadListItem().updateCustom({ pinned: !pinned }); }
+    catch { toast.error("Could not pin this chat. Try again."); }
   }
   const triggerRef = useRef<HTMLButtonElement>(null);
   const restoreFocusRef = useRef(false);
@@ -318,6 +651,29 @@ export const ThreadListItem: FC = () => {
     triggerRef.current?.focus();
   }, [isRenaming]);
 
+  const pinnable = selection?.pinnable ?? false;
+  // A sibling of the Trigger, not a child: a <button> (the pin toggle)
+  // or the select-mode Checkbox nested inside the Trigger's own
+  // interactive element would be invalid, unclickable HTML - the same
+  // reason ThreadListItemMore already sits outside it, absolutely
+  // positioned at the row's end. This one anchors the row's start
+  // instead, and the Trigger below reserves ps-11 for it unconditionally
+  // (pinned or in select mode) rather than only on hover, since a
+  // pinned thread's own indicator needs to stay visible at rest, not
+  // just on hover like the End side's own "More" button does. `remoteId
+  // !== undefined` on the pin button too (a code review, ui-v0.4.x): a
+  // freshly-created thread has no remote id yet, and
+  // `updateCustom()`'s own runtime throws for a not-yet-initialized
+  // thread regardless - the Checkbox already had this guard, the pin
+  // button didn't. `pinnable &&` on the `pinned` half too (a second
+  // review pass, same item): without it, a caller with `pinnable=false`
+  // reserved this space on every hover (no pin button ever renders to
+  // fill it), or permanently on any thread whose `custom.pinned` happens
+  // to read true from stale data - the two actual pin controls (the
+  // button above, the More menu item below) already gated on
+  // `pinnable`; this is the same gate on the space reserved for them.
+  const showLeadingSlot = selection?.selectMode || (pinnable && pinned);
+
   return (
     <ThreadListItemPrimitive.Root
       data-slot="aui_thread-list-item"
@@ -327,6 +683,31 @@ export const ThreadListItem: FC = () => {
       // floor, one real thread per row.
       className="group hover:bg-muted focus-visible:bg-muted data-active:bg-muted has-focus-visible:bg-muted has-data-[state=open]:bg-muted relative flex h-12 items-center rounded-md transition-colors focus-visible:outline-none"
     >
+      {selection?.selectMode && remoteId !== undefined && (
+        <Checkbox
+          data-slot="aui_thread-list-item-select"
+          aria-label={checked ? `Deselect “${title}”` : `Select “${title}”`}
+          checked={checked}
+          onCheckedChange={() => selection.toggleSelected(remoteId)}
+          className="absolute start-2.5 top-1/2 z-10 -translate-y-1/2"
+        />
+      )}
+      {!selection?.selectMode && pinnable && remoteId !== undefined && (
+        <button
+          type="button"
+          data-slot="aui_thread-list-item-pin"
+          aria-pressed={pinned}
+          aria-label={pinned ? "Unpin chat" : "Pin chat"}
+          onClick={(event) => { event.preventDefault(); event.stopPropagation(); void togglePin(); }}
+          className={cn(
+            hitArea(3),
+            "absolute z-10 start-1.5 top-1/2 flex size-6 -translate-y-1/2 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+            pinned ? "text-primary opacity-100" : "opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100",
+          )}
+        >
+          {pinned ? <PinIcon className="size-3.5 fill-current" /> : <PinIcon className="size-3.5" />}
+        </button>
+      )}
       {isRenaming ? (
         <ThreadListItemRename
           onDone={(restoreFocus) => {
@@ -338,14 +719,24 @@ export const ThreadListItem: FC = () => {
         <ThreadListItemPrimitive.Trigger
           ref={triggerRef}
           data-slot="aui_thread-list-item-trigger"
-          // pe-11 (44px), not pe-9 (36px): a code review caught that
-          // switching the "More options" trigger to icon-xs (above)
-          // grows its own invisible hitArea(3) reach to 42px from the
-          // row's end (end-1.5 + the visual 24px + a 12px overhang),
-          // which pe-9's own 36px no longer clears - a real click in
-          // that 6px band would have hit the invisible more-button
-          // instead of this trigger.
-          className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-base outline-none group-hover:pe-11 group-has-focus-visible:pe-11 group-has-data-[state=open]:pe-11 group-data-active:pe-11 focus-visible:ring-1"
+          // pe-11/ps-11 (44px), not pe-9/ps-9 (36px): a code review
+          // caught that the leading slot's own real invisible reach
+          // (the Checkbox's own `after:-inset-4`, or this pin button's
+          // `hitArea(3)`) lands at 42px from the row's start, the same
+          // 6px-short-of-clearing gap the End side's own "More" button
+          // was already fixed for (ps-9/pe-9's own 36px vs a 42px real
+          // reach) - a click in that band used to land on the invisible
+          // control instead of this trigger.
+          className={cn(
+            "focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-base outline-none group-hover:pe-11 group-has-focus-visible:pe-11 group-has-data-[state=open]:pe-11 group-data-active:pe-11 focus-visible:ring-1",
+            // The hover-only reservation only ever applies to the pin
+            // button's own hover-reveal (an unselected, unpinned row
+            // has nothing else that could appear in this slot on
+            // hover) - gated on `pinnable` for the same reason
+            // `showLeadingSlot` above is: a `pinnable=false` caller has
+            // no control that will ever fill this space, hovered or not.
+            showLeadingSlot ? "ps-11" : pinnable ? "group-hover:ps-11 group-has-focus-visible:ps-11" : undefined,
+          )}
         >
           {isRunning && (
             <Loader2Icon
@@ -363,14 +754,24 @@ export const ThreadListItem: FC = () => {
           {isRunning && <span className="sr-only">Running</span>}
         </ThreadListItemPrimitive.Trigger>
       )}
-      <ThreadListItemMore onRename={() => setIsRenaming(true)} onDelete={() => setConfirmDelete(true)} />
-      <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
-        <DialogContent>
-          <DialogTitle>Delete chat</DialogTitle>
-          <DialogDescription>This removes the messages in this chat. Saved memories remain.</DialogDescription>
-          <DestructiveConfirm message={`Delete “${title}”?`} confirmLabel="Delete chat" busyLabel="Deleting…" busy={deleting} onConfirm={() => void deleteThread()} onCancel={() => setConfirmDelete(false)} />
-        </DialogContent>
-      </Dialog>
+      <ThreadListItemMore
+        pinned={pinned}
+        pinnable={pinnable && remoteId !== undefined}
+        onTogglePin={() => void togglePin()}
+        onRename={() => setIsRenaming(true)}
+        onDelete={() => setConfirmDelete(true)}
+      />
+      <ThreadListConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title="Delete chat"
+        description="This removes the messages in this chat. Saved memories remain."
+        message={`Delete “${title}”?`}
+        confirmLabel="Delete chat"
+        busyLabel="Deleting…"
+        busy={deleting}
+        onConfirm={() => void deleteThread()}
+      />
     </ThreadListItemPrimitive.Root>
   );
 };
@@ -447,7 +848,7 @@ const ThreadListItemRename: FC<{
   );
 };
 
-const ThreadListItemMore: FC<{ onRename: () => void; onDelete: () => void }> = ({ onRename, onDelete }) => {
+const ThreadListItemMore: FC<{ pinned: boolean; pinnable: boolean; onTogglePin: () => void; onRename: () => void; onDelete: () => void }> = ({ pinned, pinnable, onTogglePin, onRename, onDelete }) => {
   return (
     <ThreadListItemMorePrimitive.Root sharedFocusGroup>
       <ThreadListItemMorePrimitive.Trigger asChild>
@@ -480,6 +881,16 @@ const ThreadListItemMore: FC<{ onRename: () => void; onDelete: () => void }> = (
             touch-target/type floor sweep as the rest of this file -
             this menu is @assistant-ui/react's own primitive, not the
             kit's DropdownMenuItem, so it never inherited that fix). */}
+        {pinnable && (
+          <ThreadListItemMorePrimitive.Item
+            data-slot="aui_thread-list-item-more-item"
+            className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex min-h-12 cursor-pointer items-center gap-2 rounded-lg px-2.5 text-base outline-none select-none"
+            onSelect={onTogglePin}
+          >
+            {pinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
+            {pinned ? "Unpin" : "Pin"}
+          </ThreadListItemMorePrimitive.Item>
+        )}
         <ThreadListItemMorePrimitive.Item
           data-slot="aui_thread-list-item-more-item"
           className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex min-h-12 cursor-pointer items-center gap-2 rounded-lg px-2.5 text-base outline-none select-none"

@@ -4,6 +4,60 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.4.6] - ui-v0.4.6
+
+Restores ConversationsPage's own real functions into the thread list
+(`ThreadList`, `ThreadListItem`), for Home's HOME-UI-02e: multi-select
+with batch delete and a "clear all," pin/unpin on the row and its More
+menu, and a caller-driven server-search mode so a caller whose own
+adapter already searches message bodies isn't re-filtered client-side
+by title on top of that.
+
+### Added
+- `ThreadListActions` (`batchDelete`, optional `clearAll`) and a new
+  `actions` prop on `ThreadList` - opt-in, so a caller that doesn't
+  supply it (Stack, Catalog) keeps today's single-thread-only rows.
+  Multi-select state (a select-mode toggle, per-row checkboxes, a batch
+  bar) is internal to this file.
+- Pin/unpin, on the row (a small toggle, always visible when pinned)
+  and in `ThreadListItemMore`'s own menu - piggybacks on
+  `RemoteThreadListAdapter`'s own `custom`/`updateCustom` extension
+  point (`@assistant-ui/core`'s own sanctioned shape for exactly this),
+  not a new adapter method. Gated behind a new `pinnable` prop on
+  `ThreadList`, since `updateCustom` is optional on the adapter type -
+  a caller that doesn't implement it doesn't get a pin control that
+  always fails.
+- `onSearchQueryChange` prop, debounced 300ms - a caller with its own
+  server-side search passes this and the list is trusted to already be
+  filtered (title and anything else the caller's own adapter matches),
+  skipping this component's client-side title-only re-filter.
+  `useThreadListGroups` gained a `skipFilter` argument for this.
+
+### Fixed (found across two rounds of code review before landing)
+- The leading-slot reserved space (the checkbox or pin button) was
+  36px against a real ~42px invisible hit-area reach - widened to 44px
+  (`ps-11`), mirroring the End side's own existing `pe-9`→`pe-11` fix.
+- That same reservation, and the pin button itself, weren't guarded
+  against a not-yet-initialized thread (no remote id yet) or against a
+  caller with `pinnable=false` - both now check `remoteId !== undefined`
+  and `pinnable` before rendering or reserving anything.
+- A destructive action's own success and the list-refresh that follows
+  it shared one try/catch, so a reload failure after a successful
+  batch-delete or clear-all was reported as the delete having failed.
+  Split, with its own less alarming message.
+- The debounce restarted on every parent re-render of an unmemoized
+  `onSearchQueryChange` callback (a typical inline arrow function), not
+  just on real search-text changes - now reads the latest callback via
+  a ref instead of depending on its identity, and skips the one
+  redundant call that used to fire on mount.
+- The pin button's own touch target used a hand-rolled inset instead of
+  the file's own established `hitArea(3)` helper, landing 8px under the
+  48px floor.
+- The `Dialog`/confirm/busy wrapper around `DestructiveConfirm` was
+  re-duplicated three times in this file - the exact shape
+  `DestructiveConfirm` was extracted to kill. Pulled into one
+  `ThreadListConfirmDialog`.
+
 ## [0.4.5] - ui-v0.4.5
 
 `ThingsTable`'s `rowActions`/`groupActions` prop had never had a real
