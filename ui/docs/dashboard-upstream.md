@@ -128,51 +128,40 @@ own import-path edits), so neither ever used the kit's own `@/*` alias
 in the first place. No change was needed in Home's `vite.config.ts` or
 `tsconfig.json` for this.
 
-**A real version-skew risk did surface, and is what ui-v0.5.3 fixes**:
-`@maipai/ui` is subpath-imported directly with no dist build, so a
-consuming app's bundler resolves bare-package imports inside `src/`
-(`@assistant-ui/react`, `lucide-react`, and so on) starting from *this
-package's own* `node_modules`, not the consumer's - the same reason
-`@/kit/*` needs its "who's asking" resolution, one level further out.
-Concretely: `src/elements/thread.aui.tsx` reads
+**A real version-skew risk did surface, and ui-v0.5.4 names it as a
+gap rather than fixing it**: `src/elements/thread.aui.tsx` reads
 `message.metadata.modality`, a field `@assistant-ui/core` added after
-the `0.3.17` `@assistant-ui/react@0.15.18` was originally built
-against. Three things had to be true together before this actually
-worked in a real consumer, not just in this package's own install:
+the `0.3.17` this package's own `@assistant-ui/react@0.15.18` was
+built against, so the Elements can't actually be exercised at that
+pin. Bumping `@assistant-ui/react` (tried as `0.5.1`, `0.5.2`, `0.5.3`
+in turn) looked like the fix, but this package already ships its own
+hand-built assistant-ui wrapper components (`src/assistant-ui/`,
+predating this program) in production use by Home's real chat page,
+and every file in this package shares ONE nested `@assistant-ui/react`
+resolution - a consumer's own bundler resolves bare-package imports
+inside `src/` starting from *this package's own* `node_modules`, not
+the consumer's (the same reason `@/kit/*` needs its own "who's
+asking" resolution, one level further out). Bumping it for the *new*
+Elements silently moved the *existing* wrapper components' internal
+React context to a different module instance than the one Home's own
+`ChatPage.tsx` imports directly (left at `0.15.18`, since nothing
+told it to move) - one React tree, two different
+`AssistantRuntimeProvider` instances, invisible to `tsc` and to this
+package's own tests, found only once a real consumer's full frontend
+test suite ran end to end (18 failures, "requires an AuiProvider").
+`0.5.3`'s own attempt also rippled `zod` into an unrelated consumer's
+backend along the way (13 more failures there, unrelated to
+assistant-ui entirely) before this deeper problem was even found.
 
-1. `@assistant-ui/react` itself has to declare the newer `core` - a
-   sibling `package.json` entry for `@assistant-ui/core` (tried in
-   `ui-v0.5.2`) only changes what a *bare* `import "@assistant-ui/
-   core"` resolves to; it can't reach into `@assistant-ui/react`'s own
-   internal resolution of its own dependency. That internal resolution
-   is exactly what `thread.aui.tsx` (a file inside `@assistant-ui/
-   react`'s own dependency tree, not this package's) depends on.
-   `0.5.2`'s fix only ever worked by accident, in this package's own
-   non-workspace install, where bun's classic hoisting happened to let
-   the sibling win; every real consumer is a bun *workspace*, where the
-   isolated linker gives `@assistant-ui/react` its own private,
-   hash-pinned dependency regardless of any sibling declaration - the
-   same isolation that linker exists to provide, just working against
-   this particular fix. So the actual fix is `ui-v0.5.1`'s original
-   one: bump `@assistant-ui/react` itself (to `0.15.21`, which declares
-   `^0.3.20` on its own).
-2. That bump also moves `@assistant-ui/react`'s own `zod` dependency to
-   `^4.6.5`. A consuming app that shares one bun workspace lockfile
-   across a frontend and a backend (Home does) will see that ripple
-   into the backend's own top-level `zod` resolution too, breaking
-   anything there built against an older major/minor (`@modelcontextprotocol/
-   sdk` and `@hono/zod-openapi` in Home's case - 13 unrelated test
-   failures across the turn engine, safety boundaries, widgets and the
-   Deno sandbox). The consumer's own fix is to pin its backend's `zod`
-   to an *exact* version matching what it already had, forcing the
-   isolated linker to keep it a separate, unaffected instance from
-   whatever the frontend's `@assistant-ui/react` now needs - the same
-   isolation mechanism that caused problem 1, deliberately used this
-   time instead of fought.
-3. This package's own dependents that aren't `react`'s own internals
-   (this package's other files, or a consumer's own bare imports) don't
-   need any change - they were never affected either way.
-
-See `CHANGELOG.md`'s `0.5.1`, `0.5.2` and `0.5.3` entries for the full
-trail (right diagnosis and wrong fix, then a fix that only worked by
-local accident, then this one).
+There is no version of `@assistant-ui/react` this package can pin
+today that serves both consumers (the existing wrappers, pinned to
+wherever Home's shipped `ChatPage.tsx` already is, and the new
+Elements, needing whatever version first shipped `modality`) without
+a real, coordinated SDK upgrade - this package's wrappers, Home's own
+import, and Home's full test suite bumped and re-verified together,
+not a version bump inside a kit-vendoring patch. `ui-v0.5.4` reverts
+to `0.15.18` (matching what's already shipped) and records this as a
+named gap: `home`'s `/next/chat` row (docs/plans/shell-on-
+shadcndashboard-2026-09-21.md's wiring table) is blocked on it, not on
+anything wrong in `home` itself. See `CHANGELOG.md`'s `0.5.1` through
+`0.5.4` entries for the full trail.

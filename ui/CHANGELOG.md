@@ -4,6 +4,46 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.4] - ui-v0.5.4 (reverts 0.5.1 and 0.5.3; the actual conclusion)
+
+`0.5.3`'s bump broke something `0.5.1` didn't even reach: this package
+already ships its own hand-built assistant-ui wrapper components
+(`src/assistant-ui/`, predating the shadcndashboard/Elements program),
+already in production use by Home's real chat page. Every one of them
+shares this package's own single nested `@assistant-ui/react`
+resolution - so bumping it for the *new* Elements moved the *existing*
+wrapper components' internal React context to a different module
+instance than the one Home's own `ChatPage.tsx` imports directly
+(bare `@assistant-ui/react`, left at `0.15.18` throughout `0.5.1`-
+`0.5.3` since nothing asked it to move). One React tree, two different
+`AssistantRuntimeProvider`/`useAuiState` instances: found live as 18
+frontend test failures ("You are using a component or hook that
+requires an AuiProvider") the moment a consumer's full test suite ran
+end to end, not just its typecheck.
+
+There is no version of `@assistant-ui/react` this package can pin
+today that serves both consumers at once: the existing wrapper
+components need to stay exactly wherever Home's already-shipped chat
+page's own direct import is, and the new Elements need whatever
+version actually has `ThreadMessage.metadata.modality`. Reconciling
+that needs a real, coordinated SDK upgrade (this package's wrappers,
+Home's own `ChatPage.tsx` import, and Home's full test suite bumped
+and re-verified together), not a kit-vendoring patch - named as a gap
+for that upgrade rather than solved here.
+
+### Changed
+- `@assistant-ui/react`: back to `0.15.18` (as it was before `0.5.1`,
+  and as `src/assistant-ui/`'s existing wrappers and Home's real chat
+  page already depend on it being).
+
+### Known gap
+- `src/elements/thread.aui.tsx` (and anything else in `src/elements/`
+  that reads a `@assistant-ui/core` field added after `0.3.17`) cannot
+  be exercised by a consumer yet - not a rendering bug, a real,
+  unresolved SDK-version floor. `home`'s `/next/chat` row (docs/plans/
+  shell-on-shadcndashboard-2026-09-21.md's wiring table) is blocked on
+  this, not on anything in that repo.
+
 ## [0.5.3] - ui-v0.5.3 (supersedes 0.5.2 as well)
 
 `0.5.2`'s fix (adding `@assistant-ui/core` as a sibling dependency,
