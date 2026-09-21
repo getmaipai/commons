@@ -384,6 +384,44 @@ export const Recipe = z
               .describe(
                 "Sets the result's ask field (result.schema.json, 4.5) so a recipe that can't disambiguate on its own (\"which Springfield\") can ask a deterministic follow-up instead of guessing or failing outright. Always the recipe's last step: nothing after an ask step can run in the same pass, since there is nothing left to compute until the follow-up answer arrives on a later turn.",
               ),
+            z
+              .object({
+                op: z.literal("artifact"),
+                /**Binds the raw {id, version} result into the recipe's variable scope under this name. The step also binds two flat scope keys directly, scope.artifact_id and scope.artifact_version - interpolate() has no dotted-path support, so a later format step's data mapping (which only ever reads flat top-level scope vars) needs them there, not nested under `as`.*/
+                as: z
+                  .string()
+                  .describe(
+                    "Binds the raw {id, version} result into the recipe's variable scope under this name. The step also binds two flat scope keys directly, scope.artifact_id and scope.artifact_version - interpolate() has no dotted-path support, so a later format step's data mapping (which only ever reads flat top-level scope vars) needs them there, not nested under `as`.",
+                  ),
+                /**May reference input/variable names in {braces}. Always required, even on an update - the model resends its own current title rather than the interpreter threading an optional-on-update case through the templating layer.*/
+                title: z
+                  .string()
+                  .describe(
+                    "May reference input/variable names in {braces}. Always required, even on an update - the model resends its own current title rather than the interpreter threading an optional-on-update case through the templating layer.",
+                  ),
+                /**May reference input/variable names in {braces}. Ignored by host.artifact.update (an existing artifact's kind never changes) but still required on every call, for the same reason `title` is.*/
+                kind: z
+                  .string()
+                  .describe(
+                    "May reference input/variable names in {braces}. Ignored by host.artifact.update (an existing artifact's kind never changes) but still required on every call, for the same reason `title` is.",
+                  ),
+                /**May reference input/variable names in {braces}. The full new content of this version, never a patch.*/
+                body: z
+                  .string()
+                  .describe(
+                    "May reference input/variable names in {braces}. The full new content of this version, never a patch.",
+                  ),
+                /**Names a scope variable to read DIRECTLY (scope[id_from]), the same bare-name convention pick's own "from" field already uses, not interpolate()'s templating path - interpolate() leaves an unresolved {name} as the literal string rather than resolving to undefined, which cannot tell a genuinely unset variable apart from a real answer that happens to look like that string. Whether the named variable is bound is the create-vs-update discriminator: unbound calls host.artifact.create, bound calls host.artifact.update with that value as artifact_id.*/
+                id_from: z
+                  .string()
+                  .describe(
+                    "Names a scope variable to read DIRECTLY (scope[id_from]), the same bare-name convention pick's own \"from\" field already uses, not interpolate()'s templating path - interpolate() leaves an unresolved {name} as the literal string rather than resolving to undefined, which cannot tell a genuinely unset variable apart from a real answer that happens to look like that string. Whether the named variable is bound is the create-vs-update discriminator: unbound calls host.artifact.create, bound calls host.artifact.update with that value as artifact_id.",
+                  ),
+              })
+              .strict()
+              .describe(
+                "Calls host.artifact.create or host.artifact.update (permission artifact:write) - the sanctioned way a Tier 0 recipe writes a live chat artifact-card/canvas-split document. turnEngine.ts's own tool-call path assumes a real catalog package for every check it runs; a Tier 1 handler.ts has zero DB access to write one itself, so this recipe primitive is the one sanctioned path, the same role remember_step already plays for host.memory.remember.",
+              ),
           ];
           const { errors, failed } = schemas.reduce<{
             errors: z.core.$ZodIssue[];

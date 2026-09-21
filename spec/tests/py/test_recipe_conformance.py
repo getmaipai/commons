@@ -9,7 +9,12 @@ from pathlib import Path
 
 import pytest
 
-from emulators.py.host_emulator import HostEmulator, MemoryRecordLike
+from emulators.py.host_emulator import (
+    ArtifactRecordLike,
+    HostEmulator,
+    HostError,
+    MemoryRecordLike,
+)
 from gen.py.recipe_schema import Recipe
 from interpreters.py.recipe_interpreter import run_recipe
 
@@ -34,6 +39,22 @@ async def test_recipe_conformance(fixture_path: Path):
         host.seed_memory([MemoryRecordLike(**record)])
     if fixture["host_setup"].get("shopping_list"):
         host.seed_shopping_list(fixture["host_setup"]["shopping_list"])
+    if fixture["host_setup"].get("artifacts"):
+        host.seed_artifacts(
+            [
+                ArtifactRecordLike(**record)
+                for record in fixture["host_setup"]["artifacts"]
+            ]
+        )
+
+    # A fixture proving a host method throws (host.artifact.update's own
+    # not_found/invalid_input) - mutually exclusive with `expected`: the
+    # run is expected to raise rather than produce a result.
+    if "expected_error" in fixture:
+        with pytest.raises(HostError) as exc_info:
+            await run_recipe(recipe, fixture["inputs"], host)
+        assert exc_info.value.code == fixture["expected_error"]["code"]
+        return
 
     result = await run_recipe(recipe, fixture["inputs"], host)
 

@@ -33,6 +33,17 @@ class LogEntry:
     fields: dict[str, Any]
 
 
+@dataclass
+class ArtifactRecordLike:
+    id: str
+    title: str
+    kind: str
+    body: str
+    version: int
+    parent_version: str | None
+    is_current: bool
+
+
 _REDACTED = "[redacted]"
 
 
@@ -84,6 +95,65 @@ class _MemoryNamespace:
             }
         )
         return record_id
+
+
+class _ArtifactNamespace:
+    """ARTIFACT-02: the sanctioned way a Tier 0 recipe writes a live chat
+    artifact-card/canvas-split document - the same role memory plays for
+    host.memory.remember. Synchronous like remember, not fetch: the real
+    host (packageHost.ts) backs this with the same synchronous SQLite
+    writer lib/artifacts.ts's createArtifact/updateArtifact already use.
+    Must stay behaviorally identical to host-emulator.ts's own twin
+    class."""
+
+    def __init__(self, host: HostEmulator):
+        self._host = host
+
+    def create(self, title: str, kind: str, body: str) -> dict[str, Any]:
+        artifact_id = self._host._gen_id("art")
+        self._host._artifact_store.append(
+            {
+                "id": artifact_id,
+                "title": title,
+                "kind": kind,
+                "body": body,
+                "version": 1,
+                "parent_version": None,
+                "is_current": True,
+            }
+        )
+        return {"id": artifact_id, "version": 1}
+
+    def update(self, artifact_id: str, title: str, body: str) -> dict[str, Any]:
+        current = next(
+            (a for a in self._host._artifact_store if a["id"] == artifact_id), None
+        )
+        if current is None:
+            raise HostError("not_found", f"no artifact version {artifact_id}")
+        # Editing a historical version is not a supported move (there is
+        # nothing to "redo forward" to) - the same 409-shaped failure
+        # lib/artifacts.ts's own updateArtifact() returns, mapped to
+        # invalid_input rather than a bespoke code.
+        if not current["is_current"]:
+            raise HostError(
+                "invalid_input",
+                f"{artifact_id} is not the current version - it was already superseded",
+            )
+        current["is_current"] = False
+        new_id = self._host._gen_id("art")
+        version = current["version"] + 1
+        self._host._artifact_store.append(
+            {
+                "id": new_id,
+                "title": title,
+                "kind": current["kind"],
+                "body": body,
+                "version": version,
+                "parent_version": current["id"],
+                "is_current": True,
+            }
+        )
+        return {"id": new_id, "version": version}
 
 
 class _ActionNamespace:
@@ -261,6 +331,7 @@ class HostEmulator:
         self._config_values: dict[str, Any] = {}
         self._secrets: list[str] = []
         self._memory_store: list[dict[str, Any]] = []
+        self._artifact_store: list[dict[str, Any]] = []
         self._files_store: dict[str, Any] = {}
         self._next_id = 1
 
@@ -275,6 +346,7 @@ class HostEmulator:
         self._shopping_list: list[dict[str, Any]] = []
 
         self.memory = _MemoryNamespace(self)
+        self.artifact = _ArtifactNamespace(self)
         self.action = _ActionNamespace(self)
         self.home = _HomeNamespace(self)
         self.integration = _IntegrationNamespace(self)
@@ -307,6 +379,30 @@ class HostEmulator:
                 }
             )
 
+    def seed_artifacts(self, records: list[ArtifactRecordLike]) -> None:
+        """Test setup only, the same role seed_memory() plays: preloads an
+        existing artifact version chain so a fixture can exercise
+        artifact.update() (or its not_found/invalid_input failures)
+        without first having to call create() itself. Typed like
+        seed_memory() (not a raw dict), so a fixture with a missing or
+        misspelled field fails loudly at the constructor call rather than
+        surfacing as a KeyError deep inside _ArtifactNamespace - a code
+        review found this file's own ArtifactRecordLike dataclass unused
+        and this method taking untyped dicts, the one place this file had
+        drifted from seed_memory()'s own established pattern."""
+        for r in records:
+            self._artifact_store.append(
+                {
+                    "id": r.id,
+                    "title": r.title,
+                    "kind": r.kind,
+                    "body": r.body,
+                    "version": r.version,
+                    "parent_version": r.parent_version,
+                    "is_current": r.is_current,
+                }
+            )
+
     def seed_config(self, key: str, value: Any) -> None:
         self._config_values[key] = value
 
@@ -323,6 +419,10 @@ class HostEmulator:
     @property
     def memory_store(self) -> list[dict[str, Any]]:
         return self._memory_store
+
+    @property
+    def artifact_store(self) -> list[dict[str, Any]]:
+        return self._artifact_store
 
     # --- host.* surface ---------------------------------------------------
 

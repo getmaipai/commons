@@ -1,0 +1,25 @@
+{
+  "description": "artifact + format: id_from's named scope var (artifact_id) is entirely unbound, so host.artifact.create() runs - the documents package's own shape for a brand-new document.",
+  "recipe": {
+    "id": "artifact-create",
+    "inputs": [
+      { "name": "title", "selector": "text" },
+      { "name": "kind", "selector": "text" },
+      { "name": "body", "selector": "text" }
+    ],
+    "steps": [
+      { "op": "artifact", "as": "result", "title": "{title}", "kind": "{kind}", "body": "{body}", "id_from": "artifact_id" },
+      { "op": "format", "as": "reply", "text": "Saved \"{title}\".", "data": { "artifact_id": "{artifact_id}", "artifact_version": "{artifact_version}" } }
+    ]
+  },
+  "inputs": { "title": "Packing list", "kind": "markdown", "body": "- tent\n- stove" },
+  "host_setup": {},
+  "expected": {
+    "reply": { "text": "Saved \"Packing list\".", "speech": "Saved \"Packing list\"." },
+    "actions": [],
+    "scheduled_jobs": [],
+    "home_calls": [],
+    "memory_added": [],
+    "data": { "artifact_id": "art-emu0001", "artifact_version": 1 }
+  }
+}

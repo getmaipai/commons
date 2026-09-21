@@ -1,0 +1,18 @@
+{
+  "description": "artifact: id_from's named scope var points at an artifact_id nobody ever created, so host.artifact.update() throws not_found - the same catalogue code an unknown fetch/integration.call target already uses.",
+  "recipe": {
+    "id": "artifact-not-found",
+    "inputs": [
+      { "name": "title", "selector": "text" },
+      { "name": "kind", "selector": "text" },
+      { "name": "body", "selector": "text" },
+      { "name": "artifact_id", "selector": "text", "required": false }
+    ],
+    "steps": [
+      { "op": "artifact", "as": "result", "title": "{title}", "kind": "{kind}", "body": "{body}", "id_from": "artifact_id" }
+    ]
+  },
+  "inputs": { "title": "Packing list", "kind": "markdown", "body": "- tent", "artifact_id": "art-missing1" },
+  "host_setup": {},
+  "expected_error": { "code": "not_found" }
+}

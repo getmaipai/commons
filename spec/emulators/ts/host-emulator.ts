@@ -28,6 +28,16 @@ export interface MemoryRecordLike {
   person?: string | null;
 }
 
+export interface ArtifactRecordLike {
+  id: string;
+  title: string;
+  kind: string;
+  body: string;
+  version: number;
+  parent_version: string | null;
+  is_current: boolean;
+}
+
 export interface LogEntry {
   level: string;
   message: string;
@@ -84,6 +94,24 @@ export interface Host {
     // conformance-fixture changes needed.
     recall(query: string, opts?: { scope?: string; person?: string }): MemoryRecordLike[] | Promise<MemoryRecordLike[]>;
     remember(text: string, category?: string, scope?: string, person?: string | null): string;
+  };
+  /** ARTIFACT-02: the sanctioned way a Tier 0 recipe writes a live chat
+   * artifact-card/canvas-split document - the same role `memory` plays
+   * for host.memory.remember. Synchronous like `remember`, not `fetch`:
+   * the real host (packageHost.ts) backs this with the same synchronous
+   * SQLite writer `lib/artifacts.ts`'s createArtifact/updateArtifact
+   * already use, so there is nothing here to await. */
+  artifact: {
+    create(input: { title: string; kind: string; body: string }): { id: string; version: number };
+    /** `kind` is deliberately absent here: an existing artifact's kind
+     * never changes, and `packageHost.ts`'s real implementation ignores
+     * it if the recipe step still interpolated one (recipe.schema.json's
+     * own `kind` field stays required on every call regardless, so the
+     * templating layer never needs an optional-on-update case). Throws
+     * `HostError("not_found")` for an unknown artifact_id, or
+     * `HostError("invalid_input")` for one that is no longer the current
+     * version - editing a historical version is not a supported move. */
+    update(input: { artifact_id: string; title: string; body: string }): { id: string; version: number };
   };
   action: {
     emit(kind: string, payload?: unknown): void;
@@ -174,6 +202,7 @@ export class HostEmulator implements Host {
   private configValues = new Map<string, unknown>();
   private secrets: string[] = [];
   private memoryStoreState: (MemoryRecordLike & { id: string })[] = [];
+  private artifactStoreState: ArtifactRecordLike[] = [];
   private filesState = new Map<string, unknown>();
   private nextId = 1;
 
@@ -201,6 +230,14 @@ export class HostEmulator implements Host {
     }
   }
 
+  /** Test setup only, the same role seedMemory() plays: preloads an
+   * existing artifact version chain so a fixture can exercise
+   * host.artifact.update() (or its not_found/invalid_input failures)
+   * without first having to call create() itself. */
+  seedArtifacts(records: ArtifactRecordLike[]): void {
+    for (const r of records) this.artifactStoreState.push({ ...r });
+  }
+
   seedConfig(key: string, value: unknown): void {
     this.configValues.set(key, value);
   }
@@ -212,6 +249,10 @@ export class HostEmulator implements Host {
 
   get memoryStore(): readonly (MemoryRecordLike & { id: string })[] {
     return this.memoryStoreState;
+  }
+
+  get artifactStore(): readonly ArtifactRecordLike[] {
+    return this.artifactStoreState;
   }
 
   // --- host.* surface ---------------------------------------------------
@@ -250,6 +291,48 @@ export class HostEmulator implements Host {
       const id = this.genId("mem");
       this.memoryStoreState.push({ id, text, category, scope, person: person ?? null });
       return id;
+    },
+  };
+
+  readonly artifact = {
+    create: (input: { title: string; kind: string; body: string }): { id: string; version: number } => {
+      const id = this.genId("art");
+      this.artifactStoreState.push({
+        id,
+        title: input.title,
+        kind: input.kind,
+        body: input.body,
+        version: 1,
+        parent_version: null,
+        is_current: true,
+      });
+      return { id, version: 1 };
+    },
+    update: (input: { artifact_id: string; title: string; body: string }): { id: string; version: number } => {
+      const current = this.artifactStoreState.find((a) => a.id === input.artifact_id);
+      if (!current) {
+        throw new HostError("not_found", `no artifact version ${input.artifact_id}`);
+      }
+      // Editing a historical version is not a supported move (there is
+      // nothing to "redo forward" to) - the same 409-shaped failure
+      // lib/artifacts.ts's own updateArtifact() returns, mapped to
+      // invalid_input rather than a bespoke code.
+      if (!current.is_current) {
+        throw new HostError("invalid_input", `${input.artifact_id} is not the current version - it was already superseded`);
+      }
+      current.is_current = false;
+      const id = this.genId("art");
+      const version = current.version + 1;
+      this.artifactStoreState.push({
+        id,
+        title: input.title,
+        kind: current.kind,
+        body: input.body,
+        version,
+        parent_version: current.id,
+        is_current: true,
+      });
+      return { id, version };
     },
   };
 

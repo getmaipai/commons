@@ -1,0 +1,30 @@
+{
+  "description": "artifact + format: id_from's named scope var IS bound (the model resent the artifact_id of the version it's editing), so host.artifact.update() runs against the seeded current version and chains a new one.",
+  "recipe": {
+    "id": "artifact-update",
+    "inputs": [
+      { "name": "title", "selector": "text" },
+      { "name": "kind", "selector": "text" },
+      { "name": "body", "selector": "text" },
+      { "name": "artifact_id", "selector": "text", "required": false }
+    ],
+    "steps": [
+      { "op": "artifact", "as": "result", "title": "{title}", "kind": "{kind}", "body": "{body}", "id_from": "artifact_id" },
+      { "op": "format", "as": "reply", "text": "Updated \"{title}\".", "data": { "artifact_id": "{artifact_id}", "artifact_version": "{artifact_version}" } }
+    ]
+  },
+  "inputs": { "title": "Packing list", "kind": "markdown", "body": "- tent\n- stove\n- lantern", "artifact_id": "art-cur0001" },
+  "host_setup": {
+    "artifacts": [
+      { "id": "art-cur0001", "title": "Packing list", "kind": "markdown", "body": "- tent\n- stove", "version": 1, "parent_version": null, "is_current": true }
+    ]
+  },
+  "expected": {
+    "reply": { "text": "Updated \"Packing list\".", "speech": "Updated \"Packing list\"." },
+    "actions": [],
+    "scheduled_jobs": [],
+    "home_calls": [],
+    "memory_added": [],
+    "data": { "artifact_id": "art-emu0001", "artifact_version": 2 }
+  }
+}

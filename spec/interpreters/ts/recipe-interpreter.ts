@@ -1,6 +1,6 @@
 // Interprets a Tier 0 Recipe (spec/schemas/recipe.schema.json) natively,
 // executing each step against a host (platform plan 5.2). No process, no
-// eval: every step is one of the seventeen declared primitives. This must
+// eval: every step is one of the eighteen declared primitives. This must
 // stay behaviorally identical to spec/interpreters/py/recipe_interpreter.py;
 // the conformance fixtures in spec/fixtures/recipes/ prove that.
 import { decode } from "he";
@@ -39,7 +39,7 @@ type Scope = Record<string, unknown>;
 // throughout the switch (a typo'd property would have compiled). Found
 // when backend/ first imported this file and its `tsc --noEmit` actually
 // walked it (spec/ itself has never run a standalone typecheck). Hand-
-// written here, mirroring recipe.schema.json's 17 step defs exactly, so
+// written here, mirroring recipe.schema.json's 18 step defs exactly, so
 // the switch gets real per-branch types and a real `never` check back.
 type RecipeStep =
   | { op: "fetch"; as: string; url: string; method?: "GET" | "POST"; headers?: Record<string, string>; body?: unknown }
@@ -58,7 +58,8 @@ type RecipeStep =
   | { op: "list_view"; as: string }
   | { op: "remind"; as: string; text: string }
   | { op: "timer"; as: string; text: string }
-  | { op: "ask"; prompt: string; expects?: string };
+  | { op: "ask"; prompt: string; expects?: string }
+  | { op: "artifact"; as: string; title: string; kind: string; body: string; id_from: string };
 
 // No conditional step exists in this declarative language to branch a
 // reply on "did recall find anything" - a `format` step only ever
@@ -304,6 +305,44 @@ export async function runRecipe(recipe: Recipe, inputs: Scope, host: Host): Prom
         // text, so a recipe can ask "which {thing}" using whatever
         // ambiguity it just found.
         ask = { prompt: interpolate(step.prompt, scope), expects: step.expects };
+        break;
+      }
+      case "artifact": {
+        // id_from names a scope variable read DIRECTLY (pick's own
+        // "from" convention), not interpolate()'s templating path -
+        // interpolate() leaves an unresolved {name} as that literal
+        // string rather than undefined, which can't tell "the model
+        // omitted artifact_id" apart from a real answer that happens to
+        // look like that string. Whether it's bound IS the create-vs-
+        // update discriminator; the recipe language has no conditional
+        // to express that any other way.
+        const title = interpolate(step.title, scope);
+        const kind = interpolate(step.kind, scope);
+        const body = interpolate(step.body, scope);
+        // `== null` (not `=== undefined`): a scope var can be genuinely
+        // absent (a fresh `inputs` object never had the key) OR bound to
+        // JSON `null` (an optional tool arg the model's own JSON omitted,
+        // which some callers still round-trip as an explicit null - the
+        // same shape null-interpolation.json's own fixture documents as
+        // real) - both mean "no id", the same as recipe_interpreter.py's
+        // own `is None` check, which already matches a missing dict key
+        // OR an explicit None. A code review found the two languages had
+        // drifted here: TS's `undefined`-only check would call update()
+        // with a literal null artifact_id for the same input Python
+        // creates cleanly for.
+        const existingId = scope[step.id_from] as string | null | undefined;
+        const result =
+          existingId == null
+            ? host.artifact.create({ title, kind, body })
+            : host.artifact.update({ artifact_id: existingId, title, body });
+        // Two flat scope keys, never nested under `as` - interpolate()
+        // has no dot-path support, and a later format step's own `data`
+        // mapping only ever reads flat top-level scope vars (the exact
+        // shape structuredPartForOutcomes() already reads weather's/
+        // almanac-date's own result.data from).
+        scope[step.as] = result;
+        scope.artifact_id = result.id;
+        scope.artifact_version = result.version;
         break;
       }
       default: {

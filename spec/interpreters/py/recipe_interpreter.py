@@ -1,6 +1,6 @@
 """Interprets a Tier 0 Recipe (spec/schemas/recipe.schema.json) natively,
 executing each step against a host (platform plan 5.2). No process, no
-eval: every step is one of the seventeen declared primitives. This must stay
+eval: every step is one of the eighteen declared primitives. This must stay
 behaviorally identical to spec/interpreters/ts/recipe-interpreter.ts; the
 conformance fixtures in spec/fixtures/recipes/ prove that.
 """
@@ -249,6 +249,31 @@ async def run_recipe(recipe: Any, inputs: dict[str, Any], host: Any) -> dict[str
             # description): nothing after it can depend on an answer that
             # hasn't arrived yet.
             ask = {"prompt": interpolate(step.prompt, scope), "expects": step.expects}
+        elif op == "artifact":
+            # id_from names a scope variable read DIRECTLY (pick's own
+            # "from" convention), not interpolate()'s templating path.
+            # Must stay behaviorally identical to recipe-interpreter.ts's
+            # own twin case.
+            title = interpolate(step.title, scope)
+            kind = interpolate(step.kind, scope)
+            body = interpolate(step.body, scope)
+            # `is None` matches both a genuinely absent key and one bound
+            # to JSON null (an optional tool arg the model's own JSON
+            # round-trips as explicit null) - both mean "no id". TS's own
+            # twin case matches this with `== null`, not a bare
+            # `undefined` check (a code review caught the two languages
+            # diverging on an explicit-null input before this fix).
+            existing_id = scope.get(step.id_from)
+            if existing_id is None:
+                result = host.artifact.create(title, kind, body)
+            else:
+                result = host.artifact.update(existing_id, title, body)
+            # Two flat scope keys, never nested under `as_` - must stay
+            # behaviorally identical to recipe-interpreter.ts's own twin
+            # case.
+            scope[step.as_] = result
+            scope["artifact_id"] = result["id"]
+            scope["artifact_version"] = result["version"]
         else:
             raise ValueError(f"unhandled recipe step: {step!r}")
 

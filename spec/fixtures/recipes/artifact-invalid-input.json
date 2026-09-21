@@ -1,0 +1,23 @@
+{
+  "description": "artifact: id_from's named scope var points at a superseded (no longer current) version, so host.artifact.update() throws invalid_input - editing a historical version is not a supported move.",
+  "recipe": {
+    "id": "artifact-invalid-input",
+    "inputs": [
+      { "name": "title", "selector": "text" },
+      { "name": "kind", "selector": "text" },
+      { "name": "body", "selector": "text" },
+      { "name": "artifact_id", "selector": "text", "required": false }
+    ],
+    "steps": [
+      { "op": "artifact", "as": "result", "title": "{title}", "kind": "{kind}", "body": "{body}", "id_from": "artifact_id" }
+    ]
+  },
+  "inputs": { "title": "Packing list", "kind": "markdown", "body": "- tent - stove - lantern", "artifact_id": "art-old0001" },
+  "host_setup": {
+    "artifacts": [
+      { "id": "art-old0001", "title": "Packing list", "kind": "markdown", "body": "- tent", "version": 1, "parent_version": null, "is_current": false },
+      { "id": "art-cur0002", "title": "Packing list", "kind": "markdown", "body": "- tent\n- stove", "version": 2, "parent_version": "art-old0001", "is_current": true }
+    ]
+  },
+  "expected_error": { "code": "invalid_input" }
+}

@@ -383,6 +383,38 @@ class AskStep(BaseModel):
     )
 
 
+class ArtifactStep(BaseModel):
+    """
+    Calls host.artifact.create or host.artifact.update (permission artifact:write) - the sanctioned way a Tier 0 recipe writes a live chat artifact-card/canvas-split document. turnEngine.ts's own tool-call path assumes a real catalog package for every check it runs; a Tier 1 handler.ts has zero DB access to write one itself, so this recipe primitive is the one sanctioned path, the same role remember_step already plays for host.memory.remember.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    op: Literal['artifact']
+    as_: str = Field(
+        ...,
+        alias='as',
+        description="Binds the raw {id, version} result into the recipe's variable scope under this name. The step also binds two flat scope keys directly, scope.artifact_id and scope.artifact_version - interpolate() has no dotted-path support, so a later format step's data mapping (which only ever reads flat top-level scope vars) needs them there, not nested under `as`.",
+    )
+    title: str = Field(
+        ...,
+        description='May reference input/variable names in {braces}. Always required, even on an update - the model resends its own current title rather than the interpreter threading an optional-on-update case through the templating layer.',
+    )
+    kind: str = Field(
+        ...,
+        description="May reference input/variable names in {braces}. Ignored by host.artifact.update (an existing artifact's kind never changes) but still required on every call, for the same reason `title` is.",
+    )
+    body: str = Field(
+        ...,
+        description='May reference input/variable names in {braces}. The full new content of this version, never a patch.',
+    )
+    id_from: str = Field(
+        ...,
+        description='Names a scope variable to read DIRECTLY (scope[id_from]), the same bare-name convention pick\'s own "from" field already uses, not interpolate()\'s templating path - interpolate() leaves an unresolved {name} as the literal string rather than resolving to undefined, which cannot tell a genuinely unset variable apart from a real answer that happens to look like that string. Whether the named variable is bound is the create-vs-update discriminator: unbound calls host.artifact.create, bound calls host.artifact.update with that value as artifact_id.',
+    )
+
+
 class Recipe(BaseModel):
     """
     A Tier 0 declarative package body, interpreted natively by the TS and Python interpreters in spec/interpreters/. See platform plan 5.2. A recipe is a named set of inputs plus a list of steps; each step is one of the primitives below.
@@ -413,6 +445,7 @@ class Recipe(BaseModel):
         | RemindStep
         | TimerStep
         | AskStep
+        | ArtifactStep
         | FormatStep1
         | FormatStep2
     ] = Field(..., min_length=1)
