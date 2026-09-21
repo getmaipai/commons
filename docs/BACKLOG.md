@@ -278,6 +278,20 @@ capability, needs its own design pass first).
 
 ## `spec`
 
+- [ ] **S** A spec tag's settings registry is a superset of its parent
+  tag's: the cut (`commons` `check.sh`, or a `spec/scripts/cut-tag.sh`
+  if none exists) diffs `spec/settings/keys.json` against the previous
+  `spec-v*` tag and refuses when any key disappears; found 2026-09-20
+  when two Home worktrees each regenerated the file from their own
+  aggregate and `spec-v0.1.4` silently dropped `engines.stack.url`
+  (fixed same day as `spec-v0.1.5`, no pin ever shipped against the
+  broken tag). The deeper cause, for a later design pass: the registry
+  is generated from Home's aggregate (`CORE_SETTINGS_KEYS` and its
+  imports) - Home is the source, the spec the mirror, which inverts
+  the org's spec-first rule for shared records ("Shared record changes
+  go through the spec first," org `CLAUDE.md`). The real fix is the
+  declaration living in the spec and Home generating from it, not the
+  reverse.
 - [x] **M** `spec-v0.1.0`: move `home/spec` whole (`pyproject.toml`, the
   Python package, `gen/`, `schemas.resolved/`, fixtures, tests, `uv.lock`)
   into `spec/` here. Acceptance: `bun test` and

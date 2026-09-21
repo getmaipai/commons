@@ -218,6 +218,20 @@
     ]
   },
   {
+    "key": "engines.stack.url",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "MaiPai Stack address",
+    "help": "Empty uses Home's own built-in engines. Set once a MaiPai Stack is installed on this machine to route chat, embeddings and voice through it instead.",
+    "level": "expert",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "home.access_token",
     "scope": "household",
     "selector": "text",

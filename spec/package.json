@@ -1,6 +1,6 @@
 {
   "name": "@maipai/spec",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "MaiPai household record schemas, generated TS/Python models, recipe interpreters, and host emulators. See docs/dev.md.",
   "license": "AGPL-3.0",
