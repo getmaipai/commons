@@ -128,5 +128,6 @@ describe("sectionTitle", () => {
     }
     expect(sectionTitle("household.storage")).toBe("Storage");
     expect(sectionTitle("person.allowance")).toBe("Allowance");
+    expect(sectionTitle("person.storage")).toBe("My storage");
   });
 });

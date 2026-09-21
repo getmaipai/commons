@@ -33,6 +33,7 @@ export const SECTION_TITLES: Record<string, string> = {
   "household.integrations": "Integrations",
   "household.notifications": "Notifications",
   "household.storage": "Storage",
+  "person.storage": "My storage",
   // Deliberately NOT the same string as "household.notifications": a
   // design review (2026-09-05) found both sections rendering as
   // "Notifications" back to back (SettingsPage.tsx stacks a household-

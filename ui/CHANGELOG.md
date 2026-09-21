@@ -4,6 +4,11 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.20] - ui-v0.5.20
+
+Settings: the person.storage section title (SET-TITLES-01, the
+registry-wide test's one find)
+
 ## [0.5.19] - ui-v0.5.19
 
 SET-TITLES-01: add friendly section titles for household storage and
