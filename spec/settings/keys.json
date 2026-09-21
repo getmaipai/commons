@@ -634,12 +634,19 @@
     "range": {
       "options": [
         "studio",
-        "calm"
+        "calm",
+        "neutral",
+        "stone",
+        "zinc",
+        "mauve",
+        "olive",
+        "mist",
+        "taupe"
       ]
     },
     "default": "studio",
     "label": "Look",
-    "help": "Studio matches the reference design exactly. Calm is the softer look Home shipped first.",
+    "help": "Studio matches the reference design exactly. Calm is the softer look Home shipped first. The rest are shadcn's own color presets.",
     "level": "basic",
     "secret": false,
     "lives_in": "profile.appearance",

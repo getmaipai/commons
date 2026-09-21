@@ -5,6 +5,17 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.12] - 2026-09-21
+
+### Changed
+- `ui.look`'s enum grows from `studio`/`calm` to nine values, adding
+  the seven shadcn base-color presets (ui.shadcn.com/docs/theming's
+  own current list: Neutral, Stone, Zinc, Mauve, Olive, Mist, Taupe) -
+  HOME-UI-04b's theme-preset item. CSS for the new values lives on
+  `/next` only (commons-a/ui/src/dashboard/css/globals.css); the old
+  shell keeps resolving the value but has no palette of its own for
+  them yet.
+
 ## [spec-v0.1.11] - 2026-09-21
 
 ### Added
