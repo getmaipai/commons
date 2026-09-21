@@ -50,6 +50,39 @@ class combination via `~=` attribute selectors (never a vendored file
 edited): the wrapper's fill goes transparent, leaving each card's own
 ring as the only line.
 
+## [0.5.14] - ui-v0.5.14 (CHAT-SDK-01, the coordinated bump ui-v0.5.4 named as a gap)
+
+`@assistant-ui/react`: `0.15.18` to `0.15.21`, the only explicit range
+this package's own `package.json` changes - `src/elements/
+thread.aui.tsx`'s `ThreadMessage.metadata.modality` read needs
+`@assistant-ui/core@0.3.20`, and `0.15.21` is the lowest
+`@assistant-ui/react` whose own dependency range reaches it (`0.15.18`
+depended on `@assistant-ui/core@^0.3.17`; `0.15.21` on `^0.3.20`).
+Two more versions move as a direct consequence, inside `bun.lock`,
+with no `package.json` range of their own to change: `zod`, moved by
+`@assistant-ui/react`'s own dependency range from `^4.5.4` to
+`^4.6.5` (this package's own `zod: "^4.0.0"` already allowed either);
+and `@assistant-ui/react-markdown`, still pinned here at `^0.14.14`,
+resolving to `0.14.16` under that same range once its own peer
+(`^0.15.0`, satisfied by `0.15.21` same as `0.15.18`) let the
+lockfile pick the newer patch.
+
+This time the coordinated half of ui-v0.5.4's own gap note actually
+happened: Home's `frontend/package.json` bumps to the identical
+`0.15.21` in the same item (never a kit-only patch - that was exactly
+what broke `0.5.1`-`0.5.3`, two different module instances of
+`@assistant-ui/react` because only one of the two consumers moved).
+This package's own `src/assistant-ui/` wrappers (Home's existing,
+shipped chat) needed no changes at all: typecheck, lint and the full
+`bun test` (382 pass) are clean at `0.15.21` with zero source edits -
+unlike `0.5.1`'s attempt, nothing in the wrapper layer or the Elements
+touched an API surface that actually moved between `0.3.17` and
+`0.3.20`. Home's own frontend suite and backend (the `zod` ripple
+`0.5.3` also found, 13 unrelated backend failures) are re-verified in
+the matching Home-side item, not here - this package's own gate only
+proves its own two consumers of `@assistant-ui/react`, not a
+downstream workspace's.
+
 ## [0.5.13] - ui-v0.5.13
 
 Found live re-verifying ui-v0.5.12 in a real browser, not just by scripted
@@ -261,39 +294,6 @@ the sidebar back on desktop.
   `collapsible="none"` branch (a plain, always-visible div with no
   responsive classes at all); `[data-variant]` is the one attribute
   only the desktop-fixed branch this fix targets ever sets.
-
-## [0.5.14] - ui-v0.5.14 (CHAT-SDK-01, the coordinated bump ui-v0.5.4 named as a gap)
-
-`@assistant-ui/react`: `0.15.18` to `0.15.21`, the only explicit range
-this package's own `package.json` changes - `src/elements/
-thread.aui.tsx`'s `ThreadMessage.metadata.modality` read needs
-`@assistant-ui/core@0.3.20`, and `0.15.21` is the lowest
-`@assistant-ui/react` whose own dependency range reaches it (`0.15.18`
-depended on `@assistant-ui/core@^0.3.17`; `0.15.21` on `^0.3.20`).
-Two more versions move as a direct consequence, inside `bun.lock`,
-with no `package.json` range of their own to change: `zod`, moved by
-`@assistant-ui/react`'s own dependency range from `^4.5.4` to
-`^4.6.5` (this package's own `zod: "^4.0.0"` already allowed either);
-and `@assistant-ui/react-markdown`, still pinned here at `^0.14.14`,
-resolving to `0.14.16` under that same range once its own peer
-(`^0.15.0`, satisfied by `0.15.21` same as `0.15.18`) let the
-lockfile pick the newer patch.
-
-This time the coordinated half of ui-v0.5.4's own gap note actually
-happened: Home's `frontend/package.json` bumps to the identical
-`0.15.21` in the same item (never a kit-only patch - that was exactly
-what broke `0.5.1`-`0.5.3`, two different module instances of
-`@assistant-ui/react` because only one of the two consumers moved).
-This package's own `src/assistant-ui/` wrappers (Home's existing,
-shipped chat) needed no changes at all: typecheck, lint and the full
-`bun test` (382 pass) are clean at `0.15.21` with zero source edits -
-unlike `0.5.1`'s attempt, nothing in the wrapper layer or the Elements
-touched an API surface that actually moved between `0.3.17` and
-`0.3.20`. Home's own frontend suite and backend (the `zod` ripple
-`0.5.3` also found, 13 unrelated backend failures) are re-verified in
-the matching Home-side item, not here - this package's own gate only
-proves its own two consumers of `@assistant-ui/react`, not a
-downstream workspace's.
 
 ## [0.5.4] - ui-v0.5.4 (reverts 0.5.1 and 0.5.3; the actual conclusion)
 
