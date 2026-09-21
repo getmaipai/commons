@@ -5,6 +5,14 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.6] - 2026-09-21
+
+### Added
+- `ui.shell.next` settings key (household scope, boolean, default
+  `false`): the flag behind the shell-on-shadcndashboard stand-up's
+  `/next` route tree (`home/docs/plans/shell-on-shadcndashboard-
+  2026-09-21.md`), governing the shell and the chat together.
+
 ## [spec-v0.1.4] - 2026-09-20
 
 ### Added
