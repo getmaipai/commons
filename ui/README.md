@@ -7,6 +7,20 @@ permission renderers, and the UI-schema renderer. See
 and [docs/spec.md](docs/spec.md) for the approved design specification
 this kit implements.
 
+Since 2026-09-21 the kit also carries two upstream snapshots used
+exactly as they ship, pinned and attributed in
+[docs/dashboard-upstream.md](docs/dashboard-upstream.md) and
+[../NOTICE](../NOTICE): `src/dashboard/` (shadcndashboard, MIT: the
+application shell, the pages, its shadcn primitives on Base UI) and
+`src/elements/` (assistant-ui's Elements, MIT: every element of the
+catalog). Home's shell and every non-chat page compose from the first,
+its chat from the second; the kit's own lint does not run inside
+either folder, and neither is ever edited by hand. Looks are named
+themes on the template's own style-variant mechanism (`ui.look`:
+shadcn's seven base colors, `neutral` the default, plus `navy`), and
+the only departures from the source are three kit-side rules in
+`src/tokens.css` recorded in the upstream note.
+
 ## Importing
 
 No barrel export, the same convention `@maipai/spec` and `@maipai/core`
