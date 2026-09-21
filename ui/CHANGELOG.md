@@ -4,24 +4,43 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
-## [0.5.1] - ui-v0.5.1
+## [0.5.2] - ui-v0.5.2
 
-Fixes a version-skew bug the stand-up's own /next/chat wiring found live:
-the vendored Elements (`src/elements/thread.aui.tsx`) are written against
-assistant-ui's current SDK (`ThreadMessage.metadata.modality`, added
-after 0.15.18), which the kit's own pinned `@assistant-ui/react@0.15.18`
-predates. Because `@maipai/ui` is subpath-imported directly with no dist
-build, a consumer's own bundler resolves `@assistant-ui/react` from
-*this* package's own `node_modules` for every file under `src/`
-(including `src/elements/`) - a consumer bumping its own pin doesn't
-reach it, only this package's own pin does.
+Corrects `0.5.1`: bumping `@assistant-ui/react` to `0.15.21` (to reach a
+newer `@assistant-ui/core`) also bumped that release's own `zod`
+dependency to `^4.6.5`, and because Home's frontend and backend share
+one bun workspace lockfile, that forced backend's own `zod` usage
+(schemas passed into `@modelcontextprotocol/sdk` and `@hono/zod-
+openapi`, both pinned to older zod majors' own nested copies) to split
+across incompatible module instances - found live as 13 backend test
+failures across the turn engine, safety boundaries, widgets and the
+Deno sandbox, none of them related to this kit. `@assistant-ui/core`
+alone, not `@assistant-ui/react`, is what `0.5.1`'s actual fix needed
+(see below); pinning it directly leaves `react` and its `zod` range
+untouched.
 
 ### Changed
-- `@assistant-ui/react`: `0.15.18` -> `0.15.21`, which brings its own
-  `@assistant-ui/core`/`assistant-cloud` peers forward to the versions
-  the Elements actually type-check and build against (`0.3.20`/`0.2.2`).
-  `@assistant-ui/react-markdown`'s existing `^0.14.14` range already
-  covers the matching `0.14.16`.
+- `@assistant-ui/react`: back to `0.15.18` (as it was before `0.5.1`).
+- `@assistant-ui/core`: added directly at `0.3.20` (previously only a
+  transitive dependency of `react`, resolved to `0.3.20` in this
+  package's own, smaller dependency graph but to the older `0.3.17` in
+  at least one real consumer's larger one - both satisfy `react@0.15.18`'s
+  own `^0.3.17`, so declaring the version this kit's Elements actually
+  need directly, rather than leaving it to whichever the graph happens
+  to solve to, is the fix).
+
+## [0.5.1] - ui-v0.5.1 (superseded by 0.5.2, do not use)
+
+Attempted to fix the same version-skew bug `0.5.2` above actually fixes:
+the vendored Elements (`src/elements/thread.aui.tsx`) read
+`ThreadMessage.metadata.modality`, a field added to `@assistant-ui/core`
+after the version `@assistant-ui/react@0.15.18` was built against.
+Because `@maipai/ui` is subpath-imported directly with no dist build, a
+consumer's own bundler resolves bare-package imports inside `src/`
+(including `src/elements/`) from *this* package's own `node_modules` -
+a consumer bumping its own pin never reaches it, only this package's
+own pin does. Right diagnosis, wrong fix: bumping the whole `react`
+package pulled in an unwanted `zod` bump along with it. See `0.5.2`.
 
 ## [0.5.0] - ui-v0.5.0
 

@@ -128,14 +128,24 @@ own import-path edits), so neither ever used the kit's own `@/*` alias
 in the first place. No change was needed in Home's `vite.config.ts` or
 `tsconfig.json` for this.
 
-**A real version-skew risk did surface, and is what ui-v0.5.1 fixes**:
+**A real version-skew risk did surface, and is what ui-v0.5.2 fixes**:
 `@maipai/ui` is subpath-imported directly with no dist build, so a
 consuming app's bundler resolves bare-package imports inside `src/`
 (`@assistant-ui/react`, `lucide-react`, and so on) starting from *this
 package's own* `node_modules`, not the consumer's - the same reason
 `@/kit/*` needs its "who's asking" resolution, one level further out.
 Concretely: `src/elements/thread.aui.tsx` reads
-`message.metadata.modality`, a field assistant-ui's SDK added after the
-`0.15.18` this kit had pinned; bumping the pin in a *consuming* app's
-own `package.json` did nothing; only bumping it here, in `ui`'s own
-`package.json`, reached the file. See `CHANGELOG.md`'s `0.5.1` entry.
+`message.metadata.modality`, a field `@assistant-ui/core` added after
+the `0.3.17` this package's own `react@0.15.18` transitively resolved
+to in at least one real consumer's larger dependency graph (this
+package's own smaller graph happened to solve to a newer, sufficient
+`0.3.20` on its own, which is why this package's own `tsc` never
+caught it). Bumping the pin in a *consuming* app's own `package.json`
+did nothing; only bumping it here, in `ui`'s own `package.json`,
+reached the file - but bumping the whole `@assistant-ui/react` package
+(tried first, `ui-v0.5.1`, reverted) also bumped its own `zod`
+dependency, which broke 13 unrelated backend tests in a consumer whose
+frontend and backend share one bun workspace lockfile. `ui-v0.5.2`
+adds `@assistant-ui/core` directly at the exact version needed,
+leaving `react` (and its `zod` range) untouched. See `CHANGELOG.md`'s
+`0.5.1` and `0.5.2` entries.
