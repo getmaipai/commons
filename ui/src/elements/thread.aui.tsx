@@ -102,6 +102,10 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * content yet - a caller with something more specific to say while
  * waiting (a lookup in progress, a tool running) renders it here instead
  * of the default.
+ * `ComposerExtra`, when set, renders in the composer's own action row,
+ * beside the attach button - an append point for a product-specific
+ * composer control (a model picker, a response-mode toggle) that
+ * belongs in that row rather than forked into it by hand.
  */
 export type ThreadComponents = {
   AssistantMessage?: ComponentType | undefined;
@@ -118,6 +122,7 @@ export type ThreadComponents = {
   AssistantActionBarExtra?: ComponentType | undefined;
   AssistantMessageFooterExtra?: ComponentType | undefined;
   Indicator?: ComponentType | undefined;
+  ComposerExtra?: ComponentType | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -477,9 +482,13 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
 };
 
 const ComposerAction: FC = () => {
+  const { ComposerExtra } = useContext(ThreadComponentsContext);
   return (
     <div className="aui-composer-action-wrapper relative flex items-center justify-between">
-      <ComposerAddAttachment />
+      <div className="flex items-center gap-1.5">
+        <ComposerAddAttachment />
+        {ComposerExtra && <ComposerExtra />}
+      </div>
       <div className="flex items-center gap-1.5">
         <AuiIf condition={(s) => s.thread.capabilities.dictation}>
           <AuiIf condition={(s) => s.composer.dictation == null}>

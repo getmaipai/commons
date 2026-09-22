@@ -4,6 +4,17 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.31] - ui-v0.5.31
+
+`elements/thread.aui.tsx`'s `ThreadComponents` gains an optional
+`ComposerExtra?: ComponentType` slot - when set, it renders in the
+composer's own action row, beside the attach button. Matches the shape
+`AssistantMoreItems`/`AssistantActionBarExtra`/`AssistantMessageFooterExtra`/
+`Indicator` already established: an append point for a product-specific
+control (a response-mode toggle, e.g.) that belongs in the shipped
+composer's own row rather than forked into it by hand. Unset, every
+existing caller's render is unchanged.
+
 ## [0.5.30] - ui-v0.5.30
 
 `elements/sources.tsx`'s list layout: both the title and domain spans
