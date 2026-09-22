@@ -160,6 +160,97 @@ export const ModelCapabilities = z
         );
       }
     }),
+    /**U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.*/
+    turn_budget: z
+      .object({
+        /**Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).*/
+        rounds: z
+          .union([z.literal(0), z.literal(1), z.literal(2)])
+          .describe(
+            "Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).",
+          ),
+        /**The fixed, sorted tool-name set the model node offers every turn; never varies per turn.*/
+        tools_offered: z
+          .array(z.string())
+          .describe(
+            "The fixed, sorted tool-name set the model node offers every turn; never varies per turn.",
+          ),
+        /**The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool and, when answer_from_context_tool is also true, answer_from_this_conversation.*/
+        always_search: z
+          .boolean()
+          .describe(
+            "The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool and, when answer_from_context_tool is also true, answer_from_this_conversation.",
+          ),
+        /**Whether the always_search call offers answer_from_this_conversation as the model's alternative to a search, verified by policy as a set check against the context window.*/
+        answer_from_context_tool: z
+          .boolean()
+          .describe(
+            "Whether the always_search call offers answer_from_this_conversation as the model's alternative to a search, verified by policy as a set check against the context window.",
+          ),
+        /**Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer.*/
+        model_transitions: z
+          .boolean()
+          .describe(
+            "Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer.",
+          ),
+        context_tokens: z.number().int().gt(0),
+        thinking_budget_tokens: z.number().int().gte(0),
+        /**Per-node deadlines in milliseconds (simple-turn-pipeline-2026-09-22.md section 11: 'every node has a deadline, and it can be cut').*/
+        deadlines_ms: z
+          .object({
+            model: z.number().int().gt(0),
+            tool: z.number().int().gt(0),
+            total: z.number().int().gt(0),
+          })
+          .strict()
+          .describe(
+            "Per-node deadlines in milliseconds (simple-turn-pipeline-2026-09-22.md section 11: 'every node has a deadline, and it can be cut').",
+          ),
+        /**ARCH-MEASURE-01's numbers for this model, recorded with the budget they set.*/
+        measured: z
+          .object({
+            /**Fraction of negative-corpus turns the model called a tool on when it should not have.*/
+            false_call_rate: z
+              .number()
+              .gte(0)
+              .lte(1)
+              .describe(
+                "Fraction of negative-corpus turns the model called a tool on when it should not have.",
+              ),
+            /**Fraction of world-question turns the model answered from memory instead of a fitting search.*/
+            inverse_miss_rate: z
+              .number()
+              .gte(0)
+              .lte(1)
+              .describe(
+                "Fraction of world-question turns the model answered from memory instead of a fitting search.",
+              ),
+            /**Query-rewrite bench pass rate: the model's own search words carry the referent from a pronoun in the second turn.*/
+            rewrite_pass_rate: z
+              .number()
+              .gte(0)
+              .lte(1)
+              .describe(
+                "Query-rewrite bench pass rate: the model's own search words carry the referent from a pronoun in the second turn.",
+              ),
+            /**What corpus, date, and repeat count the measured numbers are from, e.g. 'ARCH-MEASURE-01, tool-calling bench, 2026-09-22, 50 repeats'.*/
+            on: z
+              .string()
+              .min(1)
+              .describe(
+                "What corpus, date, and repeat count the measured numbers are from, e.g. 'ARCH-MEASURE-01, tool-calling bench, 2026-09-22, 50 repeats'.",
+              ),
+          })
+          .strict()
+          .describe(
+            "ARCH-MEASURE-01's numbers for this model, recorded with the budget they set.",
+          ),
+      })
+      .strict()
+      .describe(
+        "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
+      )
+      .optional(),
   })
   .strict()
   .describe(

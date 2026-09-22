@@ -31,6 +31,85 @@ class Download(BaseModel):
     approx_bytes: conint(ge=1)
 
 
+class DeadlinesMs(BaseModel):
+    """
+    Per-node deadlines in milliseconds (simple-turn-pipeline-2026-09-22.md section 11: 'every node has a deadline, and it can be cut').
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    model: PositiveInt
+    tool: PositiveInt
+    total: PositiveInt
+
+
+class Measured(BaseModel):
+    """
+    ARCH-MEASURE-01's numbers for this model, recorded with the budget they set.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    false_call_rate: confloat(ge=0.0, le=1.0) = Field(
+        ...,
+        description='Fraction of negative-corpus turns the model called a tool on when it should not have.',
+    )
+    inverse_miss_rate: confloat(ge=0.0, le=1.0) = Field(
+        ...,
+        description='Fraction of world-question turns the model answered from memory instead of a fitting search.',
+    )
+    rewrite_pass_rate: confloat(ge=0.0, le=1.0) = Field(
+        ...,
+        description="Query-rewrite bench pass rate: the model's own search words carry the referent from a pronoun in the second turn.",
+    )
+    on: constr(min_length=1) = Field(
+        ...,
+        description="What corpus, date, and repeat count the measured numbers are from, e.g. 'ARCH-MEASURE-01, tool-calling bench, 2026-09-22, 50 repeats'.",
+    )
+
+
+class TurnBudget(BaseModel):
+    """
+    U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    rounds: Literal[0, 1, 2] = Field(
+        ...,
+        description="Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).",
+    )
+    tools_offered: list[str] = Field(
+        ...,
+        description='The fixed, sorted tool-name set the model node offers every turn; never varies per turn.',
+    )
+    always_search: bool = Field(
+        ...,
+        description='The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool and, when answer_from_context_tool is also true, answer_from_this_conversation.',
+    )
+    answer_from_context_tool: bool = Field(
+        ...,
+        description="Whether the always_search call offers answer_from_this_conversation as the model's alternative to a search, verified by policy as a set check against the context window.",
+    )
+    model_transitions: bool = Field(
+        ...,
+        description="Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer.",
+    )
+    context_tokens: PositiveInt
+    thinking_budget_tokens: conint(ge=0)
+    deadlines_ms: DeadlinesMs = Field(
+        ...,
+        description="Per-node deadlines in milliseconds (simple-turn-pipeline-2026-09-22.md section 11: 'every node has a deadline, and it can be cut').",
+    )
+    measured: Measured = Field(
+        ...,
+        description="ARCH-MEASURE-01's numbers for this model, recorded with the budget they set.",
+    )
+
+
 class TransformerGgufSizing(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -120,3 +199,4 @@ class ModelCapabilities(BaseModel):
         description='Absent for a placeholder entry with nowhere to download from yet.',
     )
     sizing: TransformerGgufSizing | DiffusionSizing
+    turn_budget: TurnBudget | None = None

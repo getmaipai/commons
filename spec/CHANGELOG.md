@@ -5,6 +5,37 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.20] - 2026-09-22
+
+### Added
+- `ModelCapabilities` gains an optional `turn_budget` (U2a, home's
+  `docs/plans/turn-machine-state-record-2026-09-22.md`, "The budget
+  record"): the per-model tool-calling budget turnNext.ts's model and
+  tool nodes read - tool rounds, the fixed offered tool set, the
+  always-search interim rule and its `answer_from_this_conversation`
+  alternative, whether the model drives a second transition, context
+  and thinking-token allowances, per-node deadlines, and
+  ARCH-MEASURE-01's measured numbers. Absent for a model with no
+  measured record. `model-capabilities.chat.example.json` gains the
+  8B's starting values (deadlines model 20s/tool 10s/total 45s,
+  `always_search` true, `rounds` 1); `rewrite_pass_rate` is recorded 0
+  with a note in `measured.on` - the query-rewrite bench has not run
+  for this model yet.
+- `turn.pipeline.next` in `spec/settings/keys.json` (household scope,
+  boolean, default off, level advanced, honoured by `home` and `bot`):
+  the switch U6 flips once the new turn path passes the replay set.
+- `turn-budget.test.ts` and `settings-registry.test.ts`: the former
+  proves `turn_budget`'s own rules (optional, `rounds` closed to
+  0/1/2, `deadlines_ms`/`measured` all-or-nothing, no stray keys); the
+  latter round-trips every entry of `keys.json` through `SettingsKey`
+  (nothing did before) and pins `turn.pipeline.next`'s declared shape.
+
+### Fixed
+- Tag numbering: `spec-v0.1.19` was cut locally on another session's
+  branch (`a/woq3-corpus`) and never pushed to `origin/main`, so
+  `spec-v0.1.19` is skipped here to avoid a tag collision. That branch
+  and its tag are unmerged and flagged for cleanup by whoever owns it.
+
 ## [spec-v0.1.18] - 2026-09-22
 
 ### Added

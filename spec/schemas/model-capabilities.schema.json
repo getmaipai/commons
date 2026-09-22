@@ -58,7 +58,8 @@
       },
       "description": "Absent for a placeholder entry with nowhere to download from yet."
     },
-    "sizing": { "$ref": "#/$defs/sizing" }
+    "sizing": { "$ref": "#/$defs/sizing" },
+    "turn_budget": { "$ref": "#/$defs/turn_budget" }
   },
   "$defs": {
     "sizing": {
@@ -66,6 +67,61 @@
         { "$ref": "#/$defs/transformer_gguf_sizing" },
         { "$ref": "#/$defs/diffusion_sizing" }
       ]
+    },
+    "turn_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rounds", "tools_offered", "always_search", "answer_from_context_tool", "model_transitions", "context_tokens", "thinking_budget_tokens", "deadlines_ms", "measured"],
+      "description": "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
+      "properties": {
+        "rounds": {
+          "type": "integer",
+          "enum": [0, 1, 2],
+          "description": "Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds)."
+        },
+        "tools_offered": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "The fixed, sorted tool-name set the model node offers every turn; never varies per turn."
+        },
+        "always_search": {
+          "type": "boolean",
+          "description": "The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool and, when answer_from_context_tool is also true, answer_from_this_conversation."
+        },
+        "answer_from_context_tool": {
+          "type": "boolean",
+          "description": "Whether the always_search call offers answer_from_this_conversation as the model's alternative to a search, verified by policy as a set check against the context window."
+        },
+        "model_transitions": {
+          "type": "boolean",
+          "description": "Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer."
+        },
+        "context_tokens": { "type": "integer", "exclusiveMinimum": 0 },
+        "thinking_budget_tokens": { "type": "integer", "minimum": 0 },
+        "deadlines_ms": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["model", "tool", "total"],
+          "description": "Per-node deadlines in milliseconds (simple-turn-pipeline-2026-09-22.md section 11: 'every node has a deadline, and it can be cut').",
+          "properties": {
+            "model": { "type": "integer", "exclusiveMinimum": 0 },
+            "tool": { "type": "integer", "exclusiveMinimum": 0 },
+            "total": { "type": "integer", "exclusiveMinimum": 0 }
+          }
+        },
+        "measured": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["false_call_rate", "inverse_miss_rate", "rewrite_pass_rate", "on"],
+          "description": "ARCH-MEASURE-01's numbers for this model, recorded with the budget they set.",
+          "properties": {
+            "false_call_rate": { "type": "number", "minimum": 0, "maximum": 1, "description": "Fraction of negative-corpus turns the model called a tool on when it should not have." },
+            "inverse_miss_rate": { "type": "number", "minimum": 0, "maximum": 1, "description": "Fraction of world-question turns the model answered from memory instead of a fitting search." },
+            "rewrite_pass_rate": { "type": "number", "minimum": 0, "maximum": 1, "description": "Query-rewrite bench pass rate: the model's own search words carry the referent from a pronoun in the second turn." },
+            "on": { "type": "string", "minLength": 1, "description": "What corpus, date, and repeat count the measured numbers are from, e.g. 'ARCH-MEASURE-01, tool-calling bench, 2026-09-22, 50 repeats'." }
+          }
+        }
+      }
     },
     "transformer_gguf_sizing": {
       "type": "object",

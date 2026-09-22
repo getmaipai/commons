@@ -633,6 +633,21 @@
     ]
   },
   {
+    "key": "turn.pipeline.next",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Use the new reply engine",
+    "help": "Off keeps today's engine. On uses the rebuilt one; it must pass the same tests on this hub before it becomes the default.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.system",
+    "honoured_by": [
+      "home",
+      "bot"
+    ]
+  },
+  {
     "key": "ui.appearance",
     "scope": "person",
     "selector": "select",
