@@ -16,6 +16,7 @@ import {
   ReasoningText,
   ReasoningTrigger,
 } from "./reasoning.aui";
+import { ThinkingIndicator } from "./thinking-indicator";
 import { ToolFallback } from "./tool-fallback.aui";
 import {
   ToolGroupContent,
@@ -96,6 +97,11 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * content that a bar-row trigger expands but that doesn't belong INSIDE
  * the bar's own single icon row (the sources card's own compact list,
  * e.g., opened by its trigger in `AssistantActionBarExtra` above).
+ * `Indicator`, when set, replaces the built-in pending affordance (a
+ * plain pulsing dot) shown for a running assistant message with no
+ * content yet - a caller with something more specific to say while
+ * waiting (a lookup in progress, a tool running) renders it here instead
+ * of the default.
  */
 export type ThreadComponents = {
   AssistantMessage?: ComponentType | undefined;
@@ -111,6 +117,7 @@ export type ThreadComponents = {
   AssistantMoreItems?: ComponentType | undefined;
   AssistantActionBarExtra?: ComponentType | undefined;
   AssistantMessageFooterExtra?: ComponentType | undefined;
+  Indicator?: ComponentType | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -560,6 +567,7 @@ const AssistantMessage: FC = () => {
     ReasoningGroup,
     TaskGroup: TaskGroupComponent,
     AssistantMessageFooterExtra,
+    Indicator,
   } = useContext(ThreadComponentsContext);
   const groupBy = TaskGroupComponent ? taskAwareGroupBy : messageGroupBy;
 
@@ -636,14 +644,15 @@ const AssistantMessage: FC = () => {
                   </div>
                 );
               case "indicator":
-                return (
-                  <span
+                return Indicator ? (
+                  <Indicator />
+                ) : (
+                  <ThinkingIndicator
                     data-slot="aui_assistant-message-indicator"
-                    className="animate-pulse font-sans"
-                    aria-label="Assistant is working"
-                  >
-                    {"●"}
-                  </span>
+                    role="status"
+                    aria-live="polite"
+                    label="Thinking…"
+                  />
                 );
               default:
                 return null;

@@ -4,6 +4,18 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.29] - ui-v0.5.29
+
+`elements/thread.aui.tsx`'s `ThreadComponents` gains an optional
+`Indicator?: ComponentType` slot - when set, it replaces the pending
+affordance shown for a running assistant message with no content yet
+(previously a hardcoded, hand-drawn `<span>●</span>`). Unset, the
+default now renders the shipped `ThinkingIndicator` Element (a
+shimmering label plus an optional elapsed-time stamp) instead of that
+bare span - a real Element in place of hand-drawn prose, matching this
+kit's own "no hand-built UI" rule; existing callers see the same
+generic "Thinking…" text, just through the real Element.
+
 ## [0.5.28] - ui-v0.5.28
 
 `elements/tool-timeline.tsx`'s `ToolTimeline` now keys each rendered step
