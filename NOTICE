@@ -81,4 +81,10 @@ here:
 - tw-shimmer (MIT) - https://github.com/assistant-ui/assistant-ui
   (the loading-shimmer utility a couple of Elements use)
 
+`sources.aui.tsx` - assistant-ui (MIT) -
+https://github.com/assistant-ui/assistant-ui,
+`packages/ui/src/components/react/assistant-ui/elements/sources.aui.tsx`
+at commit `0dd6d46b0`, fetched directly (not through the registry CLI);
+only its import paths were rewritten to the kit's own.
+
 When another component lands, its attribution goes here.
