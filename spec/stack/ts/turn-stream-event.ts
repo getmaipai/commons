@@ -7,6 +7,7 @@ export const TurnStreamEvent = z.discriminatedUnion("t", [
     package_id: z.string().min(1),
     args: z.record(z.string(), z.unknown()),
     call_id: z.string().min(1),
+    label: z.string().min(1).optional(),
   }).strict(),
   z.object({
     t: z.literal("tool_result"),

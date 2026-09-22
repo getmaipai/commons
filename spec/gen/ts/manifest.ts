@@ -43,6 +43,15 @@ export const PackageManifest = z
     ]),
     display: z.string().min(1).max(60),
     description: z.string().min(1).max(200),
+    /**Optional (TOOL-EVENTS-01): the human label the turn stream's `tool_call` event carries while a package runs. Read from the manifest's own entry, so the label is the package's, not the route's. When it contains a `{place}` (or other `{arg}`) slot, the engine fills it from the call's `args` when that arg is present, else omits the slot entirely. Absent: the timeline falls back to the package's `display` name.*/
+    tool_label: z
+      .string()
+      .min(1)
+      .max(120)
+      .describe(
+        "Optional (TOOL-EVENTS-01): the human label the turn stream's `tool_call` event carries while a package runs. Read from the manifest's own entry, so the label is the package's, not the route's. When it contains a `{place}` (or other `{arg}`) slot, the engine fills it from the call's `args` when that arg is present, else omits the slot entirely. Absent: the timeline falls back to the package's `display` name.",
+      )
+      .optional(),
     author: z.string().min(1),
     license: z.string().min(1),
     homepage: z.string().url().optional(),

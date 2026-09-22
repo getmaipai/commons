@@ -5,6 +5,22 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.17] - 2026-09-22
+
+### Added
+- `turn-stream-event`'s `tool_call` shape gains an optional `label` string
+  (TOOL-EVENTS-01's label addendum): the human label the turn stream
+  carries while a package runs, read from the package manifest's own
+  `tool_label` entry (below) and templated from the call's `args` by the
+  engine. A `valid-tool-call-labeled` fixture and the hand-written Zod
+  mirror's `label: z.string().min(1).optional()` round-trip it through
+  `stack-fixtures.test.ts`.
+- `manifest.schema.json` gains an optional `tool_label` string: the
+  package-declared label its own `tool_call` wire events carry. `{arg}`
+  slots are filled from the call's `args` by the consuming engine when
+  that arg is present; absent, the timeline falls back to the package's
+  `display` name.
+
 ## [spec-v0.1.16] - 2026-09-22
 
 ### Added

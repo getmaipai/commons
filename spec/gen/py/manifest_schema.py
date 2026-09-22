@@ -283,6 +283,10 @@ class PackageManifest(BaseModel):
     ]
     display: constr(min_length=1, max_length=60)
     description: constr(min_length=1, max_length=200)
+    tool_label: constr(min_length=1, max_length=120) | None = Field(
+        None,
+        description="Optional (TOOL-EVENTS-01): the human label the turn stream's `tool_call` event carries while a package runs. Read from the manifest's own entry, so the label is the package's, not the route's. When it contains a `{place}` (or other `{arg}`) slot, the engine fills it from the call's `args` when that arg is present, else omits the slot entirely. Absent: the timeline falls back to the package's `display` name.",
+    )
     author: constr(min_length=1)
     license: constr(min_length=1)
     homepage: AnyUrl | None = None

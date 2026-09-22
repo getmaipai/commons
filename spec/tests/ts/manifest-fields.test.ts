@@ -120,4 +120,12 @@ describe("PackageManifest, step 2's new fields", () => {
   test("routing.answers rejects a kind outside the vocabulary", () => {
     expect(() => PackageManifest.parse({ ...BASE, routing: { answers: ["movie"] } })).toThrow();
   });
+
+  test("tool_label: the package-declared tool_call label (TOOL-EVENTS-01)", () => {
+    expect(PackageManifest.parse({ ...BASE, tool_label: "Checking the weather in {place}" }).tool_label).toBe(
+      "Checking the weather in {place}",
+    );
+    expect(PackageManifest.parse(BASE).tool_label).toBeUndefined();
+    expect(() => PackageManifest.parse({ ...BASE, tool_label: "" })).toThrow();
+  });
 });

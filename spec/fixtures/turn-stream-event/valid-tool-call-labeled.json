@@ -1,0 +1,1 @@
+{"t":"tool_call","package_id":"weather","args":{"place":"Portland"},"call_id":"turn-abc:call0","label":"Checking the weather in Portland"}
