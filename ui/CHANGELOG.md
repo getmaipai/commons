@@ -4,6 +4,16 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.34] - ui-v0.5.34
+
+`elements/thread.aui.tsx`'s `ThreadComponents` gains an optional
+`ComposerAddAttachmentOverride?: ComponentType` slot - when set, it
+replaces the built-in `ComposerAddAttachment` button outright instead of
+rendering beside it (the way `ComposerExtra` does). A caller whose own
+attach affordance is a grouped menu, not a single-click file picker,
+needs the one "+" in that spot to be its own control, not a second bare
+button next to it. Unset, every existing caller's render is unchanged.
+
 ## [0.5.31] - ui-v0.5.31
 
 `elements/thread.aui.tsx`'s `ThreadComponents` gains an optional

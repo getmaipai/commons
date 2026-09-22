@@ -106,6 +106,11 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * beside the attach button - an append point for a product-specific
  * composer control (a model picker, a response-mode toggle) that
  * belongs in that row rather than forked into it by hand.
+ * `ComposerAddAttachmentOverride`, when set, replaces the built-in
+ * `ComposerAddAttachment` button outright rather than rendering beside
+ * it - a caller whose own attach affordance is a grouped menu (not a
+ * single-click file picker) needs the one "+" in that spot to be its
+ * own, not a second bare button next to it.
  */
 export type ThreadComponents = {
   AssistantMessage?: ComponentType | undefined;
@@ -123,6 +128,7 @@ export type ThreadComponents = {
   AssistantMessageFooterExtra?: ComponentType | undefined;
   Indicator?: ComponentType | undefined;
   ComposerExtra?: ComponentType | undefined;
+  ComposerAddAttachmentOverride?: ComponentType | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -482,11 +488,11 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
 };
 
 const ComposerAction: FC = () => {
-  const { ComposerExtra } = useContext(ThreadComponentsContext);
+  const { ComposerExtra, ComposerAddAttachmentOverride } = useContext(ThreadComponentsContext);
   return (
     <div className="aui-composer-action-wrapper relative flex items-center justify-between">
       <div className="flex items-center gap-1.5">
-        <ComposerAddAttachment />
+        {ComposerAddAttachmentOverride ? <ComposerAddAttachmentOverride /> : <ComposerAddAttachment />}
         {ComposerExtra && <ComposerExtra />}
       </div>
       <div className="flex items-center gap-1.5">
