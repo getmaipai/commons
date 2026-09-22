@@ -5,6 +5,23 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.21] - 2026-09-22
+
+### Fixed
+- `turn.pipeline.next`'s `lives_in` corrected from `household.system` to
+  `household.ai`: spec-v0.1.20 hand-edited `spec/settings/keys.json`
+  directly instead of going through home's own declaration files
+  (`backend/src/settings/*Keys.ts`), the registry's real source of
+  truth (`spec/settings/README.md`: "not a placeholder to fill in by
+  hand", `backend/scripts/gen-settings-registry.ts`). That left home's
+  `check.sh` "settings registry, regenerate and check for drift" stage
+  red: regenerating from declarations produced no `turn.pipeline.next`
+  entry at all. Fixed at the root by adding the key to
+  `backend/src/settings/aiKeys.ts` (beside `chat.model_id`, the other
+  chat-model setting) and regenerating this file from it - every other
+  entry is byte-identical to spec-v0.1.20's hand-written version,
+  confirmed by diff, so nothing else drifted.
+
 ## [spec-v0.1.20] - 2026-09-22
 
 ### Added
