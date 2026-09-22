@@ -19,6 +19,25 @@ export interface SourcesProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   className?: string;
+  /** "grid" (default, unchanged): a two-column card grid, each source's
+   * domain and title stacked. "list": one compact line per source (a
+   * favicon glyph, then title and domain inline) - shadcn.io's own AI
+   * Sources shape, for a caller that wants the source list itself
+   * denser than the grid's own cards, not a caller whose reply already
+   * shows the same title text (both layouts render the identical
+   * title/domain fields - "list" is a denser arrangement of them, not a
+   * smaller subset). */
+  layout?: "grid" | "list";
+}
+
+/** Both layouts below use it identically - a single favicon-style
+ * initial glyph keyed off the domain's own first letter, no icon fetch. */
+function SourceGlyph({ domain, className }: { domain: string; className?: string }) {
+  return (
+    <span className={cn("bg-foreground/[0.06] text-foreground/45 flex size-4 shrink-0 items-center justify-center rounded text-[9px] font-medium", className)}>
+      {domain.charAt(0).toUpperCase()}
+    </span>
+  );
 }
 
 export function Sources({
@@ -26,6 +45,7 @@ export function Sources({
   open,
   onOpenChange,
   className,
+  layout = "grid",
 }: SourcesProps) {
   return (
     <Collapsible
@@ -47,29 +67,56 @@ export function Sources({
         <ChevronDownIcon className="size-3 opacity-60 transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] group-data-open/trigger:rotate-180 group-data-panel-open/trigger:rotate-180 motion-reduce:transition-none" />
       </CollapsibleTrigger>
       <CollapsibleContent className={cn(collapsePanel, "outline-none")}>
-        <div className="grid grid-cols-2 gap-2 pt-2.5">
-          {sources.map((source) => (
-            <div
-              key={source.domain}
-              className={cn(
-                paper,
-                "flex flex-col gap-1.5 rounded-2xl p-3 transition-transform hover:-translate-y-px",
-              )}
-            >
-              <div className="flex items-center gap-1.5">
-                <span className="bg-foreground/[0.06] text-foreground/45 flex size-4 shrink-0 items-center justify-center rounded text-[9px] font-medium">
-                  {source.domain.charAt(0).toUpperCase()}
+        {/* `key={index}`, not `source.domain`: a review on the domain
+         * key found two different pages on the same site produce
+         * identical keys and collide - `sources` is a complete,
+         * server-delivered snapshot on every known caller today (never
+         * streamed/reordered/filtered client-side after mount, wire.ts's
+         * own TurnValue.sources), so index stability holds for as long
+         * as that's true; a caller that DOES stream/reorder this array
+         * incrementally would need real per-source ids instead, not
+         * shipped here since nothing calling this Element does that
+         * yet. */}
+        {layout === "list" ? (
+          <div className="flex flex-col gap-1 pt-2.5" data-slot="sources-list">
+            {sources.map((source, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 rounded-lg px-1 py-1"
+              >
+                <SourceGlyph domain={source.domain} />
+                <span className="text-foreground/90 truncate text-[13px] leading-snug">
+                  {source.title}
                 </span>
-                <span className={cn(mono, "text-foreground/40 truncate")}>
+                <span className={cn(mono, "text-foreground/35 shrink-0 truncate text-[11px]")}>
                   {source.domain}
                 </span>
               </div>
-              <span className="text-foreground/90 line-clamp-2 text-[13px] leading-snug font-medium">
-                {source.title}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2 pt-2.5">
+            {sources.map((source, index) => (
+              <div
+                key={index}
+                className={cn(
+                  paper,
+                  "flex flex-col gap-1.5 rounded-2xl p-3 transition-transform hover:-translate-y-px",
+                )}
+              >
+                <div className="flex items-center gap-1.5">
+                  <SourceGlyph domain={source.domain} />
+                  <span className={cn(mono, "text-foreground/40 truncate")}>
+                    {source.domain}
+                  </span>
+                </div>
+                <span className="text-foreground/90 line-clamp-2 text-[13px] leading-snug font-medium">
+                  {source.title}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </CollapsibleContent>
     </Collapsible>
   );

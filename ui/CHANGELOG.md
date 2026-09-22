@@ -4,6 +4,20 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.26] - ui-v0.5.26
+
+`elements/sources.tsx`'s `Sources` gains an optional `layout?: "grid" |
+"list"` prop (default `"grid"`, every existing caller unchanged) - a
+one-line-per-source list (a favicon glyph, title, then domain), the
+shape shadcn.io's own AI Sources uses for a caller whose reply text
+already carries the source detail the grid's own cards exist to show.
+No new component: the same `Collapsible` trigger and collapsed-by-
+default behavior, a second render branch inside the existing
+`CollapsibleContent`. Also fixes a real bug found live wiring this:
+both layouts keyed each row by `source.domain`, so two different pages
+on the same site in one reply produced two rows with the identical
+React key - keyed by array index instead.
+
 ## [0.5.25] - ui-v0.5.25
 
 `dashboard/components/ui/hover-card.tsx`'s `HoverCardContent` gains a
