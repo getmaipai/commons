@@ -5,6 +5,18 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.18] - 2026-09-22
+
+### Added
+- `llm/routing-corpus.json` gains seven rows for ROUTE-FIND-03 (b)
+  (home's BACKLOG.md): "search who won the Seattle Mariners game
+  yesterday" plus five paraphrases ("search"/"look up"/"google" followed
+  by a plain query), all expecting `websearch` - home's
+  `websearch/manifest.json` gained matching `routing.patterns` in the
+  same fix. Plus one collision pin: "look up the artist Adele" still
+  expects `music`, whose own "look up the artist *" pattern must keep
+  winning over websearch's new, broader "look up *".
+
 ## [spec-v0.1.17] - 2026-09-22
 
 ### Added

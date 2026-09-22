@@ -852,5 +852,53 @@
     "must_not": [],
     "noiseFloorExempt": true,
     "note": "websearch's examples are Tier 2 material: the package is always_offer (native tool calling, offered to the model, never the deterministic winner from an example alone) and none of these utterances match its only two routing.patterns; the stub embedder can't score them above TIER1_THRESHOLD. Excluded from the null-row noise-floor stat the same way the lock-doors row is."
+  },
+  {
+    "utterance": "search who won the Seattle Mariners game yesterday",
+    "expect": "websearch",
+    "must_not": [
+      "remember"
+    ],
+    "note": "ROUTE-FIND-03 (b): the model declined the offered search and the guard's acknowledgment line (guards.ts ACKNOWLEDGE, \"Noted.\") replaced its cut reply - a leading \"search\" is now an explicit websearch command whatever follows, via websearch/manifest.json patterns, bypassing the model entirely."
+  },
+  {
+    "utterance": "look up who won the Seahawks game last night",
+    "expect": "websearch",
+    "must_not": [
+      "remember"
+    ]
+  },
+  {
+    "utterance": "google the final score of the Mariners game",
+    "expect": "websearch",
+    "must_not": [
+      "remember"
+    ]
+  },
+  {
+    "utterance": "search what time the farmers market opens on Saturday",
+    "expect": "websearch",
+    "must_not": []
+  },
+  {
+    "utterance": "look up the nearest gas station",
+    "expect": "websearch",
+    "must_not": []
+  },
+  {
+    "utterance": "google the population of Seattle",
+    "expect": "websearch",
+    "must_not": []
+  },
+  {
+    "utterance": "look up the artist Adele",
+    "expect": "music",
+    "args": {
+      "query": "Adele"
+    },
+    "must_not": [
+      "websearch"
+    ],
+    "note": "ROUTE-FIND-03 (b) collision pin: music's \"look up the artist *\" and websearch's new \"look up *\" both match - package iteration order (loadAllManifests(), alphabetical by id) puts music before websearch, so the more specific pattern wins. Pinned here so that tie-break never regresses silently."
   }
 ]
