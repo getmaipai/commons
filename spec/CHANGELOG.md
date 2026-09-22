@@ -5,6 +5,26 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.19] - 2026-09-22
+
+### Added
+- `llm/routing-corpus.json` gains ten rows for the lookup ladder's
+  "admit by properties" fix (home's ROUTE-FIND-03 (a) and REPLY-FIND-02,
+  WO-Q3 ruling): a present-tense office-holder question over a closed
+  office list ("who is the president of chile", Jesse's real turn 1 -
+  turns 2 and 3 of that conversation wait on REPLY-FIND-05), three
+  organization-announcement questions that already resolve without any
+  new name-widening (Microsoft, Google, Nintendo), an inform carrying a
+  news verb (REPLY-FIND-02's "new trailer for primetime just dropped"),
+  and five regression pins proving the admission never widens past its
+  two closed properties (a person's name, no time window, ordinary
+  current-world chatter with no news verb x2, a commissive instead of
+  an inform). Excluded on purpose: utterances needing organization-name
+  resolution for an ambiguous name like Apple or Tesla ("what did Apple
+  announce this week" - the originally reported bug itself) - the
+  ruling explicitly withheld that widening pending a different
+  approach; these land once that's decided, not guessed at here.
+
 ## [spec-v0.1.18] - 2026-09-22
 
 ### Added

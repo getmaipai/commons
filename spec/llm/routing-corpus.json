@@ -900,5 +900,72 @@
       "websearch"
     ],
     "note": "ROUTE-FIND-03 (b) collision pin: music's \"look up the artist *\" and websearch's new \"look up *\" both match - package iteration order (loadAllManifests(), alphabetical by id) puts music before websearch, so the more specific pattern wins. Pinned here so that tie-break never regresses silently."
+  },
+  {
+    "utterance": "who is the president of chile",
+    "expect": "websearch",
+    "must_not": [],
+    "note": "WO-Q3 (ROUTE-FIND-03 (a)): a present-tense office-holder question over the closed office list admits, whatever case the country is typed in - the query names the office and the place, never a hardcoded name. Jesse's real turn 1; turns 2-3 of that conversation wait on REPLY-FIND-05 (the model writing the follow-up query)."
+  },
+  {
+    "utterance": "what did Microsoft announce yesterday",
+    "expect": "websearch",
+    "must_not": []
+  },
+  {
+    "utterance": "did Google launch anything new this week",
+    "expect": "websearch",
+    "must_not": []
+  },
+  {
+    "utterance": "what did Nintendo reveal at their event this week",
+    "expect": "websearch",
+    "must_not": []
+  },
+  {
+    "utterance": "what did Serena announce this week",
+    "expect": null,
+    "must_not": [
+      "websearch"
+    ],
+    "note": "ROUTE-FIND-03 (a) regression pin: a person's name, never organization-framed by a news verb - stays the model's or ASK-02's, not this ladder."
+  },
+  {
+    "utterance": "what did Apple announce in 2007",
+    "expect": null,
+    "must_not": [
+      "websearch"
+    ],
+    "note": "ROUTE-FIND-03 (a) regression pin: no current-time window, so the event field never fires - a historical fact is the model's or a dated lookup, not this ladder."
+  },
+  {
+    "utterance": "new trailer for primetime just dropped",
+    "expect": "websearch",
+    "must_not": [],
+    "note": "REPLY-FIND-02: an inform carrying a news verb and a world subject admits the same as a question does - the ladder no longer needs a question mark."
+  },
+  {
+    "utterance": "I might go see the new Spiderman movie",
+    "expect": null,
+    "must_not": [
+      "websearch"
+    ],
+    "note": "REPLY-FIND-02 regression pin: ordinary current-world chatter with no news verb - the admission gate is the verb, never the subject's own recency alone (measured: recency alone would have forced a lookup on exactly this row)."
+  },
+  {
+    "utterance": "the new Marsh Lantern album is great",
+    "expect": null,
+    "must_not": [
+      "websearch"
+    ],
+    "note": "REPLY-FIND-02 regression pin: same as above, an opinion about a current subject, no news verb."
+  },
+  {
+    "utterance": "I'll watch the new Primetime trailer when it drops",
+    "expect": null,
+    "must_not": [
+      "websearch"
+    ],
+    "note": "REPLY-FIND-02 regression pin: a commissive, not an inform - the ladder only admits an inform on the event field, never a promise about future viewing."
   }
 ]
