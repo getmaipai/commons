@@ -1,19 +1,27 @@
-import { LifeBuoy, BookOpen } from 'lucide-react';
+import { LifeBuoy, Settings } from 'lucide-react';
 import { Link } from 'react-router';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroupContent, SidebarGroup } from "../../../../components/ui/sidebar"
 
 
+// Home's own bottom-of-rail items, as data (owner ruling, ui-v0.5.23) -
+// the template's own "Help Center"/"Documentation" here pointed at
+// shadcndashboard's own demo FAQ and docs site, the same
+// branding-data-not-component-logic class `sidebaritems.ts` already is.
+// Settings moved down here from the SYSTEM group above (now gone, with
+// nothing left in it); Help opens Home's own user guide - HELP-AI-01
+// (docs/BACKLOG.md) is the AI-assisted version this row is a placeholder
+// for, not yet built.
 export function NavUser() {
     const navItems = [
         {
-            title: "Help Center",
-            url: "https://demos.shadcndashboard.dev/theme-pages/faq",
-            icon: LifeBuoy,
+            title: "Settings",
+            url: "/next/settings",
+            icon: Settings,
         },
         {
-            title: "Documentation",
-            url: "https://shadcndashboard.dev/docs",
-            icon: BookOpen,
+            title: "Help",
+            url: "https://github.com/getmaipai/home/blob/main/docs/user/README.md",
+            icon: LifeBuoy,
         },
     ]
 

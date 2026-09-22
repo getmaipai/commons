@@ -39,18 +39,19 @@ import {
   MessageCircle,
   LayoutGrid,
   Users,
-  Settings,
-  Cpu,
-  RefreshCw,
-  Wrench,
-  DatabaseBackup,
   LucideIcon,
 } from "lucide-react";
 
-// Home's own sidebar, as data (the plan's stand-up list: Home, Chat, Apps;
-// Household: People; System: Settings; Manage: Engines, Updates, Repairs,
-// Backups). Labels and routes only - the template's own nav-items/Sidebar
-// components render this unmodified.
+// Home's own sidebar, as data (owner ruling, ui-v0.5.23: Home, Chat,
+// Apps; Household: People; Settings and Help move to the rail's own
+// bottom slot - NavUser.tsx, the same vendor-time data file this one
+// is). The former System group (Settings alone) and Manage group
+// (Engines, Updates, Repairs, Backups) are gone from the rail: all four
+// Manage routes stay real and reachable - from the dashboard's own stat
+// cards, and from a "Manage" section at the bottom of Settings' own
+// Household tab - just not as permanent rail weight for four pages a
+// household visits rarely. Labels and routes only - the template's own
+// nav-items/Sidebar components render this unmodified.
 const SidebarContent: MenuItem[] = [
   {
     heading: "Home",
@@ -83,46 +84,6 @@ const SidebarContent: MenuItem[] = [
         name: "People",
         icon: Users,
         url: "/next/people",
-      },
-    ],
-  },
-  {
-    heading: "System",
-    items: [
-      {
-        id: uniqueId(),
-        name: "Settings",
-        icon: Settings,
-        url: "/next/settings",
-      },
-    ],
-  },
-  {
-    heading: "Manage",
-    items: [
-      {
-        id: uniqueId(),
-        name: "Engines",
-        icon: Cpu,
-        url: "/next/engines",
-      },
-      {
-        id: uniqueId(),
-        name: "Updates",
-        icon: RefreshCw,
-        url: "/next/updates",
-      },
-      {
-        id: uniqueId(),
-        name: "Repairs",
-        icon: Wrench,
-        url: "/next/repairs",
-      },
-      {
-        id: uniqueId(),
-        name: "Backups",
-        icon: DatabaseBackup,
-        url: "/next/backups",
       },
     ],
   },

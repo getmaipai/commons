@@ -650,10 +650,16 @@ body {
  * panel (`sidebar.tsx`'s own `data-slot="sidebar-inner"` div) - a full
  * 1px box around the whole sidebar, on top of the page's own
  * background. Transparent border-color leaves the sidebar sitting
- * directly on the page background, no box, matching dashboard-01;
- * `border` (the width) is untouched, so there's no layout shift. */
+ * directly on the page background, no box, matching dashboard-01 -
+ * but a border still occupies its own 1px of box layout the same as
+ * a real one, transparent or not (unlike `outline` below, which never
+ * takes layout space at all): found live, ui-v0.5.23, measured against
+ * the header's own bottom edge on 8787 - the rail's logo/badge row sat
+ * 1px lower than the header's search row because this border's 1px
+ * width was still there, just invisible. `border-width: 0` removes the
+ * space itself, not just its color. */
 [data-slot="sidebar-inner"] {
-  border-color: transparent;
+  border-width: 0;
 }
 
 /* Third of the three: the main content panel's own outline.
@@ -662,7 +668,11 @@ body {
  * perimeter 1px outline around the inset content panel, on top of its
  * own `shadow-sm`. Transparent outline-color leaves the panel as a
  * plain rounded sheet carrying only its shadow, matching dashboard-01;
- * `outline` (the width) is untouched. */
+ * `outline` (the width) is untouched, and unlike the border above,
+ * genuinely doesn't need to be - CSS `outline` never occupies box
+ * layout space (transparent or not), only `border` does. Confirmed
+ * live alongside the sidebar-inner fix above: no matching 1px shift
+ * ever came from this rule. */
 [data-slot="sidebar-inset"] {
   outline-color: transparent;
 }

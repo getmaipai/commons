@@ -37,10 +37,17 @@ captures - a real screenshot caught it, exactly what "every screenshot
 gets looked at" is for); the `isPro` nav badge rendering (the field stays possible
 on `ChildItem`/`MenuItem` only insofar as nothing sets it - the sidebar
 data below never does); the sidebar header's `V.1.0` `Badge`
-(`layouts/full/vertical/sidebar/Sidebar.tsx`, ui-v0.5.21) - a version
-number belongs to the product showing it, and Home's real one already
-has a page (`/next/updates`), not a second, hardcoded, always-stale copy
-in the rail; one of the two icon systems - `@iconify/react`
+(`layouts/full/vertical/sidebar/Sidebar.tsx`, first cut as ui-v0.5.21,
+landed as ui-v0.5.22 once that tag's own missed package.json version
+bump was caught and the tag replaced rather than patched - see "A real
+gotcha, worth a line" below) - a version number belongs to the product
+showing it, and Home's real one already has a page (`/next/updates`),
+not a second, hardcoded, always-stale copy in the rail; the shared
+`Footer.tsx` (`layouts/full/shared/footer/Footer.tsx`, ui-v0.5.23) -
+the template vendor's own copyright line and "Support"/"License"
+links pointing at their site, with no Home equivalent for either;
+returns `null` now, the same "strip the demo content, not the
+component" treatment as the badge; one of the two icon systems - `@iconify/react`
 goes, `lucide-react` stays (see "Icon substitutions"); `css/pages/app.css`
 (calendar/demo-page rules, none of it reached by the kept views) and
 `css/styles/style-lyra.css` (a demo-only component-class variant, not a
@@ -65,23 +72,37 @@ that row ships for real.
 
 **Sidebar data**: `layouts/full/vertical/sidebar/sidebaritems.ts` keeps
 the template's `ChildItem`/`MenuItem` shapes (component files import from
-this exact path unmodified) but its content is Home's own - the plan's
-stand-up list (Home, Chat, Apps; Household: People; System: Settings;
-Manage: Engines, Updates, Repairs, Backups) - not the template's demo
-navigation. A later wiring row can split the data out of the vendored
-folder if that becomes friction; for now the component's own hardcoded
-import path is the reason it lives here.
+this exact path unmodified) but its content is Home's own - not the
+template's demo navigation. As of ui-v0.5.23 (owner ruling): Home, Chat,
+Apps; Household: People - the former System group (Settings alone) and
+Manage group (Engines, Updates, Repairs, Backups) are gone from the
+rail entirely, not renamed or regrouped; all four Manage routes stay
+real, reachable from the dashboard's own stat cards and from Settings'
+own Household tab instead of permanent rail weight. A later wiring row
+can split the data out of the vendored folder if that becomes friction;
+for now the component's own hardcoded import path is the reason it
+lives here.
 
-**Brand assets** (ui-v0.5.21): `assets/images/logos/darklogo.svg`,
-`whitelogo.svg`, `logoicon.svg` and `logoicon-dark.svg` - the four
-files `FullLogo.tsx`'s and `Logo.tsx`'s own import paths point at,
-unmodified - now carry MaiPai Home's real logo and icon mark (from
-`getmaipai/.github/brand/maipai-home-logo-{light,dark}.png` and
-`maipai-home-icon-{light,dark}.png`, resized for a header logo and
-wrapped as an SVG `<image>` so the raster art still fits `FullLogo.tsx`'s
-own `width={100} height={32}` unchanged) instead of the template's own
-"Shadcn Dashboard" wordmark, the same branding-data-not-component-logic
-class `sidebaritems.ts` below already is - never redrawn, per
+**Bottom-of-rail data** (ui-v0.5.23): `layouts/full/vertical/sidebar/
+NavUser.tsx` is the same shape as `sidebaritems.ts` above - a plain
+`navItems` array, vendor-time data, not component logic - and carried
+the identical class of demo content: "Help Center" and "Documentation"
+linking to shadcndashboard's own demo FAQ and docs site. Now Settings
+(moved down from the retired System group) and Help (Home's own user
+guide, `docs/user/README.md` via its GitHub page - nothing serves it
+directly from the app yet; HELP-AI-01, docs/BACKLOG.md, is the real,
+in-app, AI-assisted version this is a placeholder for).
+
+**Brand assets** (ui-v0.5.21, sizing fixed ui-v0.5.23): `assets/images/
+logos/darklogo.svg`, `whitelogo.svg`, `logoicon.svg` and
+`logoicon-dark.svg` - the four files `FullLogo.tsx`'s and `Logo.tsx`'s
+own import paths point at, unmodified - now carry MaiPai Home's real
+logo and icon mark (from `getmaipai/.github/brand/maipai-home-logo-
+{light,dark}.png` and `maipai-home-icon-{light,dark}.png`, resized and
+wrapped as an SVG `<image>` so the raster art still resolves through
+the same import paths) instead of the template's own "Shadcn
+Dashboard" wordmark, the same branding-data-not-component-logic class
+`sidebaritems.ts` below already is - never redrawn, per
 `docs/LICENSING.md`'s "third-party assets, download don't vendor" rule
 read the other way: these are MaiPai's own, so the org's usual asset
 pipeline (a release's own logo files, tracked here since the kit is
@@ -92,6 +113,25 @@ have no current consumer inside `home`'s own `/next` tree (`Logo.tsx`
 itself is never imported there, only by the vendored demo auth forms) -
 swapped anyway so no vendored file under `assets/` still carries the
 template's own branding, in case a later row wires `Logo.tsx` in.
+
+The wordmark pair's own sizing (found live, ui-v0.5.23): the first cut
+wrapped each PNG with `preserveAspectRatio="xMidYMid meet"` inside a
+`viewBox="0 0 100 32"` that matches neither source PNG's real ratio
+(3:1 and 2.667:1) - "meet" letterboxes art that doesn't match its own
+box, which read as undersized against `FullLogo.tsx`'s fixed
+`width={100} height={32}`. Since those attributes are on `FullLogo.tsx`
+itself (byte-for-byte, never touched), the rendered box is always
+exactly 100x32 regardless of what the SVG file draws inside it -
+`max-w-[120px]` on the same `<img>` never actually engages, since the
+attribute-derived 100px width is already below the 120px cap it would
+need to constrain. `preserveAspectRatio="none"` now stretches each
+wordmark to fill that fixed box edge to edge instead (a small,
+imperceptible non-uniform scale at a 32px render height) - the
+achievable version of "fill the slot," given the slot itself can't
+grow past what `FullLogo.tsx` already fixes. The icon mark pair needed
+no change: `logoicon.svg`/`logoicon-dark.svg`'s own square viewBox
+already matches their square source PNGs, so nothing was ever
+letterboxed there.
 
 **Style presets**: `globals.css` keeps the template's `dark`/`style-<name>` custom-variant mechanism. Since ui-v0.5.13 `:root`/`.dark` carry the template's OWN palette, byte-for-byte from the pinned upstream commit (light and dark, translucent borders included), per the org decision of 2026-09-21 ("the template's own palette is the default look"). `.style-studio` and `.style-calm` are full palette blocks equal to that default and differ only in `--tile-radius` (12px square, 999px circle); `.style-navy` is Home's former navy set from `docs/design/home-pages-2026-09-20.md`, kept as a preset; the seven shadcn base colors are transcribed from ui.shadcn.com. `ui.look` selects among them by body class.
 

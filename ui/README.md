@@ -48,3 +48,5 @@ pass.
 ## Pinning this workspace
 
 A consumer adds `"@maipai/ui": "file:../../shared/ui"` to its `package.json` (adjusted for its own depth), checks out this repo at the tag it wants, and runs `bun install`; `bun` copies a self-contained package, so a bump is a new checkout plus `bun install`. The pinned tag is stated in the consumer's own dev docs and checked by its `check.sh` against this workspace's `package.json` version. There is no registry; this is the `@maipai/standards` pattern.
+
+**Cutting a tag is two edits, not one** (found live, ui-v0.5.21: cut with the tag name bumped but `package.json`'s own `"version"` field left at the old value - a consumer's `check.sh` refused it immediately, correctly, since the two are meant to agree; the tag was deleted rather than patched, since nothing had a working pin to it yet). `ui-vX.Y.Z` and `package.json`'s `"version": "X.Y.Z"` move together, in the same commit, every time - check `git show <tag> -- package.json` before pushing a tag if there's any doubt.

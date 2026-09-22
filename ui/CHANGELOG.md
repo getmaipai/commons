@@ -4,6 +4,49 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.23] - ui-v0.5.23
+
+`Footer.tsx` (`layouts/full/shared/footer/Footer.tsx`) now returns
+`null`: demo content, the template vendor's own copyright line and
+"Support"/"License" links pointing at their site - the same
+strip-not-fork treatment as ui-v0.5.22's `V.1.0` `Badge`. Also: a
+README note on why a tag bump is two edits (the tag name and
+`package.json`'s own version, together), after ui-v0.5.21 was cut
+with only the first and had to be replaced.
+
+BRAND-01 follow-ups, found live on 8787: (1) `darklogo.svg`/
+`whitelogo.svg` (the wordmark pair, ui-v0.5.21) looked undersized -
+their own `<image>` used `preserveAspectRatio="xMidYMid meet"` inside
+a `viewBox="0 0 100 32"` that doesn't match either source PNG's real
+ratio (3:1 and 2.667:1), so the art letterboxed inside its own slot
+before `FullLogo.tsx`'s fixed `width={100} height={32}` ever got a
+say. `FullLogo.tsx`'s own attributes stay untouched (byte-for-byte),
+so the rendered box is always exactly 100x32 regardless of the SVG's
+content - `max-w-[120px]` on the `<img>` never actually engages
+(100 &lt; 120 already, nothing for it to cap). Both files now use
+`preserveAspectRatio="none"`, stretching the art to fill that fixed
+100x32 box edge to edge (a small, imperceptible non-uniform scale at
+this render size) instead of leaving visible padding around it - the
+achievable version of "fill the slot," given the box itself can't
+grow past what `FullLogo.tsx` already fixes. (2) The rail's own
+header row sat 1px lower than the top header's, because `tokens.css`'s
+own `[data-slot="sidebar-inner"]` deviation rule made the sidebar
+panel's 1px border transparent but left its width alone - a border
+occupies its own layout space whether or not it's visible, unlike
+`outline`, which never does. Now `border-width: 0` there instead of a
+transparent color; the matching `[data-slot="sidebar-inset"]` outline
+rule needed no change (confirmed, not assumed).
+
+Rail restructuring, owner-ruled: `sidebaritems.ts` drops the System
+group (Settings alone) and the whole Manage group (Engines, Updates,
+Repairs, Backups) - those four routes stay real, reachable from the
+dashboard's own stat cards and from a new "Manage" section on
+Settings' own Household tab (`home`'s own change), not permanent rail
+weight. `NavUser.tsx` (the rail's bottom slot, the same vendor-time
+data class as `sidebaritems.ts`) drops the template's own "Help
+Center"/"Documentation" demo links for Settings (moved down from the
+retired System group) and Help (Home's own user guide).
+
 ## [0.5.22] - ui-v0.5.22
 
 CHAT-UI-01, owner-ruled: the section-heading renderer in the vertical
