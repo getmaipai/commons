@@ -42,6 +42,7 @@ import {
   type ImageMessagePartComponent,
   type TextMessagePartComponent,
   type ToolCallMessagePartComponent,
+  useAui,
   useAuiState,
 } from "@assistant-ui/react";
 import {
@@ -61,6 +62,7 @@ import {
   SquareIcon,
   ThumbsDownIcon,
   ThumbsUpIcon,
+  Volume2Icon,
 } from "lucide-react";
 import {
   createContext,
@@ -69,6 +71,7 @@ import {
   type FC,
   type PropsWithChildren,
 } from "react";
+import { formatRelative } from "../relativeTime";
 
 export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
 
@@ -80,6 +83,10 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * `ToolFallback`. When `TaskGroup` is set, tool calls that carry a nested
  * conversation and have no registered UI render through it instead of the
  * tool group; without it they render like any other tool call.
+ * `AssistantMoreItems`, when set, renders after the built-in Export as
+ * Markdown item in the assistant action bar's own "More" menu - the one
+ * append point that menu has, for a product-specific action (an admin-
+ * only diagnostic, a stats reveal) that doesn't belong in the kit itself.
  */
 export type ThreadComponents = {
   AssistantMessage?: ComponentType | undefined;
@@ -92,6 +99,7 @@ export type ThreadComponents = {
     | ComponentType<PropsWithChildren<{ group: ThreadGroupPart }>>
     | undefined;
   TaskGroup?: ComponentType<{ group: ThreadGroupPart }> | undefined;
+  AssistantMoreItems?: ComponentType | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -338,6 +346,20 @@ const SpokenMessage: FC = () => {
   );
 };
 
+// Shared by every ActionBarPrimitive.Copy in this file (SpokenActionBar,
+// AssistantActionBar, UserActionBar) - the identical checkmark/copy icon
+// swap, kept in one place rather than hand-copied at each call site.
+const CopyIconSwap: FC = () => (
+  <>
+    <AuiIf condition={(s) => s.message.isCopied}>
+      <CheckIcon className="animate-in zoom-in-50 fade-in duration-200 ease-out" />
+    </AuiIf>
+    <AuiIf condition={(s) => !s.message.isCopied}>
+      <CopyIcon className="animate-in zoom-in-75 fade-in duration-150" />
+    </AuiIf>
+  </>
+);
+
 const SpokenActionBar: FC = () => {
   return (
     <ActionBarPrimitive.Root
@@ -347,12 +369,7 @@ const SpokenActionBar: FC = () => {
     >
       <ActionBarPrimitive.Copy asChild>
         <TooltipIconButton tooltip="Copy" className="size-6">
-          <AuiIf condition={(s) => s.message.isCopied}>
-            <CheckIcon className="animate-in zoom-in-50 fade-in duration-200 ease-out" />
-          </AuiIf>
-          <AuiIf condition={(s) => !s.message.isCopied}>
-            <CopyIcon className="animate-in zoom-in-75 fade-in duration-150" />
-          </AuiIf>
+          <CopyIconSwap />
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
     </ActionBarPrimitive.Root>
@@ -636,6 +653,7 @@ const AssistantMessage: FC = () => {
 };
 
 const AssistantActionBar: FC = () => {
+  const { AssistantMoreItems } = useContext(ThreadComponentsContext);
   return (
     <ActionBarPrimitive.Root
       hideWhenRunning
@@ -644,14 +662,25 @@ const AssistantActionBar: FC = () => {
     >
       <ActionBarPrimitive.Copy asChild>
         <TooltipIconButton tooltip="Copy">
-          <AuiIf condition={(s) => s.message.isCopied}>
-            <CheckIcon className="animate-in zoom-in-50 fade-in duration-200 ease-out" />
-          </AuiIf>
-          <AuiIf condition={(s) => !s.message.isCopied}>
-            <CopyIcon className="animate-in zoom-in-75 fade-in duration-150" />
-          </AuiIf>
+          <CopyIconSwap />
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
+      <AuiIf condition={(s) => s.thread.capabilities.speech}>
+        <AuiIf condition={(s) => s.message.speech == null}>
+          <ActionBarPrimitive.Speak asChild>
+            <TooltipIconButton tooltip="Read aloud">
+              <Volume2Icon />
+            </TooltipIconButton>
+          </ActionBarPrimitive.Speak>
+        </AuiIf>
+        <AuiIf condition={(s) => s.message.speech != null}>
+          <ActionBarPrimitive.StopSpeaking asChild>
+            <TooltipIconButton tooltip="Stop reading">
+              <SquareIcon className="fill-current" />
+            </TooltipIconButton>
+          </ActionBarPrimitive.StopSpeaking>
+        </AuiIf>
+      </AuiIf>
       <AuiIf condition={(s) => s.thread.capabilities.feedback}>
         <ActionBarPrimitive.FeedbackPositive asChild>
           <TooltipIconButton
@@ -696,6 +725,7 @@ const AssistantActionBar: FC = () => {
               Export as Markdown
             </ActionBarMorePrimitive.Item>
           </ActionBarPrimitive.ExportMarkdown>
+          {AssistantMoreItems ? <AssistantMoreItems /> : null}
         </ActionBarMorePrimitive.Content>
       </ActionBarMorePrimitive.Root>
     </ActionBarPrimitive.Root>
@@ -729,7 +759,7 @@ const UserMessage: FC = () => {
             components={{ File: UserFilePart, Image: UserImagePart }}
           />
         </div>
-        <div className="aui-user-action-bar-wrapper absolute start-0 top-1/2 -translate-x-full -translate-y-1/2 pe-2 peer-empty:hidden rtl:translate-x-full">
+        <div className="aui-user-action-bar-wrapper flex justify-end pt-1 peer-empty:hidden">
           <UserActionBar />
         </div>
       </div>
@@ -742,18 +772,83 @@ const UserMessage: FC = () => {
   );
 };
 
+const UserMessageTimestamp: FC = () => {
+  const createdAt = useAuiState((s) => s.message.createdAt);
+  return (
+    <time
+      className="aui-user-message-timestamp text-muted-foreground px-1 text-xs"
+      dateTime={createdAt.toISOString()}
+    >
+      {formatRelative(createdAt.toISOString())}
+    </time>
+  );
+};
+
+// ActionBarPrimitive.Reload's own disabled gate (assistant-ui core,
+// actionBarReloadDisabled) hard-codes `s.message.role !== "assistant"` -
+// a product choice the primitive bakes in, not a limitation of the
+// underlying reload itself (thread-message-client.ts's own `reload()`
+// just calls the thread's onReload for whatever message it's scoped to,
+// role-agnostic). Retrying from a user's own message - "same question,
+// try again" - is real, asked-for UX the shipped button can't reach, so
+// this calls the identical runtime method (`useAui().message.reload()`,
+// the same public hook every other action bar entry in this file uses).
+// `aui.message.reload()` (a review, 2026-09-22, caught this) is NOT that
+// call: @assistant-ui/core's MessageRuntime.reload() throws "Can only
+// reload assistant messages" for any non-assistant role - a real check
+// in the runtime itself, not just the primitive's own disabled gate this
+// comment originally (wrongly) called the only restriction. The actual
+// shipped, tested mechanism for "same message, try again" is the edit
+// flow's own composer: `beginEdit()` prefills the composer from the
+// message's own text (assistant-ui's own test suite: "prefills the edit
+// composer from the message on beginEdit"), and `send()` right after, in
+// the same tick, resubmits it unchanged ("dispatches a same-tick
+// beginEdit + setText + send sequence" - setText is optional; omitting
+// it is exactly a same-text resend). This is the identical sequence
+// ActionBarPrimitive.Edit + ComposerPrimitive.Send already drive through
+// EditComposer, just triggered from one button instead of two.
+const UserRetryButton: FC = () => {
+  const aui = useAui();
+  const canReload = useAuiState(
+    (s) =>
+      s.thread.capabilities.reload &&
+      !s.thread.isRunning &&
+      !s.thread.isDisabled,
+  );
+  if (!canReload) return null;
+  return (
+    <TooltipIconButton
+      tooltip="Retry"
+      className="aui-user-action-retry"
+      onClick={() => {
+        aui.composer.beginEdit();
+        aui.composer.send();
+      }}
+    >
+      <RefreshCwIcon />
+    </TooltipIconButton>
+  );
+};
+
 const UserActionBar: FC = () => {
   return (
     <ActionBarPrimitive.Root
       hideWhenRunning
       autohide="not-last"
-      className="aui-user-action-bar-root flex flex-col items-end"
+      className="aui-user-action-bar-root flex items-center gap-0.5"
     >
+      <UserMessageTimestamp />
+      <UserRetryButton />
       <ActionBarPrimitive.Edit asChild>
         <TooltipIconButton tooltip="Edit" className="aui-user-action-edit">
           <PencilIcon />
         </TooltipIconButton>
       </ActionBarPrimitive.Edit>
+      <ActionBarPrimitive.Copy asChild>
+        <TooltipIconButton tooltip="Copy" className="aui-user-action-copy">
+          <CopyIconSwap />
+        </TooltipIconButton>
+      </ActionBarPrimitive.Copy>
     </ActionBarPrimitive.Root>
   );
 };

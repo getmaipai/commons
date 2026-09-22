@@ -4,6 +4,32 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.24] - ui-v0.5.24
+
+`elements/thread.aui.tsx`'s two real action bars, extended, not forked:
+
+- `AssistantActionBar` gains a read-aloud toggle (`ActionBarPrimitive.Speak`/
+  `.StopSpeaking`, gated on `s.thread.capabilities.speech`, the same pattern
+  the existing feedback buttons already use for their own capability), and a
+  new `ThreadComponents.AssistantMoreItems` slot rendered after the built-in
+  Export as Markdown item in the "More" menu - the append point a consuming
+  app needs for a product-specific menu entry (an admin diagnostic, a stats
+  reveal) that has no place in the kit itself. Both are additive and
+  `undefined` by default; nothing changes for a consumer that doesn't pass
+  them.
+- `UserActionBar` moves from a hover-reveal column floating to the left of
+  the bubble to a static row under it, right-aligned: a relative timestamp
+  (the kit's own `formatRelative`), then retry, edit, copy. Retry has no
+  shipped primitive of its own - `ActionBarPrimitive.Reload`'s underlying
+  `MessageRuntime.reload()` throws outright on a non-assistant message
+  (`@assistant-ui/core`, "Can only reload assistant messages") - so it
+  drives the identical sequence `ActionBarPrimitive.Edit` +
+  `ComposerPrimitive.Send` already do (`aui.composer.beginEdit()` then
+  `.send()` in the same tick, both real, tested assistant-ui behavior:
+  `beginEdit()` prefills the composer from the message's own text, and
+  `send()` with nothing changed resubmits it as-is), from one button
+  instead of two, rather than forking anything.
+
 ## [0.5.23] - ui-v0.5.23
 
 `Footer.tsx` (`layouts/full/shared/footer/Footer.tsx`) now returns
