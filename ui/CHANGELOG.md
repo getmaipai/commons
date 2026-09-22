@@ -4,6 +4,21 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.25] - ui-v0.5.25
+
+`dashboard/components/ui/hover-card.tsx`'s `HoverCardContent` gains a
+`container` prop, threaded straight through to the underlying
+`PreviewCardPrimitive.Portal`'s own `container` (Base UI already exposes
+it there; nothing here adds new positioning logic, just makes an
+existing knob reachable). Found needed live: CHAT-UI-02's own peek
+overlay defaulted to portalling into `document.body`, anchored to the
+small trigger button's own rect - close in size and look, but not
+pixel-equal to the real thread-list column's box the peek is meant to
+stand in for. Portalling into the SAME container the real column is a
+flex sibling of (rather than `document.body`) is what lets a consumer's
+own `side`/`align`/offset math resolve against that column's own local
+origin instead of the viewport's.
+
 ## [0.5.24] - ui-v0.5.24
 
 `elements/thread.aui.tsx`'s two real action bars, extended, not forked:
