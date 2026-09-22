@@ -96,10 +96,19 @@ export function Sources({
                 className="flex items-center gap-2 rounded-lg px-1 py-1"
               >
                 <SourceGlyph domain={source.domain} />
-                <span className="text-foreground/90 truncate text-[13px] leading-snug">
+                {/* `min-w-0` on both spans (a bot review on the
+                 * upstream PR caught this): a flex child's default
+                 * min-width is `auto`, not `0`, so `truncate` silently
+                 * did nothing on either span before this - an unusually
+                 * long title or domain pushed the row wider than its
+                 * container instead of eliding. The domain is further
+                 * capped at `max-w-[40%]` (no longer `shrink-0`) so an
+                 * unusually long domain still yields most of the row to
+                 * the title. */}
+                <span className="text-foreground/90 min-w-0 flex-1 truncate text-[13px] leading-snug">
                   {source.title}
                 </span>
-                <span className={cn(mono, "text-foreground/35 shrink-0 truncate text-[11px]")}>
+                <span className={cn(mono, "text-foreground/35 min-w-0 max-w-[40%] shrink truncate text-[11px]")}>
                   {source.domain}
                 </span>
               </div>

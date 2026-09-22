@@ -4,6 +4,18 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.30] - ui-v0.5.30
+
+`elements/sources.tsx`'s list layout: both the title and domain spans
+now get `min-w-0` (a flex child's default min-width is `auto`, not `0`,
+so `truncate` silently did nothing on either span before this) - an
+unusually long title or domain no longer widens the row past its
+container. The domain also drops `shrink-0` for `max-w-[40%] shrink`,
+so it still yields most of the row's width to the title even when it's
+long. Found by an automated review on the upstream PR for this Element's
+own `layout` prop (`ui-v0.5.26`), ported back here to keep the two
+copies identical in behavior.
+
 ## [0.5.29] - ui-v0.5.29
 
 `elements/thread.aui.tsx`'s `ThreadComponents` gains an optional
