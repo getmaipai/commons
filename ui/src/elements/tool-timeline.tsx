@@ -75,7 +75,15 @@ export function ToolTimeline({
 
             return (
               <div
-                key={step.chip}
+                // `key={index}`, not `step.chip`: a review on a consumer
+                // calling the same package twice in one turn found two
+                // steps with the identical chip text collide on an
+                // identical key - `steps` is a plain array handed to the
+                // component once per render, not reordered/filtered
+                // after the fact, so index stability holds (the same
+                // reasoning `elements/sources.tsx` already documents for
+                // its own index-keyed rows).
+                key={index}
                 className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-foreground/55 flex items-center gap-2 text-[13.5px] duration-300"
               >
                 <Icon className="text-foreground/35 size-3.5 shrink-0" />

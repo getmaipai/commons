@@ -4,6 +4,15 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.28] - ui-v0.5.28
+
+`elements/tool-timeline.tsx`'s `ToolTimeline` now keys each rendered step
+by array index instead of `step.chip` - a review (landing TOOL-EVENTS-01's
+frontend half, home) found two calls to the same package in one turn
+produce two steps with the identical chip text, colliding on an
+identical React key. Same class of bug and same fix `elements/sources.tsx`
+already got for `source.domain` (`ui-v0.5.26`).
+
 ## [0.5.27] - ui-v0.5.27
 
 CHAT-UI-03 (Jesse's own ChatGPT comparison, 2026-09-22). Four fixes to
