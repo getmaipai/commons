@@ -5,6 +5,19 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.16] - 2026-09-22
+
+### Added
+- `turn-stream-event` wire shape (`schemas/turn-stream-event.schema.json`):
+  the three tool-event shapes the home backend's turn stream emits
+  (TOOL-EVENTS-01) - `tool_call` (`t`, `package_id`, `args`, `call_id`),
+  `tool_result` (`t`, `call_id`, `package_id`, `outcome` with optional
+  `text`/`error_code`), and `tool_error` (`t`, `call_id`, `package_id`,
+  `error`). A hand-written Zod mirror (`stack/ts/turn-stream-event.ts`)
+  and nine fixtures under `fixtures/turn-stream-event/` round-trip it
+  through `stack-fixtures.test.ts`; the schema joins the
+  `STACK_SCHEMA_NAMES` exclusion so `gen:ts` never clobbers the mirror.
+
 ## [spec-v0.1.15] - 2026-09-21
 
 ### Changed

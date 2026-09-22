@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/turn-stream-event.schema.json",
+  "title": "TurnStreamEvent",
+  "description": "A turn-stream wire event: one line of the NDJSON stream a /stream turn emits. `tool_call`, `tool_result` and `tool_error` are the tool shapes (TOOL-EVENTS-01); the remaining union members (`turn_meta`, `signal`, `delta`, `reasoning`, `spoken_cue`, `done`, `error`) are defined by the home backend and not this schema - this schema covers only the tool-event shapes the spec must name.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "t": { "const": "tool_call" },
+        "package_id": { "type": "string", "minLength": 1 },
+        "args": { "type": "object" },
+        "call_id": { "type": "string", "minLength": 1 }
+      },
+      "required": ["t", "package_id", "args", "call_id"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "t": { "const": "tool_result" },
+        "call_id": { "type": "string", "minLength": 1 },
+        "package_id": { "type": "string", "minLength": 1 },
+        "outcome": {
+          "type": "object",
+          "properties": {
+            "text": { "type": "string" },
+            "error_code": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["t", "call_id", "package_id", "outcome"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "t": { "const": "tool_error" },
+        "call_id": { "type": "string", "minLength": 1 },
+        "package_id": { "type": "string", "minLength": 1 },
+        "error": { "type": "string", "minLength": 1 }
+      },
+      "required": ["t", "call_id", "package_id", "error"],
+      "additionalProperties": false
+    }
+  ]
+}
