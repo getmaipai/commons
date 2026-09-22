@@ -280,6 +280,32 @@
   display: none;
 }
 
+/* CHAT-UI-03 (getmaipai/home, 2026-09-22): the fix above, correct for
+ * the main nav row, found a second, independent gap the same way
+ * HOME-UI-04b's own comment already predicted ("two independent
+ * components, two independent gaps"). The vendored `SidebarFooter`'s
+ * own wrapper around `NavUser` (`dashboard/layouts/full/vertical/
+ * sidebar/Sidebar.tsx:43`, `<div className="hide-menu ...">`) applies
+ * the SAME class to the WHOLE block - icons included, not just
+ * `NavUser`'s own per-item text label (which already correctly scopes
+ * its own nested `hide-menu` to just that span, `NavUser.tsx:38`) - so
+ * Settings and Help disappeared entirely in icon-collapsed mode
+ * instead of collapsing to icons like every other rail item. Re-shown
+ * at the outer wrapper specifically (one more attribute selector than
+ * the rule above, so it wins without `!important`); the nested
+ * per-item label a level in still hides correctly on its own. A review
+ * flagged this as two bespoke overrides for the same underlying
+ * template gap, discovered by hunting rather than fixed at its root
+ * (the phantom `data-sidebar-type` gate two comments up) - accepted:
+ * each is a real, narrow, one-line fix and the root fix would mean
+ * setting an attribute the template's OWN markup never sets anywhere,
+ * a bigger and unproven change for the same visible result. A THIRD
+ * `hide-menu` wrapper hiding more than its own label is the signal to
+ * stop patching instances and revisit the root gate instead. */
+[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-footer"] > .hide-menu {
+  display: flex;
+}
+
 /* CHAT-UI-01 (getmaipai/home, 2026-09-21), owner-ruled: the
  * template's own section-heading renderer (`dashboard/layouts/full/
  * vertical/sidebar/nav-collapse/index.tsx`) draws a literal "..." in

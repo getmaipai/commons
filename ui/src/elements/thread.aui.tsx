@@ -87,6 +87,15 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * Markdown item in the assistant action bar's own "More" menu - the one
  * append point that menu has, for a product-specific action (an admin-
  * only diagnostic, a stats reveal) that doesn't belong in the kit itself.
+ * `AssistantActionBarExtra`, when set, renders as the LAST item in the
+ * bar's own row itself, after "More" - for a product-specific control
+ * that belongs beside Copy/Reload/etc, not tucked inside the "More"
+ * menu (a sources-card trigger sized to the reply it belongs to, e.g.).
+ * `AssistantMessageFooterExtra`, when set, renders as a block-level
+ * sibling AFTER the whole footer row (bar and branch picker both) - for
+ * content that a bar-row trigger expands but that doesn't belong INSIDE
+ * the bar's own single icon row (the sources card's own compact list,
+ * e.g., opened by its trigger in `AssistantActionBarExtra` above).
  */
 export type ThreadComponents = {
   AssistantMessage?: ComponentType | undefined;
@@ -100,6 +109,8 @@ export type ThreadComponents = {
     | undefined;
   TaskGroup?: ComponentType<{ group: ThreadGroupPart }> | undefined;
   AssistantMoreItems?: ComponentType | undefined;
+  AssistantActionBarExtra?: ComponentType | undefined;
+  AssistantMessageFooterExtra?: ComponentType | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -548,6 +559,7 @@ const AssistantMessage: FC = () => {
     ToolGroup,
     ReasoningGroup,
     TaskGroup: TaskGroupComponent,
+    AssistantMessageFooterExtra,
   } = useContext(ThreadComponentsContext);
   const groupBy = TaskGroupComponent ? taskAwareGroupBy : messageGroupBy;
 
@@ -648,12 +660,15 @@ const AssistantMessage: FC = () => {
         <BranchPicker />
         <AssistantActionBar />
       </div>
+      {AssistantMessageFooterExtra ? <AssistantMessageFooterExtra /> : null}
     </MessagePrimitive.Root>
   );
 };
 
 const AssistantActionBar: FC = () => {
-  const { AssistantMoreItems } = useContext(ThreadComponentsContext);
+  const { AssistantMoreItems, AssistantActionBarExtra } = useContext(
+    ThreadComponentsContext,
+  );
   return (
     <ActionBarPrimitive.Root
       hideWhenRunning
@@ -728,6 +743,7 @@ const AssistantActionBar: FC = () => {
           {AssistantMoreItems ? <AssistantMoreItems /> : null}
         </ActionBarMorePrimitive.Content>
       </ActionBarMorePrimitive.Root>
+      {AssistantActionBarExtra ? <AssistantActionBarExtra /> : null}
     </ActionBarPrimitive.Root>
   );
 };
@@ -759,7 +775,16 @@ const UserMessage: FC = () => {
             components={{ File: UserFilePart, Image: UserImagePart }}
           />
         </div>
-        <div className="aui-user-action-bar-wrapper flex justify-end pt-1 peer-empty:hidden">
+        {/* CHAT-UI-03 (5): `ActionBarPrimitive.Root`'s own `autohide`
+            (`ActionBarRoot.tsx`: `if (hideAndfloatStatus === Hidden)
+            return null`) genuinely unmounts, not just CSS-hides, so
+            this wrapper collapsed to zero height between hovers,
+            shifting every message below it - the assistant message's
+            own footer already reserves its own space the identical way
+            (`ACTION_BAR_HEIGHT` a few lines up: `min-h-7.5 pt-1.5`),
+            this just gives the user message's own wrapper the same
+            fixed floor instead of a fresh, second number. */}
+        <div className="aui-user-action-bar-wrapper flex min-h-7.5 items-center justify-end pt-1.5 peer-empty:hidden">
           <UserActionBar />
         </div>
       </div>

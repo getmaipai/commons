@@ -4,6 +4,34 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.27] - ui-v0.5.27
+
+CHAT-UI-03 (Jesse's own ChatGPT comparison, 2026-09-22). Four fixes to
+`elements/thread.aui.tsx`: the sidebar footer's icon-collapsed mode
+(`tokens.css`) now keeps Settings/Help visible as icons instead of
+disappearing (`Sidebar.tsx`'s own `hide-menu` wrapper hid the whole
+block, icons included, not just the label); `UserMessage`'s own action-
+bar wrapper gets the same `min-h-7.5` reserved height
+`AssistantMessage`'s footer already had, so hovering a previous message
+no longer shifts the layout below it when the row unmounts
+(`ActionBarPrimitive.Root`'s own `autohide` truly unmounts, not just
+hides).
+
+Two new `ThreadComponents` slots, both optional and default-unset (no
+existing caller's render changes): `AssistantActionBarExtra` renders as
+the last item in the assistant message's own action bar, after "More";
+`AssistantMessageFooterExtra` renders as a block-level sibling after the
+whole footer row, for content a bar-row trigger expands that doesn't
+belong inside the bar's own single icon row.
+
+`elements/sources.tsx`'s `Sources` gains an optional `hideTrigger?:
+boolean` prop (default `false`, unchanged for every existing caller) -
+a caller can render only the `Collapsible`'s content, driving
+`open`/`onOpenChange` from a trigger it places elsewhere (the two new
+slots above, e.g.). `SourceGlyph`, the row's own favicon-style glyph,
+is now exported so that caller's own trigger can reuse it instead of a
+second hand-rolled copy.
+
 ## [0.5.26] - ui-v0.5.26
 
 `elements/sources.tsx`'s `Sources` gains an optional `layout?: "grid" |
