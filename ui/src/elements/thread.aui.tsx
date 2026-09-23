@@ -118,6 +118,17 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * conversation trigger) has nowhere else to go without forking
  * `ComposerAction` outright. Opened upstream the same day, onto
  * assistant-ui/assistant-ui#8003 (`ui/docs/dashboard-upstream.md`).
+ * `ComposerInputOverride`, when set, replaces the built-in
+ * `ComposerPrimitive.Input` outright, the same shape
+ * `ComposerAddAttachmentOverride` already has for the attach button -
+ * VOICE-LIVE-04's own gap: a caller whose composer shows something
+ * other than a text field while dictating (a live bar waveform of the
+ * microphone) has no way to swap the input region itself, only append
+ * beside it. It fully owns that region: a caller providing it renders
+ * its own `ComposerPrimitive.Input` for every state that still needs a
+ * plain text field, this component does not fall back to one on its
+ * own. Opened upstream the same day, onto
+ * assistant-ui/assistant-ui#8003 (`ui/docs/dashboard-upstream.md`).
  */
 export type ThreadComponents = {
   AssistantMessage?: ComponentType | undefined;
@@ -137,6 +148,7 @@ export type ThreadComponents = {
   ComposerExtra?: ComponentType | undefined;
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
+  ComposerInputOverride?: ComponentType | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -472,6 +484,7 @@ const ThreadSuggestionItem: FC = () => {
 };
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
+  const { ComposerInputOverride } = useContext(ThreadComponentsContext);
   return (
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
       <ComposerPrimitive.AttachmentDropzone asChild>
@@ -480,14 +493,18 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
           className="border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text flex-col gap-2 rounded-(--composer-radius) border bg-(--composer-bg) p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]"
         >
           <ComposerAttachments />
-          <ComposerPrimitive.Input
-            placeholder="Send a message..."
-            className="aui-composer-input caret-primary placeholder:text-muted-foreground/60 max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none"
-            rows={1}
-            autoFocus={autoFocus}
-            enterKeyHint="send"
-            aria-label="Message input"
-          />
+          {ComposerInputOverride ? (
+            <ComposerInputOverride />
+          ) : (
+            <ComposerPrimitive.Input
+              placeholder="Send a message..."
+              className="aui-composer-input caret-primary placeholder:text-muted-foreground/60 max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none"
+              rows={1}
+              autoFocus={autoFocus}
+              enterKeyHint="send"
+              aria-label="Message input"
+            />
+          )}
           <ComposerAction />
         </div>
       </ComposerPrimitive.AttachmentDropzone>
