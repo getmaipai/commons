@@ -820,7 +820,26 @@ const UserMessage: FC = () => {
       <UserMessageAttachments />
 
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content peer bg-muted text-foreground rounded-(--composer-radius) px-4 py-2 wrap-break-word empty:hidden">
+        {/* CHAT-FIND-0923-04: `w-fit` (found live, home) - this div and
+            the action-bar wrapper below are siblings inside this
+            wrapper, which has no width of its own; it sizes to its own
+            content's max-content width, and CSS Grid's `auto` column
+            sizing (this file's own MessagePrimitive.Root above,
+            `grid-cols-[minmax(72px,1fr)_auto]`) considers every
+            currently-laid-out child, not just the visible one at rest.
+            The action bar (`ActionBarPrimitive.Root`'s own `autohide`)
+            genuinely unmounts at rest, so only the bubble counts then -
+            a tight pill. On hover it mounts, and if its own row (a
+            timestamp plus several icon buttons) measures wider than the
+            bubble's own text, the wrapper's `auto` column widens to fit
+            it, stretching this plain block-level div along - the
+            bubble visibly grows and its own left-aligned text jumps
+            away from the trailing edge it was flush against a moment
+            before. `w-fit` (`width: fit-content`, still bounded by the
+            grid row's own overall available width, so a genuinely long
+            message still wraps exactly as before) makes the bubble's
+            own width depend only on its own content, never a sibling's. */}
+        <div className="aui-user-message-content peer bg-muted text-foreground rounded-(--composer-radius) w-fit px-4 py-2 wrap-break-word empty:hidden">
           <MessagePrimitive.Parts
             components={{ File: UserFilePart, Image: UserImagePart }}
           />
