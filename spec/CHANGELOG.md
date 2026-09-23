@@ -5,6 +5,16 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.24] - 2026-09-23
+
+### Added
+- `llm/ts/types.ts`'s `ChatCompletionUsage` gains an optional
+  `prompt_tokens_details.cached_tokens` (ENGINE-CONTRACT-01/02): llama-
+  server's own OpenAI-shaped prompt-cache telemetry, confirmed live
+  against the pinned b10797 build - home's turn machine reads it onto
+  the stored generation record so a required-miss can be read by cache
+  state.
+
 ## [spec-v0.1.23] - 2026-09-23
 
 ### Added

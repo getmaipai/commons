@@ -176,6 +176,14 @@ export interface ChatCompletionUsage {
   prompt_tokens: number;
   completion_tokens: number;
   total_tokens: number;
+  /** ENGINE-CONTRACT-01/02 (home/docs/dev.md 2026-09-23): llama-server's
+   * own OpenAI-shaped prompt-cache telemetry, confirmed live against the
+   * pinned b10797 build - absent on an engine or a request shape that
+   * doesn't report it (the test stub, cache_prompt: false with nothing
+   * cached), never assumed present. */
+  prompt_tokens_details?: {
+    cached_tokens?: number;
+  };
 }
 
 export interface ChatCompletionResponse {
