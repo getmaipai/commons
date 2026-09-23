@@ -68,6 +68,7 @@ import {
 import {
   createContext,
   useContext,
+  useRef,
   type ComponentType,
   type FC,
   type PropsWithChildren,
@@ -292,7 +293,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean }> = ({
             <ThreadScrollToBottom />
             <ThreadFollowupSuggestions />
             <Composer autoFocus={autoFocus} />
-            <AuiIf condition={(s) => isNewChatView(s) && s.composer.isEmpty}>
+            <AuiIf condition={isNewChatView}>
               <ThreadSuggestions />
             </AuiIf>
           </ThreadPrimitive.ViewportFooter>
@@ -449,10 +450,59 @@ const ThreadWelcome: FC = () => {
   );
 };
 
+// Screen finding (a new-chat composer visibly dropping a few pixels the
+// moment someone types the first character): this row used to unmount
+// entirely the instant the composer stopped being empty (the AuiIf at
+// its call site used to gate on `s.composer.isEmpty` too, not just
+// `isNewChatView`). ViewportFooter above lays its children out with
+// `gap-4`, and this row sits last - unmounting it removes both its own
+// content height AND the one `gap-4` unit before it, shrinking the
+// footer. The whole welcome block (heading, message group, footer) is
+// vertically centered while `isNewChatView` (`justify-center` on the
+// block's own parent), so a block that suddenly gets shorter
+// re-centers, and every element in it - including the heading and the
+// composer, both well above this row - shifts down by exactly half of
+// whatever height disappeared. Even with zero suggestion chips actually
+// configured (this row's own content is 0px, nothing visible ever
+// changes), the vanishing gap-4 alone is 16px, so the whole block
+// dropped 8px on the very first keystroke; a household with real
+// suggestion chips configured would have dropped even further. Fixed
+// by keeping this row mounted for the whole new-chat view (so the
+// footer's own height, and the gap before this row, never changes) and
+// hiding only its own visible content once the composer has text -
+// `invisible` rather than `hidden`, so it keeps its layout footprint
+// instead of collapsing it away again. Proven with a real headless
+// Playwright capture (getBoundingClientRect() before and after the
+// first keystroke, unchanged) - happy-dom computes no real layout, so
+// this file's own test below only proves the DOM-structure half.
+//
+// The row's own entrance animation (ThreadSuggestionItem's fade-in
+// slide-in-from-bottom-2) used to replay every time the composer was
+// cleared back to empty, because clearing it used to remount the whole
+// row. Keeping the row itself permanently mounted would otherwise
+// silently drop that replay - `replayKey` remounts just
+// ThreadPrimitive.Suggestions (not the outer wrapper this fix depends
+// on staying stable) each time the composer transitions back to empty,
+// so the animation still replays exactly as before.
+const composerHasText = (s: AssistantState) => !s.composer.isEmpty;
+
 const ThreadSuggestions: FC = () => {
+  const hasText = useAuiState(composerHasText);
+  const replayKey = useRef(0);
+  const wasHasText = useRef(hasText);
+  if (wasHasText.current && !hasText) {
+    replayKey.current += 1;
+  }
+  wasHasText.current = hasText;
+
   return (
-    <div className="aui-thread-welcome-suggestions flex w-full flex-col">
-      <ThreadPrimitive.Suggestions>
+    <div
+      className={cn(
+        "aui-thread-welcome-suggestions flex w-full flex-col",
+        hasText && "invisible",
+      )}
+    >
+      <ThreadPrimitive.Suggestions key={replayKey.current}>
         {() => <ThreadSuggestionItem />}
       </ThreadPrimitive.Suggestions>
     </div>

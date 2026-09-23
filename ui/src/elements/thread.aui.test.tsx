@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, fireEvent, render } from "@testing-library/react";
 import { AssistantRuntimeProvider, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
 import { Thread } from "./thread.aui";
 
@@ -35,5 +35,42 @@ describe("Thread's ComposerInputOverride slot", () => {
     const { getByTestId, queryByRole } = render(<Harness ComposerInputOverride={Waveform} />);
     expect(getByTestId("fake-waveform")).toBeTruthy();
     expect(queryByRole("textbox", { name: "Message input" })).toBeNull();
+  });
+});
+
+// Screen finding: typing the first character into a new chat shifted
+// the whole welcome block (heading and composer both) down by 8px.
+// Root cause: the suggestions row used to unmount the instant the
+// composer stopped being empty, removing its own `gap-4` unit from the
+// vertically-centered welcome block, so the whole block re-centered
+// and dropped. happy-dom computes no real layout (this file's own
+// established reason a pixel claim always lives in a real headless
+// Playwright capture instead), so this proves only the DOM-structure
+// half of the fix - the row staying mounted, only its visibility
+// toggling - which is what the real headless pixel check depends on.
+describe("Thread's new-chat suggestions row", () => {
+  test("stays mounted once the composer has text - visibility toggles, not presence", () => {
+    const { getByRole, container } = render(<Harness />);
+    const row = () => container.querySelector(".aui-thread-welcome-suggestions");
+
+    expect(row()).toBeTruthy();
+    expect(row()?.className).not.toContain("invisible");
+
+    fireEvent.change(getByRole("textbox", { name: "Message input" }), { target: { value: "h" } });
+
+    expect(row()).toBeTruthy();
+    expect(row()?.className).toContain("invisible");
+  });
+
+  test("becomes visible again once the composer is cleared back to empty", () => {
+    const { getByRole, container } = render(<Harness />);
+    const textbox = getByRole("textbox", { name: "Message input" });
+    const row = () => container.querySelector(".aui-thread-welcome-suggestions");
+
+    fireEvent.change(textbox, { target: { value: "h" } });
+    expect(row()?.className).toContain("invisible");
+
+    fireEvent.change(textbox, { target: { value: "" } });
+    expect(row()?.className).not.toContain("invisible");
   });
 });
