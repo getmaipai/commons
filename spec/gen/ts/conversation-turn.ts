@@ -114,11 +114,11 @@ export const ConversationTurn = z
           .describe(
             "Deterministic from surface cues (capitals, repeated punctuation, an expletive, a repeated word, a strong intensifier), never a classifier's own confidence read as intensity.",
           ),
-        /**Whom the emotion is about. Anger at the hub and sadness about oneself drive different moves and different memory.*/
+        /**Whom or what the turn is about, as the memory paths and the turn machine's interim rule read it: the emotion's target on an emotional turn (anger at the hub and sadness about oneself drive different moves and different memory), the question's referent on a question. `computed` (SIGNAL-02, 2026-09-23): the hub's own clock, calculator or converter answers the turn with no lookup: arithmetic, a percentage, a unit or currency conversion, the time or date in a place, a date difference. The interim rule forces a web search on `world` only; a `computed` turn is answered by the commands node's own compute and clock openers or by the model choosing the compute tool under `auto`, never by a search.*/
         target: z
-          .enum(["self", "other", "hub", "world"])
+          .enum(["self", "other", "hub", "world", "computed"])
           .describe(
-            "Whom the emotion is about. Anger at the hub and sadness about oneself drive different moves and different memory.",
+            "Whom or what the turn is about, as the memory paths and the turn machine's interim rule read it: the emotion's target on an emotional turn (anger at the hub and sadness about oneself drive different moves and different memory), the question's referent on a question. `computed` (SIGNAL-02, 2026-09-23): the hub's own clock, calculator or converter answers the turn with no lookup: arithmetic, a percentage, a unit or currency conversion, the time or date in a place, a date difference. The interim rule forces a web search on `world` only; a `computed` turn is answered by the commands node's own compute and clock openers or by the model choosing the compute tool under `auto`, never by a search.",
           ),
         /**Orthogonal to the act: 'no, Friday, not Thursday' is still an inform. CHAT-13's rejected-subject rule and the memory supersede path read this.*/
         repair: z
@@ -193,6 +193,12 @@ export const ConversationTurn = z
                       z.object({ kind: z.literal("speaker") }).strict(),
                       z.object({ kind: z.literal("household") }).strict(),
                       z.object({ kind: z.literal("world") }).strict(),
+                      z
+                        .object({ kind: z.literal("computed") })
+                        .strict()
+                        .describe(
+                          "SIGNAL-02: a clause the hub computes itself (arithmetic, a conversion, the time in a place); the turn's `target` is `computed` when this is the primary clause's subject.",
+                        ),
                       z.object({ kind: z.literal("unknown") }).strict(),
                       z
                         .object({

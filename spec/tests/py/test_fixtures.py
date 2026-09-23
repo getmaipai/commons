@@ -150,6 +150,10 @@ def test_turn_signal_fixture():
     TurnSignal.model_validate(load_fixture("turn-signal.example.json"))
 
 
+def test_turn_signal_computed_fixture():
+    TurnSignal.model_validate(load_fixture("turn-signal.computed.example.json"))
+
+
 def test_attachment_fixture():
     Attachment.model_validate(load_fixture("attachment.example.json"))
 

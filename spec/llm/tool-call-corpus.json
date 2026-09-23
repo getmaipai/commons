@@ -1,15 +1,24 @@
 [
   {
     "utterance": "remember that pizza night is Friday and what do you know about the wifi password",
-    "expect_calls": ["remember", "recall"]
+    "expect_calls": [
+      "remember",
+      "recall"
+    ]
   },
   {
     "utterance": "what does ephemeral mean and remember that my dentist appointment is next week",
-    "expect_calls": ["define", "remember"]
+    "expect_calls": [
+      "define",
+      "remember"
+    ]
   },
   {
     "utterance": "give me a trivia question and what do you remember about pizza night",
-    "expect_calls": ["trivia", "recall"]
+    "expect_calls": [
+      "trivia",
+      "recall"
+    ]
   },
   {
     "utterance": "should I dye my hair black",
@@ -31,5 +40,49 @@
   {
     "utterance": "I'm feeling kind of down",
     "expect_calls": []
+  },
+  {
+    "utterance": "what's 12 plus 30",
+    "expect_calls": [
+      "math"
+    ],
+    "target": "computed",
+    "note": "SIGNAL-02 (home dev.md, U6 rerun ruling (b) 3): the replay control control-twelve-plus-thirty was forced to a web search (9 to 22 s) on the new path because its signal target read world; the first labelled computed row."
+  },
+  {
+    "utterance": "what time is it in Tokyo",
+    "expect_calls": [
+      "almanac-time"
+    ],
+    "target": "computed",
+    "note": "SIGNAL-02: the replay control control-time-in-tokyo, forced to a web search on all three repeats (23 s); the clock answers it once almanac-time takes a place."
+  },
+  {
+    "utterance": "what's 20 percent of 50",
+    "expect_calls": [
+      "math"
+    ],
+    "target": "computed"
+  },
+  {
+    "utterance": "how much is 5 miles in kilometers",
+    "expect_calls": [
+      "convert"
+    ],
+    "target": "computed"
+  },
+  {
+    "utterance": "what's 100 divided by 4",
+    "expect_calls": [
+      "math"
+    ],
+    "target": "computed"
+  },
+  {
+    "utterance": "what's the date today",
+    "expect_calls": [
+      "almanac-date"
+    ],
+    "target": "computed"
   }
 ]

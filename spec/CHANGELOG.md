@@ -5,6 +5,23 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.25] - 2026-09-23
+
+### Added
+- `turn-signal.schema.json`: `target` gains `computed` and the clause
+  `subject` gains `{ kind: "computed" }` (SIGNAL-02, home dev.md "U6
+  rerun ruling" (b) 3): a turn the hub's own clock, calculator or
+  converter answers with no lookup (arithmetic, a percentage, a unit or
+  currency conversion, the time or date in a place, a date difference).
+  The turn machine's interim rule forces a web search on `world` only.
+  `target`'s description now says what the field is read as (the
+  emotion's target on an emotional turn, the question's referent on a
+  question), which is how home's classifier has derived it since
+  SPEC-01. Fixture `turn-signal.computed.example.json`; the tool-call
+  corpus gains six `computed` rows with an optional `target` label, the
+  first two being the replay controls that were forced to search.
+  Additive: every existing fixture validates unchanged.
+
 ## [spec-v0.1.24] - 2026-09-23
 
 ### Added

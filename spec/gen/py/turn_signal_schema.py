@@ -43,6 +43,17 @@ class Subject3(BaseModel):
 
 class Subject4(BaseModel):
     """
+    SIGNAL-02: a clause the hub computes itself (arithmetic, a conversion, the time in a place); the turn's `target` is `computed` when this is the primary clause's subject.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['computed']
+
+
+class Subject5(BaseModel):
+    """
     Who or what a clause is about. A reference into the turn's own SubjectRef list (subject-ref.schema.json), never a third name-carrying shape: `named` repeats the entity id a SubjectRef on the same turn already resolved.
     """
 
@@ -52,7 +63,7 @@ class Subject4(BaseModel):
     kind: Literal['unknown']
 
 
-class Subject5(BaseModel):
+class Subject6(BaseModel):
     """
     Who or what a clause is about. A reference into the turn's own SubjectRef list (subject-ref.schema.json), never a third name-carrying shape: `named` repeats the entity id a SubjectRef on the same turn already resolved.
     """
@@ -110,7 +121,7 @@ class Clause(BaseModel):
         ...,
         description='Whose claim a clause is, and how literally to take it. `unknown` writes nothing about anyone (MEM-06): precision wins on an uncertain label.',
     )
-    subject: Subject1 | Subject2 | Subject3 | Subject4 | Subject5 = Field(
+    subject: Subject1 | Subject2 | Subject3 | Subject4 | Subject5 | Subject6 = Field(
         ...,
         description="Who or what a clause is about. A reference into the turn's own SubjectRef list (subject-ref.schema.json), never a third name-carrying shape: `named` repeats the entity id a SubjectRef on the same turn already resolved.",
     )
@@ -165,9 +176,9 @@ class TurnSignal(BaseModel):
         ...,
         description="Deterministic from surface cues (capitals, repeated punctuation, an expletive, a repeated word, a strong intensifier), never a classifier's own confidence read as intensity.",
     )
-    target: Literal['self', 'other', 'hub', 'world'] = Field(
+    target: Literal['self', 'other', 'hub', 'world', 'computed'] = Field(
         ...,
-        description='Whom the emotion is about. Anger at the hub and sadness about oneself drive different moves and different memory.',
+        description="Whom or what the turn is about, as the memory paths and the turn machine's interim rule read it: the emotion's target on an emotional turn (anger at the hub and sadness about oneself drive different moves and different memory), the question's referent on a question. `computed` (SIGNAL-02, 2026-09-23): the hub's own clock, calculator or converter answers the turn with no lookup: arithmetic, a percentage, a unit or currency conversion, the time or date in a place, a date difference. The interim rule forces a web search on `world` only; a `computed` turn is answered by the commands node's own compute and clock openers or by the model choosing the compute tool under `auto`, never by a search.",
     )
     repair: Literal['none', 'correction', 'retraction'] = Field(
         ...,

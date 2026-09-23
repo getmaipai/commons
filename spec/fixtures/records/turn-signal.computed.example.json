@@ -1,0 +1,31 @@
+{
+  "primary_act": "question",
+  "secondary_acts": [],
+  "expressed_emotion": "neutral",
+  "emotion_intensity": "none",
+  "target": "computed",
+  "repair": "none",
+  "refers_to_prior": null,
+  "clauses": [
+    {
+      "range": {
+        "start": 0,
+        "end": 19
+      },
+      "act": "question",
+      "stance": "asserted",
+      "subject": {
+        "kind": "computed"
+      },
+      "emotion": "neutral",
+      "emotion_intensity": "none",
+      "confidence": 0.9
+    }
+  ],
+  "act_confidence": 0.9,
+  "emotion_confidence": 0.5,
+  "source": "rule",
+  "classifier_id": null,
+  "age_band": "adult",
+  "age_band_basis": "identified_profile"
+}

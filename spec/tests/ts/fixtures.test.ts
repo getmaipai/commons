@@ -151,6 +151,12 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => TurnSignal.parse(loadFixture("turn-signal.example.json"))).not.toThrow();
   });
 
+  test("turn-signal.computed.example.json", () => {
+    expect(() =>
+      TurnSignal.parse(loadFixture("turn-signal.computed.example.json")),
+    ).not.toThrow();
+  });
+
   test("reply-plan.example.json", () => {
     expect(() => ReplyPlan.parse(loadFixture("reply-plan.example.json"))).not.toThrow();
   });
