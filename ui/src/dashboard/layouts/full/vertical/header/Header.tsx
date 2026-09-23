@@ -14,6 +14,7 @@ import Profile from "./Profile";
 import LightDark from "./Light-Dark";
 
 import Notifications from "./Notifications";
+import HeaderSearch from "./HeaderSearch";
 import { useHeaderExtraLeft } from "./HeaderExtraContext";
 
 
@@ -100,6 +101,12 @@ const Header = () => {
             </div>
 
             <div className="flex shrink-0 sm:gap-1 gap-0 items-center">
+              {/* SHELL-SEARCH-01: the one global search, left of the
+               * theme toggle on every page - see HeaderSearch.tsx's own
+               * comment for why this is a plain unconditional render,
+               * not a slot. */}
+              <HeaderSearch />
+
               {/* Theme Toggle */}
               <LightDark />
             
