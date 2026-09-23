@@ -84,8 +84,10 @@ export function VoiceConversation({
           className={cn(
             "absolute rounded-full transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none",
             mode === "speaking"
-              ? "bg-blue-500/12 dark:bg-blue-400/15"
-              : "bg-foreground/[0.05]",
+              ? "bg-radial from-primary/16 to-primary/4"
+              : mode === "thinking"
+                ? "bg-radial from-foreground/8 to-foreground/2 motion-safe:animate-[voice-hue-drift_4s_ease-in-out_infinite]"
+                : "bg-foreground/[0.05]",
           )}
           style={{
             width: "6rem",
@@ -97,9 +99,9 @@ export function VoiceConversation({
         <span
           aria-hidden
           className={cn(
-            "absolute rounded-full transition-[transform,opacity] duration-150 ease-out motion-reduce:transition-none",
+            "absolute rounded-full transition-[transform,opacity,box-shadow] duration-150 ease-out motion-reduce:transition-none",
             mode === "speaking"
-              ? "bg-blue-500/20 dark:bg-blue-400/25"
+              ? "bg-primary/24 shadow-[0_0_1.25rem_color-mix(in_oklab,var(--color-primary)_45%,transparent)]"
               : "bg-foreground/[0.08]",
           )}
           style={{
@@ -115,10 +117,23 @@ export function VoiceConversation({
             mode === "connecting" && "bg-foreground/20 animate-pulse",
             mode === "listening" && "bg-foreground/80",
             mode === "thinking" && "bg-foreground/30 animate-pulse",
-            mode === "speaking" && "bg-blue-500 dark:bg-blue-400",
+            mode === "speaking" && "bg-primary",
           )}
           style={{ transform: `scale(${active ? 0.9 + level * 0.2 : 0.85})` }}
         />
+        {/* The first-spoken-word ripple: a single expanding, fading ring.
+            The conditional render itself is what replays it every time -
+            leaving "speaking" unmounts this span outright, so the next
+            "speaking" entry is a genuinely fresh mount, restarting the
+            CSS animation with no key needed. The flair the row asks for,
+            costing nothing in per-frame JS (a CSS animation, not a rAF
+            loop). */}
+        {mode === "speaking" && (
+          <span
+            aria-hidden
+            className="border-primary/50 absolute size-10 rounded-full border motion-reduce:hidden motion-safe:animate-[voice-ripple_0.6s_ease-out]"
+          />
+        )}
       </button>
 
       <div className="flex flex-col items-center gap-1">
@@ -140,7 +155,7 @@ export function VoiceConversation({
                 "w-8 shrink-0",
                 turn.role === "user"
                   ? "text-foreground/30"
-                  : "text-blue-500/70 dark:text-blue-400/70",
+                  : "text-primary/70",
               )}
             >
               {turn.role === "user" ? "you" : "ai"}

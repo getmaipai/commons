@@ -541,6 +541,28 @@
     0;
     }
   }
+  /* voice-conversation.tsx's own two flair animations (VOICE-LIVE-05,
+     getmaipai/home) - CSS-only on purpose, so the live voice session's
+     level animation stays driven by React state changes at its own
+     poll rate, never a second rAF loop for the flair itself. */
+  @keyframes voice-hue-drift {
+    0%, 100% {
+      filter: hue-rotate(0deg);
+    }
+    50% {
+      filter: hue-rotate(25deg);
+    }
+  }
+  @keyframes voice-ripple {
+    from {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    to {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {
