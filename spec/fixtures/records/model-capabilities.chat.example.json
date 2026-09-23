@@ -23,10 +23,11 @@
     "rounds": 1,
     "tools_offered": ["recall", "remember", "remind", "timer", "weather", "websearch"],
     "always_search": true,
-    "answer_from_context_tool": true,
+    "answer_from_context_tool": false,
     "model_transitions": true,
     "context_tokens": 4000,
     "thinking_budget_tokens": 512,
+    "thinking_for_minors": false,
     "deadlines_ms": { "model": 20000, "tool": 10000, "total": 45000 },
     "measured": {
       "false_call_rate": 0,

@@ -5,6 +5,24 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.22] - 2026-09-23
+
+### Added
+- `ModelCapabilities.turn_budget` gains `thinking_for_minors` (required
+  boolean): whether the model node even asks the engine to think on a
+  minor's turn, false by default (GROUND-01, home/docs/plans/
+  turn-machine-state-record-2026-09-22.md, "Reasoning is a second
+  output"). A cost control only - a minor's turn never emits or persists
+  reasoning regardless of this field, since `context.ts`'s
+  `decideReasoning()` already forces `reasoning.emit` false from the age
+  band alone.
+
+### Changed
+- The chat model example fixture's `answer_from_context_tool` flips to
+  `false`, matching the owner's ruling (state record, 2026-09-22) that
+  the `answer_from_this_conversation` escape is off in every budget
+  until reuse-with-freshness is built.
+
 ## [spec-v0.1.21] - 2026-09-22
 
 ### Fixed

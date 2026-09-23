@@ -37,6 +37,7 @@ const VALID_BUDGET = {
   model_transitions: true,
   context_tokens: 4000,
   thinking_budget_tokens: 512,
+  thinking_for_minors: false,
   deadlines_ms: { model: 20000, tool: 10000, total: 45000 },
   measured: { false_call_rate: 0, inverse_miss_rate: 0.62, rewrite_pass_rate: 0, on: "ARCH-MEASURE-01, 2026-09-22" },
 } as const;
@@ -57,6 +58,19 @@ describe("ModelCapabilities.turn_budget", () => {
   test("the robot's Pi shape: rounds 0, model_transitions false, no search", () => {
     const robotBudget = { ...VALID_BUDGET, rounds: 0, always_search: false, answer_from_context_tool: false, model_transitions: false };
     expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: robotBudget })).not.toThrow();
+  });
+
+  // GROUND-01: thinking_for_minors is required now turn_budget is
+  // populated at all - a budget with no opinion on it would silently
+  // default to "ask the engine to think for a minor," the opposite of
+  // "false by default."
+  test("thinking_for_minors is required: missing fails", () => {
+    const { thinking_for_minors: _tfm, ...incomplete } = VALID_BUDGET;
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: incomplete })).toThrow();
+  });
+
+  test("thinking_for_minors true still parses (a budget that measures it worth the tokens)", () => {
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, thinking_for_minors: true } })).not.toThrow();
   });
 
   test("deadlines_ms is all-or-nothing: missing 'total' fails", () => {
