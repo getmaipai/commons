@@ -278,6 +278,8 @@ capability, needs its own design pass first).
 
 ## `spec`
 
+- [ ] **CAP-VOCAB-01: the capability vocabulary gains the engine roles** (S, spec first; from home's `docs/plans/hardware-tiers-2026-09-23.md`, "Capabilities follow the allocation"). `spec/vocab/capabilities.json` gains `vision`, `image`, `video`, `music`, `stt` and `tts`, named as the Stack's role ids, each with a one-line description in the vocabulary's own shape; the chat role keeps mapping to the existing `gpu_llm` or `cpu_llm` and the embed role to `embeddings`, so the list stays one list; the fixtures and the Python package regenerate; the spec tag is bumped and home and bot pin it. Acceptance: a manifest fixture with `requires: ["image"]` validates; the round-trip fixtures pass in TypeScript and Python. Exit: `bash scripts/check.sh` and the tag.
+
 - [ ] **S** A spec tag's settings registry is a superset of its parent
   tag's: the cut (`commons` `check.sh`, or a `spec/scripts/cut-tag.sh`
   if none exists) diffs `spec/settings/keys.json` against the previous
