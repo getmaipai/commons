@@ -75,6 +75,13 @@ const Header = () => {
               >
                 <PanelLeft size={21}
                 />
+                {/* CHAT-FIND-0923-02, adjacent gap found live: this
+                    trigger had no accessible name at all - the kit's own
+                    SidebarTrigger (sidebar.tsx, not actually used here)
+                    already has exactly this sr-only span and nothing
+                    else (no aria-label alongside it); mirrored, not
+                    invented. */}
+                <span className="sr-only">Toggle Sidebar</span>
               </Button>
 
 
