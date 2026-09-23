@@ -368,6 +368,17 @@
   --destructive: #ff4b62;
   --destructive-foreground: #07111f;
   --ring: #21a6ff;
+  /* VOICE-LIVE-05 (2026-09-23, a real-render finding): a dedicated pair
+   * for the voice orb, never --primary. dashboard/css/globals.css (the
+   * vendored template) declares its OWN competing :root --primary
+   * (shadcn's own near-black neutral default, oklch(0.205 0 0)) at the
+   * identical selector and specificity - on the real page it won that
+   * cascade fight over this file's own #21a6ff, so a captured light-
+   * theme orb read as a dark grey disc, not blue. Named apart so no
+   * template style-preset can ever touch it again; the same #21a6ff
+   * this file's own --primary already carries in both themes, kept
+   * here on purpose so the orb still reads as the identical blue. */
+  --voice-accent: #21a6ff;
   /* 1rem, not shadcn's own 0.75rem default: a visual pass (2026-09-06)
    * modeled on well-designed native mobile apps found every card, tile
    * and control there noticeably rounder than this kit's own defaults -
@@ -437,6 +448,7 @@
     --primary: #21a6ff;
     --primary-foreground: #07111f;
     --ring: #21a6ff;
+    --voice-accent: #21a6ff;
     --destructive: #ff4b62;
     --destructive-foreground: #07111f;
     --sidebar: #0a1a2e;
@@ -472,6 +484,7 @@
   --primary: #21a6ff;
   --primary-foreground: #07111f;
   --ring: #21a6ff;
+  --voice-accent: #21a6ff;
   --destructive: #ff4b62;
   --destructive-foreground: #07111f;
   --sidebar: #0a1a2e;
@@ -493,6 +506,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-voice-accent: var(--voice-accent);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);

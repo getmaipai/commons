@@ -72,26 +72,35 @@ export function VoiceConversation({
 
       {...props}
     >
+      {/* VOICE-LIVE-05 (2026-09-23, Jesse's own judgment of the first
+          recording): the orb read too small and, in light theme, near-
+          black - a dark grey disc, not a blue glow. Size: ChatGPT's own
+          scale, roughly 160-200px on desktop (size-40/size-48 below,
+          160px/192px - Tailwind's own scale lands exactly there), every
+          ring scaled with it, keeping this component's own original
+          ring-to-button ratios (ring2 70.8%, the core and ripple
+          41.7%). Color: tokens.css's own --voice-accent, never
+          --primary - see that token's own comment for why --primary
+          alone wasn't safe (the vendored template's own competing
+          :root definition won the cascade in light theme). */}
       <button
         type="button"
         onClick={onInterrupt}
         disabled={!canInterrupt}
         aria-label="Interrupt the assistant"
-        className="focus-visible:ring-foreground/20 relative flex size-24 items-center justify-center rounded-full outline-none focus-visible:ring-1 disabled:cursor-default"
+        className="focus-visible:ring-foreground/20 relative flex size-40 items-center justify-center rounded-full outline-none focus-visible:ring-1 disabled:cursor-default sm:size-48"
       >
         <span
           aria-hidden
           className={cn(
-            "absolute rounded-full transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none",
+            "absolute size-40 rounded-full transition-[transform,opacity] duration-200 ease-out sm:size-48 motion-reduce:transition-none",
             mode === "speaking"
-              ? "bg-radial from-primary/16 to-primary/4"
+              ? "bg-radial from-voice-accent/16 to-voice-accent/4"
               : mode === "thinking"
                 ? "bg-radial from-foreground/8 to-foreground/2 motion-safe:animate-[voice-hue-drift_4s_ease-in-out_infinite]"
                 : "bg-foreground/[0.05]",
           )}
           style={{
-            width: "6rem",
-            height: "6rem",
             transform: `scale(${active ? 0.72 + level * 0.28 : 0.62})`,
             opacity: active ? 1 : 0.5,
           }}
@@ -99,25 +108,23 @@ export function VoiceConversation({
         <span
           aria-hidden
           className={cn(
-            "absolute rounded-full transition-[transform,opacity,box-shadow] duration-150 ease-out motion-reduce:transition-none",
+            "absolute size-[113px] rounded-full transition-[transform,opacity,box-shadow] duration-150 ease-out sm:size-[136px] motion-reduce:transition-none",
             mode === "speaking"
-              ? "bg-primary/24 shadow-[0_0_1.25rem_color-mix(in_oklab,var(--color-primary)_45%,transparent)]"
+              ? "bg-voice-accent/24 shadow-[0_0_1.25rem_color-mix(in_oklab,var(--color-voice-accent)_45%,transparent)]"
               : "bg-foreground/[0.08]",
           )}
           style={{
-            width: "4.25rem",
-            height: "4.25rem",
             transform: `scale(${active ? 0.8 + level * 0.22 : 0.7})`,
           }}
         />
         <span
           aria-hidden
           className={cn(
-            "relative size-10 rounded-full transition-[transform,background-color] duration-150 ease-out motion-reduce:transition-none",
+            "relative size-[67px] rounded-full transition-[transform,background-color] duration-150 ease-out sm:size-20 motion-reduce:transition-none",
             mode === "connecting" && "bg-foreground/20 animate-pulse",
             mode === "listening" && "bg-foreground/80",
             mode === "thinking" && "bg-foreground/30 animate-pulse",
-            mode === "speaking" && "bg-primary",
+            mode === "speaking" && "bg-voice-accent",
           )}
           style={{ transform: `scale(${active ? 0.9 + level * 0.2 : 0.85})` }}
         />
@@ -131,7 +138,7 @@ export function VoiceConversation({
         {mode === "speaking" && (
           <span
             aria-hidden
-            className="border-primary/50 absolute size-10 rounded-full border motion-reduce:hidden motion-safe:animate-[voice-ripple_0.6s_ease-out]"
+            className="border-voice-accent/50 absolute size-[67px] rounded-full border motion-reduce:hidden motion-safe:animate-[voice-ripple_0.6s_ease-out] sm:size-20"
           />
         )}
       </button>
@@ -155,7 +162,7 @@ export function VoiceConversation({
                 "w-8 shrink-0",
                 turn.role === "user"
                   ? "text-foreground/30"
-                  : "text-primary/70",
+                  : "text-voice-accent/70",
               )}
             >
               {turn.role === "user" ? "you" : "ai"}
