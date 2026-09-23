@@ -197,3 +197,10 @@ that drift. A cross-file `$ref` (the package manifest's `config[]` uses
 `settings-key.schema.json`) round-trips through both generators; that's
 part of what `tests/ts/fixtures.test.ts` and `tests/py/test_fixtures.py`
 prove, not just that a single flat schema converts.
+
+**Order of operations when a schema changes** (learned 2026-09-23, the
+spec-v0.1.25 cut): regenerate (`bun run gen:ts`, `bash scripts/gen-py.sh`),
+then stage the schema, the fixtures, the tests and every regenerated file
+in `gen/` by name, then run `scripts/check.sh`, then commit and tag. The
+gate's drift step diffs `spec/gen/` against the index, so a correct but
+unstaged regeneration reads as drift and the gate goes red for nothing.
