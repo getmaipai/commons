@@ -25,6 +25,38 @@ interface DefectCodes {
 
 const ENTITY_KINDS = new Set(Entity.shape.kind.options as readonly string[]);
 
+describe("vocab/capabilities.json", () => {
+  const vocab = load<{ $comment: string; capabilities: string[] }>("capabilities.json");
+  const ENGINE_ROLES = ["vision", "image", "video", "music", "stt", "tts"];
+
+  test("every capability is lowercase, non-empty and named exactly once", () => {
+    const seen = new Set<string>();
+    for (const cap of vocab.capabilities) {
+      expect(cap).toBe(cap.toLowerCase().trim());
+      expect(cap.length).toBeGreaterThan(0);
+      expect(seen.has(cap), `"${cap}" appears more than once`).toBe(false);
+      seen.add(cap);
+    }
+    expect(seen.size).toBe(vocab.capabilities.length);
+  });
+
+  test("the engine roles are present", () => {
+    for (const role of ENGINE_ROLES) {
+      expect(vocab.capabilities.includes(role), `${role} is missing`).toBe(true);
+    }
+  });
+
+  test("the manifest example's requires and optional draw from the vocabulary", () => {
+    const manifest = JSON.parse(
+      readFileSync(join(VOCAB_DIR, "..", "fixtures", "records", "manifest.example.json"), "utf-8"),
+    ) as { requires?: string[]; optional?: string[] };
+    const caps = new Set(vocab.capabilities);
+    for (const cap of [...(manifest.requires ?? []), ...(manifest.optional ?? [])]) {
+      expect(caps.has(cap), `${cap} is not in the vocabulary`).toBe(true);
+    }
+  });
+});
+
 describe("vocab/entity-kind-nouns.json", () => {
   const vocab = load<EntityKindNouns>("entity-kind-nouns.json");
 
