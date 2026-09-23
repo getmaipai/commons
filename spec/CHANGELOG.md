@@ -5,7 +5,10 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
-## [Unreleased]
+## [spec-v0.1.30] - 2026-09-23
+
+### Added
+- `vocab/capabilities.json`: the engine roles (`vision`, `image`, `video`, `music`, `stt`, `tts`), named exactly as the Stack's own role ids, so a package manifest's `requires`/`optional` and the hub's engine allocation share one list (CAP-VOCAB-01).
 
 ### Changed
 - tool-call corpus: "what's the latest Stephen king novel" expects a websearch call (a fresh-fact world question is a fitting search; REPLAY-BAR-01).
