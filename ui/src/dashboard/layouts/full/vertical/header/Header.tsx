@@ -32,7 +32,23 @@ const Header = () => {
            * left for justify-content to distribute (a review, 2026-09-23:
            * a class that does nothing is worse than no class, for the
            * next person reading this). */}
-          <div className="mx-auto flex flex-wrap items-center p-2">
+          {/* flex-nowrap below sm, flex-wrap at sm and up - found live
+           * (CHAT-HEADER-03, home, 2026-09-23) capturing the chat
+           * page's own title at 390px: flex-wrap's line-breaking
+           * decision uses each item's un-shrunk natural size, computed
+           * from `white-space: nowrap` text's own full, un-truncated
+           * width (truncate's min-w-0 only affects the later shrink
+           * step, never this one) - so a long chat title, exactly the
+           * content `truncate` exists to handle, forced the whole row
+           * to wrap instead of the title alone truncating on one line,
+           * the same way plain non-wrapping text with an ellipsis is
+           * supposed to. Below sm (640px, `Search`'s own wrapper below
+           * hides it entirely - `sm:block hidden`), there is nothing
+           * on the left group heavy enough to ever need the wrap
+           * escape valve, so nowrap there costs nothing and fixes the
+           * chat title; at sm and up, flex-wrap comes back to keep the
+           * Search-overflow fix below intact for that band. */}
+          <div className="mx-auto flex flex-nowrap sm:flex-wrap items-center p-2">
             {/* flex-auto (flex-basis: auto), not flex-1 (flex-basis: 0%)
              * - a review (2026-09-23) caught flex-1 zeroing this group's
              * own hypothetical size for flex-wrap's line-breaking
