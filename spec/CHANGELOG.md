@@ -5,6 +5,12 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.23] - 2026-09-23
+
+### Added
+- spec: the capability vocabulary gains the engine roles (vision, image,
+  video, music, stt, tts), named as the Stack's role ids (CAP-VOCAB-01).
+
 ## [spec-v0.1.22] - 2026-09-23
 
 ### Added
