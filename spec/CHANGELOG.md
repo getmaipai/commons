@@ -5,6 +5,23 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.27] - 2026-09-23
+
+### Added
+- `model-capabilities.schema.json`: `turn_budget` gains
+  `thinking_budget_tokens_toggled` (THINK-DEFAULT-01, home dev.md "U6
+  rerun ruling" (b) 1): `thinking_budget_tokens` becomes the turn's
+  default - 0 on every real budget, so thinking is off unless the
+  person turns it on for that turn - and the new field carries the
+  value used when they do, per model rather than one hardcoded
+  constant. Both required, the same reason `thinking_for_minors` is: a
+  budget with no opinion on either would silently default to the
+  wrong thing. The chat model example fixture's own
+  `thinking_budget_tokens` moves from 512 to 0, with
+  `thinking_budget_tokens_toggled: 512` alongside it - the number
+  itself is kept, not dropped, just repurposed as the toggled-on
+  value.
+
 ## [spec-v0.1.26] - 2026-09-23
 
 ### Added

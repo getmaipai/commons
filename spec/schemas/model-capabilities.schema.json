@@ -71,7 +71,7 @@
     "turn_budget": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rounds", "tools_offered", "always_search", "answer_from_context_tool", "model_transitions", "context_tokens", "thinking_budget_tokens", "thinking_for_minors", "deadlines_ms", "measured"],
+      "required": ["rounds", "tools_offered", "always_search", "answer_from_context_tool", "model_transitions", "context_tokens", "thinking_budget_tokens", "thinking_budget_tokens_toggled", "thinking_for_minors", "deadlines_ms", "measured"],
       "description": "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
       "properties": {
         "rounds": {
@@ -97,7 +97,16 @@
           "description": "Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer."
         },
         "context_tokens": { "type": "integer", "exclusiveMinimum": 0 },
-        "thinking_budget_tokens": { "type": "integer", "minimum": 0 },
+        "thinking_budget_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "THINK-DEFAULT-01 (home/docs/dev.md 'U6 rerun ruling' (b) 1): the default for an ordinary turn - 0 on every real budget, so thinking is off unless the person turns it on for that turn (RESP-04's composer toggle). Reasoning is a second output, never the budget's own default."
+        },
+        "thinking_budget_tokens_toggled": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "THINK-DEFAULT-01: the value used for a turn where the person explicitly toggled thinking on (the composer's RESP-04 toggle, the old path's own `thinking` request field, mirrored onto the new path's RunTurnNextOpts.thinking). Kept as its own field, per model, rather than a single hardcoded constant, since a different chat model may reason usefully at a different token count."
+        },
         "thinking_for_minors": {
           "type": "boolean",
           "description": "GROUND-01 (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'Reasoning is a second output'): whether the model node even asks the engine to think on a minor's turn - false by default, so a minor's turn sends thinking:false regardless of thinking_budget_tokens. This is a cost control, not the safety gate: a minor's turn never emits or persists reasoning either way (context.ts's decideReasoning() forces reasoning.emit false from the age band alone), so turning this on only spends the tokens on a span the household will never see or keep."

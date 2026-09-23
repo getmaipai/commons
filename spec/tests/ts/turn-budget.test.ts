@@ -36,7 +36,8 @@ const VALID_BUDGET = {
   answer_from_context_tool: true,
   model_transitions: true,
   context_tokens: 4000,
-  thinking_budget_tokens: 512,
+  thinking_budget_tokens: 0,
+  thinking_budget_tokens_toggled: 512,
   thinking_for_minors: false,
   deadlines_ms: { model: 20000, tool: 10000, total: 45000 },
   measured: { false_call_rate: 0, inverse_miss_rate: 0.62, rewrite_pass_rate: 0, on: "ARCH-MEASURE-01, 2026-09-22" },
@@ -71,6 +72,19 @@ describe("ModelCapabilities.turn_budget", () => {
 
   test("thinking_for_minors true still parses (a budget that measures it worth the tokens)", () => {
     expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, thinking_for_minors: true } })).not.toThrow();
+  });
+
+  // THINK-DEFAULT-01: thinking_budget_tokens_toggled is required for
+  // the same reason thinking_for_minors is - a budget with no opinion
+  // on it would silently default to 0 for a toggled-on turn too,
+  // losing the per-model "on" value the person's own toggle needs.
+  test("thinking_budget_tokens_toggled is required: missing fails", () => {
+    const { thinking_budget_tokens_toggled: _tbtt, ...incomplete } = VALID_BUDGET;
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: incomplete })).toThrow();
+  });
+
+  test("thinking_budget_tokens 0 with thinking_budget_tokens_toggled non-zero still parses (the default off, the toggle on)", () => {
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, thinking_budget_tokens: 0, thinking_budget_tokens_toggled: 512 } })).not.toThrow();
   });
 
   test("deadlines_ms is all-or-nothing: missing 'total' fails", () => {

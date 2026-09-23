@@ -99,7 +99,14 @@ class TurnBudget(BaseModel):
         description="Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer.",
     )
     context_tokens: PositiveInt
-    thinking_budget_tokens: conint(ge=0)
+    thinking_budget_tokens: conint(ge=0) = Field(
+        ...,
+        description="THINK-DEFAULT-01 (home/docs/dev.md 'U6 rerun ruling' (b) 1): the default for an ordinary turn - 0 on every real budget, so thinking is off unless the person turns it on for that turn (RESP-04's composer toggle). Reasoning is a second output, never the budget's own default.",
+    )
+    thinking_budget_tokens_toggled: conint(ge=0) = Field(
+        ...,
+        description="THINK-DEFAULT-01: the value used for a turn where the person explicitly toggled thinking on (the composer's RESP-04 toggle, the old path's own `thinking` request field, mirrored onto the new path's RunTurnNextOpts.thinking). Kept as its own field, per model, rather than a single hardcoded constant, since a different chat model may reason usefully at a different token count.",
+    )
     thinking_for_minors: bool = Field(
         ...,
         description="GROUND-01 (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'Reasoning is a second output'): whether the model node even asks the engine to think on a minor's turn - false by default, so a minor's turn sends thinking:false regardless of thinking_budget_tokens. This is a cost control, not the safety gate: a minor's turn never emits or persists reasoning either way (context.ts's decideReasoning() forces reasoning.emit false from the age band alone), so turning this on only spends the tokens on a span the household will never see or keep.",
