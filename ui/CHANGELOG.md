@@ -4,6 +4,24 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.35] - ui-v0.5.35
+
+`dashboard/layouts/full/`'s `Header.tsx` and `FullLayout.tsx` gain a
+header-extra slot: a new `HeaderExtraContext.tsx` (`HeaderExtraProvider`,
+mounted once in `FullLayout`; `useHeaderExtra(Component)`, called by a
+page deep inside the Outlet) lets a page put its own content on the
+header bar's left side, in place of the default Search field, without
+forking either component. The slot's value is a component type, not a
+rendered element (the same shape `elements/thread.aui.tsx`'s own
+`ComposerExtra` slot already uses) - a rendered element is a fresh
+object identity every render, which would have re-set the slot on every
+render and re-rendered `FullLayout`'s whole subtree in a loop, caught
+designing this rather than found live. Default unset; no existing
+caller's render changes. Upstream (shadcndashboard) has no such slot
+either, checked against its own main branch first - see
+`docs/dashboard-upstream.md`'s own draft issue for that project, not
+yet filed (the owner's call, not this session's).
+
 ## [0.5.34] - ui-v0.5.34
 
 `elements/thread.aui.tsx`'s `ThreadComponents` gains an optional

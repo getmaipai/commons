@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import Sidebar from './vertical/sidebar/Sidebar';
 import Header from './vertical/header/Header';
+import { HeaderExtraProvider } from './vertical/header/HeaderExtraContext';
 import { SidebarInset, SidebarProvider } from '../../components/ui/sidebar';
 import { cn } from '../../lib/utils';
 import Footer from './shared/footer/Footer';
@@ -13,13 +14,13 @@ const FullLayout: FC = () => {
            defaultOpen={true}
       style={{ "--sidebar-width-icon": "52px" } as React.CSSProperties}
     >
-      
+      <HeaderExtraProvider>
         <Sidebar />
-     
+
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}
-       <Header /> 
-        
+       <Header />
+
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">
           <div className={cn("w-full mx-auto", "container")}>
@@ -29,9 +30,10 @@ const FullLayout: FC = () => {
             </div>
           </div>
         </div>
-       
-        
+
+
       </SidebarInset>
+      </HeaderExtraProvider>
     </SidebarProvider>
   );
 };

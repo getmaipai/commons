@@ -14,11 +14,13 @@ import Profile from "./Profile";
 import LightDark from "./Light-Dark";
 
 import Notifications from "./Notifications";
+import { useHeaderExtraLeft } from "./HeaderExtraContext";
 
 
 const Header = () => {
- 
+
   const { toggleSidebar } = useSidebar();
+  const HeaderExtraLeft = useHeaderExtraLeft();
 
   return (
     <>
@@ -54,9 +56,13 @@ const Header = () => {
               />
 
 
-              <div className="sm:block hidden">
-                <Search />
-              </div>
+              {HeaderExtraLeft ? (
+                <HeaderExtraLeft />
+              ) : (
+                <div className="sm:block hidden">
+                  <Search />
+                </div>
+              )}
             </div>
 
             <div className="flex sm:gap-1 gap-0 items-center">
