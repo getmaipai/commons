@@ -195,6 +195,39 @@ describe("LlamaServerClient against the stub server", () => {
     await expect(drain()).rejects.toThrow(LlmClientError);
   });
 
+  // Found live (home's generation_failed regression, dev.md): a
+  // non-ok chat completion used to throw with the status code alone,
+  // discarding whatever llama-server's own body said was actually
+  // wrong - a plain, ad hoc server here (not the stub, which only ever
+  // answers ok) rather than teaching startStubLlmServer() a whole new
+  // scripted-failure option for one assertion.
+  test("chatCompleteStream includes the response body in the thrown error, not just the status", async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch: () => Response.json({ error: "two consecutive system messages are not supported" }, { status: 400 }),
+    });
+    try {
+      const client = new LlamaServerClient(`http://127.0.0.1:${server.port}`);
+      const drain = async () => {
+        for await (const _delta of client.chatCompleteStream({ model: "chat", messages: [{ role: "user", content: "hi" }] })) {
+          // draining is the point - the throw happens once the status is read
+        }
+      };
+      let err: unknown;
+      try {
+        await drain();
+      } catch (e) {
+        err = e;
+      }
+      expect(err).toBeInstanceOf(LlmClientError);
+      const message = (err as LlmClientError).message;
+      expect(message).toContain("400");
+      expect(message).toContain("two consecutive system messages are not supported");
+    } finally {
+      server.stop(true);
+    }
+  });
+
   // A code review (2026-09-04) found `chunk.choices[0]?.delta.content`
   // threw when a frame omitted `choices` entirely (not just sent it
   // empty) - a valid-JSON, non-standard SSE frame some backends emit

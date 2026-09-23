@@ -5,6 +5,17 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.29] - 2026-09-23
+
+### Fixed
+- `llm/ts/client.ts`: `chatCompleteStream()`'s own non-ok branch reads
+  and includes the response body (bounded to 2000 characters, best
+  effort) in the thrown `LlmClientError`, instead of the status code
+  alone. Found live: home's `generation_failed` regression (dev.md)
+  had no way to tell a rejected message shape from a dead engine or a
+  timeout, because the status-only message was the only thing a
+  caller ever saw.
+
 ## [spec-v0.1.28] - 2026-09-23
 
 ### Added

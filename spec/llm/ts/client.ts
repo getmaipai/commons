@@ -241,7 +241,21 @@ export class LlamaServerClient {
     }
     if (!res.ok) {
       clearTimeout(idleTimer);
-      throw new LlmClientError(`POST /v1/chat/completions returned ${res.status}`);
+      // A caller diagnosing a real failure (a rejected message shape, a
+      // bad request the engine actually explained) needs more than the
+      // status code alone - the status told a caller THAT it failed,
+      // never WHY, and llama-server's own 4xx bodies carry the reason
+      // (found live: home's own generation_failed regression was blind
+      // to this). Bounded and best-effort: a body read that itself
+      // fails (a closed connection, a non-text body) never masks the
+      // real status-only error underneath it.
+      let bodyText = "";
+      try {
+        bodyText = (await res.text()).slice(0, 2000);
+      } catch {
+        // best-effort only, see above
+      }
+      throw new LlmClientError(`POST /v1/chat/completions returned ${res.status}${bodyText ? `: ${bodyText}` : ""}`);
     }
     if (!res.body) {
       clearTimeout(idleTimer);
