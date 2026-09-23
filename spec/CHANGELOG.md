@@ -5,6 +5,22 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.28] - 2026-09-23
+
+### Added
+- `model-capabilities.schema.json`: `turn_budget` gains
+  `reply_ceiling_tokens` (the reply floor, home dev.md
+  "turn-machine-state-record-2026-09-22.md", "The reply floor", owner's
+  rule 2026-09-23): the most visible tokens one written adult reply may
+  take, a runaway-guard backstop the way FORCED-CALL-01's own cap plays
+  for a forced call, never a length target - the written plan's own
+  length numbers (`register.ts`'s `writtenBudgetFor`) stay room the
+  model's own end-of-reply decides inside. Required, the same reason
+  `thinking_for_minors` and `thinking_budget_tokens_toggled` are: a
+  budget with no opinion on it would silently leave a written adult
+  reply with no backstop at all. The chat model example fixture gets
+  `reply_ceiling_tokens: 1536`.
+
 ## [spec-v0.1.27] - 2026-09-23
 
 ### Added

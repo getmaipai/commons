@@ -71,7 +71,7 @@
     "turn_budget": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rounds", "tools_offered", "always_search", "answer_from_context_tool", "model_transitions", "context_tokens", "thinking_budget_tokens", "thinking_budget_tokens_toggled", "thinking_for_minors", "deadlines_ms", "measured"],
+      "required": ["rounds", "tools_offered", "always_search", "answer_from_context_tool", "model_transitions", "context_tokens", "thinking_budget_tokens", "thinking_budget_tokens_toggled", "thinking_for_minors", "reply_ceiling_tokens", "deadlines_ms", "measured"],
       "description": "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
       "properties": {
         "rounds": {
@@ -110,6 +110,11 @@
         "thinking_for_minors": {
           "type": "boolean",
           "description": "GROUND-01 (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'Reasoning is a second output'): whether the model node even asks the engine to think on a minor's turn - false by default, so a minor's turn sends thinking:false regardless of thinking_budget_tokens. This is a cost control, not the safety gate: a minor's turn never emits or persists reasoning either way (context.ts's decideReasoning() forces reasoning.emit false from the age band alone), so turning this on only spends the tokens on a span the household will never see or keep."
+        },
+        "reply_ceiling_tokens": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The reply floor (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The reply floor', owner's rule 2026-09-23): the most visible tokens one written adult reply may take - a guard against a reply that never stops, never a length target (the written plan's own length numbers, register.ts's writtenBudgetFor, are room the model's own end-of-reply decides inside, not a ceiling read out in full every time). Per model, since how long a reply may run before it has plainly run away depends on the model, not the turn; sized so this ceiling plus thinking_budget_tokens_toggled (when the person turns thinking on) still fits inside context_tokens alongside the prompt. The spoken and glance classes, and a child's turn, keep their own act-and-word-based caps instead - the floor is a written-class-only, adult-only backstop, the same role FORCED-CALL-01's own cap plays for a runaway forced call."
         },
         "deadlines_ms": {
           "type": "object",

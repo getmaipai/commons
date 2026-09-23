@@ -216,6 +216,14 @@ export const ModelCapabilities = z
           .describe(
             "GROUND-01 (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'Reasoning is a second output'): whether the model node even asks the engine to think on a minor's turn - false by default, so a minor's turn sends thinking:false regardless of thinking_budget_tokens. This is a cost control, not the safety gate: a minor's turn never emits or persists reasoning either way (context.ts's decideReasoning() forces reasoning.emit false from the age band alone), so turning this on only spends the tokens on a span the household will never see or keep.",
           ),
+        /**The reply floor (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The reply floor', owner's rule 2026-09-23): the most visible tokens one written adult reply may take - a guard against a reply that never stops, never a length target (the written plan's own length numbers, register.ts's writtenBudgetFor, are room the model's own end-of-reply decides inside, not a ceiling read out in full every time). Per model, since how long a reply may run before it has plainly run away depends on the model, not the turn; sized so this ceiling plus thinking_budget_tokens_toggled (when the person turns thinking on) still fits inside context_tokens alongside the prompt. The spoken and glance classes, and a child's turn, keep their own act-and-word-based caps instead - the floor is a written-class-only, adult-only backstop, the same role FORCED-CALL-01's own cap plays for a runaway forced call.*/
+        reply_ceiling_tokens: z
+          .number()
+          .int()
+          .gte(1)
+          .describe(
+            "The reply floor (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The reply floor', owner's rule 2026-09-23): the most visible tokens one written adult reply may take - a guard against a reply that never stops, never a length target (the written plan's own length numbers, register.ts's writtenBudgetFor, are room the model's own end-of-reply decides inside, not a ceiling read out in full every time). Per model, since how long a reply may run before it has plainly run away depends on the model, not the turn; sized so this ceiling plus thinking_budget_tokens_toggled (when the person turns thinking on) still fits inside context_tokens alongside the prompt. The spoken and glance classes, and a child's turn, keep their own act-and-word-based caps instead - the floor is a written-class-only, adult-only backstop, the same role FORCED-CALL-01's own cap plays for a runaway forced call.",
+          ),
         /**Per-node deadlines in milliseconds (simple-turn-pipeline-2026-09-22.md section 11: 'every node has a deadline, and it can be cut').*/
         deadlines_ms: z
           .object({

@@ -39,6 +39,7 @@ const VALID_BUDGET = {
   thinking_budget_tokens: 0,
   thinking_budget_tokens_toggled: 512,
   thinking_for_minors: false,
+  reply_ceiling_tokens: 1536,
   deadlines_ms: { model: 20000, tool: 10000, total: 45000 },
   measured: { false_call_rate: 0, inverse_miss_rate: 0.62, rewrite_pass_rate: 0, on: "ARCH-MEASURE-01, 2026-09-22" },
 } as const;
@@ -85,6 +86,15 @@ describe("ModelCapabilities.turn_budget", () => {
 
   test("thinking_budget_tokens 0 with thinking_budget_tokens_toggled non-zero still parses (the default off, the toggle on)", () => {
     expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, thinking_budget_tokens: 0, thinking_budget_tokens_toggled: 512 } })).not.toThrow();
+  });
+
+  // The reply floor (turn-machine-state-record-2026-09-22.md, "The
+  // reply floor"): reply_ceiling_tokens is required for the same reason
+  // thinking_budget_tokens_toggled is - a budget with no opinion on it
+  // would silently leave a written adult reply with no runaway backstop.
+  test("reply_ceiling_tokens is required: missing fails", () => {
+    const { reply_ceiling_tokens: _rct, ...incomplete } = VALID_BUDGET;
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: incomplete })).toThrow();
   });
 
   test("deadlines_ms is all-or-nothing: missing 'total' fails", () => {
