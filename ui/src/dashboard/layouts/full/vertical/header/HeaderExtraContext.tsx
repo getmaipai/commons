@@ -47,7 +47,17 @@ export function useHeaderExtraLeft(): ComponentType | undefined {
  * unmount, so navigating to a page that never calls this leaves the
  * header exactly as shipped. Pass a stable component reference (a
  * module-level function, never an inline one) - see this file's own
- * comment for why. */
+ * comment for why.
+ *
+ * The slot itself only renders the component; it does not size it.
+ * `Header.tsx`'s wrapping div is `flex-auto min-w-0` (CHAT-HEADER-03),
+ * so it grows to fill the row's free space and can shrink below its
+ * own content width - but only a component that opts into the same
+ * convention on its own root (`flex-1 min-w-0`, and `truncate` on
+ * whatever inside it should actually clip) benefits from that; one
+ * that doesn't just sits at its natural size, the same as before this
+ * item, with the header's free space going unused around it.
+ * `chatHeaderBar.tsx` (home) is the one example today. */
 export function useHeaderExtra(Component: ComponentType | undefined): void {
   const { setLeft } = useContext(HeaderExtraContext);
   useEffect(() => {
