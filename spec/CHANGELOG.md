@@ -5,6 +5,19 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.26] - 2026-09-23
+
+### Added
+- `llm/ts/types.ts`: `ChatCompletionRequest` gains `stream_options?: {
+  include_usage?: boolean }` (USAGE-01, home dev.md "U6 rerun ruling"
+  (b), the second measurement fact): without it a streamed completion
+  never carries a final usage chunk, so `cached_tokens`
+  (`ChatCompletionUsage.prompt_tokens_details`, spec-v0.1.24) stayed
+  blank on every streamed row. Only meaningful alongside `stream:
+  true`; harmless, and ignored, on a non-streaming request. Client
+  passthrough only (`client.ts` already spreads the whole request) -
+  no client code changes needed.
+
 ## [spec-v0.1.25] - 2026-09-23
 
 ### Added

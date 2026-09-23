@@ -106,6 +106,14 @@ export interface ChatCompletionRequest {
    * (one JSON body vs. SSE lines), so which one a caller gets can never
    * be ambiguous. */
   stream?: boolean;
+  /** USAGE-01 (home/docs/dev.md 2026-09-23): OpenAI's own switch for a
+   * streaming request to carry a final usage-only chunk (`choices: []`,
+   * a populated `usage`) - without it, llama-server never sends usage
+   * on a streamed completion at all, so `cached_tokens` stayed blank on
+   * every streamed row even though `ChatCompletionUsage` (spec-v0.1.24)
+   * already had the field to carry it. Only meaningful alongside
+   * `stream: true`; harmless, and ignored, on a non-streaming request. */
+  stream_options?: { include_usage?: boolean };
   /** OpenAI's structured-output param (session-a-intelligence.md step 6:
    * "Add response_format/json_schema support... if it is not there -
    * llama-server supports it"): `json_schema` grammar-constrains every
