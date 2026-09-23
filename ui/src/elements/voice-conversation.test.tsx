@@ -11,7 +11,7 @@ describe("VoiceConversation's per-mode ring styling", () => {
   // --voice-accent (tokens.css) is dedicated and never touched by a
   // template style-preset; asserted here so this can't slip back.
   test("speaking reads the dedicated voice-accent token, never --primary or a hard-coded blue utility", () => {
-    const { container } = render(<VoiceConversation mode="speaking" amplitude={0.5} transcript={[]} />);
+    const { container } = render(<VoiceConversation mode="speaking" amplitude={0.5} />);
     const html = container.innerHTML;
     expect(html).not.toContain("blue-500");
     expect(html).not.toContain("blue-400");
@@ -22,35 +22,62 @@ describe("VoiceConversation's per-mode ring styling", () => {
   });
 
   test("the first-spoken-word ripple renders only while speaking", () => {
-    const speaking = render(<VoiceConversation mode="speaking" amplitude={0} transcript={[]} />);
+    const speaking = render(<VoiceConversation mode="speaking" amplitude={0} />);
     expect(speaking.container.innerHTML).toContain("voice-ripple");
     speaking.unmount();
 
-    const listening = render(<VoiceConversation mode="listening" amplitude={0} transcript={[]} />);
+    const listening = render(<VoiceConversation mode="listening" amplitude={0} />);
     expect(listening.container.innerHTML).not.toContain("voice-ripple");
   });
 
   test("thinking gets the slow hue-drift animation, other modes don't", () => {
-    const thinking = render(<VoiceConversation mode="thinking" amplitude={0} transcript={[]} />);
+    const thinking = render(<VoiceConversation mode="thinking" amplitude={0} />);
     expect(thinking.container.innerHTML).toContain("voice-hue-drift");
     thinking.unmount();
 
-    const listening = render(<VoiceConversation mode="listening" amplitude={0} transcript={[]} />);
+    const listening = render(<VoiceConversation mode="listening" amplitude={0} />);
     expect(listening.container.innerHTML).not.toContain("voice-hue-drift");
   });
 
-  test("the AI transcript label reads the voice-accent token too, never --primary", () => {
-    const { getByText } = render(<VoiceConversation mode="listening" amplitude={0} transcript={[{ id: "1", role: "assistant", text: "hi" }]} />);
-    const label = getByText("ai");
-    expect(label.className).not.toContain("blue");
-    expect(label.className).not.toContain("text-primary");
-    expect(label.className).toContain("text-voice-accent");
-  });
-
   test("the orb is ChatGPT's own scale (roughly 160-200px), the rings scaled proportionally with it", () => {
-    const { container } = render(<VoiceConversation mode="listening" amplitude={0} transcript={[]} />);
+    const { container } = render(<VoiceConversation mode="listening" amplitude={0} />);
     const button = container.querySelector("button[aria-label='Interrupt the assistant']");
     expect(button?.className).toContain("size-40");
     expect(button?.className).toContain("sm:size-48");
+  });
+});
+
+// VOICE-LIVE-05 follow-up (Jesse's own live read, 2026-09-23): "the
+// phone call look instead of the visualizer" - a call screen, never a
+// floating card with a running transcript underneath it.
+describe("VoiceConversation is a call screen, not a transcript card", () => {
+  test("carries no transcript prop or rendering at all - not 'ai'/'you', not any turn text", () => {
+    const { container } = render(<VoiceConversation mode="listening" amplitude={0} />);
+    const html = container.innerHTML;
+    expect(html).not.toContain(">ai<");
+    expect(html).not.toContain(">you<");
+    // The old transcript list's own gap/animation class, gone with it.
+    expect(html).not.toContain("slide-in-from-bottom-1");
+  });
+
+  test("the surface fills its container on the phone (h-full w-full, no rounding, no border) and stays the small floating card at sm and up", () => {
+    const { container } = render(<VoiceConversation mode="listening" amplitude={0} />);
+    const root = container.querySelector("[data-slot='voice-conversation']");
+    expect(root?.className).toContain("h-full");
+    expect(root?.className).toContain("w-full");
+    expect(root?.className).toContain("border-0");
+    expect(root?.className).toContain("sm:max-w-xs");
+    expect(root?.className).toContain("sm:rounded-[28px]");
+    expect(root?.className).toContain("sm:border");
+  });
+
+  test("mute and end are the kit's own TooltipIconButton, never a hand-styled button", () => {
+    const { getByRole } = render(<VoiceConversation mode="listening" amplitude={0} muted={false} onToggleMute={() => {}} onEnd={() => {}} />);
+    const mute = getByRole("button", { name: "Turn the microphone off" });
+    const end = getByRole("button", { name: "End the call" });
+    // TooltipIconButton's own base class, present on both.
+    expect(mute.className).toContain("aui-button-icon");
+    expect(end.className).toContain("aui-button-icon");
+    expect(end.className).toContain("bg-destructive");
   });
 });

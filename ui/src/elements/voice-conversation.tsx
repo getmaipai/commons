@@ -3,16 +3,11 @@
 import type { ComponentProps } from "react";
 import { MicIcon, MicOffIcon, PhoneOffIcon } from "lucide-react";
 import { cn } from "cn";
-import { ghostButton, mono, paper } from "./surfaces";
+import { mono, paper } from "./surfaces";
+import { TooltipIconButton } from "../assistant-ui/tooltip-icon-button";
 import { clamp } from "./range";
 
 export type VoiceMode = "connecting" | "listening" | "thinking" | "speaking";
-
-export interface VoiceTurn {
-  id: string;
-  role: "user" | "assistant";
-  text: string;
-}
 
 const CAPTION: Record<VoiceMode, string> = {
   connecting: "Connecting",
@@ -31,7 +26,6 @@ const HINT: Record<VoiceMode, string> = {
 export function VoiceConversation({
   mode,
   amplitude,
-  transcript,
   muted,
   onToggleMute,
   onInterrupt,
@@ -43,7 +37,6 @@ export function VoiceConversation({
   | "children"
   | "mode"
   | "amplitude"
-  | "transcript"
   | "muted"
   | "onToggleMute"
   | "onInterrupt"
@@ -51,7 +44,6 @@ export function VoiceConversation({
 > & {
   mode: VoiceMode;
   amplitude: number;
-  transcript: readonly VoiceTurn[];
   muted?: boolean;
   onToggleMute?: () => void;
   onInterrupt?: () => void;
@@ -66,151 +58,146 @@ export function VoiceConversation({
       data-slot="voice-conversation"
       className={cn(
         paper,
-        "flex w-full max-w-xs flex-col items-center gap-4 rounded-[28px] px-5 py-5",
+        // VOICE-LIVE-05 follow-up (Jesse's own live read, 2026-09-23):
+        // "the phone call look instead of the visualizer" - a call
+        // screen, ChatGPT's own voice mode, not a floating card with a
+        // running transcript. Below sm (640px, the kit's own mobile
+        // breakpoint - Header.tsx's own Search fallback already hides
+        // there): the surface grows to fill whatever it's given
+        // (h-full w-full, no border, no rounding - edge to edge, the
+        // caller's own fixed overlay is the only chrome); justify-
+        // between plus the orb group's own flex-1 below centers the
+        // orb in the space above the controls while the controls stay
+        // pinned to the bottom, a real call screen's own layout. At sm
+        // and up: the original small floating card (max-w-xs,
+        // rounded-[28px], bordered via `paper`, sized to its own
+        // content, everything back to plain top-to-bottom flow).
+        "flex h-full w-full flex-col items-center justify-between gap-6 border-0 px-5 py-10 sm:h-auto sm:max-w-xs sm:justify-start sm:gap-4 sm:rounded-[28px] sm:border sm:px-5 sm:py-5",
         className,
       )}
-
       {...props}
     >
-      {/* VOICE-LIVE-05 (2026-09-23, Jesse's own judgment of the first
-          recording): the orb read too small and, in light theme, near-
-          black - a dark grey disc, not a blue glow. Size: ChatGPT's own
-          scale, roughly 160-200px on desktop (size-40/size-48 below,
-          160px/192px - Tailwind's own scale lands exactly there), every
-          ring scaled with it, keeping this component's own original
-          ring-to-button ratios (ring2 70.8%, the core and ripple
-          41.7%). Color: tokens.css's own --voice-accent, never
-          --primary - see that token's own comment for why --primary
-          alone wasn't safe (the vendored template's own competing
-          :root definition won the cascade in light theme). */}
-      <button
-        type="button"
-        onClick={onInterrupt}
-        disabled={!canInterrupt}
-        aria-label="Interrupt the assistant"
-        className="focus-visible:ring-foreground/20 relative flex size-40 items-center justify-center rounded-full outline-none focus-visible:ring-1 disabled:cursor-default sm:size-48"
-      >
-        <span
-          aria-hidden
-          className={cn(
-            "absolute size-40 rounded-full transition-[transform,opacity] duration-200 ease-out sm:size-48 motion-reduce:transition-none",
-            mode === "speaking"
-              ? "bg-radial from-voice-accent/16 to-voice-accent/4"
-              : mode === "thinking"
-                ? "bg-radial from-foreground/8 to-foreground/2 motion-safe:animate-[voice-hue-drift_4s_ease-in-out_infinite]"
-                : "bg-foreground/[0.05]",
-          )}
-          style={{
-            transform: `scale(${active ? 0.72 + level * 0.28 : 0.62})`,
-            opacity: active ? 1 : 0.5,
-          }}
-        />
-        <span
-          aria-hidden
-          className={cn(
-            "absolute size-[113px] rounded-full transition-[transform,opacity,box-shadow] duration-150 ease-out sm:size-[136px] motion-reduce:transition-none",
-            mode === "speaking"
-              ? "bg-voice-accent/24 shadow-[0_0_1.25rem_color-mix(in_oklab,var(--color-voice-accent)_45%,transparent)]"
-              : "bg-foreground/[0.08]",
-          )}
-          style={{
-            transform: `scale(${active ? 0.8 + level * 0.22 : 0.7})`,
-          }}
-        />
-        <span
-          aria-hidden
-          className={cn(
-            "relative size-[67px] rounded-full transition-[transform,background-color] duration-150 ease-out sm:size-20 motion-reduce:transition-none",
-            mode === "connecting" && "bg-foreground/20 animate-pulse",
-            mode === "listening" && "bg-foreground/80",
-            mode === "thinking" && "bg-foreground/30 animate-pulse",
-            mode === "speaking" && "bg-voice-accent",
-          )}
-          style={{ transform: `scale(${active ? 0.9 + level * 0.2 : 0.85})` }}
-        />
-        {/* The first-spoken-word ripple: a single expanding, fading ring.
-            The conditional render itself is what replays it every time -
-            leaving "speaking" unmounts this span outright, so the next
-            "speaking" entry is a genuinely fresh mount, restarting the
-            CSS animation with no key needed. The flair the row asks for,
-            costing nothing in per-frame JS (a CSS animation, not a rAF
-            loop). */}
-        {mode === "speaking" && (
-          <span
-            aria-hidden
-            className="border-voice-accent/50 absolute size-[67px] rounded-full border motion-reduce:hidden motion-safe:animate-[voice-ripple_0.6s_ease-out] sm:size-20"
-          />
-        )}
-      </button>
-
-      <div className="flex flex-col items-center gap-1">
-        <span className="text-[13.5px] font-medium">{CAPTION[mode]}</span>
-        <span className={cn(mono, "text-foreground/35")}>
-          {muted ? "Mic off" : canInterrupt ? "Tap to interrupt" : HINT[mode]}
-        </span>
-      </div>
-
-      <div className="flex min-h-[4.5rem] w-full flex-col gap-1.5">
-        {transcript.map((turn) => (
-          <div
-            key={turn.id}
-            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both flex gap-2 text-xs leading-relaxed duration-300"
-          >
-            <span
-              className={cn(
-                mono,
-                "w-8 shrink-0",
-                turn.role === "user"
-                  ? "text-foreground/30"
-                  : "text-voice-accent/70",
-              )}
-            >
-              {turn.role === "user" ? "you" : "ai"}
-            </span>
-            <span
-              className={cn(
-                "min-w-0 flex-1 break-words",
-                turn.role === "user"
-                  ? "text-foreground/50"
-                  : "text-foreground/80",
-              )}
-            >
-              {turn.text}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-2">
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 sm:flex-none sm:justify-start sm:gap-4">
+        {/* VOICE-LIVE-05 (2026-09-23, Jesse's own judgment of the first
+            recording): the orb read too small and, in light theme, near-
+            black - a dark grey disc, not a blue glow. Size: ChatGPT's own
+            scale, roughly 160-200px on desktop (size-40/size-48 below,
+            160px/192px - Tailwind's own scale lands exactly there), every
+            ring scaled with it, keeping this component's own original
+            ring-to-button ratios (ring2 70.8%, the core and ripple
+            41.7%). Color: tokens.css's own --voice-accent, never
+            --primary - see that token's own comment for why --primary
+            alone wasn't safe (the vendored template's own competing
+            :root definition won the cascade in light theme). */}
         <button
           type="button"
+          onClick={onInterrupt}
+          disabled={!canInterrupt}
+          aria-label="Interrupt the assistant"
+          className="focus-visible:ring-foreground/20 relative flex size-40 items-center justify-center rounded-full outline-none focus-visible:ring-1 disabled:cursor-default sm:size-48"
+        >
+          <span
+            aria-hidden
+            className={cn(
+              "absolute size-40 rounded-full transition-[transform,opacity] duration-200 ease-out sm:size-48 motion-reduce:transition-none",
+              mode === "speaking"
+                ? "bg-radial from-voice-accent/16 to-voice-accent/4"
+                : mode === "thinking"
+                  ? "bg-radial from-foreground/8 to-foreground/2 motion-safe:animate-[voice-hue-drift_4s_ease-in-out_infinite]"
+                  : "bg-foreground/[0.05]",
+            )}
+            style={{
+              transform: `scale(${active ? 0.72 + level * 0.28 : 0.62})`,
+              opacity: active ? 1 : 0.5,
+            }}
+          />
+          <span
+            aria-hidden
+            className={cn(
+              "absolute size-[113px] rounded-full transition-[transform,opacity,box-shadow] duration-150 ease-out sm:size-[136px] motion-reduce:transition-none",
+              mode === "speaking"
+                ? "bg-voice-accent/24 shadow-[0_0_1.25rem_color-mix(in_oklab,var(--color-voice-accent)_45%,transparent)]"
+                : "bg-foreground/[0.08]",
+            )}
+            style={{
+              transform: `scale(${active ? 0.8 + level * 0.22 : 0.7})`,
+            }}
+          />
+          <span
+            aria-hidden
+            className={cn(
+              "relative size-[67px] rounded-full transition-[transform,background-color] duration-150 ease-out sm:size-20 motion-reduce:transition-none",
+              mode === "connecting" && "bg-foreground/20 animate-pulse",
+              mode === "listening" && "bg-foreground/80",
+              mode === "thinking" && "bg-foreground/30 animate-pulse",
+              mode === "speaking" && "bg-voice-accent",
+            )}
+            style={{ transform: `scale(${active ? 0.9 + level * 0.2 : 0.85})` }}
+          />
+          {/* The first-spoken-word ripple: a single expanding, fading ring.
+              The conditional render itself is what replays it every time -
+              leaving "speaking" unmounts this span outright, so the next
+              "speaking" entry is a genuinely fresh mount, restarting the
+              CSS animation with no key needed. The flair the row asks for,
+              costing nothing in per-frame JS (a CSS animation, not a rAF
+              loop). */}
+          {mode === "speaking" && (
+            <span
+              aria-hidden
+              className="border-voice-accent/50 absolute size-[67px] rounded-full border motion-reduce:hidden motion-safe:animate-[voice-ripple_0.6s_ease-out] sm:size-20"
+            />
+          )}
+        </button>
+
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-[13.5px] font-medium">{CAPTION[mode]}</span>
+          <span className={cn(mono, "text-foreground/35")}>
+            {muted ? "Mic off" : canInterrupt ? "Tap to interrupt" : HINT[mode]}
+          </span>
+        </div>
+      </div>
+
+      {/* VOICE-LIVE-05 follow-up: "no running transcript list inside the
+          card" - the turn already lands in the thread as text, the real
+          record; a second copy printed here was the thing Jesse asked
+          to drop, along with the "you"/"ai" labels it carried (with it
+          goes the only place either ever appeared in this component). */}
+
+      <div className="flex items-center gap-3">
+        {/* "The kit's icon buttons": TooltipIconButton (the enhanced
+            copy in assistant-ui/, a real 48px+ touch target regardless
+            of the visual size override - the same component
+            liveVoiceSession.tsx's own gear already uses), never a
+            hand-styled <button>. */}
+        <TooltipIconButton
+          tooltip={muted ? "Turn the microphone on" : "Turn the microphone off"}
           aria-label={
             muted ? "Turn the microphone on" : "Turn the microphone off"
           }
           aria-pressed={muted}
+          variant={muted ? "secondary" : "ghost"}
+          size="icon"
           onClick={onToggleMute}
           disabled={!onToggleMute}
-          className={cn(
-            ghostButton,
-            "size-10 disabled:pointer-events-none disabled:opacity-30",
-            muted && "bg-foreground/[0.08] text-foreground/90",
-          )}
+          className="size-12 rounded-full disabled:pointer-events-none disabled:opacity-30"
         >
           {muted ? (
-            <MicOffIcon className="size-4" />
+            <MicOffIcon className="size-5" />
           ) : (
-            <MicIcon className="size-4" />
+            <MicIcon className="size-5" />
           )}
-        </button>
-        <button
-          type="button"
+        </TooltipIconButton>
+        <TooltipIconButton
+          tooltip="End the call"
           aria-label="End the call"
+          variant="destructive"
+          size="icon"
           onClick={onEnd}
           disabled={!onEnd}
-          className="flex size-10 items-center justify-center rounded-full bg-red-500/90 text-white transition-[opacity,scale] duration-150 hover:opacity-90 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-30 motion-reduce:transition-none"
+          className="size-12 rounded-full disabled:pointer-events-none disabled:opacity-30"
         >
-          <PhoneOffIcon className="size-4" />
-        </button>
+          <PhoneOffIcon className="size-5" />
+        </TooltipIconButton>
       </div>
     </div>
   );
