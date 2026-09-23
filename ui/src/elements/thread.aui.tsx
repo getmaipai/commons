@@ -111,6 +111,13 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * it - a caller whose own attach affordance is a grouped menu (not a
  * single-click file picker) needs the one "+" in that spot to be its
  * own, not a second bare button next to it.
+ * `ComposerExtraEnd`, when set, renders in the same action row on the
+ * trailing side, before the dictate/send controls - VOICE-LIVE-01's own
+ * gap: `ComposerExtra` is the leading-side append point, and a control
+ * that belongs beside Send rather than Attach (a live voice-
+ * conversation trigger) has nowhere else to go without forking
+ * `ComposerAction` outright. Opened upstream the same day, onto
+ * assistant-ui/assistant-ui#8003 (`ui/docs/dashboard-upstream.md`).
  */
 export type ThreadComponents = {
   AssistantMessage?: ComponentType | undefined;
@@ -129,6 +136,7 @@ export type ThreadComponents = {
   Indicator?: ComponentType | undefined;
   ComposerExtra?: ComponentType | undefined;
   ComposerAddAttachmentOverride?: ComponentType | undefined;
+  ComposerExtraEnd?: ComponentType | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -488,7 +496,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
 };
 
 const ComposerAction: FC = () => {
-  const { ComposerExtra, ComposerAddAttachmentOverride } = useContext(ThreadComponentsContext);
+  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd } = useContext(ThreadComponentsContext);
   return (
     <div className="aui-composer-action-wrapper relative flex items-center justify-between">
       <div className="flex items-center gap-1.5">
@@ -496,6 +504,7 @@ const ComposerAction: FC = () => {
         {ComposerExtra && <ComposerExtra />}
       </div>
       <div className="flex items-center gap-1.5">
+        {ComposerExtraEnd && <ComposerExtraEnd />}
         <AuiIf condition={(s) => s.thread.capabilities.dictation}>
           <AuiIf condition={(s) => s.composer.dictation == null}>
             <ComposerPrimitive.Dictate asChild>
