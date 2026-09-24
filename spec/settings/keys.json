@@ -561,6 +561,20 @@
     ]
   },
   {
+    "key": "search.wikipedia_fallback",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Ask Wikipedia when web search fails or finds nothing",
+    "help": "When your SearXNG instance is down or a search comes back empty, MaiPai asks Wikipedia's own official API instead - covers people, shows, places, products and history. On by default whenever web search is set up; turn it off here if you don't want it.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.integrations",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "storage.critical_free_gb",
     "scope": "household",
     "selector": "number",
