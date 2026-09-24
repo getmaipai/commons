@@ -20,4 +20,16 @@ describe("ThinkingIndicator", () => {
     expect(label.className).not.toContain("leading-none");
     expect(label.className).toContain("leading-tight");
   });
+
+  // tw-shimmer's own default overlay is a flat `white`, correct on a
+  // dark surface but not on this component's light-theme resting text
+  // (`text-foreground/55`) - reported live as the highlight "wiping
+  // away part of the text" instead of brightening it. Tying the
+  // highlight to the same `foreground` token the resting text already
+  // reads from keeps both themes correct.
+  test("the highlight never reverts to a hardcoded color that mismatches the theme", () => {
+    const { getByText } = render(<ThinkingIndicator label="Sizing this up…" />);
+    const label = getByText("Sizing this up…");
+    expect(label.className).toContain("shimmer-color-foreground");
+  });
 });
