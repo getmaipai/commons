@@ -564,7 +564,14 @@
     "key": "search.safe_search",
     "scope": "person",
     "selector": "select",
-    "range": { "options": ["default", "off", "moderate", "strict"] },
+    "range": {
+      "options": [
+        "default",
+        "off",
+        "moderate",
+        "strict"
+      ]
+    },
     "default": "default",
     "label": "Safe search level",
     "help": "How strictly web search filters results for you. \"Default\" follows your age: strict for a child, moderate for a teen, off for an adult. An adult can change their own; only an adult can change a child's or teen's, and a child or teen can never loosen their own below their default.",

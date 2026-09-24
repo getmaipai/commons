@@ -5,6 +5,11 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.37] - 2026-09-24
+
+### Fixed
+- `settings/keys.json`: `search.safe_search`'s own `range` field reformatted to match `gen-settings-registry.ts`'s real canonical output (`JSON.stringify(sorted, null, 2)` fully expands a nested array; spec-v0.1.35 hand-wrote it compact) - caught by home's own settings-registry drift check the moment `search.safe_search`'s TS declaration (`backend/src/settings/searchKeys.ts`) and `reference.library_dir`'s (new `backend/src/settings/referenceKeys.ts`) landed there. No field value changed, formatting only.
+
 ## [spec-v0.1.36] - 2026-09-24
 
 ### Added
