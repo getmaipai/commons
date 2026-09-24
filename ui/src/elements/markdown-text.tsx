@@ -320,12 +320,21 @@ const defaultComponents = memoizeMarkdownComponents({
       {...props}
     />
   ),
-  a: ({ className, ...props }) => (
+  // A reply's own inline link is exactly like a citation chip
+  // (elements/sources.aui.tsx's own Source): never the current tab -
+  // target/rel/referrerPolicy default here, exactly the same three
+  // attributes, so a household member never loses their place in the
+  // conversation by tapping a link inside a reply, and a linked site
+  // learns nothing from the click but the click.
+  a: ({ className, target = "_blank", rel = "noopener noreferrer", referrerPolicy = "no-referrer", ...props }) => (
     <a
       className={cn(
         "aui-md-a text-primary hover:text-primary/80 underline underline-offset-2",
         className,
       )}
+      target={target}
+      rel={rel}
+      referrerPolicy={referrerPolicy}
       {...props}
     />
   ),

@@ -80,4 +80,16 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     expect(container.textContent).toContain("$5");
     expect(container.textContent).toContain("$7");
   });
+
+  test("an inline link never opens in the current tab", async () => {
+    const reply = "see [this site](https://example.com/page) for more";
+    const { container, getByRole } = render(<Harness reply={reply} />);
+    await sendAndSettle(container, getByRole);
+
+    const link = container.querySelector('a[href="https://example.com/page"]');
+    expect(link).not.toBeNull();
+    expect(link!.getAttribute("target")).toBe("_blank");
+    expect(link!.getAttribute("rel")).toBe("noopener noreferrer");
+    expect(link!.getAttribute("referrerpolicy")).toBe("no-referrer");
+  });
 });
