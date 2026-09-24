@@ -1,13 +1,23 @@
 import { FC } from 'react';
 import Sidebar from './vertical/sidebar/Sidebar';
-import Header from './vertical/header/Header';
+import Header, { type HeaderProps } from './vertical/header/Header';
 import { HeaderExtraProvider } from './vertical/header/HeaderExtraContext';
 import { SidebarInset, SidebarProvider } from '../../components/ui/sidebar';
 import { cn } from '../../lib/utils';
 import Footer from './shared/footer/Footer';
 import { Outlet } from 'react-router';
 
-const FullLayout: FC = () => {
+export interface FullLayoutProps {
+  /** SHELL-SEARCH-02 (home, 2026-09-23): threaded straight through to
+   * `Header`'s own `headerSearchRemote` prop. `FullLayout` is the one
+   * component a caller actually instantiates itself (`<Route
+   * element={<FullLayout />}>`, home's own `NextRoutes.tsx`) - passing
+   * it here, rather than inventing a context, is how a value reaches
+   * `Header`/`HeaderSearch` two vendored layers down with no fork. */
+  headerSearchRemote?: HeaderProps["headerSearchRemote"];
+}
+
+const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote }) => {
 
   return (
     <SidebarProvider
@@ -19,7 +29,7 @@ const FullLayout: FC = () => {
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}
-       <Header />
+       <Header headerSearchRemote={headerSearchRemote} />
 
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">
