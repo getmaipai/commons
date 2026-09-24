@@ -87,7 +87,7 @@ describe("Thread's temporary prop", () => {
     const { container: armed } = render(<Harness temporary />);
     const ordinaryBg = ordinary.querySelector(".aui-thread-root")?.getAttribute("style");
     const armedBg = armed.querySelector(".aui-thread-root")?.getAttribute("style");
-    expect(armedBg).toContain("--color-accent");
+    expect(armedBg).toContain("--color-primary");
     expect(armedBg).not.toBe(ordinaryBg);
   });
 });
