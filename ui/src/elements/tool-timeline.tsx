@@ -9,11 +9,20 @@ import {
 import { cn } from "cn";
 import { collapsePanel, ShimmerLabel, SwapLabel } from "./surfaces";
 import { take } from "./range";
+import { Source, SourceIcon, SourceTitle } from "./sources.aui";
+
+export interface TimelineSite {
+  host: string;
+  url: string;
+}
 
 export interface TimelineStep {
   verb: string;
   chip: string;
   icon: LucideIcon;
+  /** TOOL-EVENTS-02: the sites a search step actually read - a weather
+   * or almanac step reads no page, so this stays empty for those. */
+  sites?: readonly TimelineSite[];
 }
 
 export interface TimelineStat {
@@ -32,6 +41,11 @@ export interface ToolTimelineProps {
   activeLabel: string;
   stats: TimelineStat[];
   className?: string;
+  /** TOOL-EVENTS-02: swaps `SourceIcon`'s own upstream favicon default
+   * for a caller's own proxy (home's `/api/favicon`, SRC-ICON-01) - the
+   * kit never hardcodes a home route, the same seam `SourcesFooterContent`
+   * (NextChatPage.tsx) already passes into `SourceIcon` directly. */
+  faviconUrl?: (domain: string) => string;
 }
 
 export function ToolTimeline({
@@ -44,6 +58,7 @@ export function ToolTimeline({
   activeLabel,
   stats,
   className,
+  faviconUrl,
 }: ToolTimelineProps) {
   return (
     <Collapsible
@@ -84,18 +99,36 @@ export function ToolTimeline({
                 // reasoning `elements/sources.tsx` already documents for
                 // its own index-keyed rows).
                 key={index}
-                className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-foreground/55 flex items-center gap-2 text-[13.5px] duration-300"
+                className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both flex flex-col gap-1.5 duration-300"
               >
-                <Icon className="text-foreground/35 size-3.5 shrink-0" />
-                <ShimmerLabel
-                  active={active}
-                  className="relative inline-block leading-none"
-                >
-                  {step.verb}
-                </ShimmerLabel>
-                <span className="bg-foreground/[0.06] text-foreground/70 rounded-md px-1.5 py-0.5 font-mono text-[11px]">
-                  {step.chip}
-                </span>
+                <div className="text-foreground/55 flex items-center gap-2 text-[13.5px]">
+                  <Icon className="text-foreground/35 size-3.5 shrink-0" />
+                  <ShimmerLabel
+                    active={active}
+                    className="relative inline-block leading-none"
+                  >
+                    {step.verb}
+                  </ShimmerLabel>
+                  <span className="bg-foreground/[0.06] text-foreground/70 rounded-md px-1.5 py-0.5 font-mono text-[11px]">
+                    {step.chip}
+                  </span>
+                </div>
+                {step.sites && step.sites.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 ps-5.5">
+                    {step.sites.map((site) => (
+                      <Source
+                        key={site.url}
+                        href={site.url}
+                        referrerPolicy="no-referrer"
+                        variant="muted"
+                        size="sm"
+                      >
+                        <SourceIcon url={site.url} faviconUrl={faviconUrl} />
+                        <SourceTitle>{site.host}</SourceTitle>
+                      </Source>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
