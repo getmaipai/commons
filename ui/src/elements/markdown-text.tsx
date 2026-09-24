@@ -1,21 +1,36 @@
 "use client";
 
 import "@assistant-ui/react-markdown/styles/dot.css";
+import "katex/dist/katex.css";
 
 import {
   type CodeHeaderProps,
+  type SyntaxHighlighterProps as AuiSyntaxHighlighterProps,
   MarkdownTextPrimitive,
+  escapeCurrencyDollars,
+  normalizeMathDelimiters,
   unstable_memoizeMarkdownComponents as memoizeMarkdownComponents,
   useIsMarkdownCodeBlock,
 } from "@assistant-ui/react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { type FC, memo, useMemo, useRef } from "react";
-import type { TextMessagePartProps } from "@assistant-ui/react";
+import { useAuiState, type TextMessagePartProps } from "@assistant-ui/react";
 import { CheckIcon, CopyIcon } from "lucide-react";
 
 import { TooltipIconButton } from "./tooltip-icon-button";
 import { useCopyToClipboard } from "./hooks/use-copy-to-clipboard";
+import { SyntaxHighlighter } from "./shiki-highlighter";
+import { MermaidDiagram } from "./mermaid-diagram";
 import { cn } from "cn";
+
+// Language models emit math in delimiters remark-math doesn't parse
+// (LaTeX \(...\)/\[...\] brackets) and write plain currency ($5) that
+// single-dollar math would otherwise eat - both documented on these
+// exports' own JSDoc as the intended `preprocess` composition.
+const preprocessMath = (text: string) =>
+  escapeCurrencyDollars(normalizeMathDelimiters(text));
 
 type MarkdownTextProps = Partial<TextMessagePartProps> & {
   components?: Parameters<typeof memoizeMarkdownComponents>[0];
@@ -37,21 +52,55 @@ const useShallowStable = <T extends Record<string, unknown> | undefined>(
   return ref.current;
 };
 
+// The two `SyntaxHighlighter` slots MarkdownTextPrimitive calls for a
+// fenced code block (`components.SyntaxHighlighter` as the default,
+// `componentsByLanguage.mermaid.SyntaxHighlighter` for that one
+// language - assistant-ui's own documented shape,
+// `MarkdownTextPrimitiveProps.componentsByLanguage`'s own example).
+// Neither uses the `components.Pre`/`Code` it's handed: `shiki-
+// highlighter.tsx` and `mermaid-diagram.tsx` render their own
+// containers. `useAuiState` reads the enclosing message's own status,
+// the same "no re-highlight/re-render mid-stream" signal
+// `NextChatPage.tsx`'s streaming indicator already keys off.
+const MarkdownSyntaxHighlighter: FC<AuiSyntaxHighlighterProps> = ({
+  language,
+  code,
+}) => {
+  const streaming = useAuiState((s) => s.message.status?.type === "running");
+  return (
+    <SyntaxHighlighter code={code} language={language} streaming={streaming} />
+  );
+};
+
+const MarkdownMermaid: FC<AuiSyntaxHighlighterProps> = ({ code }) => {
+  const streaming = useAuiState((s) => s.message.status?.type === "running");
+  return <MermaidDiagram code={code} streaming={streaming} />;
+};
+
+// Stable module-level identity, never recreated per render - matches
+// MarkdownTextPrimitive's own componentsByLanguage prop exactly (no
+// per-render allocation to memoize away).
+const componentsByLanguage = { mermaid: { SyntaxHighlighter: MarkdownMermaid } };
+const remarkPlugins = [remarkGfm, remarkMath];
+const rehypePlugins = [rehypeKatex];
+
 const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components }) => {
   const stableComponents = useShallowStable(components);
   const markdownComponents = useMemo(() => {
-    if (!stableComponents) return defaultComponents;
-    return {
-      ...defaultComponents,
-      ...memoizeMarkdownComponents(stableComponents),
-    };
+    const base = stableComponents
+      ? { ...defaultComponents, ...memoizeMarkdownComponents(stableComponents) }
+      : defaultComponents;
+    return { ...base, SyntaxHighlighter: MarkdownSyntaxHighlighter };
   }, [stableComponents]);
 
   return (
     <MarkdownTextPrimitive
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={remarkPlugins}
+      rehypePlugins={rehypePlugins}
+      preprocess={preprocessMath}
       className="aui-md"
       components={markdownComponents}
+      componentsByLanguage={componentsByLanguage}
       defer
     />
   );

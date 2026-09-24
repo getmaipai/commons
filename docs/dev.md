@@ -898,3 +898,47 @@ in Studio; the quick-action tiles' truncation fixed in both; the
 collapsed rail's one toggle, 64px width, centered 40x40 targets, and
 the active item's gradient-in-Studio/flat-in-Calm collapsed fill, in
 both looks and both themes.
+
+## CHAT-RICH-01: shiki, mermaid and math in `elements/markdown-text.tsx` (2026-09-24, `ui-v0.5.52`)
+
+`ui/src/elements/shiki-highlighter.tsx` (`react-shiki`) and
+`mermaid-diagram.tsx` (`beautiful-mermaid`) already existed, built but
+never wired into a `MarkdownText` - this item is exactly that wiring,
+plus math (new dependencies: `remark-math`, `rehype-katex`, `katex`).
+Both syntax highlighting and the diagram use `MarkdownTextPrimitive`'s
+own documented shape (`@assistant-ui/react-markdown`'s
+`componentsByLanguage`/`SyntaxHighlighter` slots - its own JSDoc
+example is literally `{ mermaid: { SyntaxHighlighter: MermaidDiagram }
+}`), never a hand-rolled `pre`/`code` branch: `components.
+SyntaxHighlighter` is the shiki adapter for every language,
+`componentsByLanguage.mermaid.SyntaxHighlighter` overrides it for
+mermaid fences specifically. Two thin adapter components
+(`MarkdownSyntaxHighlighter`, `MarkdownMermaid`) bridge assistant-ui's
+own `SyntaxHighlighterProps` shape (`{node, components: {Pre, Code},
+language, code}`) to each component's real prop shape, reading the
+enclosing message's streaming status via `useAuiState((s) => s.message.
+status?.type === "running")` - the same convention `NextChatPage.tsx`
+already uses - so a still-streaming block renders plain (no
+tokenization cost, no layout shift) and settles once the message
+completes. Math: `remarkMath` + `rehypeKatex` parse/render `$...$`/
+`$$...$$`; `preprocess` composes `normalizeMathDelimiters` +
+`escapeCurrencyDollars` (both exported by `@assistant-ui/react-markdown`
+for exactly this, per their own JSDoc) so a model's LaTeX-bracket math
+and plain currency amounts both come out right. A code review caught
+the first cut passing `componentsByLanguage` and the `SyntaxHighlighter`
+merge as fresh literals at the JSX call site - not a correctness bug
+given `MarkdownTextPrimitive`'s own multi-depth stability plumbing, but
+folded into the existing `useMemo` (`componentsByLanguage` promoted to
+a true module-level constant) anyway, so the file's own "no per-render
+allocation the primitive has to absorb" intent holds without relying on
+a reader re-deriving that the library happens to tolerate it.
+
+**Verification**: `markdown-text.test.tsx` (new, 4 tests): a fenced
+`typescript` block renders through `.aui-shiki-base`, not a plain
+`<pre>`; a fenced `mermaid` block renders `[data-slot="mermaid-diagram"]`
+instead; inline `$x^2$` renders a `.katex` node; a currency amount
+(`$5 and $7`) renders neither. This workspace's own `bun test` (408
+pass) and `bun run lint` (`tsc --noEmit && eslint src`, 0 errors) green;
+commons's own root `scripts/check.sh` green end to end (core, ui, spec).
+Screenshots and the live turn-pipeline verification are Home's own side
+of this item, not committed here.
