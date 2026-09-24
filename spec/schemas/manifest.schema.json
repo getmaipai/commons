@@ -105,7 +105,29 @@
         "formality": { "type": "string", "enum": ["casual", "neutral", "formal"] },
         "complexity": { "type": "string", "enum": ["simple", "standard", "advanced"] },
         "engagement": { "type": "string", "enum": ["brief", "balanced", "curious"] },
-        "filler_density": { "type": "string", "enum": ["none", "light", "frequent"] }
+        "filler_density": { "type": "string", "enum": ["none", "light", "frequent"] },
+        "status_phrases": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.",
+          "properties": {
+            "thinking": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1, "maxLength": 40, "pattern": "…$" },
+              "minItems": 1
+            },
+            "searching": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1, "maxLength": 40, "pattern": "…$" },
+              "minItems": 1
+            },
+            "checking": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1, "maxLength": 40, "pattern": "…$" },
+              "minItems": 1
+            }
+          }
+        }
       }
     },
     "knowledge_source": {

@@ -34,6 +34,25 @@ class Routing(BaseModel):
     )
 
 
+class StatusPhrases(BaseModel):
+    """
+    STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    thinking: list[constr(pattern=r'…$', min_length=1, max_length=40)] | None = Field(
+        None, min_length=1
+    )
+    searching: list[constr(pattern=r'…$', min_length=1, max_length=40)] | None = Field(
+        None, min_length=1
+    )
+    checking: list[constr(pattern=r'…$', min_length=1, max_length=40)] | None = Field(
+        None, min_length=1
+    )
+
+
 class Companion(BaseModel):
     """
     Required when kind is "companion" (session-a-intelligence.md step 8), unused otherwise. Composed by home/backend/src/lib/persona.ts into the turn engine's identity line and system-prompt fragment: display_name replaces the hardcoded "MaiPai" in "You are {display_name}, ...", the four style dials are the same ones lib/persona.ts already had before companions were packages, and examples is a short few-shot block (legacy's own finding: "the single biggest lever for small-model voice fidelity").
@@ -61,6 +80,10 @@ class Companion(BaseModel):
     complexity: Literal['simple', 'standard', 'advanced']
     engagement: Literal['brief', 'balanced', 'curious']
     filler_density: Literal['none', 'light', 'frequent']
+    status_phrases: StatusPhrases | None = Field(
+        None,
+        description="STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.",
+    )
 
 
 class Flavour(BaseModel):

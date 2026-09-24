@@ -5,6 +5,12 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.36] - 2026-09-24
+
+### Added
+- `vocab/status-phrases.json`: the written chat's default waiting-line phrases, one set per moment (`thinking`, `searching`, `checking`), ~50 phrases seeded from the owner's own list (STATUS-PHRASES-01).
+- `manifest.schema.json`'s `companion` object gains an optional `status_phrases` block, the same three moments - a companion's own set replaces the default for a moment it declares, falls back to `vocab/status-phrases.json` for one it leaves out. Each phrase array is schema-enforced (non-empty, max 40 characters, ends in a single "…"). Additive; every existing fixture still validates unchanged.
+
 ## [spec-v0.1.35] - 2026-09-24
 
 ### Added

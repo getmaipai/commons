@@ -129,3 +129,52 @@ describe("PackageManifest, step 2's new fields", () => {
     expect(() => PackageManifest.parse({ ...BASE, tool_label: "" })).toThrow();
   });
 });
+
+describe("PackageManifest.companion.status_phrases (STATUS-PHRASES-01)", () => {
+  const COMPANION_BASE = {
+    ...BASE,
+    kind: "companion",
+    companion: { display_name: "Test Companion", formality: "neutral", complexity: "standard", engagement: "balanced", filler_density: "light" },
+  } as const;
+
+  test("a companion may declare one moment and leave the others out", () => {
+    const manifest = { ...COMPANION_BASE, companion: { ...COMPANION_BASE.companion, status_phrases: { searching: ["Hunting around…"] } } };
+    const parsed = PackageManifest.parse(manifest);
+    expect(parsed.companion?.status_phrases?.searching).toEqual(["Hunting around…"]);
+    expect(parsed.companion?.status_phrases?.thinking).toBeUndefined();
+    expect(parsed.companion?.status_phrases?.checking).toBeUndefined();
+  });
+
+  test("a companion may declare all three moments", () => {
+    const manifest = {
+      ...COMPANION_BASE,
+      companion: {
+        ...COMPANION_BASE.companion,
+        status_phrases: { thinking: ["Wondering…"], searching: ["Hunting around…"], checking: ["Squaring it up…"] },
+      },
+    };
+    expect(() => PackageManifest.parse(manifest)).not.toThrow();
+  });
+
+  test("a companion with no status_phrases at all is fine - every moment falls back to vocab/status-phrases.json", () => {
+    expect(PackageManifest.parse(COMPANION_BASE).companion?.status_phrases).toBeUndefined();
+  });
+
+  test("rejects a phrase that doesn't end in the single ellipsis character", () => {
+    const manifest = { ...COMPANION_BASE, companion: { ...COMPANION_BASE.companion, status_phrases: { thinking: ["Wondering..."] } } };
+    expect(() => PackageManifest.parse(manifest)).toThrow();
+  });
+
+  test("rejects a phrase past the length cap", () => {
+    const manifest = {
+      ...COMPANION_BASE,
+      companion: { ...COMPANION_BASE.companion, status_phrases: { thinking: [`${"a".repeat(40)}…`] } },
+    };
+    expect(() => PackageManifest.parse(manifest)).toThrow();
+  });
+
+  test("rejects an empty phrase list for a declared moment", () => {
+    const manifest = { ...COMPANION_BASE, companion: { ...COMPANION_BASE.companion, status_phrases: { thinking: [] } } };
+    expect(() => PackageManifest.parse(manifest)).toThrow();
+  });
+});

@@ -130,3 +130,43 @@ describe("vocab/defect-codes.json", () => {
     expect(ids).toEqual(["act_mismatch", "emotion_mismatch", "missed_lookup", "unasked_unknown", "wrong_subject"].sort());
   });
 });
+
+describe("vocab/status-phrases.json", () => {
+  interface StatusPhrases {
+    thinking: string[];
+    searching: string[];
+    checking: string[];
+  }
+  const vocab = load<StatusPhrases>("status-phrases.json");
+  const MOMENTS = ["thinking", "searching", "checking"] as const;
+
+  test("every moment has at least one phrase", () => {
+    for (const moment of MOMENTS) expect(vocab[moment].length).toBeGreaterThan(0);
+  });
+
+  test("every phrase ends in a single ellipsis and is short enough for the manifest schema's own cap", () => {
+    for (const moment of MOMENTS) {
+      for (const phrase of vocab[moment]) {
+        expect(phrase.endsWith("…"), `"${phrase}" (${moment}) doesn't end in …`).toBe(true);
+        expect(phrase.length).toBeLessThanOrEqual(40);
+      }
+    }
+  });
+
+  test("no phrase reads as a promise ('give me a second', 'just a moment', 'hold on')", () => {
+    const PROMISE_RE = /give me a (second|sec|moment)|just a (second|sec|moment)|hold on|hang on|one (second|sec|moment)/i;
+    for (const moment of MOMENTS) {
+      for (const phrase of vocab[moment]) expect(PROMISE_RE.test(phrase), `"${phrase}" (${moment}) reads as a promise`).toBe(false);
+    }
+  });
+
+  test("no phrase repeats within or across moments", () => {
+    const seen = new Set<string>();
+    for (const moment of MOMENTS) {
+      for (const phrase of vocab[moment]) {
+        expect(seen.has(phrase), `"${phrase}" appears more than once`).toBe(false);
+        seen.add(phrase);
+      }
+    }
+  });
+});

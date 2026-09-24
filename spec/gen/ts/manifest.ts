@@ -120,6 +120,27 @@ export const PackageManifest = z
         complexity: z.enum(["simple", "standard", "advanced"]),
         engagement: z.enum(["brief", "balanced", "curious"]),
         filler_density: z.enum(["none", "light", "frequent"]),
+        /**STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.*/
+        status_phrases: z
+          .object({
+            thinking: z
+              .array(z.string().regex(new RegExp("…$")).min(1).max(40))
+              .min(1)
+              .optional(),
+            searching: z
+              .array(z.string().regex(new RegExp("…$")).min(1).max(40))
+              .min(1)
+              .optional(),
+            checking: z
+              .array(z.string().regex(new RegExp("…$")).min(1).max(40))
+              .min(1)
+              .optional(),
+          })
+          .strict()
+          .describe(
+            "STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.",
+          )
+          .optional(),
       })
       .strict()
       .describe(
