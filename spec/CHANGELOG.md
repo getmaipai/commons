@@ -5,6 +5,11 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.34] - 2026-09-24
+
+### Changed
+- `stack/ts/turn-stream-event.ts`: `tool_result.outcome.sites`' own cap is now a named export, `TOOL_RESULT_SITES_MAX`, instead of a bare `5` only the Zod mirror knew about - a code review on TOOL-EVENTS-02's own home-side consumer caught it duplicating that number as its own unrelated literal. No shape change; every existing fixture still validates unchanged.
+
 ## [spec-v0.1.33] - 2026-09-24
 
 ### Added
