@@ -13,11 +13,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ ComposerInputOverride }: { ComposerInputOverride?: React.ComponentType }) {
+function Harness({ ComposerInputOverride, temporary }: { ComposerInputOverride?: React.ComponentType; temporary?: boolean }) {
   const runtime = useLocalRuntime(adapter);
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={ComposerInputOverride ? { ComposerInputOverride } : undefined} />
+      <Thread components={ComposerInputOverride ? { ComposerInputOverride } : undefined} temporary={temporary} />
     </AssistantRuntimeProvider>
   );
 }
@@ -72,5 +72,22 @@ describe("Thread's new-chat suggestions row", () => {
 
     fireEvent.change(textbox, { target: { value: "" } });
     expect(row()?.className).not.toContain("invisible");
+  });
+});
+
+// CHAT-WELCOME-01: the caller's own temporary/incognito mode tints the
+// composer so the one place someone types is visibly different from an
+// ordinary, saved conversation - `--composer-bg` is the one lever
+// `Composer`'s own shell already reads, so this proves the root sets a
+// genuinely different value, not that any real color renders (happy-dom
+// computes no real layout or paint).
+describe("Thread's temporary prop", () => {
+  test("tints --composer-bg when armed, distinct from the ordinary value", () => {
+    const { container: ordinary } = render(<Harness />);
+    const { container: armed } = render(<Harness temporary />);
+    const ordinaryBg = ordinary.querySelector(".aui-thread-root")?.getAttribute("style");
+    const armedBg = armed.querySelector(".aui-thread-root")?.getAttribute("style");
+    expect(armedBg).toContain("--color-accent");
+    expect(armedBg).not.toBe(ordinaryBg);
   });
 });
