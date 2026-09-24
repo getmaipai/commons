@@ -174,17 +174,26 @@ const HeaderSearch = ({ remote }: HeaderSearchProps = {}) => {
     return defaultFilter(value, search);
   }
 
-  function go(url: string) {
-    setOpen(false);
-    navigate(url);
-  }
-
   function onOpenChange(next: boolean) {
     setOpen(next);
     if (!next) {
       setQuery("");
       setRemoteGroups([]);
     }
+  }
+
+  // Found live testing SHELL-SEARCH-02: `CommandDialog`'s `onOpenChange`
+  // only fires from the dialog's OWN close triggers (Escape, outside
+  // click) - it is never called just because a parent re-renders with a
+  // different `open` value, so a bare `setOpen(false)` here skipped
+  // `onOpenChange`'s own query/remoteGroups reset entirely. The next
+  // open (any page, since this component is mounted once in FullLayout
+  // and outlives every navigation) showed the PREVIOUS query still
+  // sitting in the input, with new typing appended onto it - reused
+  // `onOpenChange` here instead of a second, divergent close path.
+  function go(url: string) {
+    onOpenChange(false);
+    navigate(url);
   }
 
   return (

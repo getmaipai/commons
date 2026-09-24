@@ -103,6 +103,27 @@ describe("HeaderSearch (SHELL-SEARCH-02): the remote prop", () => {
     expect(getByText("Bramble")).not.toBeNull();
   });
 
+  // Found live testing SHELL-SEARCH-02 (home, 8787): selecting a result
+  // navigated, but the NEXT open of the dialog (any page - this
+  // component is mounted once in FullLayout and outlives navigation)
+  // still showed the previous query, with new typing appended onto it.
+  // go()'s own bare setOpen(false) skipped onOpenChange's reset -
+  // CommandDialog's onOpenChange only fires from the dialog's own close
+  // triggers (Escape, outside click), never just because a parent
+  // re-renders with a different `open` value.
+  test("selecting a result clears the query - the next open starts fresh, not appended to the old one", async () => {
+    const groups: SearchGroup[] = [{ kind: "app", heading: "Apps", results: [{ kind: "app", id: "weather", title: "Weather", href: "/apps/weather" }] }];
+    const remote = async () => groups;
+    const { getByRole, getByPlaceholderText, getByText, queryByText } = render(<Harness remote={remote} />);
+    fireEvent.click(getByRole("button", { name: "Search" }));
+    fireEvent.change(getByPlaceholderText("Search..."), { target: { value: "we" } });
+    await settle();
+    fireEvent.click(getByText("Weather"));
+    fireEvent.click(getByRole("button", { name: "Search" }));
+    expect((getByPlaceholderText("Search...") as HTMLInputElement).value).toBe("");
+    expect(queryByText("Weather")).toBeNull();
+  });
+
   test("never calls remote below two characters", async () => {
     let calls = 0;
     const remote = async () => {
