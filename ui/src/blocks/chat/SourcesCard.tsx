@@ -37,7 +37,7 @@ export function SourcesCard({ sources, open, onOpenChange, className }: SourcesC
         <span>Sources ({sources.length})</span>
         <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground transition-transform" aria-hidden />
       </CollapsibleTrigger>
-      <CollapsibleContent>
+      <CollapsibleContent className="overflow-hidden data-open:animate-collapsible-down data-closed:animate-collapsible-up data-closed:fill-mode-forwards data-closed:pointer-events-none motion-reduce:animate-none">
         <ul className="border-t">
           {sources.map((source) => (
             <li key={source.id}>
