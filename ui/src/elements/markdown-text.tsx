@@ -1,7 +1,6 @@
 "use client";
 
 import "@assistant-ui/react-markdown/styles/dot.css";
-import "katex/dist/katex.css";
 
 import {
   type CodeHeaderProps,
@@ -13,17 +12,55 @@ import {
   useIsMarkdownCodeBlock,
 } from "@assistant-ui/react-markdown";
 import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import { type FC, memo, useMemo, useRef } from "react";
+import type { Pluggable } from "unified";
+import {
+  type FC,
+  Suspense,
+  lazy,
+  memo,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAuiState, type TextMessagePartProps } from "@assistant-ui/react";
 import { CheckIcon, CopyIcon } from "lucide-react";
 
 import { TooltipIconButton } from "./tooltip-icon-button";
 import { useCopyToClipboard } from "./hooks/use-copy-to-clipboard";
-import { SyntaxHighlighter } from "./shiki-highlighter";
-import { MermaidDiagram } from "./mermaid-diagram";
 import { cn } from "cn";
+
+// CHAT-RICH-02: shiki, mermaid and math (katex/remark-math/rehype-katex)
+// pushed Chat's own eager entry chunk to 3.06 MB (CHAT-RICH-01, docs/
+// dev.md) - past the PWA plugin's 2 MiB precache ceiling. All three load
+// lazily now, only when a message actually needs them: shiki/mermaid
+// through React.lazy on the two SyntaxHighlighter slots below (assistant-
+// ui's own CodeOverride only ever mounts that slot for a real fenced
+// code block, so the dynamic import fires only then); math through a
+// synchronous text scan (`MATH_HINT`) that dynamically imports remark-
+// math/rehype-katex/katex's own CSS the first time a message's raw text
+// looks like it contains any, per assistant-ui's own componentsByLanguage/
+// dynamic-plugin guidance. `escapeCurrencyDollars`/`normalizeMathDelimiters`
+// stay eager - pure string functions from the already-required `@assistant-
+// ui/react-markdown` package, no bundle cost of their own.
+const LazySyntaxHighlighter = lazy(() =>
+  import("./shiki-highlighter").then((m) => ({ default: m.SyntaxHighlighter })),
+);
+const LazyMermaidDiagram = lazy(() =>
+  import("./mermaid-diagram").then((m) => ({ default: m.MermaidDiagram })),
+);
+
+// A minimal, dependency-free stand-in for the real highlighter/diagram
+// while its own chunk loads (once per session; near-instant after) -
+// deliberately never imports anything from shiki-highlighter.tsx or
+// mermaid-diagram.tsx, since a bundler can't split a module from its
+// own eagerly-imported dependencies, only from modules nothing else
+// statically imports.
+const PendingCodeBlock: FC<{ code: string }> = ({ code }) => (
+  <pre className="aui-md-pre border-border/50 bg-muted/30 overflow-x-auto rounded-t-none rounded-b-xl border border-t-0 p-3.5 text-[13px] leading-relaxed">
+    <code>{code}</code>
+  </pre>
+);
 
 // Language models emit math in delimiters remark-math doesn't parse
 // (LaTeX \(...\)/\[...\] brackets) and write plain currency ($5) that
@@ -31,6 +68,74 @@ import { cn } from "cn";
 // exports' own JSDoc as the intended `preprocess` composition.
 const preprocessMath = (text: string) =>
   escapeCurrencyDollars(normalizeMathDelimiters(text));
+
+// A cheap, deliberately over-inclusive scan (a bare "$5" also matches):
+// false positives cost one extra dynamic import, false negatives cost
+// broken math rendering, so this errs toward loading. Mirrors the same
+// delimiter shapes `normalizeMathDelimiters` itself normalizes (LaTeX
+// brackets, the custom [/math]/[/inline] tags) plus a bare `$`.
+const MATH_HINT = /\$|\\\(|\\\[|\[\/math\]|\[\/inline\]/;
+
+interface MathPlugins {
+  remarkMath: Pluggable;
+  rehypeKatex: Pluggable;
+}
+
+let mathPluginsPromise: Promise<MathPlugins> | null = null;
+function loadMathPlugins(): Promise<MathPlugins> {
+  if (!mathPluginsPromise) {
+    mathPluginsPromise = Promise.all([
+      import("remark-math"),
+      import("rehype-katex"),
+      import("katex/dist/katex.css"),
+    ])
+      .then(([remarkMathMod, rehypeKatexMod]) => ({
+        remarkMath: remarkMathMod.default,
+        rehypeKatex: rehypeKatexMod.default,
+      }))
+      .catch((err: unknown) => {
+        // A review caught the first cut of this caching the REJECTED
+        // promise forever on a transient failure (a network hiccup on
+        // first load): every later math message would reuse that same
+        // dead promise, with no retry for the rest of the session.
+        // Clearing the cache here lets the next call start fresh.
+        mathPluginsPromise = null;
+        throw err;
+      });
+  }
+  return mathPluginsPromise;
+}
+
+/** Loads remark-math/rehype-katex once `text` looks like it might
+ * contain math, module-cached across every MarkdownText instance
+ * (`loadMathPlugins`'s own memoized promise) so only the first message
+ * in a session that needs math pays the import. A load failure leaves
+ * `plugins` null (math renders as plain text for that message) rather
+ * than throwing - `loadMathPlugins` itself resets its cache so the
+ * next math-needing message gets a real retry, not a repeat of the
+ * same dead promise. */
+function useMathPlugins(text: string): MathPlugins | null {
+  const needsMath = MATH_HINT.test(text);
+  const [plugins, setPlugins] = useState<MathPlugins | null>(null);
+  useEffect(() => {
+    if (!needsMath || plugins) return;
+    let cancelled = false;
+    loadMathPlugins()
+      .then((loaded) => {
+        if (!cancelled) setPlugins(loaded);
+      })
+      .catch(() => {
+        /* swallowed: loadMathPlugins already reset its cache for a retry */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [needsMath, plugins]);
+  return plugins;
+}
+
+const remarkPluginsBase: Pluggable[] = [remarkGfm];
+const rehypePluginsBase: Pluggable[] = [];
 
 type MarkdownTextProps = Partial<TextMessagePartProps> & {
   components?: Parameters<typeof memoizeMarkdownComponents>[0];
@@ -68,23 +173,42 @@ const MarkdownSyntaxHighlighter: FC<AuiSyntaxHighlighterProps> = ({
 }) => {
   const streaming = useAuiState((s) => s.message.status?.type === "running");
   return (
-    <SyntaxHighlighter code={code} language={language} streaming={streaming} />
+    <Suspense fallback={<PendingCodeBlock code={code} />}>
+      <LazySyntaxHighlighter code={code} language={language} streaming={streaming} />
+    </Suspense>
   );
 };
 
 const MarkdownMermaid: FC<AuiSyntaxHighlighterProps> = ({ code }) => {
   const streaming = useAuiState((s) => s.message.status?.type === "running");
-  return <MermaidDiagram code={code} streaming={streaming} />;
+  return (
+    <Suspense fallback={<PendingCodeBlock code={code} />}>
+      <LazyMermaidDiagram code={code} streaming={streaming} />
+    </Suspense>
+  );
 };
 
 // Stable module-level identity, never recreated per render - matches
 // MarkdownTextPrimitive's own componentsByLanguage prop exactly (no
 // per-render allocation to memoize away).
 const componentsByLanguage = { mermaid: { SyntaxHighlighter: MarkdownMermaid } };
-const remarkPlugins = [remarkGfm, remarkMath];
-const rehypePlugins = [rehypeKatex];
 
 const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components }) => {
+  // Only read to decide whether this message's own math plugins are
+  // worth loading - MarkdownTextPrimitive reads the same part's text
+  // again internally (its own useMessagePartText/useSmooth), so this
+  // never becomes the source of truth for what renders.
+  const text = useAuiState((s) => (s.part.type === "text" ? s.part.text : ""));
+  const mathPlugins = useMathPlugins(text);
+  const remarkPlugins = useMemo(
+    () => (mathPlugins ? [remarkGfm, mathPlugins.remarkMath] : remarkPluginsBase),
+    [mathPlugins],
+  );
+  const rehypePlugins = useMemo(
+    () => (mathPlugins ? [mathPlugins.rehypeKatex] : rehypePluginsBase),
+    [mathPlugins],
+  );
+
   const stableComponents = useShallowStable(components);
   const markdownComponents = useMemo(() => {
     const base = stableComponents

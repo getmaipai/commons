@@ -942,3 +942,71 @@ pass) and `bun run lint` (`tsc --noEmit && eslint src`, 0 errors) green;
 commons's own root `scripts/check.sh` green end to end (core, ui, spec).
 Screenshots and the live turn-pipeline verification are Home's own side
 of this item, not committed here.
+
+## CHAT-RICH-02: shiki, mermaid and math load lazily (2026-09-24, `ui-v0.5.53`)
+
+CHAT-RICH-01's own trio pushed Home's Chat entry chunk to 3.06 MB
+(Home's own `docs/dev.md` has the exact before/after numbers on its
+side); this item loads all three only when a message actually needs
+them, never as part of that chunk.
+
+**Shiki and mermaid**: `React.lazy(() => import("./shiki-highlighter"))`
+/ `import("./mermaid-diagram")`, wrapped in `Suspense` inside the same
+two adapter components CHAT-RICH-01 already wired
+(`MarkdownSyntaxHighlighter`, `MarkdownMermaid`). No detection needed
+on this side: `CodeOverride` (assistant-ui's own internal component)
+only ever mounts these two slots for a real fenced code block, so the
+dynamic import fires exactly when one appears, never before. The
+`Suspense` fallback (`PendingCodeBlock`) is a small, dependency-free
+inline component - deliberately never imports anything from `shiki-
+highlighter.tsx`/`mermaid-diagram.tsx` themselves, since a bundler
+can't split a module from its own eagerly-imported dependencies, only
+from files nothing else statically imports.
+
+**Math** is different: `remarkPlugins`/`rehypePlugins` are plain
+arrays `MarkdownTextPrimitive` consumes synchronously, so there is no
+slot to defer into. `useMathPlugins` reads the message's own raw text
+(`useAuiState((s) => s.part.type === "text" ? s.part.text : "")`) and
+tests it against `MATH_HINT` (`$`, LaTeX brackets, the custom
+`[/math]`/`[/inline]` tags - deliberately over-inclusive: a bare `$5`
+also matches, costing one wasted-but-harmless dynamic import rather
+than risking a missed real math expression). Only on a hit does
+`loadMathPlugins()` dynamically import `remark-math`, `rehype-katex`
+and katex's own CSS, module-cached (`mathPluginsPromise`) so only the
+first math-needing message in a session pays for it; until it
+resolves, `remarkPlugins`/`rehypePlugins` stay at their `remarkGfm`-
+only base and the raw text renders as plain markdown, not held up
+waiting. `escapeCurrencyDollars`/`normalizeMathDelimiters` stay eager
+(pure string functions from the already-required `@assistant-ui/
+react-markdown` package, no bundle weight of their own), so currency
+amounts are protected from the very first render, before math plugins
+ever load.
+
+A review caught `loadMathPlugins`'s first cut caching a **rejected**
+promise forever on a transient failure (a network hiccup on the very
+first dynamic import) - every later math-needing message would reuse
+that same dead promise for the rest of the session, with no retry and
+no visible error. Fixed: a `.catch` resets `mathPluginsPromise` to
+`null` before rethrowing, so the next call gets a real, fresh attempt;
+`useMathPlugins`'s own effect swallows the rejection (math renders as
+plain text for that one message) rather than crashing the render.
+
+A CSS module has no ambient type declaration in this workspace (no
+`vite/client` types referenced; a bare `import "foo.css"` never needed
+one, but the new dynamic `import("katex/dist/katex.css")` resolves it
+as a real module and does) - `src/global.d.ts` (new) adds
+`declare module "*.css"`, the minimal fix, reusable by any future
+dynamic CSS import in this package.
+
+**Verification**: `markdown-text.test.tsx`'s three rich-content tests
+(code, mermaid, math) now `waitFor` the lazy content specifically
+(the Suspense fallback and the pre-load "no math yet" state both
+render first, by design) instead of asserting immediately; the
+currency test is unchanged (protected from the first render, no wait
+needed). This workspace's own `bun test` (408 pass, 0 regressions) and
+`bun run lint` (0 errors) green; commons's own root `scripts/check.sh`
+green end to end. Low-effort review: one finding (the rejected-promise
+cache above), fixed, re-reviewed clean on the fix hunk alone. The
+actual chunk-size numbers, the "still renders live" screenshots and
+the PWA precache ceiling restored to 2 MiB are Home's own side, not
+committed here.

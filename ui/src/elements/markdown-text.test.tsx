@@ -40,8 +40,13 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     const { container, getByRole } = render(<Harness reply={reply} />);
     await sendAndSettle(container, getByRole);
 
-    const highlighted = container.querySelector(".aui-shiki-base");
-    expect(highlighted).toBeTruthy();
+    // CHAT-RICH-02: shiki is lazy now - the Suspense fallback (a plain
+    // PendingCodeBlock) renders first, so this waits for its own chunk.
+    const highlighted = await waitFor(() => {
+      const el = container.querySelector(".aui-shiki-base");
+      expect(el).toBeTruthy();
+      return el;
+    });
     expect(highlighted?.querySelector("code")).toBeTruthy();
   });
 
@@ -50,7 +55,8 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     const { container, getByRole } = render(<Harness reply={reply} />);
     await sendAndSettle(container, getByRole);
 
-    expect(container.querySelector('[data-slot="mermaid-diagram"]')).toBeTruthy();
+    // CHAT-RICH-02: mermaid is lazy now - same Suspense wait as shiki above.
+    await waitFor(() => expect(container.querySelector('[data-slot="mermaid-diagram"]')).toBeTruthy());
     expect(container.querySelector(".aui-shiki-base")).toBeNull();
   });
 
@@ -59,7 +65,10 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     const { container, getByRole } = render(<Harness reply={reply} />);
     await sendAndSettle(container, getByRole);
 
-    expect(container.querySelector(".katex")).toBeTruthy();
+    // CHAT-RICH-02: remark-math/rehype-katex load only once MATH_HINT
+    // matches this message's own text, so the first render has no
+    // katex output at all - wait for the dynamic import to resolve.
+    await waitFor(() => expect(container.querySelector(".katex")).toBeTruthy());
   });
 
   test("a currency amount is never eaten as math", async () => {
