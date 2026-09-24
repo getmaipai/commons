@@ -13,7 +13,11 @@ export const TurnStreamEvent = z.discriminatedUnion("t", [
     t: z.literal("tool_result"),
     call_id: z.string().min(1),
     package_id: z.string().min(1),
-    outcome: z.object({ text: z.string().optional(), error_code: z.string().optional() }).strict(),
+    outcome: z.object({
+      text: z.string().optional(),
+      error_code: z.string().optional(),
+      sites: z.array(z.object({ host: z.string().min(1), url: z.string().url() }).strict()).max(5).optional(),
+    }).strict(),
   }).strict(),
   z.object({
     t: z.literal("tool_error"),

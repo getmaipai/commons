@@ -5,6 +5,11 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.33] - 2026-09-24
+
+### Added
+- `turn-stream-event.schema.json`: `tool_result.outcome.sites` (host + page URL, at most five) - the sites a search step actually read, so a client can show them as chips under the step (TOOL-EVENTS-02). Additive; every existing fixture still validates unchanged.
+
 ## [spec-v0.1.30] - 2026-09-23
 
 ### Added
