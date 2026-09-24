@@ -29,7 +29,17 @@ export function ThinkingIndicator({
       />
       <ShimmerLabel
         key={label}
-        className="fade-in slide-in-from-bottom-1 animate-in relative inline-block leading-none duration-300"
+        // Firefox has no `-webkit-mask-clip: text` (tw-shimmer's own
+        // `@supports` gate falls back to plain `background-clip: text`
+        // there, index.css:71-76), and that background only paints
+        // `100%` of this element's own box height - `leading-none`
+        // (line-height: 1) left no room in that box for a descender
+        // (g/p/y) to paint into, so Firefox rendered the label with its
+        // descenders simply missing (reported live, reproduced only in
+        // Firefox; Chrome/Safari take the mask-image branch instead,
+        // unaffected). `leading-tight` gives the box the same headroom
+        // `text-sm` already carries elsewhere in this file.
+        className="fade-in slide-in-from-bottom-1 animate-in relative inline-block leading-tight duration-300"
       >
         {label}
       </ShimmerLabel>
