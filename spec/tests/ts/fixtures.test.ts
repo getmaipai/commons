@@ -111,9 +111,19 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Source.parse(loadFixture("source.example.json"))).not.toThrow();
   });
 
+  test("source.archive.example.json", () => {
+    expect(() => Source.parse(loadFixture("source.archive.example.json"))).not.toThrow();
+  });
+
   test("manifest.example.json", () => {
     expect(() =>
       PackageManifest.parse(loadFixture("manifest.example.json")),
+    ).not.toThrow();
+  });
+
+  test("manifest.reference.example.json", () => {
+    expect(() =>
+      PackageManifest.parse(loadFixture("manifest.reference.example.json")),
     ).not.toThrow();
   });
 

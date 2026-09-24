@@ -17,9 +17,11 @@ class Source(BaseModel):
         extra='forbid',
     )
     id: constr(pattern=r'^src-[a-z0-9]{6,}$')
-    kind: Literal['web', 'wikidata', 'wikipedia', 'weather', 'package'] = Field(
-        ...,
-        description="Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site).",
+    kind: Literal['web', 'wikidata', 'wikipedia', 'weather', 'package', 'archive'] = (
+        Field(
+            ...,
+            description="Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site); archive is a row from an installed offline knowledge source (a `reference` package's own Kiwix-style snapshot, home/docs/plans/knowledge-sources-2026-09-24.md) - `created_at` on an archive row is the citation's own gather time as usual, never the archive's snapshot date, which the reference package's own installed flavour record carries.",
+        )
     )
     title: constr(min_length=1) = Field(
         ...,

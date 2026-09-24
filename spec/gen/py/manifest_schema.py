@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Any, Literal
 
 from pydantic import AnyUrl, BaseModel, ConfigDict, Field, conint, constr
@@ -60,6 +61,59 @@ class Companion(BaseModel):
     complexity: Literal['simple', 'standard', 'advanced']
     engagement: Literal['brief', 'balanced', 'curious']
     filler_density: Literal['none', 'light', 'frequent']
+
+
+class Flavour(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1) = Field(
+        ...,
+        description='The archive\'s own flavour id (Kiwix: e.g. "maxi", "nopic", "mini").',
+    )
+    approx_bytes: conint(ge=1) = Field(
+        ...,
+        description="The sizing input Home's wizard shows before a person picks a flavour - measured against the publisher's own catalog, never computed.",
+    )
+    snapshot_date: date = Field(
+        ...,
+        description='The date this flavour\'s own content was captured; an archive knows nothing after it (the design\'s own "why": a stale answer is labelled by this date, never presented as current).',
+    )
+
+
+class KnowledgeSource(BaseModel):
+    """
+    Required when kind is "reference" (an offline archive), and for a live plugin package that is one of the household's knowledge sources for `lookup()`'s federation (home/docs/plans/knowledge-sources-2026-09-24.md, "Routing: one lookup, not one tool per source" - the resident model chooses badly between one tool per source, home#150, dev.md PHRASE-02 and DOC-TOOL-01, so every source is reached behind the one search tool instead); unused otherwise. Declares what this source is and, for an archive, every size a person could install, so Home's sizing wizard ("proposed, never fixed": it measures the chosen drive's free space and the hardware tier, recommends a flavour and bundle, and shows the size impact) reads `flavours[].approx_bytes` straight from the manifest, never a live network call.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    origin: Literal['archive', 'live'] = Field(
+        ...,
+        description='"archive": a local, offline snapshot (a Kiwix ZIM or similar), searched with nothing sent out. "live": a network source, reached at call time.',
+    )
+    book: constr(min_length=1) | None = Field(
+        None,
+        description='The underlying work\'s own id (Kiwix\'s own naming, e.g. "wikipedia", "wiktionary", "ifixit"). Required for an archive; a live source names what it queries in its own `description` instead.',
+    )
+    languages: list[constr(pattern=r'^[a-z]{2,3}$')] | None = Field(
+        None,
+        description="ISO 639 codes for the language(s) this source's content is in.",
+        min_length=1,
+    )
+    flavours: list[Flavour] | None = Field(
+        None,
+        description='Every installable size/date combination for an archive source, one entry per flavour; empty or absent for a live source.',
+    )
+    freshness: Literal['snapshot', 'live'] = Field(
+        ...,
+        description='"snapshot": as of the installed flavour\'s own `snapshot_date`, nothing newer - the phrasing round labels a row from this source with that date. "live": minutes old, fetched at call time. Mirrors `origin` today (an archive is always a snapshot, a live source is always live) but stated as its own field since a future cached or scheduled-refresh live source could report a snapshot without changing what `origin` it is.',
+    )
+    query_id: constr(min_length=1) | None = Field(
+        None,
+        description='Required when `origin` is "live": the id of one of this package\'s own `exposes.queries[]` entries (5.4\'s typed-read mechanism, already generic) that `lookup()`\'s host machinery calls to search this source - `{query: string}` args, a `Source[]`-shaped array (source.schema.json) returned. The one thing Home\'s own federation needs to know about a live source\'s code; everything else (the request, the parsing, the rate limiting) is the package\'s own, per "Home stays lean" (home/docs/plans/feeds-and-archive-2026-09-24.md) - a live knowledge source is a catalog plugin like any other, never source-specific code in Home. Absent for an archive: `origin: "archive"` sources are searched through the shared kiwix-serve sidecar (host machinery, no package code involved), never through a query of their own.',
+    )
 
 
 class Notification(BaseModel):
@@ -266,9 +320,10 @@ class PackageManifest(BaseModel):
         'voice',
         'theme',
         'module',
+        'reference',
     ] = Field(
         ...,
-        description="A `plugin` is a self-contained, permissioned, installable capability (its own network access, its own recipe.json). A `skill` is plain instructions (a SKILL.md body, Claude-format-compatible) - no permissions, no recipe, composed into the chat model's system prompt when relevant, never runs on its own. See home/docs/dev.md's 'Naming: skill, plugin, command, connector' entry.",
+        description="A `plugin` is a self-contained, permissioned, installable capability (its own network access, its own recipe.json). A `skill` is plain instructions (a SKILL.md body, Claude-format-compatible) - no permissions, no recipe, composed into the chat model's system prompt when relevant, never runs on its own. See home/docs/dev.md's 'Naming: skill, plugin, command, connector' entry. A `reference` is a declarative offline knowledge archive (no code, like `model` and `voice`) - a Kiwix-style book a household installs and sizes before download; see `knowledge_source` below and home/docs/plans/knowledge-sources-2026-09-24.md.",
     )
     category: Literal[
         'Home',
@@ -294,6 +349,10 @@ class PackageManifest(BaseModel):
     companion: Companion | None = Field(
         None,
         description='Required when kind is "companion" (session-a-intelligence.md step 8), unused otherwise. Composed by home/backend/src/lib/persona.ts into the turn engine\'s identity line and system-prompt fragment: display_name replaces the hardcoded "MaiPai" in "You are {display_name}, ...", the four style dials are the same ones lib/persona.ts already had before companions were packages, and examples is a short few-shot block (legacy\'s own finding: "the single biggest lever for small-model voice fidelity").',
+    )
+    knowledge_source: KnowledgeSource | None = Field(
+        None,
+        description='Required when kind is "reference" (an offline archive), and for a live plugin package that is one of the household\'s knowledge sources for `lookup()`\'s federation (home/docs/plans/knowledge-sources-2026-09-24.md, "Routing: one lookup, not one tool per source" - the resident model chooses badly between one tool per source, home#150, dev.md PHRASE-02 and DOC-TOOL-01, so every source is reached behind the one search tool instead); unused otherwise. Declares what this source is and, for an archive, every size a person could install, so Home\'s sizing wizard ("proposed, never fixed": it measures the chosen drive\'s free space and the hardware tier, recommends a flavour and bundle, and shows the size impact) reads `flavours[].approx_bytes` straight from the manifest, never a live network call.',
     )
     args: Any | None = Field(
         None, description="A JSON Schema for this package's call arguments."

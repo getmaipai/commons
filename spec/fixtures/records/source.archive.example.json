@@ -1,0 +1,11 @@
+{
+  "id": "src-a1b2c4",
+  "kind": "archive",
+  "title": "Sourdough bread",
+  "url": "http://127.0.0.1:8095/viewer#wikipedia_en_mini/A/Sourdough",
+  "site": "wikipedia-mini-en",
+  "snippet": "Sourdough is a bread made by the fermentation of dough using naturally occurring wild yeast and lactic acid bacteria.",
+  "source": "turn-d4e5f7",
+  "created_at": "2026-09-24T12:00:00Z",
+  "hlc": "1757000000000:1:a1b2c4"
+}

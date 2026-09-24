@@ -5,6 +5,16 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.35] - 2026-09-24
+
+### Added
+- `manifest.schema.json`: a `reference` package `kind` (a declarative offline knowledge archive, no code, like `model` and `voice`) and a `knowledge_source` block (`origin`: archive or live, `book`, `languages`, per-flavour `approx_bytes`/`snapshot_date` sizing inputs, `freshness`) - `SOURCE-SPEC-01`, home/docs/plans/knowledge-sources-2026-09-24.md.
+- `source.schema.json`: `archive` added to `Source.kind`, a citation row from an installed offline knowledge source.
+- `settings/keys.json`: `reference.library_dir` (household, text - a local folder, an external drive, or a NAS mount; Home's own data folder only the default) and `search.safe_search` (person, select: `default`/`off`/`moderate`/`strict` - `SEARCH-SAFE-01`, Jesse's own ruling 2026-09-24: an adult may change their own, only an adult may change a child's or teen's, a child or teen can never loosen their own below their band default).
+- `fixtures/records/manifest.reference.example.json`, `source.archive.example.json`: round-trip fixtures for both new shapes.
+
+Additive throughout; every existing fixture still validates unchanged.
+
 ## [spec-v0.1.34] - 2026-09-24
 
 ### Changed

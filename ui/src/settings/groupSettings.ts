@@ -34,6 +34,12 @@ export const SECTION_TITLES: Record<string, string> = {
   "household.notifications": "Notifications",
   "household.storage": "Storage",
   "person.storage": "My storage",
+  // reference.library_dir (SOURCE-SPEC-01) - found showing its raw
+  // lives_in id before landing, the same "bare id, not household.*"
+  // slip household.ai/profile.appearance already caught (2026-09-05).
+  "household.reference": "Reference library",
+  // search.safe_search (SEARCH-SAFE-01).
+  "person.search": "Search",
   // Deliberately NOT the same string as "household.notifications": a
   // design review (2026-09-05) found both sections rendering as
   // "Notifications" back to back (SettingsPage.tsx stacks a household-

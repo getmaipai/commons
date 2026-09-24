@@ -1,0 +1,38 @@
+{
+  "id": "wikipedia-mini-en",
+  "version": "0.1.0",
+  "kind": "reference",
+  "category": "Info",
+  "display": "Wikipedia (mini)",
+  "description": "An offline copy of the English Wikipedia, searchable with nothing sent out.",
+  "author": "MaiPai",
+  "license": "AGPL-3.0",
+  "homepage": "https://github.com/getmaipai/catalog",
+  "knowledge_source": {
+    "origin": "archive",
+    "book": "wikipedia",
+    "languages": ["en"],
+    "flavours": [
+      { "id": "mini", "approx_bytes": 14400000000, "snapshot_date": "2026-09-09" },
+      { "id": "nopic", "approx_bytes": 52700000000, "snapshot_date": "2026-06-17" },
+      { "id": "maxi", "approx_bytes": 127400000000, "snapshot_date": "2026-08-25" }
+    ],
+    "freshness": "snapshot"
+  },
+  "requires": [],
+  "optional": [],
+  "platforms": ["home"],
+  "min_role": "child",
+  "consequential": false,
+  "offline": "full",
+  "config": [],
+  "data_sources": [],
+  "permissions": [],
+  "notifications": [],
+  "backup": "cold",
+  "background": false,
+  "contributes": {},
+  "min_app": "0.1.0",
+  "tier": 0,
+  "quality_scale": "bronze"
+}

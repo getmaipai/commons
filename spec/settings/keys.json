@@ -547,6 +547,35 @@
     ]
   },
   {
+    "key": "reference.library_dir",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Reference library location",
+    "help": "Where the household's offline knowledge archives live: a local folder, an external drive, or a NAS mount. Empty uses Home's own data folder. Moving this later moves the files and updates the library records.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.reference",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.safe_search",
+    "scope": "person",
+    "selector": "select",
+    "range": { "options": ["default", "off", "moderate", "strict"] },
+    "default": "default",
+    "label": "Safe search level",
+    "help": "How strictly web search filters results for you. \"Default\" follows your age: strict for a child, moderate for a teen, off for an adult. An adult can change their own; only an adult can change a child's or teen's, and a child or teen can never loosen their own below their default.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.searxng_url",
     "scope": "household",
     "selector": "text",

@@ -299,11 +299,18 @@ export const TurnArtifact = z
         z
           .object({
             id: z.string().regex(new RegExp("^src-[a-z0-9]{6,}$")),
-            /**Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site).*/
+            /**Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site); archive is a row from an installed offline knowledge source (a `reference` package's own Kiwix-style snapshot, home/docs/plans/knowledge-sources-2026-09-24.md) - `created_at` on an archive row is the citation's own gather time as usual, never the archive's snapshot date, which the reference package's own installed flavour record carries.*/
             kind: z
-              .enum(["web", "wikidata", "wikipedia", "weather", "package"])
+              .enum([
+                "web",
+                "wikidata",
+                "wikipedia",
+                "weather",
+                "package",
+                "archive",
+              ])
               .describe(
-                "Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site).",
+                "Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site); archive is a row from an installed offline knowledge source (a `reference` package's own Kiwix-style snapshot, home/docs/plans/knowledge-sources-2026-09-24.md) - `created_at` on an archive row is the citation's own gather time as usual, never the archive's snapshot date, which the reference package's own installed flavour record carries.",
               ),
             /**The cited page or result's own title, exactly as the source gave it, never rewritten by the model.*/
             title: z

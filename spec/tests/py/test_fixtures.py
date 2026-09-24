@@ -106,6 +106,10 @@ def test_source_fixture():
     Source.model_validate(load_fixture("source.example.json"))
 
 
+def test_source_archive_fixture():
+    Source.model_validate(load_fixture("source.archive.example.json"))
+
+
 @pytest.mark.parametrize("kind", ["memory", "memory-legacy", "entity", "episode"])
 def test_memory_record_fixtures(kind):
     MemoryRecord.model_validate(load_fixture(f"memory-record.{kind}.example.json"))
@@ -113,6 +117,10 @@ def test_memory_record_fixtures(kind):
 
 def test_manifest_fixture():
     PackageManifest.model_validate(load_fixture("manifest.example.json"))
+
+
+def test_manifest_reference_fixture():
+    PackageManifest.model_validate(load_fixture("manifest.reference.example.json"))
 
 
 def test_safety_result_fixture():
