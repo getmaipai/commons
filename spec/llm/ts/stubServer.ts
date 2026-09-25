@@ -13,7 +13,7 @@ import type { ChatCompletionRequest, ChatCompletionResponse, ChatCompletionTimin
 
 export interface StubLlmServerHandle {
   url: string;
-  stop: () => void;
+  stop: () => Promise<void>;
   aborted: () => number;
   requests: () => ChatCompletionRequest[];
 }
@@ -327,7 +327,10 @@ export function startStubLlmServer(port = 0, opts: StubLlmServerOptions = {}): S
   });
   return {
     url: `http://127.0.0.1:${server.port}`,
-    stop: () => { if (activeRequests > 0) abortedRequests += activeRequests; server.stop(true); },
+    stop: () => {
+      if (activeRequests > 0) abortedRequests += activeRequests;
+      return server.stop(true);
+    },
     aborted: () => abortedRequests,
     requests: () => requests,
   };

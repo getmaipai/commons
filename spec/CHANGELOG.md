@@ -5,6 +5,11 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [spec-v0.1.38] - 2026-09-25
+
+### Fixed
+- The LLM stub server handle's `stop()` now returns the server's shutdown promise, so callers can await the listener port being released. A real loopback rebind test covers the contract.
+
 ## [spec-v0.1.37] - 2026-09-24
 
 ### Fixed

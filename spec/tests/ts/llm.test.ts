@@ -10,8 +10,8 @@ import type { ToolCallWire } from "../../llm/ts/types.js";
 
 let handle: StubLlmServerHandle | undefined;
 
-afterEach(() => {
-  handle?.stop();
+afterEach(async () => {
+  await handle?.stop();
   handle = undefined;
 });
 
@@ -20,6 +20,26 @@ describe("LlamaServerClient against the stub server", () => {
     handle = startStubLlmServer();
     const client = new LlamaServerClient(handle.url);
     expect(await client.health()).toBe(true);
+  });
+
+  test("stop resolves after the listener port can be rebound", async () => {
+    handle = startStubLlmServer(0);
+    const port = Number(new URL(handle.url).port);
+    const stopResult = handle.stop();
+    await stopResult;
+
+    let rebound: ReturnType<typeof Bun.serve> | undefined;
+    try {
+      rebound = Bun.serve({
+        hostname: "127.0.0.1",
+        port,
+        fetch: () => new Response("rebound"),
+      });
+      expect(stopResult).toBeInstanceOf(Promise);
+      expect(rebound.port).toBe(port);
+    } finally {
+      await rebound?.stop(true);
+    }
   });
 
   test("health returns false, not a throw, when nothing is listening", async () => {
@@ -471,7 +491,7 @@ describe("LlamaServerClient against the stub server", () => {
     test("a stopped loopback stub still names its address in the error", async () => {
       handle = startStubLlmServer();
       const client = new LlamaServerClient(handle.url, { chatTimeoutMs: 5 });
-      handle.stop();
+      await handle.stop();
       let err: unknown;
       try {
         await client.chatComplete({ model: "chat", messages: [{ role: "user", content: "hi" }] });

@@ -41,7 +41,7 @@ WORKTREE_PATH="$TAGS_DIR/$WORKSPACE-$TAG"
 # exactly the mutable-pin bug this script exists to prevent, so it's a
 # hard error here, never silently reused or silently fixed up.
 is_valid_worktree_at_head() {
-  git -C "$REPO_ROOT" worktree list --porcelain | grep -qxF "worktree $WORKTREE_PATH" \
+  git -C "$REPO_ROOT" worktree list --porcelain | grep -xF "worktree $WORKTREE_PATH" >/dev/null \
     && [ "$(git -C "$WORKTREE_PATH" rev-parse HEAD)" = "$EXPECTED_HEAD" ]
 }
 
