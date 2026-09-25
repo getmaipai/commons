@@ -23,9 +23,12 @@ export interface HeaderProps {
    * its own here, it just passes the value along, the same as
    * `FullLayout.tsx` does one level up. */
   headerSearchRemote?: HeaderSearchProps["remote"];
+  /** PROFILE-SHEET-01 (home, 2026-09-25): Home's signed-in person's
+   * display name, passed directly to the account sheet. */
+  profileDisplayName?: string;
 }
 
-const Header = ({ headerSearchRemote }: HeaderProps = {}) => {
+const Header = ({ headerSearchRemote, profileDisplayName }: HeaderProps = {}) => {
 
   const { toggleSidebar } = useSidebar();
   const HeaderExtraLeft = useHeaderExtraLeft();
@@ -135,7 +138,7 @@ const Header = ({ headerSearchRemote }: HeaderProps = {}) => {
            
 
               {/* Profile Dropdown */}
-              <Profile />
+              <Profile displayName={profileDisplayName} />
             </div>
           </div>
         </nav>

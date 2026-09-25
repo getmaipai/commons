@@ -15,9 +15,13 @@ export interface FullLayoutProps {
    * it here, rather than inventing a context, is how a value reaches
    * `Header`/`HeaderSearch` two vendored layers down with no fork. */
   headerSearchRemote?: HeaderProps["headerSearchRemote"];
+  /** PROFILE-SHEET-01 (home, 2026-09-25): the signed-in person's real
+   * name, threaded to the account sheet instead of its shipped demo
+   * identity. */
+  profileDisplayName?: HeaderProps["profileDisplayName"];
 }
 
-const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote }) => {
+const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName }) => {
 
   return (
     <SidebarProvider
@@ -29,7 +33,7 @@ const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote }) => {
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}
-       <Header headerSearchRemote={headerSearchRemote} />
+       <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} />
 
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">
