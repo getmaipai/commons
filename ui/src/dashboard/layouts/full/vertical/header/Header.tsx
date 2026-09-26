@@ -31,6 +31,12 @@ export interface HeaderProps {
    * shared layout remains unchanged for consumers that do not pass it. */
   incognito?: boolean;
   onIncognitoChange?: (on: boolean) => void;
+  /** THEME-TOGGLE-01 (home, 2026-09-26): a consumer that already
+   * exposes light/dark as its own Settings page control (Home's
+   * `ui.appearance`, "Settings > Me > Appearance") can drop the
+   * header's redundant shortcut rather than keep two controls for the
+   * one setting. Defaults true so every other consumer is unaffected. */
+  showThemeToggle?: boolean;
 }
 
 export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) {
@@ -66,7 +72,7 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
   );
 }
 
-const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange }: HeaderProps = {}) => {
+const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle = true }: HeaderProps = {}) => {
 
   const { toggleSidebar } = useSidebar();
   const HeaderExtraLeft = useHeaderExtraLeft();
@@ -165,7 +171,7 @@ const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognito
               <HeaderSearch remote={headerSearchRemote} />
 
               {/* Theme Toggle */}
-              <LightDark />
+              {showThemeToggle ? <LightDark /> : null}
 
               {/* INCOGNITO-08 slice 1 (home): the switch is supplied only
                   by Home's /next shell and sits beside the theme control

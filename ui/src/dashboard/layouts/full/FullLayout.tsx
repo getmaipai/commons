@@ -23,9 +23,12 @@ export interface FullLayoutProps {
    * Incognito state and its change handler, threaded to the global header. */
   incognito?: HeaderProps["incognito"];
   onIncognitoChange?: HeaderProps["onIncognitoChange"];
+  /** THEME-TOGGLE-01 (home, 2026-09-26): threaded straight through to
+   * `Header`'s own `showThemeToggle` prop. */
+  showThemeToggle?: HeaderProps["showThemeToggle"];
 }
 
-const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange }) => {
+const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle }) => {
 
   return (
     <SidebarProvider
@@ -37,7 +40,7 @@ const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayNam
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}
-       <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} />
+       <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} />
 
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">
