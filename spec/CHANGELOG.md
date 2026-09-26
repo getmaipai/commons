@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.43] - 2026-09-26
+
+### Fixed
+- `settings/keys.json`: spec-v0.1.42's two new session-lock keys were hand-appended, not regenerated from a real declaration - `spec/settings/README.md`'s "not a placeholder to fill in by hand" rule, caught by home's own `gen-settings-registry.ts` drift check (`backend/src/settings/coreKeys.ts no longer matches spec/settings/keys.json`). The two keys now come from a real declaration, `home/backend/src/settings/securityKeys.ts`'s `SECURITY_SETTINGS_KEYS`, wired into the generator alongside every other keys module; regenerating now reproduces this file byte for byte (sorted position and formatting corrected, values unchanged). spec-v0.1.42 is not deleted or moved - superseded here, not amended.
+
 ## [spec-v0.1.42] - 2026-09-26
 
 ### Added
