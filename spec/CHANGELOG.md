@@ -7,6 +7,13 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.42] - 2026-09-26
+
+### Added
+- `settings/keys.json`: two new person-scope keys for INCOGNITO-07 (session lock with PIN re-entry) - `security.session_lock_required` (boolean, default off) and `security.session_lock_timeout_minutes` (number, default 5, range 1-120). Both `level: "expert"`, which `groupSettings()`'s own `level !== "expert"` filter (commons `ui/src/settings/groupSettings.ts`) drops from every renderer's eligible list entirely, self scope included - no generic settings UI surfaces them at any disclosure tier. Home's own PATCH /api/people/:id is the one owner/admin-gated surface that reads and writes them, since this is an admin-configurable-for-any-account control, not a personal preference.
+
+## [spec-v0.1.41] - 2026-09-26
+
 ### Added
 - `manifest.schema.json`: a required `incognito: blocked | ephemeral | unaffected` field on every package manifest (INCOGNITO-04) - a manifest that omits it fails validation, the same as any other required field, enforced by home's existing `PackageManifest.safeParse()` gate in `loadManifestOnly()`/`loadPackage()`. `fixtures/records/manifest.example.json` and `manifest.reference.example.json` both gain `"incognito": "unaffected"`. Additive to the shape; not additive to validity, since every existing manifest now needs the field set.
 

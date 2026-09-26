@@ -799,5 +799,34 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "security.session_lock_required",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Require PIN to unlock after inactivity",
+    "help": "When on, this account locks behind its PIN or password after sitting idle. Content stays put; unlocking just re-enters the PIN. Set by an owner or admin, for any account.",
+    "level": "expert",
+    "secret": false,
+    "lives_in": "person.security",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "security.session_lock_timeout_minutes",
+    "scope": "person",
+    "selector": "number",
+    "default": 5,
+    "range": { "min": 1, "max": 120 },
+    "label": "Session lock timeout (minutes)",
+    "help": "How many minutes of inactivity before this account locks, when session lock is required.",
+    "level": "expert",
+    "secret": false,
+    "lives_in": "person.security",
+    "honoured_by": [
+      "home"
+    ]
   }
 ]
