@@ -19,9 +19,13 @@ export interface FullLayoutProps {
    * name, threaded to the account sheet instead of its shipped demo
    * identity. */
   profileDisplayName?: HeaderProps["profileDisplayName"];
+  /** INCOGNITO-08 slice 1 (home, 2026-09-25): the shared session-only
+   * Incognito state and its change handler, threaded to the global header. */
+  incognito?: HeaderProps["incognito"];
+  onIncognitoChange?: HeaderProps["onIncognitoChange"];
 }
 
-const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName }) => {
+const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange }) => {
 
   return (
     <SidebarProvider
@@ -33,7 +37,7 @@ const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayNam
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}
-       <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} />
+       <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} />
 
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">

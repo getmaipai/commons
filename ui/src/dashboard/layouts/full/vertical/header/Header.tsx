@@ -3,7 +3,7 @@
 
 import { useSidebar } from "../../../../components/ui/sidebar";
 import { Button } from "../../../../components/ui/button";
-import { PanelLeft } from 'lucide-react';
+import { EyeOff, PanelLeft } from 'lucide-react';
 import { Separator } from "../../../../components/ui/separator";
 
 import { cn } from "../../../../lib/utils";
@@ -26,9 +26,31 @@ export interface HeaderProps {
   /** PROFILE-SHEET-01 (home, 2026-09-25): Home's signed-in person's
    * display name, passed directly to the account sheet. */
   profileDisplayName?: string;
+  /** INCOGNITO-08 slice 1 (home, 2026-09-25): Home's shared,
+   * session-only Incognito state and toggle callback. Optional so the
+   * shared layout remains unchanged for consumers that do not pass it. */
+  incognito?: boolean;
+  onIncognitoChange?: (on: boolean) => void;
 }
 
-const Header = ({ headerSearchRemote, profileDisplayName }: HeaderProps = {}) => {
+export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      className={`h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 ${on ? "text-violet-600 dark:text-violet-400" : "text-muted-foreground"}`}
+      aria-label={`Incognito ${on ? "On" : "Off"}`}
+      aria-pressed={on}
+      title={`Incognito ${on ? "on" : "off"}`}
+      onClick={() => onChange(!on)}
+    >
+      <EyeOff className="size-5" />
+    </Button>
+  );
+}
+
+const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange }: HeaderProps = {}) => {
 
   const { toggleSidebar } = useSidebar();
   const HeaderExtraLeft = useHeaderExtraLeft();
@@ -128,6 +150,13 @@ const Header = ({ headerSearchRemote, profileDisplayName }: HeaderProps = {}) =>
 
               {/* Theme Toggle */}
               <LightDark />
+
+              {/* INCOGNITO-08 slice 1 (home): the switch is supplied only
+                  by Home's /next shell and sits beside the theme control
+                  with the same 40px icon-button footprint. */}
+              {incognito !== undefined && onIncognitoChange ? (
+                <IncognitoToggle on={incognito} onChange={onIncognitoChange} />
+              ) : null}
             
 
              
