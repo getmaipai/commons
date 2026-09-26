@@ -43,7 +43,7 @@ import {
 } from "lucide-react";
 
 // Home's own sidebar, as data (owner ruling, ui-v0.5.23: Home, Chat,
-// Plugins; Household: People; Settings and Help move to the rail's own
+// Tools; Household: People; Settings and Help move to the rail's own
 // bottom slot - NavUser.tsx, the same vendor-time data file this one
 // is). The former System group (Settings alone) and Manage group
 // (Engines, Updates, Repairs, Backups) are gone from the rail: all four
@@ -71,11 +71,11 @@ const SidebarContent: MenuItem[] = [
       {
         id: uniqueId(),
         // This page lists internal tool-capability plugins, not apps a
-        // person opens; reserve "Apps" for user-facing apps (owner
-        // ruling, ui-v0.5.61, 2026-09-25).
-        name: "Plugins",
+        // person opens; reserve "Apps" for future user-facing apps (owner
+        // ruling, ui-v0.5.62, 2026-09-25).
+        name: "Tools",
         icon: LayoutGrid,
-        url: "/next/apps",
+        url: "/next/tools",
       },
     ],
   },
