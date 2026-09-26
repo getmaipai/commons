@@ -34,16 +34,32 @@ export interface HeaderProps {
 }
 
 export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) {
+  if (on) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        className="h-9 gap-1.5 rounded-full border border-violet-400 bg-violet-600 px-3 text-sm font-medium text-white cursor-pointer hover:bg-violet-500 hover:text-white focus-visible:ring-violet-500"
+        aria-label="Incognito On"
+        aria-pressed="true"
+        title="Incognito on"
+        onClick={() => onChange(false)}
+      >
+        <VenetianMask className="size-4" />
+        Incognito
+      </Button>
+    );
+  }
   return (
     <Button
       type="button"
       variant="ghost"
       size="icon"
-      className={`h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 ${on ? "text-violet-600 dark:text-violet-400 ring-2 ring-violet-500" : "text-muted-foreground"}`}
-      aria-label={`Incognito ${on ? "On" : "Off"}`}
-      aria-pressed={on}
-      title={`Incognito ${on ? "on" : "off"}`}
-      onClick={() => onChange(!on)}
+      className="h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 text-muted-foreground"
+      aria-label="Incognito Off"
+      aria-pressed="false"
+      title="Incognito off"
+      onClick={() => onChange(true)}
     >
       <VenetianMask className="size-5" />
     </Button>
