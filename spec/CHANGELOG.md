@@ -8,7 +8,12 @@ scope lands.
 ## [Unreleased]
 
 ### Added
-- Project record (project.schema.json): the harness's durable project, its plan, steps and artifacts.
+- `manifest.schema.json`: a required `incognito: blocked | ephemeral | unaffected` field on every package manifest (INCOGNITO-04) - a manifest that omits it fails validation, the same as any other required field, enforced by home's existing `PackageManifest.safeParse()` gate in `loadManifestOnly()`/`loadPackage()`. `fixtures/records/manifest.example.json` and `manifest.reference.example.json` both gain `"incognito": "unaffected"`. Additive to the shape; not additive to validity, since every existing manifest now needs the field set.
+
+## [spec-v0.1.40] - 2026-09-26
+
+### Added
+- Project record (project.schema.json): the harness's durable project, its plan, steps and artifacts. (`package.json`'s own version field was never bumped for this tag - corrected at spec-v0.1.41 below, no shape change.)
 
 ## [spec-v0.1.39] - 2026-09-26
 

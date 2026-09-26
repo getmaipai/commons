@@ -231,6 +231,12 @@ export const PackageManifest = z
       .any()
       .describe("A JSON Schema for this package's call arguments.")
       .optional(),
+    /**INCOGNITO-04: this package's behavior while Incognito is on. Required, never defaulted - a manifest that omits it fails validation the same way a manifest missing any other required field does, enforced by the one shared reader every route/install check calls (loadManifestOnly()/loadPackage(), lib/plugins.ts). "blocked": unavailable while Incognito is on (sharing, CHANNELS-01, anything that publishes for the family). "ephemeral": works normally, nothing it writes persists past the session (chat, a generation app's own generated-content tab). "unaffected": no personal data touched, nothing to gate.*/
+    incognito: z
+      .enum(["blocked", "ephemeral", "unaffected"])
+      .describe(
+        'INCOGNITO-04: this package\'s behavior while Incognito is on. Required, never defaulted - a manifest that omits it fails validation the same way a manifest missing any other required field does, enforced by the one shared reader every route/install check calls (loadManifestOnly()/loadPackage(), lib/plugins.ts). "blocked": unavailable while Incognito is on (sharing, CHANNELS-01, anything that publishes for the family). "ephemeral": works normally, nothing it writes persists past the session (chat, a generation app\'s own generated-content tab). "unaffected": no personal data touched, nothing to gate.',
+      ),
     /**Capabilities from the capability vocabulary (spec/vocab/capabilities.json) this package cannot run without.*/
     requires: z
       .array(z.string())

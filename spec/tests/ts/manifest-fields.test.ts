@@ -23,6 +23,7 @@ const BASE = {
   offline: "full",
   min_app: "0.1.0",
   tier: 0,
+  incognito: "unaffected",
 } as const;
 
 describe("PackageManifest, step 2's new fields", () => {
@@ -127,6 +128,23 @@ describe("PackageManifest, step 2's new fields", () => {
     );
     expect(PackageManifest.parse(BASE).tool_label).toBeUndefined();
     expect(() => PackageManifest.parse({ ...BASE, tool_label: "" })).toThrow();
+  });
+});
+
+describe("PackageManifest.incognito (INCOGNITO-04)", () => {
+  test("required - a manifest that omits it fails validation, never gets a silent default", () => {
+    const { incognito, ...withoutIncognito } = BASE;
+    expect(() => PackageManifest.parse(withoutIncognito)).toThrow();
+  });
+
+  test("accepts each of the three declared values", () => {
+    for (const value of ["blocked", "ephemeral", "unaffected"] as const) {
+      expect(PackageManifest.parse({ ...BASE, incognito: value }).incognito).toBe(value);
+    }
+  });
+
+  test("rejects a value outside the vocabulary", () => {
+    expect(() => PackageManifest.parse({ ...BASE, incognito: "hidden" })).toThrow();
   });
 });
 

@@ -8,7 +8,7 @@
   "required": [
     "id", "version", "kind", "category", "display", "description",
     "author", "license", "platforms", "min_role", "consequential",
-    "offline", "min_app", "tier"
+    "offline", "min_app", "tier", "incognito"
   ],
   "properties": {
     "id": {
@@ -192,6 +192,11 @@
     },
     "args": {
       "description": "A JSON Schema for this package's call arguments."
+    },
+    "incognito": {
+      "type": "string",
+      "enum": ["blocked", "ephemeral", "unaffected"],
+      "description": "INCOGNITO-04: this package's behavior while Incognito is on. Required, never defaulted - a manifest that omits it fails validation the same way a manifest missing any other required field does, enforced by the one shared reader every route/install check calls (loadManifestOnly()/loadPackage(), lib/plugins.ts). \"blocked\": unavailable while Incognito is on (sharing, CHANNELS-01, anything that publishes for the family). \"ephemeral\": works normally, nothing it writes persists past the session (chat, a generation app's own generated-content tab). \"unaffected\": no personal data touched, nothing to gate."
     },
     "requires": {
       "type": "array",

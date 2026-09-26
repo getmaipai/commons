@@ -19,6 +19,7 @@
     ],
     "freshness": "snapshot"
   },
+  "incognito": "unaffected",
   "requires": [],
   "optional": [],
   "platforms": ["home"],

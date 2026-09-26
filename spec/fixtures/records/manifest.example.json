@@ -26,6 +26,7 @@
       "time": { "type": "string" }
     }
   },
+  "incognito": "unaffected",
   "requires": [],
   "optional": ["speaker"],
   "platforms": ["home", "bot"],
