@@ -10,6 +10,11 @@ scope lands.
 ### Added
 - Project record (project.schema.json): the harness's durable project, its plan, steps and artifacts.
 
+## [spec-v0.1.39] - 2026-09-26
+
+### Added
+- `person.schema.json`: optional nullable `bio` (up to 160 characters) and `accent` (blue, violet, teal, orange, pink, red) fields for profile presentation. The person round-trip fixture exercises both fields.
+
 ## [spec-v0.1.38] - 2026-09-25
 
 ### Fixed

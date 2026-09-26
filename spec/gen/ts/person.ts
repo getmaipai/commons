@@ -32,6 +32,38 @@ export const Person = z
         "What a companion calls this person, if different from display_name.",
       )
       .optional(),
+    /**The line under the person's name on their profile page, in their own words or a parent's.*/
+    bio: z
+      .union([
+        z
+          .string()
+          .max(160)
+          .describe(
+            "The line under the person's name on their profile page, in their own words or a parent's.",
+          ),
+        z
+          .null()
+          .describe(
+            "The line under the person's name on their profile page, in their own words or a parent's.",
+          ),
+      ])
+      .describe(
+        "The line under the person's name on their profile page, in their own words or a parent's.",
+      )
+      .optional(),
+    /**A named profile color accent.*/
+    accent: z
+      .union([
+        z.literal("blue"),
+        z.literal("violet"),
+        z.literal("teal"),
+        z.literal("orange"),
+        z.literal("pink"),
+        z.literal("red"),
+        z.literal(null),
+      ])
+      .describe("A named profile color accent.")
+      .optional(),
     /**Core only. Never present in any shape a package's ctx exposes; packages see age_range on Person derived from this.*/
     birthdate: z
       .union([

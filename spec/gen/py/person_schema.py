@@ -25,6 +25,13 @@ class Person(BaseModel):
         None,
         description='What a companion calls this person, if different from display_name.',
     )
+    bio: constr(max_length=160) | None = Field(
+        None,
+        description="The line under the person's name on their profile page, in their own words or a parent's.",
+    )
+    accent: Literal['blue', 'violet', 'teal', 'orange', 'pink', 'red'] | None = Field(
+        None, description='A named profile color accent.'
+    )
     birthdate: date | None = Field(
         None,
         description="Core only. Never present in any shape a package's ctx exposes; packages see age_range on Person derived from this.",

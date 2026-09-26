@@ -22,6 +22,16 @@
       "maxLength": 80,
       "description": "What a companion calls this person, if different from display_name."
     },
+    "bio": {
+      "type": ["string", "null"],
+      "maxLength": 160,
+      "description": "The line under the person's name on their profile page, in their own words or a parent's."
+    },
+    "accent": {
+      "type": ["string", "null"],
+      "enum": ["blue", "violet", "teal", "orange", "pink", "red", null],
+      "description": "A named profile color accent."
+    },
     "birthdate": {
       "type": ["string", "null"],
       "format": "date",

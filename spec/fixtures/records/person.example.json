@@ -10,5 +10,7 @@
   "created_at": "2026-09-03T12:00:00Z",
   "updated_at": "2026-09-03T12:00:00Z",
   "deleted_at": null,
-  "hlc": "1757073600000:0:a1b2c3"
+  "hlc": "1757073600000:0:a1b2c3",
+  "bio": "Curious builder and keeper of the garden.",
+  "accent": "teal"
 }
