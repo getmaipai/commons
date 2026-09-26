@@ -361,6 +361,18 @@
   --secondary-foreground: #0b1730;
   --accent: #e3eaf3;
   --accent-foreground: #0b1730;
+  --profile-accent-blue: #a9c4e8;
+  --profile-accent-blue-foreground: #07111f;
+  --profile-accent-violet: #c0a8e5;
+  --profile-accent-violet-foreground: #07111f;
+  --profile-accent-teal: #9ed9cf;
+  --profile-accent-teal-foreground: #07111f;
+  --profile-accent-amber: #f1d28a;
+  --profile-accent-amber-foreground: #07111f;
+  --profile-accent-pink: #e7b6c8;
+  --profile-accent-pink-foreground: #07111f;
+  --profile-accent-red: #e2b1a7;
+  --profile-accent-red-foreground: #07111f;
   --primary: #21a6ff;
   /* Dark navy text on the electric blue, not white: ~7.2:1 measured,
    * against white's ~2.6:1 on this lightness of blue. */
@@ -445,6 +457,18 @@
     --secondary-foreground: #f4f8ff;
     --accent: #142a43;
     --accent-foreground: #f4f8ff;
+    --profile-accent-blue: #29456e;
+    --profile-accent-blue-foreground: #f4f8ff;
+    --profile-accent-violet: #49345f;
+    --profile-accent-violet-foreground: #f4f8ff;
+    --profile-accent-teal: #1f514b;
+    --profile-accent-teal-foreground: #f4f8ff;
+    --profile-accent-amber: #59451f;
+    --profile-accent-amber-foreground: #f4f8ff;
+    --profile-accent-pink: #573245;
+    --profile-accent-pink-foreground: #f4f8ff;
+    --profile-accent-red: #593438;
+    --profile-accent-red-foreground: #f4f8ff;
     --primary: #21a6ff;
     --primary-foreground: #07111f;
     --ring: #21a6ff;
@@ -481,6 +505,18 @@
   --secondary-foreground: #f4f8ff;
   --accent: #142a43;
   --accent-foreground: #f4f8ff;
+  --profile-accent-blue: #29456e;
+  --profile-accent-blue-foreground: #f4f8ff;
+  --profile-accent-violet: #49345f;
+  --profile-accent-violet-foreground: #f4f8ff;
+  --profile-accent-teal: #1f514b;
+  --profile-accent-teal-foreground: #f4f8ff;
+  --profile-accent-amber: #59451f;
+  --profile-accent-amber-foreground: #f4f8ff;
+  --profile-accent-pink: #573245;
+  --profile-accent-pink-foreground: #f4f8ff;
+  --profile-accent-red: #593438;
+  --profile-accent-red-foreground: #f4f8ff;
   --primary: #21a6ff;
   --primary-foreground: #07111f;
   --ring: #21a6ff;
