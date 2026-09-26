@@ -3,7 +3,7 @@
 
 import { useSidebar } from "../../../../components/ui/sidebar";
 import { Button } from "../../../../components/ui/button";
-import { EyeOff, PanelLeft } from 'lucide-react';
+import { PanelLeft, VenetianMask } from 'lucide-react';
 import { Separator } from "../../../../components/ui/separator";
 
 import { cn } from "../../../../lib/utils";
@@ -39,13 +39,13 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
       type="button"
       variant="ghost"
       size="icon"
-      className={`h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 ${on ? "text-violet-600 dark:text-violet-400" : "text-muted-foreground"}`}
+      className={`h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 ${on ? "text-violet-600 dark:text-violet-400 ring-2 ring-violet-500" : "text-muted-foreground"}`}
       aria-label={`Incognito ${on ? "On" : "Off"}`}
       aria-pressed={on}
       title={`Incognito ${on ? "on" : "off"}`}
       onClick={() => onChange(!on)}
     >
-      <EyeOff className="size-5" />
+      <VenetianMask className="size-5" />
     </Button>
   );
 }

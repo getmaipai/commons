@@ -12,6 +12,10 @@ describe("IncognitoToggle (Home INCOGNITO-08)", () => {
     expect(toggle.className).toContain("h-10");
     expect(toggle.className).toContain("w-10");
     expect(toggle.className).toContain("text-violet-600");
+    expect(toggle.className).toContain("ring-2");
+    expect(toggle.className).toContain("ring-violet-500");
+    expect(toggle.querySelector("svg.lucide-venetian-mask")).not.toBeNull();
+    expect(toggle.querySelector("svg.lucide-eye-off")).toBeNull();
   });
 
   test("reports the off state and requests the opposite value when clicked", () => {
@@ -19,6 +23,8 @@ describe("IncognitoToggle (Home INCOGNITO-08)", () => {
     const { getByRole } = render(<IncognitoToggle on={false} onChange={onChange} />);
     const toggle = getByRole("button", { name: "Incognito Off" });
     expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(toggle.className).not.toContain("ring-2");
+    expect(toggle.querySelector("svg.lucide-venetian-mask")).not.toBeNull();
     fireEvent.click(toggle);
     expect(onChange).toHaveBeenCalledWith(true);
   });
