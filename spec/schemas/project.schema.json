@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/project.schema.json",
+  "title": "Project",
+  "description": "A durable unit of background work a turn started: a plan of typed steps, their runtime state, and the artifacts they produced. The turn replies immediately; the project runs after it, survives restarts, and posts its artifacts back to the thread.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "title", "state", "plan", "steps", "artifacts", "provenance", "error", "hlc", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "minLength": 1, "description": "The catalog package id that defined this project's plan, or adhoc for a model-authored plan." },
+    "title": { "type": "string", "minLength": 1, "description": "Person-readable, shown in the thread." },
+    "state": { "type": "string", "enum": ["planned", "running", "done", "failed", "cancelled"] },
+    "plan": { "$ref": "#/$defs/ProjectPlan" },
+    "steps": { "type": "array", "items": { "$ref": "#/$defs/StepState" } },
+    "artifacts": { "type": "array", "items": { "$ref": "#/$defs/ProjectArtifact" } },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["person", "conversationId", "turnId", "planSource"],
+      "properties": {
+        "person": { "type": "string", "minLength": 1 },
+        "conversationId": { "type": ["string", "null"], "description": "Null when the project was started from an incognito thread." },
+        "turnId": { "type": ["string", "null"] },
+        "planSource": { "type": "string", "enum": ["package", "model"] }
+      }
+    },
+    "error": { "type": ["string", "null"], "description": "Plain words when state is failed." },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "ProjectPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steps", "ceilings"],
+      "properties": {
+        "steps": { "type": "array", "items": { "$ref": "#/$defs/PlanStep" }, "minItems": 1, "maxItems": 25 },
+        "ceilings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["maxWallSeconds", "maxGeneratorJobs"],
+          "properties": {
+            "maxWallSeconds": { "type": "integer", "minimum": 1 },
+            "maxGeneratorJobs": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "PlanStep": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["id", "kind", "needs", "params"], "properties": { "id": { "type": "string", "minLength": 1 }, "kind": { "const": "text" }, "needs": { "type": "array", "items": { "type": "string" } }, "params": { "type": "object", "additionalProperties": false, "required": ["role", "promptTemplate", "inputs"], "properties": { "role": { "const": "chat" }, "promptTemplate": { "type": "string", "minLength": 1 }, "inputs": { "type": "array", "items": { "type": "string" } } } } } },
+        { "type": "object", "additionalProperties": false, "required": ["id", "kind", "needs", "params"], "properties": { "id": { "type": "string", "minLength": 1 }, "kind": { "const": "media" }, "needs": { "type": "array", "items": { "type": "string" } }, "params": { "type": "object", "additionalProperties": false, "required": ["role", "quality", "promptTemplate", "inputs"], "properties": { "role": { "type": "string", "enum": ["image", "video", "music"] }, "quality": { "type": "string", "enum": ["fast", "everyday", "best"] }, "promptTemplate": { "type": "string" }, "inputs": { "type": "array", "items": { "type": "string" } } } } } },
+        { "type": "object", "additionalProperties": false, "required": ["id", "kind", "needs", "params"], "properties": { "id": { "type": "string", "minLength": 1 }, "kind": { "const": "tool" }, "needs": { "type": "array", "items": { "type": "string" } }, "params": { "type": "object", "additionalProperties": false, "required": ["tool", "args"], "properties": { "tool": { "type": "string", "minLength": 1 }, "args": { "type": "object" } } } } },
+        { "type": "object", "additionalProperties": false, "required": ["id", "kind", "needs", "params"], "properties": { "id": { "type": "string", "minLength": 1 }, "kind": { "const": "assemble" }, "needs": { "type": "array", "items": { "type": "string" } }, "params": { "type": "object", "additionalProperties": false, "required": ["assembler", "inputs"], "properties": { "assembler": { "type": "string", "minLength": 1 }, "inputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 } } } } },
+        { "type": "object", "additionalProperties": false, "required": ["id", "kind", "needs", "params"], "properties": { "id": { "type": "string", "minLength": 1 }, "kind": { "const": "gate" }, "needs": { "type": "array", "items": { "type": "string" } }, "params": { "type": "object", "additionalProperties": false, "required": ["target"], "properties": { "target": { "type": "string", "minLength": 1 } } } } }
+      ]
+    },
+    "StepState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stepId", "state", "startedAt", "endedAt", "error", "artifactIds"],
+      "properties": {
+        "stepId": { "type": "string" },
+        "state": { "type": "string", "enum": ["pending", "running", "done", "failed", "skipped"] },
+        "startedAt": { "type": ["string", "null"], "format": "date-time" },
+        "endedAt": { "type": ["string", "null"], "format": "date-time" },
+        "error": { "type": ["string", "null"] },
+        "artifactIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "ProjectArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path", "gate", "createdAt"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "type": "string", "enum": ["document", "image", "audio", "video", "file"] },
+        "path": { "type": "string", "minLength": 1 },
+        "gate": { "type": "string", "enum": ["pending", "passed", "failed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

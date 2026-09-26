@@ -5,6 +5,11 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
+## [Unreleased]
+
+### Added
+- Project record (project.schema.json): the harness's durable project, its plan, steps and artifacts.
+
 ## [spec-v0.1.38] - 2026-09-25
 
 ### Fixed

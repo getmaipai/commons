@@ -1,0 +1,29 @@
+{
+  "id": "project-dino-book",
+  "type": "coloring-book",
+  "title": "Dinosaur coloring book",
+  "state": "running",
+  "plan": {
+    "steps": [
+      { "id": "story", "kind": "text", "needs": [], "params": { "role": "chat", "promptTemplate": "Write a dinosaur coloring book story", "inputs": [] } },
+      { "id": "pages", "kind": "media", "needs": ["story"], "params": { "role": "image", "quality": "everyday", "promptTemplate": "Dinosaur coloring page from {{story}}", "inputs": ["story"] } },
+      { "id": "book", "kind": "assemble", "needs": ["pages"], "params": { "assembler": "coloring-book", "inputs": ["pages"] } },
+      { "id": "check", "kind": "gate", "needs": ["book"], "params": { "target": "book" } }
+    ],
+    "ceilings": { "maxWallSeconds": 900, "maxGeneratorJobs": 10 }
+  },
+  "steps": [
+    { "stepId": "story", "state": "done", "startedAt": "2026-09-26T14:00:00Z", "endedAt": "2026-09-26T14:00:08Z", "error": null, "artifactIds": ["artifact-dino-story"] },
+    { "stepId": "pages", "state": "running", "startedAt": "2026-09-26T14:00:10Z", "endedAt": null, "error": null, "artifactIds": [] },
+    { "stepId": "book", "state": "pending", "startedAt": null, "endedAt": null, "error": null, "artifactIds": [] },
+    { "stepId": "check", "state": "pending", "startedAt": null, "endedAt": null, "error": null, "artifactIds": [] }
+  ],
+  "artifacts": [
+    { "id": "artifact-dino-story", "kind": "document", "path": "data/projects/project-dino-book/story.md", "gate": "passed", "createdAt": "2026-09-26T14:00:08Z" }
+  ],
+  "provenance": { "person": "nova", "conversationId": "conversation-nova-001", "turnId": "turn-nova-001", "planSource": "package" },
+  "error": null,
+  "hlc": "1790431200000:0:novanode",
+  "createdAt": "2026-09-26T14:00:00Z",
+  "updatedAt": "2026-09-26T14:00:10Z"
+}

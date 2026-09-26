@@ -1,0 +1,27 @@
+{
+  "id": "project-dino-book-failed",
+  "type": "coloring-book",
+  "title": "Dinosaur coloring book generation",
+  "state": "failed",
+  "plan": {
+    "steps": [
+      { "id": "story", "kind": "text", "needs": [], "params": { "role": "chat", "promptTemplate": "Write a dinosaur coloring book story", "inputs": [] } },
+      { "id": "pages", "kind": "media", "needs": ["story"], "params": { "role": "image", "quality": "everyday", "promptTemplate": "Dinosaur coloring page from {{story}}", "inputs": ["story"] } },
+      { "id": "book", "kind": "assemble", "needs": ["pages"], "params": { "assembler": "coloring-book", "inputs": ["pages"] } },
+      { "id": "check", "kind": "gate", "needs": ["book"], "params": { "target": "book" } }
+    ],
+    "ceilings": { "maxWallSeconds": 900, "maxGeneratorJobs": 10 }
+  },
+  "steps": [
+    { "stepId": "story", "state": "done", "startedAt": "2026-09-26T14:00:00Z", "endedAt": "2026-09-26T14:00:08Z", "error": null, "artifactIds": [] },
+    { "stepId": "pages", "state": "failed", "startedAt": "2026-09-26T14:00:10Z", "endedAt": "2026-09-26T14:00:30Z", "error": "The image generator stopped before finishing.", "artifactIds": [] },
+    { "stepId": "book", "state": "skipped", "startedAt": null, "endedAt": null, "error": null, "artifactIds": [] },
+    { "stepId": "check", "state": "skipped", "startedAt": null, "endedAt": null, "error": null, "artifactIds": [] }
+  ],
+  "artifacts": [],
+  "provenance": { "person": "sprout", "conversationId": "conversation-sprout-001", "turnId": "turn-sprout-001", "planSource": "package" },
+  "error": "The image generator stopped before finishing.",
+  "hlc": "1790431230000:0:sproutnode",
+  "createdAt": "2026-09-26T14:00:00Z",
+  "updatedAt": "2026-09-26T14:00:30Z"
+}

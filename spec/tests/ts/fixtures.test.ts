@@ -30,6 +30,7 @@ import { ReplyFeedback } from "../../gen/ts/reply-feedback.js";
 import { TurnArtifact } from "../../gen/ts/turn-artifact.js";
 import { Attachment } from "../../gen/ts/attachment.js";
 import { Artifact } from "../../gen/ts/artifact.js";
+import { Project } from "../../gen/ts/project.js";
 // ErrorEntry is standards-owned (std-v0.2.0), not generated here; the error
 // catalogue's shape is imported from the sibling .github checkout, the same
 // way spec/schemas/manifest.schema.json imports PrivacyRow by $ref.
@@ -97,6 +98,14 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("conversation.example.json", () => {
     expect(() => Conversation.parse(loadFixture("conversation.example.json"))).not.toThrow();
+  });
+
+  test("project.example.json", () => {
+    expect(() => Project.parse(loadFixture("project.example.json"))).not.toThrow();
+  });
+
+  test("project.failed.example.json", () => {
+    expect(() => Project.parse(loadFixture("project.failed.example.json"))).not.toThrow();
   });
 
   test("conversation.temporary.example.json", () => {
