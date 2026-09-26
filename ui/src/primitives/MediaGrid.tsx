@@ -69,7 +69,6 @@ export function MediaGrid({ items, emptyMessage }: MediaGridProps) {
                 <video
                   src={selectedItem.thumbnailUrl}
                   controls
-                  autoPlay
                   playsInline
                   aria-label={selectedItem.altText}
                   className="max-h-[calc(90dvh-3rem)] max-w-full"
