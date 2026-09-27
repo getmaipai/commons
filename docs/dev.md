@@ -1084,6 +1084,7 @@ generation failure degrading to the initial without crashing at both
 the helper and the full-component level); `tsc --noEmit` and `eslint
 src` clean (pre-existing warnings elsewhere untouched). Low-effort
 review, two passes: the dependency-footprint finding above, fixed and
-re-reviewed clean on that hunk alone. `commons/scripts/check.sh` not
-yet run - queued behind two other lanes' gates tonight (serial on the
-shared dev machine).
+re-reviewed clean on that hunk alone. `commons/scripts/check.sh` green
+end to end (core 126, ui 426, spec 569 TS + 250 pytest, all passing),
+rebased onto `origin/main` after `STORE-SPEC-01` (`spec-v0.1.44`)
+landed ahead of this in tonight's serial gate order.

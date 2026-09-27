@@ -308,8 +308,9 @@ capability, needs its own design pass first).
   above lists it as shipped in `spec-v0.1.43`; the schema at that tag
   and at `origin/main` HEAD has no such field - flagged, not fixed
   here). Low-effort review, two passes (the dependency-footprint
-  finding above, fixed and re-reviewed clean on that hunk). Exit check:
-  `commons/scripts/check.sh` green.
+  finding above, fixed and re-reviewed clean on that hunk).
+  `commons/scripts/check.sh` green end to end, rebased onto
+  `STORE-SPEC-01`'s `spec-v0.1.44`.
 
 ## `spec`
 
