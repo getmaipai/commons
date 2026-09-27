@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.45] - 2026-09-26
+
+### Added
+- `settings/keys.json`: three keys for `STORE-CAP-01` (home `docs/plans/household-storage-2026-09-23.md`, "the two caps, declared once") - `storage.household.cap_bytes` (household, basic, default `0` meaning the setup wizard hasn't set one yet), `storage.person.default_cap_bytes` (household, basic, default 20 GB in bytes), and `storage.person.cap_bytes` (person, advanced, default `0` meaning no override - falls back to the household default). All three regenerated from `home/backend/src/settings/storageKeys.ts`'s `STORAGE_SETTINGS_KEYS` via `bun run gen:settings` (`spec/settings/README.md`'s "not a placeholder to fill in by hand" rule), diffed against `spec-v0.1.44` to confirm the change is additive only. Deliberately distinct from `storage.critical_free_gb` (disk-space headroom monitoring) and `storage.person_quota_gb` (cloned-voice storage today) - a different subsystem, checked before adding these.
+
 ## [spec-v0.1.44] - 2026-09-26
 
 ### Added

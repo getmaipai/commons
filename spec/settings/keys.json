@@ -657,6 +657,20 @@
     ]
   },
   {
+    "key": "storage.household.cap_bytes",
+    "scope": "household",
+    "selector": "number",
+    "default": 0,
+    "label": "Household storage cap (bytes)",
+    "help": "The total bytes the whole household's files may use. 0 means no cap is set yet - the setup wizard sets this from the disk.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.storage",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "storage.person_quota_gb",
     "scope": "person",
     "selector": "number",
@@ -666,6 +680,34 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "person.storage",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "storage.person.cap_bytes",
+    "scope": "person",
+    "selector": "number",
+    "default": 0,
+    "label": "This person's storage cap override (bytes)",
+    "help": "Overrides the household's default per-person cap for this one person. 0 means no override: this person follows the household default. Set by an owner or admin.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "person.storage",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "storage.person.default_cap_bytes",
+    "scope": "household",
+    "selector": "number",
+    "default": 21474836480,
+    "label": "Default per-person storage cap (bytes)",
+    "help": "How many bytes each person may use for their own files, unless that person has their own override below.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.storage",
     "honoured_by": [
       "home"
     ]
