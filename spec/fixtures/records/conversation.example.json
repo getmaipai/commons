@@ -8,6 +8,7 @@
   "settings": {
     "thinking": true,
     "model": "chat-primary",
+    "read_aloud": true,
     "future_option": "kept by older clients"
   },
   "status": "open",

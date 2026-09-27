@@ -24,6 +24,10 @@ class Settings(BaseModel):
         None,
         description='Optional model id selected for turns in this conversation. Absent means the role default.',
     )
+    read_aloud: bool | None = Field(
+        None,
+        description='Whether assistant replies are read aloud automatically in this conversation. Absent means off.',
+    )
 
 
 class Conversation(BaseModel):

@@ -55,6 +55,10 @@
         "model": {
           "type": "string",
           "description": "Optional model id selected for turns in this conversation. Absent means the role default."
+        },
+        "read_aloud": {
+          "type": "boolean",
+          "description": "Whether assistant replies are read aloud automatically in this conversation. Absent means off."
         }
       }
     },

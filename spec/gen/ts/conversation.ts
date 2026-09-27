@@ -89,6 +89,13 @@ export const Conversation = z
             "Optional model id selected for turns in this conversation. Absent means the role default.",
           )
           .optional(),
+        /**Whether assistant replies are read aloud automatically in this conversation. Absent means off.*/
+        read_aloud: z
+          .boolean()
+          .describe(
+            "Whether assistant replies are read aloud automatically in this conversation. Absent means off.",
+          )
+          .optional(),
       })
       .catchall(z.any())
       .describe(
