@@ -1,0 +1,36 @@
+{
+  "id": "coloring-book",
+  "version": "0.1.0",
+  "kind": "project",
+  "category": "Fun",
+  "display": "Coloring book",
+  "description": "Writes a short story about a chosen topic and assembles it into a printable coloring book.",
+  "author": "MaiPai",
+  "license": "AGPL-3.0",
+  "homepage": "https://github.com/getmaipai/catalog",
+  "args": {
+    "type": "object",
+    "required": ["topic"],
+    "properties": {
+      "topic": { "type": "string", "minLength": 1, "description": "What the coloring book is about." }
+    },
+    "additionalProperties": false
+  },
+  "incognito": "blocked",
+  "requires": [],
+  "optional": [],
+  "platforms": ["home"],
+  "min_role": "child",
+  "consequential": true,
+  "offline": "full",
+  "config": [],
+  "data_sources": [],
+  "permissions": [],
+  "notifications": [],
+  "backup": "hot",
+  "background": true,
+  "contributes": {},
+  "min_app": "0.1.0",
+  "tier": 0,
+  "quality_scale": "bronze"
+}

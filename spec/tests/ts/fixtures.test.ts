@@ -32,10 +32,19 @@ import { File } from "../../gen/ts/file.js";
 import { Share } from "../../gen/ts/share.js";
 import { Artifact } from "../../gen/ts/artifact.js";
 import { Project } from "../../gen/ts/project.js";
+
 // ErrorEntry is standards-owned (std-v0.2.0), not generated here; the error
 // catalogue's shape is imported from the sibling .github checkout, the same
-// way spec/schemas/manifest.schema.json imports PrivacyRow by $ref.
-import { ErrorEntry } from "../../../../.github/standards/gen/ts/error-entry.js";
+// way spec/schemas/manifest.schema.json imports PrivacyRow by $ref. Resolved
+// through MAIPAI_STANDARDS_DIR when set, falling back to the same relative
+// sibling path as before - tests/py/_standards.py's own STANDARDS_DIR already
+// does this on the Python side; a plain hardcoded "../../../../.github"
+// static import only ever resolves from the plain checkout depth and breaks
+// under a nested worktree (found live: this worktree sits at
+// commons/.claude/worktrees/<id>/spec, one directory deeper than the plain
+// checkout the hardcoded climb assumed, so the module could never be found).
+const STANDARDS_DIR = process.env.MAIPAI_STANDARDS_DIR ?? join(import.meta.dir, "..", "..", "..", "..", ".github");
+const { ErrorEntry } = await import(join(STANDARDS_DIR, "standards", "gen", "ts", "error-entry.js"));
 
 const FIXTURES_DIR = join(import.meta.dir, "..", "..", "fixtures", "records");
 
@@ -134,6 +143,26 @@ describe("record fixtures validate against their generated Zod models", () => {
   test("manifest.reference.example.json", () => {
     expect(() =>
       PackageManifest.parse(loadFixture("manifest.reference.example.json")),
+    ).not.toThrow();
+  });
+
+  test("manifest.project.example.json", () => {
+    expect(() =>
+      PackageManifest.parse(loadFixture("manifest.project.example.json")),
+    ).not.toThrow();
+  });
+
+  // project-plan.example.json is a project-kind package's own plan.json body
+  // (PROJECT-PKGTYPE-01, home docs/BACKLOG.md): a bare ProjectPlan, not yet
+  // part of a running Project record, so there's no separate ProjectPlan
+  // export to import - Project.shape.plan is the same sub-schema Zod
+  // already gives every strict z.object(), the same way every other
+  // $defs-bearing schema in this repo (subject-ref, turn-artifact,
+  // reply-plan, conversation-turn, model-capabilities, turn-signal) is only
+  // ever exported as its single top-level type, never per-$def.
+  test("project-plan.example.json", () => {
+    expect(() =>
+      Project.shape.plan.parse(loadFixture("project-plan.example.json")),
     ).not.toThrow();
   });
 

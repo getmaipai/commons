@@ -13,7 +13,7 @@ export const PackageManifest = z
       .regex(new RegExp("^[a-z0-9][a-z0-9_-]{0,63}$"))
       .describe("Unique in the catalog. No third-party name in it."),
     version: z.string().regex(new RegExp("^[0-9]+\\.[0-9]+\\.[0-9]+$")),
-    /**A `plugin` is a self-contained, permissioned, installable capability (its own network access, its own recipe.json). A `skill` is plain instructions (a SKILL.md body, Claude-format-compatible) - no permissions, no recipe, composed into the chat model's system prompt when relevant, never runs on its own. See home/docs/dev.md's 'Naming: skill, plugin, command, connector' entry. A `reference` is a declarative offline knowledge archive (no code, like `model` and `voice`) - a Kiwix-style book a household installs and sizes before download; see `knowledge_source` below and home/docs/plans/knowledge-sources-2026-09-24.md.*/
+    /**A `plugin` is a self-contained, permissioned, installable capability (its own network access, its own recipe.json). A `skill` is plain instructions (a SKILL.md body, Claude-format-compatible) - no permissions, no recipe, composed into the chat model's system prompt when relevant, never runs on its own. See home/docs/dev.md's 'Naming: skill, plugin, command, connector' entry. A `reference` is a declarative offline knowledge archive (no code, like `model` and `voice`) - a Kiwix-style book a household installs and sizes before download; see `knowledge_source` below and home/docs/plans/knowledge-sources-2026-09-24.md. A `project` package declares a background project type: its body is `plan.json` (a `ProjectPlan`, this same file's own sibling `project.schema.json`'s `$defs/ProjectPlan`), never `recipe.json`.*/
     kind: z
       .enum([
         "plugin",
@@ -27,9 +27,10 @@ export const PackageManifest = z
         "theme",
         "module",
         "reference",
+        "project",
       ])
       .describe(
-        "A `plugin` is a self-contained, permissioned, installable capability (its own network access, its own recipe.json). A `skill` is plain instructions (a SKILL.md body, Claude-format-compatible) - no permissions, no recipe, composed into the chat model's system prompt when relevant, never runs on its own. See home/docs/dev.md's 'Naming: skill, plugin, command, connector' entry. A `reference` is a declarative offline knowledge archive (no code, like `model` and `voice`) - a Kiwix-style book a household installs and sizes before download; see `knowledge_source` below and home/docs/plans/knowledge-sources-2026-09-24.md.",
+        "A `plugin` is a self-contained, permissioned, installable capability (its own network access, its own recipe.json). A `skill` is plain instructions (a SKILL.md body, Claude-format-compatible) - no permissions, no recipe, composed into the chat model's system prompt when relevant, never runs on its own. See home/docs/dev.md's 'Naming: skill, plugin, command, connector' entry. A `reference` is a declarative offline knowledge archive (no code, like `model` and `voice`) - a Kiwix-style book a household installs and sizes before download; see `knowledge_source` below and home/docs/plans/knowledge-sources-2026-09-24.md. A `project` package declares a background project type: its body is `plan.json` (a `ProjectPlan`, this same file's own sibling `project.schema.json`'s `$defs/ProjectPlan`), never `recipe.json`.",
       ),
     category: z.enum([
       "Home",

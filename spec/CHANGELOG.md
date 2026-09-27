@@ -7,6 +7,14 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.46] - 2026-09-26
+
+### Added
+- `manifest.schema.json`'s `kind` enum gains `project` (PROJECT-PKGTYPE-01 spec half, home `docs/BACKLOG.md`): a project-kind package declares a background project type, its body `plan.json` (a `ProjectPlan`, `project.schema.json`'s own `$defs/ProjectPlan`), never `recipe.json`. No new manifest field: the existing `args` field already holds a project package's own parameter schema. `fixtures/records/manifest.project.example.json` and `fixtures/records/project-plan.example.json` (one `text` step with a `{topic}`-templated `promptTemplate`, one `assemble` step) validate in TypeScript (`Project.shape.plan`) and Python (`ProjectPlan`).
+
+### Fixed
+- `tests/ts/fixtures.test.ts`'s `ErrorEntry` import: a hardcoded relative climb to the sibling `.github` checkout with no override, unlike `tests/py/_standards.py`'s own `MAIPAI_STANDARDS_DIR`-aware resolution - broke every fixture test in the file under a nested worktree. Now resolved the same way the Python side already does; unchanged for a plain checkout.
+
 ## [spec-v0.1.45] - 2026-09-26
 
 ### Added

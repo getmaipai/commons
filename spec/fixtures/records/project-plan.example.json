@@ -1,0 +1,21 @@
+{
+  "steps": [
+    {
+      "id": "story",
+      "kind": "text",
+      "needs": [],
+      "params": {
+        "role": "chat",
+        "promptTemplate": "Write a short, gentle story about {topic} for a coloring book: a title, then a few short paragraphs simple enough to picture one scene per page.",
+        "inputs": []
+      }
+    },
+    {
+      "id": "book",
+      "kind": "assemble",
+      "needs": ["story"],
+      "params": { "assembler": "markdown-concat", "inputs": ["story"] }
+    }
+  ],
+  "ceilings": { "maxWallSeconds": 300, "maxGeneratorJobs": 5 }
+}

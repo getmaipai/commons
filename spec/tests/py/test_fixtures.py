@@ -26,6 +26,7 @@ from gen.py.memory_record_schema import MemoryRecord
 from gen.py.model_capabilities_schema import ModelCapabilities
 from gen.py.open_question_schema import OpenQuestion
 from gen.py.person_schema import Person
+from gen.py.project_schema import ProjectPlan
 from gen.py.relationship_schema import Relationship
 from gen.py.reply_constraint_schema import ReplyConstraint
 from gen.py.reply_feedback_schema import ReplyFeedback
@@ -122,6 +123,19 @@ def test_manifest_fixture():
 
 def test_manifest_reference_fixture():
     PackageManifest.model_validate(load_fixture("manifest.reference.example.json"))
+
+
+def test_manifest_project_fixture():
+    PackageManifest.model_validate(load_fixture("manifest.project.example.json"))
+
+
+# project-plan.example.json is a project-kind package's own plan.json body
+# (PROJECT-PKGTYPE-01, home docs/BACKLOG.md), not yet part of a running
+# Project record. Unlike the TS side, datamodel-codegen already hoists every
+# $defs entry (ProjectPlan included) into its own class, so no workaround
+# like Project.shape.plan is needed here.
+def test_project_plan_fixture():
+    ProjectPlan.model_validate(load_fixture("project-plan.example.json"))
 
 
 def test_safety_result_fixture():
