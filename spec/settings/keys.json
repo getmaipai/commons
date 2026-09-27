@@ -406,6 +406,32 @@
     ]
   },
   {
+    "key": "notifications.file.shared_with_household.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when someone shares a file with the household",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "notifications.file.shared_with_you.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when someone shares a file with me",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "notifications.memory.judge_failed.telegram",
     "scope": "person",
     "selector": "boolean",

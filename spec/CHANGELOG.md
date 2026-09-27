@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.47] - 2026-09-27
+
+### Added
+- `settings/keys.json`: two keys completing `NOTIFY-SHARE-01` (home `docs/BACKLOG.md`) - `notifications.file.shared_with_you.telegram` and `notifications.file.shared_with_household.telegram` (both person scope, basic level, boolean, default `false`), regenerated from `home/backend/src/settings/notificationKeys.ts`'s `NOTIFICATION_SETTINGS_KEYS` via `bun run gen:settings` (`spec/settings/README.md`'s "not a placeholder to fill in by hand" rule), mirroring `notifications.memory.updated.telegram`'s exact shape. Diffed against `spec-v0.1.46` to confirm the change is additive only.
+
 ## [spec-v0.1.46] - 2026-09-26
 
 ### Added
