@@ -8,6 +8,24 @@ from typing import Literal
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
 
 
+class Settings(BaseModel):
+    """
+    Optional settings remembered with this conversation. Unknown keys are preserved for additive cross-client evolution.
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    thinking: bool | None = Field(
+        None,
+        description='Whether turns in this conversation use extended reasoning. Absent means the default (Instant).',
+    )
+    model: str | None = Field(
+        None,
+        description='Optional model id selected for turns in this conversation. Absent means the role default.',
+    )
+
+
 class Conversation(BaseModel):
     """
     One chat thread, per person and per surface (platform plan 4.14). Its turns live separately (hub-internal, conversation_turns); this record is the thread itself: title, rolling summary, and lifecycle. See session-a-intelligence.md step 3.
@@ -40,6 +58,10 @@ class Conversation(BaseModel):
     pinned: bool | None = Field(
         False,
         description="Whether this conversation stays at the top of its person's list.",
+    )
+    settings: Settings | None = Field(
+        None,
+        description='Optional settings remembered with this conversation. Unknown keys are preserved for additive cross-client evolution.',
     )
     status: Literal['open', 'closed', 'deleted'] = Field(
         ...,

@@ -72,6 +72,29 @@ export const Conversation = z
         "Whether this conversation stays at the top of its person's list.",
       )
       .default(false),
+    /**Optional settings remembered with this conversation. Unknown keys are preserved for additive cross-client evolution.*/
+    settings: z
+      .object({
+        /**Whether turns in this conversation use extended reasoning. Absent means the default (Instant).*/
+        thinking: z
+          .boolean()
+          .describe(
+            "Whether turns in this conversation use extended reasoning. Absent means the default (Instant).",
+          )
+          .optional(),
+        /**Optional model id selected for turns in this conversation. Absent means the role default.*/
+        model: z
+          .string()
+          .describe(
+            "Optional model id selected for turns in this conversation. Absent means the role default.",
+          )
+          .optional(),
+      })
+      .catchall(z.any())
+      .describe(
+        "Optional settings remembered with this conversation. Unknown keys are preserved for additive cross-client evolution.",
+      )
+      .optional(),
     /**Open is active for this person and surface. Closed is inactive and requires an explicit resume before another turn. Deleted is terminal. Resuming closes other open conversations on that surface and clears stale pending confirmations; reading never resumes.*/
     status: z
       .enum(["open", "closed", "deleted"])

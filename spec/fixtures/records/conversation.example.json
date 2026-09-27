@@ -5,6 +5,11 @@
   "mode": "research",
   "companion_id": null,
   "title": "Weekend plans",
+  "settings": {
+    "thinking": true,
+    "model": "chat-primary",
+    "future_option": "kept by older clients"
+  },
   "status": "open",
   "summary": "Riff asked about the weather earlier and then about weekend plans for a trip to Boston.",
   "summary_through_turn": "turn-d4e5f6",
