@@ -275,6 +275,41 @@ capability, needs its own design pass first).
   install refuses. Exit check: `commons/scripts/check.sh` green, a new
   `ui` tag with an intentionally mismatched nested `spec` shown to fail
   the added check.
+- [x] **S** `ui-v0.5.68`: `MediaGrid.tsx` (the shared `AspectRatio`-card
+  grid plus lightbox `Dialog`, built once for the People profile page,
+  `STORE-PAGE-01`, and any future Photos/Videos app - `home/docs/plans/
+  people-profile-2026-09-26.md`'s `MEDIA-GRID-01`), plus `tokens.css`'s
+  `--profile-accent-*` swatches (six names matching `spec`'s `Person.accent`
+  enum: blue/violet/teal/orange/pink/red). Landed as part of tonight's
+  PEOPLE-01 phase-one work; this entry backfills the tag's own record,
+  never written at the time.
+- [ ] **AVATAR-RENDER-01: real DiceBear avatar rendering, closing the
+  deferred gap** (S, Sonnet; `ui/src/primitives/Avatar.tsx`). Objective:
+  `Avatar.tsx`'s own header comment defers "3.1's real avatar rendering
+  (DiceBear SVG, PNG rasterization, `/avatar/:userId`)" until "the
+  shell's profile picker is built" - PEOPLE-PROFILE-01 is that picker,
+  so this closes the deferral: a `Person`'s `avatar_seed` (still the
+  identity key when no `avatar_file_id` is set) renders as a real
+  DiceBear-generated image instead of an initial-on-tint fallback.
+  Files: `ui/src/primitives/Avatar.tsx` (add an `avatarUrl`-or-`seed`
+  prop, keep the initial as the true fallback when neither is present),
+  a new render path using an installed DiceBear package (`@dicebear/core`
+  plus one style collection, added via `bun add`, never vendored - see
+  org `CLAUDE.md`'s "Third-party code and assets"), and (home-side, a
+  separate small item if an endpoint is needed rather than a client-side
+  SVG data URI - decide which by reading how `avatar_file_id`'s image is
+  already served before building a second serving path). Mirror: how
+  `avatar_file_id` already resolves to an image URL, once `PEOPLE-PROFILE-01`
+  lands that. Acceptance: a person with only `avatar_seed` set (no
+  uploaded photo) renders a real generated picture, deterministic from
+  the same seed; a person with neither renders the existing initial
+  fallback unchanged; every existing `Avatar` caller (SignIn, Shell,
+  MessageThread, the People grid) is unaffected in size/layout. Out of
+  scope: PNG rasterization for contexts that need a raster image (e.g. a
+  notification's own image attachment) unless a real caller needs it now -
+  note it as a follow-up rather than building it speculatively. Exit:
+  `bash scripts/check.sh` (commons), plus `home`'s own gate once it bumps
+  the `ui` pin to pick it up.
 
 ## `spec`
 
@@ -355,3 +390,11 @@ capability, needs its own design pass first).
   `fixtures/validation/cross-field.json` proving both languages agree.
   Two fixtures (`artifact.v1`, `artifact.v2`) prove the chain round-trips.
   Exit check: `bash scripts/check.sh`.
+- [x] **S** `spec-v0.1.43` (via a `0.1.39`→`0.1.41` mis-cut/rebase,
+  folded in): `Person` gains `avatar_file_id` (`string | null`, a `file`
+  record standing in for `avatar_seed` when set), `bio` (`string | null`,
+  max ~160 chars), and `accent` (`string | null`, enum
+  blue/violet/teal/orange/pink/red) - `home/docs/plans/
+  people-profile-2026-09-26.md`'s `PEOPLE-SPEC-01`. Fixture and
+  round-trip test added in both languages. This entry backfills the
+  tag's own record, never written at the time.
