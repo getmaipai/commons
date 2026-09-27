@@ -332,6 +332,27 @@ capability, needs its own design pass first).
 
 - [x] **CAP-VOCAB-01: the capability vocabulary gains the engine roles** Landed 2026-09-23 (c-99n; the tag is cut by the coordinator after the diff is read). (S, spec first; from home's `docs/plans/hardware-tiers-2026-09-23.md`, "Capabilities follow the allocation"). `spec/vocab/capabilities.json` gains `vision`, `image`, `video`, `music`, `stt` and `tts`, named as the Stack's role ids, each with a one-line description in the vocabulary's own shape; the chat role keeps mapping to the existing `gpu_llm` or `cpu_llm` and the embed role to `embeddings`, so the list stays one list; the fixtures and the Python package regenerate; the spec tag is bumped and home and bot pin it. Acceptance: a manifest fixture with `requires: ["image"]` validates; the round-trip fixtures pass in TypeScript and Python. Exit: `bash scripts/check.sh` and the tag.
 
+- [ ] **BODY-VOCAB-01: the capability vocabulary gains the body ids**
+  (S, spec first, 2026-09-27; bot's RM-00, from
+  `bot/docs/dev/design-reachy-mini-2026-09-27.md` section 2, a body
+  profile's declaration). `spec/vocab/capabilities.json` gains the ids
+  a robot body declares on its `Device.capabilities` row, each with a
+  one-line description in the vocabulary's own shape: `head_6dof`,
+  `head_pan_tilt`, `roll`, `antennas`, `body_yaw`, `eyes`, `mouth`,
+  `light_ring`, `doa`, `state_feed`, `encoders`, `touch`, `distance`,
+  `imu`, `battery_readout`, `physical_mute`, `camera_shutter`,
+  `moves_recorded`, and the speech placement pair `speech_pod` and
+  `speech_robot`; two device fixtures, a Reachy Mini row (`kind:
+  robot`, `head_6dof`, `roll`, `antennas`, `body_yaw`, `camera`, `mic`,
+  `speaker`, `doa`, `state_feed`, `imu`, `moves_recorded`,
+  `speech_pod`) and a MaiPai-build row (`head_pan_tilt`, `eyes`,
+  `mouth`, `light_ring`, `encoders`, `touch`, `distance`, `imu`,
+  `battery_readout`, `speech_robot`, plus the existing `camera`, `mic`,
+  `speaker`, `motors`); the Python package regenerates; the tag is
+  bumped and `bot` pins it. Mirror: CAP-VOCAB-01 above. Acceptance:
+  both fixtures validate in TypeScript and Python; every existing
+  fixture unchanged. Out of scope: any renderer, the robot's 20-item
+  grant list. Exit: `bash scripts/check.sh` and the tag.
 - [ ] **S** A spec tag's settings registry is a superset of its parent
   tag's: the cut (`commons` `check.sh`, or a `spec/scripts/cut-tag.sh`
   if none exists) diffs `spec/settings/keys.json` against the previous
