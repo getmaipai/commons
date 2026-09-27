@@ -1,15 +1,15 @@
-import { describe, expect, test, afterEach } from "bun:test";
+import { describe, expect, test, mock, afterEach } from "bun:test";
 import { render, cleanup } from "@testing-library/react";
-import { Avatar } from "@/kit/primitives/Avatar";
+import { Avatar, diceBearAvatarUri } from "@/kit/primitives/Avatar";
 
 afterEach(cleanup);
 
 describe("Avatar", () => {
   // Radix's own Fallback mounts on a timer even with `delayMs={0}` (an
-  // implementation detail, not a real loading delay - there's no
-  // `AvatarImage` anywhere in this kit to wait on) - `findByText`, which
+  // implementation detail, not a real loading delay) - `findByText`, which
   // retries, not the synchronous `getByText`, the same way every other
-  // Radix-backed primitive in this kit is tested.
+  // Radix-backed primitive in this kit is tested. With no seed, no
+  // `AvatarImage` mounts at all, so this is the initial's only path.
   test("shows the name's first initial", async () => {
     const { findByText } = render(<Avatar name="Sage" />);
     expect(await findByText("S")).toBeTruthy();
@@ -43,5 +43,48 @@ describe("Avatar", () => {
     const { container, findByText } = render(<Avatar name="Sage" />);
     await findByText("S");
     expect(container.querySelector('[data-slot="avatar-badge"]')).toBeNull();
+  });
+
+  // `diceBearAvatarUri` is the exact function `Avatar` calls for a seed -
+  // asserted directly rather than through a full render because
+  // happy-dom's image loading is off by default (this suite's own
+  // deterministic, offline default), so a rendered `<img>` never reaches
+  // Radix's "loaded" state for any src, real or fake, and the DOM never
+  // shows one either way. This is the real seed-to-picture mapping, not a
+  // reimplementation of it.
+  test("a seed produces a DiceBear picture as a data URI", () => {
+    const uri = diceBearAvatarUri("riff-household-1");
+    expect(uri).toMatch(/^data:image\/svg\+xml/);
+  });
+
+  test("the same seed always produces the same picture", () => {
+    expect(diceBearAvatarUri("riff-household-1")).toBe(diceBearAvatarUri("riff-household-1"));
+  });
+
+  test("different seeds produce different pictures", () => {
+    expect(diceBearAvatarUri("riff-household-1")).not.toBe(diceBearAvatarUri("sage-household-1"));
+  });
+
+  // A generation failure (a future DiceBear bump, a malformed seed) is
+  // never allowed to crash the avatar - `@dicebear/core` is the only
+  // importer of this module in the whole kit, so mocking it here can't
+  // leak into an unrelated file's tests.
+  test("a DiceBear failure returns no picture, not a thrown error", () => {
+    mock.module("@dicebear/core", () => ({
+      createAvatar: () => {
+        throw new Error("dicebear exploded");
+      },
+    }));
+    expect(diceBearAvatarUri("riff-household-1")).toBeNull();
+  });
+
+  test("Avatar itself survives a DiceBear failure and still shows the initial", async () => {
+    mock.module("@dicebear/core", () => ({
+      createAvatar: () => {
+        throw new Error("dicebear exploded");
+      },
+    }));
+    const { findByText } = render(<Avatar name="Sage" seed="riff-household-1" />);
+    expect(await findByText("S")).toBeTruthy();
   });
 });

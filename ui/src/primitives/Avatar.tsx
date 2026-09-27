@@ -1,8 +1,26 @@
-import { Avatar as AvatarRoot, AvatarFallback, AvatarBadge } from "@/kit/ui/avatar";
+import { useMemo } from "react";
+import { createAvatar } from "@dicebear/core";
+// The single style package directly, not the `@dicebear/collection`
+// barrel - `collection` depends on all ~30 style packages (avataaars,
+// bottts, croodles, every other one) to re-export them from one place,
+// so depending on it at all pulls the whole set into the install graph
+// for the one style actually used (a code review, 2026-09-26, caught
+// this the first time it landed as `@dicebear/collection`).
+import * as adventurer from "@dicebear/adventurer";
+import { Avatar as AvatarRoot, AvatarFallback, AvatarImage, AvatarBadge } from "@/kit/ui/avatar";
 import { cn } from "@/kit/utils";
 
 interface AvatarProps {
   name: string;
+  /** `Person.avatar_seed` (`spec/schemas/person.schema.json`): "Deterministic
+   * seed for a generated avatar; never a photo of a real person by
+   * default." When set, renders a DiceBear picture from it. Optional
+   * because not every caller has a Person yet (SignIn's own placeholder
+   * name has no record behind it); absent, or a generation failure,
+   * falls back to the initial below - the real photo state
+   * (`avatar_file_id`, `AVATAR-RENDER-01`'s own design note) is a
+   * separate, not-yet-spec'd field and out of scope here. */
+  seed?: string | null;
   className?: string;
   /** A small filled dot on the avatar's own corner - the phone header
    * fold's own stand-in for a separate notification badge (owner
@@ -13,24 +31,63 @@ interface AvatarProps {
   dot?: boolean;
 }
 
+// The DiceBear style is an open call this item's own design note left to
+// implementation ("make the smallest reasonable call and note it",
+// AVATAR-RENDER-01): "adventurer" - a friendly, all-ages face, not a
+// robot or an abstract identicon - the same reasoning that will pick a
+// wake word or an assistant voice, applied here first.
+//
+// Exported so Avatar.test.tsx can assert the seed-to-picture mapping
+// directly - happy-dom's image loading is off by default (deterministic,
+// offline test runs), so a full render can never observe the resulting
+// `<img>` actually "load"; this is still the one place the logic lives,
+// just testable without a real browser's image pipeline.
+export function diceBearAvatarUri(seed: string): string | null {
+  try {
+    return createAvatar(adventurer, { seed, size: 96 }).toDataUri();
+  } catch {
+    // Never a guess dressed up as a picture - genuinely unrenderable
+    // (a future DiceBear major bump, a malformed seed) falls back to
+    // the initial below exactly like no seed at all.
+    return null;
+  }
+}
+
 // 3.1's real avatar rendering (DiceBear SVG, PNG rasterization,
-// /avatar/:userId) is deferred (home/docs/dev.md's Review queue: "no shell
+// /avatar/:userId) was deferred (home/docs/dev.md's Review queue: "no shell
 // or kit work has started; revisit when the shell's profile picker is
-// built"). This is that picker's first real caller, so the deferred
-// fallback (initials on a flat tint) is what actually ships: not a guess
-// at the real thing, the documented fallback becoming real.
+// built"). The picker (`PEOPLE-GRID-01`) is built and this is that
+// revisit (`AVATAR-RENDER-01`): a seed renders a real DiceBear picture: no
+// seed at all, or a render failure, still gets the documented fallback
+// (initials on a flat tint), now a genuine last resort rather than the
+// only path.
 //
 // A pattern component on top of `kit/ui/avatar.tsx` (name-to-initial is
 // product logic, not something a generic Avatar primitive knows), the
-// same relationship Card and Select have to their generated bases.
-export function Avatar({ name, className, dot }: AvatarProps) {
+// same relationship Card and Select have to their generated bases. The
+// Image-then-Fallback shape mirrors the kit's other optional-asset avatar
+// (`assistant-ui/attachment.aui.tsx`'s `AttachmentThumb`: an `AvatarImage`
+// for the real thing, `AvatarFallback` for when there isn't one) rather
+// than inventing a second way to show "picture, or a stand-in for one."
+export function Avatar({ name, seed, className, dot }: AvatarProps) {
   const initial = name.trim().charAt(0).toUpperCase() || "?";
+  const trimmedSeed = seed?.trim();
+  // Memoized: DiceBear's own SVG generation runs synchronously and isn't
+  // free, and the seed rarely changes across a re-render.
+  const avatarUri = useMemo(() => (trimmedSeed ? diceBearAvatarUri(trimmedSeed) : null), [trimmedSeed]);
   return (
     <AvatarRoot
       // The caller's text size (SignIn's `text-xl`, Shell's `text-sm`,
       // MessageThread's `text-sm`) sets the font-size here, on the root.
       className={cn("size-12 bg-primary text-primary-foreground font-semibold text-base after:hidden", className)}
     >
+      {/* Decorative, same reasoning as the initial below: every real
+          caller already renders the full name as separate, adjacent
+          visible text, so the picture carries no information a screen
+          reader needs read aloud. Radix's own Image-to-Fallback swap
+          (kit/ui/avatar.tsx) is what makes a failed load fall through to
+          the initial with no extra code here. */}
+      {avatarUri ? <AvatarImage src={avatarUri} alt="" /> : null}
       {/* kit/ui/avatar.tsx's AvatarFallback hardcodes its own `text-sm` in
           its base classes, so it never actually inherited the root's size
           in the first place (a code review, 2026-09-05, caught every

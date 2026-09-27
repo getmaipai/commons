@@ -17,6 +17,8 @@
     "@assistant-ui/react": "0.15.21",
     "@assistant-ui/react-markdown": "^0.14.14",
     "@base-ui/react": "^1.4.1",
+    "@dicebear/adventurer": "9.4.3",
+    "@dicebear/core": "9.4.3",
     "@maipai/spec": "file:../spec",
     "@noriginmedia/norigin-spatial-navigation": "3.3.0",
     "@radix-ui/react-popover": "^1.1.23",

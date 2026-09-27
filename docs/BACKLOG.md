@@ -283,33 +283,33 @@ capability, needs its own design pass first).
   enum: blue/violet/teal/orange/pink/red). Landed as part of tonight's
   PEOPLE-01 phase-one work; this entry backfills the tag's own record,
   never written at the time.
-- [ ] **AVATAR-RENDER-01: real DiceBear avatar rendering, closing the
-  deferred gap** (S, Sonnet; `ui/src/primitives/Avatar.tsx`). Objective:
-  `Avatar.tsx`'s own header comment defers "3.1's real avatar rendering
-  (DiceBear SVG, PNG rasterization, `/avatar/:userId`)" until "the
-  shell's profile picker is built" - PEOPLE-PROFILE-01 is that picker,
-  so this closes the deferral: a `Person`'s `avatar_seed` (still the
-  identity key when no `avatar_file_id` is set) renders as a real
-  DiceBear-generated image instead of an initial-on-tint fallback.
-  Files: `ui/src/primitives/Avatar.tsx` (add an `avatarUrl`-or-`seed`
-  prop, keep the initial as the true fallback when neither is present),
-  a new render path using an installed DiceBear package (`@dicebear/core`
-  plus one style collection, added via `bun add`, never vendored - see
-  org `CLAUDE.md`'s "Third-party code and assets"), and (home-side, a
-  separate small item if an endpoint is needed rather than a client-side
-  SVG data URI - decide which by reading how `avatar_file_id`'s image is
-  already served before building a second serving path). Mirror: how
-  `avatar_file_id` already resolves to an image URL, once `PEOPLE-PROFILE-01`
-  lands that. Acceptance: a person with only `avatar_seed` set (no
-  uploaded photo) renders a real generated picture, deterministic from
-  the same seed; a person with neither renders the existing initial
-  fallback unchanged; every existing `Avatar` caller (SignIn, Shell,
-  MessageThread, the People grid) is unaffected in size/layout. Out of
-  scope: PNG rasterization for contexts that need a raster image (e.g. a
-  notification's own image attachment) unless a real caller needs it now -
-  note it as a follow-up rather than building it speculatively. Exit:
-  `bash scripts/check.sh` (commons), plus `home`'s own gate once it bumps
-  the `ui` pin to pick it up.
+- [x] **S** `AVATAR-RENDER-01`: closes `Avatar.tsx`'s own deferred DiceBear
+  rendering (home `docs/plans/people-profile-2026-09-26.md`) - a
+  `seed` prop (`Person.avatar_seed`) now renders a real DiceBear
+  picture (`adventurer` style, the open style call this item left to
+  implementation, picked for a friendly all-ages face over a robot or
+  an abstract identicon); no seed, or a generation failure, still falls
+  back to the initial-on-tint, now a genuine last resort rather than
+  the only path, mirroring the kit's existing Image-then-Fallback
+  optional-asset shape (`assistant-ui/attachment.aui.tsx`'s
+  `AttachmentThumb`). New direct dependencies `@dicebear/core` and
+  `@dicebear/adventurer`, pinned to the exact `9.4.3` release on both
+  (a first pass added the `@dicebear/collection` barrel package
+  instead, caught by a code review for pulling in all ~30 unused style
+  packages just to reach one; the single style package alone avoids
+  that). 9 tests in `Avatar.test.tsx` (photo/seed absent, a seed
+  producing a stable and distinct picture per seed, a DiceBear failure
+  degrading to the initial without crashing); happy-dom's image loading
+  is off by default in this workspace, so the seed-to-picture mapping
+  is asserted on the exported `diceBearAvatarUri` directly rather than
+  through a rendered `<img>`'s load state. `avatar_file_id` (a real
+  photo overriding the generated one) is a separate, not-yet-spec'd
+  field and stays out of scope here (`PEOPLE-SPEC-01`'s docs backfill
+  above lists it as shipped in `spec-v0.1.43`; the schema at that tag
+  and at `origin/main` HEAD has no such field - flagged, not fixed
+  here). Low-effort review, two passes (the dependency-footprint
+  finding above, fixed and re-reviewed clean on that hunk). Exit check:
+  `commons/scripts/check.sh` green.
 
 ## `spec`
 

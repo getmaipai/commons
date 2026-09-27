@@ -1010,3 +1010,80 @@ cache above), fixed, re-reviewed clean on the fix hunk alone. The
 actual chunk-size numbers, the "still renders live" screenshots and
 the PWA precache ceiling restored to 2 MiB are Home's own side, not
 committed here.
+
+## AVATAR-RENDER-01: DiceBear rendering closes `Avatar.tsx`'s own deferral (2026-09-26)
+
+`Avatar.tsx`'s header had deferred DiceBear rendering "until the shell's
+profile picker is built" (home's Review queue). Home's `PEOPLE-GRID-01`
+built that picker (`docs/plans/people-profile-2026-09-26.md`), so this
+closes the deferral rather than carrying it into another redesign - a
+new `seed` prop takes `Person.avatar_seed` and renders a real picture; no
+seed, or a failed render, still falls back to the existing initial-on-
+tint, which is what every current caller (none pass `seed` yet) already
+gets unchanged.
+
+**Style choice, an open call this item's own design note left to
+implementation**: DiceBear's `adventurer` style - a friendly, all-ages
+face, not a robot (`bottts`) or an abstract identicon. Nothing in the
+design doc or dev docs named one, so this is the smallest reasonable
+call, not a design decision to escalate.
+
+**Shape**: the kit's existing optional-asset pattern
+(`assistant-ui/attachment.aui.tsx`'s `AttachmentThumb`: `AvatarImage`
+for the real thing, `AvatarFallback` for when there isn't one), not a
+second way to show "picture, or a stand-in for one." `createAvatar
+(adventurer, { seed }).toDataUri()` runs synchronously - no network, no
+async loading state to manage - so the only failure mode is a thrown
+exception (a malformed seed, a future DiceBear major bump), caught and
+treated exactly like no seed at all.
+
+**Dependency footprint, a review finding**: the first cut depended on
+`@dicebear/collection`, the barrel package that re-exports all ~30
+DiceBear styles (avataaars, bottts, croodles, and so on) by depending on
+every one of them - so importing `adventurer` from it pulled the other
+~29 unused style packages into the install graph for nothing. Fixed by
+depending on `@dicebear/adventurer` directly (`import * as adventurer
+from "@dicebear/adventurer"`, the same namespace shape `collection`'s
+own index used internally) and dropping `collection` entirely.
+`@dicebear/core` and `@dicebear/adventurer` are both pinned to the exact
+`9.4.3` release - `@dicebear/core`'s own npm `latest` tag is `10.7.0`,
+but `@dicebear/collection`'s (and every individual style package's) had
+no `10.x` release at all when this landed, only up to `9.4.x`; `9.4.3`
+is each package's own `v9-lts` dist-tag, the newest version where core
+and the style package are still on the same major and their peer
+dependency range (`@dicebear/adventurer`'s `"@dicebear/core": "^9.0.0"`)
+is actually satisfied.
+
+**Testing**: this workspace's `tests/preload.ts` registers happy-dom
+with its default `enableImageFileLoading: false` (confirmed live -
+mutating `globalThis.happyDOM.settings.enableImageFileLoading` after
+registration has no effect on an already-created window), so a rendered
+`<img>`'s Radix "loaded" status is unreachable in this test run for any
+`src`, real or fake, real photo or generated one - the same limitation
+`AttachmentThumb`'s own untested `AvatarImage` usage already lived
+with, just now actually exercised by a test suite. `diceBearAvatarUri`
+(the exact function `Avatar` calls) is exported from `Avatar.tsx` for
+this reason, so `Avatar.test.tsx` can assert the real seed-to-picture
+mapping directly - a stable, distinct-per-seed data URI, and `null` on
+a mocked `@dicebear/core` throw - without needing a real image
+pipeline; a separate full-render test still proves the whole component,
+not just the helper, survives a DiceBear failure and shows the initial.
+`@dicebear/core` has exactly one importer in this workspace, so mocking
+it in that one test can't leak into any other file's tests (verified:
+`assistant-ui`'s own `AvatarImage`-using tests pass unaffected).
+
+`avatar_file_id` (a real photo overriding the generated one, named in
+Home's own design doc as a separate field) isn't on the spec yet
+(`spec/schemas/person.schema.json` has only `avatar_seed`) and stays out
+of scope here - this item is the `avatar_seed`-to-picture half only.
+
+**Verification**: `ui/src/primitives/Avatar.test.tsx`, 9 tests passing
+(the four pre-existing initial/dot tests unchanged, plus five new:
+seed absent, a seed producing a stable and distinct-per-seed picture, a
+generation failure degrading to the initial without crashing at both
+the helper and the full-component level); `tsc --noEmit` and `eslint
+src` clean (pre-existing warnings elsewhere untouched). Low-effort
+review, two passes: the dependency-footprint finding above, fixed and
+re-reviewed clean on that hunk alone. `commons/scripts/check.sh` not
+yet run - queued behind two other lanes' gates tonight (serial on the
+shared dev machine).
