@@ -916,5 +916,19 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "voice.wakeword.enabled",
+    "scope": "device",
+    "selector": "boolean",
+    "default": false,
+    "label": "Wake word listening",
+    "help": "Let this device listen locally for its wake word. Listening is always visible and can be stopped from the indicator.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "device.voice",
+    "honoured_by": [
+      "home"
+    ]
   }
 ]

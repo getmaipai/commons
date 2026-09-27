@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.50] - 2026-09-27
+
+### Added
+- `settings/keys.json`: `voice.wakeword.enabled` is a device-scoped boolean, defaulting off, for explicit per-device opt-in to the locally installed stock wakeword detector. Home's `backend/src/settings/wakewordKeys.ts` is its source declaration; the registry was regenerated from that declaration and diffed against spec-v0.1.49 to confirm this is the only key change.
+
 ## [spec-v0.1.47] - 2026-09-27
 
 ### Added
