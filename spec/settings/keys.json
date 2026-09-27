@@ -406,6 +406,23 @@
     ]
   },
   {
+    "key": "notifications.file_shared.muted_senders",
+    "scope": "person",
+    "selector": "person",
+    "range": {
+      "multiple": true
+    },
+    "default": [],
+    "label": "Don't notify me about shares from",
+    "help": "Pick anyone in the household whose shared files you don't want a notification about. You'll still be notified about everyone else's.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "notifications.file.shared_with_household.telegram",
     "scope": "person",
     "selector": "boolean",
