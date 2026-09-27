@@ -37,8 +37,28 @@ export const labelSwapIn = "opacity-100 blur-none";
 export const labelSwapOut =
   "pointer-events-none select-none opacity-0 blur-[2px]";
 
+// Jesse found this live (2026-09-27): every collapsible built on this
+// token (ToolTimeline's own "N tool calls", the chat's own Sources
+// footer) opened and closed with no visible transition at all. The
+// class read `h-(--collapsible-panel-height)` - Tailwind v4's shorthand
+// for `height: var(--collapsible-panel-height)`, no fallback - but
+// nothing anywhere ever sets a variable of that exact name; Radix's own
+// Collapsible sets `--radix-collapsible-content-height` on the content
+// element during open/close (confirmed live via the element's own
+// inline style), a different name entirely. An undefined custom
+// property with no fallback computes to the property's own initial
+// value - `auto` for `height` - so the panel just rendered at its
+// natural content height with nothing to transition to or from; `auto`
+// isn't an animatable value regardless of the `transition-[height]`
+// declared alongside it. This file's own `globals.css` `@keyframes
+// collapsible-down`/`collapsible-up` already read the correct two-level
+// fallback (`var(--radix-collapsible-content-height,
+// var(--collapsible-panel-height, auto))`) - only this Tailwind class
+// had the wrong (missing) variable reference. Fixed to the identical
+// fallback chain, in the bracket form Tailwind's shorthand can't express
+// (no inline fallback syntax for the parenthesis form).
 export const collapsePanel =
-  "h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] data-[ending-style]:h-0 data-[starting-style]:h-0 motion-reduce:transition-none";
+  "h-[var(--radix-collapsible-content-height,var(--collapsible-panel-height,auto))] overflow-hidden transition-[height] duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] data-[ending-style]:h-0 data-[starting-style]:h-0 motion-reduce:transition-none";
 
 export const live = "text-blue-500 dark:text-blue-400";
 
