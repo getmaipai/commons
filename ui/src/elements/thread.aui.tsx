@@ -130,6 +130,10 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * plain text field, this component does not fall back to one on its
  * own. Opened upstream the same day, onto
  * assistant-ui/assistant-ui#8003 (`ui/docs/dashboard-upstream.md`).
+ * `onEditSend`, when set, is called when the edit composer sends its
+ * update, with the edited message's id and the following assistant
+ * message's `metadata.custom.turnId` when present. A caller can use the
+ * second value to link the replacement turn to the original turn.
  */
 export type ThreadComponents = {
   AssistantMessage?: ComponentType | undefined;
@@ -150,6 +154,7 @@ export type ThreadComponents = {
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
   ComposerInputOverride?: ComponentType | undefined;
+  onEditSend?: ((messageId: string, turnId?: string) => void) | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -1014,6 +1019,14 @@ const UserActionBar: FC = () => {
 };
 
 const EditComposer: FC = () => {
+  const { onEditSend } = useContext(ThreadComponentsContext);
+  const messageId = useAuiState((s) => s.message.id);
+  const messages = useAuiState((s) => s.thread.messages);
+  const messageIndex = messages.findIndex((message) => message.id === messageId);
+  const followingMessage = messageIndex >= 0 ? messages[messageIndex + 1] : undefined;
+  const turnId = followingMessage?.role === "assistant"
+    ? (followingMessage.metadata?.custom?.turnId as string | undefined)
+    : undefined;
   return (
     <MessagePrimitive.Root
       data-slot="aui_edit-composer-wrapper"
@@ -1031,7 +1044,11 @@ const EditComposer: FC = () => {
             </Button>
           </ComposerPrimitive.Cancel>
           <ComposerPrimitive.Send asChild>
-            <Button size="sm" className="h-8 px-3">
+            <Button
+              size="sm"
+              className="h-8 px-3"
+              onClick={() => onEditSend?.(messageId, turnId)}
+            >
               Update
             </Button>
           </ComposerPrimitive.Send>

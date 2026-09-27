@@ -4,6 +4,15 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.69] - ui-v0.5.69
+
+`elements/thread.aui.tsx`'s `ThreadComponents` gains an optional
+`onEditSend(messageId, turnId)` callback. The edit composer calls it
+with the message being edited and, when available, the following
+assistant message's `metadata.custom.turnId` when its Update action is
+clicked. A caller can associate the replacement turn with the original
+turn. Unset, every existing caller's render is unchanged.
+
 ## [0.5.35] - ui-v0.5.35
 
 `dashboard/layouts/full/`'s `Header.tsx` and `FullLayout.tsx` gain a
