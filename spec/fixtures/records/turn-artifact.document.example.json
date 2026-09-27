@@ -5,16 +5,16 @@
   "evidence_version": "outcome-document-01",
   "section": {
     "type": "document",
-    "attachment_id": "att-d1e2f3",
+    "file_id": "file-d1e2f3",
     "chunks": [
       {
-        "attachment_id": "att-d1e2f3",
+        "file_id": "file-d1e2f3",
         "page": 1,
         "text": "The first page of the household document.",
         "source_id": "src-d1e2f3"
       },
       {
-        "attachment_id": "att-d1e2f3",
+        "file_id": "file-d1e2f3",
         "page": 3,
         "text": "The requested third page says the garden opens at nine.",
         "source_id": "src-d1e2f4"
@@ -26,7 +26,7 @@
       "id": "src-d1e2f3",
       "kind": "package",
       "title": "Household document, page 1",
-      "url": "attachment://att-d1e2f3/page/1",
+      "url": "household-file://file-d1e2f3/page/1",
       "site": "MaiPai Home",
       "snippet": "The first page of the household document.",
       "source": "turn-d1e2f3",
@@ -37,7 +37,7 @@
       "id": "src-d1e2f4",
       "kind": "package",
       "title": "Household document, page 3",
-      "url": "attachment://att-d1e2f3/page/3",
+      "url": "household-file://file-d1e2f3/page/3",
       "site": "MaiPai Home",
       "snippet": "The requested third page says the garden opens at nine.",
       "source": "turn-d1e2f3",

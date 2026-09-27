@@ -1,0 +1,21 @@
+{
+  "id": "file-a1b2c3",
+  "owner_person_id": "person-a1b2c3",
+  "origin": "sent",
+  "kind": "document",
+  "media_type": "application/pdf",
+  "size": 24576,
+  "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "storage_path": "people/person-a1b2c3/files/file-a1b2c3.pdf",
+  "retention": "conversation",
+  "provenance": {
+    "conversation_id": "conv-d4e5f6",
+    "turn_id": "turn-a1b2c3",
+    "package_id": null,
+    "job_id": null,
+    "requested_by_person_id": null,
+    "note": "composer:upload"
+  },
+  "created_at": "2026-09-16T12:00:00Z",
+  "hlc": "1789588800000:0:hub001"
+}

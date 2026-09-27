@@ -7,6 +7,16 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.44] - 2026-09-26
+
+### Added
+- `file.schema.json` (STORE-SPEC-01, home `docs/plans/household-storage-2026-09-23.md`): the general record for anything a person made or sent, replacing `attachment.schema.json` (no attachment rows existed in any household yet, so the rename is free) and folding in the never-built `media.schema.json` (`MEDIA-RECORD-01`). Additive over the attachment shape: `origin` (`sent`, `made`, `exported`), `kind` (`image`, `video`, `audio`, `document`, `story`, `other`), and a structured `provenance` object (`conversation_id`/`turn_id` for a sent file, `package_id`/`turn_id`/`job_id` for one a package made, `requested_by_person_id`/`turn_id` for an export) replacing the old free-text `provenance` string and the old top-level `conversation_id`/`turn_id` fields; `retention` gains `kept` alongside the existing `conversation` value. No sharing field: `share.schema.json` is the pointer record for that. `fixtures/records/file.example.json` (the migrated attachment fixture, `origin: sent`) and `fixtures/records/file.made-image.example.json` (`origin: made`, `kind: image`, from a picture-generation job) both validate in TypeScript and Python.
+- `share.schema.json` (STORE-SPEC-01): the pointer record a file is shared through - `id`, `file_id`, `from_person_id`, `to` (a person id or `"household"`), `provenance`, `created_at`, `hlc`. No `kind`, `token`, or expiry fields yet; `share-link-01` (home `docs/plans/external-sharing-2026-09-23.md`) adds those additively for an external link. `fixtures/records/share.example.json` validates in TypeScript and Python.
+- `turn-artifact.schema.json`'s `document` section: `attachment_id` renamed to `file_id` (pattern `^file-[a-z0-9]{6,}$`), matching the record it cites. `fixtures/records/turn-artifact.document.example.json` updated, including its citation `url`'s pseudo-scheme (`attachment://` to `household-file://`).
+
+### Removed
+- `attachment.schema.json` and its fixture, superseded by `file.schema.json` above.
+
 ## [spec-v0.1.43] - 2026-09-26
 
 ### Fixed

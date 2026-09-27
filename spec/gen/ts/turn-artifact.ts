@@ -233,14 +233,20 @@ export const TurnArtifact = z
         z
           .object({
             type: z.literal("document"),
-            attachment_id: z.string().regex(new RegExp("^att-[a-z0-9]{6,}$")),
+            /**The file record (file.schema.json) this document's chunks were extracted from.*/
+            file_id: z
+              .string()
+              .regex(new RegExp("^file-[a-z0-9]{6,}$"))
+              .describe(
+                "The file record (file.schema.json) this document's chunks were extracted from.",
+              ),
             chunks: z
               .array(
                 z
                   .object({
-                    attachment_id: z
+                    file_id: z
                       .string()
-                      .regex(new RegExp("^att-[a-z0-9]{6,}$")),
+                      .regex(new RegExp("^file-[a-z0-9]{6,}$")),
                     page: z.number().int().gte(1),
                     text: z.string().min(1).max(4000),
                     /**The id of a citation in the document's top-level sources array.*/

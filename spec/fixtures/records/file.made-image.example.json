@@ -1,0 +1,21 @@
+{
+  "id": "file-b2c3d4",
+  "owner_person_id": "person-a1b2c3",
+  "origin": "made",
+  "kind": "image",
+  "media_type": "image/png",
+  "size": 1048576,
+  "sha256": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+  "storage_path": "people/person-a1b2c3/files/file-b2c3d4.png",
+  "retention": "kept",
+  "provenance": {
+    "conversation_id": null,
+    "turn_id": "turn-b2c3d4",
+    "package_id": "picture-studio",
+    "job_id": "job-a1b2c3",
+    "requested_by_person_id": null,
+    "note": null
+  },
+  "created_at": "2026-09-26T12:00:00Z",
+  "hlc": "1790510400000:0:hub001"
+}

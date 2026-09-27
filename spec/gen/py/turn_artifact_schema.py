@@ -38,7 +38,7 @@ class Chunk(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    attachment_id: constr(pattern=r'^att-[a-z0-9]{6,}$')
+    file_id: constr(pattern=r'^file-[a-z0-9]{6,}$')
     page: conint(ge=1)
     text: constr(min_length=1, max_length=4000)
     source_id: constr(pattern=r'^src-[a-z0-9]{6,}$') = Field(
@@ -52,7 +52,10 @@ class Document(BaseModel):
         extra='forbid',
     )
     type: Literal['document']
-    attachment_id: constr(pattern=r'^att-[a-z0-9]{6,}$')
+    file_id: constr(pattern=r'^file-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="The file record (file.schema.json) this document's chunks were extracted from.",
+    )
     chunks: list[Chunk] = Field(..., max_length=32, min_length=1)
 
 

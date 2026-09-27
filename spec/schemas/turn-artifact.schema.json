@@ -107,10 +107,10 @@
     "document": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "attachment_id", "chunks"],
+      "required": ["type", "file_id", "chunks"],
       "properties": {
         "type": { "const": "document" },
-        "attachment_id": { "type": "string", "pattern": "^att-[a-z0-9]{6,}$" },
+        "file_id": { "type": "string", "pattern": "^file-[a-z0-9]{6,}$", "description": "The file record (file.schema.json) this document's chunks were extracted from." },
         "chunks": {
           "type": "array",
           "minItems": 1,
@@ -118,9 +118,9 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["attachment_id", "page", "text", "source_id"],
+            "required": ["file_id", "page", "text", "source_id"],
             "properties": {
-              "attachment_id": { "type": "string", "pattern": "^att-[a-z0-9]{6,}$" },
+              "file_id": { "type": "string", "pattern": "^file-[a-z0-9]{6,}$" },
               "page": { "type": "integer", "minimum": 1 },
               "text": { "type": "string", "minLength": 1, "maxLength": 4000 },
               "source_id": { "$ref": "#/$defs/source_id" }

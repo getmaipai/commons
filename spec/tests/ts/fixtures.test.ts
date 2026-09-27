@@ -28,7 +28,8 @@ import { ConversationTurn } from "../../gen/ts/conversation-turn.js";
 import { OpenQuestion } from "../../gen/ts/open-question.js";
 import { ReplyFeedback } from "../../gen/ts/reply-feedback.js";
 import { TurnArtifact } from "../../gen/ts/turn-artifact.js";
-import { Attachment } from "../../gen/ts/attachment.js";
+import { File } from "../../gen/ts/file.js";
+import { Share } from "../../gen/ts/share.js";
 import { Artifact } from "../../gen/ts/artifact.js";
 import { Project } from "../../gen/ts/project.js";
 // ErrorEntry is standards-owned (std-v0.2.0), not generated here; the error
@@ -214,8 +215,14 @@ describe("record fixtures validate against their generated Zod models", () => {
     });
   }
 
-  test("attachment.example.json", () => {
-    expect(() => Attachment.parse(loadFixture("attachment.example.json"))).not.toThrow();
+  for (const name of ["file.example.json", "file.made-image.example.json"]) {
+    test(name, () => {
+      expect(() => File.parse(loadFixture(name))).not.toThrow();
+    });
+  }
+
+  test("share.example.json", () => {
+    expect(() => Share.parse(loadFixture("share.example.json"))).not.toThrow();
   });
 
   for (const kind of ["v1", "v2"]) {

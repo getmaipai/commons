@@ -12,12 +12,12 @@ from _standards import load_standards_module
 from pydantic import ValidationError
 
 from gen.py.artifact_schema import Artifact
-from gen.py.attachment_schema import Attachment
 from gen.py.content_ceiling_schema import ContentCeiling
 from gen.py.conversation_schema import Conversation
 from gen.py.conversation_turn_schema import ConversationTurn
 from gen.py.device_schema import Device
 from gen.py.entity_schema import Entity
+from gen.py.file_schema import File
 from gen.py.grant_schema import Grant
 from gen.py.issue_schema import Issue
 from gen.py.list_schema import List
@@ -33,6 +33,7 @@ from gen.py.reply_plan_schema import ReplyPlan
 from gen.py.safety_result_schema import SafetyResult
 from gen.py.setting_value_schema import SettingValue
 from gen.py.settings_key_schema import SettingsKey
+from gen.py.share_schema import Share
 from gen.py.source_schema import Source
 from gen.py.subject_ref_schema import Household, Unresolved, World
 from gen.py.turn_artifact_schema import TurnArtifact
@@ -162,8 +163,16 @@ def test_turn_signal_computed_fixture():
     TurnSignal.model_validate(load_fixture("turn-signal.computed.example.json"))
 
 
-def test_attachment_fixture():
-    Attachment.model_validate(load_fixture("attachment.example.json"))
+def test_file_fixture():
+    File.model_validate(load_fixture("file.example.json"))
+
+
+def test_file_made_image_fixture():
+    File.model_validate(load_fixture("file.made-image.example.json"))
+
+
+def test_share_fixture():
+    Share.model_validate(load_fixture("share.example.json"))
 
 
 def test_reply_plan_fixture():
