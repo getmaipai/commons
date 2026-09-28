@@ -128,8 +128,8 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                     to stack `studio:` with). The collapsed flat-vs-
                     gradient split (owner finding, "The collapsed rail")
                     is there too. */}
-                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="mx-[13px] w-auto h-auto py-[10px] gap-[14px] rounded-[8px] px-3 [&>svg]:size-[19px] data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
-                  <NavLink to={item.url} aria-label={item.title}>
+                <SidebarMenuButton asChild isActive={item.isActive} className="mx-[13px] w-auto h-auto py-[10px] gap-[14px] rounded-[8px] px-3 [&>svg]:size-[19px] data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
+                  <NavLink to={item.url} aria-label={item.title} title={item.tooltip ?? item.title}>
                   {/* aria-label, not just the visible span below: a
                       collapsed rail (tablet defaults to collapsed,
                       defaultRailOpen()'s own <1280px threshold) hides
