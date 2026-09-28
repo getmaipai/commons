@@ -139,7 +139,7 @@
             "properties": {
               "base_model": { "type": "string" },
               "format": { "type": "string", "enum": ["gguf-lora"] },
-              "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+              "url": { "type": "string", "pattern": "^https://" },
               "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
               "approx_bytes": { "type": "integer", "minimum": 1 },
               "corpus_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }

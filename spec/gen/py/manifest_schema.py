@@ -59,7 +59,7 @@ class StyleAdapter(BaseModel):
     )
     base_model: str
     format: Literal['gguf-lora']
-    url: AnyUrl
+    url: constr(pattern=r'^https://')
     sha256: constr(pattern=r'^[a-f0-9]{64}$')
     approx_bytes: conint(ge=1)
     corpus_sha256: constr(pattern=r'^[a-f0-9]{64}$')

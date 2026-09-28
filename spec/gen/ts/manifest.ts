@@ -149,7 +149,7 @@ export const PackageManifest = z
               .object({
                 base_model: z.string(),
                 format: z.literal("gguf-lora"),
-                url: z.string().url().regex(new RegExp("^https://")),
+                url: z.string().regex(new RegExp("^https://")),
                 sha256: z.string().regex(new RegExp("^[a-f0-9]{64}$")),
                 approx_bytes: z.number().int().gte(1),
                 corpus_sha256: z.string().regex(new RegExp("^[a-f0-9]{64}$")),

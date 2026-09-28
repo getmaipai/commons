@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.53] - 2026-09-28
+
+### Fixed
+- `manifest.schema.json`: remove `format: uri` from `companion.style_adapters[].url` so Python generation retains the same `^https://` pattern validation as TypeScript and JSON Schema.
+
 ## [spec-v0.1.52] - 2026-09-28
 
 ### Added
