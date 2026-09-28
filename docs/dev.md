@@ -1088,3 +1088,23 @@ re-reviewed clean on that hunk alone. `commons/scripts/check.sh` green
 end to end (core 126, ui 426, spec 569 TS + 250 pytest, all passing),
 rebased onto `origin/main` after `STORE-SPEC-01` (`spec-v0.1.44`)
 landed ahead of this in tonight's serial gate order.
+
+## SHELL-09: retire the old shell and chat kit blocks (2026-09-28)
+
+The Home cutover removed the kit's standalone `Shell`, its old dashboard
+sidebar/header blocks, and the unused chat, browser, state, and card
+blocks. Their tests and private helper modules went with them. The
+Elements chat's `ToolFallback` remains because Home still renders it for
+tool approvals; `DetailPane` remains because the schema renderer uses
+it; and the data-browser blocks remain for Home's existing Library page.
+The old chat `MemoryChip` has no Elements replacement today (recorded as
+low-priority getmaipai/home#184).
+
+Home's verification grep still finds the Library page importing
+`@maipai/ui/src/blocks/*`, and the Elements chat importing the retained
+`@maipai/ui/src/assistant-ui/tool-fallback.aui`. Those are real call sites,
+so the source-level no-import acceptance is not yet met; this release
+does not delete their dependencies.
+
+**Verification**: `scripts/check.sh` passes in Commons; the removal set
+was limited to files with no current production importers.

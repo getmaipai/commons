@@ -114,8 +114,8 @@ describe("WCAG AA contrast over the spec's surfaces (both themes)", () => {
   }
 });
 
-// A regression test for the bug a review caught live: MetricCard's
-// state-link color (a hue mixed toward --foreground, kit/utils.ts's own
+// A regression test for the shared hue-text color (a hue mixed toward
+// --foreground, kit/utils.ts's own
 // HUE_TEXT_MIX) read as low as 2.35:1 for a raw hue, and still 3.93:1
 // for teal specifically at an earlier 60/40 mix - every named hue, both
 // themes, against the panel surface the card actually renders on.
@@ -133,8 +133,8 @@ describe("WCAG AA contrast for the kit's hue-text-mix (both themes)", () => {
 });
 
 // A second, worse-case regression test found before shipping (not live):
-// StatusPill and TypeBadge tint their own pill background with the same
-// hue at 15% (spec section 1's "Pills and badges") and set the text to
+// StatusPill tints its pill background with the same
+// hue at 15% (spec section 1's "Pills and badges") and sets the text to
 // the hue color - checked by hand, every named hue failed 4.5:1 in light
 // theme (as low as 1.51:1 for teal), several in dark. The same
 // HUE_TEXT_MIX fix clears every hue, both themes, against that 15%-tinted
