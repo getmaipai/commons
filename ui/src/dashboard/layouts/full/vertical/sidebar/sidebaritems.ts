@@ -39,6 +39,7 @@ import {
   MessageCircle,
   LayoutGrid,
   Users,
+  Folder,
   LucideIcon,
 } from "lucide-react";
 
@@ -76,6 +77,12 @@ const SidebarContent: MenuItem[] = [
         name: "Tools",
         icon: LayoutGrid,
         url: "/next/tools",
+      },
+      {
+        id: uniqueId(),
+        name: "Library",
+        icon: Folder,
+        url: "/next/files",
       },
     ],
   },
