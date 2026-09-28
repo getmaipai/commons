@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.54] - 2026-09-28
+
+### Added
+- `biometric-print.schema.json`: a shared record for one accepted face or voice enrollment sample's reference embedding (person_id, modality, model_id, model_sha256, dim, embedding, consent_at, consented_by_person_id, timestamps, hlc), the commons-side piece bot's FACE-01 was blocked on (bot `docs/dev/face-voice-recognition-design-2026-09-28.md`, `docs/dev/design-face-recognition-models-2026-09-28.md`). `validate_biometric_print`/`validateBiometricPrint` check embedding's length against dim, the one thing JSON Schema can't express; wired into the shared cross-language conformance suite. Three fixtures: an adult's own face and voice prints, and a child's face print consented by a different, adult person_id.
+
 ## [spec-v0.1.53] - 2026-09-28
 
 ### Fixed
