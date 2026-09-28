@@ -142,6 +142,25 @@ export const PackageManifest = z
             "STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.",
           )
           .optional(),
+        /**Trained per-companion voice adapters by base model, as designed in the EVAL-03 design pass.*/
+        style_adapters: z
+          .array(
+            z
+              .object({
+                base_model: z.string(),
+                format: z.literal("gguf-lora"),
+                url: z.string().url().regex(new RegExp("^https://")),
+                sha256: z.string().regex(new RegExp("^[a-f0-9]{64}$")),
+                approx_bytes: z.number().int().gte(1),
+                corpus_sha256: z.string().regex(new RegExp("^[a-f0-9]{64}$")),
+              })
+              .strict(),
+          )
+          .max(8)
+          .describe(
+            "Trained per-companion voice adapters by base model, as designed in the EVAL-03 design pass.",
+          )
+          .optional(),
       })
       .strict()
       .describe(

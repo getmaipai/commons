@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.52] - 2026-09-28
+
+### Added
+- `manifest.schema.json`: optional `companion.style_adapters` declarations identify a companion's GGUF LoRA adapter per base model, with download size, artifact checksum, and corpus checksum. The TypeScript and Python fixture suites validate a companion manifest carrying an adapter alongside the existing manifest fixture without this optional field (STYLE-SPEC-01, home `docs/BACKLOG.md`).
+
 ## [spec-v0.1.50] - 2026-09-27
 
 ### Added

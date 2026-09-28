@@ -196,3 +196,45 @@ describe("PackageManifest.companion.status_phrases (STATUS-PHRASES-01)", () => {
     expect(() => PackageManifest.parse(manifest)).toThrow();
   });
 });
+
+describe("PackageManifest.companion.style_adapters (STYLE-SPEC-01)", () => {
+  const COMPANION_BASE = {
+    ...BASE,
+    kind: "companion",
+    companion: { display_name: "Example", formality: "neutral", complexity: "standard", engagement: "balanced", filler_density: "light" },
+  } as const;
+  const ENTRY = {
+    base_model: "qwen3-8b-instruct-q4-k-m",
+    format: "gguf-lora",
+    url: "https://example.invalid/adapters/example.gguf",
+    sha256: "a".repeat(64),
+    approx_bytes: 41943040,
+    corpus_sha256: "b".repeat(64),
+  } as const;
+
+  test("a manifest with a well-formed style_adapters entry validates", () => {
+    expect(() =>
+      PackageManifest.parse({
+        ...COMPANION_BASE,
+        companion: { ...COMPANION_BASE.companion, style_adapters: [ENTRY] },
+      }),
+    ).not.toThrow();
+  });
+
+  test('an entry missing sha256, or with format: "peft" instead of "gguf-lora", is refused and the validator names the wrong field', () => {
+    const { sha256: _sha256, ...missingChecksum } = ENTRY;
+    const missing = PackageManifest.safeParse({
+      ...COMPANION_BASE,
+      companion: { ...COMPANION_BASE.companion, style_adapters: [missingChecksum] },
+    });
+    expect(missing.success).toBe(false);
+    if (!missing.success) expect(missing.error.issues.map((issue) => issue.path.join("."))).toContain("companion.style_adapters.0.sha256");
+
+    const invalid = PackageManifest.safeParse({
+      ...COMPANION_BASE,
+      companion: { ...COMPANION_BASE.companion, style_adapters: [{ ...ENTRY, format: "peft" }] },
+    });
+    expect(invalid.success).toBe(false);
+    if (!invalid.success) expect(invalid.error.issues.map((issue) => issue.path.join("."))).toContain("companion.style_adapters.0.format");
+  });
+});

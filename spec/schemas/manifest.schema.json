@@ -127,6 +127,24 @@
               "minItems": 1
             }
           }
+        },
+        "style_adapters": {
+          "type": "array",
+          "maxItems": 8,
+          "description": "Trained per-companion voice adapters by base model, as designed in the EVAL-03 design pass.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["base_model", "format", "url", "sha256", "approx_bytes", "corpus_sha256"],
+            "properties": {
+              "base_model": { "type": "string" },
+              "format": { "type": "string", "enum": ["gguf-lora"] },
+              "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+              "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "approx_bytes": { "type": "integer", "minimum": 1 },
+              "corpus_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            }
+          }
         }
       }
     },

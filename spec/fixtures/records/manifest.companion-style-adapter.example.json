@@ -1,0 +1,81 @@
+{
+  "id": "companion-example",
+  "version": "0.1.0",
+  "kind": "companion",
+  "category": "Family",
+  "display": "Example companion",
+  "description": "Sets a spoken reminder at a chosen time for a chosen person.",
+  "author": "MaiPai",
+  "license": "AGPL-3.0",
+  "homepage": "https://github.com/getmaipai/catalog",
+  "routing": {
+    "examples": [
+      "remind Riff to go to bed at 9",
+      "set a bedtime reminder for Sprout at 8:30",
+      "bedtime reminder for the kids at 8",
+      "tell me when it's bedtime",
+      "wake, remind Riff about bedtime at nine"
+    ],
+    "patterns": [
+      "bedtime reminder",
+      "remind * to go to bed"
+    ]
+  },
+  "args": {
+    "type": "object",
+    "required": [
+      "person",
+      "time"
+    ],
+    "properties": {
+      "person": {
+        "type": "string"
+      },
+      "time": {
+        "type": "string"
+      }
+    }
+  },
+  "incognito": "unaffected",
+  "requires": [],
+  "optional": [
+    "speaker"
+  ],
+  "platforms": [
+    "home",
+    "bot"
+  ],
+  "min_role": "child",
+  "consequential": false,
+  "offline": "full",
+  "config": [],
+  "data_sources": [],
+  "permissions": [
+    "schedule",
+    "speak"
+  ],
+  "notifications": [],
+  "backup": "hot",
+  "background": false,
+  "contributes": {},
+  "min_app": "0.1.0",
+  "tier": 0,
+  "quality_scale": "bronze",
+  "companion": {
+    "display_name": "Example",
+    "formality": "neutral",
+    "complexity": "standard",
+    "engagement": "balanced",
+    "filler_density": "light",
+    "style_adapters": [
+      {
+        "base_model": "qwen3-8b-instruct-q4-k-m",
+        "format": "gguf-lora",
+        "url": "https://example.invalid/adapters/example.gguf",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "approx_bytes": 41943040,
+        "corpus_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    ]
+  }
+}

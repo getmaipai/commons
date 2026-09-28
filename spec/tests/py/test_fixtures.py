@@ -121,6 +121,12 @@ def test_manifest_fixture():
     PackageManifest.model_validate(load_fixture("manifest.example.json"))
 
 
+def test_manifest_companion_style_adapter_fixture():
+    PackageManifest.model_validate(
+        load_fixture("manifest.companion-style-adapter.example.json")
+    )
+
+
 def test_manifest_reference_fixture():
     PackageManifest.model_validate(load_fixture("manifest.reference.example.json"))
 

@@ -140,6 +140,10 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
+  test("manifest.companion-style-adapter.example.json", () => {
+    expect(() => PackageManifest.parse(loadFixture("manifest.companion-style-adapter.example.json"))).not.toThrow();
+  });
+
   test("manifest.reference.example.json", () => {
     expect(() =>
       PackageManifest.parse(loadFixture("manifest.reference.example.json")),
