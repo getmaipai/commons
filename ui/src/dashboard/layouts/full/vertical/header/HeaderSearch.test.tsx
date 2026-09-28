@@ -46,12 +46,12 @@ describe("HeaderSearch (SHELL-SEARCH-01)", () => {
     expect(getByPlaceholderText("Search...")).not.toBeNull();
   });
 
-  test('typing "peo" lists People and Enter navigates to it', () => {
+  test('typing "fam" lists Family and Enter navigates to it', () => {
     const { getByRole, getByPlaceholderText, getByText, queryByText, getByTestId } = render(<Harness />);
     fireEvent.click(getByRole("button", { name: "Search" }));
     const input = getByPlaceholderText("Search...");
-    fireEvent.change(input, { target: { value: "peo" } });
-    expect(getByText("People")).not.toBeNull();
+    fireEvent.change(input, { target: { value: "fam" } });
+    expect(getByText("Family")).not.toBeNull();
     expect(queryByText("Chat")).toBeNull();
     fireEvent.keyDown(input, { key: "Enter" });
     expect(getByTestId("location").textContent).toBe("/next/people");

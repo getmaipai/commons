@@ -37,7 +37,6 @@ import { uniqueId } from "lodash";
 import {
   House,
   MessageCircle,
-  LayoutGrid,
   Users,
   Folder,
   LucideIcon,
@@ -71,15 +70,6 @@ const SidebarContent: MenuItem[] = [
       },
       {
         id: uniqueId(),
-        // This page lists internal tool-capability plugins, not apps a
-        // person opens; reserve "Apps" for future user-facing apps (owner
-        // ruling, ui-v0.5.62, 2026-09-25).
-        name: "Tools",
-        icon: LayoutGrid,
-        url: "/next/tools",
-      },
-      {
-        id: uniqueId(),
         name: "Library",
         icon: Folder,
         url: "/next/files",
@@ -91,7 +81,7 @@ const SidebarContent: MenuItem[] = [
     items: [
       {
         id: uniqueId(),
-        name: "People",
+        name: "Family",
         icon: Users,
         url: "/next/people",
       },

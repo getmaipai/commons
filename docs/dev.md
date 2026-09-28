@@ -1109,3 +1109,8 @@ intentional exception to the broad retired-wiring grep.
 
 **Verification**: `scripts/check.sh` passes in Commons; the removal set
 was limited to files with no current production importers.
+
+## FAMILY-NAV-01: remove Tools and rename People to Family (2026-09-28, `ui-v0.5.79`)
+
+The shared dashboard sidebar no longer lists Tools, and its Household
+entry is labeled Family. The People route and Users icon are unchanged.
