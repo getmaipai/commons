@@ -1096,15 +1096,16 @@ sidebar/header blocks, and the unused chat, browser, state, and card
 blocks. Their tests and private helper modules went with them. The
 Elements chat's `ToolFallback` remains because Home still renders it for
 tool approvals; `DetailPane` remains because the schema renderer uses
-it; and the data-browser blocks remain for Home's existing Library page.
+it. The Library page has since moved to Home's Next shell, so its old
+data-browser block imports were removed with that page.
 The old chat `MemoryChip` has no Elements replacement today (recorded as
 low-priority getmaipai/home#184).
 
-Home's verification grep still finds the Library page importing
-`@maipai/ui/src/blocks/*`, and the Elements chat importing the retained
-`@maipai/ui/src/assistant-ui/tool-fallback.aui`. Those are real call sites,
-so the source-level no-import acceptance is not yet met; this release
-does not delete their dependencies.
+Home's Phase 3 verification grep now finds no imports from `@maipai/ui/src/Shell`
+or `@maipai/ui/src/blocks/`. The only `assistant-ui/` match is the
+Elements chat's retained `ToolFallback` import; Home's owner explicitly
+ruled that live approval UI in scope to keep, so it remains as the single
+intentional exception to the broad retired-wiring grep.
 
 **Verification**: `scripts/check.sh` passes in Commons; the removal set
 was limited to files with no current production importers.
