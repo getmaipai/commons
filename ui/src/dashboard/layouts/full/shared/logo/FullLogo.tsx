@@ -5,7 +5,7 @@ import { cn, hitArea } from "../../../../../utils";
 
 const FullLogo = () => {
   return (
-    <Link to={'/'} className={cn("max-w-[40px] block lg:max-w-[120px] overflow-hidden", hitArea(2))}>
+    <Link to={'/'} className={cn("relative max-w-[40px] block lg:max-w-[120px] overflow-hidden", hitArea(2))}>
       {/* Dark Logo   */}
       <img
         src={Logo}

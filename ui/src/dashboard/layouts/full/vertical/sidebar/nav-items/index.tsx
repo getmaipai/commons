@@ -3,7 +3,6 @@ import { ChevronRight } from "lucide-react";
 import { ChildItem } from "../sidebaritems";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
-import { hitArea } from "../../../../../../utils";
 
 interface NavItemProps {
   item: ChildItem;
@@ -22,10 +21,10 @@ export default function NavItem({
 
   // Owner ruling, 2026-09-27, accessibility touch-target fix - see
   // docs/BACKLOG.md SHELL-09. Preserve the sidebar's 40px row appearance;
-  // the kit's transparent hit area brings each link to 48px.
+  // 48px link rows are applied by nav-collapse, where the real anchors live.
   return (
 
-    <motion.div className={cn("relative flex items-center gap-3 w-full group group-data-[state=collapsed]:px-2.5 px-3 py-2 my-0.5 transition-all duration-200 rounded-md", hitArea(1),
+    <motion.div className={cn("relative flex items-center gap-3 w-full group group-data-[state=collapsed]:px-2.5 px-3 py-2 my-0.5 transition-all duration-200 rounded-md",
       isActive && "bg-primary text-background font-medium", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

@@ -55,7 +55,7 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
                   to={item.url || "#"}
                   target={item.external ? "_blank" : undefined}
                   className={cn(
-                    "flex items-center gap-3  rounded-md transition-all duration-200 ease-in-out ",
+                    "relative flex min-h-12 items-center gap-3 rounded-md transition-all duration-200 ease-in-out",
 
                     className,
                   )}
@@ -104,8 +104,8 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
                         key={index}
                         to={sub.url || "#"}
                         target={sub.external ? "_blank" : undefined}
-                        className={cn(
-                          "block rounded-md transition-all duration-200 ease-in-out",
+                      className={cn(
+                          "relative flex min-h-12 items-center rounded-md transition-all duration-200 ease-in-out",
 
                           className,
                         )}
