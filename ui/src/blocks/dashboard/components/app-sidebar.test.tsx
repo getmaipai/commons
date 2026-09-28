@@ -41,6 +41,7 @@ describe("AppSidebar", () => {
     );
     expect(getByRole("link", { name: "Apps" })).toHaveAttribute("data-active", "true");
     expect(getByRole("link", { name: "Home" })).not.toHaveAttribute("data-active", "true");
+    expect(getByRole("link", { name: "Apps" }).closest("button")).toBeNull();
   });
 
   test("renders the footer slot only when given", () => {

@@ -129,6 +129,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                     gradient split (owner finding, "The collapsed rail")
                     is there too. */}
                 <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.tooltip ?? item.title} className="mx-[13px] w-auto h-auto py-[10px] gap-[14px] rounded-[8px] px-3 [&>svg]:size-[19px] data-[active=true]:bg-gradient-to-br data-[active=true]:from-[var(--hue-violet)] data-[active=true]:to-[var(--hue-violet-deep)] data-[active=true]:text-white data-[active=true]:hover:text-white">
+                  <NavLink to={item.url} aria-label={item.title}>
                   {/* aria-label, not just the visible span below: a
                       collapsed rail (tablet defaults to collapsed,
                       defaultRailOpen()'s own <1280px threshold) hides
@@ -139,8 +140,7 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                       so it does not cover this. A real a11y regression
                       the fix below introduced and the tablet sweep
                       caught before this line was corrected. */}
-                  <NavLink to={item.url} aria-label={item.title}>
-                    {Icon && <Icon aria-hidden />}
+                  {Icon && <Icon aria-hidden />}
                     {/* group-data-[collapsible=icon]:hidden, matching
                         SidebarGroupLabel's own class two lines up - found
                         live (a real household report, 2026-09-20): without
@@ -157,9 +157,9 @@ export function NavMain({ groups }: { groups: NavGroup[] }) {
                         font-medium (500, the nearest Tailwind step to
                         the reference's own 520) is unconditional since
                         LOOK-01 - previously gated behind `studio:`. */}
-                    <span className="text-sm font-medium group-data-[collapsible=icon]:hidden">{item.title}</span>
-                    {item.dot ? <span aria-hidden className={`size-2.5 rounded-full ${DOT[item.dot]}`} /> : null}
-                    {item.badge != null && item.badge > 0 && <span className="ml-auto text-xs text-muted-foreground">{item.badge}</span>}
+                  <span className="text-sm font-medium group-data-[collapsible=icon]:hidden">{item.title}</span>
+                  {item.dot ? <span aria-hidden className={`size-2.5 rounded-full ${DOT[item.dot]}`} /> : null}
+                  {item.badge != null && item.badge > 0 && <span className="ml-auto text-xs text-muted-foreground">{item.badge}</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>

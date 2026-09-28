@@ -22,6 +22,8 @@ const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
             variant="inset"
             collapsible="icon"
             {...props}
+            role="navigation"
+            aria-label="Primary navigation"
             className="sidebar-box **:data-[slot=sidebar-inner]:bg-background **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-border group-data-[state=collapsed]:hover:shadow-xl"
             side="left"
         >
