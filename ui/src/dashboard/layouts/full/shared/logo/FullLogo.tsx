@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import Logo from "../../../../assets/images/logos/darklogo.svg";
 import Logowhite from "../../../../assets/images/logos/whitelogo.svg";
-import { cn, hitArea } from "../../../../utils";
+import { cn, hitArea } from "../../../../../utils";
 
 const FullLogo = () => {
   return (

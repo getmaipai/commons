@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
 import { cn } from "../../../../lib/utils";
 import { LifeBuoy, Settings, X } from "lucide-react";
 import { Link } from "react-router";
-import { hitArea } from "../../../../utils";
+import { hitArea } from "../../../../../utils";
 
 const navItems = [
   { title: "Settings", href: "/next/settings", icon: Settings },

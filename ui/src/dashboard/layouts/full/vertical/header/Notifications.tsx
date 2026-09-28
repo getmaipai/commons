@@ -12,7 +12,7 @@ import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import { cn } from "../../../../lib/utils";
 import { Link } from "react-router";
-import { hitArea } from "../../../../utils";
+import { hitArea } from "../../../../../utils";
 
 const Notifications = ({ className }: { className?: string }) => {
     const [notifications, setNotifications] = useState(NotificationData.Notification);

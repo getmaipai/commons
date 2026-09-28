@@ -1,6 +1,6 @@
 import { Button } from "../../../../components/ui/button";
 import { cn } from "../../../../lib/utils";
-import { hitArea } from "../../../../utils";
+import { hitArea } from "../../../../../utils";
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../../../../context/shadcntheme/ThemeContext";

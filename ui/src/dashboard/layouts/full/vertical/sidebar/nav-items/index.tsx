@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { ChildItem } from "../sidebaritems";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
-import { hitArea } from "../../../../../utils";
+import { hitArea } from "../../../../../../utils";
 
 interface NavItemProps {
   item: ChildItem;

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Search as SearchIcon } from "lucide-react";
 import { defaultFilter } from "cmdk";
 import { Button } from "../../../../components/ui/button";
+import { cn } from "../../../../lib/utils";
 import {
   Command,
   CommandDialog,
@@ -13,7 +14,7 @@ import {
   CommandList,
 } from "../../../../components/ui/command";
 import SidebarContent, { type ChildItem } from "../../vertical/sidebar/sidebaritems";
-import { hitArea } from "../../../../utils";
+import { hitArea } from "../../../../../utils";
 
 interface FlatItem {
   key: string;
