@@ -1,4 +1,6 @@
 import { Button } from "../../../../components/ui/button";
+import { cn } from "../../../../lib/utils";
+import { hitArea } from "../../../../utils";
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../../../../context/shadcntheme/ThemeContext";
@@ -50,16 +52,21 @@ const LightDark = () => {
       {activeMode === "light" ? (
         <Button
           variant="ghost"
-          className=" h-10 w-10  hover:bg-primary/5  rounded-full cursor-pointer"
+          // Owner ruling, 2026-09-27, accessibility touch-target fix - see
+          // docs/BACKLOG.md SHELL-09. Preserve the 40px icon appearance;
+          // extend its tappable area to the kit's 48px floor.
+          className={cn("h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer", hitArea(1))}
           onClick={toggleTheme}
         >
           <Moon className="size-5" />
         </Button>
       ) : (
+        // Owner ruling, 2026-09-27, accessibility touch-target fix - see
+        // docs/BACKLOG.md SHELL-09. Same 40px icon with a 48px hit area.
         // Dark Mode Button
         <Button
           variant="ghost"
-          className=" h-10 w-10  hover:bg-primary/5  rounded-full cursor-pointer"
+          className={cn("h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer", hitArea(1))}
           onClick={toggleTheme}
         >
           <Sun className="size-5" />
@@ -70,5 +77,3 @@ const LightDark = () => {
 };
 
 export default LightDark;
-
-

@@ -13,6 +13,7 @@ import {
   CommandList,
 } from "../../../../components/ui/command";
 import SidebarContent, { type ChildItem } from "../../vertical/sidebar/sidebaritems";
+import { hitArea } from "../../../../utils";
 
 interface FlatItem {
   key: string;
@@ -201,7 +202,10 @@ const HeaderSearch = ({ remote }: HeaderSearchProps = {}) => {
       <Button
         variant="ghost"
         aria-label="Search"
-        className="h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer"
+        // Owner ruling, 2026-09-27, accessibility touch-target fix - see
+        // docs/BACKLOG.md SHELL-09. Keep the 40px search artwork and add
+        // the shared kit's 48px hit area around it.
+        className={cn("h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer", hitArea(1))}
         onClick={() => setOpen(true)}
       >
         <SearchIcon className="size-5" />

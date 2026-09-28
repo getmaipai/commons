@@ -25,6 +25,9 @@ export function NavUser() {
         },
     ]
 
+    // Owner ruling, 2026-09-27, accessibility touch-target fix - see
+    // docs/BACKLOG.md SHELL-09. Keep the existing compact row artwork and
+    // give each Settings/Help link a full 48px row target.
     return (
         <SidebarGroup className="mt-auto p-0">
             <SidebarGroupContent>
@@ -33,7 +36,7 @@ export function NavUser() {
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton size="lg" className="h-full cursor-pointer">
                                 <Link to={item.url}>
-                                    <div className="flex items-center gap-3 w-full">
+                                    <div className="relative flex min-h-12 items-center gap-3 w-full">
                                         <item.icon className="shadow-none size-5 shrink-0" />
                                         <div className="flex flex-col flex-1 text-left text-sm leading-tight hide-menu whitespace-nowrap">
                                             <span className="truncate font-medium">{item.title}</span>

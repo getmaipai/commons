@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
 import { cn } from "../../../../lib/utils";
 import { LifeBuoy, Settings, X } from "lucide-react";
 import { Link } from "react-router";
+import { hitArea } from "../../../../utils";
 
 const navItems = [
   { title: "Settings", href: "/next/settings", icon: Settings },
@@ -30,7 +31,10 @@ export default function ProfileSheet({ displayName = "" }: { displayName?: strin
     <Sheet>
       <SheetTrigger
         aria-label={displayName ? `Open account menu for ${displayName}` : "Open account menu"}
-        className="cursor-pointer hover:bg-primary/5 flex items-center justify-center rounded-full h-10 w-10"
+        // Owner ruling, 2026-09-27, accessibility touch-target fix - see
+        // docs/BACKLOG.md SHELL-09. Keep the 40px avatar and extend its
+        // tappable area to the shared 48px floor.
+        className={cn("cursor-pointer hover:bg-primary/5 flex items-center justify-center rounded-full h-10 w-10", hitArea(1))}
       >
         <Avatar className="h-8 w-8">
           <AvatarFallback>{initials(displayName)}</AvatarFallback>

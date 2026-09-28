@@ -12,6 +12,7 @@ import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import { cn } from "../../../../lib/utils";
 import { Link } from "react-router";
+import { hitArea } from "../../../../utils";
 
 const Notifications = ({ className }: { className?: string }) => {
     const [notifications, setNotifications] = useState(NotificationData.Notification);
@@ -26,11 +27,13 @@ const Notifications = ({ className }: { className?: string }) => {
         setNotifications(updatedNotifications);
     };
 
+    // Owner ruling, 2026-09-27, accessibility touch-target fix - see
+    // docs/BACKLOG.md SHELL-09. The unlabeled trigger was also a button-name
+    // axe failure; keep its 40px visual while adding the shared 48px hit area.
     return (
         <div className={cn("", className)}>
             <DropdownMenu>
-                <DropdownMenuTrigger>
-                    <div className="relative cursor-pointer">
+                <DropdownMenuTrigger aria-label="Notifications" className={cn("relative cursor-pointer", hitArea(1))}>
                         {unreadCount > 0 && (
                             <>
                                 <span className="h-2.5 w-2.5 bg-destructive rounded-full absolute top-1 end-2 text-xs text-center text-white z-1 animate-ping" />
@@ -42,7 +45,6 @@ const Notifications = ({ className }: { className?: string }) => {
                                 className="size-5"
                             />
                         </div>
-                    </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                     align="end"

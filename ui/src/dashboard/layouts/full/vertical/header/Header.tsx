@@ -16,6 +16,7 @@ import LightDark from "./Light-Dark";
 import Notifications from "./Notifications";
 import HeaderSearch, { type HeaderSearchProps } from "./HeaderSearch";
 import { useHeaderExtraLeft } from "./HeaderExtraContext";
+import { hitArea } from "../../../../../utils";
 
 export interface HeaderProps {
   /** SHELL-SEARCH-02 (home, 2026-09-23): threaded straight through to
@@ -61,7 +62,10 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
       type="button"
       variant="ghost"
       size="icon"
-      className="h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 text-muted-foreground"
+      // Owner ruling, 2026-09-27, accessibility touch-target fix - see
+      // docs/BACKLOG.md SHELL-09. Keep the existing 40px visual control;
+      // the shared kit's hitArea(1) gives it a 48px tappable area.
+      className={cn("h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 text-muted-foreground", hitArea(1))}
       aria-label="Incognito Off"
       aria-pressed="false"
       title="Incognito off"
@@ -124,7 +128,7 @@ const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognito
               <Button
                 variant="ghost"
                 size="icon"
-                className="p-2 hover:bg-primary/5 rounded-full transition cursor-pointer"
+                className={cn("p-2 hover:bg-primary/5 rounded-full transition cursor-pointer", hitArea(2))}
                 onClick={toggleSidebar}
               >
                 <PanelLeft size={21}

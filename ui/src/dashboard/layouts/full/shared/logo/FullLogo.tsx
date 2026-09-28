@@ -1,10 +1,11 @@
 import { Link } from "react-router";
 import Logo from "../../../../assets/images/logos/darklogo.svg";
 import Logowhite from "../../../../assets/images/logos/whitelogo.svg";
+import { cn, hitArea } from "../../../../utils";
 
 const FullLogo = () => {
   return (
-    <Link to={'/'} className="max-w-[40px] block lg:max-w-[120px] overflow-hidden">
+    <Link to={'/'} className={cn("max-w-[40px] block lg:max-w-[120px] overflow-hidden", hitArea(2))}>
       {/* Dark Logo   */}
       <img
         src={Logo}
