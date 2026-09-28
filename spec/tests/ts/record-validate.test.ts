@@ -21,6 +21,7 @@ import {
   validateReplyConstraint,
   validateSubjectRef,
   validateArtifact,
+  validateBiometricPrint,
   inverseRelationship,
 } from "../../records/ts/validate.js";
 import type { Entity } from "../../gen/ts/entity.js";
@@ -32,12 +33,14 @@ import type { TurnSignal } from "../../gen/ts/turn-signal.js";
 import type { OpenQuestion } from "../../gen/ts/open-question.js";
 import type { ReplyConstraint } from "../../gen/ts/reply-constraint.js";
 import type { SubjectRef } from "../../gen/ts/subject-ref.js";
+import type { BiometricPrint } from "../../gen/ts/biometric-print.js";
 import { MemoryRecord as MemoryRecordSchema } from "../../gen/ts/memory-record.js";
 import { TurnSignal as TurnSignalSchema } from "../../gen/ts/turn-signal.js";
 import { OpenQuestion as OpenQuestionSchema } from "../../gen/ts/open-question.js";
 import { ReplyConstraint as ReplyConstraintSchema } from "../../gen/ts/reply-constraint.js";
 import { SubjectRef as SubjectRefSchema } from "../../gen/ts/subject-ref.js";
 import { Artifact as ArtifactSchema } from "../../gen/ts/artifact.js";
+import { BiometricPrint as BiometricPrintSchema } from "../../gen/ts/biometric-print.js";
 
 const FIXTURES = join(import.meta.dir, "..", "..", "fixtures", "records");
 const load = <T>(name: string): T => JSON.parse(readFileSync(join(FIXTURES, name), "utf-8")) as T;
@@ -58,6 +61,9 @@ const worldSubjectRef = () => load<SubjectRef>("subject-ref.world.example.json")
 const shoppingList = () => load<List>("list.shopping.example.json");
 const todoList = () => load<List>("list.todo.example.json");
 const customList = () => load<List>("list.custom.example.json");
+const facePrint = () => load<BiometricPrint>("biometric-print.face.example.json");
+const voicePrint = () => load<BiometricPrint>("biometric-print.voice.example.json");
+const childPrint = () => load<BiometricPrint>("biometric-print.child.example.json");
 
 const VALIDATION_FIXTURES = join(import.meta.dir, "..", "..", "fixtures", "validation");
 type ValidationCase = { name: string; kind: string; base: string; overrides?: Record<string, unknown>; expected: "accept" | "refuse"; rule?: string };
@@ -82,6 +88,30 @@ describe("every shipped fixture is valid", () => {
   });
   test("memory record", () => {
     expect(validateMemoryRecord(memoryRecord())).toEqual([]);
+  });
+  test("biometric prints", () => {
+    for (const p of [facePrint(), voicePrint(), childPrint()]) expect(validateBiometricPrint(p)).toEqual([]);
+  });
+});
+
+describe("biometric print rules", () => {
+  test("a child's print names the consenting adult, not the child", () => {
+    const child = childPrint();
+    expect(child.consented_by_person_id).not.toBe(child.person_id);
+    expect(validateBiometricPrint(child)).toEqual([]);
+  });
+
+  test("embedding length must match dim", () => {
+    expect(validateBiometricPrint({ ...facePrint(), dim: 5 })).toContainEqual(
+      expect.stringContaining("they must agree"),
+    );
+  });
+
+  test("a print from a different model still parses and validates - refusing a foreign model is the matcher's own job, not the record's", () => {
+    // BiometricPrint itself has no notion of "the model this device runs" -
+    // that comparison is FaceGallery.add()'s job on the bot side
+    // (ForeignModelPrint), not something the record shape can express.
+    expect(validateBiometricPrint({ ...facePrint(), model_id: "some-other-model" })).toEqual([]);
   });
 });
 
@@ -289,6 +319,7 @@ describe("shared cross-language validation conformance", () => {
           const subject = SubjectRefSchema.parse(raw);
           problems = validateSubjectRef(subject);
         } else if (fixture.kind === "artifact") problems = validateArtifact(ArtifactSchema.parse(raw));
+        else if (fixture.kind === "print") problems = validateBiometricPrint(BiometricPrintSchema.parse(raw));
       } catch {
         schemaRefused = true;
       }

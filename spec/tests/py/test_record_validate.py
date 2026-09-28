@@ -11,6 +11,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from gen.py.artifact_schema import Artifact
+from gen.py.biometric_print_schema import BiometricPrint
 from gen.py.entity_schema import Entity
 from gen.py.grant_schema import Grant
 from gen.py.list_schema import List
@@ -23,6 +24,7 @@ from gen.py.turn_signal_schema import TurnSignal
 from records.py.validate import (
     inverse_relationship,
     validate_artifact,
+    validate_biometric_print,
     validate_entity,
     validate_grant,
     validate_list,
@@ -112,6 +114,18 @@ def custom_list() -> List:
     return List.model_validate(load("list.custom.example.json"))
 
 
+def face_print() -> BiometricPrint:
+    return BiometricPrint.model_validate(load("biometric-print.face.example.json"))
+
+
+def voice_print() -> BiometricPrint:
+    return BiometricPrint.model_validate(load("biometric-print.voice.example.json"))
+
+
+def child_print() -> BiometricPrint:
+    return BiometricPrint.model_validate(load("biometric-print.child.example.json"))
+
+
 def test_shipped_entity_fixtures_are_valid():
     for e in [person(), pet(), place()]:
         assert validate_entity(e) == []
@@ -137,6 +151,36 @@ def test_shipped_memory_record_fixture_is_valid():
 
 def test_legacy_memory_record_fixture_is_valid():
     assert validate_memory_record(legacy_memory_record()) == []
+
+
+def test_shipped_biometric_print_fixtures_are_valid():
+    for p in [face_print(), voice_print(), child_print()]:
+        assert validate_biometric_print(p) == []
+
+
+# --- biometric print rules ---
+
+
+def test_a_childs_print_names_the_consenting_adult_not_the_child():
+    child = child_print()
+    assert child.consented_by_person_id != child.person_id
+    assert validate_biometric_print(child) == []
+
+
+def test_embedding_length_must_match_dim():
+    bad = face_print()
+    bad.dim = 5
+    assert any("they must agree" in p for p in validate_biometric_print(bad))
+
+
+def test_a_print_from_a_different_model_still_parses_and_validates():
+    """BiometricPrint itself has no notion of "the model this device
+    runs" - that comparison is FaceGallery.add()'s own job on the bot
+    side (ForeignModelPrint), not something the record shape can
+    express."""
+    bad = face_print()
+    bad.model_id = "some-other-model"
+    assert validate_biometric_print(bad) == []
 
 
 # --- entity rules ---
@@ -755,6 +799,8 @@ def test_shared_cross_language_validation_conformance():
                 problems = validate_subject_ref(World.model_validate(raw))
             elif case["kind"] == "artifact":
                 problems = validate_artifact(Artifact.model_validate(raw))
+            elif case["kind"] == "print":
+                problems = validate_biometric_print(BiometricPrint.model_validate(raw))
         except ValidationError:
             schema_refused = True
         if case["expected"] == "accept":

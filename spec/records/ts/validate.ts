@@ -28,6 +28,7 @@ import type { OpenQuestion } from "../../gen/ts/open-question.js";
 import type { ReplyConstraint } from "../../gen/ts/reply-constraint.js";
 import type { SubjectRef } from "../../gen/ts/subject-ref.js";
 import type { Artifact } from "../../gen/ts/artifact.js";
+import type { BiometricPrint } from "../../gen/ts/biometric-print.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -470,6 +471,20 @@ export function validateReplyConstraint(constraint: ReplyConstraint): Problems {
     }
   }
 
+  return problems;
+}
+
+/** dim is stored so a matcher can sanity-check a print before it even
+ * reads the embedding array (design-face-recognition-models-2026-09-28.md
+ * section 5's "every matcher checks the model id before it compares"
+ * extended to the vector's own shape) - the one thing JSON Schema alone
+ * cannot cross-check, since a schema cannot reference another field's
+ * array length. */
+export function validateBiometricPrint(print: BiometricPrint): Problems {
+  const problems: Problems = [];
+  if (print.embedding.length !== print.dim) {
+    problems.push(`embedding has ${print.embedding.length} values but dim says ${print.dim} - they must agree`);
+  }
   return problems;
 }
 

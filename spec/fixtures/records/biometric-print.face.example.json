@@ -1,0 +1,16 @@
+{
+  "id": "print-a1b2c3",
+  "person_id": "person-a1b2c3",
+  "modality": "face",
+  "model_id": "sface-2021dec",
+  "model_sha256": "0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79",
+  "dim": 4,
+  "embedding": [0.12, -0.34, 0.56, -0.78],
+  "captured_by": "pwa",
+  "consent_at": "2026-09-28T12:00:00Z",
+  "consented_by_person_id": "person-a1b2c3",
+  "created_at": "2026-09-28T12:00:00Z",
+  "updated_at": "2026-09-28T12:00:00Z",
+  "deleted_at": null,
+  "hlc": "1759060800000:0:a1b2c3"
+}

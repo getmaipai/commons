@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 from gen.py.artifact_schema import Artifact
+from gen.py.biometric_print_schema import BiometricPrint
 from gen.py.entity_schema import Entity
 from gen.py.grant_schema import Grant
 from gen.py.list_schema import List
@@ -438,6 +439,24 @@ def validate_reply_constraint(constraint: ReplyConstraint) -> Problems:
     ):
         problems.append(
             f'a length constraint must carry a positive integer character budget, not "{constraint.value}"'
+        )
+
+    return problems
+
+
+def validate_biometric_print(print_: BiometricPrint) -> Problems:
+    """dim is stored so a matcher can sanity-check a print before it
+    even reads the embedding array (design-face-recognition-models-
+    2026-09-28.md section 5's "every matcher checks the model id
+    before it compares" extended to the vector's own shape) - the one
+    thing JSON Schema alone cannot cross-check, since a schema cannot
+    reference another field's array length."""
+    problems: Problems = []
+
+    if len(print_.embedding) != print_.dim:
+        problems.append(
+            f"embedding has {len(print_.embedding)} values but dim says {print_.dim} - "
+            "they must agree"
         )
 
     return problems
