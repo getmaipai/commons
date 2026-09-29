@@ -31,6 +31,7 @@ from gen.py.relationship_schema import Relationship
 from gen.py.reply_constraint_schema import ReplyConstraint
 from gen.py.reply_feedback_schema import ReplyFeedback
 from gen.py.reply_plan_schema import ReplyPlan
+from gen.py.robot_state_schema import RobotState
 from gen.py.safety_result_schema import SafetyResult
 from gen.py.setting_value_schema import SettingValue
 from gen.py.settings_key_schema import SettingsKey
@@ -94,6 +95,13 @@ def test_issue_fixture():
 
 def test_device_fixture():
     Device.model_validate(load_fixture("device.example.json"))
+
+
+@pytest.mark.parametrize(
+    "kind", ["starting", "idle", "listening", "thinking", "speaking", "unknown-battery"]
+)
+def test_robot_state_fixtures(kind: str):
+    RobotState.model_validate(load_fixture(f"robot-state.{kind}.example.json"))
 
 
 def test_conversation_fixture():
