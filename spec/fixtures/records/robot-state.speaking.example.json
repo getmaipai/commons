@@ -1,0 +1,8 @@
+{
+  "activity": "speaking",
+  "muted": true,
+  "tracking": true,
+  "on_battery": false,
+  "battery_level": 0.79,
+  "daemon_version": "1.2.3"
+}

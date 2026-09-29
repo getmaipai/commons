@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.55] - 2026-09-29
+
+### Added
+- `robot-state.schema.json`: the hub-local state projection for a paired robot's Devices-page card (activity, muted, tracking, battery state and level, daemon version), keyed externally by device_id and without synced-record identity fields. Battery and daemon fields may be omitted by producers that do not report them; explicit null represents unknown state. Six fixtures cover all activity values and the all-null optional state.
+
 ## [spec-v0.1.54] - 2026-09-28
 
 ### Added

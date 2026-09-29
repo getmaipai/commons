@@ -19,6 +19,7 @@ import { Grant } from "../../gen/ts/grant.js";
 import { Issue } from "../../gen/ts/issue.js";
 import { Conversation } from "../../gen/ts/conversation.js";
 import { Device } from "../../gen/ts/device.js";
+import { RobotState } from "../../gen/ts/robot-state.js";
 import { ContentCeiling } from "../../gen/ts/content-ceiling.js";
 import { Source } from "../../gen/ts/source.js";
 import { TurnSignal } from "../../gen/ts/turn-signal.js";
@@ -125,6 +126,12 @@ describe("record fixtures validate against their generated Zod models", () => {
   test("device.example.json", () => {
     expect(() => Device.parse(loadFixture("device.example.json"))).not.toThrow();
   });
+
+  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "unknown-battery"]) {
+    test(`robot-state.${kind}.example.json`, () => {
+      expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();
+    });
+  }
 
   test("source.example.json", () => {
     expect(() => Source.parse(loadFixture("source.example.json"))).not.toThrow();

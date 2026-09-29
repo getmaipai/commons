@@ -21,6 +21,7 @@ export * from "./file.js";
 export * from "./grant.js";
 export * from "./memory-record.js";
 export * from "./turn-signal.js";
+export * from "./robot-state.js";
 export * from "./project.js";
 export * from "./turn-artifact.js";
 export * from "./open-question.js";
