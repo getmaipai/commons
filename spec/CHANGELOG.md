@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.57] - 2026-09-29
+
+### Added
+- `robot-state.schema.json`: optional, nullable `app_version`, the MaiPai app version the robot runs (the `maipai-bot` release), so the hub can compare a robot to a `getmaipai/bot` release. `daemon_version` is unchanged and stays the vendor SDK's version. Additive: producers that omit it still validate. Fixtures cover present, null and omitted.
+
 ## [spec-v0.1.56] - 2026-09-29
 
 ### Added

@@ -98,10 +98,38 @@ def test_device_fixture():
 
 
 @pytest.mark.parametrize(
-    "kind", ["starting", "idle", "listening", "thinking", "speaking", "unknown-battery"]
+    "kind",
+    [
+        "starting",
+        "idle",
+        "listening",
+        "thinking",
+        "speaking",
+        "unknown-battery",
+        "minimal",
+    ],
 )
 def test_robot_state_fixtures(kind: str):
     RobotState.model_validate(load_fixture(f"robot-state.{kind}.example.json"))
+
+
+def test_robot_state_app_version_present_null_and_omitted():
+    present = RobotState.model_validate(load_fixture("robot-state.idle.example.json"))
+    null = RobotState.model_validate(
+        load_fixture("robot-state.unknown-battery.example.json")
+    )
+    omitted = RobotState.model_validate(
+        load_fixture("robot-state.minimal.example.json")
+    )
+    assert present.app_version == "0.4.2"
+    assert null.app_version is None
+    assert omitted.app_version is None
+
+
+def test_robot_state_app_version_rejects_wrong_type():
+    body = {**load_fixture("robot-state.idle.example.json"), "app_version": 4}
+    with pytest.raises(ValidationError):
+        RobotState.model_validate(body)
 
 
 def test_conversation_fixture():

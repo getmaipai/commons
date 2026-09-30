@@ -4,5 +4,6 @@
   "tracking": true,
   "on_battery": false,
   "battery_level": 0.82,
-  "daemon_version": "1.2.3"
+  "daemon_version": "1.2.3",
+  "app_version": "0.4.2"
 }

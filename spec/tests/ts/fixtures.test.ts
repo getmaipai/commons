@@ -127,11 +127,20 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Device.parse(loadFixture("device.example.json"))).not.toThrow();
   });
 
-  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "unknown-battery"]) {
+  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "unknown-battery", "minimal"]) {
     test(`robot-state.${kind}.example.json`, () => {
       expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();
     });
   }
+
+  test("robot-state app_version: present, null and omitted validate; wrong type is rejected", () => {
+    const present = RobotState.parse(loadFixture("robot-state.idle.example.json"));
+    expect(present.app_version).toBe("0.4.2");
+    expect(RobotState.parse(loadFixture("robot-state.unknown-battery.example.json")).app_version).toBeNull();
+    expect(RobotState.parse(loadFixture("robot-state.minimal.example.json")).app_version).toBeUndefined();
+    const body = { ...(loadFixture("robot-state.idle.example.json") as object), app_version: 4 };
+    expect(() => RobotState.parse(body)).toThrow();
+  });
 
   test("source.example.json", () => {
     expect(() => Source.parse(loadFixture("source.example.json"))).not.toThrow();
