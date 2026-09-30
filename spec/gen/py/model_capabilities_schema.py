@@ -190,9 +190,11 @@ class ModelCapabilities(BaseModel):
         ..., description="Display name, e.g. 'Qwen3 8B Instruct'."
     )
     license: constr(min_length=1)
-    engine: Literal['llama-server', 'comfyui', 'head'] = Field(
+    engine: Literal[
+        'llama-server', 'mlx-serve', 'comfyui', 'sherpa-onnx-node', 'pocket-tts', 'head'
+    ] = Field(
         ...,
-        description="Which runtime hosts this model. Only llama-server is wired to a real backend today (llmSupervisor.ts); comfyui entries are catalog data ahead of that package existing. head (SPEC-01, dev.md section 12 part 2): a small classifier run as a matrix multiply over an embedding the turn already computes, not a served model process at all - ACT-02's own gap when it lands is that this engine kind has no sizing shape yet ($defs/sizing below only covers transformer_gguf and diffusion).",
+        description="Which runtime hosts this model. llama-server and mlx-serve host chat models, sherpa-onnx-node hosts speech-to-text and pocket-tts hosts text-to-speech; comfyui entries are catalog data ahead of that package existing. head (SPEC-01, dev.md section 12 part 2): a small classifier run as a matrix multiply over an embedding the turn already computes, not a served model process at all - ACT-02's own gap when it lands is that this engine kind has no sizing shape yet ($defs/sizing below only covers transformer_gguf and diffusion).",
     )
     implemented: bool = Field(
         ...,

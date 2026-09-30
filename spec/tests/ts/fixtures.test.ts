@@ -192,7 +192,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["chat", "image"]) {
+  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts"]) {
     test(`model-capabilities.${kind}.example.json`, () => {
       expect(() =>
         ModelCapabilities.parse(loadFixture(`model-capabilities.${kind}.example.json`)),
@@ -310,5 +310,10 @@ describe("a bad record is rejected, not silently accepted", () => {
   test("person with an unknown extra field fails (additionalProperties: false)", () => {
     const bad = { ...(loadFixture("person.example.json") as Record<string, unknown>), extra: "nope" };
     expect(() => Person.parse(bad)).toThrow();
+  });
+
+  test("model-capabilities with an unknown engine is rejected", () => {
+    const bad = { ...(loadFixture("model-capabilities.chat.example.json") as Record<string, unknown>), engine: "unknown-engine" };
+    expect(() => ModelCapabilities.parse(bad)).toThrow();
   });
 });

@@ -38,11 +38,18 @@ export const ModelCapabilities = z
       .min(1)
       .describe("Display name, e.g. 'Qwen3 8B Instruct'."),
     license: z.string().min(1),
-    /**Which runtime hosts this model. Only llama-server is wired to a real backend today (llmSupervisor.ts); comfyui entries are catalog data ahead of that package existing. head (SPEC-01, dev.md section 12 part 2): a small classifier run as a matrix multiply over an embedding the turn already computes, not a served model process at all - ACT-02's own gap when it lands is that this engine kind has no sizing shape yet ($defs/sizing below only covers transformer_gguf and diffusion).*/
+    /**Which runtime hosts this model. llama-server and mlx-serve host chat models, sherpa-onnx-node hosts speech-to-text and pocket-tts hosts text-to-speech; comfyui entries are catalog data ahead of that package existing. head (SPEC-01, dev.md section 12 part 2): a small classifier run as a matrix multiply over an embedding the turn already computes, not a served model process at all - ACT-02's own gap when it lands is that this engine kind has no sizing shape yet ($defs/sizing below only covers transformer_gguf and diffusion).*/
     engine: z
-      .enum(["llama-server", "comfyui", "head"])
+      .enum([
+        "llama-server",
+        "mlx-serve",
+        "comfyui",
+        "sherpa-onnx-node",
+        "pocket-tts",
+        "head",
+      ])
       .describe(
-        "Which runtime hosts this model. Only llama-server is wired to a real backend today (llmSupervisor.ts); comfyui entries are catalog data ahead of that package existing. head (SPEC-01, dev.md section 12 part 2): a small classifier run as a matrix multiply over an embedding the turn already computes, not a served model process at all - ACT-02's own gap when it lands is that this engine kind has no sizing shape yet ($defs/sizing below only covers transformer_gguf and diffusion).",
+        "Which runtime hosts this model. llama-server and mlx-serve host chat models, sherpa-onnx-node hosts speech-to-text and pocket-tts hosts text-to-speech; comfyui entries are catalog data ahead of that package existing. head (SPEC-01, dev.md section 12 part 2): a small classifier run as a matrix multiply over an embedding the turn already computes, not a served model process at all - ACT-02's own gap when it lands is that this engine kind has no sizing shape yet ($defs/sizing below only covers transformer_gguf and diffusion).",
       ),
     /**False for a role with no real backend yet (image, video): the entry documents the decided pick without claiming it can be selected and run today.*/
     implemented: z
