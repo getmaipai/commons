@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.60] - 2026-09-30
+
+### Added
+- the role vocabulary in model-capabilities.schema.json gains judge, rerank and music
+
 ## [spec-v0.1.59] - 2026-09-30
 
 ### Added
