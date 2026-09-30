@@ -1154,3 +1154,38 @@ existing 4.5:1 hue-text-mix and 15%-tinted-pill checks in
 `contrast.test.ts` also pass for both hues in both themes. The ring
 always has a text status and an icon beside it, so color is never the
 only signal.
+
+## core-v0.1.1: where a product's data lives (DATA-LOCATION-00b)
+
+`core` gains the shared half of the data-location design in home's
+`docs/dev.md` ("DATA-LOCATION"), for Home and the Stack to import: the
+`data-location.json` record, the `maipai-folder.json` marker, class path
+resolution, volume identity and the never-create mode of `ensureDataDir`.
+Nothing in it knows a product's class list; a caller passes each class's
+`id` and `default` (a subset of the spec's `DataClass`).
+
+**A new dependency on `spec`, decided here.** `core` validates the record
+and the marker against the shapes `spec-v0.1.58` added (`DataLocation`,
+`DataFolder`), so it depends on `@maipai/spec` the way `ui` already does:
+`"@maipai/spec": "file:../spec"`, imported as
+`@maipai/spec/gen/ts/data-location.js`. A consumer that pins `core` from
+its per-tag worktree (`commons-tags/core-core-v0.1.1/core`) gets `spec` from
+the same checkout, so `core` and the `spec` its validators read are always
+one commit; no second pin exists. The cost is that installing `core` also
+installs `spec`'s dependencies. `core` also gains `plist` (and
+`@types/plist`) to read `diskutil ... -plist` output: a maintained parser
+instead of a hand-written one (org principle 6).
+
+**Where the OS is touched.** `volumeIdentity.ts` follows `keystore.ts`: pure
+invocation builders and parsers around one injected `CommandRunner`. Only
+`defaultRunner` spawns a process and no unit test calls it. The macOS
+parsers are tested against real `diskutil` and `df` output captured on a
+Mac (UUIDs replaced). The Linux `findmnt -P` and Windows PowerShell parsers
+are tested against hand-written fixtures built from the tools' documented
+output, because nothing could be captured on those systems in this item;
+a run on a real Linux and Windows machine (DATA-LOCATION-01c's installer
+runs) is what retires that gap. Running the real macOS tools against a
+not-yet-created folder found one bug the fixtures had not: `/Users` is a
+firmlink into the Data volume, so `realpath` keeps the short form while
+`df` reports the mount at `/System/Volumes/Data`; `volumeIdentity` handles
+that and has a regression test.
