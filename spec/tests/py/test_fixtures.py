@@ -37,6 +37,7 @@ from gen.py.setting_value_schema import SettingValue
 from gen.py.settings_key_schema import SettingsKey
 from gen.py.share_schema import Share
 from gen.py.source_schema import Source
+from gen.py.stack_fit_plan_schema import StackFitPlan
 from gen.py.subject_ref_schema import Household, Unresolved, World
 from gen.py.turn_artifact_schema import TurnArtifact
 from gen.py.turn_signal_schema import TurnSignal
@@ -130,6 +131,27 @@ def test_robot_state_app_version_rejects_wrong_type():
     body = {**load_fixture("robot-state.idle.example.json"), "app_version": 4}
     with pytest.raises(ValidationError):
         RobotState.model_validate(body)
+
+
+@pytest.mark.parametrize("kind", ["yes", "slow", "no", "unknown", "multi-role"])
+def test_stack_fit_plan_fixtures(kind: str):
+    StackFitPlan.model_validate(load_fixture(f"stack-fit-plan.{kind}.example.json"))
+
+
+def test_stack_fit_plan_rejects_inconsistent_figure_shapes():
+    body = load_fixture("stack-fit-plan.yes.example.json")
+    body["total"] = {"low": 1, "high": None, "source": "unknown", "as_of": "2026-09-30"}
+    with pytest.raises(ValidationError):
+        StackFitPlan.model_validate(body)
+    body = load_fixture("stack-fit-plan.yes.example.json")
+    body["total"] = {
+        "low": None,
+        "high": 2,
+        "source": "estimated",
+        "as_of": "2026-09-30",
+    }
+    with pytest.raises(ValidationError):
+        StackFitPlan.model_validate(body)
 
 
 def test_conversation_fixture():

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "model": "qwen3-1.7b",
+  "context_tokens": 4096,
+  "kv_cache_type": "f16",
+  "roles": [
+    {
+      "role": "chat",
+      "choice": "proposed",
+      "peak": {
+        "low": 1400000000,
+        "high": 1500000000,
+        "source": "measured",
+        "as_of": "2026-09-30"
+      }
+    },
+    {
+      "role": "embed",
+      "choice": "proposed",
+      "peak": {
+        "low": 200000000,
+        "high": 250000000,
+        "source": "measured",
+        "as_of": "2026-09-30"
+      }
+    },
+    {
+      "role": "tts",
+      "choice": "proposed",
+      "peak": {
+        "low": 100000000,
+        "high": 150000000,
+        "source": "measured",
+        "as_of": "2026-09-30"
+      }
+    },
+    {
+      "role": "stt",
+      "choice": "proposed",
+      "peak": {
+        "low": 150000000,
+        "high": 200000000,
+        "source": "measured",
+        "as_of": "2026-09-30"
+      }
+    }
+  ],
+  "total": {
+    "low": 2300000000,
+    "high": 2400000000,
+    "source": "measured",
+    "as_of": "2026-09-30"
+  },
+  "cap": {
+    "low": 3000000000,
+    "high": 3100000000,
+    "source": "measured",
+    "as_of": "2026-09-30"
+  },
+  "margin": {
+    "low": 500000000,
+    "high": 600000000,
+    "source": "measured",
+    "as_of": "2026-09-30"
+  },
+  "paths": [
+    {
+      "path": "unified",
+      "fits": true,
+      "verdict": "yes"
+    }
+  ],
+  "verdict": "yes",
+  "bottleneck": "memory"
+}

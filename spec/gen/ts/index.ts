@@ -11,6 +11,7 @@ export * from "./artifact.js";
 export * from "./biometric-print.js";
 export * from "./reply-plan.js";
 export * from "./data-class.js";
+export * from "./stack-fit-plan.js";
 export * from "./model-capabilities.js";
 export * from "./entity.js";
 export * from "./person.js";

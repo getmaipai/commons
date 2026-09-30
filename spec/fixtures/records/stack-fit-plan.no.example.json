@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "model": "qwen3-1.7b",
+  "context_tokens": 4096,
+  "kv_cache_type": "f16",
+  "roles": [
+    {
+      "role": "chat",
+      "choice": "proposed",
+      "peak": {
+        "low": 1400000000,
+        "high": 1500000000,
+        "source": "measured",
+        "as_of": "2026-09-30"
+      }
+    }
+  ],
+  "total": {
+    "low": 1800000000,
+    "high": 1900000000,
+    "source": "measured",
+    "as_of": "2026-09-30"
+  },
+  "cap": {
+    "low": 1000000000,
+    "high": 1100000000,
+    "source": "measured",
+    "as_of": "2026-09-30"
+  },
+  "margin": {
+    "low": 100000000,
+    "high": 200000000,
+    "source": "measured",
+    "as_of": "2026-09-30"
+  },
+  "paths": [
+    {
+      "path": "gpu",
+      "fits": false,
+      "verdict": "no",
+      "shortfall": {
+        "low": 700000000,
+        "high": 800000000,
+        "source": "measured",
+        "as_of": "2026-09-30"
+      }
+    },
+    {
+      "path": "cpu-offload",
+      "fits": false,
+      "verdict": "no",
+      "shortfall": {
+        "low": 300000000,
+        "high": 400000000,
+        "source": "measured",
+        "as_of": "2026-09-30"
+      }
+    }
+  ],
+  "verdict": "no",
+  "bottleneck": "memory"
+}

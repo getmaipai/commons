@@ -20,6 +20,7 @@ import { Issue } from "../../gen/ts/issue.js";
 import { Conversation } from "../../gen/ts/conversation.js";
 import { Device } from "../../gen/ts/device.js";
 import { RobotState } from "../../gen/ts/robot-state.js";
+import { StackFitPlan } from "../../gen/ts/stack-fit-plan.js";
 import { ContentCeiling } from "../../gen/ts/content-ceiling.js";
 import { Source } from "../../gen/ts/source.js";
 import { TurnSignal } from "../../gen/ts/turn-signal.js";
@@ -140,6 +141,22 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(RobotState.parse(loadFixture("robot-state.minimal.example.json")).app_version).toBeUndefined();
     const body = { ...(loadFixture("robot-state.idle.example.json") as object), app_version: 4 };
     expect(() => RobotState.parse(body)).toThrow();
+  });
+
+  for (const kind of ["yes", "slow", "no", "unknown", "multi-role"]) {
+    test(`stack-fit-plan.${kind}.example.json`, () => {
+      expect(() => StackFitPlan.parse(loadFixture(`stack-fit-plan.${kind}.example.json`))).not.toThrow();
+    });
+  }
+
+  test("stack-fit-plan rejects inconsistent unknown and estimated figures", () => {
+    const base = loadFixture("stack-fit-plan.yes.example.json") as any;
+    const unknownLow = structuredClone(base);
+    unknownLow.total = { low: 1, high: null, source: "unknown", as_of: "2026-09-30" };
+    expect(() => StackFitPlan.parse(unknownLow)).toThrow();
+    const estimatedNull = structuredClone(base);
+    estimatedNull.total = { low: null, high: 2, source: "estimated", as_of: "2026-09-30" };
+    expect(() => StackFitPlan.parse(estimatedNull)).toThrow();
   });
 
   test("source.example.json", () => {
