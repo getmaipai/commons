@@ -7,6 +7,14 @@ scope lands.
 
 ## [Unreleased]
 
+### Added
+- `status-note.schema.json` and `maintenance-window.schema.json` (STATUS-B1, home `docs/plans/status-page-2026-09-30.md`): admin-pinned plain-text status notes and scheduled maintenance windows, with generated TypeScript/Python models and valid, invalid and hub-enforced fixtures. Maintenance status is derived at read time; recurrence is not modeled, component ids are listed in the schema, and the hub must enforce that `ends_at` follows `starts_at`.
+
+## [spec-v0.1.61] - 2026-09-30
+
+### Added
+- `status-note.schema.json` and `maintenance-window.schema.json` (STATUS-B1, home `docs/plans/status-page-2026-09-30.md`): admin-pinned plain-text status notes and scheduled maintenance windows, with generated TypeScript/Python models and valid, invalid and hub-enforced fixtures. Maintenance status is derived at read time; recurrence is not modeled, component ids are listed in the schema, and the hub must enforce that `ends_at` follows `starts_at`.
+
 ## [spec-v0.1.60] - 2026-09-30
 
 ### Added
