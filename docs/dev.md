@@ -1114,3 +1114,43 @@ was limited to files with no current production importers.
 
 The shared dashboard sidebar no longer lists Tools, and its Household
 entry is labeled Family. The People route and Users icon are unchanged.
+
+## FACE-02L: green and yellow hues (2026-09-29, `ui-v0.5.80`)
+
+**The gap, named first.** Home's face-enrollment capture ring has to read
+as truly green when a frame registers and truly yellow when it is soft
+(the owner's rule). The kit's status hues (`ui/src/status.ts`,
+`tokens.css`) are blue, violet, teal, orange, pink and red: no green and
+no yellow, and no shipped component draws a status ring. Checked before
+adding: the palette has no green or yellow ramp to map onto, and teal
+(`#00e3ae`) and orange (`#ff8a35`) are visibly neither. Redefining
+teal or orange would recolor every ready pill and warning dot in the
+product, so that was rejected.
+
+**The smallest addition:** two tokens, `--hue-green` and `--hue-yellow`,
+in `ui/src/tokens.css`. `statusMap` is untouched (`ready` stays teal,
+`warning` stays orange); the tokens exist for a caller that needs a true
+green or yellow, and Home's ring is the first. No shipped kit component
+is edited.
+
+**Themed, not fixed.** The other hues are one value in both themes. A
+bright yellow or green cannot be: on the light page (`#f4f7fb`) they
+measure 1.4:1 to 2.1:1, under the 3:1 non-text floor. So the bright
+value lives in `@theme` and the dark root and the dark fallback, and the
+light root overrides it with a deeper one.
+
+| Token | Theme | Value | On page | On panel | On black preview |
+|---|---|---|---|---|---|
+| `--hue-green` | dark | `#22c55e` | 8.31 | 7.05 | 9.22 |
+| `--hue-green` | light | `#1a9c48` | 3.32 | 3.56 | 5.89 |
+| `--hue-yellow` | dark | `#facc15` | 12.36 | 10.48 | 13.71 |
+| `--hue-yellow` | light | `#b58700` | 3.04 | 3.27 | 6.43 |
+
+Ratios are WCAG relative-luminance contrast against the theme's
+`--surface-page` and `--surface-card` and against pure black (the
+preview). Every cell clears 3:1; the light yellow is a deep gold because
+that is the lightest yellow that still passes on a light page. The
+existing 4.5:1 hue-text-mix and 15%-tinted-pill checks in
+`contrast.test.ts` also pass for both hues in both themes. The ring
+always has a text status and an icon beside it, so color is never the
+only signal.
