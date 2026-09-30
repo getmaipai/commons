@@ -1,0 +1,9 @@
+{
+  "id": "sev-abc127",
+  "component": "background",
+  "state": "degraded",
+  "at": "2026-09-30T12:04:00Z",
+  "source": "sample",
+  "detail": "Some tasks may be delayed.",
+  "hlc": "1727000004000:0:nodeabc123"
+}

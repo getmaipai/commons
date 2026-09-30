@@ -1,0 +1,9 @@
+{
+  "id": "sev-abc128",
+  "component": "library",
+  "state": "operational",
+  "at": "2026-09-30T12:05:00Z",
+  "source": "sample",
+  "detail": null,
+  "hlc": "1727000005000:0:nodeabc123"
+}

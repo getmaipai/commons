@@ -1,0 +1,9 @@
+{
+  "id": "sev-abc134",
+  "component": "chat",
+  "state": "operational",
+  "at": "2026-09-30T12:00:00Z",
+  "source": "sample",
+  "hlc": "1727000000000:0:nodeabc123",
+  "other": "x"
+}

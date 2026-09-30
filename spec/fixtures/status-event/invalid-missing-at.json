@@ -1,0 +1,7 @@
+{
+  "id": "sev-abc132",
+  "component": "chat",
+  "state": "operational",
+  "source": "sample",
+  "hlc": "1727000000000:0:nodeabc123"
+}

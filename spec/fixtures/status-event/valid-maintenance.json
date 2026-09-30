@@ -1,0 +1,8 @@
+{
+  "id": "sev-abc126",
+  "component": "voice",
+  "state": "maintenance",
+  "at": "2026-09-30T12:03:00Z",
+  "source": "maintenance",
+  "hlc": "1727000003000:0:nodeabc123"
+}

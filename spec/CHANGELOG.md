@@ -9,6 +9,12 @@ scope lands.
 
 ### Added
 - `status-note.schema.json` and `maintenance-window.schema.json` (STATUS-B1, home `docs/plans/status-page-2026-09-30.md`): admin-pinned plain-text status notes and scheduled maintenance windows, with generated TypeScript/Python models and valid, invalid and hub-enforced fixtures. Maintenance status is derived at read time; recurrence is not modeled, component ids are listed in the schema, and the hub must enforce that `ends_at` follows `starts_at`.
+- `status-event.schema.json` and shared `status-component.schema.json` (STATUS-C1, home `docs/plans/status-page-2026-09-30.md`): append-only component state changes, with generated TypeScript/Python models and valid and invalid fixtures. The hub enforces when rows are written, 90-day pruning, duration from the next row, and the operational display rule for components with no rows.
+
+## [spec-v0.1.62] - 2026-09-30
+
+### Added
+- `status-event.schema.json` and shared `status-component.schema.json` (STATUS-C1, home `docs/plans/status-page-2026-09-30.md`): append-only component state changes, with generated TypeScript/Python models and valid and invalid fixtures. The hub enforces when rows are written, 90-day pruning, duration from the next row, and the operational display rule for components with no rows.
 
 ## [spec-v0.1.61] - 2026-09-30
 

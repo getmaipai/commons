@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/status-event.schema.json",
+  "title": "StatusEvent",
+  "description": "One row in the append-only history of a status page component's state changes. A row is written only when a component's state changes, plus the boot-gap pair for the hub. The duration of a state is the gap to the next row of the same component and is never stored. The hub prunes rows older than 90 days. A component with no rows is treated as operational since the earliest row of any component; this is a display rule, not enforceable in the schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "component", "state", "at", "source", "hlc"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^sev-[a-z0-9]{6,}$" },
+    "component": { "$ref": "status-component.schema.json" },
+    "state": { "type": "string", "enum": ["operational", "degraded", "outage", "maintenance"] },
+    "at": { "type": "string", "format": "date-time", "description": "When the component entered this state." },
+    "source": { "type": "string", "enum": ["sample", "boot_gap", "maintenance"], "description": "sample: the hub's periodic check saw it; boot_gap: written at boot to record the hub itself was not running; maintenance: derived from a scheduled window." },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$", "description": "Hybrid logical clock: wall_ms:counter:node." },
+    "detail": { "type": ["string", "null"], "maxLength": 200, "default": null, "description": "Plain words with no technical detail." }
+  }
+}

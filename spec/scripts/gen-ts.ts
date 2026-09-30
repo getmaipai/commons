@@ -78,7 +78,9 @@ async function writeFileAtomic(outPath: string, content: string): Promise<void> 
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
-  const files = (await readdir(SCHEMAS_DIR)).filter((f) => f.endsWith(".schema.json") && !STACK_SCHEMA_NAMES.has(f));
+  const files = (await readdir(SCHEMAS_DIR))
+    .filter((f) => f.endsWith(".schema.json") && !STACK_SCHEMA_NAMES.has(f))
+    .sort();
   const generated: { fileBase: string; typeName: string }[] = [];
   const writtenFileNames = new Set<string>();
 

@@ -9,7 +9,7 @@
   "properties": {
     "id": { "type": "string", "pattern": "^maint-[a-z0-9]{6,}$" },
     "title": { "type": "string", "minLength": 1, "maxLength": 120 },
-    "components": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "enum": ["chat", "embed", "background", "voice", "library", "hub"] } },
+    "components": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "status-component.schema.json" } },
     "starts_at": { "type": "string", "format": "date-time" },
     "ends_at": { "type": "string", "format": "date-time" },
     "created_by": { "type": "string", "pattern": "^person-[a-z0-9]{6,}$" },
