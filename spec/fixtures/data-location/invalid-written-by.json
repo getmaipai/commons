@@ -1,0 +1,12 @@
+{
+  "schema": 2,
+  "productRoot": "/usr/local/maipai-home",
+  "householdFolderId": "01J9ZK3M8Q2V5N7R4T6W8Y0B2D",
+  "root": {
+    "path": "/usr/local/maipai-home/data"
+  },
+  "classes": {},
+  "writtenAt": "2026-09-30T21:04:00Z",
+  "writtenBy": "hand",
+  "move": null
+}

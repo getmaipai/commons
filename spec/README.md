@@ -47,6 +47,52 @@ The error catalogue's *shape* (`ErrorEntry`) and the privacy row shape
 see "Cross-repo schemas" below. The populated error catalogue itself
 (`errors/errors.json`) is this repo's own content.
 
+Added 2026-09-29 (DATA-LOCATION-00a, `home/docs/dev.md`, "DATA-LOCATION"):
+the three shapes behind where a household's data lives, declared before
+any product writes them. **DataClass** (one class declaration: what a
+folder holds, its default place, what a boot does when it is missing, how
+it moves, how it is backed up), **DataLocation** (the bootstrap record
+`data-location.json`, `schema: 2`: a root, per-class overrides each with a
+generation and volume identity, and the move in progress with per-class
+steps) and **DataFolder** (the visible `maipai-folder.json` marker in each
+class folder). Each product declares its own list of classes in the
+DataClass shape; nothing here names a product's layout. Decisions where the
+design record left a choice:
+
+- `DataClass.move` is `offline | online | empty` and "download again" is the
+  separate boolean `refetch`, as the record's class list has it. A move
+  *step's* `mode` adds `refetch` (`offline | online | empty | refetch`),
+  because whether this move copies or starts empty is chosen per move.
+- `DataClass.sensitive` is one value, strongest wins in the order `none`,
+  `personal`, `biometric`, `keys`; the fuller description is `holds` text.
+  `size`, `access` and `holds` are prose for the Storage page; the number a
+  check enforces is `largestFileBytes`.
+- `default.subpath` is a relative, forward-slash path with no `.` or `..`
+  segment; the empty string means the base itself (`records` lives in the
+  root). The schema pattern uses no lookahead so Pydantic's regex engine
+  enforces it too.
+- `DataLocation` requires every field (`classes` may be `{}`, `move` may
+  be `null`), so a reader has one shape. `writtenBy` is `init | adopt |
+  move`, the design's three writers (a rollback is the move's write).
+  `householdFolderId` and every move id are ULIDs. `volume` is optional on
+  the root and on an override: a writer records it when it can read it.
+- A move step keeps `previous` (the class's entry before the switch, the
+  same shape as a `classes` value) because the record says rollback puts
+  path and generation back from "the step" without naming a field.
+  `staging` is null when there is no staging folder (a same-volume rename,
+  an empty target). Step `state` is `planned | copying | verified |
+  switched | healthy | deleting-old`, the states the design names.
+- `DataFolder.schema` is `1` (nothing wrote an earlier marker); the record
+  is `2` because the design record says so. `product` is `home | stack |
+  bot` in both `DataClass` and `DataFolder`.
+- What JSON Schema cannot say is left to the readers in `core` (00b):
+  one step per class in a move, a hold class having an empty `degrades`,
+  class keys naming a class the product declares.
+- Python: `schema`, `class` and `from` are Pydantic-aliased (`schema_`,
+  `class_`, `from_`); write a record back with
+  `model_dump(mode="json", by_alias=True, exclude_unset=True)`. The tests
+  prove that round trip returns the fixture unchanged.
+
 ## Layout
 
 | Path | What it is | Hand-written or generated |
@@ -74,6 +120,7 @@ see "Cross-repo schemas" below. The populated error catalogue itself
 | `fixtures/recipes/` | Recipe + inputs + expected result, run through both interpreters to prove they agree | hand-written |
 | `stack/ts/` | The Stack's nine wire shapes (role request/reply headers, the event feed, health, settings, precious-state, the STT session types, the job) - hand-written Zod, excluded from `gen:ts`/`bundle-schemas.ts` (their schemas' `allOf`/`if`/`then` conditionals aren't reliably preserved by either generator; see "Moved from `home/spec`" below) | hand-written |
 | `fixtures/<stack-shape-name>/` | `valid-*.json`/`invalid-*.json` pairs for each `stack/` shape, round-tripped through both its JSON Schema and its hand-written Zod mirror | hand-written |
+| `fixtures/data-class/`, `fixtures/data-location/`, `fixtures/data-folder/` | `valid-*.json`/`invalid-*.json` for the three DATA-LOCATION shapes, round-tripped through the JSON Schema and both generated model sets (`tests/ts/data-location-fixtures.test.ts`, `tests/py/test_data_location_fixtures.py`) | hand-written |
 | `tests/ts/`, `tests/py/` | The tests that make every proof above real, not asserted | hand-written |
 
 ## Generating

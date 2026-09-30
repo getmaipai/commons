@@ -1,0 +1,26 @@
+{
+  "id": "stack-state",
+  "product": "stack",
+  "title": "Stack state",
+  "help": "The Stack's database and keys.",
+  "level": "advanced",
+  "default": {
+    "base": "root",
+    "subpath": ""
+  },
+  "holds": "stack.db, keys/",
+  "size": "MB",
+  "access": "small random writes",
+  "durability": "irreplaceable",
+  "rebuild": "none",
+  "sensitive": "keys",
+  "needs": [
+    "sqlite",
+    "private"
+  ],
+  "whenMissing": "hold",
+  "degrades": [],
+  "move": "offline",
+  "refetch": false,
+  "backup": "hot"
+}

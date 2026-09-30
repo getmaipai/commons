@@ -1,0 +1,17 @@
+{
+  "schema": 2,
+  "productRoot": "/usr/local/maipai-home",
+  "householdFolderId": "01J9ZK3M8Q2V5N7R4T6W8Y0B2D",
+  "root": {
+    "path": "/Volumes/nas-house/MaiPai",
+    "volume": {
+      "id": "//nas.example.com/house",
+      "label": "house",
+      "relativePath": "MaiPai"
+    }
+  },
+  "classes": {},
+  "writtenAt": "2026-09-30T21:04:00Z",
+  "writtenBy": "init",
+  "move": null
+}

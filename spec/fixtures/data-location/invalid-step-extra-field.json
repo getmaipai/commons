@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "productRoot": "/usr/local/maipai-home",
+  "householdFolderId": "01J9ZK3M8Q2V5N7R4T6W8Y0B2D",
+  "root": {
+    "path": "/Volumes/Mirror/MaiPai",
+    "volume": {
+      "id": "C3F1A0D2-7B44-4E0E-9A57-2D1B6F0C8E11",
+      "label": "Mirror",
+      "relativePath": "MaiPai"
+    }
+  },
+  "classes": {
+    "records": {
+      "path": null,
+      "generation": 1
+    },
+    "keys": {
+      "path": null,
+      "generation": 1
+    },
+    "models": {
+      "path": "/Volumes/Big/MaiPai/home/models",
+      "generation": 2,
+      "volume": {
+        "id": "9A0B5E77-13C2-4B1F-8D6A-0F4C2E9B7A30",
+        "label": "Big",
+        "relativePath": "MaiPai/home/models"
+      }
+    },
+    "reference": {
+      "path": "/Volumes/Big/MaiPai/home/reference",
+      "generation": 1,
+      "volume": {
+        "id": "9A0B5E77-13C2-4B1F-8D6A-0F4C2E9B7A30",
+        "label": "Big",
+        "relativePath": "MaiPai/home/reference"
+      }
+    },
+    "backups": {
+      "path": "/Volumes/Backup/MaiPai/backups",
+      "generation": 1,
+      "volume": {
+        "id": "77D2E1C4-5A90-4C33-B1E8-6D0A3F92B5C7",
+        "label": "Backup",
+        "relativePath": "MaiPai/backups"
+      }
+    }
+  },
+  "writtenAt": "2026-09-30T21:04:00Z",
+  "writtenBy": "move",
+  "move": {
+    "id": "01J9ZK5P0X3B7D9F2H4K6M8Q1S",
+    "bootAttempts": 1,
+    "steps": [
+      {
+        "class": "records",
+        "from": "/usr/local/maipai-home/data",
+        "to": "/Volumes/Mirror/MaiPai",
+        "mode": "offline",
+        "staging": "/Volumes/Mirror/.maipai-move-01J9ZK5P0X3B7D9F2H4K6M8Q1S-records",
+        "state": "switched",
+        "previous": {
+          "path": null,
+          "generation": 1
+        },
+        "progress": 0.5
+      }
+    ]
+  }
+}

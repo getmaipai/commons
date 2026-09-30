@@ -1,0 +1,11 @@
+{
+  "schema": 2,
+  "productRoot": "/usr/local/maipai-home",
+  "root": {
+    "path": "/usr/local/maipai-home/data"
+  },
+  "classes": {},
+  "writtenAt": "2026-09-30T21:04:00Z",
+  "writtenBy": "init",
+  "move": null
+}

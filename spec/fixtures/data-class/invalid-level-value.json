@@ -1,0 +1,30 @@
+{
+  "id": "models",
+  "product": "home",
+  "title": "AI models",
+  "help": "The chat, memory and background-image model files, downloaded once from pinned sources.",
+  "level": "developer",
+  "default": {
+    "base": "root",
+    "subpath": "models"
+  },
+  "holds": "GGUF chat, embedding and background-image weights",
+  "size": "4 to 40 GB each",
+  "access": "written once by download, read in large runs at engine start",
+  "durability": "rebuildable",
+  "rebuild": "download",
+  "sensitive": "none",
+  "needs": [
+    "large-files"
+  ],
+  "whenMissing": "degrade",
+  "degrades": [
+    "chat",
+    "memory.embedding",
+    "images.background"
+  ],
+  "move": "online",
+  "refetch": true,
+  "backup": "exclude",
+  "largestFileBytes": 42949672960
+}

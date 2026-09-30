@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.58] - 2026-09-29
+
+### Added
+- `data-class.schema.json`, `data-location.schema.json` (`schema: 2`) and `data-folder.schema.json`: the class declaration, the bootstrap record of where each class of a household's data lives (a root, per-class overrides with generation and volume identity, the move in progress with per-class steps) and the folder marker (DATA-LOCATION-00a, home `docs/dev.md`, "DATA-LOCATION"). Generated TypeScript and Python models, 76 valid and invalid fixtures, and a round-trip test in each language. Additive: no existing shape changed. The choices made where the design record left one are listed in `spec/README.md`.
+
 ## [spec-v0.1.57] - 2026-09-29
 
 ### Added

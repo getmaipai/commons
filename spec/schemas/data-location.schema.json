@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/data-location.schema.json",
+  "title": "DataLocation",
+  "description": "The bootstrap record of where a machine's household data lives (home docs/dev.md, 'DATA-LOCATION', section (a)): a root folder plus per-class overrides, each with a generation and the identity of the volume it sits on, and the move in progress if there is one. It is data-location.json in the lock's folder, outside every class, because settings live in the database and the database is itself a class. Written atomically by exactly three writers (the installer's init, the hub's adoption step, a move), never by hand. A class absent from classes is treated as { path: null, generation: 1 }, so adding a class to a product needs no record migration. Schema 2 is the per-class record; the first draft's three-group record was never written by any code. Every field is required so a reader has one shape to handle: classes may be empty and move may be null.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "productRoot", "householdFolderId", "root", "classes", "writtenAt", "writtenBy", "move"],
+  "$defs": {
+    "volume": {
+      "title": "Volume",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "relativePath"],
+      "description": "The volume a path was on when the record was written, so a drive that comes back under another name is found again. A writer records it whenever it can read it and omits it when it cannot.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The filesystem UUID on macOS and Linux, the volume GUID on Windows, and for a network share the share's own address (//nas/share, nas:/export), which has no UUID."
+        },
+        "label": { "type": "string", "description": "The volume's name as a person knows it. May be empty when the volume has none." },
+        "relativePath": {
+          "type": "string",
+          "description": "The folder's path below the volume's mount point, forward slashes, empty when the folder is the volume's top."
+        }
+      }
+    },
+    "classLocation": {
+      "title": "ClassLocation",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "generation"],
+      "description": "One class's entry: an override path (or null to follow the root), its generation and the volume the override sits on.",
+      "properties": {
+        "path": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "description": "An absolute override path, or null to follow the root."
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Goes up by one on every move of this class. The folder whose marker matches (householdFolderId, class, generation) is the class's one live folder."
+        },
+        "volume": {
+          "$ref": "#/$defs/volume",
+          "description": "The volume the override path was on when it was written. Omitted when path is null or the writer could not read it."
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema": {
+      "type": "integer",
+      "const": 2,
+      "description": "The record's own version. A reader refuses a record whose schema it does not know."
+    },
+    "productRoot": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The product's install or checkout root that owns this record. A process whose own root differs (a worktree, a second checkout) treats the record as not its own, never writes it and logs one line saying so."
+    },
+    "householdFolderId": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "A ULID minted once, when the household's first folder is created or adopted, and never changed. Every folder marker of this household carries it, so a folder that belongs to another household or another install is recognised on sight."
+    },
+    "root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "description": "The folder every class without an override lives under (joined with the class's default subpath), and whose parent holds the beside-root classes.",
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "description": "An absolute path on this machine." },
+        "volume": { "$ref": "#/$defs/volume", "description": "The volume the root was on when the record was written." }
+      }
+    },
+    "classes": {
+      "type": "object",
+      "description": "Per-class entries, keyed by class id. A class with path null follows the root. A class absent here is the same as { path: null, generation: 1 }.",
+      "additionalProperties": { "$ref": "#/$defs/classLocation" }
+    },
+    "writtenAt": { "type": "string", "format": "date-time", "description": "When the record was last written." },
+    "writtenBy": {
+      "type": "string",
+      "enum": ["init", "adopt", "move"],
+      "description": "Which of the three writers wrote it: init (the installer's data-location init), adopt (the hub's one-time adoption of an existing household) or move (the mover, including its rollback)."
+    },
+    "move": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["id", "bootAttempts", "steps"],
+      "description": "The move in progress, or null. One move runs at a time. It is recorded before each step starts, so a killed process finds out exactly where it was. Each class in steps has its own copy, verify, switch and retire, so each class's switch is its own commit point. At most one step per class.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "description": "The move's id (a ULID). It is stamped into the markers the move writes and names each staging folder."
+        },
+        "bootAttempts": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many boots have started on the switched folders without reaching healthy. Two failures in a row roll the offline classes of the move back."
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "description": "One step per class in the move, in the order they are processed.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["class", "from", "to", "mode", "staging", "state", "previous"],
+            "properties": {
+              "class": { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$", "description": "The class id being moved." },
+              "from": { "type": "string", "minLength": 1, "description": "The class's resolved absolute folder before the move." },
+              "to": { "type": "string", "minLength": 1, "description": "The absolute folder the class moves to." },
+              "mode": {
+                "type": "string",
+                "enum": ["offline", "online", "empty", "refetch"],
+                "description": "How this step runs. offline, online and empty are the class's move capability. refetch is chosen per move for a class whose refetch flag is true: nothing is copied, the target starts empty and the pinned set downloads after the switch."
+              },
+              "staging": {
+                "type": ["string", "null"],
+                "minLength": 1,
+                "description": "The staging folder (.maipai-move-<id>-<class>, beside the target on the target's drive) while a copy is under way, or null when there is none (a same-volume rename, an empty target, or before the copy starts)."
+              },
+              "state": {
+                "type": "string",
+                "enum": ["planned", "copying", "verified", "switched", "healthy", "deleting-old"],
+                "description": "Where the step is. planned: accepted, nothing touched. copying: the copy into staging has started. verified: copy checked and renamed into place. switched: the record points at the new folder (the commit point). healthy: the first boot proved the move. deleting-old: the retired old folder is being deleted after the person confirmed."
+              },
+              "previous": {
+                "$ref": "#/$defs/classLocation",
+                "description": "The class's record entry before the switch, kept so the automatic rollback before healthy can put path and generation back exactly (a null path means the class followed the root)."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

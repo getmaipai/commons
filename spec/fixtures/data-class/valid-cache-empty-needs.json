@@ -1,0 +1,25 @@
+{
+  "id": "cache",
+  "product": "home",
+  "title": "Cache",
+  "help": "Package fetch responses, rebuilt on demand.",
+  "level": "expert",
+  "default": {
+    "base": "root",
+    "subpath": "cache"
+  },
+  "holds": "package fetch responses",
+  "size": "MB",
+  "access": "small random writes",
+  "durability": "disposable",
+  "rebuild": "empty",
+  "sensitive": "none",
+  "needs": [],
+  "whenMissing": "degrade",
+  "degrades": [
+    "package.widgets"
+  ],
+  "move": "empty",
+  "refetch": false,
+  "backup": "exclude"
+}

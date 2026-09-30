@@ -1,0 +1,26 @@
+{
+  "id": "records",
+  "product": "home",
+  "title": "Household records",
+  "help": "The household's database: people, memory, conversations and settings.",
+  "level": "basic",
+  "default": {
+    "base": "root",
+    "subpath": ""
+  },
+  "holds": "hub.db, its -wal and -shm files, the staged restore and factory-reset files beside it, device-id6.txt",
+  "size": "MB to a few GB",
+  "access": "small random writes, fsync on every commit",
+  "durability": "irreplaceable",
+  "rebuild": "none",
+  "sensitive": "biometric",
+  "needs": [
+    "sqlite",
+    "private"
+  ],
+  "whenMissing": "hold",
+  "degrades": [],
+  "move": "offline",
+  "refetch": false,
+  "backup": "hot"
+}

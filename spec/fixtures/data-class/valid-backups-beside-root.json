@@ -1,0 +1,27 @@
+{
+  "id": "backups",
+  "product": "home",
+  "title": "Backups",
+  "help": "The household's encrypted archives.",
+  "level": "basic",
+  "default": {
+    "base": "beside-root",
+    "subpath": "backups"
+  },
+  "holds": "the household's encrypted archives",
+  "size": "grows with retention",
+  "access": "one large sequential write a night",
+  "durability": "irreplaceable",
+  "rebuild": "none",
+  "sensitive": "personal",
+  "needs": [
+    "large-files"
+  ],
+  "whenMissing": "degrade",
+  "degrades": [
+    "backups"
+  ],
+  "move": "online",
+  "refetch": false,
+  "backup": "none"
+}
