@@ -93,6 +93,7 @@ capability, needs its own design pass first).
 
 - [x] **S** `ui-v0.5.81`: `Header` and `FullLayout` gain an optional `statusIndicator` slot (STATUS-A1).
 - [x] **S** `ui-v0.5.82`: add attributed Kibo `Status` and Tremor `UptimeStrip` snapshots (STATUS-A1b).
+- [x] **S** `ui-v0.5.83`: make `UptimeStrip` non-interactive with one labelled image summary (STATUS-C3c).
 
 - [x] **M** `ui-v0.1.0`: the kit landed, extracted from the Stack's
   committed tree at `5ec0f57` (never the working tree) plus Home's

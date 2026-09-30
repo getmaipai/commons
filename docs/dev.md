@@ -1172,9 +1172,13 @@ and `ui/THIRD_PARTY/`.
 Kibo UI Status keeps its four-state API and ping dot, with the kit's Badge,
 helper, and themed green, yellow, primary, and destructive tokens. Tremor
 Raw Tracker becomes `UptimeStrip`: its records carry a day label and status,
-optional detail appears in the kit Tooltip, and each cell has a keyboard
-focus target and accessible name. These changes keep the original ideas
-while fitting the kit's tokens and accessible interaction model.
+optional detail appears in the kit Tooltip. STATUS-C3c changes the strip to
+one labelled image with an optional summary because Home's accessibility gate
+found the 11 by 28 pixel cells below the 48 pixel touch-target floor. The
+cells are non-interactive, and pointers can still hover for each day's tooltip.
+
+The strip keeps its original status colors and data shape while using one
+accessible name for the full history.
 
 OpenStatus registry content was rejected because its license was unclear.
 Tremor's npm package was rejected because it brings its own styling system

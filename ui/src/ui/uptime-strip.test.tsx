@@ -11,36 +11,44 @@ const sample = [
 ] as const;
 
 describe("UptimeStrip", () => {
-  test("renders one accessible cell per datum", () => {
-    const { getAllByRole } = render(
+  test("renders non-interactive hidden cells and one labelled image", () => {
+    const { container, getByRole } = render(
       <TooltipProvider>
-        <UptimeStrip data={[...sample]} aria-label="Service uptime" />
+        <UptimeStrip data={[...sample]} summary="Last two days: one outage" />
       </TooltipProvider>,
     );
-    const cells = getAllByRole("button");
-    expect(cells).toHaveLength(2);
-    expect(cells[0]!.getAttribute("aria-label")).toBe("Mon, up");
-    expect(cells[1]!.getAttribute("aria-label")).toBe("Tue, down");
+    expect(getByRole("img").getAttribute("aria-label")).toBe("Last two days: one outage");
+    expect(container.querySelectorAll("button")).toHaveLength(0);
+    expect(container.querySelectorAll("[tabindex]")).toHaveLength(0);
+    expect(container.querySelectorAll("[aria-label]")).toHaveLength(1);
+    expect(container.querySelectorAll("[aria-hidden='true']")).toHaveLength(2);
   });
 
-  test("shows the day's label and detail when focused", async () => {
-    const { getAllByRole, findByText, getByText } = render(
+  test("aria-label takes precedence over summary", () => {
+    const { getByRole } = render(
+      <TooltipProvider>
+        <UptimeStrip data={[...sample]} summary="Summary" aria-label="Explicit label" />
+      </TooltipProvider>,
+    );
+    expect(getByRole("img").getAttribute("aria-label")).toBe("Explicit label");
+  });
+
+  test("generates an image label when summary is omitted", () => {
+    const { getByRole } = render(
       <TooltipProvider>
         <UptimeStrip data={[...sample]} />
       </TooltipProvider>,
     );
-    fireEvent.focus(getAllByRole("button")[0]!);
-    expect(await findByText("Mon")).toBeTruthy();
-    expect(getByText("All systems operational")).toBeTruthy();
+    expect(getByRole("img").getAttribute("aria-label")).toBe("Uptime history, 2 days");
   });
 
   test("shows the day's label and detail on hover", async () => {
-    const { getAllByRole, findByText, getByText } = render(
+    const { container, findByText, getByText } = render(
       <TooltipProvider>
         <UptimeStrip data={[...sample]} />
       </TooltipProvider>,
     );
-    fireEvent.pointerMove(getAllByRole("button")[1]!, { pointerType: "mouse" });
+    fireEvent.pointerMove(container.querySelectorAll("[aria-hidden='true']")[1]!, { pointerType: "mouse" });
     expect(await findByText("Tue")).toBeTruthy();
     expect(getByText("Database outage")).toBeTruthy();
   });
@@ -49,5 +57,7 @@ describe("UptimeStrip", () => {
     const { container } = render(<UptimeStrip data={[]} aria-label="No history" />);
     expect(container.firstElementChild).toBeTruthy();
     expect(container.querySelectorAll("button")).toHaveLength(0);
+    expect(container.firstElementChild?.getAttribute("role")).toBe("img");
+    expect(container.firstElementChild?.getAttribute("aria-label")).toBe("No history");
   });
 });
