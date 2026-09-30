@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.56] - 2026-09-29
+
+### Added
+- `settings/keys.json`: `ui.enrollment_sounds`, a person-scoped boolean (default true, level basic, `lives_in` `profile.appearance`, honoured by `home`) that turns the face-enrollment capture sounds on or off. Regenerated from Home's declaration by `gen:settings`; no other key changed.
+
 ## [spec-v0.1.55] - 2026-09-29
 
 ### Added

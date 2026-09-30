@@ -836,6 +836,20 @@
     ]
   },
   {
+    "key": "ui.enrollment_sounds",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Enrollment sounds",
+    "help": "Play soft sounds during face enrollment as the camera finds your face, then a chime when a photo is taken.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "profile.appearance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "ui.look",
     "scope": "person",
     "selector": "select",
