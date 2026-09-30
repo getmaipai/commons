@@ -1155,6 +1155,10 @@ existing 4.5:1 hue-text-mix and 15%-tinted-pill checks in
 always has a text status and an icon beside it, so color is never the
 only signal.
 
+## STATUS-A1: Header status indicator slot (2026-09-30, `ui-v0.5.81`)
+
+`Header` and `FullLayout` accept an optional `statusIndicator` node, rendered immediately before notifications. Omitting it leaves the header unchanged.
+
 ## core-v0.1.1: where a product's data lives (DATA-LOCATION-00b)
 
 `core` gains the shared half of the data-location design in home's

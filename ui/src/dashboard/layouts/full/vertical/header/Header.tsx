@@ -17,6 +17,7 @@ import Notifications from "./Notifications";
 import HeaderSearch, { type HeaderSearchProps } from "./HeaderSearch";
 import { useHeaderExtraLeft } from "./HeaderExtraContext";
 import { hitArea } from "../../../../../utils";
+import type { ReactNode } from "react";
 
 export interface HeaderProps {
   /** SHELL-SEARCH-02 (home, 2026-09-23): threaded straight through to
@@ -38,6 +39,9 @@ export interface HeaderProps {
    * header's redundant shortcut rather than keep two controls for the
    * one setting. Defaults true so every other consumer is unaffected. */
   showThemeToggle?: boolean;
+  /** STATUS-A1 (home, 2026-09-30): optional status content rendered
+   * beside the header controls, immediately before notifications. */
+  statusIndicator?: ReactNode;
 }
 
 export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) {
@@ -76,7 +80,7 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
   );
 }
 
-const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle = true }: HeaderProps = {}) => {
+const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle = true, statusIndicator }: HeaderProps = {}) => {
 
   const { toggleSidebar } = useSidebar();
   const HeaderExtraLeft = useHeaderExtraLeft();
@@ -183,7 +187,8 @@ const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognito
               {incognito !== undefined && onIncognitoChange ? (
                 <IncognitoToggle on={incognito} onChange={onIncognitoChange} />
               ) : null}
-            
+
+              {statusIndicator}
 
              
 
