@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
@@ -10,7 +11,7 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
 
 class MaintenanceWindow(BaseModel):
     """
-    Scheduled maintenance. Status is derived at read time from the clock and cancelled_at (scheduled -> in_progress -> completed, or cancelled), never stored. ends_at must be after starts_at; JSON Schema cannot express this, so the hub enforces it. Recurrence is deliberately not modeled yet; a later shape may add strategy.
+    Scheduled maintenance. Status is derived at read time from the clock and cancelled_at (scheduled -> in_progress -> completed, or cancelled), never stored. ends_at must be after starts_at; JSON Schema cannot express this, so the hub enforces it. Recurring windows store an RFC 5545 RRULE in rrule, an optional inclusive end date in until, and the occurrence duration is ends_at minus starts_at.
     """
 
     model_config = ConfigDict(
@@ -30,3 +31,5 @@ class MaintenanceWindow(BaseModel):
     )
     description: constr(max_length=1000) | None = ''
     cancelled_at: AwareDatetime | None = None
+    rrule: constr(min_length=1) | None = None
+    until: date | None = None

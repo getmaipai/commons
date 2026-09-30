@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-/**Scheduled maintenance. Status is derived at read time from the clock and cancelled_at (scheduled -> in_progress -> completed, or cancelled), never stored. ends_at must be after starts_at; JSON Schema cannot express this, so the hub enforces it. Recurrence is deliberately not modeled yet; a later shape may add strategy.*/
+/**Scheduled maintenance. Status is derived at read time from the clock and cancelled_at (scheduled -> in_progress -> completed, or cancelled), never stored. ends_at must be after starts_at; JSON Schema cannot express this, so the hub enforces it. Recurring windows store an RFC 5545 RRULE in rrule, an optional inclusive end date in until, and the occurrence duration is ends_at minus starts_at.*/
 export const MaintenanceWindow = z
   .object({
     id: z.string().regex(new RegExp("^maint-[a-z0-9]{6,}$")),
@@ -29,9 +29,11 @@ export const MaintenanceWindow = z
     cancelled_at: z
       .union([z.string().datetime({ offset: true }), z.null()])
       .default(null),
+    rrule: z.string().min(1).optional(),
+    until: z.string().date().optional(),
   })
   .strict()
   .describe(
-    "Scheduled maintenance. Status is derived at read time from the clock and cancelled_at (scheduled -> in_progress -> completed, or cancelled), never stored. ends_at must be after starts_at; JSON Schema cannot express this, so the hub enforces it. Recurrence is deliberately not modeled yet; a later shape may add strategy.",
+    "Scheduled maintenance. Status is derived at read time from the clock and cancelled_at (scheduled -> in_progress -> completed, or cancelled), never stored. ends_at must be after starts_at; JSON Schema cannot express this, so the hub enforces it. Recurring windows store an RFC 5545 RRULE in rrule, an optional inclusive end date in until, and the occurrence duration is ends_at minus starts_at.",
   );
 export type MaintenanceWindow = z.infer<typeof MaintenanceWindow>;

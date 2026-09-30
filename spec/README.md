@@ -47,7 +47,7 @@ The error catalogue's *shape* (`ErrorEntry`) and the privacy row shape
 see "Cross-repo schemas" below. The populated error catalogue itself
 (`errors/errors.json`) is this repo's own content.
 
-Added 2026-09-30 (STATUS-B1, home docs/plans/status-page-2026-09-30.md): **StatusNote**, one admin-pinned plain-text status note, and **MaintenanceWindow**, one scheduled maintenance window over status-page components. Maintenance status is derived when read; recurrence is not modeled. The hub enforces that a window ends after it starts. Component ids are declared in the MaintenanceWindow schema.
+Added 2026-09-30 (STATUS-B1, home docs/plans/status-page-2026-09-30.md): **StatusNote**, one admin-pinned plain-text status note, and **MaintenanceWindow**, one scheduled maintenance window over status-page components. Maintenance status is derived when read; optional RFC 5545 `rrule` and `until` fields describe recurring series, whose occurrences are derived from the clock. The hub enforces that a window ends after it starts. Component ids are declared in the MaintenanceWindow schema.
 
 Added 2026-09-30 (STATUS-C1, home docs/plans/status-page-2026-09-30.md): **StatusEvent**, one append-only row for each status-page component state change, plus the hub boot-gap pair. State duration is the gap to the next row for that component; the hub prunes rows older than 90 days. A component with no rows displays as operational from the earliest row across components. These history and display rules are enforced by the hub.
 
