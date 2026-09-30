@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
 from pydantic import (
@@ -29,6 +30,47 @@ class Download(BaseModel):
     url: AnyUrl
     sha256: constr(pattern=r'^[a-f0-9]{64}$')
     approx_bytes: conint(ge=1)
+
+
+class Tool(BaseModel):
+    """
+    The engine or estimator that produced the number, and its exact version.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    name: constr(min_length=1)
+    version: constr(min_length=1)
+
+
+class Footprint(BaseModel):
+    """
+    One recorded or estimated memory footprint of a model at one context length.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    bytes: PositiveInt
+    context_tokens: PositiveInt
+    kv_cache_type: Literal['f16', 'q8_0', 'q4_0'] = Field(
+        ...,
+        description='Element type of the KV cache (the per-token attention memory) for llama.cpp-family engines. f16 is the default. q8_0 and q4_0 are block-quantized (34 bytes per 32 elements and 18 bytes per 32 elements, respectively).',
+    )
+    source: Literal['measured', 'dry-run', 'estimated'] = Field(
+        ...,
+        description="measured means read from a real load; dry-run means the engine's own fit tool; estimated means computed from a file header.",
+    )
+    tool: Tool = Field(
+        ...,
+        description='The engine or estimator that produced the number, and its exact version.',
+    )
+    measured_at: date
+    hardware: constr(max_length=120) = Field(
+        ...,
+        description="A sanitized description of the machine the number applies to, such as '24 GB Apple silicon laptop', never a hostname, address or person's name. An estimate also depends on the machine: unified versus separate GPU memory, and how many layers are offloaded.",
+    )
 
 
 class DeadlinesMs(BaseModel):
@@ -216,4 +258,8 @@ class ModelCapabilities(BaseModel):
         description='Absent for a placeholder entry with nowhere to download from yet.',
     )
     sizing: TransformerGgufSizing | DiffusionSizing
+    footprints: list[Footprint] | None = Field(
+        None,
+        description='Recorded footprints for this model, newest first. A planner uses a measured entry before a dry-run one before an estimated one.',
+    )
     turn_budget: TurnBudget | None = None

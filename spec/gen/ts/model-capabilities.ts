@@ -167,6 +167,50 @@ export const ModelCapabilities = z
         );
       }
     }),
+    /**Recorded footprints for this model, newest first. A planner uses a measured entry before a dry-run one before an estimated one.*/
+    footprints: z
+      .array(
+        z
+          .object({
+            bytes: z.number().int().gt(0),
+            context_tokens: z.number().int().gt(0),
+            /**Element type of the KV cache (the per-token attention memory) for llama.cpp-family engines. f16 is the default. q8_0 and q4_0 are block-quantized (34 bytes per 32 elements and 18 bytes per 32 elements, respectively).*/
+            kv_cache_type: z
+              .enum(["f16", "q8_0", "q4_0"])
+              .describe(
+                "Element type of the KV cache (the per-token attention memory) for llama.cpp-family engines. f16 is the default. q8_0 and q4_0 are block-quantized (34 bytes per 32 elements and 18 bytes per 32 elements, respectively).",
+              ),
+            /**measured means read from a real load; dry-run means the engine's own fit tool; estimated means computed from a file header.*/
+            source: z
+              .enum(["measured", "dry-run", "estimated"])
+              .describe(
+                "measured means read from a real load; dry-run means the engine's own fit tool; estimated means computed from a file header.",
+              ),
+            /**The engine or estimator that produced the number, and its exact version.*/
+            tool: z
+              .object({ name: z.string().min(1), version: z.string().min(1) })
+              .strict()
+              .describe(
+                "The engine or estimator that produced the number, and its exact version.",
+              ),
+            measured_at: z.string().date(),
+            /**A sanitized description of the machine the number applies to, such as '24 GB Apple silicon laptop', never a hostname, address or person's name. An estimate also depends on the machine: unified versus separate GPU memory, and how many layers are offloaded.*/
+            hardware: z
+              .string()
+              .max(120)
+              .describe(
+                "A sanitized description of the machine the number applies to, such as '24 GB Apple silicon laptop', never a hostname, address or person's name. An estimate also depends on the machine: unified versus separate GPU memory, and how many layers are offloaded.",
+              ),
+          })
+          .strict()
+          .describe(
+            "One recorded or estimated memory footprint of a model at one context length.",
+          ),
+      )
+      .describe(
+        "Recorded footprints for this model, newest first. A planner uses a measured entry before a dry-run one before an estimated one.",
+      )
+      .optional(),
     /**U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.*/
     turn_budget: z
       .object({

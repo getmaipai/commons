@@ -200,6 +200,10 @@ describe("record fixtures validate against their generated Zod models", () => {
     });
   }
 
+  test("model-capabilities.chat-footprints.example.json", () => {
+    expect(() => ModelCapabilities.parse(loadFixture("model-capabilities.chat-footprints.example.json"))).not.toThrow();
+  });
+
   for (const band of ["child", "teen", "adult"]) {
     test(`content-ceiling.${band}.example.json`, () => {
       expect(() =>
@@ -315,5 +319,13 @@ describe("a bad record is rejected, not silently accepted", () => {
   test("model-capabilities with an unknown engine is rejected", () => {
     const bad = { ...(loadFixture("model-capabilities.chat.example.json") as Record<string, unknown>), engine: "unknown-engine" };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
+  });
+
+  test("model-capabilities footprint without hardware is rejected", () => {
+    expect(() => ModelCapabilities.parse(loadFixture("model-capabilities.invalid-footprint-no-hardware.json"))).toThrow();
+  });
+
+  test("model-capabilities footprint with unknown KV cache type is rejected", () => {
+    expect(() => ModelCapabilities.parse(loadFixture("model-capabilities.invalid-footprint-kv-cache-type.json"))).toThrow();
   });
 });

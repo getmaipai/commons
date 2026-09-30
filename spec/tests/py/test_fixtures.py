@@ -220,6 +220,26 @@ def test_model_capabilities_unknown_engine_is_rejected():
         ModelCapabilities.model_validate(bad)
 
 
+def test_model_capabilities_chat_footprints_fixture():
+    ModelCapabilities.model_validate(
+        load_fixture("model-capabilities.chat-footprints.example.json")
+    )
+
+
+def test_model_capabilities_footprint_without_hardware_is_rejected():
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate(
+            load_fixture("model-capabilities.invalid-footprint-no-hardware.json")
+        )
+
+
+def test_model_capabilities_footprint_unknown_kv_cache_type_is_rejected():
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate(
+            load_fixture("model-capabilities.invalid-footprint-kv-cache-type.json")
+        )
+
+
 def test_turn_signal_fixture():
     TurnSignal.model_validate(load_fixture("turn-signal.example.json"))
 
