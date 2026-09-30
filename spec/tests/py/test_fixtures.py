@@ -227,7 +227,17 @@ def test_error_catalogue_entries():
 
 
 @pytest.mark.parametrize(
-    "kind", ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts"]
+    "kind",
+    [
+        "chat",
+        "image",
+        "mlx-serve",
+        "sherpa-onnx-node",
+        "pocket-tts",
+        "judge-role",
+        "rerank-role",
+        "music-role",
+    ],
 )
 def test_model_capabilities_fixtures(kind):
     ModelCapabilities.model_validate(
@@ -238,6 +248,13 @@ def test_model_capabilities_fixtures(kind):
 def test_model_capabilities_unknown_engine_is_rejected():
     bad = load_fixture("model-capabilities.chat.example.json")
     bad["engine"] = "unknown-engine"
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate(bad)
+
+
+def test_model_capabilities_unknown_role_is_rejected():
+    bad = load_fixture("model-capabilities.chat.example.json")
+    bad["role"] = "nonsense"
     with pytest.raises(ValidationError):
         ModelCapabilities.model_validate(bad)
 

@@ -209,13 +209,18 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts"]) {
+  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts", "judge-role", "rerank-role", "music-role"]) {
     test(`model-capabilities.${kind}.example.json`, () => {
       expect(() =>
         ModelCapabilities.parse(loadFixture(`model-capabilities.${kind}.example.json`)),
       ).not.toThrow();
     });
   }
+
+  test("model-capabilities with an unknown role is rejected", () => {
+    const bad = { ...(loadFixture("model-capabilities.chat.example.json") as Record<string, unknown>), role: "nonsense" };
+    expect(() => ModelCapabilities.parse(bad)).toThrow();
+  });
 
   test("model-capabilities.chat-footprints.example.json", () => {
     expect(() => ModelCapabilities.parse(loadFixture("model-capabilities.chat-footprints.example.json"))).not.toThrow();

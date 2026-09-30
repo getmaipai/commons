@@ -14,23 +14,26 @@ export const ModelCapabilities = z
       .describe(
         "Catalog id, e.g. 'qwen3-8b-instruct-q4-k-m'. Stable once published: settings values reference it by this id.",
       ),
-    /**Matches backend/src/lib/llm.ts's LlmRole, with one addition ahead of that hub code: turn-signal (SPEC-01, dev.md section 12 part 2, the small classifier heads over the turn's existing embedding that ACT-02 fetches on demand, not wired to a real backend yet, same as image/video below). A code review on this migration caught the original wording claiming an exact match already - ACT-02 is what adds turn-signal to LlmRole itself; this is spec-only, declared here first per the migration's own no-hub-code scope.*/
+    /**Matches backend/src/lib/llm.ts's LlmRole, with one addition ahead of that hub code: turn-signal (SPEC-01, dev.md section 12 part 2, the small classifier heads over the turn's existing embedding that ACT-02 fetches on demand, not wired to a real backend yet, same as image/video below). The Stack roles also include judge, rerank and music. A code review on this migration caught the original wording claiming an exact match already - ACT-02 is what adds turn-signal to LlmRole itself; this is spec-only, declared here first per the migration's own no-hub-code scope.*/
     role: z
       .enum([
         "chat",
         "router",
         "embed",
+        "rerank",
         "vision",
         "image",
         "video",
+        "music",
         "coding",
+        "judge",
         "tts",
         "stt",
         "wakeword",
         "turn-signal",
       ])
       .describe(
-        "Matches backend/src/lib/llm.ts's LlmRole, with one addition ahead of that hub code: turn-signal (SPEC-01, dev.md section 12 part 2, the small classifier heads over the turn's existing embedding that ACT-02 fetches on demand, not wired to a real backend yet, same as image/video below). A code review on this migration caught the original wording claiming an exact match already - ACT-02 is what adds turn-signal to LlmRole itself; this is spec-only, declared here first per the migration's own no-hub-code scope.",
+        "Matches backend/src/lib/llm.ts's LlmRole, with one addition ahead of that hub code: turn-signal (SPEC-01, dev.md section 12 part 2, the small classifier heads over the turn's existing embedding that ACT-02 fetches on demand, not wired to a real backend yet, same as image/video below). The Stack roles also include judge, rerank and music. A code review on this migration caught the original wording claiming an exact match already - ACT-02 is what adds turn-signal to LlmRole itself; this is spec-only, declared here first per the migration's own no-hub-code scope.",
       ),
     /**Display name, e.g. 'Qwen3 8B Instruct'.*/
     label: z
