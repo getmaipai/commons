@@ -33,6 +33,15 @@ getmaipai/.github.
 - vaul (MIT) - https://vaul.emilkowal.ski (`ui/drawer.tsx`)
 - @tanstack/react-query (MIT) - https://tanstack.com/query
   (the settings and UI-schema renderers' data layer)
+- Kibo UI Status (MIT, Copyright (c) 2023 to Present shadcnblocks) -
+  https://github.com/shadcnblocks/kibo
+  (ui/src/ui/status.tsx, modified)
+- Tremor Raw Tracker (Apache-2.0, Copyright © 2025 Tremor. All rights reserved.) -
+  https://github.com/tremorlabs/tremor
+  (ui/src/ui/uptime-strip.tsx, modified; license text at
+  ui/THIRD_PARTY/tremor-LICENSE-Apache-2.0.txt)
+- Kibo UI Status license text:
+  ui/THIRD_PARTY/kibo-LICENSE-MIT.txt
 - react-router-dom (MIT) - https://reactrouter.com (the shell's nav,
   `PhoneNav`, `NotificationPopover`'s history link)
 - recharts (MIT) - https://recharts.org (`ui/chart.tsx`)

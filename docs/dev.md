@@ -1159,6 +1159,31 @@ only signal.
 
 `Header` and `FullLayout` accept an optional `statusIndicator` node, rendered immediately before notifications. Omitting it leaves the header unchanged.
 
+## STATUS-A1b: attributed status and uptime snapshots (`ui-v0.5.82`)
+
+The kit copies two small shadcn-style components because their upstream
+projects explicitly support copy-in use. Keeping the snapshots in the kit
+avoids adding a runtime dependency for a badge and a row of status cells,
+and lets both use the kit's own Badge, Tooltip, tokens, and class helper.
+Both licenses are permissive and compatible with the kit's AGPL distribution.
+The source files and their complete license texts are recorded in NOTICE
+and `ui/THIRD_PARTY/`.
+
+Kibo UI Status keeps its four-state API and ping dot, with the kit's Badge,
+helper, and themed green, yellow, primary, and destructive tokens. Tremor
+Raw Tracker becomes `UptimeStrip`: its records carry a day label and status,
+optional detail appears in the kit Tooltip, and each cell has a keyboard
+focus target and accessible name. These changes keep the original ideas
+while fitting the kit's tokens and accessible interaction model.
+
+OpenStatus registry content was rejected because its license was unclear.
+Tremor's npm package was rejected because it brings its own styling system
+for these two small components. To update a snapshot, fetch the named
+upstream file at the recorded source revision, compare it with the saved
+copy outside the repository, then re-apply the modifications listed in
+the component header. Update the source revision, NOTICE, and relevant
+license file if upstream licensing or attribution changes.
+
 ## core-v0.1.1: where a product's data lives (DATA-LOCATION-00b)
 
 `core` gains the shared half of the data-location design in home's
