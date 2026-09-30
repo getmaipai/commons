@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.59] - 2026-09-30
+
+### Added
+- `kv_cache_type` definition; the `mlx-serve`, `sherpa-onnx-node` and `pocket-tts` engine names; the footprint entry and the `footprints` property on the model record; and `stack-fit-plan.schema.json` (the Stack fit-plan wire shape).
+
 ## [spec-v0.1.58] - 2026-09-29
 
 ### Added
