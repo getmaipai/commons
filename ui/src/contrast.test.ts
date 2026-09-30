@@ -57,6 +57,13 @@ const HUES: Record<string, string> = {
 };
 const blueByTheme: Record<string, string> = { light: readVar(lightRoot, "--primary"), dark: readVar(darkRoot, "--primary") };
 
+// Green and yellow (FACE-02L) are themed like blue: a bright value in
+// `@theme` and the dark root, a deeper one in the light root.
+const themedHues: Record<string, Record<string, string>> = {
+  light: { green: readVar(lightRoot, "--hue-green"), yellow: readVar(lightRoot, "--hue-yellow") },
+  dark: { green: readVar(darkRoot, "--hue-green"), yellow: readVar(darkRoot, "--hue-yellow") },
+};
+
 // Linear-RGB alpha blend, not the OKLab `color-mix()` Tailwind's own
 // opacity modifiers actually use in the browser - a reasonable
 // approximation, not a guarantee (ui-v0.1.4, getmaipai/home's own step
@@ -121,7 +128,7 @@ describe("WCAG AA contrast over the spec's surfaces (both themes)", () => {
 // themes, against the panel surface the card actually renders on.
 describe("WCAG AA contrast for the kit's hue-text-mix (both themes)", () => {
   for (const theme of themes) {
-    const hues: Record<string, string> = { blue: blueByTheme[theme.name]!, ...HUES };
+    const hues: Record<string, string> = { blue: blueByTheme[theme.name]!, ...themedHues[theme.name]!, ...HUES };
     for (const [hueName, hueHex] of Object.entries(hues)) {
       test(`${theme.name}: ${hueName} state link on panel clears 4.5`, () => {
         const blended = blendedHex(hueHex, theme.primaryText, HUE_TEXT_MIX);
@@ -142,13 +149,33 @@ describe("WCAG AA contrast for the kit's hue-text-mix (both themes)", () => {
 // tint pulls the background toward the hue itself).
 describe("WCAG AA contrast for the kit's hue-text-mix on a 15%-tinted pill (both themes)", () => {
   for (const theme of themes) {
-    const hues: Record<string, string> = { blue: blueByTheme[theme.name]!, ...HUES };
+    const hues: Record<string, string> = { blue: blueByTheme[theme.name]!, ...themedHues[theme.name]!, ...HUES };
     for (const [hueName, hueHex] of Object.entries(hues)) {
       test(`${theme.name}: ${hueName} pill text on its own 15% tint clears 4.5`, () => {
         const pillBackground = blendedHex(hueHex, theme.surfaces.panel!, HUE_PILL_TINT);
         const text = blendedHex(hueHex, theme.primaryText, HUE_TEXT_MIX);
         const ratio = contrastRatio(text, pillBackground);
         expect(ratio).toBeGreaterThanOrEqual(4.5);
+      });
+    }
+  }
+});
+
+// The capture ring (FACE-02L) is a 4 px border of --hue-green or
+// --hue-yellow around a black preview, on the page. WCAG 1.4.11 asks
+// 3:1 for a graphic that carries meaning; the ring also has a text
+// status and an icon, but the color itself is held to the floor on the
+// page and card surfaces it can sit on, in both themes.
+describe("WCAG 3:1 non-text contrast for the green and yellow hues (both themes)", () => {
+  for (const theme of themes) {
+    for (const [hueName, hueHex] of Object.entries(themedHues[theme.name]!)) {
+      for (const surface of ["canvas", "panel"]) {
+        test(`${theme.name}: ${hueName} on ${surface} clears 3.0`, () => {
+          expect(contrastRatio(hueHex, theme.surfaces[surface]!)).toBeGreaterThanOrEqual(3.0);
+        });
+      }
+      test(`${theme.name}: ${hueName} on the black preview clears 3.0`, () => {
+        expect(contrastRatio(hueHex, "#000000")).toBeGreaterThanOrEqual(3.0);
       });
     }
   }

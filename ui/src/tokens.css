@@ -102,6 +102,16 @@
   --hue-orange: #ff8a35;
   --hue-pink: #ff3e9a;
   --hue-red: #ff4b62;
+  /* Green and yellow (FACE-02L), the two hues the palette lacked: the
+   * capture ring must read as truly green and truly yellow, and teal and
+   * orange are neither. Unlike the six above these two are themed: this
+   * is the bright, dark-reference value; the light root and the light
+   * fallback below override it with a deeper one, because a bright
+   * yellow or green is 1.4:1 to 2.1:1 against the light page and fails
+   * the 3:1 non-text floor there. Measured numbers in docs/dev.md
+   * (FACE-02L). */
+  --hue-green: #22c55e;
+  --hue-yellow: #facc15;
   --cat-models: var(--primary);
   --cat-adapters: var(--hue-pink);
   --cat-apps: var(--primary);
@@ -373,6 +383,8 @@
   --profile-accent-pink-foreground: #07111f;
   --profile-accent-red: #e2b1a7;
   --profile-accent-red-foreground: #07111f;
+  --hue-green: #1a9c48;
+  --hue-yellow: #b58700;
   --primary: #21a6ff;
   /* Dark navy text on the electric blue, not white: ~7.2:1 measured,
    * against white's ~2.6:1 on this lightness of blue. */
@@ -469,6 +481,8 @@
     --profile-accent-pink-foreground: #f4f8ff;
     --profile-accent-red: #593438;
     --profile-accent-red-foreground: #f4f8ff;
+    --hue-green: #22c55e;
+    --hue-yellow: #facc15;
     --primary: #21a6ff;
     --primary-foreground: #07111f;
     --ring: #21a6ff;
@@ -517,6 +531,8 @@
   --profile-accent-pink-foreground: #f4f8ff;
   --profile-accent-red: #593438;
   --profile-accent-red-foreground: #f4f8ff;
+  --hue-green: #22c55e;
+  --hue-yellow: #facc15;
   --primary: #21a6ff;
   --primary-foreground: #07111f;
   --ring: #21a6ff;

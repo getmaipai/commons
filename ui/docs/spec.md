@@ -53,6 +53,8 @@ earlier scratch reference entirely.
 | Violet | `#A434FF` | Adapters, profile affordances, selected navigation. |
 | Teal | `#00E3AE` | Healthy, running, success, GPU activity. |
 | Orange | `#FF8A35` | Workflows, storage, urgent resource activity. |
+| Green | `#22C55E` (light theme `#1A9C48`) | A true "good": the capture ring when a frame is sharp. Themed pair, `--hue-green`. |
+| Yellow | `#FACC15` (light theme `#B58700`) | A true "soft, try again": the capture ring on a soft frame. Themed pair, `--hue-yellow`. |
 | Pink | `#FF3E9A` | Image components / image apps. |
 | Red | `#FF4B62` | Errors, critical notices, notification count. |
 

@@ -4,6 +4,20 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.80] - ui-v0.5.80
+
+`tokens.css` gains `--hue-green` and `--hue-yellow`, the two hues the
+palette lacked (FACE-02L: Home's face-enrollment capture ring must be
+truly green and truly yellow). Themed, unlike the six fixed hues: a
+bright value in `@theme`, the dark root and the dark fallback
+(`#22c55e`, `#facc15`), a deeper one in the light root (`#1a9c48`,
+`#b58700`) so each clears the 3:1 non-text floor on the light page.
+`contrast.test.ts` covers them (3:1 on page, panel and a black preview
+in both themes, and the shared 4.5:1 hue-text-mix and pill checks).
+`status.ts` is unchanged: `ready` stays teal and `warning` orange, so no
+existing pill or dot moves. Additive; no existing token or component
+changes.
+
 ## [0.5.69] - ui-v0.5.69
 
 `elements/thread.aui.tsx`'s `ThreadComponents` gains an optional
