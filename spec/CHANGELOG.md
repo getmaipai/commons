@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.70] - 2026-10-01
+
+### Added
+- Household settings for the internet probe switch, DNS name, TCP address, and TCP port.
+
 ## [spec-v0.1.69] - 2026-10-01
 
 ### Added

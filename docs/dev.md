@@ -1,5 +1,12 @@
 # shared: design record
 
+## spec-v0.1.70: household internet probe settings
+
+The generated settings registry now includes the four household controls
+for the STATUS-SVC-02 internet check: enabled, DNS name, TCP IP address,
+and TCP port. The declarations stay in Home's core settings registry;
+`spec/settings/keys.json` is its shared generated output.
+
 ## spec-v0.1.69: app health declarations (STATUS-SVC-01)
 
 The package manifest's optional `needs` list now declares `{kind, id, name,
