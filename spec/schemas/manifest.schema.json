@@ -254,6 +254,22 @@
       "items": { "$ref": "https://getmaipai.github.io/.github/standards/schemas/privacy-row.schema.json" },
       "description": "Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.2.0)."
     },
+    "needs": {
+      "type": "array",
+      "description": "The capabilities this package needs for health derivation.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "id", "name", "purpose", "required"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["engine", "service", "internet"] },
+          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "purpose": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
     "permissions": {
       "type": "array",
       "items": { "type": "string" },

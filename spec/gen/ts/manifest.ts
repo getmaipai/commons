@@ -396,6 +396,25 @@ export const PackageManifest = z
         "Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.2.0).",
       )
       .optional(),
+    /**The capabilities this package needs for health derivation.*/
+    needs: z
+      .array(
+        z
+          .object({
+            kind: z.enum(["engine", "service", "internet"]),
+            id: z
+              .string()
+              .regex(new RegExp("^[a-z0-9][a-z0-9_-]*$"))
+              .min(1)
+              .max(64),
+            name: z.string().min(1).max(80),
+            purpose: z.string().min(1).max(200),
+            required: z.boolean(),
+          })
+          .strict(),
+      )
+      .describe("The capabilities this package needs for health derivation.")
+      .optional(),
     /**From the fixed permissions enum (spec/vocab/permissions.json).*/
     permissions: z
       .array(z.string())

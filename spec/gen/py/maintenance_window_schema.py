@@ -20,7 +20,8 @@ class MaintenanceWindow(BaseModel):
     id: constr(pattern=r'^maint-[a-z0-9]{6,}$')
     title: constr(min_length=1, max_length=120)
     components: list[
-        Literal['chat', 'embed', 'background', 'voice', 'library', 'hub']
+        Literal['chat', 'embed', 'background', 'voice', 'library', 'hub', 'internet']
+        | constr(pattern=r'^service:[a-z0-9][a-z0-9_-]{0,63}$')
     ] = Field(..., min_length=1)
     starts_at: AwareDatetime
     ends_at: AwareDatetime

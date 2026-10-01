@@ -1,5 +1,15 @@
 # shared: design record
 
+## spec-v0.1.69: app health declarations (STATUS-SVC-01)
+
+The package manifest's optional `needs` list now declares `{kind, id, name,
+purpose, required}` for engine, service, and internet dependencies. Status
+events accept `internet` and `service:<id>` components. Valid and invalid
+fixtures cover the new manifest declarations and status components; the
+generated TypeScript and Python validators are checked against the same
+fixtures. Home's app status view consumes these declarations without storing
+app rows.
+
 Created 2026-09-20 out of
 [`stack/docs/plans/refocus-work-order-2026-09-20.md`](https://github.com/getmaipai/stack/blob/main/docs/plans/refocus-work-order-2026-09-20.md)
 steps 0b and 0c, itself following the same day's decision that the Stack is

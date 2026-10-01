@@ -17,8 +17,10 @@ class StatusEvent(BaseModel):
         extra='forbid',
     )
     id: constr(pattern=r'^sev-[a-z0-9]{6,}$')
-    component: Literal['chat', 'embed', 'background', 'voice', 'library', 'hub'] = (
-        Field(..., title='StatusComponent')
+    component: Literal[
+        'chat', 'embed', 'background', 'voice', 'library', 'hub', 'internet'
+    ] | constr(pattern=r'^service:[a-z0-9][a-z0-9_-]{0,63}$') = Field(
+        ..., title='StatusComponent'
     )
     state: Literal['operational', 'degraded', 'outage', 'maintenance']
     at: AwareDatetime = Field(..., description='When the component entered this state.')

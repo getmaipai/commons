@@ -10,7 +10,20 @@ export const MaintenanceWindow = z
     id: z.string().regex(new RegExp("^maint-[a-z0-9]{6,}$")),
     title: z.string().min(1).max(120),
     components: z
-      .array(z.enum(["chat", "embed", "background", "voice", "library", "hub"]))
+      .array(
+        z.union([
+          z.enum([
+            "chat",
+            "embed",
+            "background",
+            "voice",
+            "library",
+            "hub",
+            "internet",
+          ]),
+          z.string().regex(new RegExp("^service:[a-z0-9][a-z0-9_-]{0,63}$")),
+        ]),
+      )
       .min(1)
       .refine(
         (arr) => arr.every((item, i) => arr.indexOf(item) == i),

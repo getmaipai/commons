@@ -4,12 +4,16 @@
 
 import { z } from "zod";
 
-export const StatusComponent = z.enum([
-  "chat",
-  "embed",
-  "background",
-  "voice",
-  "library",
-  "hub",
+export const StatusComponent = z.union([
+  z.enum([
+    "chat",
+    "embed",
+    "background",
+    "voice",
+    "library",
+    "hub",
+    "internet",
+  ]),
+  z.string().regex(new RegExp("^service:[a-z0-9][a-z0-9_-]{0,63}$")),
 ]);
 export type StatusComponent = z.infer<typeof StatusComponent>;

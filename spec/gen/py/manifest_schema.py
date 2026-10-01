@@ -156,6 +156,17 @@ class KnowledgeSource(BaseModel):
     )
 
 
+class Need(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['engine', 'service', 'internet']
+    id: constr(pattern=r'^[a-z0-9][a-z0-9_-]*$', min_length=1, max_length=64)
+    name: constr(min_length=1, max_length=80)
+    purpose: constr(min_length=1, max_length=200)
+    required: bool
+
+
 class Notification(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -424,6 +435,9 @@ class PackageManifest(BaseModel):
     data_sources: list[privacy_row_schema.PrivacyRow] | None = Field(
         None,
         description="Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.2.0).",
+    )
+    needs: list[Need] | None = Field(
+        None, description='The capabilities this package needs for health derivation.'
     )
     permissions: list[str] | None = Field(
         None,

@@ -7,6 +7,13 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.69] - 2026-10-01
+
+### Added
+- Optional `needs` declarations on package manifests for engine, service and internet dependencies.
+- `internet` and validated `service:<id>` status components.
+- Valid and invalid manifest-needs and status-event fixtures, checked by the TypeScript and Python generated validators.
+
 ## [spec-v0.1.68] - 2026-09-30
 
 ### Added

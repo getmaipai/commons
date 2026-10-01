@@ -3,5 +3,22 @@
   "$id": "https://getmaipai.github.io/shared/spec/schemas/status-component.schema.json",
   "title": "StatusComponent",
   "type": "string",
-  "enum": ["chat", "embed", "background", "voice", "library", "hub"]
+  "anyOf": [
+    {
+      "type": "string",
+      "enum": [
+        "chat",
+        "embed",
+        "background",
+        "voice",
+        "library",
+        "hub",
+        "internet"
+      ]
+    },
+    {
+      "type": "string",
+      "pattern": "^service:[a-z0-9][a-z0-9_-]{0,63}$"
+    }
+  ]
 }

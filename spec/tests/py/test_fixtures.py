@@ -179,6 +179,32 @@ def test_manifest_fixture():
     PackageManifest.model_validate(load_fixture("manifest.example.json"))
 
 
+@pytest.mark.parametrize(
+    "path", sorted((SPEC_DIR / "fixtures" / "manifest-needs").glob("*.json"))
+)
+def test_manifest_needs_fixtures(path: Path):
+    value = json.loads(path.read_text())
+    if path.name.startswith("valid-"):
+        PackageManifest.model_validate(value)
+    else:
+        with pytest.raises(ValidationError):
+            PackageManifest.model_validate(value)
+
+
+@pytest.mark.parametrize(
+    "path", sorted((SPEC_DIR / "fixtures" / "status-event").glob("*.json"))
+)
+def test_status_event_fixtures(path: Path):
+    from gen.py.status_event_schema import StatusEvent
+
+    value = json.loads(path.read_text())
+    if path.name.startswith("valid-"):
+        StatusEvent.model_validate(value)
+    else:
+        with pytest.raises(ValidationError):
+            StatusEvent.model_validate(value)
+
+
 def test_manifest_companion_style_adapter_fixture():
     PackageManifest.model_validate(
         load_fixture("manifest.companion-style-adapter.example.json")

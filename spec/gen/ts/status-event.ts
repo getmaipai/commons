@@ -8,13 +8,17 @@ import { z } from "zod";
 export const StatusEvent = z
   .object({
     id: z.string().regex(new RegExp("^sev-[a-z0-9]{6,}$")),
-    component: z.enum([
-      "chat",
-      "embed",
-      "background",
-      "voice",
-      "library",
-      "hub",
+    component: z.union([
+      z.enum([
+        "chat",
+        "embed",
+        "background",
+        "voice",
+        "library",
+        "hub",
+        "internet",
+      ]),
+      z.string().regex(new RegExp("^service:[a-z0-9][a-z0-9_-]{0,63}$")),
     ]),
     state: z.enum(["operational", "degraded", "outage", "maintenance"]),
     /**When the component entered this state.*/
