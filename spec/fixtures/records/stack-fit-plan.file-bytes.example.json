@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "model": "qwen3-1.7b",
+  "model_file_bytes": 11800000000,
+  "context_tokens": 4096,
+  "kv_cache_type": "f16",
+  "roles": [
+    {
+      "role": "chat",
+      "choice": "proposed",
+      "peak": {
+        "low": null,
+        "high": null,
+        "source": "unknown",
+        "as_of": "2026-09-30"
+      }
+    }
+  ],
+  "total": {
+    "low": null,
+    "high": null,
+    "source": "unknown",
+    "as_of": "2026-09-30"
+  },
+  "cap": {
+    "low": null,
+    "high": null,
+    "source": "unknown",
+    "as_of": "2026-09-30"
+  },
+  "margin": {
+    "low": null,
+    "high": null,
+    "source": "unknown",
+    "as_of": "2026-09-30"
+  },
+  "paths": [
+    {
+      "path": "unified",
+      "fits": false,
+      "verdict": "unknown"
+    },
+    {
+      "path": "cpu",
+      "fits": false,
+      "verdict": "unknown"
+    }
+  ],
+  "verdict": "unknown",
+  "bottleneck": "unknown"
+}

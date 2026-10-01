@@ -85,6 +85,10 @@ class StackFitPlan(BaseModel):
     )
     schema_: Literal[1] = Field(..., alias='schema')
     model: constr(min_length=1)
+    model_file_bytes: conint(ge=0) | None = Field(
+        None,
+        description="The size of the model file the plan was made for, in bytes, when the Stack knows it from the repository listing or the file itself. A hard fact, known even when the plan's figures are unknown because the model family has not been measured. Absent when the Stack could not read it.",
+    )
     context_tokens: PositiveInt
     kv_cache_type: Literal['f16', 'q8_0', 'q4_0'] = Field(
         ...,

@@ -9,6 +9,15 @@ export const StackFitPlan = z
   .object({
     schema: z.literal(1),
     model: z.string().min(1),
+    /**The size of the model file the plan was made for, in bytes, when the Stack knows it from the repository listing or the file itself. A hard fact, known even when the plan's figures are unknown because the model family has not been measured. Absent when the Stack could not read it.*/
+    model_file_bytes: z
+      .number()
+      .int()
+      .gte(0)
+      .describe(
+        "The size of the model file the plan was made for, in bytes, when the Stack knows it from the repository listing or the file itself. A hard fact, known even when the plan's figures are unknown because the model family has not been measured. Absent when the Stack could not read it.",
+      )
+      .optional(),
     context_tokens: z.number().int().gt(0),
     /**Element type of the KV cache (the per-token attention memory) for llama.cpp-family engines. f16 is the default. q8_0 and q4_0 are block-quantized (34 bytes per 32 elements and 18 bytes per 32 elements, respectively).*/
     kv_cache_type: z
