@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.67] - 2026-09-30
+
+### Added
+- `engines.stack.use_chat`, `engines.stack.use_embeddings`, `engines.stack.use_stt` and `engines.stack.use_tts`, the per-role Stack switches.
+
 ## [spec-v0.1.66] - 2026-09-30
 
 ### Added
