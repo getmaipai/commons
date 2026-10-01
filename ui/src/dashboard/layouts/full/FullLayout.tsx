@@ -8,6 +8,9 @@ import Footer from './shared/footer/Footer';
 import { Outlet } from 'react-router';
 
 export interface FullLayoutProps {
+  /** Home's derived app health badge, rendered through the shipped
+   * SidebarMenuBadge slot for the matching app menu item. */
+  sidebarItemStatus?: (item: { name: string; url?: string }) => { badge?: "amber" | "red"; title: string; ariaLabel: string } | undefined;
   /** SHELL-SEARCH-02 (home, 2026-09-23): threaded straight through to
    * `Header`'s own `headerSearchRemote` prop. `FullLayout` is the one
    * component a caller actually instantiates itself (`<Route
@@ -31,7 +34,7 @@ export interface FullLayoutProps {
   statusIndicator?: HeaderProps["statusIndicator"];
 }
 
-const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator }) => {
+const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator, sidebarItemStatus }) => {
 
   return (
     <SidebarProvider
@@ -39,7 +42,7 @@ const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayNam
       style={{ "--sidebar-width-icon": "52px" } as React.CSSProperties}
     >
       <HeaderExtraProvider>
-        <Sidebar />
+        <Sidebar sidebarItemStatus={sidebarItemStatus} />
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}

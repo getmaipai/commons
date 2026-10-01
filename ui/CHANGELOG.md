@@ -18,6 +18,15 @@ in both themes, and the shared 4.5:1 hue-text-mix and pill checks).
 existing pill or dot moves. Additive; no existing token or component
 changes.
 
+## [0.5.84] - ui-v0.5.84
+
+`FullLayout` accepts an optional `sidebarItemStatus` resolver and threads
+it to the shipped sidebar menu. A resolved warning or error uses the
+existing `SidebarMenuBadge` slot; the menu link receives the resolver's
+plain tooltip and accessible name, and keeps its original destination.
+Unset or healthy items render no badge. No vendored shadcndashboard
+component or navigation data changed.
+
 ## [0.5.69] - ui-v0.5.69
 
 `elements/thread.aui.tsx`'s `ThreadComponents` gains an optional

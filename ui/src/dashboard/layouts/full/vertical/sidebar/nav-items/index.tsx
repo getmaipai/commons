@@ -3,12 +3,14 @@ import { ChevronRight } from "lucide-react";
 import { ChildItem } from "../sidebaritems";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
+import { SidebarMenuBadge } from "../../../../../components/ui/sidebar";
 
 interface NavItemProps {
   item: ChildItem;
   hasChildren: boolean;
   className?: string;
   isActive?: boolean;
+  badge?: "amber" | "red";
 }
 
 export default function NavItem({
@@ -16,6 +18,7 @@ export default function NavItem({
   hasChildren,
   className,
   isActive,
+  badge,
 }: NavItemProps) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -51,6 +54,8 @@ export default function NavItem({
 
         {/* Name */}
         <span className="font-medium hide-menu">{item.name}</span>
+
+        {badge ? <SidebarMenuBadge aria-hidden="true" className={`!flex !size-2 !min-w-0 !rounded-full !p-0 top-2.5 group-data-[collapsible=icon]:!flex ${badge === "red" ? "bg-destructive" : "bg-[var(--hue-yellow)]"}`} /> : null}
 
         {/* Badge */}
         {item.badge && (

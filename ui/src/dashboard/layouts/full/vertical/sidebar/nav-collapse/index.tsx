@@ -7,9 +7,10 @@ import { MenuItem, ChildItem } from "../sidebaritems";
 interface NavCollapseProps {
   menu: MenuItem[];
   className?: string;
+  sidebarItemStatus?: (item: { name: string; url?: string }) => { badge?: "amber" | "red"; title: string; ariaLabel: string } | undefined;
 }
 
-export default function NavCollapse({ menu, className }: NavCollapseProps) {
+export default function NavCollapse({ menu, className, sidebarItemStatus }: NavCollapseProps) {
   const { pathname } = useLocation();
   const { state } = useSidebar();
   const isCollapse = state === "collapsed";
@@ -46,6 +47,7 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
             const hasChildren =
               Array.isArray(item.items) && item.items.length > 0;
             const active = isActiveRoute(item);
+            const status = item.name ? sidebarItemStatus?.({ name: item.name, url: item.url }) : undefined;
 
             // 👉 No children → direct link
             if (!hasChildren)
@@ -54,6 +56,8 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
                   key={index}
                   to={item.url || "#"}
                   target={item.external ? "_blank" : undefined}
+                  title={status?.title}
+                  aria-label={status?.ariaLabel}
                   className={cn(
                     "relative flex min-h-12 items-center gap-3 rounded-md transition-all duration-200 ease-in-out",
 
@@ -62,7 +66,7 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
 
                 >
 
-                  <NavItem item={item} hasChildren={false} isActive={active} />
+                  <NavItem item={item} hasChildren={false} isActive={active} badge={status?.badge} />
                 </Link>
 
 
@@ -94,23 +98,26 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
                 <div className="pl-3  ml-5  border-l border-border">
                   {item.items?.map((sub: ChildItem, index) =>
                     sub.items ? (
-                      <NavCollapse
-                        key={index}
-                        menu={[{ items: [sub] }]}
-                        className={className}
+                        <NavCollapse
+                          key={index}
+                          menu={[{ items: [sub] }]}
+                          className={className}
+                          sidebarItemStatus={sidebarItemStatus}
                       />
                     ) : (
                       <Link
                         key={index}
                         to={sub.url || "#"}
                         target={sub.external ? "_blank" : undefined}
+                        title={sub.name ? sidebarItemStatus?.({ name: sub.name, url: sub.url })?.title : undefined}
+                        aria-label={sub.name ? sidebarItemStatus?.({ name: sub.name, url: sub.url })?.ariaLabel : undefined}
                       className={cn(
                           "relative flex min-h-12 items-center rounded-md transition-all duration-200 ease-in-out",
 
                           className,
                         )}
                       >
-                        <NavItem item={sub} hasChildren={false} className={cn("px-2! py-1! my-1!", pathname === sub.url && "bg-primary/5 text-primary")} isActive={pathname === sub.url} />
+                        <NavItem item={sub} hasChildren={false} className={cn("px-2! py-1! my-1!", pathname === sub.url && "bg-primary/5 text-primary")} isActive={pathname === sub.url} badge={sub.name ? sidebarItemStatus?.({ name: sub.name, url: sub.url })?.badge : undefined} />
                       </Link>
                     )
                   )}

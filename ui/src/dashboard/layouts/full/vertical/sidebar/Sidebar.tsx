@@ -12,8 +12,9 @@ import {
 } from '../../../../components/ui/sidebar';
 import { NavUser } from './NavUser';
 import sidebaritems from './sidebaritems';
+import type { FullLayoutProps } from '../../FullLayout';
 
-const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+const SidebarLayout = ({ sidebarItemStatus, ...props }: React.ComponentProps<typeof Sidebar> & Pick<FullLayoutProps, "sidebarItemStatus">) => {
 
 
 
@@ -35,7 +36,7 @@ const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                 <SimpleBar style={{ height: "100%" }} >
                     <SidebarGroup className="flex items-center justify-center group-data-[state=collapsed]:px-2 px-3 py-4">
                         <div className="px-0 group-data-[state=collapsed]:px-0 w-full flex flex-col gap-4">
-                            <NavCollapse menu={sidebaritems} className="text-sm" />
+                            <NavCollapse menu={sidebaritems} className="text-sm" sidebarItemStatus={sidebarItemStatus} />
                         </div>
                     </SidebarGroup>
                 </SimpleBar>
