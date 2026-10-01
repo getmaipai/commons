@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.68] - 2026-09-30
+
+### Added
+- `model_file_bytes`, an optional hard fact on StackFitPlan
+
 ## [spec-v0.1.67] - 2026-09-30
 
 ### Added
