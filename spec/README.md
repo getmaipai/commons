@@ -106,7 +106,7 @@ design record left a choice:
 | `gen/ts/` | Zod schemas + TS types, one file per `schemas/*.schema.json` | generated, committed. `bun run gen:ts` |
 | `gen/py/` | Pydantic v2 models, same schemas | generated, committed. `bash scripts/gen-py.sh` |
 | `errors/errors.json` | The error catalogue, conforming to `@maipai/standards`' `ErrorEntry` shape | hand-written |
-| `settings/keys.json` | The settings registry (conforms to `schemas/settings-key.schema.json`); empty until core or a package declares a key | generated from declarations, currently empty |
+| `settings/keys.json` | The settings registry (conforms to `schemas/settings-key.schema.json`), including the per-person `notifications.browser.enabled` key | generated from declarations |
 | `vocab/capabilities.json` | The capability vocabulary (3.2) | hand-written |
 | `vocab/permissions.json` | The permissions vocabulary, the install prompt's fixed enum (3.2) | hand-written |
 | `vocab/relationship-types.json` | What may relate to what, whether it can end, and which statuses it admits | hand-written |

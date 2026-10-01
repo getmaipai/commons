@@ -7,6 +7,14 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.66] - 2026-09-30
+
+### Added
+- `notifications.browser.enabled`, the per-person setting for alerts on the open device.
+
+### Changed
+- `MaintenanceWindow` gains optional `rrule` and `until` fields for recurring maintenance series (STATUS-D1, home `docs/plans/status-page-2026-09-30.md`). Occurrence times remain derived from the stored start, end duration and current clock.
+
 ## [spec-v0.1.65] - 2026-09-30
 
 ### Changed
