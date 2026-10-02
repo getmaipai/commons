@@ -36,4 +36,18 @@ describe("NavCollapse active marker", () => {
       expect(other.hasAttribute("aria-current")).toBe(false);
     });
   }
+
+  test("an app mounted at the root marks the entry for the unprefixed path", () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={["/chat"]}>
+        <TooltipProvider>
+          <SidebarProvider defaultOpen>
+            <NavCollapse menu={menu} />
+          </SidebarProvider>
+        </TooltipProvider>
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('a[href="/next/chat"]')!.getAttribute("aria-current")).toBe("page");
+    expect(container.querySelector('a[href="/next"]')!.hasAttribute("aria-current")).toBe(false);
+  });
 });

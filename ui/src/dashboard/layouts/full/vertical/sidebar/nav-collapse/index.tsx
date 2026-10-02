@@ -16,7 +16,9 @@ export default function NavCollapse({ menu, className, itemStatus }: NavCollapse
   const isCollapse = state === "collapsed";
 
   const isActiveRoute = (item: ChildItem): boolean => {
-    if (item.url && pathname === item.url) return true;
+    // The menu's urls are written under /next, but an app can mount the same
+    // pages at the root (Home does), so the unprefixed path counts too.
+    if (item.url && (pathname === item.url || pathname === (item.url.replace(/^\/next(?=\/|$)/, "") || "/"))) return true;
     if (item.items) return item.items.some(isActiveRoute);
     return false;
   };
