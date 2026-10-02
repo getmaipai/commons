@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import FullLayout, { resolveInitialSidebarOpen } from "./FullLayout";
 import { TooltipProvider } from "../../components/ui/tooltip";
@@ -11,8 +10,6 @@ afterEach(() => {
   cleanup();
   document.cookie = "sidebar_state=; path=/; max-age=0";
 });
-
-GlobalRegistrator.register();
 
 function renderLayout(defaultSidebarOpen = true) {
   return render(

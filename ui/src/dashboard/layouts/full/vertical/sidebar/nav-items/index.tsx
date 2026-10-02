@@ -45,7 +45,7 @@ export default function NavItem({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       aria-label={ariaLabel}
-    />} tooltip={{ children: navItemTooltip(item.name, status?.title) }} aria-label={ariaLabel}>
+    />} tooltip={{ children: navItemTooltip(item.name, status?.title) }} isActive={isActive} aria-label={ariaLabel}>
       <AnimatePresence>
 
         {isHovered && (

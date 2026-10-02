@@ -54,6 +54,7 @@ export default function NavCollapse({ menu, className, itemStatus }: NavCollapse
                 <NavItem key={index} item={item} hasChildren={false} isActive={active} status={itemStatus?.(item)} render={<Link
                     to={item.url || "#"}
                     target={item.external ? "_blank" : undefined}
+                    aria-current={active ? "page" : undefined}
                     className={cn("relative flex min-h-12 items-center gap-3 rounded-md transition-all duration-200 ease-in-out", className)}
                   />} />
 
