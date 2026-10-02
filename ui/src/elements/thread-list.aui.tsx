@@ -32,15 +32,22 @@ import {
   type FC,
 } from "react";
 
-export const ThreadList: FC = () => {
+export type ThreadListLabels = {
+  newChat?: string;
+  searchChats?: string;
+};
+
+export const ThreadList: FC<{ labels?: ThreadListLabels }> = ({ labels }) => {
   const [search, setSearch] = useState("");
   const hasThreads = useAuiState((s) => s.threads.threadIds.length > 0);
+  const newChatLabel = labels?.newChat ?? "New chat";
+  const searchChatsLabel = labels?.searchChats ?? "Search chats";
 
   return (
     <ThreadListRoot>
-      <ThreadListNew />
+      <ThreadListNew label={newChatLabel} />
       {hasThreads && (
-        <ThreadListSearch value={search} onValueChange={setSearch} />
+        <ThreadListSearch value={search} onValueChange={setSearch} label={searchChatsLabel} />
       )}
       <ThreadListItems searchQuery={hasThreads ? search : ""} />
     </ThreadListRoot>
@@ -52,8 +59,9 @@ export const ThreadListSearch = forwardRef<
   Omit<ComponentPropsWithoutRef<typeof Input>, "value" | "onChange"> & {
     value: string;
     onValueChange: (value: string) => void;
+    label?: string;
   }
->(({ className, value, onValueChange, ...props }, ref) => {
+>(({ className, value, onValueChange, label = "Search chats", ...props }, ref) => {
   return (
     <div data-slot="aui_thread-list-search" className="relative px-0.5 py-1">
       <SearchIcon
@@ -65,8 +73,8 @@ export const ThreadListSearch = forwardRef<
         type="search"
         value={value}
         onChange={(event) => onValueChange(event.target.value)}
-        aria-label="Search threads"
-        placeholder="Search threads"
+        aria-label={label}
+        placeholder={label}
         className={cn("h-8 ps-8 text-sm", className)}
         {...props}
       />
@@ -221,8 +229,8 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
 
 export const ThreadListNew = forwardRef<
   HTMLButtonElement,
-  ComponentPropsWithoutRef<typeof Button> & { labelClassName?: string }
->(({ className, labelClassName, children, ...props }, ref) => {
+  ComponentPropsWithoutRef<typeof Button> & { labelClassName?: string; label?: string }
+>(({ className, labelClassName, children, label = "New chat", ...props }, ref) => {
   return (
     <ThreadListPrimitive.New asChild>
       <Button
@@ -245,7 +253,7 @@ export const ThreadListNew = forwardRef<
               data-slot="aui_thread-list-new-label"
               className={cn("whitespace-nowrap", labelClassName)}
             >
-              New Thread
+              {label}
             </span>
           </>
         )}
