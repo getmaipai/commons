@@ -3,12 +3,16 @@ import { ChevronRight } from "lucide-react";
 import { ChildItem } from "../sidebaritems";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
+import type React from "react";
+import { SidebarMenuButton } from "../../../../../components/ui/sidebar";
 
 interface NavItemProps {
   item: ChildItem;
   hasChildren: boolean;
   className?: string;
   isActive?: boolean;
+  status?: { title: string; ariaLabel: string };
+  render?: React.ReactElement;
 }
 
 export default function NavItem({
@@ -16,6 +20,8 @@ export default function NavItem({
   hasChildren,
   className,
   isActive,
+  status,
+  render,
 }: NavItemProps) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -24,11 +30,13 @@ export default function NavItem({
   // 48px link rows are applied by nav-collapse, where the real anchors live.
   return (
 
-    <motion.div className={cn("relative flex items-center gap-3 w-full group group-data-[state=collapsed]:px-2.5 px-3 py-2 my-0.5 transition-all duration-200 rounded-md",
-      isActive && "bg-primary text-background font-medium", className)}
+    <SidebarMenuButton render={render ?? <motion.div
+      className={cn("relative flex items-center gap-3 w-full group group-data-[state=collapsed]:px-2.5 px-3 py-2 my-0.5 transition-all duration-200 rounded-md",
+        isActive && "bg-primary text-background font-medium", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-    >
+      aria-label={status?.ariaLabel ?? item.name}
+    />} tooltip={{ children: status?.title ?? item.name }} aria-label={status?.ariaLabel ?? item.name}>
       <AnimatePresence>
 
         {isHovered && (
@@ -69,6 +77,6 @@ export default function NavItem({
           <ChevronRight className="ms-auto h-4 w-4 transition-transform duration-200 group-open/nav:rotate-90 hide-menu" />
         )}
       </span>
-    </motion.div >
+    </SidebarMenuButton>
   );
 }

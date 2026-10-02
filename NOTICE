@@ -59,6 +59,26 @@ commit `6f99c0b04b7169f9ef12dc99946bc4faaeb40b9b` - see
 `ui/docs/dashboard-upstream.md` for what was vendored and stripped. Its
 own dependencies added here:
 
+Local patch log for `ui-v0.5.86` (SHELL-FOLD-01, Home):
+- `ui/src/dashboard/layouts/full/FullLayout.tsx`: additive optional
+  `defaultSidebarOpen` (default remains `true`),
+  `showSidebarTriggerInMenu`, `showHeaderSidebarTrigger` and
+  `sidebarItemStatus` props. `resolveInitialSidebarOpen` reads the
+  existing `sidebar_state=true|false` cookie before the caller default.
+- `ui/src/dashboard/layouts/full/vertical/header/Header.tsx`: additive
+  `showSidebarTrigger` (default `true`); uses the shipped
+  `SidebarTrigger`, preserving header behavior for existing consumers.
+- `ui/src/dashboard/layouts/full/vertical/sidebar/Sidebar.tsx`: optional
+  shipped `SidebarTrigger` in the menu column and optional status prop.
+- `ui/src/dashboard/layouts/full/vertical/sidebar/nav-collapse/index.tsx`
+  and `nav-items/index.tsx`: thread optional status through and render
+  the existing link through the shipped `SidebarMenuButton` tooltip prop
+  with its item name as accessible name.
+- Home `frontend/src/next/NextRoutes.tsx` passes the folded default and
+  trigger relocation props; `frontend/src/next/pages/NextChatPage.tsx`
+  and `frontend/src/apps/chat/chatHeaderBar.tsx` place history beside
+  the chat title in the phone top row.
+
 - @base-ui/react (MIT) - https://base-ui.com (the template's primitives)
 - @tanstack/react-table (MIT) - https://tanstack.com/table (`DataTable`)
 - embla-carousel-react (MIT) - https://www.embla-carousel.com

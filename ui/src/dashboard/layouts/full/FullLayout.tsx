@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import Sidebar from './vertical/sidebar/Sidebar';
 import Header, { type HeaderProps } from './vertical/header/Header';
 import { HeaderExtraProvider } from './vertical/header/HeaderExtraContext';
@@ -29,21 +29,39 @@ export interface FullLayoutProps {
   /** STATUS-A1 (home, 2026-09-30): threaded straight through to
    * `Header`'s own `statusIndicator` prop. */
   statusIndicator?: HeaderProps["statusIndicator"];
+  /** Home can choose a first-run folded menu; existing consumers retain
+   * the historical expanded default. A persisted sidebar_state cookie
+   * always takes precedence. */
+  defaultSidebarOpen?: boolean;
+  /** Render the shipped sidebar trigger in the menu column. */
+  showSidebarTriggerInMenu?: boolean;
+  /** Keep the historical header trigger unless a consumer relocates it. */
+  showHeaderSidebarTrigger?: boolean;
+  /** Pass optional Home status markers to the menu entries. */
+  sidebarItemStatus?: (item: { name: string; url?: string }) => { title: string; ariaLabel: string } | undefined;
 }
 
-const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator }) => {
+export function resolveInitialSidebarOpen(cookie: string, defaultOpen: boolean): boolean {
+  const stored = cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith("sidebar_state="))?.slice("sidebar_state=".length);
+  return stored === "true" ? true : stored === "false" ? false : defaultOpen;
+}
+
+const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator, defaultSidebarOpen = true, showSidebarTriggerInMenu = false, showHeaderSidebarTrigger = true, sidebarItemStatus }) => {
+  const [initialSidebarOpen] = useState(() => {
+    return resolveInitialSidebarOpen(typeof document === "undefined" ? "" : document.cookie, defaultSidebarOpen);
+  });
 
   return (
     <SidebarProvider
-           defaultOpen={true}
+           defaultOpen={initialSidebarOpen}
       style={{ "--sidebar-width-icon": "52px" } as React.CSSProperties}
     >
       <HeaderExtraProvider>
-        <Sidebar />
+        <Sidebar showTrigger={showSidebarTriggerInMenu} sidebarItemStatus={sidebarItemStatus} />
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}
-       <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} />
+       <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} showSidebarTrigger={showHeaderSidebarTrigger} />
 
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">

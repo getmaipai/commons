@@ -1,9 +1,9 @@
 
 
 
-import { useSidebar } from "../../../../components/ui/sidebar";
+import { SidebarTrigger } from "../../../../components/ui/sidebar";
 import { Button } from "../../../../components/ui/button";
-import { PanelLeft, VenetianMask } from 'lucide-react';
+import { VenetianMask } from 'lucide-react';
 import { Separator } from "../../../../components/ui/separator";
 
 import { cn } from "../../../../lib/utils";
@@ -42,6 +42,9 @@ export interface HeaderProps {
   /** STATUS-A1 (home, 2026-09-30): optional status content rendered
    * beside the header controls, immediately before notifications. */
   statusIndicator?: ReactNode;
+  /** Preserve the default header fold button for all consumers unless
+   * its caller places the shipped trigger in the menu column. */
+  showSidebarTrigger?: boolean;
 }
 
 export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) {
@@ -80,9 +83,8 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
   );
 }
 
-const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle = true, statusIndicator }: HeaderProps = {}) => {
+const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle = true, statusIndicator, showSidebarTrigger = true }: HeaderProps = {}) => {
 
-  const { toggleSidebar } = useSidebar();
   const HeaderExtraLeft = useHeaderExtraLeft();
 
   return (
@@ -129,22 +131,15 @@ const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognito
                 <FullLogo />
               </div>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn("p-2 hover:bg-primary/5 rounded-full transition cursor-pointer", hitArea(2))}
-                onClick={toggleSidebar}
-              >
-                <PanelLeft size={21}
-                />
+              {showSidebarTrigger ? <SidebarTrigger className={cn("p-2 hover:bg-primary/5 rounded-full transition cursor-pointer", hitArea(2))}>
                 {/* CHAT-FIND-0923-02, adjacent gap found live: this
                     trigger had no accessible name at all - the kit's own
                     SidebarTrigger (sidebar.tsx, not actually used here)
                     already has exactly this sr-only span and nothing
                     else (no aria-label alongside it); mirrored, not
                     invented. */}
-                <span className="sr-only">Toggle Sidebar</span>
-              </Button>
+                Toggle Sidebar
+                </SidebarTrigger> : null}
 
 
 

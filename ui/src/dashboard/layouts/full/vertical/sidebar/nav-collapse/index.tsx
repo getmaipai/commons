@@ -7,9 +7,10 @@ import { MenuItem, ChildItem } from "../sidebaritems";
 interface NavCollapseProps {
   menu: MenuItem[];
   className?: string;
+  itemStatus?: (item: { name: string; url?: string }) => { title: string; ariaLabel: string } | undefined;
 }
 
-export default function NavCollapse({ menu, className }: NavCollapseProps) {
+export default function NavCollapse({ menu, className, itemStatus }: NavCollapseProps) {
   const { pathname } = useLocation();
   const { state } = useSidebar();
   const isCollapse = state === "collapsed";
@@ -50,20 +51,11 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
             // 👉 No children → direct link
             if (!hasChildren)
               return (
-                <Link
-                  key={index}
-                  to={item.url || "#"}
-                  target={item.external ? "_blank" : undefined}
-                  className={cn(
-                    "relative flex min-h-12 items-center gap-3 rounded-md transition-all duration-200 ease-in-out",
-
-                    className,
-                  )}
-
-                >
-
-                  <NavItem item={item} hasChildren={false} isActive={active} />
-                </Link>
+                <NavItem key={index} item={item} hasChildren={false} isActive={active} status={itemStatus?.(item)} render={<Link
+                    to={item.url || "#"}
+                    target={item.external ? "_blank" : undefined}
+                    className={cn("relative flex min-h-12 items-center gap-3 rounded-md transition-all duration-200 ease-in-out", className)}
+                  />} />
 
 
 
