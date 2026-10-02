@@ -44,7 +44,7 @@ export interface HeaderProps {
   statusIndicator?: ReactNode;
   /** Preserve the default header fold button for all consumers unless
    * its caller places the shipped trigger in the menu column. */
-  showSidebarTrigger?: boolean;
+  showSidebarTrigger?: boolean | "mobile-only";
 }
 
 export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) {
@@ -131,7 +131,7 @@ const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognito
                 <FullLogo />
               </div>
 
-              {showSidebarTrigger ? <SidebarTrigger className={cn("p-2 hover:bg-primary/5 rounded-full transition cursor-pointer", hitArea(2))}>
+              {showSidebarTrigger ? <SidebarTrigger className={cn("p-2 hover:bg-primary/5 rounded-full transition cursor-pointer", showSidebarTrigger === "mobile-only" && "md:hidden", hitArea(2))}>
                 {/* CHAT-FIND-0923-02, adjacent gap found live: this
                     trigger had no accessible name at all - the kit's own
                     SidebarTrigger (sidebar.tsx, not actually used here)

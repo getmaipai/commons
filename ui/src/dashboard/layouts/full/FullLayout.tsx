@@ -35,7 +35,7 @@ export interface FullLayoutProps {
   defaultSidebarOpen?: boolean;
   /** Render the shipped sidebar trigger in the menu column. */
   showSidebarTriggerInMenu?: boolean;
-  /** Keep the historical header trigger unless a consumer relocates it. */
+  /** Keep the historical header trigger unless a consumer relocates it on desktop. */
   showHeaderSidebarTrigger?: boolean;
   /** Pass optional Home status markers to the menu entries. */
   sidebarItemStatus?: (item: { name: string; url?: string }) => { title: string; ariaLabel: string } | undefined;
@@ -61,7 +61,7 @@ const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayNam
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}
-       <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} showSidebarTrigger={showHeaderSidebarTrigger} />
+        <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} showSidebarTrigger={showHeaderSidebarTrigger ? true : showSidebarTriggerInMenu ? "mobile-only" : false} />
 
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">

@@ -15,6 +15,10 @@ interface NavItemProps {
   render?: React.ReactElement;
 }
 
+export function navItemTooltip(name: string, statusTitle?: string) {
+  return <span className="flex flex-col"><span>{name}</span>{statusTitle ? <span className="text-[10px] opacity-75">{statusTitle}</span> : null}</span>;
+}
+
 export default function NavItem({
   item,
   hasChildren,
@@ -24,6 +28,11 @@ export default function NavItem({
   render,
 }: NavItemProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const ariaLabel = status?.ariaLabel
+    ? status.ariaLabel.toLocaleLowerCase().startsWith(`${item.name.toLocaleLowerCase()}:`)
+      ? status.ariaLabel
+      : `${item.name}: ${status.ariaLabel}`
+    : item.name;
 
   // Owner ruling, 2026-09-27, accessibility touch-target fix - see
   // docs/BACKLOG.md SHELL-09. Preserve the sidebar's 40px row appearance;
@@ -35,8 +44,8 @@ export default function NavItem({
         isActive && "bg-primary text-background font-medium", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      aria-label={status?.ariaLabel ?? item.name}
-    />} tooltip={{ children: status?.title ?? item.name }} aria-label={status?.ariaLabel ?? item.name}>
+      aria-label={ariaLabel}
+    />} tooltip={{ children: navItemTooltip(item.name, status?.title) }} aria-label={ariaLabel}>
       <AnimatePresence>
 
         {isHovered && (
