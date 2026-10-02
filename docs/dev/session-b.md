@@ -26,6 +26,8 @@ branch `b/home-stack-01-installer`) is untouched since the last
 handoff, even with `origin/main` at `233bc4f` - needed again only if a
 future Stack-side change is asked for.
 
+> **Superseded in part 2026-10-02** by [docs/design/RULES.md](../../../home/docs/design/RULES.md) chat rule 9: the table of the wire the Elements expect no longer describes the web chat's wire; the stream is `assistant-stream`.
+
 ## What landed this session (all pushed, all reported, all accepted)
 
 - **`commons` `08824d7` / tag `spec-v0.1.7` (the Artifact record)**:
@@ -152,6 +154,8 @@ here, not the usual medium - do not under-scope it to save time.
 artifact, `TurnValue.artifact` set from the real tool call, TS/Python
 conformance fixtures agree. Out of scope: any other package gaining
 `artifact:write` by default.
+
+> **Superseded in part 2026-10-02** by [docs/design/RULES.md](../../../home/docs/design/RULES.md) chat rule 2: splitting reasoning only after reattaching the prefix no longer holds; the engine's `reasoning_content` is used as returned.
 
 ## Then REASONING-01 (after ARTIFACT-02, not before)
 

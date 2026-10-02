@@ -108,6 +108,8 @@ gate calls `ensure-tag.sh` for the new tag, creating its worktree if
 this is the first consumer to ask for it, and the version compare reads
 that worktree rather than the old shared sibling checkout.
 
+> **Superseded in part 2026-10-02** by [docs/design/RULES.md](../../home/docs/design/RULES.md) chat rule 9: the hand-built `SourcesCard` in the spec's chat section no longer holds; the kit's sources and inline-citation parts are used.
+
 ## Workspace status
 
 - `ui/`: `ui-v0.1.0` landed. The kit, extracted read-only from the
