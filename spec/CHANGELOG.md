@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.71] - 2026-10-03
+
+### Added
+- Household setting `chat.teen_gate_grain` (`sentence` by default, or `arrival`): how a teen's written replies are checked before they are shown. A child and every spoken turn are always checked per sentence.
+
 ## [spec-v0.1.70] - 2026-10-01
 
 ### Added
