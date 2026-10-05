@@ -128,6 +128,12 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Device.parse(loadFixture("device.example.json"))).not.toThrow();
   });
 
+  for (const kind of ["reachy-mini", "maipai-build"]) {
+    test(`device.robot-${kind}.example.json`, () => {
+      expect(() => Device.parse(loadFixture(`device.robot-${kind}.example.json`))).not.toThrow();
+    });
+  }
+
   for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal"]) {
     test(`robot-state.${kind}.example.json`, () => {
       expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();

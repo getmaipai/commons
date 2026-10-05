@@ -98,6 +98,11 @@ def test_device_fixture():
     Device.model_validate(load_fixture("device.example.json"))
 
 
+@pytest.mark.parametrize("kind", ["reachy-mini", "maipai-build"])
+def test_robot_device_fixture(kind):
+    Device.model_validate(load_fixture(f"device.robot-{kind}.example.json"))
+
+
 @pytest.mark.parametrize(
     "kind",
     [

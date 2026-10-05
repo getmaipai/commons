@@ -358,7 +358,15 @@ capability, needs its own design pass first).
 
 - [x] **CAP-VOCAB-01: the capability vocabulary gains the engine roles** Landed 2026-09-23 (c-99n; the tag is cut by the coordinator after the diff is read). (S, spec first; from home's `docs/plans/hardware-tiers-2026-09-23.md`, "Capabilities follow the allocation"). `spec/vocab/capabilities.json` gains `vision`, `image`, `video`, `music`, `stt` and `tts`, named as the Stack's role ids, each with a one-line description in the vocabulary's own shape; the chat role keeps mapping to the existing `gpu_llm` or `cpu_llm` and the embed role to `embeddings`, so the list stays one list; the fixtures and the Python package regenerate; the spec tag is bumped and home and bot pin it. Acceptance: a manifest fixture with `requires: ["image"]` validates; the round-trip fixtures pass in TypeScript and Python. Exit: `bash scripts/check.sh` and the tag.
 
-- [ ] **BODY-VOCAB-01: the capability vocabulary gains the body ids**
+- [x] **BODY-VOCAB-01: the capability vocabulary gains the body ids**
+  Landed 2026-10-05 (the tag, `spec-v0.1.74`, is cut by the coordinator
+  after the diff is read; `bot` pins it after). Twenty ids and two
+  fixtures, `device.robot-reachy-mini.example.json` and
+  `device.robot-maipai-build.example.json`, with a parametrized test in
+  each language; the generated TypeScript and Python are unchanged
+  because no schema changed (the vocabulary is read, not generated). The
+  one-line descriptions sit in the vocabulary's `$comment`, as
+  CAP-VOCAB-01 did.
   (S, spec first, 2026-09-27; bot's RM-00, from
   `bot/docs/dev/design-reachy-mini-2026-09-27.md` section 2, a body
   profile's declaration). `spec/vocab/capabilities.json` gains the ids

@@ -1,0 +1,28 @@
+{
+  "id": "device-m8b2d4",
+  "kind": "robot",
+  "name": "MaiPai robot",
+  "area": "Living room",
+  "capabilities": [
+    "head_pan_tilt",
+    "eyes",
+    "mouth",
+    "light_ring",
+    "encoders",
+    "touch",
+    "distance",
+    "imu",
+    "battery_readout",
+    "speech_robot",
+    "camera",
+    "mic",
+    "speaker",
+    "motors"
+  ],
+  "person_id": "person-d4e5f6",
+  "watermarks": {},
+  "last_seen_at": "2026-10-05T12:00:00Z",
+  "created_at": "2026-10-01T09:00:00Z",
+  "updated_at": "2026-10-05T12:00:00Z",
+  "hlc": "1759665600000:1:abc123"
+}
