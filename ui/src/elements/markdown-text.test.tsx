@@ -19,11 +19,11 @@ function scriptedAdapter(reply: string): ChatModelAdapter {
   };
 }
 
-function Harness({ reply }: { reply: string }) {
+function Harness({ reply, preprocess }: { reply: string; preprocess?: (text: string) => string }) {
   const runtime = useLocalRuntime(scriptedAdapter(reply));
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread />
+      <Thread components={preprocess ? { markdown: { preprocess } } : undefined} />
     </AssistantRuntimeProvider>
   );
 }
@@ -35,6 +35,12 @@ async function sendAndSettle(container: HTMLElement, getByRole: (role: string, o
 }
 
 describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
+  test("Thread markdown preprocess composes with math preprocessing", async () => {
+    const { container, getByRole } = render(<Harness reply="citation 7" preprocess={(text) => text.replace("7", "[7](#citation-7)")} />);
+    await sendAndSettle(container, getByRole);
+    expect(container.querySelector('a[href="#citation-7"]')?.textContent).toBe("7");
+  });
+
   test("a fenced typescript block renders through the shiki SyntaxHighlighter, not a plain <pre>", async () => {
     const reply = "```typescript\nconst x: number = 1;\n```";
     const { container, getByRole } = render(<Harness reply={reply} />);

@@ -8,7 +8,8 @@ import { floating, mono } from "./surfaces";
 export interface Source {
   domain: string;
   title: string;
-  snippet: string;
+  snippet?: string;
+  href?: string;
 }
 
 interface CitationProps {
@@ -18,12 +19,12 @@ interface CitationProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function Citation({ index, source, open, onOpenChange }: CitationProps) {
+export function Citation({ index, source, open, onOpenChange }: CitationProps) {
   return (
     <PreviewCard.Root open={open} onOpenChange={onOpenChange}>
       <PreviewCard.Trigger
         delay={0}
-        render={<button type="button" />}
+        render={source.href ? <a href={source.href} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" /> : <button type="button" />}
         className={cn(
           "mx-0.5 inline-flex h-4 min-w-4 translate-y-[-2px] cursor-default items-center justify-center rounded-[5px] px-1 align-middle font-mono text-[10px] font-medium tabular-nums transition-colors",
           open
@@ -55,9 +56,7 @@ function Citation({ index, source, open, onOpenChange }: CitationProps) {
             <p className="mt-2 text-[13px] leading-snug font-medium">
               {source.title}
             </p>
-            <p className="text-foreground/50 mt-1 text-[13px] leading-relaxed">
-              {source.snippet}
-            </p>
+            {source.snippet ? <p className="text-foreground/50 mt-1 text-[13px] leading-relaxed">{source.snippet}</p> : null}
           </PreviewCard.Popup>
         </PreviewCard.Positioner>
       </PreviewCard.Portal>

@@ -9,6 +9,7 @@ import { File } from "./file";
 import { ThreadFollowupSuggestions } from "./follow-up-suggestions.aui";
 import { Image } from "./image";
 import { MarkdownText } from "./markdown-text";
+import type { MarkdownTextProps } from "./markdown-text";
 import {
   Reasoning,
   ReasoningContent,
@@ -148,6 +149,7 @@ export type ThreadViewportOptions = Pick<
  * second value to link the replacement turn to the original turn.
  */
 export type ThreadComponents = {
+  markdown?: { components?: MarkdownTextProps["components"]; preprocess?: (text: string) => string } | undefined;
   /** assistant-ui viewport behavior. Defaults preserve the kit's top anchor. */
   viewport?: ThreadViewportOptions | undefined;
   AssistantMessage?: ComponentType | undefined;
@@ -695,6 +697,7 @@ const MessageError: FC = () => {
 
 const AssistantMessage: FC = () => {
   const {
+    markdown,
     ToolFallback: ToolFallbackComponent = ToolFallback,
     ToolGroup,
     ReasoningGroup,
@@ -756,8 +759,9 @@ const AssistantMessage: FC = () => {
                   </ReasoningRoot>
                 );
               }
-              case "text":
-                return <MarkdownText />;
+              case "text": {
+                return <MarkdownText {...markdown} />;
+              }
               case "reasoning":
                 return <Reasoning {...part} />;
               case "tool-call":

@@ -1,5 +1,10 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.93] - ui-v0.5.93
+
+- Add optional MarkdownText preprocessing and a Thread markdown components/preprocess slot.
+- Export Citation with optional outbound href and optional snippet.
+
 ## [0.5.92] - ui-v0.5.92
 
 `ThreadComponents` gains an optional `viewport` configuration for assistant-ui's
@@ -1431,3 +1436,7 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
   The approved design specification lives at `docs/spec.md` with its six
   reference images at `docs/reference/`. See `../docs/dev.md` for the
   full inventory of what each piece replaced and why.
+## [0.5.93] - ui-v0.5.93
+
+- Add optional MarkdownText preprocessing and Thread markdown components/preprocess slot.
+- Export Citation with optional outbound href and snippet.

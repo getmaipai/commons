@@ -137,8 +137,9 @@ function useMathPlugins(text: string): MathPlugins | null {
 const remarkPluginsBase: Pluggable[] = [remarkGfm];
 const rehypePluginsBase: Pluggable[] = [];
 
-type MarkdownTextProps = Partial<TextMessagePartProps> & {
+export type MarkdownTextProps = Partial<TextMessagePartProps> & {
   components?: Parameters<typeof memoizeMarkdownComponents>[0];
+  preprocess?: (text: string) => string;
 };
 
 const useShallowStable = <T extends Record<string, unknown> | undefined>(
@@ -193,7 +194,7 @@ const MarkdownMermaid: FC<AuiSyntaxHighlighterProps> = ({ code }) => {
 // per-render allocation to memoize away).
 const componentsByLanguage = { mermaid: { SyntaxHighlighter: MarkdownMermaid } };
 
-const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components }) => {
+const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess }) => {
   // Only read to decide whether this message's own math plugins are
   // worth loading - MarkdownTextPrimitive reads the same part's text
   // again internally (its own useMessagePartText/useSmooth), so this
@@ -221,7 +222,7 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components }) => {
     <MarkdownTextPrimitive
       remarkPlugins={remarkPlugins}
       rehypePlugins={rehypePlugins}
-      preprocess={preprocessMath}
+      preprocess={(text) => (preprocess ? preprocess(preprocessMath(text)) : preprocessMath(text))}
       className="aui-md"
       components={markdownComponents}
       componentsByLanguage={componentsByLanguage}
