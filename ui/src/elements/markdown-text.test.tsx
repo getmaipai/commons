@@ -7,6 +7,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { AssistantRuntimeProvider, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
+import type { RemendConfig } from "@assistant-ui/react-streamdown";
 import { Thread } from "./thread.aui";
 
 afterEach(cleanup);
@@ -20,11 +21,11 @@ function scriptedAdapter(reply: string, pauseAfterYieldMs = 0): ChatModelAdapter
   };
 }
 
-function Harness({ reply, preprocess, pauseAfterYieldMs }: { reply: string; preprocess?: (text: string, context: { streaming: boolean }) => string; pauseAfterYieldMs?: number }) {
+function Harness({ reply, preprocess, pauseAfterYieldMs, remend }: { reply: string; preprocess?: (text: string, context: { streaming: boolean }) => string; pauseAfterYieldMs?: number; remend?: RemendConfig }) {
   const runtime = useLocalRuntime(scriptedAdapter(reply, pauseAfterYieldMs));
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={preprocess ? { markdown: { preprocess } } : undefined} />
+      <Thread components={preprocess || remend ? { markdown: { preprocess, remend } } : undefined} />
     </AssistantRuntimeProvider>
   );
 }
@@ -105,6 +106,17 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     await sendAndSettle(container, getByRole);
     await waitFor(() => expect(streamingStates).toContain(true));
     await waitFor(() => expect(streamingStates).toContain(false));
+  });
+
+  test("Thread passes Streamdown's link repair settings through to MarkdownText", async () => {
+    const reply = "See [a stable link](https://example.com";
+    const { container, getByRole } = render(
+      <Harness reply={reply} remend={{ links: false, linkMode: "text-only" }} pauseAfterYieldMs={500} />,
+    );
+    await sendAndSettle(container, getByRole);
+    await waitFor(() => expect(container.querySelector(".aui-md")?.textContent).toContain("a stable link"));
+    expect(container.querySelector(".aui-md a")).toBeNull();
+    expect(container.querySelector(".aui-md")?.textContent).not.toContain("streamdown:");
   });
 
   test("Thread markdown preprocess composes with math preprocessing", async () => {

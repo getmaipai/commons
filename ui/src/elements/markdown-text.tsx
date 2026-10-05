@@ -12,7 +12,11 @@ import {
   unstable_memoizeMarkdownComponents as memoizeMarkdownComponents,
   useIsMarkdownCodeBlock,
 } from "@assistant-ui/react-markdown";
-import { StreamdownTextPrimitive, type StreamdownTextComponents } from "@assistant-ui/react-streamdown";
+import {
+  StreamdownTextPrimitive,
+  type RemendConfig,
+  type StreamdownTextComponents,
+} from "@assistant-ui/react-streamdown";
 import remarkGfm from "remark-gfm";
 import type { Pluggable } from "unified";
 import {
@@ -162,6 +166,7 @@ export type MarkdownPreprocessContext = { streaming: boolean };
 export type MarkdownTextProps = Partial<TextMessagePartProps> & {
   components?: Parameters<typeof memoizeMarkdownComponents>[0];
   preprocess?: (text: string, context: MarkdownPreprocessContext) => string;
+  remend?: RemendConfig;
 };
 
 const useShallowStable = <T extends Record<string, unknown> | undefined>(
@@ -216,7 +221,7 @@ const MarkdownMermaid: FC<AuiSyntaxHighlighterProps> = ({ code }) => {
 // per-render allocation to memoize away).
 const componentsByLanguage = { mermaid: { SyntaxHighlighter: MarkdownMermaid } };
 
-const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess }) => {
+const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess, remend = remendOptions }) => {
   // Only read to decide whether this message's own math plugins are
   // worth loading - MarkdownTextPrimitive reads the same part's text
   // again internally (its own useMessagePartText/useSmooth), so this
@@ -251,7 +256,7 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess }) => 
       componentsByLanguage={componentsByLanguage}
       controls={false}
       animated={shouldAnimate && !prefersReducedMotion ? animationOptions : false}
-      remend={remendOptions}
+      remend={remend}
       linkSafety={linkSafety}
     />
   );
