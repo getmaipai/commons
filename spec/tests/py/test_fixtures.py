@@ -271,12 +271,31 @@ def test_error_catalogue_entries():
         "judge-role",
         "rerank-role",
         "music-role",
+        "background-turns",
     ],
 )
 def test_model_capabilities_fixtures(kind):
     ModelCapabilities.model_validate(
         load_fixture(f"model-capabilities.{kind}.example.json")
     )
+
+
+def test_model_capabilities_background_turns_default_false():
+    on = ModelCapabilities.model_validate(
+        load_fixture("model-capabilities.background-turns.example.json")
+    )
+    absent = ModelCapabilities.model_validate(
+        load_fixture("model-capabilities.chat.example.json")
+    )
+    assert on.turn_budget.background_turns is True
+    assert absent.turn_budget.background_turns is False
+
+
+def test_model_capabilities_background_turns_must_be_boolean():
+    bad = load_fixture("model-capabilities.background-turns.example.json")
+    bad["turn_budget"]["background_turns"] = "sometimes"
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate(bad)
 
 
 def test_model_capabilities_unknown_engine_is_rejected():

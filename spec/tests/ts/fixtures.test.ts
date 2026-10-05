@@ -214,7 +214,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts", "judge-role", "rerank-role", "music-role"]) {
+  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts", "judge-role", "rerank-role", "music-role", "background-turns"]) {
     test(`model-capabilities.${kind}.example.json`, () => {
       expect(() =>
         ModelCapabilities.parse(loadFixture(`model-capabilities.${kind}.example.json`)),

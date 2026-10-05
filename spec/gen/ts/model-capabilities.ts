@@ -229,6 +229,13 @@ export const ModelCapabilities = z
           .describe(
             "The fixed, sorted tool-name set the model node offers every turn; never varies per turn.",
           ),
+        /**MODEL-BG-SPEC-01: whether the model may run unattended background turns (the heartbeat, errands, price watches), the ones no person is waiting on. Optional, and absent means false. A model with no record, or a record with no turn_budget, is treated as false too (org rule 8, fail safe): an unattended turn never starts on a model nobody has measured.*/
+        background_turns: z
+          .boolean()
+          .describe(
+            "MODEL-BG-SPEC-01: whether the model may run unattended background turns (the heartbeat, errands, price watches), the ones no person is waiting on. Optional, and absent means false. A model with no record, or a record with no turn_budget, is treated as false too (org rule 8, fail safe): an unattended turn never starts on a model nobody has measured.",
+          )
+          .default(false),
         /**The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool.*/
         always_search: z
           .boolean()

@@ -9,6 +9,8 @@
 // and measured are each all-or-nothing objects, and additionalProperties
 // is false throughout (a stray key is a bug, not a future field).
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ModelCapabilities } from "../../gen/ts/model-capabilities.js";
 
 const BASE = {
@@ -112,5 +114,38 @@ describe("ModelCapabilities.turn_budget", () => {
 
   test("measured.false_call_rate is a 0..1 rate, not a count", () => {
     expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, measured: { ...VALID_BUDGET.measured, false_call_rate: 1.5 } } })).toThrow();
+  });
+});
+
+// MODEL-BG-SPEC-01: background_turns says whether the model may run
+// unattended background turns (heartbeat, errands, price watches). It is
+// optional and absent means false, so a record that never heard of it, and
+// a model with no turn_budget at all, never starts an unattended turn.
+describe("ModelCapabilities.turn_budget.background_turns", () => {
+  const fixture = (name: string) =>
+    JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", name), "utf8"));
+
+  test("the flag set true in a fixture parses and stays true", () => {
+    const parsed = ModelCapabilities.parse(fixture("model-capabilities.background-turns.example.json"));
+    expect(parsed.turn_budget?.background_turns).toBe(true);
+  });
+
+  test("a budget without the field still parses and defaults to false", () => {
+    const parsed = ModelCapabilities.parse(fixture("model-capabilities.chat.example.json"));
+    expect(parsed.turn_budget?.background_turns).toBe(false);
+  });
+
+  test("an explicit false parses as false", () => {
+    const parsed = ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, background_turns: false } });
+    expect(parsed.turn_budget?.background_turns).toBe(false);
+  });
+
+  test("a model with no turn_budget has no background flag to read", () => {
+    const parsed = ModelCapabilities.parse(BASE);
+    expect(parsed.turn_budget?.background_turns ?? false).toBe(false);
+  });
+
+  test("a non-boolean flag is rejected", () => {
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, background_turns: "sometimes" } })).toThrow();
   });
 });
