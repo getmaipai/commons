@@ -7,6 +7,12 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.72] - 2026-10-04
+
+### Removed
+- Retired household setting `turn.pipeline.next` and the unused
+  `answer_from_context_tool` field from model turn budgets.
+
 ## [spec-v0.1.71] - 2026-10-03
 
 ### Added

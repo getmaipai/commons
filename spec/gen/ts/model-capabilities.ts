@@ -214,7 +214,7 @@ export const ModelCapabilities = z
         "Recorded footprints for this model, newest first. A planner uses a measured entry before a dry-run one before an estimated one.",
       )
       .optional(),
-    /**U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.*/
+    /**U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.*/
     turn_budget: z
       .object({
         /**Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).*/
@@ -229,17 +229,11 @@ export const ModelCapabilities = z
           .describe(
             "The fixed, sorted tool-name set the model node offers every turn; never varies per turn.",
           ),
-        /**The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool and, when answer_from_context_tool is also true, answer_from_this_conversation.*/
+        /**The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool.*/
         always_search: z
           .boolean()
           .describe(
-            "The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool and, when answer_from_context_tool is also true, answer_from_this_conversation.",
-          ),
-        /**Whether the always_search call offers answer_from_this_conversation as the model's alternative to a search, verified by policy as a set check against the context window.*/
-        answer_from_context_tool: z
-          .boolean()
-          .describe(
-            "Whether the always_search call offers answer_from_this_conversation as the model's alternative to a search, verified by policy as a set check against the context window.",
+            "The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool.",
           ),
         /**Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer.*/
         model_transitions: z
@@ -331,7 +325,7 @@ export const ModelCapabilities = z
       })
       .strict()
       .describe(
-        "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule and its answer_from_this_conversation alternative are on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
+        "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
       )
       .optional(),
   })

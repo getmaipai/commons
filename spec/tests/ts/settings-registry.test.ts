@@ -1,16 +1,6 @@
-// U2a (home/docs/plans/turn-machine-state-record-2026-09-22.md, "The
-// setting"): turn.pipeline.next is declared once here, in
-// spec/settings/keys.json, honoured by home and bot. fixtures.test.ts
-// round-trips the one settings-key.example.json fixture through
-// SettingsKey; nothing before this file round-tripped the real registry
-// itself, so a hand-edit that broke another entry's shape would only
-// surface downstream, in home's settingsRegistry.ts at boot. This file
-// closes that gap (every entry in keys.json parses) and pins
-// turn.pipeline.next's own declared shape. Default flipped to `true`
-// at U6 (home/docs/dev.md "U6: the flip, decided", 2026-09-24) - the
-// new engine is the one every household starts on now; the old path
-// stays reachable (the key itself, set to false) until the plan's own
-// section 2 deletions retire it.
+// Round-trip the real registry through SettingsKey. A hand-edit that
+// breaks an entry's shape would otherwise surface downstream in a
+// consumer at boot.
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -37,15 +27,8 @@ describe("spec/settings/keys.json", () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
-  test("turn.pipeline.next: household, boolean, on by default (U6: the flip, decided), honoured by home and bot", () => {
+  test("the retired turn pipeline toggle is absent", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
-    const entry = entries.find((e) => e.key === "turn.pipeline.next");
-    expect(entry).toBeDefined();
-    const parsed = SettingsKey.parse(entry);
-    expect(parsed.scope).toBe("household");
-    expect(parsed.selector).toBe("boolean");
-    expect(parsed.default).toBe(true);
-    expect(parsed.level).toBe("advanced");
-    expect(parsed.honoured_by).toEqual(["home", "bot"]);
+    expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
   });
 });

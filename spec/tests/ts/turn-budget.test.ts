@@ -33,7 +33,6 @@ const VALID_BUDGET = {
   rounds: 1,
   tools_offered: ["recall", "remember", "remind", "timer", "weather", "websearch"],
   always_search: true,
-  answer_from_context_tool: true,
   model_transitions: true,
   context_tokens: 4000,
   thinking_budget_tokens: 0,
@@ -58,7 +57,7 @@ describe("ModelCapabilities.turn_budget", () => {
   });
 
   test("the robot's Pi shape: rounds 0, model_transitions false, no search", () => {
-    const robotBudget = { ...VALID_BUDGET, rounds: 0, always_search: false, answer_from_context_tool: false, model_transitions: false };
+    const robotBudget = { ...VALID_BUDGET, rounds: 0, always_search: false, model_transitions: false };
     expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: robotBudget })).not.toThrow();
   });
 

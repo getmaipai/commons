@@ -950,21 +950,6 @@
     ]
   },
   {
-    "key": "turn.pipeline.next",
-    "scope": "household",
-    "selector": "boolean",
-    "default": true,
-    "label": "Use the new reply engine",
-    "help": "On uses the rebuilt engine (the default since U6). Off falls back to the old one.",
-    "level": "advanced",
-    "secret": false,
-    "lives_in": "household.ai",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
-  },
-  {
     "key": "ui.appearance",
     "scope": "person",
     "selector": "select",
