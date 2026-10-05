@@ -1,5 +1,5 @@
 // CHAT-RICH-01: markdown-text.tsx wires shiki, mermaid and math into
-// MarkdownTextPrimitive's own componentsByLanguage/SyntaxHighlighter
+// Streamdown's componentsByLanguage/SyntaxHighlighter adapter
 // slots (assistant-ui's documented shape) - these confirm the wiring
 // reaches real rendered output, the same scripted-adapter harness
 // thread.aui.test.tsx already uses for a real run through the real
@@ -36,6 +36,49 @@ async function sendAndSettle(container: HTMLElement, getByRole: (role: string, o
 }
 
 describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
+  test("raw HTML is rendered as text, including active-looking tags", async () => {
+    const reply = '<script>alert("x")</script> <img src=x onerror="alert(1)">';
+    const { container, getByRole } = render(<Harness reply={reply} />);
+    await sendAndSettle(container, getByRole);
+
+    const markdown = container.querySelector(".aui-md")!;
+    expect(markdown.querySelector("script, img")).toBeNull();
+    expect(markdown.textContent).toBe(reply);
+  });
+
+  test("word animation is active only for a running assistant text part", async () => {
+    const { container, getByRole } = render(
+      <Harness reply="New words arrive here." pauseAfterYieldMs={500} />,
+    );
+    await sendAndSettle(container, getByRole);
+    await waitFor(() => expect(container.querySelector(".aui-md")?.closest('[data-status="running"]')).toBeTruthy());
+    expect(container.querySelector("[data-sd-animate]")).toBeTruthy();
+  });
+
+  test("reduced motion disables Streamdown's word animation", async () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: query === "(prefers-reduced-motion: reduce)",
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    })) as typeof window.matchMedia;
+    try {
+      const { container, getByRole } = render(
+        <Harness reply="New words arrive here." pauseAfterYieldMs={500} />,
+      );
+      await sendAndSettle(container, getByRole);
+      await waitFor(() => expect(container.querySelector(".aui-md")?.closest('[data-status="running"]')).toBeTruthy());
+      expect(container.querySelector("[data-sd-animate]")).toBeNull();
+    } finally {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
   test("wide tables stay inside a horizontally scrollable wrapper", async () => {
     const reply = `| ${Array.from({ length: 8 }, (_, i) => `Column ${i}`).join(" | ")} |\n| ${Array(8).fill("---").join(" | ")} |\n| ${Array.from({ length: 8 }, (_, i) => `value ${i}`).join(" | ")} |`;
     const { container, getByRole } = render(<Harness reply={reply} />);
@@ -83,6 +126,7 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
       return el;
     });
     expect(highlighted?.querySelector("code")).toBeTruthy();
+    expect(container.querySelector(".aui-code-header-root button")).toBeTruthy();
   });
 
   test("a fenced mermaid block renders as a diagram, not a code block", async () => {
@@ -126,5 +170,6 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     expect(link!.getAttribute("target")).toBe("_blank");
     expect(link!.getAttribute("rel")).toBe("noopener noreferrer");
     expect(link!.getAttribute("referrerpolicy")).toBe("no-referrer");
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
   });
 });

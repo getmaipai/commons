@@ -1,16 +1,18 @@
 "use client";
 
 import "@assistant-ui/react-markdown/styles/dot.css";
+import "streamdown/styles.css";
+import "./markdown-text.css";
 
 import {
   type CodeHeaderProps,
   type SyntaxHighlighterProps as AuiSyntaxHighlighterProps,
-  MarkdownTextPrimitive,
   escapeCurrencyDollars,
   normalizeMathDelimiters,
   unstable_memoizeMarkdownComponents as memoizeMarkdownComponents,
   useIsMarkdownCodeBlock,
 } from "@assistant-ui/react-markdown";
+import { StreamdownTextPrimitive, type StreamdownTextComponents } from "@assistant-ui/react-streamdown";
 import remarkGfm from "remark-gfm";
 import type { Pluggable } from "unified";
 import {
@@ -24,6 +26,7 @@ import {
   useState,
 } from "react";
 import { useAuiState, type TextMessagePartProps } from "@assistant-ui/react";
+import { useMediaQuery } from "usehooks-ts";
 import { CheckIcon, CopyIcon } from "lucide-react";
 
 import { TooltipIconButton } from "./tooltip-icon-button";
@@ -77,8 +80,8 @@ const preprocessMath = (text: string) =>
 const MATH_HINT = /\$|\\\(|\\\[|\[\/math\]|\[\/inline\]/;
 
 interface MathPlugins {
-  remarkMath: Pluggable;
-  rehypeKatex: Pluggable;
+  remarkPlugins: Pluggable[];
+  rehypePlugins: Pluggable[];
 }
 
 let mathPluginsPromise: Promise<MathPlugins> | null = null;
@@ -90,8 +93,8 @@ function loadMathPlugins(): Promise<MathPlugins> {
       import("katex/dist/katex.css"),
     ])
       .then(([remarkMathMod, rehypeKatexMod]) => ({
-        remarkMath: remarkMathMod.default,
-        rehypeKatex: rehypeKatexMod.default,
+        remarkPlugins: [remarkGfm, rawHtmlAsText, remarkMathMod.default],
+        rehypePlugins: [rehypeKatexMod.default],
       }))
       .catch((err: unknown) => {
         // A review caught the first cut of this caching the REJECTED
@@ -134,8 +137,25 @@ function useMathPlugins(text: string): MathPlugins | null {
   return plugins;
 }
 
-const remarkPluginsBase: Pluggable[] = [remarkGfm];
 const rehypePluginsBase: Pluggable[] = [];
+
+type MarkdownNode = { type: string; value?: string; children?: MarkdownNode[] };
+function rawHtmlAsText() {
+  return (tree: MarkdownNode) => {
+    const visit = (node: MarkdownNode) => {
+      if (node.type === "html") {
+        node.type = "text";
+        return;
+      }
+      node.children?.forEach(visit);
+    };
+    visit(tree);
+  };
+}
+const remarkPluginsWithoutRawHtml: Pluggable[] = [remarkGfm, rawHtmlAsText];
+const remendOptions = { links: false, linkMode: "text-only" as const };
+const linkSafety = { enabled: false };
+const animationOptions = { animation: "fadeIn" as const, duration: 150 };
 
 export type MarkdownPreprocessContext = { streaming: boolean };
 
@@ -204,32 +224,35 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess }) => 
   const text = useAuiState((s) => (s.part.type === "text" ? s.part.text : ""));
   const streaming = useAuiState((s) => s.message.status?.type === "running");
   const mathPlugins = useMathPlugins(text);
-  const remarkPlugins = useMemo(
-    () => (mathPlugins ? [remarkGfm, mathPlugins.remarkMath] : remarkPluginsBase),
-    [mathPlugins],
+  const shouldAnimate = useAuiState((s) =>
+    s.part.type === "text" && s.message.role === "assistant" && s.message.status?.type === "running",
   );
-  const rehypePlugins = useMemo(
-    () => (mathPlugins ? [mathPlugins.rehypeKatex] : rehypePluginsBase),
-    [mathPlugins],
-  );
+  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const remarkPlugins = mathPlugins?.remarkPlugins ?? remarkPluginsWithoutRawHtml;
+  const rehypePlugins = mathPlugins?.rehypePlugins ?? rehypePluginsBase;
 
   const stableComponents = useShallowStable(components);
   const markdownComponents = useMemo(() => {
     const base = stableComponents
       ? { ...defaultComponents, ...memoizeMarkdownComponents(stableComponents) }
       : defaultComponents;
-    return { ...base, SyntaxHighlighter: MarkdownSyntaxHighlighter };
+    return { ...base, SyntaxHighlighter: MarkdownSyntaxHighlighter } as StreamdownTextComponents;
   }, [stableComponents]);
 
   return (
-    <MarkdownTextPrimitive
+    <StreamdownTextPrimitive
       remarkPlugins={remarkPlugins}
       rehypePlugins={rehypePlugins}
       preprocess={(text) => (preprocess ? preprocess(preprocessMath(text), { streaming }) : preprocessMath(text))}
-      className="aui-md"
+      // Streamdown 2.7.0's memo comparator omits remarkPlugins/rehypePlugins;
+      // this changes when the lazy math plugins arrive so the parser sees them.
+      className={mathPlugins ? "aui-md aui-md-with-math" : "aui-md"}
       components={markdownComponents}
       componentsByLanguage={componentsByLanguage}
-      defer
+      controls={false}
+      animated={shouldAnimate && !prefersReducedMotion ? animationOptions : false}
+      remend={remendOptions}
+      linkSafety={linkSafety}
     />
   );
 };
