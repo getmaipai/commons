@@ -1,5 +1,11 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.92] - ui-v0.5.92
+
+`ThreadComponents` gains an optional `viewport` configuration for assistant-ui's
+`turnAnchor`, `autoScroll`, and initialize, thread-switch, and run-start scroll
+options. The default remains `turnAnchor="top"`; existing callers are unchanged.
+
 All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.

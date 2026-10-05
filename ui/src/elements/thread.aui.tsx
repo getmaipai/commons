@@ -70,12 +70,22 @@ import {
   useContext,
   useRef,
   type ComponentType,
+  type ComponentProps,
   type FC,
   type PropsWithChildren,
 } from "react";
 import { formatRelative } from "../relativeTime";
 
 export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
+
+export type ThreadViewportOptions = Pick<
+  ComponentProps<typeof ThreadPrimitive.Viewport>,
+  | "turnAnchor"
+  | "autoScroll"
+  | "scrollToBottomOnRunStart"
+  | "scrollToBottomOnInitialize"
+  | "scrollToBottomOnThreadSwitch"
+>;
 
 /**
  * Optional component overrides for the thread. `AssistantMessage` and
@@ -138,6 +148,8 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * second value to link the replacement turn to the original turn.
  */
 export type ThreadComponents = {
+  /** assistant-ui viewport behavior. Defaults preserve the kit's top anchor. */
+  viewport?: ThreadViewportOptions | undefined;
   AssistantMessage?: ComponentType | undefined;
   Welcome?: ComponentType | undefined;
   ToolFallback?: ToolCallMessagePartComponent | undefined;
@@ -259,7 +271,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean 
   autoFocus,
   temporary,
 }) => {
-  const { Welcome = ThreadWelcome } = useContext(ThreadComponentsContext);
+  const { Welcome = ThreadWelcome, viewport = {} } = useContext(ThreadComponentsContext);
 
   return (
     <ThreadPrimitive.Root
@@ -281,7 +293,8 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean 
       }}
     >
       <ThreadPrimitive.Viewport
-        turnAnchor="top"
+        {...viewport}
+        turnAnchor={viewport.turnAnchor ?? "top"}
         data-slot="aui_thread-viewport"
         className="relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll scroll-smooth"
       >

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { AssistantRuntimeProvider, MessagePrimitive, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
-import { Thread } from "./thread.aui";
+import { Thread, type ThreadViewportOptions } from "./thread.aui";
 
 afterEach(cleanup);
 
@@ -13,11 +13,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ ComposerInputOverride, MessageError, temporary, error = false }: { ComposerInputOverride?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; error?: boolean }) {
+function Harness({ ComposerInputOverride, MessageError, temporary, viewport, error = false }: { ComposerInputOverride?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean }) {
   const runtime = useLocalRuntime(error ? failingAdapter : adapter);
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={ComposerInputOverride || MessageError ? { ComposerInputOverride, MessageError } : undefined} temporary={temporary} />
+      <Thread components={ComposerInputOverride || MessageError || viewport ? { ComposerInputOverride, MessageError, viewport } : undefined} temporary={temporary} />
     </AssistantRuntimeProvider>
   );
 }
@@ -121,5 +121,18 @@ describe("Thread's temporary prop", () => {
     const armedBg = armed.querySelector(".aui-thread-root")?.getAttribute("style");
     expect(armedBg).toContain("--color-primary");
     expect(armedBg).not.toBe(ordinaryBg);
+  });
+});
+
+describe("Thread's viewport options", () => {
+  test("accepts assistant-ui bottom-follow settings through the components field", () => {
+    const { container } = render(<Harness viewport={{
+      turnAnchor: "bottom",
+      autoScroll: true,
+      scrollToBottomOnRunStart: true,
+      scrollToBottomOnInitialize: true,
+      scrollToBottomOnThreadSwitch: true,
+    }} />);
+    expect(container.querySelector('[data-slot="aui_thread-viewport"]')).toBeTruthy();
   });
 });
