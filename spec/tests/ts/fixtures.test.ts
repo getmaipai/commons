@@ -165,6 +165,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     const idle = loadFixture("robot-state.idle.example.json") as object;
     expect(RobotState.parse({ ...idle, motion: null }).motion).toBeNull();
     expect(() => RobotState.parse({ ...idle, motion: "flying" })).toThrow();
+    expect(() => RobotState.parse({ ...idle, unexpected: true })).toThrow();
     expect(() => RobotState.parse({ ...idle, put_down_count: -1 })).toThrow();
     expect(() => RobotState.parse({ ...idle, put_down_count: 1.5 })).toThrow();
     expect(() => RobotState.parse({ ...idle, put_down_count: null })).toThrow();

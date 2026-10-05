@@ -3,9 +3,18 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, confloat, conint
+from gen.py._validators import reject_explicit_null
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    confloat,
+    conint,
+    field_validator,
+)
 
 
 class RobotState(BaseModel):
@@ -60,3 +69,8 @@ class RobotState(BaseModel):
         None,
         description="The MaiPai app version the robot runs (the maipai-bot release), so the hub can compare the robot to a published Bot release; daemon_version is the vendor SDK's version, not this one. Null means no version is currently known; omission means the producer does not yet report this field.",
     )
+
+    @field_validator('put_down_count', mode='before')
+    @classmethod
+    def reject_explicit_null_validator(cls, v: Any, info: ValidationInfo) -> Any:
+        return reject_explicit_null(v, info)

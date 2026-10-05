@@ -21,6 +21,12 @@ uv run datamodel-codegen \
   --use-union-operator \
   --strict-nullable \
   --enum-field-as-literal all \
+  --validators '{"RobotState":{"validators":[{"field":"put_down_count","function":"gen.py._validators.reject_explicit_null","mode":"before"}]}}' \
   --disable-timestamp
+
+# datamodel-code-generator currently emits non-required fields with a None
+# default as Optional even when the schema excludes null. Keep its generated
+# field validator self-contained in the committed gen/py package.
+cp scripts/robot_state_validators.py gen/py/_validators.py
 
 echo "Generated Pydantic v2 models into spec/gen/py/."

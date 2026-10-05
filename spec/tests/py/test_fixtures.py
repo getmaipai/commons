@@ -159,7 +159,13 @@ def test_robot_state_motion_and_put_down_count():
     assert resting.motion == "resting" and resting.put_down_count == 3
     assert bare.motion is None and bare.put_down_count is None
     assert RobotState.model_validate({**idle, "motion": None}).motion is None
-    for bad in ({"motion": "flying"}, {"put_down_count": -1}, {"put_down_count": 1.5}):
+    for bad in (
+        {"motion": "flying"},
+        {"put_down_count": None},
+        {"put_down_count": -1},
+        {"put_down_count": 1.5},
+        {"unexpected": True},
+    ):
         with pytest.raises(ValidationError):
             RobotState.model_validate({**idle, **bad})
 
