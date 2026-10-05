@@ -298,6 +298,13 @@ def test_model_capabilities_background_turns_must_be_boolean():
         ModelCapabilities.model_validate(bad)
 
 
+def test_model_capabilities_background_turns_rejects_null():
+    bad = load_fixture("model-capabilities.background-turns.example.json")
+    bad["turn_budget"]["background_turns"] = None
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate(bad)
+
+
 def test_model_capabilities_unknown_engine_is_rejected():
     bad = load_fixture("model-capabilities.chat.example.json")
     bad["engine"] = "unknown-engine"

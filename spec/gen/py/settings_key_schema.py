@@ -13,7 +13,7 @@ class Section(BaseModel):
         extra='forbid',
     )
     id: str | None = None
-    collapsed: bool | None = False
+    collapsed: bool = False
     order: int | None = None
 
 
@@ -48,7 +48,7 @@ class SettingsKey(BaseModel):
     help: str | None = None
     section: Section | None = None
     level: Literal['basic', 'advanced', 'expert']
-    secret: bool | None = False
+    secret: bool = False
     needs: list[str] | None = Field(
         None, description='Capabilities required for this key to apply.'
     )

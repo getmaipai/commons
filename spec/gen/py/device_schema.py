@@ -29,7 +29,7 @@ class Device(BaseModel):
         None,
         description='A free-text room/location label ("Living room"), optional. Not a fixed vocabulary - a household\'s own rooms aren\'t a closed set.',
     )
-    capabilities: list[str] | None = Field(
+    capabilities: list[str] = Field(
         [],
         description="From the capability vocabulary (spec/vocab/capabilities.json), same convention manifest.schema.json's `requires`/`optional` use. Empty for every device this wave mints (a phone or TV pairing today declares none); populated once a client actually reports its own capabilities.",
     )
@@ -37,7 +37,7 @@ class Device(BaseModel):
         ...,
         description='The person currently paired to this device - whoever approved the Quick Connect request or completed the passkey ceremony that minted it. A shared household device re-paired to a different family member gets a new Device row, not a person_id change: the token that authenticated the old person is revoked first (deleting its Device row), so there is never a live token whose person_id has silently drifted out from under it.',
     )
-    watermarks: dict[str, Any] | None = Field(
+    watermarks: dict[str, Any] = Field(
         {},
         description='Per-record-type sync cursors Wave 3\'s link will populate ("how far this device has synced"). Always `{}` until the link exists - laid now only so the shape doesn\'t need a migration when it does.',
     )

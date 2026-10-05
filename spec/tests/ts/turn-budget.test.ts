@@ -117,6 +117,10 @@ describe("ModelCapabilities.turn_budget", () => {
   });
 });
 
+test("background_turns rejects explicit null", () => {
+  expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, background_turns: null } })).toThrow();
+});
+
 // MODEL-BG-SPEC-01: background_turns says whether the model may run
 // unattended background turns (heartbeat, errands, price watches). It is
 // optional and absent means false, so a record that never heard of it, and
@@ -147,5 +151,9 @@ describe("ModelCapabilities.turn_budget.background_turns", () => {
 
   test("a non-boolean flag is rejected", () => {
     expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, background_turns: "sometimes" } })).toThrow();
+  });
+
+  test("an explicit null is rejected", () => {
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, background_turns: null } })).toThrow();
   });
 });

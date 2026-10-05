@@ -25,7 +25,7 @@ class Input(BaseModel):
         'person',
         'media',
     ]
-    required: bool | None = True
+    required: bool = True
 
 
 class FetchStep(BaseModel):
@@ -43,7 +43,7 @@ class FetchStep(BaseModel):
         description="Binds the result into the recipe's variable scope under this name.",
     )
     url: str = Field(..., description='May reference input/variable names in {braces}.')
-    method: Literal['GET', 'POST'] | None = 'GET'
+    method: Literal['GET', 'POST'] = 'GET'
     headers: dict[str, str] | None = None
     body: Any | None = None
 
@@ -205,7 +205,7 @@ class RecallStep(BaseModel):
         ..., description='May reference input/variable names in {braces}.'
     )
     scope: Literal['household', 'person', 'self'] | None = None
-    limit: conint(ge=1, le=10) | None = 3
+    limit: conint(ge=1, le=10) = 3
 
 
 class ScheduleStep(BaseModel):

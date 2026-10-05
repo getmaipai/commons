@@ -48,11 +48,11 @@ class Person(BaseModel):
         ...,
         description="hub: authoritative on the hub, replicated to robots. local: a robot-only guest, never synced to the hub (4.2's local_only concept for a whole person).",
     )
-    local_only: bool | None = Field(
+    local_only: bool = Field(
         False,
         description='Keeps this person off the overlay network entirely (4.2, 4.12).',
     )
-    enabled: bool | None = Field(
+    enabled: bool = Field(
         True,
         description="Step 6/7: disabled-but-present (BACKLOG.md: 'Person has only deleted_at, disabled-but-present has no representation today'). A disabled person keeps their record, their history and their place in every relationship/grant, but cannot sign in - distinct from deleted_at, which is a tombstone for a record that should stop existing at all. Owner/admin enforce this at the auth boundary; a household pauses someone (a long trip, a temporary restriction) without erasing them.",
     )

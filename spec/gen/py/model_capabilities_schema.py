@@ -128,7 +128,7 @@ class TurnBudget(BaseModel):
         ...,
         description='The fixed, sorted tool-name set the model node offers every turn; never varies per turn.',
     )
-    background_turns: bool | None = Field(
+    background_turns: bool = Field(
         False,
         description='MODEL-BG-SPEC-01: whether the model may run unattended background turns (the heartbeat, errands, price watches), the ones no person is waiting on. Optional, and absent means false. A model with no record, or a record with no turn_budget, is treated as false too (org rule 8, fail safe): an unattended turn never starts on a model nobody has measured.',
     )
@@ -176,7 +176,7 @@ class TransformerGgufSizing(BaseModel):
     bits_per_weight: PositiveFloat = Field(
         ..., description='e.g. 4 for Q4_K_M, 8 for Q8_0.'
     )
-    gguf_overhead_fraction: confloat(ge=0.0) | None = Field(
+    gguf_overhead_fraction: confloat(ge=0.0) = Field(
         0.1,
         description='GGUF block metadata/scales over raw bit-packing (~0.05 for Q8_0, ~0.10 for Q4_K_M).',
     )

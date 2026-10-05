@@ -19,6 +19,7 @@ uv run datamodel-codegen \
   --collapse-root-models \
   --use-standard-collections \
   --use-union-operator \
+  --strict-nullable \
   --enum-field-as-literal all \
   --disable-timestamp
 

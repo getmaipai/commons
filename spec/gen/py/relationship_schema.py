@@ -68,11 +68,11 @@ class Relationship(BaseModel):
         None,
         description="When confirmed_by_person_id was set (step 3a's confirm transition): a household adult vouched for an inferred relationship at this moment. The source stays inferred, with its confidence and evidence (how it was learned never changes), and confirmed_by_person_id is what lets a renderer say it plainly instead of hedging. Null until then, and for a relationship that never needed confirming. A confirmed inferred relationship is refused a second confirmation.",
     )
-    evidence: list[constr(min_length=1)] | None = Field(
+    evidence: list[constr(min_length=1)] = Field(
         [],
         description="What this was inferred from: conversation turn ids, memory record ids, an import job. A machine guess about someone's family that cannot be traced back is not reviewable, and this is the field that makes a wrong one correctable.",
     )
-    scope: Literal['household', 'person'] | None = Field(
+    scope: Literal['household', 'person'] = Field(
         'person',
         description="Who may see this edge. Defaults to `person`, not `household`, and that default is the safety decision in this whole file: a relationship inferred from one person's conversation is THEIR data. A teen mentioning a partner must not become something the household knows because the hub joined two records together. Widening to household is a person's explicit act.",
     )
@@ -80,7 +80,7 @@ class Relationship(BaseModel):
         None,
         description='Required when scope is person; null for household scope. Same field and rule as MemoryRecord and Entity. Enforced in validate.ts.',
     )
-    sensitive: bool | None = Field(
+    sensitive: bool = Field(
         False,
         description='Withheld on shared surfaces and, on the robot, unless the person is confirmed present and alone. Some relationships are sensitive by their nature regardless of who asked.',
     )

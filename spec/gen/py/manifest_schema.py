@@ -460,7 +460,7 @@ class PackageManifest(BaseModel):
         description='Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home_place` changing re-warms `weather` right away instead of waiting for the next scheduled tick.',
     )
     backup: Literal['hot', 'cold', 'exclude'] | None = None
-    background: bool | None = False
+    background: bool = False
     contributes: Contributes | None = Field(
         None,
         description="Shell blueprints (6.1), keyed by blueprint kind: nav entries, pages, right-pane panels, settings sections, commands, quick actions, player hooks, admin sections. `additionalProperties: true` since most of 6.1's own blueprint kinds have no bundled package using them yet (Wave 1's `contributes: []` was a placeholder no package had populated); `widgets` and `pages` below are the two sub-fields session-d-packages-and-store.md steps 2/10 fix a real shape for. `pages` replaces a redundant top-level `pages: string[]` field (Session E flagged it 2026-09-06 as incompatible with this object shape and confirmed nothing in backend/src or frontend/src read it) - a package declaring a page uses `contributes.pages[]` now, never a second, competing field.",
@@ -503,7 +503,7 @@ class PackageManifest(BaseModel):
         description="wave-2.md's C-to-D contract: typed read queries a package offers beyond its own recipe, for C's Tier 2 tool-calling router to call directly rather than routing a whole turn through this package's `handle`.",
     )
     quality_scale: Literal['bronze', 'silver', 'gold'] | None = None
-    channel: Literal['stable', 'beta'] | None = Field(
+    channel: Literal['stable', 'beta'] = Field(
         'stable',
         description="The release channel this manifest version was published under (session-d step 6's store). A household's own per-package channel *choice* is store-side state, not this field - this is the publisher's declaration of what the version itself is.",
     )

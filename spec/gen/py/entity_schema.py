@@ -32,7 +32,7 @@ class Entity(BaseModel):
         ...,
         description='What the household calls this. A real field, not a parsed prefix.',
     )
-    aliases: list[constr(min_length=1, max_length=200)] | None = Field(
+    aliases: list[constr(min_length=1, max_length=200)] = Field(
         [],
         description="Other names the same entity answers to ('Mum', 'Grandma Iris', 'the vet'). Entity-first recall matches on these too, which is what the legacy hub's entities table indexed and the free-text memory entity could not.",
     )
@@ -64,7 +64,7 @@ class Entity(BaseModel):
         None,
         description="When confirmed_by_person_id was set (step 3a's confirm transition): an inferred entity becomes local when a household adult confirms it, and this is the moment; null until then, and for a entity that never needed confirming.",
     )
-    scope: Literal['household', 'person'] | None = Field(
+    scope: Literal['household', 'person'] = Field(
         'household',
         description="Who this entity is visible to, following memory-record.schema.json's scoping, minus its `self` value: `self` is the companion's own memory of itself, which an entity in the household's graph never is. A person mentioned only in one person's conversations is theirs, not the household's; pooling it is the failure the org's per-person identity rule exists to prevent.",
     )
@@ -72,7 +72,7 @@ class Entity(BaseModel):
         None,
         description='Required when scope is person; null for household scope. Same field and same rule as MemoryRecord. Enforced in validate.ts.',
     )
-    sensitive: bool | None = Field(
+    sensitive: bool = Field(
         False,
         description='Withheld on shared surfaces and, on the robot, unless the person is confirmed present and alone. Same meaning as MemoryRecord.sensitive.',
     )

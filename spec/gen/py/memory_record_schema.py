@@ -119,19 +119,17 @@ class MemoryRecord(BaseModel):
         None,
         description="CRED-01 (dev.md section 14 part 1, named against the signal's act_confidence per the outside review - never a bare `confidence` beside it). Required (non-null) on record_kind: memory only; always null on entity and episode (an entity or an episode never acquires fact credence by accident), enforced in validate.ts, the same place/person cross-field convention as elsewhere in this schema. How much support a stored proposition has, never how believable the person is: there is no person-level reliability score anywhere in this shape. Computed, never incremented, by CRED-01's own computeFactConfidence() from confidence_evidence below; records written before this field existed migrate to 1.0 with one synthetic legacy_assertion evidence entry, because the product already said them plainly and a migration that invents doubt about every old memory would be wrong. No writer until CRED-01.",
     )
-    confidence_evidence: list[ConfidenceEvidenceItem] | None = Field(
+    confidence_evidence: list[ConfidenceEvidenceItem] = Field(
         [],
         description="CRED-01: the reason fact_confidence is what it is. Merged on sync as a set union by (source_id, kind) followed by recomputation, so a corroboration seen on the robot is never lost when the hub and the robot reconcile. Empty (not null) on record_kind: entity or episode, matching fact_confidence's own null there. No writer until CRED-01.",
         validate_default=True,
     )
-    conflicts_with: list[constr(pattern=r'^(mem|ent|ep)[0-9]+-[a-z0-9]{6}$')] | None = (
-        Field(
-            [],
-            description='CRED-01: the ids of unresolved contradicting records. Distinct from superseded_by below: a conflict is unresolved (both records stay provisional and conflicted until a clarification lands), a supersession is settled. No writer until CRED-01.',
-        )
+    conflicts_with: list[constr(pattern=r'^(mem|ent|ep)[0-9]+-[a-z0-9]{6}$')] = Field(
+        [],
+        description='CRED-01: the ids of unresolved contradicting records. Distinct from superseded_by below: a conflict is unresolved (both records stay provisional and conflicted until a clarification lands), a supersession is settled. No writer until CRED-01.',
     )
     uses: conint(ge=0)
-    retrieval_feedback: RetrievalFeedback | None = Field(
+    retrieval_feedback: RetrievalFeedback = Field(
         {'corrections': 0, 'last_corrected_at': None},
         description="REVIEW-01 (dev.md 'Coherence review' question 1, 'one memory record, seven bumps'; coordinator ruling, 2026-09-14): how many times this record, once recalled, led to a correction by the person - written only by REVIEW-01, no writer until it lands. Ranking derives any penalty from this deterministically in one engine function; the number itself is never a rank or a score, so it stays auditable rather than an opaque incrementing weight.",
         validate_default=True,

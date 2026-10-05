@@ -30,7 +30,7 @@ class MaintenanceWindow(BaseModel):
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
         ..., description='Hybrid logical clock: wall_ms:counter:node.'
     )
-    description: constr(max_length=1000) | None = ''
+    description: constr(max_length=1000) = ''
     cancelled_at: AwareDatetime | None = None
     rrule: constr(min_length=1) | None = None
     until: date | None = None

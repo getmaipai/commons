@@ -62,7 +62,7 @@ class PluginResult(BaseModel):
     reply: Reply | None = None
     data: Any | None = None
     synthesis_hint: str | None = None
-    actions: list[dict[str, Any]] | None = []
+    actions: list[dict[str, Any]] = []
     directive: dict[str, Any] | None = None
     confirm: Confirm | None = None
     ask: Ask | None = Field(

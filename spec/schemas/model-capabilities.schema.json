@@ -128,6 +128,7 @@
         },
         "background_turns": {
           "type": "boolean",
+          "nullable": false,
           "default": false,
           "description": "MODEL-BG-SPEC-01: whether the model may run unattended background turns (the heartbeat, errands, price watches), the ones no person is waiting on. Optional, and absent means false. A model with no record, or a record with no turn_budget, is treated as false too (org rule 8, fail safe): an unattended turn never starts on a model nobody has measured."
         },
