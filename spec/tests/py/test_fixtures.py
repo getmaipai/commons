@@ -115,6 +115,8 @@ def test_robot_device_fixture(kind):
         "sleeping",
         "unknown-battery",
         "minimal",
+        "held",
+        "resting",
     ],
 )
 def test_robot_state_fixtures(kind: str):
@@ -142,6 +144,29 @@ def test_robot_state_app_version_present_null_and_omitted():
 
 def test_robot_state_app_version_rejects_wrong_type():
     body = {**load_fixture("robot-state.idle.example.json"), "app_version": 4}
+    with pytest.raises(ValidationError):
+        RobotState.model_validate(body)
+
+
+def test_robot_state_motion_and_put_down_count():
+    held = RobotState.model_validate(load_fixture("robot-state.held.example.json"))
+    resting = RobotState.model_validate(
+        load_fixture("robot-state.resting.example.json")
+    )
+    bare = RobotState.model_validate(load_fixture("robot-state.minimal.example.json"))
+    idle = load_fixture("robot-state.idle.example.json")
+    assert held.motion == "held" and held.put_down_count == 0
+    assert resting.motion == "resting" and resting.put_down_count == 3
+    assert bare.motion is None and bare.put_down_count is None
+    assert RobotState.model_validate({**idle, "motion": None}).motion is None
+    for bad in ({"motion": "flying"}, {"put_down_count": -1}, {"put_down_count": 1.5}):
+        with pytest.raises(ValidationError):
+            RobotState.model_validate({**idle, **bad})
+
+
+@pytest.mark.parametrize("value", ["held", "resting", "carried"])
+def test_robot_state_activity_gains_no_motion_value(value: str):
+    body = {**load_fixture("robot-state.idle.example.json"), "activity": value}
     with pytest.raises(ValidationError):
         RobotState.model_validate(body)
 

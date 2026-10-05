@@ -134,7 +134,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     });
   }
 
-  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal"]) {
+  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal", "held", "resting"]) {
     test(`robot-state.${kind}.example.json`, () => {
       expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();
     });
@@ -152,6 +152,29 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(RobotState.parse(loadFixture("robot-state.minimal.example.json")).app_version).toBeUndefined();
     const body = { ...(loadFixture("robot-state.idle.example.json") as object), app_version: 4 };
     expect(() => RobotState.parse(body)).toThrow();
+  });
+
+  test("robot-state motion and put_down_count: optional, null motion allowed, bad values rejected", () => {
+    const held = RobotState.parse(loadFixture("robot-state.held.example.json"));
+    expect(held.motion).toBe("held");
+    expect(held.put_down_count).toBe(0);
+    expect(RobotState.parse(loadFixture("robot-state.resting.example.json")).motion).toBe("resting");
+    const bare = RobotState.parse(loadFixture("robot-state.minimal.example.json"));
+    expect(bare.motion).toBeUndefined();
+    expect(bare.put_down_count).toBeUndefined();
+    const idle = loadFixture("robot-state.idle.example.json") as object;
+    expect(RobotState.parse({ ...idle, motion: null }).motion).toBeNull();
+    expect(() => RobotState.parse({ ...idle, motion: "flying" })).toThrow();
+    expect(() => RobotState.parse({ ...idle, put_down_count: -1 })).toThrow();
+    expect(() => RobotState.parse({ ...idle, put_down_count: 1.5 })).toThrow();
+    expect(() => RobotState.parse({ ...idle, put_down_count: null })).toThrow();
+  });
+
+  test("robot-state activity enum is unchanged by the motion fields", () => {
+    for (const value of ["held", "resting", "carried"]) {
+      const body = { ...(loadFixture("robot-state.idle.example.json") as object), activity: value };
+      expect(() => RobotState.parse(body)).toThrow();
+    }
   });
 
   for (const kind of ["yes", "slow", "no", "unknown", "multi-role"]) {

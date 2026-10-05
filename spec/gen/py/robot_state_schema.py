@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, confloat
+from pydantic import BaseModel, ConfigDict, Field, confloat, conint
 
 
 class RobotState(BaseModel):
@@ -47,6 +47,14 @@ class RobotState(BaseModel):
     daemon_version: str | None = Field(
         None,
         description='The robot daemon version, when available, so the hub can display which software is running. Null means no version is currently known; omission means the producer does not yet report this field.',
+    )
+    motion: Literal['resting', 'held'] | None = Field(
+        None,
+        description='Whether the body is resting on a surface or being held, so the hub can show when someone is carrying the robot. Null means the body cannot tell; omission means the producer does not yet report this field. A consumer that meets a value it does not know treats it as unknown, not as an error.',
+    )
+    put_down_count: conint(ge=0) | None = Field(
+        None,
+        description='How many times the robot has been put down since it started, a non-negative running count the hub can compare between frames. Omission means the producer does not yet report this field.',
     )
     app_version: str | None = Field(
         None,

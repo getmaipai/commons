@@ -89,6 +89,22 @@ export const RobotState = z
         "The robot daemon version, when available, so the hub can display which software is running. Null means no version is currently known; omission means the producer does not yet report this field.",
       )
       .optional(),
+    /**Whether the body is resting on a surface or being held, so the hub can show when someone is carrying the robot. Null means the body cannot tell; omission means the producer does not yet report this field. A consumer that meets a value it does not know treats it as unknown, not as an error.*/
+    motion: z
+      .union([z.literal("resting"), z.literal("held"), z.literal(null)])
+      .describe(
+        "Whether the body is resting on a surface or being held, so the hub can show when someone is carrying the robot. Null means the body cannot tell; omission means the producer does not yet report this field. A consumer that meets a value it does not know treats it as unknown, not as an error.",
+      )
+      .optional(),
+    /**How many times the robot has been put down since it started, a non-negative running count the hub can compare between frames. Omission means the producer does not yet report this field.*/
+    put_down_count: z
+      .number()
+      .int()
+      .gte(0)
+      .describe(
+        "How many times the robot has been put down since it started, a non-negative running count the hub can compare between frames. Omission means the producer does not yet report this field.",
+      )
+      .optional(),
     /**The MaiPai app version the robot runs (the maipai-bot release), so the hub can compare the robot to a published Bot release; daemon_version is the vendor SDK's version, not this one. Null means no version is currently known; omission means the producer does not yet report this field.*/
     app_version: z
       .union([
