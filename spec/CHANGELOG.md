@@ -7,6 +7,19 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.73] - 2026-10-05
+
+### Added
+- `reconnecting` and `sleeping` values on `robot.state` `activity`
+  (ROBOT-STATE-ACTIVITY-01). `reconnecting` means the robot lost the hub
+  link and is trying to restore it; `sleeping` means it is deliberately
+  idle, not unreachable. A consumer treats an activity it does not know as
+  unknown, not as an error.
+- Optional `background_turns` boolean on the model `turn_budget`
+  (MODEL-BG-SPEC-01): the model may run unattended background turns
+  (heartbeat, errands, price watches). Absent means false, and a model
+  with no record or no `turn_budget` is false too.
+
 ## [spec-v0.1.72] - 2026-10-04
 
 ### Removed
