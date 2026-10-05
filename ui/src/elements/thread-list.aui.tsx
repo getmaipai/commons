@@ -17,13 +17,17 @@ import {
   Loader2Icon,
   MoreHorizontalIcon,
   PencilIcon,
+  PinIcon,
+  PinOffIcon,
   PlusIcon,
   SearchIcon,
   TrashIcon,
 } from "lucide-react";
 import {
+  createContext,
   forwardRef,
   Fragment,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -35,9 +39,49 @@ import {
 export type ThreadListLabels = {
   newChat?: string;
   searchChats?: string;
+  /** Menu item on an unpinned row (only when `pinnable`). Default "Pin". */
+  pin?: string;
+  /** Menu item on a pinned row (only when `pinnable`). Default "Unpin". */
+  unpin?: string;
+  /** Group header above the day groups (only when `pinnable`). Default "Pinned". */
+  pinned?: string;
 };
 
-export const ThreadList: FC<{ labels?: ThreadListLabels }> = ({ labels }) => {
+type ThreadListPinConfig = {
+  pinnable: boolean;
+  pin: string;
+  unpin: string;
+  pinned: string;
+};
+
+const defaultPinConfig: ThreadListPinConfig = {
+  pinnable: false,
+  pin: "Pin",
+  unpin: "Unpin",
+  pinned: "Pinned",
+};
+
+const ThreadListPinContext = createContext<ThreadListPinConfig>(defaultPinConfig);
+
+const resolvePinConfig = (
+  pinnable: boolean | undefined,
+  labels: ThreadListLabels | undefined,
+): ThreadListPinConfig => ({
+  pinnable: pinnable ?? false,
+  pin: labels?.pin ?? defaultPinConfig.pin,
+  unpin: labels?.unpin ?? defaultPinConfig.unpin,
+  pinned: labels?.pinned ?? defaultPinConfig.pinned,
+});
+
+/** Reads the `pinned` flag a host keeps in a thread's custom metadata. */
+export const isThreadPinned = (
+  custom: Record<string, unknown> | undefined,
+): boolean => custom?.pinned === true;
+
+export const ThreadList: FC<{ labels?: ThreadListLabels; pinnable?: boolean }> = ({
+  labels,
+  pinnable,
+}) => {
   const [search, setSearch] = useState("");
   const hasThreads = useAuiState((s) => s.threads.threadIds.length > 0);
   const newChatLabel = labels?.newChat ?? "New chat";
@@ -49,7 +93,11 @@ export const ThreadList: FC<{ labels?: ThreadListLabels }> = ({ labels }) => {
       {hasThreads && (
         <ThreadListSearch value={search} onValueChange={setSearch} label={searchChatsLabel} />
       )}
-      <ThreadListItems searchQuery={hasThreads ? search : ""} />
+      <ThreadListItems
+        searchQuery={hasThreads ? search : ""}
+        pinnable={pinnable}
+        labels={labels}
+      />
     </ThreadListRoot>
   );
 };
@@ -97,21 +145,38 @@ export const ThreadListRoot: FC<
 };
 
 export const ThreadListItems: FC<
-  ComponentPropsWithoutRef<"div"> & { searchQuery?: string }
-> = ({ className, searchQuery = "", ...props }) => {
+  ComponentPropsWithoutRef<"div"> & {
+    searchQuery?: string;
+    /** Adds Pin / Unpin to each row menu, a pinned indicator and a Pinned group. */
+    pinnable?: boolean;
+    labels?: ThreadListLabels;
+  }
+> = ({ className, searchQuery = "", pinnable, labels, ...props }) => {
+  const { pin: pinLabel, unpin: unpinLabel, pinned: pinnedLabel } = labels ?? {};
+  const pin = useMemo(
+    () =>
+      resolvePinConfig(pinnable, {
+        pin: pinLabel,
+        unpin: unpinLabel,
+        pinned: pinnedLabel,
+      }),
+    [pinnable, pinLabel, unpinLabel, pinnedLabel],
+  );
   return (
-    <div
-      data-slot="aui_thread-list-items"
-      className={cn("flex flex-col gap-0.5", className)}
-      {...props}
-    >
-      <AuiIf condition={(s) => s.threads.isLoading}>
-        <ThreadListSkeleton />
-      </AuiIf>
-      <AuiIf condition={(s) => !s.threads.isLoading}>
-        <ThreadListItemGroups searchQuery={searchQuery} />
-      </AuiIf>
-    </div>
+    <ThreadListPinContext.Provider value={pin}>
+      <div
+        data-slot="aui_thread-list-items"
+        className={cn("flex flex-col gap-0.5", className)}
+        {...props}
+      >
+        <AuiIf condition={(s) => s.threads.isLoading}>
+          <ThreadListSkeleton />
+        </AuiIf>
+        <AuiIf condition={(s) => !s.threads.isLoading}>
+          <ThreadListItemGroups searchQuery={searchQuery} />
+        </AuiIf>
+      </div>
+    </ThreadListPinContext.Provider>
   );
 };
 
@@ -131,9 +196,17 @@ export type ThreadListGroup = { label: string; indices: number[] };
 /**
  * Filters the thread list by title and buckets the matches by last activity
  * (Today, Yesterday, Earlier). `groups` is null when no thread carries a
- * date, in which case `filteredIndices` keeps the runtime order.
+ * date, in which case `filteredIndices` keeps the runtime order. With
+ * `options.pinnable`, rows whose custom metadata has `pinned: true` lead in
+ * a group labelled `options.pinnedLabel` (default "Pinned") instead of
+ * landing in a day group.
  */
-export const useThreadListGroups = (searchQuery = "") => {
+export const useThreadListGroups = (
+  searchQuery = "",
+  options: { pinnable?: boolean; pinnedLabel?: string } = {},
+) => {
+  const pinnable = options.pinnable ?? false;
+  const pinnedLabel = options.pinnedLabel ?? defaultPinConfig.pinned;
   const threadIds = useAuiState((s) => s.threads.threadIds);
   const threadItems = useAuiState((s) => s.threads.threadItems);
 
@@ -167,7 +240,21 @@ export const useThreadListGroups = (searchQuery = "") => {
     const sorted = [...filteredIndices].sort((a, b) => time(b) - time(a));
 
     const result: ThreadListGroup[] = [];
+    if (pinnable) {
+      const pinned = sorted.filter((index) =>
+        isThreadPinned(itemsById.get(threadIds[index] ?? "")?.custom),
+      );
+      if (pinned.length > 0) {
+        result.push({ label: pinnedLabel, indices: pinned });
+      }
+    }
     for (const index of sorted) {
+      if (
+        pinnable &&
+        isThreadPinned(itemsById.get(threadIds[index] ?? "")?.custom)
+      ) {
+        continue;
+      }
       const label = dateGroupLabel(dates[index], startOfToday);
       const lastGroup = result[result.length - 1];
       if (lastGroup?.label === label) {
@@ -177,14 +264,17 @@ export const useThreadListGroups = (searchQuery = "") => {
       }
     }
     return { threadIds, filteredIndices, groups: result };
-  }, [threadIds, threadItems, query]);
+  }, [threadIds, threadItems, query, pinnable, pinnedLabel]);
 };
 
 const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
   searchQuery = "",
 }) => {
-  const { threadIds, filteredIndices, groups } =
-    useThreadListGroups(searchQuery);
+  const pin = useContext(ThreadListPinContext);
+  const { threadIds, filteredIndices, groups } = useThreadListGroups(
+    searchQuery,
+    { pinnable: pin.pinnable, pinnedLabel: pin.pinned },
+  );
   const query = searchQuery.trim();
 
   if (query && filteredIndices.length === 0) {
@@ -287,6 +377,8 @@ const ThreadListSkeleton: FC = () => {
 
 export const ThreadListItem: FC = () => {
   const isRunning = useAuiState((s) => s.threadListItem.isRunning);
+  const { pinnable } = useContext(ThreadListPinContext);
+  const isPinned = useAuiState((s) => isThreadPinned(s.threadListItem.custom));
   const [isRenaming, setIsRenaming] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const restoreFocusRef = useRef(false);
@@ -315,6 +407,13 @@ export const ThreadListItem: FC = () => {
           data-slot="aui_thread-list-item-trigger"
           className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 focus-visible:ring-1"
         >
+          {pinnable && isPinned && (
+            <PinIcon
+              aria-hidden
+              data-slot="aui_thread-list-item-pinned"
+              className="text-muted-foreground me-1.5 size-3 shrink-0"
+            />
+          )}
           {isRunning && (
             <Loader2Icon
               aria-hidden
@@ -401,6 +500,16 @@ const ThreadListItemRename: FC<{
 };
 
 const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
+  const aui = useAui();
+  const { pinnable, pin, unpin } = useContext(ThreadListPinContext);
+  const isPinned = useAuiState((s) => isThreadPinned(s.threadListItem.custom));
+
+  // updateCustom replaces the whole object, so keep the host's other keys.
+  const togglePinned = () => {
+    const custom = aui.threadListItem().getState().custom;
+    void aui.threadListItem().updateCustom({ ...custom, pinned: !isPinned });
+  };
+
   return (
     <ThreadListItemMorePrimitive.Root sharedFocusGroup>
       <ThreadListItemMorePrimitive.Trigger asChild>
@@ -429,6 +538,20 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
           <PencilIcon className="size-4" />
           Rename
         </ThreadListItemMorePrimitive.Item>
+        {pinnable && (
+          <ThreadListItemMorePrimitive.Item
+            data-slot="aui_thread-list-item-more-item"
+            className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none"
+            onSelect={togglePinned}
+          >
+            {isPinned ? (
+              <PinOffIcon className="size-4" />
+            ) : (
+              <PinIcon className="size-4" />
+            )}
+            {isPinned ? unpin : pin}
+          </ThreadListItemMorePrimitive.Item>
+        )}
         <ThreadListItemPrimitive.Archive asChild>
           <ThreadListItemMorePrimitive.Item
             data-slot="aui_thread-list-item-more-item"

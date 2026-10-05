@@ -79,6 +79,36 @@ and Enter work off the same matches.
 - Add optional MarkdownText preprocessing and a Thread markdown components/preprocess slot.
 - Export Citation with optional outbound href and optional snippet.
 
+## [0.5.95] - ui-v0.5.95
+
+`elements/thread-list.aui.tsx` gains an opt-in Pin / Unpin action, a
+pinned indicator and a "Pinned" group, restoring what Home's chat list
+lost when it moved to the kit's thread list. Everything is off unless the
+host passes `pinnable`; with it absent the list is unchanged.
+
+The row menu item calls the runtime's `threadListItem.updateCustom` with
+the thread's current custom metadata plus `pinned: true | false` (the
+runtime replaces the object, so other keys are kept; for a thread with no
+other metadata the payload is exactly `{ pinned: boolean }`). A row reads
+`custom.pinned === true` as pinned. The kit assumes no host API; the host
+adapter persists the change in its own `updateCustom`.
+
+PROPOSAL, new props (all optional):
+
+| Prop | On | Type | Default | Effect |
+| --- | --- | --- | --- | --- |
+| `pinnable` | `ThreadList`, `ThreadListItems` | `boolean` | `false` | Shows Pin / Unpin in each row menu, the pinned indicator, and the Pinned group |
+| `labels.pin` | `ThreadList`, `ThreadListItems` (`labels`) | `string` | `"Pin"` | Menu item on an unpinned row |
+| `labels.unpin` | same | `string` | `"Unpin"` | Menu item on a pinned row |
+| `labels.pinned` | same | `string` | `"Pinned"` | Group header above the day groups |
+| `options.pinnable`, `options.pinnedLabel` | `useThreadListGroups(searchQuery, options)` | `boolean`, `string` | `false`, `"Pinned"` | Puts pinned rows in a leading group; for hosts that render their own groups |
+
+Also new: the `isThreadPinned(custom)` helper. The Pinned group appears
+only when the list already groups by day (some thread has a date) and at
+least one pinned row exists; pinned rows leave their day group. The
+indicator is a muted pin icon in the row title line (`data-slot`
+`aui_thread-list-item-pinned`), shown only for pinned rows.
+
 ## [0.5.92] - ui-v0.5.92
 
 `ThreadComponents` gains an optional `viewport` configuration for assistant-ui's
