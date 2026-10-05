@@ -106,12 +106,20 @@ def test_device_fixture():
         "listening",
         "thinking",
         "speaking",
+        "reconnecting",
+        "sleeping",
         "unknown-battery",
         "minimal",
     ],
 )
 def test_robot_state_fixtures(kind: str):
     RobotState.model_validate(load_fixture(f"robot-state.{kind}.example.json"))
+
+
+def test_robot_state_activity_rejects_unlisted_value():
+    body = {**load_fixture("robot-state.idle.example.json"), "activity": "napping"}
+    with pytest.raises(ValidationError):
+        RobotState.model_validate(body)
 
 
 def test_robot_state_app_version_present_null_and_omitted():

@@ -128,11 +128,16 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Device.parse(loadFixture("device.example.json"))).not.toThrow();
   });
 
-  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "unknown-battery", "minimal"]) {
+  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal"]) {
     test(`robot-state.${kind}.example.json`, () => {
       expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();
     });
   }
+
+  test("robot-state activity: an unlisted value is still rejected", () => {
+    const body = { ...(loadFixture("robot-state.idle.example.json") as object), activity: "napping" };
+    expect(() => RobotState.parse(body)).toThrow();
+  });
 
   test("robot-state app_version: present, null and omitted validate; wrong type is rejected", () => {
     const present = RobotState.parse(loadFixture("robot-state.idle.example.json"));

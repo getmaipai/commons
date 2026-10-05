@@ -7,11 +7,19 @@ import { z } from "zod";
 /**A hub-local projection of a paired robot's current state, keyed externally by device_id and never synced or given its own record identity (home docs/dev.md, ‘Robot device state’; bot docs/dev.md, ‘Robot device state’ pointer). It deliberately has no id, timestamps, or hlc. Battery, daemon and app version fields may be omitted by producers that do not report them yet; explicit null means the body cannot tell or has no version to report. Reachy Mini always sends null for on_battery per section 7 of the design record.*/
 export const RobotState = z
   .object({
-    /**The robot's current interaction phase, so the hub can show an accurate Devices-page card, including the distinct startup state.*/
+    /**The robot's current interaction phase, so the hub can show an accurate Devices-page card, including the distinct startup state. reconnecting means the robot lost the hub link and is trying to restore it. sleeping means the robot is deliberately idle, not unreachable. A consumer that meets an activity value it does not know treats it as unknown, not as an error.*/
     activity: z
-      .enum(["starting", "idle", "listening", "thinking", "speaking"])
+      .enum([
+        "starting",
+        "idle",
+        "listening",
+        "thinking",
+        "speaking",
+        "reconnecting",
+        "sleeping",
+      ])
       .describe(
-        "The robot's current interaction phase, so the hub can show an accurate Devices-page card, including the distinct startup state.",
+        "The robot's current interaction phase, so the hub can show an accurate Devices-page card, including the distinct startup state. reconnecting means the robot lost the hub link and is trying to restore it. sleeping means the robot is deliberately idle, not unreachable. A consumer that meets an activity value it does not know treats it as unknown, not as an error.",
       ),
     /**Whether the robot's microphone is muted, so the card can show when it cannot hear the household.*/
     muted: z

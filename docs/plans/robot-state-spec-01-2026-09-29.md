@@ -38,7 +38,11 @@ or `bot` should be built before this lands and tags.
    design record, cite it in the schema's own top-level `description`
    rather than re-deriving anything):
    - `activity`: string enum `["starting", "idle", "listening",
-     "thinking", "speaking"]`.
+     "thinking", "speaking"]`. Later additions (ROBOT-STATE-ACTIVITY-01,
+     2026-10-05): `reconnecting` (the robot lost the hub link and is
+     trying to restore it) and `sleeping` (the robot is deliberately
+     idle, not unreachable). A consumer treats a value it does not know
+     as unknown, not as an error.
    - `muted`: boolean.
    - `tracking`: boolean.
    - `on_battery`: `["boolean", "null"]` - null means the body cannot

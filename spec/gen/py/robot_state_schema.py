@@ -16,9 +16,17 @@ class RobotState(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    activity: Literal['starting', 'idle', 'listening', 'thinking', 'speaking'] = Field(
+    activity: Literal[
+        'starting',
+        'idle',
+        'listening',
+        'thinking',
+        'speaking',
+        'reconnecting',
+        'sleeping',
+    ] = Field(
         ...,
-        description="The robot's current interaction phase, so the hub can show an accurate Devices-page card, including the distinct startup state.",
+        description="The robot's current interaction phase, so the hub can show an accurate Devices-page card, including the distinct startup state. reconnecting means the robot lost the hub link and is trying to restore it. sleeping means the robot is deliberately idle, not unreachable. A consumer that meets an activity value it does not know treats it as unknown, not as an error.",
     )
     muted: bool = Field(
         ...,

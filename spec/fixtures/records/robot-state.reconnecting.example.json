@@ -1,0 +1,9 @@
+{
+  "activity": "reconnecting",
+  "muted": false,
+  "tracking": false,
+  "on_battery": null,
+  "battery_level": null,
+  "daemon_version": "1.2.3",
+  "app_version": "0.4.2"
+}
