@@ -43,6 +43,7 @@ import {
   type FileMessagePartComponent,
   type ImageMessagePartComponent,
   type TextMessagePartComponent,
+  type ThreadMessage,
   type ToolCallMessagePartComponent,
   useAui,
   useAuiState,
@@ -68,8 +69,11 @@ import {
 } from "lucide-react";
 import {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useRef,
+  useState,
   type ComponentType,
   type ComponentProps,
   type FC,
@@ -147,6 +151,12 @@ export type ThreadViewportOptions = Pick<
  * update, with the edited message's id and the following assistant
  * message's `metadata.custom.turnId` when present. A caller can use the
  * second value to link the replacement turn to the original turn.
+ * `ThreadViewportExtra`, when set, renders as a sibling beside the
+ * viewport (not inside it), pinned to the thread root's right edge, so
+ * a caller can mount a rail such as the conversation map there. It sits
+ * inside the thread root, so `useVisibleMessageIds` and
+ * `useScrollToMessage` work in it. Unset, nothing renders and the root's
+ * layout is unchanged.
  */
 export type ThreadComponents = {
   markdown?: { components?: MarkdownTextProps["components"]; preprocess?: (text: string) => string } | undefined;
@@ -167,6 +177,7 @@ export type ThreadComponents = {
   AssistantMessageFooterExtra?: ComponentType | undefined;
   Indicator?: ComponentType | undefined;
   MessageError?: ComponentType | undefined;
+  ThreadViewportExtra?: ComponentType | undefined;
   ComposerExtra?: ComponentType | undefined;
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
@@ -219,6 +230,11 @@ const EMPTY_COMPONENTS: ThreadComponents = {};
 
 const ThreadComponentsContext =
   createContext<ThreadComponents>(EMPTY_COMPONENTS);
+
+// The viewport element, for `useVisibleMessageIds` and `useScrollToMessage`.
+// assistant-ui's own viewport state is no help here: `ThreadPrimitive.Viewport`
+// provides its store to its own subtree only, so a sibling slot never sees it.
+const ThreadViewportElementContext = createContext<HTMLElement | null>(null);
 
 // Startup exposes a loading placeholder thread; treat it as a new chat so
 // the composer mounts centered. Loads after startup keep the docked layout.
@@ -273,11 +289,16 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean 
   autoFocus,
   temporary,
 }) => {
-  const { Welcome = ThreadWelcome, viewport = {} } = useContext(ThreadComponentsContext);
+  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra } = useContext(ThreadComponentsContext);
+  const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
 
   return (
+    <ThreadViewportElementContext.Provider value={viewportElement}>
     <ThreadPrimitive.Root
-      className="aui-root aui-thread-root bg-background @container flex h-full flex-col"
+      className={cn(
+        "aui-root aui-thread-root bg-background @container flex h-full flex-col",
+        ThreadViewportExtra && "relative",
+      )}
       style={{
         ["--thread-max-width" as string]: "44rem",
         // `--color-accent` and `--color-muted` are the same value in
@@ -296,6 +317,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean 
     >
       <ThreadPrimitive.Viewport
         {...viewport}
+        ref={setViewportElement}
         turnAnchor={viewport.turnAnchor ?? "top"}
         data-slot="aui_thread-viewport"
         className="relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll scroll-smooth"
@@ -338,9 +360,123 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean 
           </ThreadPrimitive.ViewportFooter>
         </div>
       </ThreadPrimitive.Viewport>
+      {ThreadViewportExtra && (
+        <div
+          data-slot="aui_thread-viewport-extra"
+          className="absolute inset-y-0 right-3 z-10 flex items-stretch"
+        >
+          <ThreadViewportExtra />
+        </div>
+      )}
     </ThreadPrimitive.Root>
+    </ThreadViewportElementContext.Provider>
   );
 };
+
+const MESSAGE_SELECTOR = "[data-message-id]";
+const VISIBLE_THROTTLE_MS = 100;
+
+const sameIds = (a: readonly string[], b: readonly string[]) =>
+  a.length === b.length && a.every((id, i) => id === b[i]);
+
+/**
+ * Ids of the messages currently intersecting the thread viewport, in
+ * document order, updated at most once per 100ms. Call it from inside the
+ * thread (a `ThreadViewportExtra` slot, a message, a tool UI); outside one
+ * it returns an empty list. Without `IntersectionObserver` it stays empty.
+ */
+export function useVisibleMessageIds(): readonly string[] {
+  const viewport = useContext(ThreadViewportElementContext);
+  const [ids, setIds] = useState<readonly string[]>([]);
+
+  useEffect(() => {
+    if (!viewport || typeof IntersectionObserver === "undefined") return;
+    const visible = new Set<string>();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const flush = () => {
+      timer = undefined;
+      const next = [...viewport.querySelectorAll(MESSAGE_SELECTOR)]
+        .map((el) => el.getAttribute("data-message-id") ?? "")
+        .filter((id) => visible.has(id));
+      setIds((prev) => (sameIds(prev, next) ? prev : next));
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.getAttribute("data-message-id");
+          if (!id) continue;
+          if (entry.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        }
+        timer ??= setTimeout(flush, VISIBLE_THROTTLE_MS);
+      },
+      { root: viewport },
+    );
+    const watch = () => {
+      for (const el of viewport.querySelectorAll(MESSAGE_SELECTOR)) io.observe(el);
+    };
+    watch();
+    const mutations = new MutationObserver(watch);
+    mutations.observe(viewport, { childList: true, subtree: true });
+
+    return () => {
+      mutations.disconnect();
+      io.disconnect();
+      if (timer !== undefined) clearTimeout(timer);
+    };
+  }, [viewport]);
+
+  return ids;
+}
+
+/**
+ * Returns `(messageId) => void`, which scrolls that message to the top of
+ * the thread viewport. An id with no rendered message is a no-op, as is
+ * calling it outside a thread.
+ */
+export function useScrollToMessage(): (messageId: string) => void {
+  const viewport = useContext(ThreadViewportElementContext);
+  return useCallback(
+    (messageId) => {
+      const target = [...(viewport?.querySelectorAll(MESSAGE_SELECTOR) ?? [])].find(
+        (el) => el.getAttribute("data-message-id") === messageId,
+      );
+      target?.scrollIntoView({ block: "start" });
+    },
+    [viewport],
+  );
+}
+
+export type SearchableMessage = {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+};
+
+/**
+ * A plain `{ id, role, text }` list of a thread's messages for
+ * `ConversationSearch` and `ConversationMap`: text parts only, joined by
+ * newlines, system messages dropped. Pass `useAuiState((s) => s.thread.messages)`.
+ */
+export function messagesForSearch(
+  messages: readonly ThreadMessage[],
+): SearchableMessage[] {
+  return messages.flatMap((message) =>
+    message.role === "system"
+      ? []
+      : [
+          {
+            id: message.id,
+            role: message.role,
+            text: message.content
+              .flatMap((part) => (part.type === "text" ? [part.text] : []))
+              .join("\n"),
+          },
+        ],
+  );
+}
 
 const ThreadMessage: FC = () => {
   const { AssistantMessage: AssistantMessageComponent = AssistantMessage } =

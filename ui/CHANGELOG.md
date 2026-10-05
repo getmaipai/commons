@@ -1,5 +1,48 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.95] - ui-v0.5.95
+
+PROPOSAL (additive; every default unchanged):
+
+| Export / prop | Type | Default |
+|---|---|---|
+| `ThreadComponents.ThreadViewportExtra` | `ComponentType \| undefined` | unset, renders nothing |
+| `useVisibleMessageIds()` | `() => readonly string[]`, ids of messages intersecting the viewport, document order, updated at most every 100ms | `[]` outside a thread or without `IntersectionObserver` |
+| `useScrollToMessage()` | `() => (messageId: string) => void`, scrolls that message to the top of the viewport | no-op for an unknown id or outside a thread |
+| `messagesForSearch(messages)` | `(readonly ThreadMessage[]) => SearchableMessage[]` | exported helper |
+| `SearchableMessage` | `{ id: string; role: "user" \| "assistant"; text: string }` | exported type |
+
+All five are exported from `elements/thread.aui.tsx`, so Home's chat can mount
+`ConversationMap`, `ConversationSearch` and `CommandPalette` without forking the
+Thread.
+
+- `ThreadViewportExtra` renders inside the thread root as a sibling of the
+  viewport (`data-slot="aui_thread-viewport-extra"`), absolutely positioned on
+  the right edge and full height, for a rail such as `ConversationMap`. The root
+  gains `relative` only when the slot is set, so an unset slot changes no layout.
+  The slot sits inside the thread, so the two hooks below work in it.
+- The hooks read the viewport element from a kit context, not from
+  assistant-ui's viewport state: `ThreadPrimitive.Viewport` provides that store to
+  its own subtree only, so a sibling slot would see an empty one. Messages are
+  found by the `data-message-id` attribute that `MessagePrimitive.Root` renders.
+- `messagesForSearch` joins each message's text parts with newlines and drops
+  system messages. Feed it `useAuiState((s) => s.thread.messages)`.
+
+Host wiring, all with props the Elements already have (none were added):
+
+- `ConversationMap`: `entries` from `messagesForSearch` (`id`, a `title` from
+  `text`), `visibleIds={useVisibleMessageIds()}`, `onSelect={useScrollToMessage()}`.
+  `activeId` is the host's choice, for example the first visible id.
+- `ConversationSearch`: the host builds `hits` (`{ id, before, match, after,
+  position }`) from the `messagesForSearch` list; `onStep` moves `activeIndex` and
+  the host calls `useScrollToMessage()` with the active hit's `id`.
+- `CommandPalette`: the host owns the command list, the kit invents none.
+  `commands: readonly PaletteCommand[]` where `PaletteCommand` is `{ id: string;
+  label: string; group: string; keys: readonly string[] }` (`label` is the name,
+  `keys` the shortcut), plus `query`, `activeId`, `onQueryChange`,
+  `onActiveChange` and `onRun(id)`. The host maps `id` to its action in `onRun`
+  and binds Cmd+K itself.
+
 ## [0.5.94] - ui-v0.5.94
 
 PROPOSAL (new `ThreadSearch` props, all optional, defaults unchanged):
