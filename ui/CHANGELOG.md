@@ -1,5 +1,36 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.94] - ui-v0.5.94
+
+PROPOSAL (new `ThreadSearch` props, all optional, defaults unchanged):
+
+| Prop / export | Type | Default |
+|---|---|---|
+| `inputOnly` | `boolean` | `false` |
+| `onMatchesChange` | `(ids: string[]) => void` | unset |
+| `SearchableThread.preview` | `string \| undefined` (was required `string`) | unset |
+| `matchThreads(threads, query)` | `SearchableThread[]`, pinned first then day groups in first-seen order | exported helper |
+| `groupThreads(matches)` | `{ pinned, groups: { group, threads }[] }` | exported helper |
+
+A host that keeps its own list renders `<ThreadSearch inputOnly ... />` for the
+search box and filters its list with `matchThreads(threads, query)` (or takes the
+ids from `onMatchesChange`), so both use the same matching, ordering and grouping
+as the Element. `inputOnly` drops the card chrome, rows, group headings and the
+empty state; `threads`, `query` and `activeId` are still required because arrows
+and Enter work off the same matches.
+
+- `elements/thread-search.tsx` gains `inputOnly`, `onMatchesChange`, and the
+  exported `matchThreads` and `groupThreads` helpers. `onMatchesChange` fires on
+  mount and whenever the ordered ids change, never on an unrelated re-render.
+- `preview` is now optional. A thread without one matches on its title alone and
+  renders no preview line (before, a missing preview would have matched the text
+  "undefined").
+- Keyboard: Enter calls `onSelect` with the first result, Escape clears a
+  non-empty query through `onQueryChange("")`. Arrow keys are unchanged. Enter
+  and Escape previously did nothing in the Element, so the full render gains them
+  too; with no `onSelect` or `onQueryChange` they stay no-ops.
+- New `thread-search.test.tsx` covers each behaviour.
+
 ## [0.5.93] - ui-v0.5.93
 
 - Add optional MarkdownText preprocessing and a Thread markdown components/preprocess slot.

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import { useEffect, useRef, type ComponentProps } from "react";
 import { PinIcon, SearchIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, mono, paper } from "./surfaces";
@@ -9,8 +9,36 @@ export interface SearchableThread {
   id: string;
   title: string;
   group: string;
-  preview: string;
+  preview?: string;
   pinned?: boolean;
+}
+
+export function groupThreads(matches: readonly SearchableThread[]): {
+  pinned: SearchableThread[];
+  groups: { group: string; threads: SearchableThread[] }[];
+} {
+  const rest = matches.filter((thread) => !thread.pinned);
+  return {
+    pinned: matches.filter((thread) => thread.pinned),
+    groups: [...new Set(rest.map((thread) => thread.group))].map((group) => ({
+      group,
+      threads: rest.filter((thread) => thread.group === group),
+    })),
+  };
+}
+
+// Matches on title and preview, then orders pinned first and day groups in
+// first-seen order: the same order ThreadSearch renders and Enter/arrows use.
+export function matchThreads(
+  threads: readonly SearchableThread[],
+  query: string,
+): SearchableThread[] {
+  const needle = query.toLowerCase();
+  const matches = threads.filter((thread) =>
+    `${thread.title} ${thread.preview ?? ""}`.toLowerCase().includes(needle),
+  );
+  const { pinned, groups } = groupThreads(matches);
+  return [...pinned, ...groups.flatMap((entry) => entry.threads)];
 }
 
 export function ThreadSearch({
@@ -19,34 +47,41 @@ export function ThreadSearch({
   activeId,
   onQueryChange,
   onSelect,
+  onMatchesChange,
+  inputOnly = false,
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "threads" | "query" | "activeId" | "onQueryChange" | "onSelect"
+  | "children"
+  | "threads"
+  | "query"
+  | "activeId"
+  | "onQueryChange"
+  | "onSelect"
+  | "onMatchesChange"
+  | "inputOnly"
 > & {
   threads: readonly SearchableThread[];
   query: string;
   activeId: string;
   onQueryChange?: (query: string) => void;
   onSelect?: (id: string) => void;
+  // Ordered ids of the current matches, for a host list that filters itself.
+  onMatchesChange?: (ids: string[]) => void;
+  // Render only the search field; the host shows the results.
+  inputOnly?: boolean;
 }) {
-  const matches = threads.filter((thread) =>
-    `${thread.title} ${thread.preview}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
-  );
-  const pinned = matches.filter((thread) => thread.pinned);
-  const groups = [
-    ...new Set(matches.filter((t) => !t.pinned).map((t) => t.group)),
-  ];
+  const ordered = matchThreads(threads, query);
+  const { pinned, groups } = groupThreads(ordered);
 
-  const ordered = [
-    ...pinned,
-    ...groups.flatMap((group) =>
-      matches.filter((thread) => !thread.pinned && thread.group === group),
-    ),
-  ];
+  const reported = useRef<string | null>(null);
+  const orderedKey = ordered.map((thread) => thread.id).join("\n");
+  useEffect(() => {
+    if (reported.current === orderedKey) return;
+    reported.current = orderedKey;
+    onMatchesChange?.(ordered.map((thread) => thread.id));
+  });
 
   const move = (delta: number) => {
     if (ordered.length === 0) return;
@@ -65,6 +100,15 @@ export function ThreadSearch({
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
       move(-1);
+    } else if (event.key === "Enter") {
+      const first = ordered[0];
+      if (first && onSelect) {
+        event.preventDefault();
+        onSelect(first.id);
+      }
+    } else if (event.key === "Escape" && query !== "") {
+      event.preventDefault();
+      onQueryChange?.("");
     }
   };
 
@@ -87,9 +131,11 @@ export function ThreadSearch({
             {thread.title}
           </span>
         </span>
-        <span className="text-foreground/35 truncate text-xs">
-          {thread.preview}
-        </span>
+        {thread.preview && (
+          <span className="text-foreground/35 truncate text-xs">
+            {thread.preview}
+          </span>
+        )}
       </>
     );
 
@@ -109,6 +155,37 @@ export function ThreadSearch({
     );
   };
 
+  const searchField = (
+    <div
+      className={cn(
+        field,
+        "flex items-center gap-2 rounded-xl px-2.5 py-1.5",
+      )}
+    >
+      <SearchIcon className="text-foreground/30 size-3.5 shrink-0" />
+      <input
+        value={query}
+        onChange={(event) => onQueryChange?.(event.target.value)}
+        onKeyDown={onKeyDown}
+        placeholder="Search threads"
+        aria-label="Search threads"
+        className="text-foreground/85 placeholder:text-foreground/30 min-w-0 flex-1 bg-transparent text-[13px] outline-none"
+      />
+    </div>
+  );
+
+  if (inputOnly) {
+    return (
+      <div
+        data-slot="thread-search"
+        className={cn("w-full", className)}
+        {...props}
+      >
+        {searchField}
+      </div>
+    );
+  }
+
   return (
     <div
       data-slot="thread-search"
@@ -120,22 +197,7 @@ export function ThreadSearch({
 
       {...props}
     >
-      <div
-        className={cn(
-          field,
-          "flex items-center gap-2 rounded-xl px-2.5 py-1.5",
-        )}
-      >
-        <SearchIcon className="text-foreground/30 size-3.5 shrink-0" />
-        <input
-          value={query}
-          onChange={(event) => onQueryChange?.(event.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder="Search threads"
-          aria-label="Search threads"
-          className="text-foreground/85 placeholder:text-foreground/30 min-w-0 flex-1 bg-transparent text-[13px] outline-none"
-        />
-      </div>
+      {searchField}
 
       {pinned.length > 0 && (
         <div className="flex flex-col">
@@ -146,18 +208,16 @@ export function ThreadSearch({
         </div>
       )}
 
-      {groups.map((group) => (
+      {groups.map(({ group, threads: items }) => (
         <div key={group} className="flex flex-col">
           <span className={cn(mono, "text-foreground/25 px-2 pb-1")}>
             {group}
           </span>
-          {matches
-            .filter((thread) => !thread.pinned && thread.group === group)
-            .map(row)}
+          {items.map(row)}
         </div>
       ))}
 
-      {matches.length === 0 && (
+      {ordered.length === 0 && (
         <span className="text-foreground/30 px-2 py-4 text-center text-xs">
           No thread matches “{query}”
         </span>
