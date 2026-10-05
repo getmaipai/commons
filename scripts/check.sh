@@ -47,6 +47,13 @@ if [ "$DOCS_ONLY" = 0 ]; then
     fi
   done
 
+  if [ -f "spec/package.json" ]; then
+    # status-fixtures.test.ts reads schemas.resolved/; gen-py.sh also builds
+    # this ignored bundle later, but TypeScript tests need it beforehand.
+    echo "== spec: resolve schemas"
+    (cd spec && bun run scripts/bundle-schemas.ts)
+  fi
+
   if [ -f "spec/pyproject.toml" ]; then
     echo "== spec: ruff"
     (cd spec && uv run ruff check . && uv run ruff format --check .)
