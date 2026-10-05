@@ -1030,7 +1030,7 @@ actual chunk-size numbers, the "still renders live" screenshots and
 the PWA precache ceiling restored to 2 MiB are Home's own side, not
 committed here.
 
-## CHAT-STREAMDOWN-01: assistant-ui Streamdown renderer (2026-10-05, `ui-v0.5.100`)
+## CHAT-STREAMDOWN-01: assistant-ui Streamdown renderer (2026-10-05, `ui-v0.5.101`)
 
 `MarkdownText` keeps its export, preprocess callback, kit component overrides, Shiki highlighter, lazy KaTeX 0.18 and beautiful-mermaid adapter while rendering through assistant-ui's documented `StreamdownTextPrimitive`. Exact runtime pins: `@assistant-ui/react-streamdown` 0.3.18 (MIT) and `streamdown` 2.7.0 (Apache-2.0). Both arrive through the package manager and `ui/bun.lock`; no Streamdown math, Mermaid or code plugins are installed. Kit tests cover literal raw HTML, link policy, reduced motion, animation and the existing rich-content renderers; Home owns the Sources integration and browser frame audit.
 

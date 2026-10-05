@@ -4,13 +4,14 @@
 // reaches real rendered output, the same scripted-adapter harness
 // thread.aui.test.tsx already uses for a real run through the real
 // composer/thread, not a mocked recall() of markdown-text's own props.
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeAll, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { AssistantRuntimeProvider, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
 import type { RemendConfig } from "@assistant-ui/react-streamdown";
 import { Thread } from "./thread.aui";
 
 afterEach(cleanup);
+beforeAll(async () => { await import("@assistant-ui/react-streamdown"); });
 
 function scriptedAdapter(reply: string, pauseAfterYieldMs = 0): ChatModelAdapter {
   return {
@@ -33,7 +34,10 @@ function Harness({ reply, preprocess, pauseAfterYieldMs, remend }: { reply: stri
 async function sendAndSettle(container: HTMLElement, getByRole: (role: string, opts: { name: string }) => HTMLElement) {
   fireEvent.change(getByRole("textbox", { name: "Message input" }), { target: { value: "hi" } });
   fireEvent.click(getByRole("button", { name: "Send message" }));
-  await waitFor(() => expect(container.querySelector(".aui-md")).toBeTruthy());
+  await waitFor(() => {
+    expect(container.querySelector(".aui-md")).toBeTruthy();
+    expect(container.querySelector('[aria-label="Formatting message"]')).toBeNull();
+  }, { timeout: 10_000 });
 }
 
 describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {

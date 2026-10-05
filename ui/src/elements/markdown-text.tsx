@@ -12,11 +12,7 @@ import {
   unstable_memoizeMarkdownComponents as memoizeMarkdownComponents,
   useIsMarkdownCodeBlock,
 } from "@assistant-ui/react-markdown";
-import {
-  StreamdownTextPrimitive,
-  type RemendConfig,
-  type StreamdownTextComponents,
-} from "@assistant-ui/react-streamdown";
+import type { RemendConfig, StreamdownTextComponents } from "@assistant-ui/react-streamdown";
 import remarkGfm from "remark-gfm";
 import type { Pluggable } from "unified";
 import {
@@ -52,6 +48,9 @@ import { cn } from "cn";
 // ui/react-markdown` package, no bundle cost of their own.
 const LazySyntaxHighlighter = lazy(() =>
   import("./shiki-highlighter").then((m) => ({ default: m.SyntaxHighlighter })),
+);
+const LazyStreamdownTextPrimitive = lazy(() =>
+  import("@assistant-ui/react-streamdown").then((m) => ({ default: m.StreamdownTextPrimitive })),
 );
 const LazyMermaidDiagram = lazy(() =>
   import("./mermaid-diagram").then((m) => ({ default: m.MermaidDiagram })),
@@ -245,20 +244,22 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess, remen
   }, [stableComponents]);
 
   return (
-    <StreamdownTextPrimitive
-      remarkPlugins={remarkPlugins}
-      rehypePlugins={rehypePlugins}
-      preprocess={(text) => (preprocess ? preprocess(preprocessMath(text), { streaming }) : preprocessMath(text))}
-      // Streamdown 2.7.0's memo comparator omits remarkPlugins/rehypePlugins;
-      // this changes when the lazy math plugins arrive so the parser sees them.
-      className={mathPlugins ? "aui-md aui-md-with-math" : "aui-md"}
-      components={markdownComponents}
-      componentsByLanguage={componentsByLanguage}
-      controls={false}
-      animated={shouldAnimate && !prefersReducedMotion ? animationOptions : false}
-      remend={remend}
-      linkSafety={linkSafety}
-    />
+    <Suspense fallback={<span className="aui-md" aria-label="Formatting message" />}>
+      <LazyStreamdownTextPrimitive
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={rehypePlugins}
+        preprocess={(text) => (preprocess ? preprocess(preprocessMath(text), { streaming }) : preprocessMath(text))}
+        // Streamdown 2.7.0's memo comparator omits remarkPlugins/rehypePlugins;
+        // this changes when the lazy math plugins arrive so the parser sees them.
+        className={mathPlugins ? "aui-md aui-md-with-math" : "aui-md"}
+        components={markdownComponents}
+        componentsByLanguage={componentsByLanguage}
+        controls={false}
+        animated={shouldAnimate && !prefersReducedMotion ? animationOptions : false}
+        remend={remend}
+        linkSafety={linkSafety}
+      />
+    </Suspense>
   );
 };
 
