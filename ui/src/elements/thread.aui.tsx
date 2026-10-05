@@ -103,6 +103,8 @@ export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
  * content yet - a caller with something more specific to say while
  * waiting (a lookup in progress, a tool running) renders it here instead
  * of the default.
+ * `MessageError`, when set, replaces the default error block wholesale.
+ * The caller owns its own `MessagePrimitive.Error` wrapper.
  * `ComposerExtra`, when set, renders in the composer's own action row,
  * beside the attach button - an append point for a product-specific
  * composer control (a model picker, a response-mode toggle) that
@@ -150,6 +152,7 @@ export type ThreadComponents = {
   AssistantActionBarExtra?: ComponentType | undefined;
   AssistantMessageFooterExtra?: ComponentType | undefined;
   Indicator?: ComponentType | undefined;
+  MessageError?: ComponentType | undefined;
   ComposerExtra?: ComponentType | undefined;
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
@@ -662,7 +665,7 @@ const ComposerAction: FC = () => {
   );
 };
 
-const MessageError: FC = () => {
+const DefaultMessageError: FC = () => {
   return (
     <MessagePrimitive.Error>
       <ErrorPrimitive.Root className="aui-message-error-root border-destructive bg-destructive/10 text-destructive dark:bg-destructive/5 mt-2 rounded-md border p-3 text-sm dark:text-red-200">
@@ -670,6 +673,11 @@ const MessageError: FC = () => {
       </ErrorPrimitive.Root>
     </MessagePrimitive.Error>
   );
+};
+
+const MessageError: FC = () => {
+  const { MessageError: Custom } = useContext(ThreadComponentsContext);
+  return Custom ? <Custom /> : <DefaultMessageError />;
 };
 
 const AssistantMessage: FC = () => {

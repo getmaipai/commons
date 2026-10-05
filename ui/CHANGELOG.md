@@ -4,6 +4,13 @@ All notable changes to the `ui` workspace. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow semver,
 tagged `ui-vX.Y.Z`. Everything stays `0.x` until Home's adoption proves it.
 
+## [0.5.91] - ui-v0.5.91
+
+`elements/thread.aui.tsx`'s `ThreadComponents` gains an optional
+`MessageError` slot. When set, it replaces the default error block
+wholesale and the caller owns its `MessagePrimitive.Error` wrapper.
+Unset, the existing red error block is unchanged.
+
 ## [0.5.80] - ui-v0.5.80
 
 `tokens.css` gains `--hue-green` and `--hue-yellow`, the two hues the

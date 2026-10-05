@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { cleanup, fireEvent, render } from "@testing-library/react";
-import { AssistantRuntimeProvider, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { AssistantRuntimeProvider, MessagePrimitive, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
 import { Thread } from "./thread.aui";
 
 afterEach(cleanup);
@@ -13,14 +13,46 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ ComposerInputOverride, temporary }: { ComposerInputOverride?: React.ComponentType; temporary?: boolean }) {
-  const runtime = useLocalRuntime(adapter);
+function Harness({ ComposerInputOverride, MessageError, temporary, error = false }: { ComposerInputOverride?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; error?: boolean }) {
+  const runtime = useLocalRuntime(error ? failingAdapter : adapter);
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={ComposerInputOverride ? { ComposerInputOverride } : undefined} temporary={temporary} />
+      <Thread components={ComposerInputOverride || MessageError ? { ComposerInputOverride, MessageError } : undefined} temporary={temporary} />
     </AssistantRuntimeProvider>
   );
 }
+
+const failingAdapter: ChatModelAdapter = {
+  async *run() {
+    throw new Error("test failure");
+  },
+};
+
+async function sendFailingTurn(getByRole: (role: string, opts: { name: string }) => HTMLElement) {
+  fireEvent.change(getByRole("textbox", { name: "Message input" }), { target: { value: "hi" } });
+  fireEvent.click(getByRole("button", { name: "Send message" }));
+  await waitFor(() => expect(document.querySelector(".aui-message-error-root") || document.querySelector("[data-testid='message-error-slot']")).toBeTruthy());
+}
+
+describe("Thread's MessageError slot", () => {
+  test("a MessageError slot replaces the default error block", async () => {
+    function CustomMessageError() {
+      return <MessagePrimitive.Error><div data-testid="message-error-slot">Custom failure</div></MessagePrimitive.Error>;
+    }
+    const { getByRole, getByTestId, queryByText } = render(<Harness MessageError={CustomMessageError} error />);
+    await sendFailingTurn(getByRole);
+    expect(getByTestId("message-error-slot").textContent).toBe("Custom failure");
+    expect(queryByText("test failure")).toBeNull();
+    expect(document.querySelector(".aui-message-error-root")).toBeNull();
+  });
+
+  test("the default error block still renders with no slot set", async () => {
+    const { getByRole, findByText } = render(<Harness error />);
+    await sendFailingTurn(getByRole);
+    expect(await findByText("test failure")).toBeTruthy();
+    expect(document.querySelector(".aui-message-error-root")).toBeTruthy();
+  });
+});
 
 describe("Thread's ComposerInputOverride slot", () => {
   test("with no override, the built-in composer input renders", () => {
