@@ -1,5 +1,21 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.97] - ui-v0.5.97
+
+`MarkdownText` passes the current assistant message's running state to an
+optional streaming-aware preprocess callback. The default Markdown pipeline
+and one-argument callbacks remain unchanged.
+
+PROPOSAL (additive; default unchanged):
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `ThreadComponents.markdown.preprocess` | `(text: string, context: { streaming: boolean }) => string` | unset; kit math preprocessing only |
+
+The callback receives `streaming: true` while that message is running and
+`false` after it completes. Hosts can repair a transient rendered copy while
+leaving the stored message part untouched.
+
 ## [0.5.96] - ui-v0.5.96
 
 `elements/thread-list.aui.tsx` gains an opt-in Pin / Unpin action, a

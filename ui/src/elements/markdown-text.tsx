@@ -137,9 +137,11 @@ function useMathPlugins(text: string): MathPlugins | null {
 const remarkPluginsBase: Pluggable[] = [remarkGfm];
 const rehypePluginsBase: Pluggable[] = [];
 
+export type MarkdownPreprocessContext = { streaming: boolean };
+
 export type MarkdownTextProps = Partial<TextMessagePartProps> & {
   components?: Parameters<typeof memoizeMarkdownComponents>[0];
-  preprocess?: (text: string) => string;
+  preprocess?: (text: string, context: MarkdownPreprocessContext) => string;
 };
 
 const useShallowStable = <T extends Record<string, unknown> | undefined>(
@@ -200,6 +202,7 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess }) => 
   // again internally (its own useMessagePartText/useSmooth), so this
   // never becomes the source of truth for what renders.
   const text = useAuiState((s) => (s.part.type === "text" ? s.part.text : ""));
+  const streaming = useAuiState((s) => s.message.status?.type === "running");
   const mathPlugins = useMathPlugins(text);
   const remarkPlugins = useMemo(
     () => (mathPlugins ? [remarkGfm, mathPlugins.remarkMath] : remarkPluginsBase),
@@ -222,7 +225,7 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess }) => 
     <MarkdownTextPrimitive
       remarkPlugins={remarkPlugins}
       rehypePlugins={rehypePlugins}
-      preprocess={(text) => (preprocess ? preprocess(preprocessMath(text)) : preprocessMath(text))}
+      preprocess={(text) => (preprocess ? preprocess(preprocessMath(text), { streaming }) : preprocessMath(text))}
       className="aui-md"
       components={markdownComponents}
       componentsByLanguage={componentsByLanguage}

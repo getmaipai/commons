@@ -11,16 +11,17 @@ import { Thread } from "./thread.aui";
 
 afterEach(cleanup);
 
-function scriptedAdapter(reply: string): ChatModelAdapter {
+function scriptedAdapter(reply: string, pauseAfterYieldMs = 0): ChatModelAdapter {
   return {
     async *run() {
       yield { content: [{ type: "text", text: reply }] };
+      if (pauseAfterYieldMs) await new Promise((resolve) => setTimeout(resolve, pauseAfterYieldMs));
     },
   };
 }
 
-function Harness({ reply, preprocess }: { reply: string; preprocess?: (text: string) => string }) {
-  const runtime = useLocalRuntime(scriptedAdapter(reply));
+function Harness({ reply, preprocess, pauseAfterYieldMs }: { reply: string; preprocess?: (text: string, context: { streaming: boolean }) => string; pauseAfterYieldMs?: number }) {
+  const runtime = useLocalRuntime(scriptedAdapter(reply, pauseAfterYieldMs));
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <Thread components={preprocess ? { markdown: { preprocess } } : undefined} />
@@ -35,6 +36,18 @@ async function sendAndSettle(container: HTMLElement, getByRole: (role: string, o
 }
 
 describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
+  test("markdown preprocess receives the current message streaming state", async () => {
+    const streamingStates: boolean[] = [];
+    const preprocess = (text: string, context: { streaming: boolean }) => {
+      streamingStates.push(context.streaming);
+      return text;
+    };
+    const { container, getByRole } = render(<Harness reply="partial markdown" preprocess={preprocess} pauseAfterYieldMs={100} />);
+    await sendAndSettle(container, getByRole);
+    await waitFor(() => expect(streamingStates).toContain(true));
+    await waitFor(() => expect(streamingStates).toContain(false));
+  });
+
   test("Thread markdown preprocess composes with math preprocessing", async () => {
     const { container, getByRole } = render(<Harness reply="citation 7" preprocess={(text) => text.replace("7", "[7](#citation-7)")} />);
     await sendAndSettle(container, getByRole);

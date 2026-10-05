@@ -9,7 +9,7 @@ import { File } from "./file";
 import { ThreadFollowupSuggestions } from "./follow-up-suggestions.aui";
 import { Image } from "./image";
 import { MarkdownText } from "./markdown-text";
-import type { MarkdownTextProps } from "./markdown-text";
+import type { MarkdownPreprocessContext, MarkdownTextProps } from "./markdown-text";
 import {
   Reasoning,
   ReasoningContent,
@@ -159,7 +159,7 @@ export type ThreadViewportOptions = Pick<
  * layout is unchanged.
  */
 export type ThreadComponents = {
-  markdown?: { components?: MarkdownTextProps["components"]; preprocess?: (text: string) => string } | undefined;
+  markdown?: { components?: MarkdownTextProps["components"]; preprocess?: (text: string, context: MarkdownPreprocessContext) => string } | undefined;
   /** assistant-ui viewport behavior. Defaults preserve the kit's top anchor. */
   viewport?: ThreadViewportOptions | undefined;
   AssistantMessage?: ComponentType | undefined;
