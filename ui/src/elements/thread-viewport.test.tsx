@@ -136,6 +136,36 @@ describe("useVisibleMessageIds", () => {
     await waitFor(() => expect(getByTestId("probe").textContent).toBe("m1,m3"));
   });
 
+  test("promotes last visible at max scroll and reading-line message in mid-thread", async () => {
+    const { container, getByTestId } = render(<Harness components={{ ThreadViewportExtra: RailWithProbe }} />);
+    await seed();
+    const viewport = container.querySelector<HTMLElement>('[data-slot="aui_thread-viewport"]')!;
+    Object.defineProperties(viewport, {
+      scrollHeight: { configurable: true, value: 1200 },
+      clientHeight: { configurable: true, value: 400 },
+      scrollTop: { configurable: true, writable: true, value: 0 },
+    });
+    viewport.getBoundingClientRect = () => ({ top: 100, bottom: 500 } as DOMRect);
+    const els = [...container.querySelectorAll<HTMLElement>("[data-message-id]")];
+    els.forEach((el, i) => {
+      el.getBoundingClientRect = () => ({ top: 100 + i * 30, bottom: 125 + i * 30 } as DOMRect);
+    });
+    const io = FakeIntersectionObserver.instances.filter((i) => i.observed.size > 0).at(-1)!;
+    act(() => io.report({ m1: true, m2: true, m3: true }));
+    await waitFor(() => expect(getByTestId("probe").textContent).toBe("m1,m2,m3"));
+
+    viewport.scrollTop = 200;
+    els[0]!.getBoundingClientRect = () => ({ top: 10, bottom: 50 } as DOMRect);
+    els[1]!.getBoundingClientRect = () => ({ top: 90, bottom: 120 } as DOMRect);
+    els[2]!.getBoundingClientRect = () => ({ top: 130, bottom: 160 } as DOMRect);
+    act(() => io.report({ m3: false }));
+    await waitFor(() => expect(getByTestId("probe").textContent).toBe("m2,m1"));
+
+    viewport.scrollTop = 799;
+    act(() => io.report({ m3: true }));
+    await waitFor(() => expect(getByTestId("probe").textContent).toBe("m3,m1,m2"));
+  });
+
   test("returns an empty list outside a thread", () => {
     const { getByTestId } = render(<Probe />);
     expect(getByTestId("probe").textContent).toBe("");

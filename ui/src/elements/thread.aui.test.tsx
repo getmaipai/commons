@@ -5,6 +5,17 @@ import { Thread, type ThreadViewportOptions } from "./thread.aui";
 
 afterEach(cleanup);
 
+class FakeResizeObserver {
+  static instances: FakeResizeObserver[] = [];
+  targets: Element[] = [];
+  constructor(readonly callback: ResizeObserverCallback) {
+    FakeResizeObserver.instances.push(this);
+  }
+  observe(target: Element) { this.targets.push(target); }
+  unobserve() {}
+  disconnect() {}
+}
+
 // A no-op adapter - these tests exercise the composer's own slot wiring,
 // never a real turn.
 const adapter: ChatModelAdapter = {
@@ -13,11 +24,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ ComposerInputOverride, MessageError, temporary, viewport, error = false }: { ComposerInputOverride?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean }) {
+function Harness({ ComposerInputOverride, MessageError, temporary, viewport, error = false, scrollToBottomOffset }: { ComposerInputOverride?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number }) {
   const runtime = useLocalRuntime(error ? failingAdapter : adapter);
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={ComposerInputOverride || MessageError || viewport ? { ComposerInputOverride, MessageError, viewport } : undefined} temporary={temporary} />
+      <Thread components={ComposerInputOverride || MessageError || viewport ? { ComposerInputOverride, MessageError, viewport } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
     </AssistantRuntimeProvider>
   );
 }
@@ -134,5 +145,37 @@ describe("Thread's viewport options", () => {
       scrollToBottomOnThreadSwitch: true,
     }} />);
     expect(container.querySelector('[data-slot="aui_thread-viewport"]')).toBeTruthy();
+  });
+});
+
+describe("Thread scroll geometry", () => {
+  test("accepts an offset for the scroll-to-bottom button while extras are open", () => {
+    const { container } = render(<Harness scrollToBottomOffset={56} />);
+    expect(container.querySelector(".aui-thread-root")?.getAttribute("style"))
+      .toContain("--thread-scroll-to-bottom-offset: 56px");
+  });
+
+  test("reserves measured footer height plus the reading gap below messages", () => {
+    const savedResizeObserver = globalThis.ResizeObserver;
+    FakeResizeObserver.instances = [];
+    globalThis.ResizeObserver = FakeResizeObserver as unknown as typeof ResizeObserver;
+    const savedRect = HTMLElement.prototype.getBoundingClientRect;
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      return this.classList.contains("aui-thread-viewport-footer")
+        ? ({ height: 112 } as DOMRect)
+        : savedRect.call(this);
+    };
+    try {
+      const { container } = render(<Harness />);
+      const viewport = container.querySelector<HTMLElement>('[data-slot="aui_thread-viewport"]')!;
+      const footer = container.querySelector('.aui-thread-viewport-footer')!;
+      expect(viewport.style.getPropertyValue("--thread-footer-scroll-space")).toBe("128px");
+      expect(container.querySelector('[data-slot="aui_message-group"]')?.getAttribute("style"))
+        .toContain("--thread-footer-scroll-space");
+      expect(FakeResizeObserver.instances.some((observer) => observer.targets.includes(footer))).toBe(true);
+    } finally {
+      HTMLElement.prototype.getBoundingClientRect = savedRect;
+      globalThis.ResizeObserver = savedResizeObserver;
+    }
   });
 });

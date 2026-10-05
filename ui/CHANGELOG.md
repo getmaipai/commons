@@ -1,5 +1,21 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.98] - ui-v0.5.98
+
+Conversation map visibility now selects the message crossing the viewport's
+top reading line, and selects the last visible message within 2px of the
+viewport's maximum scroll position. `Thread` also accepts
+`scrollToBottomOffset` (pixels, default `0`) to move its scroll-to-bottom
+control clear of host extras. The kit reserves footer height plus a 16px gap
+below the final message using a ResizeObserver-backed viewport CSS variable.
+Markdown tables keep their intrinsic width inside a horizontally scrollable
+wrapper on narrow screens.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `Thread.scrollToBottomOffset` | `number` (pixels) | `0` |
+| `--thread-footer-scroll-space` | measured footer height + 16px | dynamically set by the thread |
+
 ## [0.5.97] - ui-v0.5.97
 
 `MarkdownText` passes the current assistant message's running state to an

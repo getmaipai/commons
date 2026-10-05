@@ -36,6 +36,22 @@ async function sendAndSettle(container: HTMLElement, getByRole: (role: string, o
 }
 
 describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
+  test("wide tables stay inside a horizontally scrollable wrapper", async () => {
+    const reply = `| ${Array.from({ length: 8 }, (_, i) => `Column ${i}`).join(" | ")} |\n| ${Array(8).fill("---").join(" | ")} |\n| ${Array.from({ length: 8 }, (_, i) => `value ${i}`).join(" | ")} |`;
+    const { container, getByRole } = render(<Harness reply={reply} />);
+    await sendAndSettle(container, getByRole);
+    const wrapper = container.querySelector<HTMLElement>(".aui-md-table-wrapper");
+    const table = wrapper?.querySelector("table");
+    if (wrapper && table) {
+      Object.defineProperty(wrapper, "clientWidth", { configurable: true, value: 342 });
+      Object.defineProperty(wrapper, "scrollWidth", { configurable: true, value: 1063 });
+      Object.defineProperty(table, "scrollWidth", { configurable: true, value: 1063 });
+    }
+    expect(wrapper?.className).toContain("overflow-x-auto");
+    expect(wrapper?.className).toContain("max-w-full");
+    expect(table?.className).toContain("min-w-max");
+    expect(table!.scrollWidth).toBeGreaterThan(wrapper!.clientWidth);
+  });
   test("markdown preprocess receives the current message streaming state", async () => {
     const streamingStates: boolean[] = [];
     const preprocess = (text: string, context: { streaming: boolean }) => {

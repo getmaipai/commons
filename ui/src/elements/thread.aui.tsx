@@ -224,6 +224,8 @@ export type ThreadProps = {
   // so the one place someone types is visibly different from an
   // ordinary, saved conversation.
   temporary?: boolean | undefined;
+  /** Extra distance for Thread's scroll-to-bottom control when host extras overlay the thread. */
+  scrollToBottomOffset?: number | undefined;
 };
 
 const EMPTY_COMPONENTS: ThreadComponents = {};
@@ -274,23 +276,40 @@ export const Thread: FC<ThreadProps> = ({
   components = EMPTY_COMPONENTS,
   autoFocus = true,
   temporary = false,
+  scrollToBottomOffset = 0,
 }) => {
   const isEmpty = useAuiState(isNewChatView);
 
   return (
     <ThreadComponentsContext.Provider value={components}>
-      <ThreadRoot isEmpty={isEmpty} autoFocus={autoFocus} temporary={temporary} />
+      <ThreadRoot isEmpty={isEmpty} autoFocus={autoFocus} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
     </ThreadComponentsContext.Provider>
   );
 };
 
-const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean }> = ({
+const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean; scrollToBottomOffset: number }> = ({
   isEmpty,
   autoFocus,
   temporary,
+  scrollToBottomOffset,
 }) => {
   const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra } = useContext(ThreadComponentsContext);
   const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
+  const [footerElement, setFooterElement] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!viewportElement || !footerElement || typeof ResizeObserver === "undefined") return;
+    const update = () => {
+      viewportElement.style.setProperty(
+        "--thread-footer-scroll-space",
+        `${footerElement.getBoundingClientRect().height + 16}px`,
+      );
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(footerElement);
+    return () => observer.disconnect();
+  }, [footerElement, viewportElement]);
 
   return (
     <ThreadViewportElementContext.Provider value={viewportElement}>
@@ -313,6 +332,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean 
           : "color-mix(in oklab, var(--color-muted) 30%, transparent)",
         ["--composer-radius" as string]: "1rem",
         ["--composer-padding" as string]: "8px",
+        ["--thread-scroll-to-bottom-offset" as string]: `${scrollToBottomOffset}px`,
       }}
     >
       <ThreadPrimitive.Viewport
@@ -335,16 +355,18 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean 
             <ThreadHistorySkeleton />
           </AuiIf>
 
-          <div
-            data-slot="aui_message-group"
-            className="mb-14 flex flex-col gap-y-6 empty:hidden"
-          >
+        <div
+          data-slot="aui_message-group"
+          className="mb-14 flex flex-col gap-y-6 empty:hidden"
+          style={{ paddingBottom: "var(--thread-footer-scroll-space, 0px)" }}
+        >
             <ThreadPrimitive.Messages>
               {() => <ThreadMessage />}
             </ThreadPrimitive.Messages>
           </div>
 
           <ThreadPrimitive.ViewportFooter
+            ref={setFooterElement}
             className={cn(
               "aui-thread-viewport-footer bg-background flex flex-col gap-4 overflow-visible pb-4 md:pb-6",
               !isEmpty &&
@@ -396,10 +418,31 @@ export function useVisibleMessageIds(): readonly string[] {
 
     const flush = () => {
       timer = undefined;
-      const next = [...viewport.querySelectorAll(MESSAGE_SELECTOR)]
+      const messages = [...viewport.querySelectorAll(MESSAGE_SELECTOR)];
+      const atBottom = viewport.scrollHeight > viewport.clientHeight &&
+        viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop <= 2;
+      const readingLine = viewport.getBoundingClientRect().top;
+      const containing = messages.find((el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.top <= readingLine && rect.bottom > readingLine;
+      });
+      const next = messages
         .map((el) => el.getAttribute("data-message-id") ?? "")
         .filter((id) => visible.has(id));
+      if (atBottom && next.length) {
+        const last = next.pop()!;
+        next.unshift(last);
+      } else if (containing?.getAttribute("data-message-id")) {
+        const id = containing.getAttribute("data-message-id")!;
+        if (visible.has(id)) {
+          const index = next.indexOf(id);
+          if (index > 0) next.unshift(...next.splice(index, 1));
+        }
+      }
       setIds((prev) => (sameIds(prev, next) ? prev : next));
+    };
+    const scheduleFlush = () => {
+      timer ??= setTimeout(flush, VISIBLE_THROTTLE_MS);
     };
 
     const io = new IntersectionObserver(
@@ -410,7 +453,7 @@ export function useVisibleMessageIds(): readonly string[] {
           if (entry.isIntersecting) visible.add(id);
           else visible.delete(id);
         }
-        timer ??= setTimeout(flush, VISIBLE_THROTTLE_MS);
+        scheduleFlush();
       },
       { root: viewport },
     );
@@ -418,12 +461,14 @@ export function useVisibleMessageIds(): readonly string[] {
       for (const el of viewport.querySelectorAll(MESSAGE_SELECTOR)) io.observe(el);
     };
     watch();
+    viewport.addEventListener("scroll", scheduleFlush, { passive: true });
     const mutations = new MutationObserver(watch);
     mutations.observe(viewport, { childList: true, subtree: true });
 
     return () => {
       mutations.disconnect();
       io.disconnect();
+      viewport.removeEventListener("scroll", scheduleFlush);
       if (timer !== undefined) clearTimeout(timer);
     };
   }, [viewport]);
@@ -607,7 +652,8 @@ const ThreadScrollToBottom: FC = () => {
       <TooltipIconButton
         tooltip="Scroll to bottom"
         variant="outline"
-        className="aui-thread-scroll-to-bottom dark:border-border dark:bg-background dark:hover:bg-accent absolute -top-12 z-10 self-center rounded-full p-4 disabled:invisible"
+        className="aui-thread-scroll-to-bottom dark:border-border dark:bg-background dark:hover:bg-accent absolute z-10 self-center rounded-full p-4 disabled:invisible"
+        style={{ top: `calc(-3rem - var(--thread-scroll-to-bottom-offset, 0px))` }}
       >
         <ArrowDownIcon />
       </TooltipIconButton>
