@@ -191,6 +191,7 @@ describe("SettingsShell layout: two panes from lg, a drill-in below", () => {
     expect(root.getAttribute("data-layout")).toBe("docked");
     expect(root.className).toContain("lg:fixed");
     expect(root.className).toContain("lg:left-14");
+    expect(root.className).toContain("lg:w-auto");
     expect(content(view.container).firstElementChild?.className).toContain("max-w-(--settings-content-max)");
   });
 

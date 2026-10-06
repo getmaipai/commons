@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.139] - ui-v0.5.139
+
+### SETTINGS-DOCK-01 follow-up
+
+The fixed docked shell uses intrinsic width resolution with its viewport edge
+anchors, preventing the workspace's containing width from causing horizontal
+overflow.
+
 ## [0.5.138] - ui-v0.5.138
 
 ### SETTINGS-DOCK-01 (additive)

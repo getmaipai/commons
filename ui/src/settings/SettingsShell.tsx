@@ -152,7 +152,7 @@ export function SettingsShell({
       data-layout={layout}
       className={cn(
         "h-full min-h-[var(--settings-shell-min-height)] min-w-0 flex-col bg-settings-page lg:flex-row",
-        layout === "docked" && "lg:fixed lg:inset-y-0 lg:left-14 lg:right-0 lg:z-10 lg:h-svh",
+        layout === "docked" && "lg:fixed lg:inset-y-0 lg:left-14 lg:right-0 lg:z-10 lg:h-svh lg:w-auto",
       )}
     >
       <span id={describedId} className="sr-only">
