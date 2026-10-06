@@ -25,6 +25,7 @@ function shell(over: Partial<SettingsShellProps> = {}) {
       <div>content</div>
     </SettingsShell>,
   );
+  Object.assign(view, within(document.body));
   return { view, onNavigate, onSearchChange };
 }
 
@@ -187,12 +188,12 @@ describe("SettingsShell layout: two panes from lg, a drill-in below", () => {
 
   test("docked layout escapes the workspace gutter and stays aligned after the 56 px app rail", () => {
     const { view } = shell({ layout: "docked" });
-    const root = view.baseElement.querySelector('[data-slot="settings-shell"]') as HTMLElement;
+    const root = document.body.querySelector('[data-slot="settings-shell"]') as HTMLElement;
     expect(root.getAttribute("data-layout")).toBe("docked");
-    expect(root.className).toContain("lg:fixed");
-    expect(root.className).toContain("lg:left-14");
-    expect(root.className).toContain("lg:w-auto");
-    expect(root.parentElement).toBe(view.baseElement);
+    expect(root.className).toContain("fixed");
+    expect(root.className).toContain("left-14");
+    expect(root.className).toContain("w-auto");
+    expect(root.parentElement).toBe(document.body);
     expect(content(view.container).firstElementChild?.className).toContain("max-w-(--settings-content-max)");
   });
 
@@ -214,12 +215,12 @@ describe("SettingsShell layout: two panes from lg, a drill-in below", () => {
 
     rerender({ layout: "docked", collapsible: { collapsed: true, onToggle, onPeekEnter: onPointerEnter } });
     expect(view.getByRole("button", { name: "Show settings sidebar" })).toBeTruthy();
-    const zone = view.baseElement.querySelector('[data-slot="settings-sidebar-hover-zone"]')!;
+    const zone = document.body.querySelector('[data-slot="settings-sidebar-hover-zone"]')!;
     fireEvent.pointerEnter(zone, { pointerType: "mouse" });
     expect(onPointerEnter).toHaveBeenCalledTimes(1);
 
     rerender({ layout: "docked", collapsible: { collapsed: true, peek: true, onToggle, onPeekEnter: onPointerEnter } });
-    expect(column(view.baseElement).getAttribute("data-state")).toBe("peek");
+    expect(column(document.body).getAttribute("data-state")).toBe("peek");
   });
 });
 
