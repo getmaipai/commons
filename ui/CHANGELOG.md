@@ -1,5 +1,31 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.130] - ui-v0.5.130
+
+### KIT-SET-02 (additive)
+
+`SettingsShell`, the one settings shell (RULES S4): a 288 px column (area
+title, pill search, grouped section rows, arrow rows that leave for another
+page and describe themselves as "Opens another page") beside a centred 728 px
+content pane with its page title. Built from the dashboard Sidebar and Item
+parts and the `--settings-*` tokens. The host passes the area (spec
+`SettingsArea`), the viewer, the open section, `onNavigate`, the search query
+and the content. Below `lg` it drills in (column alone, then the open section
+under a back row); from `lg` up both panes sit side by side. Its own
+`SidebarProvider` takes no Cmd+B.
+
+Pure helpers: `searchSettings(area, registry, values, viewer, query)` (one area,
+only keys the viewer may see: hidden sections, cards, expert keys, other
+products' keys and keys with no loaded value never appear; a direct key match
+wins, a section label or keyword answers only when no key matches), and
+`visibleGroups`, `visibleCards`, `firstVisibleSection`, `roleAllows`,
+`audienceAllows`, `resolveHref` for the role, band and capability rules.
+
+Also: tokens `--settings-page`, `--settings-column`, `--settings-column-divider`
+(Home's shell tones when present, the same mixes otherwise); icons
+`arrow-up-right`, `hard-drive`, `house`, `keyboard`, `laptop`, `palette`,
+`terminal`, `user-round`; `SettingsShellShowcase`.
+
 ## [0.5.129] - ui-v0.5.129
 
 ### KIT-SET-03 (settings renderer refreshed onto the dashboard parts)

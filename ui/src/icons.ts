@@ -5,6 +5,7 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
+  ArrowUpRight,
   AudioWaveform,
   Bell,
   BellRing,
@@ -32,11 +33,13 @@ import {
   Filter,
   Folder,
   Gauge,
+  HardDrive,
   GraduationCap,
   Grid2x2,
   HelpCircle,
   History,
   Home,
+  House,
   Inbox,
   Info,
   KeyRound,
@@ -88,6 +91,11 @@ import {
   Workflow,
   Wrench,
   X,
+  Keyboard,
+  Laptop,
+  Palette,
+  Terminal,
+  UserRound,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -190,6 +198,14 @@ export const icons = {
   workflow: Workflow,
   wrench: Wrench,
   x: X,
+  "arrow-up-right": ArrowUpRight,
+  "hard-drive": HardDrive,
+  house: House,
+  keyboard: Keyboard,
+  laptop: Laptop,
+  palette: Palette,
+  terminal: Terminal,
+  "user-round": UserRound,
 } as const;
 
 export type IconName = keyof typeof icons;

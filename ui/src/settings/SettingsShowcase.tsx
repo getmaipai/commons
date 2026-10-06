@@ -74,7 +74,7 @@ export function SettingsShowcase() {
         {ROWS.map((row, i) => (
           <Fragment key={row.title}>
             {i > 0 && <ItemSeparator variant="inset" />}
-            <Item size="setting">
+            <Item size="setting" className="flex-wrap sm:flex-nowrap">
               <ItemContent>
                 <ItemTitle>{row.title}</ItemTitle>
                 <ItemDescription clamp={false}>{row.help}</ItemDescription>
