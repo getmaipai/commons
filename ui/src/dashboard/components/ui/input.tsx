@@ -1,15 +1,29 @@
 import * as React from "react"
 import { Input as InputPrimitive } from "@base-ui/react/input"
 
+import { HIT_AREA_ROW } from "../../../utils"
 import { cn } from "../../lib/utils"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function Input({
+  className,
+  type,
+  size,
+  ...props
+}: Omit<React.ComponentProps<"input">, "size"> & {
+  /** "row" is the 28 px settings-row field. Unset keeps the 32 px field;
+   * a number is still the native `size` attribute. */
+  size?: "row" | number
+}) {
   return (
     <InputPrimitive
       type={type}
       data-slot="input"
+      data-size={size === "row" ? "row" : undefined}
+      size={size === "row" ? undefined : size}
       className={cn(
         "cn-input h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+        size === "row" &&
+          `h-7 rounded-[var(--settings-control-radius)] border-settings-control-border bg-settings-control px-2.5 text-sm dark:bg-settings-control ${HIT_AREA_ROW}`,
         className
       )}
       {...props}

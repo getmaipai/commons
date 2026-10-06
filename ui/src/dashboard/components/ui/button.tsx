@@ -1,6 +1,7 @@
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
 
+import { HIT_AREA_ROW } from "../../../utils"
 import { cn } from "../../lib/utils"
 
 const buttonVariants = cva(
@@ -31,8 +32,16 @@ const buttonVariants = cva(
         "icon-sm":
           "cn-button-size-icon-sm size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "cn-button-size-icon-lg size-9",
+        row: `cn-button-size-row h-7 gap-1.5 rounded-[var(--settings-control-radius)] px-2.5 text-sm ${HIT_AREA_ROW} [&_svg:not([class*='size-'])]:size-3.5`,
       },
     },
+    compoundVariants: [
+      {
+        variant: "secondary",
+        size: "row",
+        class: "bg-settings-button hover:bg-settings-button/80",
+      },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",

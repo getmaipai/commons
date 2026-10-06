@@ -57,6 +57,7 @@ function SidebarProvider({
   defaultOpen = true,
   open: openProp,
   onOpenChange: setOpenProp,
+  keyboardShortcut = true,
   className,
   style,
   children,
@@ -65,6 +66,11 @@ function SidebarProvider({
   defaultOpen?: boolean
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  /** The Cmd/Ctrl+key that toggles this sidebar. `true` (the default) is
+   * "b"; a string picks another key; `false` registers no listener, for a
+   * second provider on the page (the settings column) that must not take
+   * the app rail's Cmd+B. */
+  keyboardShortcut?: boolean | string
 }) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
@@ -95,9 +101,14 @@ function SidebarProvider({
 
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {
+    if (keyboardShortcut === false) return
+    const shortcutKey =
+      typeof keyboardShortcut === "string"
+        ? keyboardShortcut
+        : SIDEBAR_KEYBOARD_SHORTCUT
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
-        event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
+        event.key === shortcutKey &&
         (event.metaKey || event.ctrlKey)
       ) {
         event.preventDefault()
@@ -107,7 +118,7 @@ function SidebarProvider({
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [toggleSidebar])
+  }, [toggleSidebar, keyboardShortcut])
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.
@@ -318,13 +329,24 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
 
 function SidebarInput({
   className,
+  variant,
   ...props
-}: React.ComponentProps<typeof Input>) {
+}: React.ComponentProps<typeof Input> & {
+  /** "pill" is the settings search field: 36 px, fully rounded, filled
+   * with the settings fill and no border. Unset keeps the 32 px field. */
+  variant?: "pill"
+}) {
   return (
     <Input
       data-slot="sidebar-input"
       data-sidebar="input"
-      className={cn("h-8 w-full bg-background shadow-none", className)}
+      data-variant={variant}
+      className={cn(
+        "h-8 w-full bg-background shadow-none",
+        variant === "pill" &&
+          "h-9 rounded-full border-transparent bg-settings-fill px-3 dark:bg-settings-fill",
+        className
+      )}
       {...props}
     />
   )
@@ -488,6 +510,8 @@ const sidebarMenuButtonVariants = cva(
         default: "h-8 text-sm",
         sm: "h-7 text-xs",
         lg: "h-12 text-sm group-data-[collapsible=icon]:p-0!",
+        settings:
+          "h-[30px] gap-2 rounded-[var(--settings-control-radius)] px-2.5 py-0 text-sm hover:bg-settings-fill/60 active:bg-settings-fill data-active:bg-settings-fill data-active:font-normal data-active:text-sidebar-foreground",
       },
     },
     defaultVariants: {

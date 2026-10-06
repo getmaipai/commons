@@ -1,5 +1,29 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.127] - ui-v0.5.127
+
+### KIT-SET-01 (additive; defaults unchanged)
+
+The look of the one settings shell (ChatGPT settings reference, design note
+APP-SETTINGS-DESIGN.md section 4), as additive variants and tokens. Every
+part renders byte-identical markup when the new prop is unset
+(`settings-default-markup.json` holds the markup from before the change).
+
+- Tokens in `tokens.css`: `--settings-*` colours as mixes of the active
+  `--background` toward `--foreground` (light mirrors dark; every look follows
+  because they sit on `body` too), sizes (288 px column, 728 px content, 12 px
+  card and 8 px control radii), `--switch-checked` (defaults to `--primary`),
+  and the matching Tailwind colours (`bg-settings-card` and siblings).
+- `ItemGroup variant="card"`, `Item size="setting"`, `ItemSeparator
+  variant="inset"`, `ItemDescription clamp={false}`.
+- `Switch size="md"` (32 x 20, 16 px knob).
+- `size="row"` (28 px, 8 px radius, 48 px touch overhang on coarse pointers)
+  on `Button`, `SelectTrigger` and `Input`.
+- `SidebarInput variant="pill"`, `SidebarMenuButton size="settings"`,
+  `SidebarProvider keyboardShortcut` (`false` keeps a second provider off
+  Cmd+B).
+- `SettingsShowcase` entry for Home's UI showcase.
+
 ## [0.5.126] - ui-v0.5.126
 
 ### SAFETY-NOTICE-01

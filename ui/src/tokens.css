@@ -682,6 +682,56 @@
   --sidebar-ring: #21a6ff;
 }
 
+/* Settings tokens (KIT-SET-01, 2026-10-06). The look of the one settings
+ * shell, measured from the ChatGPT settings reference (design note
+ * APP-SETTINGS-DESIGN.md section 4.1), declared once for light, dark and
+ * every look: each colour is a mix of the active `--background` toward the
+ * active `--foreground`, so it follows whichever of light, dark or a
+ * `.style-<look>` body class is in force. Light mirrors the dark
+ * percentages until a light reference exists (owner answer Q2), so a later
+ * light screenshot retunes these numbers and nothing else.
+ *
+ * Colours sit on `body` as well as `:root`: the looks (`.style-neutral`
+ * and its siblings, globals.css) set `--background`/`--foreground` on the
+ * body, and a custom property that reads `var()` resolves where it is
+ * declared, so a `:root`-only declaration would keep the root's colours
+ * under every look. On Neutral dark (background #0a0a0a, foreground
+ * #fafafa) they land on the sampled #232323 card, #353535 border, #313030
+ * active fill, #2a2a2a control, #3b3b3b control border, #2e2e2e button,
+ * #393939 switch-off and #b2b2b2 helper text (settings-tokens.test.ts).
+ * The shell tones (--shell-main, --shell-history) stay in Home's
+ * shell/tokens.css; these mixes reference the same background/foreground
+ * pair directly. */
+:root {
+  --settings-column-width: 288px;
+  --settings-column-title-size: 18px;
+  --settings-group-label-size: 14px;
+  --settings-page-title-size: 28px;
+  --settings-section-heading-size: 14px;
+  --settings-content-max: 728px;
+  --settings-content-top: 82px;
+  --settings-row-text-max: 496px;
+  --settings-card-radius: 12px;
+  --settings-control-radius: 8px;
+}
+
+:root,
+body {
+  --settings-card: color-mix(in srgb, var(--background), var(--foreground) 10.4%);
+  --settings-card-border: color-mix(in srgb, var(--background), var(--foreground) 17.9%);
+  --settings-fill: color-mix(in srgb, var(--background), var(--foreground) 16.3%);
+  --settings-control: color-mix(in srgb, var(--background), var(--foreground) 13.3%);
+  --settings-control-border: color-mix(in srgb, var(--background), var(--foreground) 20.4%);
+  --settings-button: color-mix(in srgb, var(--background), var(--foreground) 15%);
+  --settings-switch-off: color-mix(in srgb, var(--background), var(--foreground) 19.6%);
+  --settings-helper: color-mix(in srgb, var(--background), var(--foreground) 70%);
+  --settings-arrow: color-mix(in srgb, var(--background), var(--foreground) 39%);
+  --settings-knob: #ffffff;
+  /* The checked switch track: the theme's primary by default; a look that
+   * wants ChatGPT's blue sets it (Neutral sets #3983f7 in Home). */
+  --switch-checked: var(--primary);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -716,6 +766,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-settings-card: var(--settings-card);
+  --color-settings-card-border: var(--settings-card-border);
+  --color-settings-fill: var(--settings-fill);
+  --color-settings-control: var(--settings-control);
+  --color-settings-control-border: var(--settings-control-border);
+  --color-settings-button: var(--settings-button);
+  --color-settings-switch-off: var(--settings-switch-off);
+  --color-settings-helper: var(--settings-helper);
+  --color-settings-arrow: var(--settings-arrow);
+  --color-settings-knob: var(--settings-knob);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

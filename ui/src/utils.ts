@@ -42,6 +42,12 @@ export function hitArea(insetStep: 1 | 2 | 3): string {
   return steps[insetStep];
 }
 
+/** The 48 px touch floor for the 28 px `size="row"` controls (settings
+ * rows): on a coarse pointer a transparent pseudo-element overhangs the
+ * box by 10 px on every side (28 + 20 = 48); a mouse keeps the 28 px box. */
+export const HIT_AREA_ROW =
+  "relative pointer-coarse:before:absolute pointer-coarse:before:-inset-2.5 pointer-coarse:before:content-['']";
+
 // A raw `var(--hue-*)` text color fails WCAG AA on every hue against
 // both a plain panel and a 15%-tinted pill of the same hue, in both
 // themes (found live on MetricCard's state link, 2.35:1 orange on
