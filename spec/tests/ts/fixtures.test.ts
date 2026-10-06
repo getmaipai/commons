@@ -438,6 +438,25 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => ReplyFeedback.parse(loadFixture("reply-feedback.example.json"))).not.toThrow();
   });
 
+  test("reply-feedback.reasons.example.json: several reasons and a note", () => {
+    const parsed = ReplyFeedback.parse(loadFixture("reply-feedback.reasons.example.json"));
+    expect(parsed.reasons).toEqual(["wrong", "too_long"]);
+    expect(parsed.note).toBe("The opening hours were for the wrong branch.");
+  });
+
+  test("reply-feedback: an older label without reasons or note still parses, with empty defaults", () => {
+    const parsed = ReplyFeedback.parse(loadFixture("reply-feedback.example.json"));
+    expect(parsed.reasons).toEqual([]);
+    expect(parsed.note).toBeNull();
+  });
+
+  test("reply-feedback: a repeated reason, an unknown reason and an over-long note are refused", () => {
+    const base = loadFixture("reply-feedback.reasons.example.json") as Record<string, unknown>;
+    expect(() => ReplyFeedback.parse({ ...base, reasons: ["wrong", "wrong"] })).toThrow();
+    expect(() => ReplyFeedback.parse({ ...base, reasons: ["boring"] })).toThrow();
+    expect(() => ReplyFeedback.parse({ ...base, note: "x".repeat(1001) })).toThrow();
+  });
+
   for (const kind of ["lookup", "card", "procedure", "comparison", "document"]) {
     test(`turn-artifact.${kind}.example.json`, () => {
       expect(() => TurnArtifact.parse(loadFixture(`turn-artifact.${kind}.example.json`))).not.toThrow();

@@ -46,6 +46,37 @@ export const ReplyFeedback = z
         "Optional one-tap explanation, selected from FEED-01's fixed five-value list. The child band never exposes or stores a reason.",
       )
       .default(null),
+    /**ELEMENTS-ADOPT-02: every reason the person picked in the "What went wrong?" form after a down rating, from the same fixed five-value list as reason. Additive: reason keeps the first pick for older readers. The child band never exposes or stores reasons.*/
+    reasons: z
+      .array(z.enum(["wrong", "too_long", "did_not_listen", "off", "unsafe"]))
+      .max(5)
+      .refine(
+        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+        "All items must be unique!",
+      )
+      .describe(
+        'ELEMENTS-ADOPT-02: every reason the person picked in the "What went wrong?" form after a down rating, from the same fixed five-value list as reason. Additive: reason keeps the first pick for older readers. The child band never exposes or stores reasons.',
+      )
+      .default([]),
+    /**ELEMENTS-ADOPT-02: an optional free-text note the person typed with a down rating. Private to the person who wrote it: only they read it back, it never joins the review program's label export, and it is deleted with the rating (with the conversation, at the turn's retention window, or with the person). The child band never exposes or stores a note.*/
+    note: z
+      .union([
+        z
+          .string()
+          .max(1000)
+          .describe(
+            "ELEMENTS-ADOPT-02: an optional free-text note the person typed with a down rating. Private to the person who wrote it: only they read it back, it never joins the review program's label export, and it is deleted with the rating (with the conversation, at the turn's retention window, or with the person). The child band never exposes or stores a note.",
+          ),
+        z
+          .null()
+          .describe(
+            "ELEMENTS-ADOPT-02: an optional free-text note the person typed with a down rating. Private to the person who wrote it: only they read it back, it never joins the review program's label export, and it is deleted with the rating (with the conversation, at the turn's retention window, or with the person). The child band never exposes or stores a note.",
+          ),
+      ])
+      .describe(
+        "ELEMENTS-ADOPT-02: an optional free-text note the person typed with a down rating. Private to the person who wrote it: only they read it back, it never joins the review program's label export, and it is deleted with the rating (with the conversation, at the turn's retention window, or with the person). The child band never exposes or stores a note.",
+      )
+      .default(null),
     /**Free-text provenance for the write path, matching the source field on sibling records.*/
     source: z
       .string()

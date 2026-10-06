@@ -41,6 +41,20 @@
       "default": null,
       "description": "Optional one-tap explanation, selected from FEED-01's fixed five-value list. The child band never exposes or stores a reason."
     },
+    "reasons": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["wrong", "too_long", "did_not_listen", "off", "unsafe"] },
+      "uniqueItems": true,
+      "maxItems": 5,
+      "default": [],
+      "description": "ELEMENTS-ADOPT-02: every reason the person picked in the \"What went wrong?\" form after a down rating, from the same fixed five-value list as reason. Additive: reason keeps the first pick for older readers. The child band never exposes or stores reasons."
+    },
+    "note": {
+      "type": ["string", "null"],
+      "maxLength": 1000,
+      "default": null,
+      "description": "ELEMENTS-ADOPT-02: an optional free-text note the person typed with a down rating. Private to the person who wrote it: only they read it back, it never joins the review program's label export, and it is deleted with the rating (with the conversation, at the turn's retention window, or with the person). The child band never exposes or stores a note."
+    },
     "source": {
       "type": "string",
       "minLength": 1,

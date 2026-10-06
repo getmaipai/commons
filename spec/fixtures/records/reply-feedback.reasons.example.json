@@ -1,0 +1,12 @@
+{
+  "id": "rf-d4e5f6",
+  "turn_id": "turn-d4e5f6a7",
+  "person_id": "person-d4e5f6a7",
+  "verdict": "down",
+  "reason": "wrong",
+  "reasons": ["wrong", "too_long"],
+  "note": "The opening hours were for the wrong branch.",
+  "source": "turn-d4e5f6a7",
+  "created_at": "2026-10-06T12:00:00Z",
+  "hlc": "1770000000000:0:hub001"
+}

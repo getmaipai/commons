@@ -570,6 +570,14 @@ def test_reply_feedback_fixture():
     ReplyFeedback.model_validate(load_fixture("reply-feedback.example.json"))
 
 
+def test_reply_feedback_reasons_fixture():
+    parsed = ReplyFeedback.model_validate(
+        load_fixture("reply-feedback.reasons.example.json")
+    )
+    assert parsed.reasons == ["wrong", "too_long"]
+    assert parsed.note == "The opening hours were for the wrong branch."
+
+
 @pytest.mark.parametrize("kind", ["v1", "v2"])
 def test_artifact_fixtures(kind: str):
     Artifact.model_validate(load_fixture(f"artifact.{kind}.example.json"))

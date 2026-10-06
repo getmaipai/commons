@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.88] - 2026-10-06
+
+### Added
+- Optional `reasons` (the fixed five reason values, each at most once) and `note` (up to 1000 characters, or null) on `ReplyFeedback`, for the "What went wrong?" form after a down rating (ELEMENTS-ADOPT-02). `reason` stays and keeps the first pick for older readers. The note is private to its writer, never joins the label export, and is deleted with the rating. The child band never stores either. Fixture `reply-feedback.reasons.example.json`. Additive.
+
 ## [spec-v0.1.87] - 2026-10-06
 
 ### Added

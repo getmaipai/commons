@@ -37,6 +37,17 @@ class ReplyFeedback(BaseModel):
             description="Optional one-tap explanation, selected from FEED-01's fixed five-value list. The child band never exposes or stores a reason.",
         )
     )
+    reasons: list[Literal['wrong', 'too_long', 'did_not_listen', 'off', 'unsafe']] = (
+        Field(
+            [],
+            description='ELEMENTS-ADOPT-02: every reason the person picked in the "What went wrong?" form after a down rating, from the same fixed five-value list as reason. Additive: reason keeps the first pick for older readers. The child band never exposes or stores reasons.',
+            max_length=5,
+        )
+    )
+    note: constr(max_length=1000) | None = Field(
+        None,
+        description="ELEMENTS-ADOPT-02: an optional free-text note the person typed with a down rating. Private to the person who wrote it: only they read it back, it never joins the review program's label export, and it is deleted with the rating (with the conversation, at the turn's retention window, or with the person). The child band never exposes or stores a note.",
+    )
     source: constr(min_length=1) = Field(
         ...,
         description='Free-text provenance for the write path, matching the source field on sibling records.',
