@@ -279,6 +279,25 @@ export const MemoryRecord = z
         "Names the embedding space this record was indexed under, e.g. hub-bge-m3 or bot-minilm. The embedding vector itself is never part of this record and never syncs (4.11).",
       )
       .default(null),
+    /**The project (chat folder) this memory or episode was written in; null for none (PROJECTS-P1). Provenance only until the project's memory_mode is project_only, when recall inside and outside the project follows it.*/
+    folder_id: z
+      .union([
+        z
+          .string()
+          .regex(new RegExp("^folder-[a-z0-9]{6,}$"))
+          .describe(
+            "The project (chat folder) this memory or episode was written in; null for none (PROJECTS-P1). Provenance only until the project's memory_mode is project_only, when recall inside and outside the project follows it.",
+          ),
+        z
+          .null()
+          .describe(
+            "The project (chat folder) this memory or episode was written in; null for none (PROJECTS-P1). Provenance only until the project's memory_mode is project_only, when recall inside and outside the project follows it.",
+          ),
+      ])
+      .describe(
+        "The project (chat folder) this memory or episode was written in; null for none (PROJECTS-P1). Provenance only until the project's memory_mode is project_only, when recall inside and outside the project follows it.",
+      )
+      .default(null),
     /**Hybrid logical clock: wall_ms:counter:node (7.3).*/
     hlc: z
       .string()

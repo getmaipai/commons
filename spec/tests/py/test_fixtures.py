@@ -80,7 +80,12 @@ def test_entity_fixtures(kind: str):
 
 
 @pytest.mark.parametrize(
-    "name", ["chat-folder.example.json", "chat-folder.parent-made.example.json"]
+    "name",
+    [
+        "chat-folder.example.json",
+        "chat-folder.parent-made.example.json",
+        "chat-folder.project.example.json",
+    ],
 )
 def test_chat_folder_fixtures(name: str):
     ChatFolder.model_validate(load_fixture(name))
@@ -91,7 +96,28 @@ def test_chat_folder_refuses_empty_name_and_unknown_field():
     with pytest.raises(ValidationError):
         ChatFolder.model_validate({**folder, "name": ""})
     with pytest.raises(ValidationError):
-        ChatFolder.model_validate({**folder, "instructions": "be brief"})
+        ChatFolder.model_validate({**folder, "not_a_field": "be brief"})
+
+
+def test_chat_folder_new_fields_refuse_bad_values():
+    folder = load_fixture("chat-folder.project.example.json")
+    for bad in (
+        {"color": "#ff0000"},
+        {"icon": "Folder Icon"},
+        {"description": "x" * 501},
+        {"instructions": "x" * 1501},
+        {"memory_mode": "everything"},
+        {"shares": [{"person": "person-d4e5f6", "role": "owner"}]},
+    ):
+        with pytest.raises(ValidationError):
+            ChatFolder.model_validate({**folder, **bad})
+
+
+def test_old_chat_folder_reads_with_defaults():
+    folder = ChatFolder.model_validate(load_fixture("chat-folder.example.json"))
+    assert folder.color == "neutral"
+    assert folder.memory_mode == "shared"
+    assert folder.shares == []
 
 
 def test_conversation_in_folder_fixture():
@@ -306,7 +332,9 @@ def test_source_archive_fixture():
     Source.model_validate(load_fixture("source.archive.example.json"))
 
 
-@pytest.mark.parametrize("kind", ["memory", "memory-legacy", "entity", "episode"])
+@pytest.mark.parametrize(
+    "kind", ["memory", "memory-legacy", "entity", "episode", "in-project"]
+)
 def test_memory_record_fixtures(kind):
     MemoryRecord.model_validate(load_fixture(f"memory-record.{kind}.example.json"))
 

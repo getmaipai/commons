@@ -76,7 +76,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["memory", "memory-legacy", "entity", "episode"]) {
+  for (const kind of ["memory", "memory-legacy", "entity", "episode", "in-project"]) {
     test(`memory-record.${kind}.example.json`, () => {
       expect(() =>
         MemoryRecord.parse(loadFixture(`memory-record.${kind}.example.json`)),
@@ -127,7 +127,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Conversation.parse({ ...conv, folder_id: null })).not.toThrow();
   });
 
-  for (const kind of ["example", "parent-made.example"]) {
+  for (const kind of ["example", "parent-made.example", "project.example"]) {
     test(`chat-folder.${kind}.json`, () => {
       expect(() => ChatFolder.parse(loadFixture(`chat-folder.${kind}.json`))).not.toThrow();
     });
@@ -138,7 +138,53 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => ChatFolder.parse({ ...folder, name: "" })).toThrow();
     expect(() => ChatFolder.parse({ ...folder, name: "x".repeat(81) })).toThrow();
     expect(() => ChatFolder.parse({ ...folder, id: "project-a1b2c3" })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, instructions: "be brief" })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, not_a_field: "be brief" })).toThrow();
+  });
+
+  test("a v0.1.87 chat folder still validates and reads with the new defaults (PROJECTS-P1)", () => {
+    const folder = ChatFolder.parse(loadFixture("chat-folder.example.json"));
+    expect(folder.color).toBe("neutral");
+    expect(folder.icon).toBe("folder");
+    expect(folder.description).toBe("");
+    expect(folder.instructions).toBe("");
+    expect(folder.pinned).toBe(false);
+    expect(folder.pinned_at).toBeNull();
+    expect(folder.archived_at).toBeNull();
+    expect(folder.memory_mode).toBe("shared");
+    expect(folder.shares).toEqual([]);
+  });
+
+  test("a chat folder refuses a hex colour, an unknown colour, a bad icon, long text, a bad share and an unknown memory mode", () => {
+    const folder = loadFixture("chat-folder.project.example.json") as Record<string, unknown>;
+    expect(() => ChatFolder.parse({ ...folder, color: "#ff0000" })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, color: "purple" })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, icon: "Folder Icon" })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, icon: "📁" })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, description: "x".repeat(501) })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, description: "x".repeat(500) })).not.toThrow();
+    expect(() => ChatFolder.parse({ ...folder, instructions: "x".repeat(1501) })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, instructions: "x".repeat(1500) })).not.toThrow();
+    expect(() => ChatFolder.parse({ ...folder, memory_mode: "everything" })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, shares: [{ person: "person-d4e5f6", role: "owner" }] })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, shares: [{ person: "nobody", role: "can_use" }] })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, shares: [{ person: "person-d4e5f6", role: "can_use", extra: 1 }] })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, pinned: "yes" })).toThrow();
+  });
+
+  test("every project icon fixture and the vocab file agree, and every colour is a kit hue name", () => {
+    const vocab = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "vocab", "project-icons.json"), "utf8")) as { icons: string[] };
+    expect(new Set(vocab.icons).size).toBe(vocab.icons.length);
+    expect(vocab.icons).toContain("folder");
+    for (const name of vocab.icons) expect(name).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+    const folder = ChatFolder.parse(loadFixture("chat-folder.project.example.json"));
+    expect(vocab.icons).toContain(folder.icon);
+  });
+
+  test("a memory record carries an optional folder_id, null by default, and refuses a bad one", () => {
+    const base = loadFixture("memory-record.memory.example.json") as Record<string, unknown>;
+    expect(MemoryRecord.parse(base).folder_id).toBeNull();
+    expect(MemoryRecord.parse(loadFixture("memory-record.in-project.example.json")).folder_id).toBe("folder-g7h8i9");
+    expect(() => MemoryRecord.parse({ ...base, folder_id: "project-g7h8i9" })).toThrow();
   });
 
   test("project.example.json", () => {

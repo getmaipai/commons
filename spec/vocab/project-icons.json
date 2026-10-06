@@ -1,0 +1,29 @@
+{
+  "$comment": "PROJECTS-P1: the fixed icon list for a project (ChatFolder.icon). Names are kit icon names; a Home test asserts each exists in the kit's icon registry. No uploads, no emoji.",
+  "icons": [
+    "folder",
+    "book",
+    "briefcase",
+    "home",
+    "heart",
+    "star",
+    "graduation-cap",
+    "calendar",
+    "camera",
+    "music",
+    "code",
+    "chef-hat",
+    "plane",
+    "dumbbell",
+    "leaf",
+    "paw-print",
+    "gamepad",
+    "palette",
+    "wrench",
+    "file-text",
+    "sparkles",
+    "globe",
+    "baby",
+    "gift"
+  ]
+}

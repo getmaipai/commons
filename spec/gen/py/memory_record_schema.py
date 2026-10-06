@@ -147,6 +147,10 @@ class MemoryRecord(BaseModel):
         None,
         description='Names the embedding space this record was indexed under, e.g. hub-bge-m3 or bot-minilm. The embedding vector itself is never part of this record and never syncs (4.11).',
     )
+    folder_id: constr(pattern=r'^folder-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description="The project (chat folder) this memory or episode was written in; null for none (PROJECTS-P1). Provenance only until the project's memory_mode is project_only, when recall inside and outside the project follows it.",
+    )
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
         ..., description='Hybrid logical clock: wall_ms:counter:node (7.3).'
     )

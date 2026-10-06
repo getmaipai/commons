@@ -2,10 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/chat-folder.schema.json",
   "title": "ChatFolder",
-  "description": "A named group of one person's chat conversations, shown to people as a Project in the chat history column (CHAT-PROJECT-01a). It belongs to one person; a parent may make one for a child. A conversation joins it through Conversation.folder_id. Deleting a folder keeps its conversations (their folder_id goes back to null). Named 'chat folder' on the wire so it is never mistaken for the background-work Project record (project.schema.json). This version carries no instructions or files: a folder only groups conversations.",
+  "description": "A named group of one person's chat conversations, shown to people as a Project in the chat history column (CHAT-PROJECT-01a, PROJECTS-P1). It belongs to one person; a parent may make one for a child. A conversation joins it through Conversation.folder_id. Deleting a folder keeps its conversations (their folder_id goes back to null). Named 'chat folder' on the wire so it is never mistaken for the background-work Project record (project.schema.json). Since spec-v0.1.90 it also carries a colour, an icon, a description, instructions, a pin, an archive stamp, a memory mode and a share list, all optional with defaults so a v0.1.87 record still validates. Project files are not on the record yet.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "person", "name", "source", "provenance", "hlc", "created_at", "updated_at"],
+  "required": [
+    "id",
+    "person",
+    "name",
+    "source",
+    "provenance",
+    "hlc",
+    "created_at",
+    "updated_at"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -31,7 +40,10 @@
     },
     "source": {
       "type": "string",
-      "enum": ["hub", "local"],
+      "enum": [
+        "hub",
+        "local"
+      ],
       "description": "hub: authoritative on the hub. local: made on a robot, not yet synced. Mirrors conversation.schema.json's own source field."
     },
     "provenance": {
@@ -44,13 +56,117 @@
       "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
       "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
     },
-    "created_at": { "type": "string", "format": "date-time" },
-    "updated_at": { "type": "string", "format": "date-time" },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "deleted_at": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "date-time",
       "default": null,
       "description": "Set when the folder is deleted, so a syncing client drops it. Its conversations keep existing with folder_id null."
+    },
+    "color": {
+      "type": "string",
+      "enum": [
+        "neutral",
+        "blue",
+        "violet",
+        "teal",
+        "orange",
+        "pink",
+        "red",
+        "green",
+        "yellow"
+      ],
+      "default": "neutral",
+      "description": "A palette name, never a hex. Maps one to one to the kit's --hue-* tokens; neutral is the muted foreground."
+    },
+    "icon": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "default": "folder",
+      "description": "A name from vocab/project-icons.json (a fixed list, no uploads, no emoji). Every name exists in the kit's icon registry."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500,
+      "default": "",
+      "description": "Shown to people only, never sent to the model. A minor's description passes the output floor on save."
+    },
+    "instructions": {
+      "type": "string",
+      "maxLength": 1500,
+      "default": "",
+      "description": "Notes the model follows in this project's chats. Enters the prompt after the person's own custom instructions, as labelled data that never outranks the safety floor or the age band. Passes the output floor on save for a minor project or editor."
+    },
+    "pinned": {
+      "type": "boolean",
+      "default": false,
+      "description": "Pinned to the top of the project list."
+    },
+    "pinned_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "When it was pinned; null when not pinned. Pinned projects sort by this, newest pin first."
+    },
+    "archived_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "Set when the project is archived: hidden from the default list, kept with its chats and settings. Distinct from deleted_at."
+    },
+    "memory_mode": {
+      "type": "string",
+      "enum": [
+        "shared",
+        "project_only"
+      ],
+      "default": "shared",
+      "description": "shared: chats here read and write the person's normal memory. project_only: only memories written in this project are used here, and they are used nowhere else. A record without the field reads as shared (what every project did before this field); the hub writes project_only for a new project. A shared project (non-empty shares) is always project_only."
+    },
+    "shares": {
+      "type": "array",
+      "maxItems": 20,
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "person",
+          "role"
+        ],
+        "properties": {
+          "person": {
+            "type": "string",
+            "pattern": "^person-[a-z0-9]{6,}$",
+            "description": "A household member the owner shared this project with. Unique within the list."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "can_use",
+              "can_edit"
+            ],
+            "description": "can_use: start chats in the project and use its instructions. can_edit: also change its name, icon, colour, description and instructions. Only the owner (or a parent for a child's project) changes the list, the memory mode, the archive or the delete."
+          }
+        }
+      },
+      "description": "Household members this project is shared with. Teens' and children's projects follow the band rules: a child's project is parent-managed, a teen shares only by their own choice, a child is added only by a parent."
     }
   }
 }

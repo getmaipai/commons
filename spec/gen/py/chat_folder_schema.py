@@ -8,9 +8,23 @@ from typing import Literal
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
 
 
+class Share(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    person: constr(pattern=r'^person-[a-z0-9]{6,}$') = Field(
+        ...,
+        description='A household member the owner shared this project with. Unique within the list.',
+    )
+    role: Literal['can_use', 'can_edit'] = Field(
+        ...,
+        description="can_use: start chats in the project and use its instructions. can_edit: also change its name, icon, colour, description and instructions. Only the owner (or a parent for a child's project) changes the list, the memory mode, the archive or the delete.",
+    )
+
+
 class ChatFolder(BaseModel):
     """
-    A named group of one person's chat conversations, shown to people as a Project in the chat history column (CHAT-PROJECT-01a). It belongs to one person; a parent may make one for a child. A conversation joins it through Conversation.folder_id. Deleting a folder keeps its conversations (their folder_id goes back to null). Named 'chat folder' on the wire so it is never mistaken for the background-work Project record (project.schema.json). This version carries no instructions or files: a folder only groups conversations.
+    A named group of one person's chat conversations, shown to people as a Project in the chat history column (CHAT-PROJECT-01a, PROJECTS-P1). It belongs to one person; a parent may make one for a child. A conversation joins it through Conversation.folder_id. Deleting a folder keeps its conversations (their folder_id goes back to null). Named 'chat folder' on the wire so it is never mistaken for the background-work Project record (project.schema.json). Since spec-v0.1.90 it also carries a colour, an icon, a description, instructions, a pin, an archive stamp, a memory mode and a share list, all optional with defaults so a v0.1.87 record still validates. Project files are not on the record yet.
     """
 
     model_config = ConfigDict(
@@ -46,4 +60,41 @@ class ChatFolder(BaseModel):
     deleted_at: AwareDatetime | None = Field(
         None,
         description='Set when the folder is deleted, so a syncing client drops it. Its conversations keep existing with folder_id null.',
+    )
+    color: Literal[
+        'neutral', 'blue', 'violet', 'teal', 'orange', 'pink', 'red', 'green', 'yellow'
+    ] = Field(
+        'neutral',
+        description="A palette name, never a hex. Maps one to one to the kit's --hue-* tokens; neutral is the muted foreground.",
+    )
+    icon: constr(pattern=r'^[a-z0-9]+(-[a-z0-9]+)*$') = Field(
+        'folder',
+        description="A name from vocab/project-icons.json (a fixed list, no uploads, no emoji). Every name exists in the kit's icon registry.",
+    )
+    description: constr(max_length=500) = Field(
+        '',
+        description="Shown to people only, never sent to the model. A minor's description passes the output floor on save.",
+    )
+    instructions: constr(max_length=1500) = Field(
+        '',
+        description="Notes the model follows in this project's chats. Enters the prompt after the person's own custom instructions, as labelled data that never outranks the safety floor or the age band. Passes the output floor on save for a minor project or editor.",
+    )
+    pinned: bool = Field(False, description='Pinned to the top of the project list.')
+    pinned_at: AwareDatetime | None = Field(
+        None,
+        description='When it was pinned; null when not pinned. Pinned projects sort by this, newest pin first.',
+    )
+    archived_at: AwareDatetime | None = Field(
+        None,
+        description='Set when the project is archived: hidden from the default list, kept with its chats and settings. Distinct from deleted_at.',
+    )
+    memory_mode: Literal['shared', 'project_only'] = Field(
+        'shared',
+        description="shared: chats here read and write the person's normal memory. project_only: only memories written in this project are used here, and they are used nowhere else. A record without the field reads as shared (what every project did before this field); the hub writes project_only for a new project. A shared project (non-empty shares) is always project_only.",
+    )
+    shares: list[Share] = Field(
+        [],
+        description="Household members this project is shared with. Teens' and children's projects follow the band rules: a child's project is parent-managed, a teen shares only by their own choice, a child is added only by a parent.",
+        max_length=20,
+        validate_default=True,
     )

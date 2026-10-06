@@ -7,6 +7,12 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.90] - 2026-10-06
+
+### Added
+- `ChatFolder` grows the project fields (PROJECTS-P1, PROJECTS-PARITY), all optional with defaults so a spec-v0.1.87 record still validates: `color` (one of the nine kit hue names, never a hex; default `neutral`), `icon` (a name from the new `vocab/project-icons.json`, 24 kit icon names, no uploads; default `folder`), `description` (up to 500 characters, shown to people, never sent to the model), `instructions` (up to 1500 characters), `pinned` and `pinned_at`, `archived_at`, `memory_mode` (`shared` or `project_only`; a record without the field reads `shared`, the hub writes `project_only` for a new project) and `shares` (up to 20 `{person, role}` entries, role `can_use` or `can_edit`). Fixture `chat-folder.project.example.json`. Project files are not on the record yet.
+- Optional `folder_id` on `MemoryRecord` (null or a `folder-` id): the project a memory or episode was written in. Provenance only until a project's `memory_mode` is `project_only`. Fixture `memory-record.in-project.example.json`.
+
 ## [spec-v0.1.89] - 2026-10-06
 
 ### Added
