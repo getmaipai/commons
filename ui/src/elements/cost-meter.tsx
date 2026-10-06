@@ -42,7 +42,7 @@ export function CostMeter({
         <span className="text-2xl font-medium tracking-tight tabular-nums">
           {runCost}
         </span>
-        <span className={cn(mono, "text-foreground/30")}>this run</span>
+        <span className={cn(mono, "text-muted-foreground")}>this run</span>
         <span className={cn(mono, "text-muted-foreground ms-auto tabular-nums")}>
           {sessionCost} session
         </span>
@@ -81,13 +81,13 @@ export function CostMeter({
               {line.model}
             </span>
             <span
-              className={cn(mono, "text-foreground/25 shrink-0 tabular-nums")}
+              className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
             >
               {(line.inputTokens / 1000).toFixed(1)}k in ·{" "}
               {(line.outputTokens / 1000).toFixed(1)}k out
             </span>
             <span
-              className={cn(mono, "text-foreground/55 shrink-0 tabular-nums")}
+              className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
             >
               {line.cost}
             </span>

@@ -13,7 +13,7 @@ export interface ModelStatus {
 }
 
 const STATUS_TONE: Record<ModelStatusTone, string> = {
-  neutral: "text-foreground/45",
+  neutral: "text-muted-foreground",
   good: "text-emerald-600 dark:text-emerald-400",
   warn: "text-amber-700 dark:text-amber-400",
   bad: "text-red-600 dark:text-red-400",
@@ -62,7 +62,7 @@ export function ModelPicker({
     >
       {families.map((family) => (
         <div key={family} className="flex flex-col">
-          <span className={cn(mono, "text-foreground/30 px-2 pt-2 pb-1")}>
+          <span className={cn(mono, "text-muted-foreground px-2 pt-2 pb-1")}>
             {family}
           </span>
           {models
@@ -115,7 +115,7 @@ export function ModelPicker({
                           className={cn(
                             field,
                             mono,
-                            "text-foreground/45 rounded px-1 py-px",
+                            "text-muted-foreground rounded px-1 py-px",
                           )}
                         >
                           {capability}
@@ -123,7 +123,7 @@ export function ModelPicker({
                       ))}
                     </span>
                     {model.reason !== undefined && (
-                      <span className="text-foreground/45 text-xs leading-snug">
+                      <span className="text-muted-foreground text-xs leading-snug">
                         {model.reason}
                       </span>
                     )}
@@ -137,7 +137,7 @@ export function ModelPicker({
                     </span>
                     {model.price !== undefined && (
                       <span
-                        className={cn(mono, "text-foreground/25 tabular-nums")}
+                        className={cn(mono, "text-muted-foreground tabular-nums")}
                       >
                         {model.price}
                       </span>

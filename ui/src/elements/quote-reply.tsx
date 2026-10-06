@@ -76,7 +76,7 @@ export function QuoteReply({
                   key={action.key}
                   type="button"
                   onClick={() => onAction(action.key)}
-                  className="text-foreground/60 hover:bg-foreground/[0.06] hover:text-foreground/90 flex h-7 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
+                  className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 flex h-7 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
                 >
                   <Icon className="size-3.5" />
                   {action.label}
@@ -89,8 +89,8 @@ export function QuoteReply({
 
       {quoted && (
         <div className="fade-in slide-in-from-bottom-1 animate-in flex flex-col gap-1 duration-300">
-          <span className={cn(mono, "text-foreground/30")}>replying to</span>
-          <div className="border-foreground/15 text-foreground/55 border-s-2 ps-2.5 text-xs leading-relaxed">
+          <span className={cn(mono, "text-muted-foreground")}>replying to</span>
+          <div className="border-foreground/15 text-muted-foreground border-s-2 ps-2.5 text-xs leading-relaxed">
             {quoted}
           </div>
         </div>

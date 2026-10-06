@@ -86,7 +86,7 @@ export function TraceWaterfall({
                 />
               </span>
               <span
-                className={cn(mono, "text-foreground/30 text-end tabular-nums")}
+                className={cn(mono, "text-muted-foreground text-end tabular-nums")}
               >
                 {item.durationMs}
               </span>

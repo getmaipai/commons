@@ -46,7 +46,7 @@ export function ToolGroup({
         )}
       />
       <span className="min-w-0 flex-1 truncate text-[13.5px]">{label}</span>
-      <span className={cn(mono, "text-foreground/30 shrink-0 tabular-nums")}>
+      <span className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}>
         {running > 0
           ? `${tools.length - running}/${tools.length}`
           : failed > 0
@@ -103,7 +103,7 @@ export function ToolGroup({
                   <CheckIcon className="size-3 text-emerald-500" />
                 )}
               </span>
-              <span className={cn(mono, "text-foreground/55 shrink-0")}>
+              <span className={cn(mono, "text-muted-foreground shrink-0")}>
                 {tool.name}
               </span>
               <span className="text-foreground/80 min-w-0 flex-1 truncate text-[13px]">
@@ -113,7 +113,7 @@ export function ToolGroup({
                 <span
                   className={cn(
                     mono,
-                    "text-foreground/25 shrink-0 tabular-nums",
+                    "text-muted-foreground shrink-0 tabular-nums",
                   )}
                 >
                   {tool.durationMs}ms

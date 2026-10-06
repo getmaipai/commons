@@ -66,7 +66,7 @@ export function HeatGraphDayLabels({
           <span
             className={cn(
               mono,
-              "text-foreground/25 flex",
+              "text-muted-foreground flex",
               ROW[size],
               "items-center leading-none",
             )}
@@ -91,7 +91,7 @@ export function HeatGraphMonthLabels({
       <HeatGraphPrimitive.MonthLabels>
         {({ label, totalWeeks }) => (
           <span
-            className={cn(mono, "text-foreground/25 absolute")}
+            className={cn(mono, "text-muted-foreground absolute")}
             style={{ left: `${(label.column / totalWeeks) * 100}%` }}
           >
             {monthLabel(label.month)}
@@ -138,7 +138,7 @@ export function HeatGraphLegend({
 }) {
   return (
     <div className={cn("flex items-center gap-1.5 self-end", className)}>
-      <span className={cn(mono, "text-foreground/25")}>{lessLabel}</span>
+      <span className={cn(mono, "text-muted-foreground")}>{lessLabel}</span>
       {levelClassNames.map((tint, level) => (
         <span
           key={level}
@@ -146,7 +146,7 @@ export function HeatGraphLegend({
           className={cn("size-[9px] rounded-[2px]", tint)}
         />
       ))}
-      <span className={cn(mono, "text-foreground/25")}>{moreLabel}</span>
+      <span className={cn(mono, "text-muted-foreground")}>{moreLabel}</span>
     </div>
   );
 }

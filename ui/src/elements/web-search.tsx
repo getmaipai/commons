@@ -45,7 +45,7 @@ export function WebSearch({
         <SearchIcon className="text-foreground/40 size-3" />
         {query}
       </span>
-      <div className="text-foreground/45 text-xs">
+      <div className="text-muted-foreground text-xs">
         {searching ? (
           <ShimmerLabel className="relative inline-block leading-none">
             Searching
@@ -62,7 +62,7 @@ export function WebSearch({
             key={`${cycle}-${result.domain}`}
             className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both hover:bg-foreground/[0.03] -mx-2.5 flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 transition-colors duration-300"
           >
-            <span className="bg-foreground/[0.06] text-foreground/45 flex size-4 shrink-0 items-center justify-center rounded text-[9px] font-medium">
+            <span className="bg-foreground/[0.06] text-muted-foreground flex size-4 shrink-0 items-center justify-center rounded text-[9px] font-medium">
               {result.domain.charAt(0).toUpperCase()}
             </span>
             <span className="text-foreground/90 min-w-0 flex-1 truncate text-[13.5px]">

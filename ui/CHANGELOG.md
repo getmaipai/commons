@@ -1,5 +1,20 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.122] - ui-v0.5.122
+
+### K06 (contrast sweep, whole kit)
+
+Every remaining low-opacity text colour in the Elements, the dashboard tabs and
+the assistant-ui parts now uses `text-muted-foreground` (6.1:1 on the light
+page, 9.9:1 on the dark page): `text-foreground/20` to `/60` on timeline
+timestamps and detail text, labels, captions, row metadata and placeholders,
+plus `text-muted-foreground/60` to `/80` on text. Icons, the disabled send
+button and disabled option rows keep their treatment; TerminalBlock ink text
+uses `text-background/60` (6.5:1). Class names only, no props or markup
+changes. New `src/text-opacity-contrast.test.ts` fails any text opacity
+utility below 4.5:1 on the kit surfaces in both themes, with a reasoned
+allowlist.
+
 ## [0.5.121] - ui-v0.5.121
 
 ### CHAT-PROJECT-01 (PROJECTS-01b): projects in the thread list

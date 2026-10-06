@@ -65,12 +65,12 @@ export function MessageQueue({
             <span
               className={cn(
                 mono,
-                "text-foreground/30 w-3 shrink-0 tabular-nums",
+                "text-muted-foreground w-3 shrink-0 tabular-nums",
               )}
             >
               {index + 1}
             </span>
-            <span className="text-foreground/60 min-w-0 flex-1 truncate text-[13.5px]">
+            <span className="text-muted-foreground min-w-0 flex-1 truncate text-[13.5px]">
               {message.text}
             </span>
             <ArrowUpIcon className="text-foreground/25 size-3 shrink-0" />

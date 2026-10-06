@@ -67,7 +67,7 @@ export function FileTree({
               <>
                 <ChevronDownIcon className="text-foreground/25 size-3 shrink-0" />
                 <FolderIcon className="text-foreground/35 size-3.5 shrink-0" />
-                <span className="text-foreground/60 min-w-0 flex-1 truncate">
+                <span className="text-muted-foreground min-w-0 flex-1 truncate">
                   {node.name}
                 </span>
               </>

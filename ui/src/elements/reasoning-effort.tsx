@@ -56,8 +56,8 @@ export function ReasoningEffort({
             active
               ? "bg-background text-foreground/90"
               : onSelect
-                ? "text-foreground/45 hover:text-foreground/70"
-                : "text-foreground/45",
+                ? "text-muted-foreground hover:text-foreground/70"
+                : "text-muted-foreground",
           );
           return onSelect ? (
             <button

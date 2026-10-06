@@ -57,7 +57,7 @@ export function MessageAttachments({
             </>
           ) : (
             <>
-              <span className="bg-background/70 text-foreground/45 flex size-8 shrink-0 items-center justify-center rounded-lg">
+              <span className="bg-background/70 text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
                 {item.kind === "document" ? (
                   <FileTextIcon className="size-3.5" />
                 ) : (

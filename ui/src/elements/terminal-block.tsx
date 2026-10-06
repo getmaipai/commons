@@ -54,8 +54,8 @@ export function TerminalBlock({
               className={cn(
                 mono,
                 ink
-                  ? "text-background/40 dark:text-foreground/40"
-                  : "text-foreground/40",
+                  ? "text-background/60 dark:text-muted-foreground"
+                  : "text-muted-foreground",
               )}
             >
               exit 0
@@ -76,8 +76,8 @@ export function TerminalBlock({
         className={cn(
           "flex min-h-[8.5rem] flex-col gap-1 px-4 pt-1 pb-3.5",
           ink
-            ? "text-background/55 dark:text-foreground/50"
-            : "text-foreground/50",
+            ? "text-background/60 dark:text-muted-foreground"
+            : "text-muted-foreground",
         )}
       >
         {take(lines, visibleCount).map((line, i) => {

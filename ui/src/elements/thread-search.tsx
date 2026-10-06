@@ -169,7 +169,7 @@ export function ThreadSearch({
         onKeyDown={onKeyDown}
         placeholder="Search threads"
         aria-label="Search threads"
-        className="text-foreground/85 placeholder:text-foreground/30 min-w-0 flex-1 bg-transparent text-[13px] outline-none"
+        className="text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[13px] outline-none"
       />
     </div>
   );
@@ -201,7 +201,7 @@ export function ThreadSearch({
 
       {pinned.length > 0 && (
         <div className="flex flex-col">
-          <span className={cn(mono, "text-foreground/25 px-2 pb-1")}>
+          <span className={cn(mono, "text-muted-foreground px-2 pb-1")}>
             pinned
           </span>
           {pinned.map(row)}
@@ -210,7 +210,7 @@ export function ThreadSearch({
 
       {groups.map(({ group, threads: items }) => (
         <div key={group} className="flex flex-col">
-          <span className={cn(mono, "text-foreground/25 px-2 pb-1")}>
+          <span className={cn(mono, "text-muted-foreground px-2 pb-1")}>
             {group}
           </span>
           {items.map(row)}
@@ -218,7 +218,7 @@ export function ThreadSearch({
       ))}
 
       {ordered.length === 0 && (
-        <span className="text-foreground/30 px-2 py-4 text-center text-xs">
+        <span className="text-muted-foreground px-2 py-4 text-center text-xs">
           No thread matches “{query}”
         </span>
       )}

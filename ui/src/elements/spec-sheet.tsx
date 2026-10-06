@@ -41,7 +41,7 @@ export function SpecSheet({
       <div className="flex flex-col gap-0.5">
         <span className="text-[13.5px] font-medium">{title}</span>
         {subtitle && (
-          <span className="text-foreground/45 text-xs">{subtitle}</span>
+          <span className="text-muted-foreground text-xs">{subtitle}</span>
         )}
       </div>
 

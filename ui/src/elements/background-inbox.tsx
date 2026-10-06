@@ -79,21 +79,21 @@ export function BackgroundInbox({
                 className={cn(
                   "truncate text-[13px]",
                   run.state === "running"
-                    ? "text-foreground/50"
+                    ? "text-muted-foreground"
                     : "text-foreground/90",
                 )}
               >
                 {run.title}
               </span>
               {run.summary && (
-                <span className={cn(mono, "text-foreground/30 truncate")}>
+                <span className={cn(mono, "text-muted-foreground truncate")}>
                   {run.summary}
                 </span>
               )}
             </span>
 
             <span
-              className={cn(mono, "text-foreground/25 shrink-0 tabular-nums")}
+              className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
             >
               {run.elapsed}
             </span>

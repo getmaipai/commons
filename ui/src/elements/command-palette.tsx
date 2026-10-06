@@ -109,7 +109,7 @@ export function CommandPalette({
               ? optionId(activeId)
               : undefined
           }
-          className="text-foreground/85 placeholder:text-foreground/30 min-w-0 flex-1 bg-transparent text-[13.5px] outline-none"
+          className="text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[13.5px] outline-none"
         />
         <span
           className={cn(
@@ -137,7 +137,7 @@ export function CommandPalette({
           >
             <span
               aria-hidden
-              className={cn(mono, "text-foreground/25 px-2 pt-2 pb-1")}
+              className={cn(mono, "text-muted-foreground px-2 pt-2 pb-1")}
             >
               {group}
             </span>
@@ -164,7 +164,7 @@ export function CommandPalette({
                           className={cn(
                             field,
                             mono,
-                            "text-foreground/40 rounded px-1.5 py-0.5",
+                            "text-muted-foreground rounded px-1.5 py-0.5",
                           )}
                         >
                           {key}
@@ -205,7 +205,7 @@ export function CommandPalette({
       </div>
       {matches.length === 0 && (
         <div className="border-foreground/[0.07] border-t p-1.5">
-          <span className="text-foreground/30 block px-2 py-4 text-center text-xs break-words">
+          <span className="text-muted-foreground block px-2 py-4 text-center text-xs break-words">
             No command matches “{query}”
           </span>
         </div>

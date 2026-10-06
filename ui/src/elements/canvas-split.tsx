@@ -61,7 +61,7 @@ export function CanvasSplitMessage({
         "fade-in animate-in fill-mode-both text-[13px] leading-relaxed duration-300",
         speaker === "user"
           ? cn(field, "text-foreground/80 ms-auto rounded-2xl px-3 py-2")
-          : "text-foreground/60",
+          : "text-muted-foreground",
         className,
       )}
       {...props}
@@ -110,7 +110,7 @@ export function CanvasSplitHeader({
       <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
         {title}
       </span>
-      <span className={cn(mono, "text-foreground/30 shrink-0")}>
+      <span className={cn(mono, "text-muted-foreground shrink-0")}>
         v{version}
       </span>
       <span
@@ -119,7 +119,7 @@ export function CanvasSplitHeader({
           "shrink-0 transition-colors duration-300",
           saved
             ? "text-emerald-600 dark:text-emerald-400"
-            : "text-foreground/30",
+            : "text-muted-foreground",
         )}
       >
         {saved ? (

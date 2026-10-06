@@ -52,7 +52,7 @@ export function DataTable({
             className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both hover:bg-foreground/[0.03] flex items-center gap-2.5 px-4 py-2.5 transition-colors duration-300"
             style={{ animationDelay: `${index * 80}ms` }}
           >
-            <span className="bg-foreground/[0.06] text-foreground/45 flex size-5 shrink-0 items-center justify-center rounded-md text-[9px] font-medium">
+            <span className="bg-foreground/[0.06] text-muted-foreground flex size-5 shrink-0 items-center justify-center rounded-md text-[9px] font-medium">
               {row.name[0]!}
             </span>
             <span className="text-foreground/90 flex-1 truncate">
@@ -61,7 +61,7 @@ export function DataTable({
             <span
               className={cn(
                 mono,
-                "text-foreground/55 w-16 text-end tabular-nums",
+                "text-muted-foreground w-16 text-end tabular-nums",
               )}
             >
               {row.context}
@@ -69,7 +69,7 @@ export function DataTable({
             <span
               className={cn(
                 mono,
-                "text-foreground/55 w-16 text-end tabular-nums",
+                "text-muted-foreground w-16 text-end tabular-nums",
               )}
             >
               {row.cost}

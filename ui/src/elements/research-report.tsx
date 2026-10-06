@@ -44,7 +44,7 @@ export function ResearchReport({
     >
       <div className="flex flex-col gap-1">
         <span className="text-[13.5px] font-medium">{title}</span>
-        <span className={cn(mono, "text-foreground/30 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {done}/{sections.length} sections · {sourcesRead} sources read
         </span>
       </div>
@@ -79,13 +79,13 @@ export function ResearchReport({
                 {section.heading}
               </span>
               {section.sources > 0 && (
-                <span className={cn(mono, "text-foreground/25 shrink-0")}>
+                <span className={cn(mono, "text-muted-foreground shrink-0")}>
                   {section.sources} src
                 </span>
               )}
             </div>
             {section.preview && (
-              <p className="text-foreground/50 fade-in animate-in ps-5.5 text-xs leading-relaxed duration-300">
+              <p className="text-muted-foreground fade-in animate-in ps-5.5 text-xs leading-relaxed duration-300">
                 {section.preview}
               </p>
             )}

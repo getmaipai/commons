@@ -59,7 +59,7 @@ function OptionText({ option }: { option: OptionListOption }) {
         {option.label}
       </span>
       {option.description ? (
-        <span className="text-foreground/45 text-xs leading-4 break-words">
+        <span className="text-muted-foreground text-xs leading-4 break-words">
           {option.description}
         </span>
       ) : null}

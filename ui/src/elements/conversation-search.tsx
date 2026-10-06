@@ -57,10 +57,10 @@ export function ConversationSearch({
             onChange={(event) => onQueryChange?.(event.target.value)}
             placeholder="Find in conversation"
             aria-label="Find in conversation"
-            className="text-foreground/85 placeholder:text-foreground/30 min-w-0 flex-1 bg-transparent text-[13px] outline-none"
+            className="text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[13px] outline-none"
           />
           <span
-            className={cn(mono, "text-foreground/30 shrink-0 tabular-nums")}
+            className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
           >
             {hits.length === 0 ? "0" : `${index + 1}/${hits.length}`}
           </span>
@@ -93,11 +93,11 @@ export function ConversationSearch({
               "fade-in animate-in rounded-xl px-3 py-2 text-xs leading-relaxed duration-200",
             )}
           >
-            <span className="text-foreground/45">{active.before}</span>
+            <span className="text-muted-foreground">{active.before}</span>
             <span className="text-foreground/95 rounded bg-amber-400/35 px-0.5">
               {active.match}
             </span>
-            <span className="text-foreground/45">{active.after}</span>
+            <span className="text-muted-foreground">{active.after}</span>
           </div>
         )}
       </div>

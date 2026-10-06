@@ -35,7 +35,7 @@ export function DraftRestore({
       <PencilLineIcon className="text-foreground/30 size-3.5 shrink-0" />
       <div className="flex min-w-0 flex-1 flex-col">
         <span className="text-foreground/70 truncate text-[13px]">{draft}</span>
-        <span className={cn(mono, "text-foreground/30")}>
+        <span className={cn(mono, "text-muted-foreground")}>
           unsent draft · {savedAt}
         </span>
       </div>

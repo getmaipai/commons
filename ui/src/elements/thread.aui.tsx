@@ -797,7 +797,7 @@ const ThreadSuggestionItem: FC = () => {
         >
           <span
             aria-hidden
-            className="text-muted-foreground/60 group-hover:text-foreground font-mono text-xs transition-colors motion-reduce:transition-none"
+            className="text-muted-foreground group-hover:text-foreground font-mono text-xs transition-colors motion-reduce:transition-none"
           >
             {">"}
           </span>
@@ -843,7 +843,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
     aria-label="Message input"
     {...props}
     className={cn(
-      "aui-composer-input caret-primary placeholder:text-muted-foreground/60 max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none",
+      "aui-composer-input caret-primary placeholder:text-muted-foreground max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none",
       className,
     )}
   />

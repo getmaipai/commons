@@ -103,7 +103,7 @@ export function QuestionFlow({
             .join(", ");
           return (
             <div key={step.id} className="flex flex-col gap-0.5 px-2 py-1">
-              <span className="text-foreground/45 text-xs leading-4">
+              <span className="text-muted-foreground text-xs leading-4">
                 {step.question}
               </span>
               <span className="text-foreground/80 text-[13.5px] leading-5 break-words">
@@ -136,7 +136,7 @@ export function QuestionFlow({
                   {step.question}
                 </p>
                 {step.description ? (
-                  <p className="text-foreground/45 text-xs leading-4">
+                  <p className="text-muted-foreground text-xs leading-4">
                     {step.description}
                   </p>
                 ) : null}
@@ -241,7 +241,7 @@ export function QuestionFlow({
           {currentStep.question}
         </p>
         {currentStep.description ? (
-          <p className="text-foreground/45 text-xs leading-4">
+          <p className="text-muted-foreground text-xs leading-4">
             {currentStep.description}
           </p>
         ) : null}

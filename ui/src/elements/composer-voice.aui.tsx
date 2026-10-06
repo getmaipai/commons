@@ -52,7 +52,7 @@ export function DictationTranscript({
 }: ComponentProps<typeof ComposerPrimitive.DictationTranscript>) {
   return (
     <ComposerPrimitive.DictationTranscript
-      className={cn("text-foreground/55 text-sm", className)}
+      className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
   );
@@ -108,11 +108,11 @@ export function ComposerVoiceLevels({
         ))}
       </div>
       {recording ? (
-        <span className={cn(mono, "text-foreground/40 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           0:{String(seconds).padStart(2, "0")}
         </span>
       ) : (
-        <ShimmerLabel className="text-foreground/55 relative text-[13px]">
+        <ShimmerLabel className="text-muted-foreground relative text-[13px]">
           {transcribingLabel}
         </ShimmerLabel>
       )}

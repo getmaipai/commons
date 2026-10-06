@@ -40,7 +40,7 @@ function QuoteBlockText({ className, ...props }: ComponentProps<"p">) {
     <p
       data-slot="quote-block-text"
       className={cn(
-        "text-muted-foreground/80 line-clamp-2 min-w-0 text-sm italic",
+        "text-muted-foreground line-clamp-2 min-w-0 text-sm italic",
         className,
       )}
       {...props}
@@ -185,7 +185,7 @@ function ComposerQuotePreviewIcon({
     <QuoteIcon
       data-slot="composer-quote-icon"
       className={cn(
-        "text-muted-foreground/70 mt-0.5 size-3.5 shrink-0",
+        "text-muted-foreground mt-0.5 size-3.5 shrink-0",
         className,
       )}
       {...props}
@@ -219,7 +219,7 @@ function ComposerQuotePreviewDismiss({
   label?: string;
 }) {
   const defaultClassName =
-    "shrink-0 rounded-sm p-0.5 text-muted-foreground/70 transition-colors hover:bg-accent hover:text-foreground";
+    "shrink-0 rounded-sm p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground";
 
   return (
     <ComposerPrimitive.QuoteDismiss

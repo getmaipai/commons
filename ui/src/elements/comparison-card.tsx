@@ -69,7 +69,7 @@ export function ComparisonCard({
                     </span>
                   )}
                 </span>
-                <span className="text-foreground/45 truncate text-xs">
+                <span className="text-muted-foreground truncate text-xs">
                   {option.headline}
                 </span>
               </div>
@@ -91,7 +91,7 @@ export function ComparisonCard({
                       <span
                         className={cn(
                           "min-w-0 truncate",
-                          absent ? "text-foreground/30" : "text-foreground/65",
+                          absent ? "text-muted-foreground" : "text-foreground/65",
                         )}
                       >
                         {absent ? label : trait}
@@ -106,7 +106,7 @@ export function ComparisonCard({
       </div>
 
       {reason !== undefined && (
-        <p className="text-foreground/55 text-xs leading-relaxed">{reason}</p>
+        <p className="text-muted-foreground text-xs leading-relaxed">{reason}</p>
       )}
     </div>
   );

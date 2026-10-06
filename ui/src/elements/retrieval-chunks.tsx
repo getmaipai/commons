@@ -47,7 +47,7 @@ export function RetrievalChunks({
         {query}
       </span>
 
-      <div className="text-foreground/45 text-xs">
+      <div className="text-muted-foreground text-xs">
         {searching ? (
           <ShimmerLabel className="relative inline-block leading-none">
             Retrieving
@@ -72,7 +72,7 @@ export function RetrievalChunks({
               <span className="text-foreground/90 min-w-0 flex-1 truncate text-[13px] font-medium">
                 {chunk.source}
               </span>
-              <span className={cn(mono, "text-foreground/30 shrink-0")}>
+              <span className={cn(mono, "text-muted-foreground shrink-0")}>
                 {chunk.locator}
               </span>
               <span
@@ -87,7 +87,7 @@ export function RetrievalChunks({
                 {chunk.score.toFixed(2)}
               </span>
             </div>
-            <p className="text-foreground/55 line-clamp-2 text-xs leading-relaxed">
+            <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed">
               {chunk.text}
             </p>
             <span

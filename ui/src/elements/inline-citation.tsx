@@ -29,7 +29,7 @@ export function Citation({ index, source, open, onOpenChange }: CitationProps) {
           "mx-0.5 inline-flex h-4 min-w-4 translate-y-[-2px] cursor-default items-center justify-center rounded-[5px] px-1 align-middle font-mono text-[10px] font-medium tabular-nums transition-colors",
           open
             ? "bg-foreground text-background"
-            : "bg-foreground/[0.06] text-foreground/45 hover:text-foreground/90",
+            : "bg-foreground/[0.06] text-muted-foreground hover:text-foreground/90",
         )}
       >
         {index + 1}
@@ -46,17 +46,17 @@ export function Citation({ index, source, open, onOpenChange }: CitationProps) {
             )}
           >
             <div className="flex items-center gap-1.5">
-              <span className="bg-foreground/[0.06] text-foreground/45 flex size-4 items-center justify-center rounded text-[9px] font-medium">
+              <span className="bg-foreground/[0.06] text-muted-foreground flex size-4 items-center justify-center rounded text-[9px] font-medium">
                 {source.domain[0]?.toUpperCase()}
               </span>
-              <span className={cn(mono, "text-foreground/40")}>
+              <span className={cn(mono, "text-muted-foreground")}>
                 {source.domain}
               </span>
             </div>
             <p className="mt-2 text-[13px] leading-snug font-medium">
               {source.title}
             </p>
-            {source.snippet ? <p className="text-foreground/50 mt-1 text-[13px] leading-relaxed">{source.snippet}</p> : null}
+            {source.snippet ? <p className="text-muted-foreground mt-1 text-[13px] leading-relaxed">{source.snippet}</p> : null}
           </PreviewCard.Popup>
         </PreviewCard.Positioner>
       </PreviewCard.Portal>

@@ -58,7 +58,7 @@ export function ConnectionState({
           <span className="min-w-0 flex-1 text-[13px]">Reconnecting</span>
           {attempt !== undefined && (
             <span
-              className={cn(mono, "text-foreground/30 shrink-0 tabular-nums")}
+              className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
             >
               attempt {attempt}
             </span>
@@ -74,7 +74,7 @@ export function ConnectionState({
           </span>
           {resumedTokens !== undefined && (
             <span
-              className={cn(mono, "text-foreground/30 shrink-0 tabular-nums")}
+              className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
             >
               +{resumedTokens} tokens
             </span>

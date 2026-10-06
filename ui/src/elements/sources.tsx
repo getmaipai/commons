@@ -42,7 +42,7 @@ export interface SourcesProps {
  * can reuse the identical glyph instead of a second hand-rolled copy. */
 export function SourceGlyph({ domain, className }: { domain: string; className?: string }) {
   return (
-    <span className={cn("bg-foreground/[0.06] text-foreground/45 flex size-4 shrink-0 items-center justify-center rounded text-[9px] font-medium", className)}>
+    <span className={cn("bg-foreground/[0.06] text-muted-foreground flex size-4 shrink-0 items-center justify-center rounded text-[9px] font-medium", className)}>
       {domain.charAt(0).toUpperCase()}
     </span>
   );
@@ -67,7 +67,7 @@ export function Sources({
         <CollapsibleTrigger
           className={cn(
             fieldInteractive,
-            "group/trigger text-foreground/60 hover:text-foreground/90 inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-xs outline-none",
+            "group/trigger text-muted-foreground hover:text-foreground/90 inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-xs outline-none",
           )}
         >
           <span>Sources</span>
@@ -126,7 +126,7 @@ export function Sources({
               >
                 <div className="flex items-center gap-1.5">
                   <SourceGlyph domain={source.domain} />
-                  <span className={cn(mono, "text-foreground/40 truncate")}>
+                  <span className={cn(mono, "text-muted-foreground truncate")}>
                     {source.domain}
                   </span>
                 </div>

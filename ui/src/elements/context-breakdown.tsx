@@ -101,7 +101,7 @@ export function ContextBreakdown({
             Headroom
           </span>
           <span
-            className={cn(mono, "text-foreground/25 shrink-0 tabular-nums")}
+            className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
           >
             {fmt(Math.max(0, limit - used))}
           </span>

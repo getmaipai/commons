@@ -70,14 +70,14 @@ export function TodoList({
                   item.status === "done" &&
                     "text-muted-foreground line-through decoration-[1.5px]",
                   item.status === "active" && "text-foreground/90",
-                  item.status === "pending" && "text-foreground/50",
+                  item.status === "pending" && "text-muted-foreground",
                   item.status === "failed" && "text-red-600 dark:text-red-400",
                 )}
               >
                 {item.text}
               </span>
               {item.status === "failed" && item.reason ? (
-                <p className="text-foreground/45 text-xs leading-4 break-words">
+                <p className="text-muted-foreground text-xs leading-4 break-words">
                   {item.reason}
                 </p>
               ) : null}

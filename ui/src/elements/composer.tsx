@@ -198,11 +198,11 @@ export function ComposerCommandItem({
     <ComposerMenuItem active={active} {...props}>
       <command.icon className="text-muted-foreground size-3.5 shrink-0" />
       <span className="font-medium">/{command.name}</span>
-      <span className="text-foreground/45 flex-1 truncate text-start text-xs">
+      <span className="text-muted-foreground flex-1 truncate text-start text-xs">
         {command.description}
       </span>
       {active && (
-        <kbd className="bg-foreground/[0.06] text-foreground/45 rounded px-1 font-mono text-[10px]">
+        <kbd className="bg-foreground/[0.06] text-muted-foreground rounded px-1 font-mono text-[10px]">
           ↵
         </kbd>
       )}
@@ -220,7 +220,7 @@ export function ComposerPersonItem({
 }) {
   return (
     <ComposerMenuItem active={active} {...props}>
-      <span className="bg-foreground/[0.06] text-foreground/45 flex size-5 shrink-0 items-center justify-center rounded-full text-[9px] font-medium">
+      <span className="bg-foreground/[0.06] text-muted-foreground flex size-5 shrink-0 items-center justify-center rounded-full text-[9px] font-medium">
         {person.name[0]}
       </span>
       <span className="flex-1 truncate text-start">{person.name}</span>
@@ -263,7 +263,7 @@ export function ComposerAttachmentChip({
       )}
       {...props}
     >
-      <span className="bg-background text-foreground/45 flex size-8 shrink-0 items-center justify-center rounded-[10px] dark:bg-white/10">
+      <span className="bg-background text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-[10px] dark:bg-white/10">
         <Icon className="size-4" />
       </span>
       <span className="flex flex-col">
@@ -275,7 +275,7 @@ export function ComposerAttachmentChip({
             "text-[11px]",
             attachment.state === "error"
               ? "text-red-600/80 dark:text-red-400/80"
-              : "text-foreground/40",
+              : "text-muted-foreground",
           )}
         >
           {attachment.meta}
@@ -324,7 +324,7 @@ export function ComposerInput({
         onSubmit?.();
       }}
       className={cn(
-        "placeholder:text-foreground/35 min-h-11 w-full bg-transparent px-3 text-[15px] caret-blue-500 outline-none dark:caret-blue-400",
+        "placeholder:text-muted-foreground min-h-11 w-full bg-transparent px-3 text-[15px] caret-blue-500 outline-none dark:caret-blue-400",
         className,
       )}
       {...props}
@@ -367,11 +367,11 @@ export function ComposerVoice({
         ))}
       </div>
       {recording ? (
-        <span className={cn(mono, "text-foreground/40 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           0:{String(seconds).padStart(2, "0")}
         </span>
       ) : (
-        <ShimmerLabel className="text-foreground/55 relative text-[13px]">
+        <ShimmerLabel className="text-muted-foreground relative text-[13px]">
           Transcribing
         </ShimmerLabel>
       )}
@@ -442,7 +442,7 @@ export function ComposerModelTrigger({
       aria-expanded={open}
       data-slot="composer-model-trigger"
       className={cn(
-        "text-foreground/55 hover:bg-foreground/[0.06] hover:text-foreground/90 dark:hover:bg-foreground/[0.09] flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] transition-colors",
+        "text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 dark:hover:bg-foreground/[0.09] flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] transition-colors",
         className,
       )}
       {...props}
@@ -535,23 +535,23 @@ export function ComposerContext({
           {segments.map((segment) => (
             <div
               key={segment.label}
-              className="text-foreground/55 flex items-center gap-2.5 text-[13px]"
+              className="text-muted-foreground flex items-center gap-2.5 text-[13px]"
             >
               <span
                 aria-hidden
                 className={cn("size-1.5 rounded-full", segment.className)}
               />
               <span className="flex-1">{segment.label}</span>
-              <span className={cn(mono, "text-foreground/40 tabular-nums")}>
+              <span className={cn(mono, "text-muted-foreground tabular-nums")}>
                 {segment.value}k
               </span>
             </div>
           ))}
         </div>
         <div className="bg-foreground/[0.06] h-px" />
-        <div className="text-foreground/55 flex items-center justify-between text-[13px]">
+        <div className="text-muted-foreground flex items-center justify-between text-[13px]">
           <span>Total</span>
-          <span className={cn(mono, "text-foreground/40 tabular-nums")}>
+          <span className={cn(mono, "text-muted-foreground tabular-nums")}>
             {used}k / {usage.total}k
           </span>
         </div>

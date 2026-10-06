@@ -143,7 +143,7 @@ export function TaskCard({
         )}
         {elapsed !== undefined && (
           <span
-            className={cn(mono, "text-foreground/30 shrink-0 tabular-nums")}
+            className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
           >
             {elapsed}
           </span>

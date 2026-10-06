@@ -76,12 +76,12 @@ export function ApprovalCard({
       {...props}
     >
       <div className="flex items-center gap-3">
-        <span className="bg-foreground/[0.05] text-foreground/45 flex size-9 shrink-0 items-center justify-center rounded-xl">
+        <span className="bg-foreground/[0.05] text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-xl">
           {icon ?? <TerminalIcon className="size-4" />}
         </span>
         <div className="flex flex-col">
           <p className="text-[13.5px] font-medium">{title}</p>
-          <p className="text-foreground/45 text-xs">{subtitle}</p>
+          <p className="text-muted-foreground text-xs">{subtitle}</p>
         </div>
       </div>
 
@@ -104,7 +104,7 @@ export function ApprovalCard({
                 <button
                   type="button"
                   onClick={onDeny}
-                  className="text-foreground/55 hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
+                  className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
                 >
                   Deny
                 </button>
@@ -113,7 +113,7 @@ export function ApprovalCard({
                 <button
                   type="button"
                   onClick={onAlwaysAllow}
-                  className="text-foreground/55 hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
+                  className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
                 >
                   Always allow
                 </button>
@@ -135,7 +135,7 @@ export function ApprovalCard({
           ) : (
             <div
               key={state}
-              className="fade-in animate-in text-foreground/55 flex items-center gap-2 text-xs duration-300"
+              className="fade-in animate-in text-muted-foreground flex items-center gap-2 text-xs duration-300"
             >
               {state === "running" ? (
                 <>

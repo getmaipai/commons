@@ -59,7 +59,7 @@ export function AgentPlan({
               </span>
               <span
                 className={cn(
-                  done && "text-foreground/40",
+                  done && "text-muted-foreground",
                   active && "text-foreground/90",
                   !done && !active && "text-muted-foreground",
                 )}

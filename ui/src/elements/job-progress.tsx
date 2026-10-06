@@ -124,7 +124,7 @@ export function JobProgress({
                 ? "text-muted-foreground"
                 : i === stage
                   ? "text-foreground/90"
-                  : "text-foreground/20",
+                  : "text-muted-foreground",
             )}
           >
             {item.name}

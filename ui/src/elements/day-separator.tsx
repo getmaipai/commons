@@ -31,7 +31,7 @@ export function DayDivider({
       {...props}
     >
       <span className="bg-foreground/[0.08] h-px flex-1" />
-      <span className={cn(mono, "text-foreground/30")}>{label}</span>
+      <span className={cn(mono, "text-muted-foreground")}>{label}</span>
       <span className="bg-foreground/[0.08] h-px flex-1" />
     </div>
   );
@@ -79,7 +79,7 @@ export function DaySeparator({
               <span
                 className={cn(
                   mono,
-                  "text-foreground/0 group-hover:text-foreground/30 shrink-0 tabular-nums transition-colors",
+                  "text-foreground/0 group-hover:text-muted-foreground shrink-0 tabular-nums transition-colors",
                 )}
               >
                 {message.time}
