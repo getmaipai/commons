@@ -37,6 +37,14 @@ if [ "$DOCS_ONLY" = 0 ]; then
     fi
   done
 
+  if [ -f "spec/package.json" ]; then
+    # status-fixtures.test.ts reads schemas.resolved/; gen-py.sh also builds
+    # this ignored bundle later, but TypeScript tests need it beforehand, so it
+    # runs before the test loop (a fresh worktree has no bundle yet).
+    echo "== spec: resolve schemas"
+    (cd spec && bun run scripts/bundle-schemas.ts)
+  fi
+
   for workspace in core ui spec; do
     if [ -f "$workspace/package.json" ]; then
       echo "== $workspace: lint"
@@ -46,13 +54,6 @@ if [ "$DOCS_ONLY" = 0 ]; then
       (cd "$workspace" && bun test)
     fi
   done
-
-  if [ -f "spec/package.json" ]; then
-    # status-fixtures.test.ts reads schemas.resolved/; gen-py.sh also builds
-    # this ignored bundle later, but TypeScript tests need it beforehand.
-    echo "== spec: resolve schemas"
-    (cd spec && bun run scripts/bundle-schemas.ts)
-  fi
 
   if [ -f "spec/pyproject.toml" ]; then
     echo "== spec: ruff"
