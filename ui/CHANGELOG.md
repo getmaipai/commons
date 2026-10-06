@@ -16,6 +16,11 @@ Settings, Help and Log out, each fed by the host. `HeaderSearch` gains an
 additive `triggerClassName`. Without `rail`, `FullLayout` renders exactly as
 before.
 
+Reuse check: nothing shipped fits. The shipped Sidebar's icon mode expands
+and turns into a sheet on a phone, and no shipped profile menu carries
+status, notification or Incognito rows, so both parts are composed here
+from the shipped Tooltip, DropdownMenu, Avatar and HeaderSearch.
+
 ## [0.5.106] - ui-v0.5.106
 
 ### ACTIVITY-01d
