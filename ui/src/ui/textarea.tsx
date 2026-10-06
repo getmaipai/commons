@@ -1,8 +1,16 @@
 import * as React from "react"
 import { cn } from "@/kit/utils"
 
-function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
-  return (
+function Textarea({
+  className,
+  showCount = false,
+  ...props
+}: React.ComponentProps<"textarea"> & {
+  /** Draws "n/max" under the field while `maxLength` is set and the value
+   * is controlled. Off by default; the field is unchanged without it. */
+  showCount?: boolean
+}) {
+  const field = (
     <textarea
       data-slot="textarea"
       className={cn(
@@ -12,6 +20,15 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
       )}
       {...props}
     />
+  )
+  if (!showCount || props.maxLength === undefined || typeof props.value !== "string") return field
+  return (
+    <div data-slot="textarea-count-root" className="flex w-full flex-col gap-1">
+      {field}
+      <span data-slot="textarea-count" aria-hidden className="text-muted-foreground self-end text-xs tabular-nums">
+        {props.value.length}/{props.maxLength}
+      </span>
+    </div>
   )
 }
 

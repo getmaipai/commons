@@ -221,6 +221,16 @@ export type ThreadComponents = {
   composerDensity?: ComposerDensity | undefined;
   ComposerInputOverride?: ComponentType | undefined;
   ComposerNotice?: ComponentType | undefined;
+  /** PROJECTS-KIT-01: the composer's placeholder. Default "Send a message...". */
+  composerPlaceholder?: string | undefined;
+  /** PROJECTS-KIT-01: drawn under the composer of an empty thread, in place
+   * of the follow-up suggestions (a project page's Chats, Sources and
+   * Artifacts tabs). */
+  BelowComposer?: ComponentType | undefined;
+  /** PROJECTS-KIT-01: where an empty thread's Welcome and composer sit.
+   * "center" (default) centres them; "top" is a page layout: Welcome, then
+   * the composer, then `BelowComposer`, from the top. */
+  emptyLayout?: "center" | "top" | undefined;
   ComposerQueue?: ComponentType | undefined;
   sendHeld?: boolean | undefined;
   onEditSend?: ((messageId: string, turnId?: string) => void) | undefined;
@@ -354,7 +364,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
   temporary,
   scrollToBottomOffset,
 }) => {
-  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity, engineDown } = useContext(ThreadComponentsContext);
+  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity, engineDown, BelowComposer, emptyLayout } = useContext(ThreadComponentsContext);
   const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
   const [footerElement, setFooterElement] = useState<HTMLElement | null>(null);
 
@@ -407,7 +417,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
         <div
           className={cn(
             "mx-auto flex w-full max-w-(--thread-max-width) flex-1 flex-col px-4 pt-4",
-            isEmpty && "justify-center",
+            isEmpty && emptyLayout !== "top" && "justify-center",
           )}
         >
           <AuiIf condition={isNewChatView}>
@@ -444,7 +454,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
             )}
             <Composer autoFocus={autoFocus} />
             <AuiIf condition={isNewChatView}>
-              <ThreadSuggestions />
+              {BelowComposer ? <BelowComposer /> : <ThreadSuggestions />}
             </AuiIf>
           </ThreadPrimitive.ViewportFooter>
         </div>
@@ -873,7 +883,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 );
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerNotice, sendHeld: sendHeldProp, composerDensity } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerPlaceholder } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
@@ -893,7 +903,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
             <ComposerInputOverride />
           ) : (
             <ComposerInputField
-              placeholder="Send a message..."
+              placeholder={composerPlaceholder ?? "Send a message..."}
               autoFocus={autoFocus}
               submitMode={sendHeld ? "none" : undefined}
             />

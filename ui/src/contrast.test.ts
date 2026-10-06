@@ -51,8 +51,6 @@ const secondaryText: Record<string, string> = { light: readVar(lightRoot, "--mut
 const themeBlock = block(css, "@theme {", "}");
 const HUES: Record<string, string> = {
   violet: readVar(themeBlock, "--hue-violet"),
-  teal: readVar(themeBlock, "--hue-teal"),
-  orange: readVar(themeBlock, "--hue-orange"),
   pink: readVar(themeBlock, "--hue-pink"),
   red: readVar(themeBlock, "--hue-red"),
 };
@@ -61,8 +59,8 @@ const blueByTheme: Record<string, string> = { light: readVar(lightRoot, "--prima
 // Green and yellow (FACE-02L) are themed like blue: a bright value in
 // `@theme` and the dark root, a deeper one in the light root.
 const themedHues: Record<string, Record<string, string>> = {
-  light: { green: readVar(lightRoot, "--hue-green"), yellow: readVar(lightRoot, "--hue-yellow") },
-  dark: { green: readVar(darkRoot, "--hue-green"), yellow: readVar(darkRoot, "--hue-yellow") },
+  light: { green: readVar(lightRoot, "--hue-green"), yellow: readVar(lightRoot, "--hue-yellow"), teal: readVar(lightRoot, "--hue-teal"), orange: readVar(lightRoot, "--hue-orange") },
+  dark: { green: readVar(darkRoot, "--hue-green"), yellow: readVar(darkRoot, "--hue-yellow"), teal: readVar(darkRoot, "--hue-teal"), orange: readVar(darkRoot, "--hue-orange") },
 };
 
 // Linear-RGB alpha blend, not the OKLab `color-mix()` Tailwind's own

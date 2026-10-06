@@ -12,6 +12,7 @@ import {
   useAui,
   useAuiState,
 } from "@assistant-ui/react";
+import { ProjectMark } from "./project-mark";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import {
@@ -103,6 +104,26 @@ export type ThreadListProjectLabels = {
   empty?: string;
   /** Accessible name of a project row's menu button. Default "Project options". */
   projectOptions?: string;
+  /** Menu item that opens the project's settings (needs `onEdit`). Default "Edit project". */
+  editProject?: string;
+  /** Link row after the projects (needs `onSeeAll`). Default "See all projects". */
+  seeAll?: string;
+  /** Menu items when a host passes `onPin`. Defaults "Pin project" and "Unpin project". */
+  pinProject?: string;
+  unpinProject?: string;
+  /** Accessible name of the chevron that folds a project's chats (with `onOpen`). Default "Show or hide chats". */
+  toggleChats?: string;
+};
+
+/** One project in the list. `icon` and `color` are the spec's names (see
+ * `ProjectMark`); absent, the row is the plain folder it always was. */
+export type ThreadListProjectFolder = {
+  id: string;
+  name: string;
+  icon?: string | undefined;
+  color?: string | undefined;
+  /** A pinned project lists first, under Pinned. */
+  pinned?: boolean | undefined;
 };
 
 /**
@@ -114,7 +135,7 @@ export type ThreadListProjectLabels = {
  * deleting and starting a chat in a project are the host's callbacks.
  */
 export type ThreadListProjects = {
-  folders: ReadonlyArray<{ id: string; name: string }>;
+  folders: ReadonlyArray<ThreadListProjectFolder>;
   /** Make, rename and delete projects. Default false. */
   canManage?: boolean;
   /** Move chats in and out (menu and drag). Default true. */
@@ -123,6 +144,14 @@ export type ThreadListProjects = {
   onRename?: (id: string, name: string) => void | Promise<void>;
   onDelete?: (id: string) => void | Promise<void>;
   onNewChat?: (id: string) => void;
+  /** The project's name opens its page; the chevron still folds the row. */
+  onOpen?: (id: string) => void;
+  /** Adds "Edit project" to the row menu (the host opens its settings). */
+  onEdit?: (id: string) => void;
+  /** Adds Pin / Unpin project to the row menu. */
+  onPin?: (id: string, pinned: boolean) => void;
+  /** Adds a "See all projects" row after the list. */
+  onSeeAll?: () => void;
   labels?: ThreadListProjectLabels;
 };
 
@@ -142,6 +171,11 @@ const PROJECT_LABEL_DEFAULTS: Required<ThreadListProjectLabels> = {
   showLess: "Show less",
   empty: "No chats yet",
   projectOptions: "Project options",
+  editProject: "Edit project",
+  seeAll: "See all projects",
+  pinProject: "Pin project",
+  unpinProject: "Unpin project",
+  toggleChats: "Show or hide chats",
 };
 
 type ResolvedProjects = Omit<ThreadListProjects, "labels"> & {
@@ -440,14 +474,35 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
       components={{ ThreadListItem }}
     />
   );
+  const pinnedFolders = projects && !query && pin.pinnable ? projects.folders.filter((folder) => folder.pinned) : [];
+  const pinnedProjectRows = projects
+    ? pinnedFolders.map((folder) => (
+        <ThreadListProjectRow key={folder.id} folder={folder} projects={projects} indices={byFolder.get(folder.id) ?? []} row={row} />
+      ))
+    : [];
+  const pinnedLabel = (
+    <div
+      data-slot="aui_thread-list-group-label"
+      className="text-muted-foreground px-2.5 pt-3 pb-1 text-xs font-medium"
+    >
+      {pin.pinned}
+    </div>
+  );
   const section =
     projects && !query ? (
-      <ThreadListProjectsSection projects={projects} byFolder={byFolder} row={row} />
+      <ThreadListProjectsSection
+        projects={projects}
+        byFolder={byFolder}
+        row={row}
+        skip={new Set(pinnedFolders.map((folder) => folder.id))}
+      />
     ) : null;
 
   if (!groups) {
     return (
       <>
+        {pinnedProjectRows.length > 0 ? pinnedLabel : null}
+        {pinnedProjectRows}
         {section}
         {looseIndices.map(row)}
       </>
@@ -457,7 +512,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
   // Pinned (when present) leads, then Projects, then the day groups.
   const pinnedFirst = pin.pinnable && groups[0]?.label === pin.pinned ? groups[0] : null;
   const rest = pinnedFirst ? groups.slice(1) : groups;
-  const renderGroup = (group: ThreadListGroup) => (
+  const renderGroup = (group: ThreadListGroup, leading?: React.ReactNode) => (
     <Fragment key={group.label}>
       <div
         data-slot="aui_thread-list-group-label"
@@ -465,12 +520,18 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
       >
         {group.label}
       </div>
+      {leading}
       {group.indices.map(row)}
     </Fragment>
   );
   return (
     <>
-      {pinnedFirst ? renderGroup(pinnedFirst) : null}
+      {pinnedFirst ? renderGroup(pinnedFirst, pinnedProjectRows) : pinnedProjectRows.length > 0 ? (
+        <>
+          {pinnedLabel}
+          {pinnedProjectRows}
+        </>
+      ) : null}
       {section}
       {rest.map(renderGroup)}
     </>
@@ -483,7 +544,9 @@ const ThreadListProjectsSection: FC<{
   projects: ResolvedProjects;
   byFolder: Map<string, number[]>;
   row: (index: number) => React.ReactNode;
-}> = ({ projects, byFolder, row }) => {
+  /** Projects already drawn under Pinned. */
+  skip?: ReadonlySet<string>;
+}> = ({ projects, byFolder, row, skip }) => {
   const { labels } = projects;
   const [creating, setCreating] = useState(false);
   const canCreate = projects.canManage && Boolean(projects.onCreate);
@@ -525,15 +588,27 @@ const ThreadListProjectsSection: FC<{
           }}
         />
       ) : null}
-      {projects.folders.map((folder) => (
-        <ThreadListProjectRow
-          key={folder.id}
-          folder={folder}
-          projects={projects}
-          indices={byFolder.get(folder.id) ?? []}
-          row={row}
-        />
-      ))}
+      {projects.folders
+        .filter((folder) => !skip?.has(folder.id))
+        .map((folder) => (
+          <ThreadListProjectRow
+            key={folder.id}
+            folder={folder}
+            projects={projects}
+            indices={byFolder.get(folder.id) ?? []}
+            row={row}
+          />
+        ))}
+      {projects.onSeeAll ? (
+        <Button
+          variant="ghost"
+          data-slot="aui_thread-list-projects-see-all"
+          className="text-muted-foreground h-8 justify-start rounded-md px-2.5 text-sm font-normal"
+          onClick={() => projects.onSeeAll?.()}
+        >
+          {labels.seeAll}
+        </Button>
+      ) : null}
     </div>
   );
 };
@@ -581,7 +656,7 @@ const ProjectNameField: FC<{
 };
 
 const ThreadListProjectRow: FC<{
-  folder: { id: string; name: string };
+  folder: ThreadListProjectFolder;
   projects: ResolvedProjects;
   indices: number[];
   row: (index: number) => React.ReactNode;
@@ -660,6 +735,39 @@ const ThreadListProjectRow: FC<{
               }
             }}
           />
+        ) : projects.onOpen ? (
+          <>
+            <button
+              type="button"
+              data-slot="aui_thread-list-project-open"
+              onClick={() => projects.onOpen?.(folder.id)}
+              className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center gap-2 rounded-[inherit] text-start outline-none group-hover:pe-16 group-has-focus-visible:pe-16 group-has-data-[state=open]:pe-16 focus-visible:ring-1"
+            >
+              <ProjectMark icon={folder.icon} color={folder.color} />
+              <span data-slot="aui_thread-list-project-title" className="min-w-0 flex-1 truncate">
+                {folder.name}
+              </span>
+            </button>
+            <CollapsibleTrigger asChild>
+              <button
+                ref={triggerRef}
+                type="button"
+                data-slot="aui_thread-list-project-trigger"
+                aria-label={labels.toggleChats}
+                onKeyDown={onKeyDown}
+                className="focus-visible:ring-ring/50 relative flex h-full w-7 shrink-0 items-center justify-center rounded-[inherit] outline-none focus-visible:ring-1"
+              >
+                <ChevronRightIcon
+                  aria-hidden
+                  data-slot="aui_thread-list-project-chevron"
+                  className={cn(
+                    "text-muted-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+                    open && "rotate-90",
+                  )}
+                />
+              </button>
+            </CollapsibleTrigger>
+          </>
         ) : (
           <CollapsibleTrigger asChild>
             <button
@@ -669,7 +777,7 @@ const ThreadListProjectRow: FC<{
               onKeyDown={onKeyDown}
               className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center gap-2 rounded-[inherit] text-start outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 focus-visible:ring-1"
             >
-              <FolderIcon aria-hidden data-slot="aui_thread-list-project-icon" className="text-muted-foreground size-4 shrink-0" />
+              <ProjectMark icon={folder.icon} color={folder.color} />
               <span data-slot="aui_thread-list-project-title" className="min-w-0 flex-1 truncate">
                 {folder.name}
               </span>
@@ -684,7 +792,7 @@ const ThreadListProjectRow: FC<{
             </button>
           </CollapsibleTrigger>
         )}
-        {mode !== "rename" && (projects.onNewChat || (projects.canManage && (projects.onRename || projects.onDelete))) ? (
+        {mode !== "rename" && (projects.onNewChat || projects.onEdit || projects.onPin || (projects.canManage && (projects.onRename || projects.onDelete))) ? (
           <DropdownMenuPrimitive.Root>
             <DropdownMenuPrimitive.Trigger asChild>
               <Button
@@ -709,6 +817,18 @@ const ThreadListProjectRow: FC<{
                   <DropdownMenuPrimitive.Item className={menuItemClass} onSelect={() => projects.onNewChat?.(folder.id)}>
                     <PencilIcon className="size-4" />
                     {labels.newChatInProject}
+                  </DropdownMenuPrimitive.Item>
+                ) : null}
+                {projects.canManage && projects.onEdit ? (
+                  <DropdownMenuPrimitive.Item className={menuItemClass} onSelect={() => projects.onEdit?.(folder.id)}>
+                    <PencilIcon className="size-4" />
+                    {labels.editProject}
+                  </DropdownMenuPrimitive.Item>
+                ) : null}
+                {projects.onPin ? (
+                  <DropdownMenuPrimitive.Item className={menuItemClass} onSelect={() => projects.onPin?.(folder.id, !folder.pinned)}>
+                    {folder.pinned ? <PinOffIcon className="size-4" /> : <PinIcon className="size-4" />}
+                    {folder.pinned ? labels.unpinProject : labels.pinProject}
                   </DropdownMenuPrimitive.Item>
                 ) : null}
                 {projects.canManage && projects.onRename ? (

@@ -284,4 +284,68 @@ describe("ThreadList projects mode", () => {
     });
     await waitFor(() => expect(onDelete).toHaveBeenCalledWith("folder-garden"));
   });
+
+  test("a project row draws its icon in its colour; without them it is the plain folder", async () => {
+    const view = render(
+      <Harness
+        projects={{ folders: [{ id: "folder-garden", name: "Garden", icon: "leaf", color: "green" }, { id: "folder-trip", name: "Trip" }] }}
+        seeds={[]}
+      />,
+    );
+    const garden = (await projectRow(view, "Garden")).querySelector("[data-slot=project-mark]") as HTMLElement;
+    expect(garden.dataset.hue).toBe("green");
+    expect(garden.style.color).toBe("var(--hue-green)");
+    const trip = (await projectRow(view, "Trip")).querySelector("[data-slot=project-mark]") as HTMLElement;
+    expect(trip.dataset.hue).toBe("neutral");
+  });
+
+  test("onOpen makes the name open the page while the chevron still folds the row", async () => {
+    const onOpen = mock(() => {});
+    const view = render(<Harness projects={{ folders, onOpen }} seeds={[{ remoteId: "a", title: "Alpha", folder: "folder-garden" }]} />);
+    const row = await projectRow(view, "Garden");
+    fireEvent.click(row.querySelector("[data-slot=aui_thread-list-project-open]") as HTMLElement);
+    expect(onOpen).toHaveBeenCalledWith("folder-garden");
+    expect(view.queryByText("Alpha")).toBeNull();
+    fireEvent.click(row.querySelector("[data-slot=aui_thread-list-project-trigger]") as HTMLElement);
+    await view.findByText("Alpha");
+    expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  test("Edit project, Pin project and See all projects appear only when the host passes them", async () => {
+    const onEdit = mock(() => {});
+    const onPin = mock(() => {});
+    const onSeeAll = mock(() => {});
+    const plain = render(<Harness projects={{ folders, canManage: true }} seeds={[]} />);
+    expect(plain.container.querySelector("[data-slot=aui_thread-list-projects-see-all]")).toBeNull();
+    plain.unmount();
+    const view = render(<Harness projects={{ folders, canManage: true, onEdit, onPin, onSeeAll }} seeds={[]} />);
+    const more = (await projectRow(view, "Garden")).querySelector("[data-slot=aui_thread-list-project-more]") as HTMLElement;
+    fireEvent.pointerDown(more, { button: 0, pointerType: "mouse" });
+    fireEvent.click(await view.findByText("Edit project"));
+    expect(onEdit).toHaveBeenCalledWith("folder-garden");
+    fireEvent.pointerDown(more, { button: 0, pointerType: "mouse" });
+    fireEvent.click(await view.findByText("Pin project"));
+    expect(onPin).toHaveBeenCalledWith("folder-garden", true);
+    fireEvent.click(view.getByText("See all projects"));
+    expect(onSeeAll).toHaveBeenCalledTimes(1);
+  });
+
+  test("a child's host (canManage false) gets no Edit project", async () => {
+    const view = render(<Harness projects={{ folders, canManage: false, onEdit: () => {}, onPin: () => {} }} seeds={[]} />);
+    fireEvent.pointerDown((await projectRow(view, "Garden")).querySelector("[data-slot=aui_thread-list-project-more]") as HTMLElement, { button: 0, pointerType: "mouse" });
+    await view.findByText("Pin project");
+    expect(view.queryByText("Edit project")).toBeNull();
+  });
+
+  test("pinned projects list under Pinned, before the Projects section, once", async () => {
+    const view = render(
+      <Harness pinnable projects={{ folders: [{ id: "folder-garden", name: "Garden", pinned: true }, { id: "folder-trip", name: "Trip" }] }} seeds={[{ remoteId: "a", title: "Alpha" }]} />,
+    );
+    await view.findByText("Alpha");
+    expect(labels(view)).toEqual(["Pinned", "Projects", "Today"]);
+    expect(view.getAllByText("Garden")).toHaveLength(1);
+    const order = [...view.container.querySelectorAll("[data-slot=aui_thread-list-group-label], [data-slot=aui_thread-list-project]")].map((el) => el.textContent);
+    expect(order.indexOf("Pinned")).toBeLessThan(order.findIndex((text) => text?.startsWith("Garden")));
+    expect(order.findIndex((text) => text?.startsWith("Garden"))).toBeLessThan(order.indexOf("Projects"));
+  });
 });

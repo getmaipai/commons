@@ -494,6 +494,8 @@
   --profile-accent-red: #e2b1a7;
   --profile-accent-red-foreground: #07111f;
   --hue-green: #1a9c48;
+  --hue-teal: #009a76;
+  --hue-orange: #d96300;
   --hue-yellow: #b58700;
   --primary: #21a6ff;
   /* Dark navy text on the electric blue, not white: ~7.2:1 measured,
@@ -604,6 +606,8 @@
     --profile-accent-red: #593438;
     --profile-accent-red-foreground: #f4f8ff;
     --hue-green: #22c55e;
+    --hue-teal: #00e3ae;
+    --hue-orange: #ff8a35;
     --hue-yellow: #facc15;
     --primary: #21a6ff;
     --primary-foreground: #07111f;
@@ -672,6 +676,8 @@
   --profile-accent-red: #593438;
   --profile-accent-red-foreground: #f4f8ff;
   --hue-green: #22c55e;
+  --hue-teal: #00e3ae;
+  --hue-orange: #ff8a35;
   --hue-yellow: #facc15;
   --primary: #21a6ff;
   --primary-foreground: #07111f;

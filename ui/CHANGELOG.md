@@ -1,5 +1,23 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.135] - ui-v0.5.135
+
+### PROJECTS-KIT-01 (additive)
+
+New `ProjectMark` (a project's icon in its colour; one drawing for the column,
+listing, page header and dialog), `ProjectIconPicker` (the icon button beside the
+name field with the colour and icon grids), `PROJECT_HUES` and
+`PROJECT_ICON_NAMES` (equal to spec `vocab/project-icons.json`, tested).
+`ThreadListProjects.folders` items take optional `icon`, `color`, `pinned`;
+new optional callbacks `onOpen` (name opens the page, chevron still folds),
+`onEdit`, `onPin`, `onSeeAll` with labels; pinned projects list under Pinned.
+`Thread` components take `composerPlaceholder`, `BelowComposer` and
+`emptyLayout: "top"` (a page layout). `Textarea` takes `showCount`. Sixteen
+project icons join the registry. Teal and orange are now themed like green and
+yellow (deeper in the light root, so they clear the 3:1 floor); contrast tests
+cover them in both themes. Everything is absent-safe: without the new props
+nothing changes.
+
 ## [0.5.134] - ui-v0.5.134
 
 (ui-v0.5.133 was tagged with a stale package.json version and is not used.)
