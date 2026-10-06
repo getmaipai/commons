@@ -181,7 +181,13 @@ class Notification(BaseModel):
         ..., description='`{var}`-interpolated, per docs/NOTIFICATIONS.md.'
     )
     configurable: bool
-    default_channels: list[Literal['in_app', 'telegram']] = Field(..., min_length=1)
+    privacy: bool | None = Field(
+        None,
+        description='Whether the notification is private. If absent, consumers must treat it as private.',
+    )
+    default_channels: list[Literal['in_app', 'telegram', 'robot']] = Field(
+        ..., min_length=1
+    )
     actions: list[Literal['acknowledge', 'quiet_here', 'false_alarm']] | None = Field(
         None, description='Actions available for the safety.alarm notification type.'
     )

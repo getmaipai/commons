@@ -12,10 +12,9 @@ from pydantic import (
     Field,
     RootModel,
     confloat,
+    conint,
     constr,
 )
-
-from . import robot_offer_schema
 
 
 class DeviceCommand1(BaseModel):
@@ -105,7 +104,17 @@ class Payload2(BaseModel):
         extra='forbid',
     )
     notification_id: constr(min_length=1)
+    person_id: constr(min_length=1)
     text: constr(min_length=1, max_length=1000)
+
+
+class Payload3(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    notification_id: constr(min_length=1)
+    person_id: constr(min_length=1)
+    form: Literal['waiting']
 
 
 class DeviceCommand5(BaseModel):
@@ -121,10 +130,10 @@ class DeviceCommand5(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload2
+    payload: Payload2 | Payload3
 
 
-class Payload3(BaseModel):
+class Payload4(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -145,10 +154,36 @@ class DeviceCommand6(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload3
+    payload: Payload4
 
 
 class Payload5(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    offer_id: constr(min_length=1, max_length=128)
+    person_id: constr(pattern=r'^person-[a-z0-9]{6,}$')
+    tier: conint(ge=1, le=3)
+    non_personal_line: constr(min_length=1, max_length=300)
+
+
+class DeviceCommand7(BaseModel):
+    """
+    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['offer']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload5
+
+
+class Payload6(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -168,10 +203,10 @@ class DeviceCommand8(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload5
+    payload: Payload6
 
 
-class Payload6(BaseModel):
+class Payload7(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -191,10 +226,10 @@ class DeviceCommand9(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload6
+    payload: Payload7
 
 
-class Payload7(BaseModel):
+class Payload8(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -214,10 +249,10 @@ class DeviceCommand10(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload7
+    payload: Payload8
 
 
-class Payload8(BaseModel):
+class Payload9(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -239,10 +274,10 @@ class DeviceCommand11(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload8
+    payload: Payload9
 
 
-class Payload9(BaseModel):
+class Payload10(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -262,10 +297,10 @@ class DeviceCommand12(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload9
+    payload: Payload10
 
 
-class Payload10(BaseModel):
+class Payload11(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -285,30 +320,7 @@ class DeviceCommand13(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload10
-
-
-class Payload4(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    offer: robot_offer_schema.RobotOffer
-
-
-class DeviceCommand7(BaseModel):
-    """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
-    """
-
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    id: constr(min_length=1, max_length=128)
-    kind: Literal['offer']
-    issued_at: AwareDatetime
-    expires_at: AwareDatetime
-    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload4
+    payload: Payload11
 
 
 class DeviceCommand(

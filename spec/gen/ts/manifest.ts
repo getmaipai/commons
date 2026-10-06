@@ -442,7 +442,16 @@ export const PackageManifest = z
               .min(1)
               .describe("`{var}`-interpolated, per docs/NOTIFICATIONS.md."),
             configurable: z.boolean(),
-            default_channels: z.array(z.enum(["in_app", "telegram"])).min(1),
+            /**Whether the notification is private. If absent, consumers must treat it as private.*/
+            privacy: z
+              .boolean()
+              .describe(
+                "Whether the notification is private. If absent, consumers must treat it as private.",
+              )
+              .optional(),
+            default_channels: z
+              .array(z.enum(["in_app", "telegram", "robot"]))
+              .min(1),
             /**Actions available for the safety.alarm notification type.*/
             actions: z
               .array(z.enum(["acknowledge", "quiet_here", "false_alarm"]))

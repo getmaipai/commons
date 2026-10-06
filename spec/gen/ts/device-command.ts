@@ -71,12 +71,60 @@ export const DeviceCommand = z
           issued_at: z.string().datetime({ offset: true }),
           expires_at: z.string().datetime({ offset: true }),
           hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
-          payload: z
-            .object({
-              notification_id: z.string().min(1),
-              text: z.string().min(1).max(1000),
-            })
-            .strict(),
+          payload: z.any().superRefine((x, ctx) => {
+            const schemas = [
+              z
+                .object({
+                  notification_id: z.string().min(1),
+                  person_id: z.string().min(1),
+                  text: z.string().min(1).max(1000),
+                })
+                .strict(),
+              z
+                .object({
+                  notification_id: z.string().min(1),
+                  person_id: z.string().min(1),
+                  form: z.literal("waiting"),
+                })
+                .strict(),
+            ];
+            const { errors, failed } = schemas.reduce<{
+              errors: z.core.$ZodIssue[];
+              failed: number;
+            }>(
+              ({ errors, failed }, schema) =>
+                ((result) =>
+                  result.error
+                    ? {
+                        errors: [...errors, ...result.error.issues],
+                        failed: failed + 1,
+                      }
+                    : { errors, failed })(schema.safeParse(x)),
+              { errors: [], failed: 0 },
+            );
+            const passed = schemas.length - failed;
+            if (passed !== 1) {
+              ctx.addIssue(
+                errors.length
+                  ? {
+                      path: [],
+                      code: "invalid_union",
+                      errors: [errors],
+                      message:
+                        "Invalid input: Should pass single schema. Passed " +
+                        passed,
+                    }
+                  : {
+                      path: [],
+                      code: "custom",
+                      errors: [errors],
+                      message:
+                        "Invalid input: Should pass single schema. Passed " +
+                        passed,
+                    },
+              );
+            }
+          }),
         })
         .strict(),
       z
@@ -108,21 +156,10 @@ export const DeviceCommand = z
           hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
           payload: z
             .object({
-              offer: z
-                .object({
-                  id: z.string().min(1).max(128),
-                  person_id: z
-                    .string()
-                    .regex(new RegExp("^person-[a-z0-9]{6,}$")),
-                  tier: z.number().int().gte(1).lte(3),
-                  text: z.string().min(1).max(500),
-                  expires_at: z.string().datetime({ offset: true }),
-                  provenance: z.string().min(1).max(300),
-                  hlc: z
-                    .string()
-                    .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
-                })
-                .strict(),
+              offer_id: z.string().min(1).max(128),
+              person_id: z.string().regex(new RegExp("^person-[a-z0-9]{6,}$")),
+              tier: z.number().int().gte(1).lte(3),
+              non_personal_line: z.string().min(1).max(300),
             })
             .strict(),
         })

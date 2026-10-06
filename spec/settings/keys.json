@@ -673,6 +673,20 @@
     ]
   },
   {
+    "key": "notifications.time_sensitive.robot",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Send time-sensitive notifications to a robot",
+    "help": "Deliver time-sensitive notifications through a robot channel when one is configured. Private notification content is never spoken.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.notifications",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "notifications.updates.available.telegram",
     "scope": "person",
     "selector": "boolean",

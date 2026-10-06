@@ -291,9 +291,10 @@
           "audience": { "type": "string", "enum": ["person", "household", "adults"] },
           "template": { "type": "string", "minLength": 1, "description": "`{var}`-interpolated, per docs/NOTIFICATIONS.md." },
           "configurable": { "type": "boolean" },
+          "privacy": { "type": "boolean", "description": "Whether the notification is private. If absent, consumers must treat it as private." },
           "default_channels": {
             "type": "array",
-            "items": { "type": "string", "enum": ["in_app", "telegram"] },
+            "items": { "type": "string", "enum": ["in_app", "telegram", "robot"] },
             "minItems": 1
           },
           "actions": {

@@ -57,5 +57,8 @@ describe("SETTINGS-ROBOT-01 declarations", () => {
     expect(keys.get("robot.gestures.enabled")?.default).toBe(false);
     expect(keys.get("robot.initiative.allowed_here")?.default).toBe(false);
     expect(keys.get("person.vision.watch")?.default).toBe("presence");
+    expect(keys.get("notifications.time_sensitive.robot")?.default).toBe(false);
+    expect(keys.has("person.robot.may_address")).toBe(true);
+    expect(keys.has("person.robot.greet_by_name")).toBe(true);
   });
 });

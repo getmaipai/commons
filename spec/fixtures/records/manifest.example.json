@@ -42,7 +42,8 @@
     "audience": "household",
     "template": "Safety alarm: {kind} in {area}.",
     "configurable": false,
-    "default_channels": ["in_app"],
+    "privacy": true,
+    "default_channels": ["in_app", "robot"],
     "actions": ["acknowledge", "quiet_here", "false_alarm"]
   }],
   "backup": "hot",

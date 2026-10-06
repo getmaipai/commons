@@ -7,7 +7,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -39,7 +46,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -71,7 +85,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -97,7 +118,10 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["turn_id", "kind"],
+          "required": [
+            "turn_id",
+            "kind"
+          ],
           "properties": {
             "turn_id": {
               "type": "string",
@@ -114,7 +138,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -140,14 +171,22 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["alarm_id", "area", "kind", "state"],
+          "required": [
+            "alarm_id",
+            "area",
+            "kind",
+            "state"
+          ],
           "properties": {
             "alarm_id": {
               "type": "string",
               "minLength": 1
             },
             "area": {
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             },
             "kind": {
               "type": "string",
@@ -161,7 +200,11 @@
             },
             "state": {
               "type": "string",
-              "enum": ["active", "cleared", "false_alarm"]
+              "enum": [
+                "active",
+                "cleared",
+                "false_alarm"
+              ]
             }
           }
         }
@@ -170,7 +213,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -194,27 +244,69 @@
           "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
         },
         "payload": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["notification_id", "text"],
-          "properties": {
-            "notification_id": {
-              "type": "string",
-              "minLength": 1
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "notification_id",
+                "person_id",
+                "text"
+              ],
+              "properties": {
+                "notification_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "person_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                }
+              }
             },
-            "text": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 1000
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "notification_id",
+                "person_id",
+                "form"
+              ],
+              "properties": {
+                "notification_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "person_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "form": {
+                  "type": "string",
+                  "const": "waiting"
+                }
+              }
             }
-          }
+          ]
         }
       }
     },
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -240,14 +332,24 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["gesture"],
+          "required": [
+            "gesture"
+          ],
           "properties": {
             "gesture": {
               "type": "string",
-              "enum": ["doorbell", "timer", "arrival", "perk"]
+              "enum": [
+                "doorbell",
+                "timer",
+                "arrival",
+                "perk"
+              ]
             },
             "bearing": {
-              "type": ["number", "null"],
+              "type": [
+                "number",
+                "null"
+              ],
               "minimum": -3.141592653589793,
               "maximum": 3.141592653589793
             }
@@ -258,7 +360,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -284,10 +393,31 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["offer"],
+          "required": [
+            "offer_id",
+            "person_id",
+            "tier",
+            "non_personal_line"
+          ],
           "properties": {
-            "offer": {
-              "$ref": "robot-offer.schema.json"
+            "offer_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "person_id": {
+              "type": "string",
+              "pattern": "^person-[a-z0-9]{6,}$"
+            },
+            "tier": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3
+            },
+            "non_personal_line": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
             }
           }
         }
@@ -296,7 +426,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -322,7 +459,9 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["move_id"],
+          "required": [
+            "move_id"
+          ],
           "properties": {
             "move_id": {
               "type": "string",
@@ -335,7 +474,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -361,7 +507,9 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["values"],
+          "required": [
+            "values"
+          ],
           "properties": {
             "values": {
               "type": "object"
@@ -373,7 +521,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -399,7 +554,9 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["hub_time"],
+          "required": [
+            "hub_time"
+          ],
           "properties": {
             "hub_time": {
               "type": "string",
@@ -412,7 +569,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -438,7 +602,11 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["view_id", "fps", "size"],
+          "required": [
+            "view_id",
+            "fps",
+            "size"
+          ],
           "properties": {
             "view_id": {
               "type": "string",
@@ -459,7 +627,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -485,7 +660,9 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["view_id"],
+          "required": [
+            "view_id"
+          ],
           "properties": {
             "view_id": {
               "type": "string",
@@ -498,7 +675,14 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -524,7 +708,9 @@
         "payload": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["manifest_version"],
+          "required": [
+            "manifest_version"
+          ],
           "properties": {
             "manifest_version": {
               "type": "string",

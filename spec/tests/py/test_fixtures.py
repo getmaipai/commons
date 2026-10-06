@@ -33,6 +33,7 @@ from gen.py.reply_constraint_schema import ReplyConstraint
 from gen.py.reply_feedback_schema import ReplyFeedback
 from gen.py.reply_plan_schema import ReplyPlan
 from gen.py.robot_asset_manifest_schema import RobotAssetManifest
+from gen.py.robot_channel_frame_schema import RobotChannelFrame
 from gen.py.robot_offer_schema import RobotOffer
 from gen.py.robot_state_schema import RobotState
 from gen.py.safety_result_schema import SafetyResult
@@ -117,12 +118,33 @@ def test_reachy_eye_capability_is_only_on_the_fitted_fixture():
 
 def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
     commands = load_fixture("device-command.kinds.example.json")
-    assert len(commands) == 13
+    assert len(commands) == 14
     for command in commands:
         DeviceCommand.model_validate(command)
     invalid = {**commands[0], "kind": "capture_request"}
     with pytest.raises(ValidationError):
         DeviceCommand.model_validate(invalid)
+    with pytest.raises(ValidationError):
+        DeviceCommand.model_validate(
+            load_fixture("device-command.notify-waiting-with-text.invalid.example.json")
+        )
+    offer = next(command for command in commands if command["kind"] == "offer")
+    assert "text" not in offer["payload"]
+    with pytest.raises(ValidationError):
+        DeviceCommand.model_validate(
+            {**offer, "payload": {**offer["payload"], "text": "prepared content"}}
+        )
+
+
+def test_robot_channel_frames_and_voice_only_answers():
+    frames = load_fixture("robot-channel-frame.kinds.example.json")
+    assert len(frames) == 4
+    for frame in frames:
+        RobotChannelFrame.model_validate(frame)
+    with pytest.raises(ValidationError):
+        RobotChannelFrame.model_validate(
+            load_fixture("robot-channel-frame.gesture-answer.invalid.example.json")
+        )
 
 
 def test_robot_offer_fixture():

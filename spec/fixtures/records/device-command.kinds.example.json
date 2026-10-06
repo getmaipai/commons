@@ -44,7 +44,8 @@
     "kind": "notify",
     "payload": {
       "notification_id": "timer.finished",
-      "text": "The timer is done."
+      "text": "The timer is done.",
+      "person_id": "person-abc123"
     },
     "issued_at": "2026-10-05T12:00:00Z",
     "expires_at": "2026-10-05T12:01:00Z",
@@ -65,15 +66,10 @@
     "id": "cmd-offer",
     "kind": "offer",
     "payload": {
-      "offer": {
-        "id": "offer-abc123",
-        "person_id": "person-abc123",
-        "tier": 2,
-        "text": "Want to hear a story?",
-        "expires_at": "2026-10-05T12:10:00Z",
-        "provenance": "robot.initiative",
-        "hlc": "1791201600000:0:robot123"
-      }
+      "offer_id": "offer-abc123",
+      "person_id": "person-abc123",
+      "tier": 2,
+      "non_personal_line": "I have something for you."
     },
     "issued_at": "2026-10-05T12:00:00Z",
     "expires_at": "2026-10-05T12:01:00Z",
@@ -138,6 +134,18 @@
     "kind": "asset_changed",
     "payload": {
       "manifest_version": "assets-abc123"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-notify-waiting",
+    "kind": "notify",
+    "payload": {
+      "notification_id": "doorbell.ring",
+      "person_id": "person-abc123",
+      "form": "waiting"
     },
     "issued_at": "2026-10-05T12:00:00Z",
     "expires_at": "2026-10-05T12:01:00Z",

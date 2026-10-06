@@ -1,0 +1,8 @@
+{
+  "kind": "offer_answer",
+  "payload": {
+    "offer_id": "offer-abc123",
+    "approved": true,
+    "source": "gesture"
+  }
+}

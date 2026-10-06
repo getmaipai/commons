@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/robot-channel-frame.schema.json",
+  "title": "RobotChannelFrame",
+  "description": "A typed robot-to-hub frame carried by the robot notification channel.",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "payload"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "ack"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "command_id",
+            "delivered_at"
+          ],
+          "properties": {
+            "command_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "delivered_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "payload"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "offer_answer"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "offer_id",
+            "approved",
+            "source"
+          ],
+          "properties": {
+            "offer_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "approved": {
+              "type": "boolean"
+            },
+            "source": {
+              "type": "string",
+              "enum": [
+                "voice"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "payload"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "offer_snooze"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "offer_id",
+            "source"
+          ],
+          "properties": {
+            "offer_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "source": {
+              "type": "string",
+              "enum": [
+                "voice"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

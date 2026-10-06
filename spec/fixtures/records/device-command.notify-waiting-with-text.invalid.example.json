@@ -1,0 +1,13 @@
+{
+  "id": "cmd-notify-invalid",
+  "kind": "notify",
+  "payload": {
+    "notification_id": "doorbell.ring",
+    "person_id": "person-abc123",
+    "form": "waiting",
+    "text": "private content"
+  },
+  "issued_at": "2026-10-05T12:00:00Z",
+  "expires_at": "2026-10-05T12:01:00Z",
+  "hlc": "1791201600000:0:robot123"
+}

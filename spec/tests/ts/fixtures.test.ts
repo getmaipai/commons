@@ -21,6 +21,7 @@ import { Conversation } from "../../gen/ts/conversation.js";
 import { Device } from "../../gen/ts/device.js";
 import { RobotState } from "../../gen/ts/robot-state.js";
 import { DeviceCommand } from "../../gen/ts/device-command.js";
+import { RobotChannelFrame } from "../../gen/ts/robot-channel-frame.js";
 import { RobotOffer } from "../../gen/ts/robot-offer.js";
 import { RobotAssetManifest } from "../../gen/ts/robot-asset-manifest.js";
 import { StackFitPlan } from "../../gen/ts/stack-fit-plan.js";
@@ -145,10 +146,25 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
     const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
-    expect(commands).toHaveLength(13);
+    expect(commands).toHaveLength(14);
     for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();
+    const fixtures = join(import.meta.dir, "..", "..", "fixtures", "records");
+    const waitingWithText = JSON.parse(readFileSync(join(fixtures, "device-command.notify-waiting-with-text.invalid.example.json"), "utf-8"));
+    expect(() => DeviceCommand.parse(waitingWithText)).toThrow();
+    const offer = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "offer")!;
+    expect(offer.payload).not.toHaveProperty("text");
+    expect(() => DeviceCommand.parse({ ...offer, payload: { ...offer.payload, text: "prepared content" } })).toThrow();
+  });
+
+  test("robot channel frames accept voice answers and reject gesture answers", () => {
+    const fixtures = join(import.meta.dir, "..", "..", "fixtures", "records");
+    const frames = JSON.parse(readFileSync(join(fixtures, "robot-channel-frame.kinds.example.json"), "utf-8")) as unknown[];
+    expect(frames).toHaveLength(4);
+    for (const frame of frames) expect(() => RobotChannelFrame.parse(frame)).not.toThrow();
+    const invalid = JSON.parse(readFileSync(join(fixtures, "robot-channel-frame.gesture-answer.invalid.example.json"), "utf-8"));
+    expect(() => RobotChannelFrame.parse(invalid)).toThrow();
   });
 
   test("robot offer fixture validates", () => {

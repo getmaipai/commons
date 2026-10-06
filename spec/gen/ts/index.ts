@@ -31,6 +31,7 @@ export * from "./reply-feedback.js";
 export * from "./reply-plan.js";
 export * from "./result.js";
 export * from "./robot-asset-manifest.js";
+export * from "./robot-channel-frame.js";
 export * from "./robot-offer.js";
 export * from "./robot-state.js";
 export * from "./safety-result.js";

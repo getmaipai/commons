@@ -1,0 +1,32 @@
+[
+  {
+    "kind": "ack",
+    "payload": {
+      "command_id": "cmd-notify",
+      "delivered_at": "2026-10-05T12:00:01Z"
+    }
+  },
+  {
+    "kind": "offer_answer",
+    "payload": {
+      "offer_id": "offer-abc123",
+      "approved": true,
+      "source": "voice"
+    }
+  },
+  {
+    "kind": "offer_answer",
+    "payload": {
+      "offer_id": "offer-abc123",
+      "approved": false,
+      "source": "voice"
+    }
+  },
+  {
+    "kind": "offer_snooze",
+    "payload": {
+      "offer_id": "offer-abc123",
+      "source": "voice"
+    }
+  }
+]
