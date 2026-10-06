@@ -42,7 +42,7 @@ export const TurnSignal = z
         "The other clauses' acts, ordered, so a turn with more than one request keeps every one of them ('add milk, and when is Pippa's appointment').",
       )
       .default([]),
-    /**DailyDialog's Ekman-six-plus-neutral set. What the words express, never a claim about the person's inner state.*/
+    /**Closed EMO-MAP-01 label vocabulary. The model chooses the expressed label; the robot maps it to its deterministic primitive.*/
     expressed_emotion: z
       .enum([
         "neutral",
@@ -52,9 +52,20 @@ export const TurnSignal = z
         "anger",
         "disgust",
         "fear",
+        "happy",
+        "excited",
+        "curious",
+        "surprised",
+        "thinking",
+        "gentle",
+        "sad",
+        "confused",
+        "proud",
+        "tired",
+        "playful",
       ])
       .describe(
-        "DailyDialog's Ekman-six-plus-neutral set. What the words express, never a claim about the person's inner state.",
+        "Closed EMO-MAP-01 label vocabulary. The model chooses the expressed label; the robot maps it to its deterministic primitive.",
       ),
     /**Deterministic from surface cues (capitals, repeated punctuation, an expletive, a repeated word, a strong intensifier), never a classifier's own confidence read as intensity.*/
     emotion_intensity: z

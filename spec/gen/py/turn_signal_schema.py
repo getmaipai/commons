@@ -167,10 +167,27 @@ class TurnSignal(BaseModel):
         description="The other clauses' acts, ordered, so a turn with more than one request keeps every one of them ('add milk, and when is Pippa's appointment').",
     )
     expressed_emotion: Literal[
-        'neutral', 'happiness', 'surprise', 'sadness', 'anger', 'disgust', 'fear'
+        'neutral',
+        'happiness',
+        'surprise',
+        'sadness',
+        'anger',
+        'disgust',
+        'fear',
+        'happy',
+        'excited',
+        'curious',
+        'surprised',
+        'thinking',
+        'gentle',
+        'sad',
+        'confused',
+        'proud',
+        'tired',
+        'playful',
     ] = Field(
         ...,
-        description="DailyDialog's Ekman-six-plus-neutral set. What the words express, never a claim about the person's inner state.",
+        description='Closed EMO-MAP-01 label vocabulary. The model chooses the expressed label; the robot maps it to its deterministic primitive.',
     )
     emotion_intensity: Literal['none', 'low', 'moderate', 'high'] = Field(
         ...,

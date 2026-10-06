@@ -1,0 +1,14 @@
+{
+  "key": "robot.initiative.allowed_here",
+  "scope": "device",
+  "selector": "boolean",
+  "default": true,
+  "label": "Allow offers in this room",
+  "help": "Robot-only device setting sent on hello. Turn off for a bedroom or other quiet area.",
+  "level": "basic",
+  "secret": false,
+  "lives_in": "robot.hello",
+  "honoured_by": [
+    "bot"
+  ]
+}

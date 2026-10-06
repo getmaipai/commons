@@ -517,3 +517,7 @@ def test_person_with_unknown_field_is_rejected():
     bad = {**load_fixture("person.example.json"), "extra": "nope"}
     with pytest.raises(ValidationError):
         Person.model_validate(bad)
+
+
+def test_robot_hello_setting_fixture():
+    SettingsKey.model_validate(load_fixture("settings-key.robot-hello.example.json"))

@@ -32,3 +32,30 @@ describe("spec/settings/keys.json", () => {
     expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
   });
 });
+
+
+describe("SETTINGS-ROBOT-01 declarations", () => {
+  test("all approved robot controls are declared once and the tailnet opt-in defaults off", () => {
+    const entries = loadRegistry() as { key: string; default: unknown }[];
+    const keys = new Map(entries.map((entry) => [entry.key, entry]));
+    const required = [
+      "household.quiet_hours.from", "household.quiet_hours.to",
+      "person.quiet_hours.from", "person.quiet_hours.to",
+      "robot.initiative.enabled", "robot.initiative.tiers_spoken",
+      "robot.initiative.max_offers_per_hour", "robot.initiative.accept_phrases",
+      "person.robot.may_address", "person.robot.topics", "person.robot.greet_by_name",
+      "person.robot.follow_up", "person.robot.playful_clips", "person.vision.watch",
+      "person.vision.gestures", "vision.on_request.enabled", "robot.greetings.mode",
+      "safety.alarm.sensors", "safety.alarm.voice", "safety.alarm.volume",
+      "safety.alarm.child_line", "safety.alarm.repeat_seconds",
+      "robot.live_view.enabled", "robot.live_view.who", "robot.offlan.tailnet",
+      "robot.camera.watch_level", "robot.follow_up.seconds", "robot.idle.level",
+      "robot.barge_in.open_mic", "robot.gestures.enabled", "robot.initiative.allowed_here",
+    ];
+    for (const key of required) expect(keys.has(key), key).toBe(true);
+    expect(keys.get("robot.offlan.tailnet")?.default).toBe(false);
+    expect(keys.get("robot.gestures.enabled")?.default).toBe(false);
+    expect(keys.get("robot.initiative.allowed_here")?.default).toBe(false);
+    expect(keys.get("person.vision.watch")?.default).toBe("presence");
+  });
+});

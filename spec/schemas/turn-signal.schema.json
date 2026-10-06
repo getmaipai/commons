@@ -85,8 +85,8 @@
     },
     "expressed_emotion": {
       "type": "string",
-      "enum": ["neutral", "happiness", "surprise", "sadness", "anger", "disgust", "fear"],
-      "description": "DailyDialog's Ekman-six-plus-neutral set. What the words express, never a claim about the person's inner state."
+      "enum": ["neutral", "happiness", "surprise", "sadness", "anger", "disgust", "fear", "happy", "excited", "curious", "surprised", "thinking", "gentle", "sad", "confused", "proud", "tired", "playful"],
+      "description": "Closed EMO-MAP-01 label vocabulary. The model chooses the expressed label; the robot maps it to its deterministic primitive."
     },
     "emotion_intensity": {
       "type": "string",

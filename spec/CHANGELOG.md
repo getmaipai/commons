@@ -8,6 +8,8 @@ scope lands.
 ## [Unreleased]
 
 ### Added
+- Household, person, and robot device settings for Reachy, including the default-off tailnet opt-in and the six Home-honoured robot controls (SETTINGS-ROBOT-01). Filed the EYES-07 quiet-hours follow-up.
+- Closed emotion-to-primitive and optional clip map, the twelve emotion labels, optional `ReplyPlan.react_move`, and the `thinking`, `offer`, and `shake` primitive names (EMO-MAP-01).
 - Reachy device capabilities `gestures` and `sound_events`; two Reachy Mini fixtures model the body without Eyes and with Eyes fitted. `eyes` reuses the existing capability id (BODY-VOCAB-01).
 - `DeviceCommand`, `RobotOffer`, and `RobotAssetManifest` schemas and fixtures, the fixed household `safety.alarm` notification declaration, the checksum and licence pinned base robot asset list, and optional `watch_level` on `robot.state` (SPEC-ROBOT-01). No moves or firmware are in the base asset list.
 - Optional `motion` (`resting` or `held`, null when the body cannot tell) and optional `put_down_count` (non-negative integer) on `robot.state` (MOVE-CARRY-02). `activity` gains no value. Two fixtures: `robot-state.held.example.json` and `robot-state.resting.example.json`.

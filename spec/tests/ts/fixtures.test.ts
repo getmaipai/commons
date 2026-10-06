@@ -427,3 +427,10 @@ describe("a bad record is rejected, not silently accepted", () => {
     expect(() => ModelCapabilities.parse(loadFixture("model-capabilities.invalid-footprint-kv-cache-type.json"))).toThrow();
   });
 });
+
+
+describe("robot hello setting fixture", () => {
+  test("settings-key.robot-hello.example.json", () => {
+    expect(() => SettingsKey.parse(loadFixture("settings-key.robot-hello.example.json"))).not.toThrow();
+  });
+});

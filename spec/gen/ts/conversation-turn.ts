@@ -94,7 +94,7 @@ export const ConversationTurn = z
             "The other clauses' acts, ordered, so a turn with more than one request keeps every one of them ('add milk, and when is Pippa's appointment').",
           )
           .default([]),
-        /**DailyDialog's Ekman-six-plus-neutral set. What the words express, never a claim about the person's inner state.*/
+        /**Closed EMO-MAP-01 label vocabulary. The model chooses the expressed label; the robot maps it to its deterministic primitive.*/
         expressed_emotion: z
           .enum([
             "neutral",
@@ -104,9 +104,20 @@ export const ConversationTurn = z
             "anger",
             "disgust",
             "fear",
+            "happy",
+            "excited",
+            "curious",
+            "surprised",
+            "thinking",
+            "gentle",
+            "sad",
+            "confused",
+            "proud",
+            "tired",
+            "playful",
           ])
           .describe(
-            "DailyDialog's Ekman-six-plus-neutral set. What the words express, never a claim about the person's inner state.",
+            "Closed EMO-MAP-01 label vocabulary. The model chooses the expressed label; the robot maps it to its deterministic primitive.",
           ),
         /**Deterministic from surface cues (capitals, repeated punctuation, an expletive, a repeated word, a strong intensifier), never a classifier's own confidence read as intensity.*/
         emotion_intensity: z
@@ -412,6 +423,25 @@ export const ConversationTurn = z
               .describe(
                 "Section 13 part 2: whether every piece of evidence handed to the composer this turn was shown in full, or at least one item was summarized or withheld by the content ceiling or a household record's child_disclosure - so the reply can say so honestly ('some of what came back is for grown-ups') rather than pretending nothing was found. The per-item detail lives on the bench's own evidenceDisposition expectation, not here; this is the one summary bit the plan carries. AGE-01/ACT-03's own field to build against; this shape is a starting point, not yet read by any engine code.",
               ),
+            /**Optional Pollen clip name for the react slot. It must appear in the optional PKG-MOVES-01 manifest; the primitive remains available when that pack is absent. Deterministic age, safety, consent, crisis, alarm, held and muted gates may suppress it.*/
+            react_move: z
+              .union([
+                z
+                  .string()
+                  .min(1)
+                  .describe(
+                    "Optional Pollen clip name for the react slot. It must appear in the optional PKG-MOVES-01 manifest; the primitive remains available when that pack is absent. Deterministic age, safety, consent, crisis, alarm, held and muted gates may suppress it.",
+                  ),
+                z
+                  .null()
+                  .describe(
+                    "Optional Pollen clip name for the react slot. It must appear in the optional PKG-MOVES-01 manifest; the primitive remains available when that pack is absent. Deterministic age, safety, consent, crisis, alarm, held and muted gates may suppress it.",
+                  ),
+              ])
+              .describe(
+                "Optional Pollen clip name for the react slot. It must appear in the optional PKG-MOVES-01 manifest; the primitive remains available when that pack is absent. Deterministic age, safety, consent, crisis, alarm, held and muted gates may suppress it.",
+              )
+              .default(null),
           })
           .strict()
           .describe(

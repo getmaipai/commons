@@ -1,0 +1,113 @@
+[
+  {
+    "label": "neutral",
+    "primitive": null,
+    "clip_candidates": [],
+    "child_band": "same",
+    "primitive_detail": "No movement."
+  },
+  {
+    "label": "happy",
+    "primitive": "perk",
+    "clip_candidates": [
+      "cheerful1",
+      "grateful1"
+    ],
+    "child_band": "same",
+    "primitive_detail": "Small perk."
+  },
+  {
+    "label": "excited",
+    "primitive": "perk",
+    "clip_candidates": [
+      "enthusiastic1",
+      "laughing1"
+    ],
+    "child_band": "cap_to_perk_small",
+    "primitive_detail": "Full perk with a 1.4-second antenna flutter."
+  },
+  {
+    "label": "curious",
+    "primitive": "tilt",
+    "clip_candidates": [
+      "curious1",
+      "inquiring1"
+    ],
+    "child_band": "same",
+    "primitive_detail": "Tilt."
+  },
+  {
+    "label": "surprised",
+    "primitive": "perk",
+    "clip_candidates": [
+      "surprised1",
+      "amazed1"
+    ],
+    "child_band": "same",
+    "primitive_detail": "Fast rise, slow settle."
+  },
+  {
+    "label": "thinking",
+    "primitive": "thinking",
+    "clip_candidates": [
+      "thoughtful1"
+    ],
+    "child_band": "same",
+    "primitive_detail": "Attend plus the thinking antenna pattern."
+  },
+  {
+    "label": "gentle",
+    "primitive": "attend",
+    "clip_candidates": [
+      "calming1",
+      "serenity1"
+    ],
+    "child_band": "same",
+    "primitive_detail": "Soft, low antennas."
+  },
+  {
+    "label": "sad",
+    "primitive": "attend",
+    "clip_candidates": [],
+    "child_band": "primitive_only",
+    "primitive_detail": "Pitch down six degrees."
+  },
+  {
+    "label": "confused",
+    "primitive": "tilt",
+    "clip_candidates": [
+      "confused1",
+      "uncertain1"
+    ],
+    "child_band": "same",
+    "primitive_detail": "Tilt the other way with unequal antennas."
+  },
+  {
+    "label": "proud",
+    "primitive": "nod",
+    "clip_candidates": [
+      "success1",
+      "proud1"
+    ],
+    "child_band": "same",
+    "primitive_detail": "Nod twice, antennas up."
+  },
+  {
+    "label": "tired",
+    "primitive": "settle",
+    "clip_candidates": [
+      "tired1"
+    ],
+    "child_band": "same",
+    "primitive_detail": "Slow settle, mid-low antennas."
+  },
+  {
+    "label": "playful",
+    "primitive": "glance",
+    "clip_candidates": [
+      "dance1"
+    ],
+    "child_band": "requires_person.robot.playful_clips",
+    "primitive_detail": "Glance left and right."
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "primitives": [
+    "listen",
+    "glance",
+    "tilt",
+    "nod",
+    "perk",
+    "attend",
+    "settle",
+    "breathe",
+    "track",
+    "speak",
+    "stop",
+    "thinking",
+    "offer",
+    "shake"
+  ]
+}

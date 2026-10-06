@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, conint
+from pydantic import BaseModel, ConfigDict, Field, conint, constr
 
 
 class Moves(BaseModel):
@@ -77,4 +77,8 @@ class ReplyPlan(BaseModel):
     content_disclosure: Literal['full', 'some_withheld'] = Field(
         ...,
         description="Section 13 part 2: whether every piece of evidence handed to the composer this turn was shown in full, or at least one item was summarized or withheld by the content ceiling or a household record's child_disclosure - so the reply can say so honestly ('some of what came back is for grown-ups') rather than pretending nothing was found. The per-item detail lives on the bench's own evidenceDisposition expectation, not here; this is the one summary bit the plan carries. AGE-01/ACT-03's own field to build against; this shape is a starting point, not yet read by any engine code.",
+    )
+    react_move: constr(min_length=1) | None = Field(
+        None,
+        description='Optional Pollen clip name for the react slot. It must appear in the optional PKG-MOVES-01 manifest; the primitive remains available when that pack is absent. Deterministic age, safety, consent, crisis, alarm, held and muted gates may suppress it.',
     )
