@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### CALM-TOKENS-00
+
+Document the calm elevation, page, and status tint token contract,
+including contrast floors, superseded section 1 values, and the known
+avatar progress arc gap.
+
 `ThreadComponents` gains an optional `ComposerQueue` slot (KIT-COMPOSER-QUEUE-SLOT),
 rendered in the viewport footer directly above the composer shell, so an app
 can mount its queued-messages element (Home's CHAT-QUEUE-01) there. Additive;

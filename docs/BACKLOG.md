@@ -91,6 +91,16 @@ capability, needs its own design pass first).
 
 ## `ui`
 
+- [ ] **CALM-TOKENS-00** (docs): record the approved calm token system
+  and acceptance floors in `ui/docs/spec.md`, including superseded
+  section 1 values and the one remaining avatar progress arc gap.
+- [ ] **CALM-TOKENS-01**: add elevation and page tokens, apply them in
+  kit layout/data-slot rules, restore the vendored template's `--radius`
+  line, and verify page/sidebar muted-text contrast plus `rounded-xl`.
+- [ ] **CALM-TOKENS-02**: add attention, info, and problem tint tokens;
+  style the rendered approval fallback slot in `tokens.css`; verify text
+  contrast and button boundaries in both themes. Success has no tint.
+
 - [ ] **CHAT-STREAMDOWN-01: Streamdown inside the kit's `MarkdownText`** (S; approved 2026-10-05 by `data-scratch/architect/CHAT-STREAMDOWN-01.verdict`). Use assistant-ui's documented `StreamdownTextPrimitive` migration while keeping the export, component overrides, lazy KaTeX, Shiki and beautiful-mermaid. Acceptance: native 150 ms word fade-in for running assistant text; reduced-motion and non-chat consumers remain static; raw HTML stays literal text; links retain today's attributes and no confirmation; citations, copy, code, tables, math and Mermaid pass the kit/Home integration tests. Exact pins: `streamdown` 2.7.0 and `@assistant-ui/react-streamdown` 0.3.18. Exit: both kit and Home gates green and browser frame audit accepted.
 
 - [ ] **CITE-KIT-01: the kit's sources and inline-citation parts** (M, 2026-10-02; home `docs/design/RULES.md` chat rules 7 and 9, home `THIN-4B`; fixes commons #8 and #7). A message can place a numbered citation marker (`[n]`) inside its text, opening the matching source, and the sources list links out (`rel="noopener"`) with rows that no longer collide, built from the shipped assistant-ui `Sources` and inline-citation parts, not a hand-built `SourcesCard`. Files: `ui/src/blocks/chat/` (`SourcesCard` and its replacement), the kit's `markdown-text` part. Mirror: the shipped assistant-ui Element as vendored in the kit, restyled by tokens only. Acceptance: a story and a test where "[2]" links to source 2, an unmatched "[n]" stays plain text, rows are unique by index, and a `ui` tag is cut. Out of scope: the mapper that turns a model's `[n]` into parts (home `THIN-4B`, the named gap). Exit: `bash scripts/check.sh` in `commons`.

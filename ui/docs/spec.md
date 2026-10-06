@@ -40,6 +40,41 @@ earlier scratch reference entirely.
 
 ## 1. Foundations and visual tokens
 
+### Calm kit tokens (owner decision, 2026-10-06)
+
+The kit adds elevation tokens `--elevation-color`, `--elevation-hairline`,
+`--elevation-0` through `--elevation-4`, and `--elevation-accent`, plus
+`--page` and three status tint families: attention, info, and problem.
+They are read only by kit layout wrappers, kit data-slot rules in
+`tokens.css`, and kit primitives. Home pages must not read them through
+`className` values.
+
+The study's panel shadow (`0 12px 28px rgba(0,0,0,.24)`) is replaced by
+the elevation scale. The Row-Bot `#F3F5F7` canvas, 14% tinted tiles,
+pulsing status dots, radial washes, and 26px glass blur are not adopted.
+The owner confirmed the study's softer radii on 2026-10-06: cards use
+16px computed radius (`--radius: 12px`, so `rounded-xl` is 16px), and
+controls use 10px (`--radius-control`). `--page` uses the proposed
+contrast-safe light and dark tones. Success receives no tint.
+
+Acceptance floors: muted foreground on `--page` is at least 4.5:1 in
+light and dark themes, measured by the contrast test; every text-on-tint
+pair is at least 4.5:1; non-text boundaries are at least 3:1. No new
+token animates. The existing `tokens.css` reduced-motion block remains
+authoritative. Kid presets (2 cm targets, reading age 9) and the 16px
+body floor are untouched.
+
+Known gap: an optional avatar progress arc in the shell is not built.
+The dotted canvas ground is dropped (ChatGPT has none, S2).
+
+## Supersedes
+
+This section supersedes section 1's panel shadow `0 12px 28px
+rgba(0,0,0,.24)`, 16px card radius, and 12px control radius. It also
+supersedes `tokens.css`'s `--shadow-panel` value and the comment in
+`dashboard/css/globals.css` that calls `--radius` a deliberate Home
+design choice.
+
 | Token | Hex | Use |
 |---|---|---|
 | Page canvas | `#07111F` | Main background and empty space. |
