@@ -6,6 +6,7 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "../d
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../dashboard/components/ui/select";
 import { Switch } from "../dashboard/components/ui/switch";
 import { localeDisplayName, middleEllipsis, titleCaseOption } from "./optionLabels";
+import { HitField } from "./HitField";
 import { PersonMultiSelect, type PersonOption } from "./PersonMultiSelect";
 
 // A code review (2026-09-06) found the generic write-only secret flow made
@@ -129,7 +130,7 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
   } else if (resolved.secret) {
     control = secretEditing ? (
       <>
-        <Input
+        <HitField pad={10}><Input
           size="row"
           type="password"
           className="w-56"
@@ -139,7 +140,7 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
           onChange={(e) => setSecretDraft(e.target.value)}
           aria-label={def.label}
           autoComplete="off"
-        />
+        /></HitField>
         <Button type="button" size="row" disabled={secretSaving || !secretDraft} onClick={commitSecret}>
           {secretSaving ? "Saving…" : "Save"}
         </Button>
@@ -195,7 +196,7 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
   } else if (def.selector === "number") {
     const range = def.range as { min?: number; max?: number } | undefined;
     control = (
-      <Input
+      <HitField pad={10}><Input
         size="row"
         type="number"
         className="w-28"
@@ -206,18 +207,18 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => void commitDraft()}
         aria-label={def.label}
-      />
+      /></HitField>
     );
   } else if (def.selector === "time") {
     control = (
       <>
-        <Input size="row" type="time" className="w-32" value={String(resolved.value ?? "")} disabled={disabled} onChange={(e) => {
+        <HitField pad={10}><Input size="row" type="time" className="w-32" value={String(resolved.value ?? "")} disabled={disabled} onChange={(e) => {
             // A half-typed or cleared time is not a value: only a complete
             // HH:MM is written; "Use household hours" is the way back.
             if (e.target.value) void write(e.target.value);
           }}
           aria-label={def.label}
-        />
+        /></HitField>
         {resolved.value == null ? (
           <>
             <span className="text-sm text-settings-helper">Inheriting household hours</span>
@@ -234,7 +235,7 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
     const current = String(resolved.value ?? "");
     control = editing ? (
       <>
-        <Input
+        <HitField pad={10}><Input
           size="row"
           className="w-64"
           value={draft}
@@ -249,7 +250,7 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
             }
           }}
           aria-label={def.label}
-        />
+        /></HitField>
         <Button type="button" size="row" disabled={disabled} onClick={() => void commitDraft().then((ok) => ok && setEditing(false))}>
           Save
         </Button>
@@ -267,7 +268,7 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
       </>
     ) : (
       <>
-        <span title={current} className="font-mono text-[13px] text-settings-helper">
+        <span title={current} className="min-w-0 max-w-full truncate font-mono text-[13px] text-settings-helper">
           {current ? middleEllipsis(current) : "Not set"}
         </span>
         <Button type="button" size="row" variant="secondary" disabled={disabled} aria-describedby={titleId} onClick={() => setEditing(true)}>
@@ -292,9 +293,13 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
     control = <span className="text-sm text-settings-helper">Not supported in this hub version yet.</span>;
   }
 
+  // A switch is small enough to stay beside the text on a phone; every other
+  // control drops under the helper text below `sm` so the text keeps its
+  // width and a long value cannot push the row past the screen.
+  const stacks = def.selector !== "boolean" || resolved.secret;
   return (
     <Item size="setting" id={`setting-${def.key}`} data-setting-key={def.key} className="flex-wrap sm:flex-nowrap">
-      <ItemContent>
+      <ItemContent className={stacks ? "basis-full sm:basis-0" : undefined}>
         <ItemTitle id={titleId}>{def.label}</ItemTitle>
         {def.help ? <ItemDescription clamp={false}>{def.help}</ItemDescription> : null}
         {note ? (
@@ -303,12 +308,12 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
           </p>
         ) : null}
         {canReset ? (
-          <Button type="button" variant="link" size="row" onClick={onReset} disabled={disabled} className="h-auto w-fit p-0 text-[13px]">
+          <Button type="button" variant="link" size="row" onClick={onReset} disabled={disabled} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">
             Reset to default
           </Button>
         ) : null}
       </ItemContent>
-      <ItemActions>{control}</ItemActions>
+      <ItemActions className={stacks ? "w-full min-w-0 flex-wrap sm:w-auto sm:flex-nowrap" : "min-w-0"}>{control}</ItemActions>
     </Item>
   );
 }

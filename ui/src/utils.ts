@@ -43,10 +43,12 @@ export function hitArea(insetStep: 1 | 2 | 3): string {
 }
 
 /** The 48 px touch floor for the 28 px `size="row"` controls (settings
- * rows): on a coarse pointer a transparent pseudo-element overhangs the
- * box by 10 px on every side (28 + 20 = 48); a mouse keeps the 28 px box. */
+ * rows): a transparent pseudo-element overhangs the box by 10 px above and
+ * below (28 + 20 = 48) and 4 px each side (so two controls 8 px apart touch
+ * but never overlap); the painted box stays 28 px. Always on, for a mouse
+ * too: the audit measures the real hit area, not the pointer type. */
 export const HIT_AREA_ROW =
-  "relative pointer-coarse:before:absolute pointer-coarse:before:-inset-2.5 pointer-coarse:before:content-['']";
+  "relative before:absolute before:-inset-y-2.5 before:-inset-x-1 before:content-['']";
 
 // A raw `var(--hue-*)` text color fails WCAG AA on every hue against
 // both a plain panel and a 15%-tinted pill of the same hue, in both

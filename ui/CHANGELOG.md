@@ -1,5 +1,27 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.132] - ui-v0.5.132
+
+### KIT-SET-05 (additive, three pure bug fixes)
+
+Accessibility and look fixes found by Home's APP-SET-02 gate.
+New and additive: `SettingsShell` takes `contentAs` ("main" default, or
+"section" for a host that already has a main landmark); `SettingsRenderer`
+takes `headingLevel` (2 or 3) and inside a `SettingsShell` card titles are h2
+(alone they stay h3); tokens `--settings-column-row-gap` (18px) and
+`--settings-shell-min-height` (100svh); light-mode settings tokens (off-white
+card with a hairline on the page, helper text 62 percent).
+Pure bug fixes that change a default: an `ItemGroup variant="card"` no longer
+carries `role="list"` (it held separators and a fold, which are not list items;
+the plain stack keeps it); the `size="row"` 48 px hit area (`HIT_AREA_ROW`) is
+always on instead of coarse-pointer only, 10 px above and below and 4 px each
+side, as is the `Switch size="md"` and the settings `SidebarMenuButton`
+(9 px above and below, so the column's row gap went from 1px to 18px so
+neighbouring targets tile); the settings search and every row text field sit in a
+`HitField` label that supplies the 48 px target; a non-switch control drops under
+its helper text below `sm`; the shell fills the viewport and stretches column and
+pane; the row title is `text-foreground`.
+
 ## [0.5.131] - ui-v0.5.131
 
 ### ENGINE-DOWN-UI-01 (additive)

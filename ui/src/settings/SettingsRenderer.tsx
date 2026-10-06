@@ -12,6 +12,7 @@ import { Empty, EmptyDescription, EmptyHeader } from "../dashboard/components/ui
 import { Item, ItemContent, ItemGroup, ItemSeparator, ItemTitle } from "../dashboard/components/ui/item";
 import { SettingRow, type BeforeChange } from "./SettingRow";
 import type { PersonOption } from "./PersonMultiSelect";
+import { useSettingsHeadingLevel } from "./headingLevel";
 
 interface SettingsRendererProps {
   scope: "household" | "person" | "device";
@@ -50,6 +51,9 @@ interface SettingsRendererProps {
   /** A key to scroll into view and focus once the rows have loaded (a
    * `#<key>` deep link). */
   focusKey?: string;
+  /** The card title's heading level. Default: 2 inside a SettingsShell (its
+   * page title is the h1), 3 on its own. */
+  headingLevel?: 2 | 3;
 }
 
 // The registry never varies by which renderer is asking, so every instance
@@ -80,7 +84,9 @@ export function SettingsRenderer({
   people,
   beforeChange,
   focusKey,
+  headingLevel,
 }: SettingsRendererProps) {
+  const Heading = `h${useSettingsHeadingLevel(headingLevel)}` as "h2" | "h3";
   const queryClient = useQueryClient();
   // A person-scope render is always the viewer's own settings, so the id in
   // `person:<id>` is the viewer: dropped from a person multi-select.
@@ -274,9 +280,9 @@ export function SettingsRenderer({
                 return (
                   <section key={group.id} id={`settings-${group.id}`} aria-label={titleOverrides[group.id] ?? sectionTitle(group.id)} className="flex flex-col gap-3">
                     {plainRows ? null : (
-                      <h3 className="text-[length:var(--settings-section-heading-size)] font-medium">
+                      <Heading className="text-[length:var(--settings-section-heading-size)] font-medium">
                         {titleOverrides[group.id] ?? sectionTitle(group.id)}
-                      </h3>
+                      </Heading>
                     )}
                     {card}
                   </section>

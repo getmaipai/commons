@@ -2,7 +2,7 @@
 // kinds of section (keys, view, arrow row), a pill search that works on the
 // demo rows, and the content pane. No props, no data; Home's UI showcase page
 // mounts it.
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { SettingsShell } from "./SettingsShell";
 import { SettingsShowcase } from "./SettingsShowcase";
 import type { SettingsAreaDef, SettingsViewer } from "./settingsAudience";
@@ -31,7 +31,7 @@ export function SettingsShellShowcase() {
   const [active, setActive] = useState("general");
   const [query, setQuery] = useState("");
   return (
-    <div className="h-[640px] overflow-hidden rounded-xl border border-settings-column-divider">
+    <div className="h-[640px] overflow-hidden rounded-xl border border-settings-column-divider" style={{ "--settings-shell-min-height": "0px" } as CSSProperties}>
       <SettingsShell
         area={DEMO_AREA}
         viewer={VIEWER}
@@ -39,6 +39,7 @@ export function SettingsShellShowcase() {
         onNavigate={(to) => to.kind === "section" && setActive(to.sectionId)}
         searchQuery={query}
         onSearchChange={setQuery}
+        contentAs="section"
         onBack={() => setActive("")}
       >
         <SettingsShowcase />

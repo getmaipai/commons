@@ -22,7 +22,10 @@ function ItemGroup({
 }) {
   return (
     <div
-      role="list"
+      // The card holds inset separators and a collapsible fold, which are
+      // not list items, so a card is a plain group; the unset stack keeps
+      // role="list". A caller's own role (in props) still wins.
+      role={variant === "card" ? undefined : "list"}
       data-slot="item-group"
       data-variant={variant}
       className={cn(
@@ -168,7 +171,7 @@ function ItemTitle({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="item-title"
       className={cn(
         "line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4",
-        setting && "leading-5",
+        setting && "leading-5 text-foreground",
         className
       )}
       {...props}

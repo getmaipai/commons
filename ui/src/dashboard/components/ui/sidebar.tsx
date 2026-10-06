@@ -511,7 +511,7 @@ const sidebarMenuButtonVariants = cva(
         sm: "h-7 text-xs",
         lg: "h-12 text-sm group-data-[collapsible=icon]:p-0!",
         settings:
-          "h-[30px] gap-2 rounded-[var(--settings-control-radius)] px-2.5 py-0 text-sm hover:bg-settings-fill/60 active:bg-settings-fill data-active:bg-settings-fill data-active:font-normal data-active:text-sidebar-foreground",
+          "relative h-[30px] gap-2 rounded-[var(--settings-control-radius)] px-2.5 py-0 before:absolute before:-inset-y-[9px] before:inset-x-0 before:content-[''] text-sm hover:bg-settings-fill/60 active:bg-settings-fill data-active:bg-settings-fill data-active:font-normal data-active:text-sidebar-foreground",
       },
     },
     defaultVariants: {

@@ -1,4 +1,6 @@
 import { useId, type MouseEvent, type ReactNode } from "react";
+import { SettingsHeadingLevelContext } from "./headingLevel";
+import { HitField } from "./HitField";
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
 import { getIcon } from "@/kit/icons";
 import {
@@ -54,6 +56,10 @@ export interface SettingsShellProps {
   /** The phone back row ("<area title>") at the top of an open section. */
   onBack?: () => void;
   labels?: SettingsShellLabels;
+  /** The element the content pane renders as. "main" (default) is the
+   * page's main landmark; a host that already has one (Home's rail
+   * workspace) passes "section", which is a named region instead. */
+  contentAs?: "main" | "section";
   /** The open section's content, or the search results. */
   children?: ReactNode;
 }
@@ -85,8 +91,10 @@ export function SettingsShell({
   onSearchChange,
   onBack,
   labels,
+  contentAs = "main",
   children,
 }: SettingsShellProps) {
+  const Content = contentAs;
   const describedId = useId();
   const searching = searchQuery.trim().length > 0;
   const groups = visibleGroups(area, viewer, registry, honouredBy);
@@ -110,7 +118,7 @@ export function SettingsShell({
     <SidebarProvider
       keyboardShortcut={false}
       data-slot="settings-shell"
-      className="h-full min-h-0 flex-col bg-settings-page lg:flex-row"
+      className="h-full min-h-[var(--settings-shell-min-height)] min-w-0 flex-col bg-settings-page lg:flex-row"
     >
       <span id={describedId} className="sr-only">
         {labels?.opensAnotherPage ?? "Opens another page"}
@@ -119,13 +127,13 @@ export function SettingsShell({
         collapsible="none"
         data-slot="settings-column"
         className={cn(
-          "w-full border-settings-column-divider bg-settings-column lg:w-(--settings-column-width) lg:border-r",
+          "h-auto min-w-0 w-full self-stretch border-settings-column-divider bg-settings-column lg:w-(--settings-column-width) lg:border-r",
           showColumn ? "flex" : "hidden lg:flex",
         )}
       >
         <SidebarHeader className="gap-3 px-2 pt-4 pb-2">
           <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{area.title}</h2>
-          <div className="relative">
+          <HitField pad={6} className="relative">
             <SearchIcon aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-settings-helper" />
             <SidebarInput
               variant="pill"
@@ -142,7 +150,7 @@ export function SettingsShell({
                 }
               }}
             />
-          </div>
+          </HitField>
         </SidebarHeader>
         <SidebarContent className={cn("gap-0 px-2 pb-4", searching && "hidden lg:flex")}>
           {groups.map((group) => (
@@ -150,7 +158,7 @@ export function SettingsShell({
               <SidebarGroupLabel className="h-8 px-2 text-[length:var(--settings-group-label-size)] font-normal text-settings-helper">
                 {group.label}
               </SidebarGroupLabel>
-              <SidebarMenu className="gap-px">
+              <SidebarMenu className="gap-[var(--settings-column-row-gap)]">
                 {group.sections.map((section) => {
                   const Icon = getIcon(section.icon);
                   const isLink = section.kind === "link";
@@ -181,10 +189,10 @@ export function SettingsShell({
         </SidebarContent>
       </Sidebar>
 
-      <main
+      <Content
         data-slot="settings-content"
         aria-label={title}
-        className={cn("min-w-0 flex-1 overflow-y-auto bg-settings-page", showContent ? "block" : "hidden lg:block")}
+        className={cn("min-w-0 flex-1 self-stretch overflow-y-auto bg-settings-page", showContent ? "block" : "hidden lg:block")}
       >
         <div className="mx-auto flex w-full max-w-(--settings-content-max) flex-col px-6 pb-16 pt-4 lg:pt-(--settings-content-top)">
           {onBack ? (
@@ -199,9 +207,9 @@ export function SettingsShell({
             </SidebarMenuButton>
           ) : null}
           <h1 className="mb-10 text-[length:var(--settings-page-title-size)] leading-9 font-semibold">{title}</h1>
-          {children}
+          <SettingsHeadingLevelContext.Provider value={2}>{children}</SettingsHeadingLevelContext.Provider>
         </div>
-      </main>
+      </Content>
     </SidebarProvider>
   );
 }

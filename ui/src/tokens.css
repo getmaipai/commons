@@ -745,6 +745,31 @@ body {
   /* The checked switch track: the theme's primary by default; a look that
    * wants ChatGPT's blue sets it (Neutral sets #3983f7 in Home). */
   --switch-checked: var(--primary);
+  /* Gap between two column rows. 18 px makes each 30 px row's 48 px hit
+   * area (9 px overhang above and below) tile without overlapping its
+   * neighbour; a host that wants the compact ChatGPT pitch sets 1px and
+   * accepts smaller touch targets. */
+  --settings-column-row-gap: 18px;
+  /* The shell's minimum height: fills the viewport by default; a host with
+   * its own chrome around the shell sets what is left. */
+  --settings-shell-min-height: 100svh;
+}
+
+/* Light: ChatGPT light has an off-white card with a hairline on a white
+ * page (not a grey fill on white). Dark keeps the sampled mixes above.
+ * Helper text is 62 percent so it holds 4.5:1 on the card
+ * (settings-tokens.test.ts checks every pair). */
+:root:not(.dark),
+:root:not(.dark) body {
+  --settings-card: color-mix(in srgb, var(--background), var(--foreground) 2.2%);
+  --settings-card-border: color-mix(in srgb, var(--background), var(--foreground) 9%);
+  --settings-fill: color-mix(in srgb, var(--background), var(--foreground) 6.5%);
+  --settings-control: color-mix(in srgb, var(--background), var(--foreground) 1.2%);
+  --settings-control-border: color-mix(in srgb, var(--background), var(--foreground) 14%);
+  --settings-button: color-mix(in srgb, var(--background), var(--foreground) 6%);
+  --settings-switch-off: color-mix(in srgb, var(--background), var(--foreground) 16%);
+  --settings-helper: color-mix(in srgb, var(--background), var(--foreground) 62%);
+  --settings-arrow: color-mix(in srgb, var(--background), var(--foreground) 40%);
 }
 
 @theme inline {

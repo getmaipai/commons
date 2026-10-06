@@ -146,7 +146,7 @@ describe("size=row controls are 28 px with an 8 px radius", () => {
     expect(el.className).toContain("px-2.5")
     expect(el.className).toContain("bg-settings-button")
     expect(el.className).not.toMatch(/(^| )bg-secondary( |$)/)
-    expect(el.className).toContain("pointer-coarse:before:-inset-2.5")
+    expect(el.className).toContain("before:-inset-y-2.5")
   })
 
   test("Button row keeps its variant fill when it is not secondary", () => {
