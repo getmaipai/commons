@@ -190,6 +190,8 @@ describe("SettingsShell layout: two panes from lg, a drill-in below", () => {
     const { view } = shell({ layout: "docked" });
     const root = document.body.querySelector('[data-slot="settings-shell"]') as HTMLElement;
     expect(root.getAttribute("data-layout")).toBe("docked");
+    expect(root.getAttribute("role")).toBe("region");
+    expect(root.getAttribute("aria-label")).toBe("Chat settings");
     expect(root.className).toContain("fixed");
     expect(root.className).toContain("left-14");
     expect(root.className).toContain("w-auto");

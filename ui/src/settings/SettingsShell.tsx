@@ -151,6 +151,8 @@ export function SettingsShell({
       keyboardShortcut={false}
       data-slot="settings-shell"
       data-layout={layout}
+      role={layout === "docked" ? "region" : undefined}
+      aria-label={layout === "docked" ? area.title : undefined}
       className={cn(
         "h-full min-h-[var(--settings-shell-min-height)] min-w-0 flex-col bg-settings-page lg:flex-row",
         layout === "docked" && "fixed inset-y-0 left-14 right-0 z-10 h-svh w-auto",
