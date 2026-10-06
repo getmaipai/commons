@@ -8,6 +8,11 @@ Give `ErrorState` a muted, unfilled failure presentation; let `StatusIndicator`
 disable its ping and use the attention tint for degraded status; add the
 `Thread.components.ComposerNotice` slot below the composer shell.
 
+### CHAT-SIDEBAR-FINISH-01
+
+Style the shipped thread-list row with the 48px minimum target and the
+sidebar accent fill for its active state, using its rendered data slots.
+
 ## [0.5.102] - ui-v0.5.102
 
 ### CALM-TOKENS-02

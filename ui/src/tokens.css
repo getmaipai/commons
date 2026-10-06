@@ -201,6 +201,21 @@
   border: 1px solid var(--tint-attention-border);
 }
 
+/* The assistant-ui ThreadList Element owns row behavior and markup.
+ * These stable data-slot rules give its targets the kit's 48px floor and
+ * use the sidebar accent for its active-row fill without editing the Element. */
+[data-slot="aui_thread-list-item"] {
+  min-height: 48px;
+}
+
+[data-slot="aui_thread-list-item-trigger"] {
+  min-height: 48px;
+}
+
+[data-slot="aui_thread-list-item"][data-active="true"] {
+  background-color: var(--sidebar-accent);
+}
+
 /* 1px `#24405F`, 12px above and below (owner findings, "The Studio
  * look, the numbers," 2026-09-20 18:15), inset 7px from the rail's
  * own true edge - owner ruling, ui-v0.4.3, restating "the rail

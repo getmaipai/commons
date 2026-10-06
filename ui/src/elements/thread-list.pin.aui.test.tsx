@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import {
   AssistantRuntimeProvider,
@@ -171,5 +172,24 @@ describe("ThreadList pin", () => {
       (el) => el.textContent,
     );
     expect(labels).toEqual(["Today"]);
+  });
+});
+
+describe("ThreadList data-slot styling", () => {
+  test("the shipped row slots are targeted by the 48px and active-state token rules", async () => {
+    const view = render(
+      <Harness seeds={[{ remoteId: "a", title: "Alpha" }]} updateCustom={async () => {}} />,
+    );
+    const title = await view.findByText("Alpha");
+    const row = title.closest('[data-slot="aui_thread-list-item"]');
+    const trigger = title.closest('[data-slot="aui_thread-list-item-trigger"]');
+    const tokens = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
+
+    expect(row).toBeTruthy();
+    expect(trigger).toBeTruthy();
+    expect(tokens).toMatch(/\[data-slot="aui_thread-list-item"\][^{]*\{[^}]*min-height:\s*48px/s);
+    expect(tokens).toMatch(/\[data-slot="aui_thread-list-item-trigger"\][^{]*\{[^}]*min-height:\s*48px/s);
+    expect(tokens).toContain('[data-slot="aui_thread-list-item"][data-active="true"]');
+    expect(tokens).toContain("background-color: var(--sidebar-accent)");
   });
 });
