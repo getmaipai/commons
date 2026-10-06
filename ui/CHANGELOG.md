@@ -1,5 +1,15 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.133] - ui-v0.5.133
+
+### FEEDBACK-CANCEL-01 (additive)
+
+`FeedbackDialog` takes an optional `onCancel`. When given, the dialog shows a
+Cancel button beside Send feedback and also calls it on Escape and on a press
+outside the dialog; it never calls `onSubmit`, and the thanks line (sent) has
+no Cancel. Without it nothing changes. Keeping or clearing the rating is the
+host's call.
+
 ## [0.5.132] - ui-v0.5.132
 
 ### KIT-SET-05 (additive, three pure bug fixes)

@@ -1,9 +1,9 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import { useEffect, useRef, type ComponentProps } from "react";
 import { CheckIcon, ThumbsDownIcon } from "lucide-react";
 import { cn } from "cn";
-import { field, inkButton, mono, paper } from "./surfaces";
+import { field, ghostButton, inkButton, mono, paper } from "./surfaces";
 
 export function FeedbackDialog({
   reasons,
@@ -13,6 +13,7 @@ export function FeedbackDialog({
   onToggleReason,
   onNoteChange,
   onSubmit,
+  onCancel,
   className,
   ...props
 }: Omit<
@@ -25,6 +26,7 @@ export function FeedbackDialog({
   | "onToggleReason"
   | "onNoteChange"
   | "onSubmit"
+  | "onCancel"
 > & {
   reasons: readonly string[];
   selected: readonly string[];
@@ -33,7 +35,27 @@ export function FeedbackDialog({
   onToggleReason?: (reason: string) => void;
   onNoteChange?: (note: string) => void;
   onSubmit?: () => void;
+  /**
+   * Dismiss without sending. When given, the dialog shows a Cancel button and
+   * also calls it on Escape and on a press outside the dialog (the same three
+   * ways ChatGPT's "Tell us more" closes). The rating itself is the host's to
+   * keep or clear; this only closes the form.
+   */
+  onCancel?: () => void;
 }) {
+  const root = useRef<HTMLDivElement>(null);
+  const cancel = useRef(onCancel);
+  cancel.current = onCancel;
+  const dismissible = onCancel !== undefined && !sent;
+  useEffect(() => {
+    if (!dismissible) return;
+    const outside = (event: PointerEvent) => {
+      if (event.target instanceof Node && root.current?.contains(event.target)) return;
+      cancel.current?.();
+    };
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, [dismissible]);
   return (
     <div
       data-slot="feedback-dialog"
@@ -45,6 +67,14 @@ export function FeedbackDialog({
       )}
 
       {...props}
+      ref={root}
+      onKeyDown={(event) => {
+        props.onKeyDown?.(event);
+        if (dismissible && event.key === "Escape") {
+          event.stopPropagation();
+          onCancel?.();
+        }
+      }}
     >
       {/*
         Mounted whether or not the feedback has been sent, because a live region
@@ -129,17 +159,33 @@ export function FeedbackDialog({
             )}
           />
 
-          {onSubmit && (
-            <button
-              type="button"
-              onClick={onSubmit}
-              className={cn(
-                inkButton,
-                "flex h-8 items-center justify-center self-end rounded-full px-3.5 text-xs font-medium",
+          {(onSubmit || onCancel) && (
+            <div className="flex items-center justify-end gap-1.5">
+              {onCancel && (
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className={cn(
+                    ghostButton,
+                    "h-8 px-3.5 text-xs font-medium",
+                  )}
+                >
+                  Cancel
+                </button>
               )}
-            >
-              Send feedback
-            </button>
+              {onSubmit && (
+                <button
+                  type="button"
+                  onClick={onSubmit}
+                  className={cn(
+                    inkButton,
+                    "flex h-8 items-center justify-center rounded-full px-3.5 text-xs font-medium",
+                  )}
+                >
+                  Send feedback
+                </button>
+              )}
+            </div>
           )}
         </>
       )}
