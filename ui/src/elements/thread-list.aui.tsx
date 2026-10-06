@@ -12,8 +12,15 @@ import {
   useAui,
   useAuiState,
 } from "@assistant-ui/react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import {
   ArchiveIcon,
+  ArrowLeftIcon,
+  ChevronRightIcon,
+  FolderIcon,
+  FolderInputIcon,
+  FolderMinusIcon,
   Loader2Icon,
   MoreHorizontalIcon,
   PencilIcon,
@@ -27,13 +34,16 @@ import {
   createContext,
   forwardRef,
   Fragment,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
   type ComponentPropsWithoutRef,
+  type DragEvent,
   type FC,
+  type KeyboardEvent,
 } from "react";
 
 export type ThreadListLabels = {
@@ -62,6 +72,102 @@ const defaultPinConfig: ThreadListPinConfig = {
 };
 
 const ThreadListPinContext = createContext<ThreadListPinConfig>(defaultPinConfig);
+
+/** Words the projects mode shows; every one has an English default. */
+export type ThreadListProjectLabels = {
+  /** Section label above the projects. Default "Projects". */
+  projects?: string;
+  /** The section label's "+" and the create field. Default "New project". */
+  newProject?: string;
+  /** Placeholder in the create and rename fields. Default "Project name". */
+  projectName?: string;
+  /** Chat row menu item that lists the projects. Default "Move to project". */
+  moveTo?: string;
+  /** Chat row menu item for a chat in a project. Default "Remove from project". */
+  removeFromProject?: string;
+  /** Back from the project list to the chat menu. Default "Back". */
+  back?: string;
+  /** Project row menu item. Default "New chat in project". */
+  newChatInProject?: string;
+  /** Project row menu items. Defaults "Rename" and "Delete". */
+  rename?: string;
+  delete?: string;
+  /** Inline delete confirmation. Default "Delete this project? Its chats stay." */
+  confirmDelete?: string;
+  /** Cancel in the inline confirmation. Default "Cancel". */
+  cancel?: string;
+  /** Shown under a project with more than six chats. Defaults "Show more" and "Show less". */
+  showMore?: string;
+  showLess?: string;
+  /** Shown inside an open project with no chats. Default "No chats yet". */
+  empty?: string;
+  /** Accessible name of a project row's menu button. Default "Project options". */
+  projectOptions?: string;
+};
+
+/**
+ * Opt-in projects mode (CHAT-PROJECT-01). A host passes the person's
+ * projects; a chat whose custom metadata carries `folder_id` naming one of
+ * them leaves the day groups and lists under its project instead. Moving a
+ * chat calls the thread list's own `updateCustom` with the new `folder_id`
+ * (null to take it out), the same channel pinning uses. Creating, renaming,
+ * deleting and starting a chat in a project are the host's callbacks.
+ */
+export type ThreadListProjects = {
+  folders: ReadonlyArray<{ id: string; name: string }>;
+  /** Make, rename and delete projects. Default false. */
+  canManage?: boolean;
+  /** Move chats in and out (menu and drag). Default true. */
+  canMove?: boolean;
+  onCreate?: (name: string) => void | Promise<void>;
+  onRename?: (id: string, name: string) => void | Promise<void>;
+  onDelete?: (id: string) => void | Promise<void>;
+  onNewChat?: (id: string) => void;
+  labels?: ThreadListProjectLabels;
+};
+
+const PROJECT_LABEL_DEFAULTS: Required<ThreadListProjectLabels> = {
+  projects: "Projects",
+  newProject: "New project",
+  projectName: "Project name",
+  moveTo: "Move to project",
+  removeFromProject: "Remove from project",
+  back: "Back",
+  newChatInProject: "New chat in project",
+  rename: "Rename",
+  delete: "Delete",
+  confirmDelete: "Delete this project? Its chats stay.",
+  cancel: "Cancel",
+  showMore: "Show more",
+  showLess: "Show less",
+  empty: "No chats yet",
+  projectOptions: "Project options",
+};
+
+type ResolvedProjects = Omit<ThreadListProjects, "labels"> & {
+  labels: Required<ThreadListProjectLabels>;
+  canManage: boolean;
+  canMove: boolean;
+};
+
+const ThreadListProjectsContext = createContext<ResolvedProjects | null>(null);
+
+/** Reads the project id a host keeps in a thread's custom metadata. */
+export const threadFolderId = (custom: Record<string, unknown> | undefined): string | null =>
+  typeof custom?.folder_id === "string" ? custom.folder_id : null;
+
+/** A chat shows under its project only when that project is listed, the
+ * list is not being searched, and (with pinning) the chat is not pinned:
+ * a chat appears in exactly one place, and Pinned wins. */
+const PROJECT_PREVIEW_COUNT = 6;
+const THREAD_DRAG_TYPE = "application/x-maipai-thread";
+
+const menuContentClass =
+  "bg-popover text-popover-foreground data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:animate-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 overflow-hidden rounded-xl border p-1.5";
+const menuItemClass =
+  "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none";
+const destructiveItemClass =
+  "text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none";
 
 const resolvePinConfig = (
   pinnable: boolean | undefined,
@@ -150,8 +256,10 @@ export const ThreadListItems: FC<
     /** Adds Pin / Unpin to each row menu, a pinned indicator and a Pinned group. */
     pinnable?: boolean;
     labels?: ThreadListLabels;
+    /** Opt-in projects mode; see ThreadListProjects. */
+    projects?: ThreadListProjects;
   }
-> = ({ className, searchQuery = "", pinnable, labels, ...props }) => {
+> = ({ className, searchQuery = "", pinnable, labels, projects, ...props }) => {
   const { pin: pinLabel, unpin: unpinLabel, pinned: pinnedLabel } = labels ?? {};
   const pin = useMemo(
     () =>
@@ -162,8 +270,21 @@ export const ThreadListItems: FC<
       }),
     [pinnable, pinLabel, unpinLabel, pinnedLabel],
   );
+  const resolvedProjects = useMemo<ResolvedProjects | null>(
+    () =>
+      projects
+        ? {
+            ...projects,
+            canManage: projects.canManage ?? false,
+            canMove: projects.canMove ?? true,
+            labels: { ...PROJECT_LABEL_DEFAULTS, ...projects.labels },
+          }
+        : null,
+    [projects],
+  );
   return (
     <ThreadListPinContext.Provider value={pin}>
+      <ThreadListProjectsContext.Provider value={resolvedProjects}>
       <div
         data-slot="aui_thread-list-items"
         className={cn("flex flex-col gap-0.5", className)}
@@ -176,6 +297,7 @@ export const ThreadListItems: FC<
           <ThreadListItemGroups searchQuery={searchQuery} />
         </AuiIf>
       </div>
+      </ThreadListProjectsContext.Provider>
     </ThreadListPinContext.Provider>
   );
 };
@@ -209,9 +331,10 @@ export type ThreadListGroup = { label: string; indices: number[] };
  */
 export const useThreadListGroups = (
   searchQuery = "",
-  options: { pinnable?: boolean; pinnedLabel?: string } = {},
+  options: { pinnable?: boolean; pinnedLabel?: string; folderIds?: ReadonlySet<string> | null } = {},
 ) => {
   const pinnable = options.pinnable ?? false;
+  const folderIds = options.folderIds ?? null;
   const pinnedLabel = options.pinnedLabel ?? defaultPinConfig.pinned;
   const threadIds = useAuiState((s) => s.threads.threadIds);
   const threadItems = useAuiState((s) => s.threads.threadItems);
@@ -231,14 +354,30 @@ export const useThreadListGroups = (
             .includes(query),
       )
       .map(({ index }) => index);
-    if (!filteredIndices.some((index) => dates[index])) {
-      return { threadIds, filteredIndices, groups: null };
+    // Projects mode, not searching: a chat in a listed project goes under
+    // that project (unless pinned, when Pinned wins), never in a day group.
+    const byFolder = new Map<string, number[]>();
+    const inFolder = (index: number): string | null => {
+      if (!folderIds || query) return null;
+      const custom = itemsById.get(threadIds[index] ?? "")?.custom;
+      if (pinnable && isThreadPinned(custom)) return null;
+      const folderId = threadFolderId(custom);
+      return folderId && folderIds.has(folderId) ? folderId : null;
+    };
+    const timeOf = (index: number) => dates[index]?.getTime() ?? Number.MAX_SAFE_INTEGER;
+    if (folderIds && !query) {
+      for (const index of [...filteredIndices].sort((a, b) => timeOf(b) - timeOf(a))) {
+        const folderId = inFolder(index);
+        if (folderId) byFolder.set(folderId, [...(byFolder.get(folderId) ?? []), index]);
+      }
+    }
+    const looseIndices = filteredIndices.filter((index) => inFolder(index) === null);
+    if (!looseIndices.some((index) => dates[index])) {
+      return { threadIds, filteredIndices, groups: null, looseIndices, byFolder };
     }
 
     const startOfToday = startOfLocalDay(new Date());
-    const time = (index: number) =>
-      dates[index]?.getTime() ?? Number.MAX_SAFE_INTEGER;
-    const sorted = [...filteredIndices].sort((a, b) => time(b) - time(a));
+    const sorted = [...looseIndices].sort((a, b) => timeOf(b) - timeOf(a));
 
     const result: ThreadListGroup[] = [];
     if (pinnable) {
@@ -264,17 +403,22 @@ export const useThreadListGroups = (
         result.push({ label, indices: [index] });
       }
     }
-    return { threadIds, filteredIndices, groups: result };
-  }, [threadIds, threadItems, query, pinnable, pinnedLabel]);
+    return { threadIds, filteredIndices, groups: result, looseIndices, byFolder };
+  }, [threadIds, threadItems, query, pinnable, pinnedLabel, folderIds]);
 };
 
 const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
   searchQuery = "",
 }) => {
   const pin = useContext(ThreadListPinContext);
-  const { threadIds, filteredIndices, groups } = useThreadListGroups(
+  const projects = useContext(ThreadListProjectsContext);
+  const folderIds = useMemo(
+    () => (projects ? new Set(projects.folders.map((folder) => folder.id)) : null),
+    [projects],
+  );
+  const { threadIds, filteredIndices, groups, looseIndices, byFolder } = useThreadListGroups(
     searchQuery,
-    { pinnable: pin.pinnable, pinnedLabel: pin.pinned },
+    { pinnable: pin.pinnable, pinnedLabel: pin.pinned, folderIds },
   );
   const query = searchQuery.trim();
 
@@ -289,17 +433,31 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
     );
   }
 
+  const row = (index: number) => (
+    <ThreadListPrimitive.ItemByIndex
+      key={threadIds[index]}
+      index={index}
+      components={{ ThreadListItem }}
+    />
+  );
+  const section =
+    projects && !query ? (
+      <ThreadListProjectsSection projects={projects} byFolder={byFolder} row={row} />
+    ) : null;
+
   if (!groups) {
-    return filteredIndices.map((index) => (
-      <ThreadListPrimitive.ItemByIndex
-        key={threadIds[index]}
-        index={index}
-        components={{ ThreadListItem }}
-      />
-    ));
+    return (
+      <>
+        {section}
+        {looseIndices.map(row)}
+      </>
+    );
   }
 
-  return groups.map((group) => (
+  // Pinned (when present) leads, then Projects, then the day groups.
+  const pinnedFirst = pin.pinnable && groups[0]?.label === pin.pinned ? groups[0] : null;
+  const rest = pinnedFirst ? groups.slice(1) : groups;
+  const renderGroup = (group: ThreadListGroup) => (
     <Fragment key={group.label}>
       <div
         data-slot="aui_thread-list-group-label"
@@ -307,15 +465,333 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
       >
         {group.label}
       </div>
-      {group.indices.map((index) => (
-        <ThreadListPrimitive.ItemByIndex
-          key={threadIds[index]}
-          index={index}
-          components={{ ThreadListItem }}
+      {group.indices.map(row)}
+    </Fragment>
+  );
+  return (
+    <>
+      {pinnedFirst ? renderGroup(pinnedFirst) : null}
+      {section}
+      {rest.map(renderGroup)}
+    </>
+  );
+};
+
+/** The projects section: its label (with "+" when the host allows), then
+ * one collapsible row per project with its chats indented under it. */
+const ThreadListProjectsSection: FC<{
+  projects: ResolvedProjects;
+  byFolder: Map<string, number[]>;
+  row: (index: number) => React.ReactNode;
+}> = ({ projects, byFolder, row }) => {
+  const { labels } = projects;
+  const [creating, setCreating] = useState(false);
+  const canCreate = projects.canManage && Boolean(projects.onCreate);
+  if (projects.folders.length === 0 && !canCreate) return null;
+  return (
+    <div data-slot="aui_thread-list-projects" className="flex flex-col gap-0.5">
+      <div
+        data-slot="aui_thread-list-group-label"
+        className="text-muted-foreground flex items-center justify-between px-2.5 pt-3 pb-1 text-xs font-medium"
+      >
+        <span>{labels.projects}</span>
+        {canCreate ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            data-slot="aui_thread-list-section-action"
+            aria-label={labels.newProject}
+            className="size-6 p-0"
+            onClick={() => setCreating(true)}
+          >
+            <PlusIcon className="size-3.5" />
+          </Button>
+        ) : null}
+      </div>
+      {creating ? (
+        <ProjectNameField
+          label={labels.newProject}
+          placeholder={labels.projectName}
+          initial=""
+          onDone={async (name) => {
+            // The field closes whether or not the host's save succeeds;
+            // the host says what went wrong.
+            try {
+              if (name) await projects.onCreate?.(name);
+            } finally {
+              setCreating(false);
+            }
+          }}
+        />
+      ) : null}
+      {projects.folders.map((folder) => (
+        <ThreadListProjectRow
+          key={folder.id}
+          folder={folder}
+          projects={projects}
+          indices={byFolder.get(folder.id) ?? []}
+          row={row}
         />
       ))}
-    </Fragment>
-  ));
+    </div>
+  );
+};
+
+/** One inline name field, for making and renaming a project: Enter keeps
+ * it, Escape or an empty name drops it. */
+const ProjectNameField: FC<{
+  label: string;
+  placeholder: string;
+  initial: string;
+  onDone: (name: string | null) => void | Promise<void>;
+}> = ({ label, placeholder, initial, onDone }) => {
+  const [value, setValue] = useState(initial);
+  const settled = useRef(false);
+  const finish = (keep: boolean) => {
+    if (settled.current) return;
+    settled.current = true;
+    const name = value.trim();
+    // A host whose save fails reports it itself; nothing is left pending here.
+    Promise.resolve(onDone(keep && name && name !== initial ? name : null)).catch(() => {});
+  };
+  return (
+    <Input
+      autoFocus
+      data-slot="aui_thread-list-project-name"
+      aria-label={label}
+      placeholder={placeholder}
+      maxLength={80}
+      value={value}
+      className="h-8 min-w-0 ps-2.5 text-sm"
+      onChange={(event) => setValue(event.target.value)}
+      onBlur={() => finish(true)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          finish(true);
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          finish(false);
+        }
+      }}
+    />
+  );
+};
+
+const ThreadListProjectRow: FC<{
+  folder: { id: string; name: string };
+  projects: ResolvedProjects;
+  indices: number[];
+  row: (index: number) => React.ReactNode;
+}> = ({ folder, projects, indices, row }) => {
+  const aui = useAui();
+  const { labels } = projects;
+  const activeId = useAuiState((s) => s.threads.mainThreadId);
+  const threadIds = useAuiState((s) => s.threads.threadIds);
+  const holdsActive = indices.some((index) => threadIds[index] === activeId);
+  const [open, setOpen] = useState(holdsActive);
+  const [showAll, setShowAll] = useState(false);
+  const [mode, setMode] = useState<"idle" | "rename" | "confirm">("idle");
+  const [dropping, setDropping] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // A chat opened from elsewhere (search, a new chat in this project) opens
+  // its project so the person can see where it is.
+  useEffect(() => {
+    if (holdsActive) setOpen(true);
+  }, [holdsActive]);
+
+  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === "ArrowRight" && !open) {
+      event.preventDefault();
+      setOpen(true);
+    } else if (event.key === "ArrowLeft" && open) {
+      event.preventDefault();
+      setOpen(false);
+    }
+  };
+
+  const acceptsDrop = (event: DragEvent) =>
+    projects.canMove && event.dataTransfer.types.includes(THREAD_DRAG_TYPE);
+  const onDrop = (event: DragEvent<HTMLDivElement>) => {
+    setDropping(false);
+    if (!acceptsDrop(event)) return;
+    event.preventDefault();
+    const threadId = event.dataTransfer.getData(THREAD_DRAG_TYPE);
+    if (!threadId) return;
+    const item = aui.threads().item({ id: threadId });
+    const custom = item.getState().custom;
+    if (threadFolderId(custom) === folder.id) return;
+    void item.updateCustom({ ...custom, folder_id: folder.id });
+    setOpen(true);
+  };
+
+  const visible = showAll ? indices : indices.slice(0, PROJECT_PREVIEW_COUNT);
+  const restoreFocus = useCallback(() => triggerRef.current?.focus(), []);
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <div
+        data-slot="aui_thread-list-project"
+        data-drop-target={dropping || undefined}
+        className="group data-[drop-target]:ring-ring/50 relative flex h-8 items-center transition-colors data-[drop-target]:ring-1"
+        onDragOver={(event) => {
+          if (!acceptsDrop(event)) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "move";
+          setDropping(true);
+        }}
+        onDragLeave={() => setDropping(false)}
+        onDrop={onDrop}
+      >
+        {mode === "rename" ? (
+          <ProjectNameField
+            label={labels.rename}
+            placeholder={labels.projectName}
+            initial={folder.name}
+            onDone={async (name) => {
+              try {
+                if (name) await projects.onRename?.(folder.id, name);
+              } finally {
+                setMode("idle");
+                restoreFocus();
+              }
+            }}
+          />
+        ) : (
+          <CollapsibleTrigger asChild>
+            <button
+              ref={triggerRef}
+              type="button"
+              data-slot="aui_thread-list-project-trigger"
+              onKeyDown={onKeyDown}
+              className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center gap-2 rounded-[inherit] text-start outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 focus-visible:ring-1"
+            >
+              <FolderIcon aria-hidden data-slot="aui_thread-list-project-icon" className="text-muted-foreground size-4 shrink-0" />
+              <span data-slot="aui_thread-list-project-title" className="min-w-0 flex-1 truncate">
+                {folder.name}
+              </span>
+              <ChevronRightIcon
+                aria-hidden
+                data-slot="aui_thread-list-project-chevron"
+                className={cn(
+                  "text-muted-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+                  open && "rotate-90",
+                )}
+              />
+            </button>
+          </CollapsibleTrigger>
+        )}
+        {mode !== "rename" && (projects.onNewChat || (projects.canManage && (projects.onRename || projects.onDelete))) ? (
+          <DropdownMenuPrimitive.Root>
+            <DropdownMenuPrimitive.Trigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                data-slot="aui_thread-list-project-more"
+                className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 data-[state=open]:opacity-100"
+              >
+                <MoreHorizontalIcon className="size-3.5" />
+                <span className="sr-only">{labels.projectOptions}</span>
+              </Button>
+            </DropdownMenuPrimitive.Trigger>
+            <DropdownMenuPrimitive.Portal>
+              <DropdownMenuPrimitive.Content
+                side="right"
+                align="start"
+                sideOffset={6}
+                data-slot="aui_thread-list-project-more-content"
+                className={menuContentClass}
+              >
+                {projects.onNewChat ? (
+                  <DropdownMenuPrimitive.Item className={menuItemClass} onSelect={() => projects.onNewChat?.(folder.id)}>
+                    <PencilIcon className="size-4" />
+                    {labels.newChatInProject}
+                  </DropdownMenuPrimitive.Item>
+                ) : null}
+                {projects.canManage && projects.onRename ? (
+                  <DropdownMenuPrimitive.Item className={menuItemClass} onSelect={() => setMode("rename")}>
+                    <PencilIcon className="size-4" />
+                    {labels.rename}
+                  </DropdownMenuPrimitive.Item>
+                ) : null}
+                {projects.canManage && projects.onDelete ? (
+                  <DropdownMenuPrimitive.Item className={destructiveItemClass} onSelect={() => setMode("confirm")}>
+                    <TrashIcon className="size-4" />
+                    {labels.delete}
+                  </DropdownMenuPrimitive.Item>
+                ) : null}
+              </DropdownMenuPrimitive.Content>
+            </DropdownMenuPrimitive.Portal>
+          </DropdownMenuPrimitive.Root>
+        ) : null}
+      </div>
+      {mode === "confirm" ? (
+        <div
+          role="group"
+          aria-label={labels.confirmDelete}
+          data-slot="aui_thread-list-project-confirm"
+          className="flex flex-col gap-1.5 px-2.5 py-2 text-sm"
+        >
+          <span>{labels.confirmDelete}</span>
+          <div className="flex gap-1.5">
+            <Button
+              variant="destructive"
+              size="sm"
+              autoFocus
+              onClick={() => {
+                setMode("idle");
+                Promise.resolve(projects.onDelete?.(folder.id)).catch(() => {});
+              }}
+            >
+              {labels.delete}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setMode("idle");
+                restoreFocus();
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  setMode("idle");
+                  restoreFocus();
+                }
+              }}
+            >
+              {labels.cancel}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      <CollapsibleContent
+        data-slot="aui_thread-list-project-items"
+        className="overflow-hidden ps-4 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down motion-reduce:animate-none"
+      >
+        <div className="flex flex-col gap-0.5 pt-0.5">
+          {indices.length === 0 ? (
+            <div data-slot="aui_thread-list-project-empty" className="text-muted-foreground px-2.5 py-1.5 text-xs">
+              {labels.empty}
+            </div>
+          ) : (
+            visible.map(row)
+          )}
+          {indices.length > PROJECT_PREVIEW_COUNT ? (
+            <Button
+              variant="ghost"
+              data-slot="aui_thread-list-project-show-more"
+              className="text-muted-foreground h-8 justify-start rounded-md px-2.5 text-sm font-normal"
+              onClick={() => setShowAll((all) => !all)}
+            >
+              {showAll ? labels.showLess : labels.showMore}
+            </Button>
+          ) : null}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
 };
 
 export const ThreadListNew = forwardRef<
@@ -378,6 +854,9 @@ const ThreadListSkeleton: FC = () => {
 
 export const ThreadListItem: FC = () => {
   const isRunning = useAuiState((s) => s.threadListItem.isRunning);
+  const projects = useContext(ThreadListProjectsContext);
+  const threadId = useAuiState((s) => s.threadListItem.id);
+  const draggable = Boolean(projects?.canMove && projects.folders.length > 0);
   const { pinnable } = useContext(ThreadListPinContext);
   const isPinned = useAuiState((s) => isThreadPinned(s.threadListItem.custom));
   const [isRenaming, setIsRenaming] = useState(false);
@@ -392,6 +871,15 @@ export const ThreadListItem: FC = () => {
 
   return (
     <ThreadListItemPrimitive.Root
+      draggable={draggable && !isRenaming ? true : undefined}
+      onDragStart={
+        draggable
+          ? (event: DragEvent<HTMLDivElement>) => {
+              event.dataTransfer.setData(THREAD_DRAG_TYPE, threadId);
+              event.dataTransfer.effectAllowed = "move";
+            }
+          : undefined
+      }
       data-slot="aui_thread-list-item"
       className="group hover:bg-muted focus-visible:bg-muted data-active:bg-muted has-focus-visible:bg-muted has-data-[state=open]:bg-muted relative flex h-8 items-center rounded-md transition-colors focus-visible:outline-none"
     >
@@ -504,6 +992,14 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
   const aui = useAui();
   const { pinnable, pin, unpin } = useContext(ThreadListPinContext);
   const isPinned = useAuiState((s) => isThreadPinned(s.threadListItem.custom));
+  const projects = useContext(ThreadListProjectsContext);
+  const folderId = useAuiState((s) => threadFolderId(s.threadListItem.custom));
+  const [picking, setPicking] = useState(false);
+  const canMove = Boolean(projects?.canMove);
+  const moveTo = (next: string | null) => {
+    const custom = aui.threadListItem().getState().custom;
+    void aui.threadListItem().updateCustom({ ...custom, folder_id: next });
+  };
 
   // updateCustom replaces the whole object, so keep the host's other keys.
   const togglePinned = () => {
@@ -512,7 +1008,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
   };
 
   return (
-    <ThreadListItemMorePrimitive.Root sharedFocusGroup>
+    <ThreadListItemMorePrimitive.Root sharedFocusGroup onOpenChange={(open) => { if (!open) setPicking(false); }}>
       <ThreadListItemMorePrimitive.Trigger asChild>
         <Button
           variant="ghost"
@@ -529,8 +1025,37 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
         align="start"
         sideOffset={6}
         data-slot="aui_thread-list-item-more-content"
-        className="bg-popover text-popover-foreground data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:animate-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 overflow-hidden rounded-xl border p-1.5"
+        className={menuContentClass}
       >
+        {picking && projects ? (
+          <>
+            <ThreadListItemMorePrimitive.Item
+              data-slot="aui_thread-list-item-more-item"
+              className={menuItemClass}
+              onSelect={(event) => {
+                event.preventDefault();
+                setPicking(false);
+              }}
+            >
+              <ArrowLeftIcon className="size-4" />
+              {projects.labels.back}
+            </ThreadListItemMorePrimitive.Item>
+            {projects.folders.map((folder) => (
+              <ThreadListItemMorePrimitive.Item
+                key={folder.id}
+                data-slot="aui_thread-list-item-more-item"
+                data-current={folder.id === folderId || undefined}
+                disabled={folder.id === folderId}
+                className={menuItemClass}
+                onSelect={() => moveTo(folder.id)}
+              >
+                <FolderIcon className="size-4" />
+                <span className="max-w-48 truncate">{folder.name}</span>
+              </ThreadListItemMorePrimitive.Item>
+            ))}
+          </>
+        ) : (
+        <>
         <ThreadListItemMorePrimitive.Item
           data-slot="aui_thread-list-item-more-item"
           className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none"
@@ -553,6 +1078,29 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
             {isPinned ? unpin : pin}
           </ThreadListItemMorePrimitive.Item>
         )}
+        {canMove && projects && projects.folders.length > 0 ? (
+          <ThreadListItemMorePrimitive.Item
+            data-slot="aui_thread-list-item-more-item"
+            className={menuItemClass}
+            onSelect={(event) => {
+              event.preventDefault();
+              setPicking(true);
+            }}
+          >
+            <FolderInputIcon className="size-4" />
+            {projects.labels.moveTo}
+          </ThreadListItemMorePrimitive.Item>
+        ) : null}
+        {canMove && projects && folderId ? (
+          <ThreadListItemMorePrimitive.Item
+            data-slot="aui_thread-list-item-more-item"
+            className={menuItemClass}
+            onSelect={() => moveTo(null)}
+          >
+            <FolderMinusIcon className="size-4" />
+            {projects.labels.removeFromProject}
+          </ThreadListItemMorePrimitive.Item>
+        ) : null}
         <ThreadListItemPrimitive.Archive asChild>
           <ThreadListItemMorePrimitive.Item
             data-slot="aui_thread-list-item-more-item"
@@ -571,6 +1119,8 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
             Delete
           </ThreadListItemMorePrimitive.Item>
         </ThreadListItemPrimitive.Delete>
+        </>
+        )}
       </ThreadListItemMorePrimitive.Content>
     </ThreadListItemMorePrimitive.Root>
   );

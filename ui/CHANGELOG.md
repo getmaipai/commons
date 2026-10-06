@@ -1,5 +1,48 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.121] - ui-v0.5.121
+
+### CHAT-PROJECT-01 (PROJECTS-01b): projects in the thread list
+
+`ThreadListItems` gains an opt-in `projects` prop (`ThreadListProjects`). A
+host that passes none renders exactly as before.
+
+- A chat whose custom metadata carries `folder_id` naming a listed project
+  leaves the day groups and lists under a Projects section, after Pinned and
+  before Today. A pinned chat stays under Pinned only, and a search lists
+  matches flat, so a chat is never shown twice.
+- Each project is a row with a folder glyph that opens and closes (click,
+  Enter or Space, ArrowRight and ArrowLeft) with the collapsible animation
+  (none under reduced motion), its chats indented, "Show more" after six.
+- The chat row menu gains "Move to project" (the menu turns into the list of
+  projects, with Back) and "Remove from project"; a chat row can be dragged
+  onto a project row (native drag and drop, no new dependency). Moving calls
+  the thread list's own `updateCustom` with the new `folder_id`, the same
+  channel pinning uses.
+- With `canManage`, the section label's "+" makes a project from an inline
+  field, and a project's menu renames it inline and deletes it after an
+  inline confirmation (never a floating dialog). `onNewChat` adds "New chat
+  in project". `canMove: false` turns moving off. Every word is a label prop.
+- New data-slots for host styling: `aui_thread-list-projects`,
+  `aui_thread-list-project`, `-project-trigger`, `-project-icon`,
+  `-project-title`, `-project-chevron`, `-project-more`, `-project-items`,
+  `-project-empty`, `-project-show-more`, `-project-confirm`,
+  `-project-name`, `aui_thread-list-section-action`.
+
+Reuse check: assistant-ui 0.15.21 has no thread grouping API (its thread
+list scopes expose ids, items and `updateCustom` only, and
+ThreadListItemMore has no submenu part), and `threadlist-sidebar` is a
+no-fit, so the grouping extends the vendored thread list the way pinning
+did (ui-v0.5.95). The project menu is Radix DropdownMenu from `radix-ui`,
+the open and close is the elements' own Collapsible. Tests:
+`thread-list.projects.aui.test.tsx`.
+### K05 (contrast)
+
+NumberTicker labels and readable secondary text across the Elements use the
+contrast-safe `text-muted-foreground` token instead of low-opacity foreground
+text. Icon-only, disabled, and placeholder treatments keep their existing
+styles.
+
 ## [0.5.120] - ui-v0.5.120
 
 ### K05 (contrast)

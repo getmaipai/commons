@@ -232,6 +232,32 @@
   min-height: 48px;
 }
 
+/* CHAT-PROJECT-01: a project row in the thread list. A host matches it to
+ * its own chat rows through these tokens alone (rule 9: hosts set tokens,
+ * never shape): --aui-thread-list-row-min-height (the 48px floor by
+ * default), -row-radius, -row-hover (hover, focus, open menu, drop target)
+ * and -row-padding-x / -row-font-size for the row's text. */
+[data-slot="aui_thread-list-project"],
+[data-slot="aui_thread-list-project-trigger"] {
+  min-height: var(--aui-thread-list-row-min-height, 48px);
+}
+[data-slot="aui_thread-list-project"] {
+  border-radius: var(--aui-thread-list-row-radius, calc(var(--radius) - 2px));
+}
+[data-slot="aui_thread-list-project"]:hover,
+[data-slot="aui_thread-list-project"]:has(:focus-visible),
+[data-slot="aui_thread-list-project"]:has([data-state="open"][data-slot="aui_thread-list-project-more"]),
+[data-slot="aui_thread-list-project"][data-drop-target] {
+  background-color: var(--aui-thread-list-row-hover, var(--muted));
+}
+[data-slot="aui_thread-list-project-trigger"] {
+  padding-inline-start: var(--aui-thread-list-row-padding-x, 0.625rem);
+  font-size: var(--aui-thread-list-row-font-size, 0.875rem);
+}
+[data-slot="aui_thread-list-project"]:not(:hover):not(:has(:focus-visible)):not(:has([data-state="open"][data-slot="aui_thread-list-project-more"])) [data-slot="aui_thread-list-project-trigger"] {
+  padding-inline-end: var(--aui-thread-list-row-padding-x, 0.625rem);
+}
+
 [data-slot="aui_thread-list-item"][data-active="true"] {
   background-color: var(--sidebar-accent);
 }
