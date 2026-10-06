@@ -7,7 +7,10 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.83] - 2026-10-06
+
 ### Added
+- Optional `image_input` on `ModelCapabilities`: present only on a model proven to read pictures, and it requires the pinned multimodal `projector` file (name, URL, sha256, size) its engine loads beside the weights, so image input without a projector cannot validate. A host keys picture support on this declaration, never on a model id (VISION-01a). New fixture `model-capabilities.vision-role.example.json`.
 - Closed presence states, turn-stream event mappings, private activity ownership rules, resolver priority/timing, web/Eyes/body joins, emotion-map overlays, Row-Bot transition fixtures, and the optional `RobotState.presence` field (PRESENCE-STATES-01).
 - Household, person, and robot device settings for Reachy, including the default-off tailnet opt-in and the six Home-honoured robot controls (SETTINGS-ROBOT-01). Filed the EYES-07 quiet-hours follow-up.
 - Closed emotion-to-primitive and optional clip map, the twelve emotion labels, optional `ReplyPlan.react_move`, and the `thinking`, `offer`, and `shake` primitive names (EMO-MAP-01).

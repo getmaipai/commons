@@ -377,6 +377,7 @@ def test_error_catalogue_entries():
         "rerank-role",
         "music-role",
         "background-turns",
+        "vision-role",
     ],
 )
 def test_model_capabilities_fixtures(kind):
@@ -422,6 +423,34 @@ def test_model_capabilities_unknown_role_is_rejected():
     bad["role"] = "nonsense"
     with pytest.raises(ValidationError):
         ModelCapabilities.model_validate(bad)
+
+
+def test_model_capabilities_vision_declares_image_input_with_projector():
+    record = ModelCapabilities.model_validate(
+        load_fixture("model-capabilities.vision-role.example.json")
+    )
+    assert record.image_input.projector.file == "mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf"
+
+
+def test_model_capabilities_image_input_without_projector_is_rejected():
+    bad = load_fixture("model-capabilities.vision-role.example.json")
+    bad["image_input"] = {}
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate(bad)
+
+
+def test_model_capabilities_projector_without_checksum_is_rejected():
+    bad = load_fixture("model-capabilities.vision-role.example.json")
+    del bad["image_input"]["projector"]["download"]["sha256"]
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate(bad)
+
+
+def test_model_capabilities_text_only_model_has_no_image_input():
+    record = ModelCapabilities.model_validate(
+        load_fixture("model-capabilities.chat.example.json")
+    )
+    assert record.image_input is None
 
 
 def test_model_capabilities_chat_footprints_fixture():

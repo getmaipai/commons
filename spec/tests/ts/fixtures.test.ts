@@ -301,7 +301,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts", "judge-role", "rerank-role", "music-role", "background-turns"]) {
+  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts", "judge-role", "rerank-role", "music-role", "background-turns", "vision-role"]) {
     test(`model-capabilities.${kind}.example.json`, () => {
       expect(() =>
         ModelCapabilities.parse(loadFixture(`model-capabilities.${kind}.example.json`)),
@@ -312,6 +312,27 @@ describe("record fixtures validate against their generated Zod models", () => {
   test("model-capabilities with an unknown role is rejected", () => {
     const bad = { ...(loadFixture("model-capabilities.chat.example.json") as Record<string, unknown>), role: "nonsense" };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
+  });
+
+  test("model-capabilities: a vision model declares image input with its projector (VISION-01a)", () => {
+    const parsed = ModelCapabilities.parse(loadFixture("model-capabilities.vision-role.example.json"));
+    expect(parsed.image_input?.projector.file).toBe("mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf");
+  });
+
+  test("model-capabilities that declares image input without a projector is rejected (VISION-01a)", () => {
+    const bad = { ...(loadFixture("model-capabilities.vision-role.example.json") as Record<string, unknown>), image_input: {} };
+    expect(() => ModelCapabilities.parse(bad)).toThrow();
+  });
+
+  test("model-capabilities with a projector that has no checksum is rejected (VISION-01a)", () => {
+    const fixture = loadFixture("model-capabilities.vision-role.example.json") as { image_input: { projector: { file: string; download: Record<string, unknown> } } };
+    const { sha256: _sha256, ...download } = fixture.image_input.projector.download;
+    const bad = { ...fixture, image_input: { projector: { ...fixture.image_input.projector, download } } };
+    expect(() => ModelCapabilities.parse(bad)).toThrow();
+  });
+
+  test("model-capabilities: a text-only model carries no image_input (VISION-01a)", () => {
+    expect(ModelCapabilities.parse(loadFixture("model-capabilities.chat.example.json")).image_input).toBeUndefined();
   });
 
   test("model-capabilities.chat-footprints.example.json", () => {

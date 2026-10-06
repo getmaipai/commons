@@ -89,6 +89,37 @@ export const ModelCapabilities = z
         "Absent for a placeholder entry with nowhere to download from yet.",
       )
       .optional(),
+    /**VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).*/
+    image_input: z
+      .object({
+        /**One file a model needs beside its weights, pinned by URL, sha256 and size; never selectable alone.*/
+        projector: z
+          .object({
+            /**The file name as published, e.g. 'mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf'.*/
+            file: z
+              .string()
+              .min(1)
+              .describe(
+                "The file name as published, e.g. 'mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf'.",
+              ),
+            download: z
+              .object({
+                url: z.string().url(),
+                sha256: z.string().regex(new RegExp("^[a-f0-9]{64}$")),
+                approx_bytes: z.number().int().gte(1),
+              })
+              .strict(),
+          })
+          .strict()
+          .describe(
+            "One file a model needs beside its weights, pinned by URL, sha256 and size; never selectable alone.",
+          ),
+      })
+      .strict()
+      .describe(
+        "VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).",
+      )
+      .optional(),
     sizing: z.any().superRefine((x, ctx) => {
       const schemas = [
         z

@@ -58,6 +58,15 @@
       },
       "description": "Absent for a placeholder entry with nowhere to download from yet."
     },
+    "image_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projector"],
+      "description": "VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).",
+      "properties": {
+        "projector": { "$ref": "#/$defs/component" }
+      }
+    },
     "sizing": { "$ref": "#/$defs/sizing" },
     "footprints": {
       "type": "array",
@@ -67,6 +76,25 @@
     "turn_budget": { "$ref": "#/$defs/turn_budget" }
   },
   "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "download"],
+      "description": "One file a model needs beside its weights, pinned by URL, sha256 and size; never selectable alone.",
+      "properties": {
+        "file": { "type": "string", "minLength": 1, "description": "The file name as published, e.g. 'mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf'." },
+        "download": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["url", "sha256", "approx_bytes"],
+          "properties": {
+            "url": { "type": "string", "format": "uri" },
+            "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "approx_bytes": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
     "kv_cache_type": {
       "type": "string",
       "enum": ["f16", "q8_0", "q4_0"],

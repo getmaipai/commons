@@ -32,6 +32,30 @@ class Download(BaseModel):
     approx_bytes: conint(ge=1)
 
 
+class Download1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    url: AnyUrl
+    sha256: constr(pattern=r'^[a-f0-9]{64}$')
+    approx_bytes: conint(ge=1)
+
+
+class Component(BaseModel):
+    """
+    One file a model needs beside its weights, pinned by URL, sha256 and size; never selectable alone.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    file: constr(min_length=1) = Field(
+        ...,
+        description="The file name as published, e.g. 'mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf'.",
+    )
+    download: Download1
+
+
 class Tool(BaseModel):
     """
     The engine or estimator that produced the number, and its exact version.
@@ -200,6 +224,17 @@ class DiffusionSizing(BaseModel):
     )
 
 
+class ImageInput(BaseModel):
+    """
+    VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projector: Component
+
+
 class ModelCapabilities(BaseModel):
     """
     One catalog entry: a specific model file (or checkpoint set) for one of backend/src/lib/llm.ts's roles, plus what it takes to run it. Platform plan 4.11 names this record ('context, tools, JSON schema, grammar, vision, think-mode key, template source, sampling, engine flags, quality tier, safety notes, licence') for describing catalog model packages and BYO GGUFs; spec/llm/README.md deferred writing it until a real producer (hardware detection) and consumer (the model-selection wizard/settings page) existed. Only the fields those actually use are populated; the rest of the plan's field list stays a named future gap, not guessed at here.
@@ -259,6 +294,10 @@ class ModelCapabilities(BaseModel):
     download: Download | None = Field(
         None,
         description='Absent for a placeholder entry with nowhere to download from yet.',
+    )
+    image_input: ImageInput | None = Field(
+        None,
+        description="VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).",
     )
     sizing: TransformerGgufSizing | DiffusionSizing
     footprints: list[Footprint] | None = Field(
