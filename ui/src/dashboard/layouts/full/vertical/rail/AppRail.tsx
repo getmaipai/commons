@@ -4,6 +4,7 @@ import LogoIcon from "../../../../assets/images/logos/logoicon.svg";
 import LogoIconDark from "../../../../assets/images/logos/logoicon-dark.svg";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/ui/tooltip";
 import { cn } from "../../../../lib/utils";
+import { hitArea } from "../../../../../utils";
 import SidebarContent, { type ChildItem } from "../sidebar/sidebaritems";
 import HeaderSearch, { type HeaderSearchProps } from "../header/HeaderSearch";
 
@@ -52,9 +53,9 @@ export default function AppRail({ searchRemote, itemStatus, profile }: AppRailPr
     <nav
       aria-label="Primary navigation"
       data-slot="app-rail"
-      className="flex h-svh w-14 min-w-14 max-w-14 shrink-0 flex-col items-center gap-1 bg-sidebar p-2"
+      className="sticky top-0 flex h-svh w-14 min-w-14 max-w-14 shrink-0 flex-col items-center gap-1 bg-sidebar p-2"
     >
-      <Link to="/" aria-label="MaiPai Home" className="mb-1 flex size-10 items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <Link to="/" aria-label="MaiPai Home" className={cn("mb-1 flex size-10 items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", hitArea(1))}>
         <img src={LogoIcon} alt="" className="size-7 dark:hidden" />
         <img src={LogoIconDark} alt="" className="hidden size-7 dark:block" />
       </Link>
@@ -87,7 +88,7 @@ export default function AppRail({ searchRemote, itemStatus, profile }: AppRailPr
                       aria-current={active ? "page" : undefined}
                       data-active={active ? "" : undefined}
                       data-slot="app-rail-item"
-                      className={cn(railButton, active && "bg-foreground/10 text-foreground")}
+                      className={cn(railButton, hitArea(1), active && "bg-foreground/10 text-foreground")}
                     />
                   }
                 >

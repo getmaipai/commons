@@ -71,11 +71,14 @@ function RailPageHeader() {
 function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile }: FullLayoutProps) {
   return (
     <HeaderExtraProvider>
-      <div data-slot="rail-shell" className="flex h-svh w-full overflow-hidden">
+      {/* The page scrolls as a document, as it did beside the sidebar;
+          the rail stays put (sticky, full viewport height). A full-height
+          page (a chat) bounds the workspace to the viewport itself. */}
+      <div data-slot="rail-shell" className="flex min-h-svh w-full">
         <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} />
         <main data-slot="rail-workspace" className="flex min-w-0 flex-1 flex-col" style={{ background: "var(--page)" }}>
           <RailPageHeader />
-          <div data-slot="rail-body" className="min-h-0 flex-1 overflow-y-auto">
+          <div data-slot="rail-body" className="flex-1">
             <div className={cn("w-full mx-auto p-4", "container")}>
               <Outlet />
             </div>

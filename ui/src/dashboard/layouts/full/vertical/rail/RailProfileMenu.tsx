@@ -11,6 +11,7 @@ import {
 } from "../../../../components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/ui/tooltip";
 import { cn } from "../../../../lib/utils";
+import { hitArea } from "../../../../../utils";
 
 export type RailStatusLevel = "online" | "maintenance" | "degraded" | "offline";
 
@@ -94,7 +95,7 @@ export default function RailProfileMenu({
               <DropdownMenuTrigger
                 aria-label={label}
                 data-slot="rail-profile-trigger"
-                className="relative flex size-10 cursor-pointer items-center justify-center rounded-lg hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-popup-open:bg-foreground/10"
+                className={cn("relative flex size-10 cursor-pointer items-center justify-center rounded-lg hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-popup-open:bg-foreground/10", hitArea(1))}
               />
             }
           >

@@ -1,5 +1,15 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.108] - ui-v0.5.108
+
+### RAIL-01
+
+The rail layout's page scrolls as a document again, with the rail sticky at
+full viewport height, so a page body is never a scroll region of its own
+(axe's scrollable-region-focusable). The rail's logo, app entries and
+profile button keep their 40px look and get the kit's 48px touch floor
+through `hitArea(1)`.
+
 ## [0.5.107] - ui-v0.5.107
 
 ### RAIL-01
