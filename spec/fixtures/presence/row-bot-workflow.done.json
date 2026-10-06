@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "workflow.done",
+  "presence": "done",
+  "emotion_overlay": "proud"
+}

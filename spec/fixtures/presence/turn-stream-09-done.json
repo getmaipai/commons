@@ -1,0 +1,6 @@
+{
+  "source": "turn_stream",
+  "event": "done",
+  "presence": "done",
+  "condition": "end is done"
+}

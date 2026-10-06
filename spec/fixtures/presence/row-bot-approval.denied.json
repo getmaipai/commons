@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "approval.denied",
+  "presence": "concerned",
+  "emotion_overlay": "confused"
+}

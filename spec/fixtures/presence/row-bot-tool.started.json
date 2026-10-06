@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "tool.started",
+  "presence": "working",
+  "emotion_overlay": null
+}

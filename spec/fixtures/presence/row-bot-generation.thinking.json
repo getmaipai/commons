@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "generation.thinking",
+  "presence": "thinking",
+  "emotion_overlay": "thinking"
+}

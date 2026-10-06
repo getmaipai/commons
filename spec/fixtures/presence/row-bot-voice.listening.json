@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "voice.listening",
+  "presence": "listening",
+  "emotion_overlay": null
+}

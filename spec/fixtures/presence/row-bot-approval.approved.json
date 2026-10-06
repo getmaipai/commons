@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "approval.approved",
+  "presence": "thinking",
+  "emotion_overlay": "proud"
+}

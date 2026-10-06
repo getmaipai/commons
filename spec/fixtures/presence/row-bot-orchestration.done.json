@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "orchestration.done",
+  "presence": "thinking",
+  "emotion_overlay": null
+}

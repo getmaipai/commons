@@ -1,0 +1,336 @@
+{
+  "schema": 1,
+  "description": "One shared presence vocabulary for web, robot Eyes, and body. Presence describes activity; emotion is an independent overlay from emotion-map.json. The current state contains no owner identity, turn outcome, or reason.",
+  "timing": {
+    "idle_grace_ms": 2000,
+    "stale_expiry_ms": 120000,
+    "durable_reconcile_ms": 5000
+  },
+  "turn_stream_events": [
+    {
+      "event": "turn_meta",
+      "presence": "thinking"
+    },
+    {
+      "event": "status",
+      "presence": "thinking"
+    },
+    {
+      "event": "reasoning",
+      "presence": "thinking"
+    },
+    {
+      "event": "tool_call",
+      "presence": "working"
+    },
+    {
+      "event": "tool_result",
+      "presence": "thinking"
+    },
+    {
+      "event": "tool_error",
+      "presence": "concerned",
+      "adult_only": true
+    },
+    {
+      "event": "delta",
+      "presence": "speaking"
+    },
+    {
+      "event": "spoken_cue",
+      "presence": "speaking"
+    },
+    {
+      "event": "done",
+      "presence": "done",
+      "condition": "end is done"
+    },
+    {
+      "event": "done",
+      "presence": "concerned",
+      "condition": "end is refused, blocked, or cancelled",
+      "adult_only": true
+    },
+    {
+      "event": "error",
+      "presence": "concerned",
+      "adult_only": true
+    },
+    {
+      "event": "signal",
+      "presence": null,
+      "note": "expressed_emotion is an overlay and does not select a presence state"
+    }
+  ],
+  "priority": [
+    "offline",
+    "sleeping",
+    "asking",
+    "listening",
+    "speaking",
+    "working",
+    "thinking",
+    "done",
+    "present",
+    "idle"
+  ],
+  "owner_id_rules": {
+    "ask": "pending ask id; clear only when that ask is answered or withdrawn; never stale-expire",
+    "tool": "tool_call id; clear on its result or error",
+    "turn": "conversation id; clear when the turn completes, stops, or is cancelled",
+    "routine": "routine run id; clear when that run completes, stops, or fails",
+    "voice": "voice session id; clear when the session ends",
+    "link": "client id; clear when the client reconnects or is removed",
+    "person": "signed-in person id, held only in the private resolver input",
+    "quiet_hours": "person or household setting key, held only in the private resolver input",
+    "session_lock": "session id, held only in the private resolver input",
+    "engine": "engine role id, held only in the private resolver input",
+    "robot_presence": "device-local observation id; never identifies a face"
+  },
+  "eyes_look_keys": [
+    "live",
+    "camera",
+    "alarm",
+    "alarm_dim",
+    "held",
+    "muted",
+    "idle",
+    "listening",
+    "thinking",
+    "speaking",
+    "sleep"
+  ],
+  "states": [
+    {
+      "state": "idle",
+      "eyes": "idle",
+      "primitive": "breathe",
+      "emotion_overlay": null,
+      "web": {
+        "orb": "idle",
+        "agent_status": null,
+        "caption": null,
+        "child_caption": null
+      },
+      "child_state": "idle",
+      "child_band": "same",
+      "motion": 0.2,
+      "focus": 0.2,
+      "alert": 0.0
+    },
+    {
+      "state": "present",
+      "eyes": "idle",
+      "primitive": "track",
+      "emotion_overlay": null,
+      "web": {
+        "orb": "idle",
+        "agent_status": null,
+        "caption": null,
+        "child_caption": null
+      },
+      "child_state": "present",
+      "child_band": "same",
+      "motion": 0.3,
+      "focus": 0.3,
+      "alert": 0.0
+    },
+    {
+      "state": "listening",
+      "eyes": "listening",
+      "primitive": "listen",
+      "emotion_overlay": null,
+      "web": {
+        "orb": "listening",
+        "agent_status": null,
+        "caption": "Listening",
+        "child_caption": null
+      },
+      "child_state": "listening",
+      "child_band": "same",
+      "motion": 0.6,
+      "focus": 0.7,
+      "alert": 0.1
+    },
+    {
+      "state": "thinking",
+      "eyes": "thinking",
+      "primitive": "attend",
+      "emotion_overlay": "thinking",
+      "web": {
+        "orb": "connecting",
+        "agent_status": "working",
+        "caption": "Thinking",
+        "child_caption": null
+      },
+      "child_state": "thinking",
+      "child_band": "same",
+      "motion": 0.5,
+      "focus": 0.8,
+      "alert": 0.1
+    },
+    {
+      "state": "working",
+      "eyes": "thinking",
+      "primitive": "attend",
+      "emotion_overlay": null,
+      "web": {
+        "orb": "connecting",
+        "agent_status": "working",
+        "caption": "Working",
+        "child_caption": null
+      },
+      "child_state": "working",
+      "child_band": "same",
+      "motion": 0.6,
+      "focus": 0.7,
+      "alert": 0.1
+    },
+    {
+      "state": "speaking",
+      "eyes": "speaking",
+      "primitive": "speak",
+      "emotion_overlay": null,
+      "web": {
+        "orb": "speaking",
+        "agent_status": "working",
+        "caption": "Writing",
+        "child_caption": null
+      },
+      "child_state": "speaking",
+      "child_band": "same",
+      "motion": 0.5,
+      "focus": 0.6,
+      "alert": 0.0
+    },
+    {
+      "state": "asking",
+      "eyes": "held",
+      "primitive": "offer",
+      "emotion_overlay": null,
+      "web": {
+        "orb": "connecting",
+        "agent_status": "waiting",
+        "caption": "Needs you",
+        "child_caption": "Asked a parent"
+      },
+      "child_state": "asking",
+      "child_band": "same",
+      "motion": 0.5,
+      "focus": 0.8,
+      "alert": 0.8
+    },
+    {
+      "state": "done",
+      "eyes": "idle",
+      "primitive": "settle",
+      "emotion_overlay": "proud",
+      "web": {
+        "orb": "idle",
+        "agent_status": "done",
+        "caption": "Done",
+        "child_caption": null
+      },
+      "child_state": "done",
+      "child_band": "same",
+      "motion": 0.4,
+      "focus": 0.3,
+      "alert": 0.0
+    },
+    {
+      "state": "concerned",
+      "eyes": "idle",
+      "primitive": "tilt",
+      "emotion_overlay": "confused",
+      "web": {
+        "orb": "idle",
+        "agent_status": null,
+        "caption": "That didn't work",
+        "child_caption": null
+      },
+      "child_state": "idle",
+      "child_band": "same",
+      "motion": 0.2,
+      "focus": 0.4,
+      "alert": 0.6
+    },
+    {
+      "state": "sleeping",
+      "eyes": "sleep",
+      "primitive": "settle",
+      "emotion_overlay": "tired",
+      "web": {
+        "orb": "muted",
+        "agent_status": null,
+        "caption": "Resting",
+        "child_caption": null
+      },
+      "child_state": "sleeping",
+      "child_band": "same",
+      "motion": 0.0,
+      "focus": 0.0,
+      "alert": 0.0
+    },
+    {
+      "state": "offline",
+      "eyes": "idle",
+      "primitive": "settle",
+      "emotion_overlay": null,
+      "web": {
+        "orb": "muted",
+        "agent_status": null,
+        "caption": "Can't reach Home",
+        "child_caption": null
+      },
+      "child_state": "offline",
+      "child_band": "same",
+      "motion": 0.0,
+      "focus": 0.1,
+      "alert": 0.2
+    }
+  ],
+  "activity_kinds": [
+    "ask",
+    "tool",
+    "turn",
+    "routine",
+    "voice",
+    "link",
+    "person",
+    "quiet_hours",
+    "session_lock",
+    "engine",
+    "robot_presence"
+  ],
+  "activity_policy": {
+    "grace": "Keep a working state for 2000 ms before done or idle replaces it. The robot body retains its separate 500 ms settle gate; do not add the two delays.",
+    "stale_expiry": {
+      "after_ms": 120000,
+      "kinds": [
+        "turn",
+        "tool",
+        "voice"
+      ],
+      "action": "drop stale activity and log it",
+      "never_expire": [
+        "ask"
+      ]
+    },
+    "durable_reconcile": {
+      "every_ms": 5000,
+      "sources": [
+        "pending asks",
+        "BRAKES-01 ask rows",
+        "routine runs",
+        "engine availability"
+      ],
+      "authority": "reconciled activity replaces remembered activity"
+    },
+    "scope": "One state per person per device. A shared screen shows only its signed-in person; robot room activity is shared, and personal asking state is only for the person addressed."
+  },
+  "dial_tokens": {
+    "motion": "--presence-motion",
+    "focus": "--presence-focus",
+    "alert": "--presence-alert"
+  }
+}

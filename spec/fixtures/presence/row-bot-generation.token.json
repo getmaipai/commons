@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "generation.token",
+  "presence": "speaking",
+  "emotion_overlay": null
+}

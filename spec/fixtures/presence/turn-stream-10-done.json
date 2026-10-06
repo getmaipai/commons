@@ -1,0 +1,6 @@
+{
+  "source": "turn_stream",
+  "event": "done",
+  "presence": "concerned",
+  "condition": "end is refused, blocked, or cancelled"
+}

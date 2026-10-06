@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "notification",
+  "presence": "asking",
+  "emotion_overlay": null
+}

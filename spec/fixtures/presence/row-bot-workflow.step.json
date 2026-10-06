@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "workflow.step",
+  "presence": "working",
+  "emotion_overlay": null
+}

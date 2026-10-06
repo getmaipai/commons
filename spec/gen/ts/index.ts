@@ -22,6 +22,7 @@ export * from "./memory-record.js";
 export * from "./model-capabilities.js";
 export * from "./open-question.js";
 export * from "./person.js";
+export * from "./presence-state.js";
 export * from "./project.js";
 export * from "./recipe.js";
 export * from "./relationship.js";

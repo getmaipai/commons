@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/presence-state.schema.json",
+  "title": "PresenceState",
+  "description": "The closed activity state shared by the web character, the robot Eyes and the body. It carries no owner identity or reason.",
+  "type": "string",
+  "enum": [
+    "idle",
+    "present",
+    "listening",
+    "thinking",
+    "working",
+    "speaking",
+    "asking",
+    "done",
+    "concerned",
+    "sleeping",
+    "offline"
+  ]
+}

@@ -130,6 +130,25 @@ export const RobotState = z
         "The effective local camera watch level the robot reports to the hub, using the strictest applicable person and device setting.",
       )
       .optional(),
+    /**Optional shared activity state for the web character and robot body. It contains no person identity, turn outcome, or reason.*/
+    presence: z
+      .enum([
+        "idle",
+        "present",
+        "listening",
+        "thinking",
+        "working",
+        "speaking",
+        "asking",
+        "done",
+        "concerned",
+        "sleeping",
+        "offline",
+      ])
+      .describe(
+        "Optional shared activity state for the web character and robot body. It contains no person identity, turn outcome, or reason.",
+      )
+      .optional(),
   })
   .strict()
   .describe(

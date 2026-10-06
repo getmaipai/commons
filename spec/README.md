@@ -114,6 +114,8 @@ design record left a choice:
 | `vocab/entity-kind-nouns.json` | SPEC-01: the nouns a person answers ASK-01's unknown-name question with, mapped to an entity kind | hand-written |
 | `vocab/life-events.json` | SPEC-01: the classes AGE-01's disclosure default and CRED-01's confidence weights both read, one list | hand-written |
 | `vocab/defect-codes.json` | SPEC-01: the guard reason enum, the plan-violation sub-kinds, and REVIEW-01's own review-only codes, declared once | hand-written |
+| `vocab/presence-states.json` | PRESENCE-STATES-01: shared presence states, activity ownership, timing/priority, and web/Eyes/body joins; emotion overlays reference `emotion-map.json` | hand-written; checked against generated state schema and fixtures |
+| `schemas/presence-state.schema.json` | PRESENCE-STATES-01 closed state value, referenced by the additive `RobotState.presence` field | hand-written; generated TS and Python readers |
 | `ui/schema.json`, `ui/pages/*.json` | UI schema v0 (Chat only) and the Chat page itself | hand-written; see `ui/README.md` for why this isn't codegen'd |
 | `records/ts/` | The cross-field rules for Entity, Relationship and Grant that JSON Schema conditionals cannot carry (neither generator preserves them); TS only for now, like `safety/` | hand-written |
 | `interpreters/ts/`, `interpreters/py/` | The Tier 0 recipe interpreter, one per language, kept behaviorally identical | hand-written |

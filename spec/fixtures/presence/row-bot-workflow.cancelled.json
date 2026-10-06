@@ -1,0 +1,6 @@
+{
+  "source": "Row-Bot _EVENT_REACTIONS",
+  "event": "workflow.cancelled",
+  "presence": "concerned",
+  "emotion_overlay": "confused"
+}

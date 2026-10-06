@@ -73,6 +73,26 @@ class RobotState(BaseModel):
         None,
         description='The effective local camera watch level the robot reports to the hub, using the strictest applicable person and device setting.',
     )
+    presence: (
+        Literal[
+            'idle',
+            'present',
+            'listening',
+            'thinking',
+            'working',
+            'speaking',
+            'asking',
+            'done',
+            'concerned',
+            'sleeping',
+            'offline',
+        ]
+        | None
+    ) = Field(
+        None,
+        description='Optional shared activity state for the web character and robot body. It contains no person identity, turn outcome, or reason.',
+        title='PresenceState',
+    )
 
     @field_validator('put_down_count', mode='before')
     @classmethod

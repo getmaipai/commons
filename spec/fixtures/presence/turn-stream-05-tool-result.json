@@ -1,0 +1,5 @@
+{
+  "source": "turn_stream",
+  "event": "tool_result",
+  "presence": "thinking"
+}

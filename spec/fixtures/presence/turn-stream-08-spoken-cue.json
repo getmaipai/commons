@@ -1,0 +1,5 @@
+{
+  "source": "turn_stream",
+  "event": "spoken_cue",
+  "presence": "speaking"
+}
