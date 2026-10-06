@@ -1,6 +1,8 @@
 # Changelog (`@maipai/ui`)
 
-## [0.5.133] - ui-v0.5.133
+## [0.5.134] - ui-v0.5.134
+
+(ui-v0.5.133 was tagged with a stale package.json version and is not used.)
 
 ### FEEDBACK-CANCEL-01 (additive)
 
