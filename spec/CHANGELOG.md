@@ -16,6 +16,11 @@ scope lands.
 - Optional `motion` (`resting` or `held`, null when the body cannot tell) and optional `put_down_count` (non-negative integer) on `robot.state` (MOVE-CARRY-02). `activity` gains no value. Two fixtures: `robot-state.held.example.json` and `robot-state.resting.example.json`.
 - `vocab/capabilities.json`: the twenty body ids a robot declares on its device row (`head_6dof`, `head_pan_tilt`, `roll`, `antennas`, `body_yaw`, `eyes`, `mouth`, `light_ring`, `doa`, `state_feed`, `encoders`, `touch`, `distance`, `imu`, `battery_readout`, `physical_mute`, `camera_shutter`, `moves_recorded`, `speech_pod`, `speech_robot`), and two robot device fixtures, a Reachy Mini and a MaiPai build (BODY-VOCAB-01).
 
+## [spec-v0.1.81] - 2026-10-06
+
+### Changed
+- The stub server's tokenizer splits a long run of letters or digits into pieces of up to four, the way a real subword vocabulary does, so a test that sizes a long text gets a count in proportion to its length.
+
 ## [spec-v0.1.80] - 2026-10-06
 
 ### Added

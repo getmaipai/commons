@@ -264,10 +264,11 @@ export function stubRenderTemplate(messages: ReadonlyArray<{ role?: unknown; con
   }).join("");
 }
 
-/** The stub's tokenizer: a special marker, a run of letters or digits, or
- * one other non-space character is one token. Deterministic, offline. */
+/** The stub's tokenizer: a special marker, up to four letters or digits
+ * (a long run splits the way a real subword vocabulary splits one), or one
+ * other non-space character is one token. Deterministic, offline. */
 export function stubTokenize(content: string): number[] {
-  return (content.match(/<\|[^|]+\|>|[A-Za-z0-9]+|[^\sA-Za-z0-9]/g) ?? []).map((_, index) => index);
+  return (content.match(/<\|[^|]+\|>|[A-Za-z0-9]{1,4}|[^\sA-Za-z0-9]/g) ?? []).map((_, index) => index);
 }
 
 /** port 0 lets the OS assign a free port, avoiding a fixed-port clash

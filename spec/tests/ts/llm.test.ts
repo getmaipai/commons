@@ -20,13 +20,13 @@ describe("LlamaServerClient against the stub server", () => {
     handle = startStubLlmServer();
     const client = new LlamaServerClient(handle.url);
     const messages = [{ role: "user", content: "hello there" }];
-    // The stub's render is "<|im_start|>user\nhello there<|im_end|>\n": the
-    // role and two words plus two markers, so the count is the template's,
-    // not the bare words'.
-    expect(await client.countTokens({ messages })).toBe(5);
-    expect(await client.countTokens({ content: "hello there" })).toBe(2);
+    // The stub's render is "<|im_start|>user\nhello there<|im_end|>\n": two
+    // markers, the role, and four pieces of text ("hell" "o" "ther" "e"), so
+    // the count is the template's, not the bare text's.
+    expect(await client.countTokens({ messages })).toBe(7);
+    expect(await client.countTokens({ content: "hello there" })).toBe(4);
     const withTools = await client.countTokens({ messages, tools: [{ type: "function", function: { name: "web_search" } }] });
-    expect(withTools).toBeGreaterThan(5);
+    expect(withTools).toBeGreaterThan(7);
     await expect(client.countTokens({})).rejects.toThrow(LlmClientError);
   });
 
