@@ -1,5 +1,24 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.112] - ui-v0.5.112
+
+### STREAMING-TEXT-01 fix
+
+0.5.111's keyframe never showed in a browser: on every render Streamdown
+restamps each word it already showed with `--sd-duration: 0ms`, so a
+keyframe longer than the gap between two deltas was cut short (the tint
+lasted under 20 ms, measured in Chromium). `markdown-text.css` now draws the
+Element's look with transitions on the same word spans: a word Streamdown
+stamps as new (`--sd-duration` not `0ms`) starts transparent through
+`@starting-style` and fades in over 500 ms, is tinted while it is among the
+newest words of the block still being written, and settles to ink over
+700 ms on the same element once the next words restamp it. A word remounted
+as already shown matches nothing new, so it appears at once (no re-fade).
+`STREAMING_TEXT_ANIMATION.duration` is 500. Measured in Chromium and WebKit,
+light and dark: the first word's opacity rises once over about 500 ms, never
+drops, the paragraph never moves, and no word stays tinted after the reply
+ends.
+
 ## [0.5.111] - ui-v0.5.111
 
 ### STREAMING-TEXT-01

@@ -1,15 +1,24 @@
 /*
  * STREAMING-TEXT-01: the streamed reply takes the look of the shipped
- * streaming-text Element (streaming-text.tsx), applied through Streamdown's
- * own per-word animation hook and caret prop, since that Element renders
- * plain text only. Values copied from streaming-text.tsx:
- *   word fade-in   "fade-in animate-in ... duration-500"     -> 0% to 40% of 1200 ms
+ * streaming-text Element (streaming-text.tsx) through Streamdown's own word
+ * spans and caret prop, since that Element renders plain text only. Values
+ * copied from streaming-text.tsx:
+ *   word fade-in   "fade-in animate-in ... duration-500"     -> opacity, 500 ms
  *   tint           "text-blue-500 dark:text-blue-400"        -> --aui-streaming-tint
- *   settle to ink  "transition-colors duration-700"          -> 40% to 100% of 1200 ms
+ *   settle to ink  "transition-colors duration-700"          -> color, 700 ms
  *   caret          "ml-0.5 inline-block h-4 w-0.5 animate-pulse rounded-full bg-blue-500"
- * One difference: the Element tints the newest two words by position;
- * Streamdown's hook is per word in time, so each word is blue for its first
- * half second and then settles.
+ *
+ * Why transitions and not a Streamdown keyframe: on every render Streamdown
+ * restamps each word it already showed with --sd-duration: 0ms, so a keyframe
+ * longer than the gap between two deltas is cut short (measured: the tint
+ * lasted under 20 ms). Like the Element, a word here is "fresh" only until
+ * the next words arrive: Streamdown's fresh words are the ones whose duration
+ * is not 0ms (matched with and without the space a browser or a server
+ * render writes). A fresh word starts transparent (@starting-style) and, in the
+ * block still being written, tinted; once the next delta restamps it or a
+ * new block starts below it, it settles to ink over 700 ms on the same
+ * element. A word remounted as already shown matches nothing fresh, so it
+ * appears at once in ink (no re-fade).
  */
 .aui-md {
   --aui-streaming-tint: var(--color-blue-500, oklch(62.3% 0.214 259.815));
@@ -19,16 +28,22 @@
   --aui-streaming-tint: var(--color-blue-400, oklch(70.7% 0.165 254.624));
 }
 
-/* Streamdown stamps --sd-animation: sd-streamingText on each new word. The
- * missing 100% keyframe ends on the word's own color and opacity (ink). */
-@keyframes sd-streamingText {
-  0% {
+.aui-md [data-sd-animate] {
+  animation: none;
+  transition:
+    opacity 500ms ease var(--sd-delay, 0ms),
+    color 700ms ease;
+}
+
+/* Only the block still being written: Streamdown memoizes a finished block
+ * and never restamps it, so its last words would otherwise stay tinted. */
+.aui-md > :last-child [data-sd-animate]:not([style*="--sd-duration: 0ms"]):not([style*="--sd-duration:0ms"]) {
+  color: var(--aui-streaming-tint);
+}
+
+@starting-style {
+  .aui-md [data-sd-animate]:not([style*="--sd-duration: 0ms"]):not([style*="--sd-duration:0ms"]) {
     opacity: 0;
-    color: var(--aui-streaming-tint);
-  }
-  40% {
-    opacity: 1;
-    color: var(--aui-streaming-tint);
   }
 }
 
@@ -57,6 +72,7 @@
   [data-sd-animate],
   [data-sd-animate] * {
     animation: none !important;
+    transition: none !important;
   }
 
   .aui-md[style*="--streamdown-caret"] > :last-child:not([data-sd-caret-hidden])::after {

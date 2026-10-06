@@ -161,10 +161,11 @@ const linkSafety = { enabled: false };
 // STREAMING-TEXT-01: the streamed reply takes the streaming-text Element's
 // look (its docs: each word fades in over 500 ms in blue, settles back to ink
 // over 700 ms, a blue caret after the last word). That Element renders one
-// plain <p> with no markdown, so the look rides Streamdown's own per-word
-// animation hook instead: Streamdown stamps `--sd-animation: sd-<name>` on each
-// new word and the keyframe lives in markdown-text.css.
-export const STREAMING_TEXT_ANIMATION = { animation: "streamingText", duration: 1200 } as const;
+// plain <p> with no markdown, so the look rides Streamdown's own word spans:
+// Streamdown stamps each new word with this name and a nonzero duration, and
+// markdown-text.css draws the fade, tint and settle from those stamps (see
+// its header for why that is transitions, not a keyframe).
+export const STREAMING_TEXT_ANIMATION = { animation: "streamingText", duration: 500 } as const;
 
 export type MarkdownPreprocessContext = { streaming: boolean };
 

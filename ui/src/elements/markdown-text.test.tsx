@@ -142,10 +142,21 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     expect(container.querySelector(".aui-md > :last-child")?.hasAttribute("data-sd-caret-hidden")).toBe(true);
   });
 
-  test("the animation the kit names exists in its stylesheet, with a reduced-motion stop", async () => {
+  test("the stylesheet draws the Element's fade, tint and settle from Streamdown's stamps, with a reduced-motion stop", async () => {
     const css = await Bun.file(new URL("./markdown-text.css", import.meta.url)).text();
-    expect(css).toContain(`@keyframes sd-${STREAMING_TEXT_ANIMATION.animation}`);
-    expect(css).toMatch(/prefers-reduced-motion: reduce[\s\S]*\[data-sd-animate\][\s\S]*animation: none/);
+    expect(css).toContain('.aui-md > :last-child [data-sd-animate]:not([style*="--sd-duration: 0ms"]):not([style*="--sd-duration:0ms"]) {\n  color: var(--aui-streaming-tint);');
+    expect(css).toMatch(/@starting-style \{\s*\.aui-md \[data-sd-animate\]:not\(\[style\*="--sd-duration: 0ms"\]\):not\(\[style\*="--sd-duration:0ms"\]\) \{\s*opacity: 0;/);
+    expect(css).toMatch(/opacity 500ms ease var\(--sd-delay, 0ms\),\s*color 700ms ease;/);
+    expect(css).toMatch(/prefers-reduced-motion: reduce[\s\S]*\[data-sd-animate\][\s\S]*animation: none !important;\s*transition: none !important;/);
+  });
+
+  test("Streamdown restamps an already-shown word with a zero duration, which the stylesheet reads as settled", async () => {
+    const { container, getByRole } = render(<Harness reply="Older words then newer words." pauseAfterYieldMs={500} />);
+    await sendAndSettle(container, getByRole);
+    await waitFor(() => expect(container.querySelector(".aui-md")?.closest('[data-status="running"]')).toBeTruthy());
+    const word = container.querySelector<HTMLElement>("[data-sd-animate]")!;
+    // The selector in markdown-text.css matches this exact serialization.
+    expect(word.getAttribute("style") ?? "").toMatch(/--sd-duration: (?:500|0)ms/);
   });
 
   test("wide tables stay inside a horizontally scrollable wrapper", async () => {
