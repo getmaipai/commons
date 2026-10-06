@@ -362,6 +362,7 @@ function ToolFallbackApproval({
   approval,
   respondToApproval,
   status,
+  primaryHint,
   ...props
 }: React.ComponentProps<"div"> &
   Partial<
@@ -372,6 +373,10 @@ function ToolFallbackApproval({
   > & {
     interrupt?: ToolCallMessagePart["interrupt"];
     approval?: ToolCallMessagePart["approval"];
+    /** MaiPai (APPROVE-CALM-01): a host's keyboard hint, rendered inside
+     * the one primary (allow) button only. Additive; unset renders as
+     * upstream. */
+    primaryHint?: React.ReactNode;
   }) {
   const [submitted, setSubmitted] = useState(false);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
@@ -599,6 +604,7 @@ function ToolFallbackApproval({
                 disabled={submitted}
               >
                 {approvalOptionLabel(option)}
+                {option === allowOptions[0] ? primaryHint : null}
               </Button>
             ),
           )}
@@ -657,6 +663,7 @@ function ToolFallbackApproval({
           disabled={submitted}
         >
           Allow
+          {primaryHint}
         </Button>
         <Button
           size="sm"

@@ -784,6 +784,26 @@ the Stack's refocus; none of them shipped in `@maipai/ui`:
 - The tray/desktop app chrome (`kit/host.ts`, the system tray icon and
   notifications) - the Stack has no desktop shell.
 
+## Named gap: the Running now panel (ACTIVITY-01d)
+
+No shipped Element fits the shell's "Running now" panel: `job-progress` and
+`background-inbox` loop a spinner (the ACTIVITY-01d verdict forbids any
+looping animation), offer only Cancel (no Approve, Deny, Open or Details) and
+set 13 to 13.5 px text under the 16 px body floor. The kit's `RunningNow`
+primitive fills the gap from shipped primitives only (Button, Badge, Popover,
+Sheet, Progress, Collapsible); hosts pass data and copy. It opens as a popover
+anchored to its header button, and as a bottom sheet on a phone.
+
+## The calm approval card (APPROVE-CALM-01)
+
+The approval Element in chat (`ToolFallback.Approval`, slot
+`tool-fallback-approval`) is styled by tokens only: the attention tint with
+12 px by 16 px padding, the kit radius and a soft hairline, and the prompt's
+line breaks kept. With `data-titled-prompt` on the Element, the prompt's first
+line is a short question (bold, foreground) and later lines are detail
+(muted). The one primary button may carry a host's keyboard hint
+(`primaryHint`).
+
 ## Named gap: animated companion face (Rive runtime)
 
 Owner approved the animated companion face as a later step on 2026-10-06 (OWNER-ANSWERS 2). CHAR-02 names the gap: a `companion-face` Element may wrap the Rive runtime after `companion-presence` ships. The runtime's WASM must be bundled in the kit, with no CDN request. The face is a later option and the robot never loads it. Art may be AI-generated only with a local or licence-clean tool; keep the generation record and captured tool terms beside the art, and review again before any trademark filing.

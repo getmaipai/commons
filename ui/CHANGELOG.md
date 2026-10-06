@@ -1,5 +1,26 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.106] - ui-v0.5.106
+
+### ACTIVITY-01d
+
+Add the `RunningNow` primitive (`src/primitives/RunningNow.tsx`): a header
+icon button with a calm count that opens a panel of what is running, what
+waits on the viewer (on the attention tint) and a folded "done" list, with
+per-row actions, an optional progress bar, raw details behind "Details" and a
+polite live region. A popover on desktop and tablet, a bottom sheet on a
+phone. No looping animation in any state. Data and copy come from the host.
+
+### APPROVE-CALM-01
+
+The `tool-fallback-approval` slot becomes a calm card: padding, the kit
+radius, a soft `--tint-attention-hairline` border (new token, light and dark),
+and prompt line breaks kept. A host that writes a short question as the first
+line opts in with `data-titled-prompt`: that line is bold, the rest muted. The forced
+dark frame on its buttons is gone; they keep the kit's own variants.
+`ToolFallback.Approval` gains an additive `primaryHint` prop, rendered inside
+the primary (allow) button only.
+
 ## [0.5.105] - ui-v0.5.105
 
 ### CHAT-CALM-ERRORS-01d

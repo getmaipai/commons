@@ -160,11 +160,35 @@ describe("CALM-TOKENS status tints", () => {
     }
   }
 
-  test("Element approval fallback slot and its buttons use attention boundaries", () => {
-    expect(css).toContain('[data-slot="tool-fallback-approval"]');
-    expect(css).toContain('[data-slot="tool-fallback-approval"] [data-slot="button"]');
-    expect(css).toContain("border: 1px solid var(--tint-attention-border)");
+  // APPROVE-CALM-01 (owner, 2026-10-06: "ugly yellow box"): the approval
+  // slot is a padded, rounded card on a soft hairline, its question in the
+  // page's own foreground and its detail lines muted; the buttons keep the
+  // kit's own variants (no forced dark frame). The card's fill and hairline
+  // are decorative; its meaning is carried by text, which must clear 4.5:1.
+  test("Element approval fallback slot is a padded card on a soft hairline", () => {
+    const rule = css.match(/\[data-slot="tool-fallback-approval"\] \{([^}]*)\}/)?.[1] ?? "";
+    expect(rule).toContain("background: var(--tint-attention)");
+    expect(rule).toContain("border: 1px solid var(--tint-attention-hairline)");
+    expect(rule).toMatch(/padding:\s*12px 16px/);
+    expect(rule).toMatch(/border-radius:/);
+    expect(rule).toContain("color: var(--foreground)");
+    expect(css).not.toContain('[data-slot="tool-fallback-approval"] [data-slot="button"]');
+    // Bold first line only where the host opted in with a titled prompt,
+    // so an untitled one-line prompt never changes colour at a wrap.
+    expect(css).toMatch(/\[data-titled-prompt\] \.aui-tool-fallback-approval-prompt::first-line \{[^}]*font-weight: 600/);
+    expect(css).not.toMatch(/\[data-slot="tool-fallback-approval"\] \.aui-tool-fallback-approval-prompt::first-line/);
+    // The prompt's lines are question, detail, time: they must stay lines.
+    expect(css).toMatch(/\.aui-tool-fallback-approval-prompt \{[^}]*white-space: pre-line/);
   });
+
+  for (const theme of tintThemes) {
+    test(`${theme.name}: the approval card's question and detail text clear 4.5 on the attention tint`, () => {
+      const background = requiredHex(theme.block, "--tint-attention");
+      expect(contrastRatio(requiredHex(theme.block, "--foreground"), background)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(requiredHex(theme.block, "--muted-foreground"), background)).toBeGreaterThanOrEqual(4.5);
+      expect(requiredHex(theme.block, "--tint-attention-hairline")).toMatch(/^#/);
+    });
+  }
 
   test("the kit defines exactly the three approved tint families", () => {
     expect(css).toContain("--tint-attention:");

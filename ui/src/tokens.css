@@ -189,16 +189,36 @@
   box-shadow: var(--elevation-3);
 }
 
-/* Element's approval fallback is the rendered slot in chat. Its action
- * buttons keep a visible boundary against the attention surface. */
+/* APPROVE-CALM-01: Element's approval fallback is the rendered slot in
+ * chat. A calm card: a soft tint with real padding on a soft hairline,
+ * the question (the prompt's first line) in the page's foreground and
+ * bold, the detail lines under it muted. Its buttons keep the kit's own
+ * outline and primary variants. The fill and hairline are decorative;
+ * the text carries the meaning (contrast.test.ts). */
 [data-slot="tool-fallback-approval"] {
   background: var(--tint-attention);
-  border: 1px solid var(--tint-attention-border);
-  color: var(--tint-attention-fg);
+  border: 1px solid var(--tint-attention-hairline);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  gap: 12px;
+  color: var(--foreground);
 }
 
-[data-slot="tool-fallback-approval"] [data-slot="button"] {
-  border: 1px solid var(--tint-attention-border);
+[data-slot="tool-fallback-approval"] .aui-tool-fallback-approval-prompt {
+  white-space: pre-line;
+}
+
+/* A host that writes a short question as the prompt's first line, then a
+ * line break, opts in with `data-titled-prompt` on the Element: the
+ * question is bold and the detail lines muted. Without the opt-in a long
+ * one-line prompt stays one colour wherever it wraps. */
+[data-slot="tool-fallback-approval"][data-titled-prompt] .aui-tool-fallback-approval-prompt {
+  color: var(--muted-foreground);
+}
+
+[data-slot="tool-fallback-approval"][data-titled-prompt] .aui-tool-fallback-approval-prompt::first-line {
+  color: var(--foreground);
+  font-weight: 600;
 }
 
 /* The assistant-ui ThreadList Element owns row behavior and markup.
@@ -406,6 +426,7 @@
   --tint-attention: #fbf5e6;
   --tint-attention-fg: #6e5a2b;
   --tint-attention-border: #866100;
+  --tint-attention-hairline: #ecd9a8;
   --tint-info: #eef6ff;
   --tint-info-border: #406a99;
   --tint-problem: #fff0ee;
@@ -513,6 +534,7 @@
     --tint-attention: #31240e;
     --tint-attention-fg: #ffe08a;
     --tint-attention-border: #b88a21;
+    --tint-attention-hairline: #5a4419;
     --tint-info: #172839;
     --tint-info-border: #78bfff;
     --tint-problem: #3b1c1a;
@@ -580,6 +602,7 @@
   --tint-attention: #31240e;
   --tint-attention-fg: #ffe08a;
   --tint-attention-border: #b88a21;
+  --tint-attention-hairline: #5a4419;
   --tint-info: #172839;
   --tint-info-border: #78bfff;
   --tint-problem: #3b1c1a;
