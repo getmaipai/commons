@@ -224,6 +224,15 @@ export type ThreadComponents = {
   ComposerQueue?: ComponentType | undefined;
   sendHeld?: boolean | undefined;
   onEditSend?: ((messageId: string, turnId?: string) => void) | undefined;
+  /** ENGINE-DOWN-UI-01: set (to a short reason such as "Chat is paused")
+   * while the engine behind the thread cannot answer. Every part that
+   * needs the engine is disabled through its own disabled state and
+   * carries the reason in its accessible name: the welcome and follow-up
+   * suggestions, Refresh, the user Retry and Edit buttons, the edit
+   * composer's Update, and Send (it implies `sendHeld`). Copy, Read
+   * aloud, feedback, the More menu, the branch picker and typing stay
+   * as they are. Unset, nothing changes. */
+  engineDown?: string | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -277,6 +286,17 @@ const ThreadComponentsContext =
 // The viewport element, for `useVisibleMessageIds` and `useScrollToMessage`.
 // assistant-ui's own viewport state is no help here: `ThreadPrimitive.Viewport`
 // provides its store to its own subtree only, so a sibling slot never sees it.
+/** ENGINE-DOWN-UI-01: the one reader of `engineDown`. `label(name)` is the
+ * accessible name of an engine-dependent control: unchanged while the
+ * engine answers, "<name>. <reason>" while it does not. */
+function useEngineDown() {
+  const { engineDown } = useContext(ThreadComponentsContext);
+  return {
+    down: engineDown !== undefined,
+    label: (name: string) => (engineDown === undefined ? name : `${name}. ${engineDown}`),
+  };
+}
+
 const ThreadViewportElementContext = createContext<HTMLElement | null>(null);
 
 // Startup exposes a loading placeholder thread; treat it as a new chat so
@@ -334,7 +354,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
   temporary,
   scrollToBottomOffset,
 }) => {
-  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity } = useContext(ThreadComponentsContext);
+  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity, engineDown } = useContext(ThreadComponentsContext);
   const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
   const [footerElement, setFooterElement] = useState<HTMLElement | null>(null);
 
@@ -416,7 +436,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
             )}
           >
             <ThreadScrollToBottom />
-            <ThreadFollowupSuggestions />
+            <ThreadFollowupSuggestions disabledReason={engineDown} />
             {ComposerQueue && (
               <div data-slot="aui_composer-queue" className="empty:hidden">
                 <ComposerQueue />
@@ -788,12 +808,14 @@ const ThreadSuggestions: FC = () => {
 };
 
 const ThreadSuggestionItem: FC = () => {
+  const engine = useEngineDown();
   return (
     <div className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-200">
       <SuggestionPrimitive.Trigger send asChild>
         <button
           type="button"
-          className="aui-thread-welcome-suggestion group hover:bg-foreground/[0.03] focus-visible:ring-ring/50 flex w-full items-baseline gap-2.5 rounded-md px-2 py-2 text-start text-sm transition-colors outline-none focus-visible:ring-1 motion-reduce:transition-none"
+          disabled={engine.down}
+          className="aui-thread-welcome-suggestion group hover:bg-foreground/[0.03] focus-visible:ring-ring/50 flex w-full items-baseline gap-2.5 rounded-md px-2 py-2 text-start text-sm transition-colors outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none"
         >
           <span
             aria-hidden
@@ -805,6 +827,7 @@ const ThreadSuggestionItem: FC = () => {
             <SuggestionPrimitive.Title className="aui-thread-welcome-suggestion-text-1 text-foreground" />{" "}
             <SuggestionPrimitive.Description className="aui-thread-welcome-suggestion-text-2 text-muted-foreground empty:hidden" />
           </span>
+          {engine.down ? <span className="sr-only">{engine.label("Unavailable")}</span> : null}
         </button>
       </SuggestionPrimitive.Trigger>
     </div>
@@ -850,7 +873,9 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 );
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerNotice, sendHeld, composerDensity } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerNotice, sendHeld: sendHeldProp, composerDensity } = useContext(ThreadComponentsContext);
+  const engineDownNow = useEngineDown().down;
+  const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
   const multiline = useMultiline(shellRef, composerDensity === "compact");
   return (
@@ -889,7 +914,9 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
 };
 
 const ComposerAction: FC = () => {
-  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd, sendHeld } = useContext(ThreadComponentsContext);
+  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd, sendHeld: sendHeldProp } = useContext(ThreadComponentsContext);
+  const engineDownNow = useEngineDown().down;
+  const sendHeld = sendHeldProp || engineDownNow;
   return (
     <div className="aui-composer-action-wrapper relative flex items-center justify-between">
       <div className="flex items-center gap-1.5">
@@ -1117,6 +1144,7 @@ const AssistantActionBar: FC = () => {
   const { AssistantMoreItems, AssistantActionBarExtra, assistantActionBarAutohide = "not-last" } = useContext(
     ThreadComponentsContext,
   );
+  const engine = useEngineDown();
   return (
     <ActionBarPrimitive.Root
       hideWhenRunning
@@ -1162,8 +1190,8 @@ const AssistantActionBar: FC = () => {
           </TooltipIconButton>
         </ActionBarPrimitive.FeedbackNegative>
       </AuiIf>
-      <ActionBarPrimitive.Reload asChild>
-        <TooltipIconButton tooltip="Refresh">
+      <ActionBarPrimitive.Reload asChild disabled={engine.down}>
+        <TooltipIconButton tooltip={engine.label("Refresh")}>
           <RefreshCwIcon />
         </TooltipIconButton>
       </ActionBarPrimitive.Reload>
@@ -1301,6 +1329,7 @@ const UserMessageTimestamp: FC = () => {
 // EditComposer, just triggered from one button instead of two.
 const UserRetryButton: FC = () => {
   const aui = useAui();
+  const engine = useEngineDown();
   const canReload = useAuiState(
     (s) =>
       s.thread.capabilities.reload &&
@@ -1310,7 +1339,8 @@ const UserRetryButton: FC = () => {
   if (!canReload) return null;
   return (
     <TooltipIconButton
-      tooltip="Retry"
+      tooltip={engine.label("Retry")}
+      disabled={engine.down}
       className="aui-user-action-retry"
       onClick={() => {
         aui.composer.beginEdit();
@@ -1323,6 +1353,7 @@ const UserRetryButton: FC = () => {
 };
 
 const UserActionBar: FC = () => {
+  const engine = useEngineDown();
   return (
     <ActionBarPrimitive.Root
       hideWhenRunning
@@ -1331,8 +1362,8 @@ const UserActionBar: FC = () => {
     >
       <UserMessageTimestamp />
       <UserRetryButton />
-      <ActionBarPrimitive.Edit asChild>
-        <TooltipIconButton tooltip="Edit" className="aui-user-action-edit">
+      <ActionBarPrimitive.Edit asChild disabled={engine.down}>
+        <TooltipIconButton tooltip={engine.label("Edit")} className="aui-user-action-edit">
           <PencilIcon />
         </TooltipIconButton>
       </ActionBarPrimitive.Edit>
@@ -1347,6 +1378,7 @@ const UserActionBar: FC = () => {
 
 const EditComposer: FC = () => {
   const { onEditSend } = useContext(ThreadComponentsContext);
+  const engine = useEngineDown();
   const messageId = useAuiState((s) => s.message.id);
   const messages = useAuiState((s) => s.thread.messages);
   const messageIndex = messages.findIndex((message) => message.id === messageId);
@@ -1370,13 +1402,13 @@ const EditComposer: FC = () => {
               Cancel
             </Button>
           </ComposerPrimitive.Cancel>
-          <ComposerPrimitive.Send asChild>
+          <ComposerPrimitive.Send asChild disabled={engine.down}>
             <Button
               size="sm"
               className="h-8 px-3"
               onClick={() => onEditSend?.(messageId, turnId)}
             >
-              Update
+              {engine.label("Update")}
             </Button>
           </ComposerPrimitive.Send>
         </div>

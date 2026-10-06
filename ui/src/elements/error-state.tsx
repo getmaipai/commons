@@ -24,6 +24,8 @@ export interface ErrorStateProps extends Omit<
    * `max-w-sm` and the card padding so a host lays it out itself. */
   layout?: "card" | "inline";
   retryLabel?: string;
+  /** ENGINE-DOWN-UI-01: holds Retry (disabled, this reason in its accessible name) while what it would retry cannot answer. */
+  retryDisabled?: string | undefined;
   retryingLabel?: string;
 }
 
@@ -34,6 +36,7 @@ export function ErrorState({
   onRetry,
   layout = "card",
   retryLabel = "Retry",
+  retryDisabled,
   retryingLabel = "Retrying",
   className,
   ...props
@@ -89,10 +92,12 @@ export function ErrorState({
         <button
           type="button"
           onClick={onRetry}
-          className="text-muted-foreground hover:text-foreground ms-auto flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
+          disabled={retryDisabled !== undefined}
+          className="text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-50 ms-auto flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
         >
           <RefreshCwIcon className="size-3" />
           {retryLabel}
+          {retryDisabled !== undefined && <span className="sr-only">. {retryDisabled}</span>}
         </button>
       )}
     </div>

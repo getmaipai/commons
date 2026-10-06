@@ -1,5 +1,19 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.131] - ui-v0.5.131
+
+### ENGINE-DOWN-UI-01 (additive)
+
+`Thread` takes `components.engineDown`, a short reason string (for example
+"Chat is paused"). While it is set every part that needs the engine uses its
+own disabled state and names the reason in its accessible name: the welcome
+and follow-up suggestions, Refresh, the user Retry and Edit buttons, the edit
+composer's Update, and Send (it implies `sendHeld`). Copy, Read aloud, feedback,
+the More menu, the branch picker and typing are untouched. Unset, nothing
+changes. Also additive: `EmptyStateSuggestion` has a disabled look,
+`ErrorState` takes `retryDisabled` (a reason), `RegenerateMenu` takes
+`disabled` (a reason).
+
 ## [0.5.130] - ui-v0.5.130
 
 ### KIT-SET-02 (additive)

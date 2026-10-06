@@ -3,7 +3,7 @@
 import { AuiIf, useAuiState, ThreadPrimitive } from "@assistant-ui/react";
 import { useCallback, useEffect, useRef, useState, type FC } from "react";
 
-const FollowupSuggestionsRow: FC = () => {
+const FollowupSuggestionsRow: FC<{ disabledReason?: string | undefined }> = ({ disabledReason }) => {
   const suggestions = useAuiState((s) => s.thread.suggestions);
   const scrollRef = useRef<HTMLDivElement>(null);
   const rtlRef = useRef<boolean | null>(null);
@@ -52,11 +52,13 @@ const FollowupSuggestionsRow: FC = () => {
         {suggestions.map((suggestion, idx) => (
           <ThreadPrimitive.Suggestion
             key={idx}
-            className="aui-thread-followup-suggestion border-foreground/10 hover:bg-foreground/[0.03] hover:border-foreground/25 rounded-md border px-2.5 py-1 text-sm whitespace-nowrap transition-colors ease-in motion-reduce:transition-none"
+            className="aui-thread-followup-suggestion border-foreground/10 hover:bg-foreground/[0.03] hover:border-foreground/25 rounded-md border px-2.5 py-1 text-sm whitespace-nowrap transition-colors ease-in disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none"
             prompt={suggestion.prompt}
             send
+            disabled={disabledReason !== undefined}
           >
             {suggestion.title ?? suggestion.prompt}
+            {disabledReason !== undefined && <span className="sr-only">. {disabledReason}</span>}
             {suggestion.label && (
               <span className="aui-thread-followup-suggestion-label text-muted-foreground ms-1">
                 {suggestion.label}
@@ -69,7 +71,7 @@ const FollowupSuggestionsRow: FC = () => {
   );
 };
 
-export const ThreadFollowupSuggestions: FC = () => (
+export const ThreadFollowupSuggestions: FC<{ disabledReason?: string | undefined }> = ({ disabledReason }) => (
   <AuiIf
     condition={(s) =>
       !s.thread.isEmpty &&
@@ -77,6 +79,6 @@ export const ThreadFollowupSuggestions: FC = () => (
       s.thread.suggestions.length > 0
     }
   >
-    <FollowupSuggestionsRow />
+    <FollowupSuggestionsRow disabledReason={disabledReason} />
   </AuiIf>
 );

@@ -17,6 +17,7 @@ export function RegenerateMenu({
   currentId,
   onOpenChange,
   onPick,
+  disabled,
   className,
   ...props
 }: Omit<
@@ -28,6 +29,8 @@ export function RegenerateMenu({
   currentId: string;
   onOpenChange?: (open: boolean) => void;
   onPick?: (id: string) => void;
+  /** ENGINE-DOWN-UI-01: a reason; the trigger is disabled and carries it in its accessible name. */
+  disabled?: string | undefined;
 }) {
   return (
     <div
@@ -40,11 +43,12 @@ export function RegenerateMenu({
         <button
           type="button"
           aria-expanded={open}
-          aria-label="Regenerate with a different model"
+          aria-label={disabled === undefined ? "Regenerate with a different model" : `Regenerate with a different model. ${disabled}`}
+          disabled={disabled !== undefined}
           onClick={() => onOpenChange(!open)}
           className={cn(
             ghostButton,
-            "size-7 self-start",
+            "size-7 self-start disabled:pointer-events-none disabled:opacity-50",
             open && "bg-foreground/[0.06] text-foreground/90",
           )}
         >
