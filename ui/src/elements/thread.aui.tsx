@@ -147,6 +147,9 @@ export type ThreadViewportOptions = Pick<
  * plain text field, this component does not fall back to one on its
  * own. Opened upstream the same day, onto
  * assistant-ui/assistant-ui#8003 (`ui/docs/dashboard-upstream.md`).
+ * `ComposerNotice`, when set, renders as a one-line muted notice below
+ * the composer shell, for a host notice that belongs under the input
+ * rather than in its action row.
  * `ComposerQueue`, when set, renders in the viewport footer directly
  * above the composer shell - inside the footer (so it sticks and is
  * measured with it), outside the composer's own rounded container.
@@ -190,6 +193,7 @@ export type ThreadComponents = {
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
   ComposerInputOverride?: ComponentType | undefined;
+  ComposerNotice?: ComponentType | undefined;
   ComposerQueue?: ComponentType | undefined;
   onEditSend?: ((messageId: string, turnId?: string) => void) | undefined;
 };
@@ -769,7 +773,7 @@ const ThreadSuggestionItem: FC = () => {
 };
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerNotice } = useContext(ThreadComponentsContext);
   return (
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
       <ComposerPrimitive.AttachmentDropzone asChild>
@@ -793,6 +797,14 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
           <ComposerAction />
         </div>
       </ComposerPrimitive.AttachmentDropzone>
+      {ComposerNotice && (
+        <div
+          data-slot="aui_composer-notice"
+          className="text-muted-foreground w-full truncate px-2.5 text-xs leading-5"
+        >
+          <ComposerNotice />
+        </div>
+      )}
     </ComposerPrimitive.Root>
   );
 };

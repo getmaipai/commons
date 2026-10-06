@@ -24,11 +24,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ ComposerQueue, ComposerInputOverride, MessageError, temporary, viewport, error = false, scrollToBottomOffset }: { ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number }) {
+function Harness({ ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, temporary, viewport, error = false, scrollToBottomOffset }: { ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number }) {
   const runtime = useLocalRuntime(error ? failingAdapter : adapter);
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={ComposerQueue || ComposerInputOverride || MessageError || viewport ? { ComposerQueue, ComposerInputOverride, MessageError, viewport } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
+      <Thread components={ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport ? { ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
     </AssistantRuntimeProvider>
   );
 }
@@ -78,6 +78,27 @@ describe("Thread's ComposerInputOverride slot", () => {
     const { getByTestId, queryByRole } = render(<Harness ComposerInputOverride={Waveform} />);
     expect(getByTestId("fake-waveform")).toBeTruthy();
     expect(queryByRole("textbox", { name: "Message input" })).toBeNull();
+  });
+});
+
+describe("Thread's ComposerNotice slot", () => {
+  test("renders a one-line muted notice directly beneath the composer shell", () => {
+    function Notice() {
+      return <span>Lookup unavailable; you can still send your message.</span>;
+    }
+    const { getByText } = render(<Harness ComposerNotice={Notice} />);
+    const slot = getByText("Lookup unavailable; you can still send your message.");
+    const wrapper = slot.closest("[data-slot='aui_composer-notice']");
+    const shell = document.querySelector("[data-slot='aui_composer-shell']");
+    expect(wrapper).toBeTruthy();
+    expect(wrapper?.className).toContain("text-muted-foreground");
+    expect(wrapper?.className).toContain("truncate");
+    expect(shell?.nextElementSibling).toBe(wrapper);
+  });
+
+  test("renders nothing when unset", () => {
+    render(<Harness />);
+    expect(document.querySelector("[data-slot='aui_composer-notice']")).toBeNull();
   });
 });
 

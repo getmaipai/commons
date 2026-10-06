@@ -19,4 +19,24 @@ describe("Status", () => {
     );
     expect(getByText(label)).toBeTruthy();
   });
+
+  test("supports a quiet indicator while keeping the status dot visible", () => {
+    const { container } = render(
+      <Status status="offline">
+        <StatusIndicator ping={false} />
+      </Status>,
+    );
+    expect(container.querySelector(".animate-ping")).toBeNull();
+    expect(container.querySelectorAll("[aria-hidden='true'] > span")).toHaveLength(1);
+  });
+
+  test("uses the attention foreground tint for degraded status", () => {
+    const { container } = render(
+      <Status status="degraded">
+        <StatusIndicator />
+      </Status>,
+    );
+    expect(container.querySelector(".animate-ping")?.className).toContain("var(--tint-attention-fg)");
+    expect(container.querySelector("[aria-hidden='true'] > span:last-child")?.className).toContain("var(--tint-attention-fg)");
+  });
 });

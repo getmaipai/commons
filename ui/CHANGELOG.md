@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## Unreleased
+
+### CHAT-CALM-ERRORS-01a
+
+Give `ErrorState` a muted, unfilled failure presentation; let `StatusIndicator`
+disable its ping and use the attention tint for degraded status; add the
+`Thread.components.ComposerNotice` slot below the composer shell.
+
 ## [0.5.102] - ui-v0.5.102
 
 ### CALM-TOKENS-02
