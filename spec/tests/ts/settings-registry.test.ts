@@ -62,3 +62,27 @@ describe("SETTINGS-ROBOT-01 declarations", () => {
     expect(keys.has("person.robot.greet_by_name")).toBe(true);
   });
 });
+
+describe("IMG-SPEC-KEYS declarations", () => {
+  const entries = loadRegistry() as Record<string, unknown>[];
+  const help =
+    "Adults and teens are on by default; children are off until a parent enables this. Teens control their own setting.";
+  for (const [key, label] of [
+    ["reference.images", "Show pictures in answers"],
+    ["chat.photo_uploads", "Send photos in chat"],
+  ] as const) {
+    test(`${key} is declared once, person scoped, boolean, default on, honoured by home`, () => {
+      const matches = entries.filter((e) => e.key === key);
+      expect(matches.length).toBe(1);
+      const entry = SettingsKey.parse(matches[0]);
+      expect(entry.scope).toBe("person");
+      expect(entry.selector).toBe("boolean");
+      expect(entry.default).toBe(true);
+      expect(entry.label).toBe(label);
+      expect(entry.help).toBe(help);
+      expect(entry.level).toBe("basic");
+      expect(entry.secret).toBe(false);
+      expect(entry.honoured_by).toEqual(["home"]);
+    });
+  }
+});

@@ -218,6 +218,20 @@
     ]
   },
   {
+    "key": "chat.photo_uploads",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Send photos in chat",
+    "help": "Adults and teens are on by default; children are off until a parent enables this. Teens control their own setting.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.chat",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "chat.teen_gate_grain",
     "scope": "household",
     "selector": "select",
@@ -858,6 +872,20 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.persona",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "reference.images",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Show pictures in answers",
+    "help": "Adults and teens are on by default; children are off until a parent enables this. Teens control their own setting.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.reference",
     "honoured_by": [
       "home"
     ]

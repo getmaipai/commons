@@ -66,3 +66,17 @@ def test_robot_settings_registry_is_valid_and_unique():
         ]
         is False
     )
+
+
+def test_img_spec_keys_validate_and_are_unique():
+    from gen.py.settings_key_schema import SettingsKey
+
+    registry = json.loads((ROOT / "settings" / "keys.json").read_text())
+    for key in ("reference.images", "chat.photo_uploads"):
+        matches = [entry for entry in registry if entry["key"] == key]
+        assert len(matches) == 1
+        model = SettingsKey.model_validate(matches[0])
+        assert model.scope == "person"
+        assert model.selector == "boolean"
+        assert model.default is True
+        assert model.honoured_by == ["home"]

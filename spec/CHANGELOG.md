@@ -8,6 +8,7 @@ scope lands.
 ## [Unreleased]
 
 ### Added
+- Person settings `reference.images` ("Show pictures in answers") and `chat.photo_uploads` ("Send photos in chat"): boolean, default true, honoured by home. Adults and teens are on by default, children are off until a parent enables them, and teens control their own (IMG-SPEC-KEYS).
 - Closed presence states, turn-stream event mappings, private activity ownership rules, resolver priority/timing, web/Eyes/body joins, emotion-map overlays, Row-Bot transition fixtures, and the optional `RobotState.presence` field (PRESENCE-STATES-01).
 - Household, person, and robot device settings for Reachy, including the default-off tailnet opt-in and the six Home-honoured robot controls (SETTINGS-ROBOT-01). Filed the EYES-07 quiet-hours follow-up.
 - Closed emotion-to-primitive and optional clip map, the twelve emotion labels, optional `ReplyPlan.react_move`, and the `thinking`, `offer`, and `shake` primitive names (EMO-MAP-01).

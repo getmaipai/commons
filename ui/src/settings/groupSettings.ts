@@ -40,6 +40,8 @@ export const SECTION_TITLES: Record<string, string> = {
   "household.reference": "Reference library",
   // search.safe_search (SEARCH-SAFE-01).
   "person.search": "Search",
+  // chat.photo_uploads (IMG-SPEC-KEYS).
+  "person.chat": "Chat",
   // Deliberately NOT the same string as "household.notifications": a
   // design review (2026-09-05) found both sections rendering as
   // "Notifications" back to back (SettingsPage.tsx stacks a household-
