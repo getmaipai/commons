@@ -1,6 +1,6 @@
 {
   "name": "@maipai/core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "MaiPai's product-agnostic helpers: logging, timeouts, paths, archives, identity, secrets, rate limiting, hardware, backup crypto. See ../docs/dev.md.",
   "license": "AGPL-3.0",

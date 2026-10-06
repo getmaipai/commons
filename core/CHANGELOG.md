@@ -5,6 +5,13 @@ All notable changes to the `core` workspace. Format follows
 tagged `core-vX.Y.Z`. Everything stays `0.x` until Home's and the Stack's
 adoption proves it.
 
+## [0.1.2] - core-v0.1.2
+
+### Fixed
+- `ssrfGuard`: reject NAT64, 6to4, unspecified, multicast and reserved
+  destinations, and pin validated DNS answers to the actual connection;
+  re-check every redirect hop with a bounded limit.
+
 ## [0.1.1] - core-v0.1.1
 
 ### Added
