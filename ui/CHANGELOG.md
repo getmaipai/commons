@@ -1,5 +1,27 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.109] - ui-v0.5.109
+
+### RAIL-02
+
+Owner feedback on the rail (2026-10-06). The brand mark is now the Home
+destination: the app entry whose path is the root takes the rail's top slot
+(named "Home", selected on Home, with its status marker) and is not repeated
+below Search. Rail links go to the bare path (`railHref`), not the
+preview-era `/next/...` url in `sidebaritems`: a host that redirects `/next`
+(Home does) unmounted and remounted its whole shell on every rail click.
+The rail's surface is the new `--app-rail-bg` token (falling back to
+`--sidebar`), which also colours the ring that cuts the badges out of it.
+`RailProfileMenu` moves system status to its own presence dot at the
+avatar's lower right (amber degraded, red down, none when all is well or
+under maintenance), apart from the notification count at the upper right,
+and names the state in the avatar's tooltip and accessible name ("System:
+all good", "degraded", "down").
+
+Reuse check: no new part. The changes are inside the kit's own `AppRail`
+and `RailProfileMenu`, composed from the shipped Tooltip, Avatar and
+DropdownMenu as before.
+
 ## [0.5.108] - ui-v0.5.108
 
 ### RAIL-01
