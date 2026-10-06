@@ -59,7 +59,7 @@ const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayNam
       <HeaderExtraProvider>
         <Sidebar showTrigger={showSidebarTriggerInMenu} sidebarItemStatus={sidebarItemStatus} />
 
-      <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
+      <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden" style={{ background: "var(--page)" }}>
         {/* Top Header  */}
         <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} showSidebarTrigger={showHeaderSidebarTrigger ? true : showSidebarTriggerInMenu ? "mobile-only" : false} />
 

@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { HUE_PILL_TINT, HUE_TEXT_MIX } from "@/kit/utils";
 
 const css = readFileSync(resolve(import.meta.dir, "tokens.css"), "utf8");
+const dashboardCss = readFileSync(resolve(import.meta.dir, "dashboard/css/globals.css"), "utf8");
 
 function block(source: string, from: string, to?: string): string {
   const start = source.indexOf(from);
@@ -102,6 +103,41 @@ describe("WCAG AA contrast for the kit's opacity-reduced text (both themes)", ()
       expect(ratio).toBeGreaterThanOrEqual(4.5);
     });
   }
+});
+
+function requiredHex(source: string, name: string): string {
+  const match = new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6});`).exec(source);
+  if (!match) throw new Error(`${name} not found`);
+  return match[1]!;
+}
+
+describe("CALM-TOKENS contrast and radius contract", () => {
+  const calmThemes = [
+    { name: "light", block: lightRoot },
+    { name: "dark", block: darkRoot },
+  ];
+
+  for (const theme of calmThemes) {
+    test(`${theme.name}: muted foreground on --page and --sidebar clears 4.5`, () => {
+      const muted = requiredHex(theme.block, "--muted-foreground");
+      for (const surface of ["--page", "--sidebar"]) {
+        expect(contrastRatio(muted, requiredHex(theme.block, surface))).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+  }
+
+  test("rounded-xl stays 16px from the approved 12px base radius", () => {
+    expect(css).toMatch(/--radius:\s*12px;/);
+    expect(dashboardCss).toMatch(/--radius-xl:\s*calc\(var\(--radius\) \+ 4px\)/);
+  });
+
+  test("kit slot rules paint Card and popovers", () => {
+    expect(css).toContain('[data-slot="card"]');
+    expect(css).toContain("var(--elevation-1)");
+    expect(css).toContain('[data-slot="popover-content"]');
+    expect(css).toContain("var(--elevation-3)");
+  });
 });
 
 describe("WCAG AA contrast over the spec's surfaces (both themes)", () => {

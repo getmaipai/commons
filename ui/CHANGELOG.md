@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### CALM-TOKENS-01
+
+Add the calm elevation scale and contrast-safe `--page` surfaces. The kit
+layout paints `--page`; Card and popover slots read elevation tokens. The
+approved radius tokens produce 16px `rounded-xl` cards and 10px controls.
+
 ### CALM-TOKENS-00
 
 Document the calm elevation, page, and status tint token contract,

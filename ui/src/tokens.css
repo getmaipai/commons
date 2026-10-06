@@ -65,14 +65,11 @@
   --breakpoint-lg: 960px;
   --breakpoint-xl: 1280px;
 
-  /* Radii, shadow and type scale (spec section 1). --radius-card and
-   * --radius-control are named for the spec's own vocabulary; --radius
-   * below (1rem = 16px) already gives the kit's --radius-lg the same
-   * 16px, so cards keep reading one source. */
+  /* Radii, elevation and type scale (spec section 1). */
   --radius-card: 16px;
-  --radius-control: 12px;
+  --radius-control: 10px;
   --radius-pill: 999px;
-  --shadow-panel: 0 12px 28px rgba(0, 0, 0, 0.24);
+  --shadow-panel: var(--elevation-3);
 
   --font-size-title: 30px;
   --font-weight-title: 600;
@@ -176,6 +173,22 @@
   font-size: 10px;
   letter-spacing: 0.08em;
 }
+
+/* Shared kit surfaces use elevation through data slots, so consumers
+ * never need Home page utility classes to get the calm treatment. */
+[data-slot="card"] {
+  box-shadow: var(--elevation-1);
+  border-color: var(--elevation-hairline);
+}
+
+[data-slot="popover-content"],
+[data-slot="dropdown-menu-content"],
+[data-slot="dialog-content"],
+[data-slot="alert-dialog-content"],
+[data-slot="tooltip-content"] {
+  box-shadow: var(--elevation-3);
+}
+
 /* 1px `#24405F`, 12px above and below (owner findings, "The Studio
  * look, the numbers," 2026-09-20 18:15), inset 7px from the rail's
  * own true edge - owner ruling, ui-v0.4.3, restating "the rail
@@ -354,6 +367,15 @@
    * surfaces (spec section 1, program decision 5). Dark is the default
    * and the reference; this derivation passes the same AA contrast test. */
   --surface-page: #f4f7fb;
+  --page: #f9fafb;
+  --elevation-color: oklch(0.2 0.02 255 / 0.10);
+  --elevation-hairline: oklch(0.2 0.02 255 / 0.07);
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px -1px var(--elevation-color);
+  --elevation-2: 0 1px 2px -1px var(--elevation-color), 0 8px 24px -16px var(--elevation-color);
+  --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
+  --elevation-4: 0 24px 64px -16px var(--elevation-color);
+  --elevation-accent: 0 6px 16px -10px var(--primary);
   --surface-card: #ffffff;
   --surface-pane: #e3eaf3;
   --surface-sidebar: #eaf0f7;
@@ -403,13 +425,7 @@
    * this file's own --primary already carries in both themes, kept
    * here on purpose so the orb still reads as the identical blue. */
   --voice-accent: #21a6ff;
-  /* 1rem, not shadcn's own 0.75rem default: a visual pass (2026-09-06)
-   * modeled on well-designed native mobile apps found every card, tile
-   * and control there noticeably rounder than this kit's own defaults -
-   * one token bump softens buttons, cards, inputs and popovers together
-   * rather than hand-tuning each. It also happens to give --radius-lg
-   * the spec's 16px card radius for free. */
-  --radius: 1rem;
+  --radius: 12px;
   --sidebar: #eaf0f7;
   --sidebar-foreground: #0b1730;
   --sidebar-primary: #21a6ff;
@@ -451,6 +467,16 @@
  * modes on the same page. */
 @media (prefers-color-scheme: dark) {
   :root:not(.light):not(.dark) {
+    --page: #141414;
+    --elevation-color: oklch(0 0 0 / 0.55);
+    --elevation-hairline: oklch(1 0 0 / 0.07);
+    --elevation-0: none;
+    --elevation-1: 0 1px 2px -1px var(--elevation-color);
+    --elevation-2: 0 1px 2px -1px var(--elevation-color), 0 8px 24px -16px var(--elevation-color);
+    --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
+    --elevation-4: 0 24px 64px -16px var(--elevation-color);
+    --elevation-accent: 0 6px 16px -10px var(--primary);
+    --radius: 12px;
     --surface-page: #07111f;
     --surface-card: #102238;
     --surface-pane: #142a43;
@@ -501,6 +527,16 @@
 }
 
 .dark {
+  --page: #141414;
+  --elevation-color: oklch(0 0 0 / 0.55);
+  --elevation-hairline: oklch(1 0 0 / 0.07);
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px -1px var(--elevation-color);
+  --elevation-2: 0 1px 2px -1px var(--elevation-color), 0 8px 24px -16px var(--elevation-color);
+  --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
+  --elevation-4: 0 24px 64px -16px var(--elevation-color);
+  --elevation-accent: 0 6px 16px -10px var(--primary);
+  --radius: 12px;
   --surface-page: #07111f;
   --surface-card: #102238;
   --surface-pane: #142a43;

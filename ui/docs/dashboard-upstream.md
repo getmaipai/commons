@@ -135,6 +135,12 @@ letterboxed there.
 
 **Style presets**: `globals.css` keeps the template's `dark`/`style-<name>` custom-variant mechanism. Since ui-v0.5.13 `:root`/`.dark` carry the template's OWN palette, byte-for-byte from the pinned upstream commit (light and dark, translucent borders included), per the org decision of 2026-09-21 ("the template's own palette is the default look"). `.style-studio` and `.style-calm` are full palette blocks equal to that default and differ only in `--tile-radius` (12px square, 999px circle); `.style-navy` is Home's former navy set from `docs/design/home-pages-2026-09-20.md`, kept as a preset; the seven shadcn base colors are transcribed from ui.shadcn.com. `ui.look` selects among them by body class.
 
+**Radius restoration (CALM-TOKENS-01, 2026-10-06)**: the pinned
+upstream `src/css/globals.css` declares `--radius: 8px`. The vendored
+line is restored byte-for-byte to `8px`; kit tokens in `tokens.css`
+override it to the approved 12px base, which makes Tailwind's
+`rounded-xl` 16px. No other line in `globals.css` changed.
+
 **Dead CSS upstream, found live (HOME-UI-04b, ui-v0.5.8)**:
 `css/globals.css`'s every `.hide-menu` rule (the main nav row's own way
 of hiding its label/badge/chevron in icon-collapsed mode,
