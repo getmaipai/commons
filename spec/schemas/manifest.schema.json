@@ -14,7 +14,7 @@
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$",
-      "description": "Unique in the catalog. No third-party name in it."
+      "description": "Unique in the catalog. No third-party name in it. Not one of the nine reserved settings area ids (the static legacy routes under /settings)."
     },
     "version": {
       "type": "string",
@@ -366,6 +366,10 @@
       "additionalProperties": true,
       "description": "Shell blueprints (6.1), keyed by blueprint kind: nav entries, pages, right-pane panels, settings sections, commands, quick actions, player hooks, admin sections. `additionalProperties: true` since most of 6.1's own blueprint kinds have no bundled package using them yet (Wave 1's `contributes: []` was a placeholder no package had populated); `widgets` and `pages` below are the two sub-fields session-d-packages-and-store.md steps 2/10 fix a real shape for. `pages` replaces a redundant top-level `pages: string[]` field (Session E flagged it 2026-09-06 as incompatible with this object shape and confirmed nothing in backend/src or frontend/src read it) - a package declaring a page uses `contributes.pages[]` now, never a second, competing field.",
       "properties": {
+        "settings_area": {
+          "$ref": "settings-area.schema.json",
+          "description": "This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat)."
+        },
         "widgets": {
           "type": "array",
           "items": {

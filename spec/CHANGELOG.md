@@ -7,6 +7,13 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.89] - 2026-10-06
+
+### Added
+- `SettingsArea` schema and `settings/areas.json` (SPEC-SETAREA-01): the Account, Home settings and Chat settings areas as data (sections, cards, sidebar groups, audience), plus `contributes.settings_area` on the package manifest so an app package declares its own settings area. A card is one registry group at one scope and each registry key sits in exactly one card; `not_placed` records the three groups no area shows (`person.allowance`, `person.storage`, the robot-only `robot.hello`). The four allowed view ids, the nine reserved area ids and the three central ids are closed lists; `settings/areas-check.ts` holds the conformance check and the manifest lint. Account > Robot is adults only, Chat > Parental controls is a link row for owner, admin and adult accounts with a child (never a teen, no person id), and the only href placeholder is `{self}`. Additive.
+
+### Changed
+- Settings registry: 28 existing keys change only `lives_in`, so each group fits one card; no key added or removed, and scope, default, level and who may write are untouched. `ui.show_turn_stats` and `reference.images` move to `person.chat`; `ui.enrollment_sounds` to the new `person.profile`; `person.quiet_hours.from` and `.to` to `person.notifications`; `household.quiet_hours.from` and `.to` to `household.notifications`; `notifications.telegram.chat_id` and the 15 `notifications.*.telegram` switches to the new `person.telegram`; `backup.max_total_gb` to `household.storage`; the four `status.internet_probe.*` keys to the new `household.status`. `search.brave_api_key` is not in the registry yet and arrives with SEARCH-KEYS-SPEC-01, which lands it in `household.search`; the Home settings Search card already draws that group. Home's key declarations (the source `keys.json` is generated from) must carry the same `lives_in` values.
 ## [spec-v0.1.88] - 2026-10-06
 
 ### Added

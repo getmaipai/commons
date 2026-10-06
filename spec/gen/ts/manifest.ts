@@ -7,11 +7,13 @@ import { z } from "zod";
 /**One manifest format for every package kind (plugin, skill, app, companion, integration, model, wakeword, voice, theme, module). See platform plan 5.1 and .github's docs/PACKAGES.md.*/
 export const PackageManifest = z
   .object({
-    /**Unique in the catalog. No third-party name in it.*/
+    /**Unique in the catalog. No third-party name in it. Not one of the nine reserved settings area ids (the static legacy routes under /settings).*/
     id: z
       .string()
       .regex(new RegExp("^[a-z0-9][a-z0-9_-]{0,63}$"))
-      .describe("Unique in the catalog. No third-party name in it."),
+      .describe(
+        "Unique in the catalog. No third-party name in it. Not one of the nine reserved settings area ids (the static legacy routes under /settings).",
+      ),
     version: z.string().regex(new RegExp("^[0-9]+\\.[0-9]+\\.[0-9]+$")),
     /**A `plugin` is a self-contained, permissioned, installable capability (its own network access, its own recipe.json). A `skill` is plain instructions (a SKILL.md body, Claude-format-compatible) - no permissions, no recipe, composed into the chat model's system prompt when relevant, never runs on its own. See home/docs/dev.md's 'Naming: skill, plugin, command, connector' entry. A `reference` is a declarative offline knowledge archive (no code, like `model` and `voice`) - a Kiwix-style book a household installs and sizes before download; see `knowledge_source` below and home/docs/plans/knowledge-sources-2026-09-24.md. A `project` package declares a background project type: its body is `plan.json` (a `ProjectPlan`, this same file's own sibling `project.schema.json`'s `$defs/ProjectPlan`), never `recipe.json`.*/
     kind: z
@@ -550,6 +552,292 @@ export const PackageManifest = z
     /**Shell blueprints (6.1), keyed by blueprint kind: nav entries, pages, right-pane panels, settings sections, commands, quick actions, player hooks, admin sections. `additionalProperties: true` since most of 6.1's own blueprint kinds have no bundled package using them yet (Wave 1's `contributes: []` was a placeholder no package had populated); `widgets` and `pages` below are the two sub-fields session-d-packages-and-store.md steps 2/10 fix a real shape for. `pages` replaces a redundant top-level `pages: string[]` field (Session E flagged it 2026-09-06 as incompatible with this object shape and confirmed nothing in backend/src or frontend/src read it) - a package declaring a page uses `contributes.pages[]` now, never a second, competing field.*/
     contributes: z
       .object({
+        /**This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat).*/
+        settings_area: z
+          .object({
+            /**Route segment: /settings/<id>/<section>. Unique. The nine ids in $defs.reservedIds are static legacy routes that already own those paths; areas-check.ts refuses them (a JSON Schema `not` would drop this pattern from the generated models).*/
+            id: z
+              .string()
+              .regex(new RegExp("^[a-z][a-z0-9-]{0,31}$"))
+              .describe(
+                "Route segment: /settings/<id>/<section>. Unique. The nine ids in $defs.reservedIds are static legacy routes that already own those paths; areas-check.ts refuses them (a JSON Schema `not` would drop this pattern from the generated models).",
+              ),
+            /**The settings column's heading.*/
+            title: z
+              .string()
+              .min(1)
+              .max(40)
+              .describe("The settings column's heading."),
+            /**The nav entry that owns this area, so the app's header gets a gear. Absent for Account and Home settings.*/
+            app: z
+              .string()
+              .regex(new RegExp("^/[A-Za-z0-9/_-]*$"))
+              .describe(
+                "The nav entry that owns this area, so the app's header gets a gear. Absent for Account and Home settings.",
+              )
+              .optional(),
+            /**Who sees the area at all.*/
+            audience: z
+              .object({
+                /**The role ladder, most to least privileged. min_role is the lowest role that may see the thing.*/
+                min_role: z
+                  .enum(["owner", "admin", "adult", "teen", "child", "guest"])
+                  .describe(
+                    "The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
+                  ),
+              })
+              .strict()
+              .describe("Who sees the area at all."),
+            /**Sidebar groups, in order. Every section is listed in exactly one.*/
+            groups: z
+              .array(
+                z
+                  .object({
+                    label: z.string().min(1).max(40),
+                    sections: z.array(z.string()).min(1),
+                  })
+                  .strict(),
+              )
+              .min(1)
+              .describe(
+                "Sidebar groups, in order. Every section is listed in exactly one.",
+              ),
+            sections: z
+              .array(
+                z
+                  .object({
+                    /**Unique within its area.*/
+                    id: z
+                      .string()
+                      .regex(new RegExp("^[a-z][a-z0-9-]{0,31}$"))
+                      .describe("Unique within its area."),
+                    label: z.string().min(1).max(40),
+                    icon: z.string().regex(new RegExp("^[a-z][a-z0-9-]*$")),
+                    /**keys draws cards; view draws one named Home view; link draws an arrow row that navigates.*/
+                    kind: z
+                      .enum(["keys", "view", "link"])
+                      .describe(
+                        "keys draws cards; view draws one named Home view; link draws an arrow row that navigates.",
+                      ),
+                    cards: z
+                      .array(
+                        z
+                          .object({
+                            /**The card's heading; the one place a group's title is written.*/
+                            label: z
+                              .string()
+                              .min(1)
+                              .max(60)
+                              .describe(
+                                "The card's heading; the one place a group's title is written.",
+                              ),
+                            /**A registry group: SettingsKey lives_in.*/
+                            group: z
+                              .string()
+                              .min(1)
+                              .describe(
+                                "A registry group: SettingsKey lives_in.",
+                              )
+                              .optional(),
+                            scope: z
+                              .enum(["household", "person", "device"])
+                              .optional(),
+                            /**Which key levels this card draws. Absent means basic and advanced. Expert keys are drawn only by a card in a section with id developer, whose levels are exactly [expert].*/
+                            levels: z
+                              .array(z.enum(["basic", "advanced", "expert"]))
+                              .min(1)
+                              .refine(
+                                (arr) =>
+                                  arr.every(
+                                    (item, i) => arr.indexOf(item) == i,
+                                  ),
+                                "All items must be unique!",
+                              )
+                              .describe(
+                                "Which key levels this card draws. Absent means basic and advanced. Expert keys are drawn only by a card in a section with id developer, whose levels are exactly [expert].",
+                              )
+                              .optional(),
+                            /**A card of link rows to existing pages instead of keys.*/
+                            links: z
+                              .array(
+                                z
+                                  .object({
+                                    label: z.string().min(1).max(60),
+                                    /**An in-app path. {self} is the only placeholder, resolved on the client to the viewer's own id; no other person id can appear.*/
+                                    href: z
+                                      .string()
+                                      .regex(
+                                        new RegExp("^/([^{}]|\\{self\\})*$"),
+                                      )
+                                      .describe(
+                                        "An in-app path. {self} is the only placeholder, resolved on the client to the viewer's own id; no other person id can appear.",
+                                      ),
+                                    icon: z
+                                      .string()
+                                      .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                                      .optional(),
+                                    /**The role ladder, most to least privileged. min_role is the lowest role that may see the thing.*/
+                                    min_role: z
+                                      .enum([
+                                        "owner",
+                                        "admin",
+                                        "adult",
+                                        "teen",
+                                        "child",
+                                        "guest",
+                                      ])
+                                      .describe(
+                                        "The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
+                                      )
+                                      .optional(),
+                                  })
+                                  .strict(),
+                              )
+                              .min(1)
+                              .describe(
+                                "A card of link rows to existing pages instead of keys.",
+                              )
+                              .optional(),
+                            collapsed: z.boolean().default(false),
+                            order: z.number().int().optional(),
+                            /**The role ladder, most to least privileged. min_role is the lowest role that may see the thing.*/
+                            min_role: z
+                              .enum([
+                                "owner",
+                                "admin",
+                                "adult",
+                                "teen",
+                                "child",
+                                "guest",
+                              ])
+                              .describe(
+                                "The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
+                              )
+                              .optional(),
+                            bands: z
+                              .array(z.enum(["child", "teen", "adult"]))
+                              .min(1)
+                              .refine(
+                                (arr) =>
+                                  arr.every(
+                                    (item, i) => arr.indexOf(item) == i,
+                                  ),
+                                "All items must be unique!",
+                              )
+                              .optional(),
+                            needs: z
+                              .array(z.string().min(1))
+                              .refine(
+                                (arr) =>
+                                  arr.every(
+                                    (item, i) => arr.indexOf(item) == i,
+                                  ),
+                                "All items must be unique!",
+                              )
+                              .optional(),
+                          })
+                          .strict()
+                          .describe(
+                            "One card: either a registry group at one scope (group and scope together) or a list of link rows (links), never both. areas-check.ts enforces the pairing.",
+                          ),
+                      )
+                      .min(1)
+                      .optional(),
+                    /**keys only: a view drawn above the cards.*/
+                    lead_view: z
+                      .enum([
+                        "account.profile",
+                        "account.device_appearance",
+                        "chat.skills",
+                        "chat.shortcuts",
+                      ])
+                      .describe("keys only: a view drawn above the cards.")
+                      .optional(),
+                    /**keys only: a view drawn below the cards.*/
+                    trail_view: z
+                      .enum([
+                        "account.profile",
+                        "account.device_appearance",
+                        "chat.skills",
+                        "chat.shortcuts",
+                      ])
+                      .describe("keys only: a view drawn below the cards.")
+                      .optional(),
+                    /**A named view in Home's view table. The list is closed so a package cannot name one Home does not have.*/
+                    view: z
+                      .enum([
+                        "account.profile",
+                        "account.device_appearance",
+                        "chat.skills",
+                        "chat.shortcuts",
+                      ])
+                      .describe(
+                        "A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
+                      )
+                      .optional(),
+                    /**An in-app path. {self} is the only placeholder, resolved on the client to the viewer's own id; no other person id can appear.*/
+                    href: z
+                      .string()
+                      .regex(new RegExp("^/([^{}]|\\{self\\})*$"))
+                      .describe(
+                        "An in-app path. {self} is the only placeholder, resolved on the client to the viewer's own id; no other person id can appear.",
+                      )
+                      .optional(),
+                    /**Extra words the area's own search matches.*/
+                    keywords: z
+                      .array(z.string().min(1))
+                      .refine(
+                        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                        "All items must be unique!",
+                      )
+                      .describe("Extra words the area's own search matches.")
+                      .optional(),
+                    order: z.number().int().optional(),
+                    /**The role ladder, most to least privileged. min_role is the lowest role that may see the thing.*/
+                    min_role: z
+                      .enum([
+                        "owner",
+                        "admin",
+                        "adult",
+                        "teen",
+                        "child",
+                        "guest",
+                      ])
+                      .describe(
+                        "The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
+                      )
+                      .optional(),
+                    bands: z
+                      .array(z.enum(["child", "teen", "adult"]))
+                      .min(1)
+                      .refine(
+                        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                        "All items must be unique!",
+                      )
+                      .optional(),
+                    needs: z
+                      .array(z.string().min(1))
+                      .refine(
+                        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                        "All items must be unique!",
+                      )
+                      .optional(),
+                  })
+                  .strict()
+                  .and(
+                    z.intersection(z.any(), z.intersection(z.any(), z.any())),
+                  )
+                  .describe(
+                    "One section. kind keys needs cards, view needs a view, link needs an href. areas-check.ts refuses fields that belong to another kind.",
+                  ),
+              )
+              .min(1),
+          })
+          .strict()
+          .describe(
+            "This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat).",
+          )
+          .optional(),
         /**wave-2.md's D-to-E contract: `GET /api/widgets` and `GET /api/widgets/:package/:id/data` list and serve these.*/
         widgets: z
           .array(

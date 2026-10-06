@@ -38,6 +38,7 @@ export * from "./robot-state.js";
 export * from "./safety-result.js";
 export * from "./searxng-engines.js";
 export * from "./setting-value.js";
+export * from "./settings-area.js";
 export * from "./settings-key.js";
 export * from "./share.js";
 export * from "./source.js";

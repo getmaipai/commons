@@ -8,7 +8,7 @@ from typing import Any, Literal
 
 from pydantic import AnyUrl, BaseModel, ConfigDict, Field, conint, constr
 
-from . import privacy_row_schema, settings_key_schema
+from . import privacy_row_schema, settings_area_schema, settings_key_schema
 
 
 class Routing(BaseModel):
@@ -278,24 +278,6 @@ class Page(BaseModel):
     )
 
 
-class Contributes(BaseModel):
-    """
-    Shell blueprints (6.1), keyed by blueprint kind: nav entries, pages, right-pane panels, settings sections, commands, quick actions, player hooks, admin sections. `additionalProperties: true` since most of 6.1's own blueprint kinds have no bundled package using them yet (Wave 1's `contributes: []` was a placeholder no package had populated); `widgets` and `pages` below are the two sub-fields session-d-packages-and-store.md steps 2/10 fix a real shape for. `pages` replaces a redundant top-level `pages: string[]` field (Session E flagged it 2026-09-06 as incompatible with this object shape and confirmed nothing in backend/src or frontend/src read it) - a package declaring a page uses `contributes.pages[]` now, never a second, competing field.
-    """
-
-    model_config = ConfigDict(
-        extra='allow',
-    )
-    widgets: list[Widget] | None = Field(
-        None,
-        description="wave-2.md's D-to-E contract: `GET /api/widgets` and `GET /api/widgets/:package/:id/data` list and serve these.",
-    )
-    pages: list[Page] | None = Field(
-        None,
-        description="6.2's own package-declared pages. E's PackageScopeContext and nav-registry merge (frontend/src/shell/nav.ts) are the real consumer; no package populates this yet.",
-    )
-
-
 class FallbackReply(BaseModel):
     """
     A Tier 1 package's own answer when its Deno process crashes or times out (session-d-packages-and-store.md step 5) - required practically, not just structurally, for a Tier 1 package to clear bronze, since a crash with nothing to say is a dead end for whoever asked.
@@ -357,6 +339,28 @@ class Source(BaseModel):
     sha: str | None = None
 
 
+class Contributes(BaseModel):
+    """
+    Shell blueprints (6.1), keyed by blueprint kind: nav entries, pages, right-pane panels, settings sections, commands, quick actions, player hooks, admin sections. `additionalProperties: true` since most of 6.1's own blueprint kinds have no bundled package using them yet (Wave 1's `contributes: []` was a placeholder no package had populated); `widgets` and `pages` below are the two sub-fields session-d-packages-and-store.md steps 2/10 fix a real shape for. `pages` replaces a redundant top-level `pages: string[]` field (Session E flagged it 2026-09-06 as incompatible with this object shape and confirmed nothing in backend/src or frontend/src read it) - a package declaring a page uses `contributes.pages[]` now, never a second, competing field.
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    settings_area: settings_area_schema.SettingsArea | None = Field(
+        None,
+        description="This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat).",
+    )
+    widgets: list[Widget] | None = Field(
+        None,
+        description="wave-2.md's D-to-E contract: `GET /api/widgets` and `GET /api/widgets/:package/:id/data` list and serve these.",
+    )
+    pages: list[Page] | None = Field(
+        None,
+        description="6.2's own package-declared pages. E's PackageScopeContext and nav-registry merge (frontend/src/shell/nav.ts) are the real consumer; no package populates this yet.",
+    )
+
+
 class PackageManifest(BaseModel):
     """
     One manifest format for every package kind (plugin, skill, app, companion, integration, model, wakeword, voice, theme, module). See platform plan 5.1 and .github's docs/PACKAGES.md.
@@ -366,7 +370,8 @@ class PackageManifest(BaseModel):
         extra='forbid',
     )
     id: constr(pattern=r'^[a-z0-9][a-z0-9_-]{0,63}$') = Field(
-        ..., description='Unique in the catalog. No third-party name in it.'
+        ...,
+        description='Unique in the catalog. No third-party name in it. Not one of the nine reserved settings area ids (the static legacy routes under /settings).',
     )
     version: constr(pattern=r'^[0-9]+\.[0-9]+\.[0-9]+$')
     kind: Literal[

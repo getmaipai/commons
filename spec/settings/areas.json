@@ -1,0 +1,659 @@
+{
+  "areas": [
+    {
+      "id": "account",
+      "title": "Settings",
+      "audience": {
+        "min_role": "guest"
+      },
+      "groups": [
+        {
+          "label": "Personal",
+          "sections": [
+            "profile",
+            "appearance",
+            "notifications",
+            "voice",
+            "data"
+          ]
+        },
+        {
+          "label": "Devices",
+          "sections": [
+            "device",
+            "robot"
+          ]
+        },
+        {
+          "label": "Developer",
+          "sections": [
+            "developer"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "profile",
+          "label": "Profile",
+          "icon": "user",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Face enrollment",
+              "group": "person.profile",
+              "scope": "person"
+            }
+          ],
+          "lead_view": "account.profile",
+          "keywords": [
+            "name",
+            "photo",
+            "face"
+          ]
+        },
+        {
+          "id": "appearance",
+          "label": "Appearance",
+          "icon": "palette",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Appearance",
+              "group": "profile.appearance",
+              "scope": "person"
+            }
+          ],
+          "trail_view": "account.device_appearance",
+          "keywords": [
+            "theme",
+            "dark",
+            "look"
+          ]
+        },
+        {
+          "id": "notifications",
+          "label": "Notifications",
+          "icon": "bell",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Alerts",
+              "group": "person.notifications",
+              "scope": "person"
+            },
+            {
+              "label": "Telegram",
+              "group": "person.telegram",
+              "scope": "person",
+              "collapsed": true
+            }
+          ],
+          "keywords": [
+            "quiet hours",
+            "telegram",
+            "alerts"
+          ]
+        },
+        {
+          "id": "voice",
+          "label": "Voice",
+          "icon": "mic",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Voice",
+              "group": "person.voice",
+              "scope": "person"
+            },
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "Voices",
+                  "href": "/voices"
+                },
+                {
+                  "label": "Commands",
+                  "href": "/commands"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "data",
+          "label": "Data and privacy",
+          "icon": "lock",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Your data",
+              "links": [
+                {
+                  "label": "Signed-in devices",
+                  "href": "/devices"
+                },
+                {
+                  "label": "Storage",
+                  "href": "/storage"
+                },
+                {
+                  "label": "What connects to the internet",
+                  "href": "/privacy"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "device",
+          "label": "This device",
+          "icon": "laptop",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Wake word",
+              "group": "device.voice",
+              "scope": "device",
+              "min_role": "adult",
+              "needs": [
+                "wakeword.assets"
+              ]
+            }
+          ],
+          "min_role": "adult",
+          "needs": [
+            "wakeword.assets"
+          ]
+        },
+        {
+          "id": "robot",
+          "label": "Robot",
+          "icon": "bot",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Robot",
+              "group": "robot.settings",
+              "scope": "person",
+              "bands": [
+                "adult"
+              ],
+              "needs": [
+                "robot.paired"
+              ]
+            }
+          ],
+          "bands": [
+            "adult"
+          ],
+          "needs": [
+            "robot.paired"
+          ]
+        },
+        {
+          "id": "developer",
+          "label": "Developer tools",
+          "icon": "wrench",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Developer",
+              "group": "profile.appearance",
+              "scope": "person",
+              "levels": [
+                "expert"
+              ]
+            },
+            {
+              "label": "Session lock",
+              "group": "person.security",
+              "scope": "person",
+              "levels": [
+                "expert"
+              ]
+            }
+          ],
+          "min_role": "admin"
+        }
+      ]
+    },
+    {
+      "id": "home",
+      "title": "Home settings",
+      "audience": {
+        "min_role": "admin"
+      },
+      "groups": [
+        {
+          "label": "Household",
+          "sections": [
+            "general",
+            "people",
+            "search",
+            "integrations"
+          ]
+        },
+        {
+          "label": "AI",
+          "sections": [
+            "ai"
+          ]
+        },
+        {
+          "label": "Robots",
+          "sections": [
+            "robot"
+          ]
+        },
+        {
+          "label": "Care",
+          "sections": [
+            "storage",
+            "maintenance",
+            "privacy"
+          ]
+        },
+        {
+          "label": "Developer",
+          "sections": [
+            "developer"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "general",
+          "label": "General",
+          "icon": "settings",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Household",
+              "group": "household.system",
+              "scope": "household"
+            },
+            {
+              "label": "Internet check",
+              "group": "household.status",
+              "scope": "household"
+            }
+          ],
+          "keywords": [
+            "family name",
+            "place",
+            "language",
+            "retention",
+            "history"
+          ]
+        },
+        {
+          "id": "people",
+          "label": "People",
+          "icon": "users",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "Users",
+                  "href": "/users"
+                },
+                {
+                  "label": "Family",
+                  "href": "/people"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "search",
+          "label": "Search",
+          "icon": "search",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Web search",
+              "group": "household.search",
+              "scope": "household"
+            }
+          ],
+          "keywords": [
+            "searxng",
+            "wikipedia",
+            "brave",
+            "key"
+          ]
+        },
+        {
+          "id": "integrations",
+          "label": "Integrations",
+          "icon": "plug",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Home Assistant",
+              "group": "household.integrations",
+              "scope": "household"
+            },
+            {
+              "label": "Telegram",
+              "group": "household.notifications",
+              "scope": "household"
+            },
+            {
+              "label": "Reference library",
+              "group": "household.reference",
+              "scope": "household"
+            }
+          ],
+          "keywords": [
+            "home assistant",
+            "telegram",
+            "alarm"
+          ]
+        },
+        {
+          "id": "ai",
+          "label": "AI",
+          "icon": "cpu",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Chat",
+              "group": "household.ai",
+              "scope": "household"
+            },
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "AI models",
+                  "href": "/models"
+                },
+                {
+                  "label": "Engines",
+                  "href": "/engines"
+                }
+              ]
+            }
+          ],
+          "keywords": [
+            "teen gate",
+            "context",
+            "model"
+          ]
+        },
+        {
+          "id": "robot",
+          "label": "Robot",
+          "icon": "bot",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Robot",
+              "group": "robot.settings",
+              "scope": "household",
+              "needs": [
+                "robot.paired"
+              ]
+            }
+          ],
+          "needs": [
+            "robot.paired"
+          ],
+          "keywords": [
+            "initiative",
+            "greetings",
+            "live view",
+            "alarm"
+          ]
+        },
+        {
+          "id": "storage",
+          "label": "Storage and backups",
+          "icon": "hard-drive",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Limits",
+              "group": "household.storage",
+              "scope": "household"
+            },
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "Backups",
+                  "href": "/backups"
+                },
+                {
+                  "label": "Storage",
+                  "href": "/storage"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "label": "Maintenance",
+          "icon": "wrench",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "Updates",
+                  "href": "/updates"
+                },
+                {
+                  "label": "Repairs",
+                  "href": "/repairs"
+                },
+                {
+                  "label": "Performance",
+                  "href": "/performance"
+                },
+                {
+                  "label": "Status",
+                  "href": "/status"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "privacy",
+          "label": "Privacy",
+          "icon": "lock",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "What connects to the internet",
+                  "href": "/privacy"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "developer",
+          "label": "Developer tools",
+          "icon": "terminal",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Developer",
+              "group": "household.ai",
+              "scope": "household",
+              "levels": [
+                "expert"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chat",
+      "title": "Chat settings",
+      "app": "/chat",
+      "audience": {
+        "min_role": "guest"
+      },
+      "groups": [
+        {
+          "label": "Chat",
+          "sections": [
+            "general",
+            "personalization",
+            "skills",
+            "shortcuts"
+          ]
+        },
+        {
+          "label": "Related",
+          "sections": [
+            "voice",
+            "notifications",
+            "memories",
+            "parental-controls",
+            "household"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "general",
+          "label": "General",
+          "icon": "settings",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Chat",
+              "group": "person.chat",
+              "scope": "person",
+              "bands": [
+                "teen",
+                "adult"
+              ]
+            },
+            {
+              "label": "Search",
+              "group": "person.search",
+              "scope": "person"
+            }
+          ],
+          "keywords": [
+            "photos",
+            "pictures",
+            "safe search",
+            "reply stats"
+          ]
+        },
+        {
+          "id": "personalization",
+          "label": "Personalization",
+          "icon": "user-round",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Personality",
+              "group": "person.persona",
+              "scope": "person"
+            }
+          ],
+          "keywords": [
+            "companion",
+            "persona"
+          ]
+        },
+        {
+          "id": "skills",
+          "label": "Skills",
+          "icon": "sparkles",
+          "kind": "view",
+          "view": "chat.skills",
+          "bands": [
+            "teen",
+            "adult"
+          ]
+        },
+        {
+          "id": "shortcuts",
+          "label": "Keyboard shortcuts",
+          "icon": "keyboard",
+          "kind": "view",
+          "view": "chat.shortcuts"
+        },
+        {
+          "id": "voice",
+          "label": "Voice",
+          "icon": "mic",
+          "kind": "link",
+          "href": "/settings/account/voice"
+        },
+        {
+          "id": "notifications",
+          "label": "Notifications",
+          "icon": "bell",
+          "kind": "link",
+          "href": "/settings/account/notifications"
+        },
+        {
+          "id": "memories",
+          "label": "Memories",
+          "icon": "brain",
+          "kind": "link",
+          "href": "/people/{self}?tab=memories"
+        },
+        {
+          "id": "parental-controls",
+          "label": "Parental controls",
+          "icon": "shield-check",
+          "kind": "link",
+          "href": "/people",
+          "min_role": "adult",
+          "bands": [
+            "adult"
+          ],
+          "needs": [
+            "household.has_child"
+          ]
+        },
+        {
+          "id": "household",
+          "label": "Household chat",
+          "icon": "house",
+          "kind": "link",
+          "href": "/settings/home/ai",
+          "min_role": "admin"
+        }
+      ]
+    }
+  ],
+  "not_placed": [
+    {
+      "scope": "person",
+      "group": "person.allowance",
+      "reason": "A parent sets a child's daily allowances on that child's Family page; a settings area only reads and writes the viewer's own scope, never another person's."
+    },
+    {
+      "scope": "person",
+      "group": "person.storage",
+      "reason": "An admin sets a person's quota from Users and Storage; it is never the viewer's own to change, and no settings route takes a person id."
+    },
+    {
+      "scope": "device",
+      "group": "robot.hello",
+      "reason": "Robot-only hello keys; the robot renders them on its own screen, the hub never shows them."
+    }
+  ]
+}

@@ -42,7 +42,9 @@ test("app needs fixtures match JSON Schema and generated manifest model", () => 
   const schema = JSON.parse(readFileSync(join(SPEC, "schemas.resolved", "manifest.schema.json"), "utf8"));
   const settingsSchema = JSON.parse(readFileSync(join(SPEC, "schemas", "settings-key.schema.json"), "utf8"));
   const privacySchema = JSON.parse(readFileSync(join(SPEC, "..", "..", ".github", "standards", "schemas", "privacy-row.schema.json"), "utf8"));
+  const settingsAreaSchema = JSON.parse(readFileSync(join(SPEC, "schemas", "settings-area.schema.json"), "utf8"));
   ajv.addSchema(settingsSchema);
+  ajv.addSchema(settingsAreaSchema);
   ajv.addSchema(privacySchema, "https://getmaipai.github.io/shared/spec/schemas/privacy-row.schema.json");
   const validate = ajv.compile(schema);
   for (const file of readdirSync(join(SPEC, "fixtures", "manifest-needs")).sort()) {

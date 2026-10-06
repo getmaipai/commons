@@ -107,6 +107,7 @@ design record left a choice:
 | `gen/py/` | Pydantic v2 models, same schemas | generated, committed. `bash scripts/gen-py.sh` |
 | `errors/errors.json` | The error catalogue, conforming to `@maipai/standards`' `ErrorEntry` shape | hand-written |
 | `settings/keys.json` | The settings registry (conforms to `schemas/settings-key.schema.json`), including the per-person `notifications.browser.enabled` key | generated from declarations |
+| `settings/areas.json` | The settings areas (Account, Home settings, Chat settings), conforming to `schemas/settings-area.schema.json`; `settings/areas-check.ts` checks each registry key has exactly one card | hand-written |
 | `vocab/capabilities.json` | The capability vocabulary (3.2) | hand-written |
 | `vocab/permissions.json` | The permissions vocabulary, the install prompt's fixed enum (3.2) | hand-written |
 | `vocab/relationship-types.json` | What may relate to what, whether it can end, and which statuses it admits | hand-written |

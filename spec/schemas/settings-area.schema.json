@@ -1,0 +1,369 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/settings-area.schema.json",
+  "title": "SettingsArea",
+  "description": "One settings area: the title, sidebar groups, sections and cards of a settings screen (Chat settings, Account, Home settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "audience",
+    "groups",
+    "sections"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,31}$",
+      "description": "Route segment: /settings/<id>/<section>. Unique. The nine ids in $defs.reservedIds are static legacy routes that already own those paths; areas-check.ts refuses them (a JSON Schema `not` would drop this pattern from the generated models)."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "description": "The settings column's heading."
+    },
+    "app": {
+      "type": "string",
+      "pattern": "^/[A-Za-z0-9/_-]*$",
+      "description": "The nav entry that owns this area, so the app's header gets a gear. Absent for Account and Home settings."
+    },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_role"
+      ],
+      "properties": {
+        "min_role": {
+          "$ref": "#/$defs/role"
+        }
+      },
+      "description": "Who sees the area at all."
+    },
+    "groups": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Sidebar groups, in order. Every section is listed in exactly one.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "sections"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "sections": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/section"
+      }
+    }
+  },
+  "$defs": {
+    "reservedIds": {
+      "type": "string",
+      "enum": [
+        "users",
+        "models",
+        "backups",
+        "voices",
+        "commands",
+        "devices",
+        "repairs",
+        "updates",
+        "health"
+      ],
+      "description": "Area ids and package ids that may never be used: the static legacy routes under /settings."
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "owner",
+        "admin",
+        "adult",
+        "teen",
+        "child",
+        "guest"
+      ],
+      "description": "The role ladder, most to least privileged. min_role is the lowest role that may see the thing."
+    },
+    "band": {
+      "type": "string",
+      "enum": [
+        "child",
+        "teen",
+        "adult"
+      ]
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "basic",
+        "advanced",
+        "expert"
+      ]
+    },
+    "view": {
+      "type": "string",
+      "enum": [
+        "account.profile",
+        "account.device_appearance",
+        "chat.skills",
+        "chat.shortcuts"
+      ],
+      "description": "A named view in Home's view table. The list is closed so a package cannot name one Home does not have."
+    },
+    "href": {
+      "type": "string",
+      "pattern": "^/([^{}]|\\{self\\})*$",
+      "description": "An in-app path. {self} is the only placeholder, resolved on the client to the viewer's own id; no other person id can appear."
+    },
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "href"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "href": {
+          "$ref": "#/$defs/href"
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "min_role": {
+          "$ref": "#/$defs/role"
+        }
+      }
+    },
+    "card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "description": "The card's heading; the one place a group's title is written."
+        },
+        "group": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A registry group: SettingsKey lives_in."
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "household",
+            "person",
+            "device"
+          ]
+        },
+        "levels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/level"
+          },
+          "description": "Which key levels this card draws. Absent means basic and advanced. Expert keys are drawn only by a card in a section with id developer, whose levels are exactly [expert]."
+        },
+        "links": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/link"
+          },
+          "description": "A card of link rows to existing pages instead of keys."
+        },
+        "collapsed": {
+          "type": "boolean",
+          "default": false
+        },
+        "order": {
+          "type": "integer"
+        },
+        "min_role": {
+          "$ref": "#/$defs/role"
+        },
+        "bands": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/band"
+          }
+        },
+        "needs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "description": "One card: either a registry group at one scope (group and scope together) or a list of link rows (links), never both. areas-check.ts enforces the pairing."
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "icon",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,31}$",
+          "description": "Unique within its area."
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "keys",
+            "view",
+            "link"
+          ],
+          "description": "keys draws cards; view draws one named Home view; link draws an arrow row that navigates."
+        },
+        "cards": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/card"
+          }
+        },
+        "lead_view": {
+          "$ref": "#/$defs/view",
+          "description": "keys only: a view drawn above the cards."
+        },
+        "trail_view": {
+          "$ref": "#/$defs/view",
+          "description": "keys only: a view drawn below the cards."
+        },
+        "view": {
+          "$ref": "#/$defs/view"
+        },
+        "href": {
+          "$ref": "#/$defs/href"
+        },
+        "keywords": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Extra words the area's own search matches."
+        },
+        "order": {
+          "type": "integer"
+        },
+        "min_role": {
+          "$ref": "#/$defs/role"
+        },
+        "bands": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/band"
+          }
+        },
+        "needs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "keys"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "cards"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "view"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "view"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "link"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "href"
+            ]
+          }
+        }
+      ],
+      "description": "One section. kind keys needs cards, view needs a view, link needs an href. areas-check.ts refuses fields that belong to another kind."
+    }
+  }
+}
