@@ -33,7 +33,7 @@ export function TodoList({
     >
       <div className="flex items-baseline justify-between">
         <span className="text-[13.5px] font-medium">Todos</span>
-        <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {revision === undefined
             ? `${done}/${items.length}`
             : `${done}/${items.length} · rev ${revision}`}
@@ -68,7 +68,7 @@ export function TodoList({
               <span
                 className={cn(
                   item.status === "done" &&
-                    "text-foreground/35 line-through decoration-[1.5px]",
+                    "text-muted-foreground line-through decoration-[1.5px]",
                   item.status === "active" && "text-foreground/90",
                   item.status === "pending" && "text-foreground/50",
                   item.status === "failed" && "text-red-600 dark:text-red-400",

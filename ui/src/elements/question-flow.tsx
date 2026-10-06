@@ -205,7 +205,7 @@ export function QuestionFlow({
       className={cn(root, "gap-3")}
     >
       <div className="flex items-center justify-between gap-3 px-2 pt-1">
-        <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {progressLabel(currentIndex + 1, steps.length)}
         </span>
         {currentIndex > 0 ? (

@@ -33,7 +33,7 @@ export function MemoryChips({
     >
       <div className="flex items-center gap-1.5">
         <BrainIcon className="text-foreground/30 size-3.5" />
-        <span className={cn(mono, "text-foreground/35")}>
+        <span className={cn(mono, "text-muted-foreground")}>
           {fresh > 0 ? `remembered ${fresh}` : "memory"}
         </span>
       </div>

@@ -98,7 +98,7 @@ export function ReadAloud({
           />
         </span>
 
-        <span className={cn(mono, "text-foreground/35 shrink-0 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}>
           {elapsed} / {duration}
         </span>
 

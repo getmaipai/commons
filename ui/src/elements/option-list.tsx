@@ -110,7 +110,7 @@ export function OptionList({
         {...props}
       >
         {chosen.length === 0 ? (
-          <span className={cn(mono, "text-foreground/35 px-2 py-2")}>
+          <span className={cn(mono, "text-muted-foreground px-2 py-2")}>
             {emptyLabel}
           </span>
         ) : (
@@ -222,7 +222,7 @@ export function OptionList({
               isSelected
                 ? "bg-foreground/[0.06]"
                 : !unavailable && !locked && "hover:bg-foreground/[0.035]",
-              unavailable ? "text-foreground/35" : "text-foreground/90",
+              unavailable ? "text-muted-foreground" : "text-foreground/90",
               (unavailable || locked) && "cursor-default",
             )}
           >
@@ -266,7 +266,7 @@ export function OptionList({
       ) : null}
       {multiple ? (
         <div className="flex items-center justify-between gap-3 px-2 pt-1.5 pb-1">
-          <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+          <span className={cn(mono, "text-muted-foreground tabular-nums")}>
             {countLabel(count, max)}
           </span>
           <button

@@ -156,7 +156,7 @@ export function VoiceConversation({
 
         <div className="flex flex-col items-center gap-1">
           <span className="text-[13.5px] font-medium">{CAPTION[mode]}</span>
-          <span className={cn(mono, "text-foreground/35")}>
+          <span className={cn(mono, "text-muted-foreground")}>
             {muted ? "Mic off" : canInterrupt ? "Tap to interrupt" : HINT[mode]}
           </span>
         </div>

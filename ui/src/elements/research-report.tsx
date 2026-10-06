@@ -72,7 +72,7 @@ export function ResearchReport({
                 className={cn(
                   "min-w-0 flex-1 truncate text-[13px]",
                   section.state === "pending"
-                    ? "text-foreground/35"
+                    ? "text-muted-foreground"
                     : "text-foreground/85",
                 )}
               >

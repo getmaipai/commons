@@ -36,11 +36,11 @@ export function DataTable({
       {...props}
     >
       <div className="flex items-center px-4 pt-3 pb-2">
-        <span className={cn(mono, "text-foreground/35 flex-1")}>Model</span>
-        <span className={cn(mono, "text-foreground/35 w-16 text-end")}>
+        <span className={cn(mono, "text-muted-foreground flex-1")}>Model</span>
+        <span className={cn(mono, "text-muted-foreground w-16 text-end")}>
           Context
         </span>
-        <span className={cn(mono, "text-foreground/35 w-16 text-end")}>
+        <span className={cn(mono, "text-muted-foreground w-16 text-end")}>
           Cost
         </span>
       </div>

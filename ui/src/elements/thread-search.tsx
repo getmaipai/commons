@@ -132,7 +132,7 @@ export function ThreadSearch({
           </span>
         </span>
         {thread.preview && (
-          <span className="text-foreground/35 truncate text-xs">
+          <span className="text-muted-foreground truncate text-xs">
             {thread.preview}
           </span>
         )}

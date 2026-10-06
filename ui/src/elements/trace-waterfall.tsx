@@ -51,7 +51,7 @@ export function TraceWaterfall({
     >
       <div className="flex items-baseline justify-between">
         <span className="text-[13.5px] font-medium">Trace</span>
-        <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {totalMs}ms
         </span>
       </div>

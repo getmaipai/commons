@@ -131,7 +131,7 @@ export function ModelPicker({
 
                   <span className="flex shrink-0 flex-col items-end gap-1">
                     <span
-                      className={cn(mono, "text-foreground/35 tabular-nums")}
+                      className={cn(mono, "text-muted-foreground tabular-nums")}
                     >
                       {model.context}
                     </span>

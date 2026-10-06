@@ -71,7 +71,7 @@ export function Chart({
       {...props}
     >
       <div className="flex items-baseline justify-between">
-        <span className={cn(mono, "text-foreground/35")}>{label}</span>
+        <span className={cn(mono, "text-muted-foreground")}>{label}</span>
         {delta !== undefined && (
           <span
             className={cn(

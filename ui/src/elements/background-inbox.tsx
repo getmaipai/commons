@@ -46,7 +46,7 @@ export function BackgroundInbox({
             "tabular-nums",
             ready > 0
               ? "text-blue-600 dark:text-blue-400"
-              : "text-foreground/35",
+              : "text-muted-foreground",
           )}
         >
           {ready > 0 ? `${ready} ready` : `${running} in flight`}

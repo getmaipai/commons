@@ -32,7 +32,7 @@ export function ThreadList({
 
       {...props}
     >
-      <div className={cn(mono, "text-foreground/35 px-3 pb-1.5")}>Today</div>
+      <div className={cn(mono, "text-muted-foreground px-3 pb-1.5")}>Today</div>
       {threads.map((thread, i) => {
         const active = i === activeIndex;
         const className = cn(
@@ -49,7 +49,7 @@ export function ThreadList({
             <span
               className={cn(
                 mono,
-                "text-foreground/35 flex items-center gap-1.5 tabular-nums",
+                "text-muted-foreground flex items-center gap-1.5 tabular-nums",
                 onActiveIndexChange && "group-hover:hidden",
               )}
             >

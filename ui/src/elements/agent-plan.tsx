@@ -29,7 +29,7 @@ export function AgentPlan({
     >
       <div className="flex items-center justify-between">
         <span className="text-[13.5px] font-medium">Plan</span>
-        <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {completed} of {total}
         </span>
       </div>
@@ -61,7 +61,7 @@ export function AgentPlan({
                 className={cn(
                   done && "text-foreground/40",
                   active && "text-foreground/90",
-                  !done && !active && "text-foreground/35",
+                  !done && !active && "text-muted-foreground",
                 )}
               >
                 {step}

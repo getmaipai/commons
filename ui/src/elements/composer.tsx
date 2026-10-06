@@ -196,7 +196,7 @@ export function ComposerCommandItem({
 }) {
   return (
     <ComposerMenuItem active={active} {...props}>
-      <command.icon className="text-foreground/35 size-3.5 shrink-0" />
+      <command.icon className="text-muted-foreground size-3.5 shrink-0" />
       <span className="font-medium">/{command.name}</span>
       <span className="text-foreground/45 flex-1 truncate text-start text-xs">
         {command.description}
@@ -224,7 +224,7 @@ export function ComposerPersonItem({
         {person.name[0]}
       </span>
       <span className="flex-1 truncate text-start">{person.name}</span>
-      <span className={cn(mono, "text-foreground/35")}>{person.role}</span>
+      <span className={cn(mono, "text-muted-foreground")}>{person.role}</span>
     </ComposerMenuItem>
   );
 }
@@ -464,7 +464,7 @@ export function ComposerModelItem({
   return (
     <ComposerMenuItem active={selected} {...props}>
       <span className="flex-1 text-start">{entry.name}</span>
-      <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+      <span className={cn(mono, "text-muted-foreground tabular-nums")}>
         {entry.meta}
       </span>
       <span className="flex w-4 justify-end">
@@ -513,7 +513,7 @@ export function ComposerContext({
             className={cn(
               mono,
               "tabular-nums",
-              warn ? "text-red-500 dark:text-red-400" : "text-foreground/35",
+              warn ? "text-red-500 dark:text-red-400" : "text-muted-foreground",
             )}
           >
             {Math.round(fraction * 100)}%

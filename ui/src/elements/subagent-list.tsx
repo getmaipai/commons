@@ -66,7 +66,7 @@ export function SubagentList({
               <span className="flex-1 truncate text-[13.5px]">
                 {agent.name}
               </span>
-              <span className={cn(mono, "text-foreground/35")}>
+              <span className={cn(mono, "text-muted-foreground")}>
                 {agent.model}
               </span>
             </div>
@@ -101,7 +101,7 @@ export function SubagentList({
             <span className="flex-1 truncate text-[13.5px]">
               {summaryAgent.name}
             </span>
-            <span className={cn(mono, "text-foreground/35")}>
+            <span className={cn(mono, "text-muted-foreground")}>
               {summaryAgent.model}
             </span>
           </div>

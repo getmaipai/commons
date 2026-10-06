@@ -42,7 +42,7 @@ export function ActivityGraph({
     >
       <div className="flex items-baseline justify-between">
         <span className="text-[13.5px] font-medium">{title}</span>
-        <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {total}
         </span>
       </div>

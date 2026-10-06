@@ -81,7 +81,7 @@ export function RetrievalChunks({
                   "shrink-0 tabular-nums",
                   chunk.score >= 0.8
                     ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-foreground/35",
+                    : "text-muted-foreground",
                 )}
               >
                 {chunk.score.toFixed(2)}

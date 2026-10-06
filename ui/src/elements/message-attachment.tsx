@@ -49,7 +49,7 @@ export function MessageAttachments({
                 <span className="text-foreground/90 truncate text-[13.5px]">
                   {item.name}
                 </span>
-                <span className={cn(mono, "text-foreground/35")}>
+                <span className={cn(mono, "text-muted-foreground")}>
                   {item.size}
                 </span>
               </span>
@@ -68,7 +68,7 @@ export function MessageAttachments({
                 <span className="text-foreground/90 truncate text-[13.5px]">
                   {item.name}
                 </span>
-                <span className={cn(mono, "text-foreground/35")}>
+                <span className={cn(mono, "text-muted-foreground")}>
                   {item.size}
                   {item.pages !== undefined && ` · ${item.pages} pages`}
                 </span>

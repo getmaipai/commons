@@ -115,7 +115,7 @@ export function CommandPalette({
           className={cn(
             field,
             mono,
-            "text-foreground/35 rounded px-1.5 py-0.5",
+            "text-muted-foreground rounded px-1.5 py-0.5",
           )}
         >
           esc

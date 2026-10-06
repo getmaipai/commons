@@ -80,7 +80,7 @@ export function JobProgress({
         </span>
         {(finished || eta !== undefined) && (
           <span
-            className={cn(mono, "text-foreground/35 shrink-0 tabular-nums")}
+            className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
           >
             {finished ? doneLabel : eta}
           </span>
@@ -121,7 +121,7 @@ export function JobProgress({
             className={cn(
               mono,
               i < stage
-                ? "text-foreground/35"
+                ? "text-muted-foreground"
                 : i === stage
                   ? "text-foreground/90"
                   : "text-foreground/20",

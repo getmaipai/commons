@@ -66,7 +66,7 @@ export function McpServerPanel({
     >
       <div className="flex items-baseline justify-between px-1 pb-1">
         <span className="text-[13.5px] font-medium">Servers</span>
-        <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {connected} of {servers.length} connected
         </span>
       </div>

@@ -39,7 +39,7 @@ export function CodeRunner({
       {...props}
     >
       <div className="flex items-center gap-2 px-3.5 py-2">
-        <span className={cn(mono, "text-foreground/35 min-w-0 flex-1")}>
+        <span className={cn(mono, "text-muted-foreground min-w-0 flex-1")}>
           {language}
         </span>
         {durationMs !== undefined && state !== "running" && (

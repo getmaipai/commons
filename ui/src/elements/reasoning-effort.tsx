@@ -42,7 +42,7 @@ export function ReasoningEffort({
     >
       <div className="flex items-baseline justify-between">
         <span className="text-[13.5px] font-medium">Thinking</span>
-        <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {fmt(spent)} / {fmt(budget)}
         </span>
       </div>

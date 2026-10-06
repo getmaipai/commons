@@ -68,7 +68,7 @@ export function WebSearch({
             <span className="text-foreground/90 min-w-0 flex-1 truncate text-[13.5px]">
               {result.title}
             </span>
-            <span className={cn(mono, "text-foreground/35 shrink-0")}>
+            <span className={cn(mono, "text-muted-foreground shrink-0")}>
               {result.domain}
             </span>
           </div>

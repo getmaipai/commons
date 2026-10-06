@@ -76,7 +76,7 @@ export function CheckpointHistory({
             </span>
 
             {current ? (
-              <span className={cn(mono, "text-foreground/35 shrink-0")}>
+              <span className={cn(mono, "text-muted-foreground shrink-0")}>
                 current
               </span>
             ) : onRestore ? (

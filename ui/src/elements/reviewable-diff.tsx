@@ -51,7 +51,7 @@ export function ReviewableDiff({
     >
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <span className="font-mono text-xs">{filename}</span>
-        <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+        <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {kept} of {hunks.length} kept
         </span>
       </div>
@@ -102,7 +102,7 @@ export function ReviewableDiff({
                       "fade-in animate-in duration-300",
                       hunk.decision === "kept"
                         ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-foreground/35",
+                        : "text-muted-foreground",
                     )}
                   >
                     {hunk.decision}
@@ -137,7 +137,7 @@ export function ReviewableDiff({
       </div>
 
       <div className="border-foreground/[0.06] flex items-center justify-between border-t px-4 py-2.5">
-        <span className={cn(mono, "text-foreground/35")}>
+        <span className={cn(mono, "text-muted-foreground")}>
           {pending > 0 ? `${pending} left to review` : "All reviewed"}
         </span>
         {onApply && (

@@ -127,7 +127,7 @@ export function ImageGallery({
               )}
             >
               {failed ? (
-                <span className="text-foreground/35 flex size-full items-center justify-center">
+                <span className="text-muted-foreground flex size-full items-center justify-center">
                   <ImageOffIcon aria-hidden className="size-6" />
                 </span>
               ) : (
@@ -161,7 +161,7 @@ export function ImageGallery({
             </DialogTitle>
             <div className="flex min-h-0 items-center justify-center px-10">
               {failedImages.has(keyForImage(activeImage)) ? (
-                <div className="text-foreground/35 flex h-[min(75vh,32rem)] w-full items-center justify-center">
+                <div className="text-muted-foreground flex h-[min(75vh,32rem)] w-full items-center justify-center">
                   <ImageOffIcon aria-hidden className="size-8" />
                 </div>
               ) : (

@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.120] - ui-v0.5.120
+
+### K05 (contrast)
+
+NumberTicker labels and readable secondary text across the Elements use the
+contrast-safe `text-muted-foreground` token instead of low-opacity foreground
+text. Icon-only, disabled, and placeholder treatments keep their existing
+styles.
+
 ## [0.5.119] - ui-v0.5.119
 
 ### ELT-COMPOSER-KIT-01 (additive, compact density)

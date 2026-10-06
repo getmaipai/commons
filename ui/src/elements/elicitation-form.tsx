@@ -70,7 +70,7 @@ export function ElicitationForm({
       <div className="flex flex-col gap-2.5">
         {fields.map((item) => (
           <div key={item.name} className="flex flex-col gap-1">
-            <span className={cn(mono, "text-foreground/35")}>
+            <span className={cn(mono, "text-muted-foreground")}>
               {item.label}
               {item.required && <span className="text-foreground/25"> *</span>}
             </span>

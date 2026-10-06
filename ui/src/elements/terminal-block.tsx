@@ -66,8 +66,8 @@ export function TerminalBlock({
             className={cn(
               "size-3 animate-spin motion-reduce:animate-none",
               ink
-                ? "text-background/35 dark:text-foreground/35"
-                : "text-foreground/35",
+                ? "text-background/35 dark:text-muted-foreground"
+                : "text-muted-foreground",
             )}
           />
         )}

@@ -71,7 +71,7 @@ export function Sources({
           )}
         >
           <span>Sources</span>
-          <span className={cn(mono, "text-foreground/35 tabular-nums")}>
+          <span className={cn(mono, "text-muted-foreground tabular-nums")}>
             {sources.length}
           </span>
           <ChevronDownIcon className="size-3 opacity-60 transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] group-data-open/trigger:rotate-180 group-data-panel-open/trigger:rotate-180 motion-reduce:transition-none" />
@@ -108,7 +108,7 @@ export function Sources({
                 <span className="text-foreground/90 min-w-0 flex-1 truncate text-[13px] leading-snug">
                   {source.title}
                 </span>
-                <span className={cn(mono, "text-foreground/35 min-w-0 max-w-[40%] shrink truncate text-[11px]")}>
+                <span className={cn(mono, "text-muted-foreground min-w-0 max-w-[40%] shrink truncate text-[11px]")}>
                   {source.domain}
                 </span>
               </div>
