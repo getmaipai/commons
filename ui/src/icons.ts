@@ -1,5 +1,6 @@
 import {
   Baby,
+  Share2,
   BookOpen,
   Briefcase,
   ChefHat,
@@ -222,6 +223,7 @@ export const icons = {
   terminal: Terminal,
   "user-round": UserRound,
   baby: Baby,
+  share: Share2,
   book: BookOpen,
   briefcase: Briefcase,
   "chef-hat": ChefHat,

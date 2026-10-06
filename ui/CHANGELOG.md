@@ -1,5 +1,11 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.137] - ui-v0.5.137
+
+### PROJECTS-KIT-01c (additive)
+
+The icon registry gains `share` (Share2), for a project page's Share button.
+
 ## [0.5.136] - ui-v0.5.136
 
 ### PROJECTS-KIT-01b (additive)
