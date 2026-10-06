@@ -54,7 +54,8 @@ export const ProjectShareDialog: FC<{
                   disabled={disabled}
                   options={["none", "can_use", "can_edit"]}
                   getLabel={(role) => roleLabels[role as ProjectShareRole] ?? role}
-                  onValueChange={(role) => void onRoleChange(member.id, role as ProjectShareRole)}
+                  // A failed change is the host's to report; the select stays on the stored role.
+                  onValueChange={(role) => void Promise.resolve(onRoleChange(member.id, role as ProjectShareRole)).catch(() => {})}
                 />
               </li>
             ))}

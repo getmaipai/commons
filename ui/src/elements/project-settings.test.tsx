@@ -58,6 +58,24 @@ describe("ProjectSettingsDialog", () => {
     await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1));
   });
 
+  test("a rebuilt value while open does not wipe typing", () => {
+    const view = render(<ProjectSettingsDialog open onOpenChange={() => {}} value={{ ...value }} onSave={() => {}} />);
+    fireEvent.change(view.getByLabelText("Project name"), { target: { value: "Backyard" } });
+    view.rerender(<ProjectSettingsDialog open onOpenChange={() => {}} value={{ ...value }} onSave={() => {}} />);
+    expect((view.getByLabelText("Project name") as HTMLInputElement).value).toBe("Backyard");
+  });
+
+  test("a failed delete keeps the settings dialog open", async () => {
+    const onOpenChange = mock(() => {});
+    const view = render(<ProjectSettingsDialog open onOpenChange={onOpenChange} value={value} onSave={() => {}} onDelete={async () => { throw new Error("no"); }} />);
+    fireEvent.click(view.getByRole("button", { name: "Delete project" }));
+    const confirm = (await view.findAllByRole("button", { name: "Delete project" })).at(-1)!;
+    await act(async () => {
+      fireEvent.click(confirm);
+    });
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
   test("read-only (a child's project seen by a non-editor) has no Save, Delete or editable fields", () => {
     const view = render(<ProjectSettingsDialog open onOpenChange={() => {}} value={value} onSave={() => {}} onDelete={() => {}} readOnly />);
     expect(view.queryByRole("button", { name: "Save" })).toBeNull();

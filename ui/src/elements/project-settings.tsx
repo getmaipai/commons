@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FC } from "react";
+import { useEffect, useRef, useState, type FC } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import {
   AlertDialog,
@@ -109,11 +109,15 @@ export const ProjectSettingsDialog: FC<{
   const [saving, setSaving] = useState(false);
   const [confirming, setConfirming] = useState(false);
   // A reopened dialog starts from the stored record, never a stale draft.
+  // Only on the closed-to-open edge: a host that rebuilds `value` on every
+  // render, or a refetch while the dialog is open, must not wipe typing.
+  const wasOpen = useRef(open);
   useEffect(() => {
-    if (open) setDraft(value);
+    if (open && !wasOpen.current) setDraft(value);
+    wasOpen.current = open;
   }, [open, value]);
   const text = { ...DEFAULTS, ...labels };
-  const patch = changed(draft, value);
+  const patch = changed({ ...draft, name: draft.name.trim() }, value);
   const dirty = Object.keys(patch).length > 0;
   const nameOk = draft.name.trim().length > 0;
   const memoryLabels = { ...MEMORY_DEFAULT_LABELS, ...labels?.memoryOptions };
@@ -123,7 +127,7 @@ export const ProjectSettingsDialog: FC<{
   const save = async () => {
     setSaving(true);
     try {
-      await onSave({ ...patch, ...(patch.name !== undefined ? { name: draft.name.trim() } : {}) });
+      await onSave(patch);
       onOpenChange(false);
     } catch {
       // The host says what went wrong; the dialog stays open with the draft.
@@ -236,9 +240,17 @@ export const ProjectSettingsDialog: FC<{
           <AlertDialogFooter>
             <AlertDialogCancel>{text.cancel}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                onOpenChange(false);
-                void Promise.resolve(onDelete?.()).catch(() => {});
+              onClick={async (event) => {
+                // Stay open until the delete is done; a failure keeps the
+                // settings dialog (the host says what went wrong).
+                event.preventDefault();
+                try {
+                  await onDelete?.();
+                  setConfirming(false);
+                  onOpenChange(false);
+                } catch {
+                  setConfirming(false);
+                }
               }}
             >
               {text.delete}
