@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.115] - ui-v0.5.115
+
+### ELEMENTS-ADOPT-01 (additive)
+
+`EmptyStateSuggestion` keeps a 48px touch target around its 36px chip with a
+`before:-inset-y-1.5` pseudo-element, so a host renders the chip as shipped and
+passes no size class; the chip rows are 12px apart so touch targets do not overlap.
+`EmptyState` centres itself (`mx-auto`) in a column wider than its `max-w-md`.
+
 ## [0.5.114] - ui-v0.5.114
 
 ### ELT-COMPOSER-KIT-01 (additive)

@@ -10,7 +10,7 @@ export function EmptyState({ className, ...props }: ComponentProps<"div">) {
     <div
       data-slot="empty-state"
       className={cn(
-        "flex w-full max-w-md flex-col items-center gap-7",
+        "mx-auto flex w-full max-w-md flex-col items-center gap-7",
         className,
       )}
       {...props}
@@ -41,7 +41,7 @@ export function EmptyStateSuggestions({
   return (
     <div
       data-slot="empty-state-suggestions"
-      className={cn("flex flex-wrap justify-center gap-2", className)}
+      className={cn("flex flex-wrap justify-center gap-x-2 gap-y-3", className)}
       {...props}
     />
   );
@@ -60,7 +60,9 @@ export function EmptyStateSuggestion({
       style={{ animationDelay: `${120 + index * 70}ms`, ...style }}
       className={cn(
         paper,
-        "fade-in slide-in-from-bottom-2 animate-in fill-mode-both focus-visible:ring-foreground/20 rounded-full px-4 py-2 text-[13px] transition-transform duration-500 outline-none hover:-translate-y-px focus-visible:ring-1 active:scale-[0.96] motion-reduce:animate-none",
+        // `relative before:-inset-y-1.5`: the 13px chip is 36px tall; the pseudo-element
+        // brings the touch target to the 48px floor without changing the look.
+        "relative before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] fade-in slide-in-from-bottom-2 animate-in fill-mode-both focus-visible:ring-foreground/20 rounded-full px-4 py-2 text-[13px] transition-transform duration-500 outline-none hover:-translate-y-px focus-visible:ring-1 active:scale-[0.96] motion-reduce:animate-none",
         className,
       )}
       {...props}
