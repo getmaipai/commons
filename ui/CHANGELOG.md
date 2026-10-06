@@ -11,6 +11,27 @@ unset, nothing renders and the footer is unchanged.
 | --- | --- | --- |
 | `ThreadComponents.ComposerQueue` | `ComponentType` | unset (renders nothing) |
 
+Vendor assistant-ui's `ImageGallery` Element. It shows up to `maxVisible`
+images (default `6`), with an overflow tile, and opens a lightbox with
+previous and next controls. `onOpen` is called with the opened image id.
+
+| Export | Type |
+| --- | --- |
+| `ImageGallery` | `(props: ImageGalleryProps) => JSX.Element | null` |
+| `GalleryImage` | `{ id, src, alt, caption?, source? }` |
+| `ImageGalleryProps` | `div` props, `images`, `maxVisible?`, `onOpen?` |
+
+Source behavior audit:
+
+| Behavior | Present |
+| --- | --- |
+| Swipe | No |
+| Thumbnail rail | No |
+| Focus restore on close | Yes |
+| Reduced motion | Yes |
+| Paint-time removal of a tile that fails to load | No; it shows an image-failure placeholder |
+| `referrerPolicy` on the source link | No |
+
 ## [0.5.98] - ui-v0.5.98
 
 Conversation map visibility now selects the message crossing the viewport's
