@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.128] - ui-v0.5.128
+
+### KIT-SET-04 (additive)
+
+`RailProfileMenu` takes an optional `homeSettings: { href, label }` and draws
+that row right after Settings, for the household's owner and admins (the
+host decides who). Without the prop the menu is unchanged. The label is the
+host's copy; the Incognito row is not touched.
+
 ## [0.5.127] - ui-v0.5.127
 
 ### KIT-SET-01 (additive; defaults unchanged)

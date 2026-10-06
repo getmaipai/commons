@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Bell, CircleHelp, LogOut, Settings, VenetianMask, Activity } from "lucide-react";
+import { Bell, CircleHelp, House, LogOut, Settings, VenetianMask, Activity } from "lucide-react";
 import { Link } from "react-router";
 import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
 import {
@@ -35,6 +35,10 @@ export interface RailProfileMenuProps {
    * Each adds to the avatar's count. */
   extraAttention?: number;
   settingsHref?: string;
+  /** The admin-only Home settings row, drawn right after Settings. The
+   * host passes it for the household's owner and admins; the label is the
+   * host's copy. Undefined (the default) draws no row. */
+  homeSettings?: { href: string; label: string };
   helpHref?: string;
   onLogout?: () => void;
   /** Rendered next to the avatar button, inside the rail's profile slot
@@ -77,6 +81,7 @@ export default function RailProfileMenu({
   incognito,
   extraAttention = 0,
   settingsHref = "/settings",
+  homeSettings,
   helpHref,
   onLogout,
   children,
@@ -197,6 +202,12 @@ export default function RailProfileMenu({
             <Settings aria-hidden />
             Settings
           </DropdownMenuItem>
+          {homeSettings ? (
+            <DropdownMenuItem className={rowClass} render={<Link to={homeSettings.href} />}>
+              <House aria-hidden />
+              {homeSettings.label}
+            </DropdownMenuItem>
+          ) : null}
           {helpHref ? (
             <DropdownMenuItem className={rowClass} render={<Link to={helpHref} />}>
               <CircleHelp aria-hidden />
