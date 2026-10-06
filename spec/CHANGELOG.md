@@ -7,6 +7,14 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.87] - 2026-10-06
+
+### Added
+- `ChatFolder` (`chat-folder.schema.json`, id prefix `folder-`): one person's named group of chat conversations, shown to people as a Project in the chat history column. Name 1 to 80 characters, optional `sort_order`, `provenance` naming who made it (a parent may make one for a child), `deleted_at` for sync. No instructions or files yet. Named "chat folder" so it is never confused with the background-work `Project` record (CHAT-PROJECT-01a).
+- Optional `folder_id` on `Conversation` (null or a `folder-` id): the folder the conversation sits in. Deleting a folder sets it back to null; a temporary conversation never has one. Fixtures `chat-folder.example.json`, `chat-folder.parent-made.example.json`, `conversation.in-folder.example.json`.
+
+## [spec-v0.1.86] - 2026-10-06
+
 ### Added
 - SearXNG engine-group catalog, required engine minimums, operator and country disclosures, and privacy flags for Yandex and Baidu. The search URL setting now explains that an empty value uses MaiPai’s search service; household search settings live under `household.search` (SEARXNG-SET-01).
 

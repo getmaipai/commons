@@ -63,6 +63,10 @@ class Conversation(BaseModel):
         False,
         description="Whether this conversation stays at the top of its person's list.",
     )
+    folder_id: constr(pattern=r'^folder-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description='The chat folder (chat-folder.schema.json, shown as a Project) this conversation sits in, or null. The folder belongs to the same person. A temporary conversation never has one; the host enforces that, since a cross-field rule here would be lost in codegen (see README on allOf/if/then) (CHAT-PROJECT-01a).',
+    )
     settings: Settings | None = Field(
         None,
         description='Optional settings remembered with this conversation. Unknown keys are preserved for additive cross-client evolution.',

@@ -43,6 +43,12 @@
       "default": false,
       "description": "Whether this conversation stays at the top of its person's list."
     },
+    "folder_id": {
+      "type": ["string", "null"],
+      "pattern": "^folder-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "The chat folder (chat-folder.schema.json, shown as a Project) this conversation sits in, or null. The folder belongs to the same person. A temporary conversation never has one; the host enforces that, since a cross-field rule here would be lost in codegen (see README on allOf/if/then) (CHAT-PROJECT-01a)."
+    },
     "settings": {
       "type": "object",
       "additionalProperties": true,

@@ -18,6 +18,7 @@ import { Relationship } from "../../gen/ts/relationship.js";
 import { Grant } from "../../gen/ts/grant.js";
 import { Issue } from "../../gen/ts/issue.js";
 import { Conversation } from "../../gen/ts/conversation.js";
+import { ChatFolder } from "../../gen/ts/chat-folder.js";
 import { Device } from "../../gen/ts/device.js";
 import { RobotState } from "../../gen/ts/robot-state.js";
 import { DeviceCommand } from "../../gen/ts/device-command.js";
@@ -114,6 +115,30 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("conversation.example.json", () => {
     expect(() => Conversation.parse(loadFixture("conversation.example.json"))).not.toThrow();
+  });
+
+  test("conversation.in-folder.example.json", () => {
+    expect(() => Conversation.parse(loadFixture("conversation.in-folder.example.json"))).not.toThrow();
+  });
+
+  test("a conversation's folder_id must be a folder id", () => {
+    const conv = loadFixture("conversation.in-folder.example.json") as Record<string, unknown>;
+    expect(() => Conversation.parse({ ...conv, folder_id: "proj-a1b2c3" })).toThrow();
+    expect(() => Conversation.parse({ ...conv, folder_id: null })).not.toThrow();
+  });
+
+  for (const kind of ["example", "parent-made.example"]) {
+    test(`chat-folder.${kind}.json`, () => {
+      expect(() => ChatFolder.parse(loadFixture(`chat-folder.${kind}.json`))).not.toThrow();
+    });
+  }
+
+  test("a chat folder refuses an empty name, a bad id and an unknown field", () => {
+    const folder = loadFixture("chat-folder.example.json") as Record<string, unknown>;
+    expect(() => ChatFolder.parse({ ...folder, name: "" })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, name: "x".repeat(81) })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, id: "project-a1b2c3" })).toThrow();
+    expect(() => ChatFolder.parse({ ...folder, instructions: "be brief" })).toThrow();
   });
 
   test("project.example.json", () => {

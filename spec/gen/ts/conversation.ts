@@ -72,6 +72,25 @@ export const Conversation = z
         "Whether this conversation stays at the top of its person's list.",
       )
       .default(false),
+    /**The chat folder (chat-folder.schema.json, shown as a Project) this conversation sits in, or null. The folder belongs to the same person. A temporary conversation never has one; the host enforces that, since a cross-field rule here would be lost in codegen (see README on allOf/if/then) (CHAT-PROJECT-01a).*/
+    folder_id: z
+      .union([
+        z
+          .string()
+          .regex(new RegExp("^folder-[a-z0-9]{6,}$"))
+          .describe(
+            "The chat folder (chat-folder.schema.json, shown as a Project) this conversation sits in, or null. The folder belongs to the same person. A temporary conversation never has one; the host enforces that, since a cross-field rule here would be lost in codegen (see README on allOf/if/then) (CHAT-PROJECT-01a).",
+          ),
+        z
+          .null()
+          .describe(
+            "The chat folder (chat-folder.schema.json, shown as a Project) this conversation sits in, or null. The folder belongs to the same person. A temporary conversation never has one; the host enforces that, since a cross-field rule here would be lost in codegen (see README on allOf/if/then) (CHAT-PROJECT-01a).",
+          ),
+      ])
+      .describe(
+        "The chat folder (chat-folder.schema.json, shown as a Project) this conversation sits in, or null. The folder belongs to the same person. A temporary conversation never has one; the host enforces that, since a cross-field rule here would be lost in codegen (see README on allOf/if/then) (CHAT-PROJECT-01a).",
+      )
+      .default(null),
     /**Optional settings remembered with this conversation. Unknown keys are preserved for additive cross-client evolution.*/
     settings: z
       .object({

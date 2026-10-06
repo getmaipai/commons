@@ -12,6 +12,7 @@ from _standards import load_standards_module
 from pydantic import ValidationError
 
 from gen.py.artifact_schema import Artifact
+from gen.py.chat_folder_schema import ChatFolder
 from gen.py.content_ceiling_schema import ContentCeiling
 from gen.py.conversation_schema import Conversation
 from gen.py.conversation_turn_schema import ConversationTurn
@@ -76,6 +77,28 @@ def test_settings_key_fixture():
 @pytest.mark.parametrize("kind", ["person", "pet", "place"])
 def test_entity_fixtures(kind: str):
     Entity.model_validate(load_fixture(f"entity.{kind}.example.json"))
+
+
+@pytest.mark.parametrize(
+    "name", ["chat-folder.example.json", "chat-folder.parent-made.example.json"]
+)
+def test_chat_folder_fixtures(name: str):
+    ChatFolder.model_validate(load_fixture(name))
+
+
+def test_chat_folder_refuses_empty_name_and_unknown_field():
+    folder = load_fixture("chat-folder.example.json")
+    with pytest.raises(ValidationError):
+        ChatFolder.model_validate({**folder, "name": ""})
+    with pytest.raises(ValidationError):
+        ChatFolder.model_validate({**folder, "instructions": "be brief"})
+
+
+def test_conversation_in_folder_fixture():
+    conv = Conversation.model_validate(
+        load_fixture("conversation.in-folder.example.json")
+    )
+    assert conv.folder_id == "folder-a1b2c3"
 
 
 @pytest.mark.parametrize("kind", ["shopping", "todo", "custom"])

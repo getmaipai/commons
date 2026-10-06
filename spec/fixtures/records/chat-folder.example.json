@@ -1,0 +1,12 @@
+{
+  "id": "folder-a1b2c3",
+  "person": "person-a1b2c3",
+  "name": "Garden plans",
+  "sort_order": 0,
+  "source": "hub",
+  "provenance": "person-a1b2c3 (self)",
+  "hlc": "1757000000000:0:a1b2c3",
+  "created_at": "2026-10-06T12:00:00Z",
+  "updated_at": "2026-10-06T12:00:00Z",
+  "deleted_at": null
+}
