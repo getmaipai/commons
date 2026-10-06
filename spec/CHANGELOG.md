@@ -7,6 +7,9 @@ scope lands.
 
 ## [Unreleased]
 
+### Added
+- SearXNG engine-group catalog, required engine minimums, operator and country disclosures, and privacy flags for Yandex and Baidu. The search URL setting now explains that an empty value uses MaiPai’s search service; household search settings live under `household.search` (SEARXNG-SET-01).
+
 ## [spec-v0.1.84] - 2026-10-06
 
 ### Added

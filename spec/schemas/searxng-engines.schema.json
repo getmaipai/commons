@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/searxng-engines.schema.json",
+  "title": "SearxngEngines",
+  "description": "The shared SearXNG engine groups, minimum engine counts, operator disclosures and recommended defaults used by Home and Stack. Engine names are pinned to the SearXNG version the Stack ships; no catalog engine requires an API key.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "minimums", "groups"],
+  "properties": {
+    "version": {"type":"string", "minLength":1, "description":"The SearXNG release family against which engine names are verified."},
+    "minimums": {
+      "type":"object", "additionalProperties":false,
+      "required":["jsonFormatRequired","wikipediaRequired","webEngines","childWebEngines","childImageEngines","pictureEngines"],
+      "properties": {
+        "jsonFormatRequired":{"type":"boolean"},
+        "wikipediaRequired":{"type":"boolean"},
+        "webEngines":{"type":"integer","minimum":1},
+        "childWebEngines":{"type":"integer","minimum":1},
+        "childImageEngines":{"type":"integer","minimum":1},
+        "pictureEngines":{"type":"integer","minimum":1}
+      }
+    },
+    "groups": {"type":"array","minItems":1,"items":{"$ref":"#/$defs/group"}}
+  },
+  "$defs": {
+    "group": {
+      "type":"object", "additionalProperties":false,
+      "required":["id","label","description","needed_by","default_on","locked","engines"],
+      "properties": {
+        "id":{"type":"string","pattern":"^[a-z][a-z0-9-]*$"},
+        "label":{"type":"string","minLength":1},
+        "description":{"type":"string","minLength":1},
+        "needed_by":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}},
+        "default_on":{"type":"boolean"},
+        "locked":{"type":"boolean"},
+        "engines":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/engine"}}
+      }
+    },
+    "engine": {
+      "type":"object", "additionalProperties":false,
+      "required":["name","operator","country","safe_search","privacy_flag"],
+      "properties": {
+        "name":{"type":"string","minLength":1},
+        "operator":{"type":"string","minLength":1},
+        "country":{"type":"string","minLength":1},
+        "safe_search":{"type":"boolean","description":"Whether the engine is expected to honor SearXNG's safe-search request."},
+        "privacy_flag":{"type":"boolean","description":"True when enabling the engine requires a plain-language disclosure because of where the operator is based."}
+      }
+    }
+  }
+}

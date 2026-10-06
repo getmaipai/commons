@@ -15,12 +15,14 @@ import type { ZodType } from "zod";
 import { DataClass } from "../../gen/ts/data-class.js";
 import { DataFolder } from "../../gen/ts/data-folder.js";
 import { DataLocation } from "../../gen/ts/data-location.js";
+import { SearxngEngines } from "../../gen/ts/searxng-engines.js";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
 
 const SHAPES: Array<{ name: string; zod: ZodType }> = [
+  { name: "searxng-engines", zod: SearxngEngines },
   { name: "data-class", zod: DataClass },
   { name: "data-location", zod: DataLocation },
   { name: "data-folder", zod: DataFolder },

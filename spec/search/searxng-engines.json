@@ -1,0 +1,109 @@
+{
+  "version": "2026.10",
+  "minimums": {
+    "jsonFormatRequired": true,
+    "wikipediaRequired": true,
+    "webEngines": 2,
+    "childWebEngines": 1,
+    "childImageEngines": 1,
+    "pictureEngines": 1
+  },
+  "groups": [
+    {
+      "id": "general",
+      "label": "General web",
+      "description": "Search the web for everyday questions.",
+      "needed_by": ["web search"],
+      "default_on": true,
+      "locked": true,
+      "engines": [
+        {"name":"brave","operator":"Brave","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"duckduckgo","operator":"DuckDuckGo","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"bing","operator":"Microsoft","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"startpage","operator":"Startpage","country":"Netherlands","safe_search":true,"privacy_flag":false},
+        {"name":"mojeek","operator":"Mojeek","country":"United Kingdom","safe_search":true,"privacy_flag":false}
+      ]
+    },
+    {
+      "id": "reference",
+      "label": "Wikipedia and reference",
+      "description": "Search Wikipedia and related references.",
+      "needed_by": ["web search", "people and places"],
+      "default_on": true,
+      "locked": true,
+      "engines": [
+        {"name":"wikipedia","operator":"Wikimedia Foundation","country":"International","safe_search":true,"privacy_flag":false},
+        {"name":"wikidata","operator":"Wikimedia Foundation","country":"International","safe_search":true,"privacy_flag":false},
+        {"name":"wiktionary","operator":"Wikimedia Foundation","country":"International","safe_search":true,"privacy_flag":false}
+      ]
+    },
+    {
+      "id": "images",
+      "label": "Images",
+      "description": "Find pictures to show in answers.",
+      "needed_by": ["pictures in answers"],
+      "default_on": true,
+      "locked": false,
+      "engines": [
+        {"name":"wikicommons.images","operator":"Wikimedia Foundation","country":"International","safe_search":true,"privacy_flag":false},
+        {"name":"brave.images","operator":"Brave","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"duckduckgo images","operator":"DuckDuckGo","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"bing images","operator":"Microsoft","country":"United States","safe_search":true,"privacy_flag":false}
+      ]
+    },
+    {
+      "id": "news",
+      "label": "News",
+      "description": "Search current news.",
+      "needed_by": ["news searches"],
+      "default_on": true,
+      "locked": false,
+      "engines": [
+        {"name":"brave.news","operator":"Brave","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"duckduckgo news","operator":"DuckDuckGo","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"bing news","operator":"Microsoft","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"wikinews","operator":"Wikimedia Foundation","country":"International","safe_search":true,"privacy_flag":false}
+      ]
+    },
+    {
+      "id": "video",
+      "label": "Video",
+      "description": "Search for videos.",
+      "needed_by": ["video searches"],
+      "default_on": true,
+      "locked": false,
+      "engines": [
+        {"name":"brave.videos","operator":"Brave","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"duckduckgo videos","operator":"DuckDuckGo","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"bing videos","operator":"Microsoft","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"dailymotion","operator":"Dailymotion","country":"France","safe_search":true,"privacy_flag":false}
+      ]
+    },
+    {
+      "id": "science",
+      "label": "Science",
+      "description": "Search scientific publications.",
+      "needed_by": ["optional science searches"],
+      "default_on": false,
+      "locked": false,
+      "engines": [
+        {"name":"arxiv","operator":"Cornell University","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"pubmed","operator":"US National Library of Medicine","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"semantic scholar","operator":"Allen Institute for AI","country":"United States","safe_search":true,"privacy_flag":false},
+        {"name":"openairepublications","operator":"OpenAIRE","country":"European Union","safe_search":true,"privacy_flag":false}
+      ]
+    },
+    {
+      "id": "extra",
+      "label": "Extra engines (privacy flag)",
+      "description": "Optional engines that send searches to additional operators.",
+      "needed_by": ["optional searches"],
+      "default_on": false,
+      "locked": false,
+      "engines": [
+        {"name":"yandex","operator":"Yandex","country":"Russia","safe_search":true,"privacy_flag":true},
+        {"name":"baidu","operator":"Baidu","country":"China","safe_search":true,"privacy_flag":true}
+      ]
+    }
+  ]
+}

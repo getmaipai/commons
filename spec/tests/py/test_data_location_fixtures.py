@@ -14,9 +14,11 @@ from pydantic import ValidationError
 from gen.py.data_class_schema import DataClass
 from gen.py.data_folder_schema import DataFolder
 from gen.py.data_location_schema import DataLocation
+from gen.py.searxng_engines_schema import SearxngEngines
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures"
 SHAPES = {
+    "searxng-engines": SearxngEngines,
     "data-class": DataClass,
     "data-location": DataLocation,
     "data-folder": DataFolder,
