@@ -57,6 +57,11 @@ interface GrantVocab {
   actions: Array<{ id: string; parameterized: boolean; description: string }>;
 }
 
+/** The three age bands a capability policy decides over, and who must
+ * approve at each (SPEC-CAP-01). Strictness runs none < self < parent < never. */
+export type PolicyApprover = "none" | "self" | "parent" | "never";
+export type PolicyCells = { child: PolicyApprover; teen: PolicyApprover; adult: PolicyApprover };
+
 /** vocab/entity-kind-nouns.json: the nouns a person answers "Who's
  * Quill?" with ("my coworker", "our rabbit"), each mapped to one of
  * entity.schema.json's kinds (SPEC-01, ASK-01's answer parser). */

@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.91] - 2026-10-06
+
+### Added
+- `policy` on every entry of `vocab/permissions.json` and `vocab/grant-actions.json` (risk, outbound, reversible, `approver` per band `none|self|parent|never`, optional `by_parameter`, `limits`, `model_callable`), `unknown_default` (a minor asks a parent), the core ids `share.create`, `upload.photo`, `search.hosted`, `search.household_subject`, `notify.person` and `approvals.decide`, and a test that a child's cell is never looser than a teen's (SPEC-CAP-01).
+
 ## [spec-v0.1.90] - 2026-10-06
 
 ### Added
