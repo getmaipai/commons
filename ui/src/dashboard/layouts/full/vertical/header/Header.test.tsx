@@ -10,13 +10,13 @@ afterEach(() => {
   localStorage.removeItem("vite-ui-theme");
 });
 
-function renderLayout(showThemeToggle?: boolean, statusIndicator?: React.ReactNode) {
+function renderLayout(showThemeToggle?: boolean, statusIndicator?: React.ReactNode, notifications?: React.ReactNode) {
   return render(
     <MemoryRouter initialEntries={["/next"]}>
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Routes>
-            <Route path="/next" element={<FullLayout showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} />}>
+            <Route path="/next" element={<FullLayout showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} notifications={notifications} />}>
               <Route index element={<div />} />
             </Route>
           </Routes>
@@ -57,5 +57,19 @@ describe("Header's statusIndicator prop (STATUS-A1, home 2026-09-30)", () => {
   test("renders no indicator when the prop is omitted", () => {
     const { queryByTestId } = renderLayout();
     expect(queryByTestId("dot")).toBeNull();
+  });
+});
+
+describe("Header's notifications prop (CHAT-CALM-ERRORS-01d, home 2026-10-06)", () => {
+  test("a host's own notifications control replaces the template's sample dropdown", () => {
+    const { getByTestId, queryByRole, container } = renderLayout(undefined, undefined, <button type="button" data-testid="host-bell" aria-label="Host notifications" />);
+    expect(getByTestId("host-bell").closest("header")).not.toBeNull();
+    expect(queryByRole("button", { name: "Notifications" })).toBeNull();
+    expect(container.querySelector(".animate-ping.bg-destructive")).toBeNull();
+  });
+
+  test("with no host control the template's dropdown still renders", () => {
+    const { getByRole } = renderLayout();
+    expect(getByRole("button", { name: "Notifications" })).toBeTruthy();
   });
 });

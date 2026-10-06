@@ -42,6 +42,11 @@ export interface HeaderProps {
   /** STATUS-A1 (home, 2026-09-30): optional status content rendered
    * beside the header controls, immediately before notifications. */
   statusIndicator?: ReactNode;
+  /** CHAT-CALM-ERRORS-01d (home, 2026-10-06): a host's own notifications
+   * control (its real pending list and count). When set it replaces the
+   * template's sample `Notifications` dropdown, whose red dot always
+   * pings over sample data; unset, that dropdown renders as before. */
+  notifications?: ReactNode;
   /** Preserve the default header fold button for all consumers unless
    * its caller places the shipped trigger in the menu column. */
   showSidebarTrigger?: boolean | "mobile-only";
@@ -83,7 +88,7 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
   );
 }
 
-const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle = true, statusIndicator, showSidebarTrigger = true }: HeaderProps = {}) => {
+const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle = true, statusIndicator, notifications, showSidebarTrigger = true }: HeaderProps = {}) => {
 
   const HeaderExtraLeft = useHeaderExtraLeft();
 
@@ -188,7 +193,7 @@ const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognito
              
 
               {/* Notifications Dropdown */}
-              <Notifications className="sm:block hidden" />
+              {notifications !== undefined ? <div className="sm:block hidden">{notifications}</div> : <Notifications className="sm:block hidden" />}
 
            
 

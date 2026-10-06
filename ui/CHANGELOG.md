@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.105] - ui-v0.5.105
+
+### CHAT-CALM-ERRORS-01d
+
+Add `FullLayout`/`Header` `notifications`: a host's own notifications control
+replaces the template's sample dropdown, whose red dot always pings over
+sample data. Unset, the dropdown renders as before.
+
 ## [0.5.104] - ui-v0.5.104
 
 ### CHAT-CALM-ERRORS-01d

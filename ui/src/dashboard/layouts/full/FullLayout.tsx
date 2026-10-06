@@ -29,6 +29,9 @@ export interface FullLayoutProps {
   /** STATUS-A1 (home, 2026-09-30): threaded straight through to
    * `Header`'s own `statusIndicator` prop. */
   statusIndicator?: HeaderProps["statusIndicator"];
+  /** CHAT-CALM-ERRORS-01d (home, 2026-10-06): threaded straight through to
+   * `Header`'s own `notifications` prop. */
+  notifications?: HeaderProps["notifications"];
   /** Home can choose a first-run folded menu; existing consumers retain
    * the historical expanded default. A persisted sidebar_state cookie
    * always takes precedence. */
@@ -46,7 +49,7 @@ export function resolveInitialSidebarOpen(cookie: string, defaultOpen: boolean):
   return stored === "true" ? true : stored === "false" ? false : defaultOpen;
 }
 
-const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator, defaultSidebarOpen = true, showSidebarTriggerInMenu = false, showHeaderSidebarTrigger = true, sidebarItemStatus }) => {
+const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator, notifications, defaultSidebarOpen = true, showSidebarTriggerInMenu = false, showHeaderSidebarTrigger = true, sidebarItemStatus }) => {
   const [initialSidebarOpen] = useState(() => {
     return resolveInitialSidebarOpen(typeof document === "undefined" ? "" : document.cookie, defaultSidebarOpen);
   });
@@ -61,7 +64,7 @@ const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayNam
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden" style={{ background: "var(--page)" }}>
         {/* Top Header  */}
-        <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} showSidebarTrigger={showHeaderSidebarTrigger ? true : showSidebarTriggerInMenu ? "mobile-only" : false} />
+        <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} notifications={notifications} showSidebarTrigger={showHeaderSidebarTrigger ? true : showSidebarTriggerInMenu ? "mobile-only" : false} />
 
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">
