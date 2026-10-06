@@ -23,8 +23,10 @@ export interface RailProfileMenuProps {
   /** Pending notifications. A count shows on the menu row and on the
    * avatar's badge. Undefined hides the row. */
   notifications?: { count: number; urgent?: boolean; onOpen: () => void };
-  /** System status for the menu row. `problem` puts the attention dot on
-   * the avatar. Undefined hides the row. */
+  /** System status for the menu row, the avatar's tooltip and its
+   * accessible name. Degraded puts an amber dot on the avatar's lower
+   * right, offline a red one; online and maintenance show none. Undefined
+   * hides the row and the dot. */
   status?: { label: string; level: RailStatusLevel; href: string };
   /** Incognito's existing session state and its toggle. Undefined hides
    * the row. */
@@ -51,14 +53,22 @@ const STATUS_DOT: Record<RailStatusLevel, string> = {
   offline: "bg-red-500",
 };
 
+/** What the avatar's status dot says, for its tooltip and accessible name. */
+export const STATUS_WORDS: Record<RailStatusLevel, string> = {
+  online: "all good",
+  maintenance: "maintenance",
+  degraded: "degraded",
+  offline: "down",
+};
+
 const rowClass = "h-10 gap-3 rounded-md px-2.5 text-sm [&_svg:not([class*='size-'])]:size-[18px]";
 
 /** RAIL-01 (owner's layout, 2026-10-06): the one profile entry point, at
  * the bottom of the app rail. The avatar opens the global utility menu
  * (identity, Notifications, System status, Incognito, Settings, Help, Log
- * out), the shipped DropdownMenu restyled by classes only. A small badge
- * on the avatar says something needs attention; the matching row shows
- * why. */
+ * out), the shipped DropdownMenu restyled by classes only. A count badge
+ * on the avatar's upper right counts notifications; a dot on its lower
+ * right says the system needs attention; the matching row shows why. */
 export default function RailProfileMenu({
   displayName,
   subtitle,
@@ -73,13 +83,13 @@ export default function RailProfileMenu({
 }: RailProfileMenuProps) {
   const statusProblem = status !== undefined && (status.level === "degraded" || status.level === "offline");
   const count = (notifications?.count ?? 0) + extraAttention;
-  const attention = count > 0 || statusProblem;
+  const systemLine = status ? `System: ${STATUS_WORDS[status.level]}` : null;
   // A count is red only when something urgent waits (CHAT-CALM-ERRORS-01d);
   // anything else gets a neutral count.
   const countTone = notifications?.urgent ? "bg-destructive text-white" : "bg-foreground text-background";
   const reasons = [
     notifications && notifications.count > 0 ? `${notifications.count} notification${notifications.count === 1 ? "" : "s"}` : null,
-    statusProblem ? `system ${status!.label.toLocaleLowerCase()}` : null,
+    systemLine,
     extraAttention > 0 ? `${extraAttention} waiting for you` : null,
     incognito?.on ? "Incognito on" : null,
   ].filter(Boolean);
@@ -106,15 +116,32 @@ export default function RailProfileMenu({
               <span
                 data-slot="rail-profile-badge"
                 aria-hidden
-                className={cn("absolute top-0 right-0 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[11px] leading-none font-medium ring-2 ring-sidebar", countTone)}
+                className={cn("absolute top-0 right-0 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[11px] leading-none font-medium ring-2 ring-[color:var(--app-rail-bg,var(--sidebar))]", countTone)}
               >
                 {count > 99 ? "99+" : count}
               </span>
-            ) : attention ? (
-              <span data-slot="rail-profile-dot" aria-hidden className="absolute top-1 right-1 size-2 rounded-full bg-amber-500 ring-2 ring-sidebar" />
+            ) : null}
+            {/* System status as a presence dot, cut out of the avatar's
+                lower right corner the way Slack and Discord place theirs.
+                Calm by default: no dot while all is well (or under planned
+                maintenance), amber while something is degraded or paused,
+                red only when something is down. The count above is for
+                notifications only. */}
+            {statusProblem ? (
+              <span
+                data-slot="rail-profile-dot"
+                data-level={status!.level}
+                aria-hidden
+                className={cn("absolute right-1 bottom-1 size-2.5 rounded-full ring-2 ring-[color:var(--app-rail-bg,var(--sidebar))]", STATUS_DOT[status!.level])}
+              />
             ) : null}
           </TooltipTrigger>
-          <TooltipContent side="right">{displayName || "Profile"}</TooltipContent>
+          <TooltipContent side="right">
+            <span className="flex flex-col">
+              <span>{displayName || "Profile"}</span>
+              {systemLine ? <span data-slot="rail-profile-system" className="text-[11px] opacity-75">{systemLine}</span> : null}
+            </span>
+          </TooltipContent>
         </Tooltip>
         <DropdownMenuContent
           side="right"

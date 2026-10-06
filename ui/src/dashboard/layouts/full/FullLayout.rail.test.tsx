@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import FullLayout from "./FullLayout";
 import { TooltipProvider } from "../../components/ui/tooltip";
-import { isRailItemActive } from "./vertical/rail/AppRail";
+import { isRailItemActive, railHref } from "./vertical/rail/AppRail";
 import RailProfileMenu from "./vertical/rail/RailProfileMenu";
 import { useHeaderExtra } from "./vertical/header/HeaderExtraContext";
 
@@ -23,6 +23,7 @@ function renderRail(path: string, profile = <RailProfileMenu displayName="Sage W
       <TooltipProvider>
         <Routes>
           <Route element={<FullLayout rail railProfile={profile} />}>
+            <Route path="/" element={<div>Home</div>} />
             <Route path="/chat" element={<div>Chat</div>} />
             <Route path="/settings" element={<Titled />} />
           </Route>
@@ -39,8 +40,34 @@ describe("RAIL-01 app rail", () => {
     expect(rail.className).toContain("w-14");
     for (const name of ["Home", "Chat", "Library", "Family"]) expect(view.getByRole("link", { name })).toBeTruthy();
     expect(view.getByRole("link", { name: "Chat" }).getAttribute("aria-current")).toBe("page");
+    expect(view.getByRole("link", { name: "Home" }).getAttribute("aria-current")).toBeNull();
     expect(view.getByRole("button", { name: "Search" })).toBeTruthy();
     expect(view.getByRole("button", { name: "Open profile menu for Sage Willow" })).toBeTruthy();
+  });
+
+  // Owner, 2026-10-06: "replace the upper left logo with the home button".
+  test("the brand mark is the one Home destination, at the top, selected on Home", () => {
+    const view = renderRail("/");
+    expect(view.getAllByRole("link", { name: "Home" })).toHaveLength(1);
+    const home = view.getByRole("link", { name: "Home" });
+    expect(home.getAttribute("data-slot")).toBe("app-rail-home");
+    expect(home.getAttribute("aria-current")).toBe("page");
+    expect(home.querySelector("img")).not.toBeNull();
+    const first = view.getByRole("navigation", { name: "Primary navigation" }).querySelector("a");
+    expect(first === home).toBe(true);
+    expect(view.container.querySelectorAll('[data-slot="app-rail-item"]')).toHaveLength(3);
+  });
+
+  // Owner, 2026-10-06: "clicking anything in the left rail flashes the
+  // entire app". The rail linked to /next/..., which the host redirects,
+  // remounting its whole shell; it links to the bare path now.
+  test("rail links go straight to the app's own path, never the /next redirect", () => {
+    const view = renderRail("/chat");
+    const hrefs = [...view.getByRole("navigation", { name: "Primary navigation" }).querySelectorAll("a")].map((a) => a.getAttribute("href"));
+    expect(hrefs).toEqual(["/", "/chat", "/files", "/people"]);
+    expect(railHref("/next")).toBe("/");
+    expect(railHref("/next/chat")).toBe("/chat");
+    expect(railHref("/nextcloud")).toBe("/nextcloud");
   });
 
   test("a nested path keeps its app selected; Home matches only itself", () => {
@@ -69,7 +96,7 @@ describe("RAIL-01 app rail", () => {
         onLogout={() => {}}
       />,
     );
-    const trigger = view.getByRole("button", { name: /Open profile menu for Sage Willow \(2 notifications, system degraded\)/ });
+    const trigger = view.getByRole("button", { name: /Open profile menu for Sage Willow \(2 notifications, System: degraded\)/ });
     expect(view.container.querySelector('[data-slot="rail-profile-badge"]')?.textContent).toBe("2");
     fireEvent.click(trigger);
     await waitFor(() => expect(view.getByRole("menuitem", { name: /Notifications/ })).toBeTruthy());
@@ -87,5 +114,29 @@ describe("RAIL-01 app rail", () => {
     const view = renderRail("/chat", <RailProfileMenu displayName="Sage" status={{ label: "Something is down", level: "offline", href: "/status" }} />);
     expect(view.container.querySelector('[data-slot="rail-profile-dot"]')).not.toBeNull();
     expect(view.container.querySelector('[data-slot="rail-profile-badge"]')).toBeNull();
+  });
+
+  // Owner, 2026-10-06: a status indicator in the rail. Calm: no dot when
+  // all is well, amber when degraded, red only when down; the count badge
+  // stays for notifications and both can show at once.
+  test("the avatar's status dot is calm when all is well and names the system state", () => {
+    const at = (level: "online" | "maintenance" | "degraded" | "offline", count = 0) => {
+      cleanup();
+      const view = renderRail("/chat", <RailProfileMenu displayName="Sage" notifications={{ count, onOpen: () => {} }} status={{ label: "x", level, href: "/status" }} />);
+      const dot = view.container.querySelector('[data-slot="rail-profile-dot"]');
+      const trigger = view.container.querySelector('[data-slot="rail-profile-trigger"]');
+      return { dot, label: trigger?.getAttribute("aria-label"), badge: view.container.querySelector('[data-slot="rail-profile-badge"]') };
+    };
+    expect(at("online").dot).toBeNull();
+    expect(at("online").label).toBe("Open profile menu for Sage (System: all good)");
+    expect(at("maintenance").dot).toBeNull();
+    const degraded = at("degraded");
+    expect(degraded.dot?.getAttribute("data-level")).toBe("degraded");
+    expect(degraded.dot?.className).toContain("bg-amber-500");
+    expect(degraded.dot?.className).toContain("bottom-1");
+    const down = at("offline", 3);
+    expect(down.dot?.className).toContain("bg-red-500");
+    expect(down.badge?.textContent).toBe("3");
+    expect(down.label).toBe("Open profile menu for Sage (3 notifications, System: down)");
   });
 });
