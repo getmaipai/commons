@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.125] - ui-v0.5.125
+
+### ELT-PALETTE-01 (additive)
+
+Adds `CommandPaletteDialog`, a controlled, accessible Dialog composition for
+the command-palette Element. The kit's DialogContent owns the compact command
+frame through its `command` variant, so consumers pass command data and
+handlers without reshaping kit parts.
+
 ## [0.5.123] - ui-v0.5.123
 
 ### PROJECTS-01b (touch floor)

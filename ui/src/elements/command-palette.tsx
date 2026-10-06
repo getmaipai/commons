@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useId, type ComponentProps } from "react";
+import { useEffect, useId, useRef, type ComponentProps } from "react";
 import { SearchIcon } from "lucide-react";
 import { cn } from "cn";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { field, floating, mono } from "./surfaces";
 
 export interface PaletteCommand {
@@ -10,6 +11,42 @@ export interface PaletteCommand {
   label: string;
   group: string;
   keys: readonly string[];
+}
+
+export type CommandPaletteDialogProps = Omit<ComponentProps<typeof CommandPalette>, "className"> & {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+};
+
+export function CommandPaletteDialog({
+  open,
+  onOpenChange,
+  title,
+  ...paletteProps
+}: CommandPaletteDialogProps) {
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        variant="command"
+        showCloseButton={false}
+        aria-describedby={undefined}
+        onOpenAutoFocus={() => {
+          returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        }}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus();
+          returnFocusRef.current = null;
+        }}
+      >
+        <DialogTitle className="sr-only">{title}</DialogTitle>
+        <CommandPalette {...paletteProps} />
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export function CommandPalette({
