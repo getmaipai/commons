@@ -1,5 +1,15 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.118] - ui-v0.5.118
+
+### ELT-COMPOSER-KIT-01 (additive, compact density)
+
+The label-only model state (a `ModelSelectorValue` with no trigger, shown when
+a hub has one model) gets the same quiet label look and a 10rem truncation
+contract in the compact composer, and the phone rule that puts the text on its
+own row now reacts to the trigger or the label-only value, so the label no
+longer overlaps the placeholder at 390px.
+
 ## [0.5.117] - ui-v0.5.117
 
 ### ELT-T1-K01a (additive)

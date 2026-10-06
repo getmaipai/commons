@@ -356,10 +356,18 @@ describe("Thread's composerDensity option (ELT-COMPOSER-KIT-01)", () => {
     const css = await Bun.file(new URL("./thread-composer.css", import.meta.url)).text();
     const selectors = css.replace(/\/\*[\s\S]*?\*\//g, "").split("{").map((chunk) => chunk.split("}").pop()!.trim()).filter((s) => s && !s.startsWith("@media"));
     for (const selector of selectors) {
-      for (const part of selector.split(",")) expect(part).toContain('[data-density="compact"]');
+      for (const part of selector.split(/,(?![^(]*\))/)) expect(part).toContain('[data-density="compact"]');
     }
     for (const token of ["row-height", "control-size", "send-size", "inset-start", "inset-end", "inset-y", "radius", "max-height"]) {
       expect(css).toContain(`--composer-compact-${token}`);
     }
+  });
+});
+
+describe("compact composer label-only model state (ELT-COMPOSER-KIT-01)", () => {
+  test("the phone row rule and a truncating label rule cover the label-only value", async () => {
+    const css = await Bun.file(new URL("./thread-composer.css", import.meta.url)).text();
+    expect(css).toContain(':has([data-slot="model-selector-trigger"], [data-slot="model-selector-value"])');
+    expect(css).toMatch(/\[data-slot="model-selector-value"\]:not\(button \*\) \{[^}]*max-width: 10rem;[^}]*text-overflow: ellipsis/);
   });
 });

@@ -60,10 +60,11 @@
   grid-template-areas: "att att att" "input input input" "lead . trail";
 }
 
-/* A phone row cannot hold the text beside the model label, so with the label
+/* A phone row cannot hold the text beside the model label (the selector
+ * trigger, or the label-only value a single-model hub shows), so with either
  * present the text takes its own row from the start. */
 @media (max-width: 639px) {
-  [data-slot="aui_composer-shell"][data-density="compact"]:has([data-slot="model-selector-trigger"]) {
+  [data-slot="aui_composer-shell"][data-density="compact"]:has([data-slot="model-selector-trigger"], [data-slot="model-selector-value"]) {
     grid-template-areas: "att att att" "input input input" "lead . trail";
   }
 }
@@ -172,4 +173,20 @@
 [data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper [data-slot="model-selector-trigger"] svg {
   width: 14px;
   height: 14px;
+}
+
+/* The label-only model state (a ModelSelectorValue with no trigger, shown when
+ * there is nothing to choose): same quiet look as the trigger, and it
+ * truncates instead of running into the text or the mic. */
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper [data-slot="model-selector-value"]:not(button *) {
+  min-width: 0;
+  max-width: 10rem;
+  flex-shrink: 1;
+  padding: 0 8px;
+  font-size: var(--composer-compact-label-size, 13px);
+  line-height: 20px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
