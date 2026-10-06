@@ -8,13 +8,16 @@ const DOT_DELAYS = ["-0.32s", "-0.16s", "0s"];
 
 export function TypingIndicator({
   variant = "bubble",
+  label = "Assistant is typing",
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "variant" | "role" | "aria-label"
+  "children" | "variant" | "role" | "aria-label" | "label"
 > & {
   variant?: "bubble" | "bare";
+  /** The accessible name announced for the dots (translate it). */
+  label?: string;
 }) {
   const dots = DOT_DELAYS.map((delay) => (
     <span
@@ -31,7 +34,7 @@ export function TypingIndicator({
         data-slot="typing-indicator"
         data-variant="bare"
         role="status"
-        aria-label="Assistant is typing"
+        aria-label={label}
         className={cn("flex gap-1", className)}
         {...props}
       >
@@ -49,7 +52,7 @@ export function TypingIndicator({
     >
       <div
         role="status"
-        aria-label="Assistant is typing"
+        aria-label={label}
         className="flex gap-1"
       >
         {dots}

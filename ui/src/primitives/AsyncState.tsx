@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button } from "@/kit/ui/button";
+import { ErrorState } from "@/kit/elements/error-state";
 import { EmptyState } from "@/kit/primitives/EmptyState";
 import { RouteSkeleton } from "@/kit/primitives/RouteSkeleton";
 
@@ -61,11 +61,14 @@ export function AsyncState<T>({
 
   if (error) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-        <p className="text-base text-destructive">{errorMessage}</p>
-        <Button variant="secondary" onClick={onRetry}>
-          Try again
-        </Button>
+      <div className="flex flex-1 flex-col items-center justify-center p-8">
+        <ErrorState
+          layout="inline"
+          title={errorMessage}
+          retrying={false}
+          onRetry={onRetry}
+          retryLabel="Try again"
+        />
       </div>
     );
   }

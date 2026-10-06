@@ -27,8 +27,10 @@ export function QuotaBanner({
   used: number;
   limit: number;
   unit: string;
-  resetsIn: string;
-  upgradeLabel: string;
+  /** Unset: the reset line is not drawn. */
+  resetsIn?: string;
+  /** The button is drawn only when this and `onUpgrade` are both given. */
+  upgradeLabel?: string;
   onUpgrade?: () => void;
 }) {
   const left = Math.max(0, limit - used);
@@ -55,9 +57,11 @@ export function QuotaBanner({
         >
           {left} {unit} left
         </span>
-        <span className={cn(mono, "text-foreground/30 ms-auto tabular-nums")}>
-          resets in {resetsIn}
-        </span>
+        {resetsIn !== undefined && (
+          <span className={cn(mono, "text-foreground/30 ms-auto tabular-nums")}>
+            resets in {resetsIn}
+          </span>
+        )}
       </div>
 
       <span
@@ -82,16 +86,18 @@ export function QuotaBanner({
         <span className={cn(mono, "text-foreground/30 tabular-nums")}>
           {used} of {limit} used
         </span>
-        <button
-          type="button"
-          onClick={onUpgrade}
-          className={cn(
-            inkButton,
-            "ms-auto flex h-7 items-center rounded-full px-3 text-xs font-medium",
-          )}
-        >
-          {upgradeLabel}
-        </button>
+        {onUpgrade && upgradeLabel !== undefined && (
+          <button
+            type="button"
+            onClick={onUpgrade}
+            className={cn(
+              inkButton,
+              "ms-auto flex h-7 items-center rounded-full px-3 text-xs font-medium",
+            )}
+          >
+            {upgradeLabel}
+          </button>
+        )}
       </div>
     </div>
   );

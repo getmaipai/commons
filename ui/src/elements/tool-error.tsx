@@ -11,9 +11,12 @@ export function ToolError({
   message,
   attempt,
   maxAttempts,
-  retrying,
+  retrying = false,
   onRetry,
   onSkip,
+  retryLabel = "Retry",
+  retryingLabel = "Retrying",
+  skipLabel = "Skip",
   className,
   ...props
 }: Omit<
@@ -27,16 +30,27 @@ export function ToolError({
   | "retrying"
   | "onRetry"
   | "onSkip"
+  | "retryLabel"
+  | "retryingLabel"
+  | "skipLabel"
 > & {
   name: string;
   target: string;
   message: string;
-  attempt: number;
-  maxAttempts: number;
-  retrying: boolean;
+  /** The counter shows only when both `attempt` and `maxAttempts` are given. */
+  attempt?: number;
+  maxAttempts?: number;
+  retrying?: boolean;
+  /** The Retry button is drawn only when this is given (or while retrying). */
   onRetry?: () => void;
+  /** The Skip button is drawn only when this is given. */
   onSkip?: () => void;
+  retryLabel?: string;
+  retryingLabel?: string;
+  skipLabel?: string;
 }) {
+  const showCounter = attempt !== undefined && maxAttempts !== undefined;
+  const showActions = onSkip !== undefined || onRetry !== undefined || retrying;
   return (
     <div
       data-slot="tool-error"
@@ -54,9 +68,13 @@ export function ToolError({
         <span className="text-foreground/80 min-w-0 flex-1 truncate text-[13px]">
           {target}
         </span>
-        <span className={cn(mono, "text-foreground/30 shrink-0 tabular-nums")}>
-          {attempt}/{maxAttempts}
-        </span>
+        {showCounter && (
+          <span
+            className={cn(mono, "text-foreground/30 shrink-0 tabular-nums")}
+          >
+            {attempt}/{maxAttempts}
+          </span>
+        )}
       </div>
 
       <div
@@ -68,29 +86,34 @@ export function ToolError({
         {message}
       </div>
 
-      <div className="flex items-center justify-end gap-2">
-        <button
-          type="button"
-          onClick={onSkip}
-          disabled={!onSkip}
-          className="text-foreground/45 hover:bg-foreground/[0.06] hover:text-foreground/90 h-7 rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-30"
-        >
-          Skip
-        </button>
-        <button
-          type="button"
-          onClick={onRetry}
-          disabled={retrying}
-          className="text-foreground/70 hover:bg-foreground/[0.06] hover:text-foreground/95 flex h-7 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96] disabled:pointer-events-none"
-        >
-          {retrying ? (
-            <Loader2Icon className="size-3 animate-spin motion-reduce:animate-none" />
-          ) : (
-            <RotateCwIcon className="size-3" />
+      {showActions && (
+        <div className="flex items-center justify-end gap-2">
+          {onSkip && (
+            <button
+              type="button"
+              onClick={onSkip}
+              className="text-foreground/45 hover:bg-foreground/[0.06] hover:text-foreground/90 h-7 rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-30"
+            >
+              {skipLabel}
+            </button>
           )}
-          {retrying ? "Retrying" : "Retry"}
-        </button>
-      </div>
+          {(onRetry || retrying) && (
+            <button
+              type="button"
+              onClick={onRetry}
+              disabled={retrying}
+              className="text-foreground/70 hover:bg-foreground/[0.06] hover:text-foreground/95 flex h-7 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96] disabled:pointer-events-none"
+            >
+              {retrying ? (
+                <Loader2Icon className="size-3 animate-spin motion-reduce:animate-none" />
+              ) : (
+                <RotateCwIcon className="size-3" />
+              )}
+              {retrying ? retryingLabel : retryLabel}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

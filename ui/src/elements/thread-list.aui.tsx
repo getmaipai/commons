@@ -182,7 +182,13 @@ export const ThreadListItems: FC<
 
 const DAY_IN_MS = 86_400_000;
 
-const dateGroupLabel = (
+/** Local midnight of `now`, in ms: the `startOfToday` `dateGroupLabel` takes. */
+export const startOfLocalDay = (now: Date): number =>
+  new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+/** The one definition of the day buckets (Today, Yesterday, Earlier).
+ * `startOfToday` is local midnight in ms. A missing date counts as Today. */
+export const dateGroupLabel = (
   date: Date | undefined,
   startOfToday: number,
 ): string => {
@@ -229,12 +235,7 @@ export const useThreadListGroups = (
       return { threadIds, filteredIndices, groups: null };
     }
 
-    const now = new Date();
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    ).getTime();
+    const startOfToday = startOfLocalDay(new Date());
     const time = (index: number) =>
       dates[index]?.getTime() ?? Number.MAX_SAFE_INTEGER;
     const sorted = [...filteredIndices].sort((a, b) => time(b) - time(a));

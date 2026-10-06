@@ -15,9 +15,16 @@ export interface ErrorStateProps extends Omit<
   "children" | "role"
 > {
   title: string;
-  detail: string;
+  /** Unset: only the title is drawn. */
+  detail?: string;
   retrying: boolean;
-  onRetry: () => void;
+  /** Unset: no Retry button is drawn. */
+  onRetry?: () => void;
+  /** `card` (default) is the padded, width-capped block; `inline` drops
+   * `max-w-sm` and the card padding so a host lays it out itself. */
+  layout?: "card" | "inline";
+  retryLabel?: string;
+  retryingLabel?: string;
 }
 
 export function ErrorState({
@@ -25,9 +32,13 @@ export function ErrorState({
   detail,
   retrying,
   onRetry,
+  layout = "card",
+  retryLabel = "Retry",
+  retryingLabel = "Retrying",
   className,
   ...props
 }: ErrorStateProps) {
+  const inline = layout === "inline";
   if (retrying) {
     return (
       <div
@@ -35,7 +46,9 @@ export function ErrorState({
         key="retrying"
         role="status"
         className={cn(
-          "fade-in animate-in flex w-full max-w-sm items-center gap-2.5 text-sm duration-300 motion-reduce:animate-none",
+          inline
+            ? "fade-in animate-in flex w-full items-center gap-2.5 text-sm duration-300 motion-reduce:animate-none"
+            : "fade-in animate-in flex w-full max-w-sm items-center gap-2.5 text-sm duration-300 motion-reduce:animate-none",
           className,
         )}
 
@@ -43,7 +56,7 @@ export function ErrorState({
       >
         <RefreshCwIcon className="text-foreground/45 size-3.5 shrink-0 animate-spin motion-reduce:animate-none" />
         <ShimmerLabel className="text-foreground/55 relative inline-block">
-          Retrying
+          {retryingLabel}
         </ShimmerLabel>
       </div>
     );
@@ -55,7 +68,9 @@ export function ErrorState({
       key="error"
       role="alert"
       className={cn(
-        "fade-in animate-in flex w-full max-w-sm items-start gap-2.5 rounded-2xl px-4 py-3 text-sm duration-300 motion-reduce:animate-none",
+        inline
+          ? "fade-in animate-in flex w-full items-start gap-2.5 text-sm duration-300 motion-reduce:animate-none"
+          : "fade-in animate-in flex w-full max-w-sm items-start gap-2.5 rounded-2xl px-4 py-3 text-sm duration-300 motion-reduce:animate-none",
         className,
       )}
 
@@ -64,18 +79,22 @@ export function ErrorState({
       <CircleAlertIcon className="text-muted-foreground mt-0.5 size-4 shrink-0" />
       <div>
         <p className="text-muted-foreground font-medium">{title}</p>
-        <p className="text-muted-foreground mt-0.5 text-[13px] leading-snug">
-          {detail}
-        </p>
+        {detail !== undefined && (
+          <p className="text-muted-foreground mt-0.5 text-[13px] leading-snug">
+            {detail}
+          </p>
+        )}
       </div>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="text-muted-foreground hover:text-foreground ms-auto flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
-      >
-        <RefreshCwIcon className="size-3" />
-        Retry
-      </button>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="text-muted-foreground hover:text-foreground ms-auto flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
+        >
+          <RefreshCwIcon className="size-3" />
+          {retryLabel}
+        </button>
+      )}
     </div>
   );
 }

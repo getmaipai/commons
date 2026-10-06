@@ -18,6 +18,8 @@ export function JobProgress({
   stageProgress,
   eta,
   onCancel,
+  doneLabel = "done",
+  cancelLabel = "Cancel the job",
   className,
   ...props
 }: Omit<
@@ -29,13 +31,18 @@ export function JobProgress({
   | "stageProgress"
   | "eta"
   | "onCancel"
+  | "doneLabel"
+  | "cancelLabel"
 > & {
   title: string;
   stages: readonly JobStage[];
   stageIndex: number;
   stageProgress: number;
-  eta: string;
+  /** Unset: no time estimate is drawn while the job runs. */
+  eta?: string;
   onCancel?: () => void;
+  doneLabel?: string;
+  cancelLabel?: string;
 }) {
   const stage = progressOf(stageIndex, stages.length);
   const progress = clamp(stageProgress, 0, 1);
@@ -71,13 +78,17 @@ export function JobProgress({
         <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">
           {title}
         </span>
-        <span className={cn(mono, "text-foreground/35 shrink-0 tabular-nums")}>
-          {finished ? "done" : eta}
-        </span>
+        {(finished || eta !== undefined) && (
+          <span
+            className={cn(mono, "text-foreground/35 shrink-0 tabular-nums")}
+          >
+            {finished ? doneLabel : eta}
+          </span>
+        )}
         {!finished && (
           <button
             type="button"
-            aria-label="Cancel the job"
+            aria-label={cancelLabel}
             onClick={onCancel}
             className={cn(ghostButton, "size-6 shrink-0")}
           >

@@ -5,12 +5,31 @@ import { CheckIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, mono, paper } from "./surfaces";
 
+export type ModelStatusTone = "neutral" | "good" | "warn" | "bad";
+
+export interface ModelStatus {
+  label: string;
+  tone?: ModelStatusTone;
+}
+
+const STATUS_TONE: Record<ModelStatusTone, string> = {
+  neutral: "text-foreground/45",
+  good: "text-emerald-600 dark:text-emerald-400",
+  warn: "text-amber-700 dark:text-amber-400",
+  bad: "text-red-600 dark:text-red-400",
+};
+
 export interface PickableModel {
   id: string;
   name: string;
   family: string;
   context: string;
-  price: string;
+  /** Unset: the price line is not drawn. */
+  price?: string;
+  /** A status chip beside the name (for example "Installed", "Downloading"). */
+  status?: ModelStatus;
+  /** One line under the capabilities (why the model is shown or limited). */
+  reason?: string;
   capabilities: readonly string[];
 }
 
@@ -67,7 +86,28 @@ export function ModelPicker({
                   </span>
 
                   <span className="flex min-w-0 flex-1 flex-col gap-1">
-                    <span className="truncate text-[13.5px]">{model.name}</span>
+                    {model.status ? (
+                      <span className="flex items-baseline gap-1.5">
+                        <span className="truncate text-[13.5px]">
+                          {model.name}
+                        </span>
+                        <span
+                          data-slot="model-picker-status"
+                          data-tone={model.status.tone ?? "neutral"}
+                          className={cn(
+                            mono,
+                            "shrink-0",
+                            STATUS_TONE[model.status.tone ?? "neutral"],
+                          )}
+                        >
+                          {model.status.label}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="truncate text-[13.5px]">
+                        {model.name}
+                      </span>
+                    )}
                     <span className="flex flex-wrap gap-1">
                       {model.capabilities.map((capability) => (
                         <span
@@ -82,6 +122,11 @@ export function ModelPicker({
                         </span>
                       ))}
                     </span>
+                    {model.reason !== undefined && (
+                      <span className="text-foreground/45 text-xs leading-snug">
+                        {model.reason}
+                      </span>
+                    )}
                   </span>
 
                   <span className="flex shrink-0 flex-col items-end gap-1">
@@ -90,11 +135,13 @@ export function ModelPicker({
                     >
                       {model.context}
                     </span>
-                    <span
-                      className={cn(mono, "text-foreground/25 tabular-nums")}
-                    >
-                      {model.price}
-                    </span>
+                    {model.price !== undefined && (
+                      <span
+                        className={cn(mono, "text-foreground/25 tabular-nums")}
+                      >
+                        {model.price}
+                      </span>
+                    )}
                   </span>
                 </>
               );

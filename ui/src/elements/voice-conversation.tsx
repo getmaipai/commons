@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { MicIcon, MicOffIcon, PhoneOffIcon } from "lucide-react";
 import { cn } from "cn";
 import { mono, paper } from "./surfaces";
@@ -30,6 +30,7 @@ export function VoiceConversation({
   onToggleMute,
   onInterrupt,
   onEnd,
+  extra,
   className,
   ...props
 }: Omit<
@@ -41,6 +42,7 @@ export function VoiceConversation({
   | "onToggleMute"
   | "onInterrupt"
   | "onEnd"
+  | "extra"
 > & {
   mode: VoiceMode;
   amplitude: number;
@@ -48,6 +50,9 @@ export function VoiceConversation({
   onToggleMute?: () => void;
   onInterrupt?: () => void;
   onEnd?: () => void;
+  /** Optional content drawn under the mute and end buttons (a host's own
+   * affordance, for example a settings link). */
+  extra?: ReactNode;
 }) {
   const level = clamp(amplitude, 0, 1);
   const active = mode === "listening" || mode === "speaking";
@@ -199,6 +204,7 @@ export function VoiceConversation({
           <PhoneOffIcon className="size-5" />
         </TooltipIconButton>
       </div>
+      {extra}
     </div>
   );
 }

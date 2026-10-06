@@ -1,5 +1,47 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.116] - ui-v0.5.116
+
+### ELT-T1-K03 (additive)
+
+Optional props the Home Elements slices wait on. A render that sets none of the
+new props is the markup it was before, with three exceptions that follow the
+slice text and are named in the notes below. No prop is removed, renamed or
+repurposed; props that were required are now optional.
+
+| Element | Prop | Type | When unset |
+| --- | --- | --- | --- |
+| `ComparisonCard` | `recommendedId`, `reason` | `string` (both were required) | no pick marker, no closing line |
+| `ModelPicker` | `price` (was required) | `string` | price line hidden |
+| `ModelPicker` | `status` | `{ label: string; tone?: "neutral" \| "good" \| "warn" \| "bad" }` | no chip |
+| `ModelPicker` | `reason` | `string` | no line |
+| `QuotaBanner` | `resetsIn`, `upgradeLabel` | `string` (both were required) | reset line hidden |
+| `ToolError` | `attempt`, `maxAttempts`, `retrying` | `number`, `number`, `boolean` (all were required) | counter hidden; `retrying` is `false` |
+| `ToolError` | `retryLabel`, `retryingLabel`, `skipLabel` | `string` | "Retry", "Retrying", "Skip" |
+| `ErrorState` | `layout` | `"card" \| "inline"` | `card`; `inline` drops `max-w-sm` and the card padding |
+| `ErrorState` | `onRetry`, `detail` | optional (were required) | no Retry button; title only |
+| `ErrorState` | `retryLabel`, `retryingLabel` | `string` | "Retry", "Retrying" |
+| `CanvasSplit` | `variant` | `"card" \| "pane"` | `card`; `pane` is full height, flat, with a start-side hairline |
+| `VoiceConversation` | `extra` | `ReactNode` | nothing drawn |
+| `TypingIndicator` | `label` | `string` | "Assistant is typing" |
+| `ArtifactCard` | `actions` | `ReactNode` | nothing drawn |
+| `JobProgress` | `eta` (was required), `doneLabel`, `cancelLabel` | `string` | ETA hidden; "done"; "Cancel the job" |
+| `TooltipIconButton` (`elements/`) | `hitArea48` | `boolean` | `false`; `true` extends the tap area to 48px, visible `size-6` unchanged |
+| `thread-list.aui` | exports `dateGroupLabel`, `startOfLocalDay` | functions | `useThreadListGroups` now uses the same exports |
+
+Notes on the three intended differences:
+
+- `QuotaBanner` draws its action only when `onUpgrade` is given (it used to draw
+  a dead button when the handler was missing).
+- `ToolError` draws Retry only when `onRetry` is given (or while retrying) and
+  Skip only when `onSkip` is given (it used to draw a disabled Skip).
+- `AsyncState`'s error branch now renders `ErrorState` (layout `inline`). It
+  shows the same text as before, `errorMessage` and "Try again", and adds no
+  error detail; its API is unchanged. The text is muted instead of red.
+
+`assistant-ui/tooltip-icon-button` already carries the 48px floor by default, so
+only the `elements/` copy gains `hitArea48`.
+
 ## [0.5.115] - ui-v0.5.115
 
 ### ELEMENTS-ADOPT-01 (additive)

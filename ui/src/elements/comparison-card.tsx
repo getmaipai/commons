@@ -25,8 +25,10 @@ export function ComparisonCard({
 > & {
   traitLabels: readonly string[];
   options: readonly ComparisonOption[];
-  recommendedId: string;
-  reason: string;
+  /** Unset: no option is marked as the pick. */
+  recommendedId?: string;
+  /** Unset: the closing line is not drawn. */
+  reason?: string;
 }) {
   return (
     <div
@@ -41,7 +43,8 @@ export function ComparisonCard({
     >
       <div className="flex gap-2">
         {options.map((option) => {
-          const recommended = option.id === recommendedId;
+          const recommended =
+            recommendedId !== undefined && option.id === recommendedId;
           return (
             <div
               key={option.id}
@@ -102,7 +105,9 @@ export function ComparisonCard({
         })}
       </div>
 
-      <p className="text-foreground/55 text-xs leading-relaxed">{reason}</p>
+      {reason !== undefined && (
+        <p className="text-foreground/55 text-xs leading-relaxed">{reason}</p>
+      )}
     </div>
   );
 }

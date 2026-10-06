@@ -5,13 +5,26 @@ import { CheckIcon, CopyIcon, FileTextIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, ghostButton, mono, paper } from "./surfaces";
 
-export function CanvasSplit({ className, ...props }: ComponentProps<"div">) {
+export function CanvasSplit({
+  variant = "card",
+  className,
+  ...props
+}: Omit<ComponentProps<"div">, "variant"> & {
+  /** `card` (default) is the bordered, rounded floating card. `pane` fills
+   * its parent's height, drops the card chrome and draws a left hairline. */
+  variant?: "card" | "pane";
+}) {
   return (
     <div
       data-slot="canvas-split"
+      {...(variant === "pane" ? { "data-variant": "pane" } : {})}
       className={cn(
-        paper,
-        "flex w-full max-w-3xl flex-col overflow-hidden rounded-[20px] md:h-80 md:flex-row",
+        variant === "pane"
+          ? "border-foreground/[0.07] flex h-full w-full flex-col overflow-hidden border-s md:flex-row"
+          : [
+              paper,
+              "flex w-full max-w-3xl flex-col overflow-hidden rounded-[20px] md:h-80 md:flex-row",
+            ],
         className,
       )}
       {...props}

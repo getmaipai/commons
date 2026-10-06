@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { ArrowUpRightIcon, FileTextIcon } from "lucide-react";
 import { cn } from "cn";
 import { mono, paper, ShimmerLabel } from "./surfaces";
@@ -10,16 +10,19 @@ export function ArtifactCard({
   meta,
   generating = false,
   words = 0,
+  actions,
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "title" | "meta" | "generating" | "words"
+  "children" | "title" | "meta" | "generating" | "words" | "actions"
 > & {
   title: string;
   meta: string;
   generating?: boolean;
   words?: number;
+  /** Optional controls drawn at the end of the card (a menu, a button). */
+  actions?: ReactNode;
 }) {
   return (
     <div
@@ -62,6 +65,7 @@ export function ArtifactCard({
         )}
       </div>
       <ArrowUpRightIcon className="text-foreground/35 size-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
+      {actions}
     </div>
   );
 }
