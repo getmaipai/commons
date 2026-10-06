@@ -1,5 +1,16 @@
 # Changelog (`@maipai/ui`)
 
+## Unreleased
+
+`ThreadComponents` gains an optional `ComposerQueue` slot (KIT-COMPOSER-QUEUE-SLOT),
+rendered in the viewport footer directly above the composer shell, so an app
+can mount its queued-messages element (Home's CHAT-QUEUE-01) there. Additive;
+unset, nothing renders and the footer is unchanged.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `ThreadComponents.ComposerQueue` | `ComponentType` | unset (renders nothing) |
+
 ## [0.5.98] - ui-v0.5.98
 
 Conversation map visibility now selects the message crossing the viewport's

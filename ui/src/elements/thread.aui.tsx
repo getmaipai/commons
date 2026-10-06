@@ -147,6 +147,14 @@ export type ThreadViewportOptions = Pick<
  * plain text field, this component does not fall back to one on its
  * own. Opened upstream the same day, onto
  * assistant-ui/assistant-ui#8003 (`ui/docs/dashboard-upstream.md`).
+ * `ComposerQueue`, when set, renders in the viewport footer directly
+ * above the composer shell - inside the footer (so it sticks and is
+ * measured with it), outside the composer's own rounded container.
+ * KIT-COMPOSER-QUEUE-SLOT: Home's CHAT-QUEUE-01 shows queued messages
+ * above the composer, and none of the composer-row slots above can
+ * reach that spot without forking the footer. The slot only mounts
+ * what the caller passes (the vendored `MessageQueue` element); it
+ * wraps nothing when unset, so the footer's layout is unchanged.
  * `onEditSend`, when set, is called when the edit composer sends its
  * update, with the edited message's id and the following assistant
  * message's `metadata.custom.turnId` when present. A caller can use the
@@ -182,6 +190,7 @@ export type ThreadComponents = {
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
   ComposerInputOverride?: ComponentType | undefined;
+  ComposerQueue?: ComponentType | undefined;
   onEditSend?: ((messageId: string, turnId?: string) => void) | undefined;
 };
 
@@ -293,7 +302,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
   temporary,
   scrollToBottomOffset,
 }) => {
-  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra } = useContext(ThreadComponentsContext);
+  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra, ComposerQueue } = useContext(ThreadComponentsContext);
   const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
   const [footerElement, setFooterElement] = useState<HTMLElement | null>(null);
 
@@ -375,6 +384,11 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
           >
             <ThreadScrollToBottom />
             <ThreadFollowupSuggestions />
+            {ComposerQueue && (
+              <div data-slot="aui_composer-queue" className="empty:hidden">
+                <ComposerQueue />
+              </div>
+            )}
             <Composer autoFocus={autoFocus} />
             <AuiIf condition={isNewChatView}>
               <ThreadSuggestions />

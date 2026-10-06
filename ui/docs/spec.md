@@ -644,7 +644,10 @@ Three regions on desktop, two on the phone.
   targets. Placeholder is the companion's name and an invitation
   ("Ask Nova anything"). Enter sends, Shift+Enter breaks a line; on
   the phone the keyboard's send does it. While a reply streams the
-  send control becomes stop.
+  send control becomes stop. An app may mount queued messages directly
+  above the composer panel (the kit's `ComposerQueue` slot, inside the
+  sticky footer, outside the panel's rounded container); with nothing
+  mounted the footer is unchanged.
 
 ### Inside a turn
 

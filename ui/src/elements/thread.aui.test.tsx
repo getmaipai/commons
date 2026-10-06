@@ -24,11 +24,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ ComposerInputOverride, MessageError, temporary, viewport, error = false, scrollToBottomOffset }: { ComposerInputOverride?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number }) {
+function Harness({ ComposerQueue, ComposerInputOverride, MessageError, temporary, viewport, error = false, scrollToBottomOffset }: { ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number }) {
   const runtime = useLocalRuntime(error ? failingAdapter : adapter);
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={ComposerInputOverride || MessageError || viewport ? { ComposerInputOverride, MessageError, viewport } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
+      <Thread components={ComposerQueue || ComposerInputOverride || MessageError || viewport ? { ComposerQueue, ComposerInputOverride, MessageError, viewport } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
     </AssistantRuntimeProvider>
   );
 }
@@ -177,5 +177,29 @@ describe("Thread scroll geometry", () => {
       HTMLElement.prototype.getBoundingClientRect = savedRect;
       globalThis.ResizeObserver = savedResizeObserver;
     }
+  });
+});
+
+describe("Thread's ComposerQueue slot", () => {
+  test("renders inside the viewport footer, directly above the composer shell", () => {
+    function Queue() {
+      return <div data-testid="queue-slot">queued</div>;
+    }
+    const { getByTestId } = render(<Harness ComposerQueue={Queue} />);
+    const slot = getByTestId("queue-slot");
+    const footer = slot.closest(".aui-thread-viewport-footer");
+    const root = document.querySelector(".aui-composer-root");
+    expect(footer).toBeTruthy();
+    expect(footer!.contains(root)).toBe(true);
+    // Outside the composer's own rounded container, and immediately before it.
+    expect(root!.contains(slot)).toBe(false);
+    expect(slot.closest("[data-slot='aui_composer-queue']")!.nextElementSibling).toBe(root);
+  });
+
+  test("with no slot, nothing is rendered and the footer layout is unchanged", () => {
+    render(<Harness />);
+    expect(document.querySelector("[data-slot='aui_composer-queue']")).toBeNull();
+    const root = document.querySelector(".aui-composer-root")!;
+    expect(root.previousElementSibling?.getAttribute("data-slot")).not.toBe("aui_composer-queue");
   });
 });
