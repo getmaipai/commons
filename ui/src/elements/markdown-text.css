@@ -1,6 +1,65 @@
+/*
+ * STREAMING-TEXT-01: the streamed reply takes the look of the shipped
+ * streaming-text Element (streaming-text.tsx), applied through Streamdown's
+ * own per-word animation hook and caret prop, since that Element renders
+ * plain text only. Values copied from streaming-text.tsx:
+ *   word fade-in   "fade-in animate-in ... duration-500"     -> 0% to 40% of 1200 ms
+ *   tint           "text-blue-500 dark:text-blue-400"        -> --aui-streaming-tint
+ *   settle to ink  "transition-colors duration-700"          -> 40% to 100% of 1200 ms
+ *   caret          "ml-0.5 inline-block h-4 w-0.5 animate-pulse rounded-full bg-blue-500"
+ * One difference: the Element tints the newest two words by position;
+ * Streamdown's hook is per word in time, so each word is blue for its first
+ * half second and then settles.
+ */
+.aui-md {
+  --aui-streaming-tint: var(--color-blue-500, oklch(62.3% 0.214 259.815));
+}
+
+.dark .aui-md {
+  --aui-streaming-tint: var(--color-blue-400, oklch(70.7% 0.165 254.624));
+}
+
+/* Streamdown stamps --sd-animation: sd-streamingText on each new word. The
+ * missing 100% keyframe ends on the word's own color and opacity (ink). */
+@keyframes sd-streamingText {
+  0% {
+    opacity: 0;
+    color: var(--aui-streaming-tint);
+  }
+  40% {
+    opacity: 1;
+    color: var(--aui-streaming-tint);
+  }
+}
+
+@keyframes aui-streaming-caret-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Streamdown sets --streamdown-caret inline only while the part streams and
+ * marks a last block that is an open code fence or a table with
+ * data-sd-caret-hidden, the same selector shape it uses itself. */
+.aui-md[style*="--streamdown-caret"] > :last-child:not([data-sd-caret-hidden])::after {
+  content: "";
+  display: inline-block;
+  width: 0.125rem;
+  height: 1rem;
+  margin-left: 0.125rem;
+  margin-bottom: -0.125rem;
+  border-radius: 9999px;
+  background-color: var(--aui-streaming-tint);
+  animation: aui-streaming-caret-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-sd-animate],
   [data-sd-animate] * {
     animation: none !important;
+  }
+
+  .aui-md[style*="--streamdown-caret"] > :last-child:not([data-sd-caret-hidden])::after {
+    animation: none;
   }
 }

@@ -1,5 +1,25 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.111] - ui-v0.5.111
+
+### STREAMING-TEXT-01
+
+The streamed reply takes the look of the shipped streaming-text Element:
+each new word fades in over half a second tinted blue (blue-500, blue-400
+in dark) and settles back to ink over 700 ms, and a thin pulsing blue caret
+follows the last word while the reply streams. That Element renders one
+plain `<p>` with no markdown, so `MarkdownText` gets its look through
+Streamdown's own hooks: `animated={{ animation: "streamingText", duration: 1200 }}`
+(exported as `STREAMING_TEXT_ANIMATION`) names a keyframe in
+`markdown-text.css`, and Streamdown's `caret` prop is on while an assistant
+text part runs. The old 150 ms `fadeIn` is gone. Reduced motion keeps no word
+animation and a still caret; Streamdown hides the caret inside an open code
+fence or a table. One difference from the Element: it tints the newest two
+words by position, Streamdown's hook tints each word for its first half
+second.
+
+Reuse check: no new part. `streaming-text.tsx` is untouched.
+
 ## [0.5.110] - ui-v0.5.110
 
 ### ELEMENTS-ADOPT-01 and CHAT-ACTION-ROW-01

@@ -9,6 +9,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { AssistantRuntimeProvider, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
 import type { RemendConfig } from "@assistant-ui/react-streamdown";
 import { Thread } from "./thread.aui";
+import { STREAMING_TEXT_ANIMATION } from "./markdown-text";
 
 afterEach(cleanup);
 beforeAll(async () => { await import("@assistant-ui/react-streamdown"); });
@@ -82,6 +83,69 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     } finally {
       window.matchMedia = originalMatchMedia;
     }
+  });
+
+  // STREAMING-TEXT-01: the reply streams with the streaming-text Element's
+  // look (word fades in tinted, settles to ink, caret after the last word),
+  // through Streamdown's own custom-animation name and caret props.
+  test("a streaming reply's new words use the streaming-text animation, not the old 150 ms fade", async () => {
+    const { container, getByRole } = render(
+      <Harness reply="New words arrive here." pauseAfterYieldMs={500} />,
+    );
+    await sendAndSettle(container, getByRole);
+    await waitFor(() => expect(container.querySelector(".aui-md")?.closest('[data-status="running"]')).toBeTruthy());
+    const word = container.querySelector<HTMLElement>("[data-sd-animate]");
+    expect(word?.style.getPropertyValue("--sd-animation").trim()).toBe(`sd-${STREAMING_TEXT_ANIMATION.animation}`);
+    expect(word?.style.getPropertyValue("--sd-duration").trim()).toBe(`${STREAMING_TEXT_ANIMATION.duration}ms`);
+  });
+
+  test("the first streamed word is shown with no added delay", async () => {
+    const { container, getByRole } = render(
+      <Harness reply="First words land at once." pauseAfterYieldMs={500} />,
+    );
+    await sendAndSettle(container, getByRole);
+    const first = await waitFor(() => {
+      const el = container.querySelector<HTMLElement>("[data-sd-animate]");
+      expect(el).toBeTruthy();
+      return el!;
+    });
+    expect(first.textContent).toContain("First");
+    expect(first.style.getPropertyValue("--sd-delay").trim() || "0ms").toBe("0ms");
+  });
+
+  test("a caret follows the last word only while the reply streams", async () => {
+    const { container, getByRole } = render(
+      <Harness reply="Caret while streaming." pauseAfterYieldMs={500} />,
+    );
+    await sendAndSettle(container, getByRole);
+    await waitFor(() => expect(container.querySelector(".aui-md")?.closest('[data-status="running"]')).toBeTruthy());
+    expect(container.querySelector<HTMLElement>(".aui-md")?.getAttribute("style") ?? "").toContain("--streamdown-caret");
+    await waitFor(() => expect(container.querySelector(".aui-md")?.closest('[data-status="complete"]')).toBeTruthy(), { timeout: 5_000 });
+    expect(container.querySelector<HTMLElement>(".aui-md")?.getAttribute("style") ?? "").not.toContain("--streamdown-caret");
+    expect(container.querySelector("[data-sd-animate]")).toBeNull();
+  });
+
+  test("unclosed emphasis at the streaming tail renders without raw markers", async () => {
+    const { container, getByRole } = render(<Harness reply="Some **bold words" pauseAfterYieldMs={500} />);
+    await sendAndSettle(container, getByRole);
+    await waitFor(() => expect(container.querySelector(".aui-md")?.closest('[data-status="running"]')).toBeTruthy());
+    await waitFor(() => expect(container.querySelector(".aui-md strong")?.textContent).toContain("bold words"));
+    expect(container.querySelector(".aui-md")?.textContent).not.toContain("**");
+  });
+
+  test("an open code fence at the streaming tail renders as code, with the caret held back", async () => {
+    const { container, getByRole } = render(<Harness reply={"Code:\n\n```ts\nconst x = 1;"} pauseAfterYieldMs={500} />);
+    await sendAndSettle(container, getByRole);
+    await waitFor(() => expect(container.querySelector(".aui-md")?.closest('[data-status="running"]')).toBeTruthy());
+    await waitFor(() => expect(container.querySelector(".aui-md pre, .aui-md .aui-shiki-base")).toBeTruthy());
+    expect(container.querySelector(".aui-md")?.textContent).not.toContain("```");
+    expect(container.querySelector(".aui-md > :last-child")?.hasAttribute("data-sd-caret-hidden")).toBe(true);
+  });
+
+  test("the animation the kit names exists in its stylesheet, with a reduced-motion stop", async () => {
+    const css = await Bun.file(new URL("./markdown-text.css", import.meta.url)).text();
+    expect(css).toContain(`@keyframes sd-${STREAMING_TEXT_ANIMATION.animation}`);
+    expect(css).toMatch(/prefers-reduced-motion: reduce[\s\S]*\[data-sd-animate\][\s\S]*animation: none/);
   });
 
   test("wide tables stay inside a horizontally scrollable wrapper", async () => {

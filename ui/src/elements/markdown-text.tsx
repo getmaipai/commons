@@ -158,7 +158,13 @@ function rawHtmlAsText() {
 const remarkPluginsWithoutRawHtml: Pluggable[] = [remarkGfm, rawHtmlAsText];
 const remendOptions = { links: false, linkMode: "text-only" as const };
 const linkSafety = { enabled: false };
-const animationOptions = { animation: "fadeIn" as const, duration: 150 };
+// STREAMING-TEXT-01: the streamed reply takes the streaming-text Element's
+// look (its docs: each word fades in over 500 ms in blue, settles back to ink
+// over 700 ms, a blue caret after the last word). That Element renders one
+// plain <p> with no markdown, so the look rides Streamdown's own per-word
+// animation hook instead: Streamdown stamps `--sd-animation: sd-<name>` on each
+// new word and the keyframe lives in markdown-text.css.
+export const STREAMING_TEXT_ANIMATION = { animation: "streamingText", duration: 1200 } as const;
 
 export type MarkdownPreprocessContext = { streaming: boolean };
 
@@ -255,7 +261,8 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess, remen
         components={markdownComponents}
         componentsByLanguage={componentsByLanguage}
         controls={false}
-        animated={shouldAnimate && !prefersReducedMotion ? animationOptions : false}
+        animated={shouldAnimate && !prefersReducedMotion ? STREAMING_TEXT_ANIMATION : false}
+        caret={shouldAnimate ? "block" : undefined}
         remend={remend}
         linkSafety={linkSafety}
       />
