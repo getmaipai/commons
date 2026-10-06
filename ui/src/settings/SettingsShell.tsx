@@ -1,4 +1,4 @@
-import { useId, type MouseEvent, type ReactNode } from "react";
+import { useId, type MouseEvent, type PointerEventHandler, type ReactNode, type RefObject } from "react";
 import { SettingsHeadingLevelContext } from "./headingLevel";
 import { HitField } from "./HitField";
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
@@ -16,11 +16,27 @@ import {
   SidebarProvider,
 } from "../dashboard/components/ui/sidebar";
 import { cn } from "../dashboard/lib/utils";
+import { Button } from "../ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { resolveHref, visibleGroups, type Section, type SettingsAreaDef, type SettingsViewer } from "./settingsAudience";
 
 const SearchIcon = getIcon("search");
 const ArrowUpRight = getIcon("arrow-up-right");
 const ChevronLeft = getIcon("chevron-left");
+const PanelLeftOpen = getIcon("panel-left-open");
+const PanelLeftClose = getIcon("panel-left-close");
+
+export interface SettingsShellCollapsible {
+  collapsed: boolean;
+  peek?: boolean;
+  onToggle: () => void;
+  columnToggleRef?: RefObject<HTMLButtonElement | null>;
+  headerToggleRef?: RefObject<HTMLButtonElement | null>;
+  onPeekEnter?: PointerEventHandler<HTMLDivElement>;
+  onPeekLeave?: PointerEventHandler<HTMLDivElement>;
+  onPeekColumnEnter?: PointerEventHandler<HTMLDivElement>;
+  onPeekColumnLeave?: PointerEventHandler<HTMLDivElement>;
+}
 
 /** What a click on the column asks the host to do. `section` opens one of
  * this area's own sections (a keys or view section); `link` leaves for
@@ -55,6 +71,12 @@ export interface SettingsShellProps {
   onSearchChange: (query: string) => void;
   /** The phone back row ("<area title>") at the top of an open section. */
   onBack?: () => void;
+  /** A host-provided destination row at the top of the column. */
+  backLink?: ReactNode;
+  /** Place this shell flush beside a permanent 56 px app rail. */
+  layout?: "default" | "docked";
+  /** Controlled desktop column visibility; phone drill-in ignores it. */
+  collapsible?: SettingsShellCollapsible;
   labels?: SettingsShellLabels;
   /** The element the content pane renders as. "main" (default) is the
    * page's main landmark; a host that already has one (Home's rail
@@ -90,6 +112,9 @@ export function SettingsShell({
   searchQuery,
   onSearchChange,
   onBack,
+  backLink,
+  layout = "default",
+  collapsible,
   labels,
   contentAs = "main",
   children,
@@ -103,6 +128,12 @@ export function SettingsShell({
   const title = searching ? (labels?.results ?? "Results") : (active?.label ?? area.title);
   const showColumn = !active || searching;
   const showContent = Boolean(active) || searching;
+  const collapsed = Boolean(collapsible?.collapsed);
+  const peeking = collapsed && Boolean(collapsible?.peek);
+  const mobileColumnClass = showColumn ? "flex" : "hidden";
+  const desktopColumnClass = !collapsed || peeking ? "lg:flex" : "lg:hidden";
+  const columnClass = cn(mobileColumnClass, desktopColumnClass);
+  const hasColumn = showColumn || (!collapsed || peeking);
 
   function rowHref(section: Section): string {
     return section.kind === "link" ? resolveHref(section.href ?? "#", viewer) : (sectionHref?.(section.id) ?? "#");
@@ -118,21 +149,42 @@ export function SettingsShell({
     <SidebarProvider
       keyboardShortcut={false}
       data-slot="settings-shell"
-      className="h-full min-h-[var(--settings-shell-min-height)] min-w-0 flex-col bg-settings-page lg:flex-row"
+      data-layout={layout}
+      className={cn(
+        "h-full min-h-[var(--settings-shell-min-height)] min-w-0 flex-col bg-settings-page lg:flex-row",
+        layout === "docked" && "lg:fixed lg:inset-y-0 lg:left-14 lg:right-0 lg:z-10 lg:h-svh",
+      )}
     >
       <span id={describedId} className="sr-only">
         {labels?.opensAnotherPage ?? "Opens another page"}
       </span>
+      {collapsed && !peeking ? (
+        <div
+          aria-hidden
+          data-slot="settings-sidebar-hover-zone"
+          className={cn("absolute inset-y-0 start-0 z-20 hidden w-1.5 lg:block", layout !== "docked" && "relative")}
+          onPointerEnter={collapsible?.onPeekEnter}
+          onPointerLeave={collapsible?.onPeekLeave}
+        />
+      ) : null}
       <Sidebar
         collapsible="none"
+        id="settings-column"
         data-slot="settings-column"
+        data-state={collapsed ? (peeking ? "peek" : "closed") : "open"}
+        inert={collapsed && !peeking}
+        onPointerEnter={peeking ? collapsible?.onPeekColumnEnter : undefined}
+        onPointerLeave={peeking ? collapsible?.onPeekColumnLeave : undefined}
         className={cn(
-          "h-auto min-w-0 w-full self-stretch border-settings-column-divider bg-settings-column lg:w-(--settings-column-width) lg:border-r",
-          showColumn ? "flex" : "hidden lg:flex",
+          "h-auto min-w-0 w-full self-stretch border-settings-column-divider bg-settings-column lg:h-full lg:w-(--settings-column-width) lg:border-r",
+          columnClass,
+          peeking && "lg:absolute lg:inset-y-0 lg:start-0 lg:z-30 lg:shadow-lg",
         )}
       >
         <SidebarHeader className="gap-3 px-2 pt-4 pb-2">
-          <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{area.title}</h2>
+          {collapsible && hasColumn ? <SettingsColumnToggle buttonRef={collapsible.columnToggleRef} collapsed={collapsed} peek={peeking} onToggle={collapsible.onToggle} /> : null}
+          {backLink ? <div data-slot="settings-back-link">{backLink}</div> : null}
+          {!(layout === "docked" && backLink) ? <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{area.title}</h2> : null}
           <HitField pad={6} className="relative">
             <SearchIcon aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-settings-helper" />
             <SidebarInput
@@ -192,7 +244,7 @@ export function SettingsShell({
       <Content
         data-slot="settings-content"
         aria-label={title}
-        className={cn("min-w-0 flex-1 self-stretch overflow-y-auto bg-settings-page", showContent ? "block" : "hidden lg:block")}
+        className={cn("relative min-w-0 flex-1 self-stretch overflow-y-auto bg-settings-page", showContent ? "block" : "hidden lg:block")}
       >
         <div className="mx-auto flex w-full max-w-(--settings-content-max) flex-col px-6 pb-16 pt-4 lg:pt-(--settings-content-top)">
           {onBack ? (
@@ -206,10 +258,41 @@ export function SettingsShell({
               <span>{area.title}</span>
             </SidebarMenuButton>
           ) : null}
-          <h1 className="mb-10 text-[length:var(--settings-page-title-size)] leading-9 font-semibold">{title}</h1>
+          <div className="relative mb-10 flex items-start gap-2">
+            {collapsible?.collapsed && !peeking ? <SettingsColumnToggle buttonRef={collapsible.headerToggleRef} collapsed onToggle={collapsible.onToggle} /> : null}
+            <h1 className="text-[length:var(--settings-page-title-size)] leading-9 font-semibold">{title}</h1>
+          </div>
           <SettingsHeadingLevelContext.Provider value={2}>{children}</SettingsHeadingLevelContext.Provider>
         </div>
       </Content>
     </SidebarProvider>
+  );
+}
+
+function SettingsColumnToggle({ collapsed, peek = false, onToggle, buttonRef }: { collapsed: boolean; peek?: boolean; onToggle: () => void; buttonRef?: RefObject<HTMLButtonElement | null> }) {
+  const label = peek ? "Keep settings sidebar open" : collapsed ? "Show settings sidebar" : "Hide settings sidebar";
+  const Icon = collapsed && !peek ? PanelLeftOpen : PanelLeftClose;
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            type="button"
+            ref={buttonRef}
+            variant="ghost"
+            size="icon-sm"
+            data-slot="settings-sidebar-toggle"
+            aria-label={label}
+            aria-expanded={peek ? undefined : !collapsed}
+            aria-controls="settings-column"
+            aria-keyshortcuts="Meta+B Control+B"
+            onClick={onToggle}
+          >
+            <Icon aria-hidden className="size-4.5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">{label} <span className="ms-1 opacity-60">⌘/Ctrl+B</span></TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

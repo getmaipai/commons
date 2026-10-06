@@ -1,5 +1,15 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.138] - ui-v0.5.138
+
+### SETTINGS-DOCK-01 (additive)
+
+`SettingsShell` accepts `backLink`, `layout="docked"` and a controlled
+`collapsible` column contract. Docked mode fills the viewport beside the
+permanent 56 px app rail while retaining the centered content width. The
+controlled column supports an in-column toggle, a header toggle while hidden,
+and a hover peek; omitting all new props preserves the existing shell.
+
 ## [0.5.137] - ui-v0.5.137
 
 ### A11Y-COLUMN-01 (additive)

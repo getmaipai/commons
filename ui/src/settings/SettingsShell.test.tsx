@@ -85,6 +85,15 @@ describe("SettingsShell column", () => {
     const desc = voice.getAttribute("aria-describedby")!;
     expect(view.container.querySelector(`#${CSS.escape(desc)}`)!.textContent).toBe("Opens a different page");
   });
+
+  test("an additive backLink slot is rendered at the top of the docked column", () => {
+    const { view } = shell({ layout: "docked", backLink: <a href="/chat">← Back to app</a> });
+    const col = column(view.container);
+    const back = col.querySelector('[data-slot="settings-back-link"]')!;
+    expect(back.textContent).toBe("← Back to app");
+    expect(back.compareDocumentPosition(view.getByRole("searchbox")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(view.getByRole("link", { name: "← Back to app" }).getAttribute("href")).toBe("/chat");
+  });
 });
 
 describe("SettingsShell navigation", () => {
@@ -174,6 +183,41 @@ describe("SettingsShell layout: two panes from lg, a drill-in below", () => {
     expect(inner.className).toContain("max-w-(--settings-content-max)");
     expect(inner.className).toContain("mx-auto");
     expect(inner.className).toContain("lg:pt-(--settings-content-top)");
+  });
+
+  test("docked layout escapes the workspace gutter and stays aligned after the 56 px app rail", () => {
+    const { view } = shell({ layout: "docked" });
+    const root = view.container.querySelector('[data-slot="settings-shell"]') as HTMLElement;
+    expect(root.getAttribute("data-layout")).toBe("docked");
+    expect(root.className).toContain("lg:fixed");
+    expect(root.className).toContain("lg:left-14");
+    expect(content(view.container).firstElementChild?.className).toContain("max-w-(--settings-content-max)");
+  });
+
+  test("a collapsible dock toggles from the column and content header and supports peek", () => {
+    const onToggle = mock(() => {});
+    const onPointerEnter = mock(() => {});
+    const { view, rerender } = (() => {
+      const base = shell({
+        layout: "docked",
+        collapsible: { collapsed: false, onToggle, onPeekEnter: onPointerEnter },
+      });
+      return { ...base, rerender: (props: Partial<SettingsShellProps>) => base.view.rerender(
+        <SettingsShell area={area("chat")} viewer={ADULT} registry={REGISTRY} activeSection="general" onNavigate={() => {}} searchQuery="" onSearchChange={() => {}} {...props}><div>content</div></SettingsShell>,
+      ) };
+    })();
+    const openControl = view.getByRole("button", { name: "Hide settings sidebar" });
+    fireEvent.click(openControl);
+    expect(onToggle).toHaveBeenCalledTimes(1);
+
+    rerender({ layout: "docked", collapsible: { collapsed: true, onToggle, onPeekEnter: onPointerEnter } });
+    expect(view.getByRole("button", { name: "Show settings sidebar" })).toBeTruthy();
+    const zone = view.container.querySelector('[data-slot="settings-sidebar-hover-zone"]')!;
+    fireEvent.pointerEnter(zone, { pointerType: "mouse" });
+    expect(onPointerEnter).toHaveBeenCalledTimes(1);
+
+    rerender({ layout: "docked", collapsible: { collapsed: true, peek: true, onToggle, onPeekEnter: onPointerEnter } });
+    expect(column(view.container).getAttribute("data-state")).toBe("peek");
   });
 });
 
