@@ -1,6 +1,6 @@
 # Changelog (`@maipai/ui`)
 
-## [0.5.118] - ui-v0.5.118
+## [0.5.119] - ui-v0.5.119
 
 ### ELT-COMPOSER-KIT-01 (additive, compact density)
 
