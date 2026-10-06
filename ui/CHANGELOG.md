@@ -1,6 +1,6 @@
 # Changelog (`@maipai/ui`)
 
-## Unreleased
+## [0.5.102] - ui-v0.5.102
 
 ### CALM-TOKENS-02
 
