@@ -1,5 +1,16 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.136] - ui-v0.5.136
+
+### PROJECTS-KIT-01b (additive)
+
+New `ProjectSettingsDialog` (ChatGPT's Project settings: name with the icon
+button, description and instructions with counters at 500 and 1500, memory
+select, Delete project behind a confirm; saves only the changed fields; a
+`readOnly` mode and `memoryModes` to hide the memory control) and
+`ProjectShareDialog` (each listed person with No access, Can use or Can edit).
+Both take the record, the copy and the handlers; nothing is fetched here.
+
 ## [0.5.135] - ui-v0.5.135
 
 ### PROJECTS-KIT-01 (additive)
