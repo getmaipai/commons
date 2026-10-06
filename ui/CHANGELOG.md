@@ -1,5 +1,18 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.126] - ui-v0.5.126
+
+### SAFETY-NOTICE-01
+
+`GuardrailNotice` gains optional, additive props for a notice that must
+read as support, not refusal: `tone: "support"` draws a helping-hands glyph
+on the neutral field instead of the amber shield; `policy` may be left out
+(no mono tag then); `explanation` may be left out (the title is then the
+notice's one sentence and wraps instead of truncating); `actions` draws
+links the person can follow (`tel:`, `sms:`, `https:` in a new tab with no
+referrer). With none of them set the notice is unchanged. Tests cover the
+unset case and each prop.
+
 ## [0.5.125] - ui-v0.5.125
 
 ### ELT-PALETTE-01 (additive)
