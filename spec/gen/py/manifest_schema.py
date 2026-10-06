@@ -182,6 +182,9 @@ class Notification(BaseModel):
     )
     configurable: bool
     default_channels: list[Literal['in_app', 'telegram']] = Field(..., min_length=1)
+    actions: list[Literal['acknowledge', 'quiet_here', 'false_alarm']] | None = Field(
+        None, description='Actions available for the safety.alarm notification type.'
+    )
 
 
 class Cache(BaseModel):

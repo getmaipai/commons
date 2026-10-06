@@ -69,6 +69,10 @@ class RobotState(BaseModel):
         None,
         description="The MaiPai app version the robot runs (the maipai-bot release), so the hub can compare the robot to a published Bot release; daemon_version is the vendor SDK's version, not this one. Null means no version is currently known; omission means the producer does not yet report this field.",
     )
+    watch_level: Literal['off', 'presence', 'identify'] | None = Field(
+        None,
+        description='The effective local camera watch level the robot reports to the hub, using the strictest applicable person and device setting.',
+    )
 
     @field_validator('put_down_count', mode='before')
     @classmethod

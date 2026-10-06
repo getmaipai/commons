@@ -443,6 +443,17 @@ export const PackageManifest = z
               .describe("`{var}`-interpolated, per docs/NOTIFICATIONS.md."),
             configurable: z.boolean(),
             default_channels: z.array(z.enum(["in_app", "telegram"])).min(1),
+            /**Actions available for the safety.alarm notification type.*/
+            actions: z
+              .array(z.enum(["acknowledge", "quiet_here", "false_alarm"]))
+              .refine(
+                (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                "All items must be unique!",
+              )
+              .describe(
+                "Actions available for the safety.alarm notification type.",
+              )
+              .optional(),
           })
           .strict(),
       )

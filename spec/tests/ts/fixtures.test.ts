@@ -20,6 +20,9 @@ import { Issue } from "../../gen/ts/issue.js";
 import { Conversation } from "../../gen/ts/conversation.js";
 import { Device } from "../../gen/ts/device.js";
 import { RobotState } from "../../gen/ts/robot-state.js";
+import { DeviceCommand } from "../../gen/ts/device-command.js";
+import { RobotOffer } from "../../gen/ts/robot-offer.js";
+import { RobotAssetManifest } from "../../gen/ts/robot-asset-manifest.js";
 import { StackFitPlan } from "../../gen/ts/stack-fit-plan.js";
 import { ContentCeiling } from "../../gen/ts/content-ceiling.js";
 import { Source } from "../../gen/ts/source.js";
@@ -128,7 +131,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Device.parse(loadFixture("device.example.json"))).not.toThrow();
   });
 
-  for (const kind of ["reachy-mini", "maipai-build"]) {
+  for (const kind of ["reachy-mini", "reachy-mini-eyes", "maipai-build"]) {
     test(`device.robot-${kind}.example.json`, () => {
       expect(() => Device.parse(loadFixture(`device.robot-${kind}.example.json`))).not.toThrow();
     });
@@ -139,6 +142,36 @@ describe("record fixtures validate against their generated Zod models", () => {
       expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();
     });
   }
+
+  test("device-command fixtures cover every kind and reject a mismatched payload", () => {
+    const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
+    expect(commands).toHaveLength(13);
+    for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
+    const invalid = { ...(commands[0] as object), kind: "capture_request" };
+    expect(() => DeviceCommand.parse(invalid)).toThrow();
+  });
+
+  test("robot offer fixture validates", () => {
+    expect(() => RobotOffer.parse(loadFixture("robot-offer.example.json"))).not.toThrow();
+  });
+
+  test("robot asset pins validate and contain only checksum and licence backed non-move assets", () => {
+    const pins = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "assets", "robot-assets.json"), "utf-8")) as unknown[];
+    expect(pins).toHaveLength(6);
+    for (const pin of pins) {
+      const parsed = RobotAssetManifest.parse(pin);
+      expect(parsed.sha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(parsed.licence.trim()).not.toBe("");
+      expect(parsed.kind).not.toBe("moves");
+      expect(`${parsed.id} ${parsed.file} ${parsed.source_url}`).not.toMatch(/firmware/i);
+    }
+  });
+
+  test("safety alarm notification declaration is immediate, fixed and household-wide", () => {
+    const manifest = PackageManifest.parse(loadFixture("manifest.example.json"));
+    const alarm = manifest.notifications?.find((item) => item.id === "safety.alarm");
+    expect(alarm).toMatchObject({ level: "immediate", configurable: false, audience: "household", actions: ["acknowledge", "quiet_here", "false_alarm"] });
+  });
 
   test("robot-state activity: an unlisted value is still rejected", () => {
     const body = { ...(loadFixture("robot-state.idle.example.json") as object), activity: "napping" };
@@ -152,6 +185,14 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(RobotState.parse(loadFixture("robot-state.minimal.example.json")).app_version).toBeUndefined();
     const body = { ...(loadFixture("robot-state.idle.example.json") as object), app_version: 4 };
     expect(() => RobotState.parse(body)).toThrow();
+  });
+
+  test("robot-state watch_level is optional and closed", () => {
+    const idle = loadFixture("robot-state.idle.example.json") as any;
+    expect(RobotState.parse(idle).watch_level).toBe("presence");
+    const bare = loadFixture("robot-state.minimal.example.json") as any;
+    expect(RobotState.parse(bare).watch_level).toBeUndefined();
+    expect(() => RobotState.parse({ ...idle, watch_level: "always" })).toThrow();
   });
 
   test("robot-state motion and put_down_count: optional, null motion allowed, bad values rejected", () => {

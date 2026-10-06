@@ -46,6 +46,13 @@ describe("vocab/capabilities.json", () => {
     }
   });
 
+  test("Reachy observation capabilities are present and eyes is reused", () => {
+    for (const capability of ["gestures", "sound_events", "eyes"]) {
+      expect(vocab.capabilities.includes(capability), `${capability} is missing`).toBe(true);
+    }
+    expect(vocab.capabilities.filter((capability) => capability === "eyes")).toHaveLength(1);
+  });
+
   test("the manifest example's requires and optional draw from the vocabulary", () => {
     const manifest = JSON.parse(
       readFileSync(join(VOCAB_DIR, "..", "fixtures", "records", "manifest.example.json"), "utf-8"),

@@ -36,7 +36,15 @@
   "config": [],
   "data_sources": [],
   "permissions": ["schedule", "speak"],
-  "notifications": [],
+  "notifications": [{
+    "id": "safety.alarm",
+    "level": "immediate",
+    "audience": "household",
+    "template": "Safety alarm: {kind} in {area}.",
+    "configurable": false,
+    "default_channels": ["in_app"],
+    "actions": ["acknowledge", "quiet_here", "false_alarm"]
+  }],
   "backup": "hot",
   "background": false,
   "contributes": {},

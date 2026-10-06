@@ -1,0 +1,56 @@
+[
+  {
+    "id": "openwakeword-melspectrogram-v0_5_1",
+    "file": "melspectrogram.onnx",
+    "sha256": "ba2b0e0f8b7b875369a2c89cb13360ff53bac436f2895cced9f479fa65eb176f",
+    "bytes": 1087958,
+    "licence": "CC-BY-NC-SA-4.0",
+    "source_url": "https://github.com/dscripka/openWakeWord/releases/download/v0.5.1/melspectrogram.onnx",
+    "kind": "model"
+  },
+  {
+    "id": "openwakeword-embedding-v0_5_1",
+    "file": "embedding_model.onnx",
+    "sha256": "70d164290c1d095d1d4ee149bc5e00543250a7316b59f31d056cff7bd3075c1f",
+    "bytes": 1326578,
+    "licence": "CC-BY-NC-SA-4.0",
+    "source_url": "https://github.com/dscripka/openWakeWord/releases/download/v0.5.1/embedding_model.onnx",
+    "kind": "model"
+  },
+  {
+    "id": "hey-maipai-v2",
+    "file": "trained_hey_maipai_v2.onnx",
+    "sha256": "6fbff74699801dabf931166badcc51fd655570469fb6d10da1ee5f64b4cba190",
+    "bytes": 937243,
+    "licence": "AGPL-3.0",
+    "source_url": "https://github.com/getmaipai/bot/releases/download/v0.1.0/trained_hey_maipai_v2.onnx",
+    "kind": "model"
+  },
+  {
+    "id": "sface-2021dec",
+    "file": "face_recognition_sface_2021dec.onnx",
+    "sha256": "0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79",
+    "bytes": 38696353,
+    "licence": "Apache-2.0",
+    "source_url": "https://media.githubusercontent.com/media/opencv/opencv_zoo/ba91a3b91d00d76e86540d4013f944bd6b514e39/models/face_recognition_sface/face_recognition_sface_2021dec.onnx",
+    "kind": "model"
+  },
+  {
+    "id": "yunet-2026may",
+    "file": "face_detection_yunet_2026may.onnx",
+    "sha256": "ebafce4e3c118d6554634be5c27ab333b4c047a9a8c3faf1d7cf93101c22f0f0",
+    "bytes": 229738,
+    "licence": "MIT",
+    "source_url": "https://huggingface.co/pollen-robotics/face_detection_yunet_2026may/resolve/2b8e922362946a0db67e861bae0f77826980effd/face_detection_yunet_2026may.onnx",
+    "kind": "model"
+  },
+  {
+    "id": "sherpa-kws-zipformer-gigaspeech-3_3m",
+    "file": "sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01.tar.bz2",
+    "sha256": "f170013b4716e41b62b9bfd809687c207cef798ef9bc6534d524e17af9b6561a",
+    "bytes": 17626723,
+    "licence": "Apache-2.0",
+    "source_url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01.tar.bz2",
+    "kind": "model"
+  }
+]

@@ -15,6 +15,7 @@ from gen.py.artifact_schema import Artifact
 from gen.py.content_ceiling_schema import ContentCeiling
 from gen.py.conversation_schema import Conversation
 from gen.py.conversation_turn_schema import ConversationTurn
+from gen.py.device_command_schema import DeviceCommand
 from gen.py.device_schema import Device
 from gen.py.entity_schema import Entity
 from gen.py.file_schema import File
@@ -31,6 +32,8 @@ from gen.py.relationship_schema import Relationship
 from gen.py.reply_constraint_schema import ReplyConstraint
 from gen.py.reply_feedback_schema import ReplyFeedback
 from gen.py.reply_plan_schema import ReplyPlan
+from gen.py.robot_asset_manifest_schema import RobotAssetManifest
+from gen.py.robot_offer_schema import RobotOffer
 from gen.py.robot_state_schema import RobotState
 from gen.py.safety_result_schema import SafetyResult
 from gen.py.setting_value_schema import SettingValue
@@ -50,6 +53,7 @@ ErrorEntry = load_standards_module("error_entry_schema").ErrorEntry
 
 SPEC_DIR = Path(__file__).resolve().parents[2]
 FIXTURES_DIR = SPEC_DIR / "fixtures" / "records"
+ASSETS_FILE = SPEC_DIR / "assets" / "robot-assets.json"
 
 
 def load_fixture(name: str) -> dict:
@@ -98,9 +102,51 @@ def test_device_fixture():
     Device.model_validate(load_fixture("device.example.json"))
 
 
-@pytest.mark.parametrize("kind", ["reachy-mini", "maipai-build"])
+@pytest.mark.parametrize("kind", ["reachy-mini", "reachy-mini-eyes", "maipai-build"])
 def test_robot_device_fixture(kind):
     Device.model_validate(load_fixture(f"device.robot-{kind}.example.json"))
+
+
+def test_reachy_eye_capability_is_only_on_the_fitted_fixture():
+    plain = load_fixture("device.robot-reachy-mini.example.json")
+    fitted = load_fixture("device.robot-reachy-mini-eyes.example.json")
+    assert "eyes" not in plain["capabilities"]
+    assert "eyes" in fitted["capabilities"]
+    assert set(plain["capabilities"]) | {"eyes"} == set(fitted["capabilities"])
+
+
+def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
+    commands = load_fixture("device-command.kinds.example.json")
+    assert len(commands) == 13
+    for command in commands:
+        DeviceCommand.model_validate(command)
+    invalid = {**commands[0], "kind": "capture_request"}
+    with pytest.raises(ValidationError):
+        DeviceCommand.model_validate(invalid)
+
+
+def test_robot_offer_fixture():
+    RobotOffer.model_validate(load_fixture("robot-offer.example.json"))
+
+
+def test_robot_asset_pins_have_checksums_licences_and_no_moves_or_firmware():
+    pins = json.loads(ASSETS_FILE.read_text())
+    assert len(pins) == 6
+    for row in pins:
+        pin = RobotAssetManifest.model_validate(row)
+        assert len(pin.sha256) == 64
+        assert pin.licence.strip()
+        assert pin.kind != "moves"
+        assert "firmware" not in f"{pin.id} {pin.file} {pin.source_url}".lower()
+
+
+def test_safety_alarm_notification_declaration():
+    manifest = PackageManifest.model_validate(load_fixture("manifest.example.json"))
+    alarm = next(item for item in manifest.notifications if item.id == "safety.alarm")
+    assert alarm.level == "immediate"
+    assert alarm.configurable is False
+    assert alarm.audience == "household"
+    assert alarm.actions == ["acknowledge", "quiet_here", "false_alarm"]
 
 
 @pytest.mark.parametrize(
@@ -138,6 +184,7 @@ def test_robot_state_app_version_present_null_and_omitted():
         load_fixture("robot-state.minimal.example.json")
     )
     assert present.app_version == "0.4.2"
+    assert present.watch_level == "presence"
     assert null.app_version is None
     assert omitted.app_version is None
 

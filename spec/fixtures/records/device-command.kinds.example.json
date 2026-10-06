@@ -1,0 +1,146 @@
+[
+  {
+    "id": "cmd-mute",
+    "kind": "mute",
+    "payload": {},
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-unmute",
+    "kind": "unmute",
+    "payload": {},
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-capture-request",
+    "kind": "capture_request",
+    "payload": {
+      "turn_id": "turn-abc123",
+      "kind": "still"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-alarm",
+    "kind": "alarm",
+    "payload": {
+      "alarm_id": "alarm-abc123",
+      "area": "Kitchen",
+      "kind": "smoke",
+      "state": "active"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-notify",
+    "kind": "notify",
+    "payload": {
+      "notification_id": "timer.finished",
+      "text": "The timer is done."
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-notify-gesture",
+    "kind": "notify_gesture",
+    "payload": {
+      "gesture": "doorbell",
+      "bearing": 0.5
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-offer",
+    "kind": "offer",
+    "payload": {
+      "offer": {
+        "id": "offer-abc123",
+        "person_id": "person-abc123",
+        "tier": 2,
+        "text": "Want to hear a story?",
+        "expires_at": "2026-10-05T12:10:00Z",
+        "provenance": "robot.initiative",
+        "hlc": "1791201600000:0:robot123"
+      }
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-play-move",
+    "kind": "play_move",
+    "payload": {
+      "move_id": "cheerful1"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-settings-changed",
+    "kind": "settings_changed",
+    "payload": {
+      "values": {
+        "robot.camera.watch_level": "presence"
+      }
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-time",
+    "kind": "time",
+    "payload": {
+      "hub_time": "2026-10-05T12:00:00Z"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-live-view-start",
+    "kind": "live_view_start",
+    "payload": {
+      "view_id": "view-abc123",
+      "fps": 5,
+      "size": "640x360"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-live-view-stop",
+    "kind": "live_view_stop",
+    "payload": {
+      "view_id": "view-abc123"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-asset-changed",
+    "kind": "asset_changed",
+    "payload": {
+      "manifest_version": "assets-abc123"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  }
+]

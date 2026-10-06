@@ -1,0 +1,9 @@
+{
+  "id": "offer-abc123",
+  "person_id": "person-abc123",
+  "tier": 2,
+  "text": "Want to hear a story?",
+  "expires_at": "2026-10-05T12:10:00Z",
+  "provenance": "robot.initiative",
+  "hlc": "1791201600000:0:robot123"
+}

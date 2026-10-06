@@ -1,7 +1,7 @@
 {
-  "id": "device-r3a7c1",
+  "id": "device-r3a7c2",
   "kind": "robot",
-  "name": "Reachy Mini",
+  "name": "Reachy Mini with Eyes",
   "area": "Living room",
   "capabilities": [
     "head_6dof",
@@ -15,12 +15,13 @@
     "mic",
     "speaker",
     "speech_pod",
-    "moves_recorded"
+    "moves_recorded",
+    "eyes"
   ],
   "person_id": "person-d4e5f6",
   "watermarks": {},
   "last_seen_at": "2026-10-05T12:00:00Z",
   "created_at": "2026-10-01T09:00:00Z",
   "updated_at": "2026-10-05T12:00:00Z",
-  "hlc": "1759665600000:0:abc123"
+  "hlc": "1759665600001:0:abc123"
 }
