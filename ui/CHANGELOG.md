@@ -1,5 +1,29 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.129] - ui-v0.5.129
+
+### KIT-SET-03 (settings renderer refreshed onto the dashboard parts)
+
+`SettingsRenderer` and a new `SettingRow` draw each registry group as one
+card of `Item size="setting"` rows (inset dividers, a "Show N advanced
+settings" fold row, an inline Alert for a failed write, `Empty` for no
+match), built from the shipped dashboard parts only. They replace Home's
+`NextSettingField`, `NextSettingsRenderer` and `PersonMultiSelect`, whose
+behaviour moved in: switch, select (locale shown as a language name), number
+and time inputs, text and URL as a muted value plus Change with an inline
+editor, secret as Set or Not set plus a write-only password editor (a secret
+is never drawn, and `voice.hf_token` keeps its dedicated-flow exception),
+person multi-select, reset, and the draft, revert and re-sync rules.
+
+New optional `SettingsRenderer` props: `only`, `includeKeys`,
+`includeKeysByGroup`, `expandAdvanced`, `titleOverrides`, `plainRows`,
+`mergeGroups`, `people`, `focusKey` (scroll to and focus a `#<key>` row), and
+`beforeChange(key, value)` (return `true` to write, or a sentence to refuse;
+Home uses it for the browser alert permission). `SettingField.tsx` stays as a
+shim re-exporting `titleCaseOption`, `localeDisplayName` and the row until
+Home stops importing it (APP-SET-05). The old `@/kit/ui/*` based
+implementations are gone. `middleEllipsis` joins the label helpers.
+
 ## [0.5.128] - ui-v0.5.128
 
 ### KIT-SET-04 (additive)

@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, request } from "@/kit/http";
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
 import type { ResolvedSetting } from "@/kit/settings/resolvedSetting";
 import { groupSettings, sectionTitle, type SettingsGroup, type MergedSetting } from "@/kit/settings/groupSettings";
-import { SettingField } from "@/kit/settings/SettingField";
 import { AsyncState } from "@/kit/primitives/AsyncState";
-import { Section } from "@/kit/primitives/Section";
-import { Button } from "@/kit/ui/button";
+import { getIcon } from "@/kit/icons";
+import { Alert, AlertDescription } from "../dashboard/components/ui/alert";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../dashboard/components/ui/collapsible";
+import { Empty, EmptyDescription, EmptyHeader } from "../dashboard/components/ui/empty";
+import { Item, ItemContent, ItemGroup, ItemSeparator, ItemTitle } from "../dashboard/components/ui/item";
+import { SettingRow, type BeforeChange } from "./SettingRow";
+import type { PersonOption } from "./PersonMultiSelect";
 
 interface SettingsRendererProps {
   scope: "household" | "person" | "device";
@@ -18,37 +22,69 @@ interface SettingsRendererProps {
    * `honoured_by` entries (e.g. "home", "stack") - a key not honoured by
    * this product is never shown, regardless of scope. */
   honouredBy: string;
-  /** Step 7's search filter over label and help text, lifted from
-   * `SettingsPage.tsx`'s single search box rather than each renderer
-   * instance keeping its own - one query, both scopes, the same box
-   * VS Code's own Settings editor uses. Case-insensitive substring
-   * match; a group with nothing matching renders nothing at all, and a
-   * match inside a folded advanced key surfaces it directly rather than
-   * leaving it hidden behind "Show N advanced settings". */
+  /** Case-insensitive substring match over label and help text. A group
+   * with nothing matching renders nothing, and a match inside a folded
+   * advanced key surfaces directly rather than hiding behind "Show N
+   * advanced settings". */
   filter?: string;
+  /** Render only the named `lives_in` group(s) (a second page embedding
+   * just its own group, such as Storage). Omitted: every eligible group. */
+  only?: readonly string[];
+  /** Keep only these keys (every group), or per group in
+   * `includeKeysByGroup`, which wins for a group it names. */
+  includeKeys?: readonly string[];
+  includeKeysByGroup?: Readonly<Record<string, readonly string[]>>;
+  /** Show advanced keys without the "Show N advanced settings" fold. */
+  expandAdvanced?: boolean;
+  /** Replace a group's heading, by `lives_in` id. */
+  titleOverrides?: Readonly<Record<string, string>>;
+  /** Rows only: no heading and no card (the host supplies the frame). */
+  plainRows?: boolean;
+  /** Merge every shown group into one card under the first group's heading. */
+  mergeGroups?: boolean;
+  /** The household roster for a person multi-select; omitted, the control
+   * reads `GET /api/people` itself. */
+  people?: readonly PersonOption[];
+  /** The per-key hook run before every write (see BeforeChange). */
+  beforeChange?: BeforeChange;
+  /** A key to scroll into view and focus once the rows have loaded (a
+   * `#<key>` deep link). */
+  focusKey?: string;
 }
 
-// The registry (unlike a scope's values) never varies by which
-// SettingsRenderer is asking - every instance on the page wants the
-// exact same GET /api/settings/registry response. A code review
-// (2026-09-04, on SettingsPage.tsx gaining a second instance - person
-// scope, alongside the original household one) found each instance
-// fetching it independently with no cache between them. The data layer
-// (docs/plans/session-b-ui.md step 3) owns this now: one query key,
-// `staleTime: Infinity` since the registry is generated at build/dev time
-// (spec/settings/keys.json) and never changes while a household is
-// looking at the page, shared by every SettingsRenderer instance through
-// the app's one QueryClient rather than a hand-rolled module-level
-// promise cache.
+// The registry never varies by which renderer is asking, so every instance
+// shares one query: `staleTime: Infinity` since it is generated at build
+// time (spec/settings/keys.json) and never changes while a household looks
+// at the page.
 const REGISTRY_QUERY_KEY = ["settings-registry"];
+const ChevronDown = getIcon("chevron-down");
 
-// docs/SETTINGS.md's generic renderer: "one declaration, one
-// implementation," pointed at a scope. Two real instances now
-// (SettingsPage.tsx: household, then person, 2026-09-04) - the central
-// Household/Profile lists Rule 2 describes as a further, still-missing
-// render site for the same component.
-export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: SettingsRendererProps) {
+/** docs/SETTINGS.md's generic renderer, pointed at a scope: one card per
+ * registry group (`lives_in`), one `SettingRow` per key, separated by
+ * inset dividers, with a folded "Show N advanced settings" row once a
+ * group has three or more advanced keys. Built from the shipped kit parts
+ * only (Item, ItemGroup card, Switch, Select, Input, Button, Collapsible,
+ * Alert, Empty). */
+export function SettingsRenderer({
+  scope,
+  scopeValue,
+  honouredBy,
+  filter,
+  only,
+  includeKeys,
+  includeKeysByGroup,
+  expandAdvanced = false,
+  titleOverrides = {},
+  plainRows = false,
+  mergeGroups = false,
+  people,
+  beforeChange,
+  focusKey,
+}: SettingsRendererProps) {
   const queryClient = useQueryClient();
+  // A person-scope render is always the viewer's own settings, so the id in
+  // `person:<id>` is the viewer: dropped from a person multi-select.
+  const selfPersonId = scope === "person" ? scopeValue.slice("person:".length) : undefined;
   const registryQuery = useQuery<SettingsKey[]>({
     queryKey: REGISTRY_QUERY_KEY,
     queryFn: () => request<SettingsKey[]>("/api/settings/registry"),
@@ -62,6 +98,8 @@ export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: Sett
   const [writeError, setWriteError] = useState<string | null>(null);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState<Record<string, boolean>>({});
+  const rootRef = useRef<HTMLDivElement>(null);
+  const focusedRef = useRef<string | null>(null);
 
   function replaceValue(next: ResolvedSetting) {
     queryClient.setQueryData<ResolvedSetting[]>(["settings-values", scopeValue], (prev) =>
@@ -69,12 +107,8 @@ export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: Sett
     );
   }
 
-  // Returns whether the write actually landed: a code review (2026-09-04)
-  // found SettingField had no way to know a commit failed, so a rejected
-  // value (below a key's min, etc.) stayed showing in the input forever -
-  // resolved.value never changes on failure, so the resync effect keyed
-  // on it never fires either. SettingField reverts its own draft when
-  // this comes back false.
+  // Returns whether the write actually landed so the row can revert a
+  // rejected draft (resolved.value never changes on failure).
   async function handleChange(key: string, value: unknown): Promise<boolean> {
     setPendingKey(key);
     setWriteError(null);
@@ -97,11 +131,6 @@ export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: Sett
     setPendingKey(key);
     setWriteError(null);
     try {
-      // A code review (2026-09-04) found this used to ignore the reset
-      // response and re-fetch the whole scope just to learn the value it
-      // already knew was the registry default; the route now returns it
-      // directly (backend/src/lib/settings.ts's resetValue), symmetric
-      // with setSetting.
       const restored = await request<ResolvedSetting>("/api/settings/reset", {
         method: "POST",
         body: JSON.stringify({ scope: scopeValue, key }),
@@ -118,34 +147,55 @@ export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: Sett
   const data =
     registryQuery.data && valuesQuery.data ? { registry: registryQuery.data, values: valuesQuery.data } : undefined;
 
-  // Found live in the browser (2026-09-05, while checking that the new
-  // persona.active_id setting actually renders): `flex-1 overflow-y-auto`
-  // here turns this component into its own independently-scrolling
-  // region - harmless with exactly one instance on a page, but
-  // SettingsPage.tsx renders TWO (household scope, then person scope) as
-  // plain flex-col siblings, so the two `flex-1` boxes split the SAME
-  // available height between them. With enough real settings (this
-  // session added a fourth household.ai key's own section AND the new
-  // person.persona one), the person-scope instance's box collapsed to
-  // ~32px - its content didn't disappear, it was real and hit-testable,
-  // just clipped to a sliver and scrollable only within that tiny box,
-  // never the page. This component doesn't need to scroll itself at
-  // all: the actual page-level container SettingsPage.tsx renders it
-  // inside already provides the real scrolling.
+  // A `#<key>` deep link: once the rows exist, scroll to the key's row and
+  // focus its first control, once per key.
+  useEffect(() => {
+    if (!focusKey || !data || focusedRef.current === focusKey) return;
+    const row = rootRef.current?.querySelector<HTMLElement>(`[data-setting-key="${CSS.escape(focusKey)}"]`);
+    if (!row) return;
+    focusedRef.current = focusKey;
+    row.scrollIntoView?.({ block: "center" });
+    row.querySelector<HTMLElement>("input, button, [role=switch], [role=combobox]")?.focus();
+  });
+
+  function renderRow(s: MergedSetting) {
+    return (
+      <SettingRow
+        key={s.def.key}
+        setting={s}
+        onChange={(v) => handleChange(s.def.key, v)}
+        onReset={() => handleReset(s.def.key)}
+        disabled={pendingKey === s.def.key}
+        selfPersonId={selfPersonId}
+        people={people}
+        beforeChange={beforeChange}
+      />
+    );
+  }
+
+  function renderRows(rows: MergedSetting[]) {
+    return rows.map((s, i) => (
+      <Fragment key={s.def.key}>
+        {i > 0 ? <ItemSeparator variant="inset" /> : null}
+        {renderRow(s)}
+      </Fragment>
+    ));
+  }
+
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={rootRef} className="flex flex-col gap-4">
       {writeError ? (
-        <div className="rounded-lg bg-muted px-3 py-2 text-base text-destructive">{writeError}</div>
+        <Alert variant="destructive">
+          <AlertDescription>{writeError}</AlertDescription>
+        </Alert>
       ) : null}
       <AsyncState
         data={data}
         error={error}
         isFetching={registryQuery.isFetching || valuesQuery.isFetching}
         onRetry={() => {
-          // Only the query that actually failed, not both unconditionally
-          // (a code review, 2026-09-05, caught the registry - staleTime:
-          // Infinity, so it succeeds once and never needs retrying again
-          // - being re-fetched every time only the values query failed).
+          // Only the query that actually failed (the registry succeeds
+          // once and never needs retrying again).
           if (registryQuery.isError) registryQuery.refetch();
           if (valuesQuery.isError) valuesQuery.refetch();
         }}
@@ -153,65 +203,86 @@ export function SettingsRenderer({ scope, scopeValue, honouredBy, filter }: Sett
         loadingLabel="Loading settings"
       >
         {({ registry, values }) => {
-          const groups: SettingsGroup[] = groupSettings(registry, values, scope, honouredBy);
           const needle = filter?.trim().toLowerCase();
           const matches = (s: MergedSetting) =>
             !needle || s.def.label.toLowerCase().includes(needle) || (s.def.help?.toLowerCase().includes(needle) ?? false);
-          const visibleGroups = needle
-            ? groups
-                .map((g) => ({ ...g, basic: g.basic.filter(matches), advanced: g.advanced.filter(matches) }))
-                .filter((g) => g.basic.length > 0 || g.advanced.length > 0)
-            : groups;
-          return visibleGroups.length === 0 ? (
-            <p className="text-base text-muted-foreground">
-              {needle ? "No settings match that search." : "No settings yet."}
-            </p>
-          ) : (
-            <>
-              {visibleGroups.map((group) => (
-                <Section key={group.id} id={`settings-${group.id}`} heading={sectionTitle(group.id)}>
-                  <div className="divide-y divide-border">
-                    {group.basic.map((s) => (
-                      <SettingField
-                        key={s.def.key}
-                        setting={s}
-                        onChange={(v) => handleChange(s.def.key, v)}
-                        onReset={() => handleReset(s.def.key)}
-                        disabled={pendingKey === s.def.key}
-                      />
-                    ))}
-                  </div>
-                  {group.advanced.length > 0 ? (
-                    // A search match inside a folded advanced key has to
-                    // surface directly - hiding it behind "Show N advanced
-                    // settings" after the household member just searched
-                    // for it would defeat the search entirely.
-                    group.foldAdvanced && !advancedOpen[group.id] && !needle ? (
-                      <Button
-                        type="button"
-                        variant="link"
-                        onClick={() => setAdvancedOpen((prev) => ({ ...prev, [group.id]: true }))}
-                        className="h-auto min-h-12 w-fit text-muted-foreground"
-                      >
-                        Show {group.advanced.length} advanced settings
-                      </Button>
-                    ) : (
-                      <div className="divide-y divide-border border-t border-border pt-1">
-                        {group.advanced.map((s) => (
-                          <SettingField
-                            key={s.def.key}
-                            setting={s}
-                            onChange={(v) => handleChange(s.def.key, v)}
-                            onReset={() => handleReset(s.def.key)}
-                            disabled={pendingKey === s.def.key}
-                          />
-                        ))}
-                      </div>
-                    )
-                  ) : null}
-                </Section>
-              ))}
-            </>
+          const allGroups: SettingsGroup[] = groupSettings(registry, values, scope, honouredBy);
+          let groups = (only ? allGroups.filter((g) => only.includes(g.id)) : allGroups)
+            .map((group) => {
+              const keys = includeKeysByGroup?.[group.id] ?? includeKeys;
+              const keep = (s: MergedSetting) => (!keys || keys.includes(s.def.key)) && matches(s);
+              return { ...group, basic: group.basic.filter(keep), advanced: group.advanced.filter(keep) };
+            })
+            .filter((g) => g.basic.length + g.advanced.length > 0);
+          if (mergeGroups && groups.length > 1) {
+            const first = groups[0]!;
+            groups = [
+              {
+                ...first,
+                basic: groups.flatMap((g) => g.basic),
+                advanced: groups.flatMap((g) => g.advanced),
+                foldAdvanced: false,
+              },
+            ];
+          }
+          if (groups.length === 0) {
+            return (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyDescription>{needle ? "No settings match that search." : "No settings yet."}</EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            );
+          }
+          return (
+            <div className="flex flex-col gap-14">
+              {groups.map((group) => {
+                const folded = group.foldAdvanced && !expandAdvanced && !needle;
+                // A `#<key>` deep link to a folded advanced key opens its fold.
+                const open = Boolean(advancedOpen[group.id]) || (focusKey !== undefined && group.advanced.some((a) => a.def.key === focusKey));
+                const card = (
+                  <ItemGroup variant={plainRows ? undefined : "card"}>
+                    {renderRows(group.basic)}
+                    {group.advanced.length > 0 ? (
+                      folded ? (
+                        <Collapsible open={open} onOpenChange={(next) => setAdvancedOpen((prev) => ({ ...prev, [group.id]: next }))}>
+                          {group.basic.length > 0 ? <ItemSeparator variant="inset" /> : null}
+                          <CollapsibleTrigger
+                            render={<Item size="setting" render={<button type="button" />} className="w-full cursor-pointer text-left" />}
+                          >
+                            <ItemContent>
+                              <ItemTitle className="text-muted-foreground">
+                                {open ? "Hide" : "Show"} {group.advanced.length} advanced settings
+                              </ItemTitle>
+                            </ItemContent>
+                            <ChevronDown aria-hidden className={`size-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <ItemSeparator variant="inset" />
+                            {renderRows(group.advanced)}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ) : (
+                        <>
+                          {group.basic.length > 0 ? <ItemSeparator variant="inset" /> : null}
+                          {renderRows(group.advanced)}
+                        </>
+                      )
+                    ) : null}
+                  </ItemGroup>
+                );
+                return (
+                  <section key={group.id} id={`settings-${group.id}`} aria-label={titleOverrides[group.id] ?? sectionTitle(group.id)} className="flex flex-col gap-3">
+                    {plainRows ? null : (
+                      <h3 className="text-[length:var(--settings-section-heading-size)] font-medium">
+                        {titleOverrides[group.id] ?? sectionTitle(group.id)}
+                      </h3>
+                    )}
+                    {card}
+                  </section>
+                );
+              })}
+            </div>
           );
         }}
       </AsyncState>
