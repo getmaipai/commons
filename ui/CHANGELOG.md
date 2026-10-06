@@ -1,5 +1,23 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.117] - ui-v0.5.117
+
+### ELT-T1-K01a (additive)
+
+Vendored from assistant-ui's Elements, nothing wired into Home: `OptionList`,
+`QuestionFlow`, `quote.aui` (`SelectionToolbar`, `QuoteBlock`,
+`ComposerQuotePreview`), `heat-graph` (parts on kit tokens), and the runtime
+forms of the composer family: `composer-trigger-popover.aui`,
+`composer-mentions.aui`, `composer-slash-commands.aui`,
+`composer-attachments.aui`, `composer-context.aui`,
+`composer-model-picker.aui` and `composer-voice.aui` (including
+`ComposerVoiceLevels`, a waveform that draws levels it is given). No external
+URL default ships in any of them (`vendored-no-remote.test.ts`). `ActivityGraph`
+now composes the `heat-graph` parts; its props and markup are unchanged
+(snapshot test). `quote-reply.tsx` is superseded by `quote.aui.tsx` and stays
+until its last caller moves. `composer.tsx`, `thread.aui.tsx` and
+`thread-composer.css` are untouched.
+
 ## [0.5.116] - ui-v0.5.116
 
 ### ELT-T1-K03 (additive)

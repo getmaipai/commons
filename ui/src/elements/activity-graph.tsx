@@ -1,17 +1,15 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import * as HeatGraph from "heat-graph";
+import type { HeatGraphDataPoint } from "./heat-graph";
 import { cn } from "cn";
+import {
+  HeatGraphDayLabels,
+  HeatGraphGrid,
+  HeatGraphLegend,
+  HeatGraphRoot,
+} from "./heat-graph";
 import { mono, paper } from "./surfaces";
-
-const LEVEL_TINT = [
-  "bg-foreground/[0.06]",
-  "bg-blue-500/25 dark:bg-blue-400/25",
-  "bg-blue-500/45 dark:bg-blue-400/45",
-  "bg-blue-500/70 dark:bg-blue-400/70",
-  "bg-blue-500 dark:bg-blue-400",
-] as const;
 
 export function ActivityGraph({
   data,
@@ -25,7 +23,7 @@ export function ActivityGraph({
   ComponentProps<"div">,
   "children" | "data" | "start" | "end" | "title" | "total"
 > & {
-  data: readonly HeatGraph.DataPoint[];
+  data: readonly HeatGraphDataPoint[];
   start: string | Date;
   end: string | Date;
   title: string;
@@ -49,55 +47,14 @@ export function ActivityGraph({
         </span>
       </div>
 
-      <HeatGraph.Root
-        data={[...data]}
-        start={start}
-        end={end}
-        weekStart="monday"
-        className="flex flex-col gap-2"
-      >
+      <HeatGraphRoot data={[...data]} start={start} end={end}>
         <div className="flex gap-2 overflow-x-auto">
-          <div className="flex shrink-0 flex-col gap-[3px]">
-            <HeatGraph.DayLabels>
-              {({ label }) => (
-                <span
-                  className={cn(
-                    mono,
-                    "text-foreground/25 flex h-[9px] items-center leading-none",
-                  )}
-                >
-                  {label.row % 2 === 1
-                    ? HeatGraph.DAY_SHORT[label.dayOfWeek]
-                    : ""}
-                </span>
-              )}
-            </HeatGraph.DayLabels>
-          </div>
-
-          <HeatGraph.Grid className="gap-[3px]">
-            {({ cell }) => (
-              <HeatGraph.Cell
-                className={cn(
-                  "size-[9px] rounded-[2px]",
-                  LEVEL_TINT[cell.level] ?? LEVEL_TINT[0],
-                )}
-              />
-            )}
-          </HeatGraph.Grid>
+          <HeatGraphDayLabels />
+          <HeatGraphGrid />
         </div>
 
-        <div className="flex items-center gap-1.5 self-end">
-          <span className={cn(mono, "text-foreground/25")}>less</span>
-          {LEVEL_TINT.map((tint, level) => (
-            <span
-              key={level}
-              aria-hidden
-              className={cn("size-[9px] rounded-[2px]", tint)}
-            />
-          ))}
-          <span className={cn(mono, "text-foreground/25")}>more</span>
-        </div>
-      </HeatGraph.Root>
+        <HeatGraphLegend />
+      </HeatGraphRoot>
     </div>
   );
 }

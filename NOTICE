@@ -116,4 +116,15 @@ https://github.com/assistant-ui/assistant-ui,
 at commit `0dd6d46b0`, fetched directly (not through the registry CLI);
 only its import paths were rewritten to the kit's own.
 
+ELT-T1-K01a (2026-10-06) - assistant-ui (MIT) -
+https://github.com/assistant-ui/assistant-ui, `apps/registry` at commit
+`d19b547df04e485f29b4e7bf881212e971cfbb09` (main at fetch time), fetched
+from the live registry JSON: `option-list.tsx`, `question-flow.tsx`,
+`quote.aui.tsx`, `heat-graph.tsx` (split into parts) and
+`composer-trigger-popover.aui.tsx`; `composer-attachments.aui.tsx`,
+`composer-context.aui.tsx`, `composer-mentions.aui.tsx`,
+`composer-model-picker.aui.tsx`, `composer-slash-commands.aui.tsx` and
+`composer-voice.aui.tsx` follow the runtime recipes on the upstream
+Elements pages. Imports rewritten to the kit's own, colors to kit tokens.
+
 When another component lands, its attribution goes here.
