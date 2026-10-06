@@ -1,5 +1,12 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.140] - ui-v0.5.140
+
+### SETTINGS-DOCK-01 follow-up
+
+The docked SettingsShell renders through a kit-owned portal so its viewport
+layout is independent of the centered page container it replaces.
+
 ## [0.5.139] - ui-v0.5.139
 
 ### SETTINGS-DOCK-01 follow-up

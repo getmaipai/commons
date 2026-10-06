@@ -28,8 +28,8 @@ function shell(over: Partial<SettingsShellProps> = {}) {
   return { view, onNavigate, onSearchChange };
 }
 
-const column = (c: HTMLElement) => c.querySelector("[data-slot=settings-column]") as HTMLElement;
-const content = (c: HTMLElement) => c.querySelector("[data-slot=settings-content]") as HTMLElement;
+const column = (c: HTMLElement) => c.ownerDocument.body.querySelector("[data-slot=settings-column]") as HTMLElement;
+const content = (c: HTMLElement) => c.ownerDocument.body.querySelector("[data-slot=settings-content]") as HTMLElement;
 
 describe("SettingsShell column", () => {
   test("a titled 288 px column: the area title, a pill search, the groups in order", () => {
@@ -187,11 +187,12 @@ describe("SettingsShell layout: two panes from lg, a drill-in below", () => {
 
   test("docked layout escapes the workspace gutter and stays aligned after the 56 px app rail", () => {
     const { view } = shell({ layout: "docked" });
-    const root = view.container.querySelector('[data-slot="settings-shell"]') as HTMLElement;
+    const root = view.baseElement.querySelector('[data-slot="settings-shell"]') as HTMLElement;
     expect(root.getAttribute("data-layout")).toBe("docked");
     expect(root.className).toContain("lg:fixed");
     expect(root.className).toContain("lg:left-14");
     expect(root.className).toContain("lg:w-auto");
+    expect(root.parentElement).toBe(view.baseElement);
     expect(content(view.container).firstElementChild?.className).toContain("max-w-(--settings-content-max)");
   });
 
@@ -213,12 +214,12 @@ describe("SettingsShell layout: two panes from lg, a drill-in below", () => {
 
     rerender({ layout: "docked", collapsible: { collapsed: true, onToggle, onPeekEnter: onPointerEnter } });
     expect(view.getByRole("button", { name: "Show settings sidebar" })).toBeTruthy();
-    const zone = view.container.querySelector('[data-slot="settings-sidebar-hover-zone"]')!;
+    const zone = view.baseElement.querySelector('[data-slot="settings-sidebar-hover-zone"]')!;
     fireEvent.pointerEnter(zone, { pointerType: "mouse" });
     expect(onPointerEnter).toHaveBeenCalledTimes(1);
 
     rerender({ layout: "docked", collapsible: { collapsed: true, peek: true, onToggle, onPeekEnter: onPointerEnter } });
-    expect(column(view.container).getAttribute("data-state")).toBe("peek");
+    expect(column(view.baseElement).getAttribute("data-state")).toBe("peek");
   });
 });
 

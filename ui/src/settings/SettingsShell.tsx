@@ -1,4 +1,5 @@
 import { useId, type MouseEvent, type PointerEventHandler, type ReactNode, type RefObject } from "react";
+import { createPortal } from "react-dom";
 import { SettingsHeadingLevelContext } from "./headingLevel";
 import { HitField } from "./HitField";
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
@@ -145,7 +146,7 @@ export function SettingsShell({
     onNavigate({ kind: section.kind === "link" ? "link" : "section", sectionId: section.id, href: rowHref(section) });
   }
 
-  return (
+  const shell = (
     <SidebarProvider
       keyboardShortcut={false}
       data-slot="settings-shell"
@@ -267,6 +268,7 @@ export function SettingsShell({
       </Content>
     </SidebarProvider>
   );
+  return layout === "docked" && typeof document !== "undefined" ? createPortal(shell, document.body) : shell;
 }
 
 function SettingsColumnToggle({ collapsed, peek = false, onToggle, buttonRef }: { collapsed: boolean; peek?: boolean; onToggle: () => void; buttonRef?: RefObject<HTMLButtonElement | null> }) {
