@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.123] - ui-v0.5.123
+
+### PROJECTS-01b (touch floor)
+
+The thread list's projects "+" and each project row's menu button keep
+their 24px look and gain a transparent 12px overhang, so both meet the
+48px touch-target floor (Home's a11y pass caught the "+").
+
 ## [0.5.122] - ui-v0.5.122
 
 ### K06 (contrast sweep, whole kit)

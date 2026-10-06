@@ -226,6 +226,14 @@ describe("ThreadList projects mode", () => {
     expect(item.getAttribute("draggable")).toBeNull();
   });
 
+  test("the + and the project menu button carry the 48px touch overhang", async () => {
+    const view = render(<Harness projects={{ folders, canManage: true, onCreate: async () => {}, onRename: async () => {} }} seeds={[{ remoteId: "a", title: "Alpha" }]} />);
+    const plus = await view.findByLabelText("New project");
+    expect(plus.className).toContain("before:-inset-3");
+    const more = (await projectRow(view, "Garden")).querySelector("[data-slot=aui_thread-list-project-more]") as HTMLElement;
+    expect(more.className).toContain("before:-inset-3");
+  });
+
   test("+ makes a project from an inline field", async () => {
     const onCreate = mock(async () => {});
     const view = render(<Harness projects={{ folders: [], canManage: true, onCreate }} seeds={[{ remoteId: "a", title: "Alpha" }]} />);
