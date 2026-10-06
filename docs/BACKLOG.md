@@ -360,35 +360,10 @@ capability, needs its own design pass first).
 
 - [x] **CAP-VOCAB-01: the capability vocabulary gains the engine roles** Landed 2026-09-23 (c-99n; the tag is cut by the coordinator after the diff is read). (S, spec first; from home's `docs/plans/hardware-tiers-2026-09-23.md`, "Capabilities follow the allocation"). `spec/vocab/capabilities.json` gains `vision`, `image`, `video`, `music`, `stt` and `tts`, named as the Stack's role ids, each with a one-line description in the vocabulary's own shape; the chat role keeps mapping to the existing `gpu_llm` or `cpu_llm` and the embed role to `embeddings`, so the list stays one list; the fixtures and the Python package regenerate; the spec tag is bumped and home and bot pin it. Acceptance: a manifest fixture with `requires: ["image"]` validates; the round-trip fixtures pass in TypeScript and Python. Exit: `bash scripts/check.sh` and the tag.
 
-- [x] **BODY-VOCAB-01: the capability vocabulary gains the body ids**
-  Landed 2026-10-05 (the tag, `spec-v0.1.74`, is cut by the coordinator
-  after the diff is read; `bot` pins it after). Twenty ids and two
-  fixtures, `device.robot-reachy-mini.example.json` and
-  `device.robot-maipai-build.example.json`, with a parametrized test in
-  each language; the generated TypeScript and Python are unchanged
-  because no schema changed (the vocabulary is read, not generated). The
-  one-line descriptions sit in the vocabulary's `$comment`, as
-  CAP-VOCAB-01 did.
-  (S, spec first, 2026-09-27; bot's RM-00, from
-  `bot/docs/dev/design-reachy-mini-2026-09-27.md` section 2, a body
-  profile's declaration). `spec/vocab/capabilities.json` gains the ids
-  a robot body declares on its `Device.capabilities` row, each with a
-  one-line description in the vocabulary's own shape: `head_6dof`,
-  `head_pan_tilt`, `roll`, `antennas`, `body_yaw`, `eyes`, `mouth`,
-  `light_ring`, `doa`, `state_feed`, `encoders`, `touch`, `distance`,
-  `imu`, `battery_readout`, `physical_mute`, `camera_shutter`,
-  `moves_recorded`, and the speech placement pair `speech_pod` and
-  `speech_robot`; two device fixtures, a Reachy Mini row (`kind:
-  robot`, `head_6dof`, `roll`, `antennas`, `body_yaw`, `camera`, `mic`,
-  `speaker`, `doa`, `state_feed`, `imu`, `moves_recorded`,
-  `speech_pod`) and a MaiPai-build row (`head_pan_tilt`, `eyes`,
-  `mouth`, `light_ring`, `encoders`, `touch`, `distance`, `imu`,
-  `battery_readout`, `speech_robot`, plus the existing `camera`, `mic`,
-  `speaker`, `motors`); the Python package regenerates; the tag is
-  bumped and `bot` pins it. Mirror: CAP-VOCAB-01 above. Acceptance:
-  both fixtures validate in TypeScript and Python; every existing
-  fixture unchanged. Out of scope: any renderer, the robot's 20-item
-  grant list. Exit: `bash scripts/check.sh` and the tag.
+- [ ] **BODY-VOCAB-01: the capability vocabulary gains the body ids** (S, spec first; amended 2026-10-05 for Reachy design v2). `eyes` already exists in `capabilities.json` (spec-v0.1.74) and is reused, not re-added; add `gestures` (a hand-gesture vocabulary the body can produce as observations) and `sound_events` (an on-body audio tagger; vocabulary only, the feature stays off and later per OWNER-ANSWERS 5); the Reachy Mini device fixture declares `head_6dof, roll, antennas, body_yaw, doa, state_feed, imu, camera, mic, speaker, speech_pod, moves_recorded` and `eyes` only in a second fixture that models the Eyes fitted. Acceptance: both fixtures validate in TypeScript and Python; the tag is bumped; home pins it; bot records the tag in AGENTS.md (no Python pin yet). Exit: `bash scripts/check.sh` and the tag.
+
+- [ ] **SPEC-ROBOT-01: the hub-to-robot command, the offer, the alarm, the asset manifest** (S, spec first, 2026-10-05; `home/data-scratch/research/reachy-design-v2/DESIGN-V2.md` section 10.3). Adds `spec/schemas/device-command.schema.json` (`id`, `kind` enum: `mute`, `unmute`, `capture_request`, `alarm`, `notify`, `notify_gesture`, `offer`, `play_move`, `settings_changed`, `time`, `live_view_start`, `live_view_stop`, `asset_changed`; `payload` by kind; `issued_at`; `expires_at`; `hlc`), `spec/schemas/robot-offer.schema.json` (`id`, `person_id`, `tier` 1 to 3, `text`, `expires_at`, `provenance`, `hlc`), the `safety.alarm` notification type in the notifications fixture (`level: immediate`, non-configurable, audience household, actions `acknowledge`, `quiet_here`, `false_alarm`), `spec/schemas/robot-asset-manifest.schema.json` (`id`, `file`, `sha256`, `bytes`, `licence`, `source_url`, `kind` enum `model`, `clip_bundle`, `moves`, `wheelhouse`) and the pin list `spec/assets/robot-assets.json` (openWakeWord melspectrogram and embedding v0.5.1, `trained_hey_maipai_v2`, SFace `0ba9fbfa...`, YuNet `face_detection_yunet_2026may` at revision `2b8e9223...`, the sherpa-onnx KWS zipformer 3.3M int8, each with sha256 and licence; no `moves` entry, the Pollen move pins live in PKG-MOVES-01's package manifest per OWNER-ANSWERS 7; no firmware row until AUDIO-FW-01's licence is read and recorded); `robot-state.schema.json` gains optional `watch_level` (`off`, `presence`, `identify`). Reuse check: the Stack's `/stack/v1/events` replay shape is the model for command ids; no new record kind beyond these four. Acceptance: fixtures for every command kind, one offer, one alarm, the full asset list validate in TypeScript and Python; a test that `robot-assets.json` has no entry without a 64-hex sha256 and a licence and no entry of kind `moves` or a firmware file; the tag. Exit: `bash scripts/check.sh` and the tag. Cloud: yes.
+
 - [ ] **S** A spec tag's settings registry is a superset of its parent
   tag's: the cut (`commons` `check.sh`, or a `spec/scripts/cut-tag.sh`
   if none exists) diffs `spec/settings/keys.json` against the previous
