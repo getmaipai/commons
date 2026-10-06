@@ -1,5 +1,12 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.137] - ui-v0.5.137
+
+### A11Y-COLUMN-01 (additive)
+
+Thread list New Chat and More options controls keep their compact visual sizes
+while receiving 48px hit areas.
+
 ## [0.5.136] - ui-v0.5.136
 
 ### PROJECTS-KIT-01b (additive)

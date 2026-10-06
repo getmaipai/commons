@@ -13,6 +13,7 @@ import {
   useAuiState,
 } from "@assistant-ui/react";
 import { ProjectMark } from "./project-mark";
+import { hitArea } from "../utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import {
@@ -927,6 +928,7 @@ export const ThreadListNew = forwardRef<
         data-slot="aui_thread-list-new"
         className={cn(
           "hover:bg-muted data-active:bg-muted h-8 justify-start gap-2 rounded-md px-2.5 text-sm font-normal",
+          hitArea(2),
           className,
         )}
         {...props}
@@ -1135,7 +1137,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
           variant="ghost"
           size="icon"
           data-slot="aui_thread-list-item-more"
-          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100"
+          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100 before:absolute before:-inset-3 before:content-['']"
         >
           <MoreHorizontalIcon className="size-3.5" />
           <span className="sr-only">More options</span>
