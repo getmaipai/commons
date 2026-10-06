@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/token-count-request.schema.json",
+  "title": "TokenCountRequest",
+  "description": "POST /v1/tokenize on the Stack (STACK-TOKENIZE-01): the chat engine's own token count. Send exactly one of `messages` (rendered with the engine's own chat template, no generation prompt, then tokenized; `tools` and `chat_template_kwargs` render into the prompt and are counted when sent) or `content` (a raw string, tokenized as given). `model` names a chat-wire role (`chat`, `coding`, `judge`, `router`, `vision`) or an installed chat model id. An image part counts as the template's media marker only.",
+  "type": "object",
+  "required": ["model"],
+  "properties": {
+    "model": { "type": "string", "minLength": 1 },
+    "timeout_ms": { "type": "integer", "minimum": 1 },
+    "messages": {
+      "type": "array",
+      "items": { "type": "object", "required": ["role"], "properties": { "role": { "type": "string" } } }
+    },
+    "content": { "type": "string" },
+    "tools": { "type": "array" },
+    "chat_template_kwargs": { "type": "object" }
+  },
+  "oneOf": [
+    { "required": ["messages"], "not": { "required": ["content"] } },
+    { "required": ["content"], "not": { "required": ["messages"] } }
+  ]
+}

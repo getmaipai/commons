@@ -8,7 +8,6 @@ scope lands.
 ## [Unreleased]
 
 ### Added
-- Person settings `reference.images` ("Show pictures in answers") and `chat.photo_uploads` ("Send photos in chat"): boolean, default true, honoured by home. Adults and teens are on by default, children are off until a parent enables them, and teens control their own (IMG-SPEC-KEYS).
 - Closed presence states, turn-stream event mappings, private activity ownership rules, resolver priority/timing, web/Eyes/body joins, emotion-map overlays, Row-Bot transition fixtures, and the optional `RobotState.presence` field (PRESENCE-STATES-01).
 - Household, person, and robot device settings for Reachy, including the default-off tailnet opt-in and the six Home-honoured robot controls (SETTINGS-ROBOT-01). Filed the EYES-07 quiet-hours follow-up.
 - Closed emotion-to-primitive and optional clip map, the twelve emotion labels, optional `ReplyPlan.react_move`, and the `thinking`, `offer`, and `shake` primitive names (EMO-MAP-01).
@@ -16,6 +15,12 @@ scope lands.
 - `DeviceCommand`, `RobotOffer`, and `RobotAssetManifest` schemas and fixtures, the fixed household `safety.alarm` notification declaration, the checksum and licence pinned base robot asset list, and optional `watch_level` on `robot.state` (SPEC-ROBOT-01). No moves or firmware are in the base asset list.
 - Optional `motion` (`resting` or `held`, null when the body cannot tell) and optional `put_down_count` (non-negative integer) on `robot.state` (MOVE-CARRY-02). `activity` gains no value. Two fixtures: `robot-state.held.example.json` and `robot-state.resting.example.json`.
 - `vocab/capabilities.json`: the twenty body ids a robot declares on its device row (`head_6dof`, `head_pan_tilt`, `roll`, `antennas`, `body_yaw`, `eyes`, `mouth`, `light_ring`, `doa`, `state_feed`, `encoders`, `touch`, `distance`, `imu`, `battery_readout`, `physical_mute`, `camera_shutter`, `moves_recorded`, `speech_pod`, `speech_robot`), and two robot device fixtures, a Reachy Mini and a MaiPai build (BODY-VOCAB-01).
+
+## [spec-v0.1.80] - 2026-10-06
+
+### Added
+- Person settings `reference.images` ("Show pictures in answers") and `chat.photo_uploads` ("Send photos in chat"): boolean, default true, honoured by home. Adults and teens are on by default, children are off until a parent enables them, and teens control their own (IMG-SPEC-KEYS).
+- `TokenCountRequest` and `TokenCountResponse` (schemas, Zod mirrors in `stack/ts/token-count.ts`, fixtures): the Stack's `POST /v1/tokenize`, the chat engine's own token count on its own template render (STACK-TOKENIZE-01, for Home's THIN-3B). `LlamaServerClient.countTokens()` takes the same count from a llama-server directly (`/apply-template`, then `/tokenize`), and the stub server answers all three routes offline.
 
 ## [spec-v0.1.79] - 2026-10-06
 

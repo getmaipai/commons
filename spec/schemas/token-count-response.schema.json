@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/token-count-response.schema.json",
+  "title": "TokenCountResponse",
+  "description": "The Stack's answer to POST /v1/tokenize: the number of tokens the engine's own tokenizer produced, with the role reply identity headers naming the model that counted. Never an estimate: an engine with no token-count route answers 501 instead.",
+  "type": "object",
+  "required": ["count"],
+  "additionalProperties": false,
+  "properties": {
+    "count": { "type": "integer", "minimum": 0 }
+  }
+}

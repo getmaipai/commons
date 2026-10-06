@@ -16,6 +16,51 @@ afterEach(async () => {
 });
 
 describe("LlamaServerClient against the stub server", () => {
+  test("countTokens counts the engine's template render of the messages, tools included, and raw content as given", async () => {
+    handle = startStubLlmServer();
+    const client = new LlamaServerClient(handle.url);
+    const messages = [{ role: "user", content: "hello there" }];
+    // The stub's render is "<|im_start|>user\nhello there<|im_end|>\n": the
+    // role and two words plus two markers, so the count is the template's,
+    // not the bare words'.
+    expect(await client.countTokens({ messages })).toBe(5);
+    expect(await client.countTokens({ content: "hello there" })).toBe(2);
+    const withTools = await client.countTokens({ messages, tools: [{ type: "function", function: { name: "web_search" } }] });
+    expect(withTools).toBeGreaterThan(5);
+    await expect(client.countTokens({})).rejects.toThrow(LlmClientError);
+  });
+
+  test("the stub's Stack-shaped /v1/tokenize answers the same count as the engine's two routes", async () => {
+    handle = startStubLlmServer();
+    const messages = [{ role: "system", content: "Be kind." }, { role: "user", content: "hello" }];
+    const res = await fetch(`${handle.url}/v1/tokenize`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "chat", messages }) });
+    expect(await res.json()).toEqual({ count: await new LlamaServerClient(handle.url).countTokens({ messages }) });
+    const post = (body: unknown) => fetch(`${handle!.url}/v1/tokenize`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    expect((await post({ model: "chat" })).status).toBe(400);
+    expect((await post({ model: "chat", messages, content: "hello" })).status).toBe(400);
+    expect((await post({ messages })).status).toBe(400);
+  });
+
+  test("countTokens throws an LlmClientError on an unreadable or empty body", async () => {
+    const server = Bun.serve({ port: 0, fetch: (req) => new URL(req.url).pathname === "/tokenize" ? new Response("null", { headers: { "content-type": "application/json" } }) : new Response("<html>proxy</html>") });
+    try {
+      const client = new LlamaServerClient(`http://127.0.0.1:${server.port}`);
+      await expect(client.countTokens({ messages: [{ role: "user", content: "hi" }] })).rejects.toThrow(LlmClientError);
+      await expect(client.countTokens({ content: "hi" })).rejects.toThrow(LlmClientError);
+    } finally {
+      server.stop(true);
+    }
+  });
+
+  test("countTokens throws, never estimates, when the engine has no count route", async () => {
+    const server = Bun.serve({ port: 0, fetch: () => new Response("not found", { status: 404 }) });
+    try {
+      await expect(new LlamaServerClient(`http://127.0.0.1:${server.port}`).countTokens({ content: "hi" })).rejects.toThrow(/returned 404/);
+    } finally {
+      server.stop(true);
+    }
+  });
+
   test("health reports ready once the stub is up", async () => {
     handle = startStubLlmServer();
     const client = new LlamaServerClient(handle.url);

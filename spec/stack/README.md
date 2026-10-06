@@ -7,7 +7,10 @@ ids, the health item, the settings declaration (a `SettingsKey` from
 precious-state declaration, the speech session's `SttWireEvent` and
 `SttTranscribeResponse` (mirrors of `spec/voice/ts/sttTypes.ts`,
 STACK-94b; the Stack adds nothing to them), and the job (`StackJob`,
-STACK-13a: the unit of work Home submits, watches, cancels and reads).
+STACK-13a: the unit of work Home submits, watches, cancels and reads),
+and the token count (`TokenCountRequest` and `TokenCountResponse`,
+STACK-TOKENIZE-01: `POST /v1/tokenize`, the chat engine's own count on
+its own template render, never an estimate).
 
 Each is a JSON Schema 2020-12 file under `../schemas/` (flat, alongside
 every other record and package shape), a hand-written Zod mirror under

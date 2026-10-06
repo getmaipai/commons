@@ -50,10 +50,22 @@ export interface ChatCompletionStreamStats {
 // without waiting out the real default.
 const DEFAULT_CHAT_TIMEOUT_MS = 120_000;
 const DEFAULT_EMBED_TIMEOUT_MS = 30_000;
+const DEFAULT_COUNT_TIMEOUT_MS = 10_000;
 
 export interface LlamaServerClientOptions {
   chatTimeoutMs?: number;
   embedTimeoutMs?: number;
+  countTimeoutMs?: number;
+}
+
+/** STACK-TOKENIZE-01: what a token count is taken on (the Stack's
+ * TokenCountRequest without its routing fields): exactly one of the
+ * messages, rendered with the engine's own template, or raw content. */
+export interface TokenCountInput {
+  messages?: ReadonlyArray<Record<string, unknown>>;
+  content?: string;
+  tools?: readonly unknown[];
+  chat_template_kwargs?: Record<string, unknown>;
 }
 
 // A remote engine's address must not reach the hub's log or a 503 body, so
@@ -135,6 +147,51 @@ export class LlamaServerClient {
       throw new LlmClientError(`POST /v1/chat/completions returned ${res.status}`);
     }
     return (await res.json()) as ChatCompletionResponse;
+  }
+
+  /** STACK-TOKENIZE-01: the engine's own token count. Messages are
+   * rendered by the engine's `/apply-template` (no generation prompt;
+   * tools and template switches included) and the result tokenized by
+   * its `/tokenize`; raw content goes straight to `/tokenize`. Never an
+   * estimate: any failure throws, and the caller decides the fallback.
+   * The Stack's POST /v1/tokenize is the same two calls behind one role
+   * route. */
+  async countTokens(input: TokenCountInput): Promise<number> {
+    if ((input.messages === undefined) === (input.content === undefined)) {
+      throw new LlmClientError("Send exactly one of messages or content");
+    }
+    const timeoutMs = this.opts.countTimeoutMs ?? DEFAULT_COUNT_TIMEOUT_MS;
+    const post = async (path: string, body: unknown): Promise<unknown> => {
+      let res: Response;
+      try {
+        res = await fetch(`${this.baseUrl}${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(timeoutMs) });
+      } catch (err) {
+        throw timeoutError(this.baseUrl, `POST ${path}`, timeoutMs, err);
+      }
+      if (!res.ok) throw new LlmClientError(`POST ${path} returned ${res.status}`);
+      // Every failure is an LlmClientError, the body read included (a
+      // review): a caller catches one type and chooses its own fallback.
+      let parsed: unknown;
+      try {
+        parsed = await res.json();
+      } catch (err) {
+        throw new LlmClientError(`POST ${path} returned an unreadable body`, err);
+      }
+      if (typeof parsed !== "object" || parsed === null) throw new LlmClientError(`POST ${path} returned no object`);
+      return parsed;
+    };
+    let content = input.content;
+    if (input.messages !== undefined) {
+      const rendered = (await post("/apply-template", { messages: input.messages, add_generation_prompt: false, ...(input.tools ? { tools: input.tools } : {}), ...(input.chat_template_kwargs ? { chat_template_kwargs: input.chat_template_kwargs } : {}) })) as { prompt?: unknown };
+      if (typeof rendered.prompt !== "string") throw new LlmClientError("POST /apply-template returned no prompt");
+      content = rendered.prompt;
+    }
+    // add_special: the BOS a model's tokenizer adds is counted, as the
+    // completion path adds it (llama-server never doubles one the
+    // template already wrote).
+    const counted = (await post("/tokenize", { content, add_special: true })) as { tokens?: unknown };
+    if (!Array.isArray(counted.tokens)) throw new LlmClientError("POST /tokenize returned no tokens");
+    return counted.tokens.length;
   }
 
   /** 4.11's `embed` role (2026-09-04): a real llama-server started with

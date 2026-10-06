@@ -250,6 +250,26 @@ export interface StubLlmServerOptions {
   scriptedReasoning?: (request: ChatCompletionRequest) => string | undefined;
 }
 
+/** STACK-TOKENIZE-01: the stub's chat template, a ChatML-shaped render
+ * (each message `<|im_start|>role\ncontent<|im_end|>\n`, a tool call as its
+ * JSON, the tools block ahead of everything), so a count on rendered
+ * messages differs from a count on the bare text the way a real
+ * engine's does. */
+export function stubRenderTemplate(messages: ReadonlyArray<{ role?: unknown; content?: unknown; tool_calls?: unknown }>, tools?: readonly unknown[]): string {
+  const toolsBlock = tools && tools.length > 0 ? `<|im_start|>system\n<tools>${JSON.stringify(tools)}</tools><|im_end|>\n` : "";
+  return toolsBlock + messages.map((m) => {
+    const content = typeof m.content === "string" ? m.content : m.content === undefined || m.content === null ? "" : JSON.stringify(m.content);
+    const calls = m.tool_calls ? `<tool_call>${JSON.stringify(m.tool_calls)}</tool_call>` : "";
+    return `<|im_start|>${String(m.role ?? "user")}\n${content}${calls}<|im_end|>\n`;
+  }).join("");
+}
+
+/** The stub's tokenizer: a special marker, a run of letters or digits, or
+ * one other non-space character is one token. Deterministic, offline. */
+export function stubTokenize(content: string): number[] {
+  return (content.match(/<\|[^|]+\|>|[A-Za-z0-9]+|[^\sA-Za-z0-9]/g) ?? []).map((_, index) => index);
+}
+
 /** port 0 lets the OS assign a free port, avoiding a fixed-port clash
  * when tests and a dev server both start a stub. */
 export function startStubLlmServer(port = 0, opts: StubLlmServerOptions = {}): StubLlmServerHandle {
@@ -314,6 +334,26 @@ export function startStubLlmServer(port = 0, opts: StubLlmServerOptions = {}): S
           });
         }
         return Response.json(handleChatCompletion(body));
+      }
+      // STACK-TOKENIZE-01: llama-server's own two routes, and the Stack's
+      // role route that chains them, so Home's and the Stack's tests count
+      // offline.
+      if (url.pathname === "/apply-template" && req.method === "POST") {
+        const body = (await req.json().catch(() => null)) as { messages?: unknown; tools?: unknown[] } | null;
+        if (!body || !Array.isArray(body.messages)) return Response.json({ error: "messages is required" }, { status: 400 });
+        return Response.json({ prompt: stubRenderTemplate(body.messages as Array<{ role?: unknown; content?: unknown }>, body.tools) });
+      }
+      if (url.pathname === "/tokenize" && req.method === "POST") {
+        const body = (await req.json().catch(() => null)) as { content?: unknown } | null;
+        if (!body || typeof body.content !== "string") return Response.json({ error: "content is required" }, { status: 400 });
+        return Response.json({ tokens: stubTokenize(body.content) });
+      }
+      if (url.pathname === "/v1/tokenize" && req.method === "POST") {
+        const body = (await req.json().catch(() => null)) as { model?: unknown; messages?: unknown; content?: unknown; tools?: unknown[] } | null;
+        if (!body || typeof body.model !== "string" || body.model.length === 0) return Response.json({ error: "model is required" }, { status: 400 });
+        if (Array.isArray(body.messages) === (typeof body.content === "string")) return Response.json({ error: "Send exactly one of `messages` or `content`." }, { status: 400 });
+        const content = Array.isArray(body.messages) ? stubRenderTemplate(body.messages as Array<{ role?: unknown; content?: unknown }>, body.tools) : (body.content as string);
+        return Response.json({ count: stubTokenize(content).length });
       }
       if (url.pathname === "/v1/embeddings" && req.method === "POST") {
         const body = (await req.json().catch(() => null)) as EmbeddingRequest | null;

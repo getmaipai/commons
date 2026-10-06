@@ -34,6 +34,7 @@ import { SttWireEvent } from "../../stack/ts/stt-wire-event";
 import { SttTranscribeResponse } from "../../stack/ts/stt-transcribe-response";
 import { StackJob } from "../../stack/ts/stack-job";
 import { TurnStreamEvent } from "../../stack/ts/turn-stream-event";
+import { TokenCountRequest, TokenCountResponse } from "../../stack/ts/token-count";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
@@ -50,6 +51,8 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "stt-transcribe-response", zod: SttTranscribeResponse },
   { name: "stack-job", zod: StackJob },
   { name: "turn-stream-event", zod: TurnStreamEvent },
+  { name: "token-count-request", zod: TokenCountRequest },
+  { name: "token-count-response", zod: TokenCountResponse },
 ];
 
 for (const shape of SHAPES) {
