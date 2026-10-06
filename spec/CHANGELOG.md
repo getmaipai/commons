@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.84] - 2026-10-06
+
+### Added
+- Optional `thinking_mode` on `ModelCapabilities` (`switchable`, `none` or `always`): the record says whether the model can reason before it answers, so a host shows or hides its thinking control from the record, never from a model id. A record written before the field falls back to its turn budget's `thinking_budget_tokens_toggled`. A chat-role record may carry `image_input` (nothing restricts it to the vision role). New fixture `model-capabilities.vision-chat.example.json`: Qwen3-VL-8B-Instruct as a chat model with its projector and no thinking mode (VISION-02a).
+
 ## [spec-v0.1.83] - 2026-10-06
 
 ### Added

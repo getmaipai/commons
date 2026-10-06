@@ -378,6 +378,7 @@ def test_error_catalogue_entries():
         "music-role",
         "background-turns",
         "vision-role",
+        "vision-chat",
     ],
 )
 def test_model_capabilities_fixtures(kind):
@@ -572,3 +573,21 @@ def test_person_with_unknown_field_is_rejected():
 
 def test_robot_hello_setting_fixture():
     SettingsKey.model_validate(load_fixture("settings-key.robot-hello.example.json"))
+
+
+def test_model_capabilities_vision_chat_declares_no_thinking_mode():
+    parsed = ModelCapabilities.model_validate(
+        load_fixture("model-capabilities.vision-chat.example.json")
+    )
+    assert parsed.role == "chat"
+    assert parsed.image_input is not None
+    assert parsed.thinking_mode == "none"
+
+
+def test_model_capabilities_rejects_unknown_thinking_mode():
+    bad = {
+        **load_fixture("model-capabilities.vision-chat.example.json"),
+        "thinking_mode": "sometimes",
+    }
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate(bad)

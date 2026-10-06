@@ -301,7 +301,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts", "judge-role", "rerank-role", "music-role", "background-turns", "vision-role"]) {
+  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts", "judge-role", "rerank-role", "music-role", "background-turns", "vision-role", "vision-chat"]) {
     test(`model-capabilities.${kind}.example.json`, () => {
       expect(() =>
         ModelCapabilities.parse(loadFixture(`model-capabilities.${kind}.example.json`)),
@@ -329,6 +329,22 @@ describe("record fixtures validate against their generated Zod models", () => {
     const { sha256: _sha256, ...download } = fixture.image_input.projector.download;
     const bad = { ...fixture, image_input: { projector: { ...fixture.image_input.projector, download } } };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
+  });
+
+  test("model-capabilities: a chat model reads pictures and declares it has no thinking mode (VISION-02a)", () => {
+    const parsed = ModelCapabilities.parse(loadFixture("model-capabilities.vision-chat.example.json"));
+    expect(parsed.role).toBe("chat");
+    expect(parsed.image_input?.projector.file).toBe("mmproj-Qwen3VL-8B-Instruct-Q8_0.gguf");
+    expect(parsed.thinking_mode).toBe("none");
+  });
+
+  test("model-capabilities with an unknown thinking_mode is rejected (VISION-02a)", () => {
+    const bad = { ...(loadFixture("model-capabilities.vision-chat.example.json") as Record<string, unknown>), thinking_mode: "sometimes" };
+    expect(() => ModelCapabilities.parse(bad)).toThrow();
+  });
+
+  test("model-capabilities written before thinking_mode still validates without it (VISION-02a)", () => {
+    expect(ModelCapabilities.parse(loadFixture("model-capabilities.chat.example.json")).thinking_mode).toBeUndefined();
   });
 
   test("model-capabilities: a text-only model carries no image_input (VISION-01a)", () => {
