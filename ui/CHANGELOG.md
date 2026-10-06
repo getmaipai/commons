@@ -1,5 +1,17 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.113] - ui-v0.5.113
+
+### APPROVE-CARD-02
+
+`ApprovalCard` gains optional, additive props so an ask that is not a
+terminal command can use it as it ships: `icon` replaces the terminal glyph,
+`command` may be left out (the monospace box is then not drawn),
+`statusLabels` words the running, done and denied rows, and `allowHint`
+renders inside Allow once (a keyboard hint). A request with no handlers no
+longer draws an empty button row. With none of them set the card is
+unchanged. Tests cover the unset case and each prop.
+
 ## [0.5.112] - ui-v0.5.112
 
 ### STREAMING-TEXT-01 fix
