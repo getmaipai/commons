@@ -1,5 +1,21 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.107] - ui-v0.5.107
+
+### RAIL-01
+
+Add the rail layout, opt-in through `FullLayout`'s `rail` prop (owner's
+chat shell layout, 2026-10-06): a permanent 56px `AppRail` (brand, global
+Search through the shipped `HeaderSearch`, the app entries from
+`sidebaritems`, and a `railProfile` slot pinned at its foot) in place of the
+expanding sidebar, and a slim 52px page title bar drawn only when a page
+places content in the header slot. Add `RailProfileMenu`: the avatar with a
+count badge or attention dot, opening the shipped DropdownMenu with the
+person's identity and rows for Notifications, System status, Incognito,
+Settings, Help and Log out, each fed by the host. `HeaderSearch` gains an
+additive `triggerClassName`. Without `rail`, `FullLayout` renders exactly as
+before.
+
 ## [0.5.106] - ui-v0.5.106
 
 ### ACTIVITY-01d

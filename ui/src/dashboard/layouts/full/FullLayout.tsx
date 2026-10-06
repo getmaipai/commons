@@ -1,4 +1,6 @@
-import { FC, useState } from 'react';
+import { FC, useState, type ReactNode } from 'react';
+import AppRail from './vertical/rail/AppRail';
+import { useHeaderExtraLeft } from './vertical/header/HeaderExtraContext';
 import Sidebar from './vertical/sidebar/Sidebar';
 import Header, { type HeaderProps } from './vertical/header/Header';
 import { HeaderExtraProvider } from './vertical/header/HeaderExtraContext';
@@ -42,6 +44,46 @@ export interface FullLayoutProps {
   showHeaderSidebarTrigger?: boolean;
   /** Pass optional Home status markers to the menu entries. */
   sidebarItemStatus?: (item: { name: string; url?: string }) => { title: string; ariaLabel: string } | undefined;
+  /** RAIL-01 (home, owner's layout 2026-10-06): the permanent 56px app
+   * rail in place of the expanding sidebar and the global header. The
+   * rail holds the brand, Search, the apps and `railProfile` at its
+   * bottom; the header becomes a slim, page-only title bar drawn only
+   * when a page places content in it. Off by default, so every other
+   * consumer keeps the sidebar layout unchanged. */
+  rail?: boolean;
+  /** The profile control at the bottom of the rail (RailProfileMenu). */
+  railProfile?: ReactNode;
+}
+
+/** The slim title bar of the rail layout: the page's own header content
+ * only, 52px tall, one bottom divider. A page that draws its own header
+ * (chat, beside its history column) places nothing and gets none. */
+function RailPageHeader() {
+  const Left = useHeaderExtraLeft();
+  if (!Left) return null;
+  return (
+    <header data-slot="rail-page-header" className="sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5">
+      <Left />
+    </header>
+  );
+}
+
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile }: FullLayoutProps) {
+  return (
+    <HeaderExtraProvider>
+      <div data-slot="rail-shell" className="flex h-svh w-full overflow-hidden">
+        <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} />
+        <main data-slot="rail-workspace" className="flex min-w-0 flex-1 flex-col" style={{ background: "var(--page)" }}>
+          <RailPageHeader />
+          <div data-slot="rail-body" className="min-h-0 flex-1 overflow-y-auto">
+            <div className={cn("w-full mx-auto p-4", "container")}>
+              <Outlet />
+            </div>
+          </div>
+        </main>
+      </div>
+    </HeaderExtraProvider>
+  );
 }
 
 export function resolveInitialSidebarOpen(cookie: string, defaultOpen: boolean): boolean {
@@ -49,7 +91,12 @@ export function resolveInitialSidebarOpen(cookie: string, defaultOpen: boolean):
   return stored === "true" ? true : stored === "false" ? false : defaultOpen;
 }
 
-const FullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator, notifications, defaultSidebarOpen = true, showSidebarTriggerInMenu = false, showHeaderSidebarTrigger = true, sidebarItemStatus }) => {
+const FullLayout: FC<FullLayoutProps> = (props) => {
+  if (props.rail) return <RailLayout {...props} />;
+  return <SidebarFullLayout {...props} />;
+};
+
+const SidebarFullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator, notifications, defaultSidebarOpen = true, showSidebarTriggerInMenu = false, showHeaderSidebarTrigger = true, sidebarItemStatus }) => {
   const [initialSidebarOpen] = useState(() => {
     return resolveInitialSidebarOpen(typeof document === "undefined" ? "" : document.cookie, defaultSidebarOpen);
   });

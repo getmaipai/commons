@@ -72,6 +72,10 @@ export interface HeaderSearchProps {
    * is swallowed - the previous groups just stay on screen, never a
    * crash over a caller's own network hiccup. */
   remote?: (query: string) => Promise<SearchGroup[]>;
+  /** RAIL-01 (2026-10-06): the app rail draws this same button as a
+   * rail icon (rounded square, rail hover fill); merged over the
+   * header's own classes. */
+  triggerClassName?: string;
 }
 
 /** SHELL-SEARCH-01 (home, 2026-09-23): the header's one global search -
@@ -87,7 +91,7 @@ export interface HeaderSearchProps {
  * same icon and dialog, so a component TYPE slot (that pattern's own
  * reason for existing) isn't needed here - `Header.tsx` just renders
  * this unconditionally, the same as its other two right-group icons. */
-const HeaderSearch = ({ remote }: HeaderSearchProps = {}) => {
+const HeaderSearch = ({ remote, triggerClassName }: HeaderSearchProps = {}) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [remoteGroups, setRemoteGroups] = useState<SearchGroup[]>([]);
@@ -206,7 +210,7 @@ const HeaderSearch = ({ remote }: HeaderSearchProps = {}) => {
         // Owner ruling, 2026-09-27, accessibility touch-target fix - see
         // docs/BACKLOG.md SHELL-09. Keep the 40px search artwork and add
         // the shared kit's 48px hit area around it.
-        className={cn("h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer", hitArea(1))}
+        className={cn("h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer", hitArea(1), triggerClassName)}
         onClick={() => setOpen(true)}
       >
         <SearchIcon className="size-5" />
