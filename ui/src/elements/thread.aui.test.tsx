@@ -24,11 +24,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter }: { ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter }) {
+function Harness({ composerDensity, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter }: { composerDensity?: "compact"; ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter }) {
   const runtime = useLocalRuntime(runAdapter ?? (error ? failingAdapter : adapter));
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
+      <Thread components={composerDensity || ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { composerDensity, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
     </AssistantRuntimeProvider>
   );
 }
@@ -314,5 +314,52 @@ describe("Thread's assistantActionBarAutohide option", () => {
     const { findByText } = render(<SeededHarness components={{ assistantActionBarAutohide: "never" }} />);
     await findByText("second answer");
     expect(assistantRowsWithCopy()).toEqual([true, true]);
+  });
+});
+
+describe("Thread's composerDensity option (ELT-COMPOSER-KIT-01)", () => {
+  const shell = () => document.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement;
+
+  test("unset, the composer carries no density and the stylesheet never applies", () => {
+    render(<Harness />);
+    expect(shell().hasAttribute("data-density")).toBe(false);
+    expect(document.querySelector(".aui-thread-root")?.hasAttribute("data-density")).toBe(false);
+  });
+
+  test('"compact" marks the thread root and the composer shell', () => {
+    render(<Harness composerDensity="compact" />);
+    expect(shell().getAttribute("data-density")).toBe("compact");
+    expect(document.querySelector(".aui-thread-root")?.getAttribute("data-density")).toBe("compact");
+  });
+
+  test("compact sets data-multiline once the text has a line break and clears it when emptied", async () => {
+    const { getByRole } = render(<Harness composerDensity="compact" />);
+    const input = getByRole("textbox", { name: "Message input" });
+    expect(shell().hasAttribute("data-multiline")).toBe(false);
+    fireEvent.change(input, { target: { value: "one line" } });
+    expect(shell().hasAttribute("data-multiline")).toBe(false);
+    fireEvent.change(input, { target: { value: "one\ntwo" } });
+    await waitFor(() => expect(shell().hasAttribute("data-multiline")).toBe(true));
+    fireEvent.change(input, { target: { value: "one" } });
+    expect(shell().hasAttribute("data-multiline")).toBe(true);
+    fireEvent.change(input, { target: { value: "" } });
+    await waitFor(() => expect(shell().hasAttribute("data-multiline")).toBe(false));
+  });
+
+  test("the default density never sets data-multiline", async () => {
+    const { getByRole } = render(<Harness />);
+    fireEvent.change(getByRole("textbox", { name: "Message input" }), { target: { value: "one\ntwo" } });
+    expect(shell().hasAttribute("data-multiline")).toBe(false);
+  });
+
+  test("the stylesheet is scoped to the compact density and exposes its tokens", async () => {
+    const css = await Bun.file(new URL("./thread-composer.css", import.meta.url)).text();
+    const selectors = css.replace(/\/\*[\s\S]*?\*\//g, "").split("{").map((chunk) => chunk.split("}").pop()!.trim()).filter((s) => s && !s.startsWith("@media"));
+    for (const selector of selectors) {
+      for (const part of selector.split(",")) expect(part).toContain('[data-density="compact"]');
+    }
+    for (const token of ["row-height", "control-size", "send-size", "inset-start", "inset-end", "inset-y", "radius", "max-height"]) {
+      expect(css).toContain(`--composer-compact-${token}`);
+    }
   });
 });

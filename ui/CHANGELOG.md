@@ -1,5 +1,22 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.114] - ui-v0.5.114
+
+### ELT-COMPOSER-KIT-01 (additive)
+
+Thread takes `components.composerDensity: "compact"`, the slim ChatGPT-shaped
+composer Home had been building with its own CSS. The layout now lives in the
+kit once (`elements/thread-composer.css`): an empty or one-line composer is a
+single 56px row (Add 32px, text, trailing group, Send 36px), wrapped text takes
+its own row with the controls anchored below, the field caps at 160px and
+scrolls inside, the model label is 13px and truncates before the mic, and every
+control keeps a 48px hit area. The kit sets `data-multiline` on the shell itself.
+A caller tunes it through the `--composer-compact-*` custom properties (row
+height, control size, send size, insets, radius, max height, text size, label
+size, colors) and writes no selector against the kit's markup. New export
+`ComposerInputField`, the kit's own text field, for a `ComposerInputOverride`
+that must render the real input. The default density is unchanged.
+
 ## [0.5.113] - ui-v0.5.113
 
 ### APPROVE-CARD-02

@@ -1,0 +1,175 @@
+/* Thread composer, compact density (COMPOSER-01 shape, moved into the kit by
+ * ELT-COMPOSER-KIT-01). `<Thread components={{ composerDensity: "compact" }}>`
+ * sets `data-density="compact"` on the thread root and the composer shell;
+ * nothing here applies without it, so every other Thread keeps the default
+ * composer. A caller tunes the look by setting the `--composer-compact-*`
+ * custom properties below on any ancestor (each has the default shown), and
+ * never writes a selector against the kit's markup.
+ *
+ *   --composer-compact-row-height   empty or one-line composer     56px
+ *   --composer-compact-control-size round controls (Add, mic, ...)  32px
+ *   --composer-compact-send-size    Send and Stop                   36px
+ *   --composer-compact-inset-start  left padding                    12px
+ *   --composer-compact-inset-end    right padding                   10px
+ *   --composer-compact-inset-y      top and bottom padding           3px
+ *   --composer-compact-radius       shell corner radius             20px
+ *   --composer-compact-max-height   text field cap, it scrolls      160px
+ *   --composer-compact-text-size    text field type size            15px
+ *   --composer-compact-text-line    text field line height          22px
+ *   --composer-compact-label-size   model label type size           13px
+ *   --composer-compact-bottom-gap   space under the composer        16px
+ *   --composer-compact-bg           shell fill       (--composer-bg)
+ *   --composer-compact-border       shell outline
+ *   --composer-compact-border-focus focused outline
+ *
+ * Empty or one line it is one row: Add, the text, then the trailing group
+ * (model label, voice, Send). When the text wraps the kit sets
+ * `data-multiline` on the shell: the text takes its own row and the controls
+ * stay anchored on the row below. The kit's two action groups are placed in
+ * a grid with `display: contents`, so the markup is unchanged. Every control
+ * keeps a 48px hit area through an invisible pseudo-element. */
+.aui-thread-root[data-density="compact"] .aui-thread-viewport-footer {
+  padding-bottom: var(--composer-compact-bottom-gap, 16px);
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] {
+  --_row: var(--composer-compact-row-height, 56px);
+  --_control: var(--composer-compact-control-size, 32px);
+  --_send: var(--composer-compact-send-size, 36px);
+  --_inset-y: var(--composer-compact-inset-y, 3px);
+  --_field-min: calc(var(--_row) - 2 * var(--_inset-y) - 2px);
+  --_hit: 48px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "att att att" "lead input trail";
+  align-items: end;
+  gap: 0;
+  min-height: var(--_row);
+  padding: var(--_inset-y) var(--composer-compact-inset-end, 10px) var(--_inset-y) var(--composer-compact-inset-start, 12px);
+  border-radius: var(--composer-compact-radius, 20px);
+  background: var(--composer-compact-bg, var(--composer-bg));
+  border-color: var(--composer-compact-border, color-mix(in oklab, var(--foreground) 10%, transparent));
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"]:focus-within {
+  border-color: var(--composer-compact-border-focus, color-mix(in oklab, var(--foreground) 25%, transparent));
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"][data-multiline] {
+  grid-template-areas: "att att att" "input input input" "lead . trail";
+}
+
+/* A phone row cannot hold the text beside the model label, so with the label
+ * present the text takes its own row from the start. */
+@media (max-width: 639px) {
+  [data-slot="aui_composer-shell"][data-density="compact"]:has([data-slot="model-selector-trigger"]) {
+    grid-template-areas: "att att att" "input input input" "lead . trail";
+  }
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] > :not(.aui-composer-attachments):not(.aui-composer-action-wrapper) {
+  grid-area: input;
+  min-width: 0;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-attachments,
+[data-slot="aui_composer-shell"][data-density="compact"] [data-slot="composer-attachments"] {
+  grid-area: att;
+  padding: 4px 0 6px;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] textarea {
+  box-sizing: border-box;
+  min-height: var(--_field-min);
+  max-height: var(--composer-compact-max-height, 160px);
+  padding: calc((var(--_field-min) - var(--composer-compact-text-line, 22px)) / 2) 8px;
+  font-size: var(--composer-compact-text-size, 15px);
+  line-height: var(--composer-compact-text-line, 22px);
+}
+
+/* A placeholder never wraps to a second line (it would grow the empty row),
+ * and the autosize measures it, so an empty field is exactly one line. */
+[data-slot="aui_composer-shell"][data-density="compact"] textarea:placeholder-shown {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-height: var(--_field-min) !important;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper {
+  display: contents;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper > :first-child {
+  grid-area: lead;
+  height: 48px;
+  align-items: center;
+  gap: 2px;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper > :last-child {
+  grid-area: trail;
+  height: 48px;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Every round control is one size; Send and Stop are a little larger. The
+ * menu rows inside a phone Add menu and the model label are not controls of
+ * this kind. */
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper button:where(:not([data-slot="composer-menu-item"]):not([data-slot="model-selector-trigger"])) {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--_control);
+  height: var(--_control);
+  flex: none;
+  border-radius: 9999px;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper button:where(:not([data-slot="composer-menu-item"]):not([data-slot="model-selector-trigger"]))::before {
+  position: absolute;
+  inset: calc((var(--_control) - var(--_hit)) / 2);
+  content: "";
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper .aui-composer-send,
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper .aui-composer-cancel {
+  width: var(--_send);
+  height: var(--_send);
+  margin-inline-start: 2px;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper .aui-composer-send::before,
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper .aui-composer-cancel::before {
+  inset: calc((var(--_send) - var(--_hit)) / 2);
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* The model label reads quiet: small type, no border, a small chevron, and
+ * it truncates before it pushes the mic off the row. */
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper [data-slot="model-selector-trigger"] {
+  height: var(--_control);
+  min-width: 0;
+  max-width: 10rem;
+  flex-shrink: 1;
+  padding: 0 8px;
+  gap: 4px;
+  font-size: var(--composer-compact-label-size, 13px);
+  line-height: 20px;
+  color: var(--muted-foreground);
+  border-radius: 9999px;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper [data-slot="model-selector-trigger"]:hover {
+  color: var(--foreground);
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper [data-slot="model-selector-trigger"] svg {
+  width: 14px;
+  height: 14px;
+}

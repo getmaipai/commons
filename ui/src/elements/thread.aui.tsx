@@ -9,6 +9,7 @@ import { File } from "./file";
 import { ThreadFollowupSuggestions } from "./follow-up-suggestions.aui";
 import { Image } from "./image";
 import { MarkdownText } from "./markdown-text";
+import "./thread-composer.css";
 import type { MarkdownTextProps } from "./markdown-text";
 import {
   Reasoning,
@@ -75,6 +76,7 @@ import {
   useRef,
   useState,
   type ComponentType,
+  type RefObject,
   type ComponentProps,
   type FC,
   type PropsWithChildren,
@@ -186,6 +188,8 @@ export type ThreadViewportOptions = Pick<
  * the row on the last reply and on hover elsewhere; `"never"` keeps the
  * row under every reply, the way the major chat apps draw it.
  */
+export type ComposerDensity = "compact";
+
 export type ThreadComponents = {
   markdown?: { components?: MarkdownTextProps["components"]; preprocess?: MarkdownTextProps["preprocess"]; remend?: MarkdownTextProps["remend"] } | undefined;
   /** assistant-ui viewport behavior. Defaults preserve the kit's top anchor. */
@@ -211,6 +215,10 @@ export type ThreadComponents = {
   ComposerExtra?: ComponentType | undefined;
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
+  /** Composer density. Omitted keeps the default composer; "compact" is the
+   * slim single-row composer (thread-composer.css), tuned only through the
+   * `--composer-compact-*` custom properties. */
+  composerDensity?: ComposerDensity | undefined;
   ComposerInputOverride?: ComponentType | undefined;
   ComposerNotice?: ComponentType | undefined;
   ComposerQueue?: ComponentType | undefined;
@@ -326,7 +334,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
   temporary,
   scrollToBottomOffset,
 }) => {
-  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra, ComposerQueue } = useContext(ThreadComponentsContext);
+  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity } = useContext(ThreadComponentsContext);
   const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
   const [footerElement, setFooterElement] = useState<HTMLElement | null>(null);
 
@@ -347,6 +355,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
   return (
     <ThreadViewportElementContext.Provider value={viewportElement}>
     <ThreadPrimitive.Root
+      data-density={composerDensity}
       className={cn(
         "aui-root aui-thread-root bg-background @container flex h-full flex-col",
         ThreadViewportExtra && "relative",
@@ -802,27 +811,66 @@ const ThreadSuggestionItem: FC = () => {
   );
 };
 
+// Compact density: an empty or one-line composer is one row; once the text
+// wraps the shell is marked `data-multiline` and the text takes its own row
+// above the controls. It returns to one row only when the text is cleared, so
+// a line that fits the wider row never flips the layout back and forth.
+function useMultiline(shell: RefObject<HTMLElement | null>, enabled: boolean): boolean {
+  const text = useAuiState((s) => s.composer.text);
+  const dictating = useAuiState((s) => s.composer.dictation != null);
+  const [multiline, setMultiline] = useState(false);
+  useEffect(() => {
+    if (!enabled) return;
+    if (!text) {
+      setMultiline(false);
+      return;
+    }
+    const field = shell.current?.querySelector("textarea");
+    if (!field) return;
+    const lineHeight = parseFloat(getComputedStyle(field).lineHeight) || 22;
+    if (text.includes("\n") || field.scrollHeight > lineHeight * 1.5 + 26) setMultiline(true);
+  }, [text, dictating, enabled, shell]);
+  return enabled && multiline;
+}
+
+/** The kit's own text field, for a caller whose `ComposerInputOverride` has to
+ * render the real input (a draft restore, a waveform beside it) and keeps its
+ * look: it carries the kit's classes, and the compact density sizes it. */
+export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Input>> = ({ className, ...props }) => (
+  <ComposerPrimitive.Input
+    rows={1}
+    enterKeyHint="send"
+    aria-label="Message input"
+    {...props}
+    className={cn(
+      "aui-composer-input caret-primary placeholder:text-muted-foreground/60 max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none",
+      className,
+    )}
+  />
+);
+
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerNotice, sendHeld } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerNotice, sendHeld, composerDensity } = useContext(ThreadComponentsContext);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const multiline = useMultiline(shellRef, composerDensity === "compact");
   return (
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
       <ComposerPrimitive.AttachmentDropzone asChild>
         <div
+          ref={shellRef}
           data-slot="aui_composer-shell"
+          data-density={composerDensity}
+          data-multiline={multiline ? "" : undefined}
           className="border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text flex-col gap-2 rounded-(--composer-radius) border bg-(--composer-bg) p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]"
         >
           <ComposerAttachments />
           {ComposerInputOverride ? (
             <ComposerInputOverride />
           ) : (
-            <ComposerPrimitive.Input
+            <ComposerInputField
               placeholder="Send a message..."
-              className="aui-composer-input caret-primary placeholder:text-muted-foreground/60 max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none"
-              rows={1}
               autoFocus={autoFocus}
-              enterKeyHint="send"
               submitMode={sendHeld ? "none" : undefined}
-              aria-label="Message input"
             />
           )}
           <ComposerAction />
