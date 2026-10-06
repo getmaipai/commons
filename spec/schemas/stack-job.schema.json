@@ -10,7 +10,7 @@
     "id": { "type": "string", "minLength": 1 },
     "kind": { "type": "string", "minLength": 1, "description": "The runner's kind: a generator role id (`image`), or a Stack task (`model.install`, `engine.install`, `engine.stage`)." },
     "role": { "type": ["string", "null"], "description": "The role the job serves, when it serves one." },
-    "state": { "type": "string", "enum": ["queued", "running", "done", "failed", "cancelled"] },
+    "state": { "type": "string", "enum": ["queued", "running", "waiting_for_you", "paused", "done", "failed", "cancelled"] },
     "percent": { "type": "integer", "minimum": 0, "maximum": 100 },
     "completedBytes": { "type": "integer", "minimum": 0 },
     "totalBytes": { "type": "integer", "minimum": 0 },

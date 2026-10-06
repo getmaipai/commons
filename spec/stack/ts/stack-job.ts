@@ -1,7 +1,7 @@
 // Hand-written Zod mirror of ../schemas/stack-job.schema.json.
 import { z } from "zod";
 
-export const StackJobState = z.enum(["queued", "running", "done", "failed", "cancelled"]);
+export const StackJobState = z.enum(["queued", "running", "waiting_for_you", "paused", "done", "failed", "cancelled"]);
 export type StackJobState = z.infer<typeof StackJobState>;
 
 export const StackJob = z.object({
