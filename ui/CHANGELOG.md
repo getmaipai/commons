@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### CALM-TOKENS-02
+
+Add contrast-checked attention, info, and problem tint tokens. Style the
+Element `tool-fallback-approval` slot and its action button boundaries
+through kit data-slot rules; success has no tint.
+
 ### CALM-TOKENS-01
 
 Add the calm elevation scale and contrast-safe `--page` surfaces. The kit

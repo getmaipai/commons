@@ -55,14 +55,21 @@ pulsing status dots, radial washes, and 26px glass blur are not adopted.
 The owner confirmed the study's softer radii on 2026-10-06: cards use
 16px computed radius (`--radius: 12px`, so `rounded-xl` is 16px), and
 controls use 10px (`--radius-control`). `--page` uses the proposed
-contrast-safe light and dark tones. Success receives no tint.
+contrast-safe light and dark tones (`#F9FAFB` light, `#141414` dark).
+The elevation ladder follows the study's 3.2 values. Success receives no
+tint. The light `--destructive` value is deepened to `#C91F39` so it
+clears AA on the light problem tint; the contrast test measures both
+themes' status pairs. `--elevation-accent` is defined, but no button
+shadow is applied: the kit has no stable way to identify the single
+primary action for each view, and a default-variant rule could shadow
+several buttons in one view.
 
-Acceptance floors: muted foreground on `--page` is at least 4.5:1 in
-light and dark themes, measured by the contrast test; every text-on-tint
-pair is at least 4.5:1; non-text boundaries are at least 3:1. No new
-token animates. The existing `tokens.css` reduced-motion block remains
-authoritative. Kid presets (2 cm targets, reading age 9) and the 16px
-body floor are untouched.
+Acceptance floors: muted foreground on `--page` and `--sidebar` is at
+least 4.5:1 in light and dark themes, measured by the contrast test;
+every text-on-tint pair is at least 4.5:1; non-text boundaries are at
+least 3:1. No new token animates. The existing `tokens.css`
+reduced-motion block remains authoritative. Kid presets (2 cm targets,
+reading age 9) and the 16px body floor are untouched.
 
 Known gap: an optional avatar progress arc in the shell is not built.
 The dotted canvas ground is dropped (ChatGPT has none, S2).

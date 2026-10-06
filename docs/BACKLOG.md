@@ -91,15 +91,32 @@ capability, needs its own design pass first).
 
 ## `ui`
 
-- [ ] **CALM-TOKENS-00** (docs): record the approved calm token system
-  and acceptance floors in `ui/docs/spec.md`, including superseded
-  section 1 values and the one remaining avatar progress arc gap.
-- [ ] **CALM-TOKENS-01**: add elevation and page tokens, apply them in
-  kit layout/data-slot rules, restore the vendored template's `--radius`
-  line, and verify page/sidebar muted-text contrast plus `rounded-xl`.
-- [ ] **CALM-TOKENS-02**: add attention, info, and problem tint tokens;
-  style the rendered approval fallback slot in `tokens.css`; verify text
-  contrast and button boundaries in both themes. Success has no tint.
+- [ ] **CALM-TOKENS-00** (docs): record elevation, `--page`, and the
+  attention/info/problem tint families in `ui/docs/spec.md`. Supersede
+  section 1's panel shadow and radius values and `--shadow-panel`; name
+  kit layout wrappers, kit data-slot rules and kit primitives as readers,
+  never Home page `className` values. Record the non-adopted Row-Bot
+  canvas/tinted tiles/motion/washes/blur, the optional avatar arc gap,
+  dropped dotted canvas, computed 4.5:1 text and 3:1 boundary floors,
+  reduced-motion authority, and the untouched child targets and 16px
+  body floor.
+- [ ] **CALM-TOKENS-01**: add study 3.2's elevation scale and contrast-
+  safe `--page`; owner-confirmed 12px base radius and 10px controls
+  (2026-10-06). Restore the pinned template's `--radius` line and note
+  it in `dashboard-upstream.md`; make no other `globals.css` or
+  `elements/*` edits. The layout wrapper paints `--page`, Card reads
+  `--elevation-1`, popovers read `--elevation-3`. Tests compute muted
+  foreground contrast on `--page` and `--sidebar` in both themes and
+  assert the Tailwind `rounded-xl` mapping to 16px. Keep
+  `--elevation-accent` available, but omit a primary-button shadow until
+  the kit has a stable per-view primary-action slot.
+- [ ] **CALM-TOKENS-02**: define `--tint-attention`,
+  `--tint-attention-fg`, `--tint-attention-border`, `--tint-info`, and
+  `--tint-problem` for both themes. A `tokens.css` data-slot rule styles
+  the rendered `[data-slot="tool-fallback-approval"]`; do not edit
+  Elements. Tests compute the three named text pairs at 4.5:1 and button
+  boundaries at 3:1 in both themes. Success has no tint; dark values
+  come from test measurements.
 
 - [ ] **CHAT-STREAMDOWN-01: Streamdown inside the kit's `MarkdownText`** (S; approved 2026-10-05 by `data-scratch/architect/CHAT-STREAMDOWN-01.verdict`). Use assistant-ui's documented `StreamdownTextPrimitive` migration while keeping the export, component overrides, lazy KaTeX, Shiki and beautiful-mermaid. Acceptance: native 150 ms word fade-in for running assistant text; reduced-motion and non-chat consumers remain static; raw HTML stays literal text; links retain today's attributes and no confirmation; citations, copy, code, tables, math and Mermaid pass the kit/Home integration tests. Exact pins: `streamdown` 2.7.0 and `@assistant-ui/react-streamdown` 0.3.18. Exit: both kit and Home gates green and browser frame audit accepted.
 

@@ -140,6 +140,40 @@ describe("CALM-TOKENS contrast and radius contract", () => {
   });
 });
 
+describe("CALM-TOKENS status tints", () => {
+  const tintThemes = [
+    { name: "light", block: lightRoot },
+    { name: "dark", block: darkRoot },
+  ];
+
+  for (const theme of tintThemes) {
+    for (const [name, fg, tint, border] of [
+      ["attention", "--tint-attention-fg", "--tint-attention", "--tint-attention-border"],
+      ["info", "--foreground", "--tint-info", "--tint-info-border"],
+      ["problem", "--destructive", "--tint-problem", "--tint-problem-border"],
+    ] as const) {
+      test(`${theme.name}: ${name} text clears 4.5 and its boundary clears 3`, () => {
+        const background = requiredHex(theme.block, tint);
+        expect(contrastRatio(requiredHex(theme.block, fg), background)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(requiredHex(theme.block, border), background)).toBeGreaterThanOrEqual(3);
+      });
+    }
+  }
+
+  test("Element approval fallback slot and its buttons use attention boundaries", () => {
+    expect(css).toContain('[data-slot="tool-fallback-approval"]');
+    expect(css).toContain('[data-slot="tool-fallback-approval"] [data-slot="button"]');
+    expect(css).toContain("border: 1px solid var(--tint-attention-border)");
+  });
+
+  test("the kit defines exactly the three approved tint families", () => {
+    expect(css).toContain("--tint-attention:");
+    expect(css).toContain("--tint-info:");
+    expect(css).toContain("--tint-problem:");
+    expect(css).not.toContain("--tint-success:");
+  });
+});
+
 describe("WCAG AA contrast over the spec's surfaces (both themes)", () => {
   for (const theme of themes) {
     for (const [surfaceName, surfaceHex] of Object.entries(theme.surfaces)) {

@@ -189,6 +189,18 @@
   box-shadow: var(--elevation-3);
 }
 
+/* Element's approval fallback is the rendered slot in chat. Its action
+ * buttons keep a visible boundary against the attention surface. */
+[data-slot="tool-fallback-approval"] {
+  background: var(--tint-attention);
+  border: 1px solid var(--tint-attention-border);
+  color: var(--tint-attention-fg);
+}
+
+[data-slot="tool-fallback-approval"] [data-slot="button"] {
+  border: 1px solid var(--tint-attention-border);
+}
+
 /* 1px `#24405F`, 12px above and below (owner findings, "The Studio
  * look, the numbers," 2026-09-20 18:15), inset 7px from the rail's
  * own true edge - owner ruling, ui-v0.4.3, restating "the rail
@@ -376,6 +388,13 @@
   --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
   --elevation-4: 0 24px 64px -16px var(--elevation-color);
   --elevation-accent: 0 6px 16px -10px var(--primary);
+  --tint-attention: #fbf5e6;
+  --tint-attention-fg: #6e5a2b;
+  --tint-attention-border: #866100;
+  --tint-info: #eef6ff;
+  --tint-info-border: #406a99;
+  --tint-problem: #fff0ee;
+  --tint-problem-border: #a83c35;
   --surface-card: #ffffff;
   --surface-pane: #e3eaf3;
   --surface-sidebar: #eaf0f7;
@@ -411,7 +430,7 @@
   /* Dark navy text on the electric blue, not white: ~7.2:1 measured,
    * against white's ~2.6:1 on this lightness of blue. */
   --primary-foreground: #07111f;
-  --destructive: #ff4b62;
+  --destructive: #c91f39;
   --destructive-foreground: #07111f;
   --ring: #21a6ff;
   /* VOICE-LIVE-05 (2026-09-23, a real-render finding): a dedicated pair
@@ -476,6 +495,13 @@
     --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
     --elevation-4: 0 24px 64px -16px var(--elevation-color);
     --elevation-accent: 0 6px 16px -10px var(--primary);
+    --tint-attention: #31240e;
+    --tint-attention-fg: #ffe08a;
+    --tint-attention-border: #b88a21;
+    --tint-info: #172839;
+    --tint-info-border: #78bfff;
+    --tint-problem: #3b1c1a;
+    --tint-problem-border: #ff6f68;
     --radius: 12px;
     --surface-page: #07111f;
     --surface-card: #102238;
@@ -536,6 +562,13 @@
   --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
   --elevation-4: 0 24px 64px -16px var(--elevation-color);
   --elevation-accent: 0 6px 16px -10px var(--primary);
+  --tint-attention: #31240e;
+  --tint-attention-fg: #ffe08a;
+  --tint-attention-border: #b88a21;
+  --tint-info: #172839;
+  --tint-info-border: #78bfff;
+  --tint-problem: #3b1c1a;
+  --tint-problem-border: #ff6f68;
   --radius: 12px;
   --surface-page: #07111f;
   --surface-card: #102238;
