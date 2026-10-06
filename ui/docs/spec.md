@@ -738,3 +738,7 @@ the Stack's refocus; none of them shipped in `@maipai/ui`:
   longer has clients or an operator, per the refocus.
 - The tray/desktop app chrome (`kit/host.ts`, the system tray icon and
   notifications) - the Stack has no desktop shell.
+
+## Named gap: animated companion face (Rive runtime)
+
+Owner approved the animated companion face as a later step on 2026-10-06 (OWNER-ANSWERS 2). CHAR-02 names the gap: a `companion-face` Element may wrap the Rive runtime after `companion-presence` ships. The runtime's WASM must be bundled in the kit, with no CDN request. The face is a later option and the robot never loads it. Art may be AI-generated only with a local or licence-clean tool; keep the generation record and captured tool terms beside the art, and review again before any trademark filing.
