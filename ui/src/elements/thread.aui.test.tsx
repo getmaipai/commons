@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
-import { AssistantRuntimeProvider, MessagePrimitive, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
+import { AssistantRuntimeProvider, MessagePrimitive, useAuiState, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
 import { Thread, type ThreadViewportOptions } from "./thread.aui";
 
 afterEach(cleanup);
@@ -261,5 +261,58 @@ describe("Thread's ComposerQueue slot", () => {
     expect(document.querySelector("[data-slot='aui_composer-queue']")).toBeNull();
     const root = document.querySelector(".aui-composer-root")!;
     expect(root.previousElementSibling?.getAttribute("data-slot")).not.toBe("aui_composer-queue");
+  });
+});
+
+// Two finished exchanges, so there is an assistant reply that is not the last.
+const TWO_EXCHANGES = [
+  { id: "u1", role: "user" as const, content: [{ type: "text" as const, text: "first question" }], createdAt: new Date("2026-10-05T09:00:00Z") },
+  { id: "a1", role: "assistant" as const, content: [{ type: "text" as const, text: "first answer" }], createdAt: new Date("2026-10-05T09:00:05Z") },
+  { id: "u2", role: "user" as const, content: [{ type: "text" as const, text: "second question" }], createdAt: new Date("2026-10-06T10:00:00Z") },
+  { id: "a2", role: "assistant" as const, content: [{ type: "text" as const, text: "second answer" }], createdAt: new Date("2026-10-06T10:00:05Z") },
+];
+
+function SeededHarness({ components }: { components?: React.ComponentProps<typeof Thread>["components"] }) {
+  const runtime = useLocalRuntime(adapter, { initialMessages: TWO_EXCHANGES });
+  return (
+    <AssistantRuntimeProvider runtime={runtime}>
+      <Thread components={components} />
+    </AssistantRuntimeProvider>
+  );
+}
+
+const assistantRowsWithCopy = () =>
+  [...document.querySelectorAll('[data-slot="aui_assistant-message-root"]')].map((root) =>
+    [...root.querySelectorAll("button")].some((button) => button.textContent?.includes("Copy")));
+
+describe("Thread's MessageBefore slot", () => {
+  test("renders once before every message, inside that message's context", async () => {
+    function Before() {
+      const id = useAuiState((s) => s.message.id);
+      return <div data-testid="before">{id}</div>;
+    }
+    const { findAllByTestId } = render(<SeededHarness components={{ MessageBefore: Before }} />);
+    const markers = await findAllByTestId("before");
+    expect(markers.map((marker) => marker.textContent)).toEqual(["u1", "a1", "u2", "a2"]);
+  });
+
+  test("unset, nothing extra renders", async () => {
+    const { findByText } = render(<SeededHarness />);
+    await findByText("second answer");
+    expect(document.querySelector('[data-testid="before"]')).toBeNull();
+  });
+});
+
+describe("Thread's assistantActionBarAutohide option", () => {
+  test("the default shows the action row on the last reply only", async () => {
+    const { findByText } = render(<SeededHarness />);
+    await findByText("second answer");
+    expect(assistantRowsWithCopy()).toEqual([false, true]);
+  });
+
+  test('"never" shows the action row under every reply, whichever is last', async () => {
+    const { findByText } = render(<SeededHarness components={{ assistantActionBarAutohide: "never" }} />);
+    await findByText("second answer");
+    expect(assistantRowsWithCopy()).toEqual([true, true]);
   });
 });

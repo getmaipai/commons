@@ -174,6 +174,17 @@ export type ThreadViewportOptions = Pick<
  * inside the thread root, so `useVisibleMessageIds` and
  * `useScrollToMessage` work in it. Unset, nothing renders and the root's
  * layout is unchanged.
+ * `MessageBefore`, when set, renders just before every message in the
+ * list (inside that message's own context, so `useAuiState((s) =>
+ * s.message)` and `s.thread.messages` both work) - the append point for
+ * a divider between messages, such as a date line where a new day
+ * starts. It renders nothing of its own when it returns null, so the
+ * list's spacing is unchanged for a message without one. Unset, nothing
+ * renders.
+ * `assistantActionBarAutohide` sets the assistant action bar's own
+ * `autohide`: `"not-last"` (the default, assistant-ui's own choice) shows
+ * the row on the last reply and on hover elsewhere; `"never"` keeps the
+ * row under every reply, the way the major chat apps draw it.
  */
 export type ThreadComponents = {
   markdown?: { components?: MarkdownTextProps["components"]; preprocess?: MarkdownTextProps["preprocess"]; remend?: MarkdownTextProps["remend"] } | undefined;
@@ -195,6 +206,8 @@ export type ThreadComponents = {
   Indicator?: ComponentType | undefined;
   MessageError?: ComponentType | undefined;
   ThreadViewportExtra?: ComponentType | undefined;
+  MessageBefore?: ComponentType | undefined;
+  assistantActionBarAutohide?: "not-last" | "never" | undefined;
   ComposerExtra?: ComponentType | undefined;
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
@@ -549,6 +562,16 @@ export function messagesForSearch(
 }
 
 const ThreadMessage: FC = () => {
+  const { MessageBefore } = useContext(ThreadComponentsContext);
+  return (
+    <>
+      {MessageBefore ? <MessageBefore /> : null}
+      <ThreadMessageBody />
+    </>
+  );
+};
+
+const ThreadMessageBody: FC = () => {
   const { AssistantMessage: AssistantMessageComponent = AssistantMessage } =
     useContext(ThreadComponentsContext);
   const role = useAuiState((s) => s.message.role);
@@ -1043,13 +1066,13 @@ const AssistantMessage: FC = () => {
 };
 
 const AssistantActionBar: FC = () => {
-  const { AssistantMoreItems, AssistantActionBarExtra } = useContext(
+  const { AssistantMoreItems, AssistantActionBarExtra, assistantActionBarAutohide = "not-last" } = useContext(
     ThreadComponentsContext,
   );
   return (
     <ActionBarPrimitive.Root
       hideWhenRunning
-      autohide="not-last"
+      autohide={assistantActionBarAutohide}
       className="aui-assistant-action-bar-root text-muted-foreground animate-in fade-in col-start-3 row-start-2 -ms-1 flex gap-1 duration-200"
     >
       <ActionBarPrimitive.Copy asChild>

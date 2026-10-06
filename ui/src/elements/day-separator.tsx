@@ -12,6 +12,31 @@ export interface DatedMessage {
   text: string;
 }
 
+/**
+ * The day line on its own: a centred label between two hairlines. Exported
+ * so a host that already renders its messages (the kit Thread, through its
+ * `MessageBefore` slot) can draw the same divider without a second list.
+ */
+export function DayDivider({
+  label,
+  className,
+  ...props
+}: Omit<ComponentProps<"div">, "children"> & { label: string }) {
+  return (
+    <div
+      data-slot="day-divider"
+      role="separator"
+      aria-label={label}
+      className={cn("flex items-center gap-2.5 py-1", className)}
+      {...props}
+    >
+      <span className="bg-foreground/[0.08] h-px flex-1" />
+      <span className={cn(mono, "text-foreground/30")}>{label}</span>
+      <span className="bg-foreground/[0.08] h-px flex-1" />
+    </div>
+  );
+}
+
 export function DaySeparator({
   messages,
   className,
@@ -34,15 +59,7 @@ export function DaySeparator({
 
         return (
           <div key={message.id} className="flex flex-col gap-2">
-            {newDay && (
-              <div className="flex items-center gap-2.5 py-1">
-                <span className="bg-foreground/[0.08] h-px flex-1" />
-                <span className={cn(mono, "text-foreground/30")}>
-                  {message.day}
-                </span>
-                <span className="bg-foreground/[0.08] h-px flex-1" />
-              </div>
-            )}
+            {newDay && <DayDivider label={message.day} />}
             <div
               className={cn(
                 "group flex items-baseline gap-2",

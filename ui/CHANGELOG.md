@@ -1,5 +1,26 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.110] - ui-v0.5.110
+
+### ELEMENTS-ADOPT-01 and CHAT-ACTION-ROW-01
+
+Two optional `Thread` options and one export, all additive; a host that sets
+none of them renders exactly as before.
+
+- `components.MessageBefore` renders just before every message in the list,
+  inside that message's own context. Home uses it for the date line where a
+  new day starts in a conversation.
+- `components.assistantActionBarAutohide` sets the assistant action bar's
+  `autohide`. The default stays `"not-last"`; `"never"` keeps Copy, Read
+  aloud, the thumbs, Refresh and More under every reply.
+- `day-separator.tsx` exports its divider row as `DayDivider({ label })`, a
+  named `separator`. `DaySeparator` draws its day lines with it, so the look
+  is unchanged.
+
+Reuse check: no new part. `DayDivider` is the row `DaySeparator` already
+drew; the two Thread options pass through to the shipped
+`ActionBarPrimitive.Root` and the message list it already renders.
+
 ## [0.5.109] - ui-v0.5.109
 
 ### RAIL-02
