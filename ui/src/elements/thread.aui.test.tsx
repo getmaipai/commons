@@ -24,11 +24,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, temporary, viewport, error = false, scrollToBottomOffset }: { ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number }) {
-  const runtime = useLocalRuntime(error ? failingAdapter : adapter);
+function Harness({ ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter }: { ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter }) {
+  const runtime = useLocalRuntime(runAdapter ?? (error ? failingAdapter : adapter));
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport ? { ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
+      <Thread components={ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
     </AssistantRuntimeProvider>
   );
 }
@@ -99,6 +99,45 @@ describe("Thread's ComposerNotice slot", () => {
   test("renders nothing when unset", () => {
     render(<Harness />);
     expect(document.querySelector("[data-slot='aui_composer-notice']")).toBeNull();
+  });
+});
+
+describe("Thread's sendHeld option", () => {
+  function countingAdapter() {
+    const calls: number[] = [];
+    const runAdapter: ChatModelAdapter = {
+      async *run() {
+        calls.push(1);
+        yield { content: [] };
+      },
+    };
+    return { calls, runAdapter };
+  }
+
+  test("while held, a person can still type but Send is disabled and Enter sends nothing", async () => {
+    const { calls, runAdapter } = countingAdapter();
+    const { getByRole } = render(<Harness sendHeld runAdapter={runAdapter} />);
+    const input = getByRole("textbox", { name: "Message input" }) as HTMLTextAreaElement;
+    expect(input.disabled).toBe(false);
+    fireEvent.change(input, { target: { value: "hello" } });
+    expect(input.value).toBe("hello");
+    const send = getByRole("button", { name: "Send message" }) as HTMLButtonElement;
+    expect(send.disabled).toBe(true);
+    fireEvent.click(send);
+    fireEvent.keyDown(input, { key: "Enter" });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(calls.length).toBe(0);
+    expect(input.value).toBe("hello");
+  });
+
+  test("not held, the same text sends", async () => {
+    const { calls, runAdapter } = countingAdapter();
+    const { getByRole } = render(<Harness sendHeld={false} runAdapter={runAdapter} />);
+    fireEvent.change(getByRole("textbox", { name: "Message input" }), { target: { value: "hello" } });
+    const send = getByRole("button", { name: "Send message" }) as HTMLButtonElement;
+    expect(send.disabled).toBe(false);
+    fireEvent.click(send);
+    await waitFor(() => expect(calls.length).toBe(1));
   });
 });
 

@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.104] - ui-v0.5.104
+
+### CHAT-CALM-ERRORS-01d
+
+Add `Thread.components.sendHeld`: while true the composer's text field stays
+usable, its Send button renders disabled and Enter does not send, so a host
+can hold a message while its model is paused without losing the draft.
+
 ## [0.5.103] - ui-v0.5.103
 
 ### CHAT-CALM-ERRORS-01a

@@ -158,6 +158,12 @@ export type ThreadViewportOptions = Pick<
  * reach that spot without forking the footer. The slot only mounts
  * what the caller passes (the vendored `MessageQueue` element); it
  * wraps nothing when unset, so the footer's layout is unchanged.
+ * `sendHeld`, when true, holds the composer's Send: the text field stays
+ * usable so a person can keep typing, the Send button renders disabled,
+ * and Enter does not send. CHAT-CALM-ERRORS-01d: a host whose model is
+ * paused (its engine stopped or starting) keeps the draft and says why in
+ * `ComposerNotice`; a local runtime has no send-disabled option of its
+ * own, so the hold lives here, beside the Send it holds.
  * `onEditSend`, when set, is called when the edit composer sends its
  * update, with the edited message's id and the following assistant
  * message's `metadata.custom.turnId` when present. A caller can use the
@@ -195,6 +201,7 @@ export type ThreadComponents = {
   ComposerInputOverride?: ComponentType | undefined;
   ComposerNotice?: ComponentType | undefined;
   ComposerQueue?: ComponentType | undefined;
+  sendHeld?: boolean | undefined;
   onEditSend?: ((messageId: string, turnId?: string) => void) | undefined;
 };
 
@@ -773,7 +780,7 @@ const ThreadSuggestionItem: FC = () => {
 };
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerNotice } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerNotice, sendHeld } = useContext(ThreadComponentsContext);
   return (
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
       <ComposerPrimitive.AttachmentDropzone asChild>
@@ -791,6 +798,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
               rows={1}
               autoFocus={autoFocus}
               enterKeyHint="send"
+              submitMode={sendHeld ? "none" : undefined}
               aria-label="Message input"
             />
           )}
@@ -810,7 +818,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
 };
 
 const ComposerAction: FC = () => {
-  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd } = useContext(ThreadComponentsContext);
+  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd, sendHeld } = useContext(ThreadComponentsContext);
   return (
     <div className="aui-composer-action-wrapper relative flex items-center justify-between">
       <div className="flex items-center gap-1.5">
@@ -854,7 +862,7 @@ const ComposerAction: FC = () => {
         <AuiIf
           condition={(s) => !s.thread.isRunning || s.thread.voice !== undefined}
         >
-          <ComposerPrimitive.Send asChild>
+          {sendHeld ? (
             <TooltipIconButton
               tooltip="Send message"
               side="bottom"
@@ -863,10 +871,25 @@ const ComposerAction: FC = () => {
               size="icon"
               className="aui-composer-send size-7 rounded-full"
               aria-label="Send message"
+              disabled
             >
               <ArrowUpIcon className="aui-composer-send-icon size-4" />
             </TooltipIconButton>
-          </ComposerPrimitive.Send>
+          ) : (
+            <ComposerPrimitive.Send asChild>
+              <TooltipIconButton
+                tooltip="Send message"
+                side="bottom"
+                type="button"
+                variant="default"
+                size="icon"
+                className="aui-composer-send size-7 rounded-full"
+                aria-label="Send message"
+              >
+                <ArrowUpIcon className="aui-composer-send-icon size-4" />
+              </TooltipIconButton>
+            </ComposerPrimitive.Send>
+          )}
         </AuiIf>
         <AuiIf
           condition={(s) => s.thread.isRunning && s.thread.voice === undefined}
