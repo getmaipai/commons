@@ -78,6 +78,15 @@ describe("QuotaBanner", () => {
     fireEvent.click(getByRole("button", { name: "More" }));
     expect(onUpgrade).toHaveBeenCalledTimes(1);
   });
+  test("formatAmount formats remaining, used and limit values", () => {
+    const formatAmount = (value: number) => value === 1024 ? "1 KB" : "20 GB";
+    const { container, getByRole } = render(
+      <QuotaBanner used={1024} limit={20 * 1024 ** 3} unit="bytes" formatAmount={formatAmount} />,
+    );
+    expect(container.textContent).toContain("20 GB left");
+    expect(container.textContent).toContain("1 KB of 20 GB used");
+    expect(getByRole("meter").getAttribute("aria-valuetext")).toBe("1 KB of 20 GB used");
+  });
 });
 
 describe("QuotaBanner label", () => {

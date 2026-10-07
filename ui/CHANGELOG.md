@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.159] - ui-v0.5.159
+
+### ELT-T1-07 (additive)
+
+`QuotaBanner` accepts `formatAmount` to display readable values with their
+unit while keeping the numeric values for its meter. Without the prop, the
+existing raw value and unit text is unchanged.
+
 ## [0.5.157] - ui-v0.5.157
 
 ### PROJECTS-UI-04 (additive)

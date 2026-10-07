@@ -12,6 +12,7 @@ export function QuotaBanner({
   resetsIn,
   upgradeLabel,
   onUpgrade,
+  formatAmount,
   className,
   ...props
 }: Omit<
@@ -23,10 +24,13 @@ export function QuotaBanner({
   | "resetsIn"
   | "upgradeLabel"
   | "onUpgrade"
+  | "formatAmount"
 > & {
   used: number;
   limit: number;
   unit: string;
+  /** Formats a numeric amount with its display unit. Unset: raw value and unit. */
+  formatAmount?: (value: number) => string;
   /** Unset: the reset line is not drawn. */
   resetsIn?: string;
   /** The button is drawn only when this and `onUpgrade` are both given. */
@@ -36,6 +40,7 @@ export function QuotaBanner({
   const left = Math.max(0, limit - used);
   const ratio = limit === 0 ? 0 : used / limit;
   const tight = ratio >= 0.9;
+  const amountWithUnit = (value: number) => formatAmount?.(value) ?? `${value} ${unit}`;
 
   return (
     <div
@@ -55,7 +60,7 @@ export function QuotaBanner({
             tight && "text-amber-700 dark:text-amber-400",
           )}
         >
-          {left} {unit} left
+          {amountWithUnit(left)} left
         </span>
         {resetsIn !== undefined && (
           <span className={cn(mono, "text-muted-foreground ms-auto tabular-nums")}>
@@ -70,7 +75,9 @@ export function QuotaBanner({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={announced(pct(used, limit))}
-        aria-valuetext={`${used} of ${limit} ${unit} used`}
+        aria-valuetext={formatAmount
+          ? `${formatAmount(used)} of ${formatAmount(limit)} used`
+          : `${used} of ${limit} ${unit} used`}
         className="bg-foreground/[0.06] h-1 w-full overflow-hidden rounded-full"
       >
         <span
@@ -84,7 +91,9 @@ export function QuotaBanner({
 
       <div className="flex items-center gap-2">
         <span className={cn(mono, "text-muted-foreground tabular-nums")}>
-          {used} of {limit} used
+          {formatAmount
+            ? `${formatAmount(used)} of ${formatAmount(limit)} used`
+            : `${used} of ${limit} used`}
         </span>
         {onUpgrade && upgradeLabel !== undefined && (
           <button
