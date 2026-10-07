@@ -131,12 +131,12 @@ describe("the owner's 2026-10-06 rows", () => {
       approver: { child: "parent", teen: "parent", adult: "none" },
     });
   });
-  test("SearXNG alone is a fixed lookup with no approval for any age band", () => {
-    expect(find("integration:searxng").policy).toEqual({
-      risk: "lookup",
-      outbound: true,
-      reversible: true,
-      approver: { child: "none", teen: "none", adult: "none" },
+  test("SearXNG falls through to the generic integration policy and stays parent-approved for minors", () => {
+    expect(perms.permissions.some((entry) => entry.id === "integration:searxng")).toBe(false);
+    expect(find("integration:<id>").policy!.approver).toEqual({
+      child: "parent",
+      teen: "parent",
+      adult: "none",
     });
   });
   test("show_images has an offer-only capability policy row", () => {

@@ -183,21 +183,6 @@
       }
     },
     {
-      "id": "integration:searxng",
-      "parameterized": false,
-      "description": "Use the fixed SearXNG web lookup for child, teen and adult turns without an approval prompt.",
-      "policy": {
-        "risk": "lookup",
-        "outbound": true,
-        "reversible": true,
-        "approver": {
-          "child": "none",
-          "teen": "none",
-          "adult": "none"
-        }
-      }
-    },
-    {
       "id": "tool.offer:show_images",
       "parameterized": false,
       "description": "Offer the show_images tool only on turns where the existing answer image eligibility rules allow it.",

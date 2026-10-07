@@ -1,3 +1,10 @@
+## [spec-v0.1.95] - 2026-10-07
+
+### Fixed
+- Remove the SearXNG-specific integration policy override. SearXNG now
+  falls through to `integration:<id>`, retaining parent approval for
+  child and teen accounts.
+
 # Changelog (`@maipai/spec`)
 
 All notable changes to the `spec` workspace. Format follows
