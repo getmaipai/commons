@@ -4,6 +4,7 @@ import { Fragment, type ComponentProps, type ReactNode } from "react";
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "lucide-react";
 import { cn } from "cn";
 import { Button } from "../ui/button";
+import { safeHref } from "./href";
 import { mono, paper } from "./surfaces";
 
 export interface ModelUsage {
@@ -11,6 +12,19 @@ export interface ModelUsage {
   context: string;
   cost: string;
 }
+
+/** Formatting applied to a generic table column. Defaults to plain text. */
+export type DataTableFormat =
+  | { kind: "text" }
+  | { kind: "number"; decimals?: number; compact?: boolean; unit?: string }
+  | { kind: "currency"; currency: string; decimals?: number; compact?: boolean }
+  | { kind: "percent"; decimals?: number; basis?: "fraction" | "unit" }
+  | { kind: "delta"; decimals?: number; unit?: string; upIsGood?: boolean }
+  | { kind: "date"; style?: "date" | "datetime" | "relative" }
+  | { kind: "boolean"; trueLabel?: string; falseLabel?: string }
+  | { kind: "link"; hrefKey?: string }
+  | { kind: "badge"; tones?: Readonly<Record<string, "neutral" | "success" | "warning" | "danger">> }
+  | { kind: "list"; max?: number };
 
 export interface DataTableColumn<Row> {
   id: string;
@@ -23,6 +37,8 @@ export interface DataTableColumn<Row> {
   minWidth?: number;
   /** Show the sortable header control. The caller owns sorting the rows. */
   sortable?: boolean;
+  /** Format this column's value. Unset: render its plain text value. */
+  format?: DataTableFormat;
 }
 
 export interface DataTableSort {
@@ -61,8 +77,15 @@ export interface DataTableProps<Row = ModelUsage> extends Omit<
   rowActions?: (row: Row) => ReactNode;
   /** Accessible name for the actions column header cell. */
   rowActionsLabel?: string;
+  /** Per-column upstream format defaults keyed by column id. A column's own
+   * `format` takes precedence. Unset: plain text values. */
+  formats?: Readonly<Record<string, DataTableFormat>>;
   /** Shown instead of the rows when `rows` is empty. Unset: nothing. */
   emptyLabel?: ReactNode;
+  /** Locale for numeric and date formatting. Unset: the runtime default locale. */
+  locale?: string;
+  /** Reference time in milliseconds for relative dates. Unset: now. */
+  relativeTo?: number;
 }
 
 function defaultRowId(row: unknown, index: number): string {
@@ -74,6 +97,52 @@ function cellText<Row>(column: DataTableColumn<Row>, row: Row): ReactNode {
   if (column.cell) return column.cell(row);
   const value = (row as Record<string, unknown>)[column.id];
   return value === undefined || value === null ? "" : String(value);
+}
+
+function formatCell<Row>(column: DataTableColumn<Row>, row: Row, locale: string, relativeTo: number, formats?: Readonly<Record<string, DataTableFormat>>): ReactNode {
+  const format = column.format ?? formats?.[column.id];
+  if (column.cell || !format || format.kind === "text") return cellText(column, row);
+  const value = (row as Record<string, unknown>)[column.id];
+  if (value === undefined || value === null) return "";
+  const raw = Array.isArray(value) ? value.join(", ") : String(value);
+  if (format.kind === "boolean") return value ? (format.trueLabel ?? "Yes") : (format.falseLabel ?? "No");
+  if (format.kind === "list") {
+    const values = Array.isArray(value) ? value : [value];
+    const shown = values.slice(0, Math.max(0, format.max ?? values.length));
+    return shown.join(", ") + (shown.length < values.length ? ` +${values.length - shown.length}` : "");
+  }
+  if (format.kind === "badge") {
+    const tone = format.tones?.[raw] ?? "neutral";
+    const toneClass = tone === "success" ? "text-emerald-700 dark:text-emerald-300" : tone === "warning" ? "text-amber-700 dark:text-amber-300" : tone === "danger" ? "text-red-700 dark:text-red-300" : "text-muted-foreground";
+    return <span data-tone={tone} className={toneClass}>{raw}</span>;
+  }
+  if (format.kind === "link") {
+    const hrefValue = format.hrefKey ? (row as Record<string, unknown>)[format.hrefKey] : value;
+    const href = safeHref(typeof hrefValue === "string" ? hrefValue : undefined);
+    return href ? <a href={href} className="underline underline-offset-2">{raw}</a> : raw;
+  }
+  if (typeof value !== "number" && typeof value !== "string") return raw;
+  const number = typeof value === "number" ? value : Number(value);
+  const decimals = "decimals" in format ? format.decimals : undefined;
+  const numberFormat = (options: Intl.NumberFormatOptions = {}) => {
+    try { return new Intl.NumberFormat(locale, { maximumFractionDigits: decimals, ...options }).format(number); }
+    catch { return raw; }
+  };
+  if (format.kind === "number") return `${numberFormat({ notation: format.compact ? "compact" : "standard" })}${format.unit ? ` ${format.unit}` : ""}`;
+  if (format.kind === "currency") return numberFormat({ style: "currency", currency: format.currency, notation: format.compact ? "compact" : "standard" });
+  if (format.kind === "percent") return format.basis === "unit" ? `${numberFormat({ maximumFractionDigits: format.decimals })}%` : numberFormat({ style: "percent", maximumFractionDigits: format.decimals });
+  if (format.kind === "delta") return `${numberFormat({ signDisplay: "always" })}${format.unit ? ` ${format.unit}` : ""}`;
+  if (format.kind === "date") {
+    const date = new Date(typeof value === "number" ? value : Date.parse(value));
+    if (Number.isNaN(date.getTime())) return raw;
+    if (format.style === "relative") {
+      const seconds = Math.round((date.getTime() - relativeTo) / 1000);
+      const [amount, unit] = Math.abs(seconds) < 60 ? [seconds, "second"] : Math.abs(seconds) < 3600 ? [Math.round(seconds / 60), "minute"] : Math.abs(seconds) < 86400 ? [Math.round(seconds / 3600), "hour"] : [Math.round(seconds / 86400), "day"];
+      try { return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(amount, unit as Intl.RelativeTimeFormatUnit); } catch { return raw; }
+    }
+    try { return new Intl.DateTimeFormat(locale, format.style === "datetime" ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }).format(date); } catch { return raw; }
+  }
+  return raw;
 }
 
 function columnMinWidth<Row>(column: DataTableColumn<Row>) {
@@ -114,12 +183,17 @@ export function DataTable<Row = ModelUsage>({
   toolbar,
   rowActions,
   rowActionsLabel = "Actions",
+  formats,
   emptyLabel,
+  locale,
+  relativeTo,
   className,
   ...props
 }: DataTableProps<Row>) {
   const { "aria-label": inheritedLabel, ...rootProps } = props;
   const genericMode = columns !== undefined;
+  const formatLocale = locale ?? Intl.DateTimeFormat().resolvedOptions().locale;
+  const formatRelativeTo = relativeTo ?? Date.now();
   const cols = (columns ??
     (MODEL_USAGE_COLUMNS as unknown as readonly DataTableColumn<Row>[]));
   const widthOf = (index: number) => (index === 0 ? "flex-1" : "w-16");
@@ -178,7 +252,7 @@ export function DataTable<Row = ModelUsage>({
           style={{ animationDelay: `${index * 80}ms` }}
         >
           {cols.map((column, columnIndex) => {
-            const value = cellText(column, row);
+            const value = formatCell(column, row, formatLocale, formatRelativeTo, formats);
             return columnIndex === 0 && !genericMode ? (
               <Fragment key={column.id}>
                 <span
@@ -342,7 +416,7 @@ export function DataTable<Row = ModelUsage>({
                     {column.header}
                   </span>
                   <span role="cell" className="text-foreground/90 text-end">
-                    {cellText(column, row)}
+                    {formatCell(column, row, formatLocale, formatRelativeTo, formats)}
                   </span>
                 </div>
               ))}

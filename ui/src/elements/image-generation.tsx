@@ -10,11 +10,13 @@ const DOTS = Array.from({ length: 64 }, (_, i) => i);
 export function ImageGeneration({
   prompt,
   generating,
+  onRegenerate,
   className,
   ...props
-}: Omit<ComponentProps<"div">, "children" | "prompt" | "generating"> & {
+}: Omit<ComponentProps<"div">, "children" | "prompt" | "generating" | "onRegenerate"> & {
   prompt: string;
   generating: boolean;
+  onRegenerate?: () => void;
 }) {
   return (
     <div
@@ -82,6 +84,9 @@ export function ImageGeneration({
         <button
           type="button"
           aria-label="Regenerate image"
+          aria-hidden={generating || undefined}
+          disabled={generating}
+          onClick={onRegenerate}
           className={cn(
             ghostButton,
             "size-6 shrink-0",

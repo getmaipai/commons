@@ -25,6 +25,8 @@ export function Chart({
   points,
   visibleCount,
   variant = "area",
+  trend,
+  upIsGood = true,
   className,
   ...props
 }: Omit<
@@ -36,6 +38,8 @@ export function Chart({
   | "points"
   | "visibleCount"
   | "variant"
+  | "trend"
+  | "upIsGood"
 > & {
   label: string;
   value: string;
@@ -43,6 +47,8 @@ export function Chart({
   points: readonly number[];
   visibleCount: number;
   variant?: ChartVariant;
+  trend?: "up" | "down" | "flat";
+  upIsGood?: boolean;
 }) {
   const shown = take(points, clamp(visibleCount, 1, points.length));
   const y = scale(points);
@@ -56,8 +62,8 @@ export function Chart({
     ? `M ${PAD},${H - PAD} ${coords.map((c) => `L ${c.x},${c.y}`).join(" ")} L ${last.x},${H - PAD} Z`
     : "";
   const lastIndex = shown.length - 1;
-  const falling = delta !== undefined && /^\s*[-−–]/.test(delta);
-  const rising = delta !== undefined && !falling;
+  const direction = trend ?? (delta === undefined ? undefined : /^\s*[-−–]/.test(delta) ? "down" : "up");
+  const good = direction === "up" || direction === "down" ? (direction === "up") === upIsGood : undefined;
 
   return (
     <div
@@ -75,12 +81,11 @@ export function Chart({
         {delta !== undefined && (
           <span
             className={cn(
-              mono,
-              "tabular-nums",
-              rising
-                ? "text-emerald-600 dark:text-emerald-400"
-                : "text-red-600 dark:text-red-400",
+            mono,
+            "tabular-nums",
+              good === undefined ? "text-muted-foreground" : good ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400",
             )}
+            data-trend={direction}
           >
             {delta}
           </span>

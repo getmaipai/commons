@@ -9,11 +9,13 @@ import { pct, progressOf } from "./range";
 export function AgentPlan({
   steps,
   activeIndex,
+  title = "Plan",
   className,
   ...props
-}: Omit<ComponentProps<"div">, "children" | "steps" | "activeIndex"> & {
+}: Omit<ComponentProps<"div">, "children" | "steps" | "activeIndex" | "title"> & {
   steps: readonly string[];
   activeIndex: number;
+  title?: string;
 }) {
   const total = steps.length;
   const completed = progressOf(activeIndex, total);
@@ -28,7 +30,7 @@ export function AgentPlan({
       {...props}
     >
       <div className="flex items-center justify-between">
-        <span className="text-[13.5px] font-medium">Plan</span>
+        <span className="text-[13.5px] font-medium">{title}</span>
         <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {completed} of {total}
         </span>

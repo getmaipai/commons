@@ -2,6 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { ArrowUpIcon, MicIcon, PlusIcon, SquareIcon } from "lucide-react";
+import { AuiIf, ComposerPrimitive } from "@assistant-ui/react";
 import { cn } from "cn";
 import { field, ghostButton, inkButton, mono } from "./surfaces";
 
@@ -147,5 +148,49 @@ export function MobileComposer({
         </span>
       )}
     </div>
+  );
+}
+
+/** Runtime-connected phone composer for callers already inside an assistant-ui provider. */
+export function MobileComposerRuntime({
+  className,
+  ...props
+}: Omit<ComponentProps<typeof ComposerPrimitive.Root>, "children">) {
+  return (
+    <ComposerPrimitive.Root
+      data-slot="mobile-composer-runtime"
+      className={cn("bg-background border-foreground/[0.07] flex w-full flex-col gap-2.5 rounded-t-[20px] border-t px-3 pt-3 pb-3", className)}
+      {...props}
+    >
+      <ComposerPrimitive.AttachmentDropzone asChild>
+        <div className={cn(field, "flex items-end gap-2 rounded-[18px] px-3 py-2")}>
+          <ComposerPrimitive.AddAttachment asChild>
+            <button type="button" aria-label="Add an attachment" className={cn(ghostButton, "size-9 shrink-0")}>
+              <PlusIcon className="size-4" />
+            </button>
+          </ComposerPrimitive.AddAttachment>
+          <ComposerPrimitive.Input
+            rows={1}
+            aria-label="Message"
+            placeholder="Message"
+            className="text-foreground placeholder:text-muted-foreground min-w-0 flex-1 resize-none bg-transparent text-base outline-none"
+          />
+          <AuiIf condition={(state) => !state.thread.isRunning || state.thread.voice !== undefined}>
+            <ComposerPrimitive.Send asChild>
+              <button type="button" aria-label="Send" className={cn(inkButton, "flex size-9 shrink-0 items-center justify-center rounded-full")}>
+                <ArrowUpIcon className="size-4" />
+              </button>
+            </ComposerPrimitive.Send>
+          </AuiIf>
+          <AuiIf condition={(state) => state.thread.isRunning && state.thread.voice === undefined}>
+            <ComposerPrimitive.Cancel asChild>
+              <button type="button" aria-label="Stop" className={cn(inkButton, "flex size-9 shrink-0 items-center justify-center rounded-full")}>
+                <SquareIcon className="size-3 fill-current" />
+              </button>
+            </ComposerPrimitive.Cancel>
+          </AuiIf>
+        </div>
+      </ComposerPrimitive.AttachmentDropzone>
+    </ComposerPrimitive.Root>
   );
 }

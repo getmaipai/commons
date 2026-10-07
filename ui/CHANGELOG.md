@@ -1,5 +1,19 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.166] - ui-v0.5.166
+
+### ELT-T1-K02b additive Element props
+
+The generic `DataTable` supports upstream per-column format descriptors and
+format defaults keyed by column id. `ImageGeneration` accepts `onRegenerate`;
+`AgentPlan` accepts `title`; `Chart` accepts `trend` and `upIsGood`;
+`JobProgress` accepts `outcome` and `elapsedMs`; `TerminalBlock` accepts
+`exitCode`, `stderr`, `cwd`, `durationMs`, `truncated`, and
+`maxCollapsedLines`; `TodoList` accepts `title`, `description`, `maxVisible`,
+and item descriptions. `MobileComposerRuntime` adds a composer-primitives
+connected form while the presentational `MobileComposer` remains available.
+Existing component shapes and defaults remain supported.
+
 ## [0.5.165] - ui-v0.5.165
 
 ### ELT-T1-13b table widths (additive)

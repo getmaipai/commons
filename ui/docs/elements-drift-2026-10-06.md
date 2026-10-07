@@ -1,0 +1,121 @@
+# Vendored Element prop drift (2026-10-06 registry review)
+
+Source baseline: assistant-ui default registry snapshot recorded in `dashboard-upstream.md` (monorepo commit `039c3c32822632f2a564164f089f538926886124`). Each entry names the upstream props or form absent from the vendored copy; `none recorded` means the existing audit recorded no prop-only delta for that Element. The K02b additions are marked as landed by this slice. Runtime `.aui.tsx` files are separate compositions and are not standalone registry copies.
+
+- `activity-graph`: none recorded in the 2026-10-06 audit.
+- `agent-card`: none recorded in the 2026-10-06 audit.
+- `agent-handoff`: none recorded in the 2026-10-06 audit.
+- `agent-plan`: title (added in K02b).
+- `agent-status`: none recorded in the 2026-10-06 audit.
+- `approval-card`: allowOnceLabel, alwaysAllowLabel, denyLabel, description, details, statusLabel, variant.
+- `artifact-card`: none recorded in the 2026-10-06 audit.
+- `background-inbox`: none recorded in the 2026-10-06 audit.
+- `canvas-split`: none recorded in the 2026-10-06 audit.
+- `chart`: trend, upIsGood (added in K02b).
+- `chat-panel`: none recorded in the 2026-10-06 audit.
+- `checkpoint-history`: none recorded in the 2026-10-06 audit.
+- `code-diff`: none recorded in the 2026-10-06 audit.
+- `code-runner`: none recorded in the 2026-10-06 audit.
+- `command-palette`: none recorded in the 2026-10-06 audit.
+- `comparison-card`: none recorded in the 2026-10-06 audit.
+- `composer`: none recorded in the 2026-10-06 audit.
+- `computer-use`: none recorded in the 2026-10-06 audit.
+- `confidence-marker`: none recorded in the 2026-10-06 audit.
+- `connection-state`: none recorded in the 2026-10-06 audit.
+- `context-breakdown`: none recorded in the 2026-10-06 audit.
+- `context-display`: none recorded in the 2026-10-06 audit.
+- `conversation-map`: none recorded in the 2026-10-06 audit.
+- `conversation-search`: none recorded in the 2026-10-06 audit.
+- `cost-meter`: none recorded in the 2026-10-06 audit.
+- `data-table`: per-column format, locale, relativeTo (added in K02b).
+- `day-separator`: none recorded in the 2026-10-06 audit.
+- `diagram`: none recorded in the 2026-10-06 audit.
+- `directive-text`: none recorded in the 2026-10-06 audit.
+- `document-reference`: none recorded in the 2026-10-06 audit.
+- `draft-restore`: none recorded in the 2026-10-06 audit.
+- `edit-message`: none recorded in the 2026-10-06 audit.
+- `elicitation-form`: none recorded in the 2026-10-06 audit.
+- `empty-state`: none recorded in the 2026-10-06 audit.
+- `error-state`: none recorded in the 2026-10-06 audit.
+- `feedback-dialog`: none recorded in the 2026-10-06 audit.
+- `file`: none recorded in the 2026-10-06 audit.
+- `file-tree`: none recorded in the 2026-10-06 audit.
+- `flow-graph`: none recorded in the 2026-10-06 audit.
+- `github`: none recorded in the 2026-10-06 audit.
+- `guardrail-notice`: none recorded in the 2026-10-06 audit.
+- `heat-graph`: none recorded in the 2026-10-06 audit.
+- `image`: none recorded in the 2026-10-06 audit.
+- `image-gallery`: none recorded in the 2026-10-06 audit.
+- `image-generation`: onRegenerate (added in K02b).
+- `inline-citation`: open, onOpenChange, source.
+- `job-progress`: outcome, elapsedMs (added in K02b).
+- `launcher-bubble`: none recorded in the 2026-10-06 audit.
+- `loading-state`: none recorded in the 2026-10-06 audit.
+- `map-answer`: none recorded in the 2026-10-06 audit.
+- `markdown-text`: none recorded in the 2026-10-06 audit.
+- `math-block`: none recorded in the 2026-10-06 audit.
+- `mcp-server-panel`: none recorded in the 2026-10-06 audit.
+- `memory-chips`: none recorded in the 2026-10-06 audit.
+- `mermaid-diagram`: none recorded in the 2026-10-06 audit.
+- `message-actions`: none recorded in the 2026-10-06 audit.
+- `message-attachment`: none recorded in the 2026-10-06 audit.
+- `message-branches`: none recorded in the 2026-10-06 audit.
+- `message-pair`: onCopy, onRegenerate.
+- `message-queue`: none recorded in the 2026-10-06 audit.
+- `message-timing`: none recorded in the 2026-10-06 audit.
+- `mobile-composer`: assistant-ui runtime form (added in K02b).
+- `model-picker`: none recorded in the 2026-10-06 audit.
+- `model-selector`: none recorded in the 2026-10-06 audit.
+- `number-ticker`: none recorded in the 2026-10-06 audit.
+- `onboarding`: none recorded in the 2026-10-06 audit.
+- `option-list`: none recorded in the 2026-10-06 audit.
+- `permission-grant`: none recorded in the 2026-10-06 audit.
+- `project-home-page`: none recorded in the 2026-10-06 audit.
+- `project-mark`: none recorded in the 2026-10-06 audit.
+- `project-settings`: none recorded in the 2026-10-06 audit.
+- `project-share`: none recorded in the 2026-10-06 audit.
+- `prompt-library`: none recorded in the 2026-10-06 audit.
+- `question-flow`: none recorded in the 2026-10-06 audit.
+- `quota-banner`: none recorded in the 2026-10-06 audit.
+- `quote-reply`: none recorded in the 2026-10-06 audit.
+- `read-aloud`: none recorded in the 2026-10-06 audit.
+- `reasoning`: none recorded in the 2026-10-06 audit.
+- `reasoning-effort`: none recorded in the 2026-10-06 audit.
+- `reasoning-panel`: none recorded in the 2026-10-06 audit.
+- `recommendation-card`: none recorded in the 2026-10-06 audit.
+- `regenerate-menu`: none recorded in the 2026-10-06 audit.
+- `research-report`: none recorded in the 2026-10-06 audit.
+- `retrieval-chunks`: none recorded in the 2026-10-06 audit.
+- `reviewable-diff`: none recorded in the 2026-10-06 audit.
+- `schedule-card`: none recorded in the 2026-10-06 audit.
+- `score-breakdown`: none recorded in the 2026-10-06 audit.
+- `scroll-anchor`: none recorded in the 2026-10-06 audit.
+- `settings-panel`: none recorded in the 2026-10-06 audit.
+- `shared-conversation`: none recorded in the 2026-10-06 audit.
+- `shiki-highlighter`: none recorded in the 2026-10-06 audit.
+- `sources`: none recorded in the 2026-10-06 audit.
+- `speaker-identity`: none recorded in the 2026-10-06 audit.
+- `spec-sheet`: none recorded in the 2026-10-06 audit.
+- `stopped-run`: none recorded in the 2026-10-06 audit.
+- `streaming-text`: none recorded in the 2026-10-06 audit.
+- `subagent-list`: none recorded in the 2026-10-06 audit.
+- `suggestions`: none recorded in the 2026-10-06 audit.
+- `surfaces`: none recorded in the 2026-10-06 audit.
+- `task-card`: none recorded in the 2026-10-06 audit.
+- `terminal-block`: exitCode, stderr, cwd, durationMs, truncated, maxCollapsedLines (added in K02b).
+- `thinking-indicator`: none recorded in the 2026-10-06 audit.
+- `thread-list`: onDelete, onRename.
+- `thread-search`: none recorded in the 2026-10-06 audit.
+- `timeline`: none recorded in the 2026-10-06 audit.
+- `todo-list`: title, description, maxVisible, item description (added in K02b).
+- `tool-call`: none recorded in the 2026-10-06 audit.
+- `tool-error`: none recorded in the 2026-10-06 audit.
+- `tool-group`: none recorded in the 2026-10-06 audit.
+- `tool-timeline`: none recorded in the 2026-10-06 audit.
+- `tooltip-icon-button`: none recorded in the 2026-10-06 audit.
+- `trace-waterfall`: none recorded in the 2026-10-06 audit.
+- `typing-indicator`: none recorded in the 2026-10-06 audit.
+- `voice`: none recorded in the 2026-10-06 audit.
+- `voice-conversation`: transcript.
+- `web-preview`: none recorded in the 2026-10-06 audit.
+- `web-search`: none recorded in the 2026-10-06 audit.

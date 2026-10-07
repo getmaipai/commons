@@ -12,18 +12,26 @@ export interface TodoItem {
   text: string;
   status: TodoStatus;
   reason?: string;
+  description?: string;
 }
 
 export function TodoList({
   items,
   revision,
+  title = "Todos",
+  description,
+  maxVisible,
   className,
   ...props
-}: Omit<ComponentProps<"div">, "children" | "items" | "revision"> & {
+}: Omit<ComponentProps<"div">, "children" | "items" | "revision" | "title"> & {
   items: readonly TodoItem[];
   revision?: number;
+  title?: string;
+  description?: string;
+  maxVisible?: number;
 }) {
   const done = items.filter((item) => item.status === "done").length;
+  const visibleItems = maxVisible === undefined ? items : items.slice(0, Math.max(0, maxVisible));
 
   return (
     <div
@@ -32,15 +40,16 @@ export function TodoList({
       {...props}
     >
       <div className="flex items-baseline justify-between">
-        <span className="text-[13.5px] font-medium">Todos</span>
+        <span className="text-[13.5px] font-medium">{title}</span>
         <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {revision === undefined
             ? `${done}/${items.length}`
             : `${done}/${items.length} · rev ${revision}`}
         </span>
       </div>
+      {description && <p className="text-muted-foreground text-xs">{description}</p>}
       <ul className="flex flex-col gap-1">
-        {items.map((item) => (
+        {visibleItems.map((item) => (
           <li
             key={item.id}
             className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both flex items-start gap-2.5 py-0.5 text-[13.5px] duration-300"
@@ -81,6 +90,7 @@ export function TodoList({
                   {item.reason}
                 </p>
               ) : null}
+              {item.description && <p className="text-muted-foreground text-xs leading-4 break-words">{item.description}</p>}
             </div>
           </li>
         ))}

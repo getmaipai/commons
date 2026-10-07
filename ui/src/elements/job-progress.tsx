@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { CheckIcon, Loader2Icon, XIcon } from "lucide-react";
+import { CheckIcon, CircleAlertIcon, CircleSlashIcon, Loader2Icon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { ghostButton, mono, paper } from "./surfaces";
 import { announced, clamp, pct, progressOf, take } from "./range";
@@ -20,6 +20,8 @@ export function JobProgress({
   onCancel,
   doneLabel = "done",
   cancelLabel = "Cancel the job",
+  outcome,
+  elapsedMs,
   className,
   ...props
 }: Omit<
@@ -33,6 +35,8 @@ export function JobProgress({
   | "onCancel"
   | "doneLabel"
   | "cancelLabel"
+  | "outcome"
+  | "elapsedMs"
 > & {
   title: string;
   stages: readonly JobStage[];
@@ -43,6 +47,8 @@ export function JobProgress({
   onCancel?: () => void;
   doneLabel?: string;
   cancelLabel?: string;
+  outcome?: { status: "success" | "partial" | "failed" | "cancelled"; summary?: string };
+  elapsedMs?: number;
 }) {
   const stage = progressOf(stageIndex, stages.length);
   const progress = clamp(stageProgress, 0, 1);
@@ -56,7 +62,9 @@ export function JobProgress({
     completed + (current ? current.weight * progress : 0),
     totalWeight,
   );
-  const finished = stage >= stages.length;
+  const finished = stage >= stages.length || outcome !== undefined;
+  const outcomeLabel = outcome?.status === "success" ? doneLabel : outcome?.status;
+  const elapsedLabel = elapsedMs === undefined ? undefined : `${Math.max(0, Math.round(elapsedMs / 1000))}s`;
 
   return (
     <div
@@ -70,7 +78,13 @@ export function JobProgress({
       {...props}
     >
       <div className="flex items-center gap-2.5">
-        {finished ? (
+        {outcome?.status === "partial" ? (
+          <CircleAlertIcon className="size-3.5 shrink-0 text-amber-500 dark:text-amber-400" />
+        ) : outcome?.status === "failed" ? (
+          <XIcon className="size-3.5 shrink-0 text-red-600 dark:text-red-400" />
+        ) : outcome?.status === "cancelled" ? (
+          <CircleSlashIcon className="text-muted-foreground size-3.5 shrink-0" />
+        ) : finished ? (
           <CheckIcon className="size-3.5 shrink-0 text-emerald-500" />
         ) : (
           <Loader2Icon className="text-foreground/35 size-3.5 shrink-0 animate-spin motion-reduce:animate-none" />
@@ -82,7 +96,7 @@ export function JobProgress({
           <span
             className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
           >
-            {finished ? doneLabel : eta}
+            {finished ? outcomeLabel ?? doneLabel : eta}
           </span>
         )}
         {!finished && (
@@ -96,6 +110,8 @@ export function JobProgress({
           </button>
         )}
       </div>
+      {finished && elapsedLabel && <time className={cn(mono, "text-muted-foreground")} dateTime={`PT${Math.max(0, Math.round(elapsedMs! / 1000))}S`}>{elapsedLabel}</time>}
+      {outcome?.summary && <p className="text-muted-foreground text-xs">{outcome.summary}</p>}
 
       <span
         role="progressbar"
@@ -108,7 +124,7 @@ export function JobProgress({
         <span
           className={cn(
             "block h-full rounded-full transition-[width] duration-500 ease-out motion-reduce:transition-none",
-            finished ? "bg-emerald-500" : "bg-blue-500 dark:bg-blue-400",
+            outcome?.status === "partial" ? "bg-amber-500 dark:bg-amber-400" : outcome?.status === "failed" ? "bg-red-600 dark:bg-red-400" : outcome?.status === "cancelled" ? "bg-foreground/20" : finished ? "bg-emerald-500" : "bg-blue-500 dark:bg-blue-400",
           )}
           style={{ width: `${overall}%` }}
         />
