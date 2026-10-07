@@ -56,13 +56,15 @@ export function StoppedRun({
           Continue
           <ArrowRightIcon className="size-3" />
         </button>
-        <button
-          type="button"
-          onClick={onDiscard}
-          className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 flex h-7 items-center rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
-        >
-          Discard
-        </button>
+        {onDiscard ? (
+          <button
+            type="button"
+            onClick={onDiscard}
+            className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 flex h-7 items-center rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
+          >
+            Discard
+          </button>
+        ) : null}
       </div>
     </div>
   );

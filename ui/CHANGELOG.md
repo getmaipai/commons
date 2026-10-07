@@ -1,5 +1,12 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.161] - ui-v0.5.161
+
+### ELT-T1-16 (additive)
+
+`StoppedRun` renders its Discard button only when an `onDiscard` handler is
+provided. Existing callers that provide the handler keep the same behavior.
+
 ## [0.5.159] - ui-v0.5.159
 
 ### ELT-T1-07 (additive)
