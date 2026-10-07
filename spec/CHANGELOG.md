@@ -14,6 +14,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.103] - 2026-10-07
+
+### Fixed
+- Preserve the admin-only Home Voices navigation placement alongside TOOL-OFFER-01 policy schemas.
+
 ## [spec-v0.1.102] - 2026-10-07
 
 ### Added

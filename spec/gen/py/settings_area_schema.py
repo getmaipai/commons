@@ -128,6 +128,7 @@ class Section(BaseModel):
             'chat.skills',
             'chat.shortcuts',
             'home.commands',
+            'home.voice_catalog',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn above the cards.')
@@ -139,6 +140,7 @@ class Section(BaseModel):
             'chat.skills',
             'chat.shortcuts',
             'home.commands',
+            'home.voice_catalog',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn below the cards.')
@@ -150,6 +152,7 @@ class Section(BaseModel):
             'chat.skills',
             'chat.shortcuts',
             'home.commands',
+            'home.voice_catalog',
         ]
         | None
     ) = Field(

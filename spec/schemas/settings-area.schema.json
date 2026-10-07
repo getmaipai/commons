@@ -129,7 +129,8 @@
         "account.device_appearance",
         "chat.skills",
         "chat.shortcuts",
-        "home.commands"
+        "home.commands",
+        "home.voice_catalog"
       ],
       "description": "A named view in Home's view table. The list is closed so a package cannot name one Home does not have."
     },

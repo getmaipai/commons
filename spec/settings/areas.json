@@ -394,6 +394,13 @@
           "view": "home.commands"
         },
         {
+          "id": "voices",
+          "label": "Voices",
+          "icon": "volume-2",
+          "kind": "view",
+          "view": "home.voice_catalog"
+        },
+        {
           "id": "robot",
           "label": "Robot",
           "icon": "bot",

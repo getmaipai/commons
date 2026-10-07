@@ -165,6 +165,7 @@ describe("conformance: structure", () => {
       "chat.shortcuts",
       "chat.skills",
       "home.commands",
+      "home.voice_catalog",
     ]);
   });
 
