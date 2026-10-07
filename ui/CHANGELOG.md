@@ -1,6 +1,6 @@
 # Changelog (`@maipai/ui`)
 
-## [Unreleased]
+## [0.5.164] - ui-v0.5.164
 
 ### ELT-T1-K02 data-table (additive)
 
