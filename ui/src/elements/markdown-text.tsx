@@ -25,7 +25,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useAuiState, type TextMessagePartProps } from "@assistant-ui/react";
+import { useAuiState, type TextMessagePartProps, type ThreadMessage } from "@assistant-ui/react";
 import { useMediaQuery } from "usehooks-ts";
 import { CheckIcon, CopyIcon } from "lucide-react";
 
@@ -142,7 +142,7 @@ function useMathPlugins(text: string): MathPlugins | null {
 
 const rehypePluginsBase: Pluggable[] = [];
 
-type MarkdownNode = { type: string; value?: string; children?: MarkdownNode[] };
+type MarkdownNode = { type: string; url?: string; value?: string; children?: MarkdownNode[] };
 function rawHtmlAsText() {
   return (tree: MarkdownNode) => {
     const visit = (node: MarkdownNode) => {
@@ -157,7 +157,27 @@ function rawHtmlAsText() {
 }
 const remarkPluginsWithoutRawHtml: Pluggable[] = [remarkGfm, rawHtmlAsText];
 const remendOptions = { links: false, linkMode: "text-only" as const };
-const linkSafety = { enabled: false };
+// PI-RENDER-01 (F1): a reply is model-written, and the model can be steered
+// by untrusted text, so a markdown image is a zero-click way to send private
+// data to any host (the browser fetches it). Streamdown's own `security`
+// option (rehype-harden) is the control: images may only come from the hub's
+// own proxy path, never a remote host and never a `data:` URL; an image that
+// fails the check is replaced by "[Image blocked: <alt text>]". Links stay
+// links (harden already drops javascript:, data: and file: targets) and open
+// through Streamdown's link-safety dialog, which shows the full address.
+export const DEFAULT_ALLOWED_IMAGE_PREFIXES: readonly string[] = ["/api/answer-image/"];
+
+export type MarkdownLinkContext = { message: ThreadMessage; messages: readonly ThreadMessage[] };
+export type TrustedLinks = readonly string[] | ((context: MarkdownLinkContext) => readonly string[]);
+
+function hubOrigin(): string {
+  try {
+    const o = globalThis.location?.origin;
+    return o && o !== "null" ? o : "http://localhost";
+  } catch {
+    return "http://localhost";
+  }
+}
 // STREAMING-TEXT-01: the streamed reply takes the streaming-text Element's
 // look (its docs: each word fades in over 500 ms in blue, settles back to ink
 // over 700 ms, a blue caret after the last word). That Element renders one
@@ -173,6 +193,11 @@ export type MarkdownTextProps = Partial<TextMessagePartProps> & {
   components?: Parameters<typeof memoizeMarkdownComponents>[0];
   preprocess?: (text: string, context: MarkdownPreprocessContext) => string;
   remend?: RemendConfig;
+  /** Path and local URL prefixes an image may load from. Remote hosts are
+   * never allowed. */
+  allowedImagePrefixes?: readonly string[];
+  /** Exact URLs that open without the link-safety dialog (a turn's sources). */
+  trustedLinks?: TrustedLinks;
 };
 
 const useShallowStable = <T extends Record<string, unknown> | undefined>(
@@ -227,7 +252,67 @@ const MarkdownMermaid: FC<AuiSyntaxHighlighterProps> = ({ code }) => {
 // per-render allocation to memoize away).
 const componentsByLanguage = { mermaid: { SyntaxHighlighter: MarkdownMermaid } };
 
-const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess, remend = remendOptions }) => {
+function canonicalLink(url: string, origin: string): string {
+  try { return new URL(url, origin).href; } catch { return url; }
+}
+
+function isHubLink(url: string): boolean {
+  return (url.startsWith("/") && !url.startsWith("//")) || url.startsWith("./") || url.startsWith("../") || url.startsWith("#");
+}
+
+/** Removes unlisted markdown links before HTML rendering; the full URL stays
+ * visible so a model cannot hide its destination behind trusted-looking text. */
+function stripUntrustedLinks(trusted: ReadonlySet<string>, origin: string): Pluggable {
+  return () => (tree: MarkdownNode) => {
+    const walk = (node: MarkdownNode) => {
+      const children = node.children;
+      if (!children) return;
+      for (let i = 0; i < children.length; i += 1) {
+        const child = children[i]!;
+        if (child.type === "link" && child.url && !isHubLink(child.url) && !trusted.has(canonicalLink(child.url, origin))) {
+          children.splice(i, 1, ...(child.children ?? []), { type: "text", value: ` (${child.url})` });
+          i += (child.children?.length ?? 0);
+          continue;
+        }
+        walk(child);
+      }
+    };
+    walk(tree);
+  };
+}
+
+const MarkdownTextImpl: FC<MarkdownTextProps> = ({
+  components,
+  preprocess,
+  remend = remendOptions,
+  allowedImagePrefixes = DEFAULT_ALLOWED_IMAGE_PREFIXES,
+  trustedLinks,
+}) => {
+  const origin = hubOrigin();
+  const message = useAuiState((s) => s.message);
+  const messages = useAuiState((s) => s.thread.messages);
+  const resolvedTrustedLinks = typeof trustedLinks === "function"
+    ? trustedLinks({ message, messages })
+    : trustedLinks ?? [];
+  const trustedKey = resolvedTrustedLinks.join("\n");
+  const trusted = useMemo(
+    () => new Set(trustedKey ? trustedKey.split("\n").map((url) => canonicalLink(url, origin)) : []),
+    [trustedKey, origin],
+  );
+  const trustedLinksForSecurity = useMemo(() => [...trusted], [trusted]);
+  const imagePrefixKey = allowedImagePrefixes.join("\n");
+  const security = useMemo(
+    () => ({
+      defaultOrigin: origin,
+      allowedImagePrefixes: imagePrefixKey ? imagePrefixKey.split("\n") : [],
+      allowedLinkPrefixes: ["/", "./", "../", `${origin}/`, ...trustedLinksForSecurity],
+      allowDataImages: false,
+    }),
+    [imagePrefixKey, origin, trustedLinksForSecurity],
+  );
+  const linkSafety = useMemo(() => {
+    return { enabled: true, onLinkCheck: (url: string) => trusted.has(canonicalLink(url, origin)) || isHubLink(url) };
+  }, [trusted, origin]);
   // Only read to decide whether this message's own math plugins are
   // worth loading - MarkdownTextPrimitive reads the same part's text
   // again internally (its own useMessagePartText/useSmooth), so this
@@ -239,7 +324,10 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess, remen
     s.part.type === "text" && s.message.role === "assistant" && s.message.status?.type === "running",
   );
   const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const remarkPlugins = mathPlugins?.remarkPlugins ?? remarkPluginsWithoutRawHtml;
+  const markdownRemarkPlugins = useMemo(
+    () => [...(mathPlugins?.remarkPlugins ?? remarkPluginsWithoutRawHtml), stripUntrustedLinks(trusted, origin)],
+    [mathPlugins?.remarkPlugins, trusted, origin],
+  );
   const rehypePlugins = mathPlugins?.rehypePlugins ?? rehypePluginsBase;
 
   const stableComponents = useShallowStable(components);
@@ -253,7 +341,7 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess, remen
   return (
     <Suspense fallback={<span className="aui-md" aria-label="Formatting message" />}>
       <LazyStreamdownTextPrimitive
-        remarkPlugins={remarkPlugins}
+        remarkPlugins={markdownRemarkPlugins}
         rehypePlugins={rehypePlugins}
         preprocess={(text) => (preprocess ? preprocess(preprocessMath(text), { streaming }) : preprocessMath(text))}
         // Streamdown 2.7.0's memo comparator omits remarkPlugins/rehypePlugins;
@@ -266,6 +354,7 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components, preprocess, remen
         caret={shouldAnimate ? "block" : undefined}
         remend={remend}
         linkSafety={linkSafety}
+        security={security}
       />
     </Suspense>
   );
@@ -367,8 +456,12 @@ const defaultComponents = memoizeMarkdownComponents({
   // attributes, so a household member never loses their place in the
   // conversation by tapping a link inside a reply, and a linked site
   // learns nothing from the click but the click.
-  a: ({ className, target = "_blank", rel = "noopener noreferrer", referrerPolicy = "no-referrer", ...props }) => (
+  a: ({ className, target = "_blank", rel = "noopener noreferrer", referrerPolicy = "no-referrer", href, title, ...props }) => (
     <a
+      href={href}
+      // PI-RENDER-01: the full address is one hover (or long press) away,
+      // so a model-written label never hides where a link goes.
+      title={title ?? (href && /^https?:/i.test(href) ? href : undefined)}
       className={cn(
         "aui-md-a text-primary hover:text-primary/80 underline underline-offset-2",
         className,

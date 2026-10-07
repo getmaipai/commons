@@ -192,7 +192,7 @@ export type ComposerDensity = "compact";
 export type ComposerNoticeLayout = "truncate" | "wrap";
 
 export type ThreadComponents = {
-  markdown?: { components?: MarkdownTextProps["components"]; preprocess?: MarkdownTextProps["preprocess"]; remend?: MarkdownTextProps["remend"] } | undefined;
+  markdown?: Pick<MarkdownTextProps, "components" | "preprocess" | "remend" | "allowedImagePrefixes" | "trustedLinks"> | undefined;
   /** assistant-ui viewport behavior. Defaults preserve the kit's top anchor. */
   viewport?: ThreadViewportOptions | undefined;
   AssistantMessage?: ComponentType | undefined;

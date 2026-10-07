@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.148] - ui-v0.5.148
+
+### PI-RENDER-01 (safe by default)
+
+Markdown reply images load only through the hub answer-image proxy. Unlisted
+links render as plain text with their destination visible; exact trusted links
+remain links.
+
 ## [0.5.145] - ui-v0.5.145
 
 ### A11Y-COLUMN-01 follow-up (additive)
