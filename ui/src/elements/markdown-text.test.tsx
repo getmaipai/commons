@@ -6,7 +6,7 @@
 // composer/thread, not a mocked recall() of markdown-text's own props.
 import { afterEach, beforeAll, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
-import { AssistantRuntimeProvider, AuiConfig, AuiProvider, MessagePrimitive, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
+import { AssistantRuntimeProvider, AuiConfig, AuiProvider, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
 import type { RemendConfig } from "@assistant-ui/react-streamdown";
 import { Thread } from "./thread.aui";
 import { STREAMING_TEXT_ANIMATION } from "./markdown-text";

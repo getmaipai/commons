@@ -146,7 +146,6 @@ function useMathPlugins(text: string): MathPlugins | null {
 
 const rehypePluginsBase: Pluggable[] = [];
 const streamdownSanitizeSchema = { tagNames: [] as string[], attributes: {} as Record<string, string[]> };
-const streamdownSanitizeSchema = { tagNames: [] as string[], attributes: {} as Record<string, string[]> };
 
 type MarkdownNode = { type: string; url?: string; value?: string; children?: MarkdownNode[] };
 function rawHtmlAsText() {
@@ -299,8 +298,8 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
   // `MarkdownText` is also used by standalone previews (docs, settings,
   // artifacts) where no assistant-ui Thread scope exists. Keep message
   // history optional; those callers get no conversation-derived trusted URLs.
-  const message = isStandalone ? undefined : useAuiState((s) => s.optional.message);
-  const messages = isStandalone ? undefined : useAuiState((s) => s.optional.thread?.messages);
+  const message = useAuiState((s) => s.optional.message);
+  const messages = useAuiState((s) => s.optional.thread?.messages);
   const resolvedTrustedLinks = typeof trustedLinks === "function"
     ? (message && messages ? trustedLinks({ message, messages }) : [])
     : trustedLinks ?? [];
@@ -327,12 +326,14 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
   // worth loading - MarkdownTextPrimitive reads the same part's text
   // again internally (its own useMessagePartText/useSmooth), so this
   // never becomes the source of truth for what renders.
-  const text = isStandalone ? standaloneText : useAuiState((s) => (s.part.type === "text" ? s.part.text : ""));
-  const streaming = isStandalone ? false : useAuiState((s) => s.message.status?.type === "running");
-  const mathPlugins = useMathPlugins(text);
-  const shouldAnimate = isStandalone ? false : useAuiState((s) =>
-    s.part.type === "text" && s.message.role === "assistant" && s.message.status?.type === "running",
+  const partText = useAuiState((s) => (s.optional.part?.type === "text" ? s.optional.part.text : ""));
+  const streaming = useAuiState((s) => s.optional.message?.status?.type === "running");
+  const shouldAnimateInThread = useAuiState((s) =>
+    s.optional.part?.type === "text" && s.optional.message?.role === "assistant" && s.optional.message.status?.type === "running",
   );
+  const text = isStandalone ? standaloneText : partText;
+  const shouldAnimate = !isStandalone && shouldAnimateInThread;
+  const mathPlugins = useMathPlugins(text);
   const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const markdownRemarkPlugins = useMemo(
     () => [...(mathPlugins?.remarkPlugins ?? remarkPluginsWithoutRawHtml), stripUntrustedLinks(trusted, origin)],
@@ -376,7 +377,6 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
         components={markdownComponents}
         controls={false}
         linkSafety={linkSafety}
-        security={security}
       /> : <LazyStreamdownTextPrimitive
         remarkPlugins={markdownRemarkPlugins}
         rehypePlugins={rehypePlugins}
