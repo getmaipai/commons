@@ -391,14 +391,16 @@
           "label": "Commands",
           "icon": "workflow",
           "kind": "view",
-          "view": "home.commands"
+          "view": "home.commands",
+          "min_role": "admin"
         },
         {
           "id": "voices",
           "label": "Voices",
           "icon": "volume-2",
           "kind": "view",
-          "view": "home.voice_catalog"
+          "view": "home.voice_catalog",
+          "min_role": "admin"
         },
         {
           "id": "robot",
