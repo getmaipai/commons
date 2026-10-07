@@ -18,11 +18,17 @@ export interface BackgroundRun {
 export function BackgroundInbox({
   runs,
   onCollect,
+  calm = false,
+  size = "default",
   className,
   ...props
-}: Omit<ComponentProps<"div">, "children" | "runs" | "onCollect"> & {
+}: Omit<ComponentProps<"div">, "children" | "runs" | "onCollect" | "size"> & {
   runs: readonly BackgroundRun[];
   onCollect?: (id: string) => void;
+  /** Stops the running-state spinner. Unset keeps the existing animation. */
+  calm?: boolean;
+  /** Comfortable raises kit-owned text to the 16px base token. */
+  size?: "default" | "comfortable";
 }) {
   const ready = runs.filter((run) => run.state === "ready").length;
   const running = runs.filter((run) => run.state === "running").length;
@@ -39,7 +45,14 @@ export function BackgroundInbox({
       {...props}
     >
       <div className="flex items-baseline justify-between px-1 pb-1">
-        <span className="text-[13.5px] font-medium">Running elsewhere</span>
+        <span
+          className={cn(
+            "font-medium",
+            size === "comfortable" ? "text-base" : "text-[13.5px]",
+          )}
+        >
+          Running elsewhere
+        </span>
         <span
           className={cn(
             mono,
@@ -47,6 +60,7 @@ export function BackgroundInbox({
             ready > 0
               ? "text-blue-600 dark:text-blue-400"
               : "text-muted-foreground",
+            size === "comfortable" && "text-base",
           )}
         >
           {ready > 0 ? `${ready} ready` : `${running} in flight`}
@@ -66,7 +80,7 @@ export function BackgroundInbox({
           <>
             <span className="flex size-3.5 shrink-0 items-center justify-center">
               {run.state === "running" ? (
-                <Loader2Icon className="text-foreground/30 size-3 animate-spin motion-reduce:animate-none" />
+                <Loader2Icon className={cn("text-foreground/30 size-3", !calm && "animate-spin", "motion-reduce:animate-none")} />
               ) : run.state === "failed" ? (
                 <XIcon className="size-3 text-red-500" />
               ) : (
@@ -77,7 +91,8 @@ export function BackgroundInbox({
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span
                 className={cn(
-                  "truncate text-[13px]",
+                  "truncate",
+                  size === "comfortable" ? "text-base" : "text-[13px]",
                   run.state === "running"
                     ? "text-muted-foreground"
                     : "text-foreground/90",
@@ -86,14 +101,24 @@ export function BackgroundInbox({
                 {run.title}
               </span>
               {run.summary && (
-                <span className={cn(mono, "text-muted-foreground truncate")}>
+                <span
+                  className={cn(
+                    mono,
+                    "text-muted-foreground truncate",
+                    size === "comfortable" && "text-base",
+                  )}
+                >
                   {run.summary}
                 </span>
               )}
             </span>
 
             <span
-              className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
+              className={cn(
+                mono,
+                "text-muted-foreground shrink-0 tabular-nums",
+                size === "comfortable" && "text-base",
+              )}
             >
               {run.elapsed}
             </span>

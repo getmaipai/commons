@@ -23,9 +23,11 @@ const isRenderable = (node: ReactNode) =>
 
 export function TaskStateIcon({
   state,
+  calm = false,
   className,
 }: {
   state: TaskCardState;
+  calm?: boolean;
   className?: string;
 }) {
   if (state === "done") {
@@ -57,7 +59,9 @@ export function TaskStateIcon({
       <Loader2Icon
         aria-hidden
         className={cn(
-          "text-muted-foreground size-3.5 shrink-0 animate-spin motion-reduce:animate-none",
+          "text-muted-foreground size-3.5 shrink-0",
+          !calm && "animate-spin",
+          "motion-reduce:animate-none",
           className,
         )}
       />
@@ -84,11 +88,19 @@ export function TaskCard({
   open,
   onOpenChange,
   children,
+  calm = false,
+  size = "default",
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "label" | "state" | "result" | "open" | "onOpenChange"
+  | "children"
+  | "label"
+  | "state"
+  | "result"
+  | "open"
+  | "onOpenChange"
+  | "size"
 > & {
   label: string;
   meta?: string | undefined;
@@ -99,6 +111,10 @@ export function TaskCard({
   open?: boolean | undefined;
   onOpenChange?: ((open: boolean) => void) | undefined;
   children?: ReactNode | undefined;
+  /** Suppresses the working spinner. Unset keeps its current motion-reduced animation. */
+  calm?: boolean | undefined;
+  /** Comfortable raises kit-owned text to the 16px base token; default preserves current sizing. */
+  size?: "default" | "comfortable" | undefined;
 }) {
   const hasTranscript = Children.toArray(children).length > 0;
   const inert = open !== undefined && onOpenChange === undefined;
@@ -128,14 +144,22 @@ export function TaskCard({
         onClick={toggle}
         className="hover:enabled:bg-foreground/[0.03] flex items-center gap-2.5 px-3.5 py-2.5 text-start transition-colors disabled:cursor-default"
       >
-        <TaskStateIcon state={state} />
+        <TaskStateIcon state={state} calm={calm} />
         <span className="sr-only">{state}</span>
-        <span className="min-w-0 flex-1 truncate text-[13.5px]">{label}</span>
+        <span
+          className={cn(
+            "min-w-0 flex-1 truncate",
+            size === "comfortable" ? "text-base" : "text-[13.5px]",
+          )}
+        >
+          {label}
+        </span>
         {meta !== undefined && (
           <span
             className={cn(
               mono,
               "text-muted-foreground max-w-24 shrink-0 truncate",
+              size === "comfortable" && "text-base",
             )}
           >
             {meta}
@@ -143,7 +167,11 @@ export function TaskCard({
         )}
         {elapsed !== undefined && (
           <span
-            className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
+            className={cn(
+              mono,
+              "text-muted-foreground shrink-0 tabular-nums",
+              size === "comfortable" && "text-base",
+            )}
           >
             {elapsed}
           </span>
@@ -169,7 +197,10 @@ export function TaskCard({
       {hasTranscript && isOpen && (
         <div
           data-slot="task-card-transcript"
-          className="border-border/60 flex flex-col gap-2 border-t px-3.5 py-2.5"
+          className={cn(
+            "border-border/60 flex flex-col gap-2 border-t px-3.5 py-2.5",
+            size === "comfortable" && "text-base",
+          )}
         >
           {children}
         </div>
@@ -177,7 +208,10 @@ export function TaskCard({
       {isRenderable(result) && (
         <div
           data-slot="task-card-result"
-          className="border-border/60 text-foreground/70 border-t px-3.5 py-2 text-xs leading-relaxed"
+          className={cn(
+            "border-border/60 text-foreground/70 border-t px-3.5 py-2 leading-relaxed",
+            size === "comfortable" ? "text-base" : "text-xs",
+          )}
         >
           {result}
         </div>
