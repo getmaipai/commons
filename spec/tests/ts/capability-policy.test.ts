@@ -108,8 +108,9 @@ describe("one definition per id", () => {
 
 describe("the owner's 2026-10-06 rows", () => {
   const find = (id: string) => [...perms.permissions, ...grants.actions].find((e) => e.id === id)!;
-  test("hosted search is never for a minor", () => {
+  test("hosted search is never for a minor and declares the band-default safe-search floor", () => {
     expect(find("search.hosted").policy!.approver).toEqual({ child: "never", teen: "never", adult: "none" });
+    expect(find("search.hosted").policy!.limits).toEqual(["safe_search:at_least_band_default"]);
   });
   test("a family name in a web search needs a parent for a child, the teen themselves", () => {
     expect(find("search.household_subject").policy!.approver).toEqual({ child: "parent", teen: "self", adult: "self" });

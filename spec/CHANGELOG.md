@@ -14,6 +14,13 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.96] - 2026-10-07
+
+### Added
+- Declare the hosted search safe-search floor as a capability limit:
+  the effective per-person level must be at least the speaker's band default.
+
+
 ## [spec-v0.1.94] - 2026-10-07
 
 ### Added

@@ -328,7 +328,10 @@
           "child": "never",
           "teen": "never",
           "adult": "none"
-        }
+        },
+        "limits": [
+          "safe_search:at_least_band_default"
+        ]
       }
     },
     {
