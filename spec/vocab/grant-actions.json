@@ -335,6 +335,24 @@
       }
     },
     {
+      "id": "search.safe_search",
+      "parameterized": false,
+      "description": "Apply the person's safe-search setting, never below the speaker's age-band default.",
+      "policy": {
+        "risk": "read",
+        "outbound": false,
+        "reversible": true,
+        "approver": {
+          "child": "none",
+          "teen": "none",
+          "adult": "none"
+        },
+        "limits": [
+          "safe_search:at_least_band_default"
+        ]
+      }
+    },
+    {
       "id": "search.household_subject",
       "parameterized": false,
       "description": "A web search whose query names a household member: a family name leaves the house.",

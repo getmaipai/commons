@@ -14,6 +14,13 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.97] - 2026-10-07
+
+### Added
+- Add the `search.safe_search` policy row so the gate declares and applies
+  the person's band-default safe-search floor for every search path.
+
+
 ## [spec-v0.1.96] - 2026-10-07
 
 ### Added
