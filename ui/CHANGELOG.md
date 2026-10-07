@@ -1,5 +1,17 @@
 # Changelog (`@maipai/ui`)
 
+## [Unreleased]
+
+### Settings parts (additive)
+
+Four tokens-only parts for a ChatGPT-style settings page, in `settings/`:
+`SettingsRow` (label, one-line description, trailing control slot, and a muted
+note shown only when `disabled`; no reset action), `SettingsSection` (title and
+rows split by 1 px dividers, no shadow), `SettingsSelect` (compact value and
+chevron over the kit `Select`) and `SettingsPage` (section list on the left,
+content column up to 720 px). `SettingsPartsShowcase` is the story. The kit has
+no barrel index, so each part is imported by path, like its neighbours.
+
 ## [0.5.175] - ui-v0.5.175
 
 ### SETTINGS-APPEARANCE-01 tokens and profile accent variants
