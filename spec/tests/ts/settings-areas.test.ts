@@ -54,6 +54,14 @@ describe("spec/settings/areas.json", () => {
   test("the whole file passes the cross-file conformance check", () => {
     expect(checkAreas(file, registry)).toEqual([]);
   });
+
+  test("personal voice controls stay in Account and command management is in Home", () => {
+    expect(section("account", "voice")).toMatchObject({ kind: "keys", lead_view: "account.voice" });
+    expect(section("home", "commands")).toMatchObject({ kind: "view", view: "home.commands" });
+    const accountVoice = section("account", "voice");
+    expect(accountVoice.cards?.find((card) => card.group === "person.voice")).toBeDefined();
+    expect(accountVoice.cards?.flatMap((card) => card.links ?? []).map((link) => link.href)).toEqual(["/commands"]);
+  });
 });
 
 describe("conformance: each registry group is in exactly one card", () => {
@@ -149,12 +157,14 @@ describe("conformance: structure", () => {
     expect(checkAreas(broken, registry).join("\n")).toMatch(/unknown view "chat\.nonsense"/);
   });
 
-  test("the allowed view ids are the four Home renders", () => {
+  test("the allowed view ids are the Home-owned renders", () => {
     expect([...ALLOWED_VIEW_IDS].sort()).toEqual([
       "account.device_appearance",
       "account.profile",
+      "account.voice",
       "chat.shortcuts",
       "chat.skills",
+      "home.commands",
     ]);
   });
 

@@ -99,6 +99,7 @@
           "label": "Voice",
           "icon": "mic",
           "kind": "keys",
+          "lead_view": "account.voice",
           "cards": [
             {
               "label": "Voice",
@@ -106,14 +107,11 @@
               "scope": "person"
             },
             {
-              "label": "Manage",
+              "label": "Commands",
+              "min_role": "adult",
               "links": [
                 {
-                  "label": "Voices",
-                  "href": "/voices"
-                },
-                {
-                  "label": "Commands",
+                  "label": "Create a command",
                   "href": "/commands"
                 }
               ]
@@ -231,7 +229,8 @@
             "general",
             "people",
             "search",
-            "integrations"
+            "integrations",
+            "commands"
           ]
         },
         {
@@ -385,6 +384,13 @@
             "context",
             "model"
           ]
+        },
+        {
+          "id": "commands",
+          "label": "Commands",
+          "icon": "workflow",
+          "kind": "view",
+          "view": "home.commands"
         },
         {
           "id": "robot",

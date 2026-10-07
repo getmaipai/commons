@@ -123,27 +123,33 @@ class Section(BaseModel):
     lead_view: (
         Literal[
             'account.profile',
+            'account.voice',
             'account.device_appearance',
             'chat.skills',
             'chat.shortcuts',
+            'home.commands',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn above the cards.')
     trail_view: (
         Literal[
             'account.profile',
+            'account.voice',
             'account.device_appearance',
             'chat.skills',
             'chat.shortcuts',
+            'home.commands',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn below the cards.')
     view: (
         Literal[
             'account.profile',
+            'account.voice',
             'account.device_appearance',
             'chat.skills',
             'chat.shortcuts',
+            'home.commands',
         ]
         | None
     ) = Field(

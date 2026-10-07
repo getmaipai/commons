@@ -690,6 +690,12 @@ Additive throughout; every existing fixture still validates unchanged.
   first. Regenerated `settings/keys.json` from `home/backend/src/
   settings/uiKeys.ts` via `bun run gen:settings`.
 
+## [spec-v0.1.99] - 2026-10-07
+
+### Changed
+- Settings areas: keep personal voice controls in Account and declare the
+  household command management view in admin-only Home settings.
+
 ## [spec-v0.1.0] - 2026-09-20
 
 ### Added

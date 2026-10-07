@@ -125,9 +125,11 @@
       "type": "string",
       "enum": [
         "account.profile",
+        "account.voice",
         "account.device_appearance",
         "chat.skills",
-        "chat.shortcuts"
+        "chat.shortcuts",
+        "home.commands"
       ],
       "description": "A named view in Home's view table. The list is closed so a package cannot name one Home does not have."
     },
