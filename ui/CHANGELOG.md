@@ -1,5 +1,12 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.154] - ui-v0.5.154
+
+### A11Y-STATUS-RED (additive)
+
+`Timeline` accepts `animate={false}` to render event rows immediately without
+entrance motion. The default retains the existing animation.
+
 ## [0.5.153] - ui-v0.5.153
 
 ### COLUMN-NUMBERS-01

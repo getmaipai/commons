@@ -18,11 +18,14 @@ export interface TimelineEvent {
 export function Timeline({
   events,
   visibleCount,
+  animate = true,
   className,
   ...props
-}: Omit<ComponentProps<"div">, "children" | "events" | "visibleCount"> & {
+}: Omit<ComponentProps<"div">, "children" | "events" | "visibleCount" | "animate"> & {
   events: readonly TimelineEvent[];
   visibleCount: number;
+  /** Disable entrance motion when the host needs the content visible immediately. */
+  animate?: boolean;
 }) {
   return (
     <div
@@ -38,7 +41,10 @@ export function Timeline({
       {take(events, visibleCount).map((event, i, shown) => (
         <div
           key={event.id}
-          className="fade-in slide-in-from-left-1 animate-in fill-mode-both grid grid-cols-[3.5rem_1rem_minmax(0,1fr)] gap-x-2 duration-300"
+          className={cn(
+            animate && "fade-in slide-in-from-left-1 animate-in fill-mode-both duration-300",
+            "grid grid-cols-[3.5rem_1rem_minmax(0,1fr)] gap-x-2",
+          )}
         >
           <span
             className={cn(
