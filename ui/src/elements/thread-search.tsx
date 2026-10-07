@@ -164,7 +164,7 @@ export function ThreadSearch({
       className={cn(
         field,
         density === "compact" && inputOnly
-          ? "flex h-9 items-center gap-2 rounded-lg px-2.5 py-0"
+          ? "flex h-9 items-center gap-2 rounded-[8px] px-2.5 py-0"
           : "flex items-center gap-2 rounded-xl px-2.5 py-1.5",
       )}
     >

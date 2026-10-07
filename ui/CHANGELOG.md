@@ -1,5 +1,12 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.172] - ui-v0.5.172
+
+### ELT-T1-20 compact ThreadSearch radius
+
+The compact input-only `ThreadSearch` uses an 8px radius in the kit, matching
+the ED-031 field geometry. The default field is unchanged.
+
 ## [0.5.171] - ui-v0.5.171
 
 ### ELT-T1-20 compact row surface sizing

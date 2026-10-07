@@ -63,7 +63,7 @@ describe("ThreadSearch inputOnly", () => {
     );
     const field = container.querySelector("[data-slot='thread-search'] > div");
     expect(field?.className).toContain("h-9");
-    expect(field?.className).toContain("rounded-lg");
+    expect(field?.className).toContain("rounded-[8px]");
     expect(field?.querySelector("svg")?.getAttribute("class")).toContain("size-4");
     expect(field?.querySelector("input")?.getAttribute("class")).toContain("text-[14px]");
 
