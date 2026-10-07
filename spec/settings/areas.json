@@ -102,7 +102,7 @@
           "lead_view": "account.voice",
           "cards": [
             {
-              "label": "Voice",
+              "label": "Your voice",
               "group": "person.voice",
               "scope": "person"
             },
@@ -390,7 +390,16 @@
           "label": "Commands",
           "icon": "workflow",
           "kind": "view",
+          "min_role": "admin",
           "view": "home.commands"
+        },
+        {
+          "id": "voices",
+          "label": "Voices",
+          "icon": "mic",
+          "kind": "view",
+          "min_role": "admin",
+          "view": "home.voice_catalog"
         },
         {
           "id": "robot",

@@ -1,3 +1,8 @@
+## [spec-v0.1.100] - 2026-10-07
+
+- Gate household Voice catalog and Commands settings views to administrators.
+- Keep Account Voice scoped to a person's own controls.
+
 ## [spec-v0.1.95] - 2026-10-07
 
 ### Fixed
