@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "trace_policy": {
+    "length": 6,
+    "expires": true
+  },
+  "events": [
+    {
+      "name": "hub_start",
+      "component": "hub",
+      "description": "The hub finished starting.",
+      "fields": []
+    },
+    {
+      "name": "hub_stop",
+      "component": "hub",
+      "description": "The hub stopped.",
+      "fields": []
+    },
+    {
+      "name": "engine_ready",
+      "component": "engine",
+      "description": "A model engine became ready to serve.",
+      "fields": []
+    },
+    {
+      "name": "engine_error",
+      "component": "engine",
+      "description": "A model engine reported an error.",
+      "fields": [
+        {
+          "name": "code",
+          "type": "code"
+        }
+      ]
+    },
+    {
+      "name": "turn_failed",
+      "component": "turn",
+      "description": "A chat turn failed before it finished.",
+      "fields": [
+        {
+          "name": "code",
+          "type": "code"
+        },
+        {
+          "name": "stage",
+          "type": "enum",
+          "values": [
+            "input",
+            "safety",
+            "routing",
+            "model",
+            "tools",
+            "reply"
+          ]
+        },
+        {
+          "name": "trace",
+          "type": "trace"
+        }
+      ]
+    },
+    {
+      "name": "tool_failed",
+      "component": "tool",
+      "description": "A tool call failed.",
+      "fields": [
+        {
+          "name": "tool",
+          "type": "enum",
+          "values": [
+            "recall",
+            "remember",
+            "remind",
+            "timer",
+            "weather",
+            "websearch"
+          ]
+        },
+        {
+          "name": "code",
+          "type": "code"
+        },
+        {
+          "name": "trace",
+          "type": "trace"
+        }
+      ]
+    },
+    {
+      "name": "safety_flag",
+      "component": "safety",
+      "description": "The safety floor flagged a turn.",
+      "fields": [
+        {
+          "name": "category",
+          "type": "enum",
+          "values": [
+            "self_harm",
+            "harmful_request",
+            "credible_threat",
+            "csam",
+            "grooming",
+            "pii_extraction",
+            "prompt_injection",
+            "jailbreak"
+          ]
+        },
+        {
+          "name": "mode",
+          "type": "enum",
+          "values": [
+            "child",
+            "teen",
+            "adult"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "search_degraded",
+      "component": "search",
+      "description": "Web search is running in a reduced state.",
+      "fields": [
+        {
+          "name": "code",
+          "type": "code"
+        }
+      ]
+    },
+    {
+      "name": "backup_done",
+      "component": "backup",
+      "description": "A backup finished.",
+      "fields": [
+        {
+          "name": "duration",
+          "type": "duration"
+        }
+      ]
+    },
+    {
+      "name": "backup_failed",
+      "component": "backup",
+      "description": "A backup failed.",
+      "fields": [
+        {
+          "name": "code",
+          "type": "code"
+        }
+      ]
+    },
+    {
+      "name": "update_available",
+      "component": "update",
+      "description": "A newer version is available.",
+      "fields": [
+        {
+          "name": "version",
+          "type": "version"
+        }
+      ]
+    },
+    {
+      "name": "log_rotated",
+      "component": "log",
+      "description": "The log files were rotated.",
+      "fields": [
+        {
+          "name": "files",
+          "type": "integer",
+          "minimum": 0
+        }
+      ]
+    }
+  ]
+}

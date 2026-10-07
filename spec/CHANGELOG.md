@@ -7,6 +7,10 @@ scope lands.
 
 ## [Unreleased]
 
+### Added
+- LOG-PRIV-01a: `log/events.json`, the registry of typed log events, with `LogEvents` (`log-events.schema.json`) and generated TypeScript and Python models. An event is a name, a component and fields, and a field is only an enum (members declared in the registry), integer, duration (ms), code (from `errors/errors.json`), version or trace (opaque, six characters, expiring). No free-text, title, URL, file name, argument, prompt, reply, query or person, conversation or record id type exists; every object is closed and those field names are refused. Seeded with `hub_start`, `hub_stop`, `engine_ready`, `engine_error`, `turn_failed`, `tool_failed`, `safety_flag`, `search_degraded`, `backup_done`, `backup_failed`, `update_available` and `log_rotated`.
+- `ProblemReport` (`problem-report.schema.json`, id prefix `pr-`): id, provenance (component and an expiring trace, no person, conversation or record id), `created_at`, `hlc`, `code`, `reporter_mode` (`child`, `teen` or `adult`, admin-set modes) and `parts`. In the child and teen modes every part is a `code` or `timing` part with no content; in the adult mode a `description` or `excerpt` part carries `content` only when `consented` is true. The conditions are JSON Schema if/then rules, checked by Ajv in the tests; the generated models check shapes only.
+
 ## [spec-v0.1.91] - 2026-10-06
 
 ### Added

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/problem-report.schema.json",
+  "title": "ProblemReport",
+  "description": "LOG-PRIV-01a: one problem report a person chose to send about something that went wrong. Owner principle: no log ever carries specifics that reveal what another user did. A report is built from parts, and what a part may carry depends on reporter_mode, the admin-set mode of the person sending it (child, teen or adult; a control the household sets, not a measure of anyone). In the child and teen modes a report may only carry codes and timings, so every part is kind code or timing and none has content. In the adult mode a part may also carry text (kind description or excerpt), but only when that part's consented flag is true, and a part with consented false carries none. The conditions are JSON Schema if/then rules: the generated models check the shapes, and the schema itself enforces the conditions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "provenance", "created_at", "hlc", "code", "reporter_mode", "parts"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^pr-[a-z0-9]{6,}$",
+      "description": "The report's stable id."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component", "trace"],
+      "description": "Where the report came from. It names a part of the system and an expiring trace, never a person, conversation or record.",
+      "properties": {
+        "component": {
+          "type": "string",
+          "enum": ["hub", "engine", "turn", "tool", "safety", "search", "backup", "update", "log"],
+          "description": "The component the report is about, from the same list as log/events.json."
+        },
+        "trace": {
+          "type": ["string", "null"],
+          "pattern": "^[a-z0-9]{6}$",
+          "default": null,
+          "description": "The opaque expiring six-character trace of the failing event, when there was one."
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the report was written."
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3), the clock stamp used by every synced record shape."
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "The stable error code the report is about, one of the codes in errors/errors.json."
+    },
+    "reporter_mode": {
+      "type": "string",
+      "enum": ["child", "teen", "adult"],
+      "description": "The admin-set mode of the person sending the report. It decides which parts are allowed (see the schema description)."
+    },
+    "parts": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/part" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "reporter_mode": { "const": "adult" } },
+        "required": ["reporter_mode"]
+      },
+      "else": {
+        "properties": {
+          "parts": {
+            "items": {
+              "properties": { "kind": { "enum": ["code", "timing"] }, "content": false }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "consented"],
+      "description": "One part of a report. A code part carries code, a timing part carries duration_ms, and a description or excerpt part carries content, which is present only when consented is true.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["code", "timing", "description", "excerpt"]
+        },
+        "consented": {
+          "type": "boolean",
+          "description": "True when the person agreed to send this part."
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "An error code from errors/errors.json. Only on a code part."
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "A length of time in milliseconds. Only on a timing part."
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000,
+          "description": "Text the person agreed to send. Present only when consented is true, only on a description or excerpt part, and only for the adult reporter mode."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "code" } }, "required": ["kind"] },
+          "then": { "required": ["code"], "properties": { "duration_ms": false, "content": false } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "timing" } }, "required": ["kind"] },
+          "then": { "required": ["duration_ms"], "properties": { "code": false, "content": false } }
+        },
+        {
+          "if": { "properties": { "kind": { "enum": ["description", "excerpt"] } }, "required": ["kind"] },
+          "then": {
+            "properties": { "code": false, "duration_ms": false },
+            "if": { "properties": { "consented": { "const": true } }, "required": ["consented"] },
+            "then": { "required": ["content"] },
+            "else": { "properties": { "content": false } }
+          }
+        }
+      ]
+    }
+  }
+}
