@@ -49,6 +49,7 @@ export function ThreadSearch({
   onSelect,
   onMatchesChange,
   inputOnly = false,
+  density = "default",
   className,
   ...props
 }: Omit<
@@ -61,6 +62,7 @@ export function ThreadSearch({
   | "onSelect"
   | "onMatchesChange"
   | "inputOnly"
+  | "density"
 > & {
   threads: readonly SearchableThread[];
   query: string;
@@ -71,6 +73,8 @@ export function ThreadSearch({
   onMatchesChange?: (ids: string[]) => void;
   // Render only the search field; the host shows the results.
   inputOnly?: boolean;
+  // Compact geometry is intended for input-only host search fields.
+  density?: "default" | "compact";
 }) {
   const ordered = matchThreads(threads, query);
   const { pinned, groups } = groupThreads(ordered);
@@ -159,17 +163,27 @@ export function ThreadSearch({
     <div
       className={cn(
         field,
-        "flex items-center gap-2 rounded-xl px-2.5 py-1.5",
+        density === "compact" && inputOnly
+          ? "flex h-9 items-center gap-2 rounded-lg px-2.5 py-0"
+          : "flex items-center gap-2 rounded-xl px-2.5 py-1.5",
       )}
     >
-      <SearchIcon className="text-foreground/30 size-3.5 shrink-0" />
+      {density === "compact" && inputOnly ? (
+        <SearchIcon className="text-foreground/30 size-4 shrink-0" />
+      ) : (
+        <SearchIcon className="text-foreground/30 size-3.5 shrink-0" />
+      )}
       <input
         value={query}
         onChange={(event) => onQueryChange?.(event.target.value)}
         onKeyDown={onKeyDown}
         placeholder="Search threads"
         aria-label="Search threads"
-        className="text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[13px] outline-none"
+        className={
+          density === "compact" && inputOnly
+            ? "text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[14px] outline-none"
+            : "text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[13px] outline-none"
+        }
       />
     </div>
   );

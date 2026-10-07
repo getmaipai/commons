@@ -56,6 +56,24 @@ describe("ThreadSearch inputOnly", () => {
     rerender(<ThreadSearch threads={threads} query="zzz" activeId="a" />);
     expect(getByText(/No thread matches/)).toBeTruthy();
   });
+
+  test("compact inputOnly uses the kit geometry while default remains unchanged", () => {
+    const { container, rerender } = render(
+      <ThreadSearch threads={threads} query="" activeId="a" inputOnly density="compact" />,
+    );
+    const field = container.querySelector("[data-slot='thread-search'] > div");
+    expect(field?.className).toContain("h-9");
+    expect(field?.className).toContain("rounded-lg");
+    expect(field?.querySelector("svg")?.getAttribute("class")).toContain("size-4");
+    expect(field?.querySelector("input")?.getAttribute("class")).toContain("text-[14px]");
+
+    rerender(<ThreadSearch threads={threads} query="" activeId="a" inputOnly />);
+    const defaultField = container.querySelector("[data-slot='thread-search'] > div");
+    expect(defaultField?.className).not.toContain("h-9");
+    expect(defaultField?.className).toContain("rounded-xl");
+    expect(defaultField?.querySelector("svg")?.getAttribute("class")).toContain("size-3.5");
+    expect(defaultField?.querySelector("input")?.getAttribute("class")).toContain("text-[13px]");
+  });
 });
 
 describe("ThreadSearch onMatchesChange", () => {
@@ -157,5 +175,27 @@ describe("ThreadSearch keyboard", () => {
     );
     fireEvent.keyDown(box(utils), { key: "ArrowDown" });
     expect(onSelect).toHaveBeenCalledWith("a");
+  });
+
+  test("compact mode keeps ordered Enter, arrow and Escape behavior", () => {
+    const onSelect = mock((_id: string) => {});
+    const onQueryChange = mock((_q: string) => {});
+    const utils = render(
+      <ThreadSearch
+        threads={threads}
+        query="lisbon"
+        activeId="c"
+        onSelect={onSelect}
+        onQueryChange={onQueryChange}
+        inputOnly
+        density="compact"
+      />,
+    );
+    fireEvent.keyDown(box(utils), { key: "ArrowDown" });
+    expect(onSelect).toHaveBeenLastCalledWith("a");
+    fireEvent.keyDown(box(utils), { key: "Enter" });
+    expect(onSelect).toHaveBeenLastCalledWith("c");
+    fireEvent.keyDown(box(utils), { key: "Escape" });
+    expect(onQueryChange).toHaveBeenCalledWith("");
   });
 });

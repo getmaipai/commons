@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.169] - ui-v0.5.169
+
+### ELT-T1-20 ThreadSearch density (additive)
+
+`ThreadSearch` accepts `density="compact"` for an input-only search field. It
+uses a 36px height, 14px text, 8px radius and 16px icon. The default density,
+matching order and Enter, arrow and Escape behavior are unchanged.
+
 ## [0.5.168] - ui-v0.5.168
 
 - Add a compact thread-list sidebar with empty-by-default header and footer slots, project and pin support, temporary-chat suppression, and host-controlled hover peek.
