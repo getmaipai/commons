@@ -32,7 +32,7 @@ describe("ThreadList 48px target floor", () => {
   test("thread rows use a 48px default token and compact sidebars set 36px rows", () => {
     expect(tokensCss).toContain("--aui-thread-list-item-min-height: 48px;");
     expect(tokensCss).toContain('min-height: var(--aui-thread-list-item-min-height, 48px);');
-    expect(tokensCss).toContain('[data-slot="aui_thread-list-sidebar"][data-variant="compact"] {\n  --aui-thread-list-item-min-height: 36px;');
+    expect(tokensCss).toContain('@media (pointer: fine) {\n  [data-slot="aui_thread-list-sidebar"][data-variant="compact"] {\n    --aui-thread-list-item-min-height: 36px;');
     expect(tokensCss).toContain('[data-slot="aui_thread-list-item"],\n[data-slot="aui_thread-list-item-trigger"] {');
   });
 

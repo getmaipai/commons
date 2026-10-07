@@ -238,8 +238,10 @@
   min-height: var(--aui-thread-list-item-min-height, 48px);
 }
 
-[data-slot="aui_thread-list-sidebar"][data-variant="compact"] {
-  --aui-thread-list-item-min-height: 36px;
+@media (pointer: fine) {
+  [data-slot="aui_thread-list-sidebar"][data-variant="compact"] {
+    --aui-thread-list-item-min-height: 36px;
+  }
 }
 
 /* CHAT-PROJECT-01: a project row in the thread list. A host matches it to

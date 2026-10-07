@@ -39,7 +39,7 @@ export function ThreadListSidebarShowcase() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">Compact rows: 36px visual height; 48px pointer target</p>
+        <p className="text-xs text-muted-foreground">Fine pointer: 36px rows with 48px targets; touch: 48px rows</p>
         <div className="flex h-[36rem] w-[18rem] overflow-hidden rounded-xl border">
           <ThreadListSidebar
             variant="compact"

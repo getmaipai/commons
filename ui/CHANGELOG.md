@@ -1,13 +1,22 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.171] - ui-v0.5.171
+
+### ELT-T1-20 compact row surface sizing
+
+Keep compact thread rows at 36px on fine-pointer surfaces while coarse-pointer
+surfaces retain the 48px row height and target. The `--aui-thread-list-item-min-height`
+token remains 48px by default.
+
 ## [0.5.170] - ui-v0.5.170
 
 ### ELT-T1-20 compact thread rows (additive)
 
 The thread item root and trigger read `--aui-thread-list-item-min-height`,
-which defaults to 48px. `ThreadListSidebar` with `variant="compact"` sets the
-token to 36px; the compact row's 48px pointer target remains. Default thread
-lists keep their 48px minimum.
+which defaults to 48px. On fine-pointer surfaces, `ThreadListSidebar` with
+`variant="compact"` sets the token to 36px; the compact row's 48px pointer
+target remains. Coarse-pointer surfaces and default thread lists keep their
+48px minimum.
 
 ## [0.5.169] - ui-v0.5.169
 
