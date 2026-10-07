@@ -98,6 +98,12 @@
       "policy_ref": "permissions"
     },
     {
+      "id": "tool.offer:show_images",
+      "parameterized": false,
+      "description": "Offer the show_images tool when existing turn eligibility permits it.",
+      "policy_ref": "permissions"
+    },
+    {
       "id": "chat.unrestricted",
       "parameterized": false,
       "description": "Answer this adult without content filtering, above the non-removable safety floor. Requires acknowledged_at on the grant; never a default, never inherited.",

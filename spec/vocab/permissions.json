@@ -172,12 +172,34 @@
       "parameterized": true,
       "description": "Call this specific integration through host.integration.call.",
       "policy": {
-        "risk": "action",
-        "outbound": false,
-        "reversible": false,
+        "risk": "lookup",
+        "outbound": true,
+        "reversible": true,
         "approver": {
           "child": "parent",
           "teen": "parent",
+          "adult": "none"
+        },
+        "by_parameter": {
+          "searxng": {
+            "child": "none",
+            "teen": "none",
+            "adult": "none"
+          }
+        }
+      }
+    },
+    {
+      "id": "tool.offer:show_images",
+      "parameterized": false,
+      "description": "Offer the show_images tool only on turns where the existing answer image eligibility rules allow it.",
+      "policy": {
+        "risk": "read",
+        "outbound": false,
+        "reversible": true,
+        "approver": {
+          "child": "none",
+          "teen": "none",
           "adult": "none"
         }
       }
