@@ -98,6 +98,21 @@ describe("ThreadList projects mode", () => {
     expect(view.container.querySelector("[data-slot=aui_thread-list-item]")?.getAttribute("draggable")).toBeNull();
   });
 
+  test("day group headers render only their labels, without the group's array index", async () => {
+    const today = new Date();
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+    const earlier = new Date(today.getTime() - 8 * 24 * 60 * 60 * 1000);
+    const view = render(<Harness seeds={[
+      { remoteId: "today", title: "Today chat", lastMessageAt: today },
+      { remoteId: "yesterday", title: "Yesterday chat", lastMessageAt: yesterday },
+      { remoteId: "earlier", title: "Earlier chat", lastMessageAt: earlier },
+    ]} />);
+    await view.findByText("Earlier chat");
+    const headings = [...view.container.querySelectorAll<HTMLElement>("[data-slot=aui_thread-list-group-label]")];
+    expect(headings.map((heading) => heading.textContent)).toEqual(["Today", "Yesterday", "Earlier"]);
+    expect(headings.map((heading) => heading.nextSibling?.textContent?.trim() ?? "").filter((text) => /^\d+$/.test(text))).toEqual([]);
+  });
+
   test("a chat in a listed project leaves the day groups and sits under its project, collapsed", async () => {
     const view = render(
       <Harness

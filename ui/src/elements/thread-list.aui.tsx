@@ -534,7 +534,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
         </>
       ) : null}
       {section}
-      {rest.map(renderGroup)}
+      {rest.map((group) => renderGroup(group))}
     </>
   );
 };

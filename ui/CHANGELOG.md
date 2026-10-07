@@ -1,5 +1,12 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.153] - ui-v0.5.153
+
+### COLUMN-NUMBERS-01
+
+Day group headers render only their label; the array position is no longer
+passed as optional content after the heading.
+
 ## [0.5.152] - ui-v0.5.152
 
 ### SETTINGS-NAV-01 (additive)
