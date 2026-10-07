@@ -176,7 +176,7 @@ describe("ThreadList pin", () => {
 });
 
 describe("ThreadList data-slot styling", () => {
-  test("the shipped row slots are targeted by the 48px and active-state token rules", async () => {
+  test("the shipped row slots read their 48px-default minimum-height token and active-state token", async () => {
     const view = render(
       <Harness seeds={[{ remoteId: "a", title: "Alpha" }]} updateCustom={async () => {}} />,
     );
@@ -187,8 +187,7 @@ describe("ThreadList data-slot styling", () => {
 
     expect(row).toBeTruthy();
     expect(trigger).toBeTruthy();
-    expect(tokens).toMatch(/\[data-slot="aui_thread-list-item"\][^{]*\{[^}]*min-height:\s*48px/s);
-    expect(tokens).toMatch(/\[data-slot="aui_thread-list-item-trigger"\][^{]*\{[^}]*min-height:\s*48px/s);
+    expect(tokens).toMatch(/\[data-slot="aui_thread-list-item"\],\s*\[data-slot="aui_thread-list-item-trigger"\]\s*\{\s*min-height:\s*var\(--aui-thread-list-item-min-height,\s*48px\)/s);
     expect(tokens).toContain('[data-slot="aui_thread-list-item"][data-active="true"]');
     expect(tokens).toContain("background-color: var(--sidebar-accent)");
   });

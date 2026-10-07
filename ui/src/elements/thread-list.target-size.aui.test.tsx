@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { cleanup, render } from "@testing-library/react";
 import {
   AssistantRuntimeProvider,
@@ -10,6 +11,8 @@ import {
 import { ThreadList } from "./thread-list.aui";
 
 afterEach(cleanup);
+
+const tokensCss = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
 
 const chat: ChatModelAdapter = { async *run() { yield { content: [] }; } };
 const adapter = (threads: Array<{ remoteId: string; title: string }>) => ({
@@ -26,6 +29,13 @@ function Harness({ threads }: { threads: Array<{ remoteId: string; title: string
 }
 
 describe("ThreadList 48px target floor", () => {
+  test("thread rows use a 48px default token and compact sidebars set 36px rows", () => {
+    expect(tokensCss).toContain("--aui-thread-list-item-min-height: 48px;");
+    expect(tokensCss).toContain('min-height: var(--aui-thread-list-item-min-height, 48px);');
+    expect(tokensCss).toContain('[data-slot="aui_thread-list-sidebar"][data-variant="compact"] {\n  --aui-thread-list-item-min-height: 36px;');
+    expect(tokensCss).toContain('[data-slot="aui_thread-list-item"],\n[data-slot="aui_thread-list-item-trigger"] {');
+  });
+
   test("New Chat keeps its compact painted row and adds the kit's 16px vertical hit overhang", () => {
     const view = render(<Harness threads={[]} />);
     const button = view.getByRole("button", { name: "New chat" });

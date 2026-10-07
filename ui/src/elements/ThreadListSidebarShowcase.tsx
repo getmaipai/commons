@@ -38,14 +38,17 @@ export function ThreadListSidebarShowcase() {
   const runtime = useRemoteThreadListRuntime({ runtimeHook: useChatRuntime, adapter });
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="flex h-[36rem] w-[18rem] overflow-hidden rounded-xl border">
-        <ThreadListSidebar
-          variant="compact"
-          header={<div className="px-2.5 pt-2 text-sm font-semibold">History</div>}
-          footer={<div className="px-2.5 py-2 text-xs text-muted-foreground">Local chat history</div>}
-          pinnable
-          projects={{ folders: [{ id: "home", name: "Home" }] }}
-        />
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">Compact rows: 36px visual height; 48px pointer target</p>
+        <div className="flex h-[36rem] w-[18rem] overflow-hidden rounded-xl border">
+          <ThreadListSidebar
+            variant="compact"
+            header={<div className="px-2.5 pt-2 text-sm font-semibold">History</div>}
+            footer={<div className="px-2.5 py-2 text-xs text-muted-foreground">Local chat history</div>}
+            pinnable
+            projects={{ folders: [{ id: "home", name: "Home" }] }}
+          />
+        </div>
       </div>
     </AssistantRuntimeProvider>
   );

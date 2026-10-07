@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.170] - ui-v0.5.170
+
+### ELT-T1-20 compact thread rows (additive)
+
+The thread item root and trigger read `--aui-thread-list-item-min-height`,
+which defaults to 48px. `ThreadListSidebar` with `variant="compact"` sets the
+token to 36px; the compact row's 48px pointer target remains. Default thread
+lists keep their 48px minimum.
+
 ## [0.5.169] - ui-v0.5.169
 
 ### ELT-T1-20 ThreadSearch density (additive)
