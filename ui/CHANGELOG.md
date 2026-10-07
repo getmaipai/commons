@@ -1,6 +1,6 @@
 # Changelog (`@maipai/ui`)
 
-## [Unreleased]
+## [0.5.162] - ui-v0.5.162
 
 ### ELT-T1-K04 tooltip half (additive)
 
