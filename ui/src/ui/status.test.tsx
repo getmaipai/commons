@@ -30,6 +30,13 @@ describe("Status", () => {
     expect(container.querySelectorAll("[aria-hidden='true'] > span")).toHaveLength(1);
   });
 
+  test("supports inline placement in flowing text", () => {
+    const { getByTestId } = render(<StatusIndicator inline ping={false} data-testid="paused-dot" />);
+    const dot = getByTestId("paused-dot");
+    expect(dot.className).toContain("inline-flex");
+    expect(dot.className).not.toContain(" flex ");
+  });
+
   test("uses the attention foreground tint for degraded status", () => {
     const { container } = render(
       <Status status="degraded">

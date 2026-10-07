@@ -53,15 +53,17 @@ function Status({ className, status, ...props }: StatusProps) {
 type StatusIndicatorProps = HTMLAttributes<HTMLSpanElement> & {
   status?: StatusKind;
   ping?: boolean;
+  /** Render inline with nearby sentence text instead of taking its own line. */
+  inline?: boolean;
 };
 
-function StatusIndicator({ className, status, ping = true, ...props }: StatusIndicatorProps) {
+function StatusIndicator({ className, status, ping = true, inline = false, ...props }: StatusIndicatorProps) {
   const colors = status ? indicatorColors[status] : undefined;
 
   return (
     <span
       aria-hidden="true"
-      className={cn("relative flex size-2 shrink-0", className)}
+      className={cn(inline ? "relative inline-flex size-2 shrink-0" : "relative flex size-2 shrink-0", className)}
       {...props}
     >
       {ping && (
