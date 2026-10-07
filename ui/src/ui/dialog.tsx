@@ -52,7 +52,7 @@ function DialogContent({
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  variant?: "default" | "command"
+  variant?: "default" | "command" | "call"
   showCloseButton?: boolean
 }) {
   return (
@@ -62,9 +62,11 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed top-[50%] left-[50%] z-50 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
-          variant === "command"
-            ? "flex sm:max-w-sm flex-col gap-0 border-0 bg-transparent p-0 shadow-none"
-            : "grid gap-4 rounded-lg border bg-background p-6 shadow-lg sm:max-w-lg",
+          variant === "call"
+            ? "top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-transparent p-0 shadow-none sm:top-[50%] sm:left-[50%] sm:h-auto sm:w-auto sm:max-w-xs sm:translate-x-[-50%] sm:translate-y-[-50%]"
+            : variant === "command"
+              ? "flex sm:max-w-sm flex-col gap-0 border-0 bg-transparent p-0 shadow-none"
+              : "grid gap-4 rounded-lg border bg-background p-6 shadow-lg sm:max-w-lg",
           className
         )}
         {...props}
