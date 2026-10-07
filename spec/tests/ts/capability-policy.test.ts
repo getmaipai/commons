@@ -123,16 +123,20 @@ describe("the owner's 2026-10-06 rows", () => {
   test("approvals.decide can never be held by a model, tool or package", () => {
     expect(find("approvals.decide").policy!.model_callable).toBe(false);
   });
-  test("SearXNG remains an unprompted fixed lookup for every age band", () => {
-    expect(find("integration:<id>").policy).toMatchObject({
+  test("the generic integration policy preserves the original tainted-action and ask-parent floor", () => {
+    expect(find("integration:<id>").policy).toEqual({
+      risk: "action",
+      outbound: false,
+      reversible: false,
+      approver: { child: "parent", teen: "parent", adult: "none" },
+    });
+  });
+  test("SearXNG alone is a fixed lookup with no approval for any age band", () => {
+    expect(find("integration:searxng").policy).toEqual({
       risk: "lookup",
       outbound: true,
       reversible: true,
-    });
-    expect(find("integration:<id>").policy!.by_parameter!.searxng).toEqual({
-      child: "none",
-      teen: "none",
-      adult: "none",
+      approver: { child: "none", teen: "none", adult: "none" },
     });
   });
   test("show_images has an offer-only capability policy row", () => {

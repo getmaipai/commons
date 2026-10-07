@@ -172,20 +172,28 @@
       "parameterized": true,
       "description": "Call this specific integration through host.integration.call.",
       "policy": {
-        "risk": "lookup",
-        "outbound": true,
-        "reversible": true,
+        "risk": "action",
+        "outbound": false,
+        "reversible": false,
         "approver": {
           "child": "parent",
           "teen": "parent",
           "adult": "none"
-        },
-        "by_parameter": {
-          "searxng": {
-            "child": "none",
-            "teen": "none",
-            "adult": "none"
-          }
+        }
+      }
+    },
+    {
+      "id": "integration:searxng",
+      "parameterized": false,
+      "description": "Use the fixed SearXNG web lookup for child, teen and adult turns without an approval prompt.",
+      "policy": {
+        "risk": "lookup",
+        "outbound": true,
+        "reversible": true,
+        "approver": {
+          "child": "none",
+          "teen": "none",
+          "adult": "none"
         }
       }
     },
