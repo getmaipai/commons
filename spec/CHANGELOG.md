@@ -1,3 +1,7 @@
+## [spec-v0.1.101] - 2026-10-07
+
+- Include admin-only Home Voices in the Household settings group.
+
 ## [spec-v0.1.100] - 2026-10-07
 
 - Gate household Voice catalog and Commands settings views to administrators.
