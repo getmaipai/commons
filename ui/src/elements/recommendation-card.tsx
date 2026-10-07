@@ -33,9 +33,14 @@ export function RecommendationCard({
   state: RecommendationState;
   question: string;
   children: ReactNode;
-  confidenceLabel: string;
-  acceptedLabel: string;
+  /** Draws the confidence bars and this label. Unset: neither is drawn, so
+   * a caller with no real confidence figure never shows an invented one. */
+  confidenceLabel?: string;
+  /** The line shown once accepted. Unset: the accepted row stays empty. */
+  acceptedLabel?: string;
+  /** Draws the Accept button. Unset: no button. */
   onAccept?: () => void;
+  /** Draws the Alternatives button. Unset: no button. */
   onAlternatives?: () => void;
 }) {
   return (
@@ -58,37 +63,45 @@ export function RecommendationCard({
         {state === "idle" ? (
           <>
             <div className="flex items-center gap-2">
-              <span className="flex items-end gap-0.5" aria-hidden>
-                {CONFIDENCE_BARS.map((bar) => (
-                  <span
-                    key={bar}
-                    className="w-1 rounded-full bg-emerald-500/70"
-                    style={{ height: 6 + bar * 3 }}
-                  />
-                ))}
-              </span>
-              <span className={cn(mono, "text-muted-foreground")}>
-                {confidenceLabel}
-              </span>
+              {confidenceLabel !== undefined && (
+                <>
+                  <span className="flex items-end gap-0.5" aria-hidden>
+                    {CONFIDENCE_BARS.map((bar) => (
+                      <span
+                        key={bar}
+                        className="w-1 rounded-full bg-emerald-500/70"
+                        style={{ height: 6 + bar * 3 }}
+                      />
+                    ))}
+                  </span>
+                  <span className={cn(mono, "text-muted-foreground")}>
+                    {confidenceLabel}
+                  </span>
+                </>
+              )}
             </div>
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onAlternatives}
-                className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
-              >
-                Alternatives
-              </button>
-              <button
-                type="button"
-                onClick={onAccept}
-                className={cn(
-                  inkButton,
-                  "flex h-8 items-center rounded-full px-3.5 text-xs font-medium",
-                )}
-              >
-                Accept
-              </button>
+              {onAlternatives && (
+                <button
+                  type="button"
+                  onClick={onAlternatives}
+                  className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
+                >
+                  Alternatives
+                </button>
+              )}
+              {onAccept && (
+                <button
+                  type="button"
+                  onClick={onAccept}
+                  className={cn(
+                    inkButton,
+                    "flex h-8 items-center rounded-full px-3.5 text-xs font-medium",
+                  )}
+                >
+                  Accept
+                </button>
+              )}
             </div>
           </>
         ) : (
@@ -96,8 +109,12 @@ export function RecommendationCard({
             key="accepted"
             className="fade-in animate-in text-muted-foreground flex items-center gap-2 text-xs duration-300"
           >
-            <CheckIcon className="size-3.5 text-emerald-500" />
-            {acceptedLabel}
+            {acceptedLabel !== undefined && (
+              <>
+                <CheckIcon className="size-3.5 text-emerald-500" />
+                {acceptedLabel}
+              </>
+            )}
           </div>
         )}
       </div>

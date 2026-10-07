@@ -1,5 +1,16 @@
 # Changelog (`@maipai/ui`)
 
+## [Unreleased]
+
+### ELT-T1-K05 (additive)
+
+`RecommendationCard`: `confidenceLabel` and `acceptedLabel` are now optional,
+and the confidence bars, the Accept button and the Alternatives button render
+only when `confidenceLabel`, `onAccept` and `onAlternatives` are given. A caller
+with no real confidence figure no longer shows an invented one. Callers that
+pass all three props render as before; a caller that omitted a handler used to
+get an inert button and now gets none.
+
 ## [0.5.140] - ui-v0.5.140
 
 ### SETTINGS-DOCK-01 follow-up
