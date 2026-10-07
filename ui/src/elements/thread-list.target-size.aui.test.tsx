@@ -40,4 +40,11 @@ describe("ThreadList 48px target floor", () => {
     expect(button.className).toContain("size-6");
     expect(button.className).toContain("before:-inset-3");
   });
+
+  test("history row title keeps its compact height and adds the kit's 16px vertical hit overhang", async () => {
+    const view = render(<Harness threads={[{ remoteId: "thread-1", title: "Weekend plans" }]} />);
+    const button = await view.findByRole("button", { name: "Weekend plans" });
+    expect(button.className).toContain("h-full");
+    expect(button.className).toContain("before:-inset-2");
+  });
 });

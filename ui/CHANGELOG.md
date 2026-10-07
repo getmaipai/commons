@@ -1,5 +1,12 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.145] - ui-v0.5.145
+
+### A11Y-COLUMN-01 follow-up (additive)
+
+Thread history row title controls keep their compact appearance while receiving
+48px hit areas.
+
 ## [0.5.140] - ui-v0.5.140
 
 ### SETTINGS-DOCK-01 follow-up
