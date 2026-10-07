@@ -5,7 +5,7 @@ import { cn } from "cn";
 import { mono, paper } from "./surfaces";
 import { pct, take } from "./range";
 
-export type SpanStatus = "running" | "completed" | "failed";
+export type SpanStatus = "running" | "completed" | "failed" | "skipped";
 
 export interface TraceSpan {
   id: string;
@@ -20,6 +20,7 @@ const TONE: Record<SpanStatus, string> = {
   running: "bg-blue-500 dark:bg-blue-400",
   completed: "bg-foreground/35",
   failed: "bg-red-500/80",
+  skipped: "bg-muted-foreground/30",
 };
 
 export function TraceWaterfall({

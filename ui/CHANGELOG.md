@@ -1,5 +1,11 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.155] - ui-v0.5.155
+
+### ELT-T1-05 (additive)
+
+`TraceWaterfall` accepts the `skipped` span status and labels it truthfully.
+
 ## [0.5.154] - ui-v0.5.154
 
 ### A11Y-STATUS-RED (additive)
