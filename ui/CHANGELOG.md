@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.173] - ui-v0.5.173
+
+### ELT-T1-22 TraceWaterfall contrast
+
+`TraceWaterfall` span names use `text-muted-foreground`; duration values
+already use the token. Both clear WCAG AA contrast on light and dark kit
+surfaces. Layout and typography are unchanged. Added a render regression
+test and showcase.
+
 ## [0.5.172] - ui-v0.5.172
 
 ### ELT-T1-20 compact ThreadSearch radius

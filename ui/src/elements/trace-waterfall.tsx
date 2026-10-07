@@ -67,7 +67,7 @@ export function TraceWaterfall({
               className="fade-in slide-in-from-left-1 animate-in fill-mode-both grid grid-cols-[7.5rem_1fr_2.5rem] items-center gap-2 duration-300"
             >
               <span
-                className="text-foreground/70 min-w-0 truncate text-xs"
+                className="text-muted-foreground min-w-0 truncate text-xs"
                 style={{ paddingInlineStart: `${item.depth * 0.75}rem` }}
               >
                 {item.name}
