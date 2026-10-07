@@ -7,6 +7,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.94] - 2026-10-07
+
+### Added
+- Shared flat chat role context fields and an HTTP stub for `GET /stack/v1/roles`, so Home and Stack derive their wire types and tests from one contract (THIN-3A).
+
 ## [spec-v0.1.91] - 2026-10-06
 
 ### Added
