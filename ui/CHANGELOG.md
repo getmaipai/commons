@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [Unreleased]
+
+### ELT-T1-K04 tooltip half (additive)
+
+`assistant-ui/tooltip-icon-button` gains a `hitArea48` prop, default `true`, so
+the default markup is unchanged. `hitArea48={false}` drops the 48px
+pseudo-element hit area; callers opt out through the prop, never className.
+
 ## [0.5.140] - ui-v0.5.140
 
 ### SETTINGS-DOCK-01 follow-up
