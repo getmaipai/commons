@@ -1,5 +1,10 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.168] - ui-v0.5.168
+
+- Add a compact thread-list sidebar with empty-by-default header and footer slots, project and pin support, temporary-chat suppression, and host-controlled hover peek.
+- Preserve the existing thread-list defaults while adding compact row, search, project, and group spacing.
+
 ## [0.5.167] - ui-v0.5.167
 
 ### ELT-T1-K06 activity card props (additive)

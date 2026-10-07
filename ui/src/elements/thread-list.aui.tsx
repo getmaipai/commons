@@ -197,6 +197,8 @@ type ResolvedProjects = Omit<ThreadListProjects, "labels"> & {
 };
 
 const ThreadListProjectsContext = createContext<ResolvedProjects | null>(null);
+export type ThreadListDensity = "default" | "compact";
+const ThreadListDensityContext = createContext<ThreadListDensity>("default");
 
 /** Reads the project id a host keeps in a thread's custom metadata. */
 export const threadFolderId = (custom: Record<string, unknown> | undefined): string | null =>
@@ -260,10 +262,11 @@ export const ThreadListSearch = forwardRef<
     value: string;
     onValueChange: (value: string) => void;
     label?: string;
+    density?: ThreadListDensity;
   }
->(({ className, value, onValueChange, label = "Search chats", ...props }, ref) => {
+>(({ className, value, onValueChange, label = "Search chats", density = "default", ...props }, ref) => {
   return (
-    <div data-slot="aui_thread-list-search" className="relative px-0.5 py-1">
+    <div data-slot="aui_thread-list-search" data-density={density} className={cn("relative px-0.5", density === "compact" ? "py-0" : "py-1")}>
       <SearchIcon
         data-slot="aui_thread-list-search-icon"
         className="text-muted-foreground pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2"
@@ -275,7 +278,7 @@ export const ThreadListSearch = forwardRef<
         onChange={(event) => onValueChange(event.target.value)}
         aria-label={label}
         placeholder={label}
-        className={cn("h-8 ps-8 text-sm", className)}
+        className={cn(density === "compact" ? "h-9 rounded-lg border-0 bg-muted px-2.5 ps-8 text-sm shadow-none" : "h-8 ps-8 text-sm", className)}
         {...props}
       />
     </div>
@@ -285,12 +288,13 @@ export const ThreadListSearch = forwardRef<
 ThreadListSearch.displayName = "ThreadListSearch";
 
 export const ThreadListRoot: FC<
-  ComponentPropsWithoutRef<typeof ThreadListPrimitive.Root>
-> = ({ className, ...props }) => {
+  ComponentPropsWithoutRef<typeof ThreadListPrimitive.Root> & { density?: ThreadListDensity }
+> = ({ className, density = "default", ...props }) => {
   return (
     <ThreadListPrimitive.Root
       data-slot="aui_thread-list-root"
-      className={cn("flex flex-col gap-0.5", className)}
+      data-density={density}
+      className={cn("flex flex-col", density === "compact" ? "gap-0" : "gap-0.5", className)}
       {...props}
     />
   );
@@ -304,8 +308,10 @@ export const ThreadListItems: FC<
     labels?: ThreadListLabels;
     /** Opt-in projects mode; see ThreadListProjects. */
     projects?: ThreadListProjects;
+    /** Compact chat-column density. Unset preserves the standard list. */
+    density?: ThreadListDensity;
   }
-> = ({ className, searchQuery = "", pinnable, labels, projects, ...props }) => {
+> = ({ className, searchQuery = "", pinnable, labels, projects, density = "default", ...props }) => {
   const { pin: pinLabel, unpin: unpinLabel, pinned: pinnedLabel } = labels ?? {};
   const pin = useMemo(
     () =>
@@ -329,11 +335,13 @@ export const ThreadListItems: FC<
     [projects],
   );
   return (
+    <ThreadListDensityContext.Provider value={density}>
     <ThreadListPinContext.Provider value={pin}>
       <ThreadListProjectsContext.Provider value={resolvedProjects}>
       <div
         data-slot="aui_thread-list-items"
-        className={cn("flex flex-col gap-0.5", className)}
+        data-density={density}
+        className={cn("flex flex-col", density === "compact" ? "gap-0" : "gap-0.5", className)}
         {...props}
       >
         <AuiIf condition={(s) => s.threads.isLoading}>
@@ -345,6 +353,7 @@ export const ThreadListItems: FC<
       </div>
       </ThreadListProjectsContext.Provider>
     </ThreadListPinContext.Provider>
+    </ThreadListDensityContext.Provider>
   );
 };
 
@@ -458,6 +467,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
 }) => {
   const pin = useContext(ThreadListPinContext);
   const projects = useContext(ThreadListProjectsContext);
+  const density = useContext(ThreadListDensityContext);
   const folderIds = useMemo(
     () => (projects ? new Set(projects.folders.map((folder) => folder.id)) : null),
     [projects],
@@ -495,7 +505,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
   const pinnedLabel = (
     <div
       data-slot="aui_thread-list-group-label"
-      className="text-muted-foreground px-2.5 pt-3 pb-1 text-xs font-medium"
+      className={cn("text-muted-foreground px-2.5 pb-1 text-xs font-medium", density === "compact" ? "pt-4 first:pt-2" : "pt-3")}
     >
       {pin.pinned}
     </div>
@@ -528,7 +538,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
     <Fragment key={group.label}>
       <div
         data-slot="aui_thread-list-group-label"
-        className="text-muted-foreground px-2.5 pt-3 pb-1 text-xs font-medium"
+        className={cn("text-muted-foreground px-2.5 pb-1 text-xs font-medium", density === "compact" ? "pt-4 first:pt-2" : "pt-3")}
       >
         {group.label}
       </div>
@@ -559,15 +569,16 @@ const ThreadListProjectsSection: FC<{
   /** Projects already drawn under Pinned. */
   skip?: ReadonlySet<string>;
 }> = ({ projects, byFolder, row, skip }) => {
+  const density = useContext(ThreadListDensityContext);
   const { labels } = projects;
   const [creating, setCreating] = useState(false);
   const canCreate = projects.canManage && Boolean(projects.onCreate);
   if (projects.folders.length === 0 && !canCreate) return null;
   return (
-    <div data-slot="aui_thread-list-projects" className="flex flex-col gap-0.5">
+    <div data-slot="aui_thread-list-projects" data-density={density} className={cn("flex flex-col", density === "compact" ? "gap-0" : "gap-0.5")}>
       <div
         data-slot="aui_thread-list-group-label"
-        className="text-muted-foreground flex items-center justify-between px-2.5 pt-3 pb-1 text-xs font-medium"
+        className={cn("text-muted-foreground flex items-center justify-between px-2.5 pb-1 text-xs font-medium", density === "compact" ? "pt-4 first:pt-2" : "pt-3")}
       >
         <span>{labels.projects}</span>
         {canCreate ? (
@@ -615,7 +626,7 @@ const ThreadListProjectsSection: FC<{
         <Button
           variant="ghost"
           data-slot="aui_thread-list-projects-see-all"
-          className="text-muted-foreground h-8 justify-start rounded-md px-2.5 text-sm font-normal"
+          className={cn("text-muted-foreground justify-start px-2.5 text-sm font-normal", density === "compact" ? "h-9 rounded-lg" : "h-8 rounded-md")}
           onClick={() => projects.onSeeAll?.()}
         >
           {labels.seeAll}
@@ -673,6 +684,7 @@ const ThreadListProjectRow: FC<{
   indices: number[];
   row: (index: number) => React.ReactNode;
 }> = ({ folder, projects, indices, row }) => {
+  const density = useContext(ThreadListDensityContext);
   const aui = useAui();
   const { labels } = projects;
   const activeId = useAuiState((s) => s.threads.mainThreadId);
@@ -723,7 +735,7 @@ const ThreadListProjectRow: FC<{
       <div
         data-slot="aui_thread-list-project"
         data-drop-target={dropping || undefined}
-        className="group data-[drop-target]:ring-ring/50 relative flex h-8 items-center transition-colors data-[drop-target]:ring-1"
+        className={cn("group data-[drop-target]:ring-ring/50 relative flex items-center transition-colors data-[drop-target]:ring-1", density === "compact" ? "h-9 min-h-9 rounded-lg" : "h-8")}
         onDragOver={(event) => {
           if (!acceptsDrop(event)) return;
           event.preventDefault();
@@ -929,17 +941,20 @@ const ThreadListProjectRow: FC<{
 
 export const ThreadListNew = forwardRef<
   HTMLButtonElement,
-  ComponentPropsWithoutRef<typeof Button> & { labelClassName?: string; label?: string }
->(({ className, labelClassName, children, label = "New chat", ...props }, ref) => {
+  ComponentPropsWithoutRef<typeof Button> & { labelClassName?: string; label?: string; density?: ThreadListDensity }
+>(({ className, labelClassName, children, label = "New chat", density = "default", ...props }, ref) => {
   return (
     <ThreadListPrimitive.New asChild>
       <Button
         ref={ref}
         variant="ghost"
         data-slot="aui_thread-list-new"
+        data-density={density}
         className={cn(
-          "hover:bg-muted data-active:bg-muted h-8 justify-start gap-2 rounded-md px-2.5 text-sm font-normal",
-          hitArea(2),
+          "hover:bg-muted data-active:bg-muted justify-start text-sm font-normal",
+          density === "compact"
+            ? "relative h-9 min-h-9 gap-2.5 rounded-lg border-0 bg-transparent px-2.5 shadow-none before:absolute before:-inset-y-1.5 before:inset-x-0 before:content-['']"
+            : cn("h-8 gap-2 rounded-md px-2.5", hitArea(2)),
           className,
         )}
         {...props}
@@ -966,6 +981,7 @@ export const ThreadListNew = forwardRef<
 ThreadListNew.displayName = "ThreadListNew";
 
 const ThreadListSkeleton: FC = () => {
+  const density = useContext(ThreadListDensityContext);
   return (
     <div className="flex flex-col gap-0.5">
       {Array.from({ length: 5 }, (_, i) => (
@@ -974,7 +990,8 @@ const ThreadListSkeleton: FC = () => {
           role="status"
           aria-label="Loading threads"
           data-slot="aui_thread-list-skeleton-wrapper"
-          className="flex h-8 items-center px-2.5"
+          data-density={density}
+          className={cn("flex items-center px-2.5", density === "compact" ? "h-9 min-h-9" : "h-8")}
         >
           <Skeleton
             data-slot="aui_thread-list-skeleton"
@@ -987,6 +1004,7 @@ const ThreadListSkeleton: FC = () => {
 };
 
 export const ThreadListItem: FC = () => {
+  const density = useContext(ThreadListDensityContext);
   const isRunning = useAuiState((s) => s.threadListItem.isRunning);
   const projects = useContext(ThreadListProjectsContext);
   const threadId = useAuiState((s) => s.threadListItem.id);
@@ -1016,9 +1034,10 @@ export const ThreadListItem: FC = () => {
           : undefined
       }
       data-slot="aui_thread-list-item"
+      data-density={density}
       className={cn(
         "group hover:bg-muted focus-visible:bg-muted data-active:bg-muted has-focus-visible:bg-muted has-data-[state=open]:bg-muted relative flex items-center rounded-md transition-colors focus-visible:outline-none",
-        pageRow ? "min-h-16" : "h-8",
+        pageRow ? "min-h-16" : density === "compact" ? "h-9 min-h-9 rounded-lg" : "h-8",
       )}
     >
       {isRenaming ? (
@@ -1032,10 +1051,12 @@ export const ThreadListItem: FC = () => {
         <ThreadListItemPrimitive.Trigger
           ref={triggerRef}
           data-slot="aui_thread-list-item-trigger"
+          data-density={density}
           className={cn(
-            "focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 focus-visible:ring-1",
+            "focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 focus-visible:ring-1",
+            density === "compact" ? "rounded-lg" : "rounded-md",
             pageRow && "gap-3 py-2",
-            hitArea(2),
+            density === "compact" ? "before:-inset-y-1.5 before:inset-x-0" : hitArea(2),
           )}
         >
           {pageRow?.projectIcon ? <ProjectMark icon={pageRow.projectIcon.icon} color={pageRow.projectIcon.color} /> : null}
