@@ -47,6 +47,8 @@ export type SettingsNavigation =
   | { kind: "link"; sectionId: string; href: string };
 
 export interface SettingsShellLabels {
+  /** The persistent title at the top of the column, including during search. */
+  columnTitle?: string;
   /** The search field's accessible name and placeholder. */
   search?: string;
   /** The page title while a search query is showing. */
@@ -187,7 +189,7 @@ export function SettingsShell({
         <SidebarHeader className="gap-3 px-2 pt-4 pb-2">
           {collapsible && hasColumn ? <SettingsColumnToggle buttonRef={collapsible.columnToggleRef} collapsed={collapsed} peek={peeking} onToggle={collapsible.onToggle} /> : null}
           {backLink ? <div data-slot="settings-back-link">{backLink}</div> : null}
-          {!(layout === "docked" && backLink) ? <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{area.title}</h2> : null}
+          {!(layout === "docked" && backLink) ? <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{labels?.columnTitle ?? area.title}</h2> : null}
           <HitField pad={6} className="relative">
             <SearchIcon aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-settings-helper" />
             <SidebarInput

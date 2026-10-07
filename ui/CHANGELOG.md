@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.152] - ui-v0.5.152
+
+### SETTINGS-NAV-01 (additive)
+
+`SettingsShell` accepts a persistent `labels.columnTitle`, and the app rail
+accepts `activeAppHref` so a host can keep the app that opened Settings
+selected. Omitted props preserve existing behavior.
+
 ## [0.5.148] - ui-v0.5.148
 
 ### PI-RENDER-01 (safe by default)

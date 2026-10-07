@@ -95,6 +95,11 @@ describe("SettingsShell column", () => {
     expect(back.compareDocumentPosition(view.getByRole("searchbox")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(view.getByRole("link", { name: "← Back to app" }).getAttribute("href")).toBe("/chat");
   });
+
+  test("the docked settings column accepts a host title", () => {
+    const { view } = shell({ layout: "docked", labels: { columnTitle: "Settings" } });
+    expect(view.getByRole("heading", { level: 2 }).textContent).toBe("Settings");
+  });
 });
 
 describe("SettingsShell navigation", () => {

@@ -53,6 +53,8 @@ export interface FullLayoutProps {
   rail?: boolean;
   /** The profile control at the bottom of the rail (RailProfileMenu). */
   railProfile?: ReactNode;
+  /** App destination to keep selected when the current route is outside that app (for example Settings). */
+  activeAppHref?: string;
 }
 
 /** The slim title bar of the rail layout: the page's own header content
@@ -68,14 +70,14 @@ function RailPageHeader() {
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref }: FullLayoutProps) {
   return (
     <HeaderExtraProvider>
       {/* The page scrolls as a document, as it did beside the sidebar;
           the rail stays put (sticky, full viewport height). A full-height
           page (a chat) bounds the workspace to the viewport itself. */}
       <div data-slot="rail-shell" className="flex min-h-svh w-full">
-        <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} />
+        <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} />
         <main data-slot="rail-workspace" className="flex min-w-0 flex-1 flex-col" style={{ background: "var(--page)" }}>
           <RailPageHeader />
           <div data-slot="rail-body" className="flex-1">

@@ -76,6 +76,22 @@ describe("RAIL-01 app rail", () => {
     expect(isRailItemActive("/", "/next")).toBe(true);
   });
 
+  test("a host can keep a selected app while the route is in Settings", () => {
+    const view = render(
+      <MemoryRouter initialEntries={["/settings/account/profile"]}>
+        <TooltipProvider>
+          <Routes>
+            <Route element={<FullLayout rail activeAppHref="/chat" />}>
+              <Route path="/settings/*" element={<div>Settings</div>} />
+            </Route>
+          </Routes>
+        </TooltipProvider>
+      </MemoryRouter>,
+    );
+    expect(view.getByRole("link", { name: "Chat" }).getAttribute("aria-current")).toBe("page");
+    expect(view.getByRole("link", { name: "Home" }).getAttribute("aria-current")).toBeNull();
+  });
+
   test("the page header renders only when a page places content in it", () => {
     expect(renderRail("/chat").container.querySelector("header")).toBeNull();
     cleanup();

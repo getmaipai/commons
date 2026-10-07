@@ -19,6 +19,8 @@ export interface AppRailProps {
   itemStatus?: RailItemStatus;
   /** The host's profile control, pinned to the bottom of the rail. */
   profile?: ReactNode;
+  /** App destination to keep selected when the current route is outside that app (for example Settings). */
+  activeAppHref?: string;
 }
 
 function flatten(items: ChildItem[] | undefined): ChildItem[] {
@@ -76,7 +78,7 @@ function ItemTooltip({ name, status }: { name: string; status: ReturnType<RailIt
   );
 }
 
-export default function AppRail({ searchRemote, itemStatus, profile }: AppRailProps) {
+export default function AppRail({ searchRemote, itemStatus, profile, activeAppHref }: AppRailProps) {
   const { pathname } = useLocation();
   const all = SidebarContent.flatMap((section) => flatten(section.items));
   // The brand mark is the Home destination (owner, 2026-10-06: "replace
@@ -84,7 +86,7 @@ export default function AppRail({ searchRemote, itemStatus, profile }: AppRailPr
   // the root takes the top slot and is not repeated in the list.
   const home = all.find((item) => item.url !== undefined && railHref(item.url) === "/");
   const items = home ? all.filter((item) => item !== home) : all;
-  const homeActive = home?.url ? isRailItemActive(pathname, home.url) : false;
+  const homeActive = home?.url ? (activeAppHref ? railHref(activeAppHref) === railHref(home.url) : isRailItemActive(pathname, home.url)) : false;
   const homeStatus = home ? itemStatus?.(home) : undefined;
   const logo = (
     <>
@@ -133,7 +135,7 @@ export default function AppRail({ searchRemote, itemStatus, profile }: AppRailPr
 
       <ul className="mt-2 flex flex-col items-center gap-1">
         {items.map((item) => {
-          const active = item.url ? isRailItemActive(pathname, item.url) : false;
+          const active = item.url ? (activeAppHref ? railHref(activeAppHref) === railHref(item.url) : isRailItemActive(pathname, item.url)) : false;
           const status = itemStatus?.(item);
           const Icon = item.icon;
           return (
