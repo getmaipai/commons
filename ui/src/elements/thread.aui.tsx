@@ -184,6 +184,15 @@ export type ThreadViewportOptions = Pick<
  * starts. It renders nothing of its own when it returns null, so the
  * list's spacing is unchanged for a message without one. Unset, nothing
  * renders.
+ * `SelectionToolbar`, when set, renders inside each user message's
+ * content wrapper, after its text and before the user action bar. A
+ * selection-aware toolbar can return null when there is no active
+ * selection. Unset, nothing is mounted and the message layout is
+ * unchanged.
+ * `ComposerQuotePreview`, when set, renders in the composer shell after
+ * attachments and before the input. A host can show or clear the quote
+ * it will fold into the next message. Unset, nothing is mounted and the
+ * composer layout is unchanged.
  * `assistantActionBarAutohide` sets the assistant action bar's own
  * `autohide`: `"not-last"` (the default, assistant-ui's own choice) shows
  * the row on the last reply and on hover elsewhere; `"never"` keeps the
@@ -215,6 +224,10 @@ export type ThreadComponents = {
   Indicator?: ComponentType | undefined;
   MessageError?: ComponentType | undefined;
   ThreadViewportExtra?: ComponentType | undefined;
+  /** Selection toolbar mount point in each user message; unset renders nothing. */
+  SelectionToolbar?: ComponentType | undefined;
+  /** Quote preview mount point in the composer, after attachments; unset renders nothing. */
+  ComposerQuotePreview?: ComponentType | undefined;
   MessageBefore?: ComponentType | undefined;
   assistantActionBarAutohide?: "not-last" | "never" | undefined;
   ComposerExtra?: ComponentType | undefined;
@@ -892,7 +905,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 );
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerNoticeLayout, composerPlaceholder } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerNoticeLayout, composerPlaceholder } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
@@ -908,6 +921,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
           className="border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text flex-col gap-2 rounded-(--composer-radius) border bg-(--composer-bg) p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]"
         >
           <ComposerAttachments />
+          {ComposerQuotePreview && <ComposerQuotePreview />}
           {ComposerInputOverride ? (
             <ComposerInputOverride />
           ) : (
@@ -1259,6 +1273,7 @@ const UserImagePart: ImageMessagePartComponent = (part) => (
 );
 
 const UserMessage: FC = () => {
+  const { SelectionToolbar } = useContext(ThreadComponentsContext);
   return (
     <MessagePrimitive.Root
       data-slot="aui_user-message-root"
@@ -1292,6 +1307,7 @@ const UserMessage: FC = () => {
             components={{ File: UserFilePart, Image: UserImagePart }}
           />
         </div>
+        {SelectionToolbar && <SelectionToolbar />}
         {/* CHAT-UI-03 (5): `ActionBarPrimitive.Root`'s own `autohide`
             (`ActionBarRoot.tsx`: `if (hideAndfloatStatus === Hidden)
             return null`) genuinely unmounts, not just CSS-hides, so

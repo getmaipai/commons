@@ -1,5 +1,21 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.167] - ui-v0.5.167
+
+### ELT-T1-K06 activity card props (additive)
+
+`TaskCard` and `BackgroundInbox` accept `calm` to stop their running
+spinner and `size="comfortable"` to raise kit-owned text to the 16px base
+token. Both props are optional: omitted props preserve the existing
+animation and text sizing, including the existing reduced-motion behavior.
+
+### ELT-T1-K07 Thread quote slots (additive)
+
+`ThreadComponents.SelectionToolbar` mounts inside each user message's
+content wrapper, and `ThreadComponents.ComposerQuotePreview` mounts in the
+composer shell after attachments and before the input. Both slots are empty
+when unset, preserving the default Thread layout.
+
 ## [0.5.166] - ui-v0.5.166
 
 ### ELT-T1-K02b additive Element props

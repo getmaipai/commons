@@ -93,6 +93,34 @@ const RailWithProbe = () => (
   </nav>
 );
 
+const SelectionToolbar = () => <div data-testid="selection-toolbar">Quote selection</div>;
+const ComposerQuotePreview = () => <div data-testid="composer-quote-preview">Quoted text</div>;
+
+describe("Thread quote slots", () => {
+  test("renders neither slot by default", async () => {
+    const { queryByTestId } = render(<Harness />);
+    await seed();
+    expect(queryByTestId("selection-toolbar")).toBeNull();
+    expect(queryByTestId("composer-quote-preview")).toBeNull();
+  });
+
+  test("renders the selection toolbar in user-message context and the preview in the composer", async () => {
+    const { container, getAllByTestId, getByTestId } = render(
+      <Harness components={{ SelectionToolbar, ComposerQuotePreview }} />,
+    );
+    await seed();
+
+    const toolbars = getAllByTestId("selection-toolbar");
+    expect(toolbars).toHaveLength(2);
+    const toolbar = toolbars[0]!;
+    expect(toolbar.closest(".aui-user-message-content-wrapper")).not.toBeNull();
+    expect(toolbar.closest('[data-role="assistant"]')).toBeNull();
+
+    const preview = getByTestId("composer-quote-preview");
+    expect(preview.parentElement).toBe(container.querySelector('[data-slot="aui_composer-shell"]'));
+  });
+});
+
 async function seed() {
   act(() => runtime.thread.reset(messages));
   await waitFor(() => expect(document.querySelectorAll("[data-message-id]").length).toBe(3));
