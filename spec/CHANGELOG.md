@@ -14,6 +14,13 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.104] - 2026-10-07
+
+### Added
+- Add the typed log-event registry and ProblemReport contract with consent-gated optional content.
+- Aggregate turn-derived failures by component and code in hourly counters; omit per-turn failure and safety events.
+
+
 ## [spec-v0.1.103] - 2026-10-07
 
 ### Fixed
