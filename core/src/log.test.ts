@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createLogger } from "./log";
@@ -35,6 +35,39 @@ describe("createLogger", () => {
     const entries = readdirSync(dir);
     expect(entries.some((entry) => entry.startsWith("app.log."))).toBe(true);
     expect(readFileSync(join(dir, "app.log"), "utf8")).toContain("after rotation");
+  });
+
+  test("rotates the live file when it was last written on a previous UTC day", () => {
+    dir = mkdtempSync(join(tmpdir(), "maipai-core-log-"));
+    const logger = createLogger(dir, "app");
+    logger.appendLine("before day boundary");
+    const previousDay = new Date(Date.now() - 24 * 60 * 60_000);
+    utimesSync(join(dir, "app.log"), previousDay, previousDay);
+
+    logger.appendLine("after day boundary");
+
+    const entries = readdirSync(dir);
+    expect(entries.filter((entry) => entry.startsWith("app.log.")).length).toBe(1);
+    expect(readFileSync(join(dir, "app.log"), "utf8")).toContain("after day boundary");
+  });
+
+  test("prunes rotated files after seven days on an ordinary append", () => {
+    dir = mkdtempSync(join(tmpdir(), "maipai-core-log-"));
+    const logger = createLogger(dir, "app");
+    logger.appendLine("current");
+    const staleRotation = join(dir, "app.log.stale");
+    const recentRotation = join(dir, "app.log.recent");
+    writeFileSync(staleRotation, "stale");
+    writeFileSync(recentRotation, "recent");
+    const staleDate = new Date(Date.now() - 8 * 24 * 60 * 60_000);
+    const recentDate = new Date(Date.now() - 2 * 24 * 60 * 60_000);
+    utimesSync(staleRotation, staleDate, staleDate);
+    utimesSync(recentRotation, recentDate, recentDate);
+
+    logger.appendLine("next");
+
+    expect(existsSync(staleRotation)).toBe(false);
+    expect(existsSync(recentRotation)).toBe(true);
   });
 
   test("a write failure is swallowed, never thrown", () => {

@@ -4,7 +4,7 @@ import { format } from "node:util";
 import { ensureDataDir } from "./paths";
 
 const DEFAULT_MAX_BYTES = 20 * 1024 * 1024;
-const DEFAULT_MAX_AGE_DAYS = 14;
+const DEFAULT_MAX_AGE_DAYS = 7;
 const DAY_MS = 86_400_000;
 
 export interface LoggerOptions {
@@ -75,13 +75,15 @@ export function createLogger(dir: string, name: string, options: LoggerOptions =
 
   function rotateIfNeeded(): void {
     const path = filePath();
-    let size = 0;
+    let fileStats: ReturnType<typeof statSync>;
     try {
-      size = statSync(path).size;
+      fileStats = statSync(path);
     } catch {
       return; // no file yet - nothing to rotate
     }
-    if (size < maxBytes) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const lastWriteDay = new Date(fileStats.mtimeMs).toISOString().slice(0, 10);
+    if (fileStats.size < maxBytes && lastWriteDay === today) return;
     const rotated = `${path}.${new Date().toISOString().replace(/[:.]/g, "-")}`;
     try {
       renameSync(path, rotated);
@@ -96,6 +98,7 @@ export function createLogger(dir: string, name: string, options: LoggerOptions =
     try {
       ensureDataDir(dir);
       rotateIfNeeded();
+      pruneOldRotations();
       appendFileSync(filePath(), `${redact(line)}\n`, { mode: 0o600 });
     } catch {
       // best-effort - see this method's own doc comment

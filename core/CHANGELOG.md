@@ -5,6 +5,13 @@ All notable changes to the `core` workspace. Format follows
 tagged `core-vX.Y.Z`. Everything stays `0.x` until Home's and the Stack's
 adoption proves it.
 
+## [0.1.3] - core-v0.1.3
+
+### Changed
+- `createLogger` rotates its live file at the UTC day boundary, prunes
+  rotated files after seven days on each append, and defaults to seven-day
+  retention.
+
 ## [0.1.2] - core-v0.1.2
 
 ### Fixed
