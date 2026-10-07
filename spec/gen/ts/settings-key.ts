@@ -26,7 +26,11 @@ export const SettingsKey = z
       .describe("Home Assistant's selector names (3.2)."),
     /**Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector.*/
     range: z
-      .any()
+      .object({
+        options: z.array(z.string()).optional(),
+        options_from: z.string().min(1).optional(),
+      })
+      .catchall(z.any())
       .describe(
         "Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector.",
       )
@@ -34,6 +38,27 @@ export const SettingsKey = z
     default: z.any(),
     label: z.string().min(1),
     help: z.string().optional(),
+    copy: z
+      .object({
+        does: z.string().min(1),
+        does_child: z.string().min(1).optional(),
+        does_teen: z.string().min(1).optional(),
+        options: z.record(z.string(), z.string().min(1)).optional(),
+      })
+      .strict()
+      .optional(),
+    control: z
+      .object({
+        child: z.enum(["self", "guardian"]),
+        teen: z.enum(["self", "guardian"]),
+        adult: z.enum(["self", "guardian"]),
+      })
+      .strict()
+      .optional(),
+    band_default: z
+      .object({ child: z.any(), teen: z.any(), adult: z.any() })
+      .strict()
+      .optional(),
     section: z
       .object({
         id: z.string().optional(),

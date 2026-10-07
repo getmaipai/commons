@@ -8,6 +8,7 @@ the hub refuses.
 import json
 from pathlib import Path
 
+import pytest
 from pydantic import ValidationError
 
 from gen.py.artifact_schema import Artifact
@@ -809,3 +810,12 @@ def test_shared_cross_language_validation_conformance():
             assert schema_refused or any(
                 case["rule"] in problem for problem in problems
             ), case["name"]
+
+
+def test_relationship_called_fixture_and_nonempty_constraint():
+    called = Relationship.model_validate(load("relationship.called.example.json"))
+    assert called.called == "Dad"
+    with pytest.raises(ValidationError):
+        Relationship.model_validate(
+            {**load("relationship.called.example.json"), "called": ""}
+        )

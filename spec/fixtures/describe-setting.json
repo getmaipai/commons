@@ -1,0 +1,92 @@
+[
+  {
+    "setting": {
+      "key": "person.photo_uploads",
+      "label": "Send photos",
+      "scope": "person",
+      "selector": "boolean",
+      "default": true,
+      "level": "basic",
+      "copy": { "does": "Lets you add pictures to your messages.", "does_child": "Lets you add pictures to your chats." },
+      "control": { "child": "guardian", "teen": "self", "adult": "self" },
+      "band_default": { "child": false, "teen": true, "adult": true }
+    },
+    "context": { "subjectBand": "child", "viewer": "self", "value": false, "source": "default", "effective": false, "adminName": "Steve", "personName": "Pippa" },
+    "expected": { "does": "Lets you add pictures to your chats.", "state": "Off", "reason": "Off until Steve turns it on." }
+  },
+  {
+    "setting": {
+      "key": "person.photo_uploads",
+      "label": "Send photos",
+      "scope": "person",
+      "selector": "boolean",
+      "default": true,
+      "level": "basic",
+      "copy": { "does": "Lets you add pictures to your messages." },
+      "control": { "child": "guardian", "teen": "self", "adult": "self" },
+      "band_default": { "child": false, "teen": true, "adult": true }
+    },
+    "context": { "subjectBand": "child", "viewer": "self", "value": true, "source": "user", "effective": true, "adminName": "Steve", "personName": "Pippa" },
+    "expected": { "does": "Lets you add pictures to your messages.", "state": "On", "reason": "Turned on by Steve." }
+  },
+  {
+    "setting": {
+      "key": "person.photo_uploads",
+      "label": "Send photos",
+      "scope": "person",
+      "selector": "boolean",
+      "default": true,
+      "level": "basic",
+      "copy": { "does": "Lets you add pictures to your messages." },
+      "control": { "child": "guardian", "teen": "self", "adult": "self" },
+      "band_default": { "child": false, "teen": true, "adult": true }
+    },
+    "context": { "subjectBand": "child", "viewer": "admin", "value": true, "source": "user", "effective": true, "adminName": "Steve", "personName": "Pippa" },
+    "expected": { "does": "Lets you add pictures to your messages.", "state": "On", "reason": "You turned this on for Pippa." }
+  },
+  {
+    "setting": {
+      "key": "person.photo_uploads",
+      "label": "Send photos",
+      "scope": "person",
+      "selector": "boolean",
+      "default": true,
+      "level": "basic",
+      "copy": { "does": "Lets you add pictures to your messages." },
+      "control": { "child": "guardian", "teen": "self", "adult": "self" },
+      "band_default": { "child": false, "teen": true, "adult": true }
+    },
+    "context": { "subjectBand": "adult", "viewer": "self", "value": true, "source": "default", "effective": true },
+    "expected": { "does": "Lets you add pictures to your messages." }
+  },
+  {
+    "setting": {
+      "key": "person.photo_uploads",
+      "label": "Send photos",
+      "scope": "person",
+      "selector": "boolean",
+      "default": true,
+      "level": "basic",
+      "copy": { "does": "Lets you add pictures to your messages.", "does_teen": "Lets you add pictures to your chats." },
+      "control": { "child": "guardian", "teen": "self", "adult": "self" },
+      "band_default": { "child": false, "teen": true, "adult": true }
+    },
+    "context": { "subjectBand": "teen", "viewer": "admin", "value": false, "source": "user", "effective": false },
+    "expected": { "does": "Lets you add pictures to your chats." }
+  },
+  {
+    "setting": {
+      "key": "person.photo_uploads",
+      "label": "Send photos",
+      "scope": "person",
+      "selector": "boolean",
+      "default": true,
+      "level": "basic",
+      "copy": { "does": "Lets you add pictures to your messages." },
+      "control": { "child": "guardian", "teen": "self", "adult": "self" },
+      "band_default": { "child": false, "teen": true, "adult": true }
+    },
+    "context": { "subjectBand": "child", "viewer": "self", "value": true, "source": "user", "effective": false },
+    "expected": { "does": "Lets you add pictures to your messages.", "state": "Off", "reason": "The robot's own setting is stricter." }
+  }
+]

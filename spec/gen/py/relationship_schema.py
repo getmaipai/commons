@@ -85,6 +85,10 @@ class Relationship(BaseModel):
         description='Withheld on shared surfaces and, on the robot, unless the person is confirmed present and alone. Some relationships are sensitive by their nature regardless of who asked.',
     )
     note: constr(max_length=2000) | None = None
+    called: constr(min_length=1, max_length=40) | None = Field(
+        None,
+        description='The word the person at the from end uses for the person at the to end, such as Dad or Mom.',
+    )
     created_at: AwareDatetime
     updated_at: AwareDatetime
     deleted_at: AwareDatetime | None = Field(

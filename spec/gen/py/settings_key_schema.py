@@ -8,6 +8,46 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, constr
 
 
+class Range(BaseModel):
+    """
+    Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector.
+    """
+
+    model_config = ConfigDict(
+        extra='allow',
+    )
+    options: list[str] | None = None
+    options_from: constr(min_length=1) | None = None
+
+
+class Copy(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    does: constr(min_length=1)
+    does_child: constr(min_length=1) | None = None
+    does_teen: constr(min_length=1) | None = None
+    options: dict[str, constr(min_length=1)] | None = None
+
+
+class Control(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    child: Literal['self', 'guardian']
+    teen: Literal['self', 'guardian']
+    adult: Literal['self', 'guardian']
+
+
+class BandDefault(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    child: Any
+    teen: Any
+    adult: Any
+
+
 class Section(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -39,13 +79,16 @@ class SettingsKey(BaseModel):
         'person',
         'media',
     ] = Field(..., description="Home Assistant's selector names (3.2).")
-    range: Any | None = Field(
+    range: Range | None = Field(
         None,
         description='Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector.',
     )
     default: Any
     label: constr(min_length=1)
     help: str | None = None
+    copy_: Copy | None = Field(None, alias='copy')
+    control: Control | None = None
+    band_default: BandDefault | None = None
     section: Section | None = None
     level: Literal['basic', 'advanced', 'expert']
     secret: bool = False

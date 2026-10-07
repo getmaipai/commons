@@ -154,6 +154,12 @@
       "maxLength": 2000,
       "default": null
     },
+    "called": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "description": "The word the person at the from end uses for the person at the to end, such as Dad or Mom."
+    },
     "created_at": {
       "type": "string",
       "format": "date-time"

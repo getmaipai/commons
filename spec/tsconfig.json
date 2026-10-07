@@ -15,5 +15,5 @@
     "noEmit": true,
     "types": ["bun"]
   },
-  "include": ["records", "gen/ts", "tests/ts/record-validate.test.ts", "tests/ts/relationship-vocab.test.ts"]
+  "include": ["records", "gen/ts", "interpreters/ts/describeSetting.ts", "tests/ts/record-validate.test.ts", "tests/ts/relationship-vocab.test.ts", "tests/ts/describe-setting.test.ts"]
 }

@@ -14,6 +14,13 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.98] - 2026-10-07
+
+### Added
+- `SettingsKey` accepts optional per-reader copy, control, band defaults, and option-source metadata.
+- Add `describeSetting` in TypeScript and Python with shared per-reader fixtures and a shrink-only COPY-LINT-01 baseline.
+- `Relationship` accepts an optional `called` word for a visible relationship edge.
+
 ## [spec-v0.1.97] - 2026-10-07
 
 ### Added

@@ -1,0 +1,28 @@
+{
+  "off_until_guardian": {
+    "child": { "off": "Off until {admin} turns it on." },
+    "admin": { "off": "Off for {person} until you turn it on." }
+  },
+  "set_by_guardian": {
+    "child": {
+      "off": "Turned off by {admin}.",
+      "on": "Turned on by {admin}."
+    },
+    "admin": {
+      "off": "You turned this off for {person}.",
+      "on": "You turned this on for {person}."
+    }
+  },
+  "household_admin": {
+    "child": { "line": "Set for the whole home by {admin}." },
+    "teen": { "line": "Set for the whole home by {admin}." },
+    "adult": { "line": "Set for the whole home by {admin}." },
+    "admin": { "line": "Applies to everyone in the home." }
+  },
+  "stricter_robot": {
+    "child": { "line": "The robot's own setting is stricter." },
+    "teen": { "line": "The robot's own setting is stricter." },
+    "adult": { "line": "The robot's own setting is stricter." },
+    "admin": { "line": "The robot's setting is stricter here." }
+  }
+}

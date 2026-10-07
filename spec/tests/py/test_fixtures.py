@@ -135,7 +135,7 @@ def test_list_fixtures(kind: str):
 # Three relationship fixtures, one per case the two-axis design exists
 # for: a former job (valid_to set), an estranged daughter (valid_to null,
 # status estranged), and an unconfirmed inference.
-@pytest.mark.parametrize("kind", ["stated", "estranged", "inferred"])
+@pytest.mark.parametrize("kind", ["stated", "estranged", "inferred", "called"])
 def test_relationship_fixtures(kind: str):
     Relationship.model_validate(load_fixture(f"relationship.{kind}.example.json"))
 

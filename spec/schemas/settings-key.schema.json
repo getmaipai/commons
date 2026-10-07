@@ -24,11 +24,51 @@
       "description": "Home Assistant's selector names (3.2)."
     },
     "range": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "options": { "type": "array", "items": { "type": "string" } },
+        "options_from": { "type": "string", "minLength": 1 }
+      },
       "description": "Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector."
     },
     "default": {},
     "label": { "type": "string", "minLength": 1 },
     "help": { "type": "string" },
+    "copy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["does"],
+      "properties": {
+        "does": { "type": "string", "minLength": 1 },
+        "does_child": { "type": "string", "minLength": 1 },
+        "does_teen": { "type": "string", "minLength": 1 },
+        "options": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["child", "teen", "adult"],
+      "properties": {
+        "child": { "type": "string", "enum": ["self", "guardian"] },
+        "teen": { "type": "string", "enum": ["self", "guardian"] },
+        "adult": { "type": "string", "enum": ["self", "guardian"] }
+      }
+    },
+    "band_default": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["child", "teen", "adult"],
+      "properties": {
+        "child": {},
+        "teen": {},
+        "adult": {}
+      }
+    },
     "section": {
       "type": "object",
       "additionalProperties": false,

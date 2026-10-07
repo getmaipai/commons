@@ -38,6 +38,14 @@ const ENTITY_KINDS = new Set(Entity.shape.kind.options as readonly string[]);
 const byId = new Map(vocabTypes.map((t) => [t.id, t]));
 
 describe("the relationship vocabulary is internally consistent", () => {
+  test("a child can record the word they use for a parent", () => {
+    const dir = join(import.meta.dir, "..", "..", "fixtures", "records");
+    const called = Relationship.parse(JSON.parse(readFileSync(join(dir, "relationship.called.example.json"), "utf-8")));
+    expect(called.type).toBe("child_of");
+    expect(called.called).toBe("Dad");
+    expect(() => Relationship.parse({ ...called, called: "" })).toThrow();
+  });
+
   test("every type's inverse exists and points back at it", () => {
     for (const t of vocabTypes) {
       const inverse = byId.get(t.inverse);

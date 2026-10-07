@@ -96,10 +96,8 @@ describe("record fixtures validate against their generated Zod models", () => {
     });
   }
 
-  // Three relationship fixtures, one per case the two-axis design exists
-  // for: a former job (valid_to set), an estranged daughter (valid_to
-  // null, status estranged), and an unconfirmed inference.
-  for (const kind of ["stated", "estranged", "inferred"]) {
+  // Relationship fixtures cover the two-axis cases and the optional reader name.
+  for (const kind of ["stated", "estranged", "inferred", "called"]) {
     test(`relationship.${kind}.example.json`, () => {
       expect(() => Relationship.parse(loadFixture(`relationship.${kind}.example.json`))).not.toThrow();
     });

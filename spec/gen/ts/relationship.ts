@@ -222,6 +222,15 @@ export const Relationship = z
       )
       .default(false),
     note: z.union([z.string().max(2000), z.null()]).default(null),
+    /**The word the person at the from end uses for the person at the to end, such as Dad or Mom.*/
+    called: z
+      .string()
+      .min(1)
+      .max(40)
+      .describe(
+        "The word the person at the from end uses for the person at the to end, such as Dad or Mom.",
+      )
+      .optional(),
     created_at: z.string().datetime({ offset: true }),
     updated_at: z.string().datetime({ offset: true }),
     /**A tombstone, for the same sync reason Entity and Person keep one.*/
