@@ -46,6 +46,7 @@ describe("hitArea helper", () => {
   test("quiet inline links use foreground color, hover underline, focus ring and 48px target", () => {
     const link = render(<Button asChild variant="quiet-link" size="xs"><a href="/repairs">Open Repairs</a></Button>).getByRole("link");
     expect(link.className).toContain("text-foreground");
+    expect(link.className).toContain("font-normal");
     expect(link.className).toContain("hover:underline");
     expect(link.className).toContain("focus-visible:ring-[3px]");
     expect(link.className).toContain("before:-inset-3");
