@@ -13,6 +13,10 @@ import {
   useIsMarkdownCodeBlock,
 } from "@assistant-ui/react-markdown";
 import type { RemendConfig, StreamdownTextComponents } from "@assistant-ui/react-streamdown";
+import { Streamdown } from "streamdown";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import { harden } from "rehype-harden";
 import remarkGfm from "remark-gfm";
 import type { Pluggable } from "unified";
 import {
@@ -141,6 +145,8 @@ function useMathPlugins(text: string): MathPlugins | null {
 }
 
 const rehypePluginsBase: Pluggable[] = [];
+const streamdownSanitizeSchema = { tagNames: [] as string[], attributes: {} as Record<string, string[]> };
+const streamdownSanitizeSchema = { tagNames: [] as string[], attributes: {} as Record<string, string[]> };
 
 type MarkdownNode = { type: string; url?: string; value?: string; children?: MarkdownNode[] };
 function rawHtmlAsText() {
@@ -162,9 +168,8 @@ const remendOptions = { links: false, linkMode: "text-only" as const };
 // data to any host (the browser fetches it). Streamdown's own `security`
 // option (rehype-harden) is the control: images may only come from the hub's
 // own proxy path, never a remote host and never a `data:` URL; an image that
-// fails the check is replaced by "[Image blocked: <alt text>]". Links stay
-// links (harden already drops javascript:, data: and file: targets) and open
-// through Streamdown's link-safety dialog, which shows the full address.
+// fails the check is replaced by "[Image blocked: <alt text>]". Exact trusted
+// links remain clickable; unlisted destinations become visible plain text.
 export const DEFAULT_ALLOWED_IMAGE_PREFIXES: readonly string[] = ["/api/answer-image/"];
 
 export type MarkdownLinkContext = { message: ThreadMessage; messages: readonly ThreadMessage[] };
@@ -196,7 +201,7 @@ export type MarkdownTextProps = Partial<TextMessagePartProps> & {
   /** Path and local URL prefixes an image may load from. Remote hosts are
    * never allowed. */
   allowedImagePrefixes?: readonly string[];
-  /** Exact URLs that open without the link-safety dialog (a turn's sources). */
+  /** Exact URLs that may remain clickable for this reply. */
   trustedLinks?: TrustedLinks;
 };
 
@@ -282,6 +287,7 @@ function stripUntrustedLinks(trusted: ReadonlySet<string>, origin: string): Plug
 }
 
 const MarkdownTextImpl: FC<MarkdownTextProps> = ({
+  text: standaloneText,
   components,
   preprocess,
   remend = remendOptions,
@@ -289,10 +295,14 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
   trustedLinks,
 }) => {
   const origin = hubOrigin();
-  const message = useAuiState((s) => s.message);
-  const messages = useAuiState((s) => s.thread.messages);
+  const isStandalone = typeof standaloneText === "string";
+  // `MarkdownText` is also used by standalone previews (docs, settings,
+  // artifacts) where no assistant-ui Thread scope exists. Keep message
+  // history optional; those callers get no conversation-derived trusted URLs.
+  const message = isStandalone ? undefined : useAuiState((s) => s.optional.message);
+  const messages = isStandalone ? undefined : useAuiState((s) => s.optional.thread?.messages);
   const resolvedTrustedLinks = typeof trustedLinks === "function"
-    ? trustedLinks({ message, messages })
+    ? (message && messages ? trustedLinks({ message, messages }) : [])
     : trustedLinks ?? [];
   const trustedKey = resolvedTrustedLinks.join("\n");
   const trusted = useMemo(
@@ -317,10 +327,10 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
   // worth loading - MarkdownTextPrimitive reads the same part's text
   // again internally (its own useMessagePartText/useSmooth), so this
   // never becomes the source of truth for what renders.
-  const text = useAuiState((s) => (s.part.type === "text" ? s.part.text : ""));
-  const streaming = useAuiState((s) => s.message.status?.type === "running");
+  const text = isStandalone ? standaloneText : useAuiState((s) => (s.part.type === "text" ? s.part.text : ""));
+  const streaming = isStandalone ? false : useAuiState((s) => s.message.status?.type === "running");
   const mathPlugins = useMathPlugins(text);
-  const shouldAnimate = useAuiState((s) =>
+  const shouldAnimate = isStandalone ? false : useAuiState((s) =>
     s.part.type === "text" && s.message.role === "assistant" && s.message.status?.type === "running",
   );
   const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -329,6 +339,21 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
     [mathPlugins?.remarkPlugins, trusted, origin],
   );
   const rehypePlugins = mathPlugins?.rehypePlugins ?? rehypePluginsBase;
+  const standaloneRehypePlugins = useMemo(() => [
+    rehypeRaw,
+    [rehypeSanitize, streamdownSanitizeSchema] as Pluggable,
+    [harden, security] as Pluggable,
+    ...rehypePlugins,
+  ], [security, rehypePlugins]);
+  const standaloneUrlTransform = useMemo(() => (url: string, key: string) => {
+    if (key === "src") {
+      return imagePrefixKey.split("\n").some((prefix) => url.startsWith(prefix)) ? url : undefined;
+    }
+    if (key === "href") {
+      return trusted.has(canonicalLink(url, origin)) || isHubLink(url) ? url : undefined;
+    }
+    return url;
+  }, [imagePrefixKey, trusted, origin]);
 
   const stableComponents = useShallowStable(components);
   const markdownComponents = useMemo(() => {
@@ -340,7 +365,19 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
 
   return (
     <Suspense fallback={<span className="aui-md" aria-label="Formatting message" />}>
-      <LazyStreamdownTextPrimitive
+      {isStandalone ? <Streamdown
+        mode="static"
+        parseIncompleteMarkdown={true}
+        remarkPlugins={markdownRemarkPlugins}
+        rehypePlugins={standaloneRehypePlugins}
+        urlTransform={standaloneUrlTransform}
+        children={preprocess ? preprocess(preprocessMath(standaloneText), { streaming: false }) : preprocessMath(standaloneText)}
+        className={mathPlugins ? "aui-md aui-md-with-math" : "aui-md"}
+        components={markdownComponents}
+        controls={false}
+        linkSafety={linkSafety}
+        security={security}
+      /> : <LazyStreamdownTextPrimitive
         remarkPlugins={markdownRemarkPlugins}
         rehypePlugins={rehypePlugins}
         preprocess={(text) => (preprocess ? preprocess(preprocessMath(text), { streaming }) : preprocessMath(text))}
@@ -355,7 +392,7 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
         remend={remend}
         linkSafety={linkSafety}
         security={security}
-      />
+      />}
     </Suspense>
   );
 };

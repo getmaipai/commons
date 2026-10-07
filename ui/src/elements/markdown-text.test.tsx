@@ -6,10 +6,11 @@
 // composer/thread, not a mocked recall() of markdown-text's own props.
 import { afterEach, beforeAll, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
-import { AssistantRuntimeProvider, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
+import { AssistantRuntimeProvider, AuiConfig, AuiProvider, MessagePrimitive, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
 import type { RemendConfig } from "@assistant-ui/react-streamdown";
 import { Thread } from "./thread.aui";
 import { STREAMING_TEXT_ANIMATION } from "./markdown-text";
+import { MarkdownText } from "./markdown-text";
 
 afterEach(cleanup);
 beforeAll(async () => { await import("@assistant-ui/react-streamdown"); });
@@ -43,6 +44,17 @@ async function sendAndSettle(container: HTMLElement, getByRole: (role: string, o
 }
 
 describe("markdown-text.tsx: rich content wiring (CHAT-RICH-01)", () => {
+  test("standalone MarkdownText renders remote image safely and keeps an ordinary link visible", async () => {
+    const config = AuiConfig({});
+    const { container } = render(<AuiProvider config={config}>
+      <MarkdownText text={'![remote](https://attacker.example/image.png) [read more](https://example.com/article)'} />
+    </AuiProvider>);
+    await waitFor(() => expect(container.querySelector(".aui-md")?.textContent).toContain("read more"));
+    expect(container.querySelector('.aui-md img[src="https://attacker.example/image.png"]')).toBeNull();
+    expect(container.querySelector('.aui-md a[href="https://example.com/article"]')).toBeNull();
+    expect(container.querySelector(".aui-md")?.textContent).toContain("https://example.com/article");
+  });
+
   test("raw HTML is rendered as text, including active-looking tags", async () => {
     const reply = '<script>alert("x")</script> <img src=x onerror="alert(1)">';
     const { container, getByRole } = render(<Harness reply={reply} />);
