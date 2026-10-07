@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.157] - ui-v0.5.157
+
+### PROJECTS-UI-04 (additive)
+
+Adds the `ProjectHomeHeader` and `ProjectHomeTabs` kit compositions for a
+project home page, including access-aware actions, the Chats page-row list,
+and Sources/Artifacts empty states. Thread page slots accept direct Element
+content so hosts do not need wrapper components.
+
 ## [0.5.156] - ui-v0.5.156
 
 ### PROJECTS-KIT-02 (additive)

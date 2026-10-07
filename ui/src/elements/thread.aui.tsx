@@ -80,6 +80,7 @@ import {
   type ComponentProps,
   type FC,
   type PropsWithChildren,
+  type ReactNode,
 } from "react";
 import { formatRelative } from "../relativeTime";
 
@@ -197,6 +198,9 @@ export type ThreadComponents = {
   viewport?: ThreadViewportOptions | undefined;
   AssistantMessage?: ComponentType | undefined;
   Welcome?: ComponentType | undefined;
+  /** Direct kit Element content for a host page welcome; lets pages use a
+   * shipped page composition at its use site without a Home wrapper. */
+  WelcomeContent?: ReactNode | undefined;
   ToolFallback?: ToolCallMessagePartComponent | undefined;
   ToolGroup?:
     | ComponentType<PropsWithChildren<{ group: ThreadGroupPart }>>
@@ -230,6 +234,8 @@ export type ThreadComponents = {
    * of the follow-up suggestions (a project page's Chats, Sources and
    * Artifacts tabs). */
   BelowComposer?: ComponentType | undefined;
+  /** Direct kit Element content below the compact composer. */
+  BelowComposerContent?: ReactNode | undefined;
   /** PROJECTS-KIT-01: where an empty thread's Welcome and composer sit.
    * "center" (default) centres them; "top" is a page layout: Welcome, then
    * the composer, then `BelowComposer`, from the top. */
@@ -367,7 +373,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
   temporary,
   scrollToBottomOffset,
 }) => {
-  const { Welcome = ThreadWelcome, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity, engineDown, BelowComposer, emptyLayout } = useContext(ThreadComponentsContext);
+  const { Welcome = ThreadWelcome, WelcomeContent, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity, engineDown, BelowComposer, BelowComposerContent, emptyLayout } = useContext(ThreadComponentsContext);
   const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
   const [footerElement, setFooterElement] = useState<HTMLElement | null>(null);
 
@@ -424,7 +430,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
           )}
         >
           <AuiIf condition={isNewChatView}>
-            <Welcome />
+              {WelcomeContent ?? <Welcome />}
           </AuiIf>
           <AuiIf condition={isHistoryLoadingView}>
             <ThreadHistorySkeleton />
@@ -457,7 +463,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
             )}
             <Composer autoFocus={autoFocus} />
             <AuiIf condition={isNewChatView}>
-              {BelowComposer ? <BelowComposer /> : <ThreadSuggestions />}
+              {BelowComposerContent ?? (BelowComposer ? <BelowComposer /> : <ThreadSuggestions />)}
             </AuiIf>
           </ThreadPrimitive.ViewportFooter>
         </div>
