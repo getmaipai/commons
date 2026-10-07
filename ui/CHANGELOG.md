@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.175] - ui-v0.5.175
+
+### SETTINGS-APPEARANCE-01 tokens and profile accent variants
+
+The named looks use distinct, contrast-checked primary tokens. Card and
+Avatar accept an additive profile accent variant that reads the shared
+profile accent tokens; Avatar also exposes the existing profile size as a
+kit variant.
+
 ## [0.5.174] - ui-v0.5.174
 
 ### SETTINGS-SAVE-01 saved status

@@ -45,6 +45,16 @@ describe("Avatar", () => {
     expect(container.querySelector('[data-slot="avatar-badge"]')).toBeNull();
   });
 
+  test("profile size and accent are additive kit variants driven by a token", async () => {
+    const { container, findByText } = render(<Avatar name="Sage" size="profile" accent="teal" />);
+    await findByText("S");
+    const avatar = container.querySelector('[data-slot="avatar"]') as HTMLElement;
+    expect(avatar.dataset.accent).toBe("teal");
+    expect(avatar.className).toContain("size-16");
+    expect(avatar.className).toContain("ring-[var(--profile-accent-active)]");
+    expect(avatar.style.getPropertyValue("--profile-accent-active")).toBe("var(--profile-accent-teal)");
+  });
+
   // `diceBearAvatarUri` is the exact function `Avatar` calls for a seed -
   // asserted directly rather than through a full render because
   // happy-dom's image loading is off by default (this suite's own

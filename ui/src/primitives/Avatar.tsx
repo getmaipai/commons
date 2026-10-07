@@ -9,6 +9,7 @@ import { createAvatar } from "@dicebear/core";
 import * as adventurer from "@dicebear/adventurer";
 import { Avatar as AvatarRoot, AvatarFallback, AvatarImage, AvatarBadge } from "@/kit/ui/avatar";
 import { cn } from "@/kit/utils";
+import { profileAccentStyle, type ProfileAccent } from "@/kit/primitives/profileAccent";
 
 interface AvatarProps {
   name: string;
@@ -22,6 +23,8 @@ interface AvatarProps {
    * separate, not-yet-spec'd field and out of scope here. */
   seed?: string | null;
   className?: string;
+  size?: "default" | "profile";
+  accent?: ProfileAccent;
   /** A small filled dot on the avatar's own corner - the phone header
    * fold's own stand-in for a separate notification badge (owner
    * reference, "The phone composition," 2026-09-20: "the bell's count
@@ -69,7 +72,7 @@ export function diceBearAvatarUri(seed: string): string | null {
 // (`assistant-ui/attachment.aui.tsx`'s `AttachmentThumb`: an `AvatarImage`
 // for the real thing, `AvatarFallback` for when there isn't one) rather
 // than inventing a second way to show "picture, or a stand-in for one."
-export function Avatar({ name, seed, className, dot }: AvatarProps) {
+export function Avatar({ name, seed, className, size = "default", accent, dot }: AvatarProps) {
   const initial = name.trim().charAt(0).toUpperCase() || "?";
   const trimmedSeed = seed?.trim();
   // Memoized: DiceBear's own SVG generation runs synchronously and isn't
@@ -77,9 +80,16 @@ export function Avatar({ name, seed, className, dot }: AvatarProps) {
   const avatarUri = useMemo(() => (trimmedSeed ? diceBearAvatarUri(trimmedSeed) : null), [trimmedSeed]);
   return (
     <AvatarRoot
+      data-accent={accent}
+      style={accent ? profileAccentStyle(accent) : undefined}
       // The caller's text size (SignIn's `text-xl`, Shell's `text-sm`,
       // MessageThread's `text-sm`) sets the font-size here, on the root.
-      className={cn("size-12 bg-primary text-primary-foreground font-semibold text-base after:hidden", className)}
+      className={cn(
+        size === "profile" ? "size-16 text-xl" : "size-12",
+        "bg-primary text-primary-foreground font-semibold text-base after:hidden",
+        accent && "ring-2 ring-offset-2 ring-offset-card ring-[var(--profile-accent-active)]",
+        className,
+      )}
     >
       {/* Decorative, same reasoning as the initial below: every real
           caller already renders the full name as separate, adjacent
