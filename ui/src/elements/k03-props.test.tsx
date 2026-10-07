@@ -235,6 +235,17 @@ describe("TooltipIconButton hitArea48", () => {
     // The enhanced copy already carries the 48px floor by default.
     expect(render(<TooltipIconButton tooltip="Copy">c</TooltipIconButton>).getByRole("button").className).toContain("before:-inset-3");
   });
+  test("legacy re-export: hitArea48 defaults on, false opts out, className is untouched", () => {
+    const on = render(<TooltipIconButton tooltip="Copy" hitArea48>c</TooltipIconButton>).getByRole("button");
+    expect(on.className).toContain("before:-inset-3");
+    expect(on.className).toContain("size-6");
+    cleanup();
+    const off = render(<TooltipIconButton tooltip="Copy" hitArea48={false} className="extra">c</TooltipIconButton>).getByRole("button");
+    expect(off.className).not.toContain("before:-inset-3");
+    expect(off.className).toContain("size-6");
+    expect(off.className).toContain("extra");
+    expect(off.hasAttribute("hitarea48")).toBe(false);
+  });
 });
 
 describe("File.Download hitArea48", () => {
