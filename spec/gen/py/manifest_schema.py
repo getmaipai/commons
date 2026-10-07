@@ -11,6 +11,21 @@ from pydantic import AnyUrl, BaseModel, ConfigDict, Field, conint, constr
 from . import privacy_row_schema, settings_area_schema, settings_key_schema
 
 
+class Offer(BaseModel):
+    """
+    TOOL-OFFER-01: whether this package tool may be offered to an adult written chat model. Home derives the live set from installed, enabled, smoke-healthy packages and the selected model's max_tools; absent means not measured and therefore not offered. `base` is part of the measured base set, `conditional` requires a declared gate and benchmark row, and `off` requires a reason.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    mode: Literal['base', 'conditional', 'off']
+    gate: constr(min_length=1) | None = None
+    bench_row: constr(min_length=1) | None = None
+    priority: conint(ge=0) | None = None
+    reason: constr(min_length=1, max_length=200) | None = None
+
+
 class Routing(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -407,6 +422,10 @@ class PackageManifest(BaseModel):
     tool_label: constr(min_length=1, max_length=120) | None = Field(
         None,
         description="Optional (TOOL-EVENTS-01): the human label the turn stream's `tool_call` event carries while a package runs. Read from the manifest's own entry, so the label is the package's, not the route's. When it contains a `{place}` (or other `{arg}`) slot, the engine fills it from the call's `args` when that arg is present, else omits the slot entirely. Absent: the timeline falls back to the package's `display` name.",
+    )
+    offer: Offer | None = Field(
+        None,
+        description="TOOL-OFFER-01: whether this package tool may be offered to an adult written chat model. Home derives the live set from installed, enabled, smoke-healthy packages and the selected model's max_tools; absent means not measured and therefore not offered. `base` is part of the measured base set, `conditional` requires a declared gate and benchmark row, and `off` requires a reason.",
     )
     author: constr(min_length=1)
     license: constr(min_length=1)

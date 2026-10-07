@@ -252,7 +252,7 @@ export const ModelCapabilities = z
         "Recorded footprints for this model, newest first. A planner uses a measured entry before a dry-run one before an estimated one.",
       )
       .optional(),
-    /**U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.*/
+    /**U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, the maximum number of measured tools Home may offer, whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.*/
     turn_budget: z
       .object({
         /**Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).*/
@@ -261,12 +261,23 @@ export const ModelCapabilities = z
           .describe(
             "Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).",
           ),
-        /**The fixed, sorted tool-name set the model node offers every turn; never varies per turn.*/
+        /**TOOL-OFFER-01: maximum measured tool definitions this model may receive in one adult written turn. Home fails closed when the derived offer set exceeds this cap; it never trims the set silently.*/
+        max_tools: z
+          .number()
+          .int()
+          .gte(0)
+          .lte(16)
+          .describe(
+            "TOOL-OFFER-01: maximum measured tool definitions this model may receive in one adult written turn. Home fails closed when the derived offer set exceeds this cap; it never trims the set silently.",
+          )
+          .optional(),
+        /**Deprecated by TOOL-OFFER-01. Retained as optional migration compatibility only; Home derives tool offers from installed manifests and max_tools.*/
         tools_offered: z
           .array(z.string())
           .describe(
-            "The fixed, sorted tool-name set the model node offers every turn; never varies per turn.",
-          ),
+            "Deprecated by TOOL-OFFER-01. Retained as optional migration compatibility only; Home derives tool offers from installed manifests and max_tools.",
+          )
+          .optional(),
         /**MODEL-BG-SPEC-01: whether the model may run unattended background turns (the heartbeat, errands, price watches), the ones no person is waiting on. Optional, and absent means false. A model with no record, or a record with no turn_budget, is treated as false too (org rule 8, fail safe): an unattended turn never starts on a model nobody has measured.*/
         background_turns: z
           .boolean()
@@ -370,7 +381,7 @@ export const ModelCapabilities = z
       })
       .strict()
       .describe(
-        "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
+        "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, the maximum number of measured tools Home may offer, whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
       )
       .optional(),
   })

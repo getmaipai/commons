@@ -138,7 +138,7 @@ class Measured(BaseModel):
 
 class TurnBudget(BaseModel):
     """
-    U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, which tools it is offered (a fixed, sorted set, never varying per turn), whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.
+    U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, the maximum number of measured tools Home may offer, whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.
     """
 
     model_config = ConfigDict(
@@ -148,9 +148,14 @@ class TurnBudget(BaseModel):
         ...,
         description="Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).",
     )
-    tools_offered: list[str] = Field(
-        ...,
-        description='The fixed, sorted tool-name set the model node offers every turn; never varies per turn.',
+    max_tools: conint(ge=0, le=16) | None = Field(
+        None,
+        description='TOOL-OFFER-01: maximum measured tool definitions this model may receive in one adult written turn. Home fails closed when the derived offer set exceeds this cap; it never trims the set silently.',
+    )
+    tools_offered: list[str] | None = Field(
+        None,
+        deprecated=True,
+        description='Deprecated by TOOL-OFFER-01. Retained as optional migration compatibility only; Home derives tool offers from installed manifests and max_tools.',
     )
     background_turns: bool = Field(
         False,

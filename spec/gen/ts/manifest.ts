@@ -56,6 +56,20 @@ export const PackageManifest = z
         "Optional (TOOL-EVENTS-01): the human label the turn stream's `tool_call` event carries while a package runs. Read from the manifest's own entry, so the label is the package's, not the route's. When it contains a `{place}` (or other `{arg}`) slot, the engine fills it from the call's `args` when that arg is present, else omits the slot entirely. Absent: the timeline falls back to the package's `display` name.",
       )
       .optional(),
+    /**TOOL-OFFER-01: whether this package tool may be offered to an adult written chat model. Home derives the live set from installed, enabled, smoke-healthy packages and the selected model's max_tools; absent means not measured and therefore not offered. `base` is part of the measured base set, `conditional` requires a declared gate and benchmark row, and `off` requires a reason.*/
+    offer: z
+      .object({
+        mode: z.enum(["base", "conditional", "off"]),
+        gate: z.string().min(1).optional(),
+        bench_row: z.string().min(1).optional(),
+        priority: z.number().int().gte(0).optional(),
+        reason: z.string().min(1).max(200).optional(),
+      })
+      .strict()
+      .describe(
+        "TOOL-OFFER-01: whether this package tool may be offered to an adult written chat model. Home derives the live set from installed, enabled, smoke-healthy packages and the selected model's max_tools; absent means not measured and therefore not offered. `base` is part of the measured base set, `conditional` requires a declared gate and benchmark row, and `off` requires a reason.",
+      )
+      .optional(),
     author: z.string().min(1),
     license: z.string().min(1),
     homepage: z.string().url().optional(),

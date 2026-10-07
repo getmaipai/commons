@@ -14,6 +14,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.102] - 2026-10-07
+
+### Added
+- Declare per-package tool offer decisions and per-model tool caps for TOOL-OFFER-01; retain `tools_offered` as optional deprecated migration data.
+
 ## [spec-v0.1.98] - 2026-10-07
 
 ### Added

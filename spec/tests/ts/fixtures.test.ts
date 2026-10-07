@@ -383,6 +383,14 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => ModelCapabilities.parse(bad)).toThrow();
   });
 
+  test("TOOL-OFFER-01: max_tools permits a bounded measured set and rejects caps over sixteen", () => {
+    const fixture = loadFixture("model-capabilities.chat.example.json") as { turn_budget: Record<string, unknown> };
+    expect(ModelCapabilities.parse({ ...fixture, turn_budget: { ...fixture.turn_budget, max_tools: 16 } }).turn_budget?.max_tools).toBe(16);
+    expect(() =>
+      ModelCapabilities.parse({ ...fixture, turn_budget: { ...fixture.turn_budget, max_tools: 17 } }),
+    ).toThrow();
+  });
+
   test("model-capabilities: a vision model declares image input with its projector (VISION-01a)", () => {
     const parsed = ModelCapabilities.parse(loadFixture("model-capabilities.vision-role.example.json"));
     expect(parsed.image_input?.projector.file).toBe("mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf");

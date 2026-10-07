@@ -129,6 +129,25 @@ describe("PackageManifest, step 2's new fields", () => {
     expect(PackageManifest.parse(BASE).tool_label).toBeUndefined();
     expect(() => PackageManifest.parse({ ...BASE, tool_label: "" })).toThrow();
   });
+
+  test("offer: measured base and conditional decisions, plus reasoned off decisions (TOOL-OFFER-01)", () => {
+    expect(PackageManifest.parse({ ...BASE, offer: { mode: "base", priority: 2 } }).offer?.mode).toBe("base");
+    expect(
+      PackageManifest.parse({
+        ...BASE,
+        offer: { mode: "conditional", gate: "answerImagesAllowed", bench_row: "answer-images" },
+      }).offer?.mode,
+    ).toBe("conditional");
+    expect(PackageManifest.parse({ ...BASE, offer: { mode: "off", reason: "measured recall below bar" } }).offer?.mode).toBe(
+      "off",
+    );
+    expect(PackageManifest.parse(BASE).offer).toBeUndefined();
+  });
+
+  test("offer rejects unknown modes and undeclared fields", () => {
+    expect(() => PackageManifest.parse({ ...BASE, offer: { mode: "unmeasured" } })).toThrow();
+    expect(() => PackageManifest.parse({ ...BASE, offer: { mode: "base", extra: true } })).toThrow();
+  });
 });
 
 describe("PackageManifest.incognito (INCOGNITO-04)", () => {
