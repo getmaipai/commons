@@ -232,6 +232,7 @@ describe("SettingsRenderer - writes", () => {
     const put = calls.find((c) => c.method === "PUT")!;
     expect(JSON.parse(put.body!)).toEqual({ scope: "person:p1", key: "chat.photo_uploads", value: true });
     await waitFor(() => expect(view.getByRole("switch", { name: "Send photos in chat" }).getAttribute("aria-checked")).toBe("true"));
+    expect((await view.findByRole("status")).textContent).toBe("Saved.");
   });
 
   test("a rejected write shows the server's sentence in an alert above the cards", async () => {

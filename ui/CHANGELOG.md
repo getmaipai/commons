@@ -1,5 +1,12 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.174] - ui-v0.5.174
+
+### SETTINGS-SAVE-01 saved status
+
+SettingsRenderer shows a short saved status after a setting write or reset
+succeeds, and clears it when another write begins.
+
 ## [0.5.173] - ui-v0.5.173
 
 ### ELT-T1-22 TraceWaterfall contrast

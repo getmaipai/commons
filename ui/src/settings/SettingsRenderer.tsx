@@ -102,6 +102,7 @@ export function SettingsRenderer({
   });
 
   const [writeError, setWriteError] = useState<string | null>(null);
+  const [writeSaved, setWriteSaved] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState<Record<string, boolean>>({});
   const rootRef = useRef<HTMLDivElement>(null);
@@ -118,12 +119,14 @@ export function SettingsRenderer({
   async function handleChange(key: string, value: unknown): Promise<boolean> {
     setPendingKey(key);
     setWriteError(null);
+    setWriteSaved(false);
     try {
       const updated = await request<ResolvedSetting>("/api/settings", {
         method: "PUT",
         body: JSON.stringify({ scope: scopeValue, key, value }),
       });
       replaceValue(updated);
+      setWriteSaved(true);
       return true;
     } catch (e) {
       setWriteError(e instanceof ApiError ? e.message : "Could not save that change.");
@@ -136,12 +139,14 @@ export function SettingsRenderer({
   async function handleReset(key: string) {
     setPendingKey(key);
     setWriteError(null);
+    setWriteSaved(false);
     try {
       const restored = await request<ResolvedSetting>("/api/settings/reset", {
         method: "POST",
         body: JSON.stringify({ scope: scopeValue, key }),
       });
       replaceValue(restored);
+      setWriteSaved(true);
     } catch (e) {
       setWriteError(e instanceof ApiError ? e.message : "Could not reset that setting.");
     } finally {
@@ -195,6 +200,7 @@ export function SettingsRenderer({
           <AlertDescription>{writeError}</AlertDescription>
         </Alert>
       ) : null}
+      {writeSaved ? <p role="status">Saved.</p> : null}
       <AsyncState
         data={data}
         error={error}
