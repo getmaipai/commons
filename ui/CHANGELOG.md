@@ -1,5 +1,16 @@
 # Changelog (`@maipai/ui`)
 
+## [Unreleased]
+
+### ELT-T1-K02 data-table (additive)
+
+`elements/data-table` is now a generic table: `DataTable<Row>` takes `columns`
+(`DataTableColumn<Row>`), `getRowId`, `emptyLabel`, and two kit slots,
+`toolbar` (above the header, for a filter box) and `rowActions(row)` (at the
+end of every row). With no `columns` it renders the ModelUsage demo shape
+exactly as before, and `cycle` is now optional. Not done: a refresh against the
+upstream registry source, which was not reachable from this session.
+
 ## [0.5.163] - ui-v0.5.163
 
 ### ELT-T1-K05 (additive)
