@@ -13,6 +13,7 @@ import {
   useAuiState,
 } from "@assistant-ui/react";
 import { ProjectMark } from "./project-mark";
+import { formatRelative } from "../relativeTime";
 import { hitArea } from "../utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
@@ -153,7 +154,17 @@ export type ThreadListProjects = {
   onPin?: (id: string, pinned: boolean) => void;
   /** Adds a "See all projects" row after the list. */
   onSeeAll?: () => void;
+  /** Opt into the project-page chat row presentation; absent keeps current rows unchanged. */
+  rowVariant?: "page";
+  /** Page-row details keyed by thread id. Missing fields are omitted. */
+  pageRows?: Readonly<Record<string, ThreadListPageRow>>;
   labels?: ThreadListProjectLabels;
+};
+
+export type ThreadListPageRow = {
+  preview?: string | null;
+  date?: string | null;
+  projectIcon?: { icon?: string; color?: string };
 };
 
 const PROJECT_LABEL_DEFAULTS: Required<ThreadListProjectLabels> = {
@@ -979,6 +990,7 @@ export const ThreadListItem: FC = () => {
   const isRunning = useAuiState((s) => s.threadListItem.isRunning);
   const projects = useContext(ThreadListProjectsContext);
   const threadId = useAuiState((s) => s.threadListItem.id);
+  const pageRow = projects?.rowVariant === "page" ? projects.pageRows?.[threadId] : undefined;
   const draggable = Boolean(projects?.canMove && projects.folders.length > 0);
   const { pinnable } = useContext(ThreadListPinContext);
   const isPinned = useAuiState((s) => isThreadPinned(s.threadListItem.custom));
@@ -1004,7 +1016,10 @@ export const ThreadListItem: FC = () => {
           : undefined
       }
       data-slot="aui_thread-list-item"
-      className="group hover:bg-muted focus-visible:bg-muted data-active:bg-muted has-focus-visible:bg-muted has-data-[state=open]:bg-muted relative flex h-8 items-center rounded-md transition-colors focus-visible:outline-none"
+      className={cn(
+        "group hover:bg-muted focus-visible:bg-muted data-active:bg-muted has-focus-visible:bg-muted has-data-[state=open]:bg-muted relative flex items-center rounded-md transition-colors focus-visible:outline-none",
+        pageRow ? "min-h-16" : "h-8",
+      )}
     >
       {isRenaming ? (
         <ThreadListItemRename
@@ -1019,9 +1034,11 @@ export const ThreadListItem: FC = () => {
           data-slot="aui_thread-list-item-trigger"
           className={cn(
             "focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 focus-visible:ring-1",
+            pageRow && "gap-3 py-2",
             hitArea(2),
           )}
         >
+          {pageRow?.projectIcon ? <ProjectMark icon={pageRow.projectIcon.icon} color={pageRow.projectIcon.color} /> : null}
           {pinnable && isPinned && (
             <PinIcon
               aria-hidden
@@ -1036,12 +1053,19 @@ export const ThreadListItem: FC = () => {
               className="text-muted-foreground me-1.5 size-3.5 shrink-0 animate-spin"
             />
           )}
-          <span
-            data-slot="aui_thread-list-item-title"
-            className="min-w-0 flex-1 truncate"
-          >
-            <ThreadListItemPrimitive.Title fallback="New Chat" />
-          </span>
+          {pageRow ? (
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span data-slot="aui_thread-list-item-title" className="truncate font-medium">
+                <ThreadListItemPrimitive.Title fallback="New Chat" />
+              </span>
+              {pageRow.preview ? <span data-slot="aui_thread-list-item-preview" className="text-muted-foreground truncate text-sm">{pageRow.preview}</span> : null}
+            </span>
+          ) : (
+            <span data-slot="aui_thread-list-item-title" className="min-w-0 flex-1 truncate">
+              <ThreadListItemPrimitive.Title fallback="New Chat" />
+            </span>
+          )}
+          {pageRow?.date ? <time data-slot="aui_thread-list-item-date" dateTime={pageRow.date} className="text-muted-foreground shrink-0 text-sm">{formatRelative(pageRow.date)}</time> : null}
           {isRunning && <span className="sr-only">Running</span>}
         </ThreadListItemPrimitive.Trigger>
       )}

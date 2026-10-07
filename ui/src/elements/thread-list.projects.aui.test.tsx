@@ -8,6 +8,8 @@ import {
   type RemoteThreadListAdapter,
 } from "@assistant-ui/react";
 import { ThreadListItems, ThreadListRoot, type ThreadListProjects } from "./thread-list.aui";
+import { ThreadListPageRowsShowcase } from "./ThreadListPageRowsShowcase";
+import { formatRelative } from "../relativeTime";
 
 // CHAT-PROJECT-01: the thread list's opt-in projects mode.
 
@@ -87,6 +89,13 @@ const openChatMenu = async (view: ReturnType<typeof render>, title: string) => {
 };
 
 describe("ThreadList projects mode", () => {
+  test("the page-row showcase story renders its preview, relative date, and optional icon", async () => {
+    const view = render(<ThreadListPageRowsShowcase />);
+    expect(await view.findByText("Design Review Prompt")).toBeTruthy();
+    expect(view.getByText(/Make sure you are detailed on the prompt bar/)).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="project-mark"]')).toBeTruthy();
+  });
+
   test("without projects nothing changes: no Projects section, no move items", async () => {
     const view = render(<Harness seeds={[{ remoteId: "a", title: "Alpha", folder: "folder-garden" }]} />);
     await view.findByText("Alpha");
@@ -96,6 +105,35 @@ describe("ThreadList projects mode", () => {
     await view.findByText("Rename");
     expect(view.queryByText("Move to project")).toBeNull();
     expect(view.container.querySelector("[data-slot=aui_thread-list-item]")?.getAttribute("draggable")).toBeNull();
+  });
+
+  test("page rows show the title, optional preview and relative date, with an optional project icon", async () => {
+    const date = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+    const view = render(
+      <Harness
+        projects={{
+          folders: [],
+          rowVariant: "page",
+          pageRows: {
+            alpha: { preview: "A one-line answer preview", date, projectIcon: { icon: "leaf", color: "green" } },
+            beta: { preview: null, date: null },
+          },
+        }}
+        seeds={[{ remoteId: "alpha", title: "Alpha project chat" }, { remoteId: "beta", title: "Untitled preview chat" }]}
+      />,
+    );
+
+    const alpha = await view.findByText("Alpha project chat");
+    const alphaRow = alpha.closest("[data-slot=aui_thread-list-item]") as HTMLElement;
+    expect(within(alphaRow).getByText("A one-line answer preview").className).toContain("truncate");
+    expect(within(alphaRow).getByText(formatRelative(date)).getAttribute("datetime")).toBe(date);
+    expect(alphaRow.querySelector('[data-slot="project-mark"]')).toBeTruthy();
+
+    const beta = await view.findByText("Untitled preview chat");
+    const betaRow = beta.closest("[data-slot=aui_thread-list-item]") as HTMLElement;
+    expect(betaRow.querySelector('[data-slot="aui_thread-list-item-preview"]')).toBeNull();
+    expect(betaRow.querySelector('[data-slot="aui_thread-list-item-date"]')).toBeNull();
+    expect(betaRow.querySelector('[data-slot="project-mark"]')).toBeNull();
   });
 
   test("day group headers render only their labels, without the group's array index", async () => {

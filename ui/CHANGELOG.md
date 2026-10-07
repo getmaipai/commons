@@ -1,5 +1,15 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.156] - ui-v0.5.156
+
+### PROJECTS-KIT-02 (additive)
+
+`ThreadListProjects` accepts `rowVariant="page"` and page-row data keyed by
+thread id. Page rows show the thread title, an optional one-line preview, an
+optional relative date, and an optional `ProjectMark`; without the new props,
+the existing compact thread row is unchanged. `ThreadListPageRowsShowcase`
+demonstrates the page-row variant.
+
 ## [0.5.155] - ui-v0.5.155
 
 ### ELT-T1-05 (additive)
