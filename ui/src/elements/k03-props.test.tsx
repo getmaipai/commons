@@ -16,6 +16,7 @@ import { groupThreads } from "./thread-search";
 import { TooltipIconButton } from "../assistant-ui/tooltip-icon-button";
 import { TooltipIconButton as ElementTooltipIconButton } from "./tooltip-icon-button";
 import { AsyncState } from "../primitives/AsyncState";
+import { File } from "./file";
 
 afterEach(cleanup);
 
@@ -233,6 +234,20 @@ describe("TooltipIconButton hitArea48", () => {
     cleanup();
     // The enhanced copy already carries the 48px floor by default.
     expect(render(<TooltipIconButton tooltip="Copy">c</TooltipIconButton>).getByRole("button").className).toContain("before:-inset-3");
+  });
+});
+
+describe("File.Download hitArea48", () => {
+  test("adds a 48px pseudo-element target only when requested", () => {
+    const off = render(<File.Download data="https://example.test/file" sourceType="url" mimeType="application/pdf" filename="file.pdf" />).getByRole("link");
+    expect(off.className).not.toContain("before:-inset-3");
+    expect(off.hasAttribute("hitArea48")).toBe(false);
+    cleanup();
+
+    const on = render(<File.Download data="https://example.test/file" sourceType="url" mimeType="application/pdf" filename="file.pdf" hitArea48 />).getByRole("link");
+    expect(on.className).toContain("before:-inset-3");
+    expect(on.className).toContain("relative");
+    expect(on.hasAttribute("hitArea48")).toBe(false);
   });
 });
 

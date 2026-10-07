@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { FileMessagePartComponent } from "@assistant-ui/react";
 import { cn } from "cn";
+import { hitArea } from "../utils";
 
 const fileVariants = cva(
   "aui-file-root inline-flex items-center gap-3 rounded-lg transition-colors",
@@ -210,6 +211,7 @@ type FileDownloadProps = Omit<React.ComponentProps<"a">, "href"> & {
   mimeType: string;
   filename?: string;
   sourceType?: "url" | "id";
+  hitArea48?: boolean;
 };
 
 function FileDownload({
@@ -219,6 +221,7 @@ function FileDownload({
   sourceType,
   className,
   children,
+  hitArea48,
   ...props
 }: FileDownloadProps) {
   if (typeof data !== "string") return null;
@@ -235,6 +238,7 @@ function FileDownload({
       {...(kind === "url" && { target: "_blank", rel: "noopener noreferrer" })}
       className={cn(
         "text-muted-foreground hover:bg-accent hover:text-accent-foreground shrink-0 rounded-md p-1 transition-colors",
+        hitArea48 && hitArea(3),
         className,
       )}
       aria-label={!children ? `Download ${filename || "file"}` : undefined}
