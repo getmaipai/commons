@@ -149,9 +149,9 @@ export type ThreadViewportOptions = Pick<
  * plain text field, this component does not fall back to one on its
  * own. Opened upstream the same day, onto
  * assistant-ui/assistant-ui#8003 (`ui/docs/dashboard-upstream.md`).
- * `ComposerNotice`, when set, renders as a one-line muted notice below
- * the composer shell, for a host notice that belongs under the input
- * rather than in its action row.
+ * `ComposerNotice`, when set, renders as a muted notice below the composer
+ * shell. Its layout defaults to one-line truncation; `composerNoticeLayout:
+ * "wrap"` allows a host notice to wrap without truncation.
  * `ComposerQueue`, when set, renders in the viewport footer directly
  * above the composer shell - inside the footer (so it sticks and is
  * measured with it), outside the composer's own rounded container.
@@ -189,6 +189,7 @@ export type ThreadViewportOptions = Pick<
  * row under every reply, the way the major chat apps draw it.
  */
 export type ComposerDensity = "compact";
+export type ComposerNoticeLayout = "truncate" | "wrap";
 
 export type ThreadComponents = {
   markdown?: { components?: MarkdownTextProps["components"]; preprocess?: MarkdownTextProps["preprocess"]; remend?: MarkdownTextProps["remend"] } | undefined;
@@ -221,6 +222,8 @@ export type ThreadComponents = {
   composerDensity?: ComposerDensity | undefined;
   ComposerInputOverride?: ComponentType | undefined;
   ComposerNotice?: ComponentType | undefined;
+  /** Composer notice layout. Defaults to the existing one-line truncation. */
+  composerNoticeLayout?: ComposerNoticeLayout | undefined;
   /** PROJECTS-KIT-01: the composer's placeholder. Default "Send a message...". */
   composerPlaceholder?: string | undefined;
   /** PROJECTS-KIT-01: drawn under the composer of an empty thread, in place
@@ -883,7 +886,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 );
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerPlaceholder } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerNoticeLayout, composerPlaceholder } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
@@ -914,7 +917,10 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
       {ComposerNotice && (
         <div
           data-slot="aui_composer-notice"
-          className="text-muted-foreground w-full truncate px-2.5 text-xs leading-5"
+          className={cn(
+            "text-muted-foreground w-full px-2.5 text-xs leading-5",
+            composerNoticeLayout === "wrap" ? "whitespace-normal" : "truncate",
+          )}
         >
           <ComposerNotice />
         </div>
