@@ -55,6 +55,32 @@ describe("DataTable generic rows and slots", () => {
     expect(desktopRows.getByText("BO")).toBeTruthy();
   });
 
+  test("minWidth sets desktop header and cell minimums in pixels, not card widths", () => {
+    const { container } = render(
+      <DataTable
+        rows={people}
+        columns={[
+          { id: "person", header: "Person" },
+          { id: "role", header: "Role", minWidth: 176 },
+        ]}
+      />,
+    );
+    const header = container.querySelector("[data-slot='data-table-header-row']")!;
+    const body = container.querySelector("[data-slot='data-table-body']")!;
+    const cards = container.querySelector("[data-slot='data-table-cards']")!;
+    const desktopHeader = header.querySelectorAll<HTMLElement>("[role='columnheader']");
+    const desktopCells = body.querySelectorAll<HTMLElement>("[role='cell']");
+    const card = cards.querySelector<HTMLElement>("[data-slot='data-table-card-row']")!;
+    const cardHeaders = card.querySelectorAll<HTMLElement>("[role='columnheader']");
+    const cardCells = card.querySelectorAll<HTMLElement>("[role='cell']");
+    expect(desktopHeader[0]!.style.minWidth).toBe("");
+    expect(desktopHeader[1]!.style.minWidth).toBe("176px");
+    expect(desktopCells[0]!.style.minWidth).toBe("");
+    expect(desktopCells[1]!.style.minWidth).toBe("176px");
+    expect(cardHeaders[1]!.style.minWidth).toBe("");
+    expect(cardCells[1]!.style.minWidth).toBe("");
+  });
+
   test("caption and the div structure expose table roles", () => {
     const { container, getByRole } = render(
       <DataTable rows={usage} caption="Model usage" />,

@@ -19,6 +19,8 @@ export interface DataTableColumn<Row> {
   cell?: (row: Row) => ReactNode;
   /** `end` right-aligns a numeric column. Default `start`. */
   align?: "start" | "end";
+  /** Minimum desktop column width in pixels. Ignored in card mode. */
+  minWidth?: number;
   /** Show the sortable header control. The caller owns sorting the rows. */
   sortable?: boolean;
 }
@@ -72,6 +74,12 @@ function cellText<Row>(column: DataTableColumn<Row>, row: Row): ReactNode {
   if (column.cell) return column.cell(row);
   const value = (row as Record<string, unknown>)[column.id];
   return value === undefined || value === null ? "" : String(value);
+}
+
+function columnMinWidth<Row>(column: DataTableColumn<Row>) {
+  return column.minWidth === undefined
+    ? undefined
+    : { minWidth: column.minWidth };
 }
 
 function initial(content: ReactNode): string {
@@ -191,6 +199,7 @@ export function DataTable<Row = ModelUsage>({
               <span
                 key={column.id}
                 role="cell"
+                style={columnMinWidth(column)}
                 className={cn(
                   columnIndex === 0 ? "text-foreground/90 truncate" : mono,
                   columnIndex > 0 && "text-muted-foreground tabular-nums",
@@ -254,6 +263,7 @@ export function DataTable<Row = ModelUsage>({
               key={column.id}
               role="columnheader"
               aria-sort={ariaSortFor(column)}
+              style={columnMinWidth(column)}
               className={cn(
                 mono,
                 "text-muted-foreground",

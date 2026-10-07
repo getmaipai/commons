@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.165] - ui-v0.5.165
+
+### ELT-T1-13b table widths (additive)
+
+`DataTableColumn` accepts `minWidth` in pixels. The kit applies it as an inline
+minimum width to desktop column headers and cells; card mode ignores it. The
+default columns and their sizing are unchanged.
+
 ## [0.5.164] - ui-v0.5.164
 
 ### ELT-T1-K02 data-table (additive)
