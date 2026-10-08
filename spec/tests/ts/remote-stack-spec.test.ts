@@ -39,10 +39,10 @@ describe("the engine computer settings", () => {
     expect(e.default).toBe("this_computer");
     expect((e.range as { options: string[] }).options).toEqual(["this_computer", "another_computer"]);
   });
-  test("ports default to 22 and 8771, the local port is expert", () => {
+  test("ports default to 22 and 8771, the local port is admin-visible", () => {
     expect(byKey("engines.stack.remote.ssh_port")[0]!.default).toBe(22);
     expect(byKey("engines.stack.remote.local_port")[0]!.default).toBe(8771);
-    expect(byKey("engines.stack.remote.local_port")[0]!.level).toBe("expert");
+    expect(byKey("engines.stack.remote.local_port")[0]!.level).toBe("advanced");
   });
   test("reaching the engine computer from away is off by default, in plain words", () => {
     const e = byKey("engines.stack.remote.allow_tailnet")[0]!;

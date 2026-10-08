@@ -297,7 +297,7 @@
     "default": 8771,
     "label": "Engine computer local port",
     "help": "The port on this computer where the engine computer's connection appears. Change it only if another program already uses it. Only an admin can change this. Shown only while the engine runs on another computer.",
-    "level": "expert",
+    "level": "advanced",
     "secret": false,
     "lives_in": "household.ai",
     "honoured_by": [
