@@ -49,10 +49,13 @@ function DialogContent({
   className,
   children,
   variant = "default",
+  size = "default",
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   variant?: "default" | "command" | "call"
+  // Only the command variant reads it: "lg" is the ChatGPT-proportioned search dialog.
+  size?: "default" | "lg"
   showCloseButton?: boolean
 }) {
   return (
@@ -65,7 +68,10 @@ function DialogContent({
           variant === "call"
             ? "top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-transparent p-0 shadow-none sm:top-[50%] sm:left-[50%] sm:h-auto sm:w-auto sm:max-w-xs sm:translate-x-[-50%] sm:translate-y-[-50%]"
             : variant === "command"
-              ? "flex sm:max-w-sm flex-col gap-0 border-0 bg-transparent p-0 shadow-none"
+              ? cn(
+                "flex flex-col gap-0 border-0 bg-transparent p-0 shadow-none",
+                size === "lg" ? "sm:max-w-3xl" : "sm:max-w-sm"
+              )
               : "grid gap-4 rounded-lg border bg-background p-6 shadow-lg sm:max-w-lg",
           className
         )}

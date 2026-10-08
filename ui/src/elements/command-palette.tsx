@@ -13,7 +13,8 @@ export interface PaletteCommand {
   keys: readonly string[];
 }
 
-export type CommandPaletteDialogProps = Omit<ComponentProps<typeof CommandPalette>, "className"> & {
+export type CommandPaletteDialogProps = Omit<ComponentProps<typeof CommandPalette>, "className" | "size"> & {
+  size?: "default" | "lg";
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -23,6 +24,7 @@ export function CommandPaletteDialog({
   open,
   onOpenChange,
   title,
+  size = "default",
   ...paletteProps
 }: CommandPaletteDialogProps) {
   const returnFocusRef = useRef<HTMLElement | null>(null);
@@ -31,6 +33,7 @@ export function CommandPaletteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         variant="command"
+        size={size}
         showCloseButton={false}
         aria-describedby={undefined}
         onOpenAutoFocus={() => {
@@ -43,7 +46,7 @@ export function CommandPaletteDialog({
         }}
       >
         <DialogTitle className="sr-only">{title}</DialogTitle>
-        <CommandPalette {...paletteProps} />
+        <CommandPalette size={size} {...paletteProps} />
       </DialogContent>
     </Dialog>
   );
@@ -56,6 +59,7 @@ export function CommandPalette({
   onQueryChange,
   onActiveChange,
   onRun,
+  size = "default",
   className,
   ...props
 }: Omit<
@@ -74,6 +78,8 @@ export function CommandPalette({
   onQueryChange?: (query: string) => void;
   onActiveChange?: (id: string) => void;
   onRun?: (id: string) => void;
+  // "lg" fills a wide dialog at a fixed viewport-bound height; the list scrolls inside.
+  size?: "default" | "lg";
 }) {
   const listId = useId();
   const optionId = (id: string) => `${listId}-${id}`;
@@ -123,7 +129,10 @@ export function CommandPalette({
       data-slot="command-palette"
       className={cn(
         floating,
-        "flex w-full max-w-sm flex-col overflow-hidden rounded-[20px]",
+        "flex w-full flex-col overflow-hidden rounded-[20px]",
+        size === "lg"
+          ? "h-[min(36rem,calc(100dvh-4rem))] max-w-none"
+          : "max-w-sm",
         className,
       )}
 
@@ -163,7 +172,10 @@ export function CommandPalette({
         id={listId}
         role="listbox"
         aria-label="Commands"
-        className="border-foreground/[0.07] flex max-h-72 flex-col overflow-y-auto border-t p-1.5"
+        className={cn(
+          "border-foreground/[0.07] flex flex-col overflow-y-auto border-t p-1.5",
+          size === "lg" ? "min-h-0 flex-1" : "max-h-72",
+        )}
       >
         {groups.map((group) => (
           <div

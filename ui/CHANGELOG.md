@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.179] - ui-v0.5.179
+
+### SEARCH-MODAL-SIZE-01 large command palette dialog
+
+Additive `size?: "default" | "lg"` on `CommandPaletteDialog`, `CommandPalette`
+and `DialogContent` (command variant). `lg` is a 48rem-wide dialog with a
+fixed height of 36rem capped to the viewport (`100dvh - 4rem`), the list
+scrolling inside. Without it nothing changes.
+
 ## [0.5.178] - ui-v0.5.178
 
 ### CHAT-COMPOSER-SLOT-01 reserved composer notice line

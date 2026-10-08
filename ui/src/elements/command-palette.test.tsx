@@ -64,3 +64,37 @@ test("Escape closes the controlled dialog and restores prior focus", async () =>
   await waitFor(() => expect(view.queryByRole("dialog", { name: "Chat commands" })).toBeNull());
   await waitFor(() => expect(document.activeElement).toBe(opener));
 });
+
+test("size lg widens the dialog and fixes the palette height with the list scrolling inside", () => {
+  const view = render(
+    <CommandPaletteDialog
+      open
+      onOpenChange={() => {}}
+      title="Chat commands"
+      commands={commands}
+      query=""
+      activeId="new-chat"
+      size="lg"
+    />,
+  );
+  const dialogClassName = document.querySelector('[data-slot="dialog-content"]')?.getAttribute("class") ?? "";
+  expect(dialogClassName).toContain("max-w-[calc(100%-2rem)]");
+  expect(dialogClassName).toContain("sm:max-w-3xl");
+  expect(dialogClassName).not.toContain("sm:max-w-sm");
+  const palette = document.querySelector('[data-slot="command-palette"]')?.getAttribute("class") ?? "";
+  expect(palette).toContain("max-w-none");
+  expect(palette).toContain("h-[min(36rem,calc(100dvh-4rem))]");
+  const list = view.getByRole("listbox", { name: "Commands" }).getAttribute("class") ?? "";
+  expect(list).toContain("min-h-0");
+  expect(list).toContain("flex-1");
+  expect(list).not.toContain("max-h-72");
+});
+
+test("the default size is unchanged", () => {
+  const view = render(
+    <CommandPaletteDialog open onOpenChange={() => {}} title="Chat commands" commands={commands} query="" activeId="new-chat" />,
+  );
+  const palette = document.querySelector('[data-slot="command-palette"]')?.getAttribute("class") ?? "";
+  expect(palette).toContain("max-w-sm");
+  expect(view.getByRole("listbox", { name: "Commands" }).getAttribute("class")).toContain("max-h-72");
+});
