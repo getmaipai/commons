@@ -23,6 +23,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.110] - 2026-10-08
+
+### Added
+- Shared status model (STATUS-MODEL-01): `vocab/status-model.json` declares eight states (`running`, `starting`, `paused`, `down`, `limited`, `search_limited`, `waiting_internet`, `unknown`) with severity, sticky or transient, and tone (search limited is its own amber state; paused and down stay separate), ten structured causes that each map to one state, a surface table where every surface has `length` (`short`, `medium`, `long`) and `summary` (boolean), and short, medium and long copy per state for adult, teen and child, with admin reading the adult wording plus the Repairs link text for paused and down. `status/ts/statusModel.ts` exports the pure `statusCopy(state, length, audience, options?)`, `summarize(statuses, length)`, `surfaceView(surface, statuses, audience)`, `stateForCause`, `stateFromCauses` and the table readers. Summary surfaces (profile hover, profile LED, profile row, header pill, status page header) take every status, color from the worst severity and join affected service names into one sentence; four or more affected collapse to "N services need attention" at short and medium and list at long. A child sees nothing on the profile surfaces while a service has a problem. Hand-written fixtures in `fixtures/status-model/` are the contract for the robot and Go. Additive: no field removed or repurposed.
+
 ## [spec-v0.1.109] - 2026-10-08
 
 ### Added

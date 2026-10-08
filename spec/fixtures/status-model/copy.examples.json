@@ -1,0 +1,18 @@
+{
+  "$comment": "STATUS-MODEL-01: statusCopy(state, length, audience, { service }) cases. Hand-written wording, no em dashes.",
+  "cases": [
+    { "name": "adult short running", "state": "running", "length": "short", "audience": "adult", "service": null, "text": "Chat is working", "repairsLink": null },
+    { "name": "adult medium starting", "state": "starting", "length": "medium", "audience": "adult", "service": null, "text": "Starting up. You can send in a moment.", "repairsLink": null },
+    { "name": "adult long search limited", "state": "search_limited", "length": "long", "audience": "adult", "service": null, "text": "Chat works, but searches may be limited for a while. Answers may use less up-to-date information.", "repairsLink": null },
+    { "name": "adult short waiting for internet", "state": "waiting_internet", "length": "short", "audience": "adult", "service": null, "text": "Waiting for internet", "repairsLink": null },
+    { "name": "teen long paused adds right now", "state": "paused", "length": "long", "audience": "teen", "service": null, "text": "Chat is paused right now. Your message stays here; press Send once it is back. It should come back on its own.", "repairsLink": null },
+    { "name": "admin short down has no Repairs link", "state": "down", "length": "short", "audience": "admin", "service": null, "text": "Chat is down", "repairsLink": null },
+    { "name": "admin medium paused has the Repairs link", "state": "paused", "length": "medium", "audience": "admin", "service": null, "text": "Chat is paused. Your message stays here.", "repairsLink": "Open Repairs" },
+    { "name": "admin long limited has no Repairs link", "state": "limited", "length": "long", "audience": "admin", "service": null, "text": "Chat works, but some features are not available right now.", "repairsLink": null },
+    { "name": "adult long down has no Repairs link", "state": "down", "length": "long", "audience": "adult", "service": null, "text": "Chat is down and will not come back by itself. Your message stays here; press Send once it is fixed.", "repairsLink": null },
+    { "name": "child reads one line at short", "state": "paused", "length": "short", "audience": "child", "service": null, "text": "I'm taking a break. Ask a grown-up, or try again soon.", "repairsLink": null },
+    { "name": "child reads the same line at long", "state": "paused", "length": "long", "audience": "child", "service": null, "text": "I'm taking a break. Ask a grown-up, or try again soon.", "repairsLink": null },
+    { "name": "another service fills the same template", "state": "limited", "length": "medium", "audience": "adult", "service": "Library", "text": "Some Library features may be limited.", "repairsLink": null },
+    { "name": "unknown shows nothing", "state": "unknown", "length": "long", "audience": "adult", "service": null, "text": null, "repairsLink": null }
+  ]
+}
