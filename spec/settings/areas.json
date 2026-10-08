@@ -224,33 +224,68 @@
       },
       "groups": [
         {
-          "label": "Household",
+          "label": "General",
           "sections": [
-            "general",
-            "people",
-            "search",
-            "integrations",
-            "voices",
-            "commands"
+            "general"
           ]
         },
         {
-          "label": "AI",
+          "label": "People",
+          "sections": [
+            "people"
+          ]
+        },
+        {
+          "label": "Engines and AI",
           "sections": [
             "ai"
           ]
         },
         {
-          "label": "Robots",
+          "label": "Devices",
           "sections": [
             "robot"
           ]
         },
         {
-          "label": "Care",
+          "label": "Search",
           "sections": [
-            "storage",
-            "maintenance",
+            "search"
+          ]
+        },
+        {
+          "label": "Integrations",
+          "sections": [
+            "integrations"
+          ]
+        },
+        {
+          "label": "Commands",
+          "sections": [
+            "commands"
+          ]
+        },
+        {
+          "label": "Voices",
+          "sections": [
+            "voices"
+          ]
+        },
+        {
+          "label": "Storage and backups",
+          "sections": [
+            "storage"
+          ]
+        },
+        {
+          "label": "Maintenance",
+          "sections": [
+            "maintenance"
+          ]
+        },
+        {
+          "label": "Privacy",
+          "sections": [
             "privacy"
           ]
         },
@@ -357,7 +392,7 @@
         },
         {
           "id": "ai",
-          "label": "AI",
+          "label": "Engines and AI",
           "icon": "cpu",
           "kind": "keys",
           "cards": [
@@ -380,6 +415,7 @@
               ]
             }
           ],
+          "trail_view": "home.engine_admin",
           "keywords": [
             "teen gate",
             "context",
@@ -404,7 +440,7 @@
         },
         {
           "id": "robot",
-          "label": "Robot",
+          "label": "Devices",
           "icon": "bot",
           "kind": "keys",
           "cards": [
@@ -417,6 +453,7 @@
               ]
             }
           ],
+          "trail_view": "home.devices_admin",
           "needs": [
             "robot.paired"
           ],
@@ -513,7 +550,8 @@
                 "expert"
               ]
             }
-          ]
+          ],
+          "trail_view": "home.routing_stats"
         }
       ]
     },

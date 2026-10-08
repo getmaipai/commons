@@ -62,6 +62,16 @@ describe("spec/settings/areas.json", () => {
     expect(accountVoice.cards?.find((card) => card.group === "person.voice")).toBeDefined();
     expect(accountVoice.cards?.flatMap((card) => card.links ?? []).map((link) => link.href)).toEqual(["/commands"]);
   });
+
+  test("Home settings groups household sections and names its admin views", () => {
+    expect(area("home").groups.map((group) => group.label)).toEqual([
+      "General", "People", "Engines and AI", "Devices", "Search", "Integrations", "Commands", "Voices",
+      "Storage and backups", "Maintenance", "Privacy", "Developer",
+    ]);
+    expect(section("home", "ai").trail_view).toBe("home.engine_admin");
+    expect(section("home", "robot").trail_view).toBe("home.devices_admin");
+    expect(section("home", "developer").trail_view).toBe("home.routing_stats");
+  });
 });
 
 describe("conformance: each registry group is in exactly one card", () => {
@@ -165,6 +175,9 @@ describe("conformance: structure", () => {
       "chat.shortcuts",
       "chat.skills",
       "home.commands",
+      "home.devices_admin",
+      "home.engine_admin",
+      "home.routing_stats",
       "home.voice_catalog",
     ]);
   });

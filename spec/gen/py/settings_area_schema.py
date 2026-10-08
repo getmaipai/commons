@@ -129,6 +129,9 @@ class Section(BaseModel):
             'chat.shortcuts',
             'home.commands',
             'home.voice_catalog',
+            'home.engine_admin',
+            'home.devices_admin',
+            'home.routing_stats',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn above the cards.')
@@ -141,6 +144,9 @@ class Section(BaseModel):
             'chat.shortcuts',
             'home.commands',
             'home.voice_catalog',
+            'home.engine_admin',
+            'home.devices_admin',
+            'home.routing_stats',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn below the cards.')
@@ -153,6 +159,9 @@ class Section(BaseModel):
             'chat.shortcuts',
             'home.commands',
             'home.voice_catalog',
+            'home.engine_admin',
+            'home.devices_admin',
+            'home.routing_stats',
         ]
         | None
     ) = Field(

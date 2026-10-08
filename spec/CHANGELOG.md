@@ -23,6 +23,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.111] - 2026-10-08
+
+### Changed
+- Home settings now groups household controls by their job and registers the engine, device-management and routing-stat views for Home.
+
 ## [spec-v0.1.110] - 2026-10-08
 
 ### Added
