@@ -30,10 +30,10 @@ from gen.py.open_question_schema import OpenQuestion
 from gen.py.person_schema import Person
 from gen.py.project_schema import ProjectPlan
 from gen.py.relationship_schema import Relationship
-from gen.py.result_schema import PluginResult
 from gen.py.reply_constraint_schema import ReplyConstraint
 from gen.py.reply_feedback_schema import ReplyFeedback
 from gen.py.reply_plan_schema import ReplyPlan
+from gen.py.result_schema import PluginResult
 from gen.py.robot_asset_manifest_schema import RobotAssetManifest
 from gen.py.robot_channel_frame_schema import RobotChannelFrame
 from gen.py.robot_offer_schema import RobotOffer
