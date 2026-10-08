@@ -90,6 +90,12 @@ describe("record fixtures validate against their generated Zod models", () => {
     });
   }
 
+  for (const kind of ["place-exact", "place-area", "place-named-only"]) {
+    test(`entity.${kind}.example.json`, () => {
+      expect(() => Entity.parse(loadFixture(`entity.${kind}.example.json`))).not.toThrow();
+    });
+  }
+
   for (const kind of ["shopping", "todo", "custom"]) {
     test(`list.${kind}.example.json`, () => {
       expect(() => List.parse(loadFixture(`list.${kind}.example.json`))).not.toThrow();

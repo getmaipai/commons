@@ -5,7 +5,22 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, confloat, constr
+
+
+class Geo(BaseModel):
+    """
+    Optional coordinates for a map place. `area` is a town or region label. `precision: area` coordinates are rounded to at most one decimal place; cross-field constraints are enforced in spec/records/ts/validate.ts and its tests because the generators do not preserve JSON Schema conditionals.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    lat: confloat(ge=-90.0, le=90.0)
+    lon: confloat(ge=-180.0, le=180.0)
+    precision: Literal['exact', 'area']
+    area: constr(max_length=200) | None
+    from_: Literal['search', 'browser', 'typed'] = Field(..., alias='from')
 
 
 class Entity(BaseModel):
@@ -43,6 +58,10 @@ class Entity(BaseModel):
     place_kind: Literal['map', 'area'] | None = Field(
         None,
         description='Only meaningful when kind is `place`, required then. `map` is a place on a map (a home, a workplace, a school) - Home Assistant calls this a zone. `area` is a space inside a place (a room) - Home Assistant calls this an area. Keeping both senses in one kind with a subtype, rather than two kinds, is a documented judgment call (home/docs/dev.md): a room and a house are both places you can be, and every relationship that points at one can point at the other. Cross-field rules like this one are enforced by spec/records/ts/validate.ts and its tests, not by this schema: neither generator preserves JSON Schema conditionals, so an if/then here would look enforced and do nothing. Same convention MemoryRecord already follows for its own scope/person rule.',
+    )
+    geo: Geo | None = Field(
+        None,
+        description='Optional coordinates for a map place. `area` is a town or region label. `precision: area` coordinates are rounded to at most one decimal place; cross-field constraints are enforced in spec/records/ts/validate.ts and its tests because the generators do not preserve JSON Schema conditionals.',
     )
     parent_id: constr(pattern=r'^ent-[a-z0-9]{6,}$') | None = Field(
         None,

@@ -133,6 +133,15 @@ export function validateEntity(entity: Entity): Problems {
     problems.push(`place_kind is only meaningful on a place, not on a ${entity.kind}`);
   }
 
+  if (entity.geo !== undefined && entity.geo !== null) {
+    if (entity.kind !== "place" || entity.place_kind !== "map") {
+      problems.push("geo is only meaningful on a map place");
+    }
+    if (entity.geo.precision === "area" && (!Number.isInteger(entity.geo.lat * 10) || !Number.isInteger(entity.geo.lon * 10))) {
+      problems.push("area precision coordinates must have at most one decimal place");
+    }
+  }
+
   // Only a person can sign in. A pet with an account is a data error that
   // would otherwise reach the authorization layer.
   if (entity.kind !== "person" && entity.account_person_id) {

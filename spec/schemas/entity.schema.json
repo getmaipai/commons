@@ -69,6 +69,20 @@
       "default": null,
       "description": "Only meaningful when kind is `place`, required then. `map` is a place on a map (a home, a workplace, a school) - Home Assistant calls this a zone. `area` is a space inside a place (a room) - Home Assistant calls this an area. Keeping both senses in one kind with a subtype, rather than two kinds, is a documented judgment call (home/docs/dev.md): a room and a house are both places you can be, and every relationship that points at one can point at the other. Cross-field rules like this one are enforced by spec/records/ts/validate.ts and its tests, not by this schema: neither generator preserves JSON Schema conditionals, so an if/then here would look enforced and do nothing. Same convention MemoryRecord already follows for its own scope/person rule."
     },
+    "geo": {
+      "type": ["object", "null"],
+      "default": null,
+      "additionalProperties": false,
+      "required": ["lat", "lon", "precision", "area", "from"],
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+        "precision": { "type": "string", "enum": ["exact", "area"] },
+        "area": { "type": ["string", "null"], "maxLength": 200 },
+        "from": { "type": "string", "enum": ["search", "browser", "typed"] }
+      },
+      "description": "Optional coordinates for a map place. `area` is a town or region label. `precision: area` coordinates are rounded to at most one decimal place; cross-field constraints are enforced in spec/records/ts/validate.ts and its tests because the generators do not preserve JSON Schema conditionals."
+    },
     "parent_id": {
       "type": [
         "string",

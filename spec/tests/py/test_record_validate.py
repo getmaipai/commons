@@ -128,7 +128,14 @@ def child_print() -> BiometricPrint:
 
 
 def test_shipped_entity_fixtures_are_valid():
-    for e in [person(), pet(), place()]:
+    for e in [
+        person(),
+        pet(),
+        place(),
+        Entity.model_validate(load("entity.place-exact.example.json")),
+        Entity.model_validate(load("entity.place-area.example.json")),
+        Entity.model_validate(load("entity.place-named-only.example.json")),
+    ]:
         assert validate_entity(e) == []
 
 
@@ -197,6 +204,37 @@ def test_only_a_place_carries_a_place_kind():
     bad = pet()
     bad.place_kind = "map"
     assert any("only meaningful on a place" in p for p in validate_entity(bad))
+
+
+def test_geo_belongs_to_map_places_and_area_coordinates_have_at_most_one_decimal():
+    for name in [
+        "entity.place-exact.example.json",
+        "entity.place-area.example.json",
+        "entity.place-named-only.example.json",
+    ]:
+        assert validate_entity(Entity.model_validate(load(name))) == []
+    person_with_geo = Entity.model_validate(load("invalid/entity.geo-on-person.json"))
+    assert any(
+        "geo is only meaningful on a map place" in p
+        for p in validate_entity(person_with_geo)
+    )
+    area_with_geo = Entity.model_validate(load("invalid/entity.geo-on-area-place.json"))
+    assert any(
+        "geo is only meaningful on a map place" in p
+        for p in validate_entity(area_with_geo)
+    )
+    overly_precise_area = Entity.model_validate(
+        load("invalid/entity.geo-area-two-decimals.json")
+    )
+    assert any(
+        "area precision coordinates must have at most one decimal place" in p
+        for p in validate_entity(overly_precise_area)
+    )
+
+
+def test_geo_latitude_outside_valid_range_is_rejected_by_the_record_shape():
+    with pytest.raises(ValidationError):
+        Entity.model_validate(load("invalid/entity.geo-latitude-out-of-range.json"))
 
 
 def test_only_a_person_can_hold_an_account():

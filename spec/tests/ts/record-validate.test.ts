@@ -24,7 +24,7 @@ import {
   validateBiometricPrint,
   inverseRelationship,
 } from "../../records/ts/validate.js";
-import type { Entity } from "../../gen/ts/entity.js";
+import { Entity as EntitySchema, type Entity } from "../../gen/ts/entity.js";
 import type { Relationship } from "../../gen/ts/relationship.js";
 import type { Grant } from "../../gen/ts/grant.js";
 import type { List } from "../../gen/ts/list.js";
@@ -75,7 +75,7 @@ const mergedValidationRecord = (fixture: ValidationCase): Record<string, unknown
 
 describe("every shipped fixture is valid", () => {
   test("entities", () => {
-    for (const e of [person(), pet(), place()]) expect(validateEntity(e)).toEqual([]);
+    for (const e of [person(), pet(), place(), load<Entity>("entity.place-exact.example.json"), load<Entity>("entity.place-area.example.json"), load<Entity>("entity.place-named-only.example.json")]) expect(validateEntity(e)).toEqual([]);
   });
   test("relationships", () => {
     for (const r of [statedRel(), estrangedRel(), inferredRel()]) expect(validateRelationship(r)).toEqual([]);
@@ -116,6 +116,16 @@ describe("biometric print rules", () => {
 });
 
 describe("entity rules", () => {
+  test("geo belongs to map places and area coordinates have at most one decimal", () => {
+    for (const name of ["entity.place-exact.example.json", "entity.place-area.example.json", "entity.place-named-only.example.json"]) {
+      expect(validateEntity(load<Entity>(name))).toEqual([]);
+    }
+    expect(validateEntity(load<Entity>("invalid/entity.geo-on-person.json"))).toContain("geo is only meaningful on a map place");
+    expect(validateEntity(load<Entity>("invalid/entity.geo-on-area-place.json"))).toContain("geo is only meaningful on a map place");
+    expect(validateEntity(load<Entity>("invalid/entity.geo-area-two-decimals.json"))).toContain("area precision coordinates must have at most one decimal place");
+    expect(() => EntitySchema.parse(load("invalid/entity.geo-latitude-out-of-range.json"))).toThrow();
+  });
+
   test("a place must say which kind of place it is", () => {
     expect(validateEntity({ ...place(), place_kind: null })).toContainEqual(expect.stringContaining("must say"));
   });

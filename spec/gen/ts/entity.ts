@@ -67,6 +67,31 @@ export const Entity = z
         "Only meaningful when kind is `place`, required then. `map` is a place on a map (a home, a workplace, a school) - Home Assistant calls this a zone. `area` is a space inside a place (a room) - Home Assistant calls this an area. Keeping both senses in one kind with a subtype, rather than two kinds, is a documented judgment call (home/docs/dev.md): a room and a house are both places you can be, and every relationship that points at one can point at the other. Cross-field rules like this one are enforced by spec/records/ts/validate.ts and its tests, not by this schema: neither generator preserves JSON Schema conditionals, so an if/then here would look enforced and do nothing. Same convention MemoryRecord already follows for its own scope/person rule.",
       )
       .default(null),
+    /**Optional coordinates for a map place. `area` is a town or region label. `precision: area` coordinates are rounded to at most one decimal place; cross-field constraints are enforced in spec/records/ts/validate.ts and its tests because the generators do not preserve JSON Schema conditionals.*/
+    geo: z
+      .union([
+        z
+          .object({
+            lat: z.number().gte(-90).lte(90),
+            lon: z.number().gte(-180).lte(180),
+            precision: z.enum(["exact", "area"]),
+            area: z.union([z.string().max(200), z.null()]),
+            from: z.enum(["search", "browser", "typed"]),
+          })
+          .strict()
+          .describe(
+            "Optional coordinates for a map place. `area` is a town or region label. `precision: area` coordinates are rounded to at most one decimal place; cross-field constraints are enforced in spec/records/ts/validate.ts and its tests because the generators do not preserve JSON Schema conditionals.",
+          ),
+        z
+          .null()
+          .describe(
+            "Optional coordinates for a map place. `area` is a town or region label. `precision: area` coordinates are rounded to at most one decimal place; cross-field constraints are enforced in spec/records/ts/validate.ts and its tests because the generators do not preserve JSON Schema conditionals.",
+          ),
+      ])
+      .describe(
+        "Optional coordinates for a map place. `area` is a town or region label. `precision: area` coordinates are rounded to at most one decimal place; cross-field constraints are enforced in spec/records/ts/validate.ts and its tests because the generators do not preserve JSON Schema conditionals.",
+      )
+      .default(null),
     /**Physical containment only, and only for places: a room's home, a home's... nothing yet. Exactly one parent, mirroring Home Assistant's rule that an entity belongs to one area. Every other kind of belonging is a Relationship, which is many-to-many and carries time.*/
     parent_id: z
       .union([

@@ -32,6 +32,19 @@ describe("spec/settings/keys.json", () => {
     expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
   });
 
+  test("household.home replaces the old household location key", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const keys = new Map(entries.map((entry) => [entry.key as string, SettingsKey.parse(entry)]));
+    expect(keys.has("household.home_place")).toBe(false);
+    const home = keys.get("household.home");
+    expect(home?.scope).toBe("household");
+    expect(home?.selector).toBe("location");
+    expect(home?.range).toEqual({ multiple: false, allow_current: false });
+    expect(home?.default).toBeNull();
+    expect(home?.lives_in).toBe("household.system");
+    expect(home?.honoured_by).toEqual(["home", "bot"]);
+  });
+
   test("a new registry keeps every key declared by its parent spec tag", () => {
     // This assertion is updated when a deliberate retirement is made. It
     // prevents regenerating from a lagging Home declaration set from silently

@@ -347,6 +347,7 @@ export const PackageManifest = z
                 "area",
                 "person",
                 "media",
+                "location",
               ])
               .describe("Home Assistant's selector names (3.2)."),
             /**Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector.*/
@@ -354,6 +355,8 @@ export const PackageManifest = z
               .object({
                 options: z.array(z.string()).optional(),
                 options_from: z.string().min(1).optional(),
+                multiple: z.boolean().optional(),
+                allow_current: z.boolean().optional(),
               })
               .catchall(z.any())
               .describe(
@@ -605,11 +608,11 @@ export const PackageManifest = z
         "A scheduled job that pre-populates this package's cache before anyone asks, so a common answer (the household's own weather) never waits on a live fetch.",
       )
       .optional(),
-    /**Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home_place` changing re-warms `weather` right away instead of waiting for the next scheduled tick.*/
+    /**Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home` changing re-warms `weather` right away instead of waiting for the next scheduled tick.*/
     warm_on: z
       .array(z.string().min(1))
       .describe(
-        "Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home_place` changing re-warms `weather` right away instead of waiting for the next scheduled tick.",
+        "Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home` changing re-warms `weather` right away instead of waiting for the next scheduled tick.",
       )
       .optional(),
     backup: z.enum(["hot", "cold", "exclude"]).optional(),

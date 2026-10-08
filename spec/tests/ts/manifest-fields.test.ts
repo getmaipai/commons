@@ -49,7 +49,7 @@ describe("PackageManifest, step 2's new fields", () => {
   });
 
   test("warm_on: setting keys that trigger an immediate warm", () => {
-    const manifest = { ...BASE, warm_on: ["household.home_place"] };
+    const manifest = { ...BASE, warm_on: ["household.home"] };
     expect(() => PackageManifest.parse(manifest)).not.toThrow();
   });
 
