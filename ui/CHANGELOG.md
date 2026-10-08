@@ -1,5 +1,31 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.180] - ui-v0.5.180
+
+### GENUI-03a answer-block dispatcher
+
+Additive `elements/answer-block.tsx`: `AnswerBlock` takes one `AnswerBlock`
+record from `@maipai/spec` (spec-v0.1.109) and renders it with the kit Element
+of the same kind: `spec_sheet` (SpecSheet), `data_table` (DataTable), `chart`
+(Chart), `timeline` (Timeline), `todo_list` (TodoList), `image_gallery`
+(ImageGallery), `schedule_card` (ScheduleCard) and `comparison`
+(ComparisonCard). Every v1 kind has an Element; there is no gap. The block's
+`props` pass straight through; the dispatcher knows nothing of Home.
+
+A block that fails the schema (an unknown `kind`, invalid `props`), or an
+Element that throws while rendering, shows the block's `alt` sentence in a
+token-styled box; a block with no usable `alt` renders nothing. It never
+throws. `AnswerBlockShowcase` renders a fixture per kind (the spec fixtures)
+and both fallback paths.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `block` | `AnswerBlock` | required |
+| `resolveImageSrc` | `(src: string) => string` | unset; the reference is used as is |
+| `onOpenImage` | `(blockId: string, imageId: string) => void` | unset |
+| `onToggleSchedule` | `(blockId: string) => void` | unset; no toggle is drawn |
+| `onSortChange` | `(blockId: string, sort: DataTableSort \| null) => void` | unset |
+
 ## [0.5.179] - ui-v0.5.179
 
 ### SEARCH-MODAL-SIZE-01 large command palette dialog
