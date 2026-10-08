@@ -1,5 +1,24 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.182] - ui-v0.5.182
+
+`AnswerBlockView` (`src/elements/answer-block.tsx`) renders a spec
+`AnswerBlock` (GENUI-01) with the kit Element of the same name:
+`spec_sheet`, `data_table`, `chart`, `timeline`, `todo_list`,
+`image_gallery`, `schedule_card`, `comparison`. It validates the block with
+the spec's own model; an unknown `kind`, props that fail validation or an
+Element that throws render the block's `alt` sentence (nothing when there is
+none), never an error. No Home knowledge: the host passes handlers. Additive.
+`AnswerBlockShowcase` renders every kind from the spec's valid fixtures plus
+both fallback paths.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `AnswerBlockView.block` | `unknown` (an `AnswerBlock`) | required |
+| `AnswerBlockView.resolveImageSrc` | `(src: string) => string` | unset; `src` as given |
+| `AnswerBlockView.onImageOpen` | `(blockId: string, imageId: string) => void` | unset |
+| `AnswerBlockView.onScheduleToggle` | `(blockId: string) => void` | unset; the toggle does nothing |
+
 ## [0.5.181] - ui-v0.5.181
 
 ### SEARCH-MODAL-SIZE-02 large header search dialog
