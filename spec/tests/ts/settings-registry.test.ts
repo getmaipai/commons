@@ -6,7 +6,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { SettingsKey } from "../../gen/ts/settings-key.js";
 
-const REGISTRY_PATH = join(import.meta.dir, "..", "..", "settings", "keys.json");
+const REGISTRY_PATH = join(
+  import.meta.dir,
+  "..",
+  "..",
+  "settings",
+  "keys.json",
+);
 
 function loadRegistry(): unknown[] {
   return JSON.parse(readFileSync(REGISTRY_PATH, "utf-8"));
@@ -17,7 +23,10 @@ describe("spec/settings/keys.json", () => {
     const entries = loadRegistry();
     for (const entry of entries) {
       const key = (entry as { key?: unknown }).key;
-      expect(() => SettingsKey.parse(entry), `entry "${String(key)}" failed SettingsKey.parse`).not.toThrow();
+      expect(
+        () => SettingsKey.parse(entry),
+        `entry "${String(key)}" failed SettingsKey.parse`,
+      ).not.toThrow();
     }
   });
 
@@ -30,6 +39,22 @@ describe("spec/settings/keys.json", () => {
   test("the retired turn pipeline toggle is absent", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
+  });
+
+  test("household.home is the household location selector and household.home_place is retired", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const keys = new Map(
+      entries.map((entry) => [entry.key as string, SettingsKey.parse(entry)]),
+    );
+    expect(keys.has("household.home_place")).toBe(false);
+    const home = keys.get("household.home");
+    expect(home).toBeDefined();
+    expect(home?.scope).toBe("household");
+    expect(home?.selector).toBe("location");
+    expect(home?.range).toEqual({ multiple: false, allow_current: false });
+    expect(home?.default).toBeNull();
+    expect(home?.lives_in).toBe("household.system");
+    expect(home?.honoured_by).toEqual(["home", "bot"]);
   });
 
   test("a new registry keeps every key declared by its parent spec tag", () => {
@@ -49,24 +74,42 @@ describe("spec/settings/keys.json", () => {
   });
 });
 
-
 describe("SETTINGS-ROBOT-01 declarations", () => {
   test("all approved robot controls are declared once and the tailnet opt-in defaults off", () => {
     const entries = loadRegistry() as { key: string; default: unknown }[];
     const keys = new Map(entries.map((entry) => [entry.key, entry]));
     const required = [
-      "household.quiet_hours.from", "household.quiet_hours.to",
-      "person.quiet_hours.from", "person.quiet_hours.to",
-      "robot.initiative.enabled", "robot.initiative.tiers_spoken",
-      "robot.initiative.max_offers_per_hour", "robot.initiative.accept_phrases",
-      "person.robot.may_address", "person.robot.topics", "person.robot.greet_by_name",
-      "person.robot.follow_up", "person.robot.playful_clips", "person.vision.watch",
-      "person.vision.gestures", "vision.on_request.enabled", "robot.greetings.mode",
-      "safety.alarm.sensors", "safety.alarm.voice", "safety.alarm.volume",
-      "safety.alarm.child_line", "safety.alarm.repeat_seconds",
-      "robot.live_view.enabled", "robot.live_view.who", "robot.offlan.tailnet",
-      "robot.camera.watch_level", "robot.follow_up.seconds", "robot.idle.level",
-      "robot.barge_in.open_mic", "robot.gestures.enabled", "robot.initiative.allowed_here",
+      "household.quiet_hours.from",
+      "household.quiet_hours.to",
+      "person.quiet_hours.from",
+      "person.quiet_hours.to",
+      "robot.initiative.enabled",
+      "robot.initiative.tiers_spoken",
+      "robot.initiative.max_offers_per_hour",
+      "robot.initiative.accept_phrases",
+      "person.robot.may_address",
+      "person.robot.topics",
+      "person.robot.greet_by_name",
+      "person.robot.follow_up",
+      "person.robot.playful_clips",
+      "person.vision.watch",
+      "person.vision.gestures",
+      "vision.on_request.enabled",
+      "robot.greetings.mode",
+      "safety.alarm.sensors",
+      "safety.alarm.voice",
+      "safety.alarm.volume",
+      "safety.alarm.child_line",
+      "safety.alarm.repeat_seconds",
+      "robot.live_view.enabled",
+      "robot.live_view.who",
+      "robot.offlan.tailnet",
+      "robot.camera.watch_level",
+      "robot.follow_up.seconds",
+      "robot.idle.level",
+      "robot.barge_in.open_mic",
+      "robot.gestures.enabled",
+      "robot.initiative.allowed_here",
     ];
     for (const key of required) expect(keys.has(key), key).toBe(true);
     expect(keys.get("robot.offlan.tailnet")?.default).toBe(false);

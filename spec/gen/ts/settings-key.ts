@@ -22,6 +22,7 @@ export const SettingsKey = z
         "area",
         "person",
         "media",
+        "location",
       ])
       .describe("Home Assistant's selector names (3.2)."),
     /**Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector.*/
@@ -29,6 +30,8 @@ export const SettingsKey = z
       .object({
         options: z.array(z.string()).optional(),
         options_from: z.string().min(1).optional(),
+        multiple: z.boolean().optional(),
+        allow_current: z.boolean().optional(),
       })
       .catchall(z.any())
       .describe(

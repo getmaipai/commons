@@ -60,7 +60,11 @@ interface GrantVocab {
 /** The three age bands a capability policy decides over, and who must
  * approve at each (SPEC-CAP-01). Strictness runs none < self < parent < never. */
 export type PolicyApprover = "none" | "self" | "parent" | "never";
-export type PolicyCells = { child: PolicyApprover; teen: PolicyApprover; adult: PolicyApprover };
+export type PolicyCells = {
+  child: PolicyApprover;
+  teen: PolicyApprover;
+  adult: PolicyApprover;
+};
 
 /** vocab/entity-kind-nouns.json: the nouns a person answers "Who's
  * Quill?" with ("my coworker", "our rabbit"), each mapped to one of
@@ -79,7 +83,9 @@ let grantVocab: GrantVocab | null = null;
 let kindNounVocab: EntityKindVocab | null = null;
 
 export function relationshipTypes(): RelationshipType[] {
-  relVocab ??= JSON.parse(readFileSync(join(VOCAB_DIR, "relationship-types.json"), "utf-8")) as RelationshipVocab;
+  relVocab ??= JSON.parse(
+    readFileSync(join(VOCAB_DIR, "relationship-types.json"), "utf-8"),
+  ) as RelationshipVocab;
   return relVocab.types;
 }
 
@@ -88,7 +94,9 @@ export function relationshipType(id: string): RelationshipType | undefined {
 }
 
 export function entityKindNouns(): EntityKindNouns[] {
-  kindNounVocab ??= JSON.parse(readFileSync(join(VOCAB_DIR, "entity-kind-nouns.json"), "utf-8")) as EntityKindVocab;
+  kindNounVocab ??= JSON.parse(
+    readFileSync(join(VOCAB_DIR, "entity-kind-nouns.json"), "utf-8"),
+  ) as EntityKindVocab;
   return kindNounVocab.kinds;
 }
 
@@ -100,7 +108,9 @@ export function kindForNoun(noun: string): EntityKindNouns["kind"] | undefined {
 }
 
 export function grantActions(): GrantVocab["actions"] {
-  grantVocab ??= JSON.parse(readFileSync(join(VOCAB_DIR, "grant-actions.json"), "utf-8")) as GrantVocab;
+  grantVocab ??= JSON.parse(
+    readFileSync(join(VOCAB_DIR, "grant-actions.json"), "utf-8"),
+  ) as GrantVocab;
   return grantVocab.actions;
 }
 
@@ -128,20 +138,44 @@ export function validateEntity(entity: Entity): Problems {
   const problems: Problems = [];
 
   if (entity.kind === "place") {
-    if (!entity.place_kind) problems.push("a place must say whether it is a `map` place or an `area` inside one");
+    if (!entity.place_kind)
+      problems.push(
+        "a place must say whether it is a `map` place or an `area` inside one",
+      );
   } else if (entity.place_kind) {
-    problems.push(`place_kind is only meaningful on a place, not on a ${entity.kind}`);
+    problems.push(
+      `place_kind is only meaningful on a place, not on a ${entity.kind}`,
+    );
+  }
+
+  if (entity.geo !== undefined && entity.geo !== null) {
+    if (entity.kind !== "place" || entity.place_kind !== "map") {
+      problems.push("geo is only meaningful on a map place");
+    }
+    if (
+      entity.geo.precision === "area" &&
+      (!Number.isInteger(entity.geo.lat * 10) ||
+        !Number.isInteger(entity.geo.lon * 10))
+    ) {
+      problems.push(
+        "area precision coordinates must have at most one decimal place",
+      );
+    }
   }
 
   // Only a person can sign in. A pet with an account is a data error that
   // would otherwise reach the authorization layer.
   if (entity.kind !== "person" && entity.account_person_id) {
-    problems.push(`only a person can hold an account; this is a ${entity.kind}`);
+    problems.push(
+      `only a person can hold an account; this is a ${entity.kind}`,
+    );
   }
 
   // Containment is physical, so only places contain and are contained.
   if (entity.parent_id && entity.kind !== "place") {
-    problems.push("parent_id is physical containment and only applies to places");
+    problems.push(
+      "parent_id is physical containment and only applies to places",
+    );
   }
   if (entity.parent_id && entity.parent_id === entity.id) {
     problems.push("an entity cannot contain itself");
@@ -150,8 +184,14 @@ export function validateEntity(entity: Entity): Problems {
   problems.push(...scopeProblems(entity.scope, entity.person));
 
   // An inferred entity nobody has confirmed must not claim a confirmer.
-  if (entity.source === "inferred" && entity.confirmed_by_person_id === null && entity.scope === "household") {
-    problems.push("an unconfirmed inferred entity cannot be household-scoped; it belongs to the person it came from");
+  if (
+    entity.source === "inferred" &&
+    entity.confirmed_by_person_id === null &&
+    entity.scope === "household"
+  ) {
+    problems.push(
+      "an unconfirmed inferred entity cannot be household-scoped; it belongs to the person it came from",
+    );
   }
 
   return problems;
@@ -168,7 +208,9 @@ export function validateRelationship(rel: Relationship): Problems {
   }
 
   if (!type.statuses.includes(rel.status)) {
-    problems.push(`${rel.type} does not admit the status "${rel.status}" (allowed: ${type.statuses.join(", ")})`);
+    problems.push(
+      `${rel.type} does not admit the status "${rel.status}" (allowed: ${type.statuses.join(", ")})`,
+    );
   }
 
   // The rule that makes "ex-daughter" unsayable.
@@ -189,9 +231,12 @@ export function validateRelationship(rel: Relationship): Problems {
   // A guess carries confidence and its evidence; a person's statement
   // carries neither, and carries who said it instead.
   if (rel.source === "inferred") {
-    if (rel.confidence === null) problems.push("an inferred relationship must carry a confidence");
+    if (rel.confidence === null)
+      problems.push("an inferred relationship must carry a confidence");
     if (rel.evidence.length === 0) {
-      problems.push("an inferred relationship must carry the evidence it came from, or it cannot be reviewed");
+      problems.push(
+        "an inferred relationship must carry the evidence it came from, or it cannot be reviewed",
+      );
     }
     if (rel.scope === "household" && rel.confirmed_by_person_id === null) {
       problems.push(
@@ -204,11 +249,17 @@ export function validateRelationship(rel: Relationship): Problems {
     // show "Riff said Alex is Marlow's partner" for something nobody
     // said - exactly the assertion this record type exists to prevent.
     if (rel.stated_by_person_id) {
-      problems.push("an inferred relationship must not name a person as having stated it; nobody did");
+      problems.push(
+        "an inferred relationship must not name a person as having stated it; nobody did",
+      );
     }
   } else {
-    if (rel.confidence !== null) problems.push("only an inferred relationship has a confidence; a person said this one");
-    if (rel.evidence.length > 0) problems.push("evidence belongs to an inferred relationship");
+    if (rel.confidence !== null)
+      problems.push(
+        "only an inferred relationship has a confidence; a person said this one",
+      );
+    if (rel.evidence.length > 0)
+      problems.push("evidence belongs to an inferred relationship");
     if (rel.source === "stated" && !rel.stated_by_person_id) {
       problems.push("a stated relationship must record who stated it");
     }
@@ -233,14 +284,22 @@ export function validateRelationshipEndpoints(
   // both parameters have the same TypeScript shape, so a transposed call
   // site type-checks perfectly and stores a backwards edge. Checked
   // rather than trusted (code review, 2026-09-05).
-  if (from.id !== rel.from_id) problems.push(`the "from" entity ${from.id} is not this relationship's from_id`);
-  if (to.id !== rel.to_id) problems.push(`the "to" entity ${to.id} is not this relationship's to_id`);
+  if (from.id !== rel.from_id)
+    problems.push(
+      `the "from" entity ${from.id} is not this relationship's from_id`,
+    );
+  if (to.id !== rel.to_id)
+    problems.push(`the "to" entity ${to.id} is not this relationship's to_id`);
   if (problems.length > 0) return problems;
   if (!type.from.includes(from.kind)) {
-    problems.push(`${rel.type} cannot start at a ${from.kind} (allowed: ${type.from.join(", ")})`);
+    problems.push(
+      `${rel.type} cannot start at a ${from.kind} (allowed: ${type.from.join(", ")})`,
+    );
   }
   if (!type.to.includes(to.kind)) {
-    problems.push(`${rel.type} cannot point at a ${to.kind} (allowed: ${type.to.join(", ")})`);
+    problems.push(
+      `${rel.type} cannot point at a ${to.kind} (allowed: ${type.to.join(", ")})`,
+    );
   }
   return problems;
 }
@@ -280,7 +339,9 @@ export function inverseRelationship(
  * a manifest's `net:api.open-meteo.com` matches permissions.json's
  * `net:<host>`: a literal entry matches exactly, a parameterized one
  * matches on its prefix and requires a non-empty target after the colon. */
-export function matchGrantAction(action: string): { id: string; parameterized: boolean } | undefined {
+export function matchGrantAction(
+  action: string,
+): { id: string; parameterized: boolean } | undefined {
   // An un-substituted template is not an action. Persisted, `use:<package>`
   // would validate clean and later resolve against a package literally
   // named "<package>" (code review, 2026-09-05).
@@ -313,10 +374,15 @@ export function validateGrant(grant: Grant): Problems {
   // by "a single clear dialog... one confirmation, no legalese ceremony,
   // never repeated". A grant for it that nobody acknowledged has skipped
   // that step.
-  const NEEDS_ACKNOWLEDGMENT = new Set(["chat.unrestricted", "generate.unrestricted"]);
+  const NEEDS_ACKNOWLEDGMENT = new Set([
+    "chat.unrestricted",
+    "generate.unrestricted",
+  ]);
   if (NEEDS_ACKNOWLEDGMENT.has(grant.action) && grant.effect === "allow") {
     if (!grant.acknowledged_at || !grant.acknowledged_by_person_id) {
-      problems.push(`${grant.action} requires the adult's one-time acknowledgment before it can be allowed`);
+      problems.push(
+        `${grant.action} requires the adult's one-time acknowledgment before it can be allowed`,
+      );
     } else if (grant.acknowledged_by_person_id !== grant.person) {
       // Unrestricted mode is something an adult accepts FOR THEMSELVES.
       // A code review (2026-09-05) found the earlier check proved only
@@ -330,9 +396,14 @@ export function validateGrant(grant: Grant): Problems {
   return problems;
 }
 
-function scopeProblems(scope: string, person: string | null | undefined): Problems {
-  if (scope === "person" && !person) return ["a person-scoped record must name its person"];
-  if (scope !== "person" && person) return [`a ${scope}-scoped record must not name a person`];
+function scopeProblems(
+  scope: string,
+  person: string | null | undefined,
+): Problems {
+  if (scope === "person" && !person)
+    return ["a person-scoped record must name its person"];
+  if (scope !== "person" && person)
+    return [`a ${scope}-scoped record must not name a person`];
   return [];
 }
 
@@ -349,41 +420,63 @@ export function validateMemoryRecord(record: MemoryRecord): Problems {
   const problems: Problems = [];
 
   if (record.scope === "companion") {
-    if (!record.companion_id) problems.push("a companion-scoped record must name its companion_id");
+    if (!record.companion_id)
+      problems.push("a companion-scoped record must name its companion_id");
   } else if (record.companion_id) {
-    problems.push(`companion_id is only meaningful on companion scope, not on ${record.scope}`);
+    problems.push(
+      `companion_id is only meaningful on companion scope, not on ${record.scope}`,
+    );
   }
 
   problems.push(...scopeProblems(record.scope, record.person));
 
   if (record.scope === "person" || record.scope === "self") {
     if (record.child_disclosure !== null) {
-      problems.push(`child_disclosure is meaningless on ${record.scope} scope and must stay null`);
+      problems.push(
+        `child_disclosure is meaningless on ${record.scope} scope and must stay null`,
+      );
     }
     // A third code review on item 1b caught the gap: the pairing check
     // just below only proves set_by and set_at move together, not that
     // either is meaningless here too - a person/self record could claim
     // an adult set a disclosure the record doesn't even carry.
-    if (record.child_disclosure_set_by !== null || record.child_disclosure_set_at !== null) {
-      problems.push(`child_disclosure_set_by and child_disclosure_set_at are meaningless on ${record.scope} scope and must stay null`);
+    if (
+      record.child_disclosure_set_by !== null ||
+      record.child_disclosure_set_at !== null
+    ) {
+      problems.push(
+        `child_disclosure_set_by and child_disclosure_set_at are meaningless on ${record.scope} scope and must stay null`,
+      );
     }
   }
 
   // Item 1b (a second reading of SPEC-01, 2026-09-14): set_by and set_at
   // are one fact together (who acted, and when) - one present without
   // the other is a half-written record no reader can trust.
-  if ((record.child_disclosure_set_by === null) !== (record.child_disclosure_set_at === null)) {
-    problems.push("child_disclosure_set_by and child_disclosure_set_at must be set together, or both null");
+  if (
+    (record.child_disclosure_set_by === null) !==
+    (record.child_disclosure_set_at === null)
+  ) {
+    problems.push(
+      "child_disclosure_set_by and child_disclosure_set_at must be set together, or both null",
+    );
   }
 
   // Section 14: fact credence exists only where a proposition can be
   // credited or doubted. An entity or an episode never acquires it by
   // accident.
   if (record.record_kind === "memory") {
-    if (record.fact_confidence === null) problems.push("a memory record must carry a fact_confidence");
+    if (record.fact_confidence === null)
+      problems.push("a memory record must carry a fact_confidence");
   } else {
-    if (record.fact_confidence !== null) problems.push(`fact_confidence is only meaningful on a memory record, not a ${record.record_kind}`);
-    if (record.confidence_evidence.length > 0) problems.push(`confidence_evidence is only meaningful on a memory record, not a ${record.record_kind}`);
+    if (record.fact_confidence !== null)
+      problems.push(
+        `fact_confidence is only meaningful on a memory record, not a ${record.record_kind}`,
+      );
+    if (record.confidence_evidence.length > 0)
+      problems.push(
+        `confidence_evidence is only meaningful on a memory record, not a ${record.record_kind}`,
+      );
   }
 
   // Item 1b: retrieval_feedback's own two fields tell one story (how many
@@ -391,10 +484,14 @@ export function validateMemoryRecord(record: MemoryRecord): Problems {
   // no count, is a signal REVIEW-01 could never have produced honestly.
   const feedback = record.retrieval_feedback;
   if (feedback.corrections === 0 && feedback.last_corrected_at !== null) {
-    problems.push("retrieval_feedback.last_corrected_at must be null while corrections is 0");
+    problems.push(
+      "retrieval_feedback.last_corrected_at must be null while corrections is 0",
+    );
   }
   if (feedback.corrections > 0 && feedback.last_corrected_at === null) {
-    problems.push("retrieval_feedback.last_corrected_at must be set once corrections is above 0");
+    problems.push(
+      "retrieval_feedback.last_corrected_at must be set once corrections is above 0",
+    );
   }
 
   return problems;
@@ -406,25 +503,40 @@ export function validateMemoryRecord(record: MemoryRecord): Problems {
  * when the turn's own utterance is supplied, against its length -
  * optional because a signal can be validated on its own, off the
  * turn record that carries the text a clause range indexes into. */
-export function validateTurnSignal(signal: TurnSignal, utteranceText?: string): Problems {
+export function validateTurnSignal(
+  signal: TurnSignal,
+  utteranceText?: string,
+): Problems {
   const problems: Problems = [];
 
   if (signal.source === "head") {
-    if (signal.classifier_id === null) problems.push("source: head must carry a classifier_id");
+    if (signal.classifier_id === null)
+      problems.push("source: head must carry a classifier_id");
   } else if (signal.classifier_id !== null) {
-    problems.push(`classifier_id is only meaningful when source is head, not ${signal.source}`);
+    problems.push(
+      `classifier_id is only meaningful when source is head, not ${signal.source}`,
+    );
   }
 
-  const sorted = [...signal.clauses].sort((a, b) => a.range.start - b.range.start);
+  const sorted = [...signal.clauses].sort(
+    (a, b) => a.range.start - b.range.start,
+  );
   for (let i = 0; i < sorted.length; i++) {
     const { start, end } = sorted[i]!.range;
-    if (end < start) problems.push(`a clause range is unordered: start ${start} is after end ${end}`);
+    if (end < start)
+      problems.push(
+        `a clause range is unordered: start ${start} is after end ${end}`,
+      );
     if (utteranceText !== undefined && end > utteranceText.length) {
-      problems.push(`a clause range (${start}-${end}) runs past the utterance's own length (${utteranceText.length})`);
+      problems.push(
+        `a clause range (${start}-${end}) runs past the utterance's own length (${utteranceText.length})`,
+      );
     }
     const next = sorted[i + 1];
     if (next && next.range.start < end) {
-      problems.push(`clause ranges overlap: ${start}-${end} and ${next.range.start}-${next.range.end}`);
+      problems.push(
+        `clause ranges overlap: ${start}-${end} and ${next.range.start}-${next.range.end}`,
+      );
     }
   }
 
@@ -444,13 +556,26 @@ export function validateOpenQuestion(question: OpenQuestion): Problems {
   if (question.status === "pending" && question.asked_at !== null) {
     problems.push("a pending open question must not carry asked_at yet");
   }
-  if ((question.status === "asked" || question.status === "answered" || question.status === "declined") && question.asked_at === null) {
+  if (
+    (question.status === "asked" ||
+      question.status === "answered" ||
+      question.status === "declined") &&
+    question.asked_at === null
+  ) {
     problems.push(`status ${question.status} must carry asked_at`);
   }
-  if ((question.status === "answered" || question.status === "declined") && question.resolved_at === null) {
+  if (
+    (question.status === "answered" || question.status === "declined") &&
+    question.resolved_at === null
+  ) {
     problems.push(`status ${question.status} must carry resolved_at`);
   }
-  if ((question.status === "pending" || question.status === "asked" || question.status === "expired") && question.resolved_at !== null) {
+  if (
+    (question.status === "pending" ||
+      question.status === "asked" ||
+      question.status === "expired") &&
+    question.resolved_at !== null
+  ) {
     problems.push(`status ${question.status} must not carry resolved_at`);
   }
 
@@ -466,13 +591,17 @@ export function validateReplyConstraint(constraint: ReplyConstraint): Problems {
 
   if (constraint.kind === "shape") {
     if (!["list", "number", "one_line"].includes(constraint.value)) {
-      problems.push(`a shape constraint must name a reply shape (list, number, one_line), not "${constraint.value}"`);
+      problems.push(
+        `a shape constraint must name a reply shape (list, number, one_line), not "${constraint.value}"`,
+      );
     }
   }
   if (constraint.kind === "length") {
     const budget = Number(constraint.value);
     if (!Number.isInteger(budget) || budget <= 0) {
-      problems.push(`a length constraint must carry a positive integer character budget, not "${constraint.value}"`);
+      problems.push(
+        `a length constraint must carry a positive integer character budget, not "${constraint.value}"`,
+      );
     }
   }
 
@@ -488,7 +617,9 @@ export function validateReplyConstraint(constraint: ReplyConstraint): Problems {
 export function validateBiometricPrint(print: BiometricPrint): Problems {
   const problems: Problems = [];
   if (print.embedding.length !== print.dim) {
-    problems.push(`embedding has ${print.embedding.length} values but dim says ${print.dim} - they must agree`);
+    problems.push(
+      `embedding has ${print.embedding.length} values but dim says ${print.dim} - they must agree`,
+    );
   }
   return problems;
 }
@@ -501,7 +632,9 @@ export function validateBiometricPrint(print: BiometricPrint): Problems {
 export function validateSubjectRef(ref: SubjectRef): Problems {
   if (ref.type !== "world") return [];
   if ((ref.source_kind === null) !== (ref.stable_key === null)) {
-    return ["a world SubjectRef's source_kind and stable_key must be set together, or both null"];
+    return [
+      "a world SubjectRef's source_kind and stable_key must be set together, or both null",
+    ];
   }
   return [];
 }
@@ -516,7 +649,10 @@ export function validateList(list: List): Problems {
   problems.push(...scopeProblems(list.scope, list.person));
   if (list.kind !== "todo") {
     for (const item of list.items) {
-      if (item.due_at) problems.push(`due_at is only meaningful on a todo list item, not a ${list.kind} one ("${item.text}")`);
+      if (item.due_at)
+        problems.push(
+          `due_at is only meaningful on a todo list item, not a ${list.kind} one ("${item.text}")`,
+        );
     }
   }
   return problems;

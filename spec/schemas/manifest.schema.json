@@ -6,9 +6,21 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "id", "version", "kind", "category", "display", "description",
-    "author", "license", "platforms", "min_role", "consequential",
-    "offline", "min_app", "tier", "incognito"
+    "id",
+    "version",
+    "kind",
+    "category",
+    "display",
+    "description",
+    "author",
+    "license",
+    "platforms",
+    "min_role",
+    "consequential",
+    "offline",
+    "min_app",
+    "tier",
+    "incognito"
   ],
   "properties": {
     "id": {
@@ -23,16 +35,33 @@
     "kind": {
       "type": "string",
       "enum": [
-        "plugin", "skill", "app", "companion", "integration", "model",
-        "wakeword", "voice", "theme", "module", "reference", "project"
+        "plugin",
+        "skill",
+        "app",
+        "companion",
+        "integration",
+        "model",
+        "wakeword",
+        "voice",
+        "theme",
+        "module",
+        "reference",
+        "project"
       ],
       "description": "A `plugin` is a self-contained, permissioned, installable capability (its own network access, its own recipe.json). A `skill` is plain instructions (a SKILL.md body, Claude-format-compatible) - no permissions, no recipe, composed into the chat model's system prompt when relevant, never runs on its own. See home/docs/dev.md's 'Naming: skill, plugin, command, connector' entry. A `reference` is a declarative offline knowledge archive (no code, like `model` and `voice`) - a Kiwix-style book a household installs and sizes before download; see `knowledge_source` below and home/docs/plans/knowledge-sources-2026-09-24.md. A `project` package declares a background project type: its body is `plan.json` (a `ProjectPlan`, this same file's own sibling `project.schema.json`'s `$defs/ProjectPlan`), never `recipe.json`."
     },
     "category": {
       "type": "string",
       "enum": [
-        "Home", "Family", "Info", "Fun", "Media", "Robot body",
-        "Health", "Learning", "Utilities"
+        "Home",
+        "Family",
+        "Info",
+        "Fun",
+        "Media",
+        "Robot body",
+        "Health",
+        "Learning",
+        "Utilities"
       ]
     },
     "display": { "type": "string", "minLength": 1, "maxLength": 60 },
@@ -81,7 +110,13 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["weekday", "relative_date", "clock_time", "number", "proper_noun"]
+            "enum": [
+              "weekday",
+              "relative_date",
+              "clock_time",
+              "number",
+              "proper_noun"
+            ]
           },
           "description": "CHAT-13 chunk D (home/docs/dev.md section 16 part 3, rule 3): the small vocabulary of entity kinds a package declares it answers, one field, read by routeSemantic's canFire(). A semantic winner whose captured argument carries an entity kind the manifest does not list is refused the win (the utterance goes on to the model, Tier 2, or the Tier 1 compute) instead of the fixed-answer package answering it - a weekday or relative date ('what date is next Friday') is not a holiday, so the holiday package (which declares []) cannot win it. The kinds are the kinds the deterministic tiers already extract (weekday, relative_date, clock_time, number, proper_noun), not the record entity kinds (person, pet, place, organization, thing)."
         }
@@ -91,7 +126,13 @@
       "type": "object",
       "additionalProperties": false,
       "description": "Required when kind is \"companion\" (session-a-intelligence.md step 8), unused otherwise. Composed by home/backend/src/lib/persona.ts into the turn engine's identity line and system-prompt fragment: display_name replaces the hardcoded \"MaiPai\" in \"You are {display_name}, ...\", the four style dials are the same ones lib/persona.ts already had before companions were packages, and examples is a short few-shot block (legacy's own finding: \"the single biggest lever for small-model voice fidelity\").",
-      "required": ["display_name", "formality", "complexity", "engagement", "filler_density"],
+      "required": [
+        "display_name",
+        "formality",
+        "complexity",
+        "engagement",
+        "filler_density"
+      ],
       "properties": {
         "display_name": { "type": "string", "minLength": 1, "maxLength": 40 },
         "pronouns": { "type": "string", "minLength": 1, "maxLength": 20 },
@@ -115,10 +156,22 @@
           "description": "3 to 5 lines in the character's own voice, composed as a few-shot block."
         },
         "voice_id": { "type": "string", "minLength": 1 },
-        "formality": { "type": "string", "enum": ["casual", "neutral", "formal"] },
-        "complexity": { "type": "string", "enum": ["simple", "standard", "advanced"] },
-        "engagement": { "type": "string", "enum": ["brief", "balanced", "curious"] },
-        "filler_density": { "type": "string", "enum": ["none", "light", "frequent"] },
+        "formality": {
+          "type": "string",
+          "enum": ["casual", "neutral", "formal"]
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["simple", "standard", "advanced"]
+        },
+        "engagement": {
+          "type": "string",
+          "enum": ["brief", "balanced", "curious"]
+        },
+        "filler_density": {
+          "type": "string",
+          "enum": ["none", "light", "frequent"]
+        },
         "status_phrases": {
           "type": "object",
           "additionalProperties": false,
@@ -126,17 +179,32 @@
           "properties": {
             "thinking": {
               "type": "array",
-              "items": { "type": "string", "minLength": 1, "maxLength": 40, "pattern": "…$" },
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40,
+                "pattern": "…$"
+              },
               "minItems": 1
             },
             "searching": {
               "type": "array",
-              "items": { "type": "string", "minLength": 1, "maxLength": 40, "pattern": "…$" },
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40,
+                "pattern": "…$"
+              },
               "minItems": 1
             },
             "checking": {
               "type": "array",
-              "items": { "type": "string", "minLength": 1, "maxLength": 40, "pattern": "…$" },
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40,
+                "pattern": "…$"
+              },
               "minItems": 1
             }
           }
@@ -148,7 +216,14 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["base_model", "format", "url", "sha256", "approx_bytes", "corpus_sha256"],
+            "required": [
+              "base_model",
+              "format",
+              "url",
+              "sha256",
+              "approx_bytes",
+              "corpus_sha256"
+            ],
             "properties": {
               "base_model": { "type": "string" },
               "format": { "type": "string", "enum": ["gguf-lora"] },
@@ -270,7 +345,9 @@
     },
     "data_sources": {
       "type": "array",
-      "items": { "$ref": "https://getmaipai.github.io/.github/standards/schemas/privacy-row.schema.json" },
+      "items": {
+        "$ref": "https://getmaipai.github.io/.github/standards/schemas/privacy-row.schema.json"
+      },
       "description": "Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.2.0)."
     },
     "needs": {
@@ -281,8 +358,16 @@
         "additionalProperties": false,
         "required": ["kind", "id", "name", "purpose", "required"],
         "properties": {
-          "kind": { "type": "string", "enum": ["engine", "service", "internet"] },
-          "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+          "kind": {
+            "type": "string",
+            "enum": ["engine", "service", "internet"]
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9_-]*$"
+          },
           "name": { "type": "string", "minLength": 1, "maxLength": 80 },
           "purpose": { "type": "string", "minLength": 1, "maxLength": 200 },
           "required": { "type": "boolean" }
@@ -299,26 +384,52 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "level", "audience", "template", "configurable", "default_channels"],
+        "required": [
+          "id",
+          "level",
+          "audience",
+          "template",
+          "configurable",
+          "default_channels"
+        ],
         "properties": {
           "id": {
             "type": "string",
             "pattern": "^[a-z0-9_.-]+$",
             "description": "Namespaced by the package's own id (e.g. `weather.severe_alert`) so two packages can never collide in F's shared registry."
           },
-          "level": { "type": "string", "enum": ["immediate", "time_sensitive", "passive"] },
-          "audience": { "type": "string", "enum": ["person", "household", "adults"] },
-          "template": { "type": "string", "minLength": 1, "description": "`{var}`-interpolated, per docs/NOTIFICATIONS.md." },
+          "level": {
+            "type": "string",
+            "enum": ["immediate", "time_sensitive", "passive"]
+          },
+          "audience": {
+            "type": "string",
+            "enum": ["person", "household", "adults"]
+          },
+          "template": {
+            "type": "string",
+            "minLength": 1,
+            "description": "`{var}`-interpolated, per docs/NOTIFICATIONS.md."
+          },
           "configurable": { "type": "boolean" },
-          "privacy": { "type": "boolean", "description": "Whether the notification is private. If absent, consumers must treat it as private." },
+          "privacy": {
+            "type": "boolean",
+            "description": "Whether the notification is private. If absent, consumers must treat it as private."
+          },
           "default_channels": {
             "type": "array",
-            "items": { "type": "string", "enum": ["in_app", "telegram", "robot"] },
+            "items": {
+              "type": "string",
+              "enum": ["in_app", "telegram", "robot"]
+            },
             "minItems": 1
           },
           "actions": {
             "type": "array",
-            "items": { "type": "string", "enum": ["acknowledge", "quiet_here", "false_alarm"] },
+            "items": {
+              "type": "string",
+              "enum": ["acknowledge", "quiet_here", "false_alarm"]
+            },
             "uniqueItems": true,
             "description": "Actions available for the safety.alarm notification type."
           }
@@ -373,7 +484,7 @@
     "warm_on": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 },
-      "description": "Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home_place` changing re-warms `weather` right away instead of waiting for the next scheduled tick."
+      "description": "Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home` changing re-warms `weather` right away instead of waiting for the next scheduled tick."
     },
     "backup": {
       "type": "string",
@@ -497,7 +608,10 @@
       "description": "The smoke test entry, run at install, update, and on a schedule (lib/smoke.ts). `kind: \"static\"` (loads only), `\"recipe_fixture\"` + `fixture` (a Tier 0 plugin's own recipe run against a fixture-seeded HostEmulator), or `\"deno_test\"` (Tier 1, session-d step 5).",
       "required": ["kind"],
       "properties": {
-        "kind": { "type": "string", "enum": ["static", "recipe_fixture", "deno_test"] },
+        "kind": {
+          "type": "string",
+          "enum": ["static", "recipe_fixture", "deno_test"]
+        },
         "fixture": {
           "type": "string",
           "minLength": 1,
@@ -518,9 +632,17 @@
             "required": ["id", "description", "args", "returns"],
             "properties": {
               "id": { "type": "string", "minLength": 1 },
-              "description": { "type": "string", "minLength": 1, "maxLength": 200 },
-              "args": { "description": "A JSON Schema for this query's arguments." },
-              "returns": { "description": "A JSON Schema for this query's result." }
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "args": {
+                "description": "A JSON Schema for this query's arguments."
+              },
+              "returns": {
+                "description": "A JSON Schema for this query's result."
+              }
             }
           }
         }

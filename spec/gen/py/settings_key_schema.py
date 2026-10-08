@@ -18,6 +18,8 @@ class Range(BaseModel):
     )
     options: list[str] | None = None
     options_from: constr(min_length=1) | None = None
+    multiple: bool | None = None
+    allow_current: bool | None = None
 
 
 class Copy(BaseModel):
@@ -78,6 +80,7 @@ class SettingsKey(BaseModel):
         'area',
         'person',
         'media',
+        'location',
     ] = Field(..., description="Home Assistant's selector names (3.2).")
     range: Range | None = Field(
         None,

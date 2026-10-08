@@ -9,9 +9,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "allowance.fun.daily_minutes",
@@ -23,9 +21,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "allowance.health.daily_minutes",
@@ -37,9 +33,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "allowance.home.daily_minutes",
@@ -51,9 +45,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "allowance.info.daily_minutes",
@@ -65,9 +57,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "allowance.learning.daily_minutes",
@@ -79,9 +69,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "allowance.media.daily_minutes",
@@ -93,9 +81,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "allowance.robot_body.daily_minutes",
@@ -107,9 +93,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "allowance.utilities.daily_minutes",
@@ -121,9 +105,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "backup.max_total_gb",
@@ -139,9 +121,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.storage",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "chat.context_size_override",
@@ -157,20 +137,14 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "chat.flash_attention_override",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "auto",
-        "on",
-        "off"
-      ]
+      "options": ["auto", "on", "off"]
     },
     "default": "auto",
     "label": "Flash attention override",
@@ -178,20 +152,14 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "chat.kv_cache_override",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "auto",
-        "quantized",
-        "full"
-      ]
+      "options": ["auto", "quantized", "full"]
     },
     "default": "auto",
     "label": "KV cache precision override",
@@ -199,9 +167,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "chat.model_id",
@@ -213,9 +179,7 @@
     "level": "expert",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "chat.photo_uploads",
@@ -227,19 +191,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.chat",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "chat.teen_gate_grain",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "sentence",
-        "arrival"
-      ]
+      "options": ["sentence", "arrival"]
     },
     "default": "sentence",
     "label": "How a teen's replies are checked",
@@ -247,9 +206,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.remote.allow_tailnet",
@@ -264,9 +221,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.remote.host",
@@ -281,9 +236,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.remote.local_port",
@@ -300,9 +253,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.remote.ssh_port",
@@ -322,9 +273,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.url",
@@ -336,9 +285,7 @@
     "level": "expert",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.use_chat",
@@ -350,9 +297,7 @@
     "level": "expert",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.use_embeddings",
@@ -364,9 +309,7 @@
     "level": "expert",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.use_stt",
@@ -378,9 +321,7 @@
     "level": "expert",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.use_tts",
@@ -392,19 +333,14 @@
     "level": "expert",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "engines.stack.where",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "this_computer",
-        "another_computer"
-      ]
+      "options": ["this_computer", "another_computer"]
     },
     "default": "this_computer",
     "label": "Where the engine runs",
@@ -419,9 +355,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "home.access_token",
@@ -433,9 +367,7 @@
     "level": "advanced",
     "secret": true,
     "lives_in": "household.integrations",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "home.base_url",
@@ -447,9 +379,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.integrations",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "household.conversation_retention_days",
@@ -465,9 +395,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.system",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "household.family_name",
@@ -479,34 +407,30 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.system",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
-    "key": "household.home_place",
+    "key": "household.home",
     "scope": "household",
-    "selector": "text",
-    "default": "",
-    "label": "Household location",
-    "help": "The place MaiPai uses for weather and other location-based answers, e.g. \"Seattle, WA\".",
+    "selector": "location",
+    "range": {
+      "multiple": false,
+      "allow_current": false
+    },
+    "default": null,
+    "label": "Home location",
+    "help": "The household place used as the fallback for location-based answers.",
     "level": "basic",
     "secret": false,
     "lives_in": "household.system",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
+    "honoured_by": ["home", "bot"]
   },
   {
     "key": "household.locale",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "en-US",
-        "en-GB"
-      ]
+      "options": ["en-US", "en-GB"]
     },
     "default": "en-US",
     "label": "Language and region",
@@ -514,10 +438,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.system",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
+    "honoured_by": ["home", "bot"]
   },
   {
     "key": "household.quiet_hours.from",
@@ -529,9 +450,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.notifications",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "household.quiet_hours.to",
@@ -543,9 +462,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.notifications",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.approvals.requested.telegram",
@@ -556,9 +473,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.backups.target_failing.telegram",
@@ -569,9 +484,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.browser.enabled",
@@ -583,9 +496,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.notifications",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.engines.problem.telegram",
@@ -596,9 +507,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.engines.update_applied.telegram",
@@ -609,9 +518,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.engines.update_available.telegram",
@@ -622,9 +529,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.engines.update_failed.telegram",
@@ -635,9 +540,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.file_shared.muted_senders",
@@ -652,9 +555,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.notifications",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.file.shared_with_household.telegram",
@@ -665,9 +566,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.file.shared_with_you.telegram",
@@ -678,9 +577,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.memory.judge_failed.telegram",
@@ -691,9 +588,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.memory.updated.telegram",
@@ -704,9 +599,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.model.download_failed.telegram",
@@ -717,9 +610,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.model.download_ready.telegram",
@@ -730,9 +621,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.person.band_changed.telegram",
@@ -743,9 +632,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.repairs.new.telegram",
@@ -756,9 +643,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.telegram.bot_token",
@@ -770,9 +655,7 @@
     "level": "advanced",
     "secret": true,
     "lives_in": "household.notifications",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.telegram.chat_id",
@@ -784,9 +667,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.time_sensitive.robot",
@@ -798,9 +679,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.notifications",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "notifications.updates.available.telegram",
@@ -811,9 +690,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.quiet_hours.from",
@@ -825,9 +702,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.notifications",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.quiet_hours.to",
@@ -839,9 +714,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.notifications",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.robot.follow_up",
@@ -853,9 +726,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.robot.greet_by_name",
@@ -867,9 +738,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.robot.may_address",
@@ -881,9 +750,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.robot.playful_clips",
@@ -895,21 +762,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.robot.topics",
     "scope": "person",
     "selector": "select",
     "range": {
-      "options": [
-        "off",
-        "nudges",
-        "chit_chat",
-        "both"
-      ]
+      "options": ["off", "nudges", "chit_chat", "both"]
     },
     "default": "nudges",
     "label": "Robot conversation topics",
@@ -917,9 +777,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.vision.gestures",
@@ -931,20 +789,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "person.vision.watch",
     "scope": "person",
     "selector": "select",
     "range": {
-      "options": [
-        "off",
-        "presence",
-        "identify"
-      ]
+      "options": ["off", "presence", "identify"]
     },
     "default": "presence",
     "label": "Robot vision watch level",
@@ -952,21 +804,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "persona.active_id",
     "scope": "person",
     "selector": "select",
     "range": {
-      "options": [
-        "buddy",
-        "default",
-        "pal",
-        "tutor"
-      ]
+      "options": ["buddy", "default", "pal", "tutor"]
     },
     "default": "default",
     "label": "Personality",
@@ -974,9 +819,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.persona",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "reference.images",
@@ -988,9 +831,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.chat",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "reference.library_dir",
@@ -1002,9 +843,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.reference",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "robot.barge_in.open_mic",
@@ -1016,21 +855,14 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "robot.hello",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
+    "honoured_by": ["home", "bot"]
   },
   {
     "key": "robot.camera.watch_level",
     "scope": "device",
     "selector": "select",
     "range": {
-      "options": [
-        "off",
-        "presence",
-        "identify"
-      ]
+      "options": ["off", "presence", "identify"]
     },
     "default": "identify",
     "label": "Robot camera watch level",
@@ -1038,10 +870,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.hello",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
+    "honoured_by": ["home", "bot"]
   },
   {
     "key": "robot.follow_up.seconds",
@@ -1057,10 +886,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.hello",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
+    "honoured_by": ["home", "bot"]
   },
   {
     "key": "robot.gestures.enabled",
@@ -1072,21 +898,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.hello",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
+    "honoured_by": ["home", "bot"]
   },
   {
     "key": "robot.greetings.mode",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "off",
-        "gesture",
-        "spoken"
-      ]
+      "options": ["off", "gesture", "spoken"]
     },
     "default": "gesture",
     "label": "Robot greeting style",
@@ -1094,20 +913,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "robot.idle.level",
     "scope": "device",
     "selector": "select",
     "range": {
-      "options": [
-        "still",
-        "calm",
-        "lively"
-      ]
+      "options": ["still", "calm", "lively"]
     },
     "default": "calm",
     "label": "Robot idle movement",
@@ -1115,19 +928,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.hello",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
+    "honoured_by": ["home", "bot"]
   },
   {
     "key": "robot.initiative.accept_phrases",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "default"
-      ]
+      "options": ["default"]
     },
     "default": "default",
     "label": "Offer acceptance phrases",
@@ -1135,9 +943,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "robot.initiative.allowed_here",
@@ -1149,10 +955,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.hello",
-    "honoured_by": [
-      "home",
-      "bot"
-    ]
+    "honoured_by": ["home", "bot"]
   },
   {
     "key": "robot.initiative.enabled",
@@ -1164,9 +967,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "robot.initiative.max_offers_per_hour",
@@ -1182,20 +983,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "robot.initiative.tiers_spoken",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "tier_1",
-        "tier_1_2",
-        "all"
-      ]
+      "options": ["tier_1", "tier_1_2", "all"]
     },
     "default": "tier_1",
     "label": "Spoken offer tiers",
@@ -1203,9 +998,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "robot.live_view.enabled",
@@ -1217,9 +1010,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "robot.live_view.who",
@@ -1231,9 +1022,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "robot.offlan.tailnet",
@@ -1245,9 +1034,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "safety.alarm.child_line",
@@ -1259,9 +1046,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "safety.alarm.repeat_seconds",
@@ -1277,9 +1062,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "safety.alarm.sensors",
@@ -1291,18 +1074,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.integrations",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "safety.alarm.voice",
     "scope": "household",
     "selector": "select",
     "range": {
-      "options": [
-        "default"
-      ]
+      "options": ["default"]
     },
     "default": "default",
     "label": "Safety alarm voice",
@@ -1310,9 +1089,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "safety.alarm.volume",
@@ -1328,21 +1105,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "search.safe_search",
     "scope": "person",
     "selector": "select",
     "range": {
-      "options": [
-        "default",
-        "off",
-        "moderate",
-        "strict"
-      ]
+      "options": ["default", "off", "moderate", "strict"]
     },
     "default": "default",
     "label": "Safe search level",
@@ -1350,9 +1120,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.search",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "search.searxng_url",
@@ -1364,9 +1132,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.search",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "search.wikipedia_fallback",
@@ -1378,9 +1144,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.search",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "security.session_lock_required",
@@ -1392,9 +1156,7 @@
     "level": "expert",
     "secret": false,
     "lives_in": "person.security",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "security.session_lock_timeout_minutes",
@@ -1410,9 +1172,7 @@
     "level": "expert",
     "secret": false,
     "lives_in": "person.security",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "status.internet_probe.dns_name",
@@ -1424,9 +1184,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.status",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "status.internet_probe.enabled",
@@ -1438,9 +1196,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.status",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "status.internet_probe.tcp_address",
@@ -1452,9 +1208,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.status",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "status.internet_probe.tcp_port",
@@ -1470,9 +1224,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.status",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "storage.critical_free_gb",
@@ -1484,9 +1236,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.storage",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "storage.household.cap_bytes",
@@ -1498,9 +1248,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.storage",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "storage.person_quota_gb",
@@ -1512,9 +1260,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "person.storage",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "storage.person.cap_bytes",
@@ -1526,9 +1272,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "person.storage",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "storage.person.default_cap_bytes",
@@ -1540,9 +1284,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.storage",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "tts.voice_id",
@@ -1584,20 +1326,14 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.voice",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "ui.appearance",
     "scope": "person",
     "selector": "select",
     "range": {
-      "options": [
-        "system",
-        "light",
-        "dark"
-      ]
+      "options": ["system", "light", "dark"]
     },
     "default": "system",
     "label": "Appearance",
@@ -1605,9 +1341,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "profile.appearance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "ui.enrollment_sounds",
@@ -1619,9 +1353,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.profile",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "ui.look",
@@ -1645,9 +1377,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "profile.appearance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "ui.pinned_apps",
@@ -1659,9 +1389,7 @@
     "level": "expert",
     "secret": false,
     "lives_in": "profile.appearance",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "ui.show_turn_stats",
@@ -1673,9 +1401,7 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "person.chat",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "vision.on_request.enabled",
@@ -1687,9 +1413,7 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "voice.hf_token",
@@ -1701,9 +1425,7 @@
     "level": "advanced",
     "secret": true,
     "lives_in": "household.ai",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   },
   {
     "key": "voice.wakeword.enabled",
@@ -1715,8 +1437,6 @@
     "level": "basic",
     "secret": false,
     "lives_in": "device.voice",
-    "honoured_by": [
-      "home"
-    ]
+    "honoured_by": ["home"]
   }
 ]

@@ -23,6 +23,12 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.110] - 2026-10-08
+
+### Added
+- Optional `geo` coordinates on map `Entity` records, including exact or area precision and their source.
+- The `location` settings selector with `multiple` and `allow_current` range options, plus the `household.home` entity reference used by Home and Bot. Remove `household.home_place`; no consumer outside Home reads the old key.
+
 ## [spec-v0.1.109] - 2026-10-08
 
 ### Added

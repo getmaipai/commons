@@ -50,8 +50,12 @@ import { Project } from "../../gen/ts/project.js";
 // under a nested worktree (found live: this worktree sits at
 // commons/.claude/worktrees/<id>/spec, one directory deeper than the plain
 // checkout the hardcoded climb assumed, so the module could never be found).
-const STANDARDS_DIR = process.env.MAIPAI_STANDARDS_DIR ?? join(import.meta.dir, "..", "..", "..", "..", ".github");
-const { ErrorEntry } = await import(join(STANDARDS_DIR, "standards", "gen", "ts", "error-entry.js"));
+const STANDARDS_DIR =
+  process.env.MAIPAI_STANDARDS_DIR ??
+  join(import.meta.dir, "..", "..", "..", "..", ".github");
+const { ErrorEntry } = await import(
+  join(STANDARDS_DIR, "standards", "gen", "ts", "error-entry.js")
+);
 
 const FIXTURES_DIR = join(import.meta.dir, "..", "..", "fixtures", "records");
 
@@ -61,7 +65,9 @@ function loadFixture(name: string): unknown {
 
 describe("record fixtures validate against their generated Zod models", () => {
   test("person.example.json", () => {
-    expect(() => Person.parse(loadFixture("person.example.json"))).not.toThrow();
+    expect(() =>
+      Person.parse(loadFixture("person.example.json")),
+    ).not.toThrow();
   });
 
   test("setting-value.example.json", () => {
@@ -76,7 +82,13 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["memory", "memory-legacy", "entity", "episode", "in-project"]) {
+  for (const kind of [
+    "memory",
+    "memory-legacy",
+    "entity",
+    "episode",
+    "in-project",
+  ]) {
     test(`memory-record.${kind}.example.json`, () => {
       expect(() =>
         MemoryRecord.parse(loadFixture(`memory-record.${kind}.example.json`)),
@@ -86,20 +98,34 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   for (const kind of ["person", "pet", "place"]) {
     test(`entity.${kind}.example.json`, () => {
-      expect(() => Entity.parse(loadFixture(`entity.${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        Entity.parse(loadFixture(`entity.${kind}.example.json`)),
+      ).not.toThrow();
+    });
+  }
+
+  for (const kind of ["place-exact", "place-area", "place-named-only"]) {
+    test(`entity.${kind}.example.json`, () => {
+      expect(() =>
+        Entity.parse(loadFixture(`entity.${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
   for (const kind of ["shopping", "todo", "custom"]) {
     test(`list.${kind}.example.json`, () => {
-      expect(() => List.parse(loadFixture(`list.${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        List.parse(loadFixture(`list.${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
   // Relationship fixtures cover the two-axis cases and the optional reader name.
   for (const kind of ["stated", "estranged", "inferred", "called"]) {
     test(`relationship.${kind}.example.json`, () => {
-      expect(() => Relationship.parse(loadFixture(`relationship.${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        Relationship.parse(loadFixture(`relationship.${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
@@ -112,31 +138,53 @@ describe("record fixtures validate against their generated Zod models", () => {
   });
 
   test("conversation.example.json", () => {
-    expect(() => Conversation.parse(loadFixture("conversation.example.json"))).not.toThrow();
+    expect(() =>
+      Conversation.parse(loadFixture("conversation.example.json")),
+    ).not.toThrow();
   });
 
   test("conversation.in-folder.example.json", () => {
-    expect(() => Conversation.parse(loadFixture("conversation.in-folder.example.json"))).not.toThrow();
+    expect(() =>
+      Conversation.parse(loadFixture("conversation.in-folder.example.json")),
+    ).not.toThrow();
   });
 
   test("a conversation's folder_id must be a folder id", () => {
-    const conv = loadFixture("conversation.in-folder.example.json") as Record<string, unknown>;
-    expect(() => Conversation.parse({ ...conv, folder_id: "proj-a1b2c3" })).toThrow();
-    expect(() => Conversation.parse({ ...conv, folder_id: null })).not.toThrow();
+    const conv = loadFixture("conversation.in-folder.example.json") as Record<
+      string,
+      unknown
+    >;
+    expect(() =>
+      Conversation.parse({ ...conv, folder_id: "proj-a1b2c3" }),
+    ).toThrow();
+    expect(() =>
+      Conversation.parse({ ...conv, folder_id: null }),
+    ).not.toThrow();
   });
 
   for (const kind of ["example", "parent-made.example", "project.example"]) {
     test(`chat-folder.${kind}.json`, () => {
-      expect(() => ChatFolder.parse(loadFixture(`chat-folder.${kind}.json`))).not.toThrow();
+      expect(() =>
+        ChatFolder.parse(loadFixture(`chat-folder.${kind}.json`)),
+      ).not.toThrow();
     });
   }
 
   test("a chat folder refuses an empty name, a bad id and an unknown field", () => {
-    const folder = loadFixture("chat-folder.example.json") as Record<string, unknown>;
+    const folder = loadFixture("chat-folder.example.json") as Record<
+      string,
+      unknown
+    >;
     expect(() => ChatFolder.parse({ ...folder, name: "" })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, name: "x".repeat(81) })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, id: "project-a1b2c3" })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, not_a_field: "be brief" })).toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, name: "x".repeat(81) }),
+    ).toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, id: "project-a1b2c3" }),
+    ).toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, not_a_field: "be brief" }),
+    ).toThrow();
   });
 
   test("a v0.1.87 chat folder still validates and reads with the new defaults (PROJECTS-P1)", () => {
@@ -153,122 +201,266 @@ describe("record fixtures validate against their generated Zod models", () => {
   });
 
   test("a chat folder refuses a hex colour, an unknown colour, a bad icon, long text, a bad share and an unknown memory mode", () => {
-    const folder = loadFixture("chat-folder.project.example.json") as Record<string, unknown>;
+    const folder = loadFixture("chat-folder.project.example.json") as Record<
+      string,
+      unknown
+    >;
     expect(() => ChatFolder.parse({ ...folder, color: "#ff0000" })).toThrow();
     expect(() => ChatFolder.parse({ ...folder, color: "purple" })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, icon: "Folder Icon" })).toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, icon: "Folder Icon" }),
+    ).toThrow();
     expect(() => ChatFolder.parse({ ...folder, icon: "📁" })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, description: "x".repeat(501) })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, description: "x".repeat(500) })).not.toThrow();
-    expect(() => ChatFolder.parse({ ...folder, instructions: "x".repeat(1501) })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, instructions: "x".repeat(1500) })).not.toThrow();
-    expect(() => ChatFolder.parse({ ...folder, memory_mode: "everything" })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, shares: [{ person: "person-d4e5f6", role: "owner" }] })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, shares: [{ person: "nobody", role: "can_use" }] })).toThrow();
-    expect(() => ChatFolder.parse({ ...folder, shares: [{ person: "person-d4e5f6", role: "can_use", extra: 1 }] })).toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, description: "x".repeat(501) }),
+    ).toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, description: "x".repeat(500) }),
+    ).not.toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, instructions: "x".repeat(1501) }),
+    ).toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, instructions: "x".repeat(1500) }),
+    ).not.toThrow();
+    expect(() =>
+      ChatFolder.parse({ ...folder, memory_mode: "everything" }),
+    ).toThrow();
+    expect(() =>
+      ChatFolder.parse({
+        ...folder,
+        shares: [{ person: "person-d4e5f6", role: "owner" }],
+      }),
+    ).toThrow();
+    expect(() =>
+      ChatFolder.parse({
+        ...folder,
+        shares: [{ person: "nobody", role: "can_use" }],
+      }),
+    ).toThrow();
+    expect(() =>
+      ChatFolder.parse({
+        ...folder,
+        shares: [{ person: "person-d4e5f6", role: "can_use", extra: 1 }],
+      }),
+    ).toThrow();
     expect(() => ChatFolder.parse({ ...folder, pinned: "yes" })).toThrow();
   });
 
   test("every project icon fixture and the vocab file agree, and every colour is a kit hue name", () => {
-    const vocab = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "vocab", "project-icons.json"), "utf8")) as { icons: string[] };
+    const vocab = JSON.parse(
+      readFileSync(
+        join(import.meta.dir, "..", "..", "vocab", "project-icons.json"),
+        "utf8",
+      ),
+    ) as { icons: string[] };
     expect(new Set(vocab.icons).size).toBe(vocab.icons.length);
     expect(vocab.icons).toContain("folder");
-    for (const name of vocab.icons) expect(name).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
-    const folder = ChatFolder.parse(loadFixture("chat-folder.project.example.json"));
+    for (const name of vocab.icons)
+      expect(name).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+    const folder = ChatFolder.parse(
+      loadFixture("chat-folder.project.example.json"),
+    );
     expect(vocab.icons).toContain(folder.icon);
   });
 
   test("a memory record carries an optional folder_id, null by default, and refuses a bad one", () => {
-    const base = loadFixture("memory-record.memory.example.json") as Record<string, unknown>;
+    const base = loadFixture("memory-record.memory.example.json") as Record<
+      string,
+      unknown
+    >;
     expect(MemoryRecord.parse(base).folder_id).toBeNull();
-    expect(MemoryRecord.parse(loadFixture("memory-record.in-project.example.json")).folder_id).toBe("folder-g7h8i9");
-    expect(() => MemoryRecord.parse({ ...base, folder_id: "project-g7h8i9" })).toThrow();
+    expect(
+      MemoryRecord.parse(loadFixture("memory-record.in-project.example.json"))
+        .folder_id,
+    ).toBe("folder-g7h8i9");
+    expect(() =>
+      MemoryRecord.parse({ ...base, folder_id: "project-g7h8i9" }),
+    ).toThrow();
   });
 
   test("project.example.json", () => {
-    expect(() => Project.parse(loadFixture("project.example.json"))).not.toThrow();
+    expect(() =>
+      Project.parse(loadFixture("project.example.json")),
+    ).not.toThrow();
   });
 
   test("project.failed.example.json", () => {
-    expect(() => Project.parse(loadFixture("project.failed.example.json"))).not.toThrow();
+    expect(() =>
+      Project.parse(loadFixture("project.failed.example.json")),
+    ).not.toThrow();
   });
 
   test("conversation.temporary.example.json", () => {
-    expect(() => Conversation.parse(loadFixture("conversation.temporary.example.json"))).not.toThrow();
+    expect(() =>
+      Conversation.parse(loadFixture("conversation.temporary.example.json")),
+    ).not.toThrow();
   });
 
   test("device.example.json", () => {
-    expect(() => Device.parse(loadFixture("device.example.json"))).not.toThrow();
+    expect(() =>
+      Device.parse(loadFixture("device.example.json")),
+    ).not.toThrow();
   });
 
   for (const kind of ["reachy-mini", "reachy-mini-eyes", "maipai-build"]) {
     test(`device.robot-${kind}.example.json`, () => {
-      expect(() => Device.parse(loadFixture(`device.robot-${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        Device.parse(loadFixture(`device.robot-${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
-  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal", "held", "resting"]) {
+  for (const kind of [
+    "starting",
+    "idle",
+    "listening",
+    "thinking",
+    "speaking",
+    "reconnecting",
+    "sleeping",
+    "unknown-battery",
+    "minimal",
+    "held",
+    "resting",
+  ]) {
     test(`robot-state.${kind}.example.json`, () => {
-      expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        RobotState.parse(loadFixture(`robot-state.${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
-    const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
+    const commands = JSON.parse(
+      readFileSync(
+        join(
+          import.meta.dir,
+          "..",
+          "..",
+          "fixtures",
+          "records",
+          "device-command.kinds.example.json",
+        ),
+        "utf-8",
+      ),
+    ) as unknown[];
     expect(commands).toHaveLength(14);
-    for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
+    for (const command of commands)
+      expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();
     const fixtures = join(import.meta.dir, "..", "..", "fixtures", "records");
-    const waitingWithText = JSON.parse(readFileSync(join(fixtures, "device-command.notify-waiting-with-text.invalid.example.json"), "utf-8"));
+    const waitingWithText = JSON.parse(
+      readFileSync(
+        join(
+          fixtures,
+          "device-command.notify-waiting-with-text.invalid.example.json",
+        ),
+        "utf-8",
+      ),
+    );
     expect(() => DeviceCommand.parse(waitingWithText)).toThrow();
-    const offer = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "offer")!;
+    const offer = (
+      commands as { kind: string; payload: Record<string, unknown> }[]
+    ).find((command) => command.kind === "offer")!;
     expect(offer.payload).not.toHaveProperty("text");
-    expect(() => DeviceCommand.parse({ ...offer, payload: { ...offer.payload, text: "prepared content" } })).toThrow();
+    expect(() =>
+      DeviceCommand.parse({
+        ...offer,
+        payload: { ...offer.payload, text: "prepared content" },
+      }),
+    ).toThrow();
   });
 
   test("robot channel frames accept voice answers and reject gesture answers", () => {
     const fixtures = join(import.meta.dir, "..", "..", "fixtures", "records");
-    const frames = JSON.parse(readFileSync(join(fixtures, "robot-channel-frame.kinds.example.json"), "utf-8")) as unknown[];
+    const frames = JSON.parse(
+      readFileSync(
+        join(fixtures, "robot-channel-frame.kinds.example.json"),
+        "utf-8",
+      ),
+    ) as unknown[];
     expect(frames).toHaveLength(4);
-    for (const frame of frames) expect(() => RobotChannelFrame.parse(frame)).not.toThrow();
-    const invalid = JSON.parse(readFileSync(join(fixtures, "robot-channel-frame.gesture-answer.invalid.example.json"), "utf-8"));
+    for (const frame of frames)
+      expect(() => RobotChannelFrame.parse(frame)).not.toThrow();
+    const invalid = JSON.parse(
+      readFileSync(
+        join(
+          fixtures,
+          "robot-channel-frame.gesture-answer.invalid.example.json",
+        ),
+        "utf-8",
+      ),
+    );
     expect(() => RobotChannelFrame.parse(invalid)).toThrow();
   });
 
   test("robot offer fixture validates", () => {
-    expect(() => RobotOffer.parse(loadFixture("robot-offer.example.json"))).not.toThrow();
+    expect(() =>
+      RobotOffer.parse(loadFixture("robot-offer.example.json")),
+    ).not.toThrow();
   });
 
   test("robot asset pins validate and contain only checksum and licence backed non-move assets", () => {
-    const pins = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "assets", "robot-assets.json"), "utf-8")) as unknown[];
+    const pins = JSON.parse(
+      readFileSync(
+        join(import.meta.dir, "..", "..", "assets", "robot-assets.json"),
+        "utf-8",
+      ),
+    ) as unknown[];
     expect(pins).toHaveLength(6);
     for (const pin of pins) {
       const parsed = RobotAssetManifest.parse(pin);
       expect(parsed.sha256).toMatch(/^[a-f0-9]{64}$/);
       expect(parsed.licence.trim()).not.toBe("");
       expect(parsed.kind).not.toBe("moves");
-      expect(`${parsed.id} ${parsed.file} ${parsed.source_url}`).not.toMatch(/firmware/i);
+      expect(`${parsed.id} ${parsed.file} ${parsed.source_url}`).not.toMatch(
+        /firmware/i,
+      );
     }
   });
 
   test("safety alarm notification declaration is immediate, fixed and household-wide", () => {
-    const manifest = PackageManifest.parse(loadFixture("manifest.example.json"));
-    const alarm = manifest.notifications?.find((item) => item.id === "safety.alarm");
-    expect(alarm).toMatchObject({ level: "immediate", configurable: false, audience: "household", actions: ["acknowledge", "quiet_here", "false_alarm"] });
+    const manifest = PackageManifest.parse(
+      loadFixture("manifest.example.json"),
+    );
+    const alarm = manifest.notifications?.find(
+      (item) => item.id === "safety.alarm",
+    );
+    expect(alarm).toMatchObject({
+      level: "immediate",
+      configurable: false,
+      audience: "household",
+      actions: ["acknowledge", "quiet_here", "false_alarm"],
+    });
   });
 
   test("robot-state activity: an unlisted value is still rejected", () => {
-    const body = { ...(loadFixture("robot-state.idle.example.json") as object), activity: "napping" };
+    const body = {
+      ...(loadFixture("robot-state.idle.example.json") as object),
+      activity: "napping",
+    };
     expect(() => RobotState.parse(body)).toThrow();
   });
 
   test("robot-state app_version: present, null and omitted validate; wrong type is rejected", () => {
-    const present = RobotState.parse(loadFixture("robot-state.idle.example.json"));
+    const present = RobotState.parse(
+      loadFixture("robot-state.idle.example.json"),
+    );
     expect(present.app_version).toBe("0.4.2");
-    expect(RobotState.parse(loadFixture("robot-state.unknown-battery.example.json")).app_version).toBeNull();
-    expect(RobotState.parse(loadFixture("robot-state.minimal.example.json")).app_version).toBeUndefined();
-    const body = { ...(loadFixture("robot-state.idle.example.json") as object), app_version: 4 };
+    expect(
+      RobotState.parse(loadFixture("robot-state.unknown-battery.example.json"))
+        .app_version,
+    ).toBeNull();
+    expect(
+      RobotState.parse(loadFixture("robot-state.minimal.example.json"))
+        .app_version,
+    ).toBeUndefined();
+    const body = {
+      ...(loadFixture("robot-state.idle.example.json") as object),
+      app_version: 4,
+    };
     expect(() => RobotState.parse(body)).toThrow();
   });
 
@@ -277,15 +469,21 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(RobotState.parse(idle).watch_level).toBe("presence");
     const bare = loadFixture("robot-state.minimal.example.json") as any;
     expect(RobotState.parse(bare).watch_level).toBeUndefined();
-    expect(() => RobotState.parse({ ...idle, watch_level: "always" })).toThrow();
+    expect(() =>
+      RobotState.parse({ ...idle, watch_level: "always" }),
+    ).toThrow();
   });
 
   test("robot-state motion and put_down_count: optional, null motion allowed, bad values rejected", () => {
     const held = RobotState.parse(loadFixture("robot-state.held.example.json"));
     expect(held.motion).toBe("held");
     expect(held.put_down_count).toBe(0);
-    expect(RobotState.parse(loadFixture("robot-state.resting.example.json")).motion).toBe("resting");
-    const bare = RobotState.parse(loadFixture("robot-state.minimal.example.json"));
+    expect(
+      RobotState.parse(loadFixture("robot-state.resting.example.json")).motion,
+    ).toBe("resting");
+    const bare = RobotState.parse(
+      loadFixture("robot-state.minimal.example.json"),
+    );
     expect(bare.motion).toBeUndefined();
     expect(bare.put_down_count).toBeUndefined();
     const idle = loadFixture("robot-state.idle.example.json") as object;
@@ -299,33 +497,52 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("robot-state activity enum is unchanged by the motion fields", () => {
     for (const value of ["held", "resting", "carried"]) {
-      const body = { ...(loadFixture("robot-state.idle.example.json") as object), activity: value };
+      const body = {
+        ...(loadFixture("robot-state.idle.example.json") as object),
+        activity: value,
+      };
       expect(() => RobotState.parse(body)).toThrow();
     }
   });
 
   for (const kind of ["yes", "slow", "no", "unknown", "multi-role"]) {
     test(`stack-fit-plan.${kind}.example.json`, () => {
-      expect(() => StackFitPlan.parse(loadFixture(`stack-fit-plan.${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        StackFitPlan.parse(loadFixture(`stack-fit-plan.${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
   test("stack-fit-plan rejects inconsistent unknown and estimated figures", () => {
     const base = loadFixture("stack-fit-plan.yes.example.json") as any;
     const unknownLow = structuredClone(base);
-    unknownLow.total = { low: 1, high: null, source: "unknown", as_of: "2026-09-30" };
+    unknownLow.total = {
+      low: 1,
+      high: null,
+      source: "unknown",
+      as_of: "2026-09-30",
+    };
     expect(() => StackFitPlan.parse(unknownLow)).toThrow();
     const estimatedNull = structuredClone(base);
-    estimatedNull.total = { low: null, high: 2, source: "estimated", as_of: "2026-09-30" };
+    estimatedNull.total = {
+      low: null,
+      high: 2,
+      source: "estimated",
+      as_of: "2026-09-30",
+    };
     expect(() => StackFitPlan.parse(estimatedNull)).toThrow();
   });
 
   test("source.example.json", () => {
-    expect(() => Source.parse(loadFixture("source.example.json"))).not.toThrow();
+    expect(() =>
+      Source.parse(loadFixture("source.example.json")),
+    ).not.toThrow();
   });
 
   test("source.archive.example.json", () => {
-    expect(() => Source.parse(loadFixture("source.archive.example.json"))).not.toThrow();
+    expect(() =>
+      Source.parse(loadFixture("source.archive.example.json")),
+    ).not.toThrow();
   });
 
   test("manifest.example.json", () => {
@@ -335,7 +552,11 @@ describe("record fixtures validate against their generated Zod models", () => {
   });
 
   test("manifest.companion-style-adapter.example.json", () => {
-    expect(() => PackageManifest.parse(loadFixture("manifest.companion-style-adapter.example.json"))).not.toThrow();
+    expect(() =>
+      PackageManifest.parse(
+        loadFixture("manifest.companion-style-adapter.example.json"),
+      ),
+    ).not.toThrow();
   });
 
   test("manifest.reference.example.json", () => {
@@ -370,86 +591,169 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["chat", "image", "mlx-serve", "sherpa-onnx-node", "pocket-tts", "judge-role", "rerank-role", "music-role", "background-turns", "vision-role", "vision-chat"]) {
+  for (const kind of [
+    "chat",
+    "image",
+    "mlx-serve",
+    "sherpa-onnx-node",
+    "pocket-tts",
+    "judge-role",
+    "rerank-role",
+    "music-role",
+    "background-turns",
+    "vision-role",
+    "vision-chat",
+  ]) {
     test(`model-capabilities.${kind}.example.json`, () => {
       expect(() =>
-        ModelCapabilities.parse(loadFixture(`model-capabilities.${kind}.example.json`)),
+        ModelCapabilities.parse(
+          loadFixture(`model-capabilities.${kind}.example.json`),
+        ),
       ).not.toThrow();
     });
   }
 
   test("model-capabilities with an unknown role is rejected", () => {
-    const bad = { ...(loadFixture("model-capabilities.chat.example.json") as Record<string, unknown>), role: "nonsense" };
+    const bad = {
+      ...(loadFixture("model-capabilities.chat.example.json") as Record<
+        string,
+        unknown
+      >),
+      role: "nonsense",
+    };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
   });
 
   test("TOOL-OFFER-01: max_tools permits a bounded measured set and rejects caps over sixteen", () => {
-    const fixture = loadFixture("model-capabilities.chat.example.json") as { turn_budget: Record<string, unknown> };
-    expect(ModelCapabilities.parse({ ...fixture, turn_budget: { ...fixture.turn_budget, max_tools: 16 } }).turn_budget?.max_tools).toBe(16);
+    const fixture = loadFixture("model-capabilities.chat.example.json") as {
+      turn_budget: Record<string, unknown>;
+    };
+    expect(
+      ModelCapabilities.parse({
+        ...fixture,
+        turn_budget: { ...fixture.turn_budget, max_tools: 16 },
+      }).turn_budget?.max_tools,
+    ).toBe(16);
     expect(() =>
-      ModelCapabilities.parse({ ...fixture, turn_budget: { ...fixture.turn_budget, max_tools: 17 } }),
+      ModelCapabilities.parse({
+        ...fixture,
+        turn_budget: { ...fixture.turn_budget, max_tools: 17 },
+      }),
     ).toThrow();
   });
 
   test("model-capabilities: a vision model declares image input with its projector (VISION-01a)", () => {
-    const parsed = ModelCapabilities.parse(loadFixture("model-capabilities.vision-role.example.json"));
-    expect(parsed.image_input?.projector.file).toBe("mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf");
+    const parsed = ModelCapabilities.parse(
+      loadFixture("model-capabilities.vision-role.example.json"),
+    );
+    expect(parsed.image_input?.projector.file).toBe(
+      "mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf",
+    );
   });
 
   test("model-capabilities that declares image input without a projector is rejected (VISION-01a)", () => {
-    const bad = { ...(loadFixture("model-capabilities.vision-role.example.json") as Record<string, unknown>), image_input: {} };
+    const bad = {
+      ...(loadFixture("model-capabilities.vision-role.example.json") as Record<
+        string,
+        unknown
+      >),
+      image_input: {},
+    };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
   });
 
   test("model-capabilities with a projector that has no checksum is rejected (VISION-01a)", () => {
-    const fixture = loadFixture("model-capabilities.vision-role.example.json") as { image_input: { projector: { file: string; download: Record<string, unknown> } } };
-    const { sha256: _sha256, ...download } = fixture.image_input.projector.download;
-    const bad = { ...fixture, image_input: { projector: { ...fixture.image_input.projector, download } } };
+    const fixture = loadFixture(
+      "model-capabilities.vision-role.example.json",
+    ) as {
+      image_input: {
+        projector: { file: string; download: Record<string, unknown> };
+      };
+    };
+    const { sha256: _sha256, ...download } =
+      fixture.image_input.projector.download;
+    const bad = {
+      ...fixture,
+      image_input: {
+        projector: { ...fixture.image_input.projector, download },
+      },
+    };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
   });
 
   test("model-capabilities: a chat model reads pictures and declares it has no thinking mode (VISION-02a)", () => {
-    const parsed = ModelCapabilities.parse(loadFixture("model-capabilities.vision-chat.example.json"));
+    const parsed = ModelCapabilities.parse(
+      loadFixture("model-capabilities.vision-chat.example.json"),
+    );
     expect(parsed.role).toBe("chat");
-    expect(parsed.image_input?.projector.file).toBe("mmproj-Qwen3VL-8B-Instruct-Q8_0.gguf");
+    expect(parsed.image_input?.projector.file).toBe(
+      "mmproj-Qwen3VL-8B-Instruct-Q8_0.gguf",
+    );
     expect(parsed.thinking_mode).toBe("none");
   });
 
   test("model-capabilities with an unknown thinking_mode is rejected (VISION-02a)", () => {
-    const bad = { ...(loadFixture("model-capabilities.vision-chat.example.json") as Record<string, unknown>), thinking_mode: "sometimes" };
+    const bad = {
+      ...(loadFixture("model-capabilities.vision-chat.example.json") as Record<
+        string,
+        unknown
+      >),
+      thinking_mode: "sometimes",
+    };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
   });
 
   test("model-capabilities written before thinking_mode still validates without it (VISION-02a)", () => {
-    expect(ModelCapabilities.parse(loadFixture("model-capabilities.chat.example.json")).thinking_mode).toBeUndefined();
+    expect(
+      ModelCapabilities.parse(
+        loadFixture("model-capabilities.chat.example.json"),
+      ).thinking_mode,
+    ).toBeUndefined();
   });
 
   test("model-capabilities: a text-only model carries no image_input (VISION-01a)", () => {
-    expect(ModelCapabilities.parse(loadFixture("model-capabilities.chat.example.json")).image_input).toBeUndefined();
+    expect(
+      ModelCapabilities.parse(
+        loadFixture("model-capabilities.chat.example.json"),
+      ).image_input,
+    ).toBeUndefined();
   });
 
   test("model-capabilities.chat-footprints.example.json", () => {
-    expect(() => ModelCapabilities.parse(loadFixture("model-capabilities.chat-footprints.example.json"))).not.toThrow();
+    expect(() =>
+      ModelCapabilities.parse(
+        loadFixture("model-capabilities.chat-footprints.example.json"),
+      ),
+    ).not.toThrow();
   });
 
   for (const band of ["child", "teen", "adult"]) {
     test(`content-ceiling.${band}.example.json`, () => {
       expect(() =>
-        ContentCeiling.parse(loadFixture(`content-ceiling.${band}.example.json`)),
+        ContentCeiling.parse(
+          loadFixture(`content-ceiling.${band}.example.json`),
+        ),
       ).not.toThrow();
     });
   }
 
   test("every content-ceiling band carries the identical floor - it documents an invariant, not a per-band setting", () => {
     const floors = ["child", "teen", "adult"].map(
-      (band) => (loadFixture(`content-ceiling.${band}.example.json`) as { floor: string[] }).floor,
+      (band) =>
+        (
+          loadFixture(`content-ceiling.${band}.example.json`) as {
+            floor: string[];
+          }
+        ).floor,
     );
     expect(floors[0]).toEqual(floors[1]);
     expect(floors[1]).toEqual(floors[2]);
   });
 
   test("turn-signal.example.json", () => {
-    expect(() => TurnSignal.parse(loadFixture("turn-signal.example.json"))).not.toThrow();
+    expect(() =>
+      TurnSignal.parse(loadFixture("turn-signal.example.json")),
+    ).not.toThrow();
   });
 
   test("turn-signal.computed.example.json", () => {
@@ -459,7 +763,9 @@ describe("record fixtures validate against their generated Zod models", () => {
   });
 
   test("reply-plan.example.json", () => {
-    expect(() => ReplyPlan.parse(loadFixture("reply-plan.example.json"))).not.toThrow();
+    expect(() =>
+      ReplyPlan.parse(loadFixture("reply-plan.example.json")),
+    ).not.toThrow();
   });
 
   // SPEC-01's own acceptance: round-trip fixtures for all three SubjectRef
@@ -467,51 +773,85 @@ describe("record fixtures validate against their generated Zod models", () => {
   // entity_id (the second test below).
   for (const kind of ["household", "world", "unresolved"]) {
     test(`subject-ref.${kind}.example.json`, () => {
-      expect(() => SubjectRef.parse(loadFixture(`subject-ref.${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        SubjectRef.parse(loadFixture(`subject-ref.${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
   test("a world SubjectRef carrying an entity_id is refused", () => {
-    const world = loadFixture("subject-ref.world.example.json") as Record<string, unknown>;
-    expect(() => SubjectRef.parse({ ...world, entity_id: "ent-p7q8r9" })).toThrow();
+    const world = loadFixture("subject-ref.world.example.json") as Record<
+      string,
+      unknown
+    >;
+    expect(() =>
+      SubjectRef.parse({ ...world, entity_id: "ent-p7q8r9" }),
+    ).toThrow();
   });
 
   for (const kind of ["conversation-turn", "conversation-turn.branch"]) {
     test(`${kind}.example.json`, () => {
-      expect(() => ConversationTurn.parse(loadFixture(`${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        ConversationTurn.parse(loadFixture(`${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
   test("open-question.example.json", () => {
-    expect(() => OpenQuestion.parse(loadFixture("open-question.example.json"))).not.toThrow();
+    expect(() =>
+      OpenQuestion.parse(loadFixture("open-question.example.json")),
+    ).not.toThrow();
   });
 
   test("reply-feedback.example.json", () => {
-    expect(() => ReplyFeedback.parse(loadFixture("reply-feedback.example.json"))).not.toThrow();
+    expect(() =>
+      ReplyFeedback.parse(loadFixture("reply-feedback.example.json")),
+    ).not.toThrow();
   });
 
   test("reply-feedback.reasons.example.json: several reasons and a note", () => {
-    const parsed = ReplyFeedback.parse(loadFixture("reply-feedback.reasons.example.json"));
+    const parsed = ReplyFeedback.parse(
+      loadFixture("reply-feedback.reasons.example.json"),
+    );
     expect(parsed.reasons).toEqual(["wrong", "too_long"]);
     expect(parsed.note).toBe("The opening hours were for the wrong branch.");
   });
 
   test("reply-feedback: an older label without reasons or note still parses, with empty defaults", () => {
-    const parsed = ReplyFeedback.parse(loadFixture("reply-feedback.example.json"));
+    const parsed = ReplyFeedback.parse(
+      loadFixture("reply-feedback.example.json"),
+    );
     expect(parsed.reasons).toEqual([]);
     expect(parsed.note).toBeNull();
   });
 
   test("reply-feedback: a repeated reason, an unknown reason and an over-long note are refused", () => {
-    const base = loadFixture("reply-feedback.reasons.example.json") as Record<string, unknown>;
-    expect(() => ReplyFeedback.parse({ ...base, reasons: ["wrong", "wrong"] })).toThrow();
-    expect(() => ReplyFeedback.parse({ ...base, reasons: ["boring"] })).toThrow();
-    expect(() => ReplyFeedback.parse({ ...base, note: "x".repeat(1001) })).toThrow();
+    const base = loadFixture("reply-feedback.reasons.example.json") as Record<
+      string,
+      unknown
+    >;
+    expect(() =>
+      ReplyFeedback.parse({ ...base, reasons: ["wrong", "wrong"] }),
+    ).toThrow();
+    expect(() =>
+      ReplyFeedback.parse({ ...base, reasons: ["boring"] }),
+    ).toThrow();
+    expect(() =>
+      ReplyFeedback.parse({ ...base, note: "x".repeat(1001) }),
+    ).toThrow();
   });
 
-  for (const kind of ["lookup", "card", "procedure", "comparison", "document"]) {
+  for (const kind of [
+    "lookup",
+    "card",
+    "procedure",
+    "comparison",
+    "document",
+  ]) {
     test(`turn-artifact.${kind}.example.json`, () => {
-      expect(() => TurnArtifact.parse(loadFixture(`turn-artifact.${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        TurnArtifact.parse(loadFixture(`turn-artifact.${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
@@ -527,13 +867,17 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   for (const kind of ["v1", "v2"]) {
     test(`artifact.${kind}.example.json`, () => {
-      expect(() => Artifact.parse(loadFixture(`artifact.${kind}.example.json`))).not.toThrow();
+      expect(() =>
+        Artifact.parse(loadFixture(`artifact.${kind}.example.json`)),
+      ).not.toThrow();
     });
   }
 
   test("an artifact's second version chains to the first by id", () => {
     const v1 = loadFixture("artifact.v1.example.json") as { id: string };
-    const v2 = loadFixture("artifact.v2.example.json") as { parent_version: string };
+    const v2 = loadFixture("artifact.v2.example.json") as {
+      parent_version: string;
+    };
     expect(v2.parent_version).toBe(v1.id);
   });
 
@@ -559,27 +903,45 @@ describe("a bad record is rejected, not silently accepted", () => {
   });
 
   test("person with an unknown extra field fails (additionalProperties: false)", () => {
-    const bad = { ...(loadFixture("person.example.json") as Record<string, unknown>), extra: "nope" };
+    const bad = {
+      ...(loadFixture("person.example.json") as Record<string, unknown>),
+      extra: "nope",
+    };
     expect(() => Person.parse(bad)).toThrow();
   });
 
   test("model-capabilities with an unknown engine is rejected", () => {
-    const bad = { ...(loadFixture("model-capabilities.chat.example.json") as Record<string, unknown>), engine: "unknown-engine" };
+    const bad = {
+      ...(loadFixture("model-capabilities.chat.example.json") as Record<
+        string,
+        unknown
+      >),
+      engine: "unknown-engine",
+    };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
   });
 
   test("model-capabilities footprint without hardware is rejected", () => {
-    expect(() => ModelCapabilities.parse(loadFixture("model-capabilities.invalid-footprint-no-hardware.json"))).toThrow();
+    expect(() =>
+      ModelCapabilities.parse(
+        loadFixture("model-capabilities.invalid-footprint-no-hardware.json"),
+      ),
+    ).toThrow();
   });
 
   test("model-capabilities footprint with unknown KV cache type is rejected", () => {
-    expect(() => ModelCapabilities.parse(loadFixture("model-capabilities.invalid-footprint-kv-cache-type.json"))).toThrow();
+    expect(() =>
+      ModelCapabilities.parse(
+        loadFixture("model-capabilities.invalid-footprint-kv-cache-type.json"),
+      ),
+    ).toThrow();
   });
 });
 
-
 describe("robot hello setting fixture", () => {
   test("settings-key.robot-hello.example.json", () => {
-    expect(() => SettingsKey.parse(loadFixture("settings-key.robot-hello.example.json"))).not.toThrow();
+    expect(() =>
+      SettingsKey.parse(loadFixture("settings-key.robot-hello.example.json")),
+    ).not.toThrow();
   });
 });

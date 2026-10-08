@@ -145,6 +145,17 @@ def validate_entity(entity: Entity) -> Problems:
             f"place_kind is only meaningful on a place, not on a {entity.kind}"
         )
 
+    if entity.geo is not None:
+        if entity.kind != "place" or entity.place_kind != "map":
+            problems.append("geo is only meaningful on a map place")
+        if entity.geo.precision == "area" and (
+            not float(entity.geo.lat * 10).is_integer()
+            or not float(entity.geo.lon * 10).is_integer()
+        ):
+            problems.append(
+                "area precision coordinates must have at most one decimal place"
+            )
+
     if entity.kind != "person" and entity.account_person_id:
         problems.append(f"only a person can hold an account; this is a {entity.kind}")
 

@@ -5,7 +5,16 @@
   "description": "One entry in the settings registry (spec/settings/keys.json) or a package manifest's config[]. See platform plan 3.2 and .github's docs/SETTINGS.md.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["key", "scope", "selector", "default", "label", "level", "lives_in", "honoured_by"],
+  "required": [
+    "key",
+    "scope",
+    "selector",
+    "default",
+    "label",
+    "level",
+    "lives_in",
+    "honoured_by"
+  ],
   "properties": {
     "key": {
       "type": "string",
@@ -18,8 +27,17 @@
     "selector": {
       "type": "string",
       "enum": [
-        "number", "select", "text", "boolean", "duration", "time",
-        "entity", "area", "person", "media"
+        "number",
+        "select",
+        "text",
+        "boolean",
+        "duration",
+        "time",
+        "entity",
+        "area",
+        "person",
+        "media",
+        "location"
       ],
       "description": "Home Assistant's selector names (3.2)."
     },
@@ -28,7 +46,9 @@
       "additionalProperties": true,
       "properties": {
         "options": { "type": "array", "items": { "type": "string" } },
-        "options_from": { "type": "string", "minLength": 1 }
+        "options_from": { "type": "string", "minLength": 1 },
+        "multiple": { "type": "boolean" },
+        "allow_current": { "type": "boolean" }
       },
       "description": "Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector."
     },

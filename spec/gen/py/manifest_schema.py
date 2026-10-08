@@ -508,7 +508,7 @@ class PackageManifest(BaseModel):
     )
     warm_on: list[constr(min_length=1)] | None = Field(
         None,
-        description='Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home_place` changing re-warms `weather` right away instead of waiting for the next scheduled tick.',
+        description='Setting keys (spec/settings/keys.json ids) whose change should trigger an immediate warm outside `warm.schedule` - e.g. `household.home` changing re-warms `weather` right away instead of waiting for the next scheduled tick.',
     )
     backup: Literal['hot', 'cold', 'exclude'] | None = None
     background: bool = False
