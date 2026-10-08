@@ -23,6 +23,12 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.107] - 2026-10-07
+
+### Fixed
+- Restore the REMOTE-STACK-SPEC-01 engine-computer settings removed during the settings-registry regeneration in spec-v0.1.106.
+- Keep the spec registry additive: the registry tests now fail if these parent-tag keys are dropped.
+
 ## [spec-v0.1.105] - 2026-10-08
 
 ### Added

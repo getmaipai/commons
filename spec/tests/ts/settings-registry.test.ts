@@ -31,6 +31,22 @@ describe("spec/settings/keys.json", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
   });
+
+  test("a new registry keeps every key declared by its parent spec tag", () => {
+    // This assertion is updated when a deliberate retirement is made. It
+    // prevents regenerating from a lagging Home declaration set from silently
+    // deleting a spec-owned key, as happened in spec-v0.1.106.
+    const entries = loadRegistry() as { key: string }[];
+    const current = new Set(entries.map((entry) => entry.key));
+    const parentSpecKeys = [
+      "engines.stack.where",
+      "engines.stack.remote.host",
+      "engines.stack.remote.ssh_port",
+      "engines.stack.remote.local_port",
+      "engines.stack.remote.allow_tailnet",
+    ];
+    for (const key of parentSpecKeys) expect(current.has(key), key).toBe(true);
+  });
 });
 
 
