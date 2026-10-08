@@ -166,6 +166,22 @@ export function ComposerMenu({
   );
 }
 
+export function ComposerMenuLabel({
+  className,
+  ...props
+}: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="composer-menu-label"
+      className={cn(
+        "text-muted-foreground px-2.5 pt-1.5 pb-1 text-[11px] font-medium tracking-wide",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 export function ComposerMenuItem({
   active = false,
   className,

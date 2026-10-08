@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.180] - ui-v0.5.180
+
+Additive only. `ComposerMenuLabel` is a group heading for use inside
+`ComposerMenu`. `ToolError` accepts optional `details` (a collapsed disclosure
+under the message, summary text from `detailsLabel`, default "Details") and
+`actions` (controls drawn at the start of the action row). Omitted, the
+output is unchanged.
+
 ## [0.5.179] - ui-v0.5.179
 
 ### SEARCH-MODAL-SIZE-01 large command palette dialog

@@ -5,6 +5,7 @@ import { ComparisonCard, type ComparisonOption } from "./comparison-card";
 import { ModelPicker } from "./model-picker";
 import { QuotaBanner } from "./quota-banner";
 import { ToolError } from "./tool-error";
+import { ComposerMenu, ComposerMenuLabel } from "./composer";
 import { ErrorState } from "./error-state";
 import { CanvasSplit } from "./canvas-split";
 import { VoiceConversation } from "./voice-conversation";
@@ -115,6 +116,44 @@ describe("ToolError", () => {
     );
     expect(getByRole("button", { name: "Omitir" })).toBeTruthy();
     expect(getByRole("button", { name: "Probando" })).toBeTruthy();
+  });
+});
+
+describe("ToolError details and actions", () => {
+  test("omitted: no disclosure and no actions slot", () => {
+    const { container } = render(<ToolError name="n" target="t" message="m" />);
+    expect(container.querySelector("details")).toBeNull();
+    expect(container.querySelector('[data-slot="tool-error-actions"]')).toBeNull();
+  });
+  test("details draws a collapsed disclosure with an overridable label", () => {
+    const { container, getByText } = render(
+      <ToolError name="n" target="t" message="m" details={<span>cause</span>} detailsLabel="Detalles" />,
+    );
+    const d = container.querySelector("details") as HTMLDetailsElement;
+    expect(d.open).toBe(false);
+    expect(getByText("Detalles")).toBeTruthy();
+    expect(getByText("cause")).toBeTruthy();
+  });
+  test("actions render alongside Retry", () => {
+    const { getByRole } = render(
+      <ToolError name="n" target="t" message="m" onRetry={() => {}} actions={<a href="/repairs">Repairs</a>} />,
+    );
+    expect(getByRole("link", { name: "Repairs" })).toBeTruthy();
+    expect(getByRole("button", { name: "Retry" })).toBeTruthy();
+  });
+});
+
+describe("ComposerMenuLabel", () => {
+  test("renders a token-styled heading inside ComposerMenu", () => {
+    const { getByText } = render(
+      <ComposerMenu open>
+        <ComposerMenuLabel className="x">Models</ComposerMenuLabel>
+      </ComposerMenu>,
+    );
+    const el = getByText("Models");
+    expect(el.getAttribute("data-slot")).toBe("composer-menu-label");
+    expect(el.className).toContain("text-muted-foreground");
+    expect(el.className).toContain("x");
   });
 });
 
