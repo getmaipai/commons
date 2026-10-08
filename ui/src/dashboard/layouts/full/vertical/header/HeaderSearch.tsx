@@ -76,6 +76,11 @@ export interface HeaderSearchProps {
    * rail icon (rounded square, rail hover fill); merged over the
    * header's own classes. */
   triggerClassName?: string;
+  /** SEARCH-MODAL-SIZE-02: "lg" (the default) is the ChatGPT-proportioned
+   * dialog - 48rem wide, 36rem tall, both capped to the viewport (dvh), full
+   * width minus gutters on phones - with the result list scrolling inside.
+   * "default" is the earlier small dialog. */
+  size?: "default" | "lg";
 }
 
 /** SHELL-SEARCH-01 (home, 2026-09-23): the header's one global search -
@@ -91,7 +96,7 @@ export interface HeaderSearchProps {
  * same icon and dialog, so a component TYPE slot (that pattern's own
  * reason for existing) isn't needed here - `Header.tsx` just renders
  * this unconditionally, the same as its other two right-group icons. */
-const HeaderSearch = ({ remote, triggerClassName }: HeaderSearchProps = {}) => {
+const HeaderSearch = ({ remote, triggerClassName, size = "lg" }: HeaderSearchProps = {}) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [remoteGroups, setRemoteGroups] = useState<SearchGroup[]>([]);
@@ -215,7 +220,7 @@ const HeaderSearch = ({ remote, triggerClassName }: HeaderSearchProps = {}) => {
       >
         <SearchIcon className="size-5" />
       </Button>
-      <CommandDialog open={open} onOpenChange={onOpenChange} title="Search" description="Search Home">
+      <CommandDialog open={open} onOpenChange={onOpenChange} title="Search" description="Search Home" size={size}>
         {/* command.tsx's own CommandDialog wraps {children} directly in
          * DialogContent, never in cmdk's own <Command> root the way
          * shadcn/ui's stock CommandDialog does - checked live, a
@@ -224,7 +229,7 @@ const HeaderSearch = ({ remote, triggerClassName }: HeaderSearchProps = {}) => {
          * Every caller supplies its own <Command>; this is that one. */}
         <Command filter={filterItem}>
           <CommandInput placeholder="Search..." value={query} onValueChange={setQuery} />
-          <CommandList>
+          <CommandList className={size === "lg" ? "max-h-none min-h-0 flex-1" : undefined}>
             <CommandEmpty>No results found.</CommandEmpty>
             {groups.map((section, index) => (
               // A review caught keying by `section.heading` alone: it's

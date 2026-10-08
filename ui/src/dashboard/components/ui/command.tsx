@@ -39,12 +39,16 @@ function CommandDialog({
   children,
   className,
   showCloseButton = false,
+  size = "default",
   ...props
 }: Omit<React.ComponentProps<typeof Dialog>, "children"> & {
   title?: string
   description?: string
   className?: string
   showCloseButton?: boolean
+  // "lg": a 48rem-wide dialog at a viewport-bound fixed height, centered; the
+  // caller's list scrolls inside. Same dimensions as the elements palette lg.
+  size?: "default" | "lg"
   children: React.ReactNode
 }) {
   return (
@@ -55,7 +59,10 @@ function CommandDialog({
       </DialogHeader>
       <DialogContent
         className={cn(
-          "cn-command-dialog top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0",
+          "cn-command-dialog overflow-hidden rounded-xl! p-0",
+          size === "lg"
+            ? "top-1/2 flex h-[min(36rem,calc(100dvh-4rem))] -translate-y-1/2 flex-col gap-0 sm:max-w-3xl"
+            : "top-1/3 translate-y-0",
           className
         )}
         showCloseButton={showCloseButton}
