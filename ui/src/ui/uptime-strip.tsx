@@ -13,6 +13,7 @@
  */
 import type { ReactNode } from "react";
 import { cn } from "@/kit/utils";
+import { STATUS_TONE_BG } from "./status-colors";
 import {
   Tooltip,
   TooltipContent,
@@ -35,10 +36,10 @@ export type UptimeStripProps = {
 };
 
 const statusColors: Record<UptimeStatus, string> = {
-  up: "bg-[var(--hue-green)]",
-  degraded: "bg-[var(--hue-yellow)]",
-  down: "bg-destructive",
-  maintenance: "bg-primary",
+  up: STATUS_TONE_BG.ok,
+  degraded: STATUS_TONE_BG.warning,
+  down: STATUS_TONE_BG.error,
+  maintenance: STATUS_TONE_BG.maintenance,
   none: "bg-muted",
 };
 

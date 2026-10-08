@@ -1,5 +1,18 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.176] - ui-v0.5.176
+
+### STATUS-COLORS-01 one status palette
+
+Four additive tokens, `--status-ok`, `--status-warning`, `--status-error`
+and `--status-unknown`, one literal value per theme (contrast-checked 3:1
+on page and card). The rail app LED (state-aware through the new optional
+`level` on the `itemStatus` result; absent keeps the old warning color),
+the profile LED, `Status`/`StatusIndicator` and `UptimeStrip` all draw from
+them through `ui/status-colors.ts`, so the same state is the same color on
+every surface. No prop was removed; `--hue-*`, `--destructive` and
+`--tint-attention*` are unchanged for non-status uses.
+
 ## [0.5.175] - ui-v0.5.175
 
 ### SETTINGS-APPEARANCE-01 tokens and profile accent variants

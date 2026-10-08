@@ -12,6 +12,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/ui/tooltip";
 import { cn } from "../../../../lib/utils";
 import { hitArea } from "../../../../../utils";
+import { STATUS_TONE_BG } from "../../../../../ui/status-colors";
 
 export type RailStatusLevel = "online" | "maintenance" | "degraded" | "offline";
 
@@ -51,10 +52,10 @@ export function initials(displayName: string): string {
 }
 
 const STATUS_DOT: Record<RailStatusLevel, string> = {
-  online: "bg-emerald-500",
-  maintenance: "bg-sky-500",
-  degraded: "bg-amber-500",
-  offline: "bg-red-500",
+  online: STATUS_TONE_BG.ok,
+  maintenance: STATUS_TONE_BG.maintenance,
+  degraded: STATUS_TONE_BG.warning,
+  offline: STATUS_TONE_BG.error,
 };
 
 /** What the avatar's status dot says, for its tooltip and accessible name. */

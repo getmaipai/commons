@@ -109,6 +109,14 @@
    * (FACE-02L). */
   --hue-green: #22c55e;
   --hue-yellow: #facc15;
+  /* STATUS-COLORS-01 (2026-10-08): the one status palette. Every LED, badge, strip and
+   * banner (rail Chat LED, profile LED, chat status line, status page) reads these,
+   * never a raw palette class or --hue-*. Literal values, not var() aliases, so a host
+   * that retunes --destructive or --hue-* cannot split the surfaces apart again. */
+  --status-ok: #22c55e;
+  --status-warning: #facc15;
+  --status-error: #ff4b62;
+  --status-unknown: #8da2bd;
   --cat-models: var(--primary);
   --cat-adapters: var(--hue-pink);
   --cat-apps: var(--primary);
@@ -502,6 +510,10 @@
   --hue-teal: #009a76;
   --hue-orange: #d96300;
   --hue-yellow: #b58700;
+  --status-ok: #1a9c48;
+  --status-warning: #b58700;
+  --status-error: #c91f39;
+  --status-unknown: #5b6f8a;
   --primary: #21a6ff;
   /* Dark navy text on the electric blue, not white: ~7.2:1 measured,
    * against white's ~2.6:1 on this lightness of blue. */
@@ -614,6 +626,10 @@
     --hue-teal: #00e3ae;
     --hue-orange: #ff8a35;
     --hue-yellow: #facc15;
+    --status-ok: #22c55e;
+    --status-warning: #facc15;
+    --status-error: #ff4b62;
+    --status-unknown: #8da2bd;
     --primary: #21a6ff;
     --primary-foreground: #07111f;
     --ring: #21a6ff;
@@ -684,6 +700,10 @@
   --hue-teal: #00e3ae;
   --hue-orange: #ff8a35;
   --hue-yellow: #facc15;
+  --status-ok: #22c55e;
+  --status-warning: #facc15;
+  --status-error: #ff4b62;
+  --status-unknown: #8da2bd;
   --primary: #21a6ff;
   --primary-foreground: #07111f;
   --ring: #21a6ff;

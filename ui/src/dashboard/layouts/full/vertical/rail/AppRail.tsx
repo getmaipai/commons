@@ -6,9 +6,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/
 import { cn } from "../../../../lib/utils";
 import { hitArea } from "../../../../../utils";
 import SidebarContent, { type ChildItem } from "../sidebar/sidebaritems";
+import { STATUS_LEVEL_TONE, STATUS_TONE_BG } from "../../../../../ui/status-colors";
+import type { RailStatusLevel } from "./RailProfileMenu";
 import HeaderSearch, { type HeaderSearchProps } from "../header/HeaderSearch";
 
-export type RailItemStatus = (item: { name: string; url?: string }) => { title: string; ariaLabel: string } | undefined;
+export type RailItemStatus = (item: { name: string; url?: string }) => { title: string; ariaLabel: string; level?: RailStatusLevel } | undefined;
 
 export interface AppRailProps {
   /** The host's own search over its records, threaded to the shipped
@@ -64,7 +66,7 @@ function itemLabel(item: ChildItem, status: ReturnType<RailItemStatus>): string 
 }
 
 function StatusMark({ status }: { status: ReturnType<RailItemStatus> }) {
-  return status ? <span aria-hidden className="absolute top-1.5 right-1.5 size-2 rounded-full bg-amber-500 ring-2 ring-[color:var(--app-rail-bg,var(--sidebar))]" /> : null;
+  return status ? <span aria-hidden data-slot="rail-status-mark" data-status-level={status.level ?? "degraded"} className={cn("absolute top-1.5 right-1.5 size-2 rounded-full ring-2 ring-[color:var(--app-rail-bg,var(--sidebar))]", STATUS_TONE_BG[STATUS_LEVEL_TONE[status.level ?? "degraded"]])} /> : null;
 }
 
 function ItemTooltip({ name, status }: { name: string; status: ReturnType<RailItemStatus> }) {

@@ -37,13 +37,13 @@ describe("Status", () => {
     expect(dot.className).not.toContain(" flex ");
   });
 
-  test("uses the attention foreground tint for degraded status", () => {
+  test("uses the status-warning token for degraded status", () => {
     const { container } = render(
       <Status status="degraded">
         <StatusIndicator />
       </Status>,
     );
-    expect(container.querySelector(".animate-ping")?.className).toContain("var(--tint-attention-fg)");
-    expect(container.querySelector("[aria-hidden='true'] > span:last-child")?.className).toContain("var(--tint-attention-fg)");
+    expect(container.querySelector(".animate-ping")?.className).toContain("var(--status-warning)");
+    expect(container.querySelector("[aria-hidden='true'] > span:last-child")?.className).toContain("var(--status-warning)");
   });
 });

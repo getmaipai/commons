@@ -148,10 +148,10 @@ describe("RAIL-01 app rail", () => {
     expect(at("maintenance").dot).toBeNull();
     const degraded = at("degraded");
     expect(degraded.dot?.getAttribute("data-level")).toBe("degraded");
-    expect(degraded.dot?.className).toContain("bg-amber-500");
+    expect(degraded.dot?.className).toContain("--status-warning");
     expect(degraded.dot?.className).toContain("bottom-1");
     const down = at("offline", 3);
-    expect(down.dot?.className).toContain("bg-red-500");
+    expect(down.dot?.className).toContain("--status-error");
     expect(down.badge?.textContent).toBe("3");
     expect(down.label).toBe("Open profile menu for Sage (3 notifications, System: down)");
   });

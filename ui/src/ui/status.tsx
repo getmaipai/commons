@@ -6,11 +6,12 @@
  * - Use kit Badge and cn imports instead of Kibo's component and helper paths.
  * - Replace raw palette colors with the kit's themed hue and semantic tokens.
  * - Keep the upstream ping-dot behavior and status label API.
- * - Add an opt-out for ping animation and use the attention tint for degraded state.
+ * - Add an opt-out for ping animation and use the status-warning token for degraded state.
  */
 import type { ComponentProps, HTMLAttributes } from "react";
 import { Badge } from "@/kit/ui/badge";
 import { cn } from "@/kit/utils";
+import { STATUS_GROUP_BG, STATUS_TONE_BG } from "./status-colors";
 
 export type StatusKind = "online" | "offline" | "maintenance" | "degraded";
 
@@ -19,10 +20,10 @@ export type StatusProps = ComponentProps<typeof Badge> & {
 };
 
 const indicatorColors: Record<StatusKind, string> = {
-  online: "bg-[var(--hue-green)]",
-  offline: "bg-destructive",
-  maintenance: "bg-primary",
-  degraded: "bg-[var(--tint-attention-fg)]",
+  online: STATUS_TONE_BG.ok,
+  offline: STATUS_TONE_BG.error,
+  maintenance: STATUS_TONE_BG.maintenance,
+  degraded: STATUS_TONE_BG.warning,
 };
 
 const statusLabels: Record<StatusKind, string> = {
@@ -70,14 +71,14 @@ function StatusIndicator({ className, status, ping = true, inline = false, ...pr
         <span
           className={cn(
             "absolute inline-flex size-full animate-ping rounded-full opacity-75",
-            colors ?? "group-[.online]:bg-[var(--hue-green)] group-[.offline]:bg-destructive group-[.maintenance]:bg-primary group-[.degraded]:bg-[var(--tint-attention-fg)]",
+            colors ?? STATUS_GROUP_BG,
           )}
         />
       )}
       <span
         className={cn(
           "relative inline-flex size-2 rounded-full",
-          colors ?? "group-[.online]:bg-[var(--hue-green)] group-[.offline]:bg-destructive group-[.maintenance]:bg-primary group-[.degraded]:bg-[var(--tint-attention-fg)]",
+          colors ?? STATUS_GROUP_BG,
         )}
       />
     </span>
