@@ -24,11 +24,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ composerDensity, composerNoticeLayout, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter }: { composerDensity?: "compact"; composerNoticeLayout?: "wrap"; ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter }) {
+function Harness({ composerDensity, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter }: { composerDensity?: "compact"; composerNoticeLayout?: "wrap"; composerNoticeReserve?: boolean; ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter }) {
   const runtime = useLocalRuntime(runAdapter ?? (error ? failingAdapter : adapter));
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={composerDensity || composerNoticeLayout || ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { composerDensity, composerNoticeLayout, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
+      <Thread components={composerDensity || composerNoticeLayout || composerNoticeReserve || ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { composerDensity, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
     </AssistantRuntimeProvider>
   );
 }
@@ -113,6 +113,40 @@ describe("Thread's ComposerNotice slot", () => {
   test("renders nothing when unset", () => {
     render(<Harness />);
     expect(document.querySelector("[data-slot='aui_composer-notice']")).toBeNull();
+  });
+
+  test("composerNoticeReserve keeps a fixed one-line slot, empty or filled, truncating", () => {
+    function Empty() {
+      return null;
+    }
+    const { unmount } = render(<Harness ComposerNotice={Empty} composerNoticeReserve />);
+    const empty = document.querySelector("[data-slot='aui_composer-notice']");
+    expect(empty?.className).toContain("h-6");
+    expect(empty?.className).toContain("truncate");
+    unmount();
+    function Filled() {
+      return <span>Chat is paused.</span>;
+    }
+    render(<Harness ComposerNotice={Filled} composerNoticeReserve />);
+    const filled = document.querySelector("[data-slot='aui_composer-notice']");
+    expect(filled?.className).toContain("h-6");
+    expect(filled?.className).toContain("truncate");
+    expect(filled?.className).not.toContain("whitespace-normal");
+  });
+
+  test("composerNoticeReserve draws the empty slot even with no ComposerNotice component", () => {
+    render(<Harness composerNoticeReserve />);
+    const slot = document.querySelector("[data-slot='aui_composer-notice']");
+    expect(slot).toBeTruthy();
+    expect(slot?.className).toContain("h-6");
+  });
+
+  test("without composerNoticeReserve the slot has no fixed height", () => {
+    function Filled() {
+      return <span>Chat is paused.</span>;
+    }
+    render(<Harness ComposerNotice={Filled} />);
+    expect(document.querySelector("[data-slot='aui_composer-notice']")?.className).not.toContain("h-6");
   });
 });
 

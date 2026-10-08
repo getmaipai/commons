@@ -153,6 +153,7 @@ export type ThreadViewportOptions = Pick<
  * `ComposerNotice`, when set, renders as a muted notice below the composer
  * shell. Its layout defaults to one-line truncation; `composerNoticeLayout:
  * "wrap"` allows a host notice to wrap without truncation.
+ * `composerNoticeReserve` keeps the slot one fixed 24px line, empty or not.
  * `ComposerQueue`, when set, renders in the viewport footer directly
  * above the composer shell - inside the footer (so it sticks and is
  * measured with it), outside the composer's own rounded container.
@@ -241,6 +242,12 @@ export type ThreadComponents = {
   ComposerNotice?: ComponentType | undefined;
   /** Composer notice layout. Defaults to the existing one-line truncation. */
   composerNoticeLayout?: ComposerNoticeLayout | undefined;
+  /** CHAT-COMPOSER-SLOT-01: keep the notice slot one fixed line (24px, the
+   * height of an xs button) always, empty or filled, so the composer's bottom
+   * spacing never changes when a notice appears. Forces single-line
+   * truncation (it overrides `composerNoticeLayout: "wrap"`) and draws the
+   * empty slot even with no `ComposerNotice`. Default off. */
+  composerNoticeReserve?: boolean | undefined;
   /** PROJECTS-KIT-01: the composer's placeholder. Default "Send a message...". */
   composerPlaceholder?: string | undefined;
   /** PROJECTS-KIT-01: drawn under the composer of an empty thread, in place
@@ -905,7 +912,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 );
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerNoticeLayout, composerPlaceholder } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerNoticeLayout, composerNoticeReserve, composerPlaceholder } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
@@ -934,15 +941,17 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
           <ComposerAction />
         </div>
       </ComposerPrimitive.AttachmentDropzone>
-      {ComposerNotice && (
+      {(ComposerNotice || composerNoticeReserve) && (
         <div
           data-slot="aui_composer-notice"
           className={cn(
-            "text-muted-foreground w-full px-2.5 text-xs leading-5",
-            composerNoticeLayout === "wrap" ? "whitespace-normal" : "truncate",
+            "text-muted-foreground w-full px-2.5 text-xs",
+            composerNoticeReserve
+              ? "h-6 truncate leading-6"
+              : cn("leading-5", composerNoticeLayout === "wrap" ? "whitespace-normal" : "truncate"),
           )}
         >
-          <ComposerNotice />
+          {ComposerNotice && <ComposerNotice />}
         </div>
       )}
     </ComposerPrimitive.Root>

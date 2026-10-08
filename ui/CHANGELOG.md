@@ -1,5 +1,15 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.178] - ui-v0.5.178
+
+### CHAT-COMPOSER-SLOT-01 reserved composer notice line
+
+Additive `Thread.components.composerNoticeReserve` (default off): the
+composer notice slot is always one fixed 24px line (the height of an xs
+button), empty or filled, with single-line truncation, so the composer's
+bottom spacing no longer changes when a notice appears. Without it nothing
+changes.
+
 ## [0.5.177] - ui-v0.5.177
 
 ### STATUS-COLORS-01 menu count badge
@@ -8,7 +18,6 @@ The notification count badge in the profile menu was unreadable on hover or
 focus in dark mode: the kit menu item recolors every descendant to
 `accent-foreground` on focus, which is light on the badge's light
 `bg-foreground`. The badge now sets its own text color as important.
-
 
 ## [0.5.176] - ui-v0.5.176
 
