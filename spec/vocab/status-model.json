@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "$comment": "STATUS-MODEL-01: one status model so Home, the robot and Go render the same colors and words. Owner decisions 2026-10-08: wording lives here first (tagged), paused and down are two states, search limited is its own amber state, every service uses the same model with {service} filled from one template, the composer line is long, and a child sees nothing on the profile menu while something is wrong. Additive: nothing here replaces an existing field. Copy has no em dashes. {service} is the display name the caller passes (default Chat). Rendering code lives in status/ts/statusModel.ts; a runtime without it reads this file and fixtures/status-model/*.json.",
+  "severity_note": "Higher number is worse. The worst state wins a roll-up. unknown is 0 so it never outranks a known state.",
+  "states": [
+    { "state": "running", "severity": 1, "sticky": false, "tone": "ok", "problem": false },
+    { "state": "starting", "severity": 4, "sticky": false, "tone": "info", "problem": true },
+    { "state": "paused", "severity": 5, "sticky": false, "tone": "warn", "problem": true },
+    { "state": "down", "severity": 7, "sticky": true, "tone": "error", "problem": true },
+    { "state": "limited", "severity": 3, "sticky": true, "tone": "warn", "problem": true },
+    { "state": "search_limited", "severity": 2, "sticky": false, "tone": "warn", "problem": true },
+    { "state": "waiting_internet", "severity": 6, "sticky": false, "tone": "warn", "problem": true },
+    { "state": "unknown", "severity": 0, "sticky": false, "tone": "none", "problem": false }
+  ],
+  "sticky_note": "sticky: stays until a person or the cause is fixed. Not sticky: clears by itself. paused is inside the recovery window; the backend reports the same cause as engine_failed after it, which is down.",
+  "tones": ["ok", "info", "warn", "error", "none"],
+  "tone_colors": {
+    "ok": "green",
+    "info": "blue",
+    "warn": "amber",
+    "error": "red",
+    "none": "none"
+  },
+  "causes": [
+    { "cause": "engine_stopped", "state": "paused" },
+    { "cause": "engine_loading", "state": "starting" },
+    { "cause": "engine_failed", "state": "down" },
+    { "cause": "engine_computer_disconnected", "state": "paused" },
+    { "cause": "engine_computer_slow", "state": "limited" },
+    { "cause": "memory_low", "state": "limited" },
+    { "cause": "search_limited", "state": "search_limited" },
+    { "cause": "internet_missing", "state": "waiting_internet" },
+    { "cause": "optional_part_down", "state": "limited" },
+    { "cause": "library_starting", "state": "starting" }
+  ],
+  "cause_note": "Structured, never parsed from prose. Each cause maps to exactly one state. A service takes the state of its worst cause; a tie keeps the cause listed first here.",
+  "audiences": ["adult", "teen", "child", "admin"],
+  "lengths": ["short", "medium", "long"],
+  "default_service": "Chat",
+  "repairs": {
+    "label": "Open Repairs",
+    "states": ["paused", "down"],
+    "lengths": ["medium", "long"],
+    "audiences": ["admin"]
+  },
+  "surfaces": {
+    "rail_led": { "length": "short", "summary": false, "hidden_from_child": false },
+    "rail_tooltip": { "length": "medium", "summary": false, "hidden_from_child": false },
+    "composer_line": { "length": "long", "summary": false, "hidden_from_child": false },
+    "app_header": { "length": "medium", "summary": false, "hidden_from_child": false },
+    "status_page_badge": { "length": "short", "summary": false, "hidden_from_child": false },
+    "status_page_details": { "length": "long", "summary": false, "hidden_from_child": false },
+    "incident_banner": { "length": "long", "summary": false, "hidden_from_child": false },
+    "status_page_header": { "length": "medium", "summary": true, "hidden_from_child": false },
+    "header_pill": { "length": "short", "summary": true, "hidden_from_child": false },
+    "profile_row": { "length": "short", "summary": true, "hidden_from_child": true },
+    "profile_led": { "length": "short", "summary": true, "hidden_from_child": true },
+    "profile_hover": { "length": "long", "summary": true, "hidden_from_child": true }
+  },
+  "surface_note": "length picks the copy. summary true: the surface takes every status, colors from the worst severity and names the affected services in one sentence. summary false: it shows only its own service and never rolls up. hidden_from_child true: a child sees nothing there while any service has a problem.",
+  "summary": {
+    "collapse_at": 4,
+    "collapse_lengths": ["short", "medium"],
+    "collapse_text": "{count} services need attention",
+    "mixed_text": "{names} need attention",
+    "all_clear": {
+      "short": "Everything is working",
+      "medium": "Everything is working.",
+      "long": "All services are working normally."
+    },
+    "predicates": {
+      "starting": { "one": "is starting", "many": "are starting" },
+      "paused": { "one": "is paused", "many": "are paused" },
+      "down": { "one": "is down", "many": "are down" },
+      "limited": { "one": "is limited", "many": "are limited" },
+      "search_limited": { "one": "has limited search", "many": "have limited search" },
+      "waiting_internet": { "one": "is waiting for the internet", "many": "are waiting for the internet" }
+    },
+    "note": "Affected means any state with problem true. Names sort by severity (worst first), then by code unit order, so every runtime builds the same sentence. One affected state: '<names> <predicate>'. Mixed states at short or medium: '<names> need attention'. Mixed states at long: one clause per state, worst first, joined with '; '. Four or more affected: short and medium use the collapse text; long lists. Medium and long end with a period, short does not."
+  },
+  "copy": {
+    "adult": {
+      "running": { "short": "{service} is working", "medium": "{service} is working.", "long": "{service} is working normally." },
+      "starting": { "short": "{service} is starting", "medium": "Starting up. You can send in a moment.", "long": "{service} is starting up. Your message stays here; you can send in a moment." },
+      "paused": { "short": "{service} paused", "medium": "{service} is paused. Your message stays here.", "long": "{service} is paused. Your message stays here; press Send once it is back. It should come back on its own." },
+      "down": { "short": "{service} is down", "medium": "{service} is down. Your message stays here.", "long": "{service} is down and will not come back by itself. Your message stays here; press Send once it is fixed." },
+      "search_limited": { "short": "Search is limited", "medium": "Searches may be limited right now.", "long": "{service} works, but searches may be limited for a while. Answers may use less up-to-date information." },
+      "limited": { "short": "{service} is limited", "medium": "Some {service} features may be limited.", "long": "{service} works, but some features are not available right now." },
+      "waiting_internet": { "short": "Waiting for internet", "medium": "{service} is waiting for the internet.", "long": "{service} needs the internet and cannot reach it. It will go on when the connection is back." },
+      "unknown": { "short": null, "medium": null, "long": null }
+    },
+    "teen": {
+      "running": { "short": "{service} is working", "medium": "{service} is working.", "long": "{service} is working normally." },
+      "starting": { "short": "{service} is starting", "medium": "Starting up. You can send in a moment.", "long": "{service} is starting up right now. Your message stays here; you can send in a moment." },
+      "paused": { "short": "{service} paused", "medium": "{service} is paused. Your message stays here.", "long": "{service} is paused right now. Your message stays here; press Send once it is back. It should come back on its own." },
+      "down": { "short": "{service} is down", "medium": "{service} is down. Your message stays here.", "long": "{service} is down right now and will not come back by itself. Your message stays here; press Send once it is fixed." },
+      "search_limited": { "short": "Search is limited", "medium": "Searches may be limited right now.", "long": "{service} works, but searches may be limited right now. Answers may use less up-to-date information." },
+      "limited": { "short": "{service} is limited", "medium": "Some {service} features may be limited.", "long": "{service} works, but some features are not available right now." },
+      "waiting_internet": { "short": "Waiting for internet", "medium": "{service} is waiting for the internet.", "long": "{service} needs the internet and cannot reach it right now. It will go on when the connection is back." },
+      "unknown": { "short": null, "medium": null, "long": null }
+    },
+    "child": {
+      "running": { "all": "I'm ready to chat." },
+      "starting": { "all": "I'm waking up. Send that in a moment." },
+      "paused": { "all": "I'm taking a break. Ask a grown-up, or try again soon." },
+      "down": { "all": "I can't talk right now. Please tell a grown-up." },
+      "search_limited": { "all": "Searches may be limited right now." },
+      "limited": { "all": "Some things may not work right now." },
+      "waiting_internet": { "all": "I'm waiting for the internet. Try again soon." },
+      "unknown": { "all": null }
+    },
+    "admin_note": "admin reads the adult wording and adds the Repairs link text (see repairs) for paused and down at medium and long."
+  }
+}
