@@ -63,3 +63,19 @@ describe("KIT-SET-04 homeSettings row", () => {
     expect(changes).toEqual([true]);
   });
 });
+
+describe("STATUS-COLORS-01 menu count badge", () => {
+  // Owner bug: hovering a menu row focuses it, and the kit item's
+  // `focus:**:text-accent-foreground` recolors every descendant, so the
+  // count badge (bg-foreground) got accent-foreground text: light on light
+  // in dark mode. The badge's own text color must win over that rule.
+  test.each([
+    [false, "bg-foreground", "text-background!"],
+    [true, "bg-destructive", "text-white!"],
+  ])("count badge (urgent %p) keeps its own text color through item focus", async (urgent, bg, text) => {
+    const view = await openMenu({ notifications: { count: 22, urgent, onOpen: () => {} } });
+    const badge = view.getByRole("menuitem", { name: /Notifications/ }).querySelector("[data-slot='rail-profile-menu-badge']");
+    expect(badge?.className).toContain(bg);
+    expect(badge?.className.split(" ")).toContain(text);
+  });
+});

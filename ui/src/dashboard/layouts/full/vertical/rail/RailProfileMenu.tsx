@@ -93,6 +93,10 @@ export default function RailProfileMenu({
   // A count is red only when something urgent waits (CHAT-CALM-ERRORS-01d);
   // anything else gets a neutral count.
   const countTone = notifications?.urgent ? "bg-destructive text-white" : "bg-foreground text-background";
+  // Inside a menu row the kit item recolors every descendant on focus
+  // (`focus:**:text-accent-foreground`), which put light text on this light
+  // badge in dark mode. Important keeps the badge's own pair readable.
+  const menuCountTone = notifications?.urgent ? "bg-destructive text-white!" : "bg-foreground text-background!";
   const reasons = [
     notifications && notifications.count > 0 ? `${notifications.count} notification${notifications.count === 1 ? "" : "s"}` : null,
     systemLine,
@@ -170,7 +174,7 @@ export default function RailProfileMenu({
               <Bell aria-hidden />
               <span className="flex-1">Notifications</span>
               {notifications.count > 0 ? (
-                <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-medium", countTone)}>{notifications.count}</span>
+                <span data-slot="rail-profile-menu-badge" className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-medium", menuCountTone)}>{notifications.count}</span>
               ) : (
                 <span className="text-[13px] text-muted-foreground">None</span>
               )}
