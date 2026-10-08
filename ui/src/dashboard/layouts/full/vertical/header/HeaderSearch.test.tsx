@@ -17,10 +17,10 @@ function LocationProbe() {
   return <span data-testid="location">{location.pathname}</span>;
 }
 
-function Harness({ remote }: { remote?: (query: string) => Promise<SearchGroup[]> } = {}) {
+function Harness({ remote, size }: { remote?: (query: string) => Promise<SearchGroup[]>; size?: "default" | "lg" } = {}) {
   return (
     <MemoryRouter initialEntries={["/next"]}>
-      <HeaderSearch remote={remote} />
+      <HeaderSearch remote={remote} size={size} />
       <Routes>
         <Route path="*" element={<LocationProbe />} />
       </Routes>
@@ -69,6 +69,35 @@ describe("HeaderSearch (SHELL-SEARCH-01)", () => {
     expect(queryByPlaceholderText("Search...")).toBeNull();
     fireEvent.keyDown(document, { key: "k", ctrlKey: true });
     expect(getByPlaceholderText("Search...")).not.toBeNull();
+  });
+});
+
+describe("HeaderSearch (SEARCH-MODAL-SIZE-02): the size prop", () => {
+  function open(size?: "default" | "lg") {
+    const view = render(<Harness size={size} />);
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    const dialog = document.querySelector('[data-slot="dialog-content"]')?.getAttribute("class") ?? "";
+    const list = document.querySelector('[data-slot="command-list"]')?.getAttribute("class") ?? "";
+    return { dialog, list };
+  }
+
+  test("is lg by default: a 48rem dialog at a viewport-bound height, the list scrolling inside", () => {
+    const { dialog, list } = open();
+    expect(dialog).toContain("max-w-[calc(100%-2rem)]");
+    expect(dialog).toContain("sm:max-w-3xl");
+    expect(dialog).not.toContain("sm:max-w-sm");
+    expect(dialog).toContain("h-[min(36rem,calc(100dvh-4rem))]");
+    expect(list).toContain("min-h-0");
+    expect(list).toContain("flex-1");
+    expect(list).toContain("overflow-y-auto");
+    expect(list).not.toContain("max-h-72");
+  });
+
+  test('size="default" keeps the small dialog and capped list', () => {
+    const { dialog, list } = open("default");
+    expect(dialog).not.toContain("sm:max-w-3xl");
+    expect(dialog).not.toContain("100dvh");
+    expect(list).toContain("max-h-72");
   });
 });
 

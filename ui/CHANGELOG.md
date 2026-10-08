@@ -1,5 +1,18 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.180] - ui-v0.5.180
+
+### SEARCH-MODAL-SIZE-02 large header search dialog
+
+Additive `size?: "default" | "lg"` on `HeaderSearch` and on the dashboard
+`CommandDialog` (`dashboard/components/ui/command.tsx`, the one `HeaderSearch`
+is built on; not `ui/src/ui/command.tsx`). `lg` matches the 0.5.179 palette:
+48rem wide, 36rem tall, centered, both capped to the viewport (`100dvh - 4rem`),
+full width minus 2rem gutters on phones, the result list scrolling inside.
+`HeaderSearch` defaults to `lg` (its only consumers, `Header` and `AppRail`,
+open the same dialog); pass `size="default"` for the earlier small dialog.
+`CommandDialog` itself is unchanged unless `size="lg"` is passed.
+
 ## [0.5.179] - ui-v0.5.179
 
 ### SEARCH-MODAL-SIZE-01 large command palette dialog
