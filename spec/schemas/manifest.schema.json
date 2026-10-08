@@ -239,6 +239,12 @@
       "items": { "type": "string" },
       "description": "Capabilities that add behavior but are not required."
     },
+    "returns_blocks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "answer-block.schema.json#/$defs/kind" },
+      "description": "GENUI-01: the answer-block kinds this package may return on `PluginResult.blocks`, so the host and the store card know what it can emit. Optional; absent means none. The host drops a returned block whose kind is not listed."
+    },
     "platforms": {
       "type": "array",
       "items": { "type": "string", "enum": ["home", "bot", "web"] },

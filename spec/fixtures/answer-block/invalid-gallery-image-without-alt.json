@@ -1,0 +1,30 @@
+{
+  "id": "blk-g8h9i0",
+  "kind": "image_gallery",
+  "schema_version": 1,
+  "producer": "images",
+  "alt": "Two photos of the Golden Gate Bridge at sunset.",
+  "provenance": "images call turn-k3m9x2:call0",
+  "created_at": "2026-10-08T14:03:11Z",
+  "hlc": "1791468191000:0:hub001",
+  "props": {
+    "images": [
+      {
+        "id": "p1",
+        "src": "hubimg-4f2a9c01",
+        "caption": "Seen from Marin",
+        "source": {
+          "label": "Wikimedia Commons",
+          "url": "https://commons.wikimedia.org/wiki/File:Golden_Gate.jpg"
+        }
+      },
+      {
+        "id": "p2",
+        "src": "hubimg-77b0e3d2",
+        "alt": "Fog rolling under the bridge"
+      }
+    ],
+    "maxVisible": 4
+  },
+  "min_band": "child"
+}

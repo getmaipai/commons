@@ -285,6 +285,32 @@ export const PackageManifest = z
       .array(z.string())
       .describe("Capabilities that add behavior but are not required.")
       .optional(),
+    /**GENUI-01: the answer-block kinds this package may return on `PluginResult.blocks`, so the host and the store card know what it can emit. Optional; absent means none. The host drops a returned block whose kind is not listed.*/
+    returns_blocks: z
+      .array(
+        z
+          .enum([
+            "spec_sheet",
+            "data_table",
+            "chart",
+            "timeline",
+            "todo_list",
+            "image_gallery",
+            "schedule_card",
+            "comparison",
+          ])
+          .describe(
+            "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here.",
+          ),
+      )
+      .refine(
+        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+        "All items must be unique!",
+      )
+      .describe(
+        "GENUI-01: the answer-block kinds this package may return on `PluginResult.blocks`, so the host and the store card know what it can emit. Optional; absent means none. The host drops a returned block whose kind is not listed.",
+      )
+      .optional(),
     platforms: z.array(z.enum(["home", "bot", "web"])).min(1),
     /**The floor role a person needs to invoke this package.*/
     min_role: z

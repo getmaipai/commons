@@ -1,0 +1,29 @@
+{
+  "id": "blk-s2c3h4",
+  "kind": "schedule_card",
+  "schema_version": 1,
+  "producer": "scheduler",
+  "alt": "The weekly backup runs every Sunday at 2 am and last ran fine.",
+  "provenance": "scheduler call turn-k3m9x2:call0",
+  "created_at": "2026-10-08T14:03:11Z",
+  "hlc": "1791468191000:0:hub001",
+  "props": {
+    "name": "Weekly backup",
+    "cadence": "Every Sunday at 2:00",
+    "nextRun": "Sun 2:00",
+    "enabled": true,
+    "history": [
+      {
+        "id": "r1",
+        "at": "Sun 2:00",
+        "ok": true
+      },
+      {
+        "id": "r2",
+        "at": "Sun 2:00",
+        "ok": false
+      }
+    ]
+  },
+  "min_band": "teen"
+}

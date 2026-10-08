@@ -7,7 +7,13 @@ from typing import Any, Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
 
-from . import reply_plan_schema, result_schema, subject_ref_schema, turn_signal_schema
+from . import (
+    answer_block_schema,
+    reply_plan_schema,
+    result_schema,
+    subject_ref_schema,
+    turn_signal_schema,
+)
 
 
 class SpeakerEvidence(BaseModel):
@@ -129,6 +135,20 @@ class ConversationTurn(BaseModel):
     notice_ids: list[constr(min_length=1)] | None = Field(
         ...,
         description='AGE-02 (dev.md section 13 part 4, the outside review reconciled): the notification ids this turn raised, so a dedupe check and an audit trail both read the turn record rather than a separate index. Null until AGE-02.',
+    )
+    blocks: list[
+        answer_block_schema.SpecSheet
+        | answer_block_schema.DataTable
+        | answer_block_schema.Chart
+        | answer_block_schema.Timeline
+        | answer_block_schema.TodoList
+        | answer_block_schema.ImageGallery
+        | answer_block_schema.ScheduleCard
+        | answer_block_schema.Comparison
+    ] = Field(
+        [],
+        description="GENUI-01: the answer blocks this turn showed, in tool-call order, as the hub validated and floored them. Optional and additive: an older record has none. Each block carries its own id, provenance and clock stamp. A screenless body stores them and speaks the prose (and each block's `alt` when no prose covers it).",
+        validate_default=True,
     )
     speaker_evidence: SpeakerEvidence | None = Field(
         ...,

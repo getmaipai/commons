@@ -1,0 +1,33 @@
+{
+  "id": "blk-t1m2e3",
+  "kind": "timeline",
+  "schema_version": 1,
+  "producer": "parcels",
+  "alt": "The parcel left the depot at 9 am and is due this afternoon.",
+  "provenance": "parcels call turn-k3m9x2:call0",
+  "created_at": "2026-10-08T14:03:11Z",
+  "hlc": "1791468191000:0:hub001",
+  "props": {
+    "events": [
+      {
+        "id": "e1",
+        "when": "past",
+        "time": "Mon 9:00",
+        "title": "Left the depot",
+        "detail": "Leeds"
+      },
+      {
+        "id": "e2",
+        "when": "now",
+        "time": "Tue 11:30",
+        "title": "Out for delivery"
+      },
+      {
+        "id": "e3",
+        "when": "future",
+        "time": "Tue 15:00",
+        "title": "Due at the door"
+      }
+    ]
+  }
+}

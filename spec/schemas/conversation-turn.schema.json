@@ -103,6 +103,12 @@
       "default": null,
       "description": "AGE-02 (dev.md section 13 part 4, the outside review reconciled): the notification ids this turn raised, so a dedupe check and an audit trail both read the turn record rather than a separate index. Null until AGE-02."
     },
+    "blocks": {
+      "type": "array",
+      "items": { "$ref": "answer-block.schema.json" },
+      "default": [],
+      "description": "GENUI-01: the answer blocks this turn showed, in tool-call order, as the hub validated and floored them. Optional and additive: an older record has none. Each block carries its own id, provenance and clock stamp. A screenless body stores them and speaks the prose (and each block's `alt` when no prose covers it)."
+    },
     "speaker_evidence": {
       "type": ["object", "null"], "default": null,
       "description": "What the body knows about who is speaking is evidence, typed on the turn.",

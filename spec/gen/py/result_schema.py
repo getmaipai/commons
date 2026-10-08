@@ -7,6 +7,8 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from . import answer_block_schema
+
 
 class Reply(BaseModel):
     model_config = ConfigDict(
@@ -70,6 +72,20 @@ class PluginResult(BaseModel):
     )
     end_conversation: bool | None = None
     article: dict[str, Any] | None = None
+    blocks: list[
+        answer_block_schema.SpecSheet
+        | answer_block_schema.DataTable
+        | answer_block_schema.Chart
+        | answer_block_schema.Timeline
+        | answer_block_schema.TodoList
+        | answer_block_schema.ImageGallery
+        | answer_block_schema.ScheduleCard
+        | answer_block_schema.Comparison
+    ] = Field(
+        [],
+        description='GENUI-01: typed answer blocks this call returns, in display order. Optional and additive. The hub validates each one, applies the output floor, drops an invalid one, and streams the rest as `block` events. A package may only return kinds its manifest lists in `returns_blocks`.',
+        validate_default=True,
+    )
     error: Error | None = Field(
         None,
         description="Fix B (docs/dev.md's 'Chat reliability: the 2026-09-07 incident' note): a handler's own typed report that it could not answer (an upstream fetch failure, say) - never present alongside `reply`. Distinct from a thrown exception (which the Tier 1 host maps to a strike and the manifest's fallback_reply already): this is a report of an EXPECTED failure mode a handler catches itself, so the caller can answer with the household-facing fallback without treating the package's own sandbox as unhealthy.",

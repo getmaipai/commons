@@ -1,0 +1,73 @@
+{
+  "id": "blk-d4e5f6",
+  "kind": "data_table",
+  "schema_version": 1,
+  "producer": "recipes",
+  "alt": "Three dishes with prep time and cost; the lasagne costs the most.",
+  "provenance": "recipes call turn-k3m9x2:call0",
+  "created_at": "2026-10-08T14:03:11Z",
+  "hlc": "1791468191000:0:hub001",
+  "props": {
+    "columns": [
+      {
+        "id": "dish",
+        "header": "Dish",
+        "sortable": true
+      },
+      {
+        "id": "minutes",
+        "header": "Prep",
+        "align": "end",
+        "format": {
+          "kind": "currency"
+        }
+      },
+      {
+        "id": "cost",
+        "header": "Cost",
+        "align": "end",
+        "format": {
+          "kind": "currency",
+          "currency": "USD",
+          "decimals": 2
+        }
+      },
+      {
+        "id": "vegetarian",
+        "header": "Veg",
+        "format": {
+          "kind": "boolean",
+          "trueLabel": "Yes",
+          "falseLabel": "No"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "dish": "Lasagne",
+        "minutes": 75,
+        "cost": 14.5,
+        "vegetarian": false
+      },
+      {
+        "dish": "Chana masala",
+        "minutes": 40,
+        "cost": 6.25,
+        "vegetarian": true
+      },
+      {
+        "dish": "Shakshuka",
+        "minutes": 25,
+        "cost": 5,
+        "vegetarian": true
+      }
+    ],
+    "caption": "Dinner options",
+    "sort": {
+      "columnId": "minutes",
+      "direction": "asc"
+    },
+    "emptyLabel": "No dishes",
+    "locale": "en-US"
+  }
+}

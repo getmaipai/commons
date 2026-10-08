@@ -1,0 +1,29 @@
+{
+  "id": "blk-a1b2c3",
+  "kind": "spec_sheet",
+  "schema_version": 1,
+  "producer": "products",
+  "alt": "Pixel 9 specifications: 6.3 inch display, 12 GB memory, 4700 mAh battery.",
+  "provenance": "products call turn-k3m9x2:call0",
+  "created_at": "2026-10-08T14:03:11Z",
+  "hlc": "1791468191000:0:hub001",
+  "props": {
+    "title": "Pixel 9",
+    "subtitle": "Phone",
+    "rows": [
+      {
+        "label": "Display",
+        "value": "6.3 in OLED",
+        "emphasis": true
+      },
+      {
+        "label": "Memory",
+        "value": "12 GB"
+      },
+      {
+        "label": "Battery",
+        "value": "4700 mAh"
+      }
+    ]
+  }
+}

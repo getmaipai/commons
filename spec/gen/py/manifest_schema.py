@@ -453,6 +453,24 @@ class PackageManifest(BaseModel):
     optional: list[str] | None = Field(
         None, description='Capabilities that add behavior but are not required.'
     )
+    returns_blocks: (
+        list[
+            Literal[
+                'spec_sheet',
+                'data_table',
+                'chart',
+                'timeline',
+                'todo_list',
+                'image_gallery',
+                'schedule_card',
+                'comparison',
+            ]
+        ]
+        | None
+    ) = Field(
+        None,
+        description='GENUI-01: the answer-block kinds this package may return on `PluginResult.blocks`, so the host and the store card know what it can emit. Optional; absent means none. The host drops a returned block whose kind is not listed.',
+    )
     platforms: list[Literal['home', 'bot', 'web']] = Field(..., min_length=1)
     min_role: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] = Field(
         ..., description='The floor role a person needs to invoke this package.'

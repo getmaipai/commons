@@ -1,0 +1,86 @@
+{
+  "id": "energy-report",
+  "version": "0.1.0",
+  "kind": "plugin",
+  "category": "Family",
+  "display": "Energy report",
+  "description": "Shows household electricity use as a chart and a table.",
+  "author": "MaiPai",
+  "license": "AGPL-3.0",
+  "homepage": "https://github.com/getmaipai/catalog",
+  "routing": {
+    "examples": [
+      "remind Riff to go to bed at 9",
+      "set a bedtime reminder for Sprout at 8:30",
+      "bedtime reminder for the kids at 8",
+      "tell me when it's bedtime",
+      "wake, remind Riff about bedtime at nine"
+    ],
+    "patterns": [
+      "bedtime reminder",
+      "remind * to go to bed"
+    ]
+  },
+  "args": {
+    "type": "object",
+    "required": [
+      "person",
+      "time"
+    ],
+    "properties": {
+      "person": {
+        "type": "string"
+      },
+      "time": {
+        "type": "string"
+      }
+    }
+  },
+  "incognito": "unaffected",
+  "requires": [],
+  "optional": [
+    "speaker"
+  ],
+  "platforms": [
+    "home",
+    "bot"
+  ],
+  "min_role": "child",
+  "consequential": false,
+  "offline": "full",
+  "config": [],
+  "data_sources": [],
+  "permissions": [
+    "schedule",
+    "speak"
+  ],
+  "notifications": [
+    {
+      "id": "safety.alarm",
+      "level": "immediate",
+      "audience": "household",
+      "template": "Safety alarm: {kind} in {area}.",
+      "configurable": false,
+      "privacy": true,
+      "default_channels": [
+        "in_app",
+        "robot"
+      ],
+      "actions": [
+        "acknowledge",
+        "quiet_here",
+        "false_alarm"
+      ]
+    }
+  ],
+  "backup": "hot",
+  "background": false,
+  "contributes": {},
+  "min_app": "0.1.0",
+  "tier": 0,
+  "quality_scale": "bronze",
+  "returns_blocks": [
+    "chart",
+    "data_table"
+  ]
+}

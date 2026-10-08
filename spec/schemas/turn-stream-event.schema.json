@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/turn-stream-event.schema.json",
   "title": "TurnStreamEvent",
-  "description": "A turn-stream wire event: one line of the NDJSON stream a /stream turn emits. `tool_call`, `tool_result` and `tool_error` are the tool shapes (TOOL-EVENTS-01, plus `tool_result.outcome.sites` from TOOL-EVENTS-02: the sites a search step actually read, at most five, the same list that becomes the reply's own sources); the remaining union members (`turn_meta`, `signal`, `delta`, `reasoning`, `spoken_cue`, `done`, `error`) are defined by the home backend and not this schema - this schema covers only the tool-event shapes the spec must name.",
+  "description": "A turn-stream wire event: one line of the NDJSON stream a /stream turn emits. `tool_call`, `tool_result` and `tool_error` are the tool shapes (TOOL-EVENTS-01, plus `tool_result.outcome.sites` from TOOL-EVENTS-02: the sites a search step actually read, at most five, the same list that becomes the reply's own sources); `block` (GENUI-01, additive: one answer block per event); the remaining union members (`turn_meta`, `signal`, `delta`, `reasoning`, `spoken_cue`, `done`, `error`) are defined by the home backend and not this schema - this schema covers only the tool-event shapes the spec must name.",
   "oneOf": [
     {
       "type": "object",
@@ -45,6 +45,17 @@
         }
       },
       "required": ["t", "call_id", "package_id", "outcome"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "description": "GENUI-01: one validated, floored answer block, emitted as soon as the call's tool result lands, so the visual can appear before or while the prose streams.",
+      "properties": {
+        "t": { "const": "block" },
+        "call_id": { "type": "string", "minLength": 1 },
+        "block": { "$ref": "answer-block.schema.json" }
+      },
+      "required": ["t", "call_id", "block"],
       "additionalProperties": false
     },
     {

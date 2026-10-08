@@ -41,6 +41,8 @@ disclosure default and CRED-01's confidence weights, one list), and
 sub-kinds, and REVIEW-01's own review-only codes, declared once).
 Additive only: every existing fixture still validates unchanged.
 
+Added 2026-10-08 (GENUI-01): **AnswerBlock**, one typed part of an answer (`spec_sheet`, `data_table`, `chart`, `timeline`, `todo_list`, `image_gallery`, `schedule_card`, `comparison`), defined once so the hub, the web kit, Go and the robot render the same record. A block's `props` mirror the kit Element of the same name (the Element's own camelCase prop names; render-only props are left out), and every block carries `alt` as its text fallback. Additive only: `PluginResult.blocks`, the `block` turn-stream event, `blocks` on the stored turn and `returns_blocks` on the manifest are all optional.
+
 The error catalogue's *shape* (`ErrorEntry`) and the privacy row shape
 (`PrivacyRow`, used by the manifest's `data_sources[]`) are owned by
 `@maipai/standards` (std-v0.2.0) and imported by `$ref`, not defined here;

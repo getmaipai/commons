@@ -30,6 +30,7 @@ from gen.py.open_question_schema import OpenQuestion
 from gen.py.person_schema import Person
 from gen.py.project_schema import ProjectPlan
 from gen.py.relationship_schema import Relationship
+from gen.py.result_schema import PluginResult
 from gen.py.reply_constraint_schema import ReplyConstraint
 from gen.py.reply_feedback_schema import ReplyFeedback
 from gen.py.reply_plan_schema import ReplyPlan
@@ -650,3 +651,47 @@ def test_model_capabilities_rejects_unknown_thinking_mode():
     }
     with pytest.raises(ValidationError):
         ModelCapabilities.model_validate(bad)
+
+
+# GENUI-01: AnswerBlock fixtures and the additive fields that carry blocks.
+ANSWER_BLOCK_DIR = FIXTURES_DIR.parent / "answer-block"
+V1_KINDS = [
+    "spec_sheet", "data_table", "chart", "timeline",
+    "todo_list", "image_gallery", "schedule_card", "comparison",
+]
+
+
+def _answer_block_fixtures(prefix: str) -> list[Path]:
+    return sorted(ANSWER_BLOCK_DIR.glob(f"{prefix}-*.json"))
+
+
+def test_answer_block_has_a_valid_fixture_per_v1_kind():
+    names = {p.name for p in _answer_block_fixtures("valid")}
+    assert names == {f"valid-{k}.json" for k in V1_KINDS}
+
+
+@pytest.mark.parametrize("path", _answer_block_fixtures("valid"), ids=lambda p: p.name)
+def test_answer_block_valid_fixture(path):
+    PluginResult.model_validate({"blocks": [json.loads(path.read_text())]})
+
+
+@pytest.mark.parametrize("path", _answer_block_fixtures("invalid"), ids=lambda p: p.name)
+def test_answer_block_invalid_fixture(path):
+    with pytest.raises(ValidationError):
+        PluginResult.model_validate({"blocks": [json.loads(path.read_text())]})
+
+
+def test_blocks_are_optional_and_additive():
+    assert PluginResult.model_validate({"reply": {"text": "hi"}}).blocks == []
+    PluginResult.model_validate(load_fixture("plugin-result.blocks.example.json"))
+    turn = load_fixture("conversation-turn.blocks.example.json")
+    assert len(ConversationTurn.model_validate(turn).blocks) == 2
+    older = {k: v for k, v in turn.items() if k != "blocks"}
+    assert ConversationTurn.model_validate(older).blocks == []
+
+
+def test_manifest_returns_blocks():
+    manifest = load_fixture("manifest.returns-blocks.example.json")
+    assert PackageManifest.model_validate(manifest).returns_blocks == ["chart", "data_table"]
+    with pytest.raises(ValidationError):
+        PackageManifest.model_validate({**manifest, "returns_blocks": ["hologram"]})

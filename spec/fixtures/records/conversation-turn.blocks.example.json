@@ -1,0 +1,165 @@
+{
+  "id": "turn-k3m9x2",
+  "conversation_id": "conv-d4e5f6",
+  "parent_turn_id": null,
+  "branch_chosen": true,
+  "person": "person-a1b2c3",
+  "surface": "chat",
+  "user_text": "I got the job!",
+  "reply_text": "Your electricity use fell 8 percent this week, mostly on the weekend.",
+  "source": "model",
+  "signal": {
+    "primary_act": "inform",
+    "secondary_acts": [],
+    "expressed_emotion": "happiness",
+    "emotion_intensity": "moderate",
+    "target": "self",
+    "repair": "none",
+    "refers_to_prior": null,
+    "clauses": [
+      {
+        "range": {
+          "start": 0,
+          "end": 15
+        },
+        "act": "inform",
+        "stance": "asserted",
+        "subject": {
+          "kind": "speaker"
+        },
+        "emotion": "happiness",
+        "emotion_intensity": "moderate",
+        "confidence": 0.93
+      }
+    ],
+    "act_confidence": 0.91,
+    "emotion_confidence": 0.88,
+    "source": "rule",
+    "classifier_id": null,
+    "age_band": "adult",
+    "age_band_basis": "identified_profile"
+  },
+  "plan": null,
+  "subjects": null,
+  "outcomes": null,
+  "document": null,
+  "review_id": null,
+  "notice_ids": null,
+  "speaker_evidence": {
+    "person": "person-a1b2c3",
+    "basis": "voice",
+    "level": "confirmed"
+  },
+  "present": [
+    {
+      "person": "person-a1b2c3",
+      "basis": "voice",
+      "level": "confirmed"
+    }
+  ],
+  "created_at": "2026-09-14T10:00:00Z",
+  "hlc": "1757836800000:0:a1b2c3",
+  "blocks": [
+    {
+      "id": "blk-c7d8e9",
+      "kind": "chart",
+      "schema_version": 1,
+      "producer": "energy",
+      "alt": "Electricity use fell 8 percent over the last seven days.",
+      "provenance": "energy call turn-k3m9x2:call0",
+      "created_at": "2026-10-08T14:03:11Z",
+      "hlc": "1791468191000:0:hub001",
+      "props": {
+        "label": "Electricity, kWh per day",
+        "value": "12.4 kWh",
+        "delta": "-8%",
+        "points": [
+          14,
+          13.2,
+          13.8,
+          12.9,
+          12.6,
+          12.1,
+          12.4
+        ],
+        "variant": "area",
+        "trend": "down",
+        "upIsGood": false
+      }
+    },
+    {
+      "id": "blk-d4e5f6",
+      "kind": "data_table",
+      "schema_version": 1,
+      "producer": "recipes",
+      "alt": "Three dishes with prep time and cost; the lasagne costs the most.",
+      "provenance": "recipes call turn-k3m9x2:call0",
+      "created_at": "2026-10-08T14:03:11Z",
+      "hlc": "1791468191000:0:hub001",
+      "props": {
+        "columns": [
+          {
+            "id": "dish",
+            "header": "Dish",
+            "sortable": true
+          },
+          {
+            "id": "minutes",
+            "header": "Prep",
+            "align": "end",
+            "format": {
+              "kind": "number",
+              "unit": "min"
+            }
+          },
+          {
+            "id": "cost",
+            "header": "Cost",
+            "align": "end",
+            "format": {
+              "kind": "currency",
+              "currency": "USD",
+              "decimals": 2
+            }
+          },
+          {
+            "id": "vegetarian",
+            "header": "Veg",
+            "format": {
+              "kind": "boolean",
+              "trueLabel": "Yes",
+              "falseLabel": "No"
+            }
+          }
+        ],
+        "rows": [
+          {
+            "dish": "Lasagne",
+            "minutes": 75,
+            "cost": 14.5,
+            "vegetarian": false
+          },
+          {
+            "dish": "Chana masala",
+            "minutes": 40,
+            "cost": 6.25,
+            "vegetarian": true
+          },
+          {
+            "dish": "Shakshuka",
+            "minutes": 25,
+            "cost": 5,
+            "vegetarian": true
+          }
+        ],
+        "caption": "Dinner options",
+        "sort": {
+          "columnId": "minutes",
+          "direction": "asc"
+        },
+        "emptyLabel": "No dishes",
+        "locale": "en-US"
+      }
+    }
+  ]
+}

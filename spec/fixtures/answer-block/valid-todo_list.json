@@ -1,0 +1,39 @@
+{
+  "id": "blk-l5s6t7",
+  "kind": "todo_list",
+  "schema_version": 1,
+  "producer": "lists",
+  "alt": "Packing list: two of four items are done.",
+  "provenance": "lists call turn-k3m9x2:call0",
+  "created_at": "2026-10-08T14:03:11Z",
+  "hlc": "1791468191000:0:hub001",
+  "props": {
+    "items": [
+      {
+        "id": "i1",
+        "text": "Passports",
+        "status": "done"
+      },
+      {
+        "id": "i2",
+        "text": "Chargers",
+        "status": "active",
+        "description": "Phone, tablet, watch"
+      },
+      {
+        "id": "i3",
+        "text": "Book taxi",
+        "status": "failed",
+        "reason": "No cars at 5 am"
+      },
+      {
+        "id": "i4",
+        "text": "Lock windows",
+        "status": "pending"
+      }
+    ],
+    "title": "Before we leave",
+    "description": "Flight is at 8 am",
+    "maxVisible": 8
+  }
+}

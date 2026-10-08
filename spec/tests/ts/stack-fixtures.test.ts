@@ -39,6 +39,8 @@ import { TokenCountRequest, TokenCountResponse } from "../../stack/ts/token-coun
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
+// turn-stream-event's `block` event $refs the AnswerBlock schema by its relative id.
+ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "answer-block.schema.json"), "utf8")));
 
 const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "role-request", zod: RoleRequest },

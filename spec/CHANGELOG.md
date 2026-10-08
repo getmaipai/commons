@@ -23,6 +23,14 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.109] - 2026-10-08
+
+### Added
+- `AnswerBlock` (`schemas/answer-block.schema.json`), the typed, renderable part of an answer, defined once for the hub, the web kit, Go and the robot (GENUI-01). Every block carries `id`, `kind`, `schema_version`, `producer`, `alt` (a plain-sentence text fallback), optional `min_band`, `provenance`, `created_at` and `hlc`, plus the kind's `props`, which mirror the kit Element's props. Flat, never recursive. Closed v1 kinds: `spec_sheet`, `data_table`, `chart`, `timeline`, `todo_list`, `image_gallery`, `schedule_card`, `comparison`. A client that does not know a kind says `alt`.
+- Optional `blocks` on `PluginResult` (`result.schema.json`) and on the stored turn (`conversation-turn.schema.json`), a `block` turn-stream event `{t, call_id, block}` (`turn-stream-event.schema.json` and its Zod mirror), and optional `returns_blocks` on the package manifest (the kinds a package may emit).
+- Fixtures per kind in `fixtures/answer-block/` with invalid cases, `block` stream events, a manifest, a turn and a plugin result that carry blocks. TS and Python tests cover all of them.
+- No existing field is removed or repurposed: an older turn, result or manifest without the new fields still validates unchanged.
+
 ## [spec-v0.1.107] - 2026-10-07
 
 ### Fixed

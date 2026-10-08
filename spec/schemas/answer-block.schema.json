@@ -1,0 +1,471 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/answer-block.schema.json",
+  "title": "AnswerBlock",
+  "description": "GENUI-01: one typed, renderable part of an answer, defined once here. A package returns blocks on `PluginResult.blocks`; the hub validates them, applies the output floor to each string by band, streams each as a `block` turn-stream event and stores them on the turn's `blocks`. Every client renders the same record: the web kit dispatches `kind` to the Element of the same name, Go renders it natively, the robot says `alt` when it has no screen. A client that does not know a `kind` falls back to `alt`. Envelope: `id`, `kind`, `schema_version`, `producer` (package id), `alt` (one plain sentence a screen reader, a TV fallback or the robot can say), optional `min_band`, `provenance`, `created_at` and `hlc` (the clock stamp every synced record carries), and the kind's `props`. Each kind's `props` mirror the props of the kit Element of the same name, so the web render is a pass-through; render-only Element props (visible counts, animation flags, callbacks, nodes) are not part of the record. Prop names are the Element's own (camelCase). Flat, never recursive: no block holds another block. The v1 kinds are a closed, additive list; a later kind is a new enum value and a new `props` shape, never a change to an existing one.",
+  "oneOf": [
+    { "$ref": "#/$defs/spec_sheet" },
+    { "$ref": "#/$defs/data_table" },
+    { "$ref": "#/$defs/chart" },
+    { "$ref": "#/$defs/timeline" },
+    { "$ref": "#/$defs/todo_list" },
+    { "$ref": "#/$defs/image_gallery" },
+    { "$ref": "#/$defs/schedule_card" },
+    { "$ref": "#/$defs/comparison" }
+  ],
+  "$defs": {
+    "kind": {
+      "type": "string",
+      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison"],
+      "description": "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here."
+    },
+    "block_id": {
+      "type": "string",
+      "pattern": "^blk-[a-z0-9]{6,}$",
+      "description": "Stable identity of this block. Unique within a turn's block list."
+    },
+    "schema_version": { "type": "integer", "const": 1 },
+    "producer": { "type": "string", "minLength": 1, "description": "The id of the package that returned the block." },
+    "alt": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300,
+      "description": "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice."
+    },
+    "min_band": {
+      "type": "string",
+      "enum": ["child", "teen", "adult"],
+      "description": "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses)."
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses."
+    },
+
+    "spec_sheet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "spec_sheet" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "rows"],
+          "properties": {
+            "title": { "type": "string" },
+            "subtitle": { "type": "string" },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "value"],
+                "properties": {
+                  "label": { "type": "string" },
+                  "value": { "type": "string" },
+                  "emphasis": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "data_table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "data_table" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["columns", "rows"],
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "header"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1, "description": "The key of this column's value in each row." },
+                  "header": { "type": "string" },
+                  "align": { "type": "string", "enum": ["start", "end"] },
+                  "minWidth": { "type": "number", "minimum": 0 },
+                  "sortable": { "type": "boolean" },
+                  "format": { "$ref": "#/$defs/data_table_format" }
+                }
+              }
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": { "$ref": "#/$defs/cell" }
+              }
+            },
+            "caption": { "type": "string" },
+            "sort": {
+              "type": ["object", "null"],
+              "additionalProperties": false,
+              "required": ["columnId", "direction"],
+              "properties": {
+                "columnId": { "type": "string", "minLength": 1 },
+                "direction": { "type": "string", "enum": ["asc", "desc"] }
+              }
+            },
+            "formats": {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/$defs/data_table_format" },
+              "description": "Per-column formats by column id, for a column that carries no `format` of its own."
+            },
+            "emptyLabel": { "type": "string" },
+            "locale": { "type": "string", "minLength": 1 },
+            "relativeTo": { "type": "number", "description": "Epoch milliseconds that relative dates are measured from, so every client renders the same words." }
+          }
+        }
+      }
+    },
+    "cell": {
+      "description": "One table cell: plain data, never markup.",
+      "type": ["string", "number", "boolean", "null"]
+    },
+    "data_table_format": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "text" } } },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": {
+            "kind": { "const": "number" },
+            "decimals": { "type": "integer", "minimum": 0, "maximum": 20 },
+            "compact": { "type": "boolean" },
+            "unit": { "type": "string" }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "currency"],
+          "properties": {
+            "kind": { "const": "currency" },
+            "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+            "decimals": { "type": "integer", "minimum": 0, "maximum": 20 },
+            "compact": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": {
+            "kind": { "const": "percent" },
+            "decimals": { "type": "integer", "minimum": 0, "maximum": 20 },
+            "basis": { "type": "string", "enum": ["fraction", "unit"] }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": {
+            "kind": { "const": "delta" },
+            "decimals": { "type": "integer", "minimum": 0, "maximum": 20 },
+            "unit": { "type": "string" },
+            "upIsGood": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": { "kind": { "const": "date" }, "style": { "type": "string", "enum": ["date", "datetime", "relative"] } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": { "kind": { "const": "boolean" }, "trueLabel": { "type": "string" }, "falseLabel": { "type": "string" } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": { "kind": { "const": "link" }, "hrefKey": { "type": "string" } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": {
+            "kind": { "const": "badge" },
+            "tones": {
+              "type": "object",
+              "additionalProperties": { "type": "string", "enum": ["neutral", "success", "warning", "danger"] }
+            }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": { "kind": { "const": "list" }, "max": { "type": "integer", "minimum": 1 } }
+        }
+      ]
+    },
+
+    "chart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "chart" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "value", "points"],
+          "properties": {
+            "label": { "type": "string" },
+            "value": { "type": "string" },
+            "delta": { "type": "string" },
+            "points": { "type": "array", "minItems": 1, "maxItems": 500, "items": { "type": "number" } },
+            "variant": { "type": "string", "enum": ["area", "line", "bars"] },
+            "trend": { "type": "string", "enum": ["up", "down", "flat"] },
+            "upIsGood": { "type": "boolean" }
+          }
+        }
+      }
+    },
+
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "timeline" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["events"],
+          "properties": {
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "when", "time", "title"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "when": { "type": "string", "enum": ["past", "now", "future"] },
+                  "time": { "type": "string" },
+                  "title": { "type": "string" },
+                  "detail": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "todo_list": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "todo_list" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["items"],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "text", "status"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "text": { "type": "string" },
+                  "status": { "type": "string", "enum": ["pending", "active", "done", "failed"] },
+                  "reason": { "type": "string" },
+                  "description": { "type": "string" }
+                }
+              }
+            },
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "maxVisible": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+
+    "image_gallery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "image_gallery" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["images"],
+          "properties": {
+            "images": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "src", "alt"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "src": { "type": "string", "minLength": 1, "description": "A picture reference. The hub rewrites it to a hub-proxied id before the block is streamed or stored; a package never sends a client a third-party image address." },
+                  "alt": { "type": "string", "minLength": 1, "description": "This picture's own text fallback." },
+                  "caption": { "type": "string" },
+                  "source": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "label": { "type": "string" },
+                      "url": { "type": "string", "format": "uri" }
+                    }
+                  }
+                }
+              }
+            },
+            "maxVisible": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+
+    "schedule_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "schedule_card" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "cadence", "nextRun", "enabled", "history"],
+          "properties": {
+            "name": { "type": "string" },
+            "cadence": { "type": "string" },
+            "nextRun": { "type": "string" },
+            "enabled": { "type": "boolean" },
+            "history": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "at", "ok"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "at": { "type": "string" },
+                  "ok": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "comparison" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["traitLabels", "options"],
+          "properties": {
+            "traitLabels": { "type": "array", "items": { "type": "string" } },
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "name", "headline", "traits"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "name": { "type": "string" },
+                  "headline": { "type": "string" },
+                  "traits": {
+                    "type": "array",
+                    "items": { "anyOf": [{ "type": "string" }, { "const": false }] },
+                    "description": "One entry per trait label, in order: the option's value for that trait, or false when it lacks the trait."
+                  }
+                }
+              }
+            },
+            "recommendedId": { "type": "string", "minLength": 1, "description": "The id of the option marked as the pick. Absent: no option is marked." },
+            "reason": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
