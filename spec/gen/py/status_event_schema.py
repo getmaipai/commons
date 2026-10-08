@@ -18,7 +18,14 @@ class StatusEvent(BaseModel):
     )
     id: constr(pattern=r'^sev-[a-z0-9]{6,}$')
     component: Literal[
-        'chat', 'embed', 'background', 'voice', 'library', 'hub', 'internet'
+        'chat',
+        'embed',
+        'background',
+        'voice',
+        'library',
+        'hub',
+        'internet',
+        'engine_computer',
     ] | constr(pattern=r'^service:[a-z0-9][a-z0-9_-]{0,63}$') = Field(
         ..., title='StatusComponent'
     )

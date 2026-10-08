@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/link-state.schema.json",
+  "title": "LinkState",
+  "description": "The state of Home's link to the engine computer (the Stack on another computer). `state` is what a person sees; `reason` is an error code from spec/errors/errors.json (one of the link_* codes) and is present only when the state is not ready; `path` is how the link is reached; `rtt_ms` is the last round trip; `last_ok_at` is when the link last worked; `contract` is the Stack contract version the engine computer reports. A field Home cannot know yet is absent, never null.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "state",
+    "contract"
+  ],
+  "properties": {
+    "state": {
+      "type": "string",
+      "enum": [
+        "connecting",
+        "ready",
+        "degraded",
+        "reconnecting",
+        "offline"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "link_refused",
+        "link_timeout",
+        "link_dns",
+        "link_auth_refused",
+        "link_host_key_changed",
+        "link_needs_update",
+        "link_not_paired",
+        "link_outside_home",
+        "link_stack_down"
+      ],
+      "description": "Why the link is not ready. Every value is a code in spec/errors/errors.json."
+    },
+    "path": {
+      "type": "string",
+      "enum": [
+        "home",
+        "tailnet"
+      ],
+      "description": "`home` is the household network; `tailnet` needs engines.stack.remote.allow_tailnet."
+    },
+    "rtt_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "last_ok_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "contract": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

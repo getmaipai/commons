@@ -400,7 +400,7 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("no key was added or removed, and scope, default and level are untouched (pinned counts)", () => {
-    expect(registry).toHaveLength(103);
-    expect(new Set(registryIds()).size).toBe(103);
+    expect(registry).toHaveLength(108);
+    expect(new Set(registryIds()).size).toBe(108);
   });
 });

@@ -96,5 +96,68 @@
     "spoken_fallback": "I stopped that reply.",
     "ui_message": "This reply was cancelled.",
     "retriable": false
+  },
+  {
+    "code": "link_refused",
+    "message": "The engine computer answered but refused the connection on the port Home tried.",
+    "spoken_fallback": "I can't reach the engine computer. It said no.",
+    "ui_message": "The engine computer refused the connection. Check that it is on and the engine is installed.",
+    "retriable": true
+  },
+  {
+    "code": "link_timeout",
+    "message": "The engine computer did not answer before Home stopped waiting.",
+    "spoken_fallback": "The engine computer isn't answering.",
+    "ui_message": "The engine computer didn't answer in time. Check that it is on and on your network.",
+    "retriable": true
+  },
+  {
+    "code": "link_dns",
+    "message": "Home could not find a computer with the name given for the engine computer.",
+    "spoken_fallback": "I can't find the engine computer.",
+    "ui_message": "Home can't find a computer with that name. Check the name in the engine computer settings.",
+    "retriable": false
+  },
+  {
+    "code": "link_auth_refused",
+    "message": "The engine computer did not accept Home's key for the secure connection.",
+    "spoken_fallback": "The engine computer didn't let me in.",
+    "ui_message": "The engine computer didn't accept Home's key. Pair the two computers again.",
+    "retriable": false
+  },
+  {
+    "code": "link_host_key_changed",
+    "message": "The engine computer's identity no longer matches the one Home recorded when they were paired.",
+    "spoken_fallback": "The engine computer doesn't look like the one I know.",
+    "ui_message": "The engine computer's identity changed since you paired it. Confirm it is yours, then pair again.",
+    "retriable": false
+  },
+  {
+    "code": "link_needs_update",
+    "message": "The engine on the other computer speaks a different contract version than this Home.",
+    "spoken_fallback": "The engine computer needs an update first.",
+    "ui_message": "The engine on the other computer and Home need to be updated to match.",
+    "retriable": false
+  },
+  {
+    "code": "link_not_paired",
+    "message": "Home has no saved pairing with the engine computer.",
+    "spoken_fallback": "I'm not set up with the engine computer yet.",
+    "ui_message": "Home isn't paired with the engine computer yet. Pair them to continue.",
+    "retriable": false
+  },
+  {
+    "code": "link_outside_home",
+    "message": "Home is not on the home network and the tailnet option is off, so it will not reach the engine computer.",
+    "spoken_fallback": "The engine computer is only reachable from home.",
+    "ui_message": "Home can only reach the engine computer from your home network. An admin can allow reaching it from away.",
+    "retriable": false
+  },
+  {
+    "code": "link_stack_down",
+    "message": "The engine computer is reachable but the engine on it is not running.",
+    "spoken_fallback": "The engine isn't running on the other computer.",
+    "ui_message": "The engine computer is on but the engine isn't running. Start it there.",
+    "retriable": true
   }
 ]

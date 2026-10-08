@@ -23,6 +23,18 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.105] - 2026-10-08
+
+### Added
+- REMOTE-STACK-SPEC-01: the engine computer's settings, status component, link state and error codes.
+- Settings keys `engines.stack.where` (this computer or another computer, default this computer), `engines.stack.remote.host`, `engines.stack.remote.ssh_port` (22), `engines.stack.remote.local_port` (8771, expert) and `engines.stack.remote.allow_tailnet` (off by default, "Reach the engine computer when away from home"). All household scope, admin only, in `household.ai`.
+- `engine_computer` status component.
+- `LinkState` schema (`schemas/link-state.schema.json`): state, reason, path, rtt_ms, last_ok_at, contract.
+- Error codes `link_refused`, `link_timeout`, `link_dns`, `link_auth_refused`, `link_host_key_changed`, `link_needs_update`, `link_not_paired`, `link_outside_home` and `link_stack_down`.
+
+### Changed
+- New help text for `engines.stack.url`: it describes both places the engine can run.
+
 ## [spec-v0.1.104] - 2026-10-07
 
 ### Added

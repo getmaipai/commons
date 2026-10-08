@@ -17,6 +17,7 @@ export const StatusEvent = z
         "library",
         "hub",
         "internet",
+        "engine_computer",
       ]),
       z.string().regex(new RegExp("^service:[a-z0-9][a-z0-9_-]{0,63}$")),
     ]),

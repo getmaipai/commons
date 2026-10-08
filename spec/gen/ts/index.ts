@@ -16,6 +16,7 @@ export * from "./entity.js";
 export * from "./file.js";
 export * from "./grant.js";
 export * from "./issue.js";
+export * from "./link-state.js";
 export * from "./list.js";
 export * from "./log-events.js";
 export * from "./maintenance-window.js";
