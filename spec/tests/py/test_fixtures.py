@@ -656,8 +656,14 @@ def test_model_capabilities_rejects_unknown_thinking_mode():
 # GENUI-01: AnswerBlock fixtures and the additive fields that carry blocks.
 ANSWER_BLOCK_DIR = FIXTURES_DIR.parent / "answer-block"
 V1_KINDS = [
-    "spec_sheet", "data_table", "chart", "timeline",
-    "todo_list", "image_gallery", "schedule_card", "comparison",
+    "spec_sheet",
+    "data_table",
+    "chart",
+    "timeline",
+    "todo_list",
+    "image_gallery",
+    "schedule_card",
+    "comparison",
 ]
 
 
@@ -675,7 +681,9 @@ def test_answer_block_valid_fixture(path):
     PluginResult.model_validate({"blocks": [json.loads(path.read_text())]})
 
 
-@pytest.mark.parametrize("path", _answer_block_fixtures("invalid"), ids=lambda p: p.name)
+@pytest.mark.parametrize(
+    "path", _answer_block_fixtures("invalid"), ids=lambda p: p.name
+)
 def test_answer_block_invalid_fixture(path):
     with pytest.raises(ValidationError):
         PluginResult.model_validate({"blocks": [json.loads(path.read_text())]})
@@ -692,6 +700,9 @@ def test_blocks_are_optional_and_additive():
 
 def test_manifest_returns_blocks():
     manifest = load_fixture("manifest.returns-blocks.example.json")
-    assert PackageManifest.model_validate(manifest).returns_blocks == ["chart", "data_table"]
+    assert PackageManifest.model_validate(manifest).returns_blocks == [
+        "chart",
+        "data_table",
+    ]
     with pytest.raises(ValidationError):
         PackageManifest.model_validate({**manifest, "returns_blocks": ["hologram"]})
