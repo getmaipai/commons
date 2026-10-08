@@ -5,6 +5,12 @@ All notable changes to the `core` workspace. Format follows
 tagged `core-vX.Y.Z`. Everything stays `0.x` until Home's and the Stack's
 adoption proves it.
 
+## [0.1.4] - core-v0.1.4
+
+### Added
+- `isHouseholdNetworkHost`: recognize household and opt-in Tailscale addresses
+  and names, rejecting public DNS answers and failing closed on lookup errors.
+
 ## [0.1.3] - core-v0.1.3
 
 ### Changed
