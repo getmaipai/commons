@@ -3,9 +3,10 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
-from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, Field, constr
+from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
 
 
 class Source(BaseModel):
@@ -17,11 +18,20 @@ class Source(BaseModel):
         extra='forbid',
     )
     id: constr(pattern=r'^src-[a-z0-9]{6,}$')
-    kind: Literal['web', 'wikidata', 'wikipedia', 'weather', 'package', 'archive'] = (
-        Field(
-            ...,
-            description="Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site); archive is a row from an installed offline knowledge source (a `reference` package's own Kiwix-style snapshot, home/docs/plans/knowledge-sources-2026-09-24.md) - `created_at` on an archive row is the citation's own gather time as usual, never the archive's snapshot date, which the reference package's own installed flavour record carries.",
-        )
+    kind: Literal[
+        'web',
+        'wikidata',
+        'wikipedia',
+        'weather',
+        'package',
+        'archive',
+        'reference',
+        'shelf',
+        'hosted',
+        'wikimedia',
+    ] = Field(
+        ...,
+        description='Which evidence tier produced this citation. reference is an offline library, shelf is a news item or story, web is SearXNG, archive is an archived page, hosted is an optional hosted search provider, and wikimedia is the live Wikimedia API; existing typed kinds remain supported.',
     )
     title: constr(min_length=1) = Field(
         ...,
@@ -46,4 +56,18 @@ class Source(BaseModel):
     created_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
         ..., description='Hybrid logical clock: wall_ms:counter:node (7.3).'
+    )
+    snapshot_date: date | None = Field(
+        None, description='Date of the immutable local snapshot used for this citation.'
+    )
+    licence: Literal['cc-by-sa-4.0', 'cc0', 'public-domain', 'publisher'] | None = (
+        Field(None, description='The source material licence used for attribution.')
+    )
+    local_path: constr(min_length=1) | None = Field(
+        None,
+        description='Home proxy path for a page in a locally installed reference archive.',
+    )
+    publisher_count: conint(ge=1) | None = Field(
+        None,
+        description='Number of distinct registrable publishers represented by a story after wire-copy folding.',
     )

@@ -1,0 +1,14 @@
+{
+  "id": "src-a1b2c5",
+  "kind": "reference",
+  "title": "Sourdough bread",
+  "url": "http://127.0.0.1:8095/viewer#wikipedia_en_mini/A/Sourdough",
+  "site": "wikipedia-mini-en",
+  "snippet": "Sourdough is a bread made by fermentation.",
+  "source": "turn-d4e5f8",
+  "created_at": "2026-10-09T12:00:00Z",
+  "hlc": "1791547200003:0:a1b2c5",
+  "snapshot_date": "2026-09-14",
+  "licence": "cc-by-sa-4.0",
+  "local_path": "/api/reference/wikipedia/A/Sourdough"
+}

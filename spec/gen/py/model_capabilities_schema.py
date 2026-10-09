@@ -285,6 +285,10 @@ class ModelCapabilities(BaseModel):
         ...,
         description='False for a role with no real backend yet (image, video): the entry documents the decided pick without claiming it can be selected and run today.',
     )
+    model_cutoff: date | None = Field(
+        None,
+        description="Last date represented in this model's training data, when the model publisher provides one.",
+    )
     quality_tier: Literal['draft', 'standard', 'high'] | None = None
     tags: list[str] | None = None
     pros: list[str] | None = Field(

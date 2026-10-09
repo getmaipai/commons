@@ -57,5 +57,25 @@
     "speech_robot",
     "gestures",
     "sound_events"
+  ],
+  "processors": [
+    {
+      "id": "extract_article",
+      "kind": "processor",
+      "learned": false,
+      "description": "Reads and extracts a chosen page from an installed reference snapshot."
+    },
+    {
+      "id": "cluster_story",
+      "kind": "processor",
+      "learned": false,
+      "description": "Clusters news items using their titles and summaries."
+    },
+    {
+      "id": "fold_wire_copy",
+      "kind": "processor",
+      "learned": false,
+      "description": "Folds syndicated wire copies using title similarity."
+    }
   ]
 }

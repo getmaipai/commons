@@ -19,6 +19,7 @@ from gen.py.conversation_turn_schema import ConversationTurn
 from gen.py.device_command_schema import DeviceCommand
 from gen.py.device_schema import Device
 from gen.py.entity_schema import Entity
+from gen.py.feed_schema import Feed
 from gen.py.file_schema import File
 from gen.py.grant_schema import Grant
 from gen.py.issue_schema import Issue
@@ -26,6 +27,8 @@ from gen.py.list_schema import List
 from gen.py.manifest_schema import PackageManifest
 from gen.py.memory_record_schema import MemoryRecord
 from gen.py.model_capabilities_schema import ModelCapabilities
+from gen.py.news_item_schema import NewsItem
+from gen.py.news_story_schema import NewsStory
 from gen.py.open_question_schema import OpenQuestion
 from gen.py.person_schema import Person
 from gen.py.project_schema import ProjectPlan
@@ -73,6 +76,29 @@ def test_setting_value_fixture():
 
 def test_settings_key_fixture():
     SettingsKey.model_validate(load_fixture("settings-key.example.json"))
+
+
+@pytest.mark.parametrize(
+    ("name", "model"),
+    [
+        ("feed.example.json", Feed),
+        ("news-item.example.json", NewsItem),
+        ("news-story.example.json", NewsStory),
+    ],
+)
+def test_knowledge_search_record_fixtures_round_trip(name, model):
+    data = load_fixture(name)
+    assert (
+        model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
+    )
+
+
+def test_source_reference_snapshot_attribution():
+    parsed = Source.model_validate(load_fixture("source.reference.example.json"))
+    assert parsed.kind == "reference"
+    assert parsed.snapshot_date.isoformat() == "2026-09-14"
+    assert parsed.licence == "cc-by-sa-4.0"
+    assert parsed.local_path == "/api/reference/wikipedia/A/Sourdough"
 
 
 @pytest.mark.parametrize("kind", ["person", "pet", "place"])
@@ -642,6 +668,15 @@ def test_model_capabilities_vision_chat_declares_no_thinking_mode():
     assert parsed.role == "chat"
     assert parsed.image_input is not None
     assert parsed.thinking_mode == "none"
+
+
+def test_model_capabilities_model_cutoff_is_optional_date():
+    body = load_fixture("model-capabilities.chat.example.json")
+    assert ModelCapabilities.model_validate(body).model_cutoff is None
+    parsed = ModelCapabilities.model_validate({**body, "model_cutoff": "2024-12-31"})
+    assert parsed.model_cutoff.isoformat() == "2024-12-31"
+    with pytest.raises(ValidationError):
+        ModelCapabilities.model_validate({**body, "model_cutoff": "late 2024"})
 
 
 def test_model_capabilities_rejects_unknown_thinking_mode():

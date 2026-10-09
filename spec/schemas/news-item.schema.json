@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/news-item.schema.json",
+  "title": "NewsItem",
+  "description": "One canonical item ingested from a household news feed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "feed_id",
+    "url",
+    "canonical_url",
+    "title",
+    "summary",
+    "fetched_at",
+    "publisher",
+    "lang",
+    "band_ok",
+    "hlc",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^news-[a-z0-9]{6,}$"
+    },
+    "feed_id": {
+      "type": "string",
+      "pattern": "^feed-[a-z0-9]{6,}$"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "canonical_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "published_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "fetched_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lang": {
+      "type": "string",
+      "minLength": 2
+    },
+    "story_id": {
+      "type": "string",
+      "pattern": "^story-[a-z0-9]{6,}$"
+    },
+    "body_cached_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "band_ok": {
+      "type": "string",
+      "enum": [
+        "child",
+        "teen",
+        "adult"
+      ]
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

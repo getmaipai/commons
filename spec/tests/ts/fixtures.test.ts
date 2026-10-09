@@ -39,6 +39,9 @@ import { File } from "../../gen/ts/file.js";
 import { Share } from "../../gen/ts/share.js";
 import { Artifact } from "../../gen/ts/artifact.js";
 import { Project } from "../../gen/ts/project.js";
+import { Feed } from "../../gen/ts/feed.js";
+import { NewsItem } from "../../gen/ts/news-item.js";
+import { NewsStory } from "../../gen/ts/news-story.js";
 
 // ErrorEntry is standards-owned (std-v0.2.0), not generated here; the error
 // catalogue's shape is imported from the sibling .github checkout, the same
@@ -334,6 +337,23 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Source.parse(loadFixture("source.archive.example.json"))).not.toThrow();
   });
 
+  test("source.reference.example.json carries snapshot attribution", () => {
+    const parsed = Source.parse(loadFixture("source.reference.example.json"));
+    expect(parsed.kind).toBe("reference");
+    expect(parsed.snapshot_date).toBe("2026-09-14");
+    expect(parsed.licence).toBe("cc-by-sa-4.0");
+    expect(parsed.local_path).toBe("/api/reference/wikipedia/A/Sourdough");
+  });
+
+  for (const kind of ["feed", "news-item", "news-story"]) {
+    test(`${kind}.example.json`, () => {
+      const data = loadFixture(`${kind}.example.json`);
+      const record = kind === "feed" ? Feed : kind === "news-item" ? NewsItem : NewsStory;
+      expect(() => record.parse(data)).not.toThrow();
+      expect(record.parse(data)).toEqual(data);
+    });
+  }
+
   test("manifest.example.json", () => {
     expect(() =>
       PackageManifest.parse(loadFixture("manifest.example.json")),
@@ -387,6 +407,12 @@ describe("record fixtures validate against their generated Zod models", () => {
   test("model-capabilities with an unknown role is rejected", () => {
     const bad = { ...(loadFixture("model-capabilities.chat.example.json") as Record<string, unknown>), role: "nonsense" };
     expect(() => ModelCapabilities.parse(bad)).toThrow();
+  });
+
+  test("model_cutoff is an optional calendar date", () => {
+    const fixture = loadFixture("model-capabilities.chat.example.json") as Record<string, unknown>;
+    expect(ModelCapabilities.parse({ ...fixture, model_cutoff: "2024-12-31" }).model_cutoff).toBe("2024-12-31");
+    expect(() => ModelCapabilities.parse({ ...fixture, model_cutoff: "late 2024" })).toThrow();
   });
 
   test("TOOL-OFFER-01: max_tools permits a bounded measured set and rejects caps over sixteen", () => {

@@ -353,6 +353,11 @@
               "label": "Web search",
               "group": "household.search",
               "scope": "household"
+            },
+            {
+              "label": "News shelf",
+              "group": "household.news",
+              "scope": "household"
             }
           ],
           "keywords": [

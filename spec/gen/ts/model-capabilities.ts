@@ -60,6 +60,14 @@ export const ModelCapabilities = z
       .describe(
         "False for a role with no real backend yet (image, video): the entry documents the decided pick without claiming it can be selected and run today.",
       ),
+    /**Last date represented in this model's training data, when the model publisher provides one.*/
+    model_cutoff: z
+      .string()
+      .date()
+      .describe(
+        "Last date represented in this model's training data, when the model publisher provides one.",
+      )
+      .optional(),
     quality_tier: z.enum(["draft", "standard", "high"]).optional(),
     tags: z.array(z.string()).optional(),
     /**Short, dad-readable upsides shown in the model-selection wizard.*/

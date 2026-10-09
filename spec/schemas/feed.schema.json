@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/feed.schema.json",
+  "title": "Feed",
+  "description": "A household-configured news feed and its polling state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "url",
+    "title",
+    "publisher",
+    "band",
+    "poll_interval_s",
+    "next_poll_at",
+    "fail_count",
+    "enabled",
+    "hlc",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^feed-[a-z0-9]{6,}$"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Registrable domain of the publisher."
+    },
+    "band": {
+      "type": "string",
+      "enum": [
+        "child",
+        "teen",
+        "adult"
+      ]
+    },
+    "package_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "person_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "etag": {
+      "type": "string"
+    },
+    "last_modified": {
+      "type": "string"
+    },
+    "poll_interval_s": {
+      "type": "integer",
+      "minimum": 900
+    },
+    "next_poll_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "fail_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "quiet_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

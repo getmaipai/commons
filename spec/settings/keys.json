@@ -552,6 +552,54 @@
     ]
   },
   {
+    "key": "news.poll_interval_s",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 900
+    },
+    "default": 1800,
+    "label": "News poll interval (seconds)",
+    "help": "How often Home checks enabled news feeds. At least 900 seconds.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.news",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "news.retention_days",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 1
+    },
+    "default": 90,
+    "label": "News retention (days)",
+    "help": "How long Home keeps news items and stories.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.news",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "news.shelf.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "News shelf",
+    "help": "Turn the household news shelf on or off.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.news",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "notifications.approvals.requested.telegram",
     "scope": "person",
     "selector": "boolean",
@@ -1011,6 +1059,57 @@
     ]
   },
   {
+    "key": "reference.pageviews_signal",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Use page views as a news signal",
+    "help": "Use daily Wikipedia page-view counts to help identify notable news stories.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.reference",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "reference.update.max_mbps",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 1
+    },
+    "default": 20,
+    "label": "Reference update speed limit (MB/s)",
+    "help": "Maximum speed used for automatic reference library updates.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.reference",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "reference.update.mode",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "auto",
+        "ask"
+      ]
+    },
+    "default": "ask",
+    "label": "Reference library update mode",
+    "help": "Choose whether reference library updates happen automatically or wait for you.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.reference",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "robot.barge_in.open_mic",
     "scope": "device",
     "selector": "boolean",
@@ -1337,6 +1436,23 @@
     ]
   },
   {
+    "key": "search.fetch_cache_gb",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 0
+    },
+    "default": 2,
+    "label": "Search fetch cache limit (GB)",
+    "help": "Maximum disk space used for cached search pages. The default is 2 GB on p16 and 10 GB on p64 and p128.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.safe_search",
     "scope": "person",
     "selector": "select",
@@ -1365,6 +1481,20 @@
     "default": "",
     "label": "Your own SearXNG (optional)",
     "help": "Your own SearXNG (optional). Leave empty to use the search service MaiPai runs for you.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.wayback_fallback",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Use archived pages when a source is missing",
+    "help": "Check the Wayback Machine when a cited page returns not found.",
     "level": "advanced",
     "secret": false,
     "lives_in": "household.search",

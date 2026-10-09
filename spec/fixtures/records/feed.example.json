@@ -1,0 +1,13 @@
+{
+  "id": "feed-a1b2c3",
+  "url": "https://news.example.com/rss.xml",
+  "title": "Example News",
+  "publisher": "example.com",
+  "band": "adult",
+  "poll_interval_s": 1800,
+  "next_poll_at": "2026-10-09T12:00:00Z",
+  "fail_count": 0,
+  "enabled": true,
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "package:news"
+}

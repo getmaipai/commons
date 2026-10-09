@@ -26,7 +26,7 @@ interface DefectCodes {
 const ENTITY_KINDS = new Set(Entity.shape.kind.options as readonly string[]);
 
 describe("vocab/capabilities.json", () => {
-  const vocab = load<{ $comment: string; capabilities: string[] }>("capabilities.json");
+  const vocab = load<{ $comment: string; capabilities: string[]; processors: Array<{ id: string; kind: string; learned: boolean }> }>("capabilities.json");
   const ENGINE_ROLES = ["vision", "image", "video", "music", "stt", "tts"];
 
   test("every capability is lowercase, non-empty and named exactly once", () => {
@@ -61,6 +61,14 @@ describe("vocab/capabilities.json", () => {
     for (const cap of [...(manifest.requires ?? []), ...(manifest.optional ?? [])]) {
       expect(caps.has(cap), `${cap} is not in the vocabulary`).toBe(true);
     }
+  });
+
+  test("KS-00 processors are registry rows and remain unlearned", () => {
+    expect(vocab.processors).toEqual([
+      { id: "extract_article", kind: "processor", learned: false, description: "Reads and extracts a chosen page from an installed reference snapshot." },
+      { id: "cluster_story", kind: "processor", learned: false, description: "Clusters news items using their titles and summaries." },
+      { id: "fold_wire_copy", kind: "processor", learned: false, description: "Folds syndicated wire copies using title similarity." },
+    ]);
   });
 });
 

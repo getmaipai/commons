@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/news-story.schema.json",
+  "title": "NewsStory",
+  "description": "A cluster of related news items from independent publishers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "first_seen",
+    "last_seen",
+    "item_count",
+    "publisher_count",
+    "entities",
+    "centroid_ref",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^story-[a-z0-9]{6,}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "first_seen": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_seen": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "item_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "publisher_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "pageviews_hint": {
+      "type": "number",
+      "minimum": 0
+    },
+    "centroid_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+    }
+  }
+}

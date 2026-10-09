@@ -28,6 +28,7 @@
       "type": "boolean",
       "description": "False for a role with no real backend yet (image, video): the entry documents the decided pick without claiming it can be selected and run today."
     },
+    "model_cutoff": { "type": "string", "format": "date", "description": "Last date represented in this model's training data, when the model publisher provides one." },
     "quality_tier": {
       "type": "string",
       "enum": ["draft", "standard", "high"]

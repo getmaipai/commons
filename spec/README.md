@@ -103,14 +103,14 @@ design record left a choice:
 
 | Path | What it is | Hand-written or generated |
 |---|---|---|
-| `schemas/*.schema.json` | JSON Schema 2020-12, the source of truth for every record and package shape | hand-written |
+| `schemas/*.schema.json` | JSON Schema 2020-12, the source of truth for every record and package shape, including Feed, NewsItem and NewsStory | hand-written |
 | `schemas.resolved/` | A local-only copy of `schemas/` with the cross-repo standards `$ref` swapped for a local file; not committed, `gen-py.sh`'s input | generated build output, gitignored |
 | `gen/ts/` | Zod schemas + TS types, one file per `schemas/*.schema.json` | generated, committed. `bun run gen:ts` |
 | `gen/py/` | Pydantic v2 models, same schemas | generated, committed. `bash scripts/gen-py.sh` |
 | `errors/errors.json` | The error catalogue, conforming to `@maipai/standards`' `ErrorEntry` shape | hand-written |
 | `settings/keys.json` | The settings registry (conforms to `schemas/settings-key.schema.json`), including the per-person `notifications.browser.enabled` key | generated from declarations |
 | `settings/areas.json` | The settings areas (Account, Home settings, Chat settings), conforming to `schemas/settings-area.schema.json`; `settings/areas-check.ts` checks each registry key has exactly one card | hand-written |
-| `vocab/capabilities.json` | The capability vocabulary (3.2) | hand-written |
+| `vocab/capabilities.json` | The capability vocabulary (3.2), including the KS-00 processor registry rows | hand-written |
 | `vocab/permissions.json` | The permissions vocabulary, the install prompt's fixed enum (3.2) | hand-written |
 | `vocab/relationship-types.json` | What may relate to what, whether it can end, and which statuses it admits | hand-written |
 | `vocab/grant-actions.json` | Everything a household can allow or deny per person | hand-written |

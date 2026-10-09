@@ -305,7 +305,7 @@ export const TurnArtifact = z
         z
           .object({
             id: z.string().regex(new RegExp("^src-[a-z0-9]{6,}$")),
-            /**Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site); archive is a row from an installed offline knowledge source (a `reference` package's own Kiwix-style snapshot, home/docs/plans/knowledge-sources-2026-09-24.md) - `created_at` on an archive row is the citation's own gather time as usual, never the archive's snapshot date, which the reference package's own installed flavour record carries.*/
+            /**Which evidence tier produced this citation. reference is an offline library, shelf is a news item or story, web is SearXNG, archive is an archived page, hosted is an optional hosted search provider, and wikimedia is the live Wikimedia API; existing typed kinds remain supported.*/
             kind: z
               .enum([
                 "web",
@@ -314,9 +314,13 @@ export const TurnArtifact = z
                 "weather",
                 "package",
                 "archive",
+                "reference",
+                "shelf",
+                "hosted",
+                "wikimedia",
               ])
               .describe(
-                "Which evidence rung this came from: web is the household's own SearXNG; wikidata/wikipedia/weather are the typed lookups CHAT-15 already retains; package is a future catalog package's own citation (its manifest names the site); archive is a row from an installed offline knowledge source (a `reference` package's own Kiwix-style snapshot, home/docs/plans/knowledge-sources-2026-09-24.md) - `created_at` on an archive row is the citation's own gather time as usual, never the archive's snapshot date, which the reference package's own installed flavour record carries.",
+                "Which evidence tier produced this citation. reference is an offline library, shelf is a news item or story, web is SearXNG, archive is an archived page, hosted is an optional hosted search provider, and wikimedia is the live Wikimedia API; existing typed kinds remain supported.",
               ),
             /**The cited page or result's own title, exactly as the source gave it, never rewritten by the model.*/
             title: z
@@ -370,6 +374,36 @@ export const TurnArtifact = z
               .string()
               .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
               .describe("Hybrid logical clock: wall_ms:counter:node (7.3)."),
+            /**Date of the immutable local snapshot used for this citation.*/
+            snapshot_date: z
+              .string()
+              .date()
+              .describe(
+                "Date of the immutable local snapshot used for this citation.",
+              )
+              .optional(),
+            /**The source material licence used for attribution.*/
+            licence: z
+              .enum(["cc-by-sa-4.0", "cc0", "public-domain", "publisher"])
+              .describe("The source material licence used for attribution.")
+              .optional(),
+            /**Home proxy path for a page in a locally installed reference archive.*/
+            local_path: z
+              .string()
+              .min(1)
+              .describe(
+                "Home proxy path for a page in a locally installed reference archive.",
+              )
+              .optional(),
+            /**Number of distinct registrable publishers represented by a story after wire-copy folding.*/
+            publisher_count: z
+              .number()
+              .int()
+              .gte(1)
+              .describe(
+                "Number of distinct registrable publishers represented by a story after wire-copy folding.",
+              )
+              .optional(),
           })
           .strict()
           .describe(

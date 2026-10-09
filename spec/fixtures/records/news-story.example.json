@@ -1,0 +1,13 @@
+{
+  "id": "story-a1b2c3",
+  "title": "Example event",
+  "first_seen": "2026-10-09T10:00:00Z",
+  "last_seen": "2026-10-09T11:00:00Z",
+  "item_count": 2,
+  "publisher_count": 2,
+  "entities": [
+    "Example Event"
+  ],
+  "centroid_ref": "embed:news-story-a1b2c3",
+  "hlc": "1791547200002:0:a1b2c3"
+}

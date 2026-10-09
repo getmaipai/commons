@@ -23,6 +23,16 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.114] - 2026-10-09
+
+### Added
+- KS-00 knowledge-search records: Feed, NewsItem and NewsStory schemas with TypeScript and Python round-trip fixtures.
+- Additive Source citation kinds and attribution fields for reference snapshots, licences, local paths and publisher counts.
+- Optional model training cutoff date on ModelCapabilities.
+- Eight knowledge-search settings keys generated through Home's settings registry generator.
+- Processor registry rows for extract_article, cluster_story and fold_wire_copy, all marked learned: false.
+
+
 ## [spec-v0.1.113] - 2026-10-09
 
 ### Added

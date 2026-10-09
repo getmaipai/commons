@@ -1,0 +1,15 @@
+{
+  "id": "news-a1b2c3",
+  "feed_id": "feed-a1b2c3",
+  "url": "https://news.example.com/article",
+  "canonical_url": "https://news.example.com/article",
+  "title": "Example event",
+  "summary": "An example summary.",
+  "published_at": "2026-10-09T10:00:00Z",
+  "fetched_at": "2026-10-09T11:00:00Z",
+  "publisher": "example.com",
+  "lang": "en",
+  "band_ok": "adult",
+  "hlc": "1791547200001:0:a1b2c3",
+  "provenance": "feed:feed-a1b2c3"
+}

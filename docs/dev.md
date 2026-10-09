@@ -1,3 +1,7 @@
+## spec-v0.1.114: knowledge-search record shapes (KS-00)
+
+The spec adds additive `Source` citation kinds and the optional snapshot date, licence, local proxy path and publisher count fields; `Feed`, `NewsItem` and `NewsStory`; and optional `model_cutoff` on `ModelCapabilities`. The settings registry gains the eight knowledge-search keys, generated using the real Home registry generator. The capability vocabulary carries processor rows for `extract_article`, `cluster_story` and `fold_wire_copy`, each with `learned: false`. TS and Python validate fixtures for the new records and attribution fields.
+
 # shared: design record
 
 ## spec-v0.1.70: household internet probe settings

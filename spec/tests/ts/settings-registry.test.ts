@@ -45,6 +45,25 @@ describe("spec/settings/keys.json", () => {
     expect(home?.honoured_by).toEqual(["home", "bot"]);
   });
 
+  test("KS-00 declares the eight knowledge search settings exactly once", () => {
+    const entries = loadRegistry() as { key: string; default: unknown; range?: Record<string, unknown> }[];
+    const byKey = new Map(entries.map((entry) => [entry.key, entry]));
+    const keys = [
+      "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
+      "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",
+      "search.fetch_cache_gb", "search.wayback_fallback",
+    ];
+    for (const key of keys) expect(entries.filter((entry) => entry.key === key), key).toHaveLength(1);
+    expect(byKey.get("news.poll_interval_s")?.default).toBe(1800);
+    expect(byKey.get("news.poll_interval_s")?.range?.min).toBe(900);
+    expect(byKey.get("news.retention_days")?.default).toBe(90);
+    expect(byKey.get("reference.update.mode")?.default).toBe("ask");
+    expect(byKey.get("reference.update.max_mbps")?.default).toBe(20);
+    expect(byKey.get("reference.pageviews_signal")?.default).toBe(false);
+    expect(byKey.get("search.fetch_cache_gb")?.default).toBe(2);
+    expect(byKey.get("search.wayback_fallback")?.default).toBe(true);
+  });
+
   test("a new registry keeps every key declared by its parent spec tag", () => {
     // This assertion is updated when a deliberate retirement is made. It
     // prevents regenerating from a lagging Home declaration set from silently
