@@ -138,7 +138,7 @@
     "help": "Once total backup storage passes this, the oldest backups are deleted first - checked after the normal seven-daily/four-weekly/three-monthly schedule. 0 means no extra limit.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.system",
+    "lives_in": "household.storage",
     "honoured_by": [
       "home"
     ]
@@ -213,6 +213,20 @@
     "level": "expert",
     "secret": false,
     "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "chat.photo_uploads",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Send photos in chat",
+    "help": "Adults and teens are on by default; children are off until a parent enables this. Teens control their own setting.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.chat",
     "honoured_by": [
       "home"
     ]
@@ -412,7 +426,7 @@
     "help": "Quiet hours begin at 9:00 pm by default. Safety alarms always override quiet hours.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "household.notifications",
     "honoured_by": [
       "home"
     ]
@@ -426,7 +440,7 @@
     "help": "Quiet hours end at 7:00 am by default.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "household.notifications",
     "honoured_by": [
       "home"
     ]
@@ -439,7 +453,7 @@
     "label": "Telegram me when someone is asking for approval",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -452,7 +466,7 @@
     "label": "Telegram me when backups start failing",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -479,7 +493,7 @@
     "label": "Telegram me when a Stack engine reports an open warning or critical problem",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -492,7 +506,7 @@
     "label": "Telegram me when a Stack engine updates",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -505,7 +519,7 @@
     "label": "Telegram me when a Stack engine has an update available",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -518,7 +532,7 @@
     "label": "Telegram me when a Stack engine fails to update",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -548,7 +562,7 @@
     "label": "Telegram me when someone shares a file with the household",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -561,7 +575,7 @@
     "label": "Telegram me when someone shares a file with me",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -574,7 +588,7 @@
     "label": "Telegram me when I have trouble remembering something from our conversation",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -587,7 +601,7 @@
     "label": "Telegram me when I remember something from our conversation",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -600,7 +614,7 @@
     "label": "Telegram me when a model download fails",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -613,7 +627,7 @@
     "label": "Telegram me when a model finishes downloading",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -626,7 +640,7 @@
     "label": "Telegram me when a child or teen's profile band updates on a birthday",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -639,7 +653,7 @@
     "label": "Telegram me about new Repairs items",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -667,6 +681,20 @@
     "help": "Message the household bot once, then paste the chat id it replies with, to receive your notifications on Telegram.",
     "level": "basic",
     "secret": false,
+    "lives_in": "person.telegram",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "notifications.time_sensitive.robot",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Send time-sensitive notifications to a robot",
+    "help": "Deliver time-sensitive notifications through a robot channel when one is configured. Private notification content is never spoken.",
+    "level": "basic",
+    "secret": false,
     "lives_in": "person.notifications",
     "honoured_by": [
       "home"
@@ -680,7 +708,7 @@
     "label": "Telegram me when a MaiPai Home update is available",
     "level": "basic",
     "secret": false,
-    "lives_in": "person.notifications",
+    "lives_in": "person.telegram",
     "honoured_by": [
       "home"
     ]
@@ -694,7 +722,7 @@
     "help": "Leave unset to inherit household quiet hours. A parent sets this for a child; teens can set their own.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.notifications",
     "honoured_by": [
       "home"
     ]
@@ -708,7 +736,7 @@
     "help": "Leave unset to inherit household quiet hours. A parent sets this for a child; teens can set their own.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.notifications",
     "honoured_by": [
       "home"
     ]
@@ -844,6 +872,20 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.persona",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "reference.images",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Show pictures in answers",
+    "help": "Adults and teens are on by default; children are off until a parent enables this. Teens control their own setting.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.chat",
     "honoured_by": [
       "home"
     ]
@@ -1215,11 +1257,11 @@
     "scope": "household",
     "selector": "text",
     "default": "",
-    "label": "SearXNG URL",
-    "help": "The address of a SearXNG instance you run, e.g. http://localhost:8080. Web search is off until this is set - MaiPai never scrapes a search engine directly.",
+    "label": "Your own SearXNG (optional)",
+    "help": "Your own SearXNG (optional). Leave empty to use the search service MaiPai runs for you.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.integrations",
+    "lives_in": "household.search",
     "honoured_by": [
       "home"
     ]
@@ -1233,7 +1275,7 @@
     "help": "When your SearXNG instance is down or a search comes back empty, MaiPai asks Wikipedia's own official API instead - covers people, shows, places, products and history. On by default whenever web search is set up; turn it off here if you don't want it.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.integrations",
+    "lives_in": "household.search",
     "honoured_by": [
       "home"
     ]
@@ -1279,7 +1321,7 @@
     "help": "The name MaiPai looks up once a minute to check whether internet name lookups work.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.system",
+    "lives_in": "household.status",
     "honoured_by": [
       "home"
     ]
@@ -1293,7 +1335,7 @@
     "help": "Once a minute, MaiPai looks up a neutral name and opens an empty connection to the chosen address. Turn this off to stop those checks.",
     "level": "basic",
     "secret": false,
-    "lives_in": "household.system",
+    "lives_in": "household.status",
     "honoured_by": [
       "home"
     ]
@@ -1307,7 +1349,7 @@
     "help": "The public IP address MaiPai connects to once a minute without sending data.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.system",
+    "lives_in": "household.status",
     "honoured_by": [
       "home"
     ]
@@ -1325,7 +1367,7 @@
     "help": "The port MaiPai opens and immediately closes without sending data.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.system",
+    "lives_in": "household.status",
     "honoured_by": [
       "home"
     ]
@@ -1474,7 +1516,7 @@
     "help": "Play soft sounds during face enrollment as the camera finds your face, then a chime when a photo is taken.",
     "level": "basic",
     "secret": false,
-    "lives_in": "profile.appearance",
+    "lives_in": "person.profile",
     "honoured_by": [
       "home"
     ]
@@ -1528,7 +1570,7 @@
     "help": "Show engine timing and token details below your chat replies.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "profile.appearance",
+    "lives_in": "person.chat",
     "honoured_by": [
       "home"
     ]
