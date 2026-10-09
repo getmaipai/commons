@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-/**GENUI-01: one typed, renderable part of an answer, defined once here. A package returns blocks on `PluginResult.blocks`; the hub validates them, applies the output floor to each string by band, streams each as a `block` turn-stream event and stores them on the turn's `blocks`. Every client renders the same record: the web kit dispatches `kind` to the Element of the same name, Go renders it natively, the robot says `alt` when it has no screen. A client that does not know a `kind` falls back to `alt`. Envelope: `id`, `kind`, `schema_version`, `producer` (package id), `alt` (one plain sentence a screen reader, a TV fallback or the robot can say), optional `min_band`, `provenance`, `created_at` and `hlc` (the clock stamp every synced record carries), and the kind's `props`. Each kind's `props` mirror the props of the kit Element of the same name, so the web render is a pass-through; render-only Element props (visible counts, animation flags, callbacks, nodes) are not part of the record. Prop names are the Element's own (camelCase). Flat, never recursive: no block holds another block. The v1 kinds are a closed, additive list; a later kind is a new enum value and a new `props` shape, never a change to an existing one.*/
+/**GENUI-01: one typed, renderable part of an answer, defined once here. A package returns blocks on `PluginResult.blocks`; the hub validates them, applies the output floor to each string by band, streams each as a `block` turn-stream event and stores them on the turn's `blocks`. Every client renders the same record: the web kit dispatches `kind` to the Element of the same name, Go renders it natively, the robot says `alt` when it has no screen. A client that does not know a `kind` falls back to `alt`. Envelope: `id`, `kind`, `schema_version`, `producer` (package id), `alt` (one plain sentence a screen reader, a TV fallback or the robot can say), optional `min_band`, `provenance`, `created_at`, `hlc` (the clock stamp every synced record carries) and `after_paragraph` (hub-stamped placement in the reply text), and the kind's `props`. Each kind's `props` mirror the props of the kit Element of the same name, so the web render is a pass-through; render-only Element props (visible counts, animation flags, callbacks, nodes) are not part of the record. Prop names are the Element's own (camelCase). Flat, never recursive: no block holds another block. The v1 kinds are a closed, additive list; a later kind is a new enum value and a new `props` shape, never a change to an existing one.*/
 export const AnswerBlock = z
   .any()
   .superRefine((x, ctx) => {
@@ -55,6 +55,15 @@ export const AnswerBlock = z
             .describe(
               "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
             ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
           props: z
             .object({
               title: z.string(),
@@ -118,6 +127,15 @@ export const AnswerBlock = z
             .describe(
               "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
             ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
           props: z
             .object({
               columns: z.array(
@@ -491,6 +509,15 @@ export const AnswerBlock = z
             .describe(
               "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
             ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
           props: z
             .object({
               label: z.string(),
@@ -550,6 +577,15 @@ export const AnswerBlock = z
             .describe(
               "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
             ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
           props: z
             .object({
               events: z.array(
@@ -613,6 +649,15 @@ export const AnswerBlock = z
             .describe(
               "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
             ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
           props: z
             .object({
               items: z.array(
@@ -679,6 +724,15 @@ export const AnswerBlock = z
             .describe(
               "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
             ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
           props: z
             .object({
               images: z.array(
@@ -759,6 +813,15 @@ export const AnswerBlock = z
             .describe(
               "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
             ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
           props: z
             .object({
               name: z.string(),
@@ -824,6 +887,15 @@ export const AnswerBlock = z
             .describe(
               "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
             ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
           props: z
             .object({
               traitLabels: z.array(z.string()),
@@ -892,6 +964,6 @@ export const AnswerBlock = z
     }
   })
   .describe(
-    "GENUI-01: one typed, renderable part of an answer, defined once here. A package returns blocks on `PluginResult.blocks`; the hub validates them, applies the output floor to each string by band, streams each as a `block` turn-stream event and stores them on the turn's `blocks`. Every client renders the same record: the web kit dispatches `kind` to the Element of the same name, Go renders it natively, the robot says `alt` when it has no screen. A client that does not know a `kind` falls back to `alt`. Envelope: `id`, `kind`, `schema_version`, `producer` (package id), `alt` (one plain sentence a screen reader, a TV fallback or the robot can say), optional `min_band`, `provenance`, `created_at` and `hlc` (the clock stamp every synced record carries), and the kind's `props`. Each kind's `props` mirror the props of the kit Element of the same name, so the web render is a pass-through; render-only Element props (visible counts, animation flags, callbacks, nodes) are not part of the record. Prop names are the Element's own (camelCase). Flat, never recursive: no block holds another block. The v1 kinds are a closed, additive list; a later kind is a new enum value and a new `props` shape, never a change to an existing one.",
+    "GENUI-01: one typed, renderable part of an answer, defined once here. A package returns blocks on `PluginResult.blocks`; the hub validates them, applies the output floor to each string by band, streams each as a `block` turn-stream event and stores them on the turn's `blocks`. Every client renders the same record: the web kit dispatches `kind` to the Element of the same name, Go renders it natively, the robot says `alt` when it has no screen. A client that does not know a `kind` falls back to `alt`. Envelope: `id`, `kind`, `schema_version`, `producer` (package id), `alt` (one plain sentence a screen reader, a TV fallback or the robot can say), optional `min_band`, `provenance`, `created_at`, `hlc` (the clock stamp every synced record carries) and `after_paragraph` (hub-stamped placement in the reply text), and the kind's `props`. Each kind's `props` mirror the props of the kit Element of the same name, so the web render is a pass-through; render-only Element props (visible counts, animation flags, callbacks, nodes) are not part of the record. Prop names are the Element's own (camelCase). Flat, never recursive: no block holds another block. The v1 kinds are a closed, additive list; a later kind is a new enum value and a new `props` shape, never a change to an existing one.",
   );
 export type AnswerBlock = z.infer<typeof AnswerBlock>;

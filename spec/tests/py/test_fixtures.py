@@ -673,7 +673,29 @@ def _answer_block_fixtures(prefix: str) -> list[Path]:
 
 def test_answer_block_has_a_valid_fixture_per_v1_kind():
     names = {p.name for p in _answer_block_fixtures("valid")}
-    assert names == {f"valid-{k}.json" for k in V1_KINDS}
+    # One per kind, plus the GENUI-13a fixture that carries `after_paragraph`.
+    assert names == {f"valid-{k}.json" for k in V1_KINDS} | {
+        "valid-after-paragraph.json"
+    }
+
+
+def test_answer_block_after_paragraph_is_optional_non_negative_integer():
+    """GENUI-13a: absent is valid, 0 and a count are valid, -1 and a fraction are not."""
+    for kind in V1_KINDS:
+        block = json.loads((ANSWER_BLOCK_DIR / f"valid-{kind}.json").read_text())
+        assert "after_paragraph" not in block
+        PluginResult.model_validate({"blocks": [block]})
+        for good in (0, 1, 7):
+            PluginResult.model_validate(
+                {"blocks": [{**block, "after_paragraph": good}]}
+            )
+        # (Pydantic's lax mode reads the string "2" as 2 and the generated model lets an optional field be None;
+        # the JSON Schema and Zod refuse both, and that is what tests/ts/answer-block.test.ts checks.)
+        for bad in (-1, 1.5):
+            with pytest.raises(ValidationError):
+                PluginResult.model_validate(
+                    {"blocks": [{**block, "after_paragraph": bad}]}
+                )
 
 
 @pytest.mark.parametrize("path", _answer_block_fixtures("valid"), ids=lambda p: p.name)

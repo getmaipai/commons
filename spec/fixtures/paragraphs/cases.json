@@ -1,0 +1,44 @@
+{
+  "_comment": "GENUI-13a: shared cases for interpreters/ts/paragraphs.ts and interpreters/py/paragraphs.py. Both must give these answers.",
+  "count": [
+    { "name": "empty", "text": "", "count": 0 },
+    { "name": "blank only", "text": "\n\n  \n", "count": 0 },
+    { "name": "one paragraph", "text": "Just one.", "count": 1 },
+    { "name": "one paragraph with a single newline", "text": "line one\nline two", "count": 1 },
+    { "name": "two paragraphs", "text": "First.\n\nSecond.", "count": 2 },
+    { "name": "a trailing break adds none", "text": "First.\n\nSecond.\n\n", "count": 2 },
+    { "name": "a leading break adds none", "text": "\n\nFirst.\n\nSecond.", "count": 2 },
+    { "name": "a spaced blank line is a break", "text": "First.\n \t \nSecond.", "count": 2 },
+    { "name": "many blank lines are one break", "text": "First.\n\n\n\n\nSecond.", "count": 2 },
+    { "name": "a blank line inside a code fence is not a break", "text": "Before.\n\n```\nline\n\nline\n```\n\nAfter.", "count": 3 },
+    { "name": "an unclosed fence runs to the end", "text": "Before.\n\n```\nline\n\nmore", "count": 2 }
+  ],
+  "split": [
+    { "name": "n 0 is before any text", "text": "First.\n\nSecond.", "n": 0, "before": "", "after": "First.\n\nSecond." },
+    { "name": "n below 0 is before any text", "text": "First.\n\nSecond.", "n": -3, "before": "", "after": "First.\n\nSecond." },
+    { "name": "after the first paragraph", "text": "First.\n\nSecond.\n\nThird.", "n": 1, "before": "First.\n\n", "after": "Second.\n\nThird." },
+    { "name": "after the second paragraph", "text": "First.\n\nSecond.\n\nThird.", "n": 2, "before": "First.\n\nSecond.\n\n", "after": "Third." },
+    { "name": "n is the count and the text ends without a break: all before", "text": "First.\n\nSecond.", "n": 2, "before": "First.\n\nSecond.", "after": "" },
+    { "name": "n past the end: all before", "text": "First.\n\nSecond.", "n": 9, "before": "First.\n\nSecond.", "after": "" },
+    { "name": "a trailing break: n is the count splits at its end", "text": "First.\n\n", "n": 1, "before": "First.\n\n", "after": "" },
+    { "name": "a leading break does not count a paragraph", "text": "\n\nFirst.\n\nSecond.", "n": 1, "before": "\n\nFirst.\n\n", "after": "Second." },
+    { "name": "never inside a code fence", "text": "Intro.\n\n```\na\n\nb\n```\n\nOutro.", "n": 2, "before": "Intro.\n\n```\na\n\nb\n```\n\n", "after": "Outro." },
+    { "name": "empty text", "text": "", "n": 1, "before": "", "after": "" }
+  ],
+  "cut": [
+    { "name": "no break in the piece", "released": "First", "piece": " and more", "cut": -1 },
+    { "name": "a break in the piece", "released": "First", "piece": ".\n\nSecond", "cut": 3 },
+    { "name": "the break eats the whitespace after it", "released": "First.", "piece": "\n\n   Second", "cut": 5 },
+    { "name": "a break inside a fence opened earlier is skipped", "released": "Intro.\n\n```\ncode", "piece": "\n\nmore code", "cut": -1 },
+    { "name": "a fence closed in the piece before the break counts the break", "released": "Intro.\n\n```\ncode", "piece": "\n```\n\nOutro", "cut": 6 },
+    { "name": "a fence opened in the piece skips the break after it", "released": "Intro.", "piece": " ```\na\n\nb", "cut": -1 }
+  ],
+  "boundary": [
+    { "name": "nothing released yet", "released": "", "at": true },
+    { "name": "only whitespace released", "released": " \n", "at": true },
+    { "name": "mid paragraph", "released": "First", "at": false },
+    { "name": "just after a break", "released": "First.\n\n", "at": true },
+    { "name": "a single newline is not a break", "released": "First.\n", "at": false },
+    { "name": "just after a break inside a fence", "released": "```\ncode\n\n", "at": false }
+  ]
+}

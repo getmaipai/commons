@@ -57,6 +57,38 @@ describe("answer-block fixtures", () => {
   });
 });
 
+describe("after_paragraph (GENUI-13a)", () => {
+  test("one shared $def, referenced by every kind", () => {
+    expect(schema.$defs.after_paragraph).toMatchObject({ type: "integer", minimum: 0 });
+    for (const kind of V1_KINDS) expect(schema.$defs[kind].properties.after_paragraph).toEqual({ $ref: "#/$defs/after_paragraph" });
+  });
+
+  test("optional on every kind: 0 and a count are valid, -1 and a fraction are not, and absent is valid", () => {
+    for (const kind of V1_KINDS) {
+      const block = read("fixtures", "answer-block", `valid-${kind}.json`);
+      expect(block.after_paragraph).toBeUndefined();
+      expect(validate(block), kind).toBe(true);
+      for (const good of [0, 1, 7]) {
+        expect(validate({ ...block, after_paragraph: good }), `${kind} ${good}`).toBe(true);
+        expect(AnswerBlock.safeParse({ ...block, after_paragraph: good }).success).toBe(true);
+      }
+      for (const bad of [-1, 1.5, "2", null]) {
+        expect(validate({ ...block, after_paragraph: bad }), `${kind} ${String(bad)}`).toBe(false);
+        expect(AnswerBlock.safeParse({ ...block, after_paragraph: bad }).success).toBe(false);
+      }
+    }
+  });
+
+  test("it survives a parse (the stamped value is kept) and a stored turn carries it", () => {
+    const stamped = read("fixtures", "answer-block", "valid-after-paragraph.json");
+    expect(AnswerBlock.parse(stamped).after_paragraph).toBe(2);
+    const turn = read("fixtures", "records", "conversation-turn.blocks.example.json");
+    const withPlace = { ...turn, blocks: [{ ...turn.blocks[0], after_paragraph: 1 }, ...turn.blocks.slice(1)] };
+    expect(ConversationTurn.parse(withPlace).blocks[0]?.after_paragraph).toBe(1);
+    expect(ConversationTurn.parse(turn).blocks[0]?.after_paragraph).toBeUndefined();
+  });
+});
+
 describe("additive carriers of answer blocks", () => {
   const chart = read("fixtures", "answer-block", "valid-chart.json");
 
