@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { AnswerBlockView } from "./answer-block";
-import { ANSWER_BLOCK_FIXTURES } from "./AnswerBlockShowcase";
+import afterParagraph from "@maipai/spec/fixtures/answer-block/valid-after-paragraph.json";
+import { ANSWER_BLOCK_FIXTURES, AnswerBlockInlineShowcase, INLINE_REPLY } from "./AnswerBlockShowcase";
 
 afterEach(cleanup);
 
@@ -116,5 +117,64 @@ describe("AnswerBlockView fallback", () => {
     } finally {
       console.error = originalError;
     }
+  });
+});
+
+// GENUI-13b: the dispatcher ignores placement. An envelope field (`after_paragraph` included) is never forwarded to an
+// Element as a prop and never reaches the DOM; where a block sits in a reply is message-part order, not the kit's job.
+describe("AnswerBlockView ignores placement (GENUI-13b)", () => {
+  // React's generated ids differ between two renders; the comparison is on everything else.
+  const html = (node: React.ReactElement): string => {
+    const { container } = render(node);
+    const out = container.innerHTML.replace(/[«:]r[0-9a-z]+[»:]/g, "ID");
+    cleanup();
+    return out;
+  };
+
+  for (const kind of Object.keys(ANSWER_BLOCK_FIXTURES) as Array<keyof typeof ANSWER_BLOCK_FIXTURES>) {
+    test(`${kind}: the same markup with or without after_paragraph, whatever its value`, () => {
+      const plain = html(<AnswerBlockView block={fixture(kind)} />);
+      for (const n of [0, 1, 9]) {
+        expect(html(<AnswerBlockView block={{ ...fixture(kind), after_paragraph: n }} />)).toBe(plain);
+      }
+    });
+  }
+
+  test("no envelope field becomes an attribute of the block", () => {
+    const { container } = render(<AnswerBlockView block={{ ...fixture("spec_sheet"), after_paragraph: 3 }} />);
+    const root = container.querySelector('[data-slot="answer-block"]');
+    expect(root).not.toBeNull();
+    const names = Array.from(container.querySelectorAll("*")).flatMap((el) => el.getAttributeNames());
+    expect(names.filter((name) => /paragraph|producer|provenance|min.?band|hlc/i.test(name))).toEqual([]);
+    expect(
+      Array.from(root!.attributes)
+        .map((a) => a.name)
+        .sort(),
+    ).toEqual(["data-kind", "data-slot"]);
+  });
+
+  test("a block with after_paragraph still validates and renders its Element (the field is part of the record)", () => {
+    const { container } = render(<AnswerBlockView block={afterParagraph} />);
+    expect(container.querySelector('[data-slot="spec-sheet"]')).not.toBeNull();
+    expect(container.querySelector("[data-fallback]")).toBeNull();
+  });
+});
+
+describe("the inline story: a block between two paragraphs", () => {
+  test("renders text, the block, then text, in that order", () => {
+    const { container } = render(<AnswerBlockInlineShowcase />);
+    const story = container.querySelector('[data-story="inline-block"]')!;
+    const kids = Array.from(story.children);
+    expect(kids.map((el) => (el.matches("p") ? "text" : el.getAttribute("data-slot")))).toEqual([
+      "text",
+      "answer-block",
+      "text",
+    ]);
+    expect(kids[0]!.textContent).toContain("how the two phones compare");
+    expect(kids[0]!.textContent).toContain("details are in the sheet");
+    expect(kids[2]!.textContent).toContain("Both are on sale");
+    // The text on either side is the reply, cut at the block's own `after_paragraph` and nowhere else.
+    expect(afterParagraph.after_paragraph).toBe(2);
+    expect(kids[0]!.textContent + "\n\n" + kids[2]!.textContent).toBe(INLINE_REPLY);
   });
 });

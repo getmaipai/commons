@@ -1,5 +1,15 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.183] - ui-v0.5.183
+
+GENUI-13b: `AnswerBlockView` ignores placement. It passes only the block's
+`props` to the Element and forwards no envelope field (`after_paragraph`
+included) as a prop or an attribute; a kit test proves the markup is the same
+with and without it. Where a block sits in a reply is message part order (a
+text part, the block part, a text part), which assistant-ui already renders;
+the kit adds no layout or text-splitting logic. `AnswerBlockInlineShowcase`
+adds one story with a block between two paragraphs. No API change.
+
 ## [0.5.182] - ui-v0.5.182
 
 `AnswerBlockView` (`src/elements/answer-block.tsx`) renders a spec
