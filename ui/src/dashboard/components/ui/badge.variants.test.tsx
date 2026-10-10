@@ -39,3 +39,23 @@ describe("Badge tone", () => {
     expect(c).not.toContain("bg-secondary")
   })
 })
+
+describe("Badge placement", () => {
+  test("default adds no positioning classes", () => {
+    expect(badgeVariants({ placement: "inline" })).toBe(badgeVariants({}))
+    const c = cls(render(<Badge>x</Badge>).getByText("x"))
+    expect(c).not.toContain("absolute")
+  })
+
+  test("placement=corner pins to the top-end corner (dashboard and kit)", () => {
+    const d = cls(render(<Badge placement="corner">d</Badge>).getByText("d"))
+    expect(d).toEqual(expect.arrayContaining(["absolute", "-top-1", "-end-1"]))
+    const k = cls(render(<KitBadge placement="corner">k</KitBadge>).getByText("k"))
+    expect(k).toEqual(expect.arrayContaining(["absolute", "-top-1", "-end-1"]))
+  })
+
+  test("placement combines with tone", () => {
+    const c = cls(render(<Badge tone="warning" placement="corner">c</Badge>).getByText("c"))
+    expect(c).toEqual(expect.arrayContaining(["absolute", "bg-[color:var(--hue-orange)]"]))
+  })
+})

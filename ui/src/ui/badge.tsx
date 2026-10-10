@@ -25,10 +25,17 @@ const badgeVariants = cva(
         success: "bg-[color:var(--hue-teal)] text-foreground",
         warning: "bg-[color:var(--hue-orange)] text-foreground",
       },
+      // "corner" pins the badge to the top-end corner of a relative parent
+      // (an unread or status dot on an icon).
+      placement: {
+        inline: "",
+        corner: "absolute -top-1 -end-1",
+      },
     },
     defaultVariants: {
       variant: "default",
       tone: "default",
+      placement: "inline",
     },
   }
 )
@@ -37,6 +44,7 @@ function Badge({
   className,
   variant = "default",
   tone,
+  placement,
   asChild = false,
   ...props
 }: React.ComponentProps<"span"> &
@@ -47,7 +55,7 @@ function Badge({
     <Comp
       data-slot="badge"
       data-variant={variant}
-      className={cn(badgeVariants({ variant, tone }), className)}
+      className={cn(badgeVariants({ variant, tone, placement }), className)}
       {...props}
     />
   )

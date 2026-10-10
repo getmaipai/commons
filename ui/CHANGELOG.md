@@ -1,5 +1,16 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.190] - ui-v0.5.190
+
+`Badge` gains an additive `placement` axis so a caller never needs a
+`className` to pin a count or status dot to a corner (RULE9-COMMONS-VARIANTS-01,
+Home rule 9). Both the dashboard and kit badges get it; the default adds no
+classes. The parent must be `relative`. `BadgeVariantsShowcase` shows it.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `Badge.placement` | `"inline" \| "corner"` (absolute, top-end) | `"inline"` |
+
 ## [0.5.189] - ui-v0.5.189
 
 `Badge` gains an additive `tone` axis so a caller never needs a `className`
