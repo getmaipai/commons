@@ -19,8 +19,15 @@ function PopoverContent({
   className,
   align = "center",
   sideOffset = 4,
+  padding = "default",
+  width = "default",
   ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+}: React.ComponentProps<typeof PopoverPrimitive.Content> & {
+  // Additive (RULE9-COMMONS-VARIANTS-01). "none" removes the inner padding.
+  padding?: "default" | "none"
+  // "auto" sizes to the content instead of the fixed w-72.
+  width?: "default" | "auto"
+}) {
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
@@ -29,6 +36,8 @@ function PopoverContent({
         sideOffset={sideOffset}
         className={cn(
           "z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+          padding === "none" && "p-0",
+          width === "auto" && "w-auto",
           className
         )}
         {...props}

@@ -1,5 +1,18 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.188] - ui-v0.5.188
+
+`PopoverContent` gains two additive variants so a caller never needs a
+`className` for padding or width (RULE9-COMMONS-VARIANTS-01, Home rule 9).
+Both the dashboard and kit popovers get them; every default adds no classes.
+Covers Home's `p-0 w-auto` on `PopoverContent` (StatusBoard date picker).
+`PopoverVariantsShowcase` shows them.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `PopoverContent.padding` | `"default" \| "none"` | `"default"` |
+| `PopoverContent.width` | `"default" \| "auto"` | `"default"` |
+
 ## [0.5.187] - ui-v0.5.187
 
 `SelectTrigger` gains additive variants so a caller never needs a
