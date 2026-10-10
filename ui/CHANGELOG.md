@@ -1,5 +1,17 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.187] - ui-v0.5.187
+
+`SelectTrigger` gains additive variants so a caller never needs a
+`className` for touch height or width (RULE9-COMMONS-VARIANTS-01, Home rule 9).
+Every default adds no classes. Covers Home's `min-h-12 w-full` on
+`SelectTrigger` (StatusBoard). `SelectVariantsShowcase` shows them.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `SelectTrigger.size` (dashboard) | adds `"touch"` (auto height, 48px floor) to `"sm" \| "default" \| "row"` | `"default"` |
+| `SelectTrigger.width` (dashboard and kit) | `"fit" \| "full"` | `"fit"` |
+
 ## [0.5.186] - ui-v0.5.186
 
 `DialogContent` gains two additive variants so a caller never needs a
