@@ -1,5 +1,20 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.186] - ui-v0.5.186
+
+`DialogContent` gains two additive variants so a caller never needs a
+`className` for width or scrolling (RULE9-COMMONS-VARIANTS-01, Home rule 9).
+Both families get them: `src/dashboard/components/ui/dialog.tsx` and
+`src/ui/dialog.tsx`. Every default adds no classes. Covers Home's
+`max-h-screen overflow-y-auto sm:max-w-lg` on `DialogContent`.
+`DialogVariantsShowcase` shows them.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `DialogContent.size` (dashboard) | `"default" \| "lg" \| "xl"` (sm:max-w-sm, lg, 2xl) | `"default"` |
+| `DialogContent.size` (kit, default variant) | adds `"sm"` and `"xl"` to `"default" \| "lg"` | `"default"` |
+| `DialogContent.scroll` | `"none" \| "viewport"` (max-h-screen, overflow-y-auto) | `"none"` |
+
 ## [0.5.185] - ui-v0.5.185
 
 `Button` (`src/ui/button.tsx`) gains four additive layout variants so a caller

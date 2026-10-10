@@ -50,12 +50,17 @@ function DialogContent({
   children,
   variant = "default",
   size = "default",
+  scroll = "none",
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   variant?: "default" | "command" | "call"
-  // Only the command variant reads it: "lg" is the ChatGPT-proportioned search dialog.
-  size?: "default" | "lg"
+  // The command variant reads "lg" (the ChatGPT-proportioned search dialog).
+  // The default variant reads "sm" and "xl" (RULE9-COMMONS-VARIANTS-01); its
+  // "default" and "lg" stay sm:max-w-lg.
+  size?: "sm" | "default" | "lg" | "xl"
+  // "viewport" caps the height at the screen and scrolls the content.
+  scroll?: "none" | "viewport"
   showCloseButton?: boolean
 }) {
   return (
@@ -73,6 +78,9 @@ function DialogContent({
                 size === "lg" ? "sm:max-w-3xl" : "sm:max-w-sm"
               )
               : "grid gap-4 rounded-lg border bg-background p-6 shadow-lg sm:max-w-lg",
+          variant === "default" && size === "sm" && "sm:max-w-sm",
+          variant === "default" && size === "xl" && "sm:max-w-2xl",
+          scroll === "viewport" && "max-h-screen overflow-y-auto",
           className
         )}
         {...props}
