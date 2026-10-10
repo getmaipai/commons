@@ -43,10 +43,37 @@ const buttonVariants = cva(
         "icon-sm": `size-8 ${hitArea(2)}`,
         "icon-lg": `size-10 ${hitArea(1)}`,
       },
+      // Additive layout axes (RULE9-COMMONS-VARIANTS-01). Every default is an
+      // empty string, so a Button that sets none of them renders the exact
+      // classes it did before. They exist so a caller never needs a
+      // className to change layout (Home rule 9).
+      align: {
+        center: "",
+        // Content starts at the leading edge (list rows, menu-like buttons).
+        start: "justify-start text-left",
+      },
+      height: {
+        fixed: "",
+        // Grows with its content, never below the 48px touch floor.
+        auto: "h-auto min-h-12 py-2",
+      },
+      width: {
+        auto: "",
+        full: "w-full",
+      },
+      wrap: {
+        nowrap: "",
+        // Long labels wrap instead of overflowing.
+        wrap: "whitespace-normal text-left",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      align: "center",
+      height: "fixed",
+      width: "auto",
+      wrap: "nowrap",
     },
   }
 )
@@ -55,6 +82,10 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  align,
+  height,
+  width,
+  wrap,
   asChild = false,
   ...props
 }: React.ComponentProps<"button"> &
@@ -68,7 +99,7 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, align, height, width, wrap, className }))}
       {...props}
     />
   )

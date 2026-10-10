@@ -1,5 +1,19 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.185] - ui-v0.5.185
+
+`Button` (`src/ui/button.tsx`) gains four additive layout variants so a caller
+never needs a `className` for layout (RULE9-COMMONS-VARIANTS-01, Home rule 9).
+Every default adds no classes: a Button that sets none renders exactly as
+before. `ButtonVariantsShowcase` shows them.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `Button.align` | `"center" \| "start"` | `"center"` |
+| `Button.height` | `"fixed" \| "auto"` (auto keeps the 48px minimum) | `"fixed"` |
+| `Button.width` | `"auto" \| "full"` | `"auto"` |
+| `Button.wrap` | `"nowrap" \| "wrap"` | `"nowrap"` |
+
 ## [0.5.184] - ui-v0.5.184
 
 NEXT-RETIRE-02D: the app menu stops emitting the preview-era `/next` urls.
