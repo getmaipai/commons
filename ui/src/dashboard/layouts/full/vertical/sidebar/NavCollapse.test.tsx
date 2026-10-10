@@ -11,8 +11,8 @@ afterEach(cleanup);
 const menu = [{
   heading: "Home",
   items: [
-    { name: "Home", url: "/next", icon: HomeIcon },
-    { name: "Chat", url: "/next/chat", icon: MessageCircleIcon },
+    { name: "Home", url: "/", icon: HomeIcon },
+    { name: "Chat", url: "/chat", icon: MessageCircleIcon },
   ],
 }];
 
@@ -20,7 +20,7 @@ describe("NavCollapse active marker", () => {
   for (const [label, defaultOpen] of [["expanded", true], ["folded (icon rail)", false]] as const) {
     test(`${label}: the current page's link is data-active and aria-current, others are not`, () => {
       const { container } = render(
-        <MemoryRouter initialEntries={["/next/chat"]}>
+        <MemoryRouter initialEntries={["/chat"]}>
           <TooltipProvider>
             <SidebarProvider defaultOpen={defaultOpen}>
               <NavCollapse menu={menu} />
@@ -28,8 +28,8 @@ describe("NavCollapse active marker", () => {
           </TooltipProvider>
         </MemoryRouter>,
       );
-      const active = container.querySelector<HTMLAnchorElement>('a[href="/next/chat"]')!;
-      const other = container.querySelector<HTMLAnchorElement>('a[href="/next"]')!;
+      const active = container.querySelector<HTMLAnchorElement>('a[href="/chat"]')!;
+      const other = container.querySelector<HTMLAnchorElement>('a[href="/"]')!;
       expect(active.hasAttribute("data-active")).toBe(true);
       expect(active.getAttribute("aria-current")).toBe("page");
       expect(other.hasAttribute("data-active")).toBe(false);
@@ -47,7 +47,7 @@ describe("NavCollapse active marker", () => {
         </TooltipProvider>
       </MemoryRouter>,
     );
-    expect(container.querySelector('a[href="/next/chat"]')!.getAttribute("aria-current")).toBe("page");
-    expect(container.querySelector('a[href="/next"]')!.hasAttribute("aria-current")).toBe(false);
+    expect(container.querySelector('a[href="/chat"]')!.getAttribute("aria-current")).toBe("page");
+    expect(container.querySelector('a[href="/"]')!.hasAttribute("aria-current")).toBe(false);
   });
 });

@@ -19,7 +19,7 @@ function LocationProbe() {
 
 function Harness({ remote, size }: { remote?: (query: string) => Promise<SearchGroup[]>; size?: "default" | "lg" } = {}) {
   return (
-    <MemoryRouter initialEntries={["/next"]}>
+    <MemoryRouter initialEntries={["/"]}>
       <HeaderSearch remote={remote} size={size} />
       <Routes>
         <Route path="*" element={<LocationProbe />} />
@@ -54,7 +54,7 @@ describe("HeaderSearch (SHELL-SEARCH-01)", () => {
     expect(getByText("Family")).not.toBeNull();
     expect(queryByText("Chat")).toBeNull();
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(getByTestId("location").textContent).toBe("/next/people");
+    expect(getByTestId("location").textContent).toBe("/people");
   });
 
   test("Cmd+K opens the dialog from anywhere on the page", () => {
@@ -103,7 +103,7 @@ describe("HeaderSearch (SEARCH-MODAL-SIZE-02): the size prop", () => {
 
 describe("HeaderSearch (SHELL-SEARCH-02): the remote prop", () => {
   test("renders a caller's own remote groups as real command items, below the sidebar sections", async () => {
-    const groups: SearchGroup[] = [{ kind: "conversation", heading: "Conversations", results: [{ kind: "conversation", id: "conv-1", title: "Pizza night plans", subtitle: "3 days ago", href: "/next/chat?conversation=conv-1" }] }];
+    const groups: SearchGroup[] = [{ kind: "conversation", heading: "Conversations", results: [{ kind: "conversation", id: "conv-1", title: "Pizza night plans", subtitle: "3 days ago", href: "/chat?conversation=conv-1" }] }];
     const remote = async (query: string) => (query === "pizza" ? groups : []);
     const { getByRole, getByPlaceholderText, getByText, getByTestId } = render(<Harness remote={remote} />);
     fireEvent.click(getByRole("button", { name: "Search" }));
@@ -112,7 +112,7 @@ describe("HeaderSearch (SHELL-SEARCH-02): the remote prop", () => {
     expect(getByText("Pizza night plans")).not.toBeNull();
     expect(getByText("3 days ago")).not.toBeNull();
     fireEvent.click(getByText("Pizza night plans"));
-    expect(getByTestId("location").textContent).toBe("/next/chat");
+    expect(getByTestId("location").textContent).toBe("/chat");
   });
 
   // A review caught this: cmdk's own default `filter` re-scores every
@@ -123,7 +123,7 @@ describe("HeaderSearch (SHELL-SEARCH-02): the remote prop", () => {
   // "Bramble" only by household-search relevance, not by any substring
   // of "Bramble" itself, is the regression case.
   test("a remote result with no textual resemblance to the query still renders - server relevance, not cmdk's own fuzzy filter", async () => {
-    const groups: SearchGroup[] = [{ kind: "person", heading: "People", results: [{ kind: "person", id: "p-1", title: "Bramble", href: "/next/people" }] }];
+    const groups: SearchGroup[] = [{ kind: "person", heading: "People", results: [{ kind: "person", id: "p-1", title: "Bramble", href: "/people" }] }];
     const remote = async (query: string) => (query === "sea" ? groups : []);
     const { getByRole, getByPlaceholderText, getByText } = render(<Harness remote={remote} />);
     fireEvent.click(getByRole("button", { name: "Search" }));

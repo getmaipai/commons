@@ -11,7 +11,7 @@ import { Link } from "react-router";
 import { hitArea } from "../../../../../utils";
 
 const navItems = [
-  { title: "Settings", href: "/next/settings", icon: Settings },
+  { title: "Settings", href: "/settings", icon: Settings },
   { title: "Help", href: "https://github.com/getmaipai/home/blob/main/docs/user/README.md", icon: LifeBuoy },
 ];
 

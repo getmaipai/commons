@@ -15,7 +15,7 @@ export function NavUser() {
     const navItems = [
         {
             title: "Settings",
-            url: "/next/settings",
+            url: "/settings",
             icon: Settings,
         },
         {

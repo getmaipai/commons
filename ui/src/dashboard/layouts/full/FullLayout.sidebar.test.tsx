@@ -13,10 +13,10 @@ afterEach(() => {
 
 function renderLayout(defaultSidebarOpen = true) {
   return render(
-    <MemoryRouter initialEntries={["/next"]}>
+    <MemoryRouter initialEntries={["/"]}>
       <TooltipProvider>
         <Routes>
-          <Route path="/next" element={<FullLayout defaultSidebarOpen={defaultSidebarOpen} showSidebarTriggerInMenu showHeaderSidebarTrigger={false} />}>
+          <Route path="/" element={<FullLayout defaultSidebarOpen={defaultSidebarOpen} showSidebarTriggerInMenu showHeaderSidebarTrigger={false} />}>
             <Route index element={<div>Page</div>} />
           </Route>
         </Routes>
@@ -57,10 +57,10 @@ describe("SHELL-FOLD-01 menu defaults", () => {
 
   test("each folded icon tooltip starts with its name, including entries with a status sentence", () => {
     const { getByRole } = render(
-      <MemoryRouter initialEntries={["/next"]}>
+      <MemoryRouter initialEntries={["/"]}>
         <TooltipProvider>
           <Routes>
-            <Route path="/next" element={<FullLayout defaultSidebarOpen={false} showSidebarTriggerInMenu showHeaderSidebarTrigger={false} sidebarItemStatus={(item) => item.name === "Chat" ? { title: "Chat has outside services with no recent use.", ariaLabel: "Chat: degraded" } : undefined} />}>
+            <Route path="/" element={<FullLayout defaultSidebarOpen={false} showSidebarTriggerInMenu showHeaderSidebarTrigger={false} sidebarItemStatus={(item) => item.name === "Chat" ? { title: "Chat has outside services with no recent use.", ariaLabel: "Chat: degraded" } : undefined} />}>
               <Route index element={<div>Page</div>} />
             </Route>
           </Routes>

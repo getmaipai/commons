@@ -1,5 +1,15 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.184] - ui-v0.5.184
+
+NEXT-RETIRE-02D: the app menu stops emitting the preview-era `/next` urls.
+`sidebaritems` now links Home, Chat, Library and Family to `/`, `/chat`,
+`/files` and `/people`; the user menu and the header profile menu link
+Settings to `/settings`. Those are the paths Home mounts its pages at, so no
+click passes through a `/next` redirect. `railHref` and the `NavCollapse`
+active check still strip a leading `/next` from a host-supplied menu, so a
+custom menu written under `/next` keeps working. No API change.
+
 ## [0.5.183] - ui-v0.5.183
 
 GENUI-13b: `AnswerBlockView` ignores placement. It passes only the block's

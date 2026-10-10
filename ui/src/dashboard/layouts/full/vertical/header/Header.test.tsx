@@ -12,11 +12,11 @@ afterEach(() => {
 
 function renderLayout(showThemeToggle?: boolean, statusIndicator?: React.ReactNode, notifications?: React.ReactNode) {
   return render(
-    <MemoryRouter initialEntries={["/next"]}>
+    <MemoryRouter initialEntries={["/"]}>
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Routes>
-            <Route path="/next" element={<FullLayout showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} notifications={notifications} />}>
+            <Route path="/" element={<FullLayout showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} notifications={notifications} />}>
               <Route index element={<div />} />
             </Route>
           </Routes>
