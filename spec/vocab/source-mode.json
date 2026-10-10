@@ -1,0 +1,37 @@
+{
+  "$comment": "KS-MODE-00 (home/docs/BACKLOG.md): the search source mode, declared once. Three values for the household key `search.source_mode`; the two per-source keys `search.source_mode.wikimedia` and `search.source_mode.web` take the same three plus `inherit` (follow the household value). `offline` is the narrow reading: it turns off only the Wikipedia-style live lookup, and web search, page reads, Wayback and the hosted provider stay on unless `search.source_mode.web` is itself `offline`. The mode is a ceiling for a child or teen, never a widening: a minor never reaches the live Wikipedia-style lookup or the hosted provider in any mode, and `live` changes nothing for them. Every `copy` line passes the settings copy lint (one sentence, at most 90 characters); `help` is the longer text a key's help repeats. The shipped presets (Minimum, Moderate, Full) all carry the setting value `search.source_mode = mix`; those values live in KS-REF-00's `reference-presets.json`, whose test checks the preset value is one of `values[].value`. Migration of the retired `search.wikipedia_fallback`: a stored `false` becomes `search.source_mode.wikimedia = offline` (never the household mode); a stored `true` or no stored value becomes `inherit`. The old key stays in keys.json in this tag and is removed in the tag paired with KS-MODE-01.",
+  "default": "mix",
+  "override_default": "inherit",
+  "values": [
+    {
+      "value": "live",
+      "label": "Internet first",
+      "copy": "Tries a live lookup whenever the web finds nothing, even if the library has a match.",
+      "help": "A live Wikipedia-style lookup is tried whenever web search finds nothing, even if the offline library already has a match. For children and teens nothing changes: they keep their current protections in every mode."
+    },
+    {
+      "value": "offline",
+      "label": "Library only",
+      "copy": "Skips live Wikipedia-style lookups, and web search stays on unless turned off itself.",
+      "help": "Turns off only the live Wikipedia-style lookup. Web search stays on unless web search is itself set to Library only in its own choice. The news shelf, link reading and integrations keep their own switches."
+    },
+    {
+      "value": "mix",
+      "label": "Library first",
+      "copy": "Checks the offline library first, then tries a live lookup only if nothing turns up.",
+      "help": "The offline library answers first. A live Wikipedia-style lookup is tried only when the library and web search both find nothing. This is the recommended choice."
+    }
+  ],
+  "override_values": [
+    {
+      "value": "inherit",
+      "label": "Same as the household choice",
+      "copy": "Follows the household choice for where answers come from."
+    }
+  ],
+  "web_copy": {
+    "live": "Goes to the internet even when the library already has a match.",
+    "offline": "Turns off web search, link reading, Wayback and the hosted provider.",
+    "mix": "Goes to the internet after the library, and only when it has no answer."
+  }
+}

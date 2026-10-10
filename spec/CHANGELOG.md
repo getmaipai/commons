@@ -1,3 +1,7 @@
+## [spec-v0.1.115] - 2026-10-09
+
+- `vocab/source-mode.json` and the settings `search.source_mode` (`live`, `offline`, `mix`, default `mix`) plus the per-source `search.source_mode.wikimedia` and `search.source_mode.web` (`inherit` and the three modes, default `inherit`, advanced), with plain-words copy (KS-MODE-00). `offline` turns off only the Wikipedia-style live lookup. `search.wikipedia_fallback` is kept unchanged in this tag and removed in the tag paired with KS-MODE-01.
+
 ## [spec-v0.1.101] - 2026-10-07
 
 - Include admin-only Home Voices in the Household settings group.
