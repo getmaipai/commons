@@ -20,9 +20,17 @@ const badgeVariants = cva(
           "cn-badge-variant-ghost hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "cn-badge-variant-link text-primary underline-offset-4 hover:underline",
       },
+      // Additive axes (RULE9-COMMONS-VARIANTS-01). Defaults add no classes.
+      // Tone paints the fill from the hue tokens; it wins over the variant fill.
+      tone: {
+        default: "",
+        success: "bg-[color:var(--hue-teal)] text-foreground",
+        warning: "bg-[color:var(--hue-orange)] text-foreground",
+      },
     },
     defaultVariants: {
       variant: "default",
+      tone: "default",
     },
   }
 )
@@ -30,6 +38,7 @@ const badgeVariants = cva(
 function Badge({
   className,
   variant = "default",
+  tone,
   render,
   ...props
 }: useRender.ComponentProps<"span"> & VariantProps<typeof badgeVariants>) {
@@ -37,7 +46,7 @@ function Badge({
     defaultTagName: "span",
     props: mergeProps<"span">(
       {
-        className: cn(badgeVariants({ variant }), className),
+        className: cn(badgeVariants({ variant, tone }), className),
       },
       props
     ),

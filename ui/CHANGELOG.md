@@ -1,5 +1,18 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.189] - ui-v0.5.189
+
+`Badge` gains an additive `tone` axis so a caller never needs a `className`
+to paint a status fill (RULE9-COMMONS-VARIANTS-01, Home rule 9). Both the
+dashboard and kit badges get it; the default adds no classes. Covers Home's
+`bg-[var(--hue-teal)]` and `bg-[var(--hue-orange)]` (ModelsSection fit badge),
+with `text-foreground`. Use it with `variant="secondary"` or `"default"`; the
+destructive variant keeps its own dark fill. `BadgeVariantsShowcase` shows it.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `Badge.tone` | `"default" \| "success" \| "warning"` (teal, orange) | `"default"` |
+
 ## [0.5.188] - ui-v0.5.188
 
 `PopoverContent` gains two additive variants so a caller never needs a

@@ -18,9 +18,17 @@ const badgeVariants = cva(
         ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         link: "text-primary underline-offset-4 [a&]:hover:underline",
       },
+      // Additive axes (RULE9-COMMONS-VARIANTS-01). Defaults add no classes.
+      // Tone paints the fill from the hue tokens; it wins over the variant fill.
+      tone: {
+        default: "",
+        success: "bg-[color:var(--hue-teal)] text-foreground",
+        warning: "bg-[color:var(--hue-orange)] text-foreground",
+      },
     },
     defaultVariants: {
       variant: "default",
+      tone: "default",
     },
   }
 )
@@ -28,6 +36,7 @@ const badgeVariants = cva(
 function Badge({
   className,
   variant = "default",
+  tone,
   asChild = false,
   ...props
 }: React.ComponentProps<"span"> &
@@ -38,7 +47,7 @@ function Badge({
     <Comp
       data-slot="badge"
       data-variant={variant}
-      className={cn(badgeVariants({ variant }), className)}
+      className={cn(badgeVariants({ variant, tone }), className)}
       {...props}
     />
   )
