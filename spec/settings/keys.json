@@ -1489,6 +1489,97 @@
     ]
   },
   {
+    "key": "search.source_mode",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "live",
+        "offline",
+        "mix"
+      ]
+    },
+    "default": "mix",
+    "label": "Search sources",
+    "help": "Where MaiPai looks for answers: Internet first, Library only, or Library first (the recommended choice). Library only turns off just the live Wikipedia-style lookup; web search stays on unless web search is itself set to Library only. Children and teens keep their current protections in every mode, and this choice never widens what they can reach.",
+    "copy": {
+      "does": "Chooses whether lookups use the offline library, the live internet, or both.",
+      "options": {
+        "live": "Tries a live lookup whenever the web finds nothing, even if the library has a match.",
+        "offline": "Skips live Wikipedia-style lookups, and web search stays on unless turned off itself.",
+        "mix": "Checks the offline library first, then tries a live lookup only if nothing turns up."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.source_mode.wikimedia",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "inherit",
+        "live",
+        "offline",
+        "mix"
+      ]
+    },
+    "default": "inherit",
+    "label": "Encyclopedia lookups",
+    "help": "Gives the live Wikipedia-style lookup its own choice. Same as the household choice follows the search sources setting. Library only turns this lookup off. Children and teens never use this lookup in any mode.",
+    "copy": {
+      "does": "Sets the Wikipedia-style lookup apart from the household choice.",
+      "options": {
+        "inherit": "Follows the household choice for where answers come from.",
+        "live": "Tries a live lookup whenever the web finds nothing, even if the library has a match.",
+        "offline": "Skips live Wikipedia-style lookups, and web search stays on unless turned off itself.",
+        "mix": "Checks the offline library first, then tries a live lookup only if nothing turns up."
+      }
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.source_mode.web",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "inherit",
+        "live",
+        "offline",
+        "mix"
+      ]
+    },
+    "default": "inherit",
+    "label": "Web searches",
+    "help": "Gives web search its own choice. Same as the household choice follows the search sources setting. Library only here turns off web search, link reading, Wayback and the hosted search provider together. Children and teens keep their current protections in every mode.",
+    "copy": {
+      "does": "Sets web search, page reads and the hosted provider apart from the household choice.",
+      "options": {
+        "inherit": "Follows the household choice for where answers come from.",
+        "live": "Goes to the internet even when the library already has a match.",
+        "offline": "Turns off web search, link reading, Wayback and the hosted provider.",
+        "mix": "Goes to the internet after the library, and only when it has no answer."
+      }
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.wayback_fallback",
     "scope": "household",
     "selector": "boolean",
