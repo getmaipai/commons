@@ -1,3 +1,7 @@
+## [spec-v0.1.117] - 2026-10-11
+
+- Settings key `search.dictionary_fallback` (household boolean, default off, advanced): look a word up on Wiktionary when the offline library has no entry. Adults only; the word is sent to Wikimedia.
+
 ## [spec-v0.1.116] - 2026-10-10
 
 - Same contents as spec-v0.1.115, with `spec/package.json` bumped to match its tag. The v0.1.115 tag was cut with a stale package version and is not used.

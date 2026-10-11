@@ -1436,6 +1436,23 @@
     ]
   },
   {
+    "key": "search.dictionary_fallback",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Look up words online",
+    "help": "Look up a word online when the library does not have it. The word you ask about is sent to Wiktionary (Wikimedia). Adults only. Off by default.",
+    "copy": {
+      "does": "Looks a word up on Wiktionary when the offline library has no entry for it."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.fetch_cache_gb",
     "scope": "household",
     "selector": "number",
