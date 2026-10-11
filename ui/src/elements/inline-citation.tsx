@@ -9,6 +9,8 @@ export interface Source {
   domain: string;
   title: string;
   snippet?: string;
+  /** Optional extra line (a licence and snapshot date, e.g.) under the title. */
+  detail?: string;
   href?: string;
 }
 
@@ -56,6 +58,7 @@ export function Citation({ index, source, open, onOpenChange }: CitationProps) {
             <p className="mt-2 text-[13px] leading-snug font-medium">
               {source.title}
             </p>
+            {source.detail ? <p data-slot="source-detail" className="text-muted-foreground mt-0.5 text-[11px] leading-snug break-words">{source.detail}</p> : null}
             {source.snippet ? <p className="text-muted-foreground mt-1 text-[13px] leading-relaxed">{source.snippet}</p> : null}
           </PreviewCard.Popup>
         </PreviewCard.Positioner>

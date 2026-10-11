@@ -1,5 +1,17 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.191] - ui-v0.5.191
+
+`Sources` (and the inline `Citation` popup) gain an optional `detail` string on
+each source (KS-02F-KIT), for a licence and snapshot line that does not fit
+the truncated domain. The list layout renders it as its own wrapping second
+line under the title row; the grid layout renders it under the title. When
+absent the output is unchanged.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `Source.detail` (`sources.tsx`, `inline-citation.tsx`) | `string` | unset; nothing rendered |
+
 ## [0.5.190] - ui-v0.5.190
 
 `Badge` gains an additive `placement` axis so a caller never needs a

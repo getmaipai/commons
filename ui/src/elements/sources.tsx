@@ -12,6 +12,11 @@ import { collapsePanel, fieldInteractive, mono, paper } from "./surfaces";
 export interface Source {
   domain: string;
   title: string;
+  /** Optional extra line (a licence and snapshot date, e.g.). Rendered on
+   * its own wrapping line under the title, never folded into `domain`, so
+   * it is not clipped by the list layout's truncated domain. Absent: the
+   * output is identical to before. */
+  detail?: string;
 }
 
 export interface SourcesProps {
@@ -93,7 +98,7 @@ export function Sources({
             {sources.map((source, index) => (
               <div
                 key={index}
-                className="flex items-center gap-2 rounded-lg px-1 py-1"
+                className={cn("flex items-center gap-2 rounded-lg px-1 py-1", source.detail && "flex-wrap gap-y-0.5")}
               >
                 <SourceGlyph domain={source.domain} />
                 {/* `min-w-0` on both spans (a bot review on the
@@ -111,6 +116,11 @@ export function Sources({
                 <span className={cn(mono, "text-muted-foreground min-w-0 max-w-[40%] shrink truncate text-[11px]")}>
                   {source.domain}
                 </span>
+                {source.detail ? (
+                  <span data-slot="source-detail" className="text-muted-foreground w-full basis-full pl-6 text-[11px] leading-snug break-words">
+                    {source.detail}
+                  </span>
+                ) : null}
               </div>
             ))}
           </div>
@@ -133,6 +143,11 @@ export function Sources({
                 <span className="text-foreground/90 line-clamp-2 text-[13px] leading-snug font-medium">
                   {source.title}
                 </span>
+                {source.detail ? (
+                  <span data-slot="source-detail" className="text-muted-foreground text-[11px] leading-snug break-words">
+                    {source.detail}
+                  </span>
+                ) : null}
               </div>
             ))}
           </div>
