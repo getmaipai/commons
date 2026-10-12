@@ -361,7 +361,7 @@
         "outbound": true,
         "reversible": true,
         "approver": {
-          "child": "parent",
+          "child": "never",
           "teen": "self",
           "adult": "self"
         }

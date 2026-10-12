@@ -1,3 +1,9 @@
+## [spec-v0.1.120] - 2026-10-11
+
+- Capability policy (MINOR-SEARCH-01a): `integration:<id>` gains `by_parameter.searxng` with `none` for child, teen and adult, so web search through the household's own SearXNG runs without a parent's approval; every other integration still asks a parent for a minor. Risk stays `action`, so crisis and untrusted-provenance denials are unchanged. `search.household_subject` is now `never` for a child (was `parent`); teen and adult stay `self`.
+- Settings keys `search.web.child_mode` and `search.web.teen_mode` (household select `on`/`off`, default `on`, basic, `household.search`): whether web search runs for people using child or teen controls. Admin-edited household switches; neither shows what any person searched for.
+- `search.safe_search` help no longer says only an adult can change a child's or teen's. A child's is always strict; a teen can make theirs stricter but never below moderate.
+
 ## [spec-v0.1.119] - 2026-10-11
 
 - Settings key `search.web_sources` (household select with `range.multiple`: `searxng`, `ddgs`; default `["searxng"]`; advanced): which services answer web searches. `ddgs` is listed but inert until its source is built; Home refuses an empty or ddgs-only list at write. Children and teens only use SearXNG.

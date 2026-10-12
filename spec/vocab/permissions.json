@@ -179,6 +179,13 @@
           "child": "parent",
           "teen": "parent",
           "adult": "none"
+        },
+        "by_parameter": {
+          "searxng": {
+            "child": "none",
+            "teen": "none",
+            "adult": "none"
+          }
         }
       }
     },

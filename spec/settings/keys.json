@@ -1504,7 +1504,7 @@
     },
     "default": "default",
     "label": "Safe search level",
-    "help": "How strictly web search filters results for you. \"Default\" follows your age: strict for a child, moderate for a teen, off for an adult. An adult can change their own; only an adult can change a child's or teen's, and a child or teen can never loosen their own below their default.",
+    "help": "How strictly web search filters results for you. \"Default\" follows your age: strict for a child, moderate for a teen, off for an adult. A child's is always strict. A teen can make theirs stricter but never lower than moderate. An adult can change their own.",
     "level": "basic",
     "secret": false,
     "lives_in": "person.search",
@@ -1616,6 +1616,60 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "search.web.child_mode",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "on",
+        "off"
+      ]
+    },
+    "default": "on",
+    "label": "Web search with child controls",
+    "help": "When this is on, MaiPai can look things up on the web for people using child controls. Results go through SafeSearch at its strictest, adult sites are blocked, and links are hidden. When it is off, answers come only from the offline library. Only an admin can change this, and a child's searches show in that child's own chats.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Lets answers look things up online, or keeps them to the offline library.",
+      "options": {
+        "on": "Looks things up online, with the safeguards described above.",
+        "off": "Answers only from the offline library."
+      }
+    }
+  },
+  {
+    "key": "search.web.teen_mode",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "on",
+        "off"
+      ]
+    },
+    "default": "on",
+    "label": "Web search with teen controls",
+    "help": "When this is on, MaiPai can look things up on the web for people using teen controls. Results go through SafeSearch at moderate or stricter, and adult sites are blocked. When it is off, answers come only from the offline library. Only an admin can change this. It does not show anyone what a teen searched for.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Lets answers look things up online, or keeps them to the offline library.",
+      "options": {
+        "on": "Looks things up online, with the safeguards described above.",
+        "off": "Answers only from the offline library."
+      }
+    }
   },
   {
     "key": "search.web_sources",

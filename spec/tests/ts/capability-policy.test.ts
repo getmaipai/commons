@@ -121,8 +121,8 @@ describe("the owner's 2026-10-06 rows", () => {
       limits: ["safe_search:at_least_band_default"],
     });
   });
-  test("a family name in a web search needs a parent for a child, the teen themselves", () => {
-    expect(find("search.household_subject").policy!.approver).toEqual({ child: "parent", teen: "self", adult: "self" });
+  test("a family name in a web search is never for a child, the teen themselves (MINOR-SEARCH-01a)", () => {
+    expect(find("search.household_subject").policy!.approver).toEqual({ child: "never", teen: "self", adult: "self" });
   });
   test("security home domains are never for a child and need a parent for a teen", () => {
     const by = find("home:<domain>").policy!.by_parameter!;
@@ -134,20 +134,21 @@ describe("the owner's 2026-10-06 rows", () => {
     expect(find("approvals.decide").policy!.model_callable).toBe(false);
   });
   test("the generic integration policy preserves the original tainted-action and ask-parent floor", () => {
-    expect(find("integration:<id>").policy).toEqual({
+    const { by_parameter: _byParameter, ...generic } = find("integration:<id>").policy!;
+    expect(generic).toEqual({
       risk: "action",
       outbound: false,
       reversible: false,
       approver: { child: "parent", teen: "parent", adult: "none" },
     });
   });
-  test("SearXNG falls through to the generic integration policy and stays parent-approved for minors", () => {
+  test("SearXNG runs without a parent for a child and a teen; every other integration still asks one (MINOR-SEARCH-01a)", () => {
     expect(perms.permissions.some((entry) => entry.id === "integration:searxng")).toBe(false);
-    expect(find("integration:<id>").policy!.approver).toEqual({
-      child: "parent",
-      teen: "parent",
-      adult: "none",
+    expect(find("integration:<id>").policy!.approver).toEqual({ child: "parent", teen: "parent", adult: "none" });
+    expect(find("integration:<id>").policy!.by_parameter).toEqual({
+      searxng: { child: "none", teen: "none", adult: "none" },
     });
+    expect(find("integration:<id>").policy!.risk).toBe("action");
   });
   test("show_images has an offer-only capability policy row", () => {
     expect(find("tool.offer:show_images").policy).toEqual({

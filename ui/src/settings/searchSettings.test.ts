@@ -14,7 +14,7 @@ describe("searchSettings", () => {
   });
 
   test("finds a key by help text and by an option label", () => {
-    const byHelp = searchSettings(area("chat"), REGISTRY, values, ADULT, "loosen their own", { honouredBy: "home" });
+    const byHelp = searchSettings(area("chat"), REGISTRY, values, ADULT, "never lower than moderate", { honouredBy: "home" });
     expect(keysOf(byHelp)).toEqual(["search.safe_search"]);
     const opt = REGISTRY.find((k) => k.key === "search.safe_search")!;
     const first = (opt.range as { options: string[] }).options[0]!;
