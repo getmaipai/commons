@@ -45,7 +45,7 @@ export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, onToggle, d
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id}>
-              <TableCell>
+              <TableCell className="whitespace-normal">
                 <span className="font-medium">{row.label}</span>
                 {row.does ? <span className="block text-muted-foreground">{row.does}</span> : null}
               </TableCell>
@@ -68,7 +68,7 @@ export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, onToggle, d
           ))}
         </TableBody>
       </Table>
-      {anyLocked ? <p className="text-muted-foreground">{lockedNote}</p> : null}
+      {anyLocked ? <p className="px-2 pb-2 text-sm text-muted-foreground">{lockedNote}</p> : null}
     </div>
   );
 }

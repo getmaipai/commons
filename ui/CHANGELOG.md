@@ -1,5 +1,11 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.195] - ui-v0.5.195
+
+`OptionMatrix`: the row label and its one-line description wrap instead of
+staying on one line, so the audience columns stay on screen at phone width;
+the locked-box reason is small text inside the card's padding (MINOR-SEARCH-01e-10).
+
 ## [0.5.194] - ui-v0.5.194
 
 `OptionMatrix` (Table and Checkbox, no new primitive) and a `matrix` prop on
