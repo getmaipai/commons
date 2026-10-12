@@ -415,13 +415,13 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("no key was added or removed, and scope, default and level are untouched (pinned counts)", () => {
-    expect(registry).toHaveLength(120);
-    expect(new Set(registryIds()).size).toBe(120);
+    expect(registry).toHaveLength(121);
+    expect(new Set(registryIds()).size).toBe(121);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",
       "search.fetch_cache_gb", "search.wayback_fallback", "search.dictionary_fallback",
-      "search.source_mode", "search.source_mode.wikimedia", "search.source_mode.web",
+      "search.source_mode", "search.source_mode.wikimedia", "search.source_mode.web", "chat.search_assist",
     ]) expect(registryIds()).toContain(key);
   });
 });

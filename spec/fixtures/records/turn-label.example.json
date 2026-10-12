@@ -1,0 +1,21 @@
+{
+  "id": "label-0001",
+  "utterance_ref": "bench:search-recency-04:0001",
+  "prev_turn_ref": null,
+  "band": "adult",
+  "surface": "written",
+  "language": "en",
+  "tool_need": ["websearch"],
+  "freshness": "recency",
+  "search_scope": "news",
+  "follow_up_carry": false,
+  "explicit": false,
+  "side_effect": "none",
+  "provenance": {
+    "source": "bench",
+    "author": "frontier-generator",
+    "labeller": "owner",
+    "dataset_version": "search-recency-04-labels-v1"
+  },
+  "hlc": "1791201600000:0:bench01"
+}

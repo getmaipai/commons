@@ -1,3 +1,9 @@
+## [spec-v0.1.118] - 2026-10-11
+
+- Settings key `chat.search_assist` (household select: `off`, `shadow`, `rescue`; default `shadow`; advanced). `rescue` is inert, treated as shadow, until the rescue path ships. Children and teens are never scored (ROUTER-BUILD-01a).
+- `TurnLabel` record (label spec version 1): the one label shape for the search-assist head's training and bench data. `utterance_ref` and `prev_turn_ref` are pointers to stored turn rows, never hashes of text.
+- `SearchAssistWeights` manifest schema: embed identity, feature shape, classes, coefficients, per-tool thresholds, label spec version, dataset hash and bench record. Both records ship fixtures.
+
 ## [spec-v0.1.117] - 2026-10-11
 
 - Settings key `search.dictionary_fallback` (household boolean, default off, advanced): look a word up on Wiktionary when the offline library has no entry. Adults only; the word is sent to Wikimedia.

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/turn-label.schema.json",
+  "title": "TurnLabel",
+  "description": "Spec version 1. One label on one turn, the training and bench record for the search-assist head (ROUTER-BUILD-01a). This is the one place the label spec lives; the trainer and every bench dataset cite its version. utterance_ref and prev_turn_ref are pointers to stored turn rows (or to a bench row id), never hashes of text, and are never shown on admin pages or in logs. Household rows keep their text only on the hub. memory_worthy is out: it belongs to the memory judge's own dataset.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "utterance_ref",
+    "prev_turn_ref",
+    "band",
+    "surface",
+    "language",
+    "tool_need",
+    "freshness",
+    "search_scope",
+    "follow_up_carry",
+    "explicit",
+    "side_effect",
+    "provenance",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "utterance_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "Pointer to the stored turn row (or bench row id) holding the utterance. Never a hash of the text."
+    },
+    "prev_turn_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "Pointer to the previous turn row, or null when there is none. Never a hash of the text."
+    },
+    "band": {
+      "type": "string",
+      "enum": [
+        "child",
+        "teen",
+        "adult"
+      ]
+    },
+    "surface": {
+      "type": "string",
+      "enum": [
+        "written",
+        "spoken",
+        "robot"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$",
+      "description": "BCP 47 tag, e.g. en."
+    },
+    "tool_need": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "description": "A set over the ten tools plus none. [\"none\"] means no tool; none never appears beside another name."
+    },
+    "freshness": {
+      "type": "string",
+      "enum": [
+        "recency",
+        "stable",
+        "none"
+      ]
+    },
+    "search_scope": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "The websearch scope argument the turn needs (KS-BENCH-01), or null when it needs no search."
+    },
+    "follow_up_carry": {
+      "type": "boolean",
+      "description": "Whether the previous turn's topic carries into this one."
+    },
+    "explicit": {
+      "type": "boolean",
+      "description": "True when the person asked outright, false when the need is implied."
+    },
+    "side_effect": {
+      "type": "string",
+      "enum": [
+        "none",
+        "timer",
+        "remind_create",
+        "state"
+      ],
+      "description": "Whether the turn changes state (timer, reminder creation, other state)."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "author",
+        "labeller",
+        "dataset_version"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "bench",
+            "synthetic-frontier",
+            "owner-labelled"
+          ]
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Author or generator of the utterance."
+        },
+        "labeller": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataset_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node."
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "embed": { "model": "nomic-embed-text-v1.5.Q4_K_M", "dims": 4, "preprocess": "l2", "prefix": "classification: " },
+  "features": "alone",
+  "classes": ["no_search", "search"],
+  "coef": [[0.5, -0.25, 0.125, 0.0]],
+  "intercept": [-0.5],
+  "thresholds": { "websearch": 0.5 },
+  "label_spec_version": "turn-label-1",
+  "dataset_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "bench_record": "data-scratch/chat-ab/search-recency-05/REPORT.md"
+}

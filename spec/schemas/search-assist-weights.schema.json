@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/search-assist-weights.schema.json",
+  "title": "SearchAssistWeights",
+  "description": "Manifest of the search-assist head's weights (ROUTER-BUILD-01a): a logistic head over the utterance embedding. Home refuses to score when the embed identity differs from what the Stack embed role reports. Inference is a dot product; no text is stored here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "embed", "features", "classes", "coef", "intercept", "thresholds",
+    "label_spec_version", "dataset_sha256", "bench_record"
+  ],
+  "properties": {
+    "embed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "dims", "preprocess", "prefix"],
+      "properties": {
+        "model": { "type": "string", "minLength": 1 },
+        "dims": { "type": "integer", "minimum": 1 },
+        "preprocess": { "type": "string", "minLength": 1, "description": "Name of the preprocess applied before embedding, matching Home's EMBED_PREPROCESS." },
+        "prefix": { "type": "string", "description": "Text prefix added before embedding; empty string for raw." }
+      }
+    },
+    "features": { "type": "string", "enum": ["alone", "pair", "concat"] },
+    "classes": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "coef": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "array", "minItems": 1, "items": { "type": "number" } },
+      "description": "One row per class (one row for a binary head, as scikit-learn exports it), one column per feature."
+    },
+    "intercept": { "type": "array", "minItems": 1, "items": { "type": "number" } },
+    "thresholds": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 },
+      "description": "Per-tool score threshold, keyed by tool name."
+    },
+    "label_spec_version": { "type": "string", "minLength": 1, "description": "The turn-label schema version the head was trained against." },
+    "dataset_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "bench_record": { "type": "string", "minLength": 1, "description": "Where the bench numbers for this head are recorded." }
+  }
+}
