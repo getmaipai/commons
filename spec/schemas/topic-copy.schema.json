@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/topic-copy.schema.json",
+  "title": "TopicCopy",
+  "description": "The sentences a child's or teen's topic block is made of (MINOR-TOPICS-01), declared once so the hub and the robot render the same text. One header per band (kindness, the hard lines, the danger carve-out), one line per family, band and stance, and the family-story line. Positive wording only: each line says how to answer, never to refuse a subject. The stances a household may pick come from the content-ceiling records, never from this file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "emergency_default", "header", "families", "family_stories"],
+  "properties": {
+    "version": { "type": "string", "minLength": 1, "description": "The review month of this copy, such as 2026.10." },
+    "emergency_default": { "type": "string", "minLength": 1, "description": "The emergency number used when the household has no locale number; replaces {emergency}." },
+    "header": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["child", "teen"],
+      "properties": {
+        "child": { "type": "string", "minLength": 1 },
+        "teen": { "type": "string", "minLength": 1 }
+      }
+    },
+    "families": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bodies", "health", "feelings", "risk", "violence", "people", "beliefs"],
+      "properties": {
+        "bodies": { "$ref": "#/$defs/family" },
+        "health": { "$ref": "#/$defs/family" },
+        "feelings": { "$ref": "#/$defs/family" },
+        "risk": { "$ref": "#/$defs/family" },
+        "violence": { "$ref": "#/$defs/family" },
+        "people": { "$ref": "#/$defs/family" },
+        "beliefs": { "$ref": "#/$defs/family" }
+      }
+    },
+    "family_stories": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["line"],
+      "properties": {
+        "line": { "type": "string", "minLength": 1, "description": "Child band only. {names} is replaced by the comma-separated story names." }
+      }
+    }
+  },
+  "$defs": {
+    "stanceLines": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "informative": { "type": "string", "minLength": 1 },
+        "gentle": { "type": "string", "minLength": 1 },
+        "redirect": { "type": "string", "minLength": 1 },
+        "support": { "type": "string", "minLength": 1 },
+        "protect": { "type": "string", "minLength": 1 },
+        "neutral": { "type": "string", "minLength": 1 }
+      }
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["child", "teen"],
+      "properties": {
+        "child": { "$ref": "#/$defs/stanceLines" },
+        "teen": { "$ref": "#/$defs/stanceLines" }
+      }
+    }
+  }
+}

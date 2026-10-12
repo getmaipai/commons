@@ -528,6 +528,11 @@
           "kind": "keys",
           "cards": [
             {
+              "label": "Sensitive subjects with teen controls",
+              "group": "household.topics",
+              "scope": "household"
+            },
+            {
               "label": "Manage",
               "links": [
                 {
@@ -696,6 +701,11 @@
     }
   ],
   "not_placed": [
+    {
+      "scope": "person",
+      "group": "person.topics",
+      "reason": "A parent sets a child's sensitive-subject levels on that child's Family page; a settings area only reads and writes the viewer's own scope, never another person's, and a teen has no person-level topic key at all."
+    },
     {
       "scope": "person",
       "group": "person.allowance",

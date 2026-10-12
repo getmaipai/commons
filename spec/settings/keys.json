@@ -2206,5 +2206,251 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "topics.bodies",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "redirect",
+        "gentle"
+      ]
+    },
+    "default": "default",
+    "label": "Bodies and relationships",
+    "help": "How MaiPai answers a child's questions about bodies, babies, crushes and relationships. The standard answer gently points them to you. Only a parent or admin can change a child's. It applies only while the person is on child controls and never reaches the care, safety and fairness rules, which stay the same for every child.",
+    "copy": {
+      "does": "Chooses how a child's questions about the body are answered.",
+      "options": {
+        "default": "Uses the standard answer for child controls.",
+        "redirect": "Says it is a good question for a grown-up they trust.",
+        "gentle": "Gives the correct body words and keeps it short."
+      },
+      "option_labels": {
+        "default": "Follow child controls (recommended)",
+        "redirect": "Gently point to you",
+        "gentle": "Answer simply with correct body words"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.topics",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "topics.health",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "gentle",
+        "redirect"
+      ]
+    },
+    "default": "default",
+    "label": "Illness, death and health",
+    "help": "How MaiPai answers a child's questions about illness, death, grief and medicine. The standard answer is honest, short and gentle. Only a parent or admin can change a child's. It applies only while the person is on child controls and never reaches the care, safety and fairness rules, which stay the same for every child.",
+    "copy": {
+      "does": "Chooses how a child's questions about illness are answered.",
+      "options": {
+        "default": "Uses the standard answer for child controls.",
+        "gentle": "Answers honestly in a few gentle words.",
+        "redirect": "Says it is a good question for a grown-up they trust."
+      },
+      "option_labels": {
+        "default": "Follow child controls (recommended)",
+        "gentle": "Answer gently and honestly",
+        "redirect": "Gently point to you"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.topics",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "topics.risk",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "gentle",
+        "redirect"
+      ]
+    },
+    "default": "default",
+    "label": "Drugs, alcohol, betting and dares",
+    "help": "How MaiPai answers a child's questions about medicine, drugs, alcohol, vaping, betting and dangerous dares. The standard answer explains simply that these are unsafe or for adults. Only a parent or admin can change a child's. It applies only while the person is on child controls and never reaches the care, safety and fairness rules, which stay the same for every child.",
+    "copy": {
+      "does": "Chooses how a child's questions about risky things are answered.",
+      "options": {
+        "default": "Uses the standard answer for child controls.",
+        "gentle": "Explains that these are unsafe or for grown-ups.",
+        "redirect": "Says it is a good question for a grown-up they trust."
+      },
+      "option_labels": {
+        "default": "Follow child controls (recommended)",
+        "gentle": "Explain simply and kindly",
+        "redirect": "Gently point to you"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.topics",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "topics.violence",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "gentle",
+        "redirect"
+      ]
+    },
+    "default": "default",
+    "label": "Violence, weapons and scary news",
+    "help": "How MaiPai answers a child's questions about violence, weapons, war, scary news and scary stories. The standard answer says what happened without gore and that helpers keep people safe. Only a parent or admin can change a child's. It applies only while the person is on child controls and never reaches the care, safety and fairness rules, which stay the same for every child.",
+    "copy": {
+      "does": "Chooses how a child's questions about frightening events are answered.",
+      "options": {
+        "default": "Uses the standard answer for child controls.",
+        "gentle": "Says what happened without gore and reassures them.",
+        "redirect": "Says it is a good question for a grown-up they trust."
+      },
+      "option_labels": {
+        "default": "Follow child controls (recommended)",
+        "gentle": "Answer gently, no gore",
+        "redirect": "Gently point to you"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.topics",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "topics.family_stories",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "keep",
+        "off"
+      ]
+    },
+    "default": "keep",
+    "label": "Santa Claus and other family stories",
+    "help": "Whether MaiPai keeps stories like Santa Claus, the Tooth Fairy and the Easter Bunny for a child: it never says whether they are real, plays along, and points the child to the family. Turn it off if you would rather MaiPai answered plainly. Only a parent or admin can change a child's. It applies only while the person is on child controls.",
+    "copy": {
+      "does": "Chooses whether MaiPai plays along with the Tooth Fairy and similar tales.",
+      "options": {
+        "keep": "Never says a story is real or not, and plays along.",
+        "off": "Treats these like any other question."
+      },
+      "option_labels": {
+        "keep": "Keep the stories (recommended)",
+        "off": "Don't keep them"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.topics",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "topics.family_story_names",
+    "scope": "person",
+    "selector": "text",
+    "default": "Santa Claus, the Tooth Fairy, the Easter Bunny",
+    "label": "Names of family stories",
+    "help": "The stories MaiPai keeps for this child, separated by commas. Add your family's own, such as Elf on the Shelf or the Three Kings. Only a parent or admin can change a child's.",
+    "copy": {
+      "does": "Lists the family stories MaiPai keeps for a child."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.topics",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "topics.teen.bodies",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "informative",
+        "redirect"
+      ]
+    },
+    "default": "informative",
+    "label": "Bodies and relationships with teen controls",
+    "help": "How MaiPai answers teens' questions about puberty, sex, consent, relationships and identity. The standard answer is factual and respectful, and never sexual or romantic. It applies to everyone on teen controls and is set by an admin. An admin cannot see what a teen asks.",
+    "copy": {
+      "does": "Chooses how questions about puberty and sex are answered.",
+      "options": {
+        "informative": "Answers factually and respectfully, with a pointer to a doctor.",
+        "redirect": "Says a trusted grown-up or doctor is the best person to ask."
+      },
+      "option_labels": {
+        "informative": "Answer factually (recommended)",
+        "redirect": "Point to a trusted adult or doctor"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.topics",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "topics.teen.risk",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "informative",
+        "redirect"
+      ]
+    },
+    "default": "informative",
+    "label": "Drugs, alcohol and betting with teen controls",
+    "help": "How MaiPai answers teens' questions about drugs, alcohol, vaping, gambling and dangerous challenges. The standard answer explains the real risks and how to get help fast, and never gives tips for getting high, buying or betting. It applies to everyone on teen controls and is set by an admin. An admin cannot see what a teen asks.",
+    "copy": {
+      "does": "Chooses how questions about substances and gambling are answered.",
+      "options": {
+        "informative": "Explains the real risks and how to get help fast.",
+        "redirect": "Says a doctor or grown-up is the best person to ask."
+      },
+      "option_labels": {
+        "informative": "Explain the real risks (recommended)",
+        "redirect": "Point to a trusted adult or doctor"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.topics",
+    "honoured_by": [
+      "home"
+    ]
   }
 ]

@@ -15,5 +15,5 @@
     "noEmit": true,
     "types": ["bun"]
   },
-  "include": ["records", "gen/ts", "interpreters/ts/describeSetting.ts", "interpreters/ts/hostList.ts", "tests/ts/host-list.test.ts", "tests/ts/record-validate.test.ts", "tests/ts/relationship-vocab.test.ts", "tests/ts/describe-setting.test.ts", "status/ts", "tests/ts/status-model.test.ts"]
+  "include": ["records", "gen/ts", "interpreters/ts/describeSetting.ts", "interpreters/ts/hostList.ts", "interpreters/ts/topicBlock.ts", "tests/ts/topic-copy.test.ts", "tests/ts/host-list.test.ts", "tests/ts/record-validate.test.ts", "tests/ts/relationship-vocab.test.ts", "tests/ts/describe-setting.test.ts", "status/ts", "tests/ts/status-model.test.ts"]
 }

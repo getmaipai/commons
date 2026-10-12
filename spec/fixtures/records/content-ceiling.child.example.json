@@ -10,6 +10,77 @@
     "self_harm": "off",
     "privacy": "off"
   },
-  "floor": ["harmful_request", "credible_threat", "csam", "grooming", "pii_extraction", "prompt_injection", "jailbreak"],
+  "floor": [
+    "harmful_request",
+    "credible_threat",
+    "csam",
+    "grooming",
+    "pii_extraction",
+    "prompt_injection",
+    "jailbreak"
+  ],
+  "topics": {
+    "bodies": {
+      "stance": "redirect",
+      "allowed": [
+        "redirect",
+        "gentle"
+      ],
+      "fixed": false
+    },
+    "health": {
+      "stance": "gentle",
+      "allowed": [
+        "gentle",
+        "redirect"
+      ],
+      "fixed": false
+    },
+    "feelings": {
+      "stance": "support",
+      "allowed": [
+        "support"
+      ],
+      "fixed": true
+    },
+    "risk": {
+      "stance": "gentle",
+      "allowed": [
+        "gentle",
+        "redirect"
+      ],
+      "fixed": false
+    },
+    "violence": {
+      "stance": "gentle",
+      "allowed": [
+        "gentle",
+        "redirect"
+      ],
+      "fixed": false
+    },
+    "people": {
+      "stance": "protect",
+      "allowed": [
+        "protect"
+      ],
+      "fixed": true
+    },
+    "beliefs": {
+      "stance": "neutral",
+      "allowed": [
+        "neutral"
+      ],
+      "fixed": true
+    }
+  },
+  "family_stories": {
+    "default": "keep",
+    "names": [
+      "Santa Claus",
+      "the Tooth Fairy",
+      "the Easter Bunny"
+    ]
+  },
   "hlc": "1757073600000:0:a1b2c3"
 }

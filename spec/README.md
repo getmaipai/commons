@@ -124,6 +124,7 @@ design record left a choice:
 | `records/ts/` | The cross-field rules for Entity, Relationship and Grant that JSON Schema conditionals cannot carry (neither generator preserves them); TS only for now, like `safety/` | hand-written |
 | `interpreters/ts/`, `interpreters/py/` | The Tier 0 recipe interpreter, one per language, kept behaviorally identical | hand-written |
 | `interpreters/ts/describeSetting.ts`, `interpreters/py/describe_setting.py` | Per-reader setting descriptions from `SettingsKey.copy`, `control` and `band_default`; both runtimes pass `fixtures/describe-setting.json` | hand-written |
+| `interpreters/ts/topicBlock.ts`, `safety/topic-copy.json` | MINOR-TOPICS-01: the sentences a child's or teen's topic block is made of (one copy file keyed by family, band and stance) and the one function that assembles them; stance records live on the content-ceiling band records | hand-written |
 | `interpreters/ts/hostList.ts` | MINOR-SEARCH-01e: the one reader of a synced blocked-site list file (`hosts` or `domains` format), used by the catalog re-pin and the hub sync so their entry counts agree; cases in `fixtures/host-list/cases.json` | hand-written |
 | `emulators/ts/`, `emulators/py/` | A deterministic offline stand-in for the `host.*` RPC surface (4.9), one per language | hand-written |
 | `safety/ts/`, `safety/corpus/` | The deterministic multi-signal safety classifier (4.3), TS only for now (see `safety/README.md`); the labelled corpus it's tested against | hand-written |

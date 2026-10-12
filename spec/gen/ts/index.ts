@@ -56,6 +56,7 @@ export * from "./status-component.js";
 export * from "./status-event.js";
 export * from "./status-note.js";
 export * from "./subject-ref.js";
+export * from "./topic-copy.js";
 export * from "./turn-artifact.js";
 export * from "./turn-label.js";
 export * from "./turn-signal.js";
