@@ -1843,6 +1843,108 @@
     ]
   },
   {
+    "key": "search.hosts.child.deny",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Always block these sites for child",
+    "help": "Sites that web search never shows to a child, separated by commas, like example.com, on top of the household list. A site you list here also blocks its subpages. It always wins over the allowed lists. Only an admin can change this.",
+    "copy": {
+      "does": "Hides these sites from web search, on top of the household list."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.hosts.child.allow",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Allow these sites for child",
+    "help": "Sites that web search may show to a child even when a blocked-sites list has them, separated by commas, like example.com, on top of the household list. It cannot allow an adult site for child or teen controls, and it cannot allow a site that is in an always-block list. Only an admin can change this.",
+    "copy": {
+      "does": "Lets web search show these sites despite a blocked-sites list, plus the household list."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.hosts.teen.deny",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Always block these sites for teen",
+    "help": "Sites that web search never shows to a teen, separated by commas, like example.com, on top of the household list. A site you list here also blocks its subpages. It always wins over the allowed lists. Only an admin can change this.",
+    "copy": {
+      "does": "Hides these sites from web search, on top of the household list."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.hosts.teen.allow",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Allow these sites for teen",
+    "help": "Sites that web search may show to a teen even when a blocked-sites list has them, separated by commas, like example.com, on top of the household list. It cannot allow an adult site for child or teen controls, and it cannot allow a site that is in an always-block list. Only an admin can change this.",
+    "copy": {
+      "does": "Lets web search show these sites despite a blocked-sites list, plus the household list."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.hosts.adult.deny",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Always block these sites for adult",
+    "help": "Sites that web search never shows to an adult, separated by commas, like example.com, on top of the household list. A site you list here also blocks its subpages. It always wins over the allowed lists. Only an admin can change this.",
+    "copy": {
+      "does": "Hides these sites from web search, on top of the household list."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.hosts.adult.allow",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Allow these sites for adult",
+    "help": "Sites that web search may show to an adult even when a blocked-sites list has them, separated by commas, like example.com, on top of the household list. It cannot allow an adult site for child or teen controls, and it cannot allow a site that is in an always-block list. Only an admin can change this.",
+    "copy": {
+      "does": "Lets web search show these sites despite a blocked-sites list, plus the household list."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.web_sources",
     "scope": "household",
     "selector": "select",

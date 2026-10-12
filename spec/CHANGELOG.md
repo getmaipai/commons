@@ -1,3 +1,7 @@
+## [spec-v0.1.125] - 2026-10-12
+
+- Settings keys `search.hosts.child.deny`, `search.hosts.child.allow`, `search.hosts.teen.deny`, `search.hosts.teen.allow`, `search.hosts.adult.deny` and `search.hosts.adult.allow` (household text, advanced, `household.search`; MINOR-SEARCH-01e-9, owner decision 2026-10-12): a band's own always-block and allow hosts, added to the household pair from spec-v0.1.124. A deny always wins; an allow can never unblock a host on a list locked for the band.
+
 ## [spec-v0.1.124] - 2026-10-12
 
 - Settings keys `search.hosts.deny` and `search.hosts.allow` (household text, advanced, `household.search`; MINOR-SEARCH-01e-8, owner decision 2026-10-12): comma-separated hosts the household always blocks in web search, and hosts it may show even when a blocked-sites list has them. A deny always wins. An allow can never unblock a host on a list locked for the band, so the adult-site list stays locked for child and teen controls. Admin-edited, household-wide, no per-person override.
