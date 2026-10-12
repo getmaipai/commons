@@ -24,13 +24,14 @@ describe("select + multiple keys", () => {
     expect(SettingsKey.parse(key[0]).key).toBe("search.web_sources");
   });
 
-  test("every multi-select default is a non-empty subset of its options", () => {
+  test("every multi-select default is a subset of its options, non-empty except the adult blocked-site lists", () => {
     expect(multi.length).toBeGreaterThan(0);
     for (const e of multi) {
       const options = e.range!.options ?? [];
       expect(Array.isArray(e.default), e.key).toBe(true);
       const def = e.default as string[];
-      expect(def.length, e.key).toBeGreaterThan(0);
+      // MINOR-SEARCH-01e-1: no blocked-site list is checked for adults until a parent picks one.
+      if (e.key !== "search.blocklists.adult") expect(def.length, e.key).toBeGreaterThan(0);
       for (const v of def) expect(options, e.key).toContain(v);
       expect(new Set(def).size, e.key).toBe(def.length);
     }

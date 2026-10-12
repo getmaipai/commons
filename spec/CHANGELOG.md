@@ -1,3 +1,10 @@
+## [spec-v0.1.121] - 2026-10-12
+
+- Blocked-site lists (MINOR-SEARCH-01e-1). `search/blocklists.json` declares each list once: id, category, plain-words label and line, the bands that start with it on and the bands that cannot turn it off. The default set is The Block List Project's adult, gambling, scam, phishing and malware lists for child and teen controls, plus drugs for child controls only until measured. The adult-site list is locked on for child and teen. Pins (source, checksum, size) are not here; they live in the signed catalog list index, which can never unlock a list or add one a minor gets.
+- Settings keys `search.blocklists.child`, `search.blocklists.teen` and `search.blocklists.adult` (household multi-selects, advanced, `household.search`): options are the lists not locked for the band, so the adult-site list is not an option for child or teen. Adult controls start with none. Admin-edited, household-wide, no per-person override; no admin sees what a teen searched or which sites were blocked.
+- `interpreters/ts/hostList.ts`: `parseHostList`, the one definition of how a list file is read (formats, skipped lines counted by reason, punycode, dedupe), so the catalog pin's `entries` and the hub's count agree.
+- `Blocklists` schema, fixtures, generated TS and Python models.
+
 ## [spec-v0.1.120] - 2026-10-11
 
 - Capability policy (MINOR-SEARCH-01a): `integration:<id>` gains `by_parameter.searxng` with `none` for child, teen and adult, so web search through the household's own SearXNG runs without a parent's approval; every other integration still asks a parent for a minor. Risk stays `action`, so crisis and untrusted-provenance denials are unchanged. `search.household_subject` is now `never` for a child (was `parent`); teen and adult stay `self`.

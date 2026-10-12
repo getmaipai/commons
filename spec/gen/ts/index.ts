@@ -4,6 +4,7 @@
 export * from "./answer-block.js";
 export * from "./artifact.js";
 export * from "./biometric-print.js";
+export * from "./blocklists.js";
 export * from "./chat-folder.js";
 export * from "./content-ceiling.js";
 export * from "./conversation-turn.js";

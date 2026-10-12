@@ -1,0 +1,11 @@
+{
+  "version": "2026.10",
+  "lists": [
+    {"id":"blp-porn","category":"adult","label":"Adult sites","does":"Blocks sites made only for grown-ups.","default_for":["child","teen"],"locked_for":["child","teen"]},
+    {"id":"blp-gambling","category":"gambling","label":"Gambling sites","does":"Blocks betting, casino and lottery sites.","default_for":["child","teen"],"locked_for":[]},
+    {"id":"blp-scam","category":"scam","label":"Scam sites","does":"Blocks sites known for fake offers, fake shops and fraud.","default_for":["child","teen"],"locked_for":[]},
+    {"id":"blp-phishing","category":"phishing","label":"Phishing sites","does":"Blocks sites that pretend to be a bank or an account page to steal a login.","default_for":["child","teen"],"locked_for":[]},
+    {"id":"blp-malware","category":"malware","label":"Malware sites","does":"Blocks sites known for spreading viruses and harmful downloads.","default_for":["child","teen"],"locked_for":[]},
+    {"id":"blp-drugs","category":"drugs","label":"Drug sites","does":"Blocks sites that sell or promote illegal drugs.","default_for":["child"],"locked_for":[]}
+  ]
+}

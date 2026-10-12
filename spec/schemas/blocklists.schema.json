@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/blocklists.schema.json",
+  "title": "Blocklists",
+  "description": "The blocked-site lists a household can sync, one row per list: its category, plain-words label, which age bands start with it on and which cannot turn it off. Pins (source, checksum, size) live in the signed catalog list index, never here. A list id the catalog index names that this file does not is ignored.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "lists"],
+  "properties": {
+    "version": {"type":"string","minLength":1,"description":"The review month of this policy, such as 2026.10."},
+    "lists": {"type":"array","minItems":1,"items":{"$ref":"#/$defs/list"}}
+  },
+  "$defs": {
+    "band": {"type":"string","enum":["child","teen","adult"]},
+    "list": {
+      "type":"object","additionalProperties":false,
+      "required":["id","category","label","does","default_for","locked_for"],
+      "properties": {
+        "id":{"type":"string","pattern":"^[a-z][a-z0-9-]*$"},
+        "category":{"type":"string","enum":["adult","gambling","drugs","scam","phishing","malware"]},
+        "label":{"type":"string","minLength":1},
+        "does":{"type":"string","minLength":1,"description":"One plain-words line, shown beside the list's name."},
+        "default_for":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/band"},"description":"Bands that start with this list on."},
+        "locked_for":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/band"},"description":"Bands that cannot turn this list off. Always on for them and never offered as an option."}
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "name": "hosts format: addresses dropped, comments and blanks ignored, names lowercased and deduped",
+    "format": "hosts",
+    "text": "# header\n\n127.0.0.1 localhost\n0.0.0.0 Example.COM\n0.0.0.0 example.com # again\n0.0.0.0 ads.example.net.\n0.0.0.0 0.0.0.0\n0.0.0.0 bad_name!.com\n0.0.0.0 single\n0.0.0.0\n",
+    "hosts": ["example.com", "ads.example.net"],
+    "skipped": { "tooLong": 0, "invalid": 4, "ipOnly": 1 }
+  },
+  {
+    "name": "domains format: one name a line, IPv6 and IPv4 rows skipped, unicode punycoded",
+    "format": "domains",
+    "text": "example.org\n192.0.2.7\n2001:db8::1\nbücher.example\n.leading.example\n",
+    "hosts": ["example.org", "xn--bcher-kva.example"],
+    "skipped": { "tooLong": 0, "invalid": 1, "ipOnly": 2 }
+  }
+]
