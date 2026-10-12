@@ -1618,6 +1618,40 @@
     ]
   },
   {
+    "key": "search.web_sources",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "searxng",
+        "ddgs"
+      ],
+      "multiple": true
+    },
+    "default": [
+      "searxng"
+    ],
+    "label": "Web search sources",
+    "help": "Which services answer web searches. SearXNG, the household's own search service, is on by default. DuckDuckGo is not available yet. With more than one picked, their results are blended into one list. Children and teens only use SearXNG. To turn web search off, set Web searches to Library only. Pictures and videos always use SearXNG.",
+    "copy": {
+      "does": "Chooses which services answer web searches.",
+      "options": {
+        "searxng": "The household's own search service, which stays on until you change it.",
+        "ddgs": "A second source that is not available yet."
+      },
+      "option_labels": {
+        "searxng": "SearXNG",
+        "ddgs": "DuckDuckGo"
+      }
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.wayback_fallback",
     "scope": "household",
     "selector": "boolean",

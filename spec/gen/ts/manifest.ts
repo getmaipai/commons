@@ -372,6 +372,13 @@ export const PackageManifest = z
                 does_child: z.string().min(1).optional(),
                 does_teen: z.string().min(1).optional(),
                 options: z.record(z.string(), z.string().min(1)).optional(),
+                /**Display name for each option of a select, when the raw token is not a readable name (searxng -> SearXNG).*/
+                option_labels: z
+                  .record(z.string(), z.string().min(1))
+                  .describe(
+                    "Display name for each option of a select, when the raw token is not a readable name (searxng -> SearXNG).",
+                  )
+                  .optional(),
               })
               .strict()
               .optional(),

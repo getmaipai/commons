@@ -13,7 +13,7 @@ export interface SettingDefinition {
   selector: string;
   range?: { options?: string[]; options_from?: string };
   default: unknown;
-  copy?: { does: string; does_child?: string; does_teen?: string; options?: Record<string, string> };
+  copy?: { does: string; does_child?: string; does_teen?: string; options?: Record<string, string>; option_labels?: Record<string, string> };
   control?: Record<SettingBand, "self" | "guardian">;
   band_default?: Record<SettingBand, unknown>;
 }

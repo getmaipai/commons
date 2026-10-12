@@ -30,6 +30,10 @@ class Copy(BaseModel):
     does_child: constr(min_length=1) | None = None
     does_teen: constr(min_length=1) | None = None
     options: dict[str, constr(min_length=1)] | None = None
+    option_labels: dict[str, constr(min_length=1)] | None = Field(
+        None,
+        description='Display name for each option of a select, when the raw token is not a readable name (searxng -> SearXNG).',
+    )
 
 
 class Control(BaseModel):

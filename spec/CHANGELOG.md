@@ -1,3 +1,8 @@
+## [spec-v0.1.119] - 2026-10-11
+
+- Settings key `search.web_sources` (household select with `range.multiple`: `searxng`, `ddgs`; default `["searxng"]`; advanced): which services answer web searches. `ddgs` is listed but inert until its source is built; Home refuses an empty or ddgs-only list at write. Children and teens only use SearXNG.
+- Settings key schema: `copy.option_labels`, an optional display name per select option (additive), used first by `search.web_sources`.
+
 ## [spec-v0.1.118] - 2026-10-11
 
 - Settings key `chat.search_assist` (household select: `off`, `shadow`, `rescue`; default `shadow`; advanced). `rescue` is inert, treated as shadow, until the rescue path ships. Children and teens are never scored (ROUTER-BUILD-01a).

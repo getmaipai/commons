@@ -48,6 +48,11 @@
         "options": {
           "type": "object",
           "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+        "option_labels": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 },
+          "description": "Display name for each option of a select, when the raw token is not a readable name (searxng -> SearXNG)."
         }
       }
     },
