@@ -1,5 +1,5 @@
 import { Button } from "../dashboard/components/ui/button";
-import { Checkbox } from "../dashboard/components/ui/checkbox";
+import { Checkbox } from "../ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../dashboard/components/ui/table";
 
 export interface OptionMatrixRow {
@@ -77,7 +77,7 @@ export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, unavailable
                         aria-label={`${row.label} for ${c.label}`}
                         checked={!isUnavailable && (isLocked || c.value.includes(row.id))}
                         disabled={disabled || isLocked || isUnavailable}
-                        onCheckedChange={(next) => onToggle(c.key, row.id, next)}
+                        onCheckedChange={(next) => onToggle(c.key, row.id, next === true)}
                       />
                     </div>
                   </TableCell>

@@ -1,5 +1,10 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.198] - ui-v0.5.198
+
+`OptionMatrix` draws its boxes with the kit `Checkbox` (`ui/checkbox`), whose tap area
+reaches the 48px floor, instead of the dashboard one (40x32). No prop changes.
+
 ## [0.5.197] - ui-v0.5.197
 
 `OptionMatrix` (SETTINGS-LAYERS-01d): a row may carry a `note` (who set it) and a
