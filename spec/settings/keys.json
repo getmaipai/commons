@@ -1713,7 +1713,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1759,7 +1759,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1803,7 +1803,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1820,7 +1820,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1837,7 +1837,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1854,7 +1854,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1871,7 +1871,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1888,7 +1888,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1905,7 +1905,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1922,7 +1922,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]
@@ -1939,7 +1939,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.search",
+    "lives_in": "household.blocked_sites",
     "honoured_by": [
       "home"
     ]

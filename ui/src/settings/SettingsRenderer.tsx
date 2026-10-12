@@ -13,6 +13,16 @@ import { Item, ItemContent, ItemGroup, ItemSeparator, ItemTitle } from "../dashb
 import { SettingRow, type BeforeChange } from "./SettingRow";
 import type { PersonOption } from "./PersonMultiSelect";
 import { useSettingsHeadingLevel } from "./headingLevel";
+import { OptionMatrix } from "./OptionMatrix";
+import type { AreaMatrix } from "./settingsAudience";
+import blocklistPolicy from "@maipai/spec/search/blocklists.json";
+
+interface MatrixRowSource { id: string; label: string; does?: string; locked_for?: readonly string[] }
+// The shared row sources a card's `matrix.rows` may name: the spec's own
+// files, imported once, so a row is declared in one place.
+const MATRIX_ROWS: Record<string, readonly MatrixRowSource[]> = {
+  "search/blocklists": blocklistPolicy.lists,
+};
 
 interface SettingsRendererProps {
   scope: "household" | "person" | "device";
@@ -54,6 +64,10 @@ interface SettingsRendererProps {
   /** The card title's heading level. Default: 2 inside a SettingsShell (its
    * page title is the h1), 3 on its own. */
   headingLevel?: 2 | 3;
+  /** A card's tick-box grid (areas.json `matrix`). It draws first in the
+   * group named by `only`, replaces that group's column keys as rows, and
+   * writes the same keys the rows would. */
+  matrix?: AreaMatrix;
 }
 
 // The registry never varies by which renderer is asking, so every instance
@@ -85,6 +99,7 @@ export function SettingsRenderer({
   beforeChange,
   focusKey,
   headingLevel,
+  matrix,
 }: SettingsRendererProps) {
   const Heading = `h${useSettingsHeadingLevel(headingLevel)}` as "h2" | "h3";
   const queryClient = useQueryClient();
@@ -184,6 +199,34 @@ export function SettingsRenderer({
     );
   }
 
+  function renderMatrix(m: AreaMatrix, valueRows: ResolvedSetting[]) {
+    const source = MATRIX_ROWS[m.rows] ?? [];
+    const columns = m.columns.map((c) => {
+      const v = valueRows.find((r) => r.key === c.key)?.value;
+      return {
+        key: c.key,
+        label: c.label,
+        value: Array.isArray(v) ? (v as string[]) : [],
+        locked: source.filter((r) => r.locked_for?.includes(c.band)).map((r) => r.id),
+      };
+    });
+    return (
+      <OptionMatrix
+        rowsLabel="Kind of site"
+        rows={source}
+        columns={columns}
+        lockedNote={m.locked_note}
+        disabled={pendingKey !== null}
+        onToggle={async (columnKey, rowId, checked) => {
+          const current = columns.find((c) => c.key === columnKey)?.value ?? [];
+          const next = checked ? [...current.filter((id) => id !== rowId), rowId] : current.filter((id) => id !== rowId);
+          const ok = await handleChange(columnKey, next);
+          if (!ok) setWriteError((prev) => (prev && prev !== "Could not save that change." ? prev : m.save_error));
+        }}
+      />
+    );
+  }
+
   function renderRows(rows: MergedSetting[]) {
     return rows.map((s, i) => (
       <Fragment key={s.def.key}>
@@ -225,7 +268,12 @@ export function SettingsRenderer({
               const keep = (s: MergedSetting) => (!keys || keys.includes(s.def.key)) && matches(s);
               return { ...group, basic: group.basic.filter(keep), advanced: group.advanced.filter(keep) };
             })
-            .filter((g) => g.basic.length + g.advanced.length > 0);
+            .map((group) => {
+              if (!matrix || only?.[0] !== group.id) return group;
+              const hidden = new Set(matrix.columns.map((c) => c.key));
+              return { ...group, basic: group.basic.filter((s) => !hidden.has(s.def.key)), advanced: group.advanced.filter((s) => !hidden.has(s.def.key)) };
+            })
+            .filter((g) => g.basic.length + g.advanced.length > 0 || (matrix !== undefined && only?.[0] === g.id && !needle));
           if (mergeGroups && groups.length > 1) {
             const first = groups[0]!;
             groups = [
@@ -252,8 +300,11 @@ export function SettingsRenderer({
                 const folded = group.foldAdvanced && !expandAdvanced && !needle;
                 // A `#<key>` deep link to a folded advanced key opens its fold.
                 const open = Boolean(advancedOpen[group.id]) || (focusKey !== undefined && group.advanced.some((a) => a.def.key === focusKey));
+                const showMatrix = matrix !== undefined && only?.[0] === group.id && !needle;
                 const card = (
                   <ItemGroup variant={plainRows ? undefined : "card"}>
+                    {showMatrix ? renderMatrix(matrix, values) : null}
+                    {showMatrix && group.basic.length > 0 ? <ItemSeparator variant="inset" /> : null}
                     {renderRows(group.basic)}
                     {group.advanced.length > 0 ? (
                       folded ? (

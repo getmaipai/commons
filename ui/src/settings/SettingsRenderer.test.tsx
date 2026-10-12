@@ -256,3 +256,62 @@ describe("SettingsRenderer - writes", () => {
     expect((await view.findByRole("status")).textContent).toBe("Not allowed right now.");
   });
 });
+
+describe("SettingsRenderer - option matrix card", () => {
+  const MATRIX = {
+    rows: "search/blocklists",
+    columns: [
+      { label: "Kids", key: "search.blocklists.child", band: "child" as const },
+      { label: "Teens", key: "search.blocklists.teen", band: "teen" as const },
+      { label: "Adults", key: "search.blocklists.adult", band: "adult" as const },
+    ],
+    locked_note: "Adult sites are always blocked for Kids and Teens.",
+    save_error: "That change was not saved. Check your connection, then tick the box again.",
+  };
+  const mdefs: Def[] = [
+    ...MATRIX.columns.map((c) => ({ key: c.key, selector: "select", label: `Blocked lists, ${c.label}`, lives_in: "household.blocked_sites", scope: "household", default: [], range: { multiple: true, options: ["blp-gambling"] } })),
+    { key: "search.hosts.deny", selector: "text", label: "Always block these sites", lives_in: "household.blocked_sites", scope: "household" },
+  ];
+  const mprops = { scope: "household" as const, scopeValue: "household", honouredBy: "home", only: ["household.blocked_sites"], matrix: MATRIX };
+
+  test("draws one checkbox per kind of site and audience; the column keys are not drawn as rows", async () => {
+    mockApi(mdefs, { "search.blocklists.child": ["blp-gambling"] });
+    const { findByLabelText, queryByText, findByText } = renderWithQueryClient(<SettingsRenderer {...mprops} />);
+    const kids = (await findByLabelText("Gambling sites for Kids")) as HTMLElement;
+    expect(kids.getAttribute("aria-checked")).toBe("true");
+    expect(((await findByLabelText("Gambling sites for Teens")) as HTMLElement).getAttribute("aria-checked")).toBe("false");
+    expect(queryByText("Blocked lists, Kids")).toBeNull();
+    await findByText("Always block these sites");
+  });
+
+  test("a locked cell is checked and disabled, with the plain reason shown", async () => {
+    mockApi(mdefs);
+    const { findByLabelText, findByText } = renderWithQueryClient(<SettingsRenderer {...mprops} />);
+    const locked = (await findByLabelText("Adult sites for Kids")) as HTMLElement;
+    expect(locked.getAttribute("aria-checked")).toBe("true");
+    expect(locked.hasAttribute("disabled") || locked.getAttribute("aria-disabled") === "true" || locked.hasAttribute("data-disabled")).toBe(true);
+    expect(((await findByLabelText("Adult sites for Adults")) as HTMLElement).getAttribute("aria-checked")).toBe("false");
+    await findByText(MATRIX.locked_note);
+  });
+
+  test("ticking a box writes the whole list to that audience's key", async () => {
+    mockApi(mdefs, { "search.blocklists.teen": ["blp-gambling"] });
+    const { findByLabelText } = renderWithQueryClient(<SettingsRenderer {...mprops} />);
+    fireEvent.click(await findByLabelText("Gambling sites for Kids"));
+    await waitFor(() => expect(calls.some((c) => c.method === "PUT")).toBe(true));
+    const put = calls.find((c) => c.method === "PUT")!;
+    expect(JSON.parse(put.body!)).toEqual({ scope: "household", key: "search.blocklists.child", value: ["blp-gambling"] });
+  });
+
+  test("a failed tick shows the card's own what-to-do message when the server gave none", async () => {
+    mockApi(mdefs);
+    const real = globalThis.fetch;
+    globalThis.fetch = (async (path: RequestInfo | URL, init?: RequestInit) => {
+      if (init?.method === "PUT") throw new TypeError("network down");
+      return real(path, init);
+    }) as unknown as typeof fetch;
+    const { findByLabelText, findByText } = renderWithQueryClient(<SettingsRenderer {...mprops} />);
+    fireEvent.click(await findByLabelText("Gambling sites for Kids"));
+    await findByText(MATRIX.save_error);
+  });
+});

@@ -21,6 +21,7 @@ export interface SettingsGroup {
 // separate gap for whenever a key actually declares one.
 export const SECTION_TITLES: Record<string, string> = {
   "household.system": "System",
+  "household.blocked_sites": "Blocked sites",
   "person.voice": "Voice",
   "person.persona": "Personality",
   // Not the same as ModelsSection.tsx's own "AI models" heading

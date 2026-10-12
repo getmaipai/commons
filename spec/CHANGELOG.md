@@ -1,3 +1,7 @@
+## [spec-v0.1.126] - 2026-10-12
+
+- Settings card `matrix` (MINOR-SEARCH-01e-10, owner decision 2026-10-12): an `areas.json` card may name a tick-box grid, a row per option source (`rows`, here `search/blocklists`) and a column per audience (`columns`: label, settings key, band), with a `locked_note` and a `save_error`. The Blocked sites card in Settings, Search uses it: a row per kind of site, a box each for Kids, Teens and Adults. It writes the same `search.blocklists.<band>` keys, so there is no second store. The three blocklist keys and the eight `search.hosts.*` keys now live in `household.blocked_sites`.
+
 ## [spec-v0.1.125] - 2026-10-12
 
 - Settings keys `search.hosts.child.deny`, `search.hosts.child.allow`, `search.hosts.teen.deny`, `search.hosts.teen.allow`, `search.hosts.adult.deny` and `search.hosts.adult.allow` (household text, advanced, `household.search`; MINOR-SEARCH-01e-9, owner decision 2026-10-12): a band's own always-block and allow hosts, added to the household pair from spec-v0.1.124. A deny always wins; an allow can never unblock a host on a list locked for the band.

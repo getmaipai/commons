@@ -23,7 +23,10 @@ export interface AreaCard {
   min_role?: Role;
   bands?: Band[];
   needs?: string[];
+  matrix?: AreaMatrix;
 }
+export interface AreaMatrixColumn { label: string; key: string; band: Band }
+export interface AreaMatrix { rows: string; columns: AreaMatrixColumn[]; locked_note?: string; save_error?: string }
 export interface AreaSection {
   id: string;
   label: string;
@@ -128,6 +131,19 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         if (!registryGroups.has(`${c.scope}:${c.group}`)) {
           errors.push(`${where}: card "${c.label}" group ${c.group} at ${c.scope} is not in the registry`);
           continue;
+        }
+        if (c.matrix) {
+          const bands = new Set<string>();
+          const keys = new Set<string>();
+          for (const col of c.matrix.columns) {
+            const k = registry.find((r) => r.key === col.key);
+            if (!k) errors.push(`${where}: card "${c.label}" matrix column "${col.label}" names ${col.key}, which is not in the registry`);
+            else if (k.scope !== c.scope || k.lives_in !== c.group) errors.push(`${where}: card "${c.label}" matrix column "${col.label}" key ${col.key} must live in ${c.scope}:${c.group}`);
+            if (bands.has(col.band)) errors.push(`${where}: card "${c.label}" matrix has two columns for ${col.band}`);
+            if (keys.has(col.key)) errors.push(`${where}: card "${c.label}" matrix names ${col.key} twice`);
+            bands.add(col.band);
+            keys.add(col.key);
+          }
         }
         for (const lv of levels) {
           const id = `${c.scope}:${c.group}:${lv}`;

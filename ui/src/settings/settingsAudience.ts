@@ -18,6 +18,13 @@ export type Level = "basic" | "advanced" | "expert";
 // declares them; the area type below swaps them in. The schema stays the
 // one definition: a change there is a change here.
 export interface AreaLink { label: string; href: string; icon?: string; min_role?: Role }
+export interface AreaMatrixColumn { label: string; key: string; band: Band }
+export interface AreaMatrix {
+  rows: string;
+  columns: AreaMatrixColumn[];
+  locked_note: string;
+  save_error: string;
+}
 export interface AreaCard {
   label: string;
   group?: string;
@@ -29,6 +36,7 @@ export interface AreaCard {
   min_role?: Role;
   bands?: Band[];
   needs?: string[];
+  matrix?: AreaMatrix;
 }
 export interface Section {
   id: string;

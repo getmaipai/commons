@@ -65,6 +65,41 @@ class Link(BaseModel):
     )
 
 
+class Column(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: constr(min_length=1, max_length=20)
+    key: constr(min_length=1) = Field(
+        ...,
+        description="A select key with range.multiple in this card's group and scope.",
+    )
+    band: Literal['child', 'teen', 'adult']
+
+
+class Matrix(BaseModel):
+    """
+    Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    rows: Literal['search/blocklists'] = Field(
+        ...,
+        description="The policy file the rows come from (spec/search/blocklists.json). A list in its locked_for for a column's band shows checked and disabled.",
+    )
+    columns: list[Column] = Field(..., max_length=3, min_length=1)
+    locked_note: constr(min_length=1) | None = Field(
+        None,
+        description='The plain reason shown under the grid when any cell is locked.',
+    )
+    save_error: constr(min_length=1) | None = Field(
+        None,
+        description='What the person sees when a tick does not save: what happened and what to do.',
+    )
+
+
 class Card(BaseModel):
     """
     One card: either a registry group at one scope (group and scope together) or a list of link rows (links), never both. areas-check.ts enforces the pairing.
@@ -100,6 +135,10 @@ class Card(BaseModel):
     )
     bands: list[Literal['child', 'teen', 'adult']] | None = Field(None, min_length=1)
     needs: list[constr(min_length=1)] | None = None
+    matrix: Matrix | None = Field(
+        None,
+        description="Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.",
+    )
 
 
 class Section(BaseModel):

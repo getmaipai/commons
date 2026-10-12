@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.194] - ui-v0.5.194
+
+`OptionMatrix` (Table and Checkbox, no new primitive) and a `matrix` prop on
+`SettingsRenderer`: a settings card can draw a row-by-audience grid of tick
+boxes that writes the same multi-select keys it replaces (MINOR-SEARCH-01e-10).
+Locked cells show checked and disabled with one plain reason under the grid.
+`AreaCard.matrix` is typed in `settingsAudience.ts`, and `household.blocked_sites`
+is titled "Blocked sites".
+
 ## [0.5.193] - ui-v0.5.193
 
 `Citation` (the inline `[n]` chip) opens its excerpt on a tap when the source

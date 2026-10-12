@@ -235,6 +235,63 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "matrix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rows",
+            "columns"
+          ],
+          "description": "Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.",
+          "properties": {
+            "rows": {
+              "type": "string",
+              "enum": [
+                "search/blocklists"
+              ],
+              "description": "The policy file the rows come from (spec/search/blocklists.json). A list in its locked_for for a column's band shows checked and disabled."
+            },
+            "columns": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "key",
+                  "band"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 20
+                  },
+                  "key": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "A select key with range.multiple in this card's group and scope."
+                  },
+                  "band": {
+                    "$ref": "#/$defs/band"
+                  }
+                }
+              }
+            },
+            "locked_note": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The plain reason shown under the grid when any cell is locked."
+            },
+            "save_error": {
+              "type": "string",
+              "minLength": 1,
+              "description": "What the person sees when a tick does not save: what happened and what to do."
+            }
+          }
         }
       },
       "description": "One card: either a registry group at one scope (group and scope together) or a list of link rows (links), never both. areas-check.ts enforces the pairing."

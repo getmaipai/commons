@@ -355,6 +355,33 @@
               "scope": "household"
             },
             {
+              "label": "Blocked sites",
+              "group": "household.blocked_sites",
+              "scope": "household",
+              "matrix": {
+                "rows": "search/blocklists",
+                "columns": [
+                  {
+                    "label": "Kids",
+                    "key": "search.blocklists.child",
+                    "band": "child"
+                  },
+                  {
+                    "label": "Teens",
+                    "key": "search.blocklists.teen",
+                    "band": "teen"
+                  },
+                  {
+                    "label": "Adults",
+                    "key": "search.blocklists.adult",
+                    "band": "adult"
+                  }
+                ],
+                "locked_note": "Adult sites are always blocked for Kids and Teens, so those boxes stay checked.",
+                "save_error": "That change was not saved. Check your connection, then tick the box again."
+              }
+            },
+            {
               "label": "News shelf",
               "group": "household.news",
               "scope": "household"

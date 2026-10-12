@@ -810,6 +810,59 @@ export const PackageManifest = z
                                 "All items must be unique!",
                               )
                               .optional(),
+                            /**Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.*/
+                            matrix: z
+                              .object({
+                                /**The policy file the rows come from (spec/search/blocklists.json). A list in its locked_for for a column's band shows checked and disabled.*/
+                                rows: z
+                                  .literal("search/blocklists")
+                                  .describe(
+                                    "The policy file the rows come from (spec/search/blocklists.json). A list in its locked_for for a column's band shows checked and disabled.",
+                                  ),
+                                columns: z
+                                  .array(
+                                    z
+                                      .object({
+                                        label: z.string().min(1).max(20),
+                                        /**A select key with range.multiple in this card's group and scope.*/
+                                        key: z
+                                          .string()
+                                          .min(1)
+                                          .describe(
+                                            "A select key with range.multiple in this card's group and scope.",
+                                          ),
+                                        band: z.enum([
+                                          "child",
+                                          "teen",
+                                          "adult",
+                                        ]),
+                                      })
+                                      .strict(),
+                                  )
+                                  .min(1)
+                                  .max(3),
+                                /**The plain reason shown under the grid when any cell is locked.*/
+                                locked_note: z
+                                  .string()
+                                  .min(1)
+                                  .describe(
+                                    "The plain reason shown under the grid when any cell is locked.",
+                                  )
+                                  .optional(),
+                                /**What the person sees when a tick does not save: what happened and what to do.*/
+                                save_error: z
+                                  .string()
+                                  .min(1)
+                                  .describe(
+                                    "What the person sees when a tick does not save: what happened and what to do.",
+                                  )
+                                  .optional(),
+                              })
+                              .strict()
+                              .describe(
+                                "Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.",
+                              )
+                              .optional(),
                           })
                           .strict()
                           .describe(

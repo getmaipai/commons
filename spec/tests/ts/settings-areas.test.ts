@@ -432,3 +432,35 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
     ]) expect(registryIds()).toContain(key);
   });
 });
+
+// MINOR-SEARCH-01e-10: the blocked-sites card draws its list choices as a category-by-user-type grid.
+const blockedCard = () => {
+  const found = section("home", "search").cards?.find((c) => c.matrix);
+  if (!found) throw new Error("home/search has no matrix card");
+  return found;
+};
+
+test("the blocked-sites card names the three list-choice keys, one per user type, all in its own group", () => {
+  const card = blockedCard();
+  expect(card.matrix!.columns.map((c) => c.band)).toEqual(["child", "teen", "adult"]);
+  expect(card.matrix!.columns.map((c) => c.key)).toEqual(["search.blocklists.child", "search.blocklists.teen", "search.blocklists.adult"]);
+  expect(checkAreas(file, registry)).toEqual([]);
+  expect(validateArea(area("home"))).toBe(true);
+});
+
+test("a matrix column naming a key outside the card's group, or a repeated band, is refused", () => {
+  const f = clone(file);
+  const card = f.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "search")!.cards!.find((c) => c.matrix)!;
+  card.matrix!.columns[0]!.key = "search.safe_search";
+  expect(checkAreas(f, registry).join("\n")).toContain("must live in household:household.blocked_sites");
+  card.matrix!.columns[0]!.key = "search.blocklists.child";
+  card.matrix!.columns[1]!.band = "child";
+  expect(checkAreas(f, registry).join("\n")).toContain("two columns for child");
+});
+
+test("a matrix with an unknown row source or extra field is refused by the schema", () => {
+  const a = clone(area("home"));
+  const card = a.sections.find((s) => s.id === "search")!.cards!.find((c) => c.matrix)!;
+  (card.matrix as { rows: string }).rows = "search/other";
+  expect(validateArea(a)).toBe(false);
+});
