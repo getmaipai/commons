@@ -1,3 +1,7 @@
+## [spec-v0.1.123] - 2026-10-12
+
+- Topic copy trimmed to fit the prompt budget (MINOR-TOPICS-01c). Measured with the Qwen3.8 9B tokenizer, the v0.1.122 default blocks were 328 tokens (child, with the three family-story names) and 265 (teen) against the 260-token bar. The sentences are shorter now, same instructions: child 256, teen 258. Only wording in `safety/topic-copy.json` changed; no key, stance or schema moved. The reachable-combination safety test also keeps the care sentence, hard lines and danger carve-out.
+
 ## [spec-v0.1.122] - 2026-10-12
 
 - Sensitive-subject topics for child and teen controls (MINOR-TOPICS-01a, owner sign-off 2026-10-12). The content-ceiling record gains an additive `topics` map (seven families: bodies, health, feelings, risk, violence, people, beliefs; each with a default `stance`, the `allowed` stances a household may pick and a `fixed` flag) and, on the child record, `family_stories` (`keep` by default, with the built-in names). The adult record carries neither. Topics govern whether and how a subject is engaged; `dials` still govern explicitness.

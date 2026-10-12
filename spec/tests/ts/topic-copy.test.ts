@@ -148,6 +148,15 @@ describe("renderTopicBlock", () => {
     expect(block).not.toContain("Santa");
   });
 
+  test("the default blocks stay inside the prompt budget (260 tokens, measured about 4 characters each)", () => {
+    // MINOR-TOPICS-01c measured the shipped text with the Qwen3.8 9B tokenizer: child 256 tokens, teen 258.
+    // This is a character floor so a wording edit cannot silently grow the block; the live bench re-measures.
+    const names = ["Santa Claus", "the Tooth Fairy", "the Easter Bunny"];
+    const stances = (band: "child" | "teen") => ({ ...defaults(band) });
+    expect(renderTopicBlock({ ...base("child"), stances: stances("child"), familyStoryNames: names }).length).toBeLessThanOrEqual(1000);
+    expect(renderTopicBlock({ ...base("teen"), stances: stances("teen") }).length).toBeLessThanOrEqual(1100);
+  });
+
   test("every reachable setting combination keeps the care sentence, the hard lines and the danger carve-out", () => {
     const opts = (band: "child" | "teen", f: (typeof TOPIC_FAMILIES)[number]) => record(band).topics![f].allowed as TopicStance[];
     let combos = 0;
@@ -159,7 +168,7 @@ describe("renderTopicBlock", () => {
           const block = renderTopicBlock({ ...base(band), stances: { ...defaults(band), ...cur } });
           const lower = block.toLowerCase();
           expect(block, `${band} ${JSON.stringify(cur)}`).toContain("988");
-          expect(block).toContain("If anyone may be in danger now");
+          expect(block).toMatch(/danger now: get (a grown-up|help) or call 911/i);
           expect(lower).toContain("never");
           expect(lower).toContain("no methods");
           expect(block).toContain("take no side");
