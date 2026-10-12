@@ -1,3 +1,7 @@
+## [spec-v0.1.124] - 2026-10-12
+
+- Settings keys `search.hosts.deny` and `search.hosts.allow` (household text, advanced, `household.search`; MINOR-SEARCH-01e-8, owner decision 2026-10-12): comma-separated hosts the household always blocks in web search, and hosts it may show even when a blocked-sites list has them. A deny always wins. An allow can never unblock a host on a list locked for the band, so the adult-site list stays locked for child and teen controls. Admin-edited, household-wide, no per-person override.
+
 ## [spec-v0.1.123] - 2026-10-12
 
 - Topic copy trimmed to fit the prompt budget (MINOR-TOPICS-01c). Measured with the Qwen3.8 9B tokenizer, the v0.1.122 default blocks were 328 tokens (child, with the three family-story names) and 265 (teen) against the 260-token bar. The sentences are shorter now, same instructions: child 256, teen 258. Only wording in `safety/topic-copy.json` changed; no key, stance or schema moved. The reachable-combination safety test also keeps the care sentence, hard lines and danger carve-out.

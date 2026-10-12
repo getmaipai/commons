@@ -1809,6 +1809,40 @@
     ]
   },
   {
+    "key": "search.hosts.deny",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Always block these sites",
+    "help": "Sites that web search never shows for anyone, separated by commas, like example.com. A site you list here also blocks its subpages. This works for every age, and it always wins over the allowed list. Only an admin can change this.",
+    "copy": {
+      "does": "Lists sites that web search always blocks."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.hosts.allow",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Allow these sites",
+    "help": "Sites that web search may show even when a blocked-sites list has them, separated by commas, like example.com. It cannot allow an adult site for child or teen controls, and it cannot allow a site you list under Always block these sites. Only an admin can change this.",
+    "copy": {
+      "does": "Lists sites that web search may show even if a blocked-sites list has them."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.web_sources",
     "scope": "household",
     "selector": "select",

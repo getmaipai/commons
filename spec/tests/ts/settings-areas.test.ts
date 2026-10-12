@@ -415,8 +415,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("no key was added or removed, and scope, default and level are untouched (pinned counts)", () => {
-    expect(registry).toHaveLength(135);
-    expect(new Set(registryIds()).size).toBe(135);
+    expect(registry).toHaveLength(137);
+    expect(new Set(registryIds()).size).toBe(137);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",
@@ -424,6 +424,7 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
       "search.source_mode", "search.source_mode.wikimedia", "search.source_mode.web", "search.web_sources", "chat.search_assist",
       "search.web.child_mode", "search.web.teen_mode",
       "search.blocklists.child", "search.blocklists.teen", "search.blocklists.adult",
+      "search.hosts.deny", "search.hosts.allow",
       "topics.bodies", "topics.health", "topics.risk", "topics.violence", "topics.family_stories", "topics.family_story_names",
       "topics.teen.bodies", "topics.teen.risk",
     ]) expect(registryIds()).toContain(key);
