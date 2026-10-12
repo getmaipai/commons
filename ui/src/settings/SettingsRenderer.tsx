@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from "../dashboard/components/ui/alert";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../dashboard/components/ui/collapsible";
 import { Empty, EmptyDescription, EmptyHeader } from "../dashboard/components/ui/empty";
 import { Item, ItemContent, ItemGroup, ItemSeparator, ItemTitle } from "../dashboard/components/ui/item";
-import { SettingRow, type BeforeChange } from "./SettingRow";
+import { SettingRow, type BeforeChange, type SettingRowProps } from "./SettingRow";
 import type { PersonOption } from "./PersonMultiSelect";
 import { useSettingsHeadingLevel } from "./headingLevel";
 import { OptionMatrix } from "./OptionMatrix";
@@ -70,6 +70,10 @@ interface SettingsRendererProps {
    * group named by `only`, replaces that group's column keys as rows, and
    * writes the same keys the rows would. */
   matrix?: AreaMatrix;
+  /** Extra display for single rows, by key: a summary line, a lock reason
+   * (control disabled) and one extra button. Data and handlers from the host;
+   * additive, absent means unchanged. */
+  rowExtras?: Readonly<Record<string, Pick<SettingRowProps, "note" | "lockedReason" | "action">>>;
 }
 
 // The registry never varies by which renderer is asking, so every instance
@@ -102,6 +106,7 @@ export function SettingsRenderer({
   focusKey,
   headingLevel,
   matrix,
+  rowExtras,
 }: SettingsRendererProps) {
   const Heading = `h${useSettingsHeadingLevel(headingLevel)}` as "h2" | "h3";
   const queryClient = useQueryClient();
@@ -197,6 +202,7 @@ export function SettingsRenderer({
         selfPersonId={selfPersonId}
         people={people}
         beforeChange={beforeChange}
+        {...rowExtras?.[s.def.key]}
       />
     );
   }

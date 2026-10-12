@@ -634,3 +634,33 @@ describe("SettingField compatibility shim", () => {
     expect(shim.SettingField).toBe(SettingRow);
   });
 });
+
+describe("SettingRow - note, lock and action (EASE-OF-USE-01 polish)", () => {
+  test("a note and an action button show under the row, and the action calls its handler", () => {
+    const onPress = mock(() => {});
+    const { getByText, getByRole } = render(
+      <SettingRow setting={numberSetting(45, "default")} onChange={() => Promise.resolve(true)} onReset={() => {}} note="Large + 2 changes" action={{ label: "Back to Large", onPress }} />,
+    );
+    expect(getByText("Large + 2 changes")).toBeTruthy();
+    fireEvent.click(getByRole("button", { name: "Back to Large" }));
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  test("a locked row shows its reason, disables the control and hides its own reset", () => {
+    const { getByText, getByLabelText, queryByRole } = render(
+      <SettingRow setting={numberSetting(45, "user")} onChange={() => Promise.resolve(true)} onReset={() => {}} lockedReason="Set by Jordan. Ask them to change it." />,
+    );
+    expect(getByText("Set by Jordan. Ask them to change it.")).toBeTruthy();
+    expect((getByLabelText("Conversation history retention") as HTMLInputElement).disabled).toBe(true);
+    expect(queryByRole("button", { name: "Reset to default" })).toBeNull();
+  });
+
+  test("without the new props the row is unchanged", () => {
+    const { container, queryByRole } = render(
+      <SettingRow setting={numberSetting(45, "default")} onChange={() => Promise.resolve(true)} onReset={() => {}} />,
+    );
+    expect(container.querySelector('[data-slot="setting-summary"]')).toBeNull();
+    expect(container.querySelector('[data-slot="setting-locked"]')).toBeNull();
+    expect(queryByRole("button")).toBeNull();
+  });
+});

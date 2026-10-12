@@ -115,7 +115,7 @@ export default function RailProfileMenu({
               <DropdownMenuTrigger
                 aria-label={label}
                 data-slot="rail-profile-trigger"
-                className={cn("relative flex size-10 cursor-pointer items-center justify-center rounded-lg hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-popup-open:bg-foreground/10", hitArea(1))}
+                className={cn("relative flex size-[var(--rail-button,40px)] cursor-pointer items-center justify-center rounded-lg hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-popup-open:bg-foreground/10", hitArea(1))}
               />
             }
           >

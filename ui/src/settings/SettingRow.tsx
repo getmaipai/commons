@@ -39,6 +39,16 @@ export interface SettingRowProps {
    * reads `GET /api/people` itself. */
   people?: readonly PersonOption[];
   beforeChange?: BeforeChange;
+  /** A short plain line under the row's help text, such as a summary
+   * ("Large + 2 changes"). Additive: absent, nothing is drawn. */
+  note?: string;
+  /** The plain reason this row cannot change for the viewer ("Set by Jordan.
+   * Ask them to change it."). Present: the control is disabled, the reason is
+   * shown under the row and the row's own reset is hidden. */
+  lockedReason?: string;
+  /** One extra link-style button under the row (such as "Back to Large");
+   * pressing it calls `onPress`. Absent: no button. */
+  action?: { label: string; onPress: () => void };
 }
 
 /** One settings row: the title and helper text on the left, the control for
@@ -46,14 +56,15 @@ export interface SettingRowProps {
  * from its default. Drawn as the kit's `Item size="setting"`; it goes
  * inside an `ItemGroup variant="card"` (see SettingsRenderer). A secret
  * never shows its value, only Set or Not set. */
-export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId, people, beforeChange }: SettingRowProps) {
+export function SettingRow({ setting, onChange, onReset, disabled: disabledProp, selfPersonId, people, beforeChange, note: summary, lockedReason, action }: SettingRowProps) {
+  const disabled = disabledProp || Boolean(lockedReason);
   const { def, resolved } = setting;
   const titleId = useId();
   const [draft, setDraft] = useState<string>(String(resolved.value ?? ""));
   const [editing, setEditing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const editorRef = useRef<HTMLInputElement>(null);
-  const canReset = resolved.source === "user";
+  const canReset = resolved.source === "user" && !lockedReason;
 
   // The write-only secret flow. `secretEditing` reveals a masked input; the
   // value is never read back from the server (CLAUDE.md > Credentials:
@@ -320,6 +331,13 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
           <p role="status" className="text-[13px] leading-4 text-settings-helper">
             {note}
           </p>
+        ) : null}
+        {summary ? <p data-slot="setting-summary" className="text-[13px] leading-4 text-settings-helper">{summary}</p> : null}
+        {lockedReason ? <p data-slot="setting-locked" className="text-[13px] leading-4 text-settings-helper">{lockedReason}</p> : null}
+        {action ? (
+          <Button type="button" variant="link" size="row" onClick={action.onPress} disabled={disabledProp} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">
+            {action.label}
+          </Button>
         ) : null}
         {canReset ? (
           <Button type="button" variant="link" size="row" onClick={onReset} disabled={disabled} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">

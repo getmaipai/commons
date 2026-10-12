@@ -50,7 +50,7 @@ export function isRailItemActive(pathname: string, url: string): boolean {
 }
 
 const railButton =
-  "relative flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "relative flex size-[var(--rail-button,40px)] items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /** RAIL-01 (owner's layout, 2026-10-06): the permanent 56px app rail.
  * Never expands, carries no labels (each icon names itself through its
@@ -101,7 +101,7 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
     <nav
       aria-label="Primary navigation"
       data-slot="app-rail"
-      className="sticky top-0 flex h-svh w-14 min-w-14 max-w-14 shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2"
+      className="sticky top-0 flex h-svh w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)] shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2"
     >
       {home ? (
         <Tooltip>
@@ -123,13 +123,13 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
           <ItemTooltip name={home.name} status={homeStatus} />
         </Tooltip>
       ) : (
-        <Link to="/" aria-label="MaiPai Home" data-slot="app-rail-home" className={cn("mb-1 flex size-10 items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", hitArea(1))}>
+        <Link to="/" aria-label="MaiPai Home" data-slot="app-rail-home" className={cn("mb-1 flex size-[var(--rail-button,40px)] items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", hitArea(1))}>
           {logo}
         </Link>
       )}
 
       <Tooltip>
-        <TooltipTrigger render={<div data-slot="app-rail-search" className="flex size-10 items-center justify-center" />}>
+        <TooltipTrigger render={<div data-slot="app-rail-search" className="flex size-[var(--rail-button,40px)] items-center justify-center" />}>
           <HeaderSearch remote={searchRemote} triggerClassName="rounded-lg text-muted-foreground hover:bg-foreground/5 hover:text-foreground [&_svg]:size-5" />
         </TooltipTrigger>
         <TooltipContent side="right">Search</TooltipContent>

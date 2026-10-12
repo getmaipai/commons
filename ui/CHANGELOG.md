@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.200] - ui-v0.5.200
+
+Repairs ui-v0.5.199, which was cut against a commit that held only the generator, its test and the rail test (its package.json read 0.5.198, and tokens.css and the rail were never staged). ui-v0.5.199 is left as is and must not be used. This tag carries what 0.5.199 described: the ease token block in `tokens.css` (run `bun run gen:ease`, parity test holds it) and the app rail reading `--rail-width` and `--rail-button`, so it widens and its buttons grow at large targets (icons only, still permanent). New: `SettingRow` takes optional `note` (a summary line), `lockedReason` (disables the control and says why, hides the row's own reset) and `action` (one extra link button, such as "Back to Large"); `SettingsRenderer` takes `rowExtras`, a map by key. All additive.
+
 ## [0.5.198] - ui-v0.5.198
 
 `OptionMatrix` draws its boxes with the kit `Checkbox` (`ui/checkbox`), whose tap area

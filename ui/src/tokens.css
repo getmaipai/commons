@@ -1057,3 +1057,91 @@ body {
 [data-slot="sidebar-inset"] {
   outline-color: transparent;
 }
+
+/* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */
+/* Targets: --target-min is the smallest control size; the rail reads --rail-button and --rail-width. */
+:root {
+  --target-min: 48px;
+  --rail-button: 40px;
+  --rail-width: 56px;
+}
+html[data-ease-targets="large"] {
+  --target-min: 76px;
+  --rail-button: 76px;
+  --rail-width: 92px;
+}
+html[data-ease-targets="large"] [data-slot="button"],
+html[data-ease-targets="large"] [data-slot="input"],
+html[data-ease-targets="large"] [data-slot="select-trigger"],
+html[data-ease-targets="large"] [data-slot="toggle"] {
+  min-height: var(--target-min);
+}
+/* Text size: the root font size scales every rem utility; the px type tokens scale with it. */
+html[data-ease-text="100"] {
+  font-size: 16px;
+  --font-size-title: 30px;
+  --font-size-section: 18px;
+  --font-size-metric: 28px;
+  --font-size-body: 13.5px;
+  --font-size-supporting: 12px;
+}
+html[data-ease-text="120"] {
+  font-size: 19.2px;
+  --font-size-title: 36px;
+  --font-size-section: 21.6px;
+  --font-size-metric: 33.6px;
+  --font-size-body: 16.2px;
+  --font-size-supporting: 14.4px;
+}
+html[data-ease-text="140"] {
+  font-size: 22.4px;
+  --font-size-title: 42px;
+  --font-size-section: 25.2px;
+  --font-size-metric: 39.2px;
+  --font-size-body: 18.9px;
+  --font-size-supporting: 16.8px;
+}
+html[data-ease-text="160"] {
+  font-size: 25.6px;
+  --font-size-title: 48px;
+  --font-size-section: 28.8px;
+  --font-size-metric: 44.8px;
+  --font-size-body: 21.6px;
+  --font-size-supporting: 19.2px;
+}
+/* Spacing: Tailwind's spacing unit (0.25rem). */
+html[data-ease-spacing="roomy"] {
+  --spacing: 0.3125rem;
+}
+/* Contrast: secondary text moves toward the page's strongest text color. */
+html[data-ease-contrast="more"] {
+  --muted-foreground: color-mix(in srgb, var(--background), var(--foreground) 80%);
+}
+/* Motion: calm mutes the accent hues and stops animation; the OS reduced-motion setting stops it too. */
+html[data-ease-motion="calm"] {
+  --hue-violet: color-mix(in srgb, #a434ff 65%, gray);
+  --hue-violet-deep: color-mix(in srgb, #7a1fd6 65%, gray);
+  --hue-teal: color-mix(in srgb, #00e3ae 65%, gray);
+  --hue-orange: color-mix(in srgb, #ff8a35 65%, gray);
+  --hue-pink: color-mix(in srgb, #ff3e9a 65%, gray);
+  --hue-red: color-mix(in srgb, #ff4b62 65%, gray);
+}
+html[data-ease-motion="calm"] *,
+html[data-ease-motion="calm"] *::before,
+html[data-ease-motion="calm"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html *,
+  html *::before,
+  html *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* EASE-GENERATED:END */

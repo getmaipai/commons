@@ -1,3 +1,7 @@
+## [spec-v0.1.130] - 2026-10-12
+
+- EASE-OF-USE-01 polish. In `keys.json` the `ease.*` keys are ordered Look first, then text size, spacing, button size, contrast, motion, Simple mode, reading level, explainers, word help and read aloud, and `ease.preset` is labelled "Look" (it carried the card's own title, "Ease of use"). No key, range or default changed.
+
 ## [spec-v0.1.129] - 2026-10-12
 
 - EASE-OF-USE-01a, ease of use settings (owner rulings 2026-10-12). New keys `ease.preset` (`standard`, `comfortable`, `large`, `simple`; Kids start on Simple, Teens and Adults on Standard), `ease.targets`, `ease.text_size`, `ease.spacing`, `ease.contrast`, `ease.motion` (calm mutes colors and stops animation), `ease.simple_mode`, `ease.word_help`, `ease.read_aloud` and `ease.explainers` (each defaults to `preset`, so a preset sets it until the person changes that one) and `ease.reading_level` (`standard`, `plain`, `very_simple`; Kids start on Plain). All are layered (`band`, `household`, `person`), `merge: override`, group `profile.ease`, in a new "Ease of use" card beside Appearance. Preset and level names are working names.
