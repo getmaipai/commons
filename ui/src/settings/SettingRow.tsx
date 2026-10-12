@@ -8,6 +8,7 @@ import { Switch } from "../dashboard/components/ui/switch";
 import { localeDisplayName, middleEllipsis, titleCaseOption } from "./optionLabels";
 import { HitField } from "./HitField";
 import { PersonMultiSelect, type PersonOption } from "./PersonMultiSelect";
+import { OptionMultiSelect } from "./OptionMultiSelect";
 
 // A code review (2026-09-06) found the generic write-only secret flow made
 // `voice.hf_token` writable a SECOND way: that key already has its own
@@ -168,6 +169,19 @@ export function SettingRow({ setting, onChange, onReset, disabled, selfPersonId,
   } else if (def.selector === "boolean") {
     control = (
       <Switch size="md" checked={Boolean(resolved.value)} onCheckedChange={(v) => void write(v)} disabled={disabled} aria-label={def.label} />
+    );
+  } else if (def.selector === "select" && (def.range as { multiple?: boolean } | undefined)?.multiple) {
+    // A select with `range.multiple` is a chips Combobox; names come from the spec's
+    // `copy.option_labels`, falling back to the title-cased id. The value is an array.
+    control = (
+      <OptionMultiSelect
+        value={Array.isArray(resolved.value) ? (resolved.value as string[]) : []}
+        options={(def.range as { options?: string[] } | undefined)?.options ?? []}
+        labels={(def.copy as { option_labels?: Record<string, string> } | undefined)?.option_labels}
+        onValueChange={(ids) => void write(ids)}
+        disabled={disabled}
+        ariaLabel={def.label}
+      />
     );
   } else if (def.selector === "select") {
     const options = (def.range as { options?: string[] } | undefined)?.options ?? [];

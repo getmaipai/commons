@@ -583,6 +583,31 @@ describe("SettingRow - person multi-select", () => {
   });
 });
 
+describe("SettingRow - select with range.multiple", () => {
+  const setting = {
+    ...makeSetting({ selector: "select", key: "search.web_sources", value: ["searxng"], range: { options: ["searxng", "ddgs"], multiple: true }, label: "Web search sources" }),
+  };
+  (setting.def as { copy?: unknown }).copy = { option_labels: { searxng: "SearXNG", ddgs: "DuckDuckGo" } };
+
+  test("shows the picked values as chips named from copy.option_labels, not title-cased ids", () => {
+    const { getByText, queryByText } = render(<SettingRow setting={setting} onChange={async () => true} onReset={() => {}} />);
+    expect(getByText("SearXNG")).toBeTruthy();
+    expect(queryByText("Searxng")).toBeNull();
+  });
+
+  test("picking another option writes the whole list as an array", async () => {
+    const onChange = mock(async (_v: unknown) => true);
+    const { getByRole, findByRole } = render(<SettingRow setting={setting} onChange={onChange} onReset={() => {}} />);
+    const input = getByRole("combobox");
+    await act(async () => {
+      fireEvent.focus(input);
+      fireEvent.keyDown(input, { key: "ArrowDown" });
+    });
+    fireEvent.click(await findByRole("option", { name: "DuckDuckGo" }));
+    expect(onChange).toHaveBeenCalledWith(["searxng", "ddgs"]);
+  });
+});
+
 describe("SettingRow - unknown selector and reset", () => {
   test("a selector with no real key yet says so instead of drawing nothing", () => {
     const { getByText } = render(<SettingRow setting={makeSetting({ selector: "duration", value: 5 })} onChange={async () => true} onReset={() => {}} />);

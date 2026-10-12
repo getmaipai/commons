@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.192] - ui-v0.5.192
+
+`SettingRow` (and so `SettingsRenderer`) draws a `select` selector whose
+`range.multiple` is true as a chips Combobox (new `OptionMultiSelect`): the
+value is an array, option names come from the spec's `copy.option_labels`
+(falling back to the title-cased id). A `select` without `range.multiple` is
+unchanged. No existing prop changes.
+
 ## [0.5.191] - ui-v0.5.191
 
 `Sources` (and the inline `Citation` popup) gain an optional `detail` string on
