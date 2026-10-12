@@ -1646,10 +1646,49 @@
         "strict"
       ]
     },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
     "default": "default",
     "label": "Safe search level",
     "help": "How strictly web search filters results for you. \"Default\" follows your age: strict for a child, moderate for a teen, off for an adult. A child's is always strict. A teen can make theirs stricter but never lower than moderate. An adult can change their own.",
     "level": "basic",
+    "secret": false,
+    "lives_in": "person.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "search.page_text_cleaning",
+    "scope": "person",
+    "selector": "boolean",
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": false,
+    "label": "Page text check",
+    "help": "When this is on, text MaiPai fetches from a web page is checked and cleaned before the assistant reads it. It is on by default for Kids and Teens and off for Adults. An admin can change it for everyone or for one person. A child or teen cannot turn it off.",
+    "copy": {
+      "does": "Checks and cleans text fetched from web pages before the assistant reads it."
+    },
+    "band_default": {
+      "child": true,
+      "teen": true,
+      "adult": false
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "level": "advanced",
     "secret": false,
     "lives_in": "person.search",
     "honoured_by": [
@@ -1953,9 +1992,75 @@
     ]
   },
   {
+    "key": "search.blocklists",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "blp-porn",
+        "blp-gambling",
+        "blp-scam",
+        "blp-phishing",
+        "blp-malware",
+        "blp-drugs"
+      ],
+      "multiple": true
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "union",
+    "user_defaults_keys": {
+      "child": "search.blocklists.child",
+      "teen": "search.blocklists.teen",
+      "adult": "search.blocklists.adult"
+    },
+    "default": [],
+    "label": "Kinds of sites to block",
+    "help": "Kinds of sites that web search, page reads and answer pictures leave out. Kids, Teens and Adults each start from their own user defaults. The global defaults add kinds for everyone, and a user override adds or removes kinds for one person. The adult-site list is always on for a child or teen and no override can turn it off. Only an admin can change this, and it never shows what anyone searched for.",
+    "copy": {
+      "does": "Chooses which lists of blocked sites are checked when the web is searched.",
+      "options": {
+        "blp-porn": "Blocks sites made only for grown-ups.",
+        "blp-gambling": "Blocks betting, casino and lottery sites.",
+        "blp-scam": "Blocks sites known for fake offers, fake shops and fraud.",
+        "blp-phishing": "Blocks sites that pretend to be a bank or an account page to steal a login.",
+        "blp-malware": "Blocks sites known for spreading viruses and harmful downloads.",
+        "blp-drugs": "Blocks sites that sell or promote illegal drugs."
+      },
+      "option_labels": {
+        "blp-porn": "Adult sites",
+        "blp-gambling": "Gambling sites",
+        "blp-scam": "Scam sites",
+        "blp-phishing": "Phishing sites",
+        "blp-malware": "Malware sites",
+        "blp-drugs": "Drug sites"
+      }
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.blocked_sites",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.hosts.deny",
     "scope": "household",
     "selector": "text",
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "union",
+    "user_defaults_keys": {
+      "child": "search.hosts.child.deny",
+      "teen": "search.hosts.teen.deny",
+      "adult": "search.hosts.adult.deny"
+    },
     "default": "",
     "label": "Always block these sites",
     "help": "Sites that web search never shows for anyone, separated by commas, like example.com. A site you list here also blocks its subpages. This works for every age, and it always wins over the allowed list. Only an admin can change this.",
@@ -1973,6 +2078,17 @@
     "key": "search.hosts.allow",
     "scope": "household",
     "selector": "text",
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "union",
+    "user_defaults_keys": {
+      "child": "search.hosts.child.allow",
+      "teen": "search.hosts.teen.allow",
+      "adult": "search.hosts.adult.allow"
+    },
     "default": "",
     "label": "Allow these sites",
     "help": "Sites that web search may show even when a blocked-sites list has them, separated by commas, like example.com. It cannot allow an adult site for child or teen controls, and it cannot allow a site you list under Always block these sites. Only an admin can change this.",
@@ -2099,6 +2215,11 @@
       ],
       "multiple": true
     },
+    "layers": [
+      "household",
+      "person"
+    ],
+    "merge": "override",
     "default": [
       "searxng"
     ],

@@ -7,11 +7,17 @@ import { z } from "zod";
 /**One row per (scope, key). Per-field last-writer-wins on the oplog via hlc. See platform plan 3.1, 3.2, and docs/SETTINGS.md in .github.*/
 export const SettingValue = z
   .object({
-    /**household, person:<id>, or device:<id>.*/
+    /**household (global defaults), band:<child|teen|adult> (user defaults), person:<id> (user overrides), or device:<id>.*/
     scope: z
       .string()
-      .regex(new RegExp("^(household|person:[a-z0-9-]+|device:[a-z0-9-]+)$"))
-      .describe("household, person:<id>, or device:<id>."),
+      .regex(
+        new RegExp(
+          "^(household|band:(child|teen|adult)|person:[a-z0-9-]+|device:[a-z0-9-]+)$",
+        ),
+      )
+      .describe(
+        "household (global defaults), band:<child|teen|adult> (user defaults), person:<id> (user overrides), or device:<id>.",
+      ),
     /**Dotted, lowercase, owned by exactly one package (docs/PACKAGES.md naming rule). Must exist in the settings registry.*/
     key: z
       .string()
@@ -36,6 +42,15 @@ export const SettingValue = z
       .describe(
         "Where this value last came from, for the settings UI's modified filter.",
       ),
+    /**SETTINGS-LAYERS-01. Who wrote a user override: self (the person), system, or the id of the admin who set it. Only an admin id may be lifted by an admin alone. List keys keep this per entry in the value instead (settings-delta).*/
+    set_by: z
+      .string()
+      .regex(new RegExp("^(self|system|[a-z0-9-]+)$"))
+      .min(1)
+      .describe(
+        "SETTINGS-LAYERS-01. Who wrote a user override: self (the person), system, or the id of the admin who set it. Only an admin id may be lifted by an admin alone. List keys keep this per entry in the value instead (settings-delta).",
+      )
+      .optional(),
   })
   .strict()
   .describe(

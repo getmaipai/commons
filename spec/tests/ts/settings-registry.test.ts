@@ -5,6 +5,8 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { SettingsKey } from "../../gen/ts/settings-key.js";
+import { SettingValue } from "../../gen/ts/setting-value.js";
+import { SettingsDelta } from "../../gen/ts/settings-delta.js";
 
 const REGISTRY_PATH = join(import.meta.dir, "..", "..", "settings", "keys.json");
 
@@ -133,4 +135,54 @@ describe("IMG-SPEC-KEYS declarations", () => {
       expect(entry.honoured_by).toEqual(["home"]);
     });
   }
+});
+
+describe("SETTINGS-LAYERS-01 declarations", () => {
+  type Entry = { key: string; layers?: string[]; merge?: string; user_defaults_keys?: Record<string, string>; scope: string; selector: string; range?: { multiple?: boolean } };
+  const entries = () => loadRegistry() as Entry[];
+
+  test("a layered key lists its layers lowest first and always includes the person layer or the global layer", () => {
+    for (const e of entries().filter((x) => x.layers)) {
+      const order = ["band", "household", "person"];
+      const idx = e.layers!.map((l) => order.indexOf(l));
+      expect(idx.every((i) => i >= 0), e.key).toBe(true);
+      expect([...idx].sort((a, b) => a - b), `${e.key} layers must run lowest to highest`).toEqual(idx);
+      expect(e.layers!.includes("household") || e.layers!.includes("person"), e.key).toBe(true);
+    }
+  });
+
+  test("the search block keys are layered as unions and their user defaults point at declared keys", () => {
+    const byKey = new Map(entries().map((e) => [e.key, e]));
+    for (const key of ["search.blocklists", "search.hosts.deny", "search.hosts.allow"]) {
+      const e = byKey.get(key)!;
+      expect(e.layers, key).toEqual(["band", "household", "person"]);
+      expect(e.merge, key).toBe("union");
+      expect(Object.keys(e.user_defaults_keys ?? {}).sort(), key).toEqual(["adult", "child", "teen"]);
+    }
+    for (const e of entries()) for (const target of Object.values(e.user_defaults_keys ?? {})) expect(byKey.has(target), `${e.key} -> ${target}`).toBe(true);
+  });
+
+  test("SafeSearch, web sources and page-text cleaning are overridable user defaults, never a fixed floor", () => {
+    const byKey = new Map(entries().map((e) => [e.key, e]));
+    expect(byKey.get("search.safe_search")?.layers).toEqual(["band", "household", "person"]);
+    expect(byKey.get("search.safe_search")?.merge).toBe("override");
+    expect(byKey.get("search.web_sources")?.layers).toEqual(["household", "person"]);
+    const cleaning = byKey.get("search.page_text_cleaning") as unknown as { band_default: Record<string, boolean>; control: Record<string, string> };
+    expect(cleaning.band_default).toEqual({ child: true, teen: true, adult: false });
+    expect(cleaning.control.child).toBe("guardian");
+    expect(cleaning.control.teen).toBe("guardian");
+  });
+
+  test("a setting value may live at a user-defaults row, and a user override may say who set it", () => {
+    const base = { key: "search.hosts.deny", value: "example.com", hlc: "1:0:abcdef", source: "user" };
+    expect(() => SettingValue.parse({ ...base, scope: "band:teen" })).not.toThrow();
+    expect(() => SettingValue.parse({ ...base, scope: "person:p1", set_by: "admin-1" })).not.toThrow();
+    expect(() => SettingValue.parse({ ...base, scope: "band:senior" })).toThrow();
+  });
+
+  test("a list override is a delta whose every entry carries who set it", () => {
+    const entry = { item: "blp-gambling", set_by: "admin-1", hlc: "1:0:abcdef" };
+    expect(() => SettingsDelta.parse({ add: [entry], remove: [] })).not.toThrow();
+    expect(() => SettingsDelta.parse({ add: [{ item: "blp-gambling" }] })).toThrow();
+  });
 });

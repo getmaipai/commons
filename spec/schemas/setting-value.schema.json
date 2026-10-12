@@ -9,8 +9,8 @@
   "properties": {
     "scope": {
       "type": "string",
-      "pattern": "^(household|person:[a-z0-9-]+|device:[a-z0-9-]+)$",
-      "description": "household, person:<id>, or device:<id>."
+      "pattern": "^(household|band:(child|teen|adult)|person:[a-z0-9-]+|device:[a-z0-9-]+)$",
+      "description": "household (global defaults), band:<child|teen|adult> (user defaults), person:<id> (user overrides), or device:<id>."
     },
     "key": {
       "type": "string",
@@ -29,6 +29,12 @@
       "type": "string",
       "enum": ["user", "default", "package", "sync"],
       "description": "Where this value last came from, for the settings UI's modified filter."
+    },
+    "set_by": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(self|system|[a-z0-9-]+)$",
+      "description": "SETTINGS-LAYERS-01. Who wrote a user override: self (the person), system, or the id of the admin who set it. Only an admin id may be lifted by an admin alone. List keys keep this per entry in the value instead (settings-delta)."
     }
   }
 }

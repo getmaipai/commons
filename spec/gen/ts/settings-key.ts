@@ -38,6 +38,46 @@ export const SettingsKey = z
         "Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector.",
       )
       .optional(),
+    /**SETTINGS-LAYERS-01. The scopes a row of this key may be stored at, lowest to highest precedence: band = user defaults (Kids, Teens, Adults), household = global defaults, person = user overrides. Absent means the key is stored at its own scope only and nothing is layered.*/
+    layers: z
+      .array(z.enum(["band", "household", "person"]))
+      .min(1)
+      .refine(
+        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+        "All items must be unique!",
+      )
+      .describe(
+        "SETTINGS-LAYERS-01. The scopes a row of this key may be stored at, lowest to highest precedence: band = user defaults (Kids, Teens, Adults), household = global defaults, person = user overrides. Absent means the key is stored at its own scope only and nothing is layered.",
+      )
+      .optional(),
+    /**How layers combine. override: the most specific layer that has a value wins. union: a list key; each layer adds entries and a more specific layer may remove an entry it can see, and each entry carries who set it (spec/schemas/settings-delta.schema.json). Absent means override.*/
+    merge: z
+      .enum(["override", "union"])
+      .describe(
+        "How layers combine. override: the most specific layer that has a value wins. union: a list key; each layer adds entries and a more specific layer may remove an entry it can see, and each entry carries who set it (spec/schemas/settings-delta.schema.json). Absent means override.",
+      )
+      .optional(),
+    /**Transitional. Where the user defaults for each audience are stored today, as band-named household keys, until they move to band:<name> rows. Each named key must exist.*/
+    user_defaults_keys: z
+      .object({
+        child: z
+          .string()
+          .regex(new RegExp("^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"))
+          .optional(),
+        teen: z
+          .string()
+          .regex(new RegExp("^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"))
+          .optional(),
+        adult: z
+          .string()
+          .regex(new RegExp("^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"))
+          .optional(),
+      })
+      .strict()
+      .describe(
+        "Transitional. Where the user defaults for each audience are stored today, as band-named household keys, until they move to band:<name> rows. Each named key must exist.",
+      )
+      .optional(),
     default: z.any(),
     label: z.string().min(1),
     help: z.string().optional(),

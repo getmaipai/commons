@@ -22,6 +22,19 @@ class Range(BaseModel):
     allow_current: bool | None = None
 
 
+class UserDefaultsKeys(BaseModel):
+    """
+    Transitional. Where the user defaults for each audience are stored today, as band-named household keys, until they move to band:<name> rows. Each named key must exist.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    child: constr(pattern=r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$') | None = None
+    teen: constr(pattern=r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$') | None = None
+    adult: constr(pattern=r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$') | None = None
+
+
 class Copy(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -89,6 +102,19 @@ class SettingsKey(BaseModel):
     range: Range | None = Field(
         None,
         description='Selector-specific: min/max for number, a duration unit, an option list for select, and so on. Shape depends on selector.',
+    )
+    layers: list[Literal['band', 'household', 'person']] | None = Field(
+        None,
+        description='SETTINGS-LAYERS-01. The scopes a row of this key may be stored at, lowest to highest precedence: band = user defaults (Kids, Teens, Adults), household = global defaults, person = user overrides. Absent means the key is stored at its own scope only and nothing is layered.',
+        min_length=1,
+    )
+    merge: Literal['override', 'union'] | None = Field(
+        None,
+        description='How layers combine. override: the most specific layer that has a value wins. union: a list key; each layer adds entries and a more specific layer may remove an entry it can see, and each entry carries who set it (spec/schemas/settings-delta.schema.json). Absent means override.',
+    )
+    user_defaults_keys: UserDefaultsKeys | None = Field(
+        None,
+        description='Transitional. Where the user defaults for each audience are stored today, as band-named household keys, until they move to band:<name> rows. Each named key must exist.',
     )
     default: Any
     label: constr(min_length=1)

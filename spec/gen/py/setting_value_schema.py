@@ -16,8 +16,11 @@ class SettingValue(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    scope: constr(pattern=r'^(household|person:[a-z0-9-]+|device:[a-z0-9-]+)$') = Field(
-        ..., description='household, person:<id>, or device:<id>.'
+    scope: constr(
+        pattern=r'^(household|band:(child|teen|adult)|person:[a-z0-9-]+|device:[a-z0-9-]+)$'
+    ) = Field(
+        ...,
+        description='household (global defaults), band:<child|teen|adult> (user defaults), person:<id> (user overrides), or device:<id>.',
     )
     key: constr(pattern=r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$') = Field(
         ...,
@@ -33,4 +36,8 @@ class SettingValue(BaseModel):
     source: Literal['user', 'default', 'package', 'sync'] = Field(
         ...,
         description="Where this value last came from, for the settings UI's modified filter.",
+    )
+    set_by: constr(pattern=r'^(self|system|[a-z0-9-]+)$', min_length=1) | None = Field(
+        None,
+        description='SETTINGS-LAYERS-01. Who wrote a user override: self (the person), system, or the id of the admin who set it. Only an admin id may be lifted by an admin alone. List keys keep this per entry in the value instead (settings-delta).',
     )

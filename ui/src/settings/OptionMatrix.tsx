@@ -1,3 +1,4 @@
+import { Button } from "../dashboard/components/ui/button";
 import { Checkbox } from "../dashboard/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../dashboard/components/ui/table";
 
@@ -6,6 +7,10 @@ export interface OptionMatrixRow {
   label: string;
   /** One plain sentence on what the row does; read out with the row label. */
   does?: string;
+  /** A short plain line under the row, such as who set this row ("Set by Jordan"). */
+  note?: string;
+  /** Text of the button that puts this row back to its default ("Back to Teen"). Absent: no button on this row. */
+  resetLabel?: string;
 }
 
 export interface OptionMatrixColumn {
@@ -28,12 +33,14 @@ interface OptionMatrixProps {
   /** The plain reason a box is unavailable; shown once under the grid. */
   unavailableNote?: string;
   onToggle: (columnKey: string, rowId: string, checked: boolean) => void;
+  /** Called when a row's reset button (its `resetLabel`) is pressed. */
+  onReset?: (rowId: string) => void;
   disabled?: boolean;
 }
 
 /** A grid of tick boxes: a row per option, a column per audience. Composed
  * from the shipped Table and Checkbox only. */
-export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, unavailableNote, onToggle, disabled }: OptionMatrixProps) {
+export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, unavailableNote, onToggle, onReset, disabled }: OptionMatrixProps) {
   const anyLocked = columns.some((c) => c.locked.length > 0);
   const anyUnavailable = columns.some((c) => (c.unavailable?.length ?? 0) > 0);
   return (
@@ -53,6 +60,12 @@ export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, unavailable
               <TableCell className="whitespace-normal">
                 <span className="font-medium">{row.label}</span>
                 {row.does ? <span className="block text-muted-foreground">{row.does}</span> : null}
+                {row.note ? <span className="block text-muted-foreground">{row.note}</span> : null}
+                {row.resetLabel && onReset ? (
+                  <Button type="button" variant="link" size="xs" disabled={disabled} onClick={() => onReset(row.id)}>
+                    {row.resetLabel}
+                  </Button>
+                ) : null}
               </TableCell>
               {columns.map((c) => {
                 const isLocked = c.locked.includes(row.id);

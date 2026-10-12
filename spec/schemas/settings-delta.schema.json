@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/settings-delta.schema.json",
+  "title": "SettingsDelta",
+  "description": "SETTINGS-LAYERS-01. The value of a list key (merge: union) stored in a user-overrides row (person:<id>). It never copies the lists above it: it only adds entries and removes entries that a higher layer would otherwise give the person, so a later change to the global defaults or the user defaults still flows through. Every entry records who set it, so an entry an admin set can be lifted only by an admin.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "add": { "type": "array", "items": { "$ref": "#/$defs/entry" }, "default": [] },
+    "remove": { "type": "array", "items": { "$ref": "#/$defs/entry" }, "default": [] }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item", "set_by", "hlc"],
+      "properties": {
+        "item": { "type": "string", "minLength": 1, "description": "A list id (blp-gambling) or a host (example.com)." },
+        "set_by": {
+          "type": "string",
+          "pattern": "^(self|system|[a-z0-9-]+)$",
+          "description": "self (the person) or the id of the admin who set the entry."
+        },
+        "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" }
+      }
+    }
+  }
+}

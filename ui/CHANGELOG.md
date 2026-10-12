@@ -1,5 +1,11 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.197] - ui-v0.5.197
+
+`OptionMatrix` (SETTINGS-LAYERS-01d): a row may carry a `note` (who set it) and a
+`resetLabel`; with `onReset` the row shows a small link button that puts it back to
+its default ("Back to Teen"). Additive; a grid that sets neither is unchanged.
+
 ## [0.5.196] - ui-v0.5.196
 
 `OptionMatrix` and the `matrix` card: a row can be unavailable to one audience
