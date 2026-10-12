@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.196] - ui-v0.5.196
+
+`OptionMatrix` and the `matrix` card: a row can be unavailable to one audience
+(its policy row names `offered_for`); that box shows unchecked and disabled, with
+the card's `unavailable_note` under the grid. The row heading comes from the card's
+`rows_label`, and `locked_note` is now optional. `matrix.rows` may name
+`news/feed-lists` (KS-05). Nothing changes for the Blocked sites card.
+
 ## [0.5.195] - ui-v0.5.195
 
 `OptionMatrix`: the row label and its one-line description wrap instead of

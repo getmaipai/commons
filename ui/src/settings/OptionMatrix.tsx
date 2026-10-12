@@ -15,6 +15,8 @@ export interface OptionMatrixColumn {
   value: readonly string[];
   /** Row ids ticked and locked in this column (shown checked, cannot change). */
   locked: readonly string[];
+  /** Row ids not offered to this audience: shown unchecked and disabled, never writable. */
+  unavailable?: readonly string[];
 }
 
 interface OptionMatrixProps {
@@ -22,15 +24,18 @@ interface OptionMatrixProps {
   rows: readonly OptionMatrixRow[];
   columns: readonly OptionMatrixColumn[];
   /** The plain reason a locked box cannot change; shown once under the grid. */
-  lockedNote: string;
+  lockedNote?: string;
+  /** The plain reason a box is unavailable; shown once under the grid. */
+  unavailableNote?: string;
   onToggle: (columnKey: string, rowId: string, checked: boolean) => void;
   disabled?: boolean;
 }
 
 /** A grid of tick boxes: a row per option, a column per audience. Composed
  * from the shipped Table and Checkbox only. */
-export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, onToggle, disabled }: OptionMatrixProps) {
+export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, unavailableNote, onToggle, disabled }: OptionMatrixProps) {
   const anyLocked = columns.some((c) => c.locked.length > 0);
+  const anyUnavailable = columns.some((c) => (c.unavailable?.length ?? 0) > 0);
   return (
     <div className="flex flex-col gap-2">
       <Table>
@@ -51,13 +56,14 @@ export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, onToggle, d
               </TableCell>
               {columns.map((c) => {
                 const isLocked = c.locked.includes(row.id);
+                const isUnavailable = c.unavailable?.includes(row.id) ?? false;
                 return (
                   <TableCell key={c.key} className="text-center">
                     <div className="flex justify-center">
                       <Checkbox
                         aria-label={`${row.label} for ${c.label}`}
-                        checked={isLocked || c.value.includes(row.id)}
-                        disabled={disabled || isLocked}
+                        checked={!isUnavailable && (isLocked || c.value.includes(row.id))}
+                        disabled={disabled || isLocked || isUnavailable}
                         onCheckedChange={(next) => onToggle(c.key, row.id, next)}
                       />
                     </div>
@@ -68,7 +74,8 @@ export function OptionMatrix({ rowsLabel, rows, columns, lockedNote, onToggle, d
           ))}
         </TableBody>
       </Table>
-      {anyLocked ? <p className="px-2 pb-2 text-sm text-muted-foreground">{lockedNote}</p> : null}
+      {anyLocked && lockedNote ? <p className="px-2 pb-2 text-sm text-muted-foreground">{lockedNote}</p> : null}
+      {anyUnavailable && unavailableNote ? <p className="px-2 pb-2 text-sm text-muted-foreground">{unavailableNote}</p> : null}
     </div>
   );
 }

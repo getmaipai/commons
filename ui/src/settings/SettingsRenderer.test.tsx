@@ -315,3 +315,39 @@ describe("SettingsRenderer - option matrix card", () => {
     await findByText(MATRIX.save_error);
   });
 });
+
+describe("SettingsRenderer - news feed list matrix (KS-05)", () => {
+  const NEWS = {
+    rows: "news/feed-lists",
+    rows_label: "News list",
+    columns: [
+      { label: "Kids", key: "news.lists.child", band: "child" as const },
+      { label: "Teens", key: "news.lists.teen", band: "teen" as const },
+      { label: "Adults", key: "news.lists.adult", band: "adult" as const },
+    ],
+    unavailable_note: "A dash means the list is not offered to that user type.",
+    save_error: "That change was not saved. Check your connection, then tick the box again.",
+  };
+  const ndefs: Def[] = NEWS.columns.map((c) => ({ key: c.key, selector: "select", label: `News lists, ${c.label}`, lives_in: "household.news", scope: "household", default: [], range: { multiple: true, options: ["feeds-household", "feeds-children"] } }));
+  const nprops = { scope: "household" as const, scopeValue: "household", honouredBy: "home", only: ["household.news"], matrix: NEWS };
+
+  test("a list not offered to a user type is unchecked and disabled, with the plain reason shown", async () => {
+    mockApi(ndefs, { "news.lists.child": ["feeds-household", "feeds-children"] });
+    const { findByLabelText, findByText } = renderWithQueryClient(<SettingsRenderer {...nprops} />);
+    const notOffered = (await findByLabelText("Household news for Kids")) as HTMLElement;
+    expect(notOffered.getAttribute("aria-checked")).toBe("false");
+    expect(notOffered.hasAttribute("disabled") || notOffered.getAttribute("aria-disabled") === "true" || notOffered.hasAttribute("data-disabled")).toBe(true);
+    expect(((await findByLabelText("Kids' news for Adults")) as HTMLElement).getAttribute("aria-checked")).toBe("false");
+    expect(((await findByLabelText("Kids' news for Kids")) as HTMLElement).getAttribute("aria-checked")).toBe("true");
+    await findByText("News list");
+    await findByText(NEWS.unavailable_note);
+  });
+
+  test("ticking an offered box writes the whole list to that user type's key", async () => {
+    mockApi(ndefs, {});
+    const { findByLabelText } = renderWithQueryClient(<SettingsRenderer {...nprops} />);
+    fireEvent.click(await findByLabelText("Household news for Teens"));
+    await waitFor(() => expect(calls.some((c) => c.method === "PUT")).toBe(true));
+    expect(JSON.parse(calls.find((c) => c.method === "PUT")!.body!)).toEqual({ scope: "household", key: "news.lists.teen", value: ["feeds-household"] });
+  });
+});

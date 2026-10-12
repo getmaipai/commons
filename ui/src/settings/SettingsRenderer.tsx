@@ -16,12 +16,14 @@ import { useSettingsHeadingLevel } from "./headingLevel";
 import { OptionMatrix } from "./OptionMatrix";
 import type { AreaMatrix } from "./settingsAudience";
 import blocklistPolicy from "@maipai/spec/search/blocklists.json";
+import feedListPolicy from "@maipai/spec/news/feed-lists.json";
 
-interface MatrixRowSource { id: string; label: string; does?: string; locked_for?: readonly string[] }
+interface MatrixRowSource { id: string; label: string; does?: string; locked_for?: readonly string[]; offered_for?: readonly string[] }
 // The shared row sources a card's `matrix.rows` may name: the spec's own
 // files, imported once, so a row is declared in one place.
 const MATRIX_ROWS: Record<string, readonly MatrixRowSource[]> = {
   "search/blocklists": blocklistPolicy.lists,
+  "news/feed-lists": feedListPolicy.lists,
 };
 
 interface SettingsRendererProps {
@@ -208,14 +210,16 @@ export function SettingsRenderer({
         label: c.label,
         value: Array.isArray(v) ? (v as string[]) : [],
         locked: source.filter((r) => r.locked_for?.includes(c.band)).map((r) => r.id),
+        unavailable: source.filter((r) => r.offered_for && !r.offered_for.includes(c.band)).map((r) => r.id),
       };
     });
     return (
       <OptionMatrix
-        rowsLabel="Kind of site"
+        rowsLabel={m.rows_label ?? "Kind of site"}
         rows={source}
         columns={columns}
         lockedNote={m.locked_note}
+        unavailableNote={m.unavailable_note}
         disabled={pendingKey !== null}
         onToggle={async (columnKey, rowId, checked) => {
           const current = columns.find((c) => c.key === columnKey)?.value ?? [];

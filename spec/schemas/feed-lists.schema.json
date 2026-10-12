@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/feed-lists.schema.json",
+  "title": "FeedLists",
+  "description": "The news feed lists a household can turn on, one row per list: the bundled package that carries its feeds, a plain-words label, the user types it is offered to and the ones that start with it on. A user type not in offered_for never gets the list, whatever an admin setting says. The feeds themselves live in the list's package (feed-list-package.schema.json), never here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "lists"],
+  "properties": {
+    "version": {"type": "string", "minLength": 1, "description": "The review month of this policy, such as 2026.10."},
+    "lists": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/list"}}
+  },
+  "$defs": {
+    "band": {"type": "string", "enum": ["child", "teen", "adult"]},
+    "list": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "package_id", "label", "does", "offered_for", "default_for"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "package_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "The bundled module package that carries this list's feeds."},
+        "label": {"type": "string", "minLength": 1},
+        "does": {"type": "string", "minLength": 1, "description": "One plain-words line, shown beside the list's name."},
+        "offered_for": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/band"}, "description": "User types this list may ever reach. The settings key for any other user type does not offer it and the hub ignores it if stored."},
+        "default_for": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/band"}, "description": "User types that start with this list on. Always a subset of offered_for."}
+      }
+    }
+  }
+}

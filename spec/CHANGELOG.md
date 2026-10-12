@@ -1,3 +1,9 @@
+## [spec-v0.1.127] - 2026-10-12
+
+- News feed lists (KS-05, owner requirement 2026-10-12). `news/feed-lists.json` declares each list once: id, the bundled module package that carries its feeds, plain-words label and line, the user types it is offered to and the ones that start with it on. The default set is a household list (teen and adult) and a kids' list (child only). A list not offered to a user type is not an option of that type's key, and Home ignores it if stored, so a minor never gets a list not marked for them. New `FeedLists` and `FeedListPackage` schemas (the `feeds.json` file of a feed-list package), fixtures, generated TS and Python models.
+- Settings keys `news.lists.child|teen|adult` (household multi-selects, basic, `household.news`) and `news.feeds.child|teen|adult` (household text, advanced: extra feed addresses an admin adds or removes for that user type). Admin-edited and household-wide; the age filter on each item cannot be switched off by any of them.
+- Settings card `matrix` additions, both optional: `rows` may name `news/feed-lists`; `rows_label` sets the heading over the rows; `unavailable_note` explains a box shown unchecked and disabled because the row is not offered to that user type. The News shelf card in Settings, Search uses it.
+
 ## [spec-v0.1.126] - 2026-10-12
 
 - Settings card `matrix` (MINOR-SEARCH-01e-10, owner decision 2026-10-12): an `areas.json` card may name a tick-box grid, a row per option source (`rows`, here `search/blocklists`) and a column per audience (`columns`: label, settings key, band), with a `locked_note` and a `save_error`. The Blocked sites card in Settings, Search uses it: a row per kind of site, a box each for Kids, Teens and Adults. It writes the same `search.blocklists.<band>` keys, so there is no second store. The three blocklist keys and the eight `search.hosts.*` keys now live in `household.blocked_sites`.

@@ -1,0 +1,21 @@
+{
+  "version": "2026.10",
+  "lists": [
+    {
+      "id": "feeds-household",
+      "package_id": "feeds-household",
+      "label": "Household news",
+      "does": "Headlines from public news sites.",
+      "offered_for": ["teen", "adult"],
+      "default_for": ["teen", "adult"]
+    },
+    {
+      "id": "feeds-children",
+      "package_id": "feeds-children",
+      "label": "Kids' news",
+      "does": "News written for young readers.",
+      "offered_for": ["child"],
+      "default_for": ["child"]
+    }
+  ]
+}

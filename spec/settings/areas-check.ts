@@ -26,7 +26,7 @@ export interface AreaCard {
   matrix?: AreaMatrix;
 }
 export interface AreaMatrixColumn { label: string; key: string; band: Band }
-export interface AreaMatrix { rows: string; columns: AreaMatrixColumn[]; locked_note?: string; save_error?: string }
+export interface AreaMatrix { rows: string; rows_label?: string; columns: AreaMatrixColumn[]; locked_note?: string; unavailable_note?: string; save_error?: string }
 export interface AreaSection {
   id: string;
   label: string;

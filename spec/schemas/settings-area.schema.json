@@ -248,9 +248,16 @@
             "rows": {
               "type": "string",
               "enum": [
-                "search/blocklists"
+                "search/blocklists",
+                "news/feed-lists"
               ],
-              "description": "The policy file the rows come from (spec/search/blocklists.json). A list in its locked_for for a column's band shows checked and disabled."
+              "description": "The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note."
+            },
+            "rows_label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40,
+              "description": "The heading over the row labels. Omitted, the renderer says Kind of site."
             },
             "columns": {
               "type": "array",
@@ -285,6 +292,11 @@
               "type": "string",
               "minLength": 1,
               "description": "The plain reason shown under the grid when any cell is locked."
+            },
+            "unavailable_note": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The plain reason shown under the grid when a list is not offered to a column's user type."
             },
             "save_error": {
               "type": "string",

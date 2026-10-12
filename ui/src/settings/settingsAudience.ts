@@ -22,7 +22,9 @@ export interface AreaMatrixColumn { label: string; key: string; band: Band }
 export interface AreaMatrix {
   rows: string;
   columns: AreaMatrixColumn[];
-  locked_note: string;
+  rows_label?: string;
+  locked_note?: string;
+  unavailable_note?: string;
   save_error: string;
 }
 export interface AreaCard {

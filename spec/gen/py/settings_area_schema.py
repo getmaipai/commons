@@ -85,14 +85,22 @@ class Matrix(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    rows: Literal['search/blocklists'] = Field(
+    rows: Literal['search/blocklists', 'news/feed-lists'] = Field(
         ...,
-        description="The policy file the rows come from (spec/search/blocklists.json). A list in its locked_for for a column's band shows checked and disabled.",
+        description="The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.",
+    )
+    rows_label: constr(min_length=1, max_length=40) | None = Field(
+        None,
+        description='The heading over the row labels. Omitted, the renderer says Kind of site.',
     )
     columns: list[Column] = Field(..., max_length=3, min_length=1)
     locked_note: constr(min_length=1) | None = Field(
         None,
         description='The plain reason shown under the grid when any cell is locked.',
+    )
+    unavailable_note: constr(min_length=1) | None = Field(
+        None,
+        description="The plain reason shown under the grid when a list is not offered to a column's user type.",
     )
     save_error: constr(min_length=1) | None = Field(
         None,

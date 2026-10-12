@@ -415,8 +415,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("no key was added or removed, and scope, default and level are untouched (pinned counts)", () => {
-    expect(registry).toHaveLength(143);
-    expect(new Set(registryIds()).size).toBe(143);
+    expect(registry).toHaveLength(149);
+    expect(new Set(registryIds()).size).toBe(149);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",
@@ -463,4 +463,15 @@ test("a matrix with an unknown row source or extra field is refused by the schem
   const card = a.sections.find((s) => s.id === "search")!.cards!.find((c) => c.matrix)!;
   (card.matrix as { rows: string }).rows = "search/other";
   expect(validateArea(a)).toBe(false);
+});
+
+// KS-05: the News shelf card draws its list choices as a list-by-user-type grid.
+test("the news shelf card names the three list keys, one per user type, all in its own group", () => {
+  const card = section("home", "search").cards?.find((c) => c.matrix?.rows === "news/feed-lists");
+  if (!card) throw new Error("home/search has no news feed-list matrix card");
+  expect(card.matrix!.columns.map((c) => c.band)).toEqual(["child", "teen", "adult"]);
+  expect(card.matrix!.columns.map((c) => c.key)).toEqual(["news.lists.child", "news.lists.teen", "news.lists.adult"]);
+  expect(card.matrix!.unavailable_note).toBeTruthy();
+  expect(checkAreas(file, registry)).toEqual([]);
+  expect(validateArea(area("home"))).toBe(true);
 });

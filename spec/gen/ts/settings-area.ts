@@ -171,12 +171,21 @@ export const SettingsArea = z
                     /**Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.*/
                     matrix: z
                       .object({
-                        /**The policy file the rows come from (spec/search/blocklists.json). A list in its locked_for for a column's band shows checked and disabled.*/
+                        /**The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.*/
                         rows: z
-                          .literal("search/blocklists")
+                          .enum(["search/blocklists", "news/feed-lists"])
                           .describe(
-                            "The policy file the rows come from (spec/search/blocklists.json). A list in its locked_for for a column's band shows checked and disabled.",
+                            "The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.",
                           ),
+                        /**The heading over the row labels. Omitted, the renderer says Kind of site.*/
+                        rows_label: z
+                          .string()
+                          .min(1)
+                          .max(40)
+                          .describe(
+                            "The heading over the row labels. Omitted, the renderer says Kind of site.",
+                          )
+                          .optional(),
                         columns: z
                           .array(
                             z
@@ -201,6 +210,14 @@ export const SettingsArea = z
                           .min(1)
                           .describe(
                             "The plain reason shown under the grid when any cell is locked.",
+                          )
+                          .optional(),
+                        /**The plain reason shown under the grid when a list is not offered to a column's user type.*/
+                        unavailable_note: z
+                          .string()
+                          .min(1)
+                          .describe(
+                            "The plain reason shown under the grid when a list is not offered to a column's user type.",
                           )
                           .optional(),
                         /**What the person sees when a tick does not save: what happened and what to do.*/

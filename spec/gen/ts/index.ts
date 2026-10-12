@@ -15,6 +15,8 @@ export * from "./data-location.js";
 export * from "./device-command.js";
 export * from "./device.js";
 export * from "./entity.js";
+export * from "./feed-list-package.js";
+export * from "./feed-lists.js";
 export * from "./feed.js";
 export * from "./file.js";
 export * from "./grant.js";
