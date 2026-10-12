@@ -1,6 +1,10 @@
+## [spec-v0.1.131] - 2026-10-12
+
+- `ease.preset` is labelled "Comfort style", not "Look": the Appearance page already has a theme row called "Look", and two rows with one name on the same page read as a mistake. Nothing else changed.
+
 ## [spec-v0.1.130] - 2026-10-12
 
-- EASE-OF-USE-01 polish. In `keys.json` the `ease.*` keys are ordered Look first, then text size, spacing, button size, contrast, motion, Simple mode, reading level, explainers, word help and read aloud, and `ease.preset` is labelled "Look" (it carried the card's own title, "Ease of use"). No key, range or default changed.
+- EASE-OF-USE-01 polish. In `keys.json` the `ease.*` keys are ordered with the preset first, then text size, spacing, button size, contrast, motion, Simple mode, reading level, explainers, word help and read aloud, and `ease.preset` moved to the top (it carried the card's own title, "Ease of use"). No key, range or default changed.
 
 ## [spec-v0.1.129] - 2026-10-12
 

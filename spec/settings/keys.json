@@ -271,7 +271,7 @@
     "merge": "override",
     "self_service": true,
     "default": "standard",
-    "label": "Look",
+    "label": "Comfort style",
     "help": "A bundle of comfort settings: text size, spacing, button size, contrast, calm and helpers. Pick one, then change any single setting below. It is about comfort, not age, and it never changes what is safe or allowed.",
     "level": "basic",
     "copy": {
