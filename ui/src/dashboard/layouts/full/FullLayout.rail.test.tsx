@@ -37,7 +37,7 @@ describe("RAIL-01 app rail", () => {
   test("a 56px rail with each app named, the current one marked, Search and the profile at the foot", () => {
     const view = renderRail("/chat");
     const rail = view.getByRole("navigation", { name: "Primary navigation" });
-    expect(rail.className).toContain("w-14");
+    expect(rail.className).toContain("w-[var(--rail-width,56px)]");
     for (const name of ["Home", "Chat", "Library", "Family"]) expect(view.getByRole("link", { name })).toBeTruthy();
     expect(view.getByRole("link", { name: "Chat" }).getAttribute("aria-current")).toBe("page");
     expect(view.getByRole("link", { name: "Home" }).getAttribute("aria-current")).toBeNull();
