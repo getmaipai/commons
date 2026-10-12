@@ -1,5 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.193] - ui-v0.5.193
+
+`Citation` (the inline `[n]` chip) opens its excerpt on a tap when the source
+has no `href` and the pointer is touch, and closes on a second tap or a tap
+elsewhere. Before, the excerpt opened on hover and keyboard focus only, so on a
+touch screen (where a tapped button does not always take focus) a child could
+not read it. A chip with an `href` stays a link, and mouse and keyboard
+behavior is unchanged. No prop changes.
+
 ## [0.5.192] - ui-v0.5.192
 
 `SettingRow` (and so `SettingsRenderer`) draws a `select` selector whose

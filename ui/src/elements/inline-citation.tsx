@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { ComponentProps } from "react";
 import { PreviewCard } from "@base-ui/react/preview-card";
 import { cn } from "cn";
@@ -22,10 +23,32 @@ interface CitationProps {
 }
 
 export function Citation({ index, source, open, onOpenChange }: CitationProps) {
+  // A touch screen has no hover, and a tapped button does not always take focus (iOS), so a chip without a link
+  // opens its excerpt on tap and closes on a second tap or a tap elsewhere. A chip with a link stays a link.
+  const triggerEl = useRef<HTMLElement | null>(null);
+  const touchStartedOpen = useRef<boolean | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (event.pointerType !== "touch") return;
+      const target = event.target as Element | null;
+      if (target && (triggerEl.current?.contains(target) || target.closest("[data-citation-popup]"))) return;
+      onOpenChange(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [open, onOpenChange]);
   return (
     <PreviewCard.Root open={open} onOpenChange={onOpenChange}>
       <PreviewCard.Trigger
+        ref={(node: HTMLElement | null) => { triggerEl.current = node; }}
         delay={0}
+        onPointerDown={(event) => { touchStartedOpen.current = event.pointerType === "touch" ? open : null; }}
+        onClick={source.href ? undefined : () => {
+          // Decided from the state at the start of the tap, so a hover or focus the browser fires first cannot undo it.
+          if (touchStartedOpen.current !== null) onOpenChange(!touchStartedOpen.current);
+          touchStartedOpen.current = null;
+        }}
         render={source.href ? <a href={source.href} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" /> : <button type="button" />}
         className={cn(
           "mx-0.5 inline-flex h-4 min-w-4 translate-y-[-2px] cursor-default items-center justify-center rounded-[5px] px-1 align-middle font-mono text-[10px] font-medium tabular-nums transition-colors",
@@ -39,6 +62,7 @@ export function Citation({ index, source, open, onOpenChange }: CitationProps) {
       <PreviewCard.Portal>
         <PreviewCard.Positioner side="top" sideOffset={8}>
           <PreviewCard.Popup
+            data-citation-popup=""
             className={cn(
               floating,
               "z-50 w-64 origin-(--transform-origin) rounded-2xl p-3.5 outline-none",
