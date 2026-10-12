@@ -415,8 +415,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("no key was added or removed, and scope, default and level are untouched (pinned counts)", () => {
-    expect(registry).toHaveLength(151);
-    expect(new Set(registryIds()).size).toBe(151);
+    expect(registry).toHaveLength(162);
+    expect(new Set(registryIds()).size).toBe(162);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",

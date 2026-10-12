@@ -57,6 +57,13 @@ export const SettingsKey = z
         "How layers combine. override: the most specific layer that has a value wins. union: a list key; each layer adds entries and a more specific layer may remove an entry it can see, and each entry carries who set it (spec/schemas/settings-delta.schema.json). Absent means override.",
       )
       .optional(),
+    /**EASE-OF-USE-01. Absent means false. True means a person may change their own value at any age, including a child, unless an admin has locked the key for them. Declared once here for the write gate. Only comfort keys (ease.*) carry it; a safety, consent, privacy or credentials key never does (a spec test holds that).*/
+    self_service: z
+      .boolean()
+      .describe(
+        "EASE-OF-USE-01. Absent means false. True means a person may change their own value at any age, including a child, unless an admin has locked the key for them. Declared once here for the write gate. Only comfort keys (ease.*) carry it; a safety, consent, privacy or credentials key never does (a spec test holds that).",
+      )
+      .optional(),
     /**Transitional. Where the user defaults for each audience are stored today, as band-named household keys, until they move to band:<name> rows. Each named key must exist.*/
     user_defaults_keys: z
       .object({

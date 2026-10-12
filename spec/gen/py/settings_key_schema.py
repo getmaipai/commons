@@ -112,6 +112,10 @@ class SettingsKey(BaseModel):
         None,
         description='How layers combine. override: the most specific layer that has a value wins. union: a list key; each layer adds entries and a more specific layer may remove an entry it can see, and each entry carries who set it (spec/schemas/settings-delta.schema.json). Absent means override.',
     )
+    self_service: bool | None = Field(
+        None,
+        description='EASE-OF-USE-01. Absent means false. True means a person may change their own value at any age, including a child, unless an admin has locked the key for them. Declared once here for the write gate. Only comfort keys (ease.*) carry it; a safety, consent, privacy or credentials key never does (a spec test holds that).',
+    )
     user_defaults_keys: UserDefaultsKeys | None = Field(
         None,
         description='Transitional. Where the user defaults for each audience are stored today, as band-named household keys, until they move to band:<name> rows. Each named key must exist.',

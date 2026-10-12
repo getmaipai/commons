@@ -1,0 +1,33 @@
+{
+  "$comment": "EASE-OF-USE-01. The one record of what each ease preset sets and the numbers behind each fine-grained value. The kit's token CSS is generated from it (ui/scripts/gen-ease-tokens.ts) and Go reads the same file. Working names; the numbers are the ones the design record settles.",
+  "presets": {
+    "standard": { "text_size": "100", "spacing": "standard", "targets": "standard", "motion": "standard", "contrast": "standard", "simple_mode": "off", "word_help": "off", "read_aloud": "off", "explainers": "off" },
+    "comfortable": { "text_size": "120", "spacing": "roomy", "targets": "standard", "motion": "standard", "contrast": "standard", "simple_mode": "off", "word_help": "off", "read_aloud": "off", "explainers": "off" },
+    "large": { "text_size": "140", "spacing": "roomy", "targets": "large", "motion": "standard", "contrast": "more", "simple_mode": "off", "word_help": "off", "read_aloud": "off", "explainers": "off" },
+    "simple": { "text_size": "120", "spacing": "roomy", "targets": "large", "motion": "calm", "contrast": "standard", "simple_mode": "on", "word_help": "on", "read_aloud": "on", "explainers": "on" }
+  },
+  "values": {
+    "text_size": {
+      "100": { "scale": 1 },
+      "120": { "scale": 1.2 },
+      "140": { "scale": 1.4 },
+      "160": { "scale": 1.6 }
+    },
+    "spacing": {
+      "standard": { "scale": 1 },
+      "roomy": { "scale": 1.25 }
+    },
+    "targets": {
+      "standard": { "min_px": 48 },
+      "large": { "min_px": 76, "note": "About 2 cm on a typical screen." }
+    },
+    "contrast": {
+      "standard": { "ratio": 4.5 },
+      "more": { "ratio": 7 }
+    },
+    "motion": {
+      "standard": { "reduce_motion": false, "muted_colors": false },
+      "calm": { "reduce_motion": true, "muted_colors": true }
+    }
+  }
+}

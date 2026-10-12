@@ -186,3 +186,63 @@ describe("SETTINGS-LAYERS-01 declarations", () => {
     expect(() => SettingsDelta.parse({ add: [{ item: "blp-gambling" }] })).toThrow();
   });
 });
+
+describe("EASE-OF-USE-01 ease keys", () => {
+  const entries = () => loadRegistry().map((e) => SettingsKey.parse(e));
+  const presets = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "ease", "presets.json"), "utf-8"));
+  const easeNames = ["preset", "targets", "text_size", "spacing", "contrast", "motion", "reading_level", "simple_mode", "word_help", "read_aloud", "explainers"];
+
+  test("every ease key is layered, overriding and self-service", () => {
+    const byKey = new Map(entries().map((e) => [e.key, e]));
+    for (const n of easeNames) {
+      const e = byKey.get(`ease.${n}`);
+      expect(e, `ease.${n}`).toBeDefined();
+      expect(e!.layers, n).toEqual(["band", "household", "person"]);
+      expect(e!.merge, n).toBe("override");
+      expect(e!.self_service, n).toBe(true);
+      expect(e!.lives_in, n).toBe("profile.ease");
+    }
+  });
+
+  test("fine-grained ease keys default to the preset and offer it as an option", () => {
+    const byKey = new Map(entries().map((e) => [e.key, e]));
+    for (const n of ["targets", "text_size", "spacing", "contrast", "motion", "simple_mode", "word_help", "read_aloud", "explainers"]) {
+      const e = byKey.get(`ease.${n}`)!;
+      expect(e.default, n).toBe("preset");
+      expect((e.range as { options: string[] }).options, n).toContain("preset");
+    }
+  });
+
+  test("the Kids user defaults are Simple and Plain; Teens and Adults are Standard", () => {
+    const byKey = new Map(entries().map((e) => [e.key, e]));
+    expect(byKey.get("ease.preset")!.band_default).toEqual({ child: "simple", teen: "standard", adult: "standard" });
+    expect(byKey.get("ease.reading_level")!.band_default).toEqual({ child: "plain", teen: "standard", adult: "standard" });
+  });
+
+  test("no safety, consent, privacy or credentials key is self-service", () => {
+    for (const e of entries()) {
+      if (!e.self_service) continue;
+      expect(e.key.startsWith("ease."), `${e.key} is self_service but is not a comfort key`).toBe(true);
+    }
+  });
+
+  test("presets.json sets every fine-grained ease key to a value its key offers", () => {
+    const byKey = new Map(entries().map((e) => [e.key, e]));
+    expect(Object.keys(presets.presets).sort()).toEqual(
+      (byKey.get("ease.preset")!.range as { options: string[] }).options.slice().sort(),
+    );
+    for (const [name, set] of Object.entries(presets.presets) as [string, Record<string, string>][]) {
+      for (const [k, v] of Object.entries(set)) {
+        const opts = (byKey.get(`ease.${k}`)!.range as { options: string[] }).options;
+        expect(opts, `${name}.${k}`).toContain(v);
+        if (presets.values[k]) expect(presets.values[k][v], `${name}.${k}=${v} needs numbers`).toBeDefined();
+      }
+      const fine = easeNames.filter((n) => !["preset", "reading_level"].includes(n));
+      expect(Object.keys(set).sort(), `${name} sets every fine-grained key`).toEqual(fine.slice().sort());
+    }
+    for (const [k, vals] of Object.entries(presets.values) as [string, Record<string, unknown>][]) {
+      const opts = (byKey.get(`ease.${k}`)!.range as { options: string[] }).options.filter((o) => o !== "preset");
+      expect(Object.keys(vals).sort(), `values.${k} covers every option`).toEqual(opts.slice().sort());
+    }
+  });
+});

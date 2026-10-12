@@ -252,6 +252,418 @@
     ]
   },
   {
+    "key": "ease.contrast",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "standard",
+        "more"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Contrast",
+    "help": "More makes text stand out at 7 to 1. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Sets how strongly text stands out from its background.",
+      "options": {
+        "preset": "Follow the ease of use choice.",
+        "standard": "The usual level.",
+        "more": "Text stands out strongly."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.explainers",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "off",
+        "on"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Short explainers",
+    "help": "Shows a short note at the top of a screen about what it is for, until you dismiss it. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Shows a short note about what each screen is for.",
+      "options": {
+        "preset": "Follow the ease of use choice.",
+        "off": "Not shown.",
+        "on": "Shown."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.motion",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "standard",
+        "calm"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Motion and color",
+    "help": "Calm mutes colors and stops animation. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Sets whether colors are muted and animation is stopped.",
+      "options": {
+        "preset": "Follow the ease of use choice.",
+        "standard": "Bright hues and gentle movement.",
+        "calm": "Soft hues and nothing moves."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.preset",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "standard",
+        "comfortable",
+        "large",
+        "simple"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "standard",
+    "label": "Ease of use",
+    "help": "A bundle of comfort settings: text size, spacing, button size, contrast, calm and helpers. Pick one, then change any single setting below. It is about comfort, not age, and it never changes what is safe or allowed.",
+    "level": "basic",
+    "copy": {
+      "does": "Sets the comfort bundle for how big, roomy and calm the screens are.",
+      "options": {
+        "standard": "The usual size, spacing and buttons.",
+        "comfortable": "Slightly bigger text with more room.",
+        "large": "Big text, big buttons and stronger contrast.",
+        "simple": "Bigger, calmer screens with fewer choices and helpers on."
+      }
+    },
+    "band_default": {
+      "child": "simple",
+      "teen": "standard",
+      "adult": "standard"
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.read_aloud",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "off",
+        "on"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Read aloud",
+    "help": "Adds a button to read replies and news aloud in MaiPai's own voice. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Adds a button that reads replies and news aloud.",
+      "options": {
+        "preset": "Follow the ease of use choice.",
+        "off": "Not shown.",
+        "on": "Shown."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.reading_level",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "standard",
+        "plain",
+        "very_simple"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "standard",
+    "label": "Reading level",
+    "help": "How plainly MaiPai words its answers and app text: standard, plain or very simple. It changes words and sentence shape only, never what MaiPai will talk about.",
+    "level": "basic",
+    "copy": {
+      "does": "Sets how plainly answers and app text are worded.",
+      "options": {
+        "standard": "The usual wording.",
+        "plain": "Shorter sentences and everyday words.",
+        "very_simple": "Very short sentences and the simplest words."
+      }
+    },
+    "band_default": {
+      "child": "plain",
+      "teen": "standard",
+      "adult": "standard"
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.simple_mode",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "off",
+        "on"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Simple mode",
+    "help": "Shows only the main apps and settings and hides the rest. It hides, it does not forbid. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Shows only the main apps and basic settings.",
+      "options": {
+        "preset": "Follow the ease of use choice.",
+        "off": "Not shown.",
+        "on": "Shown."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.spacing",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "standard",
+        "roomy"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Spacing",
+    "help": "How much room there is between things. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Sets how much room there is between things on screen.",
+      "options": {
+        "preset": "Follow the ease of use choice.",
+        "standard": "The usual room between things.",
+        "roomy": "More room between things."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.targets",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "standard",
+        "large"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Button size",
+    "help": "The smallest size of a button or tap area. Large is about 2 cm. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Sets the smallest size of buttons and tap areas.",
+      "options": {
+        "preset": "Follow the ease of use choice.",
+        "standard": "Buttons at least 48 pixels across.",
+        "large": "Buttons about 2 centimeters across."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.text_size",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "100",
+        "120",
+        "140",
+        "160"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Text size",
+    "help": "Percent of the normal text size. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Sets how large text is, as a percent of normal.",
+      "options": {
+        "100": "Normal size.",
+        "120": "A little larger.",
+        "140": "Large.",
+        "160": "Extra large.",
+        "preset": "Follow the ease of use choice."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "ease.word_help",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "preset",
+        "off",
+        "on"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "self_service": true,
+    "default": "preset",
+    "label": "Word help",
+    "help": "Press a word to see what it means in plain words. \"Preset\" follows your ease of use choice.",
+    "level": "basic",
+    "copy": {
+      "does": "Lets a person press a word to see what it means.",
+      "options": {
+        "preset": "Follow the ease of use choice.",
+        "off": "Not shown.",
+        "on": "Shown."
+      }
+    },
+    "secret": false,
+    "lives_in": "profile.ease",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "engines.stack.remote.allow_tailnet",
     "scope": "household",
     "selector": "boolean",

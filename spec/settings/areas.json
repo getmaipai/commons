@@ -61,6 +61,11 @@
               "label": "Appearance",
               "group": "profile.appearance",
               "scope": "person"
+            },
+            {
+              "label": "Ease of use",
+              "group": "profile.ease",
+              "scope": "person"
             }
           ],
           "trail_view": "account.device_appearance",
