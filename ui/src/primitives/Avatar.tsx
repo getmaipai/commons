@@ -32,6 +32,7 @@ interface AvatarProps {
    * the reference's own header has no room for a number, and the
    * avatar menu it opens already shows the real count. */
   dot?: boolean;
+  tourId?: string;
 }
 
 // The DiceBear style is an open call this item's own design note left to
@@ -72,7 +73,7 @@ export function diceBearAvatarUri(seed: string): string | null {
 // (`assistant-ui/attachment.aui.tsx`'s `AttachmentThumb`: an `AvatarImage`
 // for the real thing, `AvatarFallback` for when there isn't one) rather
 // than inventing a second way to show "picture, or a stand-in for one."
-export function Avatar({ name, seed, className, size = "default", accent, dot }: AvatarProps) {
+export function Avatar({ name, seed, className, size = "default", accent, dot, tourId }: AvatarProps) {
   const initial = name.trim().charAt(0).toUpperCase() || "?";
   const trimmedSeed = seed?.trim();
   // Memoized: DiceBear's own SVG generation runs synchronously and isn't
@@ -80,6 +81,7 @@ export function Avatar({ name, seed, className, size = "default", accent, dot }:
   const avatarUri = useMemo(() => (trimmedSeed ? diceBearAvatarUri(trimmedSeed) : null), [trimmedSeed]);
   return (
     <AvatarRoot
+      data-tour={tourId}
       data-accent={accent}
       style={accent ? profileAccentStyle(accent) : undefined}
       // The caller's text size (SignIn's `text-xl`, Shell's `text-sm`,

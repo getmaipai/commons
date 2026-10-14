@@ -33,6 +33,7 @@ export interface HeaderProps {
    * shared layout remains unchanged for consumers that do not pass it. */
   incognito?: boolean;
   onIncognitoChange?: (on: boolean) => void;
+  incognitoTourId?: string;
   /** THEME-TOGGLE-01 (home, 2026-09-26): a consumer that already
    * exposes light/dark as its own Settings page control (Home's
    * `ui.appearance`, "Settings > Me > Appearance") can drop the
@@ -52,7 +53,7 @@ export interface HeaderProps {
   showSidebarTrigger?: boolean | "mobile-only";
 }
 
-export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: boolean) => void }) {
+export function IncognitoToggle({ on, onChange, tourId }: { on: boolean; onChange: (on: boolean) => void; tourId?: string }) {
   if (on) {
     return (
       <Button
@@ -60,6 +61,7 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
         variant="ghost"
         className="h-9 gap-1.5 rounded-full border border-violet-400 bg-violet-600 px-3 text-sm font-medium text-white cursor-pointer hover:bg-violet-500 hover:text-white focus-visible:ring-violet-500"
         aria-label="Incognito On"
+        data-tour={tourId}
         aria-pressed="true"
         title="Incognito on"
         onClick={() => onChange(false)}
@@ -79,6 +81,7 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
       // the shared kit's hitArea(1) gives it a 48px tappable area.
       className={cn("h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 text-muted-foreground", hitArea(1))}
       aria-label="Incognito Off"
+      data-tour={tourId}
       aria-pressed="false"
       title="Incognito off"
       onClick={() => onChange(true)}
@@ -88,7 +91,7 @@ export function IncognitoToggle({ on, onChange }: { on: boolean; onChange: (on: 
   );
 }
 
-const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle = true, statusIndicator, notifications, showSidebarTrigger = true }: HeaderProps = {}) => {
+const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, incognitoTourId, showThemeToggle = true, statusIndicator, notifications, showSidebarTrigger = true }: HeaderProps = {}) => {
 
   const HeaderExtraLeft = useHeaderExtraLeft();
 
@@ -185,7 +188,7 @@ const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognito
                   by Home's /next shell and sits beside the theme control
                   with the same 40px icon-button footprint. */}
               {incognito !== undefined && onIncognitoChange ? (
-                <IncognitoToggle on={incognito} onChange={onIncognitoChange} />
+                <IncognitoToggle on={incognito} onChange={onIncognitoChange} tourId={incognitoTourId} />
               ) : null}
 
               {statusIndicator}

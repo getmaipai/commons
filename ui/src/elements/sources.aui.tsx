@@ -123,12 +123,13 @@ function DocumentSourceIcon({ className, ...props }: ComponentProps<"span">) {
 }
 
 export type SourceProps = ComponentProps<"a"> &
-  VariantProps<typeof sourceVariants>;
+  VariantProps<typeof sourceVariants> & { tourId?: string };
 
 function Source({
   className,
   variant,
   size,
+  tourId,
   target = "_blank",
   rel = "noopener noreferrer",
   ...props
@@ -136,6 +137,7 @@ function Source({
   return (
     <a
       data-slot="source"
+      data-tour={tourId}
       className={cn(
         sourceVariants({ variant, size }),
         "focus-visible:border-ring focus-visible:ring-ring/50 cursor-pointer outline-none focus-visible:ring-1",

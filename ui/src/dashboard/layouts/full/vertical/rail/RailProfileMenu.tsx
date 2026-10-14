@@ -42,6 +42,7 @@ export interface RailProfileMenuProps {
    * host's copy. Undefined (the default) draws no row. */
   homeSettings?: { href: string; label: string };
   helpHref?: string;
+  helpEntries?: { label: string; items: { label: string; onSelect: () => void }[] };
   onLogout?: () => void;
   /** Rendered next to the avatar button, inside the rail's profile slot
    * (an anchor for a host's own popover, say). */
@@ -85,6 +86,7 @@ export default function RailProfileMenu({
   settingsHref = "/settings",
   homeSettings,
   helpHref,
+  helpEntries,
   onLogout,
   children,
   tourId,
@@ -221,6 +223,17 @@ export default function RailProfileMenu({
               <CircleHelp aria-hidden />
               Help
             </DropdownMenuItem>
+          ) : null}
+          {helpEntries?.items.length ? (
+            <>
+              <DropdownMenuItem disabled className="h-8 rounded-md px-2.5 text-xs font-medium text-muted-foreground opacity-100!">{helpEntries.label}</DropdownMenuItem>
+              {helpEntries.items.map((item, index) => (
+                <DropdownMenuItem key={`${item.label}-${index}`} className={rowClass} onClick={item.onSelect} aria-label={`${helpEntries.label}: ${item.label}`}>
+                  <CircleHelp aria-hidden />
+                  <span className="flex-1">{item.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </>
           ) : null}
           {onLogout ? (
             <>

@@ -42,6 +42,18 @@ describe("RAIL-01 app rail", () => {
     expect(plain.getByRole("navigation", { name: "Primary navigation" }).hasAttribute("data-tour")).toBe(false);
   });
 
+  test("FullLayout passes rail and per-item tour ids to AppRail", () => {
+    const view = render(
+      <MemoryRouter><TooltipProvider><Routes>
+        <Route element={<FullLayout rail railTourId="shell.rail" railItemTourId={(item) => item.name === "Chat" ? "rail.chat" : undefined} />}>
+          <Route path="/" element={<div>Home</div>} />
+        </Route>
+      </Routes></TooltipProvider></MemoryRouter>,
+    );
+    expect(view.getByRole("navigation", { name: "Primary navigation" }).getAttribute("data-tour")).toBe("shell.rail");
+    expect(view.getByRole("link", { name: "Chat" }).getAttribute("data-tour")).toBe("rail.chat");
+  });
+
   test("a 56px rail with each app named, the current one marked, Search and the profile at the foot", () => {
     const view = renderRail("/chat");
     const rail = view.getByRole("navigation", { name: "Primary navigation" });

@@ -35,6 +35,14 @@ function Harness(props: ComponentProps<typeof ThreadListSidebar>) {
 }
 
 describe("ThreadListSidebar", () => {
+  test("renders data-tour when set and omits it otherwise", async () => {
+    const view = render(<Harness variant="compact" tourId="chat.history" />);
+    expect(view.container.querySelector("[data-slot=sidebar]")?.getAttribute("data-tour")).toBe("chat.history");
+    cleanup();
+    const plain = render(<Harness variant="compact" />);
+    expect(plain.container.querySelector("[data-slot=sidebar]")?.hasAttribute("data-tour")).toBe(false);
+  });
+
   test("renders the compact thread list with slots empty by default and no external links", async () => {
     const view = render(<Harness variant="compact" />);
     await view.findByText("Alpha thread");

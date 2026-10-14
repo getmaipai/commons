@@ -14,6 +14,7 @@ export type RailItemStatus = (item: { name: string; url?: string }) => { title: 
 
 export interface AppRailProps {
   tourId?: string;
+  itemTourId?: (item: { name: string; url?: string }) => string | undefined;
   /** The host's own search over its records, threaded to the shipped
    * HeaderSearch dialog the rail's Search button opens. */
   searchRemote?: HeaderSearchProps["remote"];
@@ -81,7 +82,7 @@ function ItemTooltip({ name, status }: { name: string; status: ReturnType<RailIt
   );
 }
 
-export default function AppRail({ searchRemote, itemStatus, profile, activeAppHref, tourId }: AppRailProps) {
+export default function AppRail({ searchRemote, itemStatus, profile, activeAppHref, tourId, itemTourId }: AppRailProps) {
   const { pathname } = useLocation();
   const all = SidebarContent.flatMap((section) => flatten(section.items));
   // The brand mark is the Home destination (owner, 2026-10-06: "replace
@@ -114,7 +115,8 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
                 aria-label={itemLabel(home, homeStatus)}
                 aria-current={homeActive ? "page" : undefined}
                 data-active={homeActive ? "" : undefined}
-                data-slot="app-rail-home"
+                      data-slot="app-rail-home"
+                      data-tour={itemTourId?.(home)}
                 className={cn(railButton, "mb-1", hitArea(1), homeActive && "bg-foreground/10")}
               />
             }
@@ -125,7 +127,7 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
           <ItemTooltip name={home.name} status={homeStatus} />
         </Tooltip>
       ) : (
-        <Link to="/" aria-label="MaiPai Home" data-slot="app-rail-home" className={cn("mb-1 flex size-[var(--rail-button,40px)] items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", hitArea(1))}>
+        <Link to="/" aria-label="MaiPai Home" data-slot="app-rail-home" data-tour={itemTourId?.({ name: "Home", url: "/" })} className={cn("mb-1 flex size-[var(--rail-button,40px)] items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", hitArea(1))}>
           {logo}
         </Link>
       )}
@@ -153,6 +155,7 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
                       aria-current={active ? "page" : undefined}
                       data-active={active ? "" : undefined}
                       data-slot="app-rail-item"
+                      data-tour={itemTourId?.(item)}
                       className={cn(railButton, hitArea(1), active && "bg-foreground/10 text-foreground")}
                     />
                   }

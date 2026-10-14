@@ -20,9 +20,10 @@ interface CitationProps {
   source: Source;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  tourId?: string;
 }
 
-export function Citation({ index, source, open, onOpenChange }: CitationProps) {
+export function Citation({ index, source, open, onOpenChange, tourId }: CitationProps) {
   // A touch screen has no hover, and a tapped button does not always take focus (iOS), so a chip without a link
   // opens its excerpt on tap and closes on a second tap or a tap elsewhere. A chip with a link stays a link.
   const triggerEl = useRef<HTMLElement | null>(null);
@@ -43,6 +44,7 @@ export function Citation({ index, source, open, onOpenChange }: CitationProps) {
       <PreviewCard.Trigger
         ref={(node: HTMLElement | null) => { triggerEl.current = node; }}
         delay={0}
+        data-tour={tourId}
         onPointerDown={(event) => { touchStartedOpen.current = event.pointerType === "touch" ? open : null; }}
         onClick={source.href ? undefined : () => {
           // Decided from the state at the start of the tap, so a hover or focus the browser fires first cannot undo it.

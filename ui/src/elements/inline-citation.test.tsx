@@ -5,13 +5,13 @@ import { Citation } from "./inline-citation";
 
 afterEach(cleanup);
 
-function Harness({ href }: { href?: string }) {
+function Harness({ href, tourId }: { href?: string; tourId?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div>
       <p>
         Frogs live near ponds
-        <Citation index={0} source={{ domain: "example.com", title: "All about frogs", detail: "CC BY-SA", href }} open={open} onOpenChange={setOpen} />
+        <Citation index={0} source={{ domain: "example.com", title: "All about frogs", detail: "CC BY-SA", href }} open={open} onOpenChange={setOpen} tourId={tourId} />
       </p>
       <button type="button">elsewhere</button>
     </div>
@@ -24,6 +24,13 @@ const tap = (el: Element) => {
 };
 
 describe("Citation on a touch screen", () => {
+  test("citation renders data-tour when set and omits it otherwise", () => {
+    const view = render(<Harness tourId="chat.source" />);
+    expect(view.getByRole("button", { name: "1" }).getAttribute("data-tour")).toBe("chat.source");
+    cleanup();
+    const plain = render(<Harness />);
+    expect(plain.getByRole("button", { name: "1" }).hasAttribute("data-tour")).toBe(false);
+  });
   test("a tap on a chip without a link opens the excerpt, a second tap closes it", async () => {
     const view = render(<Harness />);
     const chip = view.getByRole("button", { name: "1" });

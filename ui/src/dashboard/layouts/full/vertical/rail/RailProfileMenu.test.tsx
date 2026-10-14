@@ -60,6 +60,17 @@ describe("KIT-SET-04 homeSettings row", () => {
     expect(rowNames(view).some((n) => n.includes("Home settings"))).toBe(false);
   });
 
+  test("Help entries render under the supplied label and invoke onSelect", async () => {
+    const selected: string[] = [];
+    const view = await openMenu({ helpEntries: { label: "Show me around", items: [
+      { label: "Your Home", onSelect: () => selected.push("home") },
+      { label: "Chat", onSelect: () => selected.push("chat") },
+    ] } });
+    expect(rowNames(view).slice(-5)).toEqual(["Help", "Show me around", "Your Home", "Chat", "Log out"]);
+    fireEvent.click(view.getByRole("menuitem", { name: "Show me around: Chat" }));
+    expect(selected).toEqual(["chat"]);
+  });
+
   test("the Incognito row is untouched by the new prop: still a toggle that reports its change", async () => {
     const changes: boolean[] = [];
     const view = await openMenu({

@@ -3,6 +3,7 @@
 import { describe, expect, test, afterEach } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
 import { Sources } from "./sources";
+import { Source as SourcePart } from "./sources.aui";
 import { Citation } from "./inline-citation";
 
 afterEach(cleanup);
@@ -18,6 +19,13 @@ function html(layout: "list" | "grid", detail?: string) {
 }
 
 describe("Source.detail", () => {
+  test("source part renders data-tour when set and omits it otherwise", () => {
+    const view = render(<SourcePart href="https://example.com" tourId="chat.source" />);
+    expect(view.container.querySelector('[data-slot="source"]')?.getAttribute("data-tour")).toBe("chat.source");
+    cleanup();
+    const plain = render(<SourcePart href="https://example.com" />);
+    expect(plain.container.querySelector('[data-slot="source"]')?.hasAttribute("data-tour")).toBe(false);
+  });
   test("list: renders as its own wrapping line, not inside the truncated domain", () => {
     const c = html("list", licence);
     const d = c.querySelector('[data-slot="source-detail"]') as HTMLElement;

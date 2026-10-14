@@ -19,6 +19,7 @@ import {
 } from "./thread-list.aui";
 
 export type ThreadListSidebarProps = Omit<ComponentProps<typeof Sidebar>, "children" | "variant"> & {
+  tourId?: string;
   /** The compact density matches the Home chat history column. */
   variant?: "default" | "compact" | "sidebar" | "floating" | "inset";
   /** The underlying shadcn sidebar surface style. */
@@ -51,6 +52,7 @@ export type ThreadListSidebarProps = Omit<ComponentProps<typeof Sidebar>, "child
 /** Supersedes the branded assistant-ui demo sidebar. Slots are empty by default. */
 export function ThreadListSidebar({
   variant = "default",
+  tourId,
   sidebarVariant = "sidebar",
   header,
   footer,
@@ -106,6 +108,7 @@ export function ThreadListSidebar({
         collapsible={compact ? "none" : collapsible}
         className={className}
         data-variant={variant}
+        data-tour={tourId}
         data-peek={showPeek || undefined}
         aria-hidden={compact && collapsed && !peek ? true : undefined}
         inert={compact && collapsed && !peek ? true : undefined}

@@ -1,3 +1,7 @@
+## [0.5.214] - ui-v0.5.214
+
+Adds optional tour targets to the full layout rail and its entries, the Incognito control, chat history, citations, and avatar primitive. `RailProfileMenu` accepts Help entries with caller labels and selection callbacks. All changes are additive.
+
 # Changelog (`@maipai/ui`)
 
 ## [0.5.212] - ui-v0.5.212

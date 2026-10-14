@@ -5,6 +5,13 @@ import { IncognitoToggle } from "./Header";
 afterEach(cleanup);
 
 describe("IncognitoToggle (Home INCOGNITO-08, pill redesign)", () => {
+  test("renders data-tour when set and omits it otherwise", () => {
+    const view = render(<IncognitoToggle on onChange={() => {}} tourId="shell.incognito" />);
+    expect(view.getByRole("button", { name: "Incognito On" }).getAttribute("data-tour")).toBe("shell.incognito");
+    cleanup();
+    const plain = render(<IncognitoToggle on={false} onChange={() => {}} />);
+    expect(plain.getByRole("button", { name: "Incognito Off" }).hasAttribute("data-tour")).toBe(false);
+  });
   test("the active state is a solid violet pill badge with an icon and a text label", () => {
     const { getByRole } = render(<IncognitoToggle on onChange={() => {}} />);
     const toggle = getByRole("button", { name: "Incognito On" });

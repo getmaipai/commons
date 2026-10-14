@@ -53,6 +53,11 @@ export interface FullLayoutProps {
   rail?: boolean;
   /** The profile control at the bottom of the rail (RailProfileMenu). */
   railProfile?: ReactNode;
+  /** Stable tour target for the rail and its app entries. */
+  railTourId?: string;
+  railItemTourId?: (item: { name: string; url?: string }) => string | undefined;
+  /** Tour target for the Incognito control. */
+  incognitoTourId?: string;
   /** App destination to keep selected when the current route is outside that app (for example Settings). */
   activeAppHref?: string;
 }
@@ -70,14 +75,14 @@ function RailPageHeader() {
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId }: FullLayoutProps) {
   return (
     <HeaderExtraProvider>
       {/* The page scrolls as a document, as it did beside the sidebar;
           the rail stays put (sticky, full viewport height). A full-height
           page (a chat) bounds the workspace to the viewport itself. */}
       <div data-slot="rail-shell" className="flex min-h-svh w-full">
-        <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} />
+        <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} />
         <main data-slot="rail-workspace" className="flex min-w-0 flex-1 flex-col" style={{ background: "var(--page)" }}>
           <RailPageHeader />
           <div data-slot="rail-body" className="flex-1">
@@ -101,7 +106,7 @@ const FullLayout: FC<FullLayoutProps> = (props) => {
   return <SidebarFullLayout {...props} />;
 };
 
-const SidebarFullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, showThemeToggle, statusIndicator, notifications, defaultSidebarOpen = true, showSidebarTriggerInMenu = false, showHeaderSidebarTrigger = true, sidebarItemStatus }) => {
+const SidebarFullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDisplayName, incognito, onIncognitoChange, incognitoTourId, showThemeToggle, statusIndicator, notifications, defaultSidebarOpen = true, showSidebarTriggerInMenu = false, showHeaderSidebarTrigger = true, sidebarItemStatus }) => {
   const [initialSidebarOpen] = useState(() => {
     return resolveInitialSidebarOpen(typeof document === "undefined" ? "" : document.cookie, defaultSidebarOpen);
   });
@@ -116,7 +121,7 @@ const SidebarFullLayout: FC<FullLayoutProps> = ({ headerSearchRemote, profileDis
 
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden" style={{ background: "var(--page)" }}>
         {/* Top Header  */}
-        <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} notifications={notifications} showSidebarTrigger={showHeaderSidebarTrigger ? true : showSidebarTriggerInMenu ? "mobile-only" : false} />
+        <Header headerSearchRemote={headerSearchRemote} profileDisplayName={profileDisplayName} incognito={incognito} onIncognitoChange={onIncognitoChange} incognitoTourId={incognitoTourId} showThemeToggle={showThemeToggle} statusIndicator={statusIndicator} notifications={notifications} showSidebarTrigger={showHeaderSidebarTrigger ? true : showSidebarTriggerInMenu ? "mobile-only" : false} />
 
           {/* Body Content  */}
           <div className="flex flex-1 flex-col gap-4 p-4">
