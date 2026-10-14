@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.203] - ui-v0.5.203
+
+Adds the `Tour` primitive on React Joyride 3.2.0. Tours use kit `Card`, `Button` and `Progress` parts, adapt placement for phones, honor reduced motion, announce step counts, and report missing targets.
+
 ## [0.5.202] - ui-v0.5.202
 
 Adds the shadcn Carousel on Embla, with optional autoplay disabled when reduced motion is requested.
@@ -7,7 +11,6 @@ Adds the shadcn Carousel on Embla, with optional autoplay disabled when reduced 
 ## [0.5.201] - ui-v0.5.201
 
 Adds the shadcn Alert to the kit with its default and destructive variants, plus a warning variant using the existing orange status hue token.
-
 ## [0.5.200] - ui-v0.5.200
 
 Repairs ui-v0.5.199, which was cut against a commit that held only the generator, its test and the rail test (its package.json read 0.5.198, and tokens.css and the rail were never staged). ui-v0.5.199 is left as is and must not be used. This tag carries what 0.5.199 described: the ease token block in `tokens.css` (run `bun run gen:ease`, parity test holds it) and the app rail reading `--rail-width` and `--rail-button`, so it widens and its buttons grow at large targets (icons only, still permanent). New: `SettingRow` takes optional `note` (a summary line), `lockedReason` (disables the control and says why, hides the row's own reset) and `action` (one extra link button, such as "Back to Large"); `SettingsRenderer` takes `rowExtras`, a map by key. All additive.
