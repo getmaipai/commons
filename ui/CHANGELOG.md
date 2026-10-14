@@ -1,6 +1,6 @@
 # Changelog (`@maipai/ui`)
 
-## [0.5.209] - ui-v0.5.209
+## [0.5.210] - ui-v0.5.210
 
 Carousel adds `autoplayDelay` (default 8000 ms), controlled `paused` and `onPausedChange`, and pause-on-hover/focus behavior enabled by default when autoplay is on. Reduced-motion users start paused; manual navigation remains available with Embla animation disabled.
 
