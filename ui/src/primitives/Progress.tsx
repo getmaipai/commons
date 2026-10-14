@@ -5,6 +5,8 @@ interface ProgressProps {
   mode: "spinner" | "determinate";
   value?: number;
   label?: string;
+  /** Determinate only: draw N equal rounded segments instead of one bar. */
+  segments?: number;
 }
 
 // v0 only ever renders `spinner` (Chat has nothing determinate to show
@@ -15,10 +17,32 @@ interface ProgressProps {
 // hand-rolled div; there is no library "spinner" component, so the
 // spinner mode stays the kit's own icon-plus-`animate-spin` idiom, the
 // same one `kit/ui/sonner.tsx`'s loading toast icon already uses.
-export function Progress({ mode, value, label }: ProgressProps) {
+export function Progress({ mode, value, label, segments }: ProgressProps) {
   const Spinner = getIcon("loader");
   if (mode === "determinate") {
     const pct = Math.max(0, Math.min(100, value ?? 0));
+    if (segments && segments > 0) {
+      const filled = Math.round((pct / 100) * segments);
+      return (
+        <div
+          role="progressbar"
+          aria-label={label}
+          aria-valuemin={0}
+          aria-valuemax={segments}
+          aria-valuenow={filled}
+          className="flex w-full gap-1"
+        >
+          {Array.from({ length: segments }, (_, index) => (
+            <span
+              key={index}
+              aria-hidden="true"
+              data-segment={index < filled ? (index === filled - 1 ? "current" : "done") : "todo"}
+              className="h-1 flex-1 rounded-full bg-secondary data-[segment=current]:bg-primary data-[segment=done]:bg-primary/50"
+            />
+          ))}
+        </div>
+      );
+    }
     return <ProgressBar value={pct} aria-label={label} />;
   }
   return (

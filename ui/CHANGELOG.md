@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.217] - ui-v0.5.217
+
+Adds an optional responsive layout to `Wizard`. New optional props: `layout` (`"default"` or `"split"`), `heading`, `description`, `hero`, `stickyFooter` and `progress`. With `layout="split"` the screen is one centered column on a phone and two panes from the kit's `lg` breakpoint up (hero, heading and description left; the body right), with a full-width fixed bottom bar that carries the segmented progress along its top edge, Back as a link button on the left and the primary on the right. Screens change with a short CSS slide-and-fade that is off under reduced motion. `heading` is the one `h1`; `progress` replaces the step strip. `Progress` gains an optional `segments` count (determinate mode) that draws N rounded segments inside one `progressbar`. New size tokens: `--wizard-column-max`, `--wizard-section-gap`, `--wizard-bar-height`, and `--field-choice-padding` (default 0.625rem, today's choice-card padding; 1.25rem inside the split Wizard). Callers that pass none of the new props render exactly as before.
+
 ## [0.5.216] - ui-v0.5.216
 
 Adds an optional `banner` slot to `Wizard`, rendered between its step list and scroll region. The banner stays outside the scroll region and existing callers render unchanged.

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 import { getIcon } from "@/kit/icons";
 import { cn, FOCUS_RING } from "@/kit/utils";
+import { Progress } from "@/kit/primitives/Progress";
 
 const CheckIcon = getIcon("check");
 
@@ -34,6 +35,21 @@ interface WizardProps {
   /** Three phase flow: phase names stay visible without step numbers, and
    * each phase control keeps the kit's 48px touch target. */
   phaseMode?: boolean;
+  /** "split" is the roomy one-question-per-screen look: one centered column
+   * on a phone, two panes (hero, heading and description left; the body
+   * right) from the kit's `lg` breakpoint up. "default" is unchanged. */
+  layout?: "default" | "split";
+  /** When passed, it is the one `h1` and the step title becomes a small
+   * caption above it (or is dropped when `progress` is passed). */
+  heading?: ReactNode;
+  description?: ReactNode;
+  /** A slot shown centered above the heading; the kit ships no logo. */
+  hero?: ReactNode;
+  /** Pins the footer to the bottom of the viewport as a full-width bar.
+   * Defaults to true for layout="split", false otherwise. */
+  stickyFooter?: boolean;
+  /** Replaces the step strip with a segmented progress bar. */
+  progress?: { current: number; total: number; label?: string };
 }
 
 /** The kit's one wizard pattern (platform plan 6.4): "detect first, one
@@ -42,10 +58,10 @@ interface WizardProps {
  * progress rail with a remaining-count, which the pattern reserves for
  * three-to-seven-step wizards - the setup wizard's own 9+ steps is
  * exactly the case a task list is for). Rendered as a horizontal strip
- * of numbered steps (never a two-pane sidebar layout): works identically
- * at phone width and desktop width with no separate responsive case,
- * unlike a sidebar that would need to collapse into something else on
- * phone. A completed step's number is clickable to jump back and change
+ * of numbered steps by default (two panes appear only at wide widths with
+ * `layout="split"` and collapse to one column on narrow ones): the default
+ * works identically at phone width and desktop width with no separate
+ * responsive case. A completed step's number is clickable to jump back and change
  * an earlier answer; a step past the current one is named but not yet
  * reachable. */
 export function Wizard({
@@ -63,86 +79,204 @@ export function Wizard({
   nextDisabled,
   busy,
   phaseMode = false,
+  layout = "default",
+  heading,
+  description,
+  hero,
+  stickyFooter,
+  progress,
 }: WizardProps) {
   const currentIndex = steps.findIndex((s) => s.id === currentStepId);
+  const split = layout === "split";
+  const sticky = stickyFooter ?? split;
+  const progressLabel = progress ? (progress.label ?? `Step ${progress.current} of ${progress.total}`) : undefined;
+  const progressBar = progress ? (
+    <Progress
+      mode="determinate"
+      value={progress.total > 0 ? (progress.current / progress.total) * 100 : 0}
+      segments={progress.total}
+      label={progressLabel}
+    />
+  ) : null;
+  // Same column the bar's contents align to: one centered column on a phone,
+  // the full two-pane width from `lg` up.
+  const columnClass = "mx-auto w-full max-w-[var(--wizard-column-max)] px-4 lg:max-w-none lg:px-12";
+  const stepAnimation = split ? "motion-safe:animate-[wizard-step-in_200ms_ease-out]" : undefined;
+
+  const heads = (
+    <>
+      {hero ? <div className={cn("flex justify-center", split && "lg:justify-start")}>{hero}</div> : null}
+      {heading !== undefined ? (
+        <>
+          {!progress ? <p className="text-sm text-muted-foreground">{steps[currentIndex]?.title}</p> : null}
+          <h1 className={cn("text-[length:var(--font-size-title)] font-semibold", !split && "mb-4")}>{heading}</h1>
+        </>
+      ) : (
+        <h1 className="mb-4 text-2xl font-bold">{steps[currentIndex]?.title}</h1>
+      )}
+      {description !== undefined ? (
+        <div className="text-[length:var(--font-size-body)] text-muted-foreground">{description}</div>
+      ) : null}
+    </>
+  );
+
+  const footer = (
+    <Footer
+      onBack={onBack}
+      onNext={onNext}
+      onSkip={onSkip}
+      skipLabel={skipLabel}
+      nextLabel={nextLabel}
+      nextDisabled={nextDisabled}
+      busy={busy}
+      split={split}
+      className={sticky ? cn(columnClass, "border-0 py-3") : undefined}
+    />
+  );
+  // A fixed, full-width bar with the segmented progress along its top edge.
+  const bar = sticky ? (
+    <div
+      data-wizard-bar
+      className="fixed inset-x-0 bottom-0 z-10 flex flex-col justify-end border-t border-border bg-background"
+      style={{ minHeight: "var(--wizard-bar-height)" }}
+    >
+      {progressBar ? <div className="w-full">{progressBar}</div> : null}
+      {footer}
+    </div>
+  ) : (
+    footer
+  );
+
+  if (split) {
+    return (
+      <main
+        data-wizard-layout="split"
+        className={cn(
+          "relative mx-auto grid min-h-dvh w-full max-w-[var(--wizard-column-max)] grid-cols-1 content-start gap-[var(--wizard-section-gap)] px-4 pt-[var(--wizard-section-gap)] lg:max-w-none lg:grid-cols-2 lg:content-center lg:items-center lg:gap-x-16 lg:px-12",
+          sticky && "pb-[var(--wizard-bar-height)]",
+        )}
+      >
+        {!progress ? (
+          <ol className="flex flex-wrap items-center gap-x-1 gap-y-2 lg:col-span-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
+            {stepItems()}
+          </ol>
+        ) : null}
+        {banner ? <div className="lg:col-span-2">{banner}</div> : null}
+        <div key={`head-${currentStepId}`} className={cn("flex flex-col gap-4 lg:col-start-1", stepAnimation)}>
+          {heads}
+        </div>
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
+        <div key={`body-${currentStepId}`} tabIndex={0} className={cn("flex min-w-0 flex-col gap-[var(--wizard-section-gap)] lg:col-start-2", FOCUS_RING, stepAnimation)}>
+          {children}
+        </div>
+        {sticky ? bar : <div className="lg:col-span-2">{footer}</div>}
+      </main>
+    );
+  }
 
   return (
-    // `main`, not `div`: this renders shell-less (SignIn.tsx's own
-    // precedent - "nothing in chapter 6 renders before someone is signed
-    // in"), so there is no `SidebarInset` upstream already providing the
-    // page's one `<main>` landmark the way every authenticated route
-    // gets for free. Found live (2026-09-06) by the screenshot/a11y
-    // matrix the moment `/setup` was added to its route list: axe's
-    // `landmark-one-main`/`region` both failed, since nothing on this
-    // page sat inside any landmark at all.
     <main className="flex h-full flex-col gap-6 p-6">
-      <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
-        {steps.map((step, index) => {
-          const isDone = index < completedCount;
-          const isCurrent = step.id === currentStepId;
-          const isReachable = isDone || isCurrent;
-          return (
-            <li key={step.id} className="flex items-center gap-1">
-              {index > 0 ? <span className="h-px w-4 bg-border" aria-hidden /> : null}
-              <button
-                type="button"
-                onClick={() => isDone && !busy && onJumpTo(step.id)}
-                disabled={!isDone || busy}
-                aria-current={isCurrent ? "step" : undefined}
-                className={cn(
-                  phaseMode ? "flex min-h-12 items-center gap-2 rounded-full px-3 py-2 text-base" : "flex items-center gap-1.5 rounded-full px-2 py-1 text-base",
-                  isCurrent && "bg-primary/10 font-medium text-primary",
-                  !isCurrent && isReachable && "text-foreground",
-                  !isReachable && "text-muted-foreground",
-                  isDone && "cursor-pointer hover:bg-accent",
-                )}
-              >
-                {phaseMode ? (isDone ? <CheckIcon className="h-4 w-4" aria-hidden /> : null) : (
-                  <span
-                    className={cn(
-                      "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-sm",
-                      isDone && "border-primary bg-primary text-primary-foreground",
-                      isCurrent && !isDone && "border-primary text-primary",
-                      !isReachable && "border-border",
-                    )}
-                  >
-                    {isDone ? <CheckIcon className="h-3 w-3" aria-hidden /> : index + 1}
-                  </span>
-                )}
-                <span className={phaseMode ? undefined : "hidden sm:inline"}>{step.title}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+      {progress ? (
+        <div className="flex w-full flex-col gap-2">
+          {progressBar}
+          <span className="text-sm text-muted-foreground">{progressLabel}</span>
+        </div>
+      ) : (
+        <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
+          {stepItems()}
+        </ol>
+      )}
 
       {banner}
 
-      {/* A tab stop for the same reason DetailPane's/SplitView's scrolling
-          body has one: Safari won't focus a scrollable region on its own,
-          and axe's scrollable-region-focusable rule catches it. */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
-      <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", FOCUS_RING)}>
-        <h1 className="mb-4 text-2xl font-bold">{steps[currentIndex]?.title}</h1>
+      <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
+        {heads}
         {children}
       </div>
 
-      <div className="flex items-center gap-2 border-t border-border pt-4">
-        {onBack ? (
-          <Button type="button" variant="ghost" onClick={onBack} disabled={busy}>
-            Back
-          </Button>
-        ) : null}
-        <div className="flex-1" />
-        {onSkip ? (
-          <Button type="button" variant="ghost" onClick={onSkip} disabled={busy}>
-            {skipLabel ?? "Skip"}
-          </Button>
-        ) : null}
-        <Button type="button" onClick={onNext} disabled={busy || nextDisabled}>
-          {busy ? "Working…" : nextLabel}
-        </Button>
-      </div>
+      {bar}
     </main>
+  );
+
+  function stepItems() {
+    return steps.map((step, index) => {
+      const isDone = index < completedCount;
+      const isCurrent = step.id === currentStepId;
+      const isReachable = isDone || isCurrent;
+      return (
+        <li key={step.id} className="flex items-center gap-1">
+          {index > 0 ? <span className="h-px w-4 bg-border" aria-hidden /> : null}
+          <button
+            type="button"
+            onClick={() => isDone && !busy && onJumpTo(step.id)}
+            disabled={!isDone || busy}
+            aria-current={isCurrent ? "step" : undefined}
+            className={cn(
+              phaseMode ? "flex min-h-12 items-center gap-2 rounded-full px-3 py-2 text-base" : "flex items-center gap-1.5 rounded-full px-2 py-1 text-base",
+              isCurrent && "bg-primary/10 font-medium text-primary",
+              !isCurrent && isReachable && "text-foreground",
+              !isReachable && "text-muted-foreground",
+              isDone && "cursor-pointer hover:bg-accent",
+            )}
+          >
+            {phaseMode ? (isDone ? <CheckIcon className="h-4 w-4" aria-hidden /> : null) : (
+              <span
+                className={cn(
+                  "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-sm",
+                  isDone && "border-primary bg-primary text-primary-foreground",
+                  isCurrent && !isDone && "border-primary text-primary",
+                  !isReachable && "border-border",
+                )}
+              >
+                {isDone ? <CheckIcon className="h-3 w-3" aria-hidden /> : index + 1}
+              </span>
+            )}
+            <span className={phaseMode ? undefined : "hidden sm:inline"}>{step.title}</span>
+          </button>
+        </li>
+      );
+    });
+  }
+}
+
+function Footer({
+  onBack,
+  onNext,
+  onSkip,
+  skipLabel,
+  nextLabel,
+  nextDisabled,
+  busy,
+  split,
+  className,
+}: {
+  onBack?: () => void;
+  onNext: () => void;
+  onSkip?: () => void;
+  skipLabel?: string;
+  nextLabel: string;
+  nextDisabled?: boolean;
+  busy?: boolean;
+  split: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn("flex items-center gap-2 border-t border-border pt-4", className)}>
+      {onBack ? (
+        <Button type="button" variant={split ? "link" : "ghost"} onClick={onBack} disabled={busy}>
+          Back
+        </Button>
+      ) : null}
+      <div className="flex-1" />
+      {onSkip ? (
+        <Button type="button" variant="ghost" onClick={onSkip} disabled={busy}>
+          {skipLabel ?? "Skip"}
+        </Button>
+      ) : null}
+      <Button type="button" onClick={onNext} disabled={busy || nextDisabled}>
+        {busy ? "Working…" : nextLabel}
+      </Button>
+    </div>
   );
 }

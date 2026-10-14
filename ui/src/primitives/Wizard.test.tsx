@@ -1,6 +1,7 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
 import { render, cleanup, fireEvent } from "@testing-library/react";
 import { Wizard, type WizardStep } from "@/kit/primitives/Wizard";
+import { Progress } from "@/kit/primitives/Progress";
 
 afterEach(cleanup);
 
@@ -11,6 +12,162 @@ const STEPS: WizardStep[] = [
 ];
 
 describe("Wizard", () => {
+  test("renders identically with no new props", () => {
+    const { container } = render(<Wizard steps={STEPS} currentStepId="b" completedCount={1} onJumpTo={() => {}} onNext={() => {}}>content</Wizard>);
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  const BASE = { steps: STEPS, currentStepId: "b", completedCount: 1, onJumpTo: () => {}, onNext: () => {} };
+
+  test("split layout renders both panes in DOM order and gates the two-pane grid on lg:", () => {
+    const { container, getByTestId } = render(
+      <Wizard {...BASE} layout="split" hero={<div data-testid="hero">Hi</div>} heading="Your home" description="Short">
+        <p data-testid="body">content</p>
+      </Wizard>,
+    );
+    const main = container.querySelector("main")!;
+    expect(main.getAttribute("data-wizard-layout")).toBe("split");
+    expect(main.className).toContain("grid-cols-1");
+    expect(main.className).toContain("lg:grid-cols-2");
+    expect(main.className).not.toMatch(/min-\[|order-|absolute/);
+    const body = getByTestId("body").parentElement!;
+    const left = getByTestId("hero").parentElement!.parentElement!;
+    expect(body.className).toContain("lg:col-start-2");
+    expect(left.className).toContain("lg:col-start-1");
+    expect(left.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(left.textContent).toBe("HiOwnerYour homeShort");
+    expect(container.querySelectorAll("h1")).toHaveLength(1);
+  });
+
+  test("heading prop is the only h1 and the step title is not printed as a second heading", () => {
+    const { getAllByRole } = render(<Wizard {...BASE} heading="Your home">content</Wizard>);
+    expect(getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(getAllByRole("heading", { level: 1 })[0]!.textContent).toBe("Your home");
+  });
+
+  test("description renders under the heading; absent heading keeps the step title h1", () => {
+    const { getByRole, getByText } = render(<Wizard {...BASE} heading="Your home" description="A short description">content</Wizard>);
+    expect(getByText("A short description").previousElementSibling).toBe(getByRole("heading", { level: 1 }));
+    cleanup();
+    const fallback = render(<Wizard {...BASE}>content</Wizard>);
+    expect(fallback.getByRole("heading", { name: "Owner", level: 1 })).toBeTruthy();
+  });
+
+  test("hero renders above the heading and only when passed", () => {
+    const { container, rerender, getByTestId } = render(<Wizard {...BASE}>content</Wizard>);
+    expect(container.querySelector("[data-testid=hero]")).toBeNull();
+    rerender(<Wizard {...BASE} hero={<div data-testid="hero">Welcome</div>} heading="Your home">content</Wizard>);
+    const hero = getByTestId("hero");
+    const h1 = container.querySelector("h1")!;
+    expect(hero.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  test("progress shows 'Step 2 of 6' and a progressbar with aria-valuenow 2 of 6", () => {
+    const { getByRole, getByText } = render(<Wizard {...BASE} progress={{ current: 2, total: 6 }}>content</Wizard>);
+    expect(getByText("Step 2 of 6")).toBeTruthy();
+    const bar = getByRole("progressbar", { name: "Step 2 of 6" });
+    expect(bar.getAttribute("aria-valuenow")).toBe("2");
+    expect(bar.getAttribute("aria-valuemax")).toBe("6");
+  });
+
+  test("sticky footer pins a bar and the scroll region has bottom padding", () => {
+    const { container } = render(<Wizard {...BASE} layout="split" onBack={() => {}}>content</Wizard>);
+    expect(container.querySelector("main")!.className).toContain("pb-[var(--wizard-bar-height)]");
+    expect(container.querySelector("[data-wizard-bar]")!.className).toContain("fixed");
+    cleanup();
+    const off = render(<Wizard {...BASE} layout="split" stickyFooter={false}>content</Wizard>);
+    expect(off.container.querySelector("[data-wizard-bar]")).toBeNull();
+    expect(off.getByRole("button", { name: "Continue" })).toBeTruthy();
+    cleanup();
+    const def = render(<Wizard {...BASE} stickyFooter>content</Wizard>);
+    expect(def.container.querySelector('[tabindex="0"]')!.className).toContain("pb-[var(--wizard-bar-height)]");
+  });
+
+  test("progress replaces the step strip and prints no step-title caption", () => {
+    const { queryByRole, queryByText } = render(<Wizard {...BASE} progress={{ current: 2, total: 6 }} heading="Your home">content</Wizard>);
+    expect(queryByRole("list")).toBeNull();
+    expect(queryByText("Owner")).toBeNull();
+  });
+
+  test("footer buttons keep the same place and order on every step", () => {
+    const props = { onJumpTo: () => {}, onNext: () => {}, layout: "split" as const };
+    const { container, rerender } = render(<Wizard {...props} steps={STEPS} currentStepId="a" completedCount={0}>content</Wizard>);
+    const controls = () => Array.from(container.querySelectorAll("[data-wizard-bar] button")).map((b) => b.textContent);
+    expect(controls()).toEqual(["Continue"]);
+    rerender(<Wizard {...props} steps={STEPS} currentStepId="b" completedCount={1} onBack={() => {}}>content</Wizard>);
+    expect(controls()).toEqual(["Back", "Continue"]);
+    rerender(<Wizard {...props} steps={STEPS} currentStepId="c" completedCount={2} onBack={() => {}}>content</Wizard>);
+    expect(controls()).toEqual(["Back", "Continue"]);
+    const row = container.querySelector("[data-wizard-bar] button")!.parentElement!;
+    expect(row.children[row.children.length - 1]!.textContent).toBe("Continue");
+    expect(row.querySelector(".flex-1")).toBeTruthy();
+  });
+
+  test("Back calls onBack once and leaves the body it shows untouched", () => {
+    const onBack = mock(() => {});
+    const { getByRole } = render(<Wizard {...BASE} layout="split" onBack={onBack}><input aria-label="answer" defaultValue="kept" /></Wizard>);
+    fireEvent.click(getByRole("button", { name: "Back" }));
+    expect(onBack).toHaveBeenCalledTimes(1);
+    expect((getByRole("textbox", { name: "answer" }) as HTMLInputElement).value).toBe("kept");
+  });
+
+  test("split with heading, hero and progress has one h1, one named progressbar and named buttons", () => {
+    const { getAllByRole, getByRole } = render(
+      <Wizard {...BASE} layout="split" hero={<span>logo</span>} heading="Your home" progress={{ current: 2, total: 6 }} onBack={() => {}}>content</Wizard>,
+    );
+    expect(getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(getAllByRole("progressbar")).toHaveLength(1);
+    expect(getByRole("progressbar").getAttribute("aria-label")).toBeTruthy();
+    expect(getByRole("button", { name: "Back" })).toBeTruthy();
+    expect(getByRole("button", { name: "Continue" })).toBeTruthy();
+  });
+
+  test("segmented progress has one progressbar with the right value and N hidden segments", () => {
+    const { getByRole, container } = render(<Progress mode="determinate" value={(2 / 6) * 100} segments={6} label="Step 2 of 6" />);
+    expect(container.querySelectorAll('[role="progressbar"]')).toHaveLength(1);
+    expect(getByRole("progressbar").getAttribute("aria-valuenow")).toBe("2");
+    expect(container.querySelectorAll('span[aria-hidden="true"]')).toHaveLength(6);
+    expect(container.querySelectorAll('[data-segment="current"]')).toHaveLength(1);
+  });
+
+  test("Progress without segments renders as today", () => {
+    const { container } = render(<Progress mode="determinate" value={40} />);
+    expect(container.querySelector('[data-slot="progress"]')).toBeTruthy();
+    expect(container.querySelector('[role="progressbar"] [aria-hidden="true"]')).toBeNull();
+  });
+
+  test("choice card padding defaults to today's value and grows only inside the split Wizard", async () => {
+    const tokens = await Bun.file(new URL("../tokens.css", import.meta.url)).text();
+    expect(tokens).toContain("--field-choice-padding: 0.625rem;");
+    expect(tokens).toMatch(/:root \[data-wizard-layout="split"\] \{\s*--field-choice-padding: 1.25rem;/);
+    expect(tokens.match(/--wizard-[a-z-]+:|--field-choice-padding:/g)).toHaveLength(5);
+    const field = await Bun.file(new URL("../dashboard/components/ui/field.tsx", import.meta.url)).text();
+    expect(field).toContain("p-[var(--field-choice-padding)]");
+    const { container } = render(<Wizard {...BASE} layout="split">content</Wizard>);
+    expect(container.querySelector("main")!.getAttribute("style")).toBeNull();
+  });
+
+  test("split layout pins a full-width bottom bar with the progress on its top edge, Back on the left and the primary on the right", () => {
+    const { container } = render(<Wizard {...BASE} layout="split" progress={{ current: 2, total: 6 }} onBack={() => {}}>content</Wizard>);
+    const bar = container.querySelector("[data-wizard-bar]")!;
+    expect(bar.className).toContain("inset-x-0");
+    expect(bar.firstElementChild!.querySelector('[role="progressbar"]')).toBeTruthy();
+    expect(Array.from(bar.querySelectorAll("button")).map((b) => b.textContent)).toEqual(["Back", "Continue"]);
+  });
+
+  test("the screen change animation is motion-safe only and the keyframes ship in tokens.css", async () => {
+    const { container } = render(<Wizard {...BASE} layout="split" heading="Your home">content</Wizard>);
+    const animated = container.querySelectorAll('[class*="animate-[wizard-step-in"]');
+    expect(animated).toHaveLength(2);
+    for (const el of Array.from(animated)) expect(el.className).toContain("motion-safe:animate-[wizard-step-in");
+    expect(container.innerHTML).not.toMatch(/(^|[ "])animate-\[wizard/);
+    const tokens = await Bun.file(new URL("../tokens.css", import.meta.url)).text();
+    expect(tokens).toContain("@keyframes wizard-step-in");
+    cleanup();
+    const plain = render(<Wizard {...BASE}>content</Wizard>);
+    expect(plain.container.innerHTML).not.toContain("wizard-step-in");
+  });
+
   test("renders an optional banner between the steps and scroll region", () => {
     const props = {
       steps: STEPS,

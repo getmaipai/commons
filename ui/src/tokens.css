@@ -146,6 +146,10 @@
  * design choice. The reference's own 12px square, not the emergent
  * circle `--radius-xl` on a 40px/32px tile used to produce. */
 :root {
+  --wizard-column-max: 36rem;
+  --wizard-section-gap: 2rem;
+  --wizard-bar-height: 6rem;
+  --field-choice-padding: 0.625rem;
   /* QR contrast stays fixed across themes so every code remains scannable. */
   --qr-foreground: #000000;
   --qr-background: #ffffff;
@@ -157,6 +161,10 @@
    * dashboard to its page background only (the one route Studio's own
    * acceptance judged), not every route's surface-page token itself. */
   --canvas-background: radial-gradient(ellipse 1200px 800px at 0% 0%, color-mix(in srgb, var(--hue-blue) 8%, var(--surface-page)), var(--surface-page) 60%);
+}
+
+:root [data-wizard-layout="split"] {
+  --field-choice-padding: 1.25rem;
 }
 
 /* Rail rules, as plain attribute-selector CSS against the kit's own
@@ -858,6 +866,18 @@ body {
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Wizard split layout: a short slide-and-fade when the screen changes.
+     Applied only through motion-safe:, so reduced motion gets no animation. */
+  @keyframes wizard-step-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
   @keyframes collapsible-down {
   from {
     height:
