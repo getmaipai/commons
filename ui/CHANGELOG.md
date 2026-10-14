@@ -1,12 +1,12 @@
+# Changelog (`@maipai/ui`)
+
+## [0.5.215] - ui-v0.5.215
+
+Extends `JobProgress` for downloads with byte totals, smoothed speed, a stable ETA, per-file details in the kit Sheet, pause/stall resume and failure retry. The existing props and default presentation remain unchanged; the bar now uses the kit Progress primitive. `variant="compact"` is available for persistent progress strips.
+
 ## [0.5.214] - ui-v0.5.214
 
 Adds optional tour targets to the full layout rail and its entries, the Incognito control, chat history, citations, and avatar primitive. `RailProfileMenu` accepts Help entries with caller labels and selection callbacks. All changes are additive.
-
-# Changelog (`@maipai/ui`)
-
-## [0.5.212] - ui-v0.5.212
-
-Adds an opt-in phase mode to `Wizard`: phase labels stay visible without numeric markers, and each phase control meets the 48px touch-target floor. The default multi-step wizard is unchanged.
 
 ## [0.5.211] - ui-v0.5.211
 

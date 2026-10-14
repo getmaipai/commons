@@ -236,6 +236,42 @@ describe("JobProgress", () => {
     const done = render(<JobProgress title="J" stages={stages} stageIndex={1} stageProgress={0} doneLabel="listo" />);
     expect(done.container.textContent).toContain("listo");
   });
+
+  test("download progress exposes bytes, speed and resume for paused and stalled jobs", () => {
+    const items = [{ id: "weights", label: "model.gguf", completedBytes: 2_100_000_000, totalBytes: 9_400_000_000, state: "stalled" as const }];
+    const paused = render(<JobProgress title="Model" stages={stages} stageIndex={0} stageProgress={0.2} completedBytes={2_100_000_000} totalBytes={9_400_000_000} bytesPerSecond={1_000_000} items={items} downloadState="paused" onResume={() => {}} />);
+    expect(paused.container.textContent).toContain("2.1 GB of 9.4 GB");
+    expect(paused.getByRole("button", { name: "Resume" })).toBeTruthy();
+    expect(paused.getByRole("button", { name: "File details" })).toBeTruthy();
+    cleanup();
+    const stalled = render(<JobProgress title="Model" stages={stages} stageIndex={0} stageProgress={0.2} items={items} downloadState="stalled" onResume={() => {}} copy={{ stalled: "Connection stopped" }} variant="compact" />);
+    expect(stalled.container.textContent).toContain("Connection stopped");
+    expect(stalled.getByRole("button", { name: "Resume" })).toBeTruthy();
+  });
+
+  test("download failure copy covers checksum and out of space, and completed rows", () => {
+    const checksum = render(<JobProgress title="Model" stages={stages} stageIndex={1} stageProgress={1} downloadState="failed" downloadStatus="checksum mismatch" copy={{ checksumFailed: "Checksum did not match", retry: "Try again" }} onRetry={() => {}} />);
+    expect(checksum.container.textContent).toContain("Checksum did not match");
+    expect(checksum.getByRole("button", { name: "Try again" })).toBeTruthy();
+    cleanup();
+    const disk = render(<JobProgress title="Model" stages={stages} stageIndex={1} stageProgress={1} downloadState="failed" downloadStatus="out of space" copy={{ outOfSpace: "Free up disk space" }} />);
+    expect(disk.container.textContent).toContain("Free up disk space");
+    cleanup();
+    const done = render(<JobProgress title="Model" stages={stages} stageIndex={1} stageProgress={1} completedBytes={1000} totalBytes={1000} items={[{ id: "one", label: "one.gguf", completedBytes: 1000, totalBytes: 1000, state: "done" }]} />);
+    expect(done.container.textContent).toContain("100%");
+  });
+
+  test("can hide cancel when the producer has no cancellation action", () => {
+    const view = render(<JobProgress title="Job" stages={stages} stageIndex={0} stageProgress={0.1} cancelable={false} />);
+    expect(view.queryByRole("button", { name: "Cancel the job" })).toBeNull();
+  });
+
+  test("queued, running and verifying per-file states are rendered", () => {
+    const states = ["queued", "running", "verifying"] as const;
+    const view = render(<JobProgress title="Files" stages={stages} stageIndex={0} stageProgress={0.5} items={states.map((state) => ({ id: state, label: `${state}.gguf`, completedBytes: 10, totalBytes: 100, state }))} />);
+    fireEvent.click(view.getByRole("button", { name: "File details" }));
+    for (const state of states) expect(document.body.textContent).toContain(state);
+  });
 });
 
 describe("thread grouping export", () => {
