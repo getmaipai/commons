@@ -114,13 +114,15 @@ that worktree rather than the old shared sibling checkout.
 
 > **Superseded in part 2026-10-02** by [docs/design/RULES.md](../../home/docs/design/RULES.md) chat rule 9: the hand-built `SourcesCard` in the spec's chat section no longer holds; the kit's sources and inline-citation parts are used.
 
-## SETTINGS-EXPERT-01 (ui-v0.5.205)
+## SETTINGS-EXPERT-01 (ui-v0.5.206)
 
 The kit settings renderer keeps expert keys hidden by default. Hosts may opt
 them into a specific registry-backed section with `includeExpert`; opted-in
 expert rows stay in the advanced rows and retain their registry level. This
 lets Home expose `network.hub_port` only inside Network and access. The kit
 icon registry also recognizes the spec area's `network` icon.
+Resetting either network setting runs the same host confirmation before the
+generic settings renderer writes its default.
 
 ## Workspace status
 

@@ -90,6 +90,17 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
     return onChange(value);
   }
 
+  async function reset(): Promise<void> {
+    if (beforeChange && (def.key === "network.hub_port" || def.key === "network.lan_exposure")) {
+      const verdict = await beforeChange(def.key, def.default);
+      if (verdict !== true) {
+        setNote(verdict);
+        return;
+      }
+    }
+    onReset();
+  }
+
   async function commitSecret() {
     if (!secretDraft) return;
     setSecretSaving(true);
@@ -247,7 +258,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
         {resolved.value == null ? (
           <>
             <span className="text-sm text-settings-helper">Inheriting household hours</span>
-            <Button type="button" variant="link" size="row" onClick={onReset} disabled={disabled}>
+            <Button type="button" variant="link" size="row" onClick={reset} disabled={disabled}>
               Use household hours
             </Button>
           </>
@@ -340,7 +351,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
           </Button>
         ) : null}
         {canReset ? (
-          <Button type="button" variant="link" size="row" onClick={onReset} disabled={disabled} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">
+          <Button type="button" variant="link" size="row" onClick={reset} disabled={disabled} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">
             Reset to default
           </Button>
         ) : null}
