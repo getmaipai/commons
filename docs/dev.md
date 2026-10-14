@@ -114,7 +114,7 @@ that worktree rather than the old shared sibling checkout.
 
 > **Superseded in part 2026-10-02** by [docs/design/RULES.md](../../home/docs/design/RULES.md) chat rule 9: the hand-built `SourcesCard` in the spec's chat section no longer holds; the kit's sources and inline-citation parts are used.
 
-## SETTINGS-EXPERT-01 (ui-v0.5.206)
+## SETTINGS-EXPERT-01 (ui-v0.5.209)
 
 The kit settings renderer keeps expert keys hidden by default. Hosts may opt
 them into a specific registry-backed section with `includeExpert`; opted-in
