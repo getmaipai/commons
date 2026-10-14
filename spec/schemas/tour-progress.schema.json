@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/tour-progress.schema.json",
+  "title": "TourProgress",
+  "description": "One per-person tour completion record, following synced-record provenance, date-time and hybrid logical clock conventions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "person_id", "tour_id", "package_id", "version", "status", "step_reached", "at", "source", "hlc", "provenance"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^tour-progress-[a-z0-9]{6,}$" },
+    "person_id": { "type": "string", "pattern": "^person-[a-z0-9]{6,}$" },
+    "tour_id": { "type": "string", "minLength": 1 },
+    "package_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["completed", "skipped", "dismissed"] },
+    "step_reached": { "type": "string", "minLength": 1 },
+    "at": { "type": "string", "format": "date-time" },
+    "source": { "type": "string", "pattern": "^(hub|[a-z0-9][a-z0-9-]{0,63})$", "description": "Provenance: hub, or the id of the device that showed the tour." },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$", "description": "Hybrid logical clock: wall_ms:counter:node (7.3)." },
+    "provenance": { "type": "string", "minLength": 1 }
+  }
+}

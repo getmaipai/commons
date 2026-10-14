@@ -1,0 +1,32 @@
+{
+  "id": "chat.first-run",
+  "version": 1,
+  "title": "Show me around chat",
+  "starts_on": "page:chat",
+  "audience": [
+    "adult",
+    "teen",
+    "child"
+  ],
+  "steps": [
+    {
+      "id": "composer",
+      "target": "chat.composer",
+      "title": "Ask anything",
+      "body": "Type or talk here. Your words stay on this computer.",
+      "body_by_audience": {
+        "child": "Type or talk to Home here."
+      },
+      "placement": "top",
+      "order": 10,
+      "condition": {
+        "roles": [
+          "adult",
+          "teen",
+          "child"
+        ],
+        "surface": "desktop"
+      }
+    }
+  ]
+}

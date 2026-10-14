@@ -444,6 +444,11 @@
             }
           },
           "description": "6.2's own package-declared pages. E's PackageScopeContext and nav-registry merge (frontend/src/shell/nav.ts) are the real consumer; no package populates this yet."
+        },
+        "tours": {
+          "type": "array",
+          "items": { "$ref": "tour.schema.json" },
+          "description": "SPEC-TOUR-01: package-declared guided tours, validated by the shared Tour schema."
         }
       }
     },

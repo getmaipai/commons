@@ -1,0 +1,29 @@
+{
+  "id": "chat.first-run",
+  "version": 1,
+  "title": "Show me around chat",
+  "starts_on": "page:chat",
+  "audience": [
+    "adult",
+    "teen",
+    "child"
+  ],
+  "steps": [
+    {
+      "id": "composer",
+      "target": "chat.composer",
+      "title": "Ask anything",
+      "body": "Your privacy settings are here.",
+      "placement": "top",
+      "order": 10,
+      "condition": {
+        "roles": [
+          "adult",
+          "teen",
+          "child"
+        ],
+        "surface": "desktop"
+      }
+    }
+  ]
+}

@@ -8,7 +8,7 @@ from typing import Any, Literal
 
 from pydantic import AnyUrl, BaseModel, ConfigDict, Field, conint, constr
 
-from . import privacy_row_schema, settings_area_schema, settings_key_schema
+from . import privacy_row_schema, settings_area_schema, settings_key_schema, tour_schema
 
 
 class Offer(BaseModel):
@@ -373,6 +373,10 @@ class Contributes(BaseModel):
     pages: list[Page] | None = Field(
         None,
         description="6.2's own package-declared pages. E's PackageScopeContext and nav-registry merge (frontend/src/shell/nav.ts) are the real consumer; no package populates this yet.",
+    )
+    tours: list[tour_schema.Tour] | None = Field(
+        None,
+        description='SPEC-TOUR-01: package-declared guided tours, validated by the shared Tour schema.',
     )
 
 

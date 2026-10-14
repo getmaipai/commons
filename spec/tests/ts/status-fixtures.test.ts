@@ -12,6 +12,7 @@ const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
 ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "status-component.schema.json"), "utf8")));
+ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "tour.schema.json"), "utf8")));
 const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "status-note", zod: StatusNote },
   { name: "maintenance-window", zod: MaintenanceWindow },

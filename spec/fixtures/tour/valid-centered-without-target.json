@@ -1,0 +1,20 @@
+{
+  "id": "chat.first-run",
+  "version": 1,
+  "title": "Show me around chat",
+  "starts_on": "page:chat",
+  "audience": [
+    "adult",
+    "teen",
+    "child"
+  ],
+  "steps": [
+    {
+      "id": "welcome",
+      "placement": "center",
+      "order": 0,
+      "title": "Welcome",
+      "body": "Here is your Home."
+    }
+  ]
+}

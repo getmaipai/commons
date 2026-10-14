@@ -34,6 +34,11 @@ describe("spec/settings/keys.json", () => {
     expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
   });
 
+  test("guided tours use the automatic-start switch in Account Appearance", () => {
+    const entry = (loadRegistry() as Record<string, unknown>[]).find((row) => row.key === "tours.autostart.enabled");
+    expect(entry).toMatchObject({ scope: "person", selector: "boolean", default: true, label: "Start tours automatically", lives_in: "profile.appearance" });
+  });
+
   test("household.home replaces the old household location key", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     const keys = new Map(entries.map((entry) => [entry.key as string, SettingsKey.parse(entry)]));
