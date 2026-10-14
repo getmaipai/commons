@@ -42,7 +42,9 @@ if [ "$DOCS_ONLY" = 0 ]; then
     # this ignored bundle later, but TypeScript tests need it beforehand, so it
     # runs before the test loop (a fresh worktree has no bundle yet).
     echo "== spec: resolve schemas"
-    (cd spec && bun run scripts/bundle-schemas.ts)
+    # Bundle from the pinned tag checkout, never the sibling working tree,
+    # which may be behind or dirty.
+    (cd spec && MAIPAI_STANDARDS_DIR="$(cd "$STANDARDS_DIR" && pwd)" bun run scripts/bundle-schemas.ts)
   fi
 
   for workspace in core ui spec; do
