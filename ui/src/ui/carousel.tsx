@@ -21,6 +21,11 @@ type CarouselProps = {
   orientation?: "horizontal" | "vertical"
   setApi?: (api: CarouselApi) => void
   autoplay?: boolean
+  autoplayDelay?: number
+  paused?: boolean
+  onPausedChange?: (paused: boolean) => void
+  pauseOnHover?: boolean
+  pauseOnFocus?: boolean
 } & React.ComponentProps<"div">
 
 type CarouselContextProps = {
@@ -30,6 +35,12 @@ type CarouselContextProps = {
   scrollNext: () => void
   canScrollPrev: boolean
   canScrollNext: boolean
+  autoplay: boolean
+  autoplayDelay: number
+  paused: boolean
+  onPausedChange: (paused: boolean) => void
+  pauseOnHover?: boolean
+  pauseOnFocus?: boolean
 } & Pick<CarouselProps, "orientation">
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null)
@@ -50,12 +61,16 @@ function Carousel({
   setApi,
   plugins,
   autoplay = false,
+  autoplayDelay = 8000,
+  paused,
+  onPausedChange,
+  pauseOnHover,
+  pauseOnFocus,
   className,
   children,
   ...props
 }: CarouselProps) {
-  const [reducedMotion, setReducedMotion] = React.useState(true)
-
+  const [reducedMotion, setReducedMotion] = React.useState(false)
   React.useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)")
     const update = () => setReducedMotion(query.matches)
@@ -63,19 +78,34 @@ function Carousel({
     query.addEventListener("change", update)
     return () => query.removeEventListener("change", update)
   }, [])
+  const [internalPaused, setInternalPaused] = React.useState(false)
+  const lastMotionPreference = React.useRef(false)
+  const controlled = paused !== undefined
+  const isPaused = controlled ? paused : internalPaused
+  const setPaused = React.useCallback((value: boolean) => {
+    if (!controlled) setInternalPaused(value)
+    onPausedChange?.(value)
+  }, [controlled, onPausedChange])
+  React.useEffect(() => {
+    if (reducedMotion && !lastMotionPreference.current) setPaused(true)
+    lastMotionPreference.current = reducedMotion
+  }, [reducedMotion, setPaused])
   const autoplayPlugin = React.useMemo(
-    () => (autoplay && !reducedMotion ? [Autoplay()] : []),
-    [autoplay, reducedMotion],
+    () => (autoplay && !isPaused && !reducedMotion ? [Autoplay({ delay: autoplayDelay })] : []),
+    [autoplay, autoplayDelay, isPaused, reducedMotion],
   )
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
+      ...(reducedMotion ? { duration: 0 } : {}),
     },
     [...(plugins ?? []), ...autoplayPlugin],
   )
   const [canScrollPrev, setCanScrollPrev] = React.useState(false)
   const [canScrollNext, setCanScrollNext] = React.useState(false)
+  const [hovered, setHovered] = React.useState(false)
+  const [focused, setFocused] = React.useState(false)
 
   const onSelect = React.useCallback((api: CarouselApi) => {
     if (!api) return
@@ -122,6 +152,12 @@ function Carousel({
         carouselRef,
         api,
         orientation,
+        autoplay,
+        autoplayDelay,
+        paused: isPaused,
+        onPausedChange: setPaused,
+        pauseOnHover,
+        pauseOnFocus,
         scrollPrev,
         scrollNext,
         canScrollPrev,
@@ -130,6 +166,12 @@ function Carousel({
     >
       <div
         onKeyDownCapture={handleKeyDown}
+        onMouseEnter={() => { if (pauseOnHover ?? autoplay) { setHovered(true); setPaused(true) } }}
+        onMouseLeave={() => { if (pauseOnHover ?? autoplay) { setHovered(false); if (!focused) setPaused(false) } }}
+        onFocusCapture={() => { if (pauseOnFocus ?? autoplay) { setFocused(true); setPaused(true) } }}
+        onBlurCapture={(event) => {
+          if ((pauseOnFocus ?? autoplay) && !event.currentTarget.contains(event.relatedTarget as Node | null)) { setFocused(false); if (!hovered) setPaused(false) }
+        }}
         className={cn("relative", className)}
         role="region"
         aria-roledescription="carousel"

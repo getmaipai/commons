@@ -1,5 +1,20 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.209] - ui-v0.5.209
+
+Carousel adds `autoplayDelay` (default 8000 ms), controlled `paused` and `onPausedChange`, and pause-on-hover/focus behavior enabled by default when autoplay is on. Reduced-motion users start paused; manual navigation remains available with Embla animation disabled.
+
+| Addition | Type | Default |
+| --- | --- | --- |
+| `Carousel.autoplayDelay` | milliseconds | `8000` |
+| `Carousel.paused` / `onPausedChange` | controlled pause state | uncontrolled; internally resumes |
+| `Carousel.pauseOnHover` / `pauseOnFocus` | boolean | follows `autoplay` |
+
+
+## [0.5.206] - ui-v0.5.206
+
+Adds an opt-in phase mode to `Wizard`: phase labels stay visible without numeric markers, and each phase control meets the 48px touch-target floor. The default multi-step wizard is unchanged.
+
 ## [0.5.204] - ui-v0.5.204
 
 Adds optional `tourId` targets to the shell rail, profile menu trigger and chat thread root. Existing chat composer and thread list roots already forward `data-*` props.
