@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.202] - ui-v0.5.202
+
+Adds the shadcn Carousel on Embla, with optional autoplay disabled when reduced motion is requested.
+
 ## [0.5.201] - ui-v0.5.201
 
 Adds the shadcn Alert to the kit with its default and destructive variants, plus a warning variant using the existing orange status hue token.

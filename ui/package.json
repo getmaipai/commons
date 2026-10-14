@@ -1,6 +1,6 @@
 {
   "name": "@maipai/ui",
-  "version": "0.5.201",
+  "version": "0.5.202",
   "private": true,
   "description": "MaiPai's shell contract and kit: tokens, layout primitives, settings and permission renderers, pattern components. See ../docs/dev.md.",
   "license": "AGPL-3.0",
@@ -31,7 +31,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "cn": "^0.3.0",
-    "embla-carousel-react": "^8.6.0",
+    "embla-carousel-autoplay": "8.6.0",
+    "embla-carousel-react": "8.6.0",
     "heat-graph": "^0.0.20",
     "input-otp": "^1.4.2",
     "katex": "^0.18.9",
