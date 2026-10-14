@@ -3659,5 +3659,37 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "companions.allowed",
+    "scope": "person",
+    "selector": "boolean",
+    "layers": [
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": true,
+    "band_default": {
+      "child": true,
+      "teen": true,
+      "adult": true
+    },
+    "label": "AI companions",
+    "help": "AI companions are on for everyone unless an admin turns them off for the household or for one person. Turning this off hides companions and keeps their data.",
+    "copy": {
+      "does": "Controls who can see and use the available companions."
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "guardian"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.companions",
+    "honoured_by": [
+      "home"
+    ]
   }
 ]

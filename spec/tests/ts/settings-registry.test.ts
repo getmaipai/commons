@@ -72,6 +72,30 @@ describe("spec/settings/keys.json", () => {
     expect(entry).toMatchObject({ scope: "person", selector: "boolean", default: true, label: "Start tours automatically", lives_in: "profile.appearance" });
   });
 
+  test("AI companions default on and are guardian-controlled for every age band", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const matches = entries.filter((row) => row.key === "companions.allowed");
+    expect(matches).toHaveLength(1);
+    const entry = SettingsKey.parse(matches[0]);
+    expect(entry).toMatchObject({
+      scope: "person",
+      selector: "boolean",
+      layers: ["household", "person"],
+      merge: "override",
+      default: true,
+      band_default: { child: true, teen: true, adult: true },
+      label: "AI companions",
+      copy: { does: "Controls who can see and use the available companions." },
+      control: { child: "guardian", teen: "guardian", adult: "guardian" },
+      level: "basic",
+      secret: false,
+      lives_in: "person.companions",
+      honoured_by: ["home"],
+    });
+    expect(entry.help).toBe("AI companions are on for everyone unless an admin turns them off for the household or for one person. Turning this off hides companions and keeps their data.");
+    expect(entry.self_service).toBeUndefined();
+  });
+
   test("household.home replaces the old household location key", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     const keys = new Map(entries.map((entry) => [entry.key as string, SettingsKey.parse(entry)]));

@@ -7,6 +7,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { HeroSlide } from "../../gen/ts/hero-slide.js";
 import { SetupState } from "../../gen/ts/setup-state.js";
+import { Acknowledgment } from "../../gen/ts/acknowledgment.js";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
@@ -29,6 +30,24 @@ for (const shape of ["setup-state", "hero-slide"] as const) {
     }
   });
 }
+
+const acknowledgmentSchema = JSON.parse(readFileSync(join(SPEC, "schemas", "acknowledgment.schema.json"), "utf8"));
+const validateAcknowledgment = ajv.compile(acknowledgmentSchema);
+describe("acknowledgment fixtures", () => {
+  for (const file of readdirSync(join(SPEC, "fixtures", "acknowledgment")).filter((name) => name.endsWith(".json")).sort()) {
+    const accept = file.startsWith("valid-");
+    test(`${file}: ${accept ? "is accepted" : "is rejected"}`, () => {
+      const value = JSON.parse(readFileSync(join(SPEC, "fixtures", "acknowledgment", file), "utf8"));
+      expect(validateAcknowledgment(value), JSON.stringify(validateAcknowledgment.errors)).toBe(accept);
+      if (file !== "invalid-duplicate-item-id.json") expect(Acknowledgment.safeParse(value).success).toBe(accept);
+    });
+  }
+});
+
+test("acknowledgment item ids stay unique when wording versions differ", () => {
+  const value = JSON.parse(readFileSync(join(SPEC, "fixtures", "acknowledgment", "invalid-duplicate-item-id.json"), "utf8"));
+  expect(validateAcknowledgment(value)).toBe(false);
+});
 
 test("a setup step with an unknown status is rejected", () => {
   const value = JSON.parse(readFileSync(join(SPEC, "fixtures", "setup-state", "invalid-step-unknown-status.json"), "utf8"));

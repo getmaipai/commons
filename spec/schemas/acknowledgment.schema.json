@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/acknowledgment.schema.json",
+  "title": "Acknowledgment",
+  "description": "A record that a person accepted named, versioned acknowledgments. Wording lives in the product, not in this record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "source",
+    "items",
+    "accepted_at",
+    "person_id",
+    "created_at",
+    "updated_at",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "setup"
+      ],
+      "description": "How this acknowledgment was accepted; this is the record provenance."
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "responsibility",
+              "companions",
+              "internet_safety",
+              "fetching"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "accepted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "person_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Null when accepted before the owner exists; set when the owner is created."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    }
+  },
+  "allOf": [
+    {
+      "properties": {
+        "items": {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "responsibility"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "items": {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "companions"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "items": {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "internet_safety"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "items": {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "fetching"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      }
+    }
+  ]
+}

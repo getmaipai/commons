@@ -721,6 +721,11 @@
               "label": "Personality",
               "group": "person.persona",
               "scope": "person"
+            },
+            {
+              "label": "AI companions",
+              "group": "person.companions",
+              "scope": "person"
             }
           ],
           "keywords": [

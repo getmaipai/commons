@@ -1,0 +1,15 @@
+{
+  "id": "ack-example-2",
+  "source": "setup",
+  "items": [
+    {
+      "id": "unknown_item",
+      "version": "1"
+    }
+  ],
+  "accepted_at": "2026-10-13T12:00:00Z",
+  "person_id": null,
+  "created_at": "2026-10-13T12:00:00Z",
+  "updated_at": "2026-10-13T12:00:00Z",
+  "hlc": "1791892800000:0:hubnode"
+}

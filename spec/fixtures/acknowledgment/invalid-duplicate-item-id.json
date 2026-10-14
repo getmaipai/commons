@@ -1,0 +1,19 @@
+{
+  "id": "ack-example-4",
+  "source": "setup",
+  "items": [
+    {
+      "id": "companions",
+      "version": "1"
+    },
+    {
+      "id": "companions",
+      "version": "2"
+    }
+  ],
+  "accepted_at": "2026-10-13T12:00:00Z",
+  "person_id": null,
+  "created_at": "2026-10-13T12:00:00Z",
+  "updated_at": "2026-10-13T12:00:00Z",
+  "hlc": "1791892800000:0:hubnode"
+}

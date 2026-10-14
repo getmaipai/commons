@@ -20,6 +20,7 @@ export const SetupState = z
           .object({
             id: z.enum([
               "welcome",
+              "backup_key",
               "engine_location",
               "storage",
               "checks",

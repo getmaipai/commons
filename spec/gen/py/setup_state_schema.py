@@ -71,6 +71,7 @@ class Step(BaseModel):
     )
     id: Literal[
         'welcome',
+        'backup_key',
         'engine_location',
         'storage',
         'checks',

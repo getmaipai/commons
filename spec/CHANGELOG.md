@@ -3,6 +3,10 @@
 
 - Accept optional `attribution` and `hosts` fields on manifest `data_sources` rows through the shared PrivacyRow schema.
 
+## [spec-v0.1.139] - 2026-10-14
+
+- SPEC-SETUP-WIZARD-01. Add the `backup_key` setup step, an `Acknowledgment` record for accepted item ids and wording versions, and `companions.allowed`, a guardian-controlled person setting that defaults on. Place the companion switch in Chat Personalization. Repin `scripts/check.sh` to `std-v0.3.3` so generated PrivacyRow fields match the shared schema.
+
 ## [spec-v0.1.135] - 2026-10-13
 
 - SPEC-SESSION-SOURCE-01. New `SessionSignInSource` schema (`local`, `away`, `paired_device`, default `local`): how a session signed in, set by the hub on the server when it issues the session. It lets a person see which of their own sessions came in through the Tailscale address. Additive; the spec has no Session record, so Home stores the value in its own sessions table.

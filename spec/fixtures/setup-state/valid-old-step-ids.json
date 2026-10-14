@@ -1,0 +1,80 @@
+{
+  "id": "setup-hub",
+  "source": "wizard",
+  "steps": [
+    {
+      "id": "welcome",
+      "status": "done",
+      "at": "2026-10-13T12:00:00Z"
+    },
+    {
+      "id": "engine_location",
+      "status": "done",
+      "at": "2026-10-13T12:01:00Z"
+    },
+    {
+      "id": "storage",
+      "status": "done",
+      "at": "2026-10-13T12:02:00Z"
+    },
+    {
+      "id": "checks",
+      "status": "done",
+      "at": "2026-10-13T12:03:00Z"
+    },
+    {
+      "id": "plan",
+      "status": "done",
+      "at": "2026-10-13T12:04:00Z"
+    },
+    {
+      "id": "away",
+      "status": "done",
+      "at": "2026-10-13T12:05:00Z"
+    },
+    {
+      "id": "owner",
+      "status": "done",
+      "at": "2026-10-13T12:06:00Z"
+    },
+    {
+      "id": "face",
+      "status": "done",
+      "at": "2026-10-13T12:07:00Z"
+    },
+    {
+      "id": "profile",
+      "status": "done",
+      "at": "2026-10-13T12:08:00Z"
+    },
+    {
+      "id": "hello",
+      "status": "done",
+      "at": "2026-10-13T12:09:00Z"
+    },
+    {
+      "id": "done",
+      "status": "done",
+      "at": "2026-10-13T12:10:00Z"
+    }
+  ],
+  "phase": "done",
+  "engine": {
+    "where": "this_computer",
+    "hardware": {
+      "memory_bytes": 17179869184
+    }
+  },
+  "away": "later",
+  "plan": {
+    "option": "recommended",
+    "tier": "moderate",
+    "roles": [
+      "engines.chat.choice"
+    ]
+  },
+  "checks": [],
+  "started_at": "2026-10-13T12:00:00Z",
+  "completed_at": "2026-10-13T12:10:00Z",
+  "hlc": "1791892800000:0:hubnode"
+}

@@ -1,6 +1,7 @@
 // GENERATED FILE. Do not edit by hand.
 // Regenerate with: cd spec && bun run gen:ts
 
+export * from "./acknowledgment.js";
 export * from "./answer-block.js";
 export * from "./artifact.js";
 export * from "./biometric-print.js";
