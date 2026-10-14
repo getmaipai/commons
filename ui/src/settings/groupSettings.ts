@@ -62,10 +62,9 @@ export function sectionTitle(id: string): string {
 }
 
 // docs/SETTINGS.md Rule 4: "three levels, disclosed locally, never a
-// global mode." Expert is filtered out entirely here rather than shown
-// anywhere: it "lives under Developer tools, admin only" and no such
-// destination exists yet (deferred, docs/dev.md) - hiding it is honest,
-// building a fake Developer Tools page to hold it would not be.
+// global mode." Expert is filtered out by default. A host may opt an
+// expert key into a specific section when that settings area is its
+// declared home; opt-in keys remain expert in the registry and display.
 // `honouredBy` filters out a key declared for a different product
 // entirely (docs/SETTINGS.md's registry shape: `honoured_by` names which
 // product actually reads a key) - the caller's own product identifier
@@ -76,6 +75,7 @@ export function groupSettings(
   values: ResolvedSetting[],
   scopeKind: "household" | "person" | "device",
   honouredBy: string,
+  includeExpert = false,
 ): SettingsGroup[] {
   const valueByKey = new Map(values.map((v) => [v.key, v]));
   const eligible = registry.filter(
@@ -83,7 +83,7 @@ export function groupSettings(
     // spec currently names (`@maipai/spec`'s own settings-key schema) -
     // a real string comparison here, not narrowed to that union, since
     // this kit ships to products the spec may not name yet.
-    (k) => k.scope === scopeKind && (k.honoured_by as string[]).includes(honouredBy) && k.level !== "expert",
+    (k) => k.scope === scopeKind && (k.honoured_by as string[]).includes(honouredBy) && (includeExpert || k.level !== "expert"),
   );
 
   const groups = new Map<string, SettingsGroup>();
@@ -99,7 +99,7 @@ export function groupSettings(
       groups.set(def.lives_in, group);
     }
     const merged: MergedSetting = { def, resolved };
-    if (def.level === "advanced") group.advanced.push(merged);
+    if (def.level === "advanced" || def.level === "expert") group.advanced.push(merged);
     else group.basic.push(merged);
   }
   for (const group of groups.values()) {

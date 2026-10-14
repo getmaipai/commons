@@ -49,6 +49,9 @@ interface SettingsRendererProps {
   includeKeysByGroup?: Readonly<Record<string, readonly string[]>>;
   /** Show advanced keys without the "Show N advanced settings" fold. */
   expandAdvanced?: boolean;
+  /** Include expert keys on a host-approved section. Omitted, expert keys
+   * remain hidden, preserving the default settings surface. */
+  includeExpert?: boolean;
   /** Replace a group's heading, by `lives_in` id. */
   titleOverrides?: Readonly<Record<string, string>>;
   /** Rows only: no heading and no card (the host supplies the frame). */
@@ -98,6 +101,7 @@ export function SettingsRenderer({
   includeKeys,
   includeKeysByGroup,
   expandAdvanced = false,
+  includeExpert = false,
   titleOverrides = {},
   plainRows = false,
   mergeGroups = false,
@@ -271,7 +275,7 @@ export function SettingsRenderer({
           const needle = filter?.trim().toLowerCase();
           const matches = (s: MergedSetting) =>
             !needle || s.def.label.toLowerCase().includes(needle) || (s.def.help?.toLowerCase().includes(needle) ?? false);
-          const allGroups: SettingsGroup[] = groupSettings(registry, values, scope, honouredBy);
+          const allGroups: SettingsGroup[] = groupSettings(registry, values, scope, honouredBy, includeExpert);
           let groups = (only ? allGroups.filter((g) => only.includes(g.id)) : allGroups)
             .map((group) => {
               const keys = includeKeysByGroup?.[group.id] ?? includeKeys;

@@ -69,6 +69,18 @@ describe("groupSettings", () => {
     expect(groups).toHaveLength(0);
   });
 
+  test("a host may opt an expert key into its advanced rows", () => {
+    const groups = groupSettings(
+      [key({ key: "network.hub_port", lives_in: "household.network", level: "expert" })],
+      [value({ key: "network.hub_port", value: 3000 })],
+      "household",
+      "home",
+      true,
+    );
+    expect(groups[0]?.advanced.map((setting) => setting.def.key)).toEqual(["network.hub_port"]);
+    expect(groups[0]?.advanced[0]?.def.level).toBe("expert");
+  });
+
   test("a key not honoured by the calling product is filtered out", () => {
     const groups = groupSettings(
       [key({ key: "bot.only", honoured_by: ["bot"] })],
