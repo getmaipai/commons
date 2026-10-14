@@ -38,8 +38,8 @@ interface WizardProps {
   /** Three phase flow: phase names stay visible without step numbers, and
    * each phase control keeps the kit's 48px touch target. */
   phaseMode?: boolean;
-  /** "centered" keeps the default one-column flow in a centered 40rem-wide
-   * column. "split" uses two panes from the kit's `lg` breakpoint up. */
+  /** "centered" adds the centered Wizard treatment. Questions use a 40rem column;
+   * set stepKind="intro" for the left-aligned intro. "split" uses two panes. */
   layout?: "default" | "centered" | "split";
   /** When passed, it is the one `h1` and the step title becomes a small
    * caption above it (or is dropped when `progress` is passed). */
@@ -47,6 +47,12 @@ interface WizardProps {
   description?: ReactNode;
   /** A slot shown centered above the heading; the kit ships no logo. */
   hero?: ReactNode;
+  /** Optional top row for a logo and actions in the centered experience. */
+  header?: ReactNode;
+  /** Small label above the heading, for example a phase name or step number. */
+  eyebrow?: ReactNode;
+  /** Intro screens use a left aligned text column; questions stay centered. */
+  stepKind?: "intro" | "question";
   /** Pins the footer to the bottom of the viewport as a full-width bar.
    * Defaults to true for layout="split", false otherwise. */
   stickyFooter?: boolean;
@@ -87,6 +93,9 @@ export function Wizard({
   heading,
   description,
   hero,
+  header,
+  eyebrow,
+  stepKind = "question",
   stickyFooter,
   progress,
 }: WizardProps) {
@@ -94,6 +103,7 @@ export function Wizard({
   const showAside = useMediaQuery("(min-width: 64rem)", { defaultValue: false, initializeWithValue: false });
   const split = layout === "split";
   const centered = layout === "centered";
+  const centeredIntro = centered && stepKind === "intro";
   const sticky = stickyFooter ?? split;
   const progressLabel = progress ? (progress.label ?? `Step ${progress.current} of ${progress.total}`) : undefined;
   const progressBar = progress ? (
@@ -114,14 +124,17 @@ export function Wizard({
       {hero ? <div className={cn("flex justify-center", split && "lg:justify-start")}>{hero}</div> : null}
       {heading !== undefined ? (
         <>
-          {!progress ? <p className="text-sm text-muted-foreground">{steps[currentIndex]?.title}</p> : null}
-          <h1 className={cn("text-[length:var(--font-size-title)] font-semibold", !split && "mb-4")}>{heading}</h1>
+          {(eyebrow !== undefined || !progress || (centered && progress?.label !== undefined)) ? <p className={cn("text-sm text-muted-foreground", centered && "font-[var(--wizard-eyebrow-weight)] text-[var(--wizard-eyebrow-color)]")}>{eyebrow ?? (centered && progress ? progress.label : undefined) ?? steps[currentIndex]?.title}</p> : null}
+          <h1 className={cn(centered ? centeredIntro ? "text-[length:var(--wizard-title-size)]" : "text-[length:var(--wizard-question-title-size)]" : "text-[length:var(--font-size-title)]", centered ? "font-[var(--wizard-title-weight)] leading-[1.1] tracking-[-0.02em] text-[var(--wizard-title-color)]" : "font-semibold", !split && !centered && "mb-4")}>{heading}</h1>
         </>
       ) : (
-        <h1 className="mb-4 text-2xl font-bold">{steps[currentIndex]?.title}</h1>
+        <>
+          {(eyebrow !== undefined || (centered && progress?.label !== undefined)) ? <p className={cn("text-sm text-muted-foreground", centered && "font-[var(--wizard-eyebrow-weight)] text-[var(--wizard-eyebrow-color)]")}>{eyebrow ?? progress?.label}</p> : null}
+          <h1 className={cn("mb-4", centered ? "text-[length:var(--wizard-question-title-size)] font-semibold leading-[1.1] tracking-[-0.02em] text-[var(--wizard-title-color)]" : "text-2xl font-bold")}>{steps[currentIndex]?.title}</h1>
+        </>
       )}
       {description !== undefined ? (
-        <div className="text-[length:var(--font-size-body)] text-muted-foreground">{description}</div>
+        <div className={cn("text-[length:var(--font-size-body)] text-muted-foreground", centered && cn("mt-2 max-w-[28rem] text-base font-[var(--wizard-body-weight)] leading-[1.5] lg:text-lg", centeredIntro ? "text-[var(--wizard-body-color)]" : "text-[var(--wizard-secondary-color)]"))}>{description}</div>
       ) : null}
     </>
   );
@@ -136,8 +149,9 @@ export function Wizard({
       nextDisabled={nextDisabled}
       busy={busy}
       split={split}
+      centered={centered}
       className={sticky
-        ? cn(centered ? "mx-auto w-full max-w-[40rem] px-4" : columnClass, "border-0 py-3")
+        ? cn(centeredIntro ? "w-full px-6" : centered ? "mx-auto w-full max-w-[40rem] px-4" : columnClass, "border-0 py-3")
         : undefined}
     />
   );
@@ -152,7 +166,7 @@ export function Wizard({
       {footer}
     </div>
   ) : (
-    footer
+    <>{centered && progress ? <div className="w-full">{progressBar}</div> : null}{footer}</>
   );
 
   if (split && !aside) {
@@ -193,22 +207,24 @@ export function Wizard({
         data-wizard-layout={centered ? "centered" : "aside"}
         className="grid min-h-dvh w-full grid-cols-1 lg:grid-cols-2"
       >
-        <div className={cn("mx-auto flex min-h-dvh w-full flex-col gap-6 p-6", centered && "max-w-[40rem]")}>
-          {progress ? (
+        <div className={cn("mx-auto flex min-h-dvh w-full flex-col gap-6 p-6", centered && !centeredIntro && "max-w-[40rem]")}>
+          {header ? <header data-wizard-header className="flex min-h-10 items-center justify-between gap-4">{header}</header> : null}
+          {progress && !centered ? (
             <div className="flex w-full flex-col gap-2">
               {progressBar}
               <span className="text-sm text-muted-foreground">{progressLabel}</span>
             </div>
-          ) : (
+          ) : null}
+          {!progress ? (
             <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
               {stepItems()}
             </ol>
-          )}
+          ) : null}
           {banner}
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
-          <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
-            {heads}
-            {children}
+          <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", centered && "flex flex-col justify-center", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
+            {centered ? <div className={cn("flex w-full flex-col gap-4", centeredIntro && "lg:ml-[12vw] lg:max-w-[40rem]")}>{heads}</div> : heads}
+            {centered ? <div className={cn("mt-8 flex flex-col gap-[var(--wizard-section-gap)]", centeredIntro && "lg:ml-[12vw] lg:max-w-[40rem]")}>{children}</div> : children}
           </div>
           {bar}
         </div>
@@ -224,25 +240,27 @@ export function Wizard({
   return (
     <main
       data-wizard-layout={centered ? "centered" : undefined}
-      className={cn("flex h-full flex-col gap-6 p-6", centered && "mx-auto w-full max-w-[40rem]")}
+      className={cn("flex h-full flex-col gap-6 p-6", centered && !centeredIntro && "mx-auto w-full max-w-[40rem]", centeredIntro && "w-full bg-[var(--wizard-surface)]")}
     >
-      {progress ? (
+      {header ? <header data-wizard-header className="flex min-h-10 items-center justify-between gap-4">{header}</header> : null}
+      {progress && !centered ? (
         <div className="flex w-full flex-col gap-2">
           {progressBar}
           <span className="text-sm text-muted-foreground">{progressLabel}</span>
         </div>
-      ) : (
+      ) : null}
+      {!progress ? (
         <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
           {stepItems()}
         </ol>
-      )}
+      ) : null}
 
       {banner}
 
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
-      <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
-        {heads}
-        {children}
+      <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", centered && "flex flex-col justify-center", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
+        {centered ? <div className={cn("flex w-full flex-col gap-4", centeredIntro && "lg:ml-[12vw] lg:max-w-[40rem]")}>{heads}</div> : heads}
+        {centered ? <div className={cn("mt-8 flex flex-col gap-[var(--wizard-section-gap)]", centeredIntro && "lg:ml-[12vw] lg:max-w-[40rem]")}>{children}</div> : children}
       </div>
 
       {bar}
@@ -299,6 +317,7 @@ function Footer({
   nextDisabled,
   busy,
   split,
+  centered,
   className,
 }: {
   onBack?: () => void;
@@ -309,12 +328,13 @@ function Footer({
   nextDisabled?: boolean;
   busy?: boolean;
   split: boolean;
+  centered: boolean;
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-center gap-2 border-t border-border pt-4", className)}>
+    <div className={cn("flex items-center gap-2 border-t border-border pt-4", centered && "min-h-20 px-6 text-base", className)}>
       {onBack ? (
-        <Button type="button" variant={split ? "link" : "ghost"} onClick={onBack} disabled={busy}>
+        <Button type="button" variant={split || centered ? "link" : "ghost"} className={centered ? "font-semibold text-[var(--wizard-title-color)] underline" : undefined} onClick={onBack} disabled={busy}>
           Back
         </Button>
       ) : null}
@@ -324,7 +344,7 @@ function Footer({
           {skipLabel ?? "Skip"}
         </Button>
       ) : null}
-      <Button type="button" onClick={onNext} disabled={busy || nextDisabled}>
+      <Button type="button" className={centered ? "rounded-full bg-[var(--wizard-primary-background)] font-semibold text-[var(--wizard-primary-foreground)] hover:opacity-90 disabled:bg-[var(--wizard-primary-disabled)] disabled:text-[var(--wizard-primary-disabled-foreground)]" : undefined} onClick={onNext} disabled={busy || nextDisabled}>
         {busy ? "Working…" : nextLabel}
       </Button>
     </div>

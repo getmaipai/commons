@@ -55,6 +55,58 @@ describe("Wizard", () => {
     expect(container.querySelector("[data-wizard-bar]")).toBeNull();
   });
 
+  test("centered layout exposes header and eyebrow, centers its content, and places progress at the footer edge", () => {
+    const { container, getByText, getByRole, queryByText } = render(
+      <Wizard {...BASE} layout="centered" stickyFooter header={<span>Brand</span>} eyebrow="Step 1" heading="Tell us about your place" description="A short introduction." progress={{ current: 1, total: 3 }}>
+        <div data-testid="question">Question</div>
+      </Wizard>,
+    );
+    const main = container.querySelector("main")!;
+    const content = container.querySelector('[tabindex="0"]')!;
+    const bar = container.querySelector("[data-wizard-bar]")!;
+    expect(main.firstElementChild?.textContent).toBe("Brand");
+    expect(getByText("Step 1")).toBeTruthy();
+    expect(content.className).toContain("justify-center");
+    expect(bar.querySelector('[role="progressbar"]')).toBeTruthy();
+    expect(queryByText("Step 1 of 3")).toBeNull();
+    expect(getByRole("heading", { name: "Tell us about your place" }).className).toContain("tracking-[-0.02em]");
+  });
+
+  test("centered question step uses a 32px title and layout tokens, while default markup stays snapshotted", async () => {
+    const { container, getByRole } = render(<Wizard {...BASE} layout="centered">content</Wizard>);
+    expect(getByRole("heading", { name: "Owner" }).className).toContain("text-[length:var(--wizard-question-title-size)]");
+    const tokens = await Bun.file(new URL("../tokens.css", import.meta.url)).text();
+    expect(tokens).toContain("--wizard-title-color: #222222;");
+    expect(tokens).toContain("--wizard-secondary-color: #717171;");
+    expect(tokens).toContain("--wizard-divider: #dddddd;");
+    expect(tokens).toContain("--wizard-title-color: #f5f5f5;");
+    expect(container.querySelector('[data-wizard-layout="centered"]')).toBeTruthy();
+  });
+
+  test("centered intro gives the header and footer the full row and anchors its copy in the left half", () => {
+    const { container, getByRole } = render(
+      <Wizard {...BASE} layout="centered" stepKind="intro" header={<button>Save and exit</button>} stickyFooter onBack={() => {}} heading="Tell us about your place" eyebrow="Step 1" progress={{ current: 1, total: 3 }}>
+        body
+      </Wizard>,
+    );
+    expect(container.querySelector("main")!.className).toContain("w-full");
+    expect(container.querySelector("[data-wizard-header] button")?.parentElement?.hasAttribute("data-wizard-header")).toBe(true);
+    expect(container.querySelector('[tabindex="0"] > div')!.className).toContain("lg:ml-[12vw]");
+    expect(container.querySelector("[data-wizard-bar]")!.querySelector('[role="progressbar"]')).toBeTruthy();
+    expect(getByRole("button", { name: "Back" }).className).toContain("underline");
+  });
+
+  test("centered intro keeps its header and bottom progress treatment when an aside is supplied", () => {
+    const { container } = render(
+      <Wizard {...BASE} layout="centered" stepKind="intro" header={<button data-wizard-action>Save and exit</button>} aside={<img src="/aside.png" alt="A home" />} stickyFooter heading="Welcome" eyebrow="Step 1" progress={{ current: 1, total: 3 }}>
+        body
+      </Wizard>,
+    );
+    expect(container.querySelector("[data-wizard-header]")).toBeTruthy();
+    expect(container.querySelector("main")?.getAttribute("data-wizard-layout")).toBe("centered");
+    expect(container.querySelector("[data-wizard-bar]")!.querySelector('[role="progressbar"]')).toBeTruthy();
+  });
+
   test("centered sticky footer keeps its controls in the same centered 40rem column", () => {
     const { container } = render(
       <Wizard {...BASE} layout="centered" stickyFooter>content</Wizard>,
@@ -139,6 +191,14 @@ describe("Wizard", () => {
     expect(bar.getAttribute("aria-valuemax")).toBe("6");
   });
 
+  test("centered progress label is the eyebrow when a caller does not pass a separate eyebrow", () => {
+    const { getByText, queryByText } = render(
+      <Wizard {...BASE} layout="centered" heading="Your home" progress={{ current: 1, total: 3, label: "Getting started" }}>content</Wizard>,
+    );
+    expect(getByText("Getting started")).toBeTruthy();
+    expect(queryByText("Owner")).toBeNull();
+  });
+
   test("sticky footer pins a bar and the scroll region has bottom padding", () => {
     const { container } = render(<Wizard {...BASE} layout="split" onBack={() => {}}>content</Wizard>);
     expect(container.querySelector("main")!.className).toContain("pb-[var(--wizard-bar-height)]");
@@ -209,7 +269,8 @@ describe("Wizard", () => {
     const tokens = await Bun.file(new URL("../tokens.css", import.meta.url)).text();
     expect(tokens).toContain("--field-choice-padding: 0.625rem;");
     expect(tokens).toMatch(/:root \[data-wizard-layout="split"\] \{\s*--field-choice-padding: 1.25rem;/);
-    expect(tokens.match(/--wizard-[a-z-]+:|--field-choice-padding:/g)).toHaveLength(5);
+    expect(tokens.match(/--field-choice-padding:/g)).toHaveLength(2);
+    expect(tokens).toContain("--wizard-title-size: clamp(2rem, 3.8vw, 3.5rem);");
     const field = await Bun.file(new URL("../dashboard/components/ui/field.tsx", import.meta.url)).text();
     expect(field).toContain("p-[var(--field-choice-padding)]");
     const { container } = render(<Wizard {...BASE} layout="split">content</Wizard>);

@@ -1,7 +1,7 @@
 // Kit showcase entry for Wizard's centered layout.
 import { Wizard } from "@/kit/primitives/Wizard";
-import { Input } from "@/kit/ui/input";
-import { Label } from "@/kit/ui/label";
+import logo from "@/kit/dashboard/assets/images/logos/darklogo.svg";
+import logoWhite from "@/kit/dashboard/assets/images/logos/whitelogo.svg";
 
 const steps = [
   { id: "household", title: "Household" },
@@ -11,7 +11,7 @@ const steps = [
 
 export function WizardCenteredShowcase() {
   return (
-    <div className="h-[32rem] rounded-lg border border-border">
+    <div className="h-dvh">
       <Wizard
         steps={steps}
         currentStepId="owner"
@@ -20,13 +20,15 @@ export function WizardCenteredShowcase() {
         onBack={() => {}}
         onNext={() => {}}
         layout="centered"
-        heading="Your name"
-        description="Add the name this household should use for you."
+        stepKind="intro"
+        heading="Tell us about your place"
+        eyebrow="Step 1"
+        description="In this step, we'll ask you which type of property you have and if guests will book the entire place or just a room. Then let us know the location and how many guests can stay."
+        stickyFooter
+        progress={{ current: 1, total: 3, label: "Getting started" }}
+        header={<><img src={logo} alt="MaiPai Home" className="h-8 w-auto dark:hidden" /><img src={logoWhite} alt="MaiPai Home" className="hidden h-8 w-auto dark:block" /><button type="button" data-wizard-action>Save and exit</button></>}
       >
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="wizard-showcase-name">Name</Label>
-          <Input id="wizard-showcase-name" defaultValue="alfred" />
-        </div>
+        <div />
       </Wizard>
     </div>
   );

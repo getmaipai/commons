@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.220] - ui-v0.5.220
+
+Adds an intro presentation to `Wizard` centered layout, with a full-width header and footer, vertically centered left-side copy, a large title and lead text, and theme-aware typography and action tokens. Question steps keep a centered 40rem column with 32px headings. `WizardCenteredShowcase` demonstrates the intro layout.
+
 ## [0.5.219] - ui-v0.5.219
 
 Adds an optional `aside` picture to `Wizard`. At the `lg` breakpoint and wider, the wizard uses the left half and the picture fills a sticky right half. Below `lg`, the picture is not mounted, so its image is not requested on phone screens. Without `aside`, existing layouts stay the same.
