@@ -41,6 +41,7 @@ const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
 // turn-stream-event's `block` event $refs the AnswerBlock schema by its relative id.
 ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "answer-block.schema.json"), "utf8")));
+ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "stack-job.schema.json"), "utf8")));
 
 const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "role-request", zod: RoleRequest },
@@ -60,7 +61,7 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
 for (const shape of SHAPES) {
   describe(shape.name, () => {
     const schema = JSON.parse(readFileSync(join(SPEC, "schemas", `${shape.name}.schema.json`), "utf8")) as { $id: string; $schema: string };
-    const validate = ajv.compile(schema);
+    const validate = ajv.getSchema(schema.$id) ?? ajv.compile(schema);
     const fixtures = readdirSync(join(SPEC, "fixtures", shape.name)).filter((entry) => entry.endsWith(".json")).sort();
 
     test("declares its $id under shared/spec and has a valid and an invalid fixture", () => {

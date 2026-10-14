@@ -5,10 +5,12 @@
   "data": {
     "job": "job-1",
     "kind": "model.install",
-    "state": "running",
+    "state": "stalled",
     "percent": 42,
     "completed_bytes": 770000000,
     "total_bytes": 1834426016,
-    "status": "downloading"
+    "status": "stalled; retrying",
+    "bytesPerSecond": 1048576,
+    "items": [{"id":"weights-1","label":"model.gguf","completedBytes":440401920,"totalBytes":1048576000,"state":"stalled"}]
   }
 }

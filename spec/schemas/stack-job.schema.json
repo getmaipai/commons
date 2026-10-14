@@ -10,10 +10,12 @@
     "id": { "type": "string", "minLength": 1 },
     "kind": { "type": "string", "minLength": 1, "description": "The runner's kind: a generator role id (`image`), or a Stack task (`model.install`, `engine.install`, `engine.stage`)." },
     "role": { "type": ["string", "null"], "description": "The role the job serves, when it serves one." },
-    "state": { "type": "string", "enum": ["queued", "running", "waiting_for_you", "paused", "done", "failed", "cancelled"] },
+    "state": { "type": "string", "enum": ["queued", "running", "waiting_for_you", "paused", "stalled", "done", "failed", "cancelled"] },
     "percent": { "type": "integer", "minimum": 0, "maximum": 100 },
     "completedBytes": { "type": "integer", "minimum": 0 },
     "totalBytes": { "type": "integer", "minimum": 0 },
+    "bytesPerSecond": { "type": "number", "minimum": 0, "description": "Smoothed transfer rate in bytes per second, when available." },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/StackJobItem" }, "description": "Optional per-file progress for multi-file downloads." },
     "status": { "type": "string", "description": "A short phrase for the current step (`downloading`, `waiting for memory`, `rendering`)." },
     "position": { "type": ["integer", "null"], "minimum": 1, "description": "The job's place in its role's queue while `queued`, null otherwise." },
     "input": { "type": ["object", "null"], "description": "What was submitted, as given." },
@@ -21,5 +23,19 @@
     "reason": { "type": ["string", "null"], "description": "Why the job failed or was cancelled." },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "StackJobItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "completedBytes", "totalBytes", "state"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "completedBytes": { "type": "integer", "minimum": 0 },
+        "totalBytes": { "type": "integer", "minimum": 0 },
+        "state": { "type": "string", "enum": ["queued", "running", "paused", "stalled", "verifying", "failed", "done"] }
+      }
+    }
   }
 }
