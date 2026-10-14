@@ -35,10 +35,9 @@ interface WizardProps {
   /** Three phase flow: phase names stay visible without step numbers, and
    * each phase control keeps the kit's 48px touch target. */
   phaseMode?: boolean;
-  /** "split" is the roomy one-question-per-screen look: one centered column
-   * on a phone, two panes (hero, heading and description left; the body
-   * right) from the kit's `lg` breakpoint up. "default" is unchanged. */
-  layout?: "default" | "split";
+  /** "centered" keeps the default one-column flow in a centered 40rem-wide
+   * column. "split" uses two panes from the kit's `lg` breakpoint up. */
+  layout?: "default" | "centered" | "split";
   /** When passed, it is the one `h1` and the step title becomes a small
    * caption above it (or is dropped when `progress` is passed). */
   heading?: ReactNode;
@@ -59,7 +58,8 @@ interface WizardProps {
  * three-to-seven-step wizards - the setup wizard's own 9+ steps is
  * exactly the case a task list is for). Rendered as a horizontal strip
  * of numbered steps by default (two panes appear only at wide widths with
- * `layout="split"` and collapse to one column on narrow ones): the default
+ * `layout="centered"` constrains the same flow to a centered 40rem column;
+ * `layout="split"` uses two panes at wide widths): the default
  * works identically at phone width and desktop width with no separate
  * responsive case. A completed step's number is clickable to jump back and change
  * an earlier answer; a step past the current one is named but not yet
@@ -88,6 +88,7 @@ export function Wizard({
 }: WizardProps) {
   const currentIndex = steps.findIndex((s) => s.id === currentStepId);
   const split = layout === "split";
+  const centered = layout === "centered";
   const sticky = stickyFooter ?? split;
   const progressLabel = progress ? (progress.label ?? `Step ${progress.current} of ${progress.total}`) : undefined;
   const progressBar = progress ? (
@@ -130,7 +131,9 @@ export function Wizard({
       nextDisabled={nextDisabled}
       busy={busy}
       split={split}
-      className={sticky ? cn(columnClass, "border-0 py-3") : undefined}
+      className={sticky
+        ? cn(centered ? "mx-auto w-full max-w-[40rem] px-4" : columnClass, "border-0 py-3")
+        : undefined}
     />
   );
   // A fixed, full-width bar with the segmented progress along its top edge.
@@ -175,7 +178,10 @@ export function Wizard({
   }
 
   return (
-    <main className="flex h-full flex-col gap-6 p-6">
+    <main
+      data-wizard-layout={centered ? "centered" : undefined}
+      className={cn("flex h-full flex-col gap-6 p-6", centered && "mx-auto w-full max-w-[40rem]")}
+    >
       {progress ? (
         <div className="flex w-full flex-col gap-2">
           {progressBar}

@@ -19,6 +19,33 @@ describe("Wizard", () => {
 
   const BASE = { steps: STEPS, currentStepId: "b", completedCount: 1, onJumpTo: () => {}, onNext: () => {} };
 
+  test("centered layout keeps one column and constrains it to a centered 40rem width", () => {
+    const { container, getByText, getByRole } = render(
+      <Wizard {...BASE} layout="centered">content</Wizard>,
+    );
+    const main = container.querySelector("main")!;
+    expect(main.getAttribute("data-wizard-layout")).toBe("centered");
+    expect(main.className).toContain("mx-auto");
+    expect(main.className).toContain("w-full");
+    expect(main.className).toContain("max-w-[40rem]");
+    expect(main.className).not.toContain("grid-cols");
+    expect(getByRole("heading", { name: "Owner" })).toBeTruthy();
+    expect(getByText("content")).toBeTruthy();
+    expect(container.querySelector("[data-wizard-bar]")).toBeNull();
+  });
+
+  test("centered sticky footer keeps its controls in the same centered 40rem column", () => {
+    const { container } = render(
+      <Wizard {...BASE} layout="centered" stickyFooter>content</Wizard>,
+    );
+    const bar = container.querySelector("[data-wizard-bar]")!;
+    const footer = bar.firstElementChild!;
+    expect(bar.className).toContain("fixed");
+    expect(footer.className).toContain("mx-auto");
+    expect(footer.className).toContain("max-w-[40rem]");
+    expect(footer.className).not.toContain("lg:max-w-none");
+  });
+
   test("split layout renders both panes in DOM order and gates the two-pane grid on lg:", () => {
     const { container, getByTestId } = render(
       <Wizard {...BASE} layout="split" hero={<div data-testid="hero">Hi</div>} heading="Your home" description="Short">
