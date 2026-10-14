@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useMediaQuery } from "usehooks-ts";
 import { Button } from "@/kit/ui/button";
 import { getIcon } from "@/kit/icons";
 import { cn, FOCUS_RING } from "@/kit/utils";
@@ -22,6 +23,8 @@ interface WizardProps {
   onJumpTo: (id: string) => void;
   children: ReactNode;
   banner?: ReactNode;
+  /** Optional full-height picture beside a single-column wizard; it is not mounted below `lg`. */
+  aside?: ReactNode;
   onBack?: () => void;
   onNext: () => void;
   /** "Skip says what it means" (plan 6.4) - the caller supplies the real
@@ -57,13 +60,13 @@ interface WizardProps {
  * progress rail with a remaining-count, which the pattern reserves for
  * three-to-seven-step wizards - the setup wizard's own 9+ steps is
  * exactly the case a task list is for). Rendered as a horizontal strip
- * of numbered steps by default (two panes appear only at wide widths with
- * `layout="centered"` constrains the same flow to a centered 40rem column;
- * `layout="split"` uses two panes at wide widths): the default
- * works identically at phone width and desktop width with no separate
- * responsive case. A completed step's number is clickable to jump back and change
- * an earlier answer; a step past the current one is named but not yet
- * reachable. */
+ * of numbered steps by default. `layout="centered"` constrains the flow
+ * to a centered 40rem column; `layout="split"` uses two panes at wide
+ * widths. Passing `aside` puts the single-column wizard flow on the left
+ * and mounts the picture on the right at `lg` and wider. Without `aside`,
+ * the default works identically at phone and desktop widths. A completed
+ * step's number is clickable to jump back and change an earlier answer;
+ * a step past the current one is named but not yet reachable. */
 export function Wizard({
   steps,
   currentStepId,
@@ -71,6 +74,7 @@ export function Wizard({
   onJumpTo,
   children,
   banner,
+  aside,
   onBack,
   onNext,
   skipLabel,
@@ -87,6 +91,7 @@ export function Wizard({
   progress,
 }: WizardProps) {
   const currentIndex = steps.findIndex((s) => s.id === currentStepId);
+  const showAside = useMediaQuery("(min-width: 64rem)", { defaultValue: false, initializeWithValue: false });
   const split = layout === "split";
   const centered = layout === "centered";
   const sticky = stickyFooter ?? split;
@@ -140,7 +145,7 @@ export function Wizard({
   const bar = sticky ? (
     <div
       data-wizard-bar
-      className="fixed inset-x-0 bottom-0 z-10 flex flex-col justify-end border-t border-border bg-background"
+      className={cn("fixed inset-x-0 bottom-0 z-10 flex flex-col justify-end border-t border-border bg-background", aside && "lg:right-1/2")}
       style={{ minHeight: "var(--wizard-bar-height)" }}
     >
       {progressBar ? <div className="w-full">{progressBar}</div> : null}
@@ -150,15 +155,9 @@ export function Wizard({
     footer
   );
 
-  if (split) {
-    return (
-      <main
-        data-wizard-layout="split"
-        className={cn(
-          "relative mx-auto grid min-h-dvh w-full max-w-[var(--wizard-column-max)] grid-cols-1 content-start gap-[var(--wizard-section-gap)] px-4 pt-[var(--wizard-section-gap)] lg:max-w-none lg:grid-cols-2 lg:content-center lg:items-center lg:gap-x-16 lg:px-12",
-          sticky && "pb-[var(--wizard-bar-height)]",
-        )}
-      >
+  if (split && !aside) {
+    const content = (
+      <>
         {!progress ? (
           <ol className="flex flex-wrap items-center gap-x-1 gap-y-2 lg:col-span-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
             {stepItems()}
@@ -173,6 +172,51 @@ export function Wizard({
           {children}
         </div>
         {sticky ? bar : <div className="lg:col-span-2">{footer}</div>}
+      </>
+    );
+    return (
+      <main
+        data-wizard-layout="split"
+        className={cn(
+          "relative mx-auto grid min-h-dvh w-full max-w-[var(--wizard-column-max)] grid-cols-1 content-start gap-[var(--wizard-section-gap)] px-4 pt-[var(--wizard-section-gap)] lg:max-w-none lg:grid-cols-2 lg:content-center lg:items-center lg:gap-x-16 lg:px-12",
+          sticky && "pb-[var(--wizard-bar-height)]",
+        )}
+      >
+        {content}
+      </main>
+    );
+  }
+
+  if (aside) {
+    return (
+      <main
+        data-wizard-layout={centered ? "centered" : "aside"}
+        className="grid min-h-dvh w-full grid-cols-1 lg:grid-cols-2"
+      >
+        <div className={cn("mx-auto flex min-h-dvh w-full flex-col gap-6 p-6", centered && "max-w-[40rem]")}>
+          {progress ? (
+            <div className="flex w-full flex-col gap-2">
+              {progressBar}
+              <span className="text-sm text-muted-foreground">{progressLabel}</span>
+            </div>
+          ) : (
+            <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
+              {stepItems()}
+            </ol>
+          )}
+          {banner}
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
+          <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
+            {heads}
+            {children}
+          </div>
+          {bar}
+        </div>
+        {showAside ? (
+          <aside data-wizard-aside className="sticky top-0 h-dvh min-w-0 overflow-hidden bg-muted">
+            <div className="h-full w-full [&_img]:h-full [&_img]:w-full [&_img]:object-cover">{aside}</div>
+          </aside>
+        ) : null}
       </main>
     );
   }

@@ -7,6 +7,8 @@ permission renderers, and the UI-schema renderer. See
 and [docs/spec.md](docs/spec.md) for the approved design specification
 this kit implements.
 
+For the Wizard's responsive picture aside, see [docs/wizard.md](docs/wizard.md).
+
 Since 2026-09-21 the kit also carries two upstream snapshots used
 exactly as they ship, pinned and attributed in
 [docs/dashboard-upstream.md](docs/dashboard-upstream.md) and

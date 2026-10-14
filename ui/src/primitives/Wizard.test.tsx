@@ -1,5 +1,5 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
-import { render, cleanup, fireEvent } from "@testing-library/react";
+import { render, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { Wizard, type WizardStep } from "@/kit/primitives/Wizard";
 import { Progress } from "@/kit/primitives/Progress";
 
@@ -18,6 +18,27 @@ describe("Wizard", () => {
   });
 
   const BASE = { steps: STEPS, currentStepId: "b", completedCount: 1, onJumpTo: () => {}, onNext: () => {} };
+
+  async function withViewport(width: number, check: (container: HTMLElement) => void) {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: query === "(min-width: 64rem)" && width >= 1024,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    })) as typeof window.matchMedia;
+    try {
+      const { container } = render(<Wizard {...BASE} aside={<img src="/wizard-aside.jpg" alt="A hillside home" />}>content</Wizard>);
+      await waitFor(() => check(container));
+    } finally {
+      cleanup();
+      window.matchMedia = originalMatchMedia;
+    }
+  }
 
   test("centered layout keeps one column and constrains it to a centered 40rem width", () => {
     const { container, getByText, getByRole } = render(
@@ -44,6 +65,27 @@ describe("Wizard", () => {
     expect(footer.className).toContain("mx-auto");
     expect(footer.className).toContain("max-w-[40rem]");
     expect(footer.className).not.toContain("lg:max-w-none");
+  });
+
+  test("aside is not rendered below lg, so its image is not requested on a phone", async () => {
+    await withViewport(1023, (container) => {
+      expect(container.querySelector("[data-wizard-aside]")).toBeNull();
+      expect(container.querySelector("img")).toBeNull();
+      expect(container.querySelector("main")!.className).toContain("grid-cols-1");
+    });
+  });
+
+  test("aside fills the sticky right column at lg", async () => {
+    await withViewport(1024, (container) => {
+      const main = container.querySelector("main")!;
+      const aside = container.querySelector("[data-wizard-aside]")!;
+      const imageFrame = aside.firstElementChild!;
+      expect(main.className).toContain("lg:grid-cols-2");
+      expect(aside.className).toContain("sticky");
+      expect(aside.className).toContain("h-dvh");
+      expect(imageFrame.className).toContain("[&_img]:object-cover");
+      expect(imageFrame.querySelector("img")?.getAttribute("src")).toBe("/wizard-aside.jpg");
+    });
   });
 
   test("split layout renders both panes in DOM order and gates the two-pane grid on lg:", () => {

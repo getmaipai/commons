@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.219] - ui-v0.5.219
+
+Adds an optional `aside` picture to `Wizard`. At the `lg` breakpoint and wider, the wizard uses the left half and the picture fills a sticky right half. Below `lg`, the picture is not mounted, so its image is not requested on phone screens. Without `aside`, existing layouts stay the same.
+
 ## [0.5.218] - ui-v0.5.218
 
 Adds `layout="centered"` to `Wizard`, keeping the default single-column flow in a centered column with a 40rem maximum width. The `default` and `split` layouts are unchanged. `WizardCenteredShowcase` demonstrates the centered layout.
