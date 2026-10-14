@@ -32,6 +32,15 @@ const rowNames = (view: ReturnType<typeof render>) =>
   view.getAllByRole("menuitem").map((el) => (el.textContent ?? "").replace(/\s+/g, " ").trim());
 
 describe("KIT-SET-04 homeSettings row", () => {
+  test("profile menu trigger renders data-tour when tourId is set; renders no data-tour attribute otherwise", () => {
+    const view = render(<MemoryRouter><TooltipProvider><RailProfileMenu displayName="Sage" tourId="shell.profile" /></TooltipProvider></MemoryRouter>);
+    const trigger = view.getByRole("button", { name: /Open profile menu/ });
+    expect(trigger.getAttribute("data-tour")).toBe("shell.profile");
+    cleanup();
+    const plain = render(<MemoryRouter><TooltipProvider><RailProfileMenu displayName="Sage" /></TooltipProvider></MemoryRouter>);
+    expect(plain.getByRole("button", { name: /Open profile menu/ }).hasAttribute("data-tour")).toBe(false);
+  });
+
   test("no homeSettings prop draws no Home settings row", async () => {
     const view = await openMenu({});
     expect(rowNames(view).some((n) => n.includes("Home settings"))).toBe(false);

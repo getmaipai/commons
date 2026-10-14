@@ -24,11 +24,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ composerDensity, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter }: { composerDensity?: "compact"; composerNoticeLayout?: "wrap"; composerNoticeReserve?: boolean; ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter }) {
+function Harness({ composerDensity, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter, tourId, composerTourId, sendButtonTourId }: { composerDensity?: "compact"; composerNoticeLayout?: "wrap"; composerNoticeReserve?: boolean; ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter; tourId?: string; composerTourId?: string; sendButtonTourId?: string }) {
   const runtime = useLocalRuntime(runAdapter ?? (error ? failingAdapter : adapter));
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={composerDensity || composerNoticeLayout || composerNoticeReserve || ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { composerDensity, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
+      <Thread components={composerDensity || composerNoticeLayout || composerNoticeReserve || ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { composerDensity, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} tourId={tourId} composerTourId={composerTourId} sendButtonTourId={sendButtonTourId} />
     </AssistantRuntimeProvider>
   );
 }
@@ -46,6 +46,18 @@ async function sendFailingTurn(getByRole: (role: string, opts: { name: string })
 }
 
 describe("Thread's MessageError slot", () => {
+  test("thread, composer and send button render data-tour when tourId is set; render no data-tour attribute otherwise", () => {
+    const view = render(<Harness tourId="chat.thread" composerTourId="chat.composer" sendButtonTourId="chat.send" />);
+    expect(document.querySelector(".aui-thread-root")?.getAttribute("data-tour")).toBe("chat.thread");
+    expect(document.querySelector(".aui-composer-root")?.getAttribute("data-tour")).toBe("chat.composer");
+    expect(view.getByRole("button", { name: "Send message" }).getAttribute("data-tour")).toBe("chat.send");
+    cleanup();
+    const plain = render(<Harness />);
+    expect(document.querySelector(".aui-thread-root")?.hasAttribute("data-tour")).toBe(false);
+    expect(document.querySelector(".aui-composer-root")?.hasAttribute("data-tour")).toBe(false);
+    expect(plain.getByRole("button", { name: "Send message" }).hasAttribute("data-tour")).toBe(false);
+  });
+
   test("a MessageError slot replaces the default error block", async () => {
     function CustomMessageError() {
       return <MessagePrimitive.Error><div data-testid="message-error-slot">Custom failure</div></MessagePrimitive.Error>;

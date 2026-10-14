@@ -288,12 +288,13 @@ export const ThreadListSearch = forwardRef<
 ThreadListSearch.displayName = "ThreadListSearch";
 
 export const ThreadListRoot: FC<
-  ComponentPropsWithoutRef<typeof ThreadListPrimitive.Root> & { density?: ThreadListDensity }
-> = ({ className, density = "default", ...props }) => {
+  ComponentPropsWithoutRef<typeof ThreadListPrimitive.Root> & { density?: ThreadListDensity; tourId?: string }
+> = ({ className, density = "default", tourId, ...props }) => {
   return (
     <ThreadListPrimitive.Root
       data-slot="aui_thread-list-root"
       data-density={density}
+      data-tour={tourId}
       className={cn("flex flex-col", density === "compact" ? "gap-0" : "gap-0.5", className)}
       {...props}
     />
@@ -941,8 +942,8 @@ const ThreadListProjectRow: FC<{
 
 export const ThreadListNew = forwardRef<
   HTMLButtonElement,
-  ComponentPropsWithoutRef<typeof Button> & { labelClassName?: string; label?: string; density?: ThreadListDensity }
->(({ className, labelClassName, children, label = "New chat", density = "default", ...props }, ref) => {
+  ComponentPropsWithoutRef<typeof Button> & { labelClassName?: string; label?: string; density?: ThreadListDensity; tourId?: string }
+>(({ className, labelClassName, children, label = "New chat", density = "default", tourId, ...props }, ref) => {
   return (
     <ThreadListPrimitive.New asChild>
       <Button
@@ -950,6 +951,7 @@ export const ThreadListNew = forwardRef<
         variant="ghost"
         data-slot="aui_thread-list-new"
         data-density={density}
+        data-tour={tourId}
         className={cn(
           "hover:bg-muted data-active:bg-muted justify-start text-sm font-normal",
           density === "compact"

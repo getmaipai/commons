@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.204] - ui-v0.5.204
+
+Adds optional `tourId` targets to the shell rail, profile menu trigger and chat thread root. Existing chat composer and thread list roots already forward `data-*` props.
+
 ## [0.5.203] - ui-v0.5.203
 
 Adds the `Tour` primitive on React Joyride 3.2.0. Tours use kit `Card`, `Button` and `Progress` parts, adapt placement for phones, honor reduced motion, announce step counts, and report missing targets.

@@ -17,6 +17,7 @@ import { STATUS_TONE_BG } from "../../../../../ui/status-colors";
 export type RailStatusLevel = "online" | "maintenance" | "degraded" | "offline";
 
 export interface RailProfileMenuProps {
+  tourId?: string;
   /** The signed-in person's real name; never a demo identity. */
   displayName: string;
   /** A second identity line (the person's role, for Home). */
@@ -86,6 +87,7 @@ export default function RailProfileMenu({
   helpHref,
   onLogout,
   children,
+  tourId,
 }: RailProfileMenuProps) {
   const statusProblem = status !== undefined && (status.level === "degraded" || status.level === "offline");
   const count = (notifications?.count ?? 0) + extraAttention;
@@ -115,6 +117,7 @@ export default function RailProfileMenu({
               <DropdownMenuTrigger
                 aria-label={label}
                 data-slot="rail-profile-trigger"
+                data-tour={tourId}
                 className={cn("relative flex size-[var(--rail-button,40px)] cursor-pointer items-center justify-center rounded-lg hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-popup-open:bg-foreground/10", hitArea(1))}
               />
             }

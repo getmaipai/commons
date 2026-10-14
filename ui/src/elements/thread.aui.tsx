@@ -203,6 +203,8 @@ export type ComposerDensity = "compact";
 export type ComposerNoticeLayout = "truncate" | "wrap";
 
 export type ThreadComponents = {
+  composerTourId?: string | undefined;
+  sendButtonTourId?: string | undefined;
   markdown?: Pick<MarkdownTextProps, "components" | "preprocess" | "remend" | "allowedImagePrefixes" | "trustedLinks"> | undefined;
   /** assistant-ui viewport behavior. Defaults preserve the kit's top anchor. */
   viewport?: ThreadViewportOptions | undefined;
@@ -305,6 +307,10 @@ const taskAwareGroupBy = (
 };
 
 export type ThreadProps = {
+  /** Optional tour target id applied to the thread root. */
+  tourId?: string;
+  composerTourId?: string;
+  sendButtonTourId?: string;
   components?: ThreadComponents | undefined;
   autoFocus?: boolean | undefined;
   // Set while the caller's own temporary/incognito mode is armed for the
@@ -373,6 +379,9 @@ const ThreadHistorySkeleton: FC = () => (
 );
 
 export const Thread: FC<ThreadProps> = ({
+  tourId,
+  composerTourId,
+  sendButtonTourId,
   components = EMPTY_COMPONENTS,
   autoFocus = true,
   temporary = false,
@@ -381,17 +390,18 @@ export const Thread: FC<ThreadProps> = ({
   const isEmpty = useAuiState(isNewChatView);
 
   return (
-    <ThreadComponentsContext.Provider value={components}>
-      <ThreadRoot isEmpty={isEmpty} autoFocus={autoFocus} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} />
+    <ThreadComponentsContext.Provider value={{ ...components, composerTourId, sendButtonTourId }}>
+      <ThreadRoot isEmpty={isEmpty} autoFocus={autoFocus} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} tourId={tourId} />
     </ThreadComponentsContext.Provider>
   );
 };
 
-const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean; scrollToBottomOffset: number }> = ({
+const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean; scrollToBottomOffset: number; tourId?: string }> = ({
   isEmpty,
   autoFocus,
   temporary,
   scrollToBottomOffset,
+  tourId,
 }) => {
   const { Welcome = ThreadWelcome, WelcomeContent, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity, engineDown, BelowComposer, BelowComposerContent, emptyLayout } = useContext(ThreadComponentsContext);
   const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
@@ -414,6 +424,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
   return (
     <ThreadViewportElementContext.Provider value={viewportElement}>
     <ThreadPrimitive.Root
+      data-tour={tourId}
       data-density={composerDensity}
       className={cn(
         "aui-root aui-thread-root bg-background @container flex h-full flex-col",
@@ -912,13 +923,13 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 );
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerNoticeLayout, composerNoticeReserve, composerPlaceholder } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerNoticeLayout, composerNoticeReserve, composerPlaceholder, composerTourId } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
   const multiline = useMultiline(shellRef, composerDensity === "compact");
   return (
-    <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
+    <ComposerPrimitive.Root data-tour={composerTourId} className="aui-composer-root relative flex w-full flex-col">
       <ComposerPrimitive.AttachmentDropzone asChild>
         <div
           ref={shellRef}
@@ -959,7 +970,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
 };
 
 const ComposerAction: FC = () => {
-  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd, sendHeld: sendHeldProp } = useContext(ThreadComponentsContext);
+  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd, sendHeld: sendHeldProp, sendButtonTourId } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   return (
@@ -1013,6 +1024,7 @@ const ComposerAction: FC = () => {
               variant="default"
               size="icon"
               className="aui-composer-send size-7 rounded-full"
+              data-tour={sendButtonTourId}
               aria-label="Send message"
               disabled
             >
@@ -1027,6 +1039,7 @@ const ComposerAction: FC = () => {
                 variant="default"
                 size="icon"
                 className="aui-composer-send size-7 rounded-full"
+                data-tour={sendButtonTourId}
                 aria-label="Send message"
               >
                 <ArrowUpIcon className="aui-composer-send-icon size-4" />

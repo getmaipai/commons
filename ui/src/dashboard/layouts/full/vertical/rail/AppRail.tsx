@@ -13,6 +13,7 @@ import HeaderSearch, { type HeaderSearchProps } from "../header/HeaderSearch";
 export type RailItemStatus = (item: { name: string; url?: string }) => { title: string; ariaLabel: string; level?: RailStatusLevel } | undefined;
 
 export interface AppRailProps {
+  tourId?: string;
   /** The host's own search over its records, threaded to the shipped
    * HeaderSearch dialog the rail's Search button opens. */
   searchRemote?: HeaderSearchProps["remote"];
@@ -80,7 +81,7 @@ function ItemTooltip({ name, status }: { name: string; status: ReturnType<RailIt
   );
 }
 
-export default function AppRail({ searchRemote, itemStatus, profile, activeAppHref }: AppRailProps) {
+export default function AppRail({ searchRemote, itemStatus, profile, activeAppHref, tourId }: AppRailProps) {
   const { pathname } = useLocation();
   const all = SidebarContent.flatMap((section) => flatten(section.items));
   // The brand mark is the Home destination (owner, 2026-10-06: "replace
@@ -101,6 +102,7 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
     <nav
       aria-label="Primary navigation"
       data-slot="app-rail"
+      data-tour={tourId}
       className="sticky top-0 flex h-svh w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)] shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2"
     >
       {home ? (

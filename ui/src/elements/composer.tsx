@@ -109,10 +109,11 @@ export function applyMention(value: string, name: string): string {
   return value.replace(/@[\w]*$/, `@${name} `);
 }
 
-export function Composer({ className, ...props }: ComponentProps<"div">) {
+export function Composer({ className, tourId, ...props }: ComponentProps<"div"> & { tourId?: string }) {
   return (
     <div
       data-slot="composer"
+      data-tour={tourId}
       className={cn("relative w-full max-w-lg", className)}
       {...props}
     />

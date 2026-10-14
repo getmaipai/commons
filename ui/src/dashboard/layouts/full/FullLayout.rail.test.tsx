@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import FullLayout from "./FullLayout";
 import { TooltipProvider } from "../../components/ui/tooltip";
-import { isRailItemActive, railHref } from "./vertical/rail/AppRail";
+import AppRail, { isRailItemActive, railHref } from "./vertical/rail/AppRail";
 import RailProfileMenu from "./vertical/rail/RailProfileMenu";
 import { useHeaderExtra } from "./vertical/header/HeaderExtraContext";
 
@@ -34,6 +34,14 @@ function renderRail(path: string, profile = <RailProfileMenu displayName="Sage W
 }
 
 describe("RAIL-01 app rail", () => {
+  test("shell rail renders data-tour when tourId is set; renders no data-tour attribute otherwise", () => {
+    const view = render(<MemoryRouter><TooltipProvider><AppRail tourId="shell.rail" /></TooltipProvider></MemoryRouter>);
+    expect(view.getByRole("navigation", { name: "Primary navigation" }).getAttribute("data-tour")).toBe("shell.rail");
+    cleanup();
+    const plain = render(<MemoryRouter><TooltipProvider><AppRail /></TooltipProvider></MemoryRouter>);
+    expect(plain.getByRole("navigation", { name: "Primary navigation" }).hasAttribute("data-tour")).toBe(false);
+  });
+
   test("a 56px rail with each app named, the current one marked, Search and the profile at the foot", () => {
     const view = renderRail("/chat");
     const rail = view.getByRole("navigation", { name: "Primary navigation" });
