@@ -1,3 +1,7 @@
+## [spec-v0.1.132] - 2026-10-13
+
+- SPEC-SETUP-STATE-01 and SPEC-TOUR-01. Added `SetupState` for setup source, step status, phase, engine location and hardware, away choice, plan references, health checks and timestamps; `HeroSlide` for slide image, heading, copy source, teaching point, audience and order. Added `Tour` and `TourProgress` schemas for package-declared tours and per-person completion, tour declarations on package manifests, and the `tours.autostart.enabled` setting.
+
 ## [spec-v0.1.131] - 2026-10-12
 
 - `ease.preset` is labelled "Comfort style", not "Look": the Appearance page already has a theme row called "Look", and two rows with one name on the same page read as a mistake. Nothing else changed.
