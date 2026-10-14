@@ -664,6 +664,286 @@
     ]
   },
   {
+    "key": "engines.chat.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.chat"
+    },
+    "default": "auto",
+    "label": "Chat model choice",
+    "help": "Choose the model for the Chat role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs chat work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.router.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.router"
+    },
+    "default": "auto",
+    "label": "Router model choice",
+    "help": "Choose the model for the Router role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs router work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.embed.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.embed"
+    },
+    "default": "auto",
+    "label": "Embed model choice",
+    "help": "Choose the model for the Embed role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs embed work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.rerank.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.rerank"
+    },
+    "default": "auto",
+    "label": "Rerank model choice",
+    "help": "Choose the model for the Rerank role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs rerank work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.vision.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.vision"
+    },
+    "default": "auto",
+    "label": "Vision model choice",
+    "help": "Choose the model for the Vision role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs vision work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.image.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.image"
+    },
+    "default": "auto",
+    "label": "Image model choice",
+    "help": "Choose the model for the Image role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs image work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.video.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.video"
+    },
+    "default": "auto",
+    "label": "Video model choice",
+    "help": "Choose the model for the Video role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs video work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.music.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.music"
+    },
+    "default": "auto",
+    "label": "Music model choice",
+    "help": "Choose the model for the Music role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs music work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.coding.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.coding"
+    },
+    "default": "auto",
+    "label": "Coding model choice",
+    "help": "Choose the model for the Coding role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs coding work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.judge.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.judge"
+    },
+    "default": "auto",
+    "label": "Judge model choice",
+    "help": "Choose the model for the Judge role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs judge work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.tts.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.tts"
+    },
+    "default": "auto",
+    "label": "Tts model choice",
+    "help": "Choose the model for the Tts role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs tts work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.stt.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.stt"
+    },
+    "default": "auto",
+    "label": "Stt model choice",
+    "help": "Choose the model for the Stt role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs stt work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.wakeword.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.wakeword"
+    },
+    "default": "auto",
+    "label": "Wakeword model choice",
+    "help": "Choose the model for the Wakeword role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs wakeword work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.turn_signal.choice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "models.turn_signal"
+    },
+    "default": "auto",
+    "label": "Turn Signal model choice",
+    "help": "Choose the model for the Turn Signal role. Auto follows the selected setup plan. Only an admin can change this.",
+    "copy": {
+      "does": "Directs turn signal work to its selected package."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "engines.stack.remote.allow_tailnet",
     "scope": "household",
     "selector": "boolean",
@@ -3262,6 +3542,72 @@
     "level": "basic",
     "secret": false,
     "lives_in": "household.topics",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "network.hub_port",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 1,
+      "max": 65535,
+      "step": 1
+    },
+    "default": 3000,
+    "label": "Home network port",
+    "help": "The port Home listens on. Changing it needs a restart and changes the address devices use. Only an admin can change this.",
+    "copy": {
+      "does": "Controls where devices connect to Home."
+    },
+    "level": "expert",
+    "secret": false,
+    "lives_in": "household.network",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "network.lan_exposure",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "loopback",
+        "lan"
+      ]
+    },
+    "default": "lan",
+    "label": "Who can reach Home",
+    "help": "Loopback keeps Home on this computer. LAN lets devices on your home network connect. Changing this needs a restart. Only an admin can change this.",
+    "copy": {
+      "does": "Chooses whether Home is reachable only on this computer or across your home network.",
+      "options": {
+        "loopback": "Only this computer can connect.",
+        "lan": "Devices on your home network can connect."
+      }
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.network",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "network.tailnet_access",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Away access through Tailscale",
+    "help": "Lets your devices reach Home through your private Tailscale network. Tailscale sees device names and addresses, not your conversations. Home never turns this on for you. Only an admin can change this.",
+    "copy": {
+      "does": "Lets your devices reach Home through your Tailscale network."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.network",
     "honoured_by": [
       "home"
     ]

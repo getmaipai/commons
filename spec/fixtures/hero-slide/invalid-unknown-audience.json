@@ -1,0 +1,9 @@
+{
+  "id": "hero.home",
+  "image": "maipai-home-logo-light.png",
+  "heading": "Your own AI at home",
+  "copy_source": "copy:home",
+  "teaches": "What Home is",
+  "audience": "household",
+  "order": 0
+}

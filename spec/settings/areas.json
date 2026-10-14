@@ -299,6 +299,12 @@
           "sections": [
             "developer"
           ]
+        },
+        {
+          "label": "Network and access",
+          "sections": [
+            "network"
+          ]
         }
       ],
       "sections": [
@@ -611,9 +617,40 @@
               "levels": [
                 "expert"
               ]
+            },
+            {
+              "label": "Network port",
+              "group": "household.network",
+              "scope": "household",
+              "levels": [
+                "expert"
+              ]
             }
           ],
           "trail_view": "home.routing_stats"
+        },
+        {
+          "id": "network",
+          "label": "Network and access",
+          "icon": "network",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Network",
+              "group": "household.network",
+              "scope": "household",
+              "levels": [
+                "basic",
+                "advanced"
+              ]
+            }
+          ],
+          "keywords": [
+            "port",
+            "local network",
+            "tailnet",
+            "tailscale"
+          ]
         }
       ]
     },

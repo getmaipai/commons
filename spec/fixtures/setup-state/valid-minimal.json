@@ -1,0 +1,35 @@
+{
+  "id": "setup-hub",
+  "source": "wizard",
+  "steps": [
+    {
+      "id": "welcome",
+      "status": "done",
+      "at": "2026-10-13T12:00:00Z"
+    },
+    {
+      "id": "checks",
+      "status": "running",
+      "at": "2026-10-13T12:01:00Z"
+    }
+  ],
+  "phase": "computers",
+  "engine": {
+    "where": "this_computer",
+    "hardware": {
+      "memory_bytes": 17179869184
+    }
+  },
+  "away": "later",
+  "plan": {
+    "option": "recommended",
+    "tier": "moderate",
+    "roles": [
+      "engines.chat.choice"
+    ]
+  },
+  "checks": [],
+  "started_at": "2026-10-13T12:00:00Z",
+  "completed_at": null,
+  "hlc": "1791892800000:0:hubnode"
+}

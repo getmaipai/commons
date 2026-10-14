@@ -66,7 +66,7 @@ describe("spec/settings/areas.json", () => {
   test("Home settings groups household sections and names its admin views", () => {
     expect(area("home").groups.map((group) => group.label)).toEqual([
       "General", "People", "Engines and AI", "Devices", "Search", "Integrations", "Commands", "Voices",
-      "Storage and backups", "Maintenance", "Privacy", "Developer",
+      "Storage and backups", "Maintenance", "Privacy", "Developer", "Network and access",
     ]);
     expect(section("home", "ai").trail_view).toBe("home.engine_admin");
     expect(section("home", "robot").trail_view).toBe("home.devices_admin");
@@ -415,8 +415,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("no key was added or removed, and scope, default and level are untouched (pinned counts)", () => {
-    expect(registry).toHaveLength(162);
-    expect(new Set(registryIds()).size).toBe(162);
+    expect(registry).toHaveLength(179);
+    expect(new Set(registryIds()).size).toBe(179);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",

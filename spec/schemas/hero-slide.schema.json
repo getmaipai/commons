@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/hero-slide.schema.json",
+  "title": "HeroSlide",
+  "description": "One slide shown in the setup wait carousel and in What Home can do.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "image",
+    "heading",
+    "copy_source",
+    "teaches",
+    "audience",
+    "order"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^hero\\.[a-z][a-z0-9-]*$"
+    },
+    "image": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A file name from brand/, bundled at build time."
+    },
+    "heading": {
+      "type": "string",
+      "minLength": 1
+    },
+    "copy_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A COPY.md key resolved at build time."
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Proposed copy; present only when copy_source is proposed."
+    },
+    "copy_source": {
+      "type": "string",
+      "pattern": "^(copy:[a-z][a-z0-9_-]*|doc:[A-Za-z0-9._/-]+|proposed)$",
+      "description": "Origin of the slide text: a COPY.md key, a document, or proposed copy."
+    },
+    "teaches": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "all",
+        "adult",
+        "admin"
+      ]
+    },
+    "available_when": {
+      "type": "string",
+      "minLength": 1
+    },
+    "order": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "copy_source": {
+            "pattern": "^copy:"
+          }
+        },
+        "required": [
+          "copy_source"
+        ]
+      },
+      "then": {
+        "required": [
+          "copy_ref"
+        ],
+        "properties": {
+          "text": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "copy_source": {
+            "pattern": "^doc:"
+          }
+        },
+        "required": [
+          "copy_source"
+        ]
+      },
+      "then": {
+        "properties": {
+          "copy_ref": false,
+          "text": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "copy_source": {
+            "const": "proposed"
+          }
+        },
+        "required": [
+          "copy_source"
+        ]
+      },
+      "then": {
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "copy_ref": false
+        }
+      }
+    }
+  ]
+}
