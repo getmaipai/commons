@@ -93,6 +93,15 @@ async function detectOsVersion(): Promise<string> {
   }
 }
 
+/** Free and total bytes of the filesystem a path lives on, from `statfsSync`.
+ * The one formula for disk space in core: `detectHardware` and `diskFacts`
+ * both call it. `freeBytes` is what a non-root process can use (`bavail`).
+ * Throws the filesystem's error when the path cannot be read. */
+export function diskSpace(path: string): { freeBytes: number; totalBytes: number } {
+  const disk = statfsSync(path);
+  return { freeBytes: disk.bavail * disk.bsize, totalBytes: disk.blocks * disk.bsize };
+}
+
 export interface DetectHardwareOptions {
   /** When given, freeDiskBytes/totalDiskBytes are computed for the
    * filesystem this path lives on (a caller's own data directory).
@@ -125,7 +134,7 @@ export async function detectHardware(options: DetectHardwareOptions = {}): Promi
   const totalRamGb = Math.round(os.totalmem() / 1_073_741_824);
   const isAppleSilicon = detectIsAppleSilicon();
   const cudaDevices = isAppleSilicon ? [] : await detectCudaDevices();
-  const disk = options.diskPath ? statfsSync(options.diskPath) : null;
+  const disk = options.diskPath ? diskSpace(options.diskPath) : null;
   const info: HardwareInfo = {
     computerName: os.hostname().replace(/\.local$/i, ""),
     platform: process.platform,
@@ -139,8 +148,8 @@ export async function detectHardware(options: DetectHardwareOptions = {}): Promi
     // path.
     unifiedMemoryGb: isAppleSilicon ? totalRamGb : 0,
     cudaDevices,
-    freeDiskBytes: disk ? disk.bavail * disk.bsize : undefined,
-    totalDiskBytes: disk ? disk.blocks * disk.bsize : undefined,
+    freeDiskBytes: disk?.freeBytes,
+    totalDiskBytes: disk?.totalBytes,
     osVersion: await detectOsVersion(),
   };
   cache.set(cacheKey, { at: now(), info });

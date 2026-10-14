@@ -27,6 +27,8 @@ A consumer adds `"@maipai/core": "file:../../shared/core"` to its `package.json`
 | `secrets` | Provides reversible AES-256-GCM encryption for credentials with operator-set or keystore-managed keys. |
 | `singleflight` | Shares one in-flight promise among concurrent callers and clears it when the attempt completes. |
 | `ssrfGuard` | Rejects fetch targets resolving to private, loopback, or link-local addresses before making a request. |
+| `diskFacts` | Reads what kind of disk a folder is on (type, internal/external/network, SSD or spinning, physical disk, noexec, space); anything the OS does not say is "unknown". |
+| `probes` | Small real tests of a folder (write, exec, symlink, hardlink, file over 4 GB, permissions), each cleaning up, optionally as another account. |
 | `volumeIdentity` | Reads which volume a folder is on (macOS, Linux, Windows, network shares) and finds a recorded volume again under whatever mount point it has now. |
 | `withTimeout` | Races a promise against a timeout rejection and clears the timer in either outcome. |
 | `zip` | Writes small dependency-free stored ZIP archives for text entries without compression. |

@@ -5,6 +5,29 @@ All notable changes to the `core` workspace. Format follows
 tagged `core-vX.Y.Z`. Everything stays `0.x` until Home's and the Stack's
 adoption proves it.
 
+## [0.1.5] - core-v0.1.5
+
+### Added
+- `diskFacts(path)` (DATA-LOCATION-00d): filesystem type, internal, external
+  or network, solid-state or spinning, the physical disk, `noexec`, macOS
+  "ignore ownership", and free and total bytes; any fact the OS does not
+  report is `"unknown"`. It composes `volumeIdentity`'s tools: those parsers
+  gain `Internal`, `RemovableMediaOrExternalDevice`, `SolidState`, the APFS
+  physical store and `GlobalPermissionsEnabled` (macOS), findmnt `OPTIONS` and
+  an `lsblk -s` query (Linux), and `FileSystemType`, `DriveType`,
+  `Get-Partition`/`Get-Disk`/`Get-PhysicalDisk` (Windows).
+- `probeWrite`, `probeExec`, `probeSymlink`, `probeHardlink`,
+  `probeLargeFile` (sparse file past 4 GB) and `probePermissions`, each
+  removing what it created, with an optional `runAs` account.
+- `diskSpace(path)` in `hardware`: the one free/total formula, now also used by
+  `detectHardware`.
+- Declined: `systeminformation` and `check-disk-space`, which would duplicate
+  tools core already owns (org principle 1).
+
+### Changed
+- `parseDiskutilInfo`, `parseFindmnt` and `parseWindowsVolumes` return more
+  fields (additive); `findmntInvocation` also asks for `OPTIONS`.
+
 ## [0.1.4] - core-v0.1.4
 
 ### Added

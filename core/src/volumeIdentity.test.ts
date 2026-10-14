@@ -106,6 +106,11 @@ describe("macOS parsers, against captured output", () => {
       label: "Macintosh HD - Data",
       mountPoint: "/System/Volumes/Data",
       fsType: "apfs",
+      internal: true,
+      external: false,
+      solidState: true,
+      physicalStore: "disk0s2",
+      permissionsEnabled: true,
     });
   });
 
@@ -280,20 +285,20 @@ describe("Linux parsers and identity (from the documented format, not captured o
   test("findmntInvocation names the tool and asks for one mount by path", () => {
     expect(findmntInvocation("/mnt/big/MaiPai")).toEqual({
       file: "findmnt",
-      args: ["-P", "-o", "UUID,LABEL,TARGET,SOURCE,FSTYPE", "-T", "/mnt/big/MaiPai"],
+      args: ["-P", "-o", "UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS", "-T", "/mnt/big/MaiPai"],
     });
-    expect(findmntInvocation()).toEqual({ file: "findmnt", args: ["-P", "-o", "UUID,LABEL,TARGET,SOURCE,FSTYPE"] });
+    expect(findmntInvocation()).toEqual({ file: "findmnt", args: ["-P", "-o", "UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS"] });
   });
 
   test("parseFindmnt decodes \\xNN escapes and empty values", () => {
     const rows = parseFindmnt(FINDMNT_ALL);
     expect(rows).toHaveLength(5);
-    expect(rows[3]).toEqual({ uuid: "AB12-CD34", label: "Photos Backup", target: "/media/dad/Photos Backup", source: "/dev/sdc1", fsType: "exfat" });
+    expect(rows[3]).toEqual({ uuid: "AB12-CD34", label: "Photos Backup", target: "/media/dad/Photos Backup", source: "/dev/sdc1", fsType: "exfat", options: [] });
     expect(rows[0]).toMatchObject({ uuid: "", fsType: "proc" });
   });
 
   test("a local folder", async () => {
-    const run = fakeRunner({ "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE -T /mnt/big/MaiPai": FINDMNT_ONE });
+    const run = fakeRunner({ "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS -T /mnt/big/MaiPai": FINDMNT_ONE });
     const got = await volumeIdentity("/mnt/big/MaiPai", { platform: "linux", run, realpath: realpathId });
     expect(got).toEqual({
       id: "3c0ffee0-1111-4222-8333-444455556666",
@@ -306,7 +311,7 @@ describe("Linux parsers and identity (from the documented format, not captured o
 
   test("a CIFS share and an NFS export use their address", async () => {
     const cifs = fakeRunner({
-      "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE -T /mnt/media/x": `UUID="" LABEL="" TARGET="/mnt/media" SOURCE="//nas/Media" FSTYPE="cifs"\n`,
+      "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS -T /mnt/media/x": `UUID="" LABEL="" TARGET="/mnt/media" SOURCE="//nas/Media" FSTYPE="cifs"\n`,
     });
     expect(await volumeIdentity("/mnt/media/x", { platform: "linux", run: cifs, realpath: realpathId })).toMatchObject({
       id: "//nas/Media",
@@ -314,7 +319,7 @@ describe("Linux parsers and identity (from the documented format, not captured o
       relativePath: "x",
     });
     const nfs = fakeRunner({
-      "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE -T /srv/family": `UUID="" LABEL="" TARGET="/srv/family" SOURCE="nas:/export/family" FSTYPE="nfs4"\n`,
+      "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS -T /srv/family": `UUID="" LABEL="" TARGET="/srv/family" SOURCE="nas:/export/family" FSTYPE="nfs4"\n`,
     });
     expect(await volumeIdentity("/srv/family", { platform: "linux", run: nfs, realpath: realpathId })).toMatchObject({
       id: "nas:/export/family",
@@ -324,7 +329,7 @@ describe("Linux parsers and identity (from the documented format, not captured o
 
   test("a mount with no UUID that is not a network share (tmpfs) is a typed error", async () => {
     const run = fakeRunner({
-      "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE -T /run/x": `UUID="" LABEL="" TARGET="/run" SOURCE="tmpfs" FSTYPE="tmpfs"\n`,
+      "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS -T /run/x": `UUID="" LABEL="" TARGET="/run" SOURCE="tmpfs" FSTYPE="tmpfs"\n`,
     });
     await expect(volumeIdentity("/run/x", { platform: "linux", run, realpath: realpathId })).rejects.toBeInstanceOf(
       VolumeIdentityUnavailableError,
@@ -332,7 +337,7 @@ describe("Linux parsers and identity (from the documented format, not captured o
   });
 
   test("findVolume", async () => {
-    const run = fakeRunner({ "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE": FINDMNT_ALL });
+    const run = fakeRunner({ "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS": FINDMNT_ALL });
     expect(await findVolume("ab12-cd34", { platform: "linux", run })).toEqual({
       id: "AB12-CD34",
       label: "Photos Backup",
@@ -348,8 +353,8 @@ describe("Linux parsers and identity (from the documented format, not captured o
 // { Volumes: [{ DriveLetter, UniqueId, Label }], Network: [{ DeviceID, ProviderName }] }.
 const WIN_JSON = JSON.stringify({
   Volumes: [
-    { DriveLetter: "C", UniqueId: "\\\\?\\Volume{11111111-2222-4333-8444-555555555555}\\", Label: "" },
-    { DriveLetter: "D", UniqueId: "\\\\?\\Volume{AAAAAAAA-BBBB-4CCC-8DDD-EEEEEEEEEEEE}\\", Label: "Big" },
+    { DriveLetter: "C", UniqueId: "\\\\?\\Volume{11111111-2222-4333-8444-555555555555}\\", Label: "", FileSystem: "NTFS", DriveType: "Fixed" },
+    { DriveLetter: "D", UniqueId: "\\\\?\\Volume{AAAAAAAA-BBBB-4CCC-8DDD-EEEEEEEEEEEE}\\", Label: "Big", FileSystem: "exFAT", DriveType: "Removable" },
   ],
   Network: [{ DeviceID: "Z:", ProviderName: "\\\\nas\\Media" }],
 });
@@ -365,9 +370,9 @@ describe("Windows parsers and identity (from the documented shape, not captured 
 
   test("parseWindowsVolumes extracts the GUID from UniqueId and maps network drives to their share", () => {
     expect(parseWindowsVolumes(WIN_JSON)).toEqual([
-      { letter: "C", id: "11111111-2222-4333-8444-555555555555", label: "", network: false },
-      { letter: "D", id: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee", label: "Big", network: false },
-      { letter: "Z", id: "//nas/Media", label: "Media", network: true },
+      { letter: "C", id: "11111111-2222-4333-8444-555555555555", label: "", network: false, fsType: "NTFS", driveType: "Fixed" },
+      { letter: "D", id: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee", label: "Big", network: false, fsType: "exFAT", driveType: "Removable" },
+      { letter: "Z", id: "//nas/Media", label: "Media", network: true, fsType: "", driveType: "Remote" },
     ]);
   });
 
@@ -429,7 +434,7 @@ describe("unsupported platforms", () => {
 
 describe("locateOnVolume", () => {
   test("joins the volume's current mount point with the recorded relative path", async () => {
-    const run = fakeRunner({ "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE": FINDMNT_ALL });
+    const run = fakeRunner({ "findmnt -P -o UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS": FINDMNT_ALL });
     expect(await locateOnVolume({ id: "AB12-CD34", relativePath: "MaiPai/home/models" }, { platform: "linux", run })).toBe(
       "/media/dad/Photos Backup/MaiPai/home/models",
     );

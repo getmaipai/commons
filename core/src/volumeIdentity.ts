@@ -146,10 +146,65 @@ function asString(v: unknown): string {
 
 /** `diskutil info -plist` for one volume. `uuid` is null when the volume has
  * none (the caller refuses it: a path is not an identity). */
-export function parseDiskutilInfo(xml: string): { uuid: string | null; label: string; mountPoint: string; fsType: string } {
+export interface DiskutilInfo {
+  uuid: string | null;
+  label: string;
+  mountPoint: string;
+  fsType: string;
+  /** `Internal`; null when diskutil did not report it. */
+  internal: boolean | null;
+  /** `RemovableMediaOrExternalDevice`; null when not reported. */
+  external: boolean | null;
+  /** `SolidState`; null when not reported (a network volume, some USB bridges). */
+  solidState: boolean | null;
+  /** The first APFS physical store (`disk3s2`), or the volume's own
+   * `ParentWholeDisk`; null when diskutil reports neither (a RAID set that
+   * hides its disks). More than one APFS physical store (a Fusion pair) is
+   * also null: there is no single disk to name. */
+  physicalStore: string | null;
+  /** `GlobalPermissionsEnabled`: false means "Ignore ownership on this
+   * volume" is on. null when not reported. */
+  permissionsEnabled: boolean | null;
+}
+
+function asBool(v: unknown): boolean | null {
+  return typeof v === "boolean" ? v : null;
+}
+
+export function parseDiskutilInfo(xml: string): DiskutilInfo {
   const info = plist.parse(xml) as Record<string, unknown>;
   const uuid = asString(info.VolumeUUID);
-  return { uuid: uuid || null, label: asString(info.VolumeName), mountPoint: asString(info.MountPoint), fsType: asString(info.FilesystemType) };
+  const stores = Array.isArray(info.APFSPhysicalStores) ? (info.APFSPhysicalStores as Array<Record<string, unknown>>) : [];
+  const storeIds = stores.map((s) => asString(s.APFSPhysicalStore)).filter(Boolean);
+  let physicalStore: string | null = null;
+  if (storeIds.length === 1) physicalStore = storeIds[0]!;
+  else if (storeIds.length === 0 && info.APFSPhysicalStores === undefined) physicalStore = asString(info.ParentWholeDisk) || null;
+  return {
+    uuid: uuid || null,
+    label: asString(info.VolumeName),
+    mountPoint: asString(info.MountPoint),
+    fsType: asString(info.FilesystemType),
+    internal: asBool(info.Internal),
+    external: asBool(info.RemovableMediaOrExternalDevice),
+    solidState: asBool(info.SolidState),
+    physicalStore,
+    permissionsEnabled: asBool(info.GlobalPermissionsEnabled),
+  };
+}
+
+/** `mount` rows (`src on /mnt (smbfs, nodev, ...)`): the filesystem type of
+ * each mount point, the one place macOS names a network volume's type. */
+export function mountInvocation(): { file: string; args: string[] } {
+  return { file: "mount", args: [] };
+}
+
+export function parseMount(output: string): Array<{ source: string; mountPoint: string; fsType: string }> {
+  const rows: Array<{ source: string; mountPoint: string; fsType: string }> = [];
+  for (const line of output.split("\n")) {
+    const m = line.match(/^(.+?) on (\/.*?) \(([^,)]+)/);
+    if (m) rows.push({ source: m[1]!, mountPoint: m[2]!, fsType: m[3]!.trim() });
+  }
+  return rows;
 }
 
 /** Every mounted volume in `diskutil list -plist`, wherever it nests (a
@@ -176,7 +231,7 @@ const LINUX_NETWORK_FS = new Set(["nfs", "nfs4", "cifs", "smb3", "smbfs", "sshfs
 /** `findmnt -P` (KEY="value" pairs, one mount per line), for one path or, with
  * none, every mount. */
 export function findmntInvocation(path?: string): { file: string; args: string[] } {
-  const base = ["-P", "-o", "UUID,LABEL,TARGET,SOURCE,FSTYPE"];
+  const base = ["-P", "-o", "UUID,LABEL,TARGET,SOURCE,FSTYPE,OPTIONS"];
   return { file: "findmnt", args: path === undefined ? base : [...base, "-T", path] };
 }
 
@@ -184,8 +239,18 @@ function decodeFindmnt(value: string): string {
   return value.replace(/(?:\\x[0-9a-fA-F]{2})+/g, (run) => Buffer.from(run.replace(/\\x/g, ""), "hex").toString("utf8"));
 }
 
-export function parseFindmnt(output: string): Array<{ uuid: string; label: string; target: string; source: string; fsType: string }> {
-  const rows = [];
+export interface FindmntRow {
+  uuid: string;
+  label: string;
+  target: string;
+  source: string;
+  fsType: string;
+  /** The mount options (`rw`, `noexec`, ...). Empty when not listed. */
+  options: string[];
+}
+
+export function parseFindmnt(output: string): FindmntRow[] {
+  const rows: FindmntRow[] = [];
   for (const line of output.split("\n")) {
     if (!line.trim()) continue;
     const fields: Record<string, string> = {};
@@ -196,7 +261,39 @@ export function parseFindmnt(output: string): Array<{ uuid: string; label: strin
       target: fields.TARGET ?? "",
       source: fields.SOURCE ?? "",
       fsType: fields.FSTYPE ?? "",
+      options: (fields.OPTIONS ?? "").split(",").filter(Boolean),
     });
+  }
+  return rows;
+}
+
+/** `lsblk -s` lists the device and every device beneath it up the stack
+ * (partition, then LVM or md, then disk), so a volume's physical disks can
+ * be counted. `source` is findmnt's SOURCE; a btrfs or bind source carries a
+ * `[/subvol]` suffix that is dropped. */
+export function lsblkInvocation(source: string): { file: string; args: string[] } | null {
+  const device = source.replace(/\[.*\]$/, "");
+  if (!device.startsWith("/dev/")) return null;
+  return { file: "lsblk", args: ["-P", "-s", "-o", "NAME,TYPE,RM,ROTA,TRAN", device] };
+}
+
+export interface LsblkRow {
+  name: string;
+  type: string;
+  removable: boolean | null;
+  rotational: boolean | null;
+  /** The transport (`usb`, `sata`, `nvme`); empty when not reported. */
+  transport: string;
+}
+
+export function parseLsblk(output: string): LsblkRow[] {
+  const rows: LsblkRow[] = [];
+  const flag = (v: string | undefined): boolean | null => (v === "1" ? true : v === "0" ? false : null);
+  for (const line of output.split("\n")) {
+    if (!line.trim()) continue;
+    const f: Record<string, string> = {};
+    for (const m of line.matchAll(/([A-Z]+)="((?:[^"\\]|\\.)*)"/g)) f[m[1]!] = decodeFindmnt(m[2]!);
+    rows.push({ name: f.NAME ?? "", type: f.TYPE ?? "", removable: flag(f.RM), rotational: flag(f.ROTA), transport: f.TRAN ?? "" });
   }
   return rows;
 }
@@ -207,12 +304,45 @@ export function parseFindmnt(output: string): Array<{ uuid: string; label: strin
 // filters, so there is nothing to quote. Read from stdin like keystore.ts's
 // DPAPI script.
 const WINDOWS_VOLUMES_SCRIPT =
-  '$v=@(Get-Volume | Where-Object { $_.DriveLetter } | ForEach-Object { [pscustomobject]@{ DriveLetter = "$($_.DriveLetter)"; UniqueId = $_.UniqueId; Label = $_.FileSystemLabel } }); ' +
+  '$v=@(Get-Volume | Where-Object { $_.DriveLetter } | ForEach-Object { [pscustomobject]@{ DriveLetter = "$($_.DriveLetter)"; UniqueId = $_.UniqueId; Label = $_.FileSystemLabel; FileSystem = "$($_.FileSystemType)"; DriveType = "$($_.DriveType)" } }); ' +
   "$n=@(Get-CimInstance Win32_LogicalDisk | Where-Object { $_.DriveType -eq 4 } | ForEach-Object { [pscustomobject]@{ DeviceID = $_.DeviceID; ProviderName = $_.ProviderName } }); " +
   "[pscustomobject]@{ Volumes = $v; Network = $n } | ConvertTo-Json -Compress -Depth 4";
 
 export function windowsVolumesInvocation(): { file: string; args: string[]; input: string } {
   return { file: "powershell.exe", args: ["-NoProfile", "-NonInteractive", "-Command", "-"], input: WINDOWS_VOLUMES_SCRIPT };
+}
+
+/** The disk behind one drive letter: `Get-Partition` to `Get-Disk` to
+ * `Get-PhysicalDisk`. The letter is validated to one A-Z character here, so
+ * nothing else reaches the script. An empty object comes back when Windows
+ * hides the disk (Storage Spaces, a virtual disk). */
+export function windowsDiskInvocation(letter: string): { file: string; args: string[]; input: string } {
+  if (!/^[A-Za-z]$/.test(letter)) throw new Error(`not a drive letter: ${letter}`);
+  const script =
+    `$p=Get-Partition -DriveLetter ${letter.toUpperCase()} -ErrorAction SilentlyContinue | Select-Object -First 1; ` +
+    "$d=if($p){Get-Disk -Number $p.DiskNumber -ErrorAction SilentlyContinue}; " +
+    "$pd=if($d){Get-PhysicalDisk | Where-Object { $_.DeviceId -eq \"$($d.Number)\" }}; " +
+    "[pscustomobject]@{ DiskNumber = if($d){\"$($d.Number)\"}else{\"\"}; BusType = if($d){\"$($d.BusType)\"}else{\"\"}; MediaType = if($pd){\"$($pd.MediaType)\"}else{\"\"} } | ConvertTo-Json -Compress";
+  return { file: "powershell.exe", args: ["-NoProfile", "-NonInteractive", "-Command", "-"], input: script };
+}
+
+export interface WindowsDisk {
+  /** The physical disk number as text, or null when Windows does not say. */
+  diskNumber: string | null;
+  /** `USB`, `SATA`, `NVMe`, `Spaces` ...; empty when not reported. */
+  busType: string;
+  /** `SSD`, `HDD`, `SCM`; empty for `Unspecified` or not reported. */
+  mediaType: string;
+}
+
+export function parseWindowsDisk(json: string): WindowsDisk {
+  const d = JSON.parse(json) as Record<string, unknown>;
+  const media = asString(d.MediaType);
+  return {
+    diskNumber: asString(d.DiskNumber) || null,
+    busType: asString(d.BusType),
+    mediaType: media === "Unspecified" ? "" : media,
+  };
 }
 
 function asList(v: unknown): Array<Record<string, unknown>> {
@@ -222,18 +352,38 @@ function asList(v: unknown): Array<Record<string, unknown>> {
 
 /** The drive-lettered volumes: the GUID from `UniqueId`
  * (`\\?\Volume{guid}\`, lower-cased), or a mapped drive's share address. */
-export function parseWindowsVolumes(json: string): Array<{ letter: string; id: string; label: string; network: boolean }> {
+export interface WindowsVolume {
+  letter: string;
+  id: string;
+  label: string;
+  network: boolean;
+  /** `FileSystemType` (`NTFS`, `exFAT`, `ReFS`); empty when not reported. */
+  fsType: string;
+  /** `DriveType` (`Fixed`, `Removable`, `Remote`, `CD-ROM`); empty when not reported. */
+  driveType: string;
+}
+
+export function parseWindowsVolumes(json: string): WindowsVolume[] {
   const data = JSON.parse(json) as { Volumes?: unknown; Network?: unknown };
-  const byLetter = new Map<string, { letter: string; id: string; label: string; network: boolean }>();
+  const byLetter = new Map<string, WindowsVolume>();
   for (const v of asList(data.Volumes)) {
     const letter = asString(v.DriveLetter).toUpperCase();
     const guid = asString(v.UniqueId).match(/\{([0-9a-fA-F-]{36})\}/)?.[1];
-    if (letter && guid) byLetter.set(letter, { letter, id: guid.toLowerCase(), label: asString(v.Label), network: false });
+    if (letter && guid) {
+      byLetter.set(letter, {
+        letter,
+        id: guid.toLowerCase(),
+        label: asString(v.Label),
+        network: false,
+        fsType: asString(v.FileSystem),
+        driveType: asString(v.DriveType),
+      });
+    }
   }
   for (const n of asList(data.Network)) {
     const letter = asString(n.DeviceID).replace(/:$/, "").toUpperCase();
     const address = normalizeNetworkAddress(asString(n.ProviderName));
-    if (letter && address) byLetter.set(letter, { letter, id: address, label: lastSegment(address), network: true });
+    if (letter && address) byLetter.set(letter, { letter, id: address, label: lastSegment(address), network: true, fsType: "", driveType: "Remote" });
   }
   return [...byLetter.values()];
 }
