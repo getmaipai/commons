@@ -49,6 +49,7 @@ export * from "./robot-state.js";
 export * from "./safety-result.js";
 export * from "./search-assist-weights.js";
 export * from "./searxng-engines.js";
+export * from "./session-sign-in-source.js";
 export * from "./setting-value.js";
 export * from "./settings-area.js";
 export * from "./settings-delta.js";

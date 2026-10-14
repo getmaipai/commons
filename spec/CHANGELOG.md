@@ -1,3 +1,7 @@
+## [spec-v0.1.135] - 2026-10-13
+
+- SPEC-SESSION-SOURCE-01. New `SessionSignInSource` schema (`local`, `away`, `paired_device`, default `local`): how a session signed in, set by the hub on the server when it issues the session. It lets a person see which of their own sessions came in through the Tailscale address. Additive; the spec has no Session record, so Home stores the value in its own sessions table.
+
 ## [spec-v0.1.134] - 2026-10-13
 
 - Add the person setting `setup.checklist_dismissed`, a JSON list of setup checklist item ids this person chose to hide.

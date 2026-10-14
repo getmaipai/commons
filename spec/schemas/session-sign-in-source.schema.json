@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/session-sign-in-source.schema.json",
+  "title": "SessionSignInSource",
+  "description": "How a browser or device session signed in: 'local' on the home network or the hub computer (the default for any session recorded before this field existed), 'away' through the household's private Tailscale address, 'paired_device' by redeeming a paired device's token. The hub sets it on the server when it issues the session, once; a client never supplies it and it has no update path. Only the signed-in person reads it, for their own sessions.",
+  "type": "string",
+  "enum": ["local", "away", "paired_device"],
+  "default": "local"
+}
