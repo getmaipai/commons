@@ -3279,6 +3279,20 @@
     ]
   },
   {
+    "key": "setup.checklist_dismissed",
+    "scope": "person",
+    "selector": "text",
+    "default": "[]",
+    "label": "Setup checklist items hidden",
+    "help": "A JSON list of setup checklist item ids this person chose not to see again.",
+    "level": "expert",
+    "secret": false,
+    "lives_in": "profile.appearance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "ui.show_turn_stats",
     "scope": "person",
     "selector": "boolean",

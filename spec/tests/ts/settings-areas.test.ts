@@ -414,9 +414,9 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
     expect(new Set(probe)).toEqual(new Set(["household.status"]));
   });
 
-  test("no key was added or removed, and scope, default and level are untouched (pinned counts)", () => {
-    expect(registry).toHaveLength(181);
-    expect(new Set(registryIds()).size).toBe(181);
+  test("the registry keeps the pinned count and includes the checklist dismissal key", () => {
+    expect(registry).toHaveLength(182);
+    expect(new Set(registryIds()).size).toBe(182);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",
@@ -427,6 +427,7 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
       "search.hosts.deny", "search.hosts.allow",
       "search.hosts.child.deny", "search.hosts.child.allow", "search.hosts.teen.deny", "search.hosts.teen.allow",
       "backups.emergency_kit_saved_at",
+      "setup.checklist_dismissed",
       "search.hosts.adult.deny", "search.hosts.adult.allow",
       "topics.bodies", "topics.health", "topics.risk", "topics.violence", "topics.family_stories", "topics.family_story_names",
       "topics.teen.bodies", "topics.teen.risk",

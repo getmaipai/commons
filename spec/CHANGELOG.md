@@ -1,3 +1,7 @@
+## [spec-v0.1.134] - 2026-10-13
+
+- Add the person setting `setup.checklist_dismissed`, a JSON list of setup checklist item ids this person chose to hide.
+
 ## [spec-v0.1.133] - 2026-10-13
 
 - SPEC-BACKUP-KEY-01. Add the household-only `backups.emergency_kit_saved_at` setting for the time the owner saved or printed the emergency backup key. It defaults to null and stores no key material.

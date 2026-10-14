@@ -51,6 +51,22 @@ describe("spec/settings/keys.json", () => {
     expect(entry.layers).toBeUndefined();
   });
 
+  test("the setup checklist dismissal is a person list, not shared with pinned apps", () => {
+    const matches = (loadRegistry() as Record<string, unknown>[]).filter((row) => row.key === "setup.checklist_dismissed");
+    expect(matches).toHaveLength(1);
+    const entry = SettingsKey.parse(matches[0]);
+    expect(entry).toMatchObject({
+      scope: "person",
+      selector: "text",
+      default: "[]",
+      label: "Setup checklist items hidden",
+      lives_in: "profile.appearance",
+      honoured_by: ["home"],
+      secret: false,
+    });
+    expect(entry.self_service).toBeUndefined();
+  });
+
   test("guided tours use the automatic-start switch in Account Appearance", () => {
     const entry = (loadRegistry() as Record<string, unknown>[]).find((row) => row.key === "tours.autostart.enabled");
     expect(entry).toMatchObject({ scope: "person", selector: "boolean", default: true, label: "Start tours automatically", lives_in: "profile.appearance" });
