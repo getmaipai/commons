@@ -415,8 +415,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("no key was added or removed, and scope, default and level are untouched (pinned counts)", () => {
-    expect(registry).toHaveLength(180);
-    expect(new Set(registryIds()).size).toBe(180);
+    expect(registry).toHaveLength(181);
+    expect(new Set(registryIds()).size).toBe(181);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",
@@ -426,6 +426,7 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
       "search.blocklists.child", "search.blocklists.teen", "search.blocklists.adult", "search.blocklists", "search.page_text_cleaning",
       "search.hosts.deny", "search.hosts.allow",
       "search.hosts.child.deny", "search.hosts.child.allow", "search.hosts.teen.deny", "search.hosts.teen.allow",
+      "backups.emergency_kit_saved_at",
       "search.hosts.adult.deny", "search.hosts.adult.allow",
       "topics.bodies", "topics.health", "topics.risk", "topics.violence", "topics.family_stories", "topics.family_story_names",
       "topics.teen.bodies", "topics.teen.risk",

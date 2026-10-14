@@ -144,6 +144,23 @@
     ]
   },
   {
+    "key": "backups.emergency_kit_saved_at",
+    "scope": "household",
+    "selector": "text",
+    "default": null,
+    "label": "Backup key saved",
+    "help": "The date and time the owner saved or printed the emergency backup key. The key itself is never stored here.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.storage",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Keeps track of whether you saved a copy for emergencies."
+    }
+  },
+  {
     "key": "chat.context_size_override",
     "scope": "household",
     "selector": "number",

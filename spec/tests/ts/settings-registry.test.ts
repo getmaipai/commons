@@ -34,6 +34,23 @@ describe("spec/settings/keys.json", () => {
     expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
   });
 
+  test("the emergency kit acknowledgement stores only a household timestamp", () => {
+    const matches = (loadRegistry() as Record<string, unknown>[]).filter((row) => row.key === "backups.emergency_kit_saved_at");
+    expect(matches).toHaveLength(1);
+    const entry = SettingsKey.parse(matches[0]);
+    expect(entry).toMatchObject({
+      scope: "household",
+      selector: "text",
+      default: null,
+      label: "Backup key saved",
+      lives_in: "household.storage",
+      honoured_by: ["home"],
+      secret: false,
+    });
+    expect(entry.self_service).toBeUndefined();
+    expect(entry.layers).toBeUndefined();
+  });
+
   test("guided tours use the automatic-start switch in Account Appearance", () => {
     const entry = (loadRegistry() as Record<string, unknown>[]).find((row) => row.key === "tours.autostart.enabled");
     expect(entry).toMatchObject({ scope: "person", selector: "boolean", default: true, label: "Start tours automatically", lives_in: "profile.appearance" });

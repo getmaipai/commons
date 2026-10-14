@@ -1,3 +1,7 @@
+## [spec-v0.1.133] - 2026-10-13
+
+- SPEC-BACKUP-KEY-01. Add the household-only `backups.emergency_kit_saved_at` setting for the time the owner saved or printed the emergency backup key. It defaults to null and stores no key material.
+
 ## [spec-v0.1.132] - 2026-10-13
 
 - SPEC-SETUP-STATE-01 and SPEC-TOUR-01. Added `SetupState` for setup source, step status, phase, engine location and hardware, away choice, plan references, health checks and timestamps; `HeroSlide` for slide image, heading, copy source, teaching point, audience and order. Added `Tour` and `TourProgress` schemas for package-declared tours and per-person completion, tour declarations on package manifests, and the `tours.autostart.enabled` setting.
