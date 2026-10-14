@@ -45,7 +45,7 @@ Added 2026-10-08 (GENUI-01): **AnswerBlock**, one typed part of an answer (`spec
 
 The error catalogue's *shape* (`ErrorEntry`) and the privacy row shape
 (`PrivacyRow`, used by the manifest's `data_sources[]`) are owned by
-`@maipai/standards` (std-v0.2.0) and imported by `$ref`, not defined here;
+`@maipai/standards` (std-v0.3.2) and imported by `$ref`, not defined here;
 see "Cross-repo schemas" below. The populated error catalogue itself
 (`errors/errors.json`) is this repo's own content.
 

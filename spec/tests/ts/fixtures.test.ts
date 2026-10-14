@@ -42,6 +42,8 @@ import { Project } from "../../gen/ts/project.js";
 import { Feed } from "../../gen/ts/feed.js";
 import { NewsItem } from "../../gen/ts/news-item.js";
 import { NewsStory } from "../../gen/ts/news-story.js";
+import Ajv2020 from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
 
 // ErrorEntry is standards-owned (std-v0.2.0), not generated here; the error
 // catalogue's shape is imported from the sibling .github checkout, the same
@@ -63,6 +65,41 @@ function loadFixture(name: string): unknown {
 }
 
 describe("record fixtures validate against their generated Zod models", () => {
+  const row = {
+    id: "weather-lookup",
+    destination: "Open-Meteo",
+    when: "on request",
+    what: "weather request",
+    who: "Open-Meteo",
+    opt_in: true,
+    retention: "90 days",
+  };
+  const manifestWithRow = (dataSource: Record<string, unknown>) => ({
+    id: "bedtime-reminder", version: "0.1.0", kind: "plugin", category: "Family",
+    display: "Bedtime reminder", description: "Sets a spoken reminder.", author: "MaiPai",
+    license: "AGPL-3.0", platforms: ["home", "bot"], min_role: "child",
+    consequential: false, offline: "full", min_app: "0.1.0", tier: 0,
+    incognito: "unaffected", data_sources: [dataSource],
+  });
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  addFormats(ajv);
+  const manifestSchema = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "schemas.resolved", "manifest.schema.json"), "utf8"));
+  for (const schemaName of ["answer-block.schema.json", "settings-key.schema.json", "settings-area.schema.json", "tour.schema.json", "privacy-row.schema.json"]) {
+    const schema = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "schemas.resolved", schemaName), "utf8"));
+    ajv.addSchema(schema, schemaName === "privacy-row.schema.json" ? "https://getmaipai.github.io/shared/spec/schemas/privacy-row.schema.json" : schema.$id);
+  }
+  const validateManifest = ajv.compile(manifestSchema);
+
+  test("a data_sources row with an attribution and hosts validates", () => {
+    expect(validateManifest(manifestWithRow({ ...row, attribution: "Weather data by Open-Meteo.com (CC BY 4.0)", hosts: ["api.open-meteo.com"] }))).toBe(true);
+  });
+  test("a data_sources row with neither still validates", () => {
+    expect(validateManifest(manifestWithRow(row))).toBe(true);
+  });
+  test("a data_sources row with an unknown extra field is still rejected", () => {
+    expect(validateManifest(manifestWithRow({ ...row, unknown: true }))).toBe(false);
+  });
+
   test("person.example.json", () => {
     expect(() => Person.parse(loadFixture("person.example.json"))).not.toThrow();
   });

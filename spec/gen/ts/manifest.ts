@@ -470,7 +470,7 @@ export const PackageManifest = z
           ),
       )
       .optional(),
-    /**Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.2.0).*/
+    /**Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.3.2).*/
     data_sources: z
       .array(
         z
@@ -510,6 +510,26 @@ export const PackageManifest = z
               .describe(
                 "How long the destination keeps it, in plain language, or 'unknown, see the service's own policy' when the household does not control it.",
               ),
+            /**The exact credit line to show with data from this source, when the service asks for one.*/
+            attribution: z
+              .string()
+              .min(1)
+              .describe(
+                "The exact credit line to show with data from this source, when the service asks for one.",
+              )
+              .optional(),
+            /**Bare lower-case hosts covered by this row; each must already appear as a net: permission in the same manifest.*/
+            hosts: z
+              .array(z.string().min(1))
+              .min(1)
+              .refine(
+                (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                "All items must be unique!",
+              )
+              .describe(
+                "Bare lower-case hosts covered by this row; each must already appear as a net: permission in the same manifest.",
+              )
+              .optional(),
           })
           .strict()
           .describe(
@@ -517,7 +537,7 @@ export const PackageManifest = z
           ),
       )
       .describe(
-        "Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.2.0).",
+        "Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.3.2).",
       )
       .optional(),
     /**The capabilities this package needs for health derivation.*/

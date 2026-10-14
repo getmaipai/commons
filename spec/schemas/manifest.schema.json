@@ -271,7 +271,7 @@
     "data_sources": {
       "type": "array",
       "items": { "$ref": "https://getmaipai.github.io/.github/standards/schemas/privacy-row.schema.json" },
-      "description": "Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.2.0)."
+      "description": "Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.3.2)."
     },
     "needs": {
       "type": "array",

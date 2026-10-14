@@ -489,7 +489,7 @@ class PackageManifest(BaseModel):
     config: list[settings_key_schema.SettingsKey] | None = None
     data_sources: list[privacy_row_schema.PrivacyRow] | None = Field(
         None,
-        description="Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.2.0).",
+        description="Feeds the generated privacy row (docs/ENGINEERING.md > Privacy). The shape is @maipai/standards' PrivacyRow, imported by $ref (std-v0.3.2).",
     )
     needs: list[Need] | None = Field(
         None, description='The capabilities this package needs for health derivation.'
