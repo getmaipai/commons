@@ -146,6 +146,10 @@
  * design choice. The reference's own 12px square, not the emergent
  * circle `--radius-xl` on a 40px/32px tile used to produce. */
 :root {
+  /* QR contrast stays fixed across themes so every code remains scannable. */
+  --qr-foreground: #000000;
+  --qr-background: #ffffff;
+  --qr-quiet-zone: 4px;
   --tile-radius: 12px;
   --aui-thread-list-item-min-height: 48px;
   /* The reference's own subtle radial wash (top-left, fading to the
