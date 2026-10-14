@@ -438,6 +438,19 @@ describe("SettingRow - the per-key beforeChange hook", () => {
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(queryByRole("status")).toBeNull();
   });
+
+  test("reset asks the host before changing a network setting", async () => {
+    const onReset = mock(() => {});
+    const beforeChange = mock(async () => true as const);
+    const setting = {
+      def: { key: "network.hub_port", scope: "household", selector: "number", range: { min: 1, max: 65535 }, default: 3000, label: "Home network port", level: "expert", secret: false, lives_in: "household.network", honoured_by: ["home"] },
+      resolved: { key: "network.hub_port", value: 4555, source: "user", label: "Home network port", level: "expert", secret: false },
+    } as MergedSetting;
+    const { getByRole } = render(<SettingRow setting={setting} onChange={async () => true} onReset={onReset} beforeChange={beforeChange} />);
+    await act(async () => { fireEvent.click(getByRole("button", { name: "Reset to default" })); });
+    expect(beforeChange).toHaveBeenCalledWith("network.hub_port", 3000);
+    expect(onReset).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("SettingRow - text selector reads as a value plus Change", () => {
