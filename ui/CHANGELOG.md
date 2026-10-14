@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.216] - ui-v0.5.216
+
+Adds an optional `banner` slot to `Wizard`, rendered between its step list and scroll region. The banner stays outside the scroll region and existing callers render unchanged.
+
 ## [0.5.215] - ui-v0.5.215
 
 Extends `JobProgress` for downloads with byte totals, smoothed speed, a stable ETA, per-file details in the kit Sheet, pause/stall resume and failure retry. The existing props and default presentation remain unchanged; the bar now uses the kit Progress primitive. `variant="compact"` is available for persistent progress strips.

@@ -20,6 +20,7 @@ interface WizardProps {
   completedCount: number;
   onJumpTo: (id: string) => void;
   children: ReactNode;
+  banner?: ReactNode;
   onBack?: () => void;
   onNext: () => void;
   /** "Skip says what it means" (plan 6.4) - the caller supplies the real
@@ -53,6 +54,7 @@ export function Wizard({
   completedCount,
   onJumpTo,
   children,
+  banner,
   onBack,
   onNext,
   skipLabel,
@@ -113,6 +115,8 @@ export function Wizard({
           );
         })}
       </ol>
+
+      {banner}
 
       {/* A tab stop for the same reason DetailPane's/SplitView's scrolling
           body has one: Safari won't focus a scrollable region on its own,

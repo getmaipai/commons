@@ -11,6 +11,37 @@ const STEPS: WizardStep[] = [
 ];
 
 describe("Wizard", () => {
+  test("renders an optional banner between the steps and scroll region", () => {
+    const props = {
+      steps: STEPS,
+      currentStepId: "b",
+      completedCount: 1,
+      onJumpTo: () => {},
+      onNext: () => {},
+    };
+    const { container, rerender, getByTestId } = render(<Wizard {...props}>content</Wizard>);
+    const main = container.querySelector("main")!;
+    const noBannerMarkup = main.innerHTML;
+    expect(main.children).toHaveLength(3);
+    expect(main.children[0]?.tagName).toBe("OL");
+    expect(main.children[1]?.getAttribute("tabindex")).toBe("0");
+
+    rerender(
+      <Wizard {...props} banner={<aside data-testid="banner">Preview mode</aside>}>
+        content
+      </Wizard>,
+    );
+    const banner = getByTestId("banner");
+    const scrollRegion = main.querySelector('[tabindex="0"]')!;
+    expect(banner.parentElement).toBe(main);
+    expect(main.children[1]).toBe(banner);
+    expect(main.children[2]).toBe(scrollRegion);
+    expect(scrollRegion.contains(banner)).toBe(false);
+
+    rerender(<Wizard {...props}>content</Wizard>);
+    expect(main.innerHTML).toBe(noBannerMarkup);
+  });
+
   test("shows the current step's title as the heading", () => {
     const { getByRole } = render(
       <Wizard steps={STEPS} currentStepId="b" completedCount={1} onJumpTo={() => {}} onNext={() => {}}>
