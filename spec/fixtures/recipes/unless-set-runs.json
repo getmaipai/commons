@@ -1,0 +1,76 @@
+{
+  "description": "Unbound, null and empty string variables each let the step run.",
+  "recipe": {
+    "id": "unless-set-runs",
+    "steps": [
+      {
+        "op": "fetch",
+        "as": "unbound_result",
+        "url": "https://example.test/unbound",
+        "unless_set": "missing"
+      },
+      {
+        "op": "fetch",
+        "as": "null_result",
+        "url": "https://example.test/null",
+        "unless_set": "null_value"
+      },
+      {
+        "op": "fetch",
+        "as": "empty_result",
+        "url": "https://example.test/empty",
+        "unless_set": "empty_value"
+      },
+      {
+        "op": "pick",
+        "as": "unbound_value",
+        "from": "unbound_result",
+        "path": "value"
+      },
+      {
+        "op": "pick",
+        "as": "null_value_result",
+        "from": "null_result",
+        "path": "value"
+      },
+      {
+        "op": "pick",
+        "as": "empty_value_result",
+        "from": "empty_result",
+        "path": "value"
+      },
+      {
+        "op": "format",
+        "as": "reply",
+        "text": "{unbound_value}/{null_value_result}/{empty_value_result}"
+      }
+    ]
+  },
+  "inputs": {
+    "null_value": null,
+    "empty_value": ""
+  },
+  "host_setup": {
+    "fetch": {
+      "https://example.test/unbound": {
+        "value": "unbound"
+      },
+      "https://example.test/null": {
+        "value": "null"
+      },
+      "https://example.test/empty": {
+        "value": "empty"
+      }
+    }
+  },
+  "expected": {
+    "reply": {
+      "text": "unbound/null/empty",
+      "speech": "unbound/null/empty"
+    },
+    "actions": [],
+    "scheduled_jobs": [],
+    "home_calls": [],
+    "memory_added": []
+  }
+}

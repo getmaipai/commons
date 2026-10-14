@@ -42,24 +42,24 @@ type Scope = Record<string, unknown>;
 // written here, mirroring recipe.schema.json's 18 step defs exactly, so
 // the switch gets real per-branch types and a real `never` check back.
 type RecipeStep =
-  | { op: "fetch"; as: string; url: string; method?: "GET" | "POST"; headers?: Record<string, string>; body?: unknown }
-  | { op: "pick"; as: string; from: string; path?: string }
-  | { op: "lookup"; as: string; from: string; table: Record<string, string>; default?: string }
-  | { op: "format"; as: string; text?: string; speech?: string; data?: Record<string, string>; synthesis_hint?: string }
-  | { op: "home.call_service"; domain: string; service: string; target: Record<string, unknown>; data?: Record<string, unknown> }
-  | { op: "action"; kind: string; payload?: Record<string, unknown> }
-  | { op: "remember"; text: string; category?: string; scope?: string }
-  | { op: "recall"; as: string; query: string; scope?: string; limit?: number }
-  | { op: "schedule"; when: string; job?: string; inputs?: Record<string, unknown> }
-  | { op: "integration.call"; as: string; id: string; method: string; args?: Record<string, unknown> }
-  | { op: "compute"; as: string; expression: string }
-  | { op: "llm_complete"; as: string; prompt: string }
-  | { op: "list_add"; text: string }
-  | { op: "list_view"; as: string }
-  | { op: "remind"; as: string; text: string }
-  | { op: "timer"; as: string; text: string }
-  | { op: "ask"; prompt: string; expects?: string }
-  | { op: "artifact"; as: string; title: string; kind: string; body: string; id_from: string };
+  | { op: "fetch"; unless_set?: string; as: string; url: string; method?: "GET" | "POST"; headers?: Record<string, string>; body?: unknown }
+  | { op: "pick"; as: string; from: string; path?: string; unless_set?: string }
+  | { op: "lookup"; as: string; from: string; table: Record<string, string>; default?: string; unless_set?: string }
+  | { op: "format"; as: string; text?: string; speech?: string; data?: Record<string, string>; synthesis_hint?: string; unless_set?: string }
+  | { op: "home.call_service"; domain: string; service: string; target: Record<string, unknown>; data?: Record<string, unknown>; unless_set?: string }
+  | { op: "action"; kind: string; payload?: Record<string, unknown>; unless_set?: string }
+  | { op: "remember"; text: string; category?: string; scope?: string; unless_set?: string }
+  | { op: "recall"; as: string; query: string; scope?: string; limit?: number; unless_set?: string }
+  | { op: "schedule"; when: string; job?: string; inputs?: Record<string, unknown>; unless_set?: string }
+  | { op: "integration.call"; as: string; id: string; method: string; args?: Record<string, unknown>; unless_set?: string }
+  | { op: "compute"; as: string; expression: string; unless_set?: string }
+  | { op: "llm_complete"; as: string; prompt: string; unless_set?: string }
+  | { op: "list_add"; text: string; unless_set?: string }
+  | { op: "list_view"; as: string; unless_set?: string }
+  | { op: "remind"; as: string; text: string; unless_set?: string }
+  | { op: "timer"; as: string; text: string; unless_set?: string }
+  | { op: "ask"; prompt: string; expects?: string; unless_set?: string }
+  | { op: "artifact"; as: string; title: string; kind: string; body: string; id_from: string; unless_set?: string };
 
 // No conditional step exists in this declarative language to branch a
 // reply on "did recall find anything" - a `format` step only ever
@@ -136,6 +136,10 @@ export async function runRecipe(recipe: Recipe, inputs: Scope, host: Host): Prom
   let ask: { prompt: string; expects?: string } | undefined;
 
   for (const step of recipe.steps as RecipeStep[]) {
+    if (step.unless_set !== undefined) {
+      const value = scope[step.unless_set];
+      if (value !== undefined && value !== null && value !== "") continue;
+    }
     switch (step.op) {
       case "fetch": {
         const url = interpolate(step.url, scope);

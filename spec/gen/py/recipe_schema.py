@@ -46,6 +46,10 @@ class FetchStep(BaseModel):
     method: Literal['GET', 'POST'] = 'GET'
     headers: dict[str, str] | None = None
     body: Any | None = None
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class PickStep(BaseModel):
@@ -57,6 +61,10 @@ class PickStep(BaseModel):
     from_: str = Field(..., alias='from', description='A variable name to read from.')
     path: str | None = Field(
         None, description='A dotted path into that variable, e.g. results.0.title.'
+    )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
     )
 
 
@@ -82,6 +90,10 @@ class FormatStep1(BaseModel):
         None,
         description="The result's `synthesis_hint` (result.schema.json), a literal line for the composer (CHAT-16): the `data` answers the person's question and needs phrasing. A result carrying it is always composed, never delivered as its `text`.",
     )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class FormatStep2(BaseModel):
@@ -106,6 +118,10 @@ class FormatStep2(BaseModel):
         ...,
         description="The result's `synthesis_hint` (result.schema.json), a literal line for the composer (CHAT-16): the `data` answers the person's question and needs phrasing. A result carrying it is always composed, never delivered as its `text`.",
     )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class LookupStep(BaseModel):
@@ -127,6 +143,10 @@ class LookupStep(BaseModel):
         None,
         description='Bound when the key is not in the table; without it, the key itself.',
     )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class HomeCallServiceStep(BaseModel):
@@ -147,6 +167,10 @@ class HomeCallServiceStep(BaseModel):
     data: dict[str, Any] | None = Field(
         None, description='Same {braces} interpolation as `target`.'
     )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class ActionStep(BaseModel):
@@ -160,6 +184,10 @@ class ActionStep(BaseModel):
     op: Literal['action']
     kind: str
     payload: dict[str, Any] | None = None
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class RememberStep(BaseModel):
@@ -189,6 +217,10 @@ class RememberStep(BaseModel):
         | None
     ) = None
     scope: Literal['household', 'person', 'self'] | None = None
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class RecallStep(BaseModel):
@@ -206,6 +238,10 @@ class RecallStep(BaseModel):
     )
     scope: Literal['household', 'person', 'self'] | None = None
     limit: conint(ge=1, le=10) = 3
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class ScheduleStep(BaseModel):
@@ -226,6 +262,10 @@ class ScheduleStep(BaseModel):
     inputs: dict[str, Any] | None = Field(
         None,
         description="Carried into the recipe's own input scope when the job fires and re-runs this package (session-d-packages-and-store.md step 8: host.schedule used to hardcode {} here, so a job scheduled from within a recipe re-fired with an empty scope - a known, documented gap, docs/dev.md's own scheduler entry). Every string value, at any depth, may reference input/variable names in {braces} - the same interpolate-before-send convention integration_call_step's own `args` already uses.",
+    )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
     )
 
 
@@ -255,6 +295,10 @@ class IntegrationCallStep(BaseModel):
         None,
         description="Every string value, at any depth, may reference input/variable names in {braces} - unlike fetch's own body, which is passed through as-is.",
     )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class ComputeStep(BaseModel):
@@ -270,6 +314,10 @@ class ComputeStep(BaseModel):
     expression: str = Field(
         ...,
         description='A math/unit-conversion expression, e.g. "12 miles to km" or "{amount} * 1.08". {variable} references are substituted before evaluation, the same interpolation every other step\'s text fields use.',
+    )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
     )
 
 
@@ -291,6 +339,10 @@ class LlmCompleteStep(BaseModel):
         ...,
         description="A template with {variable} interpolation, sent as a single user-role message to the household's own local chat model. No system prompt, no conversation history: a one-shot completion for a lookup, not a chat turn.",
     )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class ListAddStep(BaseModel):
@@ -305,6 +357,10 @@ class ListAddStep(BaseModel):
     text: str = Field(
         ...,
         description="May reference input/variable names in {braces}. The item text added to the household's own default shopping list.",
+    )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
     )
 
 
@@ -321,6 +377,10 @@ class ListViewStep(BaseModel):
         ...,
         alias='as',
         description="Binds a ready-to-speak summary of the household's own default shopping list - a plain 'your list is empty' phrase if there are none, the same 'resolve a list-shaped result into one string at the interpreter, since the recipe language has no loop' move recall_step already makes.",
+    )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
     )
 
 
@@ -342,6 +402,10 @@ class RemindStep(BaseModel):
         ...,
         description='May reference input/variable names in {braces}. The household member\'s own free-typed reminder request, e.g. "at 6 to call Nadia" - host.reminders.set does the natural-language time/task extraction and the real scheduling, both host-side, since neither is something this declarative step can do for itself.',
     )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class TimerStep(BaseModel):
@@ -362,6 +426,10 @@ class TimerStep(BaseModel):
         ...,
         description='May reference input/variable names in {braces}. The household member\'s own free-typed timer request, e.g. "for ten minutes". host.timers.set parses the duration with a small deterministic parser, not a language model - a timer\'s whole point is exact minute-level accuracy, which natural-language date grammars and models are not reliably good at (session-d-packages-and-store.md step 8\'s own scheduler entry).',
     )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
 
 
 class AskStep(BaseModel):
@@ -380,6 +448,10 @@ class AskStep(BaseModel):
     expects: str | None = Field(
         None,
         description="What kind of answer the next utterance should satisfy, e.g. a variable name the recipe would otherwise have asked for. Free text, matched by the turn engine (wave-2.md's C-to-D contract), not this interpreter.",
+    )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
     )
 
 
@@ -412,6 +484,10 @@ class ArtifactStep(BaseModel):
     id_from: str = Field(
         ...,
         description='Names a scope variable to read DIRECTLY (scope[id_from]), the same bare-name convention pick\'s own "from" field already uses, not interpolate()\'s templating path - interpolate() leaves an unresolved {name} as the literal string rather than resolving to undefined, which cannot tell a genuinely unset variable apart from a real answer that happens to look like that string. Whether the named variable is bound is the create-vs-update discriminator: unbound calls host.artifact.create, bound calls host.artifact.update with that value as artifact_id.',
+    )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
     )
 
 

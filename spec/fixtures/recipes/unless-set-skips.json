@@ -1,0 +1,35 @@
+{
+  "description": "A zero-valued bound variable skips fetch and leaves the recipe result unchanged.",
+  "recipe": {
+    "id": "unless-set-skips",
+    "steps": [
+      {
+        "op": "fetch",
+        "as": "result",
+        "url": "https://example.test/uncanned",
+        "unless_set": "latitude"
+      },
+      {
+        "op": "format",
+        "as": "reply",
+        "text": "ok"
+      }
+    ]
+  },
+  "inputs": {
+    "latitude": 0
+  },
+  "host_setup": {
+    "fetch": {}
+  },
+  "expected": {
+    "reply": {
+      "text": "ok",
+      "speech": "ok"
+    },
+    "actions": [],
+    "scheduled_jobs": [],
+    "home_calls": [],
+    "memory_added": []
+  }
+}

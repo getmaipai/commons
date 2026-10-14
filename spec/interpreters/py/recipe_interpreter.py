@@ -124,6 +124,10 @@ async def run_recipe(recipe: Any, inputs: dict[str, Any], host: Any) -> dict[str
     synthesis_hint: str | None = None
 
     for step in recipe.steps:
+        if step.unless_set is not None:
+            value = scope.get(step.unless_set)
+            if value is not None and value != "":
+                continue
         op = step.op
         if op == "fetch":
             url = interpolate(step.url, scope)
