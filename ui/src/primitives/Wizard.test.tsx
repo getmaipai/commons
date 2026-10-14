@@ -338,6 +338,58 @@ describe("Wizard", () => {
     expect(getByRole("heading", { name: "Owner" })).toBeTruthy();
   });
 
+  test("keeps the centered intro inset inside the aside pane and preserves the no-aside inset", () => {
+    const heading = "Welcome to MaiPai Home and Set Up Your Household Together";
+    const { getByRole, rerender } = render(
+      <Wizard
+        steps={STEPS}
+        currentStepId="a"
+        completedCount={0}
+        onJumpTo={() => {}}
+        onNext={() => {}}
+        heading={heading}
+        description="Choose a few options to prepare your household."
+        layout="centered"
+        stepKind="intro"
+      >
+        <p>Long introductory content stays within the wizard column.</p>
+      </Wizard>,
+    );
+
+    const noAsideHeadingColumn = getByRole("heading", { name: heading }).parentElement;
+    const noAsideBodyColumn = noAsideHeadingColumn?.parentElement?.querySelector(".mt-8");
+    expect(noAsideHeadingColumn?.className).toContain("lg:ml-[12vw]");
+    expect(noAsideBodyColumn?.className).toContain("lg:ml-[12vw]");
+    expect(noAsideHeadingColumn?.className).toContain("lg:max-w-[40rem]");
+    expect(noAsideBodyColumn?.className).toContain("lg:max-w-[40rem]");
+
+    rerender(
+      <Wizard
+        steps={STEPS}
+        currentStepId="a"
+        completedCount={0}
+        onJumpTo={() => {}}
+        onNext={() => {}}
+        heading={heading}
+        description="Choose a few options to prepare your household."
+        layout="centered"
+        stepKind="intro"
+        aside={<div aria-hidden="true" />}
+      >
+        <p>Long introductory content stays within the wizard column.</p>
+      </Wizard>,
+    );
+
+    const asideHeadingColumn = getByRole("heading", { name: heading }).parentElement;
+    const asideBodyColumn = asideHeadingColumn?.parentElement?.querySelector(".mt-8");
+    for (const column of [asideHeadingColumn, asideBodyColumn]) {
+      expect(column?.className).toContain("lg:w-[90%]");
+      expect(column?.className).toContain("lg:mx-auto");
+      expect(column?.className).toContain("lg:max-w-none");
+      expect(column?.className).not.toContain("lg:ml-[12vw]");
+    }
+  });
+
   test("Continue calls onNext", () => {
     const onNext = mock(() => {});
     const { getByRole } = render(

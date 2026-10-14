@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.221] - ui-v0.5.221
+
+Fixes centered intro titles and content with an aside so they stay within the left pane and wrap at desktop widths. Intros without an aside keep their existing inset.
+
 ## [0.5.220] - ui-v0.5.220
 
 Adds an intro presentation to `Wizard` centered layout, with a full-width header and footer, vertically centered left-side copy, a large title and lead text, and theme-aware typography and action tokens. Question steps keep a centered 40rem column with 32px headings. `WizardCenteredShowcase` demonstrates the intro layout.

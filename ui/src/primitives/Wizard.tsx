@@ -104,6 +104,11 @@ export function Wizard({
   const split = layout === "split";
   const centered = layout === "centered";
   const centeredIntro = centered && stepKind === "intro";
+  const centeredIntroColumn = centeredIntro
+    ? aside
+      ? "lg:mx-auto lg:w-[90%] lg:max-w-none lg:min-w-0"
+      : "lg:ml-[12vw] lg:max-w-[40rem]"
+    : undefined;
   const sticky = stickyFooter ?? split;
   const progressLabel = progress ? (progress.label ?? `Step ${progress.current} of ${progress.total}`) : undefined;
   const progressBar = progress ? (
@@ -223,8 +228,8 @@ export function Wizard({
           {banner}
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
           <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", centered && "flex flex-col justify-center", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
-            {centered ? <div className={cn("flex w-full flex-col gap-4", centeredIntro && "lg:ml-[12vw] lg:max-w-[40rem]")}>{heads}</div> : heads}
-            {centered ? <div className={cn("mt-8 flex flex-col gap-[var(--wizard-section-gap)]", centeredIntro && "lg:ml-[12vw] lg:max-w-[40rem]")}>{children}</div> : children}
+            {centered ? <div className={cn("flex w-full flex-col gap-4", centeredIntroColumn)}>{heads}</div> : heads}
+            {centered ? <div className={cn("mt-8 flex flex-col gap-[var(--wizard-section-gap)]", centeredIntroColumn)}>{children}</div> : children}
           </div>
           {bar}
         </div>
