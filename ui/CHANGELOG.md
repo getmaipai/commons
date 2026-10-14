@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.212] - ui-v0.5.212
+
+Adds an opt-in phase mode to `Wizard`: phase labels stay visible without numeric markers, and each phase control meets the 48px touch-target floor. The default multi-step wizard is unchanged.
+
 ## [0.5.211] - ui-v0.5.211
 
 Adds the `QrCode` part, which renders an accessible SVG from a URL locally. Its dark modules and light quiet zone use scan-safe contrast tokens in both light and dark themes.
@@ -14,10 +18,6 @@ Carousel adds `autoplayDelay` (default 8000 ms), controlled `paused` and `onPaus
 | `Carousel.paused` / `onPausedChange` | controlled pause state | uncontrolled; internally resumes |
 | `Carousel.pauseOnHover` / `pauseOnFocus` | boolean | follows `autoplay` |
 
-
-## [0.5.206] - ui-v0.5.206
-
-Adds an opt-in phase mode to `Wizard`: phase labels stay visible without numeric markers, and each phase control meets the 48px touch-target floor. The default multi-step wizard is unchanged.
 
 ## [0.5.204] - ui-v0.5.204
 

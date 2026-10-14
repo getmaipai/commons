@@ -73,6 +73,19 @@ describe("Wizard", () => {
     expect(onJumpTo).not.toHaveBeenCalled();
   });
 
+  test("phase mode keeps labels visible, removes numbered markers, and holds the 48px touch floor", () => {
+    const { getByRole } = render(
+      <Wizard steps={STEPS} currentStepId="a" completedCount={0} onJumpTo={() => {}} onNext={() => {}} phaseMode>
+        content
+      </Wizard>,
+    );
+    const phaseList = getByRole("list", { name: "Setup phases" });
+    const firstPhase = getByRole("button", { name: "Household" });
+    expect(phaseList.textContent).toBe("HouseholdOwnerDone");
+    expect(firstPhase.className).toContain("min-h-12");
+    expect(firstPhase.textContent).toBe("Household");
+  });
+
   test("Skip renders the caller's own reason, never a bare label, and fires onSkip", () => {
     const onSkip = mock(() => {});
     const { getByRole } = render(

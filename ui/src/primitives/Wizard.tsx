@@ -30,6 +30,9 @@ interface WizardProps {
   nextLabel?: string;
   nextDisabled?: boolean;
   busy?: boolean;
+  /** Three phase flow: phase names stay visible without step numbers, and
+   * each phase control keeps the kit's 48px touch target. */
+  phaseMode?: boolean;
 }
 
 /** The kit's one wizard pattern (platform plan 6.4): "detect first, one
@@ -57,6 +60,7 @@ export function Wizard({
   nextLabel = "Continue",
   nextDisabled,
   busy,
+  phaseMode = false,
 }: WizardProps) {
   const currentIndex = steps.findIndex((s) => s.id === currentStepId);
 
@@ -70,7 +74,7 @@ export function Wizard({
     // `landmark-one-main`/`region` both failed, since nothing on this
     // page sat inside any landmark at all.
     <main className="flex h-full flex-col gap-6 p-6">
-      <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label="Setup steps">
+      <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
         {steps.map((step, index) => {
           const isDone = index < completedCount;
           const isCurrent = step.id === currentStepId;
@@ -84,24 +88,26 @@ export function Wizard({
                 disabled={!isDone || busy}
                 aria-current={isCurrent ? "step" : undefined}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full px-2 py-1 text-base",
+                  phaseMode ? "flex min-h-12 items-center gap-2 rounded-full px-3 py-2 text-base" : "flex items-center gap-1.5 rounded-full px-2 py-1 text-base",
                   isCurrent && "bg-primary/10 font-medium text-primary",
                   !isCurrent && isReachable && "text-foreground",
                   !isReachable && "text-muted-foreground",
                   isDone && "cursor-pointer hover:bg-accent",
                 )}
               >
-                <span
-                  className={cn(
-                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-sm",
-                    isDone && "border-primary bg-primary text-primary-foreground",
-                    isCurrent && !isDone && "border-primary text-primary",
-                    !isReachable && "border-border",
-                  )}
-                >
-                  {isDone ? <CheckIcon className="h-3 w-3" aria-hidden /> : index + 1}
-                </span>
-                <span className="hidden sm:inline">{step.title}</span>
+                {phaseMode ? (isDone ? <CheckIcon className="h-4 w-4" aria-hidden /> : null) : (
+                  <span
+                    className={cn(
+                      "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-sm",
+                      isDone && "border-primary bg-primary text-primary-foreground",
+                      isCurrent && !isDone && "border-primary text-primary",
+                      !isReachable && "border-border",
+                    )}
+                  >
+                    {isDone ? <CheckIcon className="h-3 w-3" aria-hidden /> : index + 1}
+                  </span>
+                )}
+                <span className={phaseMode ? undefined : "hidden sm:inline"}>{step.title}</span>
               </button>
             </li>
           );
