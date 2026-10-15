@@ -136,6 +136,11 @@ scope lands.
 
 ## [Unreleased]
 
+## [spec-v0.1.141] - 2026-10-14
+
+### Added
+- Robot object parts, verbs, capability references and the actionable `NotSupported` error shape in `vocab/robot-api.json`; new body capability ids are declared in `vocab/capabilities.json`.
+
 ## [spec-v0.1.114] - 2026-10-09
 
 ### Added

@@ -1,0 +1,55 @@
+{
+  "$comment": "The vendor-neutral robot object API from bot/docs/dev/design-robot-api-2026-10-14.md. This file owns part names, their verbs and capability requirements. Capability ids themselves are declared once in capabilities.json.",
+  "whole_robot_verbs": [
+    "connect",
+    "disconnect",
+    "wake",
+    "sleep",
+    "power_on",
+    "shutdown",
+    "emergency_stop"
+  ],
+  "parts": [
+    { "id": "connection", "capabilities": ["connection"], "verbs": ["connect", "disconnect"], "state": ["state"] },
+    { "id": "power", "capabilities": ["power"], "verbs": ["wake", "sleep", "power_on", "shutdown"], "state": ["state"] },
+    { "id": "estop", "capabilities": ["estop"], "verbs": ["engage", "release"], "state": ["engaged"] },
+    { "id": "lease", "capabilities": ["lease"], "verbs": ["acquire", "release"], "state": ["holder"] },
+    { "id": "head", "capabilities": ["head_6dof", "head_pan_tilt"], "capability_mode": "any", "verbs": ["set", "goto", "hold", "enable", "disable"] },
+    { "id": "appendages", "capabilities": ["appendages"], "verbs": ["set", "goto"] },
+    { "id": "base", "capabilities": ["base"], "verbs": ["drive", "stop", "goto", "turn"] },
+    { "id": "posture", "capabilities": ["posture"], "verbs": ["stand", "sit", "lie"] },
+    { "id": "dock", "capabilities": ["dock"], "verbs": ["seek", "leave"], "state": ["docked"] },
+    { "id": "battery", "capabilities": ["battery_readout"], "verbs": [], "state": ["level", "charging", "state", "low", "critical"] },
+    { "id": "health", "capabilities": ["health"], "verbs": [], "state": ["parts", "summary", "readings"] },
+    { "id": "pose", "capabilities": ["pose"], "verbs": [], "state": ["position", "heading", "frame", "confidence"] },
+    { "id": "eyes", "capabilities": ["eyes"], "verbs": ["express"] },
+    { "id": "leds", "capabilities": ["light_ring"], "verbs": ["set", "many"] },
+    { "id": "display", "capabilities": ["screen"], "verbs": ["show", "brightness"] },
+    { "id": "audio", "capabilities": ["mic", "speaker"], "capability_mode": "any", "verbs": ["speaker.play", "speaker.volume", "mic.stream", "direction_of_arrival"] },
+    { "id": "camera", "capabilities": ["camera"], "verbs": ["frame", "stream"] },
+    { "id": "imu", "capabilities": ["imu"], "verbs": ["read", "stream"] },
+    { "id": "touch", "capabilities": ["touch"], "verbs": ["read", "stream"] },
+    { "id": "proximity", "capabilities": ["distance"], "verbs": ["read", "stream"] },
+    { "id": "network", "capabilities": ["network"], "verbs": [], "state": ["link", "signal", "ip", "mac", "rtt", "speed", "peer"] },
+    { "id": "system", "capabilities": ["system"], "verbs": ["reboot", "identify", "factory_reset"], "state": ["serial", "model", "firmware", "load", "clock"] },
+    { "id": "log", "capabilities": ["log"], "verbs": ["read", "tail"] },
+    { "id": "diagnostics", "capabilities": ["diagnostics"], "verbs": ["list", "run", "bundle"] },
+    { "id": "state", "capabilities": ["state_feed"], "verbs": ["stream"] }
+  ],
+  "errors": [
+    {
+      "id": "NotSupported",
+      "shape": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["part", "capability", "message", "fix"],
+        "properties": {
+          "part": { "type": "string", "description": "The robot part the caller tried to use." },
+          "capability": { "type": "string", "description": "The missing capability id from capabilities.json." },
+          "message": { "type": "string", "description": "What the installed body does not support, in plain words." },
+          "fix": { "type": "string", "description": "The next action that lets the caller continue." }
+        }
+      }
+    }
+  ]
+}

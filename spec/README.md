@@ -111,6 +111,7 @@ design record left a choice:
 | `settings/keys.json` | The settings registry (conforms to `schemas/settings-key.schema.json`), including the per-person `notifications.browser.enabled` key | generated from declarations |
 | `settings/areas.json` | The settings areas (Account, Home settings, Chat settings), conforming to `schemas/settings-area.schema.json`; `settings/areas-check.ts` checks each registry key has exactly one card | hand-written |
 | `vocab/capabilities.json` | The capability vocabulary (3.2), including the KS-00 processor registry rows | hand-written |
+| `vocab/robot-api.json` | Robot parts, whole-robot and part verbs, capability references and the `NotSupported` error shape | hand-written |
 | `vocab/permissions.json` | The permissions vocabulary, the install prompt's fixed enum (3.2) | hand-written |
 | `vocab/relationship-types.json` | What may relate to what, whether it can end, and which statuses it admits | hand-written |
 | `vocab/grant-actions.json` | Everything a household can allow or deny per person | hand-written |
