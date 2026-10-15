@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.225] - ui-v0.5.225
+
+The `Wizard` aside layout keeps the step's eyebrow, title and description pinned at the top of the scrolling area, so only the step's content scrolls beneath them.
+
 ## [0.5.224] - ui-v0.5.224
 
 Fixes the `Wizard` aside layout so the left column is exactly one screen tall: the header stays at the top, Back and Continue stay at the bottom, and only the content between them scrolls. Before, a long step grew the page and pushed the footer off screen.

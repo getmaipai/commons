@@ -228,7 +228,7 @@ export function Wizard({
           {banner}
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
           <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", centered && "flex flex-col justify-center", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
-            {centered ? <div className={cn("flex w-full flex-col gap-4", centeredIntroColumn)}>{heads}</div> : heads}
+            <div data-wizard-heads className={cn("sticky top-0 z-10 flex w-full flex-col gap-4 bg-background pb-2", centered && centeredIntroColumn)}>{heads}</div>
             {centered ? <div className={cn("mt-8 flex flex-col gap-[var(--wizard-section-gap)]", centeredIntroColumn)}>{children}</div> : children}
           </div>
           {bar}

@@ -139,6 +139,9 @@ describe("Wizard", () => {
     expect(column.className).not.toContain("min-h-dvh");
     expect(column.querySelector("[data-wizard-header]")).not.toBeNull();
     expect(column.querySelector(".overflow-y-auto")).not.toBeNull();
+    const heads = column.querySelector("[data-wizard-heads]")!;
+    expect(heads.className).toContain("sticky");
+    expect(heads.closest(".overflow-y-auto")).not.toBeNull();
   });
 
   test("aside is not rendered below lg, so its image is not requested on a phone", async () => {
