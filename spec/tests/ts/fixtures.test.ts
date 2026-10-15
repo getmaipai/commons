@@ -247,11 +247,20 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Device.parse(loadFixture("device.example.json"))).not.toThrow();
   });
 
-  for (const kind of ["reachy-mini", "reachy-mini-eyes", "maipai-build"]) {
+  for (const kind of ["reachy-mini", "reachy-mini-eyes", "maipai-build", "stackchan"]) {
     test(`device.robot-${kind}.example.json`, () => {
       expect(() => Device.parse(loadFixture(`device.robot-${kind}.example.json`))).not.toThrow();
     });
   }
+
+  test("StackChan capabilities match the vocabulary in order", () => {
+    const fixture = loadFixture("device.robot-stackchan.example.json") as { capabilities: string[] };
+    const vocabulary = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "vocab", "capabilities.json"), "utf8")) as { capabilities: string[] };
+    expect(fixture.capabilities).toEqual([
+      "lease", "estop", "head_pan_tilt", "light_ring", "speaker", "camera", "battery_readout", "speech_pod",
+    ]);
+    for (const capability of fixture.capabilities) expect(vocabulary.capabilities).toContain(capability);
+  });
 
   for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal", "held", "resting"]) {
     test(`robot-state.${kind}.example.json`, () => {

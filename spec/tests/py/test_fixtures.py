@@ -179,9 +179,27 @@ def test_device_fixture():
     Device.model_validate(load_fixture("device.example.json"))
 
 
-@pytest.mark.parametrize("kind", ["reachy-mini", "reachy-mini-eyes", "maipai-build"])
+@pytest.mark.parametrize(
+    "kind", ["reachy-mini", "reachy-mini-eyes", "maipai-build", "stackchan"]
+)
 def test_robot_device_fixture(kind):
     Device.model_validate(load_fixture(f"device.robot-{kind}.example.json"))
+
+
+def test_stackchan_capabilities_match_vocabulary_in_order():
+    fixture = load_fixture("device.robot-stackchan.example.json")
+    vocabulary = json.loads((SPEC_DIR / "vocab" / "capabilities.json").read_text())
+    assert fixture["capabilities"] == [
+        "lease",
+        "estop",
+        "head_pan_tilt",
+        "light_ring",
+        "speaker",
+        "camera",
+        "battery_readout",
+        "speech_pod",
+    ]
+    assert set(fixture["capabilities"]).issubset(vocabulary["capabilities"])
 
 
 def test_reachy_eye_capability_is_only_on_the_fitted_fixture():

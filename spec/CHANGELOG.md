@@ -1,6 +1,7 @@
 
 ## Unreleased
 
+- STACKCHAN-31. Add a StackChan robot Device fixture with its declared capabilities.
 - Accept optional `attribution` and `hosts` fields on manifest `data_sources` rows through the shared PrivacyRow schema.
 
 ## [spec-v0.1.139] - 2026-10-14
