@@ -22,7 +22,13 @@ fi
 
 WORKSPACE="$1"
 TAG="$2"
+# A linked worktree of this repo (scripts/wt.sh start) resolves to the main checkout,
+# whose parent holds commons-tags and whose worktree list owns the per-tag worktrees.
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+COMMON_DIR="$(git -C "$REPO_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+if [ -n "$COMMON_DIR" ] && [ "$(basename "$COMMON_DIR")" = ".git" ]; then
+  REPO_ROOT="$(dirname "$COMMON_DIR")"
+fi
 
 if ! git -C "$REPO_ROOT" rev-parse -q --verify "refs/tags/$TAG^{commit}" >/dev/null; then
   echo "unknown tag: $TAG (not found in $REPO_ROOT - fetch it or check the pin)" >&2

@@ -17,3 +17,6 @@ __pycache__/
 # spec/'s codegen intermediate, once spec-v0.1.0 lands (home/spec's own
 # .gitignore entry, carried ahead of the move)
 spec/schemas.resolved/
+
+# Per-session worktree data: wt.sh sessions, ports and gate stamps, scratch notes
+data-scratch/

@@ -2,11 +2,20 @@
 # MaiPai Shared pre-commit gate. Runs each populated workspace's own
 # lint and tests, then the pinned @maipai/standards core. See docs/dev.md.
 # With --docs it runs only the standards core, the gate for a commit that
-# touches only Markdown.
+# touches only Markdown. With --pre (tier T1, `scripts/wt.sh check`) it runs
+# installs, lint and typecheck per workspace, ruff, regenerates spec/gen
+# without failing on drift, and the standards core; the tests beside the
+# changed files run from wt.sh, and the full gate (no flag) stays the T2 gate.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-DOCS_ONLY=0; if [ "${1:-}" = "--docs" ]; then DOCS_ONLY=1; fi
+DOCS_ONLY=0; PRE_ONLY=0
+case "${1:-}" in
+  --docs) DOCS_ONLY=1 ;;
+  --pre) PRE_ONLY=1; echo "== scope: pre (lint, typecheck, regenerated files, standards core)" ;;
+  "") ;;
+  *) echo "unknown option '$1'; use --docs (standards core only), --pre (cheap preflight) or no flag (full gate)."; exit 2 ;;
+esac
 
 STANDARDS_REPO="${MAIPAI_STANDARDS_DIR:-../.github}"
 STANDARDS_REPO="$(cd "$STANDARDS_REPO" && pwd)"
@@ -52,8 +61,10 @@ if [ "$DOCS_ONLY" = 0 ]; then
       echo "== $workspace: lint"
       (cd "$workspace" && bun run lint)
 
-      echo "== $workspace: test"
-      (cd "$workspace" && bun test)
+      if [ "$PRE_ONLY" = 0 ]; then
+        echo "== $workspace: test"
+        (cd "$workspace" && bun test)
+      fi
     fi
   done
 
@@ -61,8 +72,10 @@ if [ "$DOCS_ONLY" = 0 ]; then
     echo "== spec: ruff"
     (cd spec && uv run ruff check . && uv run ruff format --check .)
 
-    echo "== spec: pytest"
-    (cd spec && uv run pytest tests/py -q)
+    if [ "$PRE_ONLY" = 0 ]; then
+      echo "== spec: pytest"
+      (cd spec && uv run pytest tests/py -q)
+    fi
   fi
 
   # ensure-tag.sh: proves it creates a worktree for an existing tag and
@@ -72,16 +85,18 @@ if [ "$DOCS_ONLY" = 0 ]; then
   # worktree in place afterward on purpose - that cache is meant to be
   # reused by real consumer pins, not torn down by the gate that proved
   # it works.
-  echo "== ensure-tag.sh: create, reuse, refuse-unknown"
-  FIRST_PATH="$(bash scripts/ensure-tag.sh core core-v0.1.0)"
-  SECOND_PATH="$(bash scripts/ensure-tag.sh core core-v0.1.0)"
-  if [ "$FIRST_PATH" != "$SECOND_PATH" ] || [ ! -d "$FIRST_PATH" ]; then
-    echo "ensure-tag.sh did not reuse the worktree it just created ($FIRST_PATH vs $SECOND_PATH)"
-    exit 1
-  fi
-  if bash scripts/ensure-tag.sh core this-tag-does-not-exist >/dev/null 2>&1; then
-    echo "ensure-tag.sh accepted an unknown tag; it must refuse"
-    exit 1
+  if [ "$PRE_ONLY" = 0 ]; then
+    echo "== ensure-tag.sh: create, reuse, refuse-unknown"
+    FIRST_PATH="$(bash scripts/ensure-tag.sh core core-v0.1.0)"
+    SECOND_PATH="$(bash scripts/ensure-tag.sh core core-v0.1.0)"
+    if [ "$FIRST_PATH" != "$SECOND_PATH" ] || [ ! -d "$FIRST_PATH" ]; then
+      echo "ensure-tag.sh did not reuse the worktree it just created ($FIRST_PATH vs $SECOND_PATH)"
+      exit 1
+    fi
+    if bash scripts/ensure-tag.sh core this-tag-does-not-exist >/dev/null 2>&1; then
+      echo "ensure-tag.sh accepted an unknown tag; it must refuse"
+      exit 1
+    fi
   fi
 fi
 
@@ -108,9 +123,14 @@ if [ "$DOCS_ONLY" = 0 ] && [ -d spec/schemas ]; then
   (cd spec && bun run gen:ts >/dev/null)
   (cd spec && bash scripts/gen-py.sh >/dev/null)
   if ! git diff --quiet -- spec/gen; then
-    echo "spec/gen/ is out of date with spec/schemas/. Run the gen scripts and commit the result."
-    git --no-pager diff --stat -- spec/gen
-    exit 1
+    if [ "$PRE_ONLY" = 1 ]; then
+      echo "spec/gen/ was out of date with spec/schemas/ and has been regenerated; commit it with your change."
+      git --no-pager diff --stat -- spec/gen
+    else
+      echo "spec/gen/ is out of date with spec/schemas/. Run the gen scripts and commit the result."
+      git --no-pager diff --stat -- spec/gen
+      exit 1
+    fi
   fi
 fi
 
