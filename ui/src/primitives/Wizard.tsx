@@ -157,7 +157,7 @@ export function Wizard({
       centered={centered}
       className={sticky
         ? cn(centeredIntro ? "w-full px-6" : centered ? "mx-auto w-full max-w-[40rem] px-4" : columnClass, "border-0 py-3")
-        : undefined}
+        : centered && progress ? "border-0 pt-0" : undefined}
     />
   );
   // A fixed, full-width bar with the segmented progress along its top edge.
@@ -227,7 +227,7 @@ export function Wizard({
           ) : null}
           {banner}
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
-          <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", centered && "flex flex-col justify-center", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
+          <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
             <div data-wizard-heads className={cn("sticky top-0 z-10 flex w-full flex-col gap-4 bg-background pb-2", centered && centeredIntroColumn)}>{heads}</div>
             {centered ? <div className={cn("mt-8 flex flex-col gap-[var(--wizard-section-gap)]", centeredIntroColumn)}>{children}</div> : children}
           </div>
@@ -263,7 +263,7 @@ export function Wizard({
       {banner}
 
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
-      <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", centered && "flex flex-col justify-center", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
+      <div tabIndex={0} className={cn("min-h-0 flex-1 overflow-y-auto", centered && "flex flex-col [justify-content:safe_center]", sticky && "pb-[var(--wizard-bar-height)]", FOCUS_RING)}>
         {centered ? <div className={cn("flex w-full flex-col gap-4", centeredIntro && "lg:ml-[12vw] lg:max-w-[40rem]")}>{heads}</div> : heads}
         {centered ? <div className={cn("mt-8 flex flex-col gap-[var(--wizard-section-gap)]", centeredIntro && "lg:ml-[12vw] lg:max-w-[40rem]")}>{children}</div> : children}
       </div>

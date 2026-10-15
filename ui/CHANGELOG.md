@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.226] - ui-v0.5.226
+
+The `Wizard` aside layout is top-aligned: the eyebrow and title start at the same height on every step instead of being centered on the content, and tall steps are never clipped at the top. In the centered layout the segmented progress bar is now the divider above Back and Continue, so there is no second faint line below it and the row sits at the bottom edge.
+
 ## [0.5.225] - ui-v0.5.225
 
 The `Wizard` aside layout keeps the step's eyebrow, title and description pinned at the top of the scrolling area, so only the step's content scrolls beneath them.

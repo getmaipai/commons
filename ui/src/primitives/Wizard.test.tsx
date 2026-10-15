@@ -66,7 +66,7 @@ describe("Wizard", () => {
     const bar = container.querySelector("[data-wizard-bar]")!;
     expect(main.firstElementChild?.textContent).toBe("Brand");
     expect(getByText("Step 1")).toBeTruthy();
-    expect(content.className).toContain("justify-center");
+    expect(content.className).toContain("safe_center");
     expect(bar.querySelector('[role="progressbar"]')).toBeTruthy();
     expect(queryByText("Step 1 of 3")).toBeNull();
     expect(getByRole("heading", { name: "Tell us about your place" }).className).toContain("tracking-[-0.02em]");
@@ -142,6 +142,13 @@ describe("Wizard", () => {
     const heads = column.querySelector("[data-wizard-heads]")!;
     expect(heads.className).toContain("sticky");
     expect(heads.closest(".overflow-y-auto")).not.toBeNull();
+  });
+
+  test("an aside step starts at the same top position on every screen and is never clipped", () => {
+    const { container } = render(<Wizard {...BASE} layout="centered" aside={<img src="/aside.png" alt="A home" />}>content</Wizard>);
+    const scroller = container.querySelector(".overflow-y-auto")!;
+    expect(scroller.className).not.toContain("justify-center");
+    expect(scroller.className).not.toContain("safe_center");
   });
 
   test("aside is not rendered below lg, so its image is not requested on a phone", async () => {
