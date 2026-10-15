@@ -19,11 +19,11 @@ describe("Card accent variant", () => {
 });
 
 describe("Card state", () => {
-  test("invalid rings the card in the destructive colour and valid in the success hue", () => {
+  test("invalid outlines and tints the card in the destructive colour and valid in the success hue", () => {
     const bad = render(<Card state="invalid" />);
     const badCard = bad.container.querySelector('[data-slot="card"]') as HTMLElement;
     expect(badCard.dataset.state).toBe("invalid");
-    expect(badCard.className).toContain("ring-destructive");
+    expect(badCard.className).toContain("outline-destructive");
     bad.unmount();
     const good = render(<Card state="valid" />);
     const goodCard = good.container.querySelector('[data-slot="card"]') as HTMLElement;
