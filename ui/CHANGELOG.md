@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.223] - ui-v0.5.223
+
+Adds `FolderPicker`, an additive primitive for choosing a folder: a breadcrumb path, a list of subfolders, Up, Choose this folder and New folder with an inline name field. Rows that cannot be used show their reason. It owns no data: it takes a listing, handlers and copy, with loading and error states. `FolderPickerShowcase` demonstrates it. No existing part changes.
+
 ## [0.5.222] - ui-v0.5.222
 
 Adds an opt-in `typography="body"` mode to `Accordion` with 16px phone and 18px desktop text, generous row spacing, and muted detail copy. Existing accordion styling remains the default. Fixes the dark centered Wizard primary button with a light background and dark text; light theme colors stay the same.
