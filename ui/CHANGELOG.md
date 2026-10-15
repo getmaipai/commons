@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.224] - ui-v0.5.224
+
+Fixes the `Wizard` aside layout so the left column is exactly one screen tall: the header stays at the top, Back and Continue stay at the bottom, and only the content between them scrolls. Before, a long step grew the page and pushed the footer off screen.
+
 ## [0.5.223] - ui-v0.5.223
 
 Adds `FolderPicker`, an additive primitive for choosing a folder: a breadcrumb path, a list of subfolders, Up, Choose this folder and New folder with an inline name field. Rows that cannot be used show their reason. It owns no data: it takes a listing, handlers and copy, with loading and error states. `FolderPickerShowcase` demonstrates it. No existing part changes.

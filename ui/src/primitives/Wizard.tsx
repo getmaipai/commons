@@ -210,9 +210,9 @@ export function Wizard({
     return (
       <main
         data-wizard-layout={centered ? "centered" : "aside"}
-        className="grid min-h-dvh w-full grid-cols-1 lg:grid-cols-2"
+        className="grid h-dvh w-full grid-cols-1 grid-rows-[minmax(0,1fr)] lg:grid-cols-2"
       >
-        <div className={cn("mx-auto flex min-h-dvh w-full flex-col gap-6 p-6", centered && !centeredIntro && "max-w-[40rem]")}>
+        <div className={cn("mx-auto flex h-full min-h-0 w-full flex-col gap-6 p-6", centered && !centeredIntro && "max-w-[40rem]")}>
           {header ? <header data-wizard-header className="flex min-h-10 items-center justify-between gap-4">{header}</header> : null}
           {progress && !centered ? (
             <div className="flex w-full flex-col gap-2">

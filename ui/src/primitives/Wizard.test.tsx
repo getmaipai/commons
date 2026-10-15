@@ -130,6 +130,17 @@ describe("Wizard", () => {
     expect(footer.className).not.toContain("lg:max-w-none");
   });
 
+  test("aside layout is one screen tall so the header and footer stay put and only the middle scrolls", () => {
+    const { container } = render(<Wizard {...BASE} header={<span>Save and exit</span>} aside={<img src="/aside.png" alt="A home" />}>content</Wizard>);
+    const main = container.querySelector("[data-wizard-layout]")!;
+    expect(main.className).toContain("h-dvh");
+    expect(main.className).not.toContain("min-h-dvh");
+    const column = main.firstElementChild!;
+    expect(column.className).not.toContain("min-h-dvh");
+    expect(column.querySelector("[data-wizard-header]")).not.toBeNull();
+    expect(column.querySelector(".overflow-y-auto")).not.toBeNull();
+  });
+
   test("aside is not rendered below lg, so its image is not requested on a phone", async () => {
     await withViewport(1023, (container) => {
       expect(container.querySelector("[data-wizard-aside]")).toBeNull();
