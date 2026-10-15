@@ -83,6 +83,17 @@ describe("Wizard", () => {
     expect(container.querySelector('[data-wizard-layout="centered"]')).toBeTruthy();
   });
 
+  test("dark centered wizard keeps a light primary button while light tokens stay unchanged", async () => {
+    const tokens = await Bun.file(new URL("../tokens.css", import.meta.url)).text();
+    const lightCentered = tokens.match(/:root \[data-wizard-layout="centered"\] \{([\s\S]*?)\n\}/)?.[1];
+    const darkCentered = tokens.match(/:root\.dark \[data-wizard-layout="centered"\], \.dark \[data-wizard-layout="centered"\] \{([\s\S]*?)\n\}/)?.[1];
+
+    expect(lightCentered).toContain("--wizard-primary-background: #222222;");
+    expect(lightCentered).toContain("--wizard-primary-foreground: #ffffff;");
+    expect(darkCentered).toContain("--wizard-primary-background: #f5f5f5;");
+    expect(darkCentered).toContain("--wizard-primary-foreground: #222222;");
+  });
+
   test("centered intro gives the header and footer the full row and anchors its copy in the left half", () => {
     const { container, getByRole } = render(
       <Wizard {...BASE} layout="centered" stepKind="intro" header={<button>Save and exit</button>} stickyFooter onBack={() => {}} heading="Tell us about your place" eyebrow="Step 1" progress={{ current: 1, total: 3 }}>

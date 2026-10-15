@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.222] - ui-v0.5.222
+
+Adds an opt-in `typography="body"` mode to `Accordion` with 16px phone and 18px desktop text, generous row spacing, and muted detail copy. Existing accordion styling remains the default. Fixes the dark centered Wizard primary button with a light background and dark text; light theme colors stay the same.
+
 ## [0.5.221] - ui-v0.5.221
 
 Fixes centered intro titles and content with an aside so they stay within the left pane and wrap at desktop widths. Intros without an aside keep their existing inset.

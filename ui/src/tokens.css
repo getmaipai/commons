@@ -223,8 +223,8 @@
   --wizard-surface: #111111;
   --wizard-divider: #404040;
   --wizard-progress-fill: #f5f5f5;
-  --wizard-primary-background: #222222;
-  --wizard-primary-foreground: #ffffff;
+  --wizard-primary-background: #f5f5f5;
+  --wizard-primary-foreground: #222222;
   --wizard-primary-disabled: #404040;
   --wizard-primary-disabled-foreground: #a3a3a3;
   --wizard-header-pill-background: #111111;
