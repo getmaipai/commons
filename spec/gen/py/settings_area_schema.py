@@ -179,6 +179,7 @@ class Section(BaseModel):
             'home.engine_admin',
             'home.devices_admin',
             'home.routing_stats',
+            'home.reference_library',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn above the cards.')
@@ -194,6 +195,7 @@ class Section(BaseModel):
             'home.engine_admin',
             'home.devices_admin',
             'home.routing_stats',
+            'home.reference_library',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn below the cards.')
@@ -209,6 +211,7 @@ class Section(BaseModel):
             'home.engine_admin',
             'home.devices_admin',
             'home.routing_stats',
+            'home.reference_library',
         ]
         | None
     ) = Field(
