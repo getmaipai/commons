@@ -1,0 +1,59 @@
+{
+  "$comment": "KS-REF-00: reference library bundles are applied once; Custom is edited by the household and is not stored as a preset.",
+  "custom_note": "Custom is not stored as a preset; it is the household's editable selection.",
+  "presets": [
+    {
+      "id": "minimum",
+      "label": "Minimum",
+      "copy": "A small library with useful books for the whole family.",
+      "help": "Includes Simple English Wikipedia, Vikidia, simple Wiktionary, Wikivoyage and the Factbook.",
+      "approx_gb": 5,
+      "members": [
+        { "source": "wikipedia-simple", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "vikidia", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "wiktionary-simple", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "wikivoyage", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "world-factbook", "flavour": "default", "bands": ["child", "teen", "adult"] }
+      ],
+      "settings": { "search.source_mode": "mix", "news.retention_days": 30, "search.fetch_cache_gb": 1, "reference.update.mode": "ask", "reference.download.when": "window" }
+    },
+    {
+      "id": "moderate",
+      "label": "Moderate",
+      "copy": "A balanced library with extra books and a small Wikipedia edition.",
+      "help": "Adds a compact Wikipedia, full Wiktionary and the household Stack Exchange set.",
+      "approx_gb": 38,
+      "members": [
+        { "source": "wikipedia-simple", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "vikidia", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "wiktionary-simple", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "wikivoyage", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "world-factbook", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "wikipedia-en", "flavour": "mini", "bands": ["child", "teen", "adult"] },
+        { "source": "wiktionary-en", "flavour": "default", "bands": ["teen", "adult"] },
+        { "source": "stackexchange", "flavour": "default", "bands": ["teen", "adult"] }
+      ],
+      "settings": { "search.source_mode": "mix", "news.retention_days": 90, "search.fetch_cache_gb": 2, "reference.update.mode": "auto", "reference.download.when": "window" }
+    },
+    {
+      "id": "full",
+      "label": "Full",
+      "copy": "A large library with a broad Wikipedia edition and more reference books.",
+      "help": "Adds full Wikipedia, Wikibooks and adult-only MedlinePlus to Moderate.",
+      "approx_gb": 160,
+      "members": [
+        { "source": "wikipedia-simple", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "vikidia", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "wiktionary-simple", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "wikivoyage", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "world-factbook", "flavour": "default", "bands": ["child", "teen", "adult"] },
+        { "source": "wikipedia-en", "flavour": "maxi", "bands": ["child", "teen", "adult"] },
+        { "source": "wiktionary-en", "flavour": "default", "bands": ["teen", "adult"] },
+        { "source": "stackexchange", "flavour": "default", "bands": ["teen", "adult"] },
+        { "source": "wikibooks", "flavour": "default", "bands": ["teen", "adult"] },
+        { "source": "medlineplus", "flavour": "default", "bands": ["adult"], "adults_only": true }
+      ],
+      "settings": { "search.source_mode": "mix", "news.retention_days": 90, "search.fetch_cache_gb": 10, "reference.update.mode": "auto", "reference.download.when": "window" }
+    }
+  ]
+}

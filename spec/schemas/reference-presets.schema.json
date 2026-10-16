@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maip.ai/spec/schemas/reference-presets.schema.json",
+  "title": "Reference library presets",
+  "type": "object",
+  "required": ["$comment", "custom_note", "presets"],
+  "additionalProperties": false,
+  "properties": {
+    "$comment": { "type": "string", "minLength": 1 },
+    "custom_note": { "type": "string", "minLength": 1 },
+    "presets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "$ref": "#/$defs/preset" }
+    }
+  },
+  "$defs": {
+    "preset": {
+      "type": "object",
+      "required": ["id", "label", "copy", "help", "approx_gb", "members", "settings"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "enum": ["full", "moderate", "minimum"] },
+        "label": { "type": "string", "minLength": 1 },
+        "copy": { "type": "string", "minLength": 1, "maxLength": 90 },
+        "help": { "type": "string", "minLength": 1 },
+        "approx_gb": { "type": "number", "exclusiveMinimum": 0 },
+        "members": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/member" }
+        },
+        "settings": { "type": "object", "minProperties": 1, "additionalProperties": { "type": ["string", "number", "boolean"] } }
+      }
+    },
+    "member": {
+      "type": "object",
+      "required": ["source", "flavour", "bands"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "enum": ["vikidia", "wikipedia-simple", "wikipedia-en", "wiktionary-simple", "wiktionary-en", "wikivoyage", "wikibooks", "world-factbook", "medlineplus", "stackexchange"] },
+        "flavour": { "enum": ["mini", "maxi", "nopic", "default"] },
+        "bands": { "type": "array", "uniqueItems": true, "minItems": 1, "items": { "enum": ["child", "teen", "adult"] } },
+        "adults_only": { "const": true }
+      }
+    }
+  }
+}

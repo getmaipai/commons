@@ -1,6 +1,7 @@
 
 ## Unreleased
 
+- KS-REF-00. Add the reference library presets vocabulary (Minimum, Moderate, Full), the `off` value on `reference.update.mode`, and the `reference.download.when` key.
 - STACKCHAN-31. Add a StackChan robot Device fixture with its declared capabilities.
 - Accept optional `attribution` and `hosts` fields on manifest `data_sources` rows through the shared PrivacyRow schema.
 
