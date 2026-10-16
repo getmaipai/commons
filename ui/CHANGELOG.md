@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.231] - ui-v0.5.231
+
+`Tour` now calls `onFinish` when the last card is finished. The shown-card flag was stale inside the event handler, so Finish was never saved and the tour could start again.
+
 ## [0.5.230] - ui-v0.5.230
 
 `Tour` cards shift and flip with 16px of viewport padding, so a card next to a sidebar target no longer renders off the edge of the screen.
