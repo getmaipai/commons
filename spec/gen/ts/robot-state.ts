@@ -33,6 +33,13 @@ export const RobotState = z
       .describe(
         "Whether the robot's tracking behavior is active, so the card can expose that live device state.",
       ),
+    /**Whether the robot's clock was last corrected against the hub's. Omission means the producer does not yet report this field.*/
+    clock_synced: z
+      .boolean()
+      .describe(
+        "Whether the robot's clock was last corrected against the hub's. Omission means the producer does not yet report this field.",
+      )
+      .optional(),
     /**Whether the robot is running on battery power. Null means its body cannot tell; Reachy Mini always sends null per section 7 of the design record. Omission means the producer does not yet report this field.*/
     on_battery: z
       .union([

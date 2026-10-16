@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- ROBOT-TIME-01. `RobotState` gains optional `clock_synced`, a boolean indicating whether the robot's clock was last corrected against the hub's. Additive; producers may omit it.
+
+## Unreleased
+
 - KS-REF-00. Add the reference library presets vocabulary (Minimum, Moderate, Full), the `off` value on `reference.update.mode`, and the `reference.download.when` key.
 - STACKCHAN-31. Add a StackChan robot Device fixture with its declared capabilities.
 - Accept optional `attribution` and `hosts` fields on manifest `data_sources` rows through the shared PrivacyRow schema.

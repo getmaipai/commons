@@ -352,6 +352,13 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => RobotState.parse(body)).toThrow();
   });
 
+  test("robot-state clock_synced is optional and boolean", () => {
+    expect(RobotState.parse(loadFixture("robot-state.clock-synced.example.json")).clock_synced).toBe(true);
+    expect(RobotState.parse(loadFixture("robot-state.clock-unsynced.example.json")).clock_synced).toBe(false);
+    expect(RobotState.parse(loadFixture("robot-state.minimal.example.json")).clock_synced).toBeUndefined();
+    expect(() => RobotState.parse(loadFixture("robot-state.clock-synced-invalid.example.json"))).toThrow();
+  });
+
   test("robot-state watch_level is optional and closed", () => {
     const idle = loadFixture("robot-state.idle.example.json") as any;
     expect(RobotState.parse(idle).watch_level).toBe("presence");

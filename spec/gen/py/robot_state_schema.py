@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from gen.py._validators import reject_explicit_null
+from gen.py._validators import reject_explicit_null, require_boolean
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -74,6 +74,10 @@ class RobotState(BaseModel):
         ...,
         description="Whether the robot's tracking behavior is active, so the card can expose that live device state.",
     )
+    clock_synced: bool | None = Field(
+        None,
+        description="Whether the robot's clock was last corrected against the hub's. Omission means the producer does not yet report this field.",
+    )
     on_battery: bool | None = Field(
         None,
         description='Whether the robot is running on battery power. Null means its body cannot tell; Reachy Mini always sends null per section 7 of the design record. Omission means the producer does not yet report this field.',
@@ -139,3 +143,8 @@ class RobotState(BaseModel):
     @classmethod
     def reject_explicit_null_validator(cls, v: Any, info: ValidationInfo) -> Any:
         return reject_explicit_null(v, info)
+
+    @field_validator('clock_synced', mode='before')
+    @classmethod
+    def require_boolean_validator(cls, v: Any, info: ValidationInfo) -> Any:
+        return require_boolean(v, info)

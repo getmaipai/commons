@@ -280,6 +280,8 @@ def test_safety_alarm_notification_declaration():
         "held",
         "resting",
         "degraded",
+        "clock-synced",
+        "clock-unsynced",
     ],
 )
 def test_robot_state_fixtures(kind: str):
@@ -331,6 +333,31 @@ def test_robot_state_app_version_rejects_wrong_type():
     body = {**load_fixture("robot-state.idle.example.json"), "app_version": 4}
     with pytest.raises(ValidationError):
         RobotState.model_validate(body)
+
+
+def test_robot_state_clock_synced_is_optional_and_boolean():
+    assert (
+        RobotState.model_validate(
+            load_fixture("robot-state.clock-synced.example.json")
+        ).clock_synced
+        is True
+    )
+    assert (
+        RobotState.model_validate(
+            load_fixture("robot-state.clock-unsynced.example.json")
+        ).clock_synced
+        is False
+    )
+    assert (
+        RobotState.model_validate(
+            load_fixture("robot-state.minimal.example.json")
+        ).clock_synced
+        is None
+    )
+    with pytest.raises(ValidationError):
+        RobotState.model_validate(
+            load_fixture("robot-state.clock-synced-invalid.example.json")
+        )
 
 
 def test_robot_state_motion_and_put_down_count():
