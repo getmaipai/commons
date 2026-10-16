@@ -1,4 +1,8 @@
 
+## [spec-v0.1.151] - 2026-10-16
+
+- ROBOT-SPEC-V1 (lane V, 2026-10-16). Three additive robot changes, (1) New device setting `robot.sleep.auto` (boolean, default true, `robot.hello`, honoured by home and bot): the robot sleeps after 10 minutes of darkness and no speech, and during quiet hours; a face, speech or a knock wakes it. Per robot; an admin changes it through Home, which delivers it as `settings_changed`. (2) `household.quiet_hours.from` and `.to` are now also honoured by `bot` (the robot's temporary `night_from` and `night_to` keys can be dropped). (3) Motor reboot offer, proposal (least-surprising shape, built on the 0.1.149 state fields): `RobotState.motors_reboot_offer` (optional list of latched motor names, a subset of `motors_latched`, for which the robot asks the hub to offer a reboot to an adult; empty or omitted means no offer) is the robot-to-hub signal, carried on the existing state frame; `DeviceCommand` kind `motor_reboot` with payload `{motors: [names]}` (at least one, distinct) is the hub-to-robot command, sent only after an adult says yes on the Devices card, acknowledged by the existing `ack` channel frame. The robot never reboots a motor without the command. New fixtures `robot-state.motor-reboot-offer.example.json` and a `motor_reboot` row in `device-command.kinds.example.json`.
+
 ## [spec-v0.1.150] - 2026-10-16
 
 - Remove the `reference.update.mode` and `reference.pageviews_signal` settings keys (owner-approved 2026-10-16): nothing reads either one. The reference presets no longer set `reference.update.mode`.
@@ -16,10 +20,6 @@
 - CAPTURE-REQ-01. `ReplyPlan.moves` gains the optional ninth move `capture` (`required`, `allowed`, `forbidden`; absent means forbidden): the hub may ask the robot for one camera picture during a turn. Owner ruling 2026-10-16: allowed for every age band. Additive; every existing plan validates unchanged. New fixture `reply-plan.capture.example.json`.
 - ROBOT-SPEC-H1. `robot.live_view.who` declares `range.multiple: true` (a list of adult person ids; the flag was already in the SettingsKey schema), so a hub no longer special-cases the key. A test holds that every `person` key with `range.multiple` has a list default.
 - ROBOT-SPEC-H2. `RobotState` gains the optional `motors_latched` (list of latched motor names), `motors_stuck` (boolean) and `thermal` (`level`, `temp_c`, `vision_hz`, `fault`) keys, the shapes the robot's motor gate and thermal governor already produce. Additive; every existing fixture validates unchanged. New fixture `robot-state.degraded.example.json`.
-
-## Unreleased
-
-- ROBOT-SPEC-V1 (lane V, 2026-10-16). Three additive robot changes, no tag. (1) New device setting `robot.sleep.auto` (boolean, default true, `robot.hello`, honoured by home and bot): the robot sleeps after 10 minutes of darkness and no speech, and during quiet hours; a face, speech or a knock wakes it. Per robot; an admin changes it through Home, which delivers it as `settings_changed`. (2) `household.quiet_hours.from` and `.to` are now also honoured by `bot` (the robot's temporary `night_from` and `night_to` keys can be dropped). (3) Motor reboot offer, proposal (least-surprising shape, built on the 0.1.149 state fields): `RobotState.motors_reboot_offer` (optional list of latched motor names, a subset of `motors_latched`, for which the robot asks the hub to offer a reboot to an adult; empty or omitted means no offer) is the robot-to-hub signal, carried on the existing state frame; `DeviceCommand` kind `motor_reboot` with payload `{motors: [names]}` (at least one, distinct) is the hub-to-robot command, sent only after an adult says yes on the Devices card, acknowledged by the existing `ack` channel frame. The robot never reboots a motor without the command. New fixtures `robot-state.motor-reboot-offer.example.json` and a `motor_reboot` row in `device-command.kinds.example.json`.
 
 ## Unreleased
 
