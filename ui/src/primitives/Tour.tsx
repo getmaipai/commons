@@ -74,7 +74,7 @@ function useViewportSettings() {
 
 export function Tour({ steps, onFinish, onSkip, onTargetMissing }: TourProps) {
   const { phone, reducedMotion } = useViewportSettings();
-  const [hasShownStep, setHasShownStep] = useState(false);
+  const hasShownStep = useRef(false);
   const previousFocus = useCallback(() => {
     const active = document.activeElement;
     return active instanceof HTMLElement ? active : null;
@@ -96,14 +96,14 @@ export function Tour({ steps, onFinish, onSkip, onTargetMissing }: TourProps) {
   });
 
   const handleEvent = useCallback((event: EventData) => {
-    if (event.type === "tooltip") setHasShownStep(true);
+    if (event.type === "tooltip") hasShownStep.current = true;
     if (event.type === "error:target_not_found") onTargetMissing?.(event.index);
     if (event.type === "tour:end") {
       if (event.status === "skipped") onSkip?.();
-      else if (event.status === "finished" && hasShownStep) onFinish?.();
+      else if (event.status === "finished" && hasShownStep.current) onFinish?.();
       focusBeforeTour?.focus({ preventScroll: true });
     }
-  }, [focusBeforeTour, hasShownStep, onFinish, onSkip, onTargetMissing]);
+  }, [focusBeforeTour, onFinish, onSkip, onTargetMissing]);
 
   if (joyrideSteps.length === 0) return null;
 

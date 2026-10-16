@@ -83,6 +83,14 @@ describe("Tour", () => {
     previous.remove();
   });
 
+  test("calls onFinish when the tour ends after a card was shown", () => {
+    const onFinish = mock(() => {});
+    render(<Tour steps={[STEP]} onFinish={onFinish} />);
+    simulateEvent({ type: "tooltip" });
+    simulateEvent({ type: "tour:end", status: "finished" });
+    expect(onFinish).toHaveBeenCalledTimes(1);
+  });
+
   test("closes on Escape", () => {
     render(<Tour steps={[STEP]} />);
     expect(currentJoyrideProps().options?.dismissKeyAction).toBe("close");
