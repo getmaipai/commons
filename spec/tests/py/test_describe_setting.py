@@ -16,6 +16,38 @@ def test_shared_describe_setting_fixtures() -> None:
         assert describe_setting(row["setting"], row["context"]) == row["expected"]
 
 
+def test_voice_enrollment_copy_follows_reader_consent_rules() -> None:
+    key = next(
+        entry for entry in REGISTRY if entry["key"] == "person.voice_print.enrollment"
+    )
+    cases = [
+        ("adult", "self", "I agree to save my voice pattern on this Home."),
+        ("teen", "self", "I agree to save my voice pattern on this Home."),
+        (
+            "child",
+            "guardian",
+            "A parent must agree before a child's voice pattern is saved.",
+        ),
+        ("adult", "admin", "Guests cannot enroll a voice print."),
+    ]
+    for band, viewer, consent in cases:
+        result = describe_setting(
+            key,
+            {
+                "subjectBand": band,
+                "viewer": viewer,
+                "value": False,
+                "source": "default",
+                "effective": False,
+            },
+        )
+        assert result["title"] == "Voice print enrollment"
+        assert result["what_is_stored"] == (
+            "A voice pattern is stored on this Home to recognize you."
+        )
+        assert result["consent"] == consent
+
+
 def test_teen_settings_have_no_state_or_reason_for_admin() -> None:
     row = next(row for row in ROWS if row["context"]["subjectBand"] == "teen")
     result = describe_setting(row["setting"], row["context"])

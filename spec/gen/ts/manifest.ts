@@ -418,6 +418,12 @@ export const PackageManifest = z
                 does: z.string().min(1),
                 does_child: z.string().min(1).optional(),
                 does_teen: z.string().min(1).optional(),
+                title: z.string().min(1).optional(),
+                what_is_stored: z.string().min(1).optional(),
+                consent_adult_self: z.string().min(1).optional(),
+                consent_teen_self: z.string().min(1).optional(),
+                consent_child_parent: z.string().min(1).optional(),
+                consent_guest: z.string().min(1).optional(),
                 options: z.record(z.string(), z.string().min(1)).optional(),
                 /**Display name for each option of a select, when the raw token is not a readable name (searxng -> SearXNG).*/
                 option_labels: z

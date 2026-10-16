@@ -13,7 +13,7 @@ export interface SettingDefinition {
   selector: string;
   range?: { options?: string[]; options_from?: string };
   default: unknown;
-  copy?: { does: string; does_child?: string; does_teen?: string; options?: Record<string, string>; option_labels?: Record<string, string> };
+  copy?: { does: string; does_child?: string; does_teen?: string; title?: string; what_is_stored?: string; consent_adult_self?: string; consent_teen_self?: string; consent_child_parent?: string; consent_guest?: string; options?: Record<string, string>; option_labels?: Record<string, string> };
   control?: Record<SettingBand, "self" | "guardian">;
   band_default?: Record<SettingBand, unknown>;
 }
@@ -30,6 +30,9 @@ export interface DescribeSettingContext {
 
 export interface SettingDescription {
   does: string;
+  title?: string;
+  what_is_stored?: string;
+  consent?: string;
   state?: string;
   reason?: string;
 }
@@ -67,6 +70,17 @@ export function describeSetting(setting: SettingDefinition, context: DescribeSet
     setting.copy?.does ??
     setting.label;
   const result: SettingDescription = { does };
+  const copy = setting.copy;
+  if (copy?.title) result.title = copy.title;
+  if (copy?.what_is_stored) result.what_is_stored = copy.what_is_stored;
+  const consent = context.viewer === "self"
+    ? context.subjectBand === "adult" ? copy?.consent_adult_self
+      : context.subjectBand === "teen" ? copy?.consent_teen_self
+        : copy?.consent_child_parent
+    : context.viewer === "guardian" && context.subjectBand === "child" ? copy?.consent_child_parent
+      : context.viewer === "admin" && context.subjectBand === "child" ? copy?.consent_child_parent
+        : copy?.consent_guest;
+  if (consent) result.consent = consent;
 
   if (context.subjectBand === "teen" && context.viewer !== "self") return result;
   if (context.effective !== context.value && context.value === true && context.effective === false) {

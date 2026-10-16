@@ -51,6 +51,19 @@ describe("spec/settings/areas.json", () => {
     }
   });
 
+  test("Profile declares voice print enrollment beside face enrollment", () => {
+    expect(section("account", "profile").cards).toContainEqual({
+      label: "Face enrollment",
+      group: "person.profile",
+      scope: "person",
+    });
+    expect(section("account", "profile").cards).toContainEqual({
+      label: "Voice print enrollment",
+      group: "person.voice_print",
+      scope: "person",
+    });
+  });
+
   test("the whole file passes the cross-file conformance check", () => {
     expect(checkAreas(file, registry)).toEqual([]);
   });
@@ -415,8 +428,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("the registry keeps the pinned count and includes the checklist dismissal key", () => {
-    expect(registry).toHaveLength(184);
-    expect(new Set(registryIds()).size).toBe(184);
+    expect(registry).toHaveLength(185);
+    expect(new Set(registryIds()).size).toBe(185);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.mode", "reference.update.max_mbps", "reference.pageviews_signal",

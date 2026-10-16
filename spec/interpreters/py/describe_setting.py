@@ -48,6 +48,22 @@ def describe_setting(
         or setting["label"]
     )
     result = {"does": does}
+    copy = setting.get("copy", {})
+    for field in ("title", "what_is_stored"):
+        if copy.get(field):
+            result[field] = copy[field]
+    if context["viewer"] == "self":
+        consent_field = {
+            "adult": "consent_adult_self",
+            "teen": "consent_teen_self",
+            "child": "consent_child_parent",
+        }[band]
+    elif band == "child" and context["viewer"] in ("guardian", "admin"):
+        consent_field = "consent_child_parent"
+    else:
+        consent_field = "consent_guest"
+    if copy.get(consent_field):
+        result["consent"] = copy[consent_field]
 
     if band == "teen" and context["viewer"] != "self":
         return result

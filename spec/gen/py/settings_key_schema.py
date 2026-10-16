@@ -42,6 +42,12 @@ class Copy(BaseModel):
     does: constr(min_length=1)
     does_child: constr(min_length=1) | None = None
     does_teen: constr(min_length=1) | None = None
+    title: constr(min_length=1) | None = None
+    what_is_stored: constr(min_length=1) | None = None
+    consent_adult_self: constr(min_length=1) | None = None
+    consent_teen_self: constr(min_length=1) | None = None
+    consent_child_parent: constr(min_length=1) | None = None
+    consent_guest: constr(min_length=1) | None = None
     options: dict[str, constr(min_length=1)] | None = None
     option_labels: dict[str, constr(min_length=1)] | None = Field(
         None,

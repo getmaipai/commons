@@ -42,6 +42,11 @@
               "label": "Face enrollment",
               "group": "person.profile",
               "scope": "person"
+            },
+            {
+              "label": "Voice print enrollment",
+              "group": "person.voice_print",
+              "scope": "person"
             }
           ],
           "lead_view": "account.profile",

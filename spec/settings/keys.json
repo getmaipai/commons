@@ -3232,6 +3232,29 @@
     ]
   },
   {
+    "key": "person.voice_print.enrollment",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Voice print enrollment",
+    "help": "Choose whether to enroll a voice print for recognition.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.voice_print",
+    "honoured_by": ["home"],
+    "control": {"child": "guardian", "teen": "self", "adult": "self"},
+    "band_default": {"child": false, "teen": false, "adult": false},
+    "copy": {
+      "does": "Helps Home tell your voice apart from other voices.",
+      "title": "Voice print enrollment",
+      "what_is_stored": "A voice pattern is stored on this Home to recognize you.",
+      "consent_adult_self": "I agree to save my voice pattern on this Home.",
+      "consent_teen_self": "I agree to save my voice pattern on this Home.",
+      "consent_child_parent": "A parent must agree before a child's voice pattern is saved.",
+      "consent_guest": "Guests cannot enroll a voice print."
+    }
+  },
+  {
     "key": "ui.appearance",
     "scope": "person",
     "selector": "select",

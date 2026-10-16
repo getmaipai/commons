@@ -18,6 +18,22 @@ describe("describeSetting shared fixtures", () => {
     for (const row of rows) expect(describeSetting(row.setting, row.context)).toEqual(row.expected);
   });
 
+  test("voice enrollment copy follows reader consent rules", () => {
+    const key = registry.find((entry) => entry.key === "person.voice_print.enrollment")!;
+    for (const [subjectBand, viewer, consent] of [
+      ["adult", "self", "I agree to save my voice pattern on this Home."],
+      ["teen", "self", "I agree to save my voice pattern on this Home."],
+      ["child", "guardian", "A parent must agree before a child's voice pattern is saved."],
+      ["adult", "admin", "Guests cannot enroll a voice print."],
+    ] as const) {
+      expect(describeSetting(key, { subjectBand, viewer, value: false, source: "default", effective: false })).toMatchObject({
+        title: "Voice print enrollment",
+        what_is_stored: "A voice pattern is stored on this Home to recognize you.",
+        consent,
+      });
+    }
+  });
+
   test("keeps a teen's setting state and reason private from an admin", () => {
     const row = rows.find((item) => item.context.subjectBand === "teen")!;
     expect(describeSetting(row.setting, row.context)).not.toHaveProperty("state");
@@ -50,6 +66,13 @@ describe("COPY-LINT-01", () => {
       band_default: { child: false, teen: true, adult: true },
     });
     expect(parsed.range).toMatchObject({ options: ["first", "second"], options_from: "companion" });
+    expect(SettingsKey.parse(registry.find((entry) => entry.key === "person.voice_print.enrollment")!)).toMatchObject({
+      copy: {
+        title: "Voice print enrollment",
+        what_is_stored: "A voice pattern is stored on this Home to recognize you.",
+        consent_guest: "Guests cannot enroll a voice print.",
+      },
+    });
     expect(SettingsKey.parse({
       ...setting,
       control: { child: "guardian", teen: "self", adult: "self" },
