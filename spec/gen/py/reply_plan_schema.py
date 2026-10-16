@@ -39,11 +39,15 @@ class Moves(BaseModel):
         ...,
         description='AGE-01 (section 13 part 3): naming a trusted adult as the place for what the hub will not decide or recite, rather than pointing to a source. The trusted-adult move, distinct from `point`.',
     )
+    capture: Literal['required', 'allowed', 'forbidden'] | None = Field(
+        None,
+        description='CAPTURE-REQ-01 (owner ruling 2026-10-16, allowed for every age band): ask the paired robot for one camera picture during this turn ("what is this?"). Optional; a plan that omits it forbids it. The frame lives only for the turn, is never stored, and the robot shows its Eyes cue while it is taken; the hub keeps a parent-visible record that a capture happened (no image).',
+    )
 
 
 class ReplyPlan(BaseModel):
     """
-    SPEC-01 (dev.md section 12 part 3, amended by section 13 part 9 and the coherence review, question 1). A plan of permitted moves, not an order: the engine turns the signal, the protocol state, the surface, an explicit brevity request, the age band and the available evidence into this, and the composer realizes it in the companion's voice. Replaces the composer's earlier fixed 'react, pick, say, point' order (dev.md section 6 part 1, amended). A value shape, carried on conversation-turn.schema.json's own `plan` field, never synced independently. The move vocabulary is declared once, exactly here: react, care, say, pick, point, ask_back, close, defer - no item may add a ninth.
+    SPEC-01 (dev.md section 12 part 3, amended by section 13 part 9 and the coherence review, question 1). A plan of permitted moves, not an order: the engine turns the signal, the protocol state, the surface, an explicit brevity request, the age band and the available evidence into this, and the composer realizes it in the companion's voice. Replaces the composer's earlier fixed 'react, pick, say, point' order (dev.md section 6 part 1, amended). A value shape, carried on conversation-turn.schema.json's own `plan` field, never synced independently. The move vocabulary is declared once, exactly here: react, care, say, pick, point, ask_back, close, defer, plus one optional ninth, `capture` (CAPTURE-REQ-01, owner ruling 2026-10-16: a plan may ask the robot for one camera picture during a turn; absent means forbidden, so every existing plan is unchanged). No item may add a tenth.
 
     What this deliberately does not carry (ACT-03 narrowed, the coherence review's over-design finding): no `claim_state` (section 14, deferred to CRED-01), no `credulity` block (section 15, deferred), no typed move fields on a streamed chat turn (those exist only on a composed/lookup turn's ComposedTurn, off the interactive path per the review's cost analysis - a streamed reply is checked against this plan at the guard boundary instead, by deterministic signs in the sentences).
     """

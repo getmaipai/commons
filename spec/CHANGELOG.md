@@ -1,6 +1,7 @@
 
 ## [spec-v0.1.147] - 2026-10-16
 
+- CAPTURE-REQ-01. `ReplyPlan.moves` gains the optional ninth move `capture` (`required`, `allowed`, `forbidden`; absent means forbidden): the hub may ask the robot for one camera picture during a turn. Owner ruling 2026-10-16: allowed for every age band. Additive; every existing plan validates unchanged. New fixture `reply-plan.capture.example.json`.
 - ROBOT-SPEC-H1. `robot.live_view.who` declares `range.multiple: true` (a list of adult person ids; the flag was already in the SettingsKey schema), so a hub no longer special-cases the key. A test holds that every `person` key with `range.multiple` has a list default.
 - ROBOT-SPEC-H2. `RobotState` gains the optional `motors_latched` (list of latched motor names), `motors_stuck` (boolean) and `thermal` (`level`, `temp_c`, `vision_hz`, `fault`) keys, the shapes the robot's motor gate and thermal governor already produce. Additive; every existing fixture validates unchanged. New fixture `robot-state.degraded.example.json`.
 

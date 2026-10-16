@@ -565,6 +565,26 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => ReplyPlan.parse(loadFixture("reply-plan.example.json"))).not.toThrow();
   });
 
+  // CAPTURE-REQ-01: the optional ninth move. Absent means forbidden, so the
+  // plan without it stays valid; a present state must be one of the three.
+  test("reply-plan capture move is optional, additive and closed", () => {
+    const base = loadFixture("reply-plan.example.json") as any;
+    expect("capture" in base.moves).toBe(false);
+    const withCapture = loadFixture("reply-plan.capture.example.json") as any;
+    expect(withCapture.age_band).toBe("child");
+    expect(ReplyPlan.parse(withCapture).moves.capture).toBe("allowed");
+    for (const state of ["required", "allowed", "forbidden"]) {
+      const plan = { ...base, moves: { ...base.moves, capture: state } };
+      expect(ReplyPlan.parse(plan).moves.capture).toBe(state);
+    }
+    expect(() =>
+      ReplyPlan.parse({ ...base, moves: { ...base.moves, capture: "maybe" } }),
+    ).toThrow();
+    expect(() =>
+      ReplyPlan.parse({ ...base, moves: { ...base.moves, record: "allowed" } }),
+    ).toThrow();
+  });
+
   // SPEC-01's own acceptance: round-trip fixtures for all three SubjectRef
   // variants, and the validator refuses a world reference carrying an
   // entity_id (the second test below).

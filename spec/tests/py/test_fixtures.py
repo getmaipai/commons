@@ -616,6 +616,24 @@ def test_reply_plan_fixture():
     ReplyPlan.model_validate(load_fixture("reply-plan.example.json"))
 
 
+def test_reply_plan_capture_move_is_optional_additive_and_closed():
+    base = load_fixture("reply-plan.example.json")
+    assert "capture" not in base["moves"]
+    child = ReplyPlan.model_validate(load_fixture("reply-plan.capture.example.json"))
+    assert child.moves.capture == "allowed"
+    for state in ("required", "allowed", "forbidden"):
+        plan = {**base, "moves": {**base["moves"], "capture": state}}
+        assert ReplyPlan.model_validate(plan).moves.capture == state
+    with pytest.raises(ValidationError):
+        ReplyPlan.model_validate(
+            {**base, "moves": {**base["moves"], "capture": "maybe"}}
+        )
+    with pytest.raises(ValidationError):
+        ReplyPlan.model_validate(
+            {**base, "moves": {**base["moves"], "record": "allowed"}}
+        )
+
+
 # SubjectRef's root is a bare oneOf (no wrapping object), which
 # datamodel-codegen collapses away rather than emitting a combined union
 # type on the Python side (json-schema-to-zod does emit one for TS - see
