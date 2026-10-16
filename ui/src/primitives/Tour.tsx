@@ -121,7 +121,7 @@ export function Tour({ steps, onFinish, onSkip, onTargetMissing }: TourProps) {
         scrollDuration: reducedMotion ? 0 : 300,
         width: phone ? "calc(100vw - 2rem)" : 380,
       }}
-      floatingOptions={{ hideArrow: true }}
+      floatingOptions={{ hideArrow: true, shiftOptions: { padding: 16, crossAxis: true }, flipOptions: { padding: 16 } }}
       styles={{
         tooltip: { backgroundColor: "transparent", boxShadow: "none", padding: 0 },
         tooltipContainer: { padding: 0 },
