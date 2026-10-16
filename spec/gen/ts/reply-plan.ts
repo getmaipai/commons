@@ -51,11 +51,11 @@ export const ReplyPlan = z
           .describe(
             "AGE-01 (section 13 part 3): naming a trusted adult as the place for what the hub will not decide or recite, rather than pointing to a source. The trusted-adult move, distinct from `point`.",
           ),
-        /**CAPTURE-REQ-01 (owner ruling 2026-10-16, allowed for every age band): ask the paired robot for one camera picture during this turn ("what is this?"). Optional; a plan that omits it forbids it. The frame lives only for the turn, is never stored, and the robot shows its Eyes cue while it is taken; the hub keeps a parent-visible record that a capture happened (no image).*/
+        /**CAPTURE-REQ-01 (owner ruling 2026-10-16, allowed for every age band): ask the paired robot for one camera picture during this turn ("what is this?"). Optional; a plan that omits it forbids it. The frame lives only for the turn, is never stored, and the robot shows its Eyes cue while it is taken; the hub keeps a note that a capture happened, with no image; for a child a parent sees that note through the existing person-access path, and for a teen or adult only that person sees it.*/
         capture: z
           .enum(["required", "allowed", "forbidden"])
           .describe(
-            'CAPTURE-REQ-01 (owner ruling 2026-10-16, allowed for every age band): ask the paired robot for one camera picture during this turn ("what is this?"). Optional; a plan that omits it forbids it. The frame lives only for the turn, is never stored, and the robot shows its Eyes cue while it is taken; the hub keeps a parent-visible record that a capture happened (no image).',
+            'CAPTURE-REQ-01 (owner ruling 2026-10-16, allowed for every age band): ask the paired robot for one camera picture during this turn ("what is this?"). Optional; a plan that omits it forbids it. The frame lives only for the turn, is never stored, and the robot shows its Eyes cue while it is taken; the hub keeps a note that a capture happened, with no image; for a child a parent sees that note through the existing person-access path, and for a teen or adult only that person sees it.',
           )
           .optional(),
       })

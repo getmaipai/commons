@@ -41,7 +41,7 @@ class Moves(BaseModel):
     )
     capture: Literal['required', 'allowed', 'forbidden'] | None = Field(
         None,
-        description='CAPTURE-REQ-01 (owner ruling 2026-10-16, allowed for every age band): ask the paired robot for one camera picture during this turn ("what is this?"). Optional; a plan that omits it forbids it. The frame lives only for the turn, is never stored, and the robot shows its Eyes cue while it is taken; the hub keeps a parent-visible record that a capture happened (no image).',
+        description='CAPTURE-REQ-01 (owner ruling 2026-10-16, allowed for every age band): ask the paired robot for one camera picture during this turn ("what is this?"). Optional; a plan that omits it forbids it. The frame lives only for the turn, is never stored, and the robot shows its Eyes cue while it is taken; the hub keeps a note that a capture happened, with no image; for a child a parent sees that note through the existing person-access path, and for a teen or adult only that person sees it.',
     )
 
 

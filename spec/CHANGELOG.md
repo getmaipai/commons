@@ -1,4 +1,8 @@
 
+## Unreleased
+
+- CAPTURE-REQ-01 wording (owner-approved 2026-10-16). The `ReplyPlan.moves.capture` description no longer promises a parent-visible record for every age band. A capture leaves a note with no image; for a child a parent sees it through the existing person-access path, and for a teen or adult only that person sees it. Description text only; the move and its values are unchanged.
+
 ## [spec-v0.1.148] - 2026-10-16
 
 - SETUP-ROLES-01. `engines.vision.choice`, `engines.stt.choice` and `engines.tts.choice` gain a fixed `off` option beside their `options_from` model list, with plain-words `copy.options.off` text, so settings can turn Photos and Voice off and back on.
