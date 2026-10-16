@@ -1978,20 +1978,6 @@
     ]
   },
   {
-    "key": "reference.pageviews_signal",
-    "scope": "household",
-    "selector": "boolean",
-    "default": false,
-    "label": "Use page views as a news signal",
-    "help": "Use daily Wikipedia page-view counts to help identify notable news stories.",
-    "level": "advanced",
-    "secret": false,
-    "lives_in": "household.reference",
-    "honoured_by": [
-      "home"
-    ]
-  },
-  {
     "key": "reference.update.max_mbps",
     "scope": "household",
     "selector": "number",
@@ -2001,27 +1987,6 @@
     "default": 20,
     "label": "Reference update speed limit (MB/s)",
     "help": "Maximum speed used for automatic reference library updates.",
-    "level": "advanced",
-    "secret": false,
-    "lives_in": "household.reference",
-    "honoured_by": [
-      "home"
-    ]
-  },
-  {
-    "key": "reference.update.mode",
-    "scope": "household",
-    "selector": "select",
-    "range": {
-      "options": [
-        "auto",
-        "ask",
-        "off"
-      ]
-    },
-    "default": "ask",
-    "label": "Reference library update mode",
-    "help": "Choose whether updates happen automatically, wait for you, or stay off.",
     "level": "advanced",
     "secret": false,
     "lives_in": "household.reference",

@@ -15,7 +15,7 @@
         { "source": "wikivoyage", "flavour": "default", "bands": ["child", "teen", "adult"] },
         { "source": "world-factbook", "flavour": "default", "bands": ["child", "teen", "adult"] }
       ],
-      "settings": { "search.source_mode": "mix", "news.retention_days": 30, "search.fetch_cache_gb": 1, "reference.update.mode": "ask", "reference.download.when": "window" }
+      "settings": { "search.source_mode": "mix", "news.retention_days": 30, "search.fetch_cache_gb": 1, "reference.download.when": "window" }
     },
     {
       "id": "moderate",
@@ -33,7 +33,7 @@
         { "source": "wiktionary-en", "flavour": "default", "bands": ["teen", "adult"] },
         { "source": "stackexchange", "flavour": "default", "bands": ["teen", "adult"] }
       ],
-      "settings": { "search.source_mode": "mix", "news.retention_days": 90, "search.fetch_cache_gb": 2, "reference.update.mode": "auto", "reference.download.when": "window" }
+      "settings": { "search.source_mode": "mix", "news.retention_days": 90, "search.fetch_cache_gb": 2, "reference.download.when": "window" }
     },
     {
       "id": "full",
@@ -53,7 +53,7 @@
         { "source": "wikibooks", "flavour": "default", "bands": ["teen", "adult"] },
         { "source": "medlineplus", "flavour": "default", "bands": ["adult"], "adults_only": true }
       ],
-      "settings": { "search.source_mode": "mix", "news.retention_days": 90, "search.fetch_cache_gb": 10, "reference.update.mode": "auto", "reference.download.when": "window" }
+      "settings": { "search.source_mode": "mix", "news.retention_days": 90, "search.fetch_cache_gb": 10, "reference.download.when": "window" }
     }
   ]
 }

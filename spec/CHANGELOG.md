@@ -1,4 +1,8 @@
 
+## Unreleased
+
+- Remove the `reference.update.mode` and `reference.pageviews_signal` settings keys (owner-approved 2026-10-16): nothing reads either one. The reference presets no longer set `reference.update.mode`.
+
 ## [spec-v0.1.149] - 2026-10-16
 
 - CAPTURE-REQ-01 wording (owner-approved 2026-10-16). The `ReplyPlan.moves.capture` description no longer promises a parent-visible record for every age band. A capture leaves a note with no image; for a child a parent sees it through the existing person-access path, and for a teen or adult only that person sees it. Description text only; the move and its values are unchanged.

@@ -57,7 +57,7 @@ describe("KS-REF-00 reference presets", () => {
   });
 
   test("preset copy lines pass the settings copy lint", () => {
-    expect(lintSettingCopy(keys.filter((entry) => ["reference.update.mode", "reference.download.when"].includes(entry.key)), [])).toEqual([]);
+    expect(lintSettingCopy(keys.filter((entry) => entry.key === "reference.download.when"), [])).toEqual([]);
     for (const preset of vocab.presets) {
       expect(preset.copy.length).toBeLessThanOrEqual(90);
       expect((preset.copy.match(/[.!?]/g) ?? []).length).toBe(1);
