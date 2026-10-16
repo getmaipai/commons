@@ -765,13 +765,19 @@
     "scope": "household",
     "selector": "select",
     "range": {
+      "options": [
+        "off"
+      ],
       "options_from": "models.vision"
     },
     "default": "auto",
     "label": "Vision model choice",
     "help": "Choose the model for the Vision role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs vision work to its selected package."
+      "does": "Directs vision work to its selected package.",
+      "options": {
+        "off": "Off: Home will not use photo understanding."
+      }
     },
     "level": "basic",
     "secret": false,
@@ -885,13 +891,19 @@
     "scope": "household",
     "selector": "select",
     "range": {
+      "options": [
+        "off"
+      ],
       "options_from": "models.tts"
     },
     "default": "auto",
     "label": "Tts model choice",
     "help": "Choose the model for the Tts role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs tts work to its selected package."
+      "does": "Directs tts work to its selected package.",
+      "options": {
+        "off": "Off: Home will not speak replies aloud."
+      }
     },
     "level": "basic",
     "secret": false,
@@ -905,13 +917,19 @@
     "scope": "household",
     "selector": "select",
     "range": {
+      "options": [
+        "off"
+      ],
       "options_from": "models.stt"
     },
     "default": "auto",
     "label": "Stt model choice",
     "help": "Choose the model for the Stt role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs stt work to its selected package."
+      "does": "Directs stt work to its selected package.",
+      "options": {
+        "off": "Off: Home will not listen to speech."
+      }
     },
     "level": "basic",
     "secret": false,

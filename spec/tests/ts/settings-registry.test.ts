@@ -34,6 +34,24 @@ describe("spec/settings/keys.json", () => {
     expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
   });
 
+  test("vision and voice model selectors include the fixed off choice beside their live model source", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const copy = {
+      "engines.vision.choice": "Off: Home will not use photo understanding.",
+      "engines.stt.choice": "Off: Home will not listen to speech.",
+      "engines.tts.choice": "Off: Home will not speak replies aloud.",
+    };
+    for (const [key, description] of Object.entries(copy)) {
+      const entry = entries.find((row) => row.key === key);
+      expect(entry, key).toBeDefined();
+      expect(SettingsKey.parse(entry), key).toMatchObject({
+        selector: "select",
+        range: { options: ["off"], options_from: `models.${key.split(".")[1]}` },
+        copy: { options: { off: description } },
+      });
+    }
+  });
+
   test("the emergency kit acknowledgement stores only a household timestamp", () => {
     const matches = (loadRegistry() as Record<string, unknown>[]).filter((row) => row.key === "backups.emergency_kit_saved_at");
     expect(matches).toHaveLength(1);
