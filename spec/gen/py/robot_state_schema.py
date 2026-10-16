@@ -110,6 +110,10 @@ class RobotState(BaseModel):
         None,
         description="Whether the robot's stuck-servo recovery ladder is currently running (any stage other than healthy), so the card can say the body is working on a motor problem. Omission means the producer does not yet report this field.",
     )
+    motors_reboot_offer: list[constr(min_length=1)] | None = Field(
+        None,
+        description="Names of the latched motors for which the robot asks the hub to offer a reboot to an adult (a latched servo error that cycling the motor mode did not clear). Always a subset of motors_latched. An empty list means no offer is pending; omission means the producer does not yet report this field. The hub shows one card offer and, on an adult's yes, sends a motor_reboot command naming these motors; the robot never reboots a motor on its own while a person may be touching the head.",
+    )
     thermal: Thermal | None = Field(
         None,
         description="The robot's thermal governor state, so the hub can say why the robot has slowed down. Omission means the producer does not report thermal state (no monitor wired).",

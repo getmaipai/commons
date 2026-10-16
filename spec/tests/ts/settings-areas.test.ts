@@ -429,8 +429,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("the registry keeps the pinned count and includes the checklist dismissal key", () => {
-    expect(registry).toHaveLength(183);
-    expect(new Set(registryIds()).size).toBe(183);
+    expect(registry).toHaveLength(184);
+    expect(new Set(registryIds()).size).toBe(184);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.max_mbps",

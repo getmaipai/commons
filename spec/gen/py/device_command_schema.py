@@ -323,6 +323,33 @@ class DeviceCommand13(BaseModel):
     payload: Payload11
 
 
+class Payload12(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    motors: list[constr(min_length=1)] = Field(
+        ...,
+        description='Names of the motors to reboot, each one the robot listed in motors_reboot_offer. The hub sends this only after an adult chose to reboot on the Devices card; the robot reboots exactly these motors and no others.',
+        min_length=1,
+    )
+
+
+class DeviceCommand14(BaseModel):
+    """
+    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['motor_reboot']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload12
+
+
 class DeviceCommand(
     RootModel[
         DeviceCommand1
@@ -338,6 +365,7 @@ class DeviceCommand(
         | DeviceCommand11
         | DeviceCommand12
         | DeviceCommand13
+        | DeviceCommand14
     ]
 ):
     root: (
@@ -354,6 +382,7 @@ class DeviceCommand(
         | DeviceCommand11
         | DeviceCommand12
         | DeviceCommand13
+        | DeviceCommand14
     ) = Field(
         ...,
         description='A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.',

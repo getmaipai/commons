@@ -232,6 +232,30 @@ export const DeviceCommand = z
           payload: z.object({ manifest_version: z.string().min(1) }).strict(),
         })
         .strict(),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("motor_reboot"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({
+              /**Names of the motors to reboot, each one the robot listed in motors_reboot_offer. The hub sends this only after an adult chose to reboot on the Devices card; the robot reboots exactly these motors and no others.*/
+              motors: z
+                .array(z.string().min(1))
+                .min(1)
+                .refine(
+                  (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                  "All items must be unique!",
+                )
+                .describe(
+                  "Names of the motors to reboot, each one the robot listed in motors_reboot_offer. The hub sends this only after an adult chose to reboot on the Devices card; the robot reboots exactly these motors and no others.",
+                ),
+            })
+            .strict(),
+        })
+        .strict(),
     ];
     const { errors, failed } = schemas.reduce<{
       errors: z.core.$ZodIssue[];

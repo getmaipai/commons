@@ -1,0 +1,8 @@
+{
+  "activity": "idle",
+  "muted": false,
+  "tracking": true,
+  "motors_latched": ["body_yaw", "stewart_3"],
+  "motors_stuck": true,
+  "motors_reboot_offer": ["stewart_3"]
+}

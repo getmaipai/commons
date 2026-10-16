@@ -19,6 +19,10 @@
 
 ## Unreleased
 
+- ROBOT-SPEC-V1 (lane V, 2026-10-16). Three additive robot changes, no tag. (1) New device setting `robot.sleep.auto` (boolean, default true, `robot.hello`, honoured by home and bot): the robot sleeps after 10 minutes of darkness and no speech, and during quiet hours; a face, speech or a knock wakes it. Per robot; an admin changes it through Home, which delivers it as `settings_changed`. (2) `household.quiet_hours.from` and `.to` are now also honoured by `bot` (the robot's temporary `night_from` and `night_to` keys can be dropped). (3) Motor reboot offer, proposal (least-surprising shape, built on the 0.1.149 state fields): `RobotState.motors_reboot_offer` (optional list of latched motor names, a subset of `motors_latched`, for which the robot asks the hub to offer a reboot to an adult; empty or omitted means no offer) is the robot-to-hub signal, carried on the existing state frame; `DeviceCommand` kind `motor_reboot` with payload `{motors: [names]}` (at least one, distinct) is the hub-to-robot command, sent only after an adult says yes on the Devices card, acknowledged by the existing `ack` channel frame. The robot never reboots a motor without the command. New fixtures `robot-state.motor-reboot-offer.example.json` and a `motor_reboot` row in `device-command.kinds.example.json`.
+
+## Unreleased
+
 - ROBOT-TIME-01. `RobotState` gains optional `clock_synced`, a boolean indicating whether the robot's clock was last corrected against the hub's. Additive; producers may omit it.
 
 ## Unreleased

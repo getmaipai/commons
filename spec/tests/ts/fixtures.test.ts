@@ -262,7 +262,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     for (const capability of fixture.capabilities) expect(vocabulary.capabilities).toContain(capability);
   });
 
-  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal", "held", "resting", "degraded"]) {
+  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal", "held", "resting", "degraded", "motor-reboot-offer"]) {
     test(`robot-state.${kind}.example.json`, () => {
       expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();
     });
@@ -270,7 +270,7 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
     const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
-    expect(commands).toHaveLength(14);
+    expect(commands).toHaveLength(15);
     for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();
@@ -280,6 +280,26 @@ describe("record fixtures validate against their generated Zod models", () => {
     const offer = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "offer")!;
     expect(offer.payload).not.toHaveProperty("text");
     expect(() => DeviceCommand.parse({ ...offer, payload: { ...offer.payload, text: "prepared content" } })).toThrow();
+  });
+
+  test("motor_reboot command names at least one distinct motor and takes nothing else", () => {
+    const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as { kind: string; payload: Record<string, unknown> }[];
+    const reboot = commands.find((command) => command.kind === "motor_reboot")!;
+    expect(reboot.payload).toEqual({ motors: ["stewart_3"] });
+    for (const payload of [{}, { motors: [] }, { motors: ["a", "a"] }, { motors: [""] }, { motors: "a" }, { motors: ["a"], force: true }]) {
+      expect(() => DeviceCommand.parse({ ...reboot, payload }), JSON.stringify(payload)).toThrow();
+    }
+  });
+
+  test("robot-state motors_reboot_offer: present validates, omitted and empty validate, bad shapes are rejected", () => {
+    const offer = RobotState.parse(loadFixture("robot-state.motor-reboot-offer.example.json"));
+    expect(offer.motors_reboot_offer).toEqual(["stewart_3"]);
+    expect(RobotState.parse(loadFixture("robot-state.degraded.example.json")).motors_reboot_offer).toBeUndefined();
+    const base = loadFixture("robot-state.motor-reboot-offer.example.json") as Record<string, unknown>;
+    expect(RobotState.parse({ ...base, motors_reboot_offer: [] }).motors_reboot_offer).toEqual([]);
+    for (const bad of [{ ...base, motors_reboot_offer: "stewart_3" }, { ...base, motors_reboot_offer: ["a", "a"] }, { ...base, motors_reboot_offer: [""] }]) {
+      expect(() => RobotState.parse(bad)).toThrow();
+    }
   });
 
   test("robot channel frames accept voice answers and reject gesture answers", () => {

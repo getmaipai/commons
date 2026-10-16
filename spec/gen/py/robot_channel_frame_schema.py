@@ -28,7 +28,7 @@ class RobotChannelFrame1(BaseModel):
     payload: Payload
 
 
-class Payload13(BaseModel):
+class Payload14(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -46,10 +46,10 @@ class RobotChannelFrame2(BaseModel):
         extra='forbid',
     )
     kind: Literal['offer_answer']
-    payload: Payload13
+    payload: Payload14
 
 
-class Payload14(BaseModel):
+class Payload15(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -66,7 +66,7 @@ class RobotChannelFrame3(BaseModel):
         extra='forbid',
     )
     kind: Literal['offer_snooze']
-    payload: Payload14
+    payload: Payload15
 
 
 class RobotChannelFrame(

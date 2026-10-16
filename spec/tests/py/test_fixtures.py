@@ -212,7 +212,7 @@ def test_reachy_eye_capability_is_only_on_the_fitted_fixture():
 
 def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
     commands = load_fixture("device-command.kinds.example.json")
-    assert len(commands) == 14
+    assert len(commands) == 15
     for command in commands:
         DeviceCommand.model_validate(command)
     invalid = {**commands[0], "kind": "capture_request"}
@@ -228,6 +228,33 @@ def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
         DeviceCommand.model_validate(
             {**offer, "payload": {**offer["payload"], "text": "prepared content"}}
         )
+
+
+def test_motor_reboot_command_and_offer_shapes():
+    # Pydantic does not enforce uniqueItems; the TS test and the JSON Schema do.
+    commands = load_fixture("device-command.kinds.example.json")
+    reboot = next(c for c in commands if c["kind"] == "motor_reboot")
+    assert reboot["payload"] == {"motors": ["stewart_3"]}
+    for payload in (
+        {},
+        {"motors": []},
+        {"motors": [""]},
+        {"motors": "a"},
+        {"motors": ["a"], "force": True},
+    ):
+        with pytest.raises(ValidationError):
+            DeviceCommand.model_validate({**reboot, "payload": payload})
+    offer = RobotState.model_validate(
+        load_fixture("robot-state.motor-reboot-offer.example.json")
+    )
+    assert offer.motors_reboot_offer == ["stewart_3"]
+    base = load_fixture("robot-state.motor-reboot-offer.example.json")
+    assert RobotState.model_validate({**base, "motors_reboot_offer": []})
+    for bad in ("stewart_3", [""]):
+        with pytest.raises(ValidationError):
+            RobotState.model_validate({**base, "motors_reboot_offer": bad})
+    degraded = load_fixture("robot-state.degraded.example.json")
+    assert RobotState.model_validate(degraded).motors_reboot_offer is None
 
 
 def test_robot_channel_frames_and_voice_only_answers():
@@ -280,6 +307,7 @@ def test_safety_alarm_notification_declaration():
         "held",
         "resting",
         "degraded",
+        "motor-reboot-offer",
         "clock-synced",
         "clock-unsynced",
     ],
