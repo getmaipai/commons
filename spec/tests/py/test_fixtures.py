@@ -279,10 +279,32 @@ def test_safety_alarm_notification_declaration():
         "minimal",
         "held",
         "resting",
+        "degraded",
     ],
 )
 def test_robot_state_fixtures(kind: str):
     RobotState.model_validate(load_fixture(f"robot-state.{kind}.example.json"))
+
+
+def test_robot_state_motor_and_thermal_keys():
+    degraded = RobotState.model_validate(
+        load_fixture("robot-state.degraded.example.json")
+    )
+    assert degraded.motors_latched == ["body_yaw"]
+    assert degraded.motors_stuck is True
+    assert degraded.thermal.level == "gestures_suspended"
+    minimal = RobotState.model_validate(
+        load_fixture("robot-state.minimal.example.json")
+    )
+    assert minimal.thermal is None
+    base = load_fixture("robot-state.degraded.example.json")
+    for bad in (
+        {**base, "motors_latched": "body_yaw"},
+        {**base, "thermal": {**base["thermal"], "level": "melting"}},
+        {**base, "thermal": {"level": "nominal"}},
+    ):
+        with pytest.raises(ValidationError):
+            RobotState.model_validate(bad)
 
 
 def test_robot_state_activity_rejects_unlisted_value():

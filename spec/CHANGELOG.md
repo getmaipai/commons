@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+- ROBOT-SPEC-H1. `robot.live_view.who` declares `range.multiple: true` (a list of adult person ids; the flag was already in the SettingsKey schema), so a hub no longer special-cases the key. A test holds that every `person` key with `range.multiple` has a list default.
+- ROBOT-SPEC-H2. `RobotState` gains the optional `motors_latched` (list of latched motor names), `motors_stuck` (boolean) and `thermal` (`level`, `temp_c`, `vision_hz`, `fault`) keys, the shapes the robot's motor gate and thermal governor already produce. Additive; every existing fixture validates unchanged. New fixture `robot-state.degraded.example.json`.
 - KS-REF-00. Add the reference library presets vocabulary (Minimum, Moderate, Full), the `off` value on `reference.update.mode`, and the `reference.download.when` key.
 - STACKCHAN-31. Add a StackChan robot Device fixture with its declared capabilities.
 - Accept optional `attribution` and `hosts` fields on manifest `data_sources` rows through the shared PrivacyRow schema.

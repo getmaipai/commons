@@ -13,8 +13,37 @@ from pydantic import (
     ValidationInfo,
     confloat,
     conint,
+    constr,
     field_validator,
 )
+
+
+class Thermal(BaseModel):
+    """
+    The robot's thermal governor state, so the hub can say why the robot has slowed down. Omission means the producer does not report thermal state (no monitor wired).
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    level: Literal['nominal', 'vision_slowed', 'gestures_suspended', 'idle_still'] = (
+        Field(
+            ...,
+            description="The thermal governor's current step: nominal, vision slowed, gestures suspended, then idle and still. A consumer that meets a level it does not know treats it as unknown, not as an error.",
+        )
+    )
+    temp_c: float | None = Field(
+        ...,
+        description='The last measured body temperature in degrees Celsius. Null means no reading is available.',
+    )
+    vision_hz: confloat(ge=0.0) = Field(
+        ...,
+        description='The camera processing rate the governor currently allows, in frames per second.',
+    )
+    fault: bool = Field(
+        ...,
+        description='Whether the temperature sensor could not be read, so the level is a best guess.',
+    )
 
 
 class RobotState(BaseModel):
@@ -68,6 +97,18 @@ class RobotState(BaseModel):
     app_version: str | None = Field(
         None,
         description="The MaiPai app version the robot runs (the maipai-bot release), so the hub can compare the robot to a published Bot release; daemon_version is the vendor SDK's version, not this one. Null means no version is currently known; omission means the producer does not yet report this field.",
+    )
+    motors_latched: list[constr(min_length=1)] | None = Field(
+        None,
+        description="Names of the motors the robot's motor gate has latched off after a failed recovery, so the hub can show which parts are down. An empty list means none are latched. Omission means the producer does not yet report this field.",
+    )
+    motors_stuck: bool | None = Field(
+        None,
+        description="Whether the robot's stuck-servo recovery ladder is currently running (any stage other than healthy), so the card can say the body is working on a motor problem. Omission means the producer does not yet report this field.",
+    )
+    thermal: Thermal | None = Field(
+        None,
+        description="The robot's thermal governor state, so the hub can say why the robot has slowed down. Omission means the producer does not report thermal state (no monitor wired).",
     )
     watch_level: Literal['off', 'presence', 'identify'] | None = Field(
         None,

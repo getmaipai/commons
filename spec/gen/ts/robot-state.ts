@@ -123,6 +123,74 @@ export const RobotState = z
         "The MaiPai app version the robot runs (the maipai-bot release), so the hub can compare the robot to a published Bot release; daemon_version is the vendor SDK's version, not this one. Null means no version is currently known; omission means the producer does not yet report this field.",
       )
       .optional(),
+    /**Names of the motors the robot's motor gate has latched off after a failed recovery, so the hub can show which parts are down. An empty list means none are latched. Omission means the producer does not yet report this field.*/
+    motors_latched: z
+      .array(z.string().min(1))
+      .refine(
+        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+        "All items must be unique!",
+      )
+      .describe(
+        "Names of the motors the robot's motor gate has latched off after a failed recovery, so the hub can show which parts are down. An empty list means none are latched. Omission means the producer does not yet report this field.",
+      )
+      .optional(),
+    /**Whether the robot's stuck-servo recovery ladder is currently running (any stage other than healthy), so the card can say the body is working on a motor problem. Omission means the producer does not yet report this field.*/
+    motors_stuck: z
+      .boolean()
+      .describe(
+        "Whether the robot's stuck-servo recovery ladder is currently running (any stage other than healthy), so the card can say the body is working on a motor problem. Omission means the producer does not yet report this field.",
+      )
+      .optional(),
+    /**The robot's thermal governor state, so the hub can say why the robot has slowed down. Omission means the producer does not report thermal state (no monitor wired).*/
+    thermal: z
+      .object({
+        /**The thermal governor's current step: nominal, vision slowed, gestures suspended, then idle and still. A consumer that meets a level it does not know treats it as unknown, not as an error.*/
+        level: z
+          .enum([
+            "nominal",
+            "vision_slowed",
+            "gestures_suspended",
+            "idle_still",
+          ])
+          .describe(
+            "The thermal governor's current step: nominal, vision slowed, gestures suspended, then idle and still. A consumer that meets a level it does not know treats it as unknown, not as an error.",
+          ),
+        /**The last measured body temperature in degrees Celsius. Null means no reading is available.*/
+        temp_c: z
+          .union([
+            z
+              .number()
+              .describe(
+                "The last measured body temperature in degrees Celsius. Null means no reading is available.",
+              ),
+            z
+              .null()
+              .describe(
+                "The last measured body temperature in degrees Celsius. Null means no reading is available.",
+              ),
+          ])
+          .describe(
+            "The last measured body temperature in degrees Celsius. Null means no reading is available.",
+          ),
+        /**The camera processing rate the governor currently allows, in frames per second.*/
+        vision_hz: z
+          .number()
+          .gte(0)
+          .describe(
+            "The camera processing rate the governor currently allows, in frames per second.",
+          ),
+        /**Whether the temperature sensor could not be read, so the level is a best guess.*/
+        fault: z
+          .boolean()
+          .describe(
+            "Whether the temperature sensor could not be read, so the level is a best guess.",
+          ),
+      })
+      .strict()
+      .describe(
+        "The robot's thermal governor state, so the hub can say why the robot has slowed down. Omission means the producer does not report thermal state (no monitor wired).",
+      )
+      .optional(),
     /**The effective local camera watch level the robot reports to the hub, using the strictest applicable person and device setting.*/
     watch_level: z
       .enum(["off", "presence", "identify"])

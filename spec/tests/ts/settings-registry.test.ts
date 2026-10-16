@@ -175,6 +175,25 @@ describe("SETTINGS-ROBOT-01 declarations", () => {
   });
 });
 
+describe("robot.live_view.who is a multi-select of people", () => {
+  test("declares range.multiple with a list default, and parses as a SettingsKey", () => {
+    const entries = loadRegistry() as { key: string; selector: string; default: unknown; range?: { multiple?: boolean } }[];
+    const who = entries.filter((e) => e.key === "robot.live_view.who");
+    expect(who).toHaveLength(1);
+    expect(who[0]!.selector).toBe("person");
+    expect(who[0]!.range?.multiple).toBe(true);
+    expect(who[0]!.default).toEqual([]);
+    expect(() => SettingsKey.parse(who[0])).not.toThrow();
+  });
+
+  test("every person key with range.multiple has a list default", () => {
+    const entries = loadRegistry() as { key: string; selector: string; default: unknown; range?: { multiple?: boolean } }[];
+    for (const e of entries.filter((x) => x.selector === "person" && x.range?.multiple === true)) {
+      expect(Array.isArray(e.default), e.key).toBe(true);
+    }
+  });
+});
+
 describe("IMG-SPEC-KEYS declarations", () => {
   const entries = loadRegistry() as Record<string, unknown>[];
   const help =

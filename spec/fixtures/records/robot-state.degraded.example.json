@@ -1,0 +1,13 @@
+{
+  "activity": "idle",
+  "muted": false,
+  "tracking": true,
+  "motors_latched": ["body_yaw"],
+  "motors_stuck": true,
+  "thermal": {
+    "level": "gestures_suspended",
+    "temp_c": 74.5,
+    "vision_hz": 2.0,
+    "fault": false
+  }
+}

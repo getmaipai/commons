@@ -262,7 +262,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     for (const capability of fixture.capabilities) expect(vocabulary.capabilities).toContain(capability);
   });
 
-  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal", "held", "resting"]) {
+  for (const kind of ["starting", "idle", "listening", "thinking", "speaking", "reconnecting", "sleeping", "unknown-battery", "minimal", "held", "resting", "degraded"]) {
     test(`robot-state.${kind}.example.json`, () => {
       expect(() => RobotState.parse(loadFixture(`robot-state.${kind}.example.json`))).not.toThrow();
     });
@@ -311,6 +311,31 @@ describe("record fixtures validate against their generated Zod models", () => {
     const manifest = PackageManifest.parse(loadFixture("manifest.example.json"));
     const alarm = manifest.notifications?.find((item) => item.id === "safety.alarm");
     expect(alarm).toMatchObject({ level: "immediate", configurable: false, audience: "household", actions: ["acknowledge", "quiet_here", "false_alarm"] });
+  });
+
+  test("robot-state motors_latched, motors_stuck and thermal: present validates, omitted still validates, bad shapes are rejected", () => {
+    const degraded = RobotState.parse(loadFixture("robot-state.degraded.example.json"));
+    expect(degraded.motors_latched).toEqual(["body_yaw"]);
+    expect(degraded.motors_stuck).toBe(true);
+    expect(degraded.thermal?.level).toBe("gestures_suspended");
+    const minimal = RobotState.parse(loadFixture("robot-state.minimal.example.json"));
+    expect(minimal.motors_latched).toBeUndefined();
+    expect(minimal.thermal).toBeUndefined();
+    const base = loadFixture("robot-state.degraded.example.json") as Record<string, unknown>;
+    const thermal = base.thermal as Record<string, unknown>;
+    expect(RobotState.parse({ ...base, thermal: { ...thermal, temp_c: null, fault: true } }).thermal?.temp_c).toBeNull();
+    expect(RobotState.parse({ ...base, motors_latched: [] }).motors_latched).toEqual([]);
+    for (const bad of [
+      { ...base, motors_latched: "body_yaw" },
+      { ...base, motors_latched: ["a", "a"] },
+      { ...base, motors_stuck: "yes" },
+      { ...base, thermal: { ...thermal, level: "melting" } },
+      { ...base, thermal: { ...thermal, vision_hz: -1 } },
+      { ...base, thermal: { level: "nominal" } },
+      { ...base, thermal: { ...thermal, extra: 1 } },
+    ]) {
+      expect(() => RobotState.parse(bad)).toThrow();
+    }
   });
 
   test("robot-state activity: an unlisted value is still rejected", () => {
