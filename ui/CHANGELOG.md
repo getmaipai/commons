@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.230] - ui-v0.5.230
+
+`Tour` cards shift and flip with 16px of viewport padding, so a card next to a sidebar target no longer renders off the edge of the screen.
+
 ## [0.5.226] - ui-v0.5.226
 
 The `Wizard` aside layout is top-aligned: the eyebrow and title start at the same height on every step instead of being centered on the content, and tall steps are never clipped at the top. In the centered layout the segmented progress bar is now the divider above Back and Continue, so there is no second faint line below it and the row sits at the bottom edge.
