@@ -21,7 +21,7 @@ addFormats(ajv);
 const schema = read("schemas", "answer-block.schema.json");
 const validate = ajv.compile(schema);
 
-const V1_KINDS = ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison"];
+const V1_KINDS = ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card"];
 
 describe("answer-block fixtures", () => {
   const fixtures = readdirSync(join(SPEC, "fixtures", "answer-block")).filter((f) => f.endsWith(".json")).sort();

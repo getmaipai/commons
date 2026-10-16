@@ -11,12 +11,13 @@
     { "$ref": "#/$defs/todo_list" },
     { "$ref": "#/$defs/image_gallery" },
     { "$ref": "#/$defs/schedule_card" },
-    { "$ref": "#/$defs/comparison" }
+    { "$ref": "#/$defs/comparison" },
+    { "$ref": "#/$defs/weather_card" }
   ],
   "$defs": {
     "kind": {
       "type": "string",
-      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison"],
+      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card"],
       "description": "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here."
     },
     "block_id": {
@@ -476,6 +477,75 @@
             },
             "recommendedId": { "type": "string", "minLength": 1, "description": "The id of the option marked as the pick. Absent: no option is marked." },
             "reason": { "type": "string" }
+          }
+        }
+      }
+    },
+    "weather_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" },
+        "kind": { "const": "weather_card" },
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "producer": { "$ref": "#/$defs/producer" },
+        "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "created_at": { "$ref": "#/$defs/created_at" },
+        "hlc": { "$ref": "#/$defs/hlc" },
+        "after_paragraph": { "$ref": "#/$defs/after_paragraph" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["place", "unit", "current", "daily", "attribution"],
+          "properties": {
+            "place": { "type": "string", "minLength": 1, "description": "The place label, shown small caps on the hero." },
+            "unit": { "enum": ["F", "C"], "description": "The unit of every temperature in the block." },
+            "current": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["temp", "condition", "code", "is_day"],
+              "properties": {
+                "temp": { "type": "number" },
+                "condition": { "type": "string" },
+                "code": { "type": "integer", "minimum": 0, "maximum": 99, "description": "WMO weather code (the Open-Meteo weather_code)." },
+                "is_day": { "type": "boolean" }
+              }
+            },
+            "hourly": {
+              "type": "array",
+              "maxItems": 24,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["time", "temp"],
+                "properties": {
+                  "time": { "type": "string", "minLength": 1, "description": "ISO 8601 time." },
+                  "temp": { "type": "number" },
+                  "pop": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Chance of precipitation, percent." }
+                }
+              }
+            },
+            "daily": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["date", "high", "low", "code"],
+                "properties": {
+                  "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "description": "Calendar date, YYYY-MM-DD." },
+                  "high": { "type": "number" },
+                  "low": { "type": "number" },
+                  "code": { "type": "integer", "minimum": 0, "maximum": 99, "description": "WMO weather code." },
+                  "pop": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Chance of precipitation, percent." }
+                }
+              }
+            },
+            "attribution": { "type": "string" }
           }
         }
       }

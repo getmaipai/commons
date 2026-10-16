@@ -468,6 +468,7 @@ class PackageManifest(BaseModel):
                 'image_gallery',
                 'schedule_card',
                 'comparison',
+                'weather_card',
             ]
         ]
         | None

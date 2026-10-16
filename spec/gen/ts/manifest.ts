@@ -298,6 +298,7 @@ export const PackageManifest = z
             "image_gallery",
             "schedule_card",
             "comparison",
+            "weather_card",
           ])
           .describe(
             "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here.",

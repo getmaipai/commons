@@ -145,6 +145,7 @@ class ConversationTurn(BaseModel):
         | answer_block_schema.ImageGallery
         | answer_block_schema.ScheduleCard
         | answer_block_schema.Comparison
+        | answer_block_schema.WeatherCard
     ] = Field(
         [],
         description="GENUI-01: the answer blocks this turn showed, in tool-call order, as the hub validated and floored them. Optional and additive: an older record has none. Each block carries its own id, provenance and clock stamp. A screenless body stores them and speaks the prose (and each block's `alt` when no prose covers it).",

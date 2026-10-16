@@ -519,6 +519,97 @@ class Comparison(BaseModel):
     props: Props7
 
 
+class Current(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    temp: float
+    condition: str
+    code: conint(ge=0, le=99) = Field(
+        ..., description='WMO weather code (the Open-Meteo weather_code).'
+    )
+    is_day: bool
+
+
+class HourlyItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    time: constr(min_length=1) = Field(..., description='ISO 8601 time.')
+    temp: float
+    pop: conint(ge=0, le=100) | None = Field(
+        None, description='Chance of precipitation, percent.'
+    )
+
+
+class DailyItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    date: constr(pattern=r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$') = Field(
+        ..., description='Calendar date, YYYY-MM-DD.'
+    )
+    high: float
+    low: float
+    code: conint(ge=0, le=99) = Field(..., description='WMO weather code.')
+    pop: conint(ge=0, le=100) | None = Field(
+        None, description='Chance of precipitation, percent.'
+    )
+
+
+class Props8(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    place: constr(min_length=1) = Field(
+        ..., description='The place label, shown small caps on the hero.'
+    )
+    unit: Literal['F', 'C'] = Field(
+        ..., description='The unit of every temperature in the block.'
+    )
+    current: Current
+    hourly: list[HourlyItem] | None = Field(None, max_length=24)
+    daily: list[DailyItem] = Field(..., max_length=8, min_length=1)
+    attribution: str
+
+
+class WeatherCard(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['weather_card']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props8
+
+
 class Column(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

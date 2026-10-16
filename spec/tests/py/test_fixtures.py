@@ -812,6 +812,7 @@ V1_KINDS = [
     "image_gallery",
     "schedule_card",
     "comparison",
+    "weather_card",
 ]
 
 
