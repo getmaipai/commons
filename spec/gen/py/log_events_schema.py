@@ -119,7 +119,16 @@ class Event(BaseModel):
     )
     name: constr(pattern=r'^[a-z][a-z0-9_]*$')
     component: Literal[
-        'hub', 'engine', 'turn', 'tool', 'safety', 'search', 'backup', 'update', 'log'
+        'hub',
+        'engine',
+        'stt',
+        'turn',
+        'tool',
+        'safety',
+        'search',
+        'backup',
+        'update',
+        'log',
     ] = Field(..., description='The part of the system that writes the event.')
     description: constr(min_length=1) = Field(
         ...,

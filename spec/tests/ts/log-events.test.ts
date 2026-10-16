@@ -51,6 +51,7 @@ describe("log/events.json", () => {
       hub_stop: [],
       engine_ready: [],
       engine_error: ["code:code"],
+      stt_speaker_match: ["outcome:enum"],
       turn_failures: ["source:enum", "code:code", "count:integer"],
       search_degraded: ["code:code"],
       backup_done: ["duration:duration"],
@@ -67,6 +68,13 @@ describe("log/events.json", () => {
       const fieldNames = event.fields.map((f: { name: string }) => f.name);
       expect(new Set(fieldNames).size).toBe(fieldNames.length);
     }
+  });
+
+  test("speaker matching logs only its closed outcome vocabulary", () => {
+    const event = registry.events.find((e: { name: string }) => e.name === "stt_speaker_match");
+    expect(event.component).toBe("stt");
+    expect(event.description).toBe("A speech-to-text utterance was compared with enrolled voice prints.");
+    expect(event.fields).toEqual([{ name: "outcome", type: "enum", values: ["confirmed", "no_match", "unavailable"] }]);
   });
 
   test("the closed list of field types is exactly the seven allowed ones minus none", () => {

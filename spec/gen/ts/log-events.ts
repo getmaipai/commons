@@ -25,6 +25,7 @@ export const LogEvents = z
               .enum([
                 "hub",
                 "engine",
+                "stt",
                 "turn",
                 "tool",
                 "safety",

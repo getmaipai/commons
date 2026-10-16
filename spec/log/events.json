@@ -35,6 +35,18 @@
       ]
     },
     {
+      "name": "stt_speaker_match",
+      "component": "stt",
+      "description": "A speech-to-text utterance was compared with enrolled voice prints.",
+      "fields": [
+        {
+          "name": "outcome",
+          "type": "enum",
+          "values": ["confirmed", "no_match", "unavailable"]
+        }
+      ]
+    },
+    {
       "name": "turn_failures",
       "component": "turn",
       "description": "Hourly aggregate of turn-derived failures by component and code.",

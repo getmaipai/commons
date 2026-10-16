@@ -27,7 +27,7 @@
   "$defs": {
     "component": {
       "type": "string",
-      "enum": ["hub", "engine", "turn", "tool", "safety", "search", "backup", "update", "log"],
+      "enum": ["hub", "engine", "stt", "turn", "tool", "safety", "search", "backup", "update", "log"],
       "description": "The part of the system that writes the event."
     },
     "snake_name": {
