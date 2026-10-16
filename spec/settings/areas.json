@@ -288,6 +288,12 @@
           ]
         },
         {
+          "label": "Reference library",
+          "sections": [
+            "reference-library"
+          ]
+        },
+        {
           "label": "Maintenance",
           "sections": [
             "maintenance"
@@ -531,6 +537,14 @@
             "live view",
             "alarm"
           ]
+        },
+        {
+          "id": "reference-library",
+          "label": "Reference library",
+          "icon": "book-open",
+          "kind": "view",
+          "view": "home.reference_library",
+          "min_role": "admin"
         },
         {
           "id": "storage",
