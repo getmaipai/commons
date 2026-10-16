@@ -1,5 +1,5 @@
 
-## Unreleased
+## [spec-v0.1.150] - 2026-10-16
 
 - Remove the `reference.update.mode` and `reference.pageviews_signal` settings keys (owner-approved 2026-10-16): nothing reads either one. The reference presets no longer set `reference.update.mode`.
 
