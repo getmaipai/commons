@@ -1,4 +1,8 @@
 
+## [spec-v0.1.148] - 2026-10-16
+
+- SETUP-ROLES-01. `engines.vision.choice`, `engines.stt.choice` and `engines.tts.choice` gain a fixed `off` option beside their `options_from` model list, with plain-words `copy.options.off` text, so settings can turn Photos and Voice off and back on.
+
 ## [spec-v0.1.147] - 2026-10-16
 
 - CAPTURE-REQ-01. `ReplyPlan.moves` gains the optional ninth move `capture` (`required`, `allowed`, `forbidden`; absent means forbidden): the hub may ask the robot for one camera picture during a turn. Owner ruling 2026-10-16: allowed for every age band. Additive; every existing plan validates unchanged. New fixture `reply-plan.capture.example.json`.
