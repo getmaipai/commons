@@ -541,7 +541,7 @@
         {
           "id": "reference-library",
           "label": "Reference library",
-          "icon": "book-open",
+          "icon": "book",
           "kind": "view",
           "view": "home.reference_library",
           "min_role": "admin"
