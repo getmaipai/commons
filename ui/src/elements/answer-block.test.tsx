@@ -76,6 +76,15 @@ describe("AnswerBlockView renders each v1 kind with its Element", () => {
   });
 });
 
+describe("AnswerBlockView weather_card", () => {
+  test("weather_card renders the hero and one column per day", () => {
+    const { container, getByText } = render(<AnswerBlockView block={fixture("weather_card")} />);
+    expect(container.querySelector('[data-slot="weather-card"]')?.getAttribute("data-class")).toBe("partly-cloudy");
+    expect(getByText("Springfield")).toBeTruthy();
+    expect(container.querySelectorAll('[data-slot="weather-day"]')).toHaveLength(3);
+  });
+});
+
 describe("AnswerBlockView fallback", () => {
   test("an unknown kind renders alt, not an Element", () => {
     const block = { ...fixture("spec_sheet"), kind: "hologram", alt: "A hologram." };

@@ -651,6 +651,41 @@
   --chart-3: hsl(240 6% 70%);
   --chart-4: hsl(240 6% 30%);
   --chart-5: hsl(240 10% 4%);
+  /* WEATHER-CARD-01: the weather card hero gradients (top and bottom stop per sky and time of day). */
+  --weather-clear-day-from: #1a5fb4;
+  --weather-clear-day-to: #2569c0;
+  --weather-clear-night-from: #0b1736;
+  --weather-clear-night-to: #1b2b5c;
+  --weather-partly-cloudy-day-from: #2559a0;
+  --weather-partly-cloudy-day-to: #406da6;
+  --weather-partly-cloudy-night-from: #0f1c3b;
+  --weather-partly-cloudy-night-to: #2a3a63;
+  --weather-overcast-day-from: #4a5568;
+  --weather-overcast-day-to: #5b6678;
+  --weather-overcast-night-from: #1c2230;
+  --weather-overcast-night-to: #2d3445;
+  --weather-fog-day-from: #58626f;
+  --weather-fog-day-to: #626c79;
+  --weather-fog-night-from: #222834;
+  --weather-fog-night-to: #343b48;
+  --weather-drizzle-day-from: #3d5670;
+  --weather-drizzle-day-to: #516a84;
+  --weather-drizzle-night-from: #17212f;
+  --weather-drizzle-night-to: #27354a;
+  --weather-rain-day-from: #2f4660;
+  --weather-rain-day-to: #43607e;
+  --weather-rain-night-from: #101826;
+  --weather-rain-night-to: #1e2c40;
+  --weather-snow-day-from: #3f5f85;
+  --weather-snow-day-to: #4d6e93;
+  --weather-snow-night-from: #1a2740;
+  --weather-snow-night-to: #2c3d5c;
+  --weather-thunderstorm-day-from: #2d2a4a;
+  --weather-thunderstorm-day-to: #443f68;
+  --weather-thunderstorm-night-from: #120f24;
+  --weather-thunderstorm-night-to: #241f42;
+  --weather-ink: #ffffff;
+  --weather-scrim: rgb(0 0 0 / 0.16);
 }
 
 @media (max-width: 639px) {
@@ -680,6 +715,38 @@
 @media (prefers-color-scheme: dark) {
   :root:not(.light):not(.dark) {
     --page: #141414;
+    --weather-clear-day-from: #154d93;
+    --weather-clear-day-to: #1e569d;
+    --weather-clear-night-from: #09122c;
+    --weather-clear-night-to: #16234b;
+    --weather-partly-cloudy-day-from: #1e4883;
+    --weather-partly-cloudy-day-to: #345988;
+    --weather-partly-cloudy-night-from: #0c1630;
+    --weather-partly-cloudy-night-to: #222f51;
+    --weather-overcast-day-from: #3c4555;
+    --weather-overcast-day-to: #4a5362;
+    --weather-overcast-night-from: #161b27;
+    --weather-overcast-night-to: #242a38;
+    --weather-fog-day-from: #48505b;
+    --weather-fog-day-to: #505863;
+    --weather-fog-night-from: #1b202a;
+    --weather-fog-night-to: #2a303b;
+    --weather-drizzle-day-from: #32465b;
+    --weather-drizzle-day-to: #42566c;
+    --weather-drizzle-night-from: #121b26;
+    --weather-drizzle-night-to: #1f2b3c;
+    --weather-rain-day-from: #26394e;
+    --weather-rain-day-to: #364e67;
+    --weather-rain-night-from: #0d131f;
+    --weather-rain-night-to: #182434;
+    --weather-snow-day-from: #375271;
+    --weather-snow-day-to: #445f7e;
+    --weather-snow-night-from: #151f34;
+    --weather-snow-night-to: #24324b;
+    --weather-thunderstorm-day-from: #24223c;
+    --weather-thunderstorm-day-to: #373355;
+    --weather-thunderstorm-night-from: #0e0c1d;
+    --weather-thunderstorm-night-to: #1d1936;
     --elevation-color: oklch(0 0 0 / 0.55);
     --elevation-hairline: oklch(1 0 0 / 0.07);
     --elevation-0: none;
@@ -754,6 +821,38 @@
 
 .dark {
   --page: #141414;
+  --weather-clear-day-from: #154d93;
+  --weather-clear-day-to: #1e569d;
+  --weather-clear-night-from: #09122c;
+  --weather-clear-night-to: #16234b;
+  --weather-partly-cloudy-day-from: #1e4883;
+  --weather-partly-cloudy-day-to: #345988;
+  --weather-partly-cloudy-night-from: #0c1630;
+  --weather-partly-cloudy-night-to: #222f51;
+  --weather-overcast-day-from: #3c4555;
+  --weather-overcast-day-to: #4a5362;
+  --weather-overcast-night-from: #161b27;
+  --weather-overcast-night-to: #242a38;
+  --weather-fog-day-from: #48505b;
+  --weather-fog-day-to: #505863;
+  --weather-fog-night-from: #1b202a;
+  --weather-fog-night-to: #2a303b;
+  --weather-drizzle-day-from: #32465b;
+  --weather-drizzle-day-to: #42566c;
+  --weather-drizzle-night-from: #121b26;
+  --weather-drizzle-night-to: #1f2b3c;
+  --weather-rain-day-from: #26394e;
+  --weather-rain-day-to: #364e67;
+  --weather-rain-night-from: #0d131f;
+  --weather-rain-night-to: #182434;
+  --weather-snow-day-from: #375271;
+  --weather-snow-day-to: #445f7e;
+  --weather-snow-night-from: #151f34;
+  --weather-snow-night-to: #24324b;
+  --weather-thunderstorm-day-from: #24223c;
+  --weather-thunderstorm-day-to: #373355;
+  --weather-thunderstorm-night-from: #0e0c1d;
+  --weather-thunderstorm-night-to: #1d1936;
   --elevation-color: oklch(0 0 0 / 0.55);
   --elevation-hairline: oklch(1 0 0 / 0.07);
   --elevation-0: none;
@@ -1173,6 +1272,136 @@ body {
  * ever came from this rule. */
 [data-slot="sidebar-inset"] {
   outline-color: transparent;
+}
+
+/* WEATHER-CARD-01: the weather card's sky effects (weather-card.tsx). Every layer is
+ * decoration (aria-hidden), moves with transform or opacity only, and takes its
+ * position, size, speed and delay from the custom properties the Element sets inline
+ * (--x, --y, --s, --d, --dl, --o). Reduced motion removes the falling layers and stops
+ * the rest where they sit. */
+[data-slot="weather-card"] [data-fx] {
+  position: absolute;
+  pointer-events: none;
+}
+[data-slot="weather-card"] [data-fx="fall"] {
+  top: -24px;
+  left: calc(var(--x) * 1%);
+  width: 1px;
+  height: calc(var(--s) * 1px);
+  opacity: var(--o);
+  rotate: 7deg;
+  background: linear-gradient(to bottom, transparent, #fff);
+  animation: wx-rain var(--d) linear var(--dl) infinite;
+}
+[data-slot="weather-card"] [data-fx="flake"] {
+  top: -12px;
+  left: calc(var(--x) * 1%);
+  width: calc(var(--s) * 1px);
+  height: calc(var(--s) * 1px);
+  border-radius: 9999px;
+  opacity: var(--o);
+  background: #fff;
+  animation: wx-snow var(--d) linear var(--dl) infinite;
+}
+[data-slot="weather-card"] [data-fx="star"] {
+  top: calc(var(--y) * 1%);
+  left: calc(var(--x) * 1%);
+  width: calc(var(--s) * 1px);
+  height: calc(var(--s) * 1px);
+  border-radius: 9999px;
+  opacity: var(--o);
+  background: #fff;
+  animation: wx-twinkle var(--d) ease-in-out var(--dl) infinite alternate;
+}
+[data-slot="weather-card"] [data-fx="cloud"] {
+  top: calc(var(--y) * 1%);
+  left: calc(var(--x) * 1%);
+  width: calc(var(--s) * 1px);
+  height: calc(var(--s) * 0.3px);
+  border-radius: 9999px;
+  background: rgb(255 255 255 / var(--o));
+  filter: blur(14px);
+  animation: wx-drift var(--d) ease-in-out var(--dl) infinite alternate;
+}
+[data-slot="weather-card"] [data-fx="fog"] {
+  top: calc(var(--y) * 1%);
+  left: -20%;
+  width: 140%;
+  height: calc(var(--s) * 1%);
+  background: linear-gradient(to right, transparent, rgb(255 255 255 / var(--o)), transparent);
+  filter: blur(10px);
+  animation: wx-fog var(--d) ease-in-out var(--dl) infinite alternate;
+}
+[data-slot="weather-card"] [data-fx="sun"],
+[data-slot="weather-card"] [data-fx="moon"] {
+  top: -70px;
+  right: 14%;
+  width: 200px;
+  height: 200px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgb(255 244 200 / 0.22), transparent 68%);
+  animation: wx-pulse 7s ease-in-out infinite alternate;
+}
+[data-slot="weather-card"] [data-fx="moon"] {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgb(215 228 255 / 0.2), transparent 68%);
+}
+[data-slot="weather-card"] [data-fx="flash"] {
+  inset: 0;
+  opacity: 0;
+  background: #fff;
+  animation: wx-flash 7s linear infinite;
+}
+@keyframes wx-rain {
+  to { transform: translate3d(-32px, 270px, 0); }
+}
+@keyframes wx-snow {
+  from { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(10px, 120px, 0); }
+  to { transform: translate3d(-6px, 250px, 0); }
+}
+@keyframes wx-twinkle {
+  from { opacity: 0.15; }
+  to { opacity: 1; }
+}
+@keyframes wx-drift {
+  from { transform: translate3d(-24px, 0, 0); }
+  to { transform: translate3d(28px, 0, 0); }
+}
+@keyframes wx-fog {
+  from { transform: translate3d(-8%, 0, 0); }
+  to { transform: translate3d(8%, 0, 0); }
+}
+@keyframes wx-pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+/* Two soft flashes close together, then quiet: never more than three flashes in a second. */
+@keyframes wx-flash {
+  0%, 91%, 100% { opacity: 0; }
+  92% { opacity: 0.26; }
+  93.5% { opacity: 0.04; }
+  95% { opacity: 0.2; }
+  98% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="weather-card"] [data-fx] {
+    animation: none !important;
+  }
+  [data-slot="weather-card"] [data-fx="fall"],
+  [data-slot="weather-card"] [data-fx="flake"],
+  [data-slot="weather-card"] [data-fx="flash"] {
+    display: none;
+  }
+}
+html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx] {
+  animation: none !important;
+}
+html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="fall"],
+html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flake"],
+html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
+  display: none;
 }
 
 /* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */

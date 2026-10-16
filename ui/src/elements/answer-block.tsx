@@ -11,6 +11,7 @@ import { ScheduleCard } from "./schedule-card";
 import { SpecSheet } from "./spec-sheet";
 import { Timeline } from "./timeline";
 import { TodoList } from "./todo-list";
+import { WeatherCard } from "./weather-card";
 
 /**
  * GENUI-03a: the web renderer for a spec `AnswerBlock`. It validates the
@@ -120,6 +121,8 @@ function renderKind(
       );
     case "comparison":
       return <ComparisonCard {...props} />;
+    case "weather_card":
+      return <WeatherCard {...props} />;
     default:
       return null;
   }

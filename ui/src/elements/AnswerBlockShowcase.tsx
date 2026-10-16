@@ -13,6 +13,7 @@ import scheduleCard from "@maipai/spec/fixtures/answer-block/valid-schedule_card
 import specSheet from "@maipai/spec/fixtures/answer-block/valid-spec_sheet.json";
 import timeline from "@maipai/spec/fixtures/answer-block/valid-timeline.json";
 import todoList from "@maipai/spec/fixtures/answer-block/valid-todo_list.json";
+import weatherCard from "@maipai/spec/fixtures/answer-block/valid-weather_card.json";
 import { AnswerBlockView } from "./answer-block";
 
 export const ANSWER_BLOCK_FIXTURES = {
@@ -24,6 +25,7 @@ export const ANSWER_BLOCK_FIXTURES = {
   image_gallery: imageGallery,
   schedule_card: scheduleCard,
   comparison,
+  weather_card: weatherCard,
 } as const;
 
 const unknownKind = {

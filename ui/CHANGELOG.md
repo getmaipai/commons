@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.232] - ui-v0.5.232
+
+New `WeatherCard` Element (WEATHER-CARD-01), wired into `AnswerBlockView` as the `weather_card` kind (spec-v0.1.152): a hero whose gradient and motion follow a WMO weather code and day or night, with a strip of up to 8 daily columns (weekday, high, rain percent from 20 up or the sky icon). One table maps the 28 Open-Meteo codes to 8 sky classes (`weather-condition.ts`). The hero gradients are new `--weather-*` tokens in `tokens.css` (light, system dark and `.dark`); the sky effects (rain, snow, drifting clouds, twinkling stars, fog bands, storm flash) are CSS that moves only `transform` and `opacity`, stands still under `prefers-reduced-motion` and the calm ease setting, and uses at most 32 small elements. `hourly` is carried on the block but not drawn yet. Pin this tag together with spec-v0.1.152.
+
 ## [0.5.231] - ui-v0.5.231
 
 `Tour` now calls `onFinish` when the last card is finished. The shown-card flag was stale inside the event handler, so Finish was never saved and the tour could start again.
