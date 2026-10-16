@@ -16,7 +16,7 @@ export type SttWireEvent =
   | { t: "ready" }
   | { t: "vad"; speaking: boolean; rms: number }
   | { t: "partial"; v: string }
-  | { t: "final"; v: string }
+  | { t: "final"; v: string; speaker?: { person_id: string; basis: "voice"; level: "confirmed" } }
   | { t: "no_speech" }
   | { t: "error"; v: string };
 

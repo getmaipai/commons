@@ -81,5 +81,14 @@ for (const shape of SHAPES) {
         expect(byZod, "Zod mirror").toBe(expected === "accept");
       });
     }
+
+    if (shape.name === "stt-wire-event") {
+      test("confirmed voice speaker and legacy final fixtures both parse", () => {
+        const speaker = JSON.parse(readFileSync(join(SPEC, "fixtures", shape.name, "valid-final-speaker.json"), "utf8")) as unknown;
+        const legacy = JSON.parse(readFileSync(join(SPEC, "fixtures", shape.name, "valid-final.json"), "utf8")) as unknown;
+        expect(shape.zod.safeParse(speaker).success).toBe(true);
+        expect(shape.zod.safeParse(legacy).success).toBe(true);
+      });
+    }
   });
 }
