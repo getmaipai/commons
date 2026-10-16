@@ -12,6 +12,7 @@ import { Empty, EmptyDescription, EmptyHeader } from "../dashboard/components/ui
 import { Item, ItemContent, ItemGroup, ItemSeparator, ItemTitle } from "../dashboard/components/ui/item";
 import { SettingRow, type BeforeChange, type SettingRowProps } from "./SettingRow";
 import type { PersonOption } from "./PersonMultiSelect";
+import type { PlaceAdapter } from "./LocationField";
 import { useSettingsHeadingLevel } from "./headingLevel";
 import { OptionMatrix } from "./OptionMatrix";
 import type { AreaMatrix } from "./settingsAudience";
@@ -61,6 +62,8 @@ interface SettingsRendererProps {
   /** The household roster for a person multi-select; omitted, the control
    * reads `GET /api/people` itself. */
   people?: readonly PersonOption[];
+  /** The host's place calls for `location` rows (see PlaceAdapter). */
+  places?: PlaceAdapter;
   /** The per-key hook run before every write (see BeforeChange). */
   beforeChange?: BeforeChange;
   /** A key to scroll into view and focus once the rows have loaded (a
@@ -106,6 +109,7 @@ export function SettingsRenderer({
   plainRows = false,
   mergeGroups = false,
   people,
+  places,
   beforeChange,
   focusKey,
   headingLevel,
@@ -205,6 +209,7 @@ export function SettingsRenderer({
         disabled={pendingKey === s.def.key}
         selfPersonId={selfPersonId}
         people={people}
+        places={places}
         beforeChange={beforeChange}
         {...rowExtras?.[s.def.key]}
       />

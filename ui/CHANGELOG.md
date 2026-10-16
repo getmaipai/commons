@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.233] - ui-v0.5.233
+
+The settings renderer draws the `location` selector (PLACE-ELEMENT-01a). New `LocationField`, built from shipped parts only: a Command-in-Popover search to add, the `List` primitive for entries, a DropdownMenu per entry (rename in a Dialog, move up, move down, remove behind `DestructiveConfirm`), a Select for a single value with Current location first, and a "Use current location" Button that is the only thing that asks the browser for a position. The host passes a `PlaceAdapter` (`places` on `SettingsRenderer` and `SettingRow`) for search, save, rename, labels and the prompt; without one the row keeps the "not supported" line. Additive.
+
 ## [0.5.232] - ui-v0.5.232
 
 New `WeatherCard` Element (WEATHER-CARD-01), wired into `AnswerBlockView` as the `weather_card` kind (spec-v0.1.152): a hero whose gradient and motion follow a WMO weather code and day or night, with a strip of up to 8 daily columns (weekday, high, rain percent from 20 up or the sky icon). One table maps the 28 Open-Meteo codes to 8 sky classes (`weather-condition.ts`). The hero gradients are new `--weather-*` tokens in `tokens.css` (light, system dark and `.dark`); the sky effects (rain, snow, drifting clouds, twinkling stars, fog bands, storm flash) are CSS that moves only `transform` and `opacity`, stands still under `prefers-reduced-motion` and the calm ease setting, and uses at most 32 small elements. `hourly` is carried on the block but not drawn yet. Pin this tag together with spec-v0.1.152.

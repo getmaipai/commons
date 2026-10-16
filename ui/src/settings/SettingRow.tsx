@@ -9,6 +9,7 @@ import { localeDisplayName, middleEllipsis, titleCaseOption } from "./optionLabe
 import { HitField } from "./HitField";
 import { PersonMultiSelect, type PersonOption } from "./PersonMultiSelect";
 import { OptionMultiSelect } from "./OptionMultiSelect";
+import { LocationField, type PlaceAdapter } from "./LocationField";
 
 // A code review (2026-09-06) found the generic write-only secret flow made
 // `voice.hf_token` writable a SECOND way: that key already has its own
@@ -39,6 +40,10 @@ export interface SettingRowProps {
    * reads `GET /api/people` itself. */
   people?: readonly PersonOption[];
   beforeChange?: BeforeChange;
+  /** The host's place calls for a `location` selector (search, save, rename,
+   * and the browser prompt behind the "Use current location" button).
+   * Omitted: a location row shows the not-supported line. */
+  places?: PlaceAdapter;
   /** A short plain line under the row's help text, such as a summary
    * ("Large + 2 changes"). Additive: absent, nothing is drawn. */
   note?: string;
@@ -56,7 +61,7 @@ export interface SettingRowProps {
  * from its default. Drawn as the kit's `Item size="setting"`; it goes
  * inside an `ItemGroup variant="card"` (see SettingsRenderer). A secret
  * never shows its value, only Set or Not set. */
-export function SettingRow({ setting, onChange, onReset, disabled: disabledProp, selfPersonId, people, beforeChange, note: summary, lockedReason, action }: SettingRowProps) {
+export function SettingRow({ setting, onChange, onReset, disabled: disabledProp, selfPersonId, people, places, beforeChange, note: summary, lockedReason, action }: SettingRowProps) {
   const disabled = disabledProp || Boolean(lockedReason);
   const { def, resolved } = setting;
   const titleId = useId();
@@ -320,6 +325,19 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
         disabled={disabled}
         excludePersonId={selfPersonId}
         people={people}
+        ariaLabel={def.label}
+      />
+    );
+  } else if (def.selector === "location" && places) {
+    const range = (def.range ?? {}) as { multiple?: boolean; allow_current?: boolean };
+    control = (
+      <LocationField
+        value={resolved.value}
+        multiple={Boolean(range.multiple)}
+        allowCurrent={Boolean(range.allow_current)}
+        adapter={places}
+        onValueChange={(v) => void write(v)}
+        disabled={disabled}
         ariaLabel={def.label}
       />
     );
