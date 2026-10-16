@@ -38,6 +38,7 @@ export * from "./presence-state.js";
 export * from "./problem-report.js";
 export * from "./project.js";
 export * from "./recipe.js";
+export * from "./reference-presets.js";
 export * from "./relationship.js";
 export * from "./reply-constraint.js";
 export * from "./reply-feedback.js";
