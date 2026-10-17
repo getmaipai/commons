@@ -1,3 +1,7 @@
+## [spec-v0.1.172] - 2026-10-17
+
+- Settings registry carries keys Home declared ahead of spec, each exactly as Home declares it: `audio.speed.podcast`, `audio.speed.audiobook`, `audio.speed.video`, `audio.speed.spoken_reply` (AUDIO-SESSION-01), `media.allowlist_only` (MEDIA-KID-01), `generation.people_prompts`, and the `control` on `allowance.media.daily_minutes` (a child's and a teen's daily media minutes are guardian-set). Keys whose copy does not pass COPY-LINT-01 yet (`generation.kids*`, `generation.kid_enabled`, `generation.video_quality`, `health.keep_warm`) and the expert `media.budget.exempt_bedtime_audio` stay ahead of spec in Home.
+
 ## [spec-v0.1.171] - 2026-10-17
 
 - Additive media UI fields: `media_shelf.layout` (`rail` or `grid`, default `rail`), `art_shape` (`default` or `circle`), `density` (`default` or `compact`), `item_highlight_field` (boolean current/next-up field), `item_index_field` (leading track index) and `row_actions` (up to two `{icon, label, label_field?, action}` controls). Compact vertical rows use 72 px artwork, two caption lines and trailing `item_meta_field` running time. Grids wrap the existing card-size budget with two phone columns and honour `hide_when_empty`. `checkAppPackage` checks every row action, including confirms, like `on_select`: own-package targets and `play` allowed.

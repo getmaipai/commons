@@ -90,6 +90,11 @@
     "default": 0,
     "label": "Daily Media minutes",
     "help": "How many minutes of Media packages this person may use per day. 0 means no limit.",
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
     "level": "basic",
     "secret": false,
     "lives_in": "person.allowance",
@@ -4023,5 +4028,139 @@
       "honoured_by": [
         "home"
       ]
-    }
+    },
+  {
+    "key": "generation.people_prompts",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Ask me before making pictures and videos of people",
+    "help": "When off, Home makes what you ask for without extra questions or warnings. Safety rules for children and for real people never turn off.",
+    "copy": {
+      "does": "Turns the extra questions and warnings about people in pictures and videos on or off."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "media.allowlist_only",
+    "scope": "person",
+    "selector": "boolean",
+    "layers": [
+      "band",
+      "person"
+    ],
+    "merge": "override",
+    "default": false,
+    "label": "Approved media only",
+    "help": "Shows the home library and sources picked for you.",
+    "copy": {
+      "does": "Shows the home library and sources picked for you.",
+      "does_child": "Shows the home library and channels a grown-up picked for you."
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": true,
+      "teen": false,
+      "adult": false
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "audio.speed.podcast",
+    "scope": "person",
+    "selector": "number",
+    "range": {
+      "min": 0.5,
+      "max": 3
+    },
+    "default": 1,
+    "label": "Podcast speed",
+    "help": "How fast podcast episodes play for you. 1 is normal speed and 1.5 is one and a half times as fast. A player's speed menu changes this too.",
+    "copy": {
+      "does": "Plays episodes faster or slower than normal."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.voice",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "audio.speed.audiobook",
+    "scope": "person",
+    "selector": "number",
+    "range": {
+      "min": 0.5,
+      "max": 3
+    },
+    "default": 1,
+    "label": "Audiobook speed",
+    "help": "How fast audiobooks play for you. 1 is normal speed and 0.75 is slower. A player's speed menu changes this too.",
+    "copy": {
+      "does": "Plays audiobooks faster or slower than normal."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.voice",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "audio.speed.video",
+    "scope": "person",
+    "selector": "number",
+    "range": {
+      "min": 0.5,
+      "max": 3
+    },
+    "default": 1,
+    "label": "Video speed",
+    "help": "How fast videos play for you. 1 is normal speed. A player's speed menu changes this too.",
+    "copy": {
+      "does": "Plays videos faster or slower than normal."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.voice",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "audio.speed.spoken_reply",
+    "scope": "person",
+    "selector": "number",
+    "range": {
+      "min": 0.5,
+      "max": 3
+    },
+    "default": 1,
+    "label": "Spoken reply speed",
+    "help": "How fast MaiPai talks when it reads a reply aloud to you. 1 is normal speed. Faster speeds also sound a little higher.",
+    "copy": {
+      "does": "Speeds up or slows down spoken replies."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.voice",
+    "honoured_by": [
+      "home"
+    ]
+  }
 ]
