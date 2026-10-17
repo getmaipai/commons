@@ -42,7 +42,7 @@ export interface Form {
    * s2: runs of three or more collapsed to two (terms WITH a doubled letter match here).
    * all: every run of two or more collapsed to one (terms without a doubled letter match here).
    */
-  readonly kind: "n" | "s1" | "s2" | "all";
+  readonly kind: "n" | "s1" | "s2" | "all" | "run";
 }
 
 export interface SafetyFold {
@@ -77,15 +77,19 @@ function latinFold(noInvisible: string): string {
   return remove(noInvisible).toLowerCase().normalize("NFKD").replace(/\p{Mn}/gu, "");
 }
 
-/** Joins a run of two or more single-character words into one word ("c h i l d" is "child"). */
-function joinSingleRuns(words: string[]): string[] {
+const BREAK = "\u0001\u0001";
+const isSingle = (w: string): boolean => w.length === 1;
+
+/** Joins a run of two or more single-character words into one word ("c h i l d" is "child"). A BREAK (a comma on its own, a double space) ends a run. */
+function joinSingleRuns(words: string[], runs: string[]): string[] {
   const out: string[] = [];
   for (let i = 0; i < words.length; i++) {
-    if (words[i]!.length === 1 && i + 1 < words.length && words[i + 1]!.length === 1) {
+    if (isSingle(words[i]!) && i + 1 < words.length && isSingle(words[i + 1]!)) {
       let run = words[i]!;
-      while (i + 1 < words.length && words[i + 1]!.length === 1) run += words[++i]!;
+      while (i + 1 < words.length && isSingle(words[i + 1]!)) run += words[++i]!;
       out.push(run);
-    } else {
+      runs.push(run);
+    } else if (words[i] !== BREAK) {
       out.push(words[i]!);
     }
   }
@@ -93,18 +97,18 @@ function joinSingleRuns(words: string[]): string[] {
 }
 
 /** "a c h i l d" joins to "achild"; the real words "a" and "i" at the edge of a run are also tried apart. */
-function joinSingleRunsApart(words: string[]): string[] {
+function joinSingleRunsApart(words: string[], runs: string[]): string[] {
   const out: string[] = [];
   for (let i = 0; i < words.length; i++) {
-    if (words[i]!.length === 1 && i + 1 < words.length && words[i + 1]!.length === 1) {
+    if (isSingle(words[i]!) && i + 1 < words.length && isSingle(words[i + 1]!)) {
       const run: string[] = [words[i]!];
-      while (i + 1 < words.length && words[i + 1]!.length === 1) run.push(words[++i]!);
+      while (i + 1 < words.length && isSingle(words[i + 1]!)) run.push(words[++i]!);
       if (run[0] === "a" || run[0] === "i") { out.push(run[0]!); run.shift(); }
       const last = run[run.length - 1];
       const tail = (last === "a" || last === "i") && run.length > 2 ? run.pop() : undefined;
-      if (run.length > 1) out.push(run.join("")); else if (run.length === 1) out.push(run[0]!);
+      if (run.length > 1) { out.push(run.join("")); runs.push(run.join("")); } else if (run.length === 1) out.push(run[0]!);
       if (tail) out.push(tail);
-    } else {
+    } else if (words[i] !== BREAK) {
       out.push(words[i]!);
     }
   }
@@ -115,10 +119,20 @@ function plainOf(folded: string): string {
   return folded.replace(SEPARATORS_ONLY, " ").trim();
 }
 
-/** Each whitespace token with its punctuation removed, single-letter runs joined: the "tight" reading of dotted and spaced letters. */
-function tightOf(folded: string): string[] {
-  const words = folded.split(/\s+/).map((token) => token.replace(SEPARATORS_ONLY, "")).filter((token) => token.length > 0);
-  return [joinSingleRuns(words).join(" "), joinSingleRunsApart(words).join(" ")];
+/**
+ * Each whitespace token with its punctuation removed, single-letter runs joined: the "tight" reading of dotted and spaced letters.
+ * A token of punctuation alone ("c h i l d , n a k e d") and a double space end a run, so two spaced-out words stay two words.
+ * `runs` collects the joined runs of six or more letters for the substring reading (no gap at all between two spaced-out words).
+ */
+function tightOf(folded: string): { readings: string[]; runs: string[] } {
+  const words = folded
+    .replace(/\s{2,}/g, ` ${BREAK} `)
+    .split(/\s+/)
+    .map((token) => (token === BREAK ? BREAK : token.replace(SEPARATORS_ONLY, "") || (token ? BREAK : "")))
+    .filter((token) => token.length > 0);
+  const runs: string[] = [];
+  const readings = [joinSingleRuns(words, runs).join(" "), joinSingleRunsApart(words, runs).join(" ")];
+  return { readings, runs: runs.filter((r) => r.length >= 6) };
 }
 
 function applyLeet(folded: string, one: "i" | "l"): string {
@@ -190,7 +204,8 @@ export function foldForSafety(text: string): SafetyFold {
   };
   const plain = plainOf(folded);
   for (const base of bases) {
-    for (const reading of [plainOf(base), ...tightOf(base)]) {
+    const tight = tightOf(base);
+    for (const reading of [plainOf(base), ...tight.readings]) {
       add(reading, "n");
       const s1 = squeeze1(reading);
       if (s1 !== reading) add(s1, "s1");
@@ -199,6 +214,7 @@ export function foldForSafety(text: string): SafetyFold {
       const sa = squeezeAll(reading);
       if (sa !== reading) add(sa, "all");
     }
+    if (tight.runs.length) add([...new Set(tight.runs)].join(" "), "run");
   }
   let nativePlain = "";
   let nativeTight = "";
@@ -236,6 +252,7 @@ export class TermSet {
   private readonly everywhere: RegExp | null;
   private readonly noDoubled: RegExp | null;
   private readonly onlyDoubled: RegExp | null;
+  private readonly inRun: RegExp | null;
   private readonly singles: readonly string[];
 
   constructor(terms: readonly string[], options: TermSetOptions = {}) {
@@ -261,12 +278,18 @@ export class TermSet {
     this.everywhere = build(all);
     this.noDoubled = build(all.filter((t) => !hasDoubled(t)));
     this.onlyDoubled = build(all.filter((t) => hasDoubled(t)));
+    const long = all.filter((t) => t.length >= 4 && !t.includes(" ")).map(escapeRegex);
+    this.inRun = long.length ? new RegExp(`(?:${long.join("|")})`, "u") : null;
     this.singles = all.filter((t) => !t.includes(" ") && t.length >= 3);
   }
 
   /** True when any term is in the text in any of its forms. */
   test(fold: SafetyFold): boolean {
     for (const form of fold.forms) {
+      if (form.kind === "run") {
+        if (this.inRun && this.inRun.test(form.text)) return true;
+        continue;
+      }
       const re = form.kind === "n" ? this.everywhere : form.kind === "s2" ? this.onlyDoubled : this.noDoubled;
       if (re && re.test(form.text)) return true;
     }
