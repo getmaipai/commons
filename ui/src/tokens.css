@@ -38,6 +38,94 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* MEDIA-BOOKS-01: reading tones stay independent of the surrounding app tone.
+ * EPUB iframe styles read the resolved values; PDF canvases read the filter. */
+:root {
+  --reader-paper-background: #faf8f3;
+  --reader-paper-foreground: #292722;
+  --reader-sepia-background: #f0e3c8;
+  --reader-sepia-foreground: #4a3928;
+  --reader-night-background: #111827;
+  --reader-night-foreground: #e5e7eb;
+  --reader-paper-pdf-filter: none;
+  --reader-sepia-pdf-filter: sepia(0.5);
+  --reader-night-pdf-filter: invert(0.9) hue-rotate(180deg);
+  --reader-font: Georgia, "Times New Roman", serif;
+}
+
+[data-reader-theme="paper"] {
+  --reader-background: var(--reader-paper-background);
+  --reader-foreground: var(--reader-paper-foreground);
+  --reader-pdf-filter: var(--reader-paper-pdf-filter);
+}
+[data-reader-theme="sepia"] {
+  --reader-background: var(--reader-sepia-background);
+  --reader-foreground: var(--reader-sepia-foreground);
+  --reader-pdf-filter: var(--reader-sepia-pdf-filter);
+}
+[data-reader-theme="night"] {
+  --reader-background: var(--reader-night-background);
+  --reader-foreground: var(--reader-night-foreground);
+  --reader-pdf-filter: var(--reader-night-pdf-filter);
+}
+[data-slot="reader"] {
+  --background: var(--reader-background);
+  --foreground: var(--reader-foreground);
+  --popover: var(--reader-background);
+  --popover-foreground: var(--reader-foreground);
+  --accent: color-mix(in srgb, var(--reader-foreground) 12%, var(--reader-background));
+  --accent-foreground: var(--reader-foreground);
+  --border: color-mix(in srgb, var(--reader-foreground) 20%, var(--reader-background));
+  --ring: var(--reader-foreground);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 85dvh;
+  min-height: 360px;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--reader-background);
+  color: var(--reader-foreground);
+}
+[data-slot="reader-topbar"] {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 64px;
+  padding: env(safe-area-inset-top, 0px) 8px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--reader-background);
+}
+[data-slot="reader-topbar"][hidden] { display: none; }
+[data-slot="reader"] button { min-width: 48px; min-height: 48px; }
+[data-slot="reader-pages"] {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  min-width: 0;
+  margin: calc(64px + env(safe-area-inset-top, 0px)) 16px 0;
+  overflow: hidden;
+  font-family: var(--reader-font);
+}
+[data-slot="reader-pages"] > .epub-container { flex: 1; }
+[data-slot="reader-footer"] {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+[data-slot="reader-notice"] { position: absolute; inset: 45% 16px auto; text-align: center; }
+[data-reader-toc] { max-width: min(90vw, 400px); }
+@media (max-width: 639px) {
+  [data-slot="reader"] { position: fixed; inset: 0; z-index: 50; height: 100dvh; min-height: 0; }
+}
+
 /* The `studio:` Tailwind variant this declared (a second dimension
  * alongside light/dark, `data-look="studio"` on `<html>`, "Two looks,
  * one setting," 2026-09-20) retired with Calm and Studio themselves

@@ -29,6 +29,11 @@ describe("fillTemplate", () => {
 });
 
 describe("fillTemplateDeep", () => {
+  test("reader progress preserves a locator object and numeric percent in action args", () => {
+    const locator = { kind: "page", page: 2 };
+    expect(fillTemplateDeep<Record<string, unknown>>({ locator: "{locator}", percent: "{percent}", page: "{locator.page}" }, { locator, percent: 50 }, true)).toEqual({ locator, percent: 50, page: 2 });
+    expect(fillTemplateDeep({ page: "{locator.page}" }, { locator })).toEqual({ page: "2" });
+  });
   test("substitutes string values inside a nested object, leaving other types untouched", () => {
     const result = fillTemplateDeep({ target: "/api/memory/{id}/archive", count: 3, args: { note: "{text}" } }, {
       id: "mem-1",

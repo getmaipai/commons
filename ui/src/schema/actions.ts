@@ -19,6 +19,8 @@ import { MediaHostContext, PLAY_UNAVAILABLE, type MediaHost } from "@/kit/schema
 export interface DispatchOptions {
   quiet?: boolean;
   keepalive?: boolean;
+  /** Whole call-argument placeholders keep JSON types (Reader's locator and percent). */
+  typedArgs?: boolean;
 }
 
 // The five declared actions (platform plan 6.2). `play` hands the item to the
@@ -51,7 +53,7 @@ async function runAction(
       reportPageRejected();
       throw new Error(PACKAGE_ACTION_REFUSED);
     }
-    const args = action.call.args ? fillTemplateDeep(action.call.args, item) : undefined;
+    const args = action.call.args ? fillTemplateDeep(action.call.args, item, options.typedArgs) : undefined;
     await request(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined, keepalive: options.keepalive });
     return;
   }

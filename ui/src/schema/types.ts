@@ -216,6 +216,22 @@ export const PlayerNodeSchema = z.object({
 export type PlayerNode = z.infer<typeof PlayerNodeSchema>;
 export type PlayerActionNode = NonNullable<PlayerNode["actions"]>[number];
 
+export const ReaderNodeSchema = z.object({
+  type: z.literal("reader"),
+  bind: BindingSchema,
+  format: z.enum(["epub", "pdf"]).optional(),
+  theme: z.enum(["paper", "sepia", "night"]).optional(),
+  font_size: z.number().int().min(0).max(6).optional(),
+  fields: z.object({
+    id: z.string().min(1).optional(), src: z.string().min(1).optional(), title: z.string().min(1).optional(),
+    format: z.string().min(1).optional(), locator: z.string().min(1).optional(),
+  }).strict().optional(),
+  on_locator: ActionSchema.optional(),
+  on_close: ActionSchema.optional(),
+  empty_state: EmptyStateNodeSchema.optional(),
+}).strict();
+export type ReaderNode = z.infer<typeof ReaderNodeSchema>;
+
 export const DetailPaneNodeSchema: z.ZodType<DetailPaneNode> = z.lazy(() =>
   z.object({
     type: z.literal("detail_pane"),
@@ -389,6 +405,7 @@ export type UiNode =
   | MediaShelfNode
   | BillboardNode
   | PlayerNode
+  | ReaderNode
   | DetailPaneNode
   | SplitViewNode
   | WidgetCardNode
@@ -411,6 +428,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     MediaShelfNodeSchema,
     BillboardNodeSchema,
     PlayerNodeSchema,
+    ReaderNodeSchema,
     DetailPaneNodeSchema,
     SplitViewNodeSchema,
     WidgetCardNodeSchema,
@@ -436,6 +454,7 @@ export const NODE_TYPES = [
   "media_shelf",
   "billboard",
   "player",
+  "reader",
   "detail_pane",
   "split_view",
   "widget_card",

@@ -9,6 +9,8 @@ import { CardGrid } from "@/kit/primitives/CardGrid";
 import { MediaShelf } from "@/kit/primitives/MediaShelf";
 import { Billboard } from "@/kit/primitives/Billboard";
 import { Player, type PlayerChapter, type PlayerTextTrack, type PlayerUpNext } from "@/kit/primitives/Player";
+import { Reader } from "@/kit/primitives/Reader";
+import { readerLocator, sameOriginBookUrl } from "@/kit/primitives/readerLogic";
 import { formatTime } from "@/kit/primitives/playerLogic";
 import { Badge } from "@/kit/ui/badge";
 import { DetailPane } from "@/kit/primitives/DetailPane";
@@ -43,6 +45,7 @@ import type {
   MediaShelfNode,
   BillboardNode,
   PlayerNode,
+  ReaderNode,
   PlayerActionNode,
   DetailPaneNode,
   SplitViewNode,
@@ -711,6 +714,40 @@ function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row })
   );
 }
 
+function ReaderNodeView({ node, state }: { node: ReaderNode; state: Row }) {
+  const query = useBinding<Row | Row[]>(node.bind, state);
+  const { dispatch, lastError, pendingConfirm } = useDispatchAction();
+  const field = (name: keyof NonNullable<ReaderNode["fields"]>) => node.fields?.[name] ?? name;
+  const item = Array.isArray(query.data) ? query.data[0] : query.data;
+  const formatFor = (row: unknown) => node.format ?? readField(row, field("format"));
+  return (
+    <AsyncState
+      data={item === undefined && query.data !== undefined ? null : item}
+      error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()}
+      errorMessage="Could not load this book."
+      isEmpty={(row) => {
+        const src = readField(row, field("src"));
+        return row === null || typeof src !== "string" || !sameOriginBookUrl(src, document.baseURI) || !["epub", "pdf"].includes(String(formatFor(row)));
+      }}
+      emptyIcon={node.empty_state?.icon ?? "book"} emptyText={node.empty_state?.text ?? "This book is not available."}
+    >
+      {(row) => {
+        const r = row as Row;
+        const format = formatFor(r) as "epub" | "pdf";
+        return <>
+          <Reader key={String(readField(r, field("id")) ?? readField(r, field("src")))} src={String(readField(r, field("src")))} format={format}
+            title={String(readField(r, field("title")) ?? "Reader")} theme={node.theme} fontSize={node.font_size}
+            locator={readerLocator(readField(r, field("locator")), format)}
+            onLocatorChange={node.on_locator ? (locator, percent) => dispatch(node.on_locator!, [{ ...r, locator, percent }], undefined, { quiet: true, keepalive: true, typedArgs: true }) : undefined}
+            onClose={node.on_close ? () => dispatch(node.on_close!, [r]) : undefined} />
+          {pendingConfirm ? <ConfirmDialog pendingConfirm={pendingConfirm} /> : null}
+          {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
+        </>;
+      }}
+    </AsyncState>
+  );
+}
+
 function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const query = useBinding<Row | Row[]>(node.bind, state);
   const { dispatch, lastError } = useDispatchAction();
@@ -1069,6 +1106,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <BillboardNodeView node={node} state={state} />;
     case "player":
       return <PlayerNodeView node={node} state={state} />;
+    case "reader":
+      return <ReaderNodeView node={node} state={state} />;
     case "detail_pane":
       return <DetailPaneNodeView node={node} state={state} />;
     case "split_view":
