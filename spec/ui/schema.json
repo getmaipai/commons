@@ -20,7 +20,8 @@
     { "$ref": "#/$defs/widget_card" },
     { "$ref": "#/$defs/widget_row" },
     { "$ref": "#/$defs/answer_blocks" },
-    { "$ref": "#/$defs/picker" }
+    { "$ref": "#/$defs/picker" },
+    { "$ref": "#/$defs/tabs" }
   ],
   "$defs": {
     "binding": {
@@ -62,7 +63,16 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["to"],
-          "properties": { "to": { "type": "string" } }
+          "properties": {
+            "to": { "type": "string" },
+            "state": {
+              "type": "object",
+              "maxProperties": 8,
+              "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+              "additionalProperties": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] },
+              "description": "NEWS-00: a literal map written into the target page's state on arrival (a channel page reads its `kind` and `key` this way). String values may contain `{field}` placeholders, resolved from the bound list item or card the action fires for (as `call.args` do); a value is never read from another page's state."
+            }
+          }
         },
         "call": {
           "type": "object",
@@ -239,6 +249,19 @@
         },
         "item_badge_field": { "type": "string", "description": "Dotted path to a boolean; true shows a small badge (item_badge_label) next to the subtitle." },
         "item_badge_label": { "type": "string" },
+        "item_media_field": { "type": "string", "description": "NEWS-00: dotted path to a lucide icon name or a same-origin image path (starting with `/`); drawn as the row's leading media. An address with a scheme or host is refused, so a row never loads another site's picture." },
+        "row_toggle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["field", "on_label", "off_label", "action"],
+          "description": "NEWS-00: a per-row switch (Follow, Save). `field` is the dotted path to a boolean on the row; the action is fired with the row's fields and `on` set to the new value.",
+          "properties": {
+            "field": { "type": "string", "minLength": 1 },
+            "on_label": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "off_label": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "action": { "$ref": "#/$defs/action" }
+          }
+        },
         "row_action": {
           "type": "object",
           "additionalProperties": false,
@@ -362,7 +385,46 @@
           "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
           "description": "Draw only blocks of these kinds, so a page can place one kind per section. Absent: every block returned."
         },
-        "empty_state": { "$ref": "#/$defs/empty_state" }
+        "empty_state": { "$ref": "#/$defs/empty_state" },
+        "actions": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "NEWS-00: the actions a block may fire, by role. A block fires an entry with the item's own ids and never names a route itself. `open` navigates, `save`, `follow`, `feedback` and `summarize` call, `reset_mix` asks first (`confirm`), `listen` plays. A package page's entries stay under its own `/api/plugins/<id>/` and `/apps/<id>/` prefixes (spec/ui/app-check.ts).",
+          "properties": {
+            "open": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["navigate"], "properties": { "navigate": {} } }] },
+            "save": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
+            "follow": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
+            "feedback": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
+            "summarize": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
+            "reset_mix": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["confirm"], "properties": { "confirm": {} } }] },
+            "listen": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["play"], "properties": { "play": {} } }] }
+          }
+        }
+      }
+    },
+    "tabs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "tabs"],
+      "description": "NEWS-00: peer views of one page (Topics and Sources, say), drawn by the kit's Tabs primitive. Peer views only: the shell owns navigation between pages (UI.md). The active tab is page state `state` (default: the first tab), mirrored in the URL by the shell.",
+      "properties": {
+        "type": { "const": "tabs" },
+        "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+        "tabs": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "body"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$", "maxLength": 40 },
+              "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "body": { "type": "array", "minItems": 1, "items": { "$ref": "#" } }
+            }
+          }
+        }
       }
     },
     "picker": {

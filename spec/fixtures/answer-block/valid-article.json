@@ -1,0 +1,97 @@
+{
+  "id": "blk-n3w5k1",
+  "kind": "article",
+  "schema_version": 1,
+  "producer": "news",
+  "alt": "Headline 1, from Example Wire, with a short reader view.",
+  "provenance": "news data today",
+  "created_at": "2026-10-17T13:05:00Z",
+  "hlc": "1792242300000:0:hub001",
+  "props": {
+    "story_id": "story-1a1b2c",
+    "item_id": "news-1d4e5f",
+    "kicker": "World",
+    "title": "Headline 1",
+    "byline": {
+      "publisher": "Example Wire",
+      "site": "example.com",
+      "published_at": "2026-10-17T13:00:00Z",
+      "outlets": 3,
+      "reading_s": 120
+    },
+    "image": {
+      "w480": "/api/plugins/news/images/news-1d4e5f?w=480",
+      "w1280": "/api/plugins/news/images/news-1d4e5f?w=1280",
+      "alt": "Harbor at dawn, Example Wire"
+    },
+    "key_points": {
+      "text": "Three things happened.",
+      "band": "teen"
+    },
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 2,
+        "id": "h1",
+        "text": "What happened"
+      },
+      {
+        "type": "paragraph",
+        "inlines": [
+          {
+            "type": "text",
+            "text": "A plain sentence with "
+          },
+          {
+            "type": "link",
+            "text": "a source",
+            "href": "https://example.com/source"
+          },
+          {
+            "type": "text",
+            "text": "."
+          }
+        ]
+      },
+      {
+        "type": "quote",
+        "inlines": [
+          {
+            "type": "text",
+            "text": "A short quote."
+          }
+        ],
+        "cite": "A spokesperson"
+      },
+      {
+        "type": "figure",
+        "src": "/api/plugins/news/images/news-1d4e5f?w=1280",
+        "alt": "Harbor",
+        "caption": "The harbor."
+      }
+    ],
+    "also_covering": [
+      {
+        "story_id": "story-2a1b2c",
+        "item_id": "news-2d4e5f",
+        "title": "Headline 2",
+        "publisher": "Example Wire",
+        "site": "example.com",
+        "published_at": "2026-10-17T13:00:00Z",
+        "outlets": 3,
+        "topics": [
+          "world"
+        ],
+        "saved": false,
+        "opened": false,
+        "open_url": "https://example.com/a"
+      }
+    ],
+    "speech": [
+      "Headline 1. From Example Wire.",
+      "A plain sentence with a source."
+    ],
+    "open_url": "https://example.com/a",
+    "content_source": "fetched"
+  }
+}

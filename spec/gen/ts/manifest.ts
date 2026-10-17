@@ -299,6 +299,8 @@ export const PackageManifest = z
             "schedule_card",
             "comparison",
             "weather_card",
+            "story_feed",
+            "article",
           ])
           .describe(
             "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here.",
@@ -1204,11 +1206,11 @@ export const PackageManifest = z
                     "A place surface (PLACE-WEATHER-01). The host, never the model or the page, resolves the chosen place for this surface and injects its coordinates into the package recipe call; coordinates are consumed in that call and never stored, logged or cached by text.",
                   )
                   .optional(),
-                /**This entry returns rows (not blocks) for a picker: "places" is the asking person's saved places for `surface`, as {id, label}. An entry with `rows` runs no recipe.*/
+                /**This entry returns rows (not blocks) for a picker or a list: "places" is the asking person's saved places for `surface`, as {id, label}; "list" (NEWS-00) is a bare array of row objects the package's own hub route builds for a `list` node (no `surface`). An entry with `rows` runs no recipe.*/
                 rows: z
-                  .literal("places")
+                  .enum(["places", "list"])
                   .describe(
-                    'This entry returns rows (not blocks) for a picker: "places" is the asking person\'s saved places for `surface`, as {id, label}. An entry with `rows` runs no recipe.',
+                    'This entry returns rows (not blocks) for a picker or a list: "places" is the asking person\'s saved places for `surface`, as {id, label}; "list" (NEWS-00) is a bare array of row objects the package\'s own hub route builds for a `list` node (no `surface`). An entry with `rows` runs no recipe.',
                   )
                   .optional(),
                 /**Literal recipe inputs, the same shape as a widget's `inputs`.*/

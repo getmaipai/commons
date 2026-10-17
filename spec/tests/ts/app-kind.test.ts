@@ -101,8 +101,8 @@ describe("checkAppPackage (the cross-file lint)", () => {
     expect(checkAppPackage("weather", contributes, (m) => (m === "weather" ? route : load(m))).join("\n")).toContain('bind.source must be "package"');
   });
   test("a node that reads another route is not allowed on a package page", () => {
-    const list = { type: "page", id: "x", title: "X", body: [{ type: "list", bind: { source: "route", path: "/api/people" }, item_key_field: "id", item_label_field: "n" }] };
-    expect(checkAppPackage("weather", contributes, (m) => (m === "weather" ? list : load(m))).join("\n")).toContain('node type "list" is not allowed');
+    const list = { type: "page", id: "x", title: "X", body: [{ type: "card_grid", bind: { source: "route", path: "/api/people" }, item_key_field: "id", item_label_field: "n" }] };
+    expect(checkAppPackage("weather", contributes, (m) => (m === "weather" ? list : load(m))).join("\n")).toContain('node type "card_grid" is not allowed');
   });
   test("an action must stay under the package's own prefixes", () => {
     const action = { type: "page", id: "x", title: "X", body: [{ type: "empty_state", icon: "x", text: "t", action: { call: { target: "/api/people/1", method: "DELETE" } } }] };
@@ -125,5 +125,41 @@ describe("checkAppPackage (the cross-file lint)", () => {
     expect(text).toContain('page id "index" is declared twice');
     expect(text).toContain('data id "a" is declared twice');
     expect(text).toContain("rows needs a surface");
+  });
+});
+
+describe("the News pages (NEWS-00)", () => {
+  const pageDir = join(import.meta.dir, "..", "..", "ui", "pages");
+  const news = (name: string) => JSON.parse(readFileSync(join(pageDir, `news-${name}.json`), "utf-8"));
+  const newsContributes: AppContributes = {
+    pages: [
+      { id: "index", label: "Today", nav: true, kind: "schema", module: "today" },
+      { id: "following", label: "Following", nav: true, kind: "schema", module: "following", min_role: "child" },
+      { id: "story", label: "Story", nav: false, kind: "schema", module: "story" },
+      { id: "mix", label: "My Mix", nav: true, kind: "schema", module: "today", min_role: "teen" },
+    ],
+    data: [
+      { id: "today" }, { id: "story" },
+      { id: "topics", rows: "list" }, { id: "sources", rows: "list" },
+    ],
+  };
+  const loadNews = (module: string): unknown => news(module);
+  test("the three fixtures conform: tabs, list with a toggle and media, answer_blocks with actions", () => {
+    expect(checkAppPackage("news", newsContributes, loadNews, "child")).toEqual([]);
+    expect(() => PackageManifest.parse({ ...BASE, id: "news", contributes: newsContributes })).not.toThrow();
+  });
+  test("a list needs a rows entry and a package source; Listen's play is allowed only in the actions map", () => {
+    const badList = { type: "page", id: "x", title: "X", body: [{ type: "list", bind: { source: "package", path: "today" }, item_key_field: "k", item_label_field: "l" }] };
+    expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? badList : news(m)), "child").join("\n")).toContain("returns blocks, not rows");
+    const routeList = { type: "page", id: "x", title: "X", body: [{ type: "list", bind: { source: "route", path: "/api/x" }, item_key_field: "k", item_label_field: "l" }] };
+    expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? routeList : news(m)), "child").join("\n")).toContain('bind.source must be "package"');
+    const playElsewhere = { type: "page", id: "x", title: "X", body: [{ type: "empty_state", icon: "x", text: "t", action: { play: { media_id: "m" } } }] };
+    expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? playElsewhere : news(m)), "child").join("\n")).toContain("play action is not available");
+  });
+  test("tab ids are unique and an outbound address is not a media field", () => {
+    const dup = { type: "page", id: "x", title: "X", body: [{ type: "tabs", tabs: [{ id: "a", label: "A", body: [{ type: "empty_state", icon: "x", text: "t" }] }, { id: "a", label: "B", body: [{ type: "empty_state", icon: "x", text: "t" }] }] }] };
+    expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? dup : news(m)), "child").join("\n")).toContain("declared twice");
+    const media = { type: "page", id: "x", title: "X", body: [{ type: "list", bind: { source: "package", path: "topics" }, item_key_field: "k", item_label_field: "l", item_media_field: "https://example.com/p.png" }] };
+    expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? media : news(m)), "child").join("\n")).toContain("not an address");
   });
 });

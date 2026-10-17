@@ -610,6 +610,265 @@ class WeatherCard(BaseModel):
     props: Props8
 
 
+class Image1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    w480: constr(min_length=1)
+    w1280: constr(min_length=1)
+    alt: constr(min_length=1)
+
+
+class NewsStoryCard(BaseModel):
+    """
+    One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    story_id: constr(min_length=1)
+    item_id: constr(min_length=1)
+    title: constr(min_length=1)
+    dek: str | None = None
+    publisher: constr(min_length=1)
+    site: constr(min_length=1)
+    published_at: AwareDatetime
+    outlets: conint(ge=1) = Field(
+        ..., description='How many publishers cover this story.'
+    )
+    topics: list[constr(pattern=r'^[a-z][a-z0-9_-]*$')]
+    image: Image1 | None = None
+    saved: bool
+    opened: bool = Field(
+        ..., description='The viewer opened this story before; the card dims.'
+    )
+    open_url: AnyUrl | None = None
+
+
+class Channel(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['topic', 'source']
+    key: constr(min_length=1)
+    followed: bool
+
+
+class Header(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    title: constr(min_length=1)
+    subtitle: str | None = None
+    channel: Channel | None = None
+
+
+class Channel1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['topic', 'source']
+    key: constr(min_length=1)
+    label: constr(min_length=1)
+
+
+class Shelf(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    title: constr(min_length=1)
+    channels: list[Channel1] | None = Field(None, max_length=6)
+    stories: list[NewsStoryCard] = Field(..., max_length=12)
+
+
+class Props9(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    layout: Literal['today', 'channel', 'rows']
+    header: Header | None = None
+    hero: NewsStoryCard | None = None
+    featured: list[NewsStoryCard] | None = Field(None, max_length=4)
+    shelves: list[Shelf] | None = Field(None, max_length=6)
+    rows: list[NewsStoryCard] | None = Field(None, max_length=60)
+    as_of: AwareDatetime
+
+
+class StoryFeed(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['story_feed']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props9
+
+
+class Byline(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    publisher: constr(min_length=1)
+    site: constr(min_length=1)
+    published_at: AwareDatetime
+    outlets: conint(ge=1)
+    reading_s: conint(ge=0)
+
+
+class KeyPoints(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    text: constr(min_length=1)
+    band: Literal['child', 'teen', 'adult']
+
+
+class ArticleInline1(BaseModel):
+    """
+    One run of text inside a paragraph, list item or quote.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['text', 'emphasis', 'strong']
+    text: str
+
+
+class Target(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    book: constr(min_length=1)
+    path: constr(min_length=1)
+
+
+class ArticleInline2(BaseModel):
+    """
+    One run of text inside a paragraph, list item or quote.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['link']
+    text: str
+    target: Target | None = None
+    href: AnyUrl | None = Field(
+        None,
+        description="An outbound address. Present only when the viewer's band may follow outbound links.",
+    )
+
+
+class ArticleHeading(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['heading']
+    level: Literal[2, 3, 4]
+    id: constr(min_length=1)
+    text: str
+
+
+class ArticleParagraph(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['paragraph']
+    inlines: list[ArticleInline1 | ArticleInline2]
+
+
+class ArticleList(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['list']
+    ordered: bool
+    items: list[list[ArticleInline1 | ArticleInline2]]
+
+
+class Row1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: str
+    value: str
+
+
+class ArticleRows(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['rows']
+    rows: list[Row1]
+
+
+class ArticleTable(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['table']
+    headers: list[str]
+    rows: list[list[str]]
+
+
+class ArticleFigure(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['figure']
+    src: constr(min_length=1) = Field(
+        ..., description="A same-origin hub path, never the publisher's address."
+    )
+    alt: str
+    caption: str
+
+
+class ArticleNote(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['note']
+    text: str
+
+
+class ArticleQuote(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['quote']
+    inlines: list[ArticleInline1 | ArticleInline2]
+    cite: str | None = None
+
+
 class Column(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -706,3 +965,70 @@ class DataTable(BaseModel):
         description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
     )
     props: Props1
+
+
+class Props10(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    story_id: constr(min_length=1)
+    item_id: constr(min_length=1)
+    kicker: str
+    title: constr(min_length=1)
+    byline: Byline
+    image: Image1 | None = None
+    key_points: KeyPoints | None = None
+    blocks: list[
+        ArticleHeading
+        | ArticleParagraph
+        | ArticleList
+        | ArticleRows
+        | ArticleTable
+        | ArticleFigure
+        | ArticleNote
+        | ArticleQuote
+    ]
+    also_covering: list[NewsStoryCard] | None = Field(None, max_length=12)
+    speech: list[constr(min_length=1, max_length=4000)] = Field(
+        ...,
+        description="What Listen speaks, in order; the hub builds it from strings that passed the viewer's floor, so the client never assembles speech from other fields.",
+    )
+    open_url: AnyUrl | None = None
+    content_source: Literal['feed', 'fetched', 'archived', 'teaser']
+
+
+class Article(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['article']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props10

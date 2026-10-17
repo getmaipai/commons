@@ -13,7 +13,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[] 
  * (list, card_grid, widget_card, split_view, ...) or mounts a host component
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the two package nodes and the layout nodes. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "detail_pane"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "detail_pane", "tabs", "list"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -21,7 +21,7 @@ export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen"
 type Json = Record<string, unknown>;
 const isObject = (value: unknown): value is Json => typeof value === "object" && value !== null && !Array.isArray(value);
 
-function checkAction(action: unknown, packageId: string, where: string, out: string[]): void {
+function checkAction(action: unknown, packageId: string, where: string, out: string[], allowPlay = false): void {
   if (!isObject(action)) return;
   const navigate = action.navigate;
   if (isObject(navigate) && typeof navigate.to === "string") {
@@ -32,8 +32,8 @@ function checkAction(action: unknown, packageId: string, where: string, out: str
   if (isObject(call) && typeof call.target === "string" && !call.target.startsWith(`/api/plugins/${packageId}/`)) {
     out.push(`${where}: call.target "${call.target}" must stay under /api/plugins/${packageId}/`);
   }
-  if (isObject(action.confirm)) checkAction(action.confirm.on_confirm, packageId, where, out);
-  if (action.play !== undefined) out.push(`${where}: the play action is not available on a package page`);
+  if (isObject(action.confirm)) checkAction(action.confirm.on_confirm, packageId, where, out, allowPlay);
+  if (action.play !== undefined && !allowPlay) out.push(`${where}: the play action is not available on a package page`);
 }
 
 function checkBinding(bind: unknown, where: string, data: Map<string, AppDataEntry>, want: "blocks" | "rows", out: string[]): void {
@@ -50,10 +50,30 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   if (!isObject(node)) { out.push(`${where}: a node must be an object`); return; }
   const type = String(node.type);
   if (!PACKAGE_PAGE_NODE_TYPES.includes(type)) { out.push(`${where}: node type "${type}" is not allowed on a package page`); return; }
-  if (type === "answer_blocks") checkBinding(node.bind, `${where} answer_blocks`, data, "blocks", out);
+  if (type === "answer_blocks") {
+    checkBinding(node.bind, `${where} answer_blocks`, data, "blocks", out);
+    // NEWS-00: the actions map is the one place a package page may use `play` (Listen: the hub's own speech route).
+    if (isObject(node.actions)) for (const [role, action] of Object.entries(node.actions)) checkAction(action, packageId, `${where} answer_blocks.actions.${role}`, out, role === "listen");
+  }
+  if (type === "list") {
+    checkBinding(node.bind, `${where} list`, data, "rows", out);
+    if (isObject(node.row_action)) checkAction(node.row_action.action, packageId, `${where} list.row_action`, out);
+    if (isObject(node.row_toggle)) checkAction(node.row_toggle.action, packageId, `${where} list.row_toggle`, out);
+    if (typeof node.item_media_field === "string" && /^[a-z]+:|\/\//i.test(node.item_media_field)) out.push(`${where} list: item_media_field must be a field path, not an address`);
+  }
   if (type === "picker" && node.bind !== undefined) checkBinding(node.bind, `${where} picker`, data, "rows", out);
   if (isObject(node.empty_state)) checkAction(node.empty_state.action, packageId, where, out);
   if (type === "empty_state") checkAction(node.action, packageId, where, out);
+  if (type === "tabs" && Array.isArray(node.tabs)) {
+    const seen = new Set<string>();
+    node.tabs.forEach((tab: unknown, i: number) => {
+      if (!isObject(tab)) { out.push(`${where}/tabs[${i}]: a tab must be an object`); return; }
+      const id = String(tab.id);
+      if (seen.has(id)) out.push(`${where}/tabs[${i}]: tab id "${id}" is declared twice`);
+      seen.add(id);
+      if (Array.isArray(tab.body)) tab.body.forEach((kid, j) => walk(kid, packageId, data, `${where}/tabs[${i}]/body[${j}]`, out));
+    });
+  }
   const kids = type === "page" ? node.body : type === "section" ? node.children : type === "detail_pane" ? node.body : undefined;
   if (Array.isArray(kids)) kids.forEach((kid, i) => walk(kid, packageId, data, `${where}/${type}[${i}]`, out));
 }
@@ -81,7 +101,7 @@ export function checkAppPackage(packageId: string, contributes: AppContributes |
   for (const entry of dataList) {
     if (data.has(entry.id)) out.push(`data id "${entry.id}" is declared twice`);
     data.set(entry.id, entry);
-    if (entry.rows !== undefined && entry.surface === undefined) out.push(`data "${entry.id}": rows needs a surface`);
+    if (entry.rows === "places" && entry.surface === undefined) out.push(`data "${entry.id}": rows needs a surface`);
   }
   for (const page of pages) {
     const doc = loadPage(page.module);

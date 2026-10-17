@@ -484,8 +484,8 @@
               },
               "rows": {
                 "type": "string",
-                "enum": ["places"],
-                "description": "This entry returns rows (not blocks) for a picker: \"places\" is the asking person's saved places for `surface`, as {id, label}. An entry with `rows` runs no recipe."
+                "enum": ["places", "list"],
+                "description": "This entry returns rows (not blocks) for a picker or a list: \"places\" is the asking person's saved places for `surface`, as {id, label}; \"list\" (NEWS-00) is a bare array of row objects the package's own hub route builds for a `list` node (no `surface`). An entry with `rows` runs no recipe."
               },
               "inputs": {
                 "type": "object",

@@ -321,9 +321,9 @@ class Datum(BaseModel):
         None,
         description='A place surface (PLACE-WEATHER-01). The host, never the model or the page, resolves the chosen place for this surface and injects its coordinates into the package recipe call; coordinates are consumed in that call and never stored, logged or cached by text.',
     )
-    rows: Literal['places'] | None = Field(
+    rows: Literal['places', 'list'] | None = Field(
         None,
-        description='This entry returns rows (not blocks) for a picker: "places" is the asking person\'s saved places for `surface`, as {id, label}. An entry with `rows` runs no recipe.',
+        description='This entry returns rows (not blocks) for a picker or a list: "places" is the asking person\'s saved places for `surface`, as {id, label}; "list" (NEWS-00) is a bare array of row objects the package\'s own hub route builds for a `list` node (no `surface`). An entry with `rows` runs no recipe.',
     )
     inputs: dict[str, Any] | None = Field(
         None,
@@ -516,6 +516,8 @@ class PackageManifest(BaseModel):
                 'schedule_card',
                 'comparison',
                 'weather_card',
+                'story_feed',
+                'article',
             ]
         ]
         | None

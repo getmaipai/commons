@@ -1065,6 +1065,786 @@ export const AnswerBlock = z
             .strict(),
         })
         .strict(),
+      z
+        .object({
+          /**Stable identity of this block. Unique within a turn's block list.*/
+          id: z
+            .string()
+            .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+            .describe(
+              "Stable identity of this block. Unique within a turn's block list.",
+            ),
+          kind: z.literal("story_feed"),
+          schema_version: z.literal(1),
+          /**The id of the package that returned the block.*/
+          producer: z
+            .string()
+            .min(1)
+            .describe("The id of the package that returned the block."),
+          /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+          alt: z
+            .string()
+            .min(1)
+            .max(300)
+            .describe(
+              "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+            ),
+          /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+          min_band: z
+            .enum(["child", "teen", "adult"])
+            .describe(
+              "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+            )
+            .optional(),
+          /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+          provenance: z
+            .string()
+            .min(1)
+            .describe(
+              "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+            ),
+          created_at: z.string().datetime({ offset: true }),
+          /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+          hlc: z
+            .string()
+            .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
+            .describe(
+              "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+            ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
+          props: z
+            .object({
+              layout: z.enum(["today", "channel", "rows"]),
+              header: z
+                .object({
+                  title: z.string().min(1),
+                  subtitle: z.string().optional(),
+                  channel: z
+                    .object({
+                      kind: z.enum(["topic", "source"]),
+                      key: z.string().min(1),
+                      followed: z.boolean(),
+                    })
+                    .strict()
+                    .optional(),
+                })
+                .strict()
+                .optional(),
+              /**One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.*/
+              hero: z
+                .object({
+                  story_id: z.string().min(1),
+                  item_id: z.string().min(1),
+                  title: z.string().min(1),
+                  dek: z.string().optional(),
+                  publisher: z.string().min(1),
+                  site: z.string().min(1),
+                  published_at: z.string().datetime({ offset: true }),
+                  /**How many publishers cover this story.*/
+                  outlets: z
+                    .number()
+                    .int()
+                    .gte(1)
+                    .describe("How many publishers cover this story."),
+                  topics: z.array(
+                    z.string().regex(new RegExp("^[a-z][a-z0-9_-]*$")),
+                  ),
+                  image: z
+                    .object({
+                      w480: z.string().min(1),
+                      w1280: z.string().min(1),
+                      alt: z.string().min(1),
+                    })
+                    .strict()
+                    .optional(),
+                  saved: z.boolean(),
+                  /**The viewer opened this story before; the card dims.*/
+                  opened: z
+                    .boolean()
+                    .describe(
+                      "The viewer opened this story before; the card dims.",
+                    ),
+                  open_url: z.string().url().optional(),
+                })
+                .strict()
+                .describe(
+                  "One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.",
+                )
+                .optional(),
+              featured: z
+                .array(
+                  z
+                    .object({
+                      story_id: z.string().min(1),
+                      item_id: z.string().min(1),
+                      title: z.string().min(1),
+                      dek: z.string().optional(),
+                      publisher: z.string().min(1),
+                      site: z.string().min(1),
+                      published_at: z.string().datetime({ offset: true }),
+                      /**How many publishers cover this story.*/
+                      outlets: z
+                        .number()
+                        .int()
+                        .gte(1)
+                        .describe("How many publishers cover this story."),
+                      topics: z.array(
+                        z.string().regex(new RegExp("^[a-z][a-z0-9_-]*$")),
+                      ),
+                      image: z
+                        .object({
+                          w480: z.string().min(1),
+                          w1280: z.string().min(1),
+                          alt: z.string().min(1),
+                        })
+                        .strict()
+                        .optional(),
+                      saved: z.boolean(),
+                      /**The viewer opened this story before; the card dims.*/
+                      opened: z
+                        .boolean()
+                        .describe(
+                          "The viewer opened this story before; the card dims.",
+                        ),
+                      open_url: z.string().url().optional(),
+                    })
+                    .strict()
+                    .describe(
+                      "One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.",
+                    ),
+                )
+                .max(4)
+                .optional(),
+              shelves: z
+                .array(
+                  z
+                    .object({
+                      title: z.string().min(1),
+                      channels: z
+                        .array(
+                          z
+                            .object({
+                              kind: z.enum(["topic", "source"]),
+                              key: z.string().min(1),
+                              label: z.string().min(1),
+                            })
+                            .strict(),
+                        )
+                        .max(6)
+                        .optional(),
+                      stories: z
+                        .array(
+                          z
+                            .object({
+                              story_id: z.string().min(1),
+                              item_id: z.string().min(1),
+                              title: z.string().min(1),
+                              dek: z.string().optional(),
+                              publisher: z.string().min(1),
+                              site: z.string().min(1),
+                              published_at: z
+                                .string()
+                                .datetime({ offset: true }),
+                              /**How many publishers cover this story.*/
+                              outlets: z
+                                .number()
+                                .int()
+                                .gte(1)
+                                .describe(
+                                  "How many publishers cover this story.",
+                                ),
+                              topics: z.array(
+                                z
+                                  .string()
+                                  .regex(new RegExp("^[a-z][a-z0-9_-]*$")),
+                              ),
+                              image: z
+                                .object({
+                                  w480: z.string().min(1),
+                                  w1280: z.string().min(1),
+                                  alt: z.string().min(1),
+                                })
+                                .strict()
+                                .optional(),
+                              saved: z.boolean(),
+                              /**The viewer opened this story before; the card dims.*/
+                              opened: z
+                                .boolean()
+                                .describe(
+                                  "The viewer opened this story before; the card dims.",
+                                ),
+                              open_url: z.string().url().optional(),
+                            })
+                            .strict()
+                            .describe(
+                              "One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.",
+                            ),
+                        )
+                        .max(12),
+                    })
+                    .strict(),
+                )
+                .max(6)
+                .optional(),
+              rows: z
+                .array(
+                  z
+                    .object({
+                      story_id: z.string().min(1),
+                      item_id: z.string().min(1),
+                      title: z.string().min(1),
+                      dek: z.string().optional(),
+                      publisher: z.string().min(1),
+                      site: z.string().min(1),
+                      published_at: z.string().datetime({ offset: true }),
+                      /**How many publishers cover this story.*/
+                      outlets: z
+                        .number()
+                        .int()
+                        .gte(1)
+                        .describe("How many publishers cover this story."),
+                      topics: z.array(
+                        z.string().regex(new RegExp("^[a-z][a-z0-9_-]*$")),
+                      ),
+                      image: z
+                        .object({
+                          w480: z.string().min(1),
+                          w1280: z.string().min(1),
+                          alt: z.string().min(1),
+                        })
+                        .strict()
+                        .optional(),
+                      saved: z.boolean(),
+                      /**The viewer opened this story before; the card dims.*/
+                      opened: z
+                        .boolean()
+                        .describe(
+                          "The viewer opened this story before; the card dims.",
+                        ),
+                      open_url: z.string().url().optional(),
+                    })
+                    .strict()
+                    .describe(
+                      "One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.",
+                    ),
+                )
+                .max(60)
+                .optional(),
+              as_of: z.string().datetime({ offset: true }),
+            })
+            .strict(),
+        })
+        .strict(),
+      z
+        .object({
+          /**Stable identity of this block. Unique within a turn's block list.*/
+          id: z
+            .string()
+            .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+            .describe(
+              "Stable identity of this block. Unique within a turn's block list.",
+            ),
+          kind: z.literal("article"),
+          schema_version: z.literal(1),
+          /**The id of the package that returned the block.*/
+          producer: z
+            .string()
+            .min(1)
+            .describe("The id of the package that returned the block."),
+          /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+          alt: z
+            .string()
+            .min(1)
+            .max(300)
+            .describe(
+              "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+            ),
+          /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+          min_band: z
+            .enum(["child", "teen", "adult"])
+            .describe(
+              "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+            )
+            .optional(),
+          /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+          provenance: z
+            .string()
+            .min(1)
+            .describe(
+              "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+            ),
+          created_at: z.string().datetime({ offset: true }),
+          /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+          hlc: z
+            .string()
+            .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
+            .describe(
+              "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+            ),
+          /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+          after_paragraph: z
+            .number()
+            .int()
+            .gte(0)
+            .describe(
+              "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+            )
+            .optional(),
+          props: z
+            .object({
+              story_id: z.string().min(1),
+              item_id: z.string().min(1),
+              kicker: z.string(),
+              title: z.string().min(1),
+              byline: z
+                .object({
+                  publisher: z.string().min(1),
+                  site: z.string().min(1),
+                  published_at: z.string().datetime({ offset: true }),
+                  outlets: z.number().int().gte(1),
+                  reading_s: z.number().int().gte(0),
+                })
+                .strict(),
+              image: z
+                .object({
+                  w480: z.string().min(1),
+                  w1280: z.string().min(1),
+                  alt: z.string().min(1),
+                })
+                .strict()
+                .optional(),
+              key_points: z
+                .object({
+                  text: z.string().min(1),
+                  band: z.enum(["child", "teen", "adult"]),
+                })
+                .strict()
+                .optional(),
+              blocks: z.array(
+                z
+                  .any()
+                  .superRefine((x, ctx) => {
+                    const schemas = [
+                      z
+                        .object({
+                          type: z.literal("heading"),
+                          level: z.union([
+                            z.literal(2),
+                            z.literal(3),
+                            z.literal(4),
+                          ]),
+                          id: z.string().min(1),
+                          text: z.string(),
+                        })
+                        .strict(),
+                      z
+                        .object({
+                          type: z.literal("paragraph"),
+                          inlines: z.array(
+                            z
+                              .any()
+                              .superRefine((x, ctx) => {
+                                const schemas = [
+                                  z
+                                    .object({
+                                      type: z.enum([
+                                        "text",
+                                        "emphasis",
+                                        "strong",
+                                      ]),
+                                      text: z.string(),
+                                    })
+                                    .strict(),
+                                  z
+                                    .object({
+                                      type: z.literal("link"),
+                                      text: z.string(),
+                                      target: z
+                                        .object({
+                                          book: z.string().min(1),
+                                          path: z.string().min(1),
+                                        })
+                                        .strict()
+                                        .optional(),
+                                      /**An outbound address. Present only when the viewer's band may follow outbound links.*/
+                                      href: z
+                                        .string()
+                                        .url()
+                                        .describe(
+                                          "An outbound address. Present only when the viewer's band may follow outbound links.",
+                                        )
+                                        .optional(),
+                                    })
+                                    .strict(),
+                                ];
+                                const { errors, failed } = schemas.reduce<{
+                                  errors: z.core.$ZodIssue[];
+                                  failed: number;
+                                }>(
+                                  ({ errors, failed }, schema) =>
+                                    ((result) =>
+                                      result.error
+                                        ? {
+                                            errors: [
+                                              ...errors,
+                                              ...result.error.issues,
+                                            ],
+                                            failed: failed + 1,
+                                          }
+                                        : { errors, failed })(
+                                      schema.safeParse(x),
+                                    ),
+                                  { errors: [], failed: 0 },
+                                );
+                                const passed = schemas.length - failed;
+                                if (passed !== 1) {
+                                  ctx.addIssue(
+                                    errors.length
+                                      ? {
+                                          path: [],
+                                          code: "invalid_union",
+                                          errors: [errors],
+                                          message:
+                                            "Invalid input: Should pass single schema. Passed " +
+                                            passed,
+                                        }
+                                      : {
+                                          path: [],
+                                          code: "custom",
+                                          errors: [errors],
+                                          message:
+                                            "Invalid input: Should pass single schema. Passed " +
+                                            passed,
+                                        },
+                                  );
+                                }
+                              })
+                              .describe(
+                                "One run of text inside a paragraph, list item or quote.",
+                              ),
+                          ),
+                        })
+                        .strict(),
+                      z
+                        .object({
+                          type: z.literal("list"),
+                          ordered: z.boolean(),
+                          items: z.array(
+                            z.array(
+                              z
+                                .any()
+                                .superRefine((x, ctx) => {
+                                  const schemas = [
+                                    z
+                                      .object({
+                                        type: z.enum([
+                                          "text",
+                                          "emphasis",
+                                          "strong",
+                                        ]),
+                                        text: z.string(),
+                                      })
+                                      .strict(),
+                                    z
+                                      .object({
+                                        type: z.literal("link"),
+                                        text: z.string(),
+                                        target: z
+                                          .object({
+                                            book: z.string().min(1),
+                                            path: z.string().min(1),
+                                          })
+                                          .strict()
+                                          .optional(),
+                                        /**An outbound address. Present only when the viewer's band may follow outbound links.*/
+                                        href: z
+                                          .string()
+                                          .url()
+                                          .describe(
+                                            "An outbound address. Present only when the viewer's band may follow outbound links.",
+                                          )
+                                          .optional(),
+                                      })
+                                      .strict(),
+                                  ];
+                                  const { errors, failed } = schemas.reduce<{
+                                    errors: z.core.$ZodIssue[];
+                                    failed: number;
+                                  }>(
+                                    ({ errors, failed }, schema) =>
+                                      ((result) =>
+                                        result.error
+                                          ? {
+                                              errors: [
+                                                ...errors,
+                                                ...result.error.issues,
+                                              ],
+                                              failed: failed + 1,
+                                            }
+                                          : { errors, failed })(
+                                        schema.safeParse(x),
+                                      ),
+                                    { errors: [], failed: 0 },
+                                  );
+                                  const passed = schemas.length - failed;
+                                  if (passed !== 1) {
+                                    ctx.addIssue(
+                                      errors.length
+                                        ? {
+                                            path: [],
+                                            code: "invalid_union",
+                                            errors: [errors],
+                                            message:
+                                              "Invalid input: Should pass single schema. Passed " +
+                                              passed,
+                                          }
+                                        : {
+                                            path: [],
+                                            code: "custom",
+                                            errors: [errors],
+                                            message:
+                                              "Invalid input: Should pass single schema. Passed " +
+                                              passed,
+                                          },
+                                    );
+                                  }
+                                })
+                                .describe(
+                                  "One run of text inside a paragraph, list item or quote.",
+                                ),
+                            ),
+                          ),
+                        })
+                        .strict(),
+                      z
+                        .object({
+                          type: z.literal("rows"),
+                          rows: z.array(
+                            z
+                              .object({ label: z.string(), value: z.string() })
+                              .strict(),
+                          ),
+                        })
+                        .strict(),
+                      z
+                        .object({
+                          type: z.literal("table"),
+                          headers: z.array(z.string()),
+                          rows: z.array(z.array(z.string())),
+                        })
+                        .strict(),
+                      z
+                        .object({
+                          type: z.literal("figure"),
+                          /**A same-origin hub path, never the publisher's address.*/
+                          src: z
+                            .string()
+                            .min(1)
+                            .describe(
+                              "A same-origin hub path, never the publisher's address.",
+                            ),
+                          alt: z.string(),
+                          caption: z.string(),
+                        })
+                        .strict(),
+                      z
+                        .object({ type: z.literal("note"), text: z.string() })
+                        .strict(),
+                      z
+                        .object({
+                          type: z.literal("quote"),
+                          inlines: z.array(
+                            z
+                              .any()
+                              .superRefine((x, ctx) => {
+                                const schemas = [
+                                  z
+                                    .object({
+                                      type: z.enum([
+                                        "text",
+                                        "emphasis",
+                                        "strong",
+                                      ]),
+                                      text: z.string(),
+                                    })
+                                    .strict(),
+                                  z
+                                    .object({
+                                      type: z.literal("link"),
+                                      text: z.string(),
+                                      target: z
+                                        .object({
+                                          book: z.string().min(1),
+                                          path: z.string().min(1),
+                                        })
+                                        .strict()
+                                        .optional(),
+                                      /**An outbound address. Present only when the viewer's band may follow outbound links.*/
+                                      href: z
+                                        .string()
+                                        .url()
+                                        .describe(
+                                          "An outbound address. Present only when the viewer's band may follow outbound links.",
+                                        )
+                                        .optional(),
+                                    })
+                                    .strict(),
+                                ];
+                                const { errors, failed } = schemas.reduce<{
+                                  errors: z.core.$ZodIssue[];
+                                  failed: number;
+                                }>(
+                                  ({ errors, failed }, schema) =>
+                                    ((result) =>
+                                      result.error
+                                        ? {
+                                            errors: [
+                                              ...errors,
+                                              ...result.error.issues,
+                                            ],
+                                            failed: failed + 1,
+                                          }
+                                        : { errors, failed })(
+                                      schema.safeParse(x),
+                                    ),
+                                  { errors: [], failed: 0 },
+                                );
+                                const passed = schemas.length - failed;
+                                if (passed !== 1) {
+                                  ctx.addIssue(
+                                    errors.length
+                                      ? {
+                                          path: [],
+                                          code: "invalid_union",
+                                          errors: [errors],
+                                          message:
+                                            "Invalid input: Should pass single schema. Passed " +
+                                            passed,
+                                        }
+                                      : {
+                                          path: [],
+                                          code: "custom",
+                                          errors: [errors],
+                                          message:
+                                            "Invalid input: Should pass single schema. Passed " +
+                                            passed,
+                                        },
+                                  );
+                                }
+                              })
+                              .describe(
+                                "One run of text inside a paragraph, list item or quote.",
+                              ),
+                          ),
+                          cite: z.string().optional(),
+                        })
+                        .strict(),
+                    ];
+                    const { errors, failed } = schemas.reduce<{
+                      errors: z.core.$ZodIssue[];
+                      failed: number;
+                    }>(
+                      ({ errors, failed }, schema) =>
+                        ((result) =>
+                          result.error
+                            ? {
+                                errors: [...errors, ...result.error.issues],
+                                failed: failed + 1,
+                              }
+                            : { errors, failed })(schema.safeParse(x)),
+                      { errors: [], failed: 0 },
+                    );
+                    const passed = schemas.length - failed;
+                    if (passed !== 1) {
+                      ctx.addIssue(
+                        errors.length
+                          ? {
+                              path: [],
+                              code: "invalid_union",
+                              errors: [errors],
+                              message:
+                                "Invalid input: Should pass single schema. Passed " +
+                                passed,
+                            }
+                          : {
+                              path: [],
+                              code: "custom",
+                              errors: [errors],
+                              message:
+                                "Invalid input: Should pass single schema. Passed " +
+                                passed,
+                            },
+                      );
+                    }
+                  })
+                  .describe(
+                    "NEWS-00: one block of a cleaned article, defined once here so the hub, the web kit and Go render the same list. The closed model the one reader (`extractFullArticle`) returns: headings with ids, paragraphs of inline runs, lists, label and value rows, tables, figures, notes and quotes. Links: `target` names a book page on the reference reader; `href` is an outbound address and appears only in a teen or adult copy (the hub removes it for a child, who gets plain text). Additive after the first release: a new block type is a new `oneOf` member.",
+                  ),
+              ),
+              also_covering: z
+                .array(
+                  z
+                    .object({
+                      story_id: z.string().min(1),
+                      item_id: z.string().min(1),
+                      title: z.string().min(1),
+                      dek: z.string().optional(),
+                      publisher: z.string().min(1),
+                      site: z.string().min(1),
+                      published_at: z.string().datetime({ offset: true }),
+                      /**How many publishers cover this story.*/
+                      outlets: z
+                        .number()
+                        .int()
+                        .gte(1)
+                        .describe("How many publishers cover this story."),
+                      topics: z.array(
+                        z.string().regex(new RegExp("^[a-z][a-z0-9_-]*$")),
+                      ),
+                      image: z
+                        .object({
+                          w480: z.string().min(1),
+                          w1280: z.string().min(1),
+                          alt: z.string().min(1),
+                        })
+                        .strict()
+                        .optional(),
+                      saved: z.boolean(),
+                      /**The viewer opened this story before; the card dims.*/
+                      opened: z
+                        .boolean()
+                        .describe(
+                          "The viewer opened this story before; the card dims.",
+                        ),
+                      open_url: z.string().url().optional(),
+                    })
+                    .strict()
+                    .describe(
+                      "One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.",
+                    ),
+                )
+                .max(12)
+                .optional(),
+              /**What Listen speaks, in order; the hub builds it from strings that passed the viewer's floor, so the client never assembles speech from other fields.*/
+              speech: z
+                .array(z.string().min(1).max(4000))
+                .describe(
+                  "What Listen speaks, in order; the hub builds it from strings that passed the viewer's floor, so the client never assembles speech from other fields.",
+                ),
+              open_url: z.string().url().optional(),
+              content_source: z.enum(["feed", "fetched", "archived", "teaser"]),
+            })
+            .strict(),
+        })
+        .strict(),
     ];
     const { errors, failed } = schemas.reduce<{
       errors: z.core.$ZodIssue[];

@@ -813,6 +813,8 @@ V1_KINDS = [
     "schedule_card",
     "comparison",
     "weather_card",
+    "story_feed",
+    "article",
 ]
 
 

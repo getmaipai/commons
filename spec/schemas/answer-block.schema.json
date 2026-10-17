@@ -12,12 +12,14 @@
     { "$ref": "#/$defs/image_gallery" },
     { "$ref": "#/$defs/schedule_card" },
     { "$ref": "#/$defs/comparison" },
-    { "$ref": "#/$defs/weather_card" }
+    { "$ref": "#/$defs/weather_card" },
+    { "$ref": "#/$defs/story_feed" },
+    { "$ref": "#/$defs/article" }
   ],
   "$defs": {
     "kind": {
       "type": "string",
-      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card"],
+      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card", "story_feed", "article"],
       "description": "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here."
     },
     "block_id": {
@@ -547,6 +549,758 @@
             },
             "attribution": { "type": "string" }
           }
+        }
+      }
+    },
+    "news_story_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "story_id",
+        "item_id",
+        "title",
+        "publisher",
+        "site",
+        "published_at",
+        "outlets",
+        "topics",
+        "saved",
+        "opened"
+      ],
+      "description": "One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.",
+      "properties": {
+        "story_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dek": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "site": {
+          "type": "string",
+          "minLength": 1
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "outlets": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "How many publishers cover this story."
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]*$"
+          }
+        },
+        "image": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "w480",
+            "w1280",
+            "alt"
+          ],
+          "properties": {
+            "w480": {
+              "type": "string",
+              "minLength": 1
+            },
+            "w1280": {
+              "type": "string",
+              "minLength": 1
+            },
+            "alt": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "saved": {
+          "type": "boolean"
+        },
+        "opened": {
+          "type": "boolean",
+          "description": "The viewer opened this story before; the card dims."
+        },
+        "open_url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "story_feed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "schema_version",
+        "producer",
+        "alt",
+        "provenance",
+        "created_at",
+        "hlc",
+        "props"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/block_id"
+        },
+        "kind": {
+          "const": "story_feed"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/schema_version"
+        },
+        "producer": {
+          "$ref": "#/$defs/producer"
+        },
+        "alt": {
+          "$ref": "#/$defs/alt"
+        },
+        "min_band": {
+          "$ref": "#/$defs/min_band"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "created_at": {
+          "$ref": "#/$defs/created_at"
+        },
+        "hlc": {
+          "$ref": "#/$defs/hlc"
+        },
+        "after_paragraph": {
+          "$ref": "#/$defs/after_paragraph"
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "layout",
+            "as_of"
+          ],
+          "properties": {
+            "layout": {
+              "enum": [
+                "today",
+                "channel",
+                "rows"
+              ]
+            },
+            "header": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "subtitle": {
+                  "type": "string"
+                },
+                "channel": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "kind",
+                    "key",
+                    "followed"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "topic",
+                        "source"
+                      ]
+                    },
+                    "key": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "followed": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "hero": {
+              "$ref": "#/$defs/news_story_card"
+            },
+            "featured": {
+              "type": "array",
+              "maxItems": 4,
+              "items": {
+                "$ref": "#/$defs/news_story_card"
+              }
+            },
+            "shelves": {
+              "type": "array",
+              "maxItems": 6,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "stories"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "channels": {
+                    "type": "array",
+                    "maxItems": 6,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind",
+                        "key",
+                        "label"
+                      ],
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "topic",
+                            "source"
+                          ]
+                        },
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "label": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  },
+                  "stories": {
+                    "type": "array",
+                    "maxItems": 12,
+                    "items": {
+                      "$ref": "#/$defs/news_story_card"
+                    }
+                  }
+                }
+              }
+            },
+            "rows": {
+              "type": "array",
+              "maxItems": 60,
+              "items": {
+                "$ref": "#/$defs/news_story_card"
+              }
+            },
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    },
+    "article": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "schema_version",
+        "producer",
+        "alt",
+        "provenance",
+        "created_at",
+        "hlc",
+        "props"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/block_id"
+        },
+        "kind": {
+          "const": "article"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/schema_version"
+        },
+        "producer": {
+          "$ref": "#/$defs/producer"
+        },
+        "alt": {
+          "$ref": "#/$defs/alt"
+        },
+        "min_band": {
+          "$ref": "#/$defs/min_band"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "created_at": {
+          "$ref": "#/$defs/created_at"
+        },
+        "hlc": {
+          "$ref": "#/$defs/hlc"
+        },
+        "after_paragraph": {
+          "$ref": "#/$defs/after_paragraph"
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "story_id",
+            "item_id",
+            "kicker",
+            "title",
+            "byline",
+            "blocks",
+            "speech",
+            "content_source"
+          ],
+          "properties": {
+            "story_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "item_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kicker": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "byline": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "publisher",
+                "site",
+                "published_at",
+                "outlets",
+                "reading_s"
+              ],
+              "properties": {
+                "publisher": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "site": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "published_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "outlets": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "reading_s": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "image": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "w480",
+                "w1280",
+                "alt"
+              ],
+              "properties": {
+                "w480": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "w1280": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "alt": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "key_points": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "text",
+                "band"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "band": {
+                  "enum": [
+                    "child",
+                    "teen",
+                    "adult"
+                  ]
+                }
+              }
+            },
+            "blocks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/article_block"
+              }
+            },
+            "also_covering": {
+              "type": "array",
+              "maxItems": 12,
+              "items": {
+                "$ref": "#/$defs/news_story_card"
+              }
+            },
+            "speech": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "description": "What Listen speaks, in order; the hub builds it from strings that passed the viewer's floor, so the client never assembles speech from other fields."
+            },
+            "open_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "content_source": {
+              "enum": [
+                "feed",
+                "fetched",
+                "archived",
+                "teaser"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "article_block": {
+      "description": "NEWS-00: one block of a cleaned article, defined once here so the hub, the web kit and Go render the same list. The closed model the one reader (`extractFullArticle`) returns: headings with ids, paragraphs of inline runs, lists, label and value rows, tables, figures, notes and quotes. Links: `target` names a book page on the reference reader; `href` is an outbound address and appears only in a teen or adult copy (the hub removes it for a child, who gets plain text). Additive after the first release: a new block type is a new `oneOf` member.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/article_heading"
+        },
+        {
+          "$ref": "#/$defs/article_paragraph"
+        },
+        {
+          "$ref": "#/$defs/article_list"
+        },
+        {
+          "$ref": "#/$defs/article_rows"
+        },
+        {
+          "$ref": "#/$defs/article_table"
+        },
+        {
+          "$ref": "#/$defs/article_figure"
+        },
+        {
+          "$ref": "#/$defs/article_note"
+        },
+        {
+          "$ref": "#/$defs/article_quote"
+        }
+      ]
+    },
+    "article_inline": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "text"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "text",
+                "emphasis",
+                "strong"
+              ]
+            },
+            "text": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "text"
+          ],
+          "properties": {
+            "type": {
+              "const": "link"
+            },
+            "text": {
+              "type": "string"
+            },
+            "target": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "book",
+                "path"
+              ],
+              "properties": {
+                "book": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "href": {
+              "type": "string",
+              "format": "uri",
+              "description": "An outbound address. Present only when the viewer's band may follow outbound links."
+            }
+          }
+        }
+      ],
+      "description": "One run of text inside a paragraph, list item or quote."
+    },
+    "article_heading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "level",
+        "id",
+        "text"
+      ],
+      "properties": {
+        "type": {
+          "const": "heading"
+        },
+        "level": {
+          "enum": [
+            2,
+            3,
+            4
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "article_paragraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "inlines"
+      ],
+      "properties": {
+        "type": {
+          "const": "paragraph"
+        },
+        "inlines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/article_inline"
+          }
+        }
+      }
+    },
+    "article_list": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "ordered",
+        "items"
+      ],
+      "properties": {
+        "type": {
+          "const": "list"
+        },
+        "ordered": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/article_inline"
+            }
+          }
+        }
+      }
+    },
+    "article_rows": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "rows"
+      ],
+      "properties": {
+        "type": {
+          "const": "rows"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label",
+              "value"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "article_table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "headers",
+        "rows"
+      ],
+      "properties": {
+        "type": {
+          "const": "table"
+        },
+        "headers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "article_figure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "src",
+        "alt",
+        "caption"
+      ],
+      "properties": {
+        "type": {
+          "const": "figure"
+        },
+        "src": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A same-origin hub path, never the publisher's address."
+        },
+        "alt": {
+          "type": "string"
+        },
+        "caption": {
+          "type": "string"
+        }
+      }
+    },
+    "article_note": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "text"
+      ],
+      "properties": {
+        "type": {
+          "const": "note"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "article_quote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "inlines"
+      ],
+      "properties": {
+        "type": {
+          "const": "quote"
+        },
+        "inlines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/article_inline"
+          }
+        },
+        "cite": {
+          "type": "string"
         }
       }
     }

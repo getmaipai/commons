@@ -82,6 +82,8 @@ class PluginResult(BaseModel):
         | answer_block_schema.ScheduleCard
         | answer_block_schema.Comparison
         | answer_block_schema.WeatherCard
+        | answer_block_schema.StoryFeed
+        | answer_block_schema.Article
     ] = Field(
         [],
         description='GENUI-01: typed answer blocks this call returns, in display order. Optional and additive. The hub validates each one, applies the output floor, drops an invalid one, and streams the rest as `block` events. A package may only return kinds its manifest lists in `returns_blocks`.',
