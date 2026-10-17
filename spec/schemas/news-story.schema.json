@@ -48,6 +48,35 @@
         "minLength": 1
       }
     },
+    "lead_item_id": {
+      "type": "string",
+      "pattern": "^news-[a-z0-9]{6,}$",
+      "description": "NEWS-00. The item the hero shows: the earliest from the publisher with the most items, with a picture when any item has one."
+    },
+    "topics": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+      "description": "NEWS-00. The union of its items' topics."
+    },
+    "image_ref": {
+      "type": ["string", "null"],
+      "description": "NEWS-00. The lead item's picture cache key; null until a screen asked for it."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "NEWS-00. The Key points text, written on the hub from the article."
+    },
+    "summary_band": {
+      "type": "string",
+      "enum": ["child", "teen", "adult"],
+      "description": "NEWS-00. The band the summary was written for; a viewer of a younger band never sees an older band's summary."
+    },
+    "summary_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "pageviews_hint": {
       "type": "number",
       "minimum": 0

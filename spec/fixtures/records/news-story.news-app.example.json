@@ -1,0 +1,21 @@
+{
+  "id": "story-a1b2c3",
+  "title": "Example event",
+  "first_seen": "2026-10-17T10:00:00Z",
+  "last_seen": "2026-10-17T11:00:00Z",
+  "item_count": 2,
+  "publisher_count": 2,
+  "entities": [
+    "Example Event"
+  ],
+  "centroid_ref": "embed:news-story-a1b2c3",
+  "lead_item_id": "news-a1b2c3",
+  "topics": [
+    "science"
+  ],
+  "image_ref": "img-a1b2c3",
+  "summary": "Three things happened.",
+  "summary_band": "teen",
+  "summary_at": "2026-10-17T11:30:00Z",
+  "hlc": "1791547200000:0:a1b2c3"
+}

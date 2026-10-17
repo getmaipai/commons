@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/kit/dashboard/components/ui/dropdown-menu";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/kit/dashboard/components/ui/empty";
-import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/kit/dashboard/components/ui/item";
+import { Item, ItemContent, ItemMedia, ItemTitle } from "@/kit/dashboard/components/ui/item";
 import { RelativeTime } from "@/kit/ui/relative-time";
 import { cn, HIT_AREA_ROW } from "@/kit/utils";
 
@@ -74,7 +74,7 @@ function CardMenu({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   if (story.open_url && can("open_site")) entries.push(<DropdownMenuItem key="site" onClick={() => fire("open_site")}>Open on {story.site}</DropdownMenuItem>);
   if (entries.length === 0) return null;
   return (
-    <CardAction>
+    <CardAction className="absolute top-2 right-2 z-10 rounded-full bg-background/85 backdrop-blur">
       <DropdownMenu>
         <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={`More for ${story.title}`} className={HIT_AREA_ROW} />}>
           <EllipsisIcon aria-hidden />
@@ -87,14 +87,14 @@ function CardMenu({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
 
 function SourceLine({ story }: { story: StoryCardData }) {
   return (
-    <p className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-xs">
+    <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-xs">
       <span>{story.publisher}</span>
       <RelativeTime at={story.published_at} />
       {story.outlets > 1 ? <Badge variant="secondary">{story.outlets} sources</Badge> : null}
       {story.saved ? (
         <Badge variant="outline"><BookmarkIcon aria-hidden data-icon="inline-start" />Saved</Badge>
       ) : null}
-    </p>
+    </div>
   );
 }
 
@@ -129,10 +129,10 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
       data-tier={tier}
       data-opened={story.opened ? "" : undefined}
       interactive
-      className={cn("relative", story.opened && "opacity-70", tier === "hero" && "lg:col-span-8 lg:row-span-2", tier === "featured" && "lg:col-span-4", tier === "half" && "lg:col-span-6", tier === "shelf" && "w-64 shrink-0 snap-start")}
+      className={cn("relative gap-0 py-0", story.opened && "opacity-70", tier === "hero" && "lg:col-span-8 lg:row-span-2", tier === "featured" && "lg:col-span-4", tier === "half" && "lg:col-span-6", tier === "shelf" && "w-64 shrink-0 snap-start")}
     >
-      <StoryImage story={story} ratio={hero || tier === "half" ? 16 / 9 : 4 / 3} large={hero} />
-      <CardContent className="flex flex-col gap-2">
+      <StoryImage story={story} ratio={hero ? 3 / 2 : tier === "shelf" ? 4 / 3 : 16 / 9} large={hero} />
+      <CardContent className="flex flex-col gap-2 py-4">
         <button
           type="button"
           onClick={open}
@@ -151,7 +151,7 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
 function StoryRow({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   const open = () => ctx.onAction?.("open", { story_id: story.story_id, item_id: story.item_id });
   return (
-    <Item variant="outline" data-slot="story-row" data-opened={story.opened ? "" : undefined} className={cn("relative", story.opened && "opacity-70")}>
+    <Item variant="outline" data-slot="story-row" data-opened={story.opened ? "" : undefined} className={cn("relative gap-0 py-0", story.opened && "opacity-70")}>
       <ItemMedia variant="image" className="size-20">
         {story.image ? (
           <img src={story.image.w480} alt={story.image.alt} loading="lazy" className="size-full object-cover" />
@@ -165,8 +165,7 @@ function StoryRow({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
             {story.title}
           </button>
         </ItemTitle>
-        <ItemDescription className="line-clamp-1">{story.publisher}</ItemDescription>
-        <SourceLine story={{ ...story, publisher: story.site }} />
+        <SourceLine story={story} />
       </ItemContent>
     </Item>
   );

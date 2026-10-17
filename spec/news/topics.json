@@ -1,0 +1,104 @@
+{
+  "version": "2026.10",
+  "topics": [
+    {
+      "id": "world",
+      "label": "World",
+      "icon": "globe",
+      "description": "International news: events, governments and conflicts outside the reader's own region.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "local",
+      "label": "Local",
+      "icon": "map-pin",
+      "description": "News from the reader's own town, city, county or state: local government, schools, weather events and community stories.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "business",
+      "label": "Business",
+      "icon": "briefcase",
+      "description": "Companies, markets, jobs, prices, the economy and personal money.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "technology",
+      "label": "Technology",
+      "icon": "cpu",
+      "description": "Computers, phones, the internet, software, artificial intelligence, gadgets and the companies that make them.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "science",
+      "label": "Science",
+      "icon": "flask-conical",
+      "description": "Research, discoveries, space, physics, chemistry, biology and how things work.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "health",
+      "label": "Health",
+      "icon": "heart",
+      "description": "Medicine, public health, fitness, nutrition, sleep and mental wellbeing.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "sports",
+      "label": "Sports",
+      "icon": "trophy",
+      "description": "Games, teams, athletes, scores, seasons and tournaments.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "entertainment",
+      "label": "Entertainment",
+      "icon": "film",
+      "description": "Movies, television, music, books, games, celebrities and the arts.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "environment",
+      "label": "Environment",
+      "icon": "leaf",
+      "description": "Climate, weather, nature, wildlife, energy and conservation.",
+      "bands": [
+        "teen",
+        "adult"
+      ]
+    },
+    {
+      "id": "kids",
+      "label": "Kids",
+      "icon": "baby",
+      "description": "News written for young readers: gentle, plain stories about animals, science, school, sports and fun.",
+      "bands": [
+        "child"
+      ]
+    }
+  ]
+}

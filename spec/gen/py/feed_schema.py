@@ -24,6 +24,30 @@ class Feed(BaseModel):
     )
     band: Literal['child', 'teen', 'adult']
     package_id: constr(min_length=1) | None = None
+    kind: Literal['rss', 'atom', 'json'] | None = Field(
+        None,
+        description="NEWS-00. The feed's format (JSON Feed joins RSS and Atom). Absent reads as rss.",
+    )
+    site_url: AnyUrl | None = Field(
+        None,
+        description="NEWS-00. The publisher's own home page, for the source line and the channel page.",
+    )
+    icon_ref: constr(min_length=1) | None = Field(
+        None,
+        description="NEWS-00. The favicon cache key; the hub serves the picture, never the publisher's address.",
+    )
+    topics_hint: list[constr(pattern=r'^[a-z][a-z0-9-]*$')] | None = Field(
+        None,
+        description='NEWS-00. Topic ids (spec/news/topics.json) a list package says this feed covers.',
+    )
+    list_id: constr(pattern=r'^[a-z][a-z0-9-]*$') | None = Field(
+        None,
+        description='NEWS-00. The feed list (spec/news/feed-lists.json) this feed came from.',
+    )
+    alerts: bool | None = Field(
+        None,
+        description='NEWS-00. Reserved for FEED-ALERTS-01: this feed may raise breaking-news alerts. Nothing reads it yet.',
+    )
     person_id: constr(min_length=1) | None = None
     etag: str | None = None
     last_modified: str | None = None

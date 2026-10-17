@@ -29,6 +29,7 @@ import type { ReplyConstraint } from "../../gen/ts/reply-constraint.js";
 import type { SubjectRef } from "../../gen/ts/subject-ref.js";
 import type { Artifact } from "../../gen/ts/artifact.js";
 import type { BiometricPrint } from "../../gen/ts/biometric-print.js";
+import type { NewsInterest } from "../../gen/ts/news-interest.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -546,5 +547,17 @@ export function validateArtifact(artifact: Artifact): Problems {
   if (artifact.version > 1 && artifact.parent_version === null) {
     problems.push(`version ${artifact.version} must chain to a parent_version`);
   }
+  return problems;
+}
+
+/** NEWS-00: the one cross-field rule on `NewsInterest`. Nothing is inferred about a child: a child's row exists only
+ * because the child tapped Follow, so it is never `inferred`, and its affinity is 0 (no score is computed). `band` is
+ * the owner's age band, read by the caller from the person record (the record itself carries no band). */
+export function validateNewsInterest(interest: NewsInterest, band: "child" | "teen" | "adult"): Problems {
+  const problems: Problems = [];
+  if (band === "child" && interest.inferred) problems.push("a child's News interest is never inferred: nothing is inferred about a child");
+  if (band === "child" && interest.affinity !== 0) problems.push("a child's News interest carries no computed affinity (it must be 0)");
+  if (interest.inferred && interest.followed) problems.push("an inferred interest is one only the affinity holds, so it cannot also be followed");
+  if (interest.kind === "source" && !interest.key.startsWith("feed-")) problems.push("a source interest's key is a feed id (feed-...)");
   return problems;
 }

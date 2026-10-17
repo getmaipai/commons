@@ -1,0 +1,12 @@
+{
+  "id": "read-a1b2c3",
+  "person_id": "person-teen01",
+  "item_id": "news-a1b2c3",
+  "story_id": "story-a1b2c3",
+  "opened_at": "2026-10-17T11:12:00Z",
+  "read_s": 95,
+  "finished": false,
+  "feedback": "more",
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "hub"
+}

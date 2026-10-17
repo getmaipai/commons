@@ -1,0 +1,13 @@
+{
+  "id": "interest-g7h8i9",
+  "person_id": "person-child01",
+  "kind": "topic",
+  "key": "kids",
+  "followed": true,
+  "affinity": 0,
+  "inferred": false,
+  "updated_at": "2026-10-17T11:00:00Z",
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "hub",
+  "source": "hub"
+}

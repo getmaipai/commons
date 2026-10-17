@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/news-read.schema.json",
+  "title": "NewsRead",
+  "description": "NEWS-00. One time a person opened a story. Person scope; pruned at 90 days; feeds the affinity only and is shown nowhere but the person's own dimmed cards. `read_s` is also the Listen resume point. `finished` is true after scrolling past 80 percent or when Listen reached the end. `feedback` is the person's own More or Less like this.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "person_id",
+    "item_id",
+    "story_id",
+    "opened_at",
+    "read_s",
+    "finished",
+    "hlc",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^read-[a-z0-9]{6,}$"
+    },
+    "person_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "item_id": {
+      "type": "string",
+      "pattern": "^news-[a-z0-9]{6,}$"
+    },
+    "story_id": {
+      "type": "string",
+      "pattern": "^story-[a-z0-9]{6,}$"
+    },
+    "opened_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "read_s": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "finished": {
+      "type": "boolean"
+    },
+    "feedback": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "more",
+        "less",
+        null
+      ]
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

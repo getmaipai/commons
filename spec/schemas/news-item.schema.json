@@ -66,6 +66,39 @@
       "type": "string",
       "pattern": "^story-[a-z0-9]{6,}$"
     },
+    "topics": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+      "description": "NEWS-00. Topic ids from spec/news/topics.json; empty when the classifier is unsure."
+    },
+    "image_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "NEWS-00. The picture address the feed itself named (media:content, media:thumbnail, an image enclosure or the first picture in the feed's own content), never one read from a fetched page. Fetched only when a screen shows the story."
+    },
+    "image_ref": {
+      "type": ["string", "null"],
+      "description": "NEWS-00. The picture cache key once a screen asked for it; null until then."
+    },
+    "content_ref": {
+      "type": ["string", "null"],
+      "description": "NEWS-00. The cached article block list in the knowledge store; null until needed."
+    },
+    "content_source": {
+      "type": "string",
+      "enum": ["feed", "fetched", "archived", "teaser"],
+      "description": "NEWS-00. Where the article text came from: the feed's own text, one fetch of the page, an archived copy, or only the feed's teaser."
+    },
+    "reading_s": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "NEWS-00. Estimated reading time in seconds, from the text."
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1
+    },
     "body_cached_until": {
       "type": "string",
       "format": "date-time"

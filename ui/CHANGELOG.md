@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.252] - ui-v0.5.252
+
+NEWS-01 polish after the judged captures (1280 and 390, light and dark): the `StoryFeed` hero is 3:2 and the featured cards 16:9 so the two stacked cards match the hero's height; the card menu sits over the picture's corner instead of under the text; a card draws edge to edge with no strip above its picture; a story row's source line reads once (publisher, time, sources). Icons `flask-conical`, `film` and `trophy` for the News topics (a test keeps `spec/news/topics.json` and the registry in step).
+
 ## [0.5.250] - ui-v0.5.250
 
 GENPREVIEW-01. `ImageGeneration` gains `previewSrc`, `previewStep`, `steps`, `etaLabel` and `aspectRatio`: the engine's latest preview cross-fades in over the dotted shimmer (blurred early, sharper with each step, none on the last; no transition under reduced motion), and the time left sits beside the clock. `VideoPlayer` loses its empty grey box while a clip is made: it draws the same shimmer with the prompt on it, takes `previewSrc` (the first frame, cross-faded in, replacing the prompt) and `etaLabel` ("about 1 minute left", after the clock and the percent), and shows the engine's stage line under the bar. New `GenerationStage` (the shared picture area) and `previewBlur`. Additive: without the new props the cards draw as before, except the video card's spinner is now the shimmer.

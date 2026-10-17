@@ -1,0 +1,13 @@
+{
+  "id": "interest-d4e5f6",
+  "person_id": "person-adult01",
+  "kind": "source",
+  "key": "feed-a1b2c3",
+  "followed": false,
+  "affinity": 0.72,
+  "inferred": true,
+  "updated_at": "2026-10-17T11:00:00Z",
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "hub",
+  "source": "hub"
+}

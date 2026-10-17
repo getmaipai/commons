@@ -1,0 +1,25 @@
+{
+  "id": "news-a1b2c3",
+  "feed_id": "feed-a1b2c3",
+  "url": "https://news.example.com/a",
+  "canonical_url": "https://news.example.com/a",
+  "title": "Example headline",
+  "summary": "A short summary.",
+  "published_at": "2026-10-17T11:00:00Z",
+  "fetched_at": "2026-10-17T11:05:00Z",
+  "publisher": "example.com",
+  "lang": "en",
+  "story_id": "story-a1b2c3",
+  "band_ok": "teen",
+  "topics": [
+    "science"
+  ],
+  "image_url": "https://news.example.com/a.jpg",
+  "image_ref": null,
+  "content_ref": null,
+  "content_source": "teaser",
+  "reading_s": 150,
+  "author": "A. Writer",
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "feed:feed-a1b2c3"
+}

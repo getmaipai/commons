@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/news-topics.schema.json",
+  "title": "NewsTopics",
+  "description": "NEWS-00. The fixed set of News topics (spec/news/topics.json): the channels a person can follow and the labels the embed role classifies each item against. `description` is the text the embed role compares an item's title and summary with. `bands` says which age bands are offered the topic: `kids` is offered to the child band only; the rest to teens and adults. Politics is deliberately not a topic (it folds into `world` and `local`).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "topics"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "topics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/topic"
+      }
+    }
+  },
+  "$defs": {
+    "topic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "icon",
+        "description",
+        "bands"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 24
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "A lucide icon name (the kit icon registry)."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20
+        },
+        "bands": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "child",
+              "teen",
+              "adult"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

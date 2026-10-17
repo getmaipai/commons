@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/news-interest.schema.json",
+  "title": "NewsInterest",
+  "description": "NEWS-00. One person's standing with one News channel (a topic or a source): whether they follow it, and a computed affinity from their own reads. Person scope: never readable by another person or an admin page, cleared by Reset My Mix (inferred rows) or Unfollow, removed by the person's forget rule. `inferred` is true when only the affinity holds the row; a child never has an inferred row (nothing is inferred about a child), which the cross-field rule in spec/records/ts/validate.ts (`validateNewsInterest`) enforces because JSON Schema cannot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "person_id",
+    "kind",
+    "key",
+    "followed",
+    "affinity",
+    "inferred",
+    "updated_at",
+    "hlc",
+    "provenance",
+    "source"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^interest-[a-z0-9]{6,}$"
+    },
+    "person_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "topic",
+        "source"
+      ]
+    },
+    "key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A topic id (spec/news/topics.json) or a `feed-` id."
+    },
+    "followed": {
+      "type": "boolean",
+      "description": "The person's own tap."
+    },
+    "affinity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Computed on the hub from the person's own reads; 0 for a row that holds only a follow."
+    },
+    "inferred": {
+      "type": "boolean"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "hub"
+      ]
+    }
+  }
+}

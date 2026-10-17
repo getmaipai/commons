@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, constr
+from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
 
 
 class NewsItem(BaseModel):
@@ -27,6 +27,30 @@ class NewsItem(BaseModel):
     publisher: constr(min_length=1)
     lang: constr(min_length=2)
     story_id: constr(pattern=r'^story-[a-z0-9]{6,}$') | None = None
+    topics: list[constr(pattern=r'^[a-z][a-z0-9-]*$')] | None = Field(
+        None,
+        description='NEWS-00. Topic ids from spec/news/topics.json; empty when the classifier is unsure.',
+    )
+    image_url: AnyUrl | None = Field(
+        None,
+        description="NEWS-00. The picture address the feed itself named (media:content, media:thumbnail, an image enclosure or the first picture in the feed's own content), never one read from a fetched page. Fetched only when a screen shows the story.",
+    )
+    image_ref: str | None = Field(
+        None,
+        description='NEWS-00. The picture cache key once a screen asked for it; null until then.',
+    )
+    content_ref: str | None = Field(
+        None,
+        description='NEWS-00. The cached article block list in the knowledge store; null until needed.',
+    )
+    content_source: Literal['feed', 'fetched', 'archived', 'teaser'] | None = Field(
+        None,
+        description="NEWS-00. Where the article text came from: the feed's own text, one fetch of the page, an archived copy, or only the feed's teaser.",
+    )
+    reading_s: conint(ge=0) | None = Field(
+        None, description='NEWS-00. Estimated reading time in seconds, from the text.'
+    )
+    author: constr(min_length=1) | None = None
     body_cached_until: AwareDatetime | None = None
     band_ok: Literal['child', 'teen', 'adult']
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')

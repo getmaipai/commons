@@ -1,0 +1,13 @@
+{
+  "id": "interest-a1b2c3",
+  "person_id": "person-teen01",
+  "kind": "topic",
+  "key": "science",
+  "followed": true,
+  "affinity": 0.4,
+  "inferred": false,
+  "updated_at": "2026-10-17T11:00:00Z",
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "hub",
+  "source": "hub"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "feed-a1b2c3",
+  "url": "https://news.example.com/feed.json",
+  "title": "Example News",
+  "publisher": "example.com",
+  "band": "teen",
+  "package_id": "feeds-household",
+  "kind": "json",
+  "site_url": "https://news.example.com/",
+  "icon_ref": "favicon-a1b2c3",
+  "topics_hint": [
+    "science",
+    "technology"
+  ],
+  "list_id": "feeds-household",
+  "alerts": false,
+  "poll_interval_s": 1800,
+  "next_poll_at": "2026-10-17T12:00:00Z",
+  "fail_count": 0,
+  "enabled": true,
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "package:news"
+}

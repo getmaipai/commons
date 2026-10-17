@@ -84,6 +84,9 @@ def test_settings_key_fixture():
         ("feed.example.json", Feed),
         ("news-item.example.json", NewsItem),
         ("news-story.example.json", NewsStory),
+        ("feed.news-app.example.json", Feed),
+        ("news-item.news-app.example.json", NewsItem),
+        ("news-story.news-app.example.json", NewsStory),
     ],
 )
 def test_knowledge_search_record_fixtures_round_trip(name, model):

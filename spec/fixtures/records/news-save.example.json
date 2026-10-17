@@ -1,0 +1,13 @@
+{
+  "id": "save-a1b2c3",
+  "person_id": "person-teen01",
+  "item_id": "news-a1b2c3",
+  "story_id": "story-a1b2c3",
+  "canonical_url": "https://news.example.com/a",
+  "title": "Example headline",
+  "publisher": "example.com",
+  "saved_at": "2026-10-17T11:10:00Z",
+  "offline": true,
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "hub"
+}

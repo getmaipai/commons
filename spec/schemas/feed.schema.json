@@ -48,6 +48,36 @@
       "type": "string",
       "minLength": 1
     },
+    "kind": {
+      "type": "string",
+      "enum": ["rss", "atom", "json"],
+      "description": "NEWS-00. The feed's format (JSON Feed joins RSS and Atom). Absent reads as rss."
+    },
+    "site_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "NEWS-00. The publisher's own home page, for the source line and the channel page."
+    },
+    "icon_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "NEWS-00. The favicon cache key; the hub serves the picture, never the publisher's address."
+    },
+    "topics_hint": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+      "description": "NEWS-00. Topic ids (spec/news/topics.json) a list package says this feed covers."
+    },
+    "list_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "NEWS-00. The feed list (spec/news/feed-lists.json) this feed came from."
+    },
+    "alerts": {
+      "type": "boolean",
+      "description": "NEWS-00. Reserved for FEED-ALERTS-01: this feed may raise breaking-news alerts. Nothing reads it yet."
+    },
     "person_id": {
       "type": "string",
       "minLength": 1

@@ -3,7 +3,17 @@
 
 from __future__ import annotations
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, confloat, conint, constr
+from typing import Literal
+
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    confloat,
+    conint,
+    constr,
+)
 
 
 class NewsStory(BaseModel):
@@ -21,6 +31,26 @@ class NewsStory(BaseModel):
     item_count: conint(ge=1)
     publisher_count: conint(ge=1)
     entities: list[constr(min_length=1)]
+    lead_item_id: constr(pattern=r'^news-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description='NEWS-00. The item the hero shows: the earliest from the publisher with the most items, with a picture when any item has one.',
+    )
+    topics: list[constr(pattern=r'^[a-z][a-z0-9-]*$')] | None = Field(
+        None, description="NEWS-00. The union of its items' topics."
+    )
+    image_ref: str | None = Field(
+        None,
+        description="NEWS-00. The lead item's picture cache key; null until a screen asked for it.",
+    )
+    summary: constr(min_length=1) | None = Field(
+        None,
+        description='NEWS-00. The Key points text, written on the hub from the article.',
+    )
+    summary_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description="NEWS-00. The band the summary was written for; a viewer of a younger band never sees an older band's summary.",
+    )
+    summary_at: AwareDatetime | None = None
     pageviews_hint: confloat(ge=0.0) | None = None
     centroid_ref: constr(min_length=1)
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
