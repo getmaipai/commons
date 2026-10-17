@@ -36,6 +36,10 @@ class Provenance(BaseModel):
         None,
         description='Set when origin is "exported" and the requester differs from owner_person_id (an admin exporting a child\'s files on the child\'s behalf).',
     )
+    media_source_id: constr(pattern=r'^msrc-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description='Set when origin is "fetched": the media-source (a feed, a channel or a pasted link) the copy came from. job_id names the Stack media.fetch job.',
+    )
     note: constr(min_length=1) | None = Field(
         None,
         description="Freeform detail for a path the structured fields above don't name, matching the original attachment record's provenance string (such as composer:upload or storage-page:export). Optional; the structured fields are preferred once they apply.",
@@ -59,9 +63,9 @@ class File(BaseModel):
         ...,
         description="The one person who owns this file, always a person, never the household. Captured at write time and not inferred from a later profile change; a file's usage counts against this person's cap only, even once shared.",
     )
-    origin: Literal['sent', 'made', 'exported'] = Field(
+    origin: Literal['sent', 'made', 'exported', 'fetched'] = Field(
         ...,
-        description='"sent": a file the person gave in chat (today\'s attachment). "made": a package or a job produced it on the person\'s behalf (a generated picture, video, audio clip or story). "exported": a copy the person asked for (a data export). Shapes which fields of provenance apply below.',
+        description='"sent": a file the person gave in chat (today\'s attachment). "made": a package or a job produced it on the person\'s behalf (a generated picture, video, audio clip or story). "exported": a copy the person asked for (a data export). "fetched" (MEDIA-SPEC-01): a copy the hub fetched for a person from a source they chose (a saved video, a podcast episode, a subtitle, a storyboard); owned by the person who asked, or by the adult who created a household source. Shapes which fields of provenance apply below.',
     )
     kind: Literal['image', 'video', 'audio', 'document', 'story', 'other'] = Field(
         ...,

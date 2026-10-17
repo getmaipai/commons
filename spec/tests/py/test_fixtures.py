@@ -25,10 +25,15 @@ from gen.py.grant_schema import Grant
 from gen.py.issue_schema import Issue
 from gen.py.list_schema import List
 from gen.py.manifest_schema import PackageManifest
+from gen.py.media_collection_schema import MediaCollection
+from gen.py.media_item_schema import MediaItem
+from gen.py.media_progress_schema import MediaProgress
+from gen.py.media_source_schema import MediaSource
 from gen.py.memory_record_schema import MemoryRecord
 from gen.py.model_capabilities_schema import ModelCapabilities
 from gen.py.news_item_schema import NewsItem
 from gen.py.news_story_schema import NewsStory
+from gen.py.offline_manifest_schema import OfflineManifest
 from gen.py.open_question_schema import OpenQuestion
 from gen.py.person_schema import Person
 from gen.py.project_schema import ProjectPlan
@@ -90,6 +95,35 @@ def test_settings_key_fixture():
     ],
 )
 def test_knowledge_search_record_fixtures_round_trip(name, model):
+    data = load_fixture(name)
+    assert (
+        model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "model"),
+    [
+        ("media-item.video.example.json", MediaItem),
+        ("media-item.episode.example.json", MediaItem),
+        ("media-item.track-explicit.example.json", MediaItem),
+        ("media-item.podcast-stream.example.json", MediaItem),
+        ("media-item.book.example.json", MediaItem),
+        ("media-item.audiobook.example.json", MediaItem),
+        ("media-item.audiobook-chapter.example.json", MediaItem),
+        ("media-source.root.example.json", MediaSource),
+        ("media-source.feed.example.json", MediaSource),
+        ("media-source.channel.example.json", MediaSource),
+        ("media-progress.seconds.example.json", MediaProgress),
+        ("media-progress.book.example.json", MediaProgress),
+        ("media-collection.queue.example.json", MediaCollection),
+        ("media-collection.watchlist.example.json", MediaCollection),
+        ("offline-manifest.album.example.json", OfflineManifest),
+        ("feed.podcast.example.json", Feed),
+    ],
+)
+def test_media_record_fixtures_round_trip(name, model):
+    """MEDIA-SPEC-01: the media records round-trip through Pydantic."""
     data = load_fixture(name)
     assert (
         model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data

@@ -1,0 +1,42 @@
+{
+  "owner_person_id": "person-atlas01",
+  "root": null,
+  "feed_id": null,
+  "url": "https://videos.example.com/c/bramble",
+  "extractor": "generic",
+  "auto": {
+    "save": "video",
+    "keep_latest": 5,
+    "remove_watched": false,
+    "max_per_check": 2,
+    "max_duration_s": 3600,
+    "min_duration_s": 61,
+    "skip_shorts": true,
+    "cutoff_date": "2026-01-01",
+    "quality_max_height": 1080
+  },
+  "speed": null,
+  "skip_intro_s": 0,
+  "skip_outro_s": 0,
+  "poll_minutes": 60,
+  "paused": false,
+  "last_checked_at": null,
+  "last_status": "quiet",
+  "failures": 4,
+  "backoff_until": "2026-10-17T12:30:00Z",
+  "visible_to": [
+    "person-atlas01"
+  ],
+  "archive": [
+    "birdhouse-00"
+  ],
+  "deleted_at": null,
+  "trash_until": null,
+  "created_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub",
+  "id": "msrc-chan01",
+  "kind": "channel",
+  "scope": "person",
+  "label": "Bramble Workshop"
+}

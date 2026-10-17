@@ -1,0 +1,564 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/media-item.schema.json",
+  "title": "MediaItem",
+  "description": "MEDIA-SPEC-01 (home docs/design/media-apps-blend-2026-10-17.md section 7). One playable or readable thing in the household's media library: a video, a show's episode, a film, a music track, a podcast episode, a book, an audiobook or one chapter of a multi-file audiobook. Household scope; who may see it is band_ok plus the source's visible_to. Identity: one item per (source_id, external.id) for a web item, or per (location.root_id, location.path) for a file on a library root; a re-scan updates, never duplicates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "kind",
+    "title",
+    "source_id",
+    "location",
+    "media_type",
+    "playable",
+    "band_ok",
+    "added_at",
+    "created_at",
+    "hlc",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^media-[a-z0-9]{6,}$",
+      "description": "Stable id, never reused."
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "video",
+        "episode",
+        "film",
+        "track",
+        "podcast_episode",
+        "book",
+        "audiobook",
+        "chapter"
+      ],
+      "description": "`chapter` is one file of a folder audiobook (a folder of numbered mp3s); its parent is `parent_id`."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subtitle": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "A second line: the channel, show, artist or author as the app shows it. Books and audiobooks of the same title in one folder are linked when their subtitles match."
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "Plain text, never HTML. Passes the band check with the title before band_ok includes child."
+    },
+    "source_id": {
+      "type": "string",
+      "pattern": "^msrc-[a-z0-9]{6,}$",
+      "description": "The media-source this item came from (a root, a feed, a channel or a pasted link)."
+    },
+    "parent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^media-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "For a `chapter` item: the audiobook it belongs to. Null otherwise."
+    },
+    "location": {
+      "description": "Where the bytes are. Exactly one shape: a saved copy in the household file store, a file on a library root, or a stream-only address (a podcast episode not saved yet).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "file_id"
+          ],
+          "properties": {
+            "file_id": {
+              "type": "string",
+              "pattern": "^file-[a-z0-9]{6,}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "root_id",
+            "path"
+          ],
+          "properties": {
+            "root_id": {
+              "type": "string",
+              "pattern": "^msrc-[a-z0-9]{6,}$"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$",
+              "description": "Relative to the root, forward slashes, no traversal."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      ]
+    },
+    "media_type": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*$"
+    },
+    "duration_s": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "size": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "width": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "height": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "video_codec": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "As ffprobe names it, with the tag for HEVC (`hevc/hvc1`)."
+    },
+    "audio_codec": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "playable": {
+      "type": "string",
+      "enum": [
+        "original",
+        "transcode",
+        "none",
+        "unknown"
+      ],
+      "description": "FileTube's playability rule: original for mp4, m4v and mov with H.264 (HEVC only when tagged hvc1) and for any audio; transcode when the hub must make a playable copy once; none when it cannot. unknown until the probe ran."
+    },
+    "artwork": {
+      "description": "A saved picture (a file id) or a path under the item's root (folder art, poster.jpg). Null when there is none.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "file_id"
+          ],
+          "properties": {
+            "file_id": {
+              "type": "string",
+              "pattern": "^file-[a-z0-9]{6,}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ],
+      "default": null
+    },
+    "previews": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "default": null,
+      "properties": {
+        "storyboard_file_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^file-[a-z0-9]{6,}$"
+        },
+        "clip_file_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^file-[a-z0-9]{6,}$"
+        }
+      },
+      "description": "Built by the Stack media service (media.preview)."
+    },
+    "chapters": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "start_s",
+          "title",
+          "source"
+        ],
+        "properties": {
+          "start_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "embedded",
+              "description",
+              "files"
+            ]
+          }
+        }
+      },
+      "description": "Ordered by start_s. `files` marks chapters that are the files of a folder audiobook."
+    },
+    "subtitles": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lang",
+          "label",
+          "file_id"
+        ],
+        "properties": {
+          "lang": {
+            "type": "string",
+            "minLength": 2
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "file_id": {
+            "type": "string",
+            "pattern": "^file-[a-z0-9]{6,}$"
+          }
+        }
+      }
+    },
+    "series": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "season": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "episode": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "artist": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "album": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "album_artist": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "track_no": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "disc_no": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "year": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "genre": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "author": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "narrator": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "series_index": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null,
+      "description": "A book's or audiobook's place in its series."
+    },
+    "locator_kind": {
+      "type": "string",
+      "enum": [
+        "cfi",
+        "page",
+        "none"
+      ],
+      "default": "none",
+      "description": "How a reader position is kept: an EPUB CFI, a PDF page, or seconds (none)."
+    },
+    "external": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "default": null,
+      "required": [
+        "extractor",
+        "id"
+      ],
+      "properties": {
+        "extractor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri",
+          "default": null
+        },
+        "channel_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "channel_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "published_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "default": null
+        }
+      },
+      "description": "For anything fetched from the web or read from a feed: the extractor (yt-dlp's name, or `rss` for a podcast guid) and its id."
+    },
+    "advisory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "explicit",
+        "source"
+      ],
+      "default": {
+        "explicit": false,
+        "source": "tag"
+      },
+      "properties": {
+        "explicit": {
+          "type": "boolean"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "tag",
+            "feed",
+            "platform",
+            "classifier",
+            "adult"
+          ]
+        }
+      },
+      "description": "Explicit content as the file tag, the feed's itunes:explicit, the platform, the classifier or an adult said."
+    },
+    "band_ok": {
+      "type": "string",
+      "enum": [
+        "child",
+        "teen",
+        "adult"
+      ],
+      "description": "The lowest band that may see the title, description and artwork, computed at ingest (KS-05's band_ok path): adult until the floor passes and nothing marks it explicit; an unverified web item stays adult until an adult marks it."
+    },
+    "verified_by_person_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^person-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "The adult who marked a web item fine for a lower band, when one did."
+    },
+    "added_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "fingerprint": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "`size-mtime` for a root file, the sha256 for a saved copy. The offline status check compares it."
+    },
+    "hidden": {
+      "type": "boolean",
+      "default": false
+    },
+    "deleted_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "TRASH-01. Set when a person moves the record to the household trash; null while live. A trashed record is hidden everywhere and restorable until trash_until."
+    },
+    "trash_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "TRASH-01. When the trash purges the record for good; set together with deleted_at."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed`."
+    }
+  }
+}

@@ -62,6 +62,17 @@ export const Device = z
         "Per-record-type sync cursors Wave 3's link will populate (\"how far this device has synced\"). Always `{}` until the link exists - laid now only so the shape doesn't need a migration when it does.",
       )
       .default({}),
+    /**MEDIA-SPEC-01 (media design section 9). The routes a paired device's token may call, default-deny: empty means none. media.offline is the four media offline routes plus artwork and subtitle bytes; offline.records is the generic keep-on-this-device manifest and file routes (KEEP-OFFLINE-01). A token never reaches any other route through this list.*/
+    offline_scope: z
+      .array(z.enum(["media.offline", "offline.records"]))
+      .refine(
+        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+        "All items must be unique!",
+      )
+      .describe(
+        "MEDIA-SPEC-01 (media design section 9). The routes a paired device's token may call, default-deny: empty means none. media.offline is the four media offline routes plus artwork and subtitle bytes; offline.records is the generic keep-on-this-device manifest and file routes (KEEP-OFFLINE-01). A token never reaches any other route through this list.",
+      )
+      .default([]),
     /**Updated whenever this device's token is redeemed for a session - lets a person tell a device that's actually in use apart from one they paired once and forgot.*/
     last_seen_at: z
       .union([

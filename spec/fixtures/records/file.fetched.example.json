@@ -1,0 +1,22 @@
+{
+  "id": "file-vid001",
+  "owner_person_id": "person-atlas01",
+  "origin": "fetched",
+  "kind": "video",
+  "media_type": "video/mp4",
+  "size": 48211002,
+  "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "storage_path": "people/person-atlas01/files/file-vid001.mp4",
+  "retention": "kept",
+  "provenance": {
+    "conversation_id": null,
+    "turn_id": null,
+    "package_id": null,
+    "job_id": "job-fetch01",
+    "requested_by_person_id": null,
+    "media_source_id": "msrc-chan01",
+    "note": null
+  },
+  "created_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001"
+}

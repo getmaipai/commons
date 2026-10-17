@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/media-progress.schema.json",
+  "title": "MediaProgress",
+  "description": "MEDIA-SPEC-01 (media design sections 7 and 10). One row per person and item: where they are, whether they finished, how often they played it, and their bookmarks. Merge rule (one function, mergeProgress): newest wins by the server stamp after skew correction, a rewind applies when newer, completed is a latch only the person clears, marks union by at_s, a child's row is never written by another person's device.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "person_id",
+    "media_id",
+    "position",
+    "completed",
+    "updated_at",
+    "hlc",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^mprg-[a-z0-9]{6,}$"
+    },
+    "person_id": {
+      "type": "string",
+      "pattern": "^person-[a-z0-9]{6,}$"
+    },
+    "media_id": {
+      "type": "string",
+      "pattern": "^media-[a-z0-9]{6,}$"
+    },
+    "position": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "seconds"
+          ],
+          "properties": {
+            "seconds": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "locator",
+            "percent"
+          ],
+          "properties": {
+            "locator": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind"
+              ],
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "cfi",
+                    "page"
+                  ]
+                },
+                "cfi": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "page": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 1,
+                  "default": null
+                },
+                "spine_index": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "default": null
+                },
+                "block_index": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "default": null
+                }
+              }
+            },
+            "percent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      ],
+      "description": "Seconds for anything with a timeline, or a reader locator plus percent for a book."
+    },
+    "duration_s": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "completed": {
+      "type": "boolean",
+      "description": "A latch: video, episode and film at 90 percent, podcast episode and audiobook at 95 percent, a book by the person or at its end. A track never latches; it counts finishes."
+    },
+    "plays": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "skips": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "finishes": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "marks": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "at_s"
+        ],
+        "properties": {
+          "at_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          }
+        }
+      }
+    },
+    "device_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^device-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "The device that wrote the newest position, for the Continue here card."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Server clock after skew correction."
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

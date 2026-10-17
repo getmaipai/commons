@@ -53,6 +53,13 @@
       "description": "Per-record-type sync cursors Wave 3's link will populate (\"how far this device has synced\"). Always `{}` until the link exists - laid now only so the shape doesn't need a migration when it does.",
       "additionalProperties": true
     },
+    "offline_scope": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["media.offline", "offline.records"] },
+      "uniqueItems": true,
+      "default": [],
+      "description": "MEDIA-SPEC-01 (media design section 9). The routes a paired device's token may call, default-deny: empty means none. media.offline is the four media offline routes plus artwork and subtitle bytes; offline.records is the generic keep-on-this-device manifest and file routes (KEEP-OFFLINE-01). A token never reaches any other route through this list."
+    },
     "last_seen_at": {
       "type": ["string", "null"],
       "format": "date-time",

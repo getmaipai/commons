@@ -1,0 +1,23 @@
+{
+  "id": "mprg-ep0102",
+  "person_id": "person-pippa1",
+  "media_id": "media-ep0102",
+  "position": {
+    "seconds": 760.5
+  },
+  "duration_s": 1320,
+  "completed": false,
+  "plays": 1,
+  "skips": 0,
+  "finishes": 0,
+  "marks": [
+    {
+      "at_s": 512,
+      "label": "The boat"
+    }
+  ],
+  "device_id": "device-tv0001",
+  "updated_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub"
+}

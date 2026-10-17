@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/offline-manifest.schema.json",
+  "title": "OfflineManifest",
+  "description": "MEDIA-SPEC-01 for KEEP-OFFLINE-01 (media design sections 9 and 12). What a device needs to keep a record on the device: one entry per byte stream with its address on the hub, size, type, fingerprint and readiness, plus the person's progress when the record has one. Served by the hub's offline routes for any record kind that registers a provider (media first). FileTube's offline manifest, generalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "id",
+    "title",
+    "entries",
+    "generated_at"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The provider's record kind: media, news_story, reference_page, conversation."
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subtitle": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "url",
+          "bytes",
+          "mime",
+          "fingerprint",
+          "ready",
+          "playable"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^/",
+            "description": "A hub path, never an outside address."
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mime": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fingerprint": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ready": {
+            "type": "boolean",
+            "description": "False while a transcode is queued; the file route answers 503 with Retry-After until it is."
+          },
+          "playable": {
+            "type": "string",
+            "enum": [
+              "original",
+              "transcode",
+              "none",
+              "unknown"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "notReady",
+              "notPlayable",
+              "notOnServer",
+              null
+            ],
+            "default": null
+          },
+          "duration_s": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "default": null
+          },
+          "artwork_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^/",
+            "default": null
+          },
+          "chapters": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "start_s",
+                "title"
+              ],
+              "properties": {
+                "start_s": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "title": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "subtitles": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lang",
+                "url"
+              ],
+              "properties": {
+                "lang": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "url": {
+                  "type": "string",
+                  "pattern": "^/"
+                }
+              }
+            }
+          },
+          "progress": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "default": null,
+            "additionalProperties": false,
+            "required": [
+              "position_s",
+              "completed"
+            ],
+            "properties": {
+              "position_s": {
+                "type": "number",
+                "minimum": 0
+              },
+              "completed": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "total_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

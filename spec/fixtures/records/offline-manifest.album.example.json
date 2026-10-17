@@ -1,0 +1,29 @@
+{
+  "kind": "media",
+  "id": "media-trk001",
+  "title": "Tempo",
+  "subtitle": "The Marlows",
+  "entries": [
+    {
+      "id": "media-trk001",
+      "title": "Velvet Night",
+      "url": "/api/media/offline/file/track/media-trk001",
+      "bytes": 9100221,
+      "mime": "audio/flac",
+      "fingerprint": "9100221-1791547200000",
+      "ready": true,
+      "playable": "original",
+      "reason": null,
+      "duration_s": 214.6,
+      "artwork_url": "/api/media/artwork/media-trk001",
+      "chapters": [],
+      "subtitles": [],
+      "progress": {
+        "position_s": 12,
+        "completed": false
+      }
+    }
+  ],
+  "total_bytes": 9100221,
+  "generated_at": "2026-10-17T12:00:00Z"
+}

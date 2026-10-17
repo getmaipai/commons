@@ -1,0 +1,71 @@
+{
+  "id": "media-pod001",
+  "kind": "podcast_episode",
+  "title": "Why the sky is blue",
+  "source_id": "msrc-feed01",
+  "location": {
+    "url": "https://podcasts.example.com/sprout/ep12.mp3"
+  },
+  "media_type": "audio/mpeg",
+  "playable": "original",
+  "band_ok": "child",
+  "added_at": "2026-10-17T12:00:00Z",
+  "subtitle": "Sprout Science",
+  "description": null,
+  "parent_id": null,
+  "duration_s": 1510,
+  "size": null,
+  "width": null,
+  "height": null,
+  "video_codec": null,
+  "audio_codec": null,
+  "artwork": null,
+  "previews": null,
+  "chapters": [
+    {
+      "start_s": 0,
+      "title": "Hello",
+      "source": "description"
+    },
+    {
+      "start_s": 300,
+      "title": "Light and air",
+      "source": "description"
+    }
+  ],
+  "subtitles": [],
+  "series": null,
+  "season": null,
+  "episode": null,
+  "artist": null,
+  "album": null,
+  "album_artist": null,
+  "track_no": null,
+  "disc_no": null,
+  "year": null,
+  "genre": null,
+  "author": null,
+  "narrator": null,
+  "series_index": null,
+  "locator_kind": "none",
+  "external": {
+    "extractor": "rss",
+    "id": "urn:uuid:sprout-ep12",
+    "url": "https://podcasts.example.com/sprout/12",
+    "channel_id": null,
+    "channel_name": "Sprout Science",
+    "published_at": "2026-10-15T06:00:00Z"
+  },
+  "advisory": {
+    "explicit": false,
+    "source": "tag"
+  },
+  "verified_by_person_id": null,
+  "fingerprint": null,
+  "hidden": false,
+  "deleted_at": null,
+  "trash_until": null,
+  "created_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub:feed"
+}

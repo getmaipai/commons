@@ -24,6 +24,13 @@ export const Feed = z
         "NEWS-00. The feed's format (JSON Feed joins RSS and Atom). Absent reads as rss.",
       )
       .optional(),
+    /**MEDIA-SPEC-01. What the feed carries: news stories for the shelf, or podcast episodes for the Podcasts app (episodes become media-item records, kind podcast_episode). Absent reads as news. The media design called this feed.kind: podcast; kind already names the format (NEWS-00), so the content is its own field.*/
+    purpose: z
+      .enum(["news", "podcast"])
+      .describe(
+        "MEDIA-SPEC-01. What the feed carries: news stories for the shelf, or podcast episodes for the Podcasts app (episodes become media-item records, kind podcast_episode). Absent reads as news. The media design called this feed.kind: podcast; kind already names the format (NEWS-00), so the content is its own field.",
+      )
+      .optional(),
     /**NEWS-00. The publisher's own home page, for the source line and the channel page.*/
     site_url: z
       .string()

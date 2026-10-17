@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/media-collection.schema.json",
+  "title": "MediaCollection",
+  "description": "MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "person_id",
+    "kind",
+    "title",
+    "items",
+    "created_at",
+    "hlc",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^mcol-[a-z0-9]{6,}$"
+    },
+    "person_id": {
+      "type": "string",
+      "pattern": "^person-[a-z0-9]{6,}$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "liked",
+        "watch_later",
+        "queue",
+        "playlist",
+        "watchlist",
+        "pins"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "media_id",
+          "added_at",
+          "position"
+        ],
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "pattern": "^media-[a-z0-9]{6,}$"
+          },
+          "added_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "want",
+              "watching",
+              "completed",
+              null
+            ],
+            "default": null,
+            "description": "Watchlist only."
+          }
+        }
+      }
+    },
+    "pointer": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null,
+      "description": "The queue's current entry (an index into items)."
+    },
+    "shared_to": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "const": "household"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^person-[a-z0-9]{6,}$"
+          },
+          "uniqueItems": true
+        }
+      ],
+      "default": null,
+      "description": "Null is private. A child's collections are never shared outside the household."
+    },
+    "rules": {
+      "type": "null",
+      "default": null,
+      "description": "Reserved for smart playlists; null today."
+    },
+    "deleted_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "TRASH-01. Set when a person moves the record to the household trash; null while live. A trashed record is hidden everywhere and restorable until trash_until."
+    },
+    "trash_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "TRASH-01. When the trash purges the record for good; set together with deleted_at."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

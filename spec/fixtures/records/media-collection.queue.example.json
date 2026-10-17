@@ -1,0 +1,28 @@
+{
+  "id": "mcol-queue01",
+  "person_id": "person-atlas01",
+  "kind": "queue",
+  "title": "Up next",
+  "items": [
+    {
+      "media_id": "media-trk001",
+      "added_at": "2026-10-17T11:00:00Z",
+      "position": 0,
+      "status": null
+    },
+    {
+      "media_id": "media-pod001",
+      "added_at": "2026-10-17T11:01:00Z",
+      "position": 1,
+      "status": null
+    }
+  ],
+  "pointer": 0,
+  "shared_to": null,
+  "rules": null,
+  "deleted_at": null,
+  "trash_until": null,
+  "created_at": "2026-10-17T11:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub"
+}

@@ -21,11 +21,11 @@ export const File = z
       .describe(
         "The one person who owns this file, always a person, never the household. Captured at write time and not inferred from a later profile change; a file's usage counts against this person's cap only, even once shared.",
       ),
-    /**"sent": a file the person gave in chat (today's attachment). "made": a package or a job produced it on the person's behalf (a generated picture, video, audio clip or story). "exported": a copy the person asked for (a data export). Shapes which fields of provenance apply below.*/
+    /**"sent": a file the person gave in chat (today's attachment). "made": a package or a job produced it on the person's behalf (a generated picture, video, audio clip or story). "exported": a copy the person asked for (a data export). "fetched" (MEDIA-SPEC-01): a copy the hub fetched for a person from a source they chose (a saved video, a podcast episode, a subtitle, a storyboard); owned by the person who asked, or by the adult who created a household source. Shapes which fields of provenance apply below.*/
     origin: z
-      .enum(["sent", "made", "exported"])
+      .enum(["sent", "made", "exported", "fetched"])
       .describe(
-        '"sent": a file the person gave in chat (today\'s attachment). "made": a package or a job produced it on the person\'s behalf (a generated picture, video, audio clip or story). "exported": a copy the person asked for (a data export). Shapes which fields of provenance apply below.',
+        '"sent": a file the person gave in chat (today\'s attachment). "made": a package or a job produced it on the person\'s behalf (a generated picture, video, audio clip or story). "exported": a copy the person asked for (a data export). "fetched" (MEDIA-SPEC-01): a copy the hub fetched for a person from a source they chose (a saved video, a podcast episode, a subtitle, a storyboard); owned by the person who asked, or by the adult who created a household source. Shapes which fields of provenance apply below.',
       ),
     /**The kind of content, read by the manifest lint's output check (docs/PACKAGES.md "Uninstall, and a person's files": a manifest declares its outputs as media kinds matching this enum).*/
     kind: z
@@ -166,6 +166,25 @@ export const File = z
           ])
           .describe(
             "Set when origin is \"exported\" and the requester differs from owner_person_id (an admin exporting a child's files on the child's behalf).",
+          )
+          .default(null),
+        /**Set when origin is "fetched": the media-source (a feed, a channel or a pasted link) the copy came from. job_id names the Stack media.fetch job.*/
+        media_source_id: z
+          .union([
+            z
+              .string()
+              .regex(new RegExp("^msrc-[a-z0-9]{6,}$"))
+              .describe(
+                'Set when origin is "fetched": the media-source (a feed, a channel or a pasted link) the copy came from. job_id names the Stack media.fetch job.',
+              ),
+            z
+              .null()
+              .describe(
+                'Set when origin is "fetched": the media-source (a feed, a channel or a pasted link) the copy came from. job_id names the Stack media.fetch job.',
+              ),
+          ])
+          .describe(
+            'Set when origin is "fetched": the media-source (a feed, a channel or a pasted link) the copy came from. job_id names the Stack media.fetch job.',
           )
           .default(null),
         /**Freeform detail for a path the structured fields above don't name, matching the original attachment record's provenance string (such as composer:upload or storage-page:export). Optional; the structured fields are preferred once they apply.*/

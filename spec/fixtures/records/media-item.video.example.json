@@ -1,0 +1,82 @@
+{
+  "id": "media-vid001",
+  "kind": "video",
+  "title": "Building a birdhouse",
+  "source_id": "msrc-root01",
+  "location": {
+    "file_id": "file-vid001"
+  },
+  "media_type": "video/mp4",
+  "playable": "original",
+  "band_ok": "adult",
+  "added_at": "2026-10-17T12:00:00Z",
+  "subtitle": "Bramble Workshop",
+  "description": null,
+  "parent_id": null,
+  "duration_s": 754.2,
+  "size": 48211002,
+  "width": 1920,
+  "height": 1080,
+  "video_codec": "h264",
+  "audio_codec": "aac",
+  "artwork": {
+    "file_id": "file-art001"
+  },
+  "previews": {
+    "storyboard_file_id": "file-sb0001",
+    "clip_file_id": null
+  },
+  "chapters": [
+    {
+      "start_s": 0,
+      "title": "Intro",
+      "source": "embedded"
+    },
+    {
+      "start_s": 42.5,
+      "title": "Cutting the boards",
+      "source": "embedded"
+    }
+  ],
+  "subtitles": [
+    {
+      "lang": "en",
+      "label": "English",
+      "file_id": "file-sub001"
+    }
+  ],
+  "series": null,
+  "season": null,
+  "episode": null,
+  "artist": null,
+  "album": null,
+  "album_artist": null,
+  "track_no": null,
+  "disc_no": null,
+  "year": null,
+  "genre": null,
+  "author": null,
+  "narrator": null,
+  "series_index": null,
+  "locator_kind": "none",
+  "external": {
+    "extractor": "generic",
+    "id": "birdhouse-01",
+    "url": "https://videos.example.com/birdhouse-01",
+    "channel_id": "bramble",
+    "channel_name": "Bramble Workshop",
+    "published_at": "2026-10-01T09:00:00Z"
+  },
+  "advisory": {
+    "explicit": false,
+    "source": "tag"
+  },
+  "verified_by_person_id": null,
+  "fingerprint": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "hidden": false,
+  "deleted_at": null,
+  "trash_until": null,
+  "created_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub:fetch"
+}

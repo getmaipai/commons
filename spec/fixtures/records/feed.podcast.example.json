@@ -1,0 +1,22 @@
+{
+  "id": "feed-sprout1",
+  "url": "https://podcasts.example.com/sprout/feed.xml",
+  "title": "Sprout Science",
+  "publisher": "podcasts.example.com",
+  "band": "child",
+  "package_id": "podcasts",
+  "kind": "rss",
+  "site_url": "https://podcasts.example.com/sprout/",
+  "icon_ref": "favicon-a1b2c3",
+  "topics_hint": [
+    "science"
+  ],
+  "alerts": false,
+  "poll_interval_s": 1800,
+  "next_poll_at": "2026-10-17T12:00:00Z",
+  "fail_count": 0,
+  "enabled": true,
+  "hlc": "1791547200000:0:a1b2c3",
+  "provenance": "package:podcasts",
+  "purpose": "podcast"
+}

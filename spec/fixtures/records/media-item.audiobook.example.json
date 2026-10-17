@@ -1,0 +1,65 @@
+{
+  "id": "media-abk001",
+  "kind": "audiobook",
+  "title": "The Clockwork Garden",
+  "source_id": "msrc-root05",
+  "location": {
+    "root_id": "msrc-root05",
+    "path": "Iris Quill/The Clockwork Garden.m4b"
+  },
+  "media_type": "audio/mp4",
+  "playable": "original",
+  "band_ok": "child",
+  "added_at": "2026-10-17T12:00:00Z",
+  "subtitle": "Iris Quill",
+  "description": null,
+  "parent_id": null,
+  "duration_s": 21600,
+  "size": null,
+  "width": null,
+  "height": null,
+  "video_codec": null,
+  "audio_codec": "aac",
+  "artwork": null,
+  "previews": null,
+  "chapters": [
+    {
+      "start_s": 0,
+      "title": "Chapter 1",
+      "source": "embedded"
+    },
+    {
+      "start_s": 1800,
+      "title": "Chapter 2",
+      "source": "embedded"
+    }
+  ],
+  "subtitles": [],
+  "series": "Garden Tales",
+  "season": null,
+  "episode": null,
+  "artist": null,
+  "album": null,
+  "album_artist": null,
+  "track_no": null,
+  "disc_no": null,
+  "year": null,
+  "genre": null,
+  "author": "Iris Quill",
+  "narrator": "Nadia Sage",
+  "series_index": 1,
+  "locator_kind": "none",
+  "external": null,
+  "advisory": {
+    "explicit": false,
+    "source": "tag"
+  },
+  "verified_by_person_id": null,
+  "fingerprint": "200000000-1791547200000",
+  "hidden": false,
+  "deleted_at": null,
+  "trash_until": null,
+  "created_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub:scan"
+}

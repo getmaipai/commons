@@ -1,0 +1,72 @@
+{
+  "id": "media-ep0102",
+  "kind": "episode",
+  "title": "The Lighthouse",
+  "source_id": "msrc-root02",
+  "location": {
+    "root_id": "msrc-root02",
+    "path": "Juniper Bay/Season 1/Juniper Bay S01E02 - The Lighthouse.mkv"
+  },
+  "media_type": "video/x-matroska",
+  "playable": "transcode",
+  "band_ok": "child",
+  "added_at": "2026-10-17T12:00:00Z",
+  "subtitle": "Juniper Bay",
+  "description": null,
+  "parent_id": null,
+  "duration_s": 1320,
+  "size": 310000000,
+  "width": 1280,
+  "height": 720,
+  "video_codec": "hevc/hev1",
+  "audio_codec": "ac3",
+  "artwork": {
+    "path": "Juniper Bay/poster.jpg"
+  },
+  "previews": null,
+  "chapters": [
+    {
+      "start_s": 0,
+      "title": "Intro",
+      "source": "embedded"
+    },
+    {
+      "start_s": 75,
+      "title": "Episode",
+      "source": "embedded"
+    },
+    {
+      "start_s": 1260,
+      "title": "Credits",
+      "source": "embedded"
+    }
+  ],
+  "subtitles": [],
+  "series": "Juniper Bay",
+  "season": 1,
+  "episode": 2,
+  "artist": null,
+  "album": null,
+  "album_artist": null,
+  "track_no": null,
+  "disc_no": null,
+  "year": 2024,
+  "genre": null,
+  "author": null,
+  "narrator": null,
+  "series_index": null,
+  "locator_kind": "none",
+  "external": null,
+  "advisory": {
+    "explicit": false,
+    "source": "tag"
+  },
+  "verified_by_person_id": null,
+  "fingerprint": "310000000-1791547200000",
+  "hidden": false,
+  "deleted_at": null,
+  "trash_until": null,
+  "created_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub:scan"
+}

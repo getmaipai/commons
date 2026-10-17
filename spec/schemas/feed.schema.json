@@ -53,6 +53,11 @@
       "enum": ["rss", "atom", "json"],
       "description": "NEWS-00. The feed's format (JSON Feed joins RSS and Atom). Absent reads as rss."
     },
+    "purpose": {
+      "type": "string",
+      "enum": ["news", "podcast"],
+      "description": "MEDIA-SPEC-01. What the feed carries: news stories for the shelf, or podcast episodes for the Podcasts app (episodes become media-item records, kind podcast_episode). Absent reads as news. The media design called this feed.kind: podcast; kind already names the format (NEWS-00), so the content is its own field."
+    },
     "site_url": {
       "type": "string",
       "format": "uri",
