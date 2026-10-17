@@ -52,6 +52,15 @@ describe("manifest contributes.pages and contributes.data", () => {
       expect(() => PackageManifest.parse({ ...BASE, contributes: withPin(patch) })).toThrow();
     }
   });
+  test("a page min_role is one of the six roles; `member` is refused (NEWS-00)", () => {
+    const withRole = (min_role: unknown) => ({ ...contributes, pages: [{ ...contributes.pages![0], min_role }, ...contributes.pages!.slice(1)] });
+    for (const role of ["owner", "admin", "adult", "teen", "child", "guest"]) {
+      expect(() => PackageManifest.parse({ ...BASE, contributes: withRole(role) })).not.toThrow();
+    }
+    for (const bad of ["member", "Teen", "", 3]) {
+      expect(() => PackageManifest.parse({ ...BASE, contributes: withRole(bad) })).toThrow();
+    }
+  });
   test("a data entry refuses an unknown surface and an unknown field", () => {
     expect(() => PackageManifest.parse({ ...BASE, contributes: { data: [{ id: "forecast", surface: "moon" }] } })).toThrow();
     expect(() => PackageManifest.parse({ ...BASE, contributes: { data: [{ id: "forecast", url: "https://example.com" }] } })).toThrow();
@@ -60,6 +69,15 @@ describe("manifest contributes.pages and contributes.data", () => {
 });
 
 describe("checkAppPackage (the cross-file lint)", () => {
+  test("a page may raise the package floor but not lower it (NEWS-00)", () => {
+    const withRole = (min_role: string) => ({ ...contributes, pages: [{ ...contributes.pages![0], min_role }, ...contributes.pages!.slice(1)] });
+    expect(checkAppPackage("weather", withRole("teen"), load, "child")).toEqual([]);
+    expect(checkAppPackage("weather", withRole("child"), load, "child")).toEqual([]);
+    const lowered = checkAppPackage("weather", withRole("guest"), load, "child");
+    expect(lowered.length).toBe(1);
+    expect(lowered[0]).toContain("a page may only raise the floor");
+    expect(checkAppPackage("weather", withRole("guest"), load)).toEqual([]);
+  });
   test("the weather fixture conforms", () => {
     expect(checkAppPackage("weather", contributes, load)).toEqual([]);
   });

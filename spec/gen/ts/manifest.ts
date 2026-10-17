@@ -1163,6 +1163,13 @@ export const PackageManifest = z
                     'Read on the "index" page only. Where a default pin sits among the other default pins, lowest first (ties break by app name). Without it the app sorts last.',
                   )
                   .optional(),
+                /**NEWS-00: the floor role a person needs to see and open this page, its data ids and its actions. Optional; absent means the package's own `min_role`. A page may only raise the floor, never lower it below the package's (spec/ui/app-check.ts lints that, since JSON Schema cannot compare two fields). The hub hides the page from a person below it, answers 404 on its page route, and refuses its data and action routes. A role floor only; age still comes from the output floor and the answer-block filter.*/
+                min_role: z
+                  .enum(["owner", "admin", "adult", "teen", "child", "guest"])
+                  .describe(
+                    "NEWS-00: the floor role a person needs to see and open this page, its data ids and its actions. Optional; absent means the package's own `min_role`. A page may only raise the floor, never lower it below the package's (spec/ui/app-check.ts lints that, since JSON Schema cannot compare two fields). The hub hides the page from a person below it, answers 404 on its page route, and refuses its data and action routes. A role floor only; age still comes from the output floor and the answer-block filter.",
+                  )
+                  .optional(),
                 /**"schema": spec/ui/schema.json document, rendered by the shared shell. The old "web" escape hatch is refused outright (design rule S2, owner-confirmed 2026-10-16): a page a native Go/SwiftUI client can't render would break the platform's own "one UI schema, every client" promise.*/
                 kind: z
                   .literal("schema")

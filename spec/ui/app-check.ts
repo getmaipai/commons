@@ -5,7 +5,7 @@
 // an empty array when the app conforms. The hub runs it when a package is
 // loaded, so a bad page is refused then, never at request time.
 
-export interface AppPageEntry { id: string; label?: string; nav?: boolean; kind?: string; module: string; icon?: string; keywords?: string[]; pinned_by_default?: boolean; pin_order?: number }
+export interface AppPageEntry { id: string; label?: string; nav?: boolean; kind?: string; module: string; icon?: string; keywords?: string[]; pinned_by_default?: boolean; pin_order?: number; min_role?: string }
 export interface AppDataEntry { id: string; surface?: string; rows?: string; inputs?: Record<string, unknown>; refresh_s?: number }
 export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[] }
 
@@ -14,6 +14,9 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[] 
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the two package nodes and the layout nodes. */
 export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "detail_pane"];
+
+/** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
+export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
 
 type Json = Record<string, unknown>;
 const isObject = (value: unknown): value is Json => typeof value === "object" && value !== null && !Array.isArray(value);
@@ -55,8 +58,8 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   if (Array.isArray(kids)) kids.forEach((kid, i) => walk(kid, packageId, data, `${where}/${type}[${i}]`, out));
 }
 
-/** `loadPage(module)` returns the parsed `pages/<module>.json`, or undefined when the file is missing. */
-export function checkAppPackage(packageId: string, contributes: AppContributes | undefined, loadPage: (module: string) => unknown): string[] {
+/** `loadPage(module)` returns the parsed `pages/<module>.json`, or undefined when the file is missing. `packageMinRole` is the manifest's own `min_role`; with it a page that lowers the floor is reported. */
+export function checkAppPackage(packageId: string, contributes: AppContributes | undefined, loadPage: (module: string) => unknown, packageMinRole?: string): string[] {
   const out: string[] = [];
   const pages = contributes?.pages ?? [];
   const dataList = contributes?.data ?? [];
@@ -68,6 +71,9 @@ export function checkAppPackage(packageId: string, contributes: AppContributes |
   for (const page of pages) {
     if (ids.has(page.id)) out.push(`page id "${page.id}" is declared twice`);
     ids.add(page.id);
+    if (page.min_role !== undefined && packageMinRole !== undefined && ROLE_LADDER.includes(packageMinRole) && ROLE_LADDER.indexOf(page.min_role) > ROLE_LADDER.indexOf(packageMinRole)) {
+      out.push(`page "${page.id}": min_role "${page.min_role}" is below the package's "${packageMinRole}"; a page may only raise the floor`);
+    }
     if (page.kind !== undefined && page.kind !== "schema") out.push(`page "${page.id}": kind "${page.kind}" is refused; only "schema" pages are allowed`);
   }
   if (!ids.has("index")) out.push('an app needs one page with id "index"');

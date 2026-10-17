@@ -171,6 +171,7 @@ class Section(BaseModel):
         Literal[
             'account.profile',
             'account.voice',
+            'account.likeness',
             'account.device_appearance',
             'chat.skills',
             'chat.shortcuts',
@@ -188,6 +189,7 @@ class Section(BaseModel):
         Literal[
             'account.profile',
             'account.voice',
+            'account.likeness',
             'account.device_appearance',
             'chat.skills',
             'chat.shortcuts',
@@ -205,6 +207,7 @@ class Section(BaseModel):
         Literal[
             'account.profile',
             'account.voice',
+            'account.likeness',
             'account.device_appearance',
             'chat.skills',
             'chat.shortcuts',

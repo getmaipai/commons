@@ -1,3 +1,7 @@
+## [spec-v0.1.158] - 2026-10-17
+
+- NEWS-00 (first part). `contributes.pages[]` gains an optional `min_role` (`owner`, `admin`, `adult`, `teen`, `child` or `guest`, the same enum as the package's own): the floor role a person needs to see and open that page, its data ids and its actions. Absent means the package's floor; a page may only raise it, and `checkAppPackage` takes the package's `min_role` as an optional fourth argument and reports a page that lowers it. Additive; every existing manifest validates unchanged. The rest of NEWS-00 (News records, topics, keys, block kinds, UI schema changes) follows in later tags.
+
 ## [spec-v0.1.157] - 2026-10-17
 
 - LEFTNAV-APPS-01. `contributes.pages[]` on an app's "index" page gains optional `pinned_by_default` (boolean) and `pin_order` (integer 0 to 99): the app is pinned in the left rail for every person who may open it and has never chosen their own pins, in `pin_order` order. A person's saved `ui.pinned_apps` always wins. Additive; the `nav` description no longer says an app is never a rail icon (it reaches the rail as a pin).

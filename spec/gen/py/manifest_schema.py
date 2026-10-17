@@ -292,11 +292,15 @@ class Page(BaseModel):
         None,
         description='Read on the "index" page only. true pins the app in the left rail for every person who may open it and has never chosen their own pins (a person\'s saved `ui.pinned_apps` always wins). The hub already hides the app from anyone its role, age band, surface or Incognito rules refuse, so a default pin never shows a blocked app.',
     )
-    pin_order: int | None = Field(
+    pin_order: conint(ge=0, le=99) | None = Field(
         None,
         description='Read on the "index" page only. Where a default pin sits among the other default pins, lowest first (ties break by app name). Without it the app sorts last.',
-        ge=0,
-        le=99,
+    )
+    min_role: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] | None = (
+        Field(
+            None,
+            description="NEWS-00: the floor role a person needs to see and open this page, its data ids and its actions. Optional; absent means the package's own `min_role`. A page may only raise the floor, never lower it below the package's (spec/ui/app-check.ts lints that, since JSON Schema cannot compare two fields). The hub hides the page from a person below it, answers 404 on its page route, and refuses its data and action routes. A role floor only; age still comes from the output floor and the answer-block filter.",
+        )
     )
     kind: Literal['schema'] = Field(
         ...,
