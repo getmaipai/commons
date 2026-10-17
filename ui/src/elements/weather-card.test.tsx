@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
 import fixture from "@maipai/spec/fixtures/answer-block/valid-weather_card.json";
-import { WeatherCard, weekdayOf } from "./weather-card";
+import { WeatherCard, hourLabelOf, weekdayOf } from "./weather-card";
 import { WEATHER_CLASSES } from "./weather-condition";
 
 afterEach(cleanup);
@@ -109,5 +109,57 @@ describe("WeatherCard accessibility and variants", () => {
   test("full is the default", () => {
     const { container } = render(<WeatherCard {...props} />);
     expect(container.querySelector('[data-slot="weather-card"]')!.getAttribute("data-variant")).toBe("full");
+  });
+
+  const hours = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({
+      time: `2026-10-17T${String((20 + i) % 24).padStart(2, "0")}:00`,
+      temp: 41 + i,
+      ...(i === 1 ? { pop: 60 } : i === 2 ? { pop: 19 } : {}),
+    }));
+
+  test("wide draws the next 24 hours as a labelled list above the days", () => {
+    const { container } = render(<WeatherCard {...props} variant="wide" hourly={hours(30)} />);
+    const root = container.querySelector('[data-slot="weather-card"]')!;
+    expect(root.getAttribute("data-variant")).toBe("wide");
+    expect(root.className).toContain("max-w-3xl");
+    expect(root.className).not.toContain("max-w-md");
+    const strip = container.querySelector('[data-slot="weather-hourly"]')!;
+    expect(strip.tagName).toBe("UL");
+    const items = strip.querySelectorAll('[data-slot="weather-hour"]');
+    expect(items).toHaveLength(24);
+    expect(items[0]!.getAttribute("aria-label")).toBe("8 PM: 41 degrees Fahrenheit");
+    expect(items[1]!.getAttribute("aria-label")).toBe("9 PM: 42 degrees Fahrenheit, 60 percent chance of rain");
+    expect(items[1]!.textContent).toContain("60%");
+    expect(items[1]!.querySelector("svg")).not.toBeNull();
+    expect(items[2]!.textContent).not.toContain("%");
+    expect(items[2]!.getAttribute("aria-label")).not.toContain("rain");
+    expect(items[4]!.getAttribute("aria-label")).toStartWith("12 AM");
+    expect(container.querySelectorAll('[data-slot="weather-day"]').length).toBeGreaterThan(0);
+    expect(container.querySelector('[data-slot="weather-summary"]')).not.toBeNull();
+  });
+
+  test("wide omits the hourly strip when hourly is absent or empty", () => {
+    expect(render(<WeatherCard {...props} variant="wide" hourly={undefined} />).container.querySelector('[data-slot="weather-hourly"]')).toBeNull();
+    cleanup();
+    expect(render(<WeatherCard {...props} variant="wide" hourly={[]} />).container.querySelector('[data-slot="weather-hourly"]')).toBeNull();
+  });
+
+  test("full and compact ignore hourly: output is the same with or without it", () => {
+    for (const variant of ["full", "compact"] as const) {
+      const without = render(<WeatherCard {...props} variant={variant} hourly={undefined} />).container.innerHTML;
+      cleanup();
+      const withHours = render(<WeatherCard {...props} variant={variant} hourly={hours(24)} />).container.innerHTML;
+      cleanup();
+      expect(withHours).toBe(without);
+      expect(withHours).toContain("max-w-md");
+    }
+  });
+
+  test("hour labels are read from the ISO string with no zone conversion", () => {
+    expect(hourLabelOf("2026-10-17T00:00")).toBe("12 AM");
+    expect(hourLabelOf("2026-10-17T12:00")).toBe("12 PM");
+    expect(hourLabelOf("2026-10-17T21:00+05:00")).toBe("9 PM");
+    expect(hourLabelOf("junk")).toBe("junk");
   });
 });

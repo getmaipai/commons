@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.240] - ui-v0.5.240
+
+`weather_card` gains a `wide` variant for package pages. `WeatherCard variant="wide"` has the same hero (taller), full width up to `max-w-3xl`, an hourly strip (the next 24 `hourly` entries: hour read from the ISO string with no zone conversion, temperature, rain chance with the droplet from the same threshold as the daily columns; a list, each item labelled for assistive tech) and then the daily strip. No `hourly`: no strip. `AnswerBlockHandlers` takes `wide` (render-only, not a spec field) and `AnswerBlocksNodeView` passes it for every block. `full` and `compact` are unchanged. Additive.
+
 ## [0.5.239] - ui-v0.5.239
 
 APP-KIND-02. The schema interpreter runs a package's own pages. `SchemaPage` takes `packageId` (and `hideTitle`): it mounts `PackageScopeContext`, inside which a binding resolves only under `/api/plugins/<id>/`, a `call` only under that prefix and `navigate` only under `/apps/<id>/` (anything else is refused before a request, writes one `app.page_rejected` warning with no path, and a refused binding gets its own query key so it can never overwrite another page's cache entry). Binding source `package` posts `params` (`$state.<name>` filled from page state) to `/api/plugins/<id>/data/<path>`; a param that carries `lat` and `lon` rides the body only, never the query key. New nodes `answer_blocks` (draws returned blocks through `AnswerBlockView`, with `kinds` and the kit's loading, error-with-retry and empty states) and `picker` (kit `Select`; fixed `leading` options plus the rows of a package data call; a `geolocation` option asks the browser only on that choice and keeps `<state>_geo` in memory). `SchemaPage` owns the page state the picker writes. New icons `cloud-off`, `cloud-sun`, `locate-fixed`, `map-pin`. Additive: Memory's page and every existing node are unchanged.

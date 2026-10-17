@@ -217,16 +217,48 @@ function DayColumn({
   );
 }
 
+/** The hour on a clock for an ISO local time ("2026-10-17T21:00"), read as written: no zone conversion. */
+export function hourLabelOf(time: string): string {
+  const m = /T(\d{2})/.exec(time);
+  if (!m) return time;
+  const h = Number(m[1]) % 24;
+  return `${h % 12 === 0 ? 12 : h % 12} ${h < 12 ? "AM" : "PM"}`;
+}
+
+function HourColumn({ hour, unit }: { hour: WeatherHour; unit: string }) {
+  const rain = hour.pop !== undefined && hour.pop >= POP_SHOWN_FROM;
+  const label = hourLabelOf(hour.time);
+  return (
+    <li
+      data-slot="weather-hour"
+      aria-label={`${label}: ${Math.round(hour.temp)} ${unit === "C" ? "degrees Celsius" : "degrees Fahrenheit"}${rain ? `, ${hour.pop} percent chance of rain` : ""}`}
+      className="flex min-w-12 flex-1 flex-col items-center gap-1.5"
+    >
+      <span aria-hidden className="text-muted-foreground text-xs whitespace-nowrap">{label}</span>
+      <span aria-hidden className="text-[13px] font-medium tabular-nums">{degrees(hour.temp)}</span>
+      <span aria-hidden className="text-primary flex h-4 items-center text-[11px] tabular-nums">
+        {rain ? (
+          <>
+            <DropletIcon className="size-3" aria-hidden />
+            {hour.pop}%
+          </>
+        ) : null}
+      </span>
+    </li>
+  );
+}
+
 /**
  * The weather card: a hero whose gradient and motion follow the sky (a WMO code
- * and day or night), and a strip of up to 8 daily columns beneath it. `hourly`
- * is carried for other clients and is not drawn here.
+ * and day or night), and a strip of up to 8 daily columns beneath it. The `wide`
+ * variant (package pages) is full width up to max-w-3xl, has a taller hero and draws
+ * the next 24 `hourly` entries above the daily strip; `full` and `compact` ignore `hourly`.
  */
 export function WeatherCard({
   place,
   unit,
   current,
-  hourly: _hourly,
+  hourly,
   daily,
   attribution,
   locale = "en-US",
@@ -246,9 +278,11 @@ export function WeatherCard({
   /** Locale for the weekday names. Render-only; not part of the spec block. */
   locale?: string;
   /** `compact` draws the hero alone, shorter, for a dashboard card. Render-only; not part of the spec block. */
-  variant?: "full" | "compact";
+  variant?: "full" | "compact" | "wide";
 }) {
   const compact = variant === "compact";
+  const wide = variant === "wide";
+  const hours = wide ? (hourly ?? []).slice(0, 24) : [];
   const today = daily[0];
   const unitWord = unit === "C" ? "degrees Celsius" : "degrees Fahrenheit";
   const summary =
@@ -267,7 +301,7 @@ export function WeatherCard({
       data-class={cls}
       data-day={current.is_day ? "true" : "false"}
       data-variant={variant}
-      className={cn(paper, "w-full max-w-md overflow-hidden rounded-2xl", className)}
+      className={cn(paper, "w-full overflow-hidden rounded-2xl", wide ? "max-w-3xl" : "max-w-md", className)}
       {...props}
     >
       <div
@@ -275,7 +309,7 @@ export function WeatherCard({
         style={heroStyle}
         className={cn(
           "relative isolate flex flex-col justify-between overflow-hidden",
-          compact ? "min-h-36 gap-3 p-4" : "min-h-52 p-5",
+          compact ? "min-h-36 gap-3 p-4" : wide ? "min-h-72 p-6" : "min-h-52 p-5",
         )}
       >
         <p className="sr-only" data-slot="weather-summary">{summary}</p>
@@ -305,6 +339,13 @@ export function WeatherCard({
           </span>
         </div>
       </div>
+      {hours.length > 0 ? (
+        <ul data-slot="weather-hourly" aria-label="Next 24 hours" className="border-border flex overflow-x-auto border-b px-1.5 py-3">
+          {hours.map((hour) => (
+            <HourColumn key={hour.time} hour={hour} unit={unit} />
+          ))}
+        </ul>
+      ) : null}
       {compact ? null : (
       <ul className="flex overflow-x-auto px-1.5 py-3">
         {daily.slice(0, 8).map((day) => (

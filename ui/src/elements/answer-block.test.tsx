@@ -195,3 +195,16 @@ describe("AnswerBlockView compact", () => {
     expect(container.querySelectorAll('[data-slot="weather-day"]')).toHaveLength(0);
   });
 });
+
+describe("AnswerBlockView wide", () => {
+  test("wide reaches the weather card, which draws hourly", () => {
+    const block = fixture("weather_card") as { props: Record<string, unknown> };
+    const withHours = { ...block, props: { ...block.props, hourly: [{ time: "2026-10-17T21:00", temp: 41, pop: 60 }] } };
+    const { container } = render(<AnswerBlockView block={withHours} wide />);
+    expect(container.querySelector('[data-slot="weather-card"]')?.getAttribute("data-variant")).toBe("wide");
+    expect(container.querySelectorAll('[data-slot="weather-hour"]')).toHaveLength(1);
+    cleanup();
+    const plain = render(<AnswerBlockView block={withHours} />);
+    expect(plain.container.querySelector('[data-slot="weather-card"]')?.getAttribute("data-variant")).toBe("full");
+  });
+});

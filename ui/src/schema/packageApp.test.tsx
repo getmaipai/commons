@@ -154,6 +154,12 @@ describe("answer_blocks", () => {
     expect(queryClient.getQueryCache().getAll()).toHaveLength(1);
   });
 
+  test("every block is drawn wide", async () => {
+    const { container } = inScope(blocksNode, { place: "pl1" });
+    await waitFor(() => expect(container.querySelector('[data-slot="weather-card"]')).not.toBeNull());
+    expect(container.querySelector('[data-slot="weather-card"]')?.getAttribute("data-variant")).toBe("wide");
+  });
+
   test("coordinates ride the body but never the query key", async () => {
     const { container, queryClient } = inScope(blocksNode, { place: "current", place_geo: { lat: 47.61, lon: -122.33 }, place_geo_n: 1 });
     await waitFor(() => expect(container.querySelector('[data-slot="weather-card"]')).not.toBeNull());

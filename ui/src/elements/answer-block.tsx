@@ -31,6 +31,8 @@ export interface AnswerBlockHandlers {
   /** Draw a block in its small form where its Element has one (today the
    * `weather_card`: the hero alone, for a dashboard card). Render-only. */
   compact?: boolean;
+  /** Package pages: a weather card draws wide with its hourly strip. Render-only; not a spec field. */
+  wide?: boolean;
 }
 
 export interface AnswerBlockViewProps
@@ -85,7 +87,7 @@ class Guard extends Component<
 // inferred type is `any`; `kind` selects which props shape the cast names.
 function renderKind(
   block: any,
-  { resolveImageSrc, onImageOpen, onScheduleToggle, compact }: AnswerBlockHandlers,
+  { resolveImageSrc, onImageOpen, onScheduleToggle, compact, wide }: AnswerBlockHandlers,
 ): ReactNode {
   const props = block.props;
   switch (block.kind) {
@@ -125,7 +127,7 @@ function renderKind(
     case "comparison":
       return <ComparisonCard {...props} />;
     case "weather_card":
-      return <WeatherCard {...props} variant={compact ? "compact" : "full"} />;
+      return <WeatherCard {...props} variant={compact ? "compact" : wide ? "wide" : "full"} />;
     default:
       return null;
   }
@@ -137,6 +139,7 @@ export function AnswerBlockView({
   onImageOpen,
   onScheduleToggle,
   compact,
+  wide,
   className,
   ...props
 }: AnswerBlockViewProps) {
@@ -165,7 +168,7 @@ export function AnswerBlockView({
         className={className}
         {...props}
       >
-        {renderKind(valid, { resolveImageSrc, onImageOpen, onScheduleToggle, compact })}
+        {renderKind(valid, { resolveImageSrc, onImageOpen, onScheduleToggle, compact, wide })}
       </div>
     </Guard>
   );

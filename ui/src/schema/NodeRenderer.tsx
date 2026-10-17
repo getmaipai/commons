@@ -144,7 +144,7 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
       {(list) => (
         <div className="flex min-w-0 flex-col gap-4">
           {list.map((block, i) => (
-            <AnswerBlockView key={String((block as { id?: unknown } | null)?.id ?? i)} block={block} />
+            <AnswerBlockView key={String((block as { id?: unknown } | null)?.id ?? i)} block={block} wide />
           ))}
         </div>
       )}
