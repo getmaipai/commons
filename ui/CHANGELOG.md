@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.264] - ui-v0.5.264
+
+- `ModelSelectorTrigger` meets the 48 px touch floor at every size: each size extends its hit area with a transparent pseudo-element (`hitArea`) and sets `overflow-visible` so the trigger no longer clips it. The painted box and look are unchanged. Fixes the chat composer's "Thinking mode" button measuring 83x30 px in Home's accessibility gate.
+
 ## [0.5.263] - ui-v0.5.263
 
 - Media app variants, additive with existing defaults unchanged. `MediaShelf` gains `layout="grid"` (wrapping whole cards from the existing size budget, two columns on a phone; default `rail`), `artShape="circle"` (square art clipped to a circle; default `default`), `isHighlighted(item)` (current/next-up ring and `aria-current`), `renderIndex(item)` and `renderActions(item)` (vertical row slots outside the artwork button). Existing `density="compact"` now gives vertical rows 72 px artwork, two caption lines and trailing `renderMeta` running time. Vertical orientation takes precedence over grid layout; empty grids honour `hideWhenEmpty`.

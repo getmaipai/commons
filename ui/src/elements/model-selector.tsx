@@ -14,6 +14,7 @@ import {
 import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { cn } from "cn";
+import { hitArea } from "../utils";
 import {
   Popover,
   PopoverContent,
@@ -248,9 +249,14 @@ export const modelSelectorTriggerVariants = cva(
         muted: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
       },
       size: {
-        default: "h-9 px-3 py-2",
-        sm: "h-8 px-2.5 py-1.5 text-xs",
-        lg: "h-10 px-4 py-2.5",
+        // Each size extends its hit area to the 48 px touch floor (hitArea:
+        // a transparent pseudo-element, the painted box is unchanged). The
+        // base's overflow-hidden would clip that pseudo-element, so every
+        // size sets overflow-visible (cn's tailwind-merge keeps the last);
+        // the value text still truncates on its own span.
+        default: `h-9 px-3 py-2 overflow-visible ${hitArea(2)}`,
+        sm: `h-8 px-2.5 py-1.5 text-xs overflow-visible ${hitArea(2)}`,
+        lg: `h-10 px-4 py-2.5 overflow-visible ${hitArea(1)}`,
       },
     },
     defaultVariants: {
