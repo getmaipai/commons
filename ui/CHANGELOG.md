@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.260] - ui-v0.5.260
+
+MUSIC-GEN-04: `MusicTrack` Element, the audio sibling of `VideoPlayer`: the generation card while a song is made, then the kit `Player` in its audio layout with Download, Share, Save to Music and Make another in its actions slot, a Lyrics disclosure and a version stepper on `stepVersion` with Use this version. Additive.
+
 ## [0.5.259] - ui-v0.5.259
 
 A11Y-TARGET-01 follow-up. A closed `ComposerMenu` is `invisible` (visibility joins the 200 ms transition, so the close still fades): its rows sat at `scale-[0.97]` and measured 47 px, and, worse, stayed reachable by Tab and a screen reader while closed. Open menu unchanged.
