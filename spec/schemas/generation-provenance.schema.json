@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/generation-provenance.schema.json",
+  "title": "GenerationProvenance",
+  "description": "MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; pictures and videos may adopt it later by adding to the kind enum.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "job_id",
+    "task",
+    "model",
+    "engine",
+    "seed",
+    "duration_s",
+    "bpm",
+    "key",
+    "parent_file_id",
+    "source_kind",
+    "commercial_use",
+    "commercial_basis",
+    "made_at"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": ["music"],
+      "description": "What was generated. Only music today; pictures and videos may adopt this record later."
+    },
+    "job_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The Stack job (stack-job.schema.json) that produced the file."
+    },
+    "task": {
+      "type": "string",
+      "enum": ["text2music", "cover", "repaint", "extend", "remake", "variation", "trim", "fade", "loudness"],
+      "description": "What the job did: a new song (text2music), or a change to an existing version (the rest)."
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "licence"],
+      "description": "The weights that made the audio.",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "The model's catalog id." },
+        "revision": { "type": "string", "description": "The exact revision of the weights, such as a commit hash." },
+        "licence": { "type": "string", "description": "SPDX id of the weights' licence, such as MIT." }
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "description": "The Stack engine that ran the model.",
+      "properties": {
+        "id": { "type": "string", "description": "The engine id." },
+        "version": { "type": "string", "description": "The engine version." }
+      }
+    },
+    "seed": {
+      "type": ["integer", "null"],
+      "description": "The random seed, or null when the task has none (a trim, a fade, a loudness change)."
+    },
+    "duration_s": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Length of the result in seconds."
+    },
+    "bpm": {
+      "type": ["integer", "null"],
+      "minimum": 30,
+      "maximum": 300,
+      "description": "Tempo in beats per minute, or null when not set."
+    },
+    "key": {
+      "type": ["string", "null"],
+      "description": "Musical key, for example \"C major\", or null when not set."
+    },
+    "parent_file_id": {
+      "type": ["string", "null"],
+      "pattern": "^file-[a-z0-9]{6,}$",
+      "description": "The version this one was made from; null for a new song."
+    },
+    "source_kind": {
+      "type": "string",
+      "enum": ["none", "made_here", "upload"],
+      "description": "Where any input audio came from. \"none\": no input audio. \"made_here\": a version made in this household. \"upload\": reserved and refused today (Home's music design section 9: no uploaded audio until the owner rules)."
+    },
+    "commercial_use": {
+      "type": "string",
+      "enum": ["cleared", "personal_only", "unknown"],
+      "description": "Whether the result may be used commercially, from the model's licence and training-data statement."
+    },
+    "commercial_basis": {
+      "type": "string",
+      "minLength": 1,
+      "description": "One sentence naming why commercial_use has the value it has."
+    },
+    "made_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the job finished."
+    }
+  }
+}

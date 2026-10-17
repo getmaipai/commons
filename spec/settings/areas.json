@@ -533,12 +533,12 @@
         },
         {
           "id": "pictures",
-          "label": "Pictures and videos",
+          "label": "Pictures, videos and music",
           "icon": "image",
           "kind": "keys",
           "cards": [
             {
-              "label": "Pictures and videos",
+              "label": "Pictures, videos and music",
               "group": "household.pictures",
               "scope": "household"
             }

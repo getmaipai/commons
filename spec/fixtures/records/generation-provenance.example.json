@@ -1,0 +1,23 @@
+{
+  "kind": "music",
+  "job_id": "job-m1n2o3",
+  "task": "text2music",
+  "model": {
+    "id": "acestep-v15-turbo",
+    "revision": "19671f406d603126926c1b7e2adc169acbcade22",
+    "licence": "MIT"
+  },
+  "engine": {
+    "id": "music-gen",
+    "version": "ca1e85f"
+  },
+  "seed": 421337,
+  "duration_s": 60,
+  "bpm": 96,
+  "key": "C major",
+  "parent_file_id": null,
+  "source_kind": "none",
+  "commercial_use": "cleared",
+  "commercial_basis": "MIT weights; the model card states it was trained on licensed, royalty-free and synthetic audio and that output may be used commercially (read 2026-10-17)",
+  "made_at": "2026-10-17T12:00:00Z"
+}

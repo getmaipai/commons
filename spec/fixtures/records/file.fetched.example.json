@@ -15,6 +15,7 @@
     "job_id": "job-fetch01",
     "requested_by_person_id": null,
     "media_source_id": "msrc-chan01",
+    "generation": null,
     "note": null
   },
   "created_at": "2026-10-17T12:00:00Z",

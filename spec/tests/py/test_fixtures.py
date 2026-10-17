@@ -696,6 +696,22 @@ def test_file_fixture():
     File.model_validate(load_fixture("file.example.json"))
 
 
+def test_file_made_audio_fixture():
+    from gen.py.generation_provenance_schema import GenerationProvenance
+
+    GenerationProvenance.model_validate(
+        load_fixture("generation-provenance.example.json")
+    )
+    f = File.model_validate(load_fixture("file.made-audio.example.json"))
+    assert f.provenance.generation.task == "repaint"
+    for bad in (
+        "generation-provenance.invalid-task.example.json",
+        "generation-provenance.invalid-no-commercial-use.example.json",
+    ):
+        with pytest.raises(ValidationError):
+            GenerationProvenance.model_validate(load_fixture(bad))
+
+
 def test_file_made_image_fixture():
     File.model_validate(load_fixture("file.made-image.example.json"))
 

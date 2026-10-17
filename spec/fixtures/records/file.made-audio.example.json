@@ -1,0 +1,45 @@
+{
+  "id": "file-s7t8u9",
+  "owner_person_id": "person-a1b2c3",
+  "origin": "made",
+  "kind": "audio",
+  "media_type": "audio/mp4",
+  "size": 1572864,
+  "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "storage_path": "people/person-a1b2c3/files/file-s7t8u9.m4a",
+  "retention": "kept",
+  "provenance": {
+    "conversation_id": null,
+    "turn_id": "turn-b2c3d4",
+    "package_id": "music-studio",
+    "job_id": "job-p4q5r6",
+    "requested_by_person_id": null,
+    "media_source_id": null,
+    "generation": {
+      "kind": "music",
+      "job_id": "job-p4q5r6",
+      "task": "repaint",
+      "model": {
+        "id": "acestep-v15-turbo",
+        "revision": "19671f406d603126926c1b7e2adc169acbcade22",
+        "licence": "MIT"
+      },
+      "engine": {
+        "id": "music-gen",
+        "version": "ca1e85f"
+      },
+      "seed": 77,
+      "duration_s": 60,
+      "bpm": 96,
+      "key": "C major",
+      "parent_file_id": "file-m1n2o3",
+      "source_kind": "made_here",
+      "commercial_use": "cleared",
+      "commercial_basis": "MIT weights; the model card states it was trained on licensed, royalty-free and synthetic audio and that output may be used commercially (read 2026-10-17)",
+      "made_at": "2026-10-17T12:00:00Z"
+    },
+    "note": null
+  },
+  "created_at": "2026-10-17T12:05:00Z",
+  "hlc": "1792238700000:0:hub001"
+}

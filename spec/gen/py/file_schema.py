@@ -7,6 +7,8 @@ from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
 
+from . import generation_provenance_schema
+
 
 class Provenance(BaseModel):
     """
@@ -39,6 +41,10 @@ class Provenance(BaseModel):
     media_source_id: constr(pattern=r'^msrc-[a-z0-9]{6,}$') | None = Field(
         None,
         description='Set when origin is "fetched": the media-source (a feed, a channel or a pasted link) the copy came from. job_id names the Stack media.fetch job.',
+    )
+    generation: generation_provenance_schema.GenerationProvenance | None = Field(
+        None,
+        description='Set when origin is "made" by a generator that records it (music today): model, task, seed, parent version and whether it may be used commercially.',
     )
     note: constr(min_length=1) | None = Field(
         None,

@@ -1243,6 +1243,23 @@
     ]
   },
   {
+    "key": "generation.music.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Adults can make music",
+    "help": "Adults can ask chat to write and make songs, and change them. Children and teens cannot, whatever this says.",
+    "copy": {
+      "does": "Turns song making on or off for the grown-ups here."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "generation.adults",
     "scope": "household",
     "selector": "boolean",

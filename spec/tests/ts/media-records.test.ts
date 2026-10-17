@@ -15,14 +15,18 @@ import { OfflineManifest } from "../../gen/ts/offline-manifest.js";
 import { File } from "../../gen/ts/file.js";
 import { Feed } from "../../gen/ts/feed.js";
 import { Device } from "../../gen/ts/device.js";
+import { GenerationProvenance } from "../../gen/ts/generation-provenance.js";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const read = (path: string) => JSON.parse(readFileSync(join(SPEC, path), "utf-8"));
 const fixture = (name: string) => read(`fixtures/records/${name}.example.json`);
 const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
+const GEN_ID = "https://getmaipai.github.io/shared/spec/schemas/generation-provenance.schema.json";
+ajv.addSchema(read("schemas/generation-provenance.schema.json"));
 const compiled = new Map<string, ReturnType<typeof ajv.compile>>();
 const schema = (name: string) => {
+  if (name === "generation-provenance") return ajv.getSchema(GEN_ID)!;
   if (!compiled.has(name)) compiled.set(name, ajv.compile(read(`schemas/${name}.schema.json`)));
   return compiled.get(name)!;
 };
@@ -122,3 +126,41 @@ describe("Media records", () => {
     expect(schema("feed")({ ...fixture("feed.podcast"), purpose: "video" })).toBe(false);
   });
 });
+
+describe("GenerationProvenance (MUSIC-SPEC-01)", () => {
+  test("the song record and a made audio file accept, and Zod keeps every field", () => {
+    const g = fixture("generation-provenance");
+    expect(schema("generation-provenance")(g)).toBe(true);
+    expect(GenerationProvenance.parse(g)).toEqual(g);
+    const f = fixture("file.made-audio");
+    expect(schema("file")(f), JSON.stringify(schema("file").errors)).toBe(true);
+    expect(File.parse(f)).toEqual(f);
+    expect(f.provenance.generation.task).toBe("repaint");
+    expect(f.provenance.generation.parent_file_id).toMatch(/^file-/);
+  });
+
+  test("an unknown task or a missing commercial_use is refused", () => {
+    for (const name of ["generation-provenance.invalid-task", "generation-provenance.invalid-no-commercial-use"]) {
+      const bad = fixture(name);
+      expect(schema("generation-provenance")(bad), name).toBe(false);
+      expect(GenerationProvenance.safeParse(bad).success, name).toBe(false);
+    }
+  });
+
+  test("closed fields stay closed", () => {
+    const g = fixture("generation-provenance");
+    const v = schema("generation-provenance");
+    for (const bad of [{ kind: "video" }, { source_kind: "stream" }, { bpm: 20 }, { bpm: 301 }, { duration_s: -1 }, { parent_file_id: "x" }, { lyrics: "la" }, { commercial_basis: "" }]) {
+      expect(v({ ...g, ...bad }), JSON.stringify(bad)).toBe(false);
+    }
+  });
+
+  test("file.provenance.generation is optional and nullable", () => {
+    const f = fixture("file.made-audio");
+    const v = schema("file");
+    expect(v({ ...f, provenance: { ...f.provenance, generation: null } })).toBe(true);
+    const { generation: _g, ...rest } = f.provenance;
+    expect(v({ ...f, provenance: rest })).toBe(true);
+  });
+});
+
