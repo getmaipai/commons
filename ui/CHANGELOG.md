@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.259] - ui-v0.5.259
+
+A11Y-TARGET-01 follow-up. A closed `ComposerMenu` is `invisible` (visibility joins the 200 ms transition, so the close still fades): its rows sat at `scale-[0.97]` and measured 47 px, and, worse, stayed reachable by Tab and a screen reader while closed. Open menu unchanged.
+
 ## [0.5.258] - ui-v0.5.258
 
 A11Y-TARGET-01 follow-up. `ComposerMenuItem` uses `min-h-[48px]` instead of `min-h-12`: Home measured the rem-based 48 px as 47 px in the shell, so the touch-target floor (docs/UI.md) failed by 1 px. No API change.

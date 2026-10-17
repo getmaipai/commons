@@ -156,10 +156,10 @@ export function ComposerMenu({
         align === "start"
           ? "start-0 origin-bottom-left"
           : "end-0 origin-bottom-right",
-        "transition-[opacity,scale] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+        "transition-[opacity,scale,visibility] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
         open
           ? "scale-100 opacity-100"
-          : "pointer-events-none scale-[0.97] opacity-0",
+          : "pointer-events-none invisible scale-[0.97] opacity-0",
         className,
       )}
       {...props}
