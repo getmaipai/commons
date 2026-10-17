@@ -4080,6 +4080,23 @@
     ]
   },
   {
+    "key": "media.budget.exempt_bedtime_audio",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Audio outside screen time",
+    "help": "Music and audiobooks do not use the daily media minutes when this is on.",
+    "copy": {
+      "does": "Leaves music and audiobooks out of the daily media minutes."
+    },
+    "level": "expert",
+    "secret": false,
+    "lives_in": "media.budget",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "audio.speed.podcast",
     "scope": "person",
     "selector": "number",

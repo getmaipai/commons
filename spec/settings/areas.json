@@ -699,6 +699,14 @@
               "levels": [
                 "expert"
               ]
+            },
+            {
+              "label": "Media minutes",
+              "group": "media.budget",
+              "scope": "household",
+              "levels": [
+                "expert"
+              ]
             }
           ],
           "trail_view": "home.routing_stats"

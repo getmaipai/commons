@@ -1,3 +1,7 @@
+## [spec-v0.1.174] - 2026-10-17
+
+- Settings registry carries `media.budget.exempt_bedtime_audio` (MEDIA-KID-01) exactly as Home declares it: an expert household switch that leaves music and audiobooks out of the daily media minutes. The household Developer tools section gains a "Media minutes" card for the `media.budget` group, so no key stays ahead of spec in Home.
+
 ## [spec-v0.1.173] - 2026-10-17
 
 - Settings registry carries the keys whose copy now passes COPY-LINT-01, each exactly as Home declares it: `generation.kids`, `generation.kids_daily_pictures`, `generation.kids_daily_videos`, `generation.kid_enabled`, `generation.video_quality` and `health.keep_warm`. Only the expert `media.budget.exempt_bedtime_audio` stays ahead of spec in Home.
