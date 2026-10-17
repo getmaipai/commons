@@ -1111,44 +1111,98 @@ export const PackageManifest = z
             "wave-2.md's D-to-E contract: `GET /api/widgets` and `GET /api/widgets/:package/:id/data` list and serve these.",
           )
           .optional(),
-        /**6.2's own package-declared pages. E's PackageScopeContext and nav-registry merge (frontend/src/shell/nav.ts) are the real consumer; no package populates this yet.*/
+        /**6.2's own package-declared pages: the `app` kind (docs/plans/app-kind-2026-10-16.md). A package with pages is a launchable app at `/apps/<package id>`; its access (role, enabled, capabilities, platforms, Incognito) is the package's own, one definition.*/
         pages: z
           .array(
             z
               .object({
-                /**Derives this page's own route: `/apps/<package id>/<page id>`, or bare `/apps/<package id>` when this is exactly "index".*/
+                /**Derives this page's own route: `/apps/<package id>/<page id>`, or bare `/apps/<package id>` when this is exactly "index". An app (a package with any page) needs exactly one page with id "index"; spec/ui/app-check.ts lints that, since JSON Schema cannot say it through the generated model.*/
                 id: z
                   .string()
-                  .min(1)
+                  .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                  .max(40)
                   .describe(
-                    'Derives this page\'s own route: `/apps/<package id>/<page id>`, or bare `/apps/<package id>` when this is exactly "index".',
+                    'Derives this page\'s own route: `/apps/<package id>/<page id>`, or bare `/apps/<package id>` when this is exactly "index". An app (a package with any page) needs exactly one page with id "index"; spec/ui/app-check.ts lints that, since JSON Schema cannot say it through the generated model.',
                   ),
                 icon: z.string().optional(),
+                /**Extra search words for the app launcher and command palette (APP-KIND-01). Read on the "index" page only; the app's name, description and category come from the manifest's `display`, `description` and `category`.*/
+                keywords: z
+                  .array(z.string().min(1).max(24))
+                  .max(8)
+                  .describe(
+                    "Extra search words for the app launcher and command palette (APP-KIND-01). Read on the \"index\" page only; the app's name, description and category come from the manifest's `display`, `description` and `category`.",
+                  )
+                  .optional(),
                 label: z.string().min(1).max(40),
-                /**Whether this page gets its own entry in the shell's nav registry (frontend/src/shell/nav.ts), vs. being reachable only from elsewhere (e.g. a widget's own link).*/
+                /**On the page with id "index", true makes the app a launcher, search and pin entry (never an automatic rail icon). On any other page, true makes it one of the app's own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.*/
                 nav: z
                   .boolean()
                   .describe(
-                    "Whether this page gets its own entry in the shell's nav registry (frontend/src/shell/nav.ts), vs. being reachable only from elsewhere (e.g. a widget's own link).",
+                    'On the page with id "index", true makes the app a launcher, search and pin entry (never an automatic rail icon). On any other page, true makes it one of the app\'s own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.',
                   ),
-                /**"schema": spec/ui/schema.json document, rendered by the shared shell. "web" (this package's manifest must also list "web" under platforms): an escape hatch, unimplemented for all of Wave 2 - the loader refuses it outright, since a page a native Go/SwiftUI client can't render would break the platform's own "one UI schema, every client" promise.*/
+                /**"schema": spec/ui/schema.json document, rendered by the shared shell. The old "web" escape hatch is refused outright (design rule S2, owner-confirmed 2026-10-16): a page a native Go/SwiftUI client can't render would break the platform's own "one UI schema, every client" promise.*/
                 kind: z
-                  .enum(["schema", "web"])
+                  .literal("schema")
                   .describe(
-                    '"schema": spec/ui/schema.json document, rendered by the shared shell. "web" (this package\'s manifest must also list "web" under platforms): an escape hatch, unimplemented for all of Wave 2 - the loader refuses it outright, since a page a native Go/SwiftUI client can\'t render would break the platform\'s own "one UI schema, every client" promise.',
+                    '"schema": spec/ui/schema.json document, rendered by the shared shell. The old "web" escape hatch is refused outright (design rule S2, owner-confirmed 2026-10-16): a page a native Go/SwiftUI client can\'t render would break the platform\'s own "one UI schema, every client" promise.',
                   ),
-                /**The schema document id (kind: "schema") this page renders, served from GET /api/plugins/:id/pages/:pageId.*/
+                /**Names `pages/<module>.json` in the package directory: the schema document (kind: "schema") this page renders, served from GET /api/plugins/:id/pages/:pageId. A plain file stem, never a path.*/
                 module: z
                   .string()
-                  .min(1)
+                  .regex(new RegExp("^[a-z][a-z0-9_-]*$"))
+                  .max(40)
                   .describe(
-                    'The schema document id (kind: "schema") this page renders, served from GET /api/plugins/:id/pages/:pageId.',
+                    'Names `pages/<module>.json` in the package directory: the schema document (kind: "schema") this page renders, served from GET /api/plugins/:id/pages/:pageId. A plain file stem, never a path.',
                   ),
               })
               .strict(),
           )
           .describe(
-            "6.2's own package-declared pages. E's PackageScopeContext and nav-registry merge (frontend/src/shell/nav.ts) are the real consumer; no package populates this yet.",
+            "6.2's own package-declared pages: the `app` kind (docs/plans/app-kind-2026-10-16.md). A package with pages is a launchable app at `/apps/<package id>`; its access (role, enabled, capabilities, platforms, Incognito) is the package's own, one definition.",
+          )
+          .optional(),
+        /**App page data (APP-KIND-01): what `POST /api/plugins/:id/data/:dataId` serves to a page binding of source "package". An entry with `surface` runs the package recipe with the host-resolved place and returns {as_of, blocks, degraded?}; blocks pass the manifest's `returns_blocks`, the person's band and the output floor.*/
+        data: z
+          .array(
+            z
+              .object({
+                id: z.string().regex(new RegExp("^[a-z][a-z0-9-]*$")).max(40),
+                /**A place surface (PLACE-WEATHER-01). The host, never the model or the page, resolves the chosen place for this surface and injects its coordinates into the package recipe call; coordinates are consumed in that call and never stored, logged or cached by text.*/
+                surface: z
+                  .enum(["weather", "maps"])
+                  .describe(
+                    "A place surface (PLACE-WEATHER-01). The host, never the model or the page, resolves the chosen place for this surface and injects its coordinates into the package recipe call; coordinates are consumed in that call and never stored, logged or cached by text.",
+                  )
+                  .optional(),
+                /**This entry returns rows (not blocks) for a picker: "places" is the asking person's saved places for `surface`, as {id, label}. An entry with `rows` runs no recipe.*/
+                rows: z
+                  .literal("places")
+                  .describe(
+                    'This entry returns rows (not blocks) for a picker: "places" is the asking person\'s saved places for `surface`, as {id, label}. An entry with `rows` runs no recipe.',
+                  )
+                  .optional(),
+                /**Literal recipe inputs, the same shape as a widget's `inputs`.*/
+                inputs: z
+                  .record(z.string(), z.any())
+                  .describe(
+                    "Literal recipe inputs, the same shape as a widget's `inputs`.",
+                  )
+                  .optional(),
+                /**How long the shell treats a data call as fresh before re-asking; the package cache still decides what the recipe itself fetches.*/
+                refresh_s: z
+                  .number()
+                  .int()
+                  .gte(1)
+                  .describe(
+                    "How long the shell treats a data call as fresh before re-asking; the package cache still decides what the recipe itself fetches.",
+                  )
+                  .optional(),
+              })
+              .strict(),
+          )
+          .max(16)
+          .describe(
+            "App page data (APP-KIND-01): what `POST /api/plugins/:id/data/:dataId` serves to a page binding of source \"package\". An entry with `surface` runs the package recipe with the host-resolved place and returns {as_of, blocks, degraded?}; blocks pass the manifest's `returns_blocks`, the person's band and the output floor.",
           )
           .optional(),
         /**SPEC-TOUR-01: package-declared guided tours, validated by the shared Tour schema.*/

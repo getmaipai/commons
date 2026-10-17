@@ -18,7 +18,9 @@
     { "$ref": "#/$defs/detail_pane" },
     { "$ref": "#/$defs/split_view" },
     { "$ref": "#/$defs/widget_card" },
-    { "$ref": "#/$defs/widget_row" }
+    { "$ref": "#/$defs/widget_row" },
+    { "$ref": "#/$defs/answer_blocks" },
+    { "$ref": "#/$defs/picker" }
   ],
   "$defs": {
     "binding": {
@@ -28,16 +30,29 @@
       "properties": {
         "source": {
           "type": "string",
-          "enum": ["route", "host"],
-          "description": "route: the app's own backend route. host: a host.* RPC method (4.9)."
+          "enum": ["route", "host", "package"],
+          "description": "route: the app's own backend route. host: a host.* RPC method (4.9). package: a data call of the package whose page this is (APP-KIND-01); `path` is then a `contributes.data[]` id, never a URL, and the call is POST /api/plugins/<package id>/data/<path>."
         },
         "path": { "type": "string", "minLength": 1 },
         "stream": {
           "type": "boolean",
           "default": false,
           "description": "True when this binding delivers incremental updates (turn.token during a Chat reply, 7.2) rather than one value."
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Source \"package\" only: the JSON body of the data call. Each value is a literal or the string \"$state.<name>\", read from page state at call time (a picker writes it). A value that is an object with numeric `lat` and `lon` (Current location) travels in the body only and is never part of a query key, URL, log or cache."
         }
-      }
+      },
+      "if": { "properties": { "source": { "const": "package" } }, "required": ["source"] },
+      "then": { "properties": { "path": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "maxLength": 40 } } },
+      "else": { "properties": { "params": false } }
+    },
+    "package_binding": {
+      "type": "object",
+      "allOf": [{ "$ref": "#/$defs/binding" }, { "properties": { "source": { "const": "package" } } }],
+      "description": "A binding whose source is \"package\": the nodes that draw a package's own data (answer_blocks, picker) take only this."
     },
     "action": {
       "type": "object",
@@ -330,6 +345,58 @@
       "properties": {
         "type": { "const": "widget_row" },
         "bind": { "$ref": "#/$defs/binding" }
+      }
+    },
+    "answer_blocks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind"],
+      "description": "Draws the answer blocks a package data call returns (APP-KIND-02), each through the kit's one answer-block dispatcher (validation, then the kit Element named by `kind`; an unknown kind or invalid props shows the block's `alt` sentence). A page's hero is a first node of this type. `bind` is a package binding whose data call returns {blocks}.",
+      "properties": {
+        "type": { "const": "answer_blocks" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "kinds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "description": "Draw only blocks of these kinds, so a page can place one kind per section. Absent: every block returned."
+        },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "picker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "state", "label"],
+      "dependentRequired": { "bind": ["item_key_field", "item_label_field"] },
+      "description": "Chooses one value and writes it to page state (APP-KIND-02), drawn with the kit's select primitive. Fixed `leading` options come first, then the rows of `bind` (a package data call returning {rows}). A section's `condition` reads the state it writes.",
+      "properties": {
+        "type": { "const": "picker" },
+        "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "The page-state name this picker writes." },
+        "label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "The accessible name of the control." },
+        "placeholder": { "type": "string", "minLength": 1, "maxLength": 40, "description": "Shown while nothing is chosen (for example \"Default place\")." },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "item_key_field": { "type": "string" },
+        "item_label_field": { "type": "string" },
+        "leading": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "label"],
+            "properties": {
+              "value": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "icon": { "type": "string" },
+              "needs": {
+                "const": "geolocation",
+                "description": "Choosing this option asks the browser for the device location, on that choice only. The coordinates stay in memory as page state `<state>_geo` ({lat, lon}); they are never stored."
+              }
+            }
+          }
+        }
       }
     },
     "nav_entry": {

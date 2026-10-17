@@ -273,23 +273,51 @@ class Page(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    id: constr(min_length=1) = Field(
+    id: constr(pattern=r'^[a-z][a-z0-9-]*$', max_length=40) = Field(
         ...,
-        description='Derives this page\'s own route: `/apps/<package id>/<page id>`, or bare `/apps/<package id>` when this is exactly "index".',
+        description='Derives this page\'s own route: `/apps/<package id>/<page id>`, or bare `/apps/<package id>` when this is exactly "index". An app (a package with any page) needs exactly one page with id "index"; spec/ui/app-check.ts lints that, since JSON Schema cannot say it through the generated model.',
     )
     icon: str | None = None
+    keywords: list[constr(min_length=1, max_length=24)] | None = Field(
+        None,
+        description='Extra search words for the app launcher and command palette (APP-KIND-01). Read on the "index" page only; the app\'s name, description and category come from the manifest\'s `display`, `description` and `category`.',
+        max_length=8,
+    )
     label: constr(min_length=1, max_length=40)
     nav: bool = Field(
         ...,
-        description="Whether this page gets its own entry in the shell's nav registry (frontend/src/shell/nav.ts), vs. being reachable only from elsewhere (e.g. a widget's own link).",
+        description='On the page with id "index", true makes the app a launcher, search and pin entry (never an automatic rail icon). On any other page, true makes it one of the app\'s own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.',
     )
-    kind: Literal['schema', 'web'] = Field(
+    kind: Literal['schema'] = Field(
         ...,
-        description='"schema": spec/ui/schema.json document, rendered by the shared shell. "web" (this package\'s manifest must also list "web" under platforms): an escape hatch, unimplemented for all of Wave 2 - the loader refuses it outright, since a page a native Go/SwiftUI client can\'t render would break the platform\'s own "one UI schema, every client" promise.',
+        description='"schema": spec/ui/schema.json document, rendered by the shared shell. The old "web" escape hatch is refused outright (design rule S2, owner-confirmed 2026-10-16): a page a native Go/SwiftUI client can\'t render would break the platform\'s own "one UI schema, every client" promise.',
     )
-    module: constr(min_length=1) = Field(
+    module: constr(pattern=r'^[a-z][a-z0-9_-]*$', max_length=40) = Field(
         ...,
-        description='The schema document id (kind: "schema") this page renders, served from GET /api/plugins/:id/pages/:pageId.',
+        description='Names `pages/<module>.json` in the package directory: the schema document (kind: "schema") this page renders, served from GET /api/plugins/:id/pages/:pageId. A plain file stem, never a path.',
+    )
+
+
+class Datum(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^[a-z][a-z0-9-]*$', max_length=40)
+    surface: Literal['weather', 'maps'] | None = Field(
+        None,
+        description='A place surface (PLACE-WEATHER-01). The host, never the model or the page, resolves the chosen place for this surface and injects its coordinates into the package recipe call; coordinates are consumed in that call and never stored, logged or cached by text.',
+    )
+    rows: Literal['places'] | None = Field(
+        None,
+        description='This entry returns rows (not blocks) for a picker: "places" is the asking person\'s saved places for `surface`, as {id, label}. An entry with `rows` runs no recipe.',
+    )
+    inputs: dict[str, Any] | None = Field(
+        None,
+        description="Literal recipe inputs, the same shape as a widget's `inputs`.",
+    )
+    refresh_s: conint(ge=1) | None = Field(
+        None,
+        description='How long the shell treats a data call as fresh before re-asking; the package cache still decides what the recipe itself fetches.',
     )
 
 
@@ -372,7 +400,12 @@ class Contributes(BaseModel):
     )
     pages: list[Page] | None = Field(
         None,
-        description="6.2's own package-declared pages. E's PackageScopeContext and nav-registry merge (frontend/src/shell/nav.ts) are the real consumer; no package populates this yet.",
+        description="6.2's own package-declared pages: the `app` kind (docs/plans/app-kind-2026-10-16.md). A package with pages is a launchable app at `/apps/<package id>`; its access (role, enabled, capabilities, platforms, Incognito) is the package's own, one definition.",
+    )
+    data: list[Datum] | None = Field(
+        None,
+        description='App page data (APP-KIND-01): what `POST /api/plugins/:id/data/:dataId` serves to a page binding of source "package". An entry with `surface` runs the package recipe with the host-resolved place and returns {as_of, blocks, degraded?}; blocks pass the manifest\'s `returns_blocks`, the person\'s band and the output floor.',
+        max_length=16,
     )
     tours: list[tour_schema.Tour] | None = Field(
         None,

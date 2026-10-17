@@ -1,3 +1,7 @@
+## [spec-v0.1.153] - 2026-10-17
+
+- APP-KIND-01. The `app` kind's contract, additive except one tightening nothing used. Manifest: `contributes.pages[]` gains `keywords` (up to 8, each up to 24 characters), `id` and `module` become plain names (`^[a-z][a-z0-9-]*$`, `module` also allows `_`), `nav` is defined precisely (index: library, search and pin entry; other pages: the app's own sections), and `kind: "web"` is no longer valid (it was always refused by the loader). New `contributes.data[]` (`{id, surface?, rows?, inputs?, refresh_s?}`): `surface` (`weather` or `maps`) makes the host resolve the place and inject coordinates; `rows: "places"` returns the person's saved places for a picker with no recipe run. UI schema: binding `source` gains `package` (then `path` is a data id) and `params` (literals or `$state.<name>`), new nodes `answer_blocks` and `picker`, new `$defs.package_binding`. New `spec/ui/app-check.ts` (`checkAppPackage`): one `index` page, unique ids, bindings only to declared data ids, calls only under `/api/plugins/<id>/`, navigation only under `/apps/<id>/`, and only the node types a package page may use. New fixture `spec/ui/pages/weather.json`.
+
 
 ## [spec-v0.1.152] - 2026-10-16
 

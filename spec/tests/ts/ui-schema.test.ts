@@ -124,3 +124,39 @@ describe("UI schema", () => {
     expect(validate({ type: "widget_card", bind: { source: "route", path: "/api/widgets" }, item_key_field: "id" })).toBe(false);
   });
 });
+
+// APP-KIND-01: package bindings, answer_blocks and picker.
+describe("UI schema, package apps", () => {
+  const forecast = { source: "package", path: "forecast", params: { place: "$state.place" } };
+
+  test("a package binding with params validates", () => {
+    expect(validate({ type: "answer_blocks", bind: forecast })).toBe(true);
+    expect(validate({ type: "answer_blocks", bind: forecast, kinds: ["weather_card"], empty_state: { type: "empty_state", icon: "cloud-off", text: "Nothing." } })).toBe(true);
+  });
+
+  test("an absolute or dotted path is rejected on a package binding", () => {
+    expect(validate({ type: "answer_blocks", bind: { source: "package", path: "/api/people" } })).toBe(false);
+    expect(validate({ type: "answer_blocks", bind: { source: "package", path: "../people" } })).toBe(false);
+    expect(validate({ type: "answer_blocks", bind: { source: "package", path: "Forecast" } })).toBe(false);
+  });
+
+  test("params belong to a package binding only", () => {
+    expect(validate({ type: "list", bind: { source: "route", path: "/api/x", params: { a: 1 } }, item_key_field: "id", item_label_field: "t" })).toBe(false);
+  });
+
+  test("answer_blocks needs a package binding and refuses a route binding", () => {
+    expect(validate({ type: "answer_blocks" })).toBe(false);
+    expect(validate({ type: "answer_blocks", bind: { source: "route", path: "/api/people" } })).toBe(false);
+    expect(validate({ type: "answer_blocks", bind: forecast, kinds: [] })).toBe(false);
+    expect(validate({ type: "answer_blocks", bind: forecast, extra: true })).toBe(false);
+  });
+
+  test("a picker needs a state name and a label; bind needs both item fields", () => {
+    expect(validate({ type: "picker", state: "place", label: "Place", leading: [{ value: "current", label: "Current location", needs: "geolocation" }] })).toBe(true);
+    expect(validate({ type: "picker", state: "Place", label: "Place" })).toBe(false);
+    expect(validate({ type: "picker", state: "place" })).toBe(false);
+    expect(validate({ type: "picker", state: "place", label: "Place", bind: { source: "package", path: "places" } })).toBe(false);
+    expect(validate({ type: "picker", state: "place", label: "Place", bind: { source: "package", path: "places" }, item_key_field: "id", item_label_field: "label" })).toBe(true);
+    expect(validate({ type: "picker", state: "place", label: "Place", leading: [{ value: "x", label: "X", needs: "microphone" }] })).toBe(false);
+  });
+});

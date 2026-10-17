@@ -101,3 +101,18 @@ substitution everywhere, so a subtitle can combine more than one field
 mechanism. `{count}` is the one placeholder a confirm prompt gets that no
 single bound item's own fields could ever supply (the number of items a
 batch action is about to act on).
+
+## Package apps (APP-KIND-01)
+
+A package that lists `contributes.pages[]` in its manifest is a launchable app. Each page names `pages/<module>.json` in the
+package, a `page` document written against this schema. Three things are added for them:
+
+- Binding `source: "package"`: `path` is a `contributes.data[]` id, and `params` (literals or `"$state.<name>"`) is the JSON body of
+  `POST /api/plugins/<package id>/data/<path>`.
+- Node `answer_blocks`: draws the `blocks` a data call returns through the kit's answer-block dispatcher. A page's hero is its first
+  such node.
+- Node `picker`: writes one chosen value to page state, from fixed `leading` options and the `rows` a data call returns. An option
+  with `needs: "geolocation"` asks the browser on that choice only.
+
+`app-check.ts` is the cross-file lint a host runs when it loads the package: `pages/weather.json` is the conforming example. A
+package page may use only `page`, `section`, `empty_state`, `progress`, `answer_blocks`, `picker` and `detail_pane`.
