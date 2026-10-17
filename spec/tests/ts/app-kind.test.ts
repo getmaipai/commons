@@ -110,6 +110,11 @@ describe("checkAppPackage (the cross-file lint)", () => {
     const nav = { type: "page", id: "x", title: "X", body: [{ type: "empty_state", icon: "x", text: "t", action: { navigate: { to: "/settings" } } }] };
     expect(checkAppPackage("weather", contributes, (m) => (m === "weather" ? nav : load(m))).join("\n")).toContain("must stay under /apps/weather");
   });
+  test("a stated-reason button may open the app's own settings, and nothing else outside the app", () => {
+    const page = (to: string) => ({ type: "page", id: "x", title: "X", body: [{ type: "answer_blocks", bind: { source: "package", path: "forecast" }, states: { needs_place: { text: "t", actions: [{ label: "Go", navigate: { to } }] } } }] });
+    expect(checkAppPackage("weather", contributes, (m) => (m === "weather" ? page("/settings/weather") : load(m)))).toEqual([]);
+    expect(checkAppPackage("weather", contributes, (m) => (m === "weather" ? page("/settings/account") : load(m))).join("\n")).toContain("must stay under /apps/weather");
+  });
   test("a picker needs a rows entry and an answer_blocks node needs a recipe entry", () => {
     const wrong = { type: "page", id: "x", title: "X", body: [
       { type: "picker", state: "p", label: "P", bind: { source: "package", path: "forecast" }, item_key_field: "id", item_label_field: "l" },

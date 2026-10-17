@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getIcon } from "@/kit/icons";
+import { locationBlockedHelp } from "@/kit/geolocationHelp";
 import { List } from "@/kit/primitives/List";
 import { DestructiveConfirm } from "@/kit/primitives/DestructiveConfirm";
 import { Button } from "../dashboard/components/ui/button";
@@ -12,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 const PlusIcon = getIcon("plus");
 const EllipsisIcon = getIcon("more-horizontal");
+const PinIcon = getIcon("map-pin");
 
 /** A place a search found. `id` is set when the hub already has it as a record. */
 export interface PlaceHit {
@@ -60,6 +62,7 @@ function AddPlace({ adapter, disabled, label, onPick }: { adapter: PlaceAdapter;
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<PlaceHit[]>([]);
   const [failed, setFailed] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [busy, setBusy] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
   // The host may build its adapter inline; the search must not restart on
@@ -71,12 +74,14 @@ function AddPlace({ adapter, disabled, label, onPick }: { adapter: PlaceAdapter;
     const q = query.trim();
     setHits([]);
     setFailed(false);
+    setSearching(false);
     if (q.length < 2) return;
     let live = true;
+    setSearching(true);
     const t = setTimeout(() => {
       adapterRef.current.search(q).then(
-        (r) => live && setHits(r),
-        () => live && setFailed(true),
+        (r) => live && (setHits(r), setSearching(false)),
+        () => live && (setFailed(true), setSearching(false)),
       );
     }, 250);
     return () => {
@@ -114,19 +119,26 @@ function AddPlace({ adapter, disabled, label, onPick }: { adapter: PlaceAdapter;
           </Button>
         }
       />
-      <PopoverContent>
+      <PopoverContent width="wide" align="start">
         <Command shouldFilter={false}>
           <CommandInput value={query} onValueChange={setQuery} placeholder="Search for a place" aria-label="Search for a place" />
           <CommandList>
-            <CommandEmpty>
-              {failed ? "Search is not available right now. Try again in a moment." : query.trim().length < 2 ? "Type at least two letters." : "No place found. Try a nearby town."}
+            <CommandEmpty aria-live="polite">
+              {failed
+                ? "Search is not available right now. Try again in a moment."
+                : query.trim().length < 2
+                  ? "Type at least two letters."
+                  : searching
+                    ? "Searching"
+                    : "No places match. Try a nearby town."}
             </CommandEmpty>
             {addError ? <p role="status" className="px-2 py-1 text-sm">{addError}</p> : null}
             <CommandGroup>
               {hits.map((h) => (
-                <CommandItem key={`${h.id ?? ""}${h.lat},${h.lon}`} value={`${h.name}${h.lat}${h.lon}`} onSelect={() => void choose(h)}>
-                  {h.name}
-                  {h.area ? <span className="text-muted-foreground"> {h.area}</span> : null}
+                <CommandItem key={`${h.id ?? ""}${h.lat},${h.lon}`} value={`${h.name}${h.lat}${h.lon}`} density="roomy" onSelect={() => void choose(h)}>
+                  <PinIcon aria-hidden className="text-muted-foreground" />
+                  <span className="max-w-[60%] shrink-0 truncate">{h.name}</span>
+                  {h.area ? <span className="min-w-0 flex-1 truncate text-right text-muted-foreground">{h.area}</span> : null}
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -201,7 +213,7 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
         Use current location
       </Button>
     ) : null;
-  const deniedNote = denied ? <p role="status">Location is blocked in this browser. Allow it in the site settings, or pick a place instead.</p> : null;
+  const deniedNote = denied ? <p role="status" className="min-w-0 max-w-prose text-sm text-muted-foreground">{locationBlockedHelp()} Or pick a saved place instead.</p> : null;
 
   if (!multiple) {
     const id = typeof value === "string" && value ? value : null;
@@ -209,7 +221,7 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
       const ids = [...(adapter.choices ?? [])];
       if (id && !ids.includes(id)) ids.push(id);
       return (
-        <>
+        <div className="flex w-full min-w-0 flex-col items-start gap-2">
           <Select value={id ?? "current"} onValueChange={(v) => onValueChange(v)} disabled={disabled}>
             <SelectTrigger aria-label={ariaLabel}>
               <SelectValue>{(v: string) => (v === "current" ? "Current location" : adapter.labelFor(v))}</SelectValue>
@@ -225,7 +237,7 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
           </Select>
           {useCurrentButton}
           {deniedNote}
-        </>
+        </div>
       );
     }
     return (

@@ -386,6 +386,16 @@
           "description": "Draw only blocks of these kinds, so a page can place one kind per section. Absent: every block returned."
         },
         "empty_state": { "$ref": "#/$defs/empty_state" },
+        "states": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "WEATHER-FIX-01: what the page says when its data call cannot draw blocks for a stated reason, in the page's own words. `needs_place`: the call answered {needs: \"place\"} (the person has no place chosen) or failed with code needs_place. `down`: the source could not be reached (code down). `timed_out`: it took too long (code timed_out). Any other empty or failed call keeps `empty_state` and the generic retry.",
+          "properties": {
+            "needs_place": { "$ref": "#/$defs/data_state" },
+            "down": { "$ref": "#/$defs/data_state" },
+            "timed_out": { "$ref": "#/$defs/data_state" }
+          }
+        },
         "actions": {
           "type": "object",
           "additionalProperties": false,
@@ -398,6 +408,55 @@
             "summarize": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
             "reset_mix": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["confirm"], "properties": { "confirm": {} } }] },
             "listen": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["play"], "properties": { "play": {} } }] }
+          }
+        }
+      }
+    },
+    "data_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "description": "A stated reason for an answer_blocks node with nothing to draw: an icon, an optional title, the sentence, and up to three buttons.",
+      "properties": {
+        "icon": { "type": "string" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "actions": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "navigate"],
+                "properties": {
+                  "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+                  "icon": { "type": "string" },
+                  "navigate": { "type": "object", "additionalProperties": false, "required": ["to"], "properties": { "to": { "type": "string", "minLength": 1, "description": "A screen of this app: /apps/<id>..., or its own settings area /settings/<id>." } } }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "locate"],
+                "properties": {
+                  "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+                  "icon": { "type": "string" },
+                  "locate": { "type": "object", "additionalProperties": false, "required": ["state"], "properties": { "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "The page-state name set to \"current\" with the device coordinates in `<state>_geo`, on this click only." } } }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "retry"],
+                "properties": {
+                  "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+                  "icon": { "type": "string" },
+                  "retry": { "const": true }
+                }
+              }
+            ]
           }
         }
       }

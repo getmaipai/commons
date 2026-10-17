@@ -63,6 +63,8 @@ export interface FullLayoutProps {
   /** Installed apps for the rail's pinned section and the launcher at its foot (see AppRailProps.apps). */
   railApps?: RailApp[];
   onRailAppPinChange?: (url: string, pinned: boolean) => void;
+  /** The host's All apps page; the rail's grid button opens it (see AppRailProps.allAppsHref). */
+  railAllAppsHref?: string;
 }
 
 /** The slim title bar of the rail layout: the page's own header content
@@ -78,14 +80,14 @@ function RailPageHeader() {
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, onRailAppPinChange }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, onRailAppPinChange, railAllAppsHref }: FullLayoutProps) {
   return (
     <HeaderExtraProvider>
       {/* The page scrolls as a document, as it did beside the sidebar;
           the rail stays put (sticky, full viewport height). A full-height
           page (a chat) bounds the workspace to the viewport itself. */}
       <div data-slot="rail-shell" className="flex min-h-svh w-full">
-        <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} onTogglePin={onRailAppPinChange} />
+        <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
         <main data-slot="rail-workspace" className="flex min-w-0 flex-1 flex-col" style={{ background: "var(--page)" }}>
           <RailPageHeader />
           <div data-slot="rail-body" className="flex-1">

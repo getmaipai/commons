@@ -116,6 +116,68 @@ describe("LocationField", () => {
     await waitFor(() => r.getByText(/Location is blocked/));
   });
 
+  test("a search row is one line: the name, then the region muted on the same row, both truncating", async () => {
+    const a = adapter({ search: mock(async () => [{ name: "Milford", area: "Connecticut, United States", lat: 41.2, lon: -73.06 }]) });
+    const r = multi([], a);
+    fireEvent.click(r.getByText("Add a place"));
+    const doc = r.baseElement.ownerDocument;
+    const input = await waitFor(() => (doc.querySelector('input[aria-label="Search for a place"]') as HTMLInputElement | null) ?? (() => { throw new Error("no popover"); })());
+    fireEvent.change(input, { target: { value: "milford, ct" } });
+    const row = (await waitFor(() => doc.querySelector('[data-slot="command-item"]') ?? (() => { throw new Error("no row"); })(), { timeout: 2000 })) as HTMLElement;
+    expect(row.getAttribute("data-density")).toBe("roomy");
+    const spans = [...row.querySelectorAll("span")];
+    const name = spans.find((el) => el.textContent === "Milford")!;
+    const area = spans.find((el) => el.textContent === "Connecticut, United States")!;
+    expect(name.className).toContain("truncate");
+    expect(area.className).toContain("truncate");
+    expect(area.className).toContain("text-muted-foreground");
+    expect(row.className).toContain("min-h-11");
+    expect(doc.querySelector('[data-slot="popover-content"]')?.className).toContain("w-[26rem]");
+  });
+
+  test("the search list says Searching while it waits and No places match when nothing comes back", async () => {
+    let finish: (v: never[]) => void = () => {};
+    const a = adapter({ search: mock(() => new Promise<never[]>((resolve) => { finish = resolve; })) });
+    const r = multi([], a);
+    fireEvent.click(r.getByText("Add a place"));
+    const doc = r.baseElement.ownerDocument;
+    const input = await waitFor(() => (doc.querySelector('input[aria-label="Search for a place"]') as HTMLInputElement | null) ?? (() => { throw new Error("no popover"); })());
+    expect(r.getByText("Type at least two letters.")).toBeTruthy();
+    fireEvent.change(input, { target: { value: "zzzz" } });
+    await waitFor(() => r.getByText("Searching"));
+    await waitFor(() => expect(a.search).toHaveBeenCalled(), { timeout: 2000 });
+    finish([]);
+    await waitFor(() => r.getByText(/No places match/));
+  });
+
+  test("keyboard: arrows move the highlight and Enter picks the highlighted place", async () => {
+    const hits = [
+      { name: "Milford", area: "Connecticut, United States", lat: 41.2, lon: -73.06 },
+      { name: "Milford Lawns", area: "Connecticut, United States", lat: 41.3, lon: -73.1 },
+    ];
+    const a = adapter({ search: mock(async () => hits), add: mock(async () => "ent-picked") });
+    const r = multi([], a);
+    fireEvent.click(r.getByText("Add a place"));
+    const doc = r.baseElement.ownerDocument;
+    const input = await waitFor(() => (doc.querySelector('input[aria-label="Search for a place"]') as HTMLInputElement | null) ?? (() => { throw new Error("no popover"); })());
+    fireEvent.change(input, { target: { value: "milford" } });
+    await waitFor(() => expect(doc.querySelectorAll('[data-slot="command-item"]').length).toBe(2), { timeout: 2000 });
+    expect(doc.querySelector('[data-slot="command-item"][data-selected="true"]')?.textContent).toContain("Milford");
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+    await waitFor(() => expect(doc.querySelector('[data-slot="command-item"][data-selected="true"]')?.textContent).toContain("Milford Lawns"));
+    fireEvent.keyDown(input, { key: "Enter" });
+    await waitFor(() => expect(r.onValueChange).toHaveBeenCalledWith(["ent-picked"]));
+    expect(a.add).toHaveBeenCalledWith(hits[1]);
+  });
+
+  test("a blocked location names the browser's steps", async () => {
+    const r = multi([], adapter({ useCurrent: async () => false }));
+    fireEvent.click(r.getByText("Use current location"));
+    const note = await waitFor(() => r.getByText(/Location is blocked\./));
+    expect(note.textContent).toMatch(/site settings|Safari > Settings > Websites > Location/);
+    expect(note.textContent).toContain("pick a saved place");
+  });
+
   test("empty list shows the empty state", () => {
     const r = multi([], adapter());
     expect(r.getByText("No saved places yet.")).toBeTruthy();

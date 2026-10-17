@@ -38,11 +38,11 @@ export function underPluginApi(path: string, packageId: string): boolean {
   return path === base || path.startsWith(`${base}/`) || path.startsWith(`${base}?`);
 }
 
-/** True when `to` stays inside the package's own app routes. */
+/** True when `to` stays inside the package's own app routes: its pages, and its own settings area
+ * (`/settings/<id>`, the screen the app's Settings gear opens). */
 export function underAppRoute(to: string, packageId: string): boolean {
   if (climbs(to)) return false;
-  const base = `/apps/${packageId}`;
-  return to === base || to.startsWith(`${base}/`) || to.startsWith(`${base}?`);
+  return [`/apps/${packageId}`, `/settings/${packageId}`].some((base) => to === base || to.startsWith(`${base}/`) || to.startsWith(`${base}?`));
 }
 
 /** The typed event a client writes when a package page reaches outside its

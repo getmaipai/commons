@@ -193,11 +193,33 @@ export type WidgetRowNode = z.infer<typeof WidgetRowNodeSchema>;
 // APP-KIND-01/02: the two nodes a package app adds. Both bind to a package data call.
 export const PackageBindingSchema = BindingSchema.refine((b) => b.source === "package", "a package node binds source package");
 
+/** WEATHER-FIX-01: what a package page says when its data call cannot draw blocks for a stated reason, in the page's
+ * own words: the call needs the person to choose something (`needs_place`), the source is unreachable (`down`) or too
+ * slow (`timed_out`). Each button is one of: go to a screen of this app (`navigate`), ask the browser for the device
+ * location and write it to the page state `locate.state` (`locate`), or ask again (`retry`). */
+export const DataStateSchema = z.object({
+  icon: z.string().optional(),
+  title: z.string().min(1).max(60).optional(),
+  text: z.string().min(1).max(300),
+  actions: z
+    .array(
+      z.union([
+        z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), navigate: z.object({ to: z.string().min(1) }).strict() }).strict(),
+        z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), locate: z.object({ state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40) }).strict() }).strict(),
+        z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), retry: z.literal(true) }).strict(),
+      ]),
+    )
+    .max(3)
+    .optional(),
+}).strict();
+export type DataState = z.infer<typeof DataStateSchema>;
+
 export const AnswerBlocksNodeSchema = z.object({
   type: z.literal("answer_blocks"),
   bind: PackageBindingSchema,
   kinds: z.array(z.string()).min(1).optional(),
   empty_state: EmptyStateNodeSchema.optional(),
+  states: z.object({ needs_place: DataStateSchema, down: DataStateSchema, timed_out: DataStateSchema }).partial().strict().optional(),
   actions: z
     .object({
       open: ActionSchema,

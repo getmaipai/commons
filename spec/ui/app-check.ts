@@ -26,7 +26,9 @@ function checkAction(action: unknown, packageId: string, where: string, out: str
   const navigate = action.navigate;
   if (isObject(navigate) && typeof navigate.to === "string") {
     const base = `/apps/${packageId}`;
-    if (navigate.to !== base && !navigate.to.startsWith(`${base}/`)) out.push(`${where}: navigate.to "${navigate.to}" must stay under ${base}`);
+    const settings = `/settings/${packageId}`;
+    const inside = (root: string) => navigate.to === root || (navigate.to as string).startsWith(`${root}/`);
+    if (!inside(base) && !inside(settings)) out.push(`${where}: navigate.to "${navigate.to}" must stay under ${base} (or ${settings}, the app's own settings)`);
   }
   const call = action.call;
   if (isObject(call) && typeof call.target === "string" && !call.target.startsWith(`/api/plugins/${packageId}/`)) {
@@ -54,6 +56,10 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     checkBinding(node.bind, `${where} answer_blocks`, data, "blocks", out);
     // NEWS-00: the actions map is the one place a package page may use `play` (Listen: the hub's own speech route).
     if (isObject(node.actions)) for (const [role, action] of Object.entries(node.actions)) checkAction(action, packageId, `${where} answer_blocks.actions.${role}`, out, role === "listen");
+    // WEATHER-FIX-01: a stated-reason button may go to the app's own screens only.
+    if (isObject(node.states)) for (const [reason, notice] of Object.entries(node.states)) {
+      if (isObject(notice) && Array.isArray(notice.actions)) for (const action of notice.actions) checkAction(action, packageId, `${where} answer_blocks.states.${reason}`, out);
+    }
   }
   if (type === "list") {
     checkBinding(node.bind, `${where} list`, data, "rows", out);

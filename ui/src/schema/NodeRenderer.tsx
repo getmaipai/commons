@@ -20,6 +20,7 @@ import { Input } from "@/kit/ui/input";
 import { Checkbox } from "@/kit/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/kit/ui/tabs";
 import { getIcon } from "@/kit/icons";
+import { locationBlockedHelp } from "@/kit/geolocationHelp";
 import { AnswerBlockView } from "@/kit/elements/answer-block";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { PageStateContext } from "@/kit/schema/packageScope";
@@ -45,6 +46,7 @@ import type {
   AnswerBlocksNode,
   PickerNode,
   TabsNode,
+  DataState,
 } from "@/kit/schema/types";
 import type { WidgetData, WidgetDescriptor } from "@/kit/widgets";
 
@@ -120,6 +122,8 @@ interface PackageDataBody {
   blocks?: unknown[];
   rows?: Row[];
   degraded?: boolean;
+  /** The data call needs the person to choose something first (`"place"`): not a failure, and no blocks. */
+  needs?: string;
 }
 
 // APP-KIND-02. Draws the blocks a package data call returns, each through the kit's one
@@ -164,6 +168,53 @@ function newsActionsFor(
   };
 }
 
+/** Which stated reason (if any) a failed or empty data call came with. The hub answers `{needs: "place"}` with no
+ * blocks, or fails with `code` "needs_place", "down" or "timed_out". Anything else keeps the generic states. */
+function dataStateKey(query: { data?: PackageDataBody; error: unknown }): "needs_place" | "down" | "timed_out" | null {
+  if (query.data?.needs === "place") return "needs_place";
+  const code = query.error instanceof ApiError ? query.error.code : undefined;
+  return code === "needs_place" || code === "down" || code === "timed_out" ? code : null;
+}
+
+function DataStateNotice({ notice, state, onRetry }: { notice: DataState; state: Row; onRetry: () => void }) {
+  const { dispatch, lastError } = useDispatchAction();
+  const locateState = notice.actions?.flatMap((a) => ("locate" in a ? [a.locate.state] : []))[0] ?? "place";
+  const location = useDeviceLocation(locateState, state);
+  const Icon = getIcon(notice.icon ?? "map-pin");
+  return (
+    <div data-slot="data-state" className="mx-auto flex w-full max-w-md min-w-0 flex-col items-center gap-3 px-2 py-10 text-center">
+      <Icon className="size-10 text-muted-foreground" aria-hidden />
+      {notice.title ? <h2 className="text-lg font-medium">{notice.title}</h2> : null}
+      <p className="text-base text-muted-foreground">{notice.text}</p>
+      {notice.actions?.length ? (
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {notice.actions.map((action, i) => {
+            const ActionIcon = action.icon ? getIcon(action.icon) : null;
+            return (
+              <Button
+                key={i}
+                type="button"
+                variant={i === 0 ? "default" : "secondary"}
+                disabled={"locate" in action && location.busy}
+                onClick={() => {
+                  if ("navigate" in action) dispatch({ navigate: action.navigate });
+                  else if ("locate" in action) location.locate("current");
+                  else onRetry();
+                }}
+              >
+                {ActionIcon ? <ActionIcon aria-hidden="true" /> : null}
+                {action.label}
+              </Button>
+            );
+          })}
+        </div>
+      ) : null}
+      {location.note ? <p role="status" className="text-sm text-muted-foreground">{location.note}</p> : null}
+      {lastError ? <p role="status" className="text-sm text-destructive">{lastError}</p> : null}
+    </div>
+  );
+}
+
 function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: Row }) {
   const query = useBinding<PackageDataBody>(node.bind, state);
   const { dispatch, pendingConfirm, lastError } = useDispatchAction();
@@ -173,6 +224,11 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
     ? (query.data.blocks ?? []).filter((block) => !kinds || kinds.includes(String((block as { kind?: unknown } | null)?.kind)))
     : undefined;
   const emptyText = node.empty_state?.text ?? "Nothing to show right now.";
+  const stated = dataStateKey(query);
+  const notice = stated ? node.states?.[stated] : undefined;
+  if (notice && !(query.isFetching && query.data === undefined)) {
+    return <DataStateNotice notice={notice} state={state} onRetry={() => query.refetch()} />;
+  }
   return (
     <AsyncState
       data={query.isError ? null : blocks}
@@ -197,61 +253,91 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
   );
 }
 
-const GEOLOCATION_REFUSED = "Location is off for this site. Choose a saved place instead.";
+
+
+const GEOLOCATION_UNSUPPORTED = "This browser cannot share its location. Choose a saved place instead.";
 
 // The device location, on the choice that asked for it and never before. Two decimals is
 // about a kilometre, which is all a forecast needs; the hub coarsens further for a child.
 function currentPosition(): Promise<{ lat: number; lon: number }> {
   return new Promise((resolve, reject) => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
-      reject(new Error(GEOLOCATION_REFUSED));
+      reject(new Error(GEOLOCATION_UNSUPPORTED));
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (position) => resolve({ lat: Number(position.coords.latitude.toFixed(2)), lon: Number(position.coords.longitude.toFixed(2)) }),
-      () => reject(new Error(GEOLOCATION_REFUSED)),
+      (error) => reject(new Error(error?.code === 2 || error?.code === 3 ? "unavailable" : "denied")),
       { enableHighAccuracy: false, maximumAge: 60_000, timeout: 10_000 },
     );
   });
 }
 
-function PickerControl({ node, state, rows }: { node: PickerNode; state: Row; rows: Row[] }) {
+/** The device location written to page state on the choice that asked for it (never before): the value under
+ * `stateName`, the coordinates under `<stateName>_geo`. A refusal sets `note` with the browser's own steps. */
+function useDeviceLocation(stateName: string, state: Row) {
   const writer = useContext(PageStateContext);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const latest = useRef(0);
-  const leading = node.leading ?? [];
-  const current = state[node.state];
+  const counterRef = useRef(0);
+  counterRef.current = typeof state[`${stateName}_geo_n`] === "number" ? (state[`${stateName}_geo_n`] as number) : 0;
 
-  function choose(value: string) {
+  function locate(value: string) {
     setNote(null);
-    const option = leading.find((o) => o.value === value);
-    if (option?.needs !== "geolocation") {
-      // A named place never travels with stale coordinates.
-      writer?.merge({ [node.state]: value, [`${node.state}_geo`]: undefined, [`${node.state}_geo_n`]: undefined });
-      return;
-    }
     const ticket = ++latest.current;
     setBusy(true);
     currentPosition()
       .then((position) => {
         if (ticket !== latest.current) return;
-        const counter = typeof state[`${node.state}_geo_n`] === "number" ? (state[`${node.state}_geo_n`] as number) : 0;
-        writer?.merge({ [node.state]: value, [`${node.state}_geo`]: position, [`${node.state}_geo_n`]: counter + 1 });
+        writer?.merge({ [stateName]: value, [`${stateName}_geo`]: position, [`${stateName}_geo_n`]: counterRef.current + 1 });
       })
       .catch((e: unknown) => {
-        if (ticket === latest.current) setNote(e instanceof Error ? e.message : GEOLOCATION_REFUSED);
+        if (ticket !== latest.current) return;
+        const reason = e instanceof Error ? e.message : "";
+        setNote(reason === GEOLOCATION_UNSUPPORTED ? GEOLOCATION_UNSUPPORTED : reason === "unavailable" ? "Could not find your location just now. Try again, or choose a saved place." : locationBlockedHelp());
       })
       .finally(() => {
         if (ticket === latest.current) setBusy(false);
       });
   }
+  /** Cancels a request in flight and clears the note (a named place was chosen instead). */
+  function cancel() {
+    latest.current += 1;
+    setBusy(false);
+    setNote(null);
+  }
+  return { locate, cancel, busy, note };
+}
+
+const PinIcon = getIcon("map-pin");
+
+function PickerControl({ node, state, rows }: { node: PickerNode; state: Row; rows: Row[] }) {
+  const writer = useContext(PageStateContext);
+  const location = useDeviceLocation(node.state, state);
+  const leading = node.leading ?? [];
+  const current = state[node.state];
+  const { busy, note } = location;
+
+  function choose(value: string) {
+    const option = leading.find((o) => o.value === value);
+    if (option?.needs !== "geolocation") {
+      // A named place never travels with stale coordinates.
+      location.cancel();
+      writer?.merge({ [node.state]: value, [`${node.state}_geo`]: undefined, [`${node.state}_geo_n`]: undefined });
+      return;
+    }
+    location.locate(value);
+  }
 
   return (
-    <div className="flex w-full min-w-0 max-w-3xl flex-col gap-2">
+    <div className="flex w-full min-w-0 max-w-sm flex-col gap-2">
       <Select value={typeof current === "string" ? current : ""} onValueChange={choose} disabled={busy}>
         <SelectTrigger aria-label={node.label} width="full">
-          <SelectValue placeholder={node.placeholder ?? node.label} />
+          <span className="flex min-w-0 items-center gap-2">
+            <PinIcon aria-hidden="true" className="text-muted-foreground" />
+            <SelectValue placeholder={node.placeholder ?? node.label} />
+          </span>
         </SelectTrigger>
         <SelectContent>
           {leading.map((option) => {
@@ -274,7 +360,7 @@ function PickerControl({ node, state, rows }: { node: PickerNode; state: Row; ro
         </SelectContent>
       </Select>
       {note ? (
-        <p role="status" className="text-base text-muted-foreground">
+        <p role="status" className="text-sm text-muted-foreground">
           {note}
         </p>
       ) : null}

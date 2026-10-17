@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.253] - ui-v0.5.253
+
+WEATHER-FIX-01. Place search reads on one line: `PopoverContent` gains `width="wide"` (26 rem, never wider than the screen) and `CommandItem` gains `density="roomy"` (a 44 px row with a filled `accent` highlight); the location field's Add a place list uses both, shows the name then the region muted and truncating on the same row, says Searching while it waits and "No places match" when nothing comes back. The single default-place field stacks its select, button and note so nothing runs behind a popover, and a blocked location names the browser's own steps (Safari: Safari > Settings > Websites > Location, set the site to Allow). Schema pages: `answer_blocks` gains `states` (`needs_place`, `down`, `timed_out`: an icon, title, sentence and up to three buttons that navigate inside the app, ask for the device location on that click, or retry) so a page says why it has nothing to draw instead of one generic error; the picker shows a pin and a narrower select; a package page may navigate to its own `/settings/<id>`. `AppRail`/`FullLayout` gain `allAppsHref` (the grid button becomes an All apps link). New `AppDirectory` primitive: every app on one page with a focused search box, Favorites first then categories, a star on each tile, arrow-key navigation and an empty state.
+
 ## [0.5.252] - ui-v0.5.252
 
 NEWS-01 polish after the judged captures (1280 and 390, light and dark): the `StoryFeed` hero is 3:2 and the featured cards 16:9 so the two stacked cards match the hero's height; the card menu sits over the picture's corner instead of under the text; a card draws edge to edge with no strip above its picture; a story row's source line reads once (publisher, time, sources). Icons `flask-conical`, `film` and `trophy` for the News topics (a test keeps `spec/news/topics.json` and the registry in step).

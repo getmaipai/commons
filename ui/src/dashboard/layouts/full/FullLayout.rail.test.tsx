@@ -218,6 +218,18 @@ describe("LEFTNAV-APPS-01 pinned apps and the launcher", () => {
     expect(calls).toEqual([["/apps/notes", true], ["/apps/weather", false]]);
   });
 
+  test("with allAppsHref the grid button is an All apps link to that page, not a popover, and is marked on it", () => {
+    const apps = [app("weather", true), app("notes", false)];
+    const at = (path: string) => render(<MemoryRouter initialEntries={[path]}><TooltipProvider><AppRail apps={apps} allAppsHref="/all-apps" /></TooltipProvider></MemoryRouter>);
+    const away = at("/apps/weather");
+    const link = away.getByRole("link", { name: "All apps" });
+    expect(link.getAttribute("href")).toBe("/all-apps");
+    expect(link.getAttribute("aria-current")).toBeNull();
+    expect(away.queryByRole("button", { name: "All apps" })).toBeNull();
+    cleanup();
+    expect(at("/all-apps").getByRole("link", { name: "All apps" }).getAttribute("aria-current")).toBe("page");
+  });
+
   test("a seventh app cannot be pinned while six are", async () => {
     const apps = [...Array.from({ length: 6 }, (_, i) => app(`app${i}`, true)), app("extra", false)];
     const view = renderApps("/", apps);

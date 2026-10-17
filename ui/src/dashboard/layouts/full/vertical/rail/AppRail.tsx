@@ -44,6 +44,9 @@ export interface AppRailProps {
    * and unpins through `onTogglePin`. Without `apps` the rail is exactly the built-in destinations. */
   apps?: RailApp[];
   onTogglePin?: (url: string, pinned: boolean) => void;
+  /** WEATHER-FIX-01: the route of the host's own All apps page. When set, the grid button at the rail's foot opens
+   * that page (search, favorites, every app) instead of the small popover list, which scales to dozens of apps. */
+  allAppsHref?: string;
   /** App destination to keep selected when the current route is outside that app (for example Settings). */
   activeAppHref?: string;
 }
@@ -157,7 +160,30 @@ function AppLauncher({ apps, onTogglePin, isActive }: { apps: RailApp[]; onToggl
   );
 }
 
-export default function AppRail({ searchRemote, itemStatus, profile, activeAppHref, tourId, itemTourId, apps, onTogglePin }: AppRailProps) {
+function AllAppsLink({ href, active }: { href: string; active: boolean }) {
+  const GridIcon = getIcon("layout-grid");
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Link
+            to={railHref(href)}
+            aria-label="All apps"
+            aria-current={active ? "page" : undefined}
+            data-active={active ? "" : undefined}
+            data-slot="app-rail-launcher"
+            className={cn(railButton, hitArea(1), active && "bg-foreground/10 text-foreground")}
+          />
+        }
+      >
+        <GridIcon className="size-5" aria-hidden />
+      </TooltipTrigger>
+      <TooltipContent side="right">All apps</TooltipContent>
+    </Tooltip>
+  );
+}
+
+export default function AppRail({ searchRemote, itemStatus, profile, activeAppHref, tourId, itemTourId, apps, onTogglePin, allAppsHref }: AppRailProps) {
   const { pathname } = useLocation();
   const all = SidebarContent.flatMap((section) => flatten(section.items));
   // The brand mark is the Home destination (owner, 2026-10-06: "replace
@@ -279,7 +305,7 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
       ) : null}
 
       <div className="mt-auto flex flex-col items-center gap-1">
-        {apps?.length ? <AppLauncher apps={apps} onTogglePin={onTogglePin} isActive={isActive} /> : null}
+        {apps?.length ? allAppsHref ? <AllAppsLink href={allAppsHref} active={isRailItemActive(pathname, allAppsHref)} /> : <AppLauncher apps={apps} onTogglePin={onTogglePin} isActive={isActive} /> : null}
         {profile}
       </div>
     </nav>

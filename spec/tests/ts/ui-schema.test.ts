@@ -151,6 +151,17 @@ describe("UI schema, package apps", () => {
     expect(validate({ type: "answer_blocks", bind: forecast, extra: true })).toBe(false);
   });
 
+  test("answer_blocks states: three stated reasons, each a sentence with at most three buttons of the three kinds", () => {
+    const withStates = (states: unknown) => ({ type: "answer_blocks", bind: forecast, states });
+    const needs = { text: "Choose a place.", actions: [{ label: "Add a place", navigate: { to: "/settings/weather" } }, { label: "Use my location", locate: { state: "place" } }, { label: "Try again", retry: true }] };
+    expect(validate(withStates({ needs_place: needs, down: { text: "Offline." }, timed_out: { text: "Slow." } }))).toBe(true);
+    expect(validate(withStates({ elsewhere: { text: "x" } }))).toBe(false);
+    expect(validate(withStates({ down: {} }))).toBe(false);
+    expect(validate(withStates({ down: { text: "x", actions: [{ label: "A", retry: true }, { label: "B", retry: true }, { label: "C", retry: true }, { label: "D", retry: true }] } }))).toBe(false);
+    expect(validate(withStates({ down: { text: "x", actions: [{ label: "A", call: {} }] } }))).toBe(false);
+    expect(validate(withStates({ needs_place: { text: "x", actions: [{ label: "A", locate: { state: "Place" } }] } }))).toBe(false);
+  });
+
   test("a picker needs a state name and a label; bind needs both item fields", () => {
     expect(validate({ type: "picker", state: "place", label: "Place", leading: [{ value: "current", label: "Current location", needs: "geolocation" }] })).toBe(true);
     expect(validate({ type: "picker", state: "Place", label: "Place" })).toBe(false);

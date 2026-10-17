@@ -194,6 +194,69 @@ describe("answer_blocks", () => {
   });
 });
 
+describe("answer_blocks stated reasons (WEATHER-FIX-01)", () => {
+  const stated: UiNode = {
+    ...(blocksNode as object),
+    states: {
+      needs_place: { icon: "map-pin", title: "Choose a place", text: "Weather needs a place.", actions: [{ label: "Add a place", navigate: { to: "/settings/demo" } }, { label: "Use my location", locate: { state: "place" } }] },
+      down: { icon: "cloud-off", title: "Weather is not reachable", text: "Check that this computer is online.", actions: [{ label: "Try again", retry: true }] },
+      timed_out: { text: "Too slow." },
+    },
+  } as UiNode;
+
+  test("{needs: place} shows the page's own words and its two buttons, not the generic empty state", async () => {
+    dataBody = { as_of: "x", blocks: [], needs: "place" };
+    const view = inScope(stated);
+    await view.findByText("Weather needs a place.");
+    expect(view.getByRole("heading", { name: "Choose a place" })).toBeTruthy();
+    expect(view.getByRole("button", { name: "Add a place" })).toBeTruthy();
+    expect(view.getByRole("button", { name: "Use my location" })).toBeTruthy();
+    expect(view.queryByText("No weather right now.")).toBeNull();
+  });
+
+  test("Use my location asks the browser on that click only, then refetches with the coordinates", async () => {
+    dataBody = { as_of: "x", blocks: [], needs: "place" };
+    const getCurrentPosition = mock((ok: (p: { coords: { latitude: number; longitude: number } }) => void) => ok({ coords: { latitude: 47.6101, longitude: -122.3301 } }));
+    Object.defineProperty(navigator, "geolocation", { value: { getCurrentPosition }, configurable: true });
+    const page = { type: "page", id: "demo", title: "Demo", body: [stated] };
+    const view = renderWithQueryClient(<MemoryRouter><SchemaPage page={page as never} packageId="demo" /></MemoryRouter>);
+    await view.findByText("Weather needs a place.");
+    expect(getCurrentPosition).not.toHaveBeenCalled();
+    fireEvent.click(view.getByRole("button", { name: "Use my location" }));
+    await waitFor(() => expect(calls.some((c) => (c.body as { current?: unknown } | undefined)?.current !== undefined)).toBe(true));
+    expect(calls.find((c) => (c.body as { current?: unknown } | undefined)?.current !== undefined)!.body).toEqual({ place: "current", current: { lat: 47.61, lon: -122.33 } });
+  });
+
+  test("a refused location names the browser's own steps beside the button", async () => {
+    dataBody = { as_of: "x", blocks: [], needs: "place" };
+    Object.defineProperty(navigator, "geolocation", { value: { getCurrentPosition: (_ok: unknown, fail: (e: { code: number }) => void) => fail({ code: 1 }) }, configurable: true });
+    const view = inScope(stated);
+    await view.findByText("Weather needs a place.");
+    fireEvent.click(view.getByRole("button", { name: "Use my location" }));
+    await view.findByText(/Location is blocked\./);
+  });
+
+  test("a hub failure with code down or timed_out shows that reason; Try again asks again", async () => {
+    let n = 0;
+    globalThis.fetch = mock(() => { n += 1; return Promise.resolve(new Response(JSON.stringify({ error: "x", kind: "down", code: "down" }), { status: 502 })); }) as unknown as typeof fetch;
+    const view = inScope(stated);
+    await view.findByText("Check that this computer is online.");
+    const before = n;
+    fireEvent.click(view.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(n).toBeGreaterThan(before));
+    cleanup();
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({ error: "x", code: "timed_out" }), { status: 502 }))) as unknown as typeof fetch;
+    const slow = inScope(stated);
+    await slow.findByText("Too slow.");
+  });
+
+  test("a failure with no stated reason, or a page with no states, keeps the generic state", async () => {
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({ error: "x" }), { status: 500 }))) as unknown as typeof fetch;
+    const view = inScope(stated);
+    await view.findByText("No weather right now.");
+  });
+});
+
 describe("picker and page state", () => {
   const page = {
     type: "page",
@@ -263,7 +326,7 @@ describe("picker and page state", () => {
     const view = renderPage();
     await waitFor(() => expect(calls.length).toBeGreaterThan(0));
     await choose(view, "Current location");
-    await view.findByText("Location is off for this site. Choose a saved place instead.");
+    await view.findByText(/Location is blocked\./);
     expect(view.queryByText("Showing where you are.")).toBeNull();
   });
 });
