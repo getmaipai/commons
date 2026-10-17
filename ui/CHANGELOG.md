@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.237] - ui-v0.5.237
+
+`weather_card` gains a compact variant and a text alternative (WEATHER-CARD-01). `AnswerBlockView` takes `compact` (render-only, passed to the `weather_card` Element as `variant="compact"`): the hero alone, shorter, for a dashboard Today card. The hero now shows today's high and low, and a visually hidden sentence gives the place, the current conditions, the high and the low while the drawn hero is hidden from assistive technology. The full variant is unchanged. Additive.
+
 ## [0.5.236] - ui-v0.5.236
 
 `Input` gains an optional `valid` prop: the border and focus ring take the success hue (`--hue-teal`) and `data-valid="true"` is set. `aria-invalid` still wins. Colour is never the only signal, so callers pair it with visible text or an icon. Default look is unchanged. Additive.

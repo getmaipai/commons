@@ -28,6 +28,9 @@ export interface AnswerBlockHandlers {
   onImageOpen?: (blockId: string, imageId: string) => void;
   /** A `schedule_card` toggle was pressed. Unset: the card is read-only. */
   onScheduleToggle?: (blockId: string) => void;
+  /** Draw a block in its small form where its Element has one (today the
+   * `weather_card`: the hero alone, for a dashboard card). Render-only. */
+  compact?: boolean;
 }
 
 export interface AnswerBlockViewProps
@@ -82,7 +85,7 @@ class Guard extends Component<
 // inferred type is `any`; `kind` selects which props shape the cast names.
 function renderKind(
   block: any,
-  { resolveImageSrc, onImageOpen, onScheduleToggle }: AnswerBlockHandlers,
+  { resolveImageSrc, onImageOpen, onScheduleToggle, compact }: AnswerBlockHandlers,
 ): ReactNode {
   const props = block.props;
   switch (block.kind) {
@@ -122,7 +125,7 @@ function renderKind(
     case "comparison":
       return <ComparisonCard {...props} />;
     case "weather_card":
-      return <WeatherCard {...props} />;
+      return <WeatherCard {...props} variant={compact ? "compact" : "full"} />;
     default:
       return null;
   }
@@ -133,6 +136,7 @@ export function AnswerBlockView({
   resolveImageSrc,
   onImageOpen,
   onScheduleToggle,
+  compact,
   className,
   ...props
 }: AnswerBlockViewProps) {
@@ -161,7 +165,7 @@ export function AnswerBlockView({
         className={className}
         {...props}
       >
-        {renderKind(valid, { resolveImageSrc, onImageOpen, onScheduleToggle })}
+        {renderKind(valid, { resolveImageSrc, onImageOpen, onScheduleToggle, compact })}
       </div>
     </Guard>
   );

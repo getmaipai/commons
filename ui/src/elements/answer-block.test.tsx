@@ -187,3 +187,11 @@ describe("the inline story: a block between two paragraphs", () => {
     expect(kids[0]!.textContent + "\n\n" + kids[2]!.textContent).toBe(INLINE_REPLY);
   });
 });
+
+describe("AnswerBlockView compact", () => {
+  test("compact reaches the weather card and leaves the day strip out", () => {
+    const { container } = render(<AnswerBlockView block={fixture("weather_card")} compact />);
+    expect(container.querySelector('[data-slot="weather-card"]')?.getAttribute("data-variant")).toBe("compact");
+    expect(container.querySelectorAll('[data-slot="weather-day"]')).toHaveLength(0);
+  });
+});

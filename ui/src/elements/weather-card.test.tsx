@@ -88,3 +88,26 @@ describe("WeatherCard", () => {
     expect(render(<WeatherCard {...props} />).container.innerHTML).toBe(a);
   });
 });
+
+describe("WeatherCard accessibility and variants", () => {
+  test("a visually hidden sentence gives the conditions, the high and the low; the visible hero is hidden from assistive tech", () => {
+    const { container } = render(<WeatherCard {...props} />);
+    const summary = container.querySelector('[data-slot="weather-summary"]')!;
+    expect(summary.className).toContain("sr-only");
+    expect(summary.textContent).toContain(`Weather in ${props.place}`);
+    expect(summary.textContent).toMatch(/High \d+, low \d+\./);
+    expect(container.querySelector('[data-slot="weather-hero"] [aria-hidden="true"] [data-slot="weather-range"]')).not.toBeNull();
+  });
+
+  test("compact draws the hero alone and keeps the sentence", () => {
+    const { container } = render(<WeatherCard {...props} variant="compact" />);
+    expect(container.querySelector('[data-slot="weather-card"]')!.getAttribute("data-variant")).toBe("compact");
+    expect(container.querySelectorAll('[data-slot="weather-day"]')).toHaveLength(0);
+    expect(container.querySelector('[data-slot="weather-summary"]')).not.toBeNull();
+  });
+
+  test("full is the default", () => {
+    const { container } = render(<WeatherCard {...props} />);
+    expect(container.querySelector('[data-slot="weather-card"]')!.getAttribute("data-variant")).toBe("full");
+  });
+});

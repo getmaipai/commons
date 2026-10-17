@@ -230,6 +230,7 @@ export function WeatherCard({
   daily,
   attribution,
   locale = "en-US",
+  variant = "full",
   className,
   ...props
 }: Omit<
@@ -244,7 +245,15 @@ export function WeatherCard({
   attribution: string;
   /** Locale for the weekday names. Render-only; not part of the spec block. */
   locale?: string;
+  /** `compact` draws the hero alone, shorter, for a dashboard card. Render-only; not part of the spec block. */
+  variant?: "full" | "compact";
 }) {
+  const compact = variant === "compact";
+  const today = daily[0];
+  const unitWord = unit === "C" ? "degrees Celsius" : "degrees Fahrenheit";
+  const summary =
+    `Weather in ${place}: ${Math.round(current.temp)} ${unitWord} and ${current.condition.toLowerCase()}` +
+    (today ? `. High ${Math.round(today.high)}, low ${Math.round(today.low)}.` : ".");
   const cls = weatherClassOf(current.code);
   const tod = current.is_day ? "day" : "night";
   const ConditionIcon = current.is_day ? ICONS[cls] : cls === "clear" ? MoonIcon : ICONS[cls];
@@ -257,38 +266,52 @@ export function WeatherCard({
       data-slot="weather-card"
       data-class={cls}
       data-day={current.is_day ? "true" : "false"}
+      data-variant={variant}
       className={cn(paper, "w-full max-w-md overflow-hidden rounded-2xl", className)}
       {...props}
     >
       <div
         data-slot="weather-hero"
         style={heroStyle}
-        className="relative isolate flex min-h-52 flex-col justify-between overflow-hidden p-5"
+        className={cn(
+          "relative isolate flex flex-col justify-between overflow-hidden",
+          compact ? "min-h-36 gap-3 p-4" : "min-h-52 p-5",
+        )}
       >
+        <p className="sr-only" data-slot="weather-summary">{summary}</p>
         <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
           <Sky cls={cls} isDay={current.is_day} />
         </div>
         <div aria-hidden className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--weather-scrim)" }} />
-        <div className="flex items-start justify-between gap-3">
+        <div aria-hidden className="flex items-start justify-between gap-3">
           <span className="text-[11px] font-medium tracking-[0.14em] uppercase">{place}</span>
           <span className="text-end text-[11px]">{attribution}</span>
         </div>
-        <div className="flex items-end justify-between gap-3">
-          <span className="text-[64px] leading-none font-light tabular-nums">
+        <div aria-hidden className="flex items-end justify-between gap-3">
+          <span className={cn("leading-none font-light tabular-nums", compact ? "text-5xl" : "text-[64px]")}>
             {degrees(current.temp)}
             <span className="text-2xl">{unit}</span>
           </span>
-          <span className="flex items-center gap-1.5 pb-1.5 text-sm font-medium">
-            <ConditionIcon className="size-4" aria-hidden />
-            {current.condition}
+          <span className="flex flex-col items-end gap-1 pb-1.5 text-sm">
+            <span className="flex items-center gap-1.5 font-medium">
+              <ConditionIcon className="size-4" aria-hidden />
+              {current.condition}
+            </span>
+            {today ? (
+              <span data-slot="weather-range" className="text-xs tabular-nums">
+                H {degrees(today.high)} L {degrees(today.low)}
+              </span>
+            ) : null}
           </span>
         </div>
       </div>
+      {compact ? null : (
       <ul className="flex overflow-x-auto px-1.5 py-3">
         {daily.slice(0, 8).map((day) => (
           <DayColumn key={day.date} day={day} unit={unit} locale={locale} />
         ))}
       </ul>
+      )}
     </div>
   );
 }
