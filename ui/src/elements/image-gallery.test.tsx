@@ -55,6 +55,27 @@ describe("ImageGallery", () => {
     expect(queryByRole("dialog")).toBeNull();
   });
 
+  test("actions: an outline button per action with its hint; none when the list is empty; a disabled one does not fire", () => {
+    const images = [{ id: "a", src: "https://example.test/a.jpg", alt: "A" }];
+    const picked: string[] = [];
+    const { getByRole, getByText, container, rerender } = render(
+      <ImageGallery
+        images={images}
+        actions={[
+          { id: "detail", label: "Make it Detailed", hint: "Slower, with finer detail", onSelect: () => picked.push("detail") },
+          { id: "off", label: "Off", disabled: true, onSelect: () => picked.push("off") },
+        ]}
+      />,
+    );
+    fireEvent.click(getByRole("button", { name: "Make it Detailed" }));
+    fireEvent.click(getByRole("button", { name: "Off" }));
+    expect(picked).toEqual(["detail"]);
+    expect(getByText("Slower, with finer detail")).toBeTruthy();
+    expect(container.querySelector('[data-slot="image-gallery-actions"]')).not.toBeNull();
+    rerender(<ImageGallery images={images} actions={[]} />);
+    expect(container.querySelector('[data-slot="image-gallery-actions"]')).toBeNull();
+  });
+
   test("no onEditImage: no Edit button", () => {
     const { queryByRole } = render(
       <ImageGallery images={[{ id: "a", src: "https://example.test/a.jpg", alt: "A" }]} />,

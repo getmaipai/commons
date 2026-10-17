@@ -22,6 +22,7 @@ import {
 } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/elements/ui/dialog";
 import { cn } from "cn";
+import { Button } from "./ui/button";
 import { TooltipIconButton } from "./tooltip-icon-button";
 import { safeHref } from "./href";
 import { clamp } from "./range";
@@ -42,6 +43,16 @@ export interface GalleryImageEdit {
   index: number;
 }
 
+/** A choice offered under the pictures, such as making them again another way. */
+export interface GalleryAction {
+  id: string;
+  label: string;
+  /** A short muted line beside the button that says what pressing it does. */
+  hint?: string | undefined;
+  disabled?: boolean | undefined;
+  onSelect: () => void;
+}
+
 export interface ImageGalleryProps extends Omit<
   ComponentProps<"div">,
   "children"
@@ -58,6 +69,8 @@ export interface ImageGalleryProps extends Omit<
   editLabel?: string | undefined;
   /** `large` shows a single picture across the whole gallery width at its own proportions, never cropped to a square (a picture the person made themselves, not a thumbnail among others); several pictures keep the square grid. Default `default`. */
   size?: "default" | "large" | undefined;
+  /** Outline buttons under the pictures, each with an optional muted hint. None by default. */
+  actions?: readonly GalleryAction[] | undefined;
 }
 
 const keyForImage = (image: GalleryImage) => `${image.id}\u0000${image.src}`;
@@ -70,6 +83,7 @@ export function ImageGallery({
   canEditImage,
   editLabel = "Edit picture",
   size = "default",
+  actions,
   className,
   ...props
 }: ImageGalleryProps) {
@@ -209,6 +223,18 @@ export function ImageGallery({
           );
         })}
       </div>
+      {actions && actions.length > 0 ? (
+        <div data-slot="image-gallery-actions" className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+          {actions.map((action) => (
+            <div key={action.id} className="flex min-w-0 flex-wrap items-center gap-2">
+              <Button type="button" variant="outline" size="sm" disabled={action.disabled} onClick={action.onSelect}>
+                {action.label}
+              </Button>
+              {action.hint ? <span className="text-muted-foreground text-xs">{action.hint}</span> : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
       {activeImage ? (
         <Dialog
           open

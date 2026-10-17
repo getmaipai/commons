@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.255] - ui-v0.5.255
+
+IMGGEN-QUALITY-01. `ImageGallery` gains `actions` (`{ id, label, hint?, disabled?, onSelect }[]`): outline buttons under the pictures, each with a short muted hint, so a picture card can offer "Make it Detailed" or "Make it Quick" without a Home wrapper. Additive: no `actions`, no change.
+
 ## [0.5.254] - ui-v0.5.254
 
 `AppDirectory`: the Favorites heading reads "Favorites 3 of 6 in the left rail" to a screen reader (a space between the two parts).
