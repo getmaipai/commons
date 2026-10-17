@@ -56,7 +56,7 @@ export interface ImageGalleryProps extends Omit<
   canEditImage?: ((image: GalleryImageEdit) => boolean) | undefined;
   /** Accessible name of the Edit button. Default "Edit picture". */
   editLabel?: string | undefined;
-  /** `large` shows a single picture across the whole gallery width (a picture the person made themselves, not a thumbnail among others); several pictures keep the grid. Default `default`. */
+  /** `large` shows a single picture across the whole gallery width at its own proportions, never cropped to a square (a picture the person made themselves, not a thumbnail among others); several pictures keep the square grid. Default `default`. */
   size?: "default" | "large" | undefined;
 }
 
@@ -124,6 +124,7 @@ export function ImageGallery({
   };
 
   if (images.length === 0) return null;
+  const natural = size === "large" && images.length === 1;
 
   return (
     <div
@@ -131,7 +132,7 @@ export function ImageGallery({
       className={cn("@container w-full max-w-md", className)}
       {...props}
     >
-      <div className={cn("grid gap-2", size === "large" && images.length === 1 ? "grid-cols-1" : "grid-cols-2 @sm:grid-cols-3")}>
+      <div className={cn("grid gap-2", natural ? "grid-cols-1" : "grid-cols-2 @sm:grid-cols-3")}>
         {visibleImages.map((image, imageIndex) => {
           const failed = failedImages.has(keyForImage(image));
           const overflow =
@@ -156,7 +157,8 @@ export function ImageGallery({
               onClick={(event) => open(imageIndex, event.currentTarget)}
               className={cn(
                 field,
-                "focus-visible:ring-foreground/30 relative aspect-square overflow-hidden rounded-xl transition-[transform,background-color] duration-150 outline-none hover:scale-[1.01] focus-visible:ring-1 active:scale-[0.98] motion-reduce:transition-none",
+                natural ? "block w-full" : "aspect-square",
+                "focus-visible:ring-foreground/30 relative overflow-hidden rounded-xl transition-[transform,background-color] duration-150 outline-none hover:scale-[1.01] focus-visible:ring-1 active:scale-[0.98] motion-reduce:transition-none",
               )}
             >
               {failed ? (
@@ -168,7 +170,7 @@ export function ImageGallery({
                   src={image.src}
                   alt={image.alt}
                   loading="lazy"
-                  className="size-full object-cover"
+                  className={natural ? "block h-auto max-h-[32rem] w-full object-contain" : "size-full object-cover"}
                   onError={() => markFailed(image)}
                 />
               )}

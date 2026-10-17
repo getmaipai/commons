@@ -74,4 +74,20 @@ describe("ImageGallery", () => {
     const plain = render(<ImageGallery images={one} />);
     expect(plain.container.querySelector('[data-slot="image-gallery"] > div')!.className).toContain("grid-cols-2");
   });
+
+  test("size large keeps a single picture's own proportions; the grid and the default stay square crops", () => {
+    const one = [{ id: "a", src: "https://example.test/a.jpg", alt: "A" }];
+    const many = [...one, { id: "b", src: "https://example.test/b.jpg", alt: "B" }];
+    const single = render(<ImageGallery images={one} size="large" />);
+    expect(single.container.querySelector("button")!.className).not.toContain("aspect-square");
+    expect(single.container.querySelector("img")!.className).toContain("object-contain");
+    expect(single.container.querySelector("img")!.className).toContain("h-auto");
+    single.unmount();
+    const grid = render(<ImageGallery images={many} size="large" />);
+    expect(grid.container.querySelector("button")!.className).toContain("aspect-square");
+    expect(grid.container.querySelector("img")!.className).toContain("object-cover");
+    grid.unmount();
+    const plain = render(<ImageGallery images={one} />);
+    expect(plain.container.querySelector("button")!.className).toContain("aspect-square");
+  });
 });

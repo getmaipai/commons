@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.248] - ui-v0.5.248
+
+`ImageGallery` `size="large"` with a single picture now shows it at its own proportions (full gallery width, height from the picture, capped at 32rem, `object-contain`) instead of cropping it to a square; a wide banner or a tall poster is whole. Several pictures and the default size keep the square grid. The lightbox is unchanged. Additive.
+
 ## [0.5.247] - ui-v0.5.247
 
 `FullLayout` (rail) gains `railApps` and `onRailAppPinChange`; `AppRail` gains `apps` and `onTogglePin` (type `RailApp`). The pinned apps draw as named icon links below the built-in destinations (at most six, the open one marked), and a grid button at the foot of the rail opens a popover that lists every app with a Pin or Unpin button (disabled with a reason while six are pinned). Without `apps` the rail is unchanged. Additive.
