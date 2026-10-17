@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/device-command.schema.json",
   "title": "DeviceCommand",
-  "description": "A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.",
+  "description": "A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.",
   "oneOf": [
     {
       "type": "object",
@@ -773,6 +773,60 @@
           }
         }
       }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "play_media"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "media_id",
+            "position_s"
+          ],
+          "properties": {
+            "media_id": {
+              "type": "string",
+              "pattern": "^media-"
+            },
+            "position_s": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      },
+      "description": "Play timed media at the requested position. expires_at is issued_at plus 60 seconds. Other command kinds keep their 24 hour expiry."
     }
   ]
 }

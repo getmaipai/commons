@@ -34,6 +34,7 @@ export * from "./maintenance-window.js";
 export * from "./manifest.js";
 export * from "./media-collection.js";
 export * from "./media-item.js";
+export * from "./media-presence.js";
 export * from "./media-progress.js";
 export * from "./media-source.js";
 export * from "./memory-record.js";

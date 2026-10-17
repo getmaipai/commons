@@ -216,6 +216,26 @@ export const RobotState = z
         "The effective local camera watch level the robot reports to the hub, using the strictest applicable person and device setting.",
       )
       .optional(),
+    /**HANDOFF-01: what this device is playing now, or null. Optional: a robot that never sends it is unchanged.*/
+    media: z
+      .union([
+        z
+          .object({
+            media_id: z.string().regex(new RegExp("^media-")),
+            position_s: z.number().gte(0),
+            playing: z.boolean(),
+            updated_at: z.string().datetime({ offset: true }),
+          })
+          .strict()
+          .describe(
+            "A hub-local projection of timed media playback. It is never synced and carries no title, device name or person id. updated_at uses the hub clock.",
+          ),
+        z.null(),
+      ])
+      .describe(
+        "HANDOFF-01: what this device is playing now, or null. Optional: a robot that never sends it is unchanged.",
+      )
+      .optional(),
     /**Optional shared activity state for the web character and robot body. It contains no person identity, turn outcome, or reason.*/
     presence: z
       .enum([

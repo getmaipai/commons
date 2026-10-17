@@ -19,7 +19,7 @@ from pydantic import (
 
 class DeviceCommand1(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -35,7 +35,7 @@ class DeviceCommand1(BaseModel):
 
 class DeviceCommand2(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -59,7 +59,7 @@ class Payload(BaseModel):
 
 class DeviceCommand3(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -85,7 +85,7 @@ class Payload1(BaseModel):
 
 class DeviceCommand4(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -119,7 +119,7 @@ class Payload3(BaseModel):
 
 class DeviceCommand5(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -143,7 +143,7 @@ class Payload4(BaseModel):
 
 class DeviceCommand6(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -169,7 +169,7 @@ class Payload5(BaseModel):
 
 class DeviceCommand7(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -192,7 +192,7 @@ class Payload6(BaseModel):
 
 class DeviceCommand8(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -215,7 +215,7 @@ class Payload7(BaseModel):
 
 class DeviceCommand9(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -238,7 +238,7 @@ class Payload8(BaseModel):
 
 class DeviceCommand10(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -263,7 +263,7 @@ class Payload9(BaseModel):
 
 class DeviceCommand11(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -286,7 +286,7 @@ class Payload10(BaseModel):
 
 class DeviceCommand12(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -309,7 +309,7 @@ class Payload11(BaseModel):
 
 class DeviceCommand13(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -336,7 +336,7 @@ class Payload12(BaseModel):
 
 class DeviceCommand14(BaseModel):
     """
-    A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
 
     model_config = ConfigDict(
@@ -348,6 +348,30 @@ class DeviceCommand14(BaseModel):
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
     payload: Payload12
+
+
+class Payload13(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    media_id: constr(pattern=r'^media-')
+    position_s: confloat(ge=0.0)
+
+
+class DeviceCommand15(BaseModel):
+    """
+    Play timed media at the requested position. expires_at is issued_at plus 60 seconds. Other command kinds keep their 24 hour expiry.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['play_media']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload13
 
 
 class DeviceCommand(
@@ -366,6 +390,7 @@ class DeviceCommand(
         | DeviceCommand12
         | DeviceCommand13
         | DeviceCommand14
+        | DeviceCommand15
     ]
 ):
     root: (
@@ -383,8 +408,9 @@ class DeviceCommand(
         | DeviceCommand12
         | DeviceCommand13
         | DeviceCommand14
+        | DeviceCommand15
     ) = Field(
         ...,
-        description='A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.',
+        description='A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.',
         title='DeviceCommand',
     )

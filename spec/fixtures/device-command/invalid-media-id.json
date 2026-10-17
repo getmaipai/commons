@@ -1,0 +1,11 @@
+{
+  "id": "command-atlas",
+  "kind": "play_media",
+  "payload": {
+    "media_id": "atlas",
+    "position_s": 12.5
+  },
+  "issued_at": "2026-10-17T12:00:00Z",
+  "expires_at": "2026-10-17T12:01:00Z",
+  "hlc": "1792238400000:0:atlas00"
+}

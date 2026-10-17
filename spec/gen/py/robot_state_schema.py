@@ -17,6 +17,8 @@ from pydantic import (
     field_validator,
 )
 
+from . import media_presence_schema
+
 
 class Thermal(BaseModel):
     """
@@ -121,6 +123,10 @@ class RobotState(BaseModel):
     watch_level: Literal['off', 'presence', 'identify'] | None = Field(
         None,
         description='The effective local camera watch level the robot reports to the hub, using the strictest applicable person and device setting.',
+    )
+    media: media_presence_schema.MediaPresence | None = Field(
+        None,
+        description='HANDOFF-01: what this device is playing now, or null. Optional: a robot that never sends it is unchanged.',
     )
     presence: (
         Literal[

@@ -15,6 +15,16 @@ const validate = ajv.compile(schema);
 const pageFiles = readdirSync(join(UI_DIR, "pages")).filter((f) => f.endsWith(".json"));
 
 describe("UI schema", () => {
+  test("HANDOFF-01a: play accepts an optional start position or placeholder", () => {
+    const action = ajv.compile({ $schema: schema.$schema, $id: "https://example.com/action.schema.json", $defs: schema.$defs, $ref: "#/$defs/action" });
+    for (const play of [{ media_id: "media-atlas" }, { media_id: "media-atlas", position_s: 0 }, { media_id: "media-atlas", position_s: 12.5 }, { media_id: "{id}", position_s: "{position_s}" }]) {
+      expect(action({ play })).toBe(true);
+    }
+    for (const position_s of [-1, null, true, {}, []]) {
+      expect(action({ play: { media_id: "media-atlas", position_s } })).toBe(false);
+    }
+  });
+
   test("MEDIA-BOOKS-01: reader accepts field paths, format, tone and font steps", () => {
     const reader = { type: "reader", bind: { source: "package", path: "item" } };
     expect(validate(reader)).toBe(true);

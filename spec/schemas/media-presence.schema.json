@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/media-presence.schema.json",
+  "title": "MediaPresence",
+  "description": "A hub-local projection of timed media playback. It is never synced and carries no title, device name or person id. updated_at uses the hub clock.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "media_id",
+    "position_s",
+    "playing",
+    "updated_at"
+  ],
+  "properties": {
+    "media_id": {
+      "type": "string",
+      "pattern": "^media-"
+    },
+    "position_s": {
+      "type": "number",
+      "minimum": 0
+    },
+    "playing": {
+      "type": "boolean"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

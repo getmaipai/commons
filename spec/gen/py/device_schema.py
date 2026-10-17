@@ -10,7 +10,7 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
 
 class Device(BaseModel):
     """
-    A physical device the household has paired with the hub - a phone, a TV, a desktop, a browser, or (later) a robot or a pod (session-f-platform-and-trust.md step 6, platform plan 7.1). Laid now because device tokens and Quick Connect both need somewhere to hang a name/kind/area/capabilities, and Wave 3's link pairs a robot into this exact shape - not because the full device-management feature (renaming, per-device settings) exists yet. A Device row is created the first time a device token is minted for it (via Quick Connect approval or a native passkey sign-in); deleting it revokes every token that points at it.
+    A physical device the household has paired with the hub - a phone, a TV, a desktop, a browser, or (later) a robot or a pod (session-f-platform-and-trust.md step 6, platform plan 7.1). Laid now because device tokens and Quick Connect both need somewhere to hang a name/kind/area/capabilities, and Wave 3's link pairs a robot into this exact shape - not because the full device-management feature (renaming, per-device settings) exists yet. A Device row is created when a device token is first minted for it via Quick Connect approval or a native passkey sign-in, or when a signed-in browser registers a screen. A screen row has no token. Deleting a row revokes every token that points at it.
     """
 
     model_config = ConfigDict(

@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-/**A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.*/
+/**A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.*/
 export const DeviceCommand = z
   .any()
   .superRefine((x, ctx) => {
@@ -256,6 +256,24 @@ export const DeviceCommand = z
             .strict(),
         })
         .strict(),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("play_media"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({
+              media_id: z.string().regex(new RegExp("^media-")),
+              position_s: z.number().gte(0),
+            })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "Play timed media at the requested position. expires_at is issued_at plus 60 seconds. Other command kinds keep their 24 hour expiry.",
+        ),
     ];
     const { errors, failed } = schemas.reduce<{
       errors: z.core.$ZodIssue[];
@@ -293,6 +311,6 @@ export const DeviceCommand = z
     }
   })
   .describe(
-    "A typed hub-to-robot command event. The id is stable across replay; payload shape is selected by kind.",
+    "A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.",
   );
 export type DeviceCommand = z.infer<typeof DeviceCommand>;

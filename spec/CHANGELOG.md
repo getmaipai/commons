@@ -1,3 +1,7 @@
+## [spec-v0.1.176] - 2026-10-17
+
+- HANDOFF-01a adds the hub-local `MediaPresence` value shape, optional nullable `RobotState.media`, the `play_media` device command with a 60 second expiry, and optional `action.play.position_s` with placeholder support. Screen device rows have no token. Both generated model sets and validation and round-trip fixtures cover the additions.
+
 ## [spec-v0.1.175] - 2026-10-17
 
 - NEWS-02a and NEWS-07. Three household keys on the News settings group `household.news`: `news.images` (boolean, default on, "Pictures in News": show each story's picture; Home asks the publisher once, the first time a screen shows the story, and never in the background), `news.image_cache_mb` (number, default 512, minimum 32, "News picture storage (MB)") and `news.full_text_prefetch` (boolean, default off, "Load News stories ahead of time": the owner's 2026-09-24 exception, at most one attempt per item, one every 30 seconds and 150 per site a day). All three are advanced, so they show under Developer tools. Registry count 212. Additive.

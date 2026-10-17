@@ -99,7 +99,13 @@
           "additionalProperties": false,
           "required": ["media_id"],
           "description": "MEDIA-PLAYER-01: hand a media item to the host's player (the shell's audio session). `media_id` may contain `{field}` placeholders, resolved from the bound item the action fires for (`{id}`). The page never plays anything itself; a host with no player refuses the action with a message.",
-          "properties": { "media_id": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "media_id": { "type": "string", "minLength": 1 },
+            "position_s": {
+              "anyOf": [{ "type": "number", "minimum": 0 }, { "type": "string" }],
+              "description": "The start position in seconds. String values may contain `{field}` placeholders resolved from the bound item."
+            }
+          }
         },
         "confirm": {
           "type": "object",
