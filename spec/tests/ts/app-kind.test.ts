@@ -45,6 +45,13 @@ describe("manifest contributes.pages and contributes.data", () => {
     expect(() => PackageManifest.parse({ ...BASE, contributes: withKeywords(Array.from({ length: 9 }, (_, i) => `k${i}`)) })).toThrow();
     expect(() => PackageManifest.parse({ ...BASE, contributes: withKeywords(["x".repeat(25)]) })).toThrow();
   });
+  test("pinned_by_default and pin_order: a boolean and an integer 0 to 99", () => {
+    const withPin = (patch: Record<string, unknown>) => ({ ...contributes, pages: [{ ...contributes.pages![0], ...patch }, ...contributes.pages!.slice(1)] });
+    expect(() => PackageManifest.parse({ ...BASE, contributes: withPin({ pinned_by_default: true, pin_order: 10 }) })).not.toThrow();
+    for (const patch of [{ pinned_by_default: "yes" }, { pin_order: 100 }, { pin_order: -1 }, { pin_order: 1.5 }]) {
+      expect(() => PackageManifest.parse({ ...BASE, contributes: withPin(patch) })).toThrow();
+    }
+  });
   test("a data entry refuses an unknown surface and an unknown field", () => {
     expect(() => PackageManifest.parse({ ...BASE, contributes: { data: [{ id: "forecast", surface: "moon" }] } })).toThrow();
     expect(() => PackageManifest.parse({ ...BASE, contributes: { data: [{ id: "forecast", url: "https://example.com" }] } })).toThrow();

@@ -286,7 +286,17 @@ class Page(BaseModel):
     label: constr(min_length=1, max_length=40)
     nav: bool = Field(
         ...,
-        description='On the page with id "index", true makes the app a launcher, search and pin entry (never an automatic rail icon). On any other page, true makes it one of the app\'s own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.',
+        description='On the page with id "index", true makes the app a launcher, search and pin entry (it reaches the left rail only as a pin: the person\'s own, or this page\'s `pinned_by_default`). On any other page, true makes it one of the app\'s own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.',
+    )
+    pinned_by_default: bool | None = Field(
+        None,
+        description='Read on the "index" page only. true pins the app in the left rail for every person who may open it and has never chosen their own pins (a person\'s saved `ui.pinned_apps` always wins). The hub already hides the app from anyone its role, age band, surface or Incognito rules refuse, so a default pin never shows a blocked app.',
+    )
+    pin_order: int | None = Field(
+        None,
+        description='Read on the "index" page only. Where a default pin sits among the other default pins, lowest first (ties break by app name). Without it the app sorts last.',
+        ge=0,
+        le=99,
     )
     kind: Literal['schema'] = Field(
         ...,

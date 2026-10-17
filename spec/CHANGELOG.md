@@ -1,3 +1,7 @@
+## [spec-v0.1.157] - 2026-10-17
+
+- LEFTNAV-APPS-01. `contributes.pages[]` on an app's "index" page gains optional `pinned_by_default` (boolean) and `pin_order` (integer 0 to 99): the app is pinned in the left rail for every person who may open it and has never chosen their own pins, in `pin_order` order. A person's saved `ui.pinned_apps` always wins. Additive; the `nav` description no longer says an app is never a rail icon (it reaches the rail as a pin).
+
 ## [spec-v0.1.156] - 2026-10-17
 
 - LIKENESS-01 (owner ruling 2026-10-17: an adult may make a picture, video or style that looks like a consenting household adult). Two person settings keys on a new card of Account settings, Pictures and videos (`account` section `pictures`, adults, closed view `account.likeness`): `likeness.adults` (boolean, default off, changed only by the person themselves: let other adults in this household make pictures, videos and styles that look like me) and `likeness.adult_content` (boolean, default off, separate: including adult content; counts only while the first is on). Three new records, all with id, provenance and clock stamp: `LikenessConsent` (an append-only history of each switch change), `LikenessUse` (each time another adult made something that looks like the person; shown only to the subject) and `LikenessAdapter` (who a saved style looks like: a household adult, always adult-only, or nobody). Additive; every existing fixture validates unchanged.

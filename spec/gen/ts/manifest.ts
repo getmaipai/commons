@@ -970,6 +970,7 @@ export const PackageManifest = z
                       .enum([
                         "account.profile",
                         "account.voice",
+                        "account.likeness",
                         "account.device_appearance",
                         "chat.skills",
                         "chat.shortcuts",
@@ -988,6 +989,7 @@ export const PackageManifest = z
                       .enum([
                         "account.profile",
                         "account.voice",
+                        "account.likeness",
                         "account.device_appearance",
                         "chat.skills",
                         "chat.shortcuts",
@@ -1006,6 +1008,7 @@ export const PackageManifest = z
                       .enum([
                         "account.profile",
                         "account.voice",
+                        "account.likeness",
                         "account.device_appearance",
                         "chat.skills",
                         "chat.shortcuts",
@@ -1137,12 +1140,29 @@ export const PackageManifest = z
                   )
                   .optional(),
                 label: z.string().min(1).max(40),
-                /**On the page with id "index", true makes the app a launcher, search and pin entry (never an automatic rail icon). On any other page, true makes it one of the app's own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.*/
+                /**On the page with id "index", true makes the app a launcher, search and pin entry (it reaches the left rail only as a pin: the person's own, or this page's `pinned_by_default`). On any other page, true makes it one of the app's own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.*/
                 nav: z
                   .boolean()
                   .describe(
-                    'On the page with id "index", true makes the app a launcher, search and pin entry (never an automatic rail icon). On any other page, true makes it one of the app\'s own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.',
+                    "On the page with id \"index\", true makes the app a launcher, search and pin entry (it reaches the left rail only as a pin: the person's own, or this page's `pinned_by_default`). On any other page, true makes it one of the app's own sections, drawn by the shell as in-app tabs on wide screens and in the phone drawer (design rules S1, S2); false leaves it reachable only by a link. A package never draws its own chrome.",
                   ),
+                /**Read on the "index" page only. true pins the app in the left rail for every person who may open it and has never chosen their own pins (a person's saved `ui.pinned_apps` always wins). The hub already hides the app from anyone its role, age band, surface or Incognito rules refuse, so a default pin never shows a blocked app.*/
+                pinned_by_default: z
+                  .boolean()
+                  .describe(
+                    'Read on the "index" page only. true pins the app in the left rail for every person who may open it and has never chosen their own pins (a person\'s saved `ui.pinned_apps` always wins). The hub already hides the app from anyone its role, age band, surface or Incognito rules refuse, so a default pin never shows a blocked app.',
+                  )
+                  .optional(),
+                /**Read on the "index" page only. Where a default pin sits among the other default pins, lowest first (ties break by app name). Without it the app sorts last.*/
+                pin_order: z
+                  .number()
+                  .int()
+                  .gte(0)
+                  .lte(99)
+                  .describe(
+                    'Read on the "index" page only. Where a default pin sits among the other default pins, lowest first (ties break by app name). Without it the app sorts last.',
+                  )
+                  .optional(),
                 /**"schema": spec/ui/schema.json document, rendered by the shared shell. The old "web" escape hatch is refused outright (design rule S2, owner-confirmed 2026-10-16): a page a native Go/SwiftUI client can't render would break the platform's own "one UI schema, every client" promise.*/
                 kind: z
                   .literal("schema")

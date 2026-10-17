@@ -5,7 +5,7 @@
 // an empty array when the app conforms. The hub runs it when a package is
 // loaded, so a bad page is refused then, never at request time.
 
-export interface AppPageEntry { id: string; label?: string; nav?: boolean; kind?: string; module: string; icon?: string; keywords?: string[] }
+export interface AppPageEntry { id: string; label?: string; nav?: boolean; kind?: string; module: string; icon?: string; keywords?: string[]; pinned_by_default?: boolean; pin_order?: number }
 export interface AppDataEntry { id: string; surface?: string; rows?: string; inputs?: Record<string, unknown>; refresh_s?: number }
 export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[] }
 

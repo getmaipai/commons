@@ -247,6 +247,7 @@ export const SettingsArea = z
               .enum([
                 "account.profile",
                 "account.voice",
+                "account.likeness",
                 "account.device_appearance",
                 "chat.skills",
                 "chat.shortcuts",
@@ -265,6 +266,7 @@ export const SettingsArea = z
               .enum([
                 "account.profile",
                 "account.voice",
+                "account.likeness",
                 "account.device_appearance",
                 "chat.skills",
                 "chat.shortcuts",
@@ -283,6 +285,7 @@ export const SettingsArea = z
               .enum([
                 "account.profile",
                 "account.voice",
+                "account.likeness",
                 "account.device_appearance",
                 "chat.skills",
                 "chat.shortcuts",

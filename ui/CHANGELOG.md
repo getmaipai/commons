@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.247] - ui-v0.5.247
+
+`FullLayout` (rail) gains `railApps` and `onRailAppPinChange`; `AppRail` gains `apps` and `onTogglePin` (type `RailApp`). The pinned apps draw as named icon links below the built-in destinations (at most six, the open one marked), and a grid button at the foot of the rail opens a popover that lists every app with a Pin or Unpin button (disabled with a reason while six are pinned). Without `apps` the rail is unchanged. Additive.
+
 ## [0.5.246] - ui-v0.5.246
 
 `ImageGallery` gains `size` (`default` or `large`). `large` shows one picture across the whole gallery width instead of one grid cell; several pictures keep the grid, and the default is unchanged. Additive.

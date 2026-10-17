@@ -176,3 +176,53 @@ describe("RAIL-01 app rail", () => {
     expect(down.label).toBe("Open profile menu for Sage (3 notifications, System: down)");
   });
 });
+
+describe("LEFTNAV-APPS-01 pinned apps and the launcher", () => {
+  const app = (id: string, pinned: boolean, name = id[0]!.toUpperCase() + id.slice(1)) => ({ name, url: `/apps/${id}`, icon: id === "weather" ? "cloud-sun" : "layout-grid", pinned });
+  function renderApps(path: string, apps: ReturnType<typeof app>[], onToggle = (_u: string, _p: boolean) => {}) {
+    return render(
+      <MemoryRouter initialEntries={[path]}>
+        <TooltipProvider><AppRail apps={apps} onTogglePin={onToggle} /></TooltipProvider>
+      </MemoryRouter>,
+    );
+  }
+
+  test("without apps the rail has no pinned section and no launcher", () => {
+    const view = render(<MemoryRouter><TooltipProvider><AppRail /></TooltipProvider></MemoryRouter>);
+    expect(view.container.querySelector('[data-slot="app-rail-apps"]')).toBeNull();
+    expect(view.queryByRole("button", { name: "All apps" })).toBeNull();
+  });
+
+  test("a pinned app is a named link in the rail and the open one is marked", () => {
+    const view = renderApps("/apps/weather", [app("weather", true), app("notes", false)]);
+    const link = view.getByRole("link", { name: "Weather" });
+    expect(link.getAttribute("href")).toBe("/apps/weather");
+    expect(link.getAttribute("aria-current")).toBe("page");
+    expect(link.hasAttribute("data-active")).toBe(true);
+    expect(view.queryByRole("link", { name: "Notes" })).toBeNull();
+  });
+
+  test("at most six pinned apps draw in the rail", () => {
+    const apps = Array.from({ length: 8 }, (_, i) => app(`app${i}`, true));
+    const view = renderApps("/", apps);
+    expect(view.container.querySelectorAll('[data-slot="app-rail-app"]').length).toBe(6);
+  });
+
+  test("the launcher lists every app and pins or unpins one", async () => {
+    const calls: Array<[string, boolean]> = [];
+    const view = renderApps("/", [app("weather", true), app("notes", false)], (url, pinned) => calls.push([url, pinned]));
+    fireEvent.click(view.getByRole("button", { name: "All apps" }));
+    await waitFor(() => view.getByRole("button", { name: "Pin Notes to the rail" }));
+    fireEvent.click(view.getByRole("button", { name: "Pin Notes to the rail" }));
+    fireEvent.click(view.getByRole("button", { name: "Unpin Weather from the rail" }));
+    expect(calls).toEqual([["/apps/notes", true], ["/apps/weather", false]]);
+  });
+
+  test("a seventh app cannot be pinned while six are", async () => {
+    const apps = [...Array.from({ length: 6 }, (_, i) => app(`app${i}`, true)), app("extra", false)];
+    const view = renderApps("/", apps);
+    fireEvent.click(view.getByRole("button", { name: "All apps" }));
+    const pin = await waitFor(() => view.getByRole("button", { name: /Pin Extra to the rail/ }));
+    expect((pin as HTMLButtonElement).disabled).toBe(true);
+  });
+});
