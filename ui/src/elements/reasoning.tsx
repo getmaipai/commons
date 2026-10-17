@@ -161,16 +161,46 @@ function ReasoningFade({
   );
 }
 
+/** "Thought for 4s": whole seconds, never below 1. Pass your own function as `doneLabel` to localize. */
+export function thoughtForLabel(seconds: number): string {
+  return `Thought for ${Math.max(1, Math.round(seconds))}s`;
+}
+
 function ReasoningTrigger({
   active,
   duration,
+  label,
+  doneLabel,
+  announce,
   className,
   ...props
 }: React.ComponentProps<typeof CollapsibleTrigger> & {
   active?: boolean;
   duration?: number;
+  /**
+   * Replaces the word "Reasoning" while set (a live status such as
+   * "Pondering"). It cross-fades when it changes (no fade under
+   * `prefers-reduced-motion`). Without it the label is "Reasoning".
+   */
+  label?: string;
+  /**
+   * With `duration`, builds the whole finished label (for example
+   * `thoughtForLabel`) instead of "Reasoning (Ns)". Without it the
+   * default "Reasoning (Ns)" is unchanged.
+   */
+  doneLabel?: (seconds: number) => string;
+  /**
+   * Text for a visually hidden polite live region. Set it once per state
+   * change (the live label itself is hidden from assistive technology
+   * while `announce` is in use, so rotating words are not read out).
+   */
+  announce?: string;
 }) {
   const durationText = duration ? ` (${duration}s)` : "";
+  const text =
+    duration && doneLabel
+      ? doneLabel(duration)
+      : `${label ?? "Reasoning"}${durationText}`;
 
   return (
     <CollapsibleTrigger
@@ -192,8 +222,19 @@ function ReasoningTrigger({
           active && "shimmer motion-reduce:animate-none",
         )}
       >
-        Reasoning{durationText}
+        <span
+          key={text}
+          aria-hidden={active && announce !== undefined ? true : undefined}
+          className={label !== undefined ? "animate-in fade-in-0 duration-500 motion-reduce:animate-none" : undefined}
+        >
+          {text}
+        </span>
       </span>
+      {announce !== undefined ? (
+        <span role="status" aria-live="polite" className="sr-only">
+          {announce}
+        </span>
+      ) : null}
       <ChevronDownIcon
         data-slot="reasoning-trigger-chevron"
         className={cn(

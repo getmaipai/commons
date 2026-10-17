@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.234] - ui-v0.5.234
+
+`ReasoningTrigger` gains three optional props. `label` replaces the word "Reasoning" with a live status and cross-fades when it changes (no fade under `prefers-reduced-motion`), keeping the shimmer. `doneLabel(seconds)` builds the finished label from `duration`; the new `thoughtForLabel` gives "Thought for Ns" (whole seconds, minimum 1) and is replaceable to localize. `announce` adds one visually hidden polite status region and hides the live word from assistive technology while active, so rotating words are not read out. Without the props the trigger is unchanged ("Reasoning (Ns)"). Additive.
+
 ## [0.5.233] - ui-v0.5.233
 
 The settings renderer draws the `location` selector (PLACE-ELEMENT-01a). New `LocationField`, built from shipped parts only: a Command-in-Popover search to add, the `List` primitive for entries, a DropdownMenu per entry (rename in a Dialog, move up, move down, remove behind `DestructiveConfirm`), a Select for a single value with Current location first, and a "Use current location" Button that is the only thing that asks the browser for a position. The host passes a `PlaceAdapter` (`places` on `SettingsRenderer` and `SettingRow`) for search, save, rename, labels and the prompt; without one the row keeps the "not supported" line. Additive.
