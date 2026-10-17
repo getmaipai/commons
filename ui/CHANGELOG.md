@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.235] - ui-v0.5.235
+
+`DropdownMenuContent` gains an optional `density="compact"` prop: single-line 32px rows, text-sm, 192px minimum width, the same size as the thread list row menu, so one conversation menu looks the same in the sidebar and the chat header. Items and checkbox items inside follow it. The row menu's minimum width is now 192px (was 128px). Default density is unchanged. Additive.
+
 ## [0.5.234] - ui-v0.5.234
 
 `ReasoningTrigger` gains three optional props. `label` replaces the word "Reasoning" with a live status and cross-fades when it changes (no fade under `prefers-reduced-motion`), keeping the shimmer. `doneLabel(seconds)` builds the finished label from `duration`; the new `thoughtForLabel` gives "Thought for Ns" (whole seconds, minimum 1) and is replaceable to localize. `announce` adds one visually hidden polite status region and hides the live word from assistive technology while active, so rotating words are not read out. Without the props the trigger is unchanged ("Reasoning (Ns)"). Additive.
