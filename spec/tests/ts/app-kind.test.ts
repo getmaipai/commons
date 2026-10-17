@@ -205,3 +205,35 @@ describe("the media nodes (MEDIA-PLAYER-01)", () => {
     expect(checkAppPackage("videos", videoContributes, swap(outside), "child").join("\n")).toContain("must stay under /api/plugins/videos/");
   });
 });
+
+describe("the media page polish (MEDIA-POLISH-01)", () => {
+  const pageDir = join(import.meta.dir, "..", "..", "ui", "pages");
+  const video = (name: string) => JSON.parse(readFileSync(join(pageDir, `videos-${name}.json`), "utf-8"));
+  const videoContributes: AppContributes = {
+    pages: [
+      { id: "index", label: "Videos", nav: true, kind: "schema", module: "home" },
+      { id: "watch", label: "Watch", nav: false, kind: "schema", module: "watch" },
+    ],
+    data: [{ id: "featured", rows: "list" }, { id: "continue", rows: "list" }, { id: "item", rows: "list" }],
+  };
+  const swap = (body: unknown[]) => (m: string) => (m === "watch" ? { type: "page", id: "watch", title: "Watch", body } : video(m));
+  const shelf = { type: "media_shelf", bind: { source: "package", path: "continue" }, item_key_field: "id", item_label_field: "t", item_media_field: "m" };
+
+  test("a split_view with main and aside is allowed on a package page (the watch fixture)", () => {
+    expect(checkAppPackage("videos", videoContributes, video, "child")).toEqual([]);
+  });
+  test("a split_view's children are checked like any other node", () => {
+    const foreign = [{ type: "split_view", main: [{ ...shelf, bind: { source: "route", path: "/api/media" } }], aside: [shelf] }];
+    expect(checkAppPackage("videos", videoContributes, swap(foreign), "child").join("\n")).toContain("split_view.main[0] media_shelf: bind.source must be \"package\"");
+    const widget = [{ type: "split_view", main: [shelf], aside: [{ type: "widget_card", bind: { source: "route", path: "/api/widgets" } }] }];
+    expect(checkAppPackage("videos", videoContributes, swap(widget), "child").join("\n")).toContain('node type "widget_card" is not allowed');
+  });
+  test("a shelf's See all and a player's actions stay inside the app", () => {
+    const seeAll = [{ ...shelf, see_all: { label: "See all", action: { navigate: { to: "/apps/news" } } } }];
+    expect(checkAppPackage("videos", videoContributes, swap(seeAll), "child").join("\n")).toContain("media_shelf.see_all: navigate.to");
+    const actions = [{ type: "player", bind: { source: "package", path: "item" }, actions: [{ label: "Like", action: { call: { target: "/api/media/like" } } }] }];
+    expect(checkAppPackage("videos", videoContributes, swap(actions), "child").join("\n")).toContain("player.actions[0]: call.target");
+    const play = [{ type: "player", bind: { source: "package", path: "item" }, actions: [{ label: "Play", action: { play: { media_id: "{id}" } } }] }];
+    expect(checkAppPackage("videos", videoContributes, swap(play), "child").join("\n")).toContain("player.actions[0]: the play action is not available");
+  });
+});

@@ -30,6 +30,26 @@ describe("UI schema", () => {
     });
   }
 
+  test("MEDIA-POLISH-01: a page tone is default or cinema", () => {
+    const page = { type: "page", id: "p", title: "P", body: [{ type: "empty_state", icon: "x", text: "t" }] };
+    expect(validate({ ...page, tone: "cinema" })).toBe(true);
+    expect(validate({ ...page, tone: "neon" })).toBe(false);
+  });
+
+  test("MEDIA-POLISH-01: a split_view is list and detail, or main and aside", () => {
+    const kid = { type: "empty_state", icon: "x", text: "t" };
+    expect(validate({ type: "split_view", main: [kid], aside: [kid], aside_label: "Up next" })).toBe(true);
+    expect(validate({ type: "split_view", main: [kid] })).toBe(false);
+    expect(validate({ type: "split_view" })).toBe(false);
+  });
+
+  test("MEDIA-POLISH-01: a shelf variant and orientation are closed sets", () => {
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "x" }, item_key_field: "id", item_label_field: "t", item_media_field: "m" };
+    expect(validate({ ...shelf, variant: "plain", orientation: "vertical", hide_when_empty: true, see_all: { label: "See all", action: { navigate: { to: "/apps/x/all" } } } })).toBe(true);
+    expect(validate({ ...shelf, variant: "framed" })).toBe(false);
+    expect(validate({ ...shelf, orientation: "diagonal" })).toBe(false);
+  });
+
   test("a node with an unknown type is rejected", () => {
     const bad = { type: "not_a_real_type" };
     expect(validate(bad)).toBe(false);

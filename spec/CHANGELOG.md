@@ -1,3 +1,7 @@
+## [spec-v0.1.167] - 2026-10-17
+
+- MEDIA-POLISH-01: the UI schema's `page` gains `tone` (`default` or `cinema`, the dark media tone). `media_shelf` gains `variant` (`card` or `plain`, the frameless row), `orientation` (`horizontal` or `vertical`), `hide_when_empty` and `see_all` (a label and an action beside the heading); `billboard` gains `hide_when_empty` and `size` `banner`; `player` gains `details` (the title block) and `actions` (up to six buttons, each optionally a toggle on a boolean `field` with an `on_label`). `split_view` gains a `main` and `aside` form (arrays of nodes, `aside_label`); exactly one form is required. `ui/app-check.ts` allows `split_view` on a package page and checks its children, a shelf's `see_all` and the player's actions like any other action (no `play` there). Fixtures `videos-home.json` and `videos-watch.json` use them. Additive.
+
 ## [spec-v0.1.166] - 2026-10-17
 
 - Add `ui.reasoning_open`, `voice.hesitations`, `chat.paused`, `chat.paused_message` and `generation.picture_quality` from Home's generated settings declarations. Additive; existing entries stay unchanged.

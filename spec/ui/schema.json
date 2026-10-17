@@ -134,6 +134,7 @@
         "type": { "const": "page" },
         "id": { "type": "string", "minLength": 1 },
         "title": { "type": "string", "minLength": 1 },
+        "tone": { "type": "string", "enum": ["default", "cinema"], "default": "default", "description": "MEDIA-POLISH-01: the page tone. cinema: the dark media tone (the kit's `cinema` token set, the same in light and dark themes) over the whole screen while this page shows; the media apps select it. A client without the tone draws the default." },
         "body": {
           "type": "array",
           "items": { "$ref": "#" },
@@ -322,6 +323,10 @@
         "item_badge_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to a short string drawn as the tile's corner badge (\"Saved\", \"On this phone\", \"Not saved\"); empty draws none." },
         "item_meta_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to the running time, a number of seconds (drawn as 18:42) or a short string." },
         "aspect": { "type": "string", "enum": ["wide", "square", "poster"], "default": "wide" },
+        "variant": { "type": "string", "enum": ["card", "plain"], "default": "card", "description": "MEDIA-POLISH-01: card draws the shelf inside a bordered section card; plain draws a frameless row (a heading, the optional See all link, then the tiles), as the media apps and News do." },
+        "orientation": { "type": "string", "enum": ["horizontal", "vertical"], "default": "horizontal", "description": "MEDIA-POLISH-01: horizontal is the sideways rail; vertical stacks the tiles as rows, the picture at the start and the caption beside it (Up next beside a player)." },
+        "hide_when_empty": { "type": "boolean", "default": false, "description": "MEDIA-POLISH-01: draw nothing (no heading, no empty state) when the bound call returns no rows, so a shelf with nothing in it is simply absent. A load error still shows." },
+        "see_all": { "$ref": "#/$defs/billboard_action", "description": "MEDIA-POLISH-01: a link beside the heading (\"See all\"), usually a `navigate` to the app's full list. Fired with no row." },
         "on_select": { "$ref": "#/$defs/action" },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
@@ -335,7 +340,7 @@
         "type": { "const": "billboard" },
         "bind": { "$ref": "#/$defs/binding" },
         "label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The carousel's accessible name. Default \"Featured\"." },
-        "size": { "type": "string", "enum": ["card", "hero"], "default": "card", "description": "card: a rounded card in the page flow (Videos). hero: full width and taller, the title set large (Shows and Films)." },
+        "size": { "type": "string", "enum": ["card", "hero", "banner"], "default": "card", "description": "card: a rounded card in the page flow. hero: full width and taller, the title set large (Shows and Films). banner (MEDIA-POLISH-01): a short 340 px band from 640 px, so the first shelf shows under it (Videos); on a phone it grows with its words." },
         "autoplay": { "type": "boolean", "default": true },
         "item_key_field": { "type": "string" },
         "item_title_field": { "type": "string" },
@@ -344,6 +349,7 @@
         "item_art_field": { "type": "string", "description": "Dotted path to the backdrop's same-origin image path." },
         "primary": { "$ref": "#/$defs/billboard_action" },
         "secondary": { "type": "array", "maxItems": 2, "items": { "$ref": "#/$defs/billboard_action" } },
+        "hide_when_empty": { "type": "boolean", "default": false, "description": "MEDIA-POLISH-01: draw nothing when the bound call returns no rows (as media_shelf.hide_when_empty)." },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
     },
@@ -389,6 +395,24 @@
         },
         "on_progress": { "$ref": "#/$defs/action", "description": "Fired every 10 s while playing, on pause, on seek, at the end and on unload. Placeholders: the item's own fields plus {position_s}, {duration_s}, {reason} and {completed}." },
         "on_next": { "$ref": "#/$defs/action", "description": "Fired with the up_next item's fields (a `play`, or a `navigate` to its watch page)." },
+        "details": { "type": "boolean", "default": false, "description": "MEDIA-POLISH-01: draw the item's title and subtitle line under the picture (a watch page's title block)." },
+        "actions": {
+          "type": "array",
+          "maxItems": 6,
+          "description": "MEDIA-POLISH-01: the actions row under the title (Like, Watch later, Share to a screen). Each button fires its action with the item's fields. With `field`, the button is a toggle: pressed while that boolean field of the item is true, labelled `on_label` then, and fired with `on` set to the new value; the item is read again afterwards.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "action"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "icon": { "type": "string", "description": "A lucide icon name." },
+              "field": { "type": "string", "minLength": 1, "description": "Dotted path to a boolean on the item." },
+              "on_label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "action": { "$ref": "#/$defs/action" }
+            }
+          }
+        },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
     },
@@ -411,8 +435,10 @@
     "split_view": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "list", "detail"],
-      "description": "The kit's SplitView primitive (frontend/src/kit/primitives/SplitView.tsx). Not used by any page this session builds; added for catalog/schema completeness.",
+      "required": ["type"],
+      "dependentRequired": { "list": ["detail"], "detail": ["list"], "main": ["aside"], "aside": ["main"] },
+      "minProperties": 3,
+      "description": "The kit's SplitView primitive (ui/src/primitives/SplitView.tsx). Two forms: `list` and `detail` (an index beside one item, taking turns on a phone), or MEDIA-POLISH-01's `main` and `aside` (a wide column with a narrow one beside it from 1024 px, stacked below that: a player with Up next). A package page may use the main and aside form.",
       "properties": {
         "type": { "const": "split_view" },
         "list": {
@@ -421,7 +447,10 @@
             { "$ref": "#/$defs/card_grid" }
           ]
         },
-        "detail": { "$ref": "#/$defs/detail_pane" }
+        "detail": { "$ref": "#/$defs/detail_pane" },
+        "main": { "type": "array", "items": { "$ref": "#" }, "minItems": 1 },
+        "aside": { "type": "array", "items": { "$ref": "#" }, "minItems": 1 },
+        "aside_label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The aside column's accessible name (\"Up next\")." }
       }
     },
     "widget_card": {

@@ -10,10 +10,11 @@ export interface AppDataEntry { id: string; surface?: string; rows?: string; inp
 export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[] }
 
 /** The node types a package page may use. Anything that reads another route
- * (list, card_grid, widget_card, split_view, ...) or mounts a host component
+ * (card_grid, widget_card, ...) or mounts a host component
  * (message_thread, settings_editor) is refused: a package page draws only its
- * own data, through the two package nodes and the layout nodes. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player"];
+ * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
+ * split_view is a layout node; its children are checked like any other. */
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "split_view"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -78,6 +79,7 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   if (type === "media_shelf") {
     checkBinding(node.bind, `${where} media_shelf`, data, "list", out);
     checkAction(node.on_select, packageId, `${where} media_shelf.on_select`, out, true);
+    if (isObject(node.see_all)) checkAction(node.see_all.action, packageId, `${where} media_shelf.see_all`, out);
     checkFieldPath(node.item_media_field, `${where} media_shelf`, "item_media_field", out);
   }
   if (type === "billboard") {
@@ -90,6 +92,7 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     checkBinding(node.bind, `${where} player`, data, "list", out);
     checkAction(node.on_progress, packageId, `${where} player.on_progress`, out);
     checkAction(node.on_next, packageId, `${where} player.on_next`, out, true);
+    if (Array.isArray(node.actions)) node.actions.forEach((b, i) => isObject(b) && checkAction(b.action, packageId, `${where} player.actions[${i}]`, out));
   }
   if (type === "picker" && node.bind !== undefined) checkBinding(node.bind, `${where} picker`, data, "rows", out);
   if (isObject(node.empty_state)) checkAction(node.empty_state.action, packageId, where, out);
@@ -106,6 +109,14 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   }
   const kids = type === "page" ? node.body : type === "section" ? node.children : type === "detail_pane" ? node.body : undefined;
   if (Array.isArray(kids)) kids.forEach((kid, i) => walk(kid, packageId, data, `${where}/${type}[${i}]`, out));
+  if (type === "split_view") {
+    for (const part of ["main", "aside"] as const) {
+      const list = node[part];
+      if (Array.isArray(list)) list.forEach((kid, i) => walk(kid, packageId, data, `${where}/split_view.${part}[${i}]`, out));
+    }
+    if (node.list !== undefined) walk(node.list, packageId, data, `${where}/split_view.list`, out);
+    if (node.detail !== undefined) walk(node.detail, packageId, data, `${where}/split_view.detail`, out);
+  }
 }
 
 /** `loadPage(module)` returns the parsed `pages/<module>.json`, or undefined when the file is missing. `packageMinRole` is the manifest's own `min_role`; with it a page that lowers the floor is reported. */
