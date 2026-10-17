@@ -25,6 +25,7 @@ import { Button } from "@/kit/ui/button";
 import { Input } from "@/kit/ui/input";
 import { Checkbox } from "@/kit/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/kit/ui/tabs";
+import { Tabs as PillTabs, TabsList as PillTabsList, TabsTrigger as PillTabsTrigger } from "@/kit/dashboard/components/ui/tabs";
 import { getIcon } from "@/kit/icons";
 import { locationBlockedHelp } from "@/kit/geolocationHelp";
 import { AnswerBlockView } from "@/kit/elements/answer-block";
@@ -341,6 +342,38 @@ function PickerControl({ node, state, rows }: { node: PickerNode; state: Row; ro
     location.locate(value);
   }
 
+  if (node.variant === "pill") {
+    return (
+      <div className="flex min-w-0 max-w-full flex-col gap-2">
+        <PillTabs
+          className="min-w-0 max-w-full"
+          value={current == null ? "" : String(current)}
+          onValueChange={(value) => { if (value != null) choose(String(value)); }}
+        >
+          <PillTabsList variant="pill" aria-label={node.label}>
+            {leading.map((option) => {
+              const Icon = option.icon ? getIcon(option.icon) : null;
+              return (
+                <PillTabsTrigger key={`lead:${option.value}`} value={option.value} disabled={busy} className="min-h-[48px] min-w-[48px]">
+                  {Icon ? <Icon aria-hidden="true" /> : null}{option.label}
+                </PillTabsTrigger>
+              );
+            })}
+            {rows.map((row) => {
+              const key = String(readField(row, node.item_key_field ?? "id"));
+              return (
+                <PillTabsTrigger key={`row:${key}`} value={key} disabled={busy} className="min-h-[48px] min-w-[48px]">
+                  {String(readField(row, node.item_label_field ?? "label"))}
+                </PillTabsTrigger>
+              );
+            })}
+          </PillTabsList>
+        </PillTabs>
+        {note ? <p role="status" className="text-sm text-muted-foreground">{note}</p> : null}
+      </div>
+    );
+  }
+
   return (
     <div className="flex w-full min-w-0 max-w-sm flex-col gap-2">
       <Select value={typeof current === "string" ? current : ""} onValueChange={choose} disabled={busy}>
@@ -610,7 +643,7 @@ function localPicture(value: unknown): string | null {
 
 function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row }) {
   const query = useBinding<Row[]>(node.bind, state);
-  const { dispatch, lastError } = useDispatchAction();
+  const { dispatch, lastError, pendingConfirm } = useDispatchAction();
   function keyOf(row: Row): string {
     return String(readField(row, node.item_key_field));
   }
@@ -635,13 +668,44 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             heading={node.heading}
             variant={node.variant}
             orientation={node.orientation}
+            layout={node.layout}
+            artShape={node.art_shape}
+            density={node.density}
+            isHighlighted={node.item_highlight_field ? (row) => readField(row, node.item_highlight_field!) === true : undefined}
+            renderIndex={node.item_index_field
+              ? (row) => {
+                  const value = readField(row, node.item_index_field!);
+                  return typeof value === "string" || typeof value === "number" ? value : null;
+                }
+              : undefined}
+            renderActions={node.row_actions?.length
+              ? (row) => node.row_actions!.map((button, i) => {
+                  const Icon = getIcon(button.icon);
+                  const fieldLabel = button.label_field ? readField(row, button.label_field) : undefined;
+                  const label = typeof fieldLabel === "string" && fieldLabel !== "" ? fieldLabel : fillTemplate(button.label, row);
+                  const iconOnly = button.icon === "play";
+                  return (
+                    <Button
+                      key={i}
+                      type="button"
+                      variant={iconOnly ? "inverse" : "outline"}
+                      size={iconOnly ? "icon" : "default"}
+                      className={iconOnly ? "size-[48px] rounded-full" : "h-auto min-h-[48px] rounded-full whitespace-normal"}
+                      aria-label={`${label}: ${String(readField(row, node.item_label_field))}`}
+                      onClick={() => dispatch(button.action, [row])}
+                    >
+                      <Icon aria-hidden="true" />{iconOnly ? null : label}
+                    </Button>
+                  );
+                })
+              : undefined}
             hideWhenEmpty={node.hide_when_empty}
             seeAll={node.see_all ? { label: node.see_all.label, onSelect: () => dispatch(node.see_all!.action) } : undefined}
             onSelect={node.on_select ? (row) => dispatch(node.on_select!, [row]) : undefined}
             getLabel={(row) => String(readField(row, node.item_label_field))}
             renderCaption={(row) => (
               <span className="flex min-w-0 flex-col">
-                <span className={node.orientation === "vertical" ? "line-clamp-2 text-sm font-semibold" : "truncate text-sm font-semibold"}>{String(readField(row, node.item_label_field))}</span>
+                <span className={node.orientation === "vertical" && node.density !== "compact" ? "line-clamp-2 text-sm font-semibold" : "truncate text-sm font-semibold"}>{String(readField(row, node.item_label_field))}</span>
                 {node.item_subtitle_field ? (
                   <span className="text-muted-foreground truncate text-sm">{fillTemplate(node.item_subtitle_field, row)}</span>
                 ) : null}
@@ -671,6 +735,7 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             }
           />
           {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
+          <ConfirmDialog pendingConfirm={pendingConfirm} />
         </>
       )}
     </AsyncState>

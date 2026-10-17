@@ -1449,6 +1449,9 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   --player-radius: var(--radius-lg);
   /* MEDIA-POLISH-01: the small line over a Billboard title; the progress accent unless a tone says otherwise. */
   --art-eyebrow: var(--progress-accent);
+  /* Current track/next episode and the mockup's compact episode artwork. */
+  --media-current-ring: var(--primary);
+  --media-compact-radius: 10px;
 }
 
 /* MEDIA-POLISH-01: the cinema page tone (spec page `tone: "cinema"`, Home's

@@ -3,7 +3,7 @@ import { Card } from "@/kit/primitives/Card";
 import { Button } from "@/kit/ui/button";
 import { EmptyState } from "@/kit/primitives/EmptyState";
 import { Section } from "@/kit/primitives/Section";
-import { SHELF_ITEM_WIDTH, type Density } from "@/kit/responsive";
+import { GRID_COLUMNS, SHELF_ITEM_WIDTH, type Density } from "@/kit/responsive";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { useSurface } from "@/kit/useSurface";
 
@@ -33,6 +33,8 @@ interface MediaShelfProps<T> {
   onSelect?: (item: T) => void;
   getLabel?: (item: T) => string;
   isSelected?: (item: T) => boolean;
+  /** Compact uses the smaller rail-card budget, or 72 px artwork and two
+   * caption lines in vertical rows, with renderMeta trailing the row. */
   density?: Density;
   heading?: string;
   /** Accessible name for the rail. Falls back to `heading`. */
@@ -56,6 +58,17 @@ interface MediaShelfProps<T> {
    * `vertical` stacks the tiles as rows with the caption beside the picture
    * (Up next beside a player). */
   orientation?: "horizontal" | "vertical";
+  /** Grid wraps the existing card-size budget, with two columns on phones.
+   * Vertical orientation takes precedence over layout. */
+  layout?: "rail" | "grid";
+  /** Circle art is always square before clipping, including its current ring. */
+  artShape?: "default" | "circle";
+  /** Current/next-up state, independent of selection. */
+  isHighlighted?: (item: T) => boolean;
+  /** Optional leading track number for vertical rows. */
+  renderIndex?: (item: T) => ReactNode;
+  /** Row controls outside the artwork button. Schema shelves offer up to two. */
+  renderActions?: (item: T) => ReactNode;
   /** MEDIA-POLISH-01: with no items, draw nothing at all (no heading, no
    * empty state): a row with nothing in it is simply absent. */
   hideWhenEmpty?: boolean;
@@ -100,6 +113,11 @@ export function MediaShelf<T>({
   renderMeta,
   variant = "card",
   orientation = "horizontal",
+  layout = "rail",
+  artShape = "default",
+  isHighlighted,
+  renderIndex,
+  renderActions,
   hideWhenEmpty = false,
   seeAll,
 }: MediaShelfProps<T>) {
@@ -107,6 +125,15 @@ export function MediaShelf<T>({
   const { far } = useSurface();
   // A plain shelf is a section of the page with its own heading row; a card shelf is the kit Section card.
   const Frame = variant === "plain" ? PlainShelfFrame : CardShelfFrame;
+  const circle = artShape === "circle";
+  const artClasses = cn(
+    "relative w-full overflow-hidden bg-[var(--muted)]",
+    circle ? "aspect-square rounded-full" : ["rounded-[var(--radius)]", ASPECT_CLASSES[aspect]],
+  );
+  const currentClasses = "ring-2 ring-[var(--media-current-ring)] ring-offset-2 ring-offset-background";
+  // Use the existing card budgets, overriding only the phone count. The
+  // plain budget fits three/four whole cards instead of peeking the next.
+  const gridColumns = variant === "plain" ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4" : cn(GRID_COLUMNS[density], "grid-cols-2");
 
   if (items.length === 0 && hideWhenEmpty) return null;
 
@@ -121,22 +148,47 @@ export function MediaShelf<T>({
   if (orientation === "vertical") {
     return (
       <Frame heading={heading} seeAll={seeAll}>
-        <ul aria-label={name} className="flex min-w-0 list-none flex-col gap-3 p-0" data-slot="media-shelf" data-orientation="vertical">
+        <ul aria-label={name} className="flex min-w-0 list-none flex-col gap-3 p-0" data-slot="media-shelf" data-orientation="vertical" data-density={density}>
           {items.map((item) => (
-            <li key={getKey(item)} className="flex min-w-0 items-start gap-3">
+            <li
+              key={getKey(item)}
+              aria-current={isHighlighted?.(item) ? "true" : undefined}
+              className={cn("flex min-w-0 items-start gap-3", density === "compact" && "items-center")}
+            >
+              {renderIndex ? (
+                <span data-slot="media-shelf-index" className="w-6 shrink-0 text-right text-sm tabular-nums text-muted-foreground">{renderIndex(item)}</span>
+              ) : null}
               <Card
                 onSelect={onSelect ? () => onSelect(item) : undefined}
                 label={getLabel?.(item)}
                 selected={isSelected?.(item)}
                 far={far}
-                className={cn("w-2/5 max-w-40 shrink-0 border-0 bg-transparent", isSelected?.(item) && "ring-2 ring-primary ring-offset-2 ring-offset-background")}
+                className={cn(
+                  "w-2/5 max-w-40 shrink-0 border-0 bg-transparent",
+                  density === "compact" && "w-[72px]",
+                  circle && "rounded-full",
+                  isSelected?.(item) && "ring-2 ring-primary ring-offset-2 ring-offset-background",
+                  isHighlighted?.(item) && currentClasses,
+                )}
               >
-                <div className={cn("relative w-full overflow-hidden rounded-[var(--radius)] bg-[var(--muted)]", ASPECT_CLASSES[aspect])}>
+                <div className={cn(artClasses, density === "compact" && !circle && "rounded-[var(--media-compact-radius)]")}>
                   {renderItem(item)}
-                  <MediaTileOverlay progress={clampProgress(getProgress?.(item))} badge={renderBadge?.(item)} meta={renderMeta?.(item)} />
+                  <MediaTileOverlay
+                    progress={clampProgress(getProgress?.(item))}
+                    badge={renderBadge?.(item)}
+                    meta={density === "compact" ? undefined : renderMeta?.(item)}
+                  />
                 </div>
               </Card>
-              {renderCaption ? <div className="min-w-0 flex-1 text-sm text-[var(--foreground)]">{renderCaption(item)}</div> : null}
+              {renderCaption || renderActions ? (
+                <div className="min-w-0 flex-1 text-sm text-[var(--foreground)]">
+                  {renderCaption ? <div className={density === "compact" ? "line-clamp-2" : undefined}>{renderCaption(item)}</div> : null}
+                  {renderActions ? <div data-slot="media-shelf-row-actions" className="mt-2 flex flex-wrap items-center gap-2">{renderActions(item)}</div> : null}
+                </div>
+              ) : null}
+              {density === "compact" && renderMeta ? (
+                <span data-slot="media-shelf-duration" className="shrink-0 text-sm tabular-nums text-muted-foreground">{renderMeta(item)}</span>
+              ) : null}
             </li>
           ))}
         </ul>
@@ -151,12 +203,13 @@ export function MediaShelf<T>({
       <ul
         data-slot="media-shelf"
         data-variant={variant}
+        data-layout={layout}
         aria-label={name}
         // A scrollable region has to be reachable by keyboard (WCAG 2.2
         // AA, 2.1.1). When the tiles are buttons, tabbing through them
         // scrolls the rail already; when they are not, the rail itself
         // is the only thing left to focus, so it takes the tab stop.
-        tabIndex={onSelect ? undefined : 0}
+        tabIndex={onSelect || layout === "grid" ? undefined : 0}
         // The padding is not decoration: `overflow-x-auto` computes
         // `overflow-y` to `auto` too, so the rail clips on both axes, and
         // a tile's focus ring (2px ring, 2px offset) would be shaved off
@@ -172,10 +225,19 @@ export function MediaShelf<T>({
         // covers every `.overflow-x-auto` element on every captured
         // route, this one included, so a real instance would be caught
         // there rather than fixed blind here.
-        className={cn("flex min-w-0 list-none snap-x snap-mandatory gap-3 overflow-x-auto p-1.5", variant === "plain" && "[scrollbar-width:none]", FOCUS_RING)}
+        className={cn(
+          layout === "grid"
+            ? ["grid min-w-0 list-none gap-3 p-1.5", gridColumns]
+            : ["flex min-w-0 list-none snap-x snap-mandatory gap-3 overflow-x-auto p-1.5", variant === "plain" && "[scrollbar-width:none]"],
+          FOCUS_RING,
+        )}
       >
         {items.map((item) => (
-          <li key={getKey(item)} className={cn("flex shrink-0 snap-start flex-col gap-2", variant === "plain" ? PLAIN_ITEM_WIDTH : SHELF_ITEM_WIDTH[density])}>
+          <li
+            key={getKey(item)}
+            aria-current={isHighlighted?.(item) ? "true" : undefined}
+            className={cn("flex flex-col gap-2", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", variant === "plain" ? PLAIN_ITEM_WIDTH : SHELF_ITEM_WIDTH[density]])}
+          >
             <Card
               onSelect={onSelect ? () => onSelect(item) : undefined}
               label={getLabel?.(item)}
@@ -183,6 +245,7 @@ export function MediaShelf<T>({
               far={far}
               className={cn(
                 "border-0 bg-transparent",
+                circle && "rounded-full",
                 // The tile's own selected state. Card draws selection as
                 // a border color, which a borderless artwork tile zeroes
                 // out, so a selected tile was pixel-identical to every
@@ -193,14 +256,10 @@ export function MediaShelf<T>({
                 // away entirely; and it needs the offset, because a cyan
                 // ring drawn flush against cyan artwork is invisible.
                 isSelected?.(item) && "ring-2 ring-primary ring-offset-2 ring-offset-background",
+                isHighlighted?.(item) && currentClasses,
               )}
             >
-              <div
-                className={cn(
-                  "relative w-full overflow-hidden rounded-[var(--radius)] bg-[var(--muted)]",
-                  ASPECT_CLASSES[aspect],
-                )}
-              >
+              <div className={artClasses}>
                 {renderItem(item)}
                 <MediaTileOverlay
                   progress={clampProgress(getProgress?.(item))}

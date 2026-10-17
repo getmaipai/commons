@@ -15,6 +15,102 @@ const tracks: Track[] = [
 ];
 
 describe("MediaShelf", () => {
+  test("omitting the new variants preserves the explicit default rendering", () => {
+    const props = { items: tracks, getKey: (t: Track) => t.id, renderItem: (t: Track) => <span>{t.title}</span>, heading: "Music" };
+    const { container, rerender } = render(<MediaShelf {...props} />);
+    const before = container.innerHTML;
+    rerender(<MediaShelf {...props} layout="rail" artShape="default" density="default" />);
+    expect(container.innerHTML).toBe(before);
+  });
+
+  test("grid keeps the existing density budgets above the two-column phone layout", () => {
+    const props = { items: tracks, getKey: (t: Track) => t.id, renderItem: () => null, heading: "Music", layout: "grid" as const };
+    const { getByRole, rerender } = render(<MediaShelf {...props} />);
+    expect(getByRole("list").className).toContain("lg:grid-cols-3");
+    rerender(<MediaShelf {...props} density="compact" />);
+    expect(getByRole("list").className).toContain("lg:grid-cols-5");
+    rerender(<MediaShelf {...props} variant="plain" />);
+    expect(getByRole("list").className).toContain("xl:grid-cols-4");
+  });
+
+  for (const aspect of ["square", "poster"] as const) {
+    test(`grid wraps ${aspect} tiles in two phone columns without rail widths`, () => {
+      const { getByRole, container } = render(
+        <MediaShelf items={tracks} getKey={(t) => t.id} renderItem={() => <img alt="" src="/art.png" />}
+          heading="Collection" layout="grid" aspect={aspect} />,
+      );
+      const grid = getByRole("list", { name: "Collection" });
+      expect(grid.className.split(" ")).toContain("grid-cols-2");
+      expect(grid.className).not.toContain("overflow-x-auto");
+      expect(grid).not.toHaveAttribute("tabindex");
+      expect(grid.querySelector("li")!.className).not.toContain("w-[72%]");
+      expect(container.querySelector("img")!.parentElement!.className).toContain(aspect === "square" ? "aspect-square" : "aspect-[2/3]");
+    });
+  }
+
+  test("an empty grid honours hideWhenEmpty before the heading and empty state", () => {
+    const { container } = render(
+      <MediaShelf<Track> items={[]} getKey={(t) => t.id} renderItem={() => null} layout="grid"
+        hideWhenEmpty heading="Albums" emptyState={{ icon: "music", text: "No albums" }} />,
+    );
+    expect(container.textContent).toBe("");
+  });
+
+  test("circle art overrides poster aspect and gives the card a circular current ring", () => {
+    const { getByRole, container } = render(
+      <MediaShelf items={tracks} getKey={(t) => t.id} renderItem={() => <img alt="" src="/artist.png" />}
+        getLabel={(t) => t.title} onSelect={() => {}} artShape="circle" aspect="poster"
+        isHighlighted={(t) => t.id === "2"} layout="grid" />,
+    );
+    const box = container.querySelector("img")!.parentElement!;
+    expect(box.className).toContain("rounded-full");
+    expect(box.className).toContain("aspect-square");
+    expect(box.className).not.toContain("aspect-[2/3]");
+    const current = getByRole("button", { name: "Tempo" });
+    expect(current.className).toContain("rounded-full");
+    expect(current.className).toContain("ring-[var(--media-current-ring)]");
+    expect(current.closest("li")).toHaveAttribute("aria-current", "true");
+    expect(getByRole("button", { name: "Sprout" }).closest("li")).not.toHaveAttribute("aria-current");
+  });
+
+  test("compact rows have 72 px art, two caption lines, a leading index and trailing time outside the art", () => {
+    const select = mock((_t: Track) => {});
+    const action = mock((_t: Track) => {});
+    const { getByRole, getAllByText, container } = render(
+      <MediaShelf items={tracks} getKey={(t) => t.id} renderItem={() => <img alt="" src="/track.png" />}
+        getLabel={(t) => t.title} onSelect={select} orientation="vertical" density="compact" aspect="square"
+        renderCaption={(t) => <span>{t.title}<br />Artist</span>} renderIndex={(t) => Number(t.id) - 1}
+        renderMeta={() => "3:14"} isHighlighted={(t) => t.id === "1"}
+        renderActions={(t) => <button type="button" onClick={() => action(t)}>Save {t.title}</button>} />,
+    );
+    const tile = getByRole("button", { name: "Sprout" });
+    expect(tile.className).toContain("w-[72px]");
+    expect(container.querySelector('[data-slot="media-shelf-index"]')!.textContent).toBe("0");
+    expect(container.querySelector(".line-clamp-2")).not.toBeNull();
+    const time = getAllByText("3:14")[0]!;
+    expect(time.closest('[data-slot="media-shelf-duration"]')).not.toBeNull();
+    expect(time.closest("button")).toBeNull();
+    expect(container.querySelector('[data-slot="media-tile-meta"]')).toBeNull();
+    expect(tile.className).toContain("ring-[var(--media-current-ring)]");
+    const save = getByRole("button", { name: "Save Sprout" });
+    expect(save.parentElement!.closest("button")).toBeNull();
+    fireEvent.click(save);
+    expect(action.mock.calls[0]![0]).toEqual(tracks[0]!);
+    expect(select).not.toHaveBeenCalled();
+    fireEvent.click(tile);
+    expect(select.mock.calls[0]![0]).toEqual(tracks[0]!);
+  });
+
+  test("vertical orientation wins over grid layout and circle art still applies", () => {
+    const { getByRole, container } = render(
+      <MediaShelf items={tracks} getKey={(t) => t.id} renderItem={() => <img alt="" src="/art.png" />}
+        heading="Queue" orientation="vertical" layout="grid" artShape="circle" />,
+    );
+    expect(getByRole("list", { name: "Queue" })).toHaveAttribute("data-orientation", "vertical");
+    expect(getByRole("list", { name: "Queue" }).className).not.toContain("grid-cols");
+    expect(container.querySelector("img")!.parentElement!.className).toContain("rounded-full");
+  });
+
   test("renders one tile per item under its heading", () => {
     const { getByRole, getByLabelText } = render(
       <MediaShelf

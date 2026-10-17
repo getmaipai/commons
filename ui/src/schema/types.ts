@@ -153,6 +153,17 @@ export const MediaShelfNodeSchema = z.object({
   // MEDIA-POLISH-01: the frameless row, the vertical (Up next) list, hiding an empty shelf and the See all link.
   variant: z.enum(["card", "plain"]).default("card"),
   orientation: z.enum(["horizontal", "vertical"]).default("horizontal"),
+  layout: z.enum(["rail", "grid"]).optional(),
+  art_shape: z.enum(["default", "circle"]).optional(),
+  density: z.enum(["default", "compact"]).optional(),
+  item_highlight_field: z.string().optional(),
+  item_index_field: z.string().optional(),
+  row_actions: z.array(z.object({
+    icon: z.string().min(1),
+    label: z.string().min(1),
+    label_field: z.string().min(1).optional(),
+    action: ActionSchema,
+  }).strict()).max(2).optional(),
   hide_when_empty: z.boolean().default(false),
   see_all: z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), action: ActionSchema }).optional(),
   on_select: ActionSchema.optional(),
@@ -327,6 +338,7 @@ export type AnswerBlocksNode = z.infer<typeof AnswerBlocksNodeSchema>;
 
 export const PickerNodeSchema = z.object({
   type: z.literal("picker"),
+  variant: z.enum(["select", "pill"]).optional(),
   state: z.string().min(1),
   label: z.string().min(1),
   placeholder: z.string().optional(),
