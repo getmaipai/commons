@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.242] - ui-v0.5.242
+
+Edit action on pictures (image editor, slice A). `attachment.aui.tsx` exports `ImageEditContext` (default null) with `{ canEdit?, onEdit, label? }`: when provided, an image that is a message attachment (not the composer) shows a small pencil button at its top-start corner, named "Edit picture" (or `label`). It appears on hover or keyboard focus, always on touch (`@media (hover: none)`), and clicking it calls `onEdit({ id, name, src })` without opening the preview dialog. `ImageGallery` gains `onEditImage({ id, src, alt, index })`, `canEditImage` and `editLabel` with the same corner button per tile (tile open is not triggered); `AnswerBlockView` passes `onImageEdit(blockId, imageId)` through next to `onImageOpen`. Shared reveal classes live in `surfaces.tsx` (`imageEditRevealClass`). Additive: without the context or the props the markup is unchanged.
+
 ## [0.5.241] - ui-v0.5.241
 
 `PlaceAdapter` gains an optional `remove(id)`: `LocationField` calls it after the person confirms Remove on a list entry, so the host can delete the place record (a tombstone with its clock stamp) instead of only unlisting it. The confirm text now says the place is deleted. The schema `picker` node is `w-full max-w-3xl`, the same width as the wide `weather_card`, so the two line up on a package page at 1440. Additive: an adapter without `remove` behaves as before.

@@ -11,6 +11,7 @@ import {
   ChevronRightIcon,
   ExternalLinkIcon,
   ImageOffIcon,
+  PencilIcon,
 } from "lucide-react";
 import {
   useCallback,
@@ -21,9 +22,10 @@ import {
 } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/elements/ui/dialog";
 import { cn } from "cn";
+import { TooltipIconButton } from "./tooltip-icon-button";
 import { safeHref } from "./href";
 import { clamp } from "./range";
-import { field, ghostButton, mono } from "./surfaces";
+import { field, ghostButton, imageEditRevealClass, mono } from "./surfaces";
 
 export interface GalleryImage {
   id: string;
@@ -33,6 +35,13 @@ export interface GalleryImage {
   source?: { label?: string | undefined; url?: string | undefined } | undefined;
 }
 
+export interface GalleryImageEdit {
+  id: string;
+  src: string;
+  alt: string;
+  index: number;
+}
+
 export interface ImageGalleryProps extends Omit<
   ComponentProps<"div">,
   "children"
@@ -40,6 +49,13 @@ export interface ImageGalleryProps extends Omit<
   images: readonly GalleryImage[];
   maxVisible?: number | undefined;
   onOpen?: ((id: string) => void) | undefined;
+  /** Shows an Edit button on each tile's top-start corner (hover or focus on
+   * a pointer device, always on touch). Opening the tile is not triggered. */
+  onEditImage?: ((image: GalleryImageEdit) => void) | undefined;
+  /** Default true. Return false to hide Edit for one picture. */
+  canEditImage?: ((image: GalleryImageEdit) => boolean) | undefined;
+  /** Accessible name of the Edit button. Default "Edit picture". */
+  editLabel?: string | undefined;
 }
 
 const keyForImage = (image: GalleryImage) => `${image.id}\u0000${image.src}`;
@@ -48,6 +64,9 @@ export function ImageGallery({
   images,
   maxVisible = 6,
   onOpen,
+  onEditImage,
+  canEditImage,
+  editLabel = "Edit picture",
   className,
   ...props
 }: ImageGalleryProps) {
@@ -115,7 +134,18 @@ export function ImageGallery({
           const overflow =
             imageIndex === visibleCount - 1 && images.length > visibleCount;
 
-          return (
+          const editTarget: GalleryImageEdit = {
+            id: image.id,
+            src: image.src,
+            alt: image.alt,
+            index: imageIndex,
+          };
+          const editable =
+            onEditImage !== undefined &&
+            !failed &&
+            (canEditImage ? canEditImage(editTarget) : true);
+
+          const tile = (
             <button
               key={image.id}
               type="button"
@@ -145,6 +175,32 @@ export function ImageGallery({
                 </span>
               ) : null}
             </button>
+          );
+
+          if (!editable) return tile;
+          return (
+            <div
+              key={image.id}
+              data-slot="image-gallery-tile"
+              className="group/edit-tile relative"
+            >
+              {tile}
+              <TooltipIconButton
+                tooltip={editLabel}
+                side="top"
+                data-image-edit="true"
+                className={cn(
+                  "absolute start-2 top-2 z-10 size-6 rounded-full bg-black/50! text-white after:absolute after:-inset-1.5 hover:bg-black/70! hover:text-white! active:scale-[0.96]",
+                  imageEditRevealClass,
+                )}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onEditImage(editTarget);
+                }}
+              >
+                <PencilIcon aria-hidden className="size-3.5 stroke-[2.5]" />
+              </TooltipIconButton>
+            </div>
           );
         })}
       </div>

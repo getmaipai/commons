@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  createContext,
   type PropsWithChildren,
+  useContext,
   useState,
   type FC,
   isValidElement,
@@ -12,6 +14,7 @@ import {
   FileText,
   Loader2Icon,
   AlertCircleIcon,
+  PencilIcon,
 } from "lucide-react";
 import {
   AttachmentPrimitive,
@@ -40,6 +43,31 @@ import {
 import { TooltipIconButton } from "./tooltip-icon-button";
 import { useAttachmentSrc } from "./hooks/use-attachment-src";
 import { cn } from "cn";
+import { imageEditRevealClass } from "./surfaces";
+
+/** What the Edit action hands back for one picture. */
+export interface ImageEditTarget {
+  id: string;
+  name: string;
+  src: string;
+}
+
+/**
+ * Optional context: when a host provides it, a picture attached to a MESSAGE
+ * shows a small Edit button at its top-start corner (hover or keyboard focus on
+ * a pointer device, always on touch). Without the provider nothing changes.
+ */
+export interface ImageEditContextValue {
+  /** Default true. Return false to hide Edit for this picture. */
+  canEdit?: (attachment: ImageEditTarget) => boolean;
+  onEdit: (attachment: ImageEditTarget) => void;
+  /** Accessible name and tooltip. Default "Edit picture". */
+  label?: string;
+}
+
+export const ImageEditContext = createContext<ImageEditContextValue | null>(
+  null,
+);
 
 type AttachmentPreviewProps = {
   src: string;
@@ -150,7 +178,7 @@ const AttachmentUI: FC = () => {
       <Tooltip>
         <AttachmentPrimitive.Root
           className={cn(
-            "aui-attachment-root relative",
+            "aui-attachment-root group/edit-tile relative",
             isComposer &&
               "animate-in fade-in-0 zoom-in-95 duration-200 motion-reduce:animate-none",
             isImage &&
@@ -204,6 +232,7 @@ const AttachmentUI: FC = () => {
             </TooltipTrigger>
           </AttachmentPreviewDialog>
           {isComposer && <AttachmentRemove />}
+          {!isComposer && isImage && <AttachmentEdit />}
         </AttachmentPrimitive.Root>
         <TooltipContent side="top">
           <AttachmentPrimitive.Name />
@@ -213,6 +242,35 @@ const AttachmentUI: FC = () => {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+};
+
+const AttachmentEdit: FC = () => {
+  const edit = useContext(ImageEditContext);
+  const src = useAttachmentSrc();
+  const id = useAuiState((s) => s.attachment.id);
+  const name = useAuiState((s) => s.attachment.name);
+  if (!edit || !src) return null;
+  const target: ImageEditTarget = { id, name, src };
+  if (edit.canEdit && !edit.canEdit(target)) return null;
+  const label = edit.label ?? "Edit picture";
+  return (
+    <TooltipIconButton
+      tooltip={label}
+      side="top"
+      data-image-edit="true"
+      className={cn(
+        "aui-attachment-tile-edit absolute start-1 top-1 z-10 size-5 rounded-full bg-black/50! text-white after:absolute after:-inset-1.5 hover:bg-black/70! hover:text-white! active:scale-[0.96]",
+        imageEditRevealClass,
+      )}
+      onClick={(event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        edit.onEdit(target);
+      }}
+    >
+      <PencilIcon aria-hidden className="aui-attachment-edit-icon size-3 stroke-[2.5]" />
+    </TooltipIconButton>
   );
 };
 

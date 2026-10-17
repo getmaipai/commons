@@ -26,6 +26,8 @@ export interface AnswerBlockHandlers {
   resolveImageSrc?: (src: string) => string;
   /** An `image_gallery` tile was opened. */
   onImageOpen?: (blockId: string, imageId: string) => void;
+  /** An `image_gallery` tile's Edit button was pressed; the button shows only when this is set. */
+  onImageEdit?: (blockId: string, imageId: string) => void;
   /** A `schedule_card` toggle was pressed. Unset: the card is read-only. */
   onScheduleToggle?: (blockId: string) => void;
   /** Draw a block in its small form where its Element has one (today the
@@ -87,7 +89,7 @@ class Guard extends Component<
 // inferred type is `any`; `kind` selects which props shape the cast names.
 function renderKind(
   block: any,
-  { resolveImageSrc, onImageOpen, onScheduleToggle, compact, wide }: AnswerBlockHandlers,
+  { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide }: AnswerBlockHandlers,
 ): ReactNode {
   const props = block.props;
   switch (block.kind) {
@@ -115,6 +117,7 @@ function renderKind(
             src: resolveImageSrc ? resolveImageSrc(image.src) : image.src,
           }))}
           onOpen={onImageOpen && ((id) => onImageOpen(block.id, id))}
+          onEditImage={onImageEdit && ((image) => onImageEdit(block.id, image.id))}
         />
       );
     case "schedule_card":
@@ -137,6 +140,7 @@ export function AnswerBlockView({
   block,
   resolveImageSrc,
   onImageOpen,
+  onImageEdit,
   onScheduleToggle,
   compact,
   wide,
@@ -168,7 +172,7 @@ export function AnswerBlockView({
         className={className}
         {...props}
       >
-        {renderKind(valid, { resolveImageSrc, onImageOpen, onScheduleToggle, compact, wide })}
+        {renderKind(valid, { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide })}
       </div>
     </Guard>
   );

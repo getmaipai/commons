@@ -154,3 +154,7 @@ export function SwapLabel({
     </span>
   );
 }
+
+/** Shared reveal classes: hover/focus on pointer devices, always on touch. */
+export const imageEditRevealClass =
+  "opacity-0 transition-opacity group-hover/edit-tile:opacity-100 group-focus-within/edit-tile:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100 motion-reduce:transition-none";

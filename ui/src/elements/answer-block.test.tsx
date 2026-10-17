@@ -59,6 +59,19 @@ describe("AnswerBlockView renders each v1 kind with its Element", () => {
     expect(opened).toEqual([["blk-g8h9i0", "p1"]]);
   });
 
+  test("image_gallery Edit reports the block and image id", () => {
+    const edited: string[][] = [];
+    const { getAllByRole } = render(
+      <AnswerBlockView
+        block={fixture("image_gallery")}
+        resolveImageSrc={(src) => `data:image/gif;base64,R0lGODlhAQABAAAAACw=#${src}`}
+        onImageEdit={(blockId, imageId) => edited.push([blockId, imageId])}
+      />,
+    );
+    fireEvent.click(getAllByRole("button", { name: "Edit picture" })[0]!);
+    expect(edited).toEqual([["blk-g8h9i0", "p1"]]);
+  });
+
   test("schedule_card reports toggles with the block id", () => {
     const toggled: string[] = [];
     const { container } = render(
