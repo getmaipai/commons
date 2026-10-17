@@ -123,7 +123,10 @@ export default [
           message: "no raw colors: use a token",
         },
       ],
-      "better-tailwindcss/no-unknown-classes": "error",
+      // `dark` is the theme scope class tokens.css keys off (`.dark { ... }`), not a
+      // utility: the Player's video chrome and the Billboard set it so kit
+      // parts over a picture take the dark tokens in either theme.
+      "better-tailwindcss/no-unknown-classes": ["error", { ignore: ["^dark$"] }],
       "better-tailwindcss/no-conflicting-classes": "error",
       "better-tailwindcss/no-restricted-classes": [
         "error",

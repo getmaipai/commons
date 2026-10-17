@@ -1426,6 +1426,29 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   display: none;
 }
 
+/* MEDIA-PLAYER-01: tokens for anything drawn over a picture (art), shared by
+ * the Player, the Billboard and the media tile overlay (MediaShelf), and open
+ * to any app with artwork (News included). Words and controls over art are
+ * light-on-dark in both themes. An app restyles them by setting values here
+ * (the Videos app's red progress accent), never by touching a part. The
+ * Player maps Media Chrome's own --media-* variables from these. */
+:root {
+  /* The played-share bar on tiles and the Player's time range. */
+  --progress-accent: var(--primary);
+  /* Behind a picture that has not loaded, and the letterbox. */
+  --art-surface: #000000;
+  /* Text and icons over art. */
+  --art-foreground: #ffffff;
+  /* The unplayed part of a bar over art. */
+  --art-track: color-mix(in srgb, #ffffff 30%, transparent);
+  /* The bottom gradient that keeps controls readable over any picture. */
+  --art-scrim: linear-gradient(to top, color-mix(in srgb, #000000 78%, transparent), transparent);
+  /* A chip or panel over art (running time, the resume line, Up next). */
+  --art-overlay: color-mix(in srgb, #000000 62%, transparent);
+  --art-radius: var(--radius-md);
+  --player-radius: var(--radius-lg);
+}
+
 /* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */
 /* Targets: --target-min is the smallest control size; the rail reads --rail-button and --rail-width. */
 :root {

@@ -124,6 +124,47 @@ icon registry also recognizes the spec area's `network` icon.
 Resetting either network setting runs the same host confirmation before the
 generic settings renderer writes its default.
 
+## MEDIA-PLAYER-01 (ui-v0.5.257, spec-v0.1.164)
+
+The kit gained the media pieces the media apps design names (home
+`docs/design/media-apps-blend-2026-10-17.md` sections 6 and 10).
+
+- **Player on Media Chrome.** Reuse check in Home rule 9b's order on
+  2026-10-17: Kibo UI's `video-player` (built on Media Chrome) had no release
+  in 90 days (v1.1.5, 2025-10-29; the part last changed 2026-03-08), Media
+  Chrome 4.19.3 (2026-09-28) passed, Vidstack was not reached. The ledger
+  rows for `player` and `billboard` are in Home's
+  `docs/design/UI-DECISIONS.md`. Media Chrome draws the controller, buttons
+  and time range (chapter segments and storyboard previews come from text
+  tracks the Player writes); the kit adds the rate and chapter menus, Skip
+  intro and credits, the resume line, the Up next countdown, Media Session,
+  FileTube's gestures and the keyboard. Its theme is set only through its
+  `--media-*` variables, mapped from the new `--art-*` and
+  `--progress-accent` tokens. Two things learned in the browser: Tailwind's
+  preflight zeroes a custom element's `:host` padding, so each Media Chrome
+  part carries its padding as a class (Kibo does the same), and Media Chrome
+  fills slotted icons, so lucide icons other than play and pause carry
+  `fill-none`.
+- **One media element across layouts.** The controller and the media
+  element are keyed, so `video` to `mini` and back keeps playback going.
+  The shell's audio session (AUDIO-SESSION-01) decides where a docked
+  player lives; this slice builds no session.
+- **Progress.** `onProgress` reports every 10 s while playing and on pause,
+  seek, end and unload, and nothing before the person has played or
+  sought, so opening a page (or React's development double mount) never
+  writes a 0 over a stored position.
+- **`play` action.** The interpreter hands the filled `media_id` and the
+  row to `MediaHostContext.onPlay`; the host decides what playing means and
+  whether this person may play the item. Without a host the action fails
+  with a message that says what to do. A package page may use `play` on a
+  shelf tile, a billboard button and the player's next item only
+  (`spec/ui/app-check.ts`).
+- **Tests.** Media Chrome's custom elements build shadow CSS happy-dom
+  cannot parse, so the test preload stubs `media-chrome/react`; the kit's
+  own behaviour runs against the media element in tests, and Media
+  Chrome's drawing was judged in a browser at 1440 and 390 wide in both
+  themes.
+
 ## Workspace status
 
 - `ui/`: `ui-v0.1.0` landed. The kit, extracted read-only from the

@@ -26,3 +26,20 @@ describe("DropdownMenuContent density", () => {
     expect(document.querySelector('[data-slot="dropdown-menu-item"]')?.className).toContain("in-data-[density=compact]:min-h-8");
   });
 });
+
+describe("DropdownMenuContent container", () => {
+  test("portals into the given element (the Player root, so a menu shows in fullscreen)", () => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    render(
+      <DropdownMenu open>
+        <DropdownMenuTrigger>t</DropdownMenuTrigger>
+        <DropdownMenuContent container={host}>
+          <DropdownMenuItem>One</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>,
+    );
+    expect(host.querySelector('[data-slot="dropdown-menu-content"]')).toBeTruthy();
+    host.remove();
+  });
+});

@@ -20,6 +20,10 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
         "quiet-link": "text-foreground font-normal underline-offset-4 hover:underline",
+        // MEDIA-PLAYER-01: the strongest action over artwork (the Billboard's
+        // Play): the page's text color as the fill, so it is light under a
+        // `dark` scope and dark under a light one.
+        inverse: "bg-foreground text-background hover:bg-foreground/90",
       },
       // 48px is the kit's hard minimum touch target (docs/UI.md); "default",
       // "lg" and "icon" clear it directly, with text-base to also clear the

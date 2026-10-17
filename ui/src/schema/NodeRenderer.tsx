@@ -7,6 +7,10 @@ import { Section } from "@/kit/primitives/Section";
 import { List } from "@/kit/primitives/List";
 import { CardGrid } from "@/kit/primitives/CardGrid";
 import { MediaShelf } from "@/kit/primitives/MediaShelf";
+import { Billboard } from "@/kit/primitives/Billboard";
+import { Player, type PlayerChapter, type PlayerTextTrack, type PlayerUpNext } from "@/kit/primitives/Player";
+import { formatTime } from "@/kit/primitives/playerLogic";
+import { Badge } from "@/kit/ui/badge";
 import { DetailPane } from "@/kit/primitives/DetailPane";
 import { SplitView } from "@/kit/primitives/SplitView";
 import { WidgetCard } from "@/kit/primitives/WidgetCard";
@@ -36,6 +40,8 @@ import type {
   ListNode,
   CardGridNode,
   MediaShelfNode,
+  BillboardNode,
+  PlayerNode,
   DetailPaneNode,
   SplitViewNode,
   FormNode,
@@ -592,9 +598,14 @@ function CardGridNodeView({ node }: { node: CardGridNode }) {
   );
 }
 
-function MediaShelfNodeView({ node }: { node: MediaShelfNode }) {
-  const query = useBinding<Row[]>(node.bind);
-  const { dispatch } = useDispatchAction();
+/** A same-origin picture path, or nothing: an address with a scheme or a host is never loaded (RowMedia's rule). */
+function localPicture(value: unknown): string | null {
+  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : null;
+}
+
+function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row }) {
+  const query = useBinding<Row[]>(node.bind, state);
+  const { dispatch, lastError } = useDispatchAction();
   function keyOf(row: Row): string {
     return String(readField(row, node.item_key_field));
   }
@@ -610,19 +621,137 @@ function MediaShelfNodeView({ node }: { node: MediaShelfNode }) {
       emptyText={node.empty_state?.text ?? "Nothing here yet."}
     >
       {(rows) => (
-        <MediaShelf
-          items={rows}
-          getKey={keyOf}
-          aspect={node.aspect}
-          onSelect={node.on_select ? (row) => dispatch(node.on_select!, [row]) : undefined}
-          getLabel={(row) => String(readField(row, node.item_label_field))}
-          renderCaption={(row) => <span className="text-sm">{String(readField(row, node.item_label_field))}</span>}
-          renderItem={(row) => {
-            const src = String(readField(row, node.item_media_field) ?? "");
-            return src ? <img src={src} alt="" className="h-full w-full object-cover" /> : null;
-          }}
-        />
+        <>
+          <MediaShelf
+            items={rows}
+            getKey={keyOf}
+            aspect={node.aspect}
+            heading={node.heading}
+            onSelect={node.on_select ? (row) => dispatch(node.on_select!, [row]) : undefined}
+            getLabel={(row) => String(readField(row, node.item_label_field))}
+            renderCaption={(row) => (
+              <span className="flex min-w-0 flex-col">
+                <span className="truncate text-sm font-semibold">{String(readField(row, node.item_label_field))}</span>
+                {node.item_subtitle_field ? (
+                  <span className="text-muted-foreground truncate text-sm">{fillTemplate(node.item_subtitle_field, row)}</span>
+                ) : null}
+              </span>
+            )}
+            renderItem={(row) => {
+              const src = localPicture(readField(row, node.item_media_field));
+              return src ? <img src={src} alt="" className="h-full w-full object-cover" /> : null;
+            }}
+            getProgress={node.item_progress_field ? (row) => Number(readField(row, node.item_progress_field!)) : undefined}
+            renderBadge={
+              node.item_badge_field
+                ? (row) => {
+                    const text = readField(row, node.item_badge_field!);
+                    return typeof text === "string" && text !== "" ? <Badge variant="secondary">{text}</Badge> : null;
+                  }
+                : undefined
+            }
+            renderMeta={
+              node.item_meta_field
+                ? (row) => {
+                    const meta = readField(row, node.item_meta_field!);
+                    if (typeof meta === "number" && Number.isFinite(meta) && meta > 0) return formatTime(meta);
+                    return typeof meta === "string" && meta !== "" ? meta : null;
+                  }
+                : undefined
+            }
+          />
+          {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
+        </>
       )}
+    </AsyncState>
+  );
+}
+
+function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row }) {
+  const query = useBinding<Row[]>(node.bind, state);
+  const { dispatch, lastError } = useDispatchAction();
+  return (
+    <AsyncState
+      data={query.data}
+      error={query.isError}
+      isFetching={query.isFetching}
+      onRetry={() => query.refetch()}
+      errorMessage="Could not load the featured items."
+      isEmpty={(rows) => rows.length === 0}
+      emptyIcon={node.empty_state?.icon ?? "film"}
+      emptyText={node.empty_state?.text ?? "Nothing featured yet."}
+    >
+      {(rows) => (
+        <>
+          <Billboard
+            label={node.label ?? "Featured"}
+            size={node.size}
+            autoplay={node.autoplay}
+            slides={rows.map((row) => ({
+              id: String(readField(row, node.item_key_field)),
+              title: String(readField(row, node.item_title_field) ?? ""),
+              subtitle: node.item_subtitle_field ? fillTemplate(node.item_subtitle_field, row) : undefined,
+              eyebrow: node.item_eyebrow_field ? fillTemplate(node.item_eyebrow_field, row) : undefined,
+              art: node.item_art_field ? (localPicture(readField(row, node.item_art_field)) ?? undefined) : undefined,
+              primary: { label: node.primary.label, icon: node.primary.icon, onSelect: () => dispatch(node.primary.action, [row]) },
+              secondary: node.secondary?.map((b) => ({ label: b.label, icon: b.icon, onSelect: () => dispatch(b.action, [row]) })),
+            }))}
+          />
+          {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
+        </>
+      )}
+    </AsyncState>
+  );
+}
+
+function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
+  const query = useBinding<Row | Row[]>(node.bind, state);
+  const { dispatch, lastError } = useDispatchAction();
+  const field = (name: keyof NonNullable<PlayerNode["fields"]>, fallback: string) => node.fields?.[name] ?? fallback;
+  const item = Array.isArray(query.data) ? query.data[0] : query.data;
+  return (
+    <AsyncState
+      data={item === undefined && query.data !== undefined ? null : item}
+      error={query.isError}
+      isFetching={query.isFetching}
+      onRetry={() => query.refetch()}
+      errorMessage="Could not load this item."
+      isEmpty={(row) => row === null || localPicture(readField(row, field("src", "src"))) === null}
+      emptyIcon={node.empty_state?.icon ?? "film"}
+      emptyText={node.empty_state?.text ?? "This item is not available."}
+    >
+      {(row) => {
+        const r = row as Row;
+        const upNext = readField(r, field("up_next", "up_next")) as PlayerUpNext | undefined;
+        const position = readField(r, field("position", "position_s"));
+        return (
+          <>
+            <Player
+              src={localPicture(readField(r, field("src", "src")))!}
+              kind={node.kind}
+              layout={node.layout}
+              title={String(readField(r, field("title", "title")) ?? "")}
+              subtitle={(readField(r, field("subtitle", "subtitle")) as string | undefined) ?? undefined}
+              poster={localPicture(readField(r, field("poster", "poster"))) ?? undefined}
+              chapters={(readField(r, field("chapters", "chapters")) as PlayerChapter[] | undefined) ?? undefined}
+              captions={(readField(r, field("captions", "captions")) as PlayerTextTrack[] | undefined) ?? undefined}
+              thumbnails={localPicture(readField(r, field("thumbnails", "thumbnails"))) ?? undefined}
+              resumeFrom={typeof position === "number" ? position : undefined}
+              completed={readField(r, field("completed", "completed")) === true}
+              upNext={upNext && typeof upNext.id === "string" ? upNext : undefined}
+              autoplayNext={node.autoplay_next}
+              onProgress={
+                node.on_progress
+                  ? (p) =>
+                      dispatch(node.on_progress!, [{ ...r, ...p }], undefined, { quiet: true, keepalive: p.reason === "unload" })
+                  : undefined
+              }
+              onNext={node.on_next && upNext ? () => dispatch(node.on_next!, [upNext as unknown as Row]) : undefined}
+            />
+            {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
+          </>
+        );
+      }}
     </AsyncState>
   );
 }
@@ -873,7 +1002,11 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
     case "card_grid":
       return <CardGridNodeView node={node} />;
     case "media_shelf":
-      return <MediaShelfNodeView node={node} />;
+      return <MediaShelfNodeView node={node} state={state} />;
+    case "billboard":
+      return <BillboardNodeView node={node} state={state} />;
+    case "player":
+      return <PlayerNodeView node={node} state={state} />;
     case "detail_pane":
       return <DetailPaneNodeView node={node} state={state} />;
     case "split_view":

@@ -12,8 +12,17 @@ import {
   underPluginApi,
   type PackageScope,
 } from "@/kit/schema/packageScope";
+import { MediaHostContext, PLAY_UNAVAILABLE, type MediaHost } from "@/kit/schema/mediaHost";
 
-// The five declared actions (platform plan 6.2). `ask` has no consumer
+/** How a dispatch runs. `quiet`: no refetch of the page's bindings and no error under the node (a player's progress
+ * report every 10 s). `keepalive`: a `call` survives the page closing (the last progress report on unload). */
+export interface DispatchOptions {
+  quiet?: boolean;
+  keepalive?: boolean;
+}
+
+// The five declared actions (platform plan 6.2). `play` hands the item to the
+// host's player (MEDIA-PLAYER-01, mediaHost.ts). `ask` has no consumer
 // yet (nothing this session builds is voice-driven) - dispatching it
 // throws rather than silently no-oping, the same "loud, not quiet" gap
 // binding.ts's `host` source leaves.
@@ -22,6 +31,8 @@ async function runAction(
   item: Record<string, unknown>,
   navigate: (to: string, options?: { state?: unknown }) => void,
   scope: PackageScope | null = null,
+  host: MediaHost | null = null,
+  options: DispatchOptions = {},
 ): Promise<void> {
   if ("navigate" in action) {
     const to = fillTemplate(action.navigate.to, item);
@@ -41,11 +52,15 @@ async function runAction(
       throw new Error(PACKAGE_ACTION_REFUSED);
     }
     const args = action.call.args ? fillTemplateDeep(action.call.args, item) : undefined;
-    await request(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined });
+    await request(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined, keepalive: options.keepalive });
     return;
   }
   if ("play" in action) {
-    throw new Error(`kit/schema: action "play" has no interpreter support yet (media_id: ${action.play.media_id})`);
+    // MEDIA-PLAYER-01: hand the item to the host's player (mediaHost.ts). A package page reaches only its own rows, so
+    // the id came from its own data; the host still decides whether this person may play it.
+    if (!host) throw new Error(PLAY_UNAVAILABLE);
+    await host.onPlay(fillTemplate(action.play.media_id, item), item);
+    return;
   }
   if ("confirm" in action) {
     // Handled by useDispatchAction itself (below), which needs to show a
@@ -105,13 +120,14 @@ function fillCount(template: string, count: number): string {
  * selection for nothing. `onSettled` fires once the action truly runs
  * (success or failure), never on a plain `cancel()`. */
 export function useDispatchAction(): {
-  dispatch(action: Action, items?: Record<string, unknown>[], onSettled?: () => void): void;
+  dispatch(action: Action, items?: Record<string, unknown>[], onSettled?: () => void, options?: DispatchOptions): void;
   pendingConfirm: PendingConfirm | null;
   lastError: string | null;
 } {
   const navigateTo = useNavigate();
   const queryClient = useQueryClient();
   const scope = useContext(PackageScopeContext);
+  const host = useContext(MediaHostContext);
   const [pending, setPending] = useState<{
     action: Action;
     items: Record<string, unknown>[];
@@ -124,20 +140,24 @@ export function useDispatchAction(): {
   const navigate = useCallback((to: string, options?: { state?: unknown }) => navigateTo(to, options), [navigateTo]);
 
   const runAndInvalidate = useCallback(
-    async (action: Action, items: Record<string, unknown>[]) => {
+    async (action: Action, items: Record<string, unknown>[], options: DispatchOptions = {}) => {
+      if (options.quiet) {
+        for (const item of items) await runAction(action, item, navigate, scope, host, options);
+        return;
+      }
       try {
-        for (const item of items) await runAction(action, item, navigate, scope);
+        for (const item of items) await runAction(action, item, navigate, scope, host, options);
       } finally {
         // Whatever succeeded before a failure still needs to leave the
         // stale list, so this runs even when the loop above threw.
         await queryClient.invalidateQueries({ queryKey: ["schema-binding"] });
       }
     },
-    [navigate, queryClient, scope],
+    [navigate, queryClient, scope, host],
   );
 
   const dispatch = useCallback(
-    (action: Action, items: Record<string, unknown>[] = [{}], onSettled?: () => void) => {
+    (action: Action, items: Record<string, unknown>[] = [{}], onSettled?: () => void, options: DispatchOptions = {}) => {
       if ("confirm" in action) {
         setError(null);
         // A stale lastError from an earlier failed non-confirm dispatch (a
@@ -149,8 +169,14 @@ export function useDispatchAction(): {
         setPending({ action, items, onSettled });
         return;
       }
+      if (options.quiet) {
+        void runAndInvalidate(action, items, options)
+          .catch((e: unknown) => console.warn("kit/schema: a quiet action failed", e instanceof Error ? e.message : e))
+          .finally(() => onSettled?.());
+        return;
+      }
       setLastError(null);
-      void runAndInvalidate(action, items)
+      void runAndInvalidate(action, items, options)
         .catch((e: unknown) => setLastError(e instanceof Error ? e.message : "Something went wrong."))
         .finally(() => onSettled?.());
     },

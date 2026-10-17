@@ -165,4 +165,34 @@ describe("MediaShelf", () => {
     expect(getByText("Nothing started yet")).toBeInTheDocument();
     expect(queryByLabelText("Continue watching")).toBeNull();
   });
+
+  test("a tile shows its played share, a corner badge and its running time", () => {
+    const { getAllByRole, getByText, container } = render(
+      <MediaShelf
+        items={tracks}
+        getKey={(t) => t.id}
+        renderItem={() => <img src="/x.png" alt="" />}
+        getProgress={(t) => (t.id === "1" ? 0.4 : undefined)}
+        renderBadge={(t) => (t.id === "2" ? <span>Not saved</span> : null)}
+        renderMeta={() => "18:42"}
+        aspect="poster"
+        label="Continue"
+      />,
+    );
+    const bars = getAllByRole("progressbar", { name: "Played" });
+    expect(bars).toHaveLength(1);
+    expect(bars[0]!.getAttribute("aria-valuenow")).toBe("40");
+    expect(getByText("Not saved")).toBeInTheDocument();
+    expect(container.querySelectorAll("[data-slot=media-tile-meta]")).toHaveLength(2);
+    expect(container.querySelector(".aspect-\\[2\\/3\\]")).toBeTruthy();
+  });
+
+  test("progress is clamped and nothing is drawn at zero", () => {
+    const { getAllByRole } = render(
+      <MediaShelf items={tracks} getKey={(t) => t.id} renderItem={() => null} getProgress={(t) => (t.id === "1" ? 0 : 3)} label="P" />,
+    );
+    const bars = getAllByRole("progressbar");
+    expect(bars).toHaveLength(1);
+    expect(bars[0]!.getAttribute("aria-valuenow")).toBe("100");
+  });
 });

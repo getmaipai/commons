@@ -37,7 +37,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
           args: z.record(z.string(), z.unknown()).optional(),
         }),
       }),
-      z.object({ play: z.object({ media_id: z.string() }) }),
+      z.object({ play: z.object({ media_id: z.string().min(1) }) }),
       z.object({ confirm: z.object({ prompt: z.string(), on_confirm: ActionSchema }) }),
       z.object({ ask: z.object({ prompt: z.string(), expects: z.string() }) }),
     ])
@@ -140,15 +140,60 @@ export type CardGridNode = z.infer<typeof CardGridNodeSchema>;
 
 export const MediaShelfNodeSchema = z.object({
   type: z.literal("media_shelf"),
+  heading: z.string().min(1).max(60).optional(),
   bind: BindingSchema,
   item_key_field: z.string(),
   item_label_field: z.string(),
+  item_subtitle_field: z.string().optional(),
   item_media_field: z.string(),
+  item_progress_field: z.string().optional(),
+  item_badge_field: z.string().optional(),
+  item_meta_field: z.string().optional(),
   aspect: z.enum(["wide", "square", "poster"]).default("wide"),
   on_select: ActionSchema.optional(),
   empty_state: EmptyStateNodeSchema.optional(),
 });
 export type MediaShelfNode = z.infer<typeof MediaShelfNodeSchema>;
+
+// MEDIA-PLAYER-01: the Billboard and the Player as nodes (spec/ui/schema.json `billboard`, `player`).
+export const BillboardActionSchema = z.object({
+  label: z.string().min(1).max(40),
+  icon: z.string().optional(),
+  action: ActionSchema,
+});
+export type BillboardActionNode = z.infer<typeof BillboardActionSchema>;
+
+export const BillboardNodeSchema = z.object({
+  type: z.literal("billboard"),
+  bind: BindingSchema,
+  label: z.string().min(1).max(60).optional(),
+  size: z.enum(["card", "hero"]).default("card"),
+  autoplay: z.boolean().default(true),
+  item_key_field: z.string(),
+  item_title_field: z.string(),
+  item_subtitle_field: z.string().optional(),
+  item_eyebrow_field: z.string().optional(),
+  item_art_field: z.string().optional(),
+  primary: BillboardActionSchema,
+  secondary: z.array(BillboardActionSchema).max(2).optional(),
+  empty_state: EmptyStateNodeSchema.optional(),
+});
+export type BillboardNode = z.infer<typeof BillboardNodeSchema>;
+
+export const PLAYER_FIELDS = ["id", "src", "title", "subtitle", "poster", "chapters", "captions", "thumbnails", "position", "completed", "up_next"] as const;
+
+export const PlayerNodeSchema = z.object({
+  type: z.literal("player"),
+  bind: BindingSchema,
+  kind: z.enum(["video", "audio"]).default("video"),
+  layout: z.enum(["video", "audio", "mini"]).optional(),
+  autoplay_next: z.boolean().default(false),
+  fields: z.object(Object.fromEntries(PLAYER_FIELDS.map((f) => [f, z.string().min(1).optional()])) as Record<(typeof PLAYER_FIELDS)[number], z.ZodOptional<z.ZodString>>).strict().optional(),
+  on_progress: ActionSchema.optional(),
+  on_next: ActionSchema.optional(),
+  empty_state: EmptyStateNodeSchema.optional(),
+});
+export type PlayerNode = z.infer<typeof PlayerNodeSchema>;
 
 export const DetailPaneNodeSchema: z.ZodType<DetailPaneNode> = z.lazy(() =>
   z.object({
@@ -311,6 +356,8 @@ export type UiNode =
   | ListNode
   | CardGridNode
   | MediaShelfNode
+  | BillboardNode
+  | PlayerNode
   | DetailPaneNode
   | SplitViewNode
   | WidgetCardNode
@@ -331,6 +378,8 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     ListNodeSchema,
     CardGridNodeSchema,
     MediaShelfNodeSchema,
+    BillboardNodeSchema,
+    PlayerNodeSchema,
     DetailPaneNodeSchema,
     SplitViewNodeSchema,
     WidgetCardNodeSchema,
@@ -354,6 +403,8 @@ export const NODE_TYPES = [
   "list",
   "card_grid",
   "media_shelf",
+  "billboard",
+  "player",
   "detail_pane",
   "split_view",
   "widget_card",

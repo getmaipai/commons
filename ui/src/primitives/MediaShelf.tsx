@@ -37,6 +37,21 @@ interface MediaShelfProps<T> {
   /** Accessible name for the rail. Falls back to `heading`. */
   label?: string;
   emptyState?: { icon: string; text: string };
+  /** MEDIA-PLAYER-01: how much of the item was played, 0 to 1. A bar along
+   * the tile's bottom edge; nothing is drawn for undefined, 0 or less. */
+  getProgress?: (item: T) => number | undefined;
+  /** MEDIA-PLAYER-01: a badge pinned to the tile's top-start corner (where a
+   * copy lives: "Saved", "On this phone", "Not saved"). The caller passes a
+   * kit `Badge`. */
+  renderBadge?: (item: T) => ReactNode;
+  /** MEDIA-PLAYER-01: a small label pinned to the tile's bottom-end corner
+   * (a running time such as "18:42"). */
+  renderMeta?: (item: T) => ReactNode;
+}
+
+function clampProgress(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value) || value <= 0) return 0;
+  return Math.min(1, value);
 }
 
 // docs/UI.md names MediaShelf as a kit primitive, and docs/BACKLOG.md
@@ -66,6 +81,9 @@ export function MediaShelf<T>({
   heading,
   label,
   emptyState,
+  getProgress,
+  renderBadge,
+  renderMeta,
 }: MediaShelfProps<T>) {
   const name = label ?? heading;
   const { far } = useSurface();
@@ -129,11 +147,16 @@ export function MediaShelf<T>({
             >
               <div
                 className={cn(
-                  "w-full overflow-hidden rounded-[var(--radius)] bg-[var(--muted)]",
+                  "relative w-full overflow-hidden rounded-[var(--radius)] bg-[var(--muted)]",
                   ASPECT_CLASSES[aspect],
                 )}
               >
                 {renderItem(item)}
+                <MediaTileOverlay
+                  progress={clampProgress(getProgress?.(item))}
+                  badge={renderBadge?.(item)}
+                  meta={renderMeta?.(item)}
+                />
               </div>
             </Card>
             {renderCaption ? (
@@ -148,5 +171,35 @@ export function MediaShelf<T>({
         ))}
       </ul>
     </Section>
+  );
+}
+
+/** The tile's corners and bottom edge: badge, running time and progress. Shared with any media tile the kit draws. */
+export function MediaTileOverlay({ progress = 0, badge, meta }: { progress?: number; badge?: ReactNode; meta?: ReactNode }) {
+  return (
+    <>
+      {badge ? <span className="absolute start-2 top-2 flex" data-slot="media-tile-badge">{badge}</span> : null}
+      {meta ? (
+        <span
+          className="absolute end-2 bottom-2 rounded-md bg-[var(--art-overlay)] px-1.5 py-0.5 text-xs font-semibold text-[var(--art-foreground)] tabular-nums"
+          data-slot="media-tile-meta"
+        >
+          {meta}
+        </span>
+      ) : null}
+      {progress > 0 ? (
+        <span
+          role="progressbar"
+          aria-label="Played"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress * 100)}
+          className="absolute inset-x-0 bottom-0 h-1 bg-[var(--art-track)]"
+          data-slot="media-tile-progress"
+        >
+          <span className="block h-full bg-[var(--progress-accent)]" style={{ width: `${progress * 100}%` }} />
+        </span>
+      ) : null}
+    </>
   );
 }

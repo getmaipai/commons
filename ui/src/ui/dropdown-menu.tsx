@@ -35,15 +35,20 @@ function DropdownMenuContent({
   className,
   sideOffset = 4,
   density = "default",
+  container,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content> & {
   /** "compact": the chat row menu's size (single-line 32px rows, text-sm,
    * 192px minimum width), so one conversation menu looks the same wherever
    * it opens. Items and checkbox items inside follow it. */
   density?: "default" | "compact"
+  /** Where the menu portals to (default: the document body). The Player
+   * passes its own root so a menu still shows in fullscreen, where only the
+   * fullscreen element's subtree is drawn. */
+  container?: HTMLElement | null
 }) {
   return (
-    <DropdownMenuPrimitive.Portal>
+    <DropdownMenuPrimitive.Portal container={container ?? undefined}>
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"
         data-density={density}

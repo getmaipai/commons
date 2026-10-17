@@ -18,3 +18,8 @@ GlobalRegistrator.register();
 Object.assign(globalThis, nativeStreams);
 
 expect.extend(matchers);
+
+// MEDIA-PLAYER-01: see tests/mediaChromeStub.tsx for why Media Chrome is stubbed under happy-dom.
+import { mock } from "bun:test";
+import { mediaChromeStub } from "./mediaChromeStub";
+mock.module("media-chrome/react", () => mediaChromeStub);

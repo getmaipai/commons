@@ -61,3 +61,13 @@ describe("Button layout variants", () => {
     expect(c).toEqual(expect.arrayContaining(["justify-start", "h-auto", "w-full", "whitespace-normal"]));
   });
 });
+
+describe("Button inverse variant (MEDIA-PLAYER-01)", () => {
+  test("fills with the text color and keeps the 48px floor", () => {
+    const { getByRole } = render(<Button variant="inverse">Play</Button>);
+    const cls = getByRole("button").className;
+    expect(cls).toContain("bg-foreground");
+    expect(cls).toContain("text-background");
+    expect(cls).toContain("h-12");
+  });
+});
