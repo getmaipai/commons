@@ -1,0 +1,11 @@
+{
+  "type": "page", "id": "index", "title": "Books",
+  "body": [{
+    "type": "reader",
+    "bind": { "source": "package", "path": "item", "params": { "id": "$state.id" } },
+    "fields": { "src": "file.url", "format": "book.format", "locator": "position.locator" },
+    "theme": "paper", "font_size": 1,
+    "on_locator": { "call": { "target": "/api/plugins/books/progress/{id}", "args": { "locator": "{locator}", "percent": "{percent}" } } },
+    "on_close": { "navigate": { "to": "/apps/books/" } }
+  }]
+}

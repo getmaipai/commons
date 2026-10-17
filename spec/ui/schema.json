@@ -17,6 +17,7 @@
     { "$ref": "#/$defs/media_shelf" },
     { "$ref": "#/$defs/billboard" },
     { "$ref": "#/$defs/player" },
+    { "$ref": "#/$defs/reader" },
     { "$ref": "#/$defs/detail_pane" },
     { "$ref": "#/$defs/split_view" },
     { "$ref": "#/$defs/widget_card" },
@@ -413,6 +414,33 @@
             }
           }
         },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "reader": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind"],
+      "description": "MEDIA-BOOKS-01: one bound book (an object or the first row), drawn by the kit Reader. Default fields: id, src (same-origin URL), title, format (epub or pdf), locator ({kind: cfi, cfi, spine_index?, block_index?} or {kind: page, page}, 1-based). Heavy engines load only when a book opens.",
+      "properties": {
+        "type": { "const": "reader" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "format": { "type": "string", "enum": ["epub", "pdf"], "description": "Override the bound format field; absent reads fields.format or format." },
+        "theme": { "type": "string", "enum": ["paper", "sepia", "night"], "default": "paper" },
+        "font_size": { "type": "integer", "minimum": 0, "maximum": 6, "default": 1, "description": "EPUB font step: 85, 100, 115, 130, 150, 175 or 200 percent. PDF ignores it." },
+        "fields": {
+          "type": "object", "additionalProperties": false,
+          "description": "Dotted field paths overriding the default book fields; locator is the saved reader locator, for example position.locator.",
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "src": { "type": "string", "minLength": 1 },
+            "title": { "type": "string", "minLength": 1 },
+            "format": { "type": "string", "minLength": 1 },
+            "locator": { "type": "string", "minLength": 1 }
+          }
+        },
+        "on_locator": { "$ref": "#/$defs/action", "description": "Debounced 250 ms after relocation, flushed on close, hide and unmount. Receives the item's fields plus {locator} (a JSON object) and {percent} (number, 0 to 100); nested placeholders such as {locator.cfi} work too. Quiet calls do not refetch the binding." },
+        "on_close": { "$ref": "#/$defs/action", "description": "Draw Close and fire with the book's fields after flushing pending progress." },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
     },

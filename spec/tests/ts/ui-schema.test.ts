@@ -15,6 +15,13 @@ const validate = ajv.compile(schema);
 const pageFiles = readdirSync(join(UI_DIR, "pages")).filter((f) => f.endsWith(".json"));
 
 describe("UI schema", () => {
+  test("MEDIA-BOOKS-01: reader accepts field paths, format, tone and font steps", () => {
+    const reader = { type: "reader", bind: { source: "package", path: "item" } };
+    expect(validate(reader)).toBe(true);
+    for (const format of ["epub", "pdf"]) expect(validate({ ...reader, format, theme: "sepia", font_size: 6, fields: { src: "file.url", locator: "position.locator", format: "book.format" }, on_locator: { call: { target: "/api/plugins/books/progress/{id}" } } })).toBe(true);
+    for (const invalid of [{ format: "html" }, { theme: "blue" }, { font_size: -1 }, { font_size: 7 }, { font_size: 1.5 }, { fields: { unknown: "x" } }, { fields: { locator: "" } }, { locator: { kind: "page", page: 1 } }]) expect(validate({ ...reader, ...invalid })).toBe(false);
+    expect(validate({ type: "reader" })).toBe(false);
+  });
   test("at least one page exists to validate", () => {
     expect(pageFiles.length).toBeGreaterThan(0);
   });

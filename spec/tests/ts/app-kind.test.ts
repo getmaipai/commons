@@ -170,6 +170,18 @@ describe("the News pages (NEWS-00)", () => {
 });
 
 describe("the media nodes (MEDIA-PLAYER-01)", () => {
+  test("MEDIA-BOOKS-01: Reader binds its own rows and checks both actions and field paths", () => {
+    const page = JSON.parse(readFileSync(join(import.meta.dir, "../../ui/pages/books-reader.json"), "utf-8"));
+    const contributes = { pages: [{ id: "index", module: "reader" }], data: [{ id: "item", rows: "list" }] };
+    expect(checkAppPackage("books", contributes, () => page)).toEqual([]);
+    const changed = (props: Record<string, unknown>) => () => ({ ...page, body: [{ ...page.body[0], ...props }] });
+    expect(checkAppPackage("books", contributes, changed({ bind: { source: "route", path: "/api/books" } })).join("\n")).toContain('bind.source must be "package"');
+    expect(checkAppPackage("books", { ...contributes, data: [{ id: "item" }] }, () => page).join("\n")).toContain('must be a "rows": "list" entry');
+    expect(checkAppPackage("books", contributes, changed({ on_locator: { call: { target: "/api/media/progress" } } })).join("\n")).toContain("reader.on_locator: call.target");
+    expect(checkAppPackage("books", contributes, changed({ on_close: { navigate: { to: "/apps/videos/" } } })).join("\n")).toContain("reader.on_close: navigate.to");
+    expect(checkAppPackage("books", contributes, changed({ on_locator: { play: { media_id: "{id}" } } })).join("\n")).toContain("reader.on_locator: the play action is not available");
+    expect(checkAppPackage("books", contributes, changed({ fields: { locator: "//example.com/book" } })).join("\n")).toContain("locator must be a field path");
+  });
   const pageDir = join(import.meta.dir, "..", "..", "ui", "pages");
   const video = (name: string) => JSON.parse(readFileSync(join(pageDir, `videos-${name}.json`), "utf-8"));
   const videoContributes: AppContributes = {
