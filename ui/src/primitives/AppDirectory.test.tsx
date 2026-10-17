@@ -81,6 +81,7 @@ describe("AppDirectory", () => {
     expect(held.disabled).toBe(true);
     expect((view.getByRole("button", { name: "Remove App 01 from favorites" }) as HTMLButtonElement).disabled).toBe(false);
     expect(view.getByText("3 of 3 in the left rail")).toBeTruthy();
+    expect(view.getByRole("heading", { name: "Favorites 3 of 3 in the left rail" })).toBeTruthy();
   });
 
   test("built-in apps open but have no star", () => {

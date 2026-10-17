@@ -188,7 +188,7 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
           {sections.map((section) => (
             <section key={section.heading} aria-label={section.heading} className="flex min-w-0 flex-col gap-3">
               <h2 className="flex items-baseline gap-2 text-sm font-semibold text-muted-foreground">
-                {section.heading}
+                {section.heading}{" "}
                 {section.heading === "Favorites" && favoritesLimit !== undefined ? <span className="font-normal">{favoriteCount} of {favoritesLimit} in the left rail</span> : null}
               </h2>
               <ul className="grid min-w-0 grid-cols-[repeat(auto-fill,minmax(min(100%,15rem),1fr))] gap-3">
