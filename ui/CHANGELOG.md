@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.238] - ui-v0.5.238
+
+New `PasscodeInput` (`src/ui/passcode-input.tsx`): exactly `digits` separate boxes for a numeric passcode, like the iCloud code prompt. One real hidden input behind the boxes handles typing, paste, the phone's numeric keypad and screen readers (`inputMode` numeric, autocomplete off so no SMS or password-manager prompt). Boxes show filled dots (`masked`, default on), a blinking caret, and a red state with a short shake when `invalid` (the shake and caret blink are `motion-safe:` only). `onComplete` fires when the last box fills. The group is labelled "Enter your N-digit passcode" and each box is announced by position. New `passcode-shake` and `passcode-caret` keyframes in `tokens.css`. Additive.
+
 ## [0.5.237] - ui-v0.5.237
 
 `weather_card` gains a compact variant and a text alternative (WEATHER-CARD-01). `AnswerBlockView` takes `compact` (render-only, passed to the `weather_card` Element as `variant="compact"`): the hero alone, shorter, for a dashboard Today card. The hero now shows today's high and low, and a visually hidden sentence gives the place, the current conditions, the high and the low while the drawn hero is hidden from assistive technology. The full variant is unchanged. Additive.

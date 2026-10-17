@@ -1070,6 +1070,28 @@ body {
       transform: none;
     }
   }
+  /* PasscodeInput (src/ui/passcode-input.tsx): a short sideways shake on a wrong code and a
+     blinking caret in the active empty slot. Both are applied only through motion-safe:, so
+     reduced motion gets neither animation (the destructive colour state still shows). */
+  @keyframes passcode-shake {
+    0%, 100% {
+      transform: none;
+    }
+    20%, 60% {
+      transform: translateX(-6px);
+    }
+    40%, 80% {
+      transform: translateX(6px);
+    }
+  }
+  @keyframes passcode-caret {
+    0%, 49% {
+      opacity: 1;
+    }
+    50%, 100% {
+      opacity: 0;
+    }
+  }
   @keyframes collapsible-down {
   from {
     height:
