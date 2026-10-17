@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.241] - ui-v0.5.241
+
+`PlaceAdapter` gains an optional `remove(id)`: `LocationField` calls it after the person confirms Remove on a list entry, so the host can delete the place record (a tombstone with its clock stamp) instead of only unlisting it. The confirm text now says the place is deleted. The schema `picker` node is `w-full max-w-3xl`, the same width as the wide `weather_card`, so the two line up on a package page at 1440. Additive: an adapter without `remove` behaves as before.
+
 ## [0.5.240] - ui-v0.5.240
 
 `weather_card` gains a `wide` variant for package pages. `WeatherCard variant="wide"` has the same hero (taller), full width up to `max-w-3xl`, an hourly strip (the next 24 `hourly` entries: hour read from the ISO string with no zone conversion, temperature, rain chance with the droplet from the same threshold as the daily columns; a list, each item labelled for assistive tech) and then the daily strip. No `hourly`: no strip. `AnswerBlockHandlers` takes `wide` (render-only, not a spec field) and `AnswerBlocksNodeView` passes it for every block. `full` and `compact` are unchanged. Additive.

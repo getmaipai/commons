@@ -59,6 +59,16 @@ describe("LocationField", () => {
     expect(r.onValueChange).toHaveBeenCalledWith(["ent-a"]);
   });
 
+  test("confirmed remove also deletes the place record through the adapter", async () => {
+    const remove = mock(async (_id: string) => true);
+    const r = multi(["ent-a", "ent-b"], adapter({ remove }));
+    await openMenu(r, "Grandma");
+    fireEvent.click(r.getByText("Remove"));
+    expect(remove).not.toHaveBeenCalled();
+    fireEvent.click(await waitFor(() => r.getByRole("button", { name: "Remove" })));
+    expect(remove).toHaveBeenCalledWith("ent-b");
+  });
+
   test("rename saves through the adapter", async () => {
     const a = adapter();
     const r = multi(["ent-a"], a);

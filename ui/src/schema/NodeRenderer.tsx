@@ -203,7 +203,7 @@ function PickerControl({ node, state, rows }: { node: PickerNode; state: Row; ro
   }
 
   return (
-    <div className="flex min-w-0 flex-col gap-2">
+    <div className="flex w-full min-w-0 max-w-3xl flex-col gap-2">
       <Select value={typeof current === "string" ? current : ""} onValueChange={choose} disabled={busy}>
         <SelectTrigger aria-label={node.label} width="full">
           <SelectValue placeholder={node.placeholder ?? node.label} />

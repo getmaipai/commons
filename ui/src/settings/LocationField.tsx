@@ -34,6 +34,8 @@ export interface PlaceAdapter {
   add: (hit: PlaceHit) => Promise<string | null>;
   /** Rename a saved place; true when it landed. */
   rename: (id: string, name: string) => Promise<boolean>;
+  /** Delete a saved place's record after the person removes it from their list (a tombstone on the host, never a bare unlist). Failure is the host's to retry: the list has already dropped it. */
+  remove?: (id: string) => Promise<boolean>;
   /** Ask the browser for the current position. Called only from the
    * "Use current location" button, never on mount. True when granted. */
   useCurrent?: () => Promise<boolean>;
@@ -260,11 +262,12 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
           return removing === p ? (
             <DestructiveConfirm
               message={`Remove ${adapter.labelFor(p)}?`}
-              detail="It leaves your list. You can add it again by searching."
+              detail="It is deleted from your places. You can add it again by searching."
               confirmLabel="Remove"
               busyLabel="Removing"
               onConfirm={() => {
                 onValueChange(ids.filter((x) => x !== p));
+                void adapter.remove?.(p);
                 setRemoving(null);
               }}
               onCancel={() => setRemoving(null)}
