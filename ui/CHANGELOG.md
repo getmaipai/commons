@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.246] - ui-v0.5.246
+
+`ImageGallery` gains `size` (`default` or `large`). `large` shows one picture across the whole gallery width instead of one grid cell; several pictures keep the grid, and the default is unchanged. Additive.
+
 ## [0.5.245] - ui-v0.5.245
 
 `ImageEditor` Comment can make a change. `onComment(request, ctl)` now receives the same `{ signal, onProgress }` control a tool run gets, shows the progress and a Cancel while it waits, and may return `pending` (the picture the comment produced, the shape Erase already returns). The editor then shows it as a preview with Apply and Discard and saves it as a new version, exactly as for Erase. A reply with only `message` behaves as before. Additive.

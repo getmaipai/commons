@@ -61,4 +61,17 @@ describe("ImageGallery", () => {
     );
     expect(queryByRole("button", { name: "Edit picture" })).toBeNull();
   });
+
+  test("size large gives one picture the whole width and leaves several in the grid", () => {
+    const one = [{ id: "a", src: "https://example.test/a.jpg", alt: "A" }];
+    const many = [...one, { id: "b", src: "https://example.test/b.jpg", alt: "B" }];
+    const single = render(<ImageGallery images={one} size="large" />);
+    expect(single.container.querySelector('[data-slot="image-gallery"] > div')!.className).toContain("grid-cols-1");
+    single.unmount();
+    const grid = render(<ImageGallery images={many} size="large" />);
+    expect(grid.container.querySelector('[data-slot="image-gallery"] > div')!.className).toContain("grid-cols-2");
+    grid.unmount();
+    const plain = render(<ImageGallery images={one} />);
+    expect(plain.container.querySelector('[data-slot="image-gallery"] > div')!.className).toContain("grid-cols-2");
+  });
 });

@@ -56,6 +56,8 @@ export interface ImageGalleryProps extends Omit<
   canEditImage?: ((image: GalleryImageEdit) => boolean) | undefined;
   /** Accessible name of the Edit button. Default "Edit picture". */
   editLabel?: string | undefined;
+  /** `large` shows a single picture across the whole gallery width (a picture the person made themselves, not a thumbnail among others); several pictures keep the grid. Default `default`. */
+  size?: "default" | "large" | undefined;
 }
 
 const keyForImage = (image: GalleryImage) => `${image.id}\u0000${image.src}`;
@@ -67,6 +69,7 @@ export function ImageGallery({
   onEditImage,
   canEditImage,
   editLabel = "Edit picture",
+  size = "default",
   className,
   ...props
 }: ImageGalleryProps) {
@@ -128,7 +131,7 @@ export function ImageGallery({
       className={cn("@container w-full max-w-md", className)}
       {...props}
     >
-      <div className="grid grid-cols-2 gap-2 @sm:grid-cols-3">
+      <div className={cn("grid gap-2", size === "large" && images.length === 1 ? "grid-cols-1" : "grid-cols-2 @sm:grid-cols-3")}>
         {visibleImages.map((image, imageIndex) => {
           const failed = failedImages.has(keyForImage(image));
           const overflow =
