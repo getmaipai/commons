@@ -1,3 +1,7 @@
+## [spec-v0.1.168] - 2026-10-17
+
+- Safety: one shared obfuscation normaliser, `safety/ts/fold.ts`, now sits behind `detectCsam` in `safety/ts/signals.ts`. It folds leet, dotted, spaced, masked and repeated-letter spellings, i18n age words and native-script lists before matching, so minor-protection floors see the same text however it is disguised. Tests in `tests/ts/safety-fold.test.ts`. Additive.
+
 ## [spec-v0.1.167] - 2026-10-17
 
 - MEDIA-POLISH-01: the UI schema's `page` gains `tone` (`default` or `cinema`, the dark media tone). `media_shelf` gains `variant` (`card` or `plain`, the frameless row), `orientation` (`horizontal` or `vertical`), `hide_when_empty` and `see_all` (a label and an action beside the heading); `billboard` gains `hide_when_empty` and `size` `banner`; `player` gains `details` (the title block) and `actions` (up to six buttons, each optionally a toggle on a boolean `field` with an `on_label`). `split_view` gains a `main` and `aside` form (arrays of nodes, `aside_label`); exactly one form is required. `ui/app-check.ts` allows `split_view` on a package page and checks its children, a shelf's `see_all` and the player's actions like any other action (no `play` there). Fixtures `videos-home.json` and `videos-watch.json` use them. Additive.
