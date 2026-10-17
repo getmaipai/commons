@@ -235,6 +235,40 @@
     ]
   },
   {
+    "key": "chat.paused",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Pause chat for everyone",
+    "help": "Turns chat off for the whole household until you turn it back on. Messages are not sent while it is paused. Timers, alarms and the emergency lines keep working.",
+    "copy": {
+      "does": "Stops chat from answering until you turn it back on."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "chat.paused_message",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Message shown while chat is paused",
+    "help": "Optional. One short line everyone sees next to the pause notice, for example when chat comes back.",
+    "copy": {
+      "does": "Adds a short note to the notice people see while chat waits."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "chat.photo_uploads",
     "scope": "person",
     "selector": "boolean",
@@ -1189,6 +1223,33 @@
       "options": {
         "allowed": "Every saved style can be picked.",
         "restricted": "Styles with an age limit are left out of the choices."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.picture_quality",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "quick",
+        "detailed"
+      ]
+    },
+    "default": "quick",
+    "label": "Picture quality",
+    "help": "Quick makes a picture in a few seconds. Detailed takes longer and has more looks to choose from. Anyone can ask chat for the other one for a single picture.",
+    "copy": {
+      "does": "Decides how chat makes a picture when nobody asks for a kind.",
+      "options": {
+        "quick": "A few seconds a picture, best for most requests.",
+        "detailed": "About 15 to 30 seconds a picture, with finer detail and more styles."
       }
     },
     "level": "basic",
@@ -3456,6 +3517,20 @@
     ]
   },
   {
+    "key": "ui.reasoning_open",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Show reasoning expanded",
+    "help": "Open the model's reasoning under each chat reply instead of keeping it collapsed.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "person.chat",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "ui.show_turn_stats",
     "scope": "person",
     "selector": "boolean",
@@ -3479,6 +3554,40 @@
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "voice.hesitations",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "off",
+        "light",
+        "natural"
+      ]
+    },
+    "default": "light",
+    "label": "Natural speech sounds",
+    "help": "Lets spoken replies include a light \"hmm,\" or a laugh now and then. The written chat never shows them, and children and teens never hear them.",
+    "copy": {
+      "does": "Lets spoken replies include a light \"hmm,\" or laugh now and then.",
+      "options": {
+        "off": "Spoken replies are read exactly as written.",
+        "light": "A rare \"hmm,\" or laugh, at most once per reply.",
+        "natural": "A little more often, at most twice per reply."
+      },
+      "option_labels": {
+        "off": "Off",
+        "light": "Light",
+        "natural": "Natural"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
     "honoured_by": [
       "home"
     ]

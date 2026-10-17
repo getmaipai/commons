@@ -1,3 +1,7 @@
+## [spec-v0.1.166] - 2026-10-17
+
+- Add `ui.reasoning_open`, `voice.hesitations`, `chat.paused`, `chat.paused_message` and `generation.picture_quality` from Home's generated settings declarations. Additive; existing entries stay unchanged.
+
 ## [spec-v0.1.165] - 2026-10-17
 
 - MUSIC-SPEC-01 (Home `docs/design/music-generation-2026-10-17.md`). Household key `generation.music.enabled` (boolean, default on: adults can ask chat for songs and change them; children and teens never can, whatever it says) on the `household.pictures` card, retitled "Pictures, videos and music". New `GenerationProvenance` (`generation-provenance.schema.json`): kind, job, task, model id, revision and licence, engine, seed, duration, bpm, key, parent version, source kind (`upload` reserved and refused), `commercial_use` with its basis; carried on the new optional `file.provenance.generation`. `StackJob.kind` names `music`. Additive; every existing fixture validates unchanged.
