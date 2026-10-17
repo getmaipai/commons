@@ -1,3 +1,8 @@
+## [spec-v0.1.171] - 2026-10-17
+
+- Additive media UI fields: `media_shelf.layout` (`rail` or `grid`, default `rail`), `art_shape` (`default` or `circle`), `density` (`default` or `compact`), `item_highlight_field` (boolean current/next-up field), `item_index_field` (leading track index) and `row_actions` (up to two `{icon, label, label_field?, action}` controls). Compact vertical rows use 72 px artwork, two caption lines and trailing `item_meta_field` running time. Grids wrap the existing card-size budget with two phone columns and honour `hide_when_empty`. `checkAppPackage` checks every row action, including confirms, like `on_select`: own-package targets and `play` allowed.
+- `picker.variant` adds `pill` alongside the default `select`. Existing `bind`, `item_key_field`, `item_label_field`, `leading` and `state` supply season pills from rows, with selection in page state. New `ui/pages/music-album.json` and `ui/pages/shows-detail.json` fixtures and focused schema/conformance tests. Existing pages keep their rendering defaults.
+
 ## [spec-v0.1.170] - 2026-10-17
 
 - MEDIA-BOOKS-01: UI `reader` node for one bound book, with optional `format` override, `fields` paths for id/src/title/format/locator, token `theme`, EPUB `font_size` step, `on_locator`, `on_close` and `empty_state`. Locator data is CFI (`kind`, `cfi`, optional `spine_index`, `block_index`) or a 1-based page. Progress actions receive a JSON `locator` and numeric `percent` (0 to 100). `checkAppPackage` allows Reader with the package's declared list data and checks both actions against the package prefixes, with `play` refused. Fixture `ui/pages/books-reader.json` and schema/app tests. Additive.

@@ -1,0 +1,62 @@
+{
+  "type": "page",
+  "id": "detail",
+  "title": "Show",
+  "tone": "cinema",
+  "body": [
+    {
+      "type": "billboard",
+      "bind": { "source": "package", "path": "show", "params": { "id": "$state.id" } },
+      "label": "Show",
+      "size": "hero",
+      "autoplay": false,
+      "item_key_field": "id",
+      "item_title_field": "title",
+      "item_subtitle_field": "{summary}",
+      "item_art_field": "backdrop",
+      "primary": { "label": "Resume", "icon": "play", "action": { "play": { "media_id": "{next_episode_id}" } } }
+    },
+    {
+      "type": "picker",
+      "variant": "pill",
+      "state": "season",
+      "label": "Seasons",
+      "bind": { "source": "package", "path": "seasons", "params": { "show_id": "$state.id" } },
+      "item_key_field": "id",
+      "item_label_field": "label"
+    },
+    {
+      "type": "media_shelf",
+      "heading": "Episodes",
+      "bind": { "source": "package", "path": "episodes", "params": { "show_id": "$state.id", "season": "$state.season" } },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_subtitle_field": "{summary}",
+      "item_media_field": "thumbnail",
+      "item_highlight_field": "up_next",
+      "item_progress_field": "progress",
+      "item_meta_field": "duration_s",
+      "variant": "plain",
+      "orientation": "vertical",
+      "hide_when_empty": true,
+      "on_select": { "play": { "media_id": "{id}" } },
+      "row_actions": [
+        { "icon": "play", "label": "Play", "action": { "play": { "media_id": "{id}" } } },
+        { "icon": "download", "label": "Save", "label_field": "save_label", "action": { "call": { "target": "/api/plugins/shows/save", "args": { "episode_id": "{id}" } } } }
+      ]
+    },
+    {
+      "type": "media_shelf",
+      "heading": "More shows",
+      "bind": { "source": "package", "path": "related", "params": { "show_id": "$state.id" } },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_media_field": "poster",
+      "variant": "plain",
+      "layout": "grid",
+      "aspect": "poster",
+      "hide_when_empty": true,
+      "on_select": { "navigate": { "to": "/apps/shows/detail", "state": { "id": "{id}" } } }
+    }
+  ]
+}

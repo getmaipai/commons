@@ -326,6 +326,27 @@
         "aspect": { "type": "string", "enum": ["wide", "square", "poster"], "default": "wide" },
         "variant": { "type": "string", "enum": ["card", "plain"], "default": "card", "description": "MEDIA-POLISH-01: card draws the shelf inside a bordered section card; plain draws a frameless row (a heading, the optional See all link, then the tiles), as the media apps and News do." },
         "orientation": { "type": "string", "enum": ["horizontal", "vertical"], "default": "horizontal", "description": "MEDIA-POLISH-01: horizontal is the sideways rail; vertical stacks the tiles as rows, the picture at the start and the caption beside it (Up next beside a player)." },
+        "layout": { "type": "string", "enum": ["rail", "grid"], "default": "rail", "description": "Grid wraps whole tiles from the existing card-size budget, with two columns on a phone. Vertical orientation takes precedence." },
+        "art_shape": { "type": "string", "enum": ["default", "circle"], "default": "default", "description": "Circle uses square artwork clipped to a circle, including its current ring." },
+        "density": { "type": "string", "enum": ["default", "compact"], "default": "default", "description": "Compact vertical rows have 72 px artwork, two caption lines and trailing item_meta_field running time. Horizontal shelves use the existing card-size budget." },
+        "item_highlight_field": { "type": "string", "description": "Dotted path to a boolean; true marks the current track or next episode with the media current ring token and aria-current." },
+        "item_index_field": { "type": "string", "description": "Dotted path to the leading track index in a vertical row; zero is displayed." },
+        "row_actions": {
+          "type": "array",
+          "maxItems": 2,
+          "description": "Vertical row controls outside the artwork button. Play is icon-only; other actions are labelled pills. Labels may contain {field} placeholders; a nonempty label_field value overrides the label. Each action receives its row, just like on_select.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["icon", "label", "action"],
+            "properties": {
+              "icon": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 1 },
+              "label_field": { "type": "string", "minLength": 1 },
+              "action": { "$ref": "#/$defs/action" }
+            }
+          }
+        },
         "hide_when_empty": { "type": "boolean", "default": false, "description": "MEDIA-POLISH-01: draw nothing (no heading, no empty state) when the bound call returns no rows, so a shelf with nothing in it is simply absent. A load error still shows." },
         "see_all": { "$ref": "#/$defs/billboard_action", "description": "MEDIA-POLISH-01: a link beside the heading (\"See all\"), usually a `navigate` to the app's full list. Fired with no row." },
         "on_select": { "$ref": "#/$defs/action" },
@@ -625,6 +646,7 @@
       "description": "Chooses one value and writes it to page state (APP-KIND-02), drawn with the kit's select primitive. Fixed `leading` options come first, then the rows of `bind` (a package data call returning {rows}). A section's `condition` reads the state it writes.",
       "properties": {
         "type": { "const": "picker" },
+        "variant": { "type": "string", "enum": ["select", "pill"], "default": "select", "description": "Pill reuses TabsList variant pill for leading options and bound rows (for example seasons), reading selection from page state and writing the chosen row key." },
         "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "The page-state name this picker writes." },
         "label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "The accessible name of the control." },
         "placeholder": { "type": "string", "minLength": 1, "maxLength": 40, "description": "Shown while nothing is chosen (for example \"Default place\")." },

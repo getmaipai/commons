@@ -1,0 +1,67 @@
+{
+  "type": "page",
+  "id": "album",
+  "title": "Album",
+  "tone": "cinema",
+  "body": [
+    {
+      "type": "billboard",
+      "bind": { "source": "package", "path": "album", "params": { "id": "$state.id" } },
+      "label": "Album",
+      "autoplay": false,
+      "item_key_field": "id",
+      "item_title_field": "title",
+      "item_subtitle_field": "{artist}",
+      "item_art_field": "cover",
+      "primary": { "label": "Play album", "icon": "play", "action": { "play": { "media_id": "{id}" } } }
+    },
+    {
+      "type": "media_shelf",
+      "heading": "Tracks",
+      "bind": { "source": "package", "path": "tracks", "params": { "album_id": "$state.id" } },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_subtitle_field": "{artist}",
+      "item_media_field": "cover",
+      "item_index_field": "track_number",
+      "item_meta_field": "duration_s",
+      "item_highlight_field": "playing",
+      "variant": "plain",
+      "orientation": "vertical",
+      "density": "compact",
+      "aspect": "square",
+      "hide_when_empty": true,
+      "on_select": { "play": { "media_id": "{id}" } },
+      "row_actions": [
+        { "icon": "play", "label": "Play", "action": { "play": { "media_id": "{id}" } } },
+        { "icon": "bookmark", "label": "Save", "label_field": "save_label", "action": { "call": { "target": "/api/plugins/music/save", "args": { "media_id": "{id}" } } } }
+      ]
+    },
+    {
+      "type": "media_shelf",
+      "heading": "More albums",
+      "bind": { "source": "package", "path": "albums", "params": { "album_id": "$state.id" } },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_subtitle_field": "{artist}",
+      "item_media_field": "cover",
+      "variant": "plain",
+      "layout": "grid",
+      "aspect": "square",
+      "hide_when_empty": true,
+      "on_select": { "navigate": { "to": "/apps/music/album", "state": { "id": "{id}" } } }
+    },
+    {
+      "type": "media_shelf",
+      "heading": "Artists",
+      "bind": { "source": "package", "path": "artists", "params": { "album_id": "$state.id" } },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_media_field": "portrait",
+      "variant": "plain",
+      "layout": "grid",
+      "art_shape": "circle",
+      "hide_when_empty": true
+    }
+  ]
+}

@@ -79,6 +79,7 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   if (type === "media_shelf") {
     checkBinding(node.bind, `${where} media_shelf`, data, "list", out);
     checkAction(node.on_select, packageId, `${where} media_shelf.on_select`, out, true);
+    if (Array.isArray(node.row_actions)) node.row_actions.forEach((button, i) => isObject(button) && checkAction(button.action, packageId, `${where} media_shelf.row_actions[${i}]`, out, true));
     if (isObject(node.see_all)) checkAction(node.see_all.action, packageId, `${where} media_shelf.see_all`, out);
     checkFieldPath(node.item_media_field, `${where} media_shelf`, "item_media_field", out);
   }
