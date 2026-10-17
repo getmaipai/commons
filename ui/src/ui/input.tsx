@@ -2,10 +2,16 @@
 import * as React from "react"
 import { cn } from "@/kit/utils"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+/**
+ * `valid` marks a checked-and-good value (for example a confirm box that matches): the border and
+ * ring take the success hue (--hue-teal) and `data-valid` is set. It never carries meaning alone:
+ * pair it with visible text or an icon. `aria-invalid` wins when both are set.
+ */
+function Input({ className, type, valid, ...props }: React.ComponentProps<"input"> & { valid?: boolean }) {
   return (
     <input
       type={type}
+      data-valid={valid ? "true" : undefined}
       data-slot="input"
       className={cn(
         // h-12/text-base at every width: docs/UI.md's 48px target and 16px
@@ -15,6 +21,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "h-12 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30",
         "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
         "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+        "data-[valid=true]:border-[color:var(--hue-teal)] data-[valid=true]:ring-[color:var(--hue-teal)]/30 data-[valid=true]:aria-invalid:border-destructive",
         className
       )}
       {...props}

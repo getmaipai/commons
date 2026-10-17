@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.236] - ui-v0.5.236
+
+`Input` gains an optional `valid` prop: the border and focus ring take the success hue (`--hue-teal`) and `data-valid="true"` is set. `aria-invalid` still wins. Colour is never the only signal, so callers pair it with visible text or an icon. Default look is unchanged. Additive.
+
 ## [0.5.235] - ui-v0.5.235
 
 `DropdownMenuContent` gains an optional `density="compact"` prop: single-line 32px rows, text-sm, 192px minimum width, the same size as the thread list row menu, so one conversation menu looks the same in the sidebar and the chat header. Items and checkbox items inside follow it. The row menu's minimum width is now 192px (was 128px). Default density is unchanged. Additive.
