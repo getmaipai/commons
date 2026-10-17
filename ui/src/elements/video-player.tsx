@@ -4,7 +4,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import {
   AlertCircleIcon,
   DownloadIcon,
-  Loader2Icon,
   RefreshCwIcon,
   Share2Icon,
   SquareIcon,
@@ -15,6 +14,7 @@ import { Alert, AlertDescription } from "@/kit/ui/alert";
 import { Button } from "@/kit/ui/button";
 import { Card, CardContent } from "@/kit/ui/card";
 import { Progress } from "@/kit/ui/progress";
+import { GenerationStage } from "./generation-stage";
 
 export type VideoPlayerStatus = "queued" | "generating" | "ready" | "failed" | "cancelled";
 
@@ -85,6 +85,8 @@ export function VideoPlayer({
   queuePosition,
   startedAt,
   estimateMs = 120_000,
+  previewSrc,
+  etaLabel,
   hint,
   error,
   downloadName = "video.mp4",
@@ -115,6 +117,10 @@ export function VideoPlayer({
   startedAt?: number;
   /** How long a clip usually takes, for the bar when the engine reports no progress. */
   estimateMs?: number;
+  /** While generating: a frame of the clip so far (the engine's first-frame preview). It cross-fades in over the shimmer, and the finished clip's poster takes over. */
+  previewSrc?: string;
+  /** While generating: how long is left ("about 1 minute left"), after the clock and the percent. */
+  etaLabel?: string;
   /** One quiet line under the bar ("Videos are 5 seconds at 480p and take about 2 minutes"). */
   hint?: string;
   /** Failed: the plain reason, ending with what to do. */
@@ -162,20 +168,17 @@ export function VideoPlayer({
           aria-label={prompt}
         />
       ) : (
-        <div
-          data-slot="video-player-stage"
-          className="bg-muted text-muted-foreground relative flex w-full items-center justify-center"
-          style={{ aspectRatio: ratio }}
-        >
+        <GenerationStage generating={live} previewSrc={status === "generating" ? previewSrc : undefined} aspectRatio={ratio} className="rounded-none border-0">
           {live ? (
-            <div role="status" className="flex flex-col items-center gap-2 px-4 text-center text-sm">
-              <Loader2Icon className="size-6 animate-spin motion-reduce:animate-none" aria-hidden />
-              <span>{status === "queued" ? text.queued : text.generating}</span>
-              {status === "queued" && typeof queuePosition === "number" && queuePosition > 0 ? <span>{`Place in line: ${queuePosition}`}</span> : null}
-              {phaseLabel && status === "generating" ? <span>{phaseLabel}</span> : null}
+            <div data-slot="video-player-stage" role="status" className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-6 text-center text-sm">
+              {status === "queued" ? <span className="text-muted-foreground">{text.queued}</span> : null}
+              {status === "queued" && typeof queuePosition === "number" && queuePosition > 0 ? <span className="text-muted-foreground">{`Place in line: ${queuePosition}`}</span> : null}
+              {status === "generating" ? <span className="sr-only">{text.generating}</span> : null}
+              {status === "generating" && phaseLabel ? <span className="sr-only">{phaseLabel}</span> : null}
+              {status === "generating" && !previewSrc ? <span className="text-muted-foreground line-clamp-3 max-w-md text-balance">{prompt}</span> : null}
             </div>
           ) : null}
-        </div>
+        </GenerationStage>
       )}
       <CardContent className="flex flex-col gap-3 py-3">
         {live ? (
@@ -183,8 +186,7 @@ export function VideoPlayer({
             <Progress value={value} aria-label={text.generating} aria-valuetext={startedAt ? `${value} percent, ${formatClock(elapsedMs)} so far` : `${value} percent`} />
             <div className="flex items-center justify-between gap-3">
               <p className="text-muted-foreground text-xs tabular-nums">
-                {startedAt ? formatClock(elapsedMs) : ""}
-                {typeof progress === "number" ? `${startedAt ? " · " : ""}${value}%` : ""}
+                {[startedAt ? formatClock(elapsedMs) : "", typeof progress === "number" ? `${value}%` : "", status === "generating" ? etaLabel ?? "" : ""].filter(Boolean).join(" · ")}
               </p>
               {onStop ? (
                 <Button type="button" variant="outline" size="sm" onClick={onStop}>
@@ -193,6 +195,7 @@ export function VideoPlayer({
                 </Button>
               ) : null}
             </div>
+            {phaseLabel && status === "generating" ? <p className="text-foreground text-sm">{phaseLabel}</p> : null}
             {hint ? <p className="text-muted-foreground text-xs">{hint}</p> : null}
           </>
         ) : null}
