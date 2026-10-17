@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.245] - ui-v0.5.245
+
+`ImageEditor` Comment can make a change. `onComment(request, ctl)` now receives the same `{ signal, onProgress }` control a tool run gets, shows the progress and a Cancel while it waits, and may return `pending` (the picture the comment produced, the shape Erase already returns). The editor then shows it as a preview with Apply and Discard and saves it as a new version, exactly as for Erase. A reply with only `message` behaves as before. Additive.
+
 ## [0.5.244] - ui-v0.5.244
 
 New Element `VideoPlayer` (`src/elements/video-player.tsx`) for generated clips. `status` is `queued`, `generating`, `ready`, `failed` or `cancelled`. While live it shows a stage with the engine's step (`phaseLabel`) or the place in line (`queuePosition`), a Progress bar (the engine's `progress` when given, otherwise a slow estimate from the elapsed time that never passes 90), an elapsed clock that ticks from `startedAt`, an optional `hint` line and a Stop button (`onStop`). Ready is the browser's own `<video>` with poster, controls, loop (default on) and inline playback, `aria-label` and a two-line caption from the prompt, then Download (the file link, or `onDownload`), Share (when `onShare`), Make another (`onMakeAnother`) and an `actions` slot. Failed is a destructive Alert with the reason and Try again; cancelled says nothing was kept. `copy` overrides every string. No network access inside the Element: all I/O is props. Additive.

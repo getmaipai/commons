@@ -576,6 +576,21 @@ describe("comment", () => {
     expect(v.props.onComment.mock.calls[0]![0]).toEqual({ prompt: "Warmer colours", region: null });
   });
 
+  test("a comment that returns a picture shows it as a preview with Apply, and the run reports progress", async () => {
+    const onComment = mock(async (_request: unknown, ctl: { onProgress: (p: { percent: number | null; label: string }) => void }) => {
+      ctl.onProgress({ percent: 40, label: "Drawing" });
+      return { message: "Here is the change.", pending: { token: "t1", previewUrl: "data:image/png;base64,iVBORw0KGgo=", width: 200, height: 120 } };
+    });
+    const v = setup({ onComment: onComment as never });
+    fireEvent.click(tool(v, "Comment"));
+    fireEvent.click(v.getByRole("button", { name: "Whole picture" }));
+    fireEvent.change(v.getByRole("textbox", { name: "Describe the change" }), { target: { value: "Make it evening" } });
+    fireEvent.click(v.getByRole("button", { name: "Send" }));
+    await waitFor(() => expect(v.getByRole("button", { name: "Apply" })).toBeTruthy());
+    expect(v.getByText(/Preview: Changed as described/)).toBeTruthy();
+    expect(onComment.mock.calls[0]![1]).toBeDefined();
+  });
+
   test("Esc cancels the box, then leaves the tool", () => {
     const v = setup();
     fireEvent.click(tool(v, "Comment"));

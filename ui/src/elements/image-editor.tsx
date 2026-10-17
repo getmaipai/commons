@@ -147,7 +147,10 @@ export interface ImageEditorProps {
   onRunOperation: (op: ImageEditorOperation, ctl: ImageEditorRunControl) => Promise<ImageEditorPending>;
   onApplyPending: (pending: ImageEditorPending, label: string) => Promise<ImageEditorVersion>;
   onSaveMarkup: (png: Blob) => Promise<ImageEditorVersion>;
-  onComment: (request: { prompt: string; region: Region | null }) => Promise<{ message: string }>;
+  /** Sends the comment. The second argument carries the same cancel signal and progress callback a tool run gets.
+   * A reply may also return `pending`, the picture the comment produced: the editor then shows it as a preview with
+   * Apply and Discard, exactly as it does for Erase (additive; a reply with only `message` behaves as before). */
+  onComment: (request: { prompt: string; region: Region | null }, ctl: ImageEditorRunControl) => Promise<{ message: string; pending?: ImageEditorPending }>;
   onShare?: (version: ImageEditorVersion) => void;
   downloadName?: string;
   onClose: () => void;
@@ -601,16 +604,28 @@ export function ImageEditor({
     if (!comment || comment.prompt.trim().length === 0) return;
     const request = { prompt: comment.prompt.trim(), region: comment.region };
     setError(null);
-    setBusy({ percent: null, label: "Sending your comment", cancelable: false });
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setBusy({ percent: null, label: "Sending your comment", cancelable: true });
     try {
-      const answer = await onComment(request);
+      const answer = await onComment(request, {
+        signal: controller.signal,
+        onProgress: (progress) => {
+          if (!controller.signal.aborted) setBusy({ percent: progress.percent, label: progress.label, cancelable: true });
+        },
+      });
+      if (controller.signal.aborted) return;
       setReply(answer.message);
+      if (answer.pending) setPending({ value: answer.pending, label: "Changed as described" });
       if (request.region) setPins((existing) => [...existing, request.region as Region]);
       setComment({ region: request.region, prompt: "" });
     } catch (err) {
-      failWith(err, () => void sendComment());
+      if (!controller.signal.aborted) failWith(err, () => void sendComment());
     } finally {
-      setBusy(null);
+      if (abortRef.current === controller) {
+        abortRef.current = null;
+        setBusy(null);
+      }
     }
   }
 
