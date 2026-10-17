@@ -1,8 +1,8 @@
 # Changelog (`@maipai/ui`)
 
-## [Unreleased]
+## [0.5.262] - ui-v0.5.262
 
-- MEDIA-BOOKS-01: new `Reader` primitive with lazy epub.js (`epubjs` 0.3.93) and pdf.js (`pdfjs-dist` 4.10.38, bundled worker). Paginated EPUB with CFI resume and generated location percentages, PDF with 1-based page resume, both with TOC navigation, page buttons and arrow keys, token themes `paper`, `sepia`, `night`, EPUB font steps, a tap-hidden toolbar, and a full-screen phone layout. Progress settles for 250 ms and flushes on close, hide and unmount. Same-origin sources only. Schema `reader` binds one book, maps its format and locator fields, and dispatches `on_locator` quietly with typed JSON arguments; existing actions keep their interpolation behavior. Tiny EPUB/PDF fixtures and boundary-double tests, interpreter tests and API/setup notes in `docs/reader.md`. Dependency installation and real engine/browser validation remain with the reviewer under the offline run constraints; no version bump.
+- MEDIA-BOOKS-01: new `Reader` primitive with lazy epub.js (`epubjs` 0.3.93) and pdf.js (`pdfjs-dist` 4.10.38, bundled worker). Paginated EPUB with CFI resume and generated location percentages, PDF with 1-based page resume, both with TOC navigation, page buttons and arrow keys, token themes `paper`, `sepia`, `night`, EPUB font steps, a tap-hidden toolbar, and a full-screen phone layout. Progress settles for 250 ms and flushes on close, hide and unmount. Same-origin sources only. Schema `reader` binds one book, maps its format and locator fields, and dispatches `on_locator` quietly with typed JSON arguments; existing actions keep their interpolation behavior. Tiny EPUB/PDF fixtures and boundary-double tests, interpreter tests and API/setup notes in `docs/reader.md`. Licences: epubjs BSD-2-Clause, pdfjs-dist Apache-2.0. Not yet exercised against a real browser render of an EPUB or PDF.
 
 ## [0.5.261] - ui-v0.5.261
 

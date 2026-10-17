@@ -1,6 +1,6 @@
-## [Unreleased]
+## [spec-v0.1.170] - 2026-10-17
 
-- MEDIA-BOOKS-01: UI `reader` node for one bound book, with optional `format` override, `fields` paths for id/src/title/format/locator, token `theme`, EPUB `font_size` step, `on_locator`, `on_close` and `empty_state`. Locator data is CFI (`kind`, `cfi`, optional `spine_index`, `block_index`) or a 1-based page. Progress actions receive a JSON `locator` and numeric `percent` (0 to 100). `checkAppPackage` allows Reader with the package's declared list data and checks both actions against the package prefixes, with `play` refused. Fixture `ui/pages/books-reader.json` and schema/app tests. Additive; no version bump.
+- MEDIA-BOOKS-01: UI `reader` node for one bound book, with optional `format` override, `fields` paths for id/src/title/format/locator, token `theme`, EPUB `font_size` step, `on_locator`, `on_close` and `empty_state`. Locator data is CFI (`kind`, `cfi`, optional `spine_index`, `block_index`) or a 1-based page. Progress actions receive a JSON `locator` and numeric `percent` (0 to 100). `checkAppPackage` allows Reader with the package's declared list data and checks both actions against the package prefixes, with `play` refused. Fixture `ui/pages/books-reader.json` and schema/app tests. Additive.
 
 ## [spec-v0.1.169] - 2026-10-17
 
