@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.266] - ui-v0.5.266
+
+- HANDOFF-01c: continue on another screen. The schema `play` action reads `position_s` (a number >= 0, or a string with `{field}` placeholders, coerced to a number; dropped unless a finite number >= 0) and passes it as `MediaHost.onPlay(mediaId, item, options?: { position_s?: number })`; a host that takes two arguments is unchanged. `MediaHost` gains two optional members, `castTargets?(item): Promise<{ id, name, kind }[]>` and `castTo?(targetId, item, position_s): Promise<void>`. With both present the `player` node fills the Player's `castSlot` with the kit's own DropdownMenu ("Play on another screen", one item per target, "No other screens are on" disabled when empty; targets load each time it opens; choosing one calls `castTo` with the player's current time; a failure shows its message under the player). Without them nothing is drawn. Exports `MediaPlayOptions` and `CastTarget`. Tests in `schema/mediaHandoff.test.tsx`.
+
 ## [0.5.265] - ui-v0.5.265
 
 - `ModelSelectorTrigger` hit area overhang raised one step (default and small 12 px, large 8 px) because the rendered small trigger is 30 px tall, so 8 px left it at 46 px in Home's gate. Look unchanged.

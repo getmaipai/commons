@@ -14,13 +14,32 @@ export interface MediaItemRef {
   poster?: string;
 }
 
+/** HANDOFF-01c: what the `play` action adds. `position_s` is the action's start position, resolved to a finite number >= 0
+ * (absent when the action has none or its value did not resolve to one). */
+export interface MediaPlayOptions {
+  position_s?: number;
+}
+
+/** HANDOFF-01c: one other screen the person could continue on. */
+export interface CastTarget {
+  id: string;
+  name: string;
+  kind: string;
+}
+
 export interface MediaHost {
   /** `mediaId` is the action's `media_id` with its `{field}` placeholders filled; `item` is the bound row it fired for. */
-  onPlay(mediaId: string, item: Record<string, unknown>): void | Promise<void>;
+  onPlay(mediaId: string, item: Record<string, unknown>, options?: MediaPlayOptions): void | Promise<void>;
   /** MEDIA-POLISH-01: the element a `player` node plays this item in. A host that returns one owns it (Home's audio
    * session keeps it playing in the docked mini bar after the page closes); the same item must get the same element.
    * Absent, or null: the Player makes its own element and playback stops with the page. Called during render. */
   mediaFor?(item: MediaItemRef): HTMLMediaElement | null;
+  /** HANDOFF-01c: the other screens this person could continue `item` on. Called each time the player's cast menu opens.
+   * Absent: the `player` node draws no cast menu. */
+  castTargets?(item: Record<string, unknown>): Promise<CastTarget[]>;
+  /** HANDOFF-01c: send `item` to one target at `position_s`. Absent: the `player` node draws no cast menu. A rejection
+   * is shown under the player with its message. */
+  castTo?(targetId: string, item: Record<string, unknown>, position_s: number): Promise<void>;
 }
 
 export const MediaHostContext = createContext<MediaHost | null>(null);

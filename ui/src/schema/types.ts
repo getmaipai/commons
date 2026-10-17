@@ -37,7 +37,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
           args: z.record(z.string(), z.unknown()).optional(),
         }),
       }),
-      z.object({ play: z.object({ media_id: z.string().min(1) }) }),
+      z.object({ play: z.object({ media_id: z.string().min(1), position_s: z.union([z.number().min(0), z.string()]).optional() }) }),
       z.object({ confirm: z.object({ prompt: z.string(), on_confirm: ActionSchema }) }),
       z.object({ ask: z.object({ prompt: z.string(), expects: z.string() }) }),
     ])
@@ -46,7 +46,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
 export type Action =
   | { navigate: { to: string; state?: Record<string, string | number | boolean> } }
   | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown> } }
-  | { play: { media_id: string } }
+  | { play: { media_id: string; position_s?: number | string } }
   | { confirm: { prompt: string; on_confirm: Action } }
   | { ask: { prompt: string; expects: string } };
 

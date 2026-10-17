@@ -61,7 +61,12 @@ async function runAction(
     // MEDIA-PLAYER-01: hand the item to the host's player (mediaHost.ts). A package page reaches only its own rows, so
     // the id came from its own data; the host still decides whether this person may play it.
     if (!host) throw new Error(PLAY_UNAVAILABLE);
-    await host.onPlay(fillTemplate(action.play.media_id, item), item);
+    // HANDOFF-01c: a start position, a number or a `{field}` string, passed on only when it resolves to a finite number >= 0.
+    const raw = action.play.position_s;
+    const resolved = typeof raw === "string" ? fillTemplate(raw, item).trim() : raw;
+    const position = typeof resolved === "number" ? resolved : typeof resolved === "string" && resolved !== "" ? Number(resolved) : NaN;
+    const options = Number.isFinite(position) && position >= 0 ? { position_s: position } : undefined;
+    await host.onPlay(fillTemplate(action.play.media_id, item), item, options);
     return;
   }
   if ("confirm" in action) {

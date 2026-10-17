@@ -31,7 +31,8 @@ import { locationBlockedHelp } from "@/kit/geolocationHelp";
 import { AnswerBlockView } from "@/kit/elements/answer-block";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { PageStateContext } from "@/kit/schema/packageScope";
-import { MediaHostContext } from "@/kit/schema/mediaHost";
+import { MediaHostContext, type CastTarget, type MediaHost } from "@/kit/schema/mediaHost";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import type { Action } from "@/kit/schema/types";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
@@ -817,6 +818,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const query = useBinding<Row | Row[]>(node.bind, state);
   const { dispatch, lastError } = useDispatchAction();
   const host = useContext(MediaHostContext);
+  const mediaEl = useRef<HTMLMediaElement | null>(null);
+  const [castError, setCastError] = useState<string | null>(null);
   const field = (name: keyof NonNullable<PlayerNode["fields"]>, fallback: string) => node.fields?.[name] ?? fallback;
   const item = Array.isArray(query.data) ? query.data[0] : query.data;
   return (
@@ -844,6 +847,12 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
           <>
             <Player
               media={external}
+              mediaRef={mediaEl}
+              castSlot={
+                host?.castTargets && host.castTo ? (
+                  <PlayerCastMenu host={host} item={r} getPosition={() => mediaEl.current?.currentTime ?? 0} onError={setCastError} />
+                ) : undefined
+              }
               src={src}
               kind={node.kind}
               layout={node.layout}
@@ -868,10 +877,67 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
             {node.details ? <PlayerDetails title={title} subtitle={subtitle} /> : null}
             {node.actions && node.actions.length > 0 ? <PlayerActions actions={node.actions} item={r} dispatch={dispatch} /> : null}
             {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
+            {castError ? <p role="status" className="text-base text-destructive">{castError}</p> : null}
           </>
         );
       }}
     </AsyncState>
+  );
+}
+
+const CAST_LOAD_FAILED = "Could not look for other screens. Check that you are online, then open the menu again.";
+const CAST_SEND_FAILED = "Could not play this on the other screen. Make sure it is on and signed in, then try again.";
+
+/** HANDOFF-01c: the Player's `castSlot`: the kit's own DropdownMenu listing the household's other screens. Targets load
+ * each time the menu opens. Choosing one sends the item with the player's current time. */
+function PlayerCastMenu({ host, item, getPosition, onError }: { host: MediaHost; item: Row; getPosition: () => number; onError: (message: string | null) => void }) {
+  const [targets, setTargets] = useState<CastTarget[] | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  const Glyph = getIcon("cast");
+  const load = (open: boolean) => {
+    if (!open) return;
+    setTargets(null);
+    setLoadFailed(false);
+    onError(null);
+    Promise.resolve()
+      .then(() => host.castTargets!(item))
+      .then((list) => setTargets(Array.isArray(list) ? list : []))
+      .catch(() => {
+        setTargets([]);
+        setLoadFailed(true);
+      });
+  };
+  const send = (target: CastTarget) => {
+    onError(null);
+    Promise.resolve()
+      .then(() => host.castTo!(target.id, item, getPosition()))
+      .catch((e) => onError(e instanceof Error && e.message ? e.message : CAST_SEND_FAILED));
+  };
+  return (
+    <DropdownMenu onOpenChange={load}>
+      <DropdownMenuTrigger asChild>
+        <Button ref={trigger} variant="ghost" size="icon" aria-label="Play on another screen" data-slot="player-cast-targets">
+          {Glyph ? <Glyph /> : null}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent container={trigger.current?.closest<HTMLElement>('[data-slot="player"]') ?? undefined} align="end">
+        <DropdownMenuLabel>Play on another screen</DropdownMenuLabel>
+        {targets === null ? (
+          <DropdownMenuItem disabled>Looking for screens</DropdownMenuItem>
+        ) : loadFailed ? (
+          <DropdownMenuItem disabled>{CAST_LOAD_FAILED}</DropdownMenuItem>
+        ) : targets.length === 0 ? (
+          <DropdownMenuItem disabled>No other screens are on</DropdownMenuItem>
+        ) : (
+          targets.map((t) => (
+            <DropdownMenuItem key={t.id} onSelect={() => send(t)}>
+              {t.name}
+            </DropdownMenuItem>
+          ))
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
