@@ -979,6 +979,7 @@ export const PackageManifest = z
                         "home.devices_admin",
                         "home.routing_stats",
                         "home.reference_library",
+                        "home.pictures_library",
                       ])
                       .describe("keys only: a view drawn above the cards.")
                       .optional(),
@@ -996,6 +997,7 @@ export const PackageManifest = z
                         "home.devices_admin",
                         "home.routing_stats",
                         "home.reference_library",
+                        "home.pictures_library",
                       ])
                       .describe("keys only: a view drawn below the cards.")
                       .optional(),
@@ -1013,6 +1015,7 @@ export const PackageManifest = z
                         "home.devices_admin",
                         "home.routing_stats",
                         "home.reference_library",
+                        "home.pictures_library",
                       ])
                       .describe(
                         "A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",

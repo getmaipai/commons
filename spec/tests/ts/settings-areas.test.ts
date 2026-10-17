@@ -78,7 +78,7 @@ describe("spec/settings/areas.json", () => {
 
   test("Home settings groups household sections and names its admin views", () => {
     expect(area("home").groups.map((group) => group.label)).toEqual([
-      "General", "People", "Engines and AI", "Devices", "Search", "Integrations", "Commands", "Voices",
+      "General", "People", "Engines and AI", "Pictures and videos", "Devices", "Search", "Integrations", "Commands", "Voices",
       "Storage and backups", "Reference library", "Maintenance", "Privacy", "Developer", "Network and access",
     ]);
     expect(section("home", "ai").trail_view).toBe("home.engine_admin");
@@ -192,6 +192,7 @@ describe("conformance: structure", () => {
       "home.commands",
       "home.devices_admin",
       "home.engine_admin",
+      "home.pictures_library",
       "home.reference_library",
       "home.routing_stats",
       "home.voice_catalog",
@@ -429,8 +430,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("the registry keeps the pinned count and includes the checklist dismissal key", () => {
-    expect(registry).toHaveLength(184);
-    expect(new Set(registryIds()).size).toBe(184);
+    expect(registry).toHaveLength(186);
+    expect(new Set(registryIds()).size).toBe(186);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.max_mbps",

@@ -252,6 +252,12 @@
           ]
         },
         {
+          "label": "Pictures and videos",
+          "sections": [
+            "pictures"
+          ]
+        },
+        {
           "label": "Devices",
           "sections": [
             "robot"
@@ -497,6 +503,29 @@
             "teen gate",
             "context",
             "model"
+          ]
+        },
+        {
+          "id": "pictures",
+          "label": "Pictures and videos",
+          "icon": "image",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Pictures and videos",
+              "group": "household.pictures",
+              "scope": "household"
+            }
+          ],
+          "trail_view": "home.pictures_library",
+          "min_role": "admin",
+          "keywords": [
+            "images",
+            "styles",
+            "lora",
+            "adapters",
+            "generate",
+            "video"
           ]
         },
         {
