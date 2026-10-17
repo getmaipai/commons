@@ -185,6 +185,7 @@ describe("conformance: structure", () => {
   test("the allowed view ids are the Home-owned renders", () => {
     expect([...ALLOWED_VIEW_IDS].sort()).toEqual([
       "account.device_appearance",
+      "account.likeness",
       "account.profile",
       "account.voice",
       "chat.shortcuts",
@@ -430,8 +431,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("the registry keeps the pinned count and includes the checklist dismissal key", () => {
-    expect(registry).toHaveLength(188);
-    expect(new Set(registryIds()).size).toBe(188);
+    expect(registry).toHaveLength(190);
+    expect(new Set(registryIds()).size).toBe(190);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.max_mbps",

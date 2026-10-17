@@ -1,0 +1,13 @@
+{
+  "id": "la_01h8x0style0001",
+  "adapter_id": "lora_marlow_portrait",
+  "medium": "picture",
+  "subject_person_id": "person_marlow",
+  "classification": "adult-only",
+  "state": "active",
+  "declared_by": "person_nadia",
+  "source": "import",
+  "created_at": "2026-10-17T13:00:00.000Z",
+  "updated_at": "2026-10-17T13:00:00.000Z",
+  "hlc": "1792242000000:0:hub001"
+}

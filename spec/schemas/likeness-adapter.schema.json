@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/likeness-adapter.schema.json",
+  "title": "LikenessAdapter",
+  "description": "LIKENESS-01. Who a saved style (LoRA) in the household library looks like, declared when it was added. subject_person_id is a household adult whose consent was on at that moment, or null for \"Nobody (not a real person)\". A style of a minor or of anyone who is not a consenting household adult is refused at import and never has a record. A subject-linked style is always adult-only and is usable only while the subject's consent is on; when the consent goes off the record moves to removal_queued and the style is removed from the library.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "adapter_id", "medium", "subject_person_id", "classification", "state", "declared_by", "source", "created_at", "updated_at", "hlc"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "adapter_id": { "type": "string", "minLength": 1, "description": "The style's id in the Stack's library for this medium." },
+    "medium": { "type": "string", "enum": ["picture", "video"] },
+    "subject_person_id": { "type": ["string", "null"], "description": "The household adult this style looks like, or null for nobody." },
+    "classification": { "type": "string", "enum": ["all-ages", "adult-only"], "description": "The style's audience. Always adult-only when subject_person_id is set." },
+    "state": { "type": "string", "enum": ["active", "removal_queued", "removed"] },
+    "declared_by": { "type": "string", "minLength": 1, "description": "The adult who added the style and answered \"Who does this style look like?\"." },
+    "source": { "type": "string", "enum": ["import"], "description": "How the record came to be; this is the record provenance." },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$", "description": "Hybrid logical clock: wall_ms:counter:node (7.3)." }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "subject_person_id": { "type": "string" } }, "required": ["subject_person_id"] },
+      "then": { "properties": { "classification": { "const": "adult-only" } } }
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+## [spec-v0.1.156] - 2026-10-17
+
+- LIKENESS-01 (owner ruling 2026-10-17: an adult may make a picture, video or style that looks like a consenting household adult). Two person settings keys on a new card of Account settings, Pictures and videos (`account` section `pictures`, adults, closed view `account.likeness`): `likeness.adults` (boolean, default off, changed only by the person themselves: let other adults in this household make pictures, videos and styles that look like me) and `likeness.adult_content` (boolean, default off, separate: including adult content; counts only while the first is on). Three new records, all with id, provenance and clock stamp: `LikenessConsent` (an append-only history of each switch change), `LikenessUse` (each time another adult made something that looks like the person; shown only to the subject) and `LikenessAdapter` (who a saved style looks like: a household adult, always adult-only, or nobody). Additive; every existing fixture validates unchanged.
+
 ## [spec-v0.1.155] - 2026-10-17
 
 - VIDEO-GEN-04. Two household keys on the existing `household.pictures` card of Home settings, Pictures and videos: `generation.video.enabled` (boolean, default on: adults can ask chat for short videos; children and teens never can, whatever it says) and `generation.video.adult_adapters` (`allowed` or `restricted`, default `allowed`: whether adults can use video styles marked adult-only). Additive.

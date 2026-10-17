@@ -1,0 +1,13 @@
+{
+  "id": "la_01h8x0style0002",
+  "adapter_id": "lora_watercolor",
+  "medium": "video",
+  "subject_person_id": null,
+  "classification": "all-ages",
+  "state": "active",
+  "declared_by": "person_nadia",
+  "source": "import",
+  "created_at": "2026-10-17T13:05:00.000Z",
+  "updated_at": "2026-10-17T13:05:00.000Z",
+  "hlc": "1792242300000:0:hub001"
+}

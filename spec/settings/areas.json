@@ -14,6 +14,7 @@
             "appearance",
             "notifications",
             "voice",
+            "pictures",
             "data"
           ]
         },
@@ -126,6 +127,31 @@
                 }
               ]
             }
+          ]
+        },
+        {
+          "id": "pictures",
+          "label": "Pictures and videos",
+          "icon": "image",
+          "kind": "keys",
+          "min_role": "adult",
+          "cards": [
+            {
+              "label": "Pictures and videos that look like you",
+              "group": "person.likeness",
+              "scope": "person"
+            }
+          ],
+          "trail_view": "account.likeness",
+          "keywords": [
+            "likeness",
+            "consent",
+            "look like me",
+            "face",
+            "photo",
+            "lora",
+            "styles",
+            "video"
           ]
         },
         {

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/likeness-use.schema.json",
+  "title": "LikenessUse",
+  "description": "LIKENESS-01. One time another household adult made a picture or video that looks like this person (with a saved style of them or from a photo of them). The subject sees these rows, and only the subject: they are the \"Likeness use\" log on the person's own settings page, and each one also sends the subject a notification. No prompt, picture or file is stored here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "subject_person_id", "requester_person_id", "medium", "way", "adult_content", "source", "used_at", "created_at", "updated_at", "hlc"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "subject_person_id": { "type": "string", "minLength": 1, "description": "Whose likeness was used." },
+    "requester_person_id": { "type": "string", "minLength": 1, "description": "The adult who asked." },
+    "medium": { "type": "string", "enum": ["picture", "video"] },
+    "way": { "type": "string", "enum": ["style", "photo"], "description": "style: a saved style (LoRA) of the person. photo: an uploaded photo of the person." },
+    "adult_content": { "type": "boolean", "description": "Whether the request fell under the adult-content switch, which needed the subject's second consent." },
+    "source": { "type": "string", "enum": ["chat", "editor"], "description": "Where the request was made; this is the record provenance." },
+    "used_at": { "type": "string", "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$", "description": "Hybrid logical clock: wall_ms:counter:node (7.3)." }
+  }
+}
