@@ -1,3 +1,7 @@
+## [spec-v0.1.169] - 2026-10-17
+
+- Safety: the shared obfuscation normaliser (`safety/ts/fold.ts`) keeps the two words of a letter-spaced phrase apart (comma, double space or punctuation between them) and also matches a phrase inside a long run of single letters. Tests in `tests/ts/safety-fold.test.ts`. Additive.
+
 ## [spec-v0.1.168] - 2026-10-17
 
 - Safety: one shared obfuscation normaliser, `safety/ts/fold.ts`, now sits behind `detectCsam` in `safety/ts/signals.ts`. It folds leet, dotted, spaced, masked and repeated-letter spellings, i18n age words and native-script lists before matching, so minor-protection floors see the same text however it is disguised. Tests in `tests/ts/safety-fold.test.ts`. Additive.
