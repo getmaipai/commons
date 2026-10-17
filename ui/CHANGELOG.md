@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.256] - ui-v0.5.256
+
+A11Y-TARGET-01. `ComposerMenuItem` (and so `ComposerCommandItem`, `ComposerPersonItem` and the "+" menu rows) has a 48 px minimum height, the touch-target floor in docs/UI.md; the row is full width, so its real box grows (28 px to 48 px on a one-line row) instead of using a hit-area overhang. No prop, no API change.
+
 ## [0.5.255] - ui-v0.5.255
 
 IMGGEN-QUALITY-01. `ImageGallery` gains `actions` (`{ id, label, hint?, disabled?, onSelect }[]`): outline buttons under the pictures, each with a short muted hint, so a picture card can offer "Make it Detailed" or "Make it Quick" without a Home wrapper. Additive: no `actions`, no change.
