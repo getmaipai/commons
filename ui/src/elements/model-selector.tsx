@@ -254,9 +254,9 @@ export const modelSelectorTriggerVariants = cva(
         // base's overflow-hidden would clip that pseudo-element, so every
         // size sets overflow-visible (cn's tailwind-merge keeps the last);
         // the value text still truncates on its own span.
-        default: `h-9 px-3 py-2 overflow-visible ${hitArea(2)}`,
-        sm: `h-8 px-2.5 py-1.5 text-xs overflow-visible ${hitArea(2)}`,
-        lg: `h-10 px-4 py-2.5 overflow-visible ${hitArea(1)}`,
+        default: `h-9 px-3 py-2 overflow-visible ${hitArea(3)}`,
+        sm: `h-8 px-2.5 py-1.5 text-xs overflow-visible ${hitArea(3)}`,
+        lg: `h-10 px-4 py-2.5 overflow-visible ${hitArea(2)}`,
       },
     },
     defaultVariants: {

@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.265] - ui-v0.5.265
+
+- `ModelSelectorTrigger` hit area overhang raised one step (default and small 12 px, large 8 px) because the rendered small trigger is 30 px tall, so 8 px left it at 46 px in Home's gate. Look unchanged.
+
 ## [0.5.264] - ui-v0.5.264
 
 - `ModelSelectorTrigger` meets the 48 px touch floor at every size: each size extends its hit area with a transparent pseudo-element (`hitArea`) and sets `overflow-visible` so the trigger no longer clips it. The painted box and look are unchanged. Fixes the chat composer's "Thinking mode" button measuring 83x30 px in Home's accessibility gate.
