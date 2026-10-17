@@ -11,6 +11,9 @@
 // wake-word training rule, CLAUDE.md) applies here too, the corpus in
 // spec/safety/corpus/ is expected to grow as real misses turn up.
 import remove from "confusables";
+import {
+  NATIVE_MINOR, NATIVE_SEXUAL, NATIVE_STANDALONE, MINOR_WORDS_I18N, SEXUAL_WORDS_I18N, STANDALONE_TERMS_I18N, TermSet, foldForSafety, hasMinorAge,
+} from "./fold.js";
 
 export interface SafetyContext {
   /** Is the speaker a minor (role teen or child)? Grooming detection is
@@ -286,122 +289,31 @@ const SEXUAL_TERMS = [
   "seductive", "provocative", "in heat", "in bed", "molest",
 ];
 
-// Normalize to defeat naive separator obfuscation (l.o.l.i, l-o-l-i,
-// l_o_l_i) ON TOP of norm()'s own confusables/format-character folding
-// (issue #10: this used to duplicate norm()'s lowercase step with no
-// confusables handling of its own - a second, incomplete copy of the
-// same idea): strip combining marks, then produce two forms. `compact`
-// collapses separator runs to a single space (for multi-word phrases like
-// "school girl"). `tight` strips the punctuation separators inside each
-// whitespace-delimited token and keeps the tokens apart (so "l.o.l.i"
-// and "l-o-l-i" both reduce to the token "loli", and "under.age.sex" to
-// "underagesex"). getmaipai/home#100: `tight` used to strip whitespace
-// too, into one long string checked with a bare includes(), and the
-// four-letter terms then matched across word joins in ordinary talk:
-// "stepped on" became "steppedon", which contains "pedo", and "hello
-// little" became "hellolittle", which contains "loli". A model reply
-// about the moon landing was refused as CSAM mid-stream, and a child's
-// own "hello little one, time for bed" refused the same way. A term
-// now matches only at token boundaries after the per-token stripping,
-// never across a word join; a term split by punctuation inside one
-// token is still caught (corpus: csam.obfuscation.*), and so is a term
-// spelled out letter by letter ("l o l i"): a run of two or more
-// single-character words is joined into one word, which no ordinary
-// sentence contains and the old whitespace stripping used to catch (a
-// review of the #100 fix).
-function csamNormalize(text: string): { compact: string; tight: string } {
-  const stripped = norm(text).normalize("NFKD").replace(/[̀-ͯ]/g, "");
-  const words = stripped
-    .split(/\s+/)
-    .map((token) => token.replace(/[._\-*]+/g, ""))
-    .filter((token) => token.length > 0);
-  const joined: string[] = [];
-  for (let i = 0; i < words.length; i++) {
-    if (words[i]!.length === 1 && i + 1 < words.length && words[i + 1]!.length === 1) {
-      let run = words[i]!;
-      while (i + 1 < words.length && words[i + 1]!.length === 1) run += words[++i]!;
-      joined.push(run);
-    } else {
-      joined.push(words[i]!);
-    }
-  }
-  return {
-    compact: stripped.replace(/[\s._\-*]+/g, " "),
-    tight: joined.join(" "),
-  };
-}
-
-// Any explicitly-stated age under 18 ("12yo", "age 12", "12 years old").
-function hasMinorAge(compact: string): boolean {
-  const patterns = [
-    /\b(\d{1,2})\s*(?:yo|y\/o|y\.o\.?|yrs?|years?[\s-]*old)\b/g,
-    /\bage[d]?\s*(?:of\s*)?(\d{1,2})\b/g,
-  ];
-  for (const re of patterns) {
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(compact)) !== null) {
-      const n = Number(m[1]);
-      if (Number.isFinite(n) && n < 18) return true;
-    }
-  }
-  return false;
-}
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-// Deliberate stems meant to match as a PREFIX, not a whole word:
-// "pedophil" should still catch "pedophile"/"pedophilia", "masturbat"
-// should still catch "masturbating"/"masturbation". A single-word term
-// NOT in this set is matched as a whole word (both boundaries): a code
-// review (2026-09-04) found the first cut of this fix used a
-// left-boundary-only match for EVERY single-word term, which fixed the
-// originally-reported bugs ("sex" inside "Essex") but broke short/common
-// terms the other way ("cum" is a left-anchored prefix of "cumin",
-// "cumulative", "cumbersome", none of them stems that should ever match),
-// confirmed empirically: detectCsam("cumin is great in this kids'
-// recipe") flagged csam before this fix.
+// The obfuscation handling (separators, leetspeak, repeated and masked letters, look-alike letters, invisible
+// characters, other languages and scripts) lives in ONE place, ./fold.ts, shared with the pictures prompt floor in
+// Home (principle 4). This file keeps only the English term lists and the combination rule.
 //
-// Multi-word PHRASES ("middle school", "school girl") stay left-boundary-
-// only regardless: they need to keep matching a natural suffix
-// ("schooler" from "middle school"), and a distinctive multi-word phrase
-// doesn't have "cum"-style short-prefix collision risk the way a single
-// short word does, so the same tradeoff that broke "cum" doesn't apply.
-const PREFIX_STEM_TERMS = new Set(["pedophil", "masturbat"]);
+// Deliberate stems meant to match as a PREFIX, not a whole word: "pedophil" still catches "pedophile",
+// "masturbat" catches "masturbating". Every other single term is a whole word ("cum" must not match "cumin"), and
+// multi-word phrases match from their left edge ("middle school" matches "middle schooler").
+const PREFIX_STEM_TERMS = new Set(["pedophil", "masturbat", "pedofil"]);
+const prefixOrPhrase = (term: string): boolean => PREFIX_STEM_TERMS.has(term) || term.includes(" ");
 
-function wordMatch(compact: string, term: string): boolean {
-  const pattern = escapeRegex(term).replace(/\\ /g, "\\s+");
-  const isPhrase = term.includes(" ");
-  const boundary =
-    isPhrase || PREFIX_STEM_TERMS.has(term) ? `\\b${pattern}` : `\\b${pattern}\\b`;
-  return new RegExp(boundary).test(compact);
-}
+const STANDALONE_SET = new TermSet([...STANDALONE_SINGLE_TERMS, ...STANDALONE_PHRASES, ...STANDALONE_TERMS_I18N], { prefix: prefixOrPhrase });
+const AGE_SET = new TermSet([...AGE_TERMS, ...MINOR_WORDS_I18N], { prefix: prefixOrPhrase });
+const SEXUAL_SET = new TermSet([...SEXUAL_TERMS, ...SEXUAL_WORDS_I18N], { prefix: prefixOrPhrase });
 
 export function detectCsam(rawText: string): CategorySignals {
-  const { compact, tight } = csamNormalize(rawText);
+  const fold = foldForSafety(rawText);
   const matched: string[] = [];
 
-  for (const t of STANDALONE_SINGLE_TERMS) {
-    if (wordMatch(compact, t) || wordMatch(tight, t)) {
-      matched.push("csam.standalone_term");
-      return { category: "csam", matched };
-    }
-  }
-  for (const phrase of STANDALONE_PHRASES) {
-    // Phrases get the same obfuscation-resistant tight check single terms
-    // get: a code review (2026-09-04) found the first cut of this fix
-    // dropped it for phrases specifically, silently losing detection of
-    // "underagesex"-style concatenated evasion that the pre-fix code
-    // caught (confirmed empirically).
-    if (wordMatch(compact, phrase) || wordMatch(tight, phrase.replace(/\s+/g, ""))) {
-      matched.push("csam.standalone_term");
-      return { category: "csam", matched };
-    }
+  if (STANDALONE_SET.matches(fold) || NATIVE_STANDALONE.test(fold)) {
+    matched.push("csam.standalone_term");
+    return { category: "csam", matched };
   }
 
-  const hasAge = AGE_TERMS.some((a) => wordMatch(compact, a)) || hasMinorAge(compact);
-  const hasSexual = SEXUAL_TERMS.some((s) => wordMatch(compact, s));
+  const hasAge = AGE_SET.matches(fold) || hasMinorAge(fold) || NATIVE_MINOR.test(fold);
+  const hasSexual = SEXUAL_SET.matches(fold) || NATIVE_SEXUAL.test(fold);
   if (hasAge && hasSexual) {
     matched.push("csam.minor_indicator_with_sexual_term");
   }

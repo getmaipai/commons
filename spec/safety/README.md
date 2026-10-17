@@ -201,3 +201,14 @@ through `checkSafety`, plus a handful of invariant tests (self-harm never
 refuses, csam framing never bypasses, grooming is speaker-scoped,
 `matched_signals` never leaks the checked text). Runs from `home`'s
 `scripts/check.sh` via `spec`'s `bun test`, same as every other spec test.
+
+## The obfuscation normaliser (`ts/fold.ts`)
+
+One definition behind every minor-protection word floor: `detectCsam` here and the pictures and videos prompt floor in Home
+(`lib/pictures/minorLine.ts`) both read text only through `foldForSafety` and match terms only through `TermSet` and `NativeSet`.
+It removes invisible characters, folds width forms and look-alike letters, joins dotted, dashed and spaced letters, reads
+leetspeak digits and symbols as letters (a second form, because a digit is also an age), collapses repeated letters, matches
+masked letters (`ch*ld`), and carries Spanish, French, German, Italian and Portuguese age and nudity words plus native-script
+lists for Japanese, Chinese, Korean, Russian and Arabic. Non-Latin rule: a token wholly in one script is kept and matched
+natively; a token mixing scripts folds to Latin; a script with no list is not read. Pictures prompts fail closed on
+`fold.mixedScripts` plus any age cue (Home, minorLine.ts). `tests/ts/safety-fold.test.ts` pins each disguise with neutral words.
