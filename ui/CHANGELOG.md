@@ -1,5 +1,17 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.261] - ui-v0.5.261
+
+MEDIA-POLISH-01 (Home's approved media mockup, `docs/design/assets/media-apps-2026-10-17`, and the design note section 6). Shared pieces for every media app and News, all additive with defaults unchanged:
+
+- Cinema page tone (`tokens.css`): a page that selects it (`Page` `tone="cinema"`, from the spec page's `tone`; `SchemaPage` passes it) marks its root `data-page-tone="cinema"`, and the whole screen (rail, title bar, page, menus) takes the dark reference set with the rail one step darker (`--cinema`, `--app-rail-bg`), in light and dark themes alike; `--progress-accent` is the video red. News reuses it.
+- `MediaShelf`: `variant="plain"` (a frameless row: heading and a See all link on one line, then the tiles, about 3.2 tiles from 640 px and 4.3 from 1280 px), `orientation="vertical"` (rows with the caption beside the picture: Up next, History, Watch later), `hideWhenEmpty` (no heading and no empty state when there is nothing) and `seeAll` (`{ label, onSelect }`). News reuses the frameless rows.
+- `SplitView`: a `main` and `aside` form (a wide column with a 360 px one beside it from 1024 px, stacked below that, `asideLabel` names the aside). The list and detail form is unchanged.
+- `Player`: `media` adopts a host-owned media element (the Player keeps `src` and the poster in step, listens to its events, and returns it to the kit's hidden parking spot when it unmounts, never out of the document, so playback carries on from a watch page to the docked bar); `placement="dock"` pins the mini layout to the bottom of its scroll area with a top border and a blurred card fill. `parkMedia(el)` is exported.
+- `Billboard` gains `size="banner"` (a 340 px band from 640 px; on a phone it grows with its words, the dots above them) and its eyebrow reads `--art-eyebrow` (default `--progress-accent`, unchanged; blue in the cinema tone).
+- `TabsList` (dashboard `tabs.tsx`) gains `variant="pill"`: outlined chip tabs in a row that scrolls sideways, the selected one filled with the text colour (YouTube's section chips).
+- Schema interpreter: `media_shelf` reads `variant`, `orientation`, `hide_when_empty` and `see_all`; `billboard` reads `hide_when_empty`; `player` reads `details` (the title block under the picture) and `actions` (a row of pill buttons; one with `field` is a toggle fired with `on`, and the item is read again after it); `split_view` draws its `main` and `aside` form. `MediaHost` gains optional `mediaFor(item)`: a host that returns an element owns playback beyond the page. Icon: `clock`.
+
 ## [0.5.260] - ui-v0.5.260
 
 MUSIC-GEN-04: `MusicTrack` Element, the audio sibling of `VideoPlayer`: the generation card while a song is made, then the kit `Player` in its audio layout with Download, Share, Save to Music and Make another in its actions slot, a Lyrics disclosure and a version stepper on `stepVersion` with Use this version. Additive.

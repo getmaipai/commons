@@ -273,4 +273,32 @@ describe("Player", () => {
     expect(root.querySelector("[aria-label='Playback speed: 1x']")).toBeTruthy();
     expect(root.querySelector("[aria-label=Chapters]")).toBeTruthy();
   });
+
+  describe("MEDIA-POLISH-01 a host-owned element", () => {
+    test("is adopted into the controls, parked when the Player goes, and carries on in the next Player", () => {
+      const owned = fakeMedia(document.createElement("video"));
+      const first = render(<Player src="/a" title="Lanterns" kind="video" media={owned} />);
+      expect(first.container.querySelector("[data-slot=player-media]")).toBe(owned);
+      expect(owned.getAttribute("src")).toBe("/a");
+      act(() => void owned.play());
+      // The Player hears the element's own events: its play button now offers Pause.
+      expect(first.container.querySelector("[data-slot=player-play]")!.getAttribute("aria-label")).toBe("Pause");
+      first.unmount();
+      // Never out of the document: a media element removed from it pauses.
+      expect(owned.isConnected).toBe(true);
+      expect(owned.parentElement?.getAttribute("data-slot")).toBe("player-parking");
+      expect(owned.paused).toBe(false);
+      const dock = render(<Player src="/a" title="Lanterns" kind="video" layout="mini" placement="dock" media={owned} onExpand={() => {}} />);
+      expect(dock.container.querySelector("[data-slot=player-media]")).toBe(owned);
+      // The mini bar shows the art, not the picture.
+      expect(owned.style.display).toBe("none");
+      expect(dock.container.querySelector("[data-slot=player]")!.getAttribute("data-placement")).toBe("dock");
+      expect(dock.container.querySelector("[data-slot=player]")!.className).toContain("sticky");
+    });
+
+    test("an inline mini bar is unchanged (no sticky dock classes)", () => {
+      const view = render(<Player src="/a" kind="audio" layout="mini" title="Lanterns" onExpand={() => {}} />);
+      expect(view.container.querySelector("[data-slot=player]")!.className).not.toContain("sticky");
+    });
+  });
 });

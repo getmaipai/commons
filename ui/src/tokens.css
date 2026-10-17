@@ -1447,6 +1447,64 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   --art-overlay: color-mix(in srgb, #000000 62%, transparent);
   --art-radius: var(--radius-md);
   --player-radius: var(--radius-lg);
+  /* MEDIA-POLISH-01: the small line over a Billboard title; the progress accent unless a tone says otherwise. */
+  --art-eyebrow: var(--progress-accent);
+}
+
+/* MEDIA-POLISH-01: the cinema page tone (spec page `tone: "cinema"`, Home's
+ * media-apps design note section 6: "these apps select the dark page tone and
+ * their accent; no app CSS"). While a page that selects it is on screen, the
+ * whole screen (rail, title bar, page, menus) takes the dark reference set
+ * (the `.dark` values above) with the page one step darker behind the rail,
+ * in light and dark themes alike, the way a video app stays dark. The kit's
+ * SchemaPage marks its root `data-page-tone="cinema"`; nothing else selects it.
+ * Declared on body as well as the root because a look (`.style-<look>`) sets
+ * its colours on body; `:root ... body` outranks `.dark .style-<look>`.
+ * Shared: News and the other media apps select the same tone. */
+:root:has([data-page-tone="cinema"]),
+:root:has([data-page-tone="cinema"]) body {
+  color-scheme: dark;
+  --cinema: #040a14;
+  --page: #07111f;
+  --surface-page: #07111f;
+  --surface-card: #102238;
+  --surface-pane: #142a43;
+  --surface-sidebar: #040a14;
+  --background: #07111f;
+  --foreground: #f4f8ff;
+  --card: #102238;
+  --card-foreground: #f4f8ff;
+  --popover: #142a43;
+  --popover-foreground: #f4f8ff;
+  --border: #294563;
+  --input: #294563;
+  --muted: #142a43;
+  --muted-foreground: #a9bed7;
+  --secondary: #142a43;
+  --secondary-foreground: #f4f8ff;
+  --accent: #142a43;
+  --accent-foreground: #f4f8ff;
+  --primary: #21a6ff;
+  --primary-foreground: #07111f;
+  --ring: #21a6ff;
+  --destructive: #ff4b62;
+  --destructive-foreground: #07111f;
+  --sidebar: #040a14;
+  --sidebar-foreground: #f4f8ff;
+  --sidebar-accent: #142a43;
+  --sidebar-accent-foreground: #f4f8ff;
+  --sidebar-border: #142a43;
+  --elevation-color: oklch(0 0 0 / 0.55);
+  --elevation-hairline: oklch(1 0 0 / 0.07);
+  /* The shell's chrome tones: the rail one step darker than the page. */
+  --app-rail-bg: #040a14;
+  --shell-main: #07111f;
+  --shell-rail: #040a14;
+  --shell-history: #07111f;
+  --shell-divider: #142a43;
+  /* The video app's accent: the played-share bar and the time range are red; the Billboard's eyebrow stays blue. */
+  --progress-accent: #ff4b62;
+  --art-eyebrow: #21a6ff;
 }
 
 /* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */

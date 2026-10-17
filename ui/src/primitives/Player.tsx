@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -198,6 +199,29 @@ export interface PlayerProps {
   metadata?: PlayerMetadata;
   copy?: Partial<PlayerCopy>;
   mediaRef?: Ref<HTMLMediaElement>;
+  /** MEDIA-POLISH-01: a media element the host owns (Home's audio session), adopted while this Player is mounted
+   * instead of one of its own. The Player moves it into its controls and, when it unmounts or changes layout, into
+   * the kit's hidden parking spot, never out of the document, so playback carries on from a watch page to the
+   * docked mini bar and back without a restart. The host sets nothing else: the Player keeps `src` and the poster
+   * in step and listens to the element's events itself. */
+  media?: HTMLMediaElement | null;
+  /** MEDIA-POLISH-01: `dock` pins the mini layout to the bottom of the scrolling area it sits in, over the page with a
+   * top border and a blurred card fill (the docked mini bar). Default `inline`. */
+  placement?: "inline" | "dock";
+}
+
+/** MEDIA-POLISH-01: where a host-owned media element waits between Players: a hidden spot at the end of the body.
+ * A media element moved out of the document pauses; moved here in the same task, it keeps playing. */
+export function parkMedia(el: HTMLMediaElement): void {
+  if (typeof document === "undefined") return;
+  let spot = document.querySelector<HTMLElement>('[data-slot="player-parking"]');
+  if (!spot) {
+    spot = document.createElement("div");
+    spot.setAttribute("data-slot", "player-parking");
+    spot.hidden = true;
+    document.body.appendChild(spot);
+  }
+  if (el.parentNode !== spot) spot.appendChild(el);
 }
 
 function setRef<T>(ref: Ref<T> | undefined, value: T | null) {
@@ -287,6 +311,8 @@ export function Player(props: PlayerProps) {
     mediaSession = true,
     metadata,
     mediaRef,
+    media: external = null,
+    placement = "inline",
   } = props;
   const copy = useMemo(() => ({ ...DEFAULT_PLAYER_COPY, ...props.copy }), [props.copy]);
   const chapters = useMemo(() => normalizeChapters(props.chapters), [props.chapters]);
@@ -619,13 +645,69 @@ export function Player(props: PlayerProps) {
     }
   };
 
+  // ---- a host-owned element (MEDIA-POLISH-01) ----
+  // The same handlers the Player's own element gets as React props, read through a ref so the listeners added once stay current.
+  const mediaHandlers = {
+    loadedmetadata: () => onLoadedMetadata(),
+    durationchange: () => media.current && setDuration(media.current.duration),
+    timeupdate: () => media.current && setTime(media.current.currentTime),
+    play: () => onPlay(),
+    pause: () => onPause(),
+    seeked: () => onSeeked(),
+    ended: () => onEndedEvent(),
+    ratechange: () => {
+      if (!holding && media.current) setCurrentRate(media.current.playbackRate);
+    },
+  };
+  const handlersRef = useRef(mediaHandlers);
+  handlersRef.current = mediaHandlers;
+
+  useLayoutEffect(() => {
+    const el = external;
+    const controller = controllerRef.current;
+    if (!el || !controller) return;
+    el.setAttribute("slot", "media");
+    el.setAttribute("data-slot", "player-media");
+    el.preload = "metadata";
+    el.crossOrigin = "anonymous";
+    if (el instanceof HTMLVideoElement) {
+      el.playsInline = true;
+      if (layout === "video" && poster) el.poster = poster;
+    }
+    // Under the audio and mini layouts a video plays without its picture (the bar shows the art instead).
+    el.style.display = layout === "video" || el instanceof HTMLAudioElement ? "" : "none";
+    if (!type && el.getAttribute("src") !== src) el.setAttribute("src", src);
+    controller.insertBefore(el, controller.firstChild);
+    attachMedia(el);
+    // An element that already played (back from the mini bar) carries on where it is; a fresh one resumes as usual.
+    if (el.readyState >= 1) {
+      setDuration(el.duration);
+      setTime(el.currentTime);
+      setPlaying(!el.paused);
+      if (el.currentTime > 0 || !el.paused) startedRef.current = true;
+      else handlersRef.current.loadedmetadata();
+    }
+    const names = Object.keys(handlersRef.current) as Array<keyof typeof mediaHandlers>;
+    const listeners = names.map((name) => {
+      const listener = () => handlersRef.current[name]();
+      el.addEventListener(name, listener);
+      return () => el.removeEventListener(name, listener);
+    });
+    return () => {
+      listeners.forEach((off) => off());
+      if (el.parentNode === controller) parkMedia(el);
+    };
+    // `src` and the poster are applied on adoption; a new item is a new element from the host.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [external, layout]);
+
   // ---- derived ----
   const chapterIndex = chapterIndexAt(chapters, time);
   const offer = skipOffer(chapters, time, duration);
   const progressPct = Number.isFinite(duration) && duration > 0 ? Math.min(100, (time / duration) * 100) : 0;
 
   const MediaTag = kind === "audio" ? "audio" : "video";
-  const mediaElement = (
+  const mediaElement = external ? null : (
     // Captions come from `captions` as <track> children; a caller that has none passes none.
     <MediaTag
       key="media"
@@ -946,7 +1028,17 @@ export function Player(props: PlayerProps) {
     return (
       // Shortcuts are delegated from the focused control inside, the way a media player takes them.
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-      <div ref={rootRef} data-slot="player" data-layout="mini" onKeyDown={onKeyDown} className="relative w-full bg-card text-card-foreground">
+      <div
+        ref={rootRef}
+        data-slot="player"
+        data-layout="mini"
+        data-placement={placement}
+        onKeyDown={onKeyDown}
+        className={cn(
+          "relative w-full bg-card text-card-foreground",
+          placement === "dock" && "sticky bottom-0 z-30 border-t border-border bg-[color-mix(in_srgb,var(--card)_94%,transparent)] backdrop-blur-md",
+        )}
+      >
         <div aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-muted">
           <div className="h-full bg-[var(--progress-accent)]" style={{ width: `${progressPct}%` }} />
         </div>

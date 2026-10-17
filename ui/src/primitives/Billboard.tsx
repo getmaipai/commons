@@ -31,8 +31,10 @@ export interface BillboardProps {
   slides: readonly BillboardSlide[];
   /** Accessible name of the carousel. */
   label: string;
-  /** `card`: a rounded card in the page flow (Videos). `hero`: full width and taller, the title set large (Shows and Films). */
-  size?: "card" | "hero";
+  /** `card`: a rounded card in the page flow. `hero`: full width and taller, the title set large (Shows and Films).
+   * MEDIA-POLISH-01 `banner`: a short 340 px band from 640 px, so the first shelf shows under it (Videos, the approved
+   * media mockup); on a phone it grows with its words, with room on top for the dots. */
+  size?: "card" | "hero" | "banner";
   autoplay?: boolean;
   autoplayDelay?: number;
   /** The dwell preview slot: what to draw over a slide's backdrop after the person rests on it (a muted trailer).
@@ -147,7 +149,7 @@ export function Billboard({
             <div
               className={cn(
                 "relative isolate flex w-full flex-col justify-end overflow-hidden bg-[var(--art-surface)]",
-                hero ? "min-h-[28rem] sm:min-h-[36rem]" : "aspect-[4/3] sm:aspect-[21/8]",
+                hero ? "min-h-[28rem] sm:min-h-[36rem]" : size === "banner" ? "min-h-72 pt-14 sm:h-[340px] sm:min-h-0 sm:pt-0" : "aspect-[4/3] sm:aspect-[21/8]",
               )}
             >
               {slide.art ? <img src={slide.art} alt="" className="absolute inset-0 -z-20 size-full object-cover" /> : null}
@@ -160,7 +162,7 @@ export function Billboard({
               <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-[var(--background)] via-[color-mix(in_srgb,var(--background)_45%,transparent)] to-transparent" />
               <div className={cn("flex max-w-2xl flex-col gap-3", hero ? "p-6 sm:p-10" : "p-4 sm:p-6")}>
                 {slide.eyebrow ? (
-                  <p className="text-sm font-semibold tracking-widest text-[var(--progress-accent)] uppercase">{slide.eyebrow}</p>
+                  <p className="text-sm font-semibold tracking-widest text-[var(--art-eyebrow)] uppercase">{slide.eyebrow}</p>
                 ) : null}
                 <h2 className={cn("font-bold text-balance", hero ? "text-4xl uppercase sm:text-6xl" : "text-2xl sm:text-3xl")}>{slide.title}</h2>
                 {slide.meta ? <div className="flex flex-wrap items-center gap-2 text-sm">{slide.meta}</div> : null}

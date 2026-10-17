@@ -155,4 +155,15 @@ describe("Billboard", () => {
       restore();
     }
   });
+
+  test("MEDIA-POLISH-01: size banner is a short band from 640 px and grows on a phone; card keeps its shape; the eyebrow reads its own token", () => {
+    const { container, rerender } = render(<Billboard label="Featured" slides={SLIDES} size="banner" />);
+    const box = () => container.querySelector('[data-slot="billboard"] .isolate') as HTMLElement;
+    expect(box().className).toContain("sm:h-[340px]");
+    expect(box().className).toContain("pt-14");
+    rerender(<Billboard label="Featured" slides={SLIDES} />);
+    expect(box().className).toContain("sm:aspect-[21/8]");
+    expect(box().className).not.toContain("sm:h-[340px]");
+    expect(container.innerHTML).toContain("text-[var(--art-eyebrow)]");
+  });
 });

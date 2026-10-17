@@ -63,7 +63,7 @@ export function SchemaPage({
   return (
     <PackageScopeContext.Provider value={scope}>
       <PageStateContext.Provider value={writer}>
-        <Page title={parsed.title} hideTitle={hideTitle}>
+        <Page title={parsed.title} hideTitle={hideTitle} tone={parsed.tone}>
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
           <div tabIndex={0} className={cn("flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto p-4", FOCUS_RING)}>
             {beforeBody}

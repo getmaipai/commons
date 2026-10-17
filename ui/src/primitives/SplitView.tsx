@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { cn, FOCUS_RING } from "@/kit/utils";
 
-interface SplitViewProps {
+interface ListDetailProps {
   /** The index side: a List or a CardGrid, usually. */
   list: ReactNode;
   /** The detail side: a DetailPane, usually. Rendered even when nothing
@@ -16,6 +16,18 @@ interface SplitViewProps {
   detailLabel?: string;
 }
 
+/** MEDIA-POLISH-01: the main and aside form: a wide column with a narrow one
+ * beside it from 1024 px (a player with Up next, YouTube's watch page), the
+ * aside stacked under the main column below that. */
+interface MainAsideProps {
+  main: ReactNode;
+  aside: ReactNode;
+  /** The aside column's accessible name ("Up next"). */
+  asideLabel?: string;
+}
+
+type SplitViewProps = ListDetailProps | MainAsideProps;
+
 // docs/UI.md names SplitView as a kit primitive. It owns exactly one
 // decision - how a list and a detail share the screen at each surface -
 // and nothing else. Phone shows one at a time; tablet and desktop show
@@ -26,7 +38,23 @@ interface SplitViewProps {
 // would put a second, drifting definition of "phone" next to the kit's
 // own (@/kit/responsive). The caller only ever says whether something is
 // selected.
-export function SplitView({ list, detail, detailOpen = false, listLabel, detailLabel }: SplitViewProps) {
+export function SplitView(props: SplitViewProps) {
+  if ("main" in props) return <MainAside {...props} />;
+  return <ListDetail {...props} />;
+}
+
+function MainAside({ main, aside, asideLabel }: MainAsideProps) {
+  return (
+    <div className="grid w-full min-w-0 grid-cols-1 gap-x-7 gap-y-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]" data-slot="split-view" data-layout="main-aside">
+      <div className="flex min-w-0 flex-col gap-4">{main}</div>
+      <div role={asideLabel ? "region" : undefined} aria-label={asideLabel} className="flex min-w-0 flex-col gap-4">
+        {aside}
+      </div>
+    </div>
+  );
+}
+
+function ListDetail({ list, detail, detailOpen = false, listLabel, detailLabel }: ListDetailProps) {
   return (
     <div className="flex h-full min-h-0 w-full">
       <div

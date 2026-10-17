@@ -28,6 +28,7 @@ import { locationBlockedHelp } from "@/kit/geolocationHelp";
 import { AnswerBlockView } from "@/kit/elements/answer-block";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { PageStateContext } from "@/kit/schema/packageScope";
+import { MediaHostContext } from "@/kit/schema/mediaHost";
 import type { Action } from "@/kit/schema/types";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
@@ -42,6 +43,7 @@ import type {
   MediaShelfNode,
   BillboardNode,
   PlayerNode,
+  PlayerActionNode,
   DetailPaneNode,
   SplitViewNode,
   FormNode,
@@ -616,7 +618,8 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
       isFetching={query.isFetching}
       onRetry={() => query.refetch()}
       errorMessage="Could not load this shelf."
-      isEmpty={(rows) => rows.length === 0}
+      // MEDIA-POLISH-01: a shelf that hides when empty gets its rows either way and draws nothing for none.
+      isEmpty={(rows) => rows.length === 0 && !node.hide_when_empty}
       emptyIcon={node.empty_state?.icon ?? "inbox"}
       emptyText={node.empty_state?.text ?? "Nothing here yet."}
     >
@@ -627,11 +630,15 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             getKey={keyOf}
             aspect={node.aspect}
             heading={node.heading}
+            variant={node.variant}
+            orientation={node.orientation}
+            hideWhenEmpty={node.hide_when_empty}
+            seeAll={node.see_all ? { label: node.see_all.label, onSelect: () => dispatch(node.see_all!.action) } : undefined}
             onSelect={node.on_select ? (row) => dispatch(node.on_select!, [row]) : undefined}
             getLabel={(row) => String(readField(row, node.item_label_field))}
             renderCaption={(row) => (
               <span className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-semibold">{String(readField(row, node.item_label_field))}</span>
+                <span className={node.orientation === "vertical" ? "line-clamp-2 text-sm font-semibold" : "truncate text-sm font-semibold"}>{String(readField(row, node.item_label_field))}</span>
                 {node.item_subtitle_field ? (
                   <span className="text-muted-foreground truncate text-sm">{fillTemplate(node.item_subtitle_field, row)}</span>
                 ) : null}
@@ -677,11 +684,11 @@ function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row })
       isFetching={query.isFetching}
       onRetry={() => query.refetch()}
       errorMessage="Could not load the featured items."
-      isEmpty={(rows) => rows.length === 0}
+      isEmpty={(rows) => rows.length === 0 && !node.hide_when_empty}
       emptyIcon={node.empty_state?.icon ?? "film"}
       emptyText={node.empty_state?.text ?? "Nothing featured yet."}
     >
-      {(rows) => (
+      {(rows) => rows.length === 0 ? null : (
         <>
           <Billboard
             label={node.label ?? "Featured"}
@@ -707,6 +714,7 @@ function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row })
 function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const query = useBinding<Row | Row[]>(node.bind, state);
   const { dispatch, lastError } = useDispatchAction();
+  const host = useContext(MediaHostContext);
   const field = (name: keyof NonNullable<PlayerNode["fields"]>, fallback: string) => node.fields?.[name] ?? fallback;
   const item = Array.isArray(query.data) ? query.data[0] : query.data;
   return (
@@ -724,10 +732,17 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
         const r = row as Row;
         const upNext = readField(r, field("up_next", "up_next")) as PlayerUpNext | undefined;
         const position = readField(r, field("position", "position_s"));
+        const src = localPicture(readField(r, field("src", "src")))!;
+        const title = String(readField(r, field("title", "title")) ?? "");
+        const subtitle = (readField(r, field("subtitle", "subtitle")) as string | undefined) ?? undefined;
+        const poster = localPicture(readField(r, field("poster", "poster"))) ?? undefined;
+        // MEDIA-POLISH-01: the host may own the element, so playback outlives this page (the docked mini bar).
+        const external = host?.mediaFor?.({ id: String(readField(r, field("id", "id")) ?? ""), src, kind: node.kind, title, subtitle, poster }) ?? null;
         return (
           <>
             <Player
-              src={localPicture(readField(r, field("src", "src")))!}
+              media={external}
+              src={src}
               kind={node.kind}
               layout={node.layout}
               title={String(readField(r, field("title", "title")) ?? "")}
@@ -748,11 +763,49 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               }
               onNext={node.on_next && upNext ? () => dispatch(node.on_next!, [upNext as unknown as Row]) : undefined}
             />
+            {node.details ? <PlayerDetails title={title} subtitle={subtitle} /> : null}
+            {node.actions && node.actions.length > 0 ? <PlayerActions actions={node.actions} item={r} dispatch={dispatch} /> : null}
             {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
           </>
         );
       }}
     </AsyncState>
+  );
+}
+
+/** MEDIA-POLISH-01: a watch page's title block under the picture: the title, then the subtitle line (the channel). */
+function PlayerDetails({ title, subtitle }: { title: string; subtitle?: string }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-1" data-slot="player-details">
+      <h2 className="text-xl font-bold tracking-tight text-foreground">{title}</h2>
+      {subtitle ? <p className="text-muted-foreground text-base">{subtitle}</p> : null}
+    </div>
+  );
+}
+
+/** MEDIA-POLISH-01: the actions row under the title (Like, Watch later): pill buttons in one row that scrolls sideways
+ * on a phone. A button with a `field` is a toggle, pressed while that field of the item is true. */
+function PlayerActions({ actions, item, dispatch }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"] }) {
+  return (
+    <div className="flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" role="group" aria-label="Actions" data-slot="player-actions">
+      {actions.map((a) => {
+        const on = a.field ? readField(item, a.field) === true : false;
+        const Glyph = a.icon ? getIcon(a.icon) : null;
+        return (
+          <Button
+            key={a.label}
+            variant="secondary"
+            size="sm"
+            className="shrink-0 rounded-full px-4"
+            aria-pressed={a.field ? on : undefined}
+            onClick={() => dispatch(a.action, [a.field ? { ...item, on: !on } : item])}
+          >
+            {Glyph ? <Glyph aria-hidden className={on ? "fill-current" : undefined} /> : null}
+            {on && a.on_label ? a.on_label : a.label}
+          </Button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -905,6 +958,15 @@ function DetailPaneNodeView({ node, state }: { node: DetailPaneNode; state: Row 
 }
 
 function SplitViewNodeView({ node, state }: { node: SplitViewNode; state: Row }) {
+  if ("main" in node) {
+    return (
+      <SplitView
+        main={node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}
+        aside={node.aside.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}
+        asideLabel={node.aside_label}
+      />
+    );
+  }
   return (
     <SplitView
       list={<NodeRenderer node={node.list} state={state} />}

@@ -9,7 +9,7 @@ import { MemoryRouter } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext } from "@/kit/schema/packageScope";
-import { MediaHostContext, PLAY_UNAVAILABLE, type MediaHost } from "@/kit/schema/mediaHost";
+import { MediaHostContext, PLAY_UNAVAILABLE, type MediaHost, type MediaItemRef } from "@/kit/schema/mediaHost";
 import { PageNodeSchema, type UiNode } from "@/kit/schema/types";
 
 // The page fixtures live beside schema.json in this repo's own spec workspace (catalog.test.ts reads it the same way).
@@ -115,7 +115,7 @@ describe("billboard", () => {
 });
 
 describe("player", () => {
-  const playerNode = watchPage.body[0]!;
+  const playerNode = (watchPage.body[0] as { main: UiNode[] }).main[0]!;
 
   test("binds the item through the page state and draws the Player for it", async () => {
     const { findByRole, container } = inVideos(playerNode, { onPlay: () => {} }, { id: "m1" });
@@ -148,5 +148,54 @@ describe("player", () => {
     const { findByText, container } = inVideos(playerNode, { onPlay: () => {} }, { id: "m1" });
     await findByText("This video is not on the hub. Go back to Videos and pick another.");
     expect(container.querySelector("video")).toBeNull();
+  });
+});
+
+describe("MEDIA-POLISH-01", () => {
+  const split = watchPage.body[0]!;
+  const playerNode = (split as { main: UiNode[] }).main[0]!;
+
+  test("an empty shelf with hide_when_empty draws nothing; the page tone and plain variant come from the document", async () => {
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify([]), { status: 200 }))) as unknown as typeof fetch;
+    const { container, queryByRole } = inVideos(shelf, { onPlay: () => {} });
+    await waitFor(() => expect(container.querySelector('[data-slot="route-skeleton"], [role="progressbar"]')).toBeNull());
+    await waitFor(() => expect(container.textContent).toBe(""));
+    expect(queryByRole("heading", { name: "Continue watching" })).toBeNull();
+    expect(homePage.tone).toBe("cinema");
+  });
+
+  test("a plain shelf with rows has its See all link, which navigates inside the app", async () => {
+    const { findByRole } = inVideos(shelf, { onPlay: () => {} });
+    const seeAll = await findByRole("button", { name: "See all" });
+    expect(seeAll.closest('[data-slot="media-shelf-plain"]')).not.toBeNull();
+  });
+
+  test("the watch page is a main and aside split: the player with its title and actions, Up next as a vertical list", async () => {
+    const { findByRole, findByLabelText, container } = inVideos(split, { onPlay: () => {} }, { id: "m1" });
+    expect(await findByRole("heading", { name: "Building a pizza oven" })).toBeTruthy();
+    const upNext = await findByLabelText("Up next", { selector: "ul" });
+    expect(upNext.getAttribute("data-orientation")).toBe("vertical");
+    expect(container.querySelector('[data-layout="main-aside"]')).not.toBeNull();
+    expect(await findByRole("button", { name: "Like" })).toBeTruthy();
+  });
+
+  test("a toggle action fires with the item and on set to the new value, then reads the item again", async () => {
+    const { findByRole } = inVideos(playerNode, { onPlay: () => {} }, { id: "m1" });
+    const like = await findByRole("button", { name: "Like" });
+    expect(like.getAttribute("aria-pressed")).toBe("false");
+    fireEvent.click(like);
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/videos/like")).toBe(true));
+    expect(calls.find((c) => c.url === "/api/plugins/videos/like")!.body).toEqual({ media_id: "m1", on: true });
+    await waitFor(() => expect(calls.filter((c) => c.url.endsWith("/data/item")).length).toBeGreaterThan(1));
+  });
+
+  test("a host that owns the element gets asked for it, and the Player plays in it", async () => {
+    const owned = document.createElement("video");
+    const mediaFor = mock((_item: MediaItemRef) => owned);
+    const { findByRole, container } = inVideos(playerNode, { onPlay: () => {}, mediaFor }, { id: "m1" });
+    await findByRole("button", { name: "Chapters" });
+    expect(mediaFor.mock.calls[0]![0]).toMatchObject({ id: "m1", src: "/api/media/m1/file", kind: "video", title: "Building a pizza oven" });
+    expect(container.querySelector("video")).toBe(owned);
+    expect(owned.getAttribute("src")).toBe("/api/media/m1/file");
   });
 });

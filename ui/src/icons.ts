@@ -136,6 +136,7 @@ import {
   Palette,
   Terminal,
   UserRound,
+  Clock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -165,6 +166,8 @@ export const icons = {
   calendar: Calendar,
   camera: Camera,
   check: CheckCircle2,
+  // MEDIA-POLISH-01: Watch later on the watch page's actions row.
+  clock: Clock,
   "chevron-down": ChevronDown,
   "chevron-left": ChevronLeft,
   "chevron-right": ChevronRight,

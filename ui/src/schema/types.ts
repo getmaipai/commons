@@ -150,6 +150,11 @@ export const MediaShelfNodeSchema = z.object({
   item_badge_field: z.string().optional(),
   item_meta_field: z.string().optional(),
   aspect: z.enum(["wide", "square", "poster"]).default("wide"),
+  // MEDIA-POLISH-01: the frameless row, the vertical (Up next) list, hiding an empty shelf and the See all link.
+  variant: z.enum(["card", "plain"]).default("card"),
+  orientation: z.enum(["horizontal", "vertical"]).default("horizontal"),
+  hide_when_empty: z.boolean().default(false),
+  see_all: z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), action: ActionSchema }).optional(),
   on_select: ActionSchema.optional(),
   empty_state: EmptyStateNodeSchema.optional(),
 });
@@ -167,7 +172,7 @@ export const BillboardNodeSchema = z.object({
   type: z.literal("billboard"),
   bind: BindingSchema,
   label: z.string().min(1).max(60).optional(),
-  size: z.enum(["card", "hero"]).default("card"),
+  size: z.enum(["card", "hero", "banner"]).default("card"),
   autoplay: z.boolean().default(true),
   item_key_field: z.string(),
   item_title_field: z.string(),
@@ -176,6 +181,7 @@ export const BillboardNodeSchema = z.object({
   item_art_field: z.string().optional(),
   primary: BillboardActionSchema,
   secondary: z.array(BillboardActionSchema).max(2).optional(),
+  hide_when_empty: z.boolean().default(false),
   empty_state: EmptyStateNodeSchema.optional(),
 });
 export type BillboardNode = z.infer<typeof BillboardNodeSchema>;
@@ -191,9 +197,24 @@ export const PlayerNodeSchema = z.object({
   fields: z.object(Object.fromEntries(PLAYER_FIELDS.map((f) => [f, z.string().min(1).optional()])) as Record<(typeof PLAYER_FIELDS)[number], z.ZodOptional<z.ZodString>>).strict().optional(),
   on_progress: ActionSchema.optional(),
   on_next: ActionSchema.optional(),
+  // MEDIA-POLISH-01: the title block and the actions row under the picture.
+  details: z.boolean().default(false),
+  actions: z
+    .array(
+      z.object({
+        label: z.string().min(1).max(40),
+        icon: z.string().optional(),
+        field: z.string().min(1).optional(),
+        on_label: z.string().min(1).max(40).optional(),
+        action: ActionSchema,
+      }),
+    )
+    .max(6)
+    .optional(),
   empty_state: EmptyStateNodeSchema.optional(),
 });
 export type PlayerNode = z.infer<typeof PlayerNodeSchema>;
+export type PlayerActionNode = NonNullable<PlayerNode["actions"]>[number];
 
 export const DetailPaneNodeSchema: z.ZodType<DetailPaneNode> = z.lazy(() =>
   z.object({
@@ -210,18 +231,25 @@ export interface DetailPaneNode {
   body: UiNode[];
 }
 
+// MEDIA-POLISH-01: two forms, list and detail (an index beside one item) or main and aside (a player with Up next).
 export const SplitViewNodeSchema: z.ZodType<SplitViewNode> = z.lazy(() =>
-  z.object({
-    type: z.literal("split_view"),
-    list: z.union([ListNodeSchema, CardGridNodeSchema]),
-    detail: DetailPaneNodeSchema,
-  }),
+  z.union([
+    z.object({
+      type: z.literal("split_view"),
+      list: z.union([ListNodeSchema, CardGridNodeSchema]),
+      detail: DetailPaneNodeSchema,
+    }),
+    z.object({
+      type: z.literal("split_view"),
+      main: z.array(UiNodeSchema).min(1),
+      aside: z.array(UiNodeSchema).min(1),
+      aside_label: z.string().min(1).max(60).optional(),
+    }),
+  ]),
 );
-export interface SplitViewNode {
-  type: "split_view";
-  list: ListNode | CardGridNode;
-  detail: DetailPaneNode;
-}
+export type SplitViewNode =
+  | { type: "split_view"; list: ListNode | CardGridNode; detail: DetailPaneNode }
+  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string };
 
 export const WidgetCardNodeSchema = z.object({
   type: z.literal("widget_card"),
@@ -322,6 +350,7 @@ export const PageNodeSchema: z.ZodType<PageNode> = z.lazy(() =>
     type: z.literal("page"),
     id: z.string().min(1),
     title: z.string().min(1),
+    tone: z.enum(["default", "cinema"]).default("default"),
     body: z.array(UiNodeSchema).min(1),
   }),
 );
@@ -329,6 +358,8 @@ export interface PageNode {
   type: "page";
   id: string;
   title: string;
+  /** MEDIA-POLISH-01: the page tone; `cinema` is the dark media tone in both themes. */
+  tone?: "default" | "cinema";
   body: UiNode[];
 }
 

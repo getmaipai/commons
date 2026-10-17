@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Card } from "@/kit/primitives/Card";
+import { Button } from "@/kit/ui/button";
 import { EmptyState } from "@/kit/primitives/EmptyState";
 import { Section } from "@/kit/primitives/Section";
 import { SHELF_ITEM_WIDTH, type Density } from "@/kit/responsive";
@@ -47,6 +48,19 @@ interface MediaShelfProps<T> {
   /** MEDIA-PLAYER-01: a small label pinned to the tile's bottom-end corner
    * (a running time such as "18:42"). */
   renderMeta?: (item: T) => ReactNode;
+  /** MEDIA-POLISH-01: `card` (the default) draws the shelf inside a bordered
+   * section card; `plain` is a frameless row: the heading with an optional
+   * See all link, then the tiles (the media apps' and News' rows). */
+  variant?: "card" | "plain";
+  /** MEDIA-POLISH-01: `horizontal` (the default) is the sideways rail;
+   * `vertical` stacks the tiles as rows with the caption beside the picture
+   * (Up next beside a player). */
+  orientation?: "horizontal" | "vertical";
+  /** MEDIA-POLISH-01: with no items, draw nothing at all (no heading, no
+   * empty state): a row with nothing in it is simply absent. */
+  hideWhenEmpty?: boolean;
+  /** MEDIA-POLISH-01: a link beside the heading ("See all"). */
+  seeAll?: { label: string; onSelect: () => void };
 }
 
 function clampProgress(value: number | undefined): number {
@@ -84,23 +98,59 @@ export function MediaShelf<T>({
   getProgress,
   renderBadge,
   renderMeta,
+  variant = "card",
+  orientation = "horizontal",
+  hideWhenEmpty = false,
+  seeAll,
 }: MediaShelfProps<T>) {
   const name = label ?? heading;
   const { far } = useSurface();
+  // A plain shelf is a section of the page with its own heading row; a card shelf is the kit Section card.
+  const Frame = variant === "plain" ? PlainShelfFrame : CardShelfFrame;
+
+  if (items.length === 0 && hideWhenEmpty) return null;
 
   if (items.length === 0 && emptyState) {
     return (
-      <Section heading={heading}>
+      <Frame heading={heading} seeAll={seeAll}>
         <EmptyState icon={emptyState.icon} text={emptyState.text} />
-      </Section>
+      </Frame>
+    );
+  }
+
+  if (orientation === "vertical") {
+    return (
+      <Frame heading={heading} seeAll={seeAll}>
+        <ul aria-label={name} className="flex min-w-0 list-none flex-col gap-3 p-0" data-slot="media-shelf" data-orientation="vertical">
+          {items.map((item) => (
+            <li key={getKey(item)} className="flex min-w-0 items-start gap-3">
+              <Card
+                onSelect={onSelect ? () => onSelect(item) : undefined}
+                label={getLabel?.(item)}
+                selected={isSelected?.(item)}
+                far={far}
+                className={cn("w-2/5 max-w-40 shrink-0 border-0 bg-transparent", isSelected?.(item) && "ring-2 ring-primary ring-offset-2 ring-offset-background")}
+              >
+                <div className={cn("relative w-full overflow-hidden rounded-[var(--radius)] bg-[var(--muted)]", ASPECT_CLASSES[aspect])}>
+                  {renderItem(item)}
+                  <MediaTileOverlay progress={clampProgress(getProgress?.(item))} badge={renderBadge?.(item)} meta={renderMeta?.(item)} />
+                </div>
+              </Card>
+              {renderCaption ? <div className="min-w-0 flex-1 text-sm text-[var(--foreground)]">{renderCaption(item)}</div> : null}
+            </li>
+          ))}
+        </ul>
+      </Frame>
     );
   }
 
   // The heading is Section's, not a second one written here: a shelf is
   // a section of a page that happens to scroll sideways.
   return (
-    <Section heading={heading}>
+    <Frame heading={heading} seeAll={seeAll}>
       <ul
+        data-slot="media-shelf"
+        data-variant={variant}
         aria-label={name}
         // A scrollable region has to be reachable by keyboard (WCAG 2.2
         // AA, 2.1.1). When the tiles are buttons, tabbing through them
@@ -122,10 +172,10 @@ export function MediaShelf<T>({
         // covers every `.overflow-x-auto` element on every captured
         // route, this one included, so a real instance would be caught
         // there rather than fixed blind here.
-        className={cn("flex min-w-0 list-none snap-x snap-mandatory gap-3 overflow-x-auto p-1.5", FOCUS_RING)}
+        className={cn("flex min-w-0 list-none snap-x snap-mandatory gap-3 overflow-x-auto p-1.5", variant === "plain" && "[scrollbar-width:none]", FOCUS_RING)}
       >
         {items.map((item) => (
-          <li key={getKey(item)} className={cn("flex shrink-0 snap-start flex-col gap-2", SHELF_ITEM_WIDTH[density])}>
+          <li key={getKey(item)} className={cn("flex shrink-0 snap-start flex-col gap-2", variant === "plain" ? PLAIN_ITEM_WIDTH : SHELF_ITEM_WIDTH[density])}>
             <Card
               onSelect={onSelect ? () => onSelect(item) : undefined}
               label={getLabel?.(item)}
@@ -170,7 +220,41 @@ export function MediaShelf<T>({
           </li>
         ))}
       </ul>
-    </Section>
+    </Frame>
+  );
+}
+
+// The frameless row's tile widths, the approved media mockup's (docs/design/assets/media-apps-2026-10-17 in Home): most of
+// a tile on a phone so the next one peeks, about three and a quarter from 640, about four and a third from 1280.
+const PLAIN_ITEM_WIDTH = "w-[72%] sm:w-[calc((100%-36px)/3.2)] xl:w-[calc((100%-48px)/4.3)]";
+
+interface ShelfFrameProps {
+  heading?: string;
+  seeAll?: { label: string; onSelect: () => void };
+  children: ReactNode;
+}
+
+/** The default frame: the kit Section card. A card shelf has no See all link. */
+function CardShelfFrame({ heading, children }: ShelfFrameProps) {
+  return <Section heading={heading}>{children}</Section>;
+}
+
+/** A plain shelf's frame: no card, the heading on the start side and the See all link on the end side. */
+function PlainShelfFrame({ heading, seeAll, children }: ShelfFrameProps) {
+  return (
+    <section className="flex min-w-0 flex-col gap-2" data-slot="media-shelf-plain">
+      {heading || seeAll ? (
+        <div className="flex items-center justify-between gap-3">
+          {heading ? <h2 className="text-lg font-bold tracking-tight text-foreground">{heading}</h2> : <span />}
+          {seeAll ? (
+            <Button variant="ghost" size="sm" onClick={seeAll.onSelect} className="text-muted-foreground font-semibold">
+              {seeAll.label}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
+      {children}
+    </section>
   );
 }
 

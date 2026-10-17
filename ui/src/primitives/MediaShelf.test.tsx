@@ -195,4 +195,53 @@ describe("MediaShelf", () => {
     expect(bars).toHaveLength(1);
     expect(bars[0]!.getAttribute("aria-valuenow")).toBe("100");
   });
+
+  describe("MEDIA-POLISH-01", () => {
+    test("the default stays the bordered card; plain draws no card", () => {
+      const { container, rerender } = render(
+        <MediaShelf items={tracks} getKey={(t) => t.id} renderItem={(t) => <span>{t.title}</span>} heading="Recently added" />,
+      );
+      expect(container.querySelector("section")!.className).toContain("border");
+      rerender(<MediaShelf items={tracks} getKey={(t) => t.id} renderItem={(t) => <span>{t.title}</span>} heading="Recently added" variant="plain" />);
+      const section = container.querySelector("section")!;
+      expect(section.getAttribute("data-slot")).toBe("media-shelf-plain");
+      expect(section.className).not.toContain("border");
+      expect(section.className).not.toContain("bg-card");
+    });
+
+    test("See all sits beside the heading and fires its handler", () => {
+      const onSelect = mock(() => {});
+      const { getByRole } = render(
+        <MediaShelf items={tracks} getKey={(t) => t.id} renderItem={(t) => <span>{t.title}</span>} heading="Continue watching" variant="plain" seeAll={{ label: "See all", onSelect }} />,
+      );
+      fireEvent.click(getByRole("button", { name: "See all" }));
+      expect(onSelect).toHaveBeenCalledTimes(1);
+    });
+
+    test("hideWhenEmpty draws nothing, not even the heading or the empty state", () => {
+      const { container } = render(
+        <MediaShelf items={[]} getKey={(t: Track) => t.id} renderItem={(t) => <span>{t.title}</span>} heading="Watch again" emptyState={{ icon: "film", text: "Nothing yet" }} hideWhenEmpty />,
+      );
+      expect(container.innerHTML).toBe("");
+    });
+
+    test("without hideWhenEmpty an empty shelf still shows its empty state (default unchanged)", () => {
+      const { getByText } = render(
+        <MediaShelf items={[]} getKey={(t: Track) => t.id} renderItem={(t) => <span>{t.title}</span>} heading="Watch again" emptyState={{ icon: "film", text: "Nothing yet" }} />,
+      );
+      expect(getByText("Nothing yet")).toBeInTheDocument();
+    });
+
+    test("vertical stacks rows with the caption beside the tile", () => {
+      const { getByLabelText } = render(
+        <MediaShelf items={tracks} getKey={(t) => t.id} renderItem={() => <img src="/x.png" alt="" />} renderCaption={(t) => t.title} heading="Up next" variant="plain" orientation="vertical" getLabel={(t) => t.title} onSelect={() => {}} />,
+      );
+      const list = getByLabelText("Up next");
+      expect(list.getAttribute("data-orientation")).toBe("vertical");
+      expect(list.className).toContain("flex-col");
+      const row = list.querySelector("li")!;
+      expect(row.textContent).toContain("Sprout");
+      expect(row.querySelector("button")).not.toBeNull();
+    });
+  });
 });

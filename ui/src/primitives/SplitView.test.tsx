@@ -76,4 +76,20 @@ describe("SplitView", () => {
     expect(list).toContain("lg:w-1/3");
     expect(list).not.toMatch(/\bw-\[\d+px\]/);
   });
+
+  describe("MEDIA-POLISH-01 main and aside", () => {
+    test("draws both columns, the aside named, two columns from lg and stacked below", () => {
+      const { getByText, getByRole, container } = render(<SplitView main={<p>Player</p>} aside={<p>Up next list</p>} asideLabel="Up next" />);
+      expect(getByText("Player")).toBeInTheDocument();
+      expect(getByRole("region", { name: "Up next" }).textContent).toBe("Up next list");
+      const root = container.querySelector('[data-slot="split-view"]')!;
+      expect(root.getAttribute("data-layout")).toBe("main-aside");
+      expect(root.className).toContain("grid-cols-1");
+      expect(root.className).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]");
+    });
+    test("the list and detail form is unchanged", () => {
+      const { container } = renderSplit(true);
+      expect(container.querySelector('[data-layout="main-aside"]')).toBeNull();
+    });
+  });
 });
