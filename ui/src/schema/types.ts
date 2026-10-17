@@ -12,9 +12,11 @@ import { z } from "zod";
 // before this ever sees them). spec/ui/README.md has the full reasoning
 // for keeping both.
 export const BindingSchema = z.object({
-  source: z.enum(["route", "host"]),
+  source: z.enum(["route", "host", "package"]),
   path: z.string().min(1),
   stream: z.boolean().default(false),
+  // Source "package" only: the JSON body of the data call (literals or "$state.<name>").
+  params: z.record(z.string(), z.unknown()).optional(),
 });
 export type Binding = z.infer<typeof BindingSchema>;
 
@@ -179,6 +181,38 @@ export const WidgetRowNodeSchema = z.object({
 });
 export type WidgetRowNode = z.infer<typeof WidgetRowNodeSchema>;
 
+// APP-KIND-01/02: the two nodes a package app adds. Both bind to a package data call.
+export const PackageBindingSchema = BindingSchema.refine((b) => b.source === "package", "a package node binds source package");
+
+export const AnswerBlocksNodeSchema = z.object({
+  type: z.literal("answer_blocks"),
+  bind: PackageBindingSchema,
+  kinds: z.array(z.string()).min(1).optional(),
+  empty_state: EmptyStateNodeSchema.optional(),
+});
+export type AnswerBlocksNode = z.infer<typeof AnswerBlocksNodeSchema>;
+
+export const PickerNodeSchema = z.object({
+  type: z.literal("picker"),
+  state: z.string().min(1),
+  label: z.string().min(1),
+  placeholder: z.string().optional(),
+  bind: PackageBindingSchema.optional(),
+  item_key_field: z.string().optional(),
+  item_label_field: z.string().optional(),
+  leading: z
+    .array(
+      z.object({
+        value: z.string().min(1),
+        label: z.string().min(1),
+        icon: z.string().optional(),
+        needs: z.literal("geolocation").optional(),
+      }),
+    )
+    .optional(),
+});
+export type PickerNode = z.infer<typeof PickerNodeSchema>;
+
 export const SectionNodeSchema: z.ZodType<SectionNode> = z.lazy(() =>
   z.object({
     type: z.literal("section"),
@@ -223,7 +257,9 @@ export type UiNode =
   | DetailPaneNode
   | SplitViewNode
   | WidgetCardNode
-  | WidgetRowNode;
+  | WidgetRowNode
+  | AnswerBlocksNode
+  | PickerNode;
 
 export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
   z.union([
@@ -241,6 +277,8 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     SplitViewNodeSchema,
     WidgetCardNodeSchema,
     WidgetRowNodeSchema,
+    AnswerBlocksNodeSchema,
+    PickerNodeSchema,
   ]),
 );
 
@@ -261,4 +299,6 @@ export const NODE_TYPES = [
   "split_view",
   "widget_card",
   "widget_row",
+  "answer_blocks",
+  "picker",
 ] as const;

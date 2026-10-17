@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, request } from "@/kit/http";
 import { cardSizeGridTemplateColumns } from "@/kit/primitives/CardSizeSlider";
@@ -18,6 +18,9 @@ import { Button } from "@/kit/ui/button";
 import { Input } from "@/kit/ui/input";
 import { Checkbox } from "@/kit/ui/checkbox";
 import { getIcon } from "@/kit/icons";
+import { AnswerBlockView } from "@/kit/elements/answer-block";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
+import { PageStateContext } from "@/kit/schema/packageScope";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { ConfirmDialog } from "@/kit/schema/ConfirmDialog";
@@ -36,6 +39,8 @@ import type {
   ProgressNode,
   WidgetCardNode,
   WidgetRowNode,
+  AnswerBlocksNode,
+  PickerNode,
 } from "@/kit/schema/types";
 import type { WidgetData, WidgetDescriptor } from "@/kit/widgets";
 
@@ -105,6 +110,141 @@ function SectionNodeView({ node, state }: { node: SectionNode; state: Row }) {
       ))}
     </Section>
   );
+}
+
+interface PackageDataBody {
+  blocks?: unknown[];
+  rows?: Row[];
+  degraded?: boolean;
+}
+
+// APP-KIND-02. Draws the blocks a package data call returns, each through the kit's one
+// answer-block dispatcher: it validates the block, draws the Element named by its `kind`,
+// and falls back to the block's own `alt` sentence for a kind it does not know. Loading,
+// failure (with a retry) and "nothing to show" are the kit's AsyncState, so a page never
+// invents a fourth state.
+function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: Row }) {
+  const query = useBinding<PackageDataBody>(node.bind, state);
+  const kinds = node.kinds;
+  const blocks = query.data
+    ? (query.data.blocks ?? []).filter((block) => !kinds || kinds.includes(String((block as { kind?: unknown } | null)?.kind)))
+    : undefined;
+  const emptyText = node.empty_state?.text ?? "Nothing to show right now.";
+  return (
+    <AsyncState
+      data={query.isError ? null : blocks}
+      error={query.isError}
+      isFetching={query.isFetching}
+      onRetry={() => query.refetch()}
+      errorMessage={node.empty_state?.text ?? "Could not load this. Try again."}
+      isEmpty={(list) => list.length === 0}
+      emptyIcon={node.empty_state?.icon ?? "inbox"}
+      emptyText={emptyText}
+    >
+      {(list) => (
+        <div className="flex min-w-0 flex-col gap-4">
+          {list.map((block, i) => (
+            <AnswerBlockView key={String((block as { id?: unknown } | null)?.id ?? i)} block={block} />
+          ))}
+        </div>
+      )}
+    </AsyncState>
+  );
+}
+
+const GEOLOCATION_REFUSED = "Location is off for this site. Choose a saved place instead.";
+
+// The device location, on the choice that asked for it and never before. Two decimals is
+// about a kilometre, which is all a forecast needs; the hub coarsens further for a child.
+function currentPosition(): Promise<{ lat: number; lon: number }> {
+  return new Promise((resolve, reject) => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      reject(new Error(GEOLOCATION_REFUSED));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve({ lat: Number(position.coords.latitude.toFixed(2)), lon: Number(position.coords.longitude.toFixed(2)) }),
+      () => reject(new Error(GEOLOCATION_REFUSED)),
+      { enableHighAccuracy: false, maximumAge: 60_000, timeout: 10_000 },
+    );
+  });
+}
+
+function PickerControl({ node, state, rows }: { node: PickerNode; state: Row; rows: Row[] }) {
+  const writer = useContext(PageStateContext);
+  const [note, setNote] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const latest = useRef(0);
+  const leading = node.leading ?? [];
+  const current = state[node.state];
+
+  function choose(value: string) {
+    setNote(null);
+    const option = leading.find((o) => o.value === value);
+    if (option?.needs !== "geolocation") {
+      // A named place never travels with stale coordinates.
+      writer?.merge({ [node.state]: value, [`${node.state}_geo`]: undefined, [`${node.state}_geo_n`]: undefined });
+      return;
+    }
+    const ticket = ++latest.current;
+    setBusy(true);
+    currentPosition()
+      .then((position) => {
+        if (ticket !== latest.current) return;
+        const counter = typeof state[`${node.state}_geo_n`] === "number" ? (state[`${node.state}_geo_n`] as number) : 0;
+        writer?.merge({ [node.state]: value, [`${node.state}_geo`]: position, [`${node.state}_geo_n`]: counter + 1 });
+      })
+      .catch((e: unknown) => {
+        if (ticket === latest.current) setNote(e instanceof Error ? e.message : GEOLOCATION_REFUSED);
+      })
+      .finally(() => {
+        if (ticket === latest.current) setBusy(false);
+      });
+  }
+
+  return (
+    <div className="flex min-w-0 flex-col gap-2">
+      <Select value={typeof current === "string" ? current : ""} onValueChange={choose} disabled={busy}>
+        <SelectTrigger aria-label={node.label} width="full">
+          <SelectValue placeholder={node.placeholder ?? node.label} />
+        </SelectTrigger>
+        <SelectContent>
+          {leading.map((option) => {
+            const Icon = option.icon ? getIcon(option.icon) : null;
+            return (
+              <SelectItem key={`lead:${option.value}`} value={option.value}>
+                {Icon ? <Icon aria-hidden="true" /> : null}
+                {option.label}
+              </SelectItem>
+            );
+          })}
+          {rows.map((row) => {
+            const key = String(readField(row, node.item_key_field ?? "id"));
+            return (
+              <SelectItem key={`row:${key}`} value={key}>
+                {String(readField(row, node.item_label_field ?? "label"))}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+      {note ? (
+        <p role="status" className="text-base text-muted-foreground">
+          {note}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function BoundPickerView({ node, state }: { node: PickerNode & { bind: NonNullable<PickerNode["bind"]> }; state: Row }) {
+  const query = useBinding<PackageDataBody>(node.bind, state);
+  // A failed list of saved places never blocks the fixed options: the picker still opens.
+  return <PickerControl node={node} state={state} rows={query.data?.rows ?? []} />;
+}
+
+function PickerNodeView({ node, state }: { node: PickerNode; state: Row }) {
+  return node.bind ? <BoundPickerView node={{ ...node, bind: node.bind }} state={state} /> : <PickerControl node={node} state={state} rows={[]} />;
 }
 
 function ListNodeView({ node }: { node: ListNode }) {
@@ -550,6 +690,10 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <WidgetCardNodeView node={node} />;
     case "widget_row":
       return <WidgetRowNodeView node={node} />;
+    case "answer_blocks":
+      return <AnswerBlocksNodeView node={node} state={state} />;
+    case "picker":
+      return <PickerNodeView node={node} state={state} />;
     case "form":
       return <FormNodeView node={node} />;
     case "empty_state":

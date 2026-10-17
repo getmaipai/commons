@@ -1,21 +1,45 @@
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { request } from "@/kit/http";
 import { fillTemplate, fillTemplateDeep } from "@/kit/schema/fieldPath";
 import type { Action } from "@/kit/schema/types";
+import {
+  PackageScopeContext,
+  PACKAGE_ACTION_REFUSED,
+  reportPageRejected,
+  underAppRoute,
+  underPluginApi,
+  type PackageScope,
+} from "@/kit/schema/packageScope";
 
 // The five declared actions (platform plan 6.2). `ask` has no consumer
 // yet (nothing this session builds is voice-driven) - dispatching it
 // throws rather than silently no-oping, the same "loud, not quiet" gap
 // binding.ts's `host` source leaves.
-async function runAction(action: Action, item: Record<string, unknown>, navigate: (to: string) => void): Promise<void> {
+async function runAction(
+  action: Action,
+  item: Record<string, unknown>,
+  navigate: (to: string) => void,
+  scope: PackageScope | null = null,
+): Promise<void> {
   if ("navigate" in action) {
-    navigate(fillTemplate(action.navigate.to, item));
+    const to = fillTemplate(action.navigate.to, item);
+    // APP-KIND-02: a package page navigates only inside its own app.
+    if (scope && !underAppRoute(to, scope.packageId)) {
+      reportPageRejected();
+      throw new Error(PACKAGE_ACTION_REFUSED);
+    }
+    navigate(to);
     return;
   }
   if ("call" in action) {
     const target = fillTemplate(action.call.target, item);
+    // APP-KIND-02: and calls only under its own API prefix.
+    if (scope && !underPluginApi(target, scope.packageId)) {
+      reportPageRejected();
+      throw new Error(PACKAGE_ACTION_REFUSED);
+    }
     const args = action.call.args ? fillTemplateDeep(action.call.args, item) : undefined;
     await request(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined });
     return;
@@ -87,6 +111,7 @@ export function useDispatchAction(): {
 } {
   const navigateTo = useNavigate();
   const queryClient = useQueryClient();
+  const scope = useContext(PackageScopeContext);
   const [pending, setPending] = useState<{
     action: Action;
     items: Record<string, unknown>[];
@@ -101,14 +126,14 @@ export function useDispatchAction(): {
   const runAndInvalidate = useCallback(
     async (action: Action, items: Record<string, unknown>[]) => {
       try {
-        for (const item of items) await runAction(action, item, navigate);
+        for (const item of items) await runAction(action, item, navigate, scope);
       } finally {
         // Whatever succeeded before a failure still needs to leave the
         // stale list, so this runs even when the loop above threw.
         await queryClient.invalidateQueries({ queryKey: ["schema-binding"] });
       }
     },
-    [navigate, queryClient],
+    [navigate, queryClient, scope],
   );
 
   const dispatch = useCallback(

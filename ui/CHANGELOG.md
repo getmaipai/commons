@@ -1,10 +1,14 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.239] - ui-v0.5.239
+
+APP-KIND-02. The schema interpreter runs a package's own pages. `SchemaPage` takes `packageId` (and `hideTitle`): it mounts `PackageScopeContext`, inside which a binding resolves only under `/api/plugins/<id>/`, a `call` only under that prefix and `navigate` only under `/apps/<id>/` (anything else is refused before a request, writes one `app.page_rejected` warning with no path, and a refused binding gets its own query key so it can never overwrite another page's cache entry). Binding source `package` posts `params` (`$state.<name>` filled from page state) to `/api/plugins/<id>/data/<path>`; a param that carries `lat` and `lon` rides the body only, never the query key. New nodes `answer_blocks` (draws returned blocks through `AnswerBlockView`, with `kinds` and the kit's loading, error-with-retry and empty states) and `picker` (kit `Select`; fixed `leading` options plus the rows of a package data call; a `geolocation` option asks the browser only on that choice and keeps `<state>_geo` in memory). `SchemaPage` owns the page state the picker writes. New icons `cloud-off`, `cloud-sun`, `locate-fixed`, `map-pin`. Additive: Memory's page and every existing node are unchanged.
+
 ## [0.5.238] - ui-v0.5.238
 
 New `PasscodeInput` (`src/ui/passcode-input.tsx`): exactly `digits` separate boxes for a numeric passcode, like the iCloud code prompt. One real hidden input behind the boxes handles typing, paste, the phone's numeric keypad and screen readers (`inputMode` numeric, autocomplete off so no SMS or password-manager prompt). Boxes show filled dots (`masked`, default on), a blinking caret, and a red state with a short shake when `invalid` (the shake and caret blink are `motion-safe:` only). `onComplete` fires when the last box fills. The group is labelled "Enter your N-digit passcode" and each box is announced by position. New `passcode-shake` and `passcode-caret` keyframes in `tokens.css`. Additive.
 
-## [0.5.237] - ui-v0.5.237
+## [0.5.239] - ui-v0.5.239
 
 `weather_card` gains a compact variant and a text alternative (WEATHER-CARD-01). `AnswerBlockView` takes `compact` (render-only, passed to the `weather_card` Element as `variant="compact"`): the hero alone, shorter, for a dashboard Today card. The hero now shows today's high and low, and a visually hidden sentence gives the place, the current conditions, the high and the low while the drawn hero is hidden from assistive technology. The full variant is unchanged. Additive.
 

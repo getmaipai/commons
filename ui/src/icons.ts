@@ -1,4 +1,8 @@
 import {
+  CloudOff,
+  CloudSun,
+  LocateFixed,
+  MapPin,
   Baby,
   BookOpen,
   Briefcase,
@@ -238,6 +242,10 @@ export const icons = {
   "paw-print": PawPrint,
   plane: Plane,
   star: Star,
+  "cloud-off": CloudOff,
+  "cloud-sun": CloudSun,
+  "locate-fixed": LocateFixed,
+  "map-pin": MapPin,
 } as const;
 
 export type IconName = keyof typeof icons;
