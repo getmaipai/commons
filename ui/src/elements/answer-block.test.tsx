@@ -221,3 +221,38 @@ describe("AnswerBlockView wide", () => {
     expect(plain.container.querySelector('[data-slot="weather-card"]')?.getAttribute("data-variant")).toBe("full");
   });
 });
+
+describe("AnswerBlockView story_feed and article (NEWS-01)", () => {
+  test("story_feed draws the story feed primitive; article draws the article view", () => {
+    const feed = render(<AnswerBlockView block={fixture("story_feed")} />);
+    expect(feed.container.querySelector('[data-slot="story-feed"]')).not.toBeNull();
+    expect(feed.getByText("Headline 1")).toBeTruthy();
+    cleanup();
+    const article = render(<AnswerBlockView block={fixture("article")} />);
+    expect(article.container.querySelector('[data-slot="article-view"]')).not.toBeNull();
+    expect(article.container.querySelector("h2#h1")?.textContent).toBe("What happened");
+  });
+
+  test("with no news handler the blocks are read-only; with one, a story's open fires with its ids", () => {
+    const readOnly = render(<AnswerBlockView block={fixture("story_feed")} />);
+    expect(readOnly.queryAllByLabelText(/More for/)).toHaveLength(0);
+    cleanup();
+    const fired: Array<[string, Record<string, unknown>]> = [];
+    const { getByText } = render(
+      <AnswerBlockView block={fixture("story_feed")} news={{ available: ["open"], onAction: (a, ids) => fired.push([a, ids]) }} />,
+    );
+    fireEvent.click(getByText("Headline 1"));
+    expect(fired).toEqual([["open", { story_id: "story-1a1b2c", item_id: "news-1d4e5f" }]]);
+  });
+
+  test("a story_feed with five featured stories or an unknown layout falls back to its alt sentence", () => {
+    const block = fixture("story_feed") as unknown as { props: Record<string, unknown>; alt: string };
+    const five = { ...block, props: { ...block.props, featured: Array.from({ length: 5 }, () => (block.props.hero as object)) } };
+    const { getByText, container } = render(<AnswerBlockView block={five} />);
+    expect(getByText(block.alt)).toBeTruthy();
+    expect(container.querySelector('[data-slot="story-feed"]')).toBeNull();
+    cleanup();
+    const layout = render(<AnswerBlockView block={{ ...block, props: { ...block.props, layout: "grid" } }} />);
+    expect(layout.getByText(block.alt)).toBeTruthy();
+  });
+});

@@ -30,7 +30,8 @@
                     "target": "/api/plugins/news/actions/follow",
                     "args": {
                       "kind": "topic",
-                      "key": "{key}"
+                      "key": "{key}",
+                      "on": "{on}"
                     }
                   }
                 }
@@ -74,7 +75,8 @@
                     "target": "/api/plugins/news/actions/follow",
                     "args": {
                       "kind": "source",
-                      "key": "{key}"
+                      "key": "{key}",
+                      "on": "{on}"
                     }
                   }
                 }

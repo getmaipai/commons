@@ -1,4 +1,5 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { Page } from "@/kit/primitives/Page";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext, PageStateContext, type PageStateWriter } from "@/kit/schema/packageScope";
@@ -36,7 +37,14 @@ export function SchemaPage({
   hideTitle?: boolean;
 }) {
   const parsed = PageNodeSchema.parse(page);
-  const [state, setState] = useState<Record<string, unknown>>({});
+  // NEWS-00: a `navigate` action's `state` arrives as router state and is written into this page's state (a channel
+  // page reads its kind and key this way). Applied on arrival and again whenever the navigation changes.
+  const location = useLocation();
+  const arrived = (location.state as { pageState?: Record<string, unknown> } | null)?.pageState;
+  const [state, setState] = useState<Record<string, unknown>>(arrived ?? {});
+  useEffect(() => {
+    if (arrived) setState((prev) => ({ ...prev, ...arrived }));
+  }, [location.key, arrived]);
   const writer = useMemo<PageStateWriter>(
     () => ({
       merge: (patch) =>

@@ -1,5 +1,6 @@
 import { createContext, useContext, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import { ApiError, request } from "@/kit/http";
 import { cardSizeGridTemplateColumns } from "@/kit/primitives/CardSizeSlider";
 import { Section } from "@/kit/primitives/Section";
@@ -17,10 +18,12 @@ import { BatchBar, SelectModeToggle } from "@/kit/primitives/BatchBar";
 import { Button } from "@/kit/ui/button";
 import { Input } from "@/kit/ui/input";
 import { Checkbox } from "@/kit/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/kit/ui/tabs";
 import { getIcon } from "@/kit/icons";
 import { AnswerBlockView } from "@/kit/elements/answer-block";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { PageStateContext } from "@/kit/schema/packageScope";
+import type { Action } from "@/kit/schema/types";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { ConfirmDialog } from "@/kit/schema/ConfirmDialog";
@@ -41,6 +44,7 @@ import type {
   WidgetRowNode,
   AnswerBlocksNode,
   PickerNode,
+  TabsNode,
 } from "@/kit/schema/types";
 import type { WidgetData, WidgetDescriptor } from "@/kit/widgets";
 
@@ -123,8 +127,47 @@ interface PackageDataBody {
 // and falls back to the block's own `alt` sentence for a kind it does not know. Loading,
 // failure (with a retry) and "nothing to show" are the kit's AsyncState, so a page never
 // invents a fourth state.
+/** NEWS-00: the page's `actions` map as the one handler the news blocks fire. A block names an action ("open", "save")
+ * and hands over the story's own ids; this resolves the entry and dispatches it, so a block never names a route. */
+function newsActionsFor(
+  actions: AnswerBlocksNode["actions"],
+  dispatch: (action: Action, items?: Row[]) => void,
+): { available: string[]; onAction: (action: string, ids: Row) => void } | undefined {
+  if (!actions) return undefined;
+  const entry = (name: string): Action | undefined => {
+    switch (name) {
+      case "open": return actions.open;
+      case "save": return actions.save;
+      case "follow": return actions.follow;
+      case "feedback_more":
+      case "feedback_less": return actions.feedback;
+      case "summarize": return actions.summarize;
+      case "reset_mix": return actions.reset_mix;
+      case "listen": return actions.listen;
+      default: return undefined;
+    }
+  };
+  const names = ["open", "save", "follow", "feedback_more", "feedback_less", "summarize", "reset_mix", "listen"];
+  return {
+    available: [...names.filter((name) => entry(name) !== undefined), "open_site"],
+    onAction: (name, ids) => {
+      if (name === "open_site") {
+        const url = ids.url;
+        if (typeof url === "string" && /^https?:\/\//i.test(url)) window.open(url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      const action = entry(name);
+      if (!action) return;
+      const extra = name === "feedback_more" ? { kind: "more" } : name === "feedback_less" ? { kind: "less" } : {};
+      dispatch(action, [{ ...ids, ...extra }]);
+    },
+  };
+}
+
 function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: Row }) {
   const query = useBinding<PackageDataBody>(node.bind, state);
+  const { dispatch, pendingConfirm, lastError } = useDispatchAction();
+  const news = newsActionsFor(node.actions, dispatch);
   const kinds = node.kinds;
   const blocks = query.data
     ? (query.data.blocks ?? []).filter((block) => !kinds || kinds.includes(String((block as { kind?: unknown } | null)?.kind)))
@@ -143,8 +186,10 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
     >
       {(list) => (
         <div className="flex min-w-0 flex-col gap-4">
+          <ConfirmDialog pendingConfirm={pendingConfirm} />
+          {lastError ? <p className="text-base text-destructive">{lastError}</p> : null}
           {list.map((block, i) => (
-            <AnswerBlockView key={String((block as { id?: unknown } | null)?.id ?? i)} block={block} wide />
+            <AnswerBlockView key={String((block as { id?: unknown } | null)?.id ?? i)} block={block} wide news={news} />
           ))}
         </div>
       )}
@@ -247,6 +292,48 @@ function PickerNodeView({ node, state }: { node: PickerNode; state: Row }) {
   return node.bind ? <BoundPickerView node={{ ...node, bind: node.bind }} state={state} /> : <PickerControl node={node} state={state} rows={[]} />;
 }
 
+// NEWS-00: peer views of one page. The active tab is page state (default `tab`), mirrored in the URL's query so a
+// reload or a shared link lands on the same tab; an id that matches no tab falls back to the first.
+function TabsNodeView({ node, state }: { node: TabsNode; state: Row }) {
+  const name = node.state ?? "tab";
+  const [params, setParams] = useSearchParams();
+  const writer = useContext(PageStateContext);
+  const wanted = params.get(name);
+  const active = node.tabs.some((tab) => tab.id === wanted) ? wanted! : node.tabs[0]!.id;
+  return (
+    <Tabs
+      value={active}
+      onValueChange={(value) => {
+        const next = new URLSearchParams(params);
+        next.set(name, String(value));
+        setParams(next, { replace: true });
+        writer?.merge({ [name]: String(value) });
+      }}
+    >
+      <TabsList>
+        {node.tabs.map((tab) => <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>)}
+      </TabsList>
+      {node.tabs.map((tab) => (
+        <TabsContent key={tab.id} value={tab.id}>
+          {active === tab.id ? tab.body.map((child, i) => <NodeRenderer key={i} node={child} state={state} />) : null}
+        </TabsContent>
+      ))}
+    </Tabs>
+  );
+}
+
+/** A list row's leading media: a lucide icon by name, or a same-origin image path. An address with a scheme or a host
+ * is never loaded, so a row cannot pull a picture from another site. */
+function RowMedia({ value }: { value: unknown }) {
+  if (typeof value !== "string" || value === "") return null;
+  if (value.startsWith("/") && !value.startsWith("//")) return <img src={value} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
+  if (/^[a-z0-9-]+$/i.test(value)) {
+    const Icon = getIcon(value);
+    return Icon ? <Icon className="text-muted-foreground size-6 shrink-0" aria-hidden /> : null;
+  }
+  return null;
+}
+
 function ListNodeView({ node }: { node: ListNode }) {
   const query = useBinding<Row[]>(node.bind);
   const rowFilter = useContext(RowFilterContext);
@@ -338,6 +425,7 @@ function ListNodeView({ node }: { node: ListNode }) {
                     className="shrink-0"
                   />
                 ) : null}
+                {node.item_media_field ? <RowMedia value={readField(row, node.item_media_field)} /> : null}
                 <div className="flex min-w-0 flex-col">
                   <span className="truncate text-base">{String(readField(row, node.item_label_field))}</span>
                   {node.item_subtitle_field ? (
@@ -350,17 +438,35 @@ function ListNodeView({ node }: { node: ListNode }) {
               </div>
             )}
             renderAction={
-              node.row_action && !selectMode
-                ? (row) => (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={fillTemplate(node.row_action!.label, row)}
-                      onClick={() => dispatch(node.row_action!.action, [row])}
-                    >
-                      {RowActionIcon ? <RowActionIcon className="h-5 w-5" aria-hidden /> : null}
-                    </Button>
-                  )
+              (node.row_action || node.row_toggle) && !selectMode
+                ? (row) => {
+                    const toggle = node.row_toggle;
+                    const on = toggle ? readField(row, toggle.field) === true : false;
+                    return (
+                      <div className="flex items-center gap-1">
+                        {toggle ? (
+                          <Button
+                            variant={on ? "secondary" : "outline"}
+                            size="sm"
+                            aria-pressed={on}
+                            onClick={() => dispatch(toggle.action, [{ ...row, on: !on }])}
+                          >
+                            {on ? toggle.on_label : toggle.off_label}
+                          </Button>
+                        ) : null}
+                        {node.row_action ? (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={fillTemplate(node.row_action.label, row)}
+                            onClick={() => dispatch(node.row_action!.action, [row])}
+                          >
+                            {RowActionIcon ? <RowActionIcon className="h-5 w-5" aria-hidden /> : null}
+                          </Button>
+                        ) : null}
+                      </div>
+                    );
+                  }
                 : undefined
             }
           />
@@ -694,6 +800,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <AnswerBlocksNodeView node={node} state={state} />;
     case "picker":
       return <PickerNodeView node={node} state={state} />;
+    case "tabs":
+      return <TabsNodeView node={node} state={state} />;
     case "form":
       return <FormNodeView node={node} />;
     case "empty_state":

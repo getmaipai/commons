@@ -28,7 +28,15 @@ export function fillTemplate(template: string, item: Record<string, unknown>): s
  * (action.call's `args`) - object structure and non-string values pass
  * through untouched. */
 export function fillTemplateDeep<T>(value: T, item: Record<string, unknown>): T {
-  if (typeof value === "string") return fillTemplate(value, item) as T;
+  if (typeof value === "string") {
+    // A string that is exactly one placeholder keeps a boolean as a boolean (a row toggle's `{on}`).
+    const whole = /^\{([^}]+)\}$/.exec(value);
+    if (whole) {
+      const raw = readField(item, whole[1]!);
+      if (typeof raw === "boolean") return raw as T;
+    }
+    return fillTemplate(value, item) as T;
+  }
   if (Array.isArray(value)) return value.map((v) => fillTemplateDeep(v, item)) as T;
   if (value && typeof value === "object") {
     return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, fillTemplateDeep(v, item)])) as T;

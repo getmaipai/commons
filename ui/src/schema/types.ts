@@ -29,7 +29,7 @@ export type Binding = z.infer<typeof BindingSchema>;
 export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
   z
     .union([
-      z.object({ navigate: z.object({ to: z.string() }) }),
+      z.object({ navigate: z.object({ to: z.string(), state: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional() }) }),
       z.object({
         call: z.object({
           target: z.string(),
@@ -44,7 +44,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
     .refine((a) => Object.keys(a).length === 1, "exactly one action kind"),
 );
 export type Action =
-  | { navigate: { to: string } }
+  | { navigate: { to: string; state?: Record<string, string | number | boolean> } }
   | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown> } }
   | { play: { media_id: string } }
   | { confirm: { prompt: string; on_confirm: Action } }
@@ -102,6 +102,15 @@ export const ListNodeSchema = z.object({
   item_subtitle_field: z.string().optional(),
   item_badge_field: z.string().optional(),
   item_badge_label: z.string().optional(),
+  item_media_field: z.string().optional(),
+  row_toggle: z
+    .object({
+      field: z.string().min(1),
+      on_label: z.string().min(1),
+      off_label: z.string().min(1),
+      action: ActionSchema,
+    })
+    .optional(),
   row_action: z
     .object({
       icon: z.string(),
@@ -189,6 +198,19 @@ export const AnswerBlocksNodeSchema = z.object({
   bind: PackageBindingSchema,
   kinds: z.array(z.string()).min(1).optional(),
   empty_state: EmptyStateNodeSchema.optional(),
+  actions: z
+    .object({
+      open: ActionSchema,
+      save: ActionSchema,
+      follow: ActionSchema,
+      feedback: ActionSchema,
+      summarize: ActionSchema,
+      reset_mix: ActionSchema,
+      listen: ActionSchema,
+    })
+    .partial()
+    .strict()
+    .optional(),
 });
 export type AnswerBlocksNode = z.infer<typeof AnswerBlocksNodeSchema>;
 
@@ -243,6 +265,19 @@ export interface PageNode {
   body: UiNode[];
 }
 
+export const TabsNodeSchema: z.ZodType<TabsNode> = z.lazy(() =>
+  z.object({
+    type: z.literal("tabs"),
+    state: z.string().min(1).optional(),
+    tabs: z.array(z.object({ id: z.string().min(1), label: z.string().min(1), body: z.array(UiNodeSchema).min(1) })).min(2),
+  }),
+);
+export interface TabsNode {
+  type: "tabs";
+  state?: string;
+  tabs: Array<{ id: string; label: string; body: UiNode[] }>;
+}
+
 export type UiNode =
   | PageNode
   | SectionNode
@@ -259,7 +294,8 @@ export type UiNode =
   | WidgetCardNode
   | WidgetRowNode
   | AnswerBlocksNode
-  | PickerNode;
+  | PickerNode
+  | TabsNode;
 
 export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
   z.union([
@@ -279,6 +315,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     WidgetRowNodeSchema,
     AnswerBlocksNodeSchema,
     PickerNodeSchema,
+    TabsNodeSchema,
   ]),
 );
 
@@ -301,4 +338,5 @@ export const NODE_TYPES = [
   "widget_row",
   "answer_blocks",
   "picker",
+  "tabs",
 ] as const;

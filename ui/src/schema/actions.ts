@@ -20,7 +20,7 @@ import {
 async function runAction(
   action: Action,
   item: Record<string, unknown>,
-  navigate: (to: string) => void,
+  navigate: (to: string, options?: { state?: unknown }) => void,
   scope: PackageScope | null = null,
 ): Promise<void> {
   if ("navigate" in action) {
@@ -30,7 +30,7 @@ async function runAction(
       reportPageRejected();
       throw new Error(PACKAGE_ACTION_REFUSED);
     }
-    navigate(to);
+    navigate(to, action.navigate.state ? { state: { pageState: fillTemplateDeep(action.navigate.state, item) } } : undefined);
     return;
   }
   if ("call" in action) {
@@ -121,7 +121,7 @@ export function useDispatchAction(): {
   const [error, setError] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
 
-  const navigate = useCallback((to: string) => navigateTo(to), [navigateTo]);
+  const navigate = useCallback((to: string, options?: { state?: unknown }) => navigateTo(to, options), [navigateTo]);
 
   const runAndInvalidate = useCallback(
     async (action: Action, items: Record<string, unknown>[]) => {

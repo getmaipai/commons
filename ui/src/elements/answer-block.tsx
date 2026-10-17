@@ -12,6 +12,8 @@ import { SpecSheet } from "./spec-sheet";
 import { Timeline } from "./timeline";
 import { TodoList } from "./todo-list";
 import { WeatherCard } from "./weather-card";
+import { StoryFeed } from "../primitives/StoryFeed";
+import { ArticleView } from "../primitives/ArticleView";
 
 /**
  * GENUI-03a: the web renderer for a spec `AnswerBlock`. It validates the
@@ -35,6 +37,9 @@ export interface AnswerBlockHandlers {
   compact?: boolean;
   /** Package pages: a weather card draws wide with its hourly strip. Render-only; not a spec field. */
   wide?: boolean;
+  /** `story_feed` and `article` (NEWS-01): the actions the page declared and the one handler they fire. A block fires
+   * an action with the story's own ids and never names a route; with no handler the block is read-only. */
+  news?: { available: readonly string[]; onAction: (action: string, ids: Record<string, unknown>) => void };
 }
 
 export interface AnswerBlockViewProps
@@ -89,7 +94,7 @@ class Guard extends Component<
 // inferred type is `any`; `kind` selects which props shape the cast names.
 function renderKind(
   block: any,
-  { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide }: AnswerBlockHandlers,
+  { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide, news }: AnswerBlockHandlers,
 ): ReactNode {
   const props = block.props;
   switch (block.kind) {
@@ -131,6 +136,10 @@ function renderKind(
       return <ComparisonCard {...props} />;
     case "weather_card":
       return <WeatherCard {...props} variant={compact ? "compact" : wide ? "wide" : "full"} />;
+    case "story_feed":
+      return <StoryFeed data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} />;
+    case "article":
+      return <ArticleView data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} ids={{ story_id: props.story_id, item_id: props.item_id }} />;
     default:
       return null;
   }
@@ -144,6 +153,7 @@ export function AnswerBlockView({
   onScheduleToggle,
   compact,
   wide,
+  news,
   className,
   ...props
 }: AnswerBlockViewProps) {
@@ -172,7 +182,7 @@ export function AnswerBlockView({
         className={className}
         {...props}
       >
-        {renderKind(valid, { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide })}
+        {renderKind(valid, { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide, news })}
       </div>
     </Guard>
   );
