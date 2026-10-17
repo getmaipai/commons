@@ -168,3 +168,40 @@ describe("the News pages (NEWS-00)", () => {
     expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? media : news(m)), "child").join("\n")).toContain("not an address");
   });
 });
+
+describe("the media nodes (MEDIA-PLAYER-01)", () => {
+  const pageDir = join(import.meta.dir, "..", "..", "ui", "pages");
+  const video = (name: string) => JSON.parse(readFileSync(join(pageDir, `videos-${name}.json`), "utf-8"));
+  const videoContributes: AppContributes = {
+    pages: [
+      { id: "index", label: "Videos", nav: true, kind: "schema", module: "home", keywords: ["watch", "video"] },
+      { id: "watch", label: "Watch", nav: false, kind: "schema", module: "watch" },
+    ],
+    data: [{ id: "featured", rows: "list" }, { id: "continue", rows: "list" }, { id: "item", rows: "list" }],
+  };
+  const loadVideo = (module: string): unknown => video(module);
+  const swap = (body: unknown[]) => (m: string) => (m === "home" ? { type: "page", id: "index", title: "Videos", body } : video(m));
+
+  test("the Videos fixtures conform: a billboard and a shelf whose tiles play, and a player", () => {
+    expect(checkAppPackage("videos", videoContributes, loadVideo, "child")).toEqual([]);
+    expect(() => PackageManifest.parse({ ...BASE, id: "videos", contributes: videoContributes })).not.toThrow();
+  });
+  test("play is allowed on a shelf tile, a billboard button and the player's next item, not on a list row", () => {
+    const rowPlay = [{ type: "list", bind: { source: "package", path: "continue" }, item_key_field: "id", item_label_field: "t", row_action: { icon: "play", label: "Play", action: { play: { media_id: "{id}" } } } }];
+    expect(checkAppPackage("videos", videoContributes, swap(rowPlay), "child").join("\n")).toContain("play action is not available");
+    const progressPlay = [{ type: "player", bind: { source: "package", path: "item" }, on_progress: { play: { media_id: "{id}" } } }];
+    expect(checkAppPackage("videos", videoContributes, swap(progressPlay), "child").join("\n")).toContain("player.on_progress: the play action is not available");
+  });
+  test("a media node binds a rows: list entry of its own package", () => {
+    const blocks = { ...videoContributes, data: [{ id: "featured" }, { id: "continue", rows: "list" }, { id: "item", rows: "list" }] };
+    expect(checkAppPackage("videos", blocks, loadVideo, "child").join("\n")).toContain('must be a "rows": "list" entry');
+    const route = [{ type: "media_shelf", bind: { source: "route", path: "/api/media" }, item_key_field: "id", item_label_field: "t", item_media_field: "m" }];
+    expect(checkAppPackage("videos", videoContributes, swap(route), "child").join("\n")).toContain('bind.source must be "package"');
+  });
+  test("art fields are field paths, and a shelf's call stays inside the package", () => {
+    const art = [{ type: "billboard", bind: { source: "package", path: "featured" }, item_key_field: "id", item_title_field: "t", item_art_field: "//example.com/a.jpg", primary: { label: "Play", action: { play: { media_id: "{id}" } } } }];
+    expect(checkAppPackage("videos", videoContributes, swap(art), "child").join("\n")).toContain("item_art_field must be a field path");
+    const outside = [{ type: "media_shelf", bind: { source: "package", path: "continue" }, item_key_field: "id", item_label_field: "t", item_media_field: "m", on_select: { call: { target: "/api/media/delete" } } }];
+    expect(checkAppPackage("videos", videoContributes, swap(outside), "child").join("\n")).toContain("must stay under /api/plugins/videos/");
+  });
+});

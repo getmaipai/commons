@@ -170,4 +170,22 @@ describe("UI schema, package apps", () => {
     expect(validate({ type: "picker", state: "place", label: "Place", bind: { source: "package", path: "places" }, item_key_field: "id", item_label_field: "label" })).toBe(true);
     expect(validate({ type: "picker", state: "place", label: "Place", leading: [{ value: "x", label: "X", needs: "microphone" }] })).toBe(false);
   });
+
+  test("MEDIA-PLAYER-01: player, billboard and the media_shelf additions", () => {
+    const bind = { source: "package", path: "item" };
+    expect(validate({ type: "player", bind })).toBe(true);
+    expect(validate({ type: "player", bind, layout: "mini", kind: "audio", fields: { src: "file.path" } })).toBe(true);
+    expect(validate({ type: "player", bind, fields: { unknown: "x" } })).toBe(false);
+    expect(validate({ type: "player", bind, layout: "tv" })).toBe(false);
+    const play = { play: { media_id: "{id}" } };
+    const billboard = { type: "billboard", bind, item_key_field: "id", item_title_field: "title", primary: { label: "Play", action: play } };
+    expect(validate(billboard)).toBe(true);
+    expect(validate({ ...billboard, primary: undefined })).toBe(false);
+    const three = Array.from({ length: 3 }, (_, i) => ({ label: `B${i}`, action: play }));
+    expect(validate({ ...billboard, secondary: three })).toBe(false);
+    expect(validate({ type: "empty_state", icon: "x", text: "t", action: { play: { media_id: "" } } })).toBe(false);
+    const shelf = { type: "media_shelf", bind, item_key_field: "id", item_label_field: "t", item_media_field: "m" };
+    expect(validate({ ...shelf, heading: "Continue watching", item_progress_field: "p", item_badge_field: "b", item_meta_field: "d", item_subtitle_field: "{c}", on_select: play })).toBe(true);
+    expect(validate({ ...shelf, item_progress: "p" })).toBe(false);
+  });
 });

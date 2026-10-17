@@ -15,6 +15,8 @@
     { "$ref": "#/$defs/list" },
     { "$ref": "#/$defs/card_grid" },
     { "$ref": "#/$defs/media_shelf" },
+    { "$ref": "#/$defs/billboard" },
+    { "$ref": "#/$defs/player" },
     { "$ref": "#/$defs/detail_pane" },
     { "$ref": "#/$defs/split_view" },
     { "$ref": "#/$defs/widget_card" },
@@ -95,7 +97,8 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["media_id"],
-          "properties": { "media_id": { "type": "string" } }
+          "description": "MEDIA-PLAYER-01: hand a media item to the host's player (the shell's audio session). `media_id` may contain `{field}` placeholders, resolved from the bound item the action fires for (`{id}`). The page never plays anything itself; a host with no player refuses the action with a message.",
+          "properties": { "media_id": { "type": "string", "minLength": 1 } }
         },
         "confirm": {
           "type": "object",
@@ -306,15 +309,86 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["type", "bind", "item_key_field", "item_label_field", "item_media_field"],
-      "description": "The kit's MediaShelf primitive (frontend/src/kit/primitives/MediaShelf.tsx). Not used by any page this session builds; added for catalog/schema completeness, same reasoning as `card_grid`.",
+      "description": "The kit's MediaShelf primitive (ui/src/primitives/MediaShelf.tsx): a sideways rail of media tiles at one declared aspect (wide 16:9, poster 2:3, square 1:1). MEDIA-PLAYER-01 adds the heading, a caption subtitle, the played-share bar, a corner badge and a running-time label; on a package page `on_select` may be a `play` action.",
       "properties": {
         "type": { "const": "media_shelf" },
+        "heading": { "type": "string", "minLength": 1, "maxLength": 60, "description": "MEDIA-PLAYER-01: the shelf's heading (\"Continue watching\"), which also names the rail." },
         "bind": { "$ref": "#/$defs/binding" },
         "item_key_field": { "type": "string" },
         "item_label_field": { "type": "string" },
-        "item_media_field": { "type": "string", "description": "Dotted path to the tile's image/poster URL." },
+        "item_subtitle_field": { "type": "string", "description": "MEDIA-PLAYER-01: a `{field}` template for the caption's second line (the channel, the artist), as list.item_subtitle_field." },
+        "item_media_field": { "type": "string", "description": "Dotted path to the tile's same-origin image path (starting with `/`). An address with a scheme or a host is not loaded." },
+        "item_progress_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to the played share, a number 0 to 1, drawn as a bar along the tile's bottom edge." },
+        "item_badge_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to a short string drawn as the tile's corner badge (\"Saved\", \"On this phone\", \"Not saved\"); empty draws none." },
+        "item_meta_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to the running time, a number of seconds (drawn as 18:42) or a short string." },
         "aspect": { "type": "string", "enum": ["wide", "square", "poster"], "default": "wide" },
         "on_select": { "$ref": "#/$defs/action" },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "billboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "item_key_field", "item_title_field", "primary"],
+      "description": "MEDIA-PLAYER-01: the kit's Billboard block (ui/src/primitives/Billboard.tsx), a rotating hero of bound rows composed from the kit carousel: backdrop art, an eyebrow line, the title, a subtitle, a primary action (Play) and up to two secondary ones. Autoplay pauses on hover, on focus, on a hidden tab and under reduced motion.",
+      "properties": {
+        "type": { "const": "billboard" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The carousel's accessible name. Default \"Featured\"." },
+        "size": { "type": "string", "enum": ["card", "hero"], "default": "card", "description": "card: a rounded card in the page flow (Videos). hero: full width and taller, the title set large (Shows and Films)." },
+        "autoplay": { "type": "boolean", "default": true },
+        "item_key_field": { "type": "string" },
+        "item_title_field": { "type": "string" },
+        "item_subtitle_field": { "type": "string", "description": "A `{field}` template." },
+        "item_eyebrow_field": { "type": "string", "description": "A `{field}` template for the small line over the title." },
+        "item_art_field": { "type": "string", "description": "Dotted path to the backdrop's same-origin image path." },
+        "primary": { "$ref": "#/$defs/billboard_action" },
+        "secondary": { "type": "array", "maxItems": 2, "items": { "$ref": "#/$defs/billboard_action" } },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "billboard_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "action"],
+      "description": "One Billboard button: its words, an optional lucide icon name, and the action it fires with the slide's row.",
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "icon": { "type": "string" },
+        "action": { "$ref": "#/$defs/action" }
+      }
+    },
+    "player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind"],
+      "description": "MEDIA-PLAYER-01: the kit's Player (ui/src/primitives/Player.tsx) for one bound media item. The bound call returns the item (an object, or rows whose first row is used). Default field names: id, src, title, subtitle, poster, chapters [{start_s, title}], captions [{src, srclang, label, kind?, default?}], thumbnails (a storyboard WebVTT path), position_s, completed, up_next {id, title, subtitle?, art?}.",
+      "properties": {
+        "type": { "const": "player" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "kind": { "type": "string", "enum": ["video", "audio"], "default": "video" },
+        "layout": { "type": "string", "enum": ["video", "audio", "mini"], "description": "Default: video for kind video, audio for kind audio." },
+        "autoplay_next": { "type": "boolean", "default": false, "description": "Count down and play up_next when the item ends. Off by default; a child's page leaves it off." },
+        "fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Dotted paths that override the default field names.",
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "src": { "type": "string", "minLength": 1 },
+            "title": { "type": "string", "minLength": 1 },
+            "subtitle": { "type": "string", "minLength": 1 },
+            "poster": { "type": "string", "minLength": 1 },
+            "chapters": { "type": "string", "minLength": 1 },
+            "captions": { "type": "string", "minLength": 1 },
+            "thumbnails": { "type": "string", "minLength": 1 },
+            "position": { "type": "string", "minLength": 1 },
+            "completed": { "type": "string", "minLength": 1 },
+            "up_next": { "type": "string", "minLength": 1 }
+          }
+        },
+        "on_progress": { "$ref": "#/$defs/action", "description": "Fired every 10 s while playing, on pause, on seek, at the end and on unload. Placeholders: the item's own fields plus {position_s}, {duration_s}, {reason} and {completed}." },
+        "on_next": { "$ref": "#/$defs/action", "description": "Fired with the up_next item's fields (a `play`, or a `navigate` to its watch page)." },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
     },

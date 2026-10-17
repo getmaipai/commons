@@ -1,0 +1,21 @@
+{
+  "type": "page",
+  "id": "watch",
+  "title": "Watch",
+  "body": [
+    {
+      "type": "player",
+      "bind": { "source": "package", "path": "item", "params": { "id": "$state.id" } },
+      "kind": "video",
+      "autoplay_next": true,
+      "on_progress": {
+        "call": {
+          "target": "/api/plugins/videos/progress",
+          "args": { "media_id": "{id}", "position_s": "{position_s}", "duration_s": "{duration_s}", "reason": "{reason}" }
+        }
+      },
+      "on_next": { "play": { "media_id": "{id}" } },
+      "empty_state": { "type": "empty_state", "icon": "film", "text": "This video is not on the hub. Go back to Videos and pick another." }
+    }
+  ]
+}

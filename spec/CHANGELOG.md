@@ -1,3 +1,7 @@
+## [spec-v0.1.164] - 2026-10-17
+
+- MEDIA-PLAYER-01: the UI schema gains `billboard` (bound rows as a rotating hero: title, subtitle and eyebrow templates, art field, a primary action and up to two secondary ones, `size` card or hero, `autoplay`) and `player` (one bound media item; default field names id, src, title, subtitle, poster, chapters, captions, thumbnails, position_s, completed, up_next, overridable through `fields`; `kind`, `layout`, `autoplay_next` off by default, `on_progress`, `on_next`). `media_shelf` gains `heading`, `item_subtitle_field`, `item_progress_field`, `item_badge_field` and `item_meta_field`. `play.media_id` is non-empty and documents its `{field}` placeholders. `ui/app-check.ts` allows `media_shelf`, `billboard` and `player` on a package page, each bound to a `"rows": "list"` entry of the package, art fields as field paths only, and `play` on a shelf tile, a billboard button and the player's `on_next` (still refused elsewhere, the player's `on_progress` included). New page fixtures `videos-home.json` and `videos-watch.json`. Additive.
+
 ## [spec-v0.1.163] - 2026-10-17
 
 - `tts.voice_id` carries `default` (the voice built into the speech engine now in use) as its first option and its default, matching the declaration Home shipped in VOICE-PICK-01 ("Home's tts.voice_id declaration supersedes the spec's until a tag carries default"). Home's settings drift check passes again at this tag.

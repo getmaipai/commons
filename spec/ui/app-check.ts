@@ -13,7 +13,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[] 
  * (list, card_grid, widget_card, split_view, ...) or mounts a host component
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the two package nodes and the layout nodes. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "detail_pane", "tabs", "list"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -38,7 +38,7 @@ function checkAction(action: unknown, packageId: string, where: string, out: str
   if (action.play !== undefined && !allowPlay) out.push(`${where}: the play action is not available on a package page`);
 }
 
-function checkBinding(bind: unknown, where: string, data: Map<string, AppDataEntry>, want: "blocks" | "rows", out: string[]): void {
+function checkBinding(bind: unknown, where: string, data: Map<string, AppDataEntry>, want: "blocks" | "rows" | "list", out: string[]): void {
   if (!isObject(bind)) { out.push(`${where}: needs a bind`); return; }
   if (bind.source !== "package") { out.push(`${where}: bind.source must be "package", not "${String(bind.source)}"`); return; }
   const path = typeof bind.path === "string" ? bind.path : "";
@@ -46,6 +46,12 @@ function checkBinding(bind: unknown, where: string, data: Map<string, AppDataEnt
   if (!entry) { out.push(`${where}: bind.path "${path}" is not a contributes.data id of this package`); return; }
   if (want === "rows" && entry.rows === undefined) out.push(`${where}: data "${path}" returns blocks, not rows; a picker needs a data entry with "rows"`);
   if (want === "blocks" && entry.rows !== undefined) out.push(`${where}: data "${path}" returns rows, not blocks; an answer_blocks node needs a recipe data entry`);
+  if (want === "list" && entry.rows !== "list") out.push(`${where}: data "${path}" must be a "rows": "list" entry (the package's own row route)`);
+}
+
+/** A field that names a picture must be a field path, never an address (a page never loads another site's picture). */
+function checkFieldPath(value: unknown, where: string, field: string, out: string[]): void {
+  if (typeof value === "string" && /^[a-z]+:|\/\//i.test(value)) out.push(`${where}: ${field} must be a field path, not an address`);
 }
 
 function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>, where: string, out: string[]): void {
@@ -66,6 +72,24 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     if (isObject(node.row_action)) checkAction(node.row_action.action, packageId, `${where} list.row_action`, out);
     if (isObject(node.row_toggle)) checkAction(node.row_toggle.action, packageId, `${where} list.row_toggle`, out);
     if (typeof node.item_media_field === "string" && /^[a-z]+:|\/\//i.test(node.item_media_field)) out.push(`${where} list: item_media_field must be a field path, not an address`);
+  }
+  // MEDIA-PLAYER-01: the media nodes draw the package's own rows, and are the places a package page may hand an item to
+  // the host's player (`play`): a shelf tile, a billboard button, the player's next item.
+  if (type === "media_shelf") {
+    checkBinding(node.bind, `${where} media_shelf`, data, "list", out);
+    checkAction(node.on_select, packageId, `${where} media_shelf.on_select`, out, true);
+    checkFieldPath(node.item_media_field, `${where} media_shelf`, "item_media_field", out);
+  }
+  if (type === "billboard") {
+    checkBinding(node.bind, `${where} billboard`, data, "list", out);
+    if (isObject(node.primary)) checkAction(node.primary.action, packageId, `${where} billboard.primary`, out, true);
+    if (Array.isArray(node.secondary)) node.secondary.forEach((b, i) => isObject(b) && checkAction(b.action, packageId, `${where} billboard.secondary[${i}]`, out, true));
+    checkFieldPath(node.item_art_field, `${where} billboard`, "item_art_field", out);
+  }
+  if (type === "player") {
+    checkBinding(node.bind, `${where} player`, data, "list", out);
+    checkAction(node.on_progress, packageId, `${where} player.on_progress`, out);
+    checkAction(node.on_next, packageId, `${where} player.on_next`, out, true);
   }
   if (type === "picker" && node.bind !== undefined) checkBinding(node.bind, `${where} picker`, data, "rows", out);
   if (isObject(node.empty_state)) checkAction(node.empty_state.action, packageId, where, out);
