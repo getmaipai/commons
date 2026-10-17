@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.249] - ui-v0.5.249
+
+`ImageGeneration` gains `onStop` (a Stop button in place of the hidden regenerate button while generating), `progress` (0 to 100, a thin bar on the card), `statusLabel` (the caption while generating, default "Generating"), `elapsedLabel` (a clock beside it), `stopLabel`, `sizeLabel` (the corner mark, default "1024 × 1024") and `size` (`default` or `large`; `large` fills the width up to 28rem). Without them the Element draws exactly as before. Additive.
+
 ## [0.5.248] - ui-v0.5.248
 
 `ImageGallery` `size="large"` with a single picture now shows it at its own proportions (full gallery width, height from the picture, capped at 32rem, `object-contain`) instead of cropping it to a square; a wide banner or a tall poster is whole. Several pictures and the default size keep the square grid. The lightbox is unchanged. Additive.

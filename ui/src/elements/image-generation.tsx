@@ -1,9 +1,10 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { RefreshCwIcon } from "lucide-react";
+import { RefreshCwIcon, SquareIcon } from "lucide-react";
 import { cn } from "cn";
 import { ghostButton, mono, paper, ShimmerLabel } from "./surfaces";
+import { Progress } from "@/primitives/Progress";
 
 const DOTS = Array.from({ length: 64 }, (_, i) => i);
 
@@ -11,17 +12,40 @@ export function ImageGeneration({
   prompt,
   generating,
   onRegenerate,
+  onStop,
+  progress,
+  statusLabel = "Generating",
+  elapsedLabel,
+  stopLabel = "Stop",
+  sizeLabel = "1024 × 1024",
+  size = "default",
   className,
   ...props
-}: Omit<ComponentProps<"div">, "children" | "prompt" | "generating" | "onRegenerate"> & {
+}: Omit<
+  ComponentProps<"div">,
+  "children" | "prompt" | "generating" | "onRegenerate" | "onStop" | "progress" | "statusLabel" | "elapsedLabel" | "stopLabel" | "sizeLabel" | "size"
+> & {
   prompt: string;
   generating: boolean;
   onRegenerate?: () => void;
+  /** While generating, a Stop button replaces the hidden regenerate button. */
+  onStop?: () => void;
+  /** 0 to 100 as the engine reports it; a thin bar on the card while generating. Unset draws no bar. */
+  progress?: number;
+  /** The caption while generating (the engine's step, "Waiting its turn"). Default "Generating". */
+  statusLabel?: string;
+  /** A clock beside the caption while generating ("12s"). */
+  elapsedLabel?: string;
+  stopLabel?: string;
+  /** The size mark in the corner. Default "1024 × 1024". */
+  sizeLabel?: string;
+  /** `large` fills the width (up to 28rem) so the card matches a large gallery; default is the 13rem tile. */
+  size?: "default" | "large";
 }) {
   return (
     <div
       data-slot="image-generation"
-      className={cn("flex w-52 flex-col gap-2.5", className)}
+      className={cn("flex flex-col gap-2.5", size === "large" ? "w-full max-w-md" : "w-52", className)}
 
       {...props}
     >
@@ -70,27 +94,42 @@ export function ImageGeneration({
             generating ? "text-muted-foreground" : "text-white/70",
           )}
         >
-          1024 × 1024
+          {sizeLabel}
         </span>
+        {generating && progress !== undefined ? (
+          <div className="absolute inset-x-3 bottom-3">
+            <Progress mode="determinate" value={progress} label={statusLabel} />
+          </div>
+        ) : null}
       </div>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
+        <p className="text-muted-foreground min-w-0 flex-1 truncate text-xs" title={prompt}>
           {generating ? (
-            <ShimmerLabel className="relative">Generating</ShimmerLabel>
+            <>
+              <ShimmerLabel className="relative">{statusLabel}</ShimmerLabel>
+              {elapsedLabel ? <span className={cn(mono, "ms-2 tabular-nums")}>{elapsedLabel}</span> : null}
+            </>
           ) : (
             prompt
           )}
         </p>
+        {generating && onStop ? (
+          <button type="button" aria-label={stopLabel} onClick={onStop} className={cn(ghostButton, "size-6 shrink-0")}>
+            <SquareIcon className="size-3" />
+          </button>
+        ) : null}
         <button
           type="button"
           aria-label="Regenerate image"
           aria-hidden={generating || undefined}
+          tabIndex={generating ? -1 : undefined}
           disabled={generating}
           onClick={onRegenerate}
           className={cn(
             ghostButton,
             "size-6 shrink-0",
             generating && "pointer-events-none opacity-0",
+            generating && onStop && "hidden",
           )}
         >
           <RefreshCwIcon className="size-3" />

@@ -26,6 +26,7 @@ export function K02bShowcase() {
         locale="en-US"
       />
       <ImageGeneration prompt="A quiet garden" generating={false} onRegenerate={() => {}} />
+      <ImageGeneration prompt="A quiet garden" generating progress={40} statusLabel="Drawing" elapsedLabel="12s" onStop={() => {}} size="large" />
       <AgentPlan title="Garden plan" steps={["Choose a site", "Plant seeds"]} activeIndex={1} />
       <Chart label="Latency" value="120 ms" delta="+8 ms" trend="up" upIsGood={false} points={[90, 98, 112, 120]} visibleCount={4} />
       <JobProgress title="Export" stages={[{ name: "Write", weight: 1 }]} stageIndex={1} stageProgress={1} eta="" outcome={{ status: "partial", summary: "One file was skipped." }} elapsedMs={42000} />
