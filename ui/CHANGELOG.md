@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.258] - ui-v0.5.258
+
+A11Y-TARGET-01 follow-up. `ComposerMenuItem` uses `min-h-[48px]` instead of `min-h-12`: Home measured the rem-based 48 px as 47 px in the shell, so the touch-target floor (docs/UI.md) failed by 1 px. No API change.
+
 ## [0.5.257] - ui-v0.5.257
 
 MEDIA-PLAYER-01 (home `docs/design/media-apps-blend-2026-10-17.md` sections 6 and 10). Shared pieces any app with artwork can adopt (News included):
