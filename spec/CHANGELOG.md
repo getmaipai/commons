@@ -1,3 +1,7 @@
+## [spec-v0.1.155] - 2026-10-17
+
+- VIDEO-GEN-04. Two household keys on the existing `household.pictures` card of Home settings, Pictures and videos: `generation.video.enabled` (boolean, default on: adults can ask chat for short videos; children and teens never can, whatever it says) and `generation.video.adult_adapters` (`allowed` or `restricted`, default `allowed`: whether adults can use video styles marked adult-only). Additive.
+
 ## [spec-v0.1.154] - 2026-10-17
 
 - IMGGEN-SET-01. Home settings gains a "Pictures and videos" section (`pictures`, admin) with one card for the registry group `household.pictures` and the closed view `home.pictures_library` below it (the style library and the picture model status). Two household keys: `generation.adults` (boolean, default on: adults can ask chat for pictures; children and teens never can, whatever it says) and `generation.adult_adapters` (`allowed` or `restricted`, default `allowed`: whether adults can use styles marked adult-only). Additive.

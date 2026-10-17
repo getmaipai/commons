@@ -1199,6 +1199,50 @@
     ]
   },
   {
+    "key": "generation.video.adult_adapters",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "allowed",
+        "restricted"
+      ]
+    },
+    "default": "allowed",
+    "label": "Adult-only video styles",
+    "help": "Whether adults can use video styles marked adult-only. Children and teens never can.",
+    "copy": {
+      "does": "Decides whether every saved video style can be picked in chat.",
+      "options": {
+        "allowed": "Every saved video style can be picked.",
+        "restricted": "Video styles with an age limit are left out of the choices."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.video.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Adults can make videos",
+    "help": "Adults can ask chat for short videos. Children and teens cannot, whatever this says.",
+    "copy": {
+      "does": "Turns video making on or off for the grown-ups here."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "generation.adults",
     "scope": "household",
     "selector": "boolean",
