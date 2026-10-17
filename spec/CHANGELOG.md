@@ -1,3 +1,7 @@
+## [spec-v0.1.173] - 2026-10-17
+
+- Settings registry carries the keys whose copy now passes COPY-LINT-01, each exactly as Home declares it: `generation.kids`, `generation.kids_daily_pictures`, `generation.kids_daily_videos`, `generation.kid_enabled`, `generation.video_quality` and `health.keep_warm`. Only the expert `media.budget.exempt_bedtime_audio` stays ahead of spec in Home.
+
 ## [spec-v0.1.172] - 2026-10-17
 
 - Settings registry carries keys Home declared ahead of spec, each exactly as Home declares it: `audio.speed.podcast`, `audio.speed.audiobook`, `audio.speed.video`, `audio.speed.spoken_reply` (AUDIO-SESSION-01), `media.allowlist_only` (MEDIA-KID-01), `generation.people_prompts`, and the `control` on `allowance.media.daily_minutes` (a child's and a teen's daily media minutes are guardian-set). Keys whose copy does not pass COPY-LINT-01 yet (`generation.kids*`, `generation.kid_enabled`, `generation.video_quality`, `health.keep_warm`) and the expert `media.budget.exempt_bedtime_audio` stay ahead of spec in Home.

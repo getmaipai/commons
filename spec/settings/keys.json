@@ -4162,5 +4162,127 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "generation.kids",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Let kids make cartoon pictures and videos",
+    "help": "On by default: every child in this home can make cartoon pictures and videos of safe things, up to 20 pictures and 5 videos a day, as soon as a picture model is installed. Photos, real people and anything scary or grown-up are never made for them. Turn this off to stop it for every child.",
+    "copy": {
+      "does": "Turns the safe cartoon picture and video maker on or off for the home."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.kids_daily_pictures",
+    "scope": "household",
+    "selector": "number",
+    "default": 20,
+    "label": "Cartoon pictures a child can make each day",
+    "help": "How many cartoon pictures each child can make in a day (20 unless you change it). Changing one of their own cartoons counts as one. 0 means none.",
+    "copy": {
+      "does": "Sets the most cartoon pictures one child gets per day."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.kids_daily_videos",
+    "scope": "household",
+    "selector": "number",
+    "default": 5,
+    "label": "Cartoon videos a child can make each day",
+    "help": "How many cartoon videos each child can make in a day (5 unless you change it). 0 means none.",
+    "copy": {
+      "does": "Sets the most cartoon videos one child gets per day."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.kid_enabled",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "This child can make cartoon pictures and videos",
+    "help": "On by default for every child while the home switch is on. A parent or admin can turn it off for one child.",
+    "copy": {
+      "does": "Turns cartoon making on or off for this one person."
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "self",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": true,
+      "teen": true,
+      "adult": true
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.likeness",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.video_quality",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "quick",
+        "detailed"
+      ]
+    },
+    "default": "quick",
+    "label": "Video quality",
+    "help": "Quick makes a short silent clip and can start from a picture. Detailed adds sound and spoken words, and makes longer clips from words. Anyone who can make videos can ask chat for the other one for a single video.",
+    "copy": {
+      "does": "Decides how chat makes a video when nobody asks for a kind.",
+      "options": {
+        "quick": "A silent 5 second clip in about two minutes, and it can start from a picture.",
+        "detailed": "A clip up to 10 seconds with sound and speech, made from words, with many more styles."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "health.keep_warm",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Keep the AI warm",
+    "help": "Home sends a tiny made-up message to the AI every few minutes so the first real reply is quick, and checks that chat, tools, search and voice still work. It uses about 1,000 words of AI output an hour, stores nothing, and never runs while someone is talking to the AI. Turn it off to stop these checks.",
+    "copy": {
+      "does": "Sends a tiny test message every few minutes so replies start fast."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai",
+    "honoured_by": [
+      "home"
+    ]
   }
 ]
