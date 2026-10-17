@@ -3270,6 +3270,7 @@
     "selector": "select",
     "range": {
       "options": [
+        "default",
         "alba",
         "cosette",
         "marius",
@@ -3298,9 +3299,9 @@
         "estelle"
       ]
     },
-    "default": "alba",
+    "default": "default",
     "label": "Speaking voice",
-    "help": "The voice MaiPai uses when it reads its replies aloud to you.",
+    "help": "The voice MaiPai uses when it reads its replies aloud to you. \"default\" is the voice built into the speech engine now in use.",
     "level": "basic",
     "secret": false,
     "lives_in": "person.voice",
