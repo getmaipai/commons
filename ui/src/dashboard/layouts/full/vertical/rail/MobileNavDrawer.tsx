@@ -34,7 +34,7 @@ export default function MobileNavDrawer({ mobileSections, settingsHref, hideMobi
   }, [hideMobileMenu]);
   return <Sheet open={open} onOpenChange={setOpen}>
     {!hideMobileMenu ? <SheetTrigger ref={trigger} aria-label="Open menu" data-slot="mobile-menu-button"
-      className="fixed z-40 flex size-11 items-center justify-center rounded-full border border-border bg-sidebar text-sidebar-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-ring"
+      className="fixed z-40 flex size-12 items-center justify-center rounded-full border border-border bg-sidebar text-sidebar-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-ring"
       style={{ top: "calc(env(safe-area-inset-top, 0px) + 8px)", left: "calc(env(safe-area-inset-left, 0px) + 8px)" }}><Menu aria-hidden className="size-5" /></SheetTrigger> : null}
     <SheetContent side="left" data-slot="mobile-nav-drawer" finalFocus={trigger} className="max-w-full gap-1 overflow-y-auto bg-sidebar p-4 text-sidebar-foreground"
       onClick={(event) => { if ((event.target as Element).closest("a")) setOpen(false); }}>
@@ -44,7 +44,7 @@ export default function MobileNavDrawer({ mobileSections, settingsHref, hideMobi
       </RailEntries>
       <div className="mt-auto flex shrink-0 items-center justify-between border-t border-border pt-3">
         {props.profile}
-        {settingsHref ? <Link to={settingsHref} aria-label="Settings" className="flex size-11 items-center justify-center rounded-lg hover:bg-foreground/5"><Settings aria-hidden className="size-5" /></Link> : null}
+        {settingsHref ? <Link to={settingsHref} aria-label="Settings" className="flex size-12 items-center justify-center rounded-lg hover:bg-foreground/5"><Settings aria-hidden className="size-5" /></Link> : null}
       </div>
     </SheetContent>
   </Sheet>;

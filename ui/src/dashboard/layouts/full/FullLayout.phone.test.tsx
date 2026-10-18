@@ -80,3 +80,18 @@ test("missing matchMedia keeps the desktop fallback", () => {
   window.matchMedia = undefined as unknown as typeof window.matchMedia;
   expect(shell().getByRole("navigation", { name: "Primary navigation" })).toBeTruthy();
 });
+
+test("phone touch controls are at least 48px (the touch-target floor)", async () => {
+  media(360);
+  const view = shell();
+  const button = view.getByRole("button", { name: "Open menu" });
+  expect(button.className).toContain("size-12");
+  fireEvent.click(button);
+  const dialog = await view.findByRole("dialog", { name: "App menu" });
+  expect(view.getByRole("link", { name: "Settings" }).className).toContain("size-12");
+  for (const name of ["Home", "Chat", "Library"]) {
+    const link = dialog.querySelector(`a[aria-label^="${name}"]`) as HTMLElement | null;
+    expect(link?.className ?? "").toContain("min-h-12");
+    expect(link?.className ?? "").not.toContain("min-h-11");
+  }
+});

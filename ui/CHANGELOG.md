@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.276] - ui-v0.5.276
+
+- MOBILE-RAIL-01: the phone drawer's menu button, Settings gear and entry rows are at least 48 px (the touch-target floor); 0.5.275 drew them at 44 px.
+
 ## [0.5.275] - ui-v0.5.275
 
 - MOBILE-RAIL-01: phone layouts use a labelled navigation drawer with shared rail entries, app status marks, mobile sections, profile and optional Settings. Includes a safe-area menu button, immersive hiding, edge swipe, and viewport overflow containment. Exports useIsPhoneLayout for hosts.

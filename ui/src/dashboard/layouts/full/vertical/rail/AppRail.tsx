@@ -193,7 +193,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
   const items = home ? all.filter((item) => item !== home) : all;
   const isActive = (url: string) => (activeAppHref ? railHref(activeAppHref) === railHref(url) : isRailItemActive(pathname, url));
   const pinnedApps = mobile ? (apps ?? []) : (apps ?? []).filter((app) => app.pinned).slice(0, RAIL_APPS_MAX);
-  const entryClass = mobile ? "relative flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring" : railButton;
+  const entryClass = mobile ? "relative flex min-h-12 w-full items-center gap-3 rounded-lg px-3 text-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring" : railButton;
   const homeActive = home?.url ? (activeAppHref ? railHref(activeAppHref) === railHref(home.url) : isRailItemActive(pathname, home.url)) : false;
   const homeStatus = home ? itemStatus?.(home) : undefined;
   const logo = (
