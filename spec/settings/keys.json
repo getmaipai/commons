@@ -1338,7 +1338,6 @@
     "default": "quick",
     "label": "Song length",
     "help": "What chat makes when nobody asks for a kind. Anyone who can make songs can still ask for the other kind.",
-    "level": "basic",
     "copy": {
       "does": "Picks quick or full songs when nobody says which.",
       "options": {
@@ -1346,6 +1345,8 @@
         "full": "Full songs: about 3 minutes with every part, ready in a minute or two."
       }
     },
+    "level": "basic",
+    "secret": false,
     "lives_in": "household.pictures",
     "honoured_by": [
       "home"

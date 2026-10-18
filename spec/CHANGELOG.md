@@ -1,3 +1,7 @@
+## [spec-v0.1.178] - 2026-10-18
+
+- `generation.music.length` carries `secret: false` and the field order Home's registry writes, so the entry is identical to Home's declaration (spec-v0.1.177 differed only in that, and Home's settings drift check compares the whole entry). No behaviour change.
+
 ## [spec-v0.1.177] - 2026-10-18
 
 - MUSIC-SPEC-02 (Home `docs/design/music-generation-2026-10-17.md` section 16). Household key `generation.music.length` (`quick` or `full`, default `quick`) on the `household.pictures` card: what chat makes when nobody asks for a kind of song. Quick songs are about 45 seconds; full songs are about 3 minutes with every part. Additive.
