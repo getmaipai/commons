@@ -1,9 +1,17 @@
-import { afterEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
+import type { Window } from "happy-dom";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import feedBlock from "@maipai/spec/fixtures/answer-block/valid-story_feed.json";
 import { StoryFeed, type StoryFeedData } from "@/kit/primitives/StoryFeed";
 
-afterEach(cleanup);
+// Relative image URLs need a real base; about:blank makes happy-dom fire error synchronously.
+const browser = window as unknown as Window;
+const originalUrl = window.location.href;
+beforeEach(() => browser.happyDOM.setURL("https://example.com"));
+afterEach(() => {
+  cleanup();
+  browser.happyDOM.setURL(originalUrl);
+});
 
 const data = feedBlock.props as unknown as StoryFeedData;
 
@@ -30,8 +38,72 @@ describe("StoryFeed", () => {
   test("a story with no picture draws a plain tile, never a broken image", () => {
     const { container } = render(<StoryFeed data={{ ...data, hero: { ...data.hero!, image: undefined } }} />);
     expect(container.querySelector('[data-tier="hero"] img')).toBeNull();
-    expect(container.querySelector('[data-tier="hero"] [data-empty]')).not.toBeNull();
+    const tile = container.querySelector('[data-tier="hero"] [data-slot="story-image"][data-fallback]')!;
+    expect(tile.textContent).toBe(data.hero!.publisher.trim().charAt(0).toUpperCase());
+    expect(tile.querySelector("svg")).toBeNull();
+    expect(tile.hasAttribute("data-empty")).toBe(false);
   });
+
+  test("publisher hues are stable and include distinct hues", () => {
+    const stories = ["Atlas", "Atlas", "Bramble"].map((publisher, i) => ({ ...data.hero!, story_id: `hue-${i}`, publisher, image: undefined }));
+    const { container } = render(<StoryFeed data={{ layout: "channel", featured: stories, as_of: data.as_of }} />);
+    const tiles = Array.from(container.querySelectorAll<HTMLElement>('[data-fallback]'));
+    expect(tiles.map((tile) => tile.textContent)).toEqual(["A", "A", "B"]);
+    expect(tiles[0]!.style.backgroundColor).toMatch(/^var\(--hue-/);
+    expect(tiles[0]!.style.backgroundColor).toBe(tiles[1]!.style.backgroundColor);
+    expect(tiles[0]!.style.backgroundColor).not.toBe(tiles[2]!.style.backgroundColor);
+    expect(tiles[0]!.style.color).toBe("var(--primary-foreground)");
+  });
+
+  for (const tier of ["hero", "featured", "half", "shelf", "row"] as const) {
+    const feedFor = (image = data.hero!.image): StoryFeedData => {
+      const story = { ...data.hero!, image };
+      const base = { layout: "today" as const, as_of: data.as_of };
+      if (tier === "hero") return { ...base, hero: story };
+      if (tier === "featured") return { ...base, hero: { ...story, story_id: "other" }, featured: [story] };
+      if (tier === "half") return { ...base, featured: [story] };
+      if (tier === "shelf") return { ...base, shelves: [{ title: "Shelf", stories: [story] }] };
+      return { ...base, layout: "rows", rows: [story] };
+    };
+    const selector = tier === "row" ? '[data-slot="story-row"]' : `[data-tier="${tier}"]`;
+
+    test(`${tier} swaps failed pictures for initials and remembers each failed src`, () => {
+      const { container, rerender } = render(<StoryFeed data={feedFor()} />);
+      const card = () => container.querySelector(selector)!;
+      const beforeText = card().textContent;
+      const img = card().querySelector("img")!;
+      expect(img).not.toBeNull();
+      fireEvent.error(img);
+      const tile = card().querySelector<HTMLElement>('[data-slot="story-image"][data-fallback]')!;
+      expect(tile.textContent).toBe(data.hero!.publisher.trim().charAt(0).toUpperCase());
+      expect(tile.querySelector("svg")).toBeNull();
+      expect(card().querySelector("img")).toBeNull();
+      expect(card().textContent).toBe(tile.textContent + beforeText);
+      expect(tile.style.aspectRatio).toBe(tier === "hero" ? "var(--ratio)" : `${tier === "shelf" ? 4 / 3 : 16 / 9} / 1`);
+      rerender(<StoryFeed data={feedFor()} />);
+      expect(card().querySelector("img")).toBeNull();
+      const replacement = { ...data.hero!.image!, w480: "/replacement-small.jpg", w1280: "/replacement-large.jpg" };
+      rerender(<StoryFeed data={feedFor(replacement)} />);
+      expect(card().querySelector("img")).not.toBeNull();
+      fireEvent.error(card().querySelector("img")!);
+      rerender(<StoryFeed data={feedFor()} />);
+      expect(card().querySelector("img")).toBeNull();
+    });
+
+    test(`${tier} uses the same fallback when the image is missing`, () => {
+      const feed = feedFor();
+      for (const story of [feed.hero, ...(feed.featured ?? []), ...(feed.rows ?? []), ...(feed.shelves?.flatMap((shelf) => shelf.stories) ?? [])]) {
+        if (story) story.image = undefined;
+      }
+      const { container } = render(<StoryFeed data={feed} />);
+      const card = container.querySelector(selector)!;
+      const tile = card.querySelector('[data-slot="story-image"][data-fallback]')!;
+      expect(tile.textContent).toBe(data.hero!.publisher.trim().charAt(0).toUpperCase());
+      expect(tile.querySelector("svg")).toBeNull();
+      expect(card.querySelector("img")).toBeNull();
+      expect(card.querySelector("[data-empty]")).toBeNull();
+    });
+  }
 
   test("opening a story fires `open` with the story's own ids", () => {
     const onAction = mock(() => {});

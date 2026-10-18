@@ -1,5 +1,5 @@
 import { getIcon } from "@/kit/icons";
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
@@ -116,23 +116,41 @@ function SourceLine({ story }: { story: StoryCardData }) {
 /** The hero's picture ratio is the `--story-hero-ratio` token (default 16 / 9), set through the kit AspectRatio's own variable. */
 const HERO_RATIO_STYLE = { "--ratio": "var(--story-hero-ratio, 16 / 9)" } as CSSProperties;
 
-function StoryImage({ story, ratio, large, hero }: { story: StoryCardData; ratio: number; large?: boolean; hero?: boolean }) {
+// Named palette tokens from tokens.css, with the Avatar's filled-surface text token.
+const STORY_HUES = ["blue", "violet", "teal", "orange", "pink", "red"] as const;
+
+function StoryFallback({ publisher, ratio, style, thumbnail }: { publisher: string; ratio: number; style?: CSSProperties; thumbnail?: boolean }) {
+  let hash = 0;
+  for (const letter of publisher) hash = (Math.imul(hash, 31) + letter.codePointAt(0)!) >>> 0;
+  return (
+    <div
+      data-slot="story-image"
+      data-fallback=""
+      aria-hidden
+      className={cn("flex w-full items-center justify-center font-semibold", thumbnail ? "text-3xl" : "text-6xl")}
+      style={{ ...style, aspectRatio: style ? "var(--ratio)" : String(ratio), backgroundColor: `var(--hue-${STORY_HUES[hash % STORY_HUES.length]})`, color: "var(--primary-foreground)" }}
+    >
+      {publisher.trim().charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
+function StoryImage({ story, ratio, large, hero, thumbnail }: { story: StoryCardData; ratio: number; large?: boolean; hero?: boolean; thumbnail?: boolean }) {
+  const [failedSources, setFailedSources] = useState<ReadonlySet<string>>(() => new Set());
   const style = hero ? HERO_RATIO_STYLE : undefined;
-  if (!story.image) {
-    return (
-      <AspectRatio ratio={ratio} style={style} className="bg-muted text-muted-foreground flex items-center justify-center" data-slot="story-image" data-empty="">
-        <NewspaperIcon aria-hidden className="size-8" />
-      </AspectRatio>
-    );
+  const src = large ? story.image?.w1280 : story.image?.w480;
+  if (!src || failedSources.has(src)) {
+    return <StoryFallback publisher={story.publisher} ratio={ratio} style={style} thumbnail={thumbnail} />;
   }
   return (
-    <AspectRatio ratio={ratio} style={style} data-slot="story-image">
+    <AspectRatio ratio={ratio} style={thumbnail ? { width: "100%" } : style} data-slot="story-image">
       <img
-        src={large ? story.image.w1280 : story.image.w480}
-        srcSet={`${story.image.w480} 480w, ${story.image.w1280} 1280w`}
-        sizes={large ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
-        alt={story.image.alt}
+        src={src}
+        srcSet={thumbnail ? undefined : `${story.image!.w480} 480w, ${story.image!.w1280} 1280w`}
+        sizes={thumbnail ? undefined : large ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
+        alt={story.image!.alt}
         loading="lazy"
+        onError={() => setFailedSources((previous) => new Set(previous).add(src))}
         className="size-full object-cover"
       />
     </AspectRatio>
@@ -174,11 +192,7 @@ function StoryRow({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   return (
     <Item variant="outline" size="story" data-slot="story-row" data-opened={story.opened ? "" : undefined} className="relative">
       <ItemMedia variant="thumbnail">
-        {story.image ? (
-          <img src={story.image.w480} alt={story.image.alt} loading="lazy" />
-        ) : (
-          <NewspaperIcon aria-hidden className="text-muted-foreground size-6" />
-        )}
+        <StoryImage story={story} ratio={16 / 9} thumbnail />
       </ItemMedia>
       <ItemContent>
         <Kicker story={story} />
