@@ -30,6 +30,12 @@
           "sections": [
             "developer"
           ]
+        },
+        {
+          "label": "Coding",
+          "sections": [
+            "coding"
+          ]
         }
       ],
       "sections": [
@@ -249,6 +255,17 @@
             }
           ],
           "min_role": "admin"
+        },
+        {
+          "id": "coding",
+          "label": "Coding",
+          "icon": "code",
+          "kind": "view",
+          "view": "account.coding_keys",
+          "min_role": "child",
+          "needs": [
+            "coding.allowed_for_me"
+          ]
         }
       ]
     },
@@ -281,6 +298,12 @@
           "label": "Pictures and videos",
           "sections": [
             "pictures"
+          ]
+        },
+        {
+          "label": "Coding",
+          "sections": [
+            "coding"
           ]
         },
         {
@@ -759,6 +782,30 @@
             "tailnet",
             "tailscale"
           ]
+        },
+        {
+          "id": "coding",
+          "label": "Coding",
+          "icon": "code",
+          "kind": "keys",
+          "min_role": "admin",
+          "cards": [
+            {
+              "label": "Coding",
+              "group": "household.coding",
+              "scope": "household"
+            },
+            {
+              "label": "Who can code",
+              "group": "household.coding_people",
+              "scope": "household"
+            },
+            {
+              "label": "Sharing the computer",
+              "group": "household.coding_limits",
+              "scope": "household"
+            }
+          ]
         }
       ]
     },
@@ -925,6 +972,11 @@
       "scope": "device",
       "group": "robot.hello",
       "reason": "Robot-only hello keys; the robot renders them on its own screen, the hub never shows them."
+    },
+    {
+      "scope": "person",
+      "group": "person.coding",
+      "reason": "An admin sets coding grants and limits on the person's Family page. The account view shows what the grant allows."
     }
   ]
 }

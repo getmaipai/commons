@@ -137,7 +137,8 @@
         "home.routing_stats",
         "home.reference_library",
         "home.pictures_library",
-        "home.media_library"
+        "home.media_library",
+        "account.coding_keys"
       ],
       "description": "A named view in Home's view table. The list is closed so a package cannot name one Home does not have."
     },

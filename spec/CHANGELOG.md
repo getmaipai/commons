@@ -1,3 +1,7 @@
+## [spec-v0.1.185] - 2026-10-18
+
+- CODE-SPEC-01: personal API key records for turn and code, phase 1 coding settings with copy and band defaults, a thinking budget and admin ceiling, Coding sections in Home and Account, and a coding data class example. Existing shapes and grant actions stay the same.
+
 ## [spec-v0.1.184] - 2026-10-18
 
 - News: a feed-list package's `feeds.json` entry gains an optional `topics_hint` (topic ids from `news/topics.json`, same shape as `Feed.topics_hint`), so a list can say which topics a feed covers. Additive.

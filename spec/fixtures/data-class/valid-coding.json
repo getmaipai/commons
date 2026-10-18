@@ -1,0 +1,27 @@
+{
+  "id": "coding",
+  "product": "home",
+  "title": "Coding",
+  "help": "Coding records and saved chats. Workspaces stay out of backups.",
+  "level": "basic",
+  "default": {
+    "base": "root",
+    "subpath": "coding"
+  },
+  "holds": "Coding records and saved chats; workspace files are kept outside the backup.",
+  "size": "Up to the cap for each person",
+  "access": "Small writes while coding",
+  "durability": "irreplaceable",
+  "rebuild": "none",
+  "sensitive": "personal",
+  "needs": [
+    "private"
+  ],
+  "whenMissing": "degrade",
+  "degrades": [
+    "coding"
+  ],
+  "move": "online",
+  "refetch": false,
+  "backup": "hot"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "key_alfred01",
+  "person_id": "person-alfred",
+  "name": "Laptop",
+  "scopes": [
+    "code"
+  ],
+  "created_at": "2026-10-18T12:00:00Z",
+  "expires_at": "2027-01-16T12:00:00Z",
+  "revoked_at": null,
+  "status": "active",
+  "last_used_at": "2026-10-18T12:01:00Z",
+  "last_used_from": {
+    "place": "home_network",
+    "address": "192.0.2.10"
+  },
+  "limits": {
+    "requests_per_minute": 60
+  },
+  "hint": "abcd",
+  "provenance": "Created in Settings",
+  "hlc": "1792324800000:0:alfred"
+}

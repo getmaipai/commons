@@ -3,6 +3,7 @@
 
 export * from "./acknowledgment.js";
 export * from "./answer-block.js";
+export * from "./api-key.js";
 export * from "./artifact.js";
 export * from "./biometric-print.js";
 export * from "./blocklists.js";

@@ -183,6 +183,7 @@ class Section(BaseModel):
             'home.reference_library',
             'home.pictures_library',
             'home.media_library',
+            'account.coding_keys',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn above the cards.')
@@ -202,6 +203,7 @@ class Section(BaseModel):
             'home.reference_library',
             'home.pictures_library',
             'home.media_library',
+            'account.coding_keys',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn below the cards.')
@@ -221,6 +223,7 @@ class Section(BaseModel):
             'home.reference_library',
             'home.pictures_library',
             'home.media_library',
+            'account.coding_keys',
         ]
         | None
     ) = Field(

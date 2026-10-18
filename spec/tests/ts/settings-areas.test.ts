@@ -78,7 +78,7 @@ describe("spec/settings/areas.json", () => {
 
   test("Home settings groups household sections and names its admin views", () => {
     expect(area("home").groups.map((group) => group.label)).toEqual([
-      "General", "People", "Engines and AI", "Pictures and videos", "Devices", "Search", "Integrations", "Commands", "Voices",
+      "General", "People", "Engines and AI", "Pictures and videos", "Coding", "Devices", "Search", "Integrations", "Commands", "Voices",
       "Storage and backups", "Reference library", "Media library", "Maintenance", "Privacy", "Developer", "Network and access",
     ]);
     expect(section("home", "ai").trail_view).toBe("home.engine_admin");
@@ -184,7 +184,7 @@ describe("conformance: structure", () => {
 
   test("the allowed view ids are the Home-owned renders", () => {
     expect([...ALLOWED_VIEW_IDS].sort()).toEqual([
-      "account.device_appearance",
+      "account.coding_keys", "account.device_appearance",
       "account.likeness",
       "account.profile",
       "account.voice",
@@ -432,8 +432,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("the registry keeps the pinned count and includes the checklist dismissal key", () => {
-    expect(registry).toHaveLength(213);
-    expect(new Set(registryIds()).size).toBe(213);
+    expect(registry).toHaveLength(231);
+    expect(new Set(registryIds()).size).toBe(231);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.max_mbps",

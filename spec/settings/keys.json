@@ -4373,5 +4373,465 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "coding.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Coding",
+    "help": "Let people write code with Home's AI. Loads the coding model only when needed.",
+    "copy": {
+      "does": "Loads a model on demand so you can write programs with Home."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.coding",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "coding.paused",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Pause coding",
+    "help": "Stops coding now. Resume to let people code again.",
+    "copy": {
+      "does": "Stops all requests until you resume."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.coding",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "coding.api.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Coding tools",
+    "help": "Let people use their own coding tools with API keys.",
+    "copy": {
+      "does": "Lets you connect your own apps with a personal key."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.coding",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "coding.api.away",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Coding away from home",
+    "help": "Let API keys work away from home through your Tailscale.",
+    "copy": {
+      "does": "Lets your key connect through your Tailscale when you are out."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.coding",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "coding.adults_by_default",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Adults by default",
+    "help": "Adults can code unless you turn them off. Teens and children need an admin grant.",
+    "copy": {
+      "does": "Lets each person with full controls start with access."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.coding_people",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "coding.max_streams_per_person",
+    "scope": "household",
+    "selector": "number",
+    "default": 2,
+    "label": "Streams per person",
+    "help": "Limits how many coding replies one person can stream at once.",
+    "copy": {
+      "does": "Caps how many replies you can receive at once."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding_limits",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 1,
+      "step": 1
+    }
+  },
+  {
+    "key": "coding.requests_per_minute_per_key",
+    "scope": "household",
+    "selector": "number",
+    "default": 60,
+    "label": "Requests per minute",
+    "help": "Limits how many requests each key can send in one minute.",
+    "copy": {
+      "does": "Caps how often each key can call Home."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding_limits",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 1,
+      "step": 1
+    }
+  },
+  {
+    "key": "coding.daily_tokens_per_person",
+    "scope": "household",
+    "selector": "number",
+    "default": 0,
+    "label": "Daily tokens per person",
+    "help": "Limits coding tokens each day. Zero means no cap.",
+    "copy": {
+      "does": "Caps use each day, with zero for no cap."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding_limits",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 0,
+      "step": 1
+    }
+  },
+  {
+    "key": "coding.keep_warm_minutes",
+    "scope": "household",
+    "selector": "number",
+    "default": 15,
+    "label": "Keep warm minutes",
+    "help": "Unloads the coding model after this many quiet minutes. Chat stays loaded.",
+    "copy": {
+      "does": "Unloads the model after this many quiet minutes."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding_limits",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 0,
+      "step": 1
+    }
+  },
+  {
+    "key": "coding.thinking_budget",
+    "scope": "household",
+    "selector": "number",
+    "default": 2000,
+    "label": "Thinking tokens per request",
+    "help": "Limits thinking to this many tokens per request, up to the admin ceiling. A client cannot raise it past that ceiling. This never turns thinking on for a minor.",
+    "copy": {
+      "does": "Caps each request at the set ceiling without turning reasoning on."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding_limits",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 0,
+      "step": 1
+    }
+  },
+  {
+    "key": "coding.thinking_budget_ceiling",
+    "scope": "household",
+    "selector": "number",
+    "default": 2000,
+    "label": "Thinking token ceiling",
+    "help": "Sets the most thinking tokens a client can request. Only an admin can change this. Minors never use thinking.",
+    "copy": {
+      "does": "Caps how much reasoning a tool may request without turning it on."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding_limits",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 0,
+      "step": 1
+    }
+  },
+  {
+    "key": "coding.person.api_keys",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Api keys",
+    "help": "Lets this person hold API keys. A key reaches tools Home cannot control. Home still checks every answer.",
+    "copy": {
+      "does": "Lets you connect apps that Home cannot see or control."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "layers": [
+      "band",
+      "person"
+    ],
+    "merge": "override",
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": false,
+      "teen": false,
+      "adult": true
+    }
+  },
+  {
+    "key": "coding.person.git_hosts",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Git hosts",
+    "help": "Lets this person connect a code host. This stays off for a child.",
+    "copy": {
+      "does": "Lets you link a code site when your grant allows it."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "layers": [
+      "band",
+      "person"
+    ],
+    "merge": "override",
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": false,
+      "teen": false,
+      "adult": true
+    }
+  },
+  {
+    "key": "coding.person.network_hosts",
+    "scope": "person",
+    "selector": "text",
+    "default": null,
+    "label": "Network hosts",
+    "help": "Lists hosts this person may use from the home list. An empty list means no internet. Unset follows the home list.",
+    "copy": {
+      "does": "Sets which sites you may reach from the home list."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "multiple": true
+    },
+    "layers": [
+      "band",
+      "person"
+    ],
+    "merge": "override",
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": [],
+      "teen": [],
+      "adult": null
+    }
+  },
+  {
+    "key": "coding.person.max_sessions",
+    "scope": "person",
+    "selector": "number",
+    "default": null,
+    "label": "Max sessions",
+    "help": "Limits this person's coding sessions. Unset follows the home cap. The home cap always wins.",
+    "copy": {
+      "does": "Caps how many workspaces you can run at once within the home limit."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 1,
+      "step": 1
+    },
+    "layers": [
+      "band",
+      "person"
+    ],
+    "merge": "override",
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "guardian"
+    },
+    "band_default": {
+      "child": 1,
+      "teen": 1,
+      "adult": null
+    }
+  },
+  {
+    "key": "coding.person.daily_tokens",
+    "scope": "person",
+    "selector": "number",
+    "default": null,
+    "label": "Daily tokens",
+    "help": "Limits this person's coding tokens each day. Unset follows the home cap. Zero means no cap. The home cap always wins.",
+    "copy": {
+      "does": "Caps your use each day within the home limit."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 0,
+      "step": 1
+    },
+    "layers": [
+      "band",
+      "person"
+    ],
+    "merge": "override",
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "guardian"
+    },
+    "band_default": {
+      "child": 100000,
+      "teen": 200000,
+      "adult": null
+    }
+  },
+  {
+    "key": "coding.person.sandbox_size",
+    "scope": "person",
+    "selector": "select",
+    "default": "standard",
+    "label": "Sandbox size",
+    "help": "Small gives 2 CPUs, 2 GB of memory and 5 GB of storage. Standard gives 4 CPUs and 4 GB within the home storage cap.",
+    "copy": {
+      "does": "Sets how much CPU, memory and storage your workspace may use.",
+      "options": {
+        "small": "Uses the small workspace limits.",
+        "standard": "Uses the standard workspace limits."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "options": [
+        "small",
+        "standard"
+      ]
+    },
+    "layers": [
+      "band",
+      "person"
+    ],
+    "merge": "override",
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "guardian"
+    },
+    "band_default": {
+      "child": "small",
+      "teen": "small",
+      "adult": "standard"
+    }
+  },
+  {
+    "key": "coding.person.message_minutes",
+    "scope": "person",
+    "selector": "number",
+    "default": 30,
+    "label": "Message minutes",
+    "help": "Limits the minutes each coding message can run. The home cap always wins.",
+    "copy": {
+      "does": "Caps how long each request can run within the home limit."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 1,
+      "step": 1
+    },
+    "layers": [
+      "band",
+      "person"
+    ],
+    "merge": "override",
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "guardian"
+    },
+    "band_default": {
+      "child": 15,
+      "teen": 15,
+      "adult": 30
+    }
   }
 ]
