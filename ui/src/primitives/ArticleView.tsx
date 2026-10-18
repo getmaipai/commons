@@ -150,7 +150,12 @@ export function ArticleView({ data, onAction, available = [], ids, renderTargetL
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
   const hasActions = can("listen") || can("save") || can("summarize") || (can("open_site") && data.open_url);
   return (
-    <article data-slot="article-view" className={cn("flex min-w-0 max-w-prose flex-col gap-4", className)}>
+    <article data-slot="article-view" className={cn("mx-auto flex w-full min-w-0 max-w-prose flex-col gap-4", className)}>
+      {data.byline ? (
+        <div data-slot="article-provider" className="bg-primary text-primary-foreground rounded-lg px-4 py-3 text-center text-lg font-semibold">
+          {data.byline.publisher}
+        </div>
+      ) : null}
       <header className="flex flex-col gap-2">
         {data.kicker ? <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{data.kicker}</p> : null}
         <h2 className="text-3xl leading-tight font-semibold">{data.title}</h2>

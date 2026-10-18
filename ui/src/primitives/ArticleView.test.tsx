@@ -20,6 +20,8 @@ describe("ArticleView", () => {
     expect(getByText("World")).toBeTruthy();
     expect(getByText("Headline 1")).toBeTruthy();
     expect(container.querySelector("header")?.textContent).toContain("Example Wire");
+    expect(container.querySelector('[data-slot="article-provider"]')?.textContent).toBe("Example Wire");
+    expect(container.querySelector("article")?.className).toContain("mx-auto");
     expect(container.querySelector("header")?.textContent).toContain("3 sources");
     expect(container.querySelector('[data-slot="key-points"]')?.textContent).toContain("Three things happened.");
     expect(container.querySelector("h2#h1")?.textContent).toBe("What happened");

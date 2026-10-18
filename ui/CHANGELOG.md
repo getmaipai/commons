@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.277] - ui-v0.5.277
+
+- ArticleView: the reader opens with a provider banner (the publisher's name in a centered primary-colored band) and the article column is centered, like Apple News.
+
 ## [0.5.276] - ui-v0.5.276
 
 - MOBILE-RAIL-01: the phone drawer's menu button, Settings gear and entry rows are at least 48 px (the touch-target floor); 0.5.275 drew them at 44 px.
