@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.281] - ui-v0.5.281
+
+- SchemaPage: a `sidebar` prop says the app draws its own sidebar column beside the page (NEWS-SIDEBAR-01). A plain `search` node (one with no `recents`) is then hidden from `lg` up, because the sidebar carries the same box, and a phone keeps it; a search that keeps recents stays. Additive: without the prop nothing changes.
+
 ## [0.5.280] - ui-v0.5.280
 
 - SectionSidebar: `standalone` draws the column on its own beside page content (its own sidebar provider, hidden below `lg`, the settings column's width, border and surface), and the search can draw `recents` as chips with `onRecent`. A host passes data and handlers only, so no Home wrapper or class is needed. The settings shell is unchanged.

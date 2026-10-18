@@ -293,3 +293,29 @@ describe("search node (NEWS-LOOK-02)", () => {
     expect(queryByText("Clear")).toBeNull();
   });
 });
+
+describe("a search node beside an app's sidebar (NEWS-SIDEBAR-01)", () => {
+  const plain: UiNode = { type: "search", label: "Search News", submit: { navigate: { to: "/apps/news/search", state: { q: "{q}" } } } };
+  const kept: UiNode = { ...plain, recents: { source: "package", path: "recents", stream: false } } as UiNode;
+  const page = (node: UiNode) => PageNodeSchema.parse({ type: "page", id: "p", title: "P", body: [node] });
+  const mount = (node: UiNode, sidebar?: boolean) =>
+    renderWithQueryClient(
+      <MemoryRouter initialEntries={["/apps/news"]}>
+        <SchemaPage page={page(node)} packageId="news" sidebar={sidebar} />
+      </MemoryRouter>,
+    );
+
+  test("with a sidebar, a plain search box is hidden from lg up and a phone keeps it", () => {
+    const view = mount(plain, true);
+    const frame = view.container.querySelector('[data-slot="search-under-sidebar"]') as HTMLElement;
+    expect(frame.className).toContain("lg:hidden");
+    expect(frame.querySelector("input")).not.toBeNull();
+  });
+
+  test("a search box that keeps recents stays, and so does any box when the app has no sidebar", () => {
+    expect(mount(kept, true).container.querySelector('[data-slot="search-under-sidebar"]')).toBeNull();
+    cleanup();
+    expect(mount(plain).container.querySelector('[data-slot="search-under-sidebar"]')).toBeNull();
+    expect(mount(plain, false).container.querySelector('input')).not.toBeNull();
+  });
+});

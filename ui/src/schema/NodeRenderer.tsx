@@ -30,7 +30,7 @@ import { getIcon } from "@/kit/icons";
 import { locationBlockedHelp } from "@/kit/geolocationHelp";
 import { AnswerBlockView } from "@/kit/elements/answer-block";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
-import { PageStateContext } from "@/kit/schema/packageScope";
+import { PageSidebarContext, PageStateContext } from "@/kit/schema/packageScope";
 import { MediaHostContext, type CastTarget, type MediaHost } from "@/kit/schema/mediaHost";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import type { Action } from "@/kit/schema/types";
@@ -511,7 +511,10 @@ function BoundSearchView({ node, state }: { node: SearchNode & { recents: NonNul
 }
 
 function SearchNodeView({ node, state }: { node: SearchNode; state: Row }) {
-  return node.recents ? <BoundSearchView node={{ ...node, recents: node.recents }} state={state} /> : <SearchControl node={node} state={state} recents={[]} />;
+  const sidebar = useContext(PageSidebarContext);
+  const view = node.recents ? <BoundSearchView node={{ ...node, recents: node.recents }} state={state} /> : <SearchControl node={node} state={state} recents={[]} />;
+  // NEWS-SIDEBAR-01: beside an app's own sidebar a plain search box (no recents to keep) is the sidebar's box again: wide screens hide it.
+  return sidebar && !node.recents ? <div data-slot="search-under-sidebar" className="lg:hidden">{view}</div> : view;
 }
 
 function PickerNodeView({ node, state }: { node: PickerNode; state: Row }) {

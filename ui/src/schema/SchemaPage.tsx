@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { Page } from "@/kit/primitives/Page";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
-import { PackageScopeContext, PageStateContext, type PageStateWriter } from "@/kit/schema/packageScope";
+import { PackageScopeContext, PageSidebarContext, PageStateContext, type PageStateWriter } from "@/kit/schema/packageScope";
 import { PageNodeSchema } from "@/kit/schema/types";
 import { cn, FOCUS_RING } from "@/kit/utils";
 
@@ -30,11 +30,14 @@ export function SchemaPage({
   beforeBody,
   packageId,
   hideTitle,
+  sidebar,
 }: {
   page: unknown;
   beforeBody?: ReactNode;
   packageId?: string;
   hideTitle?: boolean;
+  /** The app draws its own sidebar column beside this page: the page's plain search box gives way to it from `lg` up. */
+  sidebar?: boolean;
 }) {
   const parsed = PageNodeSchema.parse(page);
   // NEWS-00: a `navigate` action's `state` arrives as router state and is written into this page's state (a channel
@@ -63,6 +66,7 @@ export function SchemaPage({
   return (
     <PackageScopeContext.Provider value={scope}>
       <PageStateContext.Provider value={writer}>
+       <PageSidebarContext.Provider value={sidebar === true}>
         <Page title={parsed.title} hideTitle={hideTitle} tone={parsed.tone}>
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
           <div tabIndex={0} className={cn("flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto p-4", FOCUS_RING)}>
@@ -70,6 +74,7 @@ export function SchemaPage({
             <NodeRenderer node={parsed} state={state} />
           </div>
         </Page>
+       </PageSidebarContext.Provider>
       </PageStateContext.Provider>
     </PackageScopeContext.Provider>
   );

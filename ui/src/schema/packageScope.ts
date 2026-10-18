@@ -22,6 +22,10 @@ export interface PageStateWriter {
 }
 export const PageStateContext = createContext<PageStateWriter | null>(null);
 
+/** True inside a page of an app that draws its own sidebar column beside it (NEWS-SIDEBAR-01): a plain `search` node (one with no
+ * `recents`) is the sidebar's search box said again, so it is hidden from the kit's `lg` breakpoint up and a phone keeps it. */
+export const PageSidebarContext = createContext(false);
+
 export const PACKAGE_BINDING_REFUSED = "This page can't load that.";
 export const PACKAGE_ACTION_REFUSED = "This page can't do that.";
 
