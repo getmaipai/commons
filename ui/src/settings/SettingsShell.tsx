@@ -1,27 +1,15 @@
 import { useId, type MouseEvent, type PointerEventHandler, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { SettingsHeadingLevelContext } from "./headingLevel";
-import { HitField } from "./HitField";
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
 import { getIcon } from "@/kit/icons";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInput,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-} from "../dashboard/components/ui/sidebar";
+import { SidebarMenuButton, SidebarProvider } from "../dashboard/components/ui/sidebar";
+import { SectionSidebar } from "../primitives/SectionSidebar";
 import { cn } from "../dashboard/lib/utils";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { resolveHref, visibleGroups, type Section, type SettingsAreaDef, type SettingsViewer } from "./settingsAudience";
 
-const SearchIcon = getIcon("search");
 const ArrowUpRight = getIcon("arrow-up-right");
 const ChevronLeft = getIcon("chevron-left");
 const PanelLeftOpen = getIcon("panel-left-open");
@@ -172,79 +160,45 @@ export function SettingsShell({
           onPointerLeave={collapsible?.onPeekLeave}
         />
       ) : null}
-      <Sidebar
-        collapsible="none"
-        id="settings-column"
-        data-slot="settings-column"
-        data-state={collapsed ? (peeking ? "peek" : "closed") : "open"}
-        inert={collapsed && !peeking}
-        onPointerEnter={peeking ? collapsible?.onPeekColumnEnter : undefined}
-        onPointerLeave={peeking ? collapsible?.onPeekColumnLeave : undefined}
-        className={cn(
-          "h-auto min-w-0 w-full self-stretch border-settings-column-divider bg-settings-column lg:h-full lg:w-(--settings-column-width) lg:border-r",
-          columnClass,
-          peeking && "lg:absolute lg:inset-y-0 lg:start-0 lg:z-30 lg:shadow-lg",
-        )}
-      >
-        <SidebarHeader className="gap-3 px-2 pt-4 pb-2">
-          {collapsible && hasColumn ? <SettingsColumnToggle buttonRef={collapsible.columnToggleRef} collapsed={collapsed} peek={peeking} onToggle={collapsible.onToggle} /> : null}
-          {backLink ? <div data-slot="settings-back-link">{backLink}</div> : null}
-          {!(layout === "docked" && backLink) ? <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{labels?.columnTitle ?? area.title}</h2> : null}
-          <HitField pad={6} className="relative">
-            <SearchIcon aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-settings-helper" />
-            <SidebarInput
-              variant="pill"
-              type="search"
-              className="pl-9"
-              aria-label={searchLabel}
-              placeholder={searchLabel}
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape" && searchQuery) {
-                  e.preventDefault();
-                  onSearchChange("");
-                }
-              }}
-            />
-          </HitField>
-        </SidebarHeader>
-        <SidebarContent className={cn("gap-0 px-2 pb-4", searching && "hidden lg:flex")}>
-          {groups.map((group) => (
-            <SidebarGroup key={group.label} className="p-0 pt-5">
-              <SidebarGroupLabel className="h-8 px-2 text-[length:var(--settings-group-label-size)] font-normal text-settings-helper">
-                {group.label}
-              </SidebarGroupLabel>
-              <SidebarMenu className="gap-[var(--settings-column-row-gap)]">
-                {group.sections.map((section) => {
-                  const Icon = getIcon(section.icon);
-                  const isLink = section.kind === "link";
-                  return (
-                    <SidebarMenuItem key={section.id}>
-                      <SidebarMenuButton
-                        size="settings"
-                        isActive={section.id === active?.id}
-                        render={(props) => (
-                          <a {...props} href={rowHref(section)} onClick={(e) => go(section, e)}>
-                            {props.children}
-                          </a>
-                        )}
-                        data-kind={section.kind}
-                        aria-current={section.id === active?.id ? "page" : undefined}
-                        aria-describedby={isLink ? describedId : undefined}
-                      >
-                        <Icon aria-hidden className="size-[18px] text-settings-helper" />
-                        <span className="flex-1 truncate">{section.label}</span>
-                        {isLink ? <ArrowUpRight aria-hidden className="size-3.5 text-settings-arrow" /> : null}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroup>
-          ))}
-        </SidebarContent>
-      </Sidebar>
+      <SectionSidebar
+        sidebarProps={{
+          id: "settings-column",
+          "data-slot": "settings-column",
+          "data-state": collapsed ? (peeking ? "peek" : "closed") : "open",
+          inert: collapsed && !peeking,
+          onPointerEnter: peeking ? collapsible?.onPeekColumnEnter : undefined,
+          onPointerLeave: peeking ? collapsible?.onPeekColumnLeave : undefined,
+          className: cn(
+            "h-auto min-w-0 w-full self-stretch border-settings-column-divider bg-settings-column lg:h-full lg:w-(--settings-column-width) lg:border-r",
+            columnClass,
+            peeking && "lg:absolute lg:inset-y-0 lg:start-0 lg:z-30 lg:shadow-lg",
+          ),
+        }}
+        headerTop={
+          <>
+            {collapsible && hasColumn ? <SettingsColumnToggle buttonRef={collapsible.columnToggleRef} collapsed={collapsed} peek={peeking} onToggle={collapsible.onToggle} /> : null}
+            {backLink ? <div data-slot="settings-back-link">{backLink}</div> : null}
+          </>
+        }
+        title={!(layout === "docked" && backLink) ? (labels?.columnTitle ?? area.title) : undefined}
+        search={{ value: searchQuery, onChange: onSearchChange, label: searchLabel }}
+        contentClassName={cn(searching && "hidden lg:flex")}
+        groups={groups.map((group) => ({
+          id: group.label,
+          label: group.label,
+          items: group.sections.map((section) => ({
+            id: section.id,
+            label: section.label,
+            icon: section.icon,
+            href: rowHref(section),
+            active: section.id === active?.id,
+            kind: section.kind,
+            describedBy: section.kind === "link" ? describedId : undefined,
+            trailing: section.kind === "link" ? <ArrowUpRight aria-hidden className="size-3.5 text-settings-arrow" /> : undefined,
+            onClick: (e: MouseEvent) => go(section, e),
+          })),
+        }))}
+      />
 
       <Content
         data-slot="settings-content"

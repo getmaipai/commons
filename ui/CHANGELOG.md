@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.279] - ui-v0.5.279
+
+- SectionSidebar: the settings shell's column (title, pill search, groups of icon rows) extracted into one kit part, `ui/src/primitives/SectionSidebar.tsx`, that `SettingsShell` and the News sidebar (NEWS-SIDEBAR-01) both draw with. A row may carry a picture the host serves in place of an icon, and the search reports Enter. `SettingsShell` draws the same DOM through it; its tests pass unchanged.
+
 ## [0.5.278] - ui-v0.5.278
 
 - StoryFeed and ArticleView: a picture is pinned inside its frame (`absolute inset-0`, covering it), so a tall portrait is cropped instead of stretching the card (Safari drew it at its own height). The hero ratio default is 2 / 1 and its height stops at `--story-hero-max-h` (26rem); other card pictures stop at `--story-card-max-h` (18rem) and the article's lead picture at `--article-lead-max-h` (24rem).
