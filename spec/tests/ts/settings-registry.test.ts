@@ -29,6 +29,15 @@ describe("spec/settings/keys.json", () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
+  // Hubs compare their own declaration with this file entry by entry (Home's settings drift check). A key that
+  // leaves `secret` out reads the same but is a different entry, so it fails there (spec-v0.1.177,
+  // generation.music.length). Every entry says it outright.
+  test("every entry declares secret as true or false", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const missing = entries.filter((e) => typeof e.secret !== "boolean").map((e) => e.key);
+    expect(missing).toEqual([]);
+  });
+
   test("the retired turn pipeline toggle is absent", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     expect(entries.some((e) => e.key === "turn.pipeline.next")).toBe(false);
