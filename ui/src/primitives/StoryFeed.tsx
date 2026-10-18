@@ -1,5 +1,5 @@
 import { getIcon } from "@/kit/icons";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
@@ -12,6 +12,7 @@ import {
 } from "@/kit/dashboard/components/ui/dropdown-menu";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/kit/dashboard/components/ui/empty";
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/kit/dashboard/components/ui/item";
+import { Tabs, TabsList, TabsTrigger } from "@/kit/dashboard/components/ui/tabs";
 import { RelativeTime } from "@/kit/ui/relative-time";
 import { cn, HIT_AREA_ROW } from "@/kit/utils";
 
@@ -34,22 +35,30 @@ export interface StoryCardData {
   saved: boolean;
   opened: boolean;
   open_url?: string;
+  /** The hub's day group ("This morning"); consecutive rows with the same group draw under one heading. */
+  group?: string;
+  /** The hub-built line above the headline ("Top story · 4 outlets", "Science"). */
+  kicker?: string;
 }
+
+/** One topic chip under the header. An empty `id` means All. */
+export interface StoryFilter { id: string; label: string; selected?: boolean }
 
 /** The `story_feed` block's props. */
 export interface StoryFeedData {
   layout: "today" | "channel" | "rows";
-  header?: { title: string; subtitle?: string; channel?: { kind: "topic" | "source"; key: string; followed: boolean } };
+  header?: { title: string; subtitle?: string; dateline?: string; channel?: { kind: "topic" | "source"; key: string; followed: boolean } };
   hero?: StoryCardData;
   featured?: StoryCardData[];
   shelves?: Array<{ title: string; channels?: Array<{ kind: "topic" | "source"; key: string; label: string }>; stories: StoryCardData[] }>;
   rows?: StoryCardData[];
+  filters?: StoryFilter[];
   as_of: string;
 }
 
 /** What a card can ask for. The feed never names a route: the page's `actions` map says what each name does. */
-export type StoryAction = "open" | "open_channel" | "save" | "follow" | "feedback_more" | "feedback_less" | "open_site" | "reset_mix";
-export type StoryActionIds = { story_id?: string; item_id?: string; channel_kind?: string; channel_key?: string; on?: boolean; url?: string };
+export type StoryAction = "open" | "open_channel" | "save" | "follow" | "feedback_more" | "feedback_less" | "open_site" | "reset_mix" | "filter";
+export type StoryActionIds = { story_id?: string; item_id?: string; channel_kind?: string; channel_key?: string; on?: boolean; url?: string; filter_id?: string };
 
 export interface StoryFeedProps {
   data: StoryFeedData;
@@ -85,9 +94,15 @@ function CardMenu({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   );
 }
 
+function Kicker({ story }: { story: StoryCardData }) {
+  if (!story.kicker) return null;
+  return <p data-slot="story-kicker" className="text-kicker text-xs font-semibold tracking-wide uppercase">{story.kicker}</p>;
+}
+
+/** An opened story mutes its headline and source line; the card keeps full strength. */
 function SourceLine({ story }: { story: StoryCardData }) {
   return (
-    <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-xs">
+    <div data-slot="story-source" data-opened={story.opened ? "" : undefined} className={cn("flex flex-wrap items-center gap-x-2 text-xs", story.opened ? "text-muted-foreground" : "text-foreground")}>
       <span>{story.publisher}</span>
       <RelativeTime at={story.published_at} />
       {story.outlets > 1 ? <Badge variant="secondary">{story.outlets} sources</Badge> : null}
@@ -98,16 +113,20 @@ function SourceLine({ story }: { story: StoryCardData }) {
   );
 }
 
-function StoryImage({ story, ratio, large }: { story: StoryCardData; ratio: number; large?: boolean }) {
+/** The hero's picture ratio is the `--story-hero-ratio` token (default 16 / 9), set through the kit AspectRatio's own variable. */
+const HERO_RATIO_STYLE = { "--ratio": "var(--story-hero-ratio, 16 / 9)" } as CSSProperties;
+
+function StoryImage({ story, ratio, large, hero }: { story: StoryCardData; ratio: number; large?: boolean; hero?: boolean }) {
+  const style = hero ? HERO_RATIO_STYLE : undefined;
   if (!story.image) {
     return (
-      <AspectRatio ratio={ratio} className="bg-muted text-muted-foreground flex items-center justify-center" data-slot="story-image" data-empty="">
+      <AspectRatio ratio={ratio} style={style} className="bg-muted text-muted-foreground flex items-center justify-center" data-slot="story-image" data-empty="">
         <NewspaperIcon aria-hidden className="size-8" />
       </AspectRatio>
     );
   }
   return (
-    <AspectRatio ratio={ratio} data-slot="story-image">
+    <AspectRatio ratio={ratio} style={style} data-slot="story-image">
       <img
         src={large ? story.image.w1280 : story.image.w480}
         srcSet={`${story.image.w480} 480w, ${story.image.w1280} 1280w`}
@@ -129,14 +148,16 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
       data-tier={tier}
       data-opened={story.opened ? "" : undefined}
       interactive
-      className={cn("relative gap-0 py-0", story.opened && "opacity-70", tier === "hero" && "lg:col-span-8 lg:row-span-2", tier === "featured" && "lg:col-span-4", tier === "half" && "lg:col-span-6", tier === "shelf" && "w-64 shrink-0 snap-start")}
+      className={cn("relative gap-0 py-0", tier === "hero" && "lg:col-span-8 lg:row-span-2", tier === "featured" && "lg:col-span-4", tier === "half" && "lg:col-span-6", tier === "shelf" && "w-64 shrink-0 snap-start")}
     >
-      <StoryImage story={story} ratio={hero ? 3 / 2 : tier === "shelf" ? 4 / 3 : 16 / 9} large={hero} />
+      <StoryImage story={story} ratio={hero ? 16 / 9 : tier === "shelf" ? 4 / 3 : 16 / 9} large={hero} hero={hero} />
       <CardContent className="flex flex-col gap-2 py-4">
+        <Kicker story={story} />
         <button
           type="button"
           onClick={open}
-          className={cn("text-left font-semibold underline-offset-2 hover:underline focus-visible:underline after:absolute after:inset-0 after:content-['']", hero ? "text-2xl leading-tight" : "text-base leading-snug")}
+          data-opened={story.opened ? "" : undefined}
+          className={cn("text-left font-semibold underline-offset-2 hover:underline focus-visible:underline after:absolute after:inset-0 after:content-['']", story.opened && "text-muted-foreground", hero ? "text-2xl leading-tight" : "text-base leading-snug")}
         >
           {story.title}
         </button>
@@ -151,17 +172,23 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
 function StoryRow({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   const open = () => ctx.onAction?.("open", { story_id: story.story_id, item_id: story.item_id });
   return (
-    <Item variant="outline" data-slot="story-row" data-opened={story.opened ? "" : undefined} className={cn("relative", story.opened && "opacity-70")}>
-      <ItemMedia variant="image" className="size-20">
+    <Item variant="outline" size="story" data-slot="story-row" data-opened={story.opened ? "" : undefined} className="relative">
+      <ItemMedia variant="thumbnail">
         {story.image ? (
-          <img src={story.image.w480} alt={story.image.alt} loading="lazy" className="size-full object-cover" />
+          <img src={story.image.w480} alt={story.image.alt} loading="lazy" />
         ) : (
           <NewspaperIcon aria-hidden className="text-muted-foreground size-6" />
         )}
       </ItemMedia>
       <ItemContent>
+        <Kicker story={story} />
         <ItemTitle>
-          <button type="button" onClick={open} className="text-left underline-offset-2 hover:underline focus-visible:underline after:absolute after:inset-0 after:content-['']">
+          <button
+            type="button"
+            onClick={open}
+            data-opened={story.opened ? "" : undefined}
+            className={cn("text-left underline-offset-2 hover:underline focus-visible:underline after:absolute after:inset-0 after:content-['']", story.opened && "text-muted-foreground")}
+          >
             {story.title}
           </button>
         </ItemTitle>
@@ -169,6 +196,34 @@ function StoryRow({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
       </ItemContent>
     </Item>
   );
+}
+
+/** The topic chips: one row of kit pills; the chosen one is pressed. Drawn only when the page mapped `filter`. */
+function FilterChips({ filters, ctx }: { filters: StoryFilter[]; ctx: Ctx }) {
+  if (!ctx.onAction || !ctx.available.includes("filter") || filters.length === 0) return null;
+  const chosen = filters.find((f) => f.selected);
+  return (
+    <Tabs value={chosen ? `f:${chosen.id}` : ""} onValueChange={(value) => ctx.onAction?.("filter", { filter_id: String(value).slice(2) })} className="min-w-0 max-w-full">
+      <TabsList variant="pill" aria-label="Filter stories" data-slot="story-filters">
+        {filters.map((filter) => (
+          <TabsTrigger key={filter.id} value={`f:${filter.id}`} aria-pressed={filter.selected === true} className="min-h-[48px] min-w-[48px]">
+            {filter.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
+  );
+}
+
+/** Consecutive rows with the same `group` fall under one heading with a muted count; rows with no group stay ungrouped. */
+function groupRows(rows: StoryCardData[]): Array<{ group?: string; stories: StoryCardData[] }> {
+  const out: Array<{ group?: string; stories: StoryCardData[] }> = [];
+  for (const story of rows) {
+    const last = out[out.length - 1];
+    if (last && last.group === story.group) last.stories.push(story);
+    else out.push({ group: story.group, stories: [story] });
+  }
+  return out;
 }
 
 function ChannelHeader({ header, ctx }: { header: NonNullable<StoryFeedData["header"]>; ctx: Ctx }) {
@@ -180,6 +235,7 @@ function ChannelHeader({ header, ctx }: { header: NonNullable<StoryFeedData["hea
       <div className="min-w-0">
         <h2 className="text-2xl font-semibold tracking-tight">{header.title}</h2>
         {header.subtitle ? <p className="text-muted-foreground text-sm">{header.subtitle}</p> : null}
+        {header.dateline ? <p data-slot="story-dateline" className="text-muted-foreground text-xs">{header.dateline}</p> : null}
       </div>
       <div className="flex shrink-0 items-center gap-1">
         {canFollow ? (
@@ -246,6 +302,7 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
   return (
     <section data-slot="story-feed" data-layout={data.layout} aria-label={data.header?.title ?? "Stories"} className={cn("flex min-w-0 flex-col gap-6", className)}>
       {data.header ? <ChannelHeader header={data.header} ctx={ctx} /> : null}
+      <FilterChips filters={data.filters ?? []} ctx={ctx} />
       {empty ? (
         <Empty>
           <EmptyHeader>
@@ -264,13 +321,20 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
         </div>
       ) : null}
       {(data.shelves ?? []).filter((shelf) => shelf.stories.length > 0).map((shelf) => <Shelf key={shelf.title} shelf={shelf} ctx={ctx} />)}
-      {rows.length > 0 ? (
-        <ul data-slot="story-rows" className="flex list-none flex-col gap-2 p-0">
-          {rows.map((story) => (
-            <li key={story.story_id}><StoryRow story={story} ctx={ctx} /></li>
-          ))}
-        </ul>
-      ) : null}
+      {groupRows(rows).map((segment, index) => (
+        <div key={`${segment.group ?? ""}:${index}`} data-slot="story-group" className="flex min-w-0 flex-col gap-2">
+          {segment.group ? (
+            <h3 className="text-lg font-semibold">
+              {segment.group} <span className="text-muted-foreground text-sm font-normal">{segment.stories.length}</span>
+            </h3>
+          ) : null}
+          <ul data-slot="story-rows" className="flex list-none flex-col gap-2 p-0">
+            {segment.stories.map((story) => (
+              <li key={story.story_id}><StoryRow story={story} ctx={ctx} /></li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </section>
   );
 }

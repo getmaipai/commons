@@ -10,6 +10,7 @@ import { Separator } from "./separator"
 // themselves and every other row keeps its class strings byte for byte.
 const ItemSizeContext = React.createContext<string | undefined>(undefined)
 const useIsSetting = () => React.useContext(ItemSizeContext) === "setting"
+const useIsStory = () => React.useContext(ItemSizeContext) === "story"
 
 function ItemGroup({
   className,
@@ -77,6 +78,10 @@ const itemVariants = cva(
         default: "gap-2.5 px-3 py-2.5",
         sm: "gap-2.5 px-3 py-2.5",
         xs: "gap-2 px-2.5 py-2 in-data-[slot=dropdown-menu-content]:p-0",
+        // NEWS-LOOK-02: a headline row. The picture stays beside the text at
+        // every width and font scale (never wraps above it); the text column
+        // may shrink (see ItemContent) and the title runs to three lines.
+        story: "flex-nowrap items-start gap-3 px-3 py-2.5",
         setting:
           "min-h-[60px] flex-nowrap gap-4 rounded-none px-4 py-3 [a]:hover:bg-settings-fill/50",
       },
@@ -124,6 +129,9 @@ const itemMediaVariants = cva(
       variant: {
         default: "bg-transparent",
         icon: "[&_svg:not([class*='size-'])]:size-4",
+        // NEWS-LOOK-02: a 16:9 thumbnail, 112 px wide, for a headline row.
+        thumbnail:
+          "aspect-video w-28 overflow-hidden rounded-md bg-muted [&_img]:size-full [&_img]:object-cover",
         image:
           "size-10 overflow-hidden rounded-sm group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover",
       },
@@ -151,12 +159,14 @@ function ItemMedia({
 
 function ItemContent({ className, ...props }: React.ComponentProps<"div">) {
   const setting = useIsSetting()
+  const story = useIsStory()
   return (
     <div
       data-slot="item-content"
       className={cn(
         "flex flex-1 flex-col gap-1 group-data-[size=xs]/item:gap-0 [&+[data-slot=item-content]]:flex-none",
         setting && "max-w-(--settings-row-text-max) min-w-0 gap-0",
+        story && "min-w-0",
         className
       )}
       {...props}
@@ -166,12 +176,14 @@ function ItemContent({ className, ...props }: React.ComponentProps<"div">) {
 
 function ItemTitle({ className, ...props }: React.ComponentProps<"div">) {
   const setting = useIsSetting()
+  const story = useIsStory()
   return (
     <div
       data-slot="item-title"
       className={cn(
         "line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4",
         setting && "leading-5 text-foreground",
+        story && "block w-auto line-clamp-3 text-base",
         className
       )}
       {...props}

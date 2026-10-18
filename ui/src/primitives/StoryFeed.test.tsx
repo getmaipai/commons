@@ -65,10 +65,15 @@ describe("StoryFeed", () => {
     expect(container.querySelector("a[href]")).toBeNull();
   });
 
-  test("an opened story is dimmed and a saved one says so", () => {
+  test("an opened story keeps the card at full strength and mutes its headline and source line; a saved one says so", () => {
     const marked = { ...data, hero: { ...data.hero!, opened: true, saved: true } };
     const { container, getByText } = render(<StoryFeed data={marked} />);
-    expect(container.querySelector('[data-tier="hero"]')?.hasAttribute("data-opened")).toBe(true);
+    const card = container.querySelector('[data-tier="hero"]')!;
+    expect(card.hasAttribute("data-opened")).toBe(true);
+    expect(card.className).not.toContain("opacity");
+    expect(getByText("Headline 1").hasAttribute("data-opened")).toBe(true);
+    expect(getByText("Headline 1").className).toContain("text-muted-foreground");
+    expect(card.querySelector('[data-slot="story-source"]')?.hasAttribute("data-opened")).toBe(true);
     expect(getByText("Saved")).toBeTruthy();
   });
 
@@ -104,5 +109,97 @@ describe("StoryFeed shelf channel buttons", () => {
     cleanup();
     const off = render(<StoryFeed data={shelved} onAction={() => {}} available={["open"]} />);
     expect(off.queryByText("Science")).toBeNull();
+  });
+});
+
+describe("StoryFeed look (NEWS-LOOK-02)", () => {
+  const rowsData = (rows: Array<Partial<NonNullable<StoryFeedData["rows"]>[number]>>): StoryFeedData => ({
+    layout: "rows",
+    rows: rows.map((row, i) => ({ ...data.hero!, story_id: `story-r${i}a1b2c`, item_id: `news-r${i}a1b2c`, title: `Row ${i}`, group: undefined, kicker: undefined, ...row })),
+    as_of: data.as_of,
+  });
+
+  test("the dateline sits under the title in the muted small style", () => {
+    const { container } = render(<StoryFeed data={data} />);
+    const dateline = container.querySelector('[data-slot="story-dateline"]')!;
+    expect(dateline.textContent).toBe(data.header!.dateline!);
+    expect(dateline.className).toContain("text-muted-foreground");
+    expect(dateline.className).toContain("text-xs");
+  });
+
+  test("filter chips fire `filter` with the chip's id and mark the selected one pressed", () => {
+    const onAction = mock(() => {});
+    const { getByRole } = render(<StoryFeed data={data} onAction={onAction} available={["open", "filter"]} />);
+    expect(getByRole("tab", { name: "All" }).getAttribute("aria-pressed")).toBe("true");
+    expect(getByRole("tab", { name: "World" }).getAttribute("aria-pressed")).toBe("false");
+    const science = getByRole("tab", { name: "Science" });
+    fireEvent.pointerDown(science, { button: 0 });
+    fireEvent.mouseDown(science, { button: 0 });
+    fireEvent.click(science);
+    expect(onAction).toHaveBeenCalledWith("filter", { filter_id: "science" });
+  });
+
+  test("the All chip's empty id is what a click fires", () => {
+    const onAction = mock(() => {});
+    const moved = { ...data, filters: [{ id: "", label: "All" }, { id: "world", label: "World", selected: true }] };
+    const { getByRole } = render(<StoryFeed data={moved} onAction={onAction} available={["filter"]} />);
+    const all = getByRole("tab", { name: "All" });
+    fireEvent.pointerDown(all, { button: 0 });
+    fireEvent.mouseDown(all, { button: 0 });
+    fireEvent.click(all);
+    expect(onAction).toHaveBeenCalledWith("filter", { filter_id: "" });
+  });
+
+  test("the chips are hidden when the page did not map `filter`", () => {
+    const { queryByRole, container } = render(<StoryFeed data={data} onAction={() => {}} available={["open"]} />);
+    expect(queryByRole("tab", { name: "World" })).toBeNull();
+    expect(container.querySelector('[data-slot="story-filters"]')).toBeNull();
+  });
+
+  test("consecutive rows with one group draw under one heading with a muted count", () => {
+    const { container, getAllByRole } = render(
+      <StoryFeed data={rowsData([{ group: "This morning" }, { group: "This morning" }, { group: "Last night" }, { group: "This morning" }])} />,
+    );
+    const headings = getAllByRole("heading", { level: 3 });
+    expect(headings.map((h) => h.textContent)).toEqual(["This morning 2", "Last night 1", "This morning 1"]);
+    expect(headings[0]!.querySelector("span")?.className).toContain("text-muted-foreground");
+    expect(container.querySelectorAll('[data-slot="story-group"]')).toHaveLength(3);
+  });
+
+  test("rows with no group draw without a heading", () => {
+    const { container, queryAllByRole } = render(<StoryFeed data={rowsData([{}, {}])} />);
+    expect(queryAllByRole("heading", { level: 3 })).toHaveLength(0);
+    expect(container.querySelectorAll('[data-slot="story-row"]')).toHaveLength(2);
+  });
+
+  test("a kicker draws above the headline on a card and on a row, in the kicker token", () => {
+    const card = render(<StoryFeed data={data} />);
+    const kicker = card.container.querySelector('[data-tier="hero"] [data-slot="story-kicker"]')!;
+    expect(kicker.textContent).toBe(data.hero!.kicker!);
+    expect(kicker.className).toContain("text-kicker");
+    expect(kicker.compareDocumentPosition(card.getByText("Headline 1")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    cleanup();
+    const row = render(<StoryFeed data={rowsData([{ kicker: "Science" }, {}])} />);
+    expect(row.container.querySelectorAll('[data-slot="story-row"] [data-slot="story-kicker"]')).toHaveLength(1);
+  });
+
+  test("the hero picture ratio is the --story-hero-ratio token, 16 / 9 by default", () => {
+    const { container } = render(<StoryFeed data={data} />);
+    const frame = container.querySelector('[data-tier="hero"] [data-slot="story-image"]') as HTMLElement;
+    expect(frame.getAttribute("style")).toContain("var(--story-hero-ratio, 16 / 9)");
+  });
+
+  test("a row keeps the picture beside the title: no wrapping, a shrinkable text column, a three-line title, a 112 px 16:9 thumbnail", () => {
+    const { container } = render(<StoryFeed data={rowsData([{}])} />);
+    const row = container.querySelector('[data-slot="story-row"]') as HTMLElement;
+    expect(row.className).toContain("flex-nowrap");
+    expect(row.className).not.toMatch(/(^|\s)flex-wrap(\s|$)/);
+    const [media, content] = Array.from(row.children) as HTMLElement[];
+    expect(media!.getAttribute("data-slot")).toBe("item-media");
+    expect(media!.className).toContain("w-28");
+    expect(media!.className).toContain("aspect-video");
+    expect(content!.getAttribute("data-slot")).toBe("item-content");
+    expect(content!.className).toContain("min-w-0");
+    expect(content!.querySelector('[data-slot="item-title"]')!.className).toContain("line-clamp-3");
   });
 });

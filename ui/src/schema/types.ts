@@ -318,6 +318,7 @@ export const AnswerBlocksNodeSchema = z.object({
   type: z.literal("answer_blocks"),
   bind: PackageBindingSchema,
   kinds: z.array(z.string()).min(1).optional(),
+  filter_state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40).optional(),
   empty_state: EmptyStateNodeSchema.optional(),
   states: z.object({ needs_place: DataStateSchema, down: DataStateSchema, timed_out: DataStateSchema }).partial().strict().optional(),
   actions: z
@@ -358,6 +359,20 @@ export const PickerNodeSchema = z.object({
     .optional(),
 });
 export type PickerNode = z.infer<typeof PickerNodeSchema>;
+
+/** NEWS-LOOK-02: a search field that writes page state and fires `submit` with `{q}`; recents are bound rows. */
+export const SearchNodeSchema = z.object({
+  type: z.literal("search"),
+  state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40).optional(),
+  label: z.string().min(1).max(40).optional(),
+  placeholder: z.string().min(1).max(60).optional(),
+  recents: PackageBindingSchema.optional(),
+  item_key_field: z.string().optional(),
+  item_label_field: z.string().optional(),
+  submit: ActionSchema.optional(),
+  clear_recents: ActionSchema.optional(),
+});
+export type SearchNode = z.infer<typeof SearchNodeSchema>;
 
 export const SectionNodeSchema: z.ZodType<SectionNode> = z.lazy(() =>
   z.object({
@@ -425,6 +440,7 @@ export type UiNode =
   | WidgetRowNode
   | AnswerBlocksNode
   | PickerNode
+  | SearchNode
   | TabsNode;
 
 export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
@@ -448,6 +464,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     WidgetRowNodeSchema,
     AnswerBlocksNodeSchema,
     PickerNodeSchema,
+    SearchNodeSchema,
     TabsNodeSchema,
   ]),
 );
@@ -474,5 +491,6 @@ export const NODE_TYPES = [
   "widget_row",
   "answer_blocks",
   "picker",
+  "search",
   "tabs",
 ] as const;

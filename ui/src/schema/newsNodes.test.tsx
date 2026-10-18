@@ -163,3 +163,133 @@ describe("navigate state arrives as page state", () => {
     expect(calls.find((c) => c.url.endsWith("/data/channel"))?.body).toEqual({ key: "science" });
   });
 });
+
+describe("answer_blocks filter_state (NEWS-LOOK-02)", () => {
+  const page = PageNodeSchema.parse({
+    type: "page",
+    id: "t",
+    title: "Today",
+    body: [{ type: "answer_blocks", filter_state: "topic", bind: { source: "package", path: "today", params: { topic: "$state.topic" } } }],
+  });
+  const feedCalls = () => calls.filter((c) => c.url.endsWith("/data/today"));
+
+  test("a chip writes its id to the page state, nothing is called, and the data call refetches with it", async () => {
+    const { findByRole } = renderWithQueryClient(
+      <MemoryRouter initialEntries={["/apps/news"]}>
+        <SchemaPage page={page} packageId="news" />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(feedCalls()).toHaveLength(1));
+    expect(feedCalls()[0]!.body).toEqual({});
+    const science = await findByRole("tab", { name: "Science" });
+    fireEvent.pointerDown(science, { button: 0 });
+    fireEvent.mouseDown(science, { button: 0 });
+    fireEvent.click(science);
+    await waitFor(() => expect(feedCalls()).toHaveLength(2));
+    expect(feedCalls()[1]!.body).toEqual({ topic: "science" });
+    expect(calls.filter((c) => c.method === "POST" && !c.url.includes("/data/"))).toHaveLength(0);
+  });
+
+  test("without filter_state the chips are not drawn", async () => {
+    const plain = PageNodeSchema.parse({ type: "page", id: "t", title: "Today", body: [{ type: "answer_blocks", bind: { source: "package", path: "today" } }] });
+    const { findByText, queryByRole } = renderWithQueryClient(
+      <MemoryRouter initialEntries={["/apps/news"]}>
+        <SchemaPage page={plain} packageId="news" />
+      </MemoryRouter>,
+    );
+    await findByText("Headline 1");
+    expect(queryByRole("tab", { name: "Science" })).toBeNull();
+  });
+});
+
+describe("search node (NEWS-LOOK-02)", () => {
+  const recents = [{ key: "recent-aaaaaa", label: "science" }, { key: "recent-bbbbbb", label: "harbor" }];
+  const searchNode: UiNode = {
+    type: "search",
+    label: "Search News",
+    placeholder: "Search stories",
+    recents: { source: "package", path: "recents", stream: false },
+    submit: { navigate: { to: "/apps/news/search", state: { q: "{q}" } } },
+    clear_recents: { call: { target: `${P}clear-recents` } },
+  };
+  const searchPage = PageNodeSchema.parse({
+    type: "page",
+    id: "s",
+    title: "Search",
+    body: [searchNode, { type: "answer_blocks", bind: { source: "package", path: "results", params: { q: "$state.q" } } }],
+  });
+  const resultCalls = () => calls.filter((c) => c.url.endsWith("/data/results"));
+  beforeEach(() => {
+    globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      calls.push({ url, method: init?.method ?? "GET", body: init?.body ? JSON.parse(String(init.body)) : undefined });
+      if (url.endsWith("/data/recents")) return Promise.resolve(new Response(JSON.stringify({ rows: recents }), { status: 200 }));
+      if (url.includes("/data/")) return Promise.resolve(new Response(JSON.stringify({ as_of: "2026-10-17T13:00:00Z", blocks: [feedBlock] }), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    }) as unknown as typeof fetch;
+  });
+  const mount = () =>
+    renderWithQueryClient(
+      <MemoryRouter initialEntries={["/apps/news/search"]}>
+        <SchemaPage page={searchPage} packageId="news" />
+        <Where />
+      </MemoryRouter>,
+    );
+  const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  test("typing writes the state key only after the 250 ms pause, with a visible name and nothing sent by the node", async () => {
+    const { findByLabelText } = mount();
+    const field = (await findByLabelText("Search News")) as HTMLInputElement;
+    await waitFor(() => expect(resultCalls()).toHaveLength(1));
+    fireEvent.change(field, { target: { value: "sci" } });
+    fireEvent.change(field, { target: { value: "science" } });
+    await pause(100);
+    expect(resultCalls()).toHaveLength(1);
+    await waitFor(() => expect(resultCalls()).toHaveLength(2));
+    expect(resultCalls()[1]!.body).toEqual({ q: "science" });
+    expect(calls.filter((c) => c.url.includes("/actions/"))).toHaveLength(0);
+  });
+
+  test("Enter fires submit with the item {q}, filling the navigate state, and an empty field fires nothing", async () => {
+    const { findByLabelText, getByTestId } = mount();
+    const field = await findByLabelText("Search News");
+    fireEvent.keyDown(field, { key: "Enter" });
+    await pause(20);
+    expect(getByTestId("where").textContent).toBe("/apps/news/search");
+    fireEvent.change(field, { target: { value: "  harbor " } });
+    fireEvent.keyDown(field, { key: "Enter" });
+    await waitFor(() => expect(resultCalls().some((c) => (c.body as { q?: string }).q === "  harbor ")).toBe(true));
+    expect(getByTestId("where").textContent).toBe("/apps/news/search");
+  });
+
+  test("recents show as chips while the field is empty; a chip sets the state and fires submit", async () => {
+    const { findByText, findByLabelText, queryByText } = mount();
+    const chip = await findByText("harbor");
+    expect(await findByText("science")).toBeTruthy();
+    fireEvent.click(chip);
+    await waitFor(() => expect(resultCalls().some((c) => (c.body as { q?: string }).q === "harbor")).toBe(true));
+    expect(((await findByLabelText("Search News")) as HTMLInputElement).value).toBe("harbor");
+    expect(queryByText("science")).toBeNull();
+  });
+
+  test("Clear fires clear_recents", async () => {
+    const { findByText } = mount();
+    fireEvent.click(await findByText("Clear"));
+    await waitFor(() => expect(calls.some((c) => c.url === `${P}clear-recents`)).toBe(true));
+  });
+
+  test("no recents are drawn when the binding returns no rows, and no Clear either", async () => {
+    globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      calls.push({ url, method: init?.method ?? "GET", body: init?.body ? JSON.parse(String(init.body)) : undefined });
+      if (url.endsWith("/data/recents")) return Promise.resolve(new Response(JSON.stringify({ rows: [] }), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ as_of: "2026-10-17T13:00:00Z", blocks: [feedBlock] }), { status: 200 }));
+    }) as unknown as typeof fetch;
+    const { findByLabelText, container, queryByText } = mount();
+    await findByLabelText("Search News");
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/data/recents"))).toBe(true));
+    await pause(30);
+    expect(container.querySelector('[data-slot="search-recents"]')).toBeNull();
+    expect(queryByText("Clear")).toBeNull();
+  });
+});

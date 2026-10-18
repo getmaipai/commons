@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { ApiError, request } from "@/kit/http";
@@ -58,6 +58,7 @@ import type {
   WidgetRowNode,
   AnswerBlocksNode,
   PickerNode,
+  SearchNode,
   TabsNode,
   DataState,
 } from "@/kit/schema/types";
@@ -149,9 +150,11 @@ interface PackageDataBody {
 function newsActionsFor(
   actions: AnswerBlocksNode["actions"],
   dispatch: (action: Action, items?: Row[]) => void,
+  filter?: { state: string; write: (patch: Record<string, unknown>) => void },
 ): { available: string[]; onAction: (action: string, ids: Row) => void } | undefined {
-  if (!actions) return undefined;
+  if (!actions && !filter) return undefined;
   const entry = (name: string): Action | undefined => {
+    if (!actions) return undefined;
     switch (name) {
       case "open": return actions.open;
       case "open_channel": return actions.open_channel;
@@ -167,8 +170,13 @@ function newsActionsFor(
   };
   const names = ["open", "open_channel", "save", "follow", "feedback_more", "feedback_less", "summarize", "reset_mix", "listen"];
   return {
-    available: [...names.filter((name) => entry(name) !== undefined), "open_site"],
+    available: [...names.filter((name) => entry(name) !== undefined), "open_site", ...(filter ? ["filter"] : [])],
     onAction: (name, ids) => {
+      if (name === "filter") {
+        // NEWS-LOOK-02: a chip writes its id to the page's state and nothing else; the page's bind params read it back.
+        if (filter) filter.write({ [filter.state]: typeof ids.filter_id === "string" ? ids.filter_id : "" });
+        return;
+      }
       if (name === "open_site") {
         const url = ids.url;
         if (typeof url === "string" && /^https?:\/\//i.test(url)) window.open(url, "_blank", "noopener,noreferrer");
@@ -232,7 +240,8 @@ function DataStateNotice({ notice, state, onRetry }: { notice: DataState; state:
 function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: Row }) {
   const query = useBinding<PackageDataBody>(node.bind, state);
   const { dispatch, pendingConfirm, lastError } = useDispatchAction();
-  const news = newsActionsFor(node.actions, dispatch);
+  const writer = useContext(PageStateContext);
+  const news = newsActionsFor(node.actions, dispatch, node.filter_state && writer ? { state: node.filter_state, write: (patch) => writer.merge(patch) } : undefined);
   const kinds = node.kinds;
   const blocks = query.data
     ? (query.data.blocks ?? []).filter((block) => !kinds || kinds.includes(String((block as { kind?: unknown } | null)?.kind)))
@@ -418,6 +427,90 @@ function BoundPickerView({ node, state }: { node: PickerNode & { bind: NonNullab
   const query = useBinding<PackageDataBody>(node.bind, state);
   // A failed list of saved places never blocks the fixed options: the picker still opens.
   return <PickerControl node={node} state={state} rows={query.data?.rows ?? []} />;
+}
+
+const SEARCH_DEBOUNCE_MS = 250;
+
+/** NEWS-LOOK-02: the typed text goes to page state after a short pause; Enter fires `submit` with {q}. Recents (a bound
+ * list of rows) show as chips while the field is empty. This node sends nothing itself: every request is the page's
+ * own data call (it reads the state) or the declared action. */
+function SearchControl({ node, state, recents }: { node: SearchNode; state: Row; recents: Row[] }) {
+  const writer = useContext(PageStateContext);
+  const { dispatch, lastError } = useDispatchAction();
+  const key = node.state ?? "q";
+  const fromState = typeof state[key] === "string" ? (state[key] as string) : "";
+  const [text, setText] = useState(fromState);
+  const written = useRef(fromState);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // A change from outside (arriving on the page with a query) shows in the field.
+  if (fromState !== written.current) {
+    written.current = fromState;
+    if (fromState !== text) setText(fromState);
+  }
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+
+  function write(value: string) {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    written.current = value;
+    writer?.merge({ [key]: value === "" ? undefined : value });
+  }
+  function change(value: string) {
+    setText(value);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => write(value), SEARCH_DEBOUNCE_MS);
+  }
+  function submit(value: string) {
+    const q = value.trim();
+    if (q === "") return;
+    write(value);
+    if (node.submit) dispatch(node.submit, [{ q }]);
+  }
+  const keyField = node.item_key_field ?? "key";
+  const labelField = node.item_label_field ?? "label";
+  const chips = text === "" ? recents.map((row) => ({ key: String(readField(row, keyField) ?? ""), label: String(readField(row, labelField) ?? "") })).filter((c) => c.label !== "") : [];
+  return (
+    <div role="search" data-slot="search-node" className="flex min-w-0 flex-col gap-2">
+      <Input
+        type="search"
+        value={text}
+        aria-label={node.label ?? "Search"}
+        placeholder={node.placeholder}
+        autoComplete="off"
+        onChange={(e) => change(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); submit(text); } }}
+      />
+      {chips.length > 0 ? (
+        <div data-slot="search-recents" className="flex min-w-0 flex-wrap items-center gap-2">
+          {chips.map((chip) => (
+            <Button
+              key={chip.key || chip.label}
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              onClick={() => { setText(chip.label); submit(chip.label); }}
+            >
+              {chip.label}
+            </Button>
+          ))}
+          {node.clear_recents ? (
+            <Button type="button" variant="ghost" size="sm" onClick={() => dispatch(node.clear_recents!, [{}])}>Clear</Button>
+          ) : null}
+        </div>
+      ) : null}
+      {lastError ? <p role="status" className="text-sm text-destructive">{lastError}</p> : null}
+    </div>
+  );
+}
+
+function BoundSearchView({ node, state }: { node: SearchNode & { recents: NonNullable<SearchNode["recents"]> }; state: Row }) {
+  const query = useBinding<{ rows?: Row[] }>(node.recents, state);
+  return <SearchControl node={node} state={state} recents={query.data?.rows ?? []} />;
+}
+
+function SearchNodeView({ node, state }: { node: SearchNode; state: Row }) {
+  return node.recents ? <BoundSearchView node={{ ...node, recents: node.recents }} state={state} /> : <SearchControl node={node} state={state} recents={[]} />;
 }
 
 function PickerNodeView({ node, state }: { node: PickerNode; state: Row }) {
@@ -1252,6 +1345,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <AnswerBlocksNodeView node={node} state={state} />;
     case "picker":
       return <PickerNodeView node={node} state={state} />;
+    case "search":
+      return <SearchNodeView node={node} state={state} />;
     case "tabs":
       return <TabsNodeView node={node} state={state} />;
     case "form":

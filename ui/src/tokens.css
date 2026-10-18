@@ -637,6 +637,10 @@
    * this file's own --primary already carries in both themes, kept
    * here on purpose so the orb still reads as the identical blue. */
   --voice-accent: #21a6ff;
+  /* NEWS-LOOK-02: the story kicker (topic, "Top story") in the accent; the light value passes AA on white. */
+  --kicker: #0a6cb0;
+  /* The hero picture ratio, one token (a CSS aspect-ratio value). */
+  --story-hero-ratio: 16 / 9;
   --radius: 12px;
   --sidebar: #eaf0f7;
   --sidebar-foreground: #0b1730;
@@ -806,6 +810,7 @@
     --primary-foreground: #07111f;
     --ring: #21a6ff;
     --voice-accent: #21a6ff;
+    --kicker: #21a6ff;
     --destructive: #ff4b62;
     --destructive-foreground: #07111f;
     --sidebar: #0a1a2e;
@@ -912,6 +917,7 @@
   --primary-foreground: #07111f;
   --ring: #21a6ff;
   --voice-accent: #21a6ff;
+  --kicker: #21a6ff;
   --destructive: #ff4b62;
   --destructive-foreground: #07111f;
   --sidebar: #0a1a2e;
@@ -1017,6 +1023,7 @@ body {
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-voice-accent: var(--voice-accent);
+  --color-kicker: var(--kicker);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
