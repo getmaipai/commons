@@ -1,3 +1,7 @@
+## [spec-v0.1.183] - 2026-10-18
+
+- Settings: `generation.music.length` defaults to `full`, and its help and copy say what each kind sings: Quick is the hook (the first verse and chorus), Full every part, and a song is as long as its words (owner, 2026-10-18; Home music note 18.1a, MUSIC-SPEC-03).
+
 ## [spec-v0.1.182] - 2026-10-18
 
 - UI: `empty_state` gains an optional `action_label` (1 to 40 characters), the button's own words for its action, such as "Add a folder". Without it the kit keeps its plain derived label. Additive.
