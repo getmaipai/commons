@@ -83,3 +83,13 @@ describe("StoryFeed", () => {
     expect(container.querySelectorAll('[data-slot="story-row"]')).toHaveLength(3);
   });
 });
+
+describe("StoryFeed thumbnail rows keep the Item's own padding", () => {
+  test("does not strip the row's padding or gap, so the picture sits inside the border with space before the title (verification pass)", () => {
+    const { container } = render(<StoryFeed data={data} />);
+    const row = container.querySelector('[data-slot="story-row"]') as HTMLElement;
+    expect(row).not.toBeNull();
+    expect(row.className).not.toMatch(/\bgap-0\b/);
+    expect(row.className).not.toMatch(/\bpy-0\b/);
+  });
+});

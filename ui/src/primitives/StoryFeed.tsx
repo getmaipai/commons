@@ -151,7 +151,7 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
 function StoryRow({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   const open = () => ctx.onAction?.("open", { story_id: story.story_id, item_id: story.item_id });
   return (
-    <Item variant="outline" data-slot="story-row" data-opened={story.opened ? "" : undefined} className={cn("relative gap-0 py-0", story.opened && "opacity-70")}>
+    <Item variant="outline" data-slot="story-row" data-opened={story.opened ? "" : undefined} className={cn("relative", story.opened && "opacity-70")}>
       <ItemMedia variant="image" className="size-20">
         {story.image ? (
           <img src={story.image.w480} alt={story.image.alt} loading="lazy" className="size-full object-cover" />
