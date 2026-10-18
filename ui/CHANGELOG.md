@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.280] - ui-v0.5.280
+
+- SectionSidebar: `standalone` draws the column on its own beside page content (its own sidebar provider, hidden below `lg`, the settings column's width, border and surface), and the search can draw `recents` as chips with `onRecent`. A host passes data and handlers only, so no Home wrapper or class is needed. The settings shell is unchanged.
+
 ## [0.5.279] - ui-v0.5.279
 
 - SectionSidebar: the settings shell's column (title, pill search, groups of icon rows) extracted into one kit part, `ui/src/primitives/SectionSidebar.tsx`, that `SettingsShell` and the News sidebar (NEWS-SIDEBAR-01) both draw with. A row may carry a picture the host serves in place of an icon, and the search reports Enter. `SettingsShell` draws the same DOM through it; its tests pass unchanged.

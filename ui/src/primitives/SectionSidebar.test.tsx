@@ -77,4 +77,27 @@ describe("SectionSidebar", () => {
     expect(side.getAttribute("data-slot")).toBe("news-column");
     expect(side.className).toContain("w-72");
   });
+
+  test("recent searches draw as chips under the field and a chosen one reaches the host", () => {
+    const onRecent = mock((_label: string) => {});
+    column({ search: { value: "", onChange: () => {}, label: "Search News", recents: [{ key: "a", label: "oil prices" }, { key: "b", label: "eclipse" }], onRecent } });
+    const list = screen.getByRole("list", { name: "Recent searches" });
+    expect(within(list).getAllByRole("button").map((b) => b.textContent)).toEqual(["oil prices", "eclipse"]);
+    fireEvent.click(within(list).getByRole("button", { name: "eclipse" }));
+    expect(onRecent).toHaveBeenCalledWith("eclipse");
+    cleanup();
+    column({ search: { value: "", onChange: () => {}, label: "Search News", recents: [] } });
+    expect(screen.queryByRole("list", { name: "Recent searches" })).toBeNull();
+  });
+
+  test("standalone brings its own provider, hides below the lg breakpoint and takes the settings column's look", () => {
+    const { container } = render(<SectionSidebar standalone groups={groups} sidebarProps={{ id: "app-column" }} />);
+    const provider = container.querySelector('[data-slot="section-sidebar"]') as HTMLElement;
+    expect(provider.className).toContain("hidden");
+    expect(provider.className).toContain("lg:flex");
+    const side = container.querySelector("#app-column") as HTMLElement;
+    expect(side.className).toContain("w-(--settings-column-width)");
+    expect(side.className).toContain("bg-settings-column");
+    expect(within(container).getByRole("link", { name: "Today" })).toBeTruthy();
+  });
 });
