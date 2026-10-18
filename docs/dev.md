@@ -165,6 +165,38 @@ The kit gained the media pieces the media apps design names (home
   Chrome's drawing was judged in a browser at 1440 and 390 wide in both
   themes.
 
+## LIBRARY-REVAMP-06 slice A: StorageBar, FileTile and FileGrid (`ui-v0.5.282`)
+
+Three additive kit parts for the Library page (Home
+`docs/design/library-2026-10-18.md`, sections 3.3, 3.5, 3.12, 3.13 and 4).
+No existing part changes. `MediaViewer`, the `ShareDialog` generalisation and
+`DataTable` selection are later slices.
+
+- **`StorageBar`** (primitive, `ui/src/primitives/StorageBar.tsx`). Segments
+  are `{ id, label, bytes, hue? }`; it takes numbers and words and knows no
+  file. The segment colours are the themed `--hue-*` tokens, not the chart
+  tokens: `--chart-1..5` are five greys and a near-black in both themes
+  (`--chart-5` vanishes on the dark card), so five kinds cannot be told
+  apart. The five hues are chosen to clear 3:1 against the card in both
+  themes (`contrast.test.ts`); brand blue is 2.6:1 on the light card and is
+  left out. The legend names every kind in text either way.
+- **`FileTile`** (primitive) and **`FileGrid`**. One tab stop with arrow,
+  Home, End movement; selection is controlled (`selectedIds`,
+  `onSelectionChange`). The kit owns no menu: `onActionsClick` reports the
+  click, and `wrapActions` lets the caller wrap the button as a menu trigger
+  (tested with the kit `DropdownMenu` and `asChild`). The select box and
+  actions button keep a 48 px hit area; both are out of the tab order inside
+  a grid and are reached by Space and the menu key (Shift+F10) from the tile.
+- **Density.** `FileGrid` takes the kit's `Density` budget (default
+  `compact`, 2 / 3 / 5 columns) and `density="slider"` to follow
+  `CardSizeSlider` through `cardSizeStyle`. `CardGrid` takes no slider
+  contract itself, so `slider` reads the same `--maipai-card-size` variable
+  the schema renderer already reads.
+- **Ledger rows.** The UI decisions ledger lives in Home
+  (`docs/design/UI-DECISIONS.md`), not here (see MEDIA-PLAYER-01 above); the
+  two rows for these parts are written in that file by the Home session that
+  pins this tag, from the design note's section 4.
+
 ## Workspace status
 
 - `ui/`: `ui-v0.1.0` landed. The kit, extracted read-only from the

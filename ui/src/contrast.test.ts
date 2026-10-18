@@ -272,3 +272,43 @@ describe("WCAG 3:1 non-text contrast for the green and yellow hues (both themes)
     }
   }
 });
+
+// LIBRARY-REVAMP-06 slice A: the StorageBar draws one segment per kind in
+// the STORAGE_BAR_HUES, a graphic that carries meaning, so WCAG 1.4.11
+// asks 3:1 against the card surface the bar sits on, in both themes (the
+// legend also names every kind in text). The chart tokens are not used:
+// they are five greys and a near-black. FileTile's selected state is a
+// checked box (the check glyph on --primary) plus a --primary border and
+// ring; brand blue alone is 2.6:1 on the light card, so the glyph, which
+// does clear the floor, is the cue that carries the meaning.
+describe("WCAG contrast for the StorageBar segments and the FileTile selected state (both themes)", () => {
+  const barHues = ["--hue-violet", "--hue-orange", "--hue-teal", "--hue-pink", "--hue-yellow"];
+  for (const theme of [
+    { name: "light", block: lightRoot },
+    { name: "dark", block: darkRoot },
+  ]) {
+    const hueHex = (token: string): string => {
+      const themed = themedHues[theme.name]![token.replace("--hue-", "")];
+      return themed ?? requiredHex(themeBlock, token);
+    };
+    for (const token of barHues) {
+      test(`${theme.name}: ${token} clears 3.0 on the card`, () => {
+        expect(contrastRatio(hueHex(token), requiredHex(theme.block, "--surface-card"))).toBeGreaterThanOrEqual(3);
+      });
+    }
+    test(`${theme.name}: the selected check glyph clears 4.5 on --primary`, () => {
+      expect(contrastRatio(requiredHex(theme.block, "--primary-foreground"), requiredHex(theme.block, "--primary"))).toBeGreaterThanOrEqual(4.5);
+    });
+    test(`${theme.name}: the duration badge text and secondary line clear 4.5`, () => {
+      expect(contrastRatio(requiredHex(theme.block, "--foreground"), requiredHex(theme.block, "--background"))).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(requiredHex(theme.block, "--muted-foreground"), requiredHex(theme.block, "--surface-card"))).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+
+  test("forced colours keep the bar's segments and swatches as solid system-colour blocks", () => {
+    const rule = css.match(/@media \(forced-colors: active\) \{([\s\S]*?)\n\}/)?.[1] ?? "";
+    expect(rule).toContain('[data-slot="storage-bar-segment"]');
+    expect(rule).toContain("forced-color-adjust: none");
+    expect(rule).toContain("background-color: Highlight");
+  });
+});

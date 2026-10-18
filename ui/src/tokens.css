@@ -1608,6 +1608,19 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   [data-slot="reader"] { position: fixed; inset: 0; z-index: 50; height: 100dvh; min-height: 0; }
 }
 
+/* LIBRARY-REVAMP-06 slice A: the storage bar's segments and swatches are
+ * drawn with background colours, which forced colours removes. Keep them
+ * as solid system-colour blocks so the bar still reads; the legend names
+ * every kind in text either way. */
+@media (forced-colors: active) {
+  [data-slot="storage-bar-segment"],
+  [data-slot="storage-bar-swatch"] {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    border: 1px solid CanvasText;
+  }
+}
+
 /* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */
 /* Targets: --target-min is the smallest control size; the rail reads --rail-button and --rail-width. */
 :root {

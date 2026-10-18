@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.282] - ui-v0.5.282
+
+- LIBRARY-REVAMP-06 slice A: three additive parts for the Library. `StorageBar` is a proportional multi-segment bar with a legend and one spoken summary (zero total, tiny kinds and many kinds handled; hue tokens, not chart tokens). `FileTile` is a 4:3 lazy thumbnail with a kind-icon fallback, duration badge, shared avatars with a +N cap, a select box and an actions button (48 px targets). `FileGrid` adds one tab stop with arrow, Home and End movement, controlled selection (Shift range, Ctrl or Command toggle, Space, Ctrl or Command A, Escape), the empty slot and the density budget or the card-size slider. Showcases: `StorageBarShowcase`, `FileGridShowcase`. Forced-colours rule for the bar added to `tokens.css`. No existing part or token changes.
+
 ## [0.5.281] - ui-v0.5.281
 
 - SchemaPage: a `sidebar` prop says the app draws its own sidebar column beside the page (NEWS-SIDEBAR-01). A plain `search` node (one with no `recents`) is then hidden from `lg` up, because the sidebar carries the same box, and a phone keeps it; a search that keeps recents stays. Additive: without the prop nothing changes.
