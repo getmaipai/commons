@@ -26,6 +26,17 @@ export const FeedListPackage = z
             title: z.string().min(1),
             publisher: z.string().min(1),
             lang: z.string().regex(new RegExp("^[a-z]{2,3}$")).optional(),
+            /**Topic ids (spec/news/topics.json) this feed covers; the hub tags every story the feed carries with them.*/
+            topics_hint: z
+              .array(z.string().regex(new RegExp("^[a-z][a-z0-9-]*$")))
+              .refine(
+                (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                "All items must be unique!",
+              )
+              .describe(
+                "Topic ids (spec/news/topics.json) this feed covers; the hub tags every story the feed carries with them.",
+              )
+              .optional(),
           })
           .strict(),
       )

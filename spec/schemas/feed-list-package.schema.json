@@ -19,7 +19,13 @@
           "url": {"type": "string", "pattern": "^https://", "description": "The RSS or Atom feed address. https only."},
           "title": {"type": "string", "minLength": 1},
           "publisher": {"type": "string", "minLength": 1},
-          "lang": {"type": "string", "pattern": "^[a-z]{2,3}$"}
+          "lang": {"type": "string", "pattern": "^[a-z]{2,3}$"},
+          "topics_hint": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+            "description": "Topic ids (spec/news/topics.json) this feed covers; the hub tags every story the feed carries with them."
+          }
         }
       }
     }

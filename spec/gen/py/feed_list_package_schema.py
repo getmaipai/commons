@@ -16,6 +16,10 @@ class Feed(BaseModel):
     title: constr(min_length=1)
     publisher: constr(min_length=1)
     lang: constr(pattern=r'^[a-z]{2,3}$') | None = None
+    topics_hint: list[constr(pattern=r'^[a-z][a-z0-9-]*$')] | None = Field(
+        None,
+        description='Topic ids (spec/news/topics.json) this feed covers; the hub tags every story the feed carries with them.',
+    )
 
 
 class FeedListPackage(BaseModel):

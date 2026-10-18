@@ -1,3 +1,7 @@
+## [spec-v0.1.184] - 2026-10-18
+
+- News: a feed-list package's `feeds.json` entry gains an optional `topics_hint` (topic ids from `news/topics.json`, same shape as `Feed.topics_hint`), so a list can say which topics a feed covers. Additive.
+
 ## [spec-v0.1.183] - 2026-10-18
 
 - Settings: `generation.music.length` defaults to `full`, and its help and copy say what each kind sings: Quick is the hook (the first verse and chorus), Full every part, and a song is as long as its words (owner, 2026-10-18; Home music note 18.1a, MUSIC-SPEC-03).
