@@ -182,8 +182,8 @@ export function ArticleView({ data, onAction, available = [], ids, renderTargetL
         </div>
       ) : null}
       {data.image ? (
-        <AspectRatio ratio={16 / 9}>
-          <img src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="size-full rounded-lg object-cover" />
+        <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg" style={{ maxHeight: "var(--article-lead-max-h, 24rem)" }}>
+          <img src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
         </AspectRatio>
       ) : null}
       {data.key_points ? (

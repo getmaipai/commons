@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.278] - ui-v0.5.278
+
+- StoryFeed and ArticleView: a picture is pinned inside its frame (`absolute inset-0`, covering it), so a tall portrait is cropped instead of stretching the card (Safari drew it at its own height). The hero ratio default is 2 / 1 and its height stops at `--story-hero-max-h` (26rem); other card pictures stop at `--story-card-max-h` (18rem) and the article's lead picture at `--article-lead-max-h` (24rem).
+
 ## [0.5.277] - ui-v0.5.277
 
 - ArticleView: the reader opens with a provider banner (the publisher's name in a centered primary-colored band) and the article column is centered, like Apple News.

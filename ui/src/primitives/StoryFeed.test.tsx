@@ -255,10 +255,23 @@ describe("StoryFeed look (NEWS-LOOK-02)", () => {
     expect(row.container.querySelectorAll('[data-slot="story-row"] [data-slot="story-kicker"]')).toHaveLength(1);
   });
 
-  test("the hero picture ratio is the --story-hero-ratio token, 16 / 9 by default", () => {
+  test("the hero picture ratio is the --story-hero-ratio token, 2 / 1 by default, and its height stops at a token", () => {
     const { container } = render(<StoryFeed data={data} />);
     const frame = container.querySelector('[data-tier="hero"] [data-slot="story-image"]') as HTMLElement;
-    expect(frame.getAttribute("style")).toContain("var(--story-hero-ratio, 16 / 9)");
+    expect(frame.getAttribute("style")).toContain("var(--story-hero-ratio, 2 / 1)");
+    expect(frame.getAttribute("style")).toContain("max-height: var(--story-hero-max-h, 26rem)");
+  });
+
+  test("a picture is pinned inside its frame and covers it, so a tall portrait is cropped and never stretches the card", () => {
+    const { container } = render(<StoryFeed data={{ ...data, hero: { ...data.hero!, image: { w480: "/a-480.webp", w1280: "/a-1280.webp", alt: "A portrait" } } }} />);
+    const frame = container.querySelector('[data-tier="hero"] [data-slot="story-image"]') as HTMLElement;
+    const img = frame.querySelector("img")!;
+    expect(img.className).toContain("absolute");
+    expect(img.className).toContain("inset-0");
+    expect(img.className).toContain("object-cover");
+    expect(frame.className).toContain("overflow-hidden");
+    const other = container.querySelector('[data-tier="featured"] [data-slot="story-image"], [data-tier="half"] [data-slot="story-image"]') as HTMLElement | null;
+    if (other) expect(other.getAttribute("style")).toContain("max-height: var(--story-card-max-h, 18rem)");
   });
 
   test("a row keeps the picture beside the title: no wrapping, a shrinkable text column, a three-line title, a 112 px 16:9 thumbnail", () => {

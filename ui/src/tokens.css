@@ -639,8 +639,11 @@
   --voice-accent: #21a6ff;
   /* NEWS-LOOK-02: the story kicker (topic, "Top story") in the accent; the light value passes AA on white. */
   --kicker: #0a6cb0;
-  /* The hero picture ratio, one token (a CSS aspect-ratio value). */
-  --story-hero-ratio: 16 / 9;
+  /* The hero picture ratio and the tallest a story picture may be, tokens (a CSS aspect-ratio value and lengths). */
+  --story-hero-ratio: 2 / 1;
+  --story-hero-max-h: 26rem;
+  --story-card-max-h: 18rem;
+  --article-lead-max-h: 24rem;
   --radius: 12px;
   --sidebar: #eaf0f7;
   --sidebar-foreground: #0b1730;
