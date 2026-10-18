@@ -217,7 +217,8 @@
         "type": { "const": "empty_state" },
         "icon": { "type": "string", "description": "A lucide icon name (docs/UI.md > Icons)." },
         "text": { "type": "string" },
-        "action": { "$ref": "#/$defs/action" }
+        "action": { "$ref": "#/$defs/action" },
+        "action_label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "The button's words for the action (for example \"Add a folder\"). Without it the kit derives a plain label from the action kind." }
       }
     },
     "progress": {

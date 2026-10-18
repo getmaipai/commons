@@ -132,7 +132,7 @@
         {
           "id": "pictures",
           "label": "Pictures and videos",
-          "icon": "image",
+          "icon": "camera",
           "kind": "keys",
           "min_role": "adult",
           "cards": [
@@ -540,7 +540,7 @@
         {
           "id": "pictures",
           "label": "Pictures, videos and music",
-          "icon": "image",
+          "icon": "camera",
           "kind": "keys",
           "cards": [
             {

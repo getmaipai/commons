@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.270] - ui-v0.5.270
+
+- Schema `empty_state` draws the page's own `action_label` on its button (spec-v0.1.182); without one it keeps the plain derived label ("Go" for a navigate action).
+
 ## [0.5.269] - ui-v0.5.269
 
 - NEWS-LOOK-02 (spec-v0.1.180). `StoryFeed`: `header.dateline` under the title; `filters` as one row of kit pill chips (`TabsList variant="pill"`, the selected one `aria-pressed`) that fire `filter` with `{filter_id}`, drawn only when the page mapped `filter`; consecutive `rows` with one `group` draw under one heading with a muted count; a story's `kicker` draws above the headline on cards and rows in the new `--kicker` token (the accent on dark, #0a6cb0 on light); an opened story keeps the card at full strength and mutes its headline and source line (`data-opened`) instead of `opacity-70` on the card; the hero picture ratio is the `--story-hero-ratio` token (default 16 / 9; was 3 / 2); thumbnail rows keep the picture beside the title at every width (Item `size="story"` is `flex-nowrap` with a shrinkable text column and a three-line title; ItemMedia `variant="thumbnail"` is 112 px wide, 16:9). `StoryAction` gains `"filter"`, `StoryActionIds` gains `filter_id`. Schema interpreter: `answer_blocks.filter_state` makes `newsActionsFor` offer `filter` and write `{[filter_state]: filter_id}` to page state (nothing else); new `search` node (kit Input labelled by `label`, written to page state after 250 ms, Enter fires `submit` with `{q}`, recents as chips while the field is empty, a Clear button for `clear_recents`, nothing drawn when the recents binding has no rows). Exports `SearchNode`, `SearchNodeSchema`; `search` joins `NODE_TYPES`.

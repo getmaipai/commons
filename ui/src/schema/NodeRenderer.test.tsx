@@ -513,3 +513,13 @@ describe("NodeRenderer > widget_row", () => {
     }
   });
 });
+
+describe("empty_state button label", () => {
+  test("the page's own action_label names the button; without one the kit's plain label stays", async () => {
+    const labelled = renderNode({ type: "empty_state", icon: "film", text: "No videos yet.", action: { navigate: { to: "/settings/home/media-library" } }, action_label: "Add a folder" } as never);
+    expect(await labelled.findByRole("button", { name: "Add a folder" })).toBeTruthy();
+    cleanup();
+    const plain = renderNode({ type: "empty_state", icon: "film", text: "No videos yet.", action: { navigate: { to: "/settings" } } } as never);
+    expect(await plain.findByRole("button", { name: "Go" })).toBeTruthy();
+  });
+});

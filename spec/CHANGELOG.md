@@ -1,3 +1,8 @@
+## [spec-v0.1.182] - 2026-10-18
+
+- UI: `empty_state` gains an optional `action_label` (1 to 40 characters), the button's own words for its action, such as "Add a folder". Without it the kit keeps its plain derived label. Additive.
+- Settings: the Pictures sections (Account and Home) use the icon `camera` in place of `image`, which the kit does not ship (the sidebar drew the unknown icon). `camera` names the section's subject, pictures, and is in the kit's icon set; `layout-grid` was the other candidate but reads as a layout control.
+
 ## [spec-v0.1.181] - 2026-10-18
 
 - NEWS-LOOK-02 and News search. `story_feed` props gain `header.dateline` (at most 80 characters) and `filters` (up to 16 `{id, label, selected?}` chips; an empty `id` means All). `news_story_card` gains `group` (at most 60, the hub's day group such as "This morning") and `kicker` (at most 80, the hub-built line above the headline). The `answer_blocks` node gains `filter_state` (the page-state key the filter chips write; without it the chips are not drawn). New UI node `search` (`state` default `q`, `label`, `placeholder`, `recents` package binding of rows, `item_key_field`, `item_label_field`, `submit`, `clear_recents`); `checkAppPackage` allows it and checks the recents binding, `submit` and `clear_recents` like every other action. New person-scope record `NewsSearchRecent` (`recent-...` id, `q` 1 to 120, `at`) with `validateNewsSearchRecent`, which rejects a child's row: a child's search keeps no recents. Additive.

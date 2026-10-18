@@ -47,6 +47,14 @@ describe("UI schema", () => {
     });
   }
 
+  test("an empty_state action may carry a short button label; a long one is refused", () => {
+    const base = { type: "empty_state", icon: "film", text: "No videos yet.", action: { navigate: { to: "/settings/home/media-library" } } };
+    expect(validate({ type: "page", id: "p", title: "P", body: [{ ...base, action_label: "Add a folder" }] })).toBe(true);
+    expect(validate({ type: "page", id: "p", title: "P", body: [base] })).toBe(true);
+    expect(validate({ type: "page", id: "p", title: "P", body: [{ ...base, action_label: "x".repeat(41) }] })).toBe(false);
+    expect(validate({ type: "page", id: "p", title: "P", body: [{ ...base, action_label: "" }] })).toBe(false);
+  });
+
   test("MEDIA-POLISH-01: a page tone is default or cinema", () => {
     const page = { type: "page", id: "p", title: "P", body: [{ type: "empty_state", icon: "x", text: "t" }] };
     expect(validate({ ...page, tone: "cinema" })).toBe(true);

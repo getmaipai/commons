@@ -63,6 +63,8 @@ export const EmptyStateNodeSchema = z.object({
   icon: z.string(),
   text: z.string(),
   action: ActionSchema.optional(),
+  /** The button's own words for the action (spec `empty_state.action_label`); without it the kit derives a plain label. */
+  action_label: z.string().min(1).max(40).optional(),
 });
 export type EmptyStateNode = z.infer<typeof EmptyStateNodeSchema>;
 

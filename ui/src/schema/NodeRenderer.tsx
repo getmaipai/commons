@@ -83,7 +83,7 @@ function EmptyStateNodeView({ node }: { node: EmptyStateNode }) {
     <EmptyState
       icon={node.icon}
       text={node.text}
-      actionLabel={node.action ? actionLabel(node.action) : undefined}
+      actionLabel={node.action ? (node.action_label ?? actionLabel(node.action)) : undefined}
       onAction={node.action ? () => dispatch(node.action!) : undefined}
     />
   );
@@ -93,8 +93,7 @@ function EmptyStateNodeView({ node }: { node: EmptyStateNode }) {
 // (spec/ui/schema.json's action def is deliberately just the five kinds
 // and their own arguments) - EmptyState's own primitive wants a button
 // label, so this derives a plain one from whichever kind was declared.
-// Nothing built this session actually reaches this path (Memory's own
-// empty_state has no action), kept only for schema completeness.
+// A page names its own words with `action_label` ("Add a folder"); this plain label is the fallback.
 function actionLabel(action: EmptyStateNode["action"]): string {
   if (!action) return "";
   if ("navigate" in action) return "Go";
