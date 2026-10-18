@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/news-search-recent.schema.json",
+  "title": "NewsSearchRecent",
+  "description": "NEWS-LOOK-02. One search a person ran in the News app, kept so the Search page can offer it again. Person scope: never readable by another person or an admin page. Never created for a child: a child's search keeps no recents. The schema carries no age band, so that rule cannot be enforced here; `validateNewsSearchRecent` in spec/records/ts/validate.ts takes the owner's band from the caller and rejects a child's row, and the hub writes through it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "person_id",
+    "q",
+    "at",
+    "hlc",
+    "provenance",
+    "source"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^recent-[a-z0-9]{6,}$"
+    },
+    "person_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "q": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "hub"
+      ]
+    }
+  }
+}

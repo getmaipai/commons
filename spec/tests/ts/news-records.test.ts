@@ -12,8 +12,9 @@ import { NewsStory } from "../../gen/ts/news-story.js";
 import { NewsInterest } from "../../gen/ts/news-interest.js";
 import { NewsSave } from "../../gen/ts/news-save.js";
 import { NewsRead } from "../../gen/ts/news-read.js";
+import { NewsSearchRecent } from "../../gen/ts/news-search-recent.js";
 import { NewsTopics } from "../../gen/ts/news-topics.js";
-import { validateNewsInterest } from "../../records/ts/validate.js";
+import { validateNewsInterest, validateNewsSearchRecent } from "../../records/ts/validate.js";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const read = (path: string) => JSON.parse(readFileSync(join(SPEC, path), "utf-8"));
@@ -31,6 +32,7 @@ const CASES: Array<[string, string, { parse: (v: unknown) => unknown; safeParse:
   ["feed.news-app", "feed", Feed], ["news-item.news-app", "news-item", NewsItem], ["news-story.news-app", "news-story", NewsStory],
   ["news-interest.followed", "news-interest", NewsInterest], ["news-interest.inferred", "news-interest", NewsInterest], ["news-interest.child-follow", "news-interest", NewsInterest],
   ["news-save", "news-save", NewsSave], ["news-read", "news-read", NewsRead],
+  ["news-search-recent", "news-search-recent", NewsSearchRecent],
 ];
 
 describe("News records", () => {
@@ -59,7 +61,7 @@ describe("News records", () => {
   });
 
   test("the person-scope records need their ids, person, clock stamp and provenance", () => {
-    for (const [name, model] of [["news-interest.followed", NewsInterest], ["news-save", NewsSave], ["news-read", NewsRead]] as const) {
+    for (const [name, model] of [["news-interest.followed", NewsInterest], ["news-save", NewsSave], ["news-read", NewsRead], ["news-search-recent", NewsSearchRecent]] as const) {
       const base = fixture(name);
       for (const field of ["id", "person_id", "hlc", "provenance"]) {
         const broken = clone(base);
@@ -96,6 +98,20 @@ describe("validateNewsInterest (nothing is inferred about a child)", () => {
   test("an inferred row cannot also be followed, and a source key is a feed id", () => {
     expect(validateNewsInterest({ ...fixture("news-interest.inferred"), followed: true }, "adult").join(" ")).toContain("cannot also be followed");
     expect(validateNewsInterest({ ...fixture("news-interest.followed"), kind: "source", key: "science" }, "teen").join(" ")).toContain("feed id");
+  });
+});
+
+describe("NewsSearchRecent", () => {
+  test("a query is 1 to 120 characters and the id is recent-...", () => {
+    const base = fixture("news-search-recent");
+    for (const bad of [{ q: "" }, { q: "x".repeat(121) }, { at: "yesterday" }, { source: "package" }]) expect(NewsSearchRecent.safeParse({ ...base, ...bad }).success, JSON.stringify(bad)).toBe(false);
+    expect(NewsSearchRecent.safeParse({ ...base, q: "x".repeat(120) }).success).toBe(true);
+    expect(schema("news-search-recent")({ ...base, q: "" })).toBe(false);
+  });
+  test("validateNewsSearchRecent rejects a child's row and passes a teen's or an adult's", () => {
+    expect(validateNewsSearchRecent(fixture("news-search-recent"), "child").join(" ")).toContain("no recents");
+    expect(validateNewsSearchRecent(fixture("news-search-recent"), "teen")).toEqual([]);
+    expect(validateNewsSearchRecent(fixture("news-search-recent"), "adult")).toEqual([]);
   });
 });
 

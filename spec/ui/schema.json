@@ -24,6 +24,7 @@
     { "$ref": "#/$defs/widget_row" },
     { "$ref": "#/$defs/answer_blocks" },
     { "$ref": "#/$defs/picker" },
+    { "$ref": "#/$defs/search" },
     { "$ref": "#/$defs/tabs" }
   ],
   "$defs": {
@@ -543,6 +544,7 @@
           "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
           "description": "Draw only blocks of these kinds, so a page can place one kind per section. Absent: every block returned."
         },
+        "filter_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "NEWS-LOOK-02: the page-state key the block's filter chips write when one is chosen (the chip's `id`; an empty id means All). The page's data call reads it back through `$state.<key>` in its bind params. Without it the chips are not drawn." },
         "empty_state": { "$ref": "#/$defs/empty_state" },
         "states": {
           "type": "object",
@@ -678,6 +680,23 @@
             }
           }
         }
+      }
+    },
+    "search": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "description": "NEWS-LOOK-02: a search field that writes what is typed to page state (debounced) and, on Enter, fires `submit` with the item {q}, so `{q}` placeholders in a navigate state or call args fill from it. With `recents` bound and the field empty it draws the rows as chips (a chip sets the state key to its label and fires `submit`); `clear_recents` fires from a Clear button. The node sends nothing itself.",
+      "properties": {
+        "type": { "const": "search" },
+        "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "default": "q", "description": "The page-state key the typed text is written to." },
+        "label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "The field's accessible name." },
+        "placeholder": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "recents": { "$ref": "#/$defs/package_binding" },
+        "item_key_field": { "type": "string", "description": "The recents row's key field. Default `key`." },
+        "item_label_field": { "type": "string", "description": "The recents row's label field. Default `label`." },
+        "submit": { "$ref": "#/$defs/action" },
+        "clear_recents": { "$ref": "#/$defs/action" }
       }
     },
     "nav_entry": {

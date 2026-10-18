@@ -43,6 +43,7 @@ export * from "./news-interest.js";
 export * from "./news-item.js";
 export * from "./news-read.js";
 export * from "./news-save.js";
+export * from "./news-search-recent.js";
 export * from "./news-story.js";
 export * from "./news-topics.js";
 export * from "./offline-manifest.js";

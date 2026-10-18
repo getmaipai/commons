@@ -11,7 +11,8 @@
     "layout": "today",
     "header": {
       "title": "Today",
-      "subtitle": "Updated 7:40"
+      "subtitle": "Updated 7:40",
+      "dateline": "Sat, Oct 17 · Updated 7:40"
     },
     "hero": {
       "story_id": "story-1a1b2c",
@@ -31,7 +32,9 @@
         "w480": "/api/plugins/news/images/news-1d4e5f?w=480",
         "w1280": "/api/plugins/news/images/news-1d4e5f?w=1280",
         "alt": "Harbor at dawn, Example Wire"
-      }
+      },
+      "kicker": "Top story · 3 outlets",
+      "group": "This morning"
     },
     "featured": [
       {
@@ -110,6 +113,21 @@
         "opened": false
       }
     ],
-    "as_of": "2026-10-17T13:05:00Z"
+    "as_of": "2026-10-17T13:05:00Z",
+    "filters": [
+      {
+        "id": "",
+        "label": "All",
+        "selected": true
+      },
+      {
+        "id": "world",
+        "label": "World"
+      },
+      {
+        "id": "science",
+        "label": "Science"
+      }
+    ]
   }
 }

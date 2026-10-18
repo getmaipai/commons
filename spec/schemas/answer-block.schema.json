@@ -641,6 +641,16 @@
         "open_url": {
           "type": "string",
           "format": "uri"
+        },
+        "group": {
+          "type": "string",
+          "maxLength": 60,
+          "description": "The day group a row belongs to, named by the hub (\"This morning\"). Consecutive rows with the same group draw under one heading."
+        },
+        "kicker": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "The hub-built line above the headline (\"Top story · 4 outlets\", \"Science\"). It passed the viewer's band floor like every other string."
         }
       }
     },
@@ -718,6 +728,11 @@
                 "subtitle": {
                   "type": "string"
                 },
+                "dateline": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "description": "The line under the title (\"Sat, Oct 17 · Updated 7:40\")."
+                },
                 "channel": {
                   "type": "object",
                   "additionalProperties": false,
@@ -740,6 +755,33 @@
                     "followed": {
                       "type": "boolean"
                     }
+                  }
+                }
+              }
+            },
+            "filters": {
+              "type": "array",
+              "maxItems": 16,
+              "description": "One row of topic chips under the header. An empty `id` means All. The page's `filter` action carries the chosen `filter_id`.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "selected": {
+                    "type": "boolean"
                   }
                 }
               }

@@ -30,6 +30,7 @@ import type { SubjectRef } from "../../gen/ts/subject-ref.js";
 import type { Artifact } from "../../gen/ts/artifact.js";
 import type { BiometricPrint } from "../../gen/ts/biometric-print.js";
 import type { NewsInterest } from "../../gen/ts/news-interest.js";
+import type { NewsSearchRecent } from "../../gen/ts/news-search-recent.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -559,5 +560,14 @@ export function validateNewsInterest(interest: NewsInterest, band: "child" | "te
   if (band === "child" && interest.affinity !== 0) problems.push("a child's News interest carries no computed affinity (it must be 0)");
   if (interest.inferred && interest.followed) problems.push("an inferred interest is one only the affinity holds, so it cannot also be followed");
   if (interest.kind === "source" && !interest.key.startsWith("feed-")) problems.push("a source interest's key is a feed id (feed-...)");
+  return problems;
+}
+
+/** NEWS-LOOK-02: the one cross-field rule on `NewsSearchRecent`. A child's search keeps no recents, so no row is ever
+ * created for a child. `band` is the owner's age band, read by the caller from the person record (the record carries no
+ * band, so JSON Schema cannot say this). The hub writes a recent only when this returns no problems. */
+export function validateNewsSearchRecent(_recent: NewsSearchRecent, band: "child" | "teen" | "adult"): Problems {
+  const problems: Problems = [];
+  if (band === "child") problems.push("a child's News search keeps no recents: no NewsSearchRecent row is created for a child");
   return problems;
 }

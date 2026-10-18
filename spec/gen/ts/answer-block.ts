@@ -1127,6 +1127,14 @@ export const AnswerBlock = z
                 .object({
                   title: z.string().min(1),
                   subtitle: z.string().optional(),
+                  /**The line under the title ("Sat, Oct 17 · Updated 7:40").*/
+                  dateline: z
+                    .string()
+                    .max(80)
+                    .describe(
+                      'The line under the title ("Sat, Oct 17 · Updated 7:40").',
+                    )
+                    .optional(),
                   channel: z
                     .object({
                       kind: z.enum(["topic", "source"]),
@@ -1137,6 +1145,22 @@ export const AnswerBlock = z
                     .optional(),
                 })
                 .strict()
+                .optional(),
+              /**One row of topic chips under the header. An empty `id` means All. The page's `filter` action carries the chosen `filter_id`.*/
+              filters: z
+                .array(
+                  z
+                    .object({
+                      id: z.string().max(40),
+                      label: z.string().min(1).max(40),
+                      selected: z.boolean().optional(),
+                    })
+                    .strict(),
+                )
+                .max(16)
+                .describe(
+                  "One row of topic chips under the header. An empty `id` means All. The page's `filter` action carries the chosen `filter_id`.",
+                )
                 .optional(),
               /**One story as a card draws it (NEWS-00). Every string passed the viewer's band floor on the hub before it got here. `image` holds same-origin hub paths, never the publisher's address. `open_url` is absent for a child and for any viewer whose band may not follow outbound links.*/
               hero: z
@@ -1173,6 +1197,22 @@ export const AnswerBlock = z
                       "The viewer opened this story before; the card dims.",
                     ),
                   open_url: z.string().url().optional(),
+                  /**The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.*/
+                  group: z
+                    .string()
+                    .max(60)
+                    .describe(
+                      'The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.',
+                    )
+                    .optional(),
+                  /**The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer's band floor like every other string.*/
+                  kicker: z
+                    .string()
+                    .max(80)
+                    .describe(
+                      'The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer\'s band floor like every other string.',
+                    )
+                    .optional(),
                 })
                 .strict()
                 .describe(
@@ -1215,6 +1255,22 @@ export const AnswerBlock = z
                           "The viewer opened this story before; the card dims.",
                         ),
                       open_url: z.string().url().optional(),
+                      /**The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.*/
+                      group: z
+                        .string()
+                        .max(60)
+                        .describe(
+                          'The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.',
+                        )
+                        .optional(),
+                      /**The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer's band floor like every other string.*/
+                      kicker: z
+                        .string()
+                        .max(80)
+                        .describe(
+                          'The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer\'s band floor like every other string.',
+                        )
+                        .optional(),
                     })
                     .strict()
                     .describe(
@@ -1282,6 +1338,22 @@ export const AnswerBlock = z
                                   "The viewer opened this story before; the card dims.",
                                 ),
                               open_url: z.string().url().optional(),
+                              /**The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.*/
+                              group: z
+                                .string()
+                                .max(60)
+                                .describe(
+                                  'The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.',
+                                )
+                                .optional(),
+                              /**The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer's band floor like every other string.*/
+                              kicker: z
+                                .string()
+                                .max(80)
+                                .describe(
+                                  'The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer\'s band floor like every other string.',
+                                )
+                                .optional(),
                             })
                             .strict()
                             .describe(
@@ -1330,6 +1402,22 @@ export const AnswerBlock = z
                           "The viewer opened this story before; the card dims.",
                         ),
                       open_url: z.string().url().optional(),
+                      /**The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.*/
+                      group: z
+                        .string()
+                        .max(60)
+                        .describe(
+                          'The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.',
+                        )
+                        .optional(),
+                      /**The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer's band floor like every other string.*/
+                      kicker: z
+                        .string()
+                        .max(80)
+                        .describe(
+                          'The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer\'s band floor like every other string.',
+                        )
+                        .optional(),
                     })
                     .strict()
                     .describe(
@@ -1825,6 +1913,22 @@ export const AnswerBlock = z
                           "The viewer opened this story before; the card dims.",
                         ),
                       open_url: z.string().url().optional(),
+                      /**The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.*/
+                      group: z
+                        .string()
+                        .max(60)
+                        .describe(
+                          'The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.',
+                        )
+                        .optional(),
+                      /**The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer's band floor like every other string.*/
+                      kicker: z
+                        .string()
+                        .max(80)
+                        .describe(
+                          'The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer\'s band floor like every other string.',
+                        )
+                        .optional(),
                     })
                     .strict()
                     .describe(

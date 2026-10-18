@@ -208,6 +208,19 @@ describe("UI schema, package apps", () => {
     expect(validate({ type: "picker", state: "place", label: "Place", leading: [{ value: "x", label: "X", needs: "microphone" }] })).toBe(false);
   });
 
+  test("NEWS-LOOK-02: a search node and the answer_blocks filter_state", () => {
+    const bind = { source: "package", path: "recents" };
+    expect(validate({ type: "search" })).toBe(true);
+    expect(validate({ type: "search", state: "q", label: "Search News", placeholder: "Search stories", recents: bind, item_key_field: "key", item_label_field: "label", submit: { navigate: { to: "/apps/news/search", state: { q: "{q}" } } }, clear_recents: { call: { target: "/api/plugins/news/actions/clear-recents" } } })).toBe(true);
+    expect(validate({ type: "search", state: "Q" })).toBe(false);
+    expect(validate({ type: "search", label: "" })).toBe(false);
+    expect(validate({ type: "search", recents: { source: "route", path: "/api/x" } })).toBe(false);
+    expect(validate({ type: "search", extra: 1 })).toBe(false);
+    const blocks = { type: "answer_blocks", bind: { source: "package", path: "today" } };
+    expect(validate({ ...blocks, filter_state: "topic" })).toBe(true);
+    expect(validate({ ...blocks, filter_state: "Topic" })).toBe(false);
+  });
+
   test("MEDIA-PLAYER-01: player, billboard and the media_shelf additions", () => {
     const bind = { source: "package", path: "item" };
     expect(validate({ type: "player", bind })).toBe(true);

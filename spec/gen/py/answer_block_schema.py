@@ -644,6 +644,14 @@ class NewsStoryCard(BaseModel):
         ..., description='The viewer opened this story before; the card dims.'
     )
     open_url: AnyUrl | None = None
+    group: constr(max_length=60) | None = Field(
+        None,
+        description='The day group a row belongs to, named by the hub ("This morning"). Consecutive rows with the same group draw under one heading.',
+    )
+    kicker: constr(max_length=80) | None = Field(
+        None,
+        description='The hub-built line above the headline ("Top story · 4 outlets", "Science"). It passed the viewer\'s band floor like every other string.',
+    )
 
 
 class Channel(BaseModel):
@@ -661,7 +669,19 @@ class Header(BaseModel):
     )
     title: constr(min_length=1)
     subtitle: str | None = None
+    dateline: constr(max_length=80) | None = Field(
+        None, description='The line under the title ("Sat, Oct 17 · Updated 7:40").'
+    )
     channel: Channel | None = None
+
+
+class Filter(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(max_length=40)
+    label: constr(min_length=1, max_length=40)
+    selected: bool | None = None
 
 
 class Channel1(BaseModel):
@@ -688,6 +708,11 @@ class Props9(BaseModel):
     )
     layout: Literal['today', 'channel', 'rows']
     header: Header | None = None
+    filters: list[Filter] | None = Field(
+        None,
+        description="One row of topic chips under the header. An empty `id` means All. The page's `filter` action carries the chosen `filter_id`.",
+        max_length=16,
+    )
     hero: NewsStoryCard | None = None
     featured: list[NewsStoryCard] | None = Field(None, max_length=4)
     shelves: list[Shelf] | None = Field(None, max_length=6)

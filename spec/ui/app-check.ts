@@ -14,7 +14,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[] 
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -100,6 +100,11 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     checkAction(node.on_locator, packageId, `${where} reader.on_locator`, out);
     checkAction(node.on_close, packageId, `${where} reader.on_close`, out);
     if (isObject(node.fields)) for (const [name, value] of Object.entries(node.fields)) checkFieldPath(value, `${where} reader.fields`, name, out);
+  }
+  if (type === "search") {
+    if (node.recents !== undefined) checkBinding(node.recents, `${where} search.recents`, data, "rows", out);
+    checkAction(node.submit, packageId, `${where} search.submit`, out);
+    checkAction(node.clear_recents, packageId, `${where} search.clear_recents`, out);
   }
   if (type === "picker" && node.bind !== undefined) checkBinding(node.bind, `${where} picker`, data, "rows", out);
   if (isObject(node.empty_state)) checkAction(node.empty_state.action, packageId, where, out);
