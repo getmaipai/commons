@@ -1,3 +1,7 @@
+## [spec-v0.1.179] - 2026-10-18
+
+- The `answer_blocks` actions map gains `open_channel` (a `navigate`, like `open`). A shelf's channel button fires it with `channel_kind` and `channel_key`; before this it fired `open`, which a page can only point at a story. Additive: a page that omits it shows no channel buttons on a shelf.
+
 ## [spec-v0.1.178] - 2026-10-18
 
 - `generation.music.length` carries `secret: false` and the field order Home's registry writes, so the entry is identical to Home's declaration (spec-v0.1.177 differed only in that, and Home's settings drift check compares the whole entry). No behaviour change.

@@ -93,3 +93,16 @@ describe("StoryFeed thumbnail rows keep the Item's own padding", () => {
     expect(row.className).not.toMatch(/\bpy-0\b/);
   });
 });
+
+describe("StoryFeed shelf channel buttons", () => {
+  test("a shelf channel button fires open_channel with the channel ids, and is hidden when the page does not map it", () => {
+    const shelved = { ...data, shelves: [{ title: "From your channels", stories: data.hero ? [data.hero] : [], channels: [{ kind: "topic", key: "science", label: "Science" }] }] } as unknown as StoryFeedData;
+    const onAction = mock(() => {});
+    const on = render(<StoryFeed data={shelved} onAction={onAction} available={["open", "open_channel"]} />);
+    fireEvent.click(on.getByText("Science"));
+    expect(onAction).toHaveBeenCalledWith("open_channel", { channel_kind: "topic", channel_key: "science" });
+    cleanup();
+    const off = render(<StoryFeed data={shelved} onAction={() => {}} available={["open"]} />);
+    expect(off.queryByText("Science")).toBeNull();
+  });
+});

@@ -48,7 +48,7 @@ export interface StoryFeedData {
 }
 
 /** What a card can ask for. The feed never names a route: the page's `actions` map says what each name does. */
-export type StoryAction = "open" | "save" | "follow" | "feedback_more" | "feedback_less" | "open_site" | "reset_mix";
+export type StoryAction = "open" | "open_channel" | "save" | "follow" | "feedback_more" | "feedback_less" | "open_site" | "reset_mix";
 export type StoryActionIds = { story_id?: string; item_id?: string; channel_kind?: string; channel_key?: string; on?: boolean; url?: string };
 
 export interface StoryFeedProps {
@@ -211,10 +211,10 @@ function Shelf({ shelf, ctx }: { shelf: NonNullable<StoryFeedData["shelves"]>[nu
     <section data-slot="story-shelf" aria-label={shelf.title} className="flex min-w-0 flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-lg font-semibold">{shelf.title}</h3>
-        {ctx.onAction && shelf.channels?.length ? (
+        {ctx.onAction && ctx.available.includes("open_channel") && shelf.channels?.length ? (
           <div className="flex flex-wrap gap-1">
             {shelf.channels.map((channel) => (
-              <Button key={`${channel.kind}:${channel.key}`} variant="outline" size="sm" className={HIT_AREA_ROW} onClick={() => ctx.onAction?.("open", { channel_kind: channel.kind, channel_key: channel.key })}>
+              <Button key={`${channel.kind}:${channel.key}`} variant="outline" size="sm" className={HIT_AREA_ROW} onClick={() => ctx.onAction?.("open_channel", { channel_kind: channel.kind, channel_key: channel.key })}>
                 {channel.label}
               </Button>
             ))}

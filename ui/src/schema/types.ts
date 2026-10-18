@@ -323,6 +323,7 @@ export const AnswerBlocksNodeSchema = z.object({
   actions: z
     .object({
       open: ActionSchema,
+      open_channel: ActionSchema,
       save: ActionSchema,
       follow: ActionSchema,
       feedback: ActionSchema,

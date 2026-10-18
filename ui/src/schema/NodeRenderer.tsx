@@ -154,6 +154,7 @@ function newsActionsFor(
   const entry = (name: string): Action | undefined => {
     switch (name) {
       case "open": return actions.open;
+      case "open_channel": return actions.open_channel;
       case "save": return actions.save;
       case "follow": return actions.follow;
       case "feedback_more":
@@ -164,7 +165,7 @@ function newsActionsFor(
       default: return undefined;
     }
   };
-  const names = ["open", "save", "follow", "feedback_more", "feedback_less", "summarize", "reset_mix", "listen"];
+  const names = ["open", "open_channel", "save", "follow", "feedback_more", "feedback_less", "summarize", "reset_mix", "listen"];
   return {
     available: [...names.filter((name) => entry(name) !== undefined), "open_site"],
     onAction: (name, ids) => {
