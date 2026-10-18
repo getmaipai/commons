@@ -671,6 +671,32 @@ describe("record fixtures validate against their generated Zod models", () => {
     });
   }
 
+  test("file.library-envelope.example.json carries name, audience and the trash envelope", () => {
+    const f = File.parse(loadFixture("file.library-envelope.example.json"));
+    expect(f.name).toBe("Otters in a kitchen");
+    expect(f.audience).toBe("all-ages");
+    expect(f.deleted_at).toBe("2026-10-18T12:00:00Z");
+    expect(f.trash_until).toBe("2026-11-17T12:00:00Z");
+  });
+
+  test("file.adult-only.example.json is valid with audience adult-only and no trash", () => {
+    const f = File.parse(loadFixture("file.adult-only.example.json"));
+    expect(f.audience).toBe("adult-only");
+    expect(f.deleted_at ?? null).toBeNull();
+  });
+
+  test("a file without the new fields reads as before", () => {
+    const f = File.parse(loadFixture("file.example.json"));
+    expect(f.name).toBeUndefined();
+    expect(f.audience).toBeUndefined();
+    expect(f.deleted_at ?? null).toBeNull();
+    expect(f.trash_until ?? null).toBeNull();
+  });
+
+  test("file.invalid-audience.example.json is rejected", () => {
+    expect(() => File.parse(loadFixture("file.invalid-audience.example.json"))).toThrow();
+  });
+
   test("share.example.json", () => {
     expect(() => Share.parse(loadFixture("share.example.json"))).not.toThrow();
   });

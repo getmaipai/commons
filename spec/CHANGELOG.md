@@ -1,3 +1,7 @@
+## [spec-v0.1.186] - 2026-10-18
+
+- LIBRARY-REVAMP-03: the `file` record gains four optional fields for the Library: `name` (mutable display name; writing it advances the record's `hlc`), `deleted_at` and `trash_until` (the Trash envelope, same names, formats and 30-day meaning as `media-item`; a restore clears both; no schema default, so an absent field stays absent and existing records round-trip unchanged), and `audience` (`all-ages` or `adult-only`). The adult literal is `adult-only`, not the design note's `adult`, because that is what Home already writes in picture and video provenance notes, so no data migration is needed. Absent `audience` means unknown and is read from the provenance as before. Additive; every existing fixture stays valid.
+
 ## [spec-v0.1.185] - 2026-10-18
 
 - CODE-SPEC-01: personal API key records for turn and code, phase 1 coding settings with copy and band defaults, a thinking budget and admin ceiling, Coding sections in Home and Account, and a coding data class example. Existing shapes and grant actions stay the same.

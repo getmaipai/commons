@@ -1,0 +1,20 @@
+{
+  "id": "file-c3d4e5",
+  "owner_person_id": "person-a1b2c3",
+  "origin": "made",
+  "kind": "image",
+  "media_type": "image/png",
+  "size": 1048576,
+  "sha256": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+  "storage_path": "people/person-a1b2c3/files/file-c3d4e5.png",
+  "retention": "kept",
+  "provenance": {
+    "turn_id": "turn-b2c3d4",
+    "package_id": "picture-studio",
+    "job_id": "job-a1b2c3"
+  },
+  "name": "Otters in a kitchen",
+  "audience": "adult-only",
+  "created_at": "2026-09-26T12:00:00Z",
+  "hlc": "1790510400000:1:hub001"
+}

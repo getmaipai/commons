@@ -716,6 +716,21 @@ def test_file_made_image_fixture():
     File.model_validate(load_fixture("file.made-image.example.json"))
 
 
+def test_file_library_envelope_fixtures():
+    f = File.model_validate(load_fixture("file.library-envelope.example.json"))
+    assert f.name == "Otters in a kitchen"
+    assert f.audience == "all-ages"
+    assert f.deleted_at is not None and f.trash_until is not None
+    a = File.model_validate(load_fixture("file.adult-only.example.json"))
+    assert a.audience == "adult-only"
+    assert a.deleted_at is None and a.trash_until is None
+    plain = File.model_validate(load_fixture("file.example.json"))
+    assert plain.name is None and plain.audience is None
+    assert plain.deleted_at is None and plain.trash_until is None
+    with pytest.raises(ValidationError):
+        File.model_validate(load_fixture("file.invalid-audience.example.json"))
+
+
 def test_share_fixture():
     Share.model_validate(load_fixture("share.example.json"))
 

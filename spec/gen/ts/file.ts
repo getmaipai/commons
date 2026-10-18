@@ -427,13 +427,67 @@ export const File = z
       .describe(
         'How this file entered the household, shaped by origin: for "sent", the conversation and turn that carried it; for "made", the package, turn and job that produced it; for "exported", who asked for it and, when it ran inside a turn, that turn. Every field below is optional and nullable - only the ones that apply to this record\'s origin are set, the rest stay null - because JSON Schema in this repo describes cross-field shape in prose rather than an if/then keyed on origin (see spec/README.md on the stack schemas\' own allOf/if/then codegen loss).',
       ),
+    /**LIBRARY-REVAMP-03. The file's display name, mutable: a person renames a file in the Library, and an upload saves the file's own name here. Optional; absent means no stored name, and a reader derives one (from the prompt or song title in the provenance, else the kind and date). Writing it advances hlc, the record's one clock, the way every mutable field in this repo is stamped.*/
+    name: z
+      .string()
+      .min(1)
+      .max(200)
+      .describe(
+        "LIBRARY-REVAMP-03. The file's display name, mutable: a person renames a file in the Library, and an upload saves the file's own name here. Optional; absent means no stored name, and a reader derives one (from the prompt or song title in the provenance, else the kind and date). Writing it advances hlc, the record's one clock, the way every mutable field in this repo is stamped.",
+      )
+      .optional(),
+    /**LIBRARY-REVAMP-03. Who may see this file: "all-ages" or "adult-only" (children and teens never; the owner always). The literals match what Home already writes in a picture or video provenance note (audience: all-ages | adult-only), so no data migration is needed. Optional, never required: absent means unknown, and a reader falls back to the provenance note exactly as before.*/
+    audience: z
+      .enum(["all-ages", "adult-only"])
+      .describe(
+        'LIBRARY-REVAMP-03. Who may see this file: "all-ages" or "adult-only" (children and teens never; the owner always). The literals match what Home already writes in a picture or video provenance note (audience: all-ages | adult-only), so no data migration is needed. Optional, never required: absent means unknown, and a reader falls back to the provenance note exactly as before.',
+      )
+      .optional(),
+    /**TRASH-01, as media-item. Set when a person moves the file to the household trash; null while live. A trashed file is hidden everywhere and restorable until trash_until. A restore clears both deleted_at and trash_until. No schema default (unlike media-item): an absent field stays absent, so every existing file record round-trips unchanged; absent reads as null.*/
+    deleted_at: z
+      .union([
+        z
+          .string()
+          .datetime({ offset: true })
+          .describe(
+            "TRASH-01, as media-item. Set when a person moves the file to the household trash; null while live. A trashed file is hidden everywhere and restorable until trash_until. A restore clears both deleted_at and trash_until. No schema default (unlike media-item): an absent field stays absent, so every existing file record round-trips unchanged; absent reads as null.",
+          ),
+        z
+          .null()
+          .describe(
+            "TRASH-01, as media-item. Set when a person moves the file to the household trash; null while live. A trashed file is hidden everywhere and restorable until trash_until. A restore clears both deleted_at and trash_until. No schema default (unlike media-item): an absent field stays absent, so every existing file record round-trips unchanged; absent reads as null.",
+          ),
+      ])
+      .describe(
+        "TRASH-01, as media-item. Set when a person moves the file to the household trash; null while live. A trashed file is hidden everywhere and restorable until trash_until. A restore clears both deleted_at and trash_until. No schema default (unlike media-item): an absent field stays absent, so every existing file record round-trips unchanged; absent reads as null.",
+      )
+      .optional(),
+    /**TRASH-01, as media-item. When the trash purges the file for good (30 days after deleted_at); set together with deleted_at.*/
+    trash_until: z
+      .union([
+        z
+          .string()
+          .datetime({ offset: true })
+          .describe(
+            "TRASH-01, as media-item. When the trash purges the file for good (30 days after deleted_at); set together with deleted_at.",
+          ),
+        z
+          .null()
+          .describe(
+            "TRASH-01, as media-item. When the trash purges the file for good (30 days after deleted_at); set together with deleted_at.",
+          ),
+      ])
+      .describe(
+        "TRASH-01, as media-item. When the trash purges the file for good (30 days after deleted_at); set together with deleted_at.",
+      )
+      .optional(),
     created_at: z.string().datetime({ offset: true }),
-    /**Hybrid logical clock for the immutable record, matching the shared record envelope.*/
+    /**Hybrid logical clock, matching the shared record envelope. Set at creation and advanced when a mutable field (name, deleted_at, trash_until, retention) changes.*/
     hlc: z
       .string()
       .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
       .describe(
-        "Hybrid logical clock for the immutable record, matching the shared record envelope.",
+        "Hybrid logical clock, matching the shared record envelope. Set at creation and advanced when a mutable field (name, deleted_at, trash_until, retention) changes.",
       ),
   })
   .strict()
