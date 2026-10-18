@@ -1,3 +1,7 @@
+## [spec-v0.1.177] - 2026-10-18
+
+- MUSIC-SPEC-02 (Home `docs/design/music-generation-2026-10-17.md` section 16). Household key `generation.music.length` (`quick` or `full`, default `quick`) on the `household.pictures` card: what chat makes when nobody asks for a kind of song. Quick songs are about 45 seconds; full songs are about 3 minutes with every part. Additive.
+
 ## [spec-v0.1.176] - 2026-10-17
 
 - HANDOFF-01a adds the hub-local `MediaPresence` value shape, optional nullable `RobotState.media`, the `play_media` device command with a 60 second expiry, and optional `action.play.position_s` with placeholder support. Screen device rows have no token. Both generated model sets and validation and round-trip fixtures cover the additions.
