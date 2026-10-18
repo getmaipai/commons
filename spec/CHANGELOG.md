@@ -1,3 +1,7 @@
+## [spec-v0.1.180] - 2026-10-18
+
+- Settings: a household "Media library" section (`media-library`, admin only, its own sidebar group) that draws the new Home view `home.media_library`, where an admin adds a library folder on the computer or a network share, sees each source with its last scan, rescans or removes it, and follows a podcast by feed address or imports a list of shows. The closed view list gains `home.media_library`.
+
 ## [spec-v0.1.179] - 2026-10-18
 
 - The `answer_blocks` actions map gains `open_channel` (a `navigate`, like `open`). A shelf's channel button fires it with `channel_kind` and `channel_key`; before this it fired `open`, which a page can only point at a story. Additive: a page that omits it shows no channel buttons on a shelf.

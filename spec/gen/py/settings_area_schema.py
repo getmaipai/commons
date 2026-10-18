@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, RootModel, constr
 
 class Group(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     label: constr(min_length=1, max_length=40)
     sections: list[str] = Field(..., min_length=1)
@@ -19,62 +19,62 @@ class Group(BaseModel):
 class ReservedIds(
     RootModel[
         Literal[
-            'users',
-            'models',
-            'backups',
-            'voices',
-            'commands',
-            'devices',
-            'repairs',
-            'updates',
-            'health',
+            "users",
+            "models",
+            "backups",
+            "voices",
+            "commands",
+            "devices",
+            "repairs",
+            "updates",
+            "health",
         ]
     ]
 ):
     root: Literal[
-        'users',
-        'models',
-        'backups',
-        'voices',
-        'commands',
-        'devices',
-        'repairs',
-        'updates',
-        'health',
+        "users",
+        "models",
+        "backups",
+        "voices",
+        "commands",
+        "devices",
+        "repairs",
+        "updates",
+        "health",
     ] = Field(
         ...,
-        description='Area ids and package ids that may never be used: the static legacy routes under /settings.',
+        description="Area ids and package ids that may never be used: the static legacy routes under /settings.",
     )
 
 
 class Link(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     label: constr(min_length=1, max_length=60)
-    href: constr(pattern=r'^/([^{}]|\{self\})*$') = Field(
+    href: constr(pattern=r"^/([^{}]|\{self\})*$") = Field(
         ...,
         description="An in-app path. {self} is the only placeholder, resolved on the client to the viewer's own id; no other person id can appear.",
     )
-    icon: constr(pattern=r'^[a-z][a-z0-9-]*$') | None = None
-    min_role: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] | None = (
+    icon: constr(pattern=r"^[a-z][a-z0-9-]*$") | None = None
+    min_role: Literal["owner", "admin", "adult", "teen", "child", "guest"] | None = (
         Field(
             None,
-            description='The role ladder, most to least privileged. min_role is the lowest role that may see the thing.',
+            description="The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
         )
     )
 
 
 class Column(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     label: constr(min_length=1, max_length=20)
     key: constr(min_length=1) = Field(
         ...,
         description="A select key with range.multiple in this card's group and scope.",
     )
-    band: Literal['child', 'teen', 'adult']
+    band: Literal["child", "teen", "adult"]
 
 
 class Matrix(BaseModel):
@@ -83,20 +83,20 @@ class Matrix(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
-    rows: Literal['search/blocklists', 'news/feed-lists'] = Field(
+    rows: Literal["search/blocklists", "news/feed-lists"] = Field(
         ...,
         description="The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.",
     )
     rows_label: constr(min_length=1, max_length=40) | None = Field(
         None,
-        description='The heading over the row labels. Omitted, the renderer says Kind of site.',
+        description="The heading over the row labels. Omitted, the renderer says Kind of site.",
     )
     columns: list[Column] = Field(..., max_length=3, min_length=1)
     locked_note: constr(min_length=1) | None = Field(
         None,
-        description='The plain reason shown under the grid when any cell is locked.',
+        description="The plain reason shown under the grid when any cell is locked.",
     )
     unavailable_note: constr(min_length=1) | None = Field(
         None,
@@ -104,7 +104,7 @@ class Matrix(BaseModel):
     )
     save_error: constr(min_length=1) | None = Field(
         None,
-        description='What the person sees when a tick does not save: what happened and what to do.',
+        description="What the person sees when a tick does not save: what happened and what to do.",
     )
 
 
@@ -114,34 +114,34 @@ class Card(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     label: constr(min_length=1, max_length=60) = Field(
         ..., description="The card's heading; the one place a group's title is written."
     )
     group: constr(min_length=1) | None = Field(
-        None, description='A registry group: SettingsKey lives_in.'
+        None, description="A registry group: SettingsKey lives_in."
     )
-    scope: Literal['household', 'person', 'device'] | None = None
-    levels: list[Literal['basic', 'advanced', 'expert']] | None = Field(
+    scope: Literal["household", "person", "device"] | None = None
+    levels: list[Literal["basic", "advanced", "expert"]] | None = Field(
         None,
-        description='Which key levels this card draws. Absent means basic and advanced. Expert keys are drawn only by a card in a section with id developer, whose levels are exactly [expert].',
+        description="Which key levels this card draws. Absent means basic and advanced. Expert keys are drawn only by a card in a section with id developer, whose levels are exactly [expert].",
         min_length=1,
     )
     links: list[Link] | None = Field(
         None,
-        description='A card of link rows to existing pages instead of keys.',
+        description="A card of link rows to existing pages instead of keys.",
         min_length=1,
     )
     collapsed: bool = False
     order: int | None = None
-    min_role: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] | None = (
+    min_role: Literal["owner", "admin", "adult", "teen", "child", "guest"] | None = (
         Field(
             None,
-            description='The role ladder, most to least privileged. min_role is the lowest role that may see the thing.',
+            description="The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
         )
     )
-    bands: list[Literal['child', 'teen', 'adult']] | None = Field(None, min_length=1)
+    bands: list[Literal["child", "teen", "adult"]] | None = Field(None, min_length=1)
     needs: list[constr(min_length=1)] | None = None
     matrix: Matrix | None = Field(
         None,
@@ -155,76 +155,79 @@ class Section(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
-    id: constr(pattern=r'^[a-z][a-z0-9-]{0,31}$') = Field(
-        ..., description='Unique within its area.'
+    id: constr(pattern=r"^[a-z][a-z0-9-]{0,31}$") = Field(
+        ..., description="Unique within its area."
     )
     label: constr(min_length=1, max_length=40)
-    icon: constr(pattern=r'^[a-z][a-z0-9-]*$')
-    kind: Literal['keys', 'view', 'link'] = Field(
+    icon: constr(pattern=r"^[a-z][a-z0-9-]*$")
+    kind: Literal["keys", "view", "link"] = Field(
         ...,
-        description='keys draws cards; view draws one named Home view; link draws an arrow row that navigates.',
+        description="keys draws cards; view draws one named Home view; link draws an arrow row that navigates.",
     )
     cards: list[Card] | None = Field(None, min_length=1)
     lead_view: (
         Literal[
-            'account.profile',
-            'account.voice',
-            'account.likeness',
-            'account.device_appearance',
-            'chat.skills',
-            'chat.shortcuts',
-            'home.commands',
-            'home.voice_catalog',
-            'home.engine_admin',
-            'home.devices_admin',
-            'home.routing_stats',
-            'home.reference_library',
-            'home.pictures_library',
+            "account.profile",
+            "account.voice",
+            "account.likeness",
+            "account.device_appearance",
+            "chat.skills",
+            "chat.shortcuts",
+            "home.commands",
+            "home.voice_catalog",
+            "home.engine_admin",
+            "home.devices_admin",
+            "home.routing_stats",
+            "home.reference_library",
+            "home.pictures_library",
+            "home.media_library",
         ]
         | None
-    ) = Field(None, description='keys only: a view drawn above the cards.')
+    ) = Field(None, description="keys only: a view drawn above the cards.")
     trail_view: (
         Literal[
-            'account.profile',
-            'account.voice',
-            'account.likeness',
-            'account.device_appearance',
-            'chat.skills',
-            'chat.shortcuts',
-            'home.commands',
-            'home.voice_catalog',
-            'home.engine_admin',
-            'home.devices_admin',
-            'home.routing_stats',
-            'home.reference_library',
-            'home.pictures_library',
+            "account.profile",
+            "account.voice",
+            "account.likeness",
+            "account.device_appearance",
+            "chat.skills",
+            "chat.shortcuts",
+            "home.commands",
+            "home.voice_catalog",
+            "home.engine_admin",
+            "home.devices_admin",
+            "home.routing_stats",
+            "home.reference_library",
+            "home.pictures_library",
+            "home.media_library",
         ]
         | None
-    ) = Field(None, description='keys only: a view drawn below the cards.')
+    ) = Field(None, description="keys only: a view drawn below the cards.")
     view: (
         Literal[
-            'account.profile',
-            'account.voice',
-            'account.likeness',
-            'account.device_appearance',
-            'chat.skills',
-            'chat.shortcuts',
-            'home.commands',
-            'home.voice_catalog',
-            'home.engine_admin',
-            'home.devices_admin',
-            'home.routing_stats',
-            'home.reference_library',
-            'home.pictures_library',
+            "account.profile",
+            "account.voice",
+            "account.likeness",
+            "account.device_appearance",
+            "chat.skills",
+            "chat.shortcuts",
+            "home.commands",
+            "home.voice_catalog",
+            "home.engine_admin",
+            "home.devices_admin",
+            "home.routing_stats",
+            "home.reference_library",
+            "home.pictures_library",
+            "home.media_library",
         ]
         | None
     ) = Field(
         None,
         description="A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
     )
-    href: constr(pattern=r'^/([^{}]|\{self\})*$') | None = Field(
+    href: constr(pattern=r"^/([^{}]|\{self\})*$") | None = Field(
         None,
         description="An in-app path. {self} is the only placeholder, resolved on the client to the viewer's own id; no other person id can appear.",
     )
@@ -232,13 +235,13 @@ class Section(BaseModel):
         None, description="Extra words the area's own search matches."
     )
     order: int | None = None
-    min_role: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] | None = (
+    min_role: Literal["owner", "admin", "adult", "teen", "child", "guest"] | None = (
         Field(
             None,
-            description='The role ladder, most to least privileged. min_role is the lowest role that may see the thing.',
+            description="The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
         )
     )
-    bands: list[Literal['child', 'teen', 'adult']] | None = Field(None, min_length=1)
+    bands: list[Literal["child", "teen", "adult"]] | None = Field(None, min_length=1)
     needs: list[constr(min_length=1)] | None = None
 
 
@@ -248,11 +251,11 @@ class Audience(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
-    min_role: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] = Field(
+    min_role: Literal["owner", "admin", "adult", "teen", "child", "guest"] = Field(
         ...,
-        description='The role ladder, most to least privileged. min_role is the lowest role that may see the thing.',
+        description="The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
     )
 
 
@@ -262,23 +265,23 @@ class SettingsArea(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
-    id: constr(pattern=r'^[a-z][a-z0-9-]{0,31}$') = Field(
+    id: constr(pattern=r"^[a-z][a-z0-9-]{0,31}$") = Field(
         ...,
-        description='Route segment: /settings/<id>/<section>. Unique. The nine ids in $defs.reservedIds are static legacy routes that already own those paths; areas-check.ts refuses them (a JSON Schema `not` would drop this pattern from the generated models).',
+        description="Route segment: /settings/<id>/<section>. Unique. The nine ids in $defs.reservedIds are static legacy routes that already own those paths; areas-check.ts refuses them (a JSON Schema `not` would drop this pattern from the generated models).",
     )
     title: constr(min_length=1, max_length=40) = Field(
         ..., description="The settings column's heading."
     )
-    app: constr(pattern=r'^/[A-Za-z0-9/_-]*$') | None = Field(
+    app: constr(pattern=r"^/[A-Za-z0-9/_-]*$") | None = Field(
         None,
         description="The nav entry that owns this area, so the app's header gets a gear. Absent for Account and Home settings.",
     )
-    audience: Audience = Field(..., description='Who sees the area at all.')
+    audience: Audience = Field(..., description="Who sees the area at all.")
     groups: list[Group] = Field(
         ...,
-        description='Sidebar groups, in order. Every section is listed in exactly one.',
+        description="Sidebar groups, in order. Every section is listed in exactly one.",
         min_length=1,
     )
     sections: list[Section] = Field(..., min_length=1)

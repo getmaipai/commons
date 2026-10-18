@@ -79,7 +79,7 @@ describe("spec/settings/areas.json", () => {
   test("Home settings groups household sections and names its admin views", () => {
     expect(area("home").groups.map((group) => group.label)).toEqual([
       "General", "People", "Engines and AI", "Pictures and videos", "Devices", "Search", "Integrations", "Commands", "Voices",
-      "Storage and backups", "Reference library", "Maintenance", "Privacy", "Developer", "Network and access",
+      "Storage and backups", "Reference library", "Media library", "Maintenance", "Privacy", "Developer", "Network and access",
     ]);
     expect(section("home", "ai").trail_view).toBe("home.engine_admin");
     expect(section("home", "robot").trail_view).toBe("home.devices_admin");
@@ -193,6 +193,7 @@ describe("conformance: structure", () => {
       "home.commands",
       "home.devices_admin",
       "home.engine_admin",
+      "home.media_library",
       "home.pictures_library",
       "home.reference_library",
       "home.routing_stats",
