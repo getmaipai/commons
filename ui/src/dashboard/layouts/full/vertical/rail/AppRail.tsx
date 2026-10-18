@@ -86,7 +86,7 @@ const railButton =
  * token, falling back to `--sidebar`.
  * Composed from the kit's shipped Tooltip and HeaderSearch; app entries
  * come from the same sidebaritems data the folded sidebar renders. */
-function itemLabel(item: ChildItem, status: ReturnType<RailItemStatus>): string {
+function itemLabel(item: { name: string }, status: ReturnType<RailItemStatus>): string {
   if (!status?.ariaLabel) return item.name;
   return status.ariaLabel.toLocaleLowerCase().startsWith(`${item.name.toLocaleLowerCase()}:`) ? status.ariaLabel : `${item.name}: ${status.ariaLabel}`;
 }
@@ -183,7 +183,7 @@ function AllAppsLink({ href, active }: { href: string; active: boolean }) {
   );
 }
 
-export default function AppRail({ searchRemote, itemStatus, profile, activeAppHref, tourId, itemTourId, apps, onTogglePin, allAppsHref }: AppRailProps) {
+export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, itemTourId, apps, onTogglePin, allAppsHref, mobile = false, children }: AppRailProps & { mobile?: boolean; children?: ReactNode }) {
   const { pathname } = useLocation();
   const all = SidebarContent.flatMap((section) => flatten(section.items));
   // The brand mark is the Home destination (owner, 2026-10-06: "replace
@@ -192,7 +192,8 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
   const home = all.find((item) => item.url !== undefined && railHref(item.url) === "/");
   const items = home ? all.filter((item) => item !== home) : all;
   const isActive = (url: string) => (activeAppHref ? railHref(activeAppHref) === railHref(url) : isRailItemActive(pathname, url));
-  const pinnedApps = (apps ?? []).filter((app) => app.pinned).slice(0, RAIL_APPS_MAX);
+  const pinnedApps = mobile ? (apps ?? []) : (apps ?? []).filter((app) => app.pinned).slice(0, RAIL_APPS_MAX);
+  const entryClass = mobile ? "relative flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring" : railButton;
   const homeActive = home?.url ? (activeAppHref ? railHref(activeAppHref) === railHref(home.url) : isRailItemActive(pathname, home.url)) : false;
   const homeStatus = home ? itemStatus?.(home) : undefined;
   const logo = (
@@ -203,12 +204,7 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
   );
 
   return (
-    <nav
-      aria-label="Primary navigation"
-      data-slot="app-rail"
-      data-tour={tourId}
-      className="sticky top-0 flex h-svh w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)] shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2"
-    >
+    <>
       {home ? (
         <Tooltip>
           <TooltipTrigger
@@ -220,11 +216,12 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
                 data-active={homeActive ? "" : undefined}
                       data-slot="app-rail-home"
                       data-tour={itemTourId?.(home)}
-                className={cn(railButton, "mb-1", hitArea(1), homeActive && "bg-foreground/10")}
+                className={cn(entryClass, "mb-1", !mobile && hitArea(1), homeActive && "bg-foreground/10")}
               />
             }
           >
             {logo}
+            {mobile ? <span>{home.name}</span> : null}
             <StatusMark status={homeStatus} />
           </TooltipTrigger>
           <ItemTooltip name={home.name} status={homeStatus} />
@@ -235,14 +232,17 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
         </Link>
       )}
 
+      <div className="flex items-center gap-3">
       <Tooltip>
         <TooltipTrigger render={<div data-slot="app-rail-search" className="flex size-[var(--rail-button,40px)] items-center justify-center" />}>
           <HeaderSearch remote={searchRemote} triggerClassName="rounded-lg text-muted-foreground hover:bg-foreground/5 hover:text-foreground [&_svg]:size-5" />
         </TooltipTrigger>
         <TooltipContent side="right">Search</TooltipContent>
       </Tooltip>
+      {mobile ? <span aria-hidden>Search</span> : null}
+      </div>
 
-      <ul className="mt-2 flex flex-col items-center gap-1">
+      <ul className={cn("mt-2 flex flex-col gap-1", !mobile && "items-center")}>
         {items.map((item) => {
           const active = item.url ? (activeAppHref ? railHref(activeAppHref) === railHref(item.url) : isRailItemActive(pathname, item.url)) : false;
           const status = itemStatus?.(item);
@@ -259,11 +259,12 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
                       data-active={active ? "" : undefined}
                       data-slot="app-rail-item"
                       data-tour={itemTourId?.(item)}
-                      className={cn(railButton, hitArea(1), active && "bg-foreground/10 text-foreground")}
+                      className={cn(entryClass, !mobile && hitArea(1), active && "bg-foreground/10 text-foreground")}
                     />
                   }
                 >
-                  {Icon ? <Icon className="size-5" aria-hidden /> : null}
+                  {Icon ? <Icon className="size-5 shrink-0" aria-hidden /> : null}
+                  {mobile ? <span>{item.name}</span> : null}
                   <StatusMark status={status} />
                 </TooltipTrigger>
                 <ItemTooltip name={item.name} status={status} />
@@ -274,7 +275,7 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
       </ul>
 
       {pinnedApps.length ? (
-        <ul data-slot="app-rail-apps" aria-label="Pinned apps" className="mt-1 flex flex-col items-center gap-1 border-t border-border pt-2">
+        <ul data-slot="app-rail-apps" aria-label={mobile ? "Installed apps" : "Pinned apps"} className={cn("mt-1 flex flex-col gap-1 border-t border-border pt-2", !mobile && "items-center")}>
           {pinnedApps.map((app) => {
             const active = isActive(app.url);
             const Icon = getIcon(app.icon);
@@ -285,18 +286,20 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
                     render={
                       <Link
                         to={railHref(app.url)}
-                        aria-label={app.name}
+                        aria-label={itemLabel(app, itemStatus?.(app))}
                         aria-current={active ? "page" : undefined}
                         data-active={active ? "" : undefined}
                         data-slot="app-rail-app"
                         data-tour={itemTourId?.({ name: app.name, url: app.url })}
-                        className={cn(railButton, hitArea(1), active && "bg-foreground/10 text-foreground")}
+                        className={cn(entryClass, !mobile && hitArea(1), active && "bg-foreground/10 text-foreground")}
                       />
                     }
                   >
-                    <Icon className="size-5" aria-hidden />
+                    <Icon className="size-5 shrink-0" aria-hidden />
+                    {mobile ? <span>{app.name}</span> : null}
+                    <StatusMark status={itemStatus?.(app)} />
                   </TooltipTrigger>
-                  <ItemTooltip name={app.name} status={undefined} />
+                  <ItemTooltip name={app.name} status={itemStatus?.(app)} />
                 </Tooltip>
               </li>
             );
@@ -304,10 +307,18 @@ export default function AppRail({ searchRemote, itemStatus, profile, activeAppHr
         </ul>
       ) : null}
 
-      <div className="mt-auto flex flex-col items-center gap-1">
+      {children}
+      {!mobile ? <div className="mt-auto flex flex-col items-center gap-1">
         {apps?.length ? allAppsHref ? <AllAppsLink href={allAppsHref} active={isRailItemActive(pathname, allAppsHref)} /> : <AppLauncher apps={apps} onTogglePin={onTogglePin} isActive={isActive} /> : null}
         {profile}
-      </div>
-    </nav>
+      </div> : null}
+    </>
   );
+}
+
+export default function AppRail(props: AppRailProps) {
+  return <nav aria-label="Primary navigation" data-slot="app-rail" data-tour={props.tourId}
+    className="sticky top-0 flex h-svh w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)] shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2">
+    <RailEntries {...props} />
+  </nav>;
 }

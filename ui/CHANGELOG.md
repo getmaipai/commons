@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.275] - ui-v0.5.275
+
+- MOBILE-RAIL-01: phone layouts use a labelled navigation drawer with shared rail entries, app status marks, mobile sections, profile and optional Settings. Includes a safe-area menu button, immersive hiding, edge swipe, and viewport overflow containment. Exports useIsPhoneLayout for hosts.
+
 ## [0.5.274] - ui-v0.5.274
 
 - StoryFeed: a story with no picture, or whose picture fails to load, shows a publisher-colored tile with the publisher's initial (no icon, no empty box); the hue is a stable pick from the named palette tokens and a failed picture address is remembered. Row thumbnails use the same tile. (ui-v0.5.273 carried this change but was cut without the package version bump; use 0.5.274.)

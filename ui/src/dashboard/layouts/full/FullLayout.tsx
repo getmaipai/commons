@@ -1,3 +1,6 @@
+import { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
+export { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
+import MobileNavDrawer from "./vertical/rail/MobileNavDrawer";
 import { FC, useState, type ReactNode } from 'react';
 import AppRail, { type RailApp } from './vertical/rail/AppRail';
 import { useHeaderExtraLeft } from './vertical/header/HeaderExtraContext';
@@ -51,6 +54,9 @@ export interface FullLayoutProps {
    * when a page places content in it. Off by default, so every other
    * consumer keeps the sidebar layout unchanged. */
   rail?: boolean;
+  mobileSections?: ReactNode;
+  settingsHref?: string;
+  hideMobileMenu?: boolean;
   /** The profile control at the bottom of the rail (RailProfileMenu). */
   railProfile?: ReactNode;
   /** Stable tour target for the rail and its app entries. */
@@ -80,18 +86,20 @@ function RailPageHeader() {
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, onRailAppPinChange, railAllAppsHref }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu }: FullLayoutProps) {
+  const phone = useIsPhoneLayout();
+  const Navigation = phone ? MobileNavDrawer : AppRail;
   return (
     <HeaderExtraProvider>
       {/* The page scrolls as a document, as it did beside the sidebar;
           the rail stays put (sticky, full viewport height). A full-height
           page (a chat) bounds the workspace to the viewport itself. */}
-      <div data-slot="rail-shell" className="flex min-h-svh w-full">
-        <AppRail searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
-        <main data-slot="rail-workspace" className="flex min-w-0 flex-1 flex-col" style={{ background: "var(--page)" }}>
+      <div data-slot="rail-shell" className="flex min-h-svh w-full min-w-0 max-w-full overflow-x-clip">
+        <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
+        <main data-slot="rail-workspace" className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
           <RailPageHeader />
-          <div data-slot="rail-body" className="flex-1">
-            <div className={cn("w-full mx-auto p-4", "container")}>
+          <div data-slot="rail-body" className="min-w-0 max-w-full flex-1">
+            <div className={cn("box-border min-w-0 max-w-full w-full mx-auto p-4", "container")}>
               <Outlet />
             </div>
           </div>
