@@ -40,6 +40,48 @@ describe("MusicTrack", () => {
     expect(calls).toEqual(["download", "share", "save", "another"]);
     expect(view.getByRole("button", { name: "Extra" })).toBeTruthy();
   });
+  test("cover uses the Player poster with host alt text and actions", () => {
+    const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" cover="/cover.jpg" coverAlt="A sunrise" coverActions={<button type="button">New cover</button>} />);
+    const poster = view.getByRole("img", { name: "A sunrise" });
+    expect(poster.getAttribute("src")).toBe("/cover.jpg");
+    expect(poster.closest('[data-layout="audio"]')).toBeTruthy();
+    expect(view.getByRole("button", { name: "New cover" })).toBeTruthy();
+  });
+  test("timed lyrics follow playback, seek, play and scroll with reduced motion", () => {
+    const scroll = spyOn(HTMLElement.prototype, "scrollIntoView").mockImplementation(() => {});
+    const matchMedia = spyOn(window, "matchMedia").mockReturnValue({ matches: true } as MediaQueryList);
+    const play = spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
+    try {
+      const timedLyrics = [
+        { t: 2, line: "Morning light", section: "Verse" },
+        { t: 10, line: "Across the sky", section: "Verse" },
+        { t: 20, line: "Sing along", section: "Chorus" },
+      ];
+      const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" timedLyrics={timedLyrics} lyrics="Plain fallback" />);
+      fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+      expect(view.getAllByText("Verse")).toHaveLength(1);
+      expect(view.getByText("Chorus")).toBeTruthy();
+      expect(view.container.querySelector("pre")).toBeNull();
+      const audio = view.container.querySelector("audio")!;
+      expect(view.container.querySelector('[aria-current="true"]')).toBeNull();
+      act(() => { audio.currentTime = 12.5; fireEvent.timeUpdate(audio); });
+      expect(view.getByRole("button", { name: "Across the sky" }).getAttribute("aria-current")).toBe("true");
+      expect(scroll).toHaveBeenLastCalledWith({ block: "nearest", behavior: "auto" });
+      fireEvent.click(view.getByRole("button", { name: "Sing along" }));
+      expect(audio.currentTime).toBe(20);
+      expect(play).toHaveBeenCalled();
+      expect(view.getByRole("button", { name: "Sing along" }).getAttribute("aria-current")).toBe("true");
+      act(() => { audio.currentTime = 2; fireEvent.seeked(audio); });
+      expect(view.getByRole("button", { name: "Morning light" }).getAttribute("aria-current")).toBe("true");
+      matchMedia.mockReturnValue({ matches: false } as MediaQueryList);
+      act(() => { audio.currentTime = 12.5; fireEvent.timeUpdate(audio); });
+      expect(scroll).toHaveBeenLastCalledWith({ block: "nearest", behavior: "smooth" });
+      view.rerender(<MusicTrack status="generating" title="Song" timedLyrics={timedLyrics} />);
+      scroll.mockClear();
+      act(() => { audio.currentTime = 20; fireEvent.timeUpdate(audio); });
+      expect(scroll).not.toHaveBeenCalled();
+    } finally { scroll.mockRestore(); matchMedia.mockRestore(); play.mockRestore(); }
+  });
   test("download falls back to a temporary link with default or supplied name", () => {
     const links: string[][] = [];
     const click = spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) { links.push([this.getAttribute("href")!, this.download]); });

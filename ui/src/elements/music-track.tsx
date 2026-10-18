@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AlertCircleIcon, ChevronLeftIcon, ChevronRightIcon, DownloadIcon, LibraryIcon, RefreshCwIcon, Share2Icon, SquareIcon, WandSparklesIcon } from "lucide-react";
 import { cn } from "cn";
 import { Alert, AlertDescription } from "@/kit/ui/alert";
@@ -60,7 +60,7 @@ function download(src: string, name: string) {
 /** A generated song. The host owns sources, version selection and all I/O. */
 export function MusicTrack({
   status, title, description, src, progress, phaseLabel, queuePosition, startedAt,
-  estimateMs = 120_000, etaLabel, hint, error, downloadName = "song.m4a", lyrics,
+  estimateMs = 120_000, etaLabel, hint, error, downloadName = "song.m4a", lyrics, timedLyrics, cover, coverAlt, coverActions,
   versions = [], currentId, onSelectVersion, onUseVersion, onStop, onRetry, onDownload,
   onShare, onSaveToLibrary, onMakeAnother, actions, metadata, copy, className,
 }: {
@@ -78,6 +78,10 @@ export function MusicTrack({
   error?: string;
   downloadName?: string;
   lyrics?: string;
+  cover?: string;
+  coverAlt?: string;
+  coverActions?: ReactNode;
+  timedLyrics?: { t: number; line: string; section?: string | null }[];
   /** Oldest first, newest last. Selection is controlled by the host. */
   versions?: Array<VersionLike & { label: string }>;
   currentId?: string;
@@ -96,6 +100,29 @@ export function MusicTrack({
   className?: string;
 }) {
   const text = { ...DEFAULT_COPY, ...copy };
+  const [media, setMedia] = useState<HTMLMediaElement | null>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [lyricsOpen, setLyricsOpen] = useState(false);
+  const lineRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  useEffect(() => {
+    if (!media || !timedLyrics) return;
+    const sync = () => setCurrentTime(media.currentTime);
+    sync();
+    media.addEventListener("timeupdate", sync);
+    media.addEventListener("seeked", sync);
+    return () => {
+      media.removeEventListener("timeupdate", sync);
+      media.removeEventListener("seeked", sync);
+    };
+  }, [media, timedLyrics, src]);
+  const activeLine = timedLyrics?.reduce((active, { t }, i) => t <= currentTime ? i : active, -1) ?? -1;
+  useEffect(() => {
+    if (!lyricsOpen) return;
+    lineRefs.current[activeLine]?.scrollIntoView({
+      block: "nearest",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
+  }, [activeLine, lyricsOpen, timedLyrics]);
   const live = status === "queued" || status === "generating";
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -115,12 +142,13 @@ export function MusicTrack({
     {onShare ? <Button type="button" variant="outline" size="sm" onClick={onShare}><Share2Icon aria-hidden />{text.share}</Button> : null}
     {onSaveToLibrary ? <Button type="button" variant="outline" size="sm" onClick={onSaveToLibrary}><LibraryIcon aria-hidden />{text.saveToLibrary}</Button> : null}
     {onMakeAnother ? <Button type="button" variant="outline" size="sm" onClick={onMakeAnother}><WandSparklesIcon aria-hidden />{text.makeAnother}</Button> : null}
+    {cover ? coverActions : null}
     {actions}
   </div>;
 
   return <Card data-slot="music-track" data-status={status} aria-label={title} className={cn("w-full max-w-xl gap-0 overflow-hidden py-0", className)}>
     <CardContent className="flex flex-col gap-3 py-3">
-      {ready && src ? <Player kind="audio" layout="audio" src={src} title={title} subtitle={description} actionsSlot={actionButtons} mediaSession metadata={metadata} copy={text.player} /> : <>
+      {ready && src ? <Player kind="audio" layout="audio" src={src} title={title} subtitle={description} poster={cover} posterAlt={coverAlt} mediaRef={setMedia} actionsSlot={actionButtons} mediaSession metadata={metadata} copy={text.player} /> : <>
         <div><p className="text-sm font-medium">{title}</p>{description ? <p className="text-muted-foreground text-sm">{description}</p> : null}</div>
         {live ? <>
           <GenerationStage generating={false} aspectRatio="auto" className="rounded-none border-0">
@@ -143,9 +171,27 @@ export function MusicTrack({
         {onRetry ? <Button type="button" variant="outline" size="sm" onClick={onRetry}><RefreshCwIcon aria-hidden />{text.retry}</Button> : null}
       </> : null}
       {status === "cancelled" ? <p className="text-muted-foreground text-sm">{text.stopped}</p> : null}
-      {ready && lyrics ? <Collapsible>
+      {ready && (timedLyrics || lyrics) ? <Collapsible onOpenChange={setLyricsOpen}>
         <CollapsibleTrigger asChild><Button type="button" variant="outline" size="sm">{text.lyrics}</Button></CollapsibleTrigger>
-        <CollapsibleContent><pre className="whitespace-pre-wrap break-words font-sans text-sm">{lyrics}</pre></CollapsibleContent>
+        <CollapsibleContent>
+          {timedLyrics ? <ol className="max-h-64 min-w-0 space-y-1 overflow-x-hidden overflow-y-auto" aria-label={text.lyrics}>
+            {timedLyrics.map(({ t, line, section }, i) => <li key={i} className="min-w-0">
+              {section && section !== timedLyrics[i - 1]?.section ? <p className="text-muted-foreground px-3 pt-3 text-xs font-medium">{section}</p> : null}
+              <Button
+                ref={(node) => { lineRefs.current[i] = node; }}
+                type="button" variant="ghost"
+                aria-current={i === activeLine ? "true" : undefined}
+                className={cn("h-auto w-full min-w-0 justify-start whitespace-pre-wrap px-3 py-2 text-left [overflow-wrap:anywhere]", i === activeLine && "bg-accent text-accent-foreground")}
+                onClick={() => {
+                  if (!media) return;
+                  media.currentTime = t;
+                  setCurrentTime(t);
+                  void media.play().catch(() => {});
+                }}
+              >{line}</Button>
+            </li>)}
+          </ol> : <pre className="whitespace-pre-wrap break-words font-sans text-sm">{lyrics}</pre>}
+        </CollapsibleContent>
       </Collapsible> : null}
       {ready && versions.length >= 2 && index >= 0 ? <div className="flex flex-wrap items-center gap-2">
         <Button type="button" variant="outline" size="icon" aria-label={text.previous} disabled={!previous || !onSelectVersion} onClick={() => previous && onSelectVersion?.(previous.id)}><ChevronLeftIcon aria-hidden /></Button>

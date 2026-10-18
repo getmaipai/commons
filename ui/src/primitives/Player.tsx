@@ -165,6 +165,8 @@ export interface PlayerProps {
   subtitle?: string;
   /** The video poster, or the art for audio and the mini bar. */
   poster?: string;
+  /** Alternative text for audio artwork. Decorative by default. */
+  posterAlt?: string;
   chapters?: readonly PlayerChapter[];
   /** A storyboard WebVTT (sprite `#xywh=` cues) for preview thumbnails on the time range. */
   thumbnails?: string;
@@ -290,6 +292,7 @@ export function Player(props: PlayerProps) {
     title,
     subtitle,
     poster,
+    posterAlt = "",
     thumbnails,
     captions = [],
     resumeFrom,
@@ -979,7 +982,7 @@ export function Player(props: PlayerProps) {
 
   const art = (size: string) =>
     poster ? (
-      <img src={poster} alt="" className={cn("shrink-0 rounded-[var(--art-radius)] bg-muted object-cover", size)} />
+      <img src={poster} alt={posterAlt} className={cn("shrink-0 rounded-[var(--art-radius)] bg-muted object-cover", size)} />
     ) : (
       <span aria-hidden className={cn("flex shrink-0 items-center justify-center rounded-[var(--art-radius)] bg-muted", size)}>
         <Icon name={kind === "video" ? "film" : "music"} className="text-muted-foreground size-6" />

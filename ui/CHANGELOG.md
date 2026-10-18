@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.272] - ui-v0.5.272
+
+- MusicTrack: cover art (`cover`, `coverAlt`, `coverActions`; the cover is the Player's poster and the media session artwork) and timed lyrics (`timedLyrics`: the sung line is highlighted with `aria-current`, a tap seeks to it, the list scrolls without smooth motion under reduced motion). Player: `posterAlt`. MUSIC-GEN-19 and -20.
+
 ## [0.5.271] - ui-v0.5.271
 
 - List, shelf and grid nodes draw their empty_state action and action_label as the empty state's button (the button was dropped).
