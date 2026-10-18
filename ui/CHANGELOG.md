@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.274] - ui-v0.5.274
+
+- StoryFeed: a story with no picture, or whose picture fails to load, shows a publisher-colored tile with the publisher's initial (no icon, no empty box); the hue is a stable pick from the named palette tokens and a failed picture address is remembered. Row thumbnails use the same tile. (ui-v0.5.273 carried this change but was cut without the package version bump; use 0.5.274.)
+
 ## [0.5.272] - ui-v0.5.272
 
 - MusicTrack: cover art (`cover`, `coverAlt`, `coverActions`; the cover is the Player's poster and the media session artwork) and timed lyrics (`timedLyrics`: the sung line is highlighted with `aria-current`, a tap seeks to it, the list scrolls without smooth motion under reduced motion). Player: `posterAlt`. MUSIC-GEN-19 and -20.
