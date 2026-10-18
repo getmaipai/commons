@@ -1095,6 +1095,121 @@ export const PackageManifest = z
             "This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat).",
           )
           .optional(),
+        /**NEWS-SIDEBAR-01. This app's own sidebar column on wide screens: the app's search box and ordered groups of entries, drawn by the one kit sidebar beside the main rail (design rules S1, S2). The search is the same `search` node a page uses, a row group binds a `contributes.data` list the way a `list` node does, and an entry opens its target with the same `navigate` action, so no shape is spelled twice: those three objects are defined by spec/ui/schema.json (`search`, `package_binding`, `action`) and the hub validates them against it when the package loads, as it does a page. A page entry takes its label, icon and visibility from the page it names (the page's own `min_role` and the app's own switches), so no floor is repeated here. An entry, a `manage` row or a search box whose target page the viewer cannot open is not drawn, and a group left with no entries is not drawn. The manifest lint (spec/ui/app-check.ts) checks every page id, data id, action and field against the package. On a phone the shell's drawer lists the same entries.*/
+        sidebar: z
+          .object({
+            /**The app's search box: a spec/ui/schema.json `search` node (`type: "search"`, `state`, `placeholder`, `recents` binding, `submit`, `clear_recents`).*/
+            search: z
+              .record(z.string(), z.any())
+              .describe(
+                'The app\'s search box: a spec/ui/schema.json `search` node (`type: "search"`, `state`, `placeholder`, `recents` binding, `submit`, `clear_recents`).',
+              )
+              .optional(),
+            groups: z
+              .array(
+                z
+                  .object({
+                    id: z
+                      .string()
+                      .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                      .max(40),
+                    title: z.string().min(1).max(40).optional(),
+                    /**Entries that are this package's own pages, in this order. A group has exactly one of `pages` and `rows`; the manifest lint enforces it, because the generated models cannot say it.*/
+                    pages: z
+                      .array(
+                        z
+                          .string()
+                          .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                          .max(40),
+                      )
+                      .min(1)
+                      .max(8)
+                      .refine(
+                        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                        "All items must be unique!",
+                      )
+                      .describe(
+                        "Entries that are this package's own pages, in this order. A group has exactly one of `pages` and `rows`; the manifest lint enforces it, because the generated models cannot say it.",
+                      )
+                      .optional(),
+                    rows: z
+                      .object({
+                        /**A spec/ui/schema.json `package_binding`: a `contributes.data` id with `rows: "list"`, bound as a `list` node binds it.*/
+                        bind: z
+                          .record(z.string(), z.any())
+                          .describe(
+                            'A spec/ui/schema.json `package_binding`: a `contributes.data` id with `rows: "list"`, bound as a `list` node binds it.',
+                          ),
+                        /**The row field that identifies it, as on a `list` node.*/
+                        item_key_field: z
+                          .string()
+                          .min(1)
+                          .max(40)
+                          .describe(
+                            "The row field that identifies it, as on a `list` node.",
+                          )
+                          .optional(),
+                        /**The row field drawn as the entry's label, as on a `list` node.*/
+                        item_label_field: z
+                          .string()
+                          .min(1)
+                          .max(40)
+                          .describe(
+                            "The row field drawn as the entry's label, as on a `list` node.",
+                          )
+                          .optional(),
+                        /**A dotted path to a lucide icon name or a same-origin image path (starting with `/`), as on a `list` node; never an address.*/
+                        item_media_field: z
+                          .string()
+                          .min(1)
+                          .max(40)
+                          .describe(
+                            "A dotted path to a lucide icon name or a same-origin image path (starting with `/`), as on a `list` node; never an address.",
+                          )
+                          .optional(),
+                        /**Draw only the rows whose `followed` field is true.*/
+                        only_followed: z
+                          .boolean()
+                          .describe(
+                            "Draw only the rows whose `followed` field is true.",
+                          )
+                          .optional(),
+                        /**A spec/ui/schema.json `action` run when an entry is chosen, usually a `navigate`; `{field}` placeholders in its state fill from the row.*/
+                        open: z
+                          .record(z.string(), z.any())
+                          .describe(
+                            "A spec/ui/schema.json `action` run when an entry is chosen, usually a `navigate`; `{field}` placeholders in its state fill from the row.",
+                          ),
+                        /**A last entry after the rows that opens a management page, such as Manage.*/
+                        manage: z
+                          .object({
+                            label: z.string().min(1).max(40),
+                            /**A spec/ui/schema.json `action`, usually a `navigate` to the management page.*/
+                            open: z
+                              .record(z.string(), z.any())
+                              .describe(
+                                "A spec/ui/schema.json `action`, usually a `navigate` to the management page.",
+                              ),
+                          })
+                          .strict()
+                          .describe(
+                            "A last entry after the rows that opens a management page, such as Manage.",
+                          )
+                          .optional(),
+                      })
+                      .strict()
+                      .optional(),
+                  })
+                  .strict(),
+              )
+              .min(1)
+              .max(6),
+          })
+          .strict()
+          .describe(
+            "NEWS-SIDEBAR-01. This app's own sidebar column on wide screens: the app's search box and ordered groups of entries, drawn by the one kit sidebar beside the main rail (design rules S1, S2). The search is the same `search` node a page uses, a row group binds a `contributes.data` list the way a `list` node does, and an entry opens its target with the same `navigate` action, so no shape is spelled twice: those three objects are defined by spec/ui/schema.json (`search`, `package_binding`, `action`) and the hub validates them against it when the package loads, as it does a page. A page entry takes its label, icon and visibility from the page it names (the page's own `min_role` and the app's own switches), so no floor is repeated here. An entry, a `manage` row or a search box whose target page the viewer cannot open is not drawn, and a group left with no entries is not drawn. The manifest lint (spec/ui/app-check.ts) checks every page id, data id, action and field against the package. On a phone the shell's drawer lists the same entries.",
+          )
+          .optional(),
         /**wave-2.md's D-to-E contract: `GET /api/widgets` and `GET /api/widgets/:package/:id/data` list and serve these.*/
         widgets: z
           .array(

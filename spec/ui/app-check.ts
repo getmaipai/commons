@@ -7,7 +7,10 @@
 
 export interface AppPageEntry { id: string; label?: string; nav?: boolean; kind?: string; module: string; icon?: string; keywords?: string[]; pinned_by_default?: boolean; pin_order?: number; min_role?: string }
 export interface AppDataEntry { id: string; surface?: string; rows?: string; inputs?: Record<string, unknown>; refresh_s?: number }
-export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[] }
+export interface AppSidebarRows { bind: unknown; item_key_field?: string; item_label_field?: string; item_media_field?: string; only_followed?: boolean; open: unknown; manage?: { label: string; open: unknown } }
+export interface AppSidebarGroup { id: string; title?: string; pages?: string[]; rows?: AppSidebarRows }
+export interface AppSidebar { search?: unknown; groups: AppSidebarGroup[] }
+export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[]; sidebar?: AppSidebar }
 
 /** The node types a package page may use. Anything that reads another route
  * (card_grid, widget_card, ...) or mounts a host component
@@ -131,6 +134,51 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   }
 }
 
+/** NEWS-SIDEBAR-01: the sidebar's references must land on this package. Its search is the page `search` node and its rows and
+ * actions are the page `package_binding` and `action`, so they run through the same checks a page's do (`walk`,
+ * `checkBinding`, `checkAction`); on top, every `navigate` target names a page this package declares, every `{field}`
+ * placeholder names a field the group declares, and a picture field is a field path, never an address. */
+function checkSidebar(packageId: string, sidebar: AppSidebar, pageIds: Set<string>, data: Map<string, AppDataEntry>, out: string[]): void {
+  const where = "contributes.sidebar";
+  const page = (id: string, at: string): void => { if (!pageIds.has(id)) out.push(`${where}: ${at} names page "${id}", which this package does not declare`); };
+  const target = (action: unknown, at: string, fields: ReadonlySet<string> | null): void => {
+    checkAction(action, packageId, `${where}: ${at}`, out);
+    if (!isObject(action) || !isObject(action.navigate)) return;
+    const to = action.navigate.to;
+    if (typeof to === "string") {
+      const base = `/apps/${packageId}`;
+      if (to === base) page("index", at);
+      else if (to.startsWith(`${base}/`)) page(to.slice(base.length + 1).split("/")[0] ?? "", at);
+    }
+    if (fields && isObject(action.navigate.state)) {
+      for (const value of Object.values(action.navigate.state)) {
+        if (typeof value !== "string") continue;
+        for (const match of value.matchAll(/\{([^}]+)\}/g)) if (!fields.has(match[1]!)) out.push(`${where}: ${at} placeholder {${match[1]}} names a field the group does not declare`);
+      }
+    }
+  };
+  if (sidebar.search !== undefined) {
+    if (!isObject(sidebar.search) || sidebar.search.type !== "search") out.push(`${where}: search must be a search node`);
+    else walk(sidebar.search, packageId, data, `${where} search`, out);
+    target(isObject(sidebar.search) ? sidebar.search.submit : undefined, "search.submit", null);
+  }
+  const seen = new Set<string>();
+  for (const group of sidebar.groups) {
+    const at = `group "${group.id}"`;
+    if (seen.has(group.id)) out.push(`${where}: ${at} is declared twice`);
+    seen.add(group.id);
+    if ((group.pages === undefined) === (group.rows === undefined)) out.push(`${where}: ${at} needs exactly one of pages and rows`);
+    for (const id of group.pages ?? []) page(id, at);
+    const rows = group.rows;
+    if (!rows) continue;
+    checkBinding(rows.bind, `${where}: ${at} rows`, data, "list", out);
+    const fields = new Set([rows.item_key_field ?? "key", rows.item_label_field ?? "label", ...(rows.item_media_field ? [rows.item_media_field] : [])]);
+    target(rows.open, `${at} open`, fields);
+    if (rows.manage) target(rows.manage.open, `${at} manage`, fields);
+    checkFieldPath(rows.item_media_field, `${where}: ${at}`, "rows.item_media_field", out);
+  }
+}
+
 /** `loadPage(module)` returns the parsed `pages/<module>.json`, or undefined when the file is missing. `packageMinRole` is the manifest's own `min_role`; with it a page that lowers the floor is reported. */
 export function checkAppPackage(packageId: string, contributes: AppContributes | undefined, loadPage: (module: string) => unknown, packageMinRole?: string): string[] {
   const out: string[] = [];
@@ -156,6 +204,7 @@ export function checkAppPackage(packageId: string, contributes: AppContributes |
     data.set(entry.id, entry);
     if (entry.rows === "places" && entry.surface === undefined) out.push(`data "${entry.id}": rows needs a surface`);
   }
+  if (contributes?.sidebar) checkSidebar(packageId, contributes.sidebar, ids, data, out);
   for (const page of pages) {
     const doc = loadPage(page.module);
     const where = `pages/${page.module}.json`;

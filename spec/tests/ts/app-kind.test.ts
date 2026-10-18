@@ -263,3 +263,56 @@ describe("the media page polish (MEDIA-POLISH-01)", () => {
     expect(checkAppPackage("videos", videoContributes, swap(play), "child").join("\n")).toContain("player.actions[0]: the play action is not available");
   });
 });
+
+describe("contributes.sidebar (NEWS-SIDEBAR-01)", () => {
+  const withData = (): AppContributes => ({
+    pages: [
+      { id: "index", label: "Today", nav: true, kind: "schema", module: "forecast" },
+      { id: "saved", label: "Saved", nav: true, kind: "schema", module: "forecast" },
+      { id: "channel", label: "Channel", nav: false, kind: "schema", module: "forecast" },
+      { id: "search", label: "Search", nav: false, kind: "schema", module: "forecast" },
+    ],
+    data: [{ id: "topics", rows: "list" }, { id: "recents", rows: "list" }, { id: "forecast" }],
+  });
+  const open = { navigate: { to: "/apps/weather/channel", state: { kind: "topic", key: "{key}" } } };
+  const sidebar = {
+    search: { type: "search", state: "q", placeholder: "Search", recents: { source: "package", path: "recents" }, submit: { navigate: { to: "/apps/weather/search", state: { q: "{q}" } } } },
+    groups: [
+      { id: "library", pages: ["index", "saved"] },
+      { id: "topics", title: "Topics", rows: { bind: { source: "package", path: "topics" }, item_media_field: "icon", open, manage: { label: "Manage", open: { navigate: { to: "/apps/weather/saved" } } } } },
+    ],
+  };
+  const problems = (side: unknown): string => checkAppPackage("weather", { ...withData(), sidebar: side as never }, load).join("\n");
+
+  test("a sidebar that lands on this package parses and passes the lint", () => {
+    expect(() => PackageManifest.parse({ ...BASE, contributes: { ...withData(), sidebar } })).not.toThrow();
+    expect(problems(sidebar)).toBe("");
+  });
+  test("its search, rows and actions go through the page checks, so a bad binding or recents is named", () => {
+    expect(problems({ ...sidebar, search: { ...sidebar.search, recents: { source: "package", path: "forecast" } } })).toContain("returns blocks, not rows");
+    expect(problems({ ...sidebar, search: { type: "list" } })).toContain("search must be a search node");
+    expect(problems({ groups: [{ id: "g", rows: { bind: { source: "package", path: "missing" }, open } }] })).toContain('bind.path "missing" is not a contributes.data id');
+    expect(problems({ groups: [{ id: "g", rows: { bind: { source: "package", path: "forecast" }, open } }] })).toContain('must be a "rows": "list" entry');
+    expect(problems({ groups: [{ id: "g", rows: { bind: { source: "route", path: "/x" }, open } }] })).toContain('bind.source must be "package"');
+  });
+  test("every navigate target is a page of this package and stays inside the app", () => {
+    expect(problems({ ...sidebar, search: { ...sidebar.search, submit: { navigate: { to: "/apps/weather/nowhere" } } } })).toContain('names page "nowhere"');
+    expect(problems({ groups: [{ id: "g", pages: ["ghost"] }] })).toContain('names page "ghost"');
+    expect(problems({ groups: [{ id: "g", rows: { bind: { source: "package", path: "topics" }, open: { navigate: { to: "/apps/other/channel" } } } }] })).toContain("must stay under /apps/weather");
+    expect(problems({ groups: [{ id: "g", rows: { bind: { source: "package", path: "topics" }, open: { navigate: { to: "/apps/weather/channel" } }, manage: { label: "M", open: { navigate: { to: "/apps/weather/gone" } } } } }] })).toContain('names page "gone"');
+  });
+  test("a {field} placeholder must name a field the group declares", () => {
+    expect(problems({ groups: [{ id: "g", rows: { bind: { source: "package", path: "topics" }, open: { navigate: { to: "/apps/weather/channel", state: { key: "{slug}" } } } } }] })).toContain("placeholder {slug} names a field the group does not declare");
+    expect(problems({ groups: [{ id: "g", rows: { bind: { source: "package", path: "topics" }, item_key_field: "slug", open: { navigate: { to: "/apps/weather/channel", state: { key: "{slug}" } } } } }] })).toBe("");
+  });
+  test("a group has exactly one of pages and rows, and an id once; a picture field is a path, never an address", () => {
+    expect(problems({ groups: [{ id: "g" }] })).toContain("exactly one of pages and rows");
+    expect(problems({ groups: [{ id: "g", pages: ["index"] }, { id: "g", pages: ["saved"] }] })).toContain("declared twice");
+    expect(problems({ groups: [{ id: "g", rows: { bind: { source: "package", path: "topics" }, item_media_field: "https://example.com/a.png", open } }] })).toContain("must be a field path");
+  });
+  test("the schema refuses an unknown key, no groups, a bad id and a row group with no target (both-or-neither of pages and rows is the lint's)", () => {
+    for (const bad of [{ ...sidebar, extra: 1 }, { groups: [] }, { groups: [{ id: "Bad Id", pages: ["index"] }] }, { groups: [{ id: "g", rows: { bind: {} } }] }, { groups: [{ id: "g", rows: { bind: {}, open: {}, unknown: 1 } }] }]) {
+      expect(() => PackageManifest.parse({ ...BASE, contributes: { ...withData(), sidebar: bad } })).toThrow();
+    }
+  });
+});

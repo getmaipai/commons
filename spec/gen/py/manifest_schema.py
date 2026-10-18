@@ -252,6 +252,83 @@ class Warm(BaseModel):
     )
 
 
+class Manage(BaseModel):
+    """
+    A last entry after the rows that opens a management page, such as Manage.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: constr(min_length=1, max_length=40)
+    open: dict[str, Any] = Field(
+        ...,
+        description='A spec/ui/schema.json `action`, usually a `navigate` to the management page.',
+    )
+
+
+class Rows(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    bind: dict[str, Any] = Field(
+        ...,
+        description='A spec/ui/schema.json `package_binding`: a `contributes.data` id with `rows: "list"`, bound as a `list` node binds it.',
+    )
+    item_key_field: constr(min_length=1, max_length=40) | None = Field(
+        None, description='The row field that identifies it, as on a `list` node.'
+    )
+    item_label_field: constr(min_length=1, max_length=40) | None = Field(
+        None,
+        description="The row field drawn as the entry's label, as on a `list` node.",
+    )
+    item_media_field: constr(min_length=1, max_length=40) | None = Field(
+        None,
+        description='A dotted path to a lucide icon name or a same-origin image path (starting with `/`), as on a `list` node; never an address.',
+    )
+    only_followed: bool | None = Field(
+        None, description='Draw only the rows whose `followed` field is true.'
+    )
+    open: dict[str, Any] = Field(
+        ...,
+        description='A spec/ui/schema.json `action` run when an entry is chosen, usually a `navigate`; `{field}` placeholders in its state fill from the row.',
+    )
+    manage: Manage | None = Field(
+        None,
+        description='A last entry after the rows that opens a management page, such as Manage.',
+    )
+
+
+class Group(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^[a-z][a-z0-9-]*$', max_length=40)
+    title: constr(min_length=1, max_length=40) | None = None
+    pages: list[constr(pattern=r'^[a-z][a-z0-9-]*$', max_length=40)] | None = Field(
+        None,
+        description="Entries that are this package's own pages, in this order. A group has exactly one of `pages` and `rows`; the manifest lint enforces it, because the generated models cannot say it.",
+        max_length=8,
+        min_length=1,
+    )
+    rows: Rows | None = None
+
+
+class Sidebar(BaseModel):
+    """
+    NEWS-SIDEBAR-01. This app's own sidebar column on wide screens: the app's search box and ordered groups of entries, drawn by the one kit sidebar beside the main rail (design rules S1, S2). The search is the same `search` node a page uses, a row group binds a `contributes.data` list the way a `list` node does, and an entry opens its target with the same `navigate` action, so no shape is spelled twice: those three objects are defined by spec/ui/schema.json (`search`, `package_binding`, `action`) and the hub validates them against it when the package loads, as it does a page. A page entry takes its label, icon and visibility from the page it names (the page's own `min_role` and the app's own switches), so no floor is repeated here. An entry, a `manage` row or a search box whose target page the viewer cannot open is not drawn, and a group left with no entries is not drawn. The manifest lint (spec/ui/app-check.ts) checks every page id, data id, action and field against the package. On a phone the shell's drawer lists the same entries.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    search: dict[str, Any] | None = Field(
+        None,
+        description='The app\'s search box: a spec/ui/schema.json `search` node (`type: "search"`, `state`, `placeholder`, `recents` binding, `submit`, `clear_recents`).',
+    )
+    groups: list[Group] = Field(..., max_length=6, min_length=1)
+
+
 class Widget(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -269,7 +346,7 @@ class Widget(BaseModel):
     )
 
 
-class Page(BaseModel):
+class Page1(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -408,11 +485,15 @@ class Contributes(BaseModel):
         None,
         description="This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat).",
     )
+    sidebar: Sidebar | None = Field(
+        None,
+        description="NEWS-SIDEBAR-01. This app's own sidebar column on wide screens: the app's search box and ordered groups of entries, drawn by the one kit sidebar beside the main rail (design rules S1, S2). The search is the same `search` node a page uses, a row group binds a `contributes.data` list the way a `list` node does, and an entry opens its target with the same `navigate` action, so no shape is spelled twice: those three objects are defined by spec/ui/schema.json (`search`, `package_binding`, `action`) and the hub validates them against it when the package loads, as it does a page. A page entry takes its label, icon and visibility from the page it names (the page's own `min_role` and the app's own switches), so no floor is repeated here. An entry, a `manage` row or a search box whose target page the viewer cannot open is not drawn, and a group left with no entries is not drawn. The manifest lint (spec/ui/app-check.ts) checks every page id, data id, action and field against the package. On a phone the shell's drawer lists the same entries.",
+    )
     widgets: list[Widget] | None = Field(
         None,
         description="wave-2.md's D-to-E contract: `GET /api/widgets` and `GET /api/widgets/:package/:id/data` list and serve these.",
     )
-    pages: list[Page] | None = Field(
+    pages: list[Page1] | None = Field(
         None,
         description="6.2's own package-declared pages: the `app` kind (docs/plans/app-kind-2026-10-16.md). A package with pages is a launchable app at `/apps/<package id>`; its access (role, enabled, capabilities, platforms, Incognito) is the package's own, one definition.",
     )

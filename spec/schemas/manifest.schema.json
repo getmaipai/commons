@@ -389,6 +389,116 @@
           "$ref": "settings-area.schema.json",
           "description": "This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat)."
         },
+        "sidebar": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "groups"
+          ],
+          "description": "NEWS-SIDEBAR-01. This app's own sidebar column on wide screens: the app's search box and ordered groups of entries, drawn by the one kit sidebar beside the main rail (design rules S1, S2). The search is the same `search` node a page uses, a row group binds a `contributes.data` list the way a `list` node does, and an entry opens its target with the same `navigate` action, so no shape is spelled twice: those three objects are defined by spec/ui/schema.json (`search`, `package_binding`, `action`) and the hub validates them against it when the package loads, as it does a page. A page entry takes its label, icon and visibility from the page it names (the page's own `min_role` and the app's own switches), so no floor is repeated here. An entry, a `manage` row or a search box whose target page the viewer cannot open is not drawn, and a group left with no entries is not drawn. The manifest lint (spec/ui/app-check.ts) checks every page id, data id, action and field against the package. On a phone the shell's drawer lists the same entries.",
+          "properties": {
+            "search": {
+              "type": "object",
+              "description": "The app's search box: a spec/ui/schema.json `search` node (`type: \"search\"`, `state`, `placeholder`, `recents` binding, `submit`, `clear_recents`)."
+            },
+            "groups": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 6,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]*$",
+                    "maxLength": 40
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "pages": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]*$",
+                      "maxLength": 40
+                    },
+                    "description": "Entries that are this package's own pages, in this order. A group has exactly one of `pages` and `rows`; the manifest lint enforces it, because the generated models cannot say it."
+                  },
+                  "rows": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "bind",
+                      "open"
+                    ],
+                    "properties": {
+                      "bind": {
+                        "type": "object",
+                        "description": "A spec/ui/schema.json `package_binding`: a `contributes.data` id with `rows: \"list\"`, bound as a `list` node binds it."
+                      },
+                      "item_key_field": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 40,
+                        "description": "The row field that identifies it, as on a `list` node."
+                      },
+                      "item_label_field": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 40,
+                        "description": "The row field drawn as the entry's label, as on a `list` node."
+                      },
+                      "item_media_field": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 40,
+                        "description": "A dotted path to a lucide icon name or a same-origin image path (starting with `/`), as on a `list` node; never an address."
+                      },
+                      "only_followed": {
+                        "type": "boolean",
+                        "description": "Draw only the rows whose `followed` field is true."
+                      },
+                      "open": {
+                        "type": "object",
+                        "description": "A spec/ui/schema.json `action` run when an entry is chosen, usually a `navigate`; `{field}` placeholders in its state fill from the row."
+                      },
+                      "manage": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "label",
+                          "open"
+                        ],
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40
+                          },
+                          "open": {
+                            "type": "object",
+                            "description": "A spec/ui/schema.json `action`, usually a `navigate` to the management page."
+                          }
+                        },
+                        "description": "A last entry after the rows that opens a management page, such as Manage."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "widgets": {
           "type": "array",
           "items": {
