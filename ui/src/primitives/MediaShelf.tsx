@@ -40,6 +40,8 @@ interface MediaShelfProps<T> {
   /** Accessible name for the rail. Falls back to `heading`. */
   label?: string;
   emptyState?: { icon: string; text: string };
+  emptyActionLabel?: string;
+  onEmptyAction?: () => void;
   /** MEDIA-PLAYER-01: how much of the item was played, 0 to 1. A bar along
    * the tile's bottom edge; nothing is drawn for undefined, 0 or less. */
   getProgress?: (item: T) => number | undefined;
@@ -108,6 +110,8 @@ export function MediaShelf<T>({
   heading,
   label,
   emptyState,
+  emptyActionLabel,
+  onEmptyAction,
   getProgress,
   renderBadge,
   renderMeta,
@@ -140,7 +144,7 @@ export function MediaShelf<T>({
   if (items.length === 0 && emptyState) {
     return (
       <Frame heading={heading} seeAll={seeAll}>
-        <EmptyState icon={emptyState.icon} text={emptyState.text} />
+        <EmptyState icon={emptyState.icon} text={emptyState.text} actionLabel={emptyActionLabel} onAction={onEmptyAction} />
       </Frame>
     );
   }

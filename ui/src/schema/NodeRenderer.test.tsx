@@ -1,6 +1,6 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
 import { cleanup, fireEvent, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { NodeRenderer, widgetRefetchInterval } from "@/kit/schema/NodeRenderer";
 import type { FormNode, ListNode, SectionNode, WidgetCardNode, WidgetRowNode } from "@/kit/schema/types";
@@ -521,5 +521,81 @@ describe("empty_state button label", () => {
     cleanup();
     const plain = renderNode({ type: "empty_state", icon: "film", text: "No videos yet.", action: { navigate: { to: "/settings" } } } as never);
     expect(await plain.findByRole("button", { name: "Go" })).toBeTruthy();
+  });
+});
+
+function CurrentPath() {
+  return <output aria-label="Current path">{useLocation().pathname}</output>;
+}
+
+const actionableEmptyState = {
+  type: "empty_state" as const,
+  icon: "film",
+  text: "No videos yet.",
+  action: { navigate: { to: "/settings" } },
+  action_label: "Add a folder",
+};
+
+const emptyShelf = {
+  type: "media_shelf" as const,
+  bind: listNode.bind,
+  item_key_field: "id",
+  item_label_field: "name",
+  item_media_field: "picture",
+  aspect: "wide" as const,
+  variant: "card" as const,
+  orientation: "horizontal" as const,
+  hide_when_empty: false,
+};
+
+describe("list-like empty state actions", () => {
+  for (const node of [listNode, emptyShelf]) {
+    test(`${node.type} draws its empty action and navigates when pressed`, async () => {
+      const env = stubFetch([]);
+      try {
+        const view = renderWithQueryClient(
+          <MemoryRouter>
+            <NodeRenderer node={{ ...node, empty_state: actionableEmptyState }} />
+            <CurrentPath />
+          </MemoryRouter>,
+        );
+        fireEvent.click(await view.findByRole("button", { name: "Add a folder" }));
+        await waitFor(() => expect(view.getByLabelText("Current path").textContent).toBe("/settings"));
+      } finally {
+        env.restore();
+      }
+    });
+
+    test(`${node.type} draws no button without an empty action`, async () => {
+      const env = stubFetch([]);
+      try {
+        const view = renderNode({ ...node, empty_state: { ...actionableEmptyState, action: undefined } });
+        await view.findByText("No videos yet.");
+        expect(view.queryByRole("button")).toBeNull();
+      } finally {
+        env.restore();
+      }
+    });
+
+    test(`${node.type} falls back to the derived empty action label`, async () => {
+      const env = stubFetch([]);
+      try {
+        const view = renderNode({ ...node, empty_state: { ...actionableEmptyState, action_label: undefined } });
+        expect(await view.findByRole("button", { name: "Go" })).toBeTruthy();
+      } finally {
+        env.restore();
+      }
+    });
+  }
+
+  test("an empty shelf with an action still draws nothing with hide_when_empty", async () => {
+    const env = stubFetch([]);
+    try {
+      const view = renderNode({ ...emptyShelf, hide_when_empty: true, empty_state: actionableEmptyState });
+      await waitFor(() => expect(view.queryByLabelText("Loading")).toBeNull());
+      expect(view.container.innerHTML).toBe("");
+    } finally {
+      env.restore();
+    }
   });
 });

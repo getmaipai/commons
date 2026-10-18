@@ -29,6 +29,8 @@ interface AsyncStateProps<T> {
   errorMessage?: string;
   emptyIcon?: string;
   emptyText?: string;
+  emptyActionLabel?: string;
+  onEmptyAction?: () => void;
   isEmpty?: (data: T) => boolean;
   loadingLabel?: string;
   children: (data: T) => ReactNode;
@@ -48,6 +50,8 @@ export function AsyncState<T>({
   errorMessage = "Something went wrong.",
   emptyIcon = "inbox",
   emptyText = "Nothing here yet.",
+  emptyActionLabel,
+  onEmptyAction,
   isEmpty,
   loadingLabel = "Loading",
   children,
@@ -76,7 +80,7 @@ export function AsyncState<T>({
   if (data === undefined) return loading;
 
   if (data === null || (isEmpty && isEmpty(data))) {
-    return <EmptyState icon={emptyIcon} text={emptyText} />;
+    return <EmptyState icon={emptyIcon} text={emptyText} actionLabel={emptyActionLabel} onAction={onEmptyAction} />;
   }
 
   return <>{children(data)}</>;

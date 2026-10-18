@@ -15,6 +15,20 @@ const tracks: Track[] = [
 ];
 
 describe("MediaShelf", () => {
+  test("the empty action uses the existing button and stays hidden with hideWhenEmpty", () => {
+    const onEmptyAction = mock(() => {});
+    const props = {
+      items: [] as Track[], getKey: (t: Track) => t.id, renderItem: () => null,
+      emptyState: { icon: "film", text: "No videos yet." },
+      emptyActionLabel: "Add a folder", onEmptyAction,
+    };
+    const { getByRole, container, rerender } = render(<MediaShelf {...props} />);
+    fireEvent.click(getByRole("button", { name: "Add a folder" }));
+    expect(onEmptyAction).toHaveBeenCalledTimes(1);
+    rerender(<MediaShelf {...props} hideWhenEmpty />);
+    expect(container.innerHTML).toBe("");
+  });
+
   test("omitting the new variants preserves the explicit default rendering", () => {
     const props = { items: tracks, getKey: (t: Track) => t.id, renderItem: (t: Track) => <span>{t.title}</span>, heading: "Music" };
     const { container, rerender } = render(<MediaShelf {...props} />);

@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.271] - ui-v0.5.271
+
+- List, shelf and grid nodes draw their empty_state action and action_label as the empty state's button (the button was dropped).
+
 ## [0.5.270] - ui-v0.5.270
 
 - Schema `empty_state` draws the page's own `action_label` on its button (spec-v0.1.182); without one it keeps the plain derived label ("Go" for a navigate action).

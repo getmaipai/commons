@@ -261,6 +261,8 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
       isEmpty={(list) => list.length === 0}
       emptyIcon={node.empty_state?.icon ?? "inbox"}
       emptyText={emptyText}
+      emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(list) => (
         <div className="flex min-w-0 flex-col gap-4">
@@ -632,6 +634,8 @@ function ListNodeView({ node }: { node: ListNode }) {
         isEmpty={(rows) => rows.length === 0}
         emptyIcon={node.empty_state?.icon ?? "inbox"}
         emptyText={node.empty_state?.text ?? "Nothing here yet."}
+        emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+        onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
       >
         {(rows) => (
           <List
@@ -716,6 +720,8 @@ function CardGridNodeView({ node }: { node: CardGridNode }) {
       isEmpty={(rows) => rows.length === 0}
       emptyIcon={node.empty_state?.icon ?? "inbox"}
       emptyText={node.empty_state?.text ?? "Nothing here yet."}
+      emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(rows) => (
         <CardGrid
@@ -752,6 +758,8 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
       isEmpty={(rows) => rows.length === 0 && !node.hide_when_empty}
       emptyIcon={node.empty_state?.icon ?? "inbox"}
       emptyText={node.empty_state?.text ?? "Nothing here yet."}
+      emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(rows) => (
         <>
@@ -849,6 +857,8 @@ function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row })
       isEmpty={(rows) => rows.length === 0 && !node.hide_when_empty}
       emptyIcon={node.empty_state?.icon ?? "film"}
       emptyText={node.empty_state?.text ?? "Nothing featured yet."}
+      emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(rows) => rows.length === 0 ? null : (
         <>
@@ -889,6 +899,8 @@ function ReaderNodeView({ node, state }: { node: ReaderNode; state: Row }) {
         return row === null || typeof src !== "string" || !sameOriginBookUrl(src, document.baseURI) || !["epub", "pdf"].includes(String(formatFor(row)));
       }}
       emptyIcon={node.empty_state?.icon ?? "book"} emptyText={node.empty_state?.text ?? "This book is not available."}
+      emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(row) => {
         const r = row as Row;
@@ -925,6 +937,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
       isEmpty={(row) => row === null || localPicture(readField(row, field("src", "src"))) === null}
       emptyIcon={node.empty_state?.icon ?? "film"}
       emptyText={node.empty_state?.text ?? "This item is not available."}
+      emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(row) => {
         const r = row as Row;
