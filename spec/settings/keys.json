@@ -4586,6 +4586,74 @@
     }
   },
   {
+    "key": "coding.yield_to_chat",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Wait for chat",
+    "help": "Pauses coding while chat is answering so chat can respond sooner.",
+    "copy": {
+      "does": "Coding waits while chat is answering"
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding_limits",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "coding.engine",
+    "scope": "household",
+    "selector": "select",
+    "default": "auto",
+    "label": "Coding engine",
+    "help": "Choose which engine runs coding. Auto picks the best engine for this computer.",
+    "copy": {
+      "does": "Choose how Home runs the coding model.",
+      "options": {
+        "auto": "Home picks the best engine for this computer.",
+        "splash": "Use Splash, a fast engine for some Apple computers.",
+        "llama-server": "Use llama-server, an engine that works on more computers."
+      }
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "options": [
+        "auto",
+        "splash",
+        "llama-server"
+      ]
+    }
+  },
+  {
+    "key": "coding.splash_cache_gb",
+    "scope": "household",
+    "selector": "number",
+    "default": 8,
+    "label": "Splash disk cache",
+    "help": "Sets how much disk space Splash may use for its coding cache.",
+    "copy": {
+      "does": "Sets how much drive room it may use for coding files kept for a while."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding",
+    "honoured_by": [
+      "home"
+    ],
+    "range": {
+      "min": 1,
+      "max": 64,
+      "step": 1
+    }
+  },
+  {
     "key": "coding.person.api_keys",
     "scope": "person",
     "selector": "boolean",

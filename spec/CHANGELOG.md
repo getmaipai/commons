@@ -1,3 +1,7 @@
+## [spec-v0.1.189] - 2026-10-19
+
+- Add the household coding yield-to-chat, engine choice and Splash disk-cache settings.
+
 ## [spec-v0.1.188] - 2026-10-19
 
 - NEWS-SECTION-STYLES-01: each topic in `spec/news/topics.json` gains an optional `section_style` (`top_stories`, `special`, `todays_news`), and a `story_feed` block's props gain the same optional `section_style`, read only when `layout` is `channel`. It sets how a section page arranges its stories, as Apple News does per category; selection, order and age gates are unchanged. Absent keeps the lead-and-list page. Additive; every existing fixture stays valid.

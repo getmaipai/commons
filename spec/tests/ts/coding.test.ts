@@ -83,6 +83,22 @@ test("gateway limits and idle unload keep the design defaults", () => {
   }
 });
 
+test("Home coding engine controls have their defaults, ranges and copy", () => {
+  expect(key("yield_to_chat")).toMatchObject({ scope: "household", selector: "boolean", default: true,
+    level: "advanced", lives_in: "household.coding_limits", honoured_by: ["home"],
+    copy: { does: "Coding waits while chat is answering" } });
+  expect(key("engine")).toMatchObject({ scope: "household", selector: "select", default: "auto",
+    range: { options: ["auto", "splash", "llama-server"] }, level: "advanced",
+    lives_in: "household.coding", honoured_by: ["home"] });
+  expect(key("splash_cache_gb")).toMatchObject({ scope: "household", selector: "number", default: 8,
+    range: { min: 1, max: 64, step: 1 }, level: "advanced", lives_in: "household.coding",
+    honoured_by: ["home"] });
+  for (const name of ["engine", "splash_cache_gb"]) expect(key(name).copy.does.length).toBeGreaterThan(0);
+  expect(SettingsKey.parse(read("fixtures/records/settings-key.coding-engine.example.json")))
+    .toEqual(read("fixtures/records/settings-key.coding-engine.example.json"));
+  expect(SettingsKey.safeParse(read("fixtures/records/settings-key.coding-engine.invalid.json")).success).toBe(false);
+});
+
 test("Coding sections follow the home and account audiences", () => {
   const areas = read("settings/areas.json").areas;
   const section = (id: string) => areas.find((a: any) => a.id === id).sections.find((s: any) => s.id === "coding");

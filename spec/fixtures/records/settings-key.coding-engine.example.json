@@ -1,0 +1,28 @@
+{
+  "key": "coding.engine",
+  "scope": "household",
+  "selector": "select",
+  "range": {
+    "options": [
+      "auto",
+      "splash",
+      "llama-server"
+    ]
+  },
+  "default": "auto",
+  "label": "Coding engine",
+  "copy": {
+    "does": "Choose how Home runs the coding model.",
+    "options": {
+      "auto": "Home picks the best engine for this computer.",
+      "splash": "Use Splash, a fast engine for some Apple computers.",
+      "llama-server": "Use llama-server, an engine that works on more computers."
+    }
+  },
+  "level": "advanced",
+  "secret": false,
+  "lives_in": "household.coding",
+  "honoured_by": [
+    "home"
+  ]
+}

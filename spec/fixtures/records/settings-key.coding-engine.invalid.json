@@ -1,0 +1,18 @@
+{
+  "key": "coding.engine",
+  "scope": "household",
+  "selector": "select",
+  "default": "auto",
+  "label": "Coding engine",
+  "copy": {
+    "options": {
+      "auto": "Home picks an engine."
+    }
+  },
+  "level": "advanced",
+  "secret": false,
+  "lives_in": "household.coding",
+  "honoured_by": [
+    "home"
+  ]
+}
