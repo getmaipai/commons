@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.299] - ui-v0.5.299
+
+- WORKSPACE-FILL-02: a page marked `data-workspace-fill` is now bounded to the viewport (the rail workspace is one viewport tall, its body does not scroll), so the page's own content is the one scroller and the article toolbar, which is sticky, stays at the top of it. Before, the document scrolled and the toolbar left with the text. `SchemaPage` keeps its padding on an inner box instead of the scroller, so the toolbar no longer leaves a gap above it that text scrolls through. Additive: nothing is affected without the marker; a page's layout inside the scroller is unchanged.
+
 ## [0.5.298] - ui-v0.5.298
 
 - MusicTrack adds `width` (`default`, unchanged, or `full` for the answer column), with a container-responsive Player (stacked in narrow details panels and on phones) and lyrics following the full-width player without a second lyric scroller. Adds a kit-owned, labelled `Edit` disclosure with a 48 px target and `editContent`, `editLabel` and `editPanelLabel` props. Escape closes it and returns focus to Edit. No legacy Make it full prop existed. MediaViewer showcase mounts the same full MusicTrack in the audio details panel, with cover, lyrics, versions and Edit actions. Tests cover width, disclosure behavior and viewer details.

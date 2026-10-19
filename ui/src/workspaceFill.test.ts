@@ -17,4 +17,9 @@ describe("WORKSPACE-FILL-01: a page marked data-workspace-fill fills the rail wo
     expect(css.match(/rail-body"\]:has\(/g)?.length ?? 0).toBeGreaterThanOrEqual(1);
     expect(css).not.toMatch(/\[data-slot="rail-body"\] > \.container \{\s*max-width:\s*none/);
   });
+  test("WORKSPACE-FILL-02: the workspace is one viewport tall and the content scrolls inside it", () => {
+    expect(css).toMatch(/\[data-slot="rail-workspace"\]:has\(\[data-workspace-fill\]\) \{[^}]*height:\s*100svh/);
+    expect(css).toMatch(/\[data-slot="rail-body"\]:has\(\[data-workspace-fill\]\) \{[^}]*overflow:\s*hidden/);
+    expect(css).toMatch(/\[data-workspace-fill\] \{[^}]*min-height:\s*0/);
+  });
 });

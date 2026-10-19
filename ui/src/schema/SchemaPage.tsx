@@ -69,9 +69,13 @@ export function SchemaPage({
        <PageSidebarContext.Provider value={sidebar === true}>
         <Page title={parsed.title} hideTitle={hideTitle} tone={parsed.tone}>
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
-          <div tabIndex={0} className={cn("flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto p-4", FOCUS_RING)}>
-            {beforeBody}
-            <NodeRenderer node={parsed} state={state} />
+          <div tabIndex={0} className={cn("flex min-w-0 flex-1 flex-col overflow-y-auto", FOCUS_RING)}>
+            {/* The padding lives on this inner box, not on the scroller: a sticky child (the article toolbar) would otherwise stick
+                at the padding's inner edge and let the text scroll through the gap above it. */}
+            <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
+              {beforeBody}
+              <NodeRenderer node={parsed} state={state} />
+            </div>
           </div>
         </Page>
        </PageSidebarContext.Provider>

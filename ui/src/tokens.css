@@ -308,6 +308,28 @@
   margin: 0;
   padding: 0;
 }
+/* WORKSPACE-FILL-02: and it is bounded to the viewport, like a chat's: the sticky column stays put and the page's own content is
+ * the one scroller, so a sticky bar inside it (the article toolbar) stays at the top of the content instead of scrolling away with
+ * the document. A marked page is a flex child that may shrink, so its content scrolls inside it. */
+[data-slot="rail-workspace"]:has([data-workspace-fill]) {
+  height: 100svh;
+}
+[data-slot="rail-body"]:has([data-workspace-fill]) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+[data-slot="rail-body"]:has([data-workspace-fill]) > .container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+[data-workspace-fill] {
+  flex: 1;
+  min-height: 0;
+}
 
 [data-slot="card"] {
   box-shadow: var(--elevation-1);
