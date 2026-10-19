@@ -143,7 +143,9 @@ knowing about before trusting this in a real household:
 - `csam` is a term-intersection blocklist (adapted from the legacy hub's
   hardened, obfuscation-resistant guard, see above), still deliberately
   biased toward over-flagging ambiguous cases (a parenting question that
-  happens to combine a sexual-content word with a child's age) rather than
+  happens to combine a sexual-content word with a child's age; eight weak
+  words such as `seductive` and `bikini` count only in the same sentence as
+  the age, CSAM-SAME-SENTENCE-01) rather than
   under-flagging, since a false refuse is a far smaller harm than a false
   allow in this one category. A blocklist, however hardened, is still
   evadable by phrasing its author didn't anticipate; the legacy file's own

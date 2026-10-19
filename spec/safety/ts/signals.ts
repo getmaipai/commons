@@ -282,12 +282,17 @@ const SEXUAL_TERMS = [
   "sex", "sexual", "sexy", "nude", "naked", "nudity", "nsfw", "porn", "porno",
   "explicit", "erotic", "lewd", "hentai", "ecchi", "ahegao", "fetish",
   "genital", "genitalia", "penis", "vagina", "pussy", "cock", "dick",
-  "breast", "breasts", "boob", "nipple", "areola", "cleavage",
+  "breast", "breasts", "boob", "nipple", "areola",
   "cum", "creampie", "penetration", "penetrated", "intercourse", "fellatio",
   "masturbat", "orgasm", "spread legs", "spreading legs", "topless", "bottomless",
-  "lingerie", "thong", "panties", "undress", "undressing", "bikini", "suggestive",
-  "seductive", "provocative", "in heat", "in bed", "molest",
+  "lingerie", "panties", "undress", "undressing", "molest",
 ];
+
+// Words that are sexual only in some uses ("the seductive fantasy of violent redemption", "kids in bikinis at the beach",
+// "in bed with a cold"). Next to a minor indicator in ONE sentence they still refuse; anywhere else in a longer reply they
+// do not, so a film's plot summary is not refused for a young character's age in one paragraph and "seductive" in another.
+// The strong terms above keep the whole-reply rule (a claim split across sentences). Owner-approved 2026-10-19.
+const AMBIGUOUS_SEXUAL_TERMS = ["seductive", "suggestive", "provocative", "in heat", "in bed", "bikini", "thong", "cleavage"];
 
 // The obfuscation handling (separators, leetspeak, repeated and masked letters, look-alike letters, invisible
 // characters, other languages and scripts) lives in ONE place, ./fold.ts, shared with the pictures prompt floor in
@@ -302,6 +307,8 @@ const prefixOrPhrase = (term: string): boolean => PREFIX_STEM_TERMS.has(term) ||
 const STANDALONE_SET = new TermSet([...STANDALONE_SINGLE_TERMS, ...STANDALONE_PHRASES, ...STANDALONE_TERMS_I18N], { prefix: prefixOrPhrase });
 const AGE_SET = new TermSet([...AGE_TERMS, ...MINOR_WORDS_I18N], { prefix: prefixOrPhrase });
 const SEXUAL_SET = new TermSet([...SEXUAL_TERMS, ...SEXUAL_WORDS_I18N], { prefix: prefixOrPhrase });
+const AMBIGUOUS_SET = new TermSet(AMBIGUOUS_SEXUAL_TERMS, { prefix: prefixOrPhrase });
+const SENTENCE_BREAK = /(?<=[.!?])\s+|\n+/;
 
 export function detectCsam(rawText: string): CategorySignals {
   const fold = foldForSafety(rawText);
@@ -316,6 +323,20 @@ export function detectCsam(rawText: string): CategorySignals {
   const hasSexual = SEXUAL_SET.matches(fold) || NATIVE_SEXUAL.test(fold);
   if (hasAge && hasSexual) {
     matched.push("csam.minor_indicator_with_sexual_term");
+    return { category: "csam", matched };
+  }
+
+  // An ambiguous word counts only in the same sentence as the minor indicator.
+  if (hasAge && AMBIGUOUS_SET.matches(fold)) {
+    for (const sentence of rawText.split(SENTENCE_BREAK)) {
+      if (!sentence.trim()) continue;
+      const part = foldForSafety(sentence);
+      const sentenceAge = AGE_SET.matches(part) || hasMinorAge(part) || NATIVE_MINOR.test(part);
+      if (sentenceAge && AMBIGUOUS_SET.matches(part)) {
+        matched.push("csam.minor_indicator_with_ambiguous_term_same_sentence");
+        break;
+      }
+    }
   }
 
   return { category: "csam", matched };
