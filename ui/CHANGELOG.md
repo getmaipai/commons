@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.288] - ui-v0.5.288
+
+- Phone: the floating menu button (48 px, 8 px from the start edge) no longer covers the start of a page title ("Library" read "ibrary") or any page's own top row. `FullLayout` rail mode marks the workspace `data-phone-menu` only while the button is drawn (phone width, menu not hidden) and then always draws the page header band, even when the page sets no header content. `tokens.css` makes the band at least `--phone-menu-band` (64 px) tall with its content starting `--phone-menu-clear` (72 px) from the start edge, so every page's content begins below the button. Logical properties, so RTL works. Desktop, tablet and immersive pages are unchanged.
+
 ## [0.5.287] - ui-v0.5.287
 
 - RouteSkeleton stays invisible for its first 200 ms (a CSS animation delay, `route-skeleton-in`), so a page or section that loads quickly no longer flashes a skeleton across the panel; a slow load still shows it. Affects every AsyncState loading state.

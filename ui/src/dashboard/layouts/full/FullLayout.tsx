@@ -76,12 +76,14 @@ export interface FullLayoutProps {
 /** The slim title bar of the rail layout: the page's own header content
  * only, 52px tall, one bottom divider. A page that draws its own header
  * (chat, beside its history column) places nothing and gets none. */
-function RailPageHeader() {
+function RailPageHeader({ reserveBand }: { reserveBand: boolean }) {
   const Left = useHeaderExtraLeft();
-  if (!Left) return null;
+  // On a phone with the floating menu button, the band is always drawn so the
+  // button sits in it and no page content can start under the button.
+  if (!Left && !reserveBand) return null;
   return (
     <header data-slot="rail-page-header" className="sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5">
-      <Left />
+      {Left ? <Left /> : null}
     </header>
   );
 }
@@ -96,8 +98,8 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
           page (a chat) bounds the workspace to the viewport itself. */}
       <div data-slot="rail-shell" className="flex min-h-svh w-full min-w-0 max-w-full overflow-x-clip">
         <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
-        <main data-slot="rail-workspace" className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
-          <RailPageHeader />
+        <main data-slot="rail-workspace" data-phone-menu={phone && !hideMobileMenu ? "" : undefined} className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
+          <RailPageHeader reserveBand={phone && !hideMobileMenu} />
           <div data-slot="rail-body" className="min-w-0 max-w-full flex-1">
             <div className={cn("box-border min-w-0 max-w-full w-full mx-auto p-4", "container")}>
               <Outlet />

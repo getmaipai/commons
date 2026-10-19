@@ -1630,6 +1630,25 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   }
 }
 
+/* PHONE-MENU-CLEAR: on a phone the floating menu button (MobileNavDrawer,
+ * 48px at an 8px inset) sits over the top-start corner of the page. FullLayout's
+ * rail workspace carries `data-phone-menu` only while that button is drawn
+ * (phone width, menu not hidden) and then always draws the page header band,
+ * even for a page that places nothing in it. The band is tall enough to hold
+ * the button (8 + 48 + 8 = 64px) and starts its content 72px from the start
+ * edge (8 + 48 + 16), so no title, tab row or control of any page, whatever
+ * it draws, can sit under the button: page content begins below the band.
+ * Logical properties, so RTL works. Desktop, tablet and immersive pages never
+ * get the attribute and are unchanged. Kept above the generated ease block. */
+:root {
+  --phone-menu-clear: 72px;
+  --phone-menu-band: 64px;
+}
+[data-phone-menu] [data-slot="rail-page-header"] {
+  min-height: var(--phone-menu-band);
+  padding-inline-start: var(--phone-menu-clear);
+}
+
 /* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */
 /* Targets: --target-min is the smallest control size; the rail reads --rail-button and --rail-width. */
 :root {
