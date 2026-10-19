@@ -20,10 +20,17 @@ import { Chip } from "./Chip";
 const SearchIcon = getIcon("search");
 const HideIcon = getIcon("panel-left-close");
 const ShowIcon = getIcon("panel-left-open");
+const PinIcon = getIcon("pin");
 
-/** The pointer must rest on the hidden column's edge zone this long before it peeks; it closes this long after the pointer leaves. */
-const PEEK_OPEN_DELAY_MS = 120;
-const PEEK_CLOSE_GRACE_MS = 150;
+/** The pointer must rest on the hidden column's edge zone this long before it peeks; it closes this long after the pointer leaves
+ * (the same numbers as Chat's column, COLUMN-02). */
+export const SECTION_SIDEBAR_PEEK_OPEN_DELAY_MS = 120;
+export const SECTION_SIDEBAR_PEEK_CLOSE_GRACE_MS = 150;
+const PEEK_OPEN_DELAY_MS = SECTION_SIDEBAR_PEEK_OPEN_DELAY_MS;
+const PEEK_CLOSE_GRACE_MS = SECTION_SIDEBAR_PEEK_CLOSE_GRACE_MS;
+/** The hidden column's show button (`SectionSidebarShowButton`) tells the column it names in `controls` to peek or stop peeking, the way Chat's header toggle does. */
+const PEEK_EVENT = "section-sidebar-peek";
+const POPUP_OPEN = '[aria-expanded="true"][aria-haspopup]';
 
 /** One row of the column: a link a person can open in a new tab, with its icon (or a picture the host serves) and label. */
 export interface SectionSidebarItem {
@@ -93,6 +100,11 @@ export interface SectionSidebarProps {
   collapsed?: boolean;
   /** Called by the collapse, expand and keep-open buttons and by the rail's search button. Passing it draws the collapse button. */
   onCollapsedChange?: (collapsed: boolean) => void;
+  /** The same state as `collapsed`, named the way Chat's "keep open" button reads: `pinned` is docked open, not pinned is hidden (and
+   * peeks on hover). When given, it wins over `collapsed`. The kit holds no storage: the host persists it and passes it back. */
+  pinned?: boolean;
+  /** Called with the new pinned state by the hide, keep-open (pin) and expand buttons. Passing it draws the button. */
+  onPinnedChange?: (pinned: boolean) => void;
   /** What a collapsed column looks like. "hidden" (the Chat column) shrinks to a thin hover edge that peeks the column over the page;
    * "rail" keeps a narrow icon-only strip. Default "hidden". Only `standalone` columns collapse by themselves. */
   collapsedStyle?: "hidden" | "rail";
@@ -122,6 +134,10 @@ export interface SectionSidebarProps {
  * column with it, and so do News, Library and Chat; the host passes data (groups or a `body`, search, footer) and writes no layout.
  * It holds no storage: a host that collapses the column keeps the state per person and passes it as `collapsed` and `onCollapsedChange`.
  *
+ * A `standalone` column is pinned to the viewport (sticky at the top, one viewport tall, its own scroll): the page scrolls beside it,
+ * never with it. Collapsed ("hidden" style) it behaves as Chat's column does: the same 200 ms width slide, a hover peek from the left
+ * edge, Escape or a link click closes the peek, and the pin button docks it again.
+ *
  * Phone: a `standalone` column is hidden below the kit's `lg` breakpoint. The host lists the same entries in the menu drawer with
  * `SectionSidebarDrawerSections` (pass the same `groups` and `footer` to `FullLayout`'s `mobileSections`).
  */
@@ -136,8 +152,10 @@ export function SectionSidebar({
   footer,
   footerSlot,
   footerInRail,
-  collapsed = false,
-  onCollapsedChange,
+  collapsed: collapsedProp = false,
+  onCollapsedChange: onCollapsedChangeProp,
+  pinned,
+  onPinnedChange,
   collapsedStyle = "hidden",
   collapseLabels,
   density = "comfortable",
@@ -149,12 +167,23 @@ export function SectionSidebar({
   const generatedId = useId();
   const columnId = sidebarProps?.id ?? `section-sidebar-${generatedId}`;
   const compact = density === "compact";
+  const collapsed = pinned !== undefined ? !pinned : collapsedProp;
+  const onCollapsedChange =
+    onCollapsedChangeProp || onPinnedChange
+      ? (next: boolean) => {
+          onPinnedChange?.(!next);
+          onCollapsedChangeProp?.(next);
+        }
+      : undefined;
   const collapsible = standalone === true && (onCollapsedChange !== undefined || collapsed);
   const rail = collapsible && collapsed && collapsedStyle === "rail";
   const hiddenMode = collapsible && collapsed && collapsedStyle === "hidden";
 
   const [peek, setPeek] = useState(false);
   const timer = useRef<number | null>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  // Where focus goes once the column has changed state: the host's show button after a hide, this column's own button after a pin.
+  const focusAfter = useRef<"show" | "toggle" | null>(null);
   const clearTimer = useCallback(() => {
     if (timer.current !== null) window.clearTimeout(timer.current);
     timer.current = null;
@@ -170,13 +199,24 @@ export function SectionSidebar({
     clearTimer();
     timer.current = window.setTimeout(() => {
       timer.current = null;
-      if (document.getElementById(columnId)?.querySelector('[aria-expanded="true"][aria-haspopup]')) {
+      // A row menu is open (its popup lives outside the column): look again shortly, so the peek still closes once the menu is gone.
+      if (document.getElementById(columnId)?.querySelector(POPUP_OPEN)) {
         scheduleClose();
         return;
       }
       setPeek(false);
     }, PEEK_CLOSE_GRACE_MS);
   }, [clearTimer, columnId]);
+  const showButton = useCallback(() => document.querySelector<HTMLElement>(`[data-slot="section-sidebar-show"][aria-controls="${CSS.escape(columnId)}"]`), [columnId]);
+  const closePeek = useCallback(
+    (restoreFocus: boolean) => {
+      clearTimer();
+      setPeek(false);
+      // Only a keyboard or click close hands focus back; a pointer drifting away never moves it.
+      if (restoreFocus) focusAfter.current = "show";
+    },
+    [clearTimer],
+  );
   useEffect(() => {
     if (!hiddenMode) {
       clearTimer();
@@ -187,28 +227,69 @@ export function SectionSidebar({
   useEffect(() => {
     if (!peek) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setPeek(false);
+      if (event.key !== "Escape") return;
+      // The search field's own Escape clears a typed query first; an open row menu takes this Escape first.
+      if (event.target instanceof HTMLInputElement && event.target.value !== "") return;
+      if (document.getElementById(columnId)?.querySelector(POPUP_OPEN)) return;
+      closePeek(true);
     };
     document.addEventListener("keydown", onKey, true);
     return () => document.removeEventListener("keydown", onKey, true);
-  }, [peek]);
+  }, [peek, columnId, closePeek]);
+  // A click that navigates (a link in the peeking column) closes the peek.
+  useEffect(() => {
+    if (!peek) return;
+    const onClick = (event: globalThis.MouseEvent) => {
+      const column = document.getElementById(columnId);
+      if (event.target instanceof Element && column?.contains(event.target) && event.target.closest("a[href]")) closePeek(true);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [peek, columnId, closePeek]);
+  // The host's show button peeks the column on hover or keyboard focus, as Chat's header toggle does.
+  useEffect(() => {
+    if (!hiddenMode) return;
+    const onPeek = (event: Event) => {
+      const detail = (event as CustomEvent<{ controls: string; open: boolean }>).detail;
+      if (detail?.controls !== columnId) return;
+      if (detail.open) scheduleOpen();
+      else scheduleClose();
+    };
+    window.addEventListener(PEEK_EVENT, onPeek);
+    return () => window.removeEventListener(PEEK_EVENT, onPeek);
+  }, [hiddenMode, columnId, scheduleOpen, scheduleClose]);
+  // Hand focus on after a state change (the column that was focused has just gone inert, or the pin control has just been replaced).
+  useEffect(() => {
+    const target = focusAfter.current;
+    if (!target) return;
+    if (target === "show" && hiddenMode && !peek) {
+      focusAfter.current = null;
+      showButton()?.focus({ preventScroll: true });
+    } else if (target === "toggle" && !hiddenMode) {
+      focusAfter.current = null;
+      toggleRef.current?.focus({ preventScroll: true });
+    }
+  }, [hiddenMode, peek, showButton]);
   const peeking = hiddenMode && peek;
   const closed = hiddenMode && !peek;
 
   const toggle = onCollapsedChange ? (
     <button
+      ref={toggleRef}
       type="button"
       data-slot="section-sidebar-toggle"
       aria-label={peeking ? labels.pin : rail ? labels.show : labels.hide}
       aria-expanded={peeking ? undefined : !collapsed}
       aria-controls={peeking ? undefined : columnId}
       onClick={() => {
+        clearTimer();
         setPeek(false);
+        focusAfter.current = peeking ? "toggle" : collapsed ? "toggle" : "show";
         onCollapsedChange(peeking ? false : !collapsed);
       }}
       className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
     >
-      {rail ? <ShowIcon aria-hidden className="size-[18px]" /> : <HideIcon aria-hidden className="size-[18px]" />}
+      {peeking ? <PinIcon aria-hidden className="size-[18px]" /> : rail ? <ShowIcon aria-hidden className="size-[18px]" /> : <HideIcon aria-hidden className="size-[18px]" />}
     </button>
   ) : null;
 
@@ -221,7 +302,7 @@ export function SectionSidebar({
           isActive={item.active === true}
           className={cn(compact && "h-9 rounded-lg px-2.5 before:-inset-y-1.5", rail && "justify-center gap-0 px-0")}
           render={(props) => (
-            <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); setPeek(false); }} title={rail ? item.label : undefined}>
+            <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); }} title={rail ? item.label : undefined}>
               {props.children}
             </a>
           )}
@@ -338,9 +419,13 @@ export function SectionSidebar({
 
   if (!standalone) return column;
 
-  const provider = (inner: ReactNode) => (
-    <SidebarProvider keyboardShortcut={false} data-slot="section-sidebar" className="sticky top-0 hidden h-svh min-h-0 w-auto shrink-0 self-start lg:flex">
-      {inner}
+  // Pinned to the viewport: the outer box stretches the whole row (whatever the host's alignment), and the column inside sticks to the top of
+  // the screen at one viewport tall, with its own scroll. The page scrolls beside it, never with it.
+  const provider = (inner: ReactNode, layer = "") => (
+    <SidebarProvider keyboardShortcut={false} data-slot="section-sidebar" className="relative hidden min-h-0 w-auto shrink-0 self-stretch lg:block">
+      <div data-slot="section-sidebar-pin" className={cn("sticky top-0 flex h-svh max-h-svh min-h-0", layer)}>
+        {inner}
+      </div>
     </SidebarProvider>
   );
   if (!collapsible) return provider(column);
@@ -368,18 +453,31 @@ export function SectionSidebar({
       ) : null}
       <div
         data-slot="section-sidebar-panel"
-        className={peeking ? "absolute inset-y-0 start-0 z-30 w-(--settings-column-width) shadow-xl" : closed ? "invisible h-full w-(--settings-column-width) overflow-hidden" : "h-full"}
+        className={
+          peeking
+            ? "absolute inset-y-0 start-0 z-30 w-(--settings-column-width) shadow-xl motion-safe:animate-[section-sidebar-peek-in_160ms_ease-out]"
+            : closed
+              ? "invisible h-full w-(--settings-column-width) overflow-hidden"
+              : "h-full"
+        }
         onPointerEnter={peeking ? clearTimer : undefined}
         onPointerLeave={peeking ? (event) => { if (pointerOk(event)) scheduleClose(); } : undefined}
       >
         {column}
       </div>
     </div>,
+    // Above the page's own sticky bars while the edge zone is live or the peek is open.
+    peeking ? "z-30" : closed ? "z-20" : "",
   );
 }
 
 /** The button a host puts in its page header while the column is hidden, to bring it back. 48 px target, labelled, `aria-expanded`. */
 export function SectionSidebarShowButton({ onClick, label = "Show sidebar", controls }: { onClick: () => void; label?: string; controls?: string }) {
+  // With `controls` (the column's id) resting the pointer on it, or tabbing to it, peeks the column like Chat's header toggle; a click still pins.
+  const tell = (open: boolean) => {
+    if (controls) window.dispatchEvent(new CustomEvent(PEEK_EVENT, { detail: { controls, open } }));
+  };
+  const fromPointer = useRef(false);
   return (
     <button
       type="button"
@@ -388,6 +486,22 @@ export function SectionSidebarShowButton({ onClick, label = "Show sidebar", cont
       aria-expanded={false}
       aria-controls={controls}
       onClick={onClick}
+      onPointerEnter={(event) => { if (event.pointerType !== "touch") tell(true); }}
+      onPointerLeave={(event) => { if (event.pointerType !== "touch") tell(false); }}
+      onPointerDown={() => { fromPointer.current = true; }}
+      onPointerUp={() => { fromPointer.current = false; }}
+      onFocus={() => {
+        const pointer = fromPointer.current;
+        fromPointer.current = false;
+        if (!pointer) tell(true);
+      }}
+      onBlur={(event) => {
+        fromPointer.current = false;
+        // Focus moving into the peeking column keeps it open.
+        const column = controls ? document.getElementById(controls) : null;
+        if (column && event.relatedTarget instanceof Node && column.contains(event.relatedTarget)) return;
+        tell(false);
+      }}
       className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
     >
       <ShowIcon aria-hidden className="size-[18px]" />

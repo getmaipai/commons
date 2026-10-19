@@ -1077,6 +1077,18 @@ body {
       opacity: 1;
     }
   }
+  /* SectionSidebar peek: the hidden column slides in from the start edge as it fades up, the way Chat's column does (COLUMN-02). Applied only
+     through motion-safe:, so reduced motion gets none. */
+  @keyframes section-sidebar-peek-in {
+    from {
+      opacity: 0;
+      transform: translateX(-12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
   /* Wizard split layout: a short slide-and-fade when the screen changes.
      Applied only through motion-safe:, so reduced motion gets no animation. */
   @keyframes wizard-step-in {

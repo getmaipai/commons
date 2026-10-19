@@ -1,4 +1,4 @@
-// Kit showcase entry for SectionSidebar: the News-style column in its three states.
+// Kit showcase entry for SectionSidebar: the News-style column: pinned open, hidden with the Chat peek, and the icon rail.
 import { useState } from "react";
 import { SectionSidebar, SectionSidebarShowButton, type SectionSidebarGroup, type SectionSidebarItem } from "@/kit/primitives/SectionSidebar";
 
@@ -22,26 +22,29 @@ const groups: SectionSidebarGroup[] = [
 const footer: SectionSidebarItem[] = [{ id: "settings", label: "News settings", icon: "settings", href: "#settings" }];
 
 function Demo({ title, style }: { title: string; style: "hidden" | "rail" }) {
-  const [collapsed, setCollapsed] = useState(false);
+  // Pinned is the Chat words for "not collapsed". The showcase starts hidden so the edge peek and the pin button can be tried at once.
+  const [pinned, setPinned] = useState(style === "rail");
+  const collapsed = !pinned;
   const [query, setQuery] = useState("");
   return (
     <section className="flex flex-col gap-2">
       <h3 className="text-base font-semibold">{title}</h3>
-      <div className="flex h-96 overflow-hidden rounded-lg border">
+      <div className="flex h-96 overflow-y-auto rounded-lg border">
         {/* The column is drawn from the `lg` breakpoint up, like a real page; a narrow gallery shows the phone drawer rows instead. */}
         <SectionSidebar
           standalone
           title="News"
           groups={groups}
           footer={footer}
-          collapsed={collapsed}
-          onCollapsedChange={setCollapsed}
+          pinned={pinned}
+          onPinnedChange={setPinned}
+          sidebarProps={{ id: `showcase-${style}` }}
           collapsedStyle={style}
           search={{ value: query, onChange: setQuery, label: "Search News" }}
         />
         <div className="flex flex-1 items-start gap-2 p-3">
-          {collapsed && style === "hidden" ? <SectionSidebarShowButton onClick={() => setCollapsed(false)} /> : null}
-          <p className="text-sm text-muted-foreground">Page content</p>
+          {collapsed && style === "hidden" ? <SectionSidebarShowButton onClick={() => setPinned(true)} controls={`showcase-${style}`} /> : null}
+          <p className="text-sm text-muted-foreground">{style === "hidden" ? "Rest the pointer on the left edge (or on the show button) to peek the column; Escape or a link closes it; the pin button keeps it open." : "Page content"}</p>
         </div>
       </div>
     </section>

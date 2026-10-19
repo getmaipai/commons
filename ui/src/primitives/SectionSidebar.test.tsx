@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, mock, test } from "bun:test";
-import { cleanup, fireEvent, render, within } from "@testing-library/react";
+import { afterEach, describe, expect, jest, mock, test } from "bun:test";
+import { act, cleanup, fireEvent, render, within } from "@testing-library/react";
+import { readFileSync } from "node:fs";
 import { SidebarProvider } from "../dashboard/components/ui/sidebar";
 import { SectionSidebar, SectionSidebarDrawerSections, SectionSidebarShowButton, type SectionSidebarProps } from "./SectionSidebar";
 import { SectionSidebarShowcase } from "./SectionSidebarShowcase";
@@ -95,9 +96,12 @@ describe("SectionSidebar", () => {
     const { container } = render(<SectionSidebar standalone groups={groups} sidebarProps={{ id: "app-column" }} />);
     const provider = container.querySelector('[data-slot="section-sidebar"]') as HTMLElement;
     expect(provider.className).toContain("hidden");
-    expect(provider.className).toContain("lg:flex");
-    expect(provider.className).toContain("sticky");
-    expect(provider.className).toContain("h-svh");
+    expect(provider.className).toContain("lg:block");
+    // Pinned to the viewport by default: the box stretches the row and the column inside sticks, one viewport tall.
+    expect(provider.className).toContain("self-stretch");
+    const pin = container.querySelector('[data-slot="section-sidebar-pin"]') as HTMLElement;
+    expect(pin.parentElement).toBe(provider);
+    for (const cls of ["sticky", "top-0", "h-svh", "max-h-svh"]) expect(pin.className).toContain(cls);
     const side = container.querySelector("#app-column") as HTMLElement;
     expect(side.className).toContain("w-(--settings-column-width)");
     expect(side.className).toContain("bg-settings-column");
@@ -233,6 +237,210 @@ describe("SectionSidebar", () => {
     test("the showcase draws both states", () => {
       const { container } = render(<SectionSidebarShowcase />);
       expect(container.querySelectorAll('[data-slot="section-sidebar-toggle"]')).toHaveLength(2);
+    });
+  });
+  describe("Chat parity (same peek, pin and viewport pinning as Chat's column)", () => {
+    const standalone = (over: Partial<SectionSidebarProps> = {}) =>
+      render(<SectionSidebar standalone title="News" groups={groups} onCollapsedChange={() => {}} {...over} />);
+    const zoneOf = (c: HTMLElement) => c.querySelector('[data-slot="section-sidebar-peek-zone"]') as HTMLElement;
+    const boxOf = (c: HTMLElement) => c.querySelector('[data-slot="section-sidebar-box"]') as HTMLElement;
+    const hidden = (over: Partial<SectionSidebarProps> = {}) =>
+      render(<SectionSidebar standalone title="News" groups={groups} collapsed onCollapsedChange={() => {}} {...over} />);
+    const advance = (ms: number) => act(() => { jest.advanceTimersByTime(ms); });
+    const withTimers = (run: () => void) => {
+      jest.useFakeTimers();
+      try { run(); } finally { jest.useRealTimers(); }
+    };
+
+    test("the standalone column is pinned to the viewport with or without collapse, with its own scroll", () => {
+      for (const view of [render(<SectionSidebar standalone groups={groups} />), render(<SectionSidebar standalone groups={groups} onPinnedChange={() => {}} />)]) {
+        const pin = view.container.querySelector('[data-slot="section-sidebar-pin"]') as HTMLElement;
+        expect(pin.className).toContain("sticky");
+        expect(pin.className).toContain("h-svh");
+        expect(view.container.querySelector('[data-slot="sidebar-content"]')!.className).toContain("overflow-auto");
+        view.unmount();
+      }
+    });
+
+    test("the collapse animation is Chat's: a 200 ms linear width slide on a box that keeps the panel at full width, no motion under reduced motion", () => {
+      const { container, rerender } = standalone({ collapsed: true });
+      const box = boxOf(container);
+      for (const cls of ["transition-[width]", "duration-200", "ease-linear", "motion-reduce:transition-none", "w-1.5"]) expect(box.className).toContain(cls);
+      const panel = container.querySelector('[data-slot="section-sidebar-panel"]') as HTMLElement;
+      expect(panel.className).toContain("invisible");
+      expect(panel.className).toContain("w-(--settings-column-width)");
+      rerender(<SectionSidebar standalone title="News" groups={groups} collapsed={false} onCollapsedChange={() => {}} />);
+      expect(boxOf(container).className).toContain("w-(--settings-column-width)");
+    });
+
+    test("the peek slides in as Chat's does (translate and fade, motion-safe only) and the keyframes exist", () => {
+      withTimers(() => {
+        const { container } = hidden();
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(120);
+        const panel = container.querySelector('[data-slot="section-sidebar-panel"]') as HTMLElement;
+        expect(panel.className).toContain("motion-safe:animate-[section-sidebar-peek-in_160ms_ease-out]");
+        expect(panel.className).toContain("shadow-xl");
+      });
+      const css = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
+      expect(css).toContain("@keyframes section-sidebar-peek-in");
+      expect(css).toMatch(/section-sidebar-peek-in[\s\S]{0,120}translateX\(-12px\)/);
+    });
+
+    test("hover intent: the pointer must rest 120 ms; passing across the edge does nothing", () => {
+      withTimers(() => {
+        const { container } = hidden();
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(100);
+        fireEvent.pointerLeave(zoneOf(container), { pointerType: "mouse" });
+        advance(500);
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(119);
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+        advance(1);
+        expect(boxOf(container).getAttribute("data-state")).toBe("peek");
+      });
+    });
+
+    test("the peek closes 150 ms after the pointer leaves it, and coming back cancels that", () => {
+      withTimers(() => {
+        const { container } = hidden();
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(120);
+        const panel = container.querySelector('[data-slot="section-sidebar-panel"]') as HTMLElement;
+        fireEvent.pointerLeave(panel, { pointerType: "mouse" });
+        advance(149);
+        expect(boxOf(container).getAttribute("data-state")).toBe("peek");
+        fireEvent.pointerEnter(panel, { pointerType: "mouse" });
+        advance(500);
+        expect(boxOf(container).getAttribute("data-state")).toBe("peek");
+        fireEvent.pointerLeave(panel, { pointerType: "mouse" });
+        advance(150);
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+      });
+    });
+
+    test("no peek closes while a row menu is open; it closes once the menu is gone", () => {
+      withTimers(() => {
+        const { container } = hidden({ headerActions: <button type="button" aria-haspopup="menu" aria-expanded="true">Row menu</button> });
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(120);
+        fireEvent.pointerLeave(container.querySelector('[data-slot="section-sidebar-panel"]') as HTMLElement, { pointerType: "mouse" });
+        advance(1000);
+        expect(boxOf(container).getAttribute("data-state")).toBe("peek");
+        screen.getByRole("button", { name: "Row menu" }).setAttribute("aria-expanded", "false");
+        advance(150);
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+      });
+    });
+
+    test("Escape closes the peek, but not while a menu is open or a typed search is being cleared", () => {
+      withTimers(() => {
+        const { container } = hidden({
+          search: { value: "oil", onChange: () => {}, label: "Search News" },
+          headerActions: <button type="button" aria-haspopup="menu" aria-expanded="false">Row menu</button>,
+        });
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(120);
+        fireEvent.keyDown(screen.getByRole("searchbox"), { key: "Escape" });
+        expect(boxOf(container).getAttribute("data-state")).toBe("peek");
+        const menu = screen.getByRole("button", { name: "Row menu" });
+        menu.setAttribute("aria-expanded", "true");
+        fireEvent.keyDown(menu, { key: "Escape" });
+        expect(boxOf(container).getAttribute("data-state")).toBe("peek");
+        menu.setAttribute("aria-expanded", "false");
+        fireEvent.keyDown(menu, { key: "Escape" });
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+      });
+    });
+
+    test("a click on a link inside the peek closes it", () => {
+      withTimers(() => {
+        const { container } = hidden();
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(120);
+        fireEvent.click(screen.getByRole("link", { name: "Saved" }));
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+      });
+    });
+
+    test("touch never peeks, on the zone or the panel", () => {
+      withTimers(() => {
+        const { container } = hidden();
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "touch" });
+        advance(1000);
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+      });
+    });
+
+    test("pin: the control inside the peek is a pin button; `pinned` and `onPinnedChange` model the same state as collapsed", () => {
+      withTimers(() => {
+        const onPinnedChange = mock((_p: boolean) => {});
+        const { container, rerender } = render(<SectionSidebar standalone title="News" groups={groups} pinned={false} onPinnedChange={onPinnedChange} />);
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(120);
+        const pin = screen.getByRole("button", { name: "Keep sidebar open" });
+        expect(pin.querySelector("svg")).toBeTruthy();
+        fireEvent.click(pin);
+        expect(onPinnedChange).toHaveBeenCalledWith(true);
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+        rerender(<SectionSidebar standalone title="News" groups={groups} pinned onPinnedChange={onPinnedChange} />);
+        expect(boxOf(container).getAttribute("data-state")).toBe("open");
+        fireEvent.click(screen.getByRole("button", { name: "Hide sidebar" }));
+        expect(onPinnedChange).toHaveBeenLastCalledWith(false);
+      });
+    });
+
+    test("pinned wins over collapsed, and collapsed/onCollapsedChange still work alone", () => {
+      const onCollapsedChange = mock((_c: boolean) => {});
+      const { container } = standalone({ collapsed: true, pinned: true, onCollapsedChange });
+      expect(boxOf(container).getAttribute("data-state")).toBe("open");
+      fireEvent.click(screen.getByRole("button", { name: "Hide sidebar" }));
+      expect(onCollapsedChange).toHaveBeenCalledWith(true);
+    });
+
+    test("the show button peeks the column it controls on hover or keyboard focus and a click still pins", () => {
+      withTimers(() => {
+        const onClick = mock(() => {});
+        const { container } = render(
+          <>
+            <SectionSidebarShowButton onClick={onClick} controls="news-column" />
+            <SectionSidebar standalone groups={groups} collapsed onCollapsedChange={() => {}} sidebarProps={{ id: "news-column" }} />
+          </>,
+        );
+        const show = screen.getByRole("button", { name: "Show sidebar" });
+        fireEvent.pointerEnter(show, { pointerType: "mouse" });
+        advance(120);
+        expect(boxOf(container).getAttribute("data-state")).toBe("peek");
+        fireEvent.pointerLeave(show, { pointerType: "mouse" });
+        advance(150);
+        expect(boxOf(container).getAttribute("data-state")).toBe("closed");
+        fireEvent.focus(show);
+        advance(120);
+        expect(boxOf(container).getAttribute("data-state")).toBe("peek");
+        fireEvent.click(show);
+        expect(onClick).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    test("the closed column does not trap focus: it is inert and the edge zone is not focusable", () => {
+      const { container } = hidden();
+      expect(container.querySelector('[data-collapsed="hidden"]')!.hasAttribute("inert")).toBe(true);
+      expect(zoneOf(container).getAttribute("tabindex")).toBeNull();
+      expect(zoneOf(container).getAttribute("aria-hidden")).toBe("true");
+    });
+
+    test("while hidden or peeking the column sits above the page's sticky bars", () => {
+      withTimers(() => {
+        const { container } = hidden();
+        const pin = container.querySelector('[data-slot="section-sidebar-pin"]') as HTMLElement;
+        expect(pin.className).toContain("z-20");
+        fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
+        advance(120);
+        expect(pin.className).toContain("z-30");
+      });
     });
   });
 });
