@@ -2,6 +2,12 @@
 
 - Add the household coding yield-to-chat, engine choice and Splash disk-cache settings.
 
+## [0.1.190] - spec-v0.1.190
+
+- Deprecate the UI page `tone` as an ignored compatibility field. Existing `default` and `cinema` values remain accepted; pages follow the selected theme and mode. Additive.
+- Deprecate the UI page `tone` as an ignored compatibility field. Existing `default` and `cinema` values remain accepted; pages follow the selected theme and mode. Additive.
+- Deprecate the UI page `tone` as an ignored compatibility field. Existing `default` and `cinema` values remain accepted; pages follow the selected theme and mode. Additive.
+
 ## [spec-v0.1.188] - 2026-10-19
 
 - NEWS-SECTION-STYLES-01: each topic in `spec/news/topics.json` gains an optional `section_style` (`top_stories`, `special`, `todays_news`), and a `story_feed` block's props gain the same optional `section_style`, read only when `layout` is `channel`. It sets how a section page arranges its stories, as Apple News does per category; selection, order and age gates are unchanged. Absent keeps the lead-and-list page. Additive; every existing fixture stays valid.

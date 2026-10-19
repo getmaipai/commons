@@ -1506,7 +1506,7 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
 /* MEDIA-PLAYER-01: tokens for anything drawn over a picture (art), shared by
  * the Player, the Billboard and the media tile overlay (MediaShelf), and open
  * to any app with artwork (News included). Words and controls over art follow the
- * selected look and mode (the cinema page tone keeps them light-on-dark). An app restyles them by setting values here
+ * selected look and mode. An app restyles them by setting values here
  * (the Videos app's red progress accent), never by touching a part. The
  * Player maps Media Chrome's own --media-* variables from these. */
 :root {
@@ -1524,97 +1524,11 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   --art-overlay: color-mix(in srgb, var(--background) 62%, transparent);
   --art-radius: var(--radius-md);
   --player-radius: var(--radius-lg);
-  /* MEDIA-POLISH-01: the small line over a Billboard title; the progress accent unless a tone says otherwise. */
+  /* The small line over a Billboard title; defaults to the progress accent. */
   --art-eyebrow: var(--progress-accent);
   /* Current track/next episode and the mockup's compact episode artwork. */
   --media-current-ring: var(--primary);
   --media-compact-radius: 10px;
-}
-
-/* MEDIA-POLISH-01: the cinema page tone (spec page `tone: "cinema"`, Home's
- * media-apps design note section 6: "these apps select the dark page tone and
- * their accent; no app CSS"). While a page that selects it is on screen, the
- * whole screen (rail, title bar, page, menus) goes dark, in light and dark
- * themes alike, the way a video app stays dark. The kit's SchemaPage marks
- * its root `data-page-tone="cinema"`; nothing else selects it.
- *
- * CINEMA-NEUTRAL-01: the tone follows the ACTIVE look instead of a fixed navy
- * set. The page is the look's `--background` one step darker (its
- * lightness capped at 0.2 so a light look also lands dark, then its lightness
- * scaled by 0.8), the rail by 0.57, and every surface, border and muted text
- * is a mix of that page toward a bright copy of the look's `--foreground`.
- * Hue and chroma stay the look's own, so Neutral is a neutral dark grey and a
- * tinted look keeps its tint. Primary, ring and destructive are the look's
- * own, lifted to at least 0.7 lightness so they read on the dark page.
- * The two stages are deliberate: a custom property cannot read the value it
- * is itself redefining (a cycle makes it invalid), and the look's tokens live
- * on body (`.style-<look>`). Stage 1 on body derives the `--cinema-*` values
- * from the look's tokens, which body does not redefine. Stage 2 on body's
- * children (the app root and the portals that menus and dialogs mount in)
- * assigns the real tokens from those, so nothing reads itself.
- * Kept from the old tone: color-scheme dark, the `--progress-accent`, now the look's destructive
- * red (played-share bar, time range) and the Billboard eyebrow in the accent.
- * Shared: News and the other media apps select the same tone. */
-:root:has([data-page-tone="cinema"]) {
-  color-scheme: dark;
-}
-:root:has([data-page-tone="cinema"]) body {
-  color-scheme: dark;
-  --cinema-base: oklch(from var(--background) min(l, 0.2) c h);
-  --cinema-fg: oklch(from var(--foreground) max(l, 0.96) c h);
-  --cinema-page: oklch(from var(--cinema-base) calc(l * 0.8) c h);
-  --cinema-rail: oklch(from var(--cinema-base) calc(l * 0.57) c h);
-  --cinema-card: color-mix(in srgb, var(--cinema-page), var(--cinema-fg) 7%);
-  --cinema-pane: color-mix(in srgb, var(--cinema-page), var(--cinema-fg) 11%);
-  --cinema-border: color-mix(in srgb, var(--cinema-page), var(--cinema-fg) 17%);
-  --cinema-muted-fg: color-mix(in srgb, var(--cinema-page), var(--cinema-fg) 70%);
-  --cinema-primary: oklch(from var(--primary) max(l, 0.7) c h);
-  --cinema-destructive: oklch(from var(--destructive) max(l, 0.7) c h);
-  background-color: var(--cinema-page);
-}
-:root:has([data-page-tone="cinema"]) body > * {
-  color-scheme: dark;
-  --cinema: var(--cinema-rail);
-  --page: var(--cinema-page);
-  --surface-page: var(--cinema-page);
-  --surface-card: var(--cinema-card);
-  --surface-pane: var(--cinema-pane);
-  --surface-sidebar: var(--cinema-rail);
-  --background: var(--cinema-page);
-  --foreground: var(--cinema-fg);
-  --card: var(--cinema-card);
-  --card-foreground: var(--cinema-fg);
-  --popover: var(--cinema-pane);
-  --popover-foreground: var(--cinema-fg);
-  --border: var(--cinema-border);
-  --input: var(--cinema-border);
-  --muted: var(--cinema-pane);
-  --muted-foreground: var(--cinema-muted-fg);
-  --secondary: var(--cinema-pane);
-  --secondary-foreground: var(--cinema-fg);
-  --accent: var(--cinema-pane);
-  --accent-foreground: var(--cinema-fg);
-  --primary: var(--cinema-primary);
-  --primary-foreground: var(--cinema-page);
-  --ring: var(--cinema-primary);
-  --destructive: var(--cinema-destructive);
-  --destructive-foreground: var(--cinema-page);
-  --sidebar: var(--cinema-rail);
-  --sidebar-foreground: var(--cinema-fg);
-  --sidebar-accent: var(--cinema-pane);
-  --sidebar-accent-foreground: var(--cinema-fg);
-  --sidebar-border: var(--cinema-pane);
-  --elevation-color: oklch(from var(--cinema-base) calc(l * 0.25) c h / 0.55);
-  --elevation-hairline: color-mix(in srgb, var(--cinema-fg) 7%, transparent);
-  /* The shell's chrome tones: the rail one step darker than the page. */
-  --app-rail-bg: var(--cinema-rail);
-  --shell-main: var(--cinema-page);
-  --shell-rail: var(--cinema-rail);
-  --shell-history: var(--cinema-page);
-  --shell-divider: var(--cinema-pane);
-  /* The video app's accent: the played-share bar and the time range take the look's destructive red; the Billboard's eyebrow takes the look's primary. */
-  --progress-accent: var(--cinema-destructive);
-  --art-eyebrow: var(--cinema-primary);
 }
 
 /* MEDIA-BOOKS-01: reading tones stay independent of the surrounding app tone.

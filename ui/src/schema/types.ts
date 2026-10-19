@@ -404,7 +404,7 @@ export interface PageNode {
   type: "page";
   id: string;
   title: string;
-  /** MEDIA-POLISH-01: the page tone; `cinema` is the dark media tone in both themes. */
+  /** Deprecated: ignored; every page follows the selected theme. */
   tone?: "default" | "cinema";
   body: UiNode[];
 }

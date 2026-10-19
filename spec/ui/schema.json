@@ -142,7 +142,7 @@
         "type": { "const": "page" },
         "id": { "type": "string", "minLength": 1 },
         "title": { "type": "string", "minLength": 1 },
-        "tone": { "type": "string", "enum": ["default", "cinema"], "default": "default", "description": "MEDIA-POLISH-01: the page tone. cinema: the dark media tone (the kit's `cinema` token set, the same in light and dark themes) over the whole screen while this page shows; the media apps select it. A client without the tone draws the default." },
+        "tone": { "type": "string", "enum": ["default", "cinema"], "default": "default", "description": "Deprecated: ignored; every page follows the selected theme" },
         "body": {
           "type": "array",
           "items": { "$ref": "#" },

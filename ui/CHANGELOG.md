@@ -1,5 +1,10 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.301] - ui-v0.5.301
+
+- Remove the cinema page tone. The deprecated page `tone` value remains accepted and ignored, so every page follows the selected theme and mode; media picture scrims and overlays continue to use the shared look tokens.
+- Remove the cinema page tone. The deprecated page `tone` value remains accepted and ignored, so every page follows the selected theme and mode; media picture scrims and overlays continue to use the shared look tokens.
+
 ## [0.5.300] - ui-v0.5.300
 
 - IMGTOOLS-10: `ImageGallery` and message picture attachments accept `editAlwaysVisible` (default `false`) to keep their existing Edit action visible without hover. The action remains keyboard reachable and uses a 48 px target. Showcase: the first gallery row demonstrates the option.

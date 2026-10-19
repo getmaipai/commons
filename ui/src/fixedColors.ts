@@ -76,8 +76,7 @@ export const DEFINITION_FILES = ["src/tokens.css", "src/dashboard/css/globals.cs
 
 /** Blocks of a definition file that must hold no literal at all, custom properties included (derived from the look's tokens). */
 export const STRICT_BLOCKS: { file: string; name: string; from: string; to: string }[] = [
-  { file: "src/tokens.css", name: "cinema page tone", from: ':root:has([data-page-tone="cinema"]) {', to: "/* MEDIA-BOOKS-01" },
-  { file: "src/tokens.css", name: "art tokens", from: "/* MEDIA-PLAYER-01: tokens for anything drawn over a picture", to: "/* MEDIA-POLISH-01: the cinema page tone" },
+  { file: "src/tokens.css", name: "art tokens", from: "/* MEDIA-PLAYER-01: tokens for anything drawn over a picture", to: "/* MEDIA-BOOKS-01" },
 ]
 
 export type AllowEntry = { file: string; match: RegExp; reason: string }

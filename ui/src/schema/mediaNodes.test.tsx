@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
+import { Page } from "@/kit/primitives/Page";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext } from "@/kit/schema/packageScope";
 import { MediaHostContext, PLAY_UNAVAILABLE, type MediaHost, type MediaItemRef } from "@/kit/schema/mediaHost";
@@ -155,13 +156,15 @@ describe("MEDIA-POLISH-01", () => {
   const split = watchPage.body[0]!;
   const playerNode = (split as { main: UiNode[] }).main[0]!;
 
-  test("an empty shelf with hide_when_empty draws nothing; the page tone and plain variant come from the document", async () => {
+  test("an empty shelf with hide_when_empty draws nothing; deprecated page tone is ignored and the plain variant comes from the document", async () => {
     globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify([]), { status: 200 }))) as unknown as typeof fetch;
     const { container, queryByRole } = inVideos(shelf, { onPlay: () => {} });
     await waitFor(() => expect(container.querySelector('[data-slot="route-skeleton"], [role="progressbar"]')).toBeNull());
     await waitFor(() => expect(container.textContent).toBe(""));
     expect(queryByRole("heading", { name: "Continue watching" })).toBeNull();
-    expect(homePage.tone).toBe("cinema");
+    expect(PageNodeSchema.parse({ ...homePage, tone: "cinema" }).tone).toBe("cinema");
+    const renderedPage = renderWithQueryClient(<Page title="Media" tone={homePage.tone}>body</Page>);
+    expect(renderedPage.container.firstElementChild?.hasAttribute("data-page-tone")).toBe(false);
   });
 
   test("a plain shelf with rows has its See all link, which navigates inside the app", async () => {

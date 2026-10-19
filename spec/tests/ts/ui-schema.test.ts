@@ -55,7 +55,7 @@ describe("UI schema", () => {
     expect(validate({ type: "page", id: "p", title: "P", body: [{ ...base, action_label: "" }] })).toBe(false);
   });
 
-  test("MEDIA-POLISH-01: a page tone is default or cinema", () => {
+  test("a deprecated cinema page tone remains accepted", () => {
     const page = { type: "page", id: "p", title: "P", body: [{ type: "empty_state", icon: "x", text: "t" }] };
     expect(validate({ ...page, tone: "cinema" })).toBe(true);
     expect(validate({ ...page, tone: "neon" })).toBe(false);
