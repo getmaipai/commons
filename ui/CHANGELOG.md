@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.287] - ui-v0.5.287
+
+- RouteSkeleton stays invisible for its first 200 ms (a CSS animation delay, `route-skeleton-in`), so a page or section that loads quickly no longer flashes a skeleton across the panel; a slow load still shows it. Affects every AsyncState loading state.
+
 ## [0.5.286] - ui-v0.5.286
 
 - Fixed story and article pictures that had no height: a `style` passed to the kit AspectRatio replaces the one that sets `--ratio`, so the 0.5.278 height cap left a frame at zero height. Every card, lead and article picture frame now carries its own `--ratio`. Tests assert it.
