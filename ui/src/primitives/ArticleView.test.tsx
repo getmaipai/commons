@@ -21,7 +21,20 @@ describe("ArticleView", () => {
     expect(getByText("Headline 1")).toBeTruthy();
     expect(container.querySelector("header")?.textContent).toContain("Example Wire");
     expect(container.querySelector('[data-slot="article-provider"]')?.textContent).toBe("Example Wire");
-    expect(container.querySelector("article")?.className).toContain("mx-auto");
+    const article = container.querySelector('[data-slot="article-view"]')!;
+    const column = container.querySelector('[data-slot="article-column"]')!;
+    const toolbar = container.querySelector('[data-slot="article-toolbar"]')!;
+    const provider = container.querySelector('[data-slot="article-provider"]')!;
+    expect(article.contains(toolbar)).toBe(true);
+    expect(article.contains(provider)).toBe(true);
+    expect(column.contains(toolbar)).toBe(false);
+    expect(column.contains(provider)).toBe(false);
+    expect(column.className).toContain("max-w-prose");
+    expect(article.className).not.toContain("max-w-prose");
+    expect(toolbar.className).toContain("sticky");
+    expect(provider.className).not.toContain("sticky");
+    expect(column.contains(container.querySelector("header"))).toBe(true);
+    expect(column.contains(container.querySelector('[data-slot="article-body"]'))).toBe(true);
     expect(container.querySelector("header")?.textContent).toContain("3 sources");
     expect(container.querySelector('[data-slot="key-points"]')?.textContent).toContain("Three things happened.");
     expect(container.querySelector("h2#h1")?.textContent).toBe("What happened");
@@ -103,14 +116,15 @@ describe("ArticleView", () => {
     const body = container.querySelector('[data-slot="article-body"]')!;
     expect(body.className).toContain("font-serif");
     expect(body.getAttribute("data-text-size")).toBe("medium");
-    expect(container.querySelector('[data-slot="article-view"]')!.className).toContain("max-w-prose");
+    expect(container.querySelector('[data-slot="article-column"]')!.className).toContain("max-w-prose");
   });
 
   test("the description and the footer slot draw (Reference), and a saved story shows the filled bookmark", () => {
     const noPoints: ArticleViewData = { ...data, key_points: undefined, description: "From a book", saved: true };
-    const { getByText, getByLabelText } = render(<ArticleView data={noPoints} onAction={() => {}} available={["save"]} footer={<span>Licence · Snapshot today</span>} />);
+    const { container, getByText, getByLabelText } = render(<ArticleView data={noPoints} onAction={() => {}} available={["save"]} footer={<span>Licence · Snapshot today</span>} />);
     expect(getByText("From a book")).toBeTruthy();
     expect(getByText("Licence · Snapshot today")).toBeTruthy();
+    expect(container.querySelector('[data-slot="article-column"]')!.contains(getByText("Licence · Snapshot today"))).toBe(true);
     expect(getByLabelText("Saved").getAttribute("aria-pressed")).toBe("true");
   });
 

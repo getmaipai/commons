@@ -181,9 +181,9 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const hasMore = can("listen") || (can("summarize") && !data.key_points) || (can("open_site") && !!data.open_url);
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
   return (
-    <article data-slot="article-view" className={cn("mx-auto flex w-full min-w-0 max-w-prose flex-col gap-4", className)}>
+    <article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col gap-4", className)}>
       {hasToolbar ? (
-        <div data-slot="article-toolbar" className="flex items-center gap-1">
+        <div data-slot="article-toolbar" className="sticky top-0 z-10 flex items-center gap-1 bg-background">
           {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
           <div className="ml-auto flex items-center gap-1">
             <Button
@@ -219,6 +219,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           {data.byline.publisher}
         </div>
       ) : null}
+      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-prose flex-col gap-4">
       <header className="flex flex-col gap-2">
         {data.kicker ? <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{data.kicker}</p> : null}
         <h2 className="text-3xl leading-tight font-semibold">{data.title}</h2>
@@ -259,6 +260,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         </section>
       ) : null}
       {footer ? <div className="border-t pt-4 text-sm text-muted-foreground">{footer}</div> : null}
+      </div>
     </article>
   );
 }

@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.295] - ui-v0.5.295
+
+- NEWS-ARTICLE-PANE-01: the article's toolbar and source banner span the full pane; the toolbar stays at the top while the article scrolls and the banner scrolls away; the reading column holds the headline, picture and text. Additive.
+
 ## [0.5.294] - ui-v0.5.294
 
 - NEWS-ARTICLE-PANE-01: the article reads like Apple News. `ArticleView` opens with a slim toolbar: Back (drawn when the page gives `onBack`; the schema page wires it to the browser history), Text size (one tap steps Default, Larger, Smaller; kept in this browser), Share (when the browser can share and the story has an outbound address), Save as a bookmark, and a More menu with Open original, Listen and Key points. The old row of labelled buttons is gone. The body reads in a serif column at the chosen size. A story card's menu says "Open original" where it said "Open on <site>". New icons registered: `arrow-left`, `share`, `a-large-small`. Additive: `onBack` is optional on `ArticleView` and `AnswerBlockView`.
