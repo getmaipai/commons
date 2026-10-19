@@ -20,6 +20,12 @@ export interface SafetyContext {
    * scoped to this; self-harm's parent-notify policy reads it too, but
    * that decision lives in the caller (checkSafety), not here. */
   isMinor: boolean;
+  /** CSAM-TEXT-01 (owner's ruling 2026-10-19, docs/design/child-safety-text-2026-10-19.md in the hub): how the `csam` category reads this
+   * text. `floor` (the default, and always for a teen, a child, a robot and a generation prompt) is the full rule. `adult_message` is an
+   * adult's chat message: only an explicit term or a request to produce the content refuses, so a question about a film or a pasted
+   * news article passes. `adult_reply` is the model's reply to an adult: no `csam` word rule at all (discussion is not filtered; the
+   * model's own refusals and the generation checks are the protection). Every other category reads the text the same way. */
+  csamMode?: "floor" | "adult_message" | "adult_reply";
 }
 
 export interface CategorySignals {
@@ -339,6 +345,48 @@ export function detectCsam(rawText: string): CategorySignals {
     }
   }
 
+  return { category: "csam", matched };
+}
+
+// CSAM-TEXT-01: what an ADULT's chat message is refused for. An explicit term that names the content itself (not the words news and
+// advice use, such as "csam", "pedophile" or "Lolita") in a sentence that asks for something, and a request to produce it: one sentence that asks for writing, a
+// description, a picture or a role-play (with the sentence before it) AND holds a minor indicator AND a sexual term. Discussion, news, fiction, health and advice
+// pass; the pairing anywhere else in the text is not a refusal.
+const ADULT_EXPLICIT_TERMS = ["loli", "lolicon", "shota", "shotacon", "jailbait", "childporn", "child porn", "underage sex", "underage porn", "preteen sex"];
+const ADULT_EXPLICIT_SET = new TermSet([...ADULT_EXPLICIT_TERMS, ...STANDALONE_TERMS_I18N], { prefix: prefixOrPhrase });
+const REQUEST_VERBS = [
+  "write", "describe", "draw", "show", "imagine", "roleplay", "role play", "role-play", "pretend", "generate", "create", "make it", "make her", "make him", "make them", "make this", "make that",
+  "depict", "paint", "illustrate", "narrate", "tell me", "give me", "i want", "looking for", "find me", "send me", "picture a", "picture an",
+  "what does", "how does",
+];
+const REQUEST_SET = new TermSet(REQUEST_VERBS, { prefix: prefixOrPhrase });
+
+export function detectCsamAdultMessage(rawText: string): CategorySignals {
+  const matched: string[] = [];
+  const fold = foldForSafety(rawText);
+  // An explicit term counts when the sentence asks for something ("show me loli content"); news and advice that merely name it
+  // ("child porn was found on his devices") pass, as the leading assistants' discussion allowances do.
+  const sentenceList = rawText.split(SENTENCE_BREAK).filter((x) => x.trim());
+  for (const sentence of sentenceList) {
+    const part = foldForSafety(sentence);
+    if ((ADULT_EXPLICIT_SET.matches(part) || NATIVE_STANDALONE.test(part)) && REQUEST_SET.matches(part)) {
+      matched.push("csam.explicit_term");
+      return { category: "csam", matched };
+    }
+  }
+  // A request sentence, read together with the sentence before it ("She is 11. Describe her naked."): the verb must sit in the
+  // later sentence, and the minor indicator and the sexual term must both be in the pair.
+  const sentences = sentenceList;
+  for (let i = 0; i < sentences.length; i++) {
+    if (!REQUEST_SET.matches(foldForSafety(sentences[i]!))) continue;
+    const part = foldForSafety(i > 0 ? `${sentences[i - 1]} ${sentences[i]}` : sentences[i]!);
+    const age = AGE_SET.matches(part) || hasMinorAge(part) || NATIVE_MINOR.test(part);
+    const sexual = SEXUAL_SET.matches(part) || AMBIGUOUS_SET.matches(part) || NATIVE_SEXUAL.test(part);
+    if (age && sexual) {
+      matched.push("csam.request_to_generate");
+      break;
+    }
+  }
   return { category: "csam", matched };
 }
 
