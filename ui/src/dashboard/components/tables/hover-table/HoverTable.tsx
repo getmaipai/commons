@@ -1,3 +1,4 @@
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import {
   Table,
   TableBody,
@@ -51,7 +52,7 @@ function HoverTable() {
                       <TableRow key={index} className='group/row hover:bg-lightprimary cursor-pointer'>
                         <TableCell className='ps-3 min-w-[200px]'>
                           <div className='flex gap-3 items-center'>
-                            <img
+                            <SafeImage
                               src={item.profileImg}
                               alt='profile'
                               width={40}

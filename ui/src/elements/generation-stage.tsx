@@ -3,6 +3,7 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { cn } from "cn";
 import { paper } from "./surfaces";
+import { SafeImage } from "../primitives/SafeImage";
 
 const DOTS = Array.from({ length: 64 }, (_, i) => i);
 
@@ -31,7 +32,9 @@ function useLoadedPreview(src: string | undefined): { shown: string | undefined;
     probe.onload = () => {
       if (!cancelled) setShown(src);
     };
-    probe.onerror = () => {};
+    probe.onerror = () => {
+      if (!cancelled) setShown(src);
+    };
     probe.src = src;
     return () => {
       cancelled = true;
@@ -98,7 +101,7 @@ export function GenerationStage({
       {underlay}
       {shown ? (
         // The preview is decoration for what the status line already says, so it has no alt text.
-        <img
+        <SafeImage
           data-slot="generation-preview"
           data-blur={blur}
           src={shown}

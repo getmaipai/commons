@@ -5,10 +5,11 @@ import { Card } from "@/kit/primitives/Card";
 import { EmptyState } from "@/kit/primitives/EmptyState";
 import { GRID_COLUMNS } from "@/kit/responsive";
 import { useSurface } from "@/kit/useSurface";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 
 export interface MediaGridItem {
   id: string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string | null;
   mediaType: "image" | "video";
   altText: string;
 }
@@ -22,6 +23,7 @@ interface MediaGridProps {
  * image/video lightbox. */
 export function MediaGrid({ items, emptyMessage }: MediaGridProps) {
   const [selectedItem, setSelectedItem] = useState<MediaGridItem | null>(null);
+  const [failedVideoIds, setFailedVideoIds] = useState<ReadonlySet<string>>(() => new Set());
   const { far } = useSurface();
 
   if (items.length === 0) return <EmptyState icon="camera" text={emptyMessage} />;
@@ -35,15 +37,17 @@ export function MediaGrid({ items, emptyMessage }: MediaGridProps) {
               <Card onSelect={() => setSelectedItem(item)} label={`Open media: ${item.altText}`} far={far}>
                 <AspectRatio ratio={4 / 3} className="bg-muted">
                   {item.mediaType === "image" ? (
-                    <img src={item.thumbnailUrl} alt="" className="size-full object-cover" />
+                    <SafeImage src={item.thumbnailUrl} alt="" className="size-full object-cover" />
+                  ) : !item.thumbnailUrl || failedVideoIds.has(item.id) ? (
+                    <SafeImage kind="video" alt="" className="size-full object-cover" />
                   ) : (
                     // This preview is muted and decorative. MediaGridItem carries no caption-track URL.
-                    // eslint-disable-next-line jsx-a11y/media-has-caption
                     <video
                       src={item.thumbnailUrl}
                       muted
                       playsInline
                       preload="metadata"
+                      onError={() => setFailedVideoIds((previous) => new Set(previous).add(item.id))}
                       aria-hidden="true"
                       className="size-full object-cover"
                     />
@@ -58,11 +62,13 @@ export function MediaGrid({ items, emptyMessage }: MediaGridProps) {
             <DialogTitle className="sr-only">{selectedItem.altText}</DialogTitle>
             <div className="flex max-h-[calc(90dvh-1.5rem)] items-center justify-center overflow-hidden">
               {selectedItem.mediaType === "image" ? (
-                <img
+                <SafeImage
                   src={selectedItem.thumbnailUrl}
                   alt={selectedItem.altText}
                   className="max-h-[calc(90dvh-3rem)] max-w-full object-contain"
                 />
+              ) : !selectedItem.thumbnailUrl || failedVideoIds.has(selectedItem.id) ? (
+                <SafeImage kind="video" alt={selectedItem.altText} className="max-h-[calc(90dvh-3rem)] max-w-full object-contain" />
               ) : (
                 // Caption tracks are not part of the requested item shape; altText names the video.
                 // eslint-disable-next-line jsx-a11y/media-has-caption
@@ -70,6 +76,7 @@ export function MediaGrid({ items, emptyMessage }: MediaGridProps) {
                   src={selectedItem.thumbnailUrl}
                   controls
                   playsInline
+                  onError={() => setFailedVideoIds((previous) => new Set(previous).add(selectedItem.id))}
                   aria-label={selectedItem.altText}
                   className="max-h-[calc(90dvh-3rem)] max-w-full"
                 />

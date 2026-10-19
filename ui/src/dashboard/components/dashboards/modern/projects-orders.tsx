@@ -1,3 +1,4 @@
+import { SafeImage } from "@/kit/primitives/SafeImage";
 ;
 
 import { BriefcaseBusiness, ArrowDownUp, Ellipsis } from "lucide-react";
@@ -183,7 +184,7 @@ export default function ProjectsOrders() {
                         {/* Item */}
                         <TableCell className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <img
+                            <SafeImage
                               src={order.avatar}
                               alt={order.name}
                               width={30}

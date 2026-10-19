@@ -44,6 +44,7 @@ import { TooltipIconButton } from "./tooltip-icon-button";
 import { useAttachmentSrc } from "./hooks/use-attachment-src";
 import { cn } from "cn";
 import { imageEditRevealClass } from "./surfaces";
+import { SafeImage } from "../primitives/SafeImage";
 
 /** What the Edit action hands back for one picture. */
 export interface ImageEditTarget {
@@ -78,7 +79,7 @@ type AttachmentPreviewProps = {
 const AttachmentPreview: FC<AttachmentPreviewProps> = ({ src }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   return (
-    <img
+    <SafeImage
       src={src}
       alt="Attachment preview"
       className={cn(
@@ -88,6 +89,7 @@ const AttachmentPreview: FC<AttachmentPreviewProps> = ({ src }) => {
           : "aui-attachment-preview-image-loading opacity-0",
       )}
       onLoad={() => setIsLoaded(true)}
+      onError={() => setIsLoaded(true)}
     />
   );
 };

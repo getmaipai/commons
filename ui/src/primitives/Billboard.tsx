@@ -3,6 +3,7 @@ import { getIcon } from "@/kit/icons";
 import { Button } from "@/kit/ui/button";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/kit/ui/carousel";
 import { cn, FOCUS_RING } from "@/kit/utils";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 
 /** One action on a slide. */
 export interface BillboardAction {
@@ -152,7 +153,7 @@ export function Billboard({
                 hero ? "min-h-[28rem] sm:min-h-[36rem]" : size === "banner" ? "min-h-72 pt-14 sm:h-[340px] sm:min-h-0 sm:pt-0" : "aspect-[4/3] sm:aspect-[21/8]",
               )}
             >
-              {slide.art ? <img src={slide.art} alt="" className="absolute inset-0 -z-20 size-full object-cover" /> : null}
+              <SafeImage src={slide.art} alt="" kind="video" className="absolute inset-0 -z-20 size-full object-cover" />
               {previewing === slide.id && renderPreview ? (
                 <div className="absolute inset-0 -z-10" data-slot="billboard-preview">
                   {renderPreview(slide)}

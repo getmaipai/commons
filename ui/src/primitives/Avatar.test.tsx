@@ -11,8 +11,9 @@ describe("Avatar", () => {
   // Radix-backed primitive in this kit is tested. With no seed, no
   // `AvatarImage` mounts at all, so this is the initial's only path.
   test("shows the name's first initial", async () => {
-    const { findByText } = render(<Avatar name="Sage" />);
+    const { findByText, container } = render(<Avatar name="Sage" />);
     expect(await findByText("S")).toBeTruthy();
+    expect(container.querySelector('[data-slot="safe-image-fallback"][data-kind="person"]')).not.toBeNull();
   });
 
   // A screen-reader read-through (2026-09-06) found this initial
@@ -24,7 +25,7 @@ describe("Avatar", () => {
   // (2026-09-06) found no test guarded this at all.
   test("the initial is hidden from assistive tech, not announced as real text", async () => {
     const { findByText } = render(<Avatar name="Sage" />);
-    expect(await findByText("S")).toHaveAttribute("aria-hidden", "true");
+    expect((await findByText("S")).getAttribute("aria-hidden")).toBe("true");
   });
 
   // The phone header fold's own stand-in for a separate notification
@@ -36,7 +37,7 @@ describe("Avatar", () => {
     await findByText("S");
     const badge = container.querySelector('[data-slot="avatar-badge"]');
     expect(badge).not.toBeNull();
-    expect(badge).toHaveAttribute("aria-hidden", "true");
+    expect(badge!.getAttribute("aria-hidden")).toBe("true");
   });
 
   test("without dot, no badge renders", async () => {

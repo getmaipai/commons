@@ -26,6 +26,12 @@ describe("MediaGrid", () => {
     expect(getByText("Nothing here yet")).toBeInTheDocument();
   });
 
+  test("shows the picture placeholder when a tile has no thumbnail source", () => {
+    const { container } = render(<MediaGrid items={[{ ...fixtureItems[0]!, thumbnailUrl: "" }]} emptyMessage="No media" />);
+    expect(container.querySelector('[data-slot="safe-image-fallback"][data-kind="picture"]')).not.toBeNull();
+    expect(container.querySelector("img")).toBeNull();
+  });
+
   test("opens the selected image in the lightbox", async () => {
     const { getByRole, findByRole, findByAltText } = render(<MediaGrid items={fixtureItems} emptyMessage="No media" />);
 

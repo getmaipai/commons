@@ -28,6 +28,7 @@ import {
   MediaVolumeRange,
 } from "media-chrome/react";
 import { getIcon } from "@/kit/icons";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "@/kit/ui/button";
 import {
   DropdownMenu,
@@ -867,9 +868,7 @@ export function Player(props: PlayerProps) {
               {countdown !== null ? copy.upNextIn(countdown) : copy.upNext}
             </p>
             <div className="flex items-center gap-3">
-              {upNext.art ? (
-                <img src={upNext.art} alt="" className="aspect-video w-32 shrink-0 rounded-[var(--art-radius)] object-cover" />
-              ) : null}
+              <SafeImage src={upNext.art} alt="" kind={kind === "video" ? "video" : "music"} className="aspect-video w-32 shrink-0 rounded-[var(--art-radius)] object-cover" />
               <div className="min-w-0">
                 <p className="truncate text-lg font-semibold">{upNext.title}</p>
                 {upNext.subtitle ? <p className="truncate text-sm opacity-80">{upNext.subtitle}</p> : null}
@@ -983,14 +982,9 @@ export function Player(props: PlayerProps) {
     );
   }
 
-  const art = (size: string) =>
-    poster ? (
-      <img src={poster} alt={posterAlt} className={cn("shrink-0 rounded-[var(--art-radius)] bg-muted object-cover", size)} />
-    ) : (
-      <span aria-hidden className={cn("flex shrink-0 items-center justify-center rounded-[var(--art-radius)] bg-muted", size)}>
-        <Icon name={kind === "video" ? "film" : "music"} className="text-muted-foreground size-6" />
-      </span>
-    );
+  const art = (size: string) => (
+    <SafeImage src={poster} alt={posterAlt} kind={kind === "video" ? "video" : "music"} className={cn("shrink-0 rounded-[var(--art-radius)] bg-muted object-cover", size)} />
+  );
 
   const transport = (big: boolean) => (
     <div className="flex items-center gap-1" data-slot="player-transport">

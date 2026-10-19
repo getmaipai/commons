@@ -1,3 +1,4 @@
+import { SafeImage } from "@/kit/primitives/SafeImage";
 
 
 
@@ -12,7 +13,7 @@ const Maintenance = () => {
       <div className="h-screen flex items-center  justify-center bg-card">
         <div className="text-center">
           <div className="max-w-3xl">
-            <img
+            <SafeImage
               src={maintenance}
               alt="error"
               className="mb-4"

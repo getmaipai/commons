@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.303] - ui-v0.5.303
+
+- Add `SafeImage` as the shared picture renderer for missing and failed artwork. Audio, video, file, person and picture contexts use themed placeholders in the same box; avatar initials remain the person fallback. Migrate kit picture surfaces and schema list and shelf media, and add the content picture lint with tested exceptions for SVG logos and offscreen image decoding.
+
 ## [0.5.302] - ui-v0.5.302
 
 - `DraftRestore` used in `ComposerInputOverride` now portals into a dedicated full-width row above the composer input. The draft preview truncates to one line, restore and dismiss targets are 48 px, and the input keeps its own row. Existing fragment slots continue to work without a host change; the phone-width composer showcase demonstrates the layout.

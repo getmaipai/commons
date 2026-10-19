@@ -336,6 +336,7 @@ describe("MediaViewer loading and errors", () => {
     fireEvent.error(first);
     const alert = ui().getByRole("alert");
     expect(alert.textContent).toContain("Fox in the snow could not be loaded. Check that Home is running, then try again.");
+    expect(alert.querySelector('[data-slot="safe-image-fallback"][data-kind="picture"]')).not.toBeNull();
     expect(document.body.querySelector("[data-slot=media-viewer-image]")).toBeNull();
     expect(ui().queryByRole("button", { name: "Zoom in" })).toBeNull();
     fireEvent.click(ui().getByRole("button", { name: "Try again" }));

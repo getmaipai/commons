@@ -1,3 +1,4 @@
+import { SafeImage } from "@/kit/primitives/SafeImage";
 // Kit showcase entry for Wizard's responsive picture aside.
 import { Wizard } from "@/kit/primitives/Wizard";
 import { Input } from "@/kit/ui/input";
@@ -23,7 +24,7 @@ export function WizardAsideShowcase() {
         layout="centered"
         heading="Your name"
         description="Add the name this household should use for you."
-        aside={<img src={homeIllustration} alt="A home among green hills at sunset" />}
+        aside={<SafeImage src={homeIllustration} alt="A home among green hills at sunset" />}
       >
         <div className="flex flex-col gap-2">
           <Label htmlFor="wizard-aside-showcase-name">Name</Label>

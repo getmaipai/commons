@@ -1,3 +1,4 @@
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "../../../components/ui/button";
 import { Link } from "react-router";
 import errorpage from "../../../assets/images/backgrounds/404.svg"
@@ -7,7 +8,7 @@ const Error = () => {
     <>
       <div className="h-screen flex items-center justify-center ">
         <div className="text-center">
-          <img
+          <SafeImage
             src={errorpage}
             alt="error"
             className="mb-20"

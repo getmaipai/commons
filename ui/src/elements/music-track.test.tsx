@@ -34,6 +34,7 @@ describe("MusicTrack", () => {
     const view = render(<MusicTrack status="ready" title="Pancakes" description="Folk, 1:00" src="/song.m4a" onDownload={() => calls.push("download")} onShare={() => calls.push("share")} onSaveToLibrary={() => calls.push("save")} onMakeAnother={() => calls.push("another")} actions={<button type="button">Extra</button>} />);
     expect(view.container.querySelector("audio")?.getAttribute("src")).toBe("/song.m4a");
     expect(view.container.querySelector('[data-layout="audio"]')).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="safe-image-fallback"][data-kind="music"]')).not.toBeNull();
     expect(view.container.textContent).toContain("Pancakes");
     expect(view.container.textContent).toContain("Folk, 1:00");
     for (const name of ["Download", "Share", "Save to Music", "Make another"]) fireEvent.click(view.getByRole("button", { name }));

@@ -29,6 +29,16 @@ describe("ImageGallery", () => {
     expect(getByRole("dialog")).toBeTruthy();
   });
 
+  test("a failed tile and lightbox image show the shared picture fallback", () => {
+    const images = [{ id: "one", src: "https://example.test/one.jpg", alt: "Picture one" }];
+    const { container, getByRole } = render(<ImageGallery images={images} />);
+    fireEvent.error(container.querySelector("img")!);
+    expect(container.querySelector('[data-slot="safe-image-fallback"][data-kind="picture"]')).not.toBeNull();
+    expect(container.querySelector("img")).toBeNull();
+    fireEvent.click(getByRole("button", { name: "Open image: Picture one" }));
+    expect(document.body.querySelectorAll('[data-slot="safe-image-fallback"][data-kind="picture"]')).toHaveLength(2);
+  });
+
   test("Edit button per tile: reveal classes, click edits once and does not open the lightbox", () => {
     const images = [
       { id: "one", src: "https://example.test/one.jpg", alt: "Picture one" },

@@ -66,6 +66,13 @@ function reducedMotion(on: boolean) {
 }
 
 describe("Billboard", () => {
+  test("shows the video placeholder when a slide has no artwork", () => {
+    const restore = reducedMotion(false);
+    try {
+      const { container } = render(<Billboard label="Featured" slides={[{ ...SLIDES[0]!, art: undefined }]} />);
+      expect(container.querySelector('[data-slot="safe-image-fallback"][data-kind="video"]')).not.toBeNull();
+    } finally { restore(); }
+  });
   test("draws each slide with its words and actions", () => {
     const restore = reducedMotion(false);
     try {

@@ -48,15 +48,16 @@ describe("FileTile", () => {
   test("no picture shows the kind icon, and the extension when there is one", () => {
     const { container, getByText } = render(<FileTile id="a" name="Plan" kind="document" extension="pdf" />);
     expect(container.querySelector("img")).toBeNull();
-    expect(container.querySelector('[data-slot="file-tile-fallback"] svg')).not.toBeNull();
+    expect(container.querySelector('[data-slot="safe-image-fallback"][data-kind="file"] svg')).not.toBeNull();
     expect(getByText("pdf")).toBeTruthy();
   });
 
   test("a picture that fails to load falls back to the icon, and a new address tries again", () => {
     const { container, rerender } = render(<FileTile id="a" name="Fox" kind="image" thumbnailUrl="https://example.com/a.webp" />);
     fireEvent.error(container.querySelector("img")!);
+    expect(container.querySelector('[data-slot="safe-image-fallback"]')).not.toBeNull();
     expect(container.querySelector("img")).toBeNull();
-    expect(container.querySelector('[data-slot="file-tile-fallback"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="safe-image-fallback"][data-kind="picture"]')).not.toBeNull();
     rerender(<FileTile id="a" name="Fox" kind="image" thumbnailUrl="https://example.com/b.webp" />);
     expect(container.querySelector("img")!.getAttribute("src")).toBe("https://example.com/b.webp");
   });

@@ -1,9 +1,9 @@
 // Additive Source.detail (KS-02F-KIT): its own wrapping line, and no change
 // to the rendered output when it is absent.
 import { describe, expect, test, afterEach } from "bun:test";
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, fireEvent, render } from "@testing-library/react";
 import { Sources } from "./sources";
-import { Source as SourcePart } from "./sources.aui";
+import { Source as SourcePart, SourceIcon } from "./sources.aui";
 import { Citation } from "./inline-citation";
 
 afterEach(cleanup);
@@ -19,6 +19,12 @@ function html(layout: "list" | "grid", detail?: string) {
 }
 
 describe("Source.detail", () => {
+  test("a failed favicon becomes the shared picture fallback", () => {
+    const view = render(<SourceIcon url="https://example.com" />);
+    fireEvent.error(view.container.querySelector("img")!);
+    expect(view.container.querySelector('[data-slot="safe-image-fallback"][data-kind="picture"]')).not.toBeNull();
+    expect(view.container.querySelector("img")).toBeNull();
+  });
   test("source part renders data-tour when set and omits it otherwise", () => {
     const view = render(<SourcePart href="https://example.com" tourId="chat.source" />);
     expect(view.container.querySelector('[data-slot="source"]')?.getAttribute("data-tour")).toBe("chat.source");

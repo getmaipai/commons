@@ -1,3 +1,4 @@
+import { SafeImage } from "@/kit/primitives/SafeImage";
 
 
 
@@ -100,7 +101,7 @@ const UserProfile = () => {
         <Card className='p-6 overflow-hidden'>
           <div className='flex flex-col sm:flex-row items-center gap-6 rounded-xl relative w-full break-words'>
             <div>
-              <img
+              <SafeImage
                 src={avatar}
                 alt='image'
                 width={80}

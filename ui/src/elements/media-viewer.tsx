@@ -31,6 +31,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { Skeleton } from "../ui/skeleton";
 import { Player } from "../primitives/Player";
+import { SafeImage } from "../primitives/SafeImage";
 import type { FileKind } from "../primitives/FileTile";
 import { SURFACE_MIN_WIDTH_PX } from "../responsive";
 import { safeHref } from "./href";
@@ -600,7 +601,7 @@ export function MediaViewer({
               <>
                 {status === "error" ? (
                   <div role="alert" data-slot="media-viewer-error" className="text-[var(--art-foreground)] flex max-w-md flex-col items-center gap-4 p-6 text-center">
-                    <ImageIcon aria-hidden className="size-16" />
+                    <SafeImage src={undefined} kind="picture" alt={item.name} className="size-24 rounded-lg" />
                     <p className="text-base">{copy.loadFailed(item.name)}</p>
                     <Button
                       type="button"
@@ -623,7 +624,7 @@ export function MediaViewer({
                         </p>
                       </>
                     ) : null}
-                    <img
+                    <SafeImage
                       key={`${item.id}:${attempt}`}
                       ref={attachImage}
                       src={item.url}

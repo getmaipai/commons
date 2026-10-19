@@ -9,6 +9,7 @@ import { CardGrid } from "@/kit/primitives/CardGrid";
 import { MediaShelf } from "@/kit/primitives/MediaShelf";
 import { Billboard } from "@/kit/primitives/Billboard";
 import { Player, type PlayerChapter, type PlayerTextTrack, type PlayerUpNext } from "@/kit/primitives/Player";
+import { SafeImage, type ImageFallbackKind } from "@/kit/primitives/SafeImage";
 import { Reader } from "@/kit/primitives/Reader";
 import { readerLocator, sameOriginBookUrl } from "@/kit/primitives/readerLogic";
 import { formatTime } from "@/kit/primitives/playerLogic";
@@ -556,14 +557,21 @@ function TabsNodeView({ node, state }: { node: TabsNode; state: Row }) {
 
 /** A list row's leading media: a lucide icon by name, or a same-origin image path. An address with a scheme or a host
  * is never loaded, so a row cannot pull a picture from another site. */
-function RowMedia({ value }: { value: unknown }) {
-  if (typeof value !== "string" || value === "") return null;
-  if (value.startsWith("/") && !value.startsWith("//")) return <img src={value} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
+function pictureKind(value: unknown): ImageFallbackKind {
+  if (["audio", "track", "podcast_episode", "audiobook", "chapter"].includes(String(value))) return "music";
+  if (["video", "episode", "film"].includes(String(value))) return "video";
+  if (["document", "file", "book"].includes(String(value))) return "file";
+  return value === "person" ? "person" : "picture";
+}
+
+function RowMedia({ value, kind }: { value: unknown; kind: unknown }) {
+  if (typeof value !== "string" || value === "") return <SafeImage kind={pictureKind(kind)} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
+  if (value.startsWith("/") && !value.startsWith("//")) return <SafeImage src={value} kind={pictureKind(kind)} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
   if (/^[a-z0-9-]+$/i.test(value)) {
     const Icon = getIcon(value);
     return Icon ? <Icon className="text-muted-foreground size-6 shrink-0" aria-hidden /> : null;
   }
-  return null;
+  return <SafeImage kind={pictureKind(kind)} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
 }
 
 function ListNodeView({ node }: { node: ListNode }) {
@@ -659,7 +667,7 @@ function ListNodeView({ node }: { node: ListNode }) {
                     className="shrink-0"
                   />
                 ) : null}
-                {node.item_media_field ? <RowMedia value={readField(row, node.item_media_field)} /> : null}
+                {node.item_media_field ? <RowMedia value={readField(row, node.item_media_field)} kind={readField(row, "kind")} /> : null}
                 <div className="flex min-w-0 flex-col">
                   <span className="truncate text-base">{String(readField(row, node.item_label_field))}</span>
                   {node.item_subtitle_field ? (
@@ -821,7 +829,7 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             )}
             renderItem={(row) => {
               const src = localPicture(readField(row, node.item_media_field));
-              return src ? <img src={src} alt="" className="h-full w-full object-cover" /> : null;
+              return <SafeImage src={src} kind={pictureKind(readField(row, "kind"))} alt="" className="h-full w-full object-cover" />;
             }}
             getProgress={node.item_progress_field ? (row) => Number(readField(row, node.item_progress_field!)) : undefined}
             renderBadge={

@@ -53,24 +53,18 @@ describe("StoryFeed", () => {
     expect(container.querySelector('[data-tier="lead"] img')?.getAttribute("src")).toBe(data.hero!.image!.w1280);
   });
 
-  test("a story with no picture draws a plain tile, never a broken image", () => {
+  test("a story with no picture draws the shared picture tile, never a broken image", () => {
     const { container } = render(<StoryFeed data={{ ...data, hero: { ...data.hero!, image: undefined } }} />);
     expect(container.querySelector('[data-tier="hero"] img')).toBeNull();
-    const tile = container.querySelector('[data-tier="hero"] [data-slot="story-image"][data-fallback]')!;
-    expect(tile.textContent).toBe(data.hero!.publisher.trim().charAt(0).toUpperCase());
-    expect(tile.querySelector("svg")).toBeNull();
+    const tile = container.querySelector('[data-tier="hero"] [data-slot="safe-image-fallback"][data-kind="picture"]')!;
+    expect(tile.querySelector("svg")).not.toBeNull();
     expect(tile.hasAttribute("data-empty")).toBe(false);
   });
 
-  test("publisher hues are stable and include distinct hues", () => {
-    const stories = ["Atlas", "Atlas", "Bramble"].map((publisher, i) => ({ ...data.hero!, story_id: `hue-${i}`, publisher, image: undefined }));
+  test("missing story pictures share the default picture icon", () => {
+    const stories = ["Atlas", "Atlas", "Bramble"].map((publisher, i) => ({ ...data.hero!, story_id: `missing-${i}`, publisher, image: undefined }));
     const { container } = render(<StoryFeed data={{ layout: "channel", featured: stories, as_of: data.as_of }} />);
-    const tiles = Array.from(container.querySelectorAll<HTMLElement>('[data-fallback]'));
-    expect(tiles.map((tile) => tile.textContent)).toEqual(["A", "A", "B"]);
-    expect(tiles[0]!.style.backgroundColor).toMatch(/^var\(--hue-/);
-    expect(tiles[0]!.style.backgroundColor).toBe(tiles[1]!.style.backgroundColor);
-    expect(tiles[0]!.style.backgroundColor).not.toBe(tiles[2]!.style.backgroundColor);
-    expect(tiles[0]!.style.color).toBe("var(--primary-foreground)");
+    expect(container.querySelectorAll('[data-slot="safe-image-fallback"][data-kind="picture"]')).toHaveLength(3);
   });
 
   for (const tier of ["hero", "featured", "half", "shelf", "row"] as const) {
@@ -85,21 +79,16 @@ describe("StoryFeed", () => {
     };
     const selector = tier === "row" ? '[data-slot="story-row"]' : `[data-tier="${tier}"]`;
 
-    test(`${tier} swaps failed pictures for initials and remembers each failed src`, () => {
+    test(`${tier} swaps failed pictures for the shared picture tile`, () => {
       const { container, rerender } = render(<StoryFeed data={feedFor()} />);
       const card = () => container.querySelector(selector)!;
-      const beforeText = card().textContent;
       const img = card().querySelector("img")!;
       expect(img).not.toBeNull();
       fireEvent.error(img);
-      const tile = card().querySelector<HTMLElement>('[data-slot="story-image"][data-fallback]')!;
-      expect(tile.textContent).toBe(data.hero!.publisher.trim().charAt(0).toUpperCase());
-      expect(tile.querySelector("svg")).toBeNull();
+      expect(card().querySelector('[data-slot="safe-image-fallback"]')).not.toBeNull();
+      const tile = card().querySelector<HTMLElement>('[data-slot="safe-image-fallback"][data-kind="picture"]')!;
+      expect(tile.querySelector("svg")).not.toBeNull();
       expect(card().querySelector("img")).toBeNull();
-      expect(card().textContent).toBe(tile.textContent + beforeText);
-      // A row's thumbnail frame is sized by its media box; every other tile takes its ratio from its own `--ratio`.
-      expect(tile.style.aspectRatio).toBe(tier === "row" ? `${16 / 9} / 1` : "var(--ratio)");
-      if (tier !== "hero" && tier !== "row") expect(Number(tile.style.getPropertyValue("--ratio"))).toBeCloseTo(tier === "shelf" ? 4 / 3 : 16 / 9, 5);
       rerender(<StoryFeed data={feedFor()} />);
       expect(card().querySelector("img")).toBeNull();
       const replacement = { ...data.hero!.image!, w480: "/replacement-small.jpg", w1280: "/replacement-large.jpg" };
@@ -107,6 +96,8 @@ describe("StoryFeed", () => {
       expect(card().querySelector("img")).not.toBeNull();
       fireEvent.error(card().querySelector("img")!);
       rerender(<StoryFeed data={feedFor()} />);
+      expect(card().querySelector("img")).not.toBeNull();
+      fireEvent.error(card().querySelector("img")!);
       expect(card().querySelector("img")).toBeNull();
     });
 
@@ -117,9 +108,8 @@ describe("StoryFeed", () => {
       }
       const { container } = render(<StoryFeed data={feed} />);
       const card = container.querySelector(selector)!;
-      const tile = card.querySelector('[data-slot="story-image"][data-fallback]')!;
-      expect(tile.textContent).toBe(data.hero!.publisher.trim().charAt(0).toUpperCase());
-      expect(tile.querySelector("svg")).toBeNull();
+      const tile = card.querySelector('[data-slot="safe-image-fallback"][data-kind="picture"]')!;
+      expect(tile.querySelector("svg")).not.toBeNull();
       expect(card.querySelector("img")).toBeNull();
       expect(card.querySelector("[data-empty]")).toBeNull();
     });

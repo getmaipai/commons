@@ -1,3 +1,4 @@
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import {
   Table,
   TableBody,
@@ -53,7 +54,7 @@ const BasicTable = () => {
                         <TableRow key={index} className='border-b border-border'>
                           <TableCell className='min-w-[200px]'>
                             <div className='flex gap-3 items-center'>
-                              <img
+                              <SafeImage
                                 src={item.profileImg}
                                 alt='profile'
                                 width={40}

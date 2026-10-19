@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { act, cleanup, render } from "@testing-library/react";
+import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { GenerationStage, previewBlur } from "./generation-stage";
 import { ImageGeneration } from "./image-generation";
 import { VideoPlayer } from "./video-player";
@@ -58,6 +58,24 @@ describe("the preview cross-fade", () => {
     await settle();
     expect((view.container.querySelector("img") as HTMLImageElement).style.filter).toBe("");
     expect(loading).toEqual(["/p.jpg?v=1", "/p.jpg?v=2", "/p.jpg?v=4"]);
+  });
+
+  test("a preview that fails during preload still renders the shared picture fallback", async () => {
+    const currentImage = globalThis.Image;
+    (globalThis as { Image: unknown }).Image = class {
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(_value: string) { queueMicrotask(() => this.onerror?.()); }
+    };
+    try {
+      const view = render(<GenerationStage generating previewSrc="/failed.jpg" />);
+      await settle();
+      fireEvent.error(view.container.querySelector("img[data-slot=generation-preview]")!);
+      expect(view.container.querySelector('[data-slot="safe-image-fallback"][data-kind="picture"]')).not.toBeNull();
+      expect(view.container.querySelector("img[data-slot=generation-preview]")).toBeNull();
+    } finally {
+      (globalThis as { Image: unknown }).Image = currentImage;
+    }
   });
 
   test("reduced motion switches the transitions off; the preview goes away when generating stops", async () => {

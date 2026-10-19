@@ -1,4 +1,5 @@
 "use client";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 
 // LIBRARY-REVAMP-06 slice B story: the Library's list view. DataTable with row selection and a thumbnail in the
 // first column, drawn with the table's own `cell` render (no new cell API is needed). Words and sizes are samples.
@@ -43,7 +44,7 @@ function NameCell({ file }: { file: SampleFile }) {
     <span className="flex min-w-0 items-center gap-3">
       <span className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md">
         {file.thumbnailUrl ? (
-          <img src={file.thumbnailUrl} alt="" width={48} height={48} loading="lazy" decoding="async" className="size-full object-cover" />
+          <SafeImage src={file.thumbnailUrl} alt="" width={48} height={48} loading="lazy" decoding="async" className="size-full object-cover" />
         ) : (
           <Icon aria-hidden className="size-5" />
         )}

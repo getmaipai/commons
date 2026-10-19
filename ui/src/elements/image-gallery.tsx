@@ -10,7 +10,6 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ExternalLinkIcon,
-  ImageOffIcon,
   PencilIcon,
 } from "lucide-react";
 import {
@@ -28,6 +27,7 @@ import { TooltipIconButton } from "./tooltip-icon-button";
 import { safeHref } from "./href";
 import { clamp } from "./range";
 import { field, ghostButton, imageEditRevealClass, mono } from "./surfaces";
+import { SafeImage } from "../primitives/SafeImage";
 
 export interface GalleryImage {
   id: string;
@@ -234,19 +234,13 @@ export function ImageGallery({
                 "focus-visible:ring-foreground/30 relative overflow-hidden rounded-xl transition-[transform,background-color] duration-150 outline-none hover:scale-[1.01] focus-visible:ring-1 active:scale-[0.98] motion-reduce:transition-none",
               )}
             >
-              {failed ? (
-                <span className="text-muted-foreground flex size-full items-center justify-center">
-                  <ImageOffIcon aria-hidden className="size-6" />
-                </span>
-              ) : (
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  loading="lazy"
-                  className={natural ? "block h-auto max-h-[32rem] w-full object-contain" : "size-full object-cover"}
-                  onError={() => markFailed(image)}
-                />
-              )}
+              <SafeImage
+                src={failed ? undefined : image.src}
+                alt={image.alt}
+                loading="lazy"
+                className={natural ? "block h-auto max-h-[32rem] w-full object-contain" : "size-full object-cover"}
+                onError={() => markFailed(image)}
+              />
               {overflow ? (
                 <span className="bg-foreground/65 text-background absolute inset-0 flex items-center justify-center text-lg font-medium">
                   +{images.length - visibleCount}
@@ -307,18 +301,12 @@ export function ImageGallery({
               Image {index + 1} of {images.length}
             </DialogTitle>
             <div className="flex min-h-0 items-center justify-center px-10">
-              {failedImages.has(keyForImage(activeImage)) ? (
-                <div className="text-muted-foreground flex h-[min(75vh,32rem)] w-full items-center justify-center">
-                  <ImageOffIcon aria-hidden className="size-8" />
-                </div>
-              ) : (
-                <img
-                  src={activeImage.src}
-                  alt={activeImage.alt}
-                  className="max-h-[75vh] max-w-full object-contain"
-                  onError={() => markFailed(activeImage)}
-                />
-              )}
+              <SafeImage
+                src={failedImages.has(keyForImage(activeImage)) ? undefined : activeImage.src}
+                alt={activeImage.alt}
+                className="max-h-[75vh] max-w-full object-contain"
+                onError={() => markFailed(activeImage)}
+              />
             </div>
             <div className="flex min-w-0 items-center gap-2">
               <button

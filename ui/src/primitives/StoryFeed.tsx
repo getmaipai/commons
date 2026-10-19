@@ -1,5 +1,5 @@
 import { getIcon } from "@/kit/icons";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
@@ -15,6 +15,7 @@ import { Item, ItemContent, ItemMedia, ItemTitle } from "@/kit/dashboard/compone
 import { Tabs, TabsList, TabsTrigger } from "@/kit/dashboard/components/ui/tabs";
 import { RelativeTime } from "@/kit/ui/relative-time";
 import { cn, HIT_AREA_ROW } from "@/kit/utils";
+import { SafeImage } from "./SafeImage";
 
 const BookmarkIcon = getIcon("bookmark");
 const EllipsisIcon = getIcon("more-horizontal");
@@ -125,41 +126,17 @@ const HERO_RATIO_STYLE = { "--ratio": "var(--story-hero-ratio, 2 / 1)", maxHeigh
  * The style carries its own `--ratio`: a `style` passed to the kit AspectRatio replaces the one that sets it, and a frame without it has no height. */
 const cardStyle = (ratio: number): CSSProperties => ({ "--ratio": ratio, maxHeight: "var(--story-card-max-h, 18rem)" }) as CSSProperties;
 
-// Named palette tokens from tokens.css, with the Avatar's filled-surface text token.
-const STORY_HUES = ["blue", "violet", "teal", "orange", "pink", "red"] as const;
-
-function StoryFallback({ publisher, ratio, style, thumbnail }: { publisher: string; ratio: number; style?: CSSProperties; thumbnail?: boolean }) {
-  let hash = 0;
-  for (const letter of publisher) hash = (Math.imul(hash, 31) + letter.codePointAt(0)!) >>> 0;
-  return (
-    <div
-      data-slot="story-image"
-      data-fallback=""
-      aria-hidden
-      className={cn("flex w-full items-center justify-center font-semibold", thumbnail ? "text-3xl" : "text-6xl")}
-      style={{ ...style, aspectRatio: style && "--ratio" in style ? "var(--ratio)" : String(ratio), backgroundColor: `var(--hue-${STORY_HUES[hash % STORY_HUES.length]})`, color: "var(--primary-foreground)" }}
-    >
-      {publisher.trim().charAt(0).toUpperCase()}
-    </div>
-  );
-}
-
 function StoryImage({ story, ratio, large, hero, thumbnail }: { story: StoryCardData; ratio: number; large?: boolean; hero?: boolean; thumbnail?: boolean }) {
-  const [failedSources, setFailedSources] = useState<ReadonlySet<string>>(() => new Set());
   const style = hero ? HERO_RATIO_STYLE : thumbnail ? undefined : cardStyle(ratio);
   const src = large ? story.image?.w1280 : story.image?.w480;
-  if (!src || failedSources.has(src)) {
-    return <StoryFallback publisher={story.publisher} ratio={ratio} style={style} thumbnail={thumbnail} />;
-  }
   return (
     <AspectRatio ratio={ratio} style={thumbnail ? ({ "--ratio": ratio, width: "100%" } as CSSProperties) : style} className="overflow-hidden" data-slot="story-image">
-      <img
+      <SafeImage
         src={src}
-        srcSet={thumbnail ? undefined : `${story.image!.w480} 480w, ${story.image!.w1280} 1280w`}
+        srcSet={thumbnail || !story.image ? undefined : `${story.image.w480} 480w, ${story.image.w1280} 1280w`}
         sizes={thumbnail ? undefined : large ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
-        alt={story.image!.alt}
+        alt={story.image?.alt ?? ""}
         loading="lazy"
-        onError={() => setFailedSources((previous) => new Set(previous).add(src))}
         className="absolute inset-0 size-full object-cover"
       />
     </AspectRatio>

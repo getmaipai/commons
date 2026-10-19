@@ -1,3 +1,4 @@
+import { SafeImage } from "@/kit/primitives/SafeImage";
 
 
 import React, { useMemo, useState } from 'react'
@@ -216,7 +217,7 @@ const DataTable = <T extends Record<string, unknown>>({
                 qrCode ||
                 profileImage ||
                 icon ? (
-                <img
+                <SafeImage
                   src={
                     (image as string) ??
                     (imageUrl as string) ??
@@ -293,7 +294,7 @@ const DataTable = <T extends Record<string, unknown>>({
             col.toLowerCase().includes('thumbnail') ||
             col.toLowerCase().includes('image')
           ) {
-            return <img src={value} className='size-10 rounded-md' />
+            return <SafeImage src={value} className='size-10 rounded-md' />
           }
         }
 
@@ -306,7 +307,7 @@ const DataTable = <T extends Record<string, unknown>>({
           return (
             <div className='flex items-center gap-2'>
               {avatar ? (
-                <img
+                <SafeImage
                   src={avatar}
                   alt={String(value)}
                   width={36}

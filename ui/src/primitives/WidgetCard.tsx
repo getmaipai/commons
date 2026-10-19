@@ -3,13 +3,14 @@ import { List } from "@/kit/primitives/List";
 import { Skeleton } from "@/kit/ui/skeleton";
 import { getIcon } from "@/kit/icons";
 import type { WidgetItem } from "@/kit/widgets";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 
 function WidgetItemRow({ item }: { item: WidgetItem }) {
   const Icon = item.icon ? getIcon(item.icon) : null;
   const content = (
     <div className="flex min-w-0 items-center gap-2">
       {Icon ? <Icon aria-hidden className="size-4 shrink-0 text-muted-foreground" /> : null}
-      {item.image ? <img src={item.image} alt="" className="size-8 shrink-0 rounded object-cover" /> : null}
+      {item.image ? <SafeImage src={item.image} alt="" className="size-8 shrink-0 rounded object-cover" /> : null}
       <div className="flex min-w-0 flex-col">
         <span className="truncate text-base">{item.title}</span>
         {item.subtitle ? <span className="truncate text-sm text-muted-foreground">{item.subtitle}</span> : null}

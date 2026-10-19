@@ -1,11 +1,12 @@
 "use client";
 
-import { memo, useState, type ComponentProps } from "react";
+import { memo, type ComponentProps } from "react";
 import { FileTextIcon } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { SourceMessagePartComponent } from "@assistant-ui/react";
 import { cn } from "cn";
 import { Badge } from "./ui/badge";
+import { SafeImage } from "../primitives/SafeImage";
 
 const sourceVariants = cva(
   "inline-flex items-center justify-center gap-1 rounded-md text-xs font-medium transition-colors [&_svg]:size-3 [&_svg]:shrink-0",
@@ -57,42 +58,20 @@ function SourceIcon({
   className,
   faviconUrl = defaultFaviconUrl,
   ...props
-}: ComponentProps<"span"> & {
+}: Omit<ComponentProps<"span">, "ref"> & {
   url: string;
   faviconUrl?: (domain: string) => string;
 }) {
   const domain = extractDomain(url);
   const src = faviconUrl(domain);
-  const [errorSrc, setErrorSrc] = useState<string | undefined>(undefined);
-  const hasError = errorSrc === src;
-
-  if (hasError) {
-    return (
-      <span
-        data-slot="source-icon-fallback"
-        className={cn(
-          "bg-muted flex size-3 shrink-0 items-center justify-center rounded-sm text-[10px] font-medium",
-          className,
-        )}
-        {...props}
-      >
-        {domain.charAt(0).toUpperCase() || "?"}
-      </span>
-    );
-  }
 
   return (
-    <img
+    <SafeImage
       data-slot="source-icon"
       src={src}
       alt=""
       className={cn("size-3 shrink-0 rounded-sm", className)}
-      onError={() => setErrorSrc(src)}
-      {...(props as ComponentProps<"img">)}
-      // A server-rendered image that fails before hydration never fires onError.
-      ref={(el) => {
-        if (el?.complete && el.naturalWidth === 0) setErrorSrc(src);
-      }}
+      {...props}
     />
   );
 }

@@ -1,4 +1,5 @@
 'use client'
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import { v4 as uuidv4 } from 'uuid';
 import { useState } from "react";
 
@@ -137,7 +138,7 @@ export default function RecentOrders() {
                       </TableCell>
                       <TableCell className="whitespace-nowrap p-3">
                         <div className="flex items-center gap-2">
-                          <img
+                          <SafeImage
                             src={item.productImg}
                             className="rounded-full bg-foreground/20 pt-0.5"
                             alt="product-img"

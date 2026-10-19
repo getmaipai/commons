@@ -16,6 +16,7 @@ import {
 import { cn } from "../dashboard/lib/utils";
 import { HitField } from "../settings/HitField";
 import { Chip } from "./Chip";
+import { SafeImage } from "./SafeImage";
 
 const SearchIcon = getIcon("search");
 const HideIcon = getIcon("panel-left-close");
@@ -311,7 +312,7 @@ export function SectionSidebar({
           aria-describedby={item.describedBy}
         >
           <span className="relative flex shrink-0">
-            {item.media ? <img src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className="size-[18px] text-settings-helper" />}
+            {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className="size-[18px] text-settings-helper" />}
             {rail && item.dot ? <span data-slot="section-sidebar-dot" aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary" /> : null}
           </span>
           <span className={cn("flex-1 truncate", rail && "sr-only")}>{item.label}</span>
@@ -527,7 +528,7 @@ export function SectionSidebarDrawerSections({ groups = [], footer, onNavigate }
               }}
               className="flex min-h-12 items-center gap-3 rounded-[var(--settings-control-radius)] px-3 text-sm outline-none hover:bg-settings-fill/60 focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-settings-fill"
             >
-              {item.media ? <img src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className="size-[18px] text-settings-helper" />}
+              {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className="size-[18px] text-settings-helper" />}
               <span className="flex-1 truncate">{item.label}</span>
               {item.trailing}
             </a>

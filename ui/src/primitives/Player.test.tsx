@@ -38,6 +38,10 @@ function setup(props: Partial<Parameters<typeof Player>[0]> = {}) {
 }
 
 describe("Player", () => {
+  test("shows a music placeholder when an audio poster is absent", () => {
+    const view = render(<Player src="/a" kind="audio" layout="mini" title="Song" />);
+    expect(view.container.querySelector('[data-slot="safe-image-fallback"][data-kind="music"]')).not.toBeNull();
+  });
   test("opens at the stored position with the resume line, and Start over goes to the start", async () => {
     const onProgress = mock((_: PlayerProgress) => {});
     const { el, getByRole, findByText } = setup({ resumeFrom: 760, onProgress });

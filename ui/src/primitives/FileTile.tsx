@@ -1,11 +1,12 @@
 import { useState, type MouseEvent, type ReactElement, type ReactNode, type Ref } from "react";
 import { Avatar } from "@/kit/primitives/Avatar";
 import { Card } from "@/kit/primitives/Card";
-import { getIcon, type IconName } from "@/kit/icons";
+import { getIcon } from "@/kit/icons";
 import { Button } from "@/kit/ui/button";
 import { Checkbox } from "@/kit/ui/checkbox";
 import { AvatarGroup, AvatarGroupCount } from "@/kit/ui/avatar";
 import { cn } from "@/kit/utils";
+import { SafeImage } from "./SafeImage";
 
 export type FileKind = "image" | "video" | "audio" | "document" | "other";
 
@@ -70,14 +71,6 @@ export function formatClock(seconds: number): string {
   return hours > 0 ? `${hours}:${String(minutes).padStart(2, "0")}:${rest}` : `${minutes}:${rest}`;
 }
 
-const KIND_ICON: Record<FileKind, IconName> = {
-  image: "camera",
-  video: "film",
-  audio: "music",
-  document: "file-text",
-  other: "box",
-};
-
 export interface FileTileProps extends FileTileData {
   selected?: boolean;
   /** In selection mode the select box is always shown and pressing the tile toggles it. */
@@ -138,7 +131,6 @@ export function FileTile({
   const copy: FileTileLabels = { ...DEFAULT_FILE_TILE_LABELS, ...labels, kind: { ...DEFAULT_FILE_TILE_LABELS.kind, ...labels?.kind } };
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const showPicture = Boolean(thumbnailUrl) && failedUrl !== thumbnailUrl;
-  const KindIcon = getIcon(KIND_ICON[kind]);
   const PlayIcon = getIcon("play");
   const MoreIcon = getIcon("more-horizontal");
 
@@ -204,24 +196,19 @@ export function FileTile({
           className="block w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--ring)]"
         >
           <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
-            {showPicture ? (
-              <img
-                src={thumbnailUrl ?? undefined}
-                alt=""
-                width={320}
-                height={240}
-                loading="lazy"
-                decoding="async"
-                draggable={false}
-                onError={() => setFailedUrl(thumbnailUrl ?? null)}
-                className="absolute inset-0 size-full object-cover"
-              />
-            ) : (
-              <div data-slot="file-tile-fallback" className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-muted-foreground">
-                <KindIcon aria-hidden className="size-10" />
-                {extension ? <span className="text-base font-semibold uppercase">{extension}</span> : null}
-              </div>
-            )}
+            <SafeImage
+              kind={kind === "audio" ? "music" : kind === "video" ? "video" : kind === "document" || kind === "other" ? "file" : "picture"}
+              src={thumbnailUrl ?? undefined}
+              alt=""
+              width={320}
+              height={240}
+              loading="lazy"
+              decoding="async"
+              draggable={false}
+              onError={() => setFailedUrl(thumbnailUrl ?? null)}
+              className="absolute inset-0 size-full object-cover"
+              fallbackAfterIcon={extension ? <span className="text-base font-semibold uppercase">{extension}</span> : null}
+            />
             {showPicture && kind === "video" ? (
               <span aria-hidden className="absolute left-1/2 top-1/2 flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-background/85 text-foreground">
                 <PlayIcon className="size-5" />

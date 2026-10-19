@@ -14,7 +14,6 @@ import {
   CopyIcon,
   DownloadIcon,
   ImageIcon,
-  ImageOffIcon,
   Loader2Icon,
   RefreshCwIcon,
   ShieldAlertIcon,
@@ -25,6 +24,7 @@ import type {
   ImageMessagePartComponent,
 } from "@assistant-ui/react";
 import { cn } from "cn";
+import { SafeImage } from "../primitives/SafeImage";
 
 const extensionForMimeType = (mimeType?: string): string => {
   switch (mimeType) {
@@ -176,19 +176,11 @@ function ImagePreview({
   src,
   ...props
 }: ImagePreviewProps) {
-  const imgRef = useRef<HTMLImageElement>(null);
   const [loadedSrc, setLoadedSrc] = useState<string | undefined>(undefined);
   const [errorSrc, setErrorSrc] = useState<string | undefined>(undefined);
 
   const loaded = loadedSrc === src;
   const error = errorSrc === src;
-
-  useEffect(() => {
-    const image = imgRef.current;
-    if (typeof src !== "string" || !image?.complete) return;
-    if (image.naturalWidth > 0) setLoadedSrc(src);
-    else setErrorSrc(src);
-  }, [src]);
 
   return (
     <div
@@ -203,34 +195,24 @@ function ImagePreview({
           <ImageIcon className="text-muted-foreground size-8 animate-pulse" />
         </div>
       )}
-      {error ? (
-        <div
-          data-slot="image-preview-error"
-          className="bg-muted/50 flex min-h-32 items-center justify-center p-4"
-        >
-          <ImageOffIcon className="text-muted-foreground size-8" />
-        </div>
-      ) : (
-        <img
-          ref={imgRef}
-          src={src}
-          alt={alt}
-          className={cn(
-            "block h-auto w-full object-contain",
-            !loaded && "invisible",
-            className,
-          )}
-          onLoad={(e) => {
-            if (typeof src === "string") setLoadedSrc(src);
-            onLoad?.(e);
-          }}
-          onError={(e) => {
-            if (typeof src === "string") setErrorSrc(src);
-            onError?.(e);
-          }}
-          {...props}
-        />
-      )}
+      <SafeImage
+        src={error ? undefined : src}
+        alt={alt}
+        className={cn(
+          "block h-auto w-full object-contain",
+          !loaded && !error && "invisible",
+          className,
+        )}
+        onLoad={(e) => {
+          if (typeof src === "string") setLoadedSrc(src);
+          onLoad?.(e);
+        }}
+        onError={(e) => {
+          if (typeof src === "string") setErrorSrc(src);
+          onError?.(e);
+        }}
+        {...props}
+      />
     </div>
   );
 }
@@ -346,7 +328,7 @@ function ImageZoom({ src, alt = "Image preview", children }: ImageZoomProps) {
             onClick={handleClose}
             aria-label="Zoomed image"
           >
-            <img
+            <SafeImage
               data-slot="image-zoom-content"
               src={src}
               alt={alt}

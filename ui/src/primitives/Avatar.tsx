@@ -7,9 +7,10 @@ import { createAvatar } from "@dicebear/core";
 // for the one style actually used (a code review, 2026-09-26, caught
 // this the first time it landed as `@dicebear/collection`).
 import * as adventurer from "@dicebear/adventurer";
-import { Avatar as AvatarRoot, AvatarFallback, AvatarImage, AvatarBadge } from "@/kit/ui/avatar";
+import { Avatar as AvatarRoot, AvatarBadge } from "@/kit/ui/avatar";
 import { cn } from "@/kit/utils";
 import { profileAccentStyle, type ProfileAccent } from "@/kit/primitives/profileAccent";
+import { SafeImage } from "./SafeImage";
 
 interface AvatarProps {
   name: string;
@@ -93,34 +94,9 @@ export function Avatar({ name, seed, className, size = "default", accent, dot, t
         className,
       )}
     >
-      {/* Decorative, same reasoning as the initial below: every real
-          caller already renders the full name as separate, adjacent
-          visible text, so the picture carries no information a screen
-          reader needs read aloud. Radix's own Image-to-Fallback swap
-          (kit/ui/avatar.tsx) is what makes a failed load fall through to
-          the initial with no extra code here. */}
-      {avatarUri ? <AvatarImage src={avatarUri} alt="" /> : null}
-      {/* kit/ui/avatar.tsx's AvatarFallback hardcodes its own `text-sm` in
-          its base classes, so it never actually inherited the root's size
-          in the first place (a code review, 2026-09-05, caught every
-          non-default caller's size silently doing nothing - verified live,
-          the root's text-xl/text-sm made no difference until this line).
-          `text-[length:inherit]` overrides that hardcoded size back to
-          "whatever the root above is set to", which is the one property
-          Tailwind has no bare utility for (`text-inherit` sets color, not
-          size). */}
-      {/* A screen-reader read-through (session E step 7, 2026-09-06)
-          found this initial announced as real text everywhere Avatar is
-          used - "S Sage Owner" on People, "S You M Marlow N Nova" on
-          Home's Who's Here strip - since nothing ever named the letter
-          decorative. It stands in for a real picture (this file's own
-          header comment), and every real caller already renders the
-          full name as separate, adjacent visible text, so the letter
-          itself carries no information a screen reader needs to hear
-          twice. */}
-      <AvatarFallback aria-hidden delayMs={0} className="bg-transparent text-[length:inherit] text-primary-foreground">
-        {initial}
-      </AvatarFallback>
+      {/* The real picture and the initial fallback are decorative because
+          every caller already renders the full name beside this avatar. */}
+      <SafeImage src={avatarUri} kind="person" alt="" className="size-full rounded-full bg-primary text-primary-foreground object-cover" fallbackContent={<span aria-hidden className="text-[length:inherit]">{initial}</span>} />
       {/* aria-hidden: same reasoning as the initial above - the dot
           stands in for a count the menu this avatar opens already
           shows in real text, not new information of its own. */}

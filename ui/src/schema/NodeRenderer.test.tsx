@@ -548,6 +548,21 @@ const emptyShelf = {
   hide_when_empty: false,
 };
 
+describe("schema media fallbacks", () => {
+  test("list and media shelf rows use the music placeholder for audio records without artwork", async () => {
+    const env = stubFetch([{ id: "song", name: "Song without cover", category: "audio", kind: "track", picture: null } as never]);
+    try {
+      const list = renderNode({ ...listNode, item_media_field: "picture" });
+      await list.findByText("Song without cover");
+      expect(list.container.querySelector('[data-slot="safe-image-fallback"][data-kind="music"]')).not.toBeNull();
+      cleanup();
+      const shelf = renderNode(emptyShelf);
+      await shelf.findByText("Song without cover");
+      expect(shelf.container.querySelector('[data-slot="safe-image-fallback"][data-kind="music"]')).not.toBeNull();
+    } finally { env.restore(); }
+  });
+});
+
 describe("list-like empty state actions", () => {
   for (const node of [listNode, emptyShelf]) {
     test(`${node.type} draws its empty action and navigates when pressed`, async () => {

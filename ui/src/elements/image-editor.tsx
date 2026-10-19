@@ -48,6 +48,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { cn } from "cn";
+import { SafeImage } from "../primitives/SafeImage";
 import { Alert, AlertDescription } from "@/kit/ui/alert";
 import { Badge } from "@/kit/ui/badge";
 import { Button } from "@/kit/ui/button";
@@ -789,7 +790,7 @@ export function ImageEditor({
                     if (version.id !== currentVersionId) onSelectVersion(version.id);
                   }}
                 >
-                  <img src={version.url} alt="" className="size-10 shrink-0 rounded-sm object-cover" draggable={false} />
+                  <SafeImage src={version.url} alt="" className="size-10 shrink-0 rounded-sm object-cover" draggable={false} />
                   <span className="min-w-0 flex-1 truncate text-left">{version.label}</span>
                   {version.createdAt ? (
                     <span className="text-muted-foreground shrink-0 text-xs">{formatRelative(version.createdAt)}</span>
@@ -1213,7 +1214,7 @@ export function ImageEditor({
             style={{ ...checkerboard, ...(boxW && boxH ? { width: boxW, height: boxH } : { width: 256, height: 192 }) }}
           >
             {displayUrl ? (
-              <img
+              <SafeImage
                 key={displayUrl}
                 src={displayUrl}
                 alt={title}
