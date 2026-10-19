@@ -1123,6 +1123,13 @@ export const AnswerBlock = z
           props: z
             .object({
               layout: z.enum(["today", "channel", "rows"]),
+              /**NEWS-SECTION-STYLES-01. The arrangement of a channel page, from the topic's section_style in spec/news/topics.json. Read only when layout is channel and ignored for any other layout. Absent draws the lead-and-list page.*/
+              section_style: z
+                .enum(["top_stories", "special", "todays_news"])
+                .describe(
+                  "NEWS-SECTION-STYLES-01. The arrangement of a channel page, from the topic's section_style in spec/news/topics.json. Read only when layout is channel and ignored for any other layout. Absent draws the lead-and-list page.",
+                )
+                .optional(),
               header: z
                 .object({
                   title: z.string().min(1),

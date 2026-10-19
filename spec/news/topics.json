@@ -9,7 +9,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "top_stories"
     },
     {
       "id": "local",
@@ -19,7 +20,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "todays_news"
     },
     {
       "id": "business",
@@ -29,7 +31,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "top_stories"
     },
     {
       "id": "technology",
@@ -39,7 +42,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "todays_news"
     },
     {
       "id": "science",
@@ -49,7 +53,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "special"
     },
     {
       "id": "health",
@@ -59,7 +64,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "special"
     },
     {
       "id": "sports",
@@ -69,7 +75,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "top_stories"
     },
     {
       "id": "entertainment",
@@ -79,7 +86,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "todays_news"
     },
     {
       "id": "environment",
@@ -89,7 +97,8 @@
       "bands": [
         "teen",
         "adult"
-      ]
+      ],
+      "section_style": "special"
     },
     {
       "id": "kids",
@@ -98,7 +107,8 @@
       "description": "News written for young readers: gentle, plain stories about animals, science, school, sports and fun.",
       "bands": [
         "child"
-      ]
+      ],
+      "section_style": "top_stories"
     }
   ]
 }

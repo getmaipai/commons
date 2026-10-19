@@ -1,0 +1,110 @@
+{
+  "id": "blk-n3w5k2",
+  "kind": "story_feed",
+  "schema_version": 1,
+  "producer": "news",
+  "alt": "Business: Headline 1 from Example Wire, and four more stories.",
+  "provenance": "news data today",
+  "created_at": "2026-10-17T13:05:00Z",
+  "hlc": "1792242300000:0:hub001",
+  "props": {
+    "layout": "channel",
+    "header": {
+      "title": "Business"
+    },
+    "featured": [
+      {
+        "story_id": "story-2a1b2c",
+        "item_id": "news-2d4e5f",
+        "title": "Headline 2",
+        "publisher": "Example Wire",
+        "site": "example.com",
+        "published_at": "2026-10-17T13:00:00Z",
+        "outlets": 3,
+        "topics": [
+          "world"
+        ],
+        "saved": false,
+        "opened": false,
+        "open_url": "https://example.com/a"
+      },
+      {
+        "story_id": "story-3a1b2c",
+        "item_id": "news-3d4e5f",
+        "title": "Headline 3",
+        "publisher": "Example Wire",
+        "site": "example.com",
+        "published_at": "2026-10-17T13:00:00Z",
+        "outlets": 3,
+        "topics": [
+          "world"
+        ],
+        "saved": false,
+        "opened": false,
+        "open_url": "https://example.com/a"
+      }
+    ],
+    "shelves": [
+      {
+        "title": "Science",
+        "channels": [
+          {
+            "kind": "topic",
+            "key": "science",
+            "label": "Science"
+          }
+        ],
+        "stories": [
+          {
+            "story_id": "story-4a1b2c",
+            "item_id": "news-4d4e5f",
+            "title": "Headline 4",
+            "publisher": "Example Wire",
+            "site": "example.com",
+            "published_at": "2026-10-17T13:00:00Z",
+            "outlets": 3,
+            "topics": [
+              "science"
+            ],
+            "saved": false,
+            "opened": false,
+            "open_url": "https://example.com/a"
+          }
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "story_id": "story-5a1b2c",
+        "item_id": "news-5d4e5f",
+        "title": "Headline 5",
+        "publisher": "Example Wire",
+        "site": "example.com",
+        "published_at": "2026-10-17T13:00:00Z",
+        "outlets": 3,
+        "topics": [
+          "world"
+        ],
+        "saved": false,
+        "opened": false
+      }
+    ],
+    "as_of": "2026-10-17T13:05:00Z",
+    "filters": [
+      {
+        "id": "",
+        "label": "All",
+        "selected": true
+      },
+      {
+        "id": "world",
+        "label": "World"
+      },
+      {
+        "id": "science",
+        "label": "Science"
+      }
+    ],
+    "section_style": "top_stories"
+  }
+}

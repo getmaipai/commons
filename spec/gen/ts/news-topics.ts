@@ -20,6 +20,13 @@ export const NewsTopics = z
               .regex(new RegExp("^[a-z][a-z0-9-]*$"))
               .describe("A lucide icon name (the kit icon registry)."),
             description: z.string().min(20),
+            /**NEWS-SECTION-STYLES-01. How the topic's section page arranges its stories, as Apple News does per category: top_stories (tall cards, then picture-right cards), special (two large cards, then picture-right cards), todays_news (tall cards, then one wide split card). Absent draws the lead-and-list page. Arrangement only: selection, order and age gates are unchanged.*/
+            section_style: z
+              .enum(["top_stories", "special", "todays_news"])
+              .describe(
+                "NEWS-SECTION-STYLES-01. How the topic's section page arranges its stories, as Apple News does per category: top_stories (tall cards, then picture-right cards), special (two large cards, then picture-right cards), todays_news (tall cards, then one wide split card). Absent draws the lead-and-list page. Arrangement only: selection, order and age gates are unchanged.",
+              )
+              .optional(),
             bands: z
               .array(z.enum(["child", "teen", "adult"]))
               .min(1)

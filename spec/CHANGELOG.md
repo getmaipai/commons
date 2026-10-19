@@ -1,3 +1,7 @@
+## [spec-v0.1.188] - 2026-10-19
+
+- NEWS-SECTION-STYLES-01: each topic in `spec/news/topics.json` gains an optional `section_style` (`top_stories`, `special`, `todays_news`), and a `story_feed` block's props gain the same optional `section_style`, read only when `layout` is `channel`. It sets how a section page arranges its stories, as Apple News does per category; selection, order and age gates are unchanged. Absent keeps the lead-and-list page. Additive; every existing fixture stays valid.
+
 ## [spec-v0.1.187] - 2026-10-18
 
 - NEWS-SIDEBAR-01: a package manifest gains an optional `contributes.sidebar`, the app's own sidebar column on wide screens. `search` is the same `search` node a page uses; up to six `groups` each have a `title` and exactly one of `pages` (this package's own page ids) or `rows` (a `package_binding` to a `contributes.data` list with `item_key_field`, `item_label_field`, `item_media_field` as on a `list` node, `only_followed`, an `open` action and an optional `manage` entry). Its `search`, `bind` and `open` objects are defined by `ui/schema.json`, so the hub validates them against it as it does a page. A page entry takes its label, icon and visibility from the page, so no role floor is repeated, and an entry whose target page the viewer cannot open is not drawn. `checkAppPackage` checks every page id, data id, navigate target, `{field}` placeholder and field path against the package. Additive.

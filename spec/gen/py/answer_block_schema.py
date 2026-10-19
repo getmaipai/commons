@@ -707,6 +707,10 @@ class Props9(BaseModel):
         extra='forbid',
     )
     layout: Literal['today', 'channel', 'rows']
+    section_style: Literal['top_stories', 'special', 'todays_news'] | None = Field(
+        None,
+        description="NEWS-SECTION-STYLES-01. The arrangement of a channel page, from the topic's section_style in spec/news/topics.json. Read only when layout is channel and ignored for any other layout. Absent draws the lead-and-list page.",
+    )
     header: Header | None = None
     filters: list[Filter] | None = Field(
         None,

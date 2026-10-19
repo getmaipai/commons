@@ -128,6 +128,14 @@ describe("spec/news/topics.json", () => {
     expect(new Set(topics.topics.map((t) => t.id)).size).toBe(topics.topics.length);
     for (const topic of topics.topics) { expect(topic.label.length).toBeGreaterThan(0); expect(topic.icon).toMatch(/^[a-z-]+$/); expect(topic.description.length).toBeGreaterThanOrEqual(20); }
   });
+  test("every topic carries a section style the kit draws, and the schema refuses an unknown one", () => {
+    const styles = new Set(["top_stories", "special", "todays_news"]);
+    for (const topic of topics.topics) expect(styles.has(topic.section_style as string)).toBe(true);
+    const validate = schema("news-topics");
+    const bad = clone(read("news/topics.json"));
+    bad.topics[0].section_style = "front_page";
+    expect(validate(bad)).toBe(false);
+  });
   test("the schema accepts the file and refuses a topic with no description", () => {
     const validate = schema("news-topics");
     expect(validate(read("news/topics.json"))).toBe(true);

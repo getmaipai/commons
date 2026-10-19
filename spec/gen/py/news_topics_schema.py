@@ -18,6 +18,10 @@ class Topic(BaseModel):
         ..., description='A lucide icon name (the kit icon registry).'
     )
     description: constr(min_length=20)
+    section_style: Literal['top_stories', 'special', 'todays_news'] | None = Field(
+        None,
+        description="NEWS-SECTION-STYLES-01. How the topic's section page arranges its stories, as Apple News does per category: top_stories (tall cards, then picture-right cards), special (two large cards, then picture-right cards), todays_news (tall cards, then one wide split card). Absent draws the lead-and-list page. Arrangement only: selection, order and age gates are unchanged.",
+    )
     bands: list[Literal['child', 'teen', 'adult']] = Field(..., min_length=1)
 
 
