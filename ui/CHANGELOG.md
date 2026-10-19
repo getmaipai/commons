@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.298] - ui-v0.5.298
+
+- MusicTrack adds `width` (`default`, unchanged, or `full` for the answer column), with a container-responsive Player (stacked in narrow details panels and on phones) and lyrics following the full-width player without a second lyric scroller. Adds a kit-owned, labelled `Edit` disclosure with a 48 px target and `editContent`, `editLabel` and `editPanelLabel` props. Escape closes it and returns focus to Edit. No legacy Make it full prop existed. MediaViewer showcase mounts the same full MusicTrack in the audio details panel, with cover, lyrics, versions and Edit actions. Tests cover width, disclosure behavior and viewer details.
+
 ## [0.5.297] - ui-v0.5.297
 
 - WORKSPACE-FILL-01: a page that marks its root with `data-workspace-fill` fills the rail workspace: the rail body's centred width cap and padding give way, so a package app's own sidebar column sits against the icon rail and the page is one viewport tall. Before, the cap left a gap beside the rail and the padding made the page 32 px taller than the sticky column, which scrolled a little. Additive: nothing is affected without the marker.

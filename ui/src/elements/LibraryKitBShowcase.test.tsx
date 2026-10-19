@@ -34,6 +34,24 @@ describe("Library kit slice B showcases", () => {
     expect(view.getByText(/Closed\./)).toBeTruthy();
   });
 
+  test("MediaViewerShowcase mounts a full MusicTrack in the song details area", async () => {
+    const view = render(<MediaViewerShowcase />);
+    fireEvent.click(view.getByRole("button", { name: "Moonlit lullaby" }));
+    await act(async () => {});
+    const details = document.body.querySelector("aside[data-slot='media-viewer-details']") as HTMLElement;
+    const song = details.querySelector('[data-slot="music-track"]') as HTMLElement;
+    expect(song.getAttribute("data-width")).toBe("full");
+    expect(within(song).getByRole("img", { name: "Moonlit lullaby album art" })).toBeTruthy();
+    fireEvent.click(within(song).getByRole("button", { name: "Lyrics" }));
+    expect(within(song).getByText("Moonlight settles")).toBeTruthy();
+    expect(song.querySelector("ol")?.className ?? "").not.toContain("overflow-y-auto");
+    expect(within(song).getByText("Version 2 of 2")).toBeTruthy();
+    fireEvent.click(within(song).getByRole("button", { name: "Edit" }));
+    expect(within(song).getByRole("region", { name: "Edit Moonlit lullaby" })).toBeTruthy();
+    expect(within(song).getByRole("button", { name: "New album art with a prompt" })).toBeTruthy();
+    expect(song.querySelector('[data-slot="player-play"]')).toBeTruthy();
+  });
+
   test("ShareDialogShowcase shows the locked row's reason, saves a change, and asks before the household", async () => {
     const view = render(<ShareDialogShowcase />);
     fireEvent.click(view.getByRole("button", { name: "Share a file" }));

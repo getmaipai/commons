@@ -47,6 +47,43 @@ describe("MusicTrack", () => {
     expect(poster.closest('[data-layout="audio"]')).toBeTruthy();
     expect(view.getByRole("button", { name: "New cover" })).toBeTruthy();
   });
+  test("width defaults to default and full spans the answer column", () => {
+    const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" />);
+    const card = view.container.querySelector('[data-slot="music-track"]')!;
+    expect(card.getAttribute("data-width")).toBe("default");
+    expect(card.className).toContain("max-w-xl");
+    view.rerender(<MusicTrack status="ready" title="Song" src="/song.m4a" width="full" timedLyrics={[{ t: 0, line: "Long lyric" }]} />);
+    expect(card.getAttribute("data-width")).toBe("full");
+    expect(card.className).toContain("max-w-none");
+    expect(card.querySelector('[data-slot="player"]')?.className).toContain("@container/player");
+    fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+    expect(card.querySelector("ol")?.className ?? "").not.toContain("overflow-y-auto");
+  });
+  test("Edit is a labelled 48 px disclosure for its slot and closes with focus returned", () => {
+    const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" editContent={<button type="button">Change it with a prompt</button>} editPanelLabel="Song editing" />);
+    const edit = view.getByRole("button", { name: "Edit" }) as HTMLButtonElement;
+    expect(edit.className).toContain("h-12");
+    expect(edit.getAttribute("aria-expanded")).toBe("false");
+    const panelId = edit.getAttribute("aria-controls");
+    expect(panelId).toBeTruthy();
+    if (!panelId) throw new Error("Edit must control its panel");
+    fireEvent.click(edit);
+    expect(edit.getAttribute("aria-expanded")).toBe("true");
+    const panel = view.getByRole("region", { name: "Song editing" });
+    expect(panel.id).toBe(panelId);
+    expect(view.getByRole("button", { name: "Change it with a prompt" })).toBeTruthy();
+    fireEvent.keyDown(view.getByRole("button", { name: "Change it with a prompt" }), { key: "Escape" });
+    expect(edit.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(edit);
+    fireEvent.click(edit);
+    fireEvent.click(edit);
+    expect(edit.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(edit);
+  });
+  test("Edit is absent when the host gives no content", () => {
+    const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" />);
+    expect(view.queryByRole("button", { name: "Edit" })).toBeNull();
+  });
   test("timed lyrics follow playback, seek, play and scroll with reduced motion", () => {
     const scroll = spyOn(HTMLElement.prototype, "scrollIntoView").mockImplementation(() => {});
     const matchMedia = spyOn(window, "matchMedia").mockReturnValue({ matches: true } as MediaQueryList);

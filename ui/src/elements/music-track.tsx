@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { AlertCircleIcon, ChevronLeftIcon, ChevronRightIcon, DownloadIcon, LibraryIcon, RefreshCwIcon, Share2Icon, SquareIcon, WandSparklesIcon } from "lucide-react";
 import { cn } from "cn";
 import { Alert, AlertDescription } from "@/kit/ui/alert";
@@ -63,6 +63,7 @@ export function MusicTrack({
   estimateMs = 120_000, etaLabel, hint, error, downloadName = "song.m4a", lyrics, timedLyrics, cover, coverAlt, coverActions,
   versions = [], currentId, onSelectVersion, onUseVersion, onStop, onRetry, onDownload,
   onShare, onSaveToLibrary, onMakeAnother, actions, metadata, copy, className,
+  width = "default", editContent, editLabel = "Edit", editPanelLabel,
 }: {
   status: MusicTrackStatus;
   title: string;
@@ -96,6 +97,10 @@ export function MusicTrack({
   actions?: ReactNode;
   metadata?: PlayerMetadata;
   copy?: Partial<MusicTrackCopy>;
+  width?: "default" | "full";
+  editContent?: ReactNode;
+  editLabel?: string;
+  editPanelLabel?: string;
   /** Placement in the parent only. */
   className?: string;
 }) {
@@ -103,6 +108,9 @@ export function MusicTrack({
   const [media, setMedia] = useState<HTMLMediaElement | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [lyricsOpen, setLyricsOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const editButtonRef = useRef<HTMLButtonElement | null>(null);
+  const editPanelId = `music-track-edit-${useId()}`;
   const lineRefs = useRef<Array<HTMLButtonElement | null>>([]);
   useEffect(() => {
     if (!media || !timedLyrics) return;
@@ -145,10 +153,17 @@ export function MusicTrack({
     {cover ? coverActions : null}
     {actions}
   </div>;
+  const closeEditOnEscape = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    event.stopPropagation();
+    setEditOpen(false);
+    editButtonRef.current?.focus();
+  };
 
-  return <Card data-slot="music-track" data-status={status} aria-label={title} className={cn("w-full max-w-xl gap-0 overflow-hidden py-0", className)}>
+  return <Card data-slot="music-track" data-status={status} data-width={width} aria-label={title} className={cn("w-full gap-0 overflow-hidden py-0", width === "full" ? "min-w-0 max-w-none" : "max-w-xl", className)}>
     <CardContent className="flex flex-col gap-3 py-3">
-      {ready && src ? <Player kind="audio" layout="audio" src={src} title={title} subtitle={description} poster={cover} posterAlt={coverAlt} mediaRef={setMedia} actionsSlot={actionButtons} mediaSession metadata={metadata} copy={text.player} /> : <>
+      {ready && src ? <Player kind="audio" layout="audio" audioLayout={width === "full" ? "container" : "viewport"} src={src} title={title} subtitle={description} poster={cover} posterAlt={coverAlt} mediaRef={setMedia} actionsSlot={actionButtons} mediaSession metadata={metadata} copy={text.player} /> : <>
         <div><p className="text-sm font-medium">{title}</p>{description ? <p className="text-muted-foreground text-sm">{description}</p> : null}</div>
         {live ? <>
           <GenerationStage generating={false} aspectRatio="auto" className="rounded-none border-0">
@@ -174,7 +189,7 @@ export function MusicTrack({
       {ready && (timedLyrics || lyrics) ? <Collapsible onOpenChange={setLyricsOpen}>
         <CollapsibleTrigger asChild><Button type="button" variant="outline" size="sm">{text.lyrics}</Button></CollapsibleTrigger>
         <CollapsibleContent>
-          {timedLyrics ? <ol className="max-h-64 min-w-0 space-y-1 overflow-x-hidden overflow-y-auto" aria-label={text.lyrics}>
+          {timedLyrics ? <ol className={cn("min-w-0 space-y-1 overflow-x-hidden", width === "full" ? "" : "max-h-64 overflow-y-auto")} aria-label={text.lyrics}>
             {timedLyrics.map(({ t, line, section }, i) => <li key={i} className="min-w-0">
               {section && section !== timedLyrics[i - 1]?.section ? <p className="text-muted-foreground px-3 pt-3 text-xs font-medium">{section}</p> : null}
               <Button
@@ -199,6 +214,14 @@ export function MusicTrack({
         <Button type="button" variant="outline" size="icon" aria-label={text.next} disabled={!next || !onSelectVersion} onClick={() => next && onSelectVersion?.(next.id)}><ChevronRightIcon aria-hidden /></Button>
         {next && onUseVersion && currentId ? <Button type="button" variant="outline" size="sm" onClick={() => onUseVersion(currentId)}>{text.useVersion}</Button> : null}
       </div> : null}
+      {editContent !== undefined && editContent !== null ? <Collapsible open={editOpen} onOpenChange={setEditOpen}>
+        <CollapsibleTrigger asChild>
+          <Button ref={editButtonRef} type="button" variant="outline" size="default" aria-expanded={editOpen} aria-controls={editPanelId}>{editLabel}</Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent id={editPanelId} role="region" aria-label={editPanelLabel ?? editLabel} onKeyDown={closeEditOnEscape} className="min-w-0 pt-3">
+          <div className="flex min-w-0 flex-col gap-3">{editContent}</div>
+        </CollapsibleContent>
+      </Collapsible> : null}
     </CardContent>
   </Card>;
 }

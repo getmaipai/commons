@@ -159,6 +159,8 @@ export interface PlayerProps {
   kind?: "video" | "audio";
   /** `video`: the picture with controls over it. `audio`: art, title and controls (Now playing). `mini`: the docked bar. */
   layout?: PlayerLayout;
+  /** Audio artwork and controls may respond to the player's own width instead of the viewport. */
+  audioLayout?: "viewport" | "container";
   /** MIME type of `src`, when the address does not say it. */
   type?: string;
   title: string;
@@ -288,6 +290,7 @@ export function Player(props: PlayerProps) {
     src,
     kind = "video",
     layout = kind === "audio" ? "audio" : "video",
+    audioLayout = "viewport",
     type,
     title,
     subtitle,
@@ -1087,10 +1090,10 @@ export function Player(props: PlayerProps) {
   return (
     // Shortcuts are delegated from the focused control inside, the way a media player takes them.
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-    <div ref={rootRef} data-slot="player" data-layout="audio" onKeyDown={onKeyDown} className="relative w-full">
+    <div ref={rootRef} data-slot="player" data-layout="audio" onKeyDown={onKeyDown} className={audioLayout === "container" ? "@container/player relative w-full" : "relative w-full"}>
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
-        <div className="grid w-full gap-6 sm:grid-cols-2 sm:items-center">
+        <div className={audioLayout === "container" ? "grid w-full gap-6 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-6 sm:grid-cols-2 sm:items-center"}>
           {art("aspect-square w-full max-w-md justify-self-center")}
           <div className="flex min-w-0 flex-col gap-4">
             <div className="min-w-0">

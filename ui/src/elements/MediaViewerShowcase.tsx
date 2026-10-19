@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { DownloadIcon, PencilIcon, Share2Icon, Trash2Icon } from "lucide-react";
 import { Button } from "../ui/button";
 import { MediaViewer, type MediaViewerItem } from "./media-viewer";
+import { MusicTrack } from "./music-track";
 
 function picture(from: string, to: string): string {
   return (
@@ -62,6 +63,28 @@ export function MediaViewerShowcase() {
         onClose={() => setNote("Closed. A real page puts its address back here.")}
         details={(item, index) => {
           const full = SAMPLE_ITEMS[index]!;
+          if (item.id === "lullaby") return (
+            <MusicTrack
+              status="ready"
+              width="full"
+              title={item.name}
+              description="Dream pop · 2:14"
+              src={item.url}
+              cover={item.posterUrl ?? undefined}
+              coverAlt="Moonlit lullaby album art"
+              lyrics="Moonlight settles\nSoftly over us"
+              timedLyrics={[{ t: 0, line: "Moonlight settles", section: "Verse" }, { t: 8, line: "Softly over us", section: "Verse" }]}
+              versions={[{ id: "first", label: "First take" }, { id: "soft", label: "Soft mix" }]}
+              currentId="soft"
+              onSelectVersion={() => {}}
+              editContent={[
+                <Button key="full" type="button" variant="outline">Make it full</Button>,
+                <Button key="prompt" type="button" variant="outline">Change it with a prompt</Button>,
+                <Button key="art" type="button" variant="outline">New album art with a prompt</Button>,
+              ]}
+              editPanelLabel="Edit Moonlit lullaby"
+            />
+          );
           return (
             <dl className="grid gap-3 text-base">
               <div>
