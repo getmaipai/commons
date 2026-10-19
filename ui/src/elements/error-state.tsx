@@ -9,6 +9,7 @@ import type { ComponentProps } from "react";
 import { CircleAlertIcon, RefreshCwIcon } from "lucide-react";
 import { cn } from "cn";
 import { ShimmerLabel } from "./surfaces";
+import { Button } from "./ui/button";
 
 export interface ErrorStateProps extends Omit<
   ComponentProps<"div">,
@@ -20,9 +21,9 @@ export interface ErrorStateProps extends Omit<
   retrying: boolean;
   /** Unset: no Retry button is drawn. */
   onRetry?: () => void;
-  /** `card` (default) is the padded, width-capped block; `inline` drops
-   * `max-w-sm` and the card padding so a host lays it out itself. */
-  layout?: "card" | "inline";
+  /** `stacked` (default) puts the message above a full-width retry action.
+   * `inline` drops the width cap and padding; `card` keeps the legacy inline card. */
+  layout?: "stacked" | "card" | "inline";
   retryLabel?: string;
   /** ENGINE-DOWN-UI-01: holds Retry (disabled, this reason in its accessible name) while what it would retry cannot answer. */
   retryDisabled?: string | undefined;
@@ -34,7 +35,7 @@ export function ErrorState({
   detail,
   retrying,
   onRetry,
-  layout = "card",
+  layout = "stacked",
   retryLabel = "Retry",
   retryDisabled,
   retryingLabel = "Retrying",
@@ -42,6 +43,7 @@ export function ErrorState({
   ...props
 }: ErrorStateProps) {
   const inline = layout === "inline";
+  const stacked = layout === "stacked";
   if (retrying) {
     return (
       <div
@@ -51,7 +53,9 @@ export function ErrorState({
         className={cn(
           inline
             ? "fade-in animate-in flex w-full items-center gap-2.5 text-sm duration-300 motion-reduce:animate-none"
-            : "fade-in animate-in flex w-full max-w-sm items-center gap-2.5 text-sm duration-300 motion-reduce:animate-none",
+            : stacked
+              ? "fade-in animate-in flex w-full flex-col items-start gap-2.5 text-sm duration-300 motion-reduce:animate-none"
+              : "fade-in animate-in flex w-full max-w-sm items-center gap-2.5 text-sm duration-300 motion-reduce:animate-none",
           className,
         )}
 
@@ -73,14 +77,17 @@ export function ErrorState({
       className={cn(
         inline
           ? "fade-in animate-in flex w-full items-start gap-2.5 text-sm duration-300 motion-reduce:animate-none"
-          : "fade-in animate-in flex w-full max-w-sm items-start gap-2.5 rounded-2xl px-4 py-3 text-sm duration-300 motion-reduce:animate-none",
+          : stacked
+            ? "fade-in animate-in flex w-full flex-col items-start gap-2.5 text-sm duration-300 motion-reduce:animate-none"
+            : "fade-in animate-in flex w-full max-w-sm items-start gap-2.5 rounded-2xl px-4 py-3 text-sm duration-300 motion-reduce:animate-none",
         className,
       )}
 
       {...props}
     >
+      <div className={stacked ? "flex min-w-0 items-start gap-2.5" : "contents"}>
       <CircleAlertIcon className="text-muted-foreground mt-0.5 size-4 shrink-0" />
-      <div>
+      <div className="min-w-0">
         <p className="text-muted-foreground font-medium">{title}</p>
         {detail !== undefined && (
           <p className="text-muted-foreground mt-0.5 text-[13px] leading-snug">
@@ -88,17 +95,20 @@ export function ErrorState({
           </p>
         )}
       </div>
+      </div>
       {onRetry && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="default"
           onClick={onRetry}
           disabled={retryDisabled !== undefined}
-          className="text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-50 ms-auto flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
+          className={cn("text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-50 h-12 shrink-0 gap-1.5 rounded-full px-3 text-xs font-medium transition-colors whitespace-nowrap", stacked ? "self-start" : "ms-auto")}
         >
-          <RefreshCwIcon className="size-3" />
+          <RefreshCwIcon className="size-4" />
           {retryLabel}
           {retryDisabled !== undefined && <span className="sr-only">. {retryDisabled}</span>}
-        </button>
+        </Button>
       )}
     </div>
   );

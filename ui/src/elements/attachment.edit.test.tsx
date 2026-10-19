@@ -72,6 +72,16 @@ describe("message picture Edit action", () => {
     expect(queryByRole("dialog")).toBeNull();
   });
 
+  test("always-visible Edit uses a 48px target and defaults to the reveal classes", () => {
+    const edit = { onEdit: () => {}, editAlwaysVisible: true };
+    const { getByRole, rerender } = render(<Harness edit={edit} />);
+    const button = getByRole("button", { name: "Edit picture" });
+    expect(button.className).toContain("opacity-100");
+    expect(button.className).toContain("size-12");
+    rerender(<Harness edit={{ onEdit: () => {} }} />);
+    expect(getByRole("button", { name: "Edit picture" }).className).toContain("group-hover/edit-tile:opacity-100");
+  });
+
   test("custom label and canEdit=false", () => {
     const { getByRole, rerender, queryByRole } = render(
       <Harness edit={{ onEdit: () => {}, label: "Change it" }} />,

@@ -163,8 +163,8 @@ describe("ErrorState", () => {
     expect(queryByRole("button")).toBeNull();
     expect(container.querySelectorAll("p").length).toBe(1);
   });
-  test("inline drops max-w-sm and the card padding in both branches", () => {
-    const card = render(<ErrorState title="Oops" retrying={false} />).getByRole("alert");
+  test("card keeps max-w-sm and card padding; inline drops both in both branches", () => {
+    const card = render(<ErrorState title="Oops" retrying={false} layout="card" />).getByRole("alert");
     expect(card.className).toContain("max-w-sm");
     expect(card.className).toContain("px-4");
     cleanup();
@@ -175,6 +175,13 @@ describe("ErrorState", () => {
     cleanup();
     const inlineBusy = render(<ErrorState title="Oops" retrying layout="inline" />).getByRole("status");
     expect(inlineBusy.className).not.toContain("max-w-sm");
+  });
+  test("stacked is the default and retry is a 48px, single-line button below the message", () => {
+    const { getByRole } = render(<ErrorState title="A failure message" detail="Its details" retrying={false} onRetry={() => {}} retryLabel="Try again" />);
+    expect(getByRole("alert").className).toContain("flex-col");
+    const retry = getByRole("button", { name: "Try again" });
+    expect(retry.className).toContain("h-12");
+    expect(retry.className).toContain("whitespace-nowrap");
   });
   test("retryLabel and retryingLabel override the copy", () => {
     const { getByRole } = render(<ErrorState title="Oops" retrying={false} onRetry={() => {}} retryLabel="Again" />);

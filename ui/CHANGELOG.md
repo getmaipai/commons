@@ -1,7 +1,9 @@
 # Changelog (`@maipai/ui`)
 
-## [0.5.299] - ui-v0.5.299
+## [0.5.300] - ui-v0.5.300
 
+- IMGTOOLS-10: `ImageGallery` and message picture attachments accept `editAlwaysVisible` (default `false`) to keep their existing Edit action visible without hover. The action remains keyboard reachable and uses a 48 px target. Showcase: the first gallery row demonstrates the option.
+- IMGTOOLS-11: `ErrorState` defaults to `layout="stacked"`: message content occupies its own full-width row and the left-aligned Retry button sits below, at 48 px with a no-wrap label. `layout="inline"` retains the compact host-laid-out presentation; `layout="card"` retains the padded, width-capped card. The running state follows the selected layout.
 - WORKSPACE-FILL-02: a page marked `data-workspace-fill` is now bounded to the viewport (the rail workspace is one viewport tall, its body does not scroll), so the page's own content is the one scroller and the article toolbar, which is sticky, stays at the top of it. Before, the document scrolled and the toolbar left with the text. `SchemaPage` keeps its padding on an inner box instead of the scroller, so the toolbar no longer leaves a gap above it that text scrolls through. Additive: nothing is affected without the marker; a page's layout inside the scroller is unchanged.
 
 ## [0.5.298] - ui-v0.5.298

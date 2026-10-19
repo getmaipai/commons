@@ -84,6 +84,18 @@ describe("ImageGallery", () => {
     expect(queryByRole("button", { name: "Edit picture" })).toBeNull();
   });
 
+  test("always-visible Edit is in picture tab order and has a 48px target; default remains revealed on hover/focus", () => {
+    const images = [{ id: "a", src: "https://example.test/a.jpg", alt: "A" }];
+    const { container, getByRole, rerender } = render(<ImageGallery images={images} onEditImage={() => {}} editAlwaysVisible />);
+    const edit = getByRole("button", { name: "Edit picture" });
+    expect(edit.className).toContain("opacity-100");
+    expect(edit.className).toContain("size-12");
+    expect([...container.querySelectorAll("button")].map((button) => button.getAttribute("aria-label") ?? button.textContent?.trim())).toEqual(["Open image: A", "Edit picture"]);
+    rerender(<ImageGallery images={images} onEditImage={() => {}} />);
+    expect(getByRole("button", { name: "Edit picture" }).className).toContain("group-hover/edit-tile:opacity-100");
+    expect(getByRole("button", { name: "Edit picture" }).className).not.toMatch(/(?:^| )opacity-100(?: |$)/);
+  });
+
   test("size large gives one picture the whole width and leaves several in the grid", () => {
     const one = [{ id: "a", src: "https://example.test/a.jpg", alt: "A" }];
     const many = [...one, { id: "b", src: "https://example.test/b.jpg", alt: "B" }];

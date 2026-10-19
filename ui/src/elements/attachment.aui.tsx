@@ -63,6 +63,8 @@ export interface ImageEditContextValue {
   onEdit: (attachment: ImageEditTarget) => void;
   /** Accessible name and tooltip. Default "Edit picture". */
   label?: string;
+  /** Keep Edit visible without hover or focus. Default false. */
+  editAlwaysVisible?: boolean;
 }
 
 export const ImageEditContext = createContext<ImageEditContextValue | null>(
@@ -261,7 +263,8 @@ const AttachmentEdit: FC = () => {
       data-image-edit="true"
       className={cn(
         "aui-attachment-tile-edit absolute start-1 top-1 z-10 size-5 rounded-full bg-background/70! text-foreground after:absolute after:-inset-1.5 hover:bg-background/90! hover:text-foreground! active:scale-[0.96]",
-        imageEditRevealClass,
+        edit.editAlwaysVisible ? "size-12" : "",
+        edit.editAlwaysVisible ? "opacity-100" : imageEditRevealClass,
       )}
       onClick={(event) => {
         event.stopPropagation();

@@ -1,6 +1,5 @@
-// ELT-T1-K03: every call shape that existed before the additive props must
-// render exactly today's markup. The snapshots in __snapshots__ were taken on
-// the code as it was before K03 touched it; a diff here is a regression.
+// ELT-T1-K03: snapshots keep established call shapes stable unless a decision
+// deliberately changes the rendered contract.
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
 import { ComparisonCard } from "./comparison-card";

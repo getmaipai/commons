@@ -88,7 +88,7 @@ const rowDemo = Array.from({ length: 9 }, (_, index) => ({
 export function ImageGalleryRowShowcase() {
   return (
     <div className="flex flex-col gap-4">
-      <ImageGallery images={rowDemo.slice(0, 5)} />
+      <ImageGallery images={rowDemo.slice(0, 5)} onEditImage={() => {}} editAlwaysVisible />
       <ImageGallery images={rowDemo} />
       <ImageGallery images={rowDemo} layout="grid" maxVisible={5} />
     </div>

@@ -64,6 +64,8 @@ export interface ImageGalleryProps extends Omit<
   /** Shows an Edit button on each tile's top-start corner (hover or focus on
    * a pointer device, always on touch). Opening the tile is not triggered. */
   onEditImage?: ((image: GalleryImageEdit) => void) | undefined;
+  /** Keep Edit visible without hover or focus. Default false. */
+  editAlwaysVisible?: boolean | undefined;
   /** Default true. Return false to hide Edit for one picture. */
   canEditImage?: ((image: GalleryImageEdit) => boolean) | undefined;
   /** Accessible name of the Edit button. Default "Edit picture". */
@@ -106,6 +108,7 @@ export function ImageGallery({
   maxVisible = 6,
   onOpen,
   onEditImage,
+  editAlwaysVisible = false,
   canEditImage,
   editLabel = "Edit picture",
   size = "default",
@@ -266,7 +269,8 @@ export function ImageGallery({
                 data-image-edit="true"
                 className={cn(
                   "absolute start-2 top-2 z-10 size-6 rounded-full bg-background/70! text-foreground after:absolute after:-inset-1.5 hover:bg-background/90! hover:text-foreground! active:scale-[0.96]",
-                  imageEditRevealClass,
+                  editAlwaysVisible ? "size-12" : "",
+                  editAlwaysVisible ? "opacity-100" : imageEditRevealClass,
                 )}
                 onClick={(event) => {
                   event.stopPropagation();
