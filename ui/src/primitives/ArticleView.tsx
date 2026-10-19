@@ -1,5 +1,5 @@
 import { getIcon } from "@/kit/icons";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
@@ -152,7 +152,7 @@ export function ArticleView({ data, onAction, available = [], ids, renderTargetL
   return (
     <article data-slot="article-view" className={cn("mx-auto flex w-full min-w-0 max-w-prose flex-col gap-4", className)}>
       {data.byline ? (
-        <div data-slot="article-provider" className="bg-primary text-primary-foreground rounded-lg px-4 py-3 text-center text-lg font-semibold">
+        <div data-slot="article-provider" className="bg-muted text-foreground rounded-lg border px-4 py-2 text-center text-base font-semibold">
           {data.byline.publisher}
         </div>
       ) : null}
@@ -182,7 +182,7 @@ export function ArticleView({ data, onAction, available = [], ids, renderTargetL
         </div>
       ) : null}
       {data.image ? (
-        <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg" style={{ maxHeight: "var(--article-lead-max-h, 24rem)" }}>
+        <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
           <img src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
         </AspectRatio>
       ) : null}

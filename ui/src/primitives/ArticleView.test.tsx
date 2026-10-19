@@ -30,6 +30,14 @@ describe("ArticleView", () => {
     expect(container.querySelector('[data-slot="also-covering"]')).not.toBeNull();
   });
 
+  test("the lead picture's frame carries its own ratio and a height cap, and the pinned picture covers it", () => {
+    const { container } = render(<ArticleView data={data} />);
+    const frame = container.querySelector('[data-slot="aspect-ratio"]') as HTMLElement;
+    expect(Number(frame.style.getPropertyValue("--ratio"))).toBeCloseTo(16 / 9, 5);
+    expect(frame.style.maxHeight).toContain("--article-lead-max-h");
+    expect(frame.querySelector("img")!.className).toContain("absolute");
+  });
+
   test("a teen or adult copy keeps its outbound link, opened in a new tab without the referrer", () => {
     const { getByText } = render(<ArticleView data={data} />);
     const link = getByText("a source") as HTMLAnchorElement;

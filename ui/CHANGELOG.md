@@ -1,5 +1,13 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.286] - ui-v0.5.286
+
+- Fixed story and article pictures that had no height: a `style` passed to the kit AspectRatio replaces the one that sets `--ratio`, so the 0.5.278 height cap left a frame at zero height. Every card, lead and article picture frame now carries its own `--ratio`. Tests assert it.
+- StoryFeed: a section page (`layout: "channel"`) draws one wide lead card with the picture beside the text and the other stories as a list, not Today's hero grid.
+- ArticleView: the publisher banner is a slim muted bar, not a full primary-colour block.
+- SectionSidebar `standalone`: the column is pinned to the top of the viewport at full height with its own scroll (`sticky top-0 h-svh`), so it no longer scrolls away with the page.
+- Package page data (`useBinding`) keeps the previous answer while a changed request loads, so a page never blanks to a skeleton and back.
+
 ## [0.5.285] - ui-v0.5.285
 
 - APP-SIDEBAR-01: `SectionSidebar` collapses and carries a footer, so Chat, Library, News and later apps share one column. Additive: every earlier prop and the settings shell's DOM are unchanged. New props: `collapsed` and `onCollapsedChange` (controlled; the kit holds no storage, the host remembers the state per person), `collapsedStyle` ("hidden", the Chat column: a thin hover edge that peeks the column over the page after 120 ms, Escape or a link closes it, "Keep sidebar open" docks it; or "rail": a 64 px icon-only strip, `--settings-rail-width`), `collapseLabels`, `footer` (rows pinned to the foot, for an app's Settings link), `footerSlot`, `headerActions` (icons after the title, as Chat has its settings and search icons), `body` (replaces `groups`, for Chat's conversation list) and `density` ("compact" is Chat's 36 px rows). A row gains `dot` (a small dot in the rail in place of its count). The collapse button is a native button with a 48 px target, a label, `aria-expanded` and `aria-controls`. Also exported: `SectionSidebarShowButton` (the host's page-header button while the column is hidden) and `SectionSidebarDrawerSections` (the same groups and footer as 48 px links for `FullLayout`'s `mobileSections`). Showcase: `SectionSidebarShowcase`.

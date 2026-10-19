@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { request } from "@/kit/http";
 import type { Binding } from "@/kit/schema/types";
 import {
@@ -39,6 +39,9 @@ export function useBinding<T>(binding: Binding, state: Record<string, unknown> =
       : ["schema-binding", binding.path];
   return useQuery<T>({
     queryKey: key,
+    // A page whose state changes the request (a channel's key, a search's text) keeps showing what it had until the new answer
+    // arrives, so the content never blanks to a skeleton and back.
+    placeholderData: keepPreviousData,
     queryFn: () => {
       if (!allowed || (binding.source === "package" && !scope)) {
         reportPageRejected();

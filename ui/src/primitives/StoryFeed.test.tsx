@@ -35,6 +35,24 @@ describe("StoryFeed", () => {
     expect(hero.querySelector("img")?.getAttribute("src")).toBe(data.hero!.image!.w1280);
   });
 
+  test("every picture frame carries its own ratio, because a frame without one has no height (the article and card pictures vanished)", () => {
+    const { container } = render(<StoryFeed data={data} />);
+    for (const frame of container.querySelectorAll<HTMLElement>('[data-slot="story-card"] [data-slot="story-image"]')) {
+      expect(frame.style.getPropertyValue("--ratio")).not.toBe("");
+    }
+  });
+
+  test("a section page (channel layout) draws one wide lead and a list, not Today's hero grid", () => {
+    const channel = { ...data, layout: "channel" as const, shelves: [] };
+    const { container } = render(<StoryFeed data={channel} />);
+    expect(container.querySelector('[data-tier="lead"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="story-grid"]')).toBeNull();
+    expect(container.querySelector('[data-tier="hero"]')).toBeNull();
+    // the featured stories join the rows under the lead
+    expect(container.querySelectorAll('[data-slot="story-rows"] li').length).toBe((data.featured ?? []).length + (data.rows ?? []).length);
+    expect(container.querySelector('[data-tier="lead"] img')?.getAttribute("src")).toBe(data.hero!.image!.w1280);
+  });
+
   test("a story with no picture draws a plain tile, never a broken image", () => {
     const { container } = render(<StoryFeed data={{ ...data, hero: { ...data.hero!, image: undefined } }} />);
     expect(container.querySelector('[data-tier="hero"] img')).toBeNull();
@@ -79,7 +97,9 @@ describe("StoryFeed", () => {
       expect(tile.querySelector("svg")).toBeNull();
       expect(card().querySelector("img")).toBeNull();
       expect(card().textContent).toBe(tile.textContent + beforeText);
-      expect(tile.style.aspectRatio).toBe(tier === "hero" ? "var(--ratio)" : `${tier === "shelf" ? 4 / 3 : 16 / 9} / 1`);
+      // A row's thumbnail frame is sized by its media box; every other tile takes its ratio from its own `--ratio`.
+      expect(tile.style.aspectRatio).toBe(tier === "row" ? `${16 / 9} / 1` : "var(--ratio)");
+      if (tier !== "hero" && tier !== "row") expect(Number(tile.style.getPropertyValue("--ratio"))).toBeCloseTo(tier === "shelf" ? 4 / 3 : 16 / 9, 5);
       rerender(<StoryFeed data={feedFor()} />);
       expect(card().querySelector("img")).toBeNull();
       const replacement = { ...data.hero!.image!, w480: "/replacement-small.jpg", w1280: "/replacement-large.jpg" };

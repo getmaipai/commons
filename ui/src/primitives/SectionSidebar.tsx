@@ -251,7 +251,7 @@ export function SectionSidebar({
       id={collapsible || sidebarProps?.id ? columnId : undefined}
       {...(closed ? { inert: true, "aria-hidden": true } : {})}
       className={cn(
-        standalone && "h-full min-w-0 self-stretch border-r border-settings-column-divider bg-settings-column",
+        standalone && "h-full min-w-0 border-r border-settings-column-divider bg-settings-column",
         standalone && (rail ? "w-(--settings-rail-width)" : "w-(--settings-column-width)"),
         sidebarProps?.className,
       )}
@@ -339,7 +339,7 @@ export function SectionSidebar({
   if (!standalone) return column;
 
   const provider = (inner: ReactNode) => (
-    <SidebarProvider keyboardShortcut={false} data-slot="section-sidebar" className="hidden min-h-0 w-auto shrink-0 lg:flex">
+    <SidebarProvider keyboardShortcut={false} data-slot="section-sidebar" className="sticky top-0 hidden h-svh min-h-0 w-auto shrink-0 self-start lg:flex">
       {inner}
     </SidebarProvider>
   );

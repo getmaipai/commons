@@ -116,8 +116,9 @@ function SourceLine({ story }: { story: StoryCardData }) {
 /** The hero's picture ratio is the `--story-hero-ratio` token (default 2 / 1), set through the kit AspectRatio's own variable, and
  * its height stops at `--story-hero-max-h`; the picture covers the frame, so a tall portrait is cropped, never stretched. */
 const HERO_RATIO_STYLE = { "--ratio": "var(--story-hero-ratio, 2 / 1)", maxHeight: "var(--story-hero-max-h, 26rem)" } as CSSProperties;
-/** Every other card picture stops at `--story-card-max-h`, so a half-width card on a wide screen is not taller than it is useful. */
-const CARD_MAX_STYLE = { maxHeight: "var(--story-card-max-h, 18rem)" } as CSSProperties;
+/** Every other card picture stops at `--story-card-max-h`, so a half-width card on a wide screen is not taller than it is useful.
+ * The style carries its own `--ratio`: a `style` passed to the kit AspectRatio replaces the one that sets it, and a frame without it has no height. */
+const cardStyle = (ratio: number): CSSProperties => ({ "--ratio": ratio, maxHeight: "var(--story-card-max-h, 18rem)" }) as CSSProperties;
 
 // Named palette tokens from tokens.css, with the Avatar's filled-surface text token.
 const STORY_HUES = ["blue", "violet", "teal", "orange", "pink", "red"] as const;
@@ -140,13 +141,13 @@ function StoryFallback({ publisher, ratio, style, thumbnail }: { publisher: stri
 
 function StoryImage({ story, ratio, large, hero, thumbnail }: { story: StoryCardData; ratio: number; large?: boolean; hero?: boolean; thumbnail?: boolean }) {
   const [failedSources, setFailedSources] = useState<ReadonlySet<string>>(() => new Set());
-  const style = hero ? HERO_RATIO_STYLE : thumbnail ? undefined : CARD_MAX_STYLE;
+  const style = hero ? HERO_RATIO_STYLE : thumbnail ? undefined : cardStyle(ratio);
   const src = large ? story.image?.w1280 : story.image?.w480;
   if (!src || failedSources.has(src)) {
     return <StoryFallback publisher={story.publisher} ratio={ratio} style={style} thumbnail={thumbnail} />;
   }
   return (
-    <AspectRatio ratio={ratio} style={thumbnail ? { width: "100%" } : style} className="overflow-hidden" data-slot="story-image">
+    <AspectRatio ratio={ratio} style={thumbnail ? ({ "--ratio": ratio, width: "100%" } as CSSProperties) : style} className="overflow-hidden" data-slot="story-image">
       <img
         src={src}
         srcSet={thumbnail ? undefined : `${story.image!.w480} 480w, ${story.image!.w1280} 1280w`}
@@ -183,6 +184,33 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
           {story.title}
         </button>
         {story.dek && (hero || tier === "half") ? <p className="text-muted-foreground line-clamp-2 text-sm">{story.dek}</p> : null}
+        <SourceLine story={story} />
+      </CardContent>
+      <CardMenu story={story} ctx={ctx} />
+    </Card>
+  );
+}
+
+/** A section page's lead story: one wide card, the picture beside the text, with the rest of the page a list under it. A section
+ * (a topic or a source) reads differently from Today's editorial grid, the way a native news app's section pages do. */
+function StoryLead({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
+  const open = () => ctx.onAction?.("open", { story_id: story.story_id, item_id: story.item_id });
+  return (
+    <Card data-slot="story-card" data-tier="lead" data-opened={story.opened ? "" : undefined} interactive className="relative flex-col gap-0 overflow-hidden py-0 sm:flex-row">
+      <div className="sm:w-3/5 sm:shrink-0">
+        <StoryImage story={story} ratio={16 / 9} large />
+      </div>
+      <CardContent className="flex min-w-0 flex-1 flex-col justify-center gap-2 py-4">
+        <Kicker story={story} />
+        <button
+          type="button"
+          onClick={open}
+          data-opened={story.opened ? "" : undefined}
+          className={cn("text-left text-2xl leading-tight font-semibold underline-offset-2 hover:underline focus-visible:underline after:absolute after:inset-0 after:content-['']", story.opened && "text-muted-foreground")}
+        >
+          {story.title}
+        </button>
+        {story.dek ? <p className="text-muted-foreground line-clamp-3 text-sm">{story.dek}</p> : null}
         <SourceLine story={story} />
       </CardContent>
       <CardMenu story={story} ctx={ctx} />
@@ -314,7 +342,9 @@ function Shelf({ shelf, ctx }: { shelf: NonNullable<StoryFeedData["shelves"]>[nu
 export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, className }: StoryFeedProps) {
   const ctx: Ctx = { onAction, available };
   const featured = data.featured ?? [];
-  const rows = data.rows ?? [];
+  const section = data.layout === "channel";
+  // A section page: the lead story wide, then everything else as one list (the featured stories join the rows).
+  const rows = section ? [...featured, ...(data.rows ?? [])] : (data.rows ?? []);
   const empty = !data.hero && featured.length === 0 && rows.length === 0 && (data.shelves ?? []).every((s) => s.stories.length === 0);
   return (
     <section data-slot="story-feed" data-layout={data.layout} aria-label={data.header?.title ?? "Stories"} className={cn("flex min-w-0 flex-col gap-6", className)}>
@@ -329,7 +359,8 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
           </EmptyHeader>
         </Empty>
       ) : null}
-      {data.layout !== "rows" && (data.hero || featured.length > 0) ? (
+      {section && data.hero ? <StoryLead story={data.hero} ctx={ctx} /> : null}
+      {data.layout !== "rows" && !section && (data.hero || featured.length > 0) ? (
         <div data-slot="story-grid" className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
           {data.hero ? <StoryCard story={data.hero} ctx={ctx} tier="hero" /> : null}
           {featured.map((story, index) => (

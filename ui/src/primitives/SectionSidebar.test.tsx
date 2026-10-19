@@ -96,6 +96,8 @@ describe("SectionSidebar", () => {
     const provider = container.querySelector('[data-slot="section-sidebar"]') as HTMLElement;
     expect(provider.className).toContain("hidden");
     expect(provider.className).toContain("lg:flex");
+    expect(provider.className).toContain("sticky");
+    expect(provider.className).toContain("h-svh");
     const side = container.querySelector("#app-column") as HTMLElement;
     expect(side.className).toContain("w-(--settings-column-width)");
     expect(side.className).toContain("bg-settings-column");
