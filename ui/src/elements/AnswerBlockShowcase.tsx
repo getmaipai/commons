@@ -17,6 +17,7 @@ import weatherCard from "@maipai/spec/fixtures/answer-block/valid-weather_card.j
 import storyFeed from "@maipai/spec/fixtures/answer-block/valid-story_feed.json";
 import article from "@maipai/spec/fixtures/answer-block/valid-article.json";
 import { AnswerBlockView } from "./answer-block";
+import { ImageGallery } from "./image-gallery";
 
 export const ANSWER_BLOCK_FIXTURES = {
   spec_sheet: specSheet,
@@ -72,6 +73,24 @@ export function AnswerBlockInlineShowcase() {
       <p>{before.trim()}</p>
       <AnswerBlockView block={afterParagraph} />
       {after.trim() ? <p>{after.trim()}</p> : null}
+    </div>
+  );
+}
+
+// IMGGALLERY-ROW-01: the answer image gallery draws one row of square tiles (the default), with +N on the last
+// tile; `layout="grid"` keeps the wrapping columns. Narrow the window to watch the row fit fewer tiles.
+const rowDemo = Array.from({ length: 9 }, (_, index) => ({
+  id: `row-${index + 1}`,
+  src: `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="hsl(${index * 40} 45% 60%)"/></svg>`)}`,
+  alt: `Sample picture ${index + 1}`,
+}));
+
+export function ImageGalleryRowShowcase() {
+  return (
+    <div className="flex flex-col gap-4">
+      <ImageGallery images={rowDemo.slice(0, 5)} />
+      <ImageGallery images={rowDemo} />
+      <ImageGallery images={rowDemo} layout="grid" maxVisible={5} />
     </div>
   );
 }

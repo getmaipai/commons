@@ -16,6 +16,7 @@ import {
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type ComponentProps,
@@ -71,6 +72,31 @@ export interface ImageGalleryProps extends Omit<
   size?: "default" | "large" | undefined;
   /** Outline buttons under the pictures, each with an optional muted hint. None by default. */
   actions?: readonly GalleryAction[] | undefined;
+  /** `row` (default) draws one row of square tiles sized to the container: as many as fit, up to `maxVisible`, and the last visible tile shows +N for the rest. Phones fit fewer tiles, still one row. `grid` wraps the tiles onto two or three columns and as many rows as needed. */
+  layout?: "row" | "grid" | undefined;
+}
+
+/** Smallest square tile in the one-row layout, in px (4.5rem at the root size of 16). */
+export const GALLERY_TILE_MIN = 72;
+/** Space between tiles, in px (the `gap-2` token). */
+export const GALLERY_GAP = 8;
+
+/**
+ * How many square tiles of at least `tileMin` px fit side by side in one row of
+ * `containerWidth` px with `gap` px between them, never more than `maxVisible`
+ * and never fewer than 1. A width that is not known yet (0, negative, NaN) gives
+ * `maxVisible`, so the first paint and server render show every allowed tile.
+ */
+export function tilesThatFit(
+  containerWidth: number,
+  tileMin: number,
+  gap: number,
+  maxVisible: number,
+): number {
+  const cap = Math.max(1, Math.floor(Number.isFinite(maxVisible) ? maxVisible : 1));
+  if (!(containerWidth > 0) || !(tileMin > 0)) return cap;
+  const fit = Math.floor((containerWidth + gap) / (tileMin + gap));
+  return Math.min(cap, Math.max(1, fit));
 }
 
 const keyForImage = (image: GalleryImage) => `${image.id}\u0000${image.src}`;
@@ -84,9 +110,12 @@ export function ImageGallery({
   editLabel = "Edit picture",
   size = "default",
   actions,
+  layout = "row",
   className,
   ...props
 }: ImageGalleryProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [width, setWidth] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [failedImages, setFailedImages] = useState<ReadonlySet<string>>(
     () => new Set(),
@@ -96,8 +125,31 @@ export function ImageGallery({
   if (activeId !== null && index === -1) setActiveId(null);
   const activeImage = index === -1 ? undefined : images[index];
   const sourceHref = safeHref(activeImage?.source?.url);
-  const visibleCount = Math.floor(clamp(maxVisible, 1, images.length));
+  const natural = size === "large" && images.length === 1;
+  const oneRow = layout === "row" && !natural;
+  const slots = oneRow
+    ? tilesThatFit(width, GALLERY_TILE_MIN, GALLERY_GAP, maxVisible)
+    : 0;
+  const visibleCount = oneRow
+    ? Math.min(slots, images.length)
+    : Math.floor(clamp(maxVisible, 1, images.length));
   const visibleImages = images.slice(0, visibleCount);
+
+  const hasImages = images.length > 0;
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || !oneRow) return undefined;
+    const measure = () => setWidth(Math.floor(root.getBoundingClientRect().width));
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver((entries) => {
+      const next = entries[0]?.contentRect.width;
+      if (next === undefined) measure();
+      else setWidth(Math.floor(next));
+    });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [oneRow, hasImages]);
 
   const close = useCallback(() => {
     setActiveId(null);
@@ -138,15 +190,19 @@ export function ImageGallery({
   };
 
   if (images.length === 0) return null;
-  const natural = size === "large" && images.length === 1;
 
   return (
     <div
+      ref={rootRef}
       data-slot="image-gallery"
       className={cn("@container w-full max-w-md", className)}
       {...props}
     >
-      <div className={cn("grid gap-2", natural ? "grid-cols-1" : "grid-cols-2 @sm:grid-cols-3")}>
+      <div
+        data-layout={oneRow ? "row" : "grid"}
+        className={cn("grid gap-2", !oneRow && (natural ? "grid-cols-1" : "grid-cols-2 @sm:grid-cols-3"))}
+        style={oneRow ? { gridTemplateColumns: `repeat(${slots}, minmax(0, 1fr))` } : undefined}
+      >
         {visibleImages.map((image, imageIndex) => {
           const failed = failedImages.has(keyForImage(image));
           const overflow =
