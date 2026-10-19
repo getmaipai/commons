@@ -237,6 +237,9 @@ function DataStateNotice({ notice, state, onRetry }: { notice: DataState; state:
 }
 
 function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: Row }) {
+  // The article toolbar's back button steps the browser history; with nothing behind this page it is not drawn.
+  const canGoBack = typeof window !== "undefined" && window.history.length > 1;
+  const goBack = () => window.history.back();
   const query = useBinding<PackageDataBody>(node.bind, state);
   const { dispatch, pendingConfirm, lastError } = useDispatchAction();
   const writer = useContext(PageStateContext);
@@ -269,7 +272,7 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
           <ConfirmDialog pendingConfirm={pendingConfirm} />
           {lastError ? <p className="text-base text-destructive">{lastError}</p> : null}
           {list.map((block, i) => (
-            <AnswerBlockView key={String((block as { id?: unknown } | null)?.id ?? i)} block={block} wide news={news} />
+            <AnswerBlockView key={String((block as { id?: unknown } | null)?.id ?? i)} block={block} wide news={news} onBack={canGoBack ? goBack : undefined} />
           ))}
         </div>
       )}

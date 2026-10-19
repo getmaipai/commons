@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.294] - ui-v0.5.294
+
+- NEWS-ARTICLE-PANE-01: the article reads like Apple News. `ArticleView` opens with a slim toolbar: Back (drawn when the page gives `onBack`; the schema page wires it to the browser history), Text size (one tap steps Default, Larger, Smaller; kept in this browser), Share (when the browser can share and the story has an outbound address), Save as a bookmark, and a More menu with Open original, Listen and Key points. The old row of labelled buttons is gone. The body reads in a serif column at the chosen size. A story card's menu says "Open original" where it said "Open on <site>". New icons registered: `arrow-left`, `share`, `a-large-small`. Additive: `onBack` is optional on `ArticleView` and `AnswerBlockView`.
+
 ## [0.5.293] - ui-v0.5.293
 
 - NO-FIXED-COLORS-01: the kit follows the selected theme and draws no fixed color. About 70 Elements, primitives and dashboard parts that used Tailwind palette classes (`emerald`, `amber`, `red`, `blue`, `violet`, `gray`, `white`, `black`) or hex literals now read theme tokens, so every look (Neutral included) and both modes change them, and the `dark:` twin of each color class is gone. Mapping: success to `status-ok`, warning to `status-warning`, error to the look's `destructive`, live and info accents to the look's `primary`, quiet text to `muted-foreground`. New Tailwind colors in `@theme inline`: `status-ok`, `status-warning`, `status-error`, `status-unknown`, `hue-violet` (with `hue-violet-foreground`) and the text-safe `status-ok-ink`, `status-warning-ink` and `primary-ink` (the token mixed 60/40 with `--foreground`, 4.5:1 on page and card in the kit's light and dark, tested in `ink-contrast.test.ts`). Scrims and overlays (Dialog, Sheet, Drawer, AlertDialog, image zoom, attachment and gallery buttons) are the look's `--background` at 40 to 90 percent instead of black, with `--foreground` glyphs instead of white.

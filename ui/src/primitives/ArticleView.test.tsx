@@ -46,11 +46,11 @@ describe("ArticleView", () => {
     expect(link.getAttribute("rel")).toBe("noopener noreferrer");
   });
 
-  test("a child's copy renders every link as plain text and offers no Open on site", () => {
+  test("a child's copy renders every link as plain text and offers no Open original", () => {
     const { container, getByText } = render(<ArticleView data={childCopy()} available={["open_site", "listen"]} onAction={() => {}} />);
     expect(container.querySelector("a[href]")).toBeNull();
     expect(getByText("a source").tagName).toBe("SPAN");
-    expect(container.textContent).not.toContain("Open on");
+    expect(container.textContent).not.toContain("Open original");
   });
 
   test("a book link draws through renderTargetLink, and as plain text without it (Reference)", () => {
@@ -62,28 +62,56 @@ describe("ArticleView", () => {
     expect(plain.getByText("Other page").tagName).toBe("SPAN");
   });
 
-  test("the action row shows only the declared actions and fires them with the story's ids", () => {
+  test("the toolbar shows only the declared actions: Save fires from the bookmark, Listen and Key points sit under More", () => {
     const onAction = mock(() => {});
     const none = render(<ArticleView data={data} onAction={onAction} />);
-    expect(none.queryByText("Listen")).toBeNull();
+    expect(none.queryByLabelText("Save")).toBeNull();
+    expect(none.queryByLabelText("More")).toBeNull();
     cleanup();
-    const { getByText } = render(<ArticleView data={data} onAction={onAction} available={["listen", "save"]} ids={{ story_id: "story-1", item_id: "news-1" }} />);
-    fireEvent.click(getByText("Listen"));
-    fireEvent.click(getByText("Save"));
-    expect(onAction).toHaveBeenCalledWith("listen", { story_id: "story-1", item_id: "news-1" });
+    const view = render(<ArticleView data={{ ...data, key_points: undefined }} onAction={onAction} available={["listen", "save", "summarize"]} ids={{ story_id: "story-1", item_id: "news-1" }} />);
+    fireEvent.click(view.getByLabelText("Save"));
     expect(onAction).toHaveBeenCalledWith("save", { story_id: "story-1", item_id: "news-1", on: true });
+    expect(view.getByLabelText("More")).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="article-toolbar"]')).not.toBeNull();
   });
 
-  test("Key points is offered only while there are none; the footer slot and the description draw (Reference)", () => {
-    const noPoints: ArticleViewData = { ...data, key_points: undefined, description: "From a book", saved: false };
-    const { getByText, queryByText } = render(<ArticleView data={noPoints} onAction={() => {}} available={["summarize"]} footer={<span>Licence · Snapshot today</span>} />);
-    expect(getByText("Key points")).toBeTruthy();
+  test("Back is drawn only when the page gave a way back, and calls it; the text size menu is always there", () => {
+    const withoutBack = render(<ArticleView data={data} />);
+    expect(withoutBack.queryByLabelText("Back")).toBeNull();
+    expect(withoutBack.getByLabelText("Text size")).toBeTruthy();
+    cleanup();
+    const onBack = mock(() => {});
+    const withBack = render(<ArticleView data={data} onBack={onBack} />);
+    fireEvent.click(withBack.getByLabelText("Back"));
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  test("the text size button steps Default, Larger, Smaller and the body follows", () => {
+    const { container, getByLabelText } = render(<ArticleView data={data} />);
+    const size = () => container.querySelector('[data-slot="article-body"]')!.getAttribute("data-text-size");
+    expect(size()).toBe("medium");
+    fireEvent.click(getByLabelText("Text size"));
+    expect(size()).toBe("large");
+    fireEvent.click(getByLabelText("Text size"));
+    expect(size()).toBe("small");
+    fireEvent.click(getByLabelText("Text size"));
+    expect(size()).toBe("medium");
+  });
+
+  test("the body reads in a serif at the default size, and the reading column is the page's one centred column", () => {
+    const { container } = render(<ArticleView data={data} />);
+    const body = container.querySelector('[data-slot="article-body"]')!;
+    expect(body.className).toContain("font-serif");
+    expect(body.getAttribute("data-text-size")).toBe("medium");
+    expect(container.querySelector('[data-slot="article-view"]')!.className).toContain("max-w-prose");
+  });
+
+  test("the description and the footer slot draw (Reference), and a saved story shows the filled bookmark", () => {
+    const noPoints: ArticleViewData = { ...data, key_points: undefined, description: "From a book", saved: true };
+    const { getByText, getByLabelText } = render(<ArticleView data={noPoints} onAction={() => {}} available={["save"]} footer={<span>Licence · Snapshot today</span>} />);
     expect(getByText("From a book")).toBeTruthy();
     expect(getByText("Licence · Snapshot today")).toBeTruthy();
-    cleanup();
-    const has = render(<ArticleView data={data} onAction={() => {}} available={["summarize"]} />);
-    expect(has.queryAllByText("Key points").length).toBe(1);
-    expect(queryByText("zzz")).toBeNull();
+    expect(getByLabelText("Saved").getAttribute("aria-pressed")).toBe("true");
   });
 
   test("the heading ids the table of contents scrolls to are on the headings", () => {

@@ -145,8 +145,8 @@ describe("answer_blocks actions map", () => {
   test("the article block draws through the same map", async () => {
     dataBody = { as_of: "2026-10-17T13:00:00Z", blocks: [articleBlock] };
     const articleNode: UiNode = { type: "answer_blocks", bind: { source: "package", path: "story", stream: false }, actions: { save: { call: { target: `${P}save` } } } };
-    const { findByText } = inNews(articleNode);
-    fireEvent.click(await findByText("Save"));
+    const { findByLabelText } = inNews(articleNode);
+    fireEvent.click(await findByLabelText("Save"));
     await waitFor(() => expect(calls.some((c) => c.url === `${P}save`)).toBe(true));
   });
 });

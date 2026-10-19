@@ -1,18 +1,20 @@
 import { getIcon } from "@/kit/icons";
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/kit/dashboard/components/ui/dropdown-menu";
 import { Separator } from "@/kit/dashboard/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/kit/ui/table";
 import { RelativeTime } from "@/kit/ui/relative-time";
 import { cn } from "@/kit/utils";
 import { StoryFeed, type StoryAction, type StoryActionIds, type StoryCardData } from "./StoryFeed";
 
+const ArrowLeftIcon = getIcon("arrow-left");
 const BookmarkIcon = getIcon("bookmark");
-const ExternalLinkIcon = getIcon("external-link");
-const HeadphonesIcon = getIcon("headphones");
-const SparklesIcon = getIcon("sparkles");
+const EllipsisIcon = getIcon("more-horizontal");
+const ShareIcon = getIcon("share");
+const TypeIcon = getIcon("a-large-small");
 
 /** The spec's `article_inline`: a run of text, or a link carrying a book `target` or an outbound `href`. */
 export type ArticleInlineData =
@@ -54,6 +56,8 @@ export interface ArticleViewProps {
   /** Which actions the page declared; the action row shows only these. */
   available?: readonly ArticleAction[];
   ids?: StoryActionIds;
+  /** Draws the toolbar's back button. The page owns where back goes; without it the button is not drawn. */
+  onBack?: () => void;
   /** Draws a link that names a book page (Reference). Without it such a link is plain text. */
   renderTargetLink?: (target: { book: string; path: string }, text: string) => ReactNode;
   /** A line under the article (Reference: licence and snapshot date). */
@@ -134,6 +138,25 @@ function Block({ block, renderTargetLink }: { block: ArticleBlockData; renderTar
   }
 }
 
+/** The reading size, per viewer in this browser: three steps on the body only, never the headline or the page. */
+const TEXT_SIZES = [
+  { id: "small", label: "Smaller", className: "text-base" },
+  { id: "medium", label: "Default", className: "text-lg" },
+  { id: "large", label: "Larger", className: "text-xl" },
+] as const;
+type TextSizeId = (typeof TEXT_SIZES)[number]["id"];
+/** One tap steps the size: Default, then Larger, then Smaller, then Default again. */
+const NEXT_SIZE: Record<TextSizeId, TextSizeId> = { medium: "large", large: "small", small: "medium" };
+const TEXT_SIZE_KEY = "maipai.article.text-size";
+
+function readTextSize(): TextSizeId {
+  try {
+    const stored = window.localStorage.getItem(TEXT_SIZE_KEY);
+    if (TEXT_SIZES.some((size) => size.id === stored)) return stored as TextSizeId;
+  } catch { /* storage can be blocked: the default size is fine */ }
+  return "medium";
+}
+
 function minutes(seconds: number): string {
   const m = Math.max(1, Math.round(seconds / 60));
   return `${m} min read`;
@@ -145,12 +168,52 @@ function minutes(seconds: number): string {
  * appears only when the copy it was handed carries an `href` (teens and adults) or a book `target` the page can draw,
  * so a child's article renders every link as plain text. Buttons fire `onAction` with the story's own ids.
  */
-export function ArticleView({ data, onAction, available = [], ids, renderTargetLink, footer, className }: ArticleViewProps) {
+export function ArticleView({ data, onAction, available = [], ids, onBack, renderTargetLink, footer, className }: ArticleViewProps) {
   const can = (a: ArticleAction) => onAction !== undefined && available.includes(a);
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
-  const hasActions = can("listen") || can("save") || can("summarize") || (can("open_site") && data.open_url);
+  const [textSize, setTextSize] = useState<TextSizeId>(readTextSize);
+  const chooseSize = (id: TextSizeId) => {
+    setTextSize(id);
+    try { window.localStorage.setItem(TEXT_SIZE_KEY, id); } catch { /* not kept this time */ }
+  };
+  const bodySize = TEXT_SIZES.find((size) => size.id === textSize)!.className;
+  const canShare = can("open_site") && !!data.open_url && typeof navigator !== "undefined" && typeof navigator.share === "function";
+  const hasMore = can("listen") || (can("summarize") && !data.key_points) || (can("open_site") && !!data.open_url);
+  const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
   return (
     <article data-slot="article-view" className={cn("mx-auto flex w-full min-w-0 max-w-prose flex-col gap-4", className)}>
+      {hasToolbar ? (
+        <div data-slot="article-toolbar" className="flex items-center gap-1">
+          {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
+          <div className="ml-auto flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon-lg"
+              aria-label="Text size"
+              title={`Text size: ${TEXT_SIZES.find((size) => size.id === textSize)!.label}. Tap to change.`}
+              onClick={() => chooseSize(NEXT_SIZE[textSize])}
+            >
+              <TypeIcon aria-hidden />
+            </Button>
+            {canShare ? <Button variant="ghost" size="icon-lg" aria-label="Share" onClick={() => { void navigator.share({ title: data.title, url: data.open_url }).catch(() => {}); }}><ShareIcon aria-hidden /></Button> : null}
+            {can("save") ? (
+              <Button variant="ghost" size="icon-lg" aria-label={data.saved ? "Saved" : "Save"} aria-pressed={data.saved === true} onClick={() => fire("save", { on: !data.saved })}>
+                <BookmarkIcon aria-hidden fill={data.saved ? "currentColor" : "none"} />
+              </Button>
+            ) : null}
+            {hasMore ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label="More" />}><EllipsisIcon aria-hidden /></DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {can("open_site") && data.open_url ? <DropdownMenuItem onClick={() => fire("open_site", { url: data.open_url })}>Open original</DropdownMenuItem> : null}
+                  {can("listen") ? <DropdownMenuItem onClick={() => fire("listen")}>Listen</DropdownMenuItem> : null}
+                  {can("summarize") && !data.key_points ? <DropdownMenuItem onClick={() => fire("summarize")}>Key points</DropdownMenuItem> : null}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
       {data.byline ? (
         <div data-slot="article-provider" className="bg-muted text-foreground rounded-lg border px-4 py-2 text-center text-base font-semibold">
           {data.byline.publisher}
@@ -169,18 +232,6 @@ export function ArticleView({ data, onAction, available = [], ids, renderTargetL
           </p>
         ) : null}
       </header>
-      {hasActions ? (
-        <div data-slot="article-actions" className="flex flex-wrap gap-2">
-          {can("listen") ? <Button onClick={() => fire("listen")}><HeadphonesIcon aria-hidden data-icon="inline-start" />Listen</Button> : null}
-          {can("save") ? (
-            <Button variant="outline" aria-pressed={data.saved === true} onClick={() => fire("save", { on: !data.saved })}>
-              <BookmarkIcon aria-hidden data-icon="inline-start" />{data.saved ? "Saved" : "Save"}
-            </Button>
-          ) : null}
-          {can("summarize") && !data.key_points ? <Button variant="outline" onClick={() => fire("summarize")}><SparklesIcon aria-hidden data-icon="inline-start" />Key points</Button> : null}
-          {can("open_site") && data.open_url ? <Button variant="outline" onClick={() => fire("open_site", { url: data.open_url })}><ExternalLinkIcon aria-hidden data-icon="inline-start" />Open on {data.byline?.site ?? "site"}</Button> : null}
-        </div>
-      ) : null}
       {data.image ? (
         <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
           <img src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
@@ -193,7 +244,7 @@ export function ArticleView({ data, onAction, available = [], ids, renderTargetL
           <p className="text-muted-foreground text-xs">Written on this hub from the article.</p>
         </section>
       ) : null}
-      <div data-slot="article-body" className="flex min-w-0 flex-col gap-4">
+      <div data-slot="article-body" data-text-size={textSize} className={cn("flex min-w-0 flex-col gap-4 font-serif leading-relaxed", bodySize)}>
         {data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
       </div>
       {data.also_covering && data.also_covering.length > 0 ? (

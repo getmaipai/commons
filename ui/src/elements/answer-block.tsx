@@ -40,6 +40,8 @@ export interface AnswerBlockHandlers {
   /** `story_feed` and `article` (NEWS-01): the actions the page declared and the one handler they fire. A block fires
    * an action with the story's own ids and never names a route; with no handler the block is read-only. */
   news?: { available: readonly string[]; onAction: (action: string, ids: Record<string, unknown>) => void };
+  /** `article`: the toolbar's back button. The page owns where back goes; unset, the button is not drawn. */
+  onBack?: () => void;
 }
 
 export interface AnswerBlockViewProps
@@ -94,7 +96,7 @@ class Guard extends Component<
 // inferred type is `any`; `kind` selects which props shape the cast names.
 function renderKind(
   block: any,
-  { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide, news }: AnswerBlockHandlers,
+  { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide, news, onBack }: AnswerBlockHandlers,
 ): ReactNode {
   const props = block.props;
   switch (block.kind) {
@@ -139,7 +141,7 @@ function renderKind(
     case "story_feed":
       return <StoryFeed data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} />;
     case "article":
-      return <ArticleView data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} ids={{ story_id: props.story_id, item_id: props.item_id }} />;
+      return <ArticleView data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} ids={{ story_id: props.story_id, item_id: props.item_id }} onBack={onBack} />;
     default:
       return null;
   }
@@ -154,6 +156,7 @@ export function AnswerBlockView({
   compact,
   wide,
   news,
+  onBack,
   className,
   ...props
 }: AnswerBlockViewProps) {
@@ -182,7 +185,7 @@ export function AnswerBlockView({
         className={className}
         {...props}
       >
-        {renderKind(valid, { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide, news })}
+        {renderKind(valid, { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide, news, onBack })}
       </div>
     </Guard>
   );

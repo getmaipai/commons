@@ -85,7 +85,7 @@ function CardMenu({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   if (can("save")) entries.push(<DropdownMenuItem key="save" onClick={() => fire("save", !story.saved)}>{story.saved ? "Remove from Saved" : "Save"}</DropdownMenuItem>);
   if (can("feedback_more")) entries.push(<DropdownMenuItem key="more" onClick={() => fire("feedback_more")}>More like this</DropdownMenuItem>);
   if (can("feedback_less")) entries.push(<DropdownMenuItem key="less" onClick={() => fire("feedback_less")}>Less like this</DropdownMenuItem>);
-  if (story.open_url && can("open_site")) entries.push(<DropdownMenuItem key="site" onClick={() => fire("open_site")}>Open on {story.site}</DropdownMenuItem>);
+  if (story.open_url && can("open_site")) entries.push(<DropdownMenuItem key="site" onClick={() => fire("open_site")}>Open original</DropdownMenuItem>);
   if (entries.length === 0) return null;
   return (
     <CardAction className="absolute top-2 right-2 z-10 rounded-full bg-background/85 backdrop-blur">
