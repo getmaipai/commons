@@ -41,12 +41,17 @@ export interface StoryCardData {
   kicker?: string;
 }
 
+/** How a section page arranges its stories (spec/news/topics.json `section_style`). */
+export type SectionStyle = "top_stories" | "special" | "todays_news";
+
 /** One topic chip under the header. An empty `id` means All. */
 export interface StoryFilter { id: string; label: string; selected?: boolean }
 
 /** The `story_feed` block's props. */
 export interface StoryFeedData {
   layout: "today" | "channel" | "rows";
+  /** NEWS-SECTION-STYLES-01: a channel page's arrangement, from the topic's `section_style`. Read only when `layout` is `channel`. */
+  section_style?: SectionStyle;
   header?: { title: string; subtitle?: string; dateline?: string; channel?: { kind: "topic" | "source"; key: string; followed: boolean } };
   hero?: StoryCardData;
   featured?: StoryCardData[];
@@ -161,7 +166,7 @@ function StoryImage({ story, ratio, large, hero, thumbnail }: { story: StoryCard
   );
 }
 
-function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier: "hero" | "featured" | "half" | "shelf" }) {
+function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier: "hero" | "featured" | "half" | "shelf" | "tall" }) {
   const open = () => ctx.onAction?.("open", { story_id: story.story_id, item_id: story.item_id });
   const hero = tier === "hero";
   return (
@@ -215,6 +220,70 @@ function StoryLead({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
       </CardContent>
       <CardMenu story={story} ctx={ctx} />
     </Card>
+  );
+}
+
+/** A section page's picture-right card: the text beside a small picture, the card as wide as its column. */
+function StorySide({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
+  const open = () => ctx.onAction?.("open", { story_id: story.story_id, item_id: story.item_id });
+  return (
+    <Card data-slot="story-card" data-tier="side" data-opened={story.opened ? "" : undefined} interactive className="relative h-full flex-row gap-0 overflow-hidden py-0">
+      <CardContent className="flex min-w-0 flex-1 flex-col gap-2 py-4">
+        <Kicker story={story} />
+        <button
+          type="button"
+          onClick={open}
+          data-opened={story.opened ? "" : undefined}
+          className={cn("text-left text-base leading-snug font-semibold underline-offset-2 hover:underline focus-visible:underline after:absolute after:inset-0 after:content-['']", story.opened && "text-muted-foreground")}
+        >
+          {story.title}
+        </button>
+        <SourceLine story={story} />
+      </CardContent>
+      <div className="w-2/5 shrink-0 self-stretch">
+        <StoryImage story={story} ratio={1} />
+      </div>
+      <CardMenu story={story} ctx={ctx} />
+    </Card>
+  );
+}
+
+/** The counts and headings of each section style: `tall` large picture-over-text cards, then `side` picture-right cards, then
+ * (todays_news only) one wide split card under its own heading. Whatever remains falls to the list. */
+const SECTION_STYLES: Record<SectionStyle, { heading: string; tall: number; tallCols: string; side: number; sideCols: string; wide: number; wideHeading: string }> = {
+  top_stories: { heading: "Top Stories", tall: 3, tallCols: "sm:grid-cols-2 lg:grid-cols-3", side: 3, sideCols: "sm:grid-cols-2 lg:grid-cols-3", wide: 0, wideHeading: "" },
+  special: { heading: "Top Stories", tall: 2, tallCols: "sm:grid-cols-2", side: 2, sideCols: "sm:grid-cols-2", wide: 0, wideHeading: "" },
+  todays_news: { heading: "Today's News", tall: 3, tallCols: "sm:grid-cols-2 lg:grid-cols-3", side: 0, sideCols: "", wide: 1, wideHeading: "More for you" },
+};
+
+/** The styled arrangement of a section page. Fewer stories than a style asks for fill what is there and draw no empty heading. */
+function StyledSection({ style, stories, ctx }: { style: SectionStyle; stories: StoryCardData[]; ctx: Ctx }) {
+  const plan = SECTION_STYLES[style];
+  const tall = stories.slice(0, plan.tall);
+  const side = stories.slice(plan.tall, plan.tall + plan.side);
+  const wide = stories.slice(plan.tall + plan.side, plan.tall + plan.side + plan.wide);
+  return (
+    <div data-slot="story-section" data-section-style={style} className="flex min-w-0 flex-col gap-6">
+      {tall.length > 0 ? (
+        <section aria-label={plan.heading} className="flex min-w-0 flex-col gap-3">
+          <h3 className="text-lg font-semibold">{plan.heading}</h3>
+          <div data-slot="story-tall" className={cn("grid min-w-0 grid-cols-1 gap-4", plan.tallCols)}>
+            {tall.map((story) => <StoryCard key={story.story_id} story={story} ctx={ctx} tier="tall" />)}
+          </div>
+          {side.length > 0 ? (
+            <div data-slot="story-side" className={cn("grid min-w-0 grid-cols-1 gap-4", plan.sideCols)}>
+              {side.map((story) => <StorySide key={story.story_id} story={story} ctx={ctx} />)}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+      {wide.length > 0 ? (
+        <section aria-label={plan.wideHeading} className="flex min-w-0 flex-col gap-3">
+          <h3 className="text-lg font-semibold">{plan.wideHeading}</h3>
+          {wide.map((story) => <StoryLead key={story.story_id} story={story} ctx={ctx} />)}
+        </section>
+      ) : null}
+    </div>
   );
 }
 
@@ -344,7 +413,10 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
   const featured = data.featured ?? [];
   const section = data.layout === "channel";
   // A section page: the lead story wide, then everything else as one list (the featured stories join the rows).
-  const rows = section ? [...featured, ...(data.rows ?? [])] : (data.rows ?? []);
+  const styled = section && data.section_style !== undefined ? data.section_style : undefined;
+  const lead = section ? [...(data.hero ? [data.hero] : []), ...featured, ...(data.rows ?? [])] : [];
+  const used = styled ? SECTION_STYLES[styled].tall + SECTION_STYLES[styled].side + SECTION_STYLES[styled].wide : 0;
+  const rows = styled ? lead.slice(used) : section ? [...featured, ...(data.rows ?? [])] : (data.rows ?? []);
   const empty = !data.hero && featured.length === 0 && rows.length === 0 && (data.shelves ?? []).every((s) => s.stories.length === 0);
   return (
     <section data-slot="story-feed" data-layout={data.layout} aria-label={data.header?.title ?? "Stories"} className={cn("flex min-w-0 flex-col gap-6", className)}>
@@ -359,7 +431,8 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
           </EmptyHeader>
         </Empty>
       ) : null}
-      {section && data.hero ? <StoryLead story={data.hero} ctx={ctx} /> : null}
+      {styled ? <StyledSection style={styled} stories={lead} ctx={ctx} /> : null}
+      {section && !styled && data.hero ? <StoryLead story={data.hero} ctx={ctx} /> : null}
       {data.layout !== "rows" && !section && (data.hero || featured.length > 0) ? (
         <div data-slot="story-grid" className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
           {data.hero ? <StoryCard story={data.hero} ctx={ctx} tier="hero" /> : null}
@@ -369,6 +442,7 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
         </div>
       ) : null}
       {(data.shelves ?? []).filter((shelf) => shelf.stories.length > 0).map((shelf) => <Shelf key={shelf.title} shelf={shelf} ctx={ctx} />)}
+      {styled && rows.length > 0 && !rows[0]!.group ? <h3 data-slot="story-more" className="-mb-3 text-lg font-semibold">More stories</h3> : null}
       {groupRows(rows).map((segment, index) => (
         <div key={`${segment.group ?? ""}:${index}`} data-slot="story-group" className="flex min-w-0 flex-col gap-2">
           {segment.group ? (

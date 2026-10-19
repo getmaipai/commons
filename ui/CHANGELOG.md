@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.289] - ui-v0.5.289
+
+- NEWS-SECTION-STYLES-01: `StoryFeed` draws a section page in the arrangement its `section_style` names, the way Apple News arranges each category. `top_stories`: three tall cards, three picture-right cards, then the rest as a list under "More stories". `special`: two large cards, two picture-right cards, then the list. `todays_news`: three tall cards under "Today's News", one wide split card under "More for you", then the list. Read only when `layout` is `channel`; no style, or any other layout, draws the page as before. A short list fills what is there and draws no empty heading. Built from the shipped `Card`, `AspectRatio`, `Item` and `StoryLead`; one new card tier (`side`), no override, no wrapper. Additive. Also refreshes the `AsyncState` loading snapshot that 0.5.287's skeleton delay had left stale.
+
 ## [0.5.288] - ui-v0.5.288
 
 - Phone: the floating menu button (48 px, 8 px from the start edge) no longer covers the start of a page title ("Library" read "ibrary") or any page's own top row. `FullLayout` rail mode marks the workspace `data-phone-menu` only while the button is drawn (phone width, menu not hidden) and then always draws the page header band, even when the page sets no header content. `tokens.css` makes the band at least `--phone-menu-band` (64 px) tall with its content starting `--phone-menu-clear` (72 px) from the start edge, so every page's content begins below the button. Logical properties, so RTL works. Desktop, tablet and immersive pages are unchanged.

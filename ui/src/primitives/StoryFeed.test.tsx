@@ -308,3 +308,68 @@ describe("StoryFeed look (NEWS-LOOK-02)", () => {
     expect(content!.querySelector('[data-slot="item-title"]')!.className).toContain("line-clamp-3");
   });
 });
+
+describe("StoryFeed section styles (NEWS-SECTION-STYLES-01)", () => {
+  const base = (data.hero ?? data.featured![0]!) as NonNullable<StoryFeedData["hero"]>;
+  const stories = (n: number) => Array.from({ length: n }, (_, i) => ({ ...base, group: undefined, story_id: `story-s${i}`, item_id: `news-s${i}`, title: `Story ${i + 1}` }));
+  const channel = (section_style: StoryFeedData["section_style"], n: number): StoryFeedData => ({ layout: "channel", section_style, header: { title: "Business" }, hero: stories(n)[0], featured: stories(n).slice(1, 3), rows: stories(n).slice(3), as_of: data.as_of });
+  const count = (container: HTMLElement, tier: string) => container.querySelectorAll(`[data-tier="${tier}"]`).length;
+
+  test("top_stories: three tall cards, three picture-right cards, the rest as the list under More stories", () => {
+    const { container, getByText } = render(<StoryFeed data={channel("top_stories", 10)} />);
+    expect(container.querySelector('[data-slot="story-section"]')?.getAttribute("data-section-style")).toBe("top_stories");
+    expect(getByText("Top Stories")).toBeTruthy();
+    expect(count(container, "tall")).toBe(3);
+    expect(count(container, "side")).toBe(3);
+    expect(count(container, "lead")).toBe(0);
+    expect(container.querySelectorAll('[data-slot="story-rows"] li')).toHaveLength(4);
+    expect(getByText("More stories")).toBeTruthy();
+  });
+
+  test("special: two large cards, then two picture-right cards", () => {
+    const { container } = render(<StoryFeed data={channel("special", 8)} />);
+    expect(count(container, "tall")).toBe(2);
+    expect(count(container, "side")).toBe(2);
+    expect(container.querySelectorAll('[data-slot="story-rows"] li')).toHaveLength(4);
+  });
+
+  test("todays_news: three tall cards, then More for you with one wide split card", () => {
+    const { container, getByText } = render(<StoryFeed data={channel("todays_news", 8)} />);
+    expect(getByText("Today's News")).toBeTruthy();
+    expect(getByText("More for you")).toBeTruthy();
+    expect(count(container, "tall")).toBe(3);
+    expect(count(container, "lead")).toBe(1);
+    expect(count(container, "side")).toBe(0);
+    expect(container.querySelectorAll('[data-slot="story-rows"] li')).toHaveLength(4);
+  });
+
+  test("a short list fills what is there and draws no empty heading or list", () => {
+    const two = render(<StoryFeed data={channel("top_stories", 2)} />);
+    expect(count(two.container, "tall")).toBe(2);
+    expect(count(two.container, "side")).toBe(0);
+    expect(two.container.querySelector('[data-slot="story-side"]')).toBeNull();
+    expect(two.container.querySelector('[data-slot="story-more"]')).toBeNull();
+    two.unmount();
+    const four = render(<StoryFeed data={channel("todays_news", 3)} />);
+    expect(four.queryByText("More for you")).toBeNull();
+  });
+
+  test("no style, or a style on a layout that is not channel, keeps the existing page", () => {
+    const plain = render(<StoryFeed data={channel(undefined, 8)} />);
+    expect(count(plain.container, "lead")).toBe(1);
+    expect(count(plain.container, "tall")).toBe(0);
+    plain.unmount();
+    const today = render(<StoryFeed data={{ ...data, section_style: "top_stories" }} />);
+    expect(today.container.querySelector('[data-slot="story-section"]')).toBeNull();
+    expect(count(today.container, "hero")).toBe(1);
+  });
+
+  test("a picture-right card opens its story and keeps the picture beside the text", () => {
+    const onAction = mock();
+    const { container } = render(<StoryFeed data={channel("top_stories", 6)} onAction={onAction} />);
+    const side = container.querySelector('[data-tier="side"]')!;
+    fireEvent.click(side.querySelector("button")!);
+    expect(onAction).toHaveBeenCalledWith("open", { story_id: "story-s3", item_id: "news-s3" });
+    expect(side.querySelector('[data-slot="story-image"]')).not.toBeNull();
+  });
+});
