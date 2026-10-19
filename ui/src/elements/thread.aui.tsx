@@ -83,6 +83,7 @@ import {
   type ReactNode,
 } from "react";
 import { formatRelative } from "../relativeTime";
+import { DraftRestoreRegionContext } from "./draft-restore-context";
 
 export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
 
@@ -927,30 +928,38 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
+  const [aboveInputRegion, setAboveInputRegion] = useState<HTMLDivElement | null>(null);
   const multiline = useMultiline(shellRef, composerDensity === "compact");
   return (
     <ComposerPrimitive.Root data-tour={composerTourId} className="aui-composer-root relative flex w-full flex-col">
       <ComposerPrimitive.AttachmentDropzone asChild>
-        <div
-          ref={shellRef}
-          data-slot="aui_composer-shell"
-          data-density={composerDensity}
-          data-multiline={multiline ? "" : undefined}
-          className="border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text flex-col gap-2 rounded-(--composer-radius) border bg-(--composer-bg) p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]"
-        >
-          <ComposerAttachments />
-          {ComposerQuotePreview && <ComposerQuotePreview />}
-          {ComposerInputOverride ? (
-            <ComposerInputOverride />
-          ) : (
-            <ComposerInputField
-              placeholder={composerPlaceholder ?? "Send a message..."}
-              autoFocus={autoFocus}
-              submitMode={sendHeld ? "none" : undefined}
+        <DraftRestoreRegionContext.Provider value={aboveInputRegion}>
+          <div
+            ref={shellRef}
+            data-slot="aui_composer-shell"
+            data-density={composerDensity}
+            data-multiline={multiline ? "" : undefined}
+            className="border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text flex-col gap-2 rounded-(--composer-radius) border bg-(--composer-bg) p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]"
+          >
+            <ComposerAttachments />
+            {ComposerQuotePreview && <ComposerQuotePreview />}
+            <div
+              ref={setAboveInputRegion}
+              data-slot="composer-above-input"
+              aria-live="polite"
             />
-          )}
-          <ComposerAction />
-        </div>
+            {ComposerInputOverride ? (
+              <ComposerInputOverride />
+            ) : (
+              <ComposerInputField
+                placeholder={composerPlaceholder ?? "Send a message..."}
+                autoFocus={autoFocus}
+                submitMode={sendHeld ? "none" : undefined}
+              />
+            )}
+            <ComposerAction />
+          </div>
+        </DraftRestoreRegionContext.Provider>
       </ComposerPrimitive.AttachmentDropzone>
       {(ComposerNotice || composerNoticeReserve) && (
         <div

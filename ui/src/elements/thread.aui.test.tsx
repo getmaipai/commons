@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { AssistantRuntimeProvider, MessagePrimitive, useAuiState, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
-import { Thread, type ThreadViewportOptions } from "./thread.aui";
+import { ComposerInputField, Thread, type ThreadViewportOptions } from "./thread.aui";
+import { DraftRestore } from "./draft-restore";
+import { DraftRestoreComposerShowcase } from "./DraftRestoreComposerShowcase";
 
 afterEach(cleanup);
 
@@ -90,6 +92,65 @@ describe("Thread's ComposerInputOverride slot", () => {
     const { getByTestId, queryByRole } = render(<Harness ComposerInputOverride={Waveform} />);
     expect(getByTestId("fake-waveform")).toBeTruthy();
     expect(queryByRole("textbox", { name: "Message input" })).toBeNull();
+  });
+
+  test("lifts DraftRestore above the input row, keeps controls before input, and preserves typing and send", async () => {
+    const restored: string[] = [];
+    const sent: string[] = [];
+    const capturingAdapter: ChatModelAdapter = {
+      async *run(input) {
+        sent.push(JSON.stringify(input));
+        yield { content: [] };
+      },
+    };
+    function Override() {
+      return (
+        <>
+          <DraftRestore
+            draft="A very long draft that should stay on one truncated line at phone width"
+            savedAt="2 min ago"
+            onRestore={() => restored.push("restore")}
+            onDiscard={() => restored.push("discard")}
+          />
+          <ComposerInputField />
+        </>
+      );
+    }
+    const { getByRole } = render(<Harness composerDensity="compact" ComposerInputOverride={Override} runAdapter={capturingAdapter} />);
+    await waitFor(() => expect(document.querySelector('[data-slot="draft-restore"]')).toBeTruthy());
+    const card = document.querySelector('[data-slot="draft-restore"]') as HTMLElement;
+    const region = document.querySelector('[data-slot="composer-above-input"]') as HTMLElement;
+    const shell = document.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement;
+    const input = getByRole("textbox", { name: "Message input" });
+    expect(card.parentElement).toBe(region);
+    expect(region.parentElement).toBe(shell);
+    expect(region.compareDocumentPosition(input) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(card.className).toContain("w-full");
+    expect(card.className).toContain("max-w-none");
+    expect(card.querySelector("span")?.className).toContain("truncate");
+    expect(card.querySelector("span")?.className).toContain("whitespace-nowrap");
+    const restore = getByRole("button", { name: "Restore" });
+    const dismiss = getByRole("button", { name: "Discard the draft" });
+    expect(restore.className).toContain("min-h-12");
+    expect(dismiss.className).toContain("size-12");
+    expect(restore.compareDocumentPosition(dismiss) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(dismiss.compareDocumentPosition(input) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(restore);
+    fireEvent.click(dismiss);
+    expect(restored).toEqual(["restore", "discard"]);
+    fireEvent.change(input, { target: { value: "typed as before" } });
+    expect((input as HTMLTextAreaElement).value).toBe("typed as before");
+    fireEvent.click(getByRole("button", { name: "Send message" }));
+    await waitFor(() => expect(sent).toHaveLength(1));
+    expect(sent[0]).toContain("typed as before");
+  });
+
+  test("the composer showcase uses the phone width", async () => {
+    render(<DraftRestoreComposerShowcase />);
+    await waitFor(() => expect(document.querySelector('[data-slot="draft-restore"]')).toBeTruthy());
+    expect(document.querySelector('[data-slot="draft-restore"]')?.parentElement?.getAttribute("data-slot")).toBe("composer-above-input");
+    expect(document.querySelector('[data-density="compact"]')).toBeTruthy();
+    expect(Array.from(document.querySelectorAll("div")).some((element) => element.className.includes("w-[360px]"))).toBe(true);
   });
 });
 
@@ -414,6 +475,8 @@ describe("Thread's composerDensity option (ELT-COMPOSER-KIT-01)", () => {
 
   test("the stylesheet is scoped to the compact density and exposes its tokens", async () => {
     const css = await Bun.file(new URL("./thread-composer.css", import.meta.url)).text();
+    expect(css).toContain('[data-slot="composer-above-input"] {\n  grid-area: above;');
+    expect(css).toContain('"above above above"');
     const selectors = css.replace(/\/\*[\s\S]*?\*\//g, "").split("{").map((chunk) => chunk.split("}").pop()!.trim()).filter((s) => s && !s.startsWith("@media"));
     for (const selector of selectors) {
       for (const part of selector.split(/,(?![^(]*\))/)) expect(part).toContain('[data-density="compact"]');

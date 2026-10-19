@@ -42,7 +42,7 @@
   box-sizing: border-box;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: "att att att" "lead input trail";
+  grid-template-areas: "att att att" "above above above" "lead input trail";
   align-items: end;
   gap: 0;
   min-height: var(--_row);
@@ -57,7 +57,7 @@
 }
 
 [data-slot="aui_composer-shell"][data-density="compact"][data-multiline] {
-  grid-template-areas: "att att att" "input input input" "lead . trail";
+  grid-template-areas: "att att att" "above above above" "input input input" "lead . trail";
 }
 
 /* A phone row cannot hold the text beside the model label (the selector
@@ -65,13 +65,22 @@
  * present the text takes its own row from the start. */
 @media (max-width: 639px) {
   [data-slot="aui_composer-shell"][data-density="compact"]:has([data-slot="model-selector-trigger"], [data-slot="model-selector-value"]) {
-    grid-template-areas: "att att att" "input input input" "lead . trail";
+    grid-template-areas: "att att att" "above above above" "input input input" "lead . trail";
   }
 }
 
-[data-slot="aui_composer-shell"][data-density="compact"] > :not(.aui-composer-attachments):not(.aui-composer-action-wrapper) {
+[data-slot="aui_composer-shell"][data-density="compact"] > :not(.aui-composer-attachments):not(.aui-composer-action-wrapper):not([data-slot="composer-above-input"]) {
   grid-area: input;
   min-width: 0;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] [data-slot="composer-above-input"] {
+  grid-area: above;
+  min-width: 0;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] [data-slot="composer-above-input"]:empty {
+  display: none;
 }
 
 [data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-attachments,

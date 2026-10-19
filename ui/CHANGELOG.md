@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.302] - ui-v0.5.302
+
+- `DraftRestore` used in `ComposerInputOverride` now portals into a dedicated full-width row above the composer input. The draft preview truncates to one line, restore and dismiss targets are 48 px, and the input keeps its own row. Existing fragment slots continue to work without a host change; the phone-width composer showcase demonstrates the layout.
+
 ## [0.5.301] - ui-v0.5.301
 
 - Remove the cinema page tone. The deprecated page `tone` value remains accepted and ignored, so every page follows the selected theme and mode; media picture scrims and overlays continue to use the shared look tokens.
