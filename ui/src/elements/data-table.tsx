@@ -1,9 +1,10 @@
 "use client";
 
-import { Fragment, type ComponentProps, type ReactNode } from "react";
+import { Fragment, useRef, type ComponentProps, type ReactNode } from "react";
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "lucide-react";
 import { cn } from "cn";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import { safeHref } from "./href";
 import { mono, paper } from "./surfaces";
 
@@ -46,6 +47,19 @@ export interface DataTableSort {
   direction: "asc" | "desc";
 }
 
+/** Every word the selection controls say. Replace any of them; the defaults are plain. */
+export interface DataTableSelectionLabels {
+  /** The header box that selects every row on the page. Its checked or mixed state says how many are selected. */
+  selectAll: string;
+  /** A row's box. `label` is the row's first column as text, or its id. */
+  selectRow: (label: string) => string;
+}
+
+export const DEFAULT_DATA_TABLE_SELECTION_LABELS: DataTableSelectionLabels = {
+  selectAll: "Select all rows",
+  selectRow: (label) => `Select ${label}`,
+};
+
 export const MODEL_USAGE_COLUMNS: readonly DataTableColumn<ModelUsage>[] = [
   { id: "name", header: "Model" },
   { id: "context", header: "Context", align: "end" },
@@ -86,7 +100,24 @@ export interface DataTableProps<Row = ModelUsage> extends Omit<
   locale?: string;
   /** Reference time in milliseconds for relative dates. Unset: now. */
   relativeTo?: number;
+  /** Row selection (LIBRARY-REVAMP-06). The ids of the selected rows, as `getRowId` gives them. Controlled.
+   * Ids that are not in `rows` (another page) are kept untouched. Unset: nothing is selected. */
+  selectedIds?: readonly string[];
+  /** Given, the table has a select-all box in its header and a box on every row, and calls this with the next
+   * selection (rows in table order, then any kept ids that are not on this page). Unset: no selection at all,
+   * and the table renders exactly as it did before. */
+  onSelectionChange?: (ids: string[]) => void;
+  /** Selection mode: the boxes are always shown. Otherwise they show on hover and keyboard focus, while any row
+   * is selected, and always on a touch screen. Default false. */
+  selectionMode?: boolean;
+  /** A row's name for its select box and screen readers. Unset: the first column as text, else the row id. */
+  getRowLabel?: (row: Row, index: number) => string;
+  selectionLabels?: Partial<DataTableSelectionLabels>;
 }
+
+const BOX_REVEAL =
+  "pointer-events-none opacity-0 transition-opacity motion-reduce:transition-none group-hover/table:pointer-events-auto group-hover/table:opacity-100 group-focus-within/table:pointer-events-auto group-focus-within/table:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100";
+const BOX_SHOWN = "pointer-events-auto opacity-100";
 
 function defaultRowId(row: unknown, index: number): string {
   const name = (row as { name?: unknown }).name;
@@ -187,6 +218,11 @@ export function DataTable<Row = ModelUsage>({
   emptyLabel,
   locale,
   relativeTo,
+  selectedIds = [],
+  onSelectionChange,
+  selectionMode = false,
+  getRowLabel,
+  selectionLabels,
   className,
   ...props
 }: DataTableProps<Row>) {
@@ -196,6 +232,71 @@ export function DataTable<Row = ModelUsage>({
   const formatRelativeTo = relativeTo ?? Date.now();
   const cols = (columns ??
     (MODEL_USAGE_COLUMNS as unknown as readonly DataTableColumn<Row>[]));
+  const selectable = onSelectionChange !== undefined;
+  const selectCopy: DataTableSelectionLabels = { ...DEFAULT_DATA_TABLE_SELECTION_LABELS, ...selectionLabels };
+  const anchor = useRef<string | null>(null);
+  const rowIds = rows.map((row, index) => getRowId(row, index));
+  const rowIdSet = new Set(rowIds);
+  const selectedSet = new Set(selectedIds);
+  const selectedHere = rowIds.filter((id) => selectedSet.has(id)).length;
+  const allSelected = rowIds.length > 0 && selectedHere === rowIds.length;
+  const someSelected = selectedHere > 0 && !allSelected;
+  const boxesShown = selectionMode || selectedIds.length > 0;
+  const commit = (next: Set<string>) => {
+    const here = rowIds.filter((id) => next.has(id));
+    const away = selectedIds.filter((id) => !rowIdSet.has(id));
+    onSelectionChange?.([...here, ...away]);
+  };
+  const toggleRow = (id: string, range: boolean) => {
+    const next = new Set(selectedSet);
+    if (range && anchor.current !== null && rowIdSet.has(anchor.current)) {
+      const from = rowIds.indexOf(anchor.current);
+      const to = rowIds.indexOf(id);
+      for (let i = Math.min(from, to); i <= Math.max(from, to); i++) next.add(rowIds[i]!);
+    } else {
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      anchor.current = id;
+    }
+    commit(next);
+  };
+  const toggleAll = () => {
+    const next = new Set(selectedSet);
+    for (const id of rowIds) {
+      if (allSelected) next.delete(id);
+      else next.add(id);
+    }
+    anchor.current = null;
+    commit(next);
+  };
+  const rowLabel = (row: Row, index: number, id: string): string => {
+    if (getRowLabel) return getRowLabel(row, index);
+    const first = cols[0];
+    if (!first) return id;
+    const shown = first.cell ? first.cell(row) : (row as Record<string, unknown>)[first.id];
+    return typeof shown === "string" || typeof shown === "number" ? String(shown) : id;
+  };
+  const headerBox = (name: string) => (
+    <span className={cn("flex size-6 shrink-0 items-center justify-center", boxesShown ? BOX_SHOWN : BOX_REVEAL)}>
+      <Checkbox
+        data-slot="data-table-select-all"
+        aria-label={name}
+        checked={allSelected ? true : someSelected ? "indeterminate" : false}
+        disabled={rowIds.length === 0}
+        onClick={toggleAll}
+      />
+    </span>
+  );
+  const rowBox = (row: Row, index: number, id: string, slot: string) => (
+    <span className={cn("flex size-6 shrink-0 items-center justify-center", boxesShown ? BOX_SHOWN : BOX_REVEAL)}>
+      <Checkbox
+        data-slot={slot}
+        aria-label={selectCopy.selectRow(rowLabel(row, index, id))}
+        checked={selectedSet.has(id)}
+        onClick={(event) => toggleRow(id, event.shiftKey)}
+      />
+    </span>
+  );
   const widthOf = (index: number) => (index === 0 ? "flex-1" : "w-16");
   const ariaSortFor = (column: DataTableColumn<Row>) => {
     if (!column.sortable) return undefined;
@@ -245,12 +346,22 @@ export function DataTable<Row = ModelUsage>({
       )}
       {rows.map((row, index) => (
         <div
-          key={getRowId(row, index)}
+          key={rowIds[index]}
           role="row"
           data-slot="data-table-row"
-          className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both hover:bg-foreground/[0.03] flex items-center gap-2.5 px-4 py-2.5 transition-colors duration-300"
+          aria-selected={selectable ? selectedSet.has(rowIds[index]!) : undefined}
+          data-selected={selectable && selectedSet.has(rowIds[index]!) ? "true" : undefined}
+          className={cn(
+            "fade-in slide-in-from-bottom-1 animate-in fill-mode-both hover:bg-foreground/[0.03] flex items-center gap-2.5 px-4 py-2.5 transition-colors duration-300",
+            selectable && selectedSet.has(rowIds[index]!) && "bg-primary/10 forced-colors:outline-2 forced-colors:-outline-offset-2 forced-colors:outline-[Highlight]",
+          )}
           style={{ animationDelay: `${index * 80}ms` }}
         >
+          {selectable && (
+            <span role="cell" data-slot="data-table-select-cell" className="flex shrink-0">
+              {rowBox(row, index, rowIds[index]!, "data-table-row-select")}
+            </span>
+          )}
           {cols.map((column, columnIndex) => {
             const value = formatCell(column, row, formatLocale, formatRelativeTo, formats);
             return columnIndex === 0 && !genericMode ? (
@@ -319,7 +430,7 @@ export function DataTable<Row = ModelUsage>({
           {toolbar}
         </div>
       )}
-      <div role="table" aria-label={caption ?? inheritedLabel} className="w-full">
+      <div role="table" aria-label={caption ?? inheritedLabel} className={cn("w-full", selectable && "group/table")}>
       <div
         role="rowgroup"
         data-slot="data-table-header-group"
@@ -332,6 +443,11 @@ export function DataTable<Row = ModelUsage>({
             genericMode && "hidden @md:flex",
           )}
         >
+          {selectable && (
+            <span role="columnheader" data-slot="data-table-select-header" className="mr-2.5 flex shrink-0">
+              {headerBox(selectCopy.selectAll)}
+            </span>
+          )}
           {cols.map((column, index) => (
             <span
               key={column.id}
@@ -397,13 +513,29 @@ export function DataTable<Row = ModelUsage>({
               </p>
             </div>
           )}
+          {selectable && rows.length > 0 && (
+            <div role="row" data-slot="data-table-mobile-select" className="border-foreground/[0.06] flex items-center gap-2.5 border-b px-4 py-3">
+              <span role="cell" className="flex">{headerBox(selectCopy.selectAll)}</span>
+              <span className="text-muted-foreground">{selectCopy.selectAll}</span>
+            </div>
+          )}
           {rows.map((row, index) => (
             <div
-              key={getRowId(row, index)}
+              key={rowIds[index]}
               role="row"
               data-slot="data-table-card-row"
-              className="border-foreground/[0.06] flex flex-col gap-2 border-b px-4 py-3 last:border-b-0"
+              aria-selected={selectable ? selectedSet.has(rowIds[index]!) : undefined}
+              data-selected={selectable && selectedSet.has(rowIds[index]!) ? "true" : undefined}
+              className={cn(
+                "border-foreground/[0.06] flex flex-col gap-2 border-b px-4 py-3 last:border-b-0",
+                selectable && selectedSet.has(rowIds[index]!) && "bg-primary/10 forced-colors:outline-2 forced-colors:-outline-offset-2 forced-colors:outline-[Highlight]",
+              )}
             >
+              {selectable && (
+                <div role="cell" data-slot="data-table-card-select" className="flex items-center">
+                  {rowBox(row, index, rowIds[index]!, "data-table-row-select")}
+                </div>
+              )}
               {cols.map((column) => (
                 <div
                   key={column.id}

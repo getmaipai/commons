@@ -312,3 +312,49 @@ describe("WCAG contrast for the StorageBar segments and the FileTile selected st
     expect(rule).toContain("background-color: Highlight");
   });
 });
+
+// LIBRARY-REVAMP-06 slice B: the colours MediaViewer, ShareDialog and the selected DataTable row rely on.
+// The viewer wears the kit's dark scope in both themes (a lightbox is dark), so its text pairs are read from the
+// dark root; the dialog and the table follow the page theme.
+describe("WCAG contrast for MediaViewer, ShareDialog and the selected DataTable row", () => {
+  const hex = (n: number) => Math.round(n).toString(16).padStart(2, "0");
+  /** `top` at `alpha` over `bottom`, as the browser paints it. */
+  function over(top: string, alpha: number, bottom: string): string {
+    const channel = (from: string, i: number) => parseInt(from.slice(i, i + 2), 16);
+    return "#" + [1, 3, 5].map((i) => hex(channel(top, i) * alpha + channel(bottom, i) * (1 - alpha))).join("");
+  }
+
+  test("dark scope: text, secondary text (the counter) and the card panel's text clear 4.5", () => {
+    expect(contrastRatio(requiredHex(darkRoot, "--foreground"), requiredHex(darkRoot, "--background"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(requiredHex(darkRoot, "--muted-foreground"), requiredHex(darkRoot, "--background"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(requiredHex(darkRoot, "--card-foreground"), requiredHex(darkRoot, "--card"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(requiredHex(darkRoot, "--muted-foreground"), requiredHex(darkRoot, "--card"))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test("the previous and next buttons keep their glyph above 4.5 even over a pure white picture", () => {
+    const overlay = over("#000000", 0.62, "#ffffff");
+    expect(contrastRatio(requiredHex(darkRoot, "--art-foreground"), overlay)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  for (const theme of [
+    { name: "light", block: lightRoot },
+    { name: "dark", block: darkRoot },
+  ]) {
+    test(`${theme.name}: the share dialog's reason, error and warning text clear 4.5`, () => {
+      const background = requiredHex(theme.block, "--background");
+      expect(contrastRatio(requiredHex(theme.block, "--foreground"), background)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(requiredHex(theme.block, "--destructive"), background)).toBeGreaterThanOrEqual(4.5);
+      // The warning panel tints the card with 10% of the orange hue; its text is the card text.
+      const orange = themedHues[theme.name]!["orange"] ?? requiredHex(themeBlock, "--hue-orange");
+      const warning = over(orange, 0.1, requiredHex(theme.block, "--card"));
+      expect(contrastRatio(requiredHex(theme.block, "--foreground"), warning)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(requiredHex(theme.block, "--muted-foreground"), warning)).toBeGreaterThanOrEqual(4.5);
+    });
+
+    test(`${theme.name}: a selected table row (10% primary over the card) keeps its text above 4.5`, () => {
+      const selected = over(requiredHex(theme.block, "--primary"), 0.1, requiredHex(theme.block, "--card"));
+      expect(contrastRatio(requiredHex(theme.block, "--foreground"), selected)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(requiredHex(theme.block, "--muted-foreground"), selected)).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+});

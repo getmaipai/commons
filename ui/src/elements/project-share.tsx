@@ -1,14 +1,16 @@
 "use client";
 
 import type { FC } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Select } from "../primitives/Select";
+import { ShareDialog, type ShareRole } from "./share-dialog";
 
 /**
  * PROJECTS-KIT-01. ChatGPT's project Share dialog, for a household: the
  * people the host lists (adults only; the host decides who may be shared
  * with) each with "No access", "Can use" or "Can edit". A host passes the
  * people, the copy and the handler.
+ *
+ * LIBRARY-REVAMP-06 slice B: this is now the three-role preset of `ShareDialog`
+ * (same props, same words, same behaviour).
  */
 export type ProjectShareRole = "none" | "can_use" | "can_edit";
 
@@ -32,36 +34,23 @@ export const ProjectShareDialog: FC<{
   labels?: ProjectShareLabels | undefined;
 }> = ({ open, onOpenChange, members, onRoleChange, disabled, labels }) => {
   const roleLabels = { ...ROLE_DEFAULTS, ...labels?.roles };
+  const roles: ShareRole[] = (Object.keys(ROLE_DEFAULTS) as ProjectShareRole[]).map((id) => ({ id, label: roleLabels[id] ?? id }));
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent data-slot="project-share" className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{labels?.title ?? "Share project"}</DialogTitle>
-          <DialogDescription>
-            {labels?.description ?? "Choose who in your home can use this project. People you share it with use its instructions and chats."}
-          </DialogDescription>
-        </DialogHeader>
-        {members.length === 0 ? (
-          <p className="text-muted-foreground text-sm">{labels?.empty ?? "There is no one to share with yet."}</p>
-        ) : (
-          <ul className="grid gap-3">
-            {members.map((member) => (
-              <li key={member.id} className="flex items-center justify-between gap-3">
-                <span className="min-w-0 truncate">{member.name}</span>
-                <Select
-                  aria-label={member.name}
-                  value={member.role}
-                  disabled={disabled}
-                  options={["none", "can_use", "can_edit"]}
-                  getLabel={(role) => roleLabels[role as ProjectShareRole] ?? role}
-                  // A failed change is the host's to report; the select stays on the stored role.
-                  onValueChange={(role) => void Promise.resolve(onRoleChange(member.id, role as ProjectShareRole)).catch(() => {})}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </DialogContent>
-    </Dialog>
+    <ShareDialog
+      dataSlot="project-share"
+      open={open}
+      onOpenChange={onOpenChange}
+      members={members}
+      roles={roles}
+      onRoleChange={(memberId, role) => onRoleChange(memberId, role as ProjectShareRole)}
+      disabled={disabled}
+      showDone={false}
+      showAvatars={false}
+      labels={{
+        title: labels?.title ?? "Share project",
+        description: labels?.description ?? "Choose who in your home can use this project. People you share it with use its instructions and chats.",
+        empty: labels?.empty ?? "There is no one to share with yet.",
+      }}
+    />
   );
 };

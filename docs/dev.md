@@ -197,6 +197,102 @@ No existing part changes. `MediaViewer`, the `ShareDialog` generalisation and
   two rows for these parts are written in that file by the Home session that
   pins this tag, from the design note's section 4.
 
+## LIBRARY-REVAMP-06 slice B: MediaViewer, ShareDialog and DataTable selection (`ui-v0.5.283`)
+
+Three additive changes for the Library page (Home
+`docs/design/library-2026-10-18.md`, sections 3.7 to 3.9, 3.12 to 3.14 and 4).
+Every default is unchanged: `ProjectShareDialog` keeps its words, slot,
+menus and tests, and a `DataTable` without `onSelectionChange` renders the
+same markup as before (a test compares the HTML).
+
+- **`MediaViewer`** (element, `ui/src/elements/media-viewer.tsx`, maths in
+  `media-viewer-logic.ts`). A full-screen dialog under the kit's `dark` scope
+  (a lightbox is dark in both themes). It takes `items`
+  (`{ id, kind, url, posterUrl?, name, mediaType? }`), a controlled
+  `currentId` and `onCurrentIdChange`. It fetches, routes and stores nothing.
+  - *Close and the URL.* `onOpenChange(false)` then `onClose()` run when the
+    person closes it (Escape, the close button, a click outside). A host that
+    closes it by setting `open` false is not called back, so a URL restore in
+    `onClose` never answers the host's own close.
+  - *Kinds.* A picture is a zoomable stage; video and audio play in the kit
+    `Player` (keyed by file, `mediaSession` off so the viewer never takes the
+    shell's audio session); anything else shows the kind icon, name and an
+    Open link, or the host's `unsupportedActions`. A script address gets no
+    Open link (`safeHref`).
+  - *Zoom.* Buttons, `+` `-` `0`, wheel (a trackpad pinch arrives as Ctrl and
+    wheel), double click or double tap (1 to 2.5 and back), two-finger pinch,
+    drag to pan, never past the picture's own edge. Max 4 (`maxZoom`). A new
+    file starts fitted. Escape leaves the zoom first, then the viewer. Arrow
+    keys pan while zoomed and move on when fitted.
+  - *Swipe.* Touch or pen, sideways, 56 px, only at the fitted size, and only
+    on pictures and files that cannot be previewed (a swipe on a video would
+    fight its seek bar).
+  - *Focus.* Focus goes to the stage on open so the arrow keys work at once;
+    the dialog traps focus; on close focus returns to the opener (captured on
+    open), or to `returnFocusTo()` when the opener is gone (a grid that
+    redrew). Arrow keys inside the Player belong to the Player.
+  - *Announcements.* The file name is the dialog's name; a polite status
+    line says "Name, 3 of 24" when the person moves, never on open.
+  - *Slots.* `details` (node or `(item, index)` render prop): a side panel
+    from 960 px wide, open to start; a bottom `Sheet` below, closed to start;
+    `I` and the Details button toggle it; `detailsOpen` and
+    `onDetailsOpenChange` control it. `toolbar` (node or render prop) holds
+    the host's Share, Download, Delete and Edit; the slot forces 48 px on its
+    buttons and links.
+  - *States.* A picture shows a skeleton until it loads and, on failure, the
+    plain sentence with Try again (a new `<img>` per try). Reduced motion
+    removes the picture's transition and the dialog's animation; forced colours
+    draw a border on the arrow buttons. No neighbour is prefetched: the
+    viewer asks for the picture on screen only.
+- **`ShareDialog`** (element, `ui/src/elements/share-dialog.tsx`).
+  `ProjectShareDialog` is now its three-role preset (`dataSlot` and words
+  kept, no faces, no Done button). `roles` defaults to `FILE_SHARE_ROLES`
+  (`off` "No access", `view` "Can view"); exactly two roles draw a switch
+  (first off, second on), more draw the same menu as before. A `household`
+  row ("Everyone in the home") is drawn first. A row's `disabledReason` locks
+  it and is drawn as text under the name and tied to the control with
+  `aria-describedby`, never only a tooltip. `busy` and `error` work per row and
+  for the whole dialog; `restrictions` is a slot above the list. `confirm` is
+  the warning step for the household or a child: it replaces the list and
+  Done, takes focus, its Escape is `onCancel` (the dialog stays open), and a
+  rejected `onConfirm` is the host's to report. A change reports through the
+  row's own `onChange` or the dialog's `onRoleChange(rowId, roleId)`; a
+  rejected promise never breaks the dialog.
+- **`DataTable` selection** (`ui/src/elements/data-table.tsx`). New props:
+  `selectedIds`, `onSelectionChange` (selection exists only when this is
+  given), `selectionMode` (boxes always shown; otherwise on hover, on
+  keyboard focus, while anything is selected, and always on touch),
+  `getRowLabel` and `selectionLabels`. A header box selects every row on the
+  page and shows the mixed state; each row has a box with a 48 px hit area,
+  Shift-click selects a range from the last box, and rows carry
+  `aria-selected`. Ids that are not on this page are kept. The phone card
+  layout has the same boxes and a select-all line. The thumbnail cell needs no
+  new API: the existing `cell` render of the first column does it
+  (`DataTableSelectionShowcase`). `Checkbox` now draws a minus for
+  `checked="indeterminate"` (it showed a check with no fill before).
+- **Choices where the design note was open.** The note names `onClose` and
+  `currentId` but no change callback, so it is `onCurrentIdChange`. The
+  note's "selection props" are flat props, as `FileGrid` has them. The
+  viewer's details panel opens to start on a wide screen only. The note's
+  "share confirm" screenshot shows the delete confirm, so the share step is
+  a warning panel with the kit `Alert`, not a `DestructiveConfirm`.
+- **Ledger rows.** The decisions ledger lives in Home; the Home session that
+  pins this tag adds these two rows to `docs/design/UI-DECISIONS.md`:
+  1. `MediaViewer` (element). Decision: Jesse, 2026-10-18 (Library design
+     note, section 4, rule 9c). Why no existing part does the job:
+     `MediaGrid` has a minimal dialog and `ImageGallery` has arrows and an
+     edit reveal, but neither zooms, has a details panel, plays video or
+     audio, or carries a close-to-URL contract. It composes `Player`, `Dialog`
+     and `Sheet`. Library: none new (media-chrome through `Player`). Version:
+     `ui-v0.5.283`.
+  2. `ShareDialog` (element, generalises `ProjectShareDialog`; `DataTable`
+     selection rides on the same row). Decision: Jesse, 2026-10-18 (Library
+     design note, section 4). Why: the shipped dialog fixes three project
+     roles; files need on and off per person, an "Everyone in the home" row,
+     visible reasons a row is locked, and a warning step. Additive: the
+     project dialog is the preset and `DataTable` gains opt-in selection.
+     Library: none new. Version: `ui-v0.5.283`.
+
 ## Workspace status
 
 - `ui/`: `ui-v0.1.0` landed. The kit, extracted read-only from the
