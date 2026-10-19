@@ -894,7 +894,8 @@ def test_answer_block_has_a_valid_fixture_per_v1_kind():
     names = {p.name for p in _answer_block_fixtures("valid")}
     # One per kind, plus the GENUI-13a fixture that carries `after_paragraph`.
     assert names == {f"valid-{k}.json" for k in V1_KINDS} | {
-        "valid-after-paragraph.json"
+        "valid-after-paragraph.json",
+        "valid-story_feed-section-style.json",
     }
 
 
