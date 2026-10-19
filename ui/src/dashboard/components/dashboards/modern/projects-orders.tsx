@@ -17,10 +17,10 @@ import avatar6 from "../../../assets/images/profile/user-6.png"
 type StatusKey = "Processing" | "Delayed" | "Delivered" | "Cancelled";
 
 const statusConfig: Record<StatusKey, { bg: string; text: string }> = {
-  Processing: { bg: "bg-[#f54900]/10", text: "text-[#f54900]" },
-  Delayed: { bg: "bg-[#ec003f]/10", text: "text-[#ec003f]" },
-  Delivered: { bg: "bg-[#009689]/10", text: "text-[#009689]" },
-  Cancelled: { bg: "bg-[#ec003f]/10", text: "text-[#ec003f]" },
+  Processing: { bg: "bg-status-warning/10", text: "text-status-warning-ink" },
+  Delayed: { bg: "bg-destructive/10", text: "text-destructive" },
+  Delivered: { bg: "bg-status-ok/10", text: "text-status-ok-ink" },
+  Cancelled: { bg: "bg-destructive/10", text: "text-destructive" },
 };
 
 const orders: {

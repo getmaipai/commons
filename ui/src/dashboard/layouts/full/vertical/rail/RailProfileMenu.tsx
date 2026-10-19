@@ -96,11 +96,11 @@ export default function RailProfileMenu({
   const systemLine = status ? `System: ${STATUS_WORDS[status.level]}` : null;
   // A count is red only when something urgent waits (CHAT-CALM-ERRORS-01d);
   // anything else gets a neutral count.
-  const countTone = notifications?.urgent ? "bg-destructive text-white" : "bg-foreground text-background";
+  const countTone = notifications?.urgent ? "bg-destructive text-destructive-foreground" : "bg-foreground text-background";
   // Inside a menu row the kit item recolors every descendant on focus
   // (`focus:**:text-accent-foreground`), which put light text on this light
   // badge in dark mode. Important keeps the badge's own pair readable.
-  const menuCountTone = notifications?.urgent ? "bg-destructive text-white!" : "bg-foreground text-background!";
+  const menuCountTone = notifications?.urgent ? "bg-destructive text-destructive-foreground!" : "bg-foreground text-background!";
   const reasons = [
     notifications && notifications.count > 0 ? `${notifications.count} notification${notifications.count === 1 ? "" : "s"}` : null,
     systemLine,
@@ -124,7 +124,7 @@ export default function RailProfileMenu({
               />
             }
           >
-            <Avatar className={cn("size-8", incognito?.on && "ring-2 ring-violet-500")}>
+            <Avatar className={cn("size-8", incognito?.on && "ring-2 ring-hue-violet")}>
               <AvatarFallback className="text-xs font-medium">{initials(displayName)}</AvatarFallback>
             </Avatar>
             {count > 0 ? (
@@ -202,9 +202,9 @@ export default function RailProfileMenu({
               closeOnClick={false}
               onClick={() => incognito.onChange(!incognito.on)}
             >
-              <VenetianMask aria-hidden className={cn(incognito.on && "text-violet-500")} />
+              <VenetianMask aria-hidden className={cn(incognito.on && "text-hue-violet")} />
               <span className="flex-1">Incognito</span>
-              <span className={cn("text-[13px]", incognito.on ? "font-medium text-violet-500" : "text-muted-foreground")}>{incognito.on ? "On" : "Off"}</span>
+              <span className={cn("text-[13px]", incognito.on ? "font-medium text-hue-violet" : "text-muted-foreground")}>{incognito.on ? "On" : "Off"}</span>
             </DropdownMenuItem>
           ) : null}
           <DropdownMenuSeparator className="my-1.5" />

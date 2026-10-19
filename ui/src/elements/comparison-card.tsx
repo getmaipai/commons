@@ -50,7 +50,7 @@ export function ComparisonCard({
               key={option.id}
               className={cn(
                 "flex min-w-0 flex-1 flex-col gap-2 rounded-xl p-3 transition-colors",
-                recommended ? "bg-blue-500/[0.07] dark:bg-blue-400/10" : field,
+                recommended ? "bg-primary/[0.07]" : field,
               )}
             >
               <div className="flex flex-col gap-0.5">
@@ -62,7 +62,7 @@ export function ComparisonCard({
                     <span
                       className={cn(
                         mono,
-                        "shrink-0 text-blue-600 dark:text-blue-400",
+                        "shrink-0 text-primary-ink",
                       )}
                     >
                       pick
@@ -86,7 +86,7 @@ export function ComparisonCard({
                       {absent ? (
                         <MinusIcon className="text-foreground/20 size-3 shrink-0" />
                       ) : (
-                        <CheckIcon className="size-3 shrink-0 text-emerald-500" />
+                        <CheckIcon className="size-3 shrink-0 text-status-ok" />
                       )}
                       <span
                         className={cn(

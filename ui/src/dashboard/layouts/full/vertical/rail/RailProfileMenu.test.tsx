@@ -91,7 +91,7 @@ describe("STATUS-COLORS-01 menu count badge", () => {
   // in dark mode. The badge's own text color must win over that rule.
   test.each([
     [false, "bg-foreground", "text-background!"],
-    [true, "bg-destructive", "text-white!"],
+    [true, "bg-destructive", "text-destructive-foreground!"],
   ])("count badge (urgent %p) keeps its own text color through item focus", async (urgent, bg, text) => {
     const view = await openMenu({ notifications: { count: 22, urgent, onOpen: () => {} } });
     const badge = view.getByRole("menuitem", { name: /Notifications/ }).querySelector("[data-slot='rail-profile-menu-badge']");

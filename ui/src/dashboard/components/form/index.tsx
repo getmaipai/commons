@@ -158,7 +158,7 @@ const Page = () => {
                   <Clock
                     width={18}
                     height={18}
-                    className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none'
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none'
                   />
                 </div>
               </div>
@@ -170,7 +170,7 @@ const Page = () => {
                   <CreditCard
                     width={20}
                     height={20}
-                    className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500'
+                    className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
                   />
                   <Input
                     id='card'
@@ -209,14 +209,14 @@ const Page = () => {
               </div>
 
               <div>
-                <Label htmlFor='error-comment' className='text-red-600'>
+                <Label htmlFor='error-comment' className='text-destructive'>
                   Description
                 </Label>
                 <Textarea
                   id='error-comment'
                   placeholder='Leave a comment...'
                   rows={4}
-                  className='border-red-600 text-red-600 focus-visible:border-red-600 mt-2'
+                  className='border-destructive text-destructive focus-visible:border-destructive mt-2'
                 />
               </div>
             </div>
@@ -325,7 +325,7 @@ const Page = () => {
                   />
                   <button
                     onClick={handleCopy}
-                    className='px-3 py-1 text-sm rounded-md border border-ld bg-primary/10 dark:bg-primary/10 text-primary hover:bg-gray-200'>
+                    className='px-3 py-1 text-sm rounded-md border border-ld bg-primary/10 dark:bg-primary/10 text-primary hover:bg-accent'>
                     {copied ? 'Copied' : 'Copy'}
                   </button>
                 </div>

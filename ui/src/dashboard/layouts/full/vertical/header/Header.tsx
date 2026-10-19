@@ -59,7 +59,7 @@ export function IncognitoToggle({ on, onChange, tourId }: { on: boolean; onChang
       <Button
         type="button"
         variant="ghost"
-        className="h-9 gap-1.5 rounded-full border border-violet-400 bg-violet-600 px-3 text-sm font-medium text-white cursor-pointer hover:bg-violet-500 hover:text-white focus-visible:ring-violet-500"
+        className="h-9 gap-1.5 rounded-full border border-hue-violet bg-hue-violet px-3 text-sm font-medium text-hue-violet-foreground cursor-pointer hover:bg-hue-violet/90 hover:text-hue-violet-foreground focus-visible:ring-hue-violet"
         aria-label="Incognito On"
         data-tour={tourId}
         aria-pressed="true"
@@ -79,7 +79,7 @@ export function IncognitoToggle({ on, onChange, tourId }: { on: boolean; onChang
       // Owner ruling, 2026-09-27, accessibility touch-target fix - see
       // docs/BACKLOG.md SHELL-09. Keep the existing 40px visual control;
       // the shared kit's hitArea(1) gives it a 48px tappable area.
-      className={cn("h-10 w-10 rounded-full cursor-pointer hover:bg-violet-500/10 focus-visible:ring-violet-500 text-muted-foreground", hitArea(1))}
+      className={cn("h-10 w-10 rounded-full cursor-pointer hover:bg-hue-violet/10 focus-visible:ring-hue-violet text-muted-foreground", hitArea(1))}
       aria-label="Incognito Off"
       data-tour={tourId}
       aria-pressed="false"

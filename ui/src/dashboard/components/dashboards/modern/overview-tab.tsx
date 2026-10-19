@@ -30,7 +30,7 @@ export default function OverviewTab() {
 
   const getGreetingIcon = () => {
     if (greeting === 'Good Morning' || greeting === 'Good Afternoon') {
-      return <Sun size={25} color="orange" />;
+      return <Sun size={25} className="text-status-warning" />;
     } else {
       return <Moon size={25} />;
     }

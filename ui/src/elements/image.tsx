@@ -342,7 +342,7 @@ function ImageZoom({ src, alt = "Image preview", children }: ImageZoomProps) {
             data-slot="image-zoom-overlay"
             role="dialog"
             aria-modal="true"
-            className="aui-image-zoom-overlay fade-in animate-in fixed inset-0 z-50 flex items-center justify-center bg-black/80 duration-200"
+            className="aui-image-zoom-overlay fade-in animate-in fixed inset-0 z-50 flex items-center justify-center bg-background/90 duration-200"
             onClick={handleClose}
             aria-label="Zoomed image"
           >

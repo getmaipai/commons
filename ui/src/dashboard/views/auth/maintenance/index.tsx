@@ -9,7 +9,7 @@ import maintenance from "../../../assets/images/backgrounds/maintenance.svg"
 const Maintenance = () => {
   return (
     <>
-      <div className="h-screen flex items-center  justify-center bg-white dark:bg-card">
+      <div className="h-screen flex items-center  justify-center bg-card">
         <div className="text-center">
           <div className="max-w-3xl">
             <img

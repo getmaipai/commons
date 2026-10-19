@@ -95,6 +95,8 @@
    * render time - a fixed color, same in both themes, like --hue-violet
    * itself. */
   --hue-violet-deep: #7a1fd6;
+  /* Text and icons on a --hue-violet fill (the incognito marker): white clears 4.5:1 on the violet in both themes. */
+  --hue-violet-foreground: #ffffff;
   --hue-teal: #00e3ae;
   --hue-orange: #ff8a35;
   --hue-pink: #ff3e9a;
@@ -387,7 +389,7 @@
   background-color: var(--sidebar-accent);
 }
 
-/* 1px `#24405F`, 12px above and below (owner findings, "The Studio
+/* 1px hairline in the sidebar text color, 12px above and below (owner findings, "The Studio
  * look, the numbers," 2026-09-20 18:15), inset 7px from the rail's
  * own true edge - owner ruling, ui-v0.4.3, restating "the rail
  * geometry, exactly" 2026-09-20 17:40's own literal number for this
@@ -414,12 +416,12 @@
   left: 7px;
   right: 7px;
   height: 1px;
-  background: #24405F;
+  background: color-mix(in srgb, var(--sidebar-foreground) 14%, transparent);
 }
 /* The active item's exact reference colors (owner findings, "The
  * Studio look, the numbers," 2026-09-20 18:15): the gradient
- * (`#3E1BB2` to `#311893`), a 1px inset ring `#6E3DF8`, and a soft
- * violet glow - plain CSS, not a `data-[active=true]:` Tailwind
+ * (the look's sidebar accent over the sidebar), a 1px inset ring and a soft
+ * glow in the same accent - plain CSS, not a `data-[active=true]:` Tailwind
  * variant (this file's own established reason: a stacked custom-
  * variant-plus-attribute-selector combo isn't reliably resolved by
  * `cn()`'s tailwind-merge, the same gap HOME-UI-02c found). Layered
@@ -433,11 +435,11 @@
  * (kept as the paint-order base, never visible under the gradient). */
 [data-slot="sidebar-menu-button"][data-active="true"],
 [data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"][data-active="true"] {
-  background-image: linear-gradient(135deg, #3E1BB2, #311893);
-  box-shadow: inset 0 0 0 1px #6E3DF8, 0 0 12px color-mix(in srgb, #6E3DF8 35%, transparent);
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--sidebar-primary) 38%, var(--sidebar)), color-mix(in srgb, var(--sidebar-primary) 24%, var(--sidebar)));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sidebar-primary) 60%, transparent), 0 0 12px color-mix(in srgb, var(--sidebar-primary) 35%, transparent);
 }
 [data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-menu-button"][data-active="true"] {
-  background-color: var(--hue-violet);
+  background-color: var(--sidebar-accent);
 }
 /* Lets the row's hit-area pseudo-element (sidebar.tsx's own
  * `hitArea(1)`) actually extend the real, hit-testable click region
@@ -693,6 +695,8 @@
   --weather-thunderstorm-night-to: #241f42;
   --weather-ink: #ffffff;
   --weather-scrim: rgb(0 0 0 / 0.16);
+  --weather-sun-glow: rgb(255 244 200 / 0.22);
+  --weather-moon-glow: rgb(215 228 255 / 0.2);
 }
 
 @media (max-width: 639px) {
@@ -1020,6 +1024,16 @@ body {
 
 @theme inline {
   --color-background: var(--background);
+  --color-status-ok: var(--status-ok);
+  --color-status-warning: var(--status-warning);
+  --color-status-error: var(--status-error);
+  --color-status-unknown: var(--status-unknown);
+  --color-hue-violet: var(--hue-violet);
+  --color-hue-violet-foreground: var(--hue-violet-foreground);
+  /* Readable text in a status or accent hue: the token pulled toward the foreground, so it clears 4.5:1 on the page in every look and mode. */
+  --color-status-ok-ink: color-mix(in srgb, var(--status-ok) 60%, var(--foreground));
+  --color-status-warning-ink: color-mix(in srgb, var(--status-warning) 60%, var(--foreground));
+  --color-primary-ink: color-mix(in srgb, var(--primary) 60%, var(--foreground));
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -1343,7 +1357,7 @@ body {
   height: calc(var(--s) * 1px);
   opacity: var(--o);
   rotate: 7deg;
-  background: linear-gradient(to bottom, transparent, #fff);
+  background: linear-gradient(to bottom, transparent, var(--weather-ink));
   animation: wx-rain var(--d) linear var(--dl) infinite;
 }
 [data-slot="weather-card"] [data-fx="flake"] {
@@ -1353,7 +1367,7 @@ body {
   height: calc(var(--s) * 1px);
   border-radius: 9999px;
   opacity: var(--o);
-  background: #fff;
+  background: var(--weather-ink);
   animation: wx-snow var(--d) linear var(--dl) infinite;
 }
 [data-slot="weather-card"] [data-fx="star"] {
@@ -1363,7 +1377,7 @@ body {
   height: calc(var(--s) * 1px);
   border-radius: 9999px;
   opacity: var(--o);
-  background: #fff;
+  background: var(--weather-ink);
   animation: wx-twinkle var(--d) ease-in-out var(--dl) infinite alternate;
 }
 [data-slot="weather-card"] [data-fx="cloud"] {
@@ -1372,7 +1386,7 @@ body {
   width: calc(var(--s) * 1px);
   height: calc(var(--s) * 0.3px);
   border-radius: 9999px;
-  background: rgb(255 255 255 / var(--o));
+  background: color-mix(in srgb, var(--weather-ink) calc(var(--o) * 100%), transparent);
   filter: blur(14px);
   animation: wx-drift var(--d) ease-in-out var(--dl) infinite alternate;
 }
@@ -1381,7 +1395,7 @@ body {
   left: -20%;
   width: 140%;
   height: calc(var(--s) * 1%);
-  background: linear-gradient(to right, transparent, rgb(255 255 255 / var(--o)), transparent);
+  background: linear-gradient(to right, transparent, color-mix(in srgb, var(--weather-ink) calc(var(--o) * 100%), transparent), transparent);
   filter: blur(10px);
   animation: wx-fog var(--d) ease-in-out var(--dl) infinite alternate;
 }
@@ -1392,18 +1406,18 @@ body {
   width: 200px;
   height: 200px;
   border-radius: 9999px;
-  background: radial-gradient(circle, rgb(255 244 200 / 0.22), transparent 68%);
+  background: radial-gradient(circle, var(--weather-sun-glow), transparent 68%);
   animation: wx-pulse 7s ease-in-out infinite alternate;
 }
 [data-slot="weather-card"] [data-fx="moon"] {
   width: 150px;
   height: 150px;
-  background: radial-gradient(circle, rgb(215 228 255 / 0.2), transparent 68%);
+  background: radial-gradient(circle, var(--weather-moon-glow), transparent 68%);
 }
 [data-slot="weather-card"] [data-fx="flash"] {
   inset: 0;
   opacity: 0;
-  background: #fff;
+  background: var(--weather-ink);
   animation: wx-flash 7s linear infinite;
 }
 @keyframes wx-rain {
@@ -1459,23 +1473,23 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
 
 /* MEDIA-PLAYER-01: tokens for anything drawn over a picture (art), shared by
  * the Player, the Billboard and the media tile overlay (MediaShelf), and open
- * to any app with artwork (News included). Words and controls over art are
- * light-on-dark in both themes. An app restyles them by setting values here
+ * to any app with artwork (News included). Words and controls over art follow the
+ * selected look and mode (the cinema page tone keeps them light-on-dark). An app restyles them by setting values here
  * (the Videos app's red progress accent), never by touching a part. The
  * Player maps Media Chrome's own --media-* variables from these. */
 :root {
   /* The played-share bar on tiles and the Player's time range. */
   --progress-accent: var(--primary);
-  /* Behind a picture that has not loaded, and the letterbox. */
-  --art-surface: #000000;
-  /* Text and icons over art. */
-  --art-foreground: #ffffff;
+  /* Behind a picture that has not loaded, and the letterbox: the look's own page tone. */
+  --art-surface: var(--background);
+  /* Text and icons over art: the look's foreground. */
+  --art-foreground: var(--foreground);
   /* The unplayed part of a bar over art. */
-  --art-track: color-mix(in srgb, #ffffff 30%, transparent);
+  --art-track: color-mix(in srgb, var(--foreground) 30%, transparent);
   /* The bottom gradient that keeps controls readable over any picture. */
-  --art-scrim: linear-gradient(to top, color-mix(in srgb, #000000 78%, transparent), transparent);
+  --art-scrim: linear-gradient(to top, color-mix(in srgb, var(--background) 78%, transparent), transparent);
   /* A chip or panel over art (running time, the resume line, Up next). */
-  --art-overlay: color-mix(in srgb, #000000 62%, transparent);
+  --art-overlay: color-mix(in srgb, var(--background) 62%, transparent);
   --art-radius: var(--radius-md);
   --player-radius: var(--radius-lg);
   /* MEDIA-POLISH-01: the small line over a Billboard title; the progress accent unless a tone says otherwise. */
@@ -1493,9 +1507,9 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
  * its root `data-page-tone="cinema"`; nothing else selects it.
  *
  * CINEMA-NEUTRAL-01: the tone follows the ACTIVE look instead of a fixed navy
- * set. The page is the look's `--background` one step darker (25 percent
- * toward black, its lightness capped at 0.2 so a light look also lands dark),
- * the rail 50 percent toward black, and every surface, border and muted text
+ * set. The page is the look's `--background` one step darker (its
+ * lightness capped at 0.2 so a light look also lands dark, then its lightness
+ * scaled by 0.8), the rail by 0.57, and every surface, border and muted text
  * is a mix of that page toward a bright copy of the look's `--foreground`.
  * Hue and chroma stay the look's own, so Neutral is a neutral dark grey and a
  * tinted look keeps its tint. Primary, ring and destructive are the look's
@@ -1506,8 +1520,8 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
  * from the look's tokens, which body does not redefine. Stage 2 on body's
  * children (the app root and the portals that menus and dialogs mount in)
  * assigns the real tokens from those, so nothing reads itself.
- * Kept from the old tone: color-scheme dark, the red `--progress-accent`
- * (played-share bar, time range) and the Billboard eyebrow in the accent.
+ * Kept from the old tone: color-scheme dark, the `--progress-accent`, now the look's destructive
+ * red (played-share bar, time range) and the Billboard eyebrow in the accent.
  * Shared: News and the other media apps select the same tone. */
 :root:has([data-page-tone="cinema"]) {
   color-scheme: dark;
@@ -1516,8 +1530,8 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   color-scheme: dark;
   --cinema-base: oklch(from var(--background) min(l, 0.2) c h);
   --cinema-fg: oklch(from var(--foreground) max(l, 0.96) c h);
-  --cinema-page: color-mix(in srgb, var(--cinema-base), black 25%);
-  --cinema-rail: color-mix(in srgb, var(--cinema-base), black 50%);
+  --cinema-page: oklch(from var(--cinema-base) calc(l * 0.8) c h);
+  --cinema-rail: oklch(from var(--cinema-base) calc(l * 0.57) c h);
   --cinema-card: color-mix(in srgb, var(--cinema-page), var(--cinema-fg) 7%);
   --cinema-pane: color-mix(in srgb, var(--cinema-page), var(--cinema-fg) 11%);
   --cinema-border: color-mix(in srgb, var(--cinema-page), var(--cinema-fg) 17%);
@@ -1558,16 +1572,16 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   --sidebar-accent: var(--cinema-pane);
   --sidebar-accent-foreground: var(--cinema-fg);
   --sidebar-border: var(--cinema-pane);
-  --elevation-color: oklch(0 0 0 / 0.55);
-  --elevation-hairline: oklch(1 0 0 / 0.07);
+  --elevation-color: oklch(from var(--cinema-base) calc(l * 0.25) c h / 0.55);
+  --elevation-hairline: color-mix(in srgb, var(--cinema-fg) 7%, transparent);
   /* The shell's chrome tones: the rail one step darker than the page. */
   --app-rail-bg: var(--cinema-rail);
   --shell-main: var(--cinema-page);
   --shell-rail: var(--cinema-rail);
   --shell-history: var(--cinema-page);
   --shell-divider: var(--cinema-pane);
-  /* The video app's accent: the played-share bar and the time range are red; the Billboard's eyebrow takes the look's primary. */
-  --progress-accent: #ff4b62;
+  /* The video app's accent: the played-share bar and the time range take the look's destructive red; the Billboard's eyebrow takes the look's primary. */
+  --progress-accent: var(--cinema-destructive);
   --art-eyebrow: var(--cinema-primary);
 }
 

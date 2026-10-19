@@ -61,7 +61,7 @@ export function GuardrailNotice({
             <HeartHandshakeIcon className="size-3.5" />
           </span>
         ) : (
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/12 text-amber-600 dark:text-amber-400">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-status-warning/12 text-status-warning-ink">
             <ShieldIcon className="size-3.5" />
           </span>
         )}

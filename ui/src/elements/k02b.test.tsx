@@ -69,7 +69,7 @@ describe("ELT-T1-K02b additive props", () => {
   test("chart honors explicit trend and whether an upward change is good", () => {
     const view = render(<Chart label="Latency" value="120" delta="+8" trend="up" upIsGood={false} points={[90, 120]} visibleCount={2} />);
     const delta = view.container.querySelector("[data-trend='up']")!;
-    expect(delta.className).toContain("text-red-600");
+    expect(delta.className).toContain("text-destructive");
     view.rerender(<Chart label="Latency" value="120" delta="+8" points={[90, 120]} visibleCount={2} />);
     expect(view.container.querySelector("[data-trend='up']")).toBeTruthy();
   });

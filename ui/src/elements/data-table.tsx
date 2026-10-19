@@ -144,7 +144,7 @@ function formatCell<Row>(column: DataTableColumn<Row>, row: Row, locale: string,
   }
   if (format.kind === "badge") {
     const tone = format.tones?.[raw] ?? "neutral";
-    const toneClass = tone === "success" ? "text-emerald-700 dark:text-emerald-300" : tone === "warning" ? "text-amber-700 dark:text-amber-300" : tone === "danger" ? "text-red-700 dark:text-red-300" : "text-muted-foreground";
+    const toneClass = tone === "success" ? "text-status-ok-ink" : tone === "warning" ? "text-status-warning-ink" : tone === "danger" ? "text-destructive" : "text-muted-foreground";
     return <span data-tone={tone} className={toneClass}>{raw}</span>;
   }
   if (format.kind === "link") {

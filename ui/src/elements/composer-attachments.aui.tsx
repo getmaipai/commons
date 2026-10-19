@@ -75,7 +75,7 @@ export function ComposerAttachmentDropzone({
   return (
     <ComposerPrimitive.AttachmentDropzone
       className={cn(
-        "data-[dragging=true]:border-dashed data-[dragging=true]:bg-blue-500/[0.04]",
+        "data-[dragging=true]:border-dashed data-[dragging=true]:bg-primary/[0.04]",
         className,
       )}
       {...props}

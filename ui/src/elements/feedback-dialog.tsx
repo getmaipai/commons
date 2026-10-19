@@ -91,7 +91,7 @@ export function FeedbackDialog({
       >
         {sent && (
           <>
-            <CheckIcon className="size-4 shrink-0 text-emerald-500" />
+            <CheckIcon className="size-4 shrink-0 text-status-ok" />
             Thanks. That helps us tune the model.
           </>
         )}

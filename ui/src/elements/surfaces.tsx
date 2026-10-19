@@ -76,7 +76,7 @@ export const labelSwapOut =
 export const collapsePanel =
   "overflow-hidden data-[state=open]:animate-[collapsible-down_200ms_cubic-bezier(0.32,0.72,0,1)_forwards] data-[state=closed]:animate-[collapsible-up_200ms_cubic-bezier(0.32,0.72,0,1)_forwards] motion-reduce:animate-none";
 
-export const live = "text-blue-500 dark:text-blue-400";
+export const live = "text-primary-ink";
 
 export const mono = "font-mono text-[11px] tracking-tight";
 

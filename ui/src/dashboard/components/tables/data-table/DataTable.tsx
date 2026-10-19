@@ -43,14 +43,14 @@ import { Label } from '../../ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 
 const badgeColors = [
-  'bg-blue-100 text-blue-700',
-  'bg-green-100 text-green-700',
-  'bg-yellow-100 text-yellow-700',
-  'bg-purple-100 text-purple-700',
-  'bg-pink-100 text-pink-700',
-  'bg-indigo-100 text-indigo-700',
-  'bg-teal-100 text-teal-700',
-  'bg-orange-100 text-orange-700',
+  'bg-primary/15 text-foreground',
+  'bg-status-ok/15 text-foreground',
+  'bg-status-warning/15 text-foreground',
+  'bg-chart-1/15 text-foreground',
+  'bg-chart-2/15 text-foreground',
+  'bg-chart-3/15 text-foreground',
+  'bg-chart-4/15 text-foreground',
+  'bg-chart-5/15 text-foreground',
 ]
 
 export function getColorForValue(value: string) {
@@ -149,20 +149,20 @@ const DataTable = <T extends Record<string, unknown>>({
               {[...Array(fullStars)].map((_, i) => (
                 <Star
                   key={`full-${i}`}
-                  className='text-[#f3d55b] w-6 h-6 shrink-0'
+                  className='text-status-warning w-6 h-6 shrink-0'
                   fill='currentColor'
                 />
               ))}
               {halfStar && (
                 <StarHalf
-                  className='text-[#f3d55b] w-6 h-6 shrink-0'
+                  className='text-status-warning w-6 h-6 shrink-0'
                   fill='currentColor'
                 />
               )}
               {[...Array(emptyStars)].map((_, i) => (
                 <Star
                   key={`empty-${i}`}
-                  className='text-[#f3d55b] w-6 h-6 shrink-0'
+                  className='text-status-warning w-6 h-6 shrink-0'
                 />
               ))}
             </div>
@@ -171,11 +171,11 @@ const DataTable = <T extends Record<string, unknown>>({
 
         if (typeof value === 'boolean') {
           return value ? (
-            <Badge className='px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700'>
+            <Badge className='px-2 py-1 rounded-full text-xs font-semibold bg-destructive/15 text-destructive'>
               Inactive
             </Badge>
           ) : (
-            <Badge className='px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700'>
+            <Badge className='px-2 py-1 rounded-full text-xs font-semibold bg-status-ok/15 text-status-ok-ink'>
               Active
             </Badge>
           )
@@ -183,7 +183,7 @@ const DataTable = <T extends Record<string, unknown>>({
 
         if (col.toLowerCase().includes('id')) {
           return (
-            <span className='text-gray-900 dark:text-white font-medium max-w-50 truncate whitespace-nowrap'>
+            <span className='text-foreground font-medium max-w-50 truncate whitespace-nowrap'>
               {renderValue(value)}
             </span>
           )
@@ -272,8 +272,8 @@ const DataTable = <T extends Record<string, unknown>>({
                       key={k}
                       className={
                         k === 'name'
-                          ? 'text-gray-900 dark:text-white font-semibold max-w-50 truncate whitespace-nowrap pe-6'
-                          : 'text-sm text-gray-500 dark:text-gray-400 max-w-50 truncate whitespace-nowrap pe-6'
+                          ? 'text-foreground font-semibold max-w-50 truncate whitespace-nowrap pe-6'
+                          : 'text-sm text-muted-foreground max-w-50 truncate whitespace-nowrap pe-6'
                       }>
                       {renderValue(displayValue)}
                     </span>
@@ -319,7 +319,7 @@ const DataTable = <T extends Record<string, unknown>>({
                   {value ? String(value)[0]?.toUpperCase() : '?'}
                 </Badge>
               )}
-              <span className='text-gray-900 dark:text-white font-semibold max-w-50 truncate whitespace-nowrap'>
+              <span className='text-foreground font-semibold max-w-50 truncate whitespace-nowrap'>
                 {renderValue(value)}
               </span>
             </div>
@@ -327,7 +327,7 @@ const DataTable = <T extends Record<string, unknown>>({
         }
 
         return (
-          <span className='text-gray-900 dark:text-white font-medium max-w-50 truncate block '>
+          <span className='text-foreground font-medium max-w-50 truncate block '>
             {renderValue(value)}
           </span>
         )
@@ -407,7 +407,7 @@ const DataTable = <T extends Record<string, unknown>>({
     <Card>
       <div>
         {data?.length === 0 ? (
-          <p className='text-center py-8 text-gray-500'>No data available.</p>
+          <p className='text-center py-8 text-muted-foreground'>No data available.</p>
         ) : (
           <>
             {/* Search + Download */}
@@ -421,7 +421,7 @@ const DataTable = <T extends Record<string, unknown>>({
                 <div className='flex items-center gap-2 flex-wrap'>
                   <Input
                     type='text'
-                    className='max-w-96 lg:min-w-96 min-w-full placeholder:text-gray-400 dark:placeholder:text-white/20'
+                    className='max-w-96 lg:min-w-96 min-w-full placeholder:text-muted-foreground'
                     value={globalFilter ?? ''}
                     onChange={(e) => setGlobalFilter(e.target.value)}
                     placeholder='Search your relevant items...'
@@ -478,7 +478,7 @@ const DataTable = <T extends Record<string, unknown>>({
                           {row.getVisibleCells().map((cell) => (
                             <TableCell
                               key={cell.id}
-                              className='text-gray-700 dark:text-white/70'>
+                              className='text-foreground'>
                               {flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext()
@@ -491,7 +491,7 @@ const DataTable = <T extends Record<string, unknown>>({
                       <TableRow>
                         <TableCell
                           colSpan={columns.length}
-                          className='text-center p-6 text-gray-500 dark:text-white/70 font-medium'>
+                          className='text-center p-6 text-muted-foreground font-medium'>
                           No results found.
                         </TableCell>
                       </TableRow>
@@ -517,7 +517,7 @@ const DataTable = <T extends Record<string, unknown>>({
                 </Button>
               </div>
 
-              <div className='text-forest-black dark:text-white/90 font-medium text-base'>
+              <div className='text-foreground font-medium text-base'>
                 Page {table.getState().pagination.pageIndex + 1} of{' '}
                 {table.getPageCount()}
               </div>
@@ -525,7 +525,7 @@ const DataTable = <T extends Record<string, unknown>>({
               <div className='flex items-center gap-2'>
                 <Label
                   htmlFor='pageSize'
-                  className='mr-0 text-forest-black dark:text-white/90 text-base font-medium whitespace-nowrap min-w-32'>
+                  className='mr-0 text-foreground text-base font-medium whitespace-nowrap min-w-32'>
                   Rows per page:
                 </Label>
                 <Select

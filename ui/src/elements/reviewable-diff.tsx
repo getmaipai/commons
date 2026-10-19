@@ -88,7 +88,7 @@ export function ReviewableDiff({
                         type="button"
                         aria-label={`Keep hunk ${hunk.range}`}
                         onClick={() => onKeep(hunk.id)}
-                        className="flex h-6 items-center gap-1 rounded-full bg-emerald-500/12 px-2 text-[11px] font-medium text-emerald-700 transition-[background-color,scale] duration-150 hover:bg-emerald-500/20 active:scale-[0.96] dark:text-emerald-300"
+                        className="flex h-6 items-center gap-1 rounded-full bg-status-ok/12 px-2 text-[11px] font-medium text-status-ok-ink transition-[background-color,scale] duration-150 hover:bg-status-ok/20 active:scale-[0.96]"
                       >
                         <CheckIcon className="size-3" />
                         Keep
@@ -101,7 +101,7 @@ export function ReviewableDiff({
                       mono,
                       "fade-in animate-in duration-300",
                       hunk.decision === "kept"
-                        ? "text-emerald-600 dark:text-emerald-400"
+                        ? "text-status-ok-ink"
                         : "text-muted-foreground",
                     )}
                   >
@@ -119,9 +119,9 @@ export function ReviewableDiff({
                       "flex px-4 py-0.5 leading-relaxed whitespace-pre",
                       line.kind === "context" && "text-muted-foreground",
                       line.kind === "added" &&
-                        "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+                        "bg-status-ok/10 text-status-ok-ink",
                       line.kind === "removed" &&
-                        "bg-red-500/10 text-red-700 dark:text-red-300",
+                        "bg-destructive/10 text-destructive",
                     )}
                   >
                     <span className="w-4 shrink-0 select-none">

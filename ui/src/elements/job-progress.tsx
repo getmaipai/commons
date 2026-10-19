@@ -167,13 +167,13 @@ export function JobProgress({
     >
       <div className="flex items-center gap-2.5">
         {outcome?.status === "partial" ? (
-          <CircleAlertIcon className="size-3.5 shrink-0 text-amber-500 dark:text-amber-400" />
+          <CircleAlertIcon className="size-3.5 shrink-0 text-status-warning" />
         ) : outcome?.status === "failed" ? (
-          <XIcon className="size-3.5 shrink-0 text-red-600 dark:text-red-400" />
+          <XIcon className="size-3.5 shrink-0 text-destructive" />
         ) : outcome?.status === "cancelled" ? (
           <CircleSlashIcon className="text-muted-foreground size-3.5 shrink-0" />
         ) : finished ? (
-          <CheckIcon className="size-3.5 shrink-0 text-emerald-500" />
+          <CheckIcon className="size-3.5 shrink-0 text-status-ok" />
         ) : (
           <Loader2Icon className="text-foreground/35 size-3.5 shrink-0 animate-spin motion-reduce:animate-none" />
         )}

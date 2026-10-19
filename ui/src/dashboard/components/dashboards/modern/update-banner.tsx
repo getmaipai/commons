@@ -20,7 +20,7 @@ export default function UpdateBanner() {
             </p>
           </div>
           <p className="text-sm font-normal">
-            Sales revenue increased <span className="text-emerald-600">40%</span> in 1 week
+            Sales revenue increased <span className="text-status-ok-ink">40%</span> in 1 week
           </p>
         </div>
         <Link to={'#'}>

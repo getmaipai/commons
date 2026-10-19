@@ -331,10 +331,14 @@ describe("WCAG contrast for MediaViewer, ShareDialog and the selected DataTable 
     expect(contrastRatio(requiredHex(darkRoot, "--muted-foreground"), requiredHex(darkRoot, "--card"))).toBeGreaterThanOrEqual(4.5);
   });
 
-  test("the previous and next buttons keep their glyph above 4.5 even over a pure white picture", () => {
-    const overlay = over("#000000", 0.62, "#ffffff");
-    expect(contrastRatio(requiredHex(darkRoot, "--art-foreground"), overlay)).toBeGreaterThanOrEqual(4.5);
-  });
+  // The art tokens follow the look (--art-overlay is 62% of --background, --art-foreground is --foreground), so the worst picture
+  // is the one opposite the page tone: pure white in dark, pure black in light.
+  for (const [name, block, picture] of [["dark", darkRoot, "#ffffff"], ["light", lightRoot, "#000000"]] as const) {
+    test(`${name}: the previous and next buttons keep their glyph above 4.5 even over the worst picture`, () => {
+      const overlay = over(requiredHex(block, "--background"), 0.62, picture);
+      expect(contrastRatio(requiredHex(block, "--foreground"), overlay)).toBeGreaterThanOrEqual(4.5);
+    });
+  }
 
   for (const theme of [
     { name: "light", block: lightRoot },

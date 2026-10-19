@@ -65,11 +65,11 @@ export function TerminalBlock({
         </span>
         {done ? (
           <div className="flex items-center gap-1">
-            {exitCode === 0 ? <CheckIcon className="size-3 text-emerald-500" /> : <XIcon className="size-3 text-red-600 dark:text-red-400" />}
+            {exitCode === 0 ? <CheckIcon className="size-3 text-status-ok" /> : <XIcon className="size-3 text-destructive" />}
             <span
               className={cn(
                 mono,
-                exitCode !== 0 ? "text-red-600 dark:text-red-400" : ink
+                exitCode !== 0 ? "text-destructive" : ink
                   ? "text-background/60 dark:text-muted-foreground"
                   : "text-muted-foreground",
               )}
@@ -105,7 +105,7 @@ export function TerminalBlock({
               data-stream={isStderr ? "stderr" : "stdout"}
               className={cn(
                 "fade-in animate-in fill-mode-both duration-300",
-                isStderr && "text-red-600 dark:text-red-400",
+                isStderr && "text-destructive",
                 (isLast && !isStderr) &&
                   (ink
                     ? "text-background/90 dark:text-foreground/90"
@@ -120,7 +120,7 @@ export function TerminalBlock({
         {!done && (
           <span
             aria-hidden
-            className="inline-block h-3 w-1.5 animate-pulse bg-blue-500/70 motion-reduce:animate-none dark:bg-blue-400/70"
+            className="inline-block h-3 w-1.5 animate-pulse bg-primary/70 motion-reduce:animate-none"
           />
         )}
       </div>

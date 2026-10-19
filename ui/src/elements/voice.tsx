@@ -12,28 +12,52 @@ export type VoiceOrbState =
 
 export type VoiceOrbVariant = "default" | "blue" | "violet" | "emerald";
 
-const VARIANT_COLORS: Record<VoiceOrbVariant, [number, number, number][]> = {
-  default: [
-    [0.55, 0.55, 0.6],
-    [0.7, 0.7, 0.75],
-    [0.4, 0.4, 0.45],
-  ],
-  blue: [
-    [0.2, 0.5, 1.0],
-    [0.4, 0.7, 1.0],
-    [0.1, 0.3, 0.8],
-  ],
-  violet: [
-    [0.6, 0.3, 1.0],
-    [0.8, 0.5, 1.0],
-    [0.4, 0.15, 0.8],
-  ],
-  emerald: [
-    [0.15, 0.75, 0.55],
-    [0.3, 0.9, 0.7],
-    [0.1, 0.55, 0.4],
-  ],
+/* The orb's three shader colours come from the active look at draw time, never
+ * from literals: each variant names the theme token it is built on, and the
+ * three colours are that token, a lighter mix and a deeper mix of it. */
+const VARIANT_TOKEN: Record<VoiceOrbVariant, string> = {
+  default: "--muted-foreground",
+  blue: "--primary",
+  violet: "--hue-violet",
+  emerald: "--status-ok",
 };
+
+type Rgb = [number, number, number];
+
+let scratch: CanvasRenderingContext2D | null | undefined;
+
+/** The token's resolved colour as 0..1 floats; a mid grey when the page cannot
+ * resolve it (no 2D canvas, token missing). */
+function resolveToken(host: HTMLElement, token: string): Rgb {
+  const grey: Rgb = [0.5, 0.5, 0.5];
+  if (typeof document === "undefined") return grey;
+  const probe = document.createElement("span");
+  probe.style.color = `var(${token})`;
+  const parent = host.parentElement ?? document.body;
+  parent.appendChild(probe);
+  const css = getComputedStyle(probe).color;
+  parent.removeChild(probe);
+  if (scratch === undefined) {
+    try {
+      scratch = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+    } catch {
+      scratch = null;
+    }
+  }
+  if (!scratch || !css) return grey;
+  scratch.clearRect(0, 0, 1, 1);
+  scratch.fillStyle = css;
+  scratch.fillRect(0, 0, 1, 1);
+  const px = scratch.getImageData(0, 0, 1, 1).data;
+  return [px[0]! / 255, px[1]! / 255, px[2]! / 255];
+}
+
+const mixRgb = (a: Rgb, b: Rgb, t: number): Rgb => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+
+function variantColors(host: HTMLElement, variant: VoiceOrbVariant): Rgb[] {
+  const base = resolveToken(host, VARIANT_TOKEN[variant]);
+  return [base, mixRgb(base, [1, 1, 1], 0.35), mixRgb(base, [0, 0, 0], 0.35)];
+}
 
 type OrbParams = {
   speed: number;
@@ -312,7 +336,7 @@ export const VoiceOrb: FC<VoiceOrbProps> = memo(
       targetParams.current = { ...STATE_PARAMS[state] };
     }, [state]);
 
-    const colors = VARIANT_COLORS[variant];
+    const colorsRef = useRef<{ at: number; list: Rgb[] } | null>(null);
 
     const [ready, setReady] = useState(false);
     useEffect(() => {
@@ -364,6 +388,11 @@ export const VoiceOrb: FC<VoiceOrbProps> = memo(
       gl.uniform1f(uniforms.u_brightness, p.brightness);
       gl.uniform1f(uniforms.u_pulse, p.pulse);
       gl.uniform1f(uniforms.u_saturation, p.saturation);
+      const now = performance.now();
+      if (!colorsRef.current || now - colorsRef.current.at > 500) {
+        colorsRef.current = { at: now, list: variantColors(canvas, variant) };
+      }
+      const colors = colorsRef.current.list;
       gl.uniform3fv(uniforms.u_color0, colors[0]!);
       gl.uniform3fv(uniforms.u_color1, colors[1]!);
       gl.uniform3fv(uniforms.u_color2, colors[2]!);
@@ -372,7 +401,7 @@ export const VoiceOrb: FC<VoiceOrbProps> = memo(
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
       animRef.current = requestAnimationFrame(render);
-    }, [colors]);
+    }, [variant]);
 
     useEffect(() => {
       if (!ready) return;

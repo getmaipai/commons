@@ -139,7 +139,7 @@ export default function RecentOrders() {
                         <div className="flex items-center gap-2">
                           <img
                             src={item.productImg}
-                            className="rounded-full bg-black/20 dark:bg-white/20 pt-0.5"
+                            className="rounded-full bg-foreground/20 pt-0.5"
                             alt="product-img"
                             width={32}
                             height={32}

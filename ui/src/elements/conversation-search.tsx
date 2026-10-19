@@ -94,7 +94,7 @@ export function ConversationSearch({
             )}
           >
             <span className="text-muted-foreground">{active.before}</span>
-            <span className="text-foreground/95 rounded bg-amber-400/35 px-0.5">
+            <span className="text-foreground/95 rounded bg-status-warning/35 px-0.5">
               {active.match}
             </span>
             <span className="text-muted-foreground">{active.after}</span>
@@ -109,7 +109,7 @@ export function ConversationSearch({
             aria-hidden
             className={cn(
               "absolute inset-x-0 h-1 rounded-full transition-colors duration-200",
-              i === index ? "bg-amber-500" : "bg-amber-500/35",
+              i === index ? "bg-status-warning" : "bg-status-warning/35",
             )}
             style={{ top: `${hit.position}%` }}
           />

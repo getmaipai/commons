@@ -20,13 +20,13 @@ const sourceVariants = cva(
           "bg-muted text-muted-foreground [a&]:hover:bg-muted/80 [a&]:hover:text-foreground",
         ghost:
           "text-muted-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground bg-transparent",
-        info: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 [a&]:hover:bg-blue-100/80",
+        info: "bg-primary/12 text-primary-ink [a&]:hover:bg-primary/20",
         warning:
-          "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 [a&]:hover:bg-amber-100/80",
+          "bg-status-warning/15 text-status-warning-ink [a&]:hover:bg-status-warning/25",
         success:
-          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 [a&]:hover:bg-emerald-100/80",
+          "bg-status-ok/15 text-status-ok-ink [a&]:hover:bg-status-ok/25",
         destructive:
-          "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 [a&]:hover:bg-red-100/80",
+          "bg-destructive/12 text-destructive [a&]:hover:bg-destructive/20",
       },
       size: {
         sm: "px-1.5 py-0.5",

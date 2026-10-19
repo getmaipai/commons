@@ -78,7 +78,7 @@ export function ImageGeneration({
             )}
             style={{
               background:
-                "radial-gradient(120% 90% at 20% 100%, oklch(0.45 0.09 265) 0%, transparent 55%), radial-gradient(110% 80% at 85% 90%, oklch(0.62 0.1 300 / 0.8) 0%, transparent 60%), radial-gradient(130% 100% at 60% 0%, oklch(0.88 0.06 60) 0%, oklch(0.74 0.09 25 / 0.9) 45%, transparent 75%), linear-gradient(to top, oklch(0.35 0.06 275), oklch(0.82 0.07 50))",
+                "radial-gradient(120% 90% at 20% 100%, color-mix(in oklab, var(--primary) 55%, var(--background)) 0%, transparent 55%), radial-gradient(110% 80% at 85% 90%, color-mix(in oklab, var(--chart-2) 60%, var(--background)) 0%, transparent 60%), radial-gradient(130% 100% at 60% 0%, color-mix(in oklab, var(--chart-4) 45%, var(--background)) 0%, color-mix(in oklab, var(--chart-1) 45%, var(--background)) 45%, transparent 75%), linear-gradient(to top, color-mix(in oklab, var(--primary) 35%, var(--background)), color-mix(in oklab, var(--chart-5) 35%, var(--background)))",
             }}
           />
         }
@@ -87,7 +87,7 @@ export function ImageGeneration({
           className={cn(
             mono,
             "absolute end-2.5 top-2.5 tabular-nums",
-            generating ? "text-muted-foreground" : "text-white/70",
+            generating ? "text-muted-foreground" : "text-foreground/70",
           )}
         >
           {sizeLabel}

@@ -73,7 +73,7 @@ export default function NavItem({
         {item.badge && (
           <span
             className={`ms-auto  hide-menu text-xs rounded-full px-2 py-0.5 ${item.badgeType === "filled"
-              ? "bg-primary text-white dark:text-black"
+              ? "bg-primary text-primary-foreground"
               : "border border-primary text-primary"
               }`}
           >

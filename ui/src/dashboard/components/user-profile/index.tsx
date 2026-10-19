@@ -114,11 +114,11 @@ const UserProfile = () => {
                   {personal.firstName} {personal.lastName}
                 </h5>
                 <div className='flex flex-wrap items-center gap-1 md:gap-3'>
-                  <p className='text-sm text-gray-500 dark:text-gray-400'>
+                  <p className='text-sm text-muted-foreground'>
                     {personal.position}
                   </p>
-                  <div className='hidden h-4 w-px bg-gray-300 dark:bg-gray-700 xl:block'></div>
-                  <p className='text-sm text-gray-500 dark:text-gray-400'>
+                  <div className='hidden h-4 w-px bg-border xl:block'></div>
+                  <p className='text-sm text-muted-foreground'>
                     {address.location}
                   </p>
                 </div>
@@ -129,7 +129,7 @@ const UserProfile = () => {
                     key={index}
                     to={item.href}
                     target='_blank'
-                    className='flex h-11 w-11 items-center justify-center gap-2 rounded-full shadow-md border border-border hover:bg-gray-50 dark:hover:bg-white/[0.03] dark:hover:text-gray-200'>
+                    className='flex h-11 w-11 items-center justify-center gap-2 rounded-full shadow-md border border-border hover:bg-accent'>
                     <Link2 width={20} height={20} />
                   </Link>
                 ))}
@@ -143,23 +143,23 @@ const UserProfile = () => {
             <h5 className='card-title'>Personal Information</h5>
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-7 2xl:gap-x-32'>
               <div>
-                <p className='text-xs text-gray-500'>First Name</p>
+                <p className='text-xs text-muted-foreground'>First Name</p>
                 <p>{personal.firstName}</p>
               </div>
               <div>
-                <p className='text-xs text-gray-500'>Last Name</p>
+                <p className='text-xs text-muted-foreground'>Last Name</p>
                 <p>{personal.lastName}</p>
               </div>
               <div>
-                <p className='text-xs text-gray-500'>Email</p>
+                <p className='text-xs text-muted-foreground'>Email</p>
                 <p>{personal.email}</p>
               </div>
               <div>
-                <p className='text-xs text-gray-500'>Phone</p>
+                <p className='text-xs text-muted-foreground'>Phone</p>
                 <p>{personal.phone}</p>
               </div>
               <div>
-                <p className='text-xs text-gray-500'>Position</p>
+                <p className='text-xs text-muted-foreground'>Position</p>
                 <p>{personal.position}</p>
               </div>
             </div>
@@ -179,23 +179,23 @@ const UserProfile = () => {
             <h5 className='card-title'>Address Details</h5>
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-7 2xl:gap-x-32'>
               <div>
-                <p className='text-xs text-gray-500'>Location</p>
+                <p className='text-xs text-muted-foreground'>Location</p>
                 <p>{address.location}</p>
               </div>
               <div>
-                <p className='text-xs text-gray-500'>Province / State</p>
+                <p className='text-xs text-muted-foreground'>Province / State</p>
                 <p>{address.state}</p>
               </div>
               <div>
-                <p className='text-xs text-gray-500'>PIN Code</p>
+                <p className='text-xs text-muted-foreground'>PIN Code</p>
                 <p>{address.pin}</p>
               </div>
               <div>
-                <p className='text-xs text-gray-500'>ZIP</p>
+                <p className='text-xs text-muted-foreground'>ZIP</p>
                 <p>{address.zip}</p>
               </div>
               <div>
-                <p className='text-xs text-gray-500'>Federal Tax No.</p>
+                <p className='text-xs text-muted-foreground'>Federal Tax No.</p>
                 <p>{address.taxNo}</p>
               </div>
             </div>
@@ -410,7 +410,7 @@ const UserProfile = () => {
               Save Changes
             </Button>
             <Button
-              className='rounded-md bg-lighterror dark:bg-darkerror text-error hover:bg-error hover:text-white'
+              className='rounded-md bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground'
               onClick={() => setOpenModal(false)}>
               Close
             </Button>

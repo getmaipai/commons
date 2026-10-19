@@ -15,10 +15,10 @@ import { floating, mono } from "./surfaces";
 /** Cell tint per level, empty first. The one definition of the scale. */
 export const HEAT_LEVEL_TINT = [
   "bg-foreground/[0.06]",
-  "bg-blue-500/25 dark:bg-blue-400/25",
-  "bg-blue-500/45 dark:bg-blue-400/45",
-  "bg-blue-500/70 dark:bg-blue-400/70",
-  "bg-blue-500 dark:bg-blue-400",
+  "bg-primary/25",
+  "bg-primary/45",
+  "bg-primary/70",
+  "bg-primary",
 ] as const;
 
 export type HeatGraphDataPoint = HeatGraphPrimitive.DataPoint;

@@ -4,9 +4,9 @@
  * spans and caret prop, since that Element renders plain text only. Values
  * copied from streaming-text.tsx:
  *   word fade-in   "fade-in animate-in ... duration-500"     -> opacity, 500 ms
- *   tint           "text-blue-500 dark:text-blue-400"        -> --aui-streaming-tint
+ *   tint           "text-primary-ink"                        -> --aui-streaming-tint
  *   settle to ink  "transition-colors duration-700"          -> color, 700 ms
- *   caret          "ml-0.5 inline-block h-4 w-0.5 animate-pulse rounded-full bg-blue-500"
+ *   caret          "ml-0.5 inline-block h-4 w-0.5 animate-pulse rounded-full bg-primary"
  *
  * Why transitions and not a Streamdown keyframe: on every render Streamdown
  * restamps each word it already showed with --sd-duration: 0ms, so a keyframe
@@ -21,11 +21,7 @@
  * appears at once in ink (no re-fade).
  */
 .aui-md {
-  --aui-streaming-tint: var(--color-blue-500, oklch(62.3% 0.214 259.815));
-}
-
-.dark .aui-md {
-  --aui-streaming-tint: var(--color-blue-400, oklch(70.7% 0.165 254.624));
+  --aui-streaming-tint: color-mix(in srgb, var(--primary) 60%, var(--foreground));
 }
 
 .aui-md [data-sd-animate] {

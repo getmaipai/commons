@@ -35,7 +35,7 @@ describe("cinema page tone", () => {
   test("the block exists and keeps its non-colour effects", () => {
     expect(start).toBeGreaterThan(0)
     expect(block).toContain("color-scheme: dark")
-    expect(block).toContain("--progress-accent: #ff4b62")
+    expect(block).toContain("--progress-accent: var(--cinema-destructive)")
     expect(block).toContain("--art-eyebrow:")
   })
 
@@ -45,14 +45,15 @@ describe("cinema page tone", () => {
     }
     const code = block.replace(/\/\*[\s\S]*?\*\//g, "")
     const hexes = code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []
-    expect(hexes).toEqual(["#ff4b62"])
+    expect(hexes).toEqual([])
+    expect(code).not.toMatch(/\b(?:black|white)\b|(?<![\w-])(?:rgba?|hsla?)\(|oklch\((?!from )/)
   })
 
   test("the real tokens come from the look through the two stages, never from themselves", () => {
     expect(block).toContain("oklch(from var(--background)")
     expect(block).toContain("--background: var(--cinema-page);")
-    expect(block).toContain("--cinema-page: color-mix(in srgb, var(--cinema-base), black 25%);")
-    expect(block).toContain("--cinema-rail: color-mix(in srgb, var(--cinema-base), black 50%);")
+    expect(block).toContain("--cinema-page: oklch(from var(--cinema-base) calc(l * 0.8) c h);")
+    expect(block).toContain("--cinema-rail: oklch(from var(--cinema-base) calc(l * 0.57) c h);")
     // Stage 2 sits on body's children: a token must not read itself.
     const stage2 = block.slice(block.indexOf("body > * {"))
     expect(stage2).not.toMatch(/--background:[^;]*var\(--background\)/)

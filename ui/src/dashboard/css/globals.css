@@ -37,10 +37,10 @@
 @theme {
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --shadow-md: 0 1px 4px rgba(133, 146, 173, 0.2);
-  --shadow-btn-shadow: 0 9px 17.5px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 1rem 3rem var(--elevation-color);
+  --shadow-sm: 0 0.125rem 0.25rem var(--elevation-color);
+  --shadow-md: 0 1px 4px var(--elevation-color);
+  --shadow-btn-shadow: 0 9px 17.5px var(--elevation-hairline);
   --radius-lg: 7px;
   --margin-30: 30px;
   --text-40: 40px;

@@ -265,7 +265,7 @@ export function ImageGallery({
                 side="top"
                 data-image-edit="true"
                 className={cn(
-                  "absolute start-2 top-2 z-10 size-6 rounded-full bg-black/50! text-white after:absolute after:-inset-1.5 hover:bg-black/70! hover:text-white! active:scale-[0.96]",
+                  "absolute start-2 top-2 z-10 size-6 rounded-full bg-background/70! text-foreground after:absolute after:-inset-1.5 hover:bg-background/90! hover:text-foreground! active:scale-[0.96]",
                   imageEditRevealClass,
                 )}
                 onClick={(event) => {

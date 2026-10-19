@@ -57,7 +57,7 @@ export function QuotaBanner({
         <span
           className={cn(
             "text-[13.5px] font-medium",
-            tight && "text-amber-700 dark:text-amber-400",
+            tight && "text-status-warning-ink",
           )}
         >
           {amountWithUnit(left)} left
@@ -83,7 +83,7 @@ export function QuotaBanner({
         <span
           className={cn(
             "block h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none",
-            tight ? "bg-amber-500" : "bg-foreground/40",
+            tight ? "bg-status-warning" : "bg-foreground/40",
           )}
           style={{ width: `${pct(used, limit)}%` }}
         />

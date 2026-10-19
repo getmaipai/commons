@@ -38,7 +38,7 @@ export function ConnectionState({
     >
       {phase === "dropped" && (
         <>
-          <CloudOffIcon className="size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+          <CloudOffIcon className="size-3.5 shrink-0 text-status-warning-ink" />
           <span className="min-w-0 flex-1 text-[13px]">
             Connection lost. The run kept going on the server.
           </span>
@@ -68,7 +68,7 @@ export function ConnectionState({
 
       {phase === "resumed" && (
         <>
-          <CheckIcon className="size-3.5 shrink-0 text-emerald-500" />
+          <CheckIcon className="size-3.5 shrink-0 text-status-ok" />
           <span className="min-w-0 flex-1 text-[13px]">
             Picked the stream back up.
           </span>

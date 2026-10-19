@@ -17,8 +17,8 @@ describe("IncognitoToggle (Home INCOGNITO-08, pill redesign)", () => {
     const toggle = getByRole("button", { name: "Incognito On" });
     expect(toggle).toHaveAttribute("aria-pressed", "true");
     expect(toggle.className).toContain("rounded-full");
-    expect(toggle.className).toContain("bg-violet-600");
-    expect(toggle.className).toContain("text-white");
+    expect(toggle.className).toContain("bg-hue-violet");
+    expect(toggle.className).toContain("text-hue-violet-foreground");
     expect(toggle.textContent).toContain("Incognito");
     expect(toggle.querySelector("svg.lucide-venetian-mask")).not.toBeNull();
     expect(toggle.querySelector("svg.lucide-eye-off")).toBeNull();
@@ -38,7 +38,7 @@ describe("IncognitoToggle (Home INCOGNITO-08, pill redesign)", () => {
     expect(toggle).toHaveAttribute("aria-pressed", "false");
     expect(toggle.className).toContain("h-10");
     expect(toggle.className).toContain("w-10");
-    expect(toggle.className).not.toContain("bg-violet-600");
+    expect(toggle.className).not.toMatch(/(^|\s)bg-hue-violet(\s|$)/);
     expect(toggle.textContent).not.toContain("Incognito");
     expect(toggle.querySelector("svg.lucide-venetian-mask")).not.toBeNull();
     fireEvent.click(toggle);

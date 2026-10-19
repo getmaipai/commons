@@ -14,9 +14,9 @@ export interface ModelStatus {
 
 const STATUS_TONE: Record<ModelStatusTone, string> = {
   neutral: "text-muted-foreground",
-  good: "text-emerald-600 dark:text-emerald-400",
-  warn: "text-amber-700 dark:text-amber-400",
-  bad: "text-red-600 dark:text-red-400",
+  good: "text-status-ok-ink",
+  warn: "text-status-warning-ink",
+  bad: "text-destructive",
 };
 
 export interface PickableModel {

@@ -36,8 +36,8 @@ const Notifications = ({ className }: { className?: string }) => {
                 <DropdownMenuTrigger aria-label="Notifications" className={cn("relative cursor-pointer", hitArea(1))}>
                         {unreadCount > 0 && (
                             <>
-                                <span className="h-2.5 w-2.5 bg-destructive rounded-full absolute top-1 end-2 text-xs text-center text-white z-1 animate-ping" />
-                                <span className="h-2.5 w-2.5 bg-destructive rounded-full absolute top-1 end-2 text-xs text-center text-white z-1" />
+                                <span className="h-2.5 w-2.5 bg-destructive rounded-full absolute top-1 end-2 text-xs text-center text-destructive-foreground z-1 animate-ping" />
+                                <span className="h-2.5 w-2.5 bg-destructive rounded-full absolute top-1 end-2 text-xs text-center text-destructive-foreground z-1" />
                             </>
                         )}
                         <div className="flex justify-center items-center hover:bg-primary/5 w-10 h-10 rounded-full">

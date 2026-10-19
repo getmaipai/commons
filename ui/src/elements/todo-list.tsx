@@ -63,11 +63,11 @@ export function TodoList({
                   <CheckIcon className="text-foreground/45 size-2.5" />
                 </span>
               ) : item.status === "failed" ? (
-                <span className="flex size-3.5 items-center justify-center rounded-[5px] border border-red-600/25 bg-red-600/[0.08] dark:border-red-400/25 dark:bg-red-400/[0.08]">
-                  <XIcon className="size-2.5 text-red-600 dark:text-red-400" />
+                <span className="flex size-3.5 items-center justify-center rounded-[5px] border border-destructive/25 bg-destructive/[0.08]">
+                  <XIcon className="size-2.5 text-destructive" />
                 </span>
               ) : item.status === "active" ? (
-                <Loader2Icon className="size-3.5 animate-spin text-blue-500 motion-reduce:animate-none dark:text-blue-400" />
+                <Loader2Icon className="size-3.5 animate-spin text-primary-ink motion-reduce:animate-none" />
               ) : (
                 <span className="border-foreground/15 size-3.5 rounded-[5px] border" />
               )}
@@ -80,7 +80,7 @@ export function TodoList({
                     "text-muted-foreground line-through decoration-[1.5px]",
                   item.status === "active" && "text-foreground/90",
                   item.status === "pending" && "text-muted-foreground",
-                  item.status === "failed" && "text-red-600 dark:text-red-400",
+                  item.status === "failed" && "text-destructive",
                 )}
               >
                 {item.text}

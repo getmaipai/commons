@@ -40,6 +40,6 @@ describe("HeatGraph", () => {
   test("the level scale is the kit's own tokens, one definition shared with ActivityGraph", () => {
     expect(HEAT_LEVEL_TINT).toHaveLength(5);
     const view = render(<ActivityGraph data={data} {...range} title="Runs" total="13" />);
-    expect(view.container.innerHTML).toContain("bg-blue-500/70");
+    expect(view.container.innerHTML).toContain("bg-primary/70");
   });
 });
