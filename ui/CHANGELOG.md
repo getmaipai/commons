@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.297] - ui-v0.5.297
+
+- WORKSPACE-FILL-01: a page that marks its root with `data-workspace-fill` fills the rail workspace: the rail body's centred width cap and padding give way, so a package app's own sidebar column sits against the icon rail and the page is one viewport tall. Before, the cap left a gap beside the rail and the padding made the page 32 px taller than the sticky column, which scrolled a little. Additive: nothing is affected without the marker.
+
 ## [0.5.296] - ui-v0.5.296
 
 - IMGEDIT-ERASE-01: while an Erase preview waits for Apply or Undo, `ImageEditor` no longer draws the painted area over the result. The blue paint stayed on top of the finished preview, so the erased object looked as if it was still there; Undo brings the strokes back for another try. Additive.

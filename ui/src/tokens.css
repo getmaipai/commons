@@ -299,6 +299,16 @@
 
 /* Shared kit surfaces use elevation through data slots, so consumers
  * never need Home page utility classes to get the calm treatment. */
+/* WORKSPACE-FILL-01: a page that fills the rail workspace (a package app with its own sidebar column) marks its root with
+ * `data-workspace-fill`. The rail body's centred width cap and padding then give way, so the column sits against the icon rail and
+ * the page is exactly one viewport tall: the sticky column neither leaves a gap beside the rail nor adds a scroll range. The page
+ * puts its own padding on the content beside the column. */
+[data-slot="rail-body"]:has([data-workspace-fill]) > .container {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
 [data-slot="card"] {
   box-shadow: var(--elevation-1);
   border-color: var(--elevation-hairline);
