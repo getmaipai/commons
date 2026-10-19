@@ -955,6 +955,8 @@
  * pair directly. */
 :root {
   --settings-column-width: 288px;
+  /* The collapsed icon-only rail of SectionSidebar. */
+  --settings-rail-width: 64px;
   --settings-column-title-size: 18px;
   --settings-group-label-size: 14px;
   --settings-page-title-size: 28px;

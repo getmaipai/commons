@@ -1,9 +1,10 @@
-import type { ComponentProps, MouseEvent, ReactNode } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type ComponentProps, type MouseEvent, type PointerEvent, type ReactNode } from "react";
 import { getIcon } from "@/kit/icons";
 import {
   Sidebar,
   SidebarProvider,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -17,6 +18,12 @@ import { HitField } from "../settings/HitField";
 import { Chip } from "./Chip";
 
 const SearchIcon = getIcon("search");
+const HideIcon = getIcon("panel-left-close");
+const ShowIcon = getIcon("panel-left-open");
+
+/** The pointer must rest on the hidden column's edge zone this long before it peeks; it closes this long after the pointer leaves. */
+const PEEK_OPEN_DELAY_MS = 120;
+const PEEK_CLOSE_GRACE_MS = 150;
 
 /** One row of the column: a link a person can open in a new tab, with its icon (or a picture the host serves) and label. */
 export interface SectionSidebarItem {
@@ -35,6 +42,8 @@ export interface SectionSidebarItem {
   /** Drawn after the label (an arrow, a count). */
   trailing?: ReactNode;
   onClick?: (event: MouseEvent) => void;
+  /** In the collapsed rail, where the label and `trailing` are hidden: draw a small dot to say the row has something new (a count above zero). */
+  dot?: boolean;
 }
 
 export interface SectionSidebarGroup {
@@ -59,8 +68,37 @@ export interface SectionSidebarSearch {
   onRecent?: (label: string) => void;
 }
 
+export interface SectionSidebarCollapseLabels {
+  /** The button that collapses the column. Default "Hide sidebar". */
+  hide: string;
+  /** The button that expands a collapsed rail. Default "Show sidebar". */
+  show: string;
+  /** The button inside a peeking (hidden) column that docks it again. Default "Keep sidebar open". */
+  pin: string;
+}
+
 export interface SectionSidebarProps {
-  groups: readonly SectionSidebarGroup[];
+  /** The rows. Omit them when `body` draws the column's content instead. */
+  groups?: readonly SectionSidebarGroup[];
+  /** Replaces `groups` as the column's scrolling content (Chat draws its conversation list here). */
+  body?: ReactNode;
+  /** Icon buttons or links drawn after the title on the same line (Chat settings, a search toggle); hidden in the rail. */
+  headerActions?: ReactNode;
+  /** Rows pinned to the foot of the column, drawn like group rows (an app's Settings link). In the rail they are icon-only. */
+  footer?: readonly SectionSidebarItem[];
+  /** Anything else for the foot of the column, drawn under `footer`; the host owns how it looks when the rail is collapsed (it is hidden in the rail unless `footerInRail`). */
+  footerSlot?: ReactNode;
+  footerInRail?: boolean;
+  /** Controlled collapse state. The kit holds no storage: the host remembers it per person and passes it back. */
+  collapsed?: boolean;
+  /** Called by the collapse, expand and keep-open buttons and by the rail's search button. Passing it draws the collapse button. */
+  onCollapsedChange?: (collapsed: boolean) => void;
+  /** What a collapsed column looks like. "hidden" (the Chat column) shrinks to a thin hover edge that peeks the column over the page;
+   * "rail" keeps a narrow icon-only strip. Default "hidden". Only `standalone` columns collapse by themselves. */
+  collapsedStyle?: "hidden" | "rail";
+  collapseLabels?: Partial<SectionSidebarCollapseLabels>;
+  /** "compact" is the Chat column's 36 px rows with no gap. Default "comfortable" (the settings column's rows). */
+  density?: "comfortable" | "compact";
   /** Placed first in the header: a collapse button, a back link. */
   headerTop?: ReactNode;
   /** The column's title; omit it when the host draws its own. */
@@ -79,22 +117,170 @@ export interface SectionSidebarProps {
 }
 
 /**
- * The one sidebar column of an app area (NEWS-SIDEBAR-01, RULES S1 and S2): a title, a pill search, and groups of icon rows
+ * The one sidebar column of an app area (NEWS-SIDEBAR-01, APP-SIDEBAR-01, RULES S1 and S2): a title, a pill search, and groups of icon rows
  * beside the content, built from the dashboard Sidebar parts and the `--settings-*` tokens. The settings shell draws its
- * column with it and so does News; the host passes data (groups, search) and writes no layout. It holds no collapse or peek
- * logic of its own: a host that collapses its column wraps it and passes the state through `sidebarProps`.
+ * column with it, and so do News, Library and Chat; the host passes data (groups or a `body`, search, footer) and writes no layout.
+ * It holds no storage: a host that collapses the column keeps the state per person and passes it as `collapsed` and `onCollapsedChange`.
+ *
+ * Phone: a `standalone` column is hidden below the kit's `lg` breakpoint. The host lists the same entries in the menu drawer with
+ * `SectionSidebarDrawerSections` (pass the same `groups` and `footer` to `FullLayout`'s `mobileSections`).
  */
-export function SectionSidebar({ groups, headerTop, title, search, afterSearch, contentClassName, standalone, sidebarProps }: SectionSidebarProps) {
+export function SectionSidebar({
+  groups = [],
+  body,
+  headerTop,
+  headerActions,
+  title,
+  search,
+  afterSearch,
+  footer,
+  footerSlot,
+  footerInRail,
+  collapsed = false,
+  onCollapsedChange,
+  collapsedStyle = "hidden",
+  collapseLabels,
+  density = "comfortable",
+  contentClassName,
+  standalone,
+  sidebarProps,
+}: SectionSidebarProps) {
+  const labels: SectionSidebarCollapseLabels = { hide: "Hide sidebar", show: "Show sidebar", pin: "Keep sidebar open", ...collapseLabels };
+  const generatedId = useId();
+  const columnId = sidebarProps?.id ?? `section-sidebar-${generatedId}`;
+  const compact = density === "compact";
+  const collapsible = standalone === true && (onCollapsedChange !== undefined || collapsed);
+  const rail = collapsible && collapsed && collapsedStyle === "rail";
+  const hiddenMode = collapsible && collapsed && collapsedStyle === "hidden";
+
+  const [peek, setPeek] = useState(false);
+  const timer = useRef<number | null>(null);
+  const clearTimer = useCallback(() => {
+    if (timer.current !== null) window.clearTimeout(timer.current);
+    timer.current = null;
+  }, []);
+  const scheduleOpen = useCallback(() => {
+    clearTimer();
+    timer.current = window.setTimeout(() => {
+      timer.current = null;
+      setPeek(true);
+    }, PEEK_OPEN_DELAY_MS);
+  }, [clearTimer]);
+  const scheduleClose = useCallback(() => {
+    clearTimer();
+    timer.current = window.setTimeout(() => {
+      timer.current = null;
+      if (document.getElementById(columnId)?.querySelector('[aria-expanded="true"][aria-haspopup]')) {
+        scheduleClose();
+        return;
+      }
+      setPeek(false);
+    }, PEEK_CLOSE_GRACE_MS);
+  }, [clearTimer, columnId]);
+  useEffect(() => {
+    if (!hiddenMode) {
+      clearTimer();
+      setPeek(false);
+    }
+    return clearTimer;
+  }, [hiddenMode, clearTimer]);
+  useEffect(() => {
+    if (!peek) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPeek(false);
+    };
+    document.addEventListener("keydown", onKey, true);
+    return () => document.removeEventListener("keydown", onKey, true);
+  }, [peek]);
+  const peeking = hiddenMode && peek;
+  const closed = hiddenMode && !peek;
+
+  const toggle = onCollapsedChange ? (
+    <button
+      type="button"
+      data-slot="section-sidebar-toggle"
+      aria-label={peeking ? labels.pin : rail ? labels.show : labels.hide}
+      aria-expanded={peeking ? undefined : !collapsed}
+      aria-controls={peeking ? undefined : columnId}
+      onClick={() => {
+        setPeek(false);
+        onCollapsedChange(peeking ? false : !collapsed);
+      }}
+      className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+    >
+      {rail ? <ShowIcon aria-hidden className="size-[18px]" /> : <HideIcon aria-hidden className="size-[18px]" />}
+    </button>
+  ) : null;
+
+  function row(item: SectionSidebarItem) {
+    const Icon = getIcon(item.icon ?? "chevron-right");
+    return (
+      <SidebarMenuItem key={item.id}>
+        <SidebarMenuButton
+          size="settings"
+          isActive={item.active === true}
+          className={cn(compact && "h-9 rounded-lg px-2.5 before:-inset-y-1.5", rail && "justify-center gap-0 px-0")}
+          render={(props) => (
+            <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); setPeek(false); }} title={rail ? item.label : undefined}>
+              {props.children}
+            </a>
+          )}
+          data-kind={item.kind}
+          aria-current={item.active ? "page" : undefined}
+          aria-describedby={item.describedBy}
+        >
+          <span className="relative flex shrink-0">
+            {item.media ? <img src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className="size-[18px] text-settings-helper" />}
+            {rail && item.dot ? <span data-slot="section-sidebar-dot" aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary" /> : null}
+          </span>
+          <span className={cn("flex-1 truncate", rail && "sr-only")}>{item.label}</span>
+          {rail ? null : item.trailing}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  }
+  const menuGap = compact ? "gap-0" : "gap-[var(--settings-column-row-gap)]";
+
+  const hasHeaderRow = headerActions !== undefined || toggle !== null;
+  const titleNode = title ? <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{title}</h2> : null;
+
   const column = (
     <Sidebar
       collapsible="none"
       {...sidebarProps}
-      className={cn(standalone && "h-full w-(--settings-column-width) min-w-0 self-stretch border-r border-settings-column-divider bg-settings-column", sidebarProps?.className)}
+      id={collapsible || sidebarProps?.id ? columnId : undefined}
+      {...(closed ? { inert: true, "aria-hidden": true } : {})}
+      className={cn(
+        standalone && "h-full min-w-0 self-stretch border-r border-settings-column-divider bg-settings-column",
+        standalone && (rail ? "w-(--settings-rail-width)" : "w-(--settings-column-width)"),
+        sidebarProps?.className,
+      )}
+      data-collapsed={collapsible ? (collapsed ? collapsedStyle : "false") : undefined}
     >
-      <SidebarHeader className="gap-3 px-2 pt-4 pb-2">
+      <SidebarHeader className={cn("px-2 pt-4 pb-2", compact ? "gap-1" : "gap-3", rail && "items-center")}>
         {headerTop}
-        {title ? <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{title}</h2> : null}
-        {search ? (
+        {hasHeaderRow ? (
+          <div data-slot="section-sidebar-header" className={cn("flex h-9 items-center gap-1", rail && "justify-center")}>
+            {rail ? null : title ? <h2 className="min-w-0 flex-1 truncate px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{title}</h2> : <span className="flex-1" />}
+            {rail ? null : headerActions}
+            {toggle}
+          </div>
+        ) : (
+          titleNode
+        )}
+        {search && rail ? (
+          <button
+            type="button"
+            data-slot="section-sidebar-search-button"
+            aria-label={search.label}
+            title={search.label}
+            onClick={() => onCollapsedChange?.(false)}
+            className="relative inline-flex size-9 items-center justify-center rounded-full bg-settings-fill text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+          >
+            <SearchIcon aria-hidden className="size-4" />
+          </button>
+        ) : null}
+        {search && !rail ? (
           <HitField pad={6} className="relative">
             <SearchIcon aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-settings-helper" />
             <SidebarInput
@@ -119,7 +305,7 @@ export function SectionSidebar({ groups, headerTop, title, search, afterSearch, 
             />
           </HitField>
         ) : null}
-        {search?.recents && search.recents.length > 0 ? (
+        {!rail && search?.recents && search.recents.length > 0 ? (
           <ul aria-label="Recent searches" className="flex list-none flex-wrap gap-1 px-2">
             {search.recents.map((recent) => (
               <li key={recent.key}>
@@ -128,49 +314,123 @@ export function SectionSidebar({ groups, headerTop, title, search, afterSearch, 
             ))}
           </ul>
         ) : null}
-        {afterSearch}
+        {rail ? null : afterSearch}
       </SidebarHeader>
       <SidebarContent className={cn("gap-0 px-2 pb-4", contentClassName)}>
-        {groups.map((group) => (
-          <SidebarGroup key={group.id} className="p-0 pt-5">
-            {group.label ? (
+        {body !== undefined ? (rail ? null : body) : null}
+        {groups.map((group, index) => (
+          <SidebarGroup key={group.id} className={cn("p-0", rail ? (index === 0 ? "pt-2" : "mt-2 border-t border-settings-column-divider pt-2") : compact ? "pt-2" : "pt-5")}>
+            {group.label && !rail ? (
               <SidebarGroupLabel className="h-8 px-2 text-[length:var(--settings-group-label-size)] font-normal text-settings-helper">{group.label}</SidebarGroupLabel>
             ) : null}
-            <SidebarMenu className="gap-[var(--settings-column-row-gap)]">
-              {group.items.map((item) => {
-                const Icon = getIcon(item.icon ?? "chevron-right");
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      size="settings"
-                      isActive={item.active === true}
-                      render={(props) => (
-                        <a {...props} href={item.href ?? "#"} onClick={item.onClick}>
-                          {props.children}
-                        </a>
-                      )}
-                      data-kind={item.kind}
-                      aria-current={item.active ? "page" : undefined}
-                      aria-describedby={item.describedBy}
-                    >
-                      {item.media ? <img src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className="size-[18px] text-settings-helper" />}
-                      <span className="flex-1 truncate">{item.label}</span>
-                      {item.trailing}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
+            <SidebarMenu className={menuGap}>{group.items.map(row)}</SidebarMenu>
           </SidebarGroup>
         ))}
       </SidebarContent>
+      {(footer && footer.length > 0) || (footerSlot && (!rail || footerInRail)) ? (
+        <SidebarFooter data-slot="section-sidebar-footer" className="border-t border-settings-column-divider px-2 py-2">
+          {footer && footer.length > 0 ? <SidebarMenu className={menuGap}>{footer.map(row)}</SidebarMenu> : null}
+          {!rail || footerInRail ? footerSlot : null}
+        </SidebarFooter>
+      ) : null}
     </Sidebar>
   );
-  return standalone ? (
+
+  if (!standalone) return column;
+
+  const provider = (inner: ReactNode) => (
     <SidebarProvider keyboardShortcut={false} data-slot="section-sidebar" className="hidden min-h-0 w-auto shrink-0 lg:flex">
-      {column}
+      {inner}
     </SidebarProvider>
-  ) : (
-    column
+  );
+  if (!collapsible) return provider(column);
+
+  const pointerOk = (event: PointerEvent) => event.pointerType !== "touch";
+  return provider(
+    <div
+      data-slot="section-sidebar-box"
+      data-state={peeking ? "peek" : hiddenMode ? "closed" : rail ? "rail" : "open"}
+      className={cn(
+        "relative h-full shrink-0 transition-[width] duration-200 ease-linear motion-reduce:transition-none",
+        hiddenMode ? "w-1.5" : rail ? "w-(--settings-rail-width)" : "w-(--settings-column-width)",
+      )}
+    >
+      {closed ? (
+        <div
+          data-slot="section-sidebar-peek-zone"
+          aria-hidden
+          className="absolute inset-y-0 start-0 z-20 w-1.5"
+          onPointerEnter={(event) => {
+            if (pointerOk(event)) scheduleOpen();
+          }}
+          onPointerLeave={clearTimer}
+        />
+      ) : null}
+      <div
+        data-slot="section-sidebar-panel"
+        className={peeking ? "absolute inset-y-0 start-0 z-30 w-(--settings-column-width) shadow-xl" : closed ? "invisible h-full w-(--settings-column-width) overflow-hidden" : "h-full"}
+        onPointerEnter={peeking ? clearTimer : undefined}
+        onPointerLeave={peeking ? (event) => { if (pointerOk(event)) scheduleClose(); } : undefined}
+      >
+        {column}
+      </div>
+    </div>,
+  );
+}
+
+/** The button a host puts in its page header while the column is hidden, to bring it back. 48 px target, labelled, `aria-expanded`. */
+export function SectionSidebarShowButton({ onClick, label = "Show sidebar", controls }: { onClick: () => void; label?: string; controls?: string }) {
+  return (
+    <button
+      type="button"
+      data-slot="section-sidebar-show"
+      aria-label={label}
+      aria-expanded={false}
+      aria-controls={controls}
+      onClick={onClick}
+      className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <ShowIcon aria-hidden className="size-[18px]" />
+    </button>
+  );
+}
+
+/** The same groups and footer rows as plain links, for the phone's menu drawer (`FullLayout`'s `mobileSections`). Rows are 48 px tall. */
+export function SectionSidebarDrawerSections({ groups = [], footer, onNavigate }: Pick<SectionSidebarProps, "groups" | "footer"> & { onNavigate?: () => void }) {
+  const list = (items: readonly SectionSidebarItem[]) => (
+    <ul className="flex list-none flex-col">
+      {items.map((item) => {
+        const Icon = getIcon(item.icon ?? "chevron-right");
+        return (
+          <li key={item.id}>
+            <a
+              href={item.href ?? "#"}
+              data-kind={item.kind}
+              aria-current={item.active ? "page" : undefined}
+              onClick={(event) => {
+                item.onClick?.(event);
+                onNavigate?.();
+              }}
+              className="flex min-h-12 items-center gap-3 rounded-[var(--settings-control-radius)] px-3 text-sm outline-none hover:bg-settings-fill/60 focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-settings-fill"
+            >
+              {item.media ? <img src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className="size-[18px] text-settings-helper" />}
+              <span className="flex-1 truncate">{item.label}</span>
+              {item.trailing}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  );
+  return (
+    <nav data-slot="section-sidebar-drawer" className="flex flex-col gap-2">
+      {groups.map((group) => (
+        <div key={group.id}>
+          {group.label ? <h3 className="px-3 py-1 text-xs text-settings-helper">{group.label}</h3> : null}
+          {list(group.items)}
+        </div>
+      ))}
+      {footer && footer.length > 0 ? <div className="border-t border-settings-column-divider pt-2">{list(footer)}</div> : null}
+    </nav>
   );
 }

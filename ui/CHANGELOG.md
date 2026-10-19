@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.285] - ui-v0.5.285
+
+- APP-SIDEBAR-01: `SectionSidebar` collapses and carries a footer, so Chat, Library, News and later apps share one column. Additive: every earlier prop and the settings shell's DOM are unchanged. New props: `collapsed` and `onCollapsedChange` (controlled; the kit holds no storage, the host remembers the state per person), `collapsedStyle` ("hidden", the Chat column: a thin hover edge that peeks the column over the page after 120 ms, Escape or a link closes it, "Keep sidebar open" docks it; or "rail": a 64 px icon-only strip, `--settings-rail-width`), `collapseLabels`, `footer` (rows pinned to the foot, for an app's Settings link), `footerSlot`, `headerActions` (icons after the title, as Chat has its settings and search icons), `body` (replaces `groups`, for Chat's conversation list) and `density` ("compact" is Chat's 36 px rows). A row gains `dot` (a small dot in the rail in place of its count). The collapse button is a native button with a 48 px target, a label, `aria-expanded` and `aria-controls`. Also exported: `SectionSidebarShowButton` (the host's page-header button while the column is hidden) and `SectionSidebarDrawerSections` (the same groups and footer as 48 px links for `FullLayout`'s `mobileSections`). Showcase: `SectionSidebarShowcase`.
+
 ## [0.5.284] - ui-v0.5.284
 
 - LIBRARY-REVAMP-06 slice C: `DataTable`'s header row now uses the same column gap as its body rows (`gap-2.5`) and, for the model-usage table, reserves the width of the first column's initial badge, so column labels line up with their columns. The selection header box no longer carries its own right margin (the gap does the spacing). Tables that pass `columns` (the Library list) only gain the gap; a table with row actions still lines its last columns up only as far as the actions cell is the same width as the header's (zero), so a host that wants exact alignment there gives the actions cell a fixed width.
