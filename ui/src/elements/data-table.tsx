@@ -439,14 +439,17 @@ export function DataTable<Row = ModelUsage>({
           role="row"
           data-slot="data-table-header-row"
           className={cn(
-            "flex items-center px-4 pt-3 pb-2",
+            "flex items-center gap-2.5 px-4 pt-3 pb-2",
             genericMode && "hidden @md:flex",
           )}
         >
           {selectable && (
-            <span role="columnheader" data-slot="data-table-select-header" className="mr-2.5 flex shrink-0">
+            <span role="columnheader" data-slot="data-table-select-header" className="flex shrink-0">
               {headerBox(selectCopy.selectAll)}
             </span>
+          )}
+          {!genericMode && cols.length > 0 && (
+            <span aria-hidden="true" data-slot="data-table-header-initial-spacer" className="size-5 shrink-0" />
           )}
           {cols.map((column, index) => (
             <span
