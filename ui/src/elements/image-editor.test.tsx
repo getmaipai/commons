@@ -445,6 +445,23 @@ describe("erase", () => {
     await waitFor(() => expect(v.props.onApplyPending.mock.calls[0]![1]).toBe("Object erased"));
   });
 
+  test("the painted area is not drawn over the preview, and comes back when the preview is undone", async () => {
+    layOutCanvas();
+    const drawn: string[] = [];
+    const ctx = new Proxy({}, { get: (_t, name) => (...args: unknown[]) => { if (name === "clearRect") drawn.length = 0; else drawn.push(String(name)); return args[0]; }, set: () => true }) as unknown as CanvasRenderingContext2D;
+    HTMLCanvasElement.prototype.getContext = (() => ctx) as never;
+    const paintCalls = () => drawn.filter((call) => ["fill", "stroke", "arc", "lineTo", "quadraticCurveTo"].includes(call)).length;
+    const v = setup();
+    fireEvent.click(tool(v, "Erase"));
+    drag(v.container.querySelector("canvas")!, [30, 20], [60, 40]);
+    await waitFor(() => expect(paintCalls()).toBeGreaterThan(0));
+    fireEvent.click(v.getByRole("button", { name: "Erase" }));
+    await waitFor(() => v.getByRole("button", { name: "Apply" }));
+    await waitFor(() => expect(paintCalls()).toBe(0));
+    fireEvent.click(v.getByRole("button", { name: "Undo" }));
+    await waitFor(() => expect(paintCalls()).toBeGreaterThan(0));
+  });
+
   test("[ and ] change the brush by 10 percent and the slider follows", () => {
     const v = setup();
     fireEvent.click(tool(v, "Erase"));

@@ -1240,7 +1240,9 @@ export function ImageEditor({
                 color={colorKey}
                 strokePx={strokePx}
                 brushPx={brush}
-                strokes={layer ? layer.strokes : []}
+                // While a preview waits for Apply or Undo, the painted area is not drawn: the picture shown is the result, and the
+                // paint over it made an erased object look still there. Undo brings the strokes back for another go.
+                strokes={layer && !pending ? layer.strokes : []}
                 onStroke={(stroke) => strokeLayerDispatch({ type: "add", stroke })}
                 onTextAt={(at) => setTextDraft({ at, value: "" })}
                 onRegion={(region) => {

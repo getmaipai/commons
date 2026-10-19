@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.296] - ui-v0.5.296
+
+- IMGEDIT-ERASE-01: while an Erase preview waits for Apply or Undo, `ImageEditor` no longer draws the painted area over the result. The blue paint stayed on top of the finished preview, so the erased object looked as if it was still there; Undo brings the strokes back for another try. Additive.
+
 ## [0.5.295] - ui-v0.5.295
 
 - NEWS-ARTICLE-PANE-01: the article's toolbar and source banner span the full pane; the toolbar stays at the top while the article scrolls and the banner scrolls away; the reading column holds the headline, picture and text. Additive.
