@@ -532,7 +532,7 @@ Design: `home/docs/design/robots-switch-and-install-2026-10-20.md`, `home/docs/d
   it stays quiet. Talking to it or its wake word still works."). Acceptance: keys validate; generated types in both languages carry
   the option list; fixtures updated. Exit: `scripts/check.sh`, then tag spec.
   Built 2026-10-20, spec-v0.1.195, ui-v0.5.305.
-- [ ] **SPEC-FLASH-MANIFEST-01: a signed firmware flash manifest record** (S; 2026-10-20; bot BOT-RELEASE-FLASH-01 emits it, Home
+- [x] **SPEC-FLASH-MANIFEST-01: a signed firmware flash manifest record** (Built 2026-10-20, spec-v0.1.196. S; 2026-10-20; bot BOT-RELEASE-FLASH-01 emits it, Home
   STACKCHAN-INSTALL-01 reads it). Objective: `FirmwareFlashManifest`, shaped like ESP Web Tools' manifest (`name`, `version`,
   `builds[{chipFamily, parts[{path, offset}]}]`) plus `flash_size` and, per part, `size` and `sha256`; with the record's id,
   provenance and clock stamp; signed and verified like a catalog package. Neither side invents offsets. Acceptance: schema, a
