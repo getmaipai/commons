@@ -82,6 +82,10 @@ class MemoryRecord(BaseModel):
         ...,
         description="self: the companion's own memory of itself, not shared with anyone. companion (SPEC-01, dev.md 'Coherence review' question 1, 'one memory record, seven bumps'): the same idea keyed to one specific companion by companion_id, for a household running more than one companion package (COMP-03 onward) where 'itself' is no longer one thing.",
     )
+    device_id: constr(pattern=r'^device-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description='The robot this record belongs to. Null means every surface may read it. Not the device that wrote the record: that is the {device6} part of the id.',
+    )
     person: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(
         None,
         description='Required when scope is person; null for household, self or companion scope.',

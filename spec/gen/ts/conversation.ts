@@ -15,6 +15,25 @@ export const Conversation = z
       .describe(
         "Whose conversation this is. A conversation is never shared across people.",
       ),
+    /**The robot this conversation happened on. Null for every other surface.*/
+    device_id: z
+      .union([
+        z
+          .string()
+          .regex(new RegExp("^device-[a-z0-9]{6,}$"))
+          .describe(
+            "The robot this conversation happened on. Null for every other surface.",
+          ),
+        z
+          .null()
+          .describe(
+            "The robot this conversation happened on. Null for every other surface.",
+          ),
+      ])
+      .describe(
+        "The robot this conversation happened on. Null for every other surface.",
+      )
+      .optional(),
     /**Matches turnEngine.ts's Surface (4.5): a person may hold one open conversation per surface at a time.*/
     surface: z
       .enum(["chat", "overlay", "pod", "robot", "tv", "phone"])

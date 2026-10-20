@@ -37,6 +37,25 @@ export const MemoryRecord = z
       .describe(
         "self: the companion's own memory of itself, not shared with anyone. companion (SPEC-01, dev.md 'Coherence review' question 1, 'one memory record, seven bumps'): the same idea keyed to one specific companion by companion_id, for a household running more than one companion package (COMP-03 onward) where 'itself' is no longer one thing.",
       ),
+    /**The robot this record belongs to. Null means every surface may read it. Not the device that wrote the record: that is the {device6} part of the id.*/
+    device_id: z
+      .union([
+        z
+          .string()
+          .regex(new RegExp("^device-[a-z0-9]{6,}$"))
+          .describe(
+            "The robot this record belongs to. Null means every surface may read it. Not the device that wrote the record: that is the {device6} part of the id.",
+          ),
+        z
+          .null()
+          .describe(
+            "The robot this record belongs to. Null means every surface may read it. Not the device that wrote the record: that is the {device6} part of the id.",
+          ),
+      ])
+      .describe(
+        "The robot this record belongs to. Null means every surface may read it. Not the device that wrote the record: that is the {device6} part of the id.",
+      )
+      .optional(),
     /**Required when scope is person; null for household, self or companion scope.*/
     person: z
       .union([

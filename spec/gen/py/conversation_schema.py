@@ -43,6 +43,10 @@ class Conversation(BaseModel):
         ...,
         description='Whose conversation this is. A conversation is never shared across people.',
     )
+    device_id: constr(pattern=r'^device-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description='The robot this conversation happened on. Null for every other surface.',
+    )
     surface: Literal['chat', 'overlay', 'pod', 'robot', 'tv', 'phone'] = Field(
         ...,
         description="Matches turnEngine.ts's Surface (4.5): a person may hold one open conversation per surface at a time.",

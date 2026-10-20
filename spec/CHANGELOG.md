@@ -340,6 +340,9 @@ scope lands.
 
 ## [Unreleased]
 
+### Added
+- SPEC-ROBOT-MEMORY-01: optional nullable `device_id` on MemoryRecord and Conversation, with generated TypeScript/Python models and fixtures.
+
 ## [spec-v0.1.141] - 2026-10-14
 
 ### Added

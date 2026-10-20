@@ -117,7 +117,7 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["memory", "memory-legacy", "entity", "episode", "in-project"]) {
+  for (const kind of ["memory", "memory-legacy", "entity", "episode", "in-project", "device-id-device", "device-id-null"]) {
     test(`memory-record.${kind}.example.json`, () => {
       expect(() =>
         MemoryRecord.parse(loadFixture(`memory-record.${kind}.example.json`)),
@@ -160,6 +160,19 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("conversation.example.json", () => {
     expect(() => Conversation.parse(loadFixture("conversation.example.json"))).not.toThrow();
+  });
+
+  test("conversation.device-id-device.example.json", () => {
+    expect(() => Conversation.parse(loadFixture("conversation.device-id-device.example.json"))).not.toThrow();
+  });
+
+  test("conversation.device-id-null.example.json", () => {
+    expect(() => Conversation.parse(loadFixture("conversation.device-id-null.example.json"))).not.toThrow();
+  });
+
+  test("device_id fixtures reject a bad pattern", () => {
+    expect(() => MemoryRecord.parse(loadFixture("memory-record.device-id-invalid.invalid.example.json"))).toThrow();
+    expect(() => Conversation.parse(loadFixture("conversation.device-id-invalid.invalid.example.json"))).toThrow();
   });
 
   test("conversation.in-folder.example.json", () => {

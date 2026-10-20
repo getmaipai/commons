@@ -507,9 +507,13 @@ capability, needs its own design pass first).
 
 ## Robots switch, install and face (2026-10-20)
 
-Design: `home/docs/design/robots-switch-and-install-2026-10-20.md` and `home/docs/design/robot-face-color-and-night-2026-10-20.md`
+Design: `home/docs/design/robots-switch-and-install-2026-10-20.md`, `home/docs/design/robot-face-color-and-night-2026-10-20.md`, and `home/docs/design/robot-own-name-and-memory-2026-10-20.md`
 (architect-approved in `home`). Spec first; Home and bot rows follow.
 
+- [x] **SPEC-ROBOT-MEMORY-01: device_id on MemoryRecord and Conversation** (S; 2026-10-20; Home ROBOT-MEMORY-01 and bot
+  BOT-MEMORY-01 wait on it; design home robot-own-name-and-memory-2026-10-20.md). Objective: add optional nullable robot ownership
+  to both shared records, preserving shared records as null. Landed schemas, generated TypeScript and Python types, and valid and
+  invalid device_id fixtures.
 - [ ] **SPEC-SETTING-CONFIRM-01: a confirm-before-off field on boolean keys, and the Robots switch key** (S; 2026-10-20; Home
   ROBOTS-SWITCH-01 waits on it). Objective: (1) `spec/settings` gains an optional `confirm_off` copy object on `selector: "boolean"`
   keys (`title`, `body`, `action`), validated by the keys schema, generated into `gen/ts` and `gen/py`; (2) `ui` `SettingsShell` /

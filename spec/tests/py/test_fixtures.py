@@ -477,6 +477,16 @@ def test_stack_fit_plan_rejects_inconsistent_figure_shapes():
 
 def test_conversation_fixture():
     Conversation.model_validate(load_fixture("conversation.example.json"))
+    Conversation.model_validate(
+        load_fixture("conversation.device-id-device.example.json")
+    )
+    Conversation.model_validate(
+        load_fixture("conversation.device-id-null.example.json")
+    )
+    with pytest.raises(ValidationError):
+        Conversation.model_validate(
+            load_fixture("conversation.device-id-invalid.invalid.example.json")
+        )
 
 
 def test_temporary_conversation_fixture():
@@ -492,10 +502,26 @@ def test_source_archive_fixture():
 
 
 @pytest.mark.parametrize(
-    "kind", ["memory", "memory-legacy", "entity", "episode", "in-project"]
+    "kind",
+    [
+        "memory",
+        "memory-legacy",
+        "entity",
+        "episode",
+        "in-project",
+        "device-id-device",
+        "device-id-null",
+    ],
 )
 def test_memory_record_fixtures(kind):
     MemoryRecord.model_validate(load_fixture(f"memory-record.{kind}.example.json"))
+
+
+def test_memory_record_rejects_invalid_device_id():
+    with pytest.raises(ValidationError):
+        MemoryRecord.model_validate(
+            load_fixture("memory-record.device-id-invalid.invalid.example.json")
+        )
 
 
 def test_manifest_fixture():

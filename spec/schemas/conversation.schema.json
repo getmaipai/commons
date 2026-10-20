@@ -16,6 +16,11 @@
       "pattern": "^person-[a-z0-9]{6,}$",
       "description": "Whose conversation this is. A conversation is never shared across people."
     },
+    "device_id": {
+      "type": ["string", "null"],
+      "pattern": "^device-[a-z0-9]{6,}$",
+      "description": "The robot this conversation happened on. Null for every other surface."
+    },
     "surface": {
       "type": "string",
       "enum": ["chat", "overlay", "pod", "robot", "tv", "phone"],
