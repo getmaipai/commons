@@ -25,6 +25,7 @@ export * from "./firmware-flash-manifest.js";
 export * from "./generation-provenance.js";
 export * from "./grant.js";
 export * from "./hero-slide.js";
+export * from "./household-voice.js";
 export * from "./issue.js";
 export * from "./likeness-adapter.js";
 export * from "./likeness-consent.js";
