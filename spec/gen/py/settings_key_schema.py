@@ -5,7 +5,15 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, constr
+from gen.py._validators import confirm_off_requires_boolean
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    constr,
+    field_validator,
+)
 
 
 class Range(BaseModel):
@@ -33,6 +41,19 @@ class UserDefaultsKeys(BaseModel):
     child: constr(pattern=r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$') | None = None
     teen: constr(pattern=r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$') | None = None
     adult: constr(pattern=r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$') | None = None
+
+
+class ConfirmOff(BaseModel):
+    """
+    Confirmation shown before a boolean setting is turned off.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    title: constr(min_length=1)
+    body: constr(min_length=1)
+    action: constr(min_length=1)
 
 
 class Copy(BaseModel):
@@ -129,6 +150,9 @@ class SettingsKey(BaseModel):
     default: Any
     label: constr(min_length=1)
     help: str | None = None
+    confirm_off: ConfirmOff | None = Field(
+        None, description='Confirmation shown before a boolean setting is turned off.'
+    )
     copy_: Copy | None = Field(None, alias='copy')
     control: Control | None = None
     band_default: BandDefault | None = None
@@ -143,3 +167,10 @@ class SettingsKey(BaseModel):
         description='The package, companion, integration, or central page id that renders this key.',
     )
     honoured_by: list[Literal['home', 'bot']] = Field(..., min_length=1)
+
+    @field_validator('confirm_off', mode='after')
+    @classmethod
+    def confirm_off_requires_boolean_validator(
+        cls, v: Any, info: ValidationInfo
+    ) -> Any:
+        return confirm_off_requires_boolean(v, info)

@@ -5,6 +5,7 @@ import { Input } from "../dashboard/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "../dashboard/components/ui/item";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../dashboard/components/ui/select";
 import { Switch } from "../dashboard/components/ui/switch";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../dashboard/components/ui/alert-dialog";
 import { localeDisplayName, middleEllipsis, titleCaseOption } from "./optionLabels";
 import { HitField } from "./HitField";
 import { PersonMultiSelect, type PersonOption } from "./PersonMultiSelect";
@@ -83,6 +84,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
   const [secretEditing, setSecretEditing] = useState(false);
   const [secretDraft, setSecretDraft] = useState("");
   const [secretSaving, setSecretSaving] = useState(false);
+  const [confirmingOff, setConfirmingOff] = useState(false);
 
   // Every write, from any control, goes through here so the host's
   // per-key hook sees it and a refusal never reaches the server.
@@ -198,8 +200,26 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
       </>
     );
   } else if (def.selector === "boolean") {
+    const confirmOff = (def as typeof def & { confirm_off?: { title: string; body: string; action: string } }).confirm_off;
     control = (
-      <Switch size="md" checked={Boolean(resolved.value)} onCheckedChange={(v) => void write(v)} disabled={disabled} aria-label={def.label} />
+      <>
+        <Switch size="md" checked={Boolean(resolved.value)} onCheckedChange={(v) => {
+          if (confirmOff && resolved.value && !v) setConfirmingOff(true);
+          else void write(v);
+        }} disabled={disabled} aria-label={def.label} />
+        {confirmOff ? <AlertDialog open={confirmingOff} onOpenChange={setConfirmingOff}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{confirmOff.title}</AlertDialogTitle>
+              <AlertDialogDescription>{confirmOff.body}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => { setConfirmingOff(false); void write(false); }}>{confirmOff.action}</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog> : null}
+      </>
     );
   } else if (def.selector === "select" && (def.range as { multiple?: boolean } | undefined)?.multiple) {
     // A select with `range.multiple` is a chips Combobox; names come from the spec's

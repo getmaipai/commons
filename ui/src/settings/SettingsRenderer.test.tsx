@@ -21,6 +21,7 @@ type Def = {
   honoured_by?: string[];
   range?: unknown;
   default?: unknown;
+  confirm_off?: { title: string; body: string; action: string };
 };
 
 function registryOf(defs: Def[]) {
@@ -230,6 +231,35 @@ describe("SettingsRenderer - embedding options", () => {
 });
 
 describe("SettingsRenderer - writes", () => {
+  const guarded: Def[] = [{ key: "home.robots.enabled", selector: "boolean", label: "Robots", lives_in: "home.robots", scope: "household", default: true, confirm_off: { title: "Turn off robots?", body: "Your robots stop listening.", action: "Turn off" } }];
+  const guardedProps = { scope: "household" as const, scopeValue: "household", honouredBy: "home" };
+
+  test("canceling confirm_off writes nothing and keeps the switch on", async () => {
+    mockApi(guarded, { "home.robots.enabled": true });
+    const view = renderWithQueryClient(<SettingsRenderer {...guardedProps} />);
+    await act(async () => { fireEvent.click(await view.findByRole("switch", { name: "Robots" })); });
+    expect(await view.findByText("Turn off robots?")).toBeTruthy();
+    await act(async () => { fireEvent.click(view.getByRole("button", { name: "Cancel" })); });
+    expect(calls.some((c) => c.method === "PUT")).toBe(false);
+    expect(view.getByRole("switch", { name: "Robots" }).getAttribute("aria-checked")).toBe("true");
+  });
+
+  test("confirming confirm_off writes false", async () => {
+    mockApi(guarded, { "home.robots.enabled": true });
+    const view = renderWithQueryClient(<SettingsRenderer {...guardedProps} />);
+    await act(async () => { fireEvent.click(await view.findByRole("switch", { name: "Robots" })); });
+    await act(async () => { fireEvent.click(view.getByRole("button", { name: "Turn off" })); });
+    await waitFor(() => expect(JSON.parse(calls.find((c) => c.method === "PUT")!.body!).value).toBe(false));
+  });
+
+  test("turning a confirm_off setting on writes without a dialog", async () => {
+    mockApi(guarded, { "home.robots.enabled": false });
+    const view = renderWithQueryClient(<SettingsRenderer {...guardedProps} />);
+    await act(async () => { fireEvent.click(await view.findByRole("switch", { name: "Robots" })); });
+    expect(calls.some((c) => c.method === "PUT" && JSON.parse(c.body!).value === true)).toBe(true);
+    expect(view.queryByText("Turn off robots?")).toBeNull();
+  });
+
   test("toggling a switch PUTs the key and value to the scope and shows the new state", async () => {
     mockApi(DEFS);
     const view = renderWithQueryClient(<SettingsRenderer {...props} />);

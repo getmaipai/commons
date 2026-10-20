@@ -6,6 +6,12 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["key", "scope", "selector", "default", "label", "level", "lives_in", "honoured_by"],
+  "allOf": [
+    {
+      "if": { "required": ["confirm_off"] },
+      "then": { "properties": { "selector": { "const": "boolean" } } }
+    }
+  ],
   "properties": {
     "key": {
       "type": "string",
@@ -63,6 +69,17 @@
     "default": {},
     "label": { "type": "string", "minLength": 1 },
     "help": { "type": "string" },
+    "confirm_off": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "body", "action"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 },
+        "action": { "type": "string", "minLength": 1 }
+      },
+      "description": "Confirmation shown before a boolean setting is turned off."
+    },
     "copy": {
       "type": "object",
       "additionalProperties": false,

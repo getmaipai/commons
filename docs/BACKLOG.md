@@ -514,7 +514,7 @@ Design: `home/docs/design/robots-switch-and-install-2026-10-20.md`, `home/docs/d
   BOT-MEMORY-01 wait on it; design home robot-own-name-and-memory-2026-10-20.md). Objective: add optional nullable robot ownership
   to both shared records, preserving shared records as null. Landed schemas, generated TypeScript and Python types, and valid and
   invalid device_id fixtures.
-- [ ] **SPEC-SETTING-CONFIRM-01: a confirm-before-off field on boolean keys, and the Robots switch key** (S; 2026-10-20; Home
+- [x] **SPEC-SETTING-CONFIRM-01: a confirm-before-off field on boolean keys, and the Robots switch key** (S; 2026-10-20; Home
   ROBOTS-SWITCH-01 waits on it). Objective: (1) `spec/settings` gains an optional `confirm_off` copy object on `selector: "boolean"`
   keys (`title`, `body`, `action`), validated by the keys schema, generated into `gen/ts` and `gen/py`; (2) `ui` `SettingsShell` /
   `SettingsRenderer` shows that copy in the kit `AlertDialog` before writing `false`, and writes nothing on cancel; (3) the household
@@ -523,13 +523,15 @@ Design: `home/docs/design/robots-switch-and-install-2026-10-20.md`, `home/docs/d
   the top of the household `robot` area in `areas.json` with no `needs`; every other robot card there gains `needs:
   ["robots.enabled"]`. Acceptance: schema and fixture tests in both languages; a UI test that cancel writes nothing and confirm
   writes `false`; turning on never asks. Exit: `scripts/check.sh`, then tag spec and ui.
-- [ ] **SPEC-ROBOT-FACE-NIGHT-01: face color and night mode keys** (S; 2026-10-20; Home ROBOT-FACE-NIGHT-01 and bot
+  Built 2026-10-20, spec-v0.1.195, ui-v0.5.305.
+- [x] **SPEC-ROBOT-FACE-NIGHT-01: face color and night mode keys** (S; 2026-10-20; Home ROBOT-FACE-NIGHT-01 and bot
   BOT-FACE-NIGHT-01 wait on it). Objective: two device keys in group `robot.hello`, admin, `honoured_by: ["home", "bot"]`:
   `robot.face.color` (`select`, default `mint`, options mint, sky, peach, lavender, lemon, rose, cloud; label "Face color"; the bot
   owns each option's background and ink pair) and `robot.night.mode` (`boolean`, default true, label "Night mode", help "During
   quiet hours or when the room is dark, the face turns black, the screen dims, the voice gets quieter and the robot holds still, so
   it stays quiet. Talking to it or its wake word still works."). Acceptance: keys validate; generated types in both languages carry
   the option list; fixtures updated. Exit: `scripts/check.sh`, then tag spec.
+  Built 2026-10-20, spec-v0.1.195, ui-v0.5.305.
 - [ ] **SPEC-FLASH-MANIFEST-01: a signed firmware flash manifest record** (S; 2026-10-20; bot BOT-RELEASE-FLASH-01 emits it, Home
   STACKCHAN-INSTALL-01 reads it). Objective: `FirmwareFlashManifest`, shaped like ESP Web Tools' manifest (`name`, `version`,
   `builds[{chipFamily, parts[{path, offset}]}]`) plus `flash_size` and, per part, `size` and `sha256`; with the record's id,

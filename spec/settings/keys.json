@@ -2354,6 +2354,93 @@
     ]
   },
   {
+    "key": "robot.face.color",
+    "scope": "device",
+    "selector": "select",
+    "range": {
+      "options": [
+        "mint",
+        "sky",
+        "peach",
+        "lavender",
+        "lemon",
+        "rose",
+        "cloud"
+      ]
+    },
+    "default": "mint",
+    "label": "Face color",
+    "help": "The color behind this robot's face during the day. Only an admin changes this, for each robot on its own.",
+    "copy": {
+      "does": "Sets a background shade.",
+      "options": {
+        "mint": "A soft green blue.",
+        "sky": "A clear pale blue.",
+        "peach": "A warm soft orange.",
+        "lavender": "A light purple.",
+        "lemon": "A gentle yellow.",
+        "rose": "A soft pink.",
+        "cloud": "A light neutral gray."
+      },
+      "option_labels": {
+        "mint": "Mint",
+        "sky": "Sky",
+        "peach": "Peach",
+        "lavender": "Lavender",
+        "lemon": "Lemon",
+        "rose": "Rose",
+        "cloud": "Cloud"
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "robot.hello",
+    "honoured_by": [
+      "home",
+      "bot"
+    ]
+  },
+  {
+    "key": "robot.night.mode",
+    "scope": "device",
+    "selector": "boolean",
+    "default": true,
+    "label": "Night mode",
+    "help": "During quiet hours or when the room is dark, the face turns black, the screen dims, the voice gets quieter and the robot holds still, so it stays quiet. Talking to it or its wake word still works.",
+    "copy": {
+      "does": "Lets the robot stay quiet during quiet hours or when the room is dark."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "robot.hello",
+    "honoured_by": [
+      "home",
+      "bot"
+    ]
+  },
+  {
+    "key": "home.robots.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Robots",
+    "help": "Lets this home use robots. When it's off, robots can't connect and nothing about them shows here. Nothing is deleted.",
+    "confirm_off": {
+      "title": "Turn off robots?",
+      "body": "Your robots stop listening and talking until you turn this back on. Nothing is deleted.",
+      "action": "Turn off"
+    },
+    "copy": {
+      "does": "Lets companions like StackChan join this home and talk with your family."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "home.robots",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "robot.initiative.accept_phrases",
     "scope": "household",
     "selector": "select",

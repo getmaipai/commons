@@ -48,3 +48,20 @@ def test_coding_engine_setting_fixtures_and_registry_defaults():
     assert entries["coding.yield_to_chat"]["default"] is True
     assert entries["coding.engine"]["default"] == "auto"
     assert entries["coding.splash_cache_gb"]["default"] == 8
+
+
+def test_confirm_off_is_limited_to_boolean_settings():
+    value = {
+        "key": "test.confirm",
+        "scope": "household",
+        "selector": "boolean",
+        "default": True,
+        "label": "Test",
+        "level": "basic",
+        "lives_in": "test",
+        "honoured_by": ["home"],
+        "confirm_off": {"title": "Off?", "body": "Body", "action": "Off"},
+    }
+    SettingsKey.model_validate(value)
+    with pytest.raises(ValidationError):
+        SettingsKey.model_validate({**value, "selector": "select", "default": "x"})

@@ -17,3 +17,10 @@ def require_boolean(value: Any, _info: ValidationInfo) -> Any:
     if value is not None and type(value) is not bool:
         raise ValueError("value must be a boolean")
     return value
+
+
+def confirm_off_requires_boolean(value: Any, info: ValidationInfo) -> Any:
+    """Match the schema: confirm_off copy is only allowed on a boolean selector."""
+    if value is not None and info.data.get("selector") != "boolean":
+        raise ValueError("confirm_off is only allowed when selector is boolean")
+    return value

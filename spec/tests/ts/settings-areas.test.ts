@@ -93,7 +93,8 @@ describe("spec/settings/areas.json", () => {
     expect(section("home", "ai").trail_view).toBe("home.engine_admin");
     expect(section("home", "robot").trail_view).toBe("home.devices_admin");
     expect(section("home", "robot").needs).toBeUndefined();
-    expect(section("home", "robot").cards?.[0]?.needs).toEqual(["robot.paired"]);
+    expect(section("home", "robot").cards?.[0]).toEqual({ label: "Robots", group: "home.robots", scope: "household" });
+    expect(section("home", "robot").cards?.[1]?.needs).toEqual(["robot.paired", "robots.enabled"]);
     expect(section("home", "developer").trail_view).toBe("home.routing_stats");
   });
 });
@@ -447,8 +448,8 @@ describe("registry group moves (design 3.5): only lives_in changes", () => {
   });
 
   test("the registry keeps the pinned count and includes the checklist dismissal key", () => {
-    expect(registry).toHaveLength(235);
-    expect(new Set(registryIds()).size).toBe(235);
+    expect(registry).toHaveLength(238);
+    expect(new Set(registryIds()).size).toBe(238);
     for (const key of [
       "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
       "reference.update.max_mbps",

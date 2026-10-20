@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.305] - ui-v0.5.305
+
+- SPEC-SETTING-CONFIRM-01: show the setting's confirmation dialog before a boolean setting with `confirm_off` is turned off. Cancel leaves the setting unchanged. Additive.
+
 ## [0.5.304] - ui-v0.5.304
 
 - UI-SETTINGS-OPTIONS-01: `SettingsRenderer` accepts runtime option lists for `options_from` selects and passes them to the row. Supplied labels are shown as given; an unavailable list disables the select with a note, and an unmatched current value remains visible. Ordinary selects keep their existing labels and behavior. Additive.

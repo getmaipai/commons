@@ -416,6 +416,18 @@ export const PackageManifest = z
             default: z.any(),
             label: z.string().min(1),
             help: z.string().optional(),
+            /**Confirmation shown before a boolean setting is turned off.*/
+            confirm_off: z
+              .object({
+                title: z.string().min(1),
+                body: z.string().min(1),
+                action: z.string().min(1),
+              })
+              .strict()
+              .describe(
+                "Confirmation shown before a boolean setting is turned off.",
+              )
+              .optional(),
             copy: z
               .object({
                 does: z.string().min(1),
@@ -474,6 +486,11 @@ export const PackageManifest = z
             honoured_by: z.array(z.enum(["home", "bot"])).min(1),
           })
           .strict()
+          .superRefine((value, ctx) => {
+            if (value.confirm_off !== undefined && value.selector !== "boolean") {
+              ctx.addIssue({ code: "custom", message: "confirm_off is allowed only for boolean selectors", path: ["confirm_off"] });
+            }
+          })
           .describe(
             "One entry in the settings registry (spec/settings/keys.json) or a package manifest's config[]. See platform plan 3.2 and .github's docs/SETTINGS.md.",
           ),

@@ -23,6 +23,12 @@ describe("spec/settings/keys.json", () => {
     }
   });
 
+  test("confirm_off is limited to boolean selectors", () => {
+    const base = { key: "test.confirm", scope: "household", selector: "select", default: "a", label: "Test", level: "basic", lives_in: "test", honoured_by: ["home"], confirm_off: { title: "Off?", body: "Body", action: "Off" } };
+    expect(() => SettingsKey.parse(base)).toThrow();
+    expect(() => SettingsKey.parse({ ...base, selector: "boolean", default: true })).not.toThrow();
+  });
+
   test("every key is declared exactly once (one definition, one place)", () => {
     const entries = loadRegistry() as { key: string }[];
     const keys = entries.map((e) => e.key);
@@ -190,6 +196,7 @@ describe("SETTINGS-ROBOT-01 declarations", () => {
       "robot.barge_in.open_mic", "robot.gestures.enabled", "robot.initiative.allowed_here",
       "robot.sleep.auto",
       "robot.voice.id",
+      "robot.face.color", "robot.night.mode", "home.robots.enabled",
     ];
     for (const key of required) expect(keys.has(key), key).toBe(true);
     expect(keys.get("robot.offlan.tailnet")?.default).toBe(false);

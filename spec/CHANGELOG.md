@@ -1,3 +1,8 @@
+## [spec-v0.1.195] - 2026-10-20
+
+- SPEC-SETTING-CONFIRM-01 and SPEC-ROBOT-FACE-NIGHT-01: add the household Robots switch with confirm-before-off copy, and add per-robot face color and night mode settings. Additive.
+- SPEC-ROBOT-MEMORY-01: optional nullable `device_id` on MemoryRecord and Conversation, with generated TypeScript/Python models and fixtures.
+
 ## [spec-v0.1.194] - 2026-10-20
 
 - SPEC-ROBOT-VOICE-01: add the `robot.voice.id` device setting, letting an admin choose this robot's voice from the household TTS voice list. `default` keeps the voice Home uses for the robot today. Additive.
@@ -339,9 +344,6 @@ tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
 ## [Unreleased]
-
-### Added
-- SPEC-ROBOT-MEMORY-01: optional nullable `device_id` on MemoryRecord and Conversation, with generated TypeScript/Python models and fixtures.
 
 ## [spec-v0.1.141] - 2026-10-14
 

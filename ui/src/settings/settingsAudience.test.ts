@@ -82,7 +82,7 @@ describe("Home settings and Account audience", () => {
     const plain = ids(visibleGroups(account, ADULT, REGISTRY, "home"));
     expect(plain).not.toContain("device");
     expect(plain).not.toContain("robot");
-    const equipped = ids(visibleGroups(account, { ...ADULT, capabilities: ["wakeword.assets", "robot.paired"] }, REGISTRY, "home"));
+    const equipped = ids(visibleGroups(account, { ...ADULT, capabilities: ["wakeword.assets", "robot.paired", "robots.enabled"] }, REGISTRY, "home"));
     expect(equipped).toContain("device");
     expect(equipped).toContain("robot");
   });

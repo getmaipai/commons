@@ -220,7 +220,8 @@
                 "adult"
               ],
               "needs": [
-                "robot.paired"
+                "robot.paired",
+                "robots.enabled"
               ]
             }
           ],
@@ -228,7 +229,8 @@
             "adult"
           ],
           "needs": [
-            "robot.paired"
+            "robot.paired",
+            "robots.enabled"
           ]
         },
         {
@@ -606,11 +608,17 @@
           "kind": "keys",
           "cards": [
             {
+              "label": "Robots",
+              "group": "home.robots",
+              "scope": "household"
+            },
+            {
               "label": "Robot",
               "group": "robot.settings",
               "scope": "household",
               "needs": [
-                "robot.paired"
+                "robot.paired",
+                "robots.enabled"
               ]
             }
           ],
