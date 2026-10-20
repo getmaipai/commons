@@ -499,7 +499,9 @@ def validate_firmware_flash_manifest(record) -> Problems:
         parts = sorted(build.parts, key=lambda part: part.offset)
         for index, part in enumerate(parts):
             if part.offset + part.size > capacity:
-                problems.append(f"build {build_index} part {part.path} ends past flash_size")
+                problems.append(
+                    f"build {build_index} part {part.path} ends past flash_size"
+                )
             if index and parts[index - 1].offset + parts[index - 1].size > part.offset:
                 problems.append(f"build {build_index} parts overlap at {part.path}")
     return problems
@@ -517,4 +519,6 @@ def firmware_flash_manifest_signing_payload(record) -> bytes:
         payload = {key: value for key, value in record.items() if key != "signature"}
     else:
         payload = record.model_dump(mode="json", exclude={"signature"})
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
