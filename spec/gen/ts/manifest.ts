@@ -487,8 +487,16 @@ export const PackageManifest = z
           })
           .strict()
           .superRefine((value, ctx) => {
-            if (value.confirm_off !== undefined && value.selector !== "boolean") {
-              ctx.addIssue({ code: "custom", message: "confirm_off is allowed only for boolean selectors", path: ["confirm_off"] });
+            if (
+              value.confirm_off !== undefined &&
+              value.selector !== "boolean"
+            ) {
+              ctx.addIssue({
+                code: "custom",
+                message:
+                  'confirm_off is allowed only when selector is "boolean"',
+                path: ["confirm_off"],
+              });
             }
           })
           .describe(

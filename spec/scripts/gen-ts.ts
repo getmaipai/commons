@@ -20,7 +20,7 @@
 import { readdir, mkdir, writeFile, rm, rename, readFile } from "node:fs/promises";
 import { join, basename } from "node:path";
 import $RefParser from "@apidevtools/json-schema-ref-parser";
-import { jsonSchemaToZod } from "json-schema-to-zod";
+import { jsonSchemaToZod, parseSchema, type ParserOverride } from "json-schema-to-zod";
 import prettier from "prettier";
 import { STACK_SCHEMA_NAMES } from "./stackSchemaNames.js";
 
@@ -75,6 +75,41 @@ async function writeFileAtomic(outPath: string, content: string): Promise<void> 
   await rename(tmpPath, outPath);
 }
 
+// json-schema-to-zod renders `allOf: [{ if, then }]` as `.and(z.any())`, which checks nothing and turns the object into
+// an intersection (no `.shape`). The one if/then form the spec uses on an object, "when field A is present, field B must
+// be this const" (settings-key confirm_off: SPEC-SETTING-CONFIRM-01), is emitted as a superRefine on the plain object
+// instead. The Python side enforces the same rule through a datamodel-codegen validator (scripts/gen-py.sh).
+type PresentRequiresConst = { present: string; field: string; value: unknown };
+function presentRequiresConst(schema: Record<string, unknown>): PresentRequiresConst[] | null {
+  const allOf = schema.allOf;
+  if (schema.type !== "object" || !Array.isArray(allOf) || allOf.length === 0) return null;
+  const rules: PresentRequiresConst[] = [];
+  for (const entry of allOf as Record<string, any>[]) {
+    const keys = Object.keys(entry).sort().join(",");
+    const required = entry.if?.required;
+    const props = entry.then?.properties;
+    if (keys !== "if,then" || Object.keys(entry.if).length !== 1 || !Array.isArray(required) || required.length !== 1) return null;
+    if (Object.keys(entry.then).length !== 1 || !props || Object.keys(props).length !== 1) return null;
+    const [field] = Object.keys(props);
+    if (Object.keys(props[field]).join(",") !== "const") return null;
+    rules.push({ present: required[0], field, value: props[field].const });
+  }
+  return rules;
+}
+const ifPresentOverride: ParserOverride = (schema, refs) => {
+  const rules = presentRequiresConst(schema as Record<string, unknown>);
+  if (!rules) return;
+  const { allOf: _allOf, description, ...plain } = schema as Record<string, unknown>;
+  const checks = rules
+    .map(
+      (r) =>
+        `if (value.${r.present} !== undefined && value.${r.field} !== ${JSON.stringify(r.value)}) { ctx.addIssue({ code: "custom", message: ${JSON.stringify(`${r.present} is allowed only when ${r.field} is ${JSON.stringify(r.value)}`)}, path: [${JSON.stringify(r.present)}] }); }`,
+    )
+    .join("\n");
+  const describe = typeof description === "string" ? `.describe(${JSON.stringify(description)})` : "";
+  return `${parseSchema(plain as never, refs, true)}.superRefine((value, ctx) => { ${checks} })${describe}`;
+};
+
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
@@ -101,6 +136,7 @@ async function main() {
       type: true,
       withJsdocs: true,
       zodVersion: 4,
+      parserOverride: ifPresentOverride,
     });
 
     const header = `// GENERATED FILE. Do not edit by hand.\n// Source: spec/schemas/${file}\n// Regenerate with: cd spec && bun run gen:ts\n\n`;

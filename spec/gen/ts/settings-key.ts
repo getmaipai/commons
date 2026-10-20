@@ -96,6 +96,7 @@ export const SettingsKey = z
         action: z.string().min(1),
       })
       .strict()
+      .describe("Confirmation shown before a boolean setting is turned off.")
       .optional(),
     copy: z
       .object({
@@ -157,7 +158,11 @@ export const SettingsKey = z
   .strict()
   .superRefine((value, ctx) => {
     if (value.confirm_off !== undefined && value.selector !== "boolean") {
-      ctx.addIssue({ code: "custom", message: "confirm_off is allowed only for boolean selectors", path: ["confirm_off"] });
+      ctx.addIssue({
+        code: "custom",
+        message: 'confirm_off is allowed only when selector is "boolean"',
+        path: ["confirm_off"],
+      });
     }
   })
   .describe(
