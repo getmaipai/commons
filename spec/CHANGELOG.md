@@ -1,3 +1,7 @@
+## [spec-v0.1.197] - 2026-10-20
+
+- SPEC-FLASH-MANIFEST-01: add the signed `FirmwareFlashManifest` record (ESP Web Tools shape plus flash size and each part's size and sha256) with its validator and signing payload, for flashing a robot from the browser. Additive. `spec-v0.1.196` carries the same record but its package version still read 0.1.195, so consumers pin this tag instead.
+
 ## [spec-v0.1.195] - 2026-10-20
 
 - SPEC-SETTING-CONFIRM-01 and SPEC-ROBOT-FACE-NIGHT-01: add the household Robots switch with confirm-before-off copy, and add per-robot face color and night mode settings. Additive.
