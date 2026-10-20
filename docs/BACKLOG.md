@@ -504,3 +504,31 @@ capability, needs its own design pass first).
 ## SearXNG settings
 
 - [ ] **SEARXNG-SET-01: the SearXNG engine-group catalog in the spec** (S, 2026-10-06; design `docs/plans/searxng-settings-2026-10-06.md` in home). Objective: one definition of the engine groups both the Stack and Home read. Files: `spec/search/searxng-engines.json`, its schema, `gen/ts`, `gen/py`, `spec/settings/keys.json` (`search.searxng_url` label and help; `search.*` household keys to `lives_in: household.search`), CHANGELOG, tag. Acceptance: groups General web and Wikipedia locked on; Images, News, Video on; Science off; Yandex and Baidu flagged and off; each engine names its operator and country; the minimums of section 2 are data; a fixture round-trips; no engine in the catalog needs a key. Out of scope: Stack and Home code. Exit: commons gate, new spec tag.
+
+## Robots switch, install and face (2026-10-20)
+
+Design: `home/docs/design/robots-switch-and-install-2026-10-20.md` and `home/docs/design/robot-face-color-and-night-2026-10-20.md`
+(architect-approved in `home`). Spec first; Home and bot rows follow.
+
+- [ ] **SPEC-SETTING-CONFIRM-01: a confirm-before-off field on boolean keys, and the Robots switch key** (S; 2026-10-20; Home
+  ROBOTS-SWITCH-01 waits on it). Objective: (1) `spec/settings` gains an optional `confirm_off` copy object on `selector: "boolean"`
+  keys (`title`, `body`, `action`), validated by the keys schema, generated into `gen/ts` and `gen/py`; (2) `ui` `SettingsShell` /
+  `SettingsRenderer` shows that copy in the kit `AlertDialog` before writing `false`, and writes nothing on cancel; (3) the household
+  key `home.robots.enabled` (boolean, default off, admin, `honoured_by: ["home"]`) with `confirm_off` copy ("Turn off robots?",
+  "Your robots stop listening and talking until you turn this back on. Nothing is deleted.", "Turn off"), on a new "Robots" card at
+  the top of the household `robot` area in `areas.json` with no `needs`; every other robot card there gains `needs:
+  ["robots.enabled"]`. Acceptance: schema and fixture tests in both languages; a UI test that cancel writes nothing and confirm
+  writes `false`; turning on never asks. Exit: `scripts/check.sh`, then tag spec and ui.
+- [ ] **SPEC-ROBOT-FACE-NIGHT-01: face color and night mode keys** (S; 2026-10-20; Home ROBOT-FACE-NIGHT-01 and bot
+  BOT-FACE-NIGHT-01 wait on it). Objective: two device keys in group `robot.hello`, admin, `honoured_by: ["home", "bot"]`:
+  `robot.face.color` (`select`, default `mint`, options mint, sky, peach, lavender, lemon, rose, cloud; label "Face color"; the bot
+  owns each option's background and ink pair) and `robot.night.mode` (`boolean`, default true, label "Night mode", help "During
+  quiet hours or when the room is dark, the face turns black, the screen dims, the voice gets quieter and the robot holds still, so
+  it stays quiet. Talking to it or its wake word still works."). Acceptance: keys validate; generated types in both languages carry
+  the option list; fixtures updated. Exit: `scripts/check.sh`, then tag spec.
+- [ ] **SPEC-FLASH-MANIFEST-01: a signed firmware flash manifest record** (S; 2026-10-20; bot BOT-RELEASE-FLASH-01 emits it, Home
+  STACKCHAN-INSTALL-01 reads it). Objective: `FirmwareFlashManifest`, shaped like ESP Web Tools' manifest (`name`, `version`,
+  `builds[{chipFamily, parts[{path, offset}]}]`) plus `flash_size` and, per part, `size` and `sha256`; with the record's id,
+  provenance and clock stamp; signed and verified like a catalog package. Neither side invents offsets. Acceptance: schema, a
+  StackChan (ESP32-S3) fixture, round-trip tests in both languages, a test that a part with a bad sha256 or an overlapping offset
+  fails validation. Exit: `scripts/check.sh`, then tag spec.
