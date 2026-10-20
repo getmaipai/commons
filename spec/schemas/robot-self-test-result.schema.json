@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/robot-self-test-result.schema.json",
+  "title": "RobotSelfTestResult",
+  "description": "Device-to-hub answer to self_test. detail is plain words, never audio, a transcript or an image.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "part",
+    "ok",
+    "detail",
+    "took_ms"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "part": {
+      "type": "string",
+      "enum": [
+        "speaker",
+        "face",
+        "head",
+        "lights",
+        "mic"
+      ]
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "detail": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "took_ms": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

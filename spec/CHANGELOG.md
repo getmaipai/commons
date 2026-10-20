@@ -1,3 +1,7 @@
+## [spec-v0.1.193] - 2026-10-20
+
+- SPEC-ROBOT-TEST-01: add the `no_vendor_login` capability for robot bodies without a published login password; add the hub-to-device `self_test` command and device-to-hub `robot-self-test-result` record; and place `robot.hello` on the chosen robot settings dialog as an admin-only device card. All additions are additive.
+
 ## [spec-v0.1.192] - 2026-10-19
 
 - CSAM-TEXT-01 (Owner-approved 2026-10-19): `SafetyContext.csamMode` (`floor` default, `adult_message`, `adult_reply`). An adult's chat message is refused for the `csam` category only for an explicit term in a sentence that asks for something (`show me loli content`; `loli`, `child porn`, `underage sex` and the like, not the words news and advice use) or for a request: a sentence that asks to write, describe, draw, show, imagine or role-play AND, with the sentence before it, holds a minor indicator AND a sexual term. The model's reply to an adult has no `csam` word rule. `floor` is today's rule and stays for a teen, a child, the robot and every generation prompt. Measured on the 86 labelled texts: an adult's message refuses 0 of 45 harmless texts (the rule it replaces: 24 of 45) and catches 21 of 41 harmful ones (36 of 41); the rest rely on the model's own refusal and the generation checks. Additive; the default behaviour of `checkSafety` is unchanged.

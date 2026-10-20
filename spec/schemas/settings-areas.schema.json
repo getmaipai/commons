@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/settings-areas.schema.json",
+  "title": "SettingsAreas",
+  "description": "The central settings areas and cards shown on a device's own settings dialog.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "areas",
+    "not_placed",
+    "device_cards"
+  ],
+  "properties": {
+    "areas": {
+      "type": "array",
+      "items": {
+        "$ref": "settings-area.schema.json"
+      }
+    },
+    "not_placed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scope",
+          "group",
+          "reason"
+        ],
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": [
+              "household",
+              "person",
+              "device"
+            ]
+          },
+          "group": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10
+          }
+        }
+      }
+    },
+    "device_cards": {
+      "type": "array",
+      "description": "Drawn on one device's own settings dialog, for the device the admin opened.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "device_kind",
+          "label",
+          "group",
+          "scope",
+          "min_role"
+        ],
+        "properties": {
+          "device_kind": {
+            "type": "string",
+            "const": "robot"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "group": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "string",
+            "const": "device"
+          },
+          "min_role": {
+            "$ref": "settings-area.schema.json#/$defs/role"
+          }
+        }
+      }
+    }
+  }
+}

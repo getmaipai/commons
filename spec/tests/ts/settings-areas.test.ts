@@ -20,12 +20,14 @@ import {
 
 const SPEC = join(import.meta.dir, "..", "..");
 const schema = JSON.parse(readFileSync(join(SPEC, "schemas", "settings-area.schema.json"), "utf-8"));
+const areasSchema = JSON.parse(readFileSync(join(SPEC, "schemas", "settings-areas.schema.json"), "utf-8"));
 const file = JSON.parse(readFileSync(join(SPEC, "settings", "areas.json"), "utf-8")) as AreasFile;
 const registry = JSON.parse(readFileSync(join(SPEC, "settings", "keys.json"), "utf-8")) as RegistryKey[];
 
 const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
 const validateArea = ajv.compile(schema);
+const validateAreasFile = ajv.compile(areasSchema);
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 const area = (id: string) => {
@@ -41,6 +43,13 @@ const section = (areaId: string, sectionId: string) => {
 const registryIds = () => registry.map((k) => k.key);
 
 describe("spec/settings/areas.json", () => {
+  test("the central settings file matches its schema, including device cards", () => {
+    expect(validateAreasFile(file), ajv.errorsText(validateAreasFile.errors)).toBe(true);
+    const invalid = clone(file);
+    invalid.device_cards[0]!.scope = "person" as "device";
+    expect(validateAreasFile(invalid)).toBe(false);
+  });
+
   test("declares exactly the account, home and chat areas", () => {
     expect(file.areas.map((a) => a.id).sort()).toEqual(["account", "chat", "home"]);
   });
@@ -118,10 +127,16 @@ describe("conformance: each registry group is in exactly one card", () => {
     expect(checkAreas(broken, registry).join("\n")).toMatch(/person\.ghost.*not in the registry/);
   });
 
-  test("device-only robot hello keys are not placed (the robot renders them) and the reason is recorded", () => {
-    const hello = file.not_placed.find((n) => n.group === "robot.hello");
-    expect(hello?.scope).toBe("device");
-    expect(hello?.reason.length).toBeGreaterThan(10);
+  test("robot hello is placed on the selected robot device card", () => {
+    expect(file.device_cards).toContainEqual({ device_kind: "robot", label: "This robot", group: "robot.hello", scope: "device", min_role: "admin" });
+    expect(file.not_placed.some((n) => n.scope === "device" && n.group === "robot.hello")).toBe(false);
+    expect(checkAreas(file, registry)).toEqual([]);
+  });
+
+  test("device card rejects registry groups outside device scope", () => {
+    const broken = clone(file);
+    broken.device_cards.push({ device_kind: "robot", label: "Bad", group: "person.chat", scope: "person" as "device", min_role: "admin" });
+    expect(checkAreas(broken, registry).join("\n")).toMatch(/device card group person\.chat must have device scope/);
   });
 });
 

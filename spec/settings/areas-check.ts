@@ -52,7 +52,8 @@ export interface SettingsArea {
   sections: AreaSection[];
 }
 export interface NotPlaced { scope: Scope; group: string; reason: string }
-export interface AreasFile { areas: SettingsArea[]; not_placed: NotPlaced[] }
+export interface DeviceCard { device_kind: "robot"; label: string; group: string; scope: "device"; min_role: Role }
+export interface AreasFile { areas: SettingsArea[]; not_placed: NotPlaced[]; device_cards: DeviceCard[] }
 export interface RegistryKey { key: string; scope: Scope; level: Level; lives_in: string }
 
 const defs = schema.$defs;
@@ -151,6 +152,20 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         }
       }
       if (s.href) checkHref(where, s.href, errors);
+    }
+  }
+
+  for (const card of file.device_cards ?? []) {
+    const where = `device_cards/${card.device_kind}`;
+    if (card.scope !== "device") errors.push(`${where}: device card group ${card.group} must have device scope`);
+    if (!registryGroups.has(`${card.scope}:${card.group}`)) {
+      errors.push(`${where}: group ${card.group} at ${card.scope} is not in the registry`);
+      continue;
+    }
+    const levels = registry.filter((k) => k.scope === card.scope && k.lives_in === card.group).map((k) => k.level);
+    for (const lv of new Set(levels)) {
+      const id = `${card.scope}:${card.group}:${lv}`;
+      drawn.set(id, [...(drawn.get(id) ?? []), where]);
     }
   }
 

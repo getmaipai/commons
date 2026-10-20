@@ -374,6 +374,30 @@ class DeviceCommand15(BaseModel):
     payload: Payload13
 
 
+class Payload14(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    run_id: constr(min_length=1, max_length=64)
+    part: Literal['speaker', 'face', 'head', 'lights', 'mic']
+
+
+class DeviceCommand16(BaseModel):
+    """
+    A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['self_test']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload14
+
+
 class DeviceCommand(
     RootModel[
         DeviceCommand1
@@ -391,6 +415,7 @@ class DeviceCommand(
         | DeviceCommand13
         | DeviceCommand14
         | DeviceCommand15
+        | DeviceCommand16
     ]
 ):
     root: (
@@ -409,6 +434,7 @@ class DeviceCommand(
         | DeviceCommand13
         | DeviceCommand14
         | DeviceCommand15
+        | DeviceCommand16
     ) = Field(
         ...,
         description='A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.',

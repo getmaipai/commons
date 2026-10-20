@@ -30,6 +30,14 @@ def test_every_registry_key_has_exactly_one_card() -> None:
                     continue
                 for level in card.get("levels", ["basic", "advanced"]):
                     drawn[(card["scope"], card["group"], level)] += 1
+    for card in FILE.get("device_cards", []):
+        levels = {
+            key["level"]
+            for key in REGISTRY
+            if key["scope"] == card["scope"] and key["lives_in"] == card["group"]
+        }
+        for level in levels:
+            drawn[(card["scope"], card["group"], level)] += 1
     parked = {(n["scope"], n["group"]) for n in FILE["not_placed"]}
     for key in REGISTRY:
         slot = (key["scope"], key["lives_in"], key["level"])

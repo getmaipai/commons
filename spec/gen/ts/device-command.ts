@@ -274,6 +274,21 @@ export const DeviceCommand = z
         .describe(
           "Play timed media at the requested position. expires_at is issued_at plus 60 seconds. Other command kinds keep their 24 hour expiry.",
         ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("self_test"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({
+              run_id: z.string().min(1).max(64),
+              part: z.enum(["speaker", "face", "head", "lights", "mic"]),
+            })
+            .strict(),
+        })
+        .strict(),
     ];
     const { errors, failed } = schemas.reduce<{
       errors: z.core.$ZodIssue[];

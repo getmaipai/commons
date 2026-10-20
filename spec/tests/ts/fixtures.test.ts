@@ -22,6 +22,7 @@ import { ChatFolder } from "../../gen/ts/chat-folder.js";
 import { Device } from "../../gen/ts/device.js";
 import { RobotState } from "../../gen/ts/robot-state.js";
 import { DeviceCommand } from "../../gen/ts/device-command.js";
+import { RobotSelfTestResult } from "../../gen/ts/robot-self-test-result.js";
 import { RobotChannelFrame } from "../../gen/ts/robot-channel-frame.js";
 import { RobotOffer } from "../../gen/ts/robot-offer.js";
 import { RobotAssetManifest } from "../../gen/ts/robot-asset-manifest.js";
@@ -270,7 +271,7 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
     const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
-    expect(commands).toHaveLength(15);
+    expect(commands).toHaveLength(16);
     for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();
@@ -280,6 +281,10 @@ describe("record fixtures validate against their generated Zod models", () => {
     const offer = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "offer")!;
     expect(offer.payload).not.toHaveProperty("text");
     expect(() => DeviceCommand.parse({ ...offer, payload: { ...offer.payload, text: "prepared content" } })).toThrow();
+    const selfTest = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "self_test")!;
+    expect(() => DeviceCommand.parse(selfTest)).not.toThrow();
+    expect(() => DeviceCommand.parse({ ...selfTest, payload: { ...selfTest.payload, part: "camera" } })).toThrow();
+    expect(() => DeviceCommand.parse({ ...selfTest, payload: { ...selfTest.payload, extra: true } })).toThrow();
   });
 
   test("motor_reboot command names at least one distinct motor and takes nothing else", () => {
@@ -758,4 +763,11 @@ describe("robot hello setting fixture", () => {
   test("settings-key.robot-hello.example.json", () => {
     expect(() => SettingsKey.parse(loadFixture("settings-key.robot-hello.example.json"))).not.toThrow();
   });
+});
+
+
+test("robot-self-test-result accepts valid answers and rejects invalid ones", () => {
+  expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.example.json"))).not.toThrow();
+  expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.invalid-detail.example.json"))).toThrow();
+  expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.missing-ok.invalid.example.json"))).toThrow();
 });

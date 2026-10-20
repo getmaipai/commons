@@ -969,14 +969,18 @@
       "reason": "An admin sets a person's quota from Users and Storage; it is never the viewer's own to change, and no settings route takes a person id."
     },
     {
-      "scope": "device",
-      "group": "robot.hello",
-      "reason": "Robot-only hello keys; the robot renders them on its own screen, the hub never shows them."
-    },
-    {
       "scope": "person",
       "group": "person.coding",
       "reason": "An admin sets coding grants and limits on the person's Family page. The account view shows what the grant allows."
+    }
+  ],
+  "device_cards": [
+    {
+      "device_kind": "robot",
+      "label": "This robot",
+      "group": "robot.hello",
+      "scope": "device",
+      "min_role": "admin"
     }
   ]
 }
