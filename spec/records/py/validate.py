@@ -486,3 +486,35 @@ def validate_subject_ref(ref) -> Problems:
             "a world SubjectRef's source_kind and stable_key must be set together, or both null"
         ]
     return []
+
+
+def validate_firmware_flash_manifest(record) -> Problems:
+    """Validate sorted flash ranges and bounds against the declared capacity."""
+    import re
+
+    match = re.fullmatch(r"([1-9][0-9]*)MB", record.flash_size)
+    capacity = int(match.group(1)) * 1024 * 1024 if match else 0
+    problems: Problems = []
+    for build_index, build in enumerate(record.builds):
+        parts = sorted(build.parts, key=lambda part: part.offset)
+        for index, part in enumerate(parts):
+            if part.offset + part.size > capacity:
+                problems.append(f"build {build_index} part {part.path} ends past flash_size")
+            if index and parts[index - 1].offset + parts[index - 1].size > part.offset:
+                problems.append(f"build {build_index} parts overlap at {part.path}")
+    return problems
+
+
+def firmware_flash_manifest_signing_payload(record) -> bytes:
+    """Catalog-compatible sorted-key compact JSON, excluding signature.
+
+    Verifiers pass the raw parsed JSON dict, so the bytes match what was signed even when a
+    model would re-serialize a timestamp differently; a model is accepted for producers.
+    """
+    import json
+
+    if isinstance(record, dict):
+        payload = {key: value for key, value in record.items() if key != "signature"}
+    else:
+        payload = record.model_dump(mode="json", exclude={"signature"})
+    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")

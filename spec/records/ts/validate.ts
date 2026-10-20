@@ -17,6 +17,7 @@
 // for now, see safety/README.md"): the hub is the only thing writing
 // these records today. The Python half lands when the robot writes one.
 import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 import type { Entity } from "../../gen/ts/entity.js";
 import type { Relationship } from "../../gen/ts/relationship.js";
@@ -31,6 +32,7 @@ import type { Artifact } from "../../gen/ts/artifact.js";
 import type { BiometricPrint } from "../../gen/ts/biometric-print.js";
 import type { NewsInterest } from "../../gen/ts/news-interest.js";
 import type { NewsSearchRecent } from "../../gen/ts/news-search-recent.js";
+import type { FirmwareFlashManifest } from "../../gen/ts/firmware-flash-manifest.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -570,4 +572,36 @@ export function validateNewsSearchRecent(_recent: NewsSearchRecent, band: "child
   const problems: Problems = [];
   if (band === "child") problems.push("a child's News search keeps no recents: no NewsSearchRecent row is created for a child");
   return problems;
+}
+
+/** Cross-field flash layout checks plus the catalog-compatible signing payload. */
+export function validateFirmwareFlashManifest(record: FirmwareFlashManifest): Problems {
+  const problems: Problems = [];
+  const bytes = /^([1-9][0-9]*)MB$/.exec(record.flash_size);
+  const capacity = bytes ? Number(bytes[1]) * 1024 * 1024 : 0;
+  for (const [buildIndex, build] of record.builds.entries()) {
+    const parts = [...build.parts].sort((a, b) => a.offset - b.offset);
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i]!;
+      if (part.offset + part.size > capacity) problems.push(`build ${buildIndex} part ${part.path} ends past flash_size`);
+      const previous = parts[i - 1];
+      if (previous && previous.offset + previous.size > part.offset) problems.push(`build ${buildIndex} parts overlap at ${part.path}`);
+    }
+  }
+  return problems;
+}
+
+function sortKeysDeep(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortKeysDeep);
+  if (value && typeof value === "object") return Object.fromEntries(Object.keys(value).sort().map((key) => [key, sortKeysDeep((value as Record<string, unknown>)[key])]));
+  return value;
+}
+
+export function firmwareFlashManifestSigningPayload(record: FirmwareFlashManifest): Uint8Array {
+  const { signature: _signature, ...unsigned } = record;
+  return new TextEncoder().encode(JSON.stringify(sortKeysDeep(unsigned)));
+}
+
+export function firmwareFlashManifestSigningPayloadSha256(record: FirmwareFlashManifest): string {
+  return createHash("sha256").update(firmwareFlashManifestSigningPayload(record)).digest("hex");
 }

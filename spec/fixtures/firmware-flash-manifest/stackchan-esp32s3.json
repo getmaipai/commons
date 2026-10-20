@@ -1,0 +1,20 @@
+{
+  "id": "stackchan-esp32s3-1.0.0",
+  "name": "StackChan",
+  "version": "1.0.0",
+  "builds": [{
+    "chipFamily": "ESP32-S3",
+    "parts": [
+      { "path": "bootloader.bin", "offset": 0, "size": 16384, "sha256": "1111111111111111111111111111111111111111111111111111111111111111" },
+      { "path": "partition-table.bin", "offset": 32768, "size": 4096, "sha256": "2222222222222222222222222222222222222222222222222222222222222222" },
+      { "path": "ota_data_initial.bin", "offset": 53248, "size": 8192, "sha256": "3333333333333333333333333333333333333333333333333333333333333333" },
+      { "path": "stack-chan-maipai.bin", "offset": 131072, "size": 3145728, "sha256": "4444444444444444444444444444444444444444444444444444444444444444" },
+      { "path": "generated_assets.bin", "offset": 3407872, "size": 2097152, "sha256": "5555555555555555555555555555555555555555555555555555555555555555" }
+    ]
+  }],
+  "flash_size": "16MB",
+  "provenance": "BOT-RELEASE-FLASH-01",
+  "created_at": "2026-10-20T12:00:00Z",
+  "hlc": "1792497600000:0:stackchan01",
+  "signature": { "keyid": "fixture-ed25519", "sig": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==" }
+}

@@ -21,6 +21,7 @@ export * from "./feed-list-package.js";
 export * from "./feed-lists.js";
 export * from "./feed.js";
 export * from "./file.js";
+export * from "./firmware-flash-manifest.js";
 export * from "./generation-provenance.js";
 export * from "./grant.js";
 export * from "./hero-slide.js";

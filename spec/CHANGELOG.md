@@ -1151,3 +1151,7 @@ Additive throughout; every existing fixture still validates unchanged.
   documents for JSON Schema conditionals generally. Reverted to the
   hand-written mirrors, now with the exclusion list so a future
   `gen:ts` run can't silently overwrite them again.
+
+## 0.1.196
+
+- SPEC-FLASH-MANIFEST-01: add the signed `FirmwareFlashManifest` schema, generated TypeScript and Python models, layout validation, catalog-compatible signing payload helpers, and StackChan ESP32-S3 fixture.
