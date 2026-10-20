@@ -124,6 +124,16 @@ icon registry also recognizes the spec area's `network` icon.
 Resetting either network setting runs the same host confirmation before the
 generic settings renderer writes its default.
 
+## RAIL-CORE-DESTINATIONS-01 (ui-v0.5.306)
+
+`AppRail` and `FullLayout` accept optional `coreDestinations` /
+`railCoreDestinations` (`{ name, url, icon }`) for fixed, host-owned
+destinations. They render directly after Chat, before the remaining built-in
+destinations and pinned apps, and use the kit icon registry, route selection,
+tooltip, focus treatment and token-based rail styles. They do not participate
+in the pinnable app list or its limits. The same contract is available in the
+mobile navigation drawer. `AppRailShowcase` demonstrates a fixed Media entry.
+
 ## MEDIA-PLAYER-01 (ui-v0.5.257, spec-v0.1.164)
 
 The kit gained the media pieces the media apps design names (home

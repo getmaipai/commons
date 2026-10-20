@@ -2,7 +2,7 @@ import { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
 export { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
 import MobileNavDrawer from "./vertical/rail/MobileNavDrawer";
 import { FC, useState, type ReactNode } from 'react';
-import AppRail, { type RailApp } from './vertical/rail/AppRail';
+import AppRail, { type RailApp, type RailCoreDestination } from './vertical/rail/AppRail';
 import { useHeaderExtraLeft } from './vertical/header/HeaderExtraContext';
 import Sidebar from './vertical/sidebar/Sidebar';
 import Header, { type HeaderProps } from './vertical/header/Header';
@@ -68,6 +68,8 @@ export interface FullLayoutProps {
   activeAppHref?: string;
   /** Installed apps for the rail's pinned section and the launcher at its foot (see AppRailProps.apps). */
   railApps?: RailApp[];
+  /** Fixed host-owned destinations, placed directly after Chat in the core rail. */
+  railCoreDestinations?: RailCoreDestination[];
   onRailAppPinChange?: (url: string, pinned: boolean) => void;
   /** The host's All apps page; the rail's grid button opens it (see AppRailProps.allAppsHref). */
   railAllAppsHref?: string;
@@ -88,7 +90,7 @@ function RailPageHeader({ reserveBand }: { reserveBand: boolean }) {
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu }: FullLayoutProps) {
   const phone = useIsPhoneLayout();
   const Navigation = phone ? MobileNavDrawer : AppRail;
   return (
@@ -97,7 +99,7 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
           the rail stays put (sticky, full viewport height). A full-height
           page (a chat) bounds the workspace to the viewport itself. */}
       <div data-slot="rail-shell" className="flex min-h-svh w-full min-w-0 max-w-full overflow-x-clip">
-        <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
+        <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} coreDestinations={railCoreDestinations} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
         <main data-slot="rail-workspace" data-phone-menu={phone && !hideMobileMenu ? "" : undefined} className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
           <RailPageHeader reserveBand={phone && !hideMobileMenu} />
           <div data-slot="rail-body" className="min-w-0 max-w-full flex-1">

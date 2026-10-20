@@ -25,6 +25,14 @@ export interface RailApp {
   pinned: boolean;
 }
 
+/** A host-owned destination that is always present in the core rail, never pinnable. */
+export interface RailCoreDestination {
+  name: string;
+  url: string;
+  /** A kit icon name (`getIcon`). */
+  icon: string;
+}
+
 /** At most this many pinned apps draw in the rail; the rest stay in the launcher. */
 export const RAIL_APPS_MAX = 6;
 
@@ -43,6 +51,8 @@ export interface AppRailProps {
    * destinations (at most RAIL_APPS_MAX); every one is listed in the launcher at the foot of the rail, which pins
    * and unpins through `onTogglePin`. Without `apps` the rail is exactly the built-in destinations. */
   apps?: RailApp[];
+  /** Fixed host destinations, rendered after the built-in Chat entry and before the remaining core entries. */
+  coreDestinations?: RailCoreDestination[];
   onTogglePin?: (url: string, pinned: boolean) => void;
   /** WEATHER-FIX-01: the route of the host's own All apps page. When set, the grid button at the rail's foot opens
    * that page (search, favorites, every app) instead of the small popover list, which scales to dozens of apps. */
@@ -183,7 +193,7 @@ function AllAppsLink({ href, active }: { href: string; active: boolean }) {
   );
 }
 
-export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, itemTourId, apps, onTogglePin, allAppsHref, mobile = false, children }: AppRailProps & { mobile?: boolean; children?: ReactNode }) {
+export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, itemTourId, apps, coreDestinations, onTogglePin, allAppsHref, mobile = false, children }: AppRailProps & { mobile?: boolean; children?: ReactNode }) {
   const { pathname } = useLocation();
   const all = SidebarContent.flatMap((section) => flatten(section.items));
   // The brand mark is the Home destination (owner, 2026-10-06: "replace
@@ -191,6 +201,14 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
   // the root takes the top slot and is not repeated in the list.
   const home = all.find((item) => item.url !== undefined && railHref(item.url) === "/");
   const items = home ? all.filter((item) => item !== home) : all;
+  const chatIndex = items.findIndex((item) => item.name === "Chat");
+  const beforeExtra = chatIndex < 0 ? items : items.slice(0, chatIndex + 1);
+  const afterExtra = chatIndex < 0 ? [] : items.slice(chatIndex + 1);
+  const destinations: Array<{ name: string; url?: string; icon?: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>; fixed?: false } | (RailCoreDestination & { fixed: true })> = [
+    ...beforeExtra,
+    ...(coreDestinations ?? []).map((item) => ({ ...item, fixed: true as const })),
+    ...afterExtra,
+  ];
   const isActive = (url: string) => (activeAppHref ? railHref(activeAppHref) === railHref(url) : isRailItemActive(pathname, url));
   const pinnedApps = mobile ? (apps ?? []) : (apps ?? []).filter((app) => app.pinned).slice(0, RAIL_APPS_MAX);
   const entryClass = mobile ? "relative flex min-h-12 w-full items-center gap-3 rounded-lg px-3 text-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring" : railButton;
@@ -243,12 +261,12 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
       </div>
 
       <ul className={cn("mt-2 flex flex-col gap-1", !mobile && "items-center")}>
-        {items.map((item) => {
+        {destinations.map((item) => {
           const active = item.url ? (activeAppHref ? railHref(activeAppHref) === railHref(item.url) : isRailItemActive(pathname, item.url)) : false;
           const status = itemStatus?.(item);
-          const Icon = item.icon;
+          const Icon = item.fixed ? getIcon(item.icon) : item.icon;
           return (
-            <li key={String(item.id ?? item.url)}>
+            <li key={item.url}>
               <Tooltip>
                 <TooltipTrigger
                   render={
@@ -257,7 +275,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                       aria-label={itemLabel(item, status)}
                       aria-current={active ? "page" : undefined}
                       data-active={active ? "" : undefined}
-                      data-slot="app-rail-item"
+                      data-slot={item.fixed ? "app-rail-core-destination" : "app-rail-item"}
                       data-tour={itemTourId?.(item)}
                       className={cn(entryClass, !mobile && hitArea(1), active && "bg-foreground/10 text-foreground")}
                     />

@@ -90,6 +90,28 @@ describe("RAIL-01 app rail", () => {
     expect(railHref("/nextcloud")).toBe("/nextcloud");
   });
 
+  test("host fixed destinations follow Chat, are active links, and never enter the pin launcher", async () => {
+    const destinations = [{ name: "Media", url: "/media", icon: "film" }];
+    const view = render(
+      <MemoryRouter initialEntries={["/media/library"]}>
+        <TooltipProvider><Routes>
+          <Route element={<FullLayout rail railCoreDestinations={destinations} railApps={[{ name: "Notes", url: "/apps/notes", icon: "layout-grid", pinned: false }]} />}>
+            <Route path="/media/*" element={<div>Media</div>} />
+          </Route>
+        </Routes></TooltipProvider>
+      </MemoryRouter>,
+    );
+    const media = view.getByRole("link", { name: "Media" });
+    expect(media.getAttribute("href")).toBe("/media");
+    expect(media.getAttribute("aria-current")).toBe("page");
+    const links = [...view.getByRole("navigation", { name: "Primary navigation" }).querySelectorAll("a")].map((link) => link.getAttribute("aria-label"));
+    expect(links.slice(0, 4)).toEqual(["Home", "Chat", "Media", "Library"]);
+    expect(media.getAttribute("data-slot")).toBe("app-rail-core-destination");
+    fireEvent.click(view.getByRole("button", { name: "All apps" }));
+    expect(view.queryByRole("button", { name: /Pin Media/ })).toBeNull();
+    expect(await waitFor(() => view.getByRole("link", { name: "Notes" }))).toBeTruthy();
+  });
+
   test("a nested path keeps its app selected; Home matches only itself", () => {
     expect(isRailItemActive("/people/abc", "/next/people")).toBe(true);
     expect(isRailItemActive("/chat", "/next")).toBe(false);
