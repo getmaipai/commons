@@ -1,0 +1,23 @@
+title = "MaiPai Commons gitleaks config"
+
+# Extends gitleaks' own default rule set (no rules redefined here); this file only skips paths, never weakens detection.
+[extend]
+useDefault = true
+
+# `gitleaks dir` scans the filesystem, not git, so it rescans every git-ignored byte. Found 2026-10-20: a wt.sh gate stamp
+# in data-scratch/ lists changed files with their blob shas, and an entry like "spec/settings/keys.json": "<sha>" reads as
+# a generic API key. This list mirrors .gitignore entry for entry (keep the two in sync), each pattern anchored to a path
+# segment so a committed directory that only contains one of these names as a substring is still scanned.
+[allowlist]
+paths = [
+  '''(^|/)node_modules(/|$)''',
+  '''(^|/)\.venv(/|$)''',
+  '''(^|/)data-scratch(/|$)''',
+  '''(^|/)__pycache__(/|$)''',
+  '''(^|/)\.pytest_cache(/|$)''',
+  '''(^|/)\.ruff_cache(/|$)''',
+  '''(^|/)spec/schemas\.resolved(/|$)''',
+  '''(^|/)\.DS_Store$''',
+  '''\.pyc$''',
+  '''\.tsbuildinfo$''',
+]
