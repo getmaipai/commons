@@ -1,5 +1,5 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
-import { render, cleanup, fireEvent, act } from "@testing-library/react";
+import { render, cleanup, fireEvent, act, waitFor } from "@testing-library/react";
 import { SettingRow } from "@/kit/settings/SettingRow";
 import { titleCaseOption, localeDisplayName } from "@/kit/settings/optionLabels";
 import type { MergedSetting } from "@/kit/settings/groupSettings";
@@ -203,6 +203,38 @@ describe("SettingRow - select selector", () => {
       <SettingRow setting={localeSelectSetting("en-US")} onChange={async () => true} onReset={() => {}} />,
     );
     expect(getByRole("combobox", { name: "Language and region" })).toHaveTextContent("American English");
+  });
+
+  function runtimeSelectSetting(value: string): MergedSetting {
+    const key = "robot.voice.id";
+    return {
+      def: { key, scope: "device", selector: "select", range: { options_from: "voices.tts" }, default: "default", label: "Voice", level: "basic", secret: false, lives_in: "robot.hello", honoured_by: ["home"] },
+      resolved: { key, value, source: "default", label: "Voice", level: "basic", secret: false },
+    };
+  }
+
+  test("uses runtime labels and writes the selected id", async () => {
+    const onChange = mock(() => Promise.resolve(true));
+    const { getByRole, findByRole } = render(<SettingRow setting={runtimeSelectSetting("default")} optionsFrom={{ "voices.tts": [{ value: "alba", label: "Alba" }, { value: "default", label: "Default" }] }} onChange={onChange} onReset={() => {}} />);
+    const select = getByRole("combobox", { name: "Voice" });
+    fireEvent.click(select);
+    const item = await findByRole("option", { name: "Alba" });
+    act(() => {
+      fireEvent.keyDown(item, { key: "Enter" });
+    });
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith("alba"));
+  });
+
+  test("disables an unavailable runtime source and shows its note and current value", () => {
+    const { getByRole, getByText } = render(<SettingRow setting={runtimeSelectSetting("custom")} onChange={async () => true} onReset={() => {}} />);
+    expect(getByRole("combobox", { name: "Voice" })).toBeDisabled();
+    expect(getByText("Options are not available here.")).toBeTruthy();
+    expect(getByRole("combobox", { name: "Voice" })).toHaveTextContent("custom");
+  });
+
+  test("keeps a current value missing from runtime options", () => {
+    const { getByRole } = render(<SettingRow setting={runtimeSelectSetting("custom")} optionsFrom={{ "voices.tts": [{ value: "alba", label: "Alba" }] }} onChange={async () => true} onReset={() => {}} />);
+    expect(getByRole("combobox", { name: "Voice" })).toHaveTextContent("custom");
   });
 });
 

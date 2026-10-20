@@ -51,6 +51,7 @@ const DEFS: Def[] = [
   { key: "reference.images", selector: "boolean", label: "Show pictures in answers", lives_in: "person.chat" },
   { key: "ui.show_turn_stats", selector: "boolean", label: "Show reply stats", level: "advanced", lives_in: "person.chat" },
   { key: "search.safe_search", selector: "select", label: "Safe search level", range: { options: ["off", "moderate", "strict"] }, lives_in: "person.search" },
+  { key: "voice.test", selector: "select", label: "Voice", range: { options_from: "voices.tts" }, lives_in: "person.search" },
   { key: "ui.pinned_apps", selector: "text", label: "Pinned apps", level: "expert", lives_in: "profile.appearance" },
   { key: "search.brave_api_key", selector: "text", label: "Brave key", secret: true, level: "advanced", lives_in: "person.search" },
   { key: "stack.only", selector: "boolean", label: "Stack only", lives_in: "person.chat", honoured_by: ["stack"] },
@@ -107,6 +108,13 @@ describe("SettingsRenderer - cards and rows", () => {
     const { findByText, container } = renderWithQueryClient(<SettingsRenderer {...props} expandAdvanced />);
     await findByText("Brave key");
     expect(container.innerHTML).not.toContain("BSA-secret-value");
+  });
+
+  test("threads runtime options_from items to the setting row", async () => {
+    const { findByRole } = renderWithQueryClient(<SettingsRenderer {...props} optionsFrom={{ "voices.tts": [{ value: "alba", label: "Alba" }] }} />);
+    const select = await findByRole("combobox", { name: "Voice" });
+    fireEvent.click(select);
+    await waitFor(() => expect(document.body).toHaveTextContent("Alba"));
   });
 });
 

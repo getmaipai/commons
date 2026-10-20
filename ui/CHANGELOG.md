@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.304] - ui-v0.5.304
+
+- UI-SETTINGS-OPTIONS-01: `SettingsRenderer` accepts runtime option lists for `options_from` selects and passes them to the row. Supplied labels are shown as given; an unavailable list disables the select with a note, and an unmatched current value remains visible. Ordinary selects keep their existing labels and behavior. Additive.
+
 ## [0.5.303] - ui-v0.5.303
 
 - Add `SafeImage` as the shared picture renderer for missing and failed artwork. Audio, video, file, person and picture contexts use themed placeholders in the same box; avatar initials remain the person fallback. Migrate kit picture surfaces and schema list and shelf media, and add the content picture lint with tested exceptions for SVG logos and offscreen image decoding.

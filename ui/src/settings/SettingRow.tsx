@@ -39,6 +39,9 @@ export interface SettingRowProps {
   /** The household roster for a person multi-select; omitted, the control
    * reads `GET /api/people` itself. */
   people?: readonly PersonOption[];
+  /** Runtime options for a scalar select whose spec range names
+   * `options_from`; keyed by that source id. */
+  optionsFrom?: Readonly<Record<string, readonly { value: string; label: string }[]>>;
   beforeChange?: BeforeChange;
   /** The host's place calls for a `location` selector (search, save, rename,
    * and the browser prompt behind the "Use current location" button).
@@ -61,7 +64,7 @@ export interface SettingRowProps {
  * from its default. Drawn as the kit's `Item size="setting"`; it goes
  * inside an `ItemGroup variant="card"` (see SettingsRenderer). A secret
  * never shows its value, only Set or Not set. */
-export function SettingRow({ setting, onChange, onReset, disabled: disabledProp, selfPersonId, people, places, beforeChange, note: summary, lockedReason, action }: SettingRowProps) {
+export function SettingRow({ setting, onChange, onReset, disabled: disabledProp, selfPersonId, people, optionsFrom, places, beforeChange, note: summary, lockedReason, action }: SettingRowProps) {
   const disabled = disabledProp || Boolean(lockedReason);
   const { def, resolved } = setting;
   const titleId = useId();
@@ -153,6 +156,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
   }
 
   let control: ReactNode;
+  let rowSummary = summary;
   if (resolved.secret && SECRETS_WITH_DEDICATED_FLOWS.has(def.key)) {
     control = <span className="text-sm text-settings-helper">{resolved.isSet ? "Set" : "Not set"}</span>;
   } else if (resolved.secret) {
@@ -211,29 +215,41 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
       />
     );
   } else if (def.selector === "select") {
-    const options = (def.range as { options?: string[] } | undefined)?.options ?? [];
+    const range = def.range as { options?: string[]; options_from?: string } | undefined;
+    const source = range?.options_from;
+    const runtimeOptions = source ? optionsFrom?.[source] : undefined;
+    const unavailable = Boolean(source && !runtimeOptions);
+    const current = String(resolved.value ?? "");
+    const options = source
+      ? [...(runtimeOptions ?? []), ...((runtimeOptions ?? []).some((option) => option.value === current) || !current ? [] : [{ value: current, label: current }])]
+      : (range?.options ?? []).map((option) => ({ value: option, label: option }));
     const getLabel = def.key === "household.locale" ? localeDisplayName : titleCaseOption;
+    const selectItems = options.map((option) => ({
+      ...option,
+      label: source ? option.label : getLabel(option.value),
+    }));
     control = (
       <Select
-        value={String(resolved.value)}
+        value={current}
         onValueChange={(v) => {
           if (v != null) void write(v);
         }}
-        items={options.map((option) => ({ value: option, label: getLabel(option) }))}
-        disabled={disabled}
+        items={selectItems}
+        disabled={disabled || unavailable}
       >
         <SelectTrigger size="row" aria-label={def.label}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
-            <SelectItem key={option} value={option}>
-              {getLabel(option)}
+          {selectItems.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
     );
+    if (unavailable) rowSummary = "Options are not available here.";
   } else if (def.selector === "number") {
     const range = def.range as { min?: number; max?: number } | undefined;
     control = (
@@ -361,7 +377,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
             {note}
           </p>
         ) : null}
-        {summary ? <p data-slot="setting-summary" className="text-[13px] leading-4 text-settings-helper">{summary}</p> : null}
+        {rowSummary ? <p data-slot="setting-summary" className="text-[13px] leading-4 text-settings-helper">{rowSummary}</p> : null}
         {lockedReason ? <p data-slot="setting-locked" className="text-[13px] leading-4 text-settings-helper">{lockedReason}</p> : null}
         {action ? (
           <Button type="button" variant="link" size="row" onClick={action.onPress} disabled={disabledProp} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">

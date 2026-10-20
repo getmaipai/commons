@@ -62,6 +62,9 @@ interface SettingsRendererProps {
   /** The household roster for a person multi-select; omitted, the control
    * reads `GET /api/people` itself. */
   people?: readonly PersonOption[];
+  /** Runtime options for scalar selects whose spec range names
+   * `options_from`, keyed by the source id. */
+  optionsFrom?: Readonly<Record<string, readonly { value: string; label: string }[]>>;
   /** The host's place calls for `location` rows (see PlaceAdapter). */
   places?: PlaceAdapter;
   /** The per-key hook run before every write (see BeforeChange). */
@@ -109,6 +112,7 @@ export function SettingsRenderer({
   plainRows = false,
   mergeGroups = false,
   people,
+  optionsFrom,
   places,
   beforeChange,
   focusKey,
@@ -209,6 +213,7 @@ export function SettingsRenderer({
         disabled={pendingKey === s.def.key}
         selfPersonId={selfPersonId}
         people={people}
+        optionsFrom={optionsFrom}
         places={places}
         beforeChange={beforeChange}
         {...rowExtras?.[s.def.key]}
