@@ -23,3 +23,9 @@ expect.extend(matchers);
 import { mock } from "bun:test";
 import { mediaChromeStub } from "./mediaChromeStub";
 mock.module("media-chrome/react", () => mediaChromeStub);
+
+// The full gate runs beside other sessions' work; at load averages near 40 the 1 s default let
+// "an empty shelf ... hide_when_empty", "Citation on a touch screen" and "composer-attachments" time out
+// while passing alone. 4 s stays under bun's 5 s per-test timeout.
+import { configure } from "@testing-library/dom";
+configure({ asyncUtilTimeout: 4000 });
