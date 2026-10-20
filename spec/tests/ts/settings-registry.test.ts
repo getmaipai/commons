@@ -189,11 +189,13 @@ describe("SETTINGS-ROBOT-01 declarations", () => {
       "robot.camera.watch_level", "robot.follow_up.seconds", "robot.idle.level",
       "robot.barge_in.open_mic", "robot.gestures.enabled", "robot.initiative.allowed_here",
       "robot.sleep.auto",
+      "robot.voice.id",
     ];
     for (const key of required) expect(keys.has(key), key).toBe(true);
     expect(keys.get("robot.offlan.tailnet")?.default).toBe(false);
     expect(keys.get("robot.gestures.enabled")?.default).toBe(false);
     expect(keys.get("robot.sleep.auto")).toMatchObject({ scope: "device", selector: "boolean", default: true, honoured_by: ["home", "bot"] });
+    expect(keys.get("robot.voice.id")).toMatchObject({ scope: "device", selector: "select", default: "default", range: { options_from: "voices.tts" }, lives_in: "robot.hello", honoured_by: ["home"] });
     for (const key of ["household.quiet_hours.from", "household.quiet_hours.to"]) expect(keys.get(key)?.honoured_by).toEqual(["home", "bot"]);
     expect(keys.get("robot.initiative.allowed_here")?.default).toBe(false);
     expect(keys.get("person.vision.watch")?.default).toBe("presence");

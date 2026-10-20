@@ -2486,6 +2486,26 @@
     ]
   },
   {
+    "key": "robot.voice.id",
+    "scope": "device",
+    "selector": "select",
+    "range": {
+      "options_from": "voices.tts"
+    },
+    "default": "default",
+    "label": "Voice",
+    "help": "The voice this robot speaks with. \"default\" keeps the voice Home uses for it today.",
+    "copy": {
+      "does": "Chooses how this robot sounds when it speaks."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "robot.hello",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "robot.sleep.auto",
     "scope": "device",
     "selector": "boolean",

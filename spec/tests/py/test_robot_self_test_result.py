@@ -2,8 +2,9 @@ import json
 from pathlib import Path
 
 import pytest
-from gen.py.robot_self_test_result_schema import RobotSelfTestResult
 from pydantic import ValidationError
+
+from gen.py.robot_self_test_result_schema import RobotSelfTestResult
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "records"
 

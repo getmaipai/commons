@@ -66,6 +66,10 @@ def test_robot_settings_registry_is_valid_and_unique():
         ]
         is False
     )
+    voice = next(entry for entry in registry if entry["key"] == "robot.voice.id")
+    assert voice["scope"] == "device"
+    assert voice["lives_in"] == "robot.hello"
+    assert voice["range"]["options_from"] == "voices.tts"
 
 
 def test_img_spec_keys_validate_and_are_unique():

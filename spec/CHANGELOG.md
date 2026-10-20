@@ -1,3 +1,7 @@
+## [spec-v0.1.194] - 2026-10-20
+
+- SPEC-ROBOT-VOICE-01: add the `robot.voice.id` device setting, letting an admin choose this robot's voice from the household TTS voice list. `default` keeps the voice Home uses for the robot today. Additive.
+
 ## [spec-v0.1.193] - 2026-10-20
 
 - SPEC-ROBOT-TEST-01: add the `no_vendor_login` capability for robot bodies without a published login password; add the hub-to-device `self_test` command and device-to-hub `robot-self-test-result` record; and place `robot.hello` on the chosen robot settings dialog as an admin-only device card. All additions are additive.
