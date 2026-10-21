@@ -40,7 +40,8 @@
         "type": "string",
         "enum": [
           "turn",
-          "code"
+          "code",
+          "settings"
         ]
       }
     },

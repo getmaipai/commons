@@ -43,7 +43,7 @@ class ApiKey(BaseModel):
     id: constr(pattern=r'^key_[a-z0-9]{6,}$')
     person_id: constr(pattern=r'^person-[a-z0-9]{6,}$')
     name: constr(min_length=1, max_length=60)
-    scopes: list[Literal['turn', 'code']] = Field(..., min_length=1)
+    scopes: list[Literal['turn', 'code', 'settings']] = Field(..., min_length=1)
     created_at: AwareDatetime
     expires_at: AwareDatetime = Field(
         ...,

@@ -1,3 +1,7 @@
+## [spec-v0.1.204] - 2026-10-21
+
+- OPS-KEY-01: `api-key.scopes` gains `settings`, a key an owner or admin makes so an assistant session can change a short named list of household settings (never people, passwords, safety or age gates). Additive; a key with only `turn` or `code` is unchanged.
+
 ## [spec-v0.1.203] - 2026-10-21
 
 - CMEDIA-SPEC-01: add the shared companion media vocabulary and optional manifest fields for character look, review status and pre-rendered video animation. The additions are additive, so existing manifests continue to validate unchanged.
