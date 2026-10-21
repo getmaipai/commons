@@ -123,6 +123,48 @@ export const PackageManifest = z
           )
           .optional(),
         interests: z.array(z.string().min(1)).max(8).optional(),
+        /**DYNAMIC-COMPANION-01: who this companion is for. "all" is a dynamic companion: it adapts its words, topics and tone to the age band of whoever it speaks to, and may be used on any robot. "teen" and "adult" are explicit companions: their own style may be edgier, and a robot can use one only when its controls are at or above that level. A companion never loosens a filter: the band of a turn is the person's or robot's own, whatever the companion. Absent: read from the manifest's min_role (child or guest: all, teen: teen, anything higher: adult).*/
+        audience: z
+          .enum(["all", "teen", "adult"])
+          .describe(
+            'DYNAMIC-COMPANION-01: who this companion is for. "all" is a dynamic companion: it adapts its words, topics and tone to the age band of whoever it speaks to, and may be used on any robot. "teen" and "adult" are explicit companions: their own style may be edgier, and a robot can use one only when its controls are at or above that level. A companion never loosens a filter: the band of a turn is the person\'s or robot\'s own, whatever the companion. Absent: read from the manifest\'s min_role (child or guest: all, teen: teen, anything higher: adult).',
+          )
+          .optional(),
+        /**DYNAMIC-COMPANION-01: short style rules in the character's own terms, composed after the style dials. Used for what the dials cannot say (for example: react before asking, never invent a memory).*/
+        behavior: z
+          .array(z.string().min(1).max(200))
+          .max(6)
+          .describe(
+            "DYNAMIC-COMPANION-01: short style rules in the character's own terms, composed after the style dials. Used for what the dials cannot say (for example: react before asking, never invent a memory).",
+          )
+          .optional(),
+        /**DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is child (simple words, gentle). Fewer than `examples`, then topped up from `examples`.*/
+        examples_child: z
+          .array(z.string().min(1))
+          .min(2)
+          .max(5)
+          .describe(
+            "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is child (simple words, gentle). Fewer than `examples`, then topped up from `examples`.",
+          )
+          .optional(),
+        /**DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is teen.*/
+        examples_teen: z
+          .array(z.string().min(1))
+          .min(2)
+          .max(5)
+          .describe(
+            "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is teen.",
+          )
+          .optional(),
+        /**DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is adult.*/
+        examples_adult: z
+          .array(z.string().min(1))
+          .min(2)
+          .max(5)
+          .describe(
+            "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is adult.",
+          )
+          .optional(),
         /**3 to 5 lines in the character's own voice, composed as a few-shot block.*/
         examples: z
           .array(z.string().min(1))

@@ -257,3 +257,15 @@ describe("PackageManifest.companion.style_adapters (STYLE-SPEC-01)", () => {
     if (!invalid.success) expect(invalid.error.issues.map((issue) => issue.path.join("."))).toContain("companion.style_adapters.0.format");
   });
 });
+
+describe("PackageManifest.companion audience, behavior and per-band examples (DYNAMIC-COMPANION-01)", () => {
+  const base = { ...BASE, kind: "companion", companion: { display_name: "Test Companion", formality: "neutral", complexity: "standard", engagement: "balanced", filler_density: "light" } };
+  test("a companion may declare an audience, behavior lines and examples for each band", () => {
+    const parsed = PackageManifest.parse({ ...base, companion: { ...base.companion, audience: "all", behavior: ["React before you ask."], examples_child: ["Yay!", "Ooh!"], examples_teen: ["Nice.", "Ha."], examples_adult: ["Good one.", "Hm."] } });
+    expect(parsed.companion?.audience).toBe("all");
+    expect(parsed.companion?.examples_child).toHaveLength(2);
+  });
+  test("an audience outside all, teen and adult is refused", () => {
+    expect(() => PackageManifest.parse({ ...base, companion: { ...base.companion, audience: "child" } })).toThrow();
+  });
+});

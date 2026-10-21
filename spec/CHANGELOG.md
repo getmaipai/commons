@@ -1,3 +1,7 @@
+## [spec-v0.1.202] - 2026-10-21
+
+- DYNAMIC-COMPANION-01: a companion may declare `audience` (`all`, `teen` or `adult`), `behavior` style lines and `examples_child`, `examples_teen`, `examples_adult` few-shot lines; `persona.active_id` gains the option `rivet`. Additive; a manifest without `audience` reads it from `min_role`.
+
 ## [spec-v0.1.201] - 2026-10-21
 
 - ROBOT-COMPANION-02: `persona.active_id` gains the options `lively-child`, `lively-teen` and `lively-adult` (the three bundled companions Home ships for a robot). Additive.

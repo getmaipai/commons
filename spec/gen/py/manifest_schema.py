@@ -96,6 +96,33 @@ class Companion(BaseModel):
         description="Short by design: no authoring UI exists yet to keep a longer one consistent with itself turn to turn (docs/dev.md's persona research).",
     )
     interests: list[constr(min_length=1)] | None = Field(None, max_length=8)
+    audience: Literal['all', 'teen', 'adult'] | None = Field(
+        None,
+        description='DYNAMIC-COMPANION-01: who this companion is for. "all" is a dynamic companion: it adapts its words, topics and tone to the age band of whoever it speaks to, and may be used on any robot. "teen" and "adult" are explicit companions: their own style may be edgier, and a robot can use one only when its controls are at or above that level. A companion never loosens a filter: the band of a turn is the person\'s or robot\'s own, whatever the companion. Absent: read from the manifest\'s min_role (child or guest: all, teen: teen, anything higher: adult).',
+    )
+    behavior: list[constr(min_length=1, max_length=200)] | None = Field(
+        None,
+        description="DYNAMIC-COMPANION-01: short style rules in the character's own terms, composed after the style dials. Used for what the dials cannot say (for example: react before asking, never invent a memory).",
+        max_length=6,
+    )
+    examples_child: list[constr(min_length=1)] | None = Field(
+        None,
+        description="DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is child (simple words, gentle). Fewer than `examples`, then topped up from `examples`.",
+        max_length=5,
+        min_length=2,
+    )
+    examples_teen: list[constr(min_length=1)] | None = Field(
+        None,
+        description="DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is teen.",
+        max_length=5,
+        min_length=2,
+    )
+    examples_adult: list[constr(min_length=1)] | None = Field(
+        None,
+        description="DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is adult.",
+        max_length=5,
+        min_length=2,
+    )
     examples: list[constr(min_length=1)] | None = Field(
         None,
         description="3 to 5 lines in the character's own voice, composed as a few-shot block.",

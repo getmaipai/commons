@@ -107,6 +107,38 @@
           "items": { "type": "string", "minLength": 1 },
           "maxItems": 8
         },
+        "audience": {
+          "type": "string",
+          "enum": ["all", "teen", "adult"],
+          "description": "DYNAMIC-COMPANION-01: who this companion is for. \"all\" is a dynamic companion: it adapts its words, topics and tone to the age band of whoever it speaks to, and may be used on any robot. \"teen\" and \"adult\" are explicit companions: their own style may be edgier, and a robot can use one only when its controls are at or above that level. A companion never loosens a filter: the band of a turn is the person's or robot's own, whatever the companion. Absent: read from the manifest's min_role (child or guest: all, teen: teen, anything higher: adult)."
+        },
+        "behavior": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "maxItems": 6,
+          "description": "DYNAMIC-COMPANION-01: short style rules in the character's own terms, composed after the style dials. Used for what the dials cannot say (for example: react before asking, never invent a memory)."
+        },
+        "examples_child": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 2,
+          "maxItems": 5,
+          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is child (simple words, gentle). Fewer than `examples`, then topped up from `examples`."
+        },
+        "examples_teen": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 2,
+          "maxItems": 5,
+          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is teen."
+        },
+        "examples_adult": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 2,
+          "maxItems": 5,
+          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is adult."
+        },
         "examples": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
