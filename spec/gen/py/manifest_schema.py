@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any, Literal
 
-from pydantic import AnyUrl, BaseModel, ConfigDict, Field, conint, constr
+from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
 
 from . import privacy_row_schema, settings_area_schema, settings_key_schema, tour_schema
 
@@ -80,6 +80,221 @@ class StyleAdapter(BaseModel):
     corpus_sha256: constr(pattern=r'^[a-f0-9]{64}$')
 
 
+class Review(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    confirmed_by: constr(min_length=1)
+    confirmed_at: AwareDatetime
+
+
+class Sheet(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    rest: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}$')
+    card: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}$')
+
+
+class Idle(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class IdleLook(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Listening(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Thinking(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Working(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Speaking(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class NeedsYou(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Greeting(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Happy(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Oops(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Celebrate(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class Sleeping(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+
+
+class States(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    idle: Idle
+    idle_look: IdleLook | None = None
+    listening: Listening | None = None
+    thinking: Thinking | None = None
+    working: Working | None = None
+    speaking: Speaking | None = None
+    needs_you: NeedsYou | None = None
+    greeting: Greeting | None = None
+    happy: Happy | None = None
+    oops: Oops | None = None
+    celebrate: Celebrate | None = None
+    sleeping: Sleeping | None = None
+
+
+class Provenance(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    tool: str | None = None
+    model_sha256: constr(pattern=r'^[0-9A-Fa-f]{64}$') | None = None
+    prompt_hash: constr(pattern=r'^[0-9A-Fa-f]{64}$') | None = None
+    seed: int | None = None
+    approved_by: str | None = None
+    approved_at: AwareDatetime | None = None
+
+
+class Animation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['video']
+    spec_version: conint(ge=1)
+    key: constr(pattern=r'^#[0-9A-Fa-f]{6}$')
+    sheet: Sheet | None = None
+    states: States
+    provenance: Provenance | None = None
+
+
 class Companion(BaseModel):
     """
     Required when kind is "companion" (session-a-intelligence.md step 8), unused otherwise. Composed by home/backend/src/lib/persona.ts into the turn engine's identity line and system-prompt fragment: display_name replaces the hardcoded "MaiPai" in "You are {display_name}, ...", the four style dials are the same ones lib/persona.ts already had before companions were packages, and examples is a short few-shot block (legacy's own finding: "the single biggest lever for small-model voice fidelity").
@@ -143,6 +358,15 @@ class Companion(BaseModel):
         description='Trained per-companion voice adapters by base model, as designed in the EVAL-03 design pass.',
         max_length=8,
     )
+    look_prompt: constr(min_length=1, max_length=600) | None = Field(
+        None,
+        description='The words the image and video tools start from for this character.',
+    )
+    status: Literal['draft', 'rendering', 'needs_review', 'ready'] | None = Field(
+        None, description='Absent means ready.'
+    )
+    review: Review | None = None
+    animation: Animation | None = None
 
 
 class Flavour(BaseModel):

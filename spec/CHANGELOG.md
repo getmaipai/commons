@@ -1,3 +1,7 @@
+## [spec-v0.1.203] - 2026-10-21
+
+- CMEDIA-SPEC-01: add the shared companion media vocabulary and optional manifest fields for character look, review status and pre-rendered video animation. The additions are additive, so existing manifests continue to validate unchanged.
+
 ## [spec-v0.1.202] - 2026-10-21
 
 - DYNAMIC-COMPANION-01: a companion may declare `audience` (`all`, `teen` or `adult`), `behavior` style lines and `examples_child`, `examples_teen`, `examples_adult` few-shot lines; `persona.active_id` gains the option `rivet`. Additive; a manifest without `audience` reads it from `min_role`.

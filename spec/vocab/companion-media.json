@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "image": {
+    "size": 1024,
+    "margin_percent": 12,
+    "format": "png",
+    "min_upload_short_side": 512,
+    "max_upload_bytes": 20971520
+  },
+  "key": {
+    "default": "#00FF00",
+    "alternate": "#FF00FF"
+  },
+  "generate": {
+    "width": 832,
+    "height": 480,
+    "fps": 24,
+    "frames": 121
+  },
+  "ship": {
+    "colour_width": 480,
+    "colour_height": 480,
+    "stacked_width": 480,
+    "stacked_height": 960,
+    "fps": 24,
+    "loop_seconds": {
+      "min": 2.0,
+      "max": 4.0
+    },
+    "oneshot_seconds": {
+      "min": 1.5,
+      "max": 4.0
+    },
+    "max_bytes_per_clip": 614400,
+    "max_bytes_per_character": 8388608,
+    "codecs": {
+      "required": "h264",
+      "optional": [
+        "av1"
+      ]
+    },
+    "audio": false
+  },
+  "upload_video": {
+    "max_bytes": 31457280,
+    "max_seconds": 10,
+    "types": [
+      "video/mp4",
+      "video/quicktime",
+      "video/webm"
+    ]
+  },
+  "states": [
+    {
+      "id": "idle",
+      "kind": "loop",
+      "required": true,
+      "min_seconds": 3,
+      "max_seconds": 4,
+      "motion": "breathes slowly, tiny sway, one blink",
+      "driven_by": "outside a turn"
+    },
+    {
+      "id": "idle_look",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "looks to one side, then back",
+      "driven_by": "random while idle"
+    },
+    {
+      "id": "listening",
+      "kind": "loop",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "head tilts slightly toward the viewer, attentive",
+      "driven_by": "the person is speaking to the robot"
+    },
+    {
+      "id": "thinking",
+      "kind": "loop",
+      "required": true,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "looks up and to the side, one paw to chin",
+      "driven_by": "a turn before the first word"
+    },
+    {
+      "id": "working",
+      "kind": "loop",
+      "required": true,
+      "min_seconds": 2,
+      "max_seconds": 4,
+      "motion": "busy, small repeated gesture, looking down at its hands",
+      "driven_by": "a tool, job or project is running"
+    },
+    {
+      "id": "speaking",
+      "kind": "loop",
+      "required": true,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "mouth opens and closes at a speaking rhythm, small head movement",
+      "driven_by": "the voice is playing"
+    },
+    {
+      "id": "needs_you",
+      "kind": "loop",
+      "required": true,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "leans forward, holds up one paw, hopeful",
+      "driven_by": "an approval waits for the person"
+    },
+    {
+      "id": "greeting",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "waves once, smiles",
+      "driven_by": "first open of the day"
+    },
+    {
+      "id": "happy",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 2,
+      "motion": "small hop, smile",
+      "driven_by": "a good result or a thank you"
+    },
+    {
+      "id": "oops",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 2,
+      "motion": "rubs the back of its head, sheepish",
+      "driven_by": "an error the companion owns"
+    },
+    {
+      "id": "celebrate",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "both arms up, bounce",
+      "driven_by": "a long job finished"
+    },
+    {
+      "id": "sleeping",
+      "kind": "loop",
+      "required": false,
+      "min_seconds": 3,
+      "max_seconds": 4,
+      "motion": "eyes closed, slow breathing",
+      "driven_by": "quiet hours or no activity"
+    }
+  ]
+}
