@@ -3,7 +3,7 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { cn } from "cn";
 import { paper } from "./surfaces";
-import { SafeImage } from "../primitives/SafeImage";
+import { SafeImage, type ImageFallbackKind } from "../primitives/SafeImage";
 
 const DOTS = Array.from({ length: 64 }, (_, i) => i);
 
@@ -59,6 +59,9 @@ export function GenerationStage({
   previewSrc,
   previewStep,
   steps,
+  previewAlt,
+  fallbackKind,
+  showPreviewWhenSettled = false,
   aspectRatio = "1 / 1",
   className,
   children,
@@ -69,6 +72,11 @@ export function GenerationStage({
   /** The step the preview shows, out of `steps`; unset means a settled frame with no blur. */
   previewStep?: number;
   steps?: number;
+  /** Alternative text for a settled image; previews are decorative when omitted. */
+  previewAlt?: string;
+  fallbackKind?: ImageFallbackKind;
+  /** Keep the final preview visible after generation completes. */
+  showPreviewWhenSettled?: boolean;
   /** CSS aspect-ratio of the area, "1 / 1" or "16 / 9". */
   aspectRatio?: string;
   className?: string;
@@ -77,7 +85,7 @@ export function GenerationStage({
   /** Drawn between the shimmer and the preview (the finished-picture placeholder). */
   underlay?: ReactNode;
 }) {
-  const { shown, visible } = useLoadedPreview(generating ? previewSrc : undefined);
+  const { shown, visible } = useLoadedPreview(generating || showPreviewWhenSettled ? previewSrc : undefined);
   const blur = previewBlur(previewStep, steps);
   const style: CSSProperties = { aspectRatio };
   return (
@@ -100,13 +108,13 @@ export function GenerationStage({
       </div>
       {underlay}
       {shown ? (
-        // The preview is decoration for what the status line already says, so it has no alt text.
         <SafeImage
           data-slot="generation-preview"
           data-blur={blur}
           src={shown}
-          alt=""
-          aria-hidden
+          alt={previewAlt ?? ""}
+          aria-hidden={previewAlt ? undefined : true}
+          kind={fallbackKind}
           draggable={false}
           className={cn("absolute inset-0 size-full object-cover transition-[opacity,filter,transform] duration-700 ease-out motion-reduce:transition-none", visible ? "opacity-100" : "opacity-0", blur > 0 && "scale-105")}
           style={{ filter: blur > 0 ? `blur(${blur}px)` : undefined }}

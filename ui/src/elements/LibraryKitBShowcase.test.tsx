@@ -36,6 +36,8 @@ describe("Library kit slice B showcases", () => {
 
   test("MediaViewerShowcase mounts a full MusicTrack in the song details area", async () => {
     const view = render(<MediaViewerShowcase />);
+    const finishedShowcaseCard = view.container.querySelector('[data-slot="music-track"][data-status="ready"]')!;
+    expect(within(finishedShowcaseCard as HTMLElement).getByRole("button", { name: "Edit" }).getAttribute("aria-expanded")).toBe("true");
     fireEvent.click(view.getByRole("button", { name: "Moonlit lullaby" }));
     await act(async () => {});
     const details = document.body.querySelector("aside[data-slot='media-viewer-details']") as HTMLElement;
@@ -46,10 +48,13 @@ describe("Library kit slice B showcases", () => {
     expect(within(song).getByText("Moonlight settles")).toBeTruthy();
     expect(song.querySelector("ol")?.className ?? "").not.toContain("overflow-y-auto");
     expect(within(song).getByText("Version 2 of 2")).toBeTruthy();
-    fireEvent.click(within(song).getByRole("button", { name: "Edit" }));
-    expect(within(song).getByRole("region", { name: "Edit Moonlit lullaby" })).toBeTruthy();
-    expect(within(song).getByRole("button", { name: "New album art with a prompt" })).toBeTruthy();
-    expect(song.querySelector('[data-slot="player-play"]')).toBeTruthy();
+    act(() => fireEvent.click(within(song).getByRole("button", { name: "Edit" })));
+    expect(within(document.body).getByRole("dialog", { name: "Edit Moonlit lullaby" })).toBeTruthy();
+    expect(within(document.body).getByRole("tab", { name: "New cover" })).toBeTruthy();
+    expect(within(song).getByRole("button", { name: "Play" })).toBeTruthy();
+    expect(view.container.querySelectorAll('[data-status="generating"]')).toHaveLength(1);
+    expect(view.container.querySelectorAll('[data-status="queued"]')).toHaveLength(1);
+    expect(view.container.querySelectorAll('[data-status="ready"]')).toHaveLength(1);
   });
 
   test("ShareDialogShowcase shows the locked row's reason, saves a change, and asks before the household", async () => {

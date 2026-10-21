@@ -1,3 +1,25 @@
+## ui-v0.5.308: compact MusicTrack card
+
+`MusicTrack` now uses one compact kit card for queued, generating and ready
+songs. Square cover art (or the themed music fallback) sits at the left with
+play overlaid; title, description and staged generation status sit beside it.
+Live cards accept `stages`, `currentStage`, fractional `progress`,
+`elapsedSeconds`, `etaSeconds` and `waitingForMemory`. The card shows an ETA
+only when supplied. Ready cards use a seek slider, time display, labeled
+icon actions and a playback speed menu. The new `editModes` prop presents
+song and cover edits in kit tabs, with the quick-song `Make it full` action.
+Existing host props and the legacy `editContent` slot remain supported. The
+current Home fragment's two labeled prompt fields and optional `Make it full`
+button are recognized and presented in those tabs; arbitrary legacy slots
+still render as provided. A disabled legacy `Make` gets a matching text reason.
+`GenerationStage` can keep a loaded preview visible after generation with
+`showPreviewWhenSettled`, which lets a song cover fade into the same square
+used by the ready card. Its existing default behavior is unchanged.
+
+`MediaViewerShowcase` now includes generating at a middle stage, waiting for
+memory and a finished card with Edit open. `music-track.test.tsx` covers both
+card states, stages, cover fallback, edit modes, actions and a 390 px layout.
+
 ## spec-v0.1.114: knowledge-search record shapes (KS-00)
 
 The spec adds additive `Source` citation kinds and the optional snapshot date, licence, local proxy path and publisher count fields; `Feed`, `NewsItem` and `NewsStory`; and optional `model_cutoff` on `ModelCapabilities`. The settings registry gains the eight knowledge-search keys, generated using the real Home registry generator. The capability vocabulary carries processor rows for `extract_article`, `cluster_story` and `fold_wire_copy`, each with `learned: false`. TS and Python validate fixtures for the new records and attribution fields.
