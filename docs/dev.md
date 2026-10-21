@@ -16,6 +16,21 @@ still render as provided. A disabled legacy `Make` gets a matching text reason.
 `showPreviewWhenSettled`, which lets a song cover fade into the same square
 used by the ready card. Its existing default behavior is unchanged.
 
+## CMEDIA-PLAYER-01a: companion avatar player (2026-10-21, `ui-v0.5.309`)
+
+`CompanionAvatar` owns the shared playback state machine for the pre-rendered
+companion clips. It reads state ids and loop kinds from
+`spec/vocab/companion-media.json`, draws stacked colour and alpha video through
+WebGL, selects AV1 only when the browser reports support, and falls back to
+H.264 or the state still. Wanted-state priority and one-shot timing stay in a
+pure machine with caller-supplied timestamps; reduced motion and hidden pages
+use stills or pause playback.
+
+The Element uses only kit sizing tokens and leaves the clip alpha transparent
+over the caller's surface. The wrapper supplies one accessible name while the
+clip remains decorative. `StackedAlphaVideo` keeps its canvas through source
+changes so transitions retain the last rendered frame.
+
 `MediaViewerShowcase` now includes generating at a middle stage, waiting for
 memory and a finished card with Edit open. `music-track.test.tsx` covers both
 card states, stages, cover fallback, edit modes, actions and a 390 px layout.
@@ -1460,3 +1475,4 @@ not-yet-created folder found one bug the fixtures had not: `/Users` is a
 firmlink into the Data volume, so `realpath` keeps the short form while
 `df` reports the mount at `/System/Volumes/Data`; `volumeIdentity` handles
 that and has a regression test.
+
