@@ -2153,6 +2153,9 @@
       "options": [
         "buddy",
         "default",
+        "lively-adult",
+        "lively-child",
+        "lively-teen",
         "pal",
         "tutor"
       ]
