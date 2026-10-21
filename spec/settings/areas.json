@@ -962,6 +962,11 @@
   ],
   "not_placed": [
     {
+      "scope": "household",
+      "group": "household.voice",
+      "reason": "Home's default voice is chosen on the Voices page in Home settings, next to the voices it can pick from (a view, not a settings card)."
+    },
+    {
       "scope": "person",
       "group": "person.topics",
       "reason": "A parent sets a child's sensitive-subject levels on that child's Family page; a settings area only reads and writes the viewer's own scope, never another person's, and a teen has no person-level topic key at all."

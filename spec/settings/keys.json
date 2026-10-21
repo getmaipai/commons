@@ -3572,6 +3572,26 @@
     ]
   },
   {
+    "key": "tts.home_voice",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options_from": "voices.tts"
+    },
+    "default": "default",
+    "label": "Home's default voice",
+    "help": "The voice Home and its robots speak with for anyone who has not chosen their own. \"default\" is the voice built into the speech engine now in use.",
+    "level": "basic",
+    "secret": false,
+    "copy": {
+      "does": "Sets the voice that anyone without a voice of their own hears, in Home and on its robots."
+    },
+    "lives_in": "household.voice",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "tours.autostart.enabled",
     "scope": "person",
     "selector": "boolean",
