@@ -66,3 +66,57 @@ test("AV1 is chosen only when the browser reports probably and H.264 follows an 
   await waitFor(() => expect(av1View.container.querySelector("video")?.getAttribute("src")).toBe("thinking.mp4"));
   restore();
 });
+
+test("inline placement remains in flow without absolute positioning", () => {
+  const restore = setup();
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} />);
+  expect(view.getByRole("img", { name: "Mimi" }).className).not.toMatch(/\babsolute\b/);
+  restore();
+});
+
+test("corner placement positions the Element at the top right", () => {
+  const restore = setup();
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} placement="corner" />);
+  const wrapper = view.container.firstElementChild as HTMLElement;
+  expect(wrapper.className).toContain("absolute");
+  expect(wrapper.className).toContain("right-3");
+  expect(wrapper.className).toContain("top-3");
+  expect(wrapper.className).toContain("z-10");
+  restore();
+});
+
+test("hide button is keyboard focusable, names the action, and reports hidden", () => {
+  const restore = setup();
+  const calls: boolean[] = [];
+  const onHiddenChange = (hidden: boolean) => calls.push(hidden);
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} placement="corner" onHiddenChange={onHiddenChange} />);
+  const button = view.getByRole("button", { name: "Hide the character" }) as HTMLButtonElement;
+  expect(button.tabIndex).toBe(0);
+  expect(button.className).toContain("size-12");
+  button.focus();
+  expect(document.activeElement).toBe(button);
+  fireEvent.click(button);
+  expect(calls).toEqual([true]);
+  restore();
+});
+
+test("hidden renders only a show button and does not mount media", () => {
+  const restore = setup();
+  const calls: boolean[] = [];
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} placement="corner" hidden onHiddenChange={(hidden) => calls.push(hidden)} />);
+  expect(view.getByRole("button", { name: "Show the character" })).toBeTruthy();
+  expect(view.queryByRole("img", { name: "Mimi" })).toBeNull();
+  expect(view.container.querySelector("video")).toBeNull();
+  expect(view.container.querySelector("canvas")).toBeNull();
+  expect(view.container.querySelector("img")).toBeNull();
+  fireEvent.click(view.getByRole("button", { name: "Show the character" }));
+  expect(calls).toEqual([false]);
+  restore();
+});
+
+test("corner placement without a visibility callback has no button", () => {
+  const restore = setup();
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} placement="corner" />);
+  expect(view.queryByRole("button")).toBeNull();
+  restore();
+});

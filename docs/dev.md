@@ -31,6 +31,10 @@ over the caller's surface. The wrapper supplies one accessible name while the
 clip remains decorative. `StackedAlphaVideo` keeps its canvas through source
 changes so transitions retain the last rendered frame.
 
+CMEDIA-PLAYER-01d (`ui-v0.5.310`) adds optional corner placement and a kit hide
+control. Hidden avatars mount only the show button, so their playback machine,
+video and WebGL canvas are not created. Inline placement remains the default.
+
 `MediaViewerShowcase` now includes generating at a middle stage, waiting for
 memory and a finished card with Edit open. `music-track.test.tsx` covers both
 card states, stages, cover fallback, edit modes, actions and a 390 px layout.

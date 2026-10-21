@@ -2,12 +2,33 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "cn";
 import { createCompanionAvatarMachine, pickWanted, type CompanionClips, type StateId } from "@/kit/elements/companion-avatar-machine";
 import { StackedAlphaVideo } from "@/kit/elements/stacked-alpha-video";
+import { Button } from "@/kit/ui/button";
+import { icons } from "@/kit/icons";
 
 type Wanted = Partial<Record<"needs_you" | "speaking" | "working" | "thinking" | "listening" | "sleeping", boolean>>;
-type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "sm" | "md" | "lg"; onFail?(): void; className?: string };
+type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "sm" | "md" | "lg"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void };
 const SIZES = { sm: "size-16", md: "size-24", lg: "size-40" } as const;
 
-export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className }: Props) {
+export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange }: Props) {
+  const corner = placement === "corner";
+  const wrapperClass = corner ? "group pointer-events-none absolute right-3 top-3 z-10" : "group relative";
+  const ToggleIcon = hidden ? icons.eye : icons["eye-off"];
+  const toggleLabel = hidden ? "Show the character" : "Hide the character";
+
+  return <div className={cn(wrapperClass)}>
+    {!hidden ? <CompanionAvatarVisual name={name} clips={clips} state={state} wanted={wanted} once={once} size={size} onFail={onFail} className={className} /> : null}
+    {onHiddenChange ? <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      aria-label={toggleLabel}
+      onClick={() => onHiddenChange(!hidden)}
+      className={cn("pointer-events-auto absolute right-0 top-0", hidden ? "" : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100")}
+    ><ToggleIcon aria-hidden="true" /></Button> : null}
+  </div>;
+}
+
+function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", onFail, className }: Omit<Props, "placement" | "hidden" | "onHiddenChange">) {
   const machine = useMemo(() => createCompanionAvatarMachine(clips), [clips]);
   const [current, setCurrent] = useState<StateId>(state ?? "idle");
   const [failed, setFailed] = useState(false);
