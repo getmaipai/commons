@@ -49,5 +49,5 @@ def test_look_vocabulary_and_yolox_pin():
     assert all(1 <= len(noun) <= 32 for noun in vocab["nouns"])
     assert not set(vocab["nouns"]) & (set(expected) - set(vocab["detector_classes"]))
     assets = read(ROOT / "assets" / "robot-assets.json")
-    pin = next(row for row in assets if row["id"] == "yolox-nano-0.1.1rc0")
+    pin = next(row for row in assets if row["id"] == "yolox-nano-0_1_1rc0")
     assert pin["sha256"] == "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d"

@@ -37,7 +37,7 @@ test("Look vocabulary has the pinned COCO classes and tidy household lists", () 
 
 test("YOLOX nano pin has the approved checksum", () => {
   const assets = read("assets/robot-assets.json");
-  expect(assets).toContainEqual({ id: "yolox-nano-0.1.1rc0", file: "yolox_nano.onnx",
+  expect(assets).toContainEqual({ id: "yolox-nano-0_1_1rc0", file: "yolox_nano.onnx",
     sha256: "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d", bytes: 3659407,
     licence: "Apache-2.0", source_url: "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_nano.onnx", kind: "model" });
 });
