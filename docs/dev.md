@@ -35,6 +35,10 @@ CMEDIA-PLAYER-01d (`ui-v0.5.310`) adds optional corner placement and a kit hide
 control. Hidden avatars mount only the show button, so their playback machine,
 video and WebGL canvas are not created. Inline placement remains the default.
 
+SETTINGS-UX-02 (`ui-v0.5.311`) makes the settings column readable at a glance: no heading over a one-item group, an icon tile
+per row, a filled active row with an accent bar, a 260 px column and a 760 px content pane. `SettingsShell` gains optional `sides`
+(a Mine and Household switch under the column title) and `trail` (a breadcrumb above the page title, sticky with it).
+
 `MediaViewerShowcase` now includes generating at a middle stage, waiting for
 memory and a finished card with Edit open. `music-track.test.tsx` covers both
 card states, stages, cover fallback, edit modes, actions and a 390 px layout.
