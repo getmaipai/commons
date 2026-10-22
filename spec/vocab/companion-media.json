@@ -12,10 +12,11 @@
     "alternate": "#FF00FF"
   },
   "generate": {
-    "width": 832,
+    "width": 480,
     "height": 480,
     "fps": 24,
-    "frames": 121
+    "frames": 73,
+    "seconds": 3
   },
   "ship": {
     "colour_width": 480,

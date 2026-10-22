@@ -21,7 +21,7 @@ export interface CompanionMediaSpec {
   version: number;
   image: { size: number; margin_percent: number; format: string; min_upload_short_side: number; max_upload_bytes: number };
   key: { default: string; alternate: string };
-  generate: { width: number; height: number; fps: number; frames: number };
+  generate: { width: number; height: number; fps: number; frames: number; seconds: number };
   ship: {
     colour_width: number; colour_height: number; stacked_width: number; stacked_height: number; fps: number;
     loop_seconds: { min: number; max: number }; oneshot_seconds: { min: number; max: number };

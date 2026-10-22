@@ -1,3 +1,7 @@
+## [spec-v0.1.207] - 2026-10-22
+
+- CMEDIA-SIZE-01: the clip generation size is 480 x 480 for 3 seconds (73 frames); additive in shape (a new `seconds` field), changed in value (was 832 x 480, 121 frames).
+
 ## [spec-v0.1.206] - 2026-10-22
 
 - MODE-SPEC-01: `coding.home_mode` is honoured by `home` only (v0.1.205 listed `stack` too, which widened the `honoured_by` enum and broke consumers typed on `home | bot`). The enum is back to `home | bot`. Home sends the mode to the Stack itself.

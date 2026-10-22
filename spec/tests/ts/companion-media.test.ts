@@ -108,7 +108,7 @@ describe("CMEDIA-SPEC-01 companion media", () => {
       version: 1,
       image: { size: 1024, margin_percent: 12, format: "png", min_upload_short_side: 512, max_upload_bytes: 20971520 },
       key: { default: "#00FF00", alternate: "#FF00FF" },
-      generate: { width: 832, height: 480, fps: 24, frames: 121 },
+      generate: { width: 480, height: 480, fps: 24, frames: 73, seconds: 3 },
       ship: {
         colour_width: 480, colour_height: 480, stacked_width: 480, stacked_height: 960, fps: 24,
         loop_seconds: { min: 2, max: 4 }, oneshot_seconds: { min: 1.5, max: 4 },
@@ -117,6 +117,12 @@ describe("CMEDIA-SPEC-01 companion media", () => {
       },
       upload_video: { max_bytes: 31457280, max_seconds: 10, types: ["video/mp4", "video/quicktime", "video/webm"] },
     });
+    expect((COMPANION_MEDIA.generate.frames - 1) % 4).toBe(0);
+    expect(COMPANION_MEDIA.generate.frames).toBe(COMPANION_MEDIA.generate.fps * COMPANION_MEDIA.generate.seconds + 1);
+    expect(COMPANION_MEDIA.generate.width).toBe(COMPANION_MEDIA.ship.colour_width);
+    expect(COMPANION_MEDIA.generate.height).toBe(COMPANION_MEDIA.ship.colour_height);
+    expect(COMPANION_MEDIA.generate.seconds).toBeLessThanOrEqual(Math.max(...COMPANION_MEDIA.states.map((state) => state.max_seconds)));
+    expect(COMPANION_MEDIA.generate.seconds).toBeGreaterThanOrEqual(Math.min(...COMPANION_MEDIA.states.map((state) => state.min_seconds)));
     expect(COMPANION_MEDIA.states).toEqual([
       { id: "idle", kind: "loop", required: true, min_seconds: 3, max_seconds: 4, motion: "breathes slowly, tiny sway, one blink", driven_by: "outside a turn" },
       { id: "idle_look", kind: "oneshot", required: false, min_seconds: 2, max_seconds: 3, motion: "looks to one side, then back", driven_by: "random while idle" },
