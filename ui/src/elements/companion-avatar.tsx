@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "cn";
 import { createCompanionAvatarMachine, pickWanted, type CompanionClips, type StateId } from "@/kit/elements/companion-avatar-machine";
 import { StackedAlphaVideo } from "@/kit/elements/stacked-alpha-video";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "@/kit/ui/button";
 import { icons } from "@/kit/icons";
 
@@ -95,6 +96,6 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
   }, [clip.h264, machine, onFail, source]);
   const movable = !reduced && documentVisible && !failed;
   return <div role="img" aria-label={name} className={cn(SIZES[size], "pointer-events-none relative", className)}>
-    {movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <img src={clip.still} alt="" className="size-full object-contain" />}
+    {movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <SafeImage src={clip.still} alt="" className="size-full object-contain" />}
   </div>;
 }
