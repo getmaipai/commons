@@ -1,10 +1,10 @@
-"""LookResult stays consistent across schema, vocabulary and generated model."""
+"""LookResult stays consistent across fixtures, vocabulary and the generated model (the schema itself is
+validated by the TypeScript test)."""
 
 import json
 from pathlib import Path
 
 import pytest
-from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
 from gen.py.look_result_schema import LookResult
@@ -18,11 +18,7 @@ def read(path):
 
 
 def test_look_result_fixture_schema_and_model_round_trip():
-    schema = read(ROOT / "schemas" / "look-result.schema.json")
-    Draft202012Validator.check_schema(schema)
-    validator = Draft202012Validator(schema)
     value = read(RECORDS / "look-result.example.json")
-    validator.validate(value)
     parsed = LookResult.model_validate(value)
     assert (
         json.loads(parsed.model_dump_json(by_alias=True, exclude_unset=True)) == value
@@ -31,8 +27,6 @@ def test_look_result_fixture_schema_and_model_round_trip():
 
 def test_look_result_without_scene_light_is_rejected():
     value = read(RECORDS / "look-result.invalid-no-light.example.json")
-    schema = read(ROOT / "schemas" / "look-result.schema.json")
-    assert list(Draft202012Validator(schema).iter_errors(value))
     with pytest.raises(ValidationError):
         LookResult.model_validate(value)
 
