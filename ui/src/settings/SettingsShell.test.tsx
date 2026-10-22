@@ -44,6 +44,12 @@ describe("SettingsShell column", () => {
     expect(labels).toEqual(["Chat", "Related"]);
   });
 
+  test("hides a one-row group heading and keeps a two-row heading", () => {
+    const custom = { ...area("chat"), groups: [{ label: "One", sections: ["general"] }, { label: "Two", sections: ["personalization", "voice"] }] };
+    const { view } = shell({ area: custom });
+    expect([...column(view.container).querySelectorAll("[data-slot=sidebar-group-label]")].map((x) => x.textContent)).toEqual(["Two"]);
+  });
+
   test("the open row is the one marked data-active and aria-current", () => {
     const { view } = shell({ activeSection: "personalization" });
     const rows = [...column(view.container).querySelectorAll("[data-slot=sidebar-menu-button]")];
@@ -52,6 +58,22 @@ describe("SettingsShell column", () => {
     expect(active[0]!.textContent).toBe("Personalization");
     expect(active[0]!.getAttribute("aria-current")).toBe("page");
     expect(active[0]!.getAttribute("data-size")).toBe("settings");
+  });
+
+  test("sides and trail are optional and render when provided", () => {
+    const absent = shell().view;
+    expect(absent.container.querySelector('[data-slot="toggle-group"]')).toBeNull();
+    expect(absent.container.querySelector('[data-slot="breadcrumb"]')).toBeNull();
+    cleanup();
+    const onChange = mock((_id: string) => {});
+    const { view } = shell({ sides: { value: "mine", options: [{ id: "mine", label: "Mine" }, { id: "household", label: "Household" }], label: "Settings scope", onChange }, trail: [{ label: "Settings", href: "/settings" }, { label: "General" }] });
+    expect(view.getByRole("radiogroup", { name: "Settings scope" }).querySelectorAll("[data-slot=toggle-group-item]")).toHaveLength(2);
+    fireEvent.click(view.getByRole("radio", { name: "Household" }));
+    expect(onChange).toHaveBeenCalledWith("household");
+    const nav = view.container.querySelector('[data-slot="breadcrumb"]')!;
+    expect(nav.textContent).toContain("Settings");
+    expect(nav.textContent).toContain("General");
+    expect([...nav.querySelectorAll("a")].map((a) => a.textContent)).toEqual(["Settings"]);
   });
 
   test("only the sections the viewer may see are drawn", () => {

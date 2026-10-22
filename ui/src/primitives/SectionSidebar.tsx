@@ -116,6 +116,8 @@ export interface SectionSidebarProps {
   headerTop?: ReactNode;
   /** The column's title; omit it when the host draws its own. */
   title?: string;
+  /** Drawn below the column title and above search. */
+  afterTitle?: ReactNode;
   search?: SectionSidebarSearch;
   /** Placed under the search field (recent searches). */
   afterSearch?: ReactNode;
@@ -148,6 +150,7 @@ export function SectionSidebar({
   headerTop,
   headerActions,
   title,
+  afterTitle,
   search,
   afterSearch,
   footer,
@@ -301,7 +304,7 @@ export function SectionSidebar({
         <SidebarMenuButton
           size="settings"
           isActive={item.active === true}
-          className={cn(compact && "h-9 rounded-lg px-2.5 before:-inset-y-1.5", rail && "justify-center gap-0 px-0")}
+          className={cn(compact && "h-9 rounded-lg px-2.5 before:-inset-y-1.5", rail && "justify-center gap-0 px-0", item.active && "font-semibold bg-settings-selected")}
           render={(props) => (
             <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); }} title={rail ? item.label : undefined}>
               {props.children}
@@ -311,8 +314,9 @@ export function SectionSidebar({
           aria-current={item.active ? "page" : undefined}
           aria-describedby={item.describedBy}
         >
-          <span className="relative flex shrink-0">
-            {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className="size-[18px] text-settings-helper" />}
+          {item.active ? <span aria-hidden data-active="true" className="absolute inset-y-0 start-0 w-[3px] rounded-full bg-settings-accent" /> : null}
+          <span className={cn("relative flex shrink-0", !rail && item.icon && !item.media && "size-7 items-center justify-center rounded-lg bg-settings-icon-tile", item.active && item.icon && !item.media && "bg-settings-accent/15")}>
+            {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className={cn("size-[18px]", item.icon ? "text-settings-helper" : "text-settings-helper", item.active && item.icon && "text-settings-accent")} />}
             {rail && item.dot ? <span data-slot="section-sidebar-dot" aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary" /> : null}
           </span>
           <span className={cn("flex-1 truncate", rail && "sr-only")}>{item.label}</span>
@@ -350,6 +354,7 @@ export function SectionSidebar({
         ) : (
           titleNode
         )}
+        {afterTitle}
         {search && rail ? (
           <button
             type="button"
@@ -402,7 +407,7 @@ export function SectionSidebar({
         {body !== undefined ? (rail ? null : body) : null}
         {groups.map((group, index) => (
           <SidebarGroup key={group.id} className={cn("p-0", rail ? (index === 0 ? "pt-2" : "mt-2 border-t border-settings-column-divider pt-2") : compact ? "pt-2" : "pt-5")}>
-            {group.label && !rail ? (
+            {group.label && group.items.length >= 2 && !rail ? (
               <SidebarGroupLabel className="h-8 px-2 text-[length:var(--settings-group-label-size)] font-normal text-settings-helper">{group.label}</SidebarGroupLabel>
             ) : null}
             <SidebarMenu className={menuGap}>{group.items.map(row)}</SidebarMenu>

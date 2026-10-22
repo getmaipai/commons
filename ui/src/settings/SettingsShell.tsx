@@ -1,4 +1,4 @@
-import { useId, type MouseEvent, type PointerEventHandler, type ReactNode, type RefObject } from "react";
+import { Fragment, useId, type MouseEvent, type PointerEventHandler, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { SettingsHeadingLevelContext } from "./headingLevel";
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
@@ -8,6 +8,8 @@ import { SectionSidebar } from "../primitives/SectionSidebar";
 import { cn } from "../dashboard/lib/utils";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb";
 import { resolveHref, visibleGroups, type Section, type SettingsAreaDef, type SettingsViewer } from "./settingsAudience";
 
 const ArrowUpRight = getIcon("arrow-up-right");
@@ -69,6 +71,8 @@ export interface SettingsShellProps {
   /** Controlled desktop column visibility; phone drill-in ignores it. */
   collapsible?: SettingsShellCollapsible;
   labels?: SettingsShellLabels;
+  sides?: { value: string; options: { id: string; label: string }[]; label: string; onChange: (id: string) => void };
+  trail?: { label: string; href?: string }[];
   /** The element the content pane renders as. "main" (default) is the
    * page's main landmark; a host that already has one (Home's rail
    * workspace) passes "section", which is a named region instead. */
@@ -107,6 +111,8 @@ export function SettingsShell({
   layout = "default",
   collapsible,
   labels,
+  sides,
+  trail,
   contentAs = "main",
   children,
 }: SettingsShellProps) {
@@ -181,6 +187,11 @@ export function SettingsShell({
           </>
         }
         title={!(layout === "docked" && backLink) ? (labels?.columnTitle ?? area.title) : undefined}
+        afterTitle={sides && sides.options.length >= 2 ? (
+          <ToggleGroup type="single" variant="outline" value={sides.value} aria-label={sides.label} onValueChange={(id) => { if (id) sides.onChange(id); }} className="w-full px-2">
+            {sides.options.map((option) => <ToggleGroupItem key={option.id} value={option.id} className="min-w-0 flex-1">{option.label}</ToggleGroupItem>)}
+          </ToggleGroup>
+        ) : undefined}
         search={{ value: searchQuery, onChange: onSearchChange, label: searchLabel }}
         contentClassName={cn(searching && "hidden lg:flex")}
         groups={groups.map((group) => ({
@@ -217,9 +228,15 @@ export function SettingsShell({
               <span>{area.title}</span>
             </SidebarMenuButton>
           ) : null}
-          <div className="relative mb-10 flex items-start gap-2">
+          <div data-slot="settings-content-header" className="sticky top-0 z-10 -mx-6 mb-10 bg-settings-page px-6">
+          {trail?.length ? <Breadcrumb className="mb-2 hidden lg:block"><BreadcrumbList>{trail.map((item, index) => <Fragment key={`${item.label}-${index}`}>
+            <BreadcrumbItem>{index === trail.length - 1 || !item.href ? <BreadcrumbPage>{item.label}</BreadcrumbPage> : <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>}</BreadcrumbItem>
+            {index < trail.length - 1 ? <BreadcrumbSeparator /> : null}
+          </Fragment>)}</BreadcrumbList></Breadcrumb> : null}
+          <div className="relative flex items-start gap-2">
             {collapsible?.collapsed && !peeking ? <SettingsColumnToggle buttonRef={collapsible.headerToggleRef} collapsed onToggle={collapsible.onToggle} /> : null}
             <h1 className="text-[length:var(--settings-page-title-size)] leading-9 font-semibold">{title}</h1>
+          </div>
           </div>
           <SettingsHeadingLevelContext.Provider value={2}>{children}</SettingsHeadingLevelContext.Provider>
         </div>

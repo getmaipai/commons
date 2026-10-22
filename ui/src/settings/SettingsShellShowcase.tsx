@@ -41,6 +41,8 @@ export function SettingsShellShowcase() {
         onSearchChange={setQuery}
         contentAs="section"
         onBack={() => setActive("")}
+        sides={{ value: "mine", label: "Settings scope", options: [{ id: "mine", label: "Mine" }, { id: "household", label: "Household" }], onChange: () => {} }}
+        trail={[{ label: "Settings", href: "/settings" }, { label: "Chat" }, { label: "General" }]}
       >
         <SettingsShowcase />
       </SettingsShell>

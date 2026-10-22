@@ -990,14 +990,14 @@
  * shell/tokens.css; these mixes reference the same background/foreground
  * pair directly. */
 :root {
-  --settings-column-width: 288px;
+  --settings-column-width: 260px;
   /* The collapsed icon-only rail of SectionSidebar. */
   --settings-rail-width: 64px;
   --settings-column-title-size: 18px;
   --settings-group-label-size: 14px;
   --settings-page-title-size: 28px;
   --settings-section-heading-size: 14px;
-  --settings-content-max: 728px;
+  --settings-content-max: 760px;
   --settings-content-top: 82px;
   --settings-row-text-max: 496px;
   --settings-card-radius: 12px;
@@ -1015,6 +1015,9 @@ body {
   --settings-switch-off: color-mix(in srgb, var(--background), var(--foreground) 19.6%);
   --settings-helper: color-mix(in srgb, var(--background), var(--foreground) 70%);
   --settings-arrow: color-mix(in srgb, var(--background), var(--foreground) 39%);
+  --settings-icon-tile: color-mix(in srgb, var(--background), var(--foreground) 12%);
+  --settings-selected: color-mix(in srgb, var(--background), var(--foreground) 18%);
+  --settings-accent: var(--primary);
   /* The page and column tones behind the settings shell. They reference
    * Home's shell tones when Home defines them (--shell-main, --shell-history,
    * --shell-divider, which move into the kit with Elements cleanup items 4
@@ -1112,6 +1115,9 @@ body {
   --color-settings-page: var(--settings-page);
   --color-settings-column: var(--settings-column);
   --color-settings-column-divider: var(--settings-column-divider);
+  --color-settings-icon-tile: var(--settings-icon-tile);
+  --color-settings-selected: var(--settings-selected);
+  --color-settings-accent: var(--settings-accent);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
