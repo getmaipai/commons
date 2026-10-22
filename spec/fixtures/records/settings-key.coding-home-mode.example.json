@@ -16,5 +16,5 @@
   "level": "basic",
   "secret": false,
   "lives_in": "household.coding",
-  "honoured_by": ["home", "stack"]
+  "honoured_by": ["home"]
 }

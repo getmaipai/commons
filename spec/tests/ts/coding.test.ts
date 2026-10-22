@@ -114,7 +114,7 @@ test("Home mode parses, matches its options, passes copy lint, and appears in th
   expect(SettingsKey.parse(homeMode)).toEqual(homeMode);
   expect(homeMode).toMatchObject({ scope: "household", selector: "select", default: "normal",
     range: { options: ["normal", "coding"] }, lives_in: "household.coding", level: "basic",
-    secret: false, honoured_by: ["home", "stack"] });
+    secret: false, honoured_by: ["home"] });
   expect(homeMode.range.options).toContain(homeMode.default);
   const baseline = read("settings/copy-lint-baseline.json");
   expect(lintSettingCopy(keys, baseline)).toEqual([]);

@@ -166,7 +166,7 @@ class SettingsKey(BaseModel):
         ...,
         description='The package, companion, integration, or central page id that renders this key.',
     )
-    honoured_by: list[Literal['home', 'bot', 'stack']] = Field(..., min_length=1)
+    honoured_by: list[Literal['home', 'bot']] = Field(..., min_length=1)
 
     @field_validator('confirm_off', mode='after')
     @classmethod

@@ -1,3 +1,7 @@
+## [spec-v0.1.206] - 2026-10-22
+
+- MODE-SPEC-01: `coding.home_mode` is honoured by `home` only (v0.1.205 listed `stack` too, which widened the `honoured_by` enum and broke consumers typed on `home | bot`). The enum is back to `home | bot`. Home sends the mode to the Stack itself.
+
 ## [spec-v0.1.205] - 2026-10-22
 
 - MODE-SPEC-01: add the admin-only `coding.home_mode` setting for normal and coding use, with its choices and copy. Add the `CodingModeReadiness` record, ordered checklist, reason vocabulary, fixture and generated TypeScript/Python types. Additive.
