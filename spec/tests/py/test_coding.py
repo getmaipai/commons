@@ -92,6 +92,10 @@ def test_coding_mode_readiness_fixture_and_derived_ready_rule():
 
     falsely_ready = {**value, "ready": True}
     parsed_false = CodingModeReadiness.model_validate(falsely_ready)
-    assert not (
-        parsed_false.ready and any(item.state != "done" for item in parsed_false.items)
+    # The schema cannot derive `ready`, so the rule lives in the consumer: a record that says ready
+    # while an item is not done disagrees with its own items and must be treated as not ready.
+    assert parsed_false.ready is True
+    assert not all(item.state == "done" for item in parsed_false.items)
+    assert parsed_false.ready != all(
+        item.state == "done" for item in parsed_false.items
     )
