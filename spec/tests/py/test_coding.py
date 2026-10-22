@@ -7,6 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from gen.py.api_key_schema import ApiKey
+from gen.py.coding_mode_readiness_schema import CodingModeReadiness
 from gen.py.settings_key_schema import SettingsKey
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "records"
@@ -65,3 +66,32 @@ def test_confirm_off_is_limited_to_boolean_settings():
     SettingsKey.model_validate(value)
     with pytest.raises(ValidationError):
         SettingsKey.model_validate({**value, "selector": "select", "default": "x"})
+
+
+def test_coding_mode_readiness_fixture_and_derived_ready_rule():
+    value = json.loads((FIXTURES / "coding-mode-readiness.example.json").read_text())
+    parsed = CodingModeReadiness.model_validate(value)
+    assert (
+        json.loads(parsed.model_dump_json(by_alias=True, exclude_unset=True)) == value
+    )
+    expected_ids = [
+        "coding_enabled",
+        "engine",
+        "pieces",
+        "hardware",
+        "memory",
+        "self_test",
+        "client",
+        "bench",
+    ]
+    assert [item.id for item in parsed.items] == expected_ids
+    assert parsed.ready is all(item.state == "done" for item in parsed.items)
+    assert parsed.first_unmet == next(
+        (item.id for item in parsed.items if item.state != "done"), None
+    )
+
+    falsely_ready = {**value, "ready": True}
+    parsed_false = CodingModeReadiness.model_validate(falsely_ready)
+    assert not (
+        parsed_false.ready and any(item.state != "done" for item in parsed_false.items)
+    )

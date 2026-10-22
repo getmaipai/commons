@@ -6,6 +6,8 @@ import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { ApiKey } from "../../gen/ts/api-key.js";
 import { SettingsKey } from "../../gen/ts/settings-key.js";
+import { CodingModeReadiness } from "../../gen/ts/coding-mode-readiness.js";
+import { lintSettingCopy } from "../../interpreters/ts/describeSetting.js";
 
 const root = join(import.meta.dir, "../..");
 const bytes = (path: string) => readFileSync(join(root, path));
@@ -14,6 +16,7 @@ const ajv = new Ajv2020({ strict: false });
 addFormats(ajv);
 const validate = ajv.compile(read("schemas/api-key.schema.json"));
 const fixture = read("fixtures/records/api-key.example.json");
+const readiness = read("fixtures/records/coding-mode-readiness.example.json") as any;
 const keys = read("settings/keys.json") as Record<string, any>[];
 const key = (name: string) => keys.find(k => k.key === `coding.${name}`)!;
 
@@ -104,6 +107,40 @@ test("Coding sections follow the home and account audiences", () => {
   const section = (id: string) => areas.find((a: any) => a.id === id).sections.find((s: any) => s.id === "coding");
   expect(section("home")).toMatchObject({ kind: "keys", min_role: "admin", icon: "code" });
   expect(section("account")).toMatchObject({ kind: "view", min_role: "child", view: "account.coding_keys", needs: ["coding.allowed_for_me"] });
+});
+
+test("Home mode parses, matches its options, passes copy lint, and appears in the Coding card", () => {
+  const homeMode = keys.find(k => k.key === "coding.home_mode")!;
+  expect(SettingsKey.parse(homeMode)).toEqual(homeMode);
+  expect(homeMode).toMatchObject({ scope: "household", selector: "select", default: "normal",
+    range: { options: ["normal", "coding"] }, lives_in: "household.coding", level: "basic",
+    secret: false, honoured_by: ["home", "stack"] });
+  expect(homeMode.range.options).toContain(homeMode.default);
+  const baseline = read("settings/copy-lint-baseline.json");
+  expect(lintSettingCopy(keys, baseline)).toEqual([]);
+  const codingCard = read("settings/areas.json").areas.find((a: any) => a.id === "home")
+    .sections.find((s: any) => s.id === "coding").cards;
+  expect(codingCard).toContainEqual({ label: "Coding", group: homeMode.lives_in, scope: "household" });
+  expect(SettingsKey.parse(read("fixtures/records/settings-key.coding-home-mode.example.json")))
+    .toEqual(read("fixtures/records/settings-key.coding-home-mode.example.json"));
+});
+
+test("coding mode readiness validates the fixture and keeps its eight items in order", () => {
+  const schemaValidate = ajv.compile(read("schemas/coding-mode-readiness.schema.json"));
+  const ids = ["coding_enabled", "engine", "pieces", "hardware", "memory", "self_test", "client", "bench"];
+  expect(schemaValidate(readiness)).toBe(true);
+  expect(CodingModeReadiness.parse(readiness)).toEqual(readiness);
+  expect(readiness.items.map((item: any) => item.id)).toEqual(ids);
+  const isConsistent = (value: typeof readiness) =>
+    value.ready === value.items.every((item: any) => item.state === "done") &&
+    value.first_unmet === (value.items.find((item: any) => item.state !== "done")?.id ?? null);
+  expect(isConsistent(readiness)).toBe(true);
+  const falselyReady = { ...readiness, ready: true };
+  expect(schemaValidate(falselyReady)).toBe(true);
+  expect(isConsistent(falselyReady)).toBe(false);
+  const reasons = read("vocab/coding-mode-readiness-reasons.json");
+  expect(Object.keys(reasons)).toEqual(ids);
+  for (const reason of Object.values(reasons) as string[]) expect(reason).not.toMatch(/[—–]/);
 });
 
 test("the coding data class follows the existing declaration fixture mechanism", () => {

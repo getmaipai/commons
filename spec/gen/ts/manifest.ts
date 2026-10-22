@@ -925,7 +925,7 @@ export const PackageManifest = z
               .describe(
                 "The package, companion, integration, or central page id that renders this key.",
               ),
-            honoured_by: z.array(z.enum(["home", "bot"])).min(1),
+            honoured_by: z.array(z.enum(["home", "bot", "stack"])).min(1),
           })
           .strict()
           .superRefine((value, ctx) => {

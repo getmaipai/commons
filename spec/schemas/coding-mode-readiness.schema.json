@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/coding-mode-readiness.schema.json",
+  "title": "CodingModeReadiness",
+  "description": "Home's readiness check for the shared computer's coding mode. Each item has a stable reason key in vocab/coding-mode-readiness-reasons.json and a heading anchor in the future coding-mode.md user page.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ready", "first_unmet", "checked_at", "items", "provenance", "hlc"],
+  "properties": {
+    "ready": { "type": "boolean", "description": "True only when every item is done; this derived rule is checked alongside the schema." },
+    "first_unmet": { "type": ["string", "null"], "enum": ["coding_enabled", "engine", "pieces", "hardware", "memory", "self_test", "client", "bench", null] },
+    "checked_at": { "type": "string", "format": "date-time" },
+    "items": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/item" }
+    },
+    "provenance": { "type": "string", "minLength": 1 },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "state", "reason_key", "doc_anchor"],
+      "properties": {
+        "id": { "type": "string", "enum": ["coding_enabled", "engine", "pieces", "hardware", "memory", "self_test", "client", "bench"] },
+        "state": { "type": "string", "enum": ["done", "can_do", "manual"] },
+        "reason_key": { "type": "string", "enum": ["coding_enabled", "engine", "pieces", "hardware", "memory", "self_test", "client", "bench"] },
+        "doc_anchor": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

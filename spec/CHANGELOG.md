@@ -1,3 +1,7 @@
+## [spec-v0.1.205] - 2026-10-22
+
+- MODE-SPEC-01: add the admin-only `coding.home_mode` setting for normal and coding use, with its choices and copy. Add the `CodingModeReadiness` record, ordered checklist, reason vocabulary, fixture and generated TypeScript/Python types. Additive.
+
 ## [spec-v0.1.204] - 2026-10-21
 
 - OPS-KEY-01: `api-key.scopes` gains `settings`, a key an owner or admin makes so an assistant session can change a short named list of household settings (never people, passwords, safety or age gates). Additive; a key with only `turn` or `code` is unchanged.

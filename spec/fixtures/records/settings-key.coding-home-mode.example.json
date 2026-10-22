@@ -1,0 +1,20 @@
+{
+  "key": "coding.home_mode",
+  "scope": "household",
+  "selector": "select",
+  "range": { "options": ["normal", "coding"] },
+  "default": "normal",
+  "label": "Home mode",
+  "help": "Choose how Home uses this computer. Normal keeps chat and pictures running. Coding gives most memory to one coding model. That model also answers chat.",
+  "copy": {
+    "does": "Choose how Home uses this computer for chat and coding.",
+    "options": {
+      "normal": "Keep chat and pictures running as usual.",
+      "coding": "Give most memory to one coding model for chat and coding."
+    }
+  },
+  "level": "basic",
+  "secret": false,
+  "lives_in": "household.coding",
+  "honoured_by": ["home", "stack"]
+}

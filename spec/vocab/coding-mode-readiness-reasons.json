@@ -1,0 +1,10 @@
+{
+  "coding_enabled": "Coding is off, so turn it on in Home settings.",
+  "engine": "No coding engine is set, so choose one in Home settings.",
+  "pieces": "Some model files are missing, so add them and check again.",
+  "hardware": "This computer needs more parts, so check the hardware guide.",
+  "memory": "The model needs more free memory, so free some and check again.",
+  "self_test": "The coding test is not done, so run it in Home.",
+  "client": "No coding app is set up, so connect one to Home.",
+  "bench": "The speed check is not done, so run it in Home."
+}

@@ -1,0 +1,17 @@
+{
+  "ready": false,
+  "first_unmet": "engine",
+  "checked_at": "2026-10-22T14:00:00Z",
+  "items": [
+    { "id": "coding_enabled", "state": "done", "reason_key": "coding_enabled", "doc_anchor": "Turn on coding" },
+    { "id": "engine", "state": "manual", "reason_key": "engine", "doc_anchor": "Choose a coding engine" },
+    { "id": "pieces", "state": "manual", "reason_key": "pieces", "doc_anchor": "Add the model files" },
+    { "id": "hardware", "state": "done", "reason_key": "hardware", "doc_anchor": "Check your computer" },
+    { "id": "memory", "state": "done", "reason_key": "memory", "doc_anchor": "Make room in memory" },
+    { "id": "self_test", "state": "done", "reason_key": "self_test", "doc_anchor": "Test the coding model" },
+    { "id": "client", "state": "done", "reason_key": "client", "doc_anchor": "Connect a coding app" },
+    { "id": "bench", "state": "done", "reason_key": "bench", "doc_anchor": "Check coding speed" }
+  ],
+  "provenance": "home: coding mode readiness check",
+  "hlc": "1792677600000:0:home001"
+}

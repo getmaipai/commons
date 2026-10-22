@@ -150,7 +150,7 @@
     },
     "honoured_by": {
       "type": "array",
-      "items": { "type": "string", "enum": ["home", "bot"] },
+      "items": { "type": "string", "enum": ["home", "bot", "stack"] },
       "minItems": 1
     }
   }
