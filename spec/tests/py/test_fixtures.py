@@ -311,7 +311,7 @@ def test_robot_offer_fixture():
 
 def test_robot_asset_pins_have_checksums_licences_and_no_moves_or_firmware():
     pins = json.loads(ASSETS_FILE.read_text())
-    assert len(pins) == 6
+    assert len(pins) == 7
     for row in pins:
         pin = RobotAssetManifest.model_validate(row)
         assert len(pin.sha256) == 64

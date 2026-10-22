@@ -52,5 +52,14 @@
     "licence": "Apache-2.0",
     "source_url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01.tar.bz2",
     "kind": "model"
+  },
+  {
+    "id": "yolox-nano-0.1.1rc0",
+    "file": "yolox_nano.onnx",
+    "sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "bytes": 3659407,
+    "licence": "Apache-2.0",
+    "source_url": "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_nano.onnx",
+    "kind": "model"
   }
 ]

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/look-result.schema.json",
+  "title": "LookResult",
+  "description": "A transient visual description held in memory only, never written, logged or returned by a route (Robot vision R1). Labels never go to a log.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["objects", "scene", "cost"],
+  "properties": {
+    "objects": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/object" } },
+    "scene": {
+      "type": "object", "additionalProperties": false, "required": ["light", "tags"],
+      "properties": {
+        "light": { "type": "string", "enum": ["dark", "dim", "bright"] },
+        "tags": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/tag" } },
+        "room_type": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "colours": { "type": "array", "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 32 } }
+      }
+    },
+    "cost": {
+      "type": "object", "additionalProperties": false, "required": ["ms", "tier"],
+      "properties": { "ms": { "type": "number", "minimum": 0 }, "tier": { "type": "string", "enum": ["fast", "detailed"] } }
+    }
+  },
+  "$defs": {
+    "object": {
+      "type": "object", "additionalProperties": false,
+      "required": ["label", "count", "score", "uncertain"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "count": { "type": "integer", "minimum": 1 },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "uncertain": { "type": "boolean" },
+        "box": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "number", "minimum": 0, "maximum": 1 } },
+        "attributes": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "colour": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "kind": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "make": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "model": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        }
+      }
+    },
+    "tag": {
+      "type": "object", "additionalProperties": false, "required": ["label", "score"],
+      "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 64 }, "score": { "type": "number", "minimum": 0, "maximum": 1 } }
+    }
+  }
+}

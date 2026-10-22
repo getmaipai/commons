@@ -335,7 +335,7 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("robot asset pins validate and contain only checksum and licence backed non-move assets", () => {
     const pins = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "assets", "robot-assets.json"), "utf-8")) as unknown[];
-    expect(pins).toHaveLength(6);
+    expect(pins).toHaveLength(7);
     for (const pin of pins) {
       const parsed = RobotAssetManifest.parse(pin);
       expect(parsed.sha256).toMatch(/^[a-f0-9]{64}$/);

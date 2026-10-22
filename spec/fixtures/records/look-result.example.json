@@ -1,0 +1,9 @@
+{
+  "objects": [
+    { "label": "person", "count": 1, "score": 0.98, "uncertain": false },
+    { "label": "tv", "count": 1, "score": 0.91, "uncertain": false },
+    { "label": "couch", "count": 1, "score": 0.88, "uncertain": false, "attributes": { "colour": "blue", "kind": "sectional" } }
+  ],
+  "scene": { "light": "dim", "tags": [{ "label": "indoors", "score": 0.99 }], "room_type": "living room", "colours": ["blue"] },
+  "cost": { "ms": 12, "tier": "fast" }
+}

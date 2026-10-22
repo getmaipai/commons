@@ -1,3 +1,7 @@
+## [spec-v0.1.208] - 2026-10-22
+
+- LOOK-01: add the LookResult record, the default household Look vocabulary (detector classes, nouns, scene types, lighting, activities, colours) and the pinned YOLOX-nano model (Apache-2.0) to the robot asset list. Additive.
+
 ## [spec-v0.1.207] - 2026-10-22
 
 - CMEDIA-SIZE-01: the clip generation size is 480 x 480 for 3 seconds (73 frames); additive in shape (a new `seconds` field), changed in value (was 832 x 480, 121 frames).
