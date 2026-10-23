@@ -737,6 +737,11 @@
   --weather-uv-low: #34d399;
   --weather-uv-mid: #facc15;
   --weather-uv-high: #ef4444;
+  --weather-aqi-good: #34d399;
+  --weather-aqi-moderate: #facc15;
+  --weather-aqi-poor: #ef4444;
+  --weather-moon-lit: #f1e5b9;
+  --weather-moon-dark: #27314d;
   --weather-sun-glow: rgb(255 244 200 / 0.22);
   --weather-moon-glow: rgb(215 228 255 / 0.2);
 }
@@ -1389,11 +1394,7 @@ body {
   outline-color: transparent;
 }
 
-/* WEATHER-CARD-01: the weather card's sky effects (weather-card.tsx). Every layer is
- * decoration (aria-hidden), moves with transform or opacity only, and takes its
- * position, size, speed and delay from the custom properties the Element sets inline
- * (--x, --y, --s, --d, --dl, --o). Reduced motion removes the falling layers and stops
- * the rest where they sit. */
+/* Weather scenes use compositor-friendly transforms and opacity. */
 [data-slot="weather-card"] [data-fx] {
   position: absolute;
   pointer-events: none;
@@ -1403,17 +1404,13 @@ body {
   position: absolute;
   pointer-events: none;
 }
-[data-slot="weather-location-sky"] [data-fx="cloud"],
-[data-slot="weather-forecast-hero"] [data-fx="cloud"] { filter: blur(7px); }
-[data-slot="weather-location-sky"] [data-fx="fog"],
-[data-slot="weather-forecast-hero"] [data-fx="fog"] { filter: blur(6px); }
 [data-slot="weather-sky"] [data-fx="fall"] {
   top: -24px;
   left: calc(var(--x) * 1%);
   width: 1px;
   height: calc(var(--s) * 1px);
   opacity: var(--o);
-  rotate: 7deg;
+  transform: rotate(12deg);
   background: linear-gradient(to bottom, transparent, var(--weather-ink));
   animation: wx-rain var(--d) linear var(--dl) infinite;
 }
@@ -1444,10 +1441,10 @@ body {
   height: calc(var(--s) * 0.3px);
   border-radius: 9999px;
   background: color-mix(in srgb, var(--weather-ink) calc(var(--o) * 100%), transparent);
-  filter: blur(14px);
-  animation: wx-drift var(--d) ease-in-out var(--dl) infinite alternate;
+  filter: blur(11px);
+  animation: wx-drift var(--d) linear var(--dl) infinite;
 }
-[data-slot="weather-sky"] [data-fx="cloud-slow"] { animation-duration: calc(var(--d) * 1.7); opacity: calc(var(--o) * .72); }
+[data-slot="weather-sky"] [data-fx="cloud-slow"] { animation-duration: calc(var(--d) * 1.4); opacity: calc(var(--o) * .72); }
 [data-slot="weather-sky"] [data-fx="fog"] {
   top: calc(var(--y) * 1%);
   left: -20%;
@@ -1465,8 +1462,9 @@ body {
   height: 200px;
   border-radius: 9999px;
   background: radial-gradient(circle, var(--weather-sun-glow), transparent 68%);
-  animation: wx-pulse 7s ease-in-out infinite alternate;
+  animation: wx-moon-glow 4s ease-in-out infinite alternate;
 }
+[data-slot="weather-sky"] [data-fx="sun"] { animation-name: wx-sun-pulse; animation-duration: 4s; }
 [data-slot="weather-sky"] [data-fx="moon"] {
   width: 150px;
   height: 150px;
@@ -1476,31 +1474,44 @@ body {
   inset: 0;
   opacity: 0;
   background: var(--weather-ink);
-  animation: wx-flash 7s linear infinite;
+  animation: wx-flash 6.5s linear infinite;
+}
+[data-slot="weather-sky"] [data-fx="splash"] {
+  left: 0; right: 0; bottom: 0; height: 22%;
+  background: linear-gradient(to top, color-mix(in srgb, var(--weather-ink) 28%, transparent), transparent);
+  animation: wx-splash 0.75s ease-out infinite;
 }
 @keyframes wx-rain {
-  to { transform: translate3d(-38px, 310px, 0); }
+  to { transform: translate3d(-54px, 390px, 0); }
 }
 @keyframes wx-snow {
   from { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(10px, 120px, 0); }
-  to { transform: translate3d(-6px, 250px, 0); }
+  50% { transform: translate3d(18px, 140px, 0); }
+  to { transform: translate3d(-9px, 290px, 0); }
 }
 @keyframes wx-twinkle {
   from { opacity: 0.15; }
   to { opacity: 1; }
 }
 @keyframes wx-drift {
-  from { transform: translate3d(-38px, 0, 0); }
-  to { transform: translate3d(42px, 0, 0); }
+  from { transform: translate3d(-110%, 0, 0); }
+  to { transform: translate3d(110vw, 0, 0); }
 }
 @keyframes wx-fog {
   from { transform: translate3d(-8%, 0, 0); }
   to { transform: translate3d(8%, 0, 0); }
 }
-@keyframes wx-pulse {
-  from { opacity: 0.7; }
-  to { opacity: 1; }
+@keyframes wx-sun-pulse {
+  from { opacity: 0.55; transform: scale(.72); }
+  to { opacity: 1; transform: scale(1.08); }
+}
+@keyframes wx-moon-glow {
+  from { opacity: .62; transform: scale(.92); }
+  to { opacity: 1; transform: scale(1.04); }
+}
+@keyframes wx-splash {
+  0%, 100% { opacity: .08; transform: translateY(8px); }
+  45% { opacity: .42; transform: translateY(0); }
 }
 /* Two soft flashes close together, then quiet: never more than three flashes in a second. */
 @keyframes wx-flash {
@@ -1516,34 +1527,15 @@ body {
   [data-slot="weather-location-sky"] [data-fx] {
     animation: none !important;
   }
-  [data-slot="weather-sky"] [data-fx="fall"],
-  [data-slot="weather-sky"] [data-fx="flake"],
-  [data-slot="weather-sky"] [data-fx="flash"],
-  [data-slot="weather-forecast-hero"] [data-fx="fall"],
-  [data-slot="weather-forecast-hero"] [data-fx="flake"],
-  [data-slot="weather-forecast-hero"] [data-fx="flash"],
-  [data-slot="weather-location-sky"] [data-fx="fall"],
-  [data-slot="weather-location-sky"] [data-fx="flake"],
-  [data-slot="weather-location-sky"] [data-fx="flash"] {
-    display: none;
-  }
 }
 html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx],
 html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx],
 html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx] {
   animation: none !important;
 }
-html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="fall"],
-html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flake"],
-html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
-  display: none;
-}
-html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx="fall"],
-html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx="flake"],
-html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx="flash"],
-html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx="fall"],
-html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx="flake"],
-html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx="flash"] { display: none; }
+html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx],
+html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx],
+html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx] { animation: none !important; }
 
 /* MEDIA-PLAYER-01: tokens for anything drawn over a picture (art), shared by
  * the Player, the Billboard and the media tile overlay (MediaShelf), and open

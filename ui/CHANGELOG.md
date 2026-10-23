@@ -3058,3 +3058,7 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 
 - Add optional MarkdownText preprocessing and Thread markdown components/preprocess slot.
 - Export Citation with optional outbound href and snippet.
+## [0.5.325] - ui-v0.5.325
+
+- Weather forecast page: location cards give the local time and remove action a dedicated right-side header row beside a shrinkable city name; the remove target is 44 px. The shared sky now has visible, condition-specific scenes (sun pulse, 72 night stars, drifting clouds, 64 rain streaks with a splash, snow, storm flash and fog bands), reduced particle counts for paused list previews and reduced-motion support. Forecast details add optional AQI, UV, wind dial, sunrise/sunset, feels-like, humidity/dew point, precipitation, visibility, pressure and moon tiles plus an hourly Conditions metric switcher. Unsupported details stay omitted. Showcase and focused layout, data omission, switcher and animation tests included.
+- Data for optional detail tiles: `airQuality: { aqi, category }`, `wind: { speed, direction, gust? }`, `sunrise`, `sunset`, `uvIndex`, `feelsLike`, `humidity`, `dewPoint?`, `precipitation`, `precipitationAmount?`, `precipitationLast24h?`, `precipitationNext24h?`, `visibility`, `visibilityDescription?`, `pressure`, `pressureTrend?`, and `moon: { phase, illumination }`. The hourly chart uses `hourly[].temp`, `pop?`, and `windSpeed?`.

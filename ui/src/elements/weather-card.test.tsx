@@ -66,7 +66,7 @@ describe("WeatherCard", () => {
     expect(weekdayOf("not-a-date")).toBe("not-a-date");
   });
 
-  test("every class draws a sky, and the effect layers are hidden from assistive tech with at most 32 parts", () => {
+  test("every class draws a sky, and effects are hidden from assistive tech", () => {
     const codeFor = { clear: 0, "partly-cloudy": 2, overcast: 3, fog: 45, drizzle: 51, rain: 61, snow: 71, thunderstorm: 95 } as const;
     for (const cls of WEATHER_CLASSES) {
       for (const is_day of [true, false]) {
@@ -75,7 +75,7 @@ describe("WeatherCard", () => {
         expect(root.getAttribute("data-class")).toBe(cls);
         const layers = [...container.querySelectorAll("[data-fx]")];
         expect(layers.length, `${cls} ${is_day}`).toBeGreaterThan(0);
-        expect(layers.length).toBeLessThanOrEqual(32);
+        expect(layers.length).toBeLessThanOrEqual(80);
         for (const layer of layers) expect(layer.getAttribute("aria-hidden") ?? layer.closest("[aria-hidden=true]")?.getAttribute("aria-hidden")).toBe("true");
         cleanup();
       }
@@ -86,6 +86,18 @@ describe("WeatherCard", () => {
     const { container } = render(<WeatherCard {...props} current={{ ...props.current, code: 61 }} />);
     expect(container.querySelector("[data-slot=weather-sky] [data-fx=fall]")).not.toBeNull();
     expect(container.querySelector("[data-slot=weather-sky]")?.getAttribute("data-class")).toBe("rain");
+  });
+
+  test("night, rain and snow scenes contain enough particles for visible motion", () => {
+    const night = render(<WeatherCard {...props} current={{ ...props.current, code: 0, is_day: false }} />);
+    expect(night.container.querySelectorAll('[data-fx="star"]')).toHaveLength(72);
+    cleanup();
+    const rainy = render(<WeatherCard {...props} current={{ ...props.current, code: 61 }} />);
+    expect(rainy.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(64);
+    expect(rainy.container.querySelector('[data-fx="splash"]')).not.toBeNull();
+    cleanup();
+    const snowy = render(<WeatherCard {...props} current={{ ...props.current, code: 71 }} />);
+    expect(snowy.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(56);
   });
 
   test("the same props draw the same markup", () => {

@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, test, mock } from "bun:test";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { WeatherForecastPage, dedupeLocations, formatLocalTime, rangeBarMetrics } from "./weather-forecast-page";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+const tokens = readFileSync(resolve(import.meta.dir, "../tokens.css"), "utf8");
 
 afterEach(cleanup);
 
@@ -17,9 +20,9 @@ describe("WeatherForecastPage", () => {
     const { container, getByText } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
     expect(container.querySelector('[data-slot="weather-location"]')?.textContent).toContain("My Location");
     expect(container.querySelector('[data-slot="weather-forecast-hero"]')?.textContent).toContain("Springfield");
-    expect(getByText("Wind")).toBeTruthy();
+    expect(getByText("Wind", { selector: "span" })).toBeTruthy();
     expect(getByText("Humidity")).toBeTruthy();
-    expect(container.querySelectorAll('[data-slot="weather-tile"]')).toHaveLength(5);
+    expect(container.querySelectorAll('[data-slot="weather-tile"]')).toHaveLength(6);
     expect(container.querySelector('[data-slot="weather-forecast-hero"]')?.getAttribute("style")).toContain("--weather-partly-cloudy-day-from");
   });
 
@@ -49,6 +52,50 @@ describe("WeatherForecastPage", () => {
     for (const card of cards) expect(card.className).toContain("h-40");
     expect(container.querySelectorAll("[data-slot=weather-tile]")).toHaveLength(0);
     expect(container.querySelector("[data-slot=weather-sky]")).not.toBeNull();
+  });
+
+  test("location header structurally separates a shrinkable long city from fixed time and remove target", () => {
+    const long = { id: "long", city: "San Bernardino Valley, California", localTime: "2:19 PM", detail: { temp: 80, condition: "Clear", code: 0, isDay: true } };
+    const { container } = render(<WeatherForecastPage locations={[long]} onRemoveLocation={() => {}} />);
+    const name = container.querySelector("[data-slot=weather-location-name]")!;
+    const actions = container.querySelector("[data-slot=weather-location-actions]")!;
+    expect(name.className).toContain("min-w-0");
+    expect(actions.className).toContain("shrink-0");
+    expect(actions.querySelector("[data-slot=weather-location-time]")?.className).toContain("shrink");
+    expect(container.querySelector("[aria-label^=\"Remove location\"]")?.className).toContain("size-11");
+    expect(name.parentElement).not.toBe(actions);
+  });
+
+  test("data-backed tiles appear only with fields and the Conditions switcher changes chart data", () => {
+    const detail = { ...locations[0]!.detail!, airQuality: { aqi: 22, category: "Good" }, uvIndex: 3, feelsLike: 70, dewPoint: 50,
+      precipitationNext24h: 0.2, visibility: 9, visibilityDescription: "Clear", pressure: 1012, pressureTrend: "falling" as const,
+      moon: { phase: "First Quarter", illumination: 50 }, hourly: [{ time: "2026-10-22T10:00", temp: 69, pop: 25, windSpeed: 8 }] };
+    const { container, getByRole, getByText } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail }]} selectedId="home" />);
+    for (const title of ["Air Quality", "UV Index", "Sunrise & Sunset", "Feels Like", "Humidity", "Visibility", "Pressure", "Moon Phase", "Conditions"]) expect(getByText(title)).toBeTruthy();
+    expect(container.querySelectorAll("[data-slot=weather-tile] span")).not.toHaveLength(0);
+    expect(getByText("Wind", { selector: "span" })).toBeTruthy();
+    expect(container.querySelector("[data-slot=weather-aqi-bar]")).not.toBeNull();
+    expect(container.querySelector("[data-slot=weather-wind-dial]")).not.toBeNull();
+    expect(container.querySelector("[data-slot=weather-moon-disk]")?.textContent).toBe("");
+    const precipitationButton = getByRole("button", { name: "Precipitation" });
+    fireEvent.click(precipitationButton);
+    expect(container.querySelector("[data-slot=weather-hourly-chart]")?.getAttribute("data-metric")).toBe("precipitation");
+    cleanup();
+    const empty = render(<WeatherForecastPage locations={[{ id: "bare", city: "Bare", detail: { temp: 60, condition: "Clear", code: 0, isDay: true } }]} />);
+    for (const title of ["Air Quality", "UV Index", "Sunrise & Sunset", "Feels Like", "Humidity", "Visibility", "Pressure", "Moon Phase", "Conditions"]) expect(empty.queryByText(title)).toBeNull();
+    expect(empty.container.querySelector("[data-slot=weather-tile]")).toBeNull();
+  });
+
+  test("the sky CSS defines visible scene keyframes and freezes them for reduced motion", () => {
+    expect(tokens).toContain("@keyframes wx-sun-pulse");
+    expect(tokens).toContain("animation-duration: 4s");
+    expect(tokens).toContain("@keyframes wx-twinkle");
+    expect(tokens).toContain("@keyframes wx-rain");
+    expect(tokens).toContain("@keyframes wx-snow");
+    expect(tokens).toContain("@keyframes wx-flash");
+    expect(tokens).toContain("@keyframes wx-fog");
+    expect(tokens).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(tokens).toContain("animation: none !important");
   });
 
   test("searches and opens then closes the mobile detail", () => {
