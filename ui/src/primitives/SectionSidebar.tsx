@@ -13,6 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../dashboard/components/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../elements/ui/tooltip";
 import { cn } from "../dashboard/lib/utils";
 import { HitField } from "../settings/HitField";
 import { Chip } from "./Chip";
@@ -22,6 +23,9 @@ const SearchIcon = getIcon("search");
 const HideIcon = getIcon("panel-left-close");
 const ShowIcon = getIcon("panel-left-open");
 const PinIcon = getIcon("pin");
+const PlusIcon = getIcon("plus");
+/** Chat's New chat pill: a 36px row, 10px inset, 8px icon gap, 14px label. */
+const primaryClass = "relative flex h-9 w-full items-center gap-2.5 rounded-lg px-2.5 text-sm font-normal text-sidebar-foreground outline-none hover:bg-settings-fill/60 focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:pointer-events-none disabled:opacity-50";
 
 /** The pointer must rest on the hidden column's edge zone this long before it peeks; it closes this long after the pointer leaves
  * (the same numbers as Chat's column, COLUMN-02). */
@@ -92,6 +96,8 @@ export interface SectionSidebarProps {
   body?: ReactNode;
   /** Icon buttons or links drawn after the title on the same line (Chat settings, a search toggle); hidden in the rail. */
   headerActions?: ReactNode;
+  /** The row under the header that starts a new item (Chat's "New chat"), drawn as Chat's compact pill. Compact columns only. */
+  primaryAction?: { label: string; href?: string; onClick?: (event: MouseEvent) => void; disabled?: boolean };
   /** Rows pinned to the foot of the column, drawn like group rows (an app's Settings link). In the rail they are icon-only. */
   footer?: readonly SectionSidebarItem[];
   /** Anything else for the foot of the column, drawn under `footer`; the host owns how it looks when the rail is collapsed (it is hidden in the rail unless `footerInRail`). */
@@ -110,6 +116,9 @@ export interface SectionSidebarProps {
    * "rail" keeps a narrow icon-only strip. Default "hidden". Only `standalone` columns collapse by themselves. */
   collapsedStyle?: "hidden" | "rail";
   collapseLabels?: Partial<SectionSidebarCollapseLabels>;
+  /** The keyboard shortcut that collapses the column, shown in the collapse button's tooltip and announced with `aria-keyshortcuts`
+   * (Chat's column: "Hide conversations ⌘B"). Unset, the tooltip is the label alone. */
+  collapseShortcut?: { label: string; keys: string };
   /** "compact" is the Chat column's 36 px rows with no gap. Default "comfortable" (the settings column's rows). */
   density?: "comfortable" | "compact";
   /** Placed first in the header: a collapse button, a back link. */
@@ -149,6 +158,7 @@ export function SectionSidebar({
   body,
   headerTop,
   headerActions,
+  primaryAction,
   title,
   afterTitle,
   search,
@@ -162,6 +172,7 @@ export function SectionSidebar({
   onPinnedChange,
   collapsedStyle = "hidden",
   collapseLabels,
+  collapseShortcut,
   density = "comfortable",
   contentClassName,
   standalone,
@@ -186,6 +197,13 @@ export function SectionSidebar({
   const [peek, setPeek] = useState(false);
   const timer = useRef<number | null>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  // Compact columns (Chat's) open the search field from a header icon and hide it again when it is empty and blurred.
+  const [searchOpen, setSearchOpen] = useState(false);
+  // The field the header icon opens takes focus at once; a keyboard or pointer user expects to type straight away.
+  useEffect(() => {
+    if (!searchOpen) return;
+    document.querySelector<HTMLInputElement>('[data-slot="section-sidebar-search-input"]')?.focus();
+  }, [searchOpen]);
   // Where focus goes once the column has changed state: the host's show button after a hide, this column's own button after a pin.
   const focusAfter = useRef<"show" | "toggle" | null>(null);
   const clearTimer = useCallback(() => {
@@ -277,24 +295,36 @@ export function SectionSidebar({
   const peeking = hiddenMode && peek;
   const closed = hiddenMode && !peek;
 
+  const toggleLabel = peeking ? labels.pin : rail ? labels.show : labels.hide;
   const toggle = onCollapsedChange ? (
-    <button
-      ref={toggleRef}
-      type="button"
-      data-slot="section-sidebar-toggle"
-      aria-label={peeking ? labels.pin : rail ? labels.show : labels.hide}
-      aria-expanded={peeking ? undefined : !collapsed}
-      aria-controls={peeking ? undefined : columnId}
-      onClick={() => {
-        clearTimer();
-        setPeek(false);
-        focusAfter.current = peeking ? "toggle" : collapsed ? "toggle" : "show";
-        onCollapsedChange(peeking ? false : !collapsed);
-      }}
-      className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
-    >
-      {peeking ? <PinIcon aria-hidden className="size-[18px]" /> : rail ? <ShowIcon aria-hidden className="size-[18px]" /> : <HideIcon aria-hidden className="size-[18px]" />}
-    </button>
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            ref={toggleRef}
+            type="button"
+            data-slot="section-sidebar-toggle"
+            aria-label={toggleLabel}
+            aria-expanded={peeking ? undefined : !collapsed}
+            aria-controls={peeking ? undefined : columnId}
+            aria-keyshortcuts={collapseShortcut?.keys}
+            onClick={() => {
+              clearTimer();
+              setPeek(false);
+              focusAfter.current = peeking ? "toggle" : collapsed ? "toggle" : "show";
+              onCollapsedChange(peeking ? false : !collapsed);
+            }}
+            className={cn(
+              "relative inline-flex shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+              compact ? "size-6" : "size-9",
+            )}
+          >
+            {peeking ? <PinIcon aria-hidden className={compact ? "size-4.5" : "size-[18px]"} /> : rail ? <ShowIcon aria-hidden className={compact ? "size-4.5" : "size-[18px]"} /> : <HideIcon aria-hidden className={compact ? "size-4.5" : "size-[18px]"} />}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">{collapseShortcut ? `${toggleLabel} ${collapseShortcut.label}` : toggleLabel}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   ) : null;
 
   function row(item: SectionSidebarItem) {
@@ -327,7 +357,7 @@ export function SectionSidebar({
   }
   const menuGap = compact ? "gap-0" : "gap-[var(--settings-column-row-gap)]";
 
-  const hasHeaderRow = headerActions !== undefined || toggle !== null;
+  const hasHeaderRow = headerActions !== undefined || toggle !== null || (compact && !rail && search !== undefined);
   const titleNode = title ? <h2 className="px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{title}</h2> : null;
 
   const column = (
@@ -349,12 +379,44 @@ export function SectionSidebar({
           <div data-slot="section-sidebar-header" className={cn("flex h-9 items-center gap-1", rail && "justify-center")}>
             {rail ? null : title ? <h2 className="min-w-0 flex-1 truncate px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{title}</h2> : <span className="flex-1" />}
             {rail ? null : headerActions}
+            {compact && !rail && search ? (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      data-slot="section-sidebar-search"
+                      aria-label={search.label}
+                      aria-expanded={searchOpen}
+                      onClick={() => setSearchOpen(true)}
+                      className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                    >
+                      <SearchIcon aria-hidden className="size-4.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">{search.label}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : null}
             {toggle}
           </div>
         ) : (
           titleNode
         )}
         {afterTitle}
+        {compact && !rail && primaryAction ? (
+          primaryAction.href && !primaryAction.disabled ? (
+            <a data-slot="section-sidebar-primary" href={primaryAction.href} onClick={primaryAction.onClick} className={primaryClass}>
+              <PlusIcon aria-hidden className="size-4 shrink-0" />
+              <span className="whitespace-nowrap">{primaryAction.label}</span>
+            </a>
+          ) : (
+            <button type="button" data-slot="section-sidebar-primary" disabled={primaryAction.disabled} onClick={primaryAction.onClick} className={primaryClass}>
+              <PlusIcon aria-hidden className="size-4 shrink-0" />
+              <span className="whitespace-nowrap">{primaryAction.label}</span>
+            </button>
+          )
+        ) : null}
         {search && rail ? (
           <button
             type="button"
@@ -367,23 +429,30 @@ export function SectionSidebar({
             <SearchIcon aria-hidden className="size-4" />
           </button>
         ) : null}
-        {search && !rail ? (
+        {search && !rail && (!compact || searchOpen || search.value !== "") ? (
           <HitField pad={6} className="relative">
             <SearchIcon aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-settings-helper" />
             <SidebarInput
               variant="pill"
               type="search"
+              data-slot="section-sidebar-search-input"
               className="pl-9"
               aria-label={search.label}
               placeholder={search.label}
               value={search.value}
               onChange={(e) => search.onChange(e.target.value)}
               onFocus={search.onFocus}
-              onBlur={search.onBlur}
+              onBlur={() => {
+                search.onBlur?.();
+                if (compact && search.value === "") setSearchOpen(false);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Escape" && search.value) {
                   e.preventDefault();
                   search.onChange("");
+                } else if (e.key === "Escape" && compact) {
+                  e.preventDefault();
+                  setSearchOpen(false);
                 } else if (e.key === "Enter" && search.onSubmit) {
                   e.preventDefault();
                   search.onSubmit();

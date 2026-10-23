@@ -443,4 +443,41 @@ describe("SectionSidebar", () => {
       });
     });
   });
+
+  // The compact column is Chat's: a 24px collapse button with a tooltip that names the shortcut, announced with aria-keyshortcuts.
+  test("the compact collapse button is 24px and announces its keyboard shortcut", () => {
+    const { container } = column({ density: "compact", standalone: true, onCollapsedChange: () => {}, collapseShortcut: { label: "⌘B", keys: "Meta+B Control+B" } });
+    const toggle = container.querySelector('[data-slot="section-sidebar-toggle"]') as HTMLButtonElement;
+    expect(toggle.className).toContain("size-6");
+    expect(toggle.getAttribute("aria-keyshortcuts")).toBe("Meta+B Control+B");
+  });
+
+  test("the compact column draws its primary action as Chat's New chat row, first under the header", () => {
+    const { container } = column({ density: "compact", primaryAction: { label: "New chat", href: "/apps/news/new" } });
+    const row = container.querySelector('[data-slot="section-sidebar-primary"]') as HTMLAnchorElement;
+    expect(row.tagName).toBe("A");
+    expect(row.getAttribute("href")).toBe("/apps/news/new");
+    expect(row.textContent).toBe("New chat");
+    expect(row.className).toContain("h-9");
+  });
+
+  test("the compact column opens its search field from a header icon, as Chat's does", () => {
+    const { container } = column({ density: "compact", search: { value: "", onChange: () => {}, label: "Search News" } });
+    expect(container.querySelector('input[type="search"]')).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Search News" }));
+    expect((container.querySelector('input[type="search"]') as HTMLInputElement).getAttribute("aria-label")).toBe("Search News");
+  });
+
+  test("compact search and the body slot draw the thread list inside the column scroll area", () => {
+    const { container } = column({
+      density: "compact",
+      body: <div data-testid="thread-list">Recent conversations</div>,
+      search: { value: "", onChange: () => {}, label: "Search conversations" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Search conversations" }));
+    const content = container.querySelector('[data-slot="sidebar-content"]') as HTMLElement;
+    expect(content.className).toContain("overflow-auto");
+    expect(within(content).getByTestId("thread-list").textContent).toBe("Recent conversations");
+    expect(container.querySelector('[data-slot="section-sidebar-header"]')?.contains(screen.getByRole("searchbox"))).toBe(false);
+  });
 });
