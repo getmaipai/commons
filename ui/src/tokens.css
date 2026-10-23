@@ -726,6 +726,7 @@
   --weather-thunderstorm-night-from: #120f24;
   --weather-thunderstorm-night-to: #241f42;
   --weather-ink: #ffffff;
+  --weather-range-end: var(--hue-orange);
   --weather-scrim: rgb(0 0 0 / 0.16);
   --weather-sun-glow: rgb(255 244 200 / 0.22);
   --weather-moon-glow: rgb(215 228 255 / 0.2);

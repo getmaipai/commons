@@ -5,6 +5,7 @@ import { SearchIcon } from "lucide-react";
 import { cn } from "cn";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { field, floating, mono } from "./surfaces";
+import { SafeImage } from "../primitives/SafeImage";
 
 export interface PaletteCommand {
   id: string;
@@ -209,7 +210,7 @@ export function CommandPalette({
                 const content = (
                   <>
                     {command.iconUrl ? (
-                      <img src={command.iconUrl} alt="" className="size-8 shrink-0 rounded-lg object-cover" />
+                      <SafeImage src={command.iconUrl} alt="" className="size-8 shrink-0 rounded-lg object-cover" />
                     ) : command.icon ? (
                       <span className="bg-foreground/[0.05] text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4">{command.icon}</span>
                     ) : (
