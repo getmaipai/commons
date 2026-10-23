@@ -1,4 +1,4 @@
-## [ui-v0.5.321] - 2026-10-23
+## [ui-v0.5.322] - 2026-10-23
 
 - Polish the article reader with a pinned publisher header, floating controls, wider image layout, stronger headline and favicon fallbacks.
 

@@ -1,4 +1,4 @@
-## [spec-v0.1.218] - 2026-10-23
+## [spec-v0.1.219] - 2026-10-23
 
 - Add optional `sourceIconUrl` to article props for the publisher favicon. Additive.
 
