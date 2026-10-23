@@ -1639,6 +1639,10 @@ export const PluginResult = z
                       item_id: z.string().min(1),
                       kicker: z.string(),
                       title: z.string().min(1),
+                      sourceIconUrl: z
+                        .string()
+                        .regex(new RegExp("^/api/favicon(?:[/?#].*)?$"))
+                        .optional(),
                       byline: z
                         .object({
                           publisher: z.string().min(1),

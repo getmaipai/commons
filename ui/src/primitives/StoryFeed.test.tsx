@@ -61,7 +61,12 @@ describe("StoryFeed", () => {
     expect(tile.hasAttribute("data-empty")).toBe(false);
   });
 
-  test("source favicon sits before the publisher and disappears on load failure", () => {
+  test("source favicon uses the rounded newspaper tile when missing or load fails", () => {
+    const missing = render(<StoryFeed data={{ ...data, hero: { ...data.hero!, sourceIconUrl: undefined } }} />);
+    const missingTile = missing.container.querySelector('[data-tier="hero"] [data-slot="story-source"] [data-slot="safe-image-fallback"]')!;
+    expect(missingTile.className).toContain("rounded");
+    expect(missingTile.querySelector("svg")).not.toBeNull();
+    cleanup();
     const { container } = render(<StoryFeed data={{ ...data, hero: { ...data.hero!, sourceIconUrl: "/favicon.png" } }} />);
     const source = container.querySelector('[data-tier="hero"] [data-slot="story-source"]')!;
     const icon = source.querySelector("img")!;
@@ -70,14 +75,14 @@ describe("StoryFeed", () => {
     expect(icon.className).toContain("rounded");
     expect(icon.nextElementSibling?.textContent).toBe(data.hero!.publisher);
     fireEvent.error(icon);
-    expect(source.querySelector("img")).toBeNull();
+    expect(source.querySelector('[data-slot="safe-image-fallback"] svg')).not.toBeNull();
     expect(source.textContent).toContain(data.hero!.publisher);
   });
 
   test("missing story pictures share the default picture icon", () => {
     const stories = ["Atlas", "Atlas", "Bramble"].map((publisher, i) => ({ ...data.hero!, story_id: `missing-${i}`, publisher, image: undefined }));
     const { container } = render(<StoryFeed data={{ layout: "channel", featured: stories, as_of: data.as_of }} />);
-    expect(container.querySelectorAll('[data-slot="safe-image-fallback"][data-kind="picture"]')).toHaveLength(3);
+    expect(container.querySelectorAll('[data-slot="story-image"] [data-slot="safe-image-fallback"][data-kind="picture"]')).toHaveLength(3);
   });
 
   for (const tier of ["hero", "featured", "half", "shelf", "row"] as const) {

@@ -1,3 +1,7 @@
+## [spec-v0.1.218] - 2026-10-23
+
+- Add optional `sourceIconUrl` to article props for the publisher favicon. Additive.
+
 ## [spec-v0.1.217] - 2026-10-23
 
 - Add the optional `sourceIconUrl` favicon route to embedded `news_story_card` values, including story-feed cards. Match the standalone NewsStory path pattern. Additive.

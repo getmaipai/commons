@@ -113,7 +113,7 @@ function SourceLine({ story }: { story: StoryCardData }) {
   return (
     <div data-slot="story-source" data-opened={story.opened ? "" : undefined} className={cn("flex flex-wrap items-center gap-x-2 text-xs", story.opened ? "text-muted-foreground" : "text-foreground")}>
       <span className="inline-flex min-w-0 items-center gap-1.5">
-        {story.sourceIconUrl && !iconFailed ? <SafeImage src={story.sourceIconUrl} alt="" aria-hidden className="size-4 shrink-0 rounded object-cover" onError={() => setIconFailed(true)} /> : null}
+        <SafeImage src={iconFailed ? undefined : story.sourceIconUrl} alt="" aria-hidden kind="picture" className="size-4 shrink-0 rounded bg-muted text-muted-foreground object-cover" onError={() => setIconFailed(true)} />
         <span>{story.publisher}</span>
       </span>
       <RelativeTime at={story.published_at} />

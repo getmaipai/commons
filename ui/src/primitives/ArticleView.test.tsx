@@ -29,7 +29,8 @@ describe("ArticleView", () => {
     expect(article.contains(provider)).toBe(true);
     expect(column.contains(toolbar)).toBe(false);
     expect(column.contains(provider)).toBe(false);
-    expect(column.className).toContain("max-w-prose");
+    expect(column.className).toContain("max-w-[1100px]");
+    expect(container.querySelector('[data-slot="article-body"]')!.className).toContain("max-w-[72ch]");
     expect(article.className).not.toContain("max-w-prose");
     expect(toolbar.className).toContain("sticky");
     expect(provider.className).not.toContain("sticky");
@@ -41,6 +42,32 @@ describe("ArticleView", () => {
     expect(container.querySelector("blockquote")?.textContent).toContain("A short quote.");
     expect(container.querySelector("figure img")?.getAttribute("src")).toContain("/api/plugins/news/images/");
     expect(container.querySelector('[data-slot="also-covering"]')).not.toBeNull();
+  });
+
+  test("publisher header scrolls with the article while floating controls stay pinned and unshaded", () => {
+    const withIcon = { ...data, sourceIconUrl: "/api/favicon?domain=example.com" };
+    const view = render(<ArticleView data={withIcon} onBack={() => {}} />);
+    const provider = view.container.querySelector('[data-slot="article-provider"]')!;
+    expect(provider.className).not.toContain("sticky");
+    expect(provider.className).not.toContain("bg-background");
+    expect(provider.querySelector('[data-slot="safe-image-fallback"]')).not.toBeNull();
+    const toolbar = view.container.querySelector('[data-slot="article-toolbar"]')!;
+    expect(toolbar.className).toContain("sticky");
+    expect(toolbar.className).toContain("top-0");
+    expect(toolbar.className).toContain("bg-transparent");
+    expect(toolbar.className).toContain("z-30");
+    expect(toolbar.querySelectorAll("button").length).toBeGreaterThan(0);
+    for (const button of toolbar.querySelectorAll("button")) {
+      expect(button.className).not.toMatch(/bg-background|backdrop-blur|shadow/);
+    }
+    cleanup();
+    const loaded = render(<ArticleView data={{ ...withIcon, sourceIconUrl: "https://example.com/favicon.ico" }} onBack={() => {}} />);
+    const loadedProvider = loaded.container.querySelector('[data-slot="article-provider"]')!;
+    fireEvent.error(loadedProvider.querySelector("img")!);
+    expect(loadedProvider.querySelector('[data-slot="safe-image-fallback"] svg')).not.toBeNull();
+    cleanup();
+    const missing = render(<ArticleView data={data} />);
+    expect(missing.container.querySelector('[data-slot="article-provider"] [data-slot="safe-image-fallback"] svg')).not.toBeNull();
   });
 
   test("the lead picture's frame carries its own ratio and a height cap, and the pinned picture covers it", () => {
@@ -111,12 +138,13 @@ describe("ArticleView", () => {
     expect(size()).toBe("medium");
   });
 
-  test("the body reads in a serif at the default size, and the reading column is the page's one centred column", () => {
+  test("the body reads in a serif at the default size and keeps a readable measure inside the wide article frame", () => {
     const { container } = render(<ArticleView data={data} />);
     const body = container.querySelector('[data-slot="article-body"]')!;
     expect(body.className).toContain("font-serif");
     expect(body.getAttribute("data-text-size")).toBe("medium");
-    expect(container.querySelector('[data-slot="article-column"]')!.className).toContain("max-w-prose");
+    expect(container.querySelector('[data-slot="article-column"]')!.className).toContain("max-w-[1100px]");
+    expect(body.className).toContain("max-w-[72ch]");
   });
 
   test("the description and the footer slot draw (Reference), and a saved story shows the filled bookmark", () => {

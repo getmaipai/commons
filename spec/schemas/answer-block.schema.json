@@ -952,6 +952,10 @@
               "type": "string",
               "minLength": 1
             },
+            "sourceIconUrl": {
+              "type": "string",
+              "pattern": "^/api/favicon(?:[/?#].*)?$"
+            },
             "byline": {
               "type": "object",
               "additionalProperties": false,

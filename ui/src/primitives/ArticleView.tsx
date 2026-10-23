@@ -6,7 +6,6 @@ import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/kit/dashboard/components/ui/dropdown-menu";
 import { Separator } from "@/kit/dashboard/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/kit/ui/table";
-import { RelativeTime } from "@/kit/ui/relative-time";
 import { cn } from "@/kit/utils";
 import { StoryFeed, type StoryAction, type StoryActionIds, type StoryCardData } from "./StoryFeed";
 import { SafeImage } from "./SafeImage";
@@ -16,6 +15,7 @@ const BookmarkIcon = getIcon("bookmark");
 const EllipsisIcon = getIcon("more-horizontal");
 const ShareIcon = getIcon("share");
 const TypeIcon = getIcon("a-large-small");
+const NewspaperIcon = getIcon("newspaper");
 
 /** The spec's `article_inline`: a run of text, or a link carrying a book `target` or an outbound `href`. */
 export type ArticleInlineData =
@@ -40,6 +40,7 @@ export interface ArticleViewData {
   /** A plain line under the headline (Reference: the book's source label). */
   description?: string;
   byline?: { publisher: string; site: string; published_at: string; outlets: number; reading_s: number };
+  sourceIconUrl?: string;
   image?: { w480: string; w1280: string; alt: string };
   key_points?: { text: string; band: "child" | "teen" | "adult" };
   blocks: ArticleBlockData[];
@@ -173,6 +174,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const can = (a: ArticleAction) => onAction !== undefined && available.includes(a);
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
   const [textSize, setTextSize] = useState<TextSizeId>(readTextSize);
+  const [iconFailed, setIconFailed] = useState(false);
   const chooseSize = (id: TextSizeId) => {
     setTextSize(id);
     try { window.localStorage.setItem(TEXT_SIZE_KEY, id); } catch { /* not kept this time */ }
@@ -182,29 +184,30 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const hasMore = can("listen") || (can("summarize") && !data.key_points) || (can("open_site") && !!data.open_url);
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
   return (
-    <article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col gap-4", className)}>
+    <article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col gap-4 px-4 md:px-6 lg:px-8", className)}>
       {hasToolbar ? (
-        <div data-slot="article-toolbar" className="sticky top-0 z-10 flex items-center gap-1 bg-background">
-          {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
+        <div data-slot="article-toolbar" className="sticky top-0 z-30 -mb-14 flex h-12 items-center gap-1 bg-transparent">
+          {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" className="rounded-full" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
           <div className="ml-auto flex items-center gap-1">
             <Button
               variant="ghost"
               size="icon-lg"
+              className="rounded-full"
               aria-label="Text size"
               title={`Text size: ${TEXT_SIZES.find((size) => size.id === textSize)!.label}. Tap to change.`}
               onClick={() => chooseSize(NEXT_SIZE[textSize])}
             >
               <TypeIcon aria-hidden />
             </Button>
-            {canShare ? <Button variant="ghost" size="icon-lg" aria-label="Share" onClick={() => { void navigator.share({ title: data.title, url: data.open_url }).catch(() => {}); }}><ShareIcon aria-hidden /></Button> : null}
+            {canShare ? <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label="Share" onClick={() => { void navigator.share({ title: data.title, url: data.open_url }).catch(() => {}); }}><ShareIcon aria-hidden /></Button> : null}
             {can("save") ? (
-              <Button variant="ghost" size="icon-lg" aria-label={data.saved ? "Saved" : "Save"} aria-pressed={data.saved === true} onClick={() => fire("save", { on: !data.saved })}>
+              <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label={data.saved ? "Saved" : "Save"} aria-pressed={data.saved === true} onClick={() => fire("save", { on: !data.saved })}>
                 <BookmarkIcon aria-hidden fill={data.saved ? "currentColor" : "none"} />
               </Button>
             ) : null}
             {hasMore ? (
               <DropdownMenu>
-                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label="More" />}><EllipsisIcon aria-hidden /></DropdownMenuTrigger>
+                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" className="rounded-full" aria-label="More" />}><EllipsisIcon aria-hidden /></DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {can("open_site") && data.open_url ? <DropdownMenuItem onClick={() => fire("open_site", { url: data.open_url })}>Open original</DropdownMenuItem> : null}
                   {can("listen") ? <DropdownMenuItem onClick={() => fire("listen")}>Listen</DropdownMenuItem> : null}
@@ -216,23 +219,18 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         </div>
       ) : null}
       {data.byline ? (
-        <div data-slot="article-provider" className="bg-muted text-foreground rounded-lg border px-4 py-2 text-center text-base font-semibold">
-          {data.byline.publisher}
+        <div data-slot="article-provider" className="-mt-4 flex min-h-20 items-center justify-center gap-3 px-2 pt-12 pb-3 text-center text-2xl font-semibold">
+          <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className="size-11 shrink-0 rounded-xl" onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
+          <span>{data.byline.publisher}</span>
         </div>
       ) : null}
-      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-prose flex-col gap-4">
+      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[1100px] flex-col gap-4">
       <header className="flex flex-col gap-2">
-        {data.kicker ? <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{data.kicker}</p> : null}
-        <h2 className="text-3xl leading-tight font-semibold">{data.title}</h2>
+        {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
+        {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
+        <h2 className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
         {data.description ? <p className="text-muted-foreground text-sm">{data.description}</p> : null}
-        {data.byline ? (
-          <p className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-sm">
-            <span>{data.byline.publisher}</span>
-            <RelativeTime at={data.byline.published_at} />
-            <span>{minutes(data.byline.reading_s)}</span>
-            {data.byline.outlets > 1 ? <Badge variant="secondary">{data.byline.outlets} sources</Badge> : null}
-          </p>
-        ) : null}
+        {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
       {data.image ? (
         <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
@@ -240,13 +238,13 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         </AspectRatio>
       ) : null}
       {data.key_points ? (
-        <section data-slot="key-points" aria-label="Key points" className="bg-muted flex flex-col gap-1 rounded-lg p-4">
+        <section data-slot="key-points" aria-label="Key points" className="mx-auto flex w-full max-w-[72ch] flex-col gap-1 rounded-lg bg-muted p-4">
           <h3 className="text-sm font-semibold">Key points</h3>
           <p className="whitespace-pre-line">{data.key_points.text}</p>
           <p className="text-muted-foreground text-xs">Written on this hub from the article.</p>
         </section>
       ) : null}
-      <div data-slot="article-body" data-text-size={textSize} className={cn("flex min-w-0 flex-col gap-4 font-serif leading-relaxed", bodySize)}>
+      <div data-slot="article-body" data-text-size={textSize} className={cn("mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
         {data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
       </div>
       {data.also_covering && data.also_covering.length > 0 ? (
