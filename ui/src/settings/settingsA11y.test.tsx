@@ -112,7 +112,7 @@ describe("KIT-SET-05 touch targets and layout contracts", () => {
     const rowButtons = container.querySelectorAll("[data-slot=sidebar-menu-button]");
     expect(rowButtons.length).toBeGreaterThan(0);
     for (const b of rowButtons) expect(b.className).toContain("before:-inset-y-[9px]");
-    const search = container.querySelector("[data-slot=sidebar-input]") as HTMLElement;
+    const search = container.querySelector("[data-slot=section-sidebar-search-input]") as HTMLElement;
     expect(search.closest("[data-slot=hit-field]")).not.toBeNull();
     const sw = container.querySelector("[data-slot=switch]") as HTMLElement;
     expect(sw.className).toContain("after:-inset-y-3.5");

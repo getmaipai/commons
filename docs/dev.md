@@ -11,6 +11,14 @@ The shell draws only the tab list; the host draws the panel, so each trigger's `
 Phone card rows let value cells shrink and wrap unbroken strings, preventing
 paths, ids and commands from widening the viewport.
 
+## ui-v0.5.321: compact SectionSidebar tooltips do not poison later tests (2026-10-23)
+
+Radix Tooltip's portal and focus lifecycle left asynchronous work in happy-dom
+after SectionSidebar tests, causing later tests in the same Bun process to
+time out. Compact search and collapse controls use native `title` hints instead;
+their labels, shortcut text, and behavior remain available. The settings
+accessibility test also follows the renamed `section-sidebar-search-input` slot.
+
 ## spec-v0.1.214: the hub port stays on the Network page (2026-10-23)
 
 strict one-card-per-group moved `household.network_port` (the hub port, an expert key) to the Developer card, where Home draws no expert controls, so the port would have vanished. It is drawn by a card in the Network section (expert only), through a narrow `EXPERT_OUTSIDE_DEVELOPER` allowlist in `areas-check.ts` that only shrinks. Home keeps passing the key as an extra expert key for that section.

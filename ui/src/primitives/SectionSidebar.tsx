@@ -13,7 +13,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../dashboard/components/ui/sidebar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../elements/ui/tooltip";
 import { cn } from "../dashboard/lib/utils";
 import { HitField } from "../settings/HitField";
 import { Chip } from "./Chip";
@@ -297,9 +296,6 @@ export function SectionSidebar({
 
   const toggleLabel = peeking ? labels.pin : rail ? labels.show : labels.hide;
   const toggle = onCollapsedChange ? (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
           <button
             ref={toggleRef}
             type="button"
@@ -308,6 +304,7 @@ export function SectionSidebar({
             aria-expanded={peeking ? undefined : !collapsed}
             aria-controls={peeking ? undefined : columnId}
             aria-keyshortcuts={collapseShortcut?.keys}
+            title={collapseShortcut ? `${toggleLabel} ${collapseShortcut.label}` : toggleLabel}
             onClick={() => {
               clearTimer();
               setPeek(false);
@@ -321,10 +318,6 @@ export function SectionSidebar({
           >
             {peeking ? <PinIcon aria-hidden className={compact ? "size-4.5" : "size-[18px]"} /> : rail ? <ShowIcon aria-hidden className={compact ? "size-4.5" : "size-[18px]"} /> : <HideIcon aria-hidden className={compact ? "size-4.5" : "size-[18px]"} />}
           </button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">{collapseShortcut ? `${toggleLabel} ${collapseShortcut.label}` : toggleLabel}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
   ) : null;
 
   function row(item: SectionSidebarItem) {
@@ -382,23 +375,17 @@ export function SectionSidebar({
             {rail ? null : title ? <h2 className="min-w-0 flex-1 truncate px-2 text-[length:var(--settings-column-title-size)] leading-7 font-semibold">{title}</h2> : <span className="flex-1" />}
             {rail ? null : headerActions}
             {compact && !rail && search ? (
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <button
                       type="button"
                       data-slot="section-sidebar-search"
                       aria-label={search.label}
                       aria-expanded={searchOpen}
+                      title={search.label}
                       onClick={() => setSearchOpen(true)}
                       className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                     >
                       <SearchIcon aria-hidden className="size-4.5" />
                     </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">{search.label}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
             ) : null}
             {toggle}
           </div>
