@@ -60,7 +60,7 @@ export function MediaViewerShowcase() {
           status="generating"
           title="Garden at dawn"
           description="Soft folk · making a song"
-          stages={[{ id: "queue", label: "Queued" }, { id: "model", label: "Getting the model ready" }, { id: "plan", label: "Planning" }, { id: "music", label: "Making the music" }, { id: "mix", label: "Mixing" }, { id: "finish", label: "Finishing" }]}
+          stages={[{ id: "queue", label: "Queued" }, { id: "model", label: "Loading" }, { id: "plan", label: "Planning" }, { id: "music", label: "Making" }, { id: "mix", label: "Mixing" }, { id: "finish", label: "Finishing" }]}
           currentStage={3}
           progress={0.58}
           elapsedSeconds={42}
@@ -80,7 +80,7 @@ export function MediaViewerShowcase() {
           quickSong
           onMakeFull={() => setNote("Making the full song.")}
           editModes={[
-            { id: "song", label: "Change the song", content: <div className="grid gap-2"><Input aria-label="How should it change?" placeholder="How should it change?" /><Button type="button" onClick={() => setNote("Changing the song.")}>Make</Button></div> },
+            { id: "song", label: "Change the song", content: <div className="grid gap-2"><Input aria-label="How should it change?" placeholder="Describe a change" /><Button type="button" onClick={() => setNote("Changing the song.")}>Make</Button></div> },
             { id: "cover", label: "New cover", content: <div className="grid gap-2"><Input aria-label="Describe the new cover" placeholder="Describe the new cover" /><Button type="button" onClick={() => setNote("Making a new cover.")}>Make</Button></div> },
           ]}
           onShare={() => setNote("Share Moonlit lullaby")}

@@ -1,12 +1,11 @@
 "use client";
 
 import { Children, Fragment, isValidElement, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { DownloadIcon, PauseIcon, PlayIcon, Share2Icon, BookOpenIcon, PencilIcon, LibraryIcon, WandSparklesIcon, SquareIcon, RefreshCwIcon, ChevronLeftIcon, ChevronRightIcon, Music2Icon, GaugeIcon } from "lucide-react";
+import { DownloadIcon, PauseIcon, PlayIcon, Share2Icon, BookOpenIcon, PencilIcon, LibraryIcon, WandSparklesIcon, SquareIcon, RefreshCwIcon, ChevronLeftIcon, ChevronRightIcon, GaugeIcon } from "lucide-react";
 import { Alert, AlertDescription } from "@/kit/ui/alert";
 import { Button } from "@/kit/ui/button";
 import { Card, CardContent } from "@/kit/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/kit/ui/collapsible";
-import { Progress } from "@/kit/ui/progress";
 import { Slider } from "@/kit/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/kit/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/kit/ui/tabs";
@@ -28,7 +27,7 @@ const DEFAULT_COPY: MusicTrackCopy = {
   queued: "Waiting its turn", generating: "Making the music", stop: "Stop", download: "Download", share: "Share", saveToLibrary: "Save to Music", makeAnother: "Make another", retry: "Try again", stopped: "Stopped. Nothing was kept.", failed: "I couldn't make that song.", lyrics: "Lyrics", previous: "Previous", next: "Next", useVersion: "Use this version", edit: "Edit", play: "Play", pause: "Pause", speed: "Playback speed", waitingForMemory: "Waiting for memory, your song starts when there is room",
   versionOf: (n, total) => `Version ${n} of ${total}`, queuePosition: (position) => `Place in line: ${position}`, progress: (value, elapsed) => `${value} percent${elapsed ? `, ${elapsed} so far` : ""}`, player: {},
 };
-const DEFAULT_STAGES = ["Queued", "Getting the model ready", "Planning", "Making the music", "Mixing", "Finishing"].map((label, i) => ({ id: String(i), label }));
+const DEFAULT_STAGES = ["Queued", "Loading", "Planning", "Making", "Mixing", "Finishing"].map((label, i) => ({ id: String(i), label }));
 const formatSeconds = (seconds: number) => `${Math.floor(Math.max(0, seconds) / 60)}:${String(Math.floor(Math.max(0, seconds) % 60)).padStart(2, "0")}`;
 function download(src: string, name: string) { const link = document.createElement("a"); link.href = src; link.download = name; link.rel = "noopener"; document.body.append(link); link.click(); link.remove(); }
 function legacyEditLayout(content: ReactNode): { modes: Array<{ id: string; label: string; content: ReactNode; disabledReason?: string }>; full?: ReactNode; extra: ReactNode[] } | undefined {
@@ -95,6 +94,8 @@ export function MusicTrack({
   const elapsedValue = elapsedSeconds ?? (startedAt === undefined ? 0 : Math.max(0, (now - startedAt) / 1000));
   const activeStage = currentStage ?? (status === "queued" ? 0 : 1);
   const value = typeof progress === "number" ? Math.round(Math.max(0, Math.min(1, progress > 1 ? progress / 100 : progress)) * 100) : Math.max(0, Math.min(95, Math.round(elapsedValue * 100_000 / estimateMs)));
+  const doneStages = Math.max(0, Math.min(stages.length, activeStage));
+  const currentStageLabel = stages[doneStages]?.label;
   const index = versions.findIndex((version) => version.id === currentId);
   const previous = stepVersion(versions, currentId ?? "", -1), next = stepVersion(versions, currentId ?? "", 1);
   const seek = (values: number[]) => { const media = audioRef.current; if (media && Number.isFinite(media.duration)) { media.currentTime = values[0] ?? 0; setCurrentTime(media.currentTime); } };
@@ -105,7 +106,7 @@ export function MusicTrack({
       <CollapsibleTrigger asChild><TooltipIconButton tooltip={text.lyrics} aria-label={text.lyrics} hitArea48><BookOpenIcon aria-hidden /></TooltipIconButton></CollapsibleTrigger>
       <CollapsibleContent><div className="max-h-48 overflow-y-auto pt-2">{timedLyrics ? <ol className="space-y-1" aria-label={text.lyrics}>{timedLyrics.map(({ t, line, section }, i) => <li key={i}>{section && section !== timedLyrics[i - 1]?.section ? <p className="text-muted-foreground pt-2 text-xs">{section}</p> : null}<Button type="button" variant="ghost" className="h-auto w-full justify-start whitespace-pre-wrap py-2 text-left" aria-current={t <= currentTime && (!timedLyrics[i + 1] || currentTime < timedLyrics[i + 1]!.t) ? "true" : undefined} onClick={() => { seek([t]); void audioRef.current?.play(); }}>{line}</Button></li>)}</ol> : <pre className="whitespace-pre-wrap font-sans text-sm">{lyrics}</pre>}</div></CollapsibleContent>
     </Collapsible> : null}
-    {(editModes?.length || editContent !== undefined && editContent !== null) ? <Popover open={editOpen} onOpenChange={setEditOpen}><PopoverTrigger asChild><TooltipIconButton tooltip={editLabel || text.edit} aria-label={editLabel || text.edit} hitArea48><PencilIcon aria-hidden /></TooltipIconButton></PopoverTrigger><PopoverContent align="end" width="auto" className="max-h-[min(80vh,36rem)] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto" aria-label={editPanelLabel ?? editLabel}>
+    {(editModes?.length || editContent !== undefined && editContent !== null) ? <Popover open={editOpen} onOpenChange={setEditOpen}><PopoverTrigger asChild><TooltipIconButton tooltip={editLabel || text.edit} aria-label={editLabel || text.edit} hitArea48><PencilIcon aria-hidden /></TooltipIconButton></PopoverTrigger><PopoverContent align="start" width="auto" className="max-h-[min(80vh,36rem)] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto" aria-label={editPanelLabel ?? editLabel}>
       {shownEditModes?.length ? <Tabs defaultValue={shownEditModes[0]!.id}><TabsList className="w-full">{shownEditModes.map(mode => <TabsTrigger key={mode.id} value={mode.id}>{mode.label}</TabsTrigger>)}</TabsList>{shownEditModes.map(mode => <TabsContent key={mode.id} value={mode.id} className="pt-2">{mode.content}{mode.disabledReason ? <p className="text-muted-foreground pt-1 text-xs">{mode.disabledReason}</p> : null}</TabsContent>)}{adaptedEdit?.full ?? (quickSong && onMakeFull ? <div className="pt-3"><Button type="button" variant="outline" className="w-full" onClick={onMakeFull}>Make it full</Button></div> : null)}{adaptedEdit?.extra.map((node, i) => <div key={i} className="pt-2">{node}</div>)}</Tabs> : <div id={editId} className="flex min-w-0 flex-col gap-3">{quickSong && onMakeFull ? <Button type="button" variant="outline" onClick={onMakeFull}>Make it full</Button> : null}{editContent}</div>}
     </PopoverContent></Popover> : null}
     <DropdownMenu><DropdownMenuTrigger asChild><TooltipIconButton tooltip={`${text.speed}: ${rate}x`} aria-label={`${text.speed}: ${rate}x`} hitArea48><GaugeIcon aria-hidden /></TooltipIconButton></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuLabel>{text.speed}</DropdownMenuLabel><DropdownMenuRadioGroup value={rate} onValueChange={nextRate => { setRate(nextRate); if (audioRef.current) audioRef.current.playbackRate = Number(nextRate); }}><DropdownMenuRadioItem value="0.75">0.75x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1">1x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1.25">1.25x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1.5">1.5x</DropdownMenuRadioItem><DropdownMenuRadioItem value="2">2x</DropdownMenuRadioItem></DropdownMenuRadioGroup></DropdownMenuContent></DropdownMenu>
@@ -119,19 +120,33 @@ export function MusicTrack({
     showPreviewWhenSettled
     aspectRatio="1 / 1"
     className="w-full rounded-md"
-    underlay={!cover ? <SafeImage src={undefined} alt={coverAlt ?? ""} kind="music" className="size-full" /> : undefined}
-  >{live && !cover ? <div aria-hidden className="absolute inset-0 flex items-center justify-center"><Music2Icon className="size-8 text-muted-foreground" /></div> : null}</GenerationStage>;
+    underlay={live ? <div aria-hidden className="size-full bg-primary/10" /> : <SafeImage src={undefined} alt={cover ? "" : coverAlt ?? ""} kind="music" className="size-full" />}
+  />;
   return <Card data-slot="music-track" data-status={status} data-width={width} aria-label={title} className={`w-full gap-0 overflow-hidden py-0 ${width === "full" ? "min-w-0 max-w-none" : "max-w-xl"}`}>
     <CardContent className="flex min-w-0 flex-col gap-3 p-3">
       <div className="flex min-w-0 items-start gap-3">
         <div className="relative aspect-square w-20 shrink-0 sm:w-24">{coverTile}{status === "ready" && src ? <Button type="button" variant="secondary" size="icon" aria-label={playing ? text.pause : text.play} className="absolute inset-0 m-auto size-12 rounded-full shadow-md" onClick={() => { const audio = audioRef.current; if (!audio) return; if (audio.paused) void audio.play(); else audio.pause(); }}><span className="sr-only">{playing ? text.pause : text.play}</span>{playing ? <PauseIcon aria-hidden /> : <PlayIcon aria-hidden />}</Button> : null}</div>
         <div className="flex min-h-20 min-w-0 flex-1 flex-col justify-center gap-1 sm:min-h-24">
           <p className="break-words text-sm font-semibold leading-tight">{title}</p>{description ? <p className="text-muted-foreground line-clamp-2 break-words text-xs">{description}</p> : null}
-          {live ? <div className="mt-1 flex min-w-0 flex-col gap-2">
-            <p role="status" className="text-muted-foreground text-xs">{waitingForMemory ? text.waitingForMemory : phaseLabel ?? (status === "queued" ? text.queued : text.generating)}</p>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">{stages.map((stage, i) => <span key={stage.id} aria-current={activeStage === i ? "step" : undefined} className={i < activeStage ? "text-primary" : i === activeStage ? "text-foreground font-medium" : "text-muted-foreground"}>{i < activeStage ? "✓ " : ""}{stage.label}</span>)}</div>
-            <Progress value={value} aria-label={phaseLabel ?? text.generating} aria-valuetext={text.progress(value, elapsed)} />
-            <p className="text-muted-foreground text-xs tabular-nums">{[`${value}%`, elapsed, etaSeconds !== undefined && etaSeconds !== null && etaSeconds > 0 ? `about ${Math.max(1, Math.round(etaSeconds))} seconds left` : etaSeconds === undefined ? etaLabel : undefined].filter(Boolean).join(" · ")}</p>
+          {live ? waitingForMemory ? <p role="status" className="text-muted-foreground mt-1 text-xs">{text.waitingForMemory}</p> : <div className="mt-1 flex min-w-0 flex-col gap-1.5">
+            {stages.length > 0 ? <>
+              <p role="status" className="text-muted-foreground truncate text-xs sm:hidden">Step {Math.min(doneStages + 1, stages.length)} of {stages.length} · {currentStageLabel ?? phaseLabel ?? stages.at(-1)?.label}</p>
+              <div data-slot="generation-stages" role="group" aria-label="Generation stages" className="hidden min-w-0 gap-1 sm:grid" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))` }}>
+                {stages.map((stage, i) => {
+                  const isDone = i < doneStages;
+                  const isCurrent = i === doneStages && doneStages < stages.length;
+                  const segmentValue = isDone ? 100 : isCurrent ? value : 0;
+                  return <div key={stage.id} aria-current={isCurrent ? "step" : undefined} className="min-w-0 text-center">
+                    <div role="progressbar" aria-label={stage.label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={segmentValue} className="bg-muted relative h-2 overflow-hidden rounded-full">
+                      <div className="bg-primary absolute inset-y-0 start-0 rounded-full" style={{ width: `${segmentValue}%` }} />
+                      {isDone ? <span aria-hidden className="text-primary-foreground absolute inset-0 flex items-center justify-center text-xs leading-none">✓</span> : null}
+                    </div>
+                    <span className={`mt-1 block truncate text-xs leading-tight ${isDone || isCurrent ? "text-foreground" : "text-muted-foreground"}`}>{stage.label}</span>
+                  </div>;
+                })}
+              </div>
+            </> : null}
+            <p className="text-muted-foreground text-xs tabular-nums">{[`${value}%`, elapsed, etaSeconds !== undefined && etaSeconds !== null ? `about ${Math.max(1, Math.round(etaSeconds))} seconds left` : etaSeconds === undefined ? etaLabel : undefined].filter(Boolean).join(" · ")}</p>
           </div> : null}
           {status === "ready" && src ? <div className="mt-1 flex min-w-0 flex-col gap-1"><Slider aria-label={`Seek ${title}`} min={0} max={duration || 1} step={1} value={[Math.min(currentTime, duration || 1)]} onValueChange={seek} disabled={!duration} /><div className="text-muted-foreground flex justify-between text-xs tabular-nums"><span>{formatSeconds(currentTime)}</span><span>{formatSeconds(duration)}</span></div></div> : null}
           {status === "ready" && src ? (
@@ -141,7 +156,7 @@ export function MusicTrack({
           ) : null}
         </div>
       </div>
-      {live ? <div className="flex min-w-0 items-center justify-between gap-2">{phaseLabel && !waitingForMemory ? <p className="text-muted-foreground min-w-0 truncate text-xs">{phaseLabel}</p> : <span />}{onStop ? <Button type="button" variant="outline" size="sm" className="min-h-12 shrink-0" onClick={onStop}><SquareIcon aria-hidden />{text.stop}</Button> : null}</div> : null}
+      {live && onStop ? <div className="flex min-w-0 justify-end"><Button type="button" variant="outline" size="sm" className="min-h-12 shrink-0" onClick={onStop}><SquareIcon aria-hidden />{text.stop}</Button></div> : null}
       {status === "ready" ? actionButtons : null}
       {status === "ready" && versions.length >= 2 && index >= 0 ? <div className="flex flex-wrap items-center gap-2"><Button type="button" variant="outline" size="icon" aria-label={text.previous} disabled={!previous || !onSelectVersion} onClick={() => previous && onSelectVersion?.(previous.id)}><ChevronLeftIcon aria-hidden /></Button><span className="text-muted-foreground text-sm">{text.versionOf(index + 1, versions.length)}</span><Button type="button" variant="outline" size="icon" aria-label={text.next} disabled={!next || !onSelectVersion} onClick={() => next && onSelectVersion?.(next.id)}><ChevronRightIcon aria-hidden /></Button>{next && onUseVersion && currentId ? <Button type="button" variant="outline" size="sm" onClick={() => onUseVersion(currentId)}>{text.useVersion}</Button> : null}</div> : null}
       {status === "failed" ? <><Alert variant="destructive"><AlertDescription>{error ?? text.failed}</AlertDescription></Alert>{onRetry ? <Button type="button" variant="outline" className="min-h-12" onClick={onRetry}><RefreshCwIcon aria-hidden />{text.retry}</Button> : null}</> : null}

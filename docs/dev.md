@@ -1,3 +1,16 @@
+## ui-v0.5.313: staged MusicTrack generation progress
+
+The generating `MusicTrack` now shows each host supplied stage once in a
+segmented progress rail. Completed stages are filled and ticked, the active
+stage fills by its reported progress, and remaining stages stay empty. Small
+viewports show one `Step N of N · Stage` line; the status row carries percent,
+elapsed time and an ETA only when the host provides one. Waiting-for-memory
+cards keep their calm message and omit the progress rail. The cover uses the
+shared animated `GenerationStage` placeholder while it waits for a preview,
+then fades into the supplied cover. The Edit popover aligns to its trigger
+with a viewport-aware width. Host props and callbacks, ready-card layout,
+action tooltips and the cover fallback remain supported.
+
 ## ui-v0.5.308: compact MusicTrack card
 
 `MusicTrack` now uses one compact kit card for queued, generating and ready
