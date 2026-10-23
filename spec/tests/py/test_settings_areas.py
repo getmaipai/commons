@@ -1,7 +1,9 @@
 """Python mirror of central settings area/tab structure checks."""
+
 import json
 from collections import defaultdict
 from pathlib import Path
+
 from gen.py.settings_area_schema import SettingsArea
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -9,11 +11,54 @@ SETTINGS = ROOT / "settings"
 FILE = json.loads((SETTINGS / "areas.json").read_text())
 REGISTRY = json.loads((SETTINGS / "keys.json").read_text())
 LEGACY = json.loads((SETTINGS / "legacy-sections.json").read_text())["mappings"]
-OLD_IDS = {f"{area}/{section}" for area, sections in {
-    "home": "general people search integrations ai pictures commands voices robot reference-library media-library storage maintenance privacy developer network coding".split(),
-    "account": "profile appearance notifications voice pictures data device robot developer coding".split(),
-    "chat": "general personalization skills shortcuts voice notifications memories parental-controls household".split(),
-}.items() for section in sections} | {"home/home", "account/account"}
+OLD_IDS = {
+    f"{area}/{section}"
+    for area, sections in {
+        "home": [
+            "general",
+            "people",
+            "search",
+            "integrations",
+            "ai",
+            "pictures",
+            "commands",
+            "voices",
+            "robot",
+            "reference-library",
+            "media-library",
+            "storage",
+            "maintenance",
+            "privacy",
+            "developer",
+            "network",
+            "coding",
+        ],
+        "account": [
+            "profile",
+            "appearance",
+            "notifications",
+            "voice",
+            "pictures",
+            "data",
+            "device",
+            "robot",
+            "developer",
+            "coding",
+        ],
+        "chat": [
+            "general",
+            "personalization",
+            "skills",
+            "shortcuts",
+            "voice",
+            "notifications",
+            "memories",
+            "parental-controls",
+            "household",
+        ],
+    }.items()
+    for section in sections
+} | {"home/home", "account/account"}
 
 
 def test_every_area_parses_and_page_counts_are_correct():
@@ -42,12 +87,32 @@ def test_registry_groups_are_once_or_not_placed():
 
 def test_tab_view_and_audience_constraints_and_robot_detail():
     home = FILE["areas"][0]
-    assert [s["id"] for s in home["sections"] if s["scope"] == "household"] == ["household", "privacy", "ai", "media", "home-voice", "search", "apps", "backups", "advanced"]
+    assert [s["id"] for s in home["sections"] if s["scope"] == "household"] == [
+        "household",
+        "privacy",
+        "ai",
+        "media",
+        "home-voice",
+        "search",
+        "apps",
+        "backups",
+        "advanced",
+    ]
     apps = next(s for s in home["sections"] if s["id"] == "apps")
     assert apps["detail"]["param"] == "id"
-    assert [t["id"] for t in apps["detail"]["tabs"]] == ["overview", "behaviour", "access"]
+    assert [t["id"] for t in apps["detail"]["tabs"]] == [
+        "overview",
+        "behaviour",
+        "access",
+    ]
     ai = next(s for s in home["sections"] if s["id"] == "ai")
-    assert [t["id"] for t in ai["tabs"]] == ["overview", "models", "engines", "advanced", "coding"]
+    assert [t["id"] for t in ai["tabs"]] == [
+        "overview",
+        "models",
+        "engines",
+        "advanced",
+        "coding",
+    ]
 
 
 def test_legacy_map_covers_every_old_section_and_targets_existing_page_tabs():
