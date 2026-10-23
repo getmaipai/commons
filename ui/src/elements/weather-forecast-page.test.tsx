@@ -54,16 +54,31 @@ describe("WeatherForecastPage", () => {
     expect(container.querySelector("[data-slot=weather-sky]")).not.toBeNull();
   });
 
-  test("location header structurally separates a shrinkable long city from fixed time and remove target", () => {
+  test("location header structurally separates a truncated name, fixed time and always-visible remove target", () => {
     const long = { id: "long", city: "San Bernardino Valley, California", localTime: "2:19 PM", detail: { temp: 80, condition: "Clear", code: 0, isDay: true } };
     const { container } = render(<WeatherForecastPage locations={[long]} onRemoveLocation={() => {}} />);
     const name = container.querySelector("[data-slot=weather-location-name]")!;
     const actions = container.querySelector("[data-slot=weather-location-actions]")!;
     expect(name.className).toContain("min-w-0");
+    expect(name.className).toContain("truncate");
     expect(actions.className).toContain("shrink-0");
-    expect(actions.querySelector("[data-slot=weather-location-time]")?.className).toContain("shrink");
-    expect(container.querySelector("[aria-label^=\"Remove location\"]")?.className).toContain("size-11");
+    expect(actions.querySelector("[data-slot=weather-location-time]")?.className).toContain("shrink-0");
+    const remove = container.querySelector<HTMLElement>("[aria-label^=\"Remove location\"]");
+    expect(remove?.className).toContain("weather-remove-hit");
+    expect(remove?.querySelector(".weather-remove-chip")).not.toBeNull();
     expect(name.parentElement).not.toBe(actions);
+  });
+
+  test("detail grid uses content-sized rows and hourly card is not stretched", () => {
+    const { container } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
+    const grid = container.querySelector<HTMLElement>("[data-slot=weather-detail-grid]")!;
+    expect(grid.className).toContain("repeat(auto-fill,minmax(220px,1fr))");
+    expect(grid.className).toContain("minmax(160px,auto)");
+    expect(grid.className).not.toContain("auto-rows-fr");
+    const hourly = container.querySelector<HTMLElement>("[data-slot=weather-hourly-strip]")?.closest("[data-slot=weather-tile]");
+    expect(hourly?.className).toContain("h-auto");
+    expect(hourly?.className).toContain("min-h-0");
+    expect(hourly?.className).not.toMatch(/(?:^|\s)h-(?:[0-9]|full)(?:\s|$)|aspect-/);
   });
 
   test("data-backed tiles appear only with fields and the Conditions switcher changes chart data", () => {
@@ -88,6 +103,10 @@ describe("WeatherForecastPage", () => {
 
   test("the sky CSS defines visible scene keyframes and freezes them for reduced motion", () => {
     expect(tokens).toContain("@keyframes wx-sun-pulse");
+    expect(tokens).toContain("@keyframes wx-rays");
+    expect(tokens).toContain("animation: wx-rays 60s linear infinite");
+    expect(tokens).toContain("#ffd75e, #ff9f2d");
+    expect(tokens).toContain("animation-duration: 4s");
     expect(tokens).toContain("animation-duration: 4s");
     expect(tokens).toContain("@keyframes wx-twinkle");
     expect(tokens).toContain("@keyframes wx-rain");
@@ -96,6 +115,53 @@ describe("WeatherForecastPage", () => {
     expect(tokens).toContain("@keyframes wx-fog");
     expect(tokens).toContain("@media (prefers-reduced-motion: reduce)");
     expect(tokens).toContain("animation: none !important");
+    expect(tokens).toContain(".weather-remove-chip");
+  });
+
+  test("clear day has drifting clouds and rotating rays, with motion disabled for reduced motion", () => {
+    const clear = [{ id: "sun", city: "Sun", detail: { temp: 82, condition: "Clear", code: 0, isDay: true } }];
+    const { container } = render(<WeatherForecastPage locations={clear} selectedId="sun"/>);
+    const sky = container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
+    expect(sky.querySelectorAll('[data-fx="cloud"]')).toHaveLength(3);
+    expect(sky.querySelector('[data-fx="sun-rays"]')).not.toBeNull();
+    expect(tokens).toContain("@keyframes wx-drift");
+    expect(tokens).toContain("animation: wx-rays 60s linear infinite");
+    expect(tokens).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(tokens).toContain("animation: none !important");
+  });
+
+  test("clear hero scenes contain sun and night stars", () => {
+    const day = render(<WeatherForecastPage locations={[{ id: "day", city: "Day", detail: { temp: 80, condition: "Clear", code: 0, isDay: true } }]} selectedId="day"/>);
+    const daySky = day.container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
+    expect(daySky.querySelector('[data-fx="sun"]')).not.toBeNull();
+    expect(daySky.querySelector('[data-fx="sun-rays"]')).not.toBeNull();
+    cleanup();
+    const night = render(<WeatherForecastPage locations={[{ id: "night", city: "Night", detail: { temp: 50, condition: "Clear", code: 0, isDay: false } }]} selectedId="night"/>);
+    const nightSky = night.container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
+    expect(nightSky.querySelectorAll('[data-fx="star"]').length).toBeGreaterThanOrEqual(72);
+    expect(nightSky.querySelector('[data-fx="moon"]')).not.toBeNull();
+  });
+
+  test("weather tiles draw compass, pressure arc, sunrise path, and chart gridlines without duplicate times", () => {
+    const detail = { ...locations[0]!.detail!, wind: { speed: 8, direction: 225, gust: 13 }, pressure: 1016, pressureTrend: "rising" as const,
+      sunrise: "2026-10-22T07:13:00", sunset: "2026-10-22T17:59:00", hourly: Array.from({length:6},(_,i)=>({time:`2026-10-22T${String(9+i*3).padStart(2,"0")}:00`,temp:60+i})) };
+    const { container } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail }]} selectedId="home"/>);
+    expect(container.querySelector('[data-slot="weather-wind-needle"]')?.getAttribute("style")).toContain("rotate(225deg)");
+    expect(container.querySelector('[data-slot="weather-pressure-gauge"] path:nth-child(2)')).not.toBeNull();
+    expect(container.querySelector('[data-slot="weather-sun-arc"]')).not.toBeNull();
+    const sunTile = [...container.querySelectorAll('[data-slot="weather-tile"]')].find(x=>x.textContent?.includes("Sunrise & Sunset"))!;
+    expect(sunTile.textContent?.match(/7:13 AM/g)?.length).toBe(1);
+    expect(container.querySelectorAll('[data-slot="weather-chart-gridline"]')).toHaveLength(4);
+  });
+
+  test("forecast hourly strip uses fixed width cells and short non-wrapping labels", () => {
+    const hours = Array.from({ length: 3 }, (_, i) => ({ time: `2026-10-22T${String(12 + i * 3).padStart(2, "0")}:00`, temp: 60 + i }));
+    const { container } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail: { ...locations[0]!.detail!, hourly: hours } }]} selectedId="home" />);
+    const cells = container.querySelectorAll<HTMLElement>("[data-slot=weather-forecast-hour]");
+    expect(cells).toHaveLength(3);
+    for (const cell of cells) { expect(cell.className).toContain("w-16"); expect(cell.querySelector("span")?.className).toContain("whitespace-nowrap"); }
+    expect(cells[0]?.textContent).toContain("Now");
+    expect(cells[1]?.textContent).toContain("3 PM");
   });
 
   test("searches and opens then closes the mobile detail", () => {

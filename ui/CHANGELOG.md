@@ -1,5 +1,9 @@
 ## [ui-v0.5.323] - 2026-10-23
 
+## [ui-v0.5.323-weather.2] - 2026-10-23
+
+- Fix weather detail sizing with content-height hourly forecast and compact responsive tiles in Apple-style order. Long location names truncate beside fixed local time, and the remove chip remains visible. Clear-day heroes add drifting clouds and a warm sun with rotating rays; reduced-motion still freezes the scene. Update the showcase and structural animation tests.
+
 - Weather: one animated sky (WeatherSky) drives the chat card, the location cards and the detail hero, with visible clouds, rain, snow, stars and lightning; the forecast page is redesigned with same-size location cards, an add control, an Apple-style 10-day range bar and detail tiles.
 
 ## [ui-v0.5.322] - 2026-10-23
@@ -7,6 +11,10 @@
 - Polish the article reader with a publisher header that scrolls with the story, pinned floating controls, wider image layout, stronger headline and favicon fallbacks.
 
 # Changelog (`@maipai/ui`)
+
+## [ui-v0.5.323-weather.2] - 2026-10-23
+
+- Refine weather skies with defined cloud silhouettes, visible sun rays and crescent, denser condition particle fields, full hero coverage and still reduced-motion compositions. Keep hourly forecast cells fixed at 64px, polish the location remove chip, and align detail tiles in equal-height responsive rows.
 
 ## [0.5.320] - ui-v0.5.320
 
