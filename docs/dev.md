@@ -1,3 +1,9 @@
+## spec-v0.1.212: Engines and AI keeps its trail view (2026-10-23)
+
+Note: the tag `spec-v0.1.211` was pushed by mistake on a commit whose package version is 0.1.210; it is unused and must not be pinned. Use `spec-v0.1.212`.
+
+spec-v0.1.209 dropped `trail_view: home.engine_admin` from the Home `ai` section while tabbing it, so the install plan, models, engines console and token controls had no view to draw them. Restored; `view_tab` is not used there (the view receives the open tab and draws the parts that belong to it).
+
 ## spec-v0.1.210: the settings cap counts a section's own view, not a card's (2026-10-23)
 
 `checkSettingsCap` read `view`, `lead_view` and `trail_view` from cards, where the schema has none (they belong to the section), which Home's typecheck of the spec source flagged. A section's view now counts as one setting on its summary tab. No behaviour change while `SETTINGS_CAP_ENFORCED` is off.

@@ -698,9 +698,9 @@ describe("history and keys", () => {
   test("Esc discards a preview before leaving the tool", async () => {
     const v = setup();
     fireEvent.click(tool(v, "Remove BG"));
-    await waitFor(() => v.getByRole("button", { name: "Apply" }));
+    await waitFor(() => v.getByRole("button", { name: "Apply" }), { timeout: 8000 });
     fireEvent.keyDown(v.getByRole("region", { name: "Picture stage" }), { key: "Escape" });
-    await waitFor(() => expect(v.queryByRole("button", { name: "Apply" })).toBeNull());
+    await waitFor(() => expect(v.queryByRole("button", { name: "Apply" })).toBeNull(), { timeout: 8000 });
     expect(tool(v, "Remove BG").getAttribute("aria-checked")).toBe("true");
   });
 

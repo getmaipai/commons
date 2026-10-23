@@ -577,7 +577,7 @@
               "label": "Advanced"
             }
           ],
-          "view_tab": "models"
+          "trail_view": "home.engine_admin"
         },
         {
           "id": "pictures",
