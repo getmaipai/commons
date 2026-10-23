@@ -39,6 +39,8 @@ SETTINGS-UX-02 (`ui-v0.5.311`) makes the settings column readable at a glance: n
 per row, a filled active row with an accent bar, a 260 px column and a 760 px content pane. `SettingsShell` gains optional `sides`
 (a Mine and Household switch under the column title) and `trail` (a breadcrumb above the page title, sticky with it).
 
+`ui-v0.5.312` gives the settings trail's links a transparent 48 px hit area (the touch floor) and draws the current page as plain text, not a disabled link.
+
 `MediaViewerShowcase` now includes generating at a middle stage, waiting for
 memory and a finished card with Edit open. `music-track.test.tsx` covers both
 card states, stages, cover fallback, edit modes, actions and a 390 px layout.

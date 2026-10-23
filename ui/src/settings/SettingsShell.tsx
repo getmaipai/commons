@@ -9,7 +9,7 @@ import { cn } from "../dashboard/lib/utils";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "../ui/breadcrumb";
 import { resolveHref, visibleGroups, type Section, type SettingsAreaDef, type SettingsViewer } from "./settingsAudience";
 
 const ArrowUpRight = getIcon("arrow-up-right");
@@ -230,7 +230,7 @@ export function SettingsShell({
           ) : null}
           <div data-slot="settings-content-header" className="sticky top-0 z-10 -mx-6 mb-10 bg-settings-page px-6">
           {trail?.length ? <Breadcrumb className="mb-2 hidden lg:block"><BreadcrumbList>{trail.map((item, index) => <Fragment key={`${item.label}-${index}`}>
-            <BreadcrumbItem>{index === trail.length - 1 || !item.href ? <BreadcrumbPage>{item.label}</BreadcrumbPage> : <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>}</BreadcrumbItem>
+            <BreadcrumbItem>{index === trail.length - 1 || !item.href ? <span aria-current={index === trail.length - 1 ? "page" : undefined} className="font-normal text-foreground">{item.label}</span> : <BreadcrumbLink href={item.href} className="relative before:absolute before:inset-x-0 before:-inset-y-3 before:content-['']">{item.label}</BreadcrumbLink>}</BreadcrumbItem>
             {index < trail.length - 1 ? <BreadcrumbSeparator /> : null}
           </Fragment>)}</BreadcrumbList></Breadcrumb> : null}
           <div className="relative flex items-start gap-2">
