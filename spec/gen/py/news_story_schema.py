@@ -51,7 +51,7 @@ class NewsStory(BaseModel):
     )
     summary_band: Literal['child', 'teen', 'adult'] | None = Field(
         None,
-        description="The band the summary was written for; a viewer of a younger band never sees an older band's summary.",
+        description="NEWS-00. The band the summary was written for; a viewer of a younger band never sees an older band's summary.",
     )
     summary_at: AwareDatetime | None = None
     pageviews_hint: confloat(ge=0.0) | None = None
