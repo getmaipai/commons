@@ -728,6 +728,15 @@
   --weather-ink: #ffffff;
   --weather-range-end: var(--hue-orange);
   --weather-scrim: rgb(0 0 0 / 0.16);
+  --weather-text-scrim: rgb(0 0 0 / 0.45);
+  --weather-scrim-soft: rgb(0 0 0 / 0.10);
+  --weather-scrim-control: rgb(0 0 0 / 0.25);
+  --weather-range-cool: #38bdf8;
+  --weather-range-mid: #fbbf24;
+  --weather-range-warm: #f97316;
+  --weather-uv-low: #34d399;
+  --weather-uv-mid: #facc15;
+  --weather-uv-high: #ef4444;
   --weather-sun-glow: rgb(255 244 200 / 0.22);
   --weather-moon-glow: rgb(215 228 255 / 0.2);
 }
@@ -1398,7 +1407,7 @@ body {
 [data-slot="weather-forecast-hero"] [data-fx="cloud"] { filter: blur(7px); }
 [data-slot="weather-location-sky"] [data-fx="fog"],
 [data-slot="weather-forecast-hero"] [data-fx="fog"] { filter: blur(6px); }
-[data-slot="weather-card"] [data-fx="fall"] {
+[data-slot="weather-sky"] [data-fx="fall"] {
   top: -24px;
   left: calc(var(--x) * 1%);
   width: 1px;
@@ -1408,7 +1417,7 @@ body {
   background: linear-gradient(to bottom, transparent, var(--weather-ink));
   animation: wx-rain var(--d) linear var(--dl) infinite;
 }
-[data-slot="weather-card"] [data-fx="flake"] {
+[data-slot="weather-sky"] [data-fx="flake"] {
   top: -12px;
   left: calc(var(--x) * 1%);
   width: calc(var(--s) * 1px);
@@ -1418,7 +1427,7 @@ body {
   background: var(--weather-ink);
   animation: wx-snow var(--d) linear var(--dl) infinite;
 }
-[data-slot="weather-card"] [data-fx="star"] {
+[data-slot="weather-sky"] [data-fx="star"] {
   top: calc(var(--y) * 1%);
   left: calc(var(--x) * 1%);
   width: calc(var(--s) * 1px);
@@ -1428,7 +1437,7 @@ body {
   background: var(--weather-ink);
   animation: wx-twinkle var(--d) ease-in-out var(--dl) infinite alternate;
 }
-[data-slot="weather-card"] [data-fx="cloud"] {
+[data-slot="weather-sky"] [data-fx="cloud"], [data-slot="weather-sky"] [data-fx="cloud-slow"] {
   top: calc(var(--y) * 1%);
   left: calc(var(--x) * 1%);
   width: calc(var(--s) * 1px);
@@ -1438,7 +1447,8 @@ body {
   filter: blur(14px);
   animation: wx-drift var(--d) ease-in-out var(--dl) infinite alternate;
 }
-[data-slot="weather-card"] [data-fx="fog"] {
+[data-slot="weather-sky"] [data-fx="cloud-slow"] { animation-duration: calc(var(--d) * 1.7); opacity: calc(var(--o) * .72); }
+[data-slot="weather-sky"] [data-fx="fog"] {
   top: calc(var(--y) * 1%);
   left: -20%;
   width: 140%;
@@ -1447,8 +1457,8 @@ body {
   filter: blur(10px);
   animation: wx-fog var(--d) ease-in-out var(--dl) infinite alternate;
 }
-[data-slot="weather-card"] [data-fx="sun"],
-[data-slot="weather-card"] [data-fx="moon"] {
+[data-slot="weather-sky"] [data-fx="sun"],
+[data-slot="weather-sky"] [data-fx="moon"] {
   top: -70px;
   right: 14%;
   width: 200px;
@@ -1457,12 +1467,12 @@ body {
   background: radial-gradient(circle, var(--weather-sun-glow), transparent 68%);
   animation: wx-pulse 7s ease-in-out infinite alternate;
 }
-[data-slot="weather-card"] [data-fx="moon"] {
+[data-slot="weather-sky"] [data-fx="moon"] {
   width: 150px;
   height: 150px;
   background: radial-gradient(circle, var(--weather-moon-glow), transparent 68%);
 }
-[data-slot="weather-card"] [data-fx="flash"] {
+[data-slot="weather-sky"] [data-fx="flash"] {
   inset: 0;
   opacity: 0;
   background: var(--weather-ink);
@@ -1501,14 +1511,14 @@ body {
   98% { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-slot="weather-card"] [data-fx],
+  [data-slot="weather-sky"] [data-fx],
   [data-slot="weather-forecast-hero"] [data-fx],
   [data-slot="weather-location-sky"] [data-fx] {
     animation: none !important;
   }
-  [data-slot="weather-card"] [data-fx="fall"],
-  [data-slot="weather-card"] [data-fx="flake"],
-  [data-slot="weather-card"] [data-fx="flash"],
+  [data-slot="weather-sky"] [data-fx="fall"],
+  [data-slot="weather-sky"] [data-fx="flake"],
+  [data-slot="weather-sky"] [data-fx="flash"],
   [data-slot="weather-forecast-hero"] [data-fx="fall"],
   [data-slot="weather-forecast-hero"] [data-fx="flake"],
   [data-slot="weather-forecast-hero"] [data-fx="flash"],

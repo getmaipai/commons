@@ -76,10 +76,16 @@ describe("WeatherCard", () => {
         const layers = [...container.querySelectorAll("[data-fx]")];
         expect(layers.length, `${cls} ${is_day}`).toBeGreaterThan(0);
         expect(layers.length).toBeLessThanOrEqual(32);
-        for (const layer of layers) expect(layer.getAttribute("aria-hidden")).toBe("true");
+        for (const layer of layers) expect(layer.getAttribute("aria-hidden") ?? layer.closest("[aria-hidden=true]")?.getAttribute("aria-hidden")).toBe("true");
         cleanup();
       }
     }
+  });
+
+  test("the shared sky module provides reduced-motion-safe scene hooks", () => {
+    const { container } = render(<WeatherCard {...props} current={{ ...props.current, code: 61 }} />);
+    expect(container.querySelector("[data-slot=weather-sky] [data-fx=fall]")).not.toBeNull();
+    expect(container.querySelector("[data-slot=weather-sky]")?.getAttribute("data-class")).toBe("rain");
   });
 
   test("the same props draw the same markup", () => {
