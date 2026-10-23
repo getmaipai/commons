@@ -11,8 +11,11 @@ import {
   roleAllows,
   visibleCards,
   visibleGroups,
+  visibleTabs,
 } from "./settingsAudience";
+import liveAreasFile from "../../../spec/settings/areas.json";
 import { ADMIN, ADULT, CHILD, GUEST, REGISTRY, TEEN, area } from "./settingsFixtures";
+import type { SettingsAreaDef } from "./settingsAudience";
 
 const ids = (groups: ReturnType<typeof visibleGroups>) => groups.flatMap((g) => g.sections.map((s) => s.id));
 
@@ -52,6 +55,17 @@ describe("section tabs and tabbed cards", () => {
     expect(cardsInTab(cards, "one").map((card) => card.label)).toEqual(["Summary", "One"]);
     expect(cardsInTab(cards, "two").map((card) => card.label)).toEqual(["Summary", "Two"]);
     expect(cardsInTab(cards).map((card) => card.label)).toEqual(["Summary", "One", "Two"]);
+  });
+
+  test("filters tabs by role, band, and capability while keeping a page with a visible tab", () => {
+    const section = { id: "s", label: "S", icon: "settings", kind: "keys" as const, tabs: [
+      { id: "adult", label: "Adult", min_role: "adult" as const },
+      { id: "child", label: "Child", bands: ["child"] as const },
+      { id: "paired", label: "Paired", needs: ["robot.paired"] },
+    ] };
+    expect(visibleTabs(section, CHILD).map((tab) => tab.id)).toEqual(["child"]);
+    expect(visibleTabs(section, ADULT).map((tab) => tab.id)).toEqual(["adult"]);
+    expect(visibleTabs(section, { ...ADULT, capabilities: ["robot.paired"] }).map((tab) => tab.id)).toEqual(["adult", "paired"]);
   });
 });
 
@@ -123,12 +137,23 @@ describe("Home settings and Account audience", () => {
 
 describe("every viewer, every area: never a section they may not see", () => {
   test("no hidden section appears for any role and band", () => {
+    const liveAreas = (liveAreasFile as unknown as { areas: SettingsAreaDef[] }).areas;
     for (const viewer of [ADMIN, ADULT, TEEN, CHILD, GUEST]) {
-      for (const a of [area("chat"), area("account"), area("home")]) {
+      for (const a of liveAreas) {
         for (const g of visibleGroups(a, viewer, REGISTRY, "home")) {
           for (const s of g.sections) expect(audienceAllows(viewer, s)).toBe(true);
+          for (const s of g.sections) {
+            if (s.tabs?.length) expect(visibleTabs(s, viewer).length).toBeGreaterThan(0);
+          }
         }
       }
     }
+  });
+
+  test("live product areas follow the regrouped home and account page structure", () => {
+    const liveAreas = (liveAreasFile as unknown as { areas: SettingsAreaDef[] }).areas;
+    expect(liveAreas.find((a) => a.id === "home")!.sections).toHaveLength(9);
+    expect(liveAreas.find((a) => a.id === "account")!.sections).toHaveLength(7);
+    expect(liveAreas.some((a) => a.id === "chat")).toBe(false);
   });
 });

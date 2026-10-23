@@ -1,0 +1,1055 @@
+{
+  "areas": [
+    {
+      "id": "account",
+      "title": "Settings",
+      "audience": {
+        "min_role": "guest"
+      },
+      "groups": [
+        {
+          "label": "Personal",
+          "sections": [
+            "profile",
+            "appearance",
+            "notifications",
+            "voice",
+            "pictures",
+            "data"
+          ]
+        },
+        {
+          "label": "Devices",
+          "sections": [
+            "device",
+            "robot"
+          ]
+        },
+        {
+          "label": "Developer",
+          "sections": [
+            "developer"
+          ]
+        },
+        {
+          "label": "Coding",
+          "sections": [
+            "coding"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "profile",
+          "label": "Profile",
+          "icon": "user",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Face enrollment",
+              "group": "person.profile",
+              "scope": "person"
+            },
+            {
+              "label": "Voice print enrollment",
+              "group": "person.voice_print",
+              "scope": "person"
+            }
+          ],
+          "lead_view": "account.profile",
+          "keywords": [
+            "name",
+            "photo",
+            "face"
+          ]
+        },
+        {
+          "id": "appearance",
+          "label": "Appearance",
+          "icon": "palette",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Appearance",
+              "group": "profile.appearance",
+              "scope": "person"
+            },
+            {
+              "label": "Ease of use",
+              "group": "profile.ease",
+              "scope": "person"
+            }
+          ],
+          "trail_view": "account.device_appearance",
+          "keywords": [
+            "theme",
+            "dark",
+            "look"
+          ]
+        },
+        {
+          "id": "notifications",
+          "label": "Notifications",
+          "icon": "bell",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Alerts",
+              "group": "person.notifications",
+              "scope": "person"
+            },
+            {
+              "label": "Telegram",
+              "group": "person.telegram",
+              "scope": "person",
+              "collapsed": true
+            }
+          ],
+          "keywords": [
+            "quiet hours",
+            "telegram",
+            "alerts"
+          ]
+        },
+        {
+          "id": "voice",
+          "label": "Voice",
+          "icon": "mic",
+          "kind": "keys",
+          "lead_view": "account.voice",
+          "cards": [
+            {
+              "label": "Voice",
+              "group": "person.voice",
+              "scope": "person"
+            },
+            {
+              "label": "Commands",
+              "min_role": "adult",
+              "links": [
+                {
+                  "label": "Create a command",
+                  "href": "/commands"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "pictures",
+          "label": "Pictures and videos",
+          "icon": "camera",
+          "kind": "keys",
+          "min_role": "adult",
+          "cards": [
+            {
+              "label": "Pictures and videos that look like you",
+              "group": "person.likeness",
+              "scope": "person"
+            }
+          ],
+          "trail_view": "account.likeness",
+          "keywords": [
+            "likeness",
+            "consent",
+            "look like me",
+            "face",
+            "photo",
+            "lora",
+            "styles",
+            "video"
+          ]
+        },
+        {
+          "id": "data",
+          "label": "Data and privacy",
+          "icon": "lock",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Your data",
+              "links": [
+                {
+                  "label": "Signed-in devices",
+                  "href": "/devices"
+                },
+                {
+                  "label": "Storage",
+                  "href": "/storage"
+                },
+                {
+                  "label": "What connects to the internet",
+                  "href": "/privacy"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "device",
+          "label": "This device",
+          "icon": "laptop",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Wake word",
+              "group": "device.voice",
+              "scope": "device",
+              "min_role": "adult",
+              "needs": [
+                "wakeword.assets"
+              ]
+            }
+          ],
+          "min_role": "adult",
+          "needs": [
+            "wakeword.assets"
+          ]
+        },
+        {
+          "id": "robot",
+          "label": "Robot",
+          "icon": "bot",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Robot",
+              "group": "person.robot",
+              "scope": "person",
+              "bands": [
+                "adult"
+              ],
+              "needs": [
+                "robot.paired",
+                "robots.enabled"
+              ]
+            }
+          ],
+          "bands": [
+            "adult"
+          ],
+          "needs": [
+            "robot.paired",
+            "robots.enabled"
+          ]
+        },
+        {
+          "id": "developer",
+          "label": "Developer tools",
+          "icon": "wrench",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Session lock",
+              "group": "person.security",
+              "scope": "person",
+              "levels": [
+                "expert"
+              ]
+            }
+          ],
+          "min_role": "admin"
+        },
+        {
+          "id": "coding",
+          "label": "Coding",
+          "icon": "code",
+          "kind": "view",
+          "view": "account.coding_keys",
+          "min_role": "child",
+          "needs": [
+            "coding.allowed_for_me"
+          ]
+        }
+      ],
+      "scope": "person"
+    },
+    {
+      "id": "home",
+      "title": "Home settings",
+      "audience": {
+        "min_role": "admin"
+      },
+      "groups": [
+        {
+          "label": "General",
+          "sections": [
+            "general"
+          ]
+        },
+        {
+          "label": "People",
+          "sections": [
+            "people"
+          ]
+        },
+        {
+          "label": "Engines and AI",
+          "sections": [
+            "ai"
+          ]
+        },
+        {
+          "label": "Pictures and videos",
+          "sections": [
+            "pictures"
+          ]
+        },
+        {
+          "label": "Coding",
+          "sections": [
+            "coding"
+          ]
+        },
+        {
+          "label": "Devices",
+          "sections": [
+            "robot"
+          ]
+        },
+        {
+          "label": "Search",
+          "sections": [
+            "search"
+          ]
+        },
+        {
+          "label": "Integrations",
+          "sections": [
+            "integrations"
+          ]
+        },
+        {
+          "label": "Commands",
+          "sections": [
+            "commands"
+          ]
+        },
+        {
+          "label": "Voices",
+          "sections": [
+            "voices"
+          ]
+        },
+        {
+          "label": "Storage and backups",
+          "sections": [
+            "storage"
+          ]
+        },
+        {
+          "label": "Reference library",
+          "sections": [
+            "reference-library"
+          ]
+        },
+        {
+          "label": "Media library",
+          "sections": [
+            "media-library"
+          ]
+        },
+        {
+          "label": "Maintenance",
+          "sections": [
+            "maintenance"
+          ]
+        },
+        {
+          "label": "Privacy",
+          "sections": [
+            "privacy"
+          ]
+        },
+        {
+          "label": "Developer",
+          "sections": [
+            "developer"
+          ]
+        },
+        {
+          "label": "Network and access",
+          "sections": [
+            "network"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "general",
+          "label": "General",
+          "icon": "settings",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Household",
+              "group": "household.system",
+              "scope": "household"
+            },
+            {
+              "label": "Internet check",
+              "group": "household.status",
+              "scope": "household"
+            }
+          ],
+          "keywords": [
+            "family name",
+            "place",
+            "language",
+            "retention",
+            "history"
+          ]
+        },
+        {
+          "id": "people",
+          "label": "People",
+          "icon": "users",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "Users",
+                  "href": "/users"
+                },
+                {
+                  "label": "Family",
+                  "href": "/people"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "search",
+          "label": "Search",
+          "icon": "search",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Web search",
+              "group": "household.search",
+              "scope": "household"
+            },
+            {
+              "label": "Blocked sites",
+              "group": "household.blocked_sites",
+              "scope": "household",
+              "matrix": {
+                "rows": "search/blocklists",
+                "columns": [
+                  {
+                    "label": "Kids",
+                    "key": "search.blocklists.child",
+                    "band": "child"
+                  },
+                  {
+                    "label": "Teens",
+                    "key": "search.blocklists.teen",
+                    "band": "teen"
+                  },
+                  {
+                    "label": "Adults",
+                    "key": "search.blocklists.adult",
+                    "band": "adult"
+                  }
+                ],
+                "locked_note": "Adult sites are always blocked for Kids and Teens, so those boxes stay checked.",
+                "save_error": "That change was not saved. Check your connection, then tick the box again."
+              }
+            },
+            {
+              "label": "News shelf",
+              "group": "household.news",
+              "scope": "household",
+              "matrix": {
+                "rows": "news/feed-lists",
+                "rows_label": "News list",
+                "columns": [
+                  {
+                    "label": "Kids",
+                    "key": "news.lists.child",
+                    "band": "child"
+                  },
+                  {
+                    "label": "Teens",
+                    "key": "news.lists.teen",
+                    "band": "teen"
+                  },
+                  {
+                    "label": "Adults",
+                    "key": "news.lists.adult",
+                    "band": "adult"
+                  }
+                ],
+                "unavailable_note": "A dash means the list is not offered to that user type, so it can never appear for them.",
+                "save_error": "That change was not saved. Check your connection, then tick the box again."
+              }
+            }
+          ],
+          "keywords": [
+            "searxng",
+            "wikipedia",
+            "brave",
+            "key"
+          ]
+        },
+        {
+          "id": "integrations",
+          "label": "Integrations",
+          "icon": "plug",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Home Assistant",
+              "group": "household.integrations",
+              "scope": "household"
+            },
+            {
+              "label": "Telegram",
+              "group": "household.notifications",
+              "scope": "household"
+            },
+            {
+              "label": "Reference library",
+              "group": "household.reference",
+              "scope": "household"
+            }
+          ],
+          "keywords": [
+            "home assistant",
+            "telegram",
+            "alarm"
+          ]
+        },
+        {
+          "id": "ai",
+          "label": "Engines and AI",
+          "icon": "cpu",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Chat pause",
+              "group": "household.chat_pause",
+              "scope": "household",
+              "tab": "overview"
+            },
+            {
+              "label": "Model per job",
+              "group": "household.ai_models",
+              "scope": "household",
+              "tab": "models"
+            },
+            {
+              "label": "AI settings",
+              "group": "household.ai_advanced",
+              "scope": "household",
+              "tab": "advanced"
+            },
+            {
+              "label": "Engines",
+              "group": "household.ai_runtime",
+              "scope": "household",
+              "tab": "engines"
+            },
+            {
+              "label": "Manage",
+              "tab": "overview",
+              "links": [
+                {
+                  "label": "AI models",
+                  "href": "/models"
+                },
+                {
+                  "label": "Engines",
+                  "href": "/engines"
+                }
+              ]
+            }
+          ],
+          "keywords": [
+            "teen gate",
+            "context",
+            "model"
+          ],
+          "tabs": [
+            {
+              "id": "overview",
+              "label": "Overview"
+            },
+            {
+              "id": "models",
+              "label": "Models"
+            },
+            {
+              "id": "engines",
+              "label": "Engines"
+            },
+            {
+              "id": "advanced",
+              "label": "Advanced"
+            }
+          ],
+          "trail_view": "home.engine_admin"
+        },
+        {
+          "id": "pictures",
+          "label": "Pictures, videos and music",
+          "icon": "camera",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Pictures, videos and music",
+              "group": "household.pictures",
+              "scope": "household"
+            }
+          ],
+          "trail_view": "home.pictures_library",
+          "min_role": "admin",
+          "keywords": [
+            "images",
+            "styles",
+            "lora",
+            "adapters",
+            "generate",
+            "video"
+          ]
+        },
+        {
+          "id": "commands",
+          "label": "Commands",
+          "icon": "workflow",
+          "kind": "view",
+          "view": "home.commands",
+          "min_role": "admin"
+        },
+        {
+          "id": "voices",
+          "label": "Voices",
+          "icon": "volume-2",
+          "kind": "view",
+          "view": "home.voice_catalog",
+          "min_role": "admin"
+        },
+        {
+          "id": "robot",
+          "label": "Devices",
+          "icon": "bot",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Robots",
+              "group": "home.robots",
+              "scope": "household"
+            },
+            {
+              "label": "Robot",
+              "group": "robot.settings",
+              "scope": "household",
+              "needs": [
+                "robot.paired",
+                "robots.enabled"
+              ]
+            }
+          ],
+          "trail_view": "home.devices_admin",
+          "keywords": [
+            "initiative",
+            "greetings",
+            "live view",
+            "alarm"
+          ],
+          "detail": {
+            "param": "id",
+            "view": "home.devices_admin",
+            "tabs": [
+              {
+                "id": "overview",
+                "label": "Overview"
+              },
+              {
+                "id": "behaviour",
+                "label": "Behaviour"
+              },
+              {
+                "id": "access",
+                "label": "Access"
+              }
+            ]
+          }
+        },
+        {
+          "id": "reference-library",
+          "label": "Reference library",
+          "icon": "book",
+          "kind": "view",
+          "view": "home.reference_library",
+          "min_role": "admin"
+        },
+        {
+          "id": "media-library",
+          "label": "Media library",
+          "icon": "film",
+          "kind": "view",
+          "view": "home.media_library",
+          "min_role": "admin",
+          "keywords": [
+            "videos",
+            "music",
+            "podcasts",
+            "shows",
+            "books",
+            "folder",
+            "nas",
+            "add videos",
+            "add music",
+            "library"
+          ]
+        },
+        {
+          "id": "storage",
+          "label": "Storage and backups",
+          "icon": "hard-drive",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Limits",
+              "group": "household.storage",
+              "scope": "household"
+            },
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "Backups",
+                  "href": "/backups"
+                },
+                {
+                  "label": "Storage",
+                  "href": "/storage"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "label": "Maintenance",
+          "icon": "wrench",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "Updates",
+                  "href": "/updates"
+                },
+                {
+                  "label": "Repairs",
+                  "href": "/repairs"
+                },
+                {
+                  "label": "Performance",
+                  "href": "/performance"
+                },
+                {
+                  "label": "Status",
+                  "href": "/status"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "privacy",
+          "label": "Privacy",
+          "icon": "lock",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Sensitive subjects with teen controls",
+              "group": "household.topics",
+              "scope": "household"
+            },
+            {
+              "label": "Manage",
+              "links": [
+                {
+                  "label": "What connects to the internet",
+                  "href": "/privacy"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "developer",
+          "label": "Developer tools",
+          "icon": "terminal",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Media minutes",
+              "group": "media.budget",
+              "scope": "household",
+              "levels": [
+                "expert"
+              ]
+            },
+            {
+              "label": "AI developer settings",
+              "group": "household.ai_developer",
+              "scope": "household",
+              "levels": [
+                "expert"
+              ]
+            }
+          ],
+          "trail_view": "home.routing_stats"
+        },
+        {
+          "id": "network",
+          "label": "Network and access",
+          "icon": "network",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Network",
+              "group": "household.network",
+              "scope": "household",
+              "levels": [
+                "basic",
+                "advanced"
+              ]
+            },
+            {
+              "label": "Port",
+              "group": "household.network_port",
+              "scope": "household",
+              "levels": [
+                "expert"
+              ]
+            }
+          ],
+          "keywords": [
+            "port",
+            "local network",
+            "tailnet",
+            "tailscale"
+          ]
+        },
+        {
+          "id": "coding",
+          "label": "Coding",
+          "icon": "code",
+          "kind": "keys",
+          "min_role": "admin",
+          "cards": [
+            {
+              "label": "Coding",
+              "group": "household.coding",
+              "scope": "household"
+            },
+            {
+              "label": "Who can code",
+              "group": "household.coding_people",
+              "scope": "household"
+            },
+            {
+              "label": "Sharing the computer",
+              "group": "household.coding_limits",
+              "scope": "household"
+            }
+          ]
+        }
+      ],
+      "scope": "household"
+    },
+    {
+      "id": "chat",
+      "title": "Chat settings",
+      "app": "/chat",
+      "audience": {
+        "min_role": "guest"
+      },
+      "groups": [
+        {
+          "label": "Chat",
+          "sections": [
+            "general",
+            "personalization",
+            "skills",
+            "shortcuts"
+          ]
+        },
+        {
+          "label": "Related",
+          "sections": [
+            "voice",
+            "notifications",
+            "memories",
+            "parental-controls",
+            "household"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "general",
+          "label": "General",
+          "icon": "settings",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Chat",
+              "group": "person.chat",
+              "scope": "person",
+              "bands": [
+                "teen",
+                "adult"
+              ]
+            },
+            {
+              "label": "Search",
+              "group": "person.search",
+              "scope": "person"
+            }
+          ],
+          "keywords": [
+            "photos",
+            "pictures",
+            "safe search",
+            "reply stats"
+          ]
+        },
+        {
+          "id": "personalization",
+          "label": "Personalization",
+          "icon": "user-round",
+          "kind": "keys",
+          "cards": [
+            {
+              "label": "Personality",
+              "group": "person.persona",
+              "scope": "person"
+            },
+            {
+              "label": "AI companions",
+              "group": "person.companions",
+              "scope": "person"
+            }
+          ],
+          "keywords": [
+            "companion",
+            "persona"
+          ]
+        },
+        {
+          "id": "skills",
+          "label": "Skills",
+          "icon": "sparkles",
+          "kind": "view",
+          "view": "chat.skills",
+          "bands": [
+            "teen",
+            "adult"
+          ]
+        },
+        {
+          "id": "shortcuts",
+          "label": "Keyboard shortcuts",
+          "icon": "keyboard",
+          "kind": "view",
+          "view": "chat.shortcuts"
+        },
+        {
+          "id": "voice",
+          "label": "Voice",
+          "icon": "mic",
+          "kind": "link",
+          "href": "/settings/account/voice"
+        },
+        {
+          "id": "notifications",
+          "label": "Notifications",
+          "icon": "bell",
+          "kind": "link",
+          "href": "/settings/account/notifications"
+        },
+        {
+          "id": "memories",
+          "label": "Memories",
+          "icon": "brain",
+          "kind": "link",
+          "href": "/people/{self}?tab=memories"
+        },
+        {
+          "id": "parental-controls",
+          "label": "Parental controls",
+          "icon": "shield-check",
+          "kind": "link",
+          "href": "/people",
+          "min_role": "adult",
+          "bands": [
+            "adult"
+          ],
+          "needs": [
+            "household.has_child"
+          ]
+        },
+        {
+          "id": "household",
+          "label": "Household chat",
+          "icon": "house",
+          "kind": "link",
+          "href": "/settings/home/ai",
+          "min_role": "admin"
+        }
+      ],
+      "scope": "person"
+    }
+  ],
+  "not_placed": [
+    {
+      "scope": "household",
+      "group": "household.voice",
+      "reason": "Home's default voice is chosen on the Voices page in Home settings, next to the voices it can pick from (a view, not a settings card)."
+    },
+    {
+      "scope": "person",
+      "group": "person.topics",
+      "reason": "A parent sets a child's sensitive-subject levels on that child's Family page; a settings area only reads and writes the viewer's own scope, never another person's, and a teen has no person-level topic key at all."
+    },
+    {
+      "scope": "person",
+      "group": "person.allowance",
+      "reason": "A parent sets a child's daily allowances on that child's Family page; a settings area only reads and writes the viewer's own scope, never another person's."
+    },
+    {
+      "scope": "person",
+      "group": "person.storage",
+      "reason": "An admin sets a person's quota from Users and Storage; it is never the viewer's own to change, and no settings route takes a person id."
+    },
+    {
+      "scope": "person",
+      "group": "person.coding",
+      "reason": "An admin sets coding grants and limits on the person's Family page. The account view shows what the grant allows."
+    },
+    {
+      "scope": "person",
+      "group": "profile.appearance.internal",
+      "reason": "Pinned app order and checklist dismissal are internal UI state and are not user-facing settings."
+    }
+  ],
+  "device_cards": [
+    {
+      "device_kind": "robot",
+      "label": "This robot",
+      "group": "robot.hello",
+      "scope": "device",
+      "min_role": "admin"
+    }
+  ]
+}

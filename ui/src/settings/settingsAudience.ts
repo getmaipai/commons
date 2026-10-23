@@ -55,16 +55,22 @@ export interface Section {
   min_role?: Role;
   bands?: Band[];
   needs?: string[];
-  tabs?: { id: string; label: string }[];
+  tabs?: (Gated & { id: string; label: string; view?: string })[];
   view_tab?: string;
-  detail?: { param: string; view: string; tabs?: { id: string; label: string }[] };
+  detail?: { param: string; view: string; tabs?: SettingsTab[] };
 }
 export type Card = AreaCard;
-export type SettingsTab = { id: string; label: string };
+export type SettingsTab = Gated & { id: string; label: string; view?: string };
 
 /** Tabs declared for a section, in display order. */
 export function sectionTabs(section: Section): SettingsTab[] {
   return section.tabs ?? [];
+}
+
+/** Tabs a viewer may open. A section's audience is applied separately and
+ * tab audiences can only narrow that page. */
+export function visibleTabs(section: Section, viewer: SettingsViewer): SettingsTab[] {
+  return sectionTabs(section).filter((tab) => audienceAllows(viewer, tab));
 }
 
 /** Keep a requested tab when valid, otherwise use the first declared tab. */
@@ -156,6 +162,8 @@ export function visibleCards(section: Section, viewer: SettingsViewer, registry?
 
 export function sectionVisible(section: Section, viewer: SettingsViewer, registry?: readonly SettingsKey[], honouredBy?: string): boolean {
   if (!audienceAllows(viewer, section)) return false;
+  // A tabbed page remains visible if at least one of its tabs is visible.
+  if (section.tabs?.length && visibleTabs(section, viewer).length === 0) return false;
   if (section.kind !== "keys") return true;
   // A keys section is hidden when it has no visible card and no view of its own.
   return visibleCards(section, viewer, registry, honouredBy).length > 0 || Boolean(section.lead_view || section.trail_view);
