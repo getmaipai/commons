@@ -4584,6 +4584,23 @@
     ]
   },
   {
+    "key": "coding.api.tailnet_nodes",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Devices allowed over Tailscale Serve",
+    "help": "Names of your own devices, separated by commas, that may use coding through Tailscale Serve. Empty means none.",
+    "copy": {
+      "does": "Lets only the devices you name use coding through your Tailscale."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.coding",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "coding.adults_by_default",
     "scope": "household",
     "selector": "boolean",

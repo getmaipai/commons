@@ -1,3 +1,7 @@
+## [spec-v0.1.222] - 2026-10-23
+
+- Add the household setting `coding.api.tailnet_nodes` (text, advanced, in the coding group): names of the household's own devices allowed to use coding through Tailscale Serve, separated by commas; empty means none. Honoured by Home. Additive.
+
 ## [spec-v0.1.221] - 2026-10-23
 
 - Settings: the household page is labelled "Household and people" (it was "Household", the same name as its first card, which made the page content region and the card region share a landmark name; axe landmark-unique). Label only.
