@@ -30,6 +30,7 @@ export interface AreaMatrix {
 export interface AreaCard {
   label: string;
   group?: string;
+  tab?: string;
   scope?: Scope;
   levels?: Level[];
   links?: AreaLink[];
@@ -54,8 +55,27 @@ export interface Section {
   min_role?: Role;
   bands?: Band[];
   needs?: string[];
+  tabs?: { id: string; label: string }[];
+  view_tab?: string;
+  detail?: { param: string; view: string; tabs?: { id: string; label: string }[] };
 }
 export type Card = AreaCard;
+export type SettingsTab = { id: string; label: string };
+
+/** Tabs declared for a section, in display order. */
+export function sectionTabs(section: Section): SettingsTab[] {
+  return section.tabs ?? [];
+}
+
+/** Keep a requested tab when valid, otherwise use the first declared tab. */
+export function resolveTab(tabs: readonly SettingsTab[], requestedId?: string): string | undefined {
+  return tabs.some((tab) => tab.id === requestedId) ? requestedId : tabs[0]?.id;
+}
+
+/** Untabbed summary cards remain visible on every tab. */
+export function cardsInTab<T extends { tab?: string }>(cards: readonly T[], activeTab?: string): T[] {
+  return activeTab === undefined ? [...cards] : cards.filter((card) => card.tab === undefined || card.tab === activeTab);
+}
 /** A settings area as the kit reads it: the spec's `SettingsArea` with its
  * sections typed. */
 export type SettingsAreaDef = Omit<SettingsArea, "sections"> & { sections: Section[] };

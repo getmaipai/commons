@@ -9,8 +9,9 @@ import { cn } from "../dashboard/lib/utils";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "../ui/breadcrumb";
-import { resolveHref, visibleGroups, type Section, type SettingsAreaDef, type SettingsViewer } from "./settingsAudience";
+import { resolveHref, visibleGroups, type Section, type SettingsAreaDef, type SettingsViewer, type SettingsTab } from "./settingsAudience";
 
 const ArrowUpRight = getIcon("arrow-up-right");
 const ChevronLeft = getIcon("chevron-left");
@@ -71,6 +72,9 @@ export interface SettingsShellProps {
   /** Controlled desktop column visibility; phone drill-in ignores it. */
   collapsible?: SettingsShellCollapsible;
   labels?: SettingsShellLabels;
+  tabs?: SettingsTab[];
+  tab?: string;
+  onTabChange?: (id: string) => void;
   sides?: { value: string; options: { id: string; label: string }[]; label: string; onChange: (id: string) => void };
   trail?: { label: string; href?: string }[];
   /** The element the content pane renders as. "main" (default) is the
@@ -111,6 +115,9 @@ export function SettingsShell({
   layout = "default",
   collapsible,
   labels,
+  tabs,
+  tab,
+  onTabChange,
   sides,
   trail,
   contentAs = "main",
@@ -237,6 +244,15 @@ export function SettingsShell({
             {collapsible?.collapsed && !peeking ? <SettingsColumnToggle buttonRef={collapsible.headerToggleRef} collapsed onToggle={collapsible.onToggle} /> : null}
             <h1 className="text-[length:var(--settings-page-title-size)] leading-9 font-semibold">{title}</h1>
           </div>
+          {tabs && tabs.length >= 2 ? (
+            <div data-slot="settings-tabs-scroll" className="-mx-6 mt-2 overflow-x-auto px-6 lg:overflow-visible">
+              <Tabs defaultValue={tabs[0]!.id} value={tab} onValueChange={(id) => { if (id) onTabChange?.(id); }}>
+                <TabsList variant="line" aria-label={`${title} sections`} className="min-w-max">
+                  {tabs.map((item) => <TabsTrigger key={item.id} value={item.id} className="min-h-12">{item.label}</TabsTrigger>)}
+                </TabsList>
+              </Tabs>
+            </div>
+          ) : null}
           </div>
           <SettingsHeadingLevelContext.Provider value={2}>{children}</SettingsHeadingLevelContext.Provider>
         </div>

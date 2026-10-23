@@ -3,8 +3,11 @@ import {
   areaAllows,
   audienceAllows,
   cardKeys,
+  cardsInTab,
   firstVisibleSection,
   resolveHref,
+  resolveTab,
+  sectionTabs,
   roleAllows,
   visibleCards,
   visibleGroups,
@@ -31,6 +34,24 @@ describe("role, band and needs", () => {
   test("{self} resolves to the viewer's own id and nothing else", () => {
     expect(resolveHref("/people/{self}?tab=memories", ADULT)).toBe("/people/p1?tab=memories");
     expect(resolveHref("/voices", ADULT)).toBe("/voices");
+  });
+});
+
+describe("section tabs and tabbed cards", () => {
+  test("returns declared tabs and resolves unknown requests to the first", () => {
+    const tabs = [{ id: "one", label: "One" }, { id: "two", label: "Two" }];
+    expect(sectionTabs({ id: "s", label: "S", icon: "settings", kind: "keys", tabs })).toEqual(tabs);
+    expect(sectionTabs({ id: "s", label: "S", icon: "settings", kind: "keys" })).toEqual([]);
+    expect(resolveTab(tabs, "two")).toBe("two");
+    expect(resolveTab(tabs, "missing")).toBe("one");
+    expect(resolveTab([], "missing")).toBeUndefined();
+  });
+
+  test("keeps summary cards on every tab and all cards when tab is undefined", () => {
+    const cards = [{ label: "Summary" }, { label: "One", tab: "one" }, { label: "Two", tab: "two" }];
+    expect(cardsInTab(cards, "one").map((card) => card.label)).toEqual(["Summary", "One"]);
+    expect(cardsInTab(cards, "two").map((card) => card.label)).toEqual(["Summary", "Two"]);
+    expect(cardsInTab(cards).map((card) => card.label)).toEqual(["Summary", "One", "Two"]);
   });
 });
 

@@ -1513,3 +1513,11 @@ firmlink into the Data volume, so `realpath` keeps the short form while
 `df` reports the mount at `/System/Volumes/Data`; `volumeIdentity` handles
 that and has a regression test.
 
+## ui-v0.5.314: settings page tabs (SETTINGS-UX-03b)
+
+`SettingsShell` accepts optional page tabs and draws the kit's line-style
+tab list in its sticky content header. Hosts control the selected tab and
+filter cards with the pure helpers in `settingsAudience.ts`; unassigned
+cards remain visible as a summary above each tab. Without tab props, the
+shell keeps its existing rendering.
+

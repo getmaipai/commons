@@ -152,6 +152,33 @@ describe("SettingsShell navigation", () => {
 });
 
 describe("SettingsShell search and title", () => {
+  test("draws accessible line tabs and reports selected tab changes", () => {
+    const onTabChange = mock((_id: string) => {});
+    const tabs = [{ id: "overview", label: "Overview" }, { id: "models", label: "Models" }];
+    const { view } = shell({ tabs, tab: "overview", onTabChange });
+    const list = view.getByRole("tablist", { name: "General sections" });
+    expect(list.getAttribute("data-variant")).toBe("line");
+    expect(view.getByRole("tab", { name: "Overview" }).getAttribute("aria-selected")).toBe("true");
+    fireEvent.mouseDown(view.getByRole("tab", { name: "Models" }), { button: 0, ctrlKey: false });
+    expect(onTabChange).toHaveBeenCalledWith("models");
+    expect(view.container.querySelector('[data-slot="settings-tabs-scroll"]')?.className).toContain("overflow-x-auto");
+    expect(view.getByRole("tab", { name: "Overview" }).className).toContain("min-h-12");
+  });
+
+  test("does not draw tabs for absent or single tab props", () => {
+    const absent = shell().view;
+    expect(absent.container.querySelector('[data-slot="settings-tabs-scroll"]')).toBeNull();
+    cleanup();
+    const single = shell({ tabs: [{ id: "only", label: "Only" }] }).view;
+    expect(single.container.querySelector('[data-slot="settings-tabs-scroll"]')).toBeNull();
+  });
+
+  test("props absent preserve the existing content header without a tabs wrapper", () => {
+    const { view } = shell();
+    expect(view.container.querySelector('[data-slot="settings-tabs-scroll"]')).toBeNull();
+    expect(view.getByRole("heading", { level: 1 }).textContent).toBe("General");
+  });
+
   test("typing reports the query; Escape clears it", () => {
     const { view, onSearchChange } = shell({ searchQuery: "photo" });
     const box = view.getByRole("searchbox", { name: "Search" });

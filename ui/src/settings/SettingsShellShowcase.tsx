@@ -31,6 +31,7 @@ const VIEWER: SettingsViewer = { role: "adult", band: "adult" };
 export function SettingsShellShowcase() {
   const [active, setActive] = useState("general");
   const [query, setQuery] = useState("");
+  const [tab, setTab] = useState("overview");
   return (
     <div className="h-[640px] overflow-hidden rounded-xl border border-settings-column-divider" style={{ "--settings-shell-min-height": "0px" } as CSSProperties}>
       <SettingsShell
@@ -44,6 +45,9 @@ export function SettingsShellShowcase() {
         onBack={() => setActive("")}
         sides={{ value: "mine", label: "Settings scope", options: [{ id: "mine", label: "Mine" }, { id: "household", label: "Household" }], onChange: () => {} }}
         trail={[{ label: "Settings", href: "/settings" }, { label: "Chat" }, { label: "General" }]}
+        tabs={[{ id: "overview", label: "Overview" }, { id: "models", label: "Models" }, { id: "advanced", label: "Advanced" }]}
+        tab={tab}
+        onTabChange={setTab}
       >
         <SettingsShowcase />
       </SettingsShell>
