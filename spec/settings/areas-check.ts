@@ -54,7 +54,8 @@ export interface SettingsArea {
   title: string;
   app?: string;
   audience: { min_role: Role };
-  scope: "household" | "person";
+  /** Required in the central areas file (checkAreas); optional for a package's own area, which reads as person. */
+  scope?: "household" | "person";
   groups: { label: string; sections: string[] }[];
   sections: AreaSection[];
 }
@@ -113,6 +114,7 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
   for (const area of file.areas) {
     if (areaIds.has(area.id)) errors.push(`duplicate area "${area.id}"`);
     areaIds.add(area.id);
+    if (!area.scope) errors.push(`area "${area.id}" must declare scope household or person`);
     if (RESERVED_AREA_IDS.includes(area.id)) errors.push(`area id "${area.id}" is reserved`);
     if (area.scope === "household" && rank(area.audience.min_role) > rank("admin")) {
       errors.push(`${area.id}: household area min_role ${area.audience.min_role} is broader than admin`);

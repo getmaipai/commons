@@ -1191,7 +1191,8 @@ export const PackageManifest = z
               .enum(["household", "person"])
               .describe(
                 "The settings governed by this area: household settings are admin-only; person settings belong to the viewer.",
-              ),
+              )
+              .optional(),
             /**The nav entry that owns this area, so the app's header gets a gear. Absent for Account and Home settings.*/
             app: z
               .string()

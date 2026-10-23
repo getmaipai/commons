@@ -331,8 +331,8 @@ class SettingsArea(BaseModel):
     title: constr(min_length=1, max_length=40) = Field(
         ..., description="The settings column's heading."
     )
-    scope: Literal['household', 'person'] = Field(
-        ...,
+    scope: Literal['household', 'person'] | None = Field(
+        None,
         description='The settings governed by this area: household settings are admin-only; person settings belong to the viewer.',
     )
     app: constr(pattern=r'^/[A-Za-z0-9/_-]*$') | None = Field(
