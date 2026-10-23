@@ -17,7 +17,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -76,6 +76,13 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     if (isObject(node.row_action)) checkAction(node.row_action.action, packageId, `${where} list.row_action`, out);
     if (isObject(node.row_toggle)) checkAction(node.row_toggle.action, packageId, `${where} list.row_toggle`, out);
     if (typeof node.item_media_field === "string" && /^[a-z]+:|\/\//i.test(node.item_media_field)) out.push(`${where} list: item_media_field must be a field path, not an address`);
+  }
+  if (type === "creation_header") {
+    checkBinding(node.bind, `${where} creation_header`, data, "list", out);
+    if (node.candidates_bind !== undefined) checkBinding(node.candidates_bind, `${where} creation_header.candidates_bind`, data, "list", out);
+    if (isObject(node.share_change)) {
+      for (const key of ["add", "remove", "make_private"]) checkAction(node.share_change[key], packageId, `${where} creation_header.share_change.${key}`, out);
+    }
   }
   // MEDIA-PLAYER-01: the media nodes draw the package's own rows, and are the places a package page may hand an item to
   // the host's player (`play`): a shelf tile, a billboard button, the player's next item.

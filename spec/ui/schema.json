@@ -25,6 +25,7 @@
     { "$ref": "#/$defs/answer_blocks" },
     { "$ref": "#/$defs/picker" },
     { "$ref": "#/$defs/search" },
+    { "$ref": "#/$defs/creation_header" },
     { "$ref": "#/$defs/tabs" }
   ],
   "$defs": {
@@ -133,6 +134,67 @@
       "minProperties": 1,
       "maxProperties": 1,
       "description": "Exactly one of the five declared actions (6.2)."
+    },
+    "share_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["add", "remove", "make_private"],
+      "description": "The host's calls for changing who can see the created item. Each call receives the bound creation row, with person_id added for add and remove.",
+      "properties": {
+        "add": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
+        "remove": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
+        "make_private": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] }
+      }
+    },
+    "creation_header_data": {
+      "type": "object",
+      "description": "The row returned by a creation_header bind. Display fields may be null or omitted; the kit supplies plain fallback labels. creator.href is a host-owned router destination and link_label optionally replaces the default accessible name.",
+      "properties": {
+        "title": { "type": ["string", "null"] },
+        "creator": {
+          "type": ["object", "null"],
+          "properties": {
+            "name": { "type": ["string", "null"] },
+            "avatar_url": { "type": ["string", "null"] },
+            "label": { "type": ["string", "null"], "description": "Plain creator fallback, usually Made at home." },
+            "href": { "type": ["string", "null"], "description": "Optional host router destination. When present, the avatar and name are one link." },
+            "link_label": { "type": ["string", "null"], "description": "Optional accessible name for the creator link; defaults to '<name>, open profile'." }
+          }
+        },
+        "made_at": { "type": ["string", "null"], "format": "date-time" },
+        "description": { "type": ["string", "null"] },
+        "visibility": {
+          "type": ["object", "null"],
+          "properties": {
+            "mode": { "type": "string", "enum": ["private", "shared"] },
+            "people": { "type": "array", "items": { "$ref": "#/$defs/creation_person" } },
+            "can_manage": { "type": "boolean" }
+          }
+        },
+        "candidates": { "type": "array", "items": { "$ref": "#/$defs/creation_person" }, "description": "Optional list used by the share panel when no separate candidates_bind is set." }
+      }
+    },
+    "creation_person": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": ["string", "null"] },
+        "avatar_url": { "type": ["string", "null"] }
+      }
+    },
+    "creation_header": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "share_change"],
+      "description": "The shared creation identity and visibility pattern. `bind` returns one `creation_header_data` row (or an array whose first row is used). `candidates_bind`, when present, returns candidate people; otherwise row.candidates is used. A creator href is a host-owned route; when present the avatar and name form one router link. Missing names fall back to plain labels; a raw template token is never shown.",
+      "properties": {
+        "type": { "const": "creation_header" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "share_change": { "$ref": "#/$defs/share_change" },
+        "candidates_bind": { "$ref": "#/$defs/binding", "description": "Optional binding returning candidate people [{id, name, avatar_url?}] for the share panel." },
+        "heading_level": { "type": "string", "enum": ["h1", "h2"], "default": "h1" }
+      }
     },
     "page": {
       "type": "object",

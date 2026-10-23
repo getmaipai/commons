@@ -30,6 +30,8 @@ import { Tabs as PillTabs, TabsList as PillTabsList, TabsTrigger as PillTabsTrig
 import { getIcon } from "@/kit/icons";
 import { locationBlockedHelp } from "@/kit/geolocationHelp";
 import { AnswerBlockView } from "@/kit/elements/answer-block";
+import { CreationHeader } from "@/kit/elements/creation-header";
+import { SharePanel } from "@/kit/elements/share-panel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { PageSidebarContext, PageStateContext } from "@/kit/schema/packageScope";
 import { MediaHostContext, type CastTarget, type MediaHost } from "@/kit/schema/mediaHost";
@@ -61,6 +63,7 @@ import type {
   PickerNode,
   SearchNode,
   TabsNode,
+  CreationHeaderNode,
   DataState,
 } from "@/kit/schema/types";
 import type { WidgetData, WidgetDescriptor } from "@/kit/widgets";
@@ -106,6 +109,47 @@ function actionLabel(action: EmptyStateNode["action"]): string {
 
 function ProgressNodeView({ node }: { node: ProgressNode }) {
   return <Progress mode={node.mode} />;
+}
+
+function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; state: Row }) {
+  const data = useBinding<Row | Row[]>(node.bind, state);
+  const candidatesQuery = useBinding<Row | Row[]>(node.candidates_bind ?? node.bind, state);
+  const { dispatch } = useDispatchAction();
+  const [open, setOpen] = useState(false);
+  const row = Array.isArray(data.data) ? data.data[0] : data.data;
+  if (!row) return null;
+  const creator = row.creator && typeof row.creator === "object" ? row.creator as Row : {};
+  const rawVisibility = row.visibility && typeof row.visibility === "object" ? row.visibility as Row : {};
+  const toPerson = (person: unknown) => {
+    if (!person || typeof person !== "object") return null;
+    const value = person as Row;
+    if (typeof value.id !== "string") return null;
+    const rawName = typeof value.name === "string" ? value.name.trim() : "";
+    const name = !rawName || /\{[^{}]+\}/.test(rawName) ? "Someone" : rawName;
+    const avatarUrl = typeof value.avatar_url === "string" && !/\{[^{}]+\}/.test(value.avatar_url) ? value.avatar_url : undefined;
+    return { id: value.id, name, avatarUrl };
+  };
+  const people = Array.isArray(rawVisibility.people) ? rawVisibility.people.map(toPerson).filter((person): person is NonNullable<typeof person> => person !== null) : [];
+  const candidatesData = Array.isArray(candidatesQuery.data) ? candidatesQuery.data[0] : candidatesQuery.data;
+  const rawCandidates = Array.isArray(candidatesQuery.data) ? candidatesQuery.data : Array.isArray(candidatesData?.candidates) ? candidatesData.candidates : Array.isArray(candidatesData?.rows) ? candidatesData.rows : people;
+  const candidates = rawCandidates.map(toPerson).filter((person): person is NonNullable<typeof person> => person !== null);
+  const mode = rawVisibility.mode === "shared" ? "shared" : "private";
+  const base = { ...row };
+  const fire = (action: Action, personId?: string) => dispatch(action, [{ ...base, ...(personId ? { person_id: personId } : {}) }]);
+  return (
+    <>
+      <CreationHeader
+        title={typeof row.title === "string" ? row.title : null}
+        creator={{ name: typeof creator.name === "string" ? creator.name : null, avatarUrl: typeof creator.avatar_url === "string" && !/\{[^{}]+\}/.test(creator.avatar_url) ? creator.avatar_url : null, label: typeof creator.label === "string" ? creator.label : null, href: typeof creator.href === "string" ? creator.href : null, linkLabel: typeof creator.link_label === "string" ? creator.link_label : null }}
+        madeAt={typeof row.made_at === "string" ? row.made_at : null}
+        description={typeof row.description === "string" ? row.description : null}
+        headingLevel={node.heading_level}
+        visibility={{ mode, people, canManage: rawVisibility.can_manage === true, onOpen: () => setOpen(true) }}
+      />
+      <SharePanel open={open} onOpenChange={setOpen} people={people} candidates={candidates} canManage={rawVisibility.can_manage === true}
+        onAdd={(id) => fire(node.share_change.add, id)} onRemove={(id) => fire(node.share_change.remove, id)} onMakePrivate={() => fire(node.share_change.make_private)} />
+    </>
+  );
 }
 
 function SectionNodeView({ node, state }: { node: SectionNode; state: Row }) {
@@ -1382,6 +1426,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <EmptyStateNodeView node={node} />;
     case "progress":
       return <ProgressNodeView node={node} />;
+    case "creation_header":
+      return <CreationHeaderNodeView node={node} state={state} />;
     case "message_thread":
       return <ExternallyMountedNodeView label="message_thread" />;
     case "settings_editor":

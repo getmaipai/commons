@@ -104,6 +104,21 @@ describe("checkAppPackage (the cross-file lint)", () => {
     const list = { type: "page", id: "x", title: "X", body: [{ type: "card_grid", bind: { source: "route", path: "/api/people" }, item_key_field: "id", item_label_field: "n" }] };
     expect(checkAppPackage("weather", contributes, (m) => (m === "weather" ? list : load(m))).join("\n")).toContain('node type "card_grid" is not allowed');
   });
+  test("CREATION-HEADER-01 allows package-owned rows and scoped share calls", () => {
+    const page = { type: "page", id: "x", title: "X", body: [{
+      type: "creation_header", bind: { source: "package", path: "created" },
+      candidates_bind: { source: "package", path: "created" },
+      share_change: {
+        add: { call: { target: "/api/plugins/weather/created/share", args: { person_id: "{person_id}" } } },
+        remove: { call: { target: "/api/plugins/weather/created/share", method: "DELETE", args: { person_id: "{person_id}" } } },
+        make_private: { call: { target: "/api/plugins/weather/created/private" } },
+      },
+    }] };
+    const createdContributes = { ...contributes, data: [...contributes.data!, { id: "created", surface: "weather", rows: "list" }] };
+    expect(checkAppPackage("weather", createdContributes, (module) => module === "weather" ? page : load(module))).toEqual([]);
+    const outside = { ...page, body: [{ ...page.body[0]!, share_change: { ...page.body[0]!.share_change, make_private: { call: { target: "/api/created/private" } } } }] };
+    expect(checkAppPackage("weather", createdContributes, (module) => module === "weather" ? outside : load(module)).join("\n")).toContain("must stay under /api/plugins/weather/");
+  });
   test("an action must stay under the package's own prefixes", () => {
     const action = { type: "page", id: "x", title: "X", body: [{ type: "empty_state", icon: "x", text: "t", action: { call: { target: "/api/people/1", method: "DELETE" } } }] };
     expect(checkAppPackage("weather", contributes, (m) => (m === "weather" ? action : load(m))).join("\n")).toContain("must stay under /api/plugins/weather/");

@@ -127,6 +127,32 @@ card states, stages, cover fallback, edit modes, actions and a 390 px layout.
 
 The spec adds additive `Source` citation kinds and the optional snapshot date, licence, local proxy path and publisher count fields; `Feed`, `NewsItem` and `NewsStory`; and optional `model_cutoff` on `ModelCapabilities`. The settings registry gains the eight knowledge-search keys, generated using the real Home registry generator. The capability vocabulary carries processor rows for `extract_article`, `cluster_story` and `fold_wire_copy`, each with `learned: false`. TS and Python validate fixtures for the new records and attribution fields.
 
+## CREATION-HEADER-01: shared identity and visibility pattern
+
+`ui/src/elements/creation-header.tsx`, `visibility-chip.tsx` and
+`share-panel.tsx` are the reusable creation pattern for things a person
+makes. The header shows a title, creator or “Made at home” identity, a
+formatted made-on date, an optional three-line description, and the
+visibility button. Shared items show at most three faces and a `+N`
+count; private items show a lock. The panel lists current access, lets an
+owner or admin add or remove people from the host's candidate list, and
+offers “Make private”. Viewers get a read-only list. Hosts provide data
+and callbacks; the kit fetches no sharing data itself.
+
+The creator may include `href` and optional `link_label` in its bound row.
+The kit wraps the avatar and name in one router `Link`, so the host's router
+handles navigation and the kit never owns a profile path. Without `href`,
+the identity stays plain text. `creation_header` is allowed on package pages;
+the package supplies its own bound row and three package-scoped `call` actions.
+
+`spec/ui/schema.json` declares the additive `creation_header` node and
+its `share_change` call shape first. `ui/src/schema/types.ts` mirrors
+that declaration, and `NodeRenderer` binds the item plus optional
+candidate rows and dispatches the host's three calls. Missing or
+template-shaped display values fall back to plain labels. Home records
+its design-ledger row in its own `docs/design/UI-DECISIONS.md`, since
+that ledger belongs to the consumer.
+
 # shared: design record
 
 ## spec-v0.1.70: household internet probe settings

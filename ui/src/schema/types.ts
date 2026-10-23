@@ -75,6 +75,40 @@ export const ProgressNodeSchema = z.object({
 });
 export type ProgressNode = z.infer<typeof ProgressNodeSchema>;
 
+/** The three creation sharing operations are host-owned calls, never navigation or another action kind. */
+const ShareCallActionSchema = z.object({
+  call: z.object({ target: z.string(), method: z.enum(["POST", "PATCH", "DELETE"]).default("POST"), args: z.record(z.string(), z.unknown()).optional() }),
+}).strict();
+export const ShareChangeSchema = z.object({
+  add: ShareCallActionSchema,
+  remove: ShareCallActionSchema,
+  make_private: ShareCallActionSchema,
+});
+export type ShareChange = z.infer<typeof ShareChangeSchema>;
+
+/** Shape returned by a `creation_header` binding. Null or missing display fields use plain fallbacks. */
+export interface CreationHeaderData {
+  title?: string | null;
+  creator?: { name?: string | null; avatar_url?: string | null; label?: string | null; href?: string | null; link_label?: string | null } | null;
+  made_at?: string | null;
+  description?: string | null;
+  visibility?: {
+    mode?: "private" | "shared";
+    people?: Array<{ id: string; name?: string | null; avatar_url?: string | null }>;
+    can_manage?: boolean;
+  } | null;
+  candidates?: Array<{ id: string; name?: string | null; avatar_url?: string | null }>;
+}
+
+export const CreationHeaderNodeSchema = z.object({
+  type: z.literal("creation_header"),
+  bind: BindingSchema,
+  share_change: ShareChangeSchema,
+  candidates_bind: BindingSchema.optional(),
+  heading_level: z.enum(["h1", "h2"]).default("h1"),
+});
+export type CreationHeaderNode = z.infer<typeof CreationHeaderNodeSchema>;
+
 export const FormNodeSchema = z.object({
   type: z.literal("form"),
   fields: z
@@ -430,6 +464,7 @@ export type UiNode =
   | FormNode
   | EmptyStateNode
   | ProgressNode
+  | CreationHeaderNode
   | ListNode
   | CardGridNode
   | MediaShelfNode
@@ -454,6 +489,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     FormNodeSchema,
     EmptyStateNodeSchema,
     ProgressNodeSchema,
+    CreationHeaderNodeSchema,
     ListNodeSchema,
     CardGridNodeSchema,
     MediaShelfNodeSchema,
@@ -481,6 +517,7 @@ export const NODE_TYPES = [
   "form",
   "empty_state",
   "progress",
+  "creation_header",
   "list",
   "card_grid",
   "media_shelf",

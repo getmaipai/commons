@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Switch } from "../ui/switch";
 import { Avatar } from "../primitives/Avatar";
+import { Avatar as AvatarRoot, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Select } from "../primitives/Select";
 
 /**
@@ -38,6 +39,8 @@ export interface ShareRow {
   role: string;
   /** `Person.avatar_seed`, as the kit `Avatar` takes it. */
   avatarSeed?: string | null;
+  /** A picture URL, when the host has one. */
+  avatarUrl?: string | null;
   /** A second line under the name. */
   description?: ReactNode;
   /** Given, this row cannot be changed and these words show under the name, as text (never only a tooltip). */
@@ -142,6 +145,9 @@ function Face({ row, household }: { row: ShareRow; household: boolean }) {
         <UsersIcon className="size-5" />
       </span>
     );
+  }
+  if (row.avatarUrl) {
+    return <AvatarRoot className="size-10 shrink-0 text-base"><AvatarImage src={row.avatarUrl} alt={row.name} /><AvatarFallback>{row.name.trim().slice(0, 1).toUpperCase() || "?"}</AvatarFallback></AvatarRoot>;
   }
   return <Avatar name={row.name} seed={row.avatarSeed} className="size-10 shrink-0 text-base" />;
 }

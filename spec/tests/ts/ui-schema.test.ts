@@ -32,6 +32,20 @@ describe("UI schema", () => {
     for (const invalid of [{ format: "html" }, { theme: "blue" }, { font_size: -1 }, { font_size: 7 }, { font_size: 1.5 }, { fields: { unknown: "x" } }, { fields: { locator: "" } }, { locator: { kind: "page", page: 1 } }]) expect(validate({ ...reader, ...invalid })).toBe(false);
     expect(validate({ type: "reader" })).toBe(false);
   });
+
+  test("CREATION-HEADER-01: creation_header has bound identity, optional profile href, and call-only sharing actions", () => {
+    const node = {
+      type: "creation_header",
+      bind: { source: "package", path: "created" },
+      share_change: {
+        add: { call: { target: "/api/plugins/media/created/share", args: { person_id: "{person_id}" } } },
+        remove: { call: { target: "/api/plugins/media/created/share", method: "DELETE", args: { person_id: "{person_id}" } } },
+        make_private: { call: { target: "/api/plugins/media/created/private" } },
+      },
+    };
+    expect(validate({ type: "page", id: "detail", title: "Detail", body: [node] })).toBe(true);
+    expect(validate({ type: "page", id: "detail", title: "Detail", body: [{ ...node, share_change: { ...node.share_change, add: { navigate: { to: "/apps/media" } } } }] })).toBe(false);
+  });
   test("at least one page exists to validate", () => {
     expect(pageFiles.length).toBeGreaterThan(0);
   });
