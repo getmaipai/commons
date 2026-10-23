@@ -1,3 +1,7 @@
+## [spec-v0.1.221] - 2026-10-23
+
+- Settings: the household page is labelled "Household and people" (it was "Household", the same name as its first card, which made the page content region and the card region share a landmark name; axe landmark-unique). Label only.
+
 ## [spec-v0.1.220] - 2026-10-23
 
 - Owner decision 2026-10-23: one central Settings area replaces the unreleased home/account split and removed chat area. The single column groups seven personal pages under Yours and nine household pages under The home. Sections carry required person/household scope; household sections are admin or narrower. Earlier two-area structure never shipped. Legacy routes map into Settings; Chat link rows retain replacement reasons.

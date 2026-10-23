@@ -336,7 +336,7 @@
         },
         {
           "id": "household",
-          "label": "Household",
+          "label": "Household and people",
           "icon": "settings",
           "kind": "keys",
           "cards": [
