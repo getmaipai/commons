@@ -29,8 +29,10 @@ describe("ArticleView", () => {
     expect(article.contains(provider)).toBe(true);
     expect(column.contains(toolbar)).toBe(false);
     expect(column.contains(provider)).toBe(false);
-    expect(column.className).toContain("max-w-[1100px]");
-    expect(container.querySelector('[data-slot="article-body"]')!.className).toContain("max-w-[72ch]");
+    expect(column.className).toContain("max-w-[72ch]");
+    expect(column.className).toContain("mx-auto");
+    expect(container.querySelector('[data-slot="article-body"]')!.className).not.toContain("max-w-[72ch]");
+    expect(container.querySelector('[data-slot="article-body"]')!.className).not.toContain("mx-auto");
     expect(article.className).not.toContain("max-w-prose");
     expect(toolbar.className).toContain("sticky");
     expect(provider.className).not.toContain("sticky");
@@ -70,9 +72,13 @@ describe("ArticleView", () => {
     expect(missing.container.querySelector('[data-slot="article-provider"] [data-slot="safe-image-fallback"] svg')).not.toBeNull();
   });
 
-  test("the lead picture's frame carries its own ratio and a height cap, and the pinned picture covers it", () => {
+  test("the lead picture is centered in the article column; its frame carries a ratio and height cap", () => {
     const { container } = render(<ArticleView data={data} />);
     const frame = container.querySelector('[data-slot="aspect-ratio"]') as HTMLElement;
+    expect(frame.className).toContain("mx-auto");
+    expect(frame.className).toContain("w-full");
+    expect(frame.className).toContain("max-w-[1100px]");
+    expect(frame.className).toContain("mx-auto");
     expect(Number(frame.style.getPropertyValue("--ratio"))).toBeCloseTo(16 / 9, 5);
     expect(frame.style.maxHeight).toContain("--article-lead-max-h");
     expect(frame.querySelector("img")!.className).toContain("absolute");
@@ -143,8 +149,8 @@ describe("ArticleView", () => {
     const body = container.querySelector('[data-slot="article-body"]')!;
     expect(body.className).toContain("font-serif");
     expect(body.getAttribute("data-text-size")).toBe("medium");
-    expect(container.querySelector('[data-slot="article-column"]')!.className).toContain("max-w-[1100px]");
-    expect(body.className).toContain("max-w-[72ch]");
+    expect(container.querySelector('[data-slot="article-column"]')!.className).toContain("max-w-[72ch]");
+    expect(body.className).not.toContain("max-w-[72ch]");
   });
 
   test("the description and the footer slot draw (Reference), and a saved story shows the filled bookmark", () => {

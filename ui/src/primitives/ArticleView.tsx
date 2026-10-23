@@ -224,7 +224,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           <span>{data.byline.publisher}</span>
         </div>
       ) : null}
-      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[1100px] flex-col gap-4">
+      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4">
       <header className="flex flex-col gap-2">
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
@@ -233,7 +233,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
       {data.image ? (
-        <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
+        <AspectRatio ratio={16 / 9} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
           <SafeImage src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
         </AspectRatio>
       ) : null}
@@ -244,7 +244,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           <p className="text-muted-foreground text-xs">Written on this hub from the article.</p>
         </section>
       ) : null}
-      <div data-slot="article-body" data-text-size={textSize} className={cn("mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
+      <div data-slot="article-body" data-text-size={textSize} className={cn("flex w-full min-w-0 flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
         {data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
       </div>
       {data.also_covering && data.also_covering.length > 0 ? (
