@@ -805,14 +805,6 @@
               "levels": [
                 "expert"
               ]
-            },
-            {
-              "label": "Network port",
-              "group": "household.network_port",
-              "scope": "household",
-              "levels": [
-                "expert"
-              ]
             }
           ],
           "trail_view": "home.routing_stats"
@@ -830,6 +822,14 @@
               "levels": [
                 "basic",
                 "advanced"
+              ]
+            },
+            {
+              "label": "Port",
+              "group": "household.network_port",
+              "scope": "household",
+              "levels": [
+                "expert"
               ]
             }
           ],

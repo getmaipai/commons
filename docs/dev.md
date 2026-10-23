@@ -1,3 +1,7 @@
+## spec-v0.1.214: the hub port stays on the Network page (2026-10-23)
+
+strict one-card-per-group moved `household.network_port` (the hub port, an expert key) to the Developer card, where Home draws no expert controls, so the port would have vanished. It is drawn by a card in the Network section (expert only), through a narrow `EXPERT_OUTSIDE_DEVELOPER` allowlist in `areas-check.ts` that only shrinks. Home keeps passing the key as an extra expert key for that section.
+
 ## spec-v0.1.213: Engines and AI keeps its Manage links (2026-10-23)
 
 spec-v0.1.209 dropped the `Manage` card (AI models, Engines links) from the Home `ai` section; Home's port test needs both links. Restored on the Overview tab.

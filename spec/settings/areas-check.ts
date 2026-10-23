@@ -73,6 +73,9 @@ export const ALLOWED_VIEW_IDS: readonly string[] = defs.view.enum;
 export const ROLES: readonly Role[] = defs.role.enum as Role[];
 
 /** Package household cards currently allowed by IA-02; each later slice only removes entries. */
+/** Expert groups a non-developer section may draw (a Home page that has always shown one expert key, Network's hub port). Only shrinks. */
+export const EXPERT_OUTSIDE_DEVELOPER: readonly string[] = ["household.network_port"];
+
 export const HOUSEHOLD_CARD_ALLOWLIST: readonly string[] = ["news"];
 export const PAGE_COUNT_ENFORCED = false;
 export const SETTINGS_CAP_ENFORCED = false;
@@ -171,7 +174,8 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         const levels = c.levels ?? DEFAULT_LEVELS;
         const groupLevels = new Set(registry.filter((k) => k.scope === c.scope && k.lives_in === c.group).map((k) => k.level));
         const has = (lv: Level) => levels.includes(lv);
-        if (groupLevels.has("expert") && (s.id !== "developer" || levels.length !== 1 || !has("expert"))) {
+        const expertOutside = EXPERT_OUTSIDE_DEVELOPER.includes(c.group) && s.id !== "developer" && levels.length === 1 && has("expert");
+        if (groupLevels.has("expert") && !expertOutside && (s.id !== "developer" || levels.length !== 1 || !has("expert"))) {
           errors.push(`${where}: card "${c.label}" contains expert keys outside a developer section or mixes expert levels`);
         }
         if (s.id === "developer" && (!groupLevels.has("expert") || levels.length !== 1 || !has("expert"))) {

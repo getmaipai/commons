@@ -47,11 +47,19 @@ def test_every_registry_key_has_exactly_one_card() -> None:
             assert drawn[slot] == 1, (key["key"], slot, drawn[slot])
 
 
+EXPERT_OUTSIDE_DEVELOPER = {
+    "household.network_port"
+}  # mirrors areas-check.ts; only shrinks
+
+
 def test_expert_cards_sit_only_in_developer_sections() -> None:
     for area in FILE["areas"]:
         for section in area["sections"]:
             for card in section.get("cards", []):
                 if "expert" in card.get("levels", []):
+                    if card.get("group") in EXPERT_OUTSIDE_DEVELOPER:
+                        assert card["levels"] == ["expert"]
+                        continue
                     assert section["id"] == "developer"
                     assert card["levels"] == ["expert"]
 

@@ -20,6 +20,7 @@ import {
   SETTINGS_CAP_ENFORCED,
   lintManifestSettings,
   type AreasFile,
+  EXPERT_OUTSIDE_DEVELOPER,
   type RegistryKey,
 } from "../../settings/areas-check.js";
 
@@ -168,7 +169,7 @@ describe("conformance: expert keys only under developer", () => {
     for (const a of file.areas) {
       for (const s of a.sections) {
         for (const c of s.cards ?? []) {
-          if (c.levels?.includes("expert")) {
+          if (c.levels?.includes("expert") && !EXPERT_OUTSIDE_DEVELOPER.includes(c.group ?? "")) {
             expect(s.id, `${a.id}/${s.id}`).toBe("developer");
             expect(c.levels, `${a.id}/${s.id} card ${c.label}`).toEqual(["expert"]);
           }
