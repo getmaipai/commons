@@ -1560,3 +1560,13 @@ filter cards with the pure helpers in `settingsAudience.ts`; unassigned
 cards remain visible as a summary above each tab. Without tab props, the
 shell keeps its existing rendering.
 
+## spec-v0.1.218: household and personal settings pages use tabs (2026-10-23)
+
+Home now has nine pages and Account seven. Tabs may carry their own view and
+audience, and a tab must not widen its page audience. The old Chat settings
+area folds into Account > Chat and AI; `legacy-sections.json` maps each old
+section route to a page and tab or a replacement destination. `checkAreas`
+enforces the page count, known tab views, audience narrowing, and the rule that
+a tabbed section owns its views on its tabs. `SETTINGS_CAP_ENFORCED` remains
+off; the current largest tab is Account > Notifications at 21 basic settings.
+

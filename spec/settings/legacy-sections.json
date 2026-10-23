@@ -1,0 +1,395 @@
+{
+  "mappings": [
+    {
+      "old": {
+        "area": "account",
+        "section": "profile"
+      },
+      "new": {
+        "area": "account",
+        "section": "profile",
+        "tab": "profile"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "appearance"
+      },
+      "new": {
+        "area": "account",
+        "section": "appearance",
+        "tab": "appearance"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "notifications"
+      },
+      "new": {
+        "area": "account",
+        "section": "notifications",
+        "tab": "notifications"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "voice"
+      },
+      "new": {
+        "area": "account",
+        "section": "voice",
+        "tab": "voice"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "pictures"
+      },
+      "new": {
+        "area": "account",
+        "section": "pictures",
+        "tab": "pictures"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "data"
+      },
+      "new": {
+        "area": "account",
+        "section": "data",
+        "tab": "data"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "device"
+      },
+      "new": {
+        "area": "account",
+        "section": "voice",
+        "tab": "device"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "robot"
+      },
+      "new": {
+        "area": "account",
+        "section": "voice",
+        "tab": "robot"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "developer"
+      },
+      "new": {
+        "area": "account",
+        "section": "data",
+        "tab": "developer"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "coding"
+      },
+      "new": {
+        "area": "account",
+        "section": "chat",
+        "tab": "coding"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "general"
+      },
+      "new": {
+        "area": "home",
+        "section": "household",
+        "tab": "general"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "people"
+      },
+      "new": {
+        "area": "home",
+        "section": "household",
+        "tab": "people"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "search"
+      },
+      "new": {
+        "area": "home",
+        "section": "search",
+        "tab": "search"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "integrations"
+      },
+      "new": {
+        "area": "home",
+        "section": "apps",
+        "tab": "integrations"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "ai"
+      },
+      "new": {
+        "area": "home",
+        "section": "ai",
+        "tab": "overview"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "pictures"
+      },
+      "new": {
+        "area": "home",
+        "section": "media",
+        "tab": "pictures"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "commands"
+      },
+      "new": {
+        "area": "home",
+        "section": "voice",
+        "tab": "commands"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "voices"
+      },
+      "new": {
+        "area": "home",
+        "section": "voice",
+        "tab": "voices"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "robot"
+      },
+      "new": {
+        "area": "home",
+        "section": "apps",
+        "tab": "robot"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "reference-library"
+      },
+      "new": {
+        "area": "home",
+        "section": "search",
+        "tab": "reference-library"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "media-library"
+      },
+      "new": {
+        "area": "home",
+        "section": "media",
+        "tab": "media-library"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "storage"
+      },
+      "new": {
+        "area": "home",
+        "section": "backups",
+        "tab": "storage"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "maintenance"
+      },
+      "new": {
+        "area": "home",
+        "section": "backups",
+        "tab": "maintenance"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "privacy"
+      },
+      "new": {
+        "area": "home",
+        "section": "privacy",
+        "tab": "privacy"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "developer"
+      },
+      "new": {
+        "area": "home",
+        "section": "advanced",
+        "tab": "developer"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "network"
+      },
+      "new": {
+        "area": "home",
+        "section": "advanced",
+        "tab": "network"
+      }
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "coding"
+      },
+      "new": {
+        "area": "home",
+        "section": "ai",
+        "tab": "coding"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "general"
+      },
+      "new": {
+        "area": "account",
+        "section": "chat",
+        "tab": "general"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "personalization"
+      },
+      "new": {
+        "area": "account",
+        "section": "chat",
+        "tab": "personalization"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "skills"
+      },
+      "new": {
+        "area": "account",
+        "section": "chat",
+        "tab": "skills"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "shortcuts"
+      },
+      "new": {
+        "area": "account",
+        "section": "chat",
+        "tab": "shortcuts"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "voice"
+      },
+      "replacement": {
+        "area": "account",
+        "section": "voice"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "notifications"
+      },
+      "replacement": {
+        "area": "account",
+        "section": "notifications"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "memories"
+      },
+      "replacement": {
+        "area": "account",
+        "section": "chat"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "parental-controls"
+      },
+      "replacement": {
+        "area": "home",
+        "section": "household"
+      }
+    },
+    {
+      "old": {
+        "area": "chat",
+        "section": "household"
+      },
+      "replacement": {
+        "area": "home",
+        "section": "ai"
+      }
+    }
+  ]
+}

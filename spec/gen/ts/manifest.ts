@@ -1570,10 +1570,71 @@ export const PackageManifest = z
                               .string()
                               .regex(new RegExp("^[a-z][a-z0-9-]*$")),
                             label: z.string().min(1).max(40),
+                            /**A named view drawn after this tab’s cards.*/
+                            view: z
+                              .enum([
+                                "account.profile",
+                                "account.voice",
+                                "account.likeness",
+                                "account.device_appearance",
+                                "chat.skills",
+                                "chat.shortcuts",
+                                "home.commands",
+                                "home.voice_catalog",
+                                "home.engine_admin",
+                                "home.devices_admin",
+                                "home.routing_stats",
+                                "home.reference_library",
+                                "home.pictures_library",
+                                "home.media_library",
+                                "account.coding_keys",
+                              ])
+                              .describe(
+                                "A named view drawn after this tab’s cards.",
+                              )
+                              .optional(),
+                            /**The role ladder, most to least privileged. min_role is the lowest role that may see the thing.*/
+                            min_role: z
+                              .enum([
+                                "owner",
+                                "admin",
+                                "adult",
+                                "teen",
+                                "child",
+                                "guest",
+                              ])
+                              .describe(
+                                "The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
+                              )
+                              .optional(),
+                            bands: z
+                              .array(z.enum(["child", "teen", "adult"]))
+                              .min(1)
+                              .refine(
+                                (arr) =>
+                                  arr.every(
+                                    (item, i) => arr.indexOf(item) == i,
+                                  ),
+                                "All items must be unique!",
+                              )
+                              .optional(),
+                            needs: z
+                              .array(z.string().min(1))
+                              .refine(
+                                (arr) =>
+                                  arr.every(
+                                    (item, i) => arr.indexOf(item) == i,
+                                  ),
+                                "All items must be unique!",
+                              )
+                              .optional(),
                           })
-                          .strict(),
+                          .strict()
+                          .describe(
+                            "A settings page tab with optional view and audience constraints.",
+                          ),
                       )
-                      .min(2)
+                      .min(1)
                       .max(5)
                       .describe(
                         "Subtopics in declaration order; the shell persists the open tab in ?tab=.",
@@ -1623,8 +1684,69 @@ export const PackageManifest = z
                                   .string()
                                   .regex(new RegExp("^[a-z][a-z0-9-]*$")),
                                 label: z.string().min(1).max(40),
+                                /**A named view drawn after this tab’s cards.*/
+                                view: z
+                                  .enum([
+                                    "account.profile",
+                                    "account.voice",
+                                    "account.likeness",
+                                    "account.device_appearance",
+                                    "chat.skills",
+                                    "chat.shortcuts",
+                                    "home.commands",
+                                    "home.voice_catalog",
+                                    "home.engine_admin",
+                                    "home.devices_admin",
+                                    "home.routing_stats",
+                                    "home.reference_library",
+                                    "home.pictures_library",
+                                    "home.media_library",
+                                    "account.coding_keys",
+                                  ])
+                                  .describe(
+                                    "A named view drawn after this tab’s cards.",
+                                  )
+                                  .optional(),
+                                /**The role ladder, most to least privileged. min_role is the lowest role that may see the thing.*/
+                                min_role: z
+                                  .enum([
+                                    "owner",
+                                    "admin",
+                                    "adult",
+                                    "teen",
+                                    "child",
+                                    "guest",
+                                  ])
+                                  .describe(
+                                    "The role ladder, most to least privileged. min_role is the lowest role that may see the thing.",
+                                  )
+                                  .optional(),
+                                bands: z
+                                  .array(z.enum(["child", "teen", "adult"]))
+                                  .min(1)
+                                  .refine(
+                                    (arr) =>
+                                      arr.every(
+                                        (item, i) => arr.indexOf(item) == i,
+                                      ),
+                                    "All items must be unique!",
+                                  )
+                                  .optional(),
+                                needs: z
+                                  .array(z.string().min(1))
+                                  .refine(
+                                    (arr) =>
+                                      arr.every(
+                                        (item, i) => arr.indexOf(item) == i,
+                                      ),
+                                    "All items must be unique!",
+                                  )
+                                  .optional(),
                               })
-                              .strict(),
+                              .strict()
+                              .describe(
+                                "A settings page tab with optional view and audience constraints.",
+                              ),
                           )
                           .min(2)
                           .max(5)
@@ -1638,7 +1760,10 @@ export const PackageManifest = z
                   })
                   .strict()
                   .and(
-                    z.intersection(z.any(), z.intersection(z.any(), z.any())),
+                    z.intersection(
+                      z.intersection(z.any(), z.any()),
+                      z.intersection(z.any(), z.any()),
+                    ),
                   )
                   .describe(
                     "One section. kind keys needs cards, view needs a view, link needs an href. areas-check.ts refuses fields that belong to another kind.",

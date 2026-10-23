@@ -1,3 +1,7 @@
+## [spec-v0.1.220] - 2026-10-23
+
+- Settings IA: Home is nine tabbed pages and Account is seven. Tabs carry optional views and audience constraints; old section routes have a complete redirect map. Page count is enforced, while the settings cap stays deferred.
+
 ## [spec-v0.1.219] - 2026-10-23
 
 - Add optional `sourceIconUrl` to article props for the publisher favicon. Additive.

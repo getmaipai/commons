@@ -26,7 +26,10 @@
     },
     "scope": {
       "type": "string",
-      "enum": ["household", "person"],
+      "enum": [
+        "household",
+        "person"
+      ],
       "description": "The settings governed by this area: household settings are admin-only; person settings belong to the viewer."
     },
     "app": {
@@ -326,20 +329,69 @@
     "tab": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "label"],
+      "required": [
+        "id",
+        "label"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-        "label": { "type": "string", "minLength": 1, "maxLength": 40 }
-      }
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "view": {
+          "$ref": "#/$defs/view",
+          "description": "A named view drawn after this tab\u2019s cards."
+        },
+        "min_role": {
+          "$ref": "#/$defs/role"
+        },
+        "bands": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/band"
+          }
+        },
+        "needs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "description": "A settings page tab with optional view and audience constraints."
     },
     "detail": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["param", "view"],
+      "required": [
+        "param",
+        "view"
+      ],
       "properties": {
-        "param": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
-        "view": { "$ref": "#/$defs/view" },
-        "tabs": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "$ref": "#/$defs/tab" } }
+        "param": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "view": {
+          "$ref": "#/$defs/view"
+        },
+        "tabs": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/tab"
+          }
+        }
       },
       "description": "A record detail screen at /settings/<area>/<section>/<id>; it is not an additional page."
     },
@@ -430,9 +482,11 @@
         },
         "tabs": {
           "type": "array",
-          "minItems": 2,
+          "minItems": 1,
           "maxItems": 5,
-          "items": { "$ref": "#/$defs/tab" },
+          "items": {
+            "$ref": "#/$defs/tab"
+          },
           "description": "Subtopics in declaration order; the shell persists the open tab in ?tab=."
         },
         "view_tab": {
@@ -440,16 +494,29 @@
           "pattern": "^[a-z][a-z0-9-]*$",
           "description": "Tab id for a section view, lead_view or trail_view."
         },
-        "detail": { "$ref": "#/$defs/detail" }
+        "detail": {
+          "$ref": "#/$defs/detail"
+        }
       },
       "allOf": [
         {
           "if": {
-            "properties": {
-              "kind": {
-                "const": "keys"
+            "allOf": [
+              {
+                "properties": {
+                  "kind": {
+                    "const": "keys"
+                  }
+                }
+              },
+              {
+                "not": {
+                  "required": [
+                    "tabs"
+                  ]
+                }
               }
-            }
+            ]
           },
           "then": {
             "required": [
@@ -483,6 +550,34 @@
             "required": [
               "href"
             ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "tabs"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "view"
+                  ]
+                },
+                {
+                  "required": [
+                    "lead_view"
+                  ]
+                },
+                {
+                  "required": [
+                    "trail_view"
+                  ]
+                }
+              ]
+            }
           }
         }
       ],

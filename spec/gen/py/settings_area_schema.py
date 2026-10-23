@@ -154,11 +154,43 @@ class Card(BaseModel):
 
 
 class Tab(BaseModel):
+    """
+    A settings page tab with optional view and audience constraints.
+    """
+
     model_config = ConfigDict(
         extra='forbid',
     )
     id: constr(pattern=r'^[a-z][a-z0-9-]*$')
     label: constr(min_length=1, max_length=40)
+    view: (
+        Literal[
+            'account.profile',
+            'account.voice',
+            'account.likeness',
+            'account.device_appearance',
+            'chat.skills',
+            'chat.shortcuts',
+            'home.commands',
+            'home.voice_catalog',
+            'home.engine_admin',
+            'home.devices_admin',
+            'home.routing_stats',
+            'home.reference_library',
+            'home.pictures_library',
+            'home.media_library',
+            'account.coding_keys',
+        ]
+        | None
+    ) = Field(None, description='A named view drawn after this tab’s cards.')
+    min_role: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] | None = (
+        Field(
+            None,
+            description='The role ladder, most to least privileged. min_role is the lowest role that may see the thing.',
+        )
+    )
+    bands: list[Literal['child', 'teen', 'adult']] | None = Field(None, min_length=1)
+    needs: list[constr(min_length=1)] | None = None
 
 
 class Detail(BaseModel):
@@ -294,7 +326,7 @@ class Section(BaseModel):
         None,
         description='Subtopics in declaration order; the shell persists the open tab in ?tab=.',
         max_length=5,
-        min_length=2,
+        min_length=1,
     )
     view_tab: constr(pattern=r'^[a-z][a-z0-9-]*$') | None = Field(
         None, description='Tab id for a section view, lead_view or trail_view.'

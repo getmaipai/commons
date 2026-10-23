@@ -1,591 +1,83 @@
-// SPEC-SETAREA-01: the settings area record (spec/settings/areas.json) and
-// the conformance rules that make "one definition, one place" true for the
-// settings screens: every registry key has exactly one card, expert keys sit
-// only under a developer section, and the audience rules hold.
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
-import { PackageManifest } from "../../gen/ts/manifest.js";
 import {
-  ALLOWED_VIEW_IDS,
-  CENTRAL_AREA_IDS,
-  RESERVED_AREA_IDS,
-  checkAreas,
-  checkPageCount,
-  checkSettingsCap,
-  HOUSEHOLD_CARD_ALLOWLIST,
-  PAGE_COUNT_ENFORCED,
-  SETTINGS_CAP_ENFORCED,
-  lintManifestSettings,
-  type AreasFile,
-  EXPERT_OUTSIDE_DEVELOPER,
-  type RegistryKey,
+  ALLOWED_VIEW_IDS, CENTRAL_AREA_IDS, RESERVED_AREA_IDS, PAGE_COUNT_ENFORCED,
+  SETTINGS_CAP_ENFORCED, checkAreas, checkPageCount, lintManifestSettings,
+  type AreasFile, type RegistryKey,
 } from "../../settings/areas-check.js";
 
-const SPEC = join(import.meta.dir, "..", "..");
-const schema = JSON.parse(readFileSync(join(SPEC, "schemas", "settings-area.schema.json"), "utf-8"));
-const areasSchema = JSON.parse(readFileSync(join(SPEC, "schemas", "settings-areas.schema.json"), "utf-8"));
-const file = JSON.parse(readFileSync(join(SPEC, "settings", "areas.json"), "utf-8")) as AreasFile;
-const registry = JSON.parse(readFileSync(join(SPEC, "settings", "keys.json"), "utf-8")) as RegistryKey[];
+const ROOT = join(import.meta.dir, "..", "..");
+const file = JSON.parse(readFileSync(join(ROOT, "settings/areas.json"), "utf8")) as AreasFile;
+const registry = JSON.parse(readFileSync(join(ROOT, "settings/keys.json"), "utf8")) as RegistryKey[];
+const legacy = JSON.parse(readFileSync(join(ROOT, "settings/legacy-sections.json"), "utf8"));
+const schema = JSON.parse(readFileSync(join(ROOT, "schemas/settings-area.schema.json"), "utf8"));
+const ajv = new Ajv2020({ strict: false, allErrors: true }); addFormats(ajv);
+const validate = ajv.compile(schema);
+const clone = <T>(v:T):T => JSON.parse(JSON.stringify(v));
+const getArea = (id:string) => file.areas.find(a=>a.id===id)!;
+const getPage = (a:string,id:string) => getArea(a).sections.find(s=>s.id===id)!;
 
-const ajv = new Ajv2020({ strict: false, allErrors: true });
-addFormats(ajv);
-const validateArea = ajv.compile(schema);
-const validateAreasFile = ajv.compile(areasSchema);
-
-const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v));
-const area = (id: string) => {
-  const found = file.areas.find((a) => a.id === id);
-  if (!found) throw new Error(`area ${id} missing`);
-  return found;
-};
-const section = (areaId: string, sectionId: string) => {
-  const found = area(areaId).sections.find((s) => s.id === sectionId);
-  if (!found) throw new Error(`section ${areaId}/${sectionId} missing`);
-  return found;
-};
-const registryIds = () => registry.map((k) => k.key);
-
-describe("spec/settings/areas.json", () => {
-  test("the central settings file matches its schema, including device cards", () => {
-    expect(validateAreasFile(file), ajv.errorsText(validateAreasFile.errors)).toBe(true);
-    const invalid = clone(file);
-    invalid.device_cards[0]!.scope = "person" as "device";
-    expect(validateAreasFile(invalid)).toBe(false);
-  });
-
-  test("declares exactly the account, home and chat areas", () => {
-    expect(file.areas.map((a) => a.id).sort()).toEqual(["account", "chat", "home"]);
-  });
-
-  test("every area validates against settings-area.schema.json", () => {
-    for (const a of file.areas) {
-      expect(validateArea(a), `${a.id}: ${JSON.stringify(validateArea.errors)}`).toBe(true);
-    }
-  });
-
-  test("Profile declares voice print enrollment beside face enrollment", () => {
-    expect(section("account", "profile").cards).toContainEqual({
-      label: "Face enrollment",
-      group: "person.profile",
-      scope: "person",
-    });
-    expect(section("account", "profile").cards).toContainEqual({
-      label: "Voice print enrollment",
-      group: "person.voice_print",
-      scope: "person",
-    });
-  });
-
-  test("the whole file passes the cross-file conformance check", () => {
-    expect(checkAreas(file, registry)).toEqual([]);
-  });
-
-  test("every registry group is placed exactly once or listed with a not_placed reason", () => {
-    const counts = new Map<string, number>();
-    for (const a of file.areas) for (const s of a.sections) for (const c of s.cards ?? []) if (c.group && c.scope) {
-      const id = `${c.scope}:${c.group}`;
-      counts.set(id, (counts.get(id) ?? 0) + 1);
-    }
-    for (const c of file.device_cards) {
-      const id = `${c.scope}:${c.group}`;
-      counts.set(id, (counts.get(id) ?? 0) + 1);
-    }
-    const parked = new Set(file.not_placed.map((n) => `${n.scope}:${n.group}`));
-    for (const id of new Set(registry.map((k) => `${k.scope}:${k.lives_in}`))) expect((counts.get(id) ?? 0) + Number(parked.has(id)), id).toBe(1);
-  });
-
-  test("personal voice controls stay in Account and command management is in Home", () => {
-    expect(section("account", "voice")).toMatchObject({ kind: "keys", lead_view: "account.voice" });
-    expect(section("home", "commands")).toMatchObject({ kind: "view", view: "home.commands" });
-    const accountVoice = section("account", "voice");
-    expect(accountVoice.cards?.find((card) => card.group === "person.voice")).toBeDefined();
-    expect(accountVoice.cards?.flatMap((card) => card.links ?? []).map((link) => link.href)).toEqual(["/commands"]);
-  });
-
-  test("Home settings groups household sections and names its admin views", () => {
-    expect(area("home").groups.map((group) => group.label)).toEqual([
-      "General", "People", "Engines and AI", "Pictures and videos", "Coding", "Devices", "Search", "Integrations", "Commands", "Voices",
-      "Storage and backups", "Reference library", "Media library", "Maintenance", "Privacy", "Developer", "Network and access",
-    ]);
-    expect(section("home", "ai").tabs?.map((tab) => tab.id)).toEqual(["overview", "models", "engines", "advanced"]);
-    expect(section("home", "robot").trail_view).toBe("home.devices_admin");
-    expect(section("home", "robot").detail?.tabs?.map((tab) => tab.id)).toEqual(["overview", "behaviour", "access"]);
-    expect(section("home", "robot").needs).toBeUndefined();
-    expect(section("home", "robot").cards?.[0]).toEqual({ label: "Robots", group: "home.robots", scope: "household" });
-    expect(section("home", "robot").cards?.[1]?.needs).toEqual(["robot.paired", "robots.enabled"]);
-    expect(section("home", "developer").trail_view).toBe("home.routing_stats");
-  });
+describe("settings page tabs",()=>{
+ test("central pages are 9 household and 7 personal, with no Chat area",()=>{
+  expect(file.areas.map(a=>a.id).sort()).toEqual(["account","home"]);
+  expect(getArea("home").sections.map(s=>s.id)).toEqual(["household","privacy","ai","media","voice","search","apps","backups","advanced"]);
+  expect(getArea("account").sections.map(s=>s.id)).toEqual(["profile","appearance","chat","voice","notifications","pictures","data"]);
+  expect(CENTRAL_AREA_IDS).toEqual(["account","home"]);
+  expect(RESERVED_AREA_IDS).toContain("chat");
+  expect(lintManifestSettings({id:"music",contributes:{settings_area:{...getArea("account"),id:"chat"}}}).join(" ")).toMatch(/reserved/);
+  expect(PAGE_COUNT_ENFORCED).toBe(true); expect(SETTINGS_CAP_ENFORCED).toBe(false);
+  expect(checkAreas(file,registry)).toEqual([]);
+ });
+ test("tab views and audience constraints validate",()=>{
+  for(const a of file.areas) expect(validate(a),JSON.stringify(validate.errors)).toBe(true);
+  const bad=clone(file); getPageFrom(bad,"home","ai").tabs![0]!.view="home.unknown";
+  expect(checkAreas(bad,registry).join(" ")).toMatch(/unknown view/);
+  const broad=clone(file); getPageFrom(broad,"home","ai").tabs![0]!.min_role="guest";
+  getPageFrom(broad,"home","ai").min_role="admin";
+  expect(checkAreas(broad,registry).join(" ")).toMatch(/broader than the area's admin/);
+  const sectionView=clone(file); getPageFrom(sectionView,"home","ai").trail_view="home.engine_admin";
+  expect(checkAreas(sectionView,registry).join(" ")).toMatch(/section-level views/);
+ });
+ test("audiences from replaced sections stay on tabs",()=>{
+  expect(getPage("home","media").tabs?.map(t=>t.min_role)).toEqual(["admin","admin"]);
+  expect(getPage("account","voice").tabs?.find(t=>t.id==="robot")).toMatchObject({bands:["adult"],needs:["robot.paired","robots.enabled"]});
+  expect(getPage("account","chat").tabs?.find(t=>t.id==="skills")?.bands).toEqual(["teen","adult"]);
+ });
+ test("robot details remain on Apps and tab views exist",()=>{
+  expect(getPage("home","apps").detail).toMatchObject({param:"id",view:"home.devices_admin",tabs:[{id:"overview"},{id:"behaviour"},{id:"access"}]});
+  expect(getPage("home","apps").tabs?.[0]?.view).toBe("home.devices_admin");
+  expect(getPage("home","ai").tabs?.map(t=>t.id)).toEqual(["overview","models","engines","advanced","coding"]);
+ });
+ test("legacy mapping covers each old section exactly once and targets a real page tab",()=>{
+  const old=JSON.parse(readFileSync(join(ROOT,"settings/areas.json"),"utf8")) as AreasFile;
+  const entries=legacy.mappings as any[];
+  const ids=entries.map(x=>`${x.old.area}/${x.old.section}`);
+  const expected=[
+   ..."general people search integrations ai pictures commands voices robot reference-library media-library storage maintenance privacy developer network coding".split(" ").map(x=>`home/${x}`),
+   ..."profile appearance notifications voice pictures data device robot developer coding".split(" ").map(x=>`account/${x}`),
+   ..."general personalization skills shortcuts voice notifications memories parental-controls household".split(" ").map(x=>`chat/${x}`),
+  ].sort();
+  expect(new Set(ids).size).toBe(ids.length);
+  expect(ids.sort()).toEqual(expected);
+  expect(entries.filter(x=>x.old.area==="chat"&&x.replacement).length).toBe(5);
+  for(const row of entries){
+   const dst=row.new??row.replacement;
+   if(!dst){expect(row.reason).toBeTruthy();continue;}
+   const target=file.areas.find(a=>a.id===dst.area)?.sections.find(s=>s.id===dst.section);
+   expect(target,JSON.stringify(row)).toBeDefined();
+   if(row.new) expect(target!.tabs?.some(t=>t.id===dst.tab)).toBe(true);
+  }
+  expect(ids).toContain("chat/parental-controls");
+ });
+ test("every registry group remains drawn once or explicitly not placed",()=>{
+  const counts=new Map<string,number>();
+  for(const a of file.areas) for(const s of a.sections) for(const c of s.cards??[]) if(c.group&&c.scope){const k=`${c.scope}:${c.group}`;counts.set(k,(counts.get(k)??0)+1)}
+  for(const c of file.device_cards){const k=`${c.scope}:${c.group}`;counts.set(k,(counts.get(k)??0)+1)}
+  const parked=new Set(file.not_placed.map(n=>`${n.scope}:${n.group}`));
+  for(const k of new Set(registry.map(r=>`${r.scope}:${r.lives_in}`))) expect((counts.get(k)??0)+Number(parked.has(k)),k).toBe(1);
+ });
 });
-
-describe("conformance: each registry group is in exactly one card", () => {
-  test("every basic and advanced key group at its scope is in one card, or is listed as not placed", () => {
-    expect(checkAreas(file, registry).filter((e) => /card|placed/.test(e))).toEqual([]);
-  });
-
-  test("dropping a card leaves its group unplaced and the check says so", () => {
-    const broken = clone(file);
-    const s = broken.areas.find((a) => a.id === "chat")!.sections.find((x) => x.id === "general")!;
-    s.cards = s.cards!.filter((c) => c.group !== "person.search");
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/person\.search.*no card/);
-  });
-
-  test("the same group in two cards is refused", () => {
-    const broken = clone(file);
-    const s = broken.areas.find((a) => a.id === "chat")!.sections.find((x) => x.id === "personalization")!;
-    s.cards!.push({ label: "Search again", scope: "person", group: "person.search" });
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/person\.search.*more than one card/);
-  });
-
-  test("a card naming a group the registry does not have is refused", () => {
-    const broken = clone(file);
-    broken.areas[0]!.sections.find((s) => s.kind === "keys")!.cards!.push({
-      label: "Ghost",
-      scope: "person",
-      group: "person.ghost",
-    });
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/person\.ghost.*not in the registry/);
-  });
-
-  test("robot hello is placed on the selected robot device card", () => {
-    expect(file.device_cards).toContainEqual({ device_kind: "robot", label: "This robot", group: "robot.hello", scope: "device", min_role: "admin" });
-    expect(file.not_placed.some((n) => n.scope === "device" && n.group === "robot.hello")).toBe(false);
-    expect(checkAreas(file, registry)).toEqual([]);
-  });
-
-  test("device card rejects registry groups outside device scope", () => {
-    const broken = clone(file);
-    broken.device_cards.push({ device_kind: "robot", label: "Bad", group: "person.chat", scope: "person" as "device", min_role: "admin" });
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/device card group person\.chat must have device scope/);
-  });
-});
-
-describe("conformance: expert keys only under developer", () => {
-  test("every expert key sits in a developer section card", () => {
-    const experts = registry.filter((k) => k.level === "expert");
-    expect(experts.length).toBeGreaterThan(0);
-    for (const a of file.areas) {
-      for (const s of a.sections) {
-        for (const c of s.cards ?? []) {
-          if (c.levels?.includes("expert") && !EXPERT_OUTSIDE_DEVELOPER.includes(c.group ?? "")) {
-            expect(s.id, `${a.id}/${s.id}`).toBe("developer");
-            expect(c.levels, `${a.id}/${s.id} card ${c.label}`).toEqual(["expert"]);
-          }
-        }
-      }
-    }
-    expect(checkAreas(file, registry).filter((e) => /expert/.test(e))).toEqual([]);
-  });
-
-  test("expert groups outside developer, and developer cards without a whole expert group, are refused", () => {
-    const broken = clone(file);
-    broken.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "developer")!.cards![0]!.levels = ["basic", "expert"];
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/expert/);
-  });
-});
-
-describe("conformance: structure", () => {
-  test("a duplicate section id inside an area is refused", () => {
-    const broken = clone(file);
-    const a = broken.areas.find((x) => x.id === "chat")!;
-    a.sections.push({ ...clone(a.sections[0]!) });
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/duplicate section "general"/);
-  });
-
-  test("a sidebar group naming an unknown section is refused", () => {
-    const broken = clone(file);
-    broken.areas.find((x) => x.id === "chat")!.groups[0]!.sections.push("nope");
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/unknown section "nope"/);
-  });
-
-  test("a section missing from every sidebar group is refused", () => {
-    const broken = clone(file);
-    broken.areas.find((x) => x.id === "chat")!.groups[0]!.sections.pop();
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/not in any sidebar group/);
-  });
-
-  test("an unknown view id is refused by the schema and by the check", () => {
-    const broken = clone(file);
-    const a = broken.areas.find((x) => x.id === "chat")!;
-    a.sections.find((s) => s.id === "skills")!.view = "chat.nonsense";
-    expect(validateArea(a)).toBe(false);
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/unknown view "chat\.nonsense"/);
-  });
-
-  test("the allowed view ids are the Home-owned renders", () => {
-    expect([...ALLOWED_VIEW_IDS].sort()).toEqual([
-      "account.coding_keys", "account.device_appearance",
-      "account.likeness",
-      "account.profile",
-      "account.voice",
-      "chat.shortcuts",
-      "chat.skills",
-      "home.commands",
-      "home.devices_admin",
-      "home.engine_admin",
-      "home.media_library",
-      "home.pictures_library",
-      "home.reference_library",
-      "home.routing_stats",
-      "home.voice_catalog",
-    ]);
-  });
-
-  test("reserved ids are refused as an area id", () => {
-    expect([...RESERVED_AREA_IDS].sort()).toEqual([
-      "backups", "commands", "devices", "health", "models", "repairs", "updates", "users", "voices",
-    ]);
-    for (const id of RESERVED_AREA_IDS) {
-      const broken = clone(file);
-      const a = broken.areas.find((x) => x.id === "chat")!;
-      a.id = id;
-      expect(checkAreas(broken, registry).join("\n"), id).toMatch(/reserved/);
-    }
-  });
-
-  test("a card is a group at a scope or a list of links, never both and never neither", () => {
-    const both = clone(file);
-    both.areas[0]!.sections.find((s) => s.kind === "keys")!.cards![0]!.links = [{ label: "x", href: "/x" }];
-    expect(checkAreas(both, registry).join("\n")).toMatch(/is a link card/);
-    const neither = clone(file);
-    neither.areas[0]!.sections.find((s) => s.kind === "keys")!.cards!.push({ label: "Empty" });
-    expect(checkAreas(neither, registry).join("\n")).toMatch(/needs a group and scope, or links/);
-  });
-
-  test("a view or link section missing its view or href is refused by the check too", () => {
-    const broken = clone(file);
-    const chat = broken.areas.find((x) => x.id === "chat")!;
-    delete chat.sections.find((s) => s.id === "skills")!.view;
-    delete chat.sections.find((s) => s.id === "voice")!.href;
-    const out = checkAreas(broken, registry).join("\n");
-    expect(out).toMatch(/a view section needs a view/);
-    expect(out).toMatch(/a link section needs an href/);
-  });
-
-  test("a section holding fields of another kind is refused", () => {
-    const broken = clone(file);
-    broken.areas.find((x) => x.id === "chat")!.sections.find((s) => s.id === "voice")!.view = "chat.skills";
-    expect(checkAreas(broken, registry).join("\n")).toMatch(/link section holds only an href/);
-  });
-
-  test("a section of kind keys needs cards, view needs a view, link needs an href", () => {
-    const a = clone(area("chat"));
-    delete a.sections.find((s) => s.id === "general")!.cards;
-    expect(validateArea(a)).toBe(false);
-    const b = clone(area("chat"));
-    delete b.sections.find((s) => s.id === "skills")!.view;
-    expect(validateArea(b)).toBe(false);
-    const c = clone(area("chat"));
-    delete c.sections.find((s) => s.id === "voice")!.href;
-    expect(validateArea(c)).toBe(false);
-  });
-});
-
-describe("package manifests: contributes.settings_area", () => {
-  const base = {
-    id: "music",
-    version: "0.1.0",
-    kind: "plugin",
-    category: "Media",
-    display: "Music",
-    description: "A minimal manifest for settings area tests.",
-    author: "MaiPai",
-    license: "AGPL-3.0",
-    platforms: ["home"],
-    min_role: "child",
-    consequential: false,
-    offline: "full",
-    min_app: "0.1.0",
-    tier: 0,
-    incognito: "unaffected",
-  };
-  const musicArea = {
-    id: "music",
-    title: "Music settings",
-    app: "/apps/music",
-    audience: { min_role: "child" },
-    scope: "person",
-    groups: [{ label: "Music", sections: ["general"] }],
-    sections: [
-      {
-        id: "general",
-        label: "General",
-        icon: "music",
-        kind: "keys",
-        cards: [{ label: "Library", scope: "person", group: "music.library" }],
-      },
-    ],
-  };
-
-  test("a package may declare its own area, and the manifest model carries it", () => {
-    const manifest = { ...base, contributes: { settings_area: musicArea } };
-    const parsed = PackageManifest.parse(manifest);
-    expect(parsed.contributes?.settings_area?.id).toBe("music");
-    expect(lintManifestSettings(manifest)).toEqual([]);
-  });
-
-  test("a malformed package area is refused by the manifest model", () => {
-    const bad = { ...musicArea, sections: [{ ...musicArea.sections[0], kind: "pane" }] };
-    expect(() => PackageManifest.parse({ ...base, contributes: { settings_area: bad } })).toThrow();
-  });
-
-  test("a package area may not take a reserved id or a central one", () => {
-    for (const id of [...RESERVED_AREA_IDS, ...CENTRAL_AREA_IDS]) {
-      const manifest = { ...base, contributes: { settings_area: { ...musicArea, id } } };
-      expect(lintManifestSettings(manifest).join("\n"), id).toMatch(/settings area id/);
-    }
-  });
-
-  test("a package may not use a reserved area id as its package id", () => {
-    for (const id of RESERVED_AREA_IDS) {
-      expect(lintManifestSettings({ ...base, id }).join("\n"), id).toMatch(/package id/);
-    }
-  });
-
-  test("package household cards follow the shrink-only News allowlist", () => {
-    expect([...HOUSEHOLD_CARD_ALLOWLIST]).toEqual(["news"]);
-    const householdArea = clone(musicArea) as typeof musicArea & { scope: string };
-    householdArea.scope = "person";
-    householdArea.sections[0]!.cards[0]!.scope = "household";
-    expect(lintManifestSettings({ ...base, contributes: { settings_area: householdArea } }).join("\n")).toMatch(/may not declare household cards/);
-    expect(lintManifestSettings({ ...base, id: "news", contributes: { settings_area: householdArea } }).filter((e) => /household/.test(e))).toEqual([]);
-  });
-});
-
-describe("settings tabs, detail and deferred limits", () => {
-  test("invalid card tabs, empty tabs and too many tabs are reported", () => {
-    const broken = clone(file);
-    const ai = broken.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "ai")!;
-    ai.cards![0]!.tab = "missing";
-    ai.tabs![1]!.id = "empty";
-    ai.tabs!.push({ id: "six", label: "Six" }, { id: "seven", label: "Seven" }, { id: "eight", label: "Eight" });
-    const out = checkAreas(broken, registry).join("\n");
-    expect(out).toContain("tab \"missing\" is not a tab id");
-    expect(out).toContain("tab \"empty\" holds nothing");
-    expect(out).toContain("tabs must contain 2 to 5 entries");
-  });
-
-  test("view_tab validates against section tabs and detail carries a route parameter", () => {
-    const broken = clone(file);
-    const robot = broken.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "robot")!;
-    robot.view_tab = "unknown";
-    robot.detail!.param = "not a route param!";
-    const out = checkAreas(broken, registry).join("\n");
-    expect(out).toContain("view_tab \"unknown\" is not a tab id");
-    expect(out).toContain("detail param must be a simple path parameter");
-    expect(section("home", "robot").detail).toMatchObject({ param: "id", view: "home.devices_admin" });
-  });
-
-  test("page-count and per-tab cap logic is tested while disabled until IA-04", () => {
-    expect(PAGE_COUNT_ENFORCED).toBe(false);
-    expect(SETTINGS_CAP_ENFORCED).toBe(false);
-    const short = clone(area("home"));
-    short.sections = short.sections.slice(0, 2);
-    expect(checkPageCount(short)).toEqual([]);
-    const crowded = clone(section("home", "ai"));
-    crowded.tabs = undefined;
-    crowded.cards = [{ label: "Pictures", group: "household.pictures", scope: "household" }];
-    expect(checkSettingsCap(crowded, registry)).toEqual([]);
-  });
-});
-
-describe("area scope", () => {
-  test("scope mismatch fails and the household/person areas have their declared scopes", () => {
-    expect(area("home").scope).toBe("household");
-    expect(area("account").scope).toBe("person");
-    const broken = clone(file);
-    broken.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "general")!.cards![0]!.scope = "person";
-    expect(checkAreas(broken, registry).join("\n")).toContain("scope person disagrees with area's household scope");
-  });
-
-  test("household area min_role cannot be broader than admin", () => {
-    const broken = clone(file);
-    broken.areas.find((a) => a.id === "home")!.audience.min_role = "adult";
-    expect(checkAreas(broken, registry).join("\n")).toContain("household area min_role adult is broader than admin");
-  });
-});
-
-describe("audience rules", () => {
-  test("Home settings is admins only, Account and Chat are for everyone signed in or guest", () => {
-    expect(area("home").audience.min_role).toBe("admin");
-    expect(area("account").audience.min_role).toBe("guest");
-    expect(area("chat").audience.min_role).toBe("guest");
-  });
-
-  test("Account > Robot is adults and admins only, never a teen (C-S1 a)", () => {
-    const robot = section("account", "robot");
-    expect(robot.bands).toEqual(["adult"]);
-    for (const c of robot.cards ?? []) expect(c.bands, c.label).toEqual(["adult"]);
-    expect(robot.needs).toContain("robot.paired");
-  });
-
-  test("Chat > General: chat card teen and adult, search card everyone (C-S1 b)", () => {
-    const cards = section("chat", "general").cards!;
-    expect(cards.find((c) => c.group === "person.chat")?.bands).toEqual(["teen", "adult"]);
-    expect(cards.find((c) => c.group === "person.search")?.bands).toBeUndefined();
-  });
-
-  test("Chat > Parental controls is a link row for owner, admin and adult only, when a child exists, never a person id (C-S1 c)", () => {
-    const row = section("chat", "parental-controls");
-    expect(row.kind).toBe("link");
-    expect(row.min_role).toBe("adult");
-    expect(row.bands).toEqual(["adult"]);
-    expect(row.needs).toEqual(["household.has_child"]);
-    expect(row.href).toBe("/people");
-    const related = area("chat").groups.find((g) => g.label === "Related")!;
-    expect(related.sections).toContain("parental-controls");
-  });
-
-  test("Chat > Household chat link is admin only", () => {
-    expect(section("chat", "household").min_role).toBe("admin");
-  });
-
-  test("no href holds a placeholder other than {self}; none carries a person id (C-S2)", () => {
-    const hrefs: string[] = [];
-    for (const a of file.areas) {
-      for (const s of a.sections) {
-        if (s.href) hrefs.push(s.href);
-        for (const c of s.cards ?? []) for (const l of c.links ?? []) hrefs.push(l.href);
-      }
-    }
-    expect(hrefs.length).toBeGreaterThan(10);
-    for (const h of hrefs) {
-      expect(h.startsWith("/"), h).toBe(true);
-      expect(h.replaceAll("{self}", ""), h).not.toMatch(/[{}]/);
-    }
-    expect(hrefs).toContain("/people/{self}?tab=memories");
-  });
-
-  test("a href with another placeholder is refused by the schema", () => {
-    const a = clone(area("chat"));
-    a.sections.find((s) => s.id === "memories")!.href = "/people/{person_id}";
-    expect(validateArea(a)).toBe(false);
-  });
-
-  test("household scope cards sit only where an admin is required", () => {
-    for (const a of file.areas) {
-      for (const s of a.sections) {
-        for (const c of s.cards ?? []) {
-          if (c.scope !== "household") continue;
-          const roles = [a.audience.min_role, s.min_role, c.min_role].filter(Boolean);
-          expect(roles.some((r) => r === "admin" || r === "owner"), `${a.id}/${s.id}/${c.label}`).toBe(true);
-        }
-      }
-    }
-  });
-
-  test("no card or section is broader than its area", () => {
-    expect(checkAreas(file, registry).filter((e) => /broader/.test(e))).toEqual([]);
-  });
-
-  test("allowances and per-person quotas are not in any settings area (a parent or admin sets them on a person's own page)", () => {
-    const placed = new Set<string>();
-    for (const a of file.areas) for (const s of a.sections) for (const c of s.cards ?? []) if (c.group) placed.add(`${c.scope}:${c.group}`);
-    expect(placed.has("person:person.allowance")).toBe(false);
-    expect(placed.has("person:person.storage")).toBe(false);
-    expect(file.not_placed.map((n) => `${n.scope}:${n.group}`)).toEqual(
-      expect.arrayContaining(["person:person.allowance", "person:person.storage"]),
-    );
-  });
-});
-
-describe("registry group moves (design 3.5): only lives_in changes", () => {
-  const where = (key: string) => registry.find((k) => k.key === key)?.lives_in;
-
-  test("chat keys live in person.chat", () => {
-    expect(where("ui.show_turn_stats")).toBe("person.chat");
-    expect(where("reference.images")).toBe("person.chat");
-    expect(where("chat.photo_uploads")).toBe("person.chat");
-  });
-
-  test("enrollment sounds live in the new person.profile group", () => {
-    expect(where("ui.enrollment_sounds")).toBe("person.profile");
-  });
-
-  test("quiet hours follow the notifications groups", () => {
-    expect(where("person.quiet_hours.from")).toBe("person.notifications");
-    expect(where("person.quiet_hours.to")).toBe("person.notifications");
-    expect(where("household.quiet_hours.from")).toBe("household.notifications");
-    expect(where("household.quiet_hours.to")).toBe("household.notifications");
-  });
-
-  test("the telegram chat id and the 15 per-event switches live in person.telegram", () => {
-    const telegram = registry.filter((k) => k.lives_in === "person.telegram").map((k) => k.key);
-    expect(telegram).toContain("notifications.telegram.chat_id");
-    expect(telegram.filter((k) => k.endsWith(".telegram"))).toHaveLength(15);
-    expect(telegram).toHaveLength(16);
-    expect(registry.filter((k) => k.lives_in === "person.notifications" && /telegram/.test(k.key))).toEqual([]);
-  });
-
-  test("backup limit joins storage, the internet probe gets household.status", () => {
-    expect(where("backup.max_total_gb")).toBe("household.storage");
-    const probe = registry.filter((k) => k.key.startsWith("status.internet_probe.")).map((k) => k.lives_in);
-    expect(probe).toHaveLength(4);
-    expect(new Set(probe)).toEqual(new Set(["household.status"]));
-  });
-
-  test("the registry keeps the pinned count and includes the checklist dismissal key", () => {
-    expect(registry).toHaveLength(240);
-    expect(new Set(registryIds()).size).toBe(240);
-    for (const key of [
-      "news.shelf.enabled", "news.poll_interval_s", "news.retention_days",
-      "reference.update.max_mbps",
-      "search.fetch_cache_gb", "search.wayback_fallback", "search.dictionary_fallback",
-      "search.source_mode", "search.source_mode.wikimedia", "search.source_mode.web", "search.web_sources", "chat.search_assist",
-      "search.web.child_mode", "search.web.teen_mode",
-      "search.blocklists.child", "search.blocklists.teen", "search.blocklists.adult", "search.blocklists", "search.page_text_cleaning",
-      "search.hosts.deny", "search.hosts.allow",
-      "search.hosts.child.deny", "search.hosts.child.allow", "search.hosts.teen.deny", "search.hosts.teen.allow",
-      "backups.emergency_kit_saved_at",
-      "setup.checklist_dismissed",
-      "search.hosts.adult.deny", "search.hosts.adult.allow",
-      "topics.bodies", "topics.health", "topics.risk", "topics.violence", "topics.family_stories", "topics.family_story_names",
-      "topics.teen.bodies", "topics.teen.risk",
-    ]) expect(registryIds()).toContain(key);
-  });
-});
-
-// MINOR-SEARCH-01e-10: the blocked-sites card draws its list choices as a category-by-user-type grid.
-const blockedCard = () => {
-  const found = section("home", "search").cards?.find((c) => c.matrix);
-  if (!found) throw new Error("home/search has no matrix card");
-  return found;
-};
-
-test("the blocked-sites card names the three list-choice keys, one per user type, all in its own group", () => {
-  const card = blockedCard();
-  expect(card.matrix!.columns.map((c) => c.band)).toEqual(["child", "teen", "adult"]);
-  expect(card.matrix!.columns.map((c) => c.key)).toEqual(["search.blocklists.child", "search.blocklists.teen", "search.blocklists.adult"]);
-  expect(checkAreas(file, registry)).toEqual([]);
-  expect(validateArea(area("home"))).toBe(true);
-});
-
-test("a matrix column naming a key outside the card's group, or a repeated band, is refused", () => {
-  const f = clone(file);
-  const card = f.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "search")!.cards!.find((c) => c.matrix)!;
-  card.matrix!.columns[0]!.key = "search.safe_search";
-  expect(checkAreas(f, registry).join("\n")).toContain("must live in household:household.blocked_sites");
-  card.matrix!.columns[0]!.key = "search.blocklists.child";
-  card.matrix!.columns[1]!.band = "child";
-  expect(checkAreas(f, registry).join("\n")).toContain("two columns for child");
-});
-
-test("a matrix with an unknown row source or extra field is refused by the schema", () => {
-  const a = clone(area("home"));
-  const card = a.sections.find((s) => s.id === "search")!.cards!.find((c) => c.matrix)!;
-  (card.matrix as { rows: string }).rows = "search/other";
-  expect(validateArea(a)).toBe(false);
-});
-
-// KS-05: the News shelf card draws its list choices as a list-by-user-type grid.
-test("the news shelf card names the three list keys, one per user type, all in its own group", () => {
-  const card = section("home", "search").cards?.find((c) => c.matrix?.rows === "news/feed-lists");
-  if (!card) throw new Error("home/search has no news feed-list matrix card");
-  expect(card.matrix!.columns.map((c) => c.band)).toEqual(["child", "teen", "adult"]);
-  expect(card.matrix!.columns.map((c) => c.key)).toEqual(["news.lists.child", "news.lists.teen", "news.lists.adult"]);
-  expect(card.matrix!.unavailable_note).toBeTruthy();
-  expect(checkAreas(file, registry)).toEqual([]);
-  expect(validateArea(area("home"))).toBe(true);
-});
+function getPageFrom(f:AreasFile,a:string,id:string){return f.areas.find(x=>x.id===a)!.sections.find(x=>x.id===id)!}

@@ -26,7 +26,7 @@ export interface AreaCard {
   matrix?: AreaMatrix;
   tab?: string;
 }
-export interface AreaTab { id: string; label: string }
+export interface AreaTab { id: string; label: string; view?: string; min_role?: Role; bands?: Band[]; needs?: string[] }
 export interface AreaDetail { param: string; view: string; tabs?: AreaTab[] }
 export interface AreaMatrixColumn { label: string; key: string; band: Band }
 export interface AreaMatrix { rows: string; rows_label?: string; columns: AreaMatrixColumn[]; locked_note?: string; unavailable_note?: string; save_error?: string }
@@ -66,9 +66,9 @@ export interface RegistryKey { key: string; scope: Scope; level: Level; lives_in
 
 const defs = schema.$defs;
 /** Static legacy routes under /settings that an area id may never equal. */
-export const RESERVED_AREA_IDS: readonly string[] = defs.reservedIds.enum;
+export const RESERVED_AREA_IDS: readonly string[] = [...defs.reservedIds.enum, "chat"];
 /** The areas declared centrally in areas.json; a package may not reuse them. */
-export const CENTRAL_AREA_IDS: readonly string[] = ["account", "home", "chat"];
+export const CENTRAL_AREA_IDS: readonly string[] = ["account", "home"];
 /** The views Home's view table renders. */
 export const ALLOWED_VIEW_IDS: readonly string[] = defs.view.enum;
 export const ROLES: readonly Role[] = defs.role.enum as Role[];
@@ -78,11 +78,13 @@ export const ROLES: readonly Role[] = defs.role.enum as Role[];
 export const EXPERT_OUTSIDE_DEVELOPER: readonly string[] = ["household.network_port"];
 
 export const HOUSEHOLD_CARD_ALLOWLIST: readonly string[] = ["news"];
-export const PAGE_COUNT_ENFORCED = false;
+export const PAGE_COUNT_ENFORCED = true;
 export const SETTINGS_CAP_ENFORCED = false;
 export function checkPageCount(area: SettingsArea): string[] {
   if (!PAGE_COUNT_ENFORCED || (area.id !== "home" && area.id !== "account")) return [];
-  const pages = area.sections.filter((s) => !s.min_role || rank(s.min_role) <= rank(area.audience.min_role));
+  const pages = area.sections.filter((s) => !s.tabs?.length
+    ? (!s.min_role || rank(s.min_role) <= rank(area.audience.min_role))
+    : s.tabs.some((t) => Math.min(rank(s.min_role ?? area.audience.min_role), rank(t.min_role ?? area.audience.min_role)) <= rank(area.audience.min_role)));
   return pages.length < 6 || pages.length > 9 ? [`${area.id}: must have 6 to 9 visible pages (found ${pages.length})`] : [];
 }
 export function checkSettingsCap(section: AreaSection, registry: RegistryKey[]): string[] {
@@ -91,7 +93,8 @@ export function checkSettingsCap(section: AreaSection, registry: RegistryKey[]):
   const errors: string[] = [];
   for (const tab of tabs) {
     const sectionViews = tab === "__summary__" && (section.view || section.lead_view || section.trail_view) ? 1 : 0;
-    const count = sectionViews + (section.cards ?? []).filter((c) => (c.tab ?? "__summary__") === tab).reduce((n, c) => {
+    const tabViews = section.tabs?.find((entry) => entry.id === tab)?.view ? 1 : 0;
+    const count = sectionViews + tabViews + (section.cards ?? []).filter((c) => (c.tab ?? "__summary__") === tab).reduce((n, c) => {
       if (!c.group || !c.scope) return n;
       return n + registry.filter((k) => k.scope === c.scope && k.lives_in === c.group && k.level === "basic").length;
     }, 0);
@@ -141,7 +144,8 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
     for (const s of area.sections) {
       const where = `${area.id}/${s.id}`;
       const validTabIds = new Set((s.tabs ?? []).map((tab) => tab.id));
-      if (s.tabs && (s.tabs.length < 2 || s.tabs.length > 5)) errors.push(`${where}: tabs must contain 2 to 5 entries`);
+      if (s.tabs?.length && (s.view || s.lead_view || s.trail_view)) errors.push(`${where}: a section with tabs cannot also have section-level views`);
+      if (s.tabs && (s.tabs.length < 1 || s.tabs.length > 5)) errors.push(`${where}: tabs must contain 1 to 5 entries`);
       if (new Set(validTabIds).size !== (s.tabs?.length ?? 0)) errors.push(`${where}: tab ids must be unique`);
       if (s.view_tab && !validTabIds.has(s.view_tab)) errors.push(`${where}: view_tab "${s.view_tab}" is not a tab id of the section`);
       if (s.detail) {
@@ -150,7 +154,7 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         if (s.detail.tabs && (s.detail.tabs.length < 2 || s.detail.tabs.length > 5)) errors.push(`${where}: detail tabs must contain 2 to 5 entries`);
         if (s.detail.tabs && new Set(s.detail.tabs.map((tab) => tab.id)).size !== s.detail.tabs.length) errors.push(`${where}: detail tab ids must be unique`);
       }
-      if (s.kind === "keys" && !s.cards?.length) errors.push(`${where}: a keys section needs cards`);
+      if (s.kind === "keys" && !s.cards?.length && !s.tabs?.length) errors.push(`${where}: a keys section needs cards`);
       if (s.kind === "view" && !s.view) errors.push(`${where}: a view section needs a view`);
       if (s.kind === "link" && !s.href) errors.push(`${where}: a link section needs an href`);
       if (s.kind === "keys" && (s.view || s.href)) errors.push(`${where}: a keys section holds no view or href`);
@@ -158,6 +162,13 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
       if (s.kind === "link" && (s.cards || s.view || s.lead_view || s.trail_view)) errors.push(`${where}: a link section holds only an href`);
       for (const v of [s.view, s.lead_view, s.trail_view]) {
         if (v !== undefined && !ALLOWED_VIEW_IDS.includes(v)) errors.push(`${where}: unknown view "${v}"`);
+      }
+      for (const tab of s.tabs ?? []) {
+        if (tab.view !== undefined && !ALLOWED_VIEW_IDS.includes(tab.view)) errors.push(`${where}: tab "${tab.id}" has unknown view "${tab.view}"`);
+        if (tab.min_role && rank(tab.min_role) > rank(area.audience.min_role)) errors.push(`${where}: tab "${tab.id}" min_role ${tab.min_role} is broader than the area's ${area.audience.min_role}`);
+        if (tab.min_role && s.min_role && rank(tab.min_role) < rank(s.min_role)) errors.push(`${where}: tab "${tab.id}" audience is broader than its page min_role ${s.min_role}`);
+        if (s.bands && tab.bands?.some((band) => !s.bands!.includes(band))) errors.push(`${where}: tab "${tab.id}" audience bands are broader than its page`);
+        if (s.needs && s.needs.some((need) => !tab.needs?.includes(need))) errors.push(`${where}: tab "${tab.id}" audience is broader than its page needs`);
       }
       if (s.min_role && rank(s.min_role) > rank(area.audience.min_role)) {
         errors.push(`${where}: min_role ${s.min_role} is broader than the area's ${area.audience.min_role}`);
@@ -171,17 +182,18 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         if (c.links && (c.group || c.scope || c.levels)) errors.push(`${where}: card "${c.label}" is a link card, so it has no group, scope or levels`);
         if (!c.links && !(c.group && c.scope)) errors.push(`${where}: card "${c.label}" needs a group and scope, or links`);
         if (!c.group || !c.scope) continue;
-        const deviceException = c.scope === "device" && area.scope === "person" && (s.id === "device" || s.id === "robot");
+        const deviceException = c.scope === "device" && area.scope === "person" && (s.id === "device" || s.id === "robot" || c.tab === "device");
         if (c.scope !== area.scope && !deviceException) errors.push(`${where}: card "${c.label}" scope ${c.scope} disagrees with area's ${area.scope} scope`);
         const levels = c.levels ?? DEFAULT_LEVELS;
         const groupLevels = new Set(registry.filter((k) => k.scope === c.scope && k.lives_in === c.group).map((k) => k.level));
         const has = (lv: Level) => levels.includes(lv);
-        const expertOutside = EXPERT_OUTSIDE_DEVELOPER.includes(c.group) && s.id !== "developer" && levels.length === 1 && has("expert");
-        if (groupLevels.has("expert") && !expertOutside && (s.id !== "developer" || levels.length !== 1 || !has("expert"))) {
-          errors.push(`${where}: card "${c.label}" contains expert keys outside a developer section or mixes expert levels`);
+        const expertOutside = EXPERT_OUTSIDE_DEVELOPER.includes(c.group) && levels.length === 1 && has("expert");
+        const advancedTab = c.tab === "advanced" || c.tab === "developer";
+        if (groupLevels.has("expert") && !expertOutside && (!advancedTab || levels.length !== 1 || !has("expert"))) {
+          errors.push(`${where}: card "${c.label}" contains expert keys outside an advanced/developer tab or mixes expert levels`);
         }
-        if (s.id === "developer" && (!groupLevels.has("expert") || levels.length !== 1 || !has("expert"))) {
-          errors.push(`${where}: a developer card draws expert keys only (card "${c.label}")`);
+        if (advancedTab && levels.includes("expert") && (!groupLevels.has("expert") || levels.length !== 1 || !has("expert"))) {
+          errors.push(`${where}: an advanced/developer card draws expert keys only (card "${c.label}")`);
         }
         if (!registryGroups.has(`${c.scope}:${c.group}`)) {
           errors.push(`${where}: card "${c.label}" group ${c.group} at ${c.scope} is not in the registry`);
@@ -204,7 +216,7 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         drawn.set(id, [...(drawn.get(id) ?? []), `${where}${c.tab ? `?tab=${c.tab}` : ""}`]);
       }
       if (s.tabs) for (const tab of s.tabs) {
-        if (!(s.cards ?? []).some((c) => c.tab === tab.id) && s.view_tab !== tab.id) errors.push(`${where}: tab "${tab.id}" holds nothing`);
+        if (!(s.cards ?? []).some((c) => c.tab === tab.id) && !tab.view && s.view_tab !== tab.id) errors.push(`${where}: tab "${tab.id}" holds nothing`);
       }
       errors.push(...checkSettingsCap(s, registry).map((e) => `${where}: ${e}`));
       if (s.href) checkHref(where, s.href, errors);
