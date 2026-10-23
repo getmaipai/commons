@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
-import { ArrowLeft, CloudDrizzleIcon, CloudFogIcon, CloudIcon, CloudLightningIcon, CloudRainIcon, CloudSnowIcon, CloudSunIcon, DropletIcon, MapPin, MoonIcon, Search, SunIcon, Wind, Gauge, Thermometer, Sunrise, X } from "lucide-react";
+import { ArrowLeft, CloudDrizzleIcon, CloudFogIcon, CloudIcon, CloudLightningIcon, CloudMoonIcon, CloudRainIcon, CloudSnowIcon, CloudSunIcon, DropletIcon, MapPin, MoonIcon, Search, SunIcon, Wind, Gauge, Thermometer, Sunrise, X } from "lucide-react";
 import { cn } from "cn";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { WeatherSky } from "./weather-sky";
 import { weatherClassOf, type WeatherClass } from "./weather-condition";
 
-export interface ForecastHour { time: string; temp: number; condition?: string; code?: number; pop?: number; windSpeed?: number }
+export interface ForecastHour { time: string; temp: number; condition?: string; code?: number; pop?: number; windSpeed?: number; isDay?: boolean }
 export interface ForecastDay { date: string; high: number; low: number; code: number; pop?: number }
 /** Additive, optional data for detail tiles. Missing fields omit their tile or sentence. */
 export interface WeatherLocationDetail {
@@ -71,6 +71,58 @@ export function formatLocalTime(value: string, timeZone?: string, locale = "en-U
 }
 const deg = (n: number) => `${Math.round(n)}°`;
 const ICONS: Record<WeatherClass, typeof SunIcon> = { clear: SunIcon, "partly-cloudy": CloudSunIcon, overcast: CloudIcon, fog: CloudFogIcon, drizzle: CloudDrizzleIcon, rain: CloudRainIcon, snow: CloudSnowIcon, thunderstorm: CloudLightningIcon };
+function localDateKey(value: string, timeZone?: string): string | undefined {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    const match = /^(\d{4}-\d{2}-\d{2})T/.exec(value);
+    return match?.[1];
+  }
+  try {
+    const parts = new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
+    const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(x => x.type === type)?.value;
+    return `${part("year")}-${part("month")}-${part("day")}`;
+  } catch {
+    return date.toISOString().slice(0, 10);
+  }
+}
+function clockMinutes(value: string, dateKey: string, timeZone?: string): number | undefined {
+  const date = new Date(value);
+  if (!Number.isNaN(date.getTime())) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-US", { timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(date);
+      return Number(parts.find(x => x.type === "hour")?.value) * 60 + Number(parts.find(x => x.type === "minute")?.value);
+    } catch { /* Use the source timestamp's clock below. */ }
+  }
+  const match = new RegExp(`^${dateKey}T(\\d{2}):(\\d{2})`).exec(value);
+  return match ? Number(match[1]) * 60 + Number(match[2]) : undefined;
+}
+function timeValueForDate(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const iso = /^\d{4}-\d{2}-\d{2}T(\d{2}):(\d{2})/.exec(value);
+  if (iso) return Number(iso[1]) * 60 + Number(iso[2]);
+  const clock = /(?:T)?(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(value);
+  if (!clock) return undefined;
+  let hour = Number(clock[1]) % 12;
+  if (clock[3]?.toUpperCase() === "PM") hour += 12;
+  return hour * 60 + Number(clock[2]);
+}
+function hourIsDay(hour: ForecastHour, detail: WeatherLocationDetail, timeZone?: string): boolean {
+  if (hour.isDay !== undefined) return hour.isDay;
+  const dateKey = localDateKey(hour.time, timeZone);
+  const minutes = dateKey ? clockMinutes(hour.time, dateKey, timeZone) : undefined;
+  if (dateKey && minutes !== undefined) {
+    const sunrise = timeValueForDate(detail.sunrise);
+    const sunset = timeValueForDate(detail.sunset);
+    if (sunrise !== undefined && sunset !== undefined) return minutes >= sunrise && minutes < sunset;
+  }
+  return detail.isDay;
+}
+function hourlyIcon(cls: WeatherClass, isDay: boolean) {
+  if (isDay) return ICONS[cls];
+  if (cls === "clear") return MoonIcon;
+  if (cls === "partly-cloudy") return CloudMoonIcon;
+  return ICONS[cls];
+}
 const dayName = (date: string, locale: string) => { const parts = date.split("-").map(Number); const y = parts[0] ?? 2000; const m = parts[1] ?? 1; const d = parts[2] ?? 1; return new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(y, m - 1, d))); };
 function Tile({ title, icon, children, className }: { title: string; icon?: ReactNode; children: ReactNode; className?: string }) {
   return <section data-slot="weather-tile" className={cn("bg-card/65 border-border flex min-h-40 flex-col rounded-2xl border p-4 shadow-sm backdrop-blur-xl", className)}><h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">{icon}<span>{title}</span></h3>{children}</section>;
@@ -116,7 +168,7 @@ export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch,
           <p className="text-7xl leading-none font-light tabular-nums">{deg(d.temp)}<span className="text-3xl">{unit}</span></p><p className="mt-3 text-lg">{d.condition}</p><p className="mt-1 text-sm">{d.high !== undefined && d.low !== undefined ? `H ${deg(d.high)} · L ${deg(d.low)}` : ""}</p>
         </section>
         <div data-slot="weather-detail-grid" className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] auto-rows-[minmax(160px,auto)] items-start gap-3">
-          {d.hourly?.length ? <Tile title={labels.hourlyForecast} icon={<Thermometer className="size-4" aria-hidden/>} className="col-span-full h-auto min-h-0"><ol data-slot="weather-hourly-strip" className="flex gap-2 overflow-x-auto pb-2">{d.hourly.slice(0,24).map((hour,i) => { const Icon = ICONS[weatherClassOf(hour.code ?? d.code)]; return <li key={hour.time} data-slot="weather-forecast-hour" className="flex w-16 min-w-16 shrink-0 flex-col items-center gap-2 text-sm"><span className="text-muted-foreground whitespace-nowrap">{i === 0 ? "Now" : formatLocalTime(hour.time, selected.timezone, locale).replace(/:\d{2}(?=\s|$)/, "")}</span><Icon className="size-5" aria-hidden/><b className="tabular-nums">{deg(hour.temp)}{unit}</b><span className="text-primary h-4 text-xs">{hour.pop !== undefined && hour.pop >= 10 ? `${hour.pop}%` : " "}</span></li>; })}</ol></Tile> : null}
+          {d.hourly?.length ? <Tile title={labels.hourlyForecast} icon={<Thermometer className="size-4" aria-hidden/>} className="col-span-full h-auto min-h-0"><ol data-slot="weather-hourly-strip" className="flex gap-2 overflow-x-auto pb-2">{d.hourly.slice(0,24).map((hour,i) => { const Icon = hourlyIcon(weatherClassOf(hour.code ?? d.code), hourIsDay(hour, d, selected.timezone)); return <li key={hour.time} data-slot="weather-forecast-hour" className="flex w-16 min-w-16 shrink-0 flex-col items-center gap-2 text-sm"><span className="text-muted-foreground whitespace-nowrap">{i === 0 ? "Now" : formatLocalTime(hour.time, selected.timezone, locale).replace(/:\d{2}(?=\s|$)/, "")}</span><Icon className="size-5" aria-hidden/><b className="tabular-nums">{deg(hour.temp)}{unit}</b><span className="text-primary h-4 text-xs">{hour.pop !== undefined && hour.pop >= 10 ? `${hour.pop}%` : " "}</span></li>; })}</ol></Tile> : null}
           {daily.length ? <Tile title={labels.tenDayForecast} icon={<SunIcon className="size-4" aria-hidden/>} className="col-span-full"><ol data-slot="weather-daily-list" className="divide-border divide-y">{daily.map((day,i) => { const Icon = ICONS[weatherClassOf(day.code)]; const m = rangeBarMetrics(day.low, day.high, globalMin, globalMax, i === 0 ? d.temp : undefined); return <li key={day.date} className="grid min-h-11 grid-cols-[3.2rem_2.5rem_2.6rem_minmax(2rem,1fr)_2.6rem] items-center gap-2 text-sm tabular-nums"><span>{i === 0 ? "Today" : dayName(day.date,locale)}</span><span className="flex flex-col items-center"><Icon className="size-4" aria-hidden/>{day.pop !== undefined && day.pop >= 20 && <small className="text-primary text-[10px]">{day.pop}%</small>}</span><span className="text-muted-foreground text-right">{deg(day.low)}</span><span className="bg-muted relative h-1.5 rounded-full"><span className="from-[var(--weather-range-cool)] via-[var(--weather-range-mid)] to-[var(--weather-range-warm)] absolute h-full rounded-full bg-gradient-to-r" style={{left:`${m.left}%`,width:`${m.width}%`}}/>{m.dot !== undefined && <i aria-label={labels.currentTemperature} className="bg-foreground absolute top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{left:`${m.dot}%`}}/>}</span><span className="text-right">{deg(day.high)}</span></li>; })}</ol></Tile> : null}
 
           {d.uvIndex !== undefined && tile(labels.uvIndex, d.uvIndex, d.uvIndex < 3 ? "Low" : d.uvIndex < 6 ? "Moderate" : d.uvIndex < 8 ? "High" : "Very high", <div data-slot="weather-uv-bar" className="relative h-2 rounded-full bg-gradient-to-r from-[var(--weather-uv-low)] via-[var(--weather-uv-mid)] to-[var(--weather-uv-high)]"><i className="absolute -top-1 size-4 rounded-full border-2 border-background bg-foreground" style={{left:`${Math.min(100,d.uvIndex/11*100)}%`}}/></div>)}

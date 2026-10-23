@@ -2,6 +2,10 @@
 
 ## [ui-v0.5.323-weather.3] - 2026-10-23
 
+## [ui-v0.5.323-weather.4] - 2026-10-23
+
+- Show moon and cloud-moon icons for night hours using hourly day flags or local sunrise and sunset, keep daily icons in daytime style, and reposition the warm glowing hero sun away from the update label.
+
 - Fix weather detail sizing with content-height hourly forecast and compact responsive tiles in Apple-style order. Long location names truncate beside fixed local time, and the remove chip remains visible. Clear-day heroes add drifting clouds and a warm sun with rotating rays; reduced-motion still freezes the scene. Update the showcase and structural animation tests.
 
 - Weather: one animated sky (WeatherSky) drives the chat card, the location cards and the detail hero, with visible clouds, rain, snow, stars and lightning; the forecast page is redesigned with same-size location cards, an add control, an Apple-style 10-day range bar and detail tiles.

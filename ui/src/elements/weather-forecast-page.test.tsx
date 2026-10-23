@@ -105,7 +105,7 @@ describe("WeatherForecastPage", () => {
     expect(tokens).toContain("@keyframes wx-sun-pulse");
     expect(tokens).toContain("@keyframes wx-rays");
     expect(tokens).toContain("animation: wx-rays 60s linear infinite");
-    expect(tokens).toContain("#ffd75e, #ff9f2d");
+    expect(tokens).toContain("#ffd75e, #ffb02e");
     expect(tokens).toContain("animation-duration: 4s");
     expect(tokens).toContain("animation-duration: 4s");
     expect(tokens).toContain("@keyframes wx-twinkle");
@@ -162,6 +162,22 @@ describe("WeatherForecastPage", () => {
     for (const cell of cells) { expect(cell.className).toContain("w-16"); expect(cell.querySelector("span")?.className).toContain("whitespace-nowrap"); }
     expect(cells[0]?.textContent).toContain("Now");
     expect(cells[1]?.textContent).toContain("3 PM");
+  });
+
+  test("hourly icons switch between night moon and daytime sun", () => {
+    const detail = { ...locations[0]!.detail!, code: 0, sunrise: "2026-10-22T07:00:00", sunset: "2026-10-22T18:00:00",
+      hourly: [{ time: "2026-10-22T20:00:00", temp: 55 }, { time: "2026-10-23T12:00:00", temp: 70 }] };
+    const { container } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail }]} selectedId="home"/>);
+    const cells = container.querySelectorAll("[data-slot=weather-forecast-hour]");
+    expect(cells[0]?.querySelector("svg")?.getAttribute("class")).toContain("lucide-moon");
+    expect(cells[1]?.querySelector("svg")?.getAttribute("class")).toContain("lucide-sun");
+  });
+
+  test("provided hourly isDay overrides sunrise and sunset fallback", () => {
+    const detail = { ...locations[0]!.detail!, code: 0, sunrise: "2026-10-22T07:00:00", sunset: "2026-10-22T18:00:00",
+      hourly: [{ time: "2026-10-22T20:00:00", temp: 55, isDay: true }] };
+    const { container } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail }]} selectedId="home"/>);
+    expect(container.querySelector("[data-slot=weather-forecast-hour] svg")?.getAttribute("class")).toContain("lucide-sun");
   });
 
   test("searches and opens then closes the mobile detail", () => {

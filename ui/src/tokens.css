@@ -1480,9 +1480,9 @@ body {
 }
 [data-slot="weather-sky"] [data-fx="sun"] { animation-name: wx-sun-pulse; animation-duration: 4s; }
 [data-slot="weather-location-sky"] [data-fx="sun"], [data-slot="weather-location-sky"] [data-fx="sun-rays"] { right: -80px; top: -82px; }
-[data-slot="weather-forecast-hero"] [data-fx="sun"], [data-slot="weather-forecast-hero"] [data-fx="sun-rays"] { right: 5%; top: -38px; }
+[data-slot="weather-forecast-hero"] [data-fx="sun"], [data-slot="weather-forecast-hero"] [data-fx="sun-rays"] { left: 62%; top: 18%; right: auto; }
 [data-slot="weather-forecast-hero"] > :not([data-weather-layer]) { position: relative; z-index: 2; }
-[data-slot="weather-sky"] [data-fx="sun"]::after { content: ""; position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd75e, #ff9f2d 78%); box-shadow: 0 0 32px 12px var(--weather-sun-glow); }
+[data-slot="weather-sky"] [data-fx="sun"]::after { content: ""; position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd75e, #ffb02e 78%); box-shadow: 0 0 46px 20px var(--weather-sun-glow), 0 0 96px 32px rgb(255 177 54 / .24); }
 [data-slot="weather-sky"] [data-fx="sun-rays"] { top: -55px; right: 3%; width: 170px; height: 170px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg 8deg, rgb(255 232 174 / .72) 9deg 11deg, transparent 12deg 30deg); mask: radial-gradient(circle, transparent 0 38%, #000 40% 65%, transparent 67%); animation: wx-rays 60s linear infinite; }
 [data-slot="weather-sky"] [data-fx="moon"] {
   width: 150px;
