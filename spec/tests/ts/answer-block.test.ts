@@ -59,8 +59,21 @@ describe("answer-block fixtures", () => {
   test("story-feed cards accept the hub favicon route and reject other paths", () => {
     const feed = read("fixtures", "answer-block", "valid-story_feed.json");
     expect(validate(feed)).toBe(true);
-    expect(validate({ ...feed, props: { ...feed.props, hero: { ...feed.props.hero, sourceIconUrl: "/api/favicon?domain=example.com" } } })).toBe(true);
-    expect(validate({ ...feed, props: { ...feed.props, hero: { ...feed.props.hero, sourceIconUrl: "https://example.com/favicon.ico" } } })).toBe(false);
+    const withSourceIcon = {
+      ...feed,
+      props: {
+        ...feed.props,
+        hero: { ...feed.props.hero, sourceIconUrl: "/api/favicon?domain=example.com" },
+      },
+    };
+    expect(validate(withSourceIcon)).toBe(true);
+    expect(validate({
+      ...withSourceIcon,
+      props: {
+        ...withSourceIcon.props,
+        hero: { ...withSourceIcon.props.hero, sourceIconUrl: "https://example.com/favicon.ico" },
+      },
+    })).toBe(false);
   });
 });
 
