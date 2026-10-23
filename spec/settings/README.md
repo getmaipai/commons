@@ -2,10 +2,9 @@
 
 ## Settings areas, tabs and record details
 
-`areas.json` declares each settings area with a required `scope`: `household`
-for settings that govern the home, or `person` for the viewer's own settings.
-Every key card must match its area's scope. A `device` card is the exception
-for device-local controls on a person's `device` or `robot` section.
+`areas.json` declares one central `settings` area, open to signed-in guests. Its single column has two groups: **Yours** (seven personal pages) and **The home** (nine household pages). Each section declares `scope: "person"` or `scope: "household"`; household sections require admin or narrower access, while the area itself is open and sections gate themselves. Package areas omit scope and read as person. Cards must match their section's scope, except device cards on the personal Voice page's device/robot tabs and the Apps page's robot cards.
+
+The earlier separate Home and Account structure was prepared in unreleased commits and never shipped. The legacy `home`, `account`, and `chat` route ids remain reserved.
 
 A section may declare one to five `tabs`, in display order. A card's optional
 `tab` names its section tab; cards without one form the summary strip above
@@ -23,7 +22,7 @@ two-to-five tabs. It is a drill-in screen, not another settings page.
 must appear in exactly one card, even when the keys have different levels or
 the area declares tabs, or it must appear once in `not_placed` with a reason.
 The page-count and per-tab basic-setting cap checks are implemented behind
-`PAGE_COUNT_ENFORCED` enforces 6–9 pages for Home and Account;
+`PAGE_COUNT_ENFORCED` enforces 6–9 pages per scope in Settings;
 `SETTINGS_CAP_ENFORCED` remains off pending a follow-up. Package household cards are limited by the shrink-only
 `HOUSEHOLD_CARD_ALLOWLIST`, initially `news` for the News shelf.
 

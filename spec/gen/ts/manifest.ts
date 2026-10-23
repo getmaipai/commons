@@ -1186,13 +1186,6 @@ export const PackageManifest = z
               .min(1)
               .max(40)
               .describe("The settings column's heading."),
-            /**The settings governed by this area: household settings are admin-only; person settings belong to the viewer.*/
-            scope: z
-              .enum(["household", "person"])
-              .describe(
-                "The settings governed by this area: household settings are admin-only; person settings belong to the viewer.",
-              )
-              .optional(),
             /**The nav entry that owns this area, so the app's header gets a gear. Absent for Account and Home settings.*/
             app: z
               .string()
@@ -1757,6 +1750,12 @@ export const PackageManifest = z
                         "A record detail screen at /settings/<area>/<section>/<id>; it is not an additional page.",
                       )
                       .optional(),
+                    /**Whether the page edits the viewer’s own settings or household settings.*/
+                    scope: z
+                      .enum(["person", "household"])
+                      .describe(
+                        "Whether the page edits the viewer’s own settings or household settings.",
+                      ),
                   })
                   .strict()
                   .and(

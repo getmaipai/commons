@@ -46,6 +46,7 @@ export interface Section {
   label: string;
   icon: string;
   kind: "keys" | "view" | "link";
+  scope?: "person" | "household";
   cards?: AreaCard[];
   lead_view?: string;
   trail_view?: string;

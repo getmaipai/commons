@@ -1,20 +1,17 @@
 import { describe, expect, test } from "bun:test";
 import {
-  areaAllows,
   audienceAllows,
-  cardKeys,
   cardsInTab,
-  firstVisibleSection,
   resolveHref,
   resolveTab,
   sectionTabs,
   roleAllows,
-  visibleCards,
   visibleGroups,
   visibleTabs,
 } from "./settingsAudience";
 import liveAreasFile from "../../../spec/settings/areas.json";
-import { ADMIN, ADULT, CHILD, GUEST, REGISTRY, TEEN, area } from "./settingsFixtures";
+import legacySnapshot from "./fixtures/areas.legacy.json";
+import { ADMIN, ADULT, CHILD, GUEST, REGISTRY, TEEN } from "./settingsFixtures";
 import type { SettingsAreaDef } from "./settingsAudience";
 
 const ids = (groups: ReturnType<typeof visibleGroups>) => groups.flatMap((g) => g.sections.map((s) => s.id));
@@ -69,69 +66,32 @@ describe("section tabs and tabbed cards", () => {
   });
 });
 
-describe("Chat settings audience (design 3.1)", () => {
-  const chat = area("chat");
+describe("single Settings area audience", () => {
+  const liveAreas = (liveAreasFile as unknown as { areas: SettingsAreaDef[] }).areas;
+  const settings = liveAreas[0]!;
 
-  test("an adult sees General, Personalization, Skills, Shortcuts and the arrow rows, not household", () => {
-    expect(ids(visibleGroups(chat, ADULT, REGISTRY, "home"))).toEqual([
-      "general", "personalization", "skills", "shortcuts", "voice", "notifications", "memories",
-    ]);
+  test("a non-admin sees Yours only; admins see both headings", () => {
+    expect(settings.groups.map((g) => g.label)).toEqual(["Yours", "The home"]);
+    expect(visibleGroups(settings, ADULT, REGISTRY, "home").map((g) => g.label)).toEqual(["Yours"]);
+    expect(ids(visibleGroups(settings, ADULT, REGISTRY, "home"))).toEqual(["profile", "appearance", "chat", "voice", "notifications", "pictures", "data"]);
+    expect(visibleGroups(settings, ADMIN, REGISTRY, "home").map((g) => g.label)).toEqual(["Yours", "The home"]);
   });
 
-  test("a child has no Skills and no Parental controls", () => {
-    const seen = ids(visibleGroups(chat, CHILD, REGISTRY, "home"));
-    expect(seen).not.toContain("skills");
-    expect(seen).not.toContain("parental-controls");
-    expect(seen).toContain("general");
+  test("child and teen sections are no broader than the frozen pre-regroup pages", () => {
+    const legacy = (legacySnapshot as unknown as { areas: SettingsAreaDef[] }).areas;
+    for (const viewer of [CHILD, TEEN]) {
+      for (const oldArea of legacy) for (const oldSection of oldArea.sections) {
+        if (!oldSection.scope) continue;
+        const mapped = settings.sections.find((s) => s.id === (oldArea.id === "home" && oldSection.id === "voice" ? "home-voice" : oldSection.id));
+        if (!mapped) continue;
+        expect(audienceAllows(viewer, mapped), mapped.id).toBe(audienceAllows(viewer, oldSection));
+      }
+    }
   });
 
-  test("Parental controls shows to an adult only with a child in the home; Household chat to admins", () => {
-    expect(ids(visibleGroups(chat, { ...ADULT, capabilities: ["household.has_child"] }, REGISTRY, "home"))).toContain("parental-controls");
-    expect(ids(visibleGroups(chat, { ...TEEN, capabilities: ["household.has_child"] }, REGISTRY, "home"))).not.toContain("parental-controls");
-    expect(ids(visibleGroups(chat, ADMIN, REGISTRY, "home"))).toContain("household");
-    expect(ids(visibleGroups(chat, ADULT, REGISTRY, "home"))).not.toContain("household");
-  });
-
-  test("the Chat card on General is for teens and adults; a child gets only the Search card", () => {
-    const general = chat.sections.find((s) => s.id === "general")!;
-    expect(visibleCards(general, CHILD, REGISTRY, "home").map((c) => c.label)).toEqual(["Search"]);
-    expect(visibleCards(general, TEEN, REGISTRY, "home").map((c) => c.label)).toEqual(["Chat", "Search"]);
-  });
-
-  test("the area's first openable section skips arrow rows", () => {
-    expect(firstVisibleSection(chat, ADULT, REGISTRY, "home")?.id).toBe("general");
-  });
-});
-
-describe("Home settings and Account audience", () => {
-  test("Home settings is for admins: an adult sees none of it", () => {
-    const home = area("home");
-    expect(areaAllows(home, ADULT)).toBe(false);
-    expect(visibleGroups(home, ADULT, REGISTRY, "home")).toEqual([]);
-    expect(firstVisibleSection(home, ADULT, REGISTRY, "home")).toBeUndefined();
-    expect(ids(visibleGroups(home, ADMIN, REGISTRY, "home"))).toContain("general");
-  });
-
-  test("Account's device and robot sections wait for their capabilities", () => {
-    const account = area("account");
-    const plain = ids(visibleGroups(account, ADULT, REGISTRY, "home"));
-    expect(plain).not.toContain("device");
-    expect(plain).not.toContain("robot");
-    const equipped = ids(visibleGroups(account, { ...ADULT, capabilities: ["wakeword.assets", "robot.paired", "robots.enabled"] }, REGISTRY, "home"));
-    expect(equipped).toContain("device");
-    expect(equipped).toContain("robot");
-  });
-
-  test("a child never sees Account's developer section", () => {
-    expect(ids(visibleGroups(area("account"), CHILD, REGISTRY, "home"))).not.toContain("developer");
-  });
-
-  test("an expert key is drawn only by a developer card that asks for it", () => {
-    const dev = area("account").sections.find((s) => s.id === "developer")!;
-    const expert = dev.cards!.flatMap((c) => cardKeys(c, REGISTRY, "home")).filter((k) => k.level === "expert");
-    expect(expert.length).toBeGreaterThan(0);
-    const general = area("chat").sections.find((s) => s.id === "general")!;
-    expect(general.cards!.flatMap((c) => cardKeys(c, REGISTRY, "home")).some((k) => k.level === "expert")).toBe(false);
+  test("empty groups disappear and household pages stay admin gated", () => {
+    expect(visibleGroups(settings, CHILD, REGISTRY, "home").map((g) => g.label)).toEqual(["Yours"]);
+    expect(settings.sections.filter((s) => s.scope === "household").every((s) => s.min_role === "admin")).toBe(true);
   });
 });
 
@@ -150,10 +110,10 @@ describe("every viewer, every area: never a section they may not see", () => {
     }
   });
 
-  test("live product areas follow the regrouped home and account page structure", () => {
+  test("live product data has the single Settings area", () => {
     const liveAreas = (liveAreasFile as unknown as { areas: SettingsAreaDef[] }).areas;
-    expect(liveAreas.find((a) => a.id === "home")!.sections).toHaveLength(9);
-    expect(liveAreas.find((a) => a.id === "account")!.sections).toHaveLength(7);
-    expect(liveAreas.some((a) => a.id === "chat")).toBe(false);
+    expect(liveAreas.map((a) => a.id)).toEqual(["settings"]);
+    expect(liveAreas[0]!.sections.filter((s) => s.scope === "household")).toHaveLength(9);
+    expect(liveAreas[0]!.sections.filter((s) => s.scope === "person")).toHaveLength(7);
   });
 });

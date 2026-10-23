@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/settings-area.schema.json",
   "title": "SettingsArea",
-  "description": "One settings area: the title, sidebar groups, sections and cards of a settings screen (Chat settings, Account, Home settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.",
+  "description": "One settings area: the title, sidebar groups, sections and cards of a settings screen (Settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -23,14 +23,6 @@
       "minLength": 1,
       "maxLength": 40,
       "description": "The settings column's heading."
-    },
-    "scope": {
-      "type": "string",
-      "enum": [
-        "household",
-        "person"
-      ],
-      "description": "The settings governed by this area: household settings are admin-only; person settings belong to the viewer."
     },
     "app": {
       "type": "string",
@@ -97,9 +89,13 @@
         "devices",
         "repairs",
         "updates",
-        "health"
+        "health",
+        "home",
+        "account",
+        "chat",
+        "settings"
       ],
-      "description": "Area ids and package ids that may never be used: the static legacy routes under /settings."
+      "description": "Area ids and package ids that may never be used: legacy central routes and static routes."
     },
     "role": {
       "type": "string",
@@ -402,7 +398,8 @@
         "id",
         "label",
         "icon",
-        "kind"
+        "kind",
+        "scope"
       ],
       "properties": {
         "id": {
@@ -496,6 +493,14 @@
         },
         "detail": {
           "$ref": "#/$defs/detail"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "person",
+            "household"
+          ],
+          "description": "Whether the page edits the viewer\u2019s own settings or household settings."
         }
       },
       "allOf": [

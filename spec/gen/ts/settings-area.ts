@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-/**One settings area: the title, sidebar groups, sections and cards of a settings screen (Chat settings, Account, Home settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.*/
+/**One settings area: the title, sidebar groups, sections and cards of a settings screen (Settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.*/
 export const SettingsArea = z
   .object({
     /**Route segment: /settings/<id>/<section>. Unique. The nine ids in $defs.reservedIds are static legacy routes that already own those paths; areas-check.ts refuses them (a JSON Schema `not` would drop this pattern from the generated models).*/
@@ -16,13 +16,6 @@ export const SettingsArea = z
       ),
     /**The settings column's heading.*/
     title: z.string().min(1).max(40).describe("The settings column's heading."),
-    /**The settings governed by this area: household settings are admin-only; person settings belong to the viewer.*/
-    scope: z
-      .enum(["household", "person"])
-      .describe(
-        "The settings governed by this area: household settings are admin-only; person settings belong to the viewer.",
-      )
-      .optional(),
     /**The nav entry that owns this area, so the app's header gets a gear. Absent for Account and Home settings.*/
     app: z
       .string()
@@ -538,6 +531,12 @@ export const SettingsArea = z
                 "A record detail screen at /settings/<area>/<section>/<id>; it is not an additional page.",
               )
               .optional(),
+            /**Whether the page edits the viewer’s own settings or household settings.*/
+            scope: z
+              .enum(["person", "household"])
+              .describe(
+                "Whether the page edits the viewer’s own settings or household settings.",
+              ),
           })
           .strict()
           .and(
@@ -554,6 +553,6 @@ export const SettingsArea = z
   })
   .strict()
   .describe(
-    "One settings area: the title, sidebar groups, sections and cards of a settings screen (Chat settings, Account, Home settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.",
+    "One settings area: the title, sidebar groups, sections and cards of a settings screen (Settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.",
   );
 export type SettingsArea = z.infer<typeof SettingsArea>;

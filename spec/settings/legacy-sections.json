@@ -6,7 +6,7 @@
         "section": "profile"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "profile",
         "tab": "profile"
       }
@@ -17,7 +17,7 @@
         "section": "appearance"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "appearance",
         "tab": "appearance"
       }
@@ -28,7 +28,7 @@
         "section": "notifications"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "notifications",
         "tab": "notifications"
       }
@@ -39,7 +39,7 @@
         "section": "voice"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "voice",
         "tab": "voice"
       }
@@ -50,7 +50,7 @@
         "section": "pictures"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "pictures",
         "tab": "pictures"
       }
@@ -61,7 +61,7 @@
         "section": "data"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "data",
         "tab": "data"
       }
@@ -72,7 +72,7 @@
         "section": "device"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "voice",
         "tab": "device"
       }
@@ -83,7 +83,7 @@
         "section": "robot"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "voice",
         "tab": "robot"
       }
@@ -94,7 +94,7 @@
         "section": "developer"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "data",
         "tab": "developer"
       }
@@ -105,7 +105,7 @@
         "section": "coding"
       },
       "new": {
-        "area": "account",
+        "area": "settings",
         "section": "chat",
         "tab": "coding"
       }
@@ -116,7 +116,7 @@
         "section": "general"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "household",
         "tab": "general"
       }
@@ -127,7 +127,7 @@
         "section": "people"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "household",
         "tab": "people"
       }
@@ -138,7 +138,7 @@
         "section": "search"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "search",
         "tab": "search"
       }
@@ -149,7 +149,7 @@
         "section": "integrations"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "apps",
         "tab": "integrations"
       }
@@ -160,7 +160,7 @@
         "section": "ai"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "ai",
         "tab": "overview"
       }
@@ -171,7 +171,7 @@
         "section": "pictures"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "media",
         "tab": "pictures"
       }
@@ -182,8 +182,8 @@
         "section": "commands"
       },
       "new": {
-        "area": "home",
-        "section": "voice",
+        "area": "settings",
+        "section": "home-voice",
         "tab": "commands"
       }
     },
@@ -193,8 +193,8 @@
         "section": "voices"
       },
       "new": {
-        "area": "home",
-        "section": "voice",
+        "area": "settings",
+        "section": "home-voice",
         "tab": "voices"
       }
     },
@@ -204,7 +204,7 @@
         "section": "robot"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "apps",
         "tab": "robot"
       }
@@ -215,7 +215,7 @@
         "section": "reference-library"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "search",
         "tab": "reference-library"
       }
@@ -226,7 +226,7 @@
         "section": "media-library"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "media",
         "tab": "media-library"
       }
@@ -237,7 +237,7 @@
         "section": "storage"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "backups",
         "tab": "storage"
       }
@@ -248,7 +248,7 @@
         "section": "maintenance"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "backups",
         "tab": "maintenance"
       }
@@ -259,7 +259,7 @@
         "section": "privacy"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "privacy",
         "tab": "privacy"
       }
@@ -270,7 +270,7 @@
         "section": "developer"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "advanced",
         "tab": "developer"
       }
@@ -281,7 +281,7 @@
         "section": "network"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "advanced",
         "tab": "network"
       }
@@ -292,7 +292,7 @@
         "section": "coding"
       },
       "new": {
-        "area": "home",
+        "area": "settings",
         "section": "ai",
         "tab": "coding"
       }
@@ -302,44 +302,44 @@
         "area": "chat",
         "section": "general"
       },
-      "new": {
-        "area": "account",
-        "section": "chat",
-        "tab": "general"
-      }
+      "replacement": {
+        "area": "settings",
+        "section": "chat"
+      },
+      "reason": "This old Chat link row moved into the personal Chat page; preserve the destination without inventing a tab route."
     },
     {
       "old": {
         "area": "chat",
         "section": "personalization"
       },
-      "new": {
-        "area": "account",
-        "section": "chat",
-        "tab": "personalization"
-      }
+      "replacement": {
+        "area": "settings",
+        "section": "chat"
+      },
+      "reason": "This old Chat link row moved into the personal Chat page; preserve the destination without inventing a tab route."
     },
     {
       "old": {
         "area": "chat",
         "section": "skills"
       },
-      "new": {
-        "area": "account",
-        "section": "chat",
-        "tab": "skills"
-      }
+      "replacement": {
+        "area": "settings",
+        "section": "chat"
+      },
+      "reason": "This old Chat link row moved into the personal Chat page; preserve the destination without inventing a tab route."
     },
     {
       "old": {
         "area": "chat",
         "section": "shortcuts"
       },
-      "new": {
-        "area": "account",
-        "section": "chat",
-        "tab": "shortcuts"
-      }
+      "replacement": {
+        "area": "settings",
+        "section": "chat"
+      },
+      "reason": "This old Chat link row moved into the personal Chat page; preserve the destination without inventing a tab route."
     },
     {
       "old": {
@@ -347,9 +347,10 @@
         "section": "voice"
       },
       "replacement": {
-        "area": "account",
+        "area": "settings",
         "section": "voice"
-      }
+      },
+      "reason": "Old Chat link row; retain its replacement target."
     },
     {
       "old": {
@@ -357,9 +358,10 @@
         "section": "notifications"
       },
       "replacement": {
-        "area": "account",
+        "area": "settings",
         "section": "notifications"
-      }
+      },
+      "reason": "Old Chat link row; retain its replacement target."
     },
     {
       "old": {
@@ -367,9 +369,10 @@
         "section": "memories"
       },
       "replacement": {
-        "area": "account",
+        "area": "settings",
         "section": "chat"
-      }
+      },
+      "reason": "Old Chat link row; retain its replacement target."
     },
     {
       "old": {
@@ -377,9 +380,10 @@
         "section": "parental-controls"
       },
       "replacement": {
-        "area": "home",
+        "area": "settings",
         "section": "household"
-      }
+      },
+      "reason": "Old Chat link row; retain its replacement target."
     },
     {
       "old": {
@@ -387,8 +391,31 @@
         "section": "household"
       },
       "replacement": {
-        "area": "home",
+        "area": "settings",
         "section": "ai"
+      },
+      "reason": "Old Chat link row; retain its replacement target."
+    },
+    {
+      "old": {
+        "area": "home",
+        "section": "home"
+      },
+      "new": {
+        "area": "settings",
+        "section": "household",
+        "tab": "general"
+      }
+    },
+    {
+      "old": {
+        "area": "account",
+        "section": "account"
+      },
+      "new": {
+        "area": "settings",
+        "section": "profile",
+        "tab": "profile"
       }
     }
   ]

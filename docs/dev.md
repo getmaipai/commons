@@ -2,6 +2,10 @@
 
 spec-v0.1.209 made `scope` required on every settings area, which also invalidated every bundled and community package manifest that contributes a `settings_area`. `scope` is optional in the schema again (a package area reads as person); `checkAreas` still requires it in the central areas file.
 
+## spec-v0.1.218: one Settings area with section scope (2026-10-23)
+
+One guest-openable Settings area replaces the unreleased Home and Account area split. Its column groups seven personal pages under Yours and nine household pages under The home. Sections carry `scope`; household pages require admin or narrower access. The prior two-area structure never shipped. Version 0.1.218 remains unreleased.
+
 ## ui-v0.5.317: the settings tab strip has no dangling aria-controls (2026-10-23)
 
 The shell draws only the tab list; the host draws the panel, so each trigger's `aria-controls` named an element that did not exist (axe `aria-valid-attr-value`, critical, on Engines and AI). The triggers now omit it.

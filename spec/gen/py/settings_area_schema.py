@@ -28,6 +28,10 @@ class ReservedIds(
             'repairs',
             'updates',
             'health',
+            'home',
+            'account',
+            'chat',
+            'settings',
         ]
     ]
 ):
@@ -41,9 +45,13 @@ class ReservedIds(
         'repairs',
         'updates',
         'health',
+        'home',
+        'account',
+        'chat',
+        'settings',
     ] = Field(
         ...,
-        description='Area ids and package ids that may never be used: the static legacy routes under /settings.',
+        description='Area ids and package ids that may never be used: legacy central routes and static routes.',
     )
 
 
@@ -332,6 +340,10 @@ class Section(BaseModel):
         None, description='Tab id for a section view, lead_view or trail_view.'
     )
     detail: Detail | None = None
+    scope: Literal['person', 'household'] = Field(
+        ...,
+        description='Whether the page edits the viewer’s own settings or household settings.',
+    )
 
 
 class Audience(BaseModel):
@@ -350,7 +362,7 @@ class Audience(BaseModel):
 
 class SettingsArea(BaseModel):
     """
-    One settings area: the title, sidebar groups, sections and cards of a settings screen (Chat settings, Account, Home settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.
+    One settings area: the title, sidebar groups, sections and cards of a settings screen (Settings, and later one per app). Central areas live in spec/settings/areas.json; a catalog package declares its own under contributes.settings_area. A card is one registry group (SettingsKey lives_in) at one scope, and each registry group sits in exactly one card, so every key has one home. An area only ever reads and writes the viewer's own person scope, the household scope (admins) and this device: no field here takes another person's id.
     """
 
     model_config = ConfigDict(
@@ -362,10 +374,6 @@ class SettingsArea(BaseModel):
     )
     title: constr(min_length=1, max_length=40) = Field(
         ..., description="The settings column's heading."
-    )
-    scope: Literal['household', 'person'] | None = Field(
-        None,
-        description='The settings governed by this area: household settings are admin-only; person settings belong to the viewer.',
     )
     app: constr(pattern=r'^/[A-Za-z0-9/_-]*$') | None = Field(
         None,

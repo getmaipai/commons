@@ -1,32 +1,36 @@
 {
   "areas": [
     {
-      "id": "account",
+      "id": "settings",
       "title": "Settings",
       "audience": {
         "min_role": "guest"
       },
       "groups": [
         {
-          "label": "You",
+          "label": "Yours",
           "sections": [
             "profile",
-            "chat"
-          ]
-        },
-        {
-          "label": "Preferences",
-          "sections": [
             "appearance",
+            "chat",
             "voice",
             "notifications",
-            "pictures"
+            "pictures",
+            "data"
           ]
         },
         {
-          "label": "Data",
+          "label": "The home",
           "sections": [
-            "data"
+            "household",
+            "privacy",
+            "ai",
+            "media",
+            "home-voice",
+            "search",
+            "apps",
+            "backups",
+            "advanced"
           ]
         }
       ],
@@ -56,7 +60,8 @@
               "label": "Profile",
               "view": "account.profile"
             }
-          ]
+          ],
+          "scope": "person"
         },
         {
           "id": "appearance",
@@ -83,7 +88,8 @@
               "label": "Appearance",
               "view": "account.device_appearance"
             }
-          ]
+          ],
+          "scope": "person"
         },
         {
           "id": "chat",
@@ -152,7 +158,8 @@
               ],
               "view": "account.coding_keys"
             }
-          ]
+          ],
+          "scope": "person"
         },
         {
           "id": "voice",
@@ -226,7 +233,8 @@
                 "robots.enabled"
               ]
             }
-          ]
+          ],
+          "scope": "person"
         },
         {
           "id": "notifications",
@@ -253,7 +261,8 @@
               "id": "notifications",
               "label": "Notifications"
             }
-          ]
+          ],
+          "scope": "person"
         },
         {
           "id": "pictures",
@@ -275,7 +284,8 @@
               "min_role": "adult",
               "view": "account.likeness"
             }
-          ]
+          ],
+          "scope": "person"
         },
         {
           "id": "data",
@@ -321,44 +331,9 @@
               "label": "Developer tools",
               "min_role": "admin"
             }
-          ]
-        }
-      ],
-      "scope": "person"
-    },
-    {
-      "id": "home",
-      "title": "Home settings",
-      "audience": {
-        "min_role": "admin"
-      },
-      "groups": [
-        {
-          "label": "Home",
-          "sections": [
-            "household",
-            "privacy"
-          ]
+          ],
+          "scope": "person"
         },
-        {
-          "label": "AI and media",
-          "sections": [
-            "ai",
-            "media",
-            "voice",
-            "search"
-          ]
-        },
-        {
-          "label": "System",
-          "sections": [
-            "apps",
-            "backups",
-            "advanced"
-          ]
-        }
-      ],
-      "sections": [
         {
           "id": "household",
           "label": "Household",
@@ -408,7 +383,9 @@
             "language",
             "retention",
             "history"
-          ]
+          ],
+          "scope": "household",
+          "min_role": "admin"
         },
         {
           "id": "privacy",
@@ -438,7 +415,9 @@
               "id": "privacy",
               "label": "Privacy"
             }
-          ]
+          ],
+          "scope": "household",
+          "min_role": "admin"
         },
         {
           "id": "ai",
@@ -531,7 +510,9 @@
             "teen gate",
             "context",
             "model"
-          ]
+          ],
+          "scope": "household",
+          "min_role": "admin"
         },
         {
           "id": "media",
@@ -577,10 +558,12 @@
             "add videos",
             "add music",
             "library"
-          ]
+          ],
+          "scope": "household",
+          "min_role": "admin"
         },
         {
-          "id": "voice",
+          "id": "home-voice",
           "label": "Voice",
           "icon": "volume-2",
           "kind": "keys",
@@ -597,7 +580,9 @@
               "min_role": "admin",
               "view": "home.commands"
             }
-          ]
+          ],
+          "scope": "household",
+          "min_role": "admin"
         },
         {
           "id": "search",
@@ -686,7 +671,9 @@
             "wikipedia",
             "brave",
             "key"
-          ]
+          ],
+          "scope": "household",
+          "min_role": "admin"
         },
         {
           "id": "apps",
@@ -765,7 +752,9 @@
                 "label": "Access"
               }
             ]
-          }
+          },
+          "scope": "household",
+          "min_role": "admin"
         },
         {
           "id": "backups",
@@ -825,7 +814,9 @@
               "id": "maintenance",
               "label": "Maintenance"
             }
-          ]
+          ],
+          "scope": "household",
+          "min_role": "admin"
         },
         {
           "id": "advanced",
@@ -887,17 +878,18 @@
             "local network",
             "tailnet",
             "tailscale"
-          ]
+          ],
+          "scope": "household",
+          "min_role": "admin"
         }
-      ],
-      "scope": "household"
+      ]
     }
   ],
   "not_placed": [
     {
       "scope": "household",
       "group": "household.voice",
-      "reason": "Home's default voice is chosen on the Voices page in Home settings, next to the voices it can pick from (a view, not a settings card)."
+      "reason": "Home's default voice is chosen on the Voices page in Settings, next to the voices it can pick from (a view, not a settings card)."
     },
     {
       "scope": "person",

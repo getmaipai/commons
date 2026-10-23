@@ -13,12 +13,14 @@ OLD_IDS = {f"{area}/{section}" for area, sections in {
     "home": "general people search integrations ai pictures commands voices robot reference-library media-library storage maintenance privacy developer network coding".split(),
     "account": "profile appearance notifications voice pictures data device robot developer coding".split(),
     "chat": "general personalization skills shortcuts voice notifications memories parental-controls household".split(),
-}.items() for section in sections}
+}.items() for section in sections} | {"home/home", "account/account"}
 
 
 def test_every_area_parses_and_page_counts_are_correct():
-    assert sorted(a["id"] for a in FILE["areas"]) == ["account", "home"]
-    assert [len(a["sections"]) for a in FILE["areas"]] == [7, 9]
+    assert [a["id"] for a in FILE["areas"]] == ["settings"]
+    assert len(FILE["areas"][0]["sections"]) == 16
+    assert sum(s["scope"] == "person" for s in FILE["areas"][0]["sections"]) == 7
+    assert sum(s["scope"] == "household" for s in FILE["areas"][0]["sections"]) == 9
     for area in FILE["areas"]:
         SettingsArea.model_validate(area)
 
@@ -39,8 +41,8 @@ def test_registry_groups_are_once_or_not_placed():
 
 
 def test_tab_view_and_audience_constraints_and_robot_detail():
-    home = next(a for a in FILE["areas"] if a["id"] == "home")
-    assert [s["id"] for s in home["sections"]] == ["household", "privacy", "ai", "media", "voice", "search", "apps", "backups", "advanced"]
+    home = FILE["areas"][0]
+    assert [s["id"] for s in home["sections"] if s["scope"] == "household"] == ["household", "privacy", "ai", "media", "home-voice", "search", "apps", "backups", "advanced"]
     apps = next(s for s in home["sections"] if s["id"] == "apps")
     assert apps["detail"]["param"] == "id"
     assert [t["id"] for t in apps["detail"]["tabs"]] == ["overview", "behaviour", "access"]

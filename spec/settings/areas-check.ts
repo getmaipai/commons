@@ -42,6 +42,7 @@ export interface AreaSection {
   href?: string;
   keywords?: string[];
   order?: number;
+  scope: "household" | "person";
   min_role?: Role;
   bands?: Band[];
   needs?: string[];
@@ -54,8 +55,6 @@ export interface SettingsArea {
   title: string;
   app?: string;
   audience: { min_role: Role };
-  /** Required in the central areas file (checkAreas); optional for a package's own area, which reads as person. */
-  scope?: "household" | "person";
   groups: { label: string; sections: string[] }[];
   sections: AreaSection[];
 }
@@ -66,9 +65,9 @@ export interface RegistryKey { key: string; scope: Scope; level: Level; lives_in
 
 const defs = schema.$defs;
 /** Static legacy routes under /settings that an area id may never equal. */
-export const RESERVED_AREA_IDS: readonly string[] = [...defs.reservedIds.enum, "chat"];
+export const RESERVED_AREA_IDS: readonly string[] = [...defs.reservedIds.enum];
 /** The areas declared centrally in areas.json; a package may not reuse them. */
-export const CENTRAL_AREA_IDS: readonly string[] = ["account", "home"];
+export const CENTRAL_AREA_IDS: readonly string[] = ["settings"];
 /** The views Home's view table renders. */
 export const ALLOWED_VIEW_IDS: readonly string[] = defs.view.enum;
 export const ROLES: readonly Role[] = defs.role.enum as Role[];
@@ -81,11 +80,13 @@ export const HOUSEHOLD_CARD_ALLOWLIST: readonly string[] = ["news"];
 export const PAGE_COUNT_ENFORCED = true;
 export const SETTINGS_CAP_ENFORCED = false;
 export function checkPageCount(area: SettingsArea): string[] {
-  if (!PAGE_COUNT_ENFORCED || (area.id !== "home" && area.id !== "account")) return [];
-  const pages = area.sections.filter((s) => !s.tabs?.length
-    ? (!s.min_role || rank(s.min_role) <= rank(area.audience.min_role))
-    : s.tabs.some((t) => Math.min(rank(s.min_role ?? area.audience.min_role), rank(t.min_role ?? area.audience.min_role)) <= rank(area.audience.min_role)));
-  return pages.length < 6 || pages.length > 9 ? [`${area.id}: must have 6 to 9 visible pages (found ${pages.length})`] : [];
+  if (!PAGE_COUNT_ENFORCED || area.id !== "settings") return [];
+  const errors: string[] = [];
+  for (const scope of ["person", "household"] as const) {
+    const count = area.sections.filter((s) => s.scope === scope).length;
+    if (count < 6 || count > 9) errors.push(`${area.id}: ${scope} pages must be 6 to 9 (found ${count})`);
+  }
+  return errors;
 }
 export function checkSettingsCap(section: AreaSection, registry: RegistryKey[]): string[] {
   if (!SETTINGS_CAP_ENFORCED) return [];
@@ -117,11 +118,7 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
   for (const area of file.areas) {
     if (areaIds.has(area.id)) errors.push(`duplicate area "${area.id}"`);
     areaIds.add(area.id);
-    if (!area.scope) errors.push(`area "${area.id}" must declare scope household or person`);
-    if (RESERVED_AREA_IDS.includes(area.id)) errors.push(`area id "${area.id}" is reserved`);
-    if (area.scope === "household" && rank(area.audience.min_role) > rank("admin")) {
-      errors.push(`${area.id}: household area min_role ${area.audience.min_role} is broader than admin`);
-    }
+    if (RESERVED_AREA_IDS.includes(area.id) && !CENTRAL_AREA_IDS.includes(area.id)) errors.push(`area id "${area.id}" is reserved`);
 
     const sectionIds = new Set<string>();
     for (const s of area.sections) {
@@ -143,6 +140,7 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
 
     for (const s of area.sections) {
       const where = `${area.id}/${s.id}`;
+      if (s.scope === "household" && (!s.min_role || rank(s.min_role) > rank("admin"))) errors.push(`${where}: household section must have min_role admin or narrower`);
       const validTabIds = new Set((s.tabs ?? []).map((tab) => tab.id));
       if (s.tabs?.length && (s.view || s.lead_view || s.trail_view)) errors.push(`${where}: a section with tabs cannot also have section-level views`);
       if (s.tabs && (s.tabs.length < 1 || s.tabs.length > 5)) errors.push(`${where}: tabs must contain 1 to 5 entries`);
@@ -171,19 +169,19 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         if (s.needs && s.needs.some((need) => !tab.needs?.includes(need))) errors.push(`${where}: tab "${tab.id}" audience is broader than its page needs`);
       }
       if (s.min_role && rank(s.min_role) > rank(area.audience.min_role)) {
-        errors.push(`${where}: min_role ${s.min_role} is broader than the area's ${area.audience.min_role}`);
+        errors.push(`${where}: min_role ${s.min_role} is broader than the area's ${(s.min_role ?? area.audience.min_role)}`);
       }
       for (const c of s.cards ?? []) {
         if (c.tab && !validTabIds.has(c.tab)) errors.push(`${where}: card "${c.label}" tab "${c.tab}" is not a tab id of the section`);
         if (c.min_role && rank(c.min_role) > rank(area.audience.min_role)) {
-          errors.push(`${where}: card "${c.label}" min_role ${c.min_role} is broader than the area's ${area.audience.min_role}`);
+          errors.push(`${where}: card "${c.label}" min_role ${c.min_role} is broader than the area's ${(s.min_role ?? area.audience.min_role)}`);
         }
         for (const l of c.links ?? []) checkHref(`${where}: link "${l.label}"`, l.href, errors);
         if (c.links && (c.group || c.scope || c.levels)) errors.push(`${where}: card "${c.label}" is a link card, so it has no group, scope or levels`);
         if (!c.links && !(c.group && c.scope)) errors.push(`${where}: card "${c.label}" needs a group and scope, or links`);
         if (!c.group || !c.scope) continue;
-        const deviceException = c.scope === "device" && area.scope === "person" && (s.id === "device" || s.id === "robot" || c.tab === "device");
-        if (c.scope !== area.scope && !deviceException) errors.push(`${where}: card "${c.label}" scope ${c.scope} disagrees with area's ${area.scope} scope`);
+        const deviceException = (c.scope === "device" && s.scope === "person" && s.id === "voice" && (c.tab === "device" || c.tab === "robot")) || (c.scope === "household" && s.scope === "household" && s.id === "apps" && c.group === "robot.settings");
+        if (c.scope !== s.scope && !deviceException) errors.push(`${where}: card "${c.label}" scope ${c.scope} disagrees with section scope ${s.scope}`);
         const levels = c.levels ?? DEFAULT_LEVELS;
         const groupLevels = new Set(registry.filter((k) => k.scope === c.scope && k.lives_in === c.group).map((k) => k.level));
         const has = (lv: Level) => levels.includes(lv);
