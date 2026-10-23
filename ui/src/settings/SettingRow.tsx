@@ -6,6 +6,8 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "../d
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../dashboard/components/ui/select";
 import { Switch } from "../dashboard/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../dashboard/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../dashboard/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "../dashboard/components/ui/radio-group";
 import { localeDisplayName, middleEllipsis, titleCaseOption } from "./optionLabels";
 import { HitField } from "./HitField";
 import { PersonMultiSelect, type PersonOption } from "./PersonMultiSelect";
@@ -85,6 +87,8 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
   const [secretDraft, setSecretDraft] = useState("");
   const [secretSaving, setSecretSaving] = useState(false);
   const [confirmingOff, setConfirmingOff] = useState(false);
+  const [choiceOpen, setChoiceOpen] = useState(false);
+  const [choiceDraft, setChoiceDraft] = useState(String(resolved.value ?? ""));
 
   // Every write, from any control, goes through here so the host's
   // per-key hook sees it and a refusal never reaches the server.
@@ -248,7 +252,33 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
       ...option,
       label: source ? option.label : getLabel(option.value),
     }));
-    control = (
+    if (selectItems.length > 4) {
+      const selectedLabel = selectItems.find((option) => option.value === current)?.label ?? current;
+      control = (
+        <>
+          <span className="text-sm text-settings-helper">{selectedLabel}</span>
+          <Button type="button" variant="outline" size="row" disabled={disabled || unavailable} aria-label={`Change ${def.label}`} onClick={() => { setChoiceDraft(current); setChoiceOpen(true); }}>Change</Button>
+          <Dialog open={choiceOpen} onOpenChange={setChoiceOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{def.label}</DialogTitle>
+                {def.help ? <DialogDescription>{def.help}</DialogDescription> : null}
+              </DialogHeader>
+              <RadioGroup value={choiceDraft} onValueChange={setChoiceDraft} aria-label={def.label}>
+                {selectItems.map((option) => <label key={option.value} className="flex items-center gap-3 rounded-md border border-border p-3 text-sm">
+                  <RadioGroupItem value={option.value} />
+                  <span>{option.label}</span>
+                </label>)}
+              </RadioGroup>
+              <DialogFooter>
+                <Button type="button" variant="outline" size="row" onClick={() => setChoiceOpen(false)}>Cancel</Button>
+                <Button type="button" size="row" onClick={async () => { const ok = await write(choiceDraft); if (ok) setChoiceOpen(false); }}>Save</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      );
+    } else control = (
       <Select
         value={current}
         onValueChange={(v) => {

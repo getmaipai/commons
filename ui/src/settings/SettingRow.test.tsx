@@ -236,6 +236,43 @@ describe("SettingRow - select selector", () => {
     const { getByRole } = render(<SettingRow setting={runtimeSelectSetting("custom")} optionsFrom={{ "voices.tts": [{ value: "alba", label: "Alba" }] }} onChange={async () => true} onReset={() => {}} />);
     expect(getByRole("combobox", { name: "Voice" })).toHaveTextContent("custom");
   });
+
+  function longChoiceSetting(value: string): MergedSetting {
+    const key = "notifications.digest.frequency";
+    return {
+      def: { key, scope: "household", selector: "select", range: { options: ["daily", "weekly", "monthly", "never", "hourly"] }, default: "daily", label: "Digest frequency", help: "Choose how often to receive a digest.", level: "basic", secret: false, lives_in: "household.notifications", honoured_by: ["home"] },
+      resolved: { key, value, source: "default", label: "Digest frequency", level: "basic", secret: false },
+    };
+  }
+
+  test("edits choices with more than four options in a dialog and writes only on Save", async () => {
+    const onChange = mock(() => Promise.resolve(true));
+    const { getByRole, getByText, queryByRole } = render(<SettingRow setting={longChoiceSetting("weekly")} onChange={onChange} onReset={() => {}} />);
+    expect(getByText("Weekly")).toBeTruthy();
+    const change = getByRole("button", { name: "Change Digest frequency" });
+    fireEvent.click(change);
+    expect(getByRole("dialog")).toBeTruthy();
+    expect(getByRole("dialog").textContent).toContain("Choose how often to receive a digest.");
+    fireEvent.click(getByRole("radio", { name: "Monthly" }));
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.click(getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith("monthly"));
+    await waitFor(() => expect(queryByRole("dialog")).toBeNull());
+  });
+
+  test("keeps the dialog open on a rejected write and disables Change when locked", async () => {
+    const onChange = mock(() => Promise.resolve(false));
+    const view = render(<SettingRow setting={longChoiceSetting("daily")} onChange={onChange} onReset={() => {}} />);
+    fireEvent.click(view.getByRole("button", { name: "Change Digest frequency" }));
+    fireEvent.click(view.getByRole("radio", { name: "Never" }));
+    fireEvent.click(view.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith("never"));
+    expect(view.getByRole("dialog")).toBeTruthy();
+    cleanup();
+    const locked = render(<SettingRow setting={longChoiceSetting("daily")} onChange={async () => false} onReset={() => {}} lockedReason="Set by Jordan." />);
+    expect(locked.getByRole("button", { name: "Change Digest frequency" })).toBeDisabled();
+    expect(locked.getByText("Daily")).toBeTruthy();
+  });
 });
 
 // Session B step 7: a `secret: true` key with no dedicated backend route
