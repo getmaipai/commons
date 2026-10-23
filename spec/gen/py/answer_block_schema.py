@@ -633,6 +633,9 @@ class NewsStoryCard(BaseModel):
     dek: str | None = None
     publisher: constr(min_length=1)
     site: constr(min_length=1)
+    sourceIconUrl: constr(pattern=r'^/api/favicon(?:[/?#].*)?$') | None = Field(
+        None, description="Hub-relative favicon route for the story's source."
+    )
     published_at: AwareDatetime
     outlets: conint(ge=1) = Field(
         ..., description='How many publishers cover this story.'
