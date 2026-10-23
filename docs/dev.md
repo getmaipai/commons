@@ -1564,7 +1564,7 @@ filter cards with the pure helpers in `settingsAudience.ts`; unassigned
 cards remain visible as a summary above each tab. Without tab props, the
 shell keeps its existing rendering.
 
-## ui-v0.5.321: settings audience honors live tab gates
+## ui-v0.5.322: settings audience honors live tab gates
 
 The settings kit fixtures use a frozen snapshot of spec 0.1.217's areas so
 shell, search and audience behavior tests remain stable across product page
