@@ -700,7 +700,7 @@ describe("history and keys", () => {
     fireEvent.click(tool(v, "Remove BG"));
     await waitFor(() => v.getByRole("button", { name: "Apply" }));
     fireEvent.keyDown(v.getByRole("region", { name: "Picture stage" }), { key: "Escape" });
-    expect(v.queryByRole("button", { name: "Apply" })).toBeNull();
+    await waitFor(() => expect(v.queryByRole("button", { name: "Apply" })).toBeNull());
     expect(tool(v, "Remove BG").getAttribute("aria-checked")).toBe("true");
   });
 
