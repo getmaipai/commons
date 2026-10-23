@@ -1,3 +1,7 @@
+## spec-v0.1.222: a package's settings section may omit scope (2026-10-23)
+
+Section `scope` is required only in the central file (checked by `checkAreas`); package manifests that contribute a `settings_area` stay valid.
+
 ## spec-v0.1.221: the household page is "Household and people" (2026-10-23)
 
 The page and its first card were both "Household", so Home's accessibility gate reported two landmarks with one name on the default Settings page. Label only; ids unchanged.

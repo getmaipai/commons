@@ -1,5 +1,9 @@
 ## [spec-v0.1.222] - 2026-10-23
 
+- A settings section's `scope` is optional in the schema again (a package area's sections read as person), as it was for areas in 0.1.215; `checkAreas` still requires it on every section of the central areas file. 0.1.218 made it required everywhere, which invalidated every bundled and community package manifest.
+
+## [spec-v0.1.222] - 2026-10-23
+
 - Add the household setting `coding.api.tailnet_nodes` (text, advanced, in the coding group): names of the household's own devices allowed to use coding through Tailscale Serve, separated by commas; empty means none. Honoured by Home. Additive.
 
 ## [spec-v0.1.221] - 2026-10-23

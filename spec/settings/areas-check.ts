@@ -42,7 +42,8 @@ export interface AreaSection {
   href?: string;
   keywords?: string[];
   order?: number;
-  scope: "household" | "person";
+  /** Required in the central areas file (checkAreas); optional for a package's own area, whose sections read as person. */
+  scope?: "household" | "person";
   min_role?: Role;
   bands?: Band[];
   needs?: string[];
@@ -140,6 +141,7 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
 
     for (const s of area.sections) {
       const where = `${area.id}/${s.id}`;
+      if (!s.scope) errors.push(`${where}: section must declare scope household or person`);
       if (s.scope === "household" && (!s.min_role || rank(s.min_role) > rank("admin"))) errors.push(`${where}: household section must have min_role admin or narrower`);
       const validTabIds = new Set((s.tabs ?? []).map((tab) => tab.id));
       if (s.tabs?.length && (s.view || s.lead_view || s.trail_view)) errors.push(`${where}: a section with tabs cannot also have section-level views`);

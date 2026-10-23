@@ -50,3 +50,16 @@ describe("single Settings area",()=>{
  });
  test("registry groups remain placed once",()=>{const counts=new Map<string,number>();for(const a of file.areas)for(const s of a.sections)for(const c of s.cards??[])if(c.group&&c.scope){const k=`${c.scope}:${c.group}`;counts.set(k,(counts.get(k)??0)+1)}for(const c of file.device_cards){const k=`${c.scope}:${c.group}`;counts.set(k,(counts.get(k)??0)+1)}const parked=new Set(file.not_placed.map(n=>`${n.scope}:${n.group}`));for(const k of new Set(registry.map(r=>`${r.scope}:${r.lives_in}`)))expect((counts.get(k)??0)+Number(parked.has(k)),k).toBe(1);});
 });
+
+describe("section scope: required in the central file, optional for a package area (spec 0.1.222)", () => {
+  test("a central section without scope fails; the same schema accepts a package area section without it", () => {
+    const broken = JSON.parse(JSON.stringify(file)) as typeof file;
+    delete (broken.areas[0]!.sections[0] as { scope?: string }).scope;
+    expect(checkAreas(broken, registry).some((e) => /must declare scope/.test(e))).toBe(true);
+    const manifestSection = { id: "places", label: "Places", icon: "map-pin", kind: "keys" };
+    expect(Object.keys(manifestSection)).not.toContain("scope");
+    const schemaSection = (schema as { definitions?: Record<string, { required?: string[] }>; $defs?: Record<string, { required?: string[] }> });
+    const defs = schemaSection.definitions ?? schemaSection.$defs ?? {};
+    expect(defs.section?.required ?? []).not.toContain("scope");
+  });
+});

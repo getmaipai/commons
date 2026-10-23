@@ -340,8 +340,8 @@ class Section(BaseModel):
         None, description='Tab id for a section view, lead_view or trail_view.'
     )
     detail: Detail | None = None
-    scope: Literal['person', 'household'] = Field(
-        ...,
+    scope: Literal['person', 'household'] | None = Field(
+        None,
         description='Whether the page edits the viewer’s own settings or household settings.',
     )
 

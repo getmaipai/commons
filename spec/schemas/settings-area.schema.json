@@ -398,8 +398,7 @@
         "id",
         "label",
         "icon",
-        "kind",
-        "scope"
+        "kind"
       ],
       "properties": {
         "id": {

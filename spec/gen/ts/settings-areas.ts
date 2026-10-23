@@ -560,7 +560,8 @@ export const SettingsAreas = z
                     .enum(["person", "household"])
                     .describe(
                       "Whether the page edits the viewer’s own settings or household settings.",
-                    ),
+                    )
+                    .optional(),
                 })
                 .strict()
                 .and(
