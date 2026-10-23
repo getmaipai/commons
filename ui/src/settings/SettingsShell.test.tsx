@@ -67,7 +67,10 @@ describe("SettingsShell column", () => {
     cleanup();
     const onChange = mock((_id: string) => {});
     const { view } = shell({ sides: { value: "mine", options: [{ id: "mine", label: "Mine" }, { id: "household", label: "Household" }], label: "Settings scope", onChange }, trail: [{ label: "Settings", href: "/settings" }, { label: "General" }] });
-    expect(view.getByRole("radiogroup", { name: "Settings scope" }).querySelectorAll("[data-slot=toggle-group-item]")).toHaveLength(2);
+    const sideItems = view.getByRole("radiogroup", { name: "Settings scope" }).querySelectorAll("[data-slot=toggle-group-item]");
+    expect(sideItems).toHaveLength(2);
+    expect(sideItems[0]?.getAttribute("data-state")).toBe("on");
+    expect(sideItems[0]?.className).toContain("data-[state=on]:bg-settings-selected");
     fireEvent.click(view.getByRole("radio", { name: "Household" }));
     expect(onChange).toHaveBeenCalledWith("household");
     const nav = view.container.querySelector('[data-slot="breadcrumb"]')!;

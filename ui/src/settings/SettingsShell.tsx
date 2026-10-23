@@ -189,7 +189,7 @@ export function SettingsShell({
         title={!(layout === "docked" && backLink) ? (labels?.columnTitle ?? area.title) : undefined}
         afterTitle={sides && sides.options.length >= 2 ? (
           <ToggleGroup type="single" variant="outline" value={sides.value} aria-label={sides.label} onValueChange={(id) => { if (id) sides.onChange(id); }} className="w-full px-2">
-            {sides.options.map((option) => <ToggleGroupItem key={option.id} value={option.id} className="min-w-0 flex-1">{option.label}</ToggleGroupItem>)}
+            {sides.options.map((option) => <ToggleGroupItem key={option.id} value={option.id} className="min-w-0 flex-1 data-[state=on]:bg-settings-selected data-[state=on]:font-semibold">{option.label}</ToggleGroupItem>)}
           </ToggleGroup>
         ) : undefined}
         search={{ value: searchQuery, onChange: onSearchChange, label: searchLabel }}

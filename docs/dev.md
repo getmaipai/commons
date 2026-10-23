@@ -39,6 +39,8 @@ SETTINGS-UX-02 (`ui-v0.5.311`) makes the settings column readable at a glance: n
 per row, a filled active row with an accent bar, a 260 px column and a 760 px content pane. `SettingsShell` gains optional `sides`
 (a Mine and Household switch under the column title) and `trail` (a breadcrumb above the page title, sticky with it).
 
+SETTINGS-UX-03a (`ui-v0.5.313`) marks the selected settings side with the selected-surface token. Scalar choices with more than four options show the current label and open a dialog with radio options, Save and Cancel.
+
 `ui-v0.5.312` gives the settings trail's links a transparent 48 px hit area (the touch floor) and draws the current page as plain text, not a disabled link.
 
 `MediaViewerShowcase` now includes generating at a middle stage, waiting for
