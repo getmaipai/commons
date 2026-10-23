@@ -1,6 +1,10 @@
+## [ui-v0.5.323] - 2026-10-23
+
+- Weather: one animated sky (WeatherSky) drives the chat card, the location cards and the detail hero, with visible clouds, rain, snow, stars and lightning; the forecast page is redesigned with same-size location cards, an add control, an Apple-style 10-day range bar and detail tiles.
+
 ## [ui-v0.5.322] - 2026-10-23
 
-- Polish the article reader with a pinned publisher header, floating controls, wider image layout, stronger headline and favicon fallbacks.
+- Polish the article reader with a publisher header that scrolls with the story, pinned floating controls, wider image layout, stronger headline and favicon fallbacks.
 
 # Changelog (`@maipai/ui`)
 
