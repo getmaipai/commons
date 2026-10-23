@@ -15,6 +15,7 @@
   ],
   "image_ref": "img-a1b2c3",
   "summary": "Three things happened.",
+  "sourceIconUrl": "/api/favicon?domain=example.com",
   "summary_band": "teen",
   "summary_at": "2026-10-17T11:30:00Z",
   "hlc": "1791547200000:0:a1b2c3"

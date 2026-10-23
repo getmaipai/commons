@@ -46,9 +46,12 @@ class NewsStory(BaseModel):
         None,
         description='NEWS-00. The Key points text, written on the hub from the article.',
     )
+    sourceIconUrl: constr(pattern=r'^/api/favicon(?:[/?#].*)?$') | None = Field(
+        None, description="Hub-relative favicon route for the story's source."
+    )
     summary_band: Literal['child', 'teen', 'adult'] | None = Field(
         None,
-        description="NEWS-00. The band the summary was written for; a viewer of a younger band never sees an older band's summary.",
+        description="The band the summary was written for; a viewer of a younger band never sees an older band's summary.",
     )
     summary_at: AwareDatetime | None = None
     pageviews_hint: confloat(ge=0.0) | None = None

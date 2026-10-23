@@ -57,6 +57,12 @@ export const NewsStory = z
         "NEWS-00. The Key points text, written on the hub from the article.",
       )
       .optional(),
+    /**Hub-relative favicon route for the story's source.*/
+    sourceIconUrl: z
+      .string()
+      .regex(new RegExp("^/api/favicon(?:[/?#].*)?$"))
+      .describe("Hub-relative favicon route for the story's source.")
+      .optional(),
     /**NEWS-00. The band the summary was written for; a viewer of a younger band never sees an older band's summary.*/
     summary_band: z
       .enum(["child", "teen", "adult"])

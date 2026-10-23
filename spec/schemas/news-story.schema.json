@@ -68,6 +68,11 @@
       "minLength": 1,
       "description": "NEWS-00. The Key points text, written on the hub from the article."
     },
+    "sourceIconUrl": {
+      "type": "string",
+      "pattern": "^/api/favicon(?:[/?#].*)?$",
+      "description": "Hub-relative favicon route for the story's source."
+    },
     "summary_band": {
       "type": "string",
       "enum": ["child", "teen", "adult"],

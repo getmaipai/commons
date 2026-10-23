@@ -57,7 +57,8 @@ describe("News records", () => {
     const item = fixture("news-item.news-app");
     for (const bad of [{ content_source: "scraped" }, { reading_s: -1 }, { reading_s: 1.5 }, { topics: ["World"] }, { image_url: "x" }]) expect(NewsItem.safeParse({ ...item, ...bad }).success, JSON.stringify(bad)).toBe(false);
     const story = fixture("news-story.news-app");
-    for (const bad of [{ summary_band: "baby" }, { lead_item_id: "item-1" }, { summary: "" }]) expect(NewsStory.safeParse({ ...story, ...bad }).success, JSON.stringify(bad)).toBe(false);
+    for (const bad of [{ summary_band: "baby" }, { lead_item_id: "item-1" }, { summary: "" }, { sourceIconUrl: "https://example.com/favicon.ico" }, { sourceIconUrl: "/favicon.ico" }]) expect(NewsStory.safeParse({ ...story, ...bad }).success, JSON.stringify(bad)).toBe(false);
+    expect(NewsStory.safeParse({ ...story, sourceIconUrl: "/api/favicon?domain=example.com" }).success).toBe(true);
   });
 
   test("the person-scope records need their ids, person, clock stamp and provenance", () => {
