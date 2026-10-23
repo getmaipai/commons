@@ -122,6 +122,10 @@ class Card(BaseModel):
     group: constr(min_length=1) | None = Field(
         None, description='A registry group: SettingsKey lives_in.'
     )
+    tab: constr(pattern=r'^[a-z][a-z0-9-]*$') | None = Field(
+        None,
+        description='The section tab that contains this card. Omitted cards appear in the summary strip above the tabs.',
+    )
     scope: Literal['household', 'person', 'device'] | None = None
     levels: list[Literal['basic', 'advanced', 'expert']] | None = Field(
         None,
@@ -147,6 +151,46 @@ class Card(BaseModel):
         None,
         description="Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.",
     )
+
+
+class Tab(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^[a-z][a-z0-9-]*$')
+    label: constr(min_length=1, max_length=40)
+
+
+class Detail(BaseModel):
+    """
+    A record detail screen at /settings/<area>/<section>/<id>; it is not an additional page.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    param: constr(pattern=r'^[a-z][a-z0-9_]*$')
+    view: Literal[
+        'account.profile',
+        'account.voice',
+        'account.likeness',
+        'account.device_appearance',
+        'chat.skills',
+        'chat.shortcuts',
+        'home.commands',
+        'home.voice_catalog',
+        'home.engine_admin',
+        'home.devices_admin',
+        'home.routing_stats',
+        'home.reference_library',
+        'home.pictures_library',
+        'home.media_library',
+        'account.coding_keys',
+    ] = Field(
+        ...,
+        description="A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
+    )
+    tabs: list[Tab] | None = Field(None, max_length=5, min_length=2)
 
 
 class Section(BaseModel):
@@ -246,6 +290,16 @@ class Section(BaseModel):
     )
     bands: list[Literal['child', 'teen', 'adult']] | None = Field(None, min_length=1)
     needs: list[constr(min_length=1)] | None = None
+    tabs: list[Tab] | None = Field(
+        None,
+        description='Subtopics in declaration order; the shell persists the open tab in ?tab=.',
+        max_length=5,
+        min_length=2,
+    )
+    view_tab: constr(pattern=r'^[a-z][a-z0-9-]*$') | None = Field(
+        None, description='Tab id for a section view, lead_view or trail_view.'
+    )
+    detail: Detail | None = None
 
 
 class Audience(BaseModel):
@@ -276,6 +330,10 @@ class SettingsArea(BaseModel):
     )
     title: constr(min_length=1, max_length=40) = Field(
         ..., description="The settings column's heading."
+    )
+    scope: Literal['household', 'person'] = Field(
+        ...,
+        description='The settings governed by this area: household settings are admin-only; person settings belong to the viewer.',
     )
     app: constr(pattern=r'^/[A-Za-z0-9/_-]*$') | None = Field(
         None,

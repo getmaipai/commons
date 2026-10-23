@@ -178,7 +178,7 @@
     "help": "0 lets the hub pick the largest context that fits this computer's memory. A higher number can run out of memory; a lower one leaves headroom but remembers less of the conversation.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -199,7 +199,7 @@
     "help": "\"Auto\" lets the hub decide based on the model and the quantized-KV-cache setting. Flash attention speeds up longer conversations; a very old GPU may not support it.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -220,7 +220,7 @@
     "help": "\"Auto\" quantizes the conversation cache to fit more context in the same memory, with a small quality tradeoff. \"Full\" uses full precision: more accurate, uses roughly twice the memory for the same context size.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -234,7 +234,7 @@
     "help": "The catalog model id currently downloaded and running for chat. Changed through the AI models page, not here.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_developer",
     "honoured_by": [
       "home"
     ]
@@ -251,7 +251,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.chat_pause",
     "honoured_by": [
       "home"
     ]
@@ -268,7 +268,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.chat_pause",
     "honoured_by": [
       "home"
     ]
@@ -302,7 +302,7 @@
     "help": "\"Sentence\" checks every sentence before a teen sees it (the default). \"Arrival\" shows a teen's reply as it is written and checks it as it comes, so part of a sentence can show before its check finishes and the reply stops there if the check fails. Children and anything spoken always check every sentence first.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -734,7 +734,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -754,7 +754,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -774,7 +774,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -794,7 +794,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -820,7 +820,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -840,7 +840,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -860,7 +860,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -880,7 +880,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -900,7 +900,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -920,7 +920,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -946,7 +946,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -972,7 +972,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -992,7 +992,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -1012,7 +1012,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_models",
     "honoured_by": [
       "home"
     ]
@@ -1029,7 +1029,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -1046,7 +1046,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -1065,7 +1065,7 @@
     "help": "The port on this computer where the engine computer's connection appears. Change it only if another program already uses it. Only an admin can change this. Shown only while the engine runs on another computer.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -1087,7 +1087,7 @@
     },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -1101,7 +1101,7 @@
     "help": "Empty uses Home's own built-in engines. With the engine on this computer, set this to the address of the MaiPai Stack installed here to route chat, embeddings and voice through it. With the engine on another computer, Home fills this in for you from the connection settings, so leave it empty. Only an admin can change this.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_developer",
     "honoured_by": [
       "home"
     ]
@@ -1122,7 +1122,7 @@
     "help": "\"Off\" is the kill switch: nothing is scored. \"Shadow\" (the default) only counts, as a number, how often a web search looked needed, and changes no reply. \"Rescue\" is not active yet; for now it behaves like shadow. Children and teens are never scored.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -1136,7 +1136,7 @@
     "help": "Off, Home's own engine does this. Turn on only after the Stack has been proven for it. The memory judge and background worker follow this switch because they share chat's model.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_developer",
     "honoured_by": [
       "home"
     ]
@@ -1150,7 +1150,7 @@
     "help": "Off, Home's own engine does this. Turn on only after the Stack has been proven for it.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_developer",
     "honoured_by": [
       "home"
     ]
@@ -1164,7 +1164,7 @@
     "help": "Off, Home's own engine does this. Turn on only after the Stack has been proven for it.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_developer",
     "honoured_by": [
       "home"
     ]
@@ -1178,7 +1178,7 @@
     "help": "Off, Home's own engine does this. Turn on only after the Stack has been proven for it.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_developer",
     "honoured_by": [
       "home"
     ]
@@ -1205,7 +1205,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_runtime",
     "honoured_by": [
       "home"
     ]
@@ -2041,7 +2041,7 @@
     "help": "Adults and teens are on by default. Children are off unless a parent enables this.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.robot",
     "honoured_by": [
       "home"
     ]
@@ -2055,7 +2055,7 @@
     "help": "Adults are on by default; children are off until a parent enables this. Teens control their own setting.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.robot",
     "honoured_by": [
       "home"
     ]
@@ -2069,7 +2069,7 @@
     "help": "Adults are on by default. Children are off until a parent enables this; teens control their own setting.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.robot",
     "honoured_by": [
       "home"
     ]
@@ -2083,7 +2083,7 @@
     "help": "Adults are on by default; children are off until a parent enables this. Teens control their own setting.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.robot",
     "honoured_by": [
       "home"
     ]
@@ -2105,7 +2105,7 @@
     "help": "Controls optional nudges and chit-chat. Adults get nudges on and chit-chat off by default; children get both off. Teens control their own setting.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.robot",
     "honoured_by": [
       "home"
     ]
@@ -2119,7 +2119,7 @@
     "help": "On by default; a parent can change a child setting and teens control their own setting.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.robot",
     "honoured_by": [
       "home"
     ]
@@ -2140,7 +2140,7 @@
     "help": "Identity is used only for enrolled people. Children stay at presence until a parent chooses; teens control their own setting. The stricter person and robot levels apply.",
     "level": "basic",
     "secret": false,
-    "lives_in": "robot.settings",
+    "lives_in": "person.robot",
     "honoured_by": [
       "home"
     ]
@@ -3622,9 +3622,19 @@
     "level": "basic",
     "secret": false,
     "lives_in": "person.voice_print",
-    "honoured_by": ["home"],
-    "control": {"child": "guardian", "teen": "self", "adult": "self"},
-    "band_default": {"child": false, "teen": false, "adult": false},
+    "honoured_by": [
+      "home"
+    ],
+    "control": {
+      "child": "guardian",
+      "teen": "self",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": false,
+      "teen": false,
+      "adult": false
+    },
     "copy": {
       "does": "Helps Home tell your voice apart from other voices.",
       "title": "Voice print enrollment",
@@ -3705,7 +3715,7 @@
     "help": "A JSON list of nav entry ids, in the order they should appear. Normally set by pinning an app, not by editing this directly.",
     "level": "expert",
     "secret": false,
-    "lives_in": "profile.appearance",
+    "lives_in": "profile.appearance.internal",
     "honoured_by": [
       "home"
     ]
@@ -3719,7 +3729,7 @@
     "help": "A JSON list of setup checklist item ids this person chose not to see again.",
     "level": "expert",
     "secret": false,
-    "lives_in": "profile.appearance",
+    "lives_in": "profile.appearance.internal",
     "honoured_by": [
       "home"
     ]
@@ -3795,7 +3805,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -3809,7 +3819,7 @@
     "help": "Needed to clone a voice from a recording. Accept the terms at huggingface.co/kyutai/pocket-tts, then create a read token at huggingface.co/settings/tokens and paste it here.",
     "level": "advanced",
     "secret": true,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -4091,7 +4101,7 @@
     },
     "level": "expert",
     "secret": false,
-    "lives_in": "household.network",
+    "lives_in": "household.network_port",
     "honoured_by": [
       "home"
     ]
@@ -4173,65 +4183,65 @@
     ]
   },
   {
-      "key": "likeness.adults",
-      "scope": "person",
-      "selector": "boolean",
-      "default": false,
-      "label": "Let other adults in this household make pictures, videos and styles that look like me",
-      "help": "Other adults here can make pictures and videos that look like you, from a photo of you or a saved style of you. You are told each time, and the list is in this page. Turn this off and nobody can, right away, and any saved style of you is removed. Children and teens never can, whatever this says. Only you can change this.",
-      "copy": {
-        "does": "Lets the grown-ups here create images and clips that resemble you.",
-        "title": "Pictures and videos that look like you",
-        "what_is_stored": "This Home keeps a dated note each time you switch this, and a list of each time someone makes something that looks like you.",
-        "consent_adult_self": "I agree that other adults in this household can make pictures, videos and styles that look like me.",
-        "consent_teen_self": "Teens cannot turn this on.",
-        "consent_child_parent": "Children cannot turn this on.",
-        "consent_guest": "Guests cannot turn this on."
-      },
-      "control": {
-        "child": "guardian",
-        "teen": "guardian",
-        "adult": "self"
-      },
-      "band_default": {
-        "child": false,
-        "teen": false,
-        "adult": false
-      },
-      "level": "basic",
-      "secret": false,
-      "lives_in": "person.likeness",
-      "honoured_by": [
-        "home"
-      ]
+    "key": "likeness.adults",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Let other adults in this household make pictures, videos and styles that look like me",
+    "help": "Other adults here can make pictures and videos that look like you, from a photo of you or a saved style of you. You are told each time, and the list is in this page. Turn this off and nobody can, right away, and any saved style of you is removed. Children and teens never can, whatever this says. Only you can change this.",
+    "copy": {
+      "does": "Lets the grown-ups here create images and clips that resemble you.",
+      "title": "Pictures and videos that look like you",
+      "what_is_stored": "This Home keeps a dated note each time you switch this, and a list of each time someone makes something that looks like you.",
+      "consent_adult_self": "I agree that other adults in this household can make pictures, videos and styles that look like me.",
+      "consent_teen_self": "Teens cannot turn this on.",
+      "consent_child_parent": "Children cannot turn this on.",
+      "consent_guest": "Guests cannot turn this on."
     },
-    {
-      "key": "likeness.adult_content",
-      "scope": "person",
-      "selector": "boolean",
-      "default": false,
-      "label": "Including adult content",
-      "help": "Off by default, and only counts while the switch above is on. When it is on, other adults can also use your likeness in adult-only pictures and videos. Turning it off takes effect right away.",
-      "copy": {
-        "does": "Allows grown-up content in what is made of you, once the first switch is on."
-      },
-      "control": {
-        "child": "guardian",
-        "teen": "guardian",
-        "adult": "self"
-      },
-      "band_default": {
-        "child": false,
-        "teen": false,
-        "adult": false
-      },
-      "level": "basic",
-      "secret": false,
-      "lives_in": "person.likeness",
-      "honoured_by": [
-        "home"
-      ]
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
     },
+    "band_default": {
+      "child": false,
+      "teen": false,
+      "adult": false
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.likeness",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "likeness.adult_content",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Including adult content",
+    "help": "Off by default, and only counts while the switch above is on. When it is on, other adults can also use your likeness in adult-only pictures and videos. Turning it off takes effect right away.",
+    "copy": {
+      "does": "Allows grown-up content in what is made of you, once the first switch is on."
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": false,
+      "teen": false,
+      "adult": false
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.likeness",
+    "honoured_by": [
+      "home"
+    ]
+  },
   {
     "key": "generation.people_prompts",
     "scope": "household",
@@ -4500,7 +4510,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai",
+    "lives_in": "household.ai_advanced",
     "honoured_by": [
       "home"
     ]
@@ -4777,12 +4787,17 @@
       }
     },
     "range": {
-      "options": ["normal", "coding"]
+      "options": [
+        "normal",
+        "coding"
+      ]
     },
     "level": "basic",
     "secret": false,
     "lives_in": "household.coding",
-    "honoured_by": ["home"]
+    "honoured_by": [
+      "home"
+    ]
   },
   {
     "key": "coding.splash_cache_gb",

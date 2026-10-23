@@ -31,7 +31,7 @@ describe("the engine computer settings", () => {
       expect(byKey(k).length, k).toBe(1);
       const e = SettingsKey.parse(byKey(k)[0]);
       expect(e.scope, k).toBe("household");
-      expect(e.lives_in, k).toBe("household.ai");
+      expect(e.lives_in, k).toBe(k === "engines.stack.where" ? "household.ai_runtime" : k === "engines.stack.url" ? "household.ai_developer" : "household.ai_advanced");
     }
   });
   test("where defaults to this computer and offers exactly the two places", () => {
@@ -51,12 +51,12 @@ describe("the engine computer settings", () => {
     expect(e.label).toBe("Reach the engine computer when away from home");
     expect(String(e.help)).toContain("Only an admin can change this.");
   });
-  test("the keys sit on the household AI card, which only an admin reads and writes", () => {
+  test("the runtime and remote engine cards stay household-scoped for admins", () => {
     const cards: { group?: string; scope?: string }[] = [];
     const walk = (n: unknown): void => {
       if (Array.isArray(n)) n.forEach(walk);
       else if (n && typeof n === "object") {
-        if ((n as { group?: string }).group === "household.ai") cards.push(n as { group?: string; scope?: string });
+        if (["household.ai_runtime", "household.ai_advanced", "household.ai_developer"].includes((n as { group?: string }).group ?? "")) cards.push(n as { group?: string; scope?: string });
         Object.values(n).forEach(walk);
       }
     };

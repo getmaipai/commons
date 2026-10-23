@@ -13,6 +13,11 @@ import {
   CENTRAL_AREA_IDS,
   RESERVED_AREA_IDS,
   checkAreas,
+  checkPageCount,
+  checkSettingsCap,
+  HOUSEHOLD_CARD_ALLOWLIST,
+  PAGE_COUNT_ENFORCED,
+  SETTINGS_CAP_ENFORCED,
   lintManifestSettings,
   type AreasFile,
   type RegistryKey,
@@ -77,6 +82,20 @@ describe("spec/settings/areas.json", () => {
     expect(checkAreas(file, registry)).toEqual([]);
   });
 
+  test("every registry group is placed exactly once or listed with a not_placed reason", () => {
+    const counts = new Map<string, number>();
+    for (const a of file.areas) for (const s of a.sections) for (const c of s.cards ?? []) if (c.group && c.scope) {
+      const id = `${c.scope}:${c.group}`;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    for (const c of file.device_cards) {
+      const id = `${c.scope}:${c.group}`;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    const parked = new Set(file.not_placed.map((n) => `${n.scope}:${n.group}`));
+    for (const id of new Set(registry.map((k) => `${k.scope}:${k.lives_in}`))) expect((counts.get(id) ?? 0) + Number(parked.has(id)), id).toBe(1);
+  });
+
   test("personal voice controls stay in Account and command management is in Home", () => {
     expect(section("account", "voice")).toMatchObject({ kind: "keys", lead_view: "account.voice" });
     expect(section("home", "commands")).toMatchObject({ kind: "view", view: "home.commands" });
@@ -90,8 +109,9 @@ describe("spec/settings/areas.json", () => {
       "General", "People", "Engines and AI", "Pictures and videos", "Coding", "Devices", "Search", "Integrations", "Commands", "Voices",
       "Storage and backups", "Reference library", "Media library", "Maintenance", "Privacy", "Developer", "Network and access",
     ]);
-    expect(section("home", "ai").trail_view).toBe("home.engine_admin");
+    expect(section("home", "ai").tabs?.map((tab) => tab.id)).toEqual(["overview", "models", "engines", "advanced"]);
     expect(section("home", "robot").trail_view).toBe("home.devices_admin");
+    expect(section("home", "robot").detail?.tabs?.map((tab) => tab.id)).toEqual(["overview", "behaviour", "access"]);
     expect(section("home", "robot").needs).toBeUndefined();
     expect(section("home", "robot").cards?.[0]).toEqual({ label: "Robots", group: "home.robots", scope: "household" });
     expect(section("home", "robot").cards?.[1]?.needs).toEqual(["robot.paired", "robots.enabled"]);
@@ -158,14 +178,9 @@ describe("conformance: expert keys only under developer", () => {
     expect(checkAreas(file, registry).filter((e) => /expert/.test(e))).toEqual([]);
   });
 
-  test("an expert level on a non-developer card is refused", () => {
+  test("expert groups outside developer, and developer cards without a whole expert group, are refused", () => {
     const broken = clone(file);
-    section("chat", "general");
-    broken.areas.find((a) => a.id === "chat")!.sections.find((s) => s.id === "general")!.cards![0]!.levels = [
-      "basic",
-      "advanced",
-      "expert",
-    ];
+    broken.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "developer")!.cards![0]!.levels = ["basic", "expert"];
     expect(checkAreas(broken, registry).join("\n")).toMatch(/expert/);
   });
 });
@@ -290,6 +305,7 @@ describe("package manifests: contributes.settings_area", () => {
     title: "Music settings",
     app: "/apps/music",
     audience: { min_role: "child" },
+    scope: "person",
     groups: [{ label: "Music", sections: ["general"] }],
     sections: [
       {
@@ -325,6 +341,68 @@ describe("package manifests: contributes.settings_area", () => {
     for (const id of RESERVED_AREA_IDS) {
       expect(lintManifestSettings({ ...base, id }).join("\n"), id).toMatch(/package id/);
     }
+  });
+
+  test("package household cards follow the shrink-only News allowlist", () => {
+    expect([...HOUSEHOLD_CARD_ALLOWLIST]).toEqual(["news"]);
+    const householdArea = clone(musicArea) as typeof musicArea & { scope: string };
+    householdArea.scope = "person";
+    householdArea.sections[0]!.cards[0]!.scope = "household";
+    expect(lintManifestSettings({ ...base, contributes: { settings_area: householdArea } }).join("\n")).toMatch(/may not declare household cards/);
+    expect(lintManifestSettings({ ...base, id: "news", contributes: { settings_area: householdArea } }).filter((e) => /household/.test(e))).toEqual([]);
+  });
+});
+
+describe("settings tabs, detail and deferred limits", () => {
+  test("invalid card tabs, empty tabs and too many tabs are reported", () => {
+    const broken = clone(file);
+    const ai = broken.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "ai")!;
+    ai.cards![0]!.tab = "missing";
+    ai.tabs![1]!.id = "empty";
+    ai.tabs!.push({ id: "six", label: "Six" }, { id: "seven", label: "Seven" }, { id: "eight", label: "Eight" });
+    const out = checkAreas(broken, registry).join("\n");
+    expect(out).toContain("tab \"missing\" is not a tab id");
+    expect(out).toContain("tab \"empty\" holds nothing");
+    expect(out).toContain("tabs must contain 2 to 5 entries");
+  });
+
+  test("view_tab validates against section tabs and detail carries a route parameter", () => {
+    const broken = clone(file);
+    const robot = broken.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "robot")!;
+    robot.view_tab = "unknown";
+    robot.detail!.param = "not a route param!";
+    const out = checkAreas(broken, registry).join("\n");
+    expect(out).toContain("view_tab \"unknown\" is not a tab id");
+    expect(out).toContain("detail param must be a simple path parameter");
+    expect(section("home", "robot").detail).toMatchObject({ param: "id", view: "home.devices_admin" });
+  });
+
+  test("page-count and per-tab cap logic is tested while disabled until IA-04", () => {
+    expect(PAGE_COUNT_ENFORCED).toBe(false);
+    expect(SETTINGS_CAP_ENFORCED).toBe(false);
+    const short = clone(area("home"));
+    short.sections = short.sections.slice(0, 2);
+    expect(checkPageCount(short)).toEqual([]);
+    const crowded = clone(section("home", "ai"));
+    crowded.tabs = undefined;
+    crowded.cards = [{ label: "Pictures", group: "household.pictures", scope: "household" }];
+    expect(checkSettingsCap(crowded, registry)).toEqual([]);
+  });
+});
+
+describe("area scope", () => {
+  test("scope mismatch fails and the household/person areas have their declared scopes", () => {
+    expect(area("home").scope).toBe("household");
+    expect(area("account").scope).toBe("person");
+    const broken = clone(file);
+    broken.areas.find((a) => a.id === "home")!.sections.find((s) => s.id === "general")!.cards![0]!.scope = "person";
+    expect(checkAreas(broken, registry).join("\n")).toContain("scope person disagrees with area's household scope");
+  });
+
+  test("household area min_role cannot be broader than admin", () => {
+    const broken = clone(file);
+    broken.areas.find((a) => a.id === "home")!.audience.min_role = "adult";
+    expect(checkAreas(broken, registry).join("\n")).toContain("household area min_role adult is broader than admin");
   });
 });
 

@@ -1,5 +1,29 @@
 # The settings registry
 
+## Settings areas, tabs and record details
+
+`areas.json` declares each settings area with a required `scope`: `household`
+for settings that govern the home, or `person` for the viewer's own settings.
+Every key card must match its area's scope. A `device` card is the exception
+for device-local controls on a person's `device` or `robot` section.
+
+A section may declare two to five `tabs`, in display order. A card's optional
+`tab` names its section tab; cards without one form the summary strip above
+the tabs. Sections that draw a view can use `view_tab` to place that view.
+The shell keeps the selected tab in `?tab=`.
+
+A section may also declare `detail: { param, view, tabs? }`. This describes a
+record detail screen at `/settings/<area>/<section>/<id>` and its optional
+two-to-five tabs. It is a drill-in screen, not another settings page.
+
+`checkAreas` treats `scope:lives_in` as one indivisible registry group. It
+must appear in exactly one card, even when the keys have different levels or
+the area declares tabs, or it must appear once in `not_placed` with a reason.
+The page-count and per-tab basic-setting cap checks are implemented behind
+`PAGE_COUNT_ENFORCED` and `SETTINGS_CAP_ENFORCED`; both remain off until
+SETTINGS-IA-04. Package household cards are limited by the shrink-only
+`HOUSEHOLD_CARD_ALLOWLIST`, initially `news` for the News shelf.
+
 `keys.json` is the generated-from-declarations settings index (platform
 plan 3.2 and docs/SETTINGS.md rule 5): every entry conforms to
 [`../schemas/settings-key.schema.json`](../schemas/settings-key.schema.json).

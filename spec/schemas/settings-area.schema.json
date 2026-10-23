@@ -8,6 +8,7 @@
   "required": [
     "id",
     "title",
+      "scope",
     "audience",
     "groups",
     "sections"
@@ -23,6 +24,11 @@
       "minLength": 1,
       "maxLength": 40,
       "description": "The settings column's heading."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["household", "person"],
+      "description": "The settings governed by this area: household settings are admin-only; person settings belong to the viewer."
     },
     "app": {
       "type": "string",
@@ -190,6 +196,11 @@
           "minLength": 1,
           "description": "A registry group: SettingsKey lives_in."
         },
+        "tab": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "The section tab that contains this card. Omitted cards appear in the summary strip above the tabs."
+        },
         "scope": {
           "type": "string",
           "enum": [
@@ -313,6 +324,26 @@
       },
       "description": "One card: either a registry group at one scope (group and scope together) or a list of link rows (links), never both. areas-check.ts enforces the pairing."
     },
+    "tab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 40 }
+      }
+    },
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["param", "view"],
+      "properties": {
+        "param": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "view": { "$ref": "#/$defs/view" },
+        "tabs": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "$ref": "#/$defs/tab" } }
+      },
+      "description": "A record detail screen at /settings/<area>/<section>/<id>; it is not an additional page."
+    },
     "section": {
       "type": "object",
       "additionalProperties": false,
@@ -397,7 +428,20 @@
             "type": "string",
             "minLength": 1
           }
-        }
+        },
+        "tabs": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/tab" },
+          "description": "Subtopics in declaration order; the shell persists the open tab in ?tab=."
+        },
+        "view_tab": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Tab id for a section view, lead_view or trail_view."
+        },
+        "detail": { "$ref": "#/$defs/detail" }
       },
       "allOf": [
         {

@@ -23,6 +23,12 @@ export const SettingsAreas = z
             .min(1)
             .max(40)
             .describe("The settings column's heading."),
+          /**The settings governed by this area: household settings are admin-only; person settings belong to the viewer.*/
+          scope: z
+            .enum(["household", "person"])
+            .describe(
+              "The settings governed by this area: household settings are admin-only; person settings belong to the viewer.",
+            ),
           /**The nav entry that owns this area, so the app's header gets a gear. Absent for Account and Home settings.*/
           app: z
             .string()
@@ -91,6 +97,14 @@ export const SettingsAreas = z
                             .string()
                             .min(1)
                             .describe("A registry group: SettingsKey lives_in.")
+                            .optional(),
+                          /**The section tab that contains this card. Omitted cards appear in the summary strip above the tabs.*/
+                          tab: z
+                            .string()
+                            .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                            .describe(
+                              "The section tab that contains this card. Omitted cards appear in the summary strip above the tabs.",
+                            )
                             .optional(),
                           scope: z
                             .enum(["household", "person", "device"])
@@ -357,6 +371,76 @@ export const SettingsAreas = z
                     .refine(
                       (arr) => arr.every((item, i) => arr.indexOf(item) == i),
                       "All items must be unique!",
+                    )
+                    .optional(),
+                  /**Subtopics in declaration order; the shell persists the open tab in ?tab=.*/
+                  tabs: z
+                    .array(
+                      z
+                        .object({
+                          id: z.string().regex(new RegExp("^[a-z][a-z0-9-]*$")),
+                          label: z.string().min(1).max(40),
+                        })
+                        .strict(),
+                    )
+                    .min(2)
+                    .max(5)
+                    .describe(
+                      "Subtopics in declaration order; the shell persists the open tab in ?tab=.",
+                    )
+                    .optional(),
+                  /**Tab id for a section view, lead_view or trail_view.*/
+                  view_tab: z
+                    .string()
+                    .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                    .describe(
+                      "Tab id for a section view, lead_view or trail_view.",
+                    )
+                    .optional(),
+                  /**A record detail screen at /settings/<area>/<section>/<id>; it is not an additional page.*/
+                  detail: z
+                    .object({
+                      param: z.string().regex(new RegExp("^[a-z][a-z0-9_]*$")),
+                      /**A named view in Home's view table. The list is closed so a package cannot name one Home does not have.*/
+                      view: z
+                        .enum([
+                          "account.profile",
+                          "account.voice",
+                          "account.likeness",
+                          "account.device_appearance",
+                          "chat.skills",
+                          "chat.shortcuts",
+                          "home.commands",
+                          "home.voice_catalog",
+                          "home.engine_admin",
+                          "home.devices_admin",
+                          "home.routing_stats",
+                          "home.reference_library",
+                          "home.pictures_library",
+                          "home.media_library",
+                          "account.coding_keys",
+                        ])
+                        .describe(
+                          "A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
+                        ),
+                      tabs: z
+                        .array(
+                          z
+                            .object({
+                              id: z
+                                .string()
+                                .regex(new RegExp("^[a-z][a-z0-9-]*$")),
+                              label: z.string().min(1).max(40),
+                            })
+                            .strict(),
+                        )
+                        .min(2)
+                        .max(5)
+                        .optional(),
+                    })
+                    .strict()
+                    .describe(
+                      "A record detail screen at /settings/<area>/<section>/<id>; it is not an additional page.",
                     )
                     .optional(),
                 })

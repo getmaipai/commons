@@ -1,3 +1,15 @@
+## spec-v0.1.209: settings tabs, detail views and area scope (2026-10-23)
+
+Settings areas now declare household or person scope, sections may declare
+ordered tabs and record detail views, and cards may belong to a tab. The
+area checker enforces matching card scope and one card per whole registry
+group, with a shrink-only News household-card allowlist for packages. The
+per-tab basic-setting cap and the home/account page count are implemented
+behind off flags for SETTINGS-IA-04. The AI section now declares Overview,
+Models, Engines and Advanced tabs, and robot settings declare Overview,
+Behaviour and Access detail tabs. Key placements were re-homed through
+`lives_in` only; key identity and policy fields remain unchanged.
+
 ## ui-v0.5.313: staged MusicTrack generation progress
 
 The generating `MusicTrack` now shows each host supplied stage once in a

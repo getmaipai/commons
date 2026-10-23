@@ -48,7 +48,7 @@ describe("chat.search_assist key", () => {
     const keys = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "settings", "keys.json"), "utf-8")) as Record<string, unknown>[];
     const hits = keys.filter((k) => k.key === "chat.search_assist");
     expect(hits.length).toBe(1);
-    expect(hits[0]).toMatchObject({ scope: "household", selector: "select", default: "shadow", level: "advanced", lives_in: "household.ai", honoured_by: ["home"] });
+    expect(hits[0]).toMatchObject({ scope: "household", selector: "select", default: "shadow", level: "advanced", lives_in: "household.ai_advanced", honoured_by: ["home"] });
     expect((hits[0].range as { options: string[] }).options).toEqual(["off", "shadow", "rescue"]);
   });
 });

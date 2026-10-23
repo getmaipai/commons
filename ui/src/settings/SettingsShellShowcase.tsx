@@ -10,6 +10,7 @@ import type { SettingsAreaDef, SettingsViewer } from "./settingsAudience";
 const DEMO_AREA: SettingsAreaDef = {
   id: "demo",
   title: "Settings",
+  scope: "person",
   audience: { min_role: "guest" },
   groups: [
     { label: "Personal", sections: ["general", "notifications", "profile", "appearance"] },

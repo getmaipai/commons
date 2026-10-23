@@ -93,7 +93,7 @@ describe("spec/settings/keys.json", () => {
       selector: "text",
       default: "[]",
       label: "Setup checklist items hidden",
-      lives_in: "profile.appearance",
+      lives_in: "profile.appearance.internal",
       honoured_by: ["home"],
       secret: false,
     });

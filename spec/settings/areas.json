@@ -214,7 +214,7 @@
           "cards": [
             {
               "label": "Robot",
-              "group": "robot.settings",
+              "group": "person.robot",
               "scope": "person",
               "bands": [
                 "adult"
@@ -240,14 +240,6 @@
           "kind": "keys",
           "cards": [
             {
-              "label": "Developer",
-              "group": "profile.appearance",
-              "scope": "person",
-              "levels": [
-                "expert"
-              ]
-            },
-            {
               "label": "Session lock",
               "group": "person.security",
               "scope": "person",
@@ -269,7 +261,8 @@
             "coding.allowed_for_me"
           ]
         }
-      ]
+      ],
+      "scope": "person"
     },
     {
       "id": "home",
@@ -537,30 +530,54 @@
           "kind": "keys",
           "cards": [
             {
-              "label": "Chat",
-              "group": "household.ai",
-              "scope": "household"
+              "label": "Chat pause",
+              "group": "household.chat_pause",
+              "scope": "household",
+              "tab": "overview"
             },
             {
-              "label": "Manage",
-              "links": [
-                {
-                  "label": "AI models",
-                  "href": "/models"
-                },
-                {
-                  "label": "Engines",
-                  "href": "/engines"
-                }
-              ]
+              "label": "Model per job",
+              "group": "household.ai_models",
+              "scope": "household",
+              "tab": "models"
+            },
+            {
+              "label": "AI settings",
+              "group": "household.ai_advanced",
+              "scope": "household",
+              "tab": "advanced"
+            },
+            {
+              "label": "Engines",
+              "group": "household.ai_runtime",
+              "scope": "household",
+              "tab": "engines"
             }
           ],
-          "trail_view": "home.engine_admin",
           "keywords": [
             "teen gate",
             "context",
             "model"
-          ]
+          ],
+          "tabs": [
+            {
+              "id": "overview",
+              "label": "Overview"
+            },
+            {
+              "id": "models",
+              "label": "Models"
+            },
+            {
+              "id": "engines",
+              "label": "Engines"
+            },
+            {
+              "id": "advanced",
+              "label": "Advanced"
+            }
+          ],
+          "view_tab": "models"
         },
         {
           "id": "pictures",
@@ -628,7 +645,25 @@
             "greetings",
             "live view",
             "alarm"
-          ]
+          ],
+          "detail": {
+            "param": "id",
+            "view": "home.devices_admin",
+            "tabs": [
+              {
+                "id": "overview",
+                "label": "Overview"
+              },
+              {
+                "id": "behaviour",
+                "label": "Behaviour"
+              },
+              {
+                "id": "access",
+                "label": "Access"
+              }
+            ]
+          }
         },
         {
           "id": "reference-library",
@@ -742,8 +777,16 @@
           "kind": "keys",
           "cards": [
             {
-              "label": "Developer",
-              "group": "household.ai",
+              "label": "Media minutes",
+              "group": "media.budget",
+              "scope": "household",
+              "levels": [
+                "expert"
+              ]
+            },
+            {
+              "label": "AI developer settings",
+              "group": "household.ai_developer",
               "scope": "household",
               "levels": [
                 "expert"
@@ -751,15 +794,7 @@
             },
             {
               "label": "Network port",
-              "group": "household.network",
-              "scope": "household",
-              "levels": [
-                "expert"
-              ]
-            },
-            {
-              "label": "Media minutes",
-              "group": "media.budget",
+              "group": "household.network_port",
               "scope": "household",
               "levels": [
                 "expert"
@@ -815,7 +850,8 @@
             }
           ]
         }
-      ]
+      ],
+      "scope": "household"
     },
     {
       "id": "chat",
@@ -957,7 +993,8 @@
           "href": "/settings/home/ai",
           "min_role": "admin"
         }
-      ]
+      ],
+      "scope": "person"
     }
   ],
   "not_placed": [
@@ -985,6 +1022,11 @@
       "scope": "person",
       "group": "person.coding",
       "reason": "An admin sets coding grants and limits on the person's Family page. The account view shows what the grant allows."
+    },
+    {
+      "scope": "person",
+      "group": "profile.appearance.internal",
+      "reason": "Pinned app order and checklist dismissal are internal UI state and are not user-facing settings."
     }
   ],
   "device_cards": [
