@@ -55,6 +55,13 @@ describe("answer-block fixtures", () => {
       for (const key of ["id", "kind", "alt", "provenance", "created_at", "hlc"]) expect(block[key]).toBeTruthy();
     }
   });
+
+  test("story-feed cards accept the hub favicon route and reject other paths", () => {
+    const feed = read("fixtures", "answer-block", "valid-story_feed.json");
+    expect(validate(feed)).toBe(true);
+    expect(validate({ ...feed, props: { ...feed.props, hero: { ...feed.props.hero, sourceIconUrl: "/api/favicon?domain=example.com" } } })).toBe(true);
+    expect(validate({ ...feed, props: { ...feed.props, hero: { ...feed.props.hero, sourceIconUrl: "https://example.com/favicon.ico" } } })).toBe(false);
+  });
 });
 
 describe("after_paragraph (GENUI-13a)", () => {

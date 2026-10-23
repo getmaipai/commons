@@ -1178,6 +1178,14 @@ export const AnswerBlock = z
                   dek: z.string().optional(),
                   publisher: z.string().min(1),
                   site: z.string().min(1),
+                  /**Hub-relative favicon route for the story's source.*/
+                  sourceIconUrl: z
+                    .string()
+                    .regex(new RegExp("^/api/favicon(?:[/?#].*)?$"))
+                    .describe(
+                      "Hub-relative favicon route for the story's source.",
+                    )
+                    .optional(),
                   published_at: z.string().datetime({ offset: true }),
                   /**How many publishers cover this story.*/
                   outlets: z
@@ -1236,6 +1244,14 @@ export const AnswerBlock = z
                       dek: z.string().optional(),
                       publisher: z.string().min(1),
                       site: z.string().min(1),
+                      /**Hub-relative favicon route for the story's source.*/
+                      sourceIconUrl: z
+                        .string()
+                        .regex(new RegExp("^/api/favicon(?:[/?#].*)?$"))
+                        .describe(
+                          "Hub-relative favicon route for the story's source.",
+                        )
+                        .optional(),
                       published_at: z.string().datetime({ offset: true }),
                       /**How many publishers cover this story.*/
                       outlets: z
@@ -1313,6 +1329,14 @@ export const AnswerBlock = z
                               dek: z.string().optional(),
                               publisher: z.string().min(1),
                               site: z.string().min(1),
+                              /**Hub-relative favicon route for the story's source.*/
+                              sourceIconUrl: z
+                                .string()
+                                .regex(new RegExp("^/api/favicon(?:[/?#].*)?$"))
+                                .describe(
+                                  "Hub-relative favicon route for the story's source.",
+                                )
+                                .optional(),
                               published_at: z
                                 .string()
                                 .datetime({ offset: true }),
@@ -1383,6 +1407,14 @@ export const AnswerBlock = z
                       dek: z.string().optional(),
                       publisher: z.string().min(1),
                       site: z.string().min(1),
+                      /**Hub-relative favicon route for the story's source.*/
+                      sourceIconUrl: z
+                        .string()
+                        .regex(new RegExp("^/api/favicon(?:[/?#].*)?$"))
+                        .describe(
+                          "Hub-relative favicon route for the story's source.",
+                        )
+                        .optional(),
                       published_at: z.string().datetime({ offset: true }),
                       /**How many publishers cover this story.*/
                       outlets: z
@@ -1894,6 +1926,14 @@ export const AnswerBlock = z
                       dek: z.string().optional(),
                       publisher: z.string().min(1),
                       site: z.string().min(1),
+                      /**Hub-relative favicon route for the story's source.*/
+                      sourceIconUrl: z
+                        .string()
+                        .regex(new RegExp("^/api/favicon(?:[/?#].*)?$"))
+                        .describe(
+                          "Hub-relative favicon route for the story's source.",
+                        )
+                        .optional(),
                       published_at: z.string().datetime({ offset: true }),
                       /**How many publishers cover this story.*/
                       outlets: z

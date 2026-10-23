@@ -1,3 +1,7 @@
+## [spec-v0.1.217] - 2026-10-23
+
+- Add the optional `sourceIconUrl` favicon route to embedded `news_story_card` values, including story-feed cards. Match the standalone NewsStory path pattern. Additive.
+
 ## [spec-v0.1.208] - 2026-10-22
 
 - LOOK-01: add the LookResult record, the default household Look vocabulary (detector classes, nouns, scene types, lighting, activities, colours) and the pinned YOLOX-nano model (Apache-2.0) to the robot asset list. Additive.

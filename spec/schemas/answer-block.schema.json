@@ -592,6 +592,11 @@
           "type": "string",
           "minLength": 1
         },
+        "sourceIconUrl": {
+          "type": "string",
+          "pattern": "^/api/favicon(?:[/?#].*)?$",
+          "description": "Hub-relative favicon route for the story's source."
+        },
         "published_at": {
           "type": "string",
           "format": "date-time"
