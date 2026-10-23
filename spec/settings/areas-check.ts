@@ -86,8 +86,8 @@ export function checkSettingsCap(section: AreaSection, registry: RegistryKey[]):
   const tabs = section.tabs?.length ? [...section.tabs.map((t) => t.id), "__summary__"] : ["__summary__"];
   const errors: string[] = [];
   for (const tab of tabs) {
-    const count = (section.cards ?? []).filter((c) => (c.tab ?? "__summary__") === tab).reduce((n, c) => {
-      if (c.view || c.lead_view || c.trail_view) return n + 1;
+    const sectionViews = tab === "__summary__" && (section.view || section.lead_view || section.trail_view) ? 1 : 0;
+    const count = sectionViews + (section.cards ?? []).filter((c) => (c.tab ?? "__summary__") === tab).reduce((n, c) => {
       if (!c.group || !c.scope) return n;
       return n + registry.filter((k) => k.scope === c.scope && k.lives_in === c.group && k.level === "basic").length;
     }, 0);

@@ -1,3 +1,7 @@
+## spec-v0.1.210: the settings cap counts a section's own view, not a card's (2026-10-23)
+
+`checkSettingsCap` read `view`, `lead_view` and `trail_view` from cards, where the schema has none (they belong to the section), which Home's typecheck of the spec source flagged. A section's view now counts as one setting on its summary tab. No behaviour change while `SETTINGS_CAP_ENFORCED` is off.
+
 ## spec-v0.1.209: settings tabs, detail views and area scope (2026-10-23)
 
 Settings areas now declare household or person scope, sections may declare
