@@ -1388,6 +1388,15 @@ body {
   position: absolute;
   pointer-events: none;
 }
+[data-slot="weather-forecast-hero"] [data-fx],
+[data-slot="weather-location-sky"] [data-fx] {
+  position: absolute;
+  pointer-events: none;
+}
+[data-slot="weather-location-sky"] [data-fx="cloud"],
+[data-slot="weather-forecast-hero"] [data-fx="cloud"] { filter: blur(7px); }
+[data-slot="weather-location-sky"] [data-fx="fog"],
+[data-slot="weather-forecast-hero"] [data-fx="fog"] { filter: blur(6px); }
 [data-slot="weather-card"] [data-fx="fall"] {
   top: -24px;
   left: calc(var(--x) * 1%);
@@ -1459,7 +1468,7 @@ body {
   animation: wx-flash 7s linear infinite;
 }
 @keyframes wx-rain {
-  to { transform: translate3d(-32px, 270px, 0); }
+  to { transform: translate3d(-38px, 310px, 0); }
 }
 @keyframes wx-snow {
   from { transform: translate3d(0, 0, 0); }
@@ -1471,8 +1480,8 @@ body {
   to { opacity: 1; }
 }
 @keyframes wx-drift {
-  from { transform: translate3d(-24px, 0, 0); }
-  to { transform: translate3d(28px, 0, 0); }
+  from { transform: translate3d(-38px, 0, 0); }
+  to { transform: translate3d(42px, 0, 0); }
 }
 @keyframes wx-fog {
   from { transform: translate3d(-8%, 0, 0); }
@@ -1491,16 +1500,26 @@ body {
   98% { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-slot="weather-card"] [data-fx] {
+  [data-slot="weather-card"] [data-fx],
+  [data-slot="weather-forecast-hero"] [data-fx],
+  [data-slot="weather-location-sky"] [data-fx] {
     animation: none !important;
   }
   [data-slot="weather-card"] [data-fx="fall"],
   [data-slot="weather-card"] [data-fx="flake"],
-  [data-slot="weather-card"] [data-fx="flash"] {
+  [data-slot="weather-card"] [data-fx="flash"],
+  [data-slot="weather-forecast-hero"] [data-fx="fall"],
+  [data-slot="weather-forecast-hero"] [data-fx="flake"],
+  [data-slot="weather-forecast-hero"] [data-fx="flash"],
+  [data-slot="weather-location-sky"] [data-fx="fall"],
+  [data-slot="weather-location-sky"] [data-fx="flake"],
+  [data-slot="weather-location-sky"] [data-fx="flash"] {
     display: none;
   }
 }
-html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx] {
+html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx],
+html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx],
+html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx] {
   animation: none !important;
 }
 html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="fall"],
@@ -1508,6 +1527,12 @@ html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flake"],
 html[data-ease-motion="calm"] [data-slot="weather-card"] [data-fx="flash"] {
   display: none;
 }
+html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx="fall"],
+html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx="flake"],
+html[data-ease-motion="calm"] [data-slot="weather-forecast-hero"] [data-fx="flash"],
+html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx="fall"],
+html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx="flake"],
+html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx="flash"] { display: none; }
 
 /* MEDIA-PLAYER-01: tokens for anything drawn over a picture (art), shared by
  * the Player, the Billboard and the media tile overlay (MediaShelf), and open

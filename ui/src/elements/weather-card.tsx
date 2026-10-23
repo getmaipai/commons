@@ -108,7 +108,7 @@ function Layer({ items, kind }: { items: readonly Particle[]; kind: string }) {
 }
 
 /** The sky behind the hero text: only decoration, chosen by class and time of day. */
-function Sky({ cls, isDay }: { cls: WeatherClass; isDay: boolean }) {
+export function WeatherSky({ cls, isDay }: { cls: WeatherClass; isDay: boolean }) {
   const lamp = isDay ? (
     <span data-fx="sun" aria-hidden />
   ) : (
@@ -314,7 +314,7 @@ export function WeatherCard({
       >
         <p className="sr-only" data-slot="weather-summary">{summary}</p>
         <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
-          <Sky cls={cls} isDay={current.is_day} />
+          <WeatherSky cls={cls} isDay={current.is_day} />
         </div>
         <div aria-hidden className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--weather-scrim)" }} />
         <div aria-hidden className="flex items-start justify-between gap-3">
