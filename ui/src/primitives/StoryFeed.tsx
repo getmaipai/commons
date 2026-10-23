@@ -1,5 +1,5 @@
 import { getIcon } from "@/kit/icons";
-import { type CSSProperties, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
@@ -28,6 +28,8 @@ export interface StoryCardData {
   title: string;
   dek?: string;
   publisher: string;
+  /** Optional publisher favicon URL, shown beside the source name. */
+  sourceIconUrl?: string;
   site: string;
   published_at: string;
   outlets: number;
@@ -107,9 +109,13 @@ function Kicker({ story }: { story: StoryCardData }) {
 
 /** An opened story mutes its headline and source line; the card keeps full strength. */
 function SourceLine({ story }: { story: StoryCardData }) {
+  const [iconFailed, setIconFailed] = useState(false);
   return (
     <div data-slot="story-source" data-opened={story.opened ? "" : undefined} className={cn("flex flex-wrap items-center gap-x-2 text-xs", story.opened ? "text-muted-foreground" : "text-foreground")}>
-      <span>{story.publisher}</span>
+      <span className="inline-flex min-w-0 items-center gap-1.5">
+        {story.sourceIconUrl && !iconFailed ? <img src={story.sourceIconUrl} alt="" aria-hidden className="size-4 shrink-0 rounded object-cover" onError={() => setIconFailed(true)} /> : null}
+        <span>{story.publisher}</span>
+      </span>
       <RelativeTime at={story.published_at} />
       {story.outlets > 1 ? <Badge variant="secondary">{story.outlets} sources</Badge> : null}
       {story.saved ? (

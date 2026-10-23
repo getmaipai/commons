@@ -11,6 +11,11 @@ export interface PaletteCommand {
   label: string;
   group: string;
   keys: readonly string[];
+  /** Optional detail shown beneath the command label. */
+  subtitle?: string;
+  /** Optional icon component or image URL for the result tile. */
+  icon?: ComponentProps<"span">["children"];
+  iconUrl?: string;
 }
 
 export type CommandPaletteDialogProps = Omit<ComponentProps<typeof CommandPalette>, "className" | "size"> & {
@@ -129,17 +134,17 @@ export function CommandPalette({
       data-slot="command-palette"
       className={cn(
         floating,
-        "flex w-full flex-col overflow-hidden rounded-[20px]",
+        "flex w-full flex-col overflow-hidden rounded-[24px] shadow-xl ring-1 ring-border/60 backdrop-blur-2xl",
         size === "lg"
-          ? "h-[min(36rem,calc(100dvh-4rem))] max-w-none"
-          : "max-w-sm",
+          ? "h-[min(40rem,calc(100dvh-4rem))] max-w-none"
+          : "max-w-xl",
         className,
       )}
 
       {...props}
     >
-      <div className="flex items-center gap-2.5 px-3.5 py-3">
-        <SearchIcon className="text-foreground/30 size-3.5 shrink-0" />
+      <div className="border-foreground/[0.07] flex items-center gap-4 border-b px-6 py-5">
+        <SearchIcon aria-hidden className="text-muted-foreground size-6 shrink-0" />
         <input
           value={query}
           onChange={(event) => onQueryChange?.(event.target.value)}
@@ -155,7 +160,7 @@ export function CommandPalette({
               ? optionId(activeId)
               : undefined
           }
-          className="text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[13.5px] outline-none"
+          className="text-foreground placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-xl outline-none"
         />
         <span
           className={cn(
@@ -173,7 +178,7 @@ export function CommandPalette({
         role="listbox"
         aria-label="Commands"
         className={cn(
-          "border-foreground/[0.07] flex flex-col overflow-y-auto border-t p-1.5",
+          "flex flex-col overflow-y-auto px-3 py-2",
           size === "lg" ? "min-h-0 flex-1" : "max-h-72",
         )}
       >
@@ -182,11 +187,11 @@ export function CommandPalette({
             key={group}
             role="group"
             aria-label={group}
-            className="flex flex-col"
+              className="flex flex-col gap-1 pb-2"
           >
             <span
               aria-hidden
-              className={cn(mono, "text-muted-foreground px-2 pt-2 pb-1")}
+              className={cn(mono, "text-muted-foreground px-3 pt-3 pb-1 text-[10px] font-medium uppercase tracking-wider")}
             >
               {group}
             </span>
@@ -194,17 +199,25 @@ export function CommandPalette({
               .filter((command) => command.group === group)
               .map((command) => {
                 const className = cn(
-                  "flex items-center gap-2 rounded-xl px-2 py-1.5 text-start transition-colors",
+                  "flex min-h-14 items-center gap-3 rounded-xl px-3 py-2 text-start transition-colors",
                   command.id === activeId
-                    ? "bg-foreground/[0.06]"
+                    ? "bg-accent text-accent-foreground"
                     : onRun
                       ? "hover:bg-foreground/[0.03]"
                       : undefined,
                 );
                 const content = (
                   <>
-                    <span className="min-w-0 flex-1 truncate text-[13px]">
-                      {command.label}
+                    {command.iconUrl ? (
+                      <img src={command.iconUrl} alt="" className="size-8 shrink-0 rounded-lg object-cover" />
+                    ) : command.icon ? (
+                      <span className="bg-foreground/[0.05] text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4">{command.icon}</span>
+                    ) : (
+                      <span aria-hidden className="bg-foreground/[0.05] size-8 shrink-0 rounded-lg" />
+                    )}
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="truncate text-sm font-medium">{command.label}</span>
+                      {command.subtitle ? <span className="text-muted-foreground truncate text-xs">{command.subtitle}</span> : null}
                     </span>
                     <span className="flex shrink-0 gap-1">
                       {command.keys.map((key) => (
@@ -213,7 +226,7 @@ export function CommandPalette({
                           className={cn(
                             field,
                             mono,
-                            "text-muted-foreground rounded px-1.5 py-0.5",
+                            "text-muted-foreground rounded-md px-1.5 py-0.5",
                           )}
                         >
                           {key}

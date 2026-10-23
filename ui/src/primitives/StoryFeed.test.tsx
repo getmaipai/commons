@@ -61,6 +61,19 @@ describe("StoryFeed", () => {
     expect(tile.hasAttribute("data-empty")).toBe(false);
   });
 
+  test("source favicon sits before the publisher and disappears on load failure", () => {
+    const { container } = render(<StoryFeed data={{ ...data, hero: { ...data.hero!, sourceIconUrl: "/favicon.png" } }} />);
+    const source = container.querySelector('[data-tier="hero"] [data-slot="story-source"]')!;
+    const icon = source.querySelector("img")!;
+    expect(icon.getAttribute("src")).toBe("/favicon.png");
+    expect(icon.className).toContain("size-4");
+    expect(icon.className).toContain("rounded");
+    expect(icon.nextElementSibling?.textContent).toBe(data.hero!.publisher);
+    fireEvent.error(icon);
+    expect(source.querySelector("img")).toBeNull();
+    expect(source.textContent).toContain(data.hero!.publisher);
+  });
+
   test("missing story pictures share the default picture icon", () => {
     const stories = ["Atlas", "Atlas", "Bramble"].map((publisher, i) => ({ ...data.hero!, story_id: `missing-${i}`, publisher, image: undefined }));
     const { container } = render(<StoryFeed data={{ layout: "channel", featured: stories, as_of: data.as_of }} />);

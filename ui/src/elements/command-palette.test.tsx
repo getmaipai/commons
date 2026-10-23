@@ -83,7 +83,7 @@ test("size lg widens the dialog and fixes the palette height with the list scrol
   expect(dialogClassName).not.toContain("sm:max-w-sm");
   const palette = document.querySelector('[data-slot="command-palette"]')?.getAttribute("class") ?? "";
   expect(palette).toContain("max-w-none");
-  expect(palette).toContain("h-[min(36rem,calc(100dvh-4rem))]");
+  expect(palette).toContain("h-[min(40rem,calc(100dvh-4rem))]");
   const list = view.getByRole("listbox", { name: "Commands" }).getAttribute("class") ?? "";
   expect(list).toContain("min-h-0");
   expect(list).toContain("flex-1");
@@ -95,6 +95,23 @@ test("the default size is unchanged", () => {
     <CommandPaletteDialog open onOpenChange={() => {}} title="Chat commands" commands={commands} query="" activeId="new-chat" />,
   );
   const palette = document.querySelector('[data-slot="command-palette"]')?.getAttribute("class") ?? "";
-  expect(palette).toContain("max-w-sm");
+  expect(palette).toContain("max-w-xl");
   expect(view.getByRole("listbox", { name: "Commands" }).getAttribute("class")).toContain("max-h-72");
+});
+
+test("renders optional result subtitles and icon tiles with an active row", () => {
+  const view = render(
+    <CommandPaletteDialog open onOpenChange={() => {}} title="Chat commands" commands={[
+      { ...commands[0]!, subtitle: "Start a conversation", iconUrl: "/icons/chat.png" },
+      commands[1]!,
+    ]} query="" activeId="new-chat" />,
+  );
+  expect(view.getByText("Start a conversation")).toBeTruthy();
+  const option = view.getByRole("option", { name: /New chat Start a conversation/ });
+  expect(option.getAttribute("aria-selected")).toBe("true");
+  expect(option.className).toContain("bg-accent");
+  expect(option.querySelector("img")?.getAttribute("src")).toBe("/icons/chat.png");
+  const palette = document.querySelector('[data-slot="command-palette"]')?.getAttribute("class") ?? "";
+  expect(palette).toContain("rounded-[24px]");
+  expect(palette).toContain("backdrop-blur-2xl");
 });
