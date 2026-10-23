@@ -11,7 +11,7 @@ const demoLocations: WeatherLocation[] = [{
   },
 }, { id: "long", city: "San Bernardino Valley", state: "California", localTime: "11:19 AM", detail: { temp: 86, condition: "Sunny", code: 0, isDay: true, high: 89, low: 64 } }];
 
-/** Self-contained reference page for the list, animated sky, forecast and supported detail tiles. */
+/** ui-v0.5.323-weather.2 reference: clear-day drifting clouds, fixed location header actions, compact ordered detail tiles and content-sized hourly strip. */
 export function WeatherForecastShowcase() {
   return <WeatherForecastPage locations={demoLocations} selectedId="nyc" onRemoveLocation={() => {}} className="mx-auto max-w-6xl" />;
 }

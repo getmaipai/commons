@@ -127,7 +127,7 @@ function HourColumn({ hour, unit }: { hour: WeatherHour; unit: string }) {
     <li
       data-slot="weather-hour"
       aria-label={`${label}: ${Math.round(hour.temp)} ${unit === "C" ? "degrees Celsius" : "degrees Fahrenheit"}${rain ? `, ${hour.pop} percent chance of rain` : ""}`}
-      className="flex min-w-12 flex-1 flex-col items-center gap-1.5"
+    className="flex w-16 min-w-16 shrink-0 flex-col items-center gap-1.5"
     >
       <span aria-hidden className="text-muted-foreground text-xs whitespace-nowrap">{label}</span>
       <span aria-hidden className="text-[13px] font-medium tabular-nums">{degrees(hour.temp)}</span>

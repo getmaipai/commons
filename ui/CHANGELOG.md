@@ -1,3 +1,7 @@
+## [ui-v0.5.326] - 2026-10-23
+
+- Weather: the visual pass, now on main. Real clouds, sun with rays, moon and stars, rain, snow, fog and storm scenes that fill the hero as well as the cards; the hero's sky layers are no longer flattened by the text-lift rule; compact detail tiles with a compass, pressure gauge, sun path and bars; moon icons for night hours; a one-column detail grid on phones; location cards whose name, time and remove chip never collide.
+
 ## [ui-v0.5.323] - 2026-10-23
 
 - Weather: one animated sky (WeatherSky) drives the chat card, the location cards and the detail hero, with visible clouds, rain, snow, stars and lightning; the forecast page is redesigned with same-size location cards, an add control, an Apple-style 10-day range bar and detail tiles.
