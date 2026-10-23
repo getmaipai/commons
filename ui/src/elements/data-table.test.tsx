@@ -166,6 +166,21 @@ describe("DataTable generic rows and slots", () => {
     expect(within(card).getByRole("button", { name: "Edit Ada" })).toBeTruthy();
   });
 
+  test("phone card values allow long unbroken strings to wrap", () => {
+    const longValue = "x".repeat(200);
+    const { container } = render(
+      <DataTable
+        rows={[{ id: "long", value: longValue }]}
+        columns={[{ id: "value", header: "Value" }]}
+      />,
+    );
+    const cards = container.querySelector<HTMLElement>("[data-slot='data-table-cards']")!;
+    const cell = within(cards).getByRole("cell", { name: longValue });
+    expect(cell.className).toContain("min-w-0");
+    expect(cell.className).toContain("break-words");
+    expect(cell.className).toContain("[overflow-wrap:anywhere]");
+  });
+
   test("rowActions renders per row and receives that row", () => {
     const onEdit = mock((_: string) => {});
     const { container } = render(

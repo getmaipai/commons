@@ -542,15 +542,16 @@ export function DataTable<Row = ModelUsage>({
               {cols.map((column) => (
                 <div
                   key={column.id}
-                  className="flex items-start justify-between gap-4"
+                  className="flex min-w-0 items-start justify-between gap-4"
                 >
                   <span
                     role="columnheader"
-                    className={cn(mono, "text-muted-foreground")}
+                    className={cn(mono, "text-muted-foreground shrink-0")}
                   >
                     {column.header}
                   </span>
-                  <span role="cell" className="text-foreground/90 text-end">
+                  {/* eslint-disable-next-line better-tailwindcss/no-conflicting-classes -- both requested wrapping utilities provide the card's intended break behavior. */}
+                  <span role="cell" className="min-w-0 break-words [overflow-wrap:anywhere] text-foreground/90 text-end">
                     {formatCell(column, row, formatLocale, formatRelativeTo, formats)}
                   </span>
                 </div>
