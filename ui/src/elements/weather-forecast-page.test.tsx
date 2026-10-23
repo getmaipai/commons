@@ -176,3 +176,15 @@ describe("WeatherForecastPage", () => {
     expect(onSelect).toHaveBeenLastCalledWith("");
   });
 });
+
+describe("hero sky layer layout (regression: the text-lift rule must not turn the sky wrapper into a zero-height box)", () => {
+  test("the hero's text-lift rule skips the sky and scrim layers", () => {
+    expect(tokens).toContain('[data-slot="weather-forecast-hero"] > :not([data-weather-layer]) { position: relative; z-index: 2; }');
+  });
+  test("the sky wrapper and the scrim are marked as layers and stay absolutely positioned over the hero", () => {
+    const { container } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
+    const layers = container.querySelectorAll('[data-slot="weather-forecast-hero"] > [data-weather-layer]');
+    expect(layers.length).toBe(2);
+    for (const layer of Array.from(layers)) expect(layer.className).toContain("absolute inset-0");
+  });
+});

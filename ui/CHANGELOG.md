@@ -1,6 +1,6 @@
 ## [ui-v0.5.323] - 2026-10-23
 
-## [ui-v0.5.323-weather.2] - 2026-10-23
+## [ui-v0.5.323-weather.3] - 2026-10-23
 
 - Fix weather detail sizing with content-height hourly forecast and compact responsive tiles in Apple-style order. Long location names truncate beside fixed local time, and the remove chip remains visible. Clear-day heroes add drifting clouds and a warm sun with rotating rays; reduced-motion still freezes the scene. Update the showcase and structural animation tests.
 
@@ -12,7 +12,7 @@
 
 # Changelog (`@maipai/ui`)
 
-## [ui-v0.5.323-weather.2] - 2026-10-23
+## [ui-v0.5.323-weather.3] - 2026-10-23
 
 - Refine weather skies with defined cloud silhouettes, visible sun rays and crescent, denser condition particle fields, full hero coverage and still reduced-motion compositions. Keep hourly forecast cells fixed at 64px, polish the location remove chip, and align detail tiles in equal-height responsive rows.
 
