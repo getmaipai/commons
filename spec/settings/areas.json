@@ -552,6 +552,20 @@
               "group": "household.ai_runtime",
               "scope": "household",
               "tab": "engines"
+            },
+            {
+              "label": "Manage",
+              "tab": "overview",
+              "links": [
+                {
+                  "label": "AI models",
+                  "href": "/models"
+                },
+                {
+                  "label": "Engines",
+                  "href": "/engines"
+                }
+              ]
             }
           ],
           "keywords": [

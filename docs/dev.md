@@ -1,3 +1,7 @@
+## spec-v0.1.213: Engines and AI keeps its Manage links (2026-10-23)
+
+spec-v0.1.209 dropped the `Manage` card (AI models, Engines links) from the Home `ai` section; Home's port test needs both links. Restored on the Overview tab.
+
 ## spec-v0.1.212: Engines and AI keeps its trail view (2026-10-23)
 
 Note: the tag `spec-v0.1.211` was pushed by mistake on a commit whose package version is 0.1.210; it is unused and must not be pinned. Use `spec-v0.1.212`.
