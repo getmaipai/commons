@@ -1,3 +1,7 @@
+## ui-v0.5.317: the settings tab strip has no dangling aria-controls (2026-10-23)
+
+The shell draws only the tab list; the host draws the panel, so each trigger's `aria-controls` named an element that did not exist (axe `aria-valid-attr-value`, critical, on Engines and AI). The triggers now omit it.
+
 ## spec-v0.1.214: the hub port stays on the Network page (2026-10-23)
 
 strict one-card-per-group moved `household.network_port` (the hub port, an expert key) to the Developer card, where Home draws no expert controls, so the port would have vanished. It is drawn by a card in the Network section (expert only), through a narrow `EXPERT_OUTSIDE_DEVELOPER` allowlist in `areas-check.ts` that only shrinks. Home keeps passing the key as an extra expert key for that section.

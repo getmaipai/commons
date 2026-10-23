@@ -162,6 +162,7 @@ describe("SettingsShell search and title", () => {
     fireEvent.mouseDown(view.getByRole("tab", { name: "Models" }), { button: 0, ctrlKey: false });
     expect(onTabChange).toHaveBeenCalledWith("models");
     expect(view.container.querySelector('[data-slot="settings-tabs-scroll"]')?.className).toContain("overflow-x-auto");
+    for (const trigger of Array.from(view.container.querySelectorAll('[role="tab"]'))) expect(trigger.hasAttribute("aria-controls")).toBe(false);
     expect(view.getByRole("tab", { name: "Overview" }).className).toContain("min-h-12");
   });
 

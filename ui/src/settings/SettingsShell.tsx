@@ -248,7 +248,7 @@ export function SettingsShell({
             <div data-slot="settings-tabs-scroll" className="-mx-6 mt-2 overflow-x-auto px-6 lg:overflow-visible">
               <Tabs defaultValue={tabs[0]!.id} value={tab} onValueChange={(id) => { if (id) onTabChange?.(id); }}>
                 <TabsList variant="line" aria-label={`${title} sections`} className="min-w-max">
-                  {tabs.map((item) => <TabsTrigger key={item.id} value={item.id} className="min-h-12">{item.label}</TabsTrigger>)}
+                  {tabs.map((item) => <TabsTrigger key={item.id} value={item.id} aria-controls={undefined} className="min-h-12">{item.label}</TabsTrigger>)}
                 </TabsList>
               </Tabs>
             </div>
