@@ -213,3 +213,11 @@ describe("hero sky layer layout (regression: the text-lift rule must not turn th
     for (const layer of Array.from(layers)) expect(layer.className).toContain("absolute inset-0");
   });
 });
+
+describe("detail grid at phone width (regression: a col-span-2 tile created a second implicit column)", () => {
+  test("no tile spans two columns below the sm breakpoint", () => {
+    const source = readFileSync(resolve(import.meta.dir, "./weather-forecast-page.tsx"), "utf8");
+    const bare = source.match(/(^|[\s"'`])col-span-2\b/gm) ?? [];
+    expect(bare).toEqual([]);
+  });
+});
