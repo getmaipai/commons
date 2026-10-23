@@ -1007,6 +1007,7 @@ class Props10(BaseModel):
     item_id: constr(min_length=1)
     kicker: str
     title: constr(min_length=1)
+    sourceIconUrl: constr(pattern=r'^/api/favicon(?:[/?#].*)?$') | None = None
     byline: Byline
     image: Image1 | None = None
     key_points: KeyPoints | None = None
