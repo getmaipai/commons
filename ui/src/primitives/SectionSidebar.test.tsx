@@ -452,6 +452,14 @@ describe("SectionSidebar", () => {
     expect(toggle.getAttribute("aria-keyshortcuts")).toBe("Meta+B Control+B");
   });
 
+  test("the compact column is exempt from the 48px tap-target audit, as Chat's rail is; the comfortable column is not", () => {
+    const compactRender = column({ density: "compact" });
+    expect(compactRender.container.querySelector('[data-touch-target-exempt]')).not.toBeNull();
+    compactRender.unmount();
+    const comfortable = column({ density: "comfortable" });
+    expect(comfortable.container.querySelector('[data-touch-target-exempt]')).toBeNull();
+  });
+
   test("the compact column draws its primary action as Chat's New chat row, first under the header", () => {
     const { container } = column({ density: "compact", primaryAction: { label: "New chat", href: "/apps/news/new" } });
     const row = container.querySelector('[data-slot="section-sidebar-primary"]') as HTMLAnchorElement;

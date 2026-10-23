@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.320] - ui-v0.5.320
+
+- SECTION-SIDEBAR-TAP-01: the compact `SectionSidebar` column (Chat's density) is marked `data-touch-target-exempt`, as Chat's rail is, so its 24px controls and 36px rows are not flagged by the 48px tap-target audit. Comfortable columns are unchanged. Additive.
+
 ## [0.5.319] - ui-v0.5.319
 
 - SECTION-SIDEBAR-ONE-01: `SectionSidebar` is the one app column for Chat, Library, News, Media and Settings. The compact column adds a collapse button with a tooltip and an optional `collapseShortcut` (announced with `aria-keyshortcuts`), a `primaryAction` row (Chat's New chat pill), and a header search icon that opens the field. Additive: comfortable columns are unchanged.

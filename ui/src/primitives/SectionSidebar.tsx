@@ -363,6 +363,8 @@ export function SectionSidebar({
   const column = (
     <Sidebar
       collapsible="none"
+      // The compact column is Chat's: 24px controls and 36px rows, exempt from the 48px tap-target audit the way Chat's rail is.
+      data-touch-target-exempt={compact ? "" : undefined}
       {...sidebarProps}
       id={collapsible || sidebarProps?.id ? columnId : undefined}
       {...(closed ? { inert: true, "aria-hidden": true } : {})}
