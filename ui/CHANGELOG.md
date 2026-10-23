@@ -1,5 +1,9 @@
 # Changelog (`@maipai/ui`)
 
+## [0.5.319] - ui-v0.5.319
+
+- SECTION-SIDEBAR-ONE-01: `SectionSidebar` is the one app column for Chat, Library, News, Media and Settings. The compact column adds a collapse button with a tooltip and an optional `collapseShortcut` (announced with `aria-keyshortcuts`), a `primaryAction` row (Chat's New chat pill), and a header search icon that opens the field. Additive: comfortable columns are unchanged.
+
 ## [0.5.305] - ui-v0.5.305
 
 - SPEC-SETTING-CONFIRM-01: show the setting's confirmation dialog before a boolean setting with `confirm_off` is turned off. Cancel leaves the setting unchanged. Additive.
