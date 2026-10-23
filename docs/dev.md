@@ -1,4 +1,4 @@
-## spec-v0.1.222: a package's settings section may omit scope (2026-10-23)
+## spec-v0.1.223: a package's settings section may omit scope (2026-10-23)
 
 Section `scope` is required only in the central file (checked by `checkAreas`); package manifests that contribute a `settings_area` stay valid.
 
