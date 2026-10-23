@@ -2,6 +2,10 @@
 
 ## [ui-v0.5.323-weather.3] - 2026-10-23
 
+## [ui-v0.5.323-weather.5] - 2026-10-23
+
+- Fix phone weather detail layout with a single-column mobile grid, contained hourly scrolling, and compact 10-day rows. Keep the wind needle inside the dial ring so it clears the center speed.
+
 ## [ui-v0.5.323-weather.4] - 2026-10-23
 
 - Show moon and cloud-moon icons for night hours using hourly day flags or local sunrise and sunset, keep daily icons in daytime style, and reposition the warm glowing hero sun away from the update label.

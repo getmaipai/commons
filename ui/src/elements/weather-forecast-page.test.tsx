@@ -72,12 +72,21 @@ describe("WeatherForecastPage", () => {
   test("detail grid uses content-sized rows and hourly card is not stretched", () => {
     const { container } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
     const grid = container.querySelector<HTMLElement>("[data-slot=weather-detail-grid]")!;
+    expect(grid.className).toContain("grid-cols-1");
+    expect(grid.className).toContain("sm:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]");
+    expect(grid.className).toContain("min-w-0");
+    expect(grid.className).toContain("w-full");
     expect(grid.className).toContain("repeat(auto-fill,minmax(220px,1fr))");
     expect(grid.className).toContain("minmax(160px,auto)");
     expect(grid.className).not.toContain("auto-rows-fr");
     const hourly = container.querySelector<HTMLElement>("[data-slot=weather-hourly-strip]")?.closest("[data-slot=weather-tile]");
     expect(hourly?.className).toContain("h-auto");
     expect(hourly?.className).toContain("min-h-0");
+    expect(hourly?.className).toContain("min-w-0");
+    expect(hourly?.className).toContain("w-full");
+    expect(container.querySelector<HTMLElement>("[data-slot=weather-hourly-strip]")?.className).toContain("overflow-x-auto");
+    expect(container.querySelector<HTMLElement>("[data-slot=weather-daily-list] li")?.className).toContain("grid-cols-[3rem_2rem_2.4rem_minmax(0,1fr)_2.4rem]");
+    expect([...container.querySelectorAll<HTMLElement>("[data-slot=weather-tile]")].every(tile => tile.className.includes("min-w-0") && tile.className.includes("w-full"))).toBe(true);
     expect(hourly?.className).not.toMatch(/(?:^|\s)h-(?:[0-9]|full)(?:\s|$)|aspect-/);
   });
 
