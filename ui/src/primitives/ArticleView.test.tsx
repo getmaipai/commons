@@ -61,9 +61,13 @@ describe("ArticleView", () => {
     expect(stickyHeader.className).toContain("sticky");
     expect(stickyHeader.className).toContain("top-0");
     expect(stickyHeader.className).toContain("z-30");
-    expect(stickyHeader.className).toContain("-mx-4");
+    expect(stickyHeader.className).not.toContain("mx-");
     expect(toolbar.className).toContain("h-14");
     expect(toolbar.className).toContain("bg-background");
+    expect(toolbar.className).toContain("px-3");
+    expect(provider.className).not.toMatch(/md:px|lg:px/);
+    expect(view.container.querySelector('[data-slot="article-view"]')!.className).not.toContain("px-4");
+    expect(view.container.querySelector('[data-slot="article-column"]')!.className).toContain("px-4");
     expect(toolbar.querySelectorAll("button").length).toBeGreaterThan(0);
     for (const button of toolbar.querySelectorAll("button")) {
       expect(button.className).not.toMatch(/backdrop-blur|shadow/);
