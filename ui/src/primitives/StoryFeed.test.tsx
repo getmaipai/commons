@@ -21,10 +21,31 @@ describe("StoryFeed", () => {
     expect(container.querySelector('[data-slot="story-feed"]')?.getAttribute("data-layout")).toBe("today");
     expect(container.querySelector('[data-tier="hero"]')).not.toBeNull();
     expect(container.querySelectorAll('[data-tier="featured"]')).toHaveLength(2);
+    const feedGrid = container.querySelector('[data-slot="story-grid"]')!;
+    expect(feedGrid.className).toContain("items-stretch");
+    expect(feedGrid.querySelector('[data-tier="hero"]')!.className).not.toContain("h-full");
+    expect(feedGrid.querySelector('[data-tier="featured"]')!.className).not.toContain("h-full");
     expect(container.querySelectorAll('[data-tier="shelf"]')).toHaveLength(1);
     expect(container.querySelectorAll('[data-slot="story-rows"] li')).toHaveLength(1);
     expect(getByText("Headline 1")).toBeTruthy();
     expect(getByText("Today")).toBeTruthy();
+  });
+
+  test("straight card rows stretch each card to its grid row, while the hero stack keeps its special layout", () => {
+    const straight = render(<StoryFeed data={{ ...data, hero: undefined, featured: [data.hero!, ...data.featured!] }} />);
+    const grid = straight.container.querySelector('[data-slot="story-grid"]')!;
+    expect(grid.className).toContain("items-stretch");
+    expect(grid.querySelectorAll('[data-tier="half"]')).toHaveLength(3);
+    for (const card of grid.querySelectorAll<HTMLElement>('[data-tier="half"]')) {
+      expect(card.className).toContain("h-full");
+    }
+    straight.unmount();
+
+    const hero = render(<StoryFeed data={data} />);
+    const heroGrid = hero.container.querySelector('[data-slot="story-grid"]')!;
+    expect(heroGrid.querySelector('[data-tier="hero"]')!.className).toContain("lg:row-span-2");
+    expect(heroGrid.querySelector('[data-tier="hero"]')!.className).not.toContain("h-full");
+    expect(heroGrid.querySelector('[data-tier="featured"]')!.className).not.toContain("h-full");
   });
 
   test("the hero is the lead: its picture is the large one and its card spans two grid rows", () => {
@@ -157,6 +178,24 @@ describe("StoryFeed", () => {
     cleanup();
     const some = render(<StoryFeed data={data} onAction={() => {}} available={["open", "save"]} />);
     expect(some.getAllByLabelText(/More for/).length).toBeGreaterThan(0);
+  });
+
+  test("story cards put publisher and subtle actions together in the footer without the article age", () => {
+    const { container } = render(<StoryFeed data={data} onAction={() => {}} available={["open", "save"]} />);
+    const card = container.querySelector('[data-tier="hero"]')!;
+    const footer = card.querySelector('[data-slot="story-footer"]')!;
+    const source = footer.querySelector('[data-slot="story-source"]')!;
+    const menu = footer.querySelector('[data-slot="story-menu"]')!;
+    const button = menu.querySelector("button")!;
+    expect(footer.className).toContain("mt-auto");
+    expect(footer.contains(source)).toBe(true);
+    expect(footer.contains(menu)).toBe(true);
+    expect(source.textContent).toContain(data.hero!.publisher);
+    expect(source.querySelector("time")).toBeNull();
+    expect(button.getAttribute("aria-label")).toBe(`More for ${data.hero!.title}`);
+    expect(button.className).toContain("icon-sm");
+    expect(button.className).not.toContain("icon-lg");
+    expect(menu.className).toContain("z-10");
   });
 
   test("a story with no outbound address offers no Open on site", () => {
@@ -330,6 +369,13 @@ describe("StoryFeed section styles (NEWS-SECTION-STYLES-01)", () => {
     expect(count(container, "tall")).toBe(3);
     expect(count(container, "side")).toBe(3);
     expect(count(container, "lead")).toBe(0);
+    for (const slot of ["story-tall", "story-side"]) {
+      const grid = container.querySelector(`[data-slot="${slot}"]`)!;
+      expect(grid.className).toContain("items-stretch");
+      for (const card of grid.querySelectorAll<HTMLElement>("[data-slot='story-card']")) {
+        expect(card.className).toContain("h-full");
+      }
+    }
     expect(container.querySelectorAll('[data-slot="story-rows"] li')).toHaveLength(4);
     expect(getByText("More stories")).toBeTruthy();
   });

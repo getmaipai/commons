@@ -3,7 +3,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
-import { Card, CardAction, CardContent } from "@/kit/dashboard/components/ui/card";
+import { Card, CardContent } from "@/kit/dashboard/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,6 @@ import {
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/kit/dashboard/components/ui/empty";
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/kit/dashboard/components/ui/item";
 import { Tabs, TabsList, TabsTrigger } from "@/kit/dashboard/components/ui/tabs";
-import { RelativeTime } from "@/kit/ui/relative-time";
 import { cn, HIT_AREA_ROW } from "@/kit/utils";
 import { SafeImage } from "./SafeImage";
 
@@ -91,14 +90,14 @@ function CardMenu({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   if (story.open_url && can("open_site")) entries.push(<DropdownMenuItem key="site" onClick={() => fire("open_site")}>Open original</DropdownMenuItem>);
   if (entries.length === 0) return null;
   return (
-    <CardAction className="absolute top-2 right-2 z-10 rounded-full bg-background/85 backdrop-blur">
+    <div data-slot="story-menu" className="relative z-10 shrink-0">
       <DropdownMenu>
-        <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={`More for ${story.title}`} className={HIT_AREA_ROW} />}>
+        <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" aria-label={`More for ${story.title}`} className={HIT_AREA_ROW} />}>
           <EllipsisIcon aria-hidden />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">{entries}</DropdownMenuContent>
       </DropdownMenu>
-    </CardAction>
+    </div>
   );
 }
 
@@ -111,16 +110,24 @@ function Kicker({ story }: { story: StoryCardData }) {
 function SourceLine({ story }: { story: StoryCardData }) {
   const [iconFailed, setIconFailed] = useState(false);
   return (
-    <div data-slot="story-source" data-opened={story.opened ? "" : undefined} className={cn("flex flex-wrap items-center gap-x-2 text-xs", story.opened ? "text-muted-foreground" : "text-foreground")}>
+    <div data-slot="story-source" data-opened={story.opened ? "" : undefined} className={cn("flex min-w-0 flex-1 flex-wrap items-center gap-x-2 text-xs", story.opened ? "text-muted-foreground" : "text-foreground")}>
       <span className="inline-flex min-w-0 items-center gap-1.5">
         <SafeImage src={iconFailed ? undefined : story.sourceIconUrl} alt="" aria-hidden kind="picture" className="size-4 shrink-0 rounded bg-muted text-muted-foreground object-cover" onError={() => setIconFailed(true)} />
-        <span>{story.publisher}</span>
+        <span className="truncate">{story.publisher}</span>
       </span>
-      <RelativeTime at={story.published_at} />
       {story.outlets > 1 ? <Badge variant="secondary">{story.outlets} sources</Badge> : null}
       {story.saved ? (
         <Badge variant="outline"><BookmarkIcon aria-hidden data-icon="inline-start" />Saved</Badge>
       ) : null}
+    </div>
+  );
+}
+
+function StoryCardFooter({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
+  return (
+    <div data-slot="story-footer" className="relative z-10 mt-auto flex min-w-0 items-center justify-between gap-2">
+      <SourceLine story={story} />
+      <CardMenu story={story} ctx={ctx} />
     </div>
   );
 }
@@ -158,10 +165,10 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
       data-tier={tier}
       data-opened={story.opened ? "" : undefined}
       interactive
-      className={cn("relative gap-0 py-0", tier === "hero" && "lg:col-span-8 lg:row-span-2", tier === "featured" && "lg:col-span-4", tier === "half" && "lg:col-span-6", tier === "shelf" && "w-64 shrink-0 snap-start")}
+      className={cn("relative gap-0 py-0", tier !== "hero" && tier !== "featured" && "h-full", tier === "hero" && "lg:col-span-8 lg:row-span-2", tier === "featured" && "lg:col-span-4", tier === "half" && "lg:col-span-6", tier === "shelf" && "w-64 shrink-0 snap-start")}
     >
       <StoryImage story={story} ratio={hero ? 16 / 9 : tier === "shelf" ? 4 / 3 : 16 / 9} large={hero} hero={hero} />
-      <CardContent className="flex flex-col gap-2 py-4">
+      <CardContent className="flex flex-1 flex-col gap-2 py-4">
         <Kicker story={story} />
         <button
           type="button"
@@ -172,9 +179,8 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
           {story.title}
         </button>
         {story.dek && (hero || tier === "half") ? <p className="text-muted-foreground line-clamp-2 text-sm">{story.dek}</p> : null}
-        <SourceLine story={story} />
+        <StoryCardFooter story={story} ctx={ctx} />
       </CardContent>
-      <CardMenu story={story} ctx={ctx} />
     </Card>
   );
 }
@@ -188,7 +194,7 @@ function StoryLead({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
       <div className="sm:w-3/5 sm:shrink-0">
         <StoryImage story={story} ratio={16 / 9} large />
       </div>
-      <CardContent className="flex min-w-0 flex-1 flex-col justify-center gap-2 py-4">
+      <CardContent className="flex min-w-0 flex-1 flex-col gap-2 py-4">
         <Kicker story={story} />
         <button
           type="button"
@@ -199,9 +205,8 @@ function StoryLead({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
           {story.title}
         </button>
         {story.dek ? <p className="text-muted-foreground line-clamp-3 text-sm">{story.dek}</p> : null}
-        <SourceLine story={story} />
+        <StoryCardFooter story={story} ctx={ctx} />
       </CardContent>
-      <CardMenu story={story} ctx={ctx} />
     </Card>
   );
 }
@@ -221,12 +226,11 @@ function StorySide({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
         >
           {story.title}
         </button>
-        <SourceLine story={story} />
+        <StoryCardFooter story={story} ctx={ctx} />
       </CardContent>
       <div className="w-2/5 shrink-0 self-stretch">
         <StoryImage story={story} ratio={1} />
       </div>
-      <CardMenu story={story} ctx={ctx} />
     </Card>
   );
 }
@@ -250,11 +254,11 @@ function StyledSection({ style, stories, ctx }: { style: SectionStyle; stories: 
       {tall.length > 0 ? (
         <section aria-label={plan.heading} className="flex min-w-0 flex-col gap-3">
           <h3 className="text-lg font-semibold">{plan.heading}</h3>
-          <div data-slot="story-tall" className={cn("grid min-w-0 grid-cols-1 gap-4", plan.tallCols)}>
+          <div data-slot="story-tall" className={cn("grid min-w-0 grid-cols-1 items-stretch gap-4", plan.tallCols)}>
             {tall.map((story) => <StoryCard key={story.story_id} story={story} ctx={ctx} tier="tall" />)}
           </div>
           {side.length > 0 ? (
-            <div data-slot="story-side" className={cn("grid min-w-0 grid-cols-1 gap-4", plan.sideCols)}>
+            <div data-slot="story-side" className={cn("grid min-w-0 grid-cols-1 items-stretch gap-4", plan.sideCols)}>
               {side.map((story) => <StorySide key={story.story_id} story={story} ctx={ctx} />)}
             </div>
           ) : null}
@@ -417,7 +421,7 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
       {styled ? <StyledSection style={styled} stories={lead} ctx={ctx} /> : null}
       {section && !styled && data.hero ? <StoryLead story={data.hero} ctx={ctx} /> : null}
       {data.layout !== "rows" && !section && (data.hero || featured.length > 0) ? (
-        <div data-slot="story-grid" className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
+        <div data-slot="story-grid" className="grid min-w-0 grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-12">
           {data.hero ? <StoryCard story={data.hero} ctx={ctx} tier="hero" /> : null}
           {featured.map((story, index) => (
             <StoryCard key={story.story_id} story={story} ctx={ctx} tier={data.hero && index < 2 ? "featured" : "half"} />
