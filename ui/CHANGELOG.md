@@ -1,3 +1,7 @@
+## [ui-v0.5.330] - 2026-10-24
+
+- Focal crops use the frame's rendered ratio, not the caller's hint. The 2:1 Brewers hero was cropped as 16:9 and clipped near the cap; `FocalImage` now measures the frame before it analyzes.
+
 ## [ui-v0.5.329] - 2026-10-24
 
 - Add reusable `FocalImage` and `FocalImageProvider` for content-aware `object-position` crops. FocalNet runs locally on a lazily loaded model; without an analyzer, with a failed image, or when analysis fails, images stay centered. News story cards, article lead images and article figures use the shared image component.
