@@ -70,6 +70,8 @@ describe("ArticleView", () => {
     expect(provider.className).toContain("lg:-mx-8");
     expect(view.container.querySelector('[data-slot="article-view"]')!.className).not.toContain("px-4");
     expect(view.container.querySelector('[data-slot="article-column"]')!.className).toContain("px-4");
+    expect(view.container.querySelector('[data-slot="article-column"]')!.className).toContain("-mt-14");
+    expect(provider.className).toContain("pt-14");
     expect(toolbar.querySelectorAll("button").length).toBeGreaterThan(0);
     for (const button of toolbar.querySelectorAll("button")) {
       expect(button.className).not.toMatch(/backdrop-blur|shadow/);

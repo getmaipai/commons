@@ -221,9 +221,9 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         </div>
       ) : null}
       </div>
-      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 md:px-6 lg:px-8">
+      <div data-slot="article-column" className={cn("mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 md:px-6 lg:px-8", data.byline && hasToolbar && "-mt-14")}>
       {data.byline ? (
-        <div data-slot="article-provider" className="-mx-4 flex min-h-16 items-center justify-center gap-3 bg-muted px-4 py-2 text-center text-2xl font-semibold md:-mx-6 lg:-mx-8">
+        <div data-slot="article-provider" className={cn("-mx-4 flex min-h-16 items-center justify-center gap-3 bg-muted px-4 py-2 text-center text-2xl font-semibold md:-mx-6 lg:-mx-8", hasToolbar && "pt-14")}>
           <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className="size-11 shrink-0 rounded-xl" onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
           <span>{data.byline.publisher}</span>
         </div>
