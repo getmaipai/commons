@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { focalObjectPosition, restoreFocalMap } from "./FocalImage";
+import { focalAspectRatio, focalObjectPosition, restoreFocalMap } from "./FocalImage";
 
 describe("FocalImage crop math", () => {
+  test("uses the rendered frame ratio when it differs from the requested image ratio", () => {
+    expect(focalAspectRatio(733, 366, 16 / 9)).toBeCloseTo(2, 2);
+  });
+
   test("keeps a salient region near the left or right edge inside a square crop", () => {
     const left = new Float32Array(64 * 64);
     left[32 * 64 + 5] = 1;

@@ -13,6 +13,12 @@ export function FocalImageProvider({ analyze, children }: { analyze: FocalMapAna
 type Props = Omit<ComponentProps<typeof SafeImage>, "onLoad"> & { aspectRatio?: number; onLoad?: ComponentProps<typeof SafeImage>["onLoad"] };
 const cache = new Map<string, string>();
 
+/** Prefer the actual rendered frame ratio over a caller hint; theme tokens can change the frame after props are set. */
+export function focalAspectRatio(frameWidth: number, frameHeight: number, requestedAspectRatio?: number): number {
+  if (Number.isFinite(frameWidth) && Number.isFinite(frameHeight) && frameWidth > 0 && frameHeight > 0) return frameWidth / frameHeight;
+  return requestedAspectRatio && Number.isFinite(requestedAspectRatio) && requestedAspectRatio > 0 ? requestedAspectRatio : 1;
+}
+
 /** Removes the black letterbox around FocalNet's square input map. */
 export function restoreFocalMap(map: Float32Array, imageWidth: number, imageHeight: number): Float32Array {
   if (map.length !== 64 * 64 || imageWidth < 1 || imageHeight < 1) return new Float32Array(64 * 64);
@@ -100,7 +106,7 @@ export function FocalImage({ src, aspectRatio, onLoad, style, ...props }: Props)
     const run = () => {
       if (cancelled || !visibleRef.current || startedRef.current || !image.complete || image.naturalWidth === 0) return;
       startedRef.current = true;
-      const ratio = aspectRatio && aspectRatio > 0 ? aspectRatio : image.clientWidth / Math.max(1, image.clientHeight);
+      const ratio = focalAspectRatio(image.clientWidth, image.clientHeight, aspectRatio);
       if (!Number.isFinite(ratio) || ratio <= 0) return;
       const key = `${source}|${ratio.toFixed(4)}`;
       const existing = cache.get(key);
