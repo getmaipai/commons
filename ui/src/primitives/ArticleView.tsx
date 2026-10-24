@@ -185,8 +185,9 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
   return (
     <article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col gap-4 px-4 md:px-6 lg:px-8", className)}>
+      <div data-slot="article-sticky-header" className="sticky top-0 z-30 -mx-4 flex flex-col md:-mx-6 lg:-mx-8">
       {hasToolbar ? (
-        <div data-slot="article-toolbar" className="sticky top-0 z-30 -mb-14 flex h-12 items-center gap-1 bg-transparent">
+        <div data-slot="article-toolbar" className="flex h-14 items-center gap-1 bg-background px-4 py-1 md:px-6 lg:px-8">
           {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" className="rounded-full" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
           <div className="ml-auto flex items-center gap-1">
             <Button
@@ -219,11 +220,12 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         </div>
       ) : null}
       {data.byline ? (
-        <div data-slot="article-provider" className="-mt-4 flex min-h-20 items-center justify-center gap-3 px-2 pt-12 pb-3 text-center text-2xl font-semibold">
+        <div data-slot="article-provider" className="flex min-h-16 items-center justify-center gap-3 bg-muted px-4 py-2 text-center text-2xl font-semibold md:px-6 lg:px-8">
           <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className="size-11 shrink-0 rounded-xl" onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
           <span>{data.byline.publisher}</span>
         </div>
       ) : null}
+      </div>
       <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4">
       <header className="flex flex-col gap-2">
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}

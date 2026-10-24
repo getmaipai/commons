@@ -25,8 +25,11 @@ describe("ArticleView", () => {
     const column = container.querySelector('[data-slot="article-column"]')!;
     const toolbar = container.querySelector('[data-slot="article-toolbar"]')!;
     const provider = container.querySelector('[data-slot="article-provider"]')!;
+    const stickyHeader = container.querySelector('[data-slot="article-sticky-header"]')!;
     expect(article.contains(toolbar)).toBe(true);
     expect(article.contains(provider)).toBe(true);
+    expect(stickyHeader.contains(toolbar)).toBe(true);
+    expect(stickyHeader.contains(provider)).toBe(true);
     expect(column.contains(toolbar)).toBe(false);
     expect(column.contains(provider)).toBe(false);
     expect(column.className).toContain("max-w-[72ch]");
@@ -34,7 +37,7 @@ describe("ArticleView", () => {
     expect(container.querySelector('[data-slot="article-body"]')!.className).not.toContain("max-w-[72ch]");
     expect(container.querySelector('[data-slot="article-body"]')!.className).not.toContain("mx-auto");
     expect(article.className).not.toContain("max-w-prose");
-    expect(toolbar.className).toContain("sticky");
+    expect(stickyHeader.className).toContain("sticky");
     expect(provider.className).not.toContain("sticky");
     expect(column.contains(container.querySelector("header"))).toBe(true);
     expect(column.contains(container.querySelector('[data-slot="article-body"]'))).toBe(true);
@@ -46,21 +49,24 @@ describe("ArticleView", () => {
     expect(container.querySelector('[data-slot="also-covering"]')).not.toBeNull();
   });
 
-  test("publisher header scrolls with the article while floating controls stay pinned and unshaded", () => {
+  test("controls and full-width shaded publisher header stay in a pinned stack", () => {
     const withIcon = { ...data, sourceIconUrl: "/api/favicon?domain=example.com" };
     const view = render(<ArticleView data={withIcon} onBack={() => {}} />);
     const provider = view.container.querySelector('[data-slot="article-provider"]')!;
-    expect(provider.className).not.toContain("sticky");
-    expect(provider.className).not.toContain("bg-background");
+    expect(provider.className).toContain("bg-muted");
+    expect(provider.className).toContain("min-h-16");
     expect(provider.querySelector('[data-slot="safe-image-fallback"]')).not.toBeNull();
     const toolbar = view.container.querySelector('[data-slot="article-toolbar"]')!;
-    expect(toolbar.className).toContain("sticky");
-    expect(toolbar.className).toContain("top-0");
-    expect(toolbar.className).toContain("bg-transparent");
-    expect(toolbar.className).toContain("z-30");
+    const stickyHeader = view.container.querySelector('[data-slot="article-sticky-header"]')!;
+    expect(stickyHeader.className).toContain("sticky");
+    expect(stickyHeader.className).toContain("top-0");
+    expect(stickyHeader.className).toContain("z-30");
+    expect(stickyHeader.className).toContain("-mx-4");
+    expect(toolbar.className).toContain("h-14");
+    expect(toolbar.className).toContain("bg-background");
     expect(toolbar.querySelectorAll("button").length).toBeGreaterThan(0);
     for (const button of toolbar.querySelectorAll("button")) {
-      expect(button.className).not.toMatch(/bg-background|backdrop-blur|shadow/);
+      expect(button.className).not.toMatch(/backdrop-blur|shadow/);
     }
     cleanup();
     const loaded = render(<ArticleView data={{ ...withIcon, sourceIconUrl: "https://example.com/favicon.ico" }} onBack={() => {}} />);
