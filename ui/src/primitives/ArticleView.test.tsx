@@ -29,9 +29,9 @@ describe("ArticleView", () => {
     expect(article.contains(toolbar)).toBe(true);
     expect(article.contains(provider)).toBe(true);
     expect(stickyHeader.contains(toolbar)).toBe(true);
-    expect(stickyHeader.contains(provider)).toBe(true);
+    expect(stickyHeader.contains(provider)).toBe(false);
     expect(column.contains(toolbar)).toBe(false);
-    expect(column.contains(provider)).toBe(false);
+    expect(column.contains(provider)).toBe(true);
     expect(column.className).toContain("max-w-[72ch]");
     expect(column.className).toContain("mx-auto");
     expect(container.querySelector('[data-slot="article-body"]')!.className).not.toContain("max-w-[72ch]");
@@ -49,7 +49,7 @@ describe("ArticleView", () => {
     expect(container.querySelector('[data-slot="also-covering"]')).not.toBeNull();
   });
 
-  test("controls and full-width shaded publisher header stay in a pinned stack", () => {
+  test("controls stay pinned while the full-width shaded publisher header scrolls with the article", () => {
     const withIcon = { ...data, sourceIconUrl: "/api/favicon?domain=example.com" };
     const view = render(<ArticleView data={withIcon} onBack={() => {}} />);
     const provider = view.container.querySelector('[data-slot="article-provider"]')!;
@@ -65,7 +65,9 @@ describe("ArticleView", () => {
     expect(toolbar.className).toContain("h-14");
     expect(toolbar.className).toContain("bg-background");
     expect(toolbar.className).toContain("px-3");
-    expect(provider.className).not.toMatch(/md:px|lg:px/);
+    expect(provider.className).toContain("-mx-4");
+    expect(provider.className).toContain("md:-mx-6");
+    expect(provider.className).toContain("lg:-mx-8");
     expect(view.container.querySelector('[data-slot="article-view"]')!.className).not.toContain("px-4");
     expect(view.container.querySelector('[data-slot="article-column"]')!.className).toContain("px-4");
     expect(toolbar.querySelectorAll("button").length).toBeGreaterThan(0);
