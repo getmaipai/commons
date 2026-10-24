@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn } from "@/kit/utils";
 import { StoryFeed, type StoryAction, type StoryActionIds, type StoryCardData } from "./StoryFeed";
 import { SafeImage } from "./SafeImage";
+import { FocalImage } from "./FocalImage";
 
 const ArrowLeftIcon = getIcon("arrow-left");
 const BookmarkIcon = getIcon("bookmark");
@@ -124,7 +125,7 @@ function Block({ block, renderTargetLink }: { block: ArticleBlockData; renderTar
     case "figure":
       return (
         <figure className="min-w-0">
-          <SafeImage src={block.src} alt={block.alt} loading="lazy" className="max-w-full" />
+          <FocalImage src={block.src} alt={block.alt} loading="lazy" className="max-w-full" />
           {block.caption ? <figcaption className="text-muted-foreground text-sm">{block.caption}</figcaption> : null}
         </figure>
       );
@@ -236,7 +237,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       </header>
       {data.image ? (
         <AspectRatio ratio={16 / 9} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
-          <SafeImage src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
+          <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
         </AspectRatio>
       ) : null}
       {data.key_points ? (

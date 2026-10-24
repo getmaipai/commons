@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentProps, type ReactNode, type SyntheticEvent } from "react";
+import { useEffect, useState, type ComponentProps, type ReactNode, type Ref, type SyntheticEvent } from "react";
 import { cn } from "@/kit/utils";
 import { getIcon } from "@/kit/icons";
 
@@ -30,10 +30,11 @@ export interface SafeImageProps extends Omit<ImageProps, "src" | "onError"> {
   fallbackContent?: ReactNode;
   fallbackAfterIcon?: ReactNode;
   onError?: ImageProps["onError"];
+  imageRef?: Ref<HTMLImageElement>;
 }
 
 /** An image which always occupies its box, using the kit's themed icon tile when absent or broken. */
-export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fallbackAfterIcon, className, onError, loading = "lazy", ...props }: SafeImageProps) {
+export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fallbackAfterIcon, className, onError, imageRef, loading = "lazy", ...props }: SafeImageProps) {
   const fallback = useImageFallback(src);
   const Icon = getIcon(ICONS[kind]);
   const hasBoxSizing = /(?:^|\s)(?:size-|w-full|w-\[|h-full|h-\[|aspect-)/.test(className ?? "") || props.width !== undefined || props.height !== undefined;
@@ -60,6 +61,7 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
   return (
     <img
       {...props}
+      ref={imageRef}
       src={src!}
       alt={alt}
       loading={loading}

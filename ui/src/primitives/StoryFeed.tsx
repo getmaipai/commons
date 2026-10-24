@@ -14,6 +14,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/kit/dashboard/components/ui/item";
 import { Tabs, TabsList, TabsTrigger } from "@/kit/dashboard/components/ui/tabs";
 import { cn, HIT_AREA_ROW } from "@/kit/utils";
+import { FocalImage } from "./FocalImage";
 import { SafeImage } from "./SafeImage";
 
 const BookmarkIcon = getIcon("bookmark");
@@ -144,7 +145,8 @@ function StoryImage({ story, ratio, large, hero, thumbnail }: { story: StoryCard
   const src = large ? story.image?.w1280 : story.image?.w480;
   return (
     <AspectRatio ratio={ratio} style={thumbnail ? ({ "--ratio": ratio, width: "100%" } as CSSProperties) : style} className="overflow-hidden" data-slot="story-image">
-      <SafeImage
+      <FocalImage
+        aspectRatio={ratio}
         src={src}
         srcSet={thumbnail || !story.image ? undefined : `${story.image.w480} 480w, ${story.image.w1280} 1280w`}
         sizes={thumbnail ? undefined : large ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}

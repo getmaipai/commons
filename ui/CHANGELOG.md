@@ -1,3 +1,7 @@
+## [ui-v0.5.329] - 2026-10-24
+
+- Add reusable `FocalImage` and `FocalImageProvider` for content-aware `object-position` crops. FocalNet runs locally on a lazily loaded model; without an analyzer, with a failed image, or when analysis fails, images stay centered. News story cards, article lead images and article figures use the shared image component.
+
 ## [ui-v0.5.326] - 2026-10-23
 
 - Weather: the visual pass, now on main. Real clouds, sun with rays, moon and stars, rain, snow, fog and storm scenes that fill the hero as well as the cards; the hero's sky layers are no longer flattened by the text-lift rule; compact detail tiles with a compass, pressure gauge, sun path and bars; moon icons for night hours; a one-column detail grid on phones; location cards whose name, time and remove chip never collide.
