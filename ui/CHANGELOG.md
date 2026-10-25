@@ -1,3 +1,7 @@
+## [ui-v0.5.341] - 2026-10-25
+
+- On a phone a story feed with topic chips puts the strip in the shell bar row beside the menu button and hides its title block; `StoryFeed` header gains `data-slot="story-header"`.
+
 ## [ui-v0.5.340] - 2026-10-25
 
 - `PhoneNav` takes `more`: entries that always sit under a last three-dot More button, after the trailing item. A root `data-app-reading` attribute folds the shell bar into the reader row on a phone.

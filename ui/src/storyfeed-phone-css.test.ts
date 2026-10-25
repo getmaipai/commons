@@ -21,4 +21,9 @@ describe("StoryFeed phone tokens and strip", () => {
     expect(css).toContain("font-size: 1.375rem");
     expect(css).toContain("font-size: 0.9375rem");
   });
+
+  test("a feed with chips puts the strip in the shell bar row and hides its title block", () => {
+    expect(css).toContain('[data-slot="story-feed"] > [data-slot="story-header"] { display: none; }');
+    expect(css).toContain('[data-slot="story-feed"] > [data-slot="tabs"] { position: sticky; top: 0;');
+  });
 });

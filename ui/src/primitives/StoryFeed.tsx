@@ -336,7 +336,7 @@ function ChannelHeader({ header, ctx }: { header: NonNullable<StoryFeedData["hea
   const canFollow = channel !== undefined && ctx.available.includes("follow") && ctx.onAction !== undefined;
   const canReset = ctx.available.includes("reset_mix") && ctx.onAction !== undefined;
   return (
-    <header className="flex items-start justify-between gap-3">
+    <header data-slot="story-header" className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         <h2 className="text-2xl font-semibold tracking-tight">{header.title}</h2>
         {header.subtitle ? <p className="text-muted-foreground text-sm">{header.subtitle}</p> : null}
