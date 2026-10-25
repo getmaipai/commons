@@ -25,7 +25,7 @@
 
 # Changelog (`@maipai/ui`)
 
-## [Unreleased]
+## [ui-v0.5.332] - 2026-10-25
 
 - Add `CharacterTile`, `CharacterHero` and `ChatHeader` for companion screens, with round character media, name pills, optional actions and chat controls.
 
