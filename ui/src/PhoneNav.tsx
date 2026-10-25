@@ -16,18 +16,22 @@ const BOTTOM_BAR_MAX = 5;
 // already rely on. `variant="floating"`, `label` and `trailing` are for
 // an app's own sections bar (phone-minimal-2026-10-25 P2): the same part,
 // inset and filled, with a trailing Search item that is never folded under More.
+// `more` entries (an app's settings, say) always live under the last item, the
+// three-dot More button, after any trailing Search.
 export function PhoneNav({
   entries,
   max = BOTTOM_BAR_MAX,
   variant = "bar",
   label = "Primary",
   trailing,
+  more = [],
 }: {
   entries: readonly NavEntry[];
   max?: number;
   variant?: "bar" | "floating";
   label?: string;
   trailing?: NavEntry;
+  more?: readonly NavEntry[];
 }) {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -39,11 +43,12 @@ export function PhoneNav({
   // caller passing max=0 means. Clamped to 1 (More alone, nothing
   // shown directly) as the lowest sane value.
   const safeMax = Math.max(1, max);
-  const itemCount = entries.length + (trailing ? 1 : 0);
-  const overflowing = itemCount > safeMax;
-  const entryLimit = Math.max(0, safeMax - 1 - (trailing ? 1 : 0));
+  const slots = safeMax - (trailing ? 1 : 0);
+  const overflowing = entries.length + (more.length > 0 ? 1 : 0) > slots;
+  const entryLimit = Math.max(0, slots - 1);
   const shown = overflowing ? entries.slice(0, entryLimit) : entries;
-  const overflowEntries = overflowing ? entries.slice(entryLimit) : [];
+  const sheetEntries = [...(overflowing ? entries.slice(entryLimit) : []), ...more];
+  const hasMore = sheetEntries.length > 0;
   const MoreIcon = getIcon("more-horizontal");
   const floating = variant === "floating";
 
@@ -80,7 +85,8 @@ export function PhoneNav({
           : "fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-background pb-[env(safe-area-inset-bottom)] sm:hidden"}
       >
         {shown.map(renderEntry)}
-        {overflowing ? (
+        {trailing ? renderEntry(trailing) : null}
+        {hasMore ? (
           <button
             type="button"
             onClick={() => setMoreOpen(true)}
@@ -92,16 +98,15 @@ export function PhoneNav({
             <span>More</span>
           </button>
         ) : null}
-        {trailing ? renderEntry(trailing) : null}
       </nav>
-      {overflowing ? (
+      {hasMore ? (
         <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
           <SheetContent side="bottom">
             <SheetHeader>
               <SheetTitle>More</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-1 p-2">
-              {overflowEntries.map((entry) => {
+              {sheetEntries.map((entry) => {
                 const Icon = getIcon(entry.icon);
                 return (
                   <Link

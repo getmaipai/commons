@@ -1,3 +1,7 @@
+## [ui-v0.5.340] - 2026-10-25
+
+- `PhoneNav` takes `more`: entries that always sit under a last three-dot More button, after the trailing item. A root `data-app-reading` attribute folds the shell bar into the reader row on a phone.
+
 ## [ui-v0.5.339] - 2026-10-25
 
 - `SchemaPage` starts a page from the top when a chip, tab or place is chosen, and takes `floatingBar` so the page scrolls to the screen edge and ends with room for a floating `PhoneNav`.

@@ -760,6 +760,10 @@
 }
 
 @media (max-width: 639.98px) {
+  /* An app that sets data-app-reading on the root while its reader is open drops the shell bar's band: the menu button floats at
+     the top left and the reader's Back and action pill sit in the same row, to its right. */
+  html[data-app-reading] [data-slot="rail-page-header"] { position: fixed; inset: 0 auto auto 0; width: auto; border: 0; background: transparent; padding-inline: 0.5rem; }
+  html[data-app-reading] [data-slot="article-toolbar"] { margin-top: -0.5rem; padding-inline-start: 3.75rem; }
   [data-slot="article-toolbar"] { height: auto; min-height: 0; background: transparent; padding: 0.25rem 0.75rem; }
   [data-slot="article-toolbar"] > button { min-width: 44px; min-height: 44px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }
   [data-slot="article-actions"] { height: 44px; gap: 0; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }

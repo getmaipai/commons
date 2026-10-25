@@ -146,4 +146,29 @@ describe("PhoneNav", () => {
     expect(getByRole("link", { name: /Today/ })).not.toHaveAttribute("aria-current");
     expect(getByRole("link", { name: /Books/ })).toHaveAttribute("aria-current", "page");
   });
+
+  test("more entries live under a last three-dot button, after the trailing item", () => {
+    const { getByText, getByRole, queryByText, container } = render(
+      <MemoryRouter>
+        <PhoneNav variant="floating" entries={FIVE_ENTRIES.slice(0, 3)} trailing={{ to: "/search", icon: "search", label: "Search" }} more={[{ to: "/settings/news", icon: "settings", label: "News settings" }]} />
+      </MemoryRouter>,
+    );
+    const labels = Array.from(container.querySelectorAll("nav a, nav button")).map((el) => el.textContent);
+    expect(labels).toEqual(["Home", "Apps", "Chat", "Search", "More"]);
+    expect(queryByText("News settings")).not.toBeInTheDocument();
+    fireEvent.click(getByText("More"));
+    expect(getByRole("link", { name: "News settings" })).toBeInTheDocument();
+  });
+
+  test("a more entry takes one slot, so a full row folds its last entry under More too", () => {
+    const { getByText, queryByText } = render(
+      <MemoryRouter>
+        <PhoneNav entries={FIVE_ENTRIES} more={[{ to: "/s", icon: "settings", label: "Prefs" }]} />
+      </MemoryRouter>,
+    );
+    expect(queryByText("Settings")).not.toBeInTheDocument();
+    fireEvent.click(getByText("More"));
+    expect(getByText("Settings")).toBeInTheDocument();
+    expect(getByText("Prefs")).toBeInTheDocument();
+  });
 });
