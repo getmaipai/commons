@@ -9,6 +9,7 @@ export type StackJobItemState = z.infer<typeof StackJobItemState>;
 
 export const StackJobItem = z.object({
   id: z.string().min(1),
+  companion_id: z.string().nullable().optional(),
   label: z.string().min(1),
   completedBytes: z.number().int().nonnegative(),
   totalBytes: z.number().int().nonnegative(),

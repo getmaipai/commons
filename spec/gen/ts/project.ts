@@ -180,6 +180,24 @@ export const Project = z
             "Null when the project was started from an incognito thread.",
           ),
         turnId: z.union([z.string(), z.null()]),
+        /**The companion that asked for the project, recording who worked.*/
+        companion_id: z
+          .union([
+            z
+              .string()
+              .describe(
+                "The companion that asked for the project, recording who worked.",
+              ),
+            z
+              .null()
+              .describe(
+                "The companion that asked for the project, recording who worked.",
+              ),
+          ])
+          .describe(
+            "The companion that asked for the project, recording who worked.",
+          )
+          .default(null),
         planSource: z.enum(["package", "model"]),
       })
       .strict(),

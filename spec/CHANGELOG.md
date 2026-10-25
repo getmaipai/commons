@@ -1,3 +1,7 @@
+## [spec-v0.1.228] - 2026-10-25
+
+- SPEC-ANSWERED-BY-01. Add optional `answered_by` to ConversationTurn and optional `companion_id` to StackJob and Project provenance. Additive; older records read as null.
+
 ## [spec-v0.1.227] - 2026-10-25
 
 - Voice: read validated US slash dates, abbreviated month dates, contextual years, and formatted phone numbers naturally in speech (`normalizeForSpeech`, TypeScript and Python, shared fixtures).

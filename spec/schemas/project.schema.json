@@ -22,6 +22,7 @@
         "person": { "type": "string", "minLength": 1 },
         "conversationId": { "type": ["string", "null"], "description": "Null when the project was started from an incognito thread." },
         "turnId": { "type": ["string", "null"] },
+        "companion_id": { "type": ["string", "null"], "default": null, "description": "The companion that asked for the project, recording who worked." },
         "planSource": { "type": "string", "enum": ["package", "model"] }
       }
     },

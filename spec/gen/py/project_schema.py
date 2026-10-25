@@ -17,6 +17,10 @@ class Provenance(BaseModel):
         ..., description='Null when the project was started from an incognito thread.'
     )
     turnId: str | None
+    companion_id: str | None = Field(
+        None,
+        description='The companion that asked for the project, recording who worked.',
+    )
     planSource: Literal['package', 'model']
 
 

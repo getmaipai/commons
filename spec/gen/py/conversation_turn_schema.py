@@ -29,6 +29,26 @@ class SpeakerEvidence(BaseModel):
     level: Literal['confirmed', 'tentative', 'unknown']
 
 
+class AnsweredBy(BaseModel):
+    """
+    Who answered this turn; null for a bare turn or an old row. Not speaker: speaker_evidence identifies the person who spoke.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    companion_id: constr(min_length=1) = Field(
+        ..., description='Persona id; default is MaiPai itself.'
+    )
+    name: constr(min_length=1) = Field(
+        ..., description='Display name at the moment of the turn.'
+    )
+    look: str | None = Field(
+        ..., description='Approved animation version stamp, or null when none.'
+    )
+    via: Literal['conversation', 'mention', 'device', 'fallback']
+
+
 class PresentItem(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -156,6 +176,10 @@ class ConversationTurn(BaseModel):
     speaker_evidence: SpeakerEvidence | None = Field(
         ...,
         description='What the body knows about who is speaking is evidence, typed on the turn.',
+    )
+    answered_by: AnsweredBy | None = Field(
+        None,
+        description='Who answered this turn; null for a bare turn or an old row. Not speaker: speaker_evidence identifies the person who spoke.',
     )
     present: list[PresentItem] | None = Field(
         ...,

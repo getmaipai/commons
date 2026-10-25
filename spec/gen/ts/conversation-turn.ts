@@ -5674,6 +5674,52 @@ export const ConversationTurn = z
         "What the body knows about who is speaking is evidence, typed on the turn.",
       )
       .default(null),
+    /**Who answered this turn; null for a bare turn or an old row. Not speaker: speaker_evidence identifies the person who spoke.*/
+    answered_by: z
+      .union([
+        z
+          .object({
+            /**Persona id; default is MaiPai itself.*/
+            companion_id: z
+              .string()
+              .min(1)
+              .describe("Persona id; default is MaiPai itself."),
+            /**Display name at the moment of the turn.*/
+            name: z
+              .string()
+              .min(1)
+              .describe("Display name at the moment of the turn."),
+            /**Approved animation version stamp, or null when none.*/
+            look: z
+              .union([
+                z
+                  .string()
+                  .describe(
+                    "Approved animation version stamp, or null when none.",
+                  ),
+                z
+                  .null()
+                  .describe(
+                    "Approved animation version stamp, or null when none.",
+                  ),
+              ])
+              .describe("Approved animation version stamp, or null when none."),
+            via: z.enum(["conversation", "mention", "device", "fallback"]),
+          })
+          .strict()
+          .describe(
+            "Who answered this turn; null for a bare turn or an old row. Not speaker: speaker_evidence identifies the person who spoke.",
+          ),
+        z
+          .null()
+          .describe(
+            "Who answered this turn; null for a bare turn or an old row. Not speaker: speaker_evidence identifies the person who spoke.",
+          ),
+      ])
+      .describe(
+        "Who answered this turn; null for a bare turn or an old row. Not speaker: speaker_evidence identifies the person who spoke.",
+      )
+      .default(null),
     /**The body's list of people with a fresh track or a fresh voice in the last thirty seconds, each at its own level.*/
     present: z
       .union([
