@@ -214,12 +214,33 @@ _MONTHS = [
     "November",
     "December",
 ]
-_MONTH_RE = re.compile(r"\b(" + "|".join(_MONTHS) + r")\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s*(\d{4}))?\b")
+_MONTH_RE = re.compile(
+    r"\b(" + "|".join(_MONTHS) + r")\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s*(\d{4}))?\b"
+)
 _ISO_DATE_RE = re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b")
-_MONTH_ABBREVIATIONS = {"jan": "January", "feb": "February", "mar": "March", "apr": "April", "jun": "June", "jul": "July", "aug": "August", "sep": "September", "sept": "September", "oct": "October", "nov": "November", "dec": "December"}
-_ABBREVIATED_MONTH_RE = re.compile(r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+(\d{1,2})(st|nd|rd|th)?(?:,\s*(\d{4}))?\b", re.IGNORECASE)
+_MONTH_ABBREVIATIONS = {
+    "jan": "January",
+    "feb": "February",
+    "mar": "March",
+    "apr": "April",
+    "jun": "June",
+    "jul": "July",
+    "aug": "August",
+    "sep": "September",
+    "sept": "September",
+    "oct": "October",
+    "nov": "November",
+    "dec": "December",
+}
+_ABBREVIATED_MONTH_RE = re.compile(
+    r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+(\d{1,2})(st|nd|rd|th)?(?:,\s*(\d{4}))?\b",
+    re.IGNORECASE,
+)
 _SLASH_DATE_RE = re.compile(r"\b(\d{1,2})/(\d{1,2})(?:/(\d{4}))?\b")
-_YEAR_CONTEXT_RE = re.compile(r"\b(in|since|by|until|before|after|during|from|of|circa|year|class of)\s+(1[1-9]\d{2}|20\d{2})\b", re.IGNORECASE)
+_YEAR_CONTEXT_RE = re.compile(
+    r"\b(in|since|by|until|before|after|during|from|of|circa|year|class of)\s+(1[1-9]\d{2}|20\d{2})\b",
+    re.IGNORECASE,
+)
 
 
 def _spoken_year(year: int) -> str:
@@ -257,31 +278,48 @@ def _normalize_dates(text: str) -> str:
 
     s = _MONTH_RE.sub(month_day_year, text)
     s = _ISO_DATE_RE.sub(iso_date, s)
+
     def abbreviated_month(m: re.Match[str]) -> str:
         raw_month, day, _ordinal, year = m.groups()
-        month = "May" if raw_month.lower() == "may" else _MONTH_ABBREVIATIONS[raw_month.lower()]
+        month = (
+            "May"
+            if raw_month.lower() == "may"
+            else _MONTH_ABBREVIATIONS[raw_month.lower()]
+        )
         spoken = f"{month} {_ordinal_words(int(day))}"
         return f"{spoken}, {_spoken_year(int(year))}" if year else spoken
+
     s = _ABBREVIATED_MONTH_RE.sub(abbreviated_month, s)
+
     def slash_date(m: re.Match[str]) -> str:
         month, day, year = m.groups()
         mo, d = int(month), int(day)
-        after = s[m.end():]
+        after = s[m.end() :]
         if not 1 <= mo <= 12 or not 1 <= d <= 31:
             return m.group(0)
-        if not year and re.match(r"\s*(?:cup|teaspoons?|tsp|tbsp|inches?|inch|miles?)\b", after, re.IGNORECASE):
+        if not year and re.match(
+            r"\s*(?:cup|teaspoons?|tsp|tbsp|inches?|inch|miles?)\b",
+            after,
+            re.IGNORECASE,
+        ):
             return m.group(0)
         from calendar import monthrange
+
         if d > monthrange(int(year) if year else 2024, mo)[1]:
             return m.group(0)
         spoken = f"{_MONTHS[mo - 1]} {_ordinal_words(d)}"
         return f"{spoken}, {_spoken_year(int(year))}" if year else spoken
+
     s = _SLASH_DATE_RE.sub(slash_date, s)
-    s = _YEAR_CONTEXT_RE.sub(lambda m: f"{m.group(1)} {_spoken_year(int(m.group(2)))}", s)
+    s = _YEAR_CONTEXT_RE.sub(
+        lambda m: f"{m.group(1)} {_spoken_year(int(m.group(2)))}", s
+    )
     return s
 
 
-_PHONE_RE = re.compile(r"(?<![\d.])((?:\+1\s*|1-)?(?:\(\d{3}\)\s*|\d{3}[-.])\d{3}[-.]\d{4})(?!\d)")
+_PHONE_RE = re.compile(
+    r"(?<![\d.])((?:\+1\s*|1-)?(?:\(\d{3}\)\s*|\d{3}[-.])\d{3}[-.]\d{4})(?!\d)"
+)
 
 
 def _normalize_phones(text: str) -> str:
@@ -293,7 +331,11 @@ def _normalize_phones(text: str) -> str:
         elif raw.startswith("1-"):
             prefix, raw = "one, ", raw[2:]
         digits = re.sub(r"\D", "", raw)
-        return prefix + ", ".join(" ".join(_ONES[int(d)] for d in digits[i:j]) for i, j in ((0, 3), (3, 6), (6, 10)))
+        return prefix + ", ".join(
+            " ".join(_ONES[int(d)] for d in digits[i:j])
+            for i, j in ((0, 3), (3, 6), (6, 10))
+        )
+
     return _PHONE_RE.sub(replace, text)
 
 
