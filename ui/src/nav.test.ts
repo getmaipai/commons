@@ -11,6 +11,11 @@ describe("isActiveNavPath", () => {
     expect(isActiveNavPath("/apps", "/apps")).toBe(true);
   });
 
+  test("an exact entry does not match a sub-path", () => {
+    expect(isActiveNavPath("/apps/weather", "/apps", true)).toBe(false);
+    expect(isActiveNavPath("/apps", "/apps", true)).toBe(true);
+  });
+
   test("a real sub-path is active", () => {
     expect(isActiveNavPath("/apps/weather", "/apps")).toBe(true);
   });
