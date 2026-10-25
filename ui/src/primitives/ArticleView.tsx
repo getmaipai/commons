@@ -190,7 +190,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       {hasToolbar ? (
         <div data-slot="article-toolbar" className="flex h-14 items-center gap-1 bg-background px-3 py-1">
           {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" className="rounded-full" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
-          <div className="ml-auto flex items-center gap-1">
+          <div data-slot="article-actions" className="ml-auto flex items-center gap-1">
             <Button
               variant="ghost"
               size="icon-lg"
@@ -231,14 +231,16 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       <header className="flex flex-col gap-2">
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
-        <h2 className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
-        {data.description ? <p className="text-muted-foreground text-sm">{data.description}</p> : null}
+        <h2 data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
+        {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
       {data.image ? (
-        <AspectRatio ratio={16 / 9} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
-          <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
-        </AspectRatio>
+        <div data-slot="article-lead">
+          <AspectRatio ratio={16 / 9} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
+            <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
+          </AspectRatio>
+        </div>
       ) : null}
       {data.key_points ? (
         <section data-slot="key-points" aria-label="Key points" className="mx-auto flex w-full max-w-[72ch] flex-col gap-1 rounded-lg bg-muted p-4">

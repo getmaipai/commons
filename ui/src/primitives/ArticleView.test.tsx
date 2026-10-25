@@ -49,6 +49,15 @@ describe("ArticleView", () => {
     expect(container.querySelector('[data-slot="also-covering"]')).not.toBeNull();
   });
 
+  test("exposes phone reader slots and hides sharing and Open original without an outlet URL", () => {
+    const { container, queryByLabelText, queryByText } = render(<ArticleView data={childCopy()} available={["open_site", "save", "listen"]} onAction={() => {}} />);
+    expect(container.querySelector('[data-slot="article-actions"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="article-title"]')?.textContent).toBe(data.title);
+    expect(container.querySelector('[data-slot="article-dek"]')?.textContent).toBe(data.description);
+    expect(queryByLabelText("Share")).toBeNull();
+    expect(queryByText("Open original")).toBeNull();
+  });
+
   test("controls stay pinned while the full-width shaded publisher header scrolls with the article", () => {
     const withIcon = { ...data, sourceIconUrl: "/api/favicon?domain=example.com" };
     const view = render(<ArticleView data={withIcon} onBack={() => {}} />);
