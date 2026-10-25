@@ -1,3 +1,7 @@
+## [ui-v0.5.342] - 2026-10-25
+
+- The phone chip strip in the shell bar row is a frosted band over the page color, so stories blur beneath it as they scroll.
+
 ## [ui-v0.5.341] - 2026-10-25
 
 - On a phone a story feed with topic chips puts the strip in the shell bar row beside the menu button and hides its title block; `StoryFeed` header gains `data-slot="story-header"`.
