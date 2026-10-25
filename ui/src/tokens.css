@@ -760,7 +760,7 @@
 }
 
 @media (max-width: 639.98px) {
-  :root { --story-hero-ratio: 4 / 3; }
+  [data-slot="story-feed"] { --story-hero-ratio: 4 / 3; }
   [data-slot="story-filters"],
   [data-slot="tabs-list"][data-variant="pill"] {
     touch-action: pan-x;
