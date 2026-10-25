@@ -79,6 +79,7 @@ export function PhoneNav({
   return (
     <>
       <nav
+        data-slot="phone-nav"
         aria-label={label}
         className={floating
           ? "fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-30 flex max-h-16 rounded-full bg-card p-1 shadow-lg sm:hidden"

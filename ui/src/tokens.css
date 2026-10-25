@@ -768,6 +768,13 @@
   html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]) [data-slot="story-feed"] > [data-slot="story-header"] { display: none; }
   html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]) [data-top-row-hide], html[data-app-reading] [data-top-row-hide] { display: none; }
   html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]) [data-slot="story-feed"] > [data-slot="tabs"] { position: sticky; top: 0; z-index: 5; display: flex; flex-direction: column; justify-content: center; min-height: 4rem; margin: -1rem -1rem 0; padding: 0 1rem 0 3.75rem; background: color-mix(in srgb, var(--page, var(--background)) 86%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4); }
+  /* Any app that draws the floating section bar gives its page the whole top: the shell bar keeps only the menu button and the app
+     name, with no rule under it, and the page starts straight below the button (the Apple News and Apple Music phone look). A feed
+     with chips and the open reader place their own top row above. */
+  html:not([data-app-reading]):not(:has([data-slot="story-filters"])):has([data-slot="phone-nav"]) [data-slot="rail-page-header"] { height: 3.5rem; min-height: 3.5rem; border-bottom-width: 0; background: transparent; }
+  html:not([data-app-reading]):not(:has([data-slot="story-filters"])):has([data-slot="phone-nav"]) [data-slot="rail-body"] { padding-top: 0; }
+  /* The open reader's Back and pill stay where they rest while the story scrolls under them. */
+  html[data-app-reading] [data-slot="article-sticky-header"] { top: 1rem; }
   html[data-app-reading] [data-slot="rail-page-header"] { position: fixed; inset: 0 auto auto 0; width: auto; border: 0; background: transparent; padding-inline: 0.5rem; }
   html[data-app-reading] [data-slot="article-toolbar"] { margin-top: -0.5rem; padding-inline-start: 3.75rem; }
   [data-slot="article-toolbar"] { height: auto; min-height: 0; background: transparent; padding: 0.25rem 0.75rem; }

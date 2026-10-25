@@ -1,3 +1,9 @@
+## [ui-v0.5.344] - 2026-10-25
+
+- On a phone the open reader's Back and action pill stay put while the story scrolls (the sticky header keeps its resting offset).
+- An app with the floating section bar (`PhoneNav` now carries `data-slot="phone-nav"`) drops the rule and the extra gap under the shell bar, so its page starts right below the menu button.
+- Icons `disc-3`, `list-music` and `mic-vocal` added for audio sections.
+
 ## [ui-v0.5.343] - 2026-10-25
 
 - An element marked `data-top-row-hide` inside the shell bar is hidden on a phone while chips or the reader take the bar row.

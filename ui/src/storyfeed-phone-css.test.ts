@@ -27,4 +27,9 @@ describe("StoryFeed phone tokens and strip", () => {
     expect(css).toContain('[data-slot="story-feed"] > [data-slot="tabs"] { position: sticky; top: 0;');
     expect(css).toContain("[data-top-row-hide]");
   });
+
+  test("the reader's sticky header keeps its resting offset and a section-bar app starts its page under the menu button", () => {
+    expect(css).toContain('html[data-app-reading] [data-slot="article-sticky-header"] { top: 1rem; }');
+    expect(css).toContain(':has([data-slot="phone-nav"]) [data-slot="rail-body"] { padding-top: 0; }');
+  });
 });
