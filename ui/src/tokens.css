@@ -785,6 +785,11 @@
 
 [data-slot="story-grid"] [data-slot="story-card"][data-phone-card]:not(:has([data-slot="story-image"] img)) { grid-column: 1 / -1; }
 
+/* A child's phone is one column (docs/design/phone-minimal-2026-10-25.md P4a); the app marks the page root with the person's band. */
+@media (max-width: 639.98px) {
+  html[data-age-band="child"] [data-slot="story-grid"] { grid-template-columns: minmax(0, 1fr); }
+}
+
 @media (max-width: 639px) {
   [data-phone-shell] button,
   [data-phone-shell] a {
