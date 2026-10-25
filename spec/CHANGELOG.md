@@ -1,3 +1,7 @@
+## [spec-v0.1.225] - 2026-10-25
+
+- Voice: the `stt` socket gains the additive server events `reply_pause` and `reply_resume` and the client message `played_ms {reply_id, ms}` (`SttClientMessage`), for full-duplex voice (home `docs/design/full-duplex-voice-2026-10-24.md`, DUPLEX-01). Existing clients ignore them.
+
 ## [spec-v0.1.223] - 2026-10-23
 
 - A settings section's `scope` is optional in the schema again (a package area's sections read as person), as it was for areas in 0.1.215; `checkAreas` still requires it on every section of the central areas file. 0.1.218 made it required everywhere, which invalidated every bundled and community package manifest.
