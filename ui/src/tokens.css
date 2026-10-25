@@ -781,6 +781,9 @@
   [data-slot="story-card"][data-phone-card] { border: 0; border-radius: var(--radius-card); background: var(--card); box-shadow: none; }
   [data-slot="story-card"][data-phone-card]:not([data-tier="hero"]) [data-slot="story-kicker"] { display: none; }
   [data-slot="story-card"][data-phone-card] [data-slot="story-dek"] { display: none; }
+  [data-slot="story-grid"] [data-slot="story-card"][data-tier="hero"] { grid-column: 1 / -1; }
+  [data-slot="story-card"][data-phone-card] button { font-size: 0.9375rem; line-height: 1.3; }
+  [data-slot="story-card"][data-phone-card][data-tier="hero"] button { font-size: 1.375rem; line-height: 1.2; }
 }
 
 [data-slot="story-grid"] [data-slot="story-card"][data-phone-card]:not(:has([data-slot="story-image"] img)) { grid-column: 1 / -1; }

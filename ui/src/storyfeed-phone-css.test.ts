@@ -15,4 +15,10 @@ describe("StoryFeed phone tokens and strip", () => {
   test("a child's phone is one column through the page root's age band", () => {
     expect(css).toContain('html[data-age-band="child"] [data-slot="story-grid"]');
   });
+
+  test("the lead spans both columns with a 22 px headline and the other cards use 15 px", () => {
+    expect(css).toContain('[data-slot="story-grid"] [data-slot="story-card"][data-tier="hero"] { grid-column: 1 / -1; }');
+    expect(css).toContain("font-size: 1.375rem");
+    expect(css).toContain("font-size: 0.9375rem");
+  });
 });
