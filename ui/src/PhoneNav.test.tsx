@@ -103,4 +103,47 @@ describe("PhoneNav", () => {
     expect(getByRole("link", { name: /Apps/ })).toHaveAttribute("aria-current", "page");
     expect(getByRole("link", { name: /^Home$/ })).not.toHaveAttribute("aria-current");
   });
+
+  test("keeps the default bar classes and Primary label", () => {
+    const { getByRole } = render(<MemoryRouter><PhoneNav entries={FIVE_ENTRIES} /></MemoryRouter>);
+    const nav = getByRole("navigation", { name: "Primary" });
+    expect(nav).toHaveClass("fixed", "inset-x-0", "bottom-0", "border-t", "bg-background", "sm:hidden");
+  });
+
+  test("floating variant uses inset card styling, custom label and active fill", () => {
+    const { getByRole } = render(
+      <MemoryRouter initialEntries={["/apps"]}>
+        <PhoneNav entries={FIVE_ENTRIES} variant="floating" label="News sections" />
+      </MemoryRouter>,
+    );
+    const nav = getByRole("navigation", { name: "News sections" });
+    expect(nav).toHaveClass("inset-x-3", "bottom-[calc(0.75rem+env(safe-area-inset-bottom))]", "rounded-full", "bg-card", "shadow-lg", "sm:hidden");
+    expect(getByRole("link", { name: /Apps/ })).toHaveClass("bg-muted", "text-foreground");
+  });
+
+  test("draws trailing last and keeps it out of More when entries overflow", () => {
+    const trailing: NavEntry = { to: "/search", icon: "search", label: "Search" };
+    const { getByRole, getByText } = render(
+      <MemoryRouter>
+        <PhoneNav entries={SIX_ENTRIES} trailing={trailing} max={5} />
+      </MemoryRouter>,
+    );
+    const links = getByRole("navigation").querySelectorAll("a");
+    expect(links[links.length - 1]).toHaveAttribute("href", "/search");
+    expect(getByText("More")).toBeInTheDocument();
+  });
+
+  test("exact entries are inactive on subpaths while non-exact entries stay active", () => {
+    const entries: NavEntry[] = [
+      { to: "/apps/news", icon: "newspaper", label: "Today", exact: true },
+      { to: "/apps/books", icon: "book", label: "Books" },
+    ];
+    const { getByRole } = render(
+      <MemoryRouter initialEntries={["/apps/books/detail"]}>
+        <PhoneNav entries={entries} />
+      </MemoryRouter>,
+    );
+    expect(getByRole("link", { name: /Today/ })).not.toHaveAttribute("aria-current");
+    expect(getByRole("link", { name: /Books/ })).toHaveAttribute("aria-current", "page");
+  });
 });

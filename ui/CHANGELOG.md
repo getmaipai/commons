@@ -28,6 +28,9 @@
 ## [ui-v0.5.338] - 2026-10-25
 
 - Float article reader controls and tune reader typography and lead image for phones.
+## [ui-v0.5.333] - 2026-10-25
+
+- PhoneNav adds an optional floating app sections bar, custom label, exact active matching and a trailing item such as Search. The default bottom bar keeps its existing behavior.
 
 ## [ui-v0.5.332] - 2026-10-25
 

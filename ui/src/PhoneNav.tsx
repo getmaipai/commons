@@ -13,8 +13,22 @@ const BOTTOM_BAR_MAX = 5;
 // "Home, Chat, Apps, More" - owner ruling, "Navigation, corrected,"
 // 2026-09-20: three real destinations, not four, before More) without
 // changing the default every other consumer's own tests and behavior
-// already rely on.
-export function PhoneNav({ entries, max = BOTTOM_BAR_MAX }: { entries: readonly NavEntry[]; max?: number }) {
+// already rely on. `variant="floating"`, `label` and `trailing` are for
+// an app's own sections bar (phone-minimal-2026-10-25 P2): the same part,
+// inset and filled, with a trailing Search item that is never folded under More.
+export function PhoneNav({
+  entries,
+  max = BOTTOM_BAR_MAX,
+  variant = "bar",
+  label = "Primary",
+  trailing,
+}: {
+  entries: readonly NavEntry[];
+  max?: number;
+  variant?: "bar" | "floating";
+  label?: string;
+  trailing?: NavEntry;
+}) {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
   // A code review (2026-09-20) caught `max <= 0`: `entries.slice(0, max
@@ -25,45 +39,60 @@ export function PhoneNav({ entries, max = BOTTOM_BAR_MAX }: { entries: readonly 
   // caller passing max=0 means. Clamped to 1 (More alone, nothing
   // shown directly) as the lowest sane value.
   const safeMax = Math.max(1, max);
-  const overflowing = entries.length > safeMax;
-  const shown = overflowing ? entries.slice(0, safeMax - 1) : entries;
-  const overflowEntries = overflowing ? entries.slice(safeMax - 1) : [];
+  const itemCount = entries.length + (trailing ? 1 : 0);
+  const overflowing = itemCount > safeMax;
+  const entryLimit = Math.max(0, safeMax - 1 - (trailing ? 1 : 0));
+  const shown = overflowing ? entries.slice(0, entryLimit) : entries;
+  const overflowEntries = overflowing ? entries.slice(entryLimit) : [];
   const MoreIcon = getIcon("more-horizontal");
+  const floating = variant === "floating";
+
+  const renderEntry = (entry: NavEntry) => {
+    const Icon = getIcon(entry.icon);
+    const active = isActiveNavPath(location.pathname, entry.to, entry.exact);
+    return (
+      <Link
+        key={entry.to}
+        to={entry.to}
+        aria-current={active ? "page" : undefined}
+        className={floating
+          ? cn(
+              "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs",
+              active ? "rounded-full bg-muted text-foreground" : "text-muted-foreground",
+            )
+          : cn(
+              "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base",
+              active ? "text-primary" : "text-muted-foreground",
+            )}
+      >
+        <Icon className="h-5 w-5" aria-hidden />
+        <span>{entry.label}</span>
+      </Link>
+    );
+  };
 
   return (
     <>
       <nav
-        aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-background pb-[env(safe-area-inset-bottom)] sm:hidden"
+        aria-label={label}
+        className={floating
+          ? "fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-30 flex max-h-16 rounded-full bg-card p-1 shadow-lg sm:hidden"
+          : "fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-background pb-[env(safe-area-inset-bottom)] sm:hidden"}
       >
-        {shown.map((entry) => {
-          const Icon = getIcon(entry.icon);
-          const active = isActiveNavPath(location.pathname, entry.to);
-          return (
-            <Link
-              key={entry.to}
-              to={entry.to}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base",
-                active ? "text-primary" : "text-muted-foreground",
-              )}
-            >
-              <Icon className="h-5 w-5" aria-hidden />
-              <span>{entry.label}</span>
-            </Link>
-          );
-        })}
+        {shown.map(renderEntry)}
         {overflowing ? (
           <button
             type="button"
             onClick={() => setMoreOpen(true)}
-            className="flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base text-muted-foreground"
+            className={floating
+              ? "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs text-muted-foreground"
+              : "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base text-muted-foreground"}
           >
             <MoreIcon className="h-5 w-5" aria-hidden />
             <span>More</span>
           </button>
         ) : null}
+        {trailing ? renderEntry(trailing) : null}
       </nav>
       {overflowing ? (
         <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
