@@ -1,3 +1,7 @@
+## [spec-v0.1.226] - 2026-10-25
+
+- `news.full_text_prefetch` defaults on (owner, 2026-10-25), and its help says the 30 second pace is per site. A household that already set it keeps its choice.
+
 ## [spec-v0.1.225] - 2026-10-25
 
 - Voice: the `stt` socket gains the additive server events `reply_pause` and `reply_resume` and the client message `played_ms {reply_id, ms}` (`SttClientMessage`), for full-duplex voice (home `docs/design/full-duplex-voice-2026-10-24.md`, DUPLEX-01). Existing clients ignore them.
