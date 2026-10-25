@@ -1,3 +1,8 @@
+## [ui-v0.5.331] - 2026-10-25
+
+- `SchemaPage` writes a package page's own choices (a topic chip, a tab, a picked place, a submitted search) into the address, replacing the entry in place, and reads them back on arrival, so every view reloads, shares and goes back the same. Text still being typed into a search box stays out of the address.
+- `FocalImage` keeps a picture hidden (a 120 ms fade) until its focal crop is known, at most 2.5 s, so it no longer shows centered and then slides to its subject. Crops are also kept in the browser, so a reloaded page frames pictures right from the first paint.
+
 ## [ui-v0.5.330] - 2026-10-24
 
 - Focal crops use the frame's rendered ratio, not the caller's hint. The 2:1 Brewers hero was cropped as 16:9 and clipped near the cap; `FocalImage` now measures the frame before it analyzes.

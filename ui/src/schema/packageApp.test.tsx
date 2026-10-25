@@ -1,7 +1,7 @@
 // APP-KIND-02: the package scope guard, the package binding, answer_blocks and picker.
 import { describe, expect, test, mock, afterEach, beforeEach } from "bun:test";
 import { act, cleanup, fireEvent, render, renderHook, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import weatherCard from "@maipai/spec/fixtures/answer-block/valid-weather_card.json";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
@@ -296,6 +296,28 @@ describe("picker and page state", () => {
       fireEvent.keyDown(option, { key: "Enter" });
     });
   }
+
+  function Where() { const location = useLocation(); return <output data-testid="where">{location.pathname}{location.search}</output>; }
+  function renderAt(path: string) {
+    return renderWithQueryClient(
+      <MemoryRouter initialEntries={[path]}>
+        <SchemaPage page={page} packageId="demo" />
+        <Where />
+      </MemoryRouter>,
+    );
+  }
+
+  test("a choice is written into the address, and an address with a choice opens with it (APP-URL-02)", async () => {
+    const view = renderAt("/apps/demo");
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/demo/data/places")).toBe(true));
+    await choose(view, "Grandma's house");
+    await waitFor(() => expect(view.getByTestId("where").textContent).toBe("/apps/demo?place=pl1"));
+    cleanup();
+    calls = [];
+    const reopened = renderAt("/apps/demo?place=pl1");
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/data/forecast") && (c.body as { place?: string }).place === "pl1")).toBe(true));
+    expect(reopened.getByTestId("where").textContent).toBe("/apps/demo?place=pl1");
+  });
 
   test("the saved places come from the package's rows and choosing one refetches with it", async () => {
     const view = renderPage();

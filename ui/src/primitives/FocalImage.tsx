@@ -12,6 +12,25 @@ export function FocalImageProvider({ analyze, children }: { analyze: FocalMapAna
 
 type Props = Omit<ComponentProps<typeof SafeImage>, "onLoad"> & { aspectRatio?: number; onLoad?: ComponentProps<typeof SafeImage>["onLoad"] };
 const cache = new Map<string, string>();
+const STORE_KEY = "maipai.focal.v1";
+let stored: Record<string, string> | null = null;
+
+/** Crops worked out on an earlier visit, kept in this browser so a picture is framed right from its first paint after a reload. */
+function storedPositions(): Record<string, string> {
+  if (stored) return stored;
+  try { stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? "{}") as Record<string, string>; } catch { stored = {}; }
+  return stored;
+}
+function rememberPosition(key: string, position: string): void {
+  const all = storedPositions();
+  all[key] = position;
+  const keys = Object.keys(all);
+  if (keys.length > 400) for (const old of keys.slice(0, keys.length - 400)) delete all[old];
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(all)); } catch { /* a full or blocked store only costs the next visit a fresh analysis */ }
+}
+
+/** How long a picture stays hidden waiting for its focal crop before it shows centered anyway. */
+export const FOCAL_REVEAL_MS = 2500;
 
 /** Prefer the actual rendered frame ratio over a caller hint; theme tokens can change the frame after props are set. */
 export function focalAspectRatio(frameWidth: number, frameHeight: number, requestedAspectRatio?: number): number {
@@ -92,31 +111,37 @@ export function FocalImage({ src, aspectRatio, onLoad, style, ...props }: Props)
   const startedRef = useRef(false);
   const analyzeVisibleRef = useRef<() => void>(() => {});
   const [position, setPosition] = useState("50% 50%");
+  // The picture stays invisible until its crop is known (or the wait runs out), so it never shows centered and then slides to its subject.
+  const [settled, setSettled] = useState(!analyze);
   const source = typeof src === "string" ? src : "";
 
   useEffect(() => {
     setPosition("50% 50%");
+    setSettled(!analyze);
     visibleRef.current = false;
     startedRef.current = false;
     analyzeVisibleRef.current = () => {};
-    if (!source || !analyze) return;
+    if (!source || !analyze) { setSettled(true); return; }
     const image = imageRef.current;
     if (!image) return;
     let cancelled = false;
+    const giveUp = setTimeout(() => { if (!cancelled) setSettled(true); }, FOCAL_REVEAL_MS);
     const run = () => {
       if (cancelled || !visibleRef.current || startedRef.current || !image.complete || image.naturalWidth === 0) return;
       startedRef.current = true;
       const ratio = focalAspectRatio(image.clientWidth, image.clientHeight, aspectRatio);
       if (!Number.isFinite(ratio) || ratio <= 0) return;
       const key = `${source}|${ratio.toFixed(4)}`;
-      const existing = cache.get(key);
-      if (existing) { setPosition(existing); return; }
+      const existing = cache.get(key) ?? storedPositions()[key];
+      if (existing) { setPosition(existing); setSettled(true); return; }
       void analyzeImage(image, analyze, ratio).then((next) => {
         if (cancelled) return;
         if (cache.size > 200) cache.delete(cache.keys().next().value as string);
         cache.set(key, next);
+        rememberPosition(key, next);
         setPosition(next);
-      }).catch(() => {});
+        setSettled(true);
+      }).catch(() => { if (!cancelled) setSettled(true); });
     };
     analyzeVisibleRef.current = run;
     let observer: IntersectionObserver | undefined;
@@ -131,7 +156,7 @@ export function FocalImage({ src, aspectRatio, onLoad, style, ...props }: Props)
       }, { rootMargin: "100px" });
       observer.observe(image);
     }
-    return () => { cancelled = true; observer?.disconnect(); };
+    return () => { cancelled = true; clearTimeout(giveUp); observer?.disconnect(); };
   }, [source, analyze, aspectRatio]);
 
   async function analyzeImage(image: HTMLImageElement, analyzer: FocalMapAnalyzer, ratio: number): Promise<string> {
@@ -159,5 +184,5 @@ export function FocalImage({ src, aspectRatio, onLoad, style, ...props }: Props)
     return focalObjectPosition(map, image.naturalWidth, image.naturalHeight, ratio);
   }
 
-  return <SafeImage {...props} src={src} imageRef={imageRef} style={{ ...style, objectFit: "cover", objectPosition: position }} onLoad={(event) => { onLoad?.(event); if (!event.currentTarget.complete) return; analyzeVisibleRef.current(); }} />;
+  return <SafeImage {...props} src={src} imageRef={imageRef} style={{ ...style, objectFit: "cover", objectPosition: position, opacity: settled ? (style?.opacity ?? 1) : 0, transition: [style?.transition, "opacity 120ms ease-out"].filter(Boolean).join(", ") }} onLoad={(event) => { onLoad?.(event); if (!event.currentTarget.complete) return; analyzeVisibleRef.current(); }} />;
 }

@@ -1,10 +1,20 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Page } from "@/kit/primitives/Page";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext, PageSidebarContext, PageStateContext, type PageStateWriter } from "@/kit/schema/packageScope";
 import { PageNodeSchema } from "@/kit/schema/types";
 import { cn, FOCUS_RING } from "@/kit/utils";
+
+function typedStateKeys(node: unknown, found: Set<string> = new Set()): Set<string> {
+  if (Array.isArray(node)) { for (const child of node) typedStateKeys(child, found); return found; }
+  if (node && typeof node === "object") {
+    const record = node as Record<string, unknown>;
+    if (record.type === "search" && typeof record.state === "string") found.add(record.state);
+    for (const child of Object.values(record)) typedStateKeys(child, found);
+  }
+  return found;
+}
 
 /** Renders a `spec/ui/pages/*.json` document (imported as a plain JSON
  * module - Vite resolves `.json` imports at build time, no fetch, no
@@ -44,10 +54,27 @@ export function SchemaPage({
   // page reads its kind and key this way). Applied on arrival and again whenever the navigation changes.
   const location = useLocation();
   const arrived = (location.state as { pageState?: Record<string, unknown> } | null)?.pageState;
-  const [state, setState] = useState<Record<string, unknown>>(arrived ?? {});
+  const navigate = useNavigate();
+  // Text a person is still typing into a search box is not a choice yet: it joins the address only when it is submitted (the navigation's own state).
+  const typedKeys = useMemo(() => typedStateKeys(page), [page]);
+  const [state, setState] = useState<Record<string, unknown>>(() => ({ ...(packageId ? Object.fromEntries(new URLSearchParams(location.search)) : {}), ...arrived }));
   useEffect(() => {
     if (arrived) setState((prev) => ({ ...prev, ...arrived }));
   }, [location.key, arrived]);
+  // APP-URL-02: a package page's own choices (a topic chip, a tab, a picked place) are written into its address, replacing the entry in
+  // place, so the page as it is shown reloads, shares and goes back the same. The arrival state carries the same values, so the shell
+  // does not treat the new address as a different page. Only plain text values are kept; an empty choice leaves the address clean.
+  useEffect(() => {
+    if (!packageId) return;
+    const params = new URLSearchParams();
+    for (const [name, value] of Object.entries(state)) if (typeof value === "string" && value !== "" && !typedKeys.has(name)) params.set(name, value);
+    params.sort();
+    const wanted = params.toString();
+    const current = new URLSearchParams(location.search);
+    current.sort();
+    if (wanted === current.toString()) return;
+    navigate(`${location.pathname}${wanted ? `?${wanted}` : ""}`, { replace: true, state: { ...(location.state as object | null), pageState: Object.fromEntries(params) } });
+  }, [packageId, state, typedKeys, location.pathname, location.search, location.state, navigate]);
   const writer = useMemo<PageStateWriter>(
     () => ({
       merge: (patch) =>

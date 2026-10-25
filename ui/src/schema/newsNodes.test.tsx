@@ -259,7 +259,8 @@ describe("search node (NEWS-LOOK-02)", () => {
     fireEvent.change(field, { target: { value: "  harbor " } });
     fireEvent.keyDown(field, { key: "Enter" });
     await waitFor(() => expect(resultCalls().some((c) => (c.body as { q?: string }).q === "  harbor ")).toBe(true));
-    expect(getByTestId("where").textContent).toBe("/apps/news/search");
+    // A submitted search is in the address (APP-URL-02), so it reloads and shares.
+    await waitFor(() => expect(getByTestId("where").textContent).toBe("/apps/news/search?q=++harbor+"));
   });
 
   test("recents show as chips while the field is empty; a chip sets the state and fires submit", async () => {
