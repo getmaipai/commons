@@ -1,5 +1,7 @@
 ## [spec-v0.1.226] - 2026-10-25
 
+- Voice: read validated US slash dates, abbreviated month dates, contextual years, and formatted phone numbers naturally in speech.
+
 - `news.full_text_prefetch` defaults on (owner, 2026-10-25), and its help says the 30 second pace is per site. A household that already set it keeps its choice.
 
 ## [spec-v0.1.225] - 2026-10-25

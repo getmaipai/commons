@@ -170,23 +170,31 @@ const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
 ];
-const MONTH_RE = new RegExp(`\\b(${MONTHS.join("|")})\\s+(\\d{1,2})(?:,\\s*(\\d{4}))?\\b`, "g");
+const MONTH_RE = new RegExp(`\\b(${MONTHS.join("|")})\\s+(\\d{1,2})(?:st|nd|rd|th)?(?:,\\s*(\\d{4}))?\\b`, "g");
 const ISO_DATE_RE = /\b(\d{4})-(\d{2})-(\d{2})\b/g;
+const MONTH_ABBREVIATIONS: Record<string, string> = { jan: "January", feb: "February", mar: "March", apr: "April", jun: "June", jul: "July", aug: "August", sep: "September", sept: "September", oct: "October", nov: "November", dec: "December" };
+const ABBREVIATED_MONTH_RE = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+(\d{1,2})(st|nd|rd|th)?(?:,\s*(\d{4}))?\b/gi;
+const SLASH_DATE_RE = /\b(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?\b/g;
+const YEAR_CONTEXT_RE = /\b(in|since|by|until|before|after|during|from|of|circa|year|class of)\s+(1[1-9]\d{2}|20\d{2})\b/gi;
 
 function spokenYear(year: number): string {
   // "2026" -> "twenty twenty-six", the way a person actually says a
   // four-digit year, not "two thousand twenty-six" (also correct, just
   // not how a home assistant register talks). Years before 1000 or
-  // outside a clean century split (e.g. 2005) fall back to a plain
-  // cardinal read, which is still perfectly natural for those cases
-  // ("nineteen oh five" isn't worth a special rule this domain never
-  // exercises).
-  if (year >= 2000 && year <= 2099) {
+  // Years use the familiar century-plus-pair reading, including the
+  // spoken "oh" in years whose second pair is a single digit.
+  if (year === 2000) return "two thousand";
+  if (year >= 2001 && year <= 2009) return `two thousand ${twoDigitsToWords(year - 2000)}`;
+  if (year >= 2010 && year <= 2099) {
     const rest = year - 2000;
-    return rest === 0 ? "twenty hundred" : `twenty ${twoDigitsToWords(rest)}`;
+    return `twenty ${twoDigitsToWords(rest)}`;
   }
-  if (year >= 1000 && year <= 1999 && year % 100 !== 0) {
-    return `${twoDigitsToWords(Math.floor(year / 100))} ${twoDigitsToWords(year % 100)}`;
+  if (year >= 1100 && year <= 1999) {
+    const century = Math.floor(year / 100);
+    const rest = year % 100;
+    if (rest === 0) return `${twoDigitsToWords(century)} hundred`;
+    if (rest < 10) return `${twoDigitsToWords(century)} oh ${ONES[rest]}`;
+    return `${twoDigitsToWords(century)} ${twoDigitsToWords(rest)}`;
   }
   return numberToWords(year);
 }
@@ -201,7 +209,35 @@ function normalizeDates(text: string): string {
     if (!month) return _whole; // an out-of-range month isn't a real date; leave it untouched
     return `${month} ${ordinalWords(Number(d))}, ${spokenYear(Number(y))}`;
   });
+  s = s.replace(ABBREVIATED_MONTH_RE, (_whole, rawMonth: string, day: string, _ordinal: string, year: string | undefined) => {
+    const month = rawMonth.toLowerCase() === "may" ? "May" : MONTH_ABBREVIATIONS[rawMonth.toLowerCase()];
+    const spoken = `${month} ${ordinalWords(Number(day))}`;
+    return year ? `${spoken}, ${spokenYear(Number(year))}` : spoken;
+  });
+  s = s.replace(SLASH_DATE_RE, (whole, mo: string, d: string, y: string | undefined, offset: number, source: string) => {
+    const month = Number(mo), day = Number(d), year = y ? Number(y) : undefined;
+    const after = source.slice(offset + whole.length);
+    if (month < 1 || month > 12 || day < 1 || day > 31 || (year === undefined && /^\s*(?:cup|teaspoons?|tsp|tbsp|inches?|inch|miles?)\b/i.test(after))) return whole;
+    const leapYear = year === undefined || (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
+    const maxDay = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1]!;
+    if (day > maxDay) return whole;
+    const spoken = `${MONTHS[month - 1]} ${ordinalWords(day)}`;
+    return year ? `${spoken}, ${spokenYear(year)}` : spoken;
+  });
+  s = s.replace(YEAR_CONTEXT_RE, (_whole, prefix: string, year: string) => `${prefix} ${spokenYear(Number(year))}`);
   return s;
+}
+
+const PHONE_RE = /(?<![\d.])((?:\+1\s*|1-)?(?:\(\d{3}\)\s*|\d{3}[-.])\d{3}[-.]\d{4})(?!\d)/g;
+function normalizePhones(text: string): string {
+  return text.replace(PHONE_RE, (_whole, raw: string) => {
+    let s = raw;
+    let prefix = "";
+    if (s.startsWith("+1")) { prefix = "plus one, "; s = s.slice(2).trim(); }
+    else if (s.startsWith("1-")) { prefix = "one, "; s = s.slice(2); }
+    const digits = s.replace(/\D/g, "");
+    return prefix + `${[...digits.slice(0, 3)].map((d) => ONES[Number(d)]).join(" ")}, ${[...digits.slice(3, 6)].map((d) => ONES[Number(d)]).join(" ")}, ${[...digits.slice(6)].map((d) => ONES[Number(d)]).join(" ")}`;
+  });
 }
 
 // ── Currency ─────────────────────────────────────────────────────────────
@@ -416,6 +452,7 @@ function tidyWhitespace(text: string): string {
 export function normalizeForSpeech(text: string): string {
   let s = stripMarkupForSpeech(text);
   s = normalizeDates(s);
+  s = normalizePhones(s);
   s = normalizeTimes(s);
   s = normalizeCurrency(s);
   s = normalizePercent(s);
