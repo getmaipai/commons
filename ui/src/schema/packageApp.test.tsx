@@ -319,6 +319,29 @@ describe("picker and page state", () => {
     expect(reopened.getByTestId("where").textContent).toBe("/apps/demo?place=pl1");
   });
 
+  test("choosing a place starts the page from the top, and the first render keeps its place", async () => {
+    const scrollTo = mock(() => {});
+    const original = HTMLElement.prototype.scrollTo;
+    HTMLElement.prototype.scrollTo = scrollTo as never;
+    try {
+      const view = renderPage();
+      await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/demo/data/places")).toBe(true));
+      expect(scrollTo).not.toHaveBeenCalled();
+      await choose(view, "Grandma's house");
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledWith({ top: 0 }));
+    } finally {
+      HTMLElement.prototype.scrollTo = original;
+    }
+  });
+
+  test("floatingBar leaves room at the end of the page and the page still scrolls to the screen edge", () => {
+    const plain = renderWithQueryClient(<MemoryRouter><SchemaPage page={page} packageId="demo" /></MemoryRouter>);
+    expect(plain.container.querySelector(".overflow-y-auto > .pb-24")).toBeNull();
+    cleanup();
+    const floating = renderWithQueryClient(<MemoryRouter><SchemaPage page={page} packageId="demo" floatingBar /></MemoryRouter>);
+    expect(floating.container.querySelector(".overflow-y-auto > .pb-24")).not.toBeNull();
+  });
+
   test("the saved places come from the package's rows and choosing one refetches with it", async () => {
     const view = renderPage();
     await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/demo/data/places")).toBe(true));

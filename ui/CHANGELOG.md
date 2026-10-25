@@ -1,3 +1,7 @@
+## [ui-v0.5.339] - 2026-10-25
+
+- `SchemaPage` starts a page from the top when a chip, tab or place is chosen, and takes `floatingBar` so the page scrolls to the screen edge and ends with room for a floating `PhoneNav`.
+
 ## [ui-v0.5.331] - 2026-10-25
 
 - `SchemaPage` writes a package page's own choices (a topic chip, a tab, a picked place, a submitted search) into the address, replacing the entry in place, and reads them back on arrival, so every view reloads, shares and goes back the same. Text still being typed into a search box stays out of the address.

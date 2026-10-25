@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Page } from "@/kit/primitives/Page";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
@@ -41,6 +41,7 @@ export function SchemaPage({
   packageId,
   hideTitle,
   sidebar,
+  floatingBar,
 }: {
   page: unknown;
   beforeBody?: ReactNode;
@@ -48,6 +49,8 @@ export function SchemaPage({
   hideTitle?: boolean;
   /** The app draws its own sidebar column beside this page: the page's plain search box gives way to it from `lg` up. */
   sidebar?: boolean;
+  /** A floating bar (PhoneNav's floating variant) sits over the bottom of this page: the page scrolls to the screen edge and ends with room for the bar. */
+  floatingBar?: boolean;
 }) {
   const parsed = PageNodeSchema.parse(page);
   // NEWS-00: a `navigate` action's `state` arrives as router state and is written into this page's state (a channel
@@ -75,6 +78,15 @@ export function SchemaPage({
     if (wanted === current.toString()) return;
     navigate(`${location.pathname}${wanted ? `?${wanted}` : ""}`, { replace: true, state: { ...(location.state as object | null), pageState: Object.fromEntries(params) } });
   }, [packageId, state, typedKeys, location.pathname, location.search, location.state, navigate]);
+  // Choosing a chip, tab or place shows a different list: start it from the top. The first render keeps its place.
+  const scroller = useRef<HTMLDivElement>(null);
+  const chosen = useRef<string | null>(null);
+  useEffect(() => {
+    if (!packageId) return;
+    const key = new URLSearchParams(Object.entries(state).filter(([name, value]) => typeof value === "string" && value !== "" && !typedKeys.has(name)) as [string, string][]).toString();
+    if (chosen.current !== null && chosen.current !== key) scroller.current?.scrollTo({ top: 0 });
+    chosen.current = key;
+  }, [packageId, state, typedKeys]);
   const writer = useMemo<PageStateWriter>(
     () => ({
       merge: (patch) =>
@@ -96,10 +108,10 @@ export function SchemaPage({
        <PageSidebarContext.Provider value={sidebar === true}>
         <Page title={parsed.title} hideTitle={hideTitle} tone={parsed.tone}>
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent). */}
-          <div tabIndex={0} className={cn("flex min-w-0 flex-1 flex-col overflow-y-auto", FOCUS_RING)}>
+          <div ref={scroller} tabIndex={0} className={cn("flex min-w-0 flex-1 flex-col overflow-y-auto", FOCUS_RING)}>
             {/* The padding lives on this inner box, not on the scroller: a sticky child (the article toolbar) would otherwise stick
                 at the padding's inner edge and let the text scroll through the gap above it. */}
-            <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
+            <div className={cn("flex min-w-0 flex-1 flex-col gap-6 p-4", floatingBar && "pb-24")}>
               {beforeBody}
               <NodeRenderer node={parsed} state={state} />
             </div>
