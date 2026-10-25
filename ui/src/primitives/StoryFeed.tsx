@@ -75,6 +75,7 @@ export interface StoryFeedProps {
   /** Which actions the page declared; the menu and buttons show only these. Default: open only. */
   available?: readonly StoryAction[];
   className?: string;
+  density?: "default" | "kid";
 }
 
 const DEFAULT_AVAILABLE: readonly StoryAction[] = ["open"];
@@ -158,16 +159,17 @@ function StoryImage({ story, ratio, large, hero, thumbnail }: { story: StoryCard
   );
 }
 
-function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier: "hero" | "featured" | "half" | "shelf" | "tall" }) {
+function StoryCard({ story, ctx, tier, phone }: { story: StoryCardData; ctx: Ctx; tier: "hero" | "featured" | "half" | "shelf" | "tall"; phone?: boolean }) {
   const open = () => ctx.onAction?.("open", { story_id: story.story_id, item_id: story.item_id });
   const hero = tier === "hero";
   return (
     <Card
       data-slot="story-card"
       data-tier={tier}
+      data-phone-card={phone ? "" : undefined}
       data-opened={story.opened ? "" : undefined}
       interactive
-      className={cn("relative gap-0 py-0", tier !== "hero" && tier !== "featured" && "h-full", tier === "hero" && "lg:col-span-8 lg:row-span-2", tier === "featured" && "lg:col-span-4", tier === "half" && "lg:col-span-6", tier === "shelf" && "w-64 shrink-0 snap-start")}
+      className={cn("relative gap-0 py-0", phone && "border-0 ring-0 rounded-[var(--radius-card)] bg-card", tier !== "hero" && tier !== "featured" && "h-full", tier === "hero" && "lg:col-span-8 lg:row-span-2", tier === "featured" && "lg:col-span-4", tier === "half" && "lg:col-span-6", tier === "shelf" && "w-64 shrink-0 snap-start", phone && !story.image && "max-[639.98px]:col-span-2")}
     >
       <StoryImage story={story} ratio={hero ? 16 / 9 : tier === "shelf" ? 4 / 3 : 16 / 9} large={hero} hero={hero} />
       <CardContent className="flex flex-1 flex-col gap-2 py-4">
@@ -180,7 +182,7 @@ function StoryCard({ story, ctx, tier }: { story: StoryCardData; ctx: Ctx; tier:
         >
           {story.title}
         </button>
-        {story.dek && (hero || tier === "half") ? <p className="text-muted-foreground line-clamp-2 text-sm">{story.dek}</p> : null}
+        {story.dek && (hero || tier === "half") ? <p data-slot="story-dek" className={cn("text-muted-foreground line-clamp-2 text-sm", phone && hero && "max-[639.98px]:hidden")}>{story.dek}</p> : null}
         <StoryCardFooter story={story} ctx={ctx} />
       </CardContent>
     </Card>
@@ -397,7 +399,7 @@ function Shelf({ shelf, ctx }: { shelf: NonNullable<StoryFeedData["shelves"]>[nu
  * under 640 px, two to 960 px. Draws only what the hub sent, already floored for the viewer's band: it holds no
  * ranking, no fetch and no link of its own, and fires `onAction` with the story's own ids for the page to resolve.
  */
-export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, className }: StoryFeedProps) {
+export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, className, density = "default" }: StoryFeedProps) {
   const ctx: Ctx = { onAction, available };
   const featured = data.featured ?? [];
   const section = data.layout === "channel";
@@ -408,7 +410,7 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
   const rows = styled ? lead.slice(used) : section ? [...featured, ...(data.rows ?? [])] : (data.rows ?? []);
   const empty = !data.hero && featured.length === 0 && rows.length === 0 && (data.shelves ?? []).every((s) => s.stories.length === 0);
   return (
-    <section data-slot="story-feed" data-layout={data.layout} aria-label={data.header?.title ?? "Stories"} className={cn("flex min-w-0 flex-col gap-6", className)}>
+    <section data-slot="story-feed" data-layout={data.layout} data-density={density === "kid" ? "kid" : undefined} aria-label={data.header?.title ?? "Stories"} className={cn("flex min-w-0 flex-col gap-6", className)}>
       {data.header ? <ChannelHeader header={data.header} ctx={ctx} /> : null}
       <FilterChips filters={data.filters ?? []} ctx={ctx} />
       {empty ? (
@@ -423,10 +425,10 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
       {styled ? <StyledSection style={styled} stories={lead} ctx={ctx} /> : null}
       {section && !styled && data.hero ? <StoryLead story={data.hero} ctx={ctx} /> : null}
       {data.layout !== "rows" && !section && (data.hero || featured.length > 0) ? (
-        <div data-slot="story-grid" className="grid min-w-0 grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-12">
-          {data.hero ? <StoryCard story={data.hero} ctx={ctx} tier="hero" /> : null}
+        <div data-slot="story-grid" className={cn("grid min-w-0 grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-12", density === "kid" ? "" : "max-[639.98px]:grid-cols-1 max-[639.98px]:gap-2 min-[360px]:max-[639.98px]:grid-cols-2")}>
+          {data.hero ? <StoryCard story={data.hero} ctx={ctx} tier="hero" phone /> : null}
           {featured.map((story, index) => (
-            <StoryCard key={story.story_id} story={story} ctx={ctx} tier={data.hero && index < 2 ? "featured" : "half"} />
+            <StoryCard key={story.story_id} story={story} ctx={ctx} tier={data.hero && index < 2 ? "featured" : "half"} phone />
           ))}
         </div>
       ) : null}

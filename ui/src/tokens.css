@@ -759,6 +759,32 @@
   --weather-scrim-remove: rgb(0 0 0 / 0.3);
 }
 
+@media (max-width: 639.98px) {
+  :root { --story-hero-ratio: 4 / 3; }
+  [data-slot="story-filters"],
+  [data-slot="tabs-list"][data-variant="pill"] {
+    touch-action: pan-x;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  [data-slot="story-filters"]::-webkit-scrollbar,
+  [data-slot="tabs-list"][data-variant="pill"]::-webkit-scrollbar { display: none; }
+  [data-slot="tabs-list"][data-variant="pill"] [data-slot="tabs-trigger"] {
+    min-height: 44px;
+    height: auto;
+  }
+  [data-slot="story-filters"] [data-slot="tabs-trigger"] { min-height: 48px; }
+  [data-slot="tabs-list"][data-variant="pill"] [data-slot="tabs-trigger"]:active { transform: none; }
+  [data-slot="story-card"][data-phone-card] { border: 0; border-radius: var(--radius-card); background: var(--card); box-shadow: none; }
+  [data-slot="story-card"][data-phone-card]:not([data-tier="hero"]) [data-slot="story-kicker"] { display: none; }
+  [data-slot="story-card"][data-phone-card] [data-slot="story-dek"] { display: none; }
+}
+
+[data-slot="story-grid"] [data-slot="story-card"][data-phone-card]:not(:has([data-slot="story-image"] img)) { grid-column: 1 / -1; }
+
 @media (max-width: 639px) {
   [data-phone-shell] button,
   [data-phone-shell] a {

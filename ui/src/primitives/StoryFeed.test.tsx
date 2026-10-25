@@ -23,12 +23,36 @@ describe("StoryFeed", () => {
     expect(container.querySelectorAll('[data-tier="featured"]')).toHaveLength(2);
     const feedGrid = container.querySelector('[data-slot="story-grid"]')!;
     expect(feedGrid.className).toContain("items-stretch");
+    expect(feedGrid.className).toContain("grid-cols-2");
+    expect(feedGrid.className).toContain("min-[360px]:max-[639.98px]:grid-cols-2");
+    expect(feedGrid.className).toContain("gap-2");
     expect(feedGrid.querySelector('[data-tier="hero"]')!.className).not.toContain("h-full");
     expect(feedGrid.querySelector('[data-tier="featured"]')!.className).not.toContain("h-full");
     expect(container.querySelectorAll('[data-tier="shelf"]')).toHaveLength(1);
     expect(container.querySelectorAll('[data-slot="story-rows"] li')).toHaveLength(1);
     expect(getByText("Headline 1")).toBeTruthy();
     expect(getByText("Today")).toBeTruthy();
+  });
+
+  test("kid density keeps the story grid in one column", () => {
+    const { container } = render(<StoryFeed data={data} density="kid" />);
+    expect(container.querySelector('[data-slot="story-feed"]')?.getAttribute("data-density")).toBe("kid");
+    expect(container.querySelector('[data-slot="story-grid"]')?.className).toContain("grid-cols-1");
+  });
+
+  test("a pictureless card spans both phone columns", () => {
+    const { container } = render(<StoryFeed data={{ ...data, featured: [{ ...data.featured![0]!, image: undefined }] }} />);
+    expect(container.querySelector('[data-tier="featured"]')?.className).toContain("max-[639.98px]:col-span-2");
+  });
+
+  test("the hero kicker is visible on phone and its dek is only rendered at sm and wider", () => {
+    const story = { ...data.hero!, kicker: "Lead kicker", dek: "Lead dek" };
+    const { container, rerender } = render(<StoryFeed data={{ ...data, hero: story }} />);
+    const hero = container.querySelector('[data-tier="hero"]')!;
+    expect(hero.querySelector('[data-slot="story-kicker"]')).not.toBeNull();
+    expect(hero.querySelector('[data-slot="story-dek"]')?.className).toContain("max-[639.98px]:hidden");
+    rerender(<StoryFeed data={{ ...data, hero: story }} density="default" />);
+    expect(container.querySelector('[data-tier="hero"] [data-slot="story-dek"]')?.textContent).toBe("Lead dek");
   });
 
   test("straight card rows stretch each card to its grid row, while the hero stack keeps its special layout", () => {
