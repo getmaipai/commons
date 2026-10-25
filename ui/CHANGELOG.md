@@ -1,3 +1,7 @@
+## [ui-v0.5.343] - 2026-10-25
+
+- An element marked `data-top-row-hide` inside the shell bar is hidden on a phone while chips or the reader take the bar row.
+
 ## [ui-v0.5.342] - 2026-10-25
 
 - The phone chip strip in the shell bar row is a frosted band over the page color, so stories blur beneath it as they scroll.

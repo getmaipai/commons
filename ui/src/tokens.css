@@ -766,6 +766,7 @@
      look): the feed's title block gives way, and the strip stays at the top while the stories scroll beneath it. */
   html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]) [data-slot="rail-page-header"] { position: fixed; inset: 0 auto auto 0; width: auto; border: 0; background: transparent; padding-inline: 0.5rem; z-index: 40; }
   html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]) [data-slot="story-feed"] > [data-slot="story-header"] { display: none; }
+  html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]) [data-top-row-hide], html[data-app-reading] [data-top-row-hide] { display: none; }
   html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]) [data-slot="story-feed"] > [data-slot="tabs"] { position: sticky; top: 0; z-index: 5; display: flex; flex-direction: column; justify-content: center; min-height: 4rem; margin: -1rem -1rem 0; padding: 0 1rem 0 3.75rem; background: color-mix(in srgb, var(--page, var(--background)) 86%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4); }
   html[data-app-reading] [data-slot="rail-page-header"] { position: fixed; inset: 0 auto auto 0; width: auto; border: 0; background: transparent; padding-inline: 0.5rem; }
   html[data-app-reading] [data-slot="article-toolbar"] { margin-top: -0.5rem; padding-inline-start: 3.75rem; }
