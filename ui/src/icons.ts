@@ -13,6 +13,8 @@ import {
   SkipBack,
   SkipForward,
   Smartphone,
+  Phone,
+  Menu,
   Volume1,
   CloudOff,
   CloudSun,
@@ -297,6 +299,8 @@ export const icons = {
   "skip-back": SkipBack,
   "skip-forward": SkipForward,
   smartphone: Smartphone,
+  phone: Phone,
+  menu: Menu,
   "volume-1": Volume1,
 } as const;
 

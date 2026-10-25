@@ -25,6 +25,10 @@
 
 # Changelog (`@maipai/ui`)
 
+## [Unreleased]
+
+- Add `CharacterTile`, `CharacterHero` and `ChatHeader` for companion screens, with round character media, name pills, optional actions and chat controls.
+
 ## [0.5.320] - ui-v0.5.320
 
 - SECTION-SIDEBAR-TAP-01: the compact `SectionSidebar` column (Chat's density) is marked `data-touch-target-exempt`, as Chat's rail is, so its 24px controls and 36px rows are not flagged by the 48px tap-target audit. Comfortable columns are unchanged. Additive.
