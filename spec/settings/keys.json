@@ -3707,6 +3707,56 @@
     ]
   },
   {
+    "key": "ui.home_layout",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "shelves",
+        "ask",
+        "board"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "default": "shelves",
+    "label": "Home layout",
+    "help": "Choose how Home is arranged; this only changes its layout.",
+    "level": "basic",
+    "copy": {
+      "does": "Changes how Home is arranged.",
+      "does_child": "Home keeps the simple arrangement.",
+      "options": {
+        "shelves": "Your shows, music and things you made are up front with the day beside them.",
+        "ask": "The ask box comes first, then where you left off.",
+        "board": "A grid of your day, cards and lists."
+      },
+      "option_labels": {
+        "shelves": "Shelves",
+        "ask": "Ask first",
+        "board": "Today board"
+      }
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "self",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": "ask",
+      "teen": "shelves",
+      "adult": "shelves"
+    },
+    "secret": false,
+    "lives_in": "profile.appearance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "ui.pinned_apps",
     "scope": "person",
     "selector": "text",
