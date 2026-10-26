@@ -51,6 +51,10 @@
 
 # Changelog (`@maipai/ui`)
 
+## [ui-v0.5.347] - 2026-10-25
+
+Same as 0.5.346, whose tag was cut before `ui/package.json` carried its version.
+
 ## [ui-v0.5.346] - 2026-10-25
 
 - Thread optionally marks an assistant reply when `answered_by` names a new companion, including the one-question mention label.
