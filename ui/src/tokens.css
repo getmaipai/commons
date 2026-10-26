@@ -766,7 +766,7 @@
      look): the feed's title block gives way, and the strip stays at the top while the stories scroll beneath it. */
   html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]) [data-slot="rail-page-header"] { position: fixed; inset: 0 auto auto 0; width: auto; border: 0; background: transparent; padding-inline: 0.5rem; z-index: 40; }
   html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-page-header"] { position: fixed; inset: 0 auto auto 0; width: auto; border: 0; background: transparent; padding-inline: 0.5rem; z-index: 40; }
-  html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-page-header"]::before { content: ""; position: absolute; inset: 0 0 auto; height: 6rem; background: linear-gradient(to bottom, rgb(0 0 0 / 0.55), transparent); pointer-events: none; }
+  html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-page-header"]::before { content: ""; position: absolute; inset: 0 0 auto; height: 6rem; background: linear-gradient(to bottom, color-mix(in srgb, var(--background) 60%, transparent), transparent); pointer-events: none; }
   html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-body"] { padding-top: 0; }
   html:has([data-slot="player"][data-layout="video"]) [data-slot="player"] { margin-inline: -1rem; margin-top: -1rem; border-radius: 0; }
   html:has([data-slot="player"][data-layout="video"]) [data-slot="player"] [data-slot="aspect-ratio"] { border-radius: 0; }
