@@ -381,7 +381,11 @@ export function SectionSidebar({
                       aria-label={search.label}
                       aria-expanded={searchOpen}
                       title={search.label}
-                      onClick={() => setSearchOpen(true)}
+                      onClick={() => {
+                        // Opening search shows the column too: a hidden column is never left with its field open out of view.
+                        if (collapsed && onCollapsedChange) onCollapsedChange(false);
+                        setSearchOpen(true);
+                      }}
                       className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                     >
                       <SearchIcon aria-hidden className="size-4.5" />

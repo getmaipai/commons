@@ -1,3 +1,7 @@
+## [ui-v0.5.360] - 2026-10-26
+
+- SECTION-SIDEBAR-SEARCH-01: in a compact `SectionSidebar`, opening search from its header icon also expands a collapsed column (calls `onCollapsedChange(false)`), so the field and its results are on screen. Additive.
+
 ## [ui-v0.5.359] - 2026-10-26
 
 - AIMODELS-2026-10-25: a settings card may carry `view`, `description` and `choices` (the spec 0.1.238 job cards); `visibleCards` keeps a view card that has no group, so the host can draw its own view for it.

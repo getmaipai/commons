@@ -469,6 +469,13 @@ describe("SectionSidebar", () => {
     expect(row.className).toContain("h-9");
   });
 
+  test("opening search from a collapsed compact column asks for the column to expand", () => {
+    const onCollapsedChange = mock((_c: boolean) => {});
+    const { container } = column({ density: "compact", standalone: true, collapsed: true, onCollapsedChange, search: { value: "", onChange: () => {}, label: "Search Chat" } });
+    fireEvent.click(container.querySelector('[data-slot="section-sidebar-search"]') as HTMLElement);
+    expect(onCollapsedChange).toHaveBeenCalledWith(false);
+  });
+
   test("the compact column opens its search field from a header icon, as Chat's does", () => {
     const { container } = column({ density: "compact", search: { value: "", onChange: () => {}, label: "Search News" } });
     expect(container.querySelector('input[type="search"]')).toBeNull();
