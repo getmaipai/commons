@@ -2181,6 +2181,241 @@ export const PluginResult = z
                     .strict(),
                 })
                 .strict(),
+              z
+                .object({
+                  /**Stable identity of this block. Unique within a turn's block list.*/
+                  id: z
+                    .string()
+                    .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+                    .describe(
+                      "Stable identity of this block. Unique within a turn's block list.",
+                    ),
+                  kind: z.literal("media_card"),
+                  schema_version: z.literal(1),
+                  /**The id of the package that returned the block.*/
+                  producer: z
+                    .string()
+                    .min(1)
+                    .describe("The id of the package that returned the block."),
+                  /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+                  alt: z
+                    .string()
+                    .min(1)
+                    .max(300)
+                    .describe(
+                      "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+                    ),
+                  /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+                  min_band: z
+                    .enum(["child", "teen", "adult"])
+                    .describe(
+                      "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+                    )
+                    .optional(),
+                  /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+                  provenance: z
+                    .string()
+                    .min(1)
+                    .describe(
+                      "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+                    ),
+                  created_at: z.string().datetime({ offset: true }),
+                  /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+                  hlc: z
+                    .string()
+                    .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
+                    .describe(
+                      "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+                    ),
+                  /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+                  after_paragraph: z
+                    .number()
+                    .int()
+                    .gte(0)
+                    .describe(
+                      "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+                    )
+                    .optional(),
+                  props: z
+                    .object({
+                      cover: z
+                        .object({
+                          /**Hub cache image reference only; never a remote URL.*/
+                          src: z
+                            .string()
+                            .regex(new RegExp("^hubimg-[a-f0-9]{8,}$"))
+                            .describe(
+                              "Hub cache image reference only; never a remote URL.",
+                            ),
+                          alt: z.string().min(1),
+                        })
+                        .strict()
+                        .optional(),
+                      title: z.string().min(1),
+                      subtitle: z.string().optional(),
+                      facts: z
+                        .array(
+                          z
+                            .object({
+                              label: z.string().min(1),
+                              value: z.string().min(1),
+                            })
+                            .strict(),
+                        )
+                        .max(3)
+                        .optional(),
+                      actions: z
+                        .array(z.enum(["open_app", "call", "play", "undo"]))
+                        .max(3)
+                        .refine(
+                          (arr) =>
+                            arr.every((item, i) => arr.indexOf(item) == i),
+                          "All items must be unique!",
+                        ),
+                    })
+                    .strict(),
+                })
+                .strict(),
+              z
+                .object({
+                  /**Stable identity of this block. Unique within a turn's block list.*/
+                  id: z
+                    .string()
+                    .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+                    .describe(
+                      "Stable identity of this block. Unique within a turn's block list.",
+                    ),
+                  kind: z.literal("confirmation"),
+                  schema_version: z.literal(1),
+                  /**The id of the package that returned the block.*/
+                  producer: z
+                    .string()
+                    .min(1)
+                    .describe("The id of the package that returned the block."),
+                  /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+                  alt: z
+                    .string()
+                    .min(1)
+                    .max(300)
+                    .describe(
+                      "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+                    ),
+                  /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+                  min_band: z
+                    .enum(["child", "teen", "adult"])
+                    .describe(
+                      "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+                    )
+                    .optional(),
+                  /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+                  provenance: z
+                    .string()
+                    .min(1)
+                    .describe(
+                      "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+                    ),
+                  created_at: z.string().datetime({ offset: true }),
+                  /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+                  hlc: z
+                    .string()
+                    .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
+                    .describe(
+                      "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+                    ),
+                  /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+                  after_paragraph: z
+                    .number()
+                    .int()
+                    .gte(0)
+                    .describe(
+                      "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+                    )
+                    .optional(),
+                  props: z
+                    .object({
+                      icon: z.enum([
+                        "check",
+                        "clock",
+                        "lightbulb",
+                        "lock",
+                        "music",
+                        "list",
+                      ]),
+                      sentence: z.string().min(1).max(300),
+                      undo: z
+                        .object({
+                          label: z.literal("Undo"),
+                          action: z.literal("undo"),
+                        })
+                        .strict()
+                        .optional(),
+                    })
+                    .strict(),
+                })
+                .strict(),
+              z
+                .object({
+                  /**Stable identity of this block. Unique within a turn's block list.*/
+                  id: z
+                    .string()
+                    .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+                    .describe(
+                      "Stable identity of this block. Unique within a turn's block list.",
+                    ),
+                  kind: z.literal("countdown"),
+                  schema_version: z.literal(1),
+                  /**The id of the package that returned the block.*/
+                  producer: z
+                    .string()
+                    .min(1)
+                    .describe("The id of the package that returned the block."),
+                  /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+                  alt: z
+                    .string()
+                    .min(1)
+                    .max(300)
+                    .describe(
+                      "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+                    ),
+                  /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+                  min_band: z
+                    .enum(["child", "teen", "adult"])
+                    .describe(
+                      "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+                    )
+                    .optional(),
+                  /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+                  provenance: z
+                    .string()
+                    .min(1)
+                    .describe(
+                      "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+                    ),
+                  created_at: z.string().datetime({ offset: true }),
+                  /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+                  hlc: z
+                    .string()
+                    .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
+                    .describe(
+                      "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+                    ),
+                  /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+                  after_paragraph: z
+                    .number()
+                    .int()
+                    .gte(0)
+                    .describe(
+                      "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+                    )
+                    .optional(),
+                  props: z
+                    .object({
+                      label: z.string().min(1),
+                      endsAt: z.string().datetime({ offset: true }),
+                    })
+                    .strict(),
+                })
+                .strict(),
             ];
             const { errors, failed } = schemas.reduce<{
               errors: z.core.$ZodIssue[];

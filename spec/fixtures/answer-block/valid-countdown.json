@@ -1,0 +1,11 @@
+{
+  "id": "blk-countd123",
+  "kind": "countdown",
+  "schema_version": 1,
+  "producer": "timer",
+  "alt": "Pasta timer, ending at 12:05 PM.",
+  "provenance": "timer call",
+  "created_at": "2026-10-25T12:00:00Z",
+  "hlc": "1792939200000:0:hub001",
+  "props": { "label": "Pasta timer", "endsAt": "2026-10-25T16:05:00Z" }
+}

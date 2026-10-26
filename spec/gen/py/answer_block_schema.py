@@ -892,6 +892,173 @@ class ArticleNote(BaseModel):
     text: str
 
 
+class Cover(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    src: constr(pattern=r'^hubimg-[a-f0-9]{8,}$') = Field(
+        ..., description='Hub cache image reference only; never a remote URL.'
+    )
+    alt: constr(min_length=1)
+
+
+class Fact(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: constr(min_length=1)
+    value: constr(min_length=1)
+
+
+class Props11(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    cover: Cover | None = None
+    title: constr(min_length=1)
+    subtitle: str | None = None
+    facts: list[Fact] | None = Field(None, max_length=3)
+    actions: list[Literal['open_app', 'call', 'play', 'undo']] = Field(
+        ..., max_length=3
+    )
+
+
+class MediaCard(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['media_card']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props11
+
+
+class Undo(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: Literal['Undo']
+    action: Literal['undo']
+
+
+class Props12(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    icon: Literal['check', 'clock', 'lightbulb', 'lock', 'music', 'list']
+    sentence: constr(min_length=1, max_length=300)
+    undo: Undo | None = None
+
+
+class Confirmation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['confirmation']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props12
+
+
+class Props13(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: constr(min_length=1)
+    endsAt: AwareDatetime
+
+
+class Countdown(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['countdown']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props13
+
+
 class ArticleQuote(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

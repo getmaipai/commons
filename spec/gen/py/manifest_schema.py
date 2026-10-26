@@ -850,6 +850,9 @@ class PackageManifest(BaseModel):
                 'weather_card',
                 'story_feed',
                 'article',
+                'media_card',
+                'confirmation',
+                'countdown',
             ]
         ]
         | None

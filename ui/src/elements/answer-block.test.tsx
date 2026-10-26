@@ -87,6 +87,30 @@ describe("AnswerBlockView renders each v1 kind with its Element", () => {
     expect(container.querySelector('[data-slot="comparison-card"]')).not.toBeNull();
     expect(getByText("Smaller home, mostly floors.")).toBeTruthy();
   });
+
+  test("media_card renders a cover, facts and actions without route data", () => {
+    const actions: string[] = [];
+    const { container, getByText } = render(<AnswerBlockView block={fixture("media_card")} resolveImageSrc={(src) => `/api/answer-image/${src}`} onAction={(_id, action) => actions.push(action)} />);
+    expect(container.querySelector('[data-slot="media-card"]')).not.toBeNull();
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/api/answer-image/hubimg-4f2a9c01");
+    expect(getByText("Jo Lee")).toBeTruthy();
+    fireEvent.click(getByText("open app"));
+    expect(actions).toEqual(["open_app"]);
+  });
+
+  test("confirmation reports its data action", () => {
+    const actions: string[] = [];
+    const { container, getByText } = render(<AnswerBlockView block={fixture("confirmation")} onAction={(_id, action) => actions.push(action)} />);
+    expect(container.querySelector('[data-slot="confirmation"]')).not.toBeNull();
+    fireEvent.click(getByText("Undo"));
+    expect(actions).toEqual(["undo"]);
+  });
+
+  test("countdown reaches its own expired state without motion", () => {
+    const { container, getByText } = render(<AnswerBlockView block={{ ...fixture("countdown"), props: { ...fixture("countdown").props, endsAt: "2000-01-01T00:00:00Z" } }} />);
+    expect(container.querySelector('[data-slot="countdown"]')?.hasAttribute("data-expired")).toBe(true);
+    expect(getByText("Time is up")).toBeTruthy();
+  });
 });
 
 describe("AnswerBlockView weather_card", () => {
@@ -208,6 +232,7 @@ describe("AnswerBlockView compact", () => {
     expect(container.querySelectorAll('[data-slot="weather-day"]')).toHaveLength(0);
   });
 });
+
 
 describe("AnswerBlockView wide", () => {
   test("wide reaches the weather card, which draws hourly", () => {

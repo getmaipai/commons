@@ -14,12 +14,15 @@
     { "$ref": "#/$defs/comparison" },
     { "$ref": "#/$defs/weather_card" },
     { "$ref": "#/$defs/story_feed" },
-    { "$ref": "#/$defs/article" }
+    { "$ref": "#/$defs/article" },
+    { "$ref": "#/$defs/media_card" },
+    { "$ref": "#/$defs/confirmation" },
+    { "$ref": "#/$defs/countdown" }
   ],
   "$defs": {
     "kind": {
       "type": "string",
-      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card", "story_feed", "article"],
+      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card", "story_feed", "article", "media_card", "confirmation", "countdown"],
       "description": "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here."
     },
     "block_id": {
@@ -1339,6 +1342,44 @@
         "text": {
           "type": "string"
         }
+      }
+    },
+    "media_card": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" }, "kind": { "const": "media_card" },
+        "schema_version": { "$ref": "#/$defs/schema_version" }, "producer": { "$ref": "#/$defs/producer" }, "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" }, "provenance": { "$ref": "#/$defs/provenance" }, "created_at": { "$ref": "#/$defs/created_at" }, "hlc": { "$ref": "#/$defs/hlc" }, "after_paragraph": { "$ref": "#/$defs/after_paragraph" },
+        "props": { "type": "object", "additionalProperties": false, "required": ["title", "actions"], "properties": {
+          "cover": { "type": "object", "additionalProperties": false, "required": ["src", "alt"], "properties": { "src": { "type": "string", "pattern": "^hubimg-[a-f0-9]{8,}$", "description": "Hub cache image reference only; never a remote URL." }, "alt": { "type": "string", "minLength": 1 } } },
+          "title": { "type": "string", "minLength": 1 }, "subtitle": { "type": "string" },
+          "facts": { "type": "array", "maxItems": 3, "items": { "type": "object", "additionalProperties": false, "required": ["label", "value"], "properties": { "label": { "type": "string", "minLength": 1 }, "value": { "type": "string", "minLength": 1 } } } },
+          "actions": { "type": "array", "items": { "type": "string", "enum": ["open_app", "call", "play", "undo"] }, "uniqueItems": true, "maxItems": 3 }
+        } }
+      }
+    },
+    "confirmation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" }, "kind": { "const": "confirmation" },
+        "schema_version": { "$ref": "#/$defs/schema_version" }, "producer": { "$ref": "#/$defs/producer" }, "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" }, "provenance": { "$ref": "#/$defs/provenance" }, "created_at": { "$ref": "#/$defs/created_at" }, "hlc": { "$ref": "#/$defs/hlc" }, "after_paragraph": { "$ref": "#/$defs/after_paragraph" },
+        "props": { "type": "object", "additionalProperties": false, "required": ["icon", "sentence"], "properties": {
+          "icon": { "type": "string", "enum": ["check", "clock", "lightbulb", "lock", "music", "list"] }, "sentence": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "undo": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "const": "Undo" }, "action": { "const": "undo" } } }
+        } }
+      }
+    },
+    "countdown": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" }, "kind": { "const": "countdown" },
+        "schema_version": { "$ref": "#/$defs/schema_version" }, "producer": { "$ref": "#/$defs/producer" }, "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" }, "provenance": { "$ref": "#/$defs/provenance" }, "created_at": { "$ref": "#/$defs/created_at" }, "hlc": { "$ref": "#/$defs/hlc" }, "after_paragraph": { "$ref": "#/$defs/after_paragraph" },
+        "props": { "type": "object", "additionalProperties": false, "required": ["label", "endsAt"], "properties": { "label": { "type": "string", "minLength": 1 }, "endsAt": { "type": "string", "format": "date-time" } } }
       }
     },
     "article_quote": {

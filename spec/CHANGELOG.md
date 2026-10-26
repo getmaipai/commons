@@ -1249,3 +1249,4 @@ Additive throughout; every existing fixture still validates unchanged.
 ## 0.1.196
 
 - SPEC-FLASH-MANIFEST-01: add the signed `FirmwareFlashManifest` schema, generated TypeScript and Python models, layout validation, catalog-compatible signing payload helpers, and StackChan ESP32-S3 fixture.
+- CHAT-CARDS-05: additive `media_card`, `confirmation` and `countdown` answer-block kinds, with hub-cache-only covers, semantic actions, optional Undo and client-side countdown expiry.

@@ -16,6 +16,9 @@ import todoList from "@maipai/spec/fixtures/answer-block/valid-todo_list.json";
 import weatherCard from "@maipai/spec/fixtures/answer-block/valid-weather_card.json";
 import storyFeed from "@maipai/spec/fixtures/answer-block/valid-story_feed.json";
 import article from "@maipai/spec/fixtures/answer-block/valid-article.json";
+import mediaCard from "@maipai/spec/fixtures/answer-block/valid-media_card.json";
+import confirmation from "@maipai/spec/fixtures/answer-block/valid-confirmation.json";
+import countdown from "@maipai/spec/fixtures/answer-block/valid-countdown.json";
 import { AnswerBlockView } from "./answer-block";
 import { ImageGallery } from "./image-gallery";
 
@@ -31,6 +34,9 @@ export const ANSWER_BLOCK_FIXTURES = {
   weather_card: weatherCard,
   story_feed: storyFeed,
   article,
+  media_card: mediaCard,
+  confirmation,
+  countdown,
 } as const;
 
 const unknownKind = {

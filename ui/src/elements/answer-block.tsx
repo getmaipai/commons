@@ -14,6 +14,9 @@ import { TodoList } from "./todo-list";
 import { WeatherCard } from "./weather-card";
 import { StoryFeed } from "../primitives/StoryFeed";
 import { ArticleView } from "../primitives/ArticleView";
+import { MediaCard } from "./media-card";
+import { Confirmation } from "./confirmation";
+import { Countdown } from "./countdown";
 
 /**
  * GENUI-03a: the web renderer for a spec `AnswerBlock`. It validates the
@@ -32,6 +35,8 @@ export interface AnswerBlockHandlers {
   onImageEdit?: (blockId: string, imageId: string) => void;
   /** A `schedule_card` toggle was pressed. Unset: the card is read-only. */
   onScheduleToggle?: (blockId: string) => void;
+  /** Media and confirmation actions carry a semantic name and block id, never a route. */
+  onAction?: (blockId: string, action: string) => void;
   /** Draw a block in its small form where its Element has one (today the
    * `weather_card`: the hero alone, for a dashboard card). Render-only. */
   compact?: boolean;
@@ -96,7 +101,7 @@ class Guard extends Component<
 // inferred type is `any`; `kind` selects which props shape the cast names.
 function renderKind(
   block: any,
-  { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide, news, onBack }: AnswerBlockHandlers,
+  { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, onAction, compact, wide, news, onBack }: AnswerBlockHandlers,
 ): ReactNode {
   const props = block.props;
   switch (block.kind) {
@@ -142,6 +147,12 @@ function renderKind(
       return <StoryFeed data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} />;
     case "article":
       return <ArticleView data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} ids={{ story_id: props.story_id, item_id: props.item_id }} onBack={onBack} />;
+    case "media_card":
+      return <MediaCard {...props} resolveImageSrc={resolveImageSrc} onAction={onAction && ((action) => onAction(block.id, action))} />;
+    case "confirmation":
+      return <Confirmation {...props} onUndo={onAction && (() => onAction(block.id, "undo"))} />;
+    case "countdown":
+      return <Countdown {...props} />;
     default:
       return null;
   }
@@ -153,6 +164,7 @@ export function AnswerBlockView({
   onImageOpen,
   onImageEdit,
   onScheduleToggle,
+  onAction,
   compact,
   wide,
   news,
@@ -185,7 +197,7 @@ export function AnswerBlockView({
         className={className}
         {...props}
       >
-        {renderKind(valid, { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, compact, wide, news, onBack })}
+        {renderKind(valid, { resolveImageSrc, onImageOpen, onImageEdit, onScheduleToggle, onAction, compact, wide, news, onBack })}
       </div>
     </Guard>
   );
