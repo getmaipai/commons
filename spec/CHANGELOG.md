@@ -1,3 +1,7 @@
+## [spec-v0.1.239] - 2026-10-26
+
+- Removed the LikenessAsk record and the household key `likeness.per_use` (the per-use consent step is dropped: models censor, the app filters only to protect kids). Nothing in Home reads either.
+
 ## [spec-v0.1.238] - 2026-10-26
 
 - Same content as spec-v0.1.237 (AI job cards), cut again because 0.1.237 was tagged before its package version was bumped. Use 0.1.238.
@@ -8,7 +12,7 @@
 
 ## [spec-v0.1.236] - 2026-10-26
 
-- PERUSE-2026-10-25: add the LikenessAsk record (one per-use consent ask; hash of the prompt, never its text) and the household setting `likeness.per_use` (boolean, off by default, honoured by Home). Additive.
+- Added the LikenessAsk record and the `likeness.per_use` key; both removed in spec-v0.1.239.
 
 ## [spec-v0.1.235] - 2026-10-25
 

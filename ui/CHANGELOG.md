@@ -1,3 +1,7 @@
+## [ui-v0.5.363] - 2026-10-26
+
+- Removed ApprovalCard `allowLabel` and `denyLabel` and the multi-line command wrapping added with them (the consent card they were for is dropped). Nothing uses them.
+
 ## [ui-v0.5.362] - 2026-10-26
 
 - SECTION-SIDEBAR-FOCUS-02: in a compact `SectionSidebar`, Escape in the search field closes it and returns focus to the header icon that opened it. Additive.
@@ -32,7 +36,7 @@
 
 ## [ui-v0.5.354] - 2026-10-26
 
-- ApprovalCard takes optional `allowLabel` and `denyLabel` (an ask worded Consent and Decline) and shows a long, multi-line `command` in full. Additive.
+- Added ApprovalCard `allowLabel` and `denyLabel`; removed in ui-v0.5.363.
 
 ## [ui-v0.5.353] - 2026-10-26
 

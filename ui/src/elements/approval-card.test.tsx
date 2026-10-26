@@ -99,31 +99,4 @@ describe("ApprovalCard", () => {
         ?.textContent,
     ).toBe("Ctrl Enter");
   });
-
-  test("allowLabel and denyLabel replace the button words", () => {
-    const calls: string[] = [];
-    const view = render(
-      <ApprovalCard
-        state="request"
-        title="Sage wants to make a picture"
-        subtitle="It includes adult content."
-        allowLabel="Consent"
-        denyLabel="Decline"
-        onAllowOnce={() => calls.push("allow")}
-        onDeny={() => calls.push("deny")}
-      />,
-    );
-    expect(view.queryByRole("button", { name: "Allow once" })).toBeNull();
-    expect(view.queryByRole("button", { name: "Deny" })).toBeNull();
-    fireEvent.click(view.getByRole("button", { name: "Consent" }));
-    fireEvent.click(view.getByRole("button", { name: "Decline" }));
-    expect(calls).toEqual(["allow", "deny"]);
-  });
-
-  test("a long multi-line command is shown in full", () => {
-    const long = `First line.\n${"word ".repeat(60)}end`;
-    const view = render(<ApprovalCard state="request" command={long} title="t" subtitle="s" onAllowOnce={() => {}} />);
-    const box = view.container.querySelector(".font-mono");
-    expect(box?.textContent).toBe(long);
-  });
 });
