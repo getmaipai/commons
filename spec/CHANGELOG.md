@@ -1,3 +1,7 @@
+## [spec-v0.1.235] - 2026-10-25
+
+- MEDIA-DETAIL-02b: add the optional player action `on_lyrics_open` to the UI schema.
+
 ## [spec-v0.1.234] - 2026-10-25
 
 - MEDIA-DETAIL-02: add player lyrics and edit fields, and phone aside sheets to the UI schema.

@@ -175,6 +175,9 @@ export interface PlayerProps {
   lyrics?: { lines?: readonly TimedLyricLine[]; text?: string };
   lyricsLabel?: string;
   lyricsEmptyText?: string;
+  /** Shows a waiting message while the host looks up missing lyrics. */
+  lyricsLoading?: boolean;
+  onLyricsOpen?: () => void;
   chapters?: readonly PlayerChapter[];
   /** A storyboard WebVTT (sprite `#xywh=` cues) for preview thumbnails on the time range. */
   thumbnails?: string;
@@ -305,6 +308,8 @@ export function Player(props: PlayerProps) {
     lyrics,
     lyricsLabel = "Lyrics",
     lyricsEmptyText,
+    lyricsLoading = false,
+    onLyricsOpen,
     thumbnails,
     captions = [],
     resumeFrom,
@@ -337,6 +342,13 @@ export function Player(props: PlayerProps) {
   const media = useRef<HTMLMediaElement | null>(null);
   const [time, setTime] = useState(0);
   const [lyricsOpen, setLyricsOpen] = useState(false);
+  const requestedLyricsFor = useRef<string | null>(null);
+  const previousLyricsSrc = useRef(src);
+  if (previousLyricsSrc.current !== src) {
+    previousLyricsSrc.current = src;
+    requestedLyricsFor.current = null;
+    setLyricsOpen(false);
+  }
   const [duration, setDuration] = useState(Number.NaN);
   const [playing, setPlaying] = useState(false);
   const [currentRate, setCurrentRate] = useState(rate ?? 1);
@@ -1097,7 +1109,7 @@ export function Player(props: PlayerProps) {
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
         <div className={audioLayout === "container" ? "grid w-full gap-6 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-6 sm:grid-cols-2 sm:items-center"}>
-          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsEmptyText }} largeCurrent /></div> : art("aspect-square w-full max-w-md justify-self-center")}
+          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? "Looking for lyrics..." : lyricsEmptyText }} largeCurrent /></div> : art("aspect-square w-full max-w-md justify-self-center")}
           <div className="flex min-w-0 flex-col gap-4">
             <div className="min-w-0">
               <p className="truncate text-2xl font-semibold">{title}</p>
@@ -1112,7 +1124,7 @@ export function Player(props: PlayerProps) {
             <div className="flex flex-wrap items-center justify-center gap-2">{transport(true)}</div>
             <div className="flex flex-wrap items-center justify-center gap-1">
               {actionsSlot}
-              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => setLyricsOpen(value => !value)}>{(() => { const Icon = getIcon("book"); return <Icon aria-hidden />; })()}</Button> : null}
+              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => { if (!lyricsOpen && !lyrics?.text && !lyrics?.lines?.length && requestedLyricsFor.current !== src) { requestedLyricsFor.current = src; onLyricsOpen?.(); } setLyricsOpen(value => !value); }}>{(() => { const Icon = getIcon("book"); return <Icon aria-hidden />; })()}</Button> : null}
               {rateMenu}
               {chapterMenu}
               {castButtons}

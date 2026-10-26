@@ -242,6 +242,7 @@ export const PlayerNodeSchema = z.object({
   layout: z.enum(["video", "audio", "mini"]).optional(),
   lyrics_enabled: z.boolean().optional(),
   lyrics_empty_text: z.string().optional(),
+  on_lyrics_open: ActionSchema.optional(),
   autoplay_next: z.boolean().default(false),
   fields: z.object(Object.fromEntries(PLAYER_FIELDS.map((f) => [f, z.string().min(1).optional()])) as Record<(typeof PLAYER_FIELDS)[number], z.ZodOptional<z.ZodString>>).strict().optional(),
   on_progress: ActionSchema.optional(),

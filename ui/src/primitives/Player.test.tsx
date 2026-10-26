@@ -53,6 +53,29 @@ describe("Player", () => {
     act(() => fireEvent.click(getByRole("button", { name: "Lyrics" })));
     expect(container.querySelector('[data-slot="player-lyrics"]')).toBeNull();
   });
+  test("requests missing lyrics once per source when Lyrics opens", () => {
+    const onLyricsOpen = mock(() => {});
+    const view = render(<Player src="/song" kind="audio" title="Song" lyrics={{}} onLyricsOpen={onLyricsOpen} />);
+    fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+    expect(onLyricsOpen).toHaveBeenCalledTimes(1);
+    fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+    fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+    expect(onLyricsOpen).toHaveBeenCalledTimes(1);
+    view.rerender(<Player src="/song-2" kind="audio" title="Song" lyrics={{}} onLyricsOpen={onLyricsOpen} />);
+    fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+    expect(onLyricsOpen).toHaveBeenCalledTimes(2);
+  });
+  test("does not request lyrics already present", () => {
+    const onLyricsOpen = mock(() => {});
+    const view = render(<Player src="/song" kind="audio" title="Song" lyrics={{ text: "Already here" }} onLyricsOpen={onLyricsOpen} />);
+    fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+    expect(onLyricsOpen).not.toHaveBeenCalled();
+  });
+  test("shows the loading message while lyrics are being looked up", () => {
+    const view = render(<Player src="/song" kind="audio" title="Song" lyrics={{}} lyricsLoading />);
+    fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+    expect(view.getByText("Looking for lyrics...")).toBeTruthy();
+  });
   test("opens at the stored position with the resume line, and Start over goes to the start", async () => {
     const onProgress = mock((_: PlayerProgress) => {});
     const { el, getByRole, findByText } = setup({ resumeFrom: 760, onProgress });

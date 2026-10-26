@@ -468,6 +468,7 @@
         "layout": { "type": "string", "enum": ["video", "audio", "mini"], "description": "Default: video for kind video, audio for kind audio." },
         "lyrics_enabled": { "type": "boolean", "default": false, "description": "Show the Lyrics control even when the item has no lyrics." },
         "lyrics_empty_text": { "type": "string", "description": "Plain empty state shown when lyrics are enabled but the item has no lyrics." },
+        "on_lyrics_open": { "$ref": "#/$defs/action", "description": "Fired once per item the first time Lyrics opens while the row has no lyrics text or timed lines. The row's own fields are the placeholders, such as {id}." },
         "autoplay_next": { "type": "boolean", "default": false, "description": "Count down and play up_next when the item ends. Off by default; a child's page leaves it off." },
         "fields": {
           "type": "object",

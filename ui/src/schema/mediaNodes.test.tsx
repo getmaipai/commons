@@ -189,6 +189,26 @@ describe("player", () => {
     expect(await view.findByText("No words yet")).toBeTruthy();
   });
 
+  test("on_lyrics_open receives its row and refetches the binding on success", async () => {
+    let itemFetches = 0;
+    globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === "string" ? input : input.toString();
+      calls.push({ url, method: init?.method ?? "GET", body: init?.body ? JSON.parse(String(init.body)) : undefined });
+      if (url.endsWith("/data/item")) {
+        itemFetches++;
+        const item = itemFetches > 1 ? { ...ITEM, lyrics: "New lyrics" } : ITEM;
+        return Promise.resolve(new Response(JSON.stringify([item]), { status: 200 }));
+      }
+      return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    }) as unknown as typeof fetch;
+    const audio: UiNode = { ...(playerNode as Extract<UiNode, { type: "player" }>), kind: "audio", layout: "audio", lyrics_enabled: true, on_lyrics_open: { call: { target: "/api/plugins/videos/lyrics/{id}" } } };
+    const view = inVideos(audio, { onPlay: () => {} }, { id: "m1" });
+    fireEvent.click(await view.findByRole("button", { name: "Lyrics" }));
+    await view.findByText("New lyrics");
+    expect(calls.find(call => call.url.endsWith("/lyrics/m1"))?.body).toBeUndefined();
+    expect(itemFetches).toBeGreaterThanOrEqual(2);
+  });
+
   test("the Edit pill stays hidden when can_edit is false", async () => {
     globalThis.fetch = mock((input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input.toString();

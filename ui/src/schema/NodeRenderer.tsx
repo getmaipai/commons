@@ -990,6 +990,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const host = useContext(MediaHostContext);
   const mediaEl = useRef<HTMLMediaElement | null>(null);
   const [castError, setCastError] = useState<string | null>(null);
+  const [lyricsLoading, setLyricsLoading] = useState(false);
   const phone = useIsPhoneLayout();
   const [editOpen, setEditOpen] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, unknown>>({});
@@ -1048,6 +1049,11 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               lyrics={hasLyrics || node.lyrics_enabled ? lyrics : undefined}
               lyricsLabel="Lyrics"
               lyricsEmptyText={node.lyrics_empty_text}
+              lyricsLoading={lyricsLoading}
+              onLyricsOpen={node.on_lyrics_open ? () => {
+                setLyricsLoading(true);
+                dispatch(node.on_lyrics_open!, [r], () => setLyricsLoading(false), { onSuccess: () => { setLyricsLoading(false); void query.refetch(); } });
+              } : undefined}
               chapters={(readField(r, field("chapters", "chapters")) as PlayerChapter[] | undefined) ?? undefined}
               captions={(readField(r, field("captions", "captions")) as PlayerTextTrack[] | undefined) ?? undefined}
               thumbnails={localPicture(readField(r, field("thumbnails", "thumbnails"))) ?? undefined}
