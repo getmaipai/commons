@@ -1,3 +1,6 @@
+## [spec-v0.1.241] - 2026-10-26
+
+- MEDIA-APPLE-PASS-01: add player `details_show` and collection fields, actions, and header/footer parts to the UI schema.
 ## [spec-v0.1.240] - 2026-10-26
 
 - AIMODELS-GLANCE-2026-10-26: Settings > AI and models becomes one at-a-glance card. Card props `groups` (several registry groups one view draws) and `copy` (named sentences); view id `ai.glance` replaces `ai.job_choices`; the seven job cards (adds Wake Word) collapse into one `ai.glance` card; the Models tab is removed and `household.ai_models` moves to the Advanced tab. `engines.image.choice`, `engines.video.choice`, `engines.music.choice` and `engines.wakeword.choice` move to `household.ai_pictures`, `ai_videos`, `ai_music` and the new `household.ai_wakeword`.
@@ -1278,3 +1281,6 @@ Additive throughout; every existing fixture still validates unchanged.
 
 - SPEC-FLASH-MANIFEST-01: add the signed `FirmwareFlashManifest` schema, generated TypeScript and Python models, layout validation, catalog-compatible signing payload helpers, and StackChan ESP32-S3 fixture.
 - CHAT-CARDS-05: additive `media_card`, `confirmation` and `countdown` answer-block kinds, with hub-cache-only covers, semantic actions, optional Undo and client-side countdown expiry.
+## [spec-v0.1.241] - 2026-10-26
+
+- MEDIA-APPLE-PASS-01: add player `details_show` and collection fields, actions, and header/footer parts to the UI schema.

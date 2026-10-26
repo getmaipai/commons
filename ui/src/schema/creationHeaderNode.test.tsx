@@ -24,6 +24,11 @@ const node = CreationHeaderNodeSchema.parse({
 });
 
 describe("creation_header schema node", () => {
+  test("parses collection fields, actions, and footer part", () => {
+    const collection = CreationHeaderNodeSchema.parse({ ...node, variant: "collection", fields: { art: "cover", meta: "album", footer_lines: "credits" }, primary: { label: "Play", icon: "play", action: { play: { media_id: "{id}" } } }, shuffle: { label: "Shuffle", action: { play: { media_id: "{id}", shuffle: true } } }, more: [{ label: "Edit", action: { navigate: { to: "/edit" } } }], part: "footer" });
+    expect(collection.variant).toBe("collection");
+    expect(collection.part).toBe("footer");
+  });
   test("share_change accepts host call actions only", () => {
     expect(() => ShareChangeSchema.parse(node.share_change)).not.toThrow();
     expect(() => ShareChangeSchema.parse({ ...node.share_change, add: { navigate: { to: "/people" } } })).toThrow();

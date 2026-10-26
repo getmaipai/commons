@@ -193,7 +193,13 @@
         "bind": { "$ref": "#/$defs/binding" },
         "share_change": { "$ref": "#/$defs/share_change" },
         "candidates_bind": { "$ref": "#/$defs/binding", "description": "Optional binding returning candidate people [{id, name, avatar_url?}] for the share panel." },
-        "heading_level": { "type": "string", "enum": ["h1", "h2"], "default": "h1" }
+        "heading_level": { "type": "string", "enum": ["h1", "h2"], "default": "h1" },
+        "variant": { "type": "string", "enum": ["full", "byline", "collection"], "default": "full" },
+        "fields": { "type": "object", "additionalProperties": false, "properties": { "art": { "type": "string", "default": "art" }, "meta": { "type": "string", "default": "meta" }, "footer_lines": { "type": "string", "default": "footer_lines" } } },
+        "primary": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string" }, "action": { "$ref": "#/$defs/action" } } },
+        "shuffle": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "action": { "$ref": "#/$defs/action" } } },
+        "more": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string" }, "action": { "$ref": "#/$defs/action" } } } },
+        "part": { "type": "string", "enum": ["header", "footer"], "default": "header" }
       }
     },
     "page": {
@@ -495,6 +501,8 @@
         "on_progress": { "$ref": "#/$defs/action", "description": "Fired every 10 s while playing, on pause, on seek, at the end and on unload. Placeholders: the item's own fields plus {position_s}, {duration_s}, {reason} and {completed}." },
         "on_next": { "$ref": "#/$defs/action", "description": "Fired with the up_next item's fields (a `play`, or a `navigate` to its watch page)." },
         "details": { "type": "boolean", "default": false, "description": "MEDIA-DETAIL-01: draw the item's title, facts, expandable description and chapters under the picture (a watch page's details block)." },
+        "details_show": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["title", "facts", "description", "chapters"] }, "default": ["title", "facts", "description", "chapters"], "description": "Optional detail parts. Absent means all four." },
+        "details_show": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["title", "facts", "description", "chapters"] }, "default": ["title", "facts", "description", "chapters"], "description": "Optional parts of the details block to draw. Absent means all parts." },
         "actions": {
           "type": "array",
           "maxItems": 6,

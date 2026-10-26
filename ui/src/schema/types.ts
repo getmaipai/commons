@@ -92,6 +92,9 @@ export interface CreationHeaderData {
   creator?: { name?: string | null; avatar_url?: string | null; label?: string | null; href?: string | null; link_label?: string | null } | null;
   made_at?: string | null;
   description?: string | null;
+  art?: string | null;
+  meta?: string | null;
+  footer_lines?: string[] | null;
   visibility?: {
     mode?: "private" | "shared";
     people?: Array<{ id: string; name?: string | null; avatar_url?: string | null }>;
@@ -106,6 +109,12 @@ export const CreationHeaderNodeSchema = z.object({
   share_change: ShareChangeSchema,
   candidates_bind: BindingSchema.optional(),
   heading_level: z.enum(["h1", "h2"]).default("h1"),
+  variant: z.enum(["full", "byline", "collection"]).default("full"),
+  fields: z.object({ art: z.string().min(1).default("art"), meta: z.string().min(1).default("meta"), footer_lines: z.string().min(1).default("footer_lines") }).strict().optional(),
+  primary: z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema }).optional(),
+  shuffle: z.object({ label: z.string().min(1), action: ActionSchema }).optional(),
+  more: z.array(z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema })).optional(),
+  part: z.enum(["header", "footer"]).default("header"),
 });
 export type CreationHeaderNode = z.infer<typeof CreationHeaderNodeSchema>;
 
@@ -249,6 +258,7 @@ export const PlayerNodeSchema = z.object({
   on_next: ActionSchema.optional(),
   // MEDIA-POLISH-01: the title block and the actions row under the picture.
   details: z.boolean().default(false),
+  details_show: z.array(z.enum(["title", "facts", "description", "chapters"])).default(["title", "facts", "description", "chapters"]).refine((items) => new Set(items).size === items.length, "details_show items must be unique").optional(),
   actions: z
     .array(
       z.object({

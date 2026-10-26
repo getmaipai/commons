@@ -8,6 +8,31 @@ import type { WidgetDescriptor, WidgetData } from "@/kit/widgets";
 
 afterEach(cleanup);
 
+describe("player details_show", () => {
+  const player = (details_show?: Array<"title" | "facts" | "description" | "chapters">) => ({
+    type: "player" as const, bind: { source: "route" as const, path: "/api/media", stream: false }, details: true, kind: "audio" as const, autoplay_next: false, details_show,
+  });
+  const setup = async (details_show?: Array<"title" | "facts" | "description" | "chapters">) => {
+    const original = globalThis.fetch;
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({ id: "one", src: "/song.mp3", title: "Song title", facts: "Album facts", description: "Long description", chapters: [{ start_s: 0, title: "Opening" }] }), { status: 200 }))) as unknown as typeof fetch;
+    const view = renderNode(details_show === undefined ? player() : player(details_show));
+    return { view, restore: () => { globalThis.fetch = original; } };
+  };
+  test("selects only listed detail parts", async () => {
+    const { view, restore } = await setup(["facts"]);
+    try { const details = await view.findByText("Album facts"); expect(details.closest('[data-slot="player-details"]')?.querySelector("h2")).toBeNull(); expect(details.closest('[data-slot="player-details"]')?.textContent).not.toContain("Long description"); }
+    finally { restore(); }
+  });
+  test("defaults to all parts when absent and draws none for an empty list", async () => {
+    const all = await setup();
+    try { await all.view.findByText("Long description"); expect(all.view.container.querySelector('[data-slot="player-details"] h2')?.textContent).toBe("Song title"); }
+    finally { all.restore(); }
+    const none = await setup([]);
+    try { await waitFor(() => expect(none.view.container.querySelector('[data-slot="player-details"]')?.textContent).toBe("")); }
+    finally { none.restore(); }
+  });
+});
+
 function renderNode(node: Parameters<typeof NodeRenderer>[0]["node"], state?: Record<string, unknown>) {
   return renderWithQueryClient(
     <MemoryRouter>

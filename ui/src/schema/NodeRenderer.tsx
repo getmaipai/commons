@@ -146,14 +146,25 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
   const fire = (action: Action, personId?: string) => dispatch(action, [{ ...base, ...(personId ? { person_id: personId } : {}) }]);
   return (
     <>
-      <CreationHeader
+      {node.variant === "collection" && node.part === "footer" ? (Array.isArray(row[node.fields?.footer_lines ?? "footer_lines"]) ? row[node.fields?.footer_lines ?? "footer_lines"] as unknown[] : []).length ? <footer className="flex flex-col gap-1 text-sm text-muted-foreground">{(row[node.fields?.footer_lines ?? "footer_lines"] as unknown[]).map((line, index) => <p key={index}>{String(line)}</p>)}</footer> : null : node.variant === "collection" ? <CreationHeader
         title={typeof row.title === "string" ? row.title : null}
         creator={{ name: typeof creator.name === "string" ? creator.name : null, avatarUrl: typeof creator.avatar_url === "string" && !/\{[^{}]+\}/.test(creator.avatar_url) ? creator.avatar_url : null, avatarSeed: typeof creator.avatar_seed === "string" && !/\{[^{}]+\}/.test(creator.avatar_seed) ? creator.avatar_seed : null, label: typeof creator.label === "string" ? creator.label : null, href: typeof creator.href === "string" ? creator.href : null, linkLabel: typeof creator.link_label === "string" ? creator.link_label : null }}
         madeAt={typeof row.made_at === "string" ? row.made_at : null}
         description={typeof row.description === "string" ? row.description : null}
         headingLevel={node.heading_level}
         visibility={{ mode, people, canManage: rawVisibility.can_manage === true, onOpen: () => setOpen(true) }}
+        variant="collection"
+        art={typeof row[node.fields?.art ?? "art"] === "string" ? row[node.fields?.art ?? "art"] as string : null}
+        meta={typeof row[node.fields?.meta ?? "meta"] === "string" ? row[node.fields?.meta ?? "meta"] as string : null}
+        primary={node.primary ? { ...node.primary, onSelect: () => fire(node.primary!.action) } : undefined}
+        shuffle={node.shuffle ? { ...node.shuffle, onSelect: () => fire(node.shuffle!.action) } : undefined}
+        more={(node.more ?? []).map(item => ({ ...item, onSelect: () => fire(item.action) }))}
       />
+      : <CreationHeader
+        title={typeof row.title === "string" ? row.title : null}
+        creator={{ name: typeof creator.name === "string" ? creator.name : null, avatarUrl: typeof creator.avatar_url === "string" && !/\{[^{}]+\}/.test(creator.avatar_url) ? creator.avatar_url : null, avatarSeed: typeof creator.avatar_seed === "string" && !/\{[^{}]+\}/.test(creator.avatar_seed) ? creator.avatar_seed : null, label: typeof creator.label === "string" ? creator.label : null, href: typeof creator.href === "string" ? creator.href : null, linkLabel: typeof creator.link_label === "string" ? creator.link_label : null }}
+        madeAt={typeof row.made_at === "string" ? row.made_at : null} description={typeof row.description === "string" ? row.description : null} headingLevel={node.heading_level}
+        visibility={{ mode, people, canManage: rawVisibility.can_manage === true, onOpen: () => setOpen(true) }} variant={node.variant === "byline" ? "byline" : "full"} />}
       <SharePanel open={open} onOpenChange={setOpen} people={people} candidates={candidates} canManage={rawVisibility.can_manage === true}
         onAdd={(id) => fire(node.share_change.add, id)} onRemove={(id) => fire(node.share_change.remove, id)} onMakePrivate={() => fire(node.share_change.make_private)} />
     </>
@@ -1079,6 +1090,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
                 description={(readField(r, field("description", "description")) as string | undefined) ?? undefined}
                 chapters={(readField(r, field("chapters", "chapters")) as PlayerChapter[] | undefined) ?? undefined}
                 seek={(time) => { if (mediaEl.current) mediaEl.current.currentTime = time; }}
+                show={node.details_show}
               />
             ) : null}
             {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatch}>{!audioLayout ? editButton : null}</PlayerActions> : null}
@@ -1149,32 +1161,34 @@ function PlayerCastMenu({ host, item, getPosition, onError }: { host: MediaHost;
 }
 
 /** MEDIA-DETAIL-01: the watch page's title, facts and expandable description under the picture. */
-function PlayerDetails({ title, subtitle, facts, description, chapters, seek }: {
+function PlayerDetails({ title, subtitle, facts, description, chapters, seek, show }: {
   title: string;
   subtitle?: string;
   facts?: string;
   description?: string;
   chapters?: PlayerChapter[];
   seek: (time: number) => void;
+  show?: Array<"title" | "facts" | "description" | "chapters">;
 }) {
   const [expanded, setExpanded] = useState(false);
   const detail = description?.trim() && !/\{[^{}]+\}/.test(description) ? description.trim() : null;
   const factLine = facts || subtitle;
   return (
     <div className="flex min-w-0 flex-col gap-1" data-slot="player-details">
-      <h2 className="text-xl font-bold tracking-tight text-foreground">{title}</h2>
-      {factLine ? <p className="truncate whitespace-nowrap text-sm text-muted-foreground">{factLine}</p> : null}
-      {detail ? (
+      {(show ?? ["title", "facts", "description", "chapters"]).includes("title") ? <h2 className="text-xl font-bold tracking-tight text-foreground">{title}</h2> : null}
+      {(show ?? ["title", "facts", "description", "chapters"]).includes("facts") && factLine ? <p className="truncate whitespace-nowrap text-sm text-muted-foreground">{factLine}</p> : null}
+      {(show ?? ["title", "facts", "description", "chapters"]).includes("description") && detail ? (
         <div>
           <p className={expanded ? "text-base text-muted-foreground" : "line-clamp-2 text-base text-muted-foreground"}>{detail}</p>
           <Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? "Show less" : "Show more"}</Button>
-          {expanded && chapters?.length ? (
+          {expanded && (show ?? ["title", "facts", "description", "chapters"]).includes("chapters") && chapters?.length ? (
             <div className="flex flex-col" aria-label="Chapters">
               {chapters.map((chapter) => <Button key={`${chapter.start_s}-${chapter.title}`} type="button" variant="ghost" size="sm" className="justify-start" onClick={() => seek(chapter.start_s)}>{formatTime(chapter.start_s)} {chapter.title}</Button>)}
             </div>
           ) : null}
         </div>
       ) : null}
+      {(show ?? ["title", "facts", "description", "chapters"]).includes("chapters") && !detail && chapters?.length ? <div className="flex flex-col" aria-label="Chapters">{chapters.map((chapter) => <Button key={`${chapter.start_s}-${chapter.title}`} type="button" variant="ghost" size="sm" className="justify-start" onClick={() => seek(chapter.start_s)}>{formatTime(chapter.start_s)} {chapter.title}</Button>)}</div> : null}
     </div>
   );
 }

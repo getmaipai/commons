@@ -1,3 +1,7 @@
+## [ui-v0.5.364] - 2026-10-26
+
+- MEDIA-APPLE-PASS-01: add selectable player detail parts and the collection variant of `CreationHeader` with artwork, metadata, actions, and footer lines.
+
 ## [ui-v0.5.363] - 2026-10-26
 
 - Removed ApprovalCard `allowLabel` and `denyLabel` and the multi-line command wrapping added with them (the consent card they were for is dropped). Nothing uses them.
@@ -3192,4 +3196,8 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 - Data for optional detail tiles: `airQuality: { aqi, category }`, `wind: { speed, direction, gust? }`, `sunrise`, `sunset`, `uvIndex`, `feelsLike`, `humidity`, `dewPoint?`, `precipitation`, `precipitationAmount?`, `precipitationLast24h?`, `precipitationNext24h?`, `visibility`, `visibilityDescription?`, `pressure`, `pressureTrend?`, and `moon: { phase, illumination }`. The hourly chart uses `hourly[].temp`, `pop?`, and `windSpeed?`.
 ## Unreleased
 - PHONE-01 and PHONE-03: add a phone story grid and steady pill strips.
+
+## [ui-v0.5.364] - 2026-10-26
+
+- MEDIA-APPLE-PASS-01: add selectable player detail parts and the collection variant of `CreationHeader` with artwork, metadata, actions, and footer lines.
 
