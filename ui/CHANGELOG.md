@@ -1,4 +1,4 @@
-## [ui-v0.5.348] - 2026-10-25
+## [ui-v0.5.349] - 2026-10-25
 
 - MEDIA-DETAIL-02: extract the shared lyrics list, add the audio lyrics view, schema driven edit sheet, and phone Up next drawer.
 
