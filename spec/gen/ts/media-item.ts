@@ -138,7 +138,10 @@ export const MediaItem = z
     /**A rescan updates every field except these; an edit adds the field name here.*/
     locked_fields: z
       .array(z.enum(["title", "description", "artist", "artwork"]))
-      .refine((arr) => arr.every((item, i) => arr.indexOf(item) === i))
+      .refine(
+        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+        "All items must be unique!",
+      )
       .describe(
         "A rescan updates every field except these; an edit adds the field name here.",
       )
