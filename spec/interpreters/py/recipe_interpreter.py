@@ -256,7 +256,9 @@ async def run_recipe(recipe: Any, inputs: dict[str, Any], host: Any) -> dict[str
             if step.expects is not None:
                 ask["expects"] = step.expects
             if step.fields is not None:
-                ask["fields"] = [field.model_dump(exclude_none=True) for field in step.fields]
+                ask["fields"] = [
+                    field.model_dump(exclude_none=True) for field in step.fields
+                ]
             if step.min_band is not None:
                 ask["min_band"] = step.min_band
         elif op == "artifact":
