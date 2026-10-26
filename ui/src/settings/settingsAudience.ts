@@ -40,6 +40,10 @@ export interface AreaCard {
   bands?: Band[];
   needs?: string[];
   matrix?: AreaMatrix;
+  /** A job card the host draws with its own view (`ai.job_choices`, `ai.always_on`), with this card's group (if any) as its keys. */
+  view?: string;
+  description?: string;
+  choices?: { id: string; label: string; description: string }[];
 }
 export interface Section {
   id: string;
@@ -155,6 +159,7 @@ export function visibleCards(section: Section, viewer: SettingsViewer, registry?
       out.push({ ...card, links });
       continue;
     }
+    if (card.view && !card.group) { out.push(card); continue; }
     if (registry && cardKeys(card, registry, honouredBy).length === 0) continue;
     out.push(card);
   }

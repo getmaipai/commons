@@ -6,6 +6,7 @@ import {
   resolveTab,
   sectionTabs,
   roleAllows,
+  visibleCards,
   visibleGroups,
   visibleTabs,
 } from "./settingsAudience";
@@ -115,5 +116,15 @@ describe("every viewer, every area: never a section they may not see", () => {
     expect(liveAreas.map((a) => a.id)).toEqual(["settings"]);
     expect(liveAreas[0]!.sections.filter((s) => s.scope === "household")).toHaveLength(9);
     expect(liveAreas[0]!.sections.filter((s) => s.scope === "person")).toHaveLength(7);
+  });
+});
+
+describe("view cards", () => {
+  test("a view card with no group is kept for anyone its audience allows; a grouped one still needs a key to draw", () => {
+    const section = { id: "ai", label: "AI", icon: "cpu", kind: "keys" as const, cards: [
+      { label: "Always on", view: "ai.always_on", description: "Needed." },
+      { label: "Nothing here", view: "ai.job_choices", group: "household.nothing", scope: "household" as const },
+    ] };
+    expect(visibleCards(section, ADMIN, REGISTRY).map((card) => card.label)).toEqual(["Always on"]);
   });
 });

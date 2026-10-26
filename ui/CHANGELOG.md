@@ -1,3 +1,7 @@
+## [ui-v0.5.359] - 2026-10-26
+
+- AIMODELS-2026-10-25: a settings card may carry `view`, `description` and `choices` (the spec 0.1.238 job cards); `visibleCards` keeps a view card that has no group, so the host can draw its own view for it.
+
 ## [ui-v0.5.358] - 2026-10-26
 
 - `CreationHeader` draws its description as light markdown (bold, italic, `code`, bullet lists, paragraphs and line breaks) instead of raw asterisks; the music card subtitle drops the markdown marks. One renderer, so every host of the header (Videos, Music, Library) gets it.
