@@ -145,6 +145,58 @@ export const SettingsArea = z
                         "A card of link rows to existing pages instead of keys.",
                       )
                       .optional(),
+                    /**A view that is this card's body, drawn in place of the group's default rows. With a group and scope the view draws that group's keys; without them it draws no keys.*/
+                    view: z
+                      .enum([
+                        "account.profile",
+                        "account.voice",
+                        "account.likeness",
+                        "account.device_appearance",
+                        "chat.skills",
+                        "chat.shortcuts",
+                        "home.commands",
+                        "home.voice_catalog",
+                        "home.engine_admin",
+                        "home.devices_admin",
+                        "home.routing_stats",
+                        "home.reference_library",
+                        "home.pictures_library",
+                        "home.media_library",
+                        "account.coding_keys",
+                        "ai.job_choices",
+                        "ai.always_on",
+                      ])
+                      .describe(
+                        "A view that is this card's body, drawn in place of the group's default rows. With a group and scope the view draws that group's keys; without them it draws no keys.",
+                      )
+                      .optional(),
+                    /**One plain sentence under the card heading, for a view card. The one place that sentence is written.*/
+                    description: z
+                      .string()
+                      .min(1)
+                      .max(160)
+                      .describe(
+                        "One plain sentence under the card heading, for a view card. The one place that sentence is written.",
+                      )
+                      .optional(),
+                    /**A view card's choices that set no setting (a switch that installs or removes a part): the one place their label and description are written.*/
+                    choices: z
+                      .array(
+                        z
+                          .object({
+                            id: z
+                              .string()
+                              .regex(new RegExp("^[a-z][a-z0-9_-]*$")),
+                            label: z.string().min(1).max(60),
+                            description: z.string().min(1).max(160),
+                          })
+                          .strict(),
+                      )
+                      .min(1)
+                      .describe(
+                        "A view card's choices that set no setting (a switch that installs or removes a part): the one place their label and description are written.",
+                      )
+                      .optional(),
                     collapsed: z.boolean().default(false),
                     order: z.number().int().optional(),
                     /**The role ladder, most to least privileged. min_role is the lowest role that may see the thing.*/
@@ -245,7 +297,7 @@ export const SettingsArea = z
                   })
                   .strict()
                   .describe(
-                    "One card: either a registry group at one scope (group and scope together) or a list of link rows (links), never both. areas-check.ts enforces the pairing.",
+                    "One card: either a registry group at one scope (group and scope together) or a list of link rows (links), or a view (view), never links with the others. areas-check.ts enforces the pairing.",
                   ),
               )
               .min(1)
@@ -268,6 +320,8 @@ export const SettingsArea = z
                 "home.pictures_library",
                 "home.media_library",
                 "account.coding_keys",
+                "ai.job_choices",
+                "ai.always_on",
               ])
               .describe("keys only: a view drawn above the cards.")
               .optional(),
@@ -289,6 +343,8 @@ export const SettingsArea = z
                 "home.pictures_library",
                 "home.media_library",
                 "account.coding_keys",
+                "ai.job_choices",
+                "ai.always_on",
               ])
               .describe("keys only: a view drawn below the cards.")
               .optional(),
@@ -310,6 +366,8 @@ export const SettingsArea = z
                 "home.pictures_library",
                 "home.media_library",
                 "account.coding_keys",
+                "ai.job_choices",
+                "ai.always_on",
               ])
               .describe(
                 "A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
@@ -380,6 +438,8 @@ export const SettingsArea = z
                         "home.pictures_library",
                         "home.media_library",
                         "account.coding_keys",
+                        "ai.job_choices",
+                        "ai.always_on",
                       ])
                       .describe("A named view drawn after this tab’s cards.")
                       .optional(),
@@ -452,6 +512,8 @@ export const SettingsArea = z
                     "home.pictures_library",
                     "home.media_library",
                     "account.coding_keys",
+                    "ai.job_choices",
+                    "ai.always_on",
                   ])
                   .describe(
                     "A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
@@ -480,6 +542,8 @@ export const SettingsArea = z
                             "home.pictures_library",
                             "home.media_library",
                             "account.coding_keys",
+                            "ai.job_choices",
+                            "ai.always_on",
                           ])
                           .describe(
                             "A named view drawn after this tab’s cards.",

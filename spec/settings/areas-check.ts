@@ -18,6 +18,9 @@ export interface AreaCard {
   scope?: Scope;
   levels?: Level[];
   links?: AreaLink[];
+  view?: string;
+  description?: string;
+  choices?: { id: string; label: string; description: string }[];
   collapsed?: boolean;
   order?: number;
   min_role?: Role;
@@ -180,7 +183,11 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         }
         for (const l of c.links ?? []) checkHref(`${where}: link "${l.label}"`, l.href, errors);
         if (c.links && (c.group || c.scope || c.levels)) errors.push(`${where}: card "${c.label}" is a link card, so it has no group, scope or levels`);
-        if (!c.links && !(c.group && c.scope)) errors.push(`${where}: card "${c.label}" needs a group and scope, or links`);
+        if (c.view !== undefined && !ALLOWED_VIEW_IDS.includes(c.view)) errors.push(`${where}: card "${c.label}" has unknown view "${c.view}"`);
+        if (c.view && c.links) errors.push(`${where}: card "${c.label}" is a link card, so it has no view`);
+        if ((c.description || c.choices) && !c.view) errors.push(`${where}: card "${c.label}" has a description or choices but no view to draw them`);
+        if (!c.links && !c.view && !(c.group && c.scope)) errors.push(`${where}: card "${c.label}" needs a group and scope, a view, or links`);
+        if (c.view && !!c.group !== !!c.scope) errors.push(`${where}: card "${c.label}" gives a group and a scope together, or neither`);
         if (!c.group || !c.scope) continue;
         const deviceException = (c.scope === "device" && s.scope === "person" && s.id === "voice" && (c.tab === "device" || c.tab === "robot")) || (c.scope === "household" && s.scope === "household" && s.id === "apps" && c.group === "robot.settings");
         if (c.scope !== s.scope && !deviceException) errors.push(`${where}: card "${c.label}" scope ${c.scope} disagrees with section scope ${s.scope}`);

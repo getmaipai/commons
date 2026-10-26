@@ -450,18 +450,121 @@
               "tab": "engines"
             },
             {
-              "label": "Manage",
+              "label": "Chat",
+              "group": "household.ai_chat",
+              "scope": "household",
+              "view": "ai.job_choices",
+              "description": "Talk with Home, and let it look at pictures you send.",
+              "choices": [
+                {
+                  "id": "chat-standard",
+                  "label": "Standard chat AI",
+                  "description": "The AI that answers in chat."
+                },
+                {
+                  "id": "chat-mlx",
+                  "label": "Faster on Apple chips",
+                  "description": "Runs on the Apple chip for faster answers."
+                },
+                {
+                  "id": "chat-pictures",
+                  "label": "Chat can look at pictures",
+                  "description": "Lets Home see the pictures you send."
+                }
+              ],
+              "tab": "overview"
+            },
+            {
+              "label": "Pictures",
+              "group": "household.ai_pictures",
+              "scope": "household",
+              "view": "ai.job_choices",
+              "description": "Make pictures in chat and change the ones you have.",
+              "choices": [
+                {
+                  "id": "pictures-edit",
+                  "label": "Changing pictures",
+                  "description": "Needed to change a picture and as the backup."
+                },
+                {
+                  "id": "pictures-tools",
+                  "label": "Picture tools",
+                  "description": "Take out a background, erase something, make a picture bigger."
+                },
+                {
+                  "id": "pictures-look",
+                  "label": "Name things in a picture",
+                  "description": "Names the things in a picture, so you can find them."
+                }
+              ],
+              "tab": "overview"
+            },
+            {
+              "label": "Videos",
+              "group": "household.ai_videos",
+              "scope": "household",
+              "view": "ai.job_choices",
+              "description": "Make short videos in chat.",
+              "tab": "overview"
+            },
+            {
+              "label": "Music",
+              "group": "household.ai_music",
+              "scope": "household",
+              "view": "ai.job_choices",
+              "description": "Make songs and tunes.",
+              "tab": "overview"
+            },
+            {
+              "label": "Voice and speaking",
+              "group": "household.ai_voice",
+              "scope": "household",
+              "view": "ai.job_choices",
+              "description": "Choose how Home sounds when it talks.",
+              "choices": [
+                {
+                  "id": "voice-standard",
+                  "label": "Standard voice",
+                  "description": "The voice that always comes with Home."
+                },
+                {
+                  "id": "voice-better",
+                  "label": "Better voice",
+                  "description": "Warmer and more natural, uses more space."
+                }
+              ],
+              "tab": "overview"
+            },
+            {
+              "label": "Coding helper",
+              "group": "household.ai_coding",
+              "scope": "household",
+              "view": "ai.job_choices",
+              "description": "Help with code in the Code app and in chat.",
+              "choices": [
+                {
+                  "id": "coding-helper",
+                  "label": "Coding helper",
+                  "description": "Helps with code in the Code app and in chat."
+                }
+              ],
+              "tab": "overview"
+            },
+            {
+              "label": "Search and memory",
               "tab": "overview",
               "links": [
                 {
-                  "label": "AI models",
-                  "href": "/models"
-                },
-                {
-                  "label": "Engines",
-                  "href": "/engines"
+                  "label": "Web search and memory settings",
+                  "href": "/settings/search"
                 }
               ]
+            },
+            {
+              "label": "Always on",
+              "view": "ai.always_on",
+              "description": "The parts Home needs, so they cannot be turned off.",
+              "tab": "overview"
             },
             {
               "label": "Coding",
