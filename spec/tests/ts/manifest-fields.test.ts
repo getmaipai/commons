@@ -63,6 +63,17 @@ describe("PackageManifest, step 2's new fields", () => {
     expect(() => PackageManifest.parse(manifest)).not.toThrow();
   });
 
+  test("contributes.widgets accepts all optional Home placement fields", () => {
+    const manifest = {
+      ...BASE,
+      contributes: {
+        widgets: [{ id: "forecast", title: "Weather", size: "card", refresh_s: 1800, min_role: "adult", priority: 50, hero: true, data: "forecast", surfaces: ["home"] }],
+        data: [{ id: "forecast" }],
+      },
+    };
+    expect(() => PackageManifest.parse(manifest)).not.toThrow();
+  });
+
   test("contributes.widgets rejects a size outside card/row", () => {
     const manifest = {
       ...BASE,

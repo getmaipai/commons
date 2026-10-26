@@ -1,3 +1,7 @@
+## [spec-v0.1.243] - 2026-10-26
+
+- HOME-PAGE-01: add optional Home placement fields to `contributes.widgets[]` and the person-scoped `ui.home_hidden` setting.
+
 ## [spec-v0.1.242] - 2026-10-26
 
 - AIMODELS-SLOTS-2026-10-26: Pictures splits into a Quick row and a Detailed row on the AI and models glance. New glance choices `pictures-ernie`, `pictures-klein`, `picturesdetailed`, `picturesdetailed-zimage` and `wakeword-detector`; new household keys `generation.picture_quick_model` (ernie or klein) and `generation.picture_detailed.enabled`.

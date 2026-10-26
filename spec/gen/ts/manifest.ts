@@ -1996,6 +1996,44 @@ export const PackageManifest = z
                   .describe(
                     "How often Home should re-fetch this widget's data; the data itself still only ever comes from lib/packageCache.ts (step 3's own rule: never a live fetch in the request path).",
                   ),
+                /**The floor role a person needs to see this widget; optional, and may only raise the package's own floor.*/
+                min_role: z
+                  .enum(["owner", "admin", "adult", "teen", "child", "guest"])
+                  .describe(
+                    "The floor role a person needs to see this widget; optional, and may only raise the package's own floor.",
+                  )
+                  .optional(),
+                /**Home ordering priority; higher values come first.*/
+                priority: z
+                  .number()
+                  .int()
+                  .gte(0)
+                  .lte(100)
+                  .describe("Home ordering priority; higher values come first.")
+                  .default(50),
+                /**Whether this widget may be selected for Home's single hero position.*/
+                hero: z
+                  .boolean()
+                  .describe(
+                    "Whether this widget may be selected for Home's single hero position.",
+                  )
+                  .optional(),
+                /**The id of an entry in this manifest's contributes.data array.*/
+                data: z
+                  .string()
+                  .describe(
+                    "The id of an entry in this manifest's contributes.data array.",
+                  )
+                  .optional(),
+                /**Surfaces where this widget may appear.*/
+                surfaces: z
+                  .array(z.enum(["home", "tv", "robot"]))
+                  .refine(
+                    (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                    "All items must be unique!",
+                  )
+                  .describe("Surfaces where this widget may appear.")
+                  .default(["home"]),
                 /**Resolved the same way `warm.keys` are - against household settings/state, not literal values in the manifest.*/
                 inputs: z
                   .record(z.string(), z.any())

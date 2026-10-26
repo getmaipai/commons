@@ -10,7 +10,8 @@ export interface AppDataEntry { id: string; surface?: string; rows?: string; inp
 export interface AppSidebarRows { bind: unknown; item_key_field?: string; item_label_field?: string; item_media_field?: string; only_followed?: boolean; open: unknown; manage?: { label: string; open: unknown } }
 export interface AppSidebarGroup { id: string; title?: string; pages?: string[]; rows?: AppSidebarRows }
 export interface AppSidebar { search?: unknown; groups: AppSidebarGroup[] }
-export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[]; sidebar?: AppSidebar }
+export interface AppWidgetEntry { id: string; data?: string }
+export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[]; widgets?: AppWidgetEntry[]; sidebar?: AppSidebar }
 
 /** The node types a package page may use. Anything that reads another route
  * (card_grid, widget_card, ...) or mounts a host component
@@ -191,8 +192,13 @@ export function checkAppPackage(packageId: string, contributes: AppContributes |
   const out: string[] = [];
   const pages = contributes?.pages ?? [];
   const dataList = contributes?.data ?? [];
+  const widgets = contributes?.widgets ?? [];
   if (pages.length === 0) {
     if (dataList.length > 0) out.push("contributes.data is declared but the package has no pages");
+    const data = new Map(dataList.map((entry) => [entry.id, entry]));
+    for (const widget of widgets) {
+      if (widget.data !== undefined && !data.has(widget.data)) out.push(`widget "${widget.id}": data id "${widget.data}" is not a contributes.data id of this package`);
+    }
     return out;
   }
   const ids = new Set<string>();
@@ -210,6 +216,9 @@ export function checkAppPackage(packageId: string, contributes: AppContributes |
     if (data.has(entry.id)) out.push(`data id "${entry.id}" is declared twice`);
     data.set(entry.id, entry);
     if (entry.rows === "places" && entry.surface === undefined) out.push(`data "${entry.id}": rows needs a surface`);
+  }
+  for (const widget of widgets) {
+    if (widget.data !== undefined && !data.has(widget.data)) out.push(`widget "${widget.id}": data id "${widget.data}" is not a contributes.data id of this package`);
   }
   if (contributes?.sidebar) checkSidebar(packageId, contributes.sidebar, ids, data, out);
   for (const page of pages) {

@@ -3815,6 +3815,23 @@
     ]
   },
   {
+    "key": "ui.home_hidden",
+    "scope": "person",
+    "selector": "text",
+    "default": "[]",
+    "label": "Hidden from Home (advanced)",
+    "help": "A JSON list of Home widget ids this person chose to hide. Normally set from a card on Home, not by editing this directly.",
+    "copy": {
+      "does": "Controls which Home cards this person has hidden."
+    },
+    "level": "expert",
+    "secret": false,
+    "lives_in": "profile.appearance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "setup.checklist_dismissed",
     "scope": "person",
     "selector": "text",

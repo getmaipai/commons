@@ -969,6 +969,33 @@
                 "minimum": 1,
                 "description": "How often Home should re-fetch this widget's data; the data itself still only ever comes from lib/packageCache.ts (step 3's own rule: never a live fetch in the request path)."
               },
+              "min_role": {
+                "type": "string",
+                "enum": ["owner", "admin", "adult", "teen", "child", "guest"],
+                "description": "The floor role a person needs to see this widget; optional, and may only raise the package's own floor."
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100,
+                "default": 50,
+                "description": "Home ordering priority; higher values come first."
+              },
+              "hero": {
+                "type": "boolean",
+                "description": "Whether this widget may be selected for Home's single hero position."
+              },
+              "data": {
+                "type": "string",
+                "description": "The id of an entry in this manifest's contributes.data array."
+              },
+              "surfaces": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "type": "string", "enum": ["home", "tv", "robot"] },
+                "default": ["home"],
+                "description": "Surfaces where this widget may appear."
+              },
               "inputs": {
                 "type": "object",
                 "additionalProperties": true,
