@@ -1,3 +1,7 @@
+## [ui-v0.5.362] - 2026-10-26
+
+- SECTION-SIDEBAR-FOCUS-02: in a compact `SectionSidebar`, Escape in the search field closes it and returns focus to the header icon that opened it. Additive.
+
 ## [ui-v0.5.361] - 2026-10-26
 
 - SECTION-SIDEBAR-FOCUS-01: a compact `SectionSidebar` focuses its own search field when its header icon opens it, not the first search field on the page, so two columns on one page each focus their own. Additive.

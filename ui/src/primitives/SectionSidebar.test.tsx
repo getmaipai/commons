@@ -469,6 +469,17 @@ describe("SectionSidebar", () => {
     expect(row.className).toContain("h-9");
   });
 
+  test("Escape in an empty search field closes it and returns focus to the header icon that opened it", () => {
+    const { container } = column({ density: "compact", search: { value: "", onChange: () => {}, label: "Search Chat" } });
+    const icon = container.querySelector('[data-slot="section-sidebar-search"]') as HTMLButtonElement;
+    fireEvent.click(icon);
+    const field = container.querySelector('input[aria-label="Search Chat"]') as HTMLInputElement;
+    expect(document.activeElement).toBe(field);
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(container.querySelector('input[aria-label="Search Chat"]')).toBeNull();
+    expect(document.activeElement).toBe(icon);
+  });
+
   test("opening search in one column focuses that column's field, even when another column also has search", () => {
     const search = { value: "", onChange: () => {}, label: "Search Chat" };
     const { container } = render(

@@ -199,6 +199,7 @@ export function SectionSidebar({
   // Compact columns (Chat's) open the search field from a header icon and hide it again when it is empty and blurred.
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchButtonRef = useRef<HTMLButtonElement>(null);
   // The field the header icon opens takes focus at once; a keyboard or pointer user expects to type straight away.
   useEffect(() => {
     if (!searchOpen) return;
@@ -377,6 +378,7 @@ export function SectionSidebar({
             {rail ? null : headerActions}
             {compact && !rail && search ? (
                     <button
+                      ref={searchButtonRef}
                       type="button"
                       data-slot="section-sidebar-search"
                       aria-label={search.label}
@@ -448,6 +450,8 @@ export function SectionSidebar({
                 } else if (e.key === "Escape" && compact) {
                   e.preventDefault();
                   setSearchOpen(false);
+                  // Escape from the field hands focus back to the header icon that opened it.
+                  searchButtonRef.current?.focus();
                 } else if (e.key === "Enter" && search.onSubmit) {
                   e.preventDefault();
                   search.onSubmit();
