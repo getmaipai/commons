@@ -134,7 +134,8 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
     const rawName = typeof value.name === "string" ? value.name.trim() : "";
     const name = !rawName || /\{[^{}]+\}/.test(rawName) ? "Someone" : rawName;
     const avatarUrl = typeof value.avatar_url === "string" && !/\{[^{}]+\}/.test(value.avatar_url) ? value.avatar_url : undefined;
-    return { id: value.id, name, avatarUrl };
+    const avatarSeed = typeof value.avatar_seed === "string" && !/\{[^{}]+\}/.test(value.avatar_seed) ? value.avatar_seed : undefined;
+    return { id: value.id, name, avatarUrl, avatarSeed };
   };
   const people = Array.isArray(rawVisibility.people) ? rawVisibility.people.map(toPerson).filter((person): person is NonNullable<typeof person> => person !== null) : [];
   const candidatesData = Array.isArray(candidatesQuery.data) ? candidatesQuery.data[0] : candidatesQuery.data;
@@ -147,7 +148,7 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
     <>
       <CreationHeader
         title={typeof row.title === "string" ? row.title : null}
-        creator={{ name: typeof creator.name === "string" ? creator.name : null, avatarUrl: typeof creator.avatar_url === "string" && !/\{[^{}]+\}/.test(creator.avatar_url) ? creator.avatar_url : null, label: typeof creator.label === "string" ? creator.label : null, href: typeof creator.href === "string" ? creator.href : null, linkLabel: typeof creator.link_label === "string" ? creator.link_label : null }}
+        creator={{ name: typeof creator.name === "string" ? creator.name : null, avatarUrl: typeof creator.avatar_url === "string" && !/\{[^{}]+\}/.test(creator.avatar_url) ? creator.avatar_url : null, avatarSeed: typeof creator.avatar_seed === "string" && !/\{[^{}]+\}/.test(creator.avatar_seed) ? creator.avatar_seed : null, label: typeof creator.label === "string" ? creator.label : null, href: typeof creator.href === "string" ? creator.href : null, linkLabel: typeof creator.link_label === "string" ? creator.link_label : null }}
         madeAt={typeof row.made_at === "string" ? row.made_at : null}
         description={typeof row.description === "string" ? row.description : null}
         headingLevel={node.heading_level}

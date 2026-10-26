@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { CreationHeader } from "./creation-header";
 import { VisibilityChip } from "./visibility-chip";
 import { SharePanel } from "./share-panel";
+import { withLoadedImages } from "../../tests/withLoadedImages";
 
 afterEach(cleanup);
 
@@ -28,6 +29,27 @@ describe("CreationHeader", () => {
     expect(view.getByRole("button", { name: "Show less" })).toBeTruthy();
   });
 
+  test("byline variant renders only the creator, made time and visibility chip, with no heading or show more", () => {
+    const view = render(<CreationHeader title="Song" creator={{ name: "Aster" }} madeAt="2026-10-19T12:00:00Z" description={"A long description. ".repeat(40)}
+      visibility={{ mode: "private", people: [], canManage: false, onOpen: () => {} }} variant="byline" />);
+    const header = view.container.querySelector('[data-slot="creation-header"]');
+    expect(header?.getAttribute("data-variant")).toBe("byline");
+    expect(view.queryByRole("heading")).toBeNull();
+    expect(view.queryByRole("button", { name: "Show more" })).toBeNull();
+    expect(view.getByText("Aster")).toBeTruthy();
+    expect(view.container.querySelector("time")?.textContent).toMatch(/^Made /);
+    expect(view.getByRole("button", { name: "Private, view sharing" })).toBeTruthy();
+  });
+
+  test("full variant keeps its heading and show more for a long description", () => {
+    const view = render(<CreationHeader title="Song" creator={{ name: "Aster" }} description={"A long description. ".repeat(40)}
+      visibility={{ mode: "private", people: [], canManage: false, onOpen: () => {} }} />);
+    const header = view.container.querySelector('[data-slot="creation-header"]');
+    expect(header?.getAttribute("data-variant")).toBe("full");
+    expect(view.getByRole("heading", { name: "Song" })).toBeTruthy();
+    expect(view.getByRole("button", { name: "Show more" })).toBeTruthy();
+  });
+
   test("links the avatar and name together through the host router when creator href is present", () => {
     const view = render(<MemoryRouter initialEntries={["/"]}><Routes>
       <Route path="/" element={<CreationHeader title="Song" creator={{ name: "Aster", href: "/people/aster" }} visibility={{ mode: "private", people: [], canManage: false, onOpen: () => {} }} />} />
@@ -38,6 +60,14 @@ describe("CreationHeader", () => {
     expect(link.querySelector('[data-slot="avatar"]')).toBeTruthy();
     fireEvent.click(link);
     expect(view.getByText("Profile page")).toBeTruthy();
+  });
+
+  test("draws the creator's generated face from avatarSeed when no avatarUrl is given", () => {
+    withLoadedImages(() => {
+      const view = render(<CreationHeader title="Song" creator={{ name: "Aster", avatarSeed: "sage-seed" }} visibility={{ mode: "private", people: [], canManage: false, onOpen: () => {} }} />);
+      const img = view.container.querySelector('[data-slot="creation-header"] img');
+      expect(img?.getAttribute("src")?.startsWith("data:image/svg+xml")).toBe(true);
+    });
   });
 
   test("keeps creator avatar and name plain when href is absent", () => {
@@ -55,6 +85,14 @@ describe("VisibilityChip", () => {
     expect(button.querySelector("svg.lucide-lock-keyhole")).toBeTruthy();
   });
 
+  test("draws a person's generated face from avatarSeed when no avatarUrl is given", () => {
+    withLoadedImages(() => {
+      const view = render(<VisibilityChip mode="shared" people={[{ id: "a", name: "Aster", avatarSeed: "sage-seed" }]} canManage onOpen={() => {}} />);
+      const img = view.getByRole("button", { name: "Shared, manage sharing" }).querySelector("img");
+      expect(img?.getAttribute("src")?.startsWith("data:image/svg+xml")).toBe(true);
+    });
+  });
+
   test("shows at most three faces and an accurate +N, and opens from a keyboard-focused button", () => {
     let opened = false;
     const view = render(<VisibilityChip mode="shared" people={PEOPLE} canManage onOpen={() => { opened = true; }} />);
@@ -69,6 +107,16 @@ describe("VisibilityChip", () => {
 });
 
 describe("SharePanel", () => {
+  test("draws a row's generated face from avatarSeed when no avatarUrl is given", () => {
+    withLoadedImages(() => {
+      const view = render(<SharePanel open onOpenChange={() => {}} people={[]} candidates={[{ id: "a", name: "Aster", avatarSeed: "sage-seed" }]} canManage onAdd={() => {}} onRemove={() => {}} onMakePrivate={() => {}} />);
+      const dialog = within(document.body).getByRole("dialog");
+      const img = dialog.querySelector("img[src^='data:image/svg+xml']");
+      expect(img).toBeTruthy();
+      view.unmount();
+    });
+  });
+
   test("is read-only for viewers and adds, removes, and makes private for managers", () => {
     const add: string[] = [];
     const remove: string[] = [];

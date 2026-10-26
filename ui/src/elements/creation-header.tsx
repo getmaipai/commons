@@ -5,14 +5,16 @@ import { Button } from "../ui/button";
 import { getIcon } from "../icons";
 import { absoluteTime } from "../format";
 import { VisibilityChip, type VisibilityChipProps } from "./visibility-chip";
+import { diceBearAvatarUri } from "../primitives/Avatar";
 
 export interface CreationHeaderProps {
-  title: string | null | undefined;
-  creator?: { name?: string | null; avatarUrl?: string | null; label?: string | null; href?: string | null; linkLabel?: string | null } | null;
+  title: string | null | undefined; // ignored when variant is "byline" (the host card already shows the title)
+  creator?: { name?: string | null; avatarUrl?: string | null; avatarSeed?: string | null; label?: string | null; href?: string | null; linkLabel?: string | null } | null;
   madeAt?: string | null;
   description?: string | null;
   headingLevel?: "h1" | "h2";
   visibility: Omit<VisibilityChipProps, "onOpen"> & { onOpen: () => void };
+  variant?: "full" | "byline";
 }
 
 function plain(value: string | null | undefined, fallback: string) {
@@ -27,7 +29,7 @@ function formattedDate(value?: string | null) {
   return absoluteTime(value);
 }
 
-export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility }: CreationHeaderProps) {
+export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility, variant = "full" }: CreationHeaderProps) {
   const [expanded, setExpanded] = useState(false);
   const homeLabel = plain(creator?.label, "Made at home");
   const creatorName = plain(creator?.name, homeLabel);
@@ -41,7 +43,10 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
     <>
       {isHome ? <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-foreground"><Icon className="size-4" /></span> : (
         <Avatar aria-hidden>
-          {creator?.avatarUrl ? <AvatarImage src={creator.avatarUrl} alt="" /> : null}
+          {(() => {
+            const src = creator?.avatarUrl ?? (creator?.avatarSeed ? diceBearAvatarUri(creator.avatarSeed) : null);
+            return src ? <AvatarImage src={src} alt="" /> : null;
+          })()}
           <AvatarFallback>{creatorName.trim().slice(0, 1).toUpperCase() || "?"}</AvatarFallback>
         </Avatar>
       )}
@@ -49,8 +54,8 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
     </>
   );
   return (
-    <header data-slot="creation-header" className="grid gap-3">
-      <Heading className="text-3xl font-bold tracking-tight">{plain(title, "Untitled")}</Heading>
+    <header data-slot="creation-header" data-variant={variant} className="grid gap-3">
+      {variant === "full" ? <Heading className="text-3xl font-bold tracking-tight">{plain(title, "Untitled")}</Heading> : null}
       <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
         <span className="inline-flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
           {creatorHref && !isHome ? <Link to={creatorHref} aria-label={plain(creator?.linkLabel, `${creatorName}, open profile`)} className="inline-flex min-w-0 items-center gap-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">{identity}</Link> : identity}
@@ -58,7 +63,7 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
         </span>
         <VisibilityChip {...visibility} />
       </div>
-      {detail ? (
+      {variant === "full" && detail ? (
         <div>
           <p className={expanded ? "text-base text-muted-foreground" : "line-clamp-3 text-base text-muted-foreground"}>{detail}</p>
           <Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? "Show less" : "Show more"}</Button>

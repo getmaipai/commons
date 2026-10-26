@@ -1,3 +1,8 @@
+## [ui-v0.5.352] - 2026-10-25
+
+- Creation parts draw a person's generated face from `avatarSeed` (`avatar_seed` in the schema row) when there is no photo URL: the creation header's creator, the visibility chip and the share panel.
+- `CreationHeader` has a `variant="byline"` form (creator, date and visibility chip only, no heading or description) for small cards such as the chat song card.
+
 ## [ui-v0.5.351] - 2026-10-25
 
 - ChatHeader is a one-row bar with an optional companion picker and no gradient smear.

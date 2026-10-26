@@ -1,11 +1,13 @@
 import { LockKeyholeIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { diceBearAvatarUri } from "../primitives/Avatar";
 
 export interface VisibilityPerson {
   id: string;
   name: string;
   avatarUrl?: string | null;
+  avatarSeed?: string | null;
 }
 
 export interface VisibilityChipProps {
@@ -28,7 +30,10 @@ export function VisibilityChip({ mode, people, canManage, onOpen }: VisibilityCh
         <AvatarGroup aria-hidden>
           {visible.map((person) => (
             <Avatar key={person.id}>
-              {person.avatarUrl ? <AvatarImage src={person.avatarUrl} alt="" /> : null}
+              {(() => {
+                const src = person.avatarUrl ?? (person.avatarSeed ? diceBearAvatarUri(person.avatarSeed) : null);
+                return src ? <AvatarImage src={src} alt="" /> : null;
+              })()}
               <AvatarFallback>{initials(person.name)}</AvatarFallback>
             </Avatar>
           ))}

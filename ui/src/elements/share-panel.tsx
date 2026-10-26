@@ -20,7 +20,7 @@ export function SharePanel({ open, onOpenChange, people, candidates, canManage, 
     id: person.id,
     name: person.name,
     role: currentIds.has(person.id) ? "view" : "off",
-    avatarSeed: person.name,
+    avatarSeed: person.avatarSeed ?? person.name,
     avatarUrl: person.avatarUrl,
     disabledReason: canManage ? undefined : "",
   }));

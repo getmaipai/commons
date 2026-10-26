@@ -2,6 +2,7 @@ import { afterEach, describe, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
+import { withLoadedImagesAsync } from "../../tests/withLoadedImages";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { CreationHeaderNodeSchema, PageNodeSchema, ShareChangeSchema } from "@/kit/schema/types";
 
@@ -42,6 +43,26 @@ describe("creation_header schema node", () => {
       expect(within(document.body).getByRole("switch", { name: "Basil" })).toBeTruthy();
       expect(within(document.body).getByRole("switch", { name: "Someone" })).toBeTruthy();
       expect(view.queryByText(/\{[^{}]+\}/)).toBeNull();
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+
+  test("passes avatar_seed from the creator and visibility people to the kit faces", async () => {
+    const original = globalThis.fetch;
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({
+      ...row,
+      creator: { name: "Basil", avatar_url: null, avatar_seed: "creator-seed", href: "/people/basil" },
+      visibility: { mode: "shared", people: [{ id: "person-1", name: "Aster", avatar_seed: "aster-seed" }], can_manage: true },
+    }), { status: 200 }))) as unknown as typeof fetch;
+    try {
+      await withLoadedImagesAsync(async () => {
+        const view = renderWithQueryClient(<MemoryRouter><NodeRenderer node={node} /></MemoryRouter>);
+        const link = await view.findByRole("link", { name: "Basil, open profile" });
+        expect(link.querySelector("img")?.getAttribute("src")?.startsWith("data:image/svg+xml")).toBe(true);
+        const chip = view.getByRole("button", { name: "Shared, manage sharing" });
+        expect(chip.querySelector("img")?.getAttribute("src")?.startsWith("data:image/svg+xml")).toBe(true);
+      });
     } finally {
       globalThis.fetch = original;
     }
