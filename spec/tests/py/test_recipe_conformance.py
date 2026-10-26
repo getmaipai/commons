@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from emulators.py.host_emulator import (
     ArtifactRecordLike,
@@ -88,11 +89,19 @@ def test_ask_form_fixture_has_typed_fields():
 @pytest.mark.asyncio
 async def test_ask_form_typed_fields_and_invalid_shapes():
     fixture = json.loads((FIXTURES_DIR / "ask-form.json").read_text())
-    result = await run_recipe(Recipe.model_validate(fixture["recipe"]), fixture["inputs"], HostEmulator())
+    result = await run_recipe(
+        Recipe.model_validate(fixture["recipe"]), fixture["inputs"], HostEmulator()
+    )
     assert result["ask"] == fixture["expected"]["ask"]
     PluginResult.model_validate({"ask": result["ask"]})
 
-    field = {"name": "value", "label": "Value", "kind": "text", "required": True, "max_length": 500}
+    field = {
+        "name": "value",
+        "label": "Value",
+        "kind": "text",
+        "required": True,
+        "max_length": 500,
+    }
     ask = {"prompt": "Provide a value", "min_band": "adult", "fields": [field]}
     invalid = [
         {"ask": {**ask, "fields": [{**field, "name": f"field_{i}"} for i in range(5)]}},
@@ -101,7 +110,14 @@ async def test_ask_form_typed_fields_and_invalid_shapes():
         {"ask": {"prompt": ask["prompt"], "fields": ask["fields"]}},
     ]
     for value in invalid:
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             PluginResult.model_validate(value)
-    with pytest.raises(Exception):
-        Recipe.model_validate({"id": "missing-band", "steps": [{"op": "ask", "prompt": ask["prompt"], "fields": ask["fields"]}]})
+    with pytest.raises(ValidationError):
+        Recipe.model_validate(
+            {
+                "id": "missing-band",
+                "steps": [
+                    {"op": "ask", "prompt": ask["prompt"], "fields": ask["fields"]}
+                ],
+            }
+        )
