@@ -1,3 +1,7 @@
+## [ui-v0.5.356] - 2026-10-26
+
+- ChatHeader takes `identityChoices`, `identityValue` and `onIdentityChange`: the companion picker lists each choice as a radio row with its face beside the name. Additive; `identityMenu` still works.
+
 ## [ui-v0.5.355] - 2026-10-26
 
 - ChatHeader fills the width of its slot, so the picker centers and the actions sit at the right edge inside a flex parent.

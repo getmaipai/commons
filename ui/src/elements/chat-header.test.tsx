@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { ChatHeader } from "@/kit/elements/chat-header";
 
 afterEach(cleanup);
@@ -36,6 +36,16 @@ describe("ChatHeader", () => {
   test("renders a companion picker trigger for the supplied menu item", () => {
     const { getByRole } = render(<ChatHeader name="Marlow" media={<span />} identityMenu={<span>Choose another</span>} />);
     expect(getByRole("button", { name: "Change companion" })).toBeTruthy();
+  });
+
+  test("draws each choice with its face and reports a selection", async () => {
+    const picked: string[] = [];
+    const { getByRole, findByRole } = render(<ChatHeader name="Marlow" media={<span />} identityValue="a" onIdentityChange={(value) => picked.push(value)} identityChoices={[{ value: "a", label: "Sprout" }, { value: "b", label: "Rivet", imageUrl: "/rivet.png" }]} />);
+    const trigger = getByRole("button", { name: "Change companion" });
+    act(() => { fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerId: 1 }); fireEvent.click(trigger); });
+    expect((await findByRole("menuitemradio", { name: "Sprout" })).getAttribute("aria-checked")).toBe("true");
+    fireEvent.click(getByRole("menuitemradio", { name: "Rivet" }));
+    expect(picked).toEqual(["b"]);
   });
 
   test("does not render a gradient smear below the header", () => {
