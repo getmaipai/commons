@@ -1,3 +1,7 @@
+## [spec-v0.1.236] - 2026-10-26
+
+- PERUSE-2026-10-25: add the LikenessAsk record (one per-use consent ask; hash of the prompt, never its text) and the household setting `likeness.per_use` (boolean, off by default, honoured by Home). Additive.
+
 ## [spec-v0.1.235] - 2026-10-25
 
 - MEDIA-DETAIL-02b: add the optional player action `on_lyrics_open` to the UI schema.

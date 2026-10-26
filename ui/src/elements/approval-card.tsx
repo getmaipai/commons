@@ -21,7 +21,9 @@ export type ApprovalStatusLabels = {
  * left out, and the monospace box is then not drawn (an ask that is not a
  * command); `statusLabels` words the running, done and denied rows;
  * `allowHint` renders inside the Allow once button after its label (a
- * keyboard hint such as a Kbd). A request with no handlers draws no
+ * keyboard hint such as a Kbd); `allowLabel` and `denyLabel` replace the
+ * words "Allow once" and "Deny" (an ask worded as Consent and Decline). A
+ * request with no handlers draws no
  * empty button row (an ask someone else answers).
  */
 
@@ -33,6 +35,8 @@ export function ApprovalCard({
   icon,
   statusLabels,
   allowHint,
+  allowLabel,
+  denyLabel,
   onAllowOnce,
   onAlwaysAllow,
   onDeny,
@@ -48,6 +52,8 @@ export function ApprovalCard({
   | "icon"
   | "statusLabels"
   | "allowHint"
+  | "allowLabel"
+  | "denyLabel"
   | "onAllowOnce"
   | "onAlwaysAllow"
   | "onDeny"
@@ -59,6 +65,8 @@ export function ApprovalCard({
   icon?: ReactNode;
   statusLabels?: ApprovalStatusLabels | undefined;
   allowHint?: ReactNode;
+  allowLabel?: ReactNode;
+  denyLabel?: ReactNode;
   onAllowOnce?: () => void;
   onAlwaysAllow?: () => void;
   onDeny?: () => void;
@@ -89,7 +97,7 @@ export function ApprovalCard({
         <div
           className={cn(
             field,
-            "text-foreground/70 rounded-xl px-3.5 py-2.5 font-mono text-xs",
+            "text-foreground/70 rounded-xl px-3.5 py-2.5 font-mono text-xs break-words whitespace-pre-wrap",
           )}
         >
           {command}
@@ -106,7 +114,7 @@ export function ApprovalCard({
                   onClick={onDeny}
                   className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
                 >
-                  Deny
+                  {denyLabel ?? "Deny"}
                 </button>
               )}
               {onAlwaysAllow && (
@@ -127,7 +135,7 @@ export function ApprovalCard({
                     "flex h-8 items-center rounded-full px-3.5 text-xs font-medium",
                   )}
                 >
-                  Allow once
+                  {allowLabel ?? "Allow once"}
                   {allowHint}
                 </button>
               )}
