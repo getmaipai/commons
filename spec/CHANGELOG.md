@@ -1,3 +1,7 @@
+## [spec-v0.1.240] - 2026-10-26
+
+- AIMODELS-GLANCE-2026-10-26: Settings > AI and models becomes one at-a-glance card. Card props `groups` (several registry groups one view draws) and `copy` (named sentences); view id `ai.glance` replaces `ai.job_choices`; the seven job cards (adds Wake Word) collapse into one `ai.glance` card; the Models tab is removed and `household.ai_models` moves to the Advanced tab. `engines.image.choice`, `engines.video.choice`, `engines.music.choice` and `engines.wakeword.choice` move to `household.ai_pictures`, `ai_videos`, `ai_music` and the new `household.ai_wakeword`.
+
 ## [spec-v0.1.239] - 2026-10-26
 
 - Removed the LikenessAsk record and the household key `likeness.per_use` (the per-use consent step is dropped: models censor, the app filters only to protect kids). Nothing in Home reads either.

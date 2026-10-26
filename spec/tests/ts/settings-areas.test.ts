@@ -35,7 +35,7 @@ describe("single Settings area",()=>{
   expect(page(file,"voice").tabs?.find(t=>t.id==="robot")).toMatchObject({bands:["adult"],needs:["robot.paired","robots.enabled"]});
   expect(page(file,"chat").tabs?.find(t=>t.id==="skills")?.bands).toEqual(["teen","adult"]);
   expect(page(file,"apps").detail).toMatchObject({param:"id",view:"home.devices_admin",tabs:[{id:"overview"},{id:"behaviour"},{id:"access"}]});
-  expect(page(file,"ai").tabs?.map(t=>t.id)).toEqual(["overview","models","engines","advanced","coding"]);
+  expect(page(file,"ai").tabs?.map(t=>t.id)).toEqual(["overview","engines","advanced","coding"]);
  });
  test("every old origin/main and intermediate route maps once to an existing target",()=>{
   if(!existsSync("/tmp/areas-pre.json"))return; // one-off migration fixture, absent on a clean machine
@@ -49,7 +49,7 @@ describe("single Settings area",()=>{
   expect(entries.filter(x=>x.old.area==="chat"&&x.replacement).length).toBe(9);
   for(const row of entries){const dst=row.new??row.replacement;if(!dst){expect(row.reason).toBeTruthy();continue;}const target=area().sections.find(s=>s.id===dst.section);expect(target,JSON.stringify(row)).toBeDefined();if(row.new)expect(target!.tabs?.some(t=>t.id===dst.tab)).toBe(true);}
  });
- test("registry groups remain placed once",()=>{const counts=new Map<string,number>();for(const a of file.areas)for(const s of a.sections)for(const c of s.cards??[])if(c.group&&c.scope){const k=`${c.scope}:${c.group}`;counts.set(k,(counts.get(k)??0)+1)}for(const c of file.device_cards){const k=`${c.scope}:${c.group}`;counts.set(k,(counts.get(k)??0)+1)}const parked=new Set(file.not_placed.map(n=>`${n.scope}:${n.group}`));for(const k of new Set(registry.map(r=>`${r.scope}:${r.lives_in}`)))expect((counts.get(k)??0)+Number(parked.has(k)),k).toBe(1);});
+ test("registry groups remain placed once",()=>{const counts=new Map<string,number>();for(const a of file.areas)for(const s of a.sections)for(const c of s.cards??[])if(c.scope)for(const g of c.groups??(c.group?[c.group]:[])){const k=`${c.scope}:${g}`;counts.set(k,(counts.get(k)??0)+1)}for(const c of file.device_cards){const k=`${c.scope}:${c.group}`;counts.set(k,(counts.get(k)??0)+1)}const parked=new Set(file.not_placed.map(n=>`${n.scope}:${n.group}`));for(const k of new Set(registry.map(r=>`${r.scope}:${r.lives_in}`)))expect((counts.get(k)??0)+Number(parked.has(k)),k).toBe(1);});
 });
 
 describe("section scope: required in the central file, optional for a package area (spec 0.1.222)", () => {

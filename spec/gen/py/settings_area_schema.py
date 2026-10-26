@@ -139,6 +139,11 @@ class Card(BaseModel):
     group: constr(min_length=1) | None = Field(
         None, description='A registry group: SettingsKey lives_in.'
     )
+    groups: list[constr(min_length=1)] | None = Field(
+        None,
+        description='Several registry groups one view draws together (a card with a view and a scope, never with group).',
+        min_length=2,
+    )
     tab: constr(pattern=r'^[a-z][a-z0-9-]*$') | None = Field(
         None,
         description='The section tab that contains this card. Omitted cards appear in the summary strip above the tabs.',
@@ -173,6 +178,7 @@ class Card(BaseModel):
             'account.coding_keys',
             'ai.job_choices',
             'ai.always_on',
+            'ai.glance',
         ]
         | None
     ) = Field(
@@ -201,6 +207,12 @@ class Card(BaseModel):
     matrix: Matrix | None = Field(
         None,
         description="Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.",
+    )
+    copy_: dict[str, constr(min_length=1, max_length=200)] | None = Field(
+        None,
+        alias='copy',
+        description='Named sentences a view card draws (banners, counters, badges, dialog and confirm text): the one place they are written. Placeholders in braces, such as {count}, are filled by the view.',
+        min_length=1,
     )
 
 
@@ -233,6 +245,7 @@ class Tab(BaseModel):
             'account.coding_keys',
             'ai.job_choices',
             'ai.always_on',
+            'ai.glance',
         ]
         | None
     ) = Field(None, description='A named view drawn after this tab’s cards.')
@@ -273,6 +286,7 @@ class Detail(BaseModel):
         'account.coding_keys',
         'ai.job_choices',
         'ai.always_on',
+        'ai.glance',
     ] = Field(
         ...,
         description="A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
@@ -317,6 +331,7 @@ class Section(BaseModel):
             'account.coding_keys',
             'ai.job_choices',
             'ai.always_on',
+            'ai.glance',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn above the cards.')
@@ -339,6 +354,7 @@ class Section(BaseModel):
             'account.coding_keys',
             'ai.job_choices',
             'ai.always_on',
+            'ai.glance',
         ]
         | None
     ) = Field(None, description='keys only: a view drawn below the cards.')
@@ -361,6 +377,7 @@ class Section(BaseModel):
             'account.coding_keys',
             'ai.job_choices',
             'ai.always_on',
+            'ai.glance',
         ]
         | None
     ) = Field(

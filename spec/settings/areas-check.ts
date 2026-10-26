@@ -15,6 +15,10 @@ export interface AreaLink { label: string; href: string; icon?: string; min_role
 export interface AreaCard {
   label: string;
   group?: string;
+  /** Several registry groups one view draws together; needs a view and a scope, and excludes `group`. */
+  groups?: string[];
+  /** Named sentences a view card draws (banners, counters, badges, dialogs). */
+  copy?: Record<string, string>;
   scope?: Scope;
   levels?: Level[];
   links?: AreaLink[];
@@ -100,8 +104,9 @@ export function checkSettingsCap(section: AreaSection, registry: RegistryKey[]):
     const sectionViews = tab === "__summary__" && (section.view || section.lead_view || section.trail_view) ? 1 : 0;
     const tabViews = section.tabs?.find((entry) => entry.id === tab)?.view ? 1 : 0;
     const count = sectionViews + tabViews + (section.cards ?? []).filter((c) => (c.tab ?? "__summary__") === tab).reduce((n, c) => {
-      if (!c.group || !c.scope) return n;
-      return n + registry.filter((k) => k.scope === c.scope && k.lives_in === c.group && k.level === "basic").length;
+      if (!c.scope) return n;
+      const groups = c.groups ?? (c.group ? [c.group] : []);
+      return n + registry.filter((k) => k.scope === c.scope && groups.includes(k.lives_in) && k.level === "basic").length;
     }, 0);
     if (count > 10) errors.push(`${section.id}: tab "${tab}" has more than 10 visible basic settings`);
   }
@@ -187,6 +192,18 @@ export function checkAreas(file: AreasFile, registry: RegistryKey[]): string[] {
         if (c.view && c.links) errors.push(`${where}: card "${c.label}" is a link card, so it has no view`);
         if ((c.description || c.choices) && !c.view) errors.push(`${where}: card "${c.label}" has a description or choices but no view to draw them`);
         if (!c.links && !c.view && !(c.group && c.scope)) errors.push(`${where}: card "${c.label}" needs a group and scope, a view, or links`);
+        if (c.groups) {
+          if (c.group) errors.push(`${where}: card "${c.label}" gives group or groups, not both`);
+          if (!c.view || !c.scope) errors.push(`${where}: card "${c.label}" with groups needs a view and a scope`);
+          if (c.links) errors.push(`${where}: card "${c.label}" is a link card, so it has no groups`);
+          if (new Set(c.groups).size !== c.groups.length) errors.push(`${where}: card "${c.label}" names a group twice`);
+          for (const g of c.groups) {
+            if (c.scope && !registryGroups.has(`${c.scope}:${g}`)) { errors.push(`${where}: card "${c.label}" group ${g} at ${c.scope} is not in the registry`); continue; }
+            if (c.scope) drawn.set(`${c.scope}:${g}`, [...(drawn.get(`${c.scope}:${g}`) ?? []), `${where}${c.tab ? `?tab=${c.tab}` : ""}`]);
+          }
+          if (c.scope && c.scope !== s.scope) errors.push(`${where}: card "${c.label}" scope ${c.scope} disagrees with section scope ${s.scope}`);
+          continue;
+        }
         if (c.view && !!c.group !== !!c.scope) errors.push(`${where}: card "${c.label}" gives a group and a scope together, or neither`);
         if (!c.group || !c.scope) continue;
         const deviceException = (c.scope === "device" && s.scope === "person" && s.id === "voice" && (c.tab === "device" || c.tab === "robot")) || (c.scope === "household" && s.scope === "household" && s.id === "apps" && c.group === "robot.settings");

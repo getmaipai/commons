@@ -426,36 +426,25 @@
           "kind": "keys",
           "cards": [
             {
-              "label": "Chat pause",
-              "group": "household.chat_pause",
+              "label": "AI and models",
+              "groups": [
+                "household.ai_chat",
+                "household.ai_pictures",
+                "household.ai_videos",
+                "household.ai_music",
+                "household.ai_voice",
+                "household.ai_wakeword",
+                "household.ai_coding"
+              ],
               "scope": "household",
-              "tab": "overview"
-            },
-            {
-              "label": "Model per job",
-              "group": "household.ai_models",
-              "scope": "household",
-              "tab": "models"
-            },
-            {
-              "label": "AI settings",
-              "group": "household.ai_advanced",
-              "scope": "household",
-              "tab": "advanced"
-            },
-            {
-              "label": "Engines",
-              "group": "household.ai_runtime",
-              "scope": "household",
-              "tab": "engines"
-            },
-            {
-              "label": "Chat",
-              "group": "household.ai_chat",
-              "scope": "household",
-              "view": "ai.job_choices",
-              "description": "Talk with Home, and let it look at pictures you send.",
+              "view": "ai.glance",
+              "description": "A quick look at what's running on this computer.",
               "choices": [
+                {
+                  "id": "chat",
+                  "label": "Chat",
+                  "description": "Talk with Home, and let it look at pictures you send."
+                },
                 {
                   "id": "chat-standard",
                   "label": "Standard chat AI",
@@ -470,17 +459,12 @@
                   "id": "chat-pictures",
                   "label": "Chat can look at pictures",
                   "description": "Lets Home see the pictures you send."
-                }
-              ],
-              "tab": "overview"
-            },
-            {
-              "label": "Pictures",
-              "group": "household.ai_pictures",
-              "scope": "household",
-              "view": "ai.job_choices",
-              "description": "Make pictures in chat and change the ones you have.",
-              "choices": [
+                },
+                {
+                  "id": "pictures",
+                  "label": "Pictures",
+                  "description": "Make pictures in chat and change the ones you have."
+                },
                 {
                   "id": "pictures-edit",
                   "label": "Changing pictures",
@@ -495,33 +479,22 @@
                   "id": "pictures-look",
                   "label": "Name things in a picture",
                   "description": "Names the things in a picture, so you can find them."
-                }
-              ],
-              "tab": "overview"
-            },
-            {
-              "label": "Videos",
-              "group": "household.ai_videos",
-              "scope": "household",
-              "view": "ai.job_choices",
-              "description": "Make short videos in chat.",
-              "tab": "overview"
-            },
-            {
-              "label": "Music",
-              "group": "household.ai_music",
-              "scope": "household",
-              "view": "ai.job_choices",
-              "description": "Make songs and tunes.",
-              "tab": "overview"
-            },
-            {
-              "label": "Voice and speaking",
-              "group": "household.ai_voice",
-              "scope": "household",
-              "view": "ai.job_choices",
-              "description": "Choose how Home sounds when it talks.",
-              "choices": [
+                },
+                {
+                  "id": "videos",
+                  "label": "Videos",
+                  "description": "Make short videos in chat."
+                },
+                {
+                  "id": "music",
+                  "label": "Music",
+                  "description": "Make songs and tunes."
+                },
+                {
+                  "id": "voice",
+                  "label": "Voice & speaking",
+                  "description": "Choose how Home sounds when it talks."
+                },
                 {
                   "id": "voice-standard",
                   "label": "Standard voice",
@@ -531,24 +504,86 @@
                   "id": "voice-better",
                   "label": "Better voice",
                   "description": "Warmer and more natural, uses more space."
-                }
-              ],
-              "tab": "overview"
-            },
-            {
-              "label": "Coding helper",
-              "group": "household.ai_coding",
-              "scope": "household",
-              "view": "ai.job_choices",
-              "description": "Help with code in the Code app and in chat.",
-              "choices": [
+                },
+                {
+                  "id": "wakeword",
+                  "label": "Wake Word",
+                  "description": "Lets a device wake up when it hears its name."
+                },
+                {
+                  "id": "coding",
+                  "label": "Coding helper",
+                  "description": "Help with code in the Code app and in chat."
+                },
                 {
                   "id": "coding-helper",
                   "label": "Coding helper",
                   "description": "Helps with code in the Code app and in chat."
                 }
               ],
+              "copy": {
+                "eyebrow": "Your AI setup",
+                "title": "AI & Models",
+                "subtitle": "A quick look at what's running on this computer.",
+                "download_missing": "Download missing ({count})",
+                "missing_title": "{count} models not on this device",
+                "staged": "{count} changes staged. Nothing changes until applied.",
+                "discard": "Discard",
+                "apply": "Apply changes",
+                "memory": "Memory",
+                "memory_after": "After apply and download: {delta}",
+                "storage": "Storage",
+                "storage_after": "After apply and download: {total} models ({delta})",
+                "free_up": "Free up space · {size}",
+                "glance": "Model choices at a glance",
+                "counter": "{custom} custom · {recommended} recommended · {disabled} disabled",
+                "custom": "Custom",
+                "recommended": "Recommended",
+                "disabled": "Disabled",
+                "on": "On",
+                "off": "Off",
+                "ram_estimate": "about {size} RAM",
+                "fits": "Fits this device",
+                "not_offered": "Not offered on this computer",
+                "dialog_title": "Choose a model",
+                "dialog_note": "Choices are staged. Your current model stays in use until you apply changes.",
+                "use_recommended": "Use recommended",
+                "save_choice": "Save choice",
+                "disable_option": "Disable {name}",
+                "reset_eyebrow": "Reset category",
+                "reset_title": "Use recommended for {name}?",
+                "reset_body": "This stages Home's recommended model. Your current choice stays in use until you apply the change.",
+                "reset_confirm": "Reset to recommended",
+                "cancel": "Cancel",
+                "checked": "Last checked {when}",
+                "view_device": "View device",
+                "wakeword_note": "Keeps or removes the wake word files. Listening stays off until an adult turns it on for a device."
+              },
               "tab": "overview"
+            },
+            {
+              "label": "Chat pause",
+              "group": "household.chat_pause",
+              "scope": "household",
+              "tab": "overview"
+            },
+            {
+              "label": "Model per job",
+              "group": "household.ai_models",
+              "scope": "household",
+              "tab": "advanced"
+            },
+            {
+              "label": "AI settings",
+              "group": "household.ai_advanced",
+              "scope": "household",
+              "tab": "advanced"
+            },
+            {
+              "label": "Engines",
+              "group": "household.ai_runtime",
+              "scope": "household",
+              "tab": "engines"
             },
             {
               "label": "Search and memory",
@@ -590,10 +625,6 @@
               "id": "overview",
               "label": "Overview",
               "view": "home.engine_admin"
-            },
-            {
-              "id": "models",
-              "label": "Models"
             },
             {
               "id": "engines",

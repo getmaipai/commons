@@ -1260,6 +1260,14 @@ export const PackageManifest = z
                                 "A registry group: SettingsKey lives_in.",
                               )
                               .optional(),
+                            /**Several registry groups one view draws together (a card with a view and a scope, never with group).*/
+                            groups: z
+                              .array(z.string().min(1))
+                              .min(2)
+                              .describe(
+                                "Several registry groups one view draws together (a card with a view and a scope, never with group).",
+                              )
+                              .optional(),
                             /**The section tab that contains this card. Omitted cards appear in the summary strip above the tabs.*/
                             tab: z
                               .string()
@@ -1347,6 +1355,7 @@ export const PackageManifest = z
                                 "account.coding_keys",
                                 "ai.job_choices",
                                 "ai.always_on",
+                                "ai.glance",
                               ])
                               .describe(
                                 "A view that is this card's body, drawn in place of the group's default rows. With a group and scope the view draws that group's keys; without them it draws no keys.",
@@ -1489,6 +1498,13 @@ export const PackageManifest = z
                                 "Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.",
                               )
                               .optional(),
+                            /**Named sentences a view card draws (banners, counters, badges, dialog and confirm text): the one place they are written. Placeholders in braces, such as {count}, are filled by the view.*/
+                            copy: z
+                              .record(z.string(), z.string().min(1).max(200))
+                              .describe(
+                                "Named sentences a view card draws (banners, counters, badges, dialog and confirm text): the one place they are written. Placeholders in braces, such as {count}, are filled by the view.",
+                              )
+                              .optional(),
                           })
                           .strict()
                           .describe(
@@ -1517,6 +1533,7 @@ export const PackageManifest = z
                         "account.coding_keys",
                         "ai.job_choices",
                         "ai.always_on",
+                        "ai.glance",
                       ])
                       .describe("keys only: a view drawn above the cards.")
                       .optional(),
@@ -1540,6 +1557,7 @@ export const PackageManifest = z
                         "account.coding_keys",
                         "ai.job_choices",
                         "ai.always_on",
+                        "ai.glance",
                       ])
                       .describe("keys only: a view drawn below the cards.")
                       .optional(),
@@ -1563,6 +1581,7 @@ export const PackageManifest = z
                         "account.coding_keys",
                         "ai.job_choices",
                         "ai.always_on",
+                        "ai.glance",
                       ])
                       .describe(
                         "A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
@@ -1644,6 +1663,7 @@ export const PackageManifest = z
                                 "account.coding_keys",
                                 "ai.job_choices",
                                 "ai.always_on",
+                                "ai.glance",
                               ])
                               .describe(
                                 "A named view drawn after this tab’s cards.",
@@ -1730,6 +1750,7 @@ export const PackageManifest = z
                             "account.coding_keys",
                             "ai.job_choices",
                             "ai.always_on",
+                            "ai.glance",
                           ])
                           .describe(
                             "A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
@@ -1762,6 +1783,7 @@ export const PackageManifest = z
                                     "account.coding_keys",
                                     "ai.job_choices",
                                     "ai.always_on",
+                                    "ai.glance",
                                   ])
                                   .describe(
                                     "A named view drawn after this tab’s cards.",

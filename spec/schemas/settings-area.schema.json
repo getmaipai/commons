@@ -144,7 +144,8 @@
         "home.media_library",
         "account.coding_keys",
         "ai.job_choices",
-        "ai.always_on"
+        "ai.always_on",
+        "ai.glance"
       ],
       "description": "A named view in Home's view table. The list is closed so a package cannot name one Home does not have."
     },
@@ -195,6 +196,15 @@
           "type": "string",
           "minLength": 1,
           "description": "A registry group: SettingsKey lives_in."
+        },
+        "groups": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Several registry groups one view draws together (a card with a view and a scope, never with group)."
         },
         "tab": {
           "type": "string",
@@ -360,6 +370,16 @@
               "description": "What the person sees when a tick does not save: what happened and what to do."
             }
           }
+        },
+        "copy": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "minProperties": 1,
+          "description": "Named sentences a view card draws (banners, counters, badges, dialog and confirm text): the one place they are written. Placeholders in braces, such as {count}, are filled by the view."
         }
       },
       "description": "One card: either a registry group at one scope (group and scope together) or a list of link rows (links), or a view (view), never links with the others. areas-check.ts enforces the pairing."
@@ -383,7 +403,7 @@
         },
         "view": {
           "$ref": "#/$defs/view",
-          "description": "A named view drawn after this tab\u2019s cards."
+          "description": "A named view drawn after this tab’s cards."
         },
         "min_role": {
           "$ref": "#/$defs/role"
@@ -541,7 +561,7 @@
             "person",
             "household"
           ],
-          "description": "Whether the page edits the viewer\u2019s own settings or household settings."
+          "description": "Whether the page edits the viewer’s own settings or household settings."
         }
       },
       "allOf": [
