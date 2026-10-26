@@ -28,19 +28,19 @@ export function ChatHeader({ name, media, onMenu, onCall, actions, menuExpanded,
     <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">{media}</span>
     <span className="truncate text-sm font-medium">{name}</span>
   </>;
-  return <header className="flex h-14 items-center justify-between gap-2 px-4">
-    {onMenu ? <Button variant="ghost" size="icon" aria-label="Open menu" aria-expanded={menuExpanded} aria-controls={menuControls} onClick={onMenu}><MenuIcon aria-hidden="true" /></Button> : null}
+  return <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
+    <div className="flex items-center justify-self-start">{onMenu ? <Button variant="ghost" size="icon" aria-label="Open menu" aria-expanded={menuExpanded} aria-controls={menuControls} onClick={onMenu}><MenuIcon aria-hidden="true" /></Button> : null}</div>
     {identityMenu ? <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label={identityLabel} className="mr-auto min-w-0 justify-start gap-2 px-2">
+        <Button variant="ghost" size="sm" aria-label={identityLabel} className="min-w-0 justify-center gap-2 px-2">
           {identity}<ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">{identityMenu}</DropdownMenuContent>
-    </DropdownMenu> : <div className="mr-auto flex min-w-0 items-center gap-2">{identity}</div>}
-    {actions || onCall ? <div className="flex items-center gap-1">
+      <DropdownMenuContent align="center">{identityMenu}</DropdownMenuContent>
+    </DropdownMenu> : <div className="flex min-w-0 items-center justify-center gap-2">{identity}</div>}
+    <div className="flex items-center justify-self-end gap-1">
       {actions}
       {onCall ? <Button variant="ghost" size="icon" aria-label={`Call ${name}`} onClick={onCall}><CallIcon aria-hidden="true" /></Button> : null}
-    </div> : <span />}
+    </div>
   </header>;
 }

@@ -1,3 +1,7 @@
+## [ui-v0.5.352] - 2026-10-26
+
+- ChatHeader: the companion picker sits centered, the menu button stays left and the actions stay right (three-column grid); the picker menu opens centered under it.
+
 ## [ui-v0.5.352] - 2026-10-25
 
 - Creation parts draw a person's generated face from `avatarSeed` (`avatar_seed` in the schema row) when there is no photo URL: the creation header's creator, the visibility chip and the share panel.
