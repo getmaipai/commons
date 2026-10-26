@@ -64,6 +64,85 @@ export const MediaItem = z
         "Plain text, never HTML. Passes the band check with the title before band_ok includes child.",
       )
       .default(null),
+    /**Lyrics are null when unavailable, or plain text without HTML. Text passes the same band check as description with the title before band_ok includes child.*/
+    lyrics: z
+      .any()
+      .superRefine((x, ctx) => {
+        const schemas = [
+          z.null(),
+          z
+            .object({
+              source: z.enum(["file", "sidecar", "made", "lrclib"]),
+              /**Plain text, never HTML. Passes the same band check as description with the title before band_ok includes child.*/
+              text: z
+                .string()
+                .min(1)
+                .describe(
+                  "Plain text, never HTML. Passes the same band check as description with the title before band_ok includes child.",
+                ),
+              timed: z
+                .array(
+                  z
+                    .object({
+                      t: z.number().gte(0),
+                      line: z.string(),
+                      section: z.union([z.string(), z.null()]).optional(),
+                    })
+                    .strict(),
+                )
+                .optional(),
+            })
+            .strict(),
+        ];
+        const { errors, failed } = schemas.reduce<{
+          errors: z.core.$ZodIssue[];
+          failed: number;
+        }>(
+          ({ errors, failed }, schema) =>
+            ((result) =>
+              result.error
+                ? {
+                    errors: [...errors, ...result.error.issues],
+                    failed: failed + 1,
+                  }
+                : { errors, failed })(schema.safeParse(x)),
+          { errors: [], failed: 0 },
+        );
+        const passed = schemas.length - failed;
+        if (passed !== 1) {
+          ctx.addIssue(
+            errors.length
+              ? {
+                  path: [],
+                  code: "invalid_union",
+                  errors: [errors],
+                  message:
+                    "Invalid input: Should pass single schema. Passed " +
+                    passed,
+                }
+              : {
+                  path: [],
+                  code: "custom",
+                  errors: [errors],
+                  message:
+                    "Invalid input: Should pass single schema. Passed " +
+                    passed,
+                },
+          );
+        }
+      })
+      .describe(
+        "Lyrics are null when unavailable, or plain text without HTML. Text passes the same band check as description with the title before band_ok includes child.",
+      )
+      .default(null),
+    /**A rescan updates every field except these; an edit adds the field name here.*/
+    locked_fields: z
+      .array(z.enum(["title", "description", "artist", "artwork"]))
+      .refine((arr) => arr.every((item, i) => arr.indexOf(item) === i))
+      .describe(
+        "A rescan updates every field except these; an edit adds the field name here.",
+      )
+      .default([]),
     /**The media-source this item came from (a root, a feed, a channel or a pasted link).*/
     source_id: z
       .string()
@@ -452,11 +531,13 @@ export const MediaItem = z
       .string()
       .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
       .describe("Hybrid logical clock: wall_ms:counter:node (7.3)."),
-    /**Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed`.*/
+    /**Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed` or `hub:edit`.*/
     provenance: z
       .string()
       .min(1)
-      .describe("Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed`."),
+      .describe(
+        "Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed` or `hub:edit`.",
+      ),
   })
   .strict()
   .describe(

@@ -15,6 +15,7 @@ from pydantic import (
     conint,
     constr,
 )
+from pydantic import field_validator
 
 
 class Location(BaseModel):
@@ -106,6 +107,22 @@ class Subtitle(BaseModel):
     file_id: constr(pattern=r'^file-[a-z0-9]{6,}$')
 
 
+class TimedLyric(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    t: confloat(ge=0.0)
+    line: str
+    section: str | None = None
+
+
+class Lyrics(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    source: Literal['file', 'sidecar', 'made', 'lrclib']
+    text: constr(min_length=1) = Field(
+        ..., description='Plain text, never HTML. Passes the same band check as description with the title before band_ok includes child.'
+    )
+    timed: list[TimedLyric] | None = None
+
+
 class External(BaseModel):
     """
     For anything fetched from the web or read from a feed: the extractor (yt-dlp's name, or `rss` for a podcast guid) and its id.
@@ -167,6 +184,21 @@ class MediaItem(BaseModel):
         None,
         description='Plain text, never HTML. Passes the band check with the title before band_ok includes child.',
     )
+    lyrics: Lyrics | None = Field(
+        None,
+        description='Lyrics are null when unavailable, or plain text without HTML. Text passes the same band check as description with the title before band_ok includes child.',
+    )
+    locked_fields: list[Literal['title', 'description', 'artist', 'artwork']] = Field(
+        [],
+        description='A rescan updates every field except these; an edit adds the field name here.',
+    )
+
+    @field_validator('locked_fields')
+    @classmethod
+    def locked_fields_must_be_unique(cls, value):
+        if len(value) != len(set(value)):
+            raise ValueError('locked_fields must contain unique values')
+        return value
     source_id: constr(pattern=r'^msrc-[a-z0-9]{6,}$') = Field(
         ...,
         description='The media-source this item came from (a root, a feed, a channel or a pasted link).',
@@ -262,5 +294,5 @@ class MediaItem(BaseModel):
         ..., description='Hybrid logical clock: wall_ms:counter:node (7.3).'
     )
     provenance: constr(min_length=1) = Field(
-        ..., description='Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed`.'
+        ..., description='Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed` or `hub:edit`.'
     )

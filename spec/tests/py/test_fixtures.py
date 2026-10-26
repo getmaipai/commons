@@ -107,6 +107,7 @@ def test_knowledge_search_record_fixtures_round_trip(name, model):
         ("media-item.video.example.json", MediaItem),
         ("media-item.episode.example.json", MediaItem),
         ("media-item.track-explicit.example.json", MediaItem),
+        ("media-item.lyrics-locked.example.json", MediaItem),
         ("media-item.podcast-stream.example.json", MediaItem),
         ("media-item.book.example.json", MediaItem),
         ("media-item.audiobook.example.json", MediaItem),
@@ -128,6 +129,24 @@ def test_media_record_fixtures_round_trip(name, model):
     assert (
         model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
     )
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "media-item.invalid-lyrics-source.example.json",
+        "media-item.invalid-lyrics-empty-text.example.json",
+        "media-item.invalid-lyrics-timestamp.example.json",
+        "media-item.invalid-lyrics-extra-field.example.json",
+        "media-item.invalid-locked-field.example.json",
+        "media-item.invalid-locked-duplicate.example.json",
+    ],
+)
+def test_media_item_invalid_lyrics_and_locks(name):
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        MediaItem.model_validate(load_fixture(name))
 
 
 def test_source_reference_snapshot_attribution():

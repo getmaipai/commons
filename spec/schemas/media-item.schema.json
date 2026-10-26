@@ -59,6 +59,42 @@
       "default": null,
       "description": "Plain text, never HTML. Passes the band check with the title before band_ok includes child."
     },
+    "lyrics": {
+      "description": "Lyrics are null when unavailable, or plain text without HTML. Text passes the same band check as description with the title before band_ok includes child.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "text"],
+          "properties": {
+            "source": { "type": "string", "enum": ["file", "sidecar", "made", "lrclib"] },
+            "text": { "type": "string", "minLength": 1, "description": "Plain text, never HTML. Passes the same band check as description with the title before band_ok includes child." },
+            "timed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["t", "line"],
+                "properties": {
+                  "t": { "type": "number", "minimum": 0 },
+                  "line": { "type": "string" },
+                  "section": { "type": ["string", "null"] }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "default": null
+    },
+    "locked_fields": {
+      "type": "array",
+      "uniqueItems": true,
+      "default": [],
+      "items": { "type": "string", "enum": ["title", "description", "artist", "artwork"] },
+      "description": "A rescan updates every field except these; an edit adds the field name here."
+    },
     "source_id": {
       "type": "string",
       "pattern": "^msrc-[a-z0-9]{6,}$",
@@ -558,7 +594,7 @@
     "provenance": {
       "type": "string",
       "minLength": 1,
-      "description": "Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed`."
+      "description": "Who wrote it: `hub:scan`, `hub:fetch`, `hub:feed` or `hub:edit`."
     }
   }
 }

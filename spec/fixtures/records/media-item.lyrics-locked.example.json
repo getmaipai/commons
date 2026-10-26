@@ -1,0 +1,24 @@
+{
+  "id": "media-trk001",
+  "kind": "track",
+  "title": "Velvet Night",
+  "source_id": "msrc-root03",
+  "location": { "root_id": "msrc-root03", "path": "The Marlows/Tempo/03 Velvet Night.flac" },
+  "media_type": "audio/flac",
+  "playable": "original",
+  "band_ok": "teen",
+  "added_at": "2026-10-17T12:00:00Z",
+  "artist": "The Marlows",
+  "lyrics": {
+    "source": "file",
+    "text": "Under velvet skies\nWe follow the sound",
+    "timed": [
+      { "t": 0, "line": "Under velvet skies", "section": "Verse 1" },
+      { "t": 8.5, "line": "We follow the sound", "section": null }
+    ]
+  },
+  "locked_fields": ["title", "artist"],
+  "created_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub:edit"
+}

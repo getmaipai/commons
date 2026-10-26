@@ -60,7 +60,7 @@ describe("Media records", () => {
       const validate = schema(schemaName);
       expect(validate(data), JSON.stringify(validate.errors)).toBe(true);
       expect(model.safeParse(data).success).toBe(true);
-      expect(model.parse(data)).toEqual(data);
+      expect(model.parse(data)).toMatchObject(data);
     });
   }
 
@@ -97,6 +97,27 @@ describe("Media records", () => {
     const coll = fixture("media-collection.queue");
     expect(schema("media-collection")({ ...coll, kind: "favourites" })).toBe(false);
     expect(schema("media-collection")({ ...coll, rules: { genre: "rock" } })).toBe(false);
+  });
+
+  test("lyrics and locked fields have closed, validated shapes", () => {
+    const item = fixture("media-item.track-explicit");
+    const v = schema("media-item");
+    const valid = fixture("media-item.lyrics-locked");
+    expect(v(valid), JSON.stringify(v.errors)).toBe(true);
+    expect(MediaItem.parse(valid)).toMatchObject(valid);
+    for (const name of [
+      "media-item.invalid-lyrics-source",
+      "media-item.invalid-lyrics-empty-text",
+      "media-item.invalid-lyrics-timestamp",
+      "media-item.invalid-lyrics-extra-field",
+      "media-item.invalid-locked-field",
+      "media-item.invalid-locked-duplicate",
+    ]) {
+      const bad = fixture(name);
+      expect(v(bad), name).toBe(false);
+      expect(MediaItem.safeParse(bad).success, name).toBe(false);
+    }
+    expect((MediaItem.parse(item) as { locked_fields?: string[] }).locked_fields).toEqual([]);
   });
 
   test("a progress position is seconds or a reader locator, never both", () => {
