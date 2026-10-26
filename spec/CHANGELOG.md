@@ -1,3 +1,7 @@
+## [spec-v0.1.238] - 2026-10-26
+
+- Same content as spec-v0.1.237 (AI job cards), cut again because 0.1.237 was tagged before its package version was bumped. Use 0.1.238.
+
 ## [spec-v0.1.237] - 2026-10-26
 
 - AIMODELS-2026-10-25: one Settings > AI and models card per job (Chat, Pictures, Videos, Music, Voice and speaking, Coding helper), each with its own settings group (`household.ai_chat`, `ai_pictures`, `ai_videos`, `ai_music`, `ai_voice`, `ai_coding`). Card props `view`, `description` and `choices`; view ids `ai.job_choices` and `ai.always_on`; the Search and memory link card; the dead Manage card is dropped. Six keys move group; `generation.picture_quality` option copy is reworded.
