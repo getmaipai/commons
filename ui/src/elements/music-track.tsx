@@ -58,12 +58,12 @@ function legacyEditLayout(content: ReactNode): { modes: Array<{ id: string; labe
 export function MusicTrack({
   status, title, description, src, progress, phaseLabel, queuePosition, startedAt, estimateMs = 120_000, etaLabel, hint, error, downloadName = "song.m4a", lyrics, timedLyrics, cover, coverAlt, coverActions,
   versions = [], currentId, onSelectVersion, onUseVersion, onStop, onRetry, onDownload, onShare, onSaveToLibrary, onMakeAnother, actions, metadata, copy, width = "default", editContent, editLabel = "Edit", editPanelLabel,
-  stages = DEFAULT_STAGES, currentStage, elapsedSeconds, etaSeconds, waitingForMemory = false, editModes, quickSong = false, onMakeFull, defaultEditOpen = false,
+  stages = DEFAULT_STAGES, currentStage, elapsedSeconds, etaSeconds, waitingForMemory = false, editModes, quickSong = false, onMakeFull, defaultEditOpen = false, byline,
 }: {
   status: MusicTrackStatus; title: string; description?: string; src?: string; progress?: number | null; phaseLabel?: string; queuePosition?: number | null; startedAt?: number; estimateMs?: number; etaLabel?: string; hint?: string; error?: string; downloadName?: string; lyrics?: string; cover?: string; coverAlt?: string; coverActions?: ReactNode; timedLyrics?: { t: number; line: string; section?: string | null }[];
   versions?: Array<VersionLike & { label: string }>; currentId?: string; onSelectVersion?: (id: string) => void; onUseVersion?: (id: string) => void; onStop?: () => void; onRetry?: () => void; onDownload?: () => void; onShare?: () => void; onSaveToLibrary?: () => void; onMakeAnother?: () => void; actions?: ReactNode; metadata?: PlayerMetadata; copy?: Partial<MusicTrackCopy>; width?: "default" | "full"; editContent?: ReactNode; editLabel?: string; editPanelLabel?: string; className?: string;
   stages?: Array<{ id: string; label: string }>; currentStage?: number; elapsedSeconds?: number; etaSeconds?: number | null; waitingForMemory?: boolean;
-  editModes?: Array<{ id: string; label: string; content: ReactNode; disabledReason?: string }>; quickSong?: boolean; onMakeFull?: () => void; defaultEditOpen?: boolean;
+  editModes?: Array<{ id: string; label: string; content: ReactNode; disabledReason?: string }>; quickSong?: boolean; onMakeFull?: () => void; defaultEditOpen?: boolean; byline?: ReactNode;
 }) {
   const text = { ...DEFAULT_COPY, ...copy };
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -164,6 +164,7 @@ export function MusicTrack({
       {status === "cancelled" ? <p className="text-muted-foreground text-sm">{text.stopped}</p> : null}
       {status === "queued" && queuePosition && queuePosition > 0 ? <p className="text-muted-foreground text-xs">{text.queuePosition(queuePosition)}</p> : null}
       {hint && live ? <p className="text-muted-foreground text-xs">{hint}</p> : null}
+      {byline && status === "ready" ? <div data-slot="music-track-byline" className="text-muted-foreground flex min-w-0 flex-wrap items-center gap-1 border-t border-border pt-3 text-xs">{byline}</div> : null}
     </CardContent>
   </Card>;
 }

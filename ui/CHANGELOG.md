@@ -1,3 +1,7 @@
+## [ui-v0.5.357] - 2026-10-26
+
+- `MusicTrack` has a `byline` slot: a row inside the card, under the actions, drawn only for a finished song. Home puts the creation header's `byline` variant there (creator, date, Private or Shared chip) in the chat song card.
+
 ## [ui-v0.5.356] - 2026-10-26
 
 - ChatHeader takes `identityChoices`, `identityValue` and `onIdentityChange`: the companion picker lists each choice as a radio row with its face beside the name. Additive; `identityMenu` still works.

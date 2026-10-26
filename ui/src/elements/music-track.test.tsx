@@ -115,4 +115,22 @@ describe("MusicTrack compact card", () => {
     expect(selected).toEqual(["b"]);
     expect(view.container.textContent).toContain("Version 1 of 2");
   });
+
+  test("byline renders inside the byline slot when the song is ready", () => {
+    const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" byline={<span>Made by Sage</span>} />);
+    const slot = view.container.querySelector('[data-slot="music-track-byline"]') as HTMLElement;
+    expect(slot).toBeTruthy();
+    expect(slot.querySelector("span")?.textContent).toBe("Made by Sage");
+  });
+
+  test("byline does not render while the song is generating", () => {
+    const view = render(<MusicTrack status="generating" title="Song" byline={<span>Made by Sage</span>} />);
+    expect(view.container.querySelector('[data-slot="music-track-byline"]')).toBeNull();
+    expect(view.container.textContent).not.toContain("Made by Sage");
+  });
+
+  test("no byline slot when the byline prop is absent", () => {
+    const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" />);
+    expect(view.container.querySelector('[data-slot="music-track-byline"]')).toBeNull();
+  });
 });
