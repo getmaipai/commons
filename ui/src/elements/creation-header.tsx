@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { getIcon } from "../icons";
 import { absoluteTime } from "../format";
+import { LightMarkdown } from "./light-markdown";
 import { VisibilityChip, type VisibilityChipProps } from "./visibility-chip";
 import { diceBearAvatarUri } from "../primitives/Avatar";
 
@@ -65,7 +66,7 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
       </div>
       {variant === "full" && detail ? (
         <div>
-          <p className={expanded ? "text-base text-muted-foreground" : "line-clamp-3 text-base text-muted-foreground"}>{detail}</p>
+          <div className={expanded ? "text-base text-muted-foreground" : "line-clamp-3 text-base text-muted-foreground"}><LightMarkdown text={detail} /></div>
           <Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? "Show less" : "Show more"}</Button>
         </div>
       ) : null}

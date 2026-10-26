@@ -1,3 +1,7 @@
+## [ui-v0.5.358] - 2026-10-26
+
+- `CreationHeader` draws its description as light markdown (bold, italic, `code`, bullet lists, paragraphs and line breaks) instead of raw asterisks; the music card subtitle drops the markdown marks. One renderer, so every host of the header (Videos, Music, Library) gets it.
+
 ## [ui-v0.5.357] - 2026-10-26
 
 - `MusicTrack` has a `byline` slot: a row inside the card, under the actions, drawn only for a finished song. Home puts the creation header's `byline` variant there (creator, date, Private or Shared chip) in the chat song card.

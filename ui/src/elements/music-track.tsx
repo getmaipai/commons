@@ -16,6 +16,11 @@ import { GenerationStage } from "./generation-stage";
 import { stepVersion, type VersionLike } from "./image-editor-state";
 import { formatClock } from "./video-player";
 import { LyricsList } from "./lyrics-list";
+
+// The card subtitle is one clamped line of plain text, so markdown marks (**bold**, _italic_, `code`, # headings) are dropped, not drawn.
+function plainMarkdown(value: string) {
+  return value.replace(/[*_`~]+/g, "").replace(/^#{1,6}\s+/gm, "").replace(/\s+/g, " ").trim();
+}
 import type { PlayerCopy, PlayerMetadata } from "@/kit/primitives/Player";
 
 export type MusicTrackStatus = "queued" | "generating" | "ready" | "failed" | "cancelled";
@@ -128,7 +133,7 @@ export function MusicTrack({
       <div className="flex min-w-0 items-start gap-3">
         <div className="relative aspect-square w-20 shrink-0 sm:w-24">{coverTile}{status === "ready" && src ? <Button type="button" variant="secondary" size="icon" aria-label={playing ? text.pause : text.play} className="absolute inset-0 m-auto size-12 rounded-full shadow-md" onClick={() => { const audio = audioRef.current; if (!audio) return; if (audio.paused) void audio.play(); else audio.pause(); }}><span className="sr-only">{playing ? text.pause : text.play}</span>{playing ? <PauseIcon aria-hidden /> : <PlayIcon aria-hidden />}</Button> : null}</div>
         <div className="flex min-h-20 min-w-0 flex-1 flex-col justify-center gap-1 sm:min-h-24">
-          <p className="break-words text-sm font-semibold leading-tight">{title}</p>{description ? <p className="text-muted-foreground line-clamp-2 break-words text-xs">{description}</p> : null}
+          <p className="break-words text-sm font-semibold leading-tight">{title}</p>{description ? <p className="text-muted-foreground line-clamp-2 break-words text-xs">{plainMarkdown(description)}</p> : null}
           {live ? waitingForMemory ? <p role="status" className="text-muted-foreground mt-1 text-xs">{text.waitingForMemory}</p> : <div className="mt-1 flex min-w-0 flex-col gap-1.5">
             {stages.length > 0 ? <>
               <p role="status" className="text-muted-foreground truncate text-xs sm:hidden">Step {Math.min(doneStages + 1, stages.length)} of {stages.length} · {currentStageLabel ?? phaseLabel ?? stages.at(-1)?.label}</p>

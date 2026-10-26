@@ -41,6 +41,13 @@ describe("CreationHeader", () => {
     expect(view.getByRole("button", { name: "Private, view sharing" })).toBeTruthy();
   });
 
+  test("draws the description's markdown as formatting, not as raw asterisks", () => {
+    const view = render(<CreationHeader title="Song" creator={{ name: "Aster" }} description={"**[Intro]** (Twirling finger-picking) **[Verse 1]** Jordancito se levantó"}
+      visibility={{ mode: "private", people: [], canManage: false, onOpen: () => {} }} />);
+    expect(view.container.querySelector("strong")?.textContent).toBe("[Intro]");
+    expect(view.container.textContent).not.toContain("**");
+  });
+
   test("full variant keeps its heading and show more for a long description", () => {
     const view = render(<CreationHeader title="Song" creator={{ name: "Aster" }} description={"A long description. ".repeat(40)}
       visibility={{ mode: "private", people: [], canManage: false, onOpen: () => {} }} />);
