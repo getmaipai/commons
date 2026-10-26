@@ -1,3 +1,7 @@
+## [spec-v0.1.229] - 2026-10-25
+
+- LIKENESS-SIMPLIFY-01, owner decision Jesse, 2026-10-25: add the household boolean setting `generation.household_likeness` (default on, honoured by Home) for family pictures, videos and songs. Remove the per-person keys `likeness.adults` and `likeness.adult_content`, the `LikenessConsent` and `LikenessUse` schemas, and their generated models and fixtures. Keep the saved style subject binding in `LikenessAdapter`.
+
 ## [spec-v0.1.228] - 2026-10-25
 
 - SPEC-ANSWERED-BY-01. Add optional `answered_by` to ConversationTurn and optional `companion_id` to StackJob and Project provenance. Additive; older records read as null.
