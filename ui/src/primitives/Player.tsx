@@ -28,7 +28,6 @@ import {
   MediaVolumeRange,
 } from "media-chrome/react";
 import { getIcon } from "@/kit/icons";
-import { BookOpenIcon } from "lucide-react";
 import { LyricsList, type TimedLyricLine } from "@/kit/elements/lyrics-list";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "@/kit/ui/button";
@@ -1113,7 +1112,7 @@ export function Player(props: PlayerProps) {
             <div className="flex flex-wrap items-center justify-center gap-2">{transport(true)}</div>
             <div className="flex flex-wrap items-center justify-center gap-1">
               {actionsSlot}
-              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => setLyricsOpen(value => !value)}><BookOpenIcon aria-hidden /></Button> : null}
+              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => setLyricsOpen(value => !value)}>{(() => { const Icon = getIcon("book"); return <Icon aria-hidden />; })()}</Button> : null}
               {rateMenu}
               {chapterMenu}
               {castButtons}
