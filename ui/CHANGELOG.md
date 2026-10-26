@@ -51,6 +51,10 @@
 
 # Changelog (`@maipai/ui`)
 
+## [ui-v0.5.346] - 2026-10-25
+
+- Thread optionally marks an assistant reply when `answered_by` names a new companion, including the one-question mention label.
+
 ## [ui-v0.5.345] - 2026-10-25
 
 - MEDIA-DETAIL-01: player details support facts, a guarded expandable description and seekable chapters; phone video watch pages use a full-bleed player and floating shell header.

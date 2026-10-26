@@ -202,6 +202,31 @@ export type ThreadViewportOptions = Pick<
  */
 export type ComposerDensity = "compact";
 export type ComposerNoticeLayout = "truncate" | "wrap";
+export type SpeakerMarkerAnsweredBy = {
+  companion_id: string;
+  name: string;
+  look?: string;
+  via?: string;
+};
+export type SpeakerMarkerProps = {
+  speaker: SpeakerMarkerAnsweredBy;
+  joinedLabel?: string;
+  fallbackPoster?: string;
+};
+
+export const SpeakerMarker: FC<SpeakerMarkerProps> = ({ speaker, joinedLabel, fallbackPoster }) => (
+  <div data-slot="aui_speaker-marker" className="text-muted-foreground flex items-center gap-2 px-2 pb-1 text-xs">
+    {fallbackPoster ? (
+      <img src={fallbackPoster} alt="" className="border-border bg-muted size-7 rounded-full border object-cover" />
+    ) : (
+      <span aria-hidden className="border-border bg-muted text-foreground flex size-7 items-center justify-center rounded-full border font-medium">
+        {speaker.name.trim().charAt(0).toUpperCase() || "?"}
+      </span>
+    )}
+    <span className="font-medium text-foreground">{speaker.name}</span>
+    {joinedLabel ? <span>{joinedLabel}</span> : null}
+  </div>
+);
 
 export type ThreadComponents = {
   composerTourId?: string | undefined;
@@ -275,6 +300,8 @@ export type ThreadComponents = {
    * aloud, feedback, the More menu, the branch picker and typing stay
    * as they are. Unset, nothing changes. */
   engineDown?: string | undefined;
+  /** Draws a marker when an assistant turn is attributed to a new companion. */
+  speakerMarker?: { joinedLabel: (name: string) => string; fallbackPoster?: (speaker: SpeakerMarkerAnsweredBy) => string | undefined } | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -1100,7 +1127,15 @@ const AssistantMessage: FC = () => {
     TaskGroup: TaskGroupComponent,
     AssistantMessageFooterExtra,
     Indicator,
+    speakerMarker,
   } = useContext(ThreadComponentsContext);
+  const speaker = useAuiState((s) => s.message.metadata.custom?.answered_by as SpeakerMarkerAnsweredBy | null | undefined);
+  const marker = useAuiState((s) => {
+    const current = s.message.metadata.custom?.answered_by as SpeakerMarkerAnsweredBy | null | undefined;
+    if (!speakerMarker || !current) return false;
+    const previous = s.thread.messages.slice(0, s.message.index).reverse().find((message) => message.role === "assistant")?.metadata.custom?.answered_by as SpeakerMarkerAnsweredBy | null | undefined;
+    return current.via === "mention" || (previous ? previous.companion_id !== current.companion_id : current.companion_id !== "default");
+  });
   const groupBy = TaskGroupComponent ? taskAwareGroupBy : messageGroupBy;
 
   const ACTION_BAR_PT = "pt-1.5";
@@ -1113,6 +1148,9 @@ const AssistantMessage: FC = () => {
       data-role="assistant"
       className="fade-in slide-in-from-bottom-1 animate-in relative -mb-7.5 pb-7.5 duration-150 [contain-intrinsic-size:auto_200px] [content-visibility:auto]"
     >
+      {marker && speaker ? (
+        <SpeakerMarker speaker={speaker} joinedLabel={speaker.via === "mention" ? speakerMarker!.joinedLabel(speaker.name) : undefined} fallbackPoster={speakerMarker!.fallbackPoster?.(speaker)} />
+      ) : null}
       <div
         data-slot="aui_assistant-message-content"
         className="text-foreground px-2 leading-relaxed wrap-break-word"

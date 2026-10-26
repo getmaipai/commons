@@ -7,6 +7,35 @@ import { DraftRestoreComposerShowcase } from "./DraftRestoreComposerShowcase";
 
 afterEach(cleanup);
 
+const speakerMessages = (speakers: Array<{ companion_id: string; name: string; via?: string }>) => speakers.map((speaker) => ({ role: "assistant" as const, content: [{ type: "text" as const, text: "Hello" }], metadata: { custom: { answered_by: speaker } } }));
+function SpeakerHarness({ speakers, enabled = true }: { speakers: Array<{ companion_id: string; name: string; via?: string }>; enabled?: boolean }) {
+  const runtime = useLocalRuntime(adapter, { initialMessages: speakerMessages(speakers) });
+  return <AssistantRuntimeProvider runtime={runtime}><Thread components={enabled ? { speakerMarker: { joinedLabel: (name) => `${name} joined for one question` } } : undefined} /></AssistantRuntimeProvider>;
+}
+
+describe("Thread speaker marker", () => {
+  test("marks the first assistant message", () => {
+    render(<SpeakerHarness speakers={[{ companion_id: "a", name: "Ari" }]} />);
+    expect(document.querySelectorAll('[data-slot="aui_speaker-marker"]')).toHaveLength(1);
+  });
+  test("does not mark a repeated speaker", () => {
+    render(<SpeakerHarness speakers={[{ companion_id: "a", name: "Ari" }, { companion_id: "a", name: "Ari" }]} />);
+    expect(document.querySelectorAll('[data-slot="aui_speaker-marker"]')).toHaveLength(1);
+  });
+  test("marks a speaker change", () => {
+    render(<SpeakerHarness speakers={[{ companion_id: "a", name: "Ari" }, { companion_id: "b", name: "Bo" }]} />);
+    expect(document.querySelectorAll('[data-slot="aui_speaker-marker"]')).toHaveLength(2);
+  });
+  test("shows the joined copy for a mention", () => {
+    const { getByText } = render(<SpeakerHarness speakers={[{ companion_id: "a", name: "Ari", via: "mention" }]} />);
+    expect(getByText("Ari joined for one question")).toBeTruthy();
+  });
+  test("does nothing when the prop is absent", () => {
+    render(<SpeakerHarness speakers={[{ companion_id: "a", name: "Ari" }]} enabled={false} />);
+    expect(document.querySelector('[data-slot="aui_speaker-marker"]')).toBeNull();
+  });
+});
+
 class FakeResizeObserver {
   static instances: FakeResizeObserver[] = [];
   targets: Element[] = [];
