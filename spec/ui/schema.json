@@ -466,6 +466,8 @@
         "bind": { "$ref": "#/$defs/binding" },
         "kind": { "type": "string", "enum": ["video", "audio"], "default": "video" },
         "layout": { "type": "string", "enum": ["video", "audio", "mini"], "description": "Default: video for kind video, audio for kind audio." },
+        "lyrics_enabled": { "type": "boolean", "default": false, "description": "Show the Lyrics control even when the item has no lyrics." },
+        "lyrics_empty_text": { "type": "string", "description": "Plain empty state shown when lyrics are enabled but the item has no lyrics." },
         "autoplay_next": { "type": "boolean", "default": false, "description": "Count down and play up_next when the item ends. Off by default; a child's page leaves it off." },
         "fields": {
           "type": "object",
@@ -484,7 +486,9 @@
             "completed": { "type": "string", "minLength": 1 },
             "up_next": { "type": "string", "minLength": 1 },
             "description": { "type": "string", "minLength": 1, "description": "Row field containing the optional description; defaults to description." },
-            "facts": { "type": "string", "minLength": 1, "description": "Row field containing the muted facts line; defaults to facts and falls back to subtitle." }
+            "facts": { "type": "string", "minLength": 1, "description": "Row field containing the muted facts line; defaults to facts and falls back to subtitle." },
+            "lyrics": { "type": "string", "minLength": 1, "description": "Lyrics text field, default lyrics; reads lyrics.text from a nested lyrics object." },
+            "timed_lyrics": { "type": "string", "minLength": 1, "description": "Timed lyric lines field, default timed_lyrics; reads lyrics.timed from a nested lyrics object." }
           }
         },
         "on_progress": { "$ref": "#/$defs/action", "description": "Fired every 10 s while playing, on pause, on seek, at the end and on unload. Placeholders: the item's own fields plus {position_s}, {duration_s}, {reason} and {completed}." },
@@ -505,6 +509,15 @@
               "on_label": { "type": "string", "minLength": 1, "maxLength": 40 },
               "action": { "$ref": "#/$defs/action" }
             }
+          }
+        },
+        "edit": {
+          "type": "object", "additionalProperties": false, "required": ["label", "fields", "on_save"],
+          "properties": {
+            "label": { "type": "string", "minLength": 1 }, "title": { "type": "string" },
+            "visible_field": { "type": "string", "description": "Boolean row field controlling visibility; defaults to can_edit." },
+            "fields": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["name", "label", "kind"], "properties": { "name": { "type": "string", "minLength": 1 }, "label": { "type": "string", "minLength": 1 }, "kind": { "type": "string", "enum": ["text", "textarea", "cover"] } } } },
+            "on_save": { "type": "object", "additionalProperties": false, "required": ["call"], "properties": { "call": { "$ref": "#/$defs/action/properties/call" } } }, "cover_choices_field": { "type": "string" }, "on_upload": { "type": "object", "additionalProperties": false, "required": ["call"], "properties": { "call": { "$ref": "#/$defs/action/properties/call" } } }
           }
         },
         "empty_state": { "$ref": "#/$defs/empty_state" }
@@ -571,7 +584,8 @@
         "detail": { "$ref": "#/$defs/detail_pane" },
         "main": { "type": "array", "items": { "$ref": "#" }, "minItems": 1 },
         "aside": { "type": "array", "items": { "$ref": "#" }, "minItems": 1 },
-        "aside_label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The aside column's accessible name (\"Up next\")." }
+        "aside_label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The aside column's accessible name (\"Up next\")." },
+        "aside_sheet": { "type": "string", "enum": ["phone"], "description": "On phone, hide the aside and open it in a Drawer from a labelled button." }
       }
     },
     "widget_card": {

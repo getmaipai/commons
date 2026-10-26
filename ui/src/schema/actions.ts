@@ -21,6 +21,7 @@ export interface DispatchOptions {
   keepalive?: boolean;
   /** Whole call-argument placeholders keep JSON types (Reader's locator and percent). */
   typedArgs?: boolean;
+  onSuccess?: () => void;
 }
 
 // The five declared actions (platform plan 6.2). `play` hands the item to the
@@ -184,6 +185,7 @@ export function useDispatchAction(): {
       }
       setLastError(null);
       void runAndInvalidate(action, items, options)
+        .then(() => options.onSuccess?.())
         .catch((e: unknown) => setLastError(e instanceof Error ? e.message : "Something went wrong."))
         .finally(() => onSettled?.());
     },

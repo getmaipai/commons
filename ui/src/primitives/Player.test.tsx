@@ -42,6 +42,17 @@ describe("Player", () => {
     const view = render(<Player src="/a" kind="audio" layout="mini" title="Song" />);
     expect(view.container.querySelector('[data-slot="safe-image-fallback"][data-kind="music"]')).not.toBeNull();
   });
+  test("audio lyrics button swaps artwork for the shared list and seeks", () => {
+    const { container, getByRole, getByText } = render(<Player src="/song" kind="audio" title="Song" lyrics={{ lines: [{ t: 12, line: "A lyric" }] }} />);
+    const media = fakeMedia(container.querySelector("[data-slot=player-media]") as HTMLMediaElement);
+    act(() => fireEvent.timeUpdate(media));
+    act(() => fireEvent.click(getByRole("button", { name: "Lyrics" })));
+    expect(container.querySelector('[data-slot="player-lyrics"]')).not.toBeNull();
+    act(() => fireEvent.click(getByText("A lyric")));
+    expect(media.currentTime).toBe(12);
+    act(() => fireEvent.click(getByRole("button", { name: "Lyrics" })));
+    expect(container.querySelector('[data-slot="player-lyrics"]')).toBeNull();
+  });
   test("opens at the stored position with the resume line, and Start over goes to the start", async () => {
     const onProgress = mock((_: PlayerProgress) => {});
     const { el, getByRole, findByText } = setup({ resumeFrom: 760, onProgress });

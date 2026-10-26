@@ -1,3 +1,7 @@
+## [spec-v0.1.233] - 2026-10-25
+
+- MEDIA-DETAIL-02: add player lyrics and edit fields, and phone aside sheets to the UI schema.
+
 ## [spec-v0.1.232] - 2026-10-25
 
 - MEDIA-DETAIL-01: add optional player `fields.description` and `fields.facts` row field mappings.

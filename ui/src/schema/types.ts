@@ -233,13 +233,15 @@ export const BillboardNodeSchema = z.object({
 });
 export type BillboardNode = z.infer<typeof BillboardNodeSchema>;
 
-export const PLAYER_FIELDS = ["id", "src", "title", "subtitle", "poster", "chapters", "captions", "thumbnails", "position", "completed", "up_next", "description", "facts"] as const;
+export const PLAYER_FIELDS = ["id", "src", "title", "subtitle", "poster", "chapters", "captions", "thumbnails", "position", "completed", "up_next", "description", "facts", "lyrics", "timed_lyrics"] as const;
 
 export const PlayerNodeSchema = z.object({
   type: z.literal("player"),
   bind: BindingSchema,
   kind: z.enum(["video", "audio"]).default("video"),
   layout: z.enum(["video", "audio", "mini"]).optional(),
+  lyrics_enabled: z.boolean().optional(),
+  lyrics_empty_text: z.string().optional(),
   autoplay_next: z.boolean().default(false),
   fields: z.object(Object.fromEntries(PLAYER_FIELDS.map((f) => [f, z.string().min(1).optional()])) as Record<(typeof PLAYER_FIELDS)[number], z.ZodOptional<z.ZodString>>).strict().optional(),
   on_progress: ActionSchema.optional(),
@@ -258,6 +260,11 @@ export const PlayerNodeSchema = z.object({
     )
     .max(6)
     .optional(),
+  edit: z.object({
+    label: z.string().min(1), title: z.string().optional(),
+    fields: z.array(z.object({ name: z.string().min(1), label: z.string().min(1), kind: z.enum(["text", "textarea", "cover"]) })).min(1),
+    visible_field: z.string().optional(), on_save: z.object({ call: z.object({ target: z.string(), method: z.enum(["POST", "PATCH", "DELETE"]).optional(), args: z.record(z.string(), z.unknown()).optional() }) }), cover_choices_field: z.string().optional(), on_upload: z.object({ call: z.object({ target: z.string(), method: z.enum(["POST", "PATCH", "DELETE"]).optional(), args: z.record(z.string(), z.unknown()).optional() }) }).optional(),
+  }).optional(),
   empty_state: EmptyStateNodeSchema.optional(),
 });
 export type PlayerNode = z.infer<typeof PlayerNodeSchema>;
@@ -307,12 +314,13 @@ export const SplitViewNodeSchema: z.ZodType<SplitViewNode> = z.lazy(() =>
       main: z.array(UiNodeSchema).min(1),
       aside: z.array(UiNodeSchema).min(1),
       aside_label: z.string().min(1).max(60).optional(),
+      aside_sheet: z.literal("phone").optional(),
     }),
   ]),
 );
 export type SplitViewNode =
   | { type: "split_view"; list: ListNode | CardGridNode; detail: DetailPaneNode }
-  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string };
+  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string; aside_sheet?: "phone" };
 
 export const WidgetCardNodeSchema = z.object({
   type: z.literal("widget_card"),

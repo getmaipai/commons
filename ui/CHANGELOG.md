@@ -1,3 +1,7 @@
+## [ui-v0.5.348] - 2026-10-25
+
+- MEDIA-DETAIL-02: extract the shared lyrics list, add the audio lyrics view, schema driven edit sheet, and phone Up next drawer.
+
 ## [ui-v0.5.344] - 2026-10-25
 
 - On a phone the open reader's Back and action pill stay put while the story scrolls (the sticky header keeps its resting offset).

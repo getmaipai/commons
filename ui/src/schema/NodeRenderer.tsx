@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { ApiError, request } from "@/kit/http";
@@ -24,6 +24,13 @@ import { AsyncState } from "@/kit/primitives/AsyncState";
 import { BatchBar, SelectModeToggle } from "@/kit/primitives/BatchBar";
 import { Button } from "@/kit/ui/button";
 import { Input } from "@/kit/ui/input";
+import { Textarea } from "@/kit/ui/textarea";
+import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/kit/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/kit/ui/drawer";
+import { Dropzone } from "@/kit/ui/dropzone";
+import { FileGrid } from "@/kit/primitives/FileGrid";
+import type { TimedLyricLine } from "@/kit/elements/lyrics-list";
 import { Checkbox } from "@/kit/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/kit/ui/tabs";
 import { Tabs as PillTabs, TabsList as PillTabsList, TabsTrigger as PillTabsTrigger } from "@/kit/dashboard/components/ui/tabs";
@@ -983,6 +990,11 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const host = useContext(MediaHostContext);
   const mediaEl = useRef<HTMLMediaElement | null>(null);
   const [castError, setCastError] = useState<string | null>(null);
+  const phone = useIsPhoneLayout();
+  const [editOpen, setEditOpen] = useState(false);
+  const [editValues, setEditValues] = useState<Record<string, unknown>>({});
+  const [editError, setEditError] = useState<string | null>(null);
+  useEffect(() => { if (lastError !== null && editOpen) setEditError("Could not save. Check that you are online, then try again."); }, [lastError, editOpen]);
   const field = (name: keyof NonNullable<PlayerNode["fields"]>, fallback: string) => node.fields?.[name] ?? fallback;
   const item = Array.isArray(query.data) ? query.data[0] : query.data;
   return (
@@ -1006,6 +1018,15 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
         const title = String(readField(r, field("title", "title")) ?? "");
         const subtitle = (readField(r, field("subtitle", "subtitle")) as string | undefined) ?? undefined;
         const poster = localPicture(readField(r, field("poster", "poster"))) ?? undefined;
+        const lyricText = readField(r, field("lyrics", "lyrics"));
+        const timedLines = readField(r, field("timed_lyrics", "timed_lyrics"));
+        const nestedLyrics = readField(r, "lyrics");
+        const lyrics = { text: typeof lyricText === "string" ? lyricText : typeof nestedLyrics === "object" && nestedLyrics !== null && typeof (nestedLyrics as Row).text === "string" ? (nestedLyrics as Row).text as string : undefined,
+          lines: (Array.isArray(timedLines) ? timedLines : typeof nestedLyrics === "object" && nestedLyrics !== null ? (nestedLyrics as Row).timed : undefined) as TimedLyricLine[] | undefined };
+        const hasLyrics = Boolean(lyrics.text || lyrics.lines?.length);
+        const audioLayout = node.layout ? node.layout === "audio" : node.kind === "audio";
+        const canEdit = node.edit && readField(r, node.edit.visible_field ?? "can_edit") === true;
+        const editButton = canEdit && node.edit ? <Button type="button" variant="secondary" size="sm" className="shrink-0 rounded-full px-4" onClick={() => { setEditError(null); setEditValues(Object.fromEntries(node.edit!.fields.map(f => [f.name, readField(r, f.name) ?? ""]))); setEditOpen(true); }}>{node.edit.label}</Button> : null;
         // MEDIA-POLISH-01: the host may own the element, so playback outlives this page (the docked mini bar).
         const external = host?.mediaFor?.({ id: String(readField(r, field("id", "id")) ?? ""), src, kind: node.kind, title, subtitle, poster }) ?? null;
         return (
@@ -1024,6 +1045,9 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               title={String(readField(r, field("title", "title")) ?? "")}
               subtitle={(readField(r, field("subtitle", "subtitle")) as string | undefined) ?? undefined}
               poster={localPicture(readField(r, field("poster", "poster"))) ?? undefined}
+              lyrics={hasLyrics || node.lyrics_enabled ? lyrics : undefined}
+              lyricsLabel="Lyrics"
+              lyricsEmptyText={node.lyrics_empty_text}
               chapters={(readField(r, field("chapters", "chapters")) as PlayerChapter[] | undefined) ?? undefined}
               captions={(readField(r, field("captions", "captions")) as PlayerTextTrack[] | undefined) ?? undefined}
               thumbnails={localPicture(readField(r, field("thumbnails", "thumbnails"))) ?? undefined}
@@ -1038,6 +1062,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
                   : undefined
               }
               onNext={node.on_next && upNext ? () => dispatch(node.on_next!, [upNext as unknown as Row]) : undefined}
+              actionsSlot={audioLayout ? editButton : undefined}
             />
             {node.details ? (
               <PlayerDetails
@@ -1049,7 +1074,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
                 seek={(time) => { if (mediaEl.current) mediaEl.current.currentTime = time; }}
               />
             ) : null}
-            {node.actions && node.actions.length > 0 ? <PlayerActions actions={node.actions} item={r} dispatch={dispatch} /> : null}
+            {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatch}>{!audioLayout ? editButton : null}</PlayerActions> : null}
+            {node.edit ? <EditPlayerSheet open={editOpen} onOpenChange={setEditOpen} phone={phone} definition={node.edit} item={r} values={editValues} setValues={setEditValues} error={editError} onSave={() => { const id = readField(r, field("id", "id")); const changed = Object.fromEntries(node.edit!.fields.filter(f => JSON.stringify(editValues[f.name] ?? "") !== JSON.stringify(readField(r, f.name) ?? "")).map(f => [f.name, editValues[f.name]])); if (!Object.keys(changed).length) { setEditOpen(false); return; } setEditError(null); const save = node.edit!.on_save; const action: Action = "call" in save ? { call: { ...save.call, args: { ...changed, id } } } : save; dispatch(action, [{ ...changed, id }], undefined, { onSuccess: () => setEditOpen(false) }); }} /> : null}
             {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
             {castError ? <p role="status" className="text-base text-destructive">{castError}</p> : null}
           </>
@@ -1148,7 +1174,7 @@ function PlayerDetails({ title, subtitle, facts, description, chapters, seek }: 
 
 /** MEDIA-POLISH-01: the actions row under the title (Like, Watch later): pill buttons in one row that scrolls sideways
  * on a phone. A button with a `field` is a toggle, pressed while that field of the item is true. */
-function PlayerActions({ actions, item, dispatch }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"] }) {
+function PlayerActions({ actions, item, dispatch, children }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"]; children?: ReactNode }) {
   return (
     <div className="flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" role="group" aria-label="Actions" data-slot="player-actions">
       {actions.map((a) => {
@@ -1168,8 +1194,28 @@ function PlayerActions({ actions, item, dispatch }: { actions: PlayerActionNode[
           </Button>
         );
       })}
+      {children}
     </div>
   );
+}
+
+function EditPlayerSheet({ open, onOpenChange, phone, definition, item, values, setValues, error, onSave }: {
+  open: boolean; onOpenChange: (open: boolean) => void; phone: boolean; definition: NonNullable<PlayerNode["edit"]>; item: Row;
+  values: Record<string, unknown>; setValues: (values: Record<string, unknown>) => void; error: string | null; onSave: () => void;
+}) {
+  const { dispatch } = useDispatchAction();
+  const body = <div className="grid gap-4 p-4">
+    {definition.fields.map(field => <div key={field.name} className="grid gap-2">
+      <label className="text-sm font-medium" htmlFor={`player-edit-${field.name}`}>{field.label}</label>
+      {field.kind === "cover" ? <>
+        <FileGrid label={field.label} density="compact" selectionMode items={((readField(item, definition.cover_choices_field ?? "cover_choices") as Array<{file_id:string;url:string;alt?:string}>) ?? []).map(choice => ({ id: choice.file_id, name: choice.alt ?? "Cover", kind: "image" as const, thumbnailUrl: choice.url, label: choice.alt ?? "Cover" }))} selectedIds={values[field.name] ? [String(values[field.name])] : []} onSelectionChange={ids => setValues({ ...values, [field.name]: ids[0] ?? "" })} />
+        {definition.on_upload ? <Dropzone accept="image/*" label="Add a picture" onFile={async file => { const dataUrl = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = reject; reader.readAsDataURL(file); }); const upload = definition.on_upload!; const action: Action = "call" in upload ? { call: { ...upload.call, args: { ...upload.call.args, file: "{file}" } } } : upload; dispatch(action, [{ ...item, file: { name: file.name, type: file.type, size: file.size, data_url: dataUrl } }], undefined, { typedArgs: true }); }} /> : null}
+      </> : field.kind === "textarea" ? <Textarea id={`player-edit-${field.name}`} value={String(values[field.name] ?? "")} onChange={event => setValues({ ...values, [field.name]: event.currentTarget.value })} /> : <Input id={`player-edit-${field.name}`} value={String(values[field.name] ?? "")} onChange={event => setValues({ ...values, [field.name]: event.currentTarget.value })} />}
+    </div>)}
+    {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+    <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="button" onClick={onSave}>Save</Button></div>
+  </div>;
+  return phone ? <Drawer open={open} onOpenChange={onOpenChange}><DrawerContent><DrawerHeader><DrawerTitle>{definition.title ?? definition.label}</DrawerTitle></DrawerHeader>{body}</DrawerContent></Drawer> : <Dialog open={open} onOpenChange={onOpenChange}><DialogContent><DialogHeader><DialogTitle>{definition.title ?? definition.label}</DialogTitle></DialogHeader>{body}</DialogContent></Dialog>;
 }
 
 // The widgets list (`GET /api/widgets`, D to E's contract) rather than
@@ -1321,11 +1367,15 @@ function DetailPaneNodeView({ node, state }: { node: DetailPaneNode; state: Row 
 }
 
 function SplitViewNodeView({ node, state }: { node: SplitViewNode; state: Row }) {
+  const phone = useIsPhoneLayout();
+  const [asideOpen, setAsideOpen] = useState(false);
   if ("main" in node) {
+    const aside = node.aside.map((child, i) => <NodeRenderer key={i} node={child} state={state} />);
+    if (node.aside_sheet === "phone" && phone) return <div data-slot="split-view" data-layout="main-aside"><div className="flex min-w-0 flex-col gap-4">{node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}<Button type="button" variant="outline" className="w-full" onClick={() => setAsideOpen(true)}>{node.aside_label ?? "More"}</Button><Drawer open={asideOpen} onOpenChange={setAsideOpen}><DrawerContent><DrawerHeader><DrawerTitle>{node.aside_label ?? "More"}</DrawerTitle></DrawerHeader><div className="overflow-y-auto p-4">{aside}</div></DrawerContent></Drawer></div></div>;
     return (
       <SplitView
         main={node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}
-        aside={node.aside.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}
+        aside={aside}
         asideLabel={node.aside_label}
       />
     );

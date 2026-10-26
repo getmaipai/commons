@@ -37,6 +37,7 @@ const ITEM = {
   position_s: 673,
   chapters: [{ start_s: 0, title: "Intro" }, { start_s: 74, title: "Laying the firebrick" }],
   up_next: { id: "m2", title: "How tides work" },
+  can_edit: true,
 };
 
 beforeEach(() => {
@@ -149,6 +150,56 @@ describe("player", () => {
     const { findByText, container } = inVideos(playerNode, { onPlay: () => {} }, { id: "m1" });
     await findByText("This video is not on the hub. Go back to Videos and pick another.");
     expect(container.querySelector("video")).toBeNull();
+  });
+
+  test("edit is visible only for editable rows, saves changed fields plus id, and Cancel sends nothing", async () => {
+    const editable: UiNode = { ...(playerNode as Extract<UiNode, { type: "player" }>), edit: { label: "Edit", fields: [{ name: "title", label: "Title", kind: "text" }], on_save: { call: { target: "/api/plugins/videos/edit/{id}", method: "PATCH" } } } };
+    const view = inVideos(editable, { onPlay: () => {} }, { id: "m1" });
+    await view.findByRole("button", { name: "Chapters" });
+    fireEvent.click(view.getByRole("button", { name: "Edit" }));
+    fireEvent.change(await view.findByRole("textbox", { name: "Title" }), { target: { value: "Updated title" } });
+    fireEvent.click(view.getByRole("button", { name: "Cancel" }));
+    expect(calls.some(call => call.url.includes("/edit/"))).toBe(false);
+    fireEvent.click(view.getByRole("button", { name: "Edit" }));
+    fireEvent.change(await view.findByRole("textbox", { name: "Title" }), { target: { value: "Updated title" } });
+    fireEvent.click(view.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(calls.find(call => call.url.endsWith("/edit/m1"))?.body).toEqual({ title: "Updated title", id: "m1" }));
+  });
+
+  test("failed edit save stays open and explains how to retry", async () => {
+    globalThis.fetch = mock((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url.endsWith("/data/item")) return Promise.resolve(new Response(JSON.stringify([ITEM]), { status: 200 }));
+      if (url.includes("/edit/")) return Promise.resolve(new Response("", { status: 500 }));
+      return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    }) as unknown as typeof fetch;
+    const editable: UiNode = { ...(playerNode as Extract<UiNode, { type: "player" }>), edit: { label: "Edit", fields: [{ name: "title", label: "Title", kind: "text" }], on_save: { call: { target: "/api/plugins/videos/edit/{id}", method: "PATCH" } } } };
+    const view = inVideos(editable, { onPlay: () => {} }, { id: "m1" });
+    await view.findByRole("button", { name: "Chapters" });
+    fireEvent.click(view.getByRole("button", { name: "Edit" }));
+    fireEvent.change(await view.findByRole("textbox", { name: "Title" }), { target: { value: "Updated title" } });
+    fireEvent.click(view.getByRole("button", { name: "Save" }));
+    await view.findByText("Could not save. Check that you are online, then try again.");
+  });
+
+  test("the Lyrics button appears for an empty row only when enabled and uses the node empty copy", async () => {
+    const audio: UiNode = { ...(playerNode as Extract<UiNode, { type: "player" }>), kind: "audio", layout: "audio", lyrics_enabled: true, lyrics_empty_text: "No words yet" };
+    const view = inVideos(audio, { onPlay: () => {} }, { id: "m1" });
+    fireEvent.click(await view.findByRole("button", { name: "Lyrics" }));
+    expect(await view.findByText("No words yet")).toBeTruthy();
+  });
+
+  test("the Edit pill stays hidden when can_edit is false", async () => {
+    globalThis.fetch = mock((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url.endsWith("/data/item")) return Promise.resolve(new Response(JSON.stringify([{ ...ITEM, can_edit: false }]), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    }) as unknown as typeof fetch;
+    const edit = { label: "Edit", fields: [{ name: "title", label: "Title", kind: "text" as const }], on_save: { call: { target: "/api/plugins/videos/edit/{id}" } } };
+    const editable: UiNode = { ...(playerNode as Extract<UiNode, { type: "player" }>), edit };
+    const view = inVideos(editable, { onPlay: () => {} }, { id: "m1" });
+    await view.findByRole("button", { name: "Chapters" });
+    expect(view.queryByRole("button", { name: "Edit" })).toBeNull();
   });
 });
 

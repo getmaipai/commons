@@ -361,6 +361,23 @@ describe("NodeRenderer > list", () => {
   });
 });
 
+describe("split_view phone aside sheet", () => {
+  test("opens the labelled aside in a drawer on the phone layout", async () => {
+    const original = window.matchMedia;
+    Object.defineProperty(window, "matchMedia", { configurable: true, value: (query: string) => ({ matches: query.includes("max-width"), media: query, onchange: null, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, dispatchEvent() { return false; } }) });
+    try {
+      const node = { type: "split_view", main: [{ type: "empty_state", icon: "music", text: "Player" }], aside: [{ type: "empty_state", icon: "list-music", text: "Queue contents" }], aside_label: "Up next", aside_sheet: "phone" } as const as unknown as Parameters<typeof NodeRenderer>[0]["node"];
+      const view = renderNode(node);
+      await view.findByText("Player");
+      fireEvent.click(view.getByRole("button", { name: "Up next" }));
+      expect(await view.findByText("Queue contents")).toBeTruthy();
+      expect(document.querySelector('[data-slot="drawer-content"]')).not.toBeNull();
+    } finally {
+      Object.defineProperty(window, "matchMedia", { configurable: true, value: original });
+    }
+  });
+});
+
 describe("NodeRenderer > form", () => {
   const formNode: FormNode = {
     type: "form",

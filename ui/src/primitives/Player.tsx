@@ -28,6 +28,8 @@ import {
   MediaVolumeRange,
 } from "media-chrome/react";
 import { getIcon } from "@/kit/icons";
+import { BookOpenIcon } from "lucide-react";
+import { LyricsList, type TimedLyricLine } from "@/kit/elements/lyrics-list";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "@/kit/ui/button";
 import {
@@ -170,6 +172,10 @@ export interface PlayerProps {
   poster?: string;
   /** Alternative text for audio artwork. Decorative by default. */
   posterAlt?: string;
+  /** Optional song lyrics shown in the audio layout. */
+  lyrics?: { lines?: readonly TimedLyricLine[]; text?: string };
+  lyricsLabel?: string;
+  lyricsEmptyText?: string;
   chapters?: readonly PlayerChapter[];
   /** A storyboard WebVTT (sprite `#xywh=` cues) for preview thumbnails on the time range. */
   thumbnails?: string;
@@ -297,6 +303,9 @@ export function Player(props: PlayerProps) {
     subtitle,
     poster,
     posterAlt = "",
+    lyrics,
+    lyricsLabel = "Lyrics",
+    lyricsEmptyText,
     thumbnails,
     captions = [],
     resumeFrom,
@@ -328,6 +337,7 @@ export function Player(props: PlayerProps) {
   const controllerRef = useRef<HTMLElement | null>(null);
   const media = useRef<HTMLMediaElement | null>(null);
   const [time, setTime] = useState(0);
+  const [lyricsOpen, setLyricsOpen] = useState(false);
   const [duration, setDuration] = useState(Number.NaN);
   const [playing, setPlaying] = useState(false);
   const [currentRate, setCurrentRate] = useState(rate ?? 1);
@@ -1088,7 +1098,7 @@ export function Player(props: PlayerProps) {
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
         <div className={audioLayout === "container" ? "grid w-full gap-6 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-6 sm:grid-cols-2 sm:items-center"}>
-          {art("aspect-square w-full max-w-md justify-self-center")}
+          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsEmptyText }} largeCurrent /></div> : art("aspect-square w-full max-w-md justify-self-center")}
           <div className="flex min-w-0 flex-col gap-4">
             <div className="min-w-0">
               <p className="truncate text-2xl font-semibold">{title}</p>
@@ -1103,6 +1113,7 @@ export function Player(props: PlayerProps) {
             <div className="flex flex-wrap items-center justify-center gap-2">{transport(true)}</div>
             <div className="flex flex-wrap items-center justify-center gap-1">
               {actionsSlot}
+              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => setLyricsOpen(value => !value)}><BookOpenIcon aria-hidden /></Button> : null}
               {rateMenu}
               {chapterMenu}
               {castButtons}
