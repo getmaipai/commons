@@ -5,7 +5,16 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, constr, model_validator
+from gen.py._validators import fields_requires_min_band
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    ValidationInfo,
+    constr,
+    field_validator,
+)
 
 from . import answer_block_schema
 
@@ -26,55 +35,6 @@ class Confirm(BaseModel):
     on_confirm: dict[str, Any] | None = None
 
 
-class AskField(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    name: constr(pattern=r'^[a-z][a-z0-9_]*$')
-    label: constr(min_length=1, max_length=80)
-    kind: Literal['text', 'number', 'date_time', 'choice', 'yes_no']
-    required: bool
-    placeholder: str | None = None
-    min: float | None = None
-    max: float | None = None
-    max_length: Literal[500] | None = None
-    options: list[constr(min_length=1, max_length=80)] | None = None
-
-    @model_validator(mode='after')
-    def validate_kind_constraints(self):
-        if self.kind == 'text' and self.max_length != 500:
-            raise ValueError('text fields require max_length 500')
-        if self.kind == 'choice' and (self.options is None or not 2 <= len(self.options) <= 8):
-            raise ValueError('choice fields require 2 to 8 options')
-        if self.kind != 'choice' and self.options is not None:
-            raise ValueError('options are only valid for choice fields')
-        if self.kind != 'number' and (self.min is not None or self.max is not None):
-            raise ValueError('min and max are only valid for number fields')
-        if self.kind != 'text' and self.max_length is not None:
-            raise ValueError('max_length is only valid for text fields')
-        if self.min is not None and self.max is not None and self.min > self.max:
-            raise ValueError('min cannot exceed max')
-        return self
-
-
-class Ask(BaseModel):
-    """
-    Lets a deterministic follow-up match without a model (4.5).
-    """
-
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    prompt: constr(max_length=300) | None = None
-    expects: str | None = None
-    fields: list[AskField] | None = Field(None, min_length=1, max_length=4)
-    min_band: Literal['child', 'teen', 'adult'] | None = None
-
-    @model_validator(mode='after')
-    def require_min_band_for_fields(self):
-        if self.fields is not None and self.min_band is None:
-            raise ValueError('min_band is required when fields are present')
-        return self
-
-
 class Error(BaseModel):
     """
     Fix B (docs/dev.md's 'Chat reliability: the 2026-09-07 incident' note): a handler's own typed report that it could not answer (an upstream fetch failure, say) - never present alongside `reply`. Distinct from a thrown exception (which the Tier 1 host maps to a strike and the manifest's fallback_reply already): this is a report of an EXPECTED failure mode a handler catches itself, so the caller can answer with the household-facing fallback without treating the package's own sandbox as unhealthy.
@@ -88,6 +48,46 @@ class Error(BaseModel):
         ...,
         description="Developer-facing detail, never shown to the household - the household sees the manifest's own fallback_reply or the error catalogue's spoken_fallback instead.",
     )
+
+
+class AskField(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    name: constr(pattern=r'^[a-z][a-z0-9_]*$')
+    label: constr(min_length=1, max_length=80)
+    kind: Literal['text', 'number', 'date_time', 'choice', 'yes_no']
+    required: bool
+    placeholder: str | None = None
+    min: float | None = None
+    max: float | None = None
+    max_length: Literal[500] | None = None
+    options: list[constr(min_length=1, max_length=80)] | None = Field(
+        None, max_length=8, min_length=2
+    )
+
+
+class Ask(BaseModel):
+    """
+    Lets a deterministic follow-up match without a model (4.5).
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    prompt: constr(max_length=300) | None = None
+    expects: str | None = None
+    min_band: Literal['child', 'teen', 'adult'] | None = None
+    fields: list[AskField] | None = Field(None, max_length=4, min_length=1)
+
+    @field_validator('fields', mode='after')
+    @classmethod
+    def fields_requires_min_band_validator(cls, v: Any, info: ValidationInfo) -> Any:
+        return fields_requires_min_band(v, info)
+
+
+class AskFields(RootModel[list[AskField]]):
+    root: list[AskField] = Field(..., max_length=4, min_length=1)
 
 
 class PluginResult(BaseModel):

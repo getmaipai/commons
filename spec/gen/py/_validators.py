@@ -24,3 +24,10 @@ def confirm_off_requires_boolean(value: Any, info: ValidationInfo) -> Any:
     if value is not None and info.data.get("selector") != "boolean":
         raise ValueError("confirm_off is only allowed when selector is boolean")
     return value
+
+
+def fields_requires_min_band(value: Any, info: ValidationInfo) -> Any:
+    """Match ask schemas: typed fields require an output floor."""
+    if value is not None and info.data.get("min_band") is None:
+        raise ValueError("min_band is required when fields is present")
+    return value

@@ -27,6 +27,7 @@ export const PluginResult = z
       .object({
         prompt: z.string().max(300).optional(),
         expects: z.string().optional(),
+        min_band: z.enum(["child", "teen", "adult"]).optional(),
         fields: z
           .array(
             z
@@ -62,12 +63,15 @@ export const PluginResult = z
           .min(1)
           .max(4)
           .optional(),
-        min_band: z.enum(["child", "teen", "adult"]).optional(),
       })
       .strict()
-      .superRefine((ask, ctx) => {
-        if (ask.fields !== undefined && ask.min_band === undefined) {
-          ctx.addIssue({ code: "custom", path: ["min_band"], message: "min_band is required when fields are present" });
+      .superRefine((value, ctx) => {
+        if (value.fields !== undefined && value.min_band === undefined) {
+          ctx.addIssue({
+            code: "custom",
+            message: "min_band is required when fields is present",
+            path: ["min_band"],
+          });
         }
       })
       .describe("Lets a deterministic follow-up match without a model (4.5).")

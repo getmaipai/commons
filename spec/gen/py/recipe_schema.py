@@ -5,36 +5,17 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, conint, constr, model_validator
-
-
-class AskField(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    name: constr(pattern=r'^[a-z][a-z0-9_]*$')
-    label: constr(min_length=1, max_length=80)
-    kind: Literal['text', 'number', 'date_time', 'choice', 'yes_no']
-    required: bool
-    placeholder: str | None = None
-    min: float | None = None
-    max: float | None = None
-    max_length: Literal[500] | None = None
-    options: list[constr(min_length=1, max_length=80)] | None = None
-
-    @model_validator(mode='after')
-    def validate_kind_constraints(self):
-        if self.kind == 'text' and self.max_length != 500:
-            raise ValueError('text fields require max_length 500')
-        if self.kind == 'choice' and (self.options is None or not 2 <= len(self.options) <= 8):
-            raise ValueError('choice fields require 2 to 8 options')
-        if self.kind != 'choice' and self.options is not None:
-            raise ValueError('options are only valid for choice fields')
-        if self.kind != 'number' and (self.min is not None or self.max is not None):
-            raise ValueError('min and max are only valid for number fields')
-        if self.kind != 'text' and self.max_length is not None:
-            raise ValueError('max_length is only valid for text fields')
-        if self.min is not None and self.max is not None and self.min > self.max:
-            raise ValueError('min cannot exceed max')
-        return self
+from gen.py._validators import fields_requires_min_band
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    ValidationInfo,
+    conint,
+    constr,
+    field_validator,
+)
 
 
 class Input(BaseModel):
@@ -461,35 +442,21 @@ class TimerStep(BaseModel):
     )
 
 
-class AskStep(BaseModel):
-    """
-    Sets the result's ask field (result.schema.json, 4.5) so a recipe that can't disambiguate on its own ("which Springfield") can ask a deterministic follow-up instead of guessing or failing outright. Always the recipe's last step: nothing after an ask step can run in the same pass, since there is nothing left to compute until the follow-up answer arrives on a later turn.
-    """
-
+class AskField(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    op: Literal['ask']
-    prompt: str = Field(
-        ...,
-        description='A template with {variable} interpolation, spoken/shown as the follow-up question.',
+    name: constr(pattern=r'^[a-z][a-z0-9_]*$')
+    label: constr(min_length=1, max_length=80)
+    kind: Literal['text', 'number', 'date_time', 'choice', 'yes_no']
+    required: bool
+    placeholder: str | None = None
+    min: float | None = None
+    max: float | None = None
+    max_length: Literal[500] | None = None
+    options: list[constr(min_length=1, max_length=80)] | None = Field(
+        None, max_length=8, min_length=2
     )
-    expects: str | None = Field(
-        None,
-        description="What kind of answer the next utterance should satisfy, e.g. a variable name the recipe would otherwise have asked for. Free text, matched by the turn engine (wave-2.md's C-to-D contract), not this interpreter.",
-    )
-    fields: list[AskField] | None = Field(None, min_length=1, max_length=4)
-    min_band: Literal['child', 'teen', 'adult'] | None = None
-    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
-        None,
-        description='Skip this step when that variable is bound, non-null and non-empty.',
-    )
-
-    @model_validator(mode='after')
-    def require_min_band_for_fields(self):
-        if self.fields is not None and self.min_band is None:
-            raise ValueError('min_band is required when fields are present')
-        return self
 
 
 class ArtifactStep(BaseModel):
@@ -526,6 +493,40 @@ class ArtifactStep(BaseModel):
         None,
         description='Skip this step when that variable is bound, non-null and non-empty.',
     )
+
+
+class AskStep(BaseModel):
+    """
+    Sets the result's ask field (result.schema.json, 4.5) so a recipe that can't disambiguate on its own ("which Springfield") can ask a deterministic follow-up instead of guessing or failing outright. Always the recipe's last step: nothing after an ask step can run in the same pass, since there is nothing left to compute until the follow-up answer arrives on a later turn.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    op: Literal['ask']
+    prompt: str = Field(
+        ...,
+        description='A template with {variable} interpolation, spoken/shown as the follow-up question.',
+    )
+    expects: str | None = Field(
+        None,
+        description="What kind of answer the next utterance should satisfy, e.g. a variable name the recipe would otherwise have asked for. Free text, matched by the turn engine (wave-2.md's C-to-D contract), not this interpreter.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = None
+    fields: list[AskField] | None = Field(None, max_length=4, min_length=1)
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
+
+    @field_validator('fields', mode='after')
+    @classmethod
+    def fields_requires_min_band_validator(cls, v: Any, info: ValidationInfo) -> Any:
+        return fields_requires_min_band(v, info)
+
+
+class AskFields(RootModel[list[AskField]]):
+    root: list[AskField] = Field(..., max_length=4, min_length=1)
 
 
 class Recipe(BaseModel):

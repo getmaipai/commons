@@ -309,8 +309,8 @@
         "op": { "const": "ask" },
         "prompt": { "type": "string", "description": "A template with {variable} interpolation, spoken/shown as the follow-up question." },
         "expects": { "type": "string", "description": "What kind of answer the next utterance should satisfy, e.g. a variable name the recipe would otherwise have asked for. Free text, matched by the turn engine (wave-2.md's C-to-D contract), not this interpreter." },
-        "fields": { "$ref": "#/$defs/ask_fields" },
         "min_band": { "enum": ["child", "teen", "adult"] },
+        "fields": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "$ref": "#/$defs/ask_field" } },
         "unless_set": {"$ref": "#/$defs/unless_set"}
 
       },

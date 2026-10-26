@@ -21,7 +21,7 @@ uv run datamodel-codegen \
   --use-union-operator \
   --strict-nullable \
   --enum-field-as-literal all \
-  --validators '{"RobotState":{"validators":[{"field":"put_down_count","function":"gen.py._validators.reject_explicit_null","mode":"before"},{"field":"clock_synced","function":"gen.py._validators.require_boolean","mode":"before"}]},"SettingsKey":{"validators":[{"field":"confirm_off","function":"gen.py._validators.confirm_off_requires_boolean","mode":"after"}]}}' \
+  --validators '{"RobotState":{"validators":[{"field":"put_down_count","function":"gen.py._validators.reject_explicit_null","mode":"before"},{"field":"clock_synced","function":"gen.py._validators.require_boolean","mode":"before"}]},"SettingsKey":{"validators":[{"field":"confirm_off","function":"gen.py._validators.confirm_off_requires_boolean","mode":"after"}]},"AskStep":{"validators":[{"field":"fields","function":"gen.py._validators.fields_requires_min_band","mode":"after"}]},"Ask":{"validators":[{"field":"fields","function":"gen.py._validators.fields_requires_min_band","mode":"after"}]}}' \
   --disable-timestamp
 
 # datamodel-code-generator currently emits non-required fields with a None
