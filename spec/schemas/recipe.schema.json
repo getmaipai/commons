@@ -304,14 +304,39 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["op", "prompt"],
+      "maxProperties": 6,
       "properties": {
         "op": { "const": "ask" },
         "prompt": { "type": "string", "description": "A template with {variable} interpolation, spoken/shown as the follow-up question." },
         "expects": { "type": "string", "description": "What kind of answer the next utterance should satisfy, e.g. a variable name the recipe would otherwise have asked for. Free text, matched by the turn engine (wave-2.md's C-to-D contract), not this interpreter." },
+        "fields": { "$ref": "#/$defs/ask_fields" },
+        "min_band": { "enum": ["child", "teen", "adult"] },
         "unless_set": {"$ref": "#/$defs/unless_set"}
 
       },
+      "allOf": [{ "if": { "required": ["fields"] }, "then": { "required": ["min_band"] } }],
       "description": "Sets the result's ask field (result.schema.json, 4.5) so a recipe that can't disambiguate on its own (\"which Springfield\") can ask a deterministic follow-up instead of guessing or failing outright. Always the recipe's last step: nothing after an ask step can run in the same pass, since there is nothing left to compute until the follow-up answer arrives on a later turn."
+    },
+    "ask_fields": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "$ref": "#/$defs/ask_field" } },
+    "ask_field": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "label", "kind", "required"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "kind": { "enum": ["text", "number", "date_time", "choice", "yes_no"] },
+        "required": { "type": "boolean" }, "placeholder": { "type": "string" },
+        "min": { "type": "number" }, "max": { "type": "number" },
+        "max_length": { "const": 500 },
+        "options": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 80 } }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "text" } }, "required": ["kind"] }, "then": { "required": ["max_length"], "properties": { "max_length": { "const": 500 } }, "not": { "anyOf": [{ "required": ["min"] }, { "required": ["max"] }, { "required": ["options"] }] } } },
+        { "if": { "properties": { "kind": { "const": "number" } }, "required": ["kind"] }, "then": { "not": { "anyOf": [{ "required": ["max_length"] }, { "required": ["options"] }] } } },
+        { "if": { "properties": { "kind": { "const": "date_time" } }, "required": ["kind"] }, "then": { "not": { "anyOf": [{ "required": ["min"] }, { "required": ["max"] }, { "required": ["max_length"] }, { "required": ["options"] }] } } },
+        { "if": { "properties": { "kind": { "const": "choice" } }, "required": ["kind"] }, "then": { "required": ["options"], "not": { "anyOf": [{ "required": ["min"] }, { "required": ["max"] }, { "required": ["max_length"] }] } } },
+        { "if": { "properties": { "kind": { "const": "yes_no" } }, "required": ["kind"] }, "then": { "not": { "anyOf": [{ "required": ["min"] }, { "required": ["max"] }, { "required": ["max_length"] }, { "required": ["options"] }] } } }
+      ]
     },
     "artifact_step": {
       "type": "object",

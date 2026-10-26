@@ -24,8 +24,52 @@ export const PluginResult = z
       .optional(),
     /**Lets a deterministic follow-up match without a model (4.5).*/
     ask: z
-      .object({ prompt: z.string().optional(), expects: z.string().optional() })
+      .object({
+        prompt: z.string().max(300).optional(),
+        expects: z.string().optional(),
+        fields: z
+          .array(
+            z
+              .object({
+                name: z.string().regex(new RegExp("^[a-z][a-z0-9_]*$")),
+                label: z.string().min(1).max(80),
+                kind: z.enum([
+                  "text",
+                  "number",
+                  "date_time",
+                  "choice",
+                  "yes_no",
+                ]),
+                required: z.boolean(),
+                placeholder: z.string().optional(),
+                min: z.number().optional(),
+                max: z.number().optional(),
+                max_length: z.literal(500).optional(),
+                options: z
+                  .array(z.string().min(1).max(80))
+                  .min(2)
+                  .max(8)
+                  .optional(),
+              })
+              .strict()
+              .and(
+                z.intersection(
+                  z.intersection(z.any(), z.any()),
+                  z.intersection(z.any(), z.intersection(z.any(), z.any())),
+                ),
+              ),
+          )
+          .min(1)
+          .max(4)
+          .optional(),
+        min_band: z.enum(["child", "teen", "adult"]).optional(),
+      })
       .strict()
+      .superRefine((ask, ctx) => {
+        if (ask.fields !== undefined && ask.min_band === undefined) {
+          ctx.addIssue({ code: "custom", path: ["min_band"], message: "min_band is required when fields are present" });
+        }
+      })
       .describe("Lets a deterministic follow-up match without a model (4.5).")
       .optional(),
     end_conversation: z.boolean().optional(),

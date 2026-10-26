@@ -37,6 +37,9 @@ export const Recipe = z
     steps: z
       .array(
         z.any().superRefine((x, ctx) => {
+          if (x && typeof x === "object" && "op" in x && x.op === "ask" && "fields" in x && !("min_band" in x)) {
+            ctx.addIssue({ code: "custom", path: ["min_band"], message: "min_band is required when fields are present" });
+          }
           const schemas = [
             z
               .object({
@@ -507,6 +510,45 @@ export const Recipe = z
                     "What kind of answer the next utterance should satisfy, e.g. a variable name the recipe would otherwise have asked for. Free text, matched by the turn engine (wave-2.md's C-to-D contract), not this interpreter.",
                   )
                   .optional(),
+                fields: z
+                  .array(
+                    z
+                      .object({
+                        name: z.string().regex(new RegExp("^[a-z][a-z0-9_]*$")),
+                        label: z.string().min(1).max(80),
+                        kind: z.enum([
+                          "text",
+                          "number",
+                          "date_time",
+                          "choice",
+                          "yes_no",
+                        ]),
+                        required: z.boolean(),
+                        placeholder: z.string().optional(),
+                        min: z.number().optional(),
+                        max: z.number().optional(),
+                        max_length: z.literal(500).optional(),
+                        options: z
+                          .array(z.string().min(1).max(80))
+                          .min(2)
+                          .max(8)
+                          .optional(),
+                      })
+                      .strict()
+                      .and(
+                        z.intersection(
+                          z.intersection(z.any(), z.any()),
+                          z.intersection(
+                            z.any(),
+                            z.intersection(z.any(), z.any()),
+                          ),
+                        ),
+                      ),
+                  )
+                  .min(1)
+                  .max(4)
+                  .optional(),
+                min_band: z.enum(["child", "teen", "adult"]).optional(),
                 /**Skip this step when that variable is bound, non-null and non-empty.*/
                 unless_set: z
                   .string()
@@ -517,6 +559,7 @@ export const Recipe = z
                   .optional(),
               })
               .strict()
+              .and(z.any())
               .describe(
                 "Sets the result's ask field (result.schema.json, 4.5) so a recipe that can't disambiguate on its own (\"which Springfield\") can ask a deterministic follow-up instead of guessing or failing outright. Always the recipe's last step: nothing after an ask step can run in the same pass, since there is nothing left to compute until the follow-up answer arrives on a later turn.",
               ),

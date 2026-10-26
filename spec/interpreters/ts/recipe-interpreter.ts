@@ -18,7 +18,7 @@ export interface PluginResult {
    * carrying it, and a step that gives it may omit its `text`. */
   synthesis_hint?: string;
   actions: { kind: string; payload?: unknown }[];
-  ask?: { prompt: string; expects?: string };
+  ask?: { prompt: string; expects?: string; fields?: AskField[]; min_band?: "child" | "teen" | "adult" };
   /** Fix B (docs/dev.md's "Chat reliability: the 2026-09-07 incident"
    * note): a handler's own typed report that it could not answer, never
    * alongside `reply` - see result.schema.json's own `error` field for
@@ -30,6 +30,18 @@ export interface PluginResult {
 }
 
 type Scope = Record<string, unknown>;
+
+type AskField = {
+  name: string;
+  label: string;
+  kind: "text" | "number" | "date_time" | "choice" | "yes_no";
+  required: boolean;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  max_length?: 500;
+  options?: string[];
+};
 
 // json-schema-to-zod emits recipe.schema.json's oneOf-based `step` as
 // `z.any().superRefine(...)`: the schema is validated at runtime, but
@@ -58,7 +70,7 @@ type RecipeStep =
   | { op: "list_view"; as: string; unless_set?: string }
   | { op: "remind"; as: string; text: string; unless_set?: string }
   | { op: "timer"; as: string; text: string; unless_set?: string }
-  | { op: "ask"; prompt: string; expects?: string; unless_set?: string }
+  | { op: "ask"; prompt: string; expects?: string; fields?: AskField[]; min_band?: "child" | "teen" | "adult"; unless_set?: string }
   | { op: "artifact"; as: string; title: string; kind: string; body: string; id_from: string; unless_set?: string };
 
 // No conditional step exists in this declarative language to branch a
@@ -133,7 +145,7 @@ export async function runRecipe(recipe: Recipe, inputs: Scope, host: Host): Prom
   let reply: { text: string; speech?: string } | undefined;
   let data: Record<string, unknown> | undefined;
   let synthesisHint: string | undefined;
-  let ask: { prompt: string; expects?: string } | undefined;
+  let ask: PluginResult["ask"];
 
   for (const step of recipe.steps as RecipeStep[]) {
     if (step.unless_set !== undefined) {
@@ -308,7 +320,12 @@ export async function runRecipe(recipe: Recipe, inputs: Scope, host: Host): Prom
         // hasn't arrived yet. Interpolated the same as any other prompt
         // text, so a recipe can ask "which {thing}" using whatever
         // ambiguity it just found.
-        ask = { prompt: interpolate(step.prompt, scope), expects: step.expects };
+        ask = {
+          prompt: interpolate(step.prompt, scope),
+          ...(step.expects !== undefined ? { expects: step.expects } : {}),
+          ...(step.fields !== undefined ? { fields: step.fields } : {}),
+          ...(step.min_band !== undefined ? { min_band: step.min_band } : {}),
+        };
         break;
       }
       case "artifact": {

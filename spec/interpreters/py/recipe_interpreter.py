@@ -252,7 +252,13 @@ async def run_recipe(recipe: Any, inputs: dict[str, Any], host: Any) -> dict[str
             # Always the recipe's last meaningful step (the schema's own
             # description): nothing after it can depend on an answer that
             # hasn't arrived yet.
-            ask = {"prompt": interpolate(step.prompt, scope), "expects": step.expects}
+            ask = {"prompt": interpolate(step.prompt, scope)}
+            if step.expects is not None:
+                ask["expects"] = step.expects
+            if step.fields is not None:
+                ask["fields"] = [field.model_dump(exclude_none=True) for field in step.fields]
+            if step.min_band is not None:
+                ask["min_band"] = step.min_band
         elif op == "artifact":
             # id_from names a scope variable read DIRECTLY (pick's own
             # "from" convention), not interpolate()'s templating path.

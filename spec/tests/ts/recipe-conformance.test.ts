@@ -6,6 +6,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { Recipe } from "../../gen/ts/recipe.js";
+import { PluginResult } from "../../gen/ts/result.js";
 import { HostEmulator, HostError, type ArtifactRecordLike } from "../../emulators/ts/host-emulator.js";
 import { runRecipe } from "../../interpreters/ts/recipe-interpreter.js";
 
@@ -96,4 +97,22 @@ describe("recipe conformance", () => {
       ).toEqual(expected.memory_added);
     });
   }
+
+  test("ask-form.json carries typed fields", async () => {
+    expect(fixtureFiles).toContain("ask-form.json");
+    const fixture = JSON.parse(readFileSync(join(FIXTURES_DIR, "ask-form.json"), "utf-8")) as ConformanceFixture;
+    const result = await runRecipe(Recipe.parse(fixture.recipe), fixture.inputs, new HostEmulator());
+    expect(result.ask).toEqual(fixture.expected!.ask);
+    expect(() => PluginResult.parse({ ask: result.ask })).not.toThrow();
+  });
+
+  test("typed ask fields reject invalid shapes", () => {
+    const field = { name: "value", label: "Value", kind: "text", required: true, max_length: 500 };
+    const ask = { prompt: "Provide a value", min_band: "adult", fields: [field] };
+    expect(() => PluginResult.parse({ ask: { ...ask, fields: Array.from({ length: 5 }, (_, i) => ({ ...field, name: `field_${i}` })) } })).toThrow();
+    expect(() => PluginResult.parse({ ask: { ...ask, fields: [{ ...field, label: "x".repeat(81) }] } })).toThrow();
+    expect(() => PluginResult.parse({ ask: { ...ask, fields: [{ ...field, kind: "unknown" }] } })).toThrow();
+    expect(() => PluginResult.parse({ ask: { prompt: ask.prompt, fields: ask.fields } })).toThrow();
+    expect(() => Recipe.parse({ id: "missing-band", steps: [{ op: "ask", prompt: ask.prompt, fields: ask.fields }] })).toThrow();
+  });
 });

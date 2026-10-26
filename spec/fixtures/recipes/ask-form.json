@@ -1,0 +1,40 @@
+{
+  "description": "A typed ask form with four supported field kinds.",
+  "recipe": {
+    "id": "ask-form",
+    "steps": [
+      {
+        "op": "ask",
+        "prompt": "When should I remind you?",
+        "expects": "reminder details",
+        "min_band": "adult",
+        "fields": [
+          { "name": "label", "label": "Reminder", "kind": "text", "required": true, "placeholder": "Call the dentist", "max_length": 500 },
+          { "name": "count", "label": "How many?", "kind": "number", "required": false, "min": 1, "max": 10 },
+          { "name": "when", "label": "Date and time", "kind": "date_time", "required": true },
+          { "name": "repeat", "label": "Repeat", "kind": "choice", "required": true, "options": ["Once", "Weekly"] }
+        ]
+      }
+    ]
+  },
+  "inputs": {},
+  "host_setup": {},
+  "expected": {
+    "reply": null,
+    "actions": [],
+    "scheduled_jobs": [],
+    "home_calls": [],
+    "memory_added": [],
+    "ask": {
+      "prompt": "When should I remind you?",
+      "expects": "reminder details",
+      "min_band": "adult",
+      "fields": [
+        { "name": "label", "label": "Reminder", "kind": "text", "required": true, "placeholder": "Call the dentist", "max_length": 500 },
+        { "name": "count", "label": "How many?", "kind": "number", "required": false, "min": 1, "max": 10 },
+        { "name": "when", "label": "Date and time", "kind": "date_time", "required": true },
+        { "name": "repeat", "label": "Repeat", "kind": "choice", "required": true, "options": ["Once", "Weekly"] }
+      ]
+    }
+  }
+}

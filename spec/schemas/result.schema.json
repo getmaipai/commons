@@ -36,9 +36,12 @@
       "additionalProperties": false,
       "description": "Lets a deterministic follow-up match without a model (4.5).",
       "properties": {
-        "prompt": { "type": "string" },
-        "expects": { "type": "string" }
-      }
+        "prompt": { "type": "string", "maxLength": 300 },
+        "expects": { "type": "string" },
+        "fields": { "$ref": "#/$defs/ask_fields" },
+        "min_band": { "enum": ["child", "teen", "adult"] }
+      },
+      "allOf": [{ "if": { "required": ["fields"] }, "then": { "required": ["min_band"] } }]
     },
     "end_conversation": { "type": "boolean" },
     "article": { "type": "object", "additionalProperties": true },
@@ -57,6 +60,30 @@
         "code": { "type": "string", "description": "One of spec/errors/errors.json's own codes." },
         "message": { "type": "string", "description": "Developer-facing detail, never shown to the household - the household sees the manifest's own fallback_reply or the error catalogue's spoken_fallback instead." }
       }
+    }
+  },
+  "$defs": {
+    "ask_fields": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "$ref": "#/$defs/ask_field" } },
+    "ask_field": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "label", "kind", "required"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "kind": { "enum": ["text", "number", "date_time", "choice", "yes_no"] },
+        "required": { "type": "boolean" },
+        "placeholder": { "type": "string" },
+        "min": { "type": "number" }, "max": { "type": "number" },
+        "max_length": { "const": 500 },
+        "options": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 80 } }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "text" } }, "required": ["kind"] }, "then": { "required": ["max_length"], "properties": { "max_length": { "const": 500 } }, "not": { "anyOf": [{ "required": ["min"] }, { "required": ["max"] }, { "required": ["options"] }] } } },
+        { "if": { "properties": { "kind": { "const": "number" } }, "required": ["kind"] }, "then": { "not": { "anyOf": [{ "required": ["max_length"] }, { "required": ["options"] }] } } },
+        { "if": { "properties": { "kind": { "const": "date_time" } }, "required": ["kind"] }, "then": { "not": { "anyOf": [{ "required": ["min"] }, { "required": ["max"] }, { "required": ["max_length"] }, { "required": ["options"] }] } } },
+        { "if": { "properties": { "kind": { "const": "choice" } }, "required": ["kind"] }, "then": { "required": ["options"], "not": { "anyOf": [{ "required": ["min"] }, { "required": ["max"] }, { "required": ["max_length"] }] } } },
+        { "if": { "properties": { "kind": { "const": "yes_no" } }, "required": ["kind"] }, "then": { "not": { "anyOf": [{ "required": ["min"] }, { "required": ["max"] }, { "required": ["max_length"] }, { "required": ["options"] }] } } }
+      ]
     }
   }
 }
