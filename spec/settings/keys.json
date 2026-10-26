@@ -3826,7 +3826,7 @@
     },
     "level": "expert",
     "secret": false,
-    "lives_in": "profile.appearance",
+    "lives_in": "profile.appearance.internal",
     "honoured_by": [
       "home"
     ]

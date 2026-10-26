@@ -110,7 +110,7 @@ describe("spec/settings/keys.json", () => {
       default: "[]",
       label: "Hidden from Home (advanced)",
       level: "expert",
-      lives_in: "profile.appearance",
+      lives_in: "profile.appearance.internal",
       honoured_by: ["home"],
       secret: false,
     });

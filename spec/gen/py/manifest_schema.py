@@ -591,6 +591,26 @@ class Widget(BaseModel):
         ...,
         description="How often Home should re-fetch this widget's data; the data itself still only ever comes from lib/packageCache.ts (step 3's own rule: never a live fetch in the request path).",
     )
+    min_role: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] | None = (
+        Field(
+            None,
+            description="The floor role a person needs to see this widget; optional, and may only raise the package's own floor.",
+        )
+    )
+    priority: conint(ge=0, le=100) = Field(
+        50, description='Home ordering priority; higher values come first.'
+    )
+    hero: bool | None = Field(
+        None,
+        description="Whether this widget may be selected for Home's single hero position.",
+    )
+    data: str | None = Field(
+        None,
+        description="The id of an entry in this manifest's contributes.data array.",
+    )
+    surfaces: list[Literal['home', 'tv', 'robot']] = Field(
+        ['home'], description='Surfaces where this widget may appear.'
+    )
     inputs: dict[str, Any] | None = Field(
         None,
         description='Resolved the same way `warm.keys` are - against household settings/state, not literal values in the manifest.',
