@@ -17,6 +17,11 @@ describe("ChatHeader", () => {
     expect(calls).toBe(1);
   });
 
+  test("fills the width of its slot", () => {
+    const { getByRole } = render(<ChatHeader name="Marlow" media={<span />} />);
+    expect(getByRole("banner").className).toContain("w-full");
+  });
+
   test("hides menu and call controls when handlers are absent", () => {
     const { queryByRole } = render(<ChatHeader name="Marlow" media={<span />} />);
     expect(queryByRole("button", { name: "Open menu" })).toBeNull();

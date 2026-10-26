@@ -1,3 +1,7 @@
+## [ui-v0.5.355] - 2026-10-26
+
+- ChatHeader fills the width of its slot, so the picker centers and the actions sit at the right edge inside a flex parent.
+
 ## [ui-v0.5.354] - 2026-10-26
 
 - ApprovalCard takes optional `allowLabel` and `denyLabel` (an ask worded Consent and Decline) and shows a long, multi-line `command` in full. Additive.

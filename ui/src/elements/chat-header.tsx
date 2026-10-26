@@ -28,7 +28,7 @@ export function ChatHeader({ name, media, onMenu, onCall, actions, menuExpanded,
     <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">{media}</span>
     <span className="truncate text-sm font-medium">{name}</span>
   </>;
-  return <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
+  return <header className="grid h-14 w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
     <div className="flex items-center justify-self-start">{onMenu ? <Button variant="ghost" size="icon" aria-label="Open menu" aria-expanded={menuExpanded} aria-controls={menuControls} onClick={onMenu}><MenuIcon aria-hidden="true" /></Button> : null}</div>
     {identityMenu ? <DropdownMenu>
       <DropdownMenuTrigger asChild>
