@@ -462,8 +462,28 @@
                 },
                 {
                   "id": "pictures",
-                  "label": "Pictures",
-                  "description": "Make pictures in chat and change the ones you have."
+                  "label": "Quick pictures",
+                  "description": "Make a picture in a few seconds. Used for most requests."
+                },
+                {
+                  "id": "pictures-ernie",
+                  "label": "ERNIE",
+                  "description": "Fast pictures that follow your words closely."
+                },
+                {
+                  "id": "pictures-klein",
+                  "label": "FLUX.2 Klein",
+                  "description": "Fast pictures, and the one that can also change a picture."
+                },
+                {
+                  "id": "picturesdetailed",
+                  "label": "Detailed pictures",
+                  "description": "Slower pictures with finer detail and more looks to add."
+                },
+                {
+                  "id": "picturesdetailed-zimage",
+                  "label": "Z-Image Turbo",
+                  "description": "Finer detail and more looks to choose from."
                 },
                 {
                   "id": "pictures-edit",
@@ -509,6 +529,11 @@
                   "id": "wakeword",
                   "label": "Wake Word",
                   "description": "Lets a device wake up when it hears its name."
+                },
+                {
+                  "id": "wakeword-detector",
+                  "label": "Hey Jarvis",
+                  "description": "The wake word detector and the two small files it shares with every wake word."
                 },
                 {
                   "id": "coding",

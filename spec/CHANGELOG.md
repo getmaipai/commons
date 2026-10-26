@@ -1,3 +1,7 @@
+## [spec-v0.1.242] - 2026-10-26
+
+- AIMODELS-SLOTS-2026-10-26: Pictures splits into a Quick row and a Detailed row on the AI and models glance. New glance choices `pictures-ernie`, `pictures-klein`, `picturesdetailed`, `picturesdetailed-zimage` and `wakeword-detector`; new household keys `generation.picture_quick_model` (ernie or klein) and `generation.picture_detailed.enabled`.
+
 ## [spec-v0.1.241] - 2026-10-26
 
 - MEDIA-APPLE-PASS-01: add player `details_show` and collection fields, actions, and header/footer parts to the UI schema.

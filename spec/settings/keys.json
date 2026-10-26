@@ -1265,6 +1265,50 @@
     ]
   },
   {
+    "key": "generation.picture_quick_model",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "ernie",
+        "klein"
+      ]
+    },
+    "default": "ernie",
+    "label": "Quick picture model",
+    "help": "Which model makes Quick pictures. ERNIE follows your words closely. FLUX.2 Klein also changes pictures and is the backup. If the one you pick is not on this computer, Quick uses the other.",
+    "copy": {
+      "does": "Chooses which model makes pictures when nobody asks for the slower kind.",
+      "options": {
+        "ernie": "Follows your words closely.",
+        "klein": "Fast, and it can also change a picture."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai_pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.picture_detailed.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Detailed pictures",
+    "help": "When off, chat makes every picture Quick, even when someone asks for Detailed. Turning it off does not remove the model.",
+    "copy": {
+      "does": "Lets chat make slower, finer pictures when someone asks for them."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.ai_pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "generation.video.adult_adapters",
     "scope": "household",
     "selector": "select",
