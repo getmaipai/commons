@@ -1,3 +1,8 @@
+## [ui-v0.5.351] - 2026-10-25
+
+- ChatHeader is a one-row bar with an optional companion picker and no gradient smear.
+- CharacterHero name pill no longer overlaps the avatar.
+
 ## [ui-v0.5.350] - 2026-10-25
 
 - MEDIA-DETAIL-02b: the player can ask the host for lyrics the first time Lyrics is opened on a song that has none (`on_lyrics_open`), shows a loading line, and refreshes when the call succeeds.

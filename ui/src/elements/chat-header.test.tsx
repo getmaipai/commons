@@ -23,6 +23,21 @@ describe("ChatHeader", () => {
     expect(queryByRole("button", { name: "Call Marlow" })).toBeNull();
   });
 
+  test("does not make the identity interactive without a menu", () => {
+    const { queryByRole } = render(<ChatHeader name="Marlow" media={<span />} />);
+    expect(queryByRole("button", { name: "Change companion" })).toBeNull();
+  });
+
+  test("renders a companion picker trigger for the supplied menu item", () => {
+    const { getByRole } = render(<ChatHeader name="Marlow" media={<span />} identityMenu={<span>Choose another</span>} />);
+    expect(getByRole("button", { name: "Change companion" })).toBeTruthy();
+  });
+
+  test("does not render a gradient smear below the header", () => {
+    const { container } = render(<ChatHeader name="Marlow" media={<span />} />);
+    expect(container.innerHTML).not.toContain("from-background");
+  });
+
   test("renders actions immediately left of the call button", () => {
     const { getByRole, getByText } = render(<ChatHeader name="Marlow" media={<span />} onCall={() => {}} actions={<button type="button">More</button>} />);
     const more = getByText("More");

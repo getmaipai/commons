@@ -12,5 +12,6 @@ describe("CharacterHero", () => {
     expect(getByText("Ready to chat")).toBeTruthy();
     expect(getByRole("button", { name: "Talk" })).toBeTruthy();
     expect(container.querySelector("section")?.className).toContain("sticky");
+    expect(getByText("Marlow").className).not.toContain("-mt-");
   });
 });
