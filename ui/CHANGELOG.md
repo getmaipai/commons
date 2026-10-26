@@ -1,3 +1,7 @@
+## [ui-v0.5.361] - 2026-10-26
+
+- SECTION-SIDEBAR-FOCUS-01: a compact `SectionSidebar` focuses its own search field when its header icon opens it, not the first search field on the page, so two columns on one page each focus their own. Additive.
+
 ## [ui-v0.5.360] - 2026-10-26
 
 - SECTION-SIDEBAR-SEARCH-01: in a compact `SectionSidebar`, opening search from its header icon also expands a collapsed column (calls `onCollapsedChange(false)`), so the field and its results are on screen. Additive.

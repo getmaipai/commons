@@ -469,6 +469,19 @@ describe("SectionSidebar", () => {
     expect(row.className).toContain("h-9");
   });
 
+  test("opening search in one column focuses that column's field, even when another column also has search", () => {
+    const search = { value: "", onChange: () => {}, label: "Search Chat" };
+    const { container } = render(
+      <SidebarProvider keyboardShortcut={false}>
+        <SectionSidebar density="compact" search={{ ...search, label: "Search first" }} groups={groups} />
+        <SectionSidebar density="compact" search={{ ...search, label: "Search second" }} groups={groups} />
+      </SidebarProvider>,
+    );
+    const buttons = container.querySelectorAll<HTMLButtonElement>('[data-slot="section-sidebar-search"]');
+    fireEvent.click(buttons[1]!);
+    expect(document.activeElement).toBe(container.querySelector('input[aria-label="Search second"]'));
+  });
+
   test("opening search from a collapsed compact column asks for the column to expand", () => {
     const onCollapsedChange = mock((_c: boolean) => {});
     const { container } = column({ density: "compact", standalone: true, collapsed: true, onCollapsedChange, search: { value: "", onChange: () => {}, label: "Search Chat" } });

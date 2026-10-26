@@ -198,10 +198,11 @@ export function SectionSidebar({
   const toggleRef = useRef<HTMLButtonElement>(null);
   // Compact columns (Chat's) open the search field from a header icon and hide it again when it is empty and blurred.
   const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   // The field the header icon opens takes focus at once; a keyboard or pointer user expects to type straight away.
   useEffect(() => {
     if (!searchOpen) return;
-    document.querySelector<HTMLInputElement>('[data-slot="section-sidebar-search-input"]')?.focus();
+    searchInputRef.current?.focus();
   }, [searchOpen]);
   // Where focus goes once the column has changed state: the host's show button after a hide, this column's own button after a pin.
   const focusAfter = useRef<"show" | "toggle" | null>(null);
@@ -429,6 +430,7 @@ export function SectionSidebar({
               variant="pill"
               type="search"
               data-slot="section-sidebar-search-input"
+              ref={searchInputRef}
               className="pl-9"
               aria-label={search.label}
               placeholder={search.label}
