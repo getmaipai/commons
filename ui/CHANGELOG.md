@@ -1,4 +1,4 @@
-## [ui-v0.5.352] - 2026-10-26
+## [ui-v0.5.353] - 2026-10-26
 
 - ChatHeader: the companion picker sits centered, the menu button stays left and the actions stay right (three-column grid); the picker menu opens centered under it.
 
