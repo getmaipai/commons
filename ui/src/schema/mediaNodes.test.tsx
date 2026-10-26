@@ -201,4 +201,44 @@ describe("MEDIA-POLISH-01", () => {
     expect(container.querySelector("video")).toBe(owned);
     expect(owned.getAttribute("src")).toBe("/api/media/m1/file");
   });
+
+  test("details show facts, expand a safe description into seekable chapters, and omit unsafe or absent descriptions", async () => {
+    const player: UiNode = {
+      type: "player", kind: "video", autoplay_next: false, bind: { source: "route", path: "/api/plugins/videos/data/item", stream: false }, details: true,
+      fields: { id: "id", src: "src", title: "title", subtitle: "subtitle", facts: "facts", description: "description", chapters: "chapters" },
+    };
+    const original = globalThis.fetch;
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify([{
+      ...ITEM, facts: "12 min · 4 chapters", description: "A careful build from start to finish.", chapters: ITEM.chapters,
+    }]), { status: 200 }))) as unknown as typeof fetch;
+    try {
+      const view = inVideos(player, { onPlay: () => {} });
+      expect(await view.findByText("12 min · 4 chapters")).toBeTruthy();
+      expect(view.getByText("A careful build from start to finish.").className).toContain("line-clamp-2");
+      const more = view.getByRole("button", { name: "Show more" });
+      expect(more.getAttribute("aria-expanded")).toBe("false");
+      fireEvent.click(more);
+      expect(view.getByRole("button", { name: "Show less" }).getAttribute("aria-expanded")).toBe("true");
+      expect(view.getByRole("button", { name: "0:00 Intro" })).toBeTruthy();
+      const video = view.container.querySelector("video")!;
+      // The rendered chapter seeks the existing media element.
+      Object.defineProperty(video, "currentTime", { configurable: true, writable: true, value: 0 });
+      fireEvent.click(view.getByRole("button", { name: "1:14 Laying the firebrick" }));
+      expect(video.currentTime).toBe(74);
+    } finally { globalThis.fetch = original; }
+  });
+
+  test("omits the more button when the description is absent or contains a raw token", async () => {
+    const player: UiNode = { type: "player", kind: "video", autoplay_next: false, bind: { source: "route", path: "/api/plugins/videos/data/item", stream: false }, details: true };
+    const original = globalThis.fetch;
+    try {
+      for (const description of [undefined, "Raw {token} description"]) {
+        globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify([{ ...ITEM, description }]), { status: 200 }))) as unknown as typeof fetch;
+        const view = inVideos(player, { onPlay: () => {} });
+        await view.findByRole("button", { name: "Chapters" });
+        expect(view.queryByRole("button", { name: "Show more" })).toBeNull();
+        cleanup();
+      }
+    } finally { globalThis.fetch = original; }
+  });
 });

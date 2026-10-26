@@ -1,3 +1,7 @@
+## [spec-v0.1.232] - 2026-10-25
+
+- MEDIA-DETAIL-01: add optional player `fields.description` and `fields.facts` row field mappings.
+
 ## [spec-v0.1.231] - 2026-10-25
 
 - HOME-LAYOUT-01: add the person setting `ui.home_layout`, with Shelves as the default and Ask first as the child band default. A child's row is guardian-controlled and reads from spec copy.

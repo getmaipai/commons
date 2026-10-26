@@ -482,12 +482,14 @@
             "thumbnails": { "type": "string", "minLength": 1 },
             "position": { "type": "string", "minLength": 1 },
             "completed": { "type": "string", "minLength": 1 },
-            "up_next": { "type": "string", "minLength": 1 }
+            "up_next": { "type": "string", "minLength": 1 },
+            "description": { "type": "string", "minLength": 1, "description": "Row field containing the optional description; defaults to description." },
+            "facts": { "type": "string", "minLength": 1, "description": "Row field containing the muted facts line; defaults to facts and falls back to subtitle." }
           }
         },
         "on_progress": { "$ref": "#/$defs/action", "description": "Fired every 10 s while playing, on pause, on seek, at the end and on unload. Placeholders: the item's own fields plus {position_s}, {duration_s}, {reason} and {completed}." },
         "on_next": { "$ref": "#/$defs/action", "description": "Fired with the up_next item's fields (a `play`, or a `navigate` to its watch page)." },
-        "details": { "type": "boolean", "default": false, "description": "MEDIA-POLISH-01: draw the item's title and subtitle line under the picture (a watch page's title block)." },
+        "details": { "type": "boolean", "default": false, "description": "MEDIA-DETAIL-01: draw the item's title, facts, expandable description and chapters under the picture (a watch page's details block)." },
         "actions": {
           "type": "array",
           "maxItems": 6,

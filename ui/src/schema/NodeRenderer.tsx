@@ -1039,7 +1039,16 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               }
               onNext={node.on_next && upNext ? () => dispatch(node.on_next!, [upNext as unknown as Row]) : undefined}
             />
-            {node.details ? <PlayerDetails title={title} subtitle={subtitle} /> : null}
+            {node.details ? (
+              <PlayerDetails
+                title={title}
+                subtitle={subtitle}
+                facts={(readField(r, field("facts", "facts")) as string | undefined) ?? undefined}
+                description={(readField(r, field("description", "description")) as string | undefined) ?? undefined}
+                chapters={(readField(r, field("chapters", "chapters")) as PlayerChapter[] | undefined) ?? undefined}
+                seek={(time) => { if (mediaEl.current) mediaEl.current.currentTime = time; }}
+              />
+            ) : null}
             {node.actions && node.actions.length > 0 ? <PlayerActions actions={node.actions} item={r} dispatch={dispatch} /> : null}
             {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
             {castError ? <p role="status" className="text-base text-destructive">{castError}</p> : null}
@@ -1106,12 +1115,33 @@ function PlayerCastMenu({ host, item, getPosition, onError }: { host: MediaHost;
   );
 }
 
-/** MEDIA-POLISH-01: a watch page's title block under the picture: the title, then the subtitle line (the channel). */
-function PlayerDetails({ title, subtitle }: { title: string; subtitle?: string }) {
+/** MEDIA-DETAIL-01: the watch page's title, facts and expandable description under the picture. */
+function PlayerDetails({ title, subtitle, facts, description, chapters, seek }: {
+  title: string;
+  subtitle?: string;
+  facts?: string;
+  description?: string;
+  chapters?: PlayerChapter[];
+  seek: (time: number) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const detail = description?.trim() && !/\{[^{}]+\}/.test(description) ? description.trim() : null;
+  const factLine = facts || subtitle;
   return (
     <div className="flex min-w-0 flex-col gap-1" data-slot="player-details">
       <h2 className="text-xl font-bold tracking-tight text-foreground">{title}</h2>
-      {subtitle ? <p className="text-muted-foreground text-base">{subtitle}</p> : null}
+      {factLine ? <p className="truncate whitespace-nowrap text-sm text-muted-foreground">{factLine}</p> : null}
+      {detail ? (
+        <div>
+          <p className={expanded ? "text-base text-muted-foreground" : "line-clamp-2 text-base text-muted-foreground"}>{detail}</p>
+          <Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? "Show less" : "Show more"}</Button>
+          {expanded && chapters?.length ? (
+            <div className="flex flex-col" aria-label="Chapters">
+              {chapters.map((chapter) => <Button key={`${chapter.start_s}-${chapter.title}`} type="button" variant="ghost" size="sm" className="justify-start" onClick={() => seek(chapter.start_s)}>{formatTime(chapter.start_s)} {chapter.title}</Button>)}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

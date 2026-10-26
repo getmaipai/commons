@@ -51,6 +51,10 @@
 
 # Changelog (`@maipai/ui`)
 
+## [ui-v0.5.345] - 2026-10-25
+
+- MEDIA-DETAIL-01: player details support facts, a guarded expandable description and seekable chapters; phone video watch pages use a full-bleed player and floating shell header.
+
 ## [ui-v0.5.338] - 2026-10-25
 
 - Float article reader controls and tune reader typography and lead image for phones.

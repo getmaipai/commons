@@ -233,7 +233,7 @@ export const BillboardNodeSchema = z.object({
 });
 export type BillboardNode = z.infer<typeof BillboardNodeSchema>;
 
-export const PLAYER_FIELDS = ["id", "src", "title", "subtitle", "poster", "chapters", "captions", "thumbnails", "position", "completed", "up_next"] as const;
+export const PLAYER_FIELDS = ["id", "src", "title", "subtitle", "poster", "chapters", "captions", "thumbnails", "position", "completed", "up_next", "description", "facts"] as const;
 
 export const PlayerNodeSchema = z.object({
   type: z.literal("player"),

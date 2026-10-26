@@ -32,4 +32,14 @@ describe("StoryFeed phone tokens and strip", () => {
     expect(css).toContain('html[data-app-reading] [data-slot="article-sticky-header"] { top: 1rem; }');
     expect(css).toContain(':has([data-slot="phone-nav"]) [data-slot="rail-body"] { padding-top: 0; }');
   });
+
+  test("a phone video watch page uses a floating shell header and full-bleed player", () => {
+    expect(css).toContain('html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-page-header"]');
+    expect(css).toContain('html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-body"] { padding-top: 0; }');
+    expect(css).toContain('html:has([data-slot="player"][data-layout="video"]) [data-slot="player"]');
+    expect(css).toContain("margin-inline: -1rem");
+    expect(css).toContain("margin-top: -1rem");
+    expect(css).toContain("pointer-events: none");
+    expect(css).toContain("z-index: 40");
+  });
 });
