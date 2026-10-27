@@ -31,6 +31,7 @@ export function VoiceConversation({
   onInterrupt,
   onEnd,
   extra,
+  stage,
   className,
   ...props
 }: Omit<
@@ -43,6 +44,7 @@ export function VoiceConversation({
   | "onInterrupt"
   | "onEnd"
   | "extra"
+  | "stage"
 > & {
   mode: VoiceMode;
   amplitude: number;
@@ -53,6 +55,8 @@ export function VoiceConversation({
   /** Optional content drawn under the mute and end buttons (a host's own
    * affordance, for example a settings link). */
   extra?: ReactNode;
+  /** The host's own character (about 208px) drawn in place of the orb. The host drives it from real events; the caption, mute and end controls stay. */
+  stage?: ReactNode;
 }) {
   const level = clamp(amplitude, 0, 1);
   const active = mode === "listening" || mode === "speaking";
@@ -94,65 +98,71 @@ export function VoiceConversation({
             --primary - see that token's own comment for why --primary
             alone wasn't safe (the vendored template's own competing
             :root definition won the cascade in light theme). */}
-        <button
-          type="button"
-          onClick={onInterrupt}
-          disabled={!canInterrupt}
-          aria-label="Interrupt the assistant"
-          className="focus-visible:ring-foreground/20 relative flex size-40 items-center justify-center rounded-full outline-none focus-visible:ring-1 disabled:cursor-default sm:size-48"
-        >
-          <span
-            aria-hidden
-            className={cn(
-              "absolute size-40 rounded-full transition-[transform,opacity] duration-200 ease-out sm:size-48 motion-reduce:transition-none",
-              mode === "speaking"
-                ? "bg-radial from-voice-accent/16 to-voice-accent/4"
-                : mode === "thinking"
-                  ? "bg-radial from-foreground/8 to-foreground/2 motion-safe:animate-[voice-hue-drift_4s_ease-in-out_infinite]"
-                  : "bg-foreground/[0.05]",
-            )}
-            style={{
-              transform: `scale(${active ? 0.72 + level * 0.28 : 0.62})`,
-              opacity: active ? 1 : 0.5,
-            }}
-          />
-          <span
-            aria-hidden
-            className={cn(
-              "absolute size-[113px] rounded-full transition-[transform,opacity,box-shadow] duration-150 ease-out sm:size-[136px] motion-reduce:transition-none",
-              mode === "speaking"
-                ? "bg-voice-accent/24 shadow-[0_0_1.25rem_color-mix(in_oklab,var(--color-voice-accent)_45%,transparent)]"
-                : "bg-foreground/[0.08]",
-            )}
-            style={{
-              transform: `scale(${active ? 0.8 + level * 0.22 : 0.7})`,
-            }}
-          />
-          <span
-            aria-hidden
-            className={cn(
-              "relative size-[67px] rounded-full transition-[transform,background-color] duration-150 ease-out sm:size-20 motion-reduce:transition-none",
-              mode === "connecting" && "bg-foreground/20 animate-pulse",
-              mode === "listening" && "bg-foreground/80",
-              mode === "thinking" && "bg-foreground/30 animate-pulse",
-              mode === "speaking" && "bg-voice-accent",
-            )}
-            style={{ transform: `scale(${active ? 0.9 + level * 0.2 : 0.85})` }}
-          />
-          {/* The first-spoken-word ripple: a single expanding, fading ring.
-              The conditional render itself is what replays it every time -
-              leaving "speaking" unmounts this span outright, so the next
-              "speaking" entry is a genuinely fresh mount, restarting the
-              CSS animation with no key needed. The flair the row asks for,
-              costing nothing in per-frame JS (a CSS animation, not a rAF
-              loop). */}
-          {mode === "speaking" && (
+        {stage !== undefined ? (
+          <div data-slot="voice-stage" className="flex items-center justify-center">
+            {stage}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={onInterrupt}
+            disabled={!canInterrupt}
+            aria-label="Interrupt the assistant"
+            className="focus-visible:ring-foreground/20 relative flex size-40 items-center justify-center rounded-full outline-none focus-visible:ring-1 disabled:cursor-default sm:size-48"
+          >
             <span
               aria-hidden
-              className="border-voice-accent/50 absolute size-[67px] rounded-full border motion-reduce:hidden motion-safe:animate-[voice-ripple_0.6s_ease-out] sm:size-20"
+              className={cn(
+                "absolute size-40 rounded-full transition-[transform,opacity] duration-200 ease-out sm:size-48 motion-reduce:transition-none",
+                mode === "speaking"
+                  ? "bg-radial from-voice-accent/16 to-voice-accent/4"
+                  : mode === "thinking"
+                    ? "bg-radial from-foreground/8 to-foreground/2 motion-safe:animate-[voice-hue-drift_4s_ease-in-out_infinite]"
+                    : "bg-foreground/[0.05]",
+              )}
+              style={{
+                transform: `scale(${active ? 0.72 + level * 0.28 : 0.62})`,
+                opacity: active ? 1 : 0.5,
+              }}
             />
-          )}
-        </button>
+            <span
+              aria-hidden
+              className={cn(
+                "absolute size-[113px] rounded-full transition-[transform,opacity,box-shadow] duration-150 ease-out sm:size-[136px] motion-reduce:transition-none",
+                mode === "speaking"
+                  ? "bg-voice-accent/24 shadow-[0_0_1.25rem_color-mix(in_oklab,var(--color-voice-accent)_45%,transparent)]"
+                  : "bg-foreground/[0.08]",
+              )}
+              style={{
+                transform: `scale(${active ? 0.8 + level * 0.22 : 0.7})`,
+              }}
+            />
+            <span
+              aria-hidden
+              className={cn(
+                "relative size-[67px] rounded-full transition-[transform,background-color] duration-150 ease-out sm:size-20 motion-reduce:transition-none",
+                mode === "connecting" && "bg-foreground/20 animate-pulse",
+                mode === "listening" && "bg-foreground/80",
+                mode === "thinking" && "bg-foreground/30 animate-pulse",
+                mode === "speaking" && "bg-voice-accent",
+              )}
+              style={{ transform: `scale(${active ? 0.9 + level * 0.2 : 0.85})` }}
+            />
+            {/* The first-spoken-word ripple: a single expanding, fading ring.
+                The conditional render itself is what replays it every time -
+                leaving "speaking" unmounts this span outright, so the next
+                "speaking" entry is a genuinely fresh mount, restarting the
+                CSS animation with no key needed. The flair the row asks for,
+                costing nothing in per-frame JS (a CSS animation, not a rAF
+                loop). */}
+            {mode === "speaking" && (
+              <span
+                aria-hidden
+                className="border-voice-accent/50 absolute size-[67px] rounded-full border motion-reduce:hidden motion-safe:animate-[voice-ripple_0.6s_ease-out] sm:size-20"
+              />
+            )}
+          </button>
+        )}
 
         <div className="flex flex-col items-center gap-1">
           <span className="text-[13.5px] font-medium">{CAPTION[mode]}</span>

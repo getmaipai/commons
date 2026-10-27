@@ -81,3 +81,20 @@ describe("VoiceConversation is a call screen, not a transcript card", () => {
     expect(end.className).toContain("bg-destructive");
   });
 });
+
+describe("VoiceConversation stage slot", () => {
+  test("a supplied stage replaces the orb and keeps the caption and controls", () => {
+    const { container, getByTestId, getByText, getByRole, queryByRole } = render(<VoiceConversation mode="listening" amplitude={0.5} stage={<span data-testid="stage-face" />} onEnd={() => {}} />);
+    expect(getByTestId("stage-face")).toBeTruthy();
+    expect(container.querySelector('[data-slot="voice-stage"]')).toBeTruthy();
+    expect(queryByRole("button", { name: "Interrupt the assistant" })).toBeNull();
+    expect(getByText("Listening")).toBeTruthy();
+    expect(getByRole("button", { name: "End the call" })).toBeTruthy();
+  });
+
+  test("without a stage the orb is drawn as before", () => {
+    const { container, getByRole } = render(<VoiceConversation mode="listening" amplitude={0.5} />);
+    expect(getByRole("button", { name: "Interrupt the assistant" })).toBeTruthy();
+    expect(container.querySelector('[data-slot="voice-stage"]')).toBeNull();
+  });
+});

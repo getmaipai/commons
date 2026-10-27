@@ -35,6 +35,9 @@ test("xs size uses size-7 while the existing sizes stay the same", () => {
   xs.unmount();
   const sm = render(<CompanionAvatar name="Mimi" clips={clips} size="sm" />);
   expect(sm.getByRole("img", { name: "Mimi" }).className).toContain("size-16");
+  sm.unmount();
+  const xl = render(<CompanionAvatar name="Mimi" clips={clips} size="xl" />);
+  expect(xl.getByRole("img", { name: "Mimi" }).className).toContain("size-52");
   restore();
 });
 

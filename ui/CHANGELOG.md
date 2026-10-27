@@ -1,3 +1,7 @@
+## [ui-v0.5.374] - 2026-10-27
+
+- REVAMP-PRESENCE-01: `CompanionAvatar size="xl"` (about 208px), an optional `stage` slot on `VoiceConversation` that replaces the orb with the host's character, and the new `CompanionDock` Element (face, name, one line, an optional single Review button, minimize and close; no status, count or dot).
+
 ## [ui-v0.5.373] - 2026-10-27
 
 - ChatHeader companion choices and Thread reply faces use the seeded illustrated face when no portrait is available or its image fails to load. Picker choices accept an optional seed and default to their value.
