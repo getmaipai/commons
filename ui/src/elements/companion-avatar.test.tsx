@@ -156,3 +156,11 @@ test("reduced motion ring has no animation class", () => {
   expect(ring.className).not.toMatch(/animate-/);
   restore();
 });
+
+test("animated={false} draws only the still image, with the ring", () => {
+  const restore = setup();
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} size="xs" ring="speaking" animated={false} />);
+  expect(view.container.querySelector("video")).toBeNull();
+  expect(view.container.querySelector('[data-ring="speaking"]')).toBeTruthy();
+  restore();
+});

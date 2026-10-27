@@ -1,3 +1,7 @@
+## [ui-v0.5.378] - 2026-10-27
+
+- AMBIENT-02: `CompanionAvatar` takes `animated` (default true); false draws only the still image, with the ring, for a header where no clip may play.
+
 ## [ui-v0.5.377] - 2026-10-27
 
 - AMBIENT-02: `FullLayout` rail layout takes an optional `topRight` slot, drawn once at the top right of the workspace and kept in view while the page scrolls; the slim title bar leaves room for it. No change without the prop.

@@ -7,17 +7,17 @@ import { Button } from "@/kit/ui/button";
 import { icons } from "@/kit/icons";
 
 type Wanted = Partial<Record<"needs_you" | "speaking" | "working" | "thinking" | "listening" | "sleeping", boolean>>;
-type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "listening" | "thinking" | "speaking" | null };
+type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "listening" | "thinking" | "speaking" | null; animated?: boolean };
 const SIZES = { xs: "size-7", sm: "size-16", md: "size-24", lg: "size-40", xl: "size-52" } as const;
 
-export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null }: Props) {
+export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null, animated = true }: Props) {
   const corner = placement === "corner";
   const wrapperClass = corner ? "group pointer-events-none absolute right-3 top-3 z-10" : "group relative";
   const ToggleIcon = hidden ? icons.eye : icons["eye-off"];
   const toggleLabel = hidden ? "Show the character" : "Hide the character";
 
   return <div className={cn(wrapperClass)}>
-    {!hidden ? <CompanionAvatarVisual name={name} clips={clips} state={state} wanted={wanted} once={once} size={size} onFail={onFail} className={className} ring={ring} /> : null}
+    {!hidden ? <CompanionAvatarVisual name={name} clips={clips} state={state} wanted={wanted} once={once} size={size} onFail={onFail} className={className} ring={ring} animated={animated} /> : null}
     {onHiddenChange ? <Button
       type="button"
       variant="ghost"
@@ -29,7 +29,7 @@ export function CompanionAvatar({ name, clips, state, wanted, once, size = "md",
   </div>;
 }
 
-function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", onFail, className, ring = null }: Omit<Props, "placement" | "hidden" | "onHiddenChange">) {
+function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", onFail, className, ring = null, animated = true }: Omit<Props, "placement" | "hidden" | "onHiddenChange">) {
   const machine = useMemo(() => createCompanionAvatarMachine(clips), [clips]);
   const [current, setCurrent] = useState<StateId>(state ?? "idle");
   const [failed, setFailed] = useState(false);
@@ -94,7 +94,7 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
     setCurrent(result.state);
     if (result.failed) { setFailed(true); onFail?.(); }
   }, [clip.h264, machine, onFail, source]);
-  const movable = !reduced && documentVisible && !failed;
+  const movable = animated && !reduced && documentVisible && !failed;
   const ringClass = ring === "listening" ? "border-foreground/25" : ring === "thinking" ? cn("border-foreground/35", !reduced && "animate-[pulse_3s_ease-in-out_infinite]") : ring === "speaking" ? cn("border-foreground/50", !reduced && "animate-pulse") : "";
   return <div role="img" aria-label={ring ? `${name}, ${ring}` : name} data-ring={ring ?? undefined} className={cn(SIZES[size], "pointer-events-none relative", className)}>
     {ring ? <span aria-hidden="true" className={cn("absolute -inset-1 rounded-full border-2", ringClass)} /> : null}
