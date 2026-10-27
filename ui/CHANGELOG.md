@@ -129,6 +129,10 @@
 
 # Changelog (`@maipai/ui`)
 
+## [ui-v0.5.369] - 2026-10-27
+
+- REVAMP-APPEARANCE-01: add the responsive `StudioLayout` Element for studio pages.
+
 ## [ui-v0.5.368] - 2026-10-27
 
 - REVAMP-DIRECTORY-01 and REVAMP-TASKS-01: add `ActivityFeed` and `TaskBrowser` Elements for activity and task layouts.
