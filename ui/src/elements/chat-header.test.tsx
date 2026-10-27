@@ -44,6 +44,10 @@ describe("ChatHeader", () => {
     const trigger = getByRole("button", { name: "Change companion" });
     act(() => { fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerId: 1 }); fireEvent.click(trigger); });
     expect((await findByRole("menuitemradio", { name: "Sprout" })).getAttribute("aria-checked")).toBe("true");
+    const row = getByRole("menuitemradio", { name: "Sprout" });
+    // A choice without a picture draws the seeded illustrated face (the kit Avatar primitive), never a bare letter.
+    expect(row.querySelector("[data-slot=\"avatar\"]")?.getAttribute("class")).toContain("size-9");
+    expect(getByRole("menuitemradio", { name: "Rivet" }).querySelector('[data-slot="avatar"]')).toBeTruthy();
     fireEvent.click(getByRole("menuitemradio", { name: "Rivet" }));
     expect(picked).toEqual(["b"]);
   });

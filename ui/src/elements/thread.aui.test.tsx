@@ -51,17 +51,19 @@ const restoreAvatarEnvironment = () => {
   globalThis.IntersectionObserver = class { constructor(private callback: IntersectionObserverCallback) {} observe(target: Element) { this.callback([{ isIntersecting: true, target } as IntersectionObserverEntry], this as unknown as IntersectionObserver); } disconnect() {} } as unknown as typeof IntersectionObserver;
   return () => { window.matchMedia = oldMatch; HTMLMediaElement.prototype.play = oldPlay; Object.defineProperty(HTMLMediaElement.prototype, "canPlayType", { configurable: true, value: oldCanPlay }); HTMLCanvasElement.prototype.getContext = oldContext; globalThis.IntersectionObserver = oldObserver; };
 };
-function ReplyFaceHarness({ speakers, speakingMessageId, reduceMotion = false, withClips = true, portrait = "portrait.png", running = false }: { speakers: Array<{ companion_id: string; name: string; via?: string }>; speakingMessageId?: string; reduceMotion?: boolean; withClips?: boolean; portrait?: string | undefined; running?: boolean }) {
+// A data URI never needs the network, so the image does not raise an error event in the test DOM.
+const PORTRAIT_URL = "data:image/gif;base64,R0lGODlhAQABAAAAACw=";
+function ReplyFaceHarness({ speakers, speakingMessageId, reduceMotion = false, withClips = true, portrait = PORTRAIT_URL, running = false }: { speakers: Array<{ companion_id: string; name: string; via?: string }>; speakingMessageId?: string; reduceMotion?: boolean; withClips?: boolean; portrait?: string | null; running?: boolean }) {
   const messages = speakerMessages(speakers).map((message, index) => ({ ...message, id: `reply-${index}`, ...(running && index === speakers.length - 1 ? { status: { type: "running" as const } } : {}) }));
   const runtime = useLocalRuntime(adapter, { initialMessages: messages });
   window.matchMedia = (() => ({ matches: reduceMotion, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
-  return <AssistantRuntimeProvider runtime={runtime}><Thread components={{ replyFace: { portrait: () => portrait, clips: () => withClips ? faceClips : undefined, speakingMessageId, joinedLabel: (name) => `${name} joined for one question` } }} autoFocus={false} /></AssistantRuntimeProvider>;
+  return <AssistantRuntimeProvider runtime={runtime}><Thread components={{ replyFace: { portrait: () => portrait ?? undefined, clips: () => withClips ? faceClips : undefined, speakingMessageId, joinedLabel: (name) => `${name} joined for one question` } }} autoFocus={false} /></AssistantRuntimeProvider>;
 }
 
 describe("Thread replyFace", () => {
   test("history replies show portrait and name without a video", () => {
     render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} />);
-    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe("portrait.png");
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe(PORTRAIT_URL);
     expect(document.body.textContent).toContain("Ari");
     expect(document.querySelector('[data-slot="aui_reply-face-row"] video')).toBeNull();
   });
@@ -70,10 +72,19 @@ describe("Thread replyFace", () => {
     expect(document.querySelectorAll('[data-slot="aui_reply-face-divider"]')).toHaveLength(3);
     expect(getByText("Bo joined for one question")).toBeTruthy();
   });
-  test("falls back to the initial when no portrait is supplied", () => {
-    render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} portrait="" />);
-    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')).toBeNull();
-    expect(document.querySelector('[data-slot="aui_reply-face-row"]')?.textContent).toContain("A");
+  test("falls back to the seeded face when no portrait is supplied", () => {
+    render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} portrait={null} />);
+    // The seeded illustrated face is the kit Avatar primitive; its own image may be swapped for its letter by an earlier test's image stub, so assert the slot, not the picture.
+    const row = document.querySelector('[data-slot="aui_reply-face-row"]')!;
+    expect(row.querySelector('[data-slot="avatar"]')).toBeTruthy();
+    expect(row.querySelector(`img[src="${PORTRAIT_URL}"]`)).toBeNull();
+  });
+  test("falls back to the seeded face when the portrait errors", () => {
+    render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} portrait={PORTRAIT_URL} />);
+    const row = document.querySelector('[data-slot="aui_reply-face-row"]')!;
+    fireEvent.error(row.querySelector(`img[src="${PORTRAIT_URL}"]`)!);
+    expect(row.querySelector(`img[src="${PORTRAIT_URL}"]`)).toBeNull();
+    expect(row.querySelector('[data-slot="avatar"]')).toBeTruthy();
   });
   test("running reply animates as thinking and speaking only for the selected message", async () => {
     const restore = restoreAvatarEnvironment();
@@ -91,11 +102,11 @@ describe("Thread replyFace", () => {
   });
   test("reduced motion and missing clips render the still portrait", () => {
     const reduced = render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} running reduceMotion />);
-    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe("portrait.png");
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe(PORTRAIT_URL);
     expect(document.querySelector('[data-slot="aui_reply-face-row"] video')).toBeNull();
     reduced.unmount();
     render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} running withClips={false} />);
-    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe("portrait.png");
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe(PORTRAIT_URL);
   });
 });
 

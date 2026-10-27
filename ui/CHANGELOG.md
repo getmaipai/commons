@@ -1,3 +1,7 @@
+## [ui-v0.5.372] - 2026-10-27
+
+- ChatHeader companion choices and Thread reply faces use the seeded illustrated face when no portrait is available or its image fails to load. Picker choices accept an optional seed and default to their value.
+
 ## [ui-v0.5.370] - 2026-10-27
 
 - `StudioLayout` header stacks its actions under the title on phones, so a long actions row no longer overlaps the title.

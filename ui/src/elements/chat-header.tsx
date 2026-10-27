@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/kit/ui/avatar";
+import { Avatar as SeededAvatar } from "@/kit/primitives/Avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import { Input } from "@/kit/ui/input";
 import { icons } from "@/kit/icons";
@@ -8,8 +9,10 @@ import { icons } from "@/kit/icons";
 export interface ChatHeaderChoice {
   value: string;
   label: string;
-  /** The companion's face; the label's first letter shows until it loads or when absent. */
+  /** The companion's face; a seeded illustrated face is used when absent or unavailable. */
   imageUrl?: string;
+  /** Seed for the illustrated face; defaults to `value`. */
+  seed?: string;
   description?: string;
   hint?: string;
 }
@@ -56,7 +59,7 @@ export function ChatHeader({ name, media, onMenu, onCall, actions, menuExpanded,
     {searchable ? <div className="p-2" onKeyDown={(event) => event.stopPropagation()}><Input aria-label={identitySearchLabel} value={search} onChange={(event) => setSearch(event.currentTarget.value)} onKeyDown={(event) => event.stopPropagation()} /></div> : null}
     {filteredChoices?.length ? <DropdownMenuRadioGroup value={identityValue} onValueChange={onIdentityChange}>
       {filteredChoices.map((choice) => <DropdownMenuRadioItem key={choice.value} value={choice.value} className="min-h-12 gap-3">
-        <Avatar aria-hidden="true"><AvatarImage src={choice.imageUrl} alt="" /><AvatarFallback>{choice.label.slice(0, 1)}</AvatarFallback></Avatar>
+        {choice.imageUrl ? <Avatar aria-hidden="true" className="size-9"><AvatarImage src={choice.imageUrl} alt="" /><AvatarFallback><SeededAvatar name={choice.label} seed={choice.seed ?? choice.value} className="size-9" /></AvatarFallback></Avatar> : <SeededAvatar name={choice.label} seed={choice.seed ?? choice.value} className="size-9" />}
         <span className="flex min-w-0 flex-1 flex-col text-left"><span className="truncate">{choice.label}</span>{choice.description ? <span className="truncate text-xs font-normal text-muted-foreground">{choice.description}</span> : null}</span>
         {choice.hint ? <span className="shrink-0 text-xs font-normal text-muted-foreground">{choice.hint}</span> : null}
       </DropdownMenuRadioItem>)}
