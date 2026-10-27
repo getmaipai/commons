@@ -1,3 +1,7 @@
+## [ui-v0.5.389] - 2026-10-27
+
+- `ArticleView`: the publisher row is part of the article again (full width, scrolls with it); only the buttons stay pinned, laid over the start of the article so the article's top is the top of the page body.
+
 ## [ui-v0.5.388] - 2026-10-27
 
 - AMBIENT-04: add a right header slot, fallback page title, `ChatHeader` end slot, transparent `CompanionStage`, and an assistant-ui compact talk pill variant.

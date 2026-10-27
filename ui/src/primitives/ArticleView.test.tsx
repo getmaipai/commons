@@ -29,7 +29,7 @@ describe("ArticleView", () => {
     expect(article.contains(toolbar)).toBe(true);
     expect(article.contains(provider)).toBe(true);
     expect(stickyHeader.contains(toolbar)).toBe(true);
-    expect(stickyHeader.contains(provider)).toBe(true);
+    expect(stickyHeader.contains(provider)).toBe(false);
     expect(column.contains(toolbar)).toBe(false);
     expect(column.contains(provider)).toBe(false);
     expect(article.contains(provider)).toBe(true);
@@ -59,11 +59,10 @@ describe("ArticleView", () => {
     expect(queryByText("Open original")).toBeNull();
   });
 
-  test("controls and the publisher row under them stay pinned together, flush and on the page colour, while the article scrolls behind them", () => {
+  test("controls stay pinned flush at the top, overlaying the start of the article, whose publisher row scrolls with it", () => {
     const withIcon = { ...data, sourceIconUrl: "/api/favicon?domain=example.com" };
     const view = render(<ArticleView data={withIcon} onBack={() => {}} />);
     const provider = view.container.querySelector('[data-slot="article-provider"]')!;
-    expect(provider.className).toContain("bg-background");
     expect(provider.className).toContain("min-h-16");
     expect(provider.querySelector('[data-slot="safe-image-fallback"]')).not.toBeNull();
     const toolbar = view.container.querySelector('[data-slot="article-toolbar"]')!;
@@ -71,7 +70,7 @@ describe("ArticleView", () => {
     expect(stickyHeader.className).toContain("sticky");
     expect(stickyHeader.className).toContain("top-0");
     expect(stickyHeader.className).toContain("z-30");
-    expect(stickyHeader.className).toContain("bg-background");
+    expect(stickyHeader.className).toContain("-mb-14");
     expect(stickyHeader.className).not.toContain("mx-");
     expect(toolbar.className).toContain("h-14");
     expect(toolbar.className).toContain("bg-transparent");
