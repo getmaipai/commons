@@ -314,6 +314,14 @@
   padding-inline: 0;
   padding-top: 0;
 }
+/* What follows the open article (More from) sits on the same muted surface as the source row, so it reads apart from the text. */
+[data-slot="schema-page-body"]:has([data-slot="article-sticky-header"]) [data-slot="story-feed"] {
+  background: var(--muted);
+  padding: 1.5rem 1rem;
+}
+@media (min-width: 1024px) {
+  [data-slot="schema-page-body"]:has([data-slot="article-sticky-header"]) [data-slot="story-feed"] { padding-inline: 2rem; }
+}
 /* WORKSPACE-FILL-02: and it is bounded to the viewport, like a chat's: the sticky column stays put and the page's own content is
  * the one scroller, so a sticky bar inside it (the article toolbar) stays at the top of the content instead of scrolling away with
  * the document. A marked page is a flex child that may shrink, so its content scrolls inside it. */

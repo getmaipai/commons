@@ -1,3 +1,7 @@
+## [ui-v0.5.395] - 2026-10-27
+
+- An open article's page shades the story feed under it (More from) with the muted surface, like the source row.
+
 ## [ui-v0.5.394] - 2026-10-27
 
 - `FocalImage` takes `focal` `{x, y, aspect}` (a subject point worked out on the hub): the picture shows at once, framed on that point at its `aspectRatio`, and the in-browser analysis is skipped. `StoryFeed` and `ArticleView` pass `image.focal`. New export `focalPointPosition`.

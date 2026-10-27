@@ -30,4 +30,9 @@ describe("open article header (desktop)", () => {
     const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
     expect(css).toContain('[data-slot="schema-page-body"]:has([data-slot="article-sticky-header"])');
   });
+
+  test("shades the story feed under an open article like the source row", () => {
+    expect(css).toMatch(/:has\(\[data-slot="article-sticky-header"\]\) \[data-slot="story-feed"\] \{\s*background: var\(--muted\)/);
+  });
 });
+
