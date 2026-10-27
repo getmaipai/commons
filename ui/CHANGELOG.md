@@ -1,3 +1,7 @@
+## [ui-v0.5.396] - 2026-10-27
+
+- `ArticleView` draws Listen, Key points and Discuss as buttons under the headline (they were under More), and takes a new `discuss` action; the page schema's `answer_blocks.actions.discuss` fires it.
+
 ## [ui-v0.5.395] - 2026-10-27
 
 - An open article's page shades the story feed under it (More from) with the muted surface, like the source row.

@@ -38,6 +38,14 @@
           "call": {
             "target": "/api/plugins/news/actions/summarize"
           }
+        },
+        "discuss": {
+          "navigate": {
+            "to": "/apps/news/discuss",
+            "state": {
+              "id": "{story_id}"
+            }
+          }
         }
       },
       "empty_state": {

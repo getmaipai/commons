@@ -228,10 +228,11 @@ function newsActionsFor(
       case "summarize": return actions.summarize;
       case "reset_mix": return actions.reset_mix;
       case "listen": return actions.listen;
+      case "discuss": return actions.discuss;
       default: return undefined;
     }
   };
-  const names = ["open", "open_channel", "save", "follow", "feedback_more", "feedback_less", "summarize", "reset_mix", "listen"];
+  const names = ["open", "open_channel", "save", "follow", "feedback_more", "feedback_less", "summarize", "reset_mix", "listen", "discuss"];
   return {
     available: [...names.filter((name) => entry(name) !== undefined), "open_site", ...(filter ? ["filter"] : [])],
     onAction: (name, ids) => {

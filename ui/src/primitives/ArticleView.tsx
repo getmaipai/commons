@@ -16,6 +16,9 @@ const BookmarkIcon = getIcon("bookmark");
 const EllipsisIcon = getIcon("more-horizontal");
 const ShareIcon = getIcon("share");
 const TypeIcon = getIcon("a-large-small");
+const HeadphonesIcon = getIcon("headphones");
+const ListIcon = getIcon("sparkles");
+const MessageIcon = getIcon("message-circle");
 const NewspaperIcon = getIcon("newspaper");
 
 /** The spec's `article_inline`: a run of text, or a link carrying a book `target` or an outbound `href`. */
@@ -50,7 +53,7 @@ export interface ArticleViewData {
   saved?: boolean;
 }
 
-export type ArticleAction = "listen" | "save" | "summarize" | "open_site" | "open";
+export type ArticleAction = "listen" | "save" | "summarize" | "open_site" | "open" | "discuss";
 
 export interface ArticleViewProps {
   data: ArticleViewData;
@@ -182,7 +185,8 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   };
   const bodySize = TEXT_SIZES.find((size) => size.id === textSize)!.className;
   const canShare = can("open_site") && !!data.open_url && typeof navigator !== "undefined" && typeof navigator.share === "function";
-  const hasMore = can("listen") || (can("summarize") && !data.key_points) || (can("open_site") && !!data.open_url);
+  const hasMore = can("open_site") && !!data.open_url;
+  const hasAssist = can("listen") || (can("summarize") && !data.key_points) || can("discuss");
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
   return (
     <article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col", className)}>
@@ -212,8 +216,6 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
                 <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" className="rounded-full" aria-label="More" />}><EllipsisIcon aria-hidden /></DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {can("open_site") && data.open_url ? <DropdownMenuItem onClick={() => fire("open_site", { url: data.open_url })}>Open original</DropdownMenuItem> : null}
-                  {can("listen") ? <DropdownMenuItem onClick={() => fire("listen")}>Listen</DropdownMenuItem> : null}
-                  {can("summarize") && !data.key_points ? <DropdownMenuItem onClick={() => fire("summarize")}>Key points</DropdownMenuItem> : null}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : null}
@@ -235,6 +237,13 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
+      {hasAssist ? (
+        <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex flex-wrap gap-2">
+          {can("listen") ? <Button variant="outline" size="sm" onClick={() => fire("listen")}><HeadphonesIcon aria-hidden />Listen</Button> : null}
+          {can("summarize") && !data.key_points ? <Button variant="outline" size="sm" onClick={() => fire("summarize")}><ListIcon aria-hidden />Key points</Button> : null}
+          {can("discuss") ? <Button variant="outline" size="sm" onClick={() => fire("discuss")}><MessageIcon aria-hidden />Discuss</Button> : null}
+        </div>
+      ) : null}
       {data.image ? (
         <div data-slot="article-lead">
           <AspectRatio ratio={16 / 9} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>

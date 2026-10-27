@@ -647,7 +647,7 @@
         "actions": {
           "type": "object",
           "additionalProperties": false,
-          "description": "NEWS-00: the actions a block may fire, by role. A block fires an entry with the item's own ids and never names a route itself. `open` navigates to a story and `open_channel` to a channel (the ids are `channel_kind` and `channel_key`), `save`, `follow`, `feedback` and `summarize` call, `reset_mix` asks first (`confirm`), `listen` plays. A package page's entries stay under its own `/api/plugins/<id>/` and `/apps/<id>/` prefixes (spec/ui/app-check.ts).",
+          "description": "NEWS-00: the actions a block may fire, by role. A block fires an entry with the item's own ids and never names a route itself. `open` navigates to a story and `open_channel` to a channel (the ids are `channel_kind` and `channel_key`), `save`, `follow`, `feedback` and `summarize` call, `reset_mix` asks first (`confirm`), `listen` plays, `discuss` navigates to the app's page that opens a chat about the story. A package page's entries stay under its own `/api/plugins/<id>/` and `/apps/<id>/` prefixes (spec/ui/app-check.ts).",
           "properties": {
             "open": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["navigate"], "properties": { "navigate": {} } }] },
             "open_channel": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["navigate"], "properties": { "navigate": {} } }] },
@@ -656,7 +656,8 @@
             "feedback": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
             "summarize": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
             "reset_mix": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["confirm"], "properties": { "confirm": {} } }] },
-            "listen": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["play"], "properties": { "play": {} } }] }
+            "listen": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["play"], "properties": { "play": {} } }] },
+            "discuss": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["navigate"], "properties": { "navigate": {} } }] }
           }
         }
       }

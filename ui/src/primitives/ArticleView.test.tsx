@@ -133,7 +133,7 @@ describe("ArticleView", () => {
     expect(plain.getByText("Other page").tagName).toBe("SPAN");
   });
 
-  test("the toolbar shows only the declared actions: Save fires from the bookmark, Listen and Key points sit under More", () => {
+  test("the toolbar shows only the declared actions: Save fires from the bookmark, Listen, Key points and Discuss are buttons under the headline", () => {
     const onAction = mock(() => {});
     const none = render(<ArticleView data={data} onAction={onAction} />);
     expect(none.queryByLabelText("Save")).toBeNull();
@@ -142,8 +142,18 @@ describe("ArticleView", () => {
     const view = render(<ArticleView data={{ ...data, key_points: undefined }} onAction={onAction} available={["listen", "save", "summarize"]} ids={{ story_id: "story-1", item_id: "news-1" }} />);
     fireEvent.click(view.getByLabelText("Save"));
     expect(onAction).toHaveBeenCalledWith("save", { story_id: "story-1", item_id: "news-1", on: true });
-    expect(view.getByLabelText("More")).toBeTruthy();
     expect(view.container.querySelector('[data-slot="article-toolbar"]')).not.toBeNull();
+    expect(view.queryByLabelText("More")).toBeNull();
+    fireEvent.click(view.getByText("Listen"));
+    expect(onAction).toHaveBeenCalledWith("listen", { story_id: "story-1", item_id: "news-1" });
+    fireEvent.click(view.getByText("Key points"));
+    expect(onAction).toHaveBeenCalledWith("summarize", { story_id: "story-1", item_id: "news-1" });
+    expect(view.queryByText("Discuss")).toBeNull();
+    cleanup();
+    const discuss = render(<ArticleView data={data} onAction={onAction} available={["discuss", "open_site"]} ids={{ story_id: "story-1" }} />);
+    fireEvent.click(discuss.getByText("Discuss"));
+    expect(onAction).toHaveBeenCalledWith("discuss", { story_id: "story-1" });
+    expect(discuss.queryByText("Listen")).toBeNull();
   });
 
   test("Back is drawn only when the page gave a way back, and calls it; the text size menu is always there", () => {

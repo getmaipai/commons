@@ -1,3 +1,7 @@
+## [spec-v0.1.252] - 2026-10-27
+
+- NEWS-04: a news story page may declare `discuss` (a `navigate` to the app's page that opens a chat about the story), beside `listen` and `summarize`. `news-story` declares it.
+
 ## [spec-v0.1.251] - 2026-10-27
 
 - `persona.active_id`: Tessa joins the companion list and is the default for a person who has not picked one.

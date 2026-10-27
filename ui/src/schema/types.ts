@@ -386,6 +386,7 @@ export const AnswerBlocksNodeSchema = z.object({
       summarize: ActionSchema,
       reset_mix: ActionSchema,
       listen: ActionSchema,
+      discuss: ActionSchema,
     })
     .partial()
     .strict()
