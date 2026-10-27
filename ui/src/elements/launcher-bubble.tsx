@@ -15,6 +15,7 @@ export function LauncherBubble({
   onStart,
   listening,
   onTurnOff,
+  docked,
   className,
   ...props
 }: Omit<
@@ -29,6 +30,7 @@ export function LauncherBubble({
   | "onStart"
   | "listening"
   | "onTurnOff"
+  | "docked"
 > & {
   open: boolean;
   unread: number;
@@ -41,6 +43,8 @@ export function LauncherBubble({
   listening?: string;
   /** Shown as a Turn off button on the listening row. */
   onTurnOff?: () => void;
+  /** Pins the launcher to the bottom corner of the viewport (the shell sets it; it never needs a wrapper or a className). */
+  docked?: boolean;
 }) {
   const bubble = (
     <>
@@ -77,6 +81,8 @@ export function LauncherBubble({
       data-slot="launcher-bubble"
       className={cn(
         "flex w-full max-w-[19rem] flex-col items-end gap-2.5",
+        docked &&
+          "pointer-events-none fixed end-4 bottom-4 z-[60] max-w-[min(19rem,calc(100vw-2rem))] *:pointer-events-auto",
         className,
       )}
 

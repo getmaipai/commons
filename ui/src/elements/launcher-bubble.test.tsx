@@ -28,4 +28,12 @@ describe("LauncherBubble listening state", () => {
     expect(view.getByRole("button", { name: "Open the assistant" })).toBeTruthy();
     expect(view.queryByRole("button", { name: "Turn off wake word listening" })).toBeNull();
   });
+
+  test("docked pins the launcher to the bottom corner; unset leaves it in the flow", () => {
+    const docked = render(<LauncherBubble {...base} docked listening="Listening for Hey Jarvis" />);
+    expect(docked.container.querySelector("[data-slot=launcher-bubble]")?.className).toContain("fixed");
+    cleanup();
+    const flow = render(<LauncherBubble {...base} listening="Listening for Hey Jarvis" />);
+    expect(flow.container.querySelector("[data-slot=launcher-bubble]")?.className).not.toContain("fixed");
+  });
 });
