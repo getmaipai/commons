@@ -48,6 +48,63 @@ describe("ChatHeader", () => {
     expect(picked).toEqual(["b"]);
   });
 
+  test("renders optional companion descriptions, hints, intro and notice", async () => {
+    const { getByRole, findByText, getByText } = render(<ChatHeader name="Marlow" media={<span />} identityNotice="Nova will answer next." identityIntro="Earlier messages keep their original speaker." identityChoices={[{ value: "a", label: "Nova", description: "A thoughtful guide", hint: "Standard assistant" }]} />);
+    expect(getByRole("status").textContent).toBe("Nova will answer next.");
+    const trigger = getByRole("button", { name: "Change companion" });
+    act(() => { fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerId: 1 }); fireEvent.click(trigger); });
+    expect(await findByText("A thoughtful guide")).toBeTruthy();
+    expect(getByText("Standard assistant")).toBeTruthy();
+    expect(getByText("Earlier messages keep their original speaker.")).toBeTruthy();
+  });
+
+  test("renders the old identity markup when new props are absent", () => {
+    const { container } = render(<ChatHeader name="Marlow" media={<span>portrait</span>} identityChoices={[{ value: "a", label: "Sprout" }]} />);
+    expect(container.querySelector('[role="status"]')).toBeNull();
+    expect(container.querySelector('[data-slot="input"]')).toBeNull();
+    expect(container.textContent).not.toContain("Earlier messages");
+    expect(container.textContent).toBe("portraitMarlow");
+  });
+
+  test("searches large companion lists and selects filtered choices without closing while typing", async () => {
+    const picked: string[] = [];
+    const choices = [
+      { value: "a", label: "Sprout", description: "Garden helper" },
+      { value: "b", label: "Rivet" },
+      { value: "c", label: "Nova", description: "Standard assistant" },
+      { value: "d", label: "Moss" },
+      { value: "e", label: "Pip" },
+      { value: "f", label: "Sable" },
+    ];
+    const { getByRole, queryByRole, findByRole, findByText } = render(<ChatHeader name="Marlow" media={<span />} identityChoices={choices} identityValue="a" onIdentityChange={(value) => picked.push(value)} identitySearchLabel="Search companions" identityFooter={<a href="/manage">Manage companions</a>} />);
+    const trigger = getByRole("button", { name: "Change companion" });
+    act(() => { fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerId: 1 }); fireEvent.click(trigger); });
+    const search = getByRole("textbox", { name: "Search companions" });
+    fireEvent.change(search, { target: { value: "standard" } });
+    expect(await findByRole("menuitemradio", { name: /Nova/ })).toBeTruthy();
+    expect(queryByRole("menuitemradio", { name: /Sprout/ })).toBeNull();
+    expect(getByRole("menu")).toBeTruthy();
+    expect(getByRole("link", { name: "Manage companions" })).toBeTruthy();
+    fireEvent.click(getByRole("menuitemradio", { name: /Nova/ }));
+    expect(picked).toEqual(["c"]);
+    expect(await findByText("Search companions").catch(() => null)).toBeNull();
+  });
+
+  test("only shows search for more than five choices and reports empty matches", async () => {
+    const few = Array.from({ length: 5 }, (_, index) => ({ value: `${index}`, label: `Choice ${index}` }));
+    const { getByRole, queryByRole } = render(<ChatHeader name="Marlow" media={<span />} identityChoices={few} identitySearchLabel="Search" />);
+    let trigger = getByRole("button", { name: "Change companion" });
+    act(() => { fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerId: 1 }); fireEvent.click(trigger); });
+    expect(queryByRole("textbox", { name: "Search" })).toBeNull();
+    cleanup();
+    const six = [...few, { value: "x", label: "Extra" }];
+    const result = render(<ChatHeader name="Marlow" media={<span />} identityChoices={six} identitySearchLabel="Search" />);
+    trigger = result.getByRole("button", { name: "Change companion" });
+    act(() => { fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerId: 2 }); fireEvent.click(trigger); });
+    fireEvent.change(result.getByRole("textbox", { name: "Search" }), { target: { value: "missing" } });
+    expect(await result.findByText("No companion matches. Clear the search to see them all.")).toBeTruthy();
+  });
+
   test("does not render a gradient smear below the header", () => {
     const { container } = render(<ChatHeader name="Marlow" media={<span />} />);
     expect(container.innerHTML).not.toContain("from-background");

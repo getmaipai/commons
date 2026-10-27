@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/kit/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
+import { Input } from "@/kit/ui/input";
 import { icons } from "@/kit/icons";
 
 export interface ChatHeaderChoice {
@@ -9,6 +10,8 @@ export interface ChatHeaderChoice {
   label: string;
   /** The companion's face; the label's first letter shows until it loads or when absent. */
   imageUrl?: string;
+  description?: string;
+  hint?: string;
 }
 
 export interface ChatHeaderProps {
@@ -31,31 +34,44 @@ export interface ChatHeaderProps {
   onIdentityChange?: (value: string) => void;
   /** Accessible label for the companion picker. */
   identityLabel?: string;
+  identityIntro?: string;
+  identitySearchLabel?: string;
+  identityNotice?: string;
+  identityFooter?: ReactNode;
 }
 
-export function ChatHeader({ name, media, onMenu, onCall, actions, menuExpanded, menuControls, identityMenu, identityChoices, identityValue, onIdentityChange, identityLabel = "Change companion" }: ChatHeaderProps) {
+export function ChatHeader({ name, media, onMenu, onCall, actions, menuExpanded, menuControls, identityMenu, identityChoices, identityValue, onIdentityChange, identityLabel = "Change companion", identityIntro, identitySearchLabel, identityNotice, identityFooter }: ChatHeaderProps) {
+  const [search, setSearch] = useState("");
+  const searchable = Boolean(identityChoices && identitySearchLabel && identityChoices.length > 5);
+  const filteredChoices = identityChoices?.filter((choice) => `${choice.label} ${choice.description ?? ""}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
   const MenuIcon = icons.menu;
   const CallIcon = icons.phone;
   const ChevronDownIcon = icons["chevron-down"];
   const identity = <>
     <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">{media}</span>
-    <span className="truncate text-sm font-medium">{name}</span>
+    <span className="flex min-w-0 flex-col text-left"><span className="truncate text-sm font-medium">{name}</span>{identityNotice ? <span role="status" aria-live="polite" className="truncate text-xs text-muted-foreground">{identityNotice}</span> : null}</span>
   </>;
-  const picker = identityChoices ? <DropdownMenuRadioGroup value={identityValue} onValueChange={onIdentityChange}>
-    {identityChoices.map((choice) => <DropdownMenuRadioItem key={choice.value} value={choice.value} className="gap-3">
-      <Avatar aria-hidden="true"><AvatarImage src={choice.imageUrl} alt="" /><AvatarFallback>{choice.label.slice(0, 1)}</AvatarFallback></Avatar>
-      <span className="truncate">{choice.label}</span>
-    </DropdownMenuRadioItem>)}
-  </DropdownMenuRadioGroup> : identityMenu;
+  const picker = identityChoices ? <>
+    {identityIntro ? <p className="px-3 py-2 text-xs text-muted-foreground">{identityIntro}</p> : null}
+    {searchable ? <div className="p-2" onKeyDown={(event) => event.stopPropagation()}><Input aria-label={identitySearchLabel} value={search} onChange={(event) => setSearch(event.currentTarget.value)} onKeyDown={(event) => event.stopPropagation()} /></div> : null}
+    {filteredChoices?.length ? <DropdownMenuRadioGroup value={identityValue} onValueChange={onIdentityChange}>
+      {filteredChoices.map((choice) => <DropdownMenuRadioItem key={choice.value} value={choice.value} className="min-h-12 gap-3">
+        <Avatar aria-hidden="true"><AvatarImage src={choice.imageUrl} alt="" /><AvatarFallback>{choice.label.slice(0, 1)}</AvatarFallback></Avatar>
+        <span className="flex min-w-0 flex-1 flex-col text-left"><span className="truncate">{choice.label}</span>{choice.description ? <span className="truncate text-xs font-normal text-muted-foreground">{choice.description}</span> : null}</span>
+        {choice.hint ? <span className="shrink-0 text-xs font-normal text-muted-foreground">{choice.hint}</span> : null}
+      </DropdownMenuRadioItem>)}
+    </DropdownMenuRadioGroup> : searchable && search ? <p className="px-3 py-2 text-sm text-muted-foreground">No companion matches. Clear the search to see them all.</p> : null}
+    {identityFooter ? <><DropdownMenuSeparator />{identityFooter}</> : null}
+  </> : identityMenu;
   return <header className="grid h-14 w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
     <div className="flex items-center justify-self-start">{onMenu ? <Button variant="ghost" size="icon" aria-label="Open menu" aria-expanded={menuExpanded} aria-controls={menuControls} onClick={onMenu}><MenuIcon aria-hidden="true" /></Button> : null}</div>
-    {picker ? <DropdownMenu>
+    {picker ? <DropdownMenu onOpenChange={(open) => { if (open) setSearch(""); }}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" aria-label={identityLabel} className="min-w-0 justify-center gap-2 px-2">
           {identity}<ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="center">{picker}</DropdownMenuContent>
+      <DropdownMenuContent align="center" className="max-h-[min(80vh,36rem)] w-[min(22rem,calc(100vw-2rem))]">{picker}</DropdownMenuContent>
     </DropdownMenu> : <div className="flex min-w-0 items-center justify-center gap-2">{identity}</div>}
     <div className="flex items-center justify-self-end gap-1">
       {actions}

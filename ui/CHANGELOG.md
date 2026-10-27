@@ -1,3 +1,7 @@
+## [ui-v0.5.366] - 2026-10-26
+
+- ChatHeader companion picker adds descriptions, hints, an intro, searchable choices, a live notice, and a footer slot. All additions are optional.
+
 ## [ui-v0.5.365] - 2026-10-26
 
 - REVAMP-FACE-01: add the Thread `replyFace` slot for companion portraits and a single live player on the running reply, plus a 28px `CompanionAvatar` size.
