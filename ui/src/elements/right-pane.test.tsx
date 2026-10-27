@@ -41,13 +41,13 @@ test("missing active tab falls back to companion; pin and close call handlers", 
   expect(changes).toContain(false);
 });
 
-test("phone breakpoint renders the sidebar sheet variant", async () => {
+test("phone breakpoint renders the kit sheet variant", async () => {
   const oldWidth = window.innerWidth;
   const calls: boolean[] = [];
   Object.defineProperty(window, "innerWidth", { configurable: true, value: 600 });
   window.dispatchEvent(new Event("resize"));
   const view = render(<RightPane {...props({ onOpenChange: (open) => calls.push(open) })} />);
-  await waitFor(() => expect(document.querySelector('[data-mobile="true"]')).toBeTruthy());
+  await waitFor(() => expect(document.querySelector('[role="dialog"]')).toBeTruthy());
   const dialog = document.querySelector('[role="dialog"]');
   expect(dialog).toBeTruthy();
   fireEvent.keyDown(dialog!, { key: "Escape" });

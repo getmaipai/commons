@@ -1,8 +1,8 @@
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useBreakpoint } from "@/kit/hooks/useBreakpoint";
 import { Pin, X } from "lucide-react";
 import { Button } from "@/kit/ui/button";
-import { Sidebar, SidebarContent, SidebarProvider, useSidebar } from "@/kit/ui/sidebar";
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/kit/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/kit/ui/tabs";
 
 export interface RightPaneTab { id: string; label: string; content: ReactNode; }
@@ -53,39 +53,19 @@ export function RightPane({ open, onOpenChange, pinned, onPinnedChange, companio
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, pinned, phone, onOpenChange]);
-  const body = <Sidebar side="right" collapsible={phone ? "offcanvas" : "none"} aria-label={label} className="h-full border-l border-sidebar-border">
-    <SidebarContent className="gap-0 overflow-hidden p-0">{panel}</SidebarContent>
-  </Sidebar>;
-  // A pinned pane takes its own width beside the page; an unpinned one floats over it and closes on outside click or Escape. On a phone the sidebar's own sheet does both.
-  if (phone) return <SidebarProvider open={open} onOpenChange={onOpenChange} style={{ "--sidebar-width": "22rem" } as CSSProperties} className="pointer-events-none min-h-0 w-auto"><MobileOpenSync open={open} />{body}</SidebarProvider>;
+  const body = <aside aria-label={label} className="flex h-full w-[22rem] max-w-[100vw] flex-col overflow-hidden border-l border-sidebar-border bg-sidebar text-sidebar-foreground">{panel}</aside>;
+  // A pinned pane takes its own width beside the page; an unpinned one floats over it and closes on outside click or Escape. On a phone it is the kit sheet.
+  if (phone) return <Sheet open={open} onOpenChange={onOpenChange}>
+    <SheetContent side="right" showCloseButton={false} className="w-[22rem] max-w-[100vw] gap-0 p-0">
+      <SheetTitle className="sr-only">{label}</SheetTitle>
+      <SheetDescription className="sr-only">{label}</SheetDescription>
+      {body}
+    </SheetContent>
+  </Sheet>;
   if (!open) return null;
-  const provider = <SidebarProvider open style={{ "--sidebar-width": "22rem" } as CSSProperties} className="min-h-0 h-full w-full">{body}</SidebarProvider>;
-  if (pinned) return <div data-slot="right-pane" data-pinned="" className="h-full w-[22rem] max-w-[100vw]">{provider}</div>;
+  if (pinned) return <div data-slot="right-pane" data-pinned="" className="h-full">{body}</div>;
   return <>
     <div aria-hidden="true" data-slot="right-pane-backdrop" className="fixed inset-0 z-30" onClick={() => onOpenChange(false)} />
-    <div data-slot="right-pane" className="fixed inset-y-0 right-0 z-40 w-[22rem] max-w-[100vw] shadow-xl">{provider}</div>
+    <div data-slot="right-pane" className="fixed inset-y-0 right-0 z-40 shadow-xl">{body}</div>
   </>;
-}
-
-function MobileOpenSync({ open }: { open: boolean }) {
-  const { isMobile, openMobile, setOpenMobile, setOpen } = useSidebar();
-  const initialized = useRef(false);
-  const lastOpen = useRef(open);
-  useEffect(() => {
-    if (!isMobile) { initialized.current = false; return; }
-    if (!initialized.current) {
-      initialized.current = true;
-      lastOpen.current = open;
-      setOpenMobile(open);
-      return;
-    }
-    if (open !== lastOpen.current) {
-      lastOpen.current = open;
-      setOpenMobile(open);
-    } else if (openMobile !== open) {
-      lastOpen.current = openMobile;
-      setOpen(openMobile);
-    }
-  }, [isMobile, open, openMobile, setOpen, setOpenMobile]);
-  return null;
 }

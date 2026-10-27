@@ -1,3 +1,7 @@
+## [ui-v0.5.382] - 2026-10-27
+
+- AMBIENT-03: `RightPane` no longer uses the sidebar provider (its wrapper is a full-width fixed layer, which put the pane at the left): a plain panel on desktop, pinned in flow or floating, and the kit sheet on a phone.
+
 ## [ui-v0.5.381] - 2026-10-27
 
 - AMBIENT-03: `RightPane` has a real width (22rem, never wider than the screen) pinned and floating, so it no longer collapses beside the page.
