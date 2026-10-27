@@ -133,3 +133,26 @@ test("corner placement without a visibility callback has no button", () => {
   expect(view.queryByRole("button")).toBeNull();
   restore();
 });
+
+test("ring values mark the avatar without changing its clip state", async () => {
+  const restore = setup();
+  for (const ring of ["listening", "thinking", "speaking"] as const) {
+    const view = render(<CompanionAvatar name="Mimi" clips={clips} state="idle" ring={ring} />);
+    const avatar = view.getByRole("img", { name: `Mimi, ${ring}` });
+    expect(avatar.getAttribute("data-ring")).toBe(ring);
+    await waitFor(() => expect(view.container.querySelector("video")?.getAttribute("src")).toBe("idle.av1.mp4"));
+    view.unmount();
+  }
+  const none = render(<CompanionAvatar name="Mimi" clips={clips} ring={null} />);
+  expect(none.container.querySelector("[data-ring]")).toBeNull();
+  restore();
+});
+
+test("reduced motion ring has no animation class", () => {
+  const restore = setup();
+  window.matchMedia = (() => ({ matches: true, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} ring="speaking" />);
+  const ring = view.container.querySelector("[data-ring] > span")!;
+  expect(ring.className).not.toMatch(/animate-/);
+  restore();
+});

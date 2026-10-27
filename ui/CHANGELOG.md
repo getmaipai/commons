@@ -1,3 +1,8 @@
+## [ui-v0.5.375] - 2026-10-27
+
+- AMBIENT-01: add CompanionAvatar rings, the CompanionPreview hover card, and the standard tabbed RightPane.
+- Add the shadcn registry Hover Card primitive.
+
 ## [ui-v0.5.374] - 2026-10-27
 
 - REVAMP-PRESENCE-01: `CompanionAvatar size="xl"` (about 208px), an optional `stage` slot on `VoiceConversation` that replaces the orb with the host's character, and the new `CompanionDock` Element (face, name, one line, an optional single Review button, minimize and close; no status, count or dot).

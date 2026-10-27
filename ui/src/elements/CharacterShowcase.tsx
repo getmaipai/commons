@@ -3,6 +3,10 @@ import { CharacterHero } from "@/kit/elements/character-hero";
 import { CompanionCard } from "@/kit/elements/companion-card";
 import { CompanionProfileHeader } from "@/kit/elements/companion-profile-header";
 import { ChatHeader } from "@/kit/elements/chat-header";
+import { CompanionPreview } from "@/kit/elements/companion-preview";
+import { RightPane } from "@/kit/elements/right-pane";
+import { CompanionAvatar } from "@/kit/elements/companion-avatar";
+import type { CompanionClips } from "@/kit/elements/companion-avatar-machine";
 import { ActivityFeed } from "@/kit/elements/activity-feed";
 import { TaskBrowser } from "@/kit/elements/task-browser";
 import { Button } from "@/kit/ui/button";
@@ -12,7 +16,10 @@ export function CharacterShowcase() {
   const Talk = icons["message-circle"];
   const Call = icons.smartphone;
   const More = icons["more-horizontal"];
+  const clips: CompanionClips = { idle: { h264: "", still: "", loop: true }, thinking: { h264: "", still: "", loop: true }, needs_you: { h264: "", still: "", loop: true }, happy: { h264: "", still: "", loop: false }, greeting: { h264: "", still: "", loop: false } };
   return <div className="grid gap-8 p-6">
+    <div className="flex items-center gap-6"><CompanionAvatar name="Marlow" clips={clips} size="xs" ring="speaking" /><CompanionPreview name="Marlow" trigger={<button type="button" className="rounded-full border border-border px-3 py-2">Marlow preview</button>} ready context="You're on this page" lastLine="I can help you here." askPlaceholder="Ask Marlow..." onAsk={() => {}} onMic={() => {}} action={<Button variant="outline">Review</Button>} /></div>
+    <RightPane open pinned={false} onOpenChange={() => {}} onPinnedChange={() => {}} companionTab={{ id: "companion", label: "Chat", content: <p>Companion tab</p> }} activeTab="companion" onActiveTabChange={() => {}} title="Chat" headerActions={<Button variant="ghost" size="icon" aria-label="Search"><icons.search /></Button>} avatar={<CompanionAvatar name="Marlow" clips={clips} size="xs" ring="listening" />} pinLabel="Pin pane" closeLabel="Close pane" label="Companion pane" />
     <div className="flex gap-6"><CharacterTile name="Marlow" selected line="Ready" /><CharacterTile name="Add character" variant="add" /></div>
     <CharacterHero name="Marlow" line="Here for a chat" actions={<><Button variant="ghost" size="icon" aria-label="Talk"><Talk /></Button><Button variant="ghost" size="icon" aria-label="Call"><Call /></Button><Button variant="ghost" size="icon" aria-label="More actions"><More /></Button></>} />
     <CompanionCard name="Marlow" line="A thoughtful companion for your everyday questions." status="Ready" meta="Choose a conversation to get started" actions={<Button>Chat</Button>} />
