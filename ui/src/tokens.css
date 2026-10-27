@@ -782,7 +782,7 @@
   html[data-app-reading] [data-slot="article-sticky-header"] { top: 1rem; }
   html[data-app-reading] [data-slot="rail-page-header"] { position: fixed; inset: 0 auto auto 0; width: auto; border: 0; background: transparent; padding-inline: 0.5rem; }
   html[data-app-reading] [data-slot="article-toolbar"] { margin-top: -0.5rem; padding-inline-start: 3.75rem; }
-  [data-slot="article-toolbar"] { height: auto; min-height: 0; background: transparent; padding: 0.25rem 0.75rem; }
+  [data-slot="article-toolbar"] { height: auto; min-height: 0; background: transparent; padding: 0.25rem 0; }
   [data-slot="article-toolbar"] > button { min-width: 44px; min-height: 44px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }
   [data-slot="article-actions"] { height: 44px; gap: 0; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }
   [data-slot="article-actions"] button { width: 44px; min-width: 44px; height: 44px; min-height: 44px; border-radius: 999px; }

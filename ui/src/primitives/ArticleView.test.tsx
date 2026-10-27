@@ -31,7 +31,8 @@ describe("ArticleView", () => {
     expect(stickyHeader.contains(toolbar)).toBe(true);
     expect(stickyHeader.contains(provider)).toBe(false);
     expect(column.contains(toolbar)).toBe(false);
-    expect(column.contains(provider)).toBe(true);
+    expect(column.contains(provider)).toBe(false);
+    expect(article.contains(provider)).toBe(true);
     expect(column.className).toContain("max-w-[72ch]");
     expect(column.className).toContain("mx-auto");
     expect(container.querySelector('[data-slot="article-body"]')!.className).not.toContain("max-w-[72ch]");
@@ -58,7 +59,7 @@ describe("ArticleView", () => {
     expect(queryByText("Open original")).toBeNull();
   });
 
-  test("controls stay pinned while the full-width shaded publisher header scrolls with the article", () => {
+  test("controls stay pinned, flush and unshaded, while the full-width publisher row under them scrolls with the article", () => {
     const withIcon = { ...data, sourceIconUrl: "/api/favicon?domain=example.com" };
     const view = render(<ArticleView data={withIcon} onBack={() => {}} />);
     const provider = view.container.querySelector('[data-slot="article-provider"]')!;
@@ -72,15 +73,14 @@ describe("ArticleView", () => {
     expect(stickyHeader.className).toContain("z-30");
     expect(stickyHeader.className).not.toContain("mx-");
     expect(toolbar.className).toContain("h-14");
-    expect(toolbar.className).toContain("bg-background");
-    expect(toolbar.className).toContain("px-3");
-    expect(provider.className).toContain("-mx-4");
-    expect(provider.className).toContain("md:-mx-6");
-    expect(provider.className).toContain("lg:-mx-8");
+    expect(toolbar.className).toContain("bg-transparent");
+    expect(toolbar.className).toContain("px-0");
+    expect(provider.className).toContain("w-full");
+    expect(provider.className).toContain("px-0");
+    expect(provider.className).not.toMatch(/-mx-|pt-14/);
     expect(view.container.querySelector('[data-slot="article-view"]')!.className).not.toContain("px-4");
     expect(view.container.querySelector('[data-slot="article-column"]')!.className).toContain("px-4");
-    expect(view.container.querySelector('[data-slot="article-column"]')!.className).toContain("-mt-14");
-    expect(provider.className).toContain("pt-14");
+    expect(view.container.querySelector('[data-slot="article-column"]')!.className).not.toContain("-mt-14");
     expect(toolbar.querySelectorAll("button").length).toBeGreaterThan(0);
     for (const button of toolbar.querySelectorAll("button")) {
       expect(button.className).not.toMatch(/backdrop-blur|shadow/);

@@ -1,3 +1,7 @@
+## [ui-v0.5.386] - 2026-10-27
+
+- `ArticleView`: the pinned top row has no side padding and no background, and the publisher row sits under it at full width (it no longer slides up behind the row with a negative margin and extra top padding).
+
 ## [ui-v0.5.385] - 2026-10-27
 
 - AMBIENT-04: `FullLayout` rail layout takes `topRightBand`: the slim title bar is drawn on every page without a header of its own and `topRight` sits at its end, so nothing goes under the ambient companion. `RightPane`'s header row is the same height as that bar and ends with pin, close, then the avatar, so the avatar stays in one spot with the pane open or closed.
