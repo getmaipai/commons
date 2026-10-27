@@ -59,11 +59,11 @@ export function RightPane({ open, onOpenChange, pinned, onPinnedChange, companio
   // A pinned pane takes its own width beside the page; an unpinned one floats over it and closes on outside click or Escape. On a phone the sidebar's own sheet does both.
   if (phone) return <SidebarProvider open={open} onOpenChange={onOpenChange} style={{ "--sidebar-width": "22rem" } as CSSProperties} className="pointer-events-none min-h-0 w-auto"><MobileOpenSync open={open} />{body}</SidebarProvider>;
   if (!open) return null;
-  const provider = <SidebarProvider open style={{ "--sidebar-width": "22rem" } as CSSProperties} className="min-h-0 h-full w-auto">{body}</SidebarProvider>;
-  if (pinned) return <div data-slot="right-pane" data-pinned="" className="h-full">{provider}</div>;
+  const provider = <SidebarProvider open style={{ "--sidebar-width": "22rem" } as CSSProperties} className="min-h-0 h-full w-full">{body}</SidebarProvider>;
+  if (pinned) return <div data-slot="right-pane" data-pinned="" className="h-full w-[22rem] max-w-[100vw]">{provider}</div>;
   return <>
     <div aria-hidden="true" data-slot="right-pane-backdrop" className="fixed inset-0 z-30" onClick={() => onOpenChange(false)} />
-    <div data-slot="right-pane" className="fixed inset-y-0 right-0 z-40 shadow-xl">{provider}</div>
+    <div data-slot="right-pane" className="fixed inset-y-0 right-0 z-40 w-[22rem] max-w-[100vw] shadow-xl">{provider}</div>
   </>;
 }
 

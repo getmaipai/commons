@@ -1,3 +1,7 @@
+## [ui-v0.5.381] - 2026-10-27
+
+- AMBIENT-03: `RightPane` has a real width (22rem, never wider than the screen) pinned and floating, so it no longer collapses beside the page.
+
 ## [ui-v0.5.380] - 2026-10-27
 
 - AMBIENT-03: `FullLayout` rail layout takes `rightPane`, drawn beside the workspace. `RightPane` now takes its own width when pinned, floats over the page with an outside-click and Escape close when not, and uses the sidebar sheet on a phone.
