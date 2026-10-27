@@ -11,6 +11,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    PositiveFloat,
     confloat,
     conint,
     constr,
@@ -610,6 +611,19 @@ class WeatherCard(BaseModel):
     props: Props8
 
 
+class Focal(BaseModel):
+    """
+    Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    x: confloat(ge=0.0, le=100.0)
+    y: confloat(ge=0.0, le=100.0)
+    aspect: PositiveFloat
+
+
 class Image1(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -617,6 +631,10 @@ class Image1(BaseModel):
     w480: constr(min_length=1)
     w1280: constr(min_length=1)
     alt: constr(min_length=1)
+    focal: Focal | None = Field(
+        None,
+        description="Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+    )
 
 
 class NewsStoryCard(BaseModel):
@@ -773,6 +791,19 @@ class Byline(BaseModel):
     published_at: AwareDatetime
     outlets: conint(ge=1)
     reading_s: conint(ge=0)
+
+
+class Image2(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    w480: constr(min_length=1)
+    w1280: constr(min_length=1)
+    alt: constr(min_length=1)
+    focal: Focal | None = Field(
+        None,
+        description="Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+    )
 
 
 class KeyPoints(BaseModel):
@@ -1176,7 +1207,7 @@ class Props10(BaseModel):
     title: constr(min_length=1)
     sourceIconUrl: constr(pattern=r'^/api/favicon(?:[/?#].*)?$') | None = None
     byline: Byline
-    image: Image1 | None = None
+    image: Image2 | None = None
     key_points: KeyPoints | None = None
     blocks: list[
         ArticleHeading

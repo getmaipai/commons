@@ -34,7 +34,7 @@ export interface StoryCardData {
   published_at: string;
   outlets: number;
   topics: string[];
-  image?: { w480: string; w1280: string; alt: string };
+  image?: { w480: string; w1280: string; alt: string; focal?: { x: number; y: number; aspect: number } };
   saved: boolean;
   opened: boolean;
   open_url?: string;
@@ -152,6 +152,7 @@ function StoryImage({ story, ratio, large, hero, thumbnail }: { story: StoryCard
         srcSet={thumbnail || !story.image ? undefined : `${story.image.w480} 480w, ${story.image.w1280} 1280w`}
         sizes={thumbnail ? undefined : large ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
         alt={story.image?.alt ?? ""}
+        focal={story.image?.focal}
         loading="lazy"
         className="absolute inset-0 size-full object-cover"
       />

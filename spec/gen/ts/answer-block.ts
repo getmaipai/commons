@@ -1201,6 +1201,18 @@ export const AnswerBlock = z
                       w480: z.string().min(1),
                       w1280: z.string().min(1),
                       alt: z.string().min(1),
+                      /**Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.*/
+                      focal: z
+                        .object({
+                          x: z.number().gte(0).lte(100),
+                          y: z.number().gte(0).lte(100),
+                          aspect: z.number().gt(0),
+                        })
+                        .strict()
+                        .describe(
+                          "Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+                        )
+                        .optional(),
                     })
                     .strict()
                     .optional(),
@@ -1267,6 +1279,18 @@ export const AnswerBlock = z
                           w480: z.string().min(1),
                           w1280: z.string().min(1),
                           alt: z.string().min(1),
+                          /**Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.*/
+                          focal: z
+                            .object({
+                              x: z.number().gte(0).lte(100),
+                              y: z.number().gte(0).lte(100),
+                              aspect: z.number().gt(0),
+                            })
+                            .strict()
+                            .describe(
+                              "Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+                            )
+                            .optional(),
                         })
                         .strict()
                         .optional(),
@@ -1358,6 +1382,18 @@ export const AnswerBlock = z
                                   w480: z.string().min(1),
                                   w1280: z.string().min(1),
                                   alt: z.string().min(1),
+                                  /**Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.*/
+                                  focal: z
+                                    .object({
+                                      x: z.number().gte(0).lte(100),
+                                      y: z.number().gte(0).lte(100),
+                                      aspect: z.number().gt(0),
+                                    })
+                                    .strict()
+                                    .describe(
+                                      "Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+                                    )
+                                    .optional(),
                                 })
                                 .strict()
                                 .optional(),
@@ -1430,6 +1466,18 @@ export const AnswerBlock = z
                           w480: z.string().min(1),
                           w1280: z.string().min(1),
                           alt: z.string().min(1),
+                          /**Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.*/
+                          focal: z
+                            .object({
+                              x: z.number().gte(0).lte(100),
+                              y: z.number().gte(0).lte(100),
+                              aspect: z.number().gt(0),
+                            })
+                            .strict()
+                            .describe(
+                              "Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+                            )
+                            .optional(),
                         })
                         .strict()
                         .optional(),
@@ -1549,6 +1597,18 @@ export const AnswerBlock = z
                   w480: z.string().min(1),
                   w1280: z.string().min(1),
                   alt: z.string().min(1),
+                  /**Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.*/
+                  focal: z
+                    .object({
+                      x: z.number().gte(0).lte(100),
+                      y: z.number().gte(0).lte(100),
+                      aspect: z.number().gt(0),
+                    })
+                    .strict()
+                    .describe(
+                      "Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+                    )
+                    .optional(),
                 })
                 .strict()
                 .optional(),
@@ -1953,6 +2013,18 @@ export const AnswerBlock = z
                           w480: z.string().min(1),
                           w1280: z.string().min(1),
                           alt: z.string().min(1),
+                          /**Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.*/
+                          focal: z
+                            .object({
+                              x: z.number().gte(0).lte(100),
+                              y: z.number().gte(0).lte(100),
+                              aspect: z.number().gt(0),
+                            })
+                            .strict()
+                            .describe(
+                              "Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+                            )
+                            .optional(),
                         })
                         .strict()
                         .optional(),

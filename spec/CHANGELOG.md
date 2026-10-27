@@ -1,3 +1,7 @@
+## [spec-v0.1.249] - 2026-10-27
+
+- NEWS-FOCAL-01: a story card's `image` (and the article's) may carry `focal` `{x, y, aspect}`: where the picture's subject sits, in percent of the image, and its width over height, worked out once on the hub so a client frames the picture on its first paint.
+
 ## [spec-v0.1.248] - 2026-10-27
 
 - A companion's animation state may have only a still: `h264` is now optional on every animation state (`still` and `loop` stay required). Consumers draw the still when there is no clip.

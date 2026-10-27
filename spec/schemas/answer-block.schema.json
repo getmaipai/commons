@@ -636,6 +636,32 @@
             "alt": {
               "type": "string",
               "minLength": 1
+            },
+            "focal": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+              "required": [
+                "x",
+                "y",
+                "aspect"
+              ],
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "aspect": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
             }
           }
         },
@@ -1012,6 +1038,32 @@
                 "alt": {
                   "type": "string",
                   "minLength": 1
+                },
+                "focal": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Where the picture's subject sits, worked out once on the hub: x and y are percentages of the image, aspect is its width over its height. A client crops around this point and never analyses the picture itself.",
+                  "required": [
+                    "x",
+                    "y",
+                    "aspect"
+                  ],
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "aspect": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
                 }
               }
             },

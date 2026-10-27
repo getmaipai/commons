@@ -42,7 +42,7 @@ export interface ArticleViewData {
   description?: string;
   byline?: { publisher: string; site: string; published_at: string; outlets: number; reading_s: number };
   sourceIconUrl?: string;
-  image?: { w480: string; w1280: string; alt: string };
+  image?: { w480: string; w1280: string; alt: string; focal?: { x: number; y: number; aspect: number } };
   key_points?: { text: string; band: "child" | "teen" | "adult" };
   blocks: ArticleBlockData[];
   also_covering?: StoryCardData[];
@@ -238,7 +238,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       {data.image ? (
         <div data-slot="article-lead">
           <AspectRatio ratio={16 / 9} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
-            <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} className="absolute inset-0 size-full object-cover" />
+            <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} focal={data.image.focal} className="absolute inset-0 size-full object-cover" />
           </AspectRatio>
         </div>
       ) : null}

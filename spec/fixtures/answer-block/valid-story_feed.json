@@ -31,7 +31,8 @@
       "image": {
         "w480": "/api/plugins/news/images/news-1d4e5f?w=480",
         "w1280": "/api/plugins/news/images/news-1d4e5f?w=1280",
-        "alt": "Harbor at dawn, Example Wire"
+        "alt": "Harbor at dawn, Example Wire",
+        "focal": { "x": 62.5, "y": 38, "aspect": 1.5 }
       },
       "kicker": "Top story · 3 outlets",
       "group": "This morning"

@@ -10,7 +10,10 @@ export function FocalImageProvider({ analyze, children }: { analyze: FocalMapAna
   return <FocalMapContext.Provider value={analyze}>{children}</FocalMapContext.Provider>;
 }
 
-type Props = Omit<ComponentProps<typeof SafeImage>, "onLoad"> & { aspectRatio?: number; onLoad?: ComponentProps<typeof SafeImage>["onLoad"] };
+/** A subject point worked out elsewhere (the hub): x and y are percentages of the image, aspect is its width over height. */
+export type FocalPoint = { x: number; y: number; aspect: number };
+
+type Props = Omit<ComponentProps<typeof SafeImage>, "onLoad"> & { aspectRatio?: number; focal?: FocalPoint; onLoad?: ComponentProps<typeof SafeImage>["onLoad"] };
 const cache = new Map<string, string>();
 const STORE_KEY = "maipai.focal.v1";
 let stored: Record<string, string> | null = null;
@@ -103,9 +106,21 @@ export function focalObjectPosition(map: Float32Array, imageWidth: number, image
   return `${x}% ${y}%`;
 }
 
+/** The object-position that keeps a known subject point in the middle of the largest crop at a frame ratio (width over height). */
+export function focalPointPosition(focal: FocalPoint, frameRatio: number): string {
+  const axis = (point: number, window: number) => (window >= 1 ? 50 : Math.max(0, Math.min(1 - window, point / 100 - window / 2)) / (1 - window) * 100);
+  if (!(focal.aspect > 0) || !(frameRatio > 0) || !Number.isFinite(focal.x) || !Number.isFinite(focal.y)) return "50% 50%";
+  const wide = focal.aspect > frameRatio;
+  const x = wide ? axis(focal.x, frameRatio / focal.aspect) : 50;
+  const y = wide ? 50 : axis(focal.y, focal.aspect / frameRatio);
+  return `${Math.round(x * 10) / 10}% ${Math.round(y * 10) / 10}%`;
+}
+
 /** Image with optional focal framing. It stays centered until an analyzer is provided and returns a crop. */
-export function FocalImage({ src, aspectRatio, onLoad, style, ...props }: Props) {
-  const analyze = useContext(FocalMapContext);
+export function FocalImage({ src, aspectRatio, focal, onLoad, style, ...props }: Props) {
+  // A subject point from the hub frames the picture on its first paint; the browser only analyses a picture that arrives without one.
+  const provided = useContext(FocalMapContext);
+  const analyze = focal ? null : provided;
   const imageRef = useRef<HTMLImageElement>(null);
   const visibleRef = useRef(false);
   const startedRef = useRef(false);
@@ -184,5 +199,5 @@ export function FocalImage({ src, aspectRatio, onLoad, style, ...props }: Props)
     return focalObjectPosition(map, image.naturalWidth, image.naturalHeight, ratio);
   }
 
-  return <SafeImage {...props} src={src} imageRef={imageRef} style={{ ...style, objectFit: "cover", objectPosition: position, opacity: settled ? (style?.opacity ?? 1) : 0, transition: [style?.transition, "opacity 120ms ease-out"].filter(Boolean).join(", ") }} onLoad={(event) => { onLoad?.(event); if (!event.currentTarget.complete) return; analyzeVisibleRef.current(); }} />;
+  return <SafeImage {...props} src={src} imageRef={imageRef} style={{ ...style, objectFit: "cover", objectPosition: focal && aspectRatio ? focalPointPosition(focal, aspectRatio) : position, opacity: settled ? (style?.opacity ?? 1) : 0, transition: [style?.transition, "opacity 120ms ease-out"].filter(Boolean).join(", ") }} onLoad={(event) => { onLoad?.(event); if (!event.currentTarget.complete) return; analyzeVisibleRef.current(); }} />;
 }

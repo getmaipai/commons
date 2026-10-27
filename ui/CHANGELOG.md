@@ -1,3 +1,7 @@
+## [ui-v0.5.394] - 2026-10-27
+
+- `FocalImage` takes `focal` `{x, y, aspect}` (a subject point worked out on the hub): the picture shows at once, framed on that point at its `aspectRatio`, and the in-browser analysis is skipped. `StoryFeed` and `ArticleView` pass `image.focal`. New export `focalPointPosition`.
+
 ## [ui-v0.5.393] - 2026-10-27
 
 - `ArticleView`: the article column starts with space (`pt-6`) below the source row.
