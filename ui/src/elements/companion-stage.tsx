@@ -36,9 +36,9 @@ function AudioWave({ className }: { className?: string }) {
 
 export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, className }: CompanionStageProps) {
   return <section data-slot="companion-stage" data-mode={mode} aria-label={`${name} companion`} className={cn("flex h-full min-h-0 flex-col gap-3", className)}>
-    <header className="flex min-w-0 items-center justify-between gap-3">
+    <header className="flex min-w-0 flex-col">
       <h2 className="min-w-0 truncate font-medium">{name}</h2>
-      {stateWord ? <span role="status" aria-live="polite" className="shrink-0 text-sm text-muted-foreground">{stateWord}</span> : null}
+      {stateWord ? <span role="status" aria-live="polite" className="truncate text-sm text-muted-foreground">{stateWord}</span> : null}
     </header>
 
     <div data-slot="companion-stage-character-area" className="relative flex min-h-0 flex-1 items-center justify-center">

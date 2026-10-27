@@ -1,3 +1,7 @@
+## [ui-v0.5.397] - 2026-10-27
+
+- `CompanionAvatar size="fill"` takes the space it is given. `CompanionStage` stacks the state word under the name, like the mockup.
+
 ## [ui-v0.5.396] - 2026-10-27
 
 - `ArticleView` draws Listen, Key points and Discuss as buttons under the headline (they were under More), and takes a new `discuss` action; the page schema's `answer_blocks.actions.discuss` fires it.

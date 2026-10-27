@@ -173,3 +173,10 @@ test("a state with only a still draws that still and no video", () => {
   expect(view.container.querySelector("img")?.getAttribute("src")).toBe("speaking.png");
   restore();
 });
+
+test("fill takes the whole space it is given", () => {
+  const restore = setup();
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} size="fill" animated={false} />);
+  expect(view.getByRole("img", { name: "Mimi" }).className).toContain("size-full");
+  restore();
+});
