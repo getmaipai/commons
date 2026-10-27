@@ -1,3 +1,7 @@
+## [ui-v0.5.370] - 2026-10-27
+
+- `StudioLayout` header stacks its actions under the title on phones, so a long actions row no longer overlaps the title.
+
 ## [ui-v0.5.367] - 2026-10-27
 
 - REVAMP-DIRECTORY-01: add the `CompanionCard` and `CompanionProfileHeader` Elements for companion directories and profiles.
