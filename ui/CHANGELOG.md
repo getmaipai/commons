@@ -129,6 +129,10 @@
 
 # Changelog (`@maipai/ui`)
 
+## [ui-v0.5.368] - 2026-10-27
+
+- REVAMP-DIRECTORY-01 and REVAMP-TASKS-01: add `ActivityFeed` and `TaskBrowser` Elements for activity and task layouts.
+
 ## [ui-v0.5.347] - 2026-10-25
 
 Same as 0.5.346, whose tag was cut before `ui/package.json` carried its version.
