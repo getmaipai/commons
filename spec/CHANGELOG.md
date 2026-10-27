@@ -1,4 +1,4 @@
-## [spec-v0.1.249] - 2026-10-27
+## [spec-v0.1.250] - 2026-10-27
 
 - `persona.active_id`: Tessa joins the companion list and is the default for a person who has not picked one.
 
