@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { AssistantRuntimeProvider, MessagePrimitive, useAuiState, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
-import { ComposerInputField, Thread, type ThreadViewportOptions } from "./thread.aui";
+import { ComposerInputField, TalkPill, Thread, type ThreadViewportOptions } from "./thread.aui";
 import { DraftRestore } from "./draft-restore";
 import { DraftRestoreComposerShowcase } from "./DraftRestoreComposerShowcase";
 import type { CompanionClips } from "./companion-avatar-machine";
@@ -612,5 +612,19 @@ describe("compact composer label-only model state (ELT-COMPOSER-KIT-01)", () => 
     const css = await Bun.file(new URL("./thread-composer.css", import.meta.url)).text();
     expect(css).toContain(':has([data-slot="model-selector-trigger"], [data-slot="model-selector-value"])');
     expect(css).toMatch(/\[data-slot="model-selector-value"\]:not\(button \*\) \{[^}]*max-width: 10rem;[^}]*text-overflow: ellipsis/);
+  });
+});
+
+describe("TalkPill", () => {
+  function PillHarness() {
+    const runtime = useLocalRuntime({ run: async function* () {} } as ChatModelAdapter, { initialMessages: [] });
+    return <AssistantRuntimeProvider runtime={runtime}><TalkPill placeholder="Talk to Tessa..." /></AssistantRuntimeProvider>;
+  }
+  test("draws the composer pill with its own placeholder and no thread", () => {
+    const view = render(<PillHarness />);
+    expect(view.getByPlaceholderText("Talk to Tessa...")).toBeTruthy();
+    expect(view.container.querySelector('[data-composer-variant="pill"]')).toBeTruthy();
+    expect(view.container.querySelector(".aui-thread-root")).toBeNull();
+    expect(view.container.querySelector('[data-slot="composer-attachments"], [aria-label="Add attachment"]')).toBeNull();
   });
 });

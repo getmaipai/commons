@@ -564,6 +564,13 @@ const VISIBLE_THROTTLE_MS = 100;
 const sameIds = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((id, i) => id === b[i]);
 
+/** The compact talk pill on its own: the thread's composer in its pill variant (microphone at the left, the input, send or stop at the right), for a host that has an assistant-ui runtime but no thread to draw (the companion stage). Same primitives and behaviour as the thread's composer. */
+export const TalkPill: FC<{ placeholder?: string; autoFocus?: boolean }> = ({ placeholder = "Talk...", autoFocus = false }) => (
+  <ThreadComponentsContext.Provider value={{ ...EMPTY_COMPONENTS, composerVariant: "pill", composerPlaceholder: placeholder }}>
+    <Composer autoFocus={autoFocus} />
+  </ThreadComponentsContext.Provider>
+);
+
 /**
  * Ids of the messages currently intersecting the thread viewport, in
  * document order, updated at most once per 100ms. Call it from inside the

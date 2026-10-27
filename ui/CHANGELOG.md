@@ -1,3 +1,7 @@
+## [ui-v0.5.392] - 2026-10-27
+
+- `TalkPill`: the thread's composer in its pill variant on its own (microphone, input, send or stop), for a host with an assistant-ui runtime and no thread to draw (the companion stage).
+
 ## [ui-v0.5.391] - 2026-10-27
 
 - `ArticleView`: the publisher row is shaded (`bg-muted`) and is the same height as the button row (`h-14`), so the source icon and the buttons share one vertical centre.
