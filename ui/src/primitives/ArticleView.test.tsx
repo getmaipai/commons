@@ -63,7 +63,8 @@ describe("ArticleView", () => {
     const withIcon = { ...data, sourceIconUrl: "/api/favicon?domain=example.com" };
     const view = render(<ArticleView data={withIcon} onBack={() => {}} />);
     const provider = view.container.querySelector('[data-slot="article-provider"]')!;
-    expect(provider.className).toContain("min-h-16");
+    expect(provider.className).toContain("h-14")
+    expect(provider.className).toContain("bg-muted");
     expect(provider.querySelector('[data-slot="safe-image-fallback"]')).not.toBeNull();
     const toolbar = view.container.querySelector('[data-slot="article-toolbar"]')!;
     const stickyHeader = view.container.querySelector('[data-slot="article-sticky-header"]')!;

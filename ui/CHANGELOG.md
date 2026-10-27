@@ -1,3 +1,7 @@
+## [ui-v0.5.391] - 2026-10-27
+
+- `ArticleView`: the publisher row is shaded (`bg-muted`) and is the same height as the button row (`h-14`), so the source icon and the buttons share one vertical centre.
+
 ## [ui-v0.5.390] - 2026-10-27
 
 - `CompanionAvatar` draws a state's still when it has no clip (`h264` is optional on a clip), so a companion made of pictures has a look for every state.

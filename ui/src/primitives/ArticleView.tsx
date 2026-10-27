@@ -222,7 +222,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       </div>
       {data.byline ? (
-        <div data-slot="article-provider" className="flex min-h-16 w-full items-center justify-center gap-3 px-0 py-2 text-center text-2xl font-semibold">
+        <div data-slot="article-provider" className="flex h-14 w-full items-center justify-center gap-3 bg-muted px-0 py-0 text-center text-2xl font-semibold">
           <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className="size-11 shrink-0 rounded-xl" onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
           <span>{data.byline.publisher}</span>
         </div>
