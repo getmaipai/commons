@@ -1,3 +1,7 @@
+## [ui-v0.5.367] - 2026-10-27
+
+- REVAMP-DIRECTORY-01: add the `CompanionCard` and `CompanionProfileHeader` Elements for companion directories and profiles.
+
 ## [ui-v0.5.366] - 2026-10-26
 
 - ChatHeader companion picker adds descriptions, hints, an intro, searchable choices, a live notice, and a footer slot. All additions are optional.
