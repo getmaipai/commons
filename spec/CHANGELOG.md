@@ -1,3 +1,7 @@
+## [spec-v0.1.248] - 2026-10-27
+
+- A companion's animation state may have only a still: `h264` is now optional on every animation state (`still` and `loop` stay required). Consumers draw the still when there is no clip.
+
 ## [spec-v0.1.247] - 2026-10-27
 
 - AMBIENT-01: `placement` (`chat` | `side`, default `chat`) on the Conversation record, so a chat held in the companion pane is stored with the person's other conversations and marked as a side chat. No gate reads it.

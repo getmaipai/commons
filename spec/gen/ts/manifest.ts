@@ -270,7 +270,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -297,7 +298,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -325,7 +327,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -353,7 +356,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -381,7 +385,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -409,7 +414,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -437,7 +443,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -465,7 +472,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -493,7 +501,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -521,7 +530,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -549,7 +559,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(
@@ -577,7 +588,8 @@ export const PackageManifest = z
                         new RegExp(
                           "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
                         ),
-                      ),
+                      )
+                      .optional(),
                     av1: z
                       .string()
                       .regex(

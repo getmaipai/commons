@@ -66,7 +66,7 @@ describe("CMEDIA-SPEC-01 companion media", () => {
   test("rejects invalid animation declarations", () => {
     const refused: Array<[string, Record<string, unknown>]> = [
       ["unknown state", { states: { ...animation.states, dancing: { h264: "dance.mp4", still: "dance.png", loop: true } } }],
-      ["missing h264", { states: { idle: { still: "idle.png", loop: true } } }],
+      ["missing still", { states: { idle: { h264: "idle.mp4", loop: true } } }],
       ["slash path", { states: { idle: { h264: "clips/idle.mp4", still: "idle.png", loop: true } } }],
       ["dot dot path", { states: { idle: { h264: "idle..mp4", still: "idle.png", loop: true } } }],
       ["wrong kind", { kind: "gif" }],
@@ -79,6 +79,10 @@ describe("CMEDIA-SPEC-01 companion media", () => {
       const animationChanges = Object.fromEntries(Object.entries(change).filter(([key]) => key !== "status"));
       expect(() => PackageManifest.parse(manifestWithAnimation({ ...companionChanges, animation: { ...animation, ...animationChanges } })), label).toThrow();
     }
+  });
+
+  test("a state may have only a still", () => {
+    expect(() => PackageManifest.parse(manifestWithAnimation({ animation: { ...animation, states: { ...animation.states, idle: { still: "idle.png", loop: true } } } }))).not.toThrow();
   });
 
   test("the schema state list and required states track the vocabulary", () => {

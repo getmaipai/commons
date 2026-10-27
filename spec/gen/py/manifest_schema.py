@@ -102,7 +102,9 @@ class Idle(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -115,7 +117,9 @@ class IdleLook(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -128,7 +132,9 @@ class Listening(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -141,7 +147,9 @@ class Thinking(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -154,7 +162,9 @@ class Working(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -167,7 +177,9 @@ class Speaking(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -180,7 +192,9 @@ class NeedsYou(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -193,7 +207,9 @@ class Greeting(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -206,7 +222,9 @@ class Happy(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -219,7 +237,9 @@ class Oops(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -232,7 +252,9 @@ class Celebrate(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )
@@ -245,7 +267,9 @@ class Sleeping(BaseModel):
         extra='forbid',
         regex_engine="python-re",
     )
-    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$')
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
     av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
         None
     )

@@ -275,8 +275,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -301,8 +300,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -327,8 +325,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -353,8 +350,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -379,8 +375,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -405,8 +400,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -431,8 +425,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -457,8 +450,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -483,8 +475,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -509,8 +500,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -535,8 +525,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
@@ -561,8 +550,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "h264",
-                    "still",
+                                        "still",
                     "loop"
                   ],
                   "properties": {
