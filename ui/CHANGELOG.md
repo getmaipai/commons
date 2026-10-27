@@ -1,3 +1,7 @@
+## [ui-v0.5.393] - 2026-10-27
+
+- `ArticleView`: the article column starts with space (`pt-6`) below the source row.
+
 ## [ui-v0.5.392] - 2026-10-27
 
 - `TalkPill`: the thread's composer in its pill variant on its own (microphone, input, send or stop), for a host with an assistant-ui runtime and no thread to draw (the companion stage).
