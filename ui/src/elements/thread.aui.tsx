@@ -30,6 +30,7 @@ import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 import { CompanionAvatar } from "./companion-avatar";
 import { Avatar as SeededAvatar } from "@/kit/primitives/Avatar";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import type { CompanionClips } from "./companion-avatar-machine";
 import { cn } from "cn";
 import {
@@ -221,26 +222,18 @@ export type SpeakerMarkerProps = {
 };
 
 export const SpeakerMarker: FC<SpeakerMarkerProps> = ({ speaker, joinedLabel, fallbackPoster }) => {
-  const [portraitFailed, setPortraitFailed] = useState(false);
   return (
     <div data-slot="aui_speaker-marker" className="text-muted-foreground flex items-center gap-2 px-2 pb-1 text-xs">
-      {fallbackPoster && !portraitFailed ? (
-        <img src={fallbackPoster} alt="" className="border-border size-7 rounded-full border object-cover" onError={() => setPortraitFailed(true)} />
-      ) : (
-        <SeededAvatar name={speaker.name} seed={speaker.companion_id} className="size-7" />
-      )}
+      <SafeImage src={fallbackPoster || undefined} kind="person" className="border-border size-7 rounded-full border bg-transparent object-cover" fallbackContent={<SeededAvatar name={speaker.name} seed={speaker.companion_id} className="size-7" />} />
       <span className="font-medium text-foreground">{speaker.name}</span>
       {joinedLabel ? <span>{joinedLabel}</span> : null}
     </div>
   );
 };
 
-const ReplyPortrait: FC<{ speaker: SpeakerMarkerAnsweredBy; portrait?: string }> = ({ speaker, portrait }) => {
-  const [failed, setFailed] = useState(false);
-  return portrait && !failed
-    ? <img src={portrait} alt="" className="size-7 rounded-full object-cover" onError={() => setFailed(true)} />
-    : <SeededAvatar name={speaker.name} seed={speaker.companion_id} className="size-7" />;
-};
+const ReplyPortrait: FC<{ speaker: SpeakerMarkerAnsweredBy; portrait?: string }> = ({ speaker, portrait }) => (
+  <SafeImage src={portrait} kind="person" className="size-7 rounded-full bg-transparent object-cover" fallbackContent={<SeededAvatar name={speaker.name} seed={speaker.companion_id} className="size-7" />} />
+);
 
 export type ThreadComponents = {
   composerTourId?: string | undefined;
