@@ -26,13 +26,16 @@ import { createContext, useContext, useEffect, useState, type ComponentType, typ
  * issue in commons/ui/docs/dashboard-upstream.md. */
 const HeaderExtraContext = createContext<{
   Left: ComponentType | undefined;
+  Right: ComponentType | undefined;
   setLeft: Dispatch<SetStateAction<ComponentType | undefined>>;
-}>({ Left: undefined, setLeft: () => {} });
+  setRight: Dispatch<SetStateAction<ComponentType | undefined>>;
+}>({ Left: undefined, Right: undefined, setLeft: () => {}, setRight: () => {} });
 
 export function HeaderExtraProvider({ children }: { children: React.ReactNode }) {
   const [Left, setLeft] = useState<ComponentType | undefined>(undefined);
+  const [Right, setRight] = useState<ComponentType | undefined>(undefined);
   return (
-    <HeaderExtraContext.Provider value={{ Left, setLeft }}>
+    <HeaderExtraContext.Provider value={{ Left, Right, setLeft, setRight }}>
       {children}
     </HeaderExtraContext.Provider>
   );
@@ -40,6 +43,10 @@ export function HeaderExtraProvider({ children }: { children: React.ReactNode })
 
 export function useHeaderExtraLeft(): ComponentType | undefined {
   return useContext(HeaderExtraContext).Left;
+}
+
+export function useHeaderExtraRight(): ComponentType | undefined {
+  return useContext(HeaderExtraContext).Right;
 }
 
 /** Sets the header's left-side extra content to the given component
@@ -58,10 +65,11 @@ export function useHeaderExtraLeft(): ComponentType | undefined {
  * that doesn't just sits at its natural size, the same as before this
  * item, with the header's free space going unused around it.
  * `chatHeaderBar.tsx` (home) is the one example today. */
-export function useHeaderExtra(Component: ComponentType | undefined): void {
-  const { setLeft } = useContext(HeaderExtraContext);
+export function useHeaderExtra(Component: ComponentType | undefined, Right?: ComponentType): void {
+  const { setLeft, setRight } = useContext(HeaderExtraContext);
   useEffect(() => {
     setLeft(() => Component);
-    return () => setLeft(undefined);
-  }, [Component, setLeft]);
+    setRight(() => Right);
+    return () => { setLeft(undefined); setRight(undefined); };
+  }, [Component, Right, setLeft, setRight]);
 }

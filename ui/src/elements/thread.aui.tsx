@@ -205,6 +205,7 @@ export type ThreadViewportOptions = Pick<
  * row under every reply, the way the major chat apps draw it.
  */
 export type ComposerDensity = "compact";
+export type ComposerVariant = "pill";
 export type ComposerNoticeLayout = "truncate" | "wrap";
 export type SpeakerMarkerAnsweredBy = {
   companion_id: string;
@@ -273,6 +274,8 @@ export type ThreadComponents = {
    * slim single-row composer (thread-composer.css), tuned only through the
    * `--composer-compact-*` custom properties. */
   composerDensity?: ComposerDensity | undefined;
+  /** Compact talk pill using the same assistant-ui composer primitives and state. */
+  composerVariant?: ComposerVariant | undefined;
   ComposerInputOverride?: ComponentType | undefined;
   ComposerNotice?: ComponentType | undefined;
   /** Composer notice layout. Defaults to the existing one-line truncation. */
@@ -445,7 +448,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
   scrollToBottomOffset,
   tourId,
 }) => {
-  const { Welcome = ThreadWelcome, WelcomeContent, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity, engineDown, BelowComposer, BelowComposerContent, emptyLayout } = useContext(ThreadComponentsContext);
+  const { Welcome = ThreadWelcome, WelcomeContent, viewport = {}, ThreadViewportExtra, ComposerQueue, composerDensity, composerVariant, engineDown, BelowComposer, BelowComposerContent, emptyLayout } = useContext(ThreadComponentsContext);
   const [viewportElement, setViewportElement] = useState<HTMLElement | null>(null);
   const [footerElement, setFooterElement] = useState<HTMLElement | null>(null);
 
@@ -468,6 +471,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean; temporary: boolean;
     <ThreadPrimitive.Root
       data-tour={tourId}
       data-density={composerDensity}
+      data-composer-variant={composerVariant}
       className={cn(
         "aui-root aui-thread-root bg-background @container flex h-full flex-col",
         ThreadViewportExtra && "relative",
@@ -965,7 +969,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 );
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerNoticeLayout, composerNoticeReserve, composerPlaceholder, composerTourId } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerVariant, composerNoticeLayout, composerNoticeReserve, composerPlaceholder, composerTourId } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
@@ -979,26 +983,38 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
             ref={shellRef}
             data-slot="aui_composer-shell"
             data-density={composerDensity}
+            data-composer-variant={composerVariant}
             data-multiline={multiline ? "" : undefined}
-            className="border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text flex-col gap-2 rounded-(--composer-radius) border bg-(--composer-bg) p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]"
+            className={cn("border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text border bg-(--composer-bg) transition-[border-color]", composerVariant === "pill" ? "items-center gap-1 rounded-full p-1" : "flex-col gap-2 rounded-(--composer-radius) p-(--composer-padding)", "data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]")}
           >
-            <ComposerAttachments />
-            {ComposerQuotePreview && <ComposerQuotePreview />}
+            {composerVariant !== "pill" ? <ComposerAttachments /> : null}
+            {composerVariant !== "pill" && ComposerQuotePreview ? <ComposerQuotePreview /> : null}
             <div
               ref={setAboveInputRegion}
               data-slot="composer-above-input"
               aria-live="polite"
             />
-            {ComposerInputOverride ? (
+            {composerVariant === "pill" ? <>
+              <AuiIf condition={(s) => s.composer.dictation == null}>
+                <ComposerPrimitive.Dictate asChild>
+                <TooltipIconButton tooltip="Voice input" side="top" type="button" variant="ghost" size="icon" className="size-9 shrink-0 rounded-full" aria-label="Start voice input"><MicIcon aria-hidden="true" className="size-4" /></TooltipIconButton>
+                </ComposerPrimitive.Dictate>
+              </AuiIf>
+              <AuiIf condition={(s) => s.composer.dictation != null}>
+                <ComposerPrimitive.StopDictation asChild><TooltipIconButton tooltip="Stop dictation" side="top" type="button" variant="ghost" size="icon" className="size-9 shrink-0 rounded-full" aria-label="Stop dictation"><SquareIcon aria-hidden="true" className="size-4" /></TooltipIconButton></ComposerPrimitive.StopDictation>
+              </AuiIf>
+            </> : null}
+            {ComposerInputOverride && composerVariant !== "pill" ? (
               <ComposerInputOverride />
             ) : (
               <ComposerInputField
                 placeholder={composerPlaceholder ?? "Send a message..."}
                 autoFocus={autoFocus}
                 submitMode={sendHeld ? "none" : undefined}
+                className={composerVariant === "pill" ? "min-h-9 flex-1 px-2 text-sm" : undefined}
               />
             )}
-            <ComposerAction />
+            <ComposerAction pill={composerVariant === "pill"} />
           </div>
         </DraftRestoreRegionContext.Provider>
       </ComposerPrimitive.AttachmentDropzone>
@@ -1019,10 +1035,18 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
   );
 };
 
-const ComposerAction: FC = () => {
+const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
   const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd, sendHeld: sendHeldProp, sendButtonTourId } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
+  if (pill) return <div className="flex shrink-0 items-center gap-1">
+    <AuiIf condition={(s) => !s.thread.isRunning || s.thread.voice !== undefined}>
+      {sendHeld ? <TooltipIconButton tooltip="Send message" side="top" type="button" variant="default" size="icon" className="size-9 rounded-full" data-tour={sendButtonTourId} aria-label="Send message" disabled><ArrowUpIcon aria-hidden="true" className="size-4" /></TooltipIconButton> : <ComposerPrimitive.Send asChild><TooltipIconButton tooltip="Send message" side="top" type="button" variant="default" size="icon" className="size-9 rounded-full" data-tour={sendButtonTourId} aria-label="Send message"><ArrowUpIcon aria-hidden="true" className="size-4" /></TooltipIconButton></ComposerPrimitive.Send>}
+    </AuiIf>
+    <AuiIf condition={(s) => s.thread.isRunning && s.thread.voice === undefined}>
+      <ComposerPrimitive.Cancel asChild><Button type="button" variant="default" size="icon" className="size-9 rounded-full" aria-label="Stop generating"><SquareIcon aria-hidden="true" className="size-4 fill-current" /></Button></ComposerPrimitive.Cancel>
+    </AuiIf>
+  </div>;
   return (
     <div className="aui-composer-action-wrapper relative flex items-center justify-between">
       <div className="flex items-center gap-1.5">

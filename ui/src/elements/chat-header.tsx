@@ -27,6 +27,8 @@ export interface ChatHeaderProps {
   onCall?: () => void;
   /** Rendered immediately left of the Call button (for example a conversation actions menu). */
   actions?: ReactNode;
+  /** Rendered after the existing right-hand actions as the final item in the header row. */
+  end?: ReactNode;
   /** Forwarded to the menu button as aria-expanded. */
   menuExpanded?: boolean;
   /** Forwarded to the menu button as aria-controls. */
@@ -46,7 +48,7 @@ export interface ChatHeaderProps {
   identityFooter?: ReactNode;
 }
 
-export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, menuExpanded, menuControls, identityMenu, identityChoices, identityValue, onIdentityChange, identityLabel = "Change companion", identityIntro, identitySearchLabel, identityNotice, identityFooter }: ChatHeaderProps) {
+export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, end, menuExpanded, menuControls, identityMenu, identityChoices, identityValue, onIdentityChange, identityLabel = "Change companion", identityIntro, identitySearchLabel, identityNotice, identityFooter }: ChatHeaderProps) {
   const [search, setSearch] = useState("");
   const searchable = Boolean(identityChoices && identitySearchLabel && identityChoices.length > 5);
   const filteredChoices = identityChoices?.filter((choice) => `${choice.label} ${choice.description ?? ""}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
@@ -82,6 +84,7 @@ export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, m
     <div className="flex items-center justify-self-end gap-1">
       {actions}
       {onCall ? <Button variant="ghost" size="icon" aria-label={`Call ${name}`} onClick={onCall}><CallIcon aria-hidden="true" /></Button> : null}
+      {end}
     </div>
   </header>;
 }

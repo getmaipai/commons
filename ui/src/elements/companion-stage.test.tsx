@@ -1,0 +1,51 @@
+import { afterEach, describe, expect, test } from "bun:test";
+import { cleanup, fireEvent, render } from "@testing-library/react";
+import { CompanionStage, type StageMode } from "@/kit/elements/companion-stage";
+
+afterEach(cleanup);
+
+const modes: StageMode[] = ["idle", "listening", "thinking", "speaking", "working"];
+
+describe("CompanionStage", () => {
+  test("renders every mode marker and a text-only state word", () => {
+    for (const mode of modes) {
+      const view = render(<CompanionStage name="Rivet" mode={mode} stateWord="Listening" character={<img alt="Rivet" />} talk={<button type="button">Talk</button>} workingLine="Finding photos" />);
+      const root = view.container.querySelector('[data-slot="companion-stage"]');
+      expect(root?.getAttribute("data-mode")).toBe(mode);
+      const status = view.getByRole("status");
+      expect(status.textContent).toBe("Listening");
+      expect(status.querySelector("*" )).toBeNull();
+      expect(root?.querySelector('span.rounded-full[class*="bg-"]')).toBeNull();
+      cleanup();
+    }
+  });
+
+  test("character and its ancestors through the stage root have no background utility", () => {
+    const view = render(<CompanionStage name="Rivet" mode="idle" character={<img data-testid="character" alt="Rivet" />} talk={<span />} />);
+    let node: HTMLElement | null = view.getByTestId("character");
+    while (node) {
+      expect(node.className).not.toMatch(/(?:^|\s)bg-[^\s]+/);
+      if (node.matches('[data-slot="companion-stage"]')) break;
+      node = node.parentElement;
+    }
+    expect(node?.getAttribute("data-slot")).toBe("companion-stage");
+  });
+
+  test("actions call handlers and bubble dismissal is controlled by the host", () => {
+    let selected = 0;
+    let dismissed = 0;
+    const view = render(<CompanionStage name="Rivet" mode="speaking" character={<span />} bubble={<p>Welcome back</p>} onDismissBubble={() => dismissed++} actions={[{ id: "review", label: "Review", onSelect: () => selected++ }]} talk={<span />} />);
+    fireEvent.click(view.getByRole("button", { name: "Review" }));
+    fireEvent.click(view.getByRole("button", { name: "Dismiss message" }));
+    expect(selected).toBe(1);
+    expect(dismissed).toBe(1);
+    expect(view.getByText("Welcome back")).toBeTruthy();
+  });
+
+  test("bubble is absent unless provided and motion utilities are reduced-motion safe", () => {
+    const view = render(<CompanionStage name="Rivet" mode="listening" character={<span />} talk={<span />} />);
+    expect(view.container.querySelector('[data-slot="companion-stage-bubble"]')).toBeNull();
+    expect(view.container.querySelector('[data-slot="companion-stage-listening-ring"]')?.className).toContain("motion-safe:animate-pulse");
+    expect(view.container.querySelector('[data-slot="companion-stage-wave"] span')?.className).toContain("motion-safe:animate-pulse");
+  });
+});

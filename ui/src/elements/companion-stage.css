@@ -1,0 +1,10 @@
+@keyframes companion-stage-progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-slot="companion-stage-working-progress"] > span {
+    animation: companion-stage-progress 1.5s ease-in-out infinite;
+  }
+}

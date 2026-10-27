@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { Link, MemoryRouter, Route, Routes } from "react-router-dom";
 import FullLayout from "./FullLayout";
 import { TooltipProvider } from "../../components/ui/tooltip";
 import AppRail, { isRailItemActive, railHref } from "./vertical/rail/AppRail";
@@ -16,6 +16,8 @@ function Titled() {
 function PageTitle() {
   return <span>Settings</span>;
 }
+function PageActions() { return <button type="button">App action</button>; }
+function TitledWithActions() { useHeaderExtra(PageTitle, PageActions); return <Link to="/plain">Leave page</Link>; }
 
 function renderRail(path: string, profile = <RailProfileMenu displayName="Sage Willow" subtitle="Owner" helpHref="/help" onLogout={() => {}} />) {
   return render(
@@ -306,6 +308,34 @@ describe("rail layout right pane slot", () => {
 });
 
 describe("rail layout top-right band", () => {
+  test("renders Left, Right, and topRight in order, then clears both slots on unmount", () => {
+    const view = render(
+      <MemoryRouter initialEntries={["/with"]}>
+        <TooltipProvider><Routes>
+          <Route element={<FullLayout rail topRightBand fallbackTitle="Home" topRight={<button type="button">Ambient</button>} />}>
+            <Route path="with" element={<TitledWithActions />} />
+            <Route path="plain" element={<div>Plain page</div>} />
+          </Route>
+        </Routes></TooltipProvider>
+      </MemoryRouter>,
+    );
+    const title = view.getByText("Settings");
+    const action = view.getByText("App action");
+    const ambient = view.getByText("Ambient");
+    expect(title.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(action.compareDocumentPosition(ambient) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(view.getByText("Leave page"));
+    expect(view.queryByText("App action")).toBeNull();
+    expect(view.queryByText("Settings")).toBeNull();
+    expect(view.getByText("Home").getAttribute("data-slot")).toBe("rail-fallback-title");
+  });
+
+  test("fallback title appears only when there is no Left slot", () => {
+    const view = renderRail("/settings");
+    expect(view.getByText("Settings")).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="rail-fallback-title"]')).toBeNull();
+  });
+
   test("topRightBand draws the title bar on a page with no header of its own and puts the control at its end", () => {
     const view = render(
       <MemoryRouter initialEntries={["/plain"]}>

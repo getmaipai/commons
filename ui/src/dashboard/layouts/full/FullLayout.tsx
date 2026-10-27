@@ -3,7 +3,7 @@ export { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
 import MobileNavDrawer from "./vertical/rail/MobileNavDrawer";
 import { FC, useState, type ReactNode } from 'react';
 import AppRail, { type RailApp, type RailCoreDestination } from './vertical/rail/AppRail';
-import { useHeaderExtraLeft } from './vertical/header/HeaderExtraContext';
+import { useHeaderExtraLeft, useHeaderExtraRight } from './vertical/header/HeaderExtraContext';
 import Sidebar from './vertical/sidebar/Sidebar';
 import Header, { type HeaderProps } from './vertical/header/Header';
 import { HeaderExtraProvider } from './vertical/header/HeaderExtraContext';
@@ -77,6 +77,8 @@ export interface FullLayoutProps {
   topRight?: ReactNode;
   /** Draws the slim title bar on every page that has no header of its own and puts `topRight` at its end, so nothing sits under it. Off for a page that draws its own header (Chat): `topRight` then floats and the page leaves room. */
   topRightBand?: boolean;
+  /** Plain fallback title for rail pages that do not provide a Left slot. */
+  fallbackTitle?: string;
   /** The host's right pane (the standard RightPane), drawn beside the workspace; a pinned pane takes its own width and the workspace shrinks. */
   rightPane?: ReactNode;
 }
@@ -84,20 +86,22 @@ export interface FullLayoutProps {
 /** The slim title bar of the rail layout: the page's own header content
  * only, 52px tall, one bottom divider. A page that draws its own header
  * (chat, beside its history column) places nothing and gets none. */
-function RailPageHeader({ reserveBand, reserveEnd, end }: { reserveBand: boolean; reserveEnd: boolean; end?: ReactNode }) {
+function RailPageHeader({ reserveBand, reserveEnd, end, fallbackTitle }: { reserveBand: boolean; reserveEnd: boolean; end?: ReactNode; fallbackTitle?: string }) {
   const Left = useHeaderExtraLeft();
+  const Right = useHeaderExtraRight();
   // On a phone with the floating menu button, the band is always drawn so the
   // button sits in it and no page content can start under the button.
-  if (!Left && !reserveBand && !end) return null;
+  if (!Left && !reserveBand && !end && !fallbackTitle) return null;
   return (
     <header data-slot="rail-page-header" className={cn("sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5", end && "pe-3", reserveEnd && !end && "pe-16")}>
-      {Left ? <Left /> : null}
-      {end ? <div data-slot="rail-top-right" className="ms-auto flex h-9 shrink-0 items-center">{end}</div> : null}
+      {Left ? <Left /> : fallbackTitle ? <span data-slot="rail-fallback-title" className="min-w-0 truncate">{fallbackTitle}</span> : null}
+      {Right ? <div data-slot="rail-header-right" className="ms-auto flex h-9 min-w-0 shrink items-center gap-2"><Right /></div> : null}
+      {end ? <div data-slot="rail-top-right" className={cn("flex h-9 shrink-0 items-center", !Right && "ms-auto")}>{end}</div> : null}
     </header>
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, topRightBand, rightPane }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, topRightBand, fallbackTitle, rightPane }: FullLayoutProps) {
   const phone = useIsPhoneLayout();
   const Navigation = phone ? MobileNavDrawer : AppRail;
   return (
@@ -109,7 +113,7 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
         <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} coreDestinations={railCoreDestinations} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
         <main data-slot="rail-workspace" data-phone-menu={phone && !hideMobileMenu ? "" : undefined} className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
           {topRight && !topRightBand ? <div data-slot="rail-top-right" className="pointer-events-none sticky top-2 z-30 h-0"><div className="flex h-9 justify-end pe-3 *:pointer-events-auto">{topRight}</div></div> : null}
-          <RailPageHeader reserveBand={phone && !hideMobileMenu} reserveEnd={Boolean(topRight)} end={topRightBand ? topRight : undefined} />
+          <RailPageHeader reserveBand={phone && !hideMobileMenu || Boolean(topRightBand)} reserveEnd={Boolean(topRight)} end={topRightBand ? topRight : undefined} fallbackTitle={fallbackTitle} />
           <div data-slot="rail-body" className="min-w-0 max-w-full flex-1">
             <div className={cn("box-border min-w-0 max-w-full w-full mx-auto p-4", "container")}>
               <Outlet />

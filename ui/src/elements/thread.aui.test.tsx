@@ -129,11 +129,11 @@ const adapter: ChatModelAdapter = {
   },
 };
 
-function Harness({ composerDensity, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter, tourId, composerTourId, sendButtonTourId }: { composerDensity?: "compact"; composerNoticeLayout?: "wrap"; composerNoticeReserve?: boolean; ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter; tourId?: string; composerTourId?: string; sendButtonTourId?: string }) {
+function Harness({ composerDensity, composerVariant, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, sendHeld, temporary, viewport, error = false, scrollToBottomOffset, runAdapter, tourId, composerTourId, sendButtonTourId }: { composerDensity?: "compact"; composerVariant?: "pill"; composerNoticeLayout?: "wrap"; composerNoticeReserve?: boolean; ComposerQueue?: React.ComponentType; ComposerInputOverride?: React.ComponentType; ComposerNotice?: React.ComponentType; MessageError?: React.ComponentType; sendHeld?: boolean; temporary?: boolean; viewport?: ThreadViewportOptions; error?: boolean; scrollToBottomOffset?: number; runAdapter?: ChatModelAdapter; tourId?: string; composerTourId?: string; sendButtonTourId?: string }) {
   const runtime = useLocalRuntime(runAdapter ?? (error ? failingAdapter : adapter));
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={composerDensity || composerNoticeLayout || composerNoticeReserve || ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { composerDensity, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} tourId={tourId} composerTourId={composerTourId} sendButtonTourId={sendButtonTourId} />
+      <Thread components={composerDensity || composerVariant || composerNoticeLayout || composerNoticeReserve || ComposerQueue || ComposerInputOverride || ComposerNotice || MessageError || viewport || sendHeld !== undefined ? { composerDensity, composerVariant, composerNoticeLayout, composerNoticeReserve, ComposerQueue, ComposerInputOverride, ComposerNotice, MessageError, viewport, sendHeld } : undefined} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} tourId={tourId} composerTourId={composerTourId} sendButtonTourId={sendButtonTourId} />
     </AssistantRuntimeProvider>
   );
 }
@@ -587,6 +587,23 @@ describe("Thread's composerDensity option (ELT-COMPOSER-KIT-01)", () => {
     for (const token of ["row-height", "control-size", "send-size", "inset-start", "inset-end", "inset-y", "radius", "max-height"]) {
       expect(css).toContain(`--composer-compact-${token}`);
     }
+  });
+});
+
+describe("Thread's compact talk pill", () => {
+  test("uses the shared composer input and send primitive without attachment or model controls", () => {
+    const { getByRole, container } = render(<Harness composerVariant="pill" />);
+    const shell = container.querySelector('[data-slot="aui_composer-shell"]');
+    expect(shell?.getAttribute("data-composer-variant")).toBe("pill");
+    expect(getByRole("textbox", { name: "Message input" })).toBeTruthy();
+    expect(getByRole("button", { name: "Send message" })).toBeTruthy();
+    expect(container.querySelector('[data-slot="composer-add-attachment"]')).toBeNull();
+    expect(container.querySelector('[data-slot="composer-model-trigger"]')).toBeNull();
+  });
+
+  test("keeps the send button disabled when sends are held", () => {
+    const { getByRole } = render(<Harness composerVariant="pill" sendHeld />);
+    expect((getByRole("button", { name: "Send message" }) as HTMLButtonElement).disabled).toBe(true);
   });
 });
 

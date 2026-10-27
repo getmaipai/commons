@@ -127,6 +127,14 @@ describe("ChatHeader", () => {
     expect(queryByRole("button", { name: "Call Marlow" })).toBeNull();
   });
 
+  test("renders the end slot after existing actions as the last header item", () => {
+    const { getByRole, getByText } = render(<ChatHeader name="Marlow" media={<span />} actions={<button type="button">History</button>} onCall={() => {}} end={<span data-testid="ambient">Avatar</span>} />);
+    const header = getByRole("banner");
+    const avatar = getByText("Avatar");
+    expect(getByText("History").compareDocumentPosition(avatar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(header.lastElementChild?.lastElementChild).toBe(avatar);
+  });
+
   test("forwards menuExpanded and menuControls to the menu button", () => {
     const { getByRole } = render(<ChatHeader name="Marlow" media={<span />} onMenu={() => {}} menuExpanded menuControls="side-nav" />);
     const menu = getByRole("button", { name: "Open menu" });

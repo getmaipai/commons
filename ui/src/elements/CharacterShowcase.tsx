@@ -9,6 +9,7 @@ import { CompanionAvatar } from "@/kit/elements/companion-avatar";
 import type { CompanionClips } from "@/kit/elements/companion-avatar-machine";
 import { ActivityFeed } from "@/kit/elements/activity-feed";
 import { TaskBrowser } from "@/kit/elements/task-browser";
+import { CompanionStage } from "@/kit/elements/companion-stage";
 import { Button } from "@/kit/ui/button";
 import { icons } from "@/kit/icons";
 
@@ -25,6 +26,7 @@ export function CharacterShowcase() {
     <CompanionCard name="Marlow" line="A thoughtful companion for your everyday questions." status="Ready" meta="Choose a conversation to get started" actions={<Button>Chat</Button>} />
     <CompanionProfileHeader name="Marlow" eyebrow="Built-in companion" line="Here for a chat" actions={<Button>Chat</Button>} />
     <ChatHeader name="Marlow" media={<span aria-hidden="true">M</span>} onMenu={() => {}} onCall={() => {}} />
+    <div className="h-[32rem] max-w-md"><CompanionStage name="Marlow" mode="idle" stateWord="Ready" character={<CompanionAvatar name="Marlow" clips={clips} size="lg" />} bubble={<p>Hello, Jesse.</p>} actions={[{ id: "help", label: "Help me with this page", icon: <Talk />, onSelect: () => {} }]} talk={<div className="rounded-full border border-border px-4 py-3 text-sm text-muted-foreground">Talk to Marlow...</div>} /></div>
     <ActivityFeed label="Recent activity" groups={[{ id: "today", label: "Today", items: [
       { id: "approval", title: "Trip plan needs your approval", line: "Marlow is waiting for a decision", meta: "10 minutes ago", tone: "needs_you", action: <Button variant="link">Review</Button> },
       { id: "summary", title: "Weekly summary is ready", line: "Three new updates", tone: "done" },

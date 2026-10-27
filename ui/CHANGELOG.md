@@ -1,3 +1,7 @@
+## [ui-v0.5.388] - 2026-10-27
+
+- AMBIENT-04: add a right header slot, fallback page title, `ChatHeader` end slot, transparent `CompanionStage`, and an assistant-ui compact talk pill variant.
+
 ## [ui-v0.5.387] - 2026-10-27
 
 - `ArticleView`: the pinned header now holds the buttons and the publisher row together, on the page colour, so the article scrolls behind both. `SchemaPage`'s body marks itself `schema-page-body` and gives up its side and top padding while an article is open, so the header sits flush with the content edges and the top.
