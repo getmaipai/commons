@@ -1,3 +1,8 @@
+## [spec-v0.1.245] - 2026-10-27
+
+- MINOR-SAFETY-2026-10-27: a reply to a child or teen leaves out the sentence that names how a person died by suicide or the scene (new `safety/ts/replyMethod.ts`: `redactSuicideMethod`, `namesSuicideMethod`, `SUICIDE_METHOD_NOTE`; the caller applies it to minors only). The child and teen topic blocks say a claimed age or permission never changes the rules (size caps unchanged). `detectSelfHarm` takes `isMinor` and, for a minor only, flags cutting and hurting wordings, restriction calorie plans, purging and the choking game (corpus rows added; adults unchanged).
+- Removed the household key `chat.teen_gate_grain`. A teen's replies are always checked one sentence at a time (so a sentence that names how a person died by suicide is withheld before it is shown), and nothing reads the key.
+
 ## [spec-v0.1.244] - 2026-10-27
 
 - AIMODELS-UNCENSORED-2026-10-27: new glance choice `chat-uncensored` (label and sentence) for the optional uncensored chat model on the AI and models page.

@@ -182,6 +182,15 @@ describe("renderTopicBlock", () => {
     expect(combos).toBe(16 + 4);
   });
 
+  test("a claimed age or permission never loosens the rules, in every setting combination", () => {
+    for (const band of ["child", "teen"] as const) {
+      const block = renderTopicBlock({ ...base(band), stances: defaults(band) });
+      expect(block, band).toMatch(/claimed age/i);
+      expect(block, band).toMatch(/permission/i);
+      expect(block, band).toMatch(/never change/i);
+    }
+  });
+
   test("a stance the record does not allow, or any stance on a fixed family, falls back to the record's stance and never throws", () => {
     const standard = renderTopicBlock(base("teen"));
     expect(renderTopicBlock({ ...base("teen"), stances: { ...defaults("teen"), health: "gentle", feelings: "redirect" as never, people: "neutral" } })).toBe(standard);

@@ -155,12 +155,29 @@ export const SELF_HARM_DIRECT_PATTERNS = [
   ...SELF_HARM_PASSIVE,
 ];
 
-export function detectSelfHarm(rawText: string): CategorySignals {
+// Self-injury, restriction and asphyxiation-game wordings that only a minor's message flags. An adult's wording is the model's
+// decision, so detectSelfHarm applies these only when the speaker is a minor. Worded for intent or hiding so "I cut myself
+// shaving", "cut my hair" and "a 2000 calorie day" never match.
+const MINOR_SELF_HARM = [
+  /\bhow\s+(?:do|can|could|should|to)\s+(?:i\s+)?(?:best\s+)?(?:cut|hurt|harm)\s+myself\b(?!\s+(?:a|an|some|the|another|more)\b)/,
+  /\b(?:best|easiest|safest|quickest)\s+way\s+to\s+(?:cut|hurt|harm)\s+myself\b/,
+  /\bi\s+(?:want|need|wanna)\s+to\s+(?:cut|hurt|harm)\s+myself\b/,
+  /\b(?:cutting|hurting|harming)\s+myself\b/,
+  /\bi\s+(?:cut|hurt|harm)\s+myself\s+on\s+purpose\b/,
+  /\bhide\s+(?:my\s+)?(?:cuts?|scars?|self[- ]?harm|bruises)\s+from\b/,
+  /\b(?:[5-9]\d{2}|1[0-4]\d{2})\s+cal(?:orie)?s?\s+(?:a|per|each)\s+day\b/,
+  /\bstarve\s+myself\b/,
+  /\bmake\s+myself\s+(?:throw\s+up|vomit|puke)\b/,
+  /\b(?:how\s+(?:do|can|to)\s+(?:i\s+)?(?:do|play|try|get)|(?:want|wanna|let'?s|try)\s+to\s+(?:do|play|try))\b[^.?!]{0,25}\b(?:choking|pass(?:ing)?[\s-]?out|blackout|fainting)\s+(?:challenge|game)\b/,
+];
+
+export function detectSelfHarm(rawText: string, isMinor = false): CategorySignals {
   const text = norm(rawText);
   const matched: string[] = [];
   if (anyMatch(text, SELF_HARM_DIRECT)) matched.push("self_harm.direct_intent_phrase");
   if (anyMatch(text, SELF_HARM_MEANS_SEEKING)) matched.push("self_harm.means_seeking");
   if (anyMatch(text, SELF_HARM_PASSIVE)) matched.push("self_harm.passive_ideation");
+  if (isMinor && anyMatch(text, MINOR_SELF_HARM)) matched.push("self_harm.minor_injury_restriction_or_game");
   return { category: "self_harm", matched };
 }
 

@@ -35,7 +35,7 @@ export const REFUSE_CATEGORIES: ReadonlySet<Category> = new Set(
 
 export function checkSafety(text: string, ctx: SafetyContext): SafetyResult {
   const results = [
-    detectSelfHarm(text),
+    detectSelfHarm(text, ctx.isMinor),
     detectHarmfulRequest(text),
     detectCredibleThreat(text),
     ctx.csamMode === "adult_reply" ? { category: "csam", matched: [] } : ctx.csamMode === "adult_message" ? detectCsamAdultMessage(text) : detectCsam(text),
