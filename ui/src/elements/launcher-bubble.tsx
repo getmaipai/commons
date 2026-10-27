@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { MessageCircleIcon, XIcon } from "lucide-react";
+import { EarIcon, MessageCircleIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, floating, inkButton, mono } from "./surfaces";
 
@@ -13,6 +13,8 @@ export function LauncherBubble({
   onToggle,
   onPick,
   onStart,
+  listening,
+  onTurnOff,
   className,
   ...props
 }: Omit<
@@ -25,6 +27,8 @@ export function LauncherBubble({
   | "onToggle"
   | "onPick"
   | "onStart"
+  | "listening"
+  | "onTurnOff"
 > & {
   open: boolean;
   unread: number;
@@ -33,6 +37,10 @@ export function LauncherBubble({
   onToggle?: () => void;
   onPick?: (prompt: string) => void;
   onStart?: () => void;
+  /** The sentence shown while this device's wake word has the microphone open ("Listening for Hey Jarvis"). Unset: no listening row. */
+  listening?: string;
+  /** Shown as a Turn off button on the listening row. */
+  onTurnOff?: () => void;
 }) {
   const bubble = (
     <>
@@ -131,6 +139,35 @@ export function LauncherBubble({
         </div>
       )}
 
+      {listening && (
+        <div
+          role="status"
+          data-slot="launcher-listening"
+          className={cn(
+            floating,
+            "flex w-full items-center justify-between gap-3 rounded-full py-1.5 ps-4 pe-1.5 text-[13px]",
+          )}
+        >
+          <span className="flex items-center gap-2 font-medium">
+            <EarIcon className="size-4 shrink-0" aria-hidden />
+            {listening}
+          </span>
+          {onTurnOff && (
+            <button
+              type="button"
+              onClick={onTurnOff}
+              aria-label="Turn off wake word listening"
+              className={cn(
+                inkButton,
+                "flex h-8 items-center justify-center rounded-full px-3 text-xs font-medium",
+              )}
+            >
+              Turn off
+            </button>
+          )}
+        </div>
+      )}
+
       {onToggle && (
         <button
           type="button"
@@ -146,7 +183,7 @@ export function LauncherBubble({
         </button>
       )}
 
-      {!onToggle && !open && (
+      {!onToggle && !open && !listening && (
         <div className="bg-foreground text-background relative flex size-12 shrink-0 items-center justify-center rounded-full">
           {bubble}
         </div>
