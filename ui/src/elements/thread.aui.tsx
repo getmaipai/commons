@@ -28,6 +28,8 @@ import {
 import { TooltipIconButton } from "./tooltip-icon-button";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { CompanionAvatar } from "./companion-avatar";
+import type { CompanionClips } from "./companion-avatar-machine";
 import { cn } from "cn";
 import {
   ActionBarMorePrimitive,
@@ -207,6 +209,9 @@ export type SpeakerMarkerAnsweredBy = {
   name: string;
   look?: string;
   via?: string;
+  look_version_id?: string | null;
+  voice_version?: string | null;
+  portrait?: string | null;
 };
 export type SpeakerMarkerProps = {
   speaker: SpeakerMarkerAnsweredBy;
@@ -302,6 +307,13 @@ export type ThreadComponents = {
   engineDown?: string | undefined;
   /** Draws a marker when an assistant turn is attributed to a new companion. */
   speakerMarker?: { joinedLabel: (name: string) => string; fallbackPoster?: (speaker: SpeakerMarkerAnsweredBy) => string | undefined } | undefined;
+  /** Draws a face beside every attributed reply, with an optional live player for the running reply. */
+  replyFace?: {
+    portrait: (speaker: SpeakerMarkerAnsweredBy) => string | undefined;
+    clips?: (speaker: SpeakerMarkerAnsweredBy) => CompanionClips | undefined;
+    speakingMessageId?: string | null;
+    joinedLabel: (name: string) => string;
+  } | undefined;
 };
 
 const messageGroupBy = groupPartByType({
@@ -1128,14 +1140,30 @@ const AssistantMessage: FC = () => {
     AssistantMessageFooterExtra,
     Indicator,
     speakerMarker,
+    replyFace,
   } = useContext(ThreadComponentsContext);
   const speaker = useAuiState((s) => s.message.metadata.custom?.answered_by as SpeakerMarkerAnsweredBy | null | undefined);
   const marker = useAuiState((s) => {
     const current = s.message.metadata.custom?.answered_by as SpeakerMarkerAnsweredBy | null | undefined;
-    if (!speakerMarker || !current) return false;
+    if ((!speakerMarker && !replyFace) || !current) return false;
     const previous = s.thread.messages.slice(0, s.message.index).reverse().find((message) => message.role === "assistant")?.metadata.custom?.answered_by as SpeakerMarkerAnsweredBy | null | undefined;
     return current.via === "mention" || (previous ? previous.companion_id !== current.companion_id : current.companion_id !== "default");
   });
+  const messageStatus = useAuiState((s) => s.message.status);
+  const messageId = useAuiState((s) => s.message.id);
+  const lastRunningAssistantId = useAuiState((s) => [...s.thread.messages].reverse().find((message) => message.role === "assistant" && message.status?.type === "running")?.id);
+  const clips = speaker && replyFace?.clips?.(speaker);
+  const live = !!replyFace && messageStatus?.type === "running" && messageId === lastRunningAssistantId && !!clips;
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [clipFailed, setClipFailed] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(query.matches);
+    update();
+    query.addEventListener?.("change", update);
+    return () => query.removeEventListener?.("change", update);
+  }, []);
+  const portrait = speaker && replyFace?.portrait(speaker);
   const groupBy = TaskGroupComponent ? taskAwareGroupBy : messageGroupBy;
 
   const ACTION_BAR_PT = "pt-1.5";
@@ -1148,7 +1176,15 @@ const AssistantMessage: FC = () => {
       data-role="assistant"
       className="fade-in slide-in-from-bottom-1 animate-in relative -mb-7.5 pb-7.5 duration-150 [contain-intrinsic-size:auto_200px] [content-visibility:auto]"
     >
-      {marker && speaker ? (
+      {replyFace && speaker ? <>
+        {marker ? <div data-slot="aui_reply-face-divider" className="border-border mx-2 mb-2 border-t pt-2 text-muted-foreground text-xs">
+          {speaker.via === "mention" ? replyFace.joinedLabel(speaker.name) : null}
+        </div> : null}
+        <div data-slot="aui_reply-face-row" className="flex items-center gap-2 px-2 pb-1 text-sm">
+          {live && !reducedMotion && !clipFailed ? <CompanionAvatar name={speaker.name} clips={clips!} size="xs" wanted={{ thinking: true, speaking: replyFace.speakingMessageId === messageId }} onFail={() => setClipFailed(true)} /> : portrait ? <img src={portrait} alt="" className="size-7 rounded-full object-cover" /> : <span aria-hidden className="bg-muted text-foreground flex size-7 items-center justify-center rounded-full font-medium">{speaker.name.trim().charAt(0).toUpperCase() || "?"}</span>}
+          <span className="font-medium text-foreground">{speaker.name}</span>
+        </div>
+      </> : marker && speaker && speakerMarker ? (
         <SpeakerMarker speaker={speaker} joinedLabel={speaker.via === "mention" ? speakerMarker!.joinedLabel(speaker.name) : undefined} fallbackPoster={speakerMarker!.fallbackPoster?.(speaker)} />
       ) : null}
       <div

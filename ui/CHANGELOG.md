@@ -1,3 +1,7 @@
+## [ui-v0.5.365] - 2026-10-26
+
+- REVAMP-FACE-01: add the Thread `replyFace` slot for companion portraits and a single live player on the running reply, plus a 28px `CompanionAvatar` size.
+
 ## [ui-v0.5.364] - 2026-10-26
 
 - MEDIA-APPLE-PASS-01: add selectable player detail parts and the collection variant of `CreationHeader` with artwork, metadata, actions, and footer lines.

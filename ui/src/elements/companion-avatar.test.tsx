@@ -28,6 +28,16 @@ test("state renders the requested state's clip and accessible wrapper name", asy
   restore();
 });
 
+test("xs size uses size-7 while the existing sizes stay the same", () => {
+  const restore = setup();
+  const xs = render(<CompanionAvatar name="Mimi" clips={clips} size="xs" />);
+  expect(xs.getByRole("img", { name: "Mimi" }).className).toContain("size-7");
+  xs.unmount();
+  const sm = render(<CompanionAvatar name="Mimi" clips={clips} size="sm" />);
+  expect(sm.getByRole("img", { name: "Mimi" }).className).toContain("size-16");
+  restore();
+});
+
 test("wanted chooses a state through pickWanted", async () => {
   const restore = setup();
   const view = render(<CompanionAvatar name="Mimi" clips={clips} wanted={{ thinking: true, needs_you: true }} />);

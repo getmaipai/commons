@@ -4,6 +4,7 @@ import { AssistantRuntimeProvider, MessagePrimitive, useAuiState, useLocalRuntim
 import { ComposerInputField, Thread, type ThreadViewportOptions } from "./thread.aui";
 import { DraftRestore } from "./draft-restore";
 import { DraftRestoreComposerShowcase } from "./DraftRestoreComposerShowcase";
+import type { CompanionClips } from "./companion-avatar-machine";
 
 afterEach(cleanup);
 
@@ -33,6 +34,68 @@ describe("Thread speaker marker", () => {
   test("does nothing when the prop is absent", () => {
     render(<SpeakerHarness speakers={[{ companion_id: "a", name: "Ari" }]} enabled={false} />);
     expect(document.querySelector('[data-slot="aui_speaker-marker"]')).toBeNull();
+  });
+});
+
+const faceClips: CompanionClips = { idle: { h264: "idle.mp4", av1: "idle.av1.mp4", still: "idle.png", loop: true }, thinking: { h264: "thinking.mp4", av1: "thinking.av1.mp4", still: "thinking.png", loop: true }, speaking: { h264: "speaking.mp4", av1: "speaking.av1.mp4", still: "speaking.png", loop: true } };
+const restoreAvatarEnvironment = () => {
+  const oldMatch = window.matchMedia;
+  const oldPlay = HTMLMediaElement.prototype.play;
+  const oldCanPlay = HTMLMediaElement.prototype.canPlayType;
+  const oldContext = HTMLCanvasElement.prototype.getContext;
+  const oldObserver = globalThis.IntersectionObserver;
+  window.matchMedia = (() => ({ matches: false, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  HTMLMediaElement.prototype.play = (() => Promise.resolve()) as typeof HTMLMediaElement.prototype.play;
+  Object.defineProperty(HTMLMediaElement.prototype, "canPlayType", { configurable: true, value: () => "probably" });
+  HTMLCanvasElement.prototype.getContext = (() => new Proxy({}, { get: (_target, key) => key === "getShaderParameter" || key === "getProgramParameter" ? () => true : () => ({}) })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
+  globalThis.IntersectionObserver = class { constructor(private callback: IntersectionObserverCallback) {} observe(target: Element) { this.callback([{ isIntersecting: true, target } as IntersectionObserverEntry], this as unknown as IntersectionObserver); } disconnect() {} } as unknown as typeof IntersectionObserver;
+  return () => { window.matchMedia = oldMatch; HTMLMediaElement.prototype.play = oldPlay; Object.defineProperty(HTMLMediaElement.prototype, "canPlayType", { configurable: true, value: oldCanPlay }); HTMLCanvasElement.prototype.getContext = oldContext; globalThis.IntersectionObserver = oldObserver; };
+};
+function ReplyFaceHarness({ speakers, speakingMessageId, reduceMotion = false, withClips = true, portrait = "portrait.png", running = false }: { speakers: Array<{ companion_id: string; name: string; via?: string }>; speakingMessageId?: string; reduceMotion?: boolean; withClips?: boolean; portrait?: string | undefined; running?: boolean }) {
+  const messages = speakerMessages(speakers).map((message, index) => ({ ...message, id: `reply-${index}`, ...(running && index === speakers.length - 1 ? { status: { type: "running" as const } } : {}) }));
+  const runtime = useLocalRuntime(adapter, { initialMessages: messages });
+  window.matchMedia = (() => ({ matches: reduceMotion, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  return <AssistantRuntimeProvider runtime={runtime}><Thread components={{ replyFace: { portrait: () => portrait, clips: () => withClips ? faceClips : undefined, speakingMessageId, joinedLabel: (name) => `${name} joined for one question` } }} autoFocus={false} /></AssistantRuntimeProvider>;
+}
+
+describe("Thread replyFace", () => {
+  test("history replies show portrait and name without a video", () => {
+    render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} />);
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe("portrait.png");
+    expect(document.body.textContent).toContain("Ari");
+    expect(document.querySelector("video")).toBeNull();
+  });
+  test("divides only on speaker changes and adds joined copy for mentions", () => {
+    const { getByText } = render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }, { companion_id: "a", name: "Ari" }, { companion_id: "b", name: "Bo" }, { companion_id: "b", name: "Bo", via: "mention" }]} />);
+    expect(document.querySelectorAll('[data-slot="aui_reply-face-divider"]')).toHaveLength(3);
+    expect(getByText("Bo joined for one question")).toBeTruthy();
+  });
+  test("falls back to the initial when no portrait is supplied", () => {
+    render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} portrait="" />);
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')).toBeNull();
+    expect(document.querySelector('[data-slot="aui_reply-face-row"]')?.textContent).toContain("A");
+  });
+  test("running reply animates as thinking and speaking only for the selected message", async () => {
+    const restore = restoreAvatarEnvironment();
+    const view = render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} running />);
+    await waitFor(() => expect(document.querySelector('[data-slot="aui_reply-face-row"] video')?.getAttribute("src")).toBeTruthy());
+    fireEvent.ended(document.querySelector('[data-slot="aui_reply-face-row"] video')!);
+    await waitFor(() => expect(document.querySelector('[data-slot="aui_reply-face-row"] video')?.getAttribute("src")).toBe("thinking.av1.mp4"));
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')).toBeNull();
+    view.unmount();
+    const speaking = render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} running speakingMessageId="reply-0" />);
+    await waitFor(() => expect(speaking.container.querySelector('[data-slot="aui_reply-face-row"] video')?.getAttribute("src")).toBeTruthy());
+    fireEvent.ended(speaking.container.querySelector('[data-slot="aui_reply-face-row"] video')!);
+    await waitFor(() => expect(speaking.container.querySelector('[data-slot="aui_reply-face-row"] video')?.getAttribute("src")).toBe("speaking.av1.mp4"));
+    restore();
+  });
+  test("reduced motion and missing clips render the still portrait", () => {
+    const reduced = render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} running reduceMotion />);
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe("portrait.png");
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] video')).toBeNull();
+    reduced.unmount();
+    render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} running withClips={false} />);
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe("portrait.png");
   });
 });
 
