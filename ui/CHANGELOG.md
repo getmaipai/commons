@@ -1,4 +1,4 @@
-## [ui-v0.5.375] - 2026-10-27
+## [ui-v0.5.376] - 2026-10-27
 
 - AMBIENT-01: add CompanionAvatar rings, the CompanionPreview hover card, and the standard tabbed RightPane.
 - Add the shadcn registry Hover Card primitive.
