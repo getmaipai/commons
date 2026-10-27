@@ -35,7 +35,7 @@ const toneText: Record<ActivityTone, string> = {
 
 export function ActivityFeed({ groups, aside, empty, label }: ActivityFeedProps) {
   return (
-    <section role="region" aria-label={label} data-slot="activity-feed">
+    <section aria-label={label} data-slot="activity-feed">
       {groups.length === 0 ? empty : (
         <div className={cn("grid gap-8", aside && "lg:grid-cols-[minmax(0,1fr)_20rem]")}>
           {aside ? <aside className="order-first min-w-0 lg:sticky lg:top-6 lg:order-last lg:self-start">{aside}</aside> : null}
