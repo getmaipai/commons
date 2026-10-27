@@ -1,4 +1,4 @@
-## [ui-v0.5.372] - 2026-10-27
+## [ui-v0.5.373] - 2026-10-27
 
 - ChatHeader companion choices and Thread reply faces use the seeded illustrated face when no portrait is available or its image fails to load. Picker choices accept an optional seed and default to their value.
 
