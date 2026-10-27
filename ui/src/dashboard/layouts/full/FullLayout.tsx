@@ -113,7 +113,7 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
             </div>
           </div>
         </main>
-        {rightPane ? <div data-slot="rail-right-pane" className="sticky top-0 h-svh shrink-0 self-start">{rightPane}</div> : null}
+        {rightPane ? <div data-slot="rail-right-pane" className="sticky top-0 z-40 h-svh shrink-0 self-start">{rightPane}</div> : null}
       </div>
     </HeaderExtraProvider>
   );

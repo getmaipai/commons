@@ -1,3 +1,7 @@
+## [ui-v0.5.383] - 2026-10-27
+
+- AMBIENT-03: the `rightPane` wrapper in `FullLayout` sits above the slim title bar (z-40), so a floating pane's header is not covered.
+
 ## [ui-v0.5.382] - 2026-10-27
 
 - AMBIENT-03: `RightPane` no longer uses the sidebar provider (its wrapper is a full-width fixed layer, which put the pane at the left): a plain panel on desktop, pinned in flow or floating, and the kit sheet on a phone.

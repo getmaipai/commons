@@ -298,7 +298,7 @@ describe("rail layout right pane slot", () => {
         </TooltipProvider>
       </MemoryRouter>,
     );
-    expect(view.getByText("Pane").closest('[data-slot="rail-right-pane"]')).toBeTruthy();
+    expect(view.getByText("Pane").closest('[data-slot="rail-right-pane"]')?.className).toContain("z-40");
     expect(view.container.querySelector('[data-slot="rail-workspace"]')?.nextElementSibling?.getAttribute("data-slot")).toBe("rail-right-pane");
     cleanup();
     expect(renderRail("/x").container.querySelector('[data-slot="rail-right-pane"]')).toBeNull();
