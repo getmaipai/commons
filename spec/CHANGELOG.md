@@ -1,5 +1,9 @@
 ## [spec-v0.1.249] - 2026-10-27
 
+- `persona.active_id`: Tessa joins the companion list and is the default for a person who has not picked one.
+
+## [spec-v0.1.249] - 2026-10-27
+
 - NEWS-FOCAL-01: a story card's `image` (and the article's) may carry `focal` `{x, y, aspect}`: where the picture's subject sits, in percent of the image, and its width over height, worked out once on the hub so a client frames the picture on its first paint.
 
 ## [spec-v0.1.248] - 2026-10-27

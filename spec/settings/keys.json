@@ -2182,10 +2182,11 @@
         "lively-teen",
         "pal",
         "rivet",
+        "tessa",
         "tutor"
       ]
     },
-    "default": "default",
+    "default": "tessa",
     "label": "Personality",
     "help": "How MaiPai talks to you: formality, complexity, and how much it follows up on what you say.",
     "level": "basic",
