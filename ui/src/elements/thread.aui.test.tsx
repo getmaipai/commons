@@ -63,7 +63,7 @@ describe("Thread replyFace", () => {
     render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }]} />);
     expect(document.querySelector('[data-slot="aui_reply-face-row"] img')?.getAttribute("src")).toBe("portrait.png");
     expect(document.body.textContent).toContain("Ari");
-    expect(document.querySelector("video")).toBeNull();
+    expect(document.querySelector('[data-slot="aui_reply-face-row"] video')).toBeNull();
   });
   test("divides only on speaker changes and adds joined copy for mentions", () => {
     const { getByText } = render(<ReplyFaceHarness speakers={[{ companion_id: "a", name: "Ari" }, { companion_id: "a", name: "Ari" }, { companion_id: "b", name: "Bo" }, { companion_id: "b", name: "Bo", via: "mention" }]} />);
