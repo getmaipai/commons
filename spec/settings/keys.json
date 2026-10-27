@@ -4280,6 +4280,9 @@
     "default": true,
     "label": "Companion corner card",
     "help": "Shows your companion's card in the corner of Home when you are outside Chat. Turn it off to hide the card; closing the card turns this off.",
+    "copy": {
+      "does": "Keeps a small shortcut to your helper on the Home screen."
+    },
     "level": "basic",
     "secret": false,
     "lives_in": "person.companions",
