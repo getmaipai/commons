@@ -73,24 +73,26 @@ export interface FullLayoutProps {
   onRailAppPinChange?: (url: string, pinned: boolean) => void;
   /** The host's All apps page; the rail's grid button opens it (see AppRailProps.allAppsHref). */
   railAllAppsHref?: string;
+  /** The host's top-right control (the ambient companion): drawn once at the top right of the workspace, stays in view while the page scrolls, and the slim title bar leaves room for it. */
+  topRight?: ReactNode;
 }
 
 /** The slim title bar of the rail layout: the page's own header content
  * only, 52px tall, one bottom divider. A page that draws its own header
  * (chat, beside its history column) places nothing and gets none. */
-function RailPageHeader({ reserveBand }: { reserveBand: boolean }) {
+function RailPageHeader({ reserveBand, reserveEnd }: { reserveBand: boolean; reserveEnd: boolean }) {
   const Left = useHeaderExtraLeft();
   // On a phone with the floating menu button, the band is always drawn so the
   // button sits in it and no page content can start under the button.
   if (!Left && !reserveBand) return null;
   return (
-    <header data-slot="rail-page-header" className="sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5">
+    <header data-slot="rail-page-header" className={cn("sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5", reserveEnd && "pe-16")}>
       {Left ? <Left /> : null}
     </header>
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight }: FullLayoutProps) {
   const phone = useIsPhoneLayout();
   const Navigation = phone ? MobileNavDrawer : AppRail;
   return (
@@ -101,7 +103,8 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
       <div data-slot="rail-shell" className="flex min-h-svh w-full min-w-0 max-w-full overflow-x-clip">
         <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} coreDestinations={railCoreDestinations} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
         <main data-slot="rail-workspace" data-phone-menu={phone && !hideMobileMenu ? "" : undefined} className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
-          <RailPageHeader reserveBand={phone && !hideMobileMenu} />
+          {topRight ? <div data-slot="rail-top-right" className="pointer-events-none sticky top-2 z-30 h-0"><div className="flex h-9 justify-end pe-3 *:pointer-events-auto">{topRight}</div></div> : null}
+          <RailPageHeader reserveBand={phone && !hideMobileMenu} reserveEnd={Boolean(topRight)} />
           <div data-slot="rail-body" className="min-w-0 max-w-full flex-1">
             <div className={cn("box-border min-w-0 max-w-full w-full mx-auto p-4", "container")}>
               <Outlet />

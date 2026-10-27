@@ -260,3 +260,27 @@ describe("LEFTNAV-APPS-01 pinned apps and the launcher", () => {
     expect((pin as HTMLButtonElement).disabled).toBe(true);
   });
 });
+
+describe("rail layout top-right slot", () => {
+  test("draws the host's top-right control once and leaves room for it in the title bar", () => {
+    const view = render(
+      <MemoryRouter initialEntries={["/x"]}>
+        <TooltipProvider>
+          <Routes>
+            <Route element={<FullLayout rail topRight={<button type="button">Ambient</button>} />}>
+              <Route path="x" element={<Titled />} />
+            </Route>
+          </Routes>
+        </TooltipProvider>
+      </MemoryRouter>,
+    );
+    expect(view.getAllByText("Ambient")).toHaveLength(1);
+    expect(view.container.querySelector('[data-slot="rail-top-right"]')).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="rail-page-header"]')?.className).toContain("pe-16");
+  });
+
+  test("draws nothing extra without the slot", () => {
+    const view = renderRail("/x");
+    expect(view.container.querySelector('[data-slot="rail-top-right"]')).toBeNull();
+  });
+});

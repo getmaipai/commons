@@ -1,3 +1,7 @@
+## [ui-v0.5.377] - 2026-10-27
+
+- AMBIENT-02: `FullLayout` rail layout takes an optional `topRight` slot, drawn once at the top right of the workspace and kept in view while the page scrolls; the slim title bar leaves room for it. No change without the prop.
+
 ## [ui-v0.5.376] - 2026-10-27
 
 - AMBIENT-01: add CompanionAvatar rings, the CompanionPreview hover card, and the standard tabbed RightPane.
