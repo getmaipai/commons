@@ -510,6 +510,7 @@ def test_conversation_fixture():
 
 def test_temporary_conversation_fixture():
     Conversation.model_validate(load_fixture("conversation.temporary.example.json"))
+    assert Conversation.model_validate(load_fixture("conversation.side.example.json")).placement == "side"
 
 
 def test_source_fixture():

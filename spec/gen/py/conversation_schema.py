@@ -55,6 +55,10 @@ class Conversation(BaseModel):
         'chat',
         description='How this conversation presents answers: chat keeps the ordinary reply; research keeps the details pane open after a short line; temporary keeps turns out of normal history and durable memory.',
     )
+    placement: Literal['chat', 'side'] = Field(
+        'chat',
+        description="Where the conversation was held: chat is the Chat app; side is the companion pane beside any app. One store, one retention rule and one set of age gates for both; no gate reads this field. Chat's list shows chat by default; the companion's History shows both.",
+    )
     companion_id: str | None = Field(
         None,
         description='The companion persona active when this conversation was created (5.4); null before companions exist as packages (step 8).',

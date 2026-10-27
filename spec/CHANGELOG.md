@@ -1,3 +1,7 @@
+## [spec-v0.1.247] - 2026-10-27
+
+- AMBIENT-01: `placement` (`chat` | `side`, default `chat`) on the Conversation record, so a chat held in the companion pane is stored with the person's other conversations and marked as a side chat. No gate reads it.
+
 ## [spec-v0.1.246] - 2026-10-27
 
 - REVAMP-PRESENCE-01: new person setting `companions.dock` (boolean, default on) for the companion corner card outside Chat; the card's close button turns it off.

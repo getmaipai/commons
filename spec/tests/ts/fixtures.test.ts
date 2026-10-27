@@ -253,6 +253,13 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() => Project.parse(loadFixture("project.failed.example.json"))).not.toThrow();
   });
 
+  test("conversation.side.example.json", () => {
+    const parsed = Conversation.parse(loadFixture("conversation.side.example.json"));
+    expect(parsed.placement).toBe("side");
+    expect(Conversation.parse(loadFixture("conversation.example.json")).placement).toBe("chat");
+    expect(() => Conversation.parse(loadFixture("conversation.placement-invalid.invalid.example.json"))).toThrow();
+  });
+
   test("conversation.temporary.example.json", () => {
     expect(() => Conversation.parse(loadFixture("conversation.temporary.example.json"))).not.toThrow();
   });
