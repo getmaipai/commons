@@ -164,3 +164,12 @@ test("animated={false} draws only the still image, with the ring", () => {
   expect(view.container.querySelector('[data-ring="speaking"]')).toBeTruthy();
   restore();
 });
+
+test("a state with only a still draws that still and no video", () => {
+  const restore = setup();
+  const stills: CompanionClips = { idle: { still: "idle.png", loop: true }, speaking: { still: "speaking.png", loop: true } } as CompanionClips;
+  const view = render(<CompanionAvatar name="Tessa" clips={stills} state="speaking" />);
+  expect(view.container.querySelector("video")).toBeNull();
+  expect(view.container.querySelector("img")?.getAttribute("src")).toBe("speaking.png");
+  restore();
+});

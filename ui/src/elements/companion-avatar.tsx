@@ -72,13 +72,14 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
   useEffect(() => {
     const video = videoRef.current;
     const canAv1 = !!clip.av1 && video?.canPlayType('video/mp4; codecs="av01.0.05M.08"') === "probably";
-    setSource(h264Fallback || !canAv1 ? clip.h264 : clip.av1!);
+    setSource(h264Fallback || !canAv1 ? (clip.h264 ?? "") : clip.av1!);
   }, [clip.av1, clip.h264, h264Fallback]);
   useEffect(() => {
     const idle = clips.idle;
     const next = clips[wantedState] ?? idle;
     const links: HTMLLinkElement[] = [];
     for (const src of new Set([idle.h264, next.h264])) {
+      if (!src) continue;
       const link = document.createElement("link");
       link.rel = "preload"; link.as = "video"; link.href = src;
       document.head.append(link);
@@ -89,15 +90,15 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
 
   const handleEnded = useCallback(() => setCurrent(machine.onClipEnded(Date.now())), [machine]);
   const handleError = useCallback(() => {
-    if (source !== clip.h264) { setH264Fallback(true); return; }
+    if (clip.h264 && source !== clip.h264) { setH264Fallback(true); return; }
     const result = machine.onClipError();
     setCurrent(result.state);
     if (result.failed) { setFailed(true); onFail?.(); }
   }, [clip.h264, machine, onFail, source]);
-  const movable = animated && !reduced && documentVisible && !failed;
+  const movable = animated && !reduced && documentVisible && !failed && Boolean(clip?.h264 || clip?.av1);
   const ringClass = ring === "listening" ? "border-foreground/25" : ring === "thinking" ? cn("border-foreground/35", !reduced && "animate-[pulse_3s_ease-in-out_infinite]") : ring === "speaking" ? cn("border-foreground/50", !reduced && "animate-pulse") : "";
   return <div role="img" aria-label={ring ? `${name}, ${ring}` : name} data-ring={ring ?? undefined} className={cn(SIZES[size], "pointer-events-none relative", className)}>
     {ring ? <span aria-hidden="true" className={cn("absolute -inset-1 rounded-full border-2", ringClass)} /> : null}
-    {movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <SafeImage src={clip.still} alt="" className="size-full object-contain" />}
+    {movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264 || ""} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <SafeImage src={clip.still} alt="" className="size-full object-contain" />}
   </div>;
 }

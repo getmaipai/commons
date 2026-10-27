@@ -1,3 +1,7 @@
+## [ui-v0.5.390] - 2026-10-27
+
+- `CompanionAvatar` draws a state's still when it has no clip (`h264` is optional on a clip), so a companion made of pictures has a look for every state.
+
 ## [ui-v0.5.389] - 2026-10-27
 
 - `ArticleView`: the publisher row is part of the article again (full width, scrolls with it); only the buttons stay pinned, laid over the start of the article so the article's top is the top of the page body.

@@ -2,7 +2,7 @@ import mediaVocab from "@maipai/spec/vocab/companion-media.json";
 
 export const COMPANION_STATE_IDS = mediaVocab.states.map(({ id }) => id) as readonly (typeof mediaVocab.states)[number]["id"][];
 export type StateId = (typeof COMPANION_STATE_IDS)[number];
-export type CompanionClip = { h264: string; av1?: string; still: string; loop: boolean };
+export type CompanionClip = { h264?: string; av1?: string; still: string; loop: boolean };
 export type CompanionClips = Partial<Record<StateId, CompanionClip>> & { idle: CompanionClip };
 export type WantedInputs = { needs_you: boolean; speaking: boolean; working: boolean; thinking: boolean; listening: boolean; sleeping: boolean };
 export const COMPANION_PRIORITY = ["needs_you", "speaking", "working", "thinking", "listening", "sleeping", "idle"] as const satisfies readonly StateId[];
