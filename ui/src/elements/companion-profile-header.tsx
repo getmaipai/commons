@@ -16,7 +16,7 @@ export function CompanionProfileHeader({ name, eyebrow, line, media, chips, acti
       {back ? <div>{back}</div> : null}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
         <div className="flex items-center gap-4 md:gap-6">
-          {media ? <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted md:size-28">{media}</div> : null}
+          {media ? <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full md:size-28">{media}</div> : null}
           <div className="min-w-0">
             {eyebrow ? <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{eyebrow}</div> : null}
             <h1 className="text-2xl font-semibold">{name}</h1>

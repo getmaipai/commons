@@ -225,7 +225,7 @@ export const SpeakerMarker: FC<SpeakerMarkerProps> = ({ speaker, joinedLabel, fa
   return (
     <div data-slot="aui_speaker-marker" className="text-muted-foreground flex items-center gap-2 px-2 pb-1 text-xs">
       {fallbackPoster && !portraitFailed ? (
-        <img src={fallbackPoster} alt="" className="border-border bg-muted size-7 rounded-full border object-cover" onError={() => setPortraitFailed(true)} />
+        <img src={fallbackPoster} alt="" className="border-border size-7 rounded-full border object-cover" onError={() => setPortraitFailed(true)} />
       ) : (
         <SeededAvatar name={speaker.name} seed={speaker.companion_id} className="size-7" />
       )}

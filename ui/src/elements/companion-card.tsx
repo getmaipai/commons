@@ -19,7 +19,7 @@ export function CompanionCard({ name, line, media, status, menu, meta, actions, 
   return (
     <section aria-labelledby={headingId} className="flex h-full flex-col rounded-xl border bg-card p-4 text-card-foreground">
       <div className="flex items-start justify-between gap-3">
-        {media ? <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted md:size-18">{media}</div> : null}
+        {media ? <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full md:size-18">{media}</div> : null}
         {(status || menu) ? <div className="flex min-w-0 items-center gap-2">{status ? <Badge variant="secondary">{status}</Badge> : null}{menu}</div> : null}
       </div>
       <Heading id={headingId} className="mt-3 text-xl font-semibold">{name}</Heading>

@@ -1,3 +1,7 @@
+## [ui-v0.5.384] - 2026-10-27
+
+- A companion's picture or clip is transparent and gets no background: removed the `bg-muted` fill behind the media slot in `ChatHeader`, `CompanionCard`, `CompanionProfileHeader` and `CharacterHero`, and behind the reply face in `Thread`.
+
 ## [ui-v0.5.383] - 2026-10-27
 
 - AMBIENT-03: the `rightPane` wrapper in `FullLayout` sits above the slim title bar (z-40), so a floating pane's header is not covered.

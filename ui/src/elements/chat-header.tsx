@@ -54,7 +54,7 @@ export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, m
   const CallIcon = icons.phone;
   const ChevronDownIcon = icons["chevron-down"];
   const identity = <>
-    <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">{media}</span>
+    <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full">{media}</span>
     <span className="flex min-w-0 flex-col text-left"><span className="truncate text-sm font-medium">{name}</span>{identityNotice ? <span role="status" aria-live="polite" className="truncate text-xs text-muted-foreground">{identityNotice}</span> : null}</span>
   </>;
   const picker = identityChoices ? <>
