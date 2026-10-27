@@ -75,6 +75,8 @@ export interface FullLayoutProps {
   railAllAppsHref?: string;
   /** The host's top-right control (the ambient companion): drawn once at the top right of the workspace, stays in view while the page scrolls, and the slim title bar leaves room for it. */
   topRight?: ReactNode;
+  /** Draws the slim title bar on every page that has no header of its own and puts `topRight` at its end, so nothing sits under it. Off for a page that draws its own header (Chat): `topRight` then floats and the page leaves room. */
+  topRightBand?: boolean;
   /** The host's right pane (the standard RightPane), drawn beside the workspace; a pinned pane takes its own width and the workspace shrinks. */
   rightPane?: ReactNode;
 }
@@ -82,19 +84,20 @@ export interface FullLayoutProps {
 /** The slim title bar of the rail layout: the page's own header content
  * only, 52px tall, one bottom divider. A page that draws its own header
  * (chat, beside its history column) places nothing and gets none. */
-function RailPageHeader({ reserveBand, reserveEnd }: { reserveBand: boolean; reserveEnd: boolean }) {
+function RailPageHeader({ reserveBand, reserveEnd, end }: { reserveBand: boolean; reserveEnd: boolean; end?: ReactNode }) {
   const Left = useHeaderExtraLeft();
   // On a phone with the floating menu button, the band is always drawn so the
   // button sits in it and no page content can start under the button.
-  if (!Left && !reserveBand) return null;
+  if (!Left && !reserveBand && !end) return null;
   return (
-    <header data-slot="rail-page-header" className={cn("sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5", reserveEnd && "pe-16")}>
+    <header data-slot="rail-page-header" className={cn("sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5", end && "pe-3", reserveEnd && !end && "pe-16")}>
       {Left ? <Left /> : null}
+      {end ? <div data-slot="rail-top-right" className="ms-auto flex h-9 shrink-0 items-center">{end}</div> : null}
     </header>
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, rightPane }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, topRightBand, rightPane }: FullLayoutProps) {
   const phone = useIsPhoneLayout();
   const Navigation = phone ? MobileNavDrawer : AppRail;
   return (
@@ -105,8 +108,8 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
       <div data-slot="rail-shell" className="flex min-h-svh w-full min-w-0 max-w-full overflow-x-clip">
         <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} coreDestinations={railCoreDestinations} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
         <main data-slot="rail-workspace" data-phone-menu={phone && !hideMobileMenu ? "" : undefined} className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
-          {topRight ? <div data-slot="rail-top-right" className="pointer-events-none sticky top-2 z-30 h-0"><div className="flex h-9 justify-end pe-3 *:pointer-events-auto">{topRight}</div></div> : null}
-          <RailPageHeader reserveBand={phone && !hideMobileMenu} reserveEnd={Boolean(topRight)} />
+          {topRight && !topRightBand ? <div data-slot="rail-top-right" className="pointer-events-none sticky top-2 z-30 h-0"><div className="flex h-9 justify-end pe-3 *:pointer-events-auto">{topRight}</div></div> : null}
+          <RailPageHeader reserveBand={phone && !hideMobileMenu} reserveEnd={Boolean(topRight)} end={topRightBand ? topRight : undefined} />
           <div data-slot="rail-body" className="min-w-0 max-w-full flex-1">
             <div className={cn("box-border min-w-0 max-w-full w-full mx-auto p-4", "container")}>
               <Outlet />

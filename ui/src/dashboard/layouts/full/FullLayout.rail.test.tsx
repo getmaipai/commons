@@ -304,3 +304,39 @@ describe("rail layout right pane slot", () => {
     expect(renderRail("/x").container.querySelector('[data-slot="rail-right-pane"]')).toBeNull();
   });
 });
+
+describe("rail layout top-right band", () => {
+  test("topRightBand draws the title bar on a page with no header of its own and puts the control at its end", () => {
+    const view = render(
+      <MemoryRouter initialEntries={["/plain"]}>
+        <TooltipProvider>
+          <Routes>
+            <Route element={<FullLayout rail topRightBand topRight={<button type="button">Ambient</button>} />}>
+              <Route path="plain" element={<div>Plain page</div>} />
+            </Route>
+          </Routes>
+        </TooltipProvider>
+      </MemoryRouter>,
+    );
+    const header = view.container.querySelector('[data-slot="rail-page-header"]');
+    expect(header).toBeTruthy();
+    expect(header?.querySelector('[data-slot="rail-top-right"]')?.textContent).toBe("Ambient");
+    expect(view.getAllByText("Ambient")).toHaveLength(1);
+  });
+
+  test("without topRightBand the control floats and a page with no header gets no bar", () => {
+    const view = render(
+      <MemoryRouter initialEntries={["/plain"]}>
+        <TooltipProvider>
+          <Routes>
+            <Route element={<FullLayout rail topRight={<button type="button">Ambient</button>} />}>
+              <Route path="plain" element={<div>Plain page</div>} />
+            </Route>
+          </Routes>
+        </TooltipProvider>
+      </MemoryRouter>,
+    );
+    expect(view.container.querySelector('[data-slot="rail-page-header"]')).toBeNull();
+    expect(view.container.querySelector('[data-slot="rail-top-right"]')).toBeTruthy();
+  });
+});

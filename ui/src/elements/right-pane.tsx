@@ -31,12 +31,12 @@ export function RightPane({ open, onOpenChange, pinned, onPinnedChange, companio
     if (selected !== activeTab) onActiveTabChange(companionTab.id);
   }, [activeTab, companionTab.id, onActiveTabChange, selected]);
   const panel = <>
-    <header className="flex min-h-14 items-center gap-2 border-b border-sidebar-border px-3">
+    <header className="flex h-13 shrink-0 items-center gap-2 border-b border-sidebar-border ps-4 pe-3">
       <div className="min-w-0 flex-1 truncate font-medium">{title ?? allTabs.find((tab) => tab.id === selected)?.label}</div>
       {headerActions ? <div className="flex shrink-0 items-center gap-1">{headerActions}</div> : null}
-      <div className="shrink-0">{avatar}</div>
       <Button type="button" variant="ghost" size="icon-sm" aria-label={pinLabel} aria-pressed={pinned} onClick={() => onPinnedChange(!pinned)}><Pin aria-hidden="true" /></Button>
       <Button type="button" variant="ghost" size="icon-sm" aria-label={closeLabel} onClick={() => onOpenChange(false)}><X aria-hidden="true" /></Button>
+      <div className="shrink-0">{avatar}</div>
     </header>
     <Tabs value={selected} onValueChange={onActiveTabChange} className="min-h-0 flex-1 gap-0">
       <TabsList aria-label={`${label} tabs`} variant="line" className="w-full justify-start overflow-x-auto rounded-none border-b border-sidebar-border px-2">
