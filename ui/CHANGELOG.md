@@ -1,3 +1,7 @@
+## [ui-v0.5.379] - 2026-10-27
+
+- AMBIENT-02: `ChatHeader` takes `reserveEnd`, which leaves room at its end for the control the shell draws at the top right. No change without the prop.
+
 ## [ui-v0.5.378] - 2026-10-27
 
 - AMBIENT-02: `CompanionAvatar` takes `animated` (default true); false draws only the still image, with the ring, for a header where no clip may play.

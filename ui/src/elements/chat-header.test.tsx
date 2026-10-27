@@ -141,3 +141,13 @@ describe("ChatHeader", () => {
     expect(menu.hasAttribute("aria-controls")).toBe(false);
   });
 });
+
+describe("ChatHeader reserveEnd", () => {
+  test("leaves room at the end only when asked", () => {
+    const withRoom = render(<ChatHeader name="Marlow" media={<span>portrait</span>} reserveEnd />);
+    expect(withRoom.container.querySelector("header")?.className).toContain("pe-16");
+    cleanup();
+    const without = render(<ChatHeader name="Marlow" media={<span>portrait</span>} />);
+    expect(without.container.querySelector("header")?.className).not.toContain("pe-16");
+  });
+});

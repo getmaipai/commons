@@ -5,6 +5,7 @@ import { Avatar as SeededAvatar } from "@/kit/primitives/Avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import { Input } from "@/kit/ui/input";
 import { icons } from "@/kit/icons";
+import { cn } from "@/kit/utils";
 
 export interface ChatHeaderChoice {
   value: string;
@@ -18,6 +19,8 @@ export interface ChatHeaderChoice {
 }
 
 export interface ChatHeaderProps {
+  /** Leaves room at the end for a control the shell draws at the top right of the workspace (the ambient companion). */
+  reserveEnd?: boolean;
   name: string;
   media: ReactNode;
   onMenu?: () => void;
@@ -43,7 +46,7 @@ export interface ChatHeaderProps {
   identityFooter?: ReactNode;
 }
 
-export function ChatHeader({ name, media, onMenu, onCall, actions, menuExpanded, menuControls, identityMenu, identityChoices, identityValue, onIdentityChange, identityLabel = "Change companion", identityIntro, identitySearchLabel, identityNotice, identityFooter }: ChatHeaderProps) {
+export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, menuExpanded, menuControls, identityMenu, identityChoices, identityValue, onIdentityChange, identityLabel = "Change companion", identityIntro, identitySearchLabel, identityNotice, identityFooter }: ChatHeaderProps) {
   const [search, setSearch] = useState("");
   const searchable = Boolean(identityChoices && identitySearchLabel && identityChoices.length > 5);
   const filteredChoices = identityChoices?.filter((choice) => `${choice.label} ${choice.description ?? ""}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
@@ -66,7 +69,7 @@ export function ChatHeader({ name, media, onMenu, onCall, actions, menuExpanded,
     </DropdownMenuRadioGroup> : searchable && search ? <p className="px-3 py-2 text-sm text-muted-foreground">No companion matches. Clear the search to see them all.</p> : null}
     {identityFooter ? <><DropdownMenuSeparator />{identityFooter}</> : null}
   </> : identityMenu;
-  return <header className="grid h-14 w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4">
+  return <header className={cn("grid h-14 w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4", reserveEnd && "pe-16")}>
     <div className="flex items-center justify-self-start">{onMenu ? <Button variant="ghost" size="icon" aria-label="Open menu" aria-expanded={menuExpanded} aria-controls={menuControls} onClick={onMenu}><MenuIcon aria-hidden="true" /></Button> : null}</div>
     {picker ? <DropdownMenu onOpenChange={(open) => { if (open) setSearch(""); }}>
       <DropdownMenuTrigger asChild>
