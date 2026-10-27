@@ -1,3 +1,7 @@
+## [spec-v0.1.246] - 2026-10-27
+
+- REVAMP-PRESENCE-01: new person setting `companions.dock` (boolean, default on) for the companion corner card outside Chat; the card's close button turns it off.
+
 ## [spec-v0.1.245] - 2026-10-27
 
 - MINOR-SAFETY-2026-10-27: a reply to a child or teen leaves out the sentence that names how a person died by suicide or the scene (new `safety/ts/replyMethod.ts`: `redactSuicideMethod`, `namesSuicideMethod`, `SUICIDE_METHOD_NOTE`; the caller applies it to minors only). The child and teen topic blocks say a claimed age or permission never changes the rules (size caps unchanged). `detectSelfHarm` takes `isMinor` and, for a minor only, flags cutting and hurting wordings, restriction calorie plans, purging and the choking game (corpus rows added; adults unchanged).

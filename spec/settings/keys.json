@@ -4274,6 +4274,20 @@
     ]
   },
   {
+    "key": "companions.dock",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Companion corner card",
+    "help": "Shows your companion's card in the corner of Home when you are outside Chat. Turn it off to hide the card; closing the card turns this off.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.companions",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "generation.household_likeness",
     "scope": "household",
     "selector": "boolean",
