@@ -1,3 +1,7 @@
+## [spec-v0.1.244] - 2026-10-27
+
+- AIMODELS-UNCENSORED-2026-10-27: new glance choice `chat-uncensored` (label and sentence) for the optional uncensored chat model on the AI and models page.
+
 ## [spec-v0.1.243] - 2026-10-26
 
 - HOME-PAGE-01: add optional Home placement fields to `contributes.widgets[]` and the person-scoped `ui.home_hidden` setting.

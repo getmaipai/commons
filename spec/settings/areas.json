@@ -456,6 +456,11 @@
                   "description": "Runs on the Apple chip for faster answers."
                 },
                 {
+                  "id": "chat-uncensored",
+                  "label": "Uncensored chat AI",
+                  "description": "An optional AI that does not refuse on its own. Home's age and safety rules still apply."
+                },
+                {
                   "id": "chat-pictures",
                   "label": "Chat can look at pictures",
                   "description": "Lets Home see the pictures you send."
