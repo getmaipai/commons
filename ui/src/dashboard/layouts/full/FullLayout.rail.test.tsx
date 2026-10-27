@@ -284,3 +284,23 @@ describe("rail layout top-right slot", () => {
     expect(view.container.querySelector('[data-slot="rail-top-right"]')).toBeNull();
   });
 });
+
+describe("rail layout right pane slot", () => {
+  test("draws the host's right pane beside the workspace, and nothing without it", () => {
+    const view = render(
+      <MemoryRouter initialEntries={["/x"]}>
+        <TooltipProvider>
+          <Routes>
+            <Route element={<FullLayout rail rightPane={<aside>Pane</aside>} />}>
+              <Route path="x" element={<Titled />} />
+            </Route>
+          </Routes>
+        </TooltipProvider>
+      </MemoryRouter>,
+    );
+    expect(view.getByText("Pane").closest('[data-slot="rail-right-pane"]')).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="rail-workspace"]')?.nextElementSibling?.getAttribute("data-slot")).toBe("rail-right-pane");
+    cleanup();
+    expect(renderRail("/x").container.querySelector('[data-slot="rail-right-pane"]')).toBeNull();
+  });
+});

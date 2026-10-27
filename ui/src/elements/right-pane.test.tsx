@@ -56,3 +56,23 @@ test("phone breakpoint renders the sidebar sheet variant", async () => {
   Object.defineProperty(window, "innerWidth", { configurable: true, value: oldWidth });
   window.dispatchEvent(new Event("resize"));
 });
+
+test("desktop: a pinned pane sits in flow, an unpinned one floats with a backdrop that closes it", () => {
+  const calls: boolean[] = [];
+  const pinned = render(<RightPane {...props({ pinned: true })} />);
+  expect(document.querySelector('[data-slot="right-pane"][data-pinned]')).toBeTruthy();
+  expect(document.querySelector('[data-slot="right-pane-backdrop"]')).toBeNull();
+  pinned.unmount();
+  const floating = render(<RightPane {...props({ onOpenChange: (open) => calls.push(open) })} />);
+  const backdrop = document.querySelector('[data-slot="right-pane-backdrop"]') as HTMLElement;
+  expect(backdrop).toBeTruthy();
+  fireEvent.click(backdrop);
+  fireEvent.keyDown(document, { key: "Escape" });
+  expect(calls).toEqual([false, false]);
+  floating.unmount();
+});
+
+test("a closed desktop pane draws nothing", () => {
+  const view = render(<RightPane {...props({ open: false })} />);
+  expect(view.container.querySelector('[data-slot="right-pane"]')).toBeNull();
+});

@@ -1,3 +1,7 @@
+## [ui-v0.5.380] - 2026-10-27
+
+- AMBIENT-03: `FullLayout` rail layout takes `rightPane`, drawn beside the workspace. `RightPane` now takes its own width when pinned, floats over the page with an outside-click and Escape close when not, and uses the sidebar sheet on a phone.
+
 ## [ui-v0.5.379] - 2026-10-27
 
 - AMBIENT-02: `ChatHeader` takes `reserveEnd`, which leaves room at its end for the control the shell draws at the top right. No change without the prop.

@@ -75,6 +75,8 @@ export interface FullLayoutProps {
   railAllAppsHref?: string;
   /** The host's top-right control (the ambient companion): drawn once at the top right of the workspace, stays in view while the page scrolls, and the slim title bar leaves room for it. */
   topRight?: ReactNode;
+  /** The host's right pane (the standard RightPane), drawn beside the workspace; a pinned pane takes its own width and the workspace shrinks. */
+  rightPane?: ReactNode;
 }
 
 /** The slim title bar of the rail layout: the page's own header content
@@ -92,7 +94,7 @@ function RailPageHeader({ reserveBand, reserveEnd }: { reserveBand: boolean; res
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, rightPane }: FullLayoutProps) {
   const phone = useIsPhoneLayout();
   const Navigation = phone ? MobileNavDrawer : AppRail;
   return (
@@ -111,6 +113,7 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
             </div>
           </div>
         </main>
+        {rightPane ? <div data-slot="rail-right-pane" className="sticky top-0 h-svh shrink-0 self-start">{rightPane}</div> : null}
       </div>
     </HeaderExtraProvider>
   );

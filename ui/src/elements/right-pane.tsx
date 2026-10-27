@@ -1,4 +1,5 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useBreakpoint } from "@/kit/hooks/useBreakpoint";
 import { Pin, X } from "lucide-react";
 import { Button } from "@/kit/ui/button";
 import { Sidebar, SidebarContent, SidebarProvider, useSidebar } from "@/kit/ui/sidebar";
@@ -45,12 +46,25 @@ export function RightPane({ open, onOpenChange, pinned, onPinnedChange, companio
     </Tabs>
   </>;
 
-  return <SidebarProvider open={open} onOpenChange={onOpenChange} className="pointer-events-none z-40 justify-end">
-    <MobileOpenSync open={open} />
-    <Sidebar side="right" collapsible={pinned ? "none" : "offcanvas"} aria-label={label} className={pinned ? "pointer-events-auto ml-auto h-full border-l border-sidebar-border" : "pointer-events-auto"}>
-      <SidebarContent className="gap-0 overflow-hidden p-0">{panel}</SidebarContent>
-    </Sidebar>
-  </SidebarProvider>;
+  const phone = useBreakpoint().tier === "phone";
+  useEffect(() => {
+    if (!open || pinned || phone) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") onOpenChange(false); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, pinned, phone, onOpenChange]);
+  const body = <Sidebar side="right" collapsible={phone ? "offcanvas" : "none"} aria-label={label} className="h-full border-l border-sidebar-border">
+    <SidebarContent className="gap-0 overflow-hidden p-0">{panel}</SidebarContent>
+  </Sidebar>;
+  // A pinned pane takes its own width beside the page; an unpinned one floats over it and closes on outside click or Escape. On a phone the sidebar's own sheet does both.
+  if (phone) return <SidebarProvider open={open} onOpenChange={onOpenChange} style={{ "--sidebar-width": "22rem" } as CSSProperties} className="pointer-events-none min-h-0 w-auto"><MobileOpenSync open={open} />{body}</SidebarProvider>;
+  if (!open) return null;
+  const provider = <SidebarProvider open style={{ "--sidebar-width": "22rem" } as CSSProperties} className="min-h-0 h-full w-auto">{body}</SidebarProvider>;
+  if (pinned) return <div data-slot="right-pane" data-pinned="" className="h-full">{provider}</div>;
+  return <>
+    <div aria-hidden="true" data-slot="right-pane-backdrop" className="fixed inset-0 z-30" onClick={() => onOpenChange(false)} />
+    <div data-slot="right-pane" className="fixed inset-y-0 right-0 z-40 shadow-xl">{provider}</div>
+  </>;
 }
 
 function MobileOpenSync({ open }: { open: boolean }) {
