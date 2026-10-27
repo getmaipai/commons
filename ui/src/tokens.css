@@ -308,6 +308,12 @@
   margin: 0;
   padding: 0;
 }
+/* An open article keeps its pinned top row flush: the page body's padding gives way on the sides and the top, so the row spans the
+ * whole content width and the text scrolls behind it. The article column keeps its own side padding. */
+[data-slot="schema-page-body"]:has([data-slot="article-sticky-header"]) {
+  padding-inline: 0;
+  padding-top: 0;
+}
 /* WORKSPACE-FILL-02: and it is bounded to the viewport, like a chat's: the sticky column stays put and the page's own content is
  * the one scroller, so a sticky bar inside it (the article toolbar) stays at the top of the content instead of scrolling away with
  * the document. A marked page is a flex child that may shrink, so its content scrolls inside it. */

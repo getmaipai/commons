@@ -111,7 +111,7 @@ export function SchemaPage({
           <div ref={scroller} tabIndex={0} className={cn("flex min-w-0 flex-1 flex-col overflow-y-auto", FOCUS_RING)}>
             {/* The padding lives on this inner box, not on the scroller: a sticky child (the article toolbar) would otherwise stick
                 at the padding's inner edge and let the text scroll through the gap above it. */}
-            <div className={cn("flex min-w-0 flex-1 flex-col gap-6 p-4", floatingBar && "pb-24")}>
+            <div data-slot="schema-page-body" className={cn("flex min-w-0 flex-1 flex-col gap-6 p-4", floatingBar && "pb-24")}>
               {beforeBody}
               <NodeRenderer node={parsed} state={state} />
             </div>

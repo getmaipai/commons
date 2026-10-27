@@ -1,3 +1,7 @@
+## [ui-v0.5.387] - 2026-10-27
+
+- `ArticleView`: the pinned header now holds the buttons and the publisher row together, on the page colour, so the article scrolls behind both. `SchemaPage`'s body marks itself `schema-page-body` and gives up its side and top padding while an article is open, so the header sits flush with the content edges and the top.
+
 ## [ui-v0.5.386] - 2026-10-27
 
 - `ArticleView`: the pinned top row has no side padding and no background, and the publisher row sits under it at full width (it no longer slides up behind the row with a negative margin and extra top padding).

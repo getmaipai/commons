@@ -24,3 +24,10 @@ describe("ArticleView phone styles", () => {
     expect(css).toContain("min-width: 52px");
   });
 });
+
+describe("open article header (desktop)", () => {
+  test("the page body drops its side and top padding while an article's pinned header is in it", () => {
+    const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
+    expect(css).toContain('[data-slot="schema-page-body"]:has([data-slot="article-sticky-header"])');
+  });
+});
