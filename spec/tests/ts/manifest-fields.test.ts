@@ -280,3 +280,30 @@ describe("PackageManifest.companion audience, behavior and per-band examples (DY
     expect(() => PackageManifest.parse({ ...base, companion: { ...base.companion, audience: "child" } })).toThrow();
   });
 });
+
+describe("PackageManifest.companion register dials (NAT-06)", () => {
+  const COMPANION_BASE = {
+    ...BASE,
+    kind: "companion",
+    companion: { display_name: "Test Companion", formality: "neutral", complexity: "standard", engagement: "balanced", filler_density: "light" },
+  } as const;
+
+  test("a companion that sets none of the dials stays valid", () => {
+    const parsed = PackageManifest.parse(COMPANION_BASE);
+    expect(parsed.companion?.clock_style).toBeUndefined();
+    expect(parsed.companion?.hedging).toBeUndefined();
+    expect(parsed.companion?.social).toBeUndefined();
+  });
+
+  test("accepts each declared value, and a partial social block", () => {
+    const parsed = PackageManifest.parse({ ...COMPANION_BASE, companion: { ...COMPANION_BASE.companion, clock_style: "loose", hedging: "high", social: { humor: "low" } } });
+    expect(parsed.companion?.clock_style).toBe("loose");
+    expect(parsed.companion?.hedging).toBe("high");
+    expect(parsed.companion?.social?.humor).toBe("low");
+  });
+
+  test("rejects a value outside the vocabulary, and a percentage", () => {
+    expect(() => PackageManifest.parse({ ...COMPANION_BASE, companion: { ...COMPANION_BASE.companion, clock_style: "casual" } })).toThrow();
+    expect(() => PackageManifest.parse({ ...COMPANION_BASE, companion: { ...COMPANION_BASE.companion, social: { warmth: 70 } } })).toThrow();
+  });
+});

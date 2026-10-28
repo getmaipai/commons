@@ -179,6 +179,32 @@ export const PackageManifest = z
         complexity: z.enum(["simple", "standard", "advanced"]),
         engagement: z.enum(["brief", "balanced", "curious"]),
         filler_density: z.enum(["none", "light", "frequent"]),
+        /**NAT-06: how this companion says a clock time aloud. formal keeps the part of day and says "four P M"; plain says "four o'clock"; loose is read by the prompt as "like four". Absent means plain on a spoken turn, today's behavior for a companion that sets nothing. The normalizer never rounds; loose maps to timeStyle plain.*/
+        clock_style: z
+          .enum(["formal", "plain", "loose"])
+          .describe(
+            'NAT-06: how this companion says a clock time aloud. formal keeps the part of day and says "four P M"; plain says "four o\'clock"; loose is read by the prompt as "like four". Absent means plain on a spoken turn, today\'s behavior for a companion that sets nothing. The normalizer never rounds; loose maps to timeStyle plain.',
+          )
+          .optional(),
+        /**NAT-06: how often a hedge ("probably", "I think") appears when the evidence's certainty band is below sure. Absent means medium.*/
+        hedging: z
+          .enum(["low", "medium", "high"])
+          .describe(
+            'NAT-06: how often a hedge ("probably", "I think") appears when the evidence\'s certainty band is below sure. Absent means medium.',
+          )
+          .optional(),
+        /**NAT-06: three baselines the turn's signal can override (a joke is dropped when the person is upset). Three steps, not percentages. Absent fields mean medium.*/
+        social: z
+          .object({
+            humor: z.enum(["low", "medium", "high"]).optional(),
+            warmth: z.enum(["low", "medium", "high"]).optional(),
+            initiative: z.enum(["low", "medium", "high"]).optional(),
+          })
+          .strict()
+          .describe(
+            "NAT-06: three baselines the turn's signal can override (a joke is dropped when the person is upset). Three steps, not percentages. Absent fields mean medium.",
+          )
+          .optional(),
         /**STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.*/
         status_phrases: z
           .object({

@@ -1,3 +1,7 @@
+## [spec-v0.1.262] - 2026-10-28
+
+- NAT-06: a manifest `companion` block gains optional `clock_style` (`formal`, `plain`, `loose`), `hedging` (`low`, `medium`, `high`) and `social` (`humor`, `warmth`, `initiative`, each `low`, `medium`, `high`). Additive; a companion that sets none behaves as before.
+
 ## [spec-v0.1.261] - 2026-10-28
 
 - PODCAST-PORT-03: `media-collection.kind` gains `filter`, a saved episode filter. `rules` was always null; it is now null or an object of optional rules (`unplayed`, `in_progress`, `saved`, `min_minutes`, `max_minutes`, `source_ids`, `released_within_days`), all of which must match. Only kind `filter` carries rules; `items` stay empty. Additive; existing collections stay valid. New fixture `media-collection.filter.example.json`.

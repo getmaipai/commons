@@ -151,6 +151,18 @@
         "complexity": { "type": "string", "enum": ["simple", "standard", "advanced"] },
         "engagement": { "type": "string", "enum": ["brief", "balanced", "curious"] },
         "filler_density": { "type": "string", "enum": ["none", "light", "frequent"] },
+        "clock_style": { "type": "string", "enum": ["formal", "plain", "loose"], "description": "NAT-06: how this companion says a clock time aloud. formal keeps the part of day and says \"four P M\"; plain says \"four o'clock\"; loose is read by the prompt as \"like four\". Absent means plain on a spoken turn, today's behavior for a companion that sets nothing. The normalizer never rounds; loose maps to timeStyle plain." },
+        "hedging": { "type": "string", "enum": ["low", "medium", "high"], "description": "NAT-06: how often a hedge (\"probably\", \"I think\") appears when the evidence's certainty band is below sure. Absent means medium." },
+        "social": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "NAT-06: three baselines the turn's signal can override (a joke is dropped when the person is upset). Three steps, not percentages. Absent fields mean medium.",
+          "properties": {
+            "humor": { "type": "string", "enum": ["low", "medium", "high"] },
+            "warmth": { "type": "string", "enum": ["low", "medium", "high"] },
+            "initiative": { "type": "string", "enum": ["low", "medium", "high"] }
+          }
+        },
         "status_phrases": {
           "type": "object",
           "additionalProperties": false,

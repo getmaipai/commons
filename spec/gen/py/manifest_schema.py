@@ -49,6 +49,19 @@ class Routing(BaseModel):
     )
 
 
+class Social(BaseModel):
+    """
+    NAT-06: three baselines the turn's signal can override (a joke is dropped when the person is upset). Three steps, not percentages. Absent fields mean medium.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    humor: Literal['low', 'medium', 'high'] | None = None
+    warmth: Literal['low', 'medium', 'high'] | None = None
+    initiative: Literal['low', 'medium', 'high'] | None = None
+
+
 class StatusPhrases(BaseModel):
     """
     STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.
@@ -373,6 +386,18 @@ class Companion(BaseModel):
     complexity: Literal['simple', 'standard', 'advanced']
     engagement: Literal['brief', 'balanced', 'curious']
     filler_density: Literal['none', 'light', 'frequent']
+    clock_style: Literal['formal', 'plain', 'loose'] | None = Field(
+        None,
+        description='NAT-06: how this companion says a clock time aloud. formal keeps the part of day and says "four P M"; plain says "four o\'clock"; loose is read by the prompt as "like four". Absent means plain on a spoken turn, today\'s behavior for a companion that sets nothing. The normalizer never rounds; loose maps to timeStyle plain.',
+    )
+    hedging: Literal['low', 'medium', 'high'] | None = Field(
+        None,
+        description='NAT-06: how often a hedge ("probably", "I think") appears when the evidence\'s certainty band is below sure. Absent means medium.',
+    )
+    social: Social | None = Field(
+        None,
+        description="NAT-06: three baselines the turn's signal can override (a joke is dropped when the person is upset). Three steps, not percentages. Absent fields mean medium.",
+    )
     status_phrases: StatusPhrases | None = Field(
         None,
         description="STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.",
