@@ -1,3 +1,7 @@
+## [ui-v0.5.408] - 2026-10-28
+
+- `ArticleView`: the pinned row swaps to the story title when the headline passes under the row itself (measured on scroll), not the window top, so it works in the shell's inner scroll pane. No prop changes.
+
 ## [ui-v0.5.407] - 2026-10-28
 
 - `ArticleView`: the key points write themselves. A story with none yet fires `summarize` once on open and the rail shows "Writing the key points…" until they arrive; the "Key points" button is gone. Listen and Discuss share one row, and the right rail is 24rem wide (was 16rem).

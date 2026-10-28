@@ -153,8 +153,6 @@ type TextSizeId = (typeof TEXT_SIZES)[number]["id"];
 /** One tap steps the size: Default, then Larger, then Smaller, then Default again. */
 const NEXT_SIZE: Record<TextSizeId, TextSizeId> = { medium: "large", large: "small", small: "medium" };
 const TEXT_SIZE_KEY = "maipai.article.text-size";
-/** The pinned source row is h-14. */
-const PINNED_ROW_PX = 56;
 
 function readTextSize(): TextSizeId {
   try {
@@ -182,16 +180,23 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const [iconFailed, setIconFailed] = useState(false);
   // Once the headline has scrolled up under the pinned row, the row names the story instead of the publisher.
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const providerRef = useRef<HTMLDivElement>(null);
   const [condensed, setCondensed] = useState(false);
   useEffect(() => {
-    const node = titleRef.current;
-    if (!node || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry) setCondensed(!entry.isIntersecting && entry.boundingClientRect.top < PINNED_ROW_PX); },
-      { rootMargin: `-${PINNED_ROW_PX}px 0px 0px 0px` },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
+    // Measured against the pinned row itself, so it holds in any scroll container (the shell scrolls an inner pane, not the window).
+    const measure = () => {
+      const title = titleRef.current;
+      const row = providerRef.current;
+      if (!title || !row) return;
+      setCondensed(title.getBoundingClientRect().bottom < row.getBoundingClientRect().bottom);
+    };
+    measure();
+    document.addEventListener("scroll", measure, { capture: true, passive: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      document.removeEventListener("scroll", measure, { capture: true });
+      window.removeEventListener("resize", measure);
+    };
   }, [data.title]);
   const chooseSize = (id: TextSizeId) => {
     setTextSize(id);
@@ -248,7 +253,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       </div>
       {data.byline ? (
-        <div data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", condensed ? "px-16 md:px-48" : "px-4")}>
+        <div ref={providerRef} data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", condensed ? "px-16 md:px-48" : "px-4")}>
           <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className={cn("shrink-0 rounded-xl transition-[width,height] duration-200", condensed ? "size-8" : "size-11")} onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
           <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", condensed && "truncate text-lg leading-tight")}>{condensed ? data.title : data.byline.publisher}</span>
         </div>

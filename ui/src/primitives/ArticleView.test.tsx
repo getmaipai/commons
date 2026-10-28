@@ -225,27 +225,19 @@ describe("ArticleView", () => {
   });
 
   test("the pinned source row swaps the publisher for the story title once the headline scrolls under it", async () => {
-    const callbacks: Array<(entries: unknown[]) => void> = [];
-    const original = globalThis.IntersectionObserver;
-    globalThis.IntersectionObserver = class {
-      constructor(cb: (entries: unknown[]) => void) { callbacks.push(cb); }
-      observe() {}
-      disconnect() {}
-      unobserve() {}
-      takeRecords() { return []; }
-    } as unknown as typeof IntersectionObserver;
-    try {
-      const { container } = render(<ArticleView data={data} />);
-      const provider = container.querySelector('[data-slot="article-provider"]')!;
-      expect(provider.textContent).toBe("Example Wire");
-      const { act } = await import("@testing-library/react");
-      act(() => callbacks[0]!([{ isIntersecting: false, boundingClientRect: { top: -80 } }]));
-      expect(provider.getAttribute("data-condensed")).toBe("true");
-      expect(provider.textContent).toBe(data.title);
-      act(() => callbacks[0]!([{ isIntersecting: true, boundingClientRect: { top: 200 } }]));
-      expect(provider.textContent).toBe("Example Wire");
-    } finally {
-      globalThis.IntersectionObserver = original;
-    }
+    const { container } = render(<ArticleView data={data} />);
+    const provider = container.querySelector('[data-slot="article-provider"]')!;
+    const title = container.querySelector('[data-slot="article-title"]')!;
+    const place = (el: Element, bottom: number) => { (el as HTMLElement).getBoundingClientRect = () => ({ bottom, top: bottom - 40 } as DOMRect); };
+    const { act } = await import("@testing-library/react");
+    expect(provider.textContent).toBe("Example Wire");
+    place(provider, 120);
+    place(title, 90);
+    act(() => { document.dispatchEvent(new Event("scroll")); });
+    expect(provider.getAttribute("data-condensed")).toBe("true");
+    expect(provider.textContent).toBe(data.title);
+    place(title, 300);
+    act(() => { document.dispatchEvent(new Event("scroll")); });
+    expect(provider.textContent).toBe("Example Wire");
   });
 });
