@@ -5,6 +5,13 @@ All notable changes to the `core` workspace. Format follows
 tagged `core-vX.Y.Z`. Everything stays `0.x` until Home's and the Stack's
 adoption proves it.
 
+## [Unreleased]
+
+### Added
+- `sayRound` (NAT-04): pure rounding helpers `sayTemperature`, `sayMoney`, `sayDistance`,
+  `sayMinutes`, `sayCount` and the `sayFor(kind, value, opts)` dispatcher, which returns null when
+  `exact` is true or the value is not finite.
+
 ## [0.1.5] - core-v0.1.5
 
 ### Added

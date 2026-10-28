@@ -23,6 +23,7 @@ A consumer adds `"@maipai/core": "file:../../shared/core"` to its `package.json`
 | `openapi` | Provides shared Hono OpenAPI route scaffolding and reusable error response schemas. |
 | `paths` | Creates owner-only data directories (or, with `{ create: false }`, refuses to make a missing one) and reads file modification times safely. |
 | `rateLimiter` | Provides a per-key token bucket that budgets third-party service traffic at a single choke point. |
+| `sayRound` | Turns an exact value (temperature, money, distance, minutes, count) into the way a person says it ("low seventies", "about thirty bucks"), for the spoken form beside evidence; `sayFor` is the one dispatcher and `exact: true` suppresses it. |
 | `secretThrottle` | Provides a generic brute-force throttle keyed by a client or device identifier to complement per-account lockout. |
 | `secrets` | Provides reversible AES-256-GCM encryption for credentials with operator-set or keystore-managed keys. |
 | `singleflight` | Shares one in-flight promise among concurrent callers and clears it when the attempt completes. |
