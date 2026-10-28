@@ -1,3 +1,7 @@
+## [spec-v0.1.254] - 2026-10-27
+
+- Same schema as spec-v0.1.253 (ModelCapabilities `origin`, `added_by`, `added_at`, `sampling`). The 253 tag shipped with package.json still at 0.1.252, so consumers refuse it; pin 254.
+
 ## [spec-v0.1.253] - 2026-10-27
 
 - MODEL-ADD-01: `ModelCapabilities` gains `origin` (`shipped` | `added`), `added_by`, `added_at` and `sampling` (the sampling fields Home sends today, all optional, plus a required `source`). A model an admin adds from a Hugging Face link is the same record a shipped model is.
