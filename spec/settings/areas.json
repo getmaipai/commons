@@ -587,7 +587,18 @@
                 "cancel": "Cancel",
                 "checked": "Last checked {when}",
                 "view_device": "View device",
-                "wakeword_note": "Keeps or removes the wake word files. Listening stays off until an adult turns it on for a device."
+                "wakeword_note": "Keeps or removes the wake word files. Listening stays off until an adult turns it on for a device.",
+                "add_model_title": "Add a model from a link",
+                "add_model_note": "Paste a Hugging Face link to a GGUF file. Nothing downloads until you confirm.",
+                "add_model_read": "Read the link",
+                "add_model_reading": "Reading",
+                "add_model_failed": "That model was not added",
+                "add_model_fits": "A known design: MaiPai can size it.",
+                "add_model_estimate": "An estimate: the engine checks the fit before it loads.",
+                "add_model_confirm": "Download and use",
+                "add_model_started": "Downloading now. It appears in the list above while it downloads.",
+                "not_tested": "Not tested by MaiPai",
+                "added_description": "Not tested by MaiPai. An admin added it from a link; MaiPai checked its file but has not measured it."
               },
               "tab": "overview"
             },

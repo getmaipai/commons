@@ -1,3 +1,7 @@
+## [spec-v0.1.255] - 2026-10-27
+
+- MODEL-ADD-01. The AI and models card's `copy` holds the words of the add-a-chat-model panel and the `added_description` sentence under an added model's name, so Home holds none of them. Additive.
+
 ## [spec-v0.1.254] - 2026-10-27
 
 - Same schema as spec-v0.1.253 (ModelCapabilities `origin`, `added_by`, `added_at`, `sampling`). The 253 tag shipped with package.json still at 0.1.252, so consumers refuse it; pin 254.
