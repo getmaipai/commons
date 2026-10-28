@@ -1,3 +1,7 @@
+## [spec-v0.1.263] - 2026-10-28
+
+- AMBIENT-06: the `companions.dock` setting is relabelled "Ambient companion" and its help and `copy.does` describe the companion at the top right of every page; the key, scope and default are unchanged.
+
 ## [spec-v0.1.262] - 2026-10-28
 
 - NAT-06: a manifest `companion` block gains optional `clock_style` (`formal`, `plain`, `loose`), `hedging` (`low`, `medium`, `high`) and `social` (`humor`, `warmth`, `initiative`, each `low`, `medium`, `high`). Additive; a companion that sets none behaves as before.

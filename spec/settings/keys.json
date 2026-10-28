@@ -4279,10 +4279,10 @@
     "scope": "person",
     "selector": "boolean",
     "default": true,
-    "label": "Companion corner card",
-    "help": "Shows your companion's card in the corner of Home when you are outside Chat. Turn it off to hide the card; closing the card turns this off.",
+    "label": "Ambient companion",
+    "help": "Shows your companion at the top right of every page. Hover or tap it to open the companion pane. Turn it off to hide the companion everywhere.",
     "copy": {
-      "does": "Keeps a small shortcut to your helper on the Home screen."
+      "does": "Keeps your companion one tap away on every page."
     },
     "level": "basic",
     "secret": false,
