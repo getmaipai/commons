@@ -220,4 +220,37 @@ describe("detail grid at phone width (regression: a col-span-2 tile created a se
     const bare = source.match(/(^|[\s"'`])col-span-2\b/gm) ?? [];
     expect(bare).toEqual([]);
   });
+  test("renders advice chips under the hero, with tone and icon", () => {
+    const advice = [{ id: "jacket", label: "Bring a jacket", icon: "cloud-sun" }, { id: "uv", label: "Sunscreen", tone: "warn" as const }, { id: "odd", label: "Hat", icon: "no-such-icon" }];
+    const { container, getByText } = render(<WeatherForecastPage locations={locations} selectedId="home" advice={advice}/>);
+    const row = container.querySelector('[data-slot="weather-advice"]')!;
+    expect(row.querySelectorAll('[data-slot="badge"]')).toHaveLength(3);
+    expect(getByText("Bring a jacket")).toBeTruthy();
+    expect(row.querySelector('[data-tone="warn"]')?.textContent).toBe("Sunscreen");
+    expect(row.querySelectorAll("svg")).toHaveLength(1);
+    const hero = container.querySelector('[data-slot="weather-forecast-hero"]')!;
+    expect(hero.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  test("renders the alert banner above the forecast, by severity", () => {
+    const { container, getByText, rerender } = render(<WeatherForecastPage locations={locations} selectedId="home" alert={{ title: "Wind advisory", text: "Gusts to 50 mph.", severity: "warn" }}/>);
+    const banner = container.querySelector('[data-slot="weather-alert"]')!;
+    expect(banner.getAttribute("data-severity")).toBe("warn");
+    expect(getByText("Wind advisory")).toBeTruthy();
+    expect(getByText("Gusts to 50 mph.")).toBeTruthy();
+    const hero = container.querySelector('[data-slot="weather-forecast-hero"]')!;
+    expect(banner.compareDocumentPosition(hero) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    rerender(<WeatherForecastPage locations={locations} selectedId="home" alert={{ title: "Tornado warning" }}/>);
+    expect(container.querySelector('[data-slot="weather-alert"]')?.getAttribute("data-severity")).toBe("info");
+    expect(container.querySelector('[data-slot="alert-description"]')).toBeNull();
+  });
+
+  test("renders nothing extra without advice or an alert, or with an empty advice list", () => {
+    const plain = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
+    const html = plain.container.innerHTML;
+    expect(plain.container.querySelector('[data-slot="weather-advice"]')).toBeNull();
+    expect(plain.container.querySelector('[data-slot="weather-alert"]')).toBeNull();
+    plain.rerender(<WeatherForecastPage locations={locations} selectedId="home" advice={[]}/>);
+    expect(plain.container.innerHTML).toBe(html);
+  });
 });

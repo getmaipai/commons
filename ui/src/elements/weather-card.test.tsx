@@ -196,4 +196,13 @@ describe("WeatherCard accessibility and variants", () => {
     expect(hourLabelOf("2026-10-17T21:00+05:00")).toBe("9 PM");
     expect(hourLabelOf("junk")).toBe("junk");
   });
+  test("advice chips and the alert banner draw only when given", () => {
+    const plain = render(<WeatherCard {...props} />);
+    expect(plain.container.querySelector('[data-slot="weather-advice"]')).toBeNull();
+    expect(plain.container.querySelector('[data-slot="weather-alert"]')).toBeNull();
+    cleanup();
+    const full = render(<WeatherCard {...props} advice={[{ id: "jacket", label: "Bring a jacket" }]} alert={{ title: "Frost advisory", severity: "severe" }} />);
+    expect(full.getByText("Bring a jacket")).toBeTruthy();
+    expect(full.container.querySelector('[data-slot="weather-alert"]')?.getAttribute("data-severity")).toBe("severe");
+  });
 });

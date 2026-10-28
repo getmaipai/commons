@@ -1,3 +1,7 @@
+## [spec-v0.1.258] - 2026-10-28
+
+- WEATHER-PORT-07: the `weather_card` block's props take two optional fields. `advice` (up to 12 chips of `id`, `label`, optional kit `icon` name and `tone` info or warn) and `alert` (`title`, optional `text`, optional `severity` info, warn or severe). Additive; existing blocks stay valid. New fixture `valid-weather_card-advice.json`.
+
 ## [spec-v0.1.257] - 2026-10-27
 
 - Add the household switches `radio.directory.enabled`, `podcasts.directory.enabled` and `podcasts.directory.teens` (boolean, basic, all off by default, in the new `household.media_online` group shown as the "Online radio and podcasts" card in the Media settings area). Honoured by Home. Additive (RADIO-08, PODCAST-PORT-12).

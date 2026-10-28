@@ -1,3 +1,7 @@
+## [ui-v0.5.400] - 2026-10-28
+
+- WEATHER-PORT-07: `WeatherForecastPage` and `WeatherCard` take two optional props. `advice` (`{ id, label, icon?, tone? }[]`) draws a row of kit `Badge` chips under the current conditions; `alert` (`{ title, text?, severity? }`) draws a kit `Alert` banner above the forecast (`severe` uses the destructive variant, `warn` the warning variant). Both draw nothing when absent, and `advice` draws nothing when empty. Tokens and shipped kit variants only. Additive; needs `spec-v0.1.258` for the `weather_card` block to carry them.
+
 ## [ui-v0.5.398] - 2026-10-27
 
 - `CompanionAvatar size="header"` (40 px, for a header row). `CompanionStage` takes `heard` (what the person just said, small, above the bubble) and `showHeader` (false hides the name and state word visually for a host that shows them in its own header).

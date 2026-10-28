@@ -19,6 +19,7 @@ import {
   weatherClassOf,
 } from "./weather-condition";
 import { WeatherSky } from "./weather-sky";
+import { WeatherAdviceChips, WeatherAlertBanner, type WeatherAdvice, type WeatherAlert } from "./weather-advice";
 export { WeatherSky } from "./weather-sky";
 
 export interface WeatherCurrent {
@@ -156,13 +157,15 @@ export function WeatherCard({
   hourly,
   daily,
   attribution,
+  advice,
+  alert,
   locale = "en-US",
   variant = "full",
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "place" | "unit" | "current" | "hourly" | "daily" | "attribution"
+  "children" | "place" | "unit" | "current" | "hourly" | "daily" | "attribution" | "alert"
 > & {
   place: string;
   unit: "F" | "C";
@@ -170,6 +173,10 @@ export function WeatherCard({
   hourly?: readonly WeatherHour[];
   daily: readonly WeatherDay[];
   attribution: string;
+  /** Advice chips drawn under the hero. Absent or empty: nothing extra. */
+  advice?: readonly WeatherAdvice[];
+  /** An alert banner drawn above the hero. Absent: nothing extra. */
+  alert?: WeatherAlert;
   /** Locale for the weekday names. Render-only; not part of the spec block. */
   locale?: string;
   /** `compact` draws the hero alone, shorter, for a dashboard card. Render-only; not part of the spec block. */
@@ -199,6 +206,7 @@ export function WeatherCard({
       className={cn(paper, "w-full overflow-hidden rounded-2xl", wide ? "max-w-3xl" : "max-w-md", className)}
       {...props}
     >
+      {alert ? <div className="p-3"><WeatherAlertBanner alert={alert} /></div> : null}
       <div
         data-slot="weather-hero"
         style={heroStyle}
@@ -234,6 +242,11 @@ export function WeatherCard({
           </span>
         </div>
       </div>
+      {advice?.length ? (
+        <div className="border-border border-b px-4 py-3">
+          <WeatherAdviceChips advice={advice} />
+        </div>
+      ) : null}
       {hours.length > 0 ? (
         <ul data-slot="weather-hourly" aria-label="Next 24 hours" className="border-border flex overflow-x-auto border-b px-1.5 py-3">
           {hours.map((hour) => (

@@ -558,6 +558,31 @@ class DailyItem(BaseModel):
     )
 
 
+class AdviceItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1)
+    label: constr(min_length=1)
+    icon: constr(min_length=1) | None = Field(
+        None, description='A kit icon name. An unknown name draws no icon.'
+    )
+    tone: Literal['info', 'warn'] | None = None
+
+
+class Alert(BaseModel):
+    """
+    A weather alert banner drawn above the hero. Absent: none.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    title: constr(min_length=1)
+    text: str | None = None
+    severity: Literal['info', 'warn', 'severe'] | None = None
+
+
 class Props8(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -572,6 +597,14 @@ class Props8(BaseModel):
     hourly: list[HourlyItem] | None = Field(None, max_length=24)
     daily: list[DailyItem] = Field(..., max_length=8, min_length=1)
     attribution: str
+    advice: list[AdviceItem] | None = Field(
+        None,
+        description='Advice chips drawn under the current conditions. Absent or empty: none.',
+        max_length=12,
+    )
+    alert: Alert | None = Field(
+        None, description='A weather alert banner drawn above the hero. Absent: none.'
+    )
 
 
 class WeatherCard(BaseModel):

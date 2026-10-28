@@ -6,6 +6,8 @@ import { cn } from "cn";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { WeatherSky } from "./weather-sky";
+import { WeatherAdviceChips, WeatherAlertBanner, type WeatherAdvice, type WeatherAlert } from "./weather-advice";
+export type { WeatherAdvice, WeatherAlert } from "./weather-advice";
 import { weatherClassOf, type WeatherClass } from "./weather-condition";
 
 export interface ForecastHour { time: string; temp: number; condition?: string; code?: number; pop?: number; windSpeed?: number; isDay?: boolean }
@@ -37,6 +39,10 @@ export interface WeatherForecastPageProps {
   locations: readonly WeatherLocation[]; selectedId?: string; onSelect?: (id: string) => void; onSearch?: (query: string) => void;
   onAddLocation?: () => void; onRemoveLocation?: (id: string) => void; onSelectResult?: (result: WeatherLocation) => void;
   searchResults?: readonly WeatherLocation[]; unit?: "F" | "C"; locale?: string; className?: string; labels?: Partial<WeatherForecastPageLabels>;
+  /** Advice chips for the selected place, drawn under the current conditions. Absent or empty: nothing extra. */
+  advice?: readonly WeatherAdvice[];
+  /** An alert banner for the selected place, drawn above the forecast. Absent: nothing extra. */
+  alert?: WeatherAlert;
 }
 
 export function dedupeLocations(locations: readonly WeatherLocation[]): WeatherLocation[] {
@@ -140,7 +146,7 @@ function LocationSky({ location, labels }: { location: WeatherLocation; labels: 
     <div><span className="block text-4xl font-light tabular-nums">{deg(detail.temp)}</span><span className="text-xs">{detail.condition}{detail.high !== undefined && detail.low !== undefined ? ` · H ${deg(detail.high)} L ${deg(detail.low)}` : ""}</span></div>
   </div>;
 }
-export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch, onAddLocation, onRemoveLocation, onSelectResult, searchResults = [], unit = "F", locale = "en-US", className, labels: labelsProp }: WeatherForecastPageProps) {
+export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch, onAddLocation, onRemoveLocation, onSelectResult, searchResults = [], unit = "F", locale = "en-US", className, labels: labelsProp, advice, alert }: WeatherForecastPageProps) {
   const labels = { ...weatherForecastPageDefaultLabels, ...labelsProp }; const [mobileDetail, setMobileDetail] = useState(false); const [metric, setMetric] = useState<"temperature" | "precipitation" | "wind">("temperature");
   const uniqueLocations = useMemo(() => dedupeLocations(locations), [locations]);
   const selected = uniqueLocations.find((l) => l.id === selectedId) ?? uniqueLocations.find((l) => l.isMyLocation) ?? uniqueLocations[0]; const d = selected?.detail;
@@ -162,11 +168,13 @@ export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch,
     {selected && <main data-slot="weather-location-detail" className={cn("min-w-0", !mobileDetail && "hidden lg:block")}>
       <Button type="button" variant="ghost" size="sm" data-slot="weather-back" aria-label={labels.backToLocations} onClick={() => { setMobileDetail(false); onSelect?.(""); }} className="mb-3 flex items-center gap-2 text-sm lg:hidden"><ArrowLeft className="size-4"/>{labels.backToLocations}</Button>
       {d ? <>
+        {alert ? <div className="mb-4"><WeatherAlertBanner alert={alert}/></div> : null}
         <section data-slot="weather-forecast-hero" data-class={cls} style={{ backgroundImage: `linear-gradient(150deg,var(--weather-${cls}-${tod}-from),var(--weather-${cls}-${tod}-to))`, color: "var(--weather-ink)" }} className="relative isolate mb-4 flex min-h-72 flex-col justify-end overflow-hidden rounded-3xl p-7">
           <div data-weather-layer="sky" className="absolute inset-0 z-0 overflow-hidden"><WeatherSky cls={cls} isDay={d.isDay} intensity={1}/></div><div data-weather-layer="scrim" className="absolute inset-0 z-[1] bg-gradient-to-t from-[var(--weather-text-scrim)] via-transparent to-transparent"/>
           <div className="mb-7 flex items-start justify-between gap-4"><div><p className="text-xl font-medium">{selected.city}{selected.state ? `, ${selected.state}` : ""}</p><p className="text-sm opacity-80">{selected.localTime ?? ""}{selected.timezone ? ` · ${selected.timezone}` : ""}</p></div><p className="text-xs opacity-80">Updated {d.hourly?.[0]?.time ? formatLocalTime(d.hourly[0].time, selected.timezone, locale) : "recently"}</p></div>
           <p className="text-7xl leading-none font-light tabular-nums">{deg(d.temp)}<span className="text-3xl">{unit}</span></p><p className="mt-3 text-lg">{d.condition}</p><p className="mt-1 text-sm">{d.high !== undefined && d.low !== undefined ? `H ${deg(d.high)} · L ${deg(d.low)}` : ""}</p>
         </section>
+        {advice?.length ? <div className="mb-4"><WeatherAdviceChips advice={advice}/></div> : null}
         <div data-slot="weather-detail-grid" className="grid min-w-0 w-full grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] auto-rows-[minmax(160px,auto)] items-start gap-3">
           {d.hourly?.length ? <Tile title={labels.hourlyForecast} icon={<Thermometer className="size-4" aria-hidden/>} className="col-span-full h-auto min-h-0"><ol data-slot="weather-hourly-strip" className="flex min-w-0 gap-2 overflow-x-auto pb-2">{d.hourly.slice(0,24).map((hour,i) => { const Icon = hourlyIcon(weatherClassOf(hour.code ?? d.code), hourIsDay(hour, d, selected.timezone)); return <li key={hour.time} data-slot="weather-forecast-hour" className="flex w-16 min-w-16 shrink-0 flex-col items-center gap-2 text-sm"><span className="text-muted-foreground whitespace-nowrap">{i === 0 ? "Now" : formatLocalTime(hour.time, selected.timezone, locale).replace(/:\d{2}(?=\s|$)/, "")}</span><Icon className="size-5" aria-hidden/><b className="tabular-nums">{deg(hour.temp)}{unit}</b><span className="text-primary h-4 text-xs">{hour.pop !== undefined && hour.pop >= 10 ? `${hour.pop}%` : " "}</span></li>; })}</ol></Tile> : null}
           {daily.length ? <Tile title={labels.tenDayForecast} icon={<SunIcon className="size-4" aria-hidden/>} className="col-span-full"><ol data-slot="weather-daily-list" className="min-w-0 divide-border divide-y">{daily.map((day,i) => { const Icon = ICONS[weatherClassOf(day.code)]; const m = rangeBarMetrics(day.low, day.high, globalMin, globalMax, i === 0 ? d.temp : undefined); return <li key={day.date} className="grid min-h-11 min-w-0 grid-cols-[3rem_2rem_2.4rem_minmax(0,1fr)_2.4rem] items-center gap-1 sm:gap-2 text-sm tabular-nums"><span>{i === 0 ? "Today" : dayName(day.date,locale)}</span><span className="flex flex-col items-center"><Icon className="size-4" aria-hidden/>{day.pop !== undefined && day.pop >= 20 && <small className="text-primary text-[10px]">{day.pop}%</small>}</span><span className="text-muted-foreground text-right">{deg(day.low)}</span><span className="bg-muted relative h-1.5 min-w-0 rounded-full"><span className="from-[var(--weather-range-cool)] via-[var(--weather-range-mid)] to-[var(--weather-range-warm)] absolute h-full rounded-full bg-gradient-to-r" style={{left:`${m.left}%`,width:`${m.width}%`}}/>{m.dot !== undefined && <i aria-label={labels.currentTemperature} className="bg-foreground absolute top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{left:`${m.dot}%`}}/>}</span><span className="text-right">{deg(day.high)}</span></li>; })}</ol></Tile> : null}

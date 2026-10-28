@@ -1199,6 +1199,44 @@ export const PluginResult = z
                         .min(1)
                         .max(8),
                       attribution: z.string(),
+                      /**Advice chips drawn under the current conditions. Absent or empty: none.*/
+                      advice: z
+                        .array(
+                          z
+                            .object({
+                              id: z.string().min(1),
+                              label: z.string().min(1),
+                              /**A kit icon name. An unknown name draws no icon.*/
+                              icon: z
+                                .string()
+                                .min(1)
+                                .describe(
+                                  "A kit icon name. An unknown name draws no icon.",
+                                )
+                                .optional(),
+                              tone: z.enum(["info", "warn"]).optional(),
+                            })
+                            .strict(),
+                        )
+                        .max(12)
+                        .describe(
+                          "Advice chips drawn under the current conditions. Absent or empty: none.",
+                        )
+                        .optional(),
+                      /**A weather alert banner drawn above the hero. Absent: none.*/
+                      alert: z
+                        .object({
+                          title: z.string().min(1),
+                          text: z.string().optional(),
+                          severity: z
+                            .enum(["info", "warn", "severe"])
+                            .optional(),
+                        })
+                        .strict()
+                        .describe(
+                          "A weather alert banner drawn above the hero. Absent: none.",
+                        )
+                        .optional(),
                     })
                     .strict(),
                 })
