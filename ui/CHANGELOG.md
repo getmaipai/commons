@@ -1,3 +1,7 @@
+## [ui-v0.5.398] - 2026-10-27
+
+- `CompanionAvatar size="header"` (40 px, for a header row). `CompanionStage` takes `heard` (what the person just said, small, above the bubble) and `showHeader` (false hides the name and state word visually for a host that shows them in its own header).
+
 ## [ui-v0.5.397] - 2026-10-27
 
 - `CompanionAvatar size="fill"` takes the space it is given. `CompanionStage` stacks the state word under the name, like the mockup.

@@ -25,6 +25,10 @@ export interface CompanionStageProps {
   workingLine?: string;
   actions?: CompanionStageAction[];
   talk: ReactNode;
+  /** What the person just said, drawn small above the bubble so they can see it was heard. */
+  heard?: ReactNode;
+  /** False hides the name and state word visually (the host shows them in its own header); they stay for screen readers. Default true. */
+  showHeader?: boolean;
   className?: string;
 }
 
@@ -34,9 +38,9 @@ function AudioWave({ className }: { className?: string }) {
   </div>;
 }
 
-export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, className }: CompanionStageProps) {
+export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, heard, showHeader = true, className }: CompanionStageProps) {
   return <section data-slot="companion-stage" data-mode={mode} aria-label={`${name} companion`} className={cn("flex h-full min-h-0 flex-col gap-3", className)}>
-    <header className="flex min-w-0 flex-col">
+    <header className={cn("flex min-w-0 flex-col", !showHeader && "sr-only")}>
       <h2 className="min-w-0 truncate font-medium">{name}</h2>
       {stateWord ? <span role="status" aria-live="polite" className="truncate text-sm text-muted-foreground">{stateWord}</span> : null}
     </header>
@@ -45,9 +49,12 @@ export function CompanionStage({ name, stateWord, mode, character, bubble, onDis
       <div data-slot="companion-stage-character" className="flex h-full min-h-0 w-full items-center justify-center">{character}</div>
       {mode === "listening" ? <div data-slot="companion-stage-listening-ring" aria-hidden="true" className="pointer-events-none absolute inset-4 rounded-full border border-ring/50 motion-safe:animate-pulse" /> : null}
       {mode === "thinking" ? <div data-slot="companion-stage-thought-cloud" aria-hidden="true" className="absolute right-[18%] top-[15%] size-10 rounded-[50%] border-2 border-border after:absolute after:-bottom-1 after:left-1 after:size-2 after:rounded-full after:border after:border-border" /> : null}
-      {bubble !== undefined ? <div data-slot="companion-stage-bubble" className="absolute bottom-3 left-2 z-10 flex max-w-[min(80%,22rem)] items-start gap-2 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm">
+      {heard !== undefined || bubble !== undefined ? <div className="absolute bottom-3 left-2 z-10 flex max-w-[min(80%,22rem)] flex-col items-start gap-1.5">
+        {heard !== undefined ? <p data-slot="companion-stage-heard" className="line-clamp-2 px-1 text-xs text-muted-foreground">{heard}</p> : null}
+        {bubble !== undefined ? <div data-slot="companion-stage-bubble" className="flex max-w-[min(80%,22rem)] items-start gap-2 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm">
         <div className="min-w-0 flex-1">{bubble}</div>
         {onDismissBubble ? <Button variant="ghost" size="icon" className="size-7 shrink-0" aria-label={dismissLabel} onClick={onDismissBubble}><span aria-hidden="true">×</span></Button> : null}
+      </div> : null}
       </div> : null}
     </div>
 

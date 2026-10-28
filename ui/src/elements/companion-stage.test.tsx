@@ -49,3 +49,19 @@ describe("CompanionStage", () => {
     expect(view.container.querySelector('[data-slot="companion-stage-wave"] span')?.className).toContain("motion-safe:animate-pulse");
   });
 });
+
+describe("CompanionStage heard and showHeader", () => {
+  test("shows what was heard above the bubble, and hides the header visually without removing it", () => {
+    const view = render(<CompanionStage name="Tessa" stateWord="Ready" mode="idle" character={<span>c</span>} talk={<span>t</span>} heard="Hi Tessa" bubble={<p>Hello</p>} showHeader={false} />);
+    expect(view.container.querySelector('[data-slot="companion-stage-heard"]')?.textContent).toBe("Hi Tessa");
+    expect(view.getByText("Hello")).toBeTruthy();
+    const header = view.container.querySelector("header")!;
+    expect(header.className).toContain("sr-only");
+    expect(view.getByRole("status").textContent).toBe("Ready");
+  });
+  test("the header is visible by default and heard is absent without it", () => {
+    const view = render(<CompanionStage name="Tessa" mode="idle" character={<span>c</span>} talk={<span>t</span>} />);
+    expect(view.container.querySelector("header")!.className).not.toContain("sr-only");
+    expect(view.container.querySelector('[data-slot="companion-stage-heard"]')).toBeNull();
+  });
+});

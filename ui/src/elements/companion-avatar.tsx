@@ -7,8 +7,8 @@ import { Button } from "@/kit/ui/button";
 import { icons } from "@/kit/icons";
 
 type Wanted = Partial<Record<"needs_you" | "speaking" | "working" | "thinking" | "listening" | "sleeping", boolean>>;
-type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl" | "fill"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "listening" | "thinking" | "speaking" | null; animated?: boolean };
-const SIZES = { xs: "size-7", sm: "size-16", md: "size-24", lg: "size-40", xl: "size-52", fill: "size-full" } as const;
+type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl" | "header" | "fill"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "listening" | "thinking" | "speaking" | null; animated?: boolean };
+const SIZES = { xs: "size-7", sm: "size-16", md: "size-24", lg: "size-40", xl: "size-52", header: "size-10", fill: "size-full" } as const;
 
 export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null, animated = true }: Props) {
   const corner = placement === "corner";
