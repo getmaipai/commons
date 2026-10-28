@@ -60,7 +60,7 @@ export function CompanionStage({ name, stateWord, mode, character, bubble, onDis
     <div data-slot="companion-stage-character-area" className={cn("relative flex min-h-0 items-center justify-center", history ? "flex-[2]" : "flex-1")}>
       <div data-slot="companion-stage-character" className="flex h-full min-h-0 w-full items-center justify-center">{character}</div>
       {mode === "listening" ? <div data-slot="companion-stage-listening-ring" aria-hidden="true" className="pointer-events-none absolute inset-4 rounded-full border border-ring/50 motion-safe:animate-pulse" /> : null}
-      {mode === "thinking" ? <div data-slot="companion-stage-thought-cloud" aria-hidden="true" className="absolute right-[18%] top-[8%] flex h-9 w-14 items-center justify-center gap-1 rounded-[50%] border-2 border-border bg-card text-muted-foreground after:absolute after:-bottom-1 after:left-1 after:size-2 after:rounded-full after:border after:border-border after:bg-card">
+      {mode === "thinking" ? <div data-slot="companion-stage-thought-cloud" aria-hidden="true" className="absolute right-2 top-1 flex h-9 w-14 items-center justify-center gap-1 rounded-[50%] border-2 border-border bg-card text-muted-foreground after:absolute after:-bottom-1 after:left-1 after:size-2 after:rounded-full after:border after:border-border after:bg-card">
         {[0, 1, 2].map((dot) => <i key={dot} data-slot="companion-stage-thought-dot" className="size-1.5 rounded-full bg-current motion-safe:animate-bounce" style={{ animationDelay: `${dot * 150}ms` }} />)}
       </div> : null}
       {!history && (heard !== undefined || bubble !== undefined) ? <div className="absolute bottom-3 left-2 z-10 flex max-w-[min(80%,22rem)] flex-col items-start gap-1.5">

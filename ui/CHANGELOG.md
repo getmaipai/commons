@@ -1,3 +1,7 @@
+## [ui-v0.5.413] - 2026-10-28
+
+- `CompanionStage`: the thinking cloud sits in the top right corner of the character area so it no longer covers the character's face. No prop changes.
+
 ## [ui-v0.5.412] - 2026-10-28
 
 - `CompanionStage` gains `history` (oldest first: `id`, `role` "user" or "companion", `content`, optional `time`) and `historyLabel`: a scrollable log of friendly bubbles under the character that opens at the newest message, replacing the floating bubble and "heard" line while set. The thinking cloud now holds three bouncing dots (still only with motion allowed) instead of being empty. Additive; no prop removed.
