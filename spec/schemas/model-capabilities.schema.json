@@ -59,6 +59,40 @@
       },
       "description": "Absent for a placeholder entry with nowhere to download from yet."
     },
+    "origin": {
+      "type": "string",
+      "enum": ["shipped", "added"],
+      "description": "MODEL-ADD-01: 'shipped' for a record in Home's catalog, 'added' for one an admin added from a Hugging Face link. Absent means shipped."
+    },
+    "added_by": {
+      "type": "string",
+      "minLength": 1,
+      "description": "MODEL-ADD-01: the person id of the admin who added the model. Present only when origin is 'added'. Never written to a log line or an admin status line."
+    },
+    "added_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "MODEL-ADD-01: when an admin added the model. Present only when origin is 'added'."
+    },
+    "sampling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "description": "MODEL-ADD-01 and design rule 3: the sampling this model runs on. Every field but source is optional and a missing field sends nothing, so the engine's own default applies. 'source' names where the values came from.",
+      "properties": {
+        "temperature": { "type": "number", "minimum": 0, "maximum": 2 },
+        "top_p": { "type": "number", "minimum": 0, "maximum": 1 },
+        "top_k": { "type": "integer", "minimum": 0 },
+        "min_p": { "type": "number", "minimum": 0, "maximum": 1 },
+        "presence_penalty": { "type": "number", "minimum": -2, "maximum": 2 },
+        "xtc_probability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "xtc_threshold": { "type": "number", "minimum": 0, "maximum": 1 },
+        "dry_multiplier": { "type": "number", "minimum": 0 },
+        "dry_base": { "type": "number", "minimum": 0 },
+        "dry_allowed_length": { "type": "integer", "minimum": 0 },
+        "source": { "type": "string", "minLength": 1 }
+      }
+    },
     "image_input": {
       "type": "object",
       "additionalProperties": false,

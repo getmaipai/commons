@@ -1,3 +1,7 @@
+## [spec-v0.1.253] - 2026-10-27
+
+- MODEL-ADD-01: `ModelCapabilities` gains `origin` (`shipped` | `added`), `added_by`, `added_at` and `sampling` (the sampling fields Home sends today, all optional, plus a required `source`). A model an admin adds from a Hugging Face link is the same record a shipped model is.
+
 ## [spec-v0.1.252] - 2026-10-27
 
 - NEWS-04: a news story page may declare `discuss` (a `navigate` to the app's page that opens a chat about the story), beside `listen` and `summarize`. `news-story` declares it.

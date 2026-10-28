@@ -97,6 +97,49 @@ export const ModelCapabilities = z
         "Absent for a placeholder entry with nowhere to download from yet.",
       )
       .optional(),
+    /**MODEL-ADD-01: 'shipped' for a record in Home's catalog, 'added' for one an admin added from a Hugging Face link. Absent means shipped.*/
+    origin: z
+      .enum(["shipped", "added"])
+      .describe(
+        "MODEL-ADD-01: 'shipped' for a record in Home's catalog, 'added' for one an admin added from a Hugging Face link. Absent means shipped.",
+      )
+      .optional(),
+    /**MODEL-ADD-01: the person id of the admin who added the model. Present only when origin is 'added'. Never written to a log line or an admin status line.*/
+    added_by: z
+      .string()
+      .min(1)
+      .describe(
+        "MODEL-ADD-01: the person id of the admin who added the model. Present only when origin is 'added'. Never written to a log line or an admin status line.",
+      )
+      .optional(),
+    /**MODEL-ADD-01: when an admin added the model. Present only when origin is 'added'.*/
+    added_at: z
+      .string()
+      .datetime({ offset: true })
+      .describe(
+        "MODEL-ADD-01: when an admin added the model. Present only when origin is 'added'.",
+      )
+      .optional(),
+    /**MODEL-ADD-01 and design rule 3: the sampling this model runs on. Every field but source is optional and a missing field sends nothing, so the engine's own default applies. 'source' names where the values came from.*/
+    sampling: z
+      .object({
+        temperature: z.number().gte(0).lte(2).optional(),
+        top_p: z.number().gte(0).lte(1).optional(),
+        top_k: z.number().int().gte(0).optional(),
+        min_p: z.number().gte(0).lte(1).optional(),
+        presence_penalty: z.number().gte(-2).lte(2).optional(),
+        xtc_probability: z.number().gte(0).lte(1).optional(),
+        xtc_threshold: z.number().gte(0).lte(1).optional(),
+        dry_multiplier: z.number().gte(0).optional(),
+        dry_base: z.number().gte(0).optional(),
+        dry_allowed_length: z.number().int().gte(0).optional(),
+        source: z.string().min(1),
+      })
+      .strict()
+      .describe(
+        "MODEL-ADD-01 and design rule 3: the sampling this model runs on. Every field but source is optional and a missing field sends nothing, so the engine's own default applies. 'source' names where the values came from.",
+      )
+      .optional(),
     /**VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).*/
     image_input: z
       .object({

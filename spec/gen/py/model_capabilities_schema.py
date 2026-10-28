@@ -8,6 +8,7 @@ from typing import Literal
 
 from pydantic import (
     AnyUrl,
+    AwareDatetime,
     BaseModel,
     ConfigDict,
     Field,
@@ -30,6 +31,27 @@ class Download(BaseModel):
     url: AnyUrl
     sha256: constr(pattern=r'^[a-f0-9]{64}$')
     approx_bytes: conint(ge=1)
+
+
+class Sampling(BaseModel):
+    """
+    MODEL-ADD-01 and design rule 3: the sampling this model runs on. Every field but source is optional and a missing field sends nothing, so the engine's own default applies. 'source' names where the values came from.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    temperature: confloat(ge=0.0, le=2.0) | None = None
+    top_p: confloat(ge=0.0, le=1.0) | None = None
+    top_k: conint(ge=0) | None = None
+    min_p: confloat(ge=0.0, le=1.0) | None = None
+    presence_penalty: confloat(ge=-2.0, le=2.0) | None = None
+    xtc_probability: confloat(ge=0.0, le=1.0) | None = None
+    xtc_threshold: confloat(ge=0.0, le=1.0) | None = None
+    dry_multiplier: confloat(ge=0.0) | None = None
+    dry_base: confloat(ge=0.0) | None = None
+    dry_allowed_length: conint(ge=0) | None = None
+    source: constr(min_length=1)
 
 
 class Download1(BaseModel):
@@ -303,6 +325,22 @@ class ModelCapabilities(BaseModel):
     download: Download | None = Field(
         None,
         description='Absent for a placeholder entry with nowhere to download from yet.',
+    )
+    origin: Literal['shipped', 'added'] | None = Field(
+        None,
+        description="MODEL-ADD-01: 'shipped' for a record in Home's catalog, 'added' for one an admin added from a Hugging Face link. Absent means shipped.",
+    )
+    added_by: constr(min_length=1) | None = Field(
+        None,
+        description="MODEL-ADD-01: the person id of the admin who added the model. Present only when origin is 'added'. Never written to a log line or an admin status line.",
+    )
+    added_at: AwareDatetime | None = Field(
+        None,
+        description="MODEL-ADD-01: when an admin added the model. Present only when origin is 'added'.",
+    )
+    sampling: Sampling | None = Field(
+        None,
+        description="MODEL-ADD-01 and design rule 3: the sampling this model runs on. Every field but source is optional and a missing field sends nothing, so the engine's own default applies. 'source' names where the values came from.",
     )
     image_input: ImageInput | None = Field(
         None,
