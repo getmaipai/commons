@@ -11,7 +11,7 @@ export const ApiKey = z
     person_id: z.string().regex(new RegExp("^person-[a-z0-9]{6,}$")),
     name: z.string().min(1).max(60),
     scopes: z
-      .array(z.enum(["turn", "code", "settings"]))
+      .array(z.enum(["turn", "code", "settings", "diagnose"]))
       .min(1)
       .refine(
         (arr) => arr.every((item, i) => arr.indexOf(item) == i),

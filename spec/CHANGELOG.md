@@ -1,3 +1,7 @@
+## [spec-v0.1.265] - 2026-10-28
+
+- DIAG-KEY-01: `api-key.scopes` gains `diagnose`, a read-only key an owner or admin makes so an assistant session can read turn timings and engine state to find out why chat is slow. Never message text, people or settings changes. Additive; a key with only `turn`, `code` or `settings` is unchanged.
+
 ## [spec-v0.1.264] - 2026-10-28
 
 - NAT-06b: `TurnSignal` gains an optional `wants_advice` (`yes` or `no`): the person asked for advice, or asked to be heard instead. Absent when the turn said neither. Additive; nothing existing changes.

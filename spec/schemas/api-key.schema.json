@@ -41,7 +41,8 @@
         "enum": [
           "turn",
           "code",
-          "settings"
+          "settings",
+          "diagnose"
         ]
       }
     },
