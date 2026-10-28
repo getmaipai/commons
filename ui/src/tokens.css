@@ -322,6 +322,15 @@
 @media (min-width: 1024px) {
   [data-slot="schema-page-body"]:has([data-slot="article-sticky-header"]) [data-slot="story-feed"] { padding-inline: 2rem; }
 }
+/* The pinned source row swaps its publisher for the story title once the headline scrolls under it: the new label eases in. */
+@keyframes article-provider-label-in {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: none; }
+}
+[data-slot="article-provider-label"] { animation: article-provider-label-in 200ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="article-provider-label"] { animation: none; }
+}
 /* WORKSPACE-FILL-02: and it is bounded to the viewport, like a chat's: the sticky column stays put and the page's own content is
  * the one scroller, so a sticky bar inside it (the article toolbar) stays at the top of the content instead of scrolling away with
  * the document. A marked page is a flex child that may shrink, so its content scrolls inside it. */
@@ -800,7 +809,8 @@
   [data-slot="article-toolbar"] > button { min-width: 44px; min-height: 44px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }
   [data-slot="article-actions"] { height: 44px; gap: 0; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }
   [data-slot="article-actions"] button { width: 44px; min-width: 44px; height: 44px; min-height: 44px; border-radius: 999px; }
-  [data-slot="article-provider"] { background: transparent; font-size: 1rem; }
+  [data-slot="article-provider"] { background: var(--muted); font-size: 1rem; }
+  [data-slot="article-provider"][data-condensed] { justify-content: flex-start; padding-inline: 4.5rem 12rem; }
   [data-slot="article-title"] { font-size: 1.5rem; font-weight: 600; line-height: 1.2; letter-spacing: 0; }
   [data-slot="article-dek"] { font-size: 1.25rem; }
   [data-slot="article-provider"] + header > p.text-muted-foreground { font-size: 0.875rem; }

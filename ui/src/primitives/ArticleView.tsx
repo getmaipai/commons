@@ -1,5 +1,5 @@
 import { getIcon } from "@/kit/icons";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
@@ -154,6 +154,8 @@ type TextSizeId = (typeof TEXT_SIZES)[number]["id"];
 /** One tap steps the size: Default, then Larger, then Smaller, then Default again. */
 const NEXT_SIZE: Record<TextSizeId, TextSizeId> = { medium: "large", large: "small", small: "medium" };
 const TEXT_SIZE_KEY = "maipai.article.text-size";
+/** The pinned source row is h-14. */
+const PINNED_ROW_PX = 56;
 
 function readTextSize(): TextSizeId {
   try {
@@ -179,6 +181,19 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
   const [textSize, setTextSize] = useState<TextSizeId>(readTextSize);
   const [iconFailed, setIconFailed] = useState(false);
+  // Once the headline has scrolled up under the pinned row, the row names the story instead of the publisher.
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [condensed, setCondensed] = useState(false);
+  useEffect(() => {
+    const node = titleRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry) setCondensed(!entry.isIntersecting && entry.boundingClientRect.top < PINNED_ROW_PX); },
+      { rootMargin: `-${PINNED_ROW_PX}px 0px 0px 0px` },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [data.title]);
   const chooseSize = (id: TextSizeId) => {
     setTextSize(id);
     try { window.localStorage.setItem(TEXT_SIZE_KEY, id); } catch { /* not kept this time */ }
@@ -224,24 +239,34 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       </div>
       {data.byline ? (
-        <div data-slot="article-provider" className="flex h-14 w-full items-center justify-center gap-3 bg-muted px-0 py-0 text-center text-2xl font-semibold">
-          <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className="size-11 shrink-0 rounded-xl" onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
-          <span>{data.byline.publisher}</span>
+        <div data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", condensed ? "px-16 md:px-48" : "px-4")}>
+          <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className={cn("shrink-0 rounded-xl transition-[width,height] duration-200", condensed ? "size-8" : "size-11")} onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
+          <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", condensed && "truncate text-lg leading-tight")}>{condensed ? data.title : data.byline.publisher}</span>
         </div>
       ) : null}
-      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:px-8">
+      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-[calc(72ch+22rem)] lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1">
       <header className="flex flex-col gap-2">
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
-        <h2 data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
+        <h2 ref={titleRef} data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
-      {hasAssist ? (
-        <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex flex-wrap gap-2">
-          {can("listen") ? <Button variant="outline" size="sm" onClick={() => fire("listen")}><HeadphonesIcon aria-hidden />Listen</Button> : null}
-          {can("summarize") && !data.key_points ? <Button variant="outline" size="sm" onClick={() => fire("summarize")}><ListIcon aria-hidden />Key points</Button> : null}
-          {can("discuss") ? <Button variant="outline" size="sm" onClick={() => fire("discuss")}><MessageIcon aria-hidden />Discuss</Button> : null}
+      {hasAssist || data.key_points ? (
+        <div data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start lg:[grid-row:1/span_99] lg:col-start-2">
+        {hasAssist ? (
+          <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex flex-wrap gap-2 lg:flex-col">
+            {can("listen") ? <Button variant="outline" size="sm" onClick={() => fire("listen")}><HeadphonesIcon aria-hidden />Listen</Button> : null}
+            {can("summarize") && !data.key_points ? <Button variant="outline" size="sm" onClick={() => fire("summarize")}><ListIcon aria-hidden />Key points</Button> : null}
+            {can("discuss") ? <Button variant="outline" size="sm" onClick={() => fire("discuss")}><MessageIcon aria-hidden />Discuss</Button> : null}
+          </div>
+        ) : null}
+        {data.key_points ? (
+          <section data-slot="key-points" aria-label="Key points" className="flex w-full flex-col gap-1 rounded-lg bg-muted p-4">
+            <h3 className="text-sm font-semibold">Key points</h3>
+            <p className="whitespace-pre-line">{data.key_points.text}</p>
+          </section>
+        ) : null}
         </div>
       ) : null}
       {data.image ? (
@@ -250,13 +275,6 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
             <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} focal={data.image.focal} className="absolute inset-0 size-full object-cover" />
           </AspectRatio>
         </div>
-      ) : null}
-      {data.key_points ? (
-        <section data-slot="key-points" aria-label="Key points" className="mx-auto flex w-full max-w-[72ch] flex-col gap-1 rounded-lg bg-muted p-4">
-          <h3 className="text-sm font-semibold">Key points</h3>
-          <p className="whitespace-pre-line">{data.key_points.text}</p>
-          <p className="text-muted-foreground text-xs">Written on this hub from the article.</p>
-        </section>
       ) : null}
       <div data-slot="article-body" data-text-size={textSize} className={cn("flex w-full min-w-0 flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
         {data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}

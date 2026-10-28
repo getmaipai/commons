@@ -1,3 +1,7 @@
+## [ui-v0.5.404] - 2026-10-28
+
+- `ArticleView`: Listen, Key points and Discuss move into a right-hand rail that stays pinned beside the article from `lg` up and ends where the article ends (below `lg` they stay under the headline). The source row now pins under the toolbar and swaps the publisher for the story title (with the source icon, easing in) once the headline scrolls under it. The "Written on this hub from the article." line is gone. No prop changes.
+
 ## [ui-v0.5.403] - 2026-10-28
 
 - `WeatherForecastPage` takes an optional `summary` (one or two written sentences drawn under the hero). The advice chips row now opens with a "Recommended" lead label. `WeatherCard` draws no attribution text when `attribution` is empty. Fixed the pressure gauge: its value arc asked for a large arc it never spans, so it drew on the wrong circle for readings above the midpoint. Additive.

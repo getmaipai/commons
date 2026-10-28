@@ -39,7 +39,7 @@ describe("ArticleView", () => {
     expect(container.querySelector('[data-slot="article-body"]')!.className).not.toContain("mx-auto");
     expect(article.className).not.toContain("max-w-prose");
     expect(stickyHeader.className).toContain("sticky");
-    expect(provider.className).not.toContain("sticky");
+    expect(provider.className).toContain("sticky");
     expect(column.contains(container.querySelector("header"))).toBe(true);
     expect(column.contains(container.querySelector('[data-slot="article-body"]'))).toBe(true);
     expect(container.querySelector("header")?.textContent).toContain("3 sources");
@@ -59,7 +59,7 @@ describe("ArticleView", () => {
     expect(queryByText("Open original")).toBeNull();
   });
 
-  test("controls stay pinned flush at the top, overlaying the start of the article, whose publisher row scrolls with it", () => {
+  test("controls stay pinned flush at the top, overlaying the start of the article, whose publisher row pins under them", () => {
     const withIcon = { ...data, sourceIconUrl: "/api/favicon?domain=example.com" };
     const view = render(<ArticleView data={withIcon} onBack={() => {}} />);
     const provider = view.container.querySelector('[data-slot="article-provider"]')!;
@@ -77,7 +77,7 @@ describe("ArticleView", () => {
     expect(toolbar.className).toContain("bg-transparent");
     expect(toolbar.className).toContain("px-0");
     expect(provider.className).toContain("w-full");
-    expect(provider.className).toContain("px-0");
+    expect(provider.className).toContain("px-4");
     expect(provider.className).not.toMatch(/-mx-|pt-14/);
     expect(view.container.querySelector('[data-slot="article-view"]')!.className).not.toContain("px-4");
     expect(view.container.querySelector('[data-slot="article-column"]')!.className).toContain("px-4");
@@ -200,5 +200,40 @@ describe("ArticleView", () => {
   test("the heading ids the table of contents scrolls to are on the headings", () => {
     const { container } = render(<ArticleView data={{ ...data, blocks: [{ type: "heading", level: 3, id: "sec-two", text: "Two" }] }} />);
     expect(container.querySelector("h3#sec-two")?.className).toContain("scroll-mt-6");
+  });
+
+  test("Listen, Key points and Discuss live in a sticky right rail that ends with the article, and the hub note is gone", () => {
+    const { container } = render(<ArticleView data={data} onAction={() => {}} available={["listen", "discuss"]} />);
+    const rail = container.querySelector('[data-slot="article-rail"]')!;
+    expect(rail.className).toContain("lg:sticky");
+    expect(rail.contains(container.querySelector('[data-slot="article-assist"]'))).toBe(true);
+    expect(rail.contains(container.querySelector('[data-slot="key-points"]'))).toBe(true);
+    expect(container.querySelector('[data-slot="article-column"]')!.contains(rail)).toBe(true);
+    expect(container.textContent).not.toContain("Written on this hub");
+  });
+
+  test("the pinned source row swaps the publisher for the story title once the headline scrolls under it", async () => {
+    const callbacks: Array<(entries: unknown[]) => void> = [];
+    const original = globalThis.IntersectionObserver;
+    globalThis.IntersectionObserver = class {
+      constructor(cb: (entries: unknown[]) => void) { callbacks.push(cb); }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+      takeRecords() { return []; }
+    } as unknown as typeof IntersectionObserver;
+    try {
+      const { container } = render(<ArticleView data={data} />);
+      const provider = container.querySelector('[data-slot="article-provider"]')!;
+      expect(provider.textContent).toBe("Example Wire");
+      const { act } = await import("@testing-library/react");
+      act(() => callbacks[0]!([{ isIntersecting: false, boundingClientRect: { top: -80 } }]));
+      expect(provider.getAttribute("data-condensed")).toBe("true");
+      expect(provider.textContent).toBe(data.title);
+      act(() => callbacks[0]!([{ isIntersecting: true, boundingClientRect: { top: 200 } }]));
+      expect(provider.textContent).toBe("Example Wire");
+    } finally {
+      globalThis.IntersectionObserver = original;
+    }
   });
 });
