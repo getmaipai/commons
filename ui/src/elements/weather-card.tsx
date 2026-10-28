@@ -222,7 +222,7 @@ export function WeatherCard({
         <div aria-hidden className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--weather-scrim)" }} />
         <div aria-hidden className="flex items-start justify-between gap-3">
           <span className="text-[11px] font-medium tracking-[0.14em] uppercase">{place}</span>
-          <span className="text-end text-[11px]">{attribution}</span>
+          {attribution ? <span className="text-end text-[11px]">{attribution}</span> : null}
         </div>
         <div aria-hidden className="flex items-end justify-between gap-3">
           <span className={cn("leading-none font-light tabular-nums", compact ? "text-5xl" : "text-[64px]")}>

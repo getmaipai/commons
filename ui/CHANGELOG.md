@@ -1,3 +1,7 @@
+## [ui-v0.5.403] - 2026-10-28
+
+- `WeatherForecastPage` takes an optional `summary` (one or two written sentences drawn under the hero). The advice chips row now opens with a "Recommended" lead label. `WeatherCard` draws no attribution text when `attribution` is empty. Fixed the pressure gauge: its value arc asked for a large arc it never spans, so it drew on the wrong circle for readings above the midpoint. Additive.
+
 ## [ui-v0.5.402] - 2026-10-28
 
 - `CompanionAvatar` ring is easier to see: a 4px border in the primary colour (was 2px foreground at low opacity), a wider gap, and a glow while speaking. Props and states are unchanged.

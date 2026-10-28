@@ -24,7 +24,8 @@ export interface WeatherAlert {
 export function WeatherAdviceChips({ advice }: { advice?: readonly WeatherAdvice[] }) {
   if (!advice?.length) return null;
   return (
-    <ul data-slot="weather-advice" aria-label="Advice" className="flex flex-wrap gap-2">
+    <ul data-slot="weather-advice" aria-label="Recommended" className="flex flex-wrap items-center gap-2">
+      <li data-slot="weather-advice-lead" aria-hidden className="text-xs font-medium tracking-wide uppercase opacity-70">Recommended</li>
       {advice.map((item) => {
         const Icon = item.icon && item.icon in icons ? getIcon(item.icon) : null;
         return (

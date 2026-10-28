@@ -254,3 +254,18 @@ describe("detail grid at phone width (regression: a col-span-2 tile created a se
     expect(plain.container.innerHTML).toBe(html);
   });
 });
+
+describe("weather page polish", () => {
+  const place = (extra: object) => [{ id: "a", city: "Sage Town", detail: { temp: 60, condition: "Clear", code: 0, isDay: true, high: 70, low: 50, ...extra } } as never];
+  test("draws the written summary and a Recommended lead before the advice chips", () => {
+    const { container } = render(<WeatherForecastPage locations={place({})} selectedId="a" advice={[{ id: "jacket", label: "Jacket" }]} summary="A clear, cool day." />);
+    expect(container.textContent).toContain("A clear, cool day.");
+    expect(container.querySelector("[data-slot=weather-advice-lead]")?.textContent).toBe("Recommended");
+  });
+  test("the pressure gauge never asks for a large arc", () => {
+    const { container } = render(<WeatherForecastPage locations={place({ pressure: 1033 })} selectedId="a" />);
+    const paths = [...container.querySelectorAll("[data-slot=weather-pressure-gauge] path")].map((p) => p.getAttribute("d"));
+    expect(paths.length).toBe(2);
+    expect(paths[1]).toMatch(/A82 82 0 0 1 /);
+  });
+});

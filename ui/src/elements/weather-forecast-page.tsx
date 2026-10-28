@@ -41,6 +41,8 @@ export interface WeatherForecastPageProps {
   searchResults?: readonly WeatherLocation[]; unit?: "F" | "C"; locale?: string; className?: string; labels?: Partial<WeatherForecastPageLabels>;
   /** Advice chips for the selected place, drawn under the current conditions. Absent or empty: nothing extra. */
   advice?: readonly WeatherAdvice[];
+  /** One or two written sentences about the day, drawn under the hero. */
+  summary?: string;
   /** An alert banner for the selected place, drawn above the forecast. Absent: nothing extra. */
   alert?: WeatherAlert;
 }
@@ -62,8 +64,7 @@ function PressureGauge({ value }: { value: number }) {
   const pct = Math.max(0, Math.min(1, (value - 980) / 70));
   const angle = Math.PI * (1 - pct);
   const x = 100 + 82 * Math.cos(angle); const y = 92 - 82 * Math.sin(angle);
-  const largeArc = pct > 0.5 ? 1 : 0;
-  return <svg data-slot="weather-pressure-gauge" viewBox="0 0 200 106" className="mt-2 h-14 w-full" role="img" aria-label={`Pressure ${value} hPa`}><path d="M18 92 A82 82 0 0 1 182 92" fill="none" stroke="var(--muted)" strokeWidth="10" strokeLinecap="round"/><path d={`M18 92 A82 82 0 ${largeArc} 1 ${x} ${y}`} fill="none" stroke="var(--primary)" strokeWidth="10" strokeLinecap="round"/><circle cx={x} cy={y} r="6" fill="var(--primary)" stroke="var(--card)" strokeWidth="3"/><text x="12" y="105" fontSize="9" fill="currentColor">980</text><text x="188" y="105" textAnchor="end" fontSize="9" fill="currentColor">1050 hPa</text></svg>;
+  return <svg data-slot="weather-pressure-gauge" viewBox="0 0 200 106" className="mt-2 h-14 w-full" role="img" aria-label={`Pressure ${value} hPa`}><path d="M18 92 A82 82 0 0 1 182 92" fill="none" stroke="var(--muted)" strokeWidth="10" strokeLinecap="round"/><path d={`M18 92 A82 82 0 0 1 ${x} ${y}`} fill="none" stroke="var(--primary)" strokeWidth="10" strokeLinecap="round"/><circle cx={x} cy={y} r="6" fill="var(--primary)" stroke="var(--card)" strokeWidth="3"/><text x="12" y="105" fontSize="9" fill="currentColor">980</text><text x="188" y="105" textAnchor="end" fontSize="9" fill="currentColor">1050 hPa</text></svg>;
 }
 export function formatLocalTime(value: string, timeZone?: string, locale = "en-US"): string {
   const date = new Date(value);
@@ -146,7 +147,7 @@ function LocationSky({ location, labels }: { location: WeatherLocation; labels: 
     <div><span className="block text-4xl font-light tabular-nums">{deg(detail.temp)}</span><span className="text-xs">{detail.condition}{detail.high !== undefined && detail.low !== undefined ? ` · H ${deg(detail.high)} L ${deg(detail.low)}` : ""}</span></div>
   </div>;
 }
-export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch, onAddLocation, onRemoveLocation, onSelectResult, searchResults = [], unit = "F", locale = "en-US", className, labels: labelsProp, advice, alert }: WeatherForecastPageProps) {
+export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch, onAddLocation, onRemoveLocation, onSelectResult, searchResults = [], unit = "F", locale = "en-US", className, labels: labelsProp, advice, summary, alert }: WeatherForecastPageProps) {
   const labels = { ...weatherForecastPageDefaultLabels, ...labelsProp }; const [mobileDetail, setMobileDetail] = useState(false); const [metric, setMetric] = useState<"temperature" | "precipitation" | "wind">("temperature");
   const uniqueLocations = useMemo(() => dedupeLocations(locations), [locations]);
   const selected = uniqueLocations.find((l) => l.id === selectedId) ?? uniqueLocations.find((l) => l.isMyLocation) ?? uniqueLocations[0]; const d = selected?.detail;
@@ -174,6 +175,7 @@ export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch,
           <div className="mb-7 flex items-start justify-between gap-4"><div><p className="text-xl font-medium">{selected.city}{selected.state ? `, ${selected.state}` : ""}</p><p className="text-sm opacity-80">{selected.localTime ?? ""}{selected.timezone ? ` · ${selected.timezone}` : ""}</p></div><p className="text-xs opacity-80">Updated {d.hourly?.[0]?.time ? formatLocalTime(d.hourly[0].time, selected.timezone, locale) : "recently"}</p></div>
           <p className="text-7xl leading-none font-light tabular-nums">{deg(d.temp)}<span className="text-3xl">{unit}</span></p><p className="mt-3 text-lg">{d.condition}</p><p className="mt-1 text-sm">{d.high !== undefined && d.low !== undefined ? `H ${deg(d.high)} · L ${deg(d.low)}` : ""}</p>
         </section>
+        {summary ? <p data-slot="weather-forecast-summary" className="mb-4 text-base leading-relaxed">{summary}</p> : null}
         {advice?.length ? <div className="mb-4"><WeatherAdviceChips advice={advice}/></div> : null}
         <div data-slot="weather-detail-grid" className="grid min-w-0 w-full grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] auto-rows-[minmax(160px,auto)] items-start gap-3">
           {d.hourly?.length ? <Tile title={labels.hourlyForecast} icon={<Thermometer className="size-4" aria-hidden/>} className="col-span-full h-auto min-h-0"><ol data-slot="weather-hourly-strip" className="flex min-w-0 gap-2 overflow-x-auto pb-2">{d.hourly.slice(0,24).map((hour,i) => { const Icon = hourlyIcon(weatherClassOf(hour.code ?? d.code), hourIsDay(hour, d, selected.timezone)); return <li key={hour.time} data-slot="weather-forecast-hour" className="flex w-16 min-w-16 shrink-0 flex-col items-center gap-2 text-sm"><span className="text-muted-foreground whitespace-nowrap">{i === 0 ? "Now" : formatLocalTime(hour.time, selected.timezone, locale).replace(/:\d{2}(?=\s|$)/, "")}</span><Icon className="size-5" aria-hidden/><b className="tabular-nums">{deg(hour.temp)}{unit}</b><span className="text-primary h-4 text-xs">{hour.pop !== undefined && hour.pop >= 10 ? `${hour.pop}%` : " "}</span></li>; })}</ol></Tile> : null}
