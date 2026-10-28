@@ -201,6 +201,10 @@ class TurnSignal(BaseModel):
         ...,
         description="Orthogonal to the act: 'no, Friday, not Thursday' is still an inform. CHAT-13's rejected-subject rule and the memory supersede path read this.",
     )
+    wants_advice: Literal['yes', 'no'] | None = Field(
+        None,
+        description="NAT-06b. Whether the person asked for advice (`yes`: 'what should I do', 'any advice') or asked to be heard instead (`no`: 'I just need to vent', 'I don't want advice'). Absent when the turn said neither, which is the usual case: precision wins, so the field is never guessed from tone. The reply plan reads it on an emotional turn only.",
+    )
     refers_to_prior: bool | None = Field(
         None,
         description="Whether the turn leans on a previous turn (a bare pronoun, ellipsis, a reflected question), read from CHAT-13's resolver, never recomputed here. Absent (null) until CHAT-13 lands; the coherence review states this explicitly on the schema rather than leaving it implied.",

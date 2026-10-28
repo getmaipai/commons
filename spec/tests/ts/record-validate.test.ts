@@ -278,6 +278,13 @@ describe("turn signal rules", () => {
     expect(validateTurnSignal(turnSignal())).toEqual([]);
   });
 
+  test("wants_advice is optional and takes only yes or no (NAT-06b)", () => {
+    expect(TurnSignalSchema.safeParse(turnSignal()).success).toBe(true);
+    expect(TurnSignalSchema.safeParse({ ...turnSignal(), wants_advice: "yes" }).success).toBe(true);
+    expect(TurnSignalSchema.safeParse({ ...turnSignal(), wants_advice: "no" }).success).toBe(true);
+    expect(TurnSignalSchema.safeParse({ ...turnSignal(), wants_advice: "maybe" }).success).toBe(false);
+  });
+
   test("source: head must carry a classifier_id", () => {
     expect(validateTurnSignal({ ...turnSignal(), source: "head", classifier_id: null })).toContainEqual(
       expect.stringContaining("must carry a classifier_id"),
