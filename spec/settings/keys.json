@@ -5195,7 +5195,7 @@
     "label": "Let teens find podcasts",
     "help": "Lets teens search the podcast directory too, once finding podcasts is on. Children never can.",
     "copy": {
-      "does": "Lets teens search the podcast directory."
+      "does": "Turns on podcast directory search for the younger members."
     },
     "level": "basic",
     "secret": false,
