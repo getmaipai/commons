@@ -52,6 +52,10 @@ export interface ArticleViewData {
   saved?: boolean;
 }
 
+const CONDENSE_LEAD_PX = 72;
+const SUMMARY_RETRIES = 6;
+const SUMMARY_RETRY_MS = 10_000;
+
 export type ArticleAction = "listen" | "save" | "summarize" | "open_site" | "open" | "discuss";
 
 export interface ArticleViewProps {
@@ -188,7 +192,9 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       const title = titleRef.current;
       const row = providerRef.current;
       if (!title || !row) return;
-      setCondensed(title.getBoundingClientRect().bottom < row.getBoundingClientRect().bottom);
+      // Swaps a little before the headline reaches the row (a headline's worth of lead), so the row is ready as the title leaves.
+      const rowBottom = row.getBoundingClientRect().bottom;
+      setCondensed(rowBottom > 0 && title.getBoundingClientRect().bottom < rowBottom + CONDENSE_LEAD_PX);
     };
     measure();
     document.addEventListener("scroll", measure, { capture: true, passive: true });
@@ -210,10 +216,17 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const summarizing = can("summarize") && !data.key_points;
   const askedFor = useRef<string | null>(null);
   const askKey = `${ids?.item_id ?? ""}|${ids?.story_id ?? ""}|${data.title}`;
+  // Not ready yet is never an error: the rail keeps showing progress and the ask repeats quietly a few times.
   useEffect(() => {
-    if (!summarizing || askedFor.current === askKey) return;
-    askedFor.current = askKey;
-    fire("summarize");
+    if (!summarizing) return;
+    if (askedFor.current !== askKey) { askedFor.current = askKey; fire("summarize"); }
+    let tries = 0;
+    const again = window.setInterval(() => {
+      tries += 1;
+      if (tries > SUMMARY_RETRIES) { window.clearInterval(again); return; }
+      fire("summarize");
+    }, SUMMARY_RETRY_MS);
+    return () => window.clearInterval(again);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [summarizing, askKey]);
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
@@ -253,12 +266,12 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       </div>
       {data.byline ? (
-        <div ref={providerRef} data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", condensed ? "px-16 md:px-48" : "px-4")}>
-          <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className={cn("shrink-0 rounded-xl transition-[width,height] duration-200", condensed ? "size-8" : "size-11")} onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
+        <div ref={providerRef} data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", "transition-[padding] duration-300 ease-in-out", condensed ? "px-16 md:px-48" : "px-4")}>
+          <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className={cn("shrink-0 rounded-xl transition-[width,height] duration-300 ease-in-out", condensed ? "size-8" : "size-11")} onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
           <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", condensed && "truncate text-lg leading-tight")}>{condensed ? data.title : data.byline.publisher}</span>
         </div>
       ) : null}
-      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-[calc(72ch+30rem)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-x-8 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1">
+      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-[calc(72ch+32rem)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-x-14 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1">
       <header className="flex flex-col gap-2">
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}

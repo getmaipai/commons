@@ -1,3 +1,7 @@
+## [ui-v0.5.409] - 2026-10-28
+
+- `ArticleView`: the pinned row swaps to the story title earlier (about 72px before the headline reaches the row) and eases (300ms padding and icon, 320ms label fade). More space between the article and the right rail. Key points that are not ready yet keep showing progress, and the ask repeats quietly (every 10 s, six times). No prop changes.
+
 ## [ui-v0.5.408] - 2026-10-28
 
 - `ArticleView`: the pinned row swaps to the story title when the headline passes under the row itself (measured on scroll), not the window top, so it works in the shell's inner scroll pane. No prop changes.
