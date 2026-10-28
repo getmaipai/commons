@@ -120,6 +120,7 @@ def test_knowledge_search_record_fixtures_round_trip(name, model):
         ("media-progress.book.example.json", MediaProgress),
         ("media-collection.queue.example.json", MediaCollection),
         ("media-collection.watchlist.example.json", MediaCollection),
+        ("media-collection.filter.example.json", MediaCollection),
         ("offline-manifest.album.example.json", OfflineManifest),
         ("feed.podcast.example.json", Feed),
     ],

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/media-collection.schema.json",
   "title": "MediaCollection",
-  "description": "MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer).",
+  "description": "MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer). PODCAST-PORT-03: a filter is a saved episode filter; its items stay empty and its rules say which episodes match.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -32,7 +32,8 @@
         "queue",
         "playlist",
         "watchlist",
-        "pins"
+        "pins",
+        "filter"
       ]
     },
     "title": {
@@ -110,9 +111,29 @@
       "description": "Null is private. A child's collections are never shared outside the household."
     },
     "rules": {
-      "type": "null",
+      "description": "Null for every kind but filter. For kind filter, the saved episode filter: every rule given must match (AND). Omitted rules do not restrict. Evaluated by the hub against the person's own progress and the shows they can see.",
       "default": null,
-      "description": "Reserved for smart playlists; null today."
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "unplayed": { "type": "boolean", "description": "True keeps episodes not started." },
+            "in_progress": { "type": "boolean", "description": "True keeps episodes started but not finished." },
+            "saved": { "type": "boolean", "description": "True keeps episodes saved to the household file store." },
+            "min_minutes": { "type": "integer", "minimum": 0, "description": "Shortest length in minutes." },
+            "max_minutes": { "type": "integer", "minimum": 0, "description": "Longest length in minutes." },
+            "source_ids": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^msrc-[a-z0-9]{6,}$" },
+              "description": "Only episodes of these shows."
+            },
+            "released_within_days": { "type": "integer", "minimum": 1, "description": "Only episodes published in the last N days." }
+          }
+        }
+      ]
     },
     "deleted_at": {
       "type": [

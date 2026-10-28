@@ -1,3 +1,7 @@
+## [spec-v0.1.261] - 2026-10-28
+
+- PODCAST-PORT-03: `media-collection.kind` gains `filter`, a saved episode filter. `rules` was always null; it is now null or an object of optional rules (`unplayed`, `in_progress`, `saved`, `min_minutes`, `max_minutes`, `source_ids`, `released_within_days`), all of which must match. Only kind `filter` carries rules; `items` stay empty. Additive; existing collections stay valid. New fixture `media-collection.filter.example.json`.
+
 ## [spec-v0.1.260] - 2026-10-28
 
 - RADIO-01: `media-source.kind` gains `station`, a live internet radio stream. The stream address is `url`, the name is `label`, and a new optional `station` object holds `live` (always true), `favicon_url`, `tags`, `country_code`, `codec` and `bitrate_kbps`. Additive; existing sources stay valid. New fixture `media-source.station.example.json`.

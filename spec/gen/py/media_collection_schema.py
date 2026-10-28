@@ -20,9 +20,38 @@ class Item(BaseModel):
     )
 
 
+class Rules(BaseModel):
+    """
+    Null for every kind but filter. For kind filter, the saved episode filter: every rule given must match (AND). Omitted rules do not restrict. Evaluated by the hub against the person's own progress and the shows they can see.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    unplayed: bool | None = Field(None, description='True keeps episodes not started.')
+    in_progress: bool | None = Field(
+        None, description='True keeps episodes started but not finished.'
+    )
+    saved: bool | None = Field(
+        None, description='True keeps episodes saved to the household file store.'
+    )
+    min_minutes: conint(ge=0) | None = Field(
+        None, description='Shortest length in minutes.'
+    )
+    max_minutes: conint(ge=0) | None = Field(
+        None, description='Longest length in minutes.'
+    )
+    source_ids: list[constr(pattern=r'^msrc-[a-z0-9]{6,}$')] | None = Field(
+        None, description='Only episodes of these shows.'
+    )
+    released_within_days: conint(ge=1) | None = Field(
+        None, description='Only episodes published in the last N days.'
+    )
+
+
 class MediaCollection(BaseModel):
     """
-    MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer).
+    MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer). PODCAST-PORT-03: a filter is a saved episode filter; its items stay empty and its rules say which episodes match.
     """
 
     model_config = ConfigDict(
@@ -30,7 +59,9 @@ class MediaCollection(BaseModel):
     )
     id: constr(pattern=r'^mcol-[a-z0-9]{6,}$')
     person_id: constr(pattern=r'^person-[a-z0-9]{6,}$')
-    kind: Literal['liked', 'watch_later', 'queue', 'playlist', 'watchlist', 'pins']
+    kind: Literal[
+        'liked', 'watch_later', 'queue', 'playlist', 'watchlist', 'pins', 'filter'
+    ]
     title: constr(min_length=1)
     items: list[Item]
     pointer: conint(ge=0) | None = Field(
@@ -42,7 +73,10 @@ class MediaCollection(BaseModel):
         None,
         description="Null is private. A child's collections are never shared outside the household.",
     )
-    rules: None = Field(None, description='Reserved for smart playlists; null today.')
+    rules: Rules | None = Field(
+        None,
+        description="Null for every kind but filter. For kind filter, the saved episode filter: every rule given must match (AND). Omitted rules do not restrict. Evaluated by the hub against the person's own progress and the shows they can see.",
+    )
     deleted_at: AwareDatetime | None = Field(
         None,
         description='TRASH-01. Set when a person moves the record to the household trash; null while live. A trashed record is hidden everywhere and restorable until trash_until.',

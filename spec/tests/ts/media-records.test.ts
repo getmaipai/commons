@@ -48,6 +48,7 @@ const CASES: Array<[string, string, Model]> = [
   ["media-progress.book", "media-progress", MediaProgress],
   ["media-collection.queue", "media-collection", MediaCollection],
   ["media-collection.watchlist", "media-collection", MediaCollection],
+  ["media-collection.filter", "media-collection", MediaCollection],
   ["offline-manifest.album", "offline-manifest", OfflineManifest],
   ["file.fetched", "file", File],
   ["feed.podcast", "feed", Feed],
@@ -98,6 +99,10 @@ describe("Media records", () => {
     const coll = fixture("media-collection.queue");
     expect(schema("media-collection")({ ...coll, kind: "favourites" })).toBe(false);
     expect(schema("media-collection")({ ...coll, rules: { genre: "rock" } })).toBe(false);
+    const filter = fixture("media-collection.filter");
+    for (const bad of [{ rules: { genre: "rock" } }, { rules: { max_minutes: -1 } }, { rules: { source_ids: ["feed-1"] } }, { rules: { released_within_days: 0 } }]) {
+      expect(schema("media-collection")({ ...filter, ...bad }), JSON.stringify(bad)).toBe(false);
+    }
   });
 
   test("lyrics and locked fields have closed, validated shapes", () => {
