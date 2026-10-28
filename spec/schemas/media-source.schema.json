@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/media-source.schema.json",
   "title": "MediaSource",
-  "description": "MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source.",
+  "description": "MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source. RADIO-01: a station is a live internet radio stream; its stream address is url, its name is label, and the station object holds the rest.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -25,7 +25,8 @@
         "root",
         "feed",
         "channel",
-        "link"
+        "link",
+        "station"
       ]
     },
     "scope": {
@@ -105,7 +106,66 @@
       ],
       "format": "uri",
       "default": null,
-      "description": "For a channel or a link. Never logged; excluded from an export when it carries a token."
+      "description": "For a channel, a link or a station (the stream address). Never logged; excluded from an export when it carries a token."
+    },
+    "station": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "default": null,
+      "description": "For kind station: what the directory told us about the stream. live is always true; a station has no duration and no seek.",
+      "required": [
+        "live"
+      ],
+      "properties": {
+        "live": {
+          "type": "boolean",
+          "const": true
+        },
+        "favicon_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri",
+          "default": null
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "country_code": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{2}$",
+          "default": null
+        },
+        "codec": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "default": null
+        },
+        "bitrate_kbps": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "default": null
+        }
+      }
     },
     "extractor": {
       "type": [

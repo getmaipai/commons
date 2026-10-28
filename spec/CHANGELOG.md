@@ -1,3 +1,7 @@
+## [spec-v0.1.260] - 2026-10-28
+
+- RADIO-01: `media-source.kind` gains `station`, a live internet radio stream. The stream address is `url`, the name is `label`, and a new optional `station` object holds `live` (always true), `favicon_url`, `tags`, `country_code`, `codec` and `bitrate_kbps`. Additive; existing sources stay valid. New fixture `media-source.station.example.json`.
+
 ## [spec-v0.1.259] - 2026-10-28
 
 - NAT-02: `normalizeForSpeech` (TypeScript and Python) takes optional `now`, `timeZone` and `timeStyle` (`plain` or `formal`). With `plain` and a `now`, a time on the same day within 12 hours reads without its part of day ("four o'clock", not "four o'clock in the afternoon"); `formal` keeps it. No options leaves output unchanged. Additive; new fixture cases.

@@ -1,0 +1,41 @@
+{
+  "owner_person_id": null,
+  "root": null,
+  "feed_id": null,
+  "url": "https://stream.example.com/jazz.mp3",
+  "extractor": null,
+  "auto": {
+    "save": "none"
+  },
+  "speed": null,
+  "skip_intro_s": 0,
+  "skip_outro_s": 0,
+  "poll_minutes": 60,
+  "paused": false,
+  "last_checked_at": null,
+  "last_status": null,
+  "failures": 0,
+  "backoff_until": null,
+  "visible_to": "household",
+  "archive": [],
+  "deleted_at": null,
+  "trash_until": null,
+  "created_at": "2026-10-17T12:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub",
+  "id": "msrc-radio01",
+  "kind": "station",
+  "scope": "household",
+  "label": "Example Jazz Radio",
+  "station": {
+    "live": true,
+    "favicon_url": "https://stream.example.com/icon.png",
+    "tags": [
+      "jazz",
+      "instrumental"
+    ],
+    "country_code": "US",
+    "codec": "MP3",
+    "bitrate_kbps": 128
+  }
+}

@@ -43,6 +43,7 @@ const CASES: Array<[string, string, Model]> = [
   ["media-source.root", "media-source", MediaSource],
   ["media-source.feed", "media-source", MediaSource],
   ["media-source.channel", "media-source", MediaSource],
+  ["media-source.station", "media-source", MediaSource],
   ["media-progress.seconds", "media-progress", MediaProgress],
   ["media-progress.book", "media-progress", MediaProgress],
   ["media-collection.queue", "media-collection", MediaCollection],

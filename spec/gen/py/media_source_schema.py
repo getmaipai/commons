@@ -32,6 +32,22 @@ class Root(BaseModel):
     )
 
 
+class Station(BaseModel):
+    """
+    For kind station: what the directory told us about the stream. live is always true; a station has no duration and no seek.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    live: Literal[True]
+    favicon_url: AnyUrl | None = None
+    tags: list[constr(min_length=1)] = []
+    country_code: constr(pattern=r'^[A-Z]{2}$') | None = None
+    codec: constr(min_length=1) | None = None
+    bitrate_kbps: conint(ge=0) | None = None
+
+
 class Auto(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -49,14 +65,14 @@ class Auto(BaseModel):
 
 class MediaSource(BaseModel):
     """
-    MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source.
+    MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source. RADIO-01: a station is a live internet radio stream; its stream address is url, its name is label, and the station object holds the rest.
     """
 
     model_config = ConfigDict(
         extra='forbid',
     )
     id: constr(pattern=r'^msrc-[a-z0-9]{6,}$')
-    kind: Literal['root', 'feed', 'channel', 'link']
+    kind: Literal['root', 'feed', 'channel', 'link', 'station']
     scope: Literal['household', 'person']
     owner_person_id: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(
         None,
@@ -69,7 +85,11 @@ class MediaSource(BaseModel):
     )
     url: AnyUrl | None = Field(
         None,
-        description='For a channel or a link. Never logged; excluded from an export when it carries a token.',
+        description='For a channel, a link or a station (the stream address). Never logged; excluded from an export when it carries a token.',
+    )
+    station: Station | None = Field(
+        None,
+        description='For kind station: what the directory told us about the stream. live is always true; a station has no duration and no seek.',
     )
     extractor: str | None = None
     auto: Auto = Field(

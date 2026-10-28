@@ -115,6 +115,7 @@ def test_knowledge_search_record_fixtures_round_trip(name, model):
         ("media-source.root.example.json", MediaSource),
         ("media-source.feed.example.json", MediaSource),
         ("media-source.channel.example.json", MediaSource),
+        ("media-source.station.example.json", MediaSource),
         ("media-progress.seconds.example.json", MediaProgress),
         ("media-progress.book.example.json", MediaProgress),
         ("media-collection.queue.example.json", MediaCollection),

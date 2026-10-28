@@ -4,11 +4,11 @@
 
 import { z } from "zod";
 
-/**MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source.*/
+/**MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source. RADIO-01: a station is a live internet radio stream; its stream address is url, its name is label, and the station object holds the rest.*/
 export const MediaSource = z
   .object({
     id: z.string().regex(new RegExp("^msrc-[a-z0-9]{6,}$")),
-    kind: z.enum(["root", "feed", "channel", "link"]),
+    kind: z.enum(["root", "feed", "channel", "link", "station"]),
     scope: z.enum(["household", "person"]),
     /**Set when scope is person; the adult who created a household source otherwise (for saved copies' ownership).*/
     owner_person_id: z
@@ -83,23 +83,57 @@ export const MediaSource = z
       ])
       .describe("For kind feed: the feed record (purpose podcast).")
       .default(null),
-    /**For a channel or a link. Never logged; excluded from an export when it carries a token.*/
+    /**For a channel, a link or a station (the stream address). Never logged; excluded from an export when it carries a token.*/
     url: z
       .union([
         z
           .string()
           .url()
           .describe(
-            "For a channel or a link. Never logged; excluded from an export when it carries a token.",
+            "For a channel, a link or a station (the stream address). Never logged; excluded from an export when it carries a token.",
           ),
         z
           .null()
           .describe(
-            "For a channel or a link. Never logged; excluded from an export when it carries a token.",
+            "For a channel, a link or a station (the stream address). Never logged; excluded from an export when it carries a token.",
           ),
       ])
       .describe(
-        "For a channel or a link. Never logged; excluded from an export when it carries a token.",
+        "For a channel, a link or a station (the stream address). Never logged; excluded from an export when it carries a token.",
+      )
+      .default(null),
+    /**For kind station: what the directory told us about the stream. live is always true; a station has no duration and no seek.*/
+    station: z
+      .union([
+        z
+          .object({
+            live: z.literal(true),
+            favicon_url: z.union([z.string().url(), z.null()]),
+            tags: z
+              .array(z.string().min(1))
+              .refine(
+                (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                "All items must be unique!",
+              ),
+            country_code: z.union([
+              z.string().regex(new RegExp("^[A-Z]{2}$")),
+              z.null(),
+            ]),
+            codec: z.union([z.string().min(1), z.null()]),
+            bitrate_kbps: z.union([z.number().int().gte(0), z.null()]),
+          })
+          .strict()
+          .describe(
+            "For kind station: what the directory told us about the stream. live is always true; a station has no duration and no seek.",
+          ),
+        z
+          .null()
+          .describe(
+            "For kind station: what the directory told us about the stream. live is always true; a station has no duration and no seek.",
+          ),
+      ])
+      .describe(
+        "For kind station: what the directory told us about the stream. live is always true; a station has no duration and no seek.",
       )
       .default(null),
     extractor: z.union([z.string(), z.null()]).default(null),
@@ -282,6 +316,6 @@ export const MediaSource = z
   })
   .strict()
   .describe(
-    "MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source.",
+    "MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source. RADIO-01: a station is a live internet radio stream; its stream address is url, its name is label, and the station object holds the rest.",
   );
 export type MediaSource = z.infer<typeof MediaSource>;
