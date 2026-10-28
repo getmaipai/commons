@@ -1,0 +1,7 @@
+{
+  "app_id": "media",
+  "route": "/media/photos/photo-123",
+  "record_kind": "photo",
+  "record_id": "photo-123",
+  "title": "Family picnic"
+}

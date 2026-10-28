@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maip.ai/spec/schemas/page-context.schema.json",
+  "title": "PageContext",
+  "description": "Page details the app on screen shares with the ambient companion so a side chat can help with it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["app_id", "route"],
+  "dependentRequired": {
+    "record_id": ["record_kind"]
+  },
+  "allOf": [
+    {
+      "if": { "required": ["record_id"] },
+      "then": { "required": ["record_kind"] }
+    }
+  ],
+  "properties": {
+    "app_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9-]+$",
+      "description": "The app's id, for example `media`, `library` or `settings`."
+    },
+    "route": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^/",
+      "description": "The current app route, beginning with `/`."
+    },
+    "record_kind": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[a-z0-9_-]+$",
+      "description": "What kind of record is open, for example `photo`, `model` or `setting`."
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "The id of the open record; requires `record_kind`."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Plain text of the page or record title. This is data for the model, never instructions. The server checks the record with the person's own read access before using it."
+    }
+  }
+}

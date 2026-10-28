@@ -1,3 +1,7 @@
+## [spec-v0.1.266] - 2026-10-28
+
+- AMBIENT-05: new `page-context` record (app id, route, optional record kind, record id and title) and the `quick-action` ids.
+
 ## [spec-v0.1.265] - 2026-10-28
 
 - DIAG-KEY-01: `api-key.scopes` gains `diagnose`, a read-only key an owner or admin makes so an assistant session can read turn timings and engine state to find out why chat is slow. Never message text, people or settings changes. Additive; a key with only `turn`, `code` or `settings` is unchanged.

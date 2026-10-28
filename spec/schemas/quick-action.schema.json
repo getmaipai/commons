@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maip.ai/spec/schemas/quick-action.schema.json",
+  "title": "QuickAction",
+  "description": "An id for a quick action offered by the ambient companion pane.",
+  "type": "string",
+  "enum": ["help_with_page", "find_something", "take_action"]
+}

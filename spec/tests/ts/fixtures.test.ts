@@ -43,6 +43,8 @@ import { Project } from "../../gen/ts/project.js";
 import { Feed } from "../../gen/ts/feed.js";
 import { NewsItem } from "../../gen/ts/news-item.js";
 import { NewsStory } from "../../gen/ts/news-story.js";
+import { PageContext } from "../../gen/ts/page-context.js";
+import { QuickAction } from "../../gen/ts/quick-action.js";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 
@@ -790,4 +792,31 @@ test("robot-self-test-result accepts valid answers and rejects invalid ones", ()
   expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.example.json"))).not.toThrow();
   expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.invalid-detail.example.json"))).toThrow();
   expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.missing-ok.invalid.example.json"))).toThrow();
+});
+
+describe("page-context and ambient quick actions", () => {
+  test("page-context example is valid", () => {
+    expect(() => PageContext.parse(loadFixture("page-context.example.json"))).not.toThrow();
+  });
+
+  test("page-context rejects an unknown key fixture", () => {
+    expect(() => PageContext.parse(loadFixture("page-context.unknown-key.invalid.example.json"))).toThrow();
+  });
+
+  test("page-context enforces required and bounded fields", () => {
+    const base = { app_id: "media", route: "/media" };
+    expect(() => PageContext.parse({ ...base, record_id: "123" })).toThrow();
+    expect(() => PageContext.parse({ ...base, route: "media" })).toThrow();
+    expect(() => PageContext.parse({ ...base, app_id: "" })).toThrow();
+    expect(() => PageContext.parse({ ...base, title: "x".repeat(201) })).toThrow();
+  });
+
+  test("quick-action exposes the three pane action ids", () => {
+    expect(["help_with_page", "find_something", "take_action"].map((id) => QuickAction.parse(id))).toEqual([
+      "help_with_page",
+      "find_something",
+      "take_action",
+    ]);
+    expect(() => QuickAction.parse("unknown")).toThrow();
+  });
 });

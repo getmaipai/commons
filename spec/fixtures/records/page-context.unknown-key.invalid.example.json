@@ -1,0 +1,5 @@
+{
+  "app_id": "media",
+  "route": "/media/photos/photo-123",
+  "extra": "not allowed"
+}

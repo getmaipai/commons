@@ -31,3 +31,10 @@ def fields_requires_min_band(value: Any, info: ValidationInfo) -> Any:
     if value is not None and info.data.get("min_band") is None:
         raise ValueError("min_band is required when fields is present")
     return value
+
+
+def record_id_requires_record_kind(value: Any, info: ValidationInfo) -> Any:
+    """Match PageContext's dependentRequired rule in generated Pydantic models."""
+    if value is not None and info.data.get("record_kind") is None:
+        raise ValueError("record_kind is required when record_id is present")
+    return value

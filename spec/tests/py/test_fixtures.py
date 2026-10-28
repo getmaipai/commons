@@ -35,8 +35,10 @@ from gen.py.news_item_schema import NewsItem
 from gen.py.news_story_schema import NewsStory
 from gen.py.offline_manifest_schema import OfflineManifest
 from gen.py.open_question_schema import OpenQuestion
+from gen.py.page_context_schema import PageContext
 from gen.py.person_schema import Person
 from gen.py.project_schema import ProjectPlan
+from gen.py.quick_action_schema import QuickAction
 from gen.py.relationship_schema import Relationship
 from gen.py.reply_constraint_schema import ReplyConstraint
 from gen.py.reply_feedback_schema import ReplyFeedback
@@ -1001,3 +1003,28 @@ def test_manifest_returns_blocks():
     ]
     with pytest.raises(ValidationError):
         PackageManifest.model_validate({**manifest, "returns_blocks": ["hologram"]})
+
+
+def test_page_context_fixture_and_invalid_shapes():
+    PageContext.model_validate(load_fixture("page-context.example.json"))
+    with pytest.raises(ValidationError):
+        PageContext.model_validate(
+            load_fixture("page-context.unknown-key.invalid.example.json")
+        )
+
+    base = {"app_id": "media", "route": "/media"}
+    for invalid in (
+        {**base, "record_id": "123"},
+        {**base, "route": "media"},
+        {**base, "app_id": ""},
+        {**base, "title": "x" * 201},
+    ):
+        with pytest.raises(ValidationError):
+            PageContext.model_validate(invalid)
+
+
+def test_quick_action_enum():
+    for action in ("help_with_page", "find_something", "take_action"):
+        QuickAction.model_validate(action)
+    with pytest.raises(ValidationError):
+        QuickAction.model_validate("unknown")
