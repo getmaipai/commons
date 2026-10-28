@@ -1,3 +1,7 @@
+## [spec-v0.1.267] - 2026-10-28
+
+- Owner decision: `radio.directory.enabled` (Find radio stations online) and `podcasts.directory.enabled` (Find podcasts online) default to on. A household that set either keeps its choice. Children still never reach either directory, and teens reach podcasts only behind `podcasts.directory.teens` (still off by default).
+
 ## [spec-v0.1.266] - 2026-10-28
 
 - AMBIENT-05: new `page-context` record (app id, route, optional record kind, record id and title) and the `quick-action` ids.

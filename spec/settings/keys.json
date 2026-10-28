@@ -5157,9 +5157,9 @@
     "key": "radio.directory.enabled",
     "scope": "household",
     "selector": "boolean",
-    "default": false,
+    "default": true,
     "label": "Find radio stations online",
-    "help": "Lets people search a public station directory and play stations from the internet. The station sees your home's address. Off by default.",
+    "help": "Lets people search a public station directory and play stations from the internet. The station sees your home's address. On by default; turn it off to keep radio to stations a parent saved.",
     "copy": {
       "does": "Turns on searching and playing internet radio stations."
     },
@@ -5174,9 +5174,9 @@
     "key": "podcasts.directory.enabled",
     "scope": "household",
     "selector": "boolean",
-    "default": false,
+    "default": true,
     "label": "Find podcasts online",
-    "help": "Lets adults search a public podcast directory to add shows. Off by default.",
+    "help": "Lets adults search a public podcast directory to add shows. On by default; turn it off to stop all directory searches.",
     "copy": {
       "does": "Turns on searching a public podcast directory."
     },
