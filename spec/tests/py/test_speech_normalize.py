@@ -7,6 +7,7 @@ that can silently drift apart.
 """
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -20,9 +21,19 @@ with open(FIXTURE_PATH) as f:
     fixtures = json.load(f)
 
 
-@pytest.mark.parametrize("fixture", fixtures, ids=[fx["input"] for fx in fixtures])
+@pytest.mark.parametrize(
+    "fixture", fixtures, ids=[f"{i}:{fx['input']}" for i, fx in enumerate(fixtures)]
+)
 def test_normalize_for_speech_fixture(fixture: dict) -> None:
-    assert normalize_for_speech(fixture["input"]) == fixture["expected"]
+    opts = fixture.get("opts") or {}
+    now = datetime.fromisoformat(opts["now"]) if "now" in opts else None
+    got = normalize_for_speech(
+        fixture["input"],
+        now=now,
+        time_zone=opts.get("timeZone", "UTC"),
+        time_style=opts.get("timeStyle"),
+    )
+    assert got == fixture["expected"]
 
 
 def test_number_to_words_zero_and_small_numbers() -> None:

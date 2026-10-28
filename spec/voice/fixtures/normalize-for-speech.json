@@ -62,5 +62,22 @@
   {"input": "Version 2.1", "expected": "Version two point one", "note": "decimal remains unchanged in behavior"},
   {"input": "4 gold medals", "expected": "four gold medals", "note": "plain count remains unchanged"},
   {"input": "a 3-2 win", "expected": "a three-two win", "note": "score is not a phone number"},
-  {"input": "pages 10-12", "expected": "pages ten-twelve", "note": "range is not a phone number"}
+  {"input": "pages 10-12", "expected": "pages ten-twelve", "note": "range is not a phone number"},
+  {"input": "It's 4:00 pm.", "expected": "It's four o'clock.", "opts": {"now": "2026-10-28T10:00:00Z"}, "note": "3.3: today, within 12 hours drops part of day"},
+  {"input": "It's 4:10 pm.", "expected": "It's four ten.", "opts": {"now": "2026-10-28T10:00:00Z"}, "note": "3.3: same, minutes never rounded"},
+  {"input": "It's 9:51 p.m.", "expected": "It's nine fifty-one", "opts": {"now": "2026-10-28T20:00:00Z"}, "note": "3.3: dotted marker, now 8 pm; trailing period consumed as today"},
+  {"input": "Wake me at 6:00 am.", "expected": "Wake me at six o'clock in the morning.", "opts": {"now": "2026-10-28T20:00:00Z"}, "note": "3.3: 6 am is 14h from 8 pm, keep the part of day"},
+  {"input": "Noon is 12:00 pm and 12:00 am.", "expected": "Noon is noon and midnight.", "opts": {"now": "2026-10-28T20:00:00Z"}, "note": "3.3: noon and midnight unchanged"},
+  {"input": "Leave at 3:45.", "expected": "Leave at three forty-five.", "opts": {"now": "2026-10-28T20:00:00Z"}, "note": "3.3: no marker, unchanged by now"},
+  {"input": "It's 1:30 am.", "expected": "It's one thirty.", "opts": {"now": "2026-10-28T23:00:00Z", "timeZone": "Asia/Tokyo"}, "note": "zone crossing midnight: now is 8 am next day in Tokyo, 1:30 am is 6.5h behind"},
+  {"input": "It's 9:00 pm.", "expected": "It's nine o'clock in the evening.", "opts": {"now": "2026-10-28T23:00:00Z", "timeZone": "Asia/Tokyo"}, "note": "zone crossing midnight: 9 pm is 13h from 8 am Tokyo, part of day kept"},
+  {"input": "Dinner at 8:00 pm.", "expected": "Dinner at eight o'clock.", "opts": {"now": "2026-10-28T08:00:00Z"}, "note": "now exactly 12h away still drops"},
+  {"input": "Dinner at 8:01 pm.", "expected": "Dinner at eight oh one in the evening.", "opts": {"now": "2026-10-28T08:00:00Z"}, "note": "one minute past 12h keeps the part of day"},
+  {"input": "It's 4:00 pm.", "expected": "It's four P M.", "opts": {"now": "2026-10-28T10:00:00Z", "timeStyle": "formal"}, "note": "formal keeps the part of day as letters"},
+  {"input": "It's 4:10 pm.", "expected": "It's four ten P M.", "opts": {"timeStyle": "formal"}, "note": "formal needs no now"},
+  {"input": "Up at 6:00 am.", "expected": "Up at six A M.", "opts": {"timeStyle": "formal"}, "note": "formal morning"},
+  {"input": "Train at 15:20.", "expected": "Train at three twenty P M.", "opts": {"timeStyle": "formal"}, "note": "formal derives P from a 24-hour hour"},
+  {"input": "Train at 7:05.", "expected": "Train at seven oh five A M.", "opts": {"timeStyle": "formal"}, "note": "formal derives A for an unmarked morning hour"},
+  {"input": "It's 4:10 pm.", "expected": "It's four ten in the evening.", "opts": {"timeStyle": "plain"}, "note": "plain without now is unchanged"},
+  {"input": "It's 4:10 pm.", "expected": "It's four ten in the evening.", "opts": {}, "note": "empty opts unchanged"}
 ]

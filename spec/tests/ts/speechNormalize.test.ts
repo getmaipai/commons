@@ -19,6 +19,7 @@ interface Fixture {
   input: string;
   expected: string;
   note?: string;
+  opts?: { now?: string; timeZone?: string; timeStyle?: "plain" | "formal" };
 }
 
 const fixtures: Fixture[] = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "voice", "fixtures", "normalize-for-speech.json"), "utf-8"));
@@ -59,9 +60,9 @@ describe("numberToWords", () => {
 });
 
 describe("normalizeForSpeech: the shared fixture set", () => {
-  for (const { input, expected, note } of fixtures) {
+  for (const { input, expected, note, opts } of fixtures) {
     test(note ? `${JSON.stringify(input)}: ${note}` : JSON.stringify(input), () => {
-      expect(normalizeForSpeech(input)).toBe(expected);
+      expect(opts ? normalizeForSpeech(input, { ...opts, now: opts.now ? new Date(opts.now) : undefined }) : normalizeForSpeech(input)).toBe(expected);
     });
   }
 });

@@ -12,6 +12,8 @@ third-party-code rule) plays the role `to-words` plays on the TS side.
 """
 
 import re
+from datetime import UTC, datetime
+from zoneinfo import ZoneInfo
 
 from num2words import num2words
 
@@ -174,20 +176,49 @@ def _meridiem_word(hour: int, marker: str | None) -> tuple[int, str]:
     return hour, ""
 
 
-def _normalize_times(text: str) -> str:
+def _minutes_of_day_in_zone(now: datetime, time_zone: str) -> int:
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=UTC)
+    local = now.astimezone(ZoneInfo(time_zone))
+    return local.hour * 60 + local.minute
+
+
+_MAX_SAME_DAY_MINUTES = 12 * 60
+
+
+def _normalize_times(
+    text: str,
+    now: datetime | None = None,
+    time_zone: str = "UTC",
+    time_style: str = "plain",
+) -> str:
+    now_minutes = _minutes_of_day_in_zone(now, time_zone) if now is not None else None
+    formal = time_style == "formal"
+
     def replace(m: re.Match[str]) -> str:
         hour = int(m.group(1))
         minute = int(m.group(2))
         marker = m.group(3)
         hour12, suffix = _meridiem_word(hour, marker)
         clean = (marker or "").lower().replace(".", "").strip()
+        half = clean if clean in ("am", "pm") else ("pm" if hour >= 12 else "am")
         if hour12 == 12 and minute == 0 and clean == "am":
             return "midnight"
         if hour12 == 12 and minute == 0 and clean == "pm":
             return "noon"
+        if formal:
+            if hour12 == 12 and minute == 0:
+                return "midnight" if half == "am" else "noon"
+            suffix = " A M" if half == "am" else " P M"
+        elif now_minutes is not None and clean != "":
+            hour24 = hour % 12 + (12 if clean == "pm" else 0)
+            if abs(hour24 * 60 + minute - now_minutes) <= _MAX_SAME_DAY_MINUTES:
+                suffix = ""
         hour_words = number_to_words(hour12)
         if minute == 0:
-            return f"{hour_words} o'clock{suffix}"
+            return (
+                f"{hour_words}{suffix}" if formal else f"{hour_words} o'clock{suffix}"
+            )
         minute_words = (
             f"oh {number_to_words(minute)}" if minute < 10 else number_to_words(minute)
         )
@@ -557,14 +588,19 @@ _TRAILING_SPACE_RE = re.compile(r"[ \t]{2,}")
 _SPACE_BEFORE_PUNCT_RE = re.compile(r"\s+([.,!?;:])")
 
 
-def normalize_for_speech(text: str) -> str:
+def normalize_for_speech(
+    text: str,
+    now: datetime | None = None,
+    time_zone: str = "UTC",
+    time_style: str | None = None,
+) -> str:
     """Pure and side-effect free; never call it on anything meant for the
     screen. See normalizeForSpeech.ts's own docstring for the full scope
     rationale - this mirrors it pass-for-pass, same order."""
     s = _strip_markup_for_speech(text)
     s = _normalize_dates(s)
     s = _normalize_phones(s)
-    s = _normalize_times(s)
+    s = _normalize_times(s, now, time_zone, time_style or "plain")
     s = _normalize_currency(s)
     s = _normalize_percent(s)
     s = _normalize_units_and_abbreviations(s)

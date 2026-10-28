@@ -67,7 +67,18 @@ regnal list, and a single capital or a common abbreviation such as "DC"
 is never a numeral), and stray markdown/emoji, each read the way a
 person actually says them, never touching the text a household sees on
 screen (Jesse: "if you have the voice say ten O four, you still display
-10:04"). `backend/src/lib/turnEngine.ts`'s `finalizeReply()` is the one
+10:04").
+
+**Clock options (NAT-02, additive).** `normalizeForSpeech(text, opts?)`
+takes `{ now?: Date; timeZone?: string; timeStyle?: "plain" | "formal" }`
+(Python: `normalize_for_speech(text, now=None, time_zone="UTC",
+time_style=None)`). With no options the output is unchanged. With `now`
+(and an IANA `timeZone`, default UTC), a time carrying am/pm that is
+within 12 hours of `now` on the same calendar day in that zone drops the
+part of day ("4:10 pm" is "four ten"); otherwise it is kept. `timeStyle:
+"formal"` always keeps it as letters ("four ten P M", "six A M"), deriving
+A or P from the hour when no marker is written. Noon and midnight and
+unmarked times are unchanged, and minutes are never rounded. `backend/src/lib/turnEngine.ts`'s `finalizeReply()` is the one
 central point (never per recipe) that fills every reply's `speech` field
 with it; the browser frontend imports the identical function for its own
 live, sentence-by-sentence TTS streaming (`ChatPage.tsx`), so there is

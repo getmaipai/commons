@@ -150,16 +150,53 @@ function meridiemWord(hour: number, marker: string | undefined): { hour12: numbe
   return { hour12: hour, suffix: "" };
 }
 
-function normalizeTimes(text: string): string {
+/** Options for the clock-time pass (NAT-02). Without any option the
+ * output is exactly the historical one. `now` + `timeZone` let a time that
+ * is plainly today and near drop its part of day; `timeStyle: "formal"`
+ * always keeps it, spelled as letters ("four P M"). */
+export interface SpeechOptions {
+  now?: Date;
+  /** IANA zone the household lives in (default "UTC"). */
+  timeZone?: string;
+  /** "plain" (default when options are given) or "formal". */
+  timeStyle?: "plain" | "formal";
+}
+
+/** Minutes since local midnight of `now` in `timeZone`. */
+function minutesOfDayInZone(now: Date, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone, hour: "numeric", minute: "numeric", hourCycle: "h23" }).formatToParts(now);
+  const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0) % 24;
+  const minute = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  return hour * 60 + minute;
+}
+
+const MAX_SAME_DAY_MINUTES = 12 * 60;
+
+function normalizeTimes(text: string, opts?: SpeechOptions): string {
+  const nowMinutes = opts?.now ? minutesOfDayInZone(opts.now, opts.timeZone ?? "UTC") : undefined;
+  const formal = opts?.timeStyle === "formal";
   return text.replace(TIME_RE, (_whole, h: string, m: string, marker: string | undefined) => {
     const hour = Number(h);
     const minute = Number(m);
-    const { hour12, suffix } = meridiemWord(hour, marker);
+    let { hour12, suffix } = meridiemWord(hour, marker);
     const clean = (marker ?? "").toLowerCase().replace(/\./g, "").trim();
+    // Which half of the day this time is on (formal derives it from the hour
+    // when no marker was written).
+    const half = clean === "am" || clean === "pm" ? clean : hour >= 12 ? "pm" : "am";
     if (hour12 === 12 && minute === 0 && clean === "am") return "midnight";
     if (hour12 === 12 && minute === 0 && clean === "pm") return "noon";
+    if (formal) {
+      if (hour12 === 12 && minute === 0) return half === "am" ? "midnight" : "noon";
+      suffix = half === "am" ? " A M" : " P M";
+    } else if (nowMinutes !== undefined && clean !== "") {
+      // The time is read as today in the household's zone; drop the part of
+      // day only when it is within 12 hours (ahead or behind) of now.
+      const hour24 = (hour % 12) + (clean === "pm" ? 12 : 0);
+      const spokenMinutes = hour24 * 60 + minute;
+      if (Math.abs(spokenMinutes - nowMinutes) <= MAX_SAME_DAY_MINUTES) suffix = "";
+    }
     const hourWords = numberToWords(hour12);
-    if (minute === 0) return `${hourWords} o'clock${suffix}`;
+    if (minute === 0) return formal ? `${hourWords}${suffix}` : `${hourWords} o'clock${suffix}`;
     const minuteWords = minute < 10 ? `oh ${numberToWords(minute)}` : numberToWords(minute);
     return `${hourWords} ${minuteWords}${suffix}`;
   });
@@ -449,11 +486,11 @@ function tidyWhitespace(text: string): string {
   return s.trim();
 }
 
-export function normalizeForSpeech(text: string): string {
+export function normalizeForSpeech(text: string, opts?: SpeechOptions): string {
   let s = stripMarkupForSpeech(text);
   s = normalizeDates(s);
   s = normalizePhones(s);
-  s = normalizeTimes(s);
+  s = normalizeTimes(s, opts);
   s = normalizeCurrency(s);
   s = normalizePercent(s);
   s = normalizeUnitsAndAbbreviations(s);
