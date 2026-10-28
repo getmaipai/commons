@@ -1,3 +1,7 @@
+## [spec-v0.1.259] - 2026-10-28
+
+- NAT-02: `normalizeForSpeech` (TypeScript and Python) takes optional `now`, `timeZone` and `timeStyle` (`plain` or `formal`). With `plain` and a `now`, a time on the same day within 12 hours reads without its part of day ("four o'clock", not "four o'clock in the afternoon"); `formal` keeps it. No options leaves output unchanged. Additive; new fixture cases.
+
 ## [spec-v0.1.258] - 2026-10-28
 
 - WEATHER-PORT-07: the `weather_card` block's props take two optional fields. `advice` (up to 12 chips of `id`, `label`, optional kit `icon` name and `tone` info or warn) and `alert` (`title`, optional `text`, optional `severity` info, warn or severe). Additive; existing blocks stay valid. New fixture `valid-weather_card-advice.json`.
