@@ -7,6 +7,8 @@ adoption proves it.
 
 ## [Unreleased]
 
+## [core-v0.1.6] - 2026-10-28
+
 ### Added
 - `sayRound` (NAT-04): pure rounding helpers `sayTemperature`, `sayMoney`, `sayDistance`,
   `sayMinutes`, `sayCount` and the `sayFor(kind, value, opts)` dispatcher, which returns null when
