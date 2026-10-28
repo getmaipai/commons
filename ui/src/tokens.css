@@ -811,6 +811,7 @@
   [data-slot="article-actions"] button { width: 44px; min-width: 44px; height: 44px; min-height: 44px; border-radius: 999px; }
   [data-slot="article-provider"] { background: var(--muted); font-size: 1rem; }
   [data-slot="article-provider"][data-condensed] { justify-content: flex-start; padding-inline: 4.5rem 12rem; }
+  [data-slot="article-provider"][data-condensed] [data-slot="article-provider-label"] { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 0.875rem; text-align: start; }
   [data-slot="article-title"] { font-size: 1.5rem; font-weight: 600; line-height: 1.2; letter-spacing: 0; }
   [data-slot="article-dek"] { font-size: 1.25rem; }
   [data-slot="article-provider"] + header > p.text-muted-foreground { font-size: 0.875rem; }

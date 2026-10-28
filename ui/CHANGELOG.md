@@ -1,3 +1,7 @@
+## [ui-v0.5.405] - 2026-10-28
+
+- `ArticleView`: on phones the pinned story title wraps to two lines at a smaller size instead of cutting to one word beside the toolbar buttons. CSS only.
+
 ## [ui-v0.5.404] - 2026-10-28
 
 - `ArticleView`: Listen, Key points and Discuss move into a right-hand rail that stays pinned beside the article from `lg` up and ends where the article ends (below `lg` they stay under the headline). The source row now pins under the toolbar and swaps the publisher for the story title (with the source icon, easing in) once the headline scrolls under it. The "Written on this hub from the article." line is gone. No prop changes.
