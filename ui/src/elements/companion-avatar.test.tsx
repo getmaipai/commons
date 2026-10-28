@@ -180,3 +180,12 @@ test("fill takes the whole space it is given", () => {
   expect(view.getByRole("img", { name: "Mimi" }).className).toContain("size-full");
   restore();
 });
+
+test("the ring is drawn in the primary colour at 4px so it can be seen on any page", () => {
+  const restore = setup();
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} ring="thinking" />);
+  const ring = view.container.querySelector("[data-ring] > span")!;
+  expect(ring.className).toContain("border-4");
+  expect(ring.className).toContain("border-primary");
+  restore();
+});

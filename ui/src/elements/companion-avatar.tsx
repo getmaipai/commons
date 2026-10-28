@@ -96,9 +96,9 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
     if (result.failed) { setFailed(true); onFail?.(); }
   }, [clip.h264, machine, onFail, source]);
   const movable = animated && !reduced && documentVisible && !failed && Boolean(clip?.h264 || clip?.av1);
-  const ringClass = ring === "listening" ? "border-foreground/25" : ring === "thinking" ? cn("border-foreground/35", !reduced && "animate-[pulse_3s_ease-in-out_infinite]") : ring === "speaking" ? cn("border-foreground/50", !reduced && "animate-pulse") : "";
+  const ringClass = ring === "listening" ? "border-primary/70" : ring === "thinking" ? cn("border-primary/80", !reduced && "animate-[pulse_2s_ease-in-out_infinite]") : ring === "speaking" ? cn("border-primary shadow-lg shadow-primary/50", !reduced && "animate-pulse") : "";
   return <div role="img" aria-label={ring ? `${name}, ${ring}` : name} data-ring={ring ?? undefined} className={cn(SIZES[size], "pointer-events-none relative", className)}>
-    {ring ? <span aria-hidden="true" className={cn("absolute -inset-1 rounded-full border-2", ringClass)} /> : null}
+    {ring ? <span aria-hidden="true" className={cn("absolute -inset-1.5 rounded-full border-4", ringClass)} /> : null}
     {movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264 || ""} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <SafeImage src={clip.still} alt="" className="size-full object-contain" />}
   </div>;
 }

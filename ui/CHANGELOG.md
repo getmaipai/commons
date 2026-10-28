@@ -1,3 +1,7 @@
+## [ui-v0.5.402] - 2026-10-28
+
+- `CompanionAvatar` ring is easier to see: a 4px border in the primary colour (was 2px foreground at low opacity), a wider gap, and a glow while speaking. Props and states are unchanged.
+
 ## [ui-v0.5.401] - 2026-10-28
 
 - RADIO-07: `Player` takes `live` (and `copy.live`, default "Live"). A live item, or any item whose media element reports an infinite duration, draws a kit `Badge` in place of the time range, the time and the seek buttons in the video, audio and mini layouts; arrow keys and Media Session seek actions do nothing for it. The schema `player` node reads `live: true` on its item row. The schema `form` node's text inputs now carry an `aria-label` (the field's placeholder or name), so a package page can use it as a labelled text field. Story: `PlayerLiveShowcase`. Additive; every existing item behaves as before.
