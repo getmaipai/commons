@@ -52,7 +52,9 @@ export interface ArticleViewData {
   saved?: boolean;
 }
 
-const CONDENSE_LEAD_PX = 72;
+// The row condenses once the headline is this close to it, and goes back only after the headline has moved clearly away (no flicker at the line).
+const CONDENSE_LEAD_PX = 12;
+const CONDENSE_RELEASE_PX = 64;
 const SUMMARY_RETRIES = 6;
 const SUMMARY_RETRY_MS = 10_000;
 
@@ -192,9 +194,9 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       const title = titleRef.current;
       const row = providerRef.current;
       if (!title || !row) return;
-      // Swaps a little before the headline reaches the row (a headline's worth of lead), so the row is ready as the title leaves.
-      const rowBottom = row.getBoundingClientRect().bottom;
-      setCondensed(rowBottom > 0 && title.getBoundingClientRect().bottom < rowBottom + CONDENSE_LEAD_PX);
+            const rowBottom = row.getBoundingClientRect().bottom;
+      const gap = title.getBoundingClientRect().bottom - rowBottom;
+      setCondensed((was) => rowBottom > 0 && (was ? gap < CONDENSE_RELEASE_PX : gap < CONDENSE_LEAD_PX));
     };
     measure();
     document.addEventListener("scroll", measure, { capture: true, passive: true });
@@ -266,8 +268,8 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       </div>
       {data.byline ? (
-        <div ref={providerRef} data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", "transition-[padding] duration-300 ease-in-out", condensed ? "px-16 md:px-48" : "px-4")}>
-          <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className={cn("shrink-0 rounded-xl transition-[width,height] duration-300 ease-in-out", condensed ? "size-8" : "size-11")} onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
+        <div ref={providerRef} data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", "transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", condensed ? "px-16 md:px-48" : "px-4")}>
+          <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className={cn("shrink-0 rounded-xl transition-[width,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", condensed ? "size-8" : "size-11")} onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
           <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", condensed && "truncate text-lg leading-tight")}>{condensed ? data.title : data.byline.publisher}</span>
         </div>
       ) : null}

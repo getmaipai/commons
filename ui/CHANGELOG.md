@@ -1,3 +1,7 @@
+## [ui-v0.5.411] - 2026-10-28
+
+- `ArticleView`: the pinned row swaps to the story title a little later (12px from the row, was 72px) and eases over 500ms; it goes back only after the headline is 64px clear, so it does not flicker at the line. No prop changes.
+
 ## [ui-v0.5.410] - 2026-10-28
 
 - `CompanionAvatar` ring gains `idle` and four distinct looks: idle a thin dotted ring, listening a solid ring with an outward ripple, thinking a dashed ring that turns slowly, speaking a thick ring with a pulsing glow. `null` still draws no ring.
