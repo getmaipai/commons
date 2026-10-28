@@ -45,7 +45,8 @@ describe("CompanionStage", () => {
   test("bubble is absent unless provided and motion utilities are reduced-motion safe", () => {
     const view = render(<CompanionStage name="Rivet" mode="listening" character={<span />} talk={<span />} />);
     expect(view.container.querySelector('[data-slot="companion-stage-bubble"]')).toBeNull();
-    expect(view.container.querySelector('[data-slot="companion-stage-listening-ring"]')?.className).toContain("motion-safe:animate-pulse");
+    expect(view.container.querySelector('[data-slot="companion-stage-listening-ring"]')).toBeNull();
+    expect(view.container.querySelector('[data-slot="companion-stage-character"]')?.className).toContain("pt-6");
     expect(view.container.querySelector('[data-slot="companion-stage-wave"] span')?.className).toContain("motion-safe:animate-pulse");
   });
 });
@@ -71,6 +72,7 @@ describe("CompanionStage history and thinking", () => {
     const view = render(<CompanionStage name="Tessa" mode="idle" character={<span />} talk={<span />} bubble={<p>Floating</p>} history={[{ id: "1", role: "user", content: "Hi Tessa", time: "2:14 PM" }, { id: "2", role: "companion", content: <p>Hello there</p> }]} />);
     const log = view.getByRole("log", { name: "Conversation" });
     expect(log.className).toContain("flex-col-reverse");
+    expect(log.className).toContain("mask-image");
     const items = log.querySelectorAll("li");
     expect(items[0]?.getAttribute("data-role")).toBe("user");
     expect(items[1]?.getAttribute("data-role")).toBe("companion");

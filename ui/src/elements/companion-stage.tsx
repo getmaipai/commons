@@ -58,8 +58,7 @@ export function CompanionStage({ name, stateWord, mode, character, bubble, onDis
     </header>
 
     <div data-slot="companion-stage-character-area" className={cn("relative flex min-h-0 items-center justify-center", history ? "flex-[2]" : "flex-1")}>
-      <div data-slot="companion-stage-character" className="flex h-full min-h-0 w-full items-center justify-center">{character}</div>
-      {mode === "listening" ? <div data-slot="companion-stage-listening-ring" aria-hidden="true" className="pointer-events-none absolute inset-4 rounded-full border border-ring/50 motion-safe:animate-pulse" /> : null}
+      <div data-slot="companion-stage-character" className="flex h-full min-h-0 w-full items-center justify-center pt-6">{character}</div>
       {mode === "thinking" ? <div data-slot="companion-stage-thought-cloud" aria-hidden="true" className="absolute right-2 top-1 flex h-9 w-14 items-center justify-center gap-1 rounded-[50%] border-2 border-border bg-card text-muted-foreground after:absolute after:-bottom-1 after:left-1 after:size-2 after:rounded-full after:border after:border-border after:bg-card">
         {[0, 1, 2].map((dot) => <i key={dot} data-slot="companion-stage-thought-dot" className="size-1.5 rounded-full bg-current motion-safe:animate-bounce" style={{ animationDelay: `${dot * 150}ms` }} />)}
       </div> : null}
@@ -72,7 +71,7 @@ export function CompanionStage({ name, stateWord, mode, character, bubble, onDis
       </div> : null}
     </div>
 
-    {history ? <div data-slot="companion-stage-history" role="log" aria-label={historyLabel} className="flex min-h-0 flex-[3] flex-col-reverse overflow-y-auto overscroll-contain">
+    {history ? <div data-slot="companion-stage-history" role="log" aria-label={historyLabel} className="relative z-10 -mt-10 flex min-h-0 flex-[3] flex-col-reverse overflow-y-auto overscroll-contain pt-10 [mask-image:linear-gradient(to_bottom,transparent,black_2.5rem)]">
       <ol className="flex flex-col gap-3 py-1">
         {history.map((item) => <li key={item.id} data-role={item.role} className={cn("flex max-w-[88%] flex-col gap-1", item.role === "user" ? "items-end self-end" : "items-start self-start")}>
           <div className={cn("min-w-0 rounded-2xl px-3.5 py-2 text-sm", item.role === "user" ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-muted text-foreground")}>{item.content}</div>

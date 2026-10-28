@@ -1,3 +1,7 @@
+## [ui-v0.5.414] - 2026-10-28
+
+- `CompanionStage`: the character gets headroom (1.5rem above) so a tall picture is not cut off at the top, and the circle that was drawn over the character's face while listening is gone (the avatar ring and the audio wave already show listening). The history log now reaches up under the character and fades out at its top edge, so older messages scroll up under her. No prop changes.
+
 ## [ui-v0.5.413] - 2026-10-28
 
 - `CompanionStage`: the thinking cloud sits in the top right corner of the character area so it no longer covers the character's face. No prop changes.
