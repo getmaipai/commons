@@ -1,3 +1,7 @@
+## [spec-v0.1.268] - 2026-10-28
+
+- SPLASH-KEY-01: `api-key.scopes` gains `engine`, a key an owner or admin makes so an assistant session can switch the chat engine between `auto`, `llama-server` and `splash` and nothing else. Additive; a key with only `turn`, `code`, `settings` or `diagnose` is unchanged.
+
 ## [spec-v0.1.267] - 2026-10-28
 
 - Owner decision: `radio.directory.enabled` (Find radio stations online) and `podcasts.directory.enabled` (Find podcasts online) default to on. A household that set either keeps its choice. Children still never reach either directory, and teens reach podcasts only behind `podcasts.directory.teens` (still off by default).

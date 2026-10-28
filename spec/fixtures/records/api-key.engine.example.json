@@ -1,0 +1,20 @@
+{
+  "id": "key_engine01",
+  "person_id": "person-astro01",
+  "name": "Chat engine helper",
+  "scopes": [
+    "engine"
+  ],
+  "created_at": "2026-10-28T12:00:00Z",
+  "expires_at": "2026-11-04T12:00:00Z",
+  "revoked_at": null,
+  "status": "active",
+  "last_used_at": null,
+  "last_used_from": null,
+  "limits": {
+    "requests_per_minute": 60
+  },
+  "hint": "abcd",
+  "provenance": "Created in Settings",
+  "hlc": "1792324800000:0:alfred"
+}

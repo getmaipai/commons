@@ -42,7 +42,8 @@
           "turn",
           "code",
           "settings",
-          "diagnose"
+          "diagnose",
+          "engine"
         ]
       }
     },
