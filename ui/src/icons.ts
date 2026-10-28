@@ -1,4 +1,12 @@
 import {
+  Umbrella,
+  Shirt,
+  Glasses,
+  Snowflake,
+  Wind,
+  Footprints,
+  TreePine,
+  CloudRain,
   ALargeSmall,
   Airplay,
   Captions,
@@ -161,6 +169,14 @@ export type Icon = LucideIcon;
 // and the other's call sites are updated - never two names for one
 // meaning.
 export const icons = {
+  umbrella: Umbrella,
+  shirt: Shirt,
+  glasses: Glasses,
+  snowflake: Snowflake,
+  wind: Wind,
+  footprints: Footprints,
+  "tree-pine": TreePine,
+  "cloud-rain": CloudRain,
   activity: Activity,
   "alert-triangle": AlertTriangle,
   archive: Archive,

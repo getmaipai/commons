@@ -1,3 +1,7 @@
+## [ui-v0.5.406] - 2026-10-28
+
+- Icon registry gains `umbrella`, `shirt`, `glasses`, `snowflake`, `wind`, `footprints`, `tree-pine` and `cloud-rain`, so weather advice chips can name an icon each. Additive.
+
 ## [ui-v0.5.405] - 2026-10-28
 
 - `ArticleView`: on phones the pinned story title wraps to two lines at a smaller size instead of cutting to one word beside the toolbar buttons. CSS only.
