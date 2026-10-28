@@ -1,3 +1,7 @@
+## [ui-v0.5.401] - 2026-10-28
+
+- RADIO-07: `Player` takes `live` (and `copy.live`, default "Live"). A live item, or any item whose media element reports an infinite duration, draws a kit `Badge` in place of the time range, the time and the seek buttons in the video, audio and mini layouts; arrow keys and Media Session seek actions do nothing for it. The schema `player` node reads `live: true` on its item row. The schema `form` node's text inputs now carry an `aria-label` (the field's placeholder or name), so a package page can use it as a labelled text field. Story: `PlayerLiveShowcase`. Additive; every existing item behaves as before.
+
 ## [ui-v0.5.400] - 2026-10-28
 
 - WEATHER-PORT-07: `WeatherForecastPage` and `WeatherCard` take two optional props. `advice` (`{ id, label, icon?, tone? }[]`) draws a row of kit `Badge` chips under the current conditions; `alert` (`{ title, text?, severity? }`) draws a kit `Alert` banner above the forecast (`severe` uses the destructive variant, `warn` the warning variant). Both draw nothing when absent, and `advice` draws nothing when empty. Tokens and shipped kit variants only. Additive; needs `spec-v0.1.258` for the `weather_card` block to carry them.

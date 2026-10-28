@@ -37,6 +37,46 @@ function setup(props: Partial<Parameters<typeof Player>[0]> = {}) {
   return { ...view, el, root: view.container.querySelector("[data-slot=player]") as HTMLElement };
 }
 
+describe("Player > live stream (RADIO-07)", () => {
+  test("a live item draws the Live badge and no time range or seek buttons (video layout)", () => {
+    const { container, getByText } = render(<Player src="/stream" kind="video" title="Jazz FM" live />);
+    expect(getByText("Live")).toBeTruthy();
+    expect(container.querySelector('[data-media-chrome="MediaTimeRange"]')).toBeNull();
+    expect(container.querySelector('[data-media-chrome="MediaSeekBackwardButton"]')).toBeNull();
+    expect(container.querySelector('[data-media-chrome="MediaSeekForwardButton"]')).toBeNull();
+  });
+  test("a live item in the audio layout has no time range, no remaining time and no skip buttons", () => {
+    const { container, getByText } = render(<Player src="/stream" kind="audio" title="Jazz FM" live />);
+    expect(getByText("Live")).toBeTruthy();
+    expect(container.querySelector('[data-media-chrome="MediaTimeRange"]')).toBeNull();
+    expect(container.querySelector('[data-media-chrome="MediaSeekBackwardButton"]')).toBeNull();
+    expect(container.querySelector('[data-media-chrome="MediaSeekForwardButton"]')).toBeNull();
+    expect(container.querySelector('[data-media-chrome="MediaPlayButton"]')).not.toBeNull();
+  });
+  test("the mini bar shows the Live badge", () => {
+    const { getByText } = render(<Player src="/stream" kind="audio" layout="mini" title="Jazz FM" live onExpand={() => {}} />);
+    expect(getByText("Live")).toBeTruthy();
+  });
+  test("arrow keys do not seek a live item", () => {
+    const { el, root } = setup({ live: true });
+    el.currentTime = 100;
+    fireEvent.keyDown(root, { key: "ArrowRight" });
+    expect(el.currentTime).toBe(100);
+  });
+  test("an item with a finite duration and no live prop keeps its seek controls and no badge", () => {
+    const { container, queryByText } = render(<Player src="/a" kind="video" title="Clip" />);
+    expect(queryByText("Live")).toBeNull();
+    expect(container.querySelector('[data-media-chrome="MediaSeekBackwardButton"]')).not.toBeNull();
+    expect(container.querySelector('[data-media-chrome="MediaTimeRange"]')).not.toBeNull();
+  });
+  test("an element that reports an infinite duration counts as live", () => {
+    const { container, getByText } = render(<Player src="/stream" kind="audio" title="Jazz FM" />);
+    const el = fakeMedia(container.querySelector("[data-slot=player-media]") as HTMLMediaElement, Number.POSITIVE_INFINITY);
+    act(() => { el.dispatchEvent(new Event("durationchange")); });
+    expect(getByText("Live")).toBeTruthy();
+  });
+});
+
 describe("Player", () => {
   test("shows a music placeholder when an audio poster is absent", () => {
     const view = render(<Player src="/a" kind="audio" layout="mini" title="Song" />);

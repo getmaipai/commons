@@ -1046,6 +1046,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
         return (
           <>
             <Player
+              live={r.live === true}
               media={external}
               mediaRef={mediaEl}
               castSlot={
@@ -1447,6 +1448,7 @@ function FormNodeView({ node }: { node: FormNode }) {
           <Input
             key={field.name}
             type={field.selector === "number" ? "number" : "text"}
+            aria-label={field.placeholder ?? field.name}
             placeholder={field.placeholder ?? field.name}
             value={String(values[field.name] ?? "")}
             onChange={(e) => setValues((v) => ({ ...v, [field.name]: e.target.value }))}

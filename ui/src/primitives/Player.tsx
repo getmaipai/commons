@@ -30,6 +30,7 @@ import {
 import { getIcon } from "@/kit/icons";
 import { LyricsList, type TimedLyricLine } from "@/kit/elements/lyrics-list";
 import { SafeImage } from "@/kit/primitives/SafeImage";
+import { Badge } from "@/kit/ui/badge";
 import { Button } from "@/kit/ui/button";
 import {
   DropdownMenu,
@@ -123,6 +124,7 @@ export interface PlayerCopy {
   playNow: string;
   cancel: string;
   holdSpeed: string;
+  live: string;
 }
 
 export const DEFAULT_PLAYER_COPY: PlayerCopy = {
@@ -150,6 +152,7 @@ export const DEFAULT_PLAYER_COPY: PlayerCopy = {
   playNow: "Play now",
   cancel: "Cancel",
   holdSpeed: "2x speed",
+  live: "Live",
 };
 
 export type PlayerLayout = "video" | "audio" | "mini";
@@ -211,6 +214,10 @@ export interface PlayerProps {
   mediaSession?: boolean;
   metadata?: PlayerMetadata;
   copy?: Partial<PlayerCopy>;
+  /** RADIO-07: a live stream (a radio station). Draws a Live badge instead of the time range, the time and the seek
+   * buttons, and arrow keys and Media Session seeks do nothing. A stream whose element reports an infinite duration
+   * counts as live without this prop. */
+  live?: boolean;
   mediaRef?: Ref<HTMLMediaElement>;
   /** MEDIA-POLISH-01: a media element the host owns (Home's audio session), adopted while this Player is mounted
    * instead of one of its own. The Player moves it into its controls and, when it unmounts or changes layout, into
@@ -335,6 +342,7 @@ export function Player(props: PlayerProps) {
     placement = "inline",
   } = props;
   const copy = useMemo(() => ({ ...DEFAULT_PLAYER_COPY, ...props.copy }), [props.copy]);
+  const liveProp = props.live === true;
   const chapters = useMemo(() => normalizeChapters(props.chapters), [props.chapters]);
 
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -350,6 +358,9 @@ export function Player(props: PlayerProps) {
     setLyricsOpen(false);
   }
   const [duration, setDuration] = useState(Number.NaN);
+  const live = liveProp || duration === Number.POSITIVE_INFINITY;
+  const liveRef = useRef(live);
+  liveRef.current = live;
   const [playing, setPlaying] = useState(false);
   const [currentRate, setCurrentRate] = useState(rate ?? 1);
   const [resumeLine, setResumeLine] = useState<number | null>(null);
@@ -510,9 +521,9 @@ export function Player(props: PlayerProps) {
     const handlers: Array<[MediaSessionAction, MediaSessionActionHandler | null]> = [
       ["play", () => void el()?.play()],
       ["pause", () => el()?.pause()],
-      ["seekbackward", (d) => { const m = el(); if (m) m.currentTime = clampTime(m.currentTime - (d.seekOffset ?? 10), m.duration); }],
-      ["seekforward", (d) => { const m = el(); if (m) m.currentTime = clampTime(m.currentTime + (d.seekOffset ?? 10), m.duration); }],
-      ["seekto", (d) => { const m = el(); if (m && d.seekTime !== undefined) m.currentTime = clampTime(d.seekTime, m.duration); }],
+      ["seekbackward", (d) => { const m = el(); if (m && !liveRef.current) m.currentTime = clampTime(m.currentTime - (d.seekOffset ?? 10), m.duration); }],
+      ["seekforward", (d) => { const m = el(); if (m && !liveRef.current) m.currentTime = clampTime(m.currentTime + (d.seekOffset ?? 10), m.duration); }],
+      ["seekto", (d) => { const m = el(); if (m && !liveRef.current && d.seekTime !== undefined) m.currentTime = clampTime(d.seekTime, m.duration); }],
       ["previoustrack", onPrevious ? () => onPrevious() : null],
       ["nexttrack", onNext ? () => onNext(upNext?.id) : null],
     ];
@@ -537,11 +548,11 @@ export function Player(props: PlayerProps) {
   // ---- commands ----
   const seekBy = useCallback((delta: number) => {
     const el = media.current;
-    if (el) el.currentTime = clampTime(el.currentTime + delta, el.duration);
+    if (el && !liveRef.current) el.currentTime = clampTime(el.currentTime + delta, el.duration);
   }, []);
   const seekTo = useCallback((t: number) => {
     const el = media.current;
-    if (el) el.currentTime = clampTime(t, el.duration);
+    if (el && !liveRef.current) el.currentTime = clampTime(t, el.duration);
   }, []);
   const togglePlay = useCallback(() => {
     const el = media.current;
@@ -733,6 +744,12 @@ export function Player(props: PlayerProps) {
   const chapterIndex = chapterIndexAt(chapters, time);
   const offer = skipOffer(chapters, time, duration);
   const progressPct = Number.isFinite(duration) && duration > 0 ? Math.min(100, (time / duration) * 100) : 0;
+
+  const liveBadge = (
+    <Badge variant="secondary" data-slot="player-live">
+      {copy.live}
+    </Badge>
+  );
 
   const MediaTag = kind === "audio" ? "audio" : "video";
   const mediaElement = external ? null : (
@@ -960,15 +977,19 @@ export function Player(props: PlayerProps) {
           ) : null}
           {ended && upNext ? null : <div slot="centered-chrome">{playButton(true)}</div>}
           <div className="dark flex w-full flex-col bg-[image:var(--art-scrim)] pt-8" data-slot="player-controls">
-            <MediaTimeRange aria-label={title} className="p-2.5 w-full" />
+            {live ? null : <MediaTimeRange aria-label={title} className="p-2.5 w-full" />}
             <MediaControlBar className="w-full">
               {playButton()}
-              <MediaSeekBackwardButton className="p-3 max-sm:hidden" seekOffset={10} aria-label={copy.back(10)}>
-                <Icon slot="icon" name="rotate-ccw" />
-              </MediaSeekBackwardButton>
-              <MediaSeekForwardButton className="p-3 max-sm:hidden" seekOffset={10} aria-label={copy.ahead(10)}>
-                <Icon slot="icon" name="rotate-cw" />
-              </MediaSeekForwardButton>
+              {live ? null : (
+                <MediaSeekBackwardButton className="p-3 max-sm:hidden" seekOffset={10} aria-label={copy.back(10)}>
+                  <Icon slot="icon" name="rotate-ccw" />
+                </MediaSeekBackwardButton>
+              )}
+              {live ? null : (
+                <MediaSeekForwardButton className="p-3 max-sm:hidden" seekOffset={10} aria-label={copy.ahead(10)}>
+                  <Icon slot="icon" name="rotate-cw" />
+                </MediaSeekForwardButton>
+              )}
               <MediaMuteButton aria-label={copy.mute} className="p-3 max-sm:hidden">
                 <Icon slot="off" name="volume-x" />
                 <Icon slot="low" name="volume-1" />
@@ -976,7 +997,7 @@ export function Player(props: PlayerProps) {
                 <Icon slot="high" name="volume-2" />
               </MediaMuteButton>
               <MediaVolumeRange className="p-2.5 max-md:hidden" />
-              <MediaTimeDisplay showDuration className="p-2.5 tabular-nums" />
+              {live ? <span className="p-2.5">{liveBadge}</span> : <MediaTimeDisplay showDuration className="p-2.5 tabular-nums" />}
               <span className="flex-1" aria-hidden />
               {rateMenu}
               <span className="contents max-sm:hidden">{chapterMenu}</span>
@@ -1014,13 +1035,13 @@ export function Player(props: PlayerProps) {
           <Icon name="skip-back" />
         </Button>
       ) : null}
-      {big ? (
+      {big && !live ? (
         <MediaSeekBackwardButton className="p-3" seekOffset={15} aria-label={copy.back(15)}>
           <Icon slot="icon" name="rotate-ccw" />
         </MediaSeekBackwardButton>
       ) : null}
       {playButton(big)}
-      {big ? (
+      {big && !live ? (
         <MediaSeekForwardButton className="p-3" seekOffset={30} aria-label={copy.ahead(30)}>
           <Icon slot="icon" name="rotate-cw" />
         </MediaSeekForwardButton>
@@ -1060,9 +1081,11 @@ export function Player(props: PlayerProps) {
           placement === "dock" && "sticky bottom-0 z-30 border-t border-border bg-[color-mix(in_srgb,var(--card)_94%,transparent)] backdrop-blur-md",
         )}
       >
-        <div aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-muted">
-          <div className="h-full bg-[var(--progress-accent)]" style={{ width: `${progressPct}%` }} />
-        </div>
+        {live ? null : (
+          <div aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-muted">
+            <div className="h-full bg-[var(--progress-accent)]" style={{ width: `${progressPct}%` }} />
+          </div>
+        )}
         <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
           {mediaElement}
           <div className="flex w-full items-center gap-3 px-3 py-2">
@@ -1080,6 +1103,7 @@ export function Player(props: PlayerProps) {
                   <span className="block truncate text-base font-semibold">{title}</span>
                   {subtitle ? <span className="text-muted-foreground block truncate text-sm">{subtitle}</span> : null}
                 </span>
+                {live ? liveBadge : null}
               </Button>
             ) : (
               <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -1116,11 +1140,17 @@ export function Player(props: PlayerProps) {
               {subtitle ? <p className="text-muted-foreground truncate text-lg">{subtitle}</p> : null}
               {chapterIndex >= 0 ? <p className="text-muted-foreground truncate text-sm">{chapters[chapterIndex]!.title}</p> : null}
             </div>
-            <MediaTimeRange aria-label={title} className="p-2.5 w-full" />
-            <div className="text-muted-foreground flex justify-between text-sm tabular-nums">
-              <span>{formatTime(time)}</span>
-              <span>-{formatTime(Number.isFinite(duration) ? Math.max(0, duration - time) : 0)}</span>
-            </div>
+            {live ? (
+              <div className="flex justify-center">{liveBadge}</div>
+            ) : (
+              <>
+                <MediaTimeRange aria-label={title} className="p-2.5 w-full" />
+                <div className="text-muted-foreground flex justify-between text-sm tabular-nums">
+                  <span>{formatTime(time)}</span>
+                  <span>-{formatTime(Number.isFinite(duration) ? Math.max(0, duration - time) : 0)}</span>
+                </div>
+              </>
+            )}
             <div className="flex flex-wrap items-center justify-center gap-2">{transport(true)}</div>
             <div className="flex flex-wrap items-center justify-center gap-1">
               {actionsSlot}

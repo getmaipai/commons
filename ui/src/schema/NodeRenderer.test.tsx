@@ -410,6 +410,24 @@ describe("NodeRenderer > form", () => {
     on_submit: { call: { target: "/api/test-items/create" } },
   };
 
+  test("a text field is labelled and its value goes to the action on submit (RADIO-07)", async () => {
+    const original = globalThis.fetch;
+    const calls: string[] = [];
+    globalThis.fetch = mock(async (_url: unknown, init?: RequestInit) => {
+      calls.push(String(init?.body ?? ""));
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    }) as unknown as typeof fetch;
+    try {
+      const { getByRole } = renderNode({ ...formNode, on_submit: { call: { target: "/api/test-items/create", args: { name: "{name}" } } } });
+      fireEvent.change(getByRole("textbox", { name: "Name" }), { target: { value: "https://stream.example.com/jazz" } });
+      fireEvent.click(getByRole("button", { name: "Submit" }));
+      await waitFor(() => expect(calls.length).toBe(1));
+      expect(calls[0]).toContain("https://stream.example.com/jazz");
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+
   test("stays in 'Working…' until the dispatched action actually resolves, then re-enables", async () => {
     const original = globalThis.fetch;
     let resolveFetch!: (value: Response) => void;
