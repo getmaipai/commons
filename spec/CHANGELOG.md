@@ -1,3 +1,7 @@
+## [spec-v0.1.256] - 2026-10-27
+
+- DUPLEX-02. New Stack wire shape `SttEndpointResponse` (`complete`, `probability`): the reply to an end-of-turn check on `POST /v1/audio/endpoint`, which takes the same WAV form as the transcription route. Additive.
+
 ## [spec-v0.1.255] - 2026-10-27
 
 - MODEL-ADD-01. The AI and models card's `copy` holds the words of the add-a-chat-model panel and the `added_description` sentence under an added model's name, so Home holds none of them. Additive.

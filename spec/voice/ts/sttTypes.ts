@@ -43,6 +43,14 @@ export interface SttTranscribeResponse {
   text: string;
 }
 
+/** `POST /v1/audio/endpoint` on the Stack: has the speaker finished their
+ * turn? Same WAV form as the transcription route (the utterance so far;
+ * only the last 8 seconds are read). `complete` is `probability > 0.5`. */
+export interface SttEndpointResponse {
+  complete: boolean;
+  probability: number;
+}
+
 /** `GET /api/voice/stt/status`: mirrors the wake-word status route's own
  * shape (routes/voice.ts's `GET /wakewords`) - what's installed, what's
  * actually loaded in this process right now. `installed` is true only

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stt-endpoint-response.schema.json",
+  "title": "SttEndpointResponse",
+  "description": "The reply to an end-of-turn check (POST /v1/audio/endpoint on the Stack, multipart form field `file`, 16-bit PCM WAV of the utterance so far; only the last 8 seconds are read): whether the speaker has finished their turn, with the model's probability. `complete` is true when `probability` is above 0.5.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["complete", "probability"],
+  "properties": {
+    "complete": { "type": "boolean" },
+    "probability": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}

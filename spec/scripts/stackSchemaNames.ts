@@ -11,6 +11,7 @@ export const STACK_SCHEMA_NAMES: ReadonlySet<string> = new Set([
   "stack-event.schema.json",
   "stack-job.schema.json",
   "stack-setting.schema.json",
+  "stt-endpoint-response.schema.json",
   "stt-transcribe-response.schema.json",
   "stt-wire-event.schema.json",
   "token-count-request.schema.json",

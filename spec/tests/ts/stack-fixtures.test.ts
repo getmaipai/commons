@@ -31,6 +31,7 @@ import { HealthItem } from "../../stack/ts/health-item";
 import { StackSetting } from "../../stack/ts/stack-setting";
 import { PreciousState } from "../../stack/ts/precious-state";
 import { SttWireEvent } from "../../stack/ts/stt-wire-event";
+import { SttEndpointResponse } from "../../stack/ts/stt-endpoint-response";
 import { SttTranscribeResponse } from "../../stack/ts/stt-transcribe-response";
 import { StackJob } from "../../stack/ts/stack-job";
 import { TurnStreamEvent } from "../../stack/ts/turn-stream-event";
@@ -52,6 +53,7 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "precious-state", zod: PreciousState },
   { name: "stt-wire-event", zod: SttWireEvent },
   { name: "stt-transcribe-response", zod: SttTranscribeResponse },
+  { name: "stt-endpoint-response", zod: SttEndpointResponse },
   { name: "stack-job", zod: StackJob },
   { name: "turn-stream-event", zod: TurnStreamEvent },
   { name: "token-count-request", zod: TokenCountRequest },
