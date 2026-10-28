@@ -1,3 +1,7 @@
+## [ui-v0.5.410] - 2026-10-28
+
+- `CompanionAvatar` ring gains `idle` and four distinct looks: idle a thin dotted ring, listening a solid ring with an outward ripple, thinking a dashed ring that turns slowly, speaking a thick ring with a pulsing glow. `null` still draws no ring.
+
 ## [ui-v0.5.409] - 2026-10-28
 
 - `ArticleView`: the pinned row swaps to the story title earlier (about 72px before the headline reaches the row) and eases (300ms padding and icon, 320ms label fade). More space between the article and the right rail. Key points that are not ready yet keep showing progress, and the ask repeats quietly (every 10 s, six times). No prop changes.

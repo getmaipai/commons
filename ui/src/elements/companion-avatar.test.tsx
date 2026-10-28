@@ -136,7 +136,7 @@ test("corner placement without a visibility callback has no button", () => {
 
 test("ring values mark the avatar without changing its clip state", async () => {
   const restore = setup();
-  for (const ring of ["listening", "thinking", "speaking"] as const) {
+  for (const ring of ["idle", "listening", "thinking", "speaking"] as const) {
     const view = render(<CompanionAvatar name="Mimi" clips={clips} state="idle" ring={ring} />);
     const avatar = view.getByRole("img", { name: `Mimi, ${ring}` });
     expect(avatar.getAttribute("data-ring")).toBe(ring);
@@ -187,5 +187,24 @@ test("the ring is drawn in the primary colour at 4px so it can be seen on any pa
   const ring = view.container.querySelector("[data-ring] > span")!;
   expect(ring.className).toContain("border-4");
   expect(ring.className).toContain("border-primary");
+  restore();
+});
+
+test("each ring differs in shape or motion, not only colour", () => {
+  const restore = setup();
+  const classes: Record<string, string> = {};
+  for (const ring of ["idle", "listening", "thinking", "speaking"] as const) {
+    const view = render(<CompanionAvatar name="Mimi" clips={clips} ring={ring} />);
+    classes[ring] = view.container.querySelector("[data-ring] > span")!.className;
+    if (ring === "listening") expect(view.container.querySelector("[data-ring-ripple]")).not.toBeNull();
+    else expect(view.container.querySelector("[data-ring-ripple]")).toBeNull();
+    view.unmount();
+  }
+  expect(classes.idle).toContain("border-dotted");
+  expect(classes.listening).toContain("border-solid");
+  expect(classes.thinking).toContain("border-dashed");
+  expect(classes.thinking).toContain("animate-");
+  expect(classes.speaking).toContain("shadow-lg");
+  expect(new Set(Object.values(classes)).size).toBe(4);
   restore();
 });

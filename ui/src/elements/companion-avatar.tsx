@@ -7,7 +7,7 @@ import { Button } from "@/kit/ui/button";
 import { icons } from "@/kit/icons";
 
 type Wanted = Partial<Record<"needs_you" | "speaking" | "working" | "thinking" | "listening" | "sleeping", boolean>>;
-type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl" | "header" | "fill"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "listening" | "thinking" | "speaking" | null; animated?: boolean };
+type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl" | "header" | "fill"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "idle" | "listening" | "thinking" | "speaking" | null; animated?: boolean };
 const SIZES = { xs: "size-7", sm: "size-16", md: "size-24", lg: "size-40", xl: "size-52", header: "size-10", fill: "size-full" } as const;
 
 export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null, animated = true }: Props) {
@@ -96,9 +96,15 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
     if (result.failed) { setFailed(true); onFail?.(); }
   }, [clip.h264, machine, onFail, source]);
   const movable = animated && !reduced && documentVisible && !failed && Boolean(clip?.h264 || clip?.av1);
-  const ringClass = ring === "listening" ? "border-primary/70" : ring === "thinking" ? cn("border-primary/80", !reduced && "animate-[pulse_2s_ease-in-out_infinite]") : ring === "speaking" ? cn("border-primary shadow-lg shadow-primary/50", !reduced && "animate-pulse") : "";
+  // Four rings that differ in shape and motion, not only colour: idle is a thin dotted ring, listening a solid ring with an outward ripple,
+  // thinking a dashed ring that turns slowly, speaking a thick solid ring with a pulsing glow. Reduced motion keeps every shape, still.
+  const ringClass = ring === "idle" ? "-inset-1 border-2 border-dotted border-muted-foreground/60"
+    : ring === "listening" ? "-inset-1.5 border-2 border-solid border-primary"
+    : ring === "thinking" ? cn("-inset-1.5 border-4 border-dashed border-primary/80", !reduced && "animate-[spin_6s_linear_infinite]")
+    : ring === "speaking" ? cn("-inset-1.5 border-4 border-solid border-primary shadow-lg shadow-primary/50", !reduced && "animate-pulse") : "";
   return <div role="img" aria-label={ring ? `${name}, ${ring}` : name} data-ring={ring ?? undefined} className={cn(SIZES[size], "pointer-events-none relative", className)}>
-    {ring ? <span aria-hidden="true" className={cn("absolute -inset-1.5 rounded-full border-4", ringClass)} /> : null}
+    {ring ? <span aria-hidden="true" className={cn("absolute rounded-full", ringClass)} /> : null}
+    {ring === "listening" && !reduced ? <span aria-hidden="true" data-ring-ripple="" className="absolute -inset-1.5 animate-ping rounded-full border-2 border-primary/50" /> : null}
     {movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264 || ""} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <SafeImage src={clip.still} alt="" className="size-full object-contain" />}
   </div>;
 }
