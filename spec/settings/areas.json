@@ -700,6 +700,12 @@
               "group": "household.pictures",
               "scope": "household",
               "tab": "pictures"
+            },
+            {
+              "label": "Online radio and podcasts",
+              "group": "household.media_online",
+              "scope": "household",
+              "tab": "pictures"
             }
           ],
           "tabs": [

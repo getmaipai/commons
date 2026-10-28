@@ -5152,5 +5152,56 @@
       "teen": 15,
       "adult": 30
     }
+  },
+  {
+    "key": "radio.directory.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Find radio stations online",
+    "help": "Lets people search a public station directory and play stations from the internet. The station sees your home's address. Off by default.",
+    "copy": {
+      "does": "Turns on searching and playing internet radio stations."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.media_online",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "podcasts.directory.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Find podcasts online",
+    "help": "Lets adults search a public podcast directory to add shows. Off by default.",
+    "copy": {
+      "does": "Turns on searching a public podcast directory."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.media_online",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "podcasts.directory.teens",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Let teens find podcasts",
+    "help": "Lets teens search the podcast directory too, once finding podcasts is on. Children never can.",
+    "copy": {
+      "does": "Lets teens search the podcast directory."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.media_online",
+    "honoured_by": [
+      "home"
+    ]
   }
 ]

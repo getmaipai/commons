@@ -1,3 +1,7 @@
+## [spec-v0.1.257] - 2026-10-27
+
+- Add the household switches `radio.directory.enabled`, `podcasts.directory.enabled` and `podcasts.directory.teens` (boolean, basic, all off by default, in the new `household.media_online` group shown as the "Online radio and podcasts" card in the Media settings area). Honoured by Home. Additive (RADIO-08, PODCAST-PORT-12).
+
 ## [spec-v0.1.256] - 2026-10-27
 
 - DUPLEX-02. New Stack wire shape `SttEndpointResponse` (`complete`, `probability`): the reply to an end-of-turn check on `POST /v1/audio/endpoint`, which takes the same WAV form as the transcription route. Additive.
