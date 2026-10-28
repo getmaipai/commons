@@ -7,6 +7,14 @@ adoption proves it.
 
 ## [Unreleased]
 
+## [core-v0.1.7] - 2026-10-28
+
+### Fixed
+- `guardedFetch`: cancelling a streaming response while the server is still sending no longer throws
+  from a stream handler (it killed the whole process).
+- `guardedFetch`: a Shoutcast v1 server that answers `ICY 200 OK` (which the HTTP parser rejects) is
+  retried once over a bare socket for plain-http GET, then streams like any other response.
+
 ## [core-v0.1.6] - 2026-10-28
 
 ### Added

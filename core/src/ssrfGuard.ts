@@ -2,7 +2,7 @@
 // and connect to that exact address while preserving the URL hostname for Host
 // and TLS SNI. Callers must use guardedFetch rather than checking then fetch().
 import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
+import { connect, isIP } from "node:net";
 import { request as httpRequest, type IncomingHttpHeaders } from "node:http";
 import { request as httpsRequest } from "node:https";
 
@@ -155,7 +155,71 @@ export async function guardedFetch(input: string | URL, options: GuardedFetchOpt
   }
 }
 
-function requestPinned(url: URL, target: GuardedTarget, options: GuardedFetchOptions): Promise<Response> {
+export async function requestPinned(url: URL, target: GuardedTarget, options: GuardedFetchOptions): Promise<Response> {
+  try {
+    return await requestHttpPinned(url, target, options);
+  } catch (error) {
+    // Shoutcast v1 servers answer "ICY 200 OK", which the HTTP parser refuses; replay the GET over a raw socket.
+    const method = options.method ?? "GET";
+    if ((error as NodeJS.ErrnoException)?.code === "HPE_INVALID_CONSTANT" && url.protocol === "http:" && method === "GET" && !options.body) return requestIcyPinned(url, target, options);
+    throw error;
+  }
+}
+
+/** A bare-socket GET that accepts an "ICY 200 OK" status line; the body streams after the headers. */
+function requestIcyPinned(url: URL, target: GuardedTarget, options: GuardedFetchOptions): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const headers = new Headers(options.headers);
+    if (!headers.has("host")) headers.set("host", url.host);
+    headers.set("connection", "close");
+    const socket = connect({ host: target.address, port: Number(url.port || 80), family: target.family });
+    const abort = () => socket.destroy(options.signal?.reason instanceof Error ? options.signal.reason : new DOMException("Aborted", "AbortError"));
+    if (options.signal?.aborted) abort();
+    else options.signal?.addEventListener("abort", abort, { once: true });
+    socket.on("close", () => options.signal?.removeEventListener("abort", abort));
+    socket.once("error", reject);
+    socket.on("connect", () => {
+      const lines = [`GET ${url.pathname}${url.search} HTTP/1.0`, ...[...headers.entries()].map(([k, v]) => `${k}: ${v}`), "", ""];
+      socket.write(lines.join("\r\n"));
+    });
+    let head = Buffer.alloc(0);
+    let controller: ReadableStreamDefaultController<Uint8Array> | null = null;
+    let finished = false;
+    let resolved = false;
+    const body = new ReadableStream<Uint8Array>({
+      start(c) { controller = c; },
+      cancel() { finished = true; socket.destroy(); },
+    });
+    socket.on("data", (chunk: Buffer) => {
+      if (!resolved) {
+        head = Buffer.concat([head, chunk]);
+        const end = head.indexOf("\r\n\r\n");
+        if (end < 0) {
+          if (head.length > 16384) socket.destroy(new Error("ICY response headers too large"));
+          return;
+        }
+        const [statusLine = "", ...fields] = head.subarray(0, end).toString("latin1").split("\r\n");
+        const match = /^(?:ICY|HTTP\/\d(?:\.\d)?) (\d{3})(?: (.*))?$/.exec(statusLine);
+        if (!match) { socket.destroy(new Error("unrecognized response status line")); return; }
+        const responseHeaders = new Headers();
+        for (const field of fields) {
+          const colon = field.indexOf(":");
+          if (colon > 0) responseHeaders.append(field.slice(0, colon).trim(), field.slice(colon + 1).trim());
+        }
+        resolved = true;
+        resolve(new Response(body, { status: Number(match[1]), statusText: match[2] ?? "", headers: responseHeaders }));
+        const rest = head.subarray(end + 4);
+        if (rest.length) controller?.enqueue(new Uint8Array(rest));
+        return;
+      }
+      if (!finished) controller?.enqueue(new Uint8Array(chunk));
+    });
+    socket.on("end", () => { if (!finished) { finished = true; try { controller?.close(); } catch { /* already cancelled */ } } });
+    socket.on("error", (error) => { if (resolved && !finished) { finished = true; try { controller?.error(error); } catch { /* already cancelled */ } } });
+  });
+}
+
+function requestHttpPinned(url: URL, target: GuardedTarget, options: GuardedFetchOptions): Promise<Response> {
   return new Promise((resolve, reject) => {
     const headers = new Headers(options.headers);
     if (!headers.has("host")) headers.set("host", url.host);
@@ -174,13 +238,15 @@ function requestPinned(url: URL, target: GuardedTarget, options: GuardedFetchOpt
         if (Array.isArray(value)) for (const entry of value) responseHeaders.append(key, entry);
         else if (value !== undefined) responseHeaders.set(key, value);
       }
+      // After a cancel, node can still emit data, end or error; touching the controller then throws and kills the process.
+      let cancelled = false;
       const body = new ReadableStream<Uint8Array>({
         start(controller) {
-          res.on("data", (chunk: Buffer) => controller.enqueue(new Uint8Array(chunk)));
-          res.on("end", () => controller.close());
-          res.on("error", (error) => controller.error(error));
+          res.on("data", (chunk: Buffer) => { if (!cancelled) controller.enqueue(new Uint8Array(chunk)); });
+          res.on("end", () => { if (!cancelled) controller.close(); });
+          res.on("error", (error) => { if (!cancelled) controller.error(error); });
         },
-        cancel() { res.destroy(); },
+        cancel() { cancelled = true; res.destroy(); },
       });
       resolve(new Response(body, { status: res.statusCode ?? 500, statusText: res.statusMessage, headers: responseHeaders }));
     });

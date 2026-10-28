@@ -128,3 +128,43 @@ describe("assertNotPrivateHost", () => {
     await expect(assertNotPrivateHost("[2001:4860:4860::8888]", neverCalled)).resolves.toBeUndefined();
   });
 });
+
+describe("guardedFetch against raw servers", () => {
+  const publicLookup: DnsLookup = async () => ({ address: "93.184.216.34", family: 4 });
+  // The pinned request connects to the checked address, so point it at the local server by lying in the target.
+  const toLocal = (port: number) => async (url: URL, target: unknown, options: Parameters<typeof guardedFetch>[1] = {}) => {
+    const { requestPinned } = await import("./ssrfGuard");
+    return requestPinned(new URL(`http://127.0.0.1:${port}${url.pathname}`), { hostname: "127.0.0.1", address: "127.0.0.1", family: 4 }, options ?? {});
+  };
+
+  test("accepts a Shoutcast v1 'ICY 200 OK' reply and streams its body", async () => {
+    const { createServer } = await import("node:net");
+    const server = createServer((s) => { s.on("data", () => { s.end("ICY 200 OK\r\nicy-name: Test FM\r\ncontent-type: audio/mpeg\r\n\r\nabcdef"); }); });
+    await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+    const port = (server.address() as { port: number }).port;
+    try {
+      const res = await guardedFetch("http://radio.example.com/live", {}, publicLookup, toLocal(port));
+      expect(res.status).toBe(200);
+      expect(res.headers.get("icy-name")).toBe("Test FM");
+      expect(await res.text()).toBe("abcdef");
+    } finally { server.close(); }
+  });
+
+  test("cancelling a streaming body while the server keeps sending does not throw", async () => {
+    const { createServer } = await import("node:http");
+    const server = createServer((_req, res) => { res.writeHead(200, { "content-type": "audio/mpeg" }); const t = setInterval(() => res.write("x".repeat(1024)), 5); res.on("close", () => clearInterval(t)); });
+    await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+    const port = (server.address() as { port: number }).port;
+    const errors: unknown[] = [];
+    const onError = (e: unknown) => errors.push(e);
+    process.on("uncaughtException", onError);
+    try {
+      const res = await guardedFetch("http://radio.example.com/live", {}, publicLookup, toLocal(port));
+      const reader = res.body!.getReader();
+      await reader.read();
+      await reader.cancel();
+      await new Promise((r) => setTimeout(r, 150));
+      expect(errors).toEqual([]);
+    } finally { process.off("uncaughtException", onError); server.close(); }
+  });
+});
