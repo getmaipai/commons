@@ -15,7 +15,7 @@ describe("CompanionStage", () => {
       const status = view.getByRole("status");
       expect(status.textContent).toBe("Listening");
       expect(status.querySelector("*" )).toBeNull();
-      expect(root?.querySelector('span.rounded-full[class*="bg-"]')).toBeNull();
+      expect(root?.querySelector('header span.rounded-full[class*="bg-"]')).toBeNull();
       cleanup();
     }
   });
@@ -63,5 +63,34 @@ describe("CompanionStage heard and showHeader", () => {
     const view = render(<CompanionStage name="Tessa" mode="idle" character={<span>c</span>} talk={<span>t</span>} />);
     expect(view.container.querySelector("header")!.className).not.toContain("sr-only");
     expect(view.container.querySelector('[data-slot="companion-stage-heard"]')).toBeNull();
+  });
+});
+
+describe("CompanionStage history and thinking", () => {
+  test("history draws both roles as bubbles in a log that starts at the newest message, and replaces the floating bubble", () => {
+    const view = render(<CompanionStage name="Tessa" mode="idle" character={<span />} talk={<span />} bubble={<p>Floating</p>} history={[{ id: "1", role: "user", content: "Hi Tessa", time: "2:14 PM" }, { id: "2", role: "companion", content: <p>Hello there</p> }]} />);
+    const log = view.getByRole("log", { name: "Conversation" });
+    expect(log.className).toContain("flex-col-reverse");
+    const items = log.querySelectorAll("li");
+    expect(items[0]?.getAttribute("data-role")).toBe("user");
+    expect(items[1]?.getAttribute("data-role")).toBe("companion");
+    expect(view.getByText("2:14 PM")).toBeTruthy();
+    expect(view.queryByText("Floating")).toBeNull();
+  });
+
+  test("no history means no log and the floating bubble still shows", () => {
+    const view = render(<CompanionStage name="Tessa" mode="idle" character={<span />} talk={<span />} bubble={<p>Floating</p>} />);
+    expect(view.queryByRole("log")).toBeNull();
+    expect(view.getByText("Floating")).toBeTruthy();
+  });
+
+  test("the thought cloud holds three dots that only animate when motion is allowed", () => {
+    const view = render(<CompanionStage name="Tessa" mode="thinking" character={<span />} talk={<span />} />);
+    const dots = view.container.querySelectorAll('[data-slot="companion-stage-thought-dot"]');
+    expect(dots.length).toBe(3);
+    for (const dot of dots) expect(dot.className).toContain("motion-safe:animate-bounce");
+    cleanup();
+    const idle = render(<CompanionStage name="Tessa" mode="idle" character={<span />} talk={<span />} />);
+    expect(idle.container.querySelector('[data-slot="companion-stage-thought-cloud"]')).toBeNull();
   });
 });

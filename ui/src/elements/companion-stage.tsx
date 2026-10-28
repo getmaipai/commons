@@ -13,6 +13,14 @@ export interface CompanionStageAction {
   disabled?: boolean;
 }
 
+export interface CompanionStageHistoryItem {
+  id: string;
+  role: "user" | "companion";
+  content: ReactNode;
+  /** A short time label such as "2:14 PM". */
+  time?: string;
+}
+
 export interface CompanionStageProps {
   name: string;
   /** A state word as text. Omit for idle. */
@@ -25,6 +33,10 @@ export interface CompanionStageProps {
   workingLine?: string;
   actions?: CompanionStageAction[];
   talk: ReactNode;
+  /** The conversation so far, oldest first, drawn as friendly bubbles in a scroll area under the character; it starts at the newest message. Omit for none. */
+  history?: CompanionStageHistoryItem[];
+  /** Accessible name of the history area. Default "Conversation". */
+  historyLabel?: string;
   /** What the person just said, drawn small above the bubble so they can see it was heard. */
   heard?: ReactNode;
   /** False hides the name and state word visually (the host shows them in its own header); they stay for screen readers. Default true. */
@@ -38,18 +50,20 @@ function AudioWave({ className }: { className?: string }) {
   </div>;
 }
 
-export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, heard, showHeader = true, className }: CompanionStageProps) {
+export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, heard, history, historyLabel = "Conversation", showHeader = true, className }: CompanionStageProps) {
   return <section data-slot="companion-stage" data-mode={mode} aria-label={`${name} companion`} className={cn("flex h-full min-h-0 flex-col gap-3", className)}>
     <header className={cn("flex min-w-0 flex-col", !showHeader && "sr-only")}>
       <h2 className="min-w-0 truncate font-medium">{name}</h2>
       {stateWord ? <span role="status" aria-live="polite" className="truncate text-sm text-muted-foreground">{stateWord}</span> : null}
     </header>
 
-    <div data-slot="companion-stage-character-area" className="relative flex min-h-0 flex-1 items-center justify-center">
+    <div data-slot="companion-stage-character-area" className={cn("relative flex min-h-0 items-center justify-center", history ? "flex-[2]" : "flex-1")}>
       <div data-slot="companion-stage-character" className="flex h-full min-h-0 w-full items-center justify-center">{character}</div>
       {mode === "listening" ? <div data-slot="companion-stage-listening-ring" aria-hidden="true" className="pointer-events-none absolute inset-4 rounded-full border border-ring/50 motion-safe:animate-pulse" /> : null}
-      {mode === "thinking" ? <div data-slot="companion-stage-thought-cloud" aria-hidden="true" className="absolute right-[18%] top-[15%] size-10 rounded-[50%] border-2 border-border after:absolute after:-bottom-1 after:left-1 after:size-2 after:rounded-full after:border after:border-border" /> : null}
-      {heard !== undefined || bubble !== undefined ? <div className="absolute bottom-3 left-2 z-10 flex max-w-[min(80%,22rem)] flex-col items-start gap-1.5">
+      {mode === "thinking" ? <div data-slot="companion-stage-thought-cloud" aria-hidden="true" className="absolute right-[18%] top-[8%] flex h-9 w-14 items-center justify-center gap-1 rounded-[50%] border-2 border-border bg-card text-muted-foreground after:absolute after:-bottom-1 after:left-1 after:size-2 after:rounded-full after:border after:border-border after:bg-card">
+        {[0, 1, 2].map((dot) => <i key={dot} data-slot="companion-stage-thought-dot" className="size-1.5 rounded-full bg-current motion-safe:animate-bounce" style={{ animationDelay: `${dot * 150}ms` }} />)}
+      </div> : null}
+      {!history && (heard !== undefined || bubble !== undefined) ? <div className="absolute bottom-3 left-2 z-10 flex max-w-[min(80%,22rem)] flex-col items-start gap-1.5">
         {heard !== undefined ? <p data-slot="companion-stage-heard" className="line-clamp-2 px-1 text-xs text-muted-foreground">{heard}</p> : null}
         {bubble !== undefined ? <div data-slot="companion-stage-bubble" className="flex max-w-[min(80%,22rem)] items-start gap-2 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm">
         <div className="min-w-0 flex-1">{bubble}</div>
@@ -57,6 +71,15 @@ export function CompanionStage({ name, stateWord, mode, character, bubble, onDis
       </div> : null}
       </div> : null}
     </div>
+
+    {history ? <div data-slot="companion-stage-history" role="log" aria-label={historyLabel} className="flex min-h-0 flex-[3] flex-col-reverse overflow-y-auto overscroll-contain">
+      <ol className="flex flex-col gap-3 py-1">
+        {history.map((item) => <li key={item.id} data-role={item.role} className={cn("flex max-w-[88%] flex-col gap-1", item.role === "user" ? "items-end self-end" : "items-start self-start")}>
+          <div className={cn("min-w-0 rounded-2xl px-3.5 py-2 text-sm", item.role === "user" ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-muted text-foreground")}>{item.content}</div>
+          {item.time ? <span className="px-1 text-xs text-muted-foreground">{item.time}</span> : null}
+        </li>)}
+      </ol>
+    </div> : null}
 
     {mode === "working" && workingLine ? <div className="min-w-0 text-sm text-muted-foreground" data-slot="companion-stage-working-line">{workingLine}</div> : null}
     {mode === "working" ? <div data-slot="companion-stage-working-progress" role="progressbar" aria-label="Working" className="h-0.5 w-full overflow-hidden rounded-full bg-muted"><span className="block h-full w-1/3 rounded-sm bg-primary" /></div> : null}

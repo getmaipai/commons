@@ -1,3 +1,7 @@
+## [ui-v0.5.412] - 2026-10-28
+
+- `CompanionStage` gains `history` (oldest first: `id`, `role` "user" or "companion", `content`, optional `time`) and `historyLabel`: a scrollable log of friendly bubbles under the character that opens at the newest message, replacing the floating bubble and "heard" line while set. The thinking cloud now holds three bouncing dots (still only with motion allowed) instead of being empty. Additive; no prop removed.
+
 ## [ui-v0.5.411] - 2026-10-28
 
 - `ArticleView`: the pinned row swaps to the story title a little later (12px from the row, was 72px) and eases over 500ms; it goes back only after the headline is 64px clear, so it does not flicker at the line. No prop changes.
