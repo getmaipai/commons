@@ -133,7 +133,7 @@ describe("ArticleView", () => {
     expect(plain.getByText("Other page").tagName).toBe("SPAN");
   });
 
-  test("the toolbar shows only the declared actions: Save fires from the bookmark, Listen, Key points and Discuss are buttons under the headline", () => {
+  test("the toolbar shows only the declared actions: Save fires from the bookmark, Listen and Discuss are buttons under the headline, and Key points ask for themselves", () => {
     const onAction = mock(() => {});
     const none = render(<ArticleView data={data} onAction={onAction} />);
     expect(none.queryByLabelText("Save")).toBeNull();
@@ -146,8 +146,9 @@ describe("ArticleView", () => {
     expect(view.queryByLabelText("More")).toBeNull();
     fireEvent.click(view.getByText("Listen"));
     expect(onAction).toHaveBeenCalledWith("listen", { story_id: "story-1", item_id: "news-1" });
-    fireEvent.click(view.getByText("Key points"));
+    expect(view.queryByRole("button", { name: "Key points" })).toBeNull();
     expect(onAction).toHaveBeenCalledWith("summarize", { story_id: "story-1", item_id: "news-1" });
+    expect(view.getByText("Writing the key points…")).not.toBeNull();
     expect(view.queryByText("Discuss")).toBeNull();
     cleanup();
     const discuss = render(<ArticleView data={data} onAction={onAction} available={["discuss", "open_site"]} ids={{ story_id: "story-1" }} />);
@@ -210,6 +211,17 @@ describe("ArticleView", () => {
     expect(rail.contains(container.querySelector('[data-slot="key-points"]'))).toBe(true);
     expect(container.querySelector('[data-slot="article-column"]')!.contains(rail)).toBe(true);
     expect(container.textContent).not.toContain("Written on this hub");
+  });
+
+  test("a story with no key points asks for them once on open; one that has them asks for nothing", () => {
+    const onAction = mock(() => {});
+    const view = render(<ArticleView data={{ ...data, key_points: undefined }} onAction={onAction} available={["summarize"]} ids={{ item_id: "news-1" }} />);
+    view.rerender(<ArticleView data={{ ...data, key_points: undefined }} onAction={onAction} available={["summarize"]} ids={{ item_id: "news-1" }} />);
+    expect(onAction).toHaveBeenCalledTimes(1);
+    cleanup();
+    const done = mock(() => {});
+    render(<ArticleView data={data} onAction={done} available={["summarize"]} />);
+    expect(done).not.toHaveBeenCalled();
   });
 
   test("the pinned source row swaps the publisher for the story title once the headline scrolls under it", async () => {

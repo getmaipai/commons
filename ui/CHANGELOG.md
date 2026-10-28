@@ -1,5 +1,9 @@
 ## [ui-v0.5.406] - 2026-10-28
 
+- `ArticleView`: the key points write themselves. A story with none yet fires `summarize` once on open and the rail shows "Writing the key points…" until they arrive; the "Key points" button is gone. Listen and Discuss share one row, and the right rail is 24rem wide (was 16rem).
+
+## [ui-v0.5.406] - 2026-10-28
+
 - Icon registry gains `umbrella`, `shirt`, `glasses`, `snowflake`, `wind`, `footprints`, `tree-pine` and `cloud-rain`, so weather advice chips can name an icon each. Additive.
 
 ## [ui-v0.5.405] - 2026-10-28

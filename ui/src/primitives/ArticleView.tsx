@@ -17,7 +17,6 @@ const EllipsisIcon = getIcon("more-horizontal");
 const ShareIcon = getIcon("share");
 const TypeIcon = getIcon("a-large-small");
 const HeadphonesIcon = getIcon("headphones");
-const ListIcon = getIcon("sparkles");
 const MessageIcon = getIcon("message-circle");
 const NewspaperIcon = getIcon("newspaper");
 
@@ -201,7 +200,17 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const bodySize = TEXT_SIZES.find((size) => size.id === textSize)!.className;
   const canShare = can("open_site") && !!data.open_url && typeof navigator !== "undefined" && typeof navigator.share === "function";
   const hasMore = can("open_site") && !!data.open_url;
-  const hasAssist = can("listen") || (can("summarize") && !data.key_points) || can("discuss");
+  const hasAssist = can("listen") || can("discuss");
+  // The key points write themselves: opening a story that has none yet asks for them once.
+  const summarizing = can("summarize") && !data.key_points;
+  const askedFor = useRef<string | null>(null);
+  const askKey = `${ids?.item_id ?? ""}|${ids?.story_id ?? ""}|${data.title}`;
+  useEffect(() => {
+    if (!summarizing || askedFor.current === askKey) return;
+    askedFor.current = askKey;
+    fire("summarize");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [summarizing, askKey]);
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
   return (
     <article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col", className)}>
@@ -244,7 +253,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", condensed && "truncate text-lg leading-tight")}>{condensed ? data.title : data.byline.publisher}</span>
         </div>
       ) : null}
-      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-[calc(72ch+22rem)] lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1">
+      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-[calc(72ch+30rem)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-x-8 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1">
       <header className="flex flex-col gap-2">
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
@@ -252,19 +261,18 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
-      {hasAssist || data.key_points ? (
+      {hasAssist || data.key_points || summarizing ? (
         <div data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start lg:[grid-row:1/span_99] lg:col-start-2">
         {hasAssist ? (
-          <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex flex-wrap gap-2 lg:flex-col">
+          <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex gap-2 [&>*]:flex-1">
             {can("listen") ? <Button variant="outline" size="sm" onClick={() => fire("listen")}><HeadphonesIcon aria-hidden />Listen</Button> : null}
-            {can("summarize") && !data.key_points ? <Button variant="outline" size="sm" onClick={() => fire("summarize")}><ListIcon aria-hidden />Key points</Button> : null}
             {can("discuss") ? <Button variant="outline" size="sm" onClick={() => fire("discuss")}><MessageIcon aria-hidden />Discuss</Button> : null}
           </div>
         ) : null}
-        {data.key_points ? (
+        {data.key_points || summarizing ? (
           <section data-slot="key-points" aria-label="Key points" className="flex w-full flex-col gap-1 rounded-lg bg-muted p-4">
             <h3 className="text-sm font-semibold">Key points</h3>
-            <p className="whitespace-pre-line">{data.key_points.text}</p>
+            {data.key_points ? <p className="whitespace-pre-line">{data.key_points.text}</p> : <p className="text-muted-foreground" aria-live="polite">Writing the key points…</p>}
           </section>
         ) : null}
         </div>
