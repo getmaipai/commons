@@ -178,6 +178,7 @@ test("fill takes the whole space it is given", () => {
   const restore = setup();
   const view = render(<CompanionAvatar name="Mimi" clips={clips} size="fill" animated={false} />);
   expect(view.getByRole("img", { name: "Mimi" }).className).toContain("size-full");
+  expect(view.getByRole("img", { name: "Mimi" }).parentElement?.className).toContain("size-full");
   restore();
 });
 

@@ -12,7 +12,7 @@ const SIZES = { xs: "size-7", sm: "size-16", md: "size-24", lg: "size-40", xl: "
 
 export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null, animated = true }: Props) {
   const corner = placement === "corner";
-  const wrapperClass = corner ? "group pointer-events-none absolute right-3 top-3 z-10" : "group relative";
+  const wrapperClass = corner ? "group pointer-events-none absolute right-3 top-3 z-10" : size === "fill" ? "group relative size-full" : "group relative";
   const ToggleIcon = hidden ? icons.eye : icons["eye-off"];
   const toggleLabel = hidden ? "Show the character" : "Hide the character";
 
