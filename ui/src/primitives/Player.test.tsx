@@ -302,6 +302,13 @@ describe("Player", () => {
     expect(onNext).toHaveBeenCalledWith("m2");
   });
 
+  test("the video layout is never taller than the window, so the title stays on screen under it", () => {
+    const view = render(<Player src="/a" title="Lanterns" kind="video" layout="video" />);
+    const root = view.container.querySelector("[data-slot=player]") as HTMLElement;
+    expect(root.style.maxWidth).toContain("100dvh");
+    expect(root.style.maxWidth).toContain("16 / 9");
+  });
+
   test("docking to the mini layout keeps the same media element (playback never restarts)", () => {
     const view = render(<Player src="/a" title="Lanterns" kind="video" layout="video" />);
     const before = view.container.querySelector("[data-slot=player-media]");

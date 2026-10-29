@@ -945,6 +945,10 @@ export function Player(props: PlayerProps) {
         data-slot="player"
         data-layout="video"
         onKeyDown={onKeyDown}
+        // A 16:9 picture as wide as its column is taller than the window on a wide screen, which pushes the title and the
+        // buttons below the fold. The width stops where the picture is as tall as the window less the header and the title
+        // block (never under 22rem), so the title shows under the picture the way it does on a video site.
+        style={{ maxWidth: "max(22rem, calc((100dvh - 14rem) * 16 / 9))" }}
         className="relative w-full overflow-hidden rounded-[var(--player-radius)] bg-[var(--art-surface)]"
       >
         <MediaController
