@@ -542,6 +542,209 @@
                     }
                   }
                 },
+                "researching": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "writing": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "done": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "laughing": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "surprised": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "sad": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "confused": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
                 "idle_look": {
                   "type": "object",
                   "additionalProperties": false,

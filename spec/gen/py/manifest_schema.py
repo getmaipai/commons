@@ -128,6 +128,132 @@ class Idle(BaseModel):
     ) = None
 
 
+class Researching(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
+
+
+class Writing(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
+
+
+class Done(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
+
+
+class Laughing(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
+
+
+class Surprised(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
+
+
+class Sad(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
+
+
+class Confused(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    h264: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    av1: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.mp4$') | None = (
+        None
+    )
+    still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
+
+
 class IdleLook(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -331,6 +457,13 @@ class States(BaseModel):
         extra='forbid',
     )
     idle: Idle
+    researching: Researching | None = None
+    writing: Writing | None = None
+    done: Done | None = None
+    laughing: Laughing | None = None
+    surprised: Surprised | None = None
+    sad: Sad | None = None
+    confused: Confused | None = None
     idle_look: IdleLook | None = None
     listening: Listening | None = None
     thinking: Thinking | None = None

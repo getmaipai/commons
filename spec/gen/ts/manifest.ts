@@ -324,6 +324,265 @@ export const PackageManifest = z
                       .optional(),
                   })
                   .strict(),
+                researching: z
+                  .object({
+                    h264: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    av1: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    still: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
+                  })
+                  .strict()
+                  .optional(),
+                writing: z
+                  .object({
+                    h264: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    av1: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    still: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
+                  })
+                  .strict()
+                  .optional(),
+                done: z
+                  .object({
+                    h264: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    av1: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    still: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
+                  })
+                  .strict()
+                  .optional(),
+                laughing: z
+                  .object({
+                    h264: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    av1: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    still: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
+                  })
+                  .strict()
+                  .optional(),
+                surprised: z
+                  .object({
+                    h264: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    av1: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    still: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
+                  })
+                  .strict()
+                  .optional(),
+                sad: z
+                  .object({
+                    h264: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    av1: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    still: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
+                  })
+                  .strict()
+                  .optional(),
+                confused: z
+                  .object({
+                    h264: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    av1: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$",
+                        ),
+                      )
+                      .optional(),
+                    still: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
+                  })
+                  .strict()
+                  .optional(),
                 idle_look: z
                   .object({
                     h264: z
