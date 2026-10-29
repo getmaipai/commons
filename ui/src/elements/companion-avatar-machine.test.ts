@@ -1,8 +1,27 @@
 import { expect, test } from "bun:test";
-import { createCompanionAvatarMachine, pickWanted, type CompanionClips } from "./companion-avatar-machine";
+import { createCompanionAvatarMachine, emotionClip, pictureFor, pickWanted, resolveClip, type CompanionClips } from "./companion-avatar-machine";
 
 const clip = (loop = true) => ({ h264: "x.mp4", still: "x.png", loop });
 const allClips = (): CompanionClips => ({ idle: clip(), idle_look: clip(false), needs_you: clip(), speaking: clip(), working: clip(), thinking: clip(), listening: clip(), sleeping: clip(), greeting: clip(false), happy: clip(false), oops: clip(false), celebrate: clip(false) });
+
+test("clip fallback follows the shared table", () => {
+  expect(resolveClip("researching", ["thinking"])).toBe("thinking");
+  expect(resolveClip("researching", [])).toBe("idle");
+  expect(resolveClip("needs_you", ["listening"])).toBe("listening");
+});
+
+test("emotion clips follow child bands", () => {
+  expect(emotionClip("sad", "child")).toBeNull();
+  expect(emotionClip("sad", "adult")).toBe("sad");
+  expect(emotionClip("happy", "child")).toBe("laughing");
+  expect(emotionClip("excited", "child")).toBeNull();
+});
+
+test("picture fallback prefers keyframe, then still", () => {
+  expect(pictureFor("thinking", { keyframe: "pose.png", still: "still.png" })).toBe("pose.png");
+  expect(pictureFor("thinking", { still: "still.png" })).toBe("still.png");
+  expect(pictureFor("thinking", {})).toBeNull();
+});
 
  test("wanted priority follows the vocabulary priority table", () => {
   expect(pickWanted({ sleeping: true, listening: true, thinking: true, working: true, speaking: true, needs_you: true })).toBe("needs_you");

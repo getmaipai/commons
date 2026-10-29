@@ -1,9 +1,26 @@
 import mediaVocab from "@maipai/spec/vocab/companion-media.json";
+import emotionMap from "@maipai/spec/vocab/emotion-map.json";
 
 export const COMPANION_STATE_IDS = mediaVocab.states.map(({ id }) => id) as readonly (typeof mediaVocab.states)[number]["id"][];
 export type StateId = (typeof COMPANION_STATE_IDS)[number];
 export type CompanionClip = { h264?: string; av1?: string; still: string; loop: boolean };
 export type CompanionClips = Partial<Record<StateId, CompanionClip>> & { idle: CompanionClip };
+export type PictureState = { keyframe?: string | null; still?: string | null };
+type EmotionLabel = keyof typeof mediaVocab.emotion_clips;
+export function resolveClip(state: StateId, available: readonly StateId[]): StateId {
+  const choices = [state, ...(mediaVocab.fallback as Partial<Record<StateId, StateId[]>>)[state] ?? ["idle"]];
+  return choices.find((candidate) => available.includes(candidate)) ?? "idle";
+}
+export function emotionClip(label: string, band: "child" | "teen" | "adult"): StateId | null {
+  const mapping = mediaVocab.emotion_clips[label as EmotionLabel];
+  if (!mapping) return null;
+  const emotion = emotionMap.labels.find(({ label: name }) => name === label);
+  if (band === "child" && emotion?.child_band !== "same") return null;
+  return mapping.state as StateId;
+}
+export function pictureFor(_state: StateId, manifestState: PictureState): string | null {
+  return manifestState.keyframe || manifestState.still || null;
+}
 export type WantedInputs = { needs_you: boolean; speaking: boolean; working: boolean; thinking: boolean; listening: boolean; sleeping: boolean };
 export const COMPANION_PRIORITY = ["needs_you", "speaking", "working", "thinking", "listening", "sleeping", "idle"] as const satisfies readonly StateId[];
 const ONE_SHOTS = mediaVocab.states.filter(({ kind }) => kind === "oneshot").map(({ id }) => id) as StateId[];
@@ -29,7 +46,7 @@ export function createCompanionAvatarMachine(clips: CompanionClips, options: Com
   const max = options.idleLookMaxMs ?? 40_000;
   const random = options.random ?? Math.random;
   const available = (state: StateId) => !!clips[state] && !unavailable.has(state);
-  const resolve = (state: StateId) => available(state) ? state : "idle";
+  const resolve = (state: StateId) => resolveClip(state, COMPANION_STATE_IDS.filter(available));
   const setCurrent = (state: StateId, nowMs?: number) => {
     const next = resolve(state);
     if (next === current) return;

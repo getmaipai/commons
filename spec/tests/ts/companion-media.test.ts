@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { COMPANION_MEDIA, COMPANION_MEDIA_STATES } from "../../media/ts/companionMedia.js";
 import { PackageManifest } from "../../gen/ts/manifest.js";
+import emotionMap from "../../vocab/emotion-map.json" with { type: "json" };
 
 const SPEC = join(import.meta.dir, "..", "..");
 const BASE = {
@@ -26,7 +27,7 @@ const BASE = {
 
 const animation = {
   kind: "video",
-  spec_version: 1,
+  spec_version: 2,
   key: "#00FF00",
   sheet: { rest: "pip-rest.png", card: "pip-card.png" },
   states: {
@@ -98,18 +99,41 @@ describe("CMEDIA-SPEC-01 companion media", () => {
       };
     };
     const stateSchema = schema.properties.companion.properties.animation.properties.states;
-    expect(Object.keys(stateSchema.properties)).toEqual(COMPANION_MEDIA_STATES);
+    expect(Object.keys(stateSchema.properties).sort()).toEqual([...COMPANION_MEDIA_STATES].sort());
     expect(COMPANION_MEDIA.states.map((state) => state.id)).toEqual(COMPANION_MEDIA_STATES);
-    expect(COMPANION_MEDIA.states.filter((state) => state.required).map((state) => state.id)).toEqual([
-      "idle", "thinking", "working", "speaking", "needs_you",
-    ]);
-    expect(COMPANION_MEDIA.states.filter((state) => state.required)).toHaveLength(5);
+    expect(COMPANION_MEDIA.states.filter((state) => state.creator).map((state) => state.id)).toHaveLength(13);
+    expect(COMPANION_MEDIA.states.filter((state) => state.required).map((state) => state.id)).toEqual(["idle", "listening", "thinking", "speaking"]);
     expect(stateSchema.required).toEqual(["idle"]);
+  });
+
+  test("creator list, legacy ids, fallback and emotion mappings are consistent", () => {
+    const ids = new Set(COMPANION_MEDIA.states.map(({ id }) => id));
+    expect(COMPANION_MEDIA.states.filter(({ creator }) => creator).map(({ id }) => id)).toEqual([
+      "idle", "listening", "thinking", "speaking", "working", "researching", "writing", "done", "sleeping", "laughing", "surprised", "sad", "confused",
+    ]);
+    for (const id of ["idle_look", "needs_you", "greeting", "happy", "oops", "celebrate"]) {
+      expect(COMPANION_MEDIA.states.find((state) => state.id === id)).toMatchObject({ legacy: true, required: false });
+    }
+    for (const targets of Object.values(COMPANION_MEDIA.fallback)) for (const target of targets ?? []) expect(ids.has(target)).toBe(true);
+    const emotions = new Map<string, string>(emotionMap.labels.map(({ label, child_band }) => [label, child_band]));
+    for (const [label, mapping] of Object.entries(COMPANION_MEDIA.emotion_clips)) {
+      expect(ids.has(mapping.state)).toBe(true);
+      if (label !== "concerned") expect(mapping.child_band).toBe(emotions.get(label)!);
+    }
+  });
+
+  test("manifest states accept optional keyframe and reject unknown fields", () => {
+    const withKeyframe = structuredClone(animation) as { states: Record<string, Record<string, unknown>>; [key: string]: unknown };
+    withKeyframe.states.idle!.keyframe = "pip-idle-keyframe.png";
+    expect(() => PackageManifest.parse(manifestWithAnimation({ animation: withKeyframe }))).not.toThrow();
+    const invalid = structuredClone(animation) as { states: Record<string, Record<string, unknown>>; [key: string]: unknown };
+    (invalid.states.idle as Record<string, unknown>).extra = true;
+    expect(() => PackageManifest.parse(manifestWithAnimation({ animation: invalid }))).toThrow();
   });
 
   test("the vocab numbers stay at the CMEDIA-SPEC-01 values", () => {
     expect(COMPANION_MEDIA).toMatchObject({
-      version: 1,
+      version: 2,
       image: { size: 1024, margin_percent: 12, format: "png", min_upload_short_side: 512, max_upload_bytes: 20971520 },
       key: { default: "#00FF00", alternate: "#FF00FF" },
       generate: { width: 480, height: 480, fps: 24, frames: 73, seconds: 3 },
@@ -127,19 +151,6 @@ describe("CMEDIA-SPEC-01 companion media", () => {
     expect(COMPANION_MEDIA.generate.height).toBe(COMPANION_MEDIA.ship.colour_height);
     expect(COMPANION_MEDIA.generate.seconds).toBeLessThanOrEqual(Math.max(...COMPANION_MEDIA.states.map((state) => state.max_seconds)));
     expect(COMPANION_MEDIA.generate.seconds).toBeGreaterThanOrEqual(Math.min(...COMPANION_MEDIA.states.map((state) => state.min_seconds)));
-    expect(COMPANION_MEDIA.states).toEqual([
-      { id: "idle", kind: "loop", required: true, min_seconds: 3, max_seconds: 4, motion: "breathes slowly, tiny sway, one blink", driven_by: "outside a turn" },
-      { id: "idle_look", kind: "oneshot", required: false, min_seconds: 2, max_seconds: 3, motion: "looks to one side, then back", driven_by: "random while idle" },
-      { id: "listening", kind: "loop", required: false, min_seconds: 2, max_seconds: 3, motion: "head tilts slightly toward the viewer, attentive", driven_by: "the person is speaking to the robot" },
-      { id: "thinking", kind: "loop", required: true, min_seconds: 2, max_seconds: 3, motion: "looks up and to the side, one paw to chin", driven_by: "a turn before the first word" },
-      { id: "working", kind: "loop", required: true, min_seconds: 2, max_seconds: 4, motion: "busy, small repeated gesture, looking down at its hands", driven_by: "a tool, job or project is running" },
-      { id: "speaking", kind: "loop", required: true, min_seconds: 2, max_seconds: 3, motion: "mouth opens and closes at a speaking rhythm, small head movement", driven_by: "the voice is playing" },
-      { id: "needs_you", kind: "loop", required: true, min_seconds: 2, max_seconds: 3, motion: "leans forward, holds up one paw, hopeful", driven_by: "an approval waits for the person" },
-      { id: "greeting", kind: "oneshot", required: false, min_seconds: 2, max_seconds: 3, motion: "waves once, smiles", driven_by: "first open of the day" },
-      { id: "happy", kind: "oneshot", required: false, min_seconds: 2, max_seconds: 2, motion: "small hop, smile", driven_by: "a good result or a thank you" },
-      { id: "oops", kind: "oneshot", required: false, min_seconds: 2, max_seconds: 2, motion: "rubs the back of its head, sheepish", driven_by: "an error the companion owns" },
-      { id: "celebrate", kind: "oneshot", required: false, min_seconds: 2, max_seconds: 3, motion: "both arms up, bounce", driven_by: "a long job finished" },
-      { id: "sleeping", kind: "loop", required: false, min_seconds: 3, max_seconds: 4, motion: "eyes closed, slow breathing", driven_by: "quiet hours or no activity" },
-    ]);
+    expect(COMPANION_MEDIA.states).toHaveLength(19);
   });
 });

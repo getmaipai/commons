@@ -314,6 +314,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict(),
                 idle_look: z
@@ -342,6 +350,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -371,6 +387,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -400,6 +424,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -429,6 +461,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -458,6 +498,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -487,6 +535,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -516,6 +572,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -545,6 +609,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -574,6 +646,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -603,6 +683,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),
@@ -632,6 +720,14 @@ export const PackageManifest = z
                         ),
                       ),
                     loop: z.boolean(),
+                    keyframe: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      )
+                      .optional(),
                   })
                   .strict()
                   .optional(),

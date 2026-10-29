@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "image": {
     "size": 1024,
     "margin_percent": 12,
@@ -59,25 +59,18 @@
       "min_seconds": 3,
       "max_seconds": 4,
       "motion": "breathes slowly, tiny sway, one blink",
-      "driven_by": "outside a turn"
-    },
-    {
-      "id": "idle_look",
-      "kind": "oneshot",
-      "required": false,
-      "min_seconds": 2,
-      "max_seconds": 3,
-      "motion": "looks to one side, then back",
-      "driven_by": "random while idle"
+      "driven_by": "outside a turn",
+      "creator": true
     },
     {
       "id": "listening",
       "kind": "loop",
-      "required": false,
+      "required": true,
       "min_seconds": 2,
       "max_seconds": 3,
       "motion": "head tilts slightly toward the viewer, attentive",
-      "driven_by": "the person is speaking to the robot"
+      "driven_by": "the person is speaking to the robot",
+      "creator": true
     },
     {
       "id": "thinking",
@@ -86,16 +79,8 @@
       "min_seconds": 2,
       "max_seconds": 3,
       "motion": "looks up and to the side, one paw to chin",
-      "driven_by": "a turn before the first word"
-    },
-    {
-      "id": "working",
-      "kind": "loop",
-      "required": true,
-      "min_seconds": 2,
-      "max_seconds": 4,
-      "motion": "busy, small repeated gesture, looking down at its hands",
-      "driven_by": "a tool, job or project is running"
+      "driven_by": "a turn before the first word",
+      "creator": true
     },
     {
       "id": "speaking",
@@ -104,52 +89,48 @@
       "min_seconds": 2,
       "max_seconds": 3,
       "motion": "mouth opens and closes at a speaking rhythm, small head movement",
-      "driven_by": "the voice is playing"
+      "driven_by": "the voice is playing",
+      "creator": true
     },
     {
-      "id": "needs_you",
+      "id": "working",
       "kind": "loop",
-      "required": true,
+      "required": false,
       "min_seconds": 2,
-      "max_seconds": 3,
-      "motion": "leans forward, holds up one paw, hopeful",
-      "driven_by": "an approval waits for the person"
+      "max_seconds": 4,
+      "motion": "busy, small repeated gesture, looking down at its hands",
+      "driven_by": "a tool, job or project is running",
+      "creator": true
     },
     {
-      "id": "greeting",
+      "id": "researching",
+      "kind": "loop",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 4,
+      "motion": "focused scan, small repeated gesture",
+      "driven_by": "a research task is running",
+      "creator": true
+    },
+    {
+      "id": "writing",
+      "kind": "loop",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 4,
+      "motion": "looks down while making a small writing gesture",
+      "driven_by": "a writing task is running",
+      "creator": true
+    },
+    {
+      "id": "done",
       "kind": "oneshot",
       "required": false,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "waves once, smiles",
-      "driven_by": "first open of the day"
-    },
-    {
-      "id": "happy",
-      "kind": "oneshot",
-      "required": false,
-      "min_seconds": 2,
-      "max_seconds": 2,
-      "motion": "small hop, smile",
-      "driven_by": "a good result or a thank you"
-    },
-    {
-      "id": "oops",
-      "kind": "oneshot",
-      "required": false,
-      "min_seconds": 2,
-      "max_seconds": 2,
-      "motion": "rubs the back of its head, sheepish",
-      "driven_by": "an error the companion owns"
-    },
-    {
-      "id": "celebrate",
-      "kind": "oneshot",
-      "required": false,
-      "min_seconds": 2,
-      "max_seconds": 3,
-      "motion": "both arms up, bounce",
-      "driven_by": "a long job finished"
+      "motion": "small satisfied nod, then settles",
+      "driven_by": "a task finished",
+      "creator": true
     },
     {
       "id": "sleeping",
@@ -158,7 +139,208 @@
       "min_seconds": 3,
       "max_seconds": 4,
       "motion": "eyes closed, slow breathing",
-      "driven_by": "quiet hours or no activity"
+      "driven_by": "quiet hours or no activity",
+      "creator": true
+    },
+    {
+      "id": "laughing",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "warm laugh, shoulders bounce once",
+      "driven_by": "happy, excited or playful emotion",
+      "creator": true
+    },
+    {
+      "id": "surprised",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "quick wide-eyed reaction, then settles",
+      "driven_by": "surprised emotion",
+      "creator": true
+    },
+    {
+      "id": "sad",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "gentle downward glance, then settles",
+      "driven_by": "sad emotion",
+      "creator": true
+    },
+    {
+      "id": "confused",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "tilts head with unequal antennae",
+      "driven_by": "confused emotion",
+      "creator": true
+    },
+    {
+      "id": "idle_look",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "looks to one side, then back",
+      "driven_by": "random while idle",
+      "legacy": true
+    },
+    {
+      "id": "needs_you",
+      "kind": "loop",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "leans forward, holds up one paw, hopeful",
+      "driven_by": "an approval waits for the person",
+      "legacy": true
+    },
+    {
+      "id": "greeting",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "waves once, smiles",
+      "driven_by": "first open of the day",
+      "legacy": true
+    },
+    {
+      "id": "happy",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 2,
+      "motion": "small hop, smile",
+      "driven_by": "a good result or a thank you",
+      "legacy": true
+    },
+    {
+      "id": "oops",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 2,
+      "motion": "rubs the back of its head, sheepish",
+      "driven_by": "an error the companion owns",
+      "legacy": true
+    },
+    {
+      "id": "celebrate",
+      "kind": "oneshot",
+      "required": false,
+      "min_seconds": 2,
+      "max_seconds": 3,
+      "motion": "both arms up, bounce",
+      "driven_by": "a long job finished",
+      "legacy": true
     }
+  ],
+  "fallback": {
+    "idle": [
+      "idle"
+    ],
+    "listening": [
+      "idle"
+    ],
+    "thinking": [
+      "idle"
+    ],
+    "speaking": [
+      "idle"
+    ],
+    "working": [
+      "thinking",
+      "idle"
+    ],
+    "researching": [
+      "working",
+      "thinking",
+      "idle"
+    ],
+    "writing": [
+      "working",
+      "thinking",
+      "idle"
+    ],
+    "done": [
+      "idle"
+    ],
+    "sleeping": [
+      "idle"
+    ],
+    "needs_you": [
+      "listening",
+      "idle"
+    ],
+    "idle_look": [
+      "idle"
+    ],
+    "greeting": [
+      "idle"
+    ],
+    "happy": [
+      "idle"
+    ],
+    "oops": [
+      "idle"
+    ],
+    "celebrate": [
+      "idle"
+    ],
+    "laughing": [
+      "idle"
+    ],
+    "surprised": [
+      "idle"
+    ],
+    "sad": [
+      "idle"
+    ],
+    "confused": [
+      "idle"
+    ]
+  },
+  "emotion_clips": {
+    "happy": {
+      "state": "laughing",
+      "child_band": "same"
+    },
+    "excited": {
+      "state": "laughing",
+      "child_band": "cap_to_perk_small"
+    },
+    "playful": {
+      "state": "laughing",
+      "child_band": "requires_person.robot.playful_clips"
+    },
+    "surprised": {
+      "state": "surprised",
+      "child_band": "same"
+    },
+    "sad": {
+      "state": "sad",
+      "child_band": "primitive_only"
+    },
+    "confused": {
+      "state": "confused",
+      "child_band": "same"
+    },
+    "concerned": {
+      "state": "confused",
+      "child_band": "same"
+    }
+  },
+  "picture_fallback": [
+    "keyframe",
+    "still",
+    "portrait"
   ]
 }

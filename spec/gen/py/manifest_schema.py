@@ -123,6 +123,9 @@ class Idle(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class IdleLook(BaseModel):
@@ -138,6 +141,9 @@ class IdleLook(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Listening(BaseModel):
@@ -153,6 +159,9 @@ class Listening(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Thinking(BaseModel):
@@ -168,6 +177,9 @@ class Thinking(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Working(BaseModel):
@@ -183,6 +195,9 @@ class Working(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Speaking(BaseModel):
@@ -198,6 +213,9 @@ class Speaking(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class NeedsYou(BaseModel):
@@ -213,6 +231,9 @@ class NeedsYou(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Greeting(BaseModel):
@@ -228,6 +249,9 @@ class Greeting(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Happy(BaseModel):
@@ -243,6 +267,9 @@ class Happy(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Oops(BaseModel):
@@ -258,6 +285,9 @@ class Oops(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Celebrate(BaseModel):
@@ -273,6 +303,9 @@ class Celebrate(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class Sleeping(BaseModel):
@@ -288,6 +321,9 @@ class Sleeping(BaseModel):
     )
     still: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
     loop: bool
+    keyframe: (
+        constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None
+    ) = None
 
 
 class States(BaseModel):
