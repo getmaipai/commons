@@ -800,7 +800,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai_models",
+    "lives_in": "household.ai_vision",
     "honoured_by": [
       "home"
     ]

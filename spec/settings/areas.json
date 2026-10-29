@@ -434,6 +434,7 @@
                 "household.ai_music",
                 "household.ai_voice",
                 "household.ai_wakeword",
+                "household.ai_vision",
                 "household.ai_coding"
               ],
               "scope": "household",
@@ -539,6 +540,16 @@
                   "id": "wakeword-detector",
                   "label": "Hey Jarvis",
                   "description": "The wake word detector and the two small files it shares with every wake word."
+                },
+                {
+                  "id": "vision",
+                  "label": "Describing pictures",
+                  "description": "Home uses it to check finished video clips and pictures for safety when the chat AI cannot read pictures. Without it, clips are held back."
+                },
+                {
+                  "id": "vision-reader",
+                  "label": "Picture reader",
+                  "description": "A small AI that describes what is in a picture. Used for safety checks."
                 },
                 {
                   "id": "coding",

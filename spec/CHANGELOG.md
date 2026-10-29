@@ -1,3 +1,7 @@
+## [Unreleased]
+
+- AIMODELS-VISION-01: the AI and models glance card gains the `vision` job ("Describing pictures") and its `vision-reader` choice (words only), and `engines.vision.choice` moves to its own group `household.ai_vision` (listed in the glance card's `groups`) so the job card, not Model per job, draws it. Additive.
+
 ## [spec-v0.1.268] - 2026-10-28
 
 - SPLASH-KEY-01: `api-key.scopes` gains `engine`, a key an owner or admin makes so an assistant session can switch the chat engine between `auto`, `llama-server` and `splash` and nothing else. Additive; a key with only `turn`, `code`, `settings` or `diagnose` is unchanged.
