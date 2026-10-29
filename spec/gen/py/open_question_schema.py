@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
 
@@ -25,15 +25,15 @@ class OpenQuestion(BaseModel):
         ...,
         description="The conversation this question arose from, when there is one to point back to. Asking happens on the person's NEXT reply on any conversation (the whole reason this is keyed by person, not by conversation), so this is provenance, not a constraint on where it gets asked.",
     )
-    kind: Literal['who', 'clarify_fact', 'relay'] = Field(
+    kind: Literal['who', 'clarify_fact', 'relay', 'thread'] = Field(
         ...,
         description="who: an unconfirmed inference's own open question (ASK-01 part 4, 'is Alex your partner?'). clarify_fact: CRED-01's one clarification after a contradiction. relay: AGE-01's defer move, 'want me to tell them you asked?', queued for an adult on the child's behalf.",
     )
-    text: constr(min_length=1) = Field(
+    text: Any = Field(
         ...,
         description="The question, in the household's own words, asked verbatim - never re-generated at ask time.",
     )
-    subject_id: constr(pattern=r'^(ent|rel)-[a-z0-9]{6,}$') | None = Field(
+    subject_id: constr(pattern=r'^(ent|rel|mem|ep)[0-9]*-[a-z0-9]{6,}$') | None = Field(
         None,
         description="The entity or relationship this question is about, when there is one (an inferred relationship's own confirm, a contradicted memory record's subject entity). Null for a question with no single record behind it.",
     )

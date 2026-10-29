@@ -695,3 +695,16 @@ describe("MemoryRecord.offer_withheld (NAT-07c)", () => {
     expect(MemoryRecordSchema.safeParse({ ...memoryRecord(), offer_withheld: "yes" }).success).toBe(false);
   });
 });
+
+describe("MemoryRecord.archived_reason (NAT-07b)", () => {
+  test("accepts each reason and null, and is optional", () => {
+    expect(MemoryRecordSchema.safeParse(memoryRecord()).success).toBe(true);
+    for (const archived_reason of ["end_date", "decay", "person", "edit", "forgotten", null]) {
+      expect(MemoryRecordSchema.safeParse({ ...memoryRecord(), archived_reason }).success).toBe(true);
+    }
+  });
+
+  test("rejects an unknown reason", () => {
+    expect(MemoryRecordSchema.safeParse({ ...memoryRecord(), archived_reason: "expired" }).success).toBe(false);
+  });
+});

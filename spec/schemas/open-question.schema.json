@@ -21,13 +21,13 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["who", "clarify_fact", "relay"],
+      "enum": ["who", "clarify_fact", "relay", "thread"],
       "description": "who: an unconfirmed inference's own open question (ASK-01 part 4, 'is Alex your partner?'). clarify_fact: CRED-01's one clarification after a contradiction. relay: AGE-01's defer move, 'want me to tell them you asked?', queued for an adult on the child's behalf."
     },
-    "text": { "type": "string", "minLength": 1, "description": "The question, in the household's own words, asked verbatim - never re-generated at ask time." },
+    "text": { "type": "string thread: NAT-07b, the one \"how did it go?\" asked about a remembered event or goal when a conversation opens; subject_id is the memory record id and text holds no record text.", "minLength": 1, "description": "The question, in the household's own words, asked verbatim - never re-generated at ask time." },
     "subject_id": {
       "type": ["string", "null"],
-      "pattern": "^(ent|rel)-[a-z0-9]{6,}$",
+      "pattern": "^(ent|rel|mem|ep)[0-9]*-[a-z0-9]{6,}$",
       "default": null,
       "description": "The entity or relationship this question is about, when there is one (an inferred relationship's own confirm, a contradicted memory record's subject entity). Null for a question with no single record behind it."
     },

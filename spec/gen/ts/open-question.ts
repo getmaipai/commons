@@ -36,14 +36,13 @@ export const OpenQuestion = z
       .default(null),
     /**who: an unconfirmed inference's own open question (ASK-01 part 4, 'is Alex your partner?'). clarify_fact: CRED-01's one clarification after a contradiction. relay: AGE-01's defer move, 'want me to tell them you asked?', queued for an adult on the child's behalf.*/
     kind: z
-      .enum(["who", "clarify_fact", "relay"])
+      .enum(["who", "clarify_fact", "relay", "thread"])
       .describe(
         "who: an unconfirmed inference's own open question (ASK-01 part 4, 'is Alex your partner?'). clarify_fact: CRED-01's one clarification after a contradiction. relay: AGE-01's defer move, 'want me to tell them you asked?', queued for an adult on the child's behalf.",
       ),
     /**The question, in the household's own words, asked verbatim - never re-generated at ask time.*/
     text: z
-      .string()
-      .min(1)
+      .any()
       .describe(
         "The question, in the household's own words, asked verbatim - never re-generated at ask time.",
       ),
@@ -52,7 +51,7 @@ export const OpenQuestion = z
       .union([
         z
           .string()
-          .regex(new RegExp("^(ent|rel)-[a-z0-9]{6,}$"))
+          .regex(new RegExp("^(ent|rel|mem|ep)[0-9]*-[a-z0-9]{6,}$"))
           .describe(
             "The entity or relationship this question is about, when there is one (an inferred relationship's own confirm, a contradicted memory record's subject entity). Null for a question with no single record behind it.",
           ),

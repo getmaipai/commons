@@ -144,6 +144,13 @@ export const ConversationTurn = z
             "NAT-06b. Whether the person asked for advice (`yes`: 'what should I do', 'any advice') or asked to be heard instead (`no`: 'I just need to vent', 'I don't want advice'). Absent when the turn said neither, which is the usual case: precision wins, so the field is never guessed from tone. The reply plan reads it on an emotional turn only.",
           )
           .optional(),
+        /**NAT-07b. True when the turn carries no task of its own: a bare greeting or a check-in with nothing asked (`hey`, `good morning`, `I'm back`). Absent otherwise, which is the usual case. The conversation opening item is eligible only on a turn that sets it, so a person who opens with a real question is never met with a remembered thread first.*/
+        no_task: z
+          .boolean()
+          .describe(
+            "NAT-07b. True when the turn carries no task of its own: a bare greeting or a check-in with nothing asked (`hey`, `good morning`, `I'm back`). Absent otherwise, which is the usual case. The conversation opening item is eligible only on a turn that sets it, so a person who opens with a real question is never met with a remembered thread first.",
+          )
+          .optional(),
         /**Whether the turn leans on a previous turn (a bare pronoun, ellipsis, a reflected question), read from CHAT-13's resolver, never recomputed here. Absent (null) until CHAT-13 lands; the coherence review states this explicitly on the schema rather than leaving it implied.*/
         refers_to_prior: z
           .union([

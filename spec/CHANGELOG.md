@@ -1,3 +1,7 @@
+## [Unreleased]
+
+- NAT-07b: `MemoryRecord` gains an optional `archived_reason` (`end_date`, `decay`, `person`, `edit`, `forgotten`, or null), why a record left the active set. `OpenQuestion.kind` gains `thread` (the one "how did it go?" asked when a conversation opens) and `subject_id` also accepts a memory record id. `TurnSignal` gains an optional `no_task` boolean (the turn carries no task of its own). All additive.
+
 ## [spec-v0.1.269] - 2026-10-28
 
 - AIMODELS-VISION-01: the AI and models glance card gains the `vision` job ("Describing pictures") and its `vision-reader` choice (words only), and `engines.vision.choice` moves to its own group `household.ai_vision` (listed in the glance card's `groups`) so the job card, not Model per job, draws it. Additive.
