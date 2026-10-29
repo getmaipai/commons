@@ -679,3 +679,19 @@ describe("the reciprocal edge", () => {
     expect(inverseRelationship({ ...statedRel(), type: "frenemy_of" }, stamps)).toBeNull();
   });
 });
+
+describe("MemoryRecord.offer_withheld (NAT-07c)", () => {
+  test("is optional, so a record written before it existed still parses", () => {
+    expect(MemoryRecordSchema.safeParse(memoryRecord()).success).toBe(true);
+  });
+
+  test("accepts true, false and null", () => {
+    for (const offer_withheld of [true, false, null]) {
+      expect(MemoryRecordSchema.safeParse({ ...memoryRecord(), offer_withheld }).success).toBe(true);
+    }
+  });
+
+  test("rejects a non-boolean", () => {
+    expect(MemoryRecordSchema.safeParse({ ...memoryRecord(), offer_withheld: "yes" }).success).toBe(false);
+  });
+});

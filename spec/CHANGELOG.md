@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 - AIMODELS-VISION-01: the AI and models glance card gains the `vision` job ("Describing pictures") and its `vision-reader` choice (words only), and `engines.vision.choice` moves to its own group `household.ai_vision` (listed in the glance card's `groups`) so the job card, not Model per job, draws it. Additive.
+- NAT-07c: `MemoryRecord` gains an optional `offer_withheld` (boolean or null): the memory judge's one tag, at extraction, that a record must never be offered as an opening thread. It only adds withholding on top of the hub's own floor. Additive; a record without it reads as not withheld.
 
 ## [spec-v0.1.268] - 2026-10-28
 
