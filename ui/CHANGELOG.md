@@ -1,3 +1,7 @@
+## [ui-v0.5.418] - 2026-10-29
+
+- The video `Player` layout is never taller than the window: its width stops where the 16:9 picture is as tall as the window less 14rem (never under 22rem), so the title and the buttons under it stay on screen. Phones and the mini and audio layouts are unchanged.
+
 ## [ui-v0.5.417] - 2026-10-29
 
 - Additive, every default unchanged: `GenerationStage` and `CompanionStage` gain `frame` ("default" | "strong": a clear 2px token border and a quiet `bg-muted` fill, so a transparent character shows where its box ends) and `transparency` ("plain" | "checker": a token-based checkerboard behind the picture, inside the picture area only; follows light and dark). Data attributes `data-frame` and `data-transparency` appear only when set. The companion-flow showcase uses both on the screen-1 preview.
