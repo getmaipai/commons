@@ -1,4 +1,4 @@
-## [Unreleased] - KIT-PREVIEW-FRAME-01 (COMPANION-3S-01)
+## [ui-v0.5.417] - 2026-10-29
 
 - Additive, every default unchanged: `GenerationStage` and `CompanionStage` gain `frame` ("default" | "strong": a clear 2px token border and a quiet `bg-muted` fill, so a transparent character shows where its box ends) and `transparency` ("plain" | "checker": a token-based checkerboard behind the picture, inside the picture area only; follows light and dark). Data attributes `data-frame` and `data-transparency` appear only when set. The companion-flow showcase uses both on the screen-1 preview.
 
