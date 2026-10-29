@@ -1,4 +1,4 @@
-## [Unreleased]
+## [spec-v0.1.270] - 2026-10-28
 
 - NAT-07b: `MemoryRecord` gains an optional `archived_reason` (`end_date`, `decay`, `person`, `edit`, `forgotten`, or null), why a record left the active set. `OpenQuestion.kind` gains `thread` (the one "how did it go?" asked when a conversation opens) and `subject_id` also accepts a memory record id. `TurnSignal` gains an optional `no_task` boolean (the turn carries no task of its own). All additive.
 
