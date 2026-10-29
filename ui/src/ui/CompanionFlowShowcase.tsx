@@ -52,7 +52,7 @@ export function CreateCharacterShowcase() {
             <Button width="full" shape="pill"><WandSparkles />Generate character</Button>
           </div>
           <DialogSection title="Character Preview">
-            <GenerationStage generating={false} shape="panel" aspectRatio="4 / 5" />
+            <GenerationStage generating={false} shape="panel" frame="strong" transparency="checker" aspectRatio="4 / 5" />
             <p className="text-sm text-muted-foreground">Happy with it? Approve to move on, or change the words and generate again.</p>
             <Button shape="pill" width="full">Approve &amp; Continue</Button>
           </DialogSection>

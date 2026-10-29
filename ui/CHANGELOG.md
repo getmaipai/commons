@@ -1,3 +1,7 @@
+## [Unreleased] - KIT-PREVIEW-FRAME-01 (COMPANION-3S-01)
+
+- Additive, every default unchanged: `GenerationStage` and `CompanionStage` gain `frame` ("default" | "strong": a clear 2px token border and a quiet `bg-muted` fill, so a transparent character shows where its box ends) and `transparency` ("plain" | "checker": a token-based checkerboard behind the picture, inside the picture area only; follows light and dark). Data attributes `data-frame` and `data-transparency` appear only when set. The companion-flow showcase uses both on the screen-1 preview.
+
 ## [ui-v0.5.416] - 2026-10-29
 
 - Additive companion-flow variants, no prop removed and every default unchanged: `Button shape="pill"`; `Input shape="pill"`, `Textarea shape="rounded"`, `SelectTrigger shape="pill"`; `ToggleGroup` variants `segmented` and `chip` plus `fill` and `wrap`; `DialogContent variant="flow"` (full screen on a phone, rounded card from sm), `DialogTitle size="xl"`, `DialogFooter align="between"`, new `DialogBody` and `DialogSection`; `Progress` (segments) `tone="solid"` and `size="md"`; `CharacterTile` variants `picture` and `animation` with `locked`, `checked`, `onCheckedChange`; `GenerationStage shape="panel"` and `caption`; `CompanionStage surface="panel"` and action `primary`. Audit: `docs/dev/companion-three-screens-kit-audit.md`.

@@ -5,6 +5,12 @@ import { cn } from "cn";
 import { paper } from "./surfaces";
 import { SafeImage, type ImageFallbackKind } from "../primitives/SafeImage";
 
+/** The checkerboard behind a transparent picture, drawn from theme tokens so it follows light and dark. */
+export const checkerStyle: CSSProperties = {
+  backgroundImage: "conic-gradient(color-mix(in srgb, var(--foreground) 10%, transparent) 25%, transparent 0 50%, color-mix(in srgb, var(--foreground) 10%, transparent) 0 75%, transparent 0)",
+  backgroundSize: "20px 20px",
+};
+
 const DOTS = Array.from({ length: 64 }, (_, i) => i);
 
 /** The blur, in pixels, of a preview taken after `step` of `steps` steps: heavy early, none on the last step. */
@@ -68,6 +74,8 @@ export function GenerationStage({
   underlay,
   shape = "card",
   caption,
+  frame = "default",
+  transparency = "plain",
 }: {
   generating: boolean;
   previewSrc?: string;
@@ -90,12 +98,17 @@ export function GenerationStage({
   shape?: "card" | "panel";
   /** A short line drawn along the bottom edge over the picture (the animation preview's caption). */
   caption?: ReactNode;
+  /** "strong" (KIT-PREVIEW-FRAME-01) draws a clear 2px token border and a quiet fill that differs from the dialog surface, so a transparent picture shows where its box ends. Default is unchanged. */
+  frame?: "default" | "strong";
+  /** "checker" (KIT-PREVIEW-FRAME-01) draws a token-based checkerboard behind the picture, inside the picture area only. Default "plain" is unchanged. */
+  transparency?: "plain" | "checker";
 }) {
   const { shown, visible } = useLoadedPreview(generating || showPreviewWhenSettled ? previewSrc : undefined);
   const blur = previewBlur(previewStep, steps);
   const style: CSSProperties = { aspectRatio };
   return (
-    <div data-slot="generation-stage" data-shape={shape === "panel" ? "panel" : undefined} data-preview={shown ? "true" : undefined} className={cn(paper, "relative w-full overflow-hidden", shape === "panel" ? "rounded-3xl bg-muted/40 dark:bg-muted/40" : "rounded-2xl", className)} style={style}>
+    <div data-slot="generation-stage" data-shape={shape === "panel" ? "panel" : undefined} data-frame={frame === "strong" ? "strong" : undefined} data-transparency={transparency === "checker" ? "checker" : undefined} data-preview={shown ? "true" : undefined} className={cn(paper, "relative w-full overflow-hidden", shape === "panel" ? "rounded-3xl bg-muted/40 dark:bg-muted/40" : "rounded-2xl", frame === "strong" && "border-2 border-foreground/30 bg-muted dark:bg-muted", className)} style={style}>
+      {transparency === "checker" ? <div data-slot="generation-checker" aria-hidden className="absolute inset-0" style={checkerStyle} /> : null}
       <div
         className={cn("absolute inset-0 grid grid-cols-8 place-items-center p-6 transition-opacity duration-700 motion-reduce:transition-none", shown && visible && "opacity-0")}
         aria-hidden

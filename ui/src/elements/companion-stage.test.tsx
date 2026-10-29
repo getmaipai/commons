@@ -96,3 +96,25 @@ describe("CompanionStage history and thinking", () => {
     expect(idle.container.querySelector('[data-slot="companion-stage-thought-cloud"]')).toBeNull();
   });
 });
+
+describe("CompanionStage frame and transparency (KIT-PREVIEW-FRAME-01)", () => {
+  const base = { name: "Rivet", mode: "idle" as StageMode, stateWord: "Idle", character: <img alt="Rivet" />, talk: <button type="button">Talk</button> };
+  test("defaults add no attributes, layer or strong classes", () => {
+    const { container } = render(<CompanionStage {...base} surface="panel" />);
+    const root = container.querySelector('[data-slot="companion-stage"]') as HTMLElement;
+    expect(root.hasAttribute("data-frame")).toBe(false);
+    expect(root.hasAttribute("data-transparency")).toBe(false);
+    expect(root.className).not.toContain("border-2");
+    expect(container.querySelector('[data-slot="companion-stage-checker"]')).toBeNull();
+  });
+  test("strong frame and checker layer", () => {
+    const { container } = render(<CompanionStage {...base} surface="panel" frame="strong" transparency="checker" />);
+    const root = container.querySelector('[data-slot="companion-stage"]') as HTMLElement;
+    expect(root.getAttribute("data-frame")).toBe("strong");
+    expect(root.getAttribute("data-transparency")).toBe("checker");
+    expect(root.className).toContain("border-2");
+    expect(root.className).toContain("border-foreground/30");
+    expect(root.className).toContain("bg-muted");
+    expect(container.querySelector('[data-slot="companion-stage-checker"]')?.getAttribute("style")).toContain("background-size");
+  });
+});

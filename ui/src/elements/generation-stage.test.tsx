@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
-import { GenerationStage, previewBlur } from "./generation-stage";
+import { GenerationStage, checkerStyle, previewBlur } from "./generation-stage";
 import { ImageGeneration } from "./image-generation";
 import { VideoPlayer } from "./video-player";
 
@@ -120,5 +120,33 @@ describe("VideoPlayer while it is made", () => {
     expect(view.getByRole("status").textContent).toContain("Place in line: 2");
     expect(view.container.querySelector("img")).toBeNull();
     expect(view.container.textContent).not.toContain("about 2 minutes left");
+  });
+});
+
+describe("frame and transparency (KIT-PREVIEW-FRAME-01)", () => {
+  test("defaults add no attributes, checker layer or strong classes", () => {
+    const { container } = render(<GenerationStage generating={false} shape="panel" />);
+    const stage = container.querySelector('[data-slot="generation-stage"]') as HTMLElement;
+    expect(stage.hasAttribute("data-frame")).toBe(false);
+    expect(stage.hasAttribute("data-transparency")).toBe(false);
+    expect(stage.className).not.toContain("border-2");
+    expect(container.querySelector('[data-slot="generation-checker"]')).toBeNull();
+  });
+  test("strong frame draws a 2px token border and a muted fill", () => {
+    const { container } = render(<GenerationStage generating={false} shape="panel" frame="strong" />);
+    const stage = container.querySelector('[data-slot="generation-stage"]') as HTMLElement;
+    expect(stage.getAttribute("data-frame")).toBe("strong");
+    expect(stage.className).toContain("border-2");
+    expect(stage.className).toContain("border-foreground/30");
+    expect(stage.className).toContain("bg-muted");
+  });
+  test("checker draws a token-based layer inside the area", () => {
+    const { container } = render(<GenerationStage generating={false} transparency="checker" />);
+    const stage = container.querySelector('[data-slot="generation-stage"]') as HTMLElement;
+    expect(stage.getAttribute("data-transparency")).toBe("checker");
+    const layer = container.querySelector('[data-slot="generation-checker"]') as HTMLElement;
+    expect(layer.getAttribute("style")).toContain("background-size");
+    expect(checkerStyle.backgroundImage).toContain("var(--foreground)");
+    expect(checkerStyle.backgroundImage).not.toMatch(/#[0-9a-f]{3,6}|rgb\(/i);
   });
 });

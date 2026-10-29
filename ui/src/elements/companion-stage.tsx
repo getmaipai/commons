@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 import { cn } from "@/kit/utils";
+import { checkerStyle } from "./generation-stage";
 import "./companion-stage.css";
 
 export type StageMode = "idle" | "listening" | "thinking" | "speaking" | "working";
@@ -45,6 +46,10 @@ export interface CompanionStageProps {
   showHeader?: boolean;
   /** "panel" (KIT-3S-01) frames the stage as a large rounded preview panel with centred pill actions (the Companion Preview of the customize screen). Default "plain" is unchanged. */
   surface?: "plain" | "panel";
+  /** "strong" (KIT-PREVIEW-FRAME-01) draws a clear 2px token border and a quiet fill that differs from the dialog surface. Default is unchanged. */
+  frame?: "default" | "strong";
+  /** "checker" (KIT-PREVIEW-FRAME-01) draws a token-based checkerboard behind the character, inside the character area only. Default "plain" is unchanged. */
+  transparency?: "plain" | "checker";
   className?: string;
 }
 
@@ -54,16 +59,17 @@ function AudioWave({ className }: { className?: string }) {
   </div>;
 }
 
-export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, heard, history, historyLabel = "Conversation", showHeader = true, surface = "plain", className }: CompanionStageProps) {
+export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, heard, history, historyLabel = "Conversation", showHeader = true, surface = "plain", frame = "default", transparency = "plain", className }: CompanionStageProps) {
   const panel = surface === "panel";
-  return <section data-slot="companion-stage" data-mode={mode} data-surface={panel ? "panel" : undefined} aria-label={`${name} companion`} className={cn("flex h-full min-h-0 flex-col gap-3", panel && "rounded-3xl border border-border bg-card p-4 text-card-foreground", className)}>
+  return <section data-slot="companion-stage" data-mode={mode} data-surface={panel ? "panel" : undefined} data-frame={frame === "strong" ? "strong" : undefined} data-transparency={transparency === "checker" ? "checker" : undefined} aria-label={`${name} companion`} className={cn("flex h-full min-h-0 flex-col gap-3", panel && "rounded-3xl border border-border bg-card p-4 text-card-foreground", frame === "strong" && "border-2 border-foreground/30 bg-muted text-foreground", className)}>
     <header className={cn("flex min-w-0 flex-col", !showHeader && "sr-only")}>
       <h2 className="min-w-0 truncate font-medium">{name}</h2>
       {stateWord ? <span role="status" aria-live="polite" className="truncate text-sm text-muted-foreground">{stateWord}</span> : null}
     </header>
 
     <div data-slot="companion-stage-character-area" className={cn("relative flex min-h-0 items-center justify-center", history ? "flex-[2]" : "flex-1")}>
-      <div data-slot="companion-stage-character" className="flex h-full min-h-0 w-full items-center justify-center pt-6">{character}</div>
+      {transparency === "checker" ? <div data-slot="companion-stage-checker" aria-hidden="true" className="absolute inset-0" style={checkerStyle} /> : null}
+      <div data-slot="companion-stage-character" className={cn("flex h-full min-h-0 w-full items-center justify-center pt-6", transparency === "checker" && "relative")}>{character}</div>
       {mode === "thinking" ? <div data-slot="companion-stage-thought-cloud" aria-hidden="true" className="absolute right-2 top-1 flex h-9 w-14 items-center justify-center gap-1 rounded-[50%] border-2 border-border bg-card text-muted-foreground after:absolute after:-bottom-1 after:left-1 after:size-2 after:rounded-full after:border after:border-border after:bg-card">
         {[0, 1, 2].map((dot) => <i key={dot} data-slot="companion-stage-thought-dot" className="size-1.5 rounded-full bg-current motion-safe:animate-bounce" style={{ animationDelay: `${dot * 150}ms` }} />)}
       </div> : null}
