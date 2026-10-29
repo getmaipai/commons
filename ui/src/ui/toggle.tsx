@@ -14,6 +14,14 @@ const toggleVariants = cva(
         default: "bg-transparent",
         outline:
           "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+        // KIT-3S-01. Inside a ToggleGroup: "segmented" is the two-option pill
+        // switch (the group draws the muted track); "chip" is a pill choice
+        // chip whose selected state is the page's text colour as the fill, so
+        // it reads light under a dark theme and dark under a light one.
+        segmented:
+          "rounded-full bg-transparent text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm",
+        chip:
+          "rounded-full border border-input bg-transparent hover:bg-accent hover:text-accent-foreground data-[state=on]:border-foreground data-[state=on]:bg-foreground data-[state=on]:text-background",
       },
       // 48px floor (docs/UI.md), the same rule as Button's sizes: "default"
       // clears it directly with text-base; "sm"/"lg" stay visually compact

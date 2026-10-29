@@ -66,6 +66,8 @@ export function GenerationStage({
   className,
   children,
   underlay,
+  shape = "card",
+  caption,
 }: {
   generating: boolean;
   previewSrc?: string;
@@ -84,12 +86,16 @@ export function GenerationStage({
   children?: ReactNode;
   /** Drawn between the shimmer and the preview (the finished-picture placeholder). */
   underlay?: ReactNode;
+  /** "panel" (KIT-3S-01) is the large soft-cornered preview panel of the companion flow, with a theme-token frame. Default "card" is unchanged. */
+  shape?: "card" | "panel";
+  /** A short line drawn along the bottom edge over the picture (the animation preview's caption). */
+  caption?: ReactNode;
 }) {
   const { shown, visible } = useLoadedPreview(generating || showPreviewWhenSettled ? previewSrc : undefined);
   const blur = previewBlur(previewStep, steps);
   const style: CSSProperties = { aspectRatio };
   return (
-    <div data-slot="generation-stage" data-preview={shown ? "true" : undefined} className={cn(paper, "relative w-full overflow-hidden rounded-2xl", className)} style={style}>
+    <div data-slot="generation-stage" data-shape={shape === "panel" ? "panel" : undefined} data-preview={shown ? "true" : undefined} className={cn(paper, "relative w-full overflow-hidden", shape === "panel" ? "rounded-3xl bg-muted/40 dark:bg-muted/40" : "rounded-2xl", className)} style={style}>
       <div
         className={cn("absolute inset-0 grid grid-cols-8 place-items-center p-6 transition-opacity duration-700 motion-reduce:transition-none", shown && visible && "opacity-0")}
         aria-hidden
@@ -121,6 +127,7 @@ export function GenerationStage({
         />
       ) : null}
       {children}
+      {caption ? <div data-slot="generation-caption" className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent px-4 pb-3 pt-8 text-center text-sm text-foreground">{caption}</div> : null}
     </div>
   );
 }

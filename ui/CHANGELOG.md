@@ -1,3 +1,7 @@
+## [Unreleased] - KIT-3S-01 (COMPANION-3S-01)
+
+- Additive companion-flow variants, no prop removed and every default unchanged: `Button shape="pill"`; `Input shape="pill"`, `Textarea shape="rounded"`, `SelectTrigger shape="pill"`; `ToggleGroup` variants `segmented` and `chip` plus `fill` and `wrap`; `DialogContent variant="flow"` (full screen on a phone, rounded card from sm), `DialogTitle size="xl"`, `DialogFooter align="between"`, new `DialogBody` and `DialogSection`; `Progress` (segments) `tone="solid"` and `size="md"`; `CharacterTile` variants `picture` and `animation` with `locked`, `checked`, `onCheckedChange`; `GenerationStage shape="panel"` and `caption`; `CompanionStage surface="panel"` and action `primary`. Audit: `docs/dev/companion-three-screens-kit-audit.md`.
+
 ## [ui-v0.5.415] - 2026-10-28
 
 - `CompanionAvatar` with `size="fill"`: the wrapper now fills its space too, so the character shrinks to fit the area it is given instead of keeping its full picture height and being cut off behind the history log in `CompanionStage`. No prop changes.

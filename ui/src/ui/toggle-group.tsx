@@ -9,38 +9,54 @@ import { toggleVariants } from "@/kit/ui/toggle"
 const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants> & {
     spacing?: number
+    fill?: boolean
   }
 >({
   size: "default",
   variant: "default",
   spacing: 0,
+  fill: false,
 })
 
 function ToggleGroup({
   className,
   variant,
   size,
-  spacing = 0,
+  spacing,
+  fill = false,
+  wrap = false,
   children,
   ...props
 }: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
   VariantProps<typeof toggleVariants> & {
     spacing?: number
+    // KIT-3S-01: the items share the row's width equally (a two-option
+    // segmented switch that spans its column).
+    fill?: boolean
+    // KIT-3S-01: the items wrap onto more lines (a cloud of choice chips).
+    wrap?: boolean
   }) {
+  // Segmented items sit inside one padded track; chips keep a gap. Both set
+  // their own radius, so the edge-to-edge square-corner rule stays off.
+  const gap = spacing ?? (variant === "chip" ? 2 : 0)
   return (
     <ToggleGroupPrimitive.Root
       data-slot="toggle-group"
       data-variant={variant}
       data-size={size}
-      data-spacing={spacing}
-      style={{ "--gap": spacing } as React.CSSProperties}
+      data-spacing={gap}
+      data-fill={fill ? "true" : undefined}
+      style={{ "--gap": gap } as React.CSSProperties}
       className={cn(
         "group/toggle-group flex w-fit items-center gap-[--spacing(var(--gap))] rounded-md",
+        variant === "segmented" && "rounded-full bg-muted p-1",
+        fill && "w-full",
+        wrap && "flex-wrap",
         className
       )}
       {...props}
     >
-      <ToggleGroupContext.Provider value={{ variant, size, spacing }}>
+      <ToggleGroupContext.Provider value={{ variant, size, spacing: gap, fill }}>
         {children}
       </ToggleGroupContext.Provider>
     </ToggleGroupPrimitive.Root>
@@ -78,7 +94,9 @@ function ToggleGroupItem({
           size: context.size || size,
         }),
         "w-auto min-w-0 shrink-0 px-3 before:content-none focus:z-10 focus-visible:z-10",
-        "data-[spacing=0]:rounded-none data-[spacing=0]:shadow-none data-[spacing=0]:first:rounded-l-md data-[spacing=0]:last:rounded-r-md data-[spacing=0]:data-[variant=outline]:border-l-0 data-[spacing=0]:data-[variant=outline]:first:border-l",
+        context.variant !== "segmented" && context.variant !== "chip" &&
+          "data-[spacing=0]:rounded-none data-[spacing=0]:shadow-none data-[spacing=0]:first:rounded-l-md data-[spacing=0]:last:rounded-r-md data-[spacing=0]:data-[variant=outline]:border-l-0 data-[spacing=0]:data-[variant=outline]:first:border-l",
+        context.fill && "flex-1",
         className
       )}
       {...props}

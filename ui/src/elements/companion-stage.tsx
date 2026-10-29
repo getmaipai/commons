@@ -11,6 +11,8 @@ export interface CompanionStageAction {
   icon?: ReactNode;
   onSelect: () => void;
   disabled?: boolean;
+  /** KIT-3S-01: the filled primary look instead of the outline look. */
+  primary?: boolean;
 }
 
 export interface CompanionStageHistoryItem {
@@ -41,6 +43,8 @@ export interface CompanionStageProps {
   heard?: ReactNode;
   /** False hides the name and state word visually (the host shows them in its own header); they stay for screen readers. Default true. */
   showHeader?: boolean;
+  /** "panel" (KIT-3S-01) frames the stage as a large rounded preview panel with centred pill actions (the Companion Preview of the customize screen). Default "plain" is unchanged. */
+  surface?: "plain" | "panel";
   className?: string;
 }
 
@@ -50,8 +54,9 @@ function AudioWave({ className }: { className?: string }) {
   </div>;
 }
 
-export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, heard, history, historyLabel = "Conversation", showHeader = true, className }: CompanionStageProps) {
-  return <section data-slot="companion-stage" data-mode={mode} aria-label={`${name} companion`} className={cn("flex h-full min-h-0 flex-col gap-3", className)}>
+export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, heard, history, historyLabel = "Conversation", showHeader = true, surface = "plain", className }: CompanionStageProps) {
+  const panel = surface === "panel";
+  return <section data-slot="companion-stage" data-mode={mode} data-surface={panel ? "panel" : undefined} aria-label={`${name} companion`} className={cn("flex h-full min-h-0 flex-col gap-3", panel && "rounded-3xl border border-border bg-card p-4 text-card-foreground", className)}>
     <header className={cn("flex min-w-0 flex-col", !showHeader && "sr-only")}>
       <h2 className="min-w-0 truncate font-medium">{name}</h2>
       {stateWord ? <span role="status" aria-live="polite" className="truncate text-sm text-muted-foreground">{stateWord}</span> : null}
@@ -83,7 +88,7 @@ export function CompanionStage({ name, stateWord, mode, character, bubble, onDis
     {mode === "working" && workingLine ? <div className="min-w-0 text-sm text-muted-foreground" data-slot="companion-stage-working-line">{workingLine}</div> : null}
     {mode === "working" ? <div data-slot="companion-stage-working-progress" role="progressbar" aria-label="Working" className="h-0.5 w-full overflow-hidden rounded-full bg-muted"><span className="block h-full w-1/3 rounded-sm bg-primary" /></div> : null}
     {actions.length ? <div data-slot="companion-stage-actions" className="flex w-full flex-col gap-2">
-      {actions.map((action) => <Button key={action.id} type="button" variant="outline" className="w-full justify-start gap-2" disabled={action.disabled} onClick={action.onSelect}>{action.icon ? <span className="shrink-0">{action.icon}</span> : null}<span className="truncate">{action.label}</span></Button>)}
+      {actions.map((action) => <Button key={action.id} type="button" variant={action.primary ? "default" : "outline"} shape={panel ? "pill" : undefined} className={panel ? "w-full gap-2" : "w-full justify-start gap-2"} disabled={action.disabled} onClick={action.onSelect}>{action.icon ? <span className="shrink-0">{action.icon}</span> : null}<span className="truncate">{action.label}</span></Button>)}
     </div> : null}
     {mode === "listening" || mode === "speaking" ? <AudioWave className={mode === "listening" ? "text-primary" : "text-foreground"} /> : null}
     <div data-slot="companion-stage-talk" className="w-full">{talk}</div>

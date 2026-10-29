@@ -26,22 +26,27 @@ function SelectTrigger({
   className,
   size = "default",
   width = "fit",
+  shape = "default",
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default"
   // "full" fills the row (RULE9-COMMONS-VARIANTS-01); the default stays content-width.
   width?: "fit" | "full"
+  // "pill" draws a fully rounded trigger (KIT-3S-01, the companion flow).
+  shape?: "default" | "pill"
 }) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       data-size={size}
+      data-shape={shape === "default" ? undefined : shape}
       className={cn(
         // 48px default height, 16px text (docs/UI.md); "sm" stays compact
         // and desktop/mouse-only, same rule as Button's small sizes.
         "flex w-fit items-center justify-between gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-base whitespace-nowrap outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[placeholder]:text-muted-foreground data-[size=default]:h-12 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
         width === "full" && "w-full",
+        shape === "pill" && "rounded-full px-5",
         className
       )}
       {...props}

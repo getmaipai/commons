@@ -1,4 +1,5 @@
 import { getIcon } from "@/kit/icons";
+import { cn } from "@/kit/utils";
 import { Progress as ProgressBar } from "@/kit/ui/progress";
 
 interface ProgressProps {
@@ -7,6 +8,10 @@ interface ProgressProps {
   label?: string;
   /** Determinate only: draw N equal rounded segments instead of one bar. */
   segments?: number;
+  /** Segmented only. "solid" fills every reached segment the same (a flow's step bar); "default" dims the earlier ones. */
+  tone?: "default" | "solid";
+  /** Segmented only. "md" draws thicker segments than the default 4px. */
+  size?: "sm" | "md";
 }
 
 // v0 only ever renders `spinner` (Chat has nothing determinate to show
@@ -17,7 +22,7 @@ interface ProgressProps {
 // hand-rolled div; there is no library "spinner" component, so the
 // spinner mode stays the kit's own icon-plus-`animate-spin` idiom, the
 // same one `kit/ui/sonner.tsx`'s loading toast icon already uses.
-export function Progress({ mode, value, label, segments }: ProgressProps) {
+export function Progress({ mode, value, label, segments, tone = "default", size = "sm" }: ProgressProps) {
   const Spinner = getIcon("loader");
   if (mode === "determinate") {
     const pct = Math.max(0, Math.min(100, value ?? 0));
@@ -30,6 +35,7 @@ export function Progress({ mode, value, label, segments }: ProgressProps) {
           aria-valuemin={0}
           aria-valuemax={segments}
           aria-valuenow={filled}
+          data-tone={tone === "solid" ? "solid" : undefined}
           className="flex w-full gap-1"
         >
           {Array.from({ length: segments }, (_, index) => (
@@ -37,7 +43,11 @@ export function Progress({ mode, value, label, segments }: ProgressProps) {
               key={index}
               aria-hidden="true"
               data-segment={index < filled ? (index === filled - 1 ? "current" : "done") : "todo"}
-              className="h-1 flex-1 rounded-full bg-secondary data-[segment=current]:bg-primary data-[segment=done]:bg-primary/50"
+              className={cn(
+                "flex-1 rounded-full bg-secondary data-[segment=current]:bg-primary",
+                size === "md" ? "h-1.5" : "h-1",
+                tone === "solid" ? "data-[segment=done]:bg-primary" : "data-[segment=done]:bg-primary/50",
+              )}
             />
           ))}
         </div>

@@ -65,6 +65,13 @@ const buttonVariants = cva(
         auto: "",
         full: "w-full",
       },
+      // KIT-3S-01: "pill" makes any variant fully rounded (the companion flow's
+      // Back, Continue, outline and secondary buttons). "default" keeps the
+      // variant's own radius, so omitting it changes nothing.
+      shape: {
+        default: "",
+        pill: "rounded-full",
+      },
       wrap: {
         nowrap: "",
         // Long labels wrap instead of overflowing.
@@ -77,6 +84,7 @@ const buttonVariants = cva(
       align: "center",
       height: "fixed",
       width: "auto",
+      shape: "default",
       wrap: "nowrap",
     },
   }
@@ -89,6 +97,7 @@ function Button({
   align,
   height,
   width,
+  shape,
   wrap,
   asChild = false,
   ...props
@@ -103,7 +112,7 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ variant, size, align, height, width, wrap, className }))}
+      className={cn(buttonVariants({ variant, size, align, height, width, shape, wrap, className }))}
       {...props}
     />
   )
