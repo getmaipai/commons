@@ -1,3 +1,7 @@
+## [spec-v0.1.271] - 2026-10-28
+
+- ANIM-SPEC-01 (COMPANION-3S-01): `vocab/companion-media.json` (version 2) lists 13 creator animations (required `idle`, `listening`, `thinking`, `speaking`; optional `working`, `researching`, `writing`, `done`, `sleeping`, `laughing`, `surprised`, `sad`, `confused`). The six older ids (`idle_look`, `needs_you`, `greeting`, `happy`, `oops`, `celebrate`) stay valid and are marked `legacy`. New data: `fallback` (which state plays when a clip was not made), `emotion_clips` (emotion label to clip, with each label's `child_band` copied from `emotion-map.json`), `picture_fallback` (keyframe, then still, then portrait). The manifest `animation.states` objects gain the new ids and an optional `keyframe` beside the required `still`; the kit's avatar machine resolves clips through `resolveClip`, `emotionClip` and `pictureFor`. Additive: old manifests stay valid. `presence-states.json` and `emotion-map.json` are unchanged.
+
 ## [spec-v0.1.270] - 2026-10-28
 
 - NAT-07b: `MemoryRecord` gains an optional `archived_reason` (`end_date`, `decay`, `person`, `edit`, `forgotten`, or null), why a record left the active set. `OpenQuestion.kind` gains `thread` (the one "how did it go?" asked when a conversation opens) and `subject_id` also accepts a memory record id. `TurnSignal` gains an optional `no_task` boolean (the turn carries no task of its own). All additive.
