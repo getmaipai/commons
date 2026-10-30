@@ -3406,3 +3406,8 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 
 - MEDIA-APPLE-PASS-01: add selectable player detail parts and the collection variant of `CreationHeader` with artwork, metadata, actions, and footer lines.
 
+
+## [ui-v0.5.420] - 2026-10-30
+
+- Add token themed `ProgressRing` with accessible percentage, reduced motion support, primary and muted tones, and a showcase.
+- Add the `TabsList` bottom bar variant with equal width touch targets, safe-area padding and optional sticky positioning, plus a showcase. Default and line variants remain unchanged.

@@ -37,6 +37,7 @@ const tabsListVariants = cva(
       variant: {
         default: "bg-muted",
         line: "gap-1 bg-transparent",
+        bottom: "w-full rounded-none bg-background border-t border-border pb-[env(safe-area-inset-bottom)] pt-1",
       },
     },
     defaultVariants: {
@@ -48,13 +49,15 @@ const tabsListVariants = cva(
 function TabsList({
   className,
   variant = "default",
+  position,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List> &
+}: React.ComponentProps<typeof TabsPrimitive.List> & { position?: "sticky" } &
   VariantProps<typeof tabsListVariants>) {
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
       data-variant={variant}
+      data-position={position}
       // Deliberate touch-target-floor exception (docs/UI.md): Radix's own
       // RovingFocusGroup puts a real, roving `tabIndex` on this LIST
       // wrapper itself, not just on each trigger, so a touch-target sweep
@@ -62,7 +65,7 @@ function TabsList({
       // one: its two real targets are the TabsTrigger buttons inside, each
       // already cleared to 48px on its own.
       data-touch-target-exempt
-      className={cn(tabsListVariants({ variant }), className)}
+      className={cn(tabsListVariants({ variant }), position === "sticky" && variant === "bottom" && "sticky bottom-0 z-10", className)}
       {...props}
     />
   )
@@ -96,6 +99,7 @@ function TabsTrigger({
         "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all before:absolute before:content-[''] group-data-[orientation=horizontal]/tabs:before:-inset-y-3.5 group-data-[orientation=vertical]/tabs:before:-inset-x-3.5 group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:border-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
         "data-[state=active]:bg-background data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 dark:data-[state=active]:text-foreground",
+        "group-data-[variant=bottom]/tabs-list:min-h-12 group-data-[variant=bottom]/tabs-list:flex-1 group-data-[variant=bottom]/tabs-list:flex-col group-data-[variant=bottom]/tabs-list:gap-1 group-data-[variant=bottom]/tabs-list:rounded-none group-data-[variant=bottom]/tabs-list:py-1 group-data-[variant=bottom]/tabs-list:before:hidden group-data-[variant=bottom]/tabs-list:after:hidden",
         "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",
         className
       )}
