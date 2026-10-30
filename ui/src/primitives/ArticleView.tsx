@@ -11,9 +11,12 @@ import { StoryFeed, type StoryAction, type StoryActionIds, type StoryCardData } 
 import { SafeImage } from "./SafeImage";
 import { FocalImage } from "./FocalImage";
 import { ArticleSpeechContext } from "./articleSpeech";
+import { ArticleContentsNav, ArticleInfoboxCard, ArticlePreviewContext, PreviewLink, useActiveSection, usePhoneWidth, type ArticleContentsItem, type ArticleInfobox, type ArticlePreviewLoader } from "./articleReader";
 
 export { ArticleSpeechContext, type ArticleSpeech } from "./articleSpeech";
+export type { ArticleContentsItem, ArticleInfobox, ArticlePreview, ArticlePreviewLoader } from "./articleReader";
 
+const ChevronDownIcon = getIcon("chevron-down");
 const ArrowLeftIcon = getIcon("arrow-left");
 const BookmarkIcon = getIcon("bookmark");
 const EllipsisIcon = getIcon("more-horizontal");
@@ -52,6 +55,14 @@ export interface ArticleViewData {
   sourceIconUrl?: string;
   image?: { w480: string; w1280: string; alt: string; focal?: { x: number; y: number; aspect: number } };
   key_points?: { text: string; band: "child" | "teen" | "adult" };
+  /** A one-line "for other uses" note under the headline (Reference). */
+  hatnote?: string;
+  /** The article's facts box (Reference). Beside the text on a wide screen, a closed box above it on a phone. */
+  infobox?: ArticleInfobox;
+  /** The section list, with the section being read marked (Reference). Each id is a heading block's id. */
+  contents?: ArticleContentsItem[];
+  /** On a phone, every section after the lead folds closed and a tap on its heading opens it. A wide screen folds nothing. */
+  foldSections?: boolean;
   blocks: ArticleBlockData[];
   also_covering?: StoryCardData[];
   open_url?: string;
@@ -79,6 +90,8 @@ export interface ArticleViewProps {
   renderTargetLink?: (target: { book: string; path: string }, text: string) => ReactNode;
   /** A line under the article (Reference: licence and snapshot date). */
   footer?: ReactNode;
+  /** Gives every book link a hover-card summary. Called only when a card opens; the page owns the request. */
+  loadPreview?: ArticlePreviewLoader;
   className?: string;
 }
 
@@ -91,7 +104,7 @@ function Inlines({ values, renderTargetLink }: { values: ArticleInlineData[]; re
         if (value.type === "link") {
           // A child's copy carries neither `href` nor `target`, so it falls through to plain text here.
           if (value.href) return <a key={i} href={value.href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{value.text}</a>;
-          if (value.target && renderTargetLink) return <span key={i}>{renderTargetLink(value.target, value.text)}</span>;
+          if (value.target && renderTargetLink) return <span key={i}><PreviewLink target={value.target}>{renderTargetLink(value.target, value.text)}</PreviewLink></span>;
         }
         return <span key={i}>{value.text}</span>;
       })}
@@ -261,7 +274,39 @@ function minutes(seconds: number): string {
  * appears only when the copy it was handed carries an `href` (teens and adults) or a book `target` the page can draw,
  * so a child's article renders every link as plain text. Buttons fire `onAction` with the story's own ids.
  */
-export function ArticleView({ data, onAction, available = [], ids, onBack, renderTargetLink, footer, className }: ArticleViewProps) {
+/** The lead (everything before the first section heading) stays open; each level-2 section folds on a phone. */
+function FoldedBody({ blocks, renderTargetLink, open, onToggle }: { blocks: ArticleBlockData[]; renderTargetLink?: ArticleViewProps["renderTargetLink"]; open: ReadonlySet<string>; onToggle: (id: string) => void }) {
+  const firstHeading = blocks.findIndex((b) => b.type === "heading" && b.level === 2);
+  if (firstHeading === -1) return <>{blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}</>;
+  const sections: Array<{ heading: Extract<ArticleBlockData, { type: "heading" }>; rest: ArticleBlockData[] }> = [];
+  for (const block of blocks.slice(firstHeading)) {
+    if (block.type === "heading" && block.level === 2) sections.push({ heading: block, rest: [] });
+    else sections[sections.length - 1]!.rest.push(block);
+  }
+  return (
+    <>
+      {blocks.slice(0, firstHeading).map((block, index) => <Block key={`lead-${index}`} block={block} renderTargetLink={renderTargetLink} />)}
+      {sections.map(({ heading, rest }) => {
+        const isOpen = open.has(heading.id);
+        return (
+          <section key={heading.id} data-slot="article-section" data-state={isOpen ? "open" : "closed"} className="flex flex-col gap-4 border-b pb-2">
+            <h2 id={heading.id} className="scroll-mt-6 font-semibold">
+              <button type="button" aria-expanded={isOpen} onClick={() => onToggle(heading.id)} className="flex w-full items-center justify-between gap-2 py-2 text-left">
+                <span className="min-w-0">{heading.text}</span>
+                <ChevronDownIcon aria-hidden className={cn("size-5 shrink-0 transition-transform", isOpen && "rotate-180")} />
+              </button>
+            </h2>
+            <div hidden={!isOpen} className="flex flex-col gap-4">
+              {rest.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
+            </div>
+          </section>
+        );
+      })}
+    </>
+  );
+}
+
+export function ArticleView({ data, onAction, available = [], ids, onBack, renderTargetLink, footer, loadPreview, className }: ArticleViewProps) {
   const can = (a: ArticleAction) => onAction !== undefined && available.includes(a);
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
   const [textSize, setTextSize] = useState<TextSizeId>(readTextSize);
@@ -272,6 +317,16 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const speech = useContext(ArticleSpeechContext);
   const speakingThis = speech.storyId !== null && speech.storyId === ids?.story_id;
   const bodyRef = useRef<HTMLDivElement>(null);
+  const phone = usePhoneWidth();
+  const folding = data.foldSections === true && phone;
+  const [openSections, setOpenSections] = useState<ReadonlySet<string>>(new Set());
+  useEffect(() => { setOpenSections(new Set()); }, [data.title]);
+  const toggleSection = (id: string) => setOpenSections((was) => { const next = new Set(was); if (!next.delete(id)) next.add(id); return next; });
+  const activeSection = useActiveSection(bodyRef, (data.contents ?? []).map((item) => item.id));
+  const pickSection = (id: string) => {
+    if (folding) setOpenSections((was) => new Set(was).add(id));
+    window.requestAnimationFrame(() => bodyRef.current?.querySelector(`[id="${id}"]`)?.scrollIntoView?.({ block: "start" }));
+  };
   useSpokenHighlight(bodyRef, speakingThis && speech.phase === "playing", speech.progress);
   // Once the headline has scrolled up under the pinned row, the row names the story instead of the publisher.
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -322,7 +377,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   }, [summarizing, askKey]);
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
   return (
-    <article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col", className)}>
+    <ArticlePreviewContext.Provider value={loadPreview ?? null}><article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col", className)}>
       <div data-slot="article-sticky-header" className="sticky top-0 z-30 -mb-14 flex flex-col">
       {hasToolbar ? (
         <div data-slot="article-toolbar" className="flex h-14 items-center gap-1 bg-transparent px-0 py-1">
@@ -367,10 +422,11 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
         <h2 ref={titleRef} data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
+        {data.hatnote ? <p data-slot="article-hatnote" className="text-muted-foreground text-sm italic">{data.hatnote}</p> : null}
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
-      {hasAssist || data.key_points || summarizing ? (
+      {hasAssist || data.key_points || summarizing || data.infobox || (data.contents && data.contents.length > 0) ? (
         <div data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start lg:[grid-row:1/span_99] lg:col-start-2">
         {hasAssist ? (
           <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex gap-2 [&>*]:flex-1">
@@ -384,6 +440,8 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           </div>
         ) : null}
         {data.key_points || summarizing ? <KeyPoints text={data.key_points?.text} loading={summarizing} /> : null}
+        {data.infobox && data.infobox.rows.length > 0 ? <ArticleInfoboxCard infobox={data.infobox} /> : null}
+        {data.contents && data.contents.length > 0 ? <ArticleContentsNav items={data.contents} activeId={activeSection} onPick={pickSection} /> : null}
         </div>
       ) : null}
       {data.image ? (
@@ -394,7 +452,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         </div>
       ) : null}
       <div ref={bodyRef} data-slot="article-body" data-text-size={textSize} className={cn("flex w-full min-w-0 flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
-        {data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
+        {folding ? <FoldedBody blocks={data.blocks} renderTargetLink={renderTargetLink} open={openSections} onToggle={toggleSection} /> : data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
       </div>
       {data.also_covering && data.also_covering.length > 0 ? (
         <section data-slot="also-covering" className="flex flex-col gap-2">
@@ -409,6 +467,6 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       {footer ? <div className="border-t pt-4 text-sm text-muted-foreground">{footer}</div> : null}
       </div>
-    </article>
+    </article></ArticlePreviewContext.Provider>
   );
 }

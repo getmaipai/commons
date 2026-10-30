@@ -285,3 +285,90 @@ describe("ArticleView", () => {
     expect(column.className).toContain("lg:max-w-none");
   });
 });
+
+// READER-00: the reader a Kiwix book needs (infobox, hatnote, contents with the section being read, folding sections on a
+// phone, and a link preview through the kit hover-card).
+describe("ArticleView reader parts", () => {
+  const reader = (extra: Partial<ArticleViewData> = {}): ArticleViewData => ({
+    title: "Aspen",
+    description: "Wikipedia (English)",
+    hatnote: "For other uses, see Aspen (disambiguation).",
+    infobox: { title: "Aspen", rows: [{ label: "Kingdom", value: "Plantae" }, { label: "Family", value: "Salicaceae" }] },
+    contents: [{ id: "Overview", title: "Overview", level: 2 }, { id: "Uses", title: "Uses", level: 2 }],
+    blocks: [
+      { type: "paragraph", inlines: [{ type: "text", text: "Aspens are trees." }] },
+      { type: "heading", level: 2, id: "Overview", text: "Overview" },
+      { type: "paragraph", inlines: [{ type: "link", text: "Populus", target: { book: "wiki", path: "Populus" } }] },
+      { type: "heading", level: 2, id: "Uses", text: "Uses" },
+      { type: "paragraph", inlines: [{ type: "text", text: "Pulp and board." }] },
+    ],
+    ...extra,
+  });
+  const phone = (matches: boolean) => { window.matchMedia = ((query: string) => ({ matches: matches && query.includes("max-width"), media: query, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })) as unknown as typeof window.matchMedia; };
+
+  test("draws the hatnote under the headline and the infobox in the rail with its title and rows", () => {
+    const { container } = render(<ArticleView data={reader()} />);
+    expect(container.querySelector('[data-slot="article-hatnote"]')?.textContent).toBe("For other uses, see Aspen (disambiguation).");
+    const rail = container.querySelector('[data-slot="article-rail"]')!;
+    const box = rail.querySelector('[data-slot="article-infobox"]')!;
+    expect(box.textContent).toContain("Aspen");
+    expect(box.querySelector("th[scope=row]")?.textContent).toBe("Kingdom");
+    expect(box.textContent).toContain("Salicaceae");
+  });
+
+  test("an article without the new fields draws none of them", () => {
+    const { container } = render(<ArticleView data={data} />);
+    for (const slot of ["article-hatnote", "article-infobox", "article-contents"]) expect(container.querySelector(`[data-slot="${slot}"]`)).toBeNull();
+  });
+
+  test("contents link to each heading id and mark the section being read", () => {
+    const { container } = render(<ArticleView data={reader()} />);
+    const nav = container.querySelector('[data-slot="article-contents"]')!;
+    const links = Array.from(nav.querySelectorAll("a")) as HTMLAnchorElement[];
+    expect(links.map((a) => a.getAttribute("href"))).toEqual(["#Overview", "#Uses"]);
+    const tops: Record<string, number> = { Overview: -300, Uses: 40 };
+    for (const [id, top] of Object.entries(tops)) container.querySelector(`#${id}`)!.getBoundingClientRect = () => ({ top, bottom: top + 20, left: 0, right: 0, width: 0, height: 20, x: 0, y: top, toJSON() {} });
+    fireEvent.scroll(document);
+    expect(links[1]!.getAttribute("aria-current")).toBe("true");
+    expect(links[0]!.getAttribute("aria-current")).toBeNull();
+  });
+
+  test("foldSections folds every section on a phone except the lead, and a tap opens one", () => {
+    phone(true);
+    const { container, getByText } = render(<ArticleView data={reader({ foldSections: true })} />);
+    expect(getByText("Aspens are trees.")).toBeTruthy();
+    expect(container.querySelector('[data-slot="article-section"][data-state="closed"]')).not.toBeNull();
+    expect(container.querySelectorAll('[data-slot="article-section"]').length).toBe(2);
+    fireEvent.click(container.querySelector('#Overview button')!);
+    expect(container.querySelector('[data-slot="article-section"][data-state="open"]')).not.toBeNull();
+  });
+
+  test("foldSections folds nothing on a wide screen", () => {
+    phone(false);
+    const { container } = render(<ArticleView data={reader({ foldSections: true })} />);
+    expect(container.querySelectorAll('[data-slot="article-section"]').length).toBe(0);
+    expect(container.querySelector("#Overview")).not.toBeNull();
+  });
+
+  test("a book link gets a preview trigger only when loadPreview is given, and nothing loads before it opens", () => {
+    const loadPreview = mock(async () => ({ title: "Populus", summary: "Populus is a genus of trees." }));
+    const renderTargetLink = (_t: { book: string; path: string }, text: string) => <a href="#x">{text}</a>;
+    const plain = render(<ArticleView data={reader()} renderTargetLink={renderTargetLink} />);
+    expect(plain.container.querySelector('[data-slot="hover-card-trigger"]')).toBeNull();
+    plain.unmount();
+    const { container } = render(<ArticleView data={reader()} renderTargetLink={renderTargetLink} loadPreview={loadPreview} />);
+    expect(container.querySelector('[data-slot="hover-card-trigger"]')).not.toBeNull();
+    expect(loadPreview).not.toHaveBeenCalled();
+  });
+
+  test("hovering a book link opens a card that loads the summary once", async () => {
+    const loadPreview = mock(async () => ({ title: "Populus", summary: "Populus is a genus of trees." }));
+    const renderTargetLink = (_t: { book: string; path: string }, text: string) => <a href="#x">{text}</a>;
+    const { container, findByText } = render(<ArticleView data={reader()} renderTargetLink={renderTargetLink} loadPreview={loadPreview} />);
+    const trigger = container.querySelector('[data-slot="hover-card-trigger"]')!;
+    fireEvent.pointerEnter(trigger); fireEvent.mouseEnter(trigger); fireEvent.focus(trigger.querySelector("a")!);
+    expect(await findByText("Populus is a genus of trees.", {}, { timeout: 2000 })).toBeTruthy();
+    expect(loadPreview).toHaveBeenCalledTimes(1);
+    expect(loadPreview).toHaveBeenCalledWith({ book: "wiki", path: "Populus" });
+  });
+});
