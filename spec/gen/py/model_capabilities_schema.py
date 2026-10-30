@@ -311,6 +311,10 @@ class ModelCapabilities(BaseModel):
         None,
         description="Last date represented in this model's training data, when the model publisher provides one.",
     )
+    family: constr(pattern=r'^[a-z][a-z0-9-]*$') | None = Field(
+        None,
+        description='TIER-SPEC-01 (tier-families F1). The model family, such as `chatterbox` or `qwen3`. The AI and models dialogs group candidates by it, and a swap inside one family is the `family` switch cost (vocab/resource-tiers.json). Absent means a family of one.',
+    )
     quality_tier: Literal['draft', 'standard', 'high'] | None = None
     tags: list[str] | None = None
     pros: list[str] | None = Field(

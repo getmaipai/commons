@@ -1133,6 +1133,16 @@
       "scope": "person",
       "group": "profile.appearance.internal",
       "reason": "Pinned app order and checklist dismissal are internal UI state and are not user-facing settings."
+    },
+    {
+      "scope": "household",
+      "group": "household.resources",
+      "reason": "Home places these on Settings > AI and models > Performance in TIER-HOME and MEM-SPACE-04; the spec declares each key once first."
+    },
+    {
+      "scope": "household",
+      "group": "household.ai_tiers",
+      "reason": "Home draws the tier slot records on the AI and models page in TIER-HOME-04, as options and switches, not as raw JSON text."
     }
   ],
   "device_cards": [

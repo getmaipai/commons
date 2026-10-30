@@ -23,7 +23,23 @@
     "result": { "description": "What the runner returned when `done`; a generator returns `{ images: [{ b64_json }] }`." },
     "reason": { "type": ["string", "null"], "description": "Why the job failed or was cancelled." },
     "createdAt": { "type": "string", "format": "date-time" },
-    "updatedAt": { "type": "string", "format": "date-time" }
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "tier": { "type": ["string", "null"], "enum": ["reduced", "standard", "boost", "max", null], "default": null, "description": "TIER-SPEC-01. The tier the job ran or runs at, when it has one. Absent or null for a task with no tier (a download)." },
+    "window": { "type": ["string", "null"], "default": null, "description": "TIER-SPEC-01. The id of the Max window this job runs inside, so chained jobs share one lowering. Null when no window applies." },
+    "tier_reason": { "type": ["string", "null"], "default": null, "description": "TIER-SPEC-01. A short code for why the job is not at the tier asked for (`tier_reduced`, `profile_lowered`, `max_window`, `quiet_wait`, `fair_share`), or null. A reason code, never a person's words." },
+    "profile": {
+      "type": ["object", "null"],
+      "default": null,
+      "additionalProperties": false,
+      "description": "TIER-SPEC-01. The profile the job actually got, as counts only. No app, person or model names (making-space note section 9).",
+      "properties": {
+        "lowered": { "type": "integer", "minimum": 0, "description": "Categories lowered to a lower tier for this job." },
+        "queued": { "type": "integer", "minimum": 0, "description": "Categories held back with a reason while this job ran." },
+        "off": { "type": "integer", "minimum": 0, "description": "Categories switched off while this job ran." },
+        "closed_apps": { "type": "integer", "minimum": 0, "description": "How many apps Home closed for the job. A count only; names stay in memory for the job's life." },
+        "closed_bytes": { "type": "integer", "minimum": 0, "description": "About how many bytes closing those apps freed." }
+      }
+    }
   },
   "$defs": {
     "StackJobItem": {

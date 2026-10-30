@@ -34,5 +34,15 @@ export const StackJob = z.object({
   reason: z.string().nullable(),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
+  tier: z.enum(["reduced", "standard", "boost", "max"]).nullable().optional(),
+  window: z.string().nullable().optional(),
+  tier_reason: z.string().nullable().optional(),
+  profile: z.object({
+    lowered: z.number().int().nonnegative().optional(),
+    queued: z.number().int().nonnegative().optional(),
+    off: z.number().int().nonnegative().optional(),
+    closed_apps: z.number().int().nonnegative().optional(),
+    closed_bytes: z.number().int().nonnegative().optional(),
+  }).strict().nullable().optional(),
 }).strict();
 export type StackJob = z.infer<typeof StackJob>;

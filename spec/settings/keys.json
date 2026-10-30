@@ -5203,5 +5203,792 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "resources.preset",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "chat_first",
+        "balanced",
+        "big_jobs_first",
+        "custom"
+      ]
+    },
+    "default": "chat_first",
+    "label": "Big-job behaviour",
+    "help": "How Home shares the computer when a big job needs more room. A preset sets the quiet time, the wait and whether Home asks before lowering a job. Changing one of those by hand shows Custom.",
+    "copy": {
+      "does": "Chooses how much big jobs may simplify chat while they run.",
+      "options": {
+        "chat_first": "Chat always answers, and big jobs wait for a quiet moment.",
+        "balanced": "Big jobs may make chat a little simpler while they run.",
+        "big_jobs_first": "Big jobs get the best quality and chat gets simpler while they run.",
+        "custom": "Your own values."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.quiet_seconds",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 20,
+      "max": 600,
+      "step": 1
+    },
+    "default": 60,
+    "label": "Quiet time before chat is simplified",
+    "help": "Chat is simplified only after nobody has chatted or spoken for this many seconds. The least is 20, because swapping the chat model takes 20 to 60 seconds.",
+    "copy": {
+      "does": "Waits for a quiet moment in chat before a big job lowers it."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.quiet_max_wait",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 60,
+      "max": 3600,
+      "step": 1
+    },
+    "default": 600,
+    "label": "Longest wait for a quiet moment",
+    "help": "How many seconds a big job waits for a quiet moment in chat. After that, the next setting decides what happens.",
+    "copy": {
+      "does": "Limits how long a big job waits for chat to go quiet."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.quiet_timeout",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "proceed",
+        "keep_waiting"
+      ]
+    },
+    "default": "proceed",
+    "label": "When the wait runs out",
+    "help": "What a big job does when chat never goes quiet: go ahead at the next turn boundary, or keep waiting.",
+    "copy": {
+      "does": "Chooses whether a big job goes ahead or keeps waiting after the longest wait.",
+      "options": {
+        "proceed": "The job goes ahead at the next turn boundary and chat is never paused.",
+        "keep_waiting": "The job keeps waiting for a quiet moment."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.cooldown_seconds",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 0,
+      "max": 3600,
+      "step": 1
+    },
+    "default": 300,
+    "label": "Wait before lowering chat again",
+    "help": "After chat is restored it is not lowered again for this many seconds, unless the next job is part of the same window.",
+    "copy": {
+      "does": "Stops chat from switching back and forth between big jobs."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.lower_without_asking.chat",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Lower chat quietly",
+    "help": "When on, Home may run a job with chat at a lower level to make room without asking first. When off, Home asks the person who started the job.",
+    "copy": {
+      "does": "Lets Home run a big job with simpler chat and no question first."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.lower_without_asking.image",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Lower pictures quietly",
+    "help": "When on, Home may run a job with pictures at a lower level to make room without asking first. When off, Home asks the person who started the job.",
+    "copy": {
+      "does": "Lets Home run a big job with simpler pictures and no question first."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.lower_without_asking.video",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Lower video quietly",
+    "help": "When on, Home may run a job with video at a lower level to make room without asking first. When off, Home asks the person who started the job.",
+    "copy": {
+      "does": "Lets Home run a big job with simpler video and no question first."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.lower_without_asking.music",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Lower music quietly",
+    "help": "When on, Home may run a job with music at a lower level to make room without asking first. When off, Home asks the person who started the job.",
+    "copy": {
+      "does": "Lets Home run a big job with simpler music and no question first."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.priority",
+    "scope": "household",
+    "selector": "text",
+    "default": "[\"chat\", \"image\", \"video\", \"music\"]",
+    "label": "Order of importance",
+    "help": "A JSON list of categories, most important first. Chat and voice always go first and cannot be moved. Normally set by dragging on the Performance page.",
+    "copy": {
+      "does": "Decides which category waits when two need the same room."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.close_apps.mode",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "off",
+        "automatic"
+      ]
+    },
+    "default": "off",
+    "label": "Close apps for big jobs",
+    "help": "Off by default. Automatic lets Home close apps you listed under Always close, and only those, when a big job needs room and nothing else is left to try. Apps on the Never list and the built-in floor are never closed.",
+    "copy": {
+      "does": "Lets Home quit chosen programs when a large task needs the room.",
+      "options": {
+        "off": "Home never closes an app.",
+        "automatic": "Home closes only the apps on your Always close list, then reopens them."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.close_apps.always",
+    "scope": "household",
+    "selector": "text",
+    "default": "[]",
+    "label": "Allowed to close",
+    "help": "A JSON list of app bundle ids, in the order they are tried. Empty means none. Home keeps the names only in memory while a job runs and stores counts only.",
+    "copy": {
+      "does": "Lists the apps Home may shut down for a big job."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.close_apps.never",
+    "scope": "household",
+    "selector": "text",
+    "default": "[]",
+    "label": "Apps Home never closes",
+    "help": "A JSON list of app bundle ids that win over everything, on top of a built-in list of system apps that can never be closed.",
+    "copy": {
+      "does": "Lists the apps Home must leave open."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.close_apps.reopen",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Reopen closed apps afterwards",
+    "help": "When on, Home reopens the apps it closed once the job ends, in the order it closed them.",
+    "copy": {
+      "does": "Reopens the apps Home closed after the big job finishes."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.chat.tier.reduced",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "chat",
+      "tier": "reduced"
+    },
+    "default": {
+      "model": "off",
+      "options": {}
+    },
+    "label": "Chat at Reduced",
+    "help": "The model and options that fill the Reduced level of chat. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.chat.tier.standard",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "chat",
+      "tier": "standard"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Chat at Standard",
+    "help": "The model and options that fill the Standard level of chat. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.chat.tier.boost",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "chat",
+      "tier": "boost"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Chat at Boost",
+    "help": "The model and options that fill the Boost level of chat. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.chat.tier.max",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "chat",
+      "tier": "max"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Chat at Max",
+    "help": "The model and options that fill the Max level of chat. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.image.tier.reduced",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "image",
+      "tier": "reduced"
+    },
+    "default": {
+      "model": "off",
+      "options": {}
+    },
+    "label": "Pictures at Reduced",
+    "help": "The model and options that fill the Reduced level of pictures. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.image.tier.standard",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "image",
+      "tier": "standard"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Pictures at Standard",
+    "help": "The model and options that fill the Standard level of pictures. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.image.tier.boost",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "image",
+      "tier": "boost"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Pictures at Boost",
+    "help": "The model and options that fill the Boost level of pictures. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.image.tier.max",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "image",
+      "tier": "max"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Pictures at Max",
+    "help": "The model and options that fill the Max level of pictures. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.video.tier.reduced",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "video",
+      "tier": "reduced"
+    },
+    "default": {
+      "model": "off",
+      "options": {}
+    },
+    "label": "Video at Reduced",
+    "help": "The model and options that fill the Reduced level of video. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.video.tier.standard",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "video",
+      "tier": "standard"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Video at Standard",
+    "help": "The model and options that fill the Standard level of video. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.video.tier.boost",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "video",
+      "tier": "boost"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Video at Boost",
+    "help": "The model and options that fill the Boost level of video. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.video.tier.max",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "video",
+      "tier": "max"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Video at Max",
+    "help": "The model and options that fill the Max level of video. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.music.tier.reduced",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "music",
+      "tier": "reduced"
+    },
+    "default": {
+      "model": "off",
+      "options": {}
+    },
+    "label": "Music at Reduced",
+    "help": "The model and options that fill the Reduced level of music. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.music.tier.standard",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "music",
+      "tier": "standard"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Music at Standard",
+    "help": "The model and options that fill the Standard level of music. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.music.tier.boost",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "music",
+      "tier": "boost"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Music at Boost",
+    "help": "The model and options that fill the Boost level of music. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.music.tier.max",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "music",
+      "tier": "max"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Music at Max",
+    "help": "The model and options that fill the Max level of music. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.tts.tier.reduced",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "voice",
+      "tier": "reduced"
+    },
+    "default": {
+      "model": "off",
+      "options": {}
+    },
+    "label": "Voice at Reduced",
+    "help": "The model and options that fill the Reduced level of voice. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.tts.tier.standard",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "voice",
+      "tier": "standard"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Voice at Standard",
+    "help": "The model and options that fill the Standard level of voice. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.tts.tier.boost",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "voice",
+      "tier": "boost"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Voice at Boost",
+    "help": "The model and options that fill the Boost level of voice. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.tts.tier.max",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "voice",
+      "tier": "max"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Voice at Max",
+    "help": "The model and options that fill the Max level of voice. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
   }
 ]

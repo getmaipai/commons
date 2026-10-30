@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/tier-slot.schema.json",
+  "title": "TierSlot",
+  "description": "TIER-SPEC-01 (Home docs/design/tier-families-and-options-2026-10-30.md section 2). The value of one `engines.<role>.tier.<reduced|standard|boost|max>` setting: which model fills the slot and the options it runs with. `model` is a catalog candidate id, `recommended` (follows catalog updates) or `off` (the slot is switched off; the model stays installed). `options` is typed per category by vocab/resource-tiers.json; a name that category does not declare is invalid. The slot never holds a draft model (a launch setting, not an option). `who` is the optional Who can use it choice, defaulting by tier from the same vocab.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "model",
+    "options"
+  ],
+  "properties": {
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(recommended|off|[a-z][a-z0-9-]*)$",
+      "description": "`recommended`, `off`, or a catalog candidate id (model-capabilities.schema.json)."
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "boolean",
+          "integer",
+          "number"
+        ]
+      },
+      "description": "Option values by name. Names, types and ranges come from vocab/resource-tiers.json for the slot's category; the Stack and Home validate against it."
+    },
+    "who": {
+      "type": "string",
+      "enum": [
+        "everyone",
+        "assigned",
+        "admins"
+      ],
+      "description": "Who can use the slot. Absent means the tier's default in vocab/resource-tiers.json. Nobody may widen Max past the `tier.max` grant."
+    }
+  },
+  "$defs": {
+    "SwitchCost": {
+      "type": "string",
+      "enum": [
+        "option",
+        "family",
+        "cross"
+      ],
+      "description": "How a tier is reached from another: an option switch, a same-family swap, or a cross-family load (vocab/resource-tiers.json)."
+    }
+  }
+}

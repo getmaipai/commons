@@ -101,6 +101,11 @@
       "type": "string",
       "format": "date-time",
       "description": "When the job finished."
+    },
+    "tier": {
+      "type": ["string", "null"],
+      "enum": ["reduced", "standard", "boost", "max", null],
+      "description": "TIER-SPEC-01. The tier the result was made at. Absent on records made before tiers."
     }
   }
 }

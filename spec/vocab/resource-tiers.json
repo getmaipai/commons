@@ -1,0 +1,207 @@
+{
+  "$comment": "TIER-SPEC-01 (Home docs/design/resource-tiers-2026-10-27.md and tier-families-and-options-2026-10-30.md). The one definition of the resource tiers: the four tier ids, the categories that have them, the typed options a slot may carry for each category, the switch-cost classes, and the minors policy. Home draws the options as plain switches and the Stack's resolver reads the same names, so neither declares a copy. Tier ids are stable. `reduced` is applied by the system only and is never a person's pick. A job record keeps counts and ids only, never an app name (making-space note section 9).",
+  "tiers": [
+    {
+      "id": "reduced",
+      "label": "Reduced",
+      "pickable": false,
+      "promise": "Simpler, so a bigger job can have more of the computer. Applied by Home only."
+    },
+    {
+      "id": "standard",
+      "label": "Standard",
+      "pickable": true,
+      "promise": "Home keeps working normally while this runs."
+    },
+    {
+      "id": "boost",
+      "label": "Boost",
+      "pickable": true,
+      "promise": "Home stays up, but other big jobs wait their turn."
+    },
+    {
+      "id": "max",
+      "label": "Max",
+      "pickable": true,
+      "promise": "This takes the computer. Everything big waits."
+    }
+  ],
+  "who": [
+    {
+      "id": "everyone",
+      "label": "Everyone the age gates allow"
+    },
+    {
+      "id": "assigned",
+      "label": "Assigned people only"
+    },
+    {
+      "id": "admins",
+      "label": "Admins only"
+    }
+  ],
+  "who_default": {
+    "reduced": "admins",
+    "standard": "everyone",
+    "boost": "everyone",
+    "max": "admins"
+  },
+  "switch_costs": [
+    {
+      "id": "option",
+      "label": "Option switch",
+      "description": "A per-request change on the model already loaded. No load, no swap."
+    },
+    {
+      "id": "family",
+      "label": "Same family",
+      "description": "Unload and load within one model family. The time is measured by the evaluations and stays unverified until then."
+    },
+    {
+      "id": "cross",
+      "label": "Different family",
+      "description": "A full load of a model from another family."
+    }
+  ],
+  "categories": [
+    {
+      "id": "chat",
+      "role": "chat",
+      "label": "Chat",
+      "grant_parameter": "chat",
+      "options": [
+        {
+          "id": "thinking",
+          "type": "boolean",
+          "default": false,
+          "label": "Thinks longer",
+          "minors": false
+        },
+        {
+          "id": "reasoning_budget",
+          "type": "integer",
+          "min": 0,
+          "max": 32768,
+          "default": 0,
+          "label": "Thinking allowance",
+          "minors": false
+        }
+      ]
+    },
+    {
+      "id": "image",
+      "role": "image",
+      "label": "Pictures",
+      "grant_parameter": "image",
+      "options": [
+        {
+          "id": "steps",
+          "type": "integer",
+          "min": 1,
+          "max": 100,
+          "default": 8,
+          "label": "Detail passes",
+          "minors": true
+        },
+        {
+          "id": "guidance",
+          "type": "number",
+          "min": 0,
+          "max": 20,
+          "default": 1,
+          "label": "How closely it follows your words",
+          "minors": true
+        },
+        {
+          "id": "resolution",
+          "type": "integer",
+          "min": 256,
+          "max": 4096,
+          "default": 1024,
+          "label": "Size",
+          "minors": true
+        }
+      ]
+    },
+    {
+      "id": "video",
+      "role": "video",
+      "label": "Video",
+      "grant_parameter": "video",
+      "options": [
+        {
+          "id": "steps",
+          "type": "integer",
+          "min": 1,
+          "max": 100,
+          "default": 8,
+          "label": "Detail passes",
+          "minors": true
+        },
+        {
+          "id": "resolution",
+          "type": "integer",
+          "min": 256,
+          "max": 2160,
+          "default": 480,
+          "label": "Size",
+          "minors": true
+        },
+        {
+          "id": "length_seconds",
+          "type": "number",
+          "min": 1,
+          "max": 60,
+          "default": 5,
+          "label": "Length",
+          "minors": true
+        },
+        {
+          "id": "sound",
+          "type": "boolean",
+          "default": false,
+          "label": "With sound",
+          "minors": true
+        }
+      ]
+    },
+    {
+      "id": "music",
+      "role": "music",
+      "label": "Music",
+      "grant_parameter": "music",
+      "options": [
+        {
+          "id": "steps",
+          "type": "integer",
+          "min": 1,
+          "max": 100,
+          "default": 8,
+          "label": "Detail passes",
+          "minors": true
+        },
+        {
+          "id": "planner",
+          "type": "boolean",
+          "default": false,
+          "label": "Plans the song first",
+          "minors": true
+        }
+      ]
+    },
+    {
+      "id": "voice",
+      "role": "tts",
+      "label": "Voice",
+      "grant_parameter": "voice",
+      "options": []
+    }
+  ],
+  "minors_policy": {
+    "$comment": "RULES.md rules 2 and 8 and tiers-families F6. An option with `minors: false` (see each category) is forced to its default for every child and teen whatever a slot says. `tier.max` is never held by a child; a teen's Max reaches only the categories in `teen_max_categories`.",
+    "teen_max_categories": [
+      "image"
+    ],
+    "child_max": "never"
+  }
+}

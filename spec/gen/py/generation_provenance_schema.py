@@ -104,3 +104,7 @@ class GenerationProvenance(BaseModel):
         ..., description='One sentence naming why commercial_use has the value it has.'
     )
     made_at: AwareDatetime = Field(..., description='When the job finished.')
+    tier: Literal['reduced', 'standard', 'boost', 'max'] | None = Field(
+        None,
+        description='TIER-SPEC-01. The tier the result was made at. Absent on records made before tiers.',
+    )

@@ -89,6 +89,7 @@ export * from "./status-component.js";
 export * from "./status-event.js";
 export * from "./status-note.js";
 export * from "./subject-ref.js";
+export * from "./tier-slot.js";
 export * from "./topic-copy.js";
 export * from "./tour-progress.js";
 export * from "./tour.js";

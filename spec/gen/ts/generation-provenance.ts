@@ -145,6 +145,19 @@ export const GenerationProvenance = z
       .string()
       .datetime({ offset: true })
       .describe("When the job finished."),
+    /**TIER-SPEC-01. The tier the result was made at. Absent on records made before tiers.*/
+    tier: z
+      .union([
+        z.literal("reduced"),
+        z.literal("standard"),
+        z.literal("boost"),
+        z.literal("max"),
+        z.literal(null),
+      ])
+      .describe(
+        "TIER-SPEC-01. The tier the result was made at. Absent on records made before tiers.",
+      )
+      .optional(),
   })
   .strict()
   .describe(

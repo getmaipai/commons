@@ -68,6 +68,14 @@ export const ModelCapabilities = z
         "Last date represented in this model's training data, when the model publisher provides one.",
       )
       .optional(),
+    /**TIER-SPEC-01 (tier-families F1). The model family, such as `chatterbox` or `qwen3`. The AI and models dialogs group candidates by it, and a swap inside one family is the `family` switch cost (vocab/resource-tiers.json). Absent means a family of one.*/
+    family: z
+      .string()
+      .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+      .describe(
+        "TIER-SPEC-01 (tier-families F1). The model family, such as `chatterbox` or `qwen3`. The AI and models dialogs group candidates by it, and a swap inside one family is the `family` switch cost (vocab/resource-tiers.json). Absent means a family of one.",
+      )
+      .optional(),
     quality_tier: z.enum(["draft", "standard", "high"]).optional(),
     tags: z.array(z.string()).optional(),
     /**Short, dad-readable upsides shown in the model-selection wizard.*/
