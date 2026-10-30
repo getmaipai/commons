@@ -9,11 +9,9 @@ from pathlib import Path
 
 import pytest
 from _standards import load_standards_module
-from gen.py.alarm_schema import Alarm
-from gen.py.quick_timer_schema import QuickTimer
-from gen.py.world_place_schema import WorldPlace
 from pydantic import ValidationError
 
+from gen.py.alarm_schema import Alarm
 from gen.py.artifact_schema import Artifact
 from gen.py.chat_folder_schema import ChatFolder
 from gen.py.content_ceiling_schema import ContentCeiling
@@ -42,6 +40,7 @@ from gen.py.page_context_schema import PageContext
 from gen.py.person_schema import Person
 from gen.py.project_schema import ProjectPlan
 from gen.py.quick_action_schema import QuickAction
+from gen.py.quick_timer_schema import QuickTimer
 from gen.py.relationship_schema import Relationship
 from gen.py.reply_constraint_schema import ReplyConstraint
 from gen.py.reply_feedback_schema import ReplyFeedback
@@ -60,6 +59,7 @@ from gen.py.stack_fit_plan_schema import StackFitPlan
 from gen.py.subject_ref_schema import Household, Unresolved, World
 from gen.py.turn_artifact_schema import TurnArtifact
 from gen.py.turn_signal_schema import TurnSignal
+from gen.py.world_place_schema import WorldPlace
 
 # ErrorEntry is standards-owned (std-v0.2.0), not generated here; loaded
 # from the sibling .github checkout the same way spec/schemas/manifest
