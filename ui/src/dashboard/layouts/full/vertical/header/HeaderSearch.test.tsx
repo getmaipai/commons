@@ -243,3 +243,82 @@ describe("HeaderSearch (SEARCH-MODERN-04): options from context", () => {
     expect(asked).toEqual(["qqqq"]);
   });
 });
+
+describe("HeaderSearch (WEB-TAB-02): the Web tab", () => {
+  function setup(webSearch: (q: string) => Promise<{ results: { kind: string; id: string; title: string; href: string; source?: string; snippet?: string; action?: string }[]; note?: string }>) {
+    const view = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <HeaderSearch webSearch={webSearch} />
+      </MemoryRouter>,
+    );
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    const input = view.getByPlaceholderText("Search...");
+    fireEvent.change(input, { target: { value: "tea" } });
+    return { view, input };
+  }
+
+  test("no Web tab without a webSearch function", () => {
+    const view = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <HeaderSearch />
+      </MemoryRouter>,
+    );
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    fireEvent.change(view.getByPlaceholderText("Search..."), { target: { value: "tea" } });
+    expect(view.queryByRole("tab", { name: "Web" })).toBeNull();
+  });
+
+  test("typing never calls webSearch; Enter on the Web tab calls it once and shows the rows", async () => {
+    const calls: string[] = [];
+    const { view, input } = setup(async (q) => {
+      calls.push(q);
+      return { results: [{ kind: "web", id: "w1", title: "How to brew tea", href: "https://example.com/tea", source: "example.com", snippet: "Steep for three minutes", action: "Open" }] };
+    });
+    await settle();
+    fireEvent.click(view.getByRole("tab", { name: "Web" }));
+    expect(calls).toEqual([]);
+    expect(document.body.textContent).toContain("Press Enter to search the web");
+    fireEvent.keyDown(input, { key: "Enter" });
+    await settle();
+    expect(calls).toEqual(["tea"]);
+    expect([...document.querySelectorAll('[role="option"]')].map((row) => row.textContent).join("|")).toContain("How to brew tea");
+  });
+
+  test("the route's own reason is shown when there are no rows, and a failed search says it did not answer", async () => {
+    const reason = setup(async () => ({ results: [], note: "Web search is off for this household." }));
+    fireEvent.click(reason.view.getByRole("tab", { name: "Web" }));
+    fireEvent.keyDown(reason.input, { key: "Enter" });
+    await settle();
+    expect(document.body.textContent).toContain("Web search is off for this household.");
+    cleanup();
+    const failed = setup(async () => {
+      throw new Error("boom");
+    });
+    fireEvent.click(failed.view.getByRole("tab", { name: "Web" }));
+    fireEvent.keyDown(failed.input, { key: "Enter" });
+    await settle();
+    expect(document.body.textContent).toContain("Web search did not answer");
+  });
+
+  test("a web row opens in a new tab with no opener, and editing the query hides stale rows", async () => {
+    const opened: unknown[][] = [];
+    const original = window.open;
+    window.open = ((...args: unknown[]) => {
+      opened.push(args);
+      return null;
+    }) as typeof window.open;
+    try {
+      const { view, input } = setup(async () => ({ results: [{ kind: "web", id: "w1", title: "Tea guide", href: "https://example.com/tea" }] }));
+      fireEvent.click(view.getByRole("tab", { name: "Web" }));
+      fireEvent.keyDown(input, { key: "Enter" });
+      await settle();
+      fireEvent.change(input, { target: { value: "tea bags" } });
+      expect(document.body.textContent).not.toContain("Tea guide");
+      fireEvent.change(input, { target: { value: "tea" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+      expect(opened).toEqual([["https://example.com/tea", "_blank", "noopener,noreferrer"]]);
+    } finally {
+      window.open = original;
+    }
+  });
+});

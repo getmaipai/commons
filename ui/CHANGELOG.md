@@ -1,3 +1,8 @@
+## [ui-v0.5.429] - 2026-10-30
+
+- Command palette Element, additive: `PaletteTab.submit` marks a tab whose results are fetched only when the person presses Enter, with `onSubmitQuery` and `submittedQuery` on the Element. Defaults unchanged.
+- `HeaderSearch` gains an optional `webSearch` (also settable through `HeaderSearchOptionsContext`): a Web tab appears only when it is given. The function runs on Enter, never while typing; its rows (kind `web`) open in a new tab with no opener, and a reason from the caller's own server (`note`) shows when there are no rows. WEB-TAB-02.
+
 ## [ui-v0.5.428] - 2026-10-30
 
 - `ArticleView`: a Related row with no picture (or one that fails to load) shows the title's first letter on a quiet tile instead of an empty square; with a breadcrumb the article column starts below the toolbar below `lg`, so the Back button no longer covers the breadcrumb on a phone. READER-POLISH-01.

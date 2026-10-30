@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router";
-import { AlarmClock, BookOpen, Bot, Brain, Clapperboard, FileText, LayoutGrid, MessageCircle, Search as SearchIcon, Settings, SquareTerminal, Users } from "lucide-react";
+import { AlarmClock, BookOpen, Bot, Brain, Clapperboard, FileText, Globe, LayoutGrid, MessageCircle, Search as SearchIcon, Settings, SquareTerminal, Users } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
 import { cn } from "../../../../lib/utils";
 import { CommandPaletteDialog, type PaletteCommand, type PaletteTab } from "../../../../../elements/command-palette";
@@ -41,6 +41,13 @@ export interface SearchResult {
   action?: string;
 }
 
+/** What a caller's web search answers: result rows (kind "web", `href` an outside address) and, when it gave none, a plain-words
+ * reason from the caller's own server ("Web search is off for this household"). The kit never works the reason out itself. */
+export interface WebSearchResponse {
+  results: SearchResult[];
+  note?: string;
+}
+
 export interface SearchGroup {
   kind: string;
   heading: string;
@@ -69,6 +76,9 @@ export interface HeaderSearchProps {
   remote?: (query: string) => Promise<SearchGroup[]>;
   /** Shown under the empty query as "Recent": pointers the caller already ranks (e.g. the person's recent chats). */
   recents?: SearchResult[];
+  /** When given, a Web tab appears. It runs this only when the person presses Enter on that tab, never while they type, so a
+   * query leaves the house only by their choice. A rejected promise shows a plain "did not answer" line. */
+  webSearch?: (query: string) => Promise<WebSearchResponse>;
   /** When given, a typed query gets a last "Ask" row that calls this with the text. */
   onAsk?: (query: string) => void;
   /** The app rail draws this same button as a rail icon; merged over the header's own classes. */
@@ -81,6 +91,7 @@ export interface HeaderSearchProps {
  * header and the rail. A prop given to `HeaderSearch` itself wins. */
 export interface HeaderSearchOptions {
   recents?: SearchResult[];
+  webSearch?: (query: string) => Promise<WebSearchResponse>;
   onAsk?: (query: string) => void;
 }
 export const HeaderSearchOptionsContext = createContext<HeaderSearchOptions>({});
@@ -97,9 +108,14 @@ const KIND_ICONS: Record<string, ReactNode> = {
   command: <SquareTerminal />,
   file: <FileText />,
   reference: <BookOpen />,
+  web: <Globe />,
 };
 
 const ASK_ID = "ask";
+const WEB_TAB: PaletteTab = { id: "web", label: "Web", submit: true };
+const WEB_HINT = "Press Enter to search the web";
+const WEB_FAILED = "Web search did not answer. Try again in a moment.";
+type WebState = { status: "idle" } | { status: "loading" | "done"; query: string; results: SearchResult[]; note?: string };
 
 // A result's kind decides its tab; every kind not named here is a page or record in Home.
 const TABS: readonly PaletteTab[] = [
@@ -125,10 +141,13 @@ function richOf(result: SearchResult): Partial<PaletteCommand> {
 
 /** The header's one global search: an icon button opening the kit's command-palette Element over the sidebar's pages, the
  * caller's recents and the caller's remote results. */
-const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, triggerClassName, size = "lg" }: HeaderSearchProps = {}) => {
+const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearch: webSearchProp, triggerClassName, size = "lg" }: HeaderSearchProps = {}) => {
   const options = useContext(HeaderSearchOptionsContext);
   const recents = recentsProp ?? options.recents;
   const onAsk = onAskProp ?? options.onAsk;
+  const webSearch = webSearchProp ?? options.webSearch;
+  const [web, setWeb] = useState<WebState>({ status: "idle" });
+  const webRequestRef = useRef(0);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeId, setActiveId] = useState("");
@@ -181,6 +200,16 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, triggerC
     const out: PaletteCommand[] = [];
     const to = new Map<string, string>();
     const trimmed = query.trim().toLowerCase();
+    if (trimmed !== "" && tab === "web") {
+      if (web.status === "done" && web.query.toLowerCase() === trimmed) {
+        for (const result of web.results) {
+          const id = `web:${result.id}`;
+          out.push({ id, label: result.title, group: "Web", keys: [], icon: <Globe />, ...richOf(result) });
+          to.set(id, result.href);
+        }
+      }
+      return { commands: out, hrefs: to };
+    }
     if (trimmed === "") {
       for (const { item, heading } of pages) {
         out.push({ id: `page:${item.key}`, label: item.name, group: heading || "Pages", keys: [], icon: item.icon ? <item.icon /> : undefined });
@@ -208,7 +237,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, triggerC
     }
     if (onAsk && tab === "all") out.push({ id: ASK_ID, label: `Ask: ${query.trim()}`, group: "Ask", keys: [], icon: <MessageCircle /> });
     return { commands: out, hrefs: to };
-  }, [query, pages, recents, remoteGroups, onAsk, tab]);
+  }, [query, pages, recents, remoteGroups, onAsk, tab, web]);
 
   // The highlighted row follows the first command whenever the list changes under it, so Enter opens the top hit. The
   // Ask row is a last resort and never keeps the highlight once a real result exists.
@@ -227,7 +256,23 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, triggerC
       setRemoteGroups([]);
       setActiveId("");
       setTab("all");
+      webRequestRef.current += 1;
+      setWeb({ status: "idle" });
     }
+  }
+
+  function submitWeb(text: string) {
+    if (!webSearch) return;
+    const id = ++webRequestRef.current;
+    setWeb({ status: "loading", query: text, results: [] });
+    Promise.resolve()
+      .then(() => webSearch(text))
+      .then((response) => {
+        if (webRequestRef.current === id) setWeb({ status: "done", query: text, results: response.results, note: response.note });
+      })
+      .catch(() => {
+        if (webRequestRef.current === id) setWeb({ status: "done", query: text, results: [], note: WEB_FAILED });
+      });
   }
 
   function run(id: string) {
@@ -238,8 +283,21 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, triggerC
       return;
     }
     const href = hrefs.get(id);
-    if (href) navigate(href);
+    if (!href) return;
+    // A web result is an outside address: opened in its own tab, with no opener and no referrer.
+    if (id.startsWith("web:")) window.open(href, "_blank", "noopener,noreferrer");
+    else navigate(href);
   }
+
+  const onWebTab = tab === "web" && query.trim() !== "";
+  const webMatches = web.status !== "idle" && web.query.toLowerCase() === query.trim().toLowerCase();
+  const emptyMessage = !onWebTab
+    ? "No results found."
+    : !webMatches
+      ? WEB_HINT
+      : web.status === "loading"
+        ? "Searching the web..."
+        : (web.status === "done" && web.note) || "No web results found.";
 
   return (
     <>
@@ -257,7 +315,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, triggerC
         onOpenChange={onOpenChange}
         title="Search"
         placeholder="Search..."
-        emptyMessage="No results found."
+        emptyMessage={emptyMessage}
         prefiltered
         size={size}
         commands={commands}
@@ -266,10 +324,12 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, triggerC
         onQueryChange={setQuery}
         onActiveChange={setActiveId}
         onRun={run}
-        tabs={query.trim() === "" ? undefined : TABS}
+        tabs={query.trim() === "" ? undefined : webSearch ? [...TABS, WEB_TAB] : TABS}
         activeTab={tab}
         onTabChange={setTab}
-        footer="Search anywhere in Home · Esc to close"
+        onSubmitQuery={submitWeb}
+        submittedQuery={webMatches ? web.query : undefined}
+        footer={onWebTab ? `${WEB_HINT} · Esc to close` : "Search anywhere in Home · Esc to close"}
       />
     </>
   );

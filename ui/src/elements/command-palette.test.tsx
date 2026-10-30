@@ -154,3 +154,39 @@ test("tabs, rich cards and a footer render, and the tab buttons report their id"
   expect(view.getByText("Open")).toBeTruthy();
   expect(view.getByText("Search anywhere in Home")).toBeTruthy();
 });
+
+test("a submit tab calls onSubmitQuery on Enter until the query was submitted, then runs the active row", () => {
+  const onSubmitQuery = mock((_query: string) => {});
+  const onRun = mock((_id: string) => {});
+  const props = {
+    open: true,
+    onOpenChange: () => {},
+    title: "Search",
+    commands,
+    activeId: "new-chat",
+    prefiltered: true,
+    tabs: [{ id: "all", label: "All" }, { id: "web", label: "Web", submit: true }],
+    activeTab: "web",
+    onSubmitQuery,
+    onRun,
+  };
+  const view = render(<CommandPaletteDialog {...props} query=" tea " />);
+  fireEvent.keyDown(view.getByRole("combobox"), { key: "Enter" });
+  expect(onSubmitQuery).toHaveBeenCalledWith("tea");
+  expect(onRun).not.toHaveBeenCalled();
+  view.rerender(<CommandPaletteDialog {...props} query=" tea " submittedQuery="tea" />);
+  fireEvent.keyDown(view.getByRole("combobox"), { key: "Enter" });
+  expect(onSubmitQuery).toHaveBeenCalledTimes(1);
+  expect(onRun).toHaveBeenCalledWith("new-chat");
+});
+
+test("Enter on a tab that is not a submit tab never calls onSubmitQuery", () => {
+  const onSubmitQuery = mock((_query: string) => {});
+  const onRun = mock((_id: string) => {});
+  const view = render(
+    <CommandPaletteDialog open onOpenChange={() => {}} title="Search" commands={commands} query="new" activeId="new-chat" tabs={[{ id: "all", label: "All" }, { id: "web", label: "Web", submit: true }]} activeTab="all" onSubmitQuery={onSubmitQuery} onRun={onRun} />,
+  );
+  fireEvent.keyDown(view.getByRole("combobox"), { key: "Enter" });
+  expect(onSubmitQuery).not.toHaveBeenCalled();
+  expect(onRun).toHaveBeenCalledWith("new-chat");
+});

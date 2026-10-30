@@ -34,6 +34,9 @@ export interface PaletteCommand {
 export interface PaletteTab {
   id: string;
   label: string;
+  /** A tab whose results are fetched only when the person presses Enter, never while they type (e.g. a web search, where
+   * each query leaves the house). Enter calls `onSubmitQuery` until `submittedQuery` matches the query, then runs the active row. */
+  submit?: boolean;
 }
 
 export type CommandPaletteDialogProps = Omit<ComponentProps<typeof CommandPalette>, "className" | "size"> & {
@@ -89,6 +92,8 @@ export function CommandPalette({
   tabs,
   activeTab,
   onTabChange,
+  onSubmitQuery,
+  submittedQuery,
   footer,
   className,
   ...props
@@ -120,6 +125,10 @@ export function CommandPalette({
   tabs?: readonly PaletteTab[];
   activeTab?: string;
   onTabChange?: (id: string) => void;
+  /** Called with the query when Enter is pressed on a `submit` tab whose results are not yet for this query. */
+  onSubmitQuery?: (query: string) => void;
+  /** The query the caller last submitted; once it equals the query, Enter runs the active row instead of submitting. */
+  submittedQuery?: string;
   /** A line under the list, e.g. a hint about keys. */
   footer?: ReactNode;
 }) {
@@ -163,6 +172,11 @@ export function CommandPalette({
       move(-1);
     } else if (event.key === "Enter") {
       event.preventDefault();
+      const submitTab = tabs?.find((tab) => tab.id === activeTab)?.submit === true;
+      if (submitTab && query.trim() !== "" && query.trim() !== submittedQuery) {
+        onSubmitQuery?.(query.trim());
+        return;
+      }
       const active = ordered.find((command) => command.id === activeId);
       if (active && onRun) onRun(active.id);
     }
