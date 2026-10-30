@@ -114,7 +114,7 @@ describe("every viewer, every area: never a section they may not see", () => {
   test("live product data has the single Settings area", () => {
     const liveAreas = (liveAreasFile as unknown as { areas: SettingsAreaDef[] }).areas;
     expect(liveAreas.map((a) => a.id)).toEqual(["settings"]);
-    expect(liveAreas[0]!.sections.filter((s) => s.scope === "household")).toHaveLength(9);
+    expect(liveAreas[0]!.sections.filter((s) => s.scope === "household")).toHaveLength(10);
     expect(liveAreas[0]!.sections.filter((s) => s.scope === "person")).toHaveLength(7);
   });
 });
