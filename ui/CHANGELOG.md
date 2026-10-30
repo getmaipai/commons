@@ -1,3 +1,7 @@
+## [ui-v0.5.432] - 2026-10-30
+
+- New `TierSegment` Element: the Standard, Boost, Max choice for a picture, video or song card (give it only the tiers the person may pick; a tier with a `confirm` line asks once before it applies) and `TierChip`, the composer model chip's tier marker (a held Max can be tapped to release). Additive; nothing else changes. TIER-UI-01. `ui-v0.5.431` was cut before this version bump and is not used.
+
 ## [ui-v0.5.430] - 2026-10-30
 
 - `HeaderSearch` Web tab: before a search is run the empty list says "Nothing is sent to the web until you press Enter." (the footer already carries the key hint). WEB-TAB-02.
