@@ -16,8 +16,8 @@ const area=()=>file.areas[0]!;const page=(f:AreasFile,id:string)=>f.areas[0]!.se
 describe("single Settings area",()=>{
  test("has one guest-openable area with two exact groups and scoped page counts",()=>{
   expect(file.areas.map(a=>a.id)).toEqual(["settings"]); expect(area().audience.min_role).toBe("guest");
-  expect(area().groups).toEqual([{label:"Yours",sections:["profile","appearance","chat","voice","notifications","pictures","data"]},{label:"The home",sections:["household","privacy","ai","media","home-voice","search","apps","backups","advanced"]}]);
-  expect(area().sections.filter(s=>s.scope==="person")).toHaveLength(7);expect(area().sections.filter(s=>s.scope==="household")).toHaveLength(9);
+  expect(area().groups).toEqual([{label:"Yours",sections:["profile","appearance","chat","voice","notifications","pictures","data"]},{label:"The home",sections:["household","privacy","ai","media","home-voice","search","offline-data","apps","backups","advanced"]}]);
+  expect(area().sections.filter(s=>s.scope==="person")).toHaveLength(7);expect(area().sections.filter(s=>s.scope==="household")).toHaveLength(10);
   expect(CENTRAL_AREA_IDS).toEqual(["settings"]);expect(RESERVED_AREA_IDS).toEqual(expect.arrayContaining(["home","account","chat","settings"]));
   expect(lintManifestSettings({id:"music",contributes:{settings_area:{...area(),id:"settings"}}}).join(" ")).toMatch(/reserved/);
   expect(PAGE_COUNT_ENFORCED).toBe(true);expect(SETTINGS_CAP_ENFORCED).toBe(false);expect(checkAreas(file,registry)).toEqual([]);

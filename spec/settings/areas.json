@@ -28,6 +28,7 @@
             "media",
             "home-voice",
             "search",
+            "offline-data",
             "apps",
             "backups",
             "advanced"
@@ -844,18 +845,22 @@
                 "save_error": "That change was not saved. Check your connection, then tick the box again."
               },
               "tab": "search"
+            },
+            {
+              "label": "Offline books",
+              "links": [
+                {
+                  "label": "Download Wikipedia, health and other offline books",
+                  "href": "/settings/offline-data"
+                }
+              ],
+              "tab": "search"
             }
           ],
           "tabs": [
             {
               "id": "search",
               "label": "Search"
-            },
-            {
-              "id": "reference-library",
-              "label": "Reference library",
-              "min_role": "admin",
-              "view": "home.reference_library"
             }
           ],
           "keywords": [
@@ -863,6 +868,27 @@
             "wikipedia",
             "brave",
             "key"
+          ],
+          "scope": "household",
+          "min_role": "admin"
+        },
+        {
+          "id": "offline-data",
+          "label": "Offline data",
+          "icon": "download",
+          "kind": "view",
+          "view": "home.reference_library",
+          "keywords": [
+            "wikipedia",
+            "offline",
+            "kiwix",
+            "reference",
+            "medical",
+            "health",
+            "books",
+            "download",
+            "library",
+            "encyclopedia"
           ],
           "scope": "household",
           "min_role": "admin"

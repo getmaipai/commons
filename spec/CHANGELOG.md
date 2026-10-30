@@ -1,3 +1,7 @@
+## [spec-v0.1.278] - 2026-10-30
+
+- READER-14: Offline data is its own Settings page in The home (section `offline-data`, view `home.reference_library`, admin), right after Search and web. The Reference library tab leaves Search and web, which gains a link card to the new page, and the old `reference-library` route maps to it. Owner decision 2026-10-30: the household page limit rises from nine to ten.
+
 ## [spec-v0.1.277] - 2026-10-30
 
 - MOON-LOOK-02: `weather_card` props gain optional `moon: { phase, illumination }` for phase-accurate night rendering. Additive; absent moon data keeps the generic moon. New valid and invalid fixtures.

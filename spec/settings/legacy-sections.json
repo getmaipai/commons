@@ -216,8 +216,7 @@
       },
       "new": {
         "area": "settings",
-        "section": "search",
-        "tab": "reference-library"
+        "section": "offline-data"
       }
     },
     {

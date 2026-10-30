@@ -92,7 +92,7 @@ export function checkPageCount(area: SettingsArea): string[] {
   const errors: string[] = [];
   for (const scope of ["person", "household"] as const) {
     const count = area.sections.filter((s) => s.scope === scope).length;
-    if (count < 6 || count > 9) errors.push(`${area.id}: ${scope} pages must be 6 to 9 (found ${count})`);
+    if (count < 6 || count > (scope === "household" ? 10 : 9)) errors.push(`${area.id}: ${scope} pages must be 6 to ${scope === "household" ? 10 : 9} (found ${count})`);
   }
   return errors;
 }
