@@ -298,7 +298,7 @@ function ArticleRelated({ items, renderTargetLink }: { items: NonNullable<Articl
       <ul className="flex flex-col gap-1">
         {items.map((item) => (
           <li key={`${item.target.book}/${item.target.path}`} className="bg-card text-card-foreground hover:bg-muted relative flex items-center gap-3 overflow-hidden rounded-lg border">
-            {item.thumbnail ? <img src={item.thumbnail.src} alt={item.thumbnail.alt} loading="lazy" className="size-12 shrink-0 object-cover" /> : <span aria-hidden className="size-12 shrink-0" />}
+            {item.thumbnail ? <SafeImage src={item.thumbnail.src} alt={item.thumbnail.alt} loading="lazy" className="size-12 shrink-0 object-cover" /> : <span aria-hidden className="size-12 shrink-0" />}
             <span className="min-w-0 flex-1 truncate text-sm [&_a]:after:absolute [&_a]:after:inset-0">{renderTargetLink ? renderTargetLink(item.target, item.title) : item.title}</span>
           </li>
         ))}

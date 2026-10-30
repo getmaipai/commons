@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode, type Re
 import { getIcon } from "@/kit/icons";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/kit/dashboard/components/ui/hover-card";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/kit/ui/table";
+import { SafeImage } from "./SafeImage";
 import { cn } from "@/kit/utils";
 
 const ChevronIcon = getIcon("chevron-down");
@@ -78,7 +79,7 @@ export function ArticleInfoboxCard({ infobox }: { infobox: ArticleInfobox }) {
   return (
     <aside data-slot="article-infobox" aria-label={infobox.title ?? "At a glance"}>
       <Disclosure slot="article-infobox-box" title={infobox.title ?? "At a glance"}>
-        {infobox.image ? <img src={infobox.image.src} alt={infobox.image.alt} loading="lazy" className="mx-3 mb-2 w-[calc(100%-1.5rem)] rounded-md object-cover" /> : null}
+        {infobox.image ? <SafeImage src={infobox.image.src} alt={infobox.image.alt} loading="lazy" className="mx-3 mb-2 w-[calc(100%-1.5rem)] rounded-md object-cover" /> : null}
         <Table className="text-sm">
           <TableBody>
             {infobox.rows.map((row, i) => <TableRow key={i}><TableHead scope="row" className="w-2/5 whitespace-normal align-top">{row.label}</TableHead><TableCell className="whitespace-normal break-words">{row.value}</TableCell></TableRow>)}
@@ -122,7 +123,7 @@ function PreviewBody({ target }: { target: { book: string; path: string } }) {
   if (state === "none") return <p className="text-muted-foreground">No preview for this page.</p>;
   return (
     <div data-slot="article-preview" className="flex flex-col gap-2">
-      {state.thumbnail ? <img src={state.thumbnail.src} alt={state.thumbnail.alt} loading="lazy" className="max-h-32 w-full rounded-md object-cover" /> : null}
+      {state.thumbnail ? <SafeImage src={state.thumbnail.src} alt={state.thumbnail.alt} loading="lazy" className="max-h-32 w-full rounded-md object-cover" /> : null}
       <p className="font-semibold">{state.title}</p>
       <p className="line-clamp-5">{state.summary}</p>
     </div>
