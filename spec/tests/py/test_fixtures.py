@@ -994,6 +994,7 @@ def test_answer_block_has_a_valid_fixture_per_v1_kind():
         "valid-after-paragraph.json",
         "valid-story_feed-section-style.json",
         "valid-weather_card-advice.json",
+        "valid-weather_card-moon.json",
     }
 
 

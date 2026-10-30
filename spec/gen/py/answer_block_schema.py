@@ -558,6 +558,22 @@ class DailyItem(BaseModel):
     )
 
 
+class Moon(BaseModel):
+    """
+    The moon's phase for a night card. Absent: the card keeps its generic moon.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    phase: constr(min_length=1) = Field(
+        ..., description='The phase name, e.g. "Waning Gibbous"'
+    )
+    illumination: conint(ge=0, le=100) = Field(
+        ..., description='Percent of the disc lit.'
+    )
+
+
 class AdviceItem(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -597,6 +613,10 @@ class Props8(BaseModel):
     hourly: list[HourlyItem] | None = Field(None, max_length=24)
     daily: list[DailyItem] = Field(..., max_length=8, min_length=1)
     attribution: str
+    moon: Moon | None = Field(
+        None,
+        description="The moon's phase for a night card. Absent: the card keeps its generic moon.",
+    )
     advice: list[AdviceItem] | None = Field(
         None,
         description='Advice chips drawn under the current conditions. Absent or empty: none.',

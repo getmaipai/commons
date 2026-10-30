@@ -551,6 +551,16 @@
               }
             },
             "attribution": { "type": "string" },
+            "moon": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["phase", "illumination"],
+              "description": "The moon's phase for a night card. Absent: the card keeps its generic moon.",
+              "properties": {
+                "phase": { "type": "string", "minLength": 1, "description": "The phase name, e.g. \"Waning Gibbous\"" },
+                "illumination": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Percent of the disc lit." }
+              }
+            },
             "advice": {
               "type": "array",
               "maxItems": 12,

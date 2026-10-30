@@ -1,0 +1,57 @@
+{
+  "id": "blk-w3a7k1",
+  "kind": "weather_card",
+  "schema_version": 1,
+  "producer": "weather",
+  "alt": "Weather in Springfield: 72 degrees and partly cloudy, high of 78 tomorrow.",
+  "provenance": "weather call turn-k3m9x2:call0",
+  "created_at": "2026-10-16T14:03:11Z",
+  "hlc": "1791468191000:0:hub001",
+  "props": {
+    "place": "Springfield",
+    "unit": "F",
+    "current": {
+      "temp": 72,
+      "condition": "Partly cloudy",
+      "code": 2,
+      "is_day": true
+    },
+    "hourly": [
+      {
+        "time": "2026-10-16T15:00",
+        "temp": 73,
+        "pop": 5
+      },
+      {
+        "time": "2026-10-16T16:00",
+        "temp": 74
+      }
+    ],
+    "daily": [
+      {
+        "date": "2026-10-16",
+        "high": 75,
+        "low": 58,
+        "code": 2,
+        "pop": 10
+      },
+      {
+        "date": "2026-10-17",
+        "high": 78,
+        "low": 60,
+        "code": 0
+      },
+      {
+        "date": "2026-10-18",
+        "high": 69,
+        "low": 55,
+        "code": 61,
+        "pop": 70
+      }
+    ],
+    "attribution": "Open-Meteo",
+    "moon": {
+      "illumination": 72
+    }
+  }
+}

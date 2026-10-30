@@ -75,6 +75,12 @@ describe("answer-block fixtures", () => {
       },
     })).toBe(false);
   });
+
+  test("weather card moon accepts a phase and bounded illumination", () => {
+    const moon = read("fixtures", "answer-block", "valid-weather_card-moon.json");
+    expect(validate(moon)).toBe(true);
+    expect(AnswerBlock.safeParse(moon).success).toBe(true);
+  });
 });
 
 describe("after_paragraph (GENUI-13a)", () => {

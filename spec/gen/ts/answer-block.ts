@@ -1061,6 +1061,27 @@ export const AnswerBlock = z
                 .min(1)
                 .max(8),
               attribution: z.string(),
+              /**The moon's phase for a night card. Absent: the card keeps its generic moon.*/
+              moon: z
+                .object({
+                  /**The phase name, e.g. "Waning Gibbous"*/
+                  phase: z
+                    .string()
+                    .min(1)
+                    .describe('The phase name, e.g. "Waning Gibbous"'),
+                  /**Percent of the disc lit.*/
+                  illumination: z
+                    .number()
+                    .int()
+                    .gte(0)
+                    .lte(100)
+                    .describe("Percent of the disc lit."),
+                })
+                .strict()
+                .describe(
+                  "The moon's phase for a night card. Absent: the card keeps its generic moon.",
+                )
+                .optional(),
               /**Advice chips drawn under the current conditions. Absent or empty: none.*/
               advice: z
                 .array(

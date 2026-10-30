@@ -1421,3 +1421,7 @@ Additive throughout; every existing fixture still validates unchanged.
 - Optional List `icon` from the fixed built-in icon set. Built-in lists
   have fixed icons; custom lists choose one from the set.
 
+## Unreleased
+
+- MOON-LOOK-02: `weather_card` props gain optional `moon: { phase, illumination }` for phase-accurate night rendering. Additive; absent moon data keeps the generic moon. New valid and invalid fixtures.
+
