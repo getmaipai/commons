@@ -27,6 +27,14 @@ function show(apps: DirectoryApp[], over: Partial<React.ComponentProps<typeof Ap
 }
 
 describe("AppDirectory", () => {
+  test("hideTitle keeps the heading for screen readers and draws nothing visible", () => {
+    const shown = show(core);
+    expect(shown.getByRole("heading", { level: 1, name: "All apps" }).className).not.toContain("sr-only");
+    cleanup();
+    const hidden = show(core, { hideTitle: true });
+    expect(hidden.getByRole("heading", { level: 1, name: "All apps" }).className).toContain("sr-only");
+  });
+
   test("the search box is focused on open and the page says how many apps there are", () => {
     const view = show(fake(60));
     expect(document.activeElement).toBe(view.getByRole("searchbox", { name: "Search apps" }));

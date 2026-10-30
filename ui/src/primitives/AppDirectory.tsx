@@ -31,6 +31,8 @@ export interface AppDirectoryProps {
   busy?: boolean;
   /** The route of the page the person came from; its tile is marked. */
   currentTo?: string;
+  /** The host's page header already says "All apps": the heading stays for screen readers only, never drawn twice. */
+  hideTitle?: boolean;
 }
 
 /** Every word of the query must appear in the app's name, description, category or keywords. */
@@ -105,7 +107,7 @@ function Tile({ app, current, starDisabled, starReason, onToggle }: { app: Direc
  * open) filters as you type; with no query, Favorites come first and the rest group by category; a star on each tile
  * adds or removes a favorite; arrow keys move between tiles. Content-agnostic: the host passes the apps and saves the
  * favorite. */
-export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, currentTo }: AppDirectoryProps) {
+export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, currentTo, hideTitle }: AppDirectoryProps) {
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -157,7 +159,7 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
   return (
     <div data-slot="app-directory" className="flex min-w-0 flex-col gap-5">
       <div className="sticky top-0 z-10 -mx-1 flex flex-col gap-2 bg-[var(--page,var(--background))] px-1 pt-1 pb-3">
-        <h1 className="text-3xl font-bold tracking-tight">All apps</h1>
+        <h1 className={hideTitle ? "sr-only" : "text-3xl font-bold tracking-tight"}>All apps</h1>
         <InputGroup className="h-11 max-w-xl">
           <InputGroupAddon><SearchIcon aria-hidden /></InputGroupAddon>
           <InputGroupInput
