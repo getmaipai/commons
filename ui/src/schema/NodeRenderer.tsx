@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { ApiError, request } from "@/kit/http";
 import { cardSizeGridTemplateColumns } from "@/kit/primitives/CardSizeSlider";
 import { Section } from "@/kit/primitives/Section";
+import { cn } from "@/kit/utils";
 import { List } from "@/kit/primitives/List";
 import { CardGrid } from "@/kit/primitives/CardGrid";
 import { MediaShelf } from "@/kit/primitives/MediaShelf";
@@ -722,7 +723,13 @@ function ListNodeView({ node }: { node: ListNode }) {
             label={node.item_label_field}
             isSelected={selectMode ? (row) => selected.has(keyOf(row)) : undefined}
             renderItem={(row) => (
-              <div className="flex min-w-0 flex-1 items-center gap-3">
+              // A list that names a row action opens the row on a click anywhere on it, not only on the action's own button
+              // (which stays, for the keyboard and for a screen reader). A row toggle's own button is outside this area.
+              <div
+                className={cn("flex min-w-0 flex-1 items-center gap-3", node.row_action && !selectMode && "cursor-pointer")}
+                data-slot={node.row_action && !selectMode ? "list-row-open" : undefined}
+                onClick={node.row_action && !selectMode ? () => dispatch(node.row_action!.action, [row]) : undefined}
+              >
                 {selectMode ? (
                   <Checkbox
                     checked={selected.has(keyOf(row))}

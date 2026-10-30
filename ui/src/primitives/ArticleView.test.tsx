@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import articleBlock from "@maipai/spec/fixtures/answer-block/valid-article.json";
-import { ArticleView, type ArticleViewData } from "@/kit/primitives/ArticleView";
+import { ArticleSpeechContext, ArticleView, type ArticleViewData } from "@/kit/primitives/ArticleView";
 
 afterEach(cleanup);
 
@@ -239,5 +239,49 @@ describe("ArticleView", () => {
     place(title, 300);
     act(() => { document.dispatchEvent(new Event("scroll")); });
     expect(provider.textContent).toBe("Example Wire");
+  });
+
+  test("Key points read as a lead and a short list, and the rest wait behind Show all", () => {
+    const text = "Lead line of the story.\n• One\n• Two\n• Three\n• Four\n• Five";
+    const { container, getByRole, queryByRole } = render(<ArticleView data={{ ...data, key_points: { text, band: "adult" } }} />);
+    const section = container.querySelector('[data-slot="key-points"]')!;
+    expect(section.querySelectorAll("li")).toHaveLength(3);
+    expect(section.textContent).toContain("Lead line of the story.");
+    fireEvent.click(getByRole("button", { name: "Show all 5" }));
+    expect(section.querySelectorAll("li")).toHaveLength(5);
+    expect(queryByRole("button", { name: "Show fewer" })).toBeTruthy();
+  });
+
+  test("Save answers at once: the icon fills and the button reads Saved before the page answers", () => {
+    const onAction = mock(() => {});
+    const { getByRole } = render(<ArticleView data={{ ...data, saved: false }} onAction={onAction} available={["save"]} ids={{ item_id: "i1", story_id: "s1" }} />);
+    fireEvent.click(getByRole("button", { name: "Save" }));
+    const saved = getByRole("button", { name: "Saved" });
+    expect(saved.getAttribute("aria-pressed")).toBe("true");
+    expect(saved.querySelector("svg")?.getAttribute("fill")).toBe("currentColor");
+    expect(onAction).toHaveBeenCalledWith("save", expect.objectContaining({ on: true }));
+  });
+
+  test("Listen says it is starting, then listening, for the story being read", () => {
+    const ids = { item_id: "i1", story_id: "s1" };
+    const view = (phase: "loading" | "playing" | null, storyId: string | null = "s1") => (
+      <ArticleSpeechContext.Provider value={{ storyId, phase, progress: 0 }}>
+        <ArticleView data={data} onAction={() => {}} available={["listen"]} ids={ids} />
+      </ArticleSpeechContext.Provider>
+    );
+    const { getByRole, rerender } = render(view(null));
+    expect(getByRole("button", { name: "Listen" })).toBeTruthy();
+    rerender(view("loading"));
+    expect(getByRole("button", { name: "Starting…" }).getAttribute("aria-busy")).toBe("true");
+    rerender(view("playing"));
+    expect(getByRole("button", { name: "Listening" })).toBeTruthy();
+    rerender(view("playing", "another-story"));
+    expect(getByRole("button", { name: "Listen" })).toBeTruthy();
+  });
+
+  test("the right column sits at the far right: the article column is no longer centred at a fixed width", () => {
+    const { container } = render(<ArticleView data={data} onAction={() => {}} available={["listen"]} />);
+    const column = container.querySelector('[data-slot="article-column"]')!;
+    expect(column.className).toContain("lg:max-w-none");
   });
 });

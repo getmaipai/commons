@@ -119,6 +119,17 @@ describe("NodeRenderer > list", () => {
     }
   });
 
+  test("a click anywhere on a row opens it the way the row's action button does", async () => {
+    const env = stubFetch([{ id: "a", name: "First", category: "fact" }]);
+    try {
+      const { findByText } = renderNode(listNode);
+      fireEvent.click(await findByText("First"));
+      await waitFor(() => expect(env.archiveCalls).toEqual(["a"]));
+    } finally {
+      env.restore();
+    }
+  });
+
   // A code review (2026-09-05) found `lastError` (the banner a failed
   // non-confirm dispatch, like this row_action, leaves under the list)
   // was never cleared by any later confirm-based action - success or

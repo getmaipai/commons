@@ -1,5 +1,5 @@
 import { getIcon } from "@/kit/icons";
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
@@ -10,6 +10,9 @@ import { cn } from "@/kit/utils";
 import { StoryFeed, type StoryAction, type StoryActionIds, type StoryCardData } from "./StoryFeed";
 import { SafeImage } from "./SafeImage";
 import { FocalImage } from "./FocalImage";
+import { ArticleSpeechContext } from "./articleSpeech";
+
+export { ArticleSpeechContext, type ArticleSpeech } from "./articleSpeech";
 
 const ArrowLeftIcon = getIcon("arrow-left");
 const BookmarkIcon = getIcon("bookmark");
@@ -18,6 +21,9 @@ const ShareIcon = getIcon("share");
 const TypeIcon = getIcon("a-large-small");
 const HeadphonesIcon = getIcon("headphones");
 const MessageIcon = getIcon("message-circle");
+const SparklesIcon = getIcon("sparkles");
+const LoaderIcon = getIcon("loader");
+const AudioIcon = getIcon("audio-waveform");
 const NewspaperIcon = getIcon("newspaper");
 
 /** The spec's `article_inline`: a run of text, or a link carrying a book `target` or an outbound `href`. */
@@ -168,6 +174,82 @@ function readTextSize(): TextSizeId {
   return "medium";
 }
 
+/** Words are found by their text, never re-rendered: the Custom Highlight API paints the spoken range and the current word over the
+ * body as it stands, so reading never costs a re-render per word. A browser without it just shows the Listen state. */
+function useSpokenHighlight(bodyRef: React.RefObject<HTMLElement | null>, active: boolean, progress: number) {
+  useEffect(() => {
+    const registry = (globalThis as { CSS?: { highlights?: Map<string, unknown> } }).CSS?.highlights;
+    const HighlightCtor = (globalThis as { Highlight?: new (...ranges: Range[]) => unknown }).Highlight;
+    const clear = () => { registry?.delete("article-spoken"); registry?.delete("article-speaking"); };
+    const root = bodyRef.current;
+    if (!active || !registry || !HighlightCtor || !root) { clear(); return; }
+    const words: Array<{ node: Text; start: number; end: number }> = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (node) => (node.parentElement?.closest("figcaption,table,script,style") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    for (let node = walker.nextNode() as Text | null; node; node = walker.nextNode() as Text | null) {
+      for (const match of node.data.matchAll(/\S+/g)) words.push({ node, start: match.index, end: match.index + match[0].length });
+    }
+    if (words.length === 0) { clear(); return; }
+    const at = Math.min(words.length - 1, Math.max(0, Math.floor(progress * words.length)));
+    const first = words[0]!;
+    const current = words[at]!;
+    const spoken = new Range();
+    spoken.setStart(first.node, first.start);
+    spoken.setEnd(current.node, current.start);
+    const now = new Range();
+    now.setStart(current.node, current.start);
+    now.setEnd(current.node, current.end);
+    registry.set("article-spoken", new HighlightCtor(spoken));
+    registry.set("article-speaking", new HighlightCtor(now));
+    // Keep the spoken word on screen without fighting a reader who scrolled away on purpose: only move when it left the middle band.
+    const rect = now.getBoundingClientRect();
+    if (rect.height > 0 && (rect.top < 140 || rect.bottom > window.innerHeight - 160)) current.node.parentElement?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [bodyRef, active, progress]);
+  useEffect(() => () => {
+    const registry = (globalThis as { CSS?: { highlights?: Map<string, unknown> } }).CSS?.highlights;
+    registry?.delete("article-spoken");
+    registry?.delete("article-speaking");
+  }, []);
+}
+
+const KEY_POINTS_SHOWN = 3;
+
+/** The hub writes Key points as one short lead line and then lines that start with a bullet. They read as a lead and a short list, not a
+ * block of text; past the first few the rest wait behind "Show all". */
+function KeyPoints({ text, loading }: { text?: string; loading: boolean }) {
+  const [all, setAll] = useState(false);
+  const lines = (text ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const bulletOf = (line: string) => /^[•*-]\s+/.test(line) ? line.replace(/^[•*-]\s+/, "") : null;
+  const lead = lines.filter((line) => bulletOf(line) === null).join(" ");
+  const bullets = lines.map(bulletOf).filter((line): line is string => line !== null);
+  const shown = all ? bullets : bullets.slice(0, KEY_POINTS_SHOWN);
+  return (
+    <section data-slot="key-points" aria-label="Key points" className="bg-muted/60 border-border flex w-full flex-col gap-3 rounded-xl border p-4">
+      <div className="flex items-center gap-2">
+        <SparklesIcon aria-hidden className="text-primary size-4" />
+        <h3 className="text-sm font-semibold">Key points</h3>
+      </div>
+      {text ? (
+        <>
+          {lead ? <p className="text-[15px] leading-snug font-medium">{lead}</p> : null}
+          {shown.length > 0 ? (
+            <ul className="flex flex-col gap-2.5">
+              {shown.map((point, i) => (
+                <li key={i} className="flex gap-2.5 text-sm leading-snug">
+                  <span aria-hidden className="bg-primary mt-1.5 size-1.5 shrink-0 rounded-full" />
+                  <span className="text-foreground/90 min-w-0">{point}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {bullets.length > KEY_POINTS_SHOWN ? (
+            <Button variant="ghost" size="sm" className="-ml-2 w-fit" aria-expanded={all} onClick={() => setAll((was) => !was)}>{all ? "Show fewer" : `Show all ${bullets.length}`}</Button>
+          ) : null}
+        </>
+      ) : loading ? <p className="text-muted-foreground text-sm" aria-live="polite">Writing the key points…</p> : null}
+    </section>
+  );
+}
+
 function minutes(seconds: number): string {
   const m = Math.max(1, Math.round(seconds / 60));
   return `${m} min read`;
@@ -184,6 +266,13 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
   const [textSize, setTextSize] = useState<TextSizeId>(readTextSize);
   const [iconFailed, setIconFailed] = useState(false);
+  // Save answers at once: the page's own answer arrives a moment later and wins whenever it differs.
+  const [saved, setSaved] = useState(data.saved === true);
+  useEffect(() => { setSaved(data.saved === true); }, [data.saved]);
+  const speech = useContext(ArticleSpeechContext);
+  const speakingThis = speech.storyId !== null && speech.storyId === ids?.story_id;
+  const bodyRef = useRef<HTMLDivElement>(null);
+  useSpokenHighlight(bodyRef, speakingThis && speech.phase === "playing", speech.progress);
   // Once the headline has scrolled up under the pinned row, the row names the story instead of the publisher.
   const titleRef = useRef<HTMLHeadingElement>(null);
   const providerRef = useRef<HTMLDivElement>(null);
@@ -251,8 +340,8 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
             </Button>
             {canShare ? <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label="Share" onClick={() => { void navigator.share({ title: data.title, url: data.open_url }).catch(() => {}); }}><ShareIcon aria-hidden /></Button> : null}
             {can("save") ? (
-              <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label={data.saved ? "Saved" : "Save"} aria-pressed={data.saved === true} onClick={() => fire("save", { on: !data.saved })}>
-                <BookmarkIcon aria-hidden fill={data.saved ? "currentColor" : "none"} />
+              <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label={saved ? "Saved" : "Save"} aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}>
+                <BookmarkIcon aria-hidden fill={saved ? "currentColor" : "none"} className={cn("transition-transform duration-200", saved && "text-primary scale-110")} />
               </Button>
             ) : null}
             {hasMore ? (
@@ -273,7 +362,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", condensed && "truncate text-lg leading-tight")}>{condensed ? data.title : data.byline.publisher}</span>
         </div>
       ) : null}
-      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-[calc(72ch+32rem)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-x-14 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1">
+      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1 lg:[&>*:not([data-slot=article-rail])]:w-full lg:[&>*:not([data-slot=article-rail])]:max-w-[80ch] lg:[&>*:not([data-slot=article-rail])]:justify-self-center">
       <header className="flex flex-col gap-2">
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
@@ -285,16 +374,16 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         <div data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start lg:[grid-row:1/span_99] lg:col-start-2">
         {hasAssist ? (
           <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex gap-2 [&>*]:flex-1">
-            {can("listen") ? <Button variant="outline" size="sm" onClick={() => fire("listen")}><HeadphonesIcon aria-hidden />Listen</Button> : null}
+            {can("listen") ? (
+              <Button variant="outline" size="sm" aria-busy={speakingThis && speech.phase === "loading"} data-state={speakingThis ? speech.phase ?? undefined : undefined} onClick={() => fire("listen")}>
+                {speakingThis && speech.phase === "loading" ? <LoaderIcon aria-hidden className="animate-spin" /> : speakingThis && speech.phase ? <AudioIcon aria-hidden className="text-primary" /> : <HeadphonesIcon aria-hidden />}
+                {speakingThis && speech.phase === "loading" ? "Starting…" : speakingThis && speech.phase === "playing" ? "Listening" : speakingThis && speech.phase === "paused" ? "Paused" : "Listen"}
+              </Button>
+            ) : null}
             {can("discuss") ? <Button variant="outline" size="sm" onClick={() => fire("discuss")}><MessageIcon aria-hidden />Discuss</Button> : null}
           </div>
         ) : null}
-        {data.key_points || summarizing ? (
-          <section data-slot="key-points" aria-label="Key points" className="flex w-full flex-col gap-1 rounded-lg bg-muted p-4">
-            <h3 className="text-sm font-semibold">Key points</h3>
-            {data.key_points ? <p className="whitespace-pre-line">{data.key_points.text}</p> : <p className="text-muted-foreground" aria-live="polite">Writing the key points…</p>}
-          </section>
-        ) : null}
+        {data.key_points || summarizing ? <KeyPoints text={data.key_points?.text} loading={summarizing} /> : null}
         </div>
       ) : null}
       {data.image ? (
@@ -304,7 +393,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           </AspectRatio>
         </div>
       ) : null}
-      <div data-slot="article-body" data-text-size={textSize} className={cn("flex w-full min-w-0 flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
+      <div ref={bodyRef} data-slot="article-body" data-text-size={textSize} className={cn("flex w-full min-w-0 flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
         {data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
       </div>
       {data.also_covering && data.also_covering.length > 0 ? (
