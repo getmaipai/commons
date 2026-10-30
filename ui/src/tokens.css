@@ -1605,6 +1605,18 @@ body {
   background: radial-gradient(circle, var(--weather-sun-glow), transparent 68%);
   animation: wx-moon-glow 4s ease-in-out infinite alternate;
 }
+[data-slot="weather-moon-disk"] {
+  overflow: visible;
+  filter: drop-shadow(0 0 5px var(--weather-moon-glow));
+  animation: moon-glow-pulse 5.5s ease-in-out infinite alternate;
+}
+@keyframes moon-glow-pulse {
+  from { filter: drop-shadow(0 0 3px var(--weather-moon-glow)); }
+  to { filter: drop-shadow(0 0 8px var(--weather-moon-glow)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="weather-moon-disk"] { animation: none; }
+}
 [data-slot="weather-sky"] [data-fx="sun"] { animation-name: wx-sun-pulse; animation-duration: 4s; }
 [data-slot="weather-location-sky"] [data-fx="sun"], [data-slot="weather-location-sky"] [data-fx="sun-rays"] { right: -80px; top: -82px; }
 [data-slot="weather-forecast-hero"] [data-fx="sun"], [data-slot="weather-forecast-hero"] [data-fx="sun-rays"] { left: 62%; top: 18%; right: auto; }

@@ -6,6 +6,8 @@ import { cn } from "cn";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { WeatherSky } from "./weather-sky";
+import { MoonDisc } from "./moon-disc";
+export { MoonDisc } from "./moon-disc";
 import { WeatherAdviceChips, WeatherAlertBanner, type WeatherAdvice, type WeatherAlert } from "./weather-advice";
 export type { WeatherAdvice, WeatherAlert } from "./weather-advice";
 import { weatherClassOf, type WeatherClass } from "./weather-condition";
@@ -21,19 +23,19 @@ export interface WeatherLocationDetail {
   sunrise?: string; sunset?: string; uvIndex?: number; feelsLike?: number; humidity?: number; dewPoint?: number;
   precipitation?: number; precipitationAmount?: number; precipitationLast24h?: number; precipitationNext24h?: number;
   visibility?: number; visibilityDescription?: string; pressure?: number; pressureTrend?: "rising" | "falling" | "steady";
-  moon?: { phase: string; illumination: number };
+  moon?: { phase: string; illumination: number; nextFull?: string; nextNew?: string };
 }
 export interface WeatherLocation { id: string; city: string; state?: string; country?: string; latitude?: number; longitude?: number; timezone?: string; localTime?: string; isMyLocation?: boolean; detail?: WeatherLocationDetail }
 export interface WeatherForecastPageLabels {
   searchLocations: string; myLocation: string; weatherUnavailable: string; backToLocations: string; hourlyForecast: string; tenDayForecast: string;
   airQuality: string; wind: string; conditions: string; temperature: string; precipitationMetric: string; windMetric: string; sunriseAndSunset: string; uvIndex: string; feelsLike: string; humidity: string; precipitation: string;
-  visibility: string; pressure: string; moonPhase: string; currentTemperature: string; detailsUnavailable: string; addLocation: string; removeLocation: string;
+  visibility: string; pressure: string; moonPhase: string; nextFullMoon: string; nextNewMoon: string; currentTemperature: string; detailsUnavailable: string; addLocation: string; removeLocation: string;
 }
 export const weatherForecastPageDefaultLabels: WeatherForecastPageLabels = {
   searchLocations: "Search locations", myLocation: "My Location", weatherUnavailable: "Weather unavailable", backToLocations: "Locations",
   hourlyForecast: "Hourly Forecast", tenDayForecast: "10-Day Forecast", airQuality: "Air Quality", wind: "Wind", conditions: "Conditions", temperature: "Temperature", precipitationMetric: "Precipitation", windMetric: "Wind", sunriseAndSunset: "Sunrise & Sunset",
   uvIndex: "UV Index", feelsLike: "Feels Like", humidity: "Humidity", precipitation: "Precipitation", visibility: "Visibility", pressure: "Pressure",
-  moonPhase: "Moon Phase", currentTemperature: "Current temperature", detailsUnavailable: "Weather details unavailable.", addLocation: "Add location", removeLocation: "Remove location",
+  moonPhase: "Moon Phase", nextFullMoon: "Next full moon", nextNewMoon: "Next new moon", currentTemperature: "Current temperature", detailsUnavailable: "Weather details unavailable.", addLocation: "Add location", removeLocation: "Remove location",
 };
 export interface WeatherForecastPageProps {
   locations: readonly WeatherLocation[]; selectedId?: string; onSelect?: (id: string) => void; onSearch?: (query: string) => void;
@@ -131,6 +133,13 @@ function hourlyIcon(cls: WeatherClass, isDay: boolean) {
   return ICONS[cls];
 }
 const dayName = (date: string, locale: string) => { const parts = date.split("-").map(Number); const y = parts[0] ?? 2000; const m = parts[1] ?? 1; const d = parts[2] ?? 1; return new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(y, m - 1, d))); };
+function moonDate(value: string | undefined, locale: string): string | undefined {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year!, month! - 1, day!));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month! - 1 || date.getUTCDate() !== day) return undefined;
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", timeZone: "UTC" }).format(date);
+}
 function Tile({ title, icon, children, className }: { title: string; icon?: ReactNode; children: ReactNode; className?: string }) {
   return <section data-slot="weather-tile" className={cn("bg-card/65 border-border flex w-full min-w-0 min-h-40 flex-col rounded-2xl border p-4 shadow-sm backdrop-blur-xl", className)}><h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">{icon}<span>{title}</span></h3>{children}</section>;
 }
@@ -199,7 +208,7 @@ export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch,
           </Tile> : null}
 
           {d.wind && tileVisual(labels.wind, <Wind className="size-4" aria-hidden/>, <div className="flex items-center gap-4"><div data-slot="weather-wind-dial" className="relative size-24 shrink-0 rounded-full border border-border"><span className="absolute inset-x-0 top-1 text-center text-[9px] font-semibold">N</span><span className="absolute inset-y-0 right-1 flex items-center text-[9px]">E</span><span className="absolute inset-x-0 bottom-1 text-center text-[9px]">S</span><span className="absolute inset-y-0 left-1 flex items-center text-[9px]">W</span>{[0,45,90,135].map(a=><i key={a} className="absolute left-1/2 top-1/2 h-2 -translate-x-1/2 -translate-y-1/2 border-l border-border" style={{transform:`translate(-50%,-50%) rotate(${a}deg) translateY(-43px)`}}/>)}<span data-slot="weather-wind-needle" className="absolute left-1/2 top-1/2 block h-12 w-0.5 origin-bottom bg-primary" style={{transform:`translate(-50%,-100%) rotate(${d.wind.direction}deg)`}}/><span className="absolute inset-0 flex flex-col items-center justify-center text-xs font-semibold tabular-nums">{fmt(d.wind.speed)}<small className="text-[9px] font-normal">{d.wind.label ?? (unit === "F" ? "mph" : "km/h")}</small></span></div><div className="text-sm">{d.wind.gust !== undefined ? `Gust ${fmt(d.wind.gust)} ${d.wind.label ?? (unit === "F" ? "mph" : "km/h")}` : "Wind direction"}</div></div>)}
-          {d.moon && <Tile title={labels.moonPhase} icon={<MoonIcon className="size-4" aria-hidden/>}><div className="flex items-center gap-3"><span data-slot="weather-moon-disk" style={{background:`linear-gradient(90deg,var(--weather-moon-lit) ${d.moon.illumination}%,var(--weather-moon-dark) ${d.moon.illumination}%)`}} className="size-10 rounded-full shadow-inner"/><div><div className="text-xl font-light">{d.moon.phase}</div><p className="text-muted-foreground text-xs">{d.moon.illumination}% illuminated</p></div></div></Tile>}
+          {d.moon && <Tile title={labels.moonPhase} icon={<MoonIcon className="size-4" aria-hidden/>}><div className="flex items-center gap-3"><MoonDisc phase={d.moon.phase} illumination={d.moon.illumination} size={64}/><div><div className="text-xl font-light">{d.moon.phase}</div><p className="text-muted-foreground text-xs">{Math.max(0, Math.min(100, d.moon.illumination))}% illuminated</p></div></div>{moonDate(d.moon.nextFull, locale) && <p className="text-muted-foreground mt-2 text-xs">{labels.nextFullMoon}: {moonDate(d.moon.nextFull, locale)}</p>}{moonDate(d.moon.nextNew, locale) && <p className="text-muted-foreground text-xs">{labels.nextNewMoon}: {moonDate(d.moon.nextNew, locale)}</p>}</Tile>}
         </div>
       </> : <div data-slot="weather-empty-detail" className="text-muted-foreground rounded-2xl border p-8">{labels.detailsUnavailable}</div>}
     </main>}

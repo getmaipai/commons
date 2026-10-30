@@ -110,6 +110,17 @@ describe("WeatherForecastPage", () => {
     expect(empty.container.querySelector("[data-slot=weather-tile]")).toBeNull();
   });
 
+  test("moon dates render as calendar dates and omit missing or invalid values", () => {
+    const moon = { phase: "Waxing Crescent", illumination: 28, nextFull: "2026-11-02", nextNew: "2026-11-17" };
+    const { container, getByText, rerender, queryByText } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail: { ...locations[0]!.detail!, moon } }]} selectedId="home"/>);
+    expect(getByText("Next full moon: Nov 2")).toBeTruthy();
+    expect(getByText("Next new moon: Nov 17")).toBeTruthy();
+    rerender(<WeatherForecastPage locations={[{ ...locations[0]!, detail: { ...locations[0]!.detail!, moon: { phase: "New Moon", illumination: 0, nextFull: "2026-02-30", nextNew: "bad" } } }]} selectedId="home"/>);
+    expect(queryByText(/Next full moon:/)).toBeNull();
+    expect(queryByText(/Next new moon:/)).toBeNull();
+    expect(container.querySelector('[data-slot="weather-moon-disk"]')).not.toBeNull();
+  });
+
   test("the sky CSS defines visible scene keyframes and freezes them for reduced motion", () => {
     expect(tokens).toContain("@keyframes wx-sun-pulse");
     expect(tokens).toContain("@keyframes wx-rays");

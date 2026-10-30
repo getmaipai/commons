@@ -3410,6 +3410,7 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 - Data for optional detail tiles: `airQuality: { aqi, category }`, `wind: { speed, direction, gust? }`, `sunrise`, `sunset`, `uvIndex`, `feelsLike`, `humidity`, `dewPoint?`, `precipitation`, `precipitationAmount?`, `precipitationLast24h?`, `precipitationNext24h?`, `visibility`, `visibilityDescription?`, `pressure`, `pressureTrend?`, and `moon: { phase, illumination }`. The hourly chart uses `hourly[].temp`, `pop?`, and `windSpeed?`.
 ## Unreleased
 - PHONE-01 and PHONE-03: add a phone story grid and steady pill strips.
+- MOON-LOOK-01: add a phase-accurate `MoonDisc` element and optional `nextFull` / `nextNew` dates to the Weather Moon Phase tile.
 
 ## [ui-v0.5.364] - 2026-10-26
 
