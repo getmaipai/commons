@@ -1,4 +1,4 @@
-## [spec-v0.1.273] - 2026-10-29
+## [spec-v0.1.275] - 2026-10-29
 
 - ANIM-QUALITY-01: `vocab/companion-media.json` (version 3) gives each creator animation a `motions` list of three or four specific, varied motions (`motion` stays the first, for older readers), drops robot words from the text people see, and sets the generated clip size to 384 by 384 (the delivered clip stays 480). Additive: `motions` is optional.
 
@@ -590,7 +590,7 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
-## [spec-v0.1.273] - 2026-10-29
+## [spec-v0.1.275] - 2026-10-29
 
 ## [spec-v0.1.141] - 2026-10-14
 
