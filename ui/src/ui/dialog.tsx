@@ -56,7 +56,8 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   // "flow" (KIT-3S-01) is the large rounded multi-step dialog of the
   // companion screens: it fills the phone screen and is a centred rounded
-  // card from sm up. Its colours are the theme's tokens only.
+  // card from sm up. Its colours are the theme's tokens only. Its "xl" size
+  // is the wide card (sm:max-w-7xl) for a screen that lays out three columns.
   variant?: "default" | "command" | "call" | "flow"
   // The command variant reads "lg" (the ChatGPT-proportioned search dialog).
   // The default variant reads "sm" and "xl" (RULE9-COMMONS-VARIANTS-01); its
@@ -76,7 +77,7 @@ function DialogContent({
           variant === "call"
             ? "top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-transparent p-0 shadow-none sm:top-[50%] sm:left-[50%] sm:h-auto sm:w-auto sm:max-w-xs sm:translate-x-[-50%] sm:translate-y-[-50%]"
             : variant === "flow"
-              ? "top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-6 overflow-y-auto rounded-none border-0 bg-background p-5 shadow-lg sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-full sm:max-w-5xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border sm:p-8 [&_[data-slot=dialog-header]]:pr-12"
+              ? cn("top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-6 overflow-y-auto rounded-none border-0 bg-background p-5 shadow-lg sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-full sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border sm:p-8 [&_[data-slot=dialog-header]]:pr-12", size === "xl" ? "sm:max-w-7xl" : "sm:max-w-5xl")
             : variant === "command"
               ? cn(
                 "flex flex-col gap-0 border-0 bg-transparent p-0 shadow-none",
@@ -187,12 +188,12 @@ function DialogDescription({
 }
 
 // KIT-3S-01: the body of a flow dialog. "two" puts the sections in two
-// columns from lg up and stacks them on a phone.
+// columns ("three" for the wide flow dialog) from lg up and stacks them on a phone.
 function DialogBody({
   className,
   columns = "one",
   ...props
-}: React.ComponentProps<"div"> & { columns?: "one" | "two" }) {
+}: React.ComponentProps<"div"> & { columns?: "one" | "two" | "three" }) {
   return (
     <div
       data-slot="dialog-body"
@@ -200,6 +201,7 @@ function DialogBody({
       className={cn(
         "grid min-h-0 grid-cols-1 gap-6",
         columns === "two" && "lg:grid-cols-2 lg:gap-8",
+        columns === "three" && "lg:grid-cols-3 lg:gap-8",
         className
       )}
       {...props}
