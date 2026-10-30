@@ -1,3 +1,7 @@
+## [ui-v0.5.423] - 2026-10-30
+
+- Weather forecast page: the Moon Phase tile draws a phase-accurate `MoonDisc` (waxing lights the right side, waning the left; colors from the `--weather-moon-*` tokens; the glow pulse stops under reduced motion) and shows the next full and new moon from the optional `moon.nextFull` and `moon.nextNew` (`YYYY-MM-DD`). Additive; a moon without the dates looks as before apart from the disc.
+
 ## [ui-v0.5.422] - 2026-10-30
 
 - News reader (`ArticleView`): the right column (Listen, Discuss, Key points) sits at the far right and the article takes the space; Key points draw as a lead line and a short bulleted list (first three, then "Show all N"); Save fills its icon at once; the Listen button reads Starting, Listening or Paused for the story being read (new `ArticleSpeechContext` in `articleSpeech.ts`, which the host provides: `{ storyId, phase, progress }`); the words being spoken are lit through the CSS Custom Highlight API (`::highlight(article-spoken)` and `::highlight(article-speaking)` in `tokens.css`).
