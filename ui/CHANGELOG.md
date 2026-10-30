@@ -1,3 +1,7 @@
+## [ui-v0.5.425] - 2026-10-30
+
+- Reader (`ArticleView`), additive: `breadcrumb` (items are text or buttons; the last is the page), `kickerStyle: "chip"`, `actionRow: "top"` (the labelled Save, Listen and Share row beside the chip in the header; `true` and `"under-hero"` keep the row under the hero), `floatFirstFigure` (the first figure floats left of the paragraphs before the first section on a wide screen), and an `image` in the infobox card. Data without these fields draws as before.
+
 ## [ui-v0.5.424] - 2026-10-30
 
 - Reader (`ArticleView`), additive: an `infobox` card (a closed box on a phone), a `hatnote`, a `contents` list that marks the section being read, `foldSections` (every section after the lead folds on a phone), and a hover-card link preview through the new `loadPreview` prop (called only when a card opens); an `image.badge` chip on the hero, a bold `lead`, an `actionRow` (labelled Save, Listen and Share under the hero on a wide screen), a `quick_fact` card and a `related` list with thumbnails in the right column. Data without these fields draws as before.
