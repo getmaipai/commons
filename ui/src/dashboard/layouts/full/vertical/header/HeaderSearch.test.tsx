@@ -277,7 +277,8 @@ describe("HeaderSearch (WEB-TAB-02): the Web tab", () => {
     await settle();
     fireEvent.click(view.getByRole("tab", { name: "Web" }));
     expect(calls).toEqual([]);
-    expect(document.body.textContent).toContain("Press Enter to search the web");
+    expect(document.body.textContent).toContain("Nothing is sent to the web until you press Enter.");
+    expect(document.body.textContent).toContain("Press Enter to search the web · Esc to close");
     fireEvent.keyDown(input, { key: "Enter" });
     await settle();
     expect(calls).toEqual(["tea"]);

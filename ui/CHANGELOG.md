@@ -1,3 +1,7 @@
+## [ui-v0.5.430] - 2026-10-30
+
+- `HeaderSearch` Web tab: before a search is run the empty list says "Nothing is sent to the web until you press Enter." (the footer already carries the key hint). WEB-TAB-02.
+
 ## [ui-v0.5.429] - 2026-10-30
 
 - Command palette Element, additive: `PaletteTab.submit` marks a tab whose results are fetched only when the person presses Enter, with `onSubmitQuery` and `submittedQuery` on the Element. Defaults unchanged.

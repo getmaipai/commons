@@ -114,6 +114,7 @@ const KIND_ICONS: Record<string, ReactNode> = {
 const ASK_ID = "ask";
 const WEB_TAB: PaletteTab = { id: "web", label: "Web", submit: true };
 const WEB_HINT = "Press Enter to search the web";
+const WEB_IDLE = "Nothing is sent to the web until you press Enter.";
 const WEB_FAILED = "Web search did not answer. Try again in a moment.";
 type WebState = { status: "idle" } | { status: "loading" | "done"; query: string; results: SearchResult[]; note?: string };
 
@@ -294,7 +295,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
   const emptyMessage = !onWebTab
     ? "No results found."
     : !webMatches
-      ? WEB_HINT
+      ? WEB_IDLE
       : web.status === "loading"
         ? "Searching the web..."
         : (web.status === "done" && web.note) || "No web results found.";
