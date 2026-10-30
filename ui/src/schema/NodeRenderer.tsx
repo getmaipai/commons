@@ -725,6 +725,7 @@ function ListNodeView({ node }: { node: ListNode }) {
             renderItem={(row) => (
               // A list that names a row action opens the row on a click anywhere on it, not only on the action's own button
               // (which stays, for the keyboard and for a screen reader). A row toggle's own button is outside this area.
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <div
                 className={cn("flex min-w-0 flex-1 items-center gap-3", node.row_action && !selectMode && "cursor-pointer")}
                 data-slot={node.row_action && !selectMode ? "list-row-open" : undefined}
