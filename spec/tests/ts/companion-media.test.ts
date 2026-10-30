@@ -133,10 +133,10 @@ describe("CMEDIA-SPEC-01 companion media", () => {
 
   test("the vocab numbers stay at the CMEDIA-SPEC-01 values", () => {
     expect(COMPANION_MEDIA).toMatchObject({
-      version: 2,
+      version: 3,
       image: { size: 1024, margin_percent: 12, format: "png", min_upload_short_side: 512, max_upload_bytes: 20971520 },
       key: { default: "#00FF00", alternate: "#FF00FF" },
-      generate: { width: 480, height: 480, fps: 24, frames: 73, seconds: 3 },
+      generate: { width: 384, height: 384, fps: 24, frames: 73, seconds: 3 },
       ship: {
         colour_width: 480, colour_height: 480, stacked_width: 480, stacked_height: 960, fps: 24,
         loop_seconds: { min: 2, max: 4 }, oneshot_seconds: { min: 1.5, max: 4 },
@@ -147,8 +147,6 @@ describe("CMEDIA-SPEC-01 companion media", () => {
     });
     expect((COMPANION_MEDIA.generate.frames - 1) % 4).toBe(0);
     expect(COMPANION_MEDIA.generate.frames).toBe(COMPANION_MEDIA.generate.fps * COMPANION_MEDIA.generate.seconds + 1);
-    expect(COMPANION_MEDIA.generate.width).toBe(COMPANION_MEDIA.ship.colour_width);
-    expect(COMPANION_MEDIA.generate.height).toBe(COMPANION_MEDIA.ship.colour_height);
     expect(COMPANION_MEDIA.generate.seconds).toBeLessThanOrEqual(Math.max(...COMPANION_MEDIA.states.map((state) => state.max_seconds)));
     expect(COMPANION_MEDIA.generate.seconds).toBeGreaterThanOrEqual(Math.min(...COMPANION_MEDIA.states.map((state) => state.min_seconds)));
     expect(COMPANION_MEDIA.states).toHaveLength(19);

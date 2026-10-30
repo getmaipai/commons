@@ -1,3 +1,7 @@
+## [spec-v0.1.273] - 2026-10-29
+
+- ANIM-QUALITY-01: `vocab/companion-media.json` (version 3) gives each creator animation a `motions` list of three or four specific, varied motions (`motion` stays the first, for older readers), drops robot words from the text people see, and sets the generated clip size to 384 by 384 (the delivered clip stays 480). Additive: `motions` is optional.
+
 ## [spec-v0.1.271] - 2026-10-28
 
 - ANIM-SPEC-01 (COMPANION-3S-01): `vocab/companion-media.json` (version 2) lists 13 creator animations (required `idle`, `listening`, `thinking`, `speaking`; optional `working`, `researching`, `writing`, `done`, `sleeping`, `laughing`, `surprised`, `sad`, `confused`). The six older ids (`idle_look`, `needs_you`, `greeting`, `happy`, `oops`, `celebrate`) stay valid and are marked `legacy`. New data: `fallback` (which state plays when a clip was not made), `emotion_clips` (emotion label to clip, with each label's `child_band` copied from `emotion-map.json`), `picture_fallback` (keyframe, then still, then portrait). The manifest `animation.states` objects gain the new ids and an optional `keyframe` beside the required `still`; the kit's avatar machine resolves clips through `resolveClip`, `emotionClip` and `pictureFor`. Additive: old manifests stay valid. `presence-states.json` and `emotion-map.json` are unchanged.
@@ -586,7 +590,7 @@ All notable changes to the `spec` workspace. Format follows
 tagged `spec-vX.Y.Z`. Everything stays `0.x` until the platform's Hub v0.1
 scope lands.
 
-## [Unreleased]
+## [spec-v0.1.273] - 2026-10-29
 
 ## [spec-v0.1.141] - 2026-10-14
 

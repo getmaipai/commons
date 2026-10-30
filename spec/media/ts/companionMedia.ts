@@ -20,7 +20,7 @@ export interface CompanionMediaSpec {
     codecs: { required: string; optional: string[] }; audio: boolean;
   };
   upload_video: { max_bytes: number; max_seconds: number; types: string[] };
-  states: Array<{ id: CompanionMediaState; kind: "loop" | "oneshot"; required: boolean; creator?: boolean; legacy?: boolean; min_seconds: number; max_seconds: number; motion: string; driven_by: string }>;
+  states: Array<{ id: CompanionMediaState; kind: "loop" | "oneshot"; required: boolean; creator?: boolean; legacy?: boolean; min_seconds: number; max_seconds: number; motion: string; motions?: string[]; driven_by: string }>;
 }
 
 export const COMPANION_MEDIA = spec as unknown as CompanionMediaSpec;

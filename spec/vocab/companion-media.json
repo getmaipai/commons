@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "image": {
     "size": 1024,
     "margin_percent": 12,
@@ -12,8 +12,8 @@
     "alternate": "#FF00FF"
   },
   "generate": {
-    "width": 480,
-    "height": 480,
+    "width": 384,
+    "height": 384,
     "fps": 24,
     "frames": 73,
     "seconds": 3
@@ -58,9 +58,14 @@
       "required": true,
       "min_seconds": 3,
       "max_seconds": 4,
-      "motion": "breathes slowly, tiny sway, one blink",
+      "motion": "breathes slowly with a tiny sway and one slow blink, hands resting",
       "driven_by": "outside a turn",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "breathes slowly with a tiny sway and one slow blink, hands resting",
+        "shifts weight gently from one foot to the other, glances to one side and back, a faint smile",
+        "stretches the shoulders a little, lets out a calm breath, then settles with a soft blink"
+      ]
     },
     {
       "id": "listening",
@@ -68,9 +73,14 @@
       "required": true,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "head tilts slightly toward the viewer, attentive",
-      "driven_by": "the person is speaking to the robot",
-      "creator": true
+      "motion": "head tilts toward the viewer, eyes steady and attentive, gives one small nod",
+      "driven_by": "the person is speaking to the companion",
+      "creator": true,
+      "motions": [
+        "head tilts toward the viewer, eyes steady and attentive, gives one small nod",
+        "leans slightly forward, one hand cupped behind the ear, eyebrows raised with interest",
+        "nods slowly twice, mouth closed in a warm half smile, eyes following the viewer"
+      ]
     },
     {
       "id": "thinking",
@@ -78,9 +88,15 @@
       "required": true,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "looks up and to the side, one paw to chin",
+      "motion": "raises a fist to the lips and looks up and to the side, brow furrowed",
       "driven_by": "a turn before the first word",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "raises a fist to the lips and looks up and to the side, brow furrowed",
+        "taps one finger against the temple, eyes rolling upward, then a slow nod",
+        "a glowing lightbulb pops up above the head as the eyes widen and a finger lifts",
+        "scratches the chin with one hand, gaze drifting up, head tilting side to side"
+      ]
     },
     {
       "id": "speaking",
@@ -88,9 +104,14 @@
       "required": true,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "mouth opens and closes at a speaking rhythm, small head movement",
+      "motion": "mouth opens and closes at a natural speaking rhythm, small head movements, one hand gestures",
       "driven_by": "the voice is playing",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "mouth opens and closes at a natural speaking rhythm, small head movements, one hand gestures",
+        "talks warmly with an open palm moving gently, eyebrows lifting on the beats",
+        "speaks with a small nod on each phrase, both hands moving a little as if explaining"
+      ]
     },
     {
       "id": "working",
@@ -98,9 +119,14 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 4,
-      "motion": "busy, small repeated gesture, looking down at its hands",
+      "motion": "head down, hands busy with a quick repeated motion, brow focused",
       "driven_by": "a tool, job or project is running",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "head down, hands busy with a quick repeated motion, brow focused",
+        "taps rapidly on an unseen keyboard in front of the chest, eyes flicking across a screen",
+        "rolls up the sleeves, then works with both hands, glancing up once and back down"
+      ]
     },
     {
       "id": "researching",
@@ -108,9 +134,14 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 4,
-      "motion": "focused scan, small repeated gesture",
+      "motion": "holds a magnifying glass up to one eye and scans slowly left to right",
       "driven_by": "a research task is running",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "holds a magnifying glass up to one eye and scans slowly left to right",
+        "flips through the pages of a small book, eyes darting along the lines, then looks up with interest",
+        "shades the eyes with one hand and scans the distance, then points and nods"
+      ]
     },
     {
       "id": "writing",
@@ -118,9 +149,14 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 4,
-      "motion": "looks down while making a small writing gesture",
+      "motion": "looks down and writes with a pen in one hand, pausing to think and writing again",
       "driven_by": "a writing task is running",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "looks down and writes with a pen in one hand, pausing to think and writing again",
+        "scribbles quickly on a small notepad held in the other hand, tongue slightly out in concentration",
+        "writes a line, taps the pen against the chin, then writes again"
+      ]
     },
     {
       "id": "done",
@@ -128,9 +164,14 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "small satisfied nod, then settles",
+      "motion": "gives a small satisfied nod, dusts off the hands, then settles with a smile",
       "driven_by": "a task finished",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "gives a small satisfied nod, dusts off the hands, then settles with a smile",
+        "raises a thumbs up with a proud grin, then lowers it and relaxes",
+        "breathes out in relief, wipes the brow, then straightens up with a pleased smile"
+      ]
     },
     {
       "id": "sleeping",
@@ -138,9 +179,14 @@
       "required": false,
       "min_seconds": 3,
       "max_seconds": 4,
-      "motion": "eyes closed, slow breathing",
+      "motion": "eyes closed, slow deep breathing, head drooping a little and lifting again",
       "driven_by": "quiet hours or no activity",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "eyes closed, slow deep breathing, head drooping a little and lifting again",
+        "dozes standing up, head nodding down and jerking slightly up, then drifting back down",
+        "eyes closed, a small slow breath with a gentle sway, a soft peaceful face"
+      ]
     },
     {
       "id": "laughing",
@@ -148,9 +194,14 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "warm laugh, shoulders bounce once",
+      "motion": "throws the head back in a warm laugh, shoulders bouncing, one hand on the stomach",
       "driven_by": "happy, excited or playful emotion",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "throws the head back in a warm laugh, shoulders bouncing, one hand on the stomach",
+        "bursts into a giggle, covers the mouth with a hand, shoulders shaking",
+        "laughs out loud and slaps a knee, eyes squeezed shut with joy"
+      ]
     },
     {
       "id": "surprised",
@@ -158,9 +209,14 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "quick wide-eyed reaction, then settles",
+      "motion": "jumps back with wide eyes and a gasp, hands flying up, then slowly settles",
       "driven_by": "surprised emotion",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "jumps back with wide eyes and a gasp, hands flying up, then slowly settles",
+        "freezes with mouth open and eyebrows high, both hands to the cheeks, then blinks",
+        "leans back in astonishment, eyes huge, one hand on the chest, then lets out a breath"
+      ]
     },
     {
       "id": "sad",
@@ -168,9 +224,14 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "gentle downward glance, then settles",
+      "motion": "looks down with a quivering lip and slumped shoulders, then a slow sigh",
       "driven_by": "sad emotion",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "looks down with a quivering lip and slumped shoulders, then a slow sigh",
+        "wipes one eye with a hand, shoulders drooping, gaze on the ground",
+        "lowers the head, a single slow shake, mouth turned down, then settles"
+      ]
     },
     {
       "id": "confused",
@@ -178,9 +239,14 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "tilts head with unequal antennae",
+      "motion": "tilts the head to one side and scratches it, brow furrowed, eyes narrowed",
       "driven_by": "confused emotion",
-      "creator": true
+      "creator": true,
+      "motions": [
+        "tilts the head to one side and scratches it, brow furrowed, eyes narrowed",
+        "shrugs both shoulders with palms up and a puzzled frown, looking from side to side",
+        "a question mark floats above the head as the eyes squint and one finger lifts to the chin"
+      ]
     },
     {
       "id": "idle_look",
@@ -198,7 +264,7 @@
       "required": false,
       "min_seconds": 2,
       "max_seconds": 3,
-      "motion": "leans forward, holds up one paw, hopeful",
+      "motion": "leans forward and holds up one hand, hopeful",
       "driven_by": "an approval waits for the person",
       "legacy": true
     },
