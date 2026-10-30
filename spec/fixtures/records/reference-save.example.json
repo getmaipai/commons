@@ -1,0 +1,11 @@
+{
+  "id": "refsave-a1b2c3d4",
+  "person_id": "person-sage",
+  "book": "wikipedia_en_all_maxi_2026-09",
+  "path": "A/Aurora",
+  "title": "Aurora",
+  "saved_at": "2026-10-29T18:00:00Z",
+  "offline": false,
+  "hlc": "1793296800000:0:node0001",
+  "provenance": "reader:save"
+}

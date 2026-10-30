@@ -1,3 +1,7 @@
+## [spec-v0.1.276] - 2026-10-30
+
+- READER-05: add the person-scope `ReferenceSave` record (one saved reference article: book, path, title, `offline`, clock stamp, provenance; id prefix `refsave-`). Additive.
+
 ## [spec-v0.1.275] - 2026-10-29
 
 - ANIM-QUALITY-01: `vocab/companion-media.json` (version 3) gives each creator animation a `motions` list of three or four specific, varied motions (`motion` stays the first, for older readers), drops robot words from the text people see, and sets the generated clip size to 384 by 384 (the delivered clip stays 480). Additive: `motions` is optional.

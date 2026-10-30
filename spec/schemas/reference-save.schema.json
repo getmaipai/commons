@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/reference-save.schema.json",
+  "title": "ReferenceSave",
+  "description": "READER-05. One reference article (a Wikipedia or other Kiwix book page) a person saved. Person scope. A person has at most one save per book and path. `offline` is true once the article text and pictures are kept on this device.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "person_id",
+    "book",
+    "path",
+    "title",
+    "saved_at",
+    "offline",
+    "hlc",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^refsave-[a-z0-9]{6,}$"
+    },
+    "person_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "book": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The installed book's id, as the reference routes name it."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The article path inside the book, unencoded."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "saved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "offline": {
+      "type": "boolean"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node (7.3)."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
