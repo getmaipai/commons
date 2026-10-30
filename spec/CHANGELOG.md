@@ -1,3 +1,7 @@
+## [spec-v0.1.281] - 2026-10-30
+
+- MEM-SPACE-09: settings key `resources.close_apps.no_reopen`, the apps Home does not reopen after a job (the per-app Reopen when done switch; `reopen` stays the household default). Additive.
+
 ## [spec-v0.1.280] - 2026-10-30
 
 - MEM-SPACE-04: settings key `resources.profiles`, the profile table (one row per lead job and tier, one cell per category: a tier, `queued` or `off`; chat is never queued or off), default as in the resource profiles note section 3. Additive.

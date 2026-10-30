@@ -5509,6 +5509,23 @@
     ]
   },
   {
+    "key": "resources.close_apps.no_reopen",
+    "scope": "household",
+    "selector": "text",
+    "default": "[]",
+    "label": "Apps to leave closed",
+    "help": "A JSON list of app bundle ids that Home does not reopen after a job, even when reopening is on. Normally set with the Reopen when done switch beside each app on the Performance page.",
+    "copy": {
+      "does": "Lists the apps that stay closed once the job ends."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "engines.chat.tier.reduced",
     "scope": "household",
     "selector": "text",

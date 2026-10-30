@@ -122,6 +122,7 @@ describe("resources.* settings", () => {
     expect(keyOf("resources.close_apps.always").default).toBe("[]");
     expect(keyOf("resources.close_apps.never").default).toBe("[]");
     expect(keyOf("resources.close_apps.reopen").default).toBe(true);
+    expect(keyOf("resources.close_apps.no_reopen").default).toBe("[]");
   });
   test("lower without asking is per category, chat is never lowered without asking by default, voice has none", () => {
     for (const c of ["chat", "image", "video", "music"]) expect(keyOf(`resources.lower_without_asking.${c}`).default).toBe(false);
