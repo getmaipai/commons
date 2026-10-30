@@ -1,3 +1,7 @@
+## [ui-v0.5.424] - 2026-10-30
+
+- Reader (`ArticleView`), additive: an `infobox` card (a closed box on a phone), a `hatnote`, a `contents` list that marks the section being read, `foldSections` (every section after the lead folds on a phone), and a hover-card link preview through the new `loadPreview` prop (called only when a card opens); an `image.badge` chip on the hero, a bold `lead`, an `actionRow` (labelled Save, Listen and Share under the hero on a wide screen), a `quick_fact` card and a `related` list with thumbnails in the right column. Data without these fields draws as before.
+
 ## [ui-v0.5.423] - 2026-10-30
 
 - Weather forecast page: the Moon Phase tile draws a phase-accurate `MoonDisc` (waxing lights the right side, waning the left; colors from the `--weather-moon-*` tokens; the glow pulse stops under reduced motion) and shows the next full and new moon from the optional `moon.nextFull` and `moon.nextNew` (`YYYY-MM-DD`). Additive; a moon without the dates looks as before apart from the disc.
