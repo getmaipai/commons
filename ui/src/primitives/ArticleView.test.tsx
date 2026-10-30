@@ -507,4 +507,14 @@ describe("ArticleView facts-column parts", () => {
     expect(img.getAttribute("src")).toBe("/z.jpg");
     expect(img.getAttribute("alt")).toBe("Zendaya");
   });
+
+  test("a related row without a picture shows its first letter, never an empty square", () => {
+    const { container } = render(<ArticleView data={facts({ related: [{ target: { book: "b", path: "p" }, title: "aurora" }] })} />);
+    expect(container.querySelector('[data-slot="article-related-initial"]')?.textContent).toBe("A");
+  });
+
+  test("with a breadcrumb and a toolbar the column starts below the toolbar on a phone", () => {
+    const { container } = render(<ArticleView data={facts({ breadcrumb: [{ label: "Wikipedia" }, { label: "Zendaya" }] })} onBack={() => {}} />);
+    expect(container.querySelector('[data-slot="article-column"]')!.className).toContain("pt-16");
+  });
 });

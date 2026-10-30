@@ -1,3 +1,7 @@
+## [ui-v0.5.428] - 2026-10-30
+
+- `ArticleView`: a Related row with no picture (or one that fails to load) shows the title's first letter on a quiet tile instead of an empty square; with a breadcrumb the article column starts below the toolbar below `lg`, so the Back button no longer covers the breadcrumb on a phone. READER-POLISH-01.
+
 ## [ui-v0.5.427] - 2026-10-30
 
 - `WeatherCard` accepts optional `moon` (phase and illumination) and draws the phase-accurate `MoonDisc` in the clear night hero icon and sky. Without it the generic moon is unchanged. MOON-LOOK-02.

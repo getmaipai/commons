@@ -290,6 +290,11 @@ function minutes(seconds: number): string {
  * appears only when the copy it was handed carries an `href` (teens and adults) or a book `target` the page can draw,
  * so a child's article renders every link as plain text. Buttons fire `onAction` with the story's own ids.
  */
+/** A row with no picture (or one that failed to load) shows the title's first letter on a quiet tile, never an empty square. */
+function RelatedInitial({ title }: { title: string }) {
+  return <span aria-hidden data-slot="article-related-initial" className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center text-lg font-semibold">{Array.from(title.trim())[0]?.toUpperCase() ?? ""}</span>;
+}
+
 /** The rail's Related list: a thumbnail and a title per row; the title is the book link and stretches over the row. */
 function ArticleRelated({ items, renderTargetLink }: { items: NonNullable<ArticleViewData["related"]>; renderTargetLink?: ArticleViewProps["renderTargetLink"] }) {
   return (
@@ -298,7 +303,7 @@ function ArticleRelated({ items, renderTargetLink }: { items: NonNullable<Articl
       <ul className="flex flex-col gap-1">
         {items.map((item) => (
           <li key={`${item.target.book}/${item.target.path}`} className="bg-card text-card-foreground hover:bg-muted relative flex items-center gap-3 overflow-hidden rounded-lg border">
-            {item.thumbnail ? <SafeImage src={item.thumbnail.src} alt={item.thumbnail.alt} loading="lazy" className="size-12 shrink-0 object-cover" /> : <span aria-hidden className="size-12 shrink-0" />}
+            {item.thumbnail ? <SafeImage src={item.thumbnail.src} alt={item.thumbnail.alt} loading="lazy" className="size-12 shrink-0 object-cover" fallbackContent={<RelatedInitial title={item.title} />} /> : <RelatedInitial title={item.title} />}
             <span className="min-w-0 flex-1 truncate text-sm [&_a]:after:absolute [&_a]:after:inset-0">{renderTargetLink ? renderTargetLink(item.target, item.title) : item.title}</span>
           </li>
         ))}
@@ -475,7 +480,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", condensed && "truncate text-lg leading-tight")}>{condensed ? data.title : data.byline.publisher}</span>
         </div>
       ) : null}
-      <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1 lg:[&>*:not([data-slot=article-rail])]:w-full lg:[&>*:not([data-slot=article-rail])]:max-w-[80ch] lg:[&>*:not([data-slot=article-rail])]:justify-self-center">
+      <div data-slot="article-column" className={cn("mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 md:px-6", hasToolbar && data.breadcrumb && data.breadcrumb.length > 0 ? "pt-16 lg:pt-6" : "pt-6", "lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1 lg:[&>*:not([data-slot=article-rail])]:w-full lg:[&>*:not([data-slot=article-rail])]:max-w-[80ch] lg:[&>*:not([data-slot=article-rail])]:justify-self-center")}>
       <header className="flex flex-col gap-2">
         {data.breadcrumb && data.breadcrumb.length > 0 ? (
           <Breadcrumb data-slot="article-breadcrumb" aria-label="Breadcrumb">
