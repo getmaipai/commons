@@ -2,6 +2,7 @@
 // Regenerate with: cd spec && bun run gen:ts
 
 export * from "./acknowledgment.js";
+export * from "./alarm.js";
 export * from "./answer-block.js";
 export * from "./api-key.js";
 export * from "./artifact.js";
@@ -57,6 +58,7 @@ export * from "./presence-state.js";
 export * from "./problem-report.js";
 export * from "./project.js";
 export * from "./quick-action.js";
+export * from "./quick-timer.js";
 export * from "./recipe.js";
 export * from "./reference-presets.js";
 export * from "./relationship.js";
@@ -92,3 +94,4 @@ export * from "./tour.js";
 export * from "./turn-artifact.js";
 export * from "./turn-label.js";
 export * from "./turn-signal.js";
+export * from "./world-place.js";

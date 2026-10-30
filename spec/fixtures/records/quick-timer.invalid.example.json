@@ -1,0 +1,12 @@
+{
+  "id": "qtimer-a1b2c3",
+  "person": "person-a1b2c3",
+  "name": "Tea",
+  "minutes": 1441,
+  "position": -1,
+  "source": "hub",
+  "created_at": "2026-10-29T10:00:00Z",
+  "updated_at": "2026-10-29T10:00:00Z",
+  "deleted_at": null,
+  "hlc": "1793268000000:0:node123"
+}

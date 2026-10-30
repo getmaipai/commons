@@ -1402,3 +1402,14 @@ Additive throughout; every existing fixture still validates unchanged.
 ## [spec-v0.1.241] - 2026-10-26
 
 - MEDIA-APPLE-PASS-01: add player `details_show` and collection fields, actions, and header/footer parts to the UI schema.
+## [spec-v0.1.272] - 2026-10-30
+
+### Added
+- Alarm, WorldPlace and QuickTimer records for clock and reminders, with
+  person ownership, shared bookkeeping fields, generated TypeScript and
+  Python models, fixtures and validation coverage. WorldPlace time zones
+  are checked against `Intl.DateTimeFormat`; Home enforces the 12-place
+  per-person limit.
+- Optional List `icon` from the fixed built-in icon set. Built-in lists
+  have fixed icons; custom lists choose one from the set.
+

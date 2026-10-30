@@ -45,6 +45,9 @@ import { NewsItem } from "../../gen/ts/news-item.js";
 import { NewsStory } from "../../gen/ts/news-story.js";
 import { PageContext } from "../../gen/ts/page-context.js";
 import { QuickAction } from "../../gen/ts/quick-action.js";
+import { Alarm } from "../../gen/ts/alarm.js";
+import { WorldPlace } from "../../gen/ts/world-place.js";
+import { QuickTimer } from "../../gen/ts/quick-timer.js";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 
@@ -111,6 +114,20 @@ describe("record fixtures validate against their generated Zod models", () => {
     expect(() =>
       SettingValue.parse(loadFixture("setting-value.example.json")),
     ).not.toThrow();
+  });
+
+  test("alarm.example.json", () => expect(() => Alarm.parse(loadFixture("alarm.example.json"))).not.toThrow());
+  test("world-place.example.json", () => expect(() => WorldPlace.parse(loadFixture("world-place.example.json"))).not.toThrow());
+  test("quick-timer.example.json", () => expect(() => QuickTimer.parse(loadFixture("quick-timer.example.json"))).not.toThrow());
+  test("clock record invalid examples are rejected", () => {
+    for (const [model, name] of [[Alarm, "alarm.invalid.example.json"], [WorldPlace, "world-place.invalid.example.json"], [QuickTimer, "quick-timer.invalid.example.json"]] as const) {
+      expect(() => model.parse(loadFixture(name))).toThrow();
+    }
+    expect(() => WorldPlace.parse({ ...loadFixture("world-place.example.json") as object, person: undefined })).toThrow();
+  });
+  test("world place zone is accepted by Intl.DateTimeFormat", () => {
+    const place = WorldPlace.parse(loadFixture("world-place.example.json"));
+    expect(() => new Intl.DateTimeFormat("en", { timeZone: place.zone })).not.toThrow();
   });
 
   test("settings-key.example.json", () => {

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/alarm.schema.json",
+  "title": "Alarm",
+  "description": "A person's local-time alarm. An empty days array means a one-time alarm. An occurrence before skip_until is skipped.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "person", "time", "days", "label", "tag", "enabled", "skip_until", "sound", "snooze_minutes", "source", "created_at", "updated_at", "hlc"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^alarm-[a-z0-9]{6,}$", "description": "Stable id, never reused, even after deleted_at is set." },
+    "person": { "type": "string", "pattern": "^person-[a-z0-9]{6,}$", "description": "Person who owns this alarm." },
+    "time": { "type": "string", "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$", "description": "Local wall-clock time in 24-hour HH:MM form." },
+    "days": { "type": "array", "uniqueItems": true, "items": { "type": "integer", "minimum": 1, "maximum": 7 }, "description": "ISO weekdays, Monday is 1. Empty means a one-time alarm." },
+    "label": { "type": "string", "maxLength": 120 },
+    "tag": { "type": "string", "maxLength": 40 },
+    "enabled": { "type": "boolean", "default": true },
+    "skip_until": { "type": ["string", "null"], "format": "date-time", "default": null, "description": "An occurrence before this instant is skipped." },
+    "sound": { "type": "string", "enum": ["default", "none", "bell", "chime", "digital", "rise", "gentle", "gentle_wake"] },
+    "snooze_minutes": { "type": ["integer", "null"], "enum": [5, 10, 15, 30, 60, null], "description": "Null means use the person's default snooze duration." },
+    "source": { "type": "string", "enum": ["hub", "local"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "default": null },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" }
+  }
+}

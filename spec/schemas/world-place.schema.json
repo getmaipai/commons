@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/world-place.schema.json",
+  "title": "WorldPlace",
+  "description": "A named world clock location for a person. Home enforces a maximum of 12 world places per person; this schema does not.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "person", "name", "country", "zone", "position", "source", "created_at", "updated_at", "hlc"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^place-[a-z0-9]{6,}$", "description": "Stable id, never reused, even after deleted_at is set." },
+    "person": { "type": "string", "pattern": "^person-[a-z0-9]{6,}$", "description": "Person who owns this world place." },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "country": { "type": "string", "maxLength": 120 },
+    "zone": { "type": "string", "minLength": 1, "maxLength": 64, "description": "IANA time zone name accepted by Intl.DateTimeFormat." },
+    "position": { "type": "integer", "minimum": 0 },
+    "source": { "type": "string", "enum": ["hub", "local"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "default": null },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" }
+  }
+}

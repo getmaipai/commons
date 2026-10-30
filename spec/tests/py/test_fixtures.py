@@ -9,6 +9,9 @@ from pathlib import Path
 
 import pytest
 from _standards import load_standards_module
+from gen.py.alarm_schema import Alarm
+from gen.py.quick_timer_schema import QuickTimer
+from gen.py.world_place_schema import WorldPlace
 from pydantic import ValidationError
 
 from gen.py.artifact_schema import Artifact
@@ -79,6 +82,46 @@ def test_person_fixture():
 
 def test_setting_value_fixture():
     SettingValue.model_validate(load_fixture("setting-value.example.json"))
+
+
+@pytest.mark.parametrize(
+    ("name", "model"),
+    [
+        ("alarm.example.json", Alarm),
+        ("world-place.example.json", WorldPlace),
+        ("quick-timer.example.json", QuickTimer),
+    ],
+)
+def test_clock_record_fixtures_round_trip(name, model):
+    data = load_fixture(name)
+    assert (
+        model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "model"),
+    [
+        ("alarm.invalid.example.json", Alarm),
+        ("world-place.invalid.example.json", WorldPlace),
+        ("quick-timer.invalid.example.json", QuickTimer),
+    ],
+)
+def test_clock_record_invalid_examples_are_rejected(name, model):
+    with pytest.raises(ValidationError):
+        model.model_validate(load_fixture(name))
+
+
+def test_clock_record_person_is_required():
+    for name, model in [
+        ("alarm.example.json", Alarm),
+        ("world-place.example.json", WorldPlace),
+        ("quick-timer.example.json", QuickTimer),
+    ]:
+        data = load_fixture(name)
+        del data["person"]
+        with pytest.raises(ValidationError):
+            model.model_validate(data)
 
 
 def test_settings_key_fixture():

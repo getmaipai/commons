@@ -52,6 +52,27 @@ export const List = z
       .describe(
         "What the household calls this list. Defaulted from kind ('Shopping List', 'To-Do List') when not given; required and free-text for kind: custom.",
       ),
+    /**A custom list takes one built-in icon from this set. Built-in lists have fixed icons.*/
+    icon: z
+      .union([
+        z.literal("cart"),
+        z.literal("check"),
+        z.literal("sparkle"),
+        z.literal("briefcase"),
+        z.literal("home"),
+        z.literal("heart"),
+        z.literal("book"),
+        z.literal("star"),
+        z.literal("gift"),
+        z.literal("plane"),
+        z.literal("leaf"),
+        z.literal("sun"),
+        z.literal(null),
+      ])
+      .describe(
+        "A custom list takes one built-in icon from this set. Built-in lists have fixed icons.",
+      )
+      .default(null),
     items: z
       .array(
         z

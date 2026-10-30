@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/quick-timer.schema.json",
+  "title": "QuickTimer",
+  "description": "A saved quick timer duration for a person.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "person", "name", "minutes", "position", "source", "created_at", "updated_at", "hlc"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^qtimer-[a-z0-9]{6,}$", "description": "Stable id, never reused, even after deleted_at is set." },
+    "person": { "type": "string", "pattern": "^person-[a-z0-9]{6,}$", "description": "Person who owns this quick timer." },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "minutes": { "type": "integer", "minimum": 1, "maximum": 1440 },
+    "position": { "type": "integer", "minimum": 0 },
+    "source": { "type": "string", "enum": ["hub", "local"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "default": null },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" }
+  }
+}

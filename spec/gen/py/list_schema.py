@@ -49,6 +49,26 @@ class List(BaseModel):
         ...,
         description="What the household calls this list. Defaulted from kind ('Shopping List', 'To-Do List') when not given; required and free-text for kind: custom.",
     )
+    icon: (
+        Literal[
+            'cart',
+            'check',
+            'sparkle',
+            'briefcase',
+            'home',
+            'heart',
+            'book',
+            'star',
+            'gift',
+            'plane',
+            'leaf',
+            'sun',
+        ]
+        | None
+    ) = Field(
+        None,
+        description='A custom list takes one built-in icon from this set. Built-in lists have fixed icons.',
+    )
     items: list[Item]
     source: Literal['hub', 'local'] = Field(
         ...,
