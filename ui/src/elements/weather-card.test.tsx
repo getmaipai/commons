@@ -102,6 +102,23 @@ describe("WeatherCard", () => {
     expect(snowy.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(0);
   });
 
+  test("moon data changes only the clear night hero icon", () => {
+    const moon = { phase: "Waning Gibbous", illumination: 72 };
+    const night = render(<WeatherCard {...props} moon={moon} current={{ ...props.current, code: 0, is_day: false }} />);
+    expect(night.container.querySelector('[data-slot="weather-moon-disk"]')).not.toBeNull();
+    expect(night.container.querySelector("svg.lucide-moon")).toBeNull();
+    cleanup();
+    const generic = render(<WeatherCard {...props} current={{ ...props.current, code: 0, is_day: false }} />);
+    expect(generic.container.querySelector("svg.lucide-moon")).not.toBeNull();
+    cleanup();
+    const day = render(<WeatherCard {...props} moon={moon} current={{ ...props.current, code: 0, is_day: true }} />);
+    expect(day.container.querySelector('[data-slot="weather-moon-disk"]')).toBeNull();
+    cleanup();
+    const rain = render(<WeatherCard {...props} moon={moon} current={{ ...props.current, code: 61, is_day: false }} />);
+    expect(rain.container.querySelector("svg.lucide-cloud-rain")).not.toBeNull();
+    expect(rain.container.querySelector('[data-slot="weather-moon-disk"]')).toBeNull();
+  });
+
   test("sun, shaped clouds and storm bolt render for their weather classes", () => {
     const clear = render(<WeatherCard {...props} current={{ ...props.current, code: 0, is_day: true }} />);
     expect(clear.container.querySelector('[data-fx="sun"]')).not.toBeNull();

@@ -3428,6 +3428,7 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 ## Unreleased
 - PHONE-01 and PHONE-03: add a phone story grid and steady pill strips.
 - MOON-LOOK-01: add a phase-accurate `MoonDisc` element and optional `nextFull` / `nextNew` dates to the Weather Moon Phase tile.
+- MOON-LOOK-02: `WeatherCard` accepts optional phase and illumination data and uses `MoonDisc` in the clear night hero and sky. Without it, the generic moon is unchanged.
 
 ## [ui-v0.5.364] - 2026-10-26
 

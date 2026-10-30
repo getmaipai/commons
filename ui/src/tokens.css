@@ -1596,7 +1596,8 @@ body {
   animation: wx-fog var(--d) ease-in-out var(--dl) infinite alternate;
 }
 [data-slot="weather-sky"] [data-fx="sun"],
-[data-slot="weather-sky"] [data-fx="moon"] {
+[data-slot="weather-sky"] [data-fx="moon"],
+[data-slot="weather-sky"] [data-fx="moon-glow"] {
   top: -70px;
   right: 14%;
   width: 200px;
@@ -1624,13 +1625,15 @@ body {
 /* The sun core keeps the original #ffd75e, #ffb02e gradient stops. */
 [data-slot="weather-sky"] [data-fx="sun"]::after { content: ""; position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--weather-sun-core), var(--weather-sun-edge) 78%); box-shadow: 0 0 46px 20px var(--weather-sun-glow), 0 0 96px 32px var(--weather-sun-shadow); }
 [data-slot="weather-sky"] [data-fx="sun-rays"] { top: -55px; right: 3%; width: 170px; height: 170px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg 8deg, var(--weather-sun-ray) 9deg 11deg, transparent 12deg 30deg); mask: radial-gradient(circle, transparent 0 38%, var(--weather-mask-ink) 40% 65%, transparent 67%); animation: wx-rays 60s linear infinite; }
-[data-slot="weather-sky"] [data-fx="moon"] {
+[data-slot="weather-sky"] [data-fx="moon"],
+[data-slot="weather-sky"] [data-fx="moon-glow"] {
   width: 150px;
   height: 150px;
   background: radial-gradient(circle, var(--weather-moon-glow), transparent 68%);
 }
 [data-slot="weather-sky"] [data-fx="moon"]::after { content: ""; position: absolute; top: 20%; left: 30%; width: 54px; height: 54px; border-radius: 50%; background: var(--weather-moon-core); box-shadow: 0 0 25px 8px var(--weather-moon-glow); }
 [data-slot="weather-sky"] [data-fx="moon"]::before { content: ""; position: absolute; z-index: 1; top: 15%; left: 39%; width: 52px; height: 52px; border-radius: 50%; background: var(--weather-moon-night); }
+[data-slot="weather-sky"] [data-fx="moon-disc"] { position: absolute; top: 52%; left: 30%; width: 54px; height: 54px; line-height: 0; }
 [data-slot="weather-sky"] [data-fx="flash"] {
   inset: 0;
   opacity: 0;

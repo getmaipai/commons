@@ -18,9 +18,11 @@ import { paper } from "./surfaces";
 import {
   weatherClassOf,
 } from "./weather-condition";
-import { WeatherSky } from "./weather-sky";
+import { WeatherSky, type WeatherMoon } from "./weather-sky";
+import { MoonDisc } from "./moon-disc";
 import { WeatherAdviceChips, WeatherAlertBanner, type WeatherAdvice, type WeatherAlert } from "./weather-advice";
 export { WeatherSky } from "./weather-sky";
+export type { WeatherMoon } from "./weather-sky";
 
 export interface WeatherCurrent {
   temp: number;
@@ -159,13 +161,14 @@ export function WeatherCard({
   attribution,
   advice,
   alert,
+  moon,
   locale = "en-US",
   variant = "full",
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "place" | "unit" | "current" | "hourly" | "daily" | "attribution" | "alert"
+  "children" | "place" | "unit" | "current" | "hourly" | "daily" | "attribution" | "alert" | "moon"
 > & {
   place: string;
   unit: "F" | "C";
@@ -177,6 +180,8 @@ export function WeatherCard({
   advice?: readonly WeatherAdvice[];
   /** An alert banner drawn above the hero. Absent: nothing extra. */
   alert?: WeatherAlert;
+  /** Moon phase shown on a clear night. */
+  moon?: WeatherMoon;
   /** Locale for the weekday names. Render-only; not part of the spec block. */
   locale?: string;
   /** `compact` draws the hero alone, shorter, for a dashboard card. Render-only; not part of the spec block. */
@@ -217,7 +222,7 @@ export function WeatherCard({
       >
         <p className="sr-only" data-slot="weather-summary">{summary}</p>
         <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
-          <WeatherSky cls={cls} isDay={current.is_day} intensity={1} />
+          <WeatherSky cls={cls} isDay={current.is_day} intensity={1} moon={moon} />
         </div>
         <div aria-hidden className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--weather-scrim)" }} />
         <div aria-hidden className="flex items-start justify-between gap-3">
@@ -231,7 +236,7 @@ export function WeatherCard({
           </span>
           <span className="flex flex-col items-end gap-1 pb-1.5 text-sm">
             <span className="flex items-center gap-1.5 font-medium">
-              <ConditionIcon className="size-4" aria-hidden />
+              {!current.is_day && cls === "clear" && moon ? <MoonDisc phase={moon.phase} illumination={moon.illumination} size={16}/> : <ConditionIcon className="size-4" aria-hidden />}
               {current.condition}
             </span>
             {today ? (

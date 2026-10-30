@@ -9,7 +9,7 @@ const demoLocations: WeatherLocation[] = [{
     airQuality: { aqi: 34, category: "Good" }, wind: { speed: 8, direction: 225, gust: 13 }, sunrise: "2026-10-23T07:13:00-04:00", sunset: "2026-10-23T18:02:00-04:00",
     uvIndex: 5, feelsLike: 74, humidity: 54, dewPoint: 55, precipitation: 10, precipitationNext24h: 0.12, visibility: 10, visibilityDescription: "Visibility is clear", pressure: 1016, pressureTrend: "rising", moon: { phase: "Waxing Crescent", illumination: 18, nextFull: "2026-11-02", nextNew: "2026-11-17" },
   },
-}, { id: "long", city: "San Bernardino Valley", state: "California", localTime: "11:19 AM", detail: { temp: 86, condition: "Sunny", code: 0, isDay: true, high: 89, low: 64 } }];
+}, { id: "night", city: "New York", state: "NY", localTime: "9:19 PM", timezone: "America/New_York", detail: { temp: 54, condition: "Clear", code: 0, isDay: false, high: 61, low: 49, moon: { phase: "Waning Gibbous", illumination: 72 } } }, { id: "long", city: "San Bernardino Valley", state: "California", localTime: "11:19 AM", detail: { temp: 86, condition: "Sunny", code: 0, isDay: true, high: 89, low: 64 } }];
 
 const demoAdvice = [{ id: "jacket", label: "Bring a light jacket", icon: "cloud-sun" }, { id: "sunscreen", label: "Sunscreen", tone: "warn" as const }, { id: "sunglasses", label: "Sunglasses" }];
 const demoAlert = { title: "Wind advisory until 8 PM", text: "Gusts up to 40 mph are likely this evening.", severity: "warn" as const };

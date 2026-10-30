@@ -1,5 +1,11 @@
 import type { CSSProperties } from "react";
 import { particles, type Particle, type WeatherClass } from "./weather-condition";
+import { MoonDisc } from "./moon-disc";
+
+export interface WeatherMoon {
+  phase: string;
+  illumination: number;
+}
 
 const rain = particles(11, 76, { size: [14, 22], dur: [0.55, 0.9], opacity: [0.55, 0.9] });
 const snow = particles(41, 60, { y: [-10, 0], size: [2, 5], dur: [7, 11], opacity: [0.55, 1] });
@@ -24,12 +30,12 @@ function Clouds({ count }: { count: number }) {
 }
 
 /** Shared decorative scene. Paused previews keep the same still composition. */
-export function WeatherSky({ cls, isDay, intensity = 1, paused = false }: { cls: WeatherClass; isDay: boolean; intensity?: number; paused?: boolean }) {
+export function WeatherSky({ cls, isDay, intensity = 1, paused = false, moon }: { cls: WeatherClass; isDay: boolean; intensity?: number; paused?: boolean; moon?: WeatherMoon }) {
   const count = paused ? 12 : 76;
   const hasSun = isDay && (cls === "clear" || cls === "partly-cloudy");
   return <div data-slot="weather-sky" data-class={cls} data-paused={paused ? "true" : "false"} style={{ "--weather-intensity": intensity } as CSSProperties} aria-hidden="true">
     {hasSun && <><span data-fx="sun"/><span data-fx="sun-rays"/></>}
-    {!isDay && cls === "clear" && <><span data-fx="moon"/><Layer list={stars} kind="star" count={paused ? 12 : 72}/></>}
+    {!isDay && cls === "clear" && <>{moon ? <span data-fx="moon-glow" aria-hidden="true"><span data-fx="moon-disc"><MoonDisc phase={moon.phase} illumination={moon.illumination} size={54}/></span></span> : <span data-fx="moon"/>}<Layer list={stars} kind="star" count={paused ? 12 : 72}/></>}
     {(cls === "clear" && isDay) && <Clouds count={3}/>}
     {cls === "partly-cloudy" && <Clouds count={2}/>}
     {(cls === "overcast" || cls === "thunderstorm") && <Clouds count={5}/>}
