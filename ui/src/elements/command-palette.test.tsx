@@ -115,3 +115,42 @@ test("renders optional result subtitles and icon tiles with an active row", () =
   expect(palette).toContain("rounded-[24px]");
   expect(palette).toContain("backdrop-blur-2xl");
 });
+
+test("prefiltered shows every command in the caller's order, with the caller's placeholder and empty line", () => {
+  const view = render(
+    <CommandPaletteDialog open onOpenChange={() => {}} title="Search" placeholder="Search..." prefiltered commands={[
+      { id: "a", label: "Zeta", group: "People", keys: [], subtitle: "matched in the subtitle" },
+    ]} query="subtitle" activeId="a" />,
+  );
+  expect(view.getByRole("option", { name: /Zeta/ })).toBeTruthy();
+  expect(view.getByRole("combobox", { name: "Search..." })).toBeTruthy();
+  view.rerender(<CommandPaletteDialog open onOpenChange={() => {}} title="Search" prefiltered emptyMessage="No results." commands={[]} query="x" activeId="" />);
+  expect(view.getByText("No results.")).toBeTruthy();
+});
+
+test("a command's match range is emphasized inside its label", () => {
+  render(
+    <CommandPaletteDialog open onOpenChange={() => {}} title="Search" commands={[
+      { id: "a", label: "Walk with Sage", group: "Alarms", keys: [], match: [10, 14] },
+    ]} query="" activeId="a" />,
+  );
+  expect(document.querySelector("mark")?.textContent).toBe("Sage");
+});
+
+test("tabs, rich cards and a footer render, and the tab buttons report their id", () => {
+  const picked: string[] = [];
+  const view = render(
+    <CommandPaletteDialog open onOpenChange={() => {}} title="Search" prefiltered
+      tabs={[{ id: "all", label: "All" }, { id: "chats", label: "Chats" }]} activeTab="all" onTabChange={(id) => picked.push(id)}
+      footer="Search anywhere in Home"
+      commands={[{ id: "a", label: "Aurora", group: "Wikipedia", keys: [], source: "Wikipedia", description: "A natural light display.", meta: "Article", thumbnailUrl: "/aurora.jpg", actionLabel: "Open" }]}
+      query="aurora" activeId="a" />,
+  );
+  expect(view.getByRole("tab", { name: "All" }).getAttribute("aria-selected")).toBe("true");
+  fireEvent.click(view.getByRole("tab", { name: "Chats" }));
+  expect(picked).toEqual(["chats"]);
+  expect(view.getByText("A natural light display.")).toBeTruthy();
+  expect(view.getByText("Article")).toBeTruthy();
+  expect(view.getByText("Open")).toBeTruthy();
+  expect(view.getByText("Search anywhere in Home")).toBeTruthy();
+});

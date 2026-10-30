@@ -1,3 +1,8 @@
+## [ui-v0.5.426] - 2026-10-30
+
+- Command palette Element, additive: `placeholder`, `prefiltered` (a caller that already ranked its results), `emptyMessage`, `tabs` / `activeTab` / `onTabChange`, `footer`, and per-command `match` (emphasized range), `source`, `description`, `meta`, `thumbnailUrl`, `actionLabel` for rich result cards. Defaults unchanged.
+- `HeaderSearch` now draws the Element: tabs (All, Chats, Files, Wikipedia, Home) under a typed query, rich rows from a result's `snippet`, `source`, `meta`, `thumbnail`, `action`, a `recents` list under the empty query, an optional `onAsk` row, and a footer hint. `remote`, `size` and `triggerClassName` are unchanged. `HeaderSearchOptionsContext` sets `recents` and `onAsk` once around a layout, so nothing is threaded through the header and rail. SEARCH-MODERN-04.
+
 ## [ui-v0.5.425] - 2026-10-30
 
 - Reader (`ArticleView`), additive: `breadcrumb` (items are text or buttons; the last is the page), `kickerStyle: "chip"`, `actionRow: "top"` (the labelled Save, Listen and Share row beside the chip in the header; `true` and `"under-hero"` keep the row under the hero), `floatFirstFigure` (the first figure floats left of the paragraphs before the first section on a wide screen), and an `image` in the infobox card. Data without these fields draws as before.

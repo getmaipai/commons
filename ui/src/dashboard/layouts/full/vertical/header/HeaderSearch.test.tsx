@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
-import HeaderSearch, { type SearchGroup } from "./HeaderSearch";
+import HeaderSearch, { HeaderSearchOptionsContext, type SearchGroup } from "./HeaderSearch";
 
 afterEach(cleanup);
 
@@ -47,12 +47,13 @@ describe("HeaderSearch (SHELL-SEARCH-01)", () => {
   });
 
   test('typing "fam" lists Family and Enter navigates to it', () => {
-    const { getByRole, getByPlaceholderText, getByText, queryByText, getByTestId } = render(<Harness />);
+    const { getByRole, getByPlaceholderText, getByTestId } = render(<Harness />);
     fireEvent.click(getByRole("button", { name: "Search" }));
     const input = getByPlaceholderText("Search...");
     fireEvent.change(input, { target: { value: "fam" } });
-    expect(getByText("Family")).not.toBeNull();
-    expect(queryByText("Chat")).toBeNull();
+    // The matched part is wrapped in <mark>, so read the rows' text rather than a single text node.
+    const rows = [...document.querySelectorAll('[role="option"]')].map((row) => row.textContent);
+    expect(rows).toEqual(["Family"]);
     fireEvent.keyDown(input, { key: "Enter" });
     expect(getByTestId("location").textContent).toBe("/people");
   });
@@ -76,17 +77,15 @@ describe("HeaderSearch (SEARCH-MODAL-SIZE-02): the size prop", () => {
   function open(size?: "default" | "lg") {
     const view = render(<Harness size={size} />);
     fireEvent.click(view.getByRole("button", { name: "Search" }));
-    const dialog = document.querySelector('[data-slot="dialog-content"]')?.getAttribute("class") ?? "";
-    const list = document.querySelector('[data-slot="command-list"]')?.getAttribute("class") ?? "";
+    const dialog = document.querySelector('[data-slot="command-palette"]')?.getAttribute("class") ?? "";
+    const list = document.querySelector('[role="listbox"]')?.getAttribute("class") ?? "";
     return { dialog, list };
   }
 
   test("is lg by default: a 48rem dialog at a viewport-bound height, the list scrolling inside", () => {
     const { dialog, list } = open();
-    expect(dialog).toContain("max-w-[calc(100%-2rem)]");
-    expect(dialog).toContain("sm:max-w-3xl");
-    expect(dialog).not.toContain("sm:max-w-sm");
-    expect(dialog).toContain("h-[min(36rem,calc(100dvh-4rem))]");
+    expect(dialog).toContain("h-[min(40rem,calc(100dvh-4rem))]");
+    expect(document.querySelector('[data-slot="dialog-content"]')?.getAttribute("class")).toContain("sm:max-w-3xl");
     expect(list).toContain("min-h-0");
     expect(list).toContain("flex-1");
     expect(list).toContain("overflow-y-auto");
@@ -95,7 +94,7 @@ describe("HeaderSearch (SEARCH-MODAL-SIZE-02): the size prop", () => {
 
   test('size="default" keeps the small dialog and capped list', () => {
     const { dialog, list } = open("default");
-    expect(dialog).not.toContain("sm:max-w-3xl");
+    expect(document.querySelector('[data-slot="dialog-content"]')?.getAttribute("class")).not.toContain("sm:max-w-3xl");
     expect(dialog).not.toContain("100dvh");
     expect(list).toContain("max-h-72");
   });
@@ -190,5 +189,57 @@ describe("HeaderSearch (SHELL-SEARCH-02): the remote prop", () => {
     fireEvent.change(getByPlaceholderText("Search..."), { target: { value: "conversations" } });
     await settle();
     expect(queryByText("Conversations")).toBeNull();
+  });
+});
+
+describe("HeaderSearch (SEARCH-MODERN-04): tabs, rich rows, Ask", () => {
+  const groups: SearchGroup[] = [
+    { kind: "conversation", heading: "Conversations", results: [{ kind: "conversation", id: "c1", title: "Northern lights chat", snippet: "Charged particles from the solar wind", meta: "Mar 14", href: "/chat?conversation=c1", match: [0, 8] }] },
+    { kind: "reference", heading: "Wikipedia", results: [{ kind: "reference", id: "aurora", title: "Aurora", source: "Wikipedia", snippet: "A natural light display", action: "Open", href: "/reference/wiki/Aurora" }] },
+  ];
+
+  test("a typed query shows tabs; Chats keeps only chat results; rich fields render", async () => {
+    const { getByRole, getByPlaceholderText, queryByText, getByText } = render(<Harness remote={async () => groups} />);
+    fireEvent.click(getByRole("button", { name: "Search" }));
+    fireEvent.change(getByPlaceholderText("Search..."), { target: { value: "aurora" } });
+    await settle();
+    expect(getByText("Charged particles from the solar wind")).not.toBeNull();
+    expect(getByText("A natural light display")).not.toBeNull();
+    fireEvent.click(getByRole("tab", { name: "Chats" }));
+    expect(queryByText("A natural light display")).toBeNull();
+    expect(getByText("Charged particles from the solar wind")).not.toBeNull();
+  });
+
+  test("the Ask row is last and calls onAsk with the typed text", async () => {
+    const asked: string[] = [];
+    const view = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <HeaderSearch onAsk={(q) => asked.push(q)} />
+      </MemoryRouter>,
+    );
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    const input = view.getByPlaceholderText("Search...");
+    fireEvent.change(input, { target: { value: "zzzz nothing" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(asked).toEqual(["zzzz nothing"]);
+  });
+});
+
+describe("HeaderSearch (SEARCH-MODERN-04): options from context", () => {
+  test("recents and Ask come from the context provider when no prop is given", () => {
+    const asked: string[] = [];
+    const view = render(
+      <HeaderSearchOptionsContext.Provider value={{ recents: [{ kind: "conversation", id: "c9", title: "Pizza night plans", href: "/chat?conversation=c9" }], onAsk: (q) => asked.push(q) }}>
+        <MemoryRouter initialEntries={["/"]}>
+          <HeaderSearch />
+        </MemoryRouter>
+      </HeaderSearchOptionsContext.Provider>,
+    );
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    expect([...document.querySelectorAll('[role="option"]')].map((row) => row.textContent)).toContain("Pizza night plans");
+    const input = view.getByPlaceholderText("Search...");
+    fireEvent.change(input, { target: { value: "qqqq" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(asked).toEqual(["qqqq"]);
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, type ComponentProps } from "react";
+import { useEffect, useId, useRef, type ComponentProps, type ReactNode } from "react";
 import { SearchIcon } from "lucide-react";
 import { cn } from "cn";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
@@ -17,6 +17,23 @@ export interface PaletteCommand {
   /** Optional icon component or image URL for the result tile. */
   icon?: ComponentProps<"span">["children"];
   iconUrl?: string;
+  /** [start, end) of the part of `label` to emphasize, e.g. the matched text of a search. */
+  match?: readonly [number, number];
+  /** A small label above the title naming where the result lives, e.g. "Wikipedia". Makes the row a rich card. */
+  source?: string;
+  /** Up to two lines of text under the title, e.g. a search snippet. Makes the row a rich card. */
+  description?: string;
+  /** A line of facts under the description, e.g. "Article · 12 min read". */
+  meta?: string;
+  /** A picture shown at the end of a rich card. */
+  thumbnailUrl?: string;
+  /** Text of a button-looking affordance shown on the active row; running the row does what it says. */
+  actionLabel?: string;
+}
+
+export interface PaletteTab {
+  id: string;
+  label: string;
 }
 
 export type CommandPaletteDialogProps = Omit<ComponentProps<typeof CommandPalette>, "className" | "size"> & {
@@ -66,6 +83,13 @@ export function CommandPalette({
   onActiveChange,
   onRun,
   size = "default",
+  placeholder = "Type a command",
+  prefiltered = false,
+  emptyMessage,
+  tabs,
+  activeTab,
+  onTabChange,
+  footer,
   className,
   ...props
 }: Omit<
@@ -86,12 +110,26 @@ export function CommandPalette({
   onRun?: (id: string) => void;
   // "lg" fills a wide dialog at a fixed viewport-bound height; the list scrolls inside.
   size?: "default" | "lg";
+  /** Input placeholder and accessible name; a search caller says "Search". */
+  placeholder?: string;
+  /** True when the caller already filtered and ranked `commands` (a server search): they all show, in the caller's order. */
+  prefiltered?: boolean;
+  /** Replaces the empty-result line, which otherwise names the query as a command. */
+  emptyMessage?: string;
+  /** A row of tabs under the input; the caller filters `commands` for the active one. */
+  tabs?: readonly PaletteTab[];
+  activeTab?: string;
+  onTabChange?: (id: string) => void;
+  /** A line under the list, e.g. a hint about keys. */
+  footer?: ReactNode;
 }) {
   const listId = useId();
   const optionId = (id: string) => `${listId}-${id}`;
-  const matches = commands.filter((command) =>
-    command.label.toLowerCase().includes(query.toLowerCase()),
-  );
+  const matches = prefiltered
+    ? commands
+    : commands.filter((command) =>
+        command.label.toLowerCase().includes(query.toLowerCase()),
+      );
   const groups = [...new Set(matches.map((command) => command.group))];
   // display order, which is grouped and so differs from the filter order
   const ordered = groups.flatMap((group) =>
@@ -150,8 +188,8 @@ export function CommandPalette({
           value={query}
           onChange={(event) => onQueryChange?.(event.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Type a command"
-          aria-label="Type a command"
+          placeholder={placeholder}
+          aria-label={placeholder}
           role="combobox"
           aria-expanded={ordered.length > 0}
           aria-controls={listId}
@@ -173,6 +211,28 @@ export function CommandPalette({
           esc
         </span>
       </div>
+
+      {tabs && tabs.length > 0 ? (
+        <div role="tablist" aria-label="Result type" className="border-foreground/[0.07] flex gap-5 overflow-x-auto border-b px-6">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={tab.id === activeTab}
+              tabIndex={-1}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => onTabChange?.(tab.id)}
+              className={cn(
+                "-mb-px shrink-0 border-b-2 py-2.5 text-sm transition-colors",
+                tab.id === activeTab ? "border-primary text-foreground font-medium" : "text-muted-foreground hover:text-foreground border-transparent",
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <div
         id={listId}
@@ -199,8 +259,10 @@ export function CommandPalette({
             {matches
               .filter((command) => command.group === group)
               .map((command) => {
+                const rich = Boolean(command.description || command.source || command.thumbnailUrl);
                 const className = cn(
-                  "flex min-h-14 items-center gap-3 rounded-xl px-3 py-2 text-start transition-colors",
+                  "flex items-center gap-3 rounded-xl px-3 py-2 text-start transition-colors",
+                  rich ? "min-h-20 py-3" : "min-h-14",
                   command.id === activeId
                     ? "bg-accent text-accent-foreground"
                     : onRun
@@ -217,9 +279,16 @@ export function CommandPalette({
                       <span aria-hidden className="bg-foreground/[0.05] size-8 shrink-0 rounded-lg" />
                     )}
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate text-sm font-medium">{command.label}</span>
+                      {command.source ? <span className="text-muted-foreground truncate text-xs">{command.source}</span> : null}
+                      <span className={cn("text-sm font-medium", rich ? "" : "truncate")}>{highlighted(command.label, command.match)}</span>
                       {command.subtitle ? <span className="text-muted-foreground truncate text-xs">{command.subtitle}</span> : null}
+                      {command.description ? <span className="text-muted-foreground line-clamp-2 text-xs">{command.description}</span> : null}
+                      {command.meta ? <span className="text-muted-foreground truncate pt-1 text-xs">{command.meta}</span> : null}
                     </span>
+                    {command.thumbnailUrl ? <SafeImage src={command.thumbnailUrl} alt="" className="h-16 w-28 shrink-0 rounded-lg object-cover" /> : null}
+                    {command.actionLabel && command.id === activeId ? (
+                      <span className={cn(field, "text-foreground shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium")}>{command.actionLabel}</span>
+                    ) : null}
                     <span className="flex shrink-0 gap-1">
                       {command.keys.map((key) => (
                         <span
@@ -269,10 +338,22 @@ export function CommandPalette({
       {matches.length === 0 && (
         <div className="border-foreground/[0.07] border-t p-1.5">
           <span className="text-muted-foreground block px-2 py-4 text-center text-xs break-words">
-            No command matches “{query}”
+            {emptyMessage ?? `No command matches “${query}”`}
           </span>
         </div>
       )}
+      {footer ? <div className="border-foreground/[0.07] text-muted-foreground border-t px-6 py-3 text-center text-xs">{footer}</div> : null}
     </div>
+  );
+}
+
+function highlighted(label: string, match: PaletteCommand["match"]) {
+  if (!match || match[0] < 0 || match[1] > label.length || match[0] >= match[1]) return label;
+  return (
+    <>
+      {label.slice(0, match[0])}
+      <mark className="bg-transparent font-semibold text-inherit underline decoration-primary/60 underline-offset-2">{label.slice(match[0], match[1])}</mark>
+      {label.slice(match[1])}
+    </>
   );
 }
