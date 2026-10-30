@@ -1,9 +1,10 @@
 import { getIcon } from "@/kit/icons";
-import { useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/kit/dashboard/components/ui/dropdown-menu";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/kit/dashboard/components/ui/breadcrumb";
 import { Separator } from "@/kit/dashboard/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/kit/ui/table";
 import { cn } from "@/kit/utils";
@@ -50,6 +51,12 @@ export type ArticleBlockData =
 export interface ArticleViewData {
   title: string;
   kicker?: string;
+  /** `chip` draws the kicker as a chip instead of small uppercase text. */
+  kickerStyle?: "chip";
+  /** Where the page sits: each item is plain text, or a button when it has `onClick`; the last item is the page itself. */
+  breadcrumb?: Array<{ label: string; onClick?: () => void }>;
+  /** The first figure floats at the left of the paragraphs that follow it, before the first section, on a wide screen. */
+  floatFirstFigure?: boolean;
   /** A plain line under the headline (Reference: the book's source label). */
   description?: string;
   byline?: { publisher: string; site: string; published_at: string; outlets: number; reading_s: number };
@@ -59,7 +66,7 @@ export interface ArticleViewData {
   /** A bold standfirst before the body (Reference: the article's own first sentence). */
   lead?: string;
   /** Draws labelled Save, Listen and Share under the hero on a wide screen; the phone keeps the floating pill. */
-  actionRow?: boolean;
+  actionRow?: boolean | "top" | "under-hero";
   /** One fact in a card at the top of the rail (Reference). */
   quick_fact?: string;
   /** Other articles in the rail, each a title, an optional picture and a book link drawn by `renderTargetLink`. */
@@ -404,8 +411,29 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const listenLoading = speakingThis && speech.phase === "loading";
   const listenText = listenLoading ? "Starting…" : speakingThis && speech.phase === "playing" ? "Listening" : speakingThis && speech.phase === "paused" ? "Paused" : "Listen";
   const shareNow = () => { void navigator.share({ title: data.title, url: data.open_url }).catch(() => {}); };
-  const hasActionRow = data.actionRow === true && (can("save") || can("listen") || canShare);
+  const rowPlace = data.actionRow === "top" ? "top" : data.actionRow ? "under-hero" : null;
+  const hasActionRow = rowPlace !== null && (can("save") || can("listen") || canShare);
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
+  const floatAt = data.floatFirstFigure ? data.blocks.findIndex((b) => b.type === "figure") : -1;
+  const firstSection = data.blocks.findIndex((b) => b.type === "heading" && b.level === 2);
+  const floatEnd = firstSection === -1 ? data.blocks.length : firstSection;
+  const plainBlocks = floatAt !== -1 && floatAt < floatEnd ? (
+    <>
+      {data.blocks.slice(0, floatAt).map((block, index) => <Block key={`pre-${index}`} block={block} renderTargetLink={renderTargetLink} />)}
+      <div data-slot="article-floated" className="flow-root [&>*+*]:mt-4">
+        <div className="mb-3 md:float-left md:mr-5 md:mb-2 md:w-[34%]"><Block block={data.blocks[floatAt]!} renderTargetLink={renderTargetLink} /></div>
+        {data.blocks.slice(floatAt + 1, floatEnd).map((block, index) => <Block key={`flo-${index}`} block={block} renderTargetLink={renderTargetLink} />)}
+      </div>
+      {data.blocks.slice(floatEnd).map((block, index) => <Block key={`post-${index}`} block={block} renderTargetLink={renderTargetLink} />)}
+    </>
+  ) : data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />);
+  const actionRowEl = hasActionRow ? (
+        <div data-slot="article-action-row" role="group" aria-label="Article actions" className={cn("hidden items-center gap-2 md:flex", rowPlace === "under-hero" && "border-b pb-2")}>
+      {can("save") ? <Button variant="ghost" aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}><BookmarkIcon aria-hidden fill={saved ? "currentColor" : "none"} />{saved ? "Saved" : "Save"}</Button> : null}
+      {can("listen") ? <Button variant="ghost" aria-busy={listenLoading} onClick={() => fire("listen")}>{listenLoading ? <LoaderIcon aria-hidden className="animate-spin" /> : speakingThis && speech.phase ? <AudioIcon aria-hidden className="text-primary" /> : <PlayIcon aria-hidden />}{listenText}</Button> : null}
+      {canShare ? <Button variant="ghost" onClick={shareNow}><ShareIcon aria-hidden />Share</Button> : null}
+    </div>
+  ) : null;
   return (
     <ArticlePreviewContext.Provider value={loadPreview ?? null}><article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col", className)}>
       <div data-slot="article-sticky-header" className="sticky top-0 z-30 -mb-14 flex flex-col">
@@ -449,8 +477,31 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       <div data-slot="article-column" className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 pt-6 md:px-6 lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1 lg:[&>*:not([data-slot=article-rail])]:w-full lg:[&>*:not([data-slot=article-rail])]:max-w-[80ch] lg:[&>*:not([data-slot=article-rail])]:justify-self-center">
       <header className="flex flex-col gap-2">
+        {data.breadcrumb && data.breadcrumb.length > 0 ? (
+          <Breadcrumb data-slot="article-breadcrumb" aria-label="Breadcrumb">
+            <BreadcrumbList>
+              {data.breadcrumb.map((item, i) => {
+                const last = i === data.breadcrumb!.length - 1;
+                return (
+                  <Fragment key={i}>
+                    <BreadcrumbItem>
+                      {last ? <BreadcrumbPage>{item.label}</BreadcrumbPage> : item.onClick ? <BreadcrumbLink render={<button type="button" onClick={item.onClick} />}>{item.label}</BreadcrumbLink> : <span>{item.label}</span>}
+                    </BreadcrumbItem>
+                    {last ? null : <BreadcrumbSeparator />}
+                  </Fragment>
+                );
+              })}
+            </BreadcrumbList>
+          </Breadcrumb>
+        ) : null}
+        {(data.kicker && data.kickerStyle === "chip") || (hasActionRow && rowPlace === "top") ? (
+          <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
+            {data.kicker && data.kickerStyle === "chip" ? <Badge data-slot="article-kicker-chip" variant="outline" className="tracking-wide uppercase">{data.kicker}</Badge> : <span />}
+            {hasActionRow && rowPlace === "top" ? actionRowEl : null}
+          </div>
+        ) : null}
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
-        {data.kicker ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
+        {data.kicker && data.kickerStyle !== "chip" ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
         <h2 ref={titleRef} data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
         {data.hatnote ? <p data-slot="article-hatnote" className="text-muted-foreground text-sm italic">{data.hatnote}</p> : null}
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}
@@ -484,16 +535,10 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           </AspectRatio>
         </div>
       ) : null}
-      {hasActionRow ? (
-        <div data-slot="article-action-row" role="group" aria-label="Article actions" className="hidden items-center gap-2 border-b pb-2 md:flex">
-          {can("save") ? <Button variant="ghost" aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}><BookmarkIcon aria-hidden fill={saved ? "currentColor" : "none"} />{saved ? "Saved" : "Save"}</Button> : null}
-          {can("listen") ? <Button variant="ghost" aria-busy={listenLoading} onClick={() => fire("listen")}>{listenLoading ? <LoaderIcon aria-hidden className="animate-spin" /> : speakingThis && speech.phase ? <AudioIcon aria-hidden className="text-primary" /> : <PlayIcon aria-hidden />}{listenText}</Button> : null}
-          {canShare ? <Button variant="ghost" onClick={shareNow}><ShareIcon aria-hidden />Share</Button> : null}
-        </div>
-      ) : null}
+      {hasActionRow && rowPlace === "under-hero" ? actionRowEl : null}
       {data.lead ? <p data-slot="article-standfirst" className="text-2xl leading-snug font-semibold">{data.lead}</p> : null}
       <div ref={bodyRef} data-slot="article-body" data-text-size={textSize} className={cn("flex w-full min-w-0 flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
-        {folding ? <FoldedBody blocks={data.blocks} renderTargetLink={renderTargetLink} open={openSections} onToggle={toggleSection} /> : data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
+        {folding ? <FoldedBody blocks={data.blocks} renderTargetLink={renderTargetLink} open={openSections} onToggle={toggleSection} /> : plainBlocks}
       </div>
       {data.also_covering && data.also_covering.length > 0 ? (
         <section data-slot="also-covering" className="flex flex-col gap-2">

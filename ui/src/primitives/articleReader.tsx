@@ -13,7 +13,7 @@ export type ArticlePreviewLoader = (target: { book: string; path: string }) => P
 export const ArticlePreviewContext = createContext<ArticlePreviewLoader | null>(null);
 
 export interface ArticleContentsItem { id: string; title: string; level: 2 | 3 | 4 }
-export interface ArticleInfobox { title?: string; rows: Array<{ label: string; value: string }> }
+export interface ArticleInfobox { title?: string; image?: { src: string; alt: string }; rows: Array<{ label: string; value: string }> }
 
 const PHONE_QUERY = "(max-width: 767px)";
 /** True on a phone-width screen. A browser without `matchMedia` counts as wide. */
@@ -78,6 +78,7 @@ export function ArticleInfoboxCard({ infobox }: { infobox: ArticleInfobox }) {
   return (
     <aside data-slot="article-infobox" aria-label={infobox.title ?? "At a glance"}>
       <Disclosure slot="article-infobox-box" title={infobox.title ?? "At a glance"}>
+        {infobox.image ? <img src={infobox.image.src} alt={infobox.image.alt} loading="lazy" className="mx-3 mb-2 w-[calc(100%-1.5rem)] rounded-md object-cover" /> : null}
         <Table className="text-sm">
           <TableBody>
             {infobox.rows.map((row, i) => <TableRow key={i}><TableHead scope="row" className="w-2/5 whitespace-normal align-top">{row.label}</TableHead><TableCell className="whitespace-normal break-words">{row.value}</TableCell></TableRow>)}

@@ -439,3 +439,72 @@ describe("ArticleView mockup parts", () => {
     expect(related.textContent).toContain("Solar wind");
   });
 });
+
+// READER-09: the owner's second mockup (breadcrumb, kicker chip, top action row, floated first figure, infobox picture).
+describe("ArticleView facts-column parts", () => {
+  const facts = (extra: Partial<ArticleViewData> = {}): ArticleViewData => ({
+    title: "Zendaya",
+    kicker: "Actor · Producer",
+    kickerStyle: "chip",
+    description: "American actor and producer",
+    breadcrumb: [{ label: "Wikipedia", onClick: () => {} }, { label: "People" }, { label: "Zendaya" }],
+    infobox: { title: "Zendaya", image: { src: "/z.jpg", alt: "Zendaya" }, rows: [{ label: "Born", value: "September 1, 1996" }] },
+    floatFirstFigure: true,
+    blocks: [
+      { type: "figure", src: "/f.jpg", alt: "Portrait", caption: "" },
+      { type: "paragraph", inlines: [{ type: "text", text: "Zendaya Maree Stoermer Coleman is an American actor." }] },
+      { type: "heading", level: 2, id: "Early", text: "Early life" },
+      { type: "paragraph", inlines: [{ type: "text", text: "Born in Oakland." }] },
+    ],
+    ...extra,
+  });
+
+  test("draws a breadcrumb whose last item is the page and whose app item fires its callback", () => {
+    const onClick = mock(() => {});
+    const { container } = render(<ArticleView data={facts({ breadcrumb: [{ label: "Wikipedia", onClick }, { label: "Zendaya" }] })} />);
+    const nav = container.querySelector('nav[aria-label="Breadcrumb"]')!;
+    expect(nav.textContent).toContain("Wikipedia");
+    expect(nav.querySelector('[aria-current="page"]')?.textContent).toBe("Zendaya");
+    fireEvent.click(Array.from(nav.querySelectorAll("a,button")).find((el) => el.textContent === "Wikipedia")!);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  test("kickerStyle chip draws the kicker as a chip; the default stays plain text", () => {
+    const chip = render(<ArticleView data={facts()} />);
+    expect(chip.container.querySelector('[data-slot="article-kicker-chip"]')?.textContent).toBe("Actor · Producer");
+    chip.unmount();
+    const plain = render(<ArticleView data={facts({ kickerStyle: undefined })} />);
+    expect(plain.container.querySelector('[data-slot="article-kicker-chip"]')).toBeNull();
+    expect(plain.container.textContent).toContain("Actor · Producer");
+  });
+
+  test('actionRow "top" puts the labelled row in the header beside the chip, not under the hero', () => {
+    Object.defineProperty(navigator, "share", { value: mock(async () => {}), configurable: true });
+    const { container } = render(<ArticleView data={{ ...facts(), open_url: "https://example.com/z", actionRow: "top" }} onAction={() => {}} available={["save", "listen", "open_site"]} />);
+    const row = container.querySelector('[data-slot="article-action-row"]')!;
+    expect(row.closest("header")).not.toBeNull();
+    expect(Array.from(row.querySelectorAll("button")).map((b) => b.textContent?.trim())).toEqual(["Save", "Listen", "Share"]);
+  });
+
+  test("the first figure floats at the left with the paragraphs that follow it, before the first section", () => {
+    const { container } = render(<ArticleView data={facts()} />);
+    const group = container.querySelector('[data-slot="article-floated"]')!;
+    expect(group.querySelector("figure")).not.toBeNull();
+    expect(group.textContent).toContain("Zendaya Maree Stoermer Coleman");
+    expect(group.textContent).not.toContain("Born in Oakland");
+    expect(group.querySelector("figure")!.parentElement!.className).toContain("md:float-left");
+  });
+
+  test("without floatFirstFigure the figure is drawn in the normal flow", () => {
+    const { container } = render(<ArticleView data={facts({ floatFirstFigure: undefined })} />);
+    expect(container.querySelector('[data-slot="article-floated"]')).toBeNull();
+    expect(container.querySelector("figure")).not.toBeNull();
+  });
+
+  test("the infobox card draws its picture under the title", () => {
+    const { container } = render(<ArticleView data={facts()} />);
+    const img = container.querySelector('[data-slot="article-infobox"] img')!;
+    expect(img.getAttribute("src")).toBe("/z.jpg");
+    expect(img.getAttribute("alt")).toBe("Zendaya");
+  });
+});
