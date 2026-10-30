@@ -5414,6 +5414,23 @@
     ]
   },
   {
+    "key": "resources.profiles",
+    "scope": "household",
+    "selector": "text",
+    "default": "{\"video.max\": {\"chat\": \"reduced\", \"image\": \"boost\", \"video\": \"max\", \"music\": \"queued\", \"tools\": \"queued\"}, \"video.boost\": {\"chat\": \"standard\", \"image\": \"standard\", \"video\": \"boost\", \"music\": \"queued\", \"tools\": \"standard\"}, \"image.max\": {\"chat\": \"standard\", \"image\": \"max\", \"video\": \"queued\", \"music\": \"queued\", \"tools\": \"queued\"}, \"chat.max\": {\"chat\": \"max\", \"image\": \"queued\", \"video\": \"queued\", \"music\": \"queued\", \"tools\": \"queued\"}}",
+    "label": "Big-job profiles",
+    "help": "A JSON table. Each row is a big job and its tier; each cell says what chat, pictures, video, music and tools do while it runs: a tier (reduced, standard, boost, max), queued, or off. Chat is never queued or off. Normally edited under Customize on the Performance page; changing it shows Custom.",
+    "copy": {
+      "does": "Sets how chat, pictures, video and music share the computer during a large task."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "resources.close_apps.mode",
     "scope": "household",
     "selector": "select",

@@ -127,6 +127,11 @@ describe("resources.* settings", () => {
     for (const c of ["chat", "image", "video", "music"]) expect(keyOf(`resources.lower_without_asking.${c}`).default).toBe(false);
     expect(keys.some((k) => k.key === "resources.lower_without_asking.voice")).toBe(false);
   });
+  test("the profile table holds the four default rows and chat is never queued or off", () => {
+    const t = JSON.parse(keyOf("resources.profiles").default);
+    expect(Object.keys(t)).toEqual(["video.max", "video.boost", "image.max", "chat.max"]);
+    for (const row of Object.values<any>(t)) expect(["queued", "off"]).not.toContain(row.chat);
+  });
   test("the priority list leaves chat first and holds no voice", () => {
     expect(JSON.parse(keyOf("resources.priority").default)[0]).toBe("chat");
   });
