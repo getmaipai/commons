@@ -1,3 +1,7 @@
+## [ui-v0.5.419] - 2026-10-29
+
+- Additive, every default unchanged: `DialogContent variant="flow" size="xl"` is the wide card (`sm:max-w-7xl`, the default flow card stays `sm:max-w-5xl`); `DialogBody columns="three"` lays three columns from `lg`; `Textarea maxRows` caps how tall the box grows and scrolls inside itself past it.
+
 ## [ui-v0.5.418] - 2026-10-29
 
 - The video `Player` layout is never taller than the window: its width stops where the 16:9 picture is as tall as the window less 14rem (never under 22rem), so the title and the buttons under it stay on screen. Phones and the mini and audio layouts are unchanged.
