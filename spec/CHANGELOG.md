@@ -1,3 +1,7 @@
+## [spec-v0.1.277] - 2026-10-30
+
+- MOON-LOOK-02: `weather_card` props gain optional `moon: { phase, illumination }` for phase-accurate night rendering. Additive; absent moon data keeps the generic moon. New valid and invalid fixtures.
+
 ## [spec-v0.1.276] - 2026-10-30
 
 - READER-05: add the person-scope `ReferenceSave` record (one saved reference article: book, path, title, `offline`, clock stamp, provenance; id prefix `refsave-`). Additive.
@@ -1420,8 +1424,3 @@ Additive throughout; every existing fixture still validates unchanged.
   per-person limit.
 - Optional List `icon` from the fixed built-in icon set. Built-in lists
   have fixed icons; custom lists choose one from the set.
-
-## Unreleased
-
-- MOON-LOOK-02: `weather_card` props gain optional `moon: { phase, illumination }` for phase-accurate night rendering. Additive; absent moon data keeps the generic moon. New valid and invalid fixtures.
-

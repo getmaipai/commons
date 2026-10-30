@@ -1,3 +1,8 @@
+## [ui-v0.5.427] - 2026-10-30
+
+- `WeatherCard` accepts optional `moon` (phase and illumination) and draws the phase-accurate `MoonDisc` in the clear night hero icon and sky. Without it the generic moon is unchanged. MOON-LOOK-02.
+- Reader thumbnails (related list, infobox image, link preview) render through `SafeImage`.
+
 ## [ui-v0.5.426] - 2026-10-30
 
 - Command palette Element, additive: `placeholder`, `prefiltered` (a caller that already ranked its results), `emptyMessage`, `tabs` / `activeTab` / `onTabChange`, `footer`, and per-command `match` (emphasized range), `source`, `description`, `meta`, `thumbnailUrl`, `actionLabel` for rich result cards. Defaults unchanged.
@@ -3428,7 +3433,6 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 ## Unreleased
 - PHONE-01 and PHONE-03: add a phone story grid and steady pill strips.
 - MOON-LOOK-01: add a phase-accurate `MoonDisc` element and optional `nextFull` / `nextNew` dates to the Weather Moon Phase tile.
-- MOON-LOOK-02: `WeatherCard` accepts optional phase and illumination data and uses `MoonDisc` in the clear night hero and sky. Without it, the generic moon is unchanged.
 
 ## [ui-v0.5.364] - 2026-10-26
 
