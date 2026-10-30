@@ -372,3 +372,70 @@ describe("ArticleView reader parts", () => {
     expect(loadPreview).toHaveBeenCalledWith({ book: "wiki", path: "Populus" });
   });
 });
+
+// READER-00b: the owner's reader mockup (chip on the hero, standfirst, labelled action row, Quick fact and Related in the rail).
+describe("ArticleView mockup parts", () => {
+  const mock00b = (extra: Partial<ArticleViewData> = {}): ArticleViewData => ({
+    title: "Aurora",
+    image: { w480: "/a480.jpg", w1280: "/a1280.jpg", alt: "Green lights over a lake", badge: "Earth's light show" },
+    lead: "On clear nights near the poles, the sky can ripple with color.",
+    quick_fact: "Auroras happen when charged particles from the Sun meet Earth's atmosphere.",
+    related: [
+      { target: { book: "wiki", path: "Solar_wind" }, title: "Solar wind", thumbnail: { src: "/sw.jpg", alt: "" } },
+      { target: { book: "wiki", path: "Night_sky" }, title: "Night sky" },
+    ],
+    blocks: [{ type: "paragraph", inlines: [{ type: "text", text: "Auroras are caused by charged particles." }] }],
+    ...extra,
+  });
+
+  test("draws the chip on the hero picture and the standfirst before the body", () => {
+    const { container } = render(<ArticleView data={mock00b()} />);
+    expect(container.querySelector('[data-slot="article-lead"] [data-slot="article-image-badge"]')?.textContent).toBe("Earth's light show");
+    const standfirst = container.querySelector('[data-slot="article-standfirst"]')!;
+    expect(standfirst.textContent).toContain("ripple with color");
+    const body = container.querySelector('[data-slot="article-body"]')!;
+    expect(standfirst.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  test("draws none of the new parts when the data has none of them", () => {
+    const { container } = render(<ArticleView data={data} />);
+    for (const slot of ["article-image-badge", "article-standfirst", "article-action-row", "article-quick-fact", "article-related"]) expect(container.querySelector(`[data-slot="${slot}"]`)).toBeNull();
+  });
+
+  test("actionRow draws labelled Save, Listen and Share under the hero, and each fires its action", () => {
+    Object.defineProperty(navigator, "share", { value: mock(async () => {}), configurable: true });
+    const onAction = mock(() => {});
+    const { container } = render(<ArticleView data={{ ...mock00b(), open_url: "https://example.com/a", actionRow: true }} onAction={onAction} available={["save", "listen", "open_site"]} />);
+    const row = container.querySelector('[data-slot="article-action-row"]')!;
+    const labels = Array.from(row.querySelectorAll("button")).map((b) => b.textContent?.trim());
+    expect(labels).toEqual(["Save", "Listen", "Share"]);
+    fireEvent.click(row.querySelectorAll("button")[0]!);
+    expect(onAction).toHaveBeenCalledWith("save", expect.objectContaining({ on: true }));
+    fireEvent.click(row.querySelectorAll("button")[1]!);
+    expect(onAction).toHaveBeenCalledWith("listen", expect.anything());
+  });
+
+  test("without actionRow there is no labelled row", () => {
+    const { container } = render(<ArticleView data={mock00b()} onAction={() => {}} available={["save", "listen"]} />);
+    expect(container.querySelector('[data-slot="article-action-row"]')).toBeNull();
+  });
+
+  test("the rail has a Quick fact card and a Related list with titles, thumbnails and book links", () => {
+    const renderTargetLink = (t: { book: string; path: string }, text: string) => <a href={`#${t.path}`}>{text}</a>;
+    const { container } = render(<ArticleView data={mock00b()} renderTargetLink={renderTargetLink} />);
+    const rail = container.querySelector('[data-slot="article-rail"]')!;
+    expect(rail.querySelector('[data-slot="article-quick-fact"]')?.textContent).toContain("charged particles from the Sun");
+    const related = rail.querySelector('[data-slot="article-related"]')!;
+    const links = Array.from(related.querySelectorAll("a"));
+    expect(links.map((a) => a.textContent)).toEqual(["Solar wind", "Night sky"]);
+    expect(links.map((a) => a.getAttribute("href"))).toEqual(["#Solar_wind", "#Night_sky"]);
+    expect(related.querySelectorAll("img").length).toBe(1);
+  });
+
+  test("Related without a link renderer shows the titles as plain text", () => {
+    const { container } = render(<ArticleView data={mock00b()} />);
+    const related = container.querySelector('[data-slot="article-related"]')!;
+    expect(related.querySelectorAll("a").length).toBe(0);
+    expect(related.textContent).toContain("Solar wind");
+  });
+});

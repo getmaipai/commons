@@ -18,6 +18,7 @@ export type { ArticleContentsItem, ArticleInfobox, ArticlePreview, ArticlePrevie
 
 const ChevronDownIcon = getIcon("chevron-down");
 const ArrowLeftIcon = getIcon("arrow-left");
+const PlayIcon = getIcon("play");
 const BookmarkIcon = getIcon("bookmark");
 const EllipsisIcon = getIcon("more-horizontal");
 const ShareIcon = getIcon("share");
@@ -53,8 +54,16 @@ export interface ArticleViewData {
   description?: string;
   byline?: { publisher: string; site: string; published_at: string; outlets: number; reading_s: number };
   sourceIconUrl?: string;
-  image?: { w480: string; w1280: string; alt: string; focal?: { x: number; y: number; aspect: number } };
+  image?: { w480: string; w1280: string; alt: string; /** A short chip drawn on the picture (Reference: the picture's own caption). */ badge?: string; focal?: { x: number; y: number; aspect: number } };
   key_points?: { text: string; band: "child" | "teen" | "adult" };
+  /** A bold standfirst before the body (Reference: the article's own first sentence). */
+  lead?: string;
+  /** Draws labelled Save, Listen and Share under the hero on a wide screen; the phone keeps the floating pill. */
+  actionRow?: boolean;
+  /** One fact in a card at the top of the rail (Reference). */
+  quick_fact?: string;
+  /** Other articles in the rail, each a title, an optional picture and a book link drawn by `renderTargetLink`. */
+  related?: Array<{ target: { book: string; path: string }; title: string; thumbnail?: { src: string; alt: string } }>;
   /** A one-line "for other uses" note under the headline (Reference). */
   hatnote?: string;
   /** The article's facts box (Reference). Beside the text on a wide screen, a closed box above it on a phone. */
@@ -274,6 +283,23 @@ function minutes(seconds: number): string {
  * appears only when the copy it was handed carries an `href` (teens and adults) or a book `target` the page can draw,
  * so a child's article renders every link as plain text. Buttons fire `onAction` with the story's own ids.
  */
+/** The rail's Related list: a thumbnail and a title per row; the title is the book link and stretches over the row. */
+function ArticleRelated({ items, renderTargetLink }: { items: NonNullable<ArticleViewData["related"]>; renderTargetLink?: ArticleViewProps["renderTargetLink"] }) {
+  return (
+    <section data-slot="article-related" aria-label="Related" className="flex flex-col gap-2">
+      <h3 className="text-lg font-semibold">Related</h3>
+      <ul className="flex flex-col gap-1">
+        {items.map((item) => (
+          <li key={`${item.target.book}/${item.target.path}`} className="bg-card text-card-foreground hover:bg-muted relative flex items-center gap-3 overflow-hidden rounded-lg border">
+            {item.thumbnail ? <img src={item.thumbnail.src} alt={item.thumbnail.alt} loading="lazy" className="size-12 shrink-0 object-cover" /> : <span aria-hidden className="size-12 shrink-0" />}
+            <span className="min-w-0 flex-1 truncate text-sm [&_a]:after:absolute [&_a]:after:inset-0">{renderTargetLink ? renderTargetLink(item.target, item.title) : item.title}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** The lead (everything before the first section heading) stays open; each level-2 section folds on a phone. */
 function FoldedBody({ blocks, renderTargetLink, open, onToggle }: { blocks: ArticleBlockData[]; renderTargetLink?: ArticleViewProps["renderTargetLink"]; open: ReadonlySet<string>; onToggle: (id: string) => void }) {
   const firstHeading = blocks.findIndex((b) => b.type === "heading" && b.level === 2);
@@ -375,6 +401,10 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
     return () => window.clearInterval(again);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [summarizing, askKey]);
+  const listenLoading = speakingThis && speech.phase === "loading";
+  const listenText = listenLoading ? "Starting…" : speakingThis && speech.phase === "playing" ? "Listening" : speakingThis && speech.phase === "paused" ? "Paused" : "Listen";
+  const shareNow = () => { void navigator.share({ title: data.title, url: data.open_url }).catch(() => {}); };
+  const hasActionRow = data.actionRow === true && (can("save") || can("listen") || canShare);
   const hasToolbar = onBack !== undefined || can("save") || canShare || hasMore || data.blocks.length > 0;
   return (
     <ArticlePreviewContext.Provider value={loadPreview ?? null}><article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col", className)}>
@@ -393,9 +423,9 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
             >
               <TypeIcon aria-hidden />
             </Button>
-            {canShare ? <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label="Share" onClick={() => { void navigator.share({ title: data.title, url: data.open_url }).catch(() => {}); }}><ShareIcon aria-hidden /></Button> : null}
+            {canShare ? <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label="Share" onClick={shareNow}><ShareIcon aria-hidden /></Button> : null}
             {can("save") ? (
-              <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label={saved ? "Saved" : "Save"} aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}>
+              <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label={saved ? "Saved" : "Save"} aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}>
                 <BookmarkIcon aria-hidden fill={saved ? "currentColor" : "none"} className={cn("transition-transform duration-200", saved && "text-primary scale-110")} />
               </Button>
             ) : null}
@@ -426,12 +456,12 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
-      {hasAssist || data.key_points || summarizing || data.infobox || (data.contents && data.contents.length > 0) ? (
+      {hasAssist || data.key_points || summarizing || data.quick_fact || (data.related && data.related.length > 0) || data.infobox || (data.contents && data.contents.length > 0) ? (
         <div data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start lg:[grid-row:1/span_99] lg:col-start-2">
         {hasAssist ? (
           <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex gap-2 [&>*]:flex-1">
             {can("listen") ? (
-              <Button variant="outline" size="sm" aria-busy={speakingThis && speech.phase === "loading"} data-state={speakingThis ? speech.phase ?? undefined : undefined} onClick={() => fire("listen")}>
+              <Button variant="outline" size="sm" className={hasActionRow ? "md:hidden" : undefined} aria-busy={speakingThis && speech.phase === "loading"} data-state={speakingThis ? speech.phase ?? undefined : undefined} onClick={() => fire("listen")}>
                 {speakingThis && speech.phase === "loading" ? <LoaderIcon aria-hidden className="animate-spin" /> : speakingThis && speech.phase ? <AudioIcon aria-hidden className="text-primary" /> : <HeadphonesIcon aria-hidden />}
                 {speakingThis && speech.phase === "loading" ? "Starting…" : speakingThis && speech.phase === "playing" ? "Listening" : speakingThis && speech.phase === "paused" ? "Paused" : "Listen"}
               </Button>
@@ -440,6 +470,8 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           </div>
         ) : null}
         {data.key_points || summarizing ? <KeyPoints text={data.key_points?.text} loading={summarizing} /> : null}
+        {data.quick_fact ? <section data-slot="article-quick-fact" aria-label="Quick fact" className="flex flex-col gap-1 rounded-lg border bg-card p-4 text-card-foreground"><h3 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">Quick fact</h3><p className="text-lg leading-snug">{data.quick_fact}</p></section> : null}
+        {data.related && data.related.length > 0 ? <ArticleRelated items={data.related} renderTargetLink={renderTargetLink} /> : null}
         {data.infobox && data.infobox.rows.length > 0 ? <ArticleInfoboxCard infobox={data.infobox} /> : null}
         {data.contents && data.contents.length > 0 ? <ArticleContentsNav items={data.contents} activeId={activeSection} onPick={pickSection} /> : null}
         </div>
@@ -447,10 +479,19 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       {data.image ? (
         <div data-slot="article-lead">
           <AspectRatio ratio={16 / 9} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
+            {data.image.badge ? <Badge data-slot="article-image-badge" variant="secondary" className="absolute top-3 left-3 z-10 max-w-[70%] truncate">{data.image.badge}</Badge> : null}
             <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} focal={data.image.focal} className="absolute inset-0 size-full object-cover" />
           </AspectRatio>
         </div>
       ) : null}
+      {hasActionRow ? (
+        <div data-slot="article-action-row" role="group" aria-label="Article actions" className="hidden items-center gap-2 border-b pb-2 md:flex">
+          {can("save") ? <Button variant="ghost" aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}><BookmarkIcon aria-hidden fill={saved ? "currentColor" : "none"} />{saved ? "Saved" : "Save"}</Button> : null}
+          {can("listen") ? <Button variant="ghost" aria-busy={listenLoading} onClick={() => fire("listen")}>{listenLoading ? <LoaderIcon aria-hidden className="animate-spin" /> : speakingThis && speech.phase ? <AudioIcon aria-hidden className="text-primary" /> : <PlayIcon aria-hidden />}{listenText}</Button> : null}
+          {canShare ? <Button variant="ghost" onClick={shareNow}><ShareIcon aria-hidden />Share</Button> : null}
+        </div>
+      ) : null}
+      {data.lead ? <p data-slot="article-standfirst" className="text-2xl leading-snug font-semibold">{data.lead}</p> : null}
       <div ref={bodyRef} data-slot="article-body" data-text-size={textSize} className={cn("flex w-full min-w-0 flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
         {folding ? <FoldedBody blocks={data.blocks} renderTargetLink={renderTargetLink} open={openSections} onToggle={toggleSection} /> : data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />)}
       </div>
