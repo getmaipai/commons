@@ -1,3 +1,8 @@
+## [ui-v0.5.422] - 2026-10-30
+
+- News reader (`ArticleView`): the right column (Listen, Discuss, Key points) sits at the far right and the article takes the space; Key points draw as a lead line and a short bulleted list (first three, then "Show all N"); Save fills its icon at once; the Listen button reads Starting, Listening or Paused for the story being read (new `ArticleSpeechContext` in `articleSpeech.ts`, which the host provides: `{ storyId, phase, progress }`); the words being spoken are lit through the CSS Custom Highlight API (`::highlight(article-spoken)` and `::highlight(article-speaking)` in `tokens.css`).
+- `list` node: a row with a `row_action` opens on a click anywhere on the row, not only on the action's button (which stays for the keyboard).
+
 ## [ui-v0.5.421] - 2026-10-29
 
 - Additive, every default unchanged: `Textarea maxRows` (the `ui` Textarea the companion screens use) caps how tall the box grows and scrolls inside itself past it.
