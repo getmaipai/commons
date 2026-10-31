@@ -33,7 +33,30 @@ class DeviceCommand1(BaseModel):
     payload: dict[str, Any] = Field(..., max_length=0)
 
 
+class Payload(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    seconds: conint(ge=1, le=30) = 5
+
+
 class DeviceCommand2(BaseModel):
+    """
+    The robot chirps and flashes its ring so a person can find it; it never speaks or moves. Queued like every command when the robot is offline.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['find_me']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload
+
+
+class DeviceCommand3(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -49,7 +72,7 @@ class DeviceCommand2(BaseModel):
     payload: dict[str, Any] = Field(..., max_length=0)
 
 
-class Payload(BaseModel):
+class Payload1(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -57,7 +80,7 @@ class Payload(BaseModel):
     kind: Literal['still']
 
 
-class DeviceCommand3(BaseModel):
+class DeviceCommand4(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -70,10 +93,10 @@ class DeviceCommand3(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload
+    payload: Payload1
 
 
-class Payload1(BaseModel):
+class Payload2(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -83,7 +106,7 @@ class Payload1(BaseModel):
     state: Literal['active', 'cleared', 'false_alarm']
 
 
-class DeviceCommand4(BaseModel):
+class DeviceCommand5(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -96,16 +119,7 @@ class DeviceCommand4(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload1
-
-
-class Payload2(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    notification_id: constr(min_length=1)
-    person_id: constr(min_length=1)
-    text: constr(min_length=1, max_length=1000)
+    payload: Payload2
 
 
 class Payload3(BaseModel):
@@ -114,10 +128,19 @@ class Payload3(BaseModel):
     )
     notification_id: constr(min_length=1)
     person_id: constr(min_length=1)
+    text: constr(min_length=1, max_length=1000)
+
+
+class Payload4(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    notification_id: constr(min_length=1)
+    person_id: constr(min_length=1)
     form: Literal['waiting']
 
 
-class DeviceCommand5(BaseModel):
+class DeviceCommand6(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -130,10 +153,10 @@ class DeviceCommand5(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload2 | Payload3
+    payload: Payload3 | Payload4
 
 
-class Payload4(BaseModel):
+class Payload5(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -141,7 +164,7 @@ class Payload4(BaseModel):
     bearing: confloat(ge=-3.141592653589793, le=3.141592653589793) | None = None
 
 
-class DeviceCommand6(BaseModel):
+class DeviceCommand7(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -154,10 +177,10 @@ class DeviceCommand6(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload4
+    payload: Payload5
 
 
-class Payload5(BaseModel):
+class Payload6(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -167,7 +190,7 @@ class Payload5(BaseModel):
     non_personal_line: constr(min_length=1, max_length=300)
 
 
-class DeviceCommand7(BaseModel):
+class DeviceCommand8(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -180,17 +203,17 @@ class DeviceCommand7(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload5
+    payload: Payload6
 
 
-class Payload6(BaseModel):
+class Payload7(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     move_id: constr(min_length=1)
 
 
-class DeviceCommand8(BaseModel):
+class DeviceCommand9(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -203,17 +226,17 @@ class DeviceCommand8(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload6
+    payload: Payload7
 
 
-class Payload7(BaseModel):
+class Payload8(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     values: dict[str, Any]
 
 
-class DeviceCommand9(BaseModel):
+class DeviceCommand10(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -226,17 +249,17 @@ class DeviceCommand9(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload7
+    payload: Payload8
 
 
-class Payload8(BaseModel):
+class Payload9(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     hub_time: AwareDatetime
 
 
-class DeviceCommand10(BaseModel):
+class DeviceCommand11(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -249,10 +272,10 @@ class DeviceCommand10(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload8
+    payload: Payload9
 
 
-class Payload9(BaseModel):
+class Payload10(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -261,7 +284,7 @@ class Payload9(BaseModel):
     size: Literal['640x360']
 
 
-class DeviceCommand11(BaseModel):
+class DeviceCommand12(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -274,17 +297,17 @@ class DeviceCommand11(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload9
+    payload: Payload10
 
 
-class Payload10(BaseModel):
+class Payload11(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     view_id: constr(min_length=1)
 
 
-class DeviceCommand12(BaseModel):
+class DeviceCommand13(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -297,17 +320,17 @@ class DeviceCommand12(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload10
+    payload: Payload11
 
 
-class Payload11(BaseModel):
+class Payload12(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     manifest_version: constr(min_length=1)
 
 
-class DeviceCommand13(BaseModel):
+class DeviceCommand14(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -320,10 +343,10 @@ class DeviceCommand13(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload11
+    payload: Payload12
 
 
-class Payload12(BaseModel):
+class Payload13(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -334,7 +357,7 @@ class Payload12(BaseModel):
     )
 
 
-class DeviceCommand14(BaseModel):
+class DeviceCommand15(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -347,10 +370,10 @@ class DeviceCommand14(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload12
+    payload: Payload13
 
 
-class Payload13(BaseModel):
+class Payload14(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -358,7 +381,7 @@ class Payload13(BaseModel):
     position_s: confloat(ge=0.0)
 
 
-class DeviceCommand15(BaseModel):
+class DeviceCommand16(BaseModel):
     """
     Play timed media at the requested position. expires_at is issued_at plus 60 seconds. Other command kinds keep their 24 hour expiry.
     """
@@ -371,10 +394,10 @@ class DeviceCommand15(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload13
+    payload: Payload14
 
 
-class Payload14(BaseModel):
+class Payload15(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -382,7 +405,7 @@ class Payload14(BaseModel):
     part: Literal['speaker', 'face', 'head', 'lights', 'mic']
 
 
-class DeviceCommand16(BaseModel):
+class DeviceCommand17(BaseModel):
     """
     A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.
     """
@@ -392,29 +415,6 @@ class DeviceCommand16(BaseModel):
     )
     id: constr(min_length=1, max_length=128)
     kind: Literal['self_test']
-    issued_at: AwareDatetime
-    expires_at: AwareDatetime
-    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload14
-
-
-class Payload15(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    seconds: conint(ge=1, le=30) = 5
-
-
-class DeviceCommand17(BaseModel):
-    """
-    The robot chirps and flashes its ring so a person can find it; it never speaks or moves. Queued like every command when the robot is offline.
-    """
-
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    id: constr(min_length=1, max_length=128)
-    kind: Literal['find_me']
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
@@ -459,6 +459,7 @@ class DeviceCommand(
         | DeviceCommand14
         | DeviceCommand15
         | DeviceCommand16
+        | DeviceCommand17
     ) = Field(
         ...,
         description='A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.',
