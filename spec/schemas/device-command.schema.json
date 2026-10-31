@@ -44,6 +44,54 @@
       }
     },
     {
+      "description": "The robot chirps and flashes its ring so a person can find it; it never speaks or moves. Queued like every command when the robot is offline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "find_me"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "seconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 30,
+              "default": 5
+            }
+          }
+        }
+      }
+    },
+    {
       "type": "object",
       "additionalProperties": false,
       "required": [

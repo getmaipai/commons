@@ -314,7 +314,7 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
     const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
-    expect(commands).toHaveLength(16);
+    expect(commands).toHaveLength(17);
     for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();

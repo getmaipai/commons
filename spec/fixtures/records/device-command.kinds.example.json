@@ -120,6 +120,16 @@
     "hlc": "1791201600000:0:robot123"
   },
   {
+    "id": "cmd-find-me",
+    "kind": "find_me",
+    "payload": {
+      "seconds": 5
+    },
+    "issued_at": "2026-10-31T12:00:00Z",
+    "expires_at": "2026-10-31T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
     "id": "cmd-live-view-stop",
     "kind": "live_view_stop",
     "payload": {

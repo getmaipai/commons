@@ -4292,6 +4292,23 @@
     ]
   },
   {
+    "key": "companions.ambient_bot",
+    "scope": "person",
+    "selector": "text",
+    "default": "",
+    "label": "Bot in the companion spot",
+    "help": "Puts one of the household's robots in the top-right companion spot instead of a companion. Pick it from the companion pane. Leave empty to show your companion.",
+    "copy": {
+      "does": "Shows a robot's face, voice and room at the top right."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.companions",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "generation.household_likeness",
     "scope": "household",
     "selector": "boolean",

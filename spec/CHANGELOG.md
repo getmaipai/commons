@@ -1,3 +1,7 @@
+## [spec-v0.1.285] - 2026-10-31
+
+- Person setting `companions.ambient_bot` (a robot's device id for the top-right companion spot, empty by default) and device command kind `find_me` (chirp and ring flash, optional seconds 1 to 30). Additive.
+
 ## [spec-v0.1.284] - 2026-10-31
 
 - Recipe `format` steps gain an optional interpolated BCP-47 `language` for replies. Invalid or empty values are omitted. Additive.

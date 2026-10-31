@@ -22,6 +22,21 @@ export const DeviceCommand = z
       z
         .object({
           id: z.string().min(1).max(128),
+          kind: z.literal("find_me"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({ seconds: z.number().int().gte(1).lte(30).default(5) })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "The robot chirps and flashes its ring so a person can find it; it never speaks or moves. Queued like every command when the robot is offline.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
           kind: z.literal("unmute"),
           issued_at: z.string().datetime({ offset: true }),
           expires_at: z.string().datetime({ offset: true }),

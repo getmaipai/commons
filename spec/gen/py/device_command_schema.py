@@ -398,6 +398,29 @@ class DeviceCommand16(BaseModel):
     payload: Payload14
 
 
+class Payload15(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    seconds: conint(ge=1, le=30) = 5
+
+
+class DeviceCommand17(BaseModel):
+    """
+    The robot chirps and flashes its ring so a person can find it; it never speaks or moves. Queued like every command when the robot is offline.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['find_me']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload15
+
+
 class DeviceCommand(
     RootModel[
         DeviceCommand1
@@ -416,6 +439,7 @@ class DeviceCommand(
         | DeviceCommand14
         | DeviceCommand15
         | DeviceCommand16
+        | DeviceCommand17
     ]
 ):
     root: (
