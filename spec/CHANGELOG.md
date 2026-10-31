@@ -1,9 +1,12 @@
+## [spec-v0.1.283] - 2026-10-31
+
+- getmaipai/home#58: optional `PluginResult.reply.language`, a BCP-47 tag for the reply text and speech. The hub uses an installed voice for that language or says plainly when none is installed. New valid `es` and `es-MX` fixtures and an invalid language fixture. Additive.
+- MEM-PROV-01 (getmaipai/home#57): optional nullable `created_by` on MemoryRecord names the member whose action wrote it. Additive.
+
 ## [spec-v0.1.282] - 2026-10-31
 
 - MemoryRecord and the recipe `remember` step gain the category `instruction`: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope. The category field now carries a description. Additive.
 - MemoryRecord `archived_reason` gains `profile_card_replaced`: the weekly profile paragraph row was retired when the deterministic profile card replaced it (2026-10-31). Additive.
-- getmaipai/home#58: optional `PluginResult.reply.language`, a BCP-47 tag for the reply text and speech. The hub uses an installed voice for that language or says plainly when none is installed. New valid `es` and `es-MX` fixtures and an invalid language fixture. Additive.
-- MEM-PROV-01 (getmaipai/home#57): optional nullable `created_by` on MemoryRecord names the member whose action wrote it. Additive.
 
 ## [spec-v0.1.281] - 2026-10-30
 

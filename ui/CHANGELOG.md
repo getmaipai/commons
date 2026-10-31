@@ -1,3 +1,9 @@
+## [ui-v0.5.435] - 2026-10-31
+
+- `AppDirectory`: a held favorite star stays clickable so it cannot activate the app tile underneath. At the rail limit, clicking it explains how to make room; while a favorite save is busy, it does nothing. APPS-DIRECTORY-02.
+- `AppRail`: pinned apps are unlimited and scroll within the rail when needed; Home, fixed destinations and the foot controls stay in place. `RAIL_APPS_MAX` remains exported as deprecated for compatibility.
+- `Sources`: optional source URLs now make rows in both layouts open the source in a new tab.
+
 ## [ui-v0.5.434] - 2026-10-31
 
 - `EmptyStateGreeting` takes `size` (`default` or `lg`): the new-chat greeting in Home uses `lg`.
