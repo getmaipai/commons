@@ -1,8 +1,10 @@
-import { describe, expect, it } from "bun:test";
-import { render } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "bun:test";
+import { cleanup, render } from "@testing-library/react";
 import { RobotFace, type RobotFaceExpression } from "./robot-face";
 
 describe("RobotFace", () => {
+  afterEach(cleanup);
+
   it("renders with default props", () => {
     const { getByRole } = render(<RobotFace name="Rover" />);
     expect(getByRole("img")).toHaveAttribute("data-expression", "idle");
