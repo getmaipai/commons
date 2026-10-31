@@ -94,6 +94,10 @@ class MemoryRecord(BaseModel):
         None,
         description='Required when scope is person; null for household, self or companion scope.',
     )
+    created_by: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description='The household member whose action wrote this record (their own typed or spoken words, or the turn the memory judge read). Null for pure maintenance and for records written before authors were kept. Not who the record is about: that is person.',
+    )
     companion_id: str | None = Field(
         None,
         description="Required when scope is companion; null otherwise. Matches conversation.schema.json's own companion_id field's convention (a free string, package-declared - COMP-03 hasn't shipped an id format yet).",

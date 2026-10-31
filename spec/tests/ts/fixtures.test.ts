@@ -136,13 +136,17 @@ describe("record fixtures validate against their generated Zod models", () => {
     ).not.toThrow();
   });
 
-  for (const kind of ["memory", "memory-legacy", "entity", "episode", "in-project", "device-id-device", "device-id-null", "instruction"]) {
+  for (const kind of ["memory", "memory-legacy", "entity", "episode", "in-project", "device-id-device", "device-id-null", "instruction", "created-by-person", "created-by-null"]) {
     test(`memory-record.${kind}.example.json`, () => {
       expect(() =>
         MemoryRecord.parse(loadFixture(`memory-record.${kind}.example.json`)),
       ).not.toThrow();
     });
   }
+
+  test("created_by fixtures reject a bad pattern", () => {
+    expect(() => MemoryRecord.parse(loadFixture("memory-record.created-by-invalid.invalid.example.json"))).toThrow();
+  });
 
   for (const kind of ["person", "pet", "place"]) {
     test(`entity.${kind}.example.json`, () => {

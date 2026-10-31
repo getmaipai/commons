@@ -81,6 +81,25 @@ export const MemoryRecord = z
         "Required when scope is person; null for household, self or companion scope.",
       )
       .optional(),
+    /**The household member whose action wrote this record (their own typed or spoken words, or the turn the memory judge read). Null for pure maintenance and for records written before authors were kept. Not who the record is about: that is person.*/
+    created_by: z
+      .union([
+        z
+          .string()
+          .regex(new RegExp("^person-[a-z0-9]{6,}$"))
+          .describe(
+            "The household member whose action wrote this record (their own typed or spoken words, or the turn the memory judge read). Null for pure maintenance and for records written before authors were kept. Not who the record is about: that is person.",
+          ),
+        z
+          .null()
+          .describe(
+            "The household member whose action wrote this record (their own typed or spoken words, or the turn the memory judge read). Null for pure maintenance and for records written before authors were kept. Not who the record is about: that is person.",
+          ),
+      ])
+      .describe(
+        "The household member whose action wrote this record (their own typed or spoken words, or the turn the memory judge read). Null for pure maintenance and for records written before authors were kept. Not who the record is about: that is person.",
+      )
+      .optional(),
     /**Required when scope is companion; null otherwise. Matches conversation.schema.json's own companion_id field's convention (a free string, package-declared - COMP-03 hasn't shipped an id format yet).*/
     companion_id: z
       .union([

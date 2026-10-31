@@ -580,6 +580,8 @@ def test_source_archive_fixture():
         "device-id-device",
         "device-id-null",
         "instruction",
+        "created-by-person",
+        "created-by-null",
     ],
 )
 def test_memory_record_fixtures(kind):
@@ -590,6 +592,13 @@ def test_memory_record_rejects_invalid_device_id():
     with pytest.raises(ValidationError):
         MemoryRecord.model_validate(
             load_fixture("memory-record.device-id-invalid.invalid.example.json")
+        )
+
+
+def test_memory_record_rejects_invalid_created_by():
+    with pytest.raises(ValidationError):
+        MemoryRecord.model_validate(
+            load_fixture("memory-record.created-by-invalid.invalid.example.json")
         )
 
 
