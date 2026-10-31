@@ -1,3 +1,7 @@
+## [ui-v0.5.436] - 2026-10-31
+
+- `RobotFace`: a representation of a StackChan robot's face (seven face colours, night, eleven expressions, header and stage sizes) for the ambient companion spot in Home.
+
 ## [ui-v0.5.435] - 2026-10-31
 
 - `AppDirectory`: a held favorite star stays clickable so it cannot activate the app tile underneath. At the rail limit, clicking it explains how to make room; while a favorite save is busy, it does nothing. APPS-DIRECTORY-02.
