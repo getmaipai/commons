@@ -157,10 +157,10 @@ describe("ArticleView", () => {
     expect(discuss.queryByText("Listen")).toBeNull();
   });
 
-  test("Back is drawn only when the page gave a way back, and calls it; the text size menu is always there", () => {
+  test("Back is drawn only when the page gave a way back, and calls it; the reading settings button is always there", () => {
     const withoutBack = render(<ArticleView data={data} />);
     expect(withoutBack.queryByLabelText("Back")).toBeNull();
-    expect(withoutBack.getByLabelText("Text size")).toBeTruthy();
+    expect(withoutBack.getByLabelText("Reading settings")).toBeTruthy();
     cleanup();
     const onBack = mock(() => {});
     const withBack = render(<ArticleView data={data} onBack={onBack} />);
@@ -168,16 +168,34 @@ describe("ArticleView", () => {
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
-  test("the text size button steps Default, Larger, Smaller and the body follows", () => {
-    const { container, getByLabelText } = render(<ArticleView data={data} />);
-    const size = () => container.querySelector('[data-slot="article-body"]')!.getAttribute("data-text-size");
-    expect(size()).toBe("medium");
-    fireEvent.click(getByLabelText("Text size"));
-    expect(size()).toBe("large");
-    fireEvent.click(getByLabelText("Text size"));
-    expect(size()).toBe("small");
-    fireEvent.click(getByLabelText("Text size"));
-    expect(size()).toBe("medium");
+  test("the reading settings change the typeface, size, spacing and width of the body, and are remembered", () => {
+    window.localStorage.clear();
+    const { container, getByLabelText, getByRole } = render(<ArticleView data={data} />);
+    const body = () => container.querySelector('[data-slot="article-body"]')!;
+    expect(body().getAttribute("data-text-size")).toBe("medium");
+    fireEvent.click(getByLabelText("Reading settings"));
+    fireEvent.click(getByRole("radio", { name: "Text size: Large" }));
+    expect(body().getAttribute("data-text-size")).toBe("large");
+    fireEvent.click(getByRole("radio", { name: "Typeface: Sans" }));
+    expect(body().className).toContain("font-sans");
+    expect(body().className).not.toContain("font-serif");
+    fireEvent.click(getByRole("radio", { name: "Line spacing: Roomy" }));
+    expect(body().className).toContain("leading-[1.9]");
+    fireEvent.click(getByRole("radio", { name: "Page width: Narrow" }));
+    expect(body().className).toContain("max-w-[52ch]");
+    expect(window.localStorage.getItem("maipai.article.font")).toBe("sans");
+    fireEvent.click(getByLabelText("Reading settings") );
+    cleanup();
+    const again = render(<ArticleView data={data} />);
+    expect(again.container.querySelector('[data-slot="article-body"]')!.getAttribute("data-text-size")).toBe("large");
+    window.localStorage.clear();
+  });
+
+  test("the right column keeps its own scroll, so a tall rail never runs off the bottom of the screen", () => {
+    const { container } = render(<ArticleView data={{ ...data, infobox: { title: "T", rows: [{ label: "A", value: "B" }] } }} />);
+    const rail = container.querySelector('[data-slot="article-rail"]');
+    expect(rail?.className).toContain("lg:overflow-y-auto");
+    expect(rail?.className).toContain("lg:max-h-[calc(100vh-6rem)]");
   });
 
   test("the body reads in a serif at the default size and keeps a readable measure inside the wide article frame", () => {

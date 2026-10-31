@@ -1,3 +1,8 @@
+## [ui-v0.5.433] - 2026-10-31
+
+- `ArticleView` reading settings: the "Aa" toolbar button now opens a panel with Typeface (Serif or Sans), Text size (four steps), Line spacing (Tight, Normal, Roomy) and Page width (Normal or Narrow). Each choice is kept per person in this browser (`maipai.article.text-size`, `.font`, `.spacing`, `.width`) and applies to every article the reader draws, the news included. New `ReadingSettings` module (`useReadingPrefs`, `ReadingSettingsButton`, `READING_CLASSES`). Colours are not part of it: the page follows the person's theme. The old one-tap size button is gone (its label "Text size" is now the panel's "Reading settings").
+- `ArticleView` right column (`article-rail`, the facts card, contents and related list): it now has its own scroll below the sticky offset (`lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto`), so a tall rail is never cut off at the bottom of the screen.
+
 ## [ui-v0.5.432] - 2026-10-30
 
 - New `TierSegment` Element: the Standard, Boost, Max choice for a picture, video or song card (give it only the tiers the person may pick; a tier with a `confirm` line asks once before it applies) and `TierChip`, the composer model chip's tier marker (a held Max can be tapped to release). Additive; nothing else changes. TIER-UI-01. `ui-v0.5.431` was cut before this version bump and is not used.

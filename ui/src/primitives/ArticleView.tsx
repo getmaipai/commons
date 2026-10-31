@@ -12,6 +12,7 @@ import { StoryFeed, type StoryAction, type StoryActionIds, type StoryCardData } 
 import { SafeImage } from "./SafeImage";
 import { FocalImage } from "./FocalImage";
 import { ArticleSpeechContext } from "./articleSpeech";
+import { READING_CLASSES, ReadingSettingsButton, useReadingPrefs } from "./ReadingSettings";
 import { ArticleContentsNav, ArticleInfoboxCard, ArticlePreviewContext, PreviewLink, useActiveSection, usePhoneWidth, type ArticleContentsItem, type ArticleInfobox, type ArticlePreviewLoader } from "./articleReader";
 
 export { ArticleSpeechContext, type ArticleSpeech } from "./articleSpeech";
@@ -23,7 +24,6 @@ const PlayIcon = getIcon("play");
 const BookmarkIcon = getIcon("bookmark");
 const EllipsisIcon = getIcon("more-horizontal");
 const ShareIcon = getIcon("share");
-const TypeIcon = getIcon("a-large-small");
 const HeadphonesIcon = getIcon("headphones");
 const MessageIcon = getIcon("message-circle");
 const SparklesIcon = getIcon("sparkles");
@@ -184,25 +184,6 @@ function Block({ block, renderTargetLink }: { block: ArticleBlockData; renderTar
   }
 }
 
-/** The reading size, per viewer in this browser: three steps on the body only, never the headline or the page. */
-const TEXT_SIZES = [
-  { id: "small", label: "Smaller", className: "text-base" },
-  { id: "medium", label: "Default", className: "text-lg" },
-  { id: "large", label: "Larger", className: "text-xl" },
-] as const;
-type TextSizeId = (typeof TEXT_SIZES)[number]["id"];
-/** One tap steps the size: Default, then Larger, then Smaller, then Default again. */
-const NEXT_SIZE: Record<TextSizeId, TextSizeId> = { medium: "large", large: "small", small: "medium" };
-const TEXT_SIZE_KEY = "maipai.article.text-size";
-
-function readTextSize(): TextSizeId {
-  try {
-    const stored = window.localStorage.getItem(TEXT_SIZE_KEY);
-    if (TEXT_SIZES.some((size) => size.id === stored)) return stored as TextSizeId;
-  } catch { /* storage can be blocked: the default size is fine */ }
-  return "medium";
-}
-
 /** Words are found by their text, never re-rendered: the Custom Highlight API paints the spoken range and the current word over the
  * body as it stands, so reading never costs a re-render per word. A browser without it just shows the Listen state. */
 function useSpokenHighlight(bodyRef: React.RefObject<HTMLElement | null>, active: boolean, progress: number) {
@@ -347,7 +328,7 @@ function FoldedBody({ blocks, renderTargetLink, open, onToggle }: { blocks: Arti
 export function ArticleView({ data, onAction, available = [], ids, onBack, renderTargetLink, footer, loadPreview, className }: ArticleViewProps) {
   const can = (a: ArticleAction) => onAction !== undefined && available.includes(a);
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
-  const [textSize, setTextSize] = useState<TextSizeId>(readTextSize);
+  const [reading, setReading] = useReadingPrefs();
   const [iconFailed, setIconFailed] = useState(false);
   // Save answers at once: the page's own answer arrives a moment later and wins whenever it differs.
   const [saved, setSaved] = useState(data.saved === true);
@@ -388,11 +369,6 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       window.removeEventListener("resize", measure);
     };
   }, [data.title]);
-  const chooseSize = (id: TextSizeId) => {
-    setTextSize(id);
-    try { window.localStorage.setItem(TEXT_SIZE_KEY, id); } catch { /* not kept this time */ }
-  };
-  const bodySize = TEXT_SIZES.find((size) => size.id === textSize)!.className;
   const canShare = can("open_site") && !!data.open_url && typeof navigator !== "undefined" && typeof navigator.share === "function";
   const hasMore = can("open_site") && !!data.open_url;
   const hasAssist = can("listen") || can("discuss");
@@ -446,16 +422,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         <div data-slot="article-toolbar" className="flex h-14 items-center gap-1 bg-transparent px-0 py-1">
           {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" className="rounded-full" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
           <div data-slot="article-actions" className="ml-auto flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-lg"
-              className="rounded-full"
-              aria-label="Text size"
-              title={`Text size: ${TEXT_SIZES.find((size) => size.id === textSize)!.label}. Tap to change.`}
-              onClick={() => chooseSize(NEXT_SIZE[textSize])}
-            >
-              <TypeIcon aria-hidden />
-            </Button>
+            <ReadingSettingsButton prefs={reading} onChange={setReading} />
             {canShare ? <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label="Share" onClick={shareNow}><ShareIcon aria-hidden /></Button> : null}
             {can("save") ? (
               <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label={saved ? "Saved" : "Save"} aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}>
@@ -513,7 +480,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
       {hasAssist || data.key_points || summarizing || data.quick_fact || (data.related && data.related.length > 0) || data.infobox || (data.contents && data.contents.length > 0) ? (
-        <div data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start lg:[grid-row:1/span_99] lg:col-start-2">
+        <div data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:[grid-row:1/span_99] lg:col-start-2">
         {hasAssist ? (
           <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex gap-2 [&>*]:flex-1">
             {can("listen") ? (
@@ -542,7 +509,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       {hasActionRow && rowPlace === "under-hero" ? actionRowEl : null}
       {data.lead ? <p data-slot="article-standfirst" className="text-2xl leading-snug font-semibold">{data.lead}</p> : null}
-      <div ref={bodyRef} data-slot="article-body" data-text-size={textSize} className={cn("flex w-full min-w-0 flex-col gap-4 font-serif leading-[1.6] [&[data-text-size=medium]]:text-xl", bodySize)}>
+      <div ref={bodyRef} data-slot="article-body" data-text-size={reading.size} className={cn("flex w-full min-w-0 flex-col gap-4 [&[data-text-size=medium]]:text-xl [&[data-text-size=xlarge]]:text-2xl", READING_CLASSES.font[reading.font], READING_CLASSES.size[reading.size], READING_CLASSES.spacing[reading.spacing], READING_CLASSES.width[reading.width])}>
         {folding ? <FoldedBody blocks={data.blocks} renderTargetLink={renderTargetLink} open={openSections} onToggle={toggleSection} /> : plainBlocks}
       </div>
       {data.also_covering && data.also_covering.length > 0 ? (
