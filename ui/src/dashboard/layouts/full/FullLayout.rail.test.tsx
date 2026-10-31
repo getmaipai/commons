@@ -226,10 +226,10 @@ describe("LEFTNAV-APPS-01 pinned apps and the launcher", () => {
     expect(view.queryByRole("link", { name: "Notes" })).toBeNull();
   });
 
-  test("at most six pinned apps draw in the rail", () => {
+  test("all pinned apps draw in the rail", () => {
     const apps = Array.from({ length: 8 }, (_, i) => app(`app${i}`, true));
     const view = renderApps("/", apps);
-    expect(view.container.querySelectorAll('[data-slot="app-rail-app"]').length).toBe(6);
+    expect(view.container.querySelectorAll('[data-slot="app-rail-app"]').length).toBe(8);
   });
 
   test("the launcher lists every app and pins or unpins one", async () => {
@@ -254,12 +254,12 @@ describe("LEFTNAV-APPS-01 pinned apps and the launcher", () => {
     expect(at("/all-apps").getByRole("link", { name: "All apps" }).getAttribute("aria-current")).toBe("page");
   });
 
-  test("a seventh app cannot be pinned while six are", async () => {
+  test("an app can be pinned when six are already pinned", async () => {
     const apps = [...Array.from({ length: 6 }, (_, i) => app(`app${i}`, true)), app("extra", false)];
     const view = renderApps("/", apps);
     fireEvent.click(view.getByRole("button", { name: "All apps" }));
     const pin = await waitFor(() => view.getByRole("button", { name: /Pin Extra to the rail/ }));
-    expect((pin as HTMLButtonElement).disabled).toBe(true);
+    expect((pin as HTMLButtonElement).disabled).toBe(false);
   });
 });
 

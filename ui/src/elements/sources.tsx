@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { ChevronDownIcon } from "lucide-react";
 import {
   Collapsible,
@@ -12,11 +13,21 @@ import { collapsePanel, fieldInteractive, mono, paper } from "./surfaces";
 export interface Source {
   domain: string;
   title: string;
+  /** Optional destination for the source. */
+  url?: string;
   /** Optional extra line (a licence and snapshot date, e.g.). Rendered on
    * its own wrapping line under the title, never folded into `domain`, so
    * it is not clipped by the list layout's truncated domain. Absent: the
    * output is identical to before. */
   detail?: string;
+}
+
+function SourceRow({ source, children, className }: { source: Source; children: ReactNode; className: string }) {
+  return source.url ? (
+    <a href={source.url} target="_blank" rel="noopener noreferrer" className={className}>{children}</a>
+  ) : (
+    <div className={className}>{children}</div>
+  );
 }
 
 export interface SourcesProps {
@@ -96,8 +107,9 @@ export function Sources({
         {layout === "list" ? (
           <div className="flex flex-col gap-1 pt-2.5" data-slot="sources-list">
             {sources.map((source, index) => (
-              <div
+              <SourceRow
                 key={index}
+                source={source}
                 className={cn("flex items-center gap-2 rounded-lg px-1 py-1", source.detail && "flex-wrap gap-y-0.5")}
               >
                 <SourceGlyph domain={source.domain} />
@@ -121,14 +133,15 @@ export function Sources({
                     {source.detail}
                   </span>
                 ) : null}
-              </div>
+              </SourceRow>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2 pt-2.5">
             {sources.map((source, index) => (
-              <div
+              <SourceRow
                 key={index}
+                source={source}
                 className={cn(
                   paper,
                   "flex flex-col gap-1.5 rounded-2xl p-3 transition-transform hover:-translate-y-px",
@@ -148,7 +161,7 @@ export function Sources({
                     {source.detail}
                   </span>
                 ) : null}
-              </div>
+              </SourceRow>
             ))}
           </div>
         )}

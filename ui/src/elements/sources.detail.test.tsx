@@ -42,6 +42,23 @@ describe("Source.detail", () => {
     expect(c.querySelector('[data-slot="sources-list"] > div')?.className).toContain("flex-wrap");
   });
 
+  test("URLs make rows links in both layouts, while sources without URLs stay plain rows", () => {
+    for (const layout of ["list", "grid"] as const) {
+      const url = "https://example.com/article";
+      const linked = render(<Sources sources={[{ ...base, url }]} open onOpenChange={() => {}} layout={layout} hideTrigger />);
+      const anchor = linked.container.querySelector("a");
+      expect(anchor?.getAttribute("href")).toBe(url);
+      expect(anchor?.getAttribute("target")).toBe("_blank");
+      expect(anchor?.getAttribute("rel")).toBe("noopener noreferrer");
+      cleanup();
+
+      const plain = render(<Sources sources={[base]} open onOpenChange={() => {}} layout={layout} hideTrigger />);
+      expect(plain.container.querySelector("a")).toBeNull();
+      expect(plain.container.querySelector(layout === "list" ? '[data-slot="sources-list"] > div' : ".grid > div")).not.toBeNull();
+      cleanup();
+    }
+  });
+
   test("grid: renders under the title", () => {
     const d = html("grid", licence).querySelector('[data-slot="source-detail"]') as HTMLElement;
     expect(d.textContent).toBe(licence);

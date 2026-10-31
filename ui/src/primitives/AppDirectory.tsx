@@ -25,7 +25,7 @@ export interface DirectoryApp {
 export interface AppDirectoryProps {
   apps: readonly DirectoryApp[];
   onToggleFavorite: (app: DirectoryApp) => void;
-  /** How many favorites the rail holds. At the limit a non-favorite's star is held with the reason. */
+  /** Optional maximum favorites count. When omitted, favorites are unlimited. */
   favoritesLimit?: number;
   /** Disables the stars while the host saves. */
   busy?: boolean;
@@ -61,10 +61,10 @@ export function groupApps(apps: readonly DirectoryApp[]): Array<{ heading: strin
   ];
 }
 
-function Tile({ app, current, starDisabled, starReason, onToggle }: { app: DirectoryApp; current: boolean; starDisabled: boolean; starReason?: string; onToggle: () => void }) {
+function Tile({ app, current, starDisabled, onToggle }: { app: DirectoryApp; current: boolean; starDisabled: boolean; onToggle: () => void }) {
   const Icon = getIcon(app.icon);
   const StarIcon = getIcon("star");
-  const starLabel = app.favorite ? `Remove ${app.name} from favorites` : starReason ? `Add ${app.name} to favorites (${starReason})` : `Add ${app.name} to favorites`;
+  const starLabel = app.favorite ? `Remove ${app.name} from favorites` : `Add ${app.name} to favorites`;
   return (
     <li data-slot="app-directory-tile" className="relative min-w-0">
       <Link
@@ -92,9 +92,9 @@ function Tile({ app, current, starDisabled, starReason, onToggle }: { app: Direc
           size="icon"
           aria-label={starLabel}
           aria-pressed={app.favorite}
-          disabled={starDisabled}
+          aria-disabled={starDisabled || undefined}
           onClick={onToggle}
-          className="absolute top-1/2 right-1.5 -translate-y-1/2"
+          className={cn("absolute top-1/2 right-1.5 -translate-y-1/2", starDisabled && "opacity-50")}
         >
           <StarIcon aria-hidden fill={app.favorite ? "currentColor" : "none"} />
         </Button>
@@ -109,6 +109,7 @@ function Tile({ app, current, starDisabled, starReason, onToggle }: { app: Direc
  * favorite. */
 export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, currentTo, hideTitle }: AppDirectoryProps) {
   const [query, setQuery] = useState("");
+  const [notice, setNotice] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const SearchIcon = getIcon("search");
@@ -166,7 +167,7 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
             ref={searchRef}
             type="search"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => { setQuery(event.target.value); setNotice(""); }}
             onKeyDown={(event) => {
               if (event.key === "Escape" && query) { event.preventDefault(); setQuery(""); }
               if (event.key === "ArrowDown") { event.preventDefault(); focusTile(0); }
@@ -179,7 +180,7 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
           />
         </InputGroup>
         <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
-          {trimmed ? `${results.length} ${results.length === 1 ? "app matches" : "apps match"} "${trimmed}"` : `${apps.length} ${apps.length === 1 ? "app" : "apps"}`}
+          {notice || (trimmed ? `${results.length} ${results.length === 1 ? "app matches" : "apps match"} "${trimmed}"` : `${apps.length} ${apps.length === 1 ? "app" : "apps"}`)}
         </p>
       </div>
 
@@ -200,8 +201,15 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
                     app={app}
                     current={currentTo === app.to}
                     starDisabled={busy === true || (!app.favorite && full)}
-                    starReason={!app.favorite && full ? "the rail is full, remove one first" : undefined}
-                    onToggle={() => onToggleFavorite(app)}
+                    onToggle={() => {
+                      if (busy) return;
+                      if (!app.favorite && full) {
+                        setNotice(`The left rail holds ${favoritesLimit} apps. Remove one from Favorites first.`);
+                        return;
+                      }
+                      setNotice("");
+                      onToggleFavorite(app);
+                    }}
                   />
                 ))}
               </ul>

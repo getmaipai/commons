@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { Link, MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { AppDirectory, groupApps, matchesApp, type DirectoryApp } from "@/kit/primitives/AppDirectory";
 
 afterEach(cleanup);
@@ -22,8 +22,16 @@ const core: DirectoryApp[] = [{ id: "chat", name: "Chat", to: "/chat", icon: "me
 
 function show(apps: DirectoryApp[], over: Partial<React.ComponentProps<typeof AppDirectory>> = {}) {
   const onToggleFavorite = mock((_app: DirectoryApp) => {});
-  const view = render(<MemoryRouter><AppDirectory apps={apps} onToggleFavorite={onToggleFavorite} {...over} /></MemoryRouter>);
+  const view = render(<MemoryRouter initialEntries={["/directory"]}><Routes>
+    <Route path="/directory" element={<><AppDirectory apps={apps} onToggleFavorite={onToggleFavorite} {...over} /><Link to="/visited">Visited</Link></>} />
+    <Route path="/visited" element={<Visited />} />
+  </Routes></MemoryRouter>);
   return { ...view, onToggleFavorite };
+}
+
+function Visited() {
+  const location = useLocation();
+  return <p data-testid="visited">{location.pathname}</p>;
 }
 
 describe("AppDirectory", () => {
@@ -83,13 +91,33 @@ describe("AppDirectory", () => {
     expect(view.getByRole("button", { name: "Remove App 01 from favorites" }).getAttribute("aria-pressed")).toBe("true");
   });
 
-  test("at the rail's limit a new star is held with the reason, and removing one stays possible", () => {
+  test("at the rail's limit a new star does not open the app and explains why it is held", () => {
     const view = show(fake(10, [0, 1, 2]), { favoritesLimit: 3 });
-    const held = view.getByRole("button", { name: /Add App 05 to favorites \(the rail is full, remove one first\)/ }) as HTMLButtonElement;
-    expect(held.disabled).toBe(true);
-    expect((view.getByRole("button", { name: "Remove App 01 from favorites" }) as HTMLButtonElement).disabled).toBe(false);
+    const held = view.getByRole("button", { name: "Add App 05 to favorites" }) as HTMLButtonElement;
+    fireEvent.click(held);
+    expect(held.getAttribute("aria-disabled")).toBe("true");
+    expect(view.queryByTestId("visited")).toBeNull();
+    expect(view.onToggleFavorite).not.toHaveBeenCalled();
+    expect(view.getByRole("status").textContent).toBe("The left rail holds 3 apps. Remove one from Favorites first.");
+    fireEvent.click(view.getByRole("button", { name: "Remove App 01 from favorites" }));
+    expect(view.onToggleFavorite.mock.calls.map(([app]) => app.id)).toEqual(["app1"]);
     expect(view.getByText("3 of 3 in the left rail")).toBeTruthy();
     expect(view.getByRole("heading", { name: "Favorites 3 of 3 in the left rail" })).toBeTruthy();
+  });
+
+  test("while busy a star does not open the app or toggle", () => {
+    const view = show(fake(5), { busy: true });
+    fireEvent.click(view.getByRole("button", { name: "Add App 02 to favorites" }));
+    expect(view.queryByTestId("visited")).toBeNull();
+    expect(view.onToggleFavorite).not.toHaveBeenCalled();
+    expect(view.getByRole("status").textContent).toBe("5 apps");
+  });
+
+  test("below the limit a new star toggles without opening the app", () => {
+    const view = show(fake(5), { favoritesLimit: 3 });
+    fireEvent.click(view.getByRole("button", { name: "Add App 02 to favorites" }));
+    expect(view.queryByTestId("visited")).toBeNull();
+    expect(view.onToggleFavorite.mock.calls.map(([app]) => app.id)).toEqual(["app2"]);
   });
 
   test("built-in apps open but have no star", () => {

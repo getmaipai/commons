@@ -33,7 +33,7 @@ export interface RailCoreDestination {
   icon: string;
 }
 
-/** At most this many pinned apps draw in the rail; the rest stay in the launcher. */
+/** @deprecated Pinned apps now scroll in the rail; there is no cap. */
 export const RAIL_APPS_MAX = 6;
 
 export interface AppRailProps {
@@ -48,7 +48,7 @@ export interface AppRailProps {
   /** The host's profile control, pinned to the bottom of the rail. */
   profile?: ReactNode;
   /** Installed apps in the order the host wants them: the pinned ones draw in the rail below the built-in
-   * destinations (at most RAIL_APPS_MAX); every one is listed in the launcher at the foot of the rail, which pins
+   * destinations; every one is listed in the launcher at the foot of the rail, which pins
    * and unpins through `onTogglePin`. Without `apps` the rail is exactly the built-in destinations. */
   apps?: RailApp[];
   /** Fixed host destinations, rendered after the built-in Chat entry and before the remaining core entries. */
@@ -119,8 +119,6 @@ function ItemTooltip({ name, status }: { name: string; status: ReturnType<RailIt
 function AppLauncher({ apps, onTogglePin, isActive }: { apps: RailApp[]; onTogglePin?: AppRailProps["onTogglePin"]; isActive: (url: string) => boolean }) {
   const [open, setOpen] = useState(false);
   const GridIcon = getIcon("layout-grid");
-  const pinnedCount = apps.filter((app) => app.pinned).length;
-  const full = pinnedCount >= RAIL_APPS_MAX;
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <Tooltip>
@@ -135,7 +133,6 @@ function AppLauncher({ apps, onTogglePin, isActive }: { apps: RailApp[]; onToggl
           {apps.map((app) => {
             const Icon = getIcon(app.icon);
             const active = isActive(app.url);
-            const blocked = !app.pinned && full;
             return (
               <li key={app.url} className="flex items-center gap-1">
                 <Link
@@ -152,9 +149,8 @@ function AppLauncher({ apps, onTogglePin, isActive }: { apps: RailApp[]; onToggl
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={app.pinned ? `Unpin ${app.name} from the rail` : blocked ? `Pin ${app.name} to the rail (the rail is full, unpin one first)` : `Pin ${app.name} to the rail`}
+                    aria-label={app.pinned ? `Unpin ${app.name} from the rail` : `Pin ${app.name} to the rail`}
                     aria-pressed={app.pinned}
-                    disabled={blocked}
                     onClick={() => onTogglePin(app.url, !app.pinned)}
                   >
                     {app.pinned ? <PinOff aria-hidden /> : <Pin aria-hidden />}
@@ -164,7 +160,6 @@ function AppLauncher({ apps, onTogglePin, isActive }: { apps: RailApp[]; onToggl
             );
           })}
         </ul>
-        {full ? <p className="px-1 text-xs text-muted-foreground">The rail holds {RAIL_APPS_MAX} apps. Unpin one to pin another.</p> : null}
       </PopoverContent>
     </Popover>
   );
@@ -210,7 +205,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
     ...afterExtra,
   ];
   const isActive = (url: string) => (activeAppHref ? railHref(activeAppHref) === railHref(url) : isRailItemActive(pathname, url));
-  const pinnedApps = mobile ? (apps ?? []) : (apps ?? []).filter((app) => app.pinned).slice(0, RAIL_APPS_MAX);
+  const pinnedApps = mobile ? (apps ?? []) : (apps ?? []).filter((app) => app.pinned);
   const entryClass = mobile ? "relative flex min-h-12 w-full items-center gap-3 rounded-lg px-3 text-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring" : railButton;
   const homeActive = home?.url ? (activeAppHref ? railHref(activeAppHref) === railHref(home.url) : isRailItemActive(pathname, home.url)) : false;
   const homeStatus = home ? itemStatus?.(home) : undefined;
@@ -293,6 +288,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
       </ul>
 
       {pinnedApps.length ? (
+        <div data-slot="app-rail-pinned" className={cn(!mobile && "min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:thin]")}>
         <ul data-slot="app-rail-apps" aria-label={mobile ? "Installed apps" : "Pinned apps"} className={cn("mt-1 flex flex-col gap-1 border-t border-border pt-2", !mobile && "items-center")}>
           {pinnedApps.map((app) => {
             const active = isActive(app.url);
@@ -323,6 +319,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
             );
           })}
         </ul>
+        </div>
       ) : null}
 
       {children}
@@ -336,7 +333,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
 
 export default function AppRail(props: AppRailProps) {
   return <nav aria-label="Primary navigation" data-slot="app-rail" data-tour={props.tourId}
-    className="sticky top-0 flex h-svh w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)] shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2">
+    className="sticky top-0 flex h-svh min-h-0 w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)] shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2">
     <RailEntries {...props} />
   </nav>;
 }
