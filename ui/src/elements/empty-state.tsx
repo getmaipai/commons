@@ -19,14 +19,17 @@ export function EmptyState({ className, ...props }: ComponentProps<"div">) {
 }
 
 export function EmptyStateGreeting({
+  size = "default",
   className,
   ...props
-}: ComponentProps<"h2">) {
+}: ComponentProps<"h2"> & { size?: "default" | "lg" }) {
   return (
     <h2
       data-slot="empty-state-greeting"
+      data-size={size}
       className={cn(
-        "fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-center text-2xl font-medium tracking-tight duration-500 motion-reduce:animate-none",
+        "fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-center font-medium tracking-tight duration-500 motion-reduce:animate-none",
+        size === "lg" ? "text-3xl" : "text-2xl",
         className,
       )}
       {...props}

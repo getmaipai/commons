@@ -1,3 +1,7 @@
+## [ui-v0.5.434] - 2026-10-31
+
+- `EmptyStateGreeting` takes `size` (`default` or `lg`): the new-chat greeting in Home uses `lg`.
+
 ## [ui-v0.5.433] - 2026-10-31
 
 - `ArticleView` reading settings: the "Aa" toolbar button now opens a panel with Typeface (Serif or Sans), Text size (four steps), Line spacing (Tight, Normal, Roomy) and Page width (Normal or Narrow). Each choice is kept per person in this browser (`maipai.article.text-size`, `.font`, `.spacing`, `.width`) and applies to every article the reader draws, the news included. New `ReadingSettings` module (`useReadingPrefs`, `ReadingSettingsButton`, `READING_CLASSES`). Colours are not part of it: the page follows the person's theme. The old one-tap size button is gone (its label "Text size" is now the panel's "Reading settings").
