@@ -217,6 +217,7 @@ export const Recipe = z
               .object({
                 op: z.literal("remember"),
                 text: z.string(),
+                /**The same list as memory-record.schema.json's category. instruction: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope.*/
                 category: z
                   .enum([
                     "person",
@@ -230,7 +231,11 @@ export const Recipe = z
                     "relationship",
                     "fact",
                     "state",
+                    "instruction",
                   ])
+                  .describe(
+                    "The same list as memory-record.schema.json's category. instruction: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope.",
+                  )
                   .optional(),
                 scope: z.enum(["household", "person", "self"]).optional(),
                 /**Skip this step when that variable is bound, non-null and non-empty.*/

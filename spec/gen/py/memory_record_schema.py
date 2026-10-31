@@ -75,7 +75,11 @@ class MemoryRecord(BaseModel):
         'relationship',
         'fact',
         'state',
-    ]
+        'instruction',
+    ] = Field(
+        ...,
+        description='What the record is about. instruction: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope.',
+    )
     tier: Literal['durable', 'episodic', 'observation']
     status: Literal['active', 'superseded', 'archived']
     scope: Literal['household', 'person', 'self', 'companion'] = Field(

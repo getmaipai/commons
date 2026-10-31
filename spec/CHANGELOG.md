@@ -1,3 +1,7 @@
+## [spec-v0.1.282] - 2026-10-31
+
+- MemoryRecord and the recipe `remember` step gain the category `instruction`: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope. The category field now carries a description. Additive.
+
 ## [spec-v0.1.281] - 2026-10-30
 
 - MEM-SPACE-09: settings key `resources.close_apps.no_reopen`, the apps Home does not reopen after a job (the per-app Reopen when done switch; `reopen` stays the household default). Additive.

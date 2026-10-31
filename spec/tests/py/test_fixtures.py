@@ -579,6 +579,7 @@ def test_source_archive_fixture():
         "in-project",
         "device-id-device",
         "device-id-null",
+        "instruction",
     ],
 )
 def test_memory_record_fixtures(kind):

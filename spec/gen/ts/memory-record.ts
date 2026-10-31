@@ -16,19 +16,25 @@ export const MemoryRecord = z
       ),
     record_kind: z.enum(["memory", "entity", "episode"]),
     text: z.string().min(1),
-    category: z.enum([
-      "person",
-      "place",
-      "thing",
-      "preference",
-      "identity",
-      "event",
-      "project",
-      "goal",
-      "relationship",
-      "fact",
-      "state",
-    ]),
+    /**What the record is about. instruction: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope.*/
+    category: z
+      .enum([
+        "person",
+        "place",
+        "thing",
+        "preference",
+        "identity",
+        "event",
+        "project",
+        "goal",
+        "relationship",
+        "fact",
+        "state",
+        "instruction",
+      ])
+      .describe(
+        "What the record is about. instruction: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope.",
+      ),
     tier: z.enum(["durable", "episodic", "observation"]),
     status: z.enum(["active", "superseded", "archived"]),
     /**self: the companion's own memory of itself, not shared with anyone. companion (SPEC-01, dev.md 'Coherence review' question 1, 'one memory record, seven bumps'): the same idea keyed to one specific companion by companion_id, for a household running more than one companion package (COMP-03 onward) where 'itself' is no longer one thing.*/

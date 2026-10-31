@@ -223,9 +223,13 @@ class RememberStep(BaseModel):
             'relationship',
             'fact',
             'state',
+            'instruction',
         ]
         | None
-    ) = None
+    ) = Field(
+        None,
+        description="The same list as memory-record.schema.json's category. instruction: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope.",
+    )
     scope: Literal['household', 'person', 'self'] | None = None
     unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
         None,

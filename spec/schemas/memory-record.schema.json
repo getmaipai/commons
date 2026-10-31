@@ -28,8 +28,9 @@
       "type": "string",
       "enum": [
         "person", "place", "thing", "preference", "identity", "event",
-        "project", "goal", "relationship", "fact", "state"
-      ]
+        "project", "goal", "relationship", "fact", "state", "instruction"
+      ],
+      "description": "What the record is about. instruction: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope."
     },
     "tier": {
       "type": "string",
