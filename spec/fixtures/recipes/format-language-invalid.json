@@ -1,0 +1,18 @@
+{
+  "description": "An invalid interpolated language tag is omitted from the reply.",
+  "recipe": {
+    "id": "format-language-invalid",
+    "steps": [
+      { "op": "format", "as": "reply", "text": "Hola", "language": "Spanish" }
+    ]
+  },
+  "inputs": {},
+  "host_setup": {},
+  "expected": {
+    "reply": { "text": "Hola", "speech": "Hola" },
+    "actions": [],
+    "scheduled_jobs": [],
+    "home_calls": [],
+    "memory_added": []
+  }
+}

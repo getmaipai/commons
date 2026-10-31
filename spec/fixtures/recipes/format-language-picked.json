@@ -1,0 +1,19 @@
+{
+  "description": "A format step interpolates a picked BCP-47 language value into the reply and scope value.",
+  "recipe": {
+    "id": "format-language-picked",
+    "steps": [
+      { "op": "pick", "as": "reply_language", "from": "request", "path": "language" },
+      { "op": "format", "as": "reply", "text": "Hola", "language": "{reply_language}" }
+    ]
+  },
+  "inputs": { "request": { "language": "es" } },
+  "host_setup": {},
+  "expected": {
+    "reply": { "text": "Hola", "speech": "Hola", "language": "es" },
+    "actions": [],
+    "scheduled_jobs": [],
+    "home_calls": [],
+    "memory_added": []
+  }
+}

@@ -141,6 +141,13 @@ export const Recipe = z
                     "A template for the spoken form. Falls back to text if omitted.",
                   )
                   .optional(),
+                /**A template for the BCP-47 tag of the language the reply is written in; omitted when it interpolates to empty or to something that is not a BCP-47 tag.*/
+                language: z
+                  .string()
+                  .describe(
+                    "A template for the BCP-47 tag of the language the reply is written in; omitted when it interpolates to empty or to something that is not a BCP-47 tag.",
+                  )
+                  .optional(),
                 /**Named fields for the result's `data` (result.schema.json): each value is a template; a template that is exactly one {variable} keeps that variable's own type (a number stays a number), anything else is interpolated text. What a composer (CHAT-16) phrases from, beside the reply text.*/
                 data: z
                   .record(z.string(), z.string())

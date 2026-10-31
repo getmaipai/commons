@@ -97,6 +97,7 @@
         "as": { "type": "string" },
         "text": { "type": "string", "description": "A template with {variable} interpolation for the on-screen reply. May be omitted when `synthesis_hint` is given: the result then carries `data` and the hint and no reply, and the composer (CHAT-16) phrases the answer." },
         "speech": { "type": "string", "description": "A template for the spoken form. Falls back to text if omitted." },
+        "language": { "type": "string", "description": "A template for the BCP-47 tag of the language the reply is written in; omitted when it interpolates to empty or to something that is not a BCP-47 tag." },
         "data": {
           "type": "object",
           "additionalProperties": { "type": "string" },

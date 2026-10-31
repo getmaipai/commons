@@ -157,8 +157,24 @@ async def run_recipe(recipe: Any, inputs: dict[str, Any], host: Any) -> dict[str
             else:
                 text = interpolate(step.text, scope)
                 speech = interpolate(step.speech, scope) if step.speech else text
-                scope[step.as_] = {"text": text, "speech": speech}
-                reply = {"text": text, "speech": speech}
+                language = (
+                    interpolate(step.language, scope).strip() if step.language else ""
+                )
+                reply_language = (
+                    language
+                    if re.fullmatch(r"[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*", language)
+                    else None
+                )
+                scope[step.as_] = {
+                    "text": text,
+                    "speech": speech,
+                    **({"language": reply_language} if reply_language else {}),
+                }
+                reply = {
+                    "text": text,
+                    "speech": speech,
+                    **({"language": reply_language} if reply_language else {}),
+                }
             synthesis_hint = step.synthesis_hint
             # Named fields beside the text (result.schema.json's `data`): a
             # template that is exactly one {variable} keeps the variable's

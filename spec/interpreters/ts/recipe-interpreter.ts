@@ -9,7 +9,7 @@ import type { Host } from "../../emulators/ts/host-emulator.js";
 import { evaluateExpression } from "./compute.js";
 
 export interface PluginResult {
-  reply?: { text: string; speech?: string };
+  reply?: { text: string; speech?: string; language?: string };
   /** Named fields beside the reply (a `format` step's `data`): what a
    * composer phrases from, typed as the recipe bound them. */
   data?: Record<string, unknown>;
@@ -57,7 +57,7 @@ type RecipeStep =
   | { op: "fetch"; unless_set?: string; as: string; url: string; method?: "GET" | "POST"; headers?: Record<string, string>; body?: unknown }
   | { op: "pick"; as: string; from: string; path?: string; unless_set?: string }
   | { op: "lookup"; as: string; from: string; table: Record<string, string>; default?: string; unless_set?: string }
-  | { op: "format"; as: string; text?: string; speech?: string; data?: Record<string, string>; synthesis_hint?: string; unless_set?: string }
+  | { op: "format"; as: string; text?: string; speech?: string; language?: string; data?: Record<string, string>; synthesis_hint?: string; unless_set?: string }
   | { op: "home.call_service"; domain: string; service: string; target: Record<string, unknown>; data?: Record<string, unknown>; unless_set?: string }
   | { op: "action"; kind: string; payload?: Record<string, unknown>; unless_set?: string }
   | { op: "remember"; text: string; category?: string; scope?: string; unless_set?: string }
@@ -142,7 +142,7 @@ function pickPath(value: unknown, path: string | undefined): unknown {
 export async function runRecipe(recipe: Recipe, inputs: Scope, host: Host): Promise<PluginResult> {
   const scope: Scope = { ...inputs };
   const actions: { kind: string; payload?: unknown }[] = [];
-  let reply: { text: string; speech?: string } | undefined;
+  let reply: { text: string; speech?: string; language?: string } | undefined;
   let data: Record<string, unknown> | undefined;
   let synthesisHint: string | undefined;
   let ask: PluginResult["ask"];
@@ -181,8 +181,10 @@ export async function runRecipe(recipe: Recipe, inputs: Scope, host: Host): Prom
         } else {
           const text = interpolate(step.text, scope);
           const speech = step.speech ? interpolate(step.speech, scope) : text;
-          scope[step.as] = { text, speech };
-          reply = { text, speech };
+          const language = step.language ? interpolate(step.language, scope).trim() : "";
+          const replyLanguage = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(language) ? language : undefined;
+          scope[step.as] = { text, speech, ...(replyLanguage ? { language: replyLanguage } : {}) };
+          reply = { text, speech, ...(replyLanguage ? { language: replyLanguage } : {}) };
         }
         synthesisHint = step.synthesis_hint;
         // Named fields beside the text (result.schema.json's `data`): a
