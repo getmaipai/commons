@@ -730,6 +730,16 @@ export const ConversationTurn = z
                         .object({
                           text: z.string(),
                           speech: z.string().optional(),
+                          /**BCP-47 tag of the language the reply's text and speech are written in ("es", "es-MX"). Optional; absent means the household's own language. The hub speaks the reply with an installed voice for this language, and says so plainly when none is installed (getmaipai/home#58).*/
+                          language: z
+                            .string()
+                            .regex(
+                              new RegExp("^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$"),
+                            )
+                            .describe(
+                              'BCP-47 tag of the language the reply\'s text and speech are written in ("es", "es-MX"). Optional; absent means the household\'s own language. The hub speaks the reply with an installed voice for this language, and says so plainly when none is installed (getmaipai/home#58).',
+                            )
+                            .optional(),
                         })
                         .strict()
                         .optional(),
