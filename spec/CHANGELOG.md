@@ -1,3 +1,7 @@
+## [spec-v0.1.284] - 2026-10-31
+
+- Recipe `format` steps gain an optional interpolated BCP-47 `language` for replies. Invalid or empty values are omitted. Additive.
+
 ## [spec-v0.1.283] - 2026-10-31
 
 - getmaipai/home#58: optional `PluginResult.reply.language`, a BCP-47 tag for the reply text and speech. The hub uses an installed voice for that language or says plainly when none is installed. New valid `es` and `es-MX` fixtures and an invalid language fixture. Additive.
