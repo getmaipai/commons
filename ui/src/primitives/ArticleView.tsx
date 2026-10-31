@@ -51,6 +51,8 @@ export type ArticleBlockData =
 export interface ArticleViewData {
   title: string;
   kicker?: string;
+  /** Makes the label above the title a button (Reference: it opens the category). */
+  onKicker?: () => void;
   /** `chip` draws the kicker as a chip instead of small uppercase text. */
   kickerStyle?: "chip";
   /** Where the page sits: each item is plain text, or a button when it has `onClick`; the last item is the page itself. */
@@ -350,12 +352,13 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   // Once the headline has scrolled up under the pinned row, the row names the story instead of the publisher.
   const titleRef = useRef<HTMLHeadingElement>(null);
   const providerRef = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const [condensed, setCondensed] = useState(false);
   useEffect(() => {
     // Measured against the pinned row itself, so it holds in any scroll container (the shell scrolls an inner pane, not the window).
     const measure = () => {
       const title = titleRef.current;
-      const row = providerRef.current;
+      const row = providerRef.current ?? toolbarRef.current;
       if (!title || !row) return;
             const rowBottom = row.getBoundingClientRect().bottom;
       const gap = title.getBoundingClientRect().bottom - rowBottom;
@@ -419,8 +422,9 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
     <ArticlePreviewContext.Provider value={loadPreview ?? null}><article data-slot="article-view" className={cn("flex w-full min-w-0 flex-col", className)}>
       <div data-slot="article-sticky-header" className="sticky top-0 z-30 -mb-14 flex flex-col">
       {hasToolbar ? (
-        <div data-slot="article-toolbar" className="flex h-14 items-center gap-1 bg-transparent px-0 py-1">
+        <div ref={toolbarRef} data-slot="article-toolbar" className="flex h-14 items-center gap-1 bg-transparent px-0 py-1">
           {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" className="rounded-full" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
+          {!data.byline && condensed ? <span data-slot="article-toolbar-title" className="min-w-0 flex-1 truncate px-2 text-base font-semibold">{data.title}</span> : null}
           <div data-slot="article-actions" className="ml-auto flex items-center gap-1">
             <ReadingSettingsButton prefs={reading} onChange={setReading} />
             {canShare ? <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label="Share" onClick={shareNow}><ShareIcon aria-hidden /></Button> : null}
@@ -468,12 +472,14 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         ) : null}
         {(data.kicker && data.kickerStyle === "chip") || (hasActionRow && rowPlace === "top") ? (
           <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
-            {data.kicker && data.kickerStyle === "chip" ? <Badge data-slot="article-kicker-chip" variant="outline" className="tracking-wide uppercase">{data.kicker}</Badge> : <span />}
+            {data.kicker && data.kickerStyle === "chip" ? (data.onKicker
+              ? <button type="button" data-slot="article-kicker-chip" onClick={data.onKicker} className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Badge variant="outline" className="hover:bg-muted tracking-wide uppercase">{data.kicker}</Badge></button>
+              : <Badge data-slot="article-kicker-chip" variant="outline" className="tracking-wide uppercase">{data.kicker}</Badge>) : <span />}
             {hasActionRow && rowPlace === "top" ? actionRowEl : null}
           </div>
         ) : null}
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
-        {data.kicker && data.kickerStyle !== "chip" ? <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p> : null}
+        {data.kicker && data.kickerStyle !== "chip" ? (data.onKicker ? <button type="button" onClick={data.onKicker} className="text-muted-foreground hover:text-foreground w-fit text-xs font-semibold tracking-wide uppercase underline-offset-2 hover:underline">{data.kicker}</button> : <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p>) : null}
         <h2 ref={titleRef} data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
         {data.hatnote ? <p data-slot="article-hatnote" className="text-muted-foreground text-sm italic">{data.hatnote}</p> : null}
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}

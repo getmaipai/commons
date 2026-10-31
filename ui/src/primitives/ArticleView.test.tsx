@@ -157,6 +157,15 @@ describe("ArticleView", () => {
     expect(discuss.queryByText("Listen")).toBeNull();
   });
 
+  test("a kicker with onKicker is a button that calls it; without it the label is plain text", () => {
+    const onKicker = mock(() => {});
+    const view = render(<ArticleView data={{ title: "Oakland", kicker: "Cities", onKicker, blocks: [] }} />);
+    fireEvent.click(view.getByRole("button", { name: "Cities" }));
+    expect(onKicker).toHaveBeenCalledTimes(1);
+    view.rerender(<ArticleView data={{ title: "Oakland", kicker: "Cities", blocks: [] }} />);
+    expect(view.queryByRole("button", { name: "Cities" })).toBeNull();
+  });
+
   test("Back is drawn only when the page gave a way back, and calls it; the reading settings button is always there", () => {
     const withoutBack = render(<ArticleView data={data} />);
     expect(withoutBack.queryByLabelText("Back")).toBeNull();
