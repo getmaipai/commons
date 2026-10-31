@@ -117,10 +117,13 @@ class MemoryRecord(BaseModel):
         description="AGE-01 (dev.md section 13 part 3 and part 9, the outside review reconciled; the coherence review, question 1: 'child_disclosure wins' over an earlier `audience` field name). Whether a CHILD may hear this record from the hub, separate from `sensitive` (which withholds from non-admins and shared surfaces regardless of age) and from `scope` (whose record it is). Null on person and self scope, where it is meaningless (the org's per-person identity rule already keeps a person-scoped record out of anyone else's context); meaningful on household and companion scope. A household-scope record's write-time default (AGE-01's own engine work, no writer yet) is deterministic, never the judge model's judgment: adult_only when the subject is a memorialized person or the text falls in one of vocab/life-events.json's own adult_to_tell classes, child_ok otherwise. An adult may flip it either way on the Memory page (a confirmed household-scope record's flip is an edit with provenance, like any other); the judge itself never sets or raises a record's disclosure - only the deterministic write-time default and an adult's own edit ever touch this field.",
     )
     archived_reason: (
-        Literal['end_date', 'decay', 'person', 'edit', 'forgotten'] | None
+        Literal[
+            'end_date', 'decay', 'person', 'edit', 'forgotten', 'profile_card_replaced'
+        ]
+        | None
     ) = Field(
         None,
-        description="NAT-07b: why the record left the active set, written by the five archive paths. `end_date`: its own end date passed. `decay`: the hub's age-out. `person`: the person archived it. `edit`: an edit retired it. `forgotten`: the forget tombstone. Null or absent on records written before it existed and on any other archive path (state expiry, person deletion); a record with a null reason is never offered as an opening thread, so only `end_date` ever qualifies.",
+        description="NAT-07b: why the record left the active set, written by the archive paths. `end_date`: its own end date passed. `decay`: the hub's age-out. `person`: the person archived it. `edit`: an edit retired it. `forgotten`: the forget tombstone. `profile_card_replaced`: the weekly profile paragraph row was retired when the deterministic profile card replaced it (2026-10-31). Null or absent on records written before it existed and on any other archive path (state expiry, person deletion); a record with a null reason is never offered as an opening thread, so only `end_date` ever qualifies.",
     )
     offer_withheld: bool | None = Field(
         None,

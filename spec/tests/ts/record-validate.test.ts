@@ -699,7 +699,7 @@ describe("MemoryRecord.offer_withheld (NAT-07c)", () => {
 describe("MemoryRecord.archived_reason (NAT-07b)", () => {
   test("accepts each reason and null, and is optional", () => {
     expect(MemoryRecordSchema.safeParse(memoryRecord()).success).toBe(true);
-    for (const archived_reason of ["end_date", "decay", "person", "edit", "forgotten", null]) {
+    for (const archived_reason of ["end_date", "decay", "person", "edit", "forgotten", "profile_card_replaced", null]) {
       expect(MemoryRecordSchema.safeParse({ ...memoryRecord(), archived_reason }).success).toBe(true);
     }
   });

@@ -1,6 +1,7 @@
 ## [spec-v0.1.282] - 2026-10-31
 
 - MemoryRecord and the recipe `remember` step gain the category `instruction`: a standing rule the person gave the assistant about how to behave for them (answer in short sentences, check the weather when I say it is cold, do not say X). Durable, person scope. The category field now carries a description. Additive.
+- MemoryRecord `archived_reason` gains `profile_card_replaced`: the weekly profile paragraph row was retired when the deterministic profile card replaced it (2026-10-31). Additive.
 
 ## [spec-v0.1.281] - 2026-10-30
 
