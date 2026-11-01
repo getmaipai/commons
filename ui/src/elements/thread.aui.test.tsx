@@ -310,6 +310,18 @@ describe("Thread's ComposerNotice slot", () => {
     expect(filled?.className).not.toContain("whitespace-normal");
   });
 
+  test("composerNoticeReserve with wrap layout keeps a 24px minimum but shows the whole notice", () => {
+    function Filled() {
+      return <span>Chat is simpler while a big job runs. Answers are shorter and some extras may be paused.</span>;
+    }
+    render(<Harness ComposerNotice={Filled} composerNoticeReserve composerNoticeLayout="wrap" />);
+    const wrapper = document.querySelector("[data-slot='aui_composer-notice']");
+    expect(wrapper?.className).toContain("min-h-6");
+    expect(wrapper?.className).toContain("whitespace-normal");
+    expect(wrapper?.className).not.toContain("truncate");
+    expect(wrapper?.className?.split(" ")).not.toContain("h-6");
+  });
+
   test("composerNoticeReserve draws the empty slot even with no ComposerNotice component", () => {
     render(<Harness composerNoticeReserve />);
     const slot = document.querySelector("[data-slot='aui_composer-notice']");

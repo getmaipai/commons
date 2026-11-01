@@ -282,9 +282,10 @@ export type ThreadComponents = {
   composerNoticeLayout?: ComposerNoticeLayout | undefined;
   /** CHAT-COMPOSER-SLOT-01: keep the notice slot one fixed line (24px, the
    * height of an xs button) always, empty or filled, so the composer's bottom
-   * spacing never changes when a notice appears. Forces single-line
-   * truncation (it overrides `composerNoticeLayout: "wrap"`) and draws the
-   * empty slot even with no `ComposerNotice`. Default off. */
+   * spacing never changes when a notice appears. Truncates to one line
+   * unless `composerNoticeLayout: "wrap"` is also set: then the slot is at
+   * least 24px and grows to show the whole notice (a long line on a phone).
+   * Draws the empty slot even with no `ComposerNotice`. Default off. */
   composerNoticeReserve?: boolean | undefined;
   /** PROJECTS-KIT-01: the composer's placeholder. Default "Send a message...". */
   composerPlaceholder?: string | undefined;
@@ -1031,7 +1032,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
           className={cn(
             "text-muted-foreground w-full px-2.5 text-xs",
             composerNoticeReserve
-              ? "h-6 truncate leading-6"
+              ? composerNoticeLayout === "wrap" ? "min-h-6 whitespace-normal leading-5" : "h-6 truncate leading-6"
               : cn("leading-5", composerNoticeLayout === "wrap" ? "whitespace-normal" : "truncate"),
           )}
         >
