@@ -1,3 +1,7 @@
+## [spec-v0.1.291] - 2026-11-01
+
+- RESEARCH-TIER-01: household setting `research.max_web` (boolean, default on, owner ruling 2026-11-01): Max may run up to 12 web searches and read up to 40 pages for one question, at most 4 from one site, 3 seconds apart, stopping at the first refusal. Off keeps Max to the offline library and one ordinary search. Additive.
+
 ## [spec-v0.1.290] - 2026-11-01
 
 - RESEARCH-TIER-01: `turn_budget` gains the optional `rounds_thinking` and `rounds_max` (0 to 12): the tool rounds an adult's written turn may take when the person picked Thinking or Max for that message, so research depth follows the answer style. `rounds` keeps its 0, 1 or 2 and stays the Instant figure. Additive.

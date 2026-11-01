@@ -2740,6 +2740,23 @@
     ]
   },
   {
+    "key": "research.max_web",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Max can search the web in depth",
+    "help": "When someone picks Max for a question, it may run up to 12 searches and read up to 40 pages, at most 4 from one site, 3 seconds apart, and it stops reading at the first refusal. Teens and children never get Max. Turn this off to keep Max to the offline library and one ordinary search.",
+    "copy": {
+      "does": "Lets Max run up to 12 web searches and read up to 40 pages for one question."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.search",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.fetch_cache_gb",
     "scope": "household",
     "selector": "number",
