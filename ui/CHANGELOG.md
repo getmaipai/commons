@@ -1,3 +1,7 @@
+## [ui-v0.5.437] - 2026-10-31
+
+- Add `ArticleSkeleton`, a delayed article-shaped loading placeholder with a category chip, title, byline, lead image and body lines.
+
 ## [ui-v0.5.436] - 2026-10-31
 
 - `RobotFace`: a representation of a StackChan robot's face (seven face colours, night, eleven expressions, header and stage sizes) for the ambient companion spot in Home.
