@@ -65,6 +65,8 @@ export interface ArticleViewData {
   description?: string;
   byline?: { publisher: string; site: string; published_at: string; outlets: number; reading_s: number };
   sourceIconUrl?: string;
+  /** Replaces the publisher name in the provider row (Reference: the article's own title, with its picture as the icon). */
+  providerLabel?: string;
   image?: { w480: string; w1280: string; alt: string; /** A short chip drawn on the picture (Reference: the picture's own caption). */ badge?: string; focal?: { x: number; y: number; aspect: number } };
   key_points?: { text: string; band: "child" | "teen" | "adult" };
   /** A bold standfirst before the body (Reference: the article's own first sentence). */
@@ -486,7 +488,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       {data.byline ? (
         <div ref={providerRef} data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", "transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", condensed ? "px-16 md:px-48" : "px-4")}>
           <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className={cn("shrink-0 rounded-xl transition-[width,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", condensed ? "size-8" : "size-11")} onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
-          <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", condensed && "truncate text-lg leading-tight")}>{condensed ? data.title : data.byline.publisher}</span>
+          <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", (condensed || data.providerLabel) && "truncate leading-tight", condensed && "text-lg")}>{condensed ? data.title : data.providerLabel ?? data.byline.publisher}</span>
         </div>
       ) : null}
       <div data-slot="article-column" className={cn("mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 md:px-6", hasToolbar && data.breadcrumb && data.breadcrumb.length > 0 ? "pt-16 lg:pt-6" : "pt-6", "lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1 lg:[&>*:not([data-slot=article-rail])]:w-full lg:[&>*:not([data-slot=article-rail])]:max-w-[80ch] lg:[&>*:not([data-slot=article-rail])]:justify-self-center")}>

@@ -1,3 +1,7 @@
+## [ui-v0.5.441] - 2026-11-01
+
+- `ArticleView` takes an optional `providerLabel` that replaces the publisher name in the provider row.
+
 ## [ui-v0.5.440] - 2026-11-01
 
 - `ArticleView` formats date-only bylines without a time and sizes its sticky rail to the nearest scrollable ancestor.

@@ -20,6 +20,11 @@ describe("ArticleView", () => {
     expect(formatBylineDate("2026-09-01T14:05:00.000Z")).toMatch(/Sep 1, 2026.*\d{1,2}:05\s?(AM|PM)/);
   });
 
+  test("providerLabel replaces the publisher name in the provider row", () => {
+    const view = render(<ArticleView data={{ ...data, providerLabel: "Aurora", sourceIconUrl: "/pic.jpg" }} />);
+    expect(view.container.querySelector('[data-slot="article-provider-label"]')?.textContent).toBe("Aurora");
+  });
+
   test("opens the kicker channel when its label is clicked", () => {
     const onAction = mock(() => {});
     const view = render(<ArticleView data={{ ...data, kicker: "World", kickerStyle: "chip", kicker_channel: { kind: "topic", key: "world" } }} onAction={onAction} />);
