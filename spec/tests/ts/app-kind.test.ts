@@ -372,6 +372,14 @@ describe("contributes.header (MEDIA-HEADER-01)", () => {
     expect(problems({ actions: { primary: { label: "Go", open: { navigate: { to: "/apps/other/x" } } } } }, [{ id: "g", pages: ["index"] }])).toContain("must stay under /apps/weather");
     expect(problems({ actions: { more: [{ label: "Go", open: { navigate: { to: "/apps/weather/gone" } } }] } }, [{ id: "g", pages: ["index"] }])).toContain('names page "gone"');
   });
+  test("a group with no mode is drawn in every mode, and a header with only actions needs no sidebar", () => {
+    expect(problems(header, [{ id: "all", pages: ["index"] }, { id: "make", mode: "create", pages: ["create"] }])).toBe("");
+    const bare: AppContributes = { ...contributes({ actions: { primary: { label: "New", open: { navigate: { to: "/apps/weather/create" } } } } }), sidebar: undefined };
+    expect(checkAppPackage("weather", bare, load).join("\n")).toBe("");
+  });
+  test("a page-less package still gets its header checked", () => {
+    expect(checkAppPackage("weather", { header: { modes: [{ id: "a", label: "A", page: "index" }, { id: "b", label: "B", page: "index" }] } }, load).join("\n")).toContain('names page "index"');
+  });
   test("the schema refuses an unknown key, one mode, too many modes, and a button with no action", () => {
     const mode = (id: string) => ({ id, label: id, page: "index" });
     for (const bad of [{ extra: 1 }, { modes: [mode("a")] }, { modes: [mode("a"), mode("b"), mode("c"), mode("d")] }, { actions: { primary: { label: "x" } } }, { search: { label: "" } }, { actions: { more: [] } }]) {

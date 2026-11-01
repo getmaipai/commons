@@ -144,6 +144,14 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   }
 }
 
+/** The page id a `navigate.to` inside this app opens ("index" for the app root), or undefined for any other address. */
+function appPageOf(packageId: string, to: unknown): string | undefined {
+  if (typeof to !== "string") return undefined;
+  const base = `/apps/${packageId}`;
+  if (to === base) return "index";
+  return to.startsWith(`${base}/`) ? (to.slice(base.length + 1).split("/")[0] ?? "") : undefined;
+}
+
 /** NEWS-SIDEBAR-01: the sidebar's references must land on this package. Its search is the page `search` node and its rows and
  * actions are the page `package_binding` and `action`, so they run through the same checks a page's do (`walk`,
  * `checkBinding`, `checkAction`); on top, every `navigate` target names a page this package declares, every `{field}`
@@ -154,12 +162,8 @@ function checkSidebar(packageId: string, sidebar: AppSidebar, pageIds: Set<strin
   const target = (action: unknown, at: string, fields: ReadonlySet<string> | null): void => {
     checkAction(action, packageId, `${where}: ${at}`, out);
     if (!isObject(action) || !isObject(action.navigate)) return;
-    const to = action.navigate.to;
-    if (typeof to === "string") {
-      const base = `/apps/${packageId}`;
-      if (to === base) page("index", at);
-      else if (to.startsWith(`${base}/`)) page(to.slice(base.length + 1).split("/")[0] ?? "", at);
-    }
+    const opens = appPageOf(packageId, action.navigate.to);
+    if (opens !== undefined) page(opens, at);
     if (fields && isObject(action.navigate.state)) {
       for (const value of Object.values(action.navigate.state)) {
         if (typeof value !== "string") continue;
@@ -209,11 +213,8 @@ function checkHeader(packageId: string, header: AppHeader, sidebar: AppSidebar |
   }
   const button = (item: AppHeaderButton, at: string): void => {
     checkAction(item.open, packageId, `${where}: ${at}`, out);
-    if (!isObject(item.open) || !isObject(item.open.navigate) || typeof item.open.navigate.to !== "string") return;
-    const base = `/apps/${packageId}`;
-    const to = item.open.navigate.to;
-    if (to === base) page("index", at);
-    else if (to.startsWith(`${base}/`)) page(to.slice(base.length + 1).split("/")[0] ?? "", at);
+    const opens = isObject(item.open) && isObject(item.open.navigate) ? appPageOf(packageId, item.open.navigate.to) : undefined;
+    if (opens !== undefined) page(opens, at);
   };
   if (header.actions?.primary) button(header.actions.primary, "primary action");
   (header.actions?.more ?? []).forEach((item, index) => button(item, `more action ${index + 1}`));
@@ -231,6 +232,7 @@ export function checkAppPackage(packageId: string, contributes: AppContributes |
     for (const widget of widgets) {
       if (widget.data !== undefined && !data.has(widget.data)) out.push(`widget "${widget.id}": data id "${widget.data}" is not a contributes.data id of this package`);
     }
+    if (contributes?.header) checkHeader(packageId, contributes.header, contributes.sidebar, new Set(), out);
     return out;
   }
   const ids = new Set<string>();
