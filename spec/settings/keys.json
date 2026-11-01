@@ -5543,6 +5543,145 @@
     ]
   },
   {
+    "key": "resources.max_concurrent_per_person",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 1,
+      "max": 3,
+      "step": 1
+    },
+    "default": 1,
+    "label": "Big jobs at once per person",
+    "help": "How many picture, video or song jobs one person may have running at the same time. One keeps a heavy user from holding the computer while others wait.",
+    "copy": {
+      "does": "Limits how many big jobs one person runs at once."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.max_wait_before_aging.image",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 0,
+      "max": 120,
+      "step": 1
+    },
+    "default": 0,
+    "label": "Minutes before waiting pictures move up",
+    "help": "How many minutes a waiting picture job sits before it starts moving up the line. Zero starts moving it right away, one place for each minute it waits.",
+    "copy": {
+      "does": "Delays when waiting pictures start to move up the line."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.max_wait_before_aging.video",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 0,
+      "max": 120,
+      "step": 1
+    },
+    "default": 0,
+    "label": "Minutes before waiting videos move up",
+    "help": "How many minutes a waiting video job sits before it starts moving up the line. Zero starts moving it right away, one place for each minute it waits.",
+    "copy": {
+      "does": "Delays when waiting videos start to move up the line."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.max_wait_before_aging.music",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 0,
+      "max": 120,
+      "step": 1
+    },
+    "default": 0,
+    "label": "Minutes before waiting songs move up",
+    "help": "How many minutes a waiting song job sits before it starts moving up the line. Zero starts moving it right away, one place for each minute it waits.",
+    "copy": {
+      "does": "Delays when waiting songs start to move up the line."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.strict.image",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Pictures always go first",
+    "help": "When on, a waiting picture job goes before every other kind of big job, however long the others have waited. Chat always goes first either way.",
+    "copy": {
+      "does": "Puts pictures ahead of every other big job."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.strict.video",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Videos always go first",
+    "help": "When on, a waiting video job goes before every other kind of big job, however long the others have waited. Chat always goes first either way.",
+    "copy": {
+      "does": "Puts videos ahead of every other big job."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "resources.strict.music",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Songs always go first",
+    "help": "When on, a waiting song job goes before every other kind of big job, however long the others have waited. Chat always goes first either way.",
+    "copy": {
+      "does": "Puts songs ahead of every other big job."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "engines.chat.tier.reduced",
     "scope": "household",
     "selector": "text",

@@ -124,6 +124,14 @@ describe("resources.* settings", () => {
     expect(keyOf("resources.close_apps.reopen").default).toBe(true);
     expect(keyOf("resources.close_apps.no_reopen").default).toBe("[]");
   });
+  test("the queue policy settings default to today's behavior: one job per person, no aging delay, nothing strict", () => {
+    expect(keyOf("resources.max_concurrent_per_person").default).toBe(1);
+    expect(keyOf("resources.max_concurrent_per_person").range).toMatchObject({ min: 1, max: 3 });
+    for (const c of ["image", "video", "music"]) {
+      expect(keyOf(`resources.max_wait_before_aging.${c}`).default).toBe(0);
+      expect(keyOf(`resources.strict.${c}`).default).toBe(false);
+    }
+  });
   test("lower without asking is per category, chat is never lowered without asking by default, voice has none", () => {
     for (const c of ["chat", "image", "video", "music"]) expect(keyOf(`resources.lower_without_asking.${c}`).default).toBe(false);
     expect(keys.some((k) => k.key === "resources.lower_without_asking.voice")).toBe(false);
