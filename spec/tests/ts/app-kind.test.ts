@@ -331,3 +331,51 @@ describe("contributes.sidebar (NEWS-SIDEBAR-01)", () => {
     }
   });
 });
+
+describe("contributes.header (MEDIA-HEADER-01)", () => {
+  const contributes = (header: unknown, groups: unknown[] = [{ id: "play", mode: "play", pages: ["index"] }, { id: "make", mode: "create", pages: ["create"] }]): AppContributes => ({
+    pages: [
+      { id: "index", label: "Listen", nav: true, kind: "schema", module: "forecast" },
+      { id: "create", label: "Create", nav: true, kind: "schema", module: "forecast" },
+      { id: "search", label: "Search", nav: false, kind: "schema", module: "forecast" },
+    ],
+    data: [{ id: "forecast" }],
+    sidebar: {
+      search: { type: "search", state: "q", placeholder: "Search", submit: { navigate: { to: "/apps/weather/search", state: { q: "{q}" } } } },
+      groups: groups as never,
+    },
+    header: header as never,
+  });
+  const header = {
+    search: { label: "Search music" },
+    modes: [{ id: "play", label: "Browse", page: "index" }, { id: "create", label: "Create", icon: "sparkles", page: "create" }],
+    actions: { primary: { label: "New", open: { navigate: { to: "/apps/weather/create" } } }, more: [{ label: "Settings", open: { navigate: { to: "/settings/weather" } } }] },
+  };
+  const problems = (head: unknown, groups?: unknown[]): string => checkAppPackage("weather", contributes(head, groups), load).join("\n");
+
+  test("a header that lands on this package parses and passes the lint", () => {
+    expect(() => PackageManifest.parse({ ...BASE, contributes: contributes(header) })).not.toThrow();
+    expect(problems(header)).toBe("");
+    expect(problems({ search: {} }, [{ id: "g", pages: ["index"] }])).toBe("");
+  });
+  test("a mode lands on a page of this package, once, and a group's mode names a declared one", () => {
+    expect(problems({ modes: [{ id: "play", label: "A", page: "index" }, { id: "play", label: "B", page: "create" }] })).toContain('mode "play" is declared twice');
+    expect(problems({ modes: [{ id: "play", label: "A", page: "ghost" }, { id: "create", label: "B", page: "create" }] })).toContain('names page "ghost"');
+    expect(problems(header, [{ id: "g", mode: "radio", pages: ["index"] }])).toContain('names mode "radio", which the header does not declare');
+    expect(problems({ search: {} })).toContain('names mode "play", but the header declares no modes');
+  });
+  test("the search trigger needs the sidebar search it opens", () => {
+    const bare: AppContributes = { ...contributes(header), sidebar: { groups: [{ id: "g", pages: ["index"] }] } };
+    expect(checkAppPackage("weather", bare, load).join("\n")).toContain("search needs contributes.sidebar.search");
+  });
+  test("a button's action stays inside the app on a declared page", () => {
+    expect(problems({ actions: { primary: { label: "Go", open: { navigate: { to: "/apps/other/x" } } } } }, [{ id: "g", pages: ["index"] }])).toContain("must stay under /apps/weather");
+    expect(problems({ actions: { more: [{ label: "Go", open: { navigate: { to: "/apps/weather/gone" } } }] } }, [{ id: "g", pages: ["index"] }])).toContain('names page "gone"');
+  });
+  test("the schema refuses an unknown key, one mode, too many modes, and a button with no action", () => {
+    const mode = (id: string) => ({ id, label: id, page: "index" });
+    for (const bad of [{ extra: 1 }, { modes: [mode("a")] }, { modes: [mode("a"), mode("b"), mode("c"), mode("d")] }, { actions: { primary: { label: "x" } } }, { search: { label: "" } }, { actions: { more: [] } }]) {
+      expect(() => PackageManifest.parse({ ...BASE, contributes: contributes(bad) })).toThrow();
+    }
+  });
+});

@@ -2258,6 +2258,115 @@ export const PackageManifest = z
             "This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat).",
           )
           .optional(),
+        /**MEDIA-HEADER-01. What this app puts in the shell's one header row (design rule S2): the app's own buttons, left of the companion avatar, in this order. `search` is a field-shaped trigger that opens the app's own scoped search (the `contributes.sidebar.search` node); it searches only this app's records and never offers a whole-home scope, because global Search lives only in the rail (S1). `modes` is a segmented control; the chosen mode is the URL, remembered per person, and a mode the viewer may not use is not drawn. `actions` is at most one primary button and an overflow menu. Below 900 px the search trigger collapses to an icon, and on a phone the shell's bar and drawer carry the same entries. The manifest lint (spec/ui/app-check.ts) checks every page, action and the search against the package.*/
+        header: z
+          .object({
+            /**Draw the search trigger. Needs `contributes.sidebar.search`, which supplies the search node, its recents and its submit.*/
+            search: z
+              .object({
+                /**The trigger's words, such as Search music.*/
+                label: z
+                  .string()
+                  .min(1)
+                  .max(40)
+                  .describe("The trigger's words, such as Search music.")
+                  .optional(),
+              })
+              .strict()
+              .describe(
+                "Draw the search trigger. Needs `contributes.sidebar.search`, which supplies the search node, its recents and its submit.",
+              )
+              .optional(),
+            /**The segmented control, in order; the first is the default mode. A `contributes.sidebar` group with a `mode` is drawn only in that mode; a group with none is drawn in every mode.*/
+            modes: z
+              .array(
+                z
+                  .object({
+                    id: z
+                      .string()
+                      .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                      .max(40),
+                    label: z.string().min(1).max(40),
+                    /**A lucide icon name.*/
+                    icon: z
+                      .string()
+                      .min(1)
+                      .max(40)
+                      .describe("A lucide icon name.")
+                      .optional(),
+                    /**The page this mode lands on; a `contributes.pages` id.*/
+                    page: z
+                      .string()
+                      .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                      .max(40)
+                      .describe(
+                        "The page this mode lands on; a `contributes.pages` id.",
+                      ),
+                  })
+                  .strict(),
+              )
+              .min(2)
+              .max(3)
+              .describe(
+                "The segmented control, in order; the first is the default mode. A `contributes.sidebar` group with a `mode` is drawn only in that mode; a group with none is drawn in every mode.",
+              )
+              .optional(),
+            /**At most one primary button and an overflow menu.*/
+            actions: z
+              .object({
+                primary: z
+                  .object({
+                    label: z.string().min(1).max(40),
+                    /**A lucide icon name.*/
+                    icon: z
+                      .string()
+                      .min(1)
+                      .max(40)
+                      .describe("A lucide icon name.")
+                      .optional(),
+                    /**A spec/ui/schema.json `action`, usually a `navigate` inside this app.*/
+                    open: z
+                      .record(z.string(), z.any())
+                      .describe(
+                        "A spec/ui/schema.json `action`, usually a `navigate` inside this app.",
+                      ),
+                  })
+                  .strict()
+                  .optional(),
+                /**The overflow menu, in order.*/
+                more: z
+                  .array(
+                    z
+                      .object({
+                        label: z.string().min(1).max(40),
+                        /**A lucide icon name.*/
+                        icon: z
+                          .string()
+                          .min(1)
+                          .max(40)
+                          .describe("A lucide icon name.")
+                          .optional(),
+                        /**A spec/ui/schema.json `action`.*/
+                        open: z
+                          .record(z.string(), z.any())
+                          .describe("A spec/ui/schema.json `action`."),
+                      })
+                      .strict(),
+                  )
+                  .min(1)
+                  .max(6)
+                  .describe("The overflow menu, in order.")
+                  .optional(),
+              })
+              .strict()
+              .describe("At most one primary button and an overflow menu.")
+              .optional(),
+          })
+          .strict()
+          .describe(
+            "MEDIA-HEADER-01. What this app puts in the shell's one header row (design rule S2): the app's own buttons, left of the companion avatar, in this order. `search` is a field-shaped trigger that opens the app's own scoped search (the `contributes.sidebar.search` node); it searches only this app's records and never offers a whole-home scope, because global Search lives only in the rail (S1). `modes` is a segmented control; the chosen mode is the URL, remembered per person, and a mode the viewer may not use is not drawn. `actions` is at most one primary button and an overflow menu. Below 900 px the search trigger collapses to an icon, and on a phone the shell's bar and drawer carry the same entries. The manifest lint (spec/ui/app-check.ts) checks every page, action and the search against the package.",
+          )
+          .optional(),
         /**NEWS-SIDEBAR-01. This app's own sidebar column on wide screens: the app's search box and ordered groups of entries, drawn by the one kit sidebar beside the main rail (design rules S1, S2). The search is the same `search` node a page uses, a row group binds a `contributes.data` list the way a `list` node does, and an entry opens its target with the same `navigate` action, so no shape is spelled twice: those three objects are defined by spec/ui/schema.json (`search`, `package_binding`, `action`) and the hub validates them against it when the package loads, as it does a page. A page entry takes its label, icon and visibility from the page it names (the page's own `min_role` and the app's own switches), so no floor is repeated here. An entry, a `manage` row or a search box whose target page the viewer cannot open is not drawn, and a group left with no entries is not drawn. The manifest lint (spec/ui/app-check.ts) checks every page id, data id, action and field against the package. On a phone the shell's drawer lists the same entries.*/
         sidebar: z
           .object({
@@ -2361,6 +2470,15 @@ export const PackageManifest = z
                           .optional(),
                       })
                       .strict()
+                      .optional(),
+                    /**MEDIA-HEADER-01. Draw this group only in the named `contributes.header.modes` mode; no value draws it in every mode.*/
+                    mode: z
+                      .string()
+                      .regex(new RegExp("^[a-z][a-z0-9-]*$"))
+                      .max(40)
+                      .describe(
+                        "MEDIA-HEADER-01. Draw this group only in the named `contributes.header.modes` mode; no value draws it in every mode.",
+                      )
                       .optional(),
                   })
                   .strict(),

@@ -1,3 +1,7 @@
+## [spec-v0.1.289] - 2026-11-01
+
+- MEDIA-HEADER-01: manifest `contributes.header` declares what an app puts in the shell's one header row: a `search` trigger for the app's own scoped search, 2 or 3 `modes` (a segmented control whose page and sidebar groups change with the mode) and `actions` (one primary button plus an overflow menu). Sidebar groups gain an optional `mode`. The manifest lint checks pages, actions, mode names and that the search trigger has a sidebar search to open. Additive.
+
 ## [spec-v0.1.288] - 2026-11-01
 
 - TIER-PRIO-02/06: household settings for the job queue policy: `resources.max_concurrent_per_person` (1 to 3, default 1), `resources.max_wait_before_aging.image|video|music` (minutes, default 0) and `resources.strict.image|video|music` (a kind that goes before every other, default off). Additive.

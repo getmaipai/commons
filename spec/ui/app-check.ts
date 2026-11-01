@@ -8,10 +8,12 @@
 export interface AppPageEntry { id: string; label?: string; nav?: boolean; kind?: string; module: string; icon?: string; keywords?: string[]; pinned_by_default?: boolean; pin_order?: number; min_role?: string }
 export interface AppDataEntry { id: string; surface?: string; rows?: string; inputs?: Record<string, unknown>; refresh_s?: number }
 export interface AppSidebarRows { bind: unknown; item_key_field?: string; item_label_field?: string; item_media_field?: string; only_followed?: boolean; open: unknown; manage?: { label: string; open: unknown } }
-export interface AppSidebarGroup { id: string; title?: string; pages?: string[]; rows?: AppSidebarRows }
+export interface AppSidebarGroup { id: string; title?: string; mode?: string; pages?: string[]; rows?: AppSidebarRows }
 export interface AppSidebar { search?: unknown; groups: AppSidebarGroup[] }
+export interface AppHeaderButton { label: string; icon?: string; open: unknown }
+export interface AppHeader { search?: { label?: string }; modes?: { id: string; label: string; icon?: string; page: string }[]; actions?: { primary?: AppHeaderButton; more?: AppHeaderButton[] } }
 export interface AppWidgetEntry { id: string; data?: string }
-export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[]; widgets?: AppWidgetEntry[]; sidebar?: AppSidebar }
+export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[]; widgets?: AppWidgetEntry[]; sidebar?: AppSidebar; header?: AppHeader }
 
 /** The node types a package page may use. Anything that reads another route
  * (card_grid, widget_card, ...) or mounts a host component
@@ -187,6 +189,36 @@ function checkSidebar(packageId: string, sidebar: AppSidebar, pageIds: Set<strin
   }
 }
 
+/** MEDIA-HEADER-01: the header row's references must land on this package. The search trigger opens the sidebar's search, so it
+ * needs one; a mode lands on a page this package declares and has an id once; a sidebar group's `mode` names a declared mode; a
+ * button's action goes through the same `checkAction` a page's does and a `navigate` stays inside the app on a declared page. */
+function checkHeader(packageId: string, header: AppHeader, sidebar: AppSidebar | undefined, pageIds: Set<string>, out: string[]): void {
+  const where = "contributes.header";
+  const page = (id: string, at: string): void => { if (!pageIds.has(id)) out.push(`${where}: ${at} names page "${id}", which this package does not declare`); };
+  if (header.search && sidebar?.search === undefined) out.push(`${where}: search needs contributes.sidebar.search, which supplies the search it opens`);
+  const modes = new Set<string>();
+  for (const mode of header.modes ?? []) {
+    if (modes.has(mode.id)) out.push(`${where}: mode "${mode.id}" is declared twice`);
+    modes.add(mode.id);
+    page(mode.page, `mode "${mode.id}"`);
+  }
+  for (const group of sidebar?.groups ?? []) {
+    if (group.mode === undefined) continue;
+    if (modes.size === 0) out.push(`${where}: sidebar group "${group.id}" names mode "${group.mode}", but the header declares no modes`);
+    else if (!modes.has(group.mode)) out.push(`${where}: sidebar group "${group.id}" names mode "${group.mode}", which the header does not declare`);
+  }
+  const button = (item: AppHeaderButton, at: string): void => {
+    checkAction(item.open, packageId, `${where}: ${at}`, out);
+    if (!isObject(item.open) || !isObject(item.open.navigate) || typeof item.open.navigate.to !== "string") return;
+    const base = `/apps/${packageId}`;
+    const to = item.open.navigate.to;
+    if (to === base) page("index", at);
+    else if (to.startsWith(`${base}/`)) page(to.slice(base.length + 1).split("/")[0] ?? "", at);
+  };
+  if (header.actions?.primary) button(header.actions.primary, "primary action");
+  (header.actions?.more ?? []).forEach((item, index) => button(item, `more action ${index + 1}`));
+}
+
 /** `loadPage(module)` returns the parsed `pages/<module>.json`, or undefined when the file is missing. `packageMinRole` is the manifest's own `min_role`; with it a page that lowers the floor is reported. */
 export function checkAppPackage(packageId: string, contributes: AppContributes | undefined, loadPage: (module: string) => unknown, packageMinRole?: string): string[] {
   const out: string[] = [];
@@ -221,6 +253,7 @@ export function checkAppPackage(packageId: string, contributes: AppContributes |
     if (widget.data !== undefined && !data.has(widget.data)) out.push(`widget "${widget.id}": data id "${widget.data}" is not a contributes.data id of this package`);
   }
   if (contributes?.sidebar) checkSidebar(packageId, contributes.sidebar, ids, data, out);
+  if (contributes?.header) checkHeader(packageId, contributes.header, contributes.sidebar, ids, out);
   for (const page of pages) {
     const doc = loadPage(page.module);
     const where = `pages/${page.module}.json`;

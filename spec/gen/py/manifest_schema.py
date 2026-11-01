@@ -721,6 +721,95 @@ class Warm(BaseModel):
     )
 
 
+class Search(BaseModel):
+    """
+    Draw the search trigger. Needs `contributes.sidebar.search`, which supplies the search node, its recents and its submit.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: constr(min_length=1, max_length=40) | None = Field(
+        None, description="The trigger's words, such as Search music."
+    )
+
+
+class Mode(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^[a-z][a-z0-9-]*$', max_length=40)
+    label: constr(min_length=1, max_length=40)
+    icon: constr(min_length=1, max_length=40) | None = Field(
+        None, description='A lucide icon name.'
+    )
+    page: constr(pattern=r'^[a-z][a-z0-9-]*$', max_length=40) = Field(
+        ..., description='The page this mode lands on; a `contributes.pages` id.'
+    )
+
+
+class Primary(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: constr(min_length=1, max_length=40)
+    icon: constr(min_length=1, max_length=40) | None = Field(
+        None, description='A lucide icon name.'
+    )
+    open: dict[str, Any] = Field(
+        ...,
+        description='A spec/ui/schema.json `action`, usually a `navigate` inside this app.',
+    )
+
+
+class MoreItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: constr(min_length=1, max_length=40)
+    icon: constr(min_length=1, max_length=40) | None = Field(
+        None, description='A lucide icon name.'
+    )
+    open: dict[str, Any] = Field(..., description='A spec/ui/schema.json `action`.')
+
+
+class Actions(BaseModel):
+    """
+    At most one primary button and an overflow menu.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    primary: Primary | None = None
+    more: list[MoreItem] | None = Field(
+        None, description='The overflow menu, in order.', max_length=6, min_length=1
+    )
+
+
+class Header(BaseModel):
+    """
+    MEDIA-HEADER-01. What this app puts in the shell's one header row (design rule S2): the app's own buttons, left of the companion avatar, in this order. `search` is a field-shaped trigger that opens the app's own scoped search (the `contributes.sidebar.search` node); it searches only this app's records and never offers a whole-home scope, because global Search lives only in the rail (S1). `modes` is a segmented control; the chosen mode is the URL, remembered per person, and a mode the viewer may not use is not drawn. `actions` is at most one primary button and an overflow menu. Below 900 px the search trigger collapses to an icon, and on a phone the shell's bar and drawer carry the same entries. The manifest lint (spec/ui/app-check.ts) checks every page, action and the search against the package.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    search: Search | None = Field(
+        None,
+        description='Draw the search trigger. Needs `contributes.sidebar.search`, which supplies the search node, its recents and its submit.',
+    )
+    modes: list[Mode] | None = Field(
+        None,
+        description='The segmented control, in order; the first is the default mode. A `contributes.sidebar` group with a `mode` is drawn only in that mode; a group with none is drawn in every mode.',
+        max_length=3,
+        min_length=2,
+    )
+    actions: Actions | None = Field(
+        None, description='At most one primary button and an overflow menu.'
+    )
+
+
 class Manage(BaseModel):
     """
     A last entry after the rows that opens a management page, such as Manage.
@@ -781,6 +870,10 @@ class Group(BaseModel):
         min_length=1,
     )
     rows: Rows | None = None
+    mode: constr(pattern=r'^[a-z][a-z0-9-]*$', max_length=40) | None = Field(
+        None,
+        description='MEDIA-HEADER-01. Draw this group only in the named `contributes.header.modes` mode; no value draws it in every mode.',
+    )
 
 
 class Sidebar(BaseModel):
@@ -973,6 +1066,10 @@ class Contributes(BaseModel):
     settings_area: settings_area_schema.SettingsArea | None = Field(
         None,
         description="This package's own settings area (SPEC-SETAREA-01): an app's settings page, drawn by the one settings shell and opened from the app's gear. Same record as spec/settings/areas.json. The manifest lint (spec/settings/areas-check.ts) refuses an area id that is a reserved legacy route id or a central area (account, home, chat).",
+    )
+    header: Header | None = Field(
+        None,
+        description="MEDIA-HEADER-01. What this app puts in the shell's one header row (design rule S2): the app's own buttons, left of the companion avatar, in this order. `search` is a field-shaped trigger that opens the app's own scoped search (the `contributes.sidebar.search` node); it searches only this app's records and never offers a whole-home scope, because global Search lives only in the rail (S1). `modes` is a segmented control; the chosen mode is the URL, remembered per person, and a mode the viewer may not use is not drawn. `actions` is at most one primary button and an overflow menu. Below 900 px the search trigger collapses to an icon, and on a phone the shell's bar and drawer carry the same entries. The manifest lint (spec/ui/app-check.ts) checks every page, action and the search against the package.",
     )
     sidebar: Sidebar | None = Field(
         None,
