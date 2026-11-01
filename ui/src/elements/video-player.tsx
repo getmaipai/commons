@@ -15,6 +15,7 @@ import { Button } from "@/kit/ui/button";
 import { Card, CardContent } from "@/kit/ui/card";
 import { Progress } from "@/kit/ui/progress";
 import { GenerationStage } from "./generation-stage";
+import { PendingActions, type PendingAction } from "./pending-actions";
 
 export type VideoPlayerStatus = "queued" | "generating" | "ready" | "failed" | "cancelled";
 
@@ -88,6 +89,7 @@ export function VideoPlayer({
   previewSrc,
   etaLabel,
   hint,
+  pendingActions,
   error,
   downloadName = "video.mp4",
   loop = true,
@@ -123,6 +125,8 @@ export function VideoPlayer({
   etaLabel?: string;
   /** One quiet line under the bar ("Videos are 5 seconds at 480p and take about 2 minutes"). */
   hint?: string;
+  /** Answers to a held job ("Make it now at the lower level"). Drawn only while the status is queued. */
+  pendingActions?: PendingAction[];
   /** Failed: the plain reason, ending with what to do. */
   error?: string;
   downloadName?: string;
@@ -197,6 +201,7 @@ export function VideoPlayer({
             </div>
             {phaseLabel && status === "generating" ? <p className="text-foreground text-sm">{phaseLabel}</p> : null}
             {hint ? <p className="text-muted-foreground text-xs">{hint}</p> : null}
+            {status === "queued" ? <PendingActions actions={pendingActions} /> : null}
           </>
         ) : null}
         {status === "failed" ? (

@@ -1,3 +1,7 @@
+## [ui-v0.5.445] - 2026-11-01
+
+- `VideoPlayer`, `MusicTrack` and `ImageGeneration` take an optional `pendingActions: {label, onSelect, variant?, disabled?}[]`, drawn as kit Buttons only while a job is queued (image: while generating; the host passes them only when the job is held).
+
 ## [ui-v0.5.444] - 2026-11-01
 
 - `Thread`: with `composerNoticeReserve`, `composerNoticeLayout: "wrap"` keeps the 24px slot and lets a long notice wrap instead of truncating. (ui-v0.5.443 was tagged before its version was bumped; use 0.5.444.)

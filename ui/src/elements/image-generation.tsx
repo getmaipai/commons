@@ -6,6 +6,7 @@ import { cn } from "cn";
 import { ghostButton, mono, ShimmerLabel } from "./surfaces";
 import { Progress } from "@/primitives/Progress";
 import { GenerationStage } from "./generation-stage";
+import { PendingActions, type PendingAction } from "./pending-actions";
 
 export function ImageGeneration({
   prompt,
@@ -23,11 +24,12 @@ export function ImageGeneration({
   steps,
   etaLabel,
   aspectRatio = "1 / 1",
+  pendingActions,
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "prompt" | "generating" | "onRegenerate" | "onStop" | "progress" | "statusLabel" | "elapsedLabel" | "stopLabel" | "sizeLabel" | "size" | "previewSrc" | "previewStep" | "steps" | "etaLabel" | "aspectRatio"
+  "children" | "prompt" | "generating" | "onRegenerate" | "onStop" | "progress" | "statusLabel" | "elapsedLabel" | "stopLabel" | "sizeLabel" | "size" | "previewSrc" | "previewStep" | "steps" | "etaLabel" | "aspectRatio" | "pendingActions"
 > & {
   prompt: string;
   generating: boolean;
@@ -54,6 +56,8 @@ export function ImageGeneration({
   etaLabel?: string;
   /** CSS aspect-ratio of the picture area. Default "1 / 1". */
   aspectRatio?: string;
+  /** Answers to a held job. Drawn under the caption only while `generating`; the host passes them only while the job is held. */
+  pendingActions?: PendingAction[];
 }) {
   return (
     <div
@@ -132,6 +136,7 @@ export function ImageGeneration({
           <RefreshCwIcon className="size-3" />
         </button>
       </div>
+      {generating ? <PendingActions actions={pendingActions} /> : null}
     </div>
   );
 }
