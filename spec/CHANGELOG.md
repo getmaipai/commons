@@ -1,3 +1,7 @@
+## [spec-v0.1.287] - 2026-11-01
+
+- The AI glance card in settings gains the words for a Stems card: `stems`, `stems-standard`, `stems-finer` and `stems-more`. Additive.
+
 ## [spec-v0.1.286] - 2026-10-31
 
 - News article props gain optional `kicker_channel` (`topic` or `feed`, with a non-empty key) so the category label can open its channel. Additive.

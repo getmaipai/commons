@@ -518,6 +518,26 @@
                   "description": "Make songs and tunes."
                 },
                 {
+                  "id": "stems",
+                  "label": "Stems",
+                  "description": "Split a song into vocals, drums, bass and other."
+                },
+                {
+                  "id": "stems-standard",
+                  "label": "Split songs into stems",
+                  "description": "Splits a song into its parts. Stays on this computer."
+                },
+                {
+                  "id": "stems-finer",
+                  "label": "Finer stem splitter",
+                  "description": "Cleaner parts, a little slower."
+                },
+                {
+                  "id": "stems-more",
+                  "label": "Guitar and piano parts",
+                  "description": "Also pulls out guitar and piano."
+                },
+                {
                   "id": "voice",
                   "label": "Voice & speaking",
                   "description": "Choose how Home sounds when it talks."
