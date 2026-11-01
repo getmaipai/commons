@@ -835,6 +835,14 @@ class StoryFeed(BaseModel):
     props: Props9
 
 
+class KickerChannel(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['topic', 'feed']
+    key: constr(min_length=1)
+
+
 class Byline(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1248,14 +1256,6 @@ class DataTable(BaseModel):
         description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
     )
     props: Props1
-
-
-class KickerChannel(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    kind: Literal['topic', 'feed']
-    key: constr(min_length=1)
 
 
 class Props10(BaseModel):
