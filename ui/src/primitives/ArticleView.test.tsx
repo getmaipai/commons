@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import articleBlock from "@maipai/spec/fixtures/answer-block/valid-article.json";
-import { ArticleSpeechContext, ArticleView, type ArticleViewData } from "@/kit/primitives/ArticleView";
+import { ArticleSpeechContext, ArticleView, formatBylineDate, type ArticleViewData } from "@/kit/primitives/ArticleView";
 
 afterEach(cleanup);
 
@@ -15,6 +15,11 @@ const childCopy = (): ArticleViewData => ({
 });
 
 describe("ArticleView", () => {
+  test("formats date-only bylines without a time and full timestamps with a time", () => {
+    expect(formatBylineDate("2026-09-01")).toBe("Sep 1, 2026");
+    expect(formatBylineDate("2026-09-01T14:05:00.000Z")).toMatch(/Sep 1, 2026.*\d{1,2}:05\s?(AM|PM)/);
+  });
+
   test("opens the kicker channel when its label is clicked", () => {
     const onAction = mock(() => {});
     const view = render(<ArticleView data={{ ...data, kicker: "World", kickerStyle: "chip", kicker_channel: { kind: "topic", key: "world" } }} onAction={onAction} />);
@@ -216,7 +221,20 @@ describe("ArticleView", () => {
     const { container } = render(<ArticleView data={{ ...data, infobox: { title: "T", rows: [{ label: "A", value: "B" }] } }} />);
     const rail = container.querySelector('[data-slot="article-rail"]');
     expect(rail?.className).toContain("lg:overflow-y-auto");
-    expect(rail?.className).toContain("lg:max-h-[calc(100vh-6rem)]");
+    expect(rail?.className).toContain("lg:max-h-[var(--article-rail-max,calc(100vh-6rem))]");
+  });
+
+  test("sets the rail max height from its scrollable parent", () => {
+    const parent = document.createElement("div");
+    parent.style.overflowY = "auto";
+    Object.defineProperty(parent, "clientHeight", { configurable: true, value: 700 });
+    const mount = document.createElement("div");
+    parent.append(mount);
+    document.body.append(parent);
+    const { container } = render(<ArticleView data={{ ...data, contents: [{ id: "section", title: "Section", level: 2 }] }} />, { container: mount });
+    const rail = container.querySelector<HTMLElement>('[data-slot="article-rail"]')!;
+    expect(rail.style.getPropertyValue("--article-rail-max")).toBe("calc(700px - 6rem)");
+    parent.remove();
   });
 
   test("the body reads in a serif at the default size and keeps a readable measure inside the wide article frame", () => {

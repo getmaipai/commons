@@ -1,3 +1,7 @@
+## [ui-v0.5.440] - 2026-11-01
+
+- `ArticleView` formats date-only bylines without a time and sizes its sticky rail to the nearest scrollable ancestor.
+
 ## [ui-v0.5.439] - 2026-10-31
 
 - News article kicker chips open their `kicker_channel` through `onAction("open_channel", ...)`; explicit Wikipedia `onKicker` callbacks keep priority.

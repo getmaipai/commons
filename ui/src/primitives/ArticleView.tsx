@@ -1,5 +1,5 @@
 import { getIcon } from "@/kit/icons";
-import { Fragment, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { AspectRatio } from "@/kit/dashboard/components/ui/aspect-ratio";
@@ -94,6 +94,16 @@ const CONDENSE_LEAD_PX = 12;
 const CONDENSE_RELEASE_PX = 64;
 const SUMMARY_RETRIES = 6;
 const SUMMARY_RETRY_MS = 10_000;
+
+export function formatBylineDate(publishedAt: string): string {
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(publishedAt);
+  const date = dateOnly
+    ? new Date(Number(publishedAt.slice(0, 4)), Number(publishedAt.slice(5, 7)) - 1, Number(publishedAt.slice(8, 10)))
+    : new Date(publishedAt);
+  return new Intl.DateTimeFormat(undefined, dateOnly
+    ? { month: "short", day: "numeric", year: "numeric" }
+    : { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(date);
+}
 
 export type ArticleAction = "listen" | "save" | "summarize" | "open_site" | "open" | "discuss" | "open_channel";
 
@@ -341,6 +351,31 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
   const speech = useContext(ArticleSpeechContext);
   const speakingThis = speech.storyId !== null && speech.storyId === ids?.story_id;
   const bodyRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    let ancestor = rail.parentElement;
+    while (ancestor) {
+      const overflowY = window.getComputedStyle(ancestor).overflowY;
+      if (overflowY === "auto" || overflowY === "scroll") break;
+      ancestor = ancestor.parentElement;
+    }
+    const measure = () => {
+      const visibleHeight = ancestor
+        ? ancestor.clientHeight
+        : window.innerHeight;
+      rail.style.setProperty("--article-rail-max", `calc(${visibleHeight}px - 6rem)`);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(ancestor ?? document.documentElement);
+    if (!ancestor) window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      if (!ancestor) window.removeEventListener("resize", measure);
+    };
+  }, []);
   const phone = usePhoneWidth();
   const folding = data.foldSections === true && phone;
   const [openSections, setOpenSections] = useState<ReadonlySet<string>>(new Set());
@@ -481,7 +516,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
             {hasActionRow && rowPlace === "top" ? actionRowEl : null}
           </div>
         ) : null}
-        {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
+        {data.byline ? <p className="text-muted-foreground text-sm">{formatBylineDate(data.byline.published_at)} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {data.kicker && data.kickerStyle !== "chip" ? (onKicker ? <button type="button" onClick={onKicker} className="text-muted-foreground hover:text-foreground w-fit text-xs font-semibold tracking-wide uppercase underline-offset-2 hover:underline">{data.kicker}</button> : <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p>) : null}
         <h2 ref={titleRef} data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
         {data.hatnote ? <p data-slot="article-hatnote" className="text-muted-foreground text-sm italic">{data.hatnote}</p> : null}
@@ -489,7 +524,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
       </header>
       {hasAssist || data.key_points || summarizing || data.quick_fact || (data.related && data.related.length > 0) || data.infobox || (data.contents && data.contents.length > 0) ? (
-        <div data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:[grid-row:1/span_99] lg:col-start-2">
+        <div ref={railRef} data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:max-h-[var(--article-rail-max,calc(100vh-6rem))] lg:self-start lg:overflow-y-auto lg:[grid-row:1/span_99] lg:col-start-2">
         {hasAssist ? (
           <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex gap-2 [&>*]:flex-1">
             {can("listen") ? (
