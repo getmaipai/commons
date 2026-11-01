@@ -1,3 +1,7 @@
+## [ui-v0.5.450] - 2026-11-01
+
+- `HeaderSearch` gains `scope={{ label }}`: an app's own search. The trigger is a field ("Search Music") from 900 px up and a 40 px icon below; the dialog is titled and worded for the app, lists no shell pages, tabs, Ask or web rows, and leaves Cmd+K to the rail. Without `scope` nothing changes.
+
 ## [ui-v0.5.449] - 2026-11-01
 
 - `AnswerStyleSelect` (elements/answer-style-select): an icon-only 44 px composer dropdown named by its current word, with icon, word and one plain line per choice in the open menu; an optional accent mark on a choice's icon.

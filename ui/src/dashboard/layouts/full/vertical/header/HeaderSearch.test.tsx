@@ -17,10 +17,10 @@ function LocationProbe() {
   return <span data-testid="location">{location.pathname}</span>;
 }
 
-function Harness({ remote, size }: { remote?: (query: string) => Promise<SearchGroup[]>; size?: "default" | "lg" } = {}) {
+function Harness({ remote, size, scope }: { remote?: (query: string) => Promise<SearchGroup[]>; size?: "default" | "lg"; scope?: { label: string } } = {}) {
   return (
     <MemoryRouter initialEntries={["/"]}>
-      <HeaderSearch remote={remote} size={size} />
+      <HeaderSearch remote={remote} size={size} scope={scope} />
       <Routes>
         <Route path="*" element={<LocationProbe />} />
       </Routes>
@@ -321,5 +321,40 @@ describe("HeaderSearch (WEB-TAB-02): the Web tab", () => {
     } finally {
       window.open = original;
     }
+  });
+});
+
+describe("HeaderSearch (MEDIA-HEADER-01): the scope prop", () => {
+  test("the trigger is named for the app and opens a dialog titled and worded for it", () => {
+    const { getByRole, getByPlaceholderText, queryByRole } = render(<Harness scope={{ label: "Music" }} />);
+    expect(queryByRole("button", { name: "Search" })).toBeNull();
+    fireEvent.click(getByRole("button", { name: "Search Music" }));
+    expect(getByPlaceholderText("Search Music...")).not.toBeNull();
+    expect(document.body.textContent).toContain("Search Music \u00b7 Esc to close");
+  });
+
+  test("it lists no shell pages and Cmd+K does not open it", () => {
+    const { getByRole, getByPlaceholderText, queryByPlaceholderText } = render(<Harness scope={{ label: "Music" }} />);
+    fireEvent.keyDown(document, { key: "k", metaKey: true });
+    expect(queryByPlaceholderText("Search Music...")).toBeNull();
+    fireEvent.click(getByRole("button", { name: "Search Music" }));
+    expect(document.querySelectorAll('[role="option"]').length).toBe(0);
+    fireEvent.change(getByPlaceholderText("Search Music..."), { target: { value: "fam" } });
+    expect(document.querySelectorAll('[role="option"]').length).toBe(0);
+  });
+
+  test("a typed query shows the caller's results with no tabs and no Ask row", async () => {
+    const groups: SearchGroup[] = [{ kind: "media", heading: "Songs", results: [{ kind: "media", id: "s1", title: "Blue Hour", href: "/apps/music/play?id=s1" }] }];
+    const { getByRole, getByPlaceholderText, getByText, queryByText, queryByRole } = render(
+      <HeaderSearchOptionsContext.Provider value={{ onAsk: () => {} }}>
+        <Harness remote={async () => groups} scope={{ label: "Music" }} />
+      </HeaderSearchOptionsContext.Provider>,
+    );
+    fireEvent.click(getByRole("button", { name: "Search Music" }));
+    fireEvent.change(getByPlaceholderText("Search Music..."), { target: { value: "blue" } });
+    await settle();
+    expect(getByText("Blue Hour")).not.toBeNull();
+    expect(queryByText(/^Ask:/)).toBeNull();
+    expect(queryByRole("tab")).toBeNull();
   });
 });

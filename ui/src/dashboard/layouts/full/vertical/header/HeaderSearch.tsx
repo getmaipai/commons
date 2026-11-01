@@ -85,6 +85,10 @@ export interface HeaderSearchProps {
   triggerClassName?: string;
   /** "lg" (the default) is the ChatGPT-proportioned dialog; "default" is the small one. */
   size?: "default" | "lg";
+  /** An app's own search: a field-shaped trigger ("Search Music", icon only below 900 px) opening a dialog with no shell
+   * pages, tabs, Ask or web rows and no Cmd+K (that stays the rail's). Only `remote` feeds it; recents, ask and web search
+   * from props or context are ignored. */
+  scope?: { label: string };
 }
 
 /** Defaults for `recents` and `onAsk`, so an app sets them once around its layout instead of threading props through the
@@ -142,11 +146,11 @@ function richOf(result: SearchResult): Partial<PaletteCommand> {
 
 /** The header's one global search: an icon button opening the kit's command-palette Element over the sidebar's pages, the
  * caller's recents and the caller's remote results. */
-const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearch: webSearchProp, triggerClassName, size = "lg" }: HeaderSearchProps = {}) => {
+const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearch: webSearchProp, triggerClassName, size = "lg", scope }: HeaderSearchProps = {}) => {
   const options = useContext(HeaderSearchOptionsContext);
-  const recents = recentsProp ?? options.recents;
-  const onAsk = onAskProp ?? options.onAsk;
-  const webSearch = webSearchProp ?? options.webSearch;
+  const recents = scope ? undefined : (recentsProp ?? options.recents);
+  const onAsk = scope ? undefined : (onAskProp ?? options.onAsk);
+  const webSearch = scope ? undefined : (webSearchProp ?? options.webSearch);
   const [web, setWeb] = useState<WebState>({ status: "idle" });
   const webRequestRef = useRef(0);
   const [open, setOpen] = useState(false);
@@ -162,6 +166,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
   remoteRef.current = remote;
 
   useEffect(() => {
+    if (scope) return;
     function onKeyDown(event: KeyboardEvent) {
       if (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
@@ -170,7 +175,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [scope]);
 
   useEffect(() => {
     if (!remoteRef.current) return;
@@ -193,8 +198,8 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
   }, [query]);
 
   const pages = useMemo(
-    () => SidebarContent.flatMap((section) => flatten(section.items).map((item) => ({ item, heading: section.heading ?? "" }))),
-    [],
+    () => scope ? [] : SidebarContent.flatMap((section) => flatten(section.items).map((item) => ({ item, heading: section.heading ?? "" }))),
+    [scope],
   );
 
   const { commands, hrefs } = useMemo(() => {
@@ -292,7 +297,9 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
 
   const onWebTab = tab === "web" && query.trim() !== "";
   const webMatches = web.status !== "idle" && web.query.toLowerCase() === query.trim().toLowerCase();
-  const emptyMessage = !onWebTab
+  const emptyMessage = scope && query.trim() === ""
+    ? `Type to search ${scope.label}.`
+    : !onWebTab
     ? "No results found."
     : !webMatches
       ? WEB_IDLE
@@ -303,19 +310,26 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
   return (
     <>
       <Button
-        variant="ghost"
-        aria-label="Search"
-        // 40px artwork plus the shared kit's 48px hit area (owner ruling 2026-09-27, SHELL-09).
-        className={cn("h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer", hitArea(1), triggerClassName)}
+        variant={scope ? "outline" : "ghost"}
+        aria-label={scope ? `Search ${scope.label}` : "Search"}
+        // 40px artwork plus the shared kit's 48px hit area (owner ruling 2026-09-27, SHELL-09). A scoped trigger is a
+        // 288 px field from 900 px up and the same 40 px circle below it.
+        className={cn(
+          "h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer",
+          scope && "min-[900px]:w-72 min-[900px]:justify-start min-[900px]:gap-2 min-[900px]:px-4 font-normal text-muted-foreground",
+          hitArea(1),
+          triggerClassName,
+        )}
         onClick={() => setOpen(true)}
       >
-        <SearchIcon className="size-5" />
+        <SearchIcon className="size-5 shrink-0" />
+        {scope && <span className="hidden min-[900px]:inline truncate">Search {scope.label}</span>}
       </Button>
       <CommandPaletteDialog
         open={open}
         onOpenChange={onOpenChange}
-        title="Search"
-        placeholder="Search..."
+        title={scope ? `Search ${scope.label}` : "Search"}
+        placeholder={scope ? `Search ${scope.label}...` : "Search..."}
         emptyMessage={emptyMessage}
         prefiltered
         size={size}
@@ -325,12 +339,12 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
         onQueryChange={setQuery}
         onActiveChange={setActiveId}
         onRun={run}
-        tabs={query.trim() === "" ? undefined : webSearch ? [...TABS, WEB_TAB] : TABS}
+        tabs={scope || query.trim() === "" ? undefined : webSearch ? [...TABS, WEB_TAB] : TABS}
         activeTab={tab}
         onTabChange={setTab}
         onSubmitQuery={submitWeb}
         submittedQuery={webMatches ? web.query : undefined}
-        footer={onWebTab ? `${WEB_HINT} · Esc to close` : "Search anywhere in Home · Esc to close"}
+        footer={onWebTab ? `${WEB_HINT} · Esc to close` : scope ? `Search ${scope.label} · Esc to close` : "Search anywhere in Home · Esc to close"}
       />
     </>
   );
