@@ -5555,7 +5555,7 @@
     "label": "Big jobs at once per person",
     "help": "How many picture, video or song jobs one person may have running at the same time. One keeps a heavy user from holding the computer while others wait.",
     "copy": {
-      "does": "Limits how many big jobs one person runs at once."
+      "does": "Keeps one person from taking every slot."
     },
     "level": "advanced",
     "secret": false,
@@ -5577,7 +5577,7 @@
     "label": "Minutes before waiting pictures move up",
     "help": "How many minutes a waiting picture job sits before it starts moving up the line. Zero starts moving it right away, one place for each minute it waits.",
     "copy": {
-      "does": "Delays when waiting pictures start to move up the line."
+      "does": "Gives new pictures a grace period before they climb."
     },
     "level": "advanced",
     "secret": false,
@@ -5599,7 +5599,7 @@
     "label": "Minutes before waiting videos move up",
     "help": "How many minutes a waiting video job sits before it starts moving up the line. Zero starts moving it right away, one place for each minute it waits.",
     "copy": {
-      "does": "Delays when waiting videos start to move up the line."
+      "does": "Gives new videos a grace period before they climb."
     },
     "level": "advanced",
     "secret": false,
@@ -5621,7 +5621,7 @@
     "label": "Minutes before waiting songs move up",
     "help": "How many minutes a waiting song job sits before it starts moving up the line. Zero starts moving it right away, one place for each minute it waits.",
     "copy": {
-      "does": "Delays when waiting songs start to move up the line."
+      "does": "Gives new songs a grace period before they climb."
     },
     "level": "advanced",
     "secret": false,
