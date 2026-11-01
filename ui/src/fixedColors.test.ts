@@ -31,6 +31,11 @@ const ALLOW: AllowEntry[] = [
     reason: "The inpainting mask raster: black means keep, white means edit. Data sent to the model, not interface color.",
   },
   {
+    file: "src/elements/robot-face.tsx",
+    match: /^#[0-9a-f]{6}$/i,
+    reason: "The robot face mirrors the physical display's fixed palette (firmware colors), so it must not follow the theme.",
+  },
+  {
     file: "src/elements/AnswerBlockShowcase.tsx",
     match: /^hsl\($/,
     reason: "Showcase only: generated sample thumbnails so the gallery demo has pictures in different hues.",
