@@ -246,6 +246,33 @@ class MediaItem(BaseModel):
     artist: str | None = None
     album: str | None = None
     album_artist: str | None = None
+    musicbrainz_recording_id: (
+        constr(
+            pattern=r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+        )
+        | None
+    ) = Field(
+        None,
+        description='MusicBrainz recording id (lowercase UUID) for this track, or null when unmatched.',
+    )
+    musicbrainz_artist_id: (
+        constr(
+            pattern=r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+        )
+        | None
+    ) = Field(
+        None,
+        description='MusicBrainz artist id (lowercase UUID) for the track artist, or null when unmatched.',
+    )
+    musicbrainz_release_group_id: (
+        constr(
+            pattern=r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+        )
+        | None
+    ) = Field(
+        None,
+        description='MusicBrainz release group id (lowercase UUID) for the album, or null when unmatched.',
+    )
     track_no: conint(ge=0) | None = None
     disc_no: conint(ge=0) | None = None
     year: conint(ge=0) | None = None

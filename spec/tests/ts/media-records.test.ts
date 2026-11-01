@@ -36,6 +36,7 @@ const CASES: Array<[string, string, Model]> = [
   ["media-item.video", "media-item", MediaItem],
   ["media-item.episode", "media-item", MediaItem],
   ["media-item.track-explicit", "media-item", MediaItem],
+  ["media-item.track-musicbrainz", "media-item", MediaItem],
   ["media-item.podcast-stream", "media-item", MediaItem],
   ["media-item.book", "media-item", MediaItem],
   ["media-item.audiobook", "media-item", MediaItem],
@@ -102,6 +103,18 @@ describe("Media records", () => {
     const filter = fixture("media-collection.filter");
     for (const bad of [{ rules: { genre: "rock" } }, { rules: { max_minutes: -1 } }, { rules: { source_ids: ["feed-1"] } }, { rules: { released_within_days: 0 } }]) {
       expect(schema("media-collection")({ ...filter, ...bad }), JSON.stringify(bad)).toBe(false);
+    }
+  });
+
+  test("MusicBrainz ids are lowercase UUIDs or null, and optional", () => {
+    const v = schema("media-item");
+    const item = fixture("media-item.track-musicbrainz");
+    expect(v(item), JSON.stringify(v.errors)).toBe(true);
+    const { musicbrainz_recording_id: _a, musicbrainz_artist_id: _b, musicbrainz_release_group_id: _c, ...bare } = item as Record<string, unknown>;
+    expect(v(bare), JSON.stringify(v.errors)).toBe(true);
+    expect(v({ ...item, musicbrainz_recording_id: null })).toBe(true);
+    for (const bad of ["not-a-uuid", "5B2E8C1A-3F4D-4A6B-9C7E-1D2F3A4B5C6D", 7]) {
+      expect(v({ ...item, musicbrainz_artist_id: bad }), String(bad)).toBe(false);
     }
   });
 

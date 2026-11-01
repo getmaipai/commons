@@ -1,3 +1,7 @@
+## [spec-v0.1.292] - 2026-11-01
+
+- MUSIC-MB-01: `media-item` gains the optional `musicbrainz_recording_id`, `musicbrainz_artist_id` and `musicbrainz_release_group_id` (each a lowercase UUID string or null, default null): the MusicBrainz ids a track is matched to. Additive; an item without them reads as unmatched.
+
 ## [spec-v0.1.291] - 2026-11-01
 
 - RESEARCH-TIER-01: household setting `research.max_web` (boolean, default on, owner ruling 2026-11-01): Max may run up to 12 web searches and read up to 40 pages for one question, at most 4 from one site, 3 seconds apart, stopping at the first refusal. Off keeps Max to the offline library and one ordinary search. Additive.

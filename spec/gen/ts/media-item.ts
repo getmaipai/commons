@@ -381,6 +381,75 @@ export const MediaItem = z
     artist: z.union([z.string(), z.null()]).default(null),
     album: z.union([z.string(), z.null()]).default(null),
     album_artist: z.union([z.string(), z.null()]).default(null),
+    /**MusicBrainz recording id (lowercase UUID) for this track, or null when unmatched.*/
+    musicbrainz_recording_id: z
+      .union([
+        z
+          .string()
+          .regex(
+            new RegExp(
+              "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            ),
+          )
+          .describe(
+            "MusicBrainz recording id (lowercase UUID) for this track, or null when unmatched.",
+          ),
+        z
+          .null()
+          .describe(
+            "MusicBrainz recording id (lowercase UUID) for this track, or null when unmatched.",
+          ),
+      ])
+      .describe(
+        "MusicBrainz recording id (lowercase UUID) for this track, or null when unmatched.",
+      )
+      .default(null),
+    /**MusicBrainz artist id (lowercase UUID) for the track artist, or null when unmatched.*/
+    musicbrainz_artist_id: z
+      .union([
+        z
+          .string()
+          .regex(
+            new RegExp(
+              "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            ),
+          )
+          .describe(
+            "MusicBrainz artist id (lowercase UUID) for the track artist, or null when unmatched.",
+          ),
+        z
+          .null()
+          .describe(
+            "MusicBrainz artist id (lowercase UUID) for the track artist, or null when unmatched.",
+          ),
+      ])
+      .describe(
+        "MusicBrainz artist id (lowercase UUID) for the track artist, or null when unmatched.",
+      )
+      .default(null),
+    /**MusicBrainz release group id (lowercase UUID) for the album, or null when unmatched.*/
+    musicbrainz_release_group_id: z
+      .union([
+        z
+          .string()
+          .regex(
+            new RegExp(
+              "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            ),
+          )
+          .describe(
+            "MusicBrainz release group id (lowercase UUID) for the album, or null when unmatched.",
+          ),
+        z
+          .null()
+          .describe(
+            "MusicBrainz release group id (lowercase UUID) for the album, or null when unmatched.",
+          ),
+      ])
+      .describe(
+        "MusicBrainz release group id (lowercase UUID) for the album, or null when unmatched.",
+      )
+      .default(null),
     track_no: z.union([z.number().int().gte(0), z.null()]).default(null),
     disc_no: z.union([z.number().int().gte(0), z.null()]).default(null),
     year: z.union([z.number().int().gte(0), z.null()]).default(null),
