@@ -1,3 +1,7 @@
+## [ui-v0.5.439] - 2026-10-31
+
+- News article kicker chips open their `kicker_channel` through `onAction("open_channel", ...)`; explicit Wikipedia `onKicker` callbacks keep priority.
+
 ## [ui-v0.5.438] - 2026-10-31
 
 - Package version matches its tag. `ui-v0.5.437` was cut with the package still at 0.5.436 and cannot be pinned; use this tag for `ArticleSkeleton`.

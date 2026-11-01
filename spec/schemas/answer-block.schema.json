@@ -1014,6 +1014,15 @@
             "kicker": {
               "type": "string"
             },
+            "kicker_channel": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "key"],
+              "properties": {
+                "kind": { "type": "string", "enum": ["topic", "feed"] },
+                "key": { "type": "string", "minLength": 1 }
+              }
+            },
             "title": {
               "type": "string",
               "minLength": 1

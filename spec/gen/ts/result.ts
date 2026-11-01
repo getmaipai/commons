@@ -1804,6 +1804,13 @@ export const PluginResult = z
                       story_id: z.string().min(1),
                       item_id: z.string().min(1),
                       kicker: z.string(),
+                      kicker_channel: z
+                        .object({
+                          kind: z.enum(["topic", "feed"]),
+                          key: z.string().min(1),
+                        })
+                        .strict()
+                        .optional(),
                       title: z.string().min(1),
                       sourceIconUrl: z
                         .string()

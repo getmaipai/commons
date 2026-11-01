@@ -1250,6 +1250,14 @@ class DataTable(BaseModel):
     props: Props1
 
 
+class KickerChannel(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['topic', 'feed']
+    key: constr(min_length=1)
+
+
 class Props10(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1257,6 +1265,7 @@ class Props10(BaseModel):
     story_id: constr(min_length=1)
     item_id: constr(min_length=1)
     kicker: str
+    kicker_channel: KickerChannel | None = None
     title: constr(min_length=1)
     sourceIconUrl: constr(pattern=r'^/api/favicon(?:[/?#].*)?$') | None = None
     byline: Byline

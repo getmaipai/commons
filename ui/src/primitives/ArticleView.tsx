@@ -53,6 +53,8 @@ export interface ArticleViewData {
   kicker?: string;
   /** Makes the label above the title a button (Reference: it opens the category). */
   onKicker?: () => void;
+  /** News channel opened by the kicker when no explicit `onKicker` is supplied. */
+  kicker_channel?: { kind: string; key: string };
   /** `chip` draws the kicker as a chip instead of small uppercase text. */
   kickerStyle?: "chip";
   /** Where the page sits: each item is plain text, or a button when it has `onClick`; the last item is the page itself. */
@@ -93,7 +95,7 @@ const CONDENSE_RELEASE_PX = 64;
 const SUMMARY_RETRIES = 6;
 const SUMMARY_RETRY_MS = 10_000;
 
-export type ArticleAction = "listen" | "save" | "summarize" | "open_site" | "open" | "discuss";
+export type ArticleAction = "listen" | "save" | "summarize" | "open_site" | "open" | "discuss" | "open_channel";
 
 export interface ArticleViewProps {
   data: ArticleViewData;
@@ -330,6 +332,7 @@ function FoldedBody({ blocks, renderTargetLink, open, onToggle }: { blocks: Arti
 export function ArticleView({ data, onAction, available = [], ids, onBack, renderTargetLink, footer, loadPreview, className }: ArticleViewProps) {
   const can = (a: ArticleAction) => onAction !== undefined && available.includes(a);
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
+  const onKicker = data.onKicker ?? (data.kicker_channel && onAction ? () => fire("open_channel", { channel_kind: data.kicker_channel!.kind, channel_key: data.kicker_channel!.key }) : undefined);
   const [reading, setReading] = useReadingPrefs();
   const [iconFailed, setIconFailed] = useState(false);
   // Save answers at once: the page's own answer arrives a moment later and wins whenever it differs.
@@ -472,14 +475,14 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         ) : null}
         {(data.kicker && data.kickerStyle === "chip") || (hasActionRow && rowPlace === "top") ? (
           <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
-            {data.kicker && data.kickerStyle === "chip" ? (data.onKicker
-              ? <button type="button" data-slot="article-kicker-chip" onClick={data.onKicker} className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Badge variant="outline" className="hover:bg-muted tracking-wide uppercase">{data.kicker}</Badge></button>
+            {data.kicker && data.kickerStyle === "chip" ? (onKicker
+              ? <button type="button" data-slot="article-kicker-chip" onClick={onKicker} className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Badge variant="outline" className="hover:bg-muted tracking-wide uppercase">{data.kicker}</Badge></button>
               : <Badge data-slot="article-kicker-chip" variant="outline" className="tracking-wide uppercase">{data.kicker}</Badge>) : <span />}
             {hasActionRow && rowPlace === "top" ? actionRowEl : null}
           </div>
         ) : null}
         {data.byline ? <p className="text-muted-foreground text-sm">{new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(data.byline.published_at))} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
-        {data.kicker && data.kickerStyle !== "chip" ? (data.onKicker ? <button type="button" onClick={data.onKicker} className="text-muted-foreground hover:text-foreground w-fit text-xs font-semibold tracking-wide uppercase underline-offset-2 hover:underline">{data.kicker}</button> : <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p>) : null}
+        {data.kicker && data.kickerStyle !== "chip" ? (onKicker ? <button type="button" onClick={onKicker} className="text-muted-foreground hover:text-foreground w-fit text-xs font-semibold tracking-wide uppercase underline-offset-2 hover:underline">{data.kicker}</button> : <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p>) : null}
         <h2 ref={titleRef} data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
         {data.hatnote ? <p data-slot="article-hatnote" className="text-muted-foreground text-sm italic">{data.hatnote}</p> : null}
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}

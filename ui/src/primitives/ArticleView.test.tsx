@@ -15,6 +15,18 @@ const childCopy = (): ArticleViewData => ({
 });
 
 describe("ArticleView", () => {
+  test("opens the kicker channel when its label is clicked", () => {
+    const onAction = mock(() => {});
+    const view = render(<ArticleView data={{ ...data, kicker: "World", kickerStyle: "chip", kicker_channel: { kind: "topic", key: "world" } }} onAction={onAction} />);
+    fireEvent.click(view.getByRole("button", { name: "World" }));
+    expect(onAction).toHaveBeenCalledWith("open_channel", { channel_kind: "topic", channel_key: "world" });
+  });
+
+  test("does not make the kicker a button without a channel or onKicker", () => {
+    const view = render(<ArticleView data={{ ...data, kicker: "World", kickerStyle: "chip", kicker_channel: undefined }} onAction={() => {}} />);
+    expect(view.queryByRole("button", { name: "World" })).toBeNull();
+  });
+
   test("draws the kicker, headline, byline, picture, Key points and every block type in the fixture", () => {
     const { container, getByText } = render(<ArticleView data={data} />);
     expect(getByText("World")).toBeTruthy();

@@ -1,3 +1,7 @@
+## [spec-v0.1.286] - 2026-10-31
+
+- News article props gain optional `kicker_channel` (`topic` or `feed`, with a non-empty key) so the category label can open its channel. Additive.
+
 ## [spec-v0.1.285] - 2026-10-31
 
 - Person setting `companions.ambient_bot` (a robot's device id for the top-right companion spot, empty by default) and device command kind `find_me` (chirp and ring flash, optional seconds 1 to 30). Additive.
