@@ -39,6 +39,8 @@ import { getIcon } from "@/kit/icons";
 import { locationBlockedHelp } from "@/kit/geolocationHelp";
 import { AnswerBlockView } from "@/kit/elements/answer-block";
 import { CreationHeader } from "@/kit/elements/creation-header";
+import { PromptBar } from "@/kit/elements/prompt-bar";
+import type { TierId } from "@/kit/elements/tier-segment";
 import { SharePanel } from "@/kit/elements/share-panel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { PageSidebarContext, PageStateContext } from "@/kit/schema/packageScope";
@@ -70,6 +72,7 @@ import type {
   AnswerBlocksNode,
   PickerNode,
   SearchNode,
+  PromptBarNode,
   TabsNode,
   CreationHeaderNode,
   DataState,
@@ -584,6 +587,65 @@ function SearchNodeView({ node, state }: { node: SearchNode; state: Row }) {
   const view = node.recents ? <BoundSearchView node={{ ...node, recents: node.recents }} state={state} /> : <SearchControl node={node} state={state} recents={[]} />;
   // NEWS-SIDEBAR-01: beside an app's own sidebar a plain search box (no recents to keep) is the sidebar's box again: wide screens hide it.
   return sidebar && !node.recents ? <div data-slot="search-under-sidebar" className="lg:hidden">{view}</div> : view;
+}
+
+/** VIDEO-CREATE-01: the prompt bar as a schema node. Chip and tier choices go to page state as they change, the prompt text
+ * when Make is pressed; Make fires `submit` once with {prompt, <chip states>, <tier state>}. The node sends nothing itself. */
+function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row }) {
+  const writer = useContext(PageStateContext);
+  const { dispatch, lastError } = useDispatchAction();
+  const promptKey = node.prompt_state ?? "prompt";
+  const chips = node.chips ?? [];
+  const initial: Record<string, string | number> = {};
+  for (const chip of chips) {
+    const fromState = state[chip.state];
+    const known = chip.options.find((o) => o.value === fromState || String(o.value) === String(fromState));
+    initial[chip.state] = known ? known.value : (chip.default ?? chip.options[0]!.value);
+  }
+  const [text, setText] = useState(typeof state[promptKey] === "string" ? (state[promptKey] as string) : "");
+  const [picked, setPicked] = useState<Record<string, string | number>>(initial);
+  const [tier, setTier] = useState<TierId>(() => {
+    const fromState = node.tier ? state[node.tier.state] : undefined;
+    return node.tier?.tiers.find((t) => t.id === fromState)?.id ?? node.tier?.default ?? node.tier?.tiers[0]?.id ?? "standard";
+  });
+  const [busy, setBusy] = useState(false);
+
+  function submit() {
+    const item: Record<string, unknown> = { ...picked, [promptKey]: text.trim() };
+    if (node.tier) item[node.tier.state] = tier;
+    writer?.merge({ [promptKey]: text.trim() });
+    setBusy(true);
+    dispatch(node.submit, [item], () => setBusy(false), { typedArgs: true });
+  }
+  return (
+    <PromptBar
+      label={node.label}
+      placeholder={node.placeholder}
+      maxLength={node.max_length}
+      value={text}
+      onValueChange={setText}
+      submitLabel={node.submit_label}
+      busy={busy}
+      error={lastError}
+      onSubmit={submit}
+      chips={chips.map((chip) => ({
+        id: chip.state,
+        label: chip.label,
+        options: chip.options,
+        value: picked[chip.state]!,
+        onValueChange: (value) => {
+          setPicked((prev) => ({ ...prev, [chip.state]: value }));
+          writer?.merge({ [chip.state]: value });
+        },
+      }))}
+      tier={node.tier ? {
+        value: tier,
+        label: node.tier.label,
+        tiers: node.tier.tiers.map((t) => ({ id: t.id, label: t.label, hint: t.hint, disabledReason: t.disabled_reason, confirm: t.confirm })),
+        onValueChange: (next) => { setTier(next); writer?.merge({ [node.tier!.state]: next }); },
+      } : undefined}
+    />
+  );
 }
 
 function PickerNodeView({ node, state }: { node: PickerNode; state: Row }) {
@@ -1530,6 +1592,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <PickerNodeView node={node} state={state} />;
     case "search":
       return <SearchNodeView node={node} state={state} />;
+    case "prompt_bar":
+      return <PromptBarNodeView node={node} state={state} />;
     case "tabs":
       return <TabsNodeView node={node} state={state} />;
     case "form":

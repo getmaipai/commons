@@ -1,0 +1,30 @@
+{
+  "type": "page",
+  "id": "make-video",
+  "title": "Make a video",
+  "body": [
+    {
+      "type": "prompt_bar",
+      "label": "Describe your video",
+      "placeholder": "A fox running through snow at sunrise",
+      "chips": [
+        { "state": "shape", "label": "Shape", "default": "landscape", "options": [{ "value": "landscape", "label": "Landscape" }, { "value": "portrait", "label": "Portrait" }] },
+        { "state": "length", "label": "Length", "default": 5, "options": [{ "value": 3, "label": "3 seconds" }, { "value": 5, "label": "5 seconds" }, { "value": 8, "label": "8 seconds" }] },
+        { "state": "recipe", "label": "Camera move", "default": "none", "options": [{ "value": "none", "label": "No camera move" }, { "value": "dolly_in", "label": "Dolly in" }, { "value": "orbit", "label": "Orbit" }] }
+      ],
+      "tier": {
+        "state": "tier",
+        "label": "Quality",
+        "default": "standard",
+        "tiers": [{ "id": "standard", "label": "Standard", "hint": "Fastest" }, { "id": "boost", "label": "Boost", "hint": "More detail" }, { "id": "max", "label": "Max", "confirm": "Max uses the most room and other work waits." }]
+      },
+      "submit_label": "Make",
+      "submit": {
+        "call": {
+          "target": "/api/plugins/videos/make",
+          "args": { "prompt": "{prompt}", "shape": "{shape}", "length": "{length}", "tier": "{tier}", "recipe": "{recipe}" }
+        }
+      }
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+## [spec-v0.1.293] - 2026-11-01
+
+- VIDEO-CREATE-01: new UI node `prompt_bar` (a prompt box, up to six chips that each choose one value, an optional Standard/Boost/Max tier, and one Make button whose `submit` action receives the prompt and every chosen value). Allowed on a package page (`PACKAGE_PAGE_NODE_TYPES`); `checkAppPackage` checks its `submit` stays inside the package and its state keys are distinct. Fixture `ui/pages/videos-make.json`.
+
 ## [spec-v0.1.292] - 2026-11-01
 
 - MUSIC-MB-01: `media-item` gains the optional `musicbrainz_recording_id`, `musicbrainz_artist_id` and `musicbrainz_release_group_id` (each a lowercase UUID string or null, default null): the MusicBrainz ids a track is matched to. Additive; an item without them reads as unmatched.

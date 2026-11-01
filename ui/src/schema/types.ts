@@ -430,6 +430,48 @@ export const SearchNodeSchema = z.object({
 });
 export type SearchNode = z.infer<typeof SearchNodeSchema>;
 
+/** VIDEO-CREATE-01: a prompt box with chips, an optional tier segment and one Make button; `submit` fires once with every chosen value. */
+export const PromptBarNodeSchema = z.object({
+  type: z.literal("prompt_bar"),
+  label: z.string().min(1).max(40),
+  placeholder: z.string().min(1).max(120).optional(),
+  prompt_state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40).optional(),
+  max_length: z.number().int().min(1).max(4000).optional(),
+  chips: z
+    .array(
+      z.object({
+        state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
+        label: z.string().min(1).max(40),
+        options: z.array(z.object({ value: z.union([z.string(), z.number()]), label: z.string().min(1).max(40) })).min(1).max(24),
+        default: z.union([z.string(), z.number()]).optional(),
+      }),
+    )
+    .max(6)
+    .optional(),
+  tier: z
+    .object({
+      state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
+      label: z.string().min(1).max(40).optional(),
+      default: z.enum(["standard", "boost", "max"]).optional(),
+      tiers: z
+        .array(
+          z.object({
+            id: z.enum(["standard", "boost", "max"]),
+            label: z.string().min(1).max(24),
+            hint: z.string().max(80).optional(),
+            disabled_reason: z.string().max(120).optional(),
+            confirm: z.string().max(200).optional(),
+          }),
+        )
+        .min(1)
+        .max(3),
+    })
+    .optional(),
+  submit_label: z.string().min(1).max(24).optional(),
+  submit: ActionSchema,
+});
+export type PromptBarNode = z.infer<typeof PromptBarNodeSchema>;
+
 export const SectionNodeSchema: z.ZodType<SectionNode> = z.lazy(() =>
   z.object({
     type: z.literal("section"),
@@ -498,6 +540,7 @@ export type UiNode =
   | AnswerBlocksNode
   | PickerNode
   | SearchNode
+  | PromptBarNode
   | TabsNode;
 
 export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
@@ -523,6 +566,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     AnswerBlocksNodeSchema,
     PickerNodeSchema,
     SearchNodeSchema,
+    PromptBarNodeSchema,
     TabsNodeSchema,
   ]),
 );
@@ -552,4 +596,5 @@ export const NODE_TYPES = [
   "picker",
   "search",
   "tabs",
+  "prompt_bar",
 ] as const;

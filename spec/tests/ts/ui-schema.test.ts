@@ -203,6 +203,17 @@ describe("UI schema, package apps", () => {
     expect(validate({ type: "list", bind: { source: "route", path: "/api/x", params: { a: 1 } }, item_key_field: "id", item_label_field: "t" })).toBe(false);
   });
 
+  test("VIDEO-CREATE-01: prompt_bar needs a label and a submit action, and refuses unknown keys, tiers and chip counts", () => {
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    expect(validate(ok)).toBe(true);
+    expect(validate({ ...ok, chips: [{ state: "shape", label: "Shape", default: "a", options: [{ value: "a", label: "A" }, { value: 5, label: "Five" }] }], tier: { state: "tier", tiers: [{ id: "standard", label: "Standard" }] } })).toBe(true);
+    expect(validate({ type: "prompt_bar", label: "Describe" })).toBe(false);
+    expect(validate({ ...ok, extra: 1 })).toBe(false);
+    expect(validate({ ...ok, chips: [{ state: "Shape", label: "S", options: [{ value: "a", label: "A" }] }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ state: "s", label: "S", options: [] }] })).toBe(false);
+    expect(validate({ ...ok, tier: { state: "tier", tiers: [{ id: "ultra", label: "Ultra" }] } })).toBe(false);
+  });
+
   test("answer_blocks needs a package binding and refuses a route binding", () => {
     expect(validate({ type: "answer_blocks" })).toBe(false);
     expect(validate({ type: "answer_blocks", bind: { source: "route", path: "/api/people" } })).toBe(false);

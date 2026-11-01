@@ -20,7 +20,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -118,6 +118,15 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     if (node.recents !== undefined) checkBinding(node.recents, `${where} search.recents`, data, "rows", out);
     checkAction(node.submit, packageId, `${where} search.submit`, out);
     checkAction(node.clear_recents, packageId, `${where} search.clear_recents`, out);
+  }
+  // VIDEO-CREATE-01: the prompt bar's one action is the page's own call; chip and prompt state keys must be distinct.
+  if (type === "prompt_bar") {
+    checkAction(node.submit, packageId, `${where} prompt_bar.submit`, out);
+    const keys = [typeof node.prompt_state === "string" ? node.prompt_state : "prompt"];
+    if (Array.isArray(node.chips)) for (const chip of node.chips) if (isObject(chip)) keys.push(String(chip.state));
+    if (isObject(node.tier)) keys.push(String(node.tier.state));
+    const seen = new Set<string>();
+    for (const key of keys) { if (seen.has(key)) out.push(`${where} prompt_bar: state key "${key}" is used twice`); seen.add(key); }
   }
   if (type === "picker" && node.bind !== undefined) checkBinding(node.bind, `${where} picker`, data, "rows", out);
   if (isObject(node.empty_state)) checkAction(node.empty_state.action, packageId, where, out);

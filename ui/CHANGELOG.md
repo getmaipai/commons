@@ -1,3 +1,7 @@
+## [ui-v0.5.452] - 2026-11-01
+
+- VIDEO-CREATE-01: `PromptBar` element (`elements/prompt-bar.tsx`) and the `prompt_bar` schema node. Text box, chips, the kit `TierSegment` and one Make button; used by the Videos Create page and the chat video card. Theme tokens only.
+
 ## [ui-v0.5.450] - 2026-11-01
 
 - `HeaderSearch` gains `scope={{ label }}`: an app's own search. The trigger is a field ("Search Music") from 900 px up and a 40 px icon below; the dialog is titled and worded for the app, lists no shell pages, tabs, Ask or web rows, and leaves Cmd+K to the rail. Without `scope` nothing changes.

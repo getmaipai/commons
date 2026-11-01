@@ -182,6 +182,14 @@ describe("the News pages (NEWS-00)", () => {
     expect(run({ ...ok, clear_recents: { navigate: { to: "https://example.com" } } })).toContain("search.clear_recents: navigate.to");
     expect(run({ ...ok, clear_recents: { call: { target: "/api/elsewhere" } } })).toContain("search.clear_recents: call.target");
   });
+  test("VIDEO-CREATE-01: a prompt_bar is allowed, its submit stays in the package and its state keys are distinct", () => {
+    const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
+    const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
+    const ok = { type: "prompt_bar", label: "Describe", chips: [{ state: "shape", label: "Shape", options: [{ value: "a", label: "A" }] }], submit: { call: { target: "/api/plugins/news/make", args: { prompt: "{prompt}" } } } };
+    expect(run(ok)).toBe("");
+    expect(run({ ...ok, submit: { call: { target: "/api/plugins/other/make" } } })).toContain("prompt_bar.submit: call.target");
+    expect(run({ ...ok, chips: [{ state: "prompt", label: "Clash", options: [{ value: "a", label: "A" }] }] })).toContain('state key "prompt" is used twice');
+  });
   test("a list needs a rows entry and a package source; Listen's play is allowed only in the actions map", () => {
     const badList = { type: "page", id: "x", title: "X", body: [{ type: "list", bind: { source: "package", path: "today" }, item_key_field: "k", item_label_field: "l" }] };
     expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? badList : news(m)), "child").join("\n")).toContain("returns blocks, not rows");

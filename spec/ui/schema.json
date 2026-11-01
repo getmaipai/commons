@@ -26,7 +26,8 @@
     { "$ref": "#/$defs/picker" },
     { "$ref": "#/$defs/search" },
     { "$ref": "#/$defs/creation_header" },
-    { "$ref": "#/$defs/tabs" }
+    { "$ref": "#/$defs/tabs" },
+    { "$ref": "#/$defs/prompt_bar" }
   ],
   "$defs": {
     "binding": {
@@ -768,6 +769,174 @@
               }
             }
           }
+        }
+      }
+    },
+    "prompt_bar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "label",
+        "submit"
+      ],
+      "description": "VIDEO-CREATE-01: a prompt box with chips and one Make button. Every chip and the optional tier segment write their chosen value to page state under their own `state` key as it changes; the prompt text is written under `prompt_state` when Make is pressed. Make fires `submit` once with the item {<prompt_state>: text, <each chip state>: value, <tier state>: id}, so `{prompt}` and `{shape}` placeholders in the call args fill from it (a whole-string placeholder keeps a number's type). Make stays off while the prompt is empty. The node sends nothing itself.",
+      "properties": {
+        "type": {
+          "const": "prompt_bar"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40,
+          "description": "The text box's accessible name."
+        },
+        "placeholder": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "prompt_state": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 40,
+          "default": "prompt"
+        },
+        "max_length": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4000
+        },
+        "chips": {
+          "type": "array",
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "state",
+              "label",
+              "options"
+            ],
+            "properties": {
+              "state": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "maxLength": 40
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40,
+                "description": "The chip's accessible name."
+              },
+              "options": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 24,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "label"
+                  ],
+                  "properties": {
+                    "value": {
+                      "anyOf": [{ "type": "string" }, { "type": "number" }]
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 40
+                    }
+                  }
+                }
+              },
+              "default": {
+                "anyOf": [{ "type": "string" }, { "type": "number" }],
+                "description": "The option chosen first; the first option when omitted."
+              }
+            }
+          }
+        },
+        "tier": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "tiers"
+          ],
+          "description": "The kit tier segment (Standard, Boost, Max).",
+          "properties": {
+            "state": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "maxLength": 40
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            },
+            "default": {
+              "type": "string",
+              "enum": [
+                "standard",
+                "boost",
+                "max"
+              ]
+            },
+            "tiers": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "standard",
+                      "boost",
+                      "max"
+                    ]
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24
+                  },
+                  "hint": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "disabled_reason": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "confirm": {
+                    "type": "string",
+                    "maxLength": 200
+                  }
+                }
+              }
+            }
+          }
+        },
+        "submit_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 24,
+          "default": "Make"
+        },
+        "submit": {
+          "$ref": "#/$defs/action"
         }
       }
     },
