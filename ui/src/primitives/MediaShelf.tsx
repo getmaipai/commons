@@ -4,6 +4,7 @@ import { Button } from "@/kit/ui/button";
 import { EmptyState } from "@/kit/primitives/EmptyState";
 import { Section } from "@/kit/primitives/Section";
 import { GRID_COLUMNS, SHELF_ITEM_WIDTH, type Density } from "@/kit/responsive";
+import { getIcon } from "@/kit/icons";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { useSurface } from "@/kit/useSurface";
 
@@ -76,6 +77,17 @@ interface MediaShelfProps<T> {
   hideWhenEmpty?: boolean;
   /** MEDIA-POLISH-01: a link beside the heading ("See all"). */
   seeAll?: { label: string; onSelect: () => void };
+  /** MUSIC-KIT-01: `tight` draws the art with the 8 px `--media-card-radius` instead of the card radius. Default `default`. */
+  cardRadius?: "default" | "tight";
+  /** MUSIC-KIT-01: a pressed tile shrinks to `--media-press-scale` (0.98). Not applied under reduced motion. Default off. */
+  pressScale?: boolean;
+  /** MUSIC-KIT-01: draws a round Play button. On a rail or grid tile it slides up over the art's bottom-end corner on
+   * hover or keyboard focus (never on touch screens, where the tile itself opens). In vertical rows that have
+   * `renderIndex`, the number turns into a play icon on hover or focus. The button is a sibling of the tile's button,
+   * never inside it. Absent, nothing is drawn. */
+  onPlay?: (item: T) => void;
+  /** MUSIC-KIT-01: the accessible name of the Play button, per item (for example "Play Lanterns"). Falls back to `getLabel`, then "Play". */
+  getPlayLabel?: (item: T) => string;
 }
 
 function clampProgress(value: number | undefined): number {
@@ -124,16 +136,24 @@ export function MediaShelf<T>({
   renderActions,
   hideWhenEmpty = false,
   seeAll,
+  cardRadius = "default",
+  pressScale = false,
+  onPlay,
+  getPlayLabel,
 }: MediaShelfProps<T>) {
   const name = label ?? heading;
   const { far } = useSurface();
   // A plain shelf is a section of the page with its own heading row; a card shelf is the kit Section card.
   const Frame = variant === "plain" ? PlainShelfFrame : CardShelfFrame;
   const circle = artShape === "circle";
+  const tight = cardRadius === "tight";
   const artClasses = cn(
     "relative w-full overflow-hidden bg-[var(--muted)]",
-    circle ? "aspect-square rounded-full" : ["rounded-[var(--radius)]", ASPECT_CLASSES[aspect]],
+    circle ? "aspect-square rounded-full" : [tight ? "rounded-[var(--media-card-radius)]" : "rounded-[var(--radius)]", ASPECT_CLASSES[aspect]],
   );
+  // The Card surface has its own radius; a tight tile clips to the same 8 px so the art and its frame agree.
+  const tileClasses = cn(tight && !circle && "rounded-[var(--media-card-radius)]", pressScale && PRESS_CLASSES);
+  const playName = (item: T) => getPlayLabel?.(item) ?? getLabel?.(item) ?? "Play";
   const currentClasses = "ring-2 ring-[var(--media-current-ring)] ring-offset-2 ring-offset-background";
   // Use the existing card budgets, overriding only the phone count. The
   // plain budget fits three/four whole cards instead of peeking the next.
@@ -157,10 +177,25 @@ export function MediaShelf<T>({
             <li
               key={getKey(item)}
               aria-current={isHighlighted?.(item) ? "true" : undefined}
-              className={cn("flex min-w-0 items-start gap-3", density === "compact" && "items-center")}
+              className={cn("group/row flex min-w-0 items-start gap-3", density === "compact" && "items-center")}
             >
               {renderIndex ? (
-                <span data-slot="media-shelf-index" className="w-6 shrink-0 text-right text-sm tabular-nums text-muted-foreground">{renderIndex(item)}</span>
+                <span data-slot="media-shelf-index" className="group/index relative w-6 shrink-0 text-right text-sm tabular-nums text-muted-foreground">
+                  {onPlay ? (
+                    <>
+                      <span aria-hidden className="transition-opacity group-hover/row:opacity-0 group-focus-within/index:opacity-0">{renderIndex(item)}</span>
+                      <button
+                        type="button"
+                        aria-label={playName(item)}
+                        data-slot="media-shelf-index-play"
+                        onClick={() => onPlay(item)}
+                        className={cn("absolute inset-0 flex items-center justify-end text-foreground opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100", FOCUS_RING)}
+                      >
+                        <PlayGlyph className="size-4" />
+                      </button>
+                    </>
+                  ) : renderIndex(item)}
+                </span>
               ) : null}
               <Card
                 onSelect={onSelect ? () => onSelect(item) : undefined}
@@ -170,6 +205,7 @@ export function MediaShelf<T>({
                 className={cn(
                   "w-2/5 max-w-40 shrink-0 border-0 bg-transparent",
                   density === "compact" && "w-[72px]",
+                  tileClasses,
                   circle && "rounded-full",
                   isSelected?.(item) && "ring-2 ring-primary ring-offset-2 ring-offset-background",
                   isHighlighted?.(item) && currentClasses,
@@ -242,6 +278,7 @@ export function MediaShelf<T>({
             aria-current={isHighlighted?.(item) ? "true" : undefined}
             className={cn("flex flex-col gap-2", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", variant === "plain" ? PLAIN_ITEM_WIDTH : SHELF_ITEM_WIDTH[density]])}
           >
+            <TileFrame onPlay={onPlay ? () => onPlay(item) : undefined} playLabel={playName(item)}>
             <Card
               onSelect={onSelect ? () => onSelect(item) : undefined}
               label={getLabel?.(item)}
@@ -249,6 +286,7 @@ export function MediaShelf<T>({
               far={far}
               className={cn(
                 "border-0 bg-transparent",
+                tileClasses,
                 circle && "rounded-full",
                 // The tile's own selected state. Card draws selection as
                 // a border color, which a borderless artwork tile zeroes
@@ -272,6 +310,7 @@ export function MediaShelf<T>({
                 />
               </div>
             </Card>
+            </TileFrame>
             {renderCaption ? (
               // Outside the Card, not inside it: a caption is flow
               // content, which is invalid inside a button, and a caption
@@ -284,6 +323,34 @@ export function MediaShelf<T>({
         ))}
       </ul>
     </Frame>
+  );
+}
+
+const PRESS_CLASSES = "motion-safe:transition-[transform,opacity] motion-safe:active:scale-[var(--media-press-scale)]";
+
+const PlayGlyph = getIcon("play");
+
+/** The tile and, when the shelf has `onPlay`, its hover Play button as a sibling (a button inside a button is invalid). */
+function TileFrame({ onPlay, playLabel, children }: { onPlay?: () => void; playLabel: string; children: ReactNode }) {
+  if (!onPlay) return <>{children}</>;
+  return (
+    <div className="group/tile relative" data-slot="media-tile">
+      {children}
+      <button
+        type="button"
+        aria-label={playLabel}
+        data-slot="media-tile-play"
+        onClick={onPlay}
+        className={cn(
+          "absolute end-2 bottom-2 flex size-[var(--media-play-size)] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md",
+          "translate-y-2 opacity-0 group-hover/tile:translate-y-0 group-hover/tile:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100",
+          "motion-safe:transition-[transform,opacity] motion-safe:duration-200 [@media(hover:none)]:hidden",
+          FOCUS_RING,
+        )}
+      >
+        <PlayGlyph aria-hidden className="size-5" />
+      </button>
+    </div>
   );
 }
 

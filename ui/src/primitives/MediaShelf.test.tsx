@@ -354,4 +354,43 @@ describe("MediaShelf", () => {
       expect(row.querySelector("button")).not.toBeNull();
     });
   });
+
+  describe("MUSIC-KIT-01 props", () => {
+    const base = { items: tracks, getKey: (t: Track) => t.id, renderItem: (t: Track) => <span>{t.title}</span>, getLabel: (t: Track) => t.title, onSelect: () => {}, heading: "Music" };
+    test("cardRadius tight uses the 8 px token on the art; default keeps the card radius", () => {
+      const { container, rerender } = render(<MediaShelf {...base} />);
+      expect(container.innerHTML).not.toContain("--media-card-radius");
+      rerender(<MediaShelf {...base} cardRadius="tight" />);
+      expect(container.querySelector("li button > div")?.className).toContain("rounded-[var(--media-card-radius)]");
+    });
+    test("pressScale adds the motion-safe press class only when asked", () => {
+      const { container, rerender } = render(<MediaShelf {...base} />);
+      expect(container.innerHTML).not.toContain("media-press-scale");
+      rerender(<MediaShelf {...base} pressScale />);
+      expect(container.querySelector("button")?.className).toContain("motion-safe:active:scale-[var(--media-press-scale)]");
+    });
+    test("onPlay draws a Play button beside the tile button, named per item, and plays without selecting", () => {
+      const onPlay = mock((_t: Track) => {});
+      const onSelect = mock(() => {});
+      const { getByRole, queryByRole, rerender } = render(<MediaShelf {...base} onSelect={onSelect} />);
+      expect(queryByRole("button", { name: "Play Tempo" })).toBeNull();
+      rerender(<MediaShelf {...base} onSelect={onSelect} onPlay={onPlay} getPlayLabel={(t) => `Play ${t.title}`} />);
+      const play = getByRole("button", { name: "Play Tempo" });
+      expect(play.parentElement?.querySelector("button:not([data-slot=media-tile-play])")).toBeTruthy();
+      expect(play.closest("button:not([data-slot=media-tile-play])")).toBeNull();
+      expect(play.className).toContain("motion-safe:transition");
+      fireEvent.click(play);
+      expect(onPlay.mock.calls[0]![0].id).toBe("2");
+      expect(onSelect).not.toHaveBeenCalled();
+    });
+    test("vertical rows with renderIndex get a hover number-to-play swap", () => {
+      const onPlay = mock((_t: Track) => {});
+      const { container } = render(<MediaShelf {...base} orientation="vertical" density="compact" renderIndex={(t) => t.id} onPlay={onPlay} />);
+      expect(container.querySelector("[data-slot=media-shelf-index] > span")?.className).toContain("group-hover/row:opacity-0");
+      const plays = container.querySelectorAll("[data-slot=media-shelf-index-play]");
+      expect(plays.length).toBe(2);
+      fireEvent.click(plays[1]!);
+      expect(onPlay.mock.calls[0]![0].id).toBe("2");
+    });
+  });
 });

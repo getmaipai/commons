@@ -1730,6 +1730,21 @@ html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx] { ani
   /* Current track/next episode and the mockup's compact episode artwork. */
   --media-current-ring: var(--primary);
   --media-compact-radius: 10px;
+  /* MUSIC-KIT-01: the modern music look. All used only when a prop opts in, so the old look is unchanged. */
+  /* MediaShelf cardRadius="tight": the 8 px card. */
+  --media-card-radius: 8px;
+  /* MediaShelf pressScale: how small a pressed tile gets. */
+  --media-press-scale: 0.98;
+  /* MediaShelf onPlay: the round Play button's size. */
+  --media-play-size: 2.75rem;
+  /* Player artSpring: the Now Playing art grows to full size on play and settles back on pause. */
+  --art-resting-scale: 0.86;
+  --art-spring-duration: 420ms;
+  --art-spring-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* LyricsList blurByDistance: blur and fade per line away from the active one, up to the max step. */
+  --lyrics-blur-step: 1.25px;
+  --lyrics-fade-step: 0.14;
+  --lyrics-distance-max: 4;
 }
 
 /* MEDIA-BOOKS-01: reading tones stay independent of the surrounding app tone.

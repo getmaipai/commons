@@ -327,6 +327,54 @@ describe("Player", () => {
     expect(view.container.querySelector("audio")).toBeTruthy();
   });
 
+  describe("MUSIC-KIT-01 props", () => {
+    const touch = (el: Element, type: "pointerdown" | "pointerup", y: number, pointerType = "touch") => {
+      const event = new Event(type, { bubbles: true }) as Event & Record<string, unknown>;
+      Object.assign(event, { clientX: 100, clientY: y, pointerId: 1, pointerType });
+      el.dispatchEvent(event);
+    };
+    test("swipeUpToExpand: a touch drag up on the mini bar opens the player once; a short drag, a mouse drag and the default do not", () => {
+      const onExpand = mock(() => {});
+      const view = render(<Player src="/a" kind="audio" layout="mini" title="Lanterns" onExpand={onExpand} swipeUpToExpand />);
+      const bar = view.container.querySelector("[data-slot=player]")!;
+      expect(bar.getAttribute("data-swipe-up")).toBe("true");
+      touch(bar, "pointerdown", 300); touch(bar, "pointerup", 280);
+      touch(bar, "pointerdown", 300, "mouse"); touch(bar, "pointerup", 200, "mouse");
+      expect(onExpand).not.toHaveBeenCalled();
+      touch(bar, "pointerdown", 300); touch(bar, "pointerup", 240);
+      expect(onExpand).toHaveBeenCalledTimes(1);
+      // the click the browser sends after the swipe is swallowed, so it does not open twice
+      fireEvent.click(view.getByRole("button", { name: "Open the player: Lanterns" }));
+      expect(onExpand).toHaveBeenCalledTimes(1);
+      fireEvent.click(view.getByRole("button", { name: "Open the player: Lanterns" }));
+      expect(onExpand).toHaveBeenCalledTimes(2);
+    });
+    test("without swipeUpToExpand the mini bar ignores a swipe and keeps its markup", () => {
+      const onExpand = mock(() => {});
+      const view = render(<Player src="/a" kind="audio" layout="mini" title="Lanterns" onExpand={onExpand} />);
+      const bar = view.container.querySelector("[data-slot=player]")!;
+      expect(bar.getAttribute("data-swipe-up")).toBeNull();
+      expect(bar.className).not.toContain("touch-pan-x");
+      touch(bar, "pointerdown", 300); touch(bar, "pointerup", 100);
+      expect(onExpand).not.toHaveBeenCalled();
+    });
+    test("artSpring: the audio art rests small while paused and is motion-safe only; off by default", () => {
+      const view = render(<Player src="/a" kind="audio" title="Lanterns" poster="/p.jpg" artSpring />);
+      const img = view.container.querySelector("[data-slot=player] img, [data-slot=player] svg, [data-slot=player] [class*=aspect-square]")!;
+      expect(img.className).toContain("motion-safe:scale-[var(--art-resting-scale)]");
+      expect(img.className).toContain("motion-safe:ease-[var(--art-spring-ease)]");
+      expect(img.className).not.toMatch(/(^|\s)scale-/);
+      view.rerender(<Player src="/a" kind="audio" title="Lanterns" poster="/p.jpg" />);
+      expect(view.container.innerHTML).not.toContain("art-spring");
+    });
+    test("lyricsBlur passes blurByDistance to the lyrics list", () => {
+      const lines = [{ t: 0, line: "One" }, { t: 5, line: "Two" }];
+      const view = render(<Player src="/a" kind="audio" title="Song" lyrics={{ lines }} lyricsBlur />);
+      fireEvent.click(view.getByRole("button", { name: "Lyrics" }));
+      expect(view.container.querySelector("[data-slot=player-lyrics] [data-distance]")).toBeTruthy();
+    });
+  });
+
   test("Media Session: metadata and handlers while playing", () => {
     const handlers = new Map<string, unknown>();
     const session = { metadata: null as unknown, setActionHandler: (a: string, h: unknown) => handlers.set(a, h) };

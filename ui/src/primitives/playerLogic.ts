@@ -17,6 +17,13 @@ export const TAP_CHAIN_MS = 800;
 export const HOLD_MS = 500;
 export const HOLD_RATE = 2;
 export const PULL_DOCK_PX = 80;
+/** MUSIC-KIT-01: how far up (px) a finger drags on the mini bar to open the full player. */
+export const SWIPE_UP_PX = 40;
+
+/** True when a drag moved mostly upward by at least SWIPE_UP_PX (dx and dy are end minus start). */
+export function isSwipeUp(dx: number, dy: number): boolean {
+  return dy <= -SWIPE_UP_PX && Math.abs(dx) < Math.abs(dy);
+}
 /** The keyboard's arrow seek. */
 export const ARROW_SEEK_S = 5;
 /** onProgress cadence while playing. */

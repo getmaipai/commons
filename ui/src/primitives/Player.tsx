@@ -53,6 +53,7 @@ import {
   PLAYBACK_RATES,
   PROGRESS_INTERVAL_MS,
   PULL_DOCK_PX,
+  isSwipeUp,
   RESUME_LINE_MS,
   shouldResume,
   skipOffer,
@@ -228,6 +229,14 @@ export interface PlayerProps {
   /** MEDIA-POLISH-01: `dock` pins the mini layout to the bottom of the scrolling area it sits in, over the page with a
    * top border and a blurred card fill (the docked mini bar). Default `inline`. */
   placement?: "inline" | "dock";
+  /** MUSIC-KIT-01: in the `mini` layout, dragging up on the bar (touch or pen) calls `onExpand`, like tapping it. The
+   * bar keeps its horizontal scroll; the swipe never fires a tap. Default off. */
+  swipeUpToExpand?: boolean;
+  /** MUSIC-KIT-01: in the `audio` layout, the art rests smaller (`--art-resting-scale`) while paused and springs to full
+   * size on play (`--art-spring-duration`, `--art-spring-ease`). Under reduced motion the art stays full size. Default off. */
+  artSpring?: boolean;
+  /** MUSIC-KIT-01: in the `audio` layout, lyrics blur and fade by distance from the active line (LyricsList `blurByDistance`). Default off. */
+  lyricsBlur?: boolean;
 }
 
 /** MEDIA-POLISH-01: where a host-owned media element waits between Players: a hidden spot at the end of the body.
@@ -340,6 +349,9 @@ export function Player(props: PlayerProps) {
     mediaRef,
     media: external = null,
     placement = "inline",
+    swipeUpToExpand = false,
+    artSpring = false,
+    lyricsBlur = false,
   } = props;
   const copy = useMemo(() => ({ ...DEFAULT_PLAYER_COPY, ...props.copy }), [props.copy]);
   const liveProp = props.live === true;
@@ -362,6 +374,9 @@ export function Player(props: PlayerProps) {
   const liveRef = useRef(live);
   liveRef.current = live;
   const [playing, setPlaying] = useState(false);
+  // MUSIC-KIT-01: the touch that may become a swipe up on the mini bar.
+  const swipe = useRef<{ x: number; y: number; id: number } | null>(null);
+  const swiped = useRef(false);
   const [currentRate, setCurrentRate] = useState(rate ?? 1);
   const [resumeLine, setResumeLine] = useState<number | null>(null);
   const [ended, setEnded] = useState(false);
@@ -1028,9 +1043,42 @@ export function Player(props: PlayerProps) {
     );
   }
 
-  const art = (size: string) => (
-    <SafeImage src={poster} alt={posterAlt} kind={kind === "video" ? "video" : "music"} className={cn("shrink-0 rounded-[var(--art-radius)] bg-muted object-cover", size)} />
+  const art = (size: string, spring = false) => (
+    <SafeImage
+      src={poster}
+      alt={posterAlt}
+      kind={kind === "video" ? "video" : "music"}
+      className={cn(
+        "shrink-0 rounded-[var(--art-radius)] bg-muted object-cover",
+        spring && "motion-safe:transition-transform motion-safe:duration-[var(--art-spring-duration)] motion-safe:ease-[var(--art-spring-ease)]",
+        spring && (playing ? "motion-safe:scale-100" : "motion-safe:scale-[var(--art-resting-scale)]"),
+        size,
+      )}
+    />
   );
+  // MUSIC-KIT-01: a drag up on the mini bar opens the full player. Mouse is left alone (it has the expand button).
+  const swipeHandlers = swipeUpToExpand && onExpand
+    ? {
+        onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) => {
+          swiped.current = false;
+          swipe.current = event.pointerType === "mouse" ? null : { x: event.clientX, y: event.clientY, id: event.pointerId };
+        },
+        onPointerUp: (event: ReactPointerEvent<HTMLDivElement>) => {
+          const start = swipe.current;
+          swipe.current = null;
+          if (!start || start.id !== event.pointerId) return;
+          if (isSwipeUp(event.clientX - start.x, event.clientY - start.y)) {
+            swiped.current = true;
+            onExpand();
+          }
+        },
+        onPointerCancel: () => { swipe.current = null; },
+        // The click that follows a swipe on the expand button must not open it a second time.
+        onClickCapture: (event: { stopPropagation: () => void; preventDefault: () => void }) => {
+          if (swiped.current) { swiped.current = false; event.preventDefault(); event.stopPropagation(); }
+        },
+      }
+    : {};
 
   const transport = (big: boolean) => (
     <div className="flex items-center gap-1" data-slot="player-transport">
@@ -1079,9 +1127,12 @@ export function Player(props: PlayerProps) {
         data-slot="player"
         data-layout="mini"
         data-placement={placement}
+        data-swipe-up={swipeUpToExpand && onExpand ? "true" : undefined}
         onKeyDown={onKeyDown}
+        {...swipeHandlers}
         className={cn(
           "relative w-full bg-card text-card-foreground",
+          swipeUpToExpand && onExpand && "touch-pan-x",
           placement === "dock" && "sticky bottom-0 z-30 border-t border-border bg-[color-mix(in_srgb,var(--card)_94%,transparent)] backdrop-blur-md",
         )}
       >
@@ -1137,7 +1188,7 @@ export function Player(props: PlayerProps) {
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
         <div className={audioLayout === "container" ? "grid w-full gap-6 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-6 sm:grid-cols-2 sm:items-center"}>
-          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? "Looking for lyrics..." : lyricsEmptyText }} largeCurrent /></div> : art("aspect-square w-full max-w-md justify-self-center")}
+          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? "Looking for lyrics..." : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center", artSpring)}
           <div className="flex min-w-0 flex-col gap-4">
             <div className="min-w-0">
               <p className="truncate text-2xl font-semibold">{title}</p>

@@ -1,3 +1,13 @@
+## [ui-v0.5.453] - 2026-11-01
+
+MUSIC-KIT-01, the modern music look. Every prop is optional and off by default; with none set the markup and look are unchanged. Motion uses `motion-safe:`, so reduced motion gets none.
+
+- New tokens in `tokens.css`: `--media-card-radius` (8px), `--media-press-scale` (0.98), `--media-play-size`, `--art-resting-scale`, `--art-spring-duration`, `--art-spring-ease`, `--lyrics-blur-step`, `--lyrics-fade-step`, `--lyrics-distance-max`.
+- `MediaShelf` gains `cardRadius` ("default" | "tight"), `pressScale`, `onPlay` and `getPlayLabel`. `onPlay` draws a round Play button that slides up over the tile on hover or focus (hidden on touch screens), and in vertical rows with `renderIndex` turns the number into a play icon.
+- `LyricsList` gains `blurByDistance`: lines blur and fade by distance from the active line; hover and focus clear it. Exports `lyricDistance`.
+- `Player` gains `swipeUpToExpand` (mini bar: a touch drag up calls `onExpand`), `artSpring` (audio layout: art rests smaller while paused, springs to full on play) and `lyricsBlur`. `playerLogic` exports `isSwipeUp` and `SWIPE_UP_PX`.
+- New primitives in `primitives/MusicBlocks`: `QuickTiles`, `TopResultCard`, `CategoryTiles` and `TrackRows` (hover-number rows with disc headings).
+
 ## [ui-v0.5.452] - 2026-11-01
 
 - VIDEO-CREATE-01: `PromptBar` element (`elements/prompt-bar.tsx`) and the `prompt_bar` schema node. Text box, chips, the kit `TierSegment` and one Make button; used by the Videos Create page and the chat video card. Theme tokens only.

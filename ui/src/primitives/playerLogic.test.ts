@@ -4,6 +4,8 @@ import {
   chaptersToVtt,
   clampTime,
   formatTime,
+  isSwipeUp,
+  SWIPE_UP_PX,
   normalizeChapters,
   PLAYBACK_RATES,
   shouldResume,
@@ -84,5 +86,13 @@ describe("playerLogic", () => {
     expect(clampTime(-3, 100)).toBe(0);
     expect(clampTime(140, 100)).toBe(100);
     expect(clampTime(50, Number.NaN)).toBe(50);
+  });
+
+  test("isSwipeUp needs a mostly upward drag of at least SWIPE_UP_PX", () => {
+    expect(isSwipeUp(0, -SWIPE_UP_PX)).toBe(true);
+    expect(isSwipeUp(10, -(SWIPE_UP_PX + 20))).toBe(true);
+    expect(isSwipeUp(0, -(SWIPE_UP_PX - 1))).toBe(false);
+    expect(isSwipeUp(0, 80)).toBe(false);
+    expect(isSwipeUp(90, -50)).toBe(false);
   });
 });
