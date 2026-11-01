@@ -493,23 +493,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       ) : null}
       <div data-slot="article-column" className={cn("mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 md:px-6", hasToolbar && data.breadcrumb && data.breadcrumb.length > 0 ? "pt-16 lg:pt-6" : "pt-6", "lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1 lg:[&>*:not([data-slot=article-rail])]:w-full lg:[&>*:not([data-slot=article-rail])]:max-w-[80ch] lg:[&>*:not([data-slot=article-rail])]:justify-self-center")}>
       <header className="flex flex-col gap-2">
-        {data.breadcrumb && data.breadcrumb.length > 0 ? (
-          <Breadcrumb data-slot="article-breadcrumb" aria-label="Breadcrumb">
-            <BreadcrumbList>
-              {data.breadcrumb.map((item, i) => {
-                const last = i === data.breadcrumb!.length - 1;
-                return (
-                  <Fragment key={i}>
-                    <BreadcrumbItem>
-                      {last ? <BreadcrumbPage>{item.label}</BreadcrumbPage> : item.onClick ? <BreadcrumbLink render={<button type="button" onClick={item.onClick} />}>{item.label}</BreadcrumbLink> : <span>{item.label}</span>}
-                    </BreadcrumbItem>
-                    {last ? null : <BreadcrumbSeparator />}
-                  </Fragment>
-                );
-              })}
-            </BreadcrumbList>
-          </Breadcrumb>
-        ) : null}
+        {data.byline ? <p className="text-muted-foreground text-sm">{formatBylineDate(data.byline.published_at)} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
         {(data.kicker && data.kickerStyle === "chip") || (hasActionRow && rowPlace === "top") ? (
           <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
             {data.kicker && data.kickerStyle === "chip" ? (onKicker
@@ -518,7 +502,23 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
             {hasActionRow && rowPlace === "top" ? actionRowEl : null}
           </div>
         ) : null}
-        {data.byline ? <p className="text-muted-foreground text-sm">{formatBylineDate(data.byline.published_at)} · {data.byline.publisher} · {minutes(data.byline.reading_s)}</p> : null}
+        {data.breadcrumb && data.breadcrumb.length > 0 ? (
+          <Breadcrumb data-slot="article-breadcrumb" aria-label="Breadcrumb">
+            <BreadcrumbList>
+              {data.breadcrumb.map((item, i) => {
+                const last = i === data.breadcrumb!.length - 1;
+                return (
+                  <Fragment key={i}>
+                    <BreadcrumbItem>
+                      {last && !item.onClick ? <BreadcrumbPage>{item.label}</BreadcrumbPage> : item.onClick ? <BreadcrumbLink render={<button type="button" onClick={item.onClick} />}>{item.label}</BreadcrumbLink> : <span>{item.label}</span>}
+                    </BreadcrumbItem>
+                    {last ? null : <BreadcrumbSeparator />}
+                  </Fragment>
+                );
+              })}
+            </BreadcrumbList>
+          </Breadcrumb>
+        ) : null}
         {data.kicker && data.kickerStyle !== "chip" ? (onKicker ? <button type="button" onClick={onKicker} className="text-muted-foreground hover:text-foreground w-fit text-xs font-semibold tracking-wide uppercase underline-offset-2 hover:underline">{data.kicker}</button> : <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{data.kicker}</p>) : null}
         <h2 ref={titleRef} data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
         {data.hatnote ? <p data-slot="article-hatnote" className="text-muted-foreground text-sm italic">{data.hatnote}</p> : null}

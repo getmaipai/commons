@@ -1,3 +1,7 @@
+## [ui-v0.5.442] - 2026-11-01
+
+- `ArticleView` header order is byline, kicker row, breadcrumb, title; the last breadcrumb item stays a link when it has a click.
+
 ## [ui-v0.5.441] - 2026-11-01
 
 - `ArticleView` takes an optional `providerLabel` that replaces the publisher name in the provider row.

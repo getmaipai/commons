@@ -20,6 +20,15 @@ describe("ArticleView", () => {
     expect(formatBylineDate("2026-09-01T14:05:00.000Z")).toMatch(/Sep 1, 2026.*\d{1,2}:05\s?(AM|PM)/);
   });
 
+  test("the byline line comes first, then the breadcrumb, then the title; a last crumb with a click stays a link", () => {
+    const view = render(<ArticleView data={{ ...data, breadcrumb: [{ label: "Wikipedia", onClick: () => {} }, { label: "Cats", onClick: () => {} }] }} />);
+    const header = view.container.querySelector("header")!;
+    const order = [header.querySelector("p"), header.querySelector('[data-slot="article-breadcrumb"]'), header.querySelector('[data-slot="article-title"]')];
+    expect(order[0]!.compareDocumentPosition(order[1]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(order[1]!.compareDocumentPosition(order[2]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(view.getByRole("button", { name: "Cats" })).toBeTruthy();
+  });
+
   test("providerLabel replaces the publisher name in the provider row", () => {
     const view = render(<ArticleView data={{ ...data, providerLabel: "Aurora", sourceIconUrl: "/pic.jpg" }} />);
     expect(view.container.querySelector('[data-slot="article-provider-label"]')?.textContent).toBe("Aurora");
