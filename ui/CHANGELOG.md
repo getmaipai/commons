@@ -1,3 +1,7 @@
+## [ui-v0.5.438] - 2026-10-31
+
+- Package version matches its tag. `ui-v0.5.437` was cut with the package still at 0.5.436 and cannot be pinned; use this tag for `ArticleSkeleton`.
+
 ## [ui-v0.5.437] - 2026-10-31
 
 - Add `ArticleSkeleton`, a delayed article-shaped loading placeholder with a category chip, title, byline, lead image and body lines.
