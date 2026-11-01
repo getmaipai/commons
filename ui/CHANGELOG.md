@@ -1,3 +1,7 @@
+## [ui-v0.5.448] - 2026-11-01
+
+- Icons: `zap` (lightning bolt) joins the registry. (`ui-v0.5.447` was cut before its version bump; use 0.5.448.)
+
 ## [ui-v0.5.446] - 2026-11-01
 
 - `pendingActions`: a queued `VideoPlayer` with answers shows the host phase line (the question), and `ImageGeneration` wraps its caption instead of truncating it while it has answers.
