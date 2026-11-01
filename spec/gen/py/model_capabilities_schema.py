@@ -170,6 +170,14 @@ class TurnBudget(BaseModel):
         ...,
         description="Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).",
     )
+    rounds_thinking: conint(ge=0, le=12) | None = Field(
+        None,
+        description="RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Thinking for that message. Absent means the model has no Thinking research depth and the turn keeps `rounds`.",
+    )
+    rounds_max: conint(ge=0, le=12) | None = Field(
+        None,
+        description="RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Max for that message. Absent means the model has no Max research depth and the turn keeps `rounds` (or `rounds_thinking` when Thinking is also on).",
+    )
     max_tools: conint(ge=0, le=16) | None = Field(
         None,
         description='TOOL-OFFER-01: maximum measured tool definitions this model may receive in one adult written turn. Home fails closed when the derived offer set exceeds this cap; it never trims the set silently.',

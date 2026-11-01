@@ -320,6 +320,26 @@ export const ModelCapabilities = z
           .describe(
             "Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).",
           ),
+        /**RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Thinking for that message. Absent means the model has no Thinking research depth and the turn keeps `rounds`.*/
+        rounds_thinking: z
+          .number()
+          .int()
+          .gte(0)
+          .lte(12)
+          .describe(
+            "RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Thinking for that message. Absent means the model has no Thinking research depth and the turn keeps `rounds`.",
+          )
+          .optional(),
+        /**RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Max for that message. Absent means the model has no Max research depth and the turn keeps `rounds` (or `rounds_thinking` when Thinking is also on).*/
+        rounds_max: z
+          .number()
+          .int()
+          .gte(0)
+          .lte(12)
+          .describe(
+            "RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Max for that message. Absent means the model has no Max research depth and the turn keeps `rounds` (or `rounds_thinking` when Thinking is also on).",
+          )
+          .optional(),
         /**TOOL-OFFER-01: maximum measured tool definitions this model may receive in one adult written turn. Home fails closed when the derived offer set exceeds this cap; it never trims the set silently.*/
         max_tools: z
           .number()

@@ -190,6 +190,18 @@
           "enum": [0, 1, 2],
           "description": "Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds)."
         },
+        "rounds_thinking": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 12,
+          "description": "RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Thinking for that message. Absent means the model has no Thinking research depth and the turn keeps `rounds`."
+        },
+        "rounds_max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 12,
+          "description": "RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Max for that message. Absent means the model has no Max research depth and the turn keeps `rounds` (or `rounds_thinking` when Thinking is also on)."
+        },
         "max_tools": {
           "type": "integer",
           "minimum": 0,

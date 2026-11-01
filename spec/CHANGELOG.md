@@ -1,3 +1,7 @@
+## [spec-v0.1.290] - 2026-11-01
+
+- RESEARCH-TIER-01: `turn_budget` gains the optional `rounds_thinking` and `rounds_max` (0 to 12): the tool rounds an adult's written turn may take when the person picked Thinking or Max for that message, so research depth follows the answer style. `rounds` keeps its 0, 1 or 2 and stays the Instant figure. Additive.
+
 ## [spec-v0.1.289] - 2026-11-01
 
 - MEDIA-HEADER-01: manifest `contributes.header` declares what an app puts in the shell's one header row: a `search` trigger for the app's own scoped search, 2 or 3 `modes` (a segmented control whose page and sidebar groups change with the mode) and `actions` (one primary button plus an overflow menu). Sidebar groups gain an optional `mode`. The manifest lint checks pages, actions, mode names and that the search trigger has a sidebar search to open. Additive.

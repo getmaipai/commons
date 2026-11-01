@@ -54,6 +54,12 @@ describe("ModelCapabilities.turn_budget", () => {
     expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: VALID_BUDGET })).not.toThrow();
   });
 
+  test("RESEARCH-TIER-01: rounds_thinking and rounds_max are optional and run 0 to 12", () => {
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, rounds_thinking: 4, rounds_max: 12 } })).not.toThrow();
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, rounds_max: 13 } })).toThrow();
+    expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, rounds_thinking: -1 } })).toThrow();
+  });
+
   test("rounds is closed to 0, 1, or 2", () => {
     expect(() => ModelCapabilities.parse({ ...BASE, turn_budget: { ...VALID_BUDGET, rounds: 3 } })).toThrow();
   });
