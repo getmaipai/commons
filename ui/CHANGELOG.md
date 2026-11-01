@@ -1,3 +1,7 @@
+## [ui-v0.5.449] - 2026-11-01
+
+- `AnswerStyleSelect` (elements/answer-style-select): an icon-only 44 px composer dropdown named by its current word, with icon, word and one plain line per choice in the open menu; an optional accent mark on a choice's icon.
+
 ## [ui-v0.5.448] - 2026-11-01
 
 - Icons: `zap` (lightning bolt) joins the registry. (`ui-v0.5.447` was cut before its version bump; use 0.5.448.)
