@@ -47,3 +47,16 @@ describe("pendingActions on the generation elements", () => {
     expect(view.container.querySelector("[data-slot=pending-actions]")).toBeNull();
   });
 });
+
+describe("the question stays readable", () => {
+  test("a queued VideoPlayer with answers shows the host's phase line (the question); without answers it does not", () => {
+    const view = render(<VideoPlayer status="queued" prompt="x" phaseLabel="Run it lower, or wait?" pendingActions={actions([])} />);
+    expect(view.getByText("Run it lower, or wait?")).toBeTruthy();
+    view.rerender(<VideoPlayer status="queued" prompt="x" phaseLabel="Run it lower, or wait?" />);
+    expect(view.queryByText("Run it lower, or wait?")).toBeNull();
+  });
+  test("ImageGeneration with answers does not truncate its caption", () => {
+    const view = render(<ImageGeneration prompt="A garden" generating statusLabel="Run it lower, or wait?" pendingActions={actions([])} />);
+    expect(view.getByText("Run it lower, or wait?").closest("p")!.className).not.toContain("truncate");
+  });
+});

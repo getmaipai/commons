@@ -59,6 +59,8 @@ export function ImageGeneration({
   /** Answers to a held job. Drawn under the caption only while `generating`; the host passes them only while the job is held. */
   pendingActions?: PendingAction[];
 }) {
+  // While the job asks a question the caption is the question, so it wraps instead of being cut off.
+  const asking = generating && !!pendingActions && pendingActions.length > 0;
   return (
     <div
       data-slot="image-generation"
@@ -103,7 +105,7 @@ export function ImageGeneration({
         ) : null}
       </GenerationStage>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-muted-foreground min-w-0 flex-1 truncate text-xs" title={prompt}>
+        <p className={cn("text-muted-foreground min-w-0 flex-1 text-xs", asking ? "text-foreground" : "truncate")} title={prompt}>
           {generating ? (
             <>
               <ShimmerLabel className="relative">{statusLabel}</ShimmerLabel>

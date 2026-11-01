@@ -1,3 +1,7 @@
+## [ui-v0.5.446] - 2026-11-01
+
+- `pendingActions`: a queued `VideoPlayer` with answers shows the host phase line (the question), and `ImageGeneration` wraps its caption instead of truncating it while it has answers.
+
 ## [ui-v0.5.445] - 2026-11-01
 
 - `VideoPlayer`, `MusicTrack` and `ImageGeneration` take an optional `pendingActions: {label, onSelect, variant?, disabled?}[]`, drawn as kit Buttons only while a job is queued (image: while generating; the host passes them only when the job is held).

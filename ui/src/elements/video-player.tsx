@@ -199,7 +199,7 @@ export function VideoPlayer({
                 </Button>
               ) : null}
             </div>
-            {phaseLabel && status === "generating" ? <p className="text-foreground text-sm">{phaseLabel}</p> : null}
+            {phaseLabel && (status === "generating" || (status === "queued" && pendingActions && pendingActions.length > 0)) ? <p className="text-foreground text-sm">{phaseLabel}</p> : null}
             {hint ? <p className="text-muted-foreground text-xs">{hint}</p> : null}
             {status === "queued" ? <PendingActions actions={pendingActions} /> : null}
           </>
