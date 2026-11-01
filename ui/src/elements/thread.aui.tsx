@@ -1074,6 +1074,7 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
                 size="icon"
                 className="aui-composer-dictate text-muted-foreground hover:text-foreground size-7 rounded-full"
                 aria-label="Start voice input"
+                aria-pressed={false}
               >
                 <MicIcon className="aui-composer-dictate-icon size-4" />
               </TooltipIconButton>
@@ -1085,10 +1086,11 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
                 tooltip="Stop dictation"
                 side="bottom"
                 type="button"
-                variant="ghost"
+                variant="default"
                 size="icon"
-                className="aui-composer-stop-dictation text-destructive size-7 rounded-full"
+                className="aui-composer-stop-dictation size-7 rounded-full"
                 aria-label="Stop voice input"
+                aria-pressed={true}
               >
                 <SquareIcon className="aui-composer-stop-dictation-icon size-3.5 animate-pulse fill-current" />
               </TooltipIconButton>

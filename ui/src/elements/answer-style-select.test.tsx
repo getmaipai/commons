@@ -40,4 +40,24 @@ describe("AnswerStyleSelect", () => {
     fireEvent.click(within(view.getByRole("menu")).getByRole("menuitemradio", { name: /^Max/ }));
     expect(picked).toEqual([]);
   });
+
+  test("the closed control is quiet when the current choice is off and shows the filled on-look when it is on", () => {
+    const withOn = choices.map((c) => ({ ...c, on: c.id !== "instant" }));
+    const idle = render(<AnswerStyleSelect choices={withOn} value="instant" onValueChange={() => {}} />);
+    const quiet = idle.getByRole("combobox");
+    expect(quiet.getAttribute("data-variant")).toBe("ghost");
+    expect(quiet.getAttribute("data-on")).toBe("false");
+    cleanup();
+    const thinking = render(<AnswerStyleSelect choices={withOn} value="thinking" onValueChange={() => {}} />);
+    expect(thinking.getByRole("combobox").getAttribute("data-variant")).toBe("default");
+    expect(thinking.getByRole("combobox").getAttribute("data-on")).toBe("true");
+    cleanup();
+    const max = render(<AnswerStyleSelect choices={withOn} value="max" onValueChange={() => {}} />);
+    expect(max.getByRole("combobox").getAttribute("data-on")).toBe("true");
+  });
+
+  test("a choice that does not say it is on keeps the quiet look", () => {
+    const view = render(<AnswerStyleSelect choices={choices} value="thinking" onValueChange={() => {}} />);
+    expect(view.getByRole("combobox").getAttribute("data-variant")).toBe("ghost");
+  });
 });
