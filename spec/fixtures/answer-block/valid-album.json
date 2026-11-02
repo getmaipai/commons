@@ -1,0 +1,25 @@
+{
+  "id": "blk-a1bum0001",
+  "kind": "album",
+  "schema_version": 1,
+  "producer": "music",
+  "alt": "Salt on the Glass, a made album by Lantern Hollow with three tracks.",
+  "provenance": "music make_album result",
+  "created_at": "2026-11-02T12:00:00Z",
+  "hlc": "1793016000000:0:hub001",
+  "props": {
+    "title": "Salt on the Glass",
+    "artist": "Lantern Hollow",
+    "blurb": "Quiet songs for ships that never came.",
+    "genres": ["lo-fi", "dream pop"],
+    "cover": { "src": "hubimg-7d5e2f34", "alt": "Salt on the Glass album cover" },
+    "look": "a lighthouse at dusk, hazy film grain, teal and amber",
+    "sound": "hazy lo-fi drums, tape-warped keys, close whispered vocals",
+    "tracks": [
+      { "media_id": "media-tr4ck001", "title": "Salt on the Glass", "length_s": 152 },
+      { "media_id": "media-tr4ck002", "title": "Lamp Oil", "length_s": 141 },
+      { "media_id": "media-tr4ck003", "title": "Low Tide Letters", "length_s": 168 }
+    ],
+    "actions": ["play_all", "remake_cover", "keep", "discard"]
+  }
+}

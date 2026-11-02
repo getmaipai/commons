@@ -18,12 +18,14 @@
     { "$ref": "#/$defs/media_card" },
     { "$ref": "#/$defs/confirmation" },
     { "$ref": "#/$defs/countdown" },
-    { "$ref": "#/$defs/band" }
+    { "$ref": "#/$defs/band" },
+    { "$ref": "#/$defs/album" },
+    { "$ref": "#/$defs/song_style" }
   ],
   "$defs": {
     "kind": {
       "type": "string",
-      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card", "story_feed", "article", "media_card", "confirmation", "countdown", "band"],
+      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card", "story_feed", "article", "media_card", "confirmation", "countdown", "band", "album", "song_style"],
       "description": "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here."
     },
     "block_id": {
@@ -1497,7 +1499,57 @@
           "members": { "type": "array", "maxItems": 12, "items": { "type": "object", "additionalProperties": false, "required": ["name", "role"], "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 80 }, "role": { "type": "string", "minLength": 1, "maxLength": 60 }, "portrait": { "type": "object", "additionalProperties": false, "required": ["src", "alt"], "properties": { "src": { "type": "string", "pattern": "^hubimg-[a-f0-9]{8,}$" }, "alt": { "type": "string", "minLength": 1 } } } } } },
           "inspiredBy": { "type": "string", "maxLength": 120, "description": "Set when the band was made like a playing track: the card says it was inspired by this, and the band's own name never copies it." },
           "singleTitle": { "type": "string", "maxLength": 120, "description": "The first single to judge, once it is made." },
+          "look": { "type": "string", "maxLength": 1000, "description": "The words the band's picture and logo are made from. Shown and edited only in edit mode." },
+          "sound": { "type": "string", "maxLength": 1000, "description": "The band's style words (MadeArtist.style.description). Shown and edited only in edit mode." },
+          "editable": { "type": "boolean", "description": "True when the card may be edited inline. Saving emits the `edit_band` action with only the changed fields." },
           "actions": { "type": "array", "items": { "type": "string", "enum": ["make_album", "remake_logo", "remake_portrait", "keep", "remake", "discard", "open_app"] }, "uniqueItems": true, "maxItems": 4 }
+        } }
+      }
+    },
+    "album": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" }, "kind": { "const": "album" },
+        "schema_version": { "$ref": "#/$defs/schema_version" }, "producer": { "$ref": "#/$defs/producer" }, "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" }, "provenance": { "$ref": "#/$defs/provenance" }, "created_at": { "$ref": "#/$defs/created_at" }, "hlc": { "$ref": "#/$defs/hlc" }, "after_paragraph": { "$ref": "#/$defs/after_paragraph" },
+        "props": { "type": "object", "additionalProperties": false, "required": ["title", "actions"], "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "artist": { "type": "string", "maxLength": 120, "description": "The band's name (MadeArtist.name)." },
+          "blurb": { "type": "string", "maxLength": 1000, "description": "Plain text, never HTML." },
+          "genres": { "type": "array", "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 40 } },
+          "cover": { "type": "object", "additionalProperties": false, "required": ["src", "alt"], "properties": { "src": { "type": "string", "pattern": "^hubimg-[a-f0-9]{8,}$", "description": "Hub cache image reference only; never a remote URL." }, "alt": { "type": "string", "minLength": 1 } } },
+          "look": { "type": "string", "maxLength": 1000, "description": "The words the cover is made from. Shown and edited only in edit mode." },
+          "sound": { "type": "string", "maxLength": 1000, "description": "The album's style words (MadeAlbum.style.description). Shown and edited only in edit mode." },
+          "inspiredBy": { "type": "string", "maxLength": 120 },
+          "tracks": { "type": "array", "maxItems": 100, "items": { "type": "object", "additionalProperties": false, "required": ["media_id", "title"], "properties": {
+            "media_id": { "type": "string", "pattern": "^media-[a-z0-9]{6,}$", "description": "The track's media-item id. Play, reorder and remove name tracks by it." },
+            "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "length_s": { "type": "integer", "minimum": 0, "maximum": 36000 }
+          } } },
+          "editable": { "type": "boolean", "description": "True when the card may be edited inline. Saving emits the `edit_album` action with only the changed fields; the track order and removals travel as `track_ids`." },
+          "actions": { "type": "array", "items": { "type": "string", "enum": ["play_all", "keep", "remake_cover", "discard", "open_app"] }, "uniqueItems": true, "maxItems": 5 }
+        } }
+      }
+    },
+    "song_style": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" }, "kind": { "const": "song_style" },
+        "schema_version": { "$ref": "#/$defs/schema_version" }, "producer": { "$ref": "#/$defs/producer" }, "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" }, "provenance": { "$ref": "#/$defs/provenance" }, "created_at": { "$ref": "#/$defs/created_at" }, "hlc": { "$ref": "#/$defs/hlc" }, "after_paragraph": { "$ref": "#/$defs/after_paragraph" },
+        "props": { "type": "object", "additionalProperties": false, "required": ["title", "sound", "actions"], "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "sound": { "type": "string", "minLength": 1, "maxLength": 1000, "description": "The style words (SongStyle.style.description). Never lyrics." },
+          "genres": { "type": "array", "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 40 } },
+          "instrumental": { "type": "boolean" },
+          "bpm": { "type": "integer", "minimum": 30, "maximum": 300 },
+          "key": { "type": "string", "maxLength": 20 },
+          "length_s": { "type": "integer", "minimum": 5, "maximum": 600 },
+          "inspiredBy": { "type": "string", "maxLength": 120 },
+          "editable": { "type": "boolean", "description": "True when the card may be edited inline. Saving emits the `edit_song_style` action with only the changed fields." },
+          "actions": { "type": "array", "items": { "type": "string", "enum": ["make_song", "save", "discard", "open_app"] }, "uniqueItems": true, "maxItems": 4 }
         } }
       }
     },

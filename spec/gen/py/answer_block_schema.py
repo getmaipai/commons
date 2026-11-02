@@ -1207,6 +1207,18 @@ class Props14(BaseModel):
     singleTitle: constr(max_length=120) | None = Field(
         None, description='The first single to judge, once it is made.'
     )
+    look: constr(max_length=1000) | None = Field(
+        None,
+        description="The words the band's picture and logo are made from. Shown and edited only in edit mode.",
+    )
+    sound: constr(max_length=1000) | None = Field(
+        None,
+        description="The band's style words (MadeArtist.style.description). Shown and edited only in edit mode.",
+    )
+    editable: bool | None = Field(
+        None,
+        description='True when the card may be edited inline. Saving emits the `edit_band` action with only the changed fields.',
+    )
     actions: list[
         Literal[
             'make_album',
@@ -1255,6 +1267,147 @@ class Band(BaseModel):
         description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
     )
     props: Props14
+
+
+class Track(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    media_id: constr(pattern=r'^media-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="The track's media-item id. Play, reorder and remove name tracks by it.",
+    )
+    title: constr(min_length=1, max_length=120)
+    length_s: conint(ge=0, le=36000) | None = None
+
+
+class Props15(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    title: constr(min_length=1, max_length=120)
+    artist: constr(max_length=120) | None = Field(
+        None, description="The band's name (MadeArtist.name)."
+    )
+    blurb: constr(max_length=1000) | None = Field(
+        None, description='Plain text, never HTML.'
+    )
+    genres: list[constr(min_length=1, max_length=40)] | None = Field(None, max_length=8)
+    cover: Cover | None = None
+    look: constr(max_length=1000) | None = Field(
+        None,
+        description='The words the cover is made from. Shown and edited only in edit mode.',
+    )
+    sound: constr(max_length=1000) | None = Field(
+        None,
+        description="The album's style words (MadeAlbum.style.description). Shown and edited only in edit mode.",
+    )
+    inspiredBy: constr(max_length=120) | None = None
+    tracks: list[Track] | None = Field(None, max_length=100)
+    editable: bool | None = Field(
+        None,
+        description='True when the card may be edited inline. Saving emits the `edit_album` action with only the changed fields; the track order and removals travel as `track_ids`.',
+    )
+    actions: list[
+        Literal['play_all', 'keep', 'remake_cover', 'discard', 'open_app']
+    ] = Field(..., max_length=5)
+
+
+class Album(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['album']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props15
+
+
+class Props16(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    title: constr(min_length=1, max_length=80)
+    sound: constr(min_length=1, max_length=1000) = Field(
+        ..., description='The style words (SongStyle.style.description). Never lyrics.'
+    )
+    genres: list[constr(min_length=1, max_length=40)] | None = Field(None, max_length=8)
+    instrumental: bool | None = None
+    bpm: conint(ge=30, le=300) | None = None
+    key: constr(max_length=20) | None = None
+    length_s: conint(ge=5, le=600) | None = None
+    inspiredBy: constr(max_length=120) | None = None
+    editable: bool | None = Field(
+        None,
+        description='True when the card may be edited inline. Saving emits the `edit_song_style` action with only the changed fields.',
+    )
+    actions: list[Literal['make_song', 'save', 'discard', 'open_app']] = Field(
+        ..., max_length=4
+    )
+
+
+class SongStyle(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['song_style']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props16
 
 
 class ArticleQuote(BaseModel):

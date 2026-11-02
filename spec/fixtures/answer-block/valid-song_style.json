@@ -1,0 +1,21 @@
+{
+  "id": "blk-s0ngst001",
+  "kind": "song_style",
+  "schema_version": 1,
+  "producer": "music",
+  "alt": "Rainy day piano, a saved song style: slow felt piano, soft rain, warm and sleepy.",
+  "provenance": "music song_style result",
+  "created_at": "2026-11-02T12:00:00Z",
+  "hlc": "1793016000000:0:hub001",
+  "props": {
+    "title": "Rainy day piano",
+    "sound": "slow felt piano, soft rain, warm and sleepy",
+    "genres": ["ambient", "piano"],
+    "instrumental": true,
+    "bpm": 64,
+    "key": "A minor",
+    "length_s": 120,
+    "inspiredBy": "a song that was playing",
+    "actions": ["make_song", "save", "discard"]
+  }
+}

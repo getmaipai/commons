@@ -19,6 +19,8 @@ import article from "@maipai/spec/fixtures/answer-block/valid-article.json";
 import mediaCard from "@maipai/spec/fixtures/answer-block/valid-media_card.json";
 import confirmation from "@maipai/spec/fixtures/answer-block/valid-confirmation.json";
 import band from "@maipai/spec/fixtures/answer-block/valid-band.json";
+import album from "@maipai/spec/fixtures/answer-block/valid-album.json";
+import songStyle from "@maipai/spec/fixtures/answer-block/valid-song_style.json";
 import countdown from "@maipai/spec/fixtures/answer-block/valid-countdown.json";
 import { AnswerBlockView } from "./answer-block";
 import { ImageGallery } from "./image-gallery";
@@ -38,6 +40,8 @@ export const ANSWER_BLOCK_FIXTURES = {
   media_card: mediaCard,
   confirmation,
   band,
+  album,
+  song_style: songStyle,
   countdown,
 } as const;
 

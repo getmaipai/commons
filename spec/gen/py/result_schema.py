@@ -129,6 +129,8 @@ class PluginResult(BaseModel):
         | answer_block_schema.Confirmation
         | answer_block_schema.Countdown
         | answer_block_schema.Band
+        | answer_block_schema.Album
+        | answer_block_schema.SongStyle
     ] = Field(
         [],
         description='GENUI-01: typed answer blocks this call returns, in display order. Optional and additive. The hub validates each one, applies the output floor, drops an invalid one, and streams the rest as `block` events. A package may only return kinds its manifest lists in `returns_blocks`.',

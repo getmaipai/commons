@@ -25,6 +25,7 @@ from gen.py.file_schema import File
 from gen.py.grant_schema import Grant
 from gen.py.issue_schema import Issue
 from gen.py.list_schema import List
+from gen.py.made_album_schema import MadeAlbum
 from gen.py.made_artist_schema import MadeArtist
 from gen.py.manifest_schema import PackageManifest
 from gen.py.media_collection_schema import MediaCollection
@@ -119,6 +120,7 @@ def test_clock_record_invalid_examples_are_rejected(name, model):
     [
         ("song-style.example.json", SongStyle),
         ("made-artist.example.json", MadeArtist),
+        ("made-album.example.json", MadeAlbum),
     ],
 )
 def test_music_record_fixtures_round_trip(name, model):
@@ -1015,6 +1017,8 @@ V1_KINDS = [
     "confirmation",
     "countdown",
     "band",
+    "album",
+    "song_style",
 ]
 
 

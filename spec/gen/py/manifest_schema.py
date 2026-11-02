@@ -1189,6 +1189,8 @@ class PackageManifest(BaseModel):
                 'confirmation',
                 'countdown',
                 'band',
+                'album',
+                'song_style',
             ]
         ]
         | None

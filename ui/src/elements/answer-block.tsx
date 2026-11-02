@@ -16,6 +16,8 @@ import { StoryFeed } from "../primitives/StoryFeed";
 import { ArticleView } from "../primitives/ArticleView";
 import { MediaCard } from "./media-card";
 import { Band } from "./band";
+import { Album } from "./album";
+import { SongStyleCard } from "./song-style";
 import { Confirmation } from "./confirmation";
 import { Countdown } from "./countdown";
 
@@ -37,7 +39,7 @@ export interface AnswerBlockHandlers {
   /** A `schedule_card` toggle was pressed. Unset: the card is read-only. */
   onScheduleToggle?: (blockId: string) => void;
   /** Media and confirmation actions carry a semantic name and block id, never a route. */
-  onAction?: (blockId: string, action: string) => void;
+  onAction?: (blockId: string, action: string, detail?: Record<string, unknown>) => void;
   /** Draw a block in its small form where its Element has one (today the
    * `weather_card`: the hero alone, for a dashboard card). Render-only. */
   compact?: boolean;
@@ -151,7 +153,13 @@ function renderKind(
     case "media_card":
       return <MediaCard {...props} resolveImageSrc={resolveImageSrc} onAction={onAction && ((action) => onAction(block.id, action))} />;
     case "band":
-      return <Band {...props} resolveImageSrc={resolveImageSrc} onAction={onAction && ((action) => onAction(block.id, action))} />;
+      return <Band {...props} resolveImageSrc={resolveImageSrc} onAction={onAction && ((action) => onAction(block.id, action))} onEdit={props.editable && onAction ? (patch) => onAction(block.id, "edit_band", { ...patch }) : undefined} />;
+    case "album":
+      return <Album {...props} resolveImageSrc={resolveImageSrc} onAction={onAction && ((action) => onAction(block.id, action))} onPlayTrack={onAction && ((mediaId) => onAction(block.id, "play_track", { media_id: mediaId }))} onEdit={props.editable && onAction ? (patch) => onAction(block.id, "edit_album", { ...patch }) : undefined} />;
+    case "song_style": {
+      const { key: musicKey, ...rest } = props;
+      return <SongStyleCard {...rest} musicKey={musicKey} onAction={onAction && ((action) => onAction(block.id, action))} onEdit={props.editable && onAction ? (patch) => onAction(block.id, "edit_song_style", { ...patch }) : undefined} />;
+    }
     case "confirmation":
       return <Confirmation {...props} onUndo={onAction && (() => onAction(block.id, "undo"))} />;
     case "countdown":

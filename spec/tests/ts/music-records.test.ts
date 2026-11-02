@@ -7,6 +7,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { SongStyle } from "../../gen/ts/song-style.js";
 import { MadeArtist } from "../../gen/ts/made-artist.js";
+import { MadeAlbum } from "../../gen/ts/made-album.js";
 import { AnswerBlock } from "../../gen/ts/answer-block.js";
 
 const SPEC = join(import.meta.dir, "..", "..");
@@ -16,14 +17,18 @@ addFormats(ajv);
 ajv.addSchema(read("schemas/song-style.schema.json"));
 const validateStyle = ajv.getSchema("https://getmaipai.github.io/shared/spec/schemas/song-style.schema.json")!;
 ajv.addSchema(read("schemas/made-artist.schema.json"));
+ajv.addSchema(read("schemas/made-album.schema.json"));
+const validateAlbum = ajv.getSchema("https://getmaipai.github.io/shared/spec/schemas/made-album.schema.json")!;
 const validateArtist = ajv.getSchema("https://getmaipai.github.io/shared/spec/schemas/made-artist.schema.json")!;
 const style = read("fixtures/records/song-style.example.json");
 const artist = read("fixtures/records/made-artist.example.json");
+const album = read("fixtures/records/made-album.example.json");
 const COMMON = ["id", "source", "provenance", "created_at", "updated_at", "hlc"];
 
 const both = [
   ["SongStyle", SongStyle, validateStyle, style, [...COMMON, "title", "origin", "style"]],
   ["MadeArtist", MadeArtist, validateArtist, artist, [...COMMON, "name", "origin", "style"]],
+  ["MadeAlbum", MadeAlbum, validateAlbum, album, [...COMMON, "title", "origin", "style"]],
 ] as const;
 
 for (const [name, model, validate, base, required] of both) {
@@ -122,5 +127,52 @@ describe("the word recipe stays out of the music spec", () => {
     for (const file of ["schemas/song-style.schema.json", "schemas/made-artist.schema.json", "fixtures/records/song-style.example.json", "fixtures/records/made-artist.example.json", "fixtures/answer-block/valid-band.json"]) {
       expect(readFileSync(join(SPEC, file), "utf-8").toLowerCase()).not.toContain("recipe");
     }
+  });
+});
+
+describe("MadeAlbum", () => {
+  test("holds the one shared style and seed, and defines neither", () => {
+    const text = readFileSync(join(SPEC, "schemas/made-album.schema.json"), "utf-8");
+    expect(text).toContain("song-style.schema.json#/$defs/style");
+    expect(text).toContain("song-style.schema.json#/$defs/seed");
+    expect(read("schemas/made-album.schema.json").$defs).toBeUndefined();
+  });
+  test("tracks are unique media ids, at most 100, in order", () => {
+    expect(MadeAlbum.parse(album).track_media_ids).toEqual(["media-tr4ck001", "media-tr4ck002", "media-tr4ck003"]);
+    for (const bad of [["media-tr4ck001", "media-tr4ck001"], ["song-12345678"], Array.from({ length: 101 }, (_, i) => `media-trk${String(i).padStart(4, "0")}`)]) {
+      expect(MadeAlbum.safeParse({ ...album, track_media_ids: bad }).success, JSON.stringify(bad).slice(0, 60)).toBe(false);
+      expect(validateAlbum({ ...album, track_media_ids: bad })).toBe(false);
+    }
+  });
+  test("band, style and cover refs keep their id prefixes; cover seed is an unsigned 32-bit number", () => {
+    for (const bad of [{ made_artist_id: "mband-1" }, { song_style_id: "style-a1b2c3d4" }, { cover_file_id: "media-tr4ck001" }, { cover_seed: -1 }, { cover_seed: 4294967296 }, { cover_seed: 1.5 }]) {
+      expect(MadeAlbum.safeParse({ ...album, ...bad }).success, JSON.stringify(bad)).toBe(false);
+    }
+    expect(MadeAlbum.safeParse({ ...album, made_artist_id: null, song_style_id: null, cover_seed: null }).success).toBe(true);
+  });
+});
+
+describe("answer-block album and song_style kinds", () => {
+  const albumBlock = read("fixtures/answer-block/valid-album.json");
+  const styleBlock = read("fixtures/answer-block/valid-song_style.json");
+  test("the fixtures parse and keep their props", () => {
+    expect(AnswerBlock.parse(albumBlock)).toEqual(albumBlock);
+    expect(AnswerBlock.parse(styleBlock)).toEqual(styleBlock);
+  });
+  test("refuse a remote cover, a track without a media id, an unknown action and extra props", () => {
+    const album = (props: Record<string, unknown>) => ({ ...albumBlock, props: { ...albumBlock.props, ...props } });
+    for (const bad of [{ cover: { src: "https://example.com/a.png", alt: "x" } }, { tracks: [{ title: "x" }] }, { tracks: [{ media_id: "file-12345678", title: "x" }] }, { actions: ["buy_now"] }, { extra: 1 }]) {
+      expect(AnswerBlock.safeParse(album(bad)).success, JSON.stringify(bad)).toBe(false);
+    }
+    const style = (props: Record<string, unknown>) => ({ ...styleBlock, props: { ...styleBlock.props, ...props } });
+    for (const bad of [{ sound: "" }, { actions: ["remake_cover"] }, { bpm: 5 }, { lyrics: "la la" }]) {
+      expect(AnswerBlock.safeParse(style(bad)).success, JSON.stringify(bad)).toBe(false);
+    }
+  });
+  test("the edit flags and fields are accepted on all three cards", () => {
+    const band = read("fixtures/answer-block/valid-band.json");
+    expect(AnswerBlock.safeParse({ ...band, props: { ...band.props, look: "x", sound: "y", editable: true } }).success).toBe(true);
+    expect(AnswerBlock.safeParse({ ...albumBlock, props: { ...albumBlock.props, editable: true } }).success).toBe(true);
+    expect(AnswerBlock.safeParse({ ...styleBlock, props: { ...styleBlock.props, editable: true } }).success).toBe(true);
   });
 });

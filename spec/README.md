@@ -267,3 +267,5 @@ gate's drift step diffs `spec/gen/` against the index, so a correct but
 unstaged regeneration reads as drift and the gate goes red for nothing.
 
 Added 2026-11-02 (MUSIC-STUDIO-S2, MUSIC-LISTEN-C5): **SongStyle** (a saved way a song should sound: style words and a few knobs, never lyrics; the one 'make one like this' shape) and **MadeArtist** (a band the household made: name, back story, members, portrait, logo). Both carry the shared record fields (id, source, provenance, clock stamp, `created_at`, `updated_at`, `deleted_at`) and use ONE `style` definition (`song-style.schema.json#/$defs/style`) and ONE `seed` field (a file made here or a library media-item). The AnswerBlock gains the `band` kind. Additive only.
+
+Added 2026-11-02 (MUSIC-STUDIO-ALBUM): **MadeAlbum** (an album the household made: title, band, cover, ordered track ids; the same shared `style` and `seed` as SongStyle and MadeArtist) and the AnswerBlock kinds `album` and `song_style`. `band`, `album` and `song_style` blocks may be `editable`; saving an edit reports `edit_band`, `edit_album` or `edit_song_style` with only the changed fields. Additive only.

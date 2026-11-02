@@ -34,6 +34,7 @@ export * from "./link-state.js";
 export * from "./list.js";
 export * from "./log-events.js";
 export * from "./look-result.js";
+export * from "./made-album.js";
 export * from "./made-artist.js";
 export * from "./maintenance-window.js";
 export * from "./manifest.js";

@@ -1,0 +1,30 @@
+{
+  "id": "malbum-a1b2c3d4",
+  "title": "Salt on the Glass",
+  "origin": "made",
+  "owner_person_id": "person-sage01",
+  "made_artist_id": "mband-a1b2c3d4",
+  "song_style_id": "sstyle-a1b2c3d4",
+  "blurb": "Ten quiet songs for ships that never came.",
+  "look": "a lighthouse at dusk, hazy film grain, teal and amber",
+  "cover_file_id": "file-c0v3r001",
+  "cover_seed": 90210,
+  "track_media_ids": ["media-tr4ck001", "media-tr4ck002", "media-tr4ck003"],
+  "style": {
+    "description": "hazy lo-fi drums, tape-warped keys, close whispered vocals",
+    "genres": ["lo-fi", "dream pop"],
+    "instrumental": false,
+    "length_s": 150,
+    "bpm": 82,
+    "key": null,
+    "language": "en"
+  },
+  "seed": null,
+  "shared_to": "household",
+  "source": "hub",
+  "provenance": "person-sage (self)",
+  "hlc": "1793016000000:2:node0001",
+  "created_at": "2026-11-02T12:00:00Z",
+  "updated_at": "2026-11-02T12:10:00Z",
+  "deleted_at": null
+}

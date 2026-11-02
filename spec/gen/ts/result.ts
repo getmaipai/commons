@@ -2693,6 +2693,29 @@ export const PluginResult = z
                         .max(120)
                         .describe("The first single to judge, once it is made.")
                         .optional(),
+                      /**The words the band's picture and logo are made from. Shown and edited only in edit mode.*/
+                      look: z
+                        .string()
+                        .max(1000)
+                        .describe(
+                          "The words the band's picture and logo are made from. Shown and edited only in edit mode.",
+                        )
+                        .optional(),
+                      /**The band's style words (MadeArtist.style.description). Shown and edited only in edit mode.*/
+                      sound: z
+                        .string()
+                        .max(1000)
+                        .describe(
+                          "The band's style words (MadeArtist.style.description). Shown and edited only in edit mode.",
+                        )
+                        .optional(),
+                      /**True when the card may be edited inline. Saving emits the `edit_band` action with only the changed fields.*/
+                      editable: z
+                        .boolean()
+                        .describe(
+                          "True when the card may be edited inline. Saving emits the `edit_band` action with only the changed fields.",
+                        )
+                        .optional(),
                       actions: z
                         .array(
                           z.enum([
@@ -2704,6 +2727,256 @@ export const PluginResult = z
                             "discard",
                             "open_app",
                           ]),
+                        )
+                        .max(4)
+                        .refine(
+                          (arr) =>
+                            arr.every((item, i) => arr.indexOf(item) == i),
+                          "All items must be unique!",
+                        ),
+                    })
+                    .strict(),
+                })
+                .strict(),
+              z
+                .object({
+                  /**Stable identity of this block. Unique within a turn's block list.*/
+                  id: z
+                    .string()
+                    .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+                    .describe(
+                      "Stable identity of this block. Unique within a turn's block list.",
+                    ),
+                  kind: z.literal("album"),
+                  schema_version: z.literal(1),
+                  /**The id of the package that returned the block.*/
+                  producer: z
+                    .string()
+                    .min(1)
+                    .describe("The id of the package that returned the block."),
+                  /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+                  alt: z
+                    .string()
+                    .min(1)
+                    .max(300)
+                    .describe(
+                      "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+                    ),
+                  /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+                  min_band: z
+                    .enum(["child", "teen", "adult"])
+                    .describe(
+                      "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+                    )
+                    .optional(),
+                  /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+                  provenance: z
+                    .string()
+                    .min(1)
+                    .describe(
+                      "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+                    ),
+                  created_at: z.string().datetime({ offset: true }),
+                  /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+                  hlc: z
+                    .string()
+                    .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
+                    .describe(
+                      "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+                    ),
+                  /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+                  after_paragraph: z
+                    .number()
+                    .int()
+                    .gte(0)
+                    .describe(
+                      "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+                    )
+                    .optional(),
+                  props: z
+                    .object({
+                      title: z.string().min(1).max(120),
+                      /**The band's name (MadeArtist.name).*/
+                      artist: z
+                        .string()
+                        .max(120)
+                        .describe("The band's name (MadeArtist.name).")
+                        .optional(),
+                      /**Plain text, never HTML.*/
+                      blurb: z
+                        .string()
+                        .max(1000)
+                        .describe("Plain text, never HTML.")
+                        .optional(),
+                      genres: z
+                        .array(z.string().min(1).max(40))
+                        .max(8)
+                        .optional(),
+                      cover: z
+                        .object({
+                          /**Hub cache image reference only; never a remote URL.*/
+                          src: z
+                            .string()
+                            .regex(new RegExp("^hubimg-[a-f0-9]{8,}$"))
+                            .describe(
+                              "Hub cache image reference only; never a remote URL.",
+                            ),
+                          alt: z.string().min(1),
+                        })
+                        .strict()
+                        .optional(),
+                      /**The words the cover is made from. Shown and edited only in edit mode.*/
+                      look: z
+                        .string()
+                        .max(1000)
+                        .describe(
+                          "The words the cover is made from. Shown and edited only in edit mode.",
+                        )
+                        .optional(),
+                      /**The album's style words (MadeAlbum.style.description). Shown and edited only in edit mode.*/
+                      sound: z
+                        .string()
+                        .max(1000)
+                        .describe(
+                          "The album's style words (MadeAlbum.style.description). Shown and edited only in edit mode.",
+                        )
+                        .optional(),
+                      inspiredBy: z.string().max(120).optional(),
+                      tracks: z
+                        .array(
+                          z
+                            .object({
+                              /**The track's media-item id. Play, reorder and remove name tracks by it.*/
+                              media_id: z
+                                .string()
+                                .regex(new RegExp("^media-[a-z0-9]{6,}$"))
+                                .describe(
+                                  "The track's media-item id. Play, reorder and remove name tracks by it.",
+                                ),
+                              title: z.string().min(1).max(120),
+                              length_s: z
+                                .number()
+                                .int()
+                                .gte(0)
+                                .lte(36000)
+                                .optional(),
+                            })
+                            .strict(),
+                        )
+                        .max(100)
+                        .optional(),
+                      /**True when the card may be edited inline. Saving emits the `edit_album` action with only the changed fields; the track order and removals travel as `track_ids`.*/
+                      editable: z
+                        .boolean()
+                        .describe(
+                          "True when the card may be edited inline. Saving emits the `edit_album` action with only the changed fields; the track order and removals travel as `track_ids`.",
+                        )
+                        .optional(),
+                      actions: z
+                        .array(
+                          z.enum([
+                            "play_all",
+                            "keep",
+                            "remake_cover",
+                            "discard",
+                            "open_app",
+                          ]),
+                        )
+                        .max(5)
+                        .refine(
+                          (arr) =>
+                            arr.every((item, i) => arr.indexOf(item) == i),
+                          "All items must be unique!",
+                        ),
+                    })
+                    .strict(),
+                })
+                .strict(),
+              z
+                .object({
+                  /**Stable identity of this block. Unique within a turn's block list.*/
+                  id: z
+                    .string()
+                    .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+                    .describe(
+                      "Stable identity of this block. Unique within a turn's block list.",
+                    ),
+                  kind: z.literal("song_style"),
+                  schema_version: z.literal(1),
+                  /**The id of the package that returned the block.*/
+                  producer: z
+                    .string()
+                    .min(1)
+                    .describe("The id of the package that returned the block."),
+                  /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+                  alt: z
+                    .string()
+                    .min(1)
+                    .max(300)
+                    .describe(
+                      "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+                    ),
+                  /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+                  min_band: z
+                    .enum(["child", "teen", "adult"])
+                    .describe(
+                      "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+                    )
+                    .optional(),
+                  /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+                  provenance: z
+                    .string()
+                    .min(1)
+                    .describe(
+                      "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+                    ),
+                  created_at: z.string().datetime({ offset: true }),
+                  /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+                  hlc: z
+                    .string()
+                    .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
+                    .describe(
+                      "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+                    ),
+                  /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+                  after_paragraph: z
+                    .number()
+                    .int()
+                    .gte(0)
+                    .describe(
+                      "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+                    )
+                    .optional(),
+                  props: z
+                    .object({
+                      title: z.string().min(1).max(80),
+                      /**The style words (SongStyle.style.description). Never lyrics.*/
+                      sound: z
+                        .string()
+                        .min(1)
+                        .max(1000)
+                        .describe(
+                          "The style words (SongStyle.style.description). Never lyrics.",
+                        ),
+                      genres: z
+                        .array(z.string().min(1).max(40))
+                        .max(8)
+                        .optional(),
+                      instrumental: z.boolean().optional(),
+                      bpm: z.number().int().gte(30).lte(300).optional(),
+                      key: z.string().max(20).optional(),
+                      length_s: z.number().int().gte(5).lte(600).optional(),
+                      inspiredBy: z.string().max(120).optional(),
+                      /**True when the card may be edited inline. Saving emits the `edit_song_style` action with only the changed fields.*/
+                      editable: z
+                        .boolean()
+                        .describe(
+                          "True when the card may be edited inline. Saving emits the `edit_song_style` action with only the changed fields.",
+                        )
+                        .optional(),
+                      actions: z
+                        .array(
+                          z.enum(["make_song", "save", "discard", "open_app"]),
                         )
                         .max(4)
                         .refine(

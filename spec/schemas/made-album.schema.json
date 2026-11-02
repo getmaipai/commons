@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/made-album.schema.json",
+  "title": "MadeAlbum",
+  "description": "MUSIC-STUDIO-ALBUM. An album the household made here: a title, the made band it belongs to, the sound every track reuses, a cover and the ordered tracks. A track is a normal made song (a media-item whose `made_artist_id` is the band), so the album only lists their ids in play order; there is no second copy of a song. It holds the SAME shared `style` and `seed` definitions as song-style and made-artist (one definition each), and may name a saved SongStyle it started from. Person scope, always labelled 'Made here'. Title and blurb are a person's own words and are never logged (rule 6a). The cover is a picture made from `cover_seed`: the same seed and look make the same cover, a new seed makes a new one.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "origin",
+    "style",
+    "source",
+    "provenance",
+    "hlc",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^malbum-[a-z0-9]{6,}$",
+      "description": "Stable id, never reused."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "The album's title. Trimmed; not unique."
+    },
+    "origin": {
+      "type": "string",
+      "const": "made",
+      "description": "Always made: an album found in the library is a media-item album, not this record."
+    },
+    "owner_person_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^person-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "Who made the album."
+    },
+    "made_artist_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^mband-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "The made band the album belongs to; null for an album of mixed artists."
+    },
+    "song_style_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^sstyle-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "The saved SongStyle the album started from, if any. `style` is the album's own copy and wins."
+    },
+    "blurb": {
+      "type": "string",
+      "maxLength": 1000,
+      "default": "",
+      "description": "A short plain-text description for the album page. Never HTML. Passes the same output gate as chat before it is stored (rule 10)."
+    },
+    "look": {
+      "type": "string",
+      "maxLength": 1000,
+      "default": "",
+      "description": "The words the cover picture is made from (what it should look like)."
+    },
+    "cover_file_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^file-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "The cover picture."
+    },
+    "cover_seed": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 4294967295,
+      "default": null,
+      "description": "The picture seed of the cover. Remaking the cover picks a new one."
+    },
+    "track_media_ids": {
+      "type": "array",
+      "maxItems": 100,
+      "uniqueItems": true,
+      "default": [],
+      "items": {
+        "type": "string",
+        "pattern": "^media-[a-z0-9]{6,}$"
+      },
+      "description": "The tracks in play order, as media-item ids. Removing a track here does not delete the song."
+    },
+    "style": {
+      "$ref": "song-style.schema.json#/$defs/style"
+    },
+    "seed": {
+      "$ref": "song-style.schema.json#/$defs/seed"
+    },
+    "shared_to": {
+      "$ref": "song-style.schema.json#/$defs/shared_to"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "hub",
+        "local"
+      ],
+      "description": "hub: authoritative on the hub. local: made on a robot, not yet synced."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Free text naming who made the album, for example 'person-a1b2c3 (self)'."
+    },
+    "hlc": {
+      "$ref": "song-style.schema.json#/$defs/hlc"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deleted_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "Set when the album is deleted, so a syncing client drops it. Its tracks stay as songs."
+    }
+  }
+}

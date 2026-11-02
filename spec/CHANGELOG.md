@@ -1,3 +1,7 @@
+## [spec-v0.1.301] - 2026-11-02
+
+- MUSIC-STUDIO-ALBUM: new record `MadeAlbum` (`malbum-`: title, `made_artist_id`, `song_style_id`, blurb, `look`, `cover_file_id`, `cover_seed`, `track_media_ids` in play order). It holds the SAME shared `style` and `seed` definitions as `SongStyle` and `MadeArtist`; a track is a normal made song, so the album only lists ids. New answer-block kinds `album` and `song_style` (props mirror the kit Album and SongStyle Elements). The `band`, `album` and `song_style` props gain `editable` (edit mode) and the editable words `look` and `sound`. Edit saves report these actions with only the changed fields: `edit_band`, `edit_album` (tracks as `track_ids`, the full new order), `edit_song_style`; `play_track` reports `{media_id}`. Additive.
+
 ## [spec-v0.1.300] - 2026-11-02
 
 - VIDEO-CREATE-02 U1: `prompt_bar` chips gain the optional `variant` (`dropdown` default, or `cards`: a grid of picture cards, one choice) and each chip option gains the optional `media` (a relative package asset path, no `..`, no scheme, for a short silent mp4 or webp loop or an image). `prompt_bar` gains the optional `references` (up to 6 `{state, label, kind: picture | character | place}` slots; each writes a chosen file id under `state` and joins the submit item). `checkAppPackage` counts reference keys in the distinct-state check. All additive; old pages are unchanged.
