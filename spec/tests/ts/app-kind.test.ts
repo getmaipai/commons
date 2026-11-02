@@ -197,6 +197,17 @@ describe("the News pages (NEWS-00)", () => {
     expect(run(ok)).toBe("");
     expect(run({ ...ok, references: [{ state: "look", label: "Picture", kind: "picture" }] })).toContain('state key "look" is used twice');
   });
+  test("VIDEO-UI-04: a result_feed stays under its package and polls a data entry of its own", () => {
+    const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
+    const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
+    const base = { type: "result_feed", bind: { source: "package", path: "today" }, fields: { words: "w", status: "s" }, poll_while: { statuses: ["queued"], record: { path: "today" } } };
+    const out = run(base);
+    expect(out).not.toContain("result_feed.poll_while");
+    expect(run({ ...base, poll_while: { statuses: ["queued"], record: { path: "nope" } } })).toContain("result_feed.poll_while.record");
+    expect(run({ ...base, handlers: { stop: { call: { target: "/api/plugins/other/cancel" } } } })).toContain("result_feed.handlers.stop: call.target");
+    expect(run({ ...base, fields: { words: "https://x.test/a", status: "s", src: "https://x.test/a.mp4" } })).toContain("result_feed.fields: src must be a field path");
+    expect(run({ ...base, filters: [{ kind: "toggle", state: "a", label: "A" }, { kind: "toggle", state: "a", label: "B" }] })).toContain('filter state key "a" is used twice');
+  });
   test("a list needs a rows entry and a package source; Listen's play is allowed only in the actions map", () => {
     const badList = { type: "page", id: "x", title: "X", body: [{ type: "list", bind: { source: "package", path: "today" }, item_key_field: "k", item_label_field: "l" }] };
     expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? badList : news(m)), "child").join("\n")).toContain("returns blocks, not rows");

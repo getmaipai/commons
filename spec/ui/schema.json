@@ -31,7 +31,8 @@
     { "$ref": "#/$defs/quick_tiles" },
     { "$ref": "#/$defs/top_result" },
     { "$ref": "#/$defs/category_tiles" },
-    { "$ref": "#/$defs/track_rows" }
+    { "$ref": "#/$defs/track_rows" },
+    { "$ref": "#/$defs/result_feed" }
   ],
   "$defs": {
     "binding": {
@@ -557,6 +558,126 @@
         },
         "hide_when_empty": { "type": "boolean", "default": false, "description": "Draw nothing when the bound call returns no rows." },
         "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "result_feed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "fields", "poll_while"],
+      "description": "VIDEO-UI-04 (K9, K10): the kit's ResultFeed block, a newest-first feed of the package's own rows. Each row is one entry: its words, tags, reference chips (a Start frame chip with its thumbnail), one `VideoPlayer` (queued, generating, draft, ready, failed, cancelled) and its actions. `filters` write page state that `bind.params` reads as `$state.<name>`. Entries are grouped under a `DayDivider` per day of `fields.created_at` (or, while a toggle marked `group` is on, under their words). The player's built-in Stop, Try again, Make another, Render, Another still, Edit words and Favorite are mapped from `handlers`; only extra buttons (Remix, Make it Max) are `actions`. `starts` on a handler or action marks it as starting a picture or video: the host's `makingNotice` disables it with that notice. `poll_while` is required: the feed re-reads only the running rows' own records, every `FEED_POLL_INTERVAL_MS` (3 s, defined once in ui/src/schema/feedPolling.ts) while any row's status is one of `poll_while.statuses`, stops when none is, and re-reads at once when a hidden tab is shown again.",
+      "properties": {
+        "type": { "const": "result_feed" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["words", "status"],
+          "description": "Dotted paths into each row. `key` defaults to \"id\".",
+          "properties": {
+            "key": { "type": "string" },
+            "words": { "type": "string" },
+            "tags": { "type": "string", "description": "Dotted path to an array of short strings." },
+            "references": { "type": "string", "description": "Dotted path to an array of {label, thumb}; thumb is a same-origin path." },
+            "status": { "type": "string", "description": "Dotted path to one of queued, generating, draft, ready, failed, cancelled." },
+            "progress": { "type": "string", "description": "Dotted path to 0 to 100, or null." },
+            "phase": { "type": "string" },
+            "queue_position": { "type": "string" },
+            "started_at": { "type": "string", "description": "Dotted path to epoch milliseconds the job started." },
+            "error": { "type": "string" },
+            "poster": { "type": "string", "description": "Dotted path to the still (a draft's picture, a clip's poster)." },
+            "src": { "type": "string", "description": "Dotted path to the clip's same-origin path." },
+            "favorite": { "type": "string", "description": "Dotted path to a boolean." },
+            "created_at": { "type": "string", "description": "Dotted path to an ISO date or epoch milliseconds; the day headings read it." },
+            "width": { "type": "string" },
+            "height": { "type": "string" }
+          }
+        },
+        "filters": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "state", "label"],
+            "properties": {
+              "kind": { "type": "string", "enum": ["toggle", "select"] },
+              "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+              "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "options": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 8,
+                "description": "A select's choices; the first is the default.",
+                "items": { "type": "object", "additionalProperties": false, "required": ["value", "label"], "properties": { "value": { "type": "string" }, "label": { "type": "string", "minLength": 1, "maxLength": 40 } } }
+              },
+              "group": { "type": "boolean", "default": false, "description": "A toggle only: while on, entries with the same words are gathered under a heading of those words, in place of the day headings." }
+            }
+          }
+        },
+        "handlers": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The VideoPlayer's own built-in actions, each one action run with the row. `starts` is the K8 marker.",
+          "properties": {
+            "stop": { "$ref": "#/$defs/feed_handler" },
+            "retry": { "$ref": "#/$defs/feed_handler" },
+            "make_another": { "$ref": "#/$defs/feed_handler" },
+            "render": { "$ref": "#/$defs/feed_handler" },
+            "another_still": { "$ref": "#/$defs/feed_handler" },
+            "edit_words": { "$ref": "#/$defs/feed_handler" },
+            "favorite": { "$ref": "#/$defs/feed_handler" }
+          }
+        },
+        "actions": {
+          "type": "array",
+          "maxItems": 4,
+          "description": "Extra buttons after the built-in ones. With no `when`, an action shows in `ready`.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "action"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "icon": { "type": "string" },
+              "starts": { "type": "string", "enum": ["picture", "video"] },
+              "when": { "type": "array", "minItems": 1, "items": { "type": "string", "enum": ["draft", "ready", "failed", "cancelled"] } },
+              "action": { "$ref": "#/$defs/action" }
+            }
+          }
+        },
+        "actions_variant": { "type": "string", "enum": ["default", "icons"], "default": "default", "description": "Passed to each VideoPlayer; `icons` needs VIDEO-UI-02's player." },
+        "actions_inline": { "type": "integer", "minimum": 1, "maximum": 8, "description": "Passed to each VideoPlayer; the rest go in its More menu (VIDEO-UI-02)." },
+        "poll_while": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["statuses", "record"],
+          "properties": {
+            "statuses": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "enum": ["queued", "generating"] }, "description": "The statuses that mean a job is running. Every other status is settled." },
+            "record": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path"],
+              "description": "The read of one job's own record: a data call of this package (a `contributes.data[]` id), POSTed with `params` filled from the running row (`{id}`); it returns that row in the feed's shape.",
+              "properties": {
+                "path": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "maxLength": 40 },
+                "params": { "type": "object", "additionalProperties": true }
+              }
+            }
+          }
+        },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "feed_handler": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "VIDEO-UI-04: one action (navigate, call or confirm, exactly one) run with the row, plus the optional K8 `starts` marker (the action starts a picture or a video, so the host's `makingNotice` disables it).",
+      "oneOf": [{ "required": ["navigate"], "properties": { "navigate": true } }, { "required": ["call"], "properties": { "call": true } }, { "required": ["confirm"], "properties": { "confirm": true } }],
+      "properties": {
+        "starts": { "type": "string", "enum": ["picture", "video"] },
+        "navigate": { "$ref": "#/$defs/action/properties/navigate" },
+        "call": { "$ref": "#/$defs/action/properties/call" },
+        "confirm": { "$ref": "#/$defs/action/properties/confirm" }
       }
     },
     "billboard": {

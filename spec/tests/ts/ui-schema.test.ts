@@ -228,6 +228,35 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, references: [{ state: "x", label: "X" }] })).toBe(false);
   });
 
+  test("VIDEO-UI-04: result_feed needs a binding, fields.words and fields.status, and a poll_while", () => {
+    const ok = {
+      type: "result_feed",
+      bind: { source: "package", path: "recipes", params: { scope: "feed", favorites: "$state.favorites_only" } },
+      fields: { words: "prompt", status: "status", tags: "tags", references: "references", progress: "percent", poster: "still", src: "src", favorite: "favorite", created_at: "created_at" },
+      filters: [{ kind: "toggle", state: "favorites_only", label: "Favorites only" }, { kind: "toggle", state: "group_by_words", label: "Group by words", group: true }, { kind: "select", state: "type", label: "Type", options: [{ value: "all", label: "All" }, { value: "video", label: "Videos" }] }],
+      handlers: { stop: { call: { target: "/api/plugins/videos/actions/cancel", args: { id: "{id}" } } }, retry: { starts: "video", call: { target: "/api/plugins/videos/actions/another" } }, edit_words: { navigate: { to: "/apps/videos/create", state: { prompt: "{prompt}" } } }, favorite: { call: { target: "/api/plugins/videos/actions/favorite" } } },
+      actions: [{ label: "Remix", icon: "pencil", when: ["ready"], action: { navigate: { to: "/apps/videos/create" } } }, { label: "Make it Max", starts: "video", action: { call: { target: "/api/plugins/videos/actions/max" } } }],
+      actions_variant: "icons",
+      actions_inline: 4,
+      poll_while: { statuses: ["queued", "generating"], record: { path: "recipes", params: { scope: "job", id: "{id}" } } },
+    };
+    expect(validate(ok)).toBe(true);
+    const { poll_while: _p, ...noPoll } = ok;
+    expect(validate(noPoll)).toBe(false);
+    expect(validate({ ...ok, poll_while: { statuses: [], record: { path: "recipes" } } })).toBe(false);
+    expect(validate({ ...ok, poll_while: { statuses: ["ready"], record: { path: "recipes" } } })).toBe(false);
+    expect(validate({ ...ok, poll_while: { statuses: ["queued"] } })).toBe(false);
+    expect(validate({ ...ok, fields: { words: "prompt" } })).toBe(false);
+    expect(validate({ ...ok, bind: undefined })).toBe(false);
+    expect(validate({ ...ok, handlers: { unknown: { call: { target: "/x" } } } })).toBe(false);
+    expect(validate({ ...ok, handlers: { stop: { starts: "audio", call: { target: "/x" } } } })).toBe(false);
+    expect(validate({ ...ok, handlers: { stop: { starts: "video" } } })).toBe(false);
+    expect(validate({ ...ok, handlers: { stop: { play: { media_id: "x" } } } })).toBe(false);
+    expect(validate({ ...ok, filters: [{ kind: "radio", state: "x", label: "X" }] })).toBe(false);
+    expect(validate({ ...ok, actions: [{ label: "A", starts: "audio", action: { call: { target: "/x" } } }] })).toBe(false);
+    expect(validate({ ...ok, actions_variant: "wide" })).toBe(false);
+  });
+
   test("answer_blocks needs a package binding and refuses a route binding", () => {
     expect(validate({ type: "answer_blocks" })).toBe(false);
     expect(validate({ type: "answer_blocks", bind: { source: "route", path: "/api/people" } })).toBe(false);

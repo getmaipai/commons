@@ -20,7 +20,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -111,6 +111,22 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     checkAction(node.on_play, packageId, `${where} ${type}.on_play`, out, true);
     checkFieldPath(node.item_media_field, `${where} ${type}`, "item_media_field", out);
     if (type === "track_rows" && Array.isArray(node.row_actions)) node.row_actions.forEach((button, i) => isObject(button) && checkAction(button.action, packageId, `${where} track_rows.row_actions[${i}]`, out, true));
+  }
+  // VIDEO-UI-04: the result feed binds the package's own rows; every handler and action stays under the package, and the
+  // running-job record it re-reads is another data entry of the same package. Filter state keys must be distinct.
+  if (type === "result_feed") {
+    checkBinding(node.bind, `${where} result_feed`, data, "list", out);
+    if (isObject(node.fields)) for (const [name, value] of Object.entries(node.fields)) checkFieldPath(value, `${where} result_feed.fields`, name, out);
+    if (isObject(node.handlers)) for (const [key, handler] of Object.entries(node.handlers)) checkAction(handler, packageId, `${where} result_feed.handlers.${key}`, out);
+    if (Array.isArray(node.actions)) node.actions.forEach((b, i) => isObject(b) && checkAction(b.action, packageId, `${where} result_feed.actions[${i}]`, out));
+    if (isObject(node.poll_while) && isObject(node.poll_while.record)) {
+      const path = String(node.poll_while.record.path);
+      if (!data.has(path)) out.push(`${where} result_feed.poll_while.record: path "${path}" is not a contributes.data id of this package`);
+    }
+    if (Array.isArray(node.filters)) {
+      const seen = new Set<string>();
+      for (const f of node.filters) if (isObject(f)) { const key = String(f.state); if (seen.has(key)) out.push(`${where} result_feed: filter state key "${key}" is used twice`); seen.add(key); }
+    }
   }
   if (type === "billboard") {
     checkBinding(node.bind, `${where} billboard`, data, "list", out);

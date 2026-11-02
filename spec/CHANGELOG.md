@@ -1,3 +1,7 @@
+## [spec-v0.1.304] - 2026-11-02
+
+- VIDEO-UI-04 (K9, K10): new UI node `result_feed`: a newest-first feed of the package's own rows, one `VideoPlayer` per entry with words, tags and reference chips, `filters` (toggle, select) that write page state, day headings (or the words, for a toggle marked `group`), `handlers` for the player's built-in `stop`, `retry`, `make_another`, `render`, `another_still`, `edit_words` and `favorite` (each one action plus the optional `starts` marker), extra `actions` with `when`, and the required `poll_while` (`statuses` of running jobs, `record`: the data call that reads one job's own record). `checkAppPackage` allows the node on a package page and checks its bind, handler and action targets, `fields` paths, `poll_while.record` data id and distinct filter keys. All additive; no existing node changes.
+
 ## [spec-v0.1.303] - 2026-11-02
 
 - VIDEO-UI-05 (K12): `media_shelf` gains the optional `group_by_field` (a date path; day groups headed by the kit DayDivider, grid layout) with `group_noun` (the counted word, `{one, other}`), `size_control` (boolean, default false; the kit CardSizeSlider above a grid) and `favorite` (`{field, action}`, a heart toggle on each tile). `checkAppPackage` keeps the favorite call inside the package and both fields as paths. Additive; a shelf without them is unchanged.
