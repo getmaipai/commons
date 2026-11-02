@@ -1,0 +1,73 @@
+{
+  "type": "page",
+  "id": "listen-blocks",
+  "title": "Listen now",
+  "body": [
+    {
+      "type": "quick_tiles",
+      "label": "Pick up where you left off",
+      "bind": { "source": "package", "path": "recent" },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_media_field": "cover",
+      "max": 6,
+      "hide_when_empty": true,
+      "on_select": { "navigate": { "to": "/apps/music/album", "state": { "id": "{album_id}" } } },
+      "on_play": { "play": { "media_id": "{id}" } },
+      "play_label": "Play {title}"
+    },
+    {
+      "type": "media_shelf",
+      "heading": "Recently played",
+      "bind": { "source": "package", "path": "recent" },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_subtitle_field": "{artist}",
+      "item_media_field": "cover",
+      "aspect": "square",
+      "variant": "plain",
+      "card_radius": "tight",
+      "press_scale": true,
+      "hide_when_empty": true,
+      "on_select": { "navigate": { "to": "/apps/music/album", "state": { "id": "{album_id}" } } },
+      "on_play": { "play": { "media_id": "{id}" } },
+      "play_label": "Play {title}"
+    },
+    {
+      "type": "top_result",
+      "bind": { "source": "package", "path": "top" },
+      "item_label_field": "title",
+      "item_eyebrow_field": "{kind_label}",
+      "item_subtitle_field": "{artist}",
+      "item_media_field": "cover",
+      "art_shape": "circle",
+      "hide_when_empty": true,
+      "on_select": { "navigate": { "to": "/apps/music/artist", "state": { "id": "{id}" } } },
+      "on_play": { "play": { "media_id": "{id}" } }
+    },
+    {
+      "type": "category_tiles",
+      "label": "Browse by genre and mood",
+      "bind": { "source": "package", "path": "categories" },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_color_field": "color",
+      "hide_when_empty": true,
+      "on_select": { "navigate": { "to": "/apps/music/search", "state": { "q": "{title}" } } }
+    },
+    {
+      "type": "track_rows",
+      "label": "Tracks",
+      "bind": { "source": "package", "path": "tracks", "params": { "album_id": "$state.id" } },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_subtitle_field": "{artist}",
+      "item_number_field": "track_number",
+      "item_meta_field": "duration_s",
+      "item_group_field": "disc_label",
+      "item_highlight_field": "playing",
+      "hide_when_empty": true,
+      "on_play": { "play": { "media_id": "{id}" } }
+    }
+  ]
+}

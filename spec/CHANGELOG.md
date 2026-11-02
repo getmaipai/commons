@@ -1,3 +1,7 @@
+## [spec-v0.1.294] - 2026-11-01
+
+- MUSIC-KIT-01: four new UI nodes for the modern music pages, `quick_tiles` (Listen now's six compact tiles), `top_result` (Search's Top result card), `category_tiles` (colour tiles for genre, mood, decade) and `track_rows` (numbered tracklist, the number turns into a play icon on hover). `media_shelf` gains the optional `card_radius` (`default` or `tight`), `press_scale`, `on_play` (a hover Play button that fires with the tile's row) and `play_label`; `player` gains the optional `art_spring` and `lyrics_blur`. All additive and allowed on a package page (`PACKAGE_PAGE_NODE_TYPES`); `checkAppPackage` keeps `on_select` and `on_play` inside the package (`play` allowed). Play counts are data: a page for a child profile binds rows without a count field. Fixture `ui/pages/music-listen.json`.
+
 ## [spec-v0.1.293] - 2026-11-01
 
 - VIDEO-CREATE-01: new UI node `prompt_bar` (a prompt box, up to six chips that each choose one value, an optional Standard/Boost/Max tier, and one Make button whose `submit` action receives the prompt and every chosen value). Allowed on a package page (`PACKAGE_PAGE_NODE_TYPES`); `checkAppPackage` checks its `submit` stays inside the package and its state keys are distinct. Fixture `ui/pages/videos-make.json`.

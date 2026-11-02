@@ -20,7 +20,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -95,6 +95,14 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     if (Array.isArray(node.row_actions)) node.row_actions.forEach((button, i) => isObject(button) && checkAction(button.action, packageId, `${where} media_shelf.row_actions[${i}]`, out, true));
     if (isObject(node.see_all)) checkAction(node.see_all.action, packageId, `${where} media_shelf.see_all`, out);
     checkFieldPath(node.item_media_field, `${where} media_shelf`, "item_media_field", out);
+    checkAction(node.on_play, packageId, `${where} media_shelf.on_play`, out, true);
+  }
+  // MUSIC-KIT-01: the music page blocks draw the package's own rows; selecting and playing may hand an item to the host.
+  if (type === "quick_tiles" || type === "top_result" || type === "category_tiles" || type === "track_rows") {
+    checkBinding(node.bind, `${where} ${type}`, data, "list", out);
+    checkAction(node.on_select, packageId, `${where} ${type}.on_select`, out, true);
+    checkAction(node.on_play, packageId, `${where} ${type}.on_play`, out, true);
+    checkFieldPath(node.item_media_field, `${where} ${type}`, "item_media_field", out);
   }
   if (type === "billboard") {
     checkBinding(node.bind, `${where} billboard`, data, "list", out);

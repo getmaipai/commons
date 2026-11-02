@@ -27,7 +27,11 @@
     { "$ref": "#/$defs/search" },
     { "$ref": "#/$defs/creation_header" },
     { "$ref": "#/$defs/tabs" },
-    { "$ref": "#/$defs/prompt_bar" }
+    { "$ref": "#/$defs/prompt_bar" },
+    { "$ref": "#/$defs/quick_tiles" },
+    { "$ref": "#/$defs/top_result" },
+    { "$ref": "#/$defs/category_tiles" },
+    { "$ref": "#/$defs/track_rows" }
   ],
   "$defs": {
     "binding": {
@@ -424,9 +428,93 @@
             }
           }
         },
+        "card_radius": { "type": "string", "enum": ["default", "tight"], "default": "default", "description": "MUSIC-KIT-01: tight draws the tiles with the 8 px media card radius token (the modern music look). Round art (art_shape circle) stays round." },
+        "press_scale": { "type": "boolean", "default": false, "description": "MUSIC-KIT-01: a tile shrinks slightly while pressed. Gated on reduced motion by the kit." },
+        "on_play": { "$ref": "#/$defs/action", "description": "MUSIC-KIT-01: draws a round Play button over each tile on hover or focus (never on touch screens). It fires this action with the tile's row, the same as a `play` on_select. Horizontal shelves only." },
+        "play_label": { "type": "string", "minLength": 1, "maxLength": 80, "description": "MUSIC-KIT-01: a `{field}` template for the Play button's accessible name (\"Play {title}\"). Default: the tile's label." },
         "hide_when_empty": { "type": "boolean", "default": false, "description": "MEDIA-POLISH-01: draw nothing (no heading, no empty state) when the bound call returns no rows, so a shelf with nothing in it is simply absent. A load error still shows." },
         "see_all": { "$ref": "#/$defs/billboard_action", "description": "MEDIA-POLISH-01: a link beside the heading (\"See all\"), usually a `navigate` to the app's full list. Fired with no row." },
         "on_select": { "$ref": "#/$defs/action" },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "quick_tiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "label", "item_key_field", "item_label_field", "item_media_field"],
+      "description": "MUSIC-KIT-01: the kit's QuickTiles block (ui/src/primitives/MusicBlocks.tsx): Listen now's \"Pick up where you left off\", a two-column (three from 768 px) grid of compact tiles, small square art beside a title. A tile selects with `on_select`; `on_play` adds a round Play button on hover or focus (never on touch screens) that fires with the same row.",
+      "properties": {
+        "type": { "const": "quick_tiles" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The group's accessible name." },
+        "item_key_field": { "type": "string" },
+        "item_label_field": { "type": "string" },
+        "item_media_field": { "type": "string", "description": "Dotted path to the art's same-origin image path (starting with `/`)." },
+        "max": { "type": "integer", "minimum": 1, "maximum": 12, "default": 6, "description": "At most this many tiles are drawn." },
+        "on_select": { "$ref": "#/$defs/action" },
+        "on_play": { "$ref": "#/$defs/action" },
+        "play_label": { "type": "string", "minLength": 1, "maxLength": 80, "description": "A `{field}` template for the Play button's accessible name (\"Play {title}\")." },
+        "hide_when_empty": { "type": "boolean", "default": false, "description": "Draw nothing when the bound call returns no rows." },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "top_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "item_label_field"],
+      "description": "MUSIC-KIT-01: the kit's TopResultCard block: Search's Top result, a large card with art, an eyebrow (\"Artist\"), the name, one quiet line and an always-visible round Play button. The bound call returns rows; the first row is used.",
+      "properties": {
+        "type": { "const": "top_result" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "item_label_field": { "type": "string", "description": "Dotted path to the title." },
+        "item_eyebrow_field": { "type": "string", "description": "A `{field}` template for the small line above the title." },
+        "item_subtitle_field": { "type": "string", "description": "A `{field}` template for the quiet line under the title." },
+        "item_media_field": { "type": "string", "description": "Dotted path to the art's same-origin image path." },
+        "art_shape": { "type": "string", "enum": ["default", "circle"], "default": "default", "description": "Circle is for an artist." },
+        "on_select": { "$ref": "#/$defs/action" },
+        "on_play": { "$ref": "#/$defs/action" },
+        "play_label": { "type": "string", "minLength": 1, "maxLength": 80, "description": "A `{field}` template for the Play button's accessible name (\"Play {title}\")." },
+        "hide_when_empty": { "type": "boolean", "default": false, "description": "Draw nothing when the bound call returns no rows." },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "category_tiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "label", "item_key_field", "item_label_field"],
+      "description": "MUSIC-KIT-01: the kit's CategoryTiles block: Search's empty state, colour tiles for genre, mood, decade and \"Made here\". The tile mixes its colour into the card colour so the title keeps its contrast in light and dark.",
+      "properties": {
+        "type": { "const": "category_tiles" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The group's accessible name." },
+        "item_key_field": { "type": "string" },
+        "item_label_field": { "type": "string" },
+        "item_color_field": { "type": "string", "description": "Dotted path to a colour string (#rgb, #rrggbb, or an rgb(), hsl() or oklch() function). Anything else is ignored and the tile keeps the neutral colour." },
+        "item_media_field": { "type": "string", "description": "Dotted path to optional art tucked into the tile's corner (same-origin path)." },
+        "on_select": { "$ref": "#/$defs/action" },
+        "hide_when_empty": { "type": "boolean", "default": false, "description": "Draw nothing when the bound call returns no rows." },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "track_rows": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "label", "item_key_field", "item_label_field", "on_play"],
+      "description": "MUSIC-KIT-01: the kit's TrackRows block: Album and Playlist tracklists. Each row has a number (it turns into a play icon on hover or focus), a title and artist, and an end label. Pressing the number or the row plays it through `on_play`, with the row. Play counts are data: a page for a child profile binds rows that carry no count field, so no count is drawn.",
+      "properties": {
+        "type": { "const": "track_rows" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The list's accessible name." },
+        "item_key_field": { "type": "string" },
+        "item_label_field": { "type": "string" },
+        "item_subtitle_field": { "type": "string", "description": "A `{field}` template for the artist line." },
+        "item_number_field": { "type": "string", "description": "Dotted path to the number shown at the row's start. Default: the 1-based position." },
+        "item_meta_field": { "type": "string", "description": "Dotted path to the end label: a number of seconds (drawn as 3:42) or a short string such as a play count. A row without it draws none." },
+        "item_group_field": { "type": "string", "description": "Dotted path to a heading drawn before each run of equal values (a disc: \"Disc 2\")." },
+        "item_highlight_field": { "type": "string", "description": "Dotted path to a boolean; true marks the playing row." },
+        "on_play": { "$ref": "#/$defs/action" },
+        "play_label": { "type": "string", "minLength": 1, "maxLength": 80, "description": "A `{field}` template for the Play button's accessible name (\"Play {title}\")." },
+        "hide_when_empty": { "type": "boolean", "default": false, "description": "Draw nothing when the bound call returns no rows." },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
     },
@@ -474,6 +562,8 @@
         "kind": { "type": "string", "enum": ["video", "audio"], "default": "video" },
         "layout": { "type": "string", "enum": ["video", "audio", "mini"], "description": "Default: video for kind video, audio for kind audio." },
         "lyrics_enabled": { "type": "boolean", "default": false, "description": "Show the Lyrics control even when the item has no lyrics." },
+        "art_spring": { "type": "boolean", "default": false, "description": "MUSIC-KIT-01: in the audio layout the cover art grows when playing and settles when paused. Gated on reduced motion by the kit." },
+        "lyrics_blur": { "type": "boolean", "default": false, "description": "MUSIC-KIT-01: in the audio layout, lyric lines blur and fade by distance from the active line." },
         "lyrics_empty_text": { "type": "string", "description": "Plain empty state shown when lyrics are enabled but the item has no lyrics." },
         "on_lyrics_open": { "$ref": "#/$defs/action", "description": "Fired once per item the first time Lyrics opens while the row has no lyrics text or timed lines. The row's own fields are the placeholders, such as {id}." },
         "autoplay_next": { "type": "boolean", "default": false, "description": "Count down and play up_next when the item ends. Off by default; a child's page leaves it off." },
