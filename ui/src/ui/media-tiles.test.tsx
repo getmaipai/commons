@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
-import { Cover, MediaCarousel, MediaTile, coverVars, seedOf } from "@/kit/elements/media-tiles";
+import { Cover, MediaCarousel, MediaTile, coverVars, seedOf } from "@/kit/ui/media-tiles";
 
 afterEach(cleanup);
 

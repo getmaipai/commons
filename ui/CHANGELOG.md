@@ -1,3 +1,7 @@
+## [ui-v0.5.472] - 2026-11-02
+
+- `media-tiles` moves from `src/elements/` to `src/ui/` (it is a set of building blocks like `button`, not a page Element, so Home's wrapper lint does not treat a page that composes it as a wrapper). Import `@maipai/ui/src/ui/media-tiles`. Same exports as ui-v0.5.471, which is now unused.
+
 ## [ui-v0.5.471] - 2026-11-02
 
 - New Element file `media-tiles` (additive, no spec change): `Cover` (a real picture, or three soft hue lights drawn from the id with the title in big type), `MediaTile` (tall tile with hover lift, play overlay, glass pills, shimmer while busy, progress bar), `MediaCarousel` (snapping row with arrows), `GlassPill`, `Shimmer`, and `seedOf`/`coverVars`. (`ui-v0.5.470` was cut one commit early with the version still 0.5.469; do not pin it.)
