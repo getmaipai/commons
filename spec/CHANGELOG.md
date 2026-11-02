@@ -1,3 +1,7 @@
+## [spec-v0.1.302] - 2026-11-02
+
+- MUSIC-LYRICS-KEY-01: the household setting `music.lyrics_online` (boolean, on by default, advanced, honoured by home), the switch for the Music app's one-song lyrics lookup. Home already declares it identically. Additive.
+
 ## [spec-v0.1.301] - 2026-11-02
 
 - MUSIC-STUDIO-ALBUM: new record `MadeAlbum` (`malbum-`: title, `made_artist_id`, `song_style_id`, blurb, `look`, `cover_file_id`, `cover_seed`, `track_media_ids` in play order). It holds the SAME shared `style` and `seed` definitions as `SongStyle` and `MadeArtist`; a track is a normal made song, so the album only lists ids. New answer-block kinds `album` and `song_style` (props mirror the kit Album and SongStyle Elements). The `band`, `album` and `song_style` props gain `editable` (edit mode) and the editable words `look` and `sound`. Edit saves report these actions with only the changed fields: `edit_band`, `edit_album` (tracks as `track_ids`, the full new order), `edit_song_style`; `play_track` reports `{media_id}`. Additive.
