@@ -1,3 +1,7 @@
+## [spec-v0.1.312] - 2026-11-02
+
+- VIDEO-STUDIO-03 (home `docs/design/video-studio-2026-11-02.md` K2 and K5): `creation_header` `variant` gains `studio`, with the optional `eyebrow` (string, 1 to 40 characters), `secondary` (as `primary`) and `fields.locked` (dotted path to a boolean). `media_shelf` and `result_feed` gain the optional `heading_style` (`default`, or `eyebrow`). All additive, defaults unchanged; `app-check` checks the studio header's `primary` and `secondary` actions.
+
 ## [spec-v0.1.311] - 2026-11-02
 
 - VIDEO-STUDIO-02 (K1b): `page` gains the optional `surface` (`page` default, or `studio`: the page body draws as a rounded pane on the kit's studio token scope). `checkAppPackage` refuses any other `surface` word. Additive; old pages are unchanged.
