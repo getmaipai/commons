@@ -192,6 +192,11 @@ export interface AdultLockDialogProps {
   hasCredential?: boolean;
   /** Passed to the dialog content: where focus goes when it closes. */
   onCloseAutoFocus?: (event: Event) => void;
+  /** ADULT-LOCK-06: the same dialog asks for a fresh passcode to confirm one action (the creator removing the lock). `title` replaces "Enter your passcode",
+   * `description` replaces the line under it, `actionLabel` replaces "Unlock" on the button. Each default is unchanged. */
+  title?: string;
+  description?: ReactNode;
+  actionLabel?: string;
 }
 
 function formatWait(seconds: number): string {
@@ -205,7 +210,7 @@ function formatWait(seconds: number): string {
  * and explains a failure in plain words. Modal with a focus trap (the kit `Dialog`), focus on the first box, Escape and Cancel
  * close it. The title, text and messages never name an item.
  */
-export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits = 6, credentialWord = "passcode", hasCredential = true, onCloseAutoFocus }: AdultLockDialogProps) {
+export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits = 6, credentialWord = "passcode", hasCredential = true, onCloseAutoFocus, title, description, actionLabel }: AdultLockDialogProps) {
   const [code, setCode] = useState("");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -288,10 +293,10 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
         }}
       >
         <DialogHeader>
-          <DialogTitle>{hasCredential ? `Enter your ${credentialWord}` : "Locked items"}</DialogTitle>
+          <DialogTitle>{hasCredential ? title ?? `Enter your ${credentialWord}` : "Locked items"}</DialogTitle>
           <DialogDescription>
             {hasCredential
-              ? "These items stay hidden until you do. Only your own code opens them."
+              ? description ?? "These items stay hidden until you do. Only your own code opens them."
               : "These items stay hidden until you set a code. Nothing opens without one."}
           </DialogDescription>
         </DialogHeader>
@@ -318,7 +323,7 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
             {lockedOut ? <p aria-hidden="true" data-slot="adult-lock-wait" className="text-muted-foreground text-sm tabular-nums">Try again in {formatWait(remaining)}.</p> : null}
             <DialogFooter className="w-full">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type="submit" disabled={checking || lockedOut || code.length !== digits}>{checking ? "Checking" : "Unlock"}</Button>
+              <Button type="submit" disabled={checking || lockedOut || code.length !== digits}>{checking ? "Checking" : actionLabel ?? "Unlock"}</Button>
             </DialogFooter>
           </form>
         ) : (

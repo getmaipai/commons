@@ -1,3 +1,7 @@
+## [ui-v0.5.481] - 2026-11-02
+
+- ADULT-LOCK-06 (home `docs/design/video-loras-2026-11-02.md` 3.10; `UI-DECISIONS.md` row first), additive, every default unchanged. `AdultLockDialog` takes `title`, `description` and `actionLabel`, so the same modal, passcode field, lockout countdown and plain failure lines also serve the creator's confirm before removing the Adult lock (a fresh passcode for one action). Without them the dialog reads as before.
+
 ## [ui-v0.5.480] - 2026-11-02
 
 - ADULT-LOCK-03b (found building the Home host; `UI-DECISIONS.md` row updated first; home `docs/design/video-loras-2026-11-02.md` section 3.9 item 2), additive, every default unchanged. The schema nodes' picture rule (`localPicture`, `RowMedia`) accepts a `blob:` object URL of the page's own origin besides a same-origin path: an unlocked adult-only picture or clip is fetched by the host with the proof header into a Blob (a header cannot ride on `<img src>` or `<video src>`) and the row carries that URL. Any other scheme, host or origin is still refused. The `player` node passes `mediaSession={false}` to the `Player` for a row with `adult_only: true`, so no title or artwork reaches the Media Session.

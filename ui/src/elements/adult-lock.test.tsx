@@ -10,6 +10,7 @@ import { VideoPlayer } from "./video-player";
 import { OptionCards } from "./option-cards";
 import { PromptBar } from "./prompt-bar";
 import {
+  AdultLockDialog,
   AdultLockProvider,
   LOCK_TILE_NAME,
   LockTile,
@@ -412,5 +413,28 @@ describe("the locked state on every list part", () => {
     for (const el of Array.from(document.body.querySelectorAll("*"))) {
       for (const attr of Array.from(el.attributes)) expect(attr.value.toLowerCase().includes("zorblax")).toBe(false);
     }
+  });
+});
+
+describe("AdultLockDialog as a confirm (ADULT-LOCK-06)", () => {
+  test("title, description and actionLabel replace the unlock words; the field, the check and the failure lines are the same", async () => {
+    const unlock = mock(async (): Promise<UnlockResult> => ({ status: "failed" }));
+    const view = render(<AdultLockDialog open onOpenChange={() => {}} unlock={unlock} onUnlocked={() => {}} digits={4} title="Remove the lock" description="This changes who can see it." actionLabel="Remove lock" />);
+    const text = document.querySelector('[data-slot="adult-lock-dialog"]')!.textContent!;
+    expect(text).toContain("Remove the lock");
+    expect(text).toContain("This changes who can see it.");
+    expect(text).not.toContain("Enter your passcode");
+    expect(view.getByRole("button", { name: "Remove lock" })).toBeTruthy();
+    fireEvent.change(codeInput(), { target: { value: "1234" } });
+    await waitFor(() => expect(unlock).toHaveBeenCalledWith("1234"));
+    await waitFor(() => expect(document.querySelector('[data-slot="adult-lock-error"]')?.textContent).toContain("was not right"));
+  });
+
+  test("with none of the three props the dialog reads as before", () => {
+    const view = render(<AdultLockDialog open onOpenChange={() => {}} unlock={async () => ({ status: "ok" })} onUnlocked={() => {}} />);
+    const text = document.querySelector('[data-slot="adult-lock-dialog"]')!.textContent!;
+    expect(text).toContain("Enter your passcode");
+    expect(text).toContain("Only your own code opens them.");
+    expect(view.getByRole("button", { name: "Unlock" })).toBeTruthy();
   });
 });
