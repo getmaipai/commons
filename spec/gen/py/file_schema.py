@@ -110,6 +110,14 @@ class File(BaseModel):
         None,
         description='LIBRARY-REVAMP-03. Who may see this file: "all-ages" or "adult-only" (children and teens never; the owner always). The literals match what Home already writes in a picture or video provenance note (audience: all-ages | adult-only), so no data migration is needed. Optional, never required: absent means unknown, and a reader falls back to the provenance note exactly as before.',
     )
+    made_audience: Literal['all-ages', 'adult-only'] | None = Field(
+        None,
+        description='ADULT-LOCK-06 (home docs/design/video-loras-2026-11-02.md, section 3.10). The machine fact about what this file contains or was made from, set by the Home and Stack pipeline and never lowered (not even by its creator). It is the minor ceiling: a minor never reads a file whose made_audience is adult-only, whatever `lock` says. `audience` keeps its meaning for readers that do not know this field; a writer sets both, and a reader that knows made_audience reads it first. Optional: absent means unknown and a reader falls back to `audience`, then to the provenance note, exactly as before.',
+    )
+    lock: Literal['on', 'off'] | None = Field(
+        None,
+        description='ADULT-LOCK-06. Whether the Adult lock applies to this file (a locked tile with no metadata until the owner of the screen enters their passcode). Starts equal to made_audience (on for adult-only, off for all-ages), and only the creator can set it to off (a fresh passcode, an audit row in Home); marking it on again is free. Never on while made_audience is all-ages. Optional: absent reads as off for an all-ages file and on for an adult-only one, so no existing record changes meaning. Writing it advances hlc.',
+    )
     deleted_at: AwareDatetime | None = Field(
         None,
         description='TRASH-01, as media-item. Set when a person moves the file to the household trash; null while live. A trashed file is hidden everywhere and restorable until trash_until. A restore clears both deleted_at and trash_until. No schema default (unlike media-item): an absent field stays absent, so every existing file record round-trips unchanged; absent reads as null.',

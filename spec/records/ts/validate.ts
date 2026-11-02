@@ -33,6 +33,8 @@ import type { BiometricPrint } from "../../gen/ts/biometric-print.js";
 import type { NewsInterest } from "../../gen/ts/news-interest.js";
 import type { NewsSearchRecent } from "../../gen/ts/news-search-recent.js";
 import type { FirmwareFlashManifest } from "../../gen/ts/firmware-flash-manifest.js";
+import type { Lora } from "../../gen/ts/lora.js";
+import type { File as FileRecord } from "../../gen/ts/file.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -604,4 +606,57 @@ export function firmwareFlashManifestSigningPayload(record: FirmwareFlashManifes
 
 export function firmwareFlashManifestSigningPayloadSha256(record: FirmwareFlashManifest): string {
   return createHash("sha256").update(firmwareFlashManifestSigningPayload(record)).digest("hex");
+}
+
+const personKey = /^person-[a-z0-9]{6,}$/;
+const totalLen = (xs: string[]) => xs.reduce((n, x) => n + x.length, 0);
+
+/** VIDEO-LORA-02: the rules of a Lora record JSON Schema cannot carry in
+ * the generated models (the generators drop if/then, and a schema cannot
+ * compare two numbers or sum string lengths). The record holds no ages, so
+ * "availability never names a minor" is the writer's rule, enforced in
+ * Home's lib/loras/access.ts; this function checks everything the record
+ * itself can prove. */
+export function validateLora(lora: Lora): Problems {
+  const problems: Problems = [];
+  const { strength: st } = lora;
+  if (!(st.min <= st.default && st.default <= st.max)) {
+    problems.push(`strength must satisfy min <= default <= max (got ${st.min}, ${st.default}, ${st.max})`);
+  }
+  if (lora.audience === "all-ages" && !lora.audience_set_by) {
+    problems.push("an all-ages LoRA needs audience_set_by: only an owner or admin can choose all-ages, a source can only raise to adult-only");
+  }
+  const { who, people } = lora.availability;
+  if (who === "people" && people.length === 0) problems.push("availability.who is people but names nobody");
+  if (who !== "people" && people.length > 0) problems.push(`availability.people must be empty when who is ${who}`);
+  for (const id of people) if (!personKey.test(id)) problems.push(`availability.people has a bad person id: ${id}`);
+  for (const key of ["positive_addins", "negative_addins", "avoid_as_positive"] as const) {
+    if (totalLen(lora[key]) > 400) problems.push(`${key} is ${totalLen(lora[key])} characters in total; the limit is 400`);
+  }
+  if (lora.base_model === "unknown") {
+    if (lora.compatible_with.length > 0) problems.push("compatible_with must be empty while base_model is unknown");
+  } else if (!lora.compatible_with.includes(lora.base_model)) {
+    problems.push("compatible_with must include base_model");
+  }
+  if ((lora.removed_at === null) !== (lora.trash_until === null)) {
+    problems.push("removed_at and trash_until are set together, or both null");
+  } else if (lora.removed_at && lora.trash_until && Date.parse(lora.trash_until) <= Date.parse(lora.removed_at)) {
+    problems.push("trash_until must be after removed_at");
+  }
+  if (lora.licence.acknowledged_by === null && lora.licence.acknowledged_at !== null) {
+    problems.push("licence.acknowledged_at is set without licence.acknowledged_by");
+  }
+  if (lora.source.site === "file" && (lora.source.url !== null || lora.source.token_ref !== null)) {
+    problems.push("a file the admin placed has no source url and no token_ref");
+  }
+  return problems;
+}
+
+/** ADULT-LOCK-06: made_audience is the minor ceiling and lock is the
+ * creator-clearable lock; a lock on an all-ages file has no meaning. */
+export function validateFileAdultLock(file: FileRecord): Problems {
+  if (file.lock === "on" && file.made_audience === "all-ages") {
+    return ["lock is on but made_audience is all-ages: the Adult lock only applies to an adult-only file"];
+  }
+  return [];
 }

@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/lora.schema.json",
+  "title": "Lora",
+  "description": "VIDEO-LORA-02 (home docs/design/video-loras-2026-11-02.md, section 4.1). One LoRA (a saved style, character or motion adapter) in the household library. Home owns this record: who may use it (audience, availability), what its prompt add-ins are, its preview and its trash state. The Stack owns the file bytes and the facts read from them (`file`: hash, size, rank, modules). `media` says what it is for: `video` now, `picture` when pictures move onto this record (VIDEO-LORA-12). Defaults are the safe side everywhere: availability is admins only, audience is adult-only until an admin says otherwise (a source can only raise it), and a base model that is `unknown` blocks use. A minor never sees or uses any LoRA: availability never names one (the writer refuses it, because the record holds no ages) and the access function reads the person's age, never this record alone. Rules JSON Schema cannot carry in the generators (audience all-ages needs an admin's choice, availability `people` only when availability.who is `people`, strength order and bounds, add-in length totals, compatible_with contains the base) are in spec/records/ts/validate.ts `validateLora`, and the audience rule is also an if/then below (the generated models drop it; Ajv enforces it).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "kind",
+    "description",
+    "media",
+    "source",
+    "file",
+    "base_model",
+    "compatible_with",
+    "trigger_words",
+    "trigger_position",
+    "positive_addins",
+    "negative_addins",
+    "avoid_as_positive",
+    "strength",
+    "audience",
+    "audience_set_by",
+    "audience_set_at",
+    "availability",
+    "added_by",
+    "added_at",
+    "licence",
+    "preview",
+    "removed_at",
+    "trash_until",
+    "last_check",
+    "provenance",
+    "created_at",
+    "updated_at",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^lora-[a-z0-9]{6,}$",
+      "description": "Home's stable id, never reused. `file.sha256` is the file's identity; two records may not share a live sha256."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "The person-facing name, admin editable."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["style", "character", "motion", "other"],
+      "description": "Groups the picker (\"Styles\", \"Characters\"). At most one `character` per clip; the limit is Home's, not this record's."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 140,
+      "description": "One plain line, admin edited: shown on the card and, for an all-ages LoRA only, in the model's tool description. May be empty."
+    },
+    "media": {
+      "type": "string",
+      "enum": ["video", "picture"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["site", "url", "remote_id", "version_id", "token_ref"],
+      "description": "Where the file came from. Recorded once, never refreshed automatically.",
+      "properties": {
+        "site": { "type": "string", "enum": ["huggingface", "civitai", "file"] },
+        "url": { "type": ["string", "null"], "maxLength": 2048, "description": "The page or file URL the admin chose; null for a file the admin placed. Never carries a token." },
+        "remote_id": { "type": ["string", "null"], "description": "The site's own id for the model (a Civitai model id, a Hugging Face repo id and file)." },
+        "version_id": { "type": ["string", "null"], "description": "The site's own id for the version." },
+        "token_ref": {
+          "type": ["string", "null"],
+          "enum": ["huggingface", "civitai", null],
+          "description": "Which stored source token the install used, by name only (the secret lives in Home's secrets store, CREDENTIALS.md). Never the token itself. Null when none was used."
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "bytes", "rank", "modules", "format"],
+      "description": "Facts read from the downloaded bytes by the Stack.",
+      "properties": {
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "Lowercase SHA-256 of the file, recorded on download." },
+        "bytes": { "type": "integer", "minimum": 1, "maximum": 4294967296, "description": "Exact byte length; at most 4 GB (design D11)." },
+        "rank": { "type": ["integer", "null"], "minimum": 1, "description": "The LoRA rank read from the tensors; null when it could not be read." },
+        "modules": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "The module groups the file touches (for example attn, ffn), read from tensor names." },
+        "format": { "type": "string", "const": "safetensors" }
+      }
+    },
+    "base_model": {
+      "type": "string",
+      "enum": ["ltx-2.3", "ltx-2.5", "wan2.2-ti2v-5b", "unknown"],
+      "description": "Read from the tensors and the source's own base field. `unknown` blocks use until an admin sets it."
+    },
+    "compatible_with": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["ltx-2.3", "ltx-2.5", "wan2.2-ti2v-5b"] },
+      "uniqueItems": true,
+      "description": "Base ids this file may be used with. Defaults to [base_model] (empty while base_model is unknown); widened only by a bench result (design D12)."
+    },
+    "trigger_words": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 80 },
+      "maxItems": 12,
+      "description": "Sanitised at import: plain text, no control characters, no markup."
+    },
+    "trigger_position": {
+      "type": "string",
+      "enum": ["start", "end"],
+      "description": "Where Home puts the trigger words in the prompt. Default `start` for styles."
+    },
+    "positive_addins": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 },
+      "maxItems": 8,
+      "description": "Admin-written prompt additions; each at most 120 characters, 400 in total per LoRA (validateLora)."
+    },
+    "negative_addins": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 },
+      "maxItems": 8,
+      "description": "Admin-written negative text, sent only to an engine that reports a negative prompt it honours. Same limits as positive_addins."
+    },
+    "avoid_as_positive": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 },
+      "maxItems": 8,
+      "description": "The admin-written positive counterpart used when the engine has no negative prompt (design D9). Same limits."
+    },
+    "strength": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "min", "max"],
+      "description": "LoRA strength, 0 to 2, with min <= default <= max (validateLora). Characters default to their min of 0.8.",
+      "properties": {
+        "default": { "type": "number", "minimum": 0, "maximum": 2, "default": 1 },
+        "min": { "type": "number", "minimum": 0, "maximum": 2, "default": 0 },
+        "max": { "type": "number", "minimum": 0, "maximum": 2, "default": 1.5 }
+      }
+    },
+    "audience": {
+      "type": "string",
+      "enum": ["all-ages", "adult-only"],
+      "default": "adult-only",
+      "description": "Design D4. Uncertain is `adult-only`. A source (import metadata, tags) can only raise it to adult-only; `all-ages` is only ever an owner's or admin's explicit choice, so it needs audience_set_by."
+    },
+    "audience_set_by": {
+      "type": ["string", "null"],
+      "pattern": "^person-[a-z0-9]{6,}$",
+      "description": "The owner or admin who last chose the audience. Null while it is still what import set (always adult-only then)."
+    },
+    "audience_set_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "When audience was last set, by import or by an admin."
+    },
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["who", "people"],
+      "description": "Who besides admins may use it. Default `admins`. Never includes a minor (the writer refuses one) and never widens what the Adult lock and the household adult-adapters switch hide.",
+      "properties": {
+        "who": {
+          "type": "string",
+          "enum": ["admins", "adults", "people"],
+          "default": "admins",
+          "description": "`admins`: owner and admins only (the default for every new LoRA). `adults`: every adult. `people`: the adults named in `people`."
+        },
+        "people": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^person-[a-z0-9]{6,}$" },
+          "uniqueItems": true,
+          "default": [],
+          "description": "The chosen adults; empty unless who is `people`, and non-empty when it is."
+        }
+      }
+    },
+    "added_by": {
+      "type": "string",
+      "pattern": "^person-[a-z0-9]{6,}$",
+      "description": "The owner or admin who added it."
+    },
+    "added_at": { "type": "string", "format": "date-time" },
+    "licence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "commercial_use", "acknowledged_by", "acknowledged_at"],
+      "description": "A non-open or unknown licence needs the adder's acknowledgment (acknowledged_by set).",
+      "properties": {
+        "id": { "type": ["string", "null"], "maxLength": 80, "description": "An SPDX-style id or the source's own licence name; null when unknown." },
+        "text": { "type": ["string", "null"], "maxLength": 2000, "description": "The terms as the source states them; null when it states none." },
+        "commercial_use": { "type": "string", "enum": ["yes", "no", "unknown"], "default": "unknown" },
+        "acknowledged_by": { "type": ["string", "null"], "pattern": "^person-[a-z0-9]{6,}$" },
+        "acknowledged_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "preview": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file_id"],
+          "properties": {
+            "file_id": { "type": "string", "pattern": "^file-[a-z0-9]{6,}$", "description": "A File record the admin picked, fetched once through the hub and stored locally, never hot-linked. An adult-only LoRA's preview follows the Adult lock." }
+          }
+        },
+        { "type": "null" }
+      ],
+      "description": "The card image, or null for none."
+    },
+    "removed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Restorable trash (design 4.3). Set when an admin removes it; null while live. A removed LoRA is unusable and hidden except from Recently removed."
+    },
+    "trash_until": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "30 days after removed_at; the file is deleted and the record dropped then. Set together with removed_at."
+    },
+    "last_check": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["at", "ok"],
+          "properties": {
+            "at": { "type": "string", "format": "date-time" },
+            "ok": { "type": "boolean", "description": "False when the file's hash no longer matches file.sha256." }
+          }
+        },
+        { "type": "null" }
+      ],
+      "description": "The last time the file was re-hashed; null before the first check."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "job_id"],
+      "description": "How this record came to exist (no data debt: set from the first write).",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "enum": ["install", "file", "migration"],
+          "description": "`install`: the Stack video.lora.install job downloaded it. `file`: an admin placed a file. `migration`: VIDEO-LORA-03 made it from a pre-record Stack LoRA or a video_adapter_prefs row."
+        },
+        "job_id": { "type": ["string", "null"], "minLength": 1, "description": "The Stack job that fetched or checked it; null for a migration." }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node. Advanced on every mutable field change."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "audience": { "const": "all-ages" } }, "required": ["audience"] },
+      "then": { "properties": { "audience_set_by": { "type": "string" } } }
+    }
+  ]
+}
