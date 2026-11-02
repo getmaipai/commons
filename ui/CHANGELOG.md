@@ -1,3 +1,7 @@
+## [ui-v0.5.461] - 2026-11-02
+
+- MUSIC-LIKE-02 (needs spec-v0.1.299): the Player takes `actions_wrap`; the actions row wraps onto more lines instead of scrolling sideways with its scrollbar hidden. Default off, so every other player is unchanged.
+
 ## [ui-v0.5.460] - 2026-11-02
 
 - MUSIC-LIKE-01 (needs spec-v0.1.298): an action `call` runs its `then` navigation after the call succeeds with the response merged over the item, and a Player action with a `busy_label` shows it and disables that button while the action runs. No new prop.

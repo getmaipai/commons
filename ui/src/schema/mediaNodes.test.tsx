@@ -253,6 +253,21 @@ describe("MEDIA-POLISH-01", () => {
     expect(await findByRole("button", { name: "Like" })).toBeTruthy();
   });
 
+  test("actions_wrap lets the actions row wrap instead of scrolling sideways", async () => {
+    const wrapped = { ...(playerNode as Extract<UiNode, { type: "player" }>), actions_wrap: true };
+    const { findByRole, container } = inVideos(wrapped, { onPlay: () => {} }, { id: "m1" });
+    await findByRole("button", { name: "Like" });
+    const row = container.querySelector('[data-slot="player-actions"]')!;
+    expect(row.className).toContain("flex-wrap");
+    expect(row.className).not.toContain("overflow-x-auto");
+  });
+
+  test("without actions_wrap the actions row scrolls sideways", async () => {
+    const { findByRole, container } = inVideos(playerNode, { onPlay: () => {} }, { id: "m1" });
+    await findByRole("button", { name: "Like" });
+    expect(container.querySelector('[data-slot="player-actions"]')!.className).toContain("overflow-x-auto");
+  });
+
   test("a toggle action fires with the item and on set to the new value, then reads the item again", async () => {
     const { findByRole } = inVideos(playerNode, { onPlay: () => {} }, { id: "m1" });
     const like = await findByRole("button", { name: "Like" });

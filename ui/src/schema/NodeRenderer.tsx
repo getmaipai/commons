@@ -1345,7 +1345,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
                 show={node.details_show}
               />
             ) : null}
-            {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatch}>{!audioLayout ? editButton : null}</PlayerActions> : null}
+            {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatch} wrap={node.actions_wrap === true}>{!audioLayout ? editButton : null}</PlayerActions> : null}
             {node.edit ? <EditPlayerSheet open={editOpen} onOpenChange={setEditOpen} phone={phone} definition={node.edit} item={r} values={editValues} setValues={setEditValues} error={editError} onSave={() => { const id = readField(r, field("id", "id")); const changed = Object.fromEntries(node.edit!.fields.filter(f => JSON.stringify(editValues[f.name] ?? "") !== JSON.stringify(readField(r, f.name) ?? "")).map(f => [f.name, editValues[f.name]])); if (!Object.keys(changed).length) { setEditOpen(false); return; } setEditError(null); const save = node.edit!.on_save; const action: Action = "call" in save ? { call: { ...save.call, args: { ...changed, id } } } : save; dispatch(action, [{ ...changed, id }], undefined, { onSuccess: () => setEditOpen(false) }); }} /> : null}
             {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
             {castError ? <p role="status" className="text-base text-destructive">{castError}</p> : null}
@@ -1447,10 +1447,10 @@ function PlayerDetails({ title, subtitle, facts, description, chapters, seek, sh
 
 /** MEDIA-POLISH-01: the actions row under the title (Like, Watch later): pill buttons in one row that scrolls sideways
  * on a phone. A button with a `field` is a toggle, pressed while that field of the item is true. */
-function PlayerActions({ actions, item, dispatch, children }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"]; children?: ReactNode }) {
+function PlayerActions({ actions, item, dispatch, wrap, children }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"]; wrap?: boolean; children?: ReactNode }) {
   const [busy, setBusy] = useState<string | null>(null);
   return (
-    <div className="flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" role="group" aria-label="Actions" data-slot="player-actions">
+    <div className={wrap ? "flex min-w-0 flex-wrap gap-2 pb-1" : "flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"} role="group" aria-label="Actions" data-slot="player-actions">
       {actions.map((a) => {
         const on = a.field ? readField(item, a.field) === true : false;
         const Glyph = a.icon ? getIcon(a.icon) : null;

@@ -616,6 +616,7 @@
         "details": { "type": "boolean", "default": false, "description": "MEDIA-DETAIL-01: draw the item's title, facts, expandable description and chapters under the picture (a watch page's details block)." },
         "details_show": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["title", "facts", "description", "chapters"] }, "default": ["title", "facts", "description", "chapters"], "description": "Optional detail parts. Absent means all four." },
         "details_show": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["title", "facts", "description", "chapters"] }, "default": ["title", "facts", "description", "chapters"], "description": "Optional parts of the details block to draw. Absent means all parts." },
+        "actions_wrap": { "type": "boolean", "default": false, "description": "MUSIC-LIKE-02: the actions row wraps onto more lines instead of scrolling sideways with its scrollbar hidden. Use it where the column is narrow or the row has more than three buttons." },
         "actions": {
           "type": "array",
           "maxItems": 6,

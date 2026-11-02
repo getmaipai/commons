@@ -1,3 +1,7 @@
+## [spec-v0.1.299] - 2026-11-02
+
+- MUSIC-LIKE-02: `player` gains the optional `actions_wrap` (boolean, default false): the actions row wraps instead of scrolling sideways. Additive.
+
 ## [spec-v0.1.298] - 2026-11-02
 
 - MUSIC-LIKE-01: `media-item` gains the optional `made_artist_id` (`mband-...`, the made band a track belongs to; default null), `action.call` gains the optional `then` (a `navigate` run after a successful call, the response merged over the item, so a button can make something and open it), and a `player.actions` item gains the optional `busy_label` (the button's words and disabled state while its action runs). `checkAppPackage` checks `then` like any action. All additive.

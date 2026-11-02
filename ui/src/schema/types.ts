@@ -281,6 +281,8 @@ export const PlayerNodeSchema = z.object({
     )
     .max(6)
     .optional(),
+  // The actions row wraps onto more lines instead of scrolling sideways (a narrow column or a phone).
+  actions_wrap: z.boolean().optional(),
   edit: z.object({
     label: z.string().min(1), title: z.string().optional(),
     fields: z.array(z.object({ name: z.string().min(1), label: z.string().min(1), kind: z.enum(["text", "textarea", "cover"]) })).min(1),
