@@ -14,3 +14,8 @@ test("equalizer icon is registered for the visualizer menu", () => {
 test("the weather advice icons are registered", () => {
   for (const name of ["umbrella", "shirt", "glasses", "snowflake", "wind", "footprints", "tree-pine", "cloud-rain", "sun"]) expect((iconNames as readonly string[]).includes(name)).toBe(true);
 });
+
+test("the music header icons are registered: shuffle and radio (MUSIC-POLISH-01)", () => {
+  for (const name of ["shuffle", "radio"]) expect((iconNames as readonly string[]).includes(name)).toBe(true);
+  expect(getIcon("shuffle")).toBe(icons.shuffle);
+});

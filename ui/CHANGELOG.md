@@ -1,3 +1,7 @@
+## [ui-v0.5.456] - 2026-11-01
+
+- MUSIC-POLISH-01: the kit icon set registers `shuffle` and `radio`. `CreationHeader` asked for `shuffle` all along and drew the unknown-icon question mark in its place. Additive.
+
 ## [ui-v0.5.455] - 2026-11-01
 
 MUSIC-POLISH-01 (pairs with spec-v0.1.295). All additive.
