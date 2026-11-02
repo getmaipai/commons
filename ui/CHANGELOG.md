@@ -1,3 +1,7 @@
+## [ui-v0.5.458] - 2026-11-02
+
+- `formatBytes` promotes to the next unit when rounding reaches 1024, so 1048575 bytes reads "1 MB" instead of "1024 KB". Bug fix, no API change.
+
 ## [ui-v0.5.457] - 2026-11-01
 
 - MUSIC-POLISH-01: the circle tile centres itself in its grid cell (`mx-auto`), so it stays under its centred name when a large text scale makes one column wider than the circle. Additive.

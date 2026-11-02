@@ -11,16 +11,19 @@ function trimmed(value: number, digits: number): string {
 
 const BYTE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"] as const;
 
-function byteMagnitude(bytes: number): { value: number; unit: (typeof BYTE_UNITS)[number] } {
+function byteMagnitude(bytes: number, digits = 1): { value: number; unit: (typeof BYTE_UNITS)[number] } {
   if (bytes === 0) return { value: 0, unit: "B" };
-  const exponent = Math.min(BYTE_UNITS.length - 1, Math.floor(Math.log(Math.abs(bytes)) / Math.log(1024)));
+  const top = BYTE_UNITS.length - 1;
+  let exponent = Math.min(top, Math.floor(Math.log(Math.abs(bytes)) / Math.log(1024)));
+  // Rounding can reach 1024 of the unit (1048575 B is 1024 KB), so promote when it does.
+  while (exponent < top && Math.abs(Number((bytes / 1024 ** exponent).toFixed(digits))) >= 1024) exponent += 1;
   return { value: bytes / 1024 ** exponent, unit: BYTE_UNITS[exponent]! };
 }
 
 export function formatBytes(bytes: number | null, digits = 1): string {
   if (bytes === null) return NOT_REPORTED;
   if (bytes === 0) return "0 B";
-  const { value, unit } = byteMagnitude(bytes);
+  const { value, unit } = byteMagnitude(bytes, digits);
   return `${trimmed(value, digits)} ${unit}`;
 }
 
