@@ -328,3 +328,48 @@ describe("MEDIA-POLISH-01", () => {
     } finally { globalThis.fetch = original; }
   });
 });
+
+describe("media_shelf library additions (VIDEO-UI-05, K12)", () => {
+  const today = new Date();
+  const iso = (daysAgo: number) => new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysAgo, 12).toISOString();
+  const CLIPS = [
+    { id: "c1", title: "Harbor", thumbnail: "/t/1.jpg", made_at: iso(0), favorite: false },
+    { id: "c2", title: "Forest", thumbnail: "/t/2.jpg", made_at: iso(0), favorite: true },
+    { id: "c3", title: "Desert", thumbnail: "/t/3.jpg", made_at: iso(1), favorite: false },
+    { id: "c4", title: "Lake", thumbnail: "/t/4.jpg", made_at: "not a date", favorite: false },
+  ];
+  const library: UiNode = {
+    type: "media_shelf", bind: { source: "package", path: "clips", stream: false }, item_key_field: "id", item_label_field: "title", item_media_field: "thumbnail",
+    layout: "grid", group_by_field: "made_at", group_noun: { one: "clip", other: "clips" }, size_control: true,
+    favorite: { field: "favorite", action: { call: { target: "/api/plugins/videos/favorite", args: { id: "{id}", favorite: "{favorite}" } } } },
+    aspect: "wide", variant: "card", orientation: "horizontal", hide_when_empty: false,
+  } as UiNode;
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === "string" ? input : input.toString();
+      calls.push({ url, method: init?.method ?? "GET", body: init?.body ? JSON.parse(String(init.body)) : undefined });
+      if (url.includes("/data/clips")) return Promise.resolve(new Response(JSON.stringify(CLIPS), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    }) as unknown as typeof fetch;
+  });
+
+  test("day headings read Today and Yesterday with counts; an undated row joins the group before it", async () => {
+    const { findAllByRole } = inVideos(library, null);
+    const labels = (await findAllByRole("separator")).map((el) => el.getAttribute("aria-label"));
+    expect(labels).toEqual(["Today, 2 clips", "Yesterday, 2 clips"]);
+  });
+
+  test("the heart turns at once, sends the row with its new value, and the size slider is drawn", async () => {
+    const { findByRole, getByRole } = inVideos(library, null);
+    const heart = await findByRole("button", { name: "Favorite Harbor" });
+    expect(heart.getAttribute("aria-pressed")).toBe("false");
+    fireEvent.click(heart);
+    expect(heart.getAttribute("aria-pressed")).toBe("true");
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/api/plugins/videos/favorite"))).toBe(true));
+    const sent = calls.find((c) => c.url.endsWith("/api/plugins/videos/favorite"))!;
+    expect(sent.body).toEqual({ id: "c1", favorite: true });
+    expect(getByRole("slider", { name: "Card size" })).toBeTruthy();
+  });
+});

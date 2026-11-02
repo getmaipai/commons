@@ -217,6 +217,11 @@ export const MediaShelfNodeSchema = z.object({
   play_label: z.string().min(1).max(80).optional(),
   hide_when_empty: z.boolean().default(false),
   see_all: z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), action: ActionSchema }).optional(),
+  // VIDEO-UI-05 (K12): day groups, the tile-size slider and the favorite heart (spec/ui/schema.json `media_shelf`).
+  group_by_field: z.string().min(1).optional(),
+  group_noun: z.object({ one: z.string().min(1).max(24), other: z.string().min(1).max(24) }).strict().optional(),
+  size_control: z.boolean().optional(),
+  favorite: z.object({ field: z.string().min(1), action: ActionSchema }).strict().optional(),
   on_select: ActionSchema.optional(),
   empty_state: EmptyStateNodeSchema.optional(),
 });

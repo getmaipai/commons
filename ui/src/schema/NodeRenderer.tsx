@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { ApiError, request } from "@/kit/http";
-import { cardSizeGridTemplateColumns } from "@/kit/primitives/CardSizeSlider";
+import { cardSizeGridTemplateColumns, useCardSize } from "@/kit/primitives/CardSizeSlider";
+import { dayHeading, dayKey } from "@/kit/relativeTime";
 import { Section } from "@/kit/primitives/Section";
 import { cn } from "@/kit/utils";
 import { List } from "@/kit/primitives/List";
@@ -52,7 +53,7 @@ import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { ConfirmDialog } from "@/kit/schema/ConfirmDialog";
 import { evaluateCondition } from "@/kit/schema/condition";
-import { fillTemplate, readField } from "@/kit/schema/fieldPath";
+import { fillTemplate, readField, writeField } from "@/kit/schema/fieldPath";
 import type {
   UiNode,
   SectionNode,
@@ -929,9 +930,24 @@ function localPicture(value: unknown): string | null {
   return typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : null;
 }
 
+/** Each row's day group key, in order. A row with no readable date joins the group before it (the first one, "undated"). */
+function dayGroupKeys(rows: readonly Row[], field: string): Map<Row, string> {
+  const keys = new Map<Row, string>();
+  let last = "undated";
+  for (const row of rows) {
+    last = dayKey(readField(row, field)) ?? last;
+    keys.set(row, last);
+  }
+  return keys;
+}
+
 function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row }) {
   const query = useBinding<Row[]>(node.bind, state);
   const { dispatch, lastError, pendingConfirm } = useDispatchAction();
+  // The slider's size is per shelf and per device (the card-size hook's own storage), whether or not a slider is drawn.
+  const [tileSize, setTileSize] = useCardSize(`shelf:${node.bind.path}`);
+  // The heart turns at once; the action's refresh then brings the stored value, which is the truth (a failed call puts it back).
+  const [pressed, setPressed] = useState<Record<string, boolean>>({});
   function keyOf(row: Row): string {
     return String(readField(row, node.item_key_field));
   }
@@ -949,11 +965,37 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
-      {(rows) => (
+      {(rows) => {
+        const groupKeys = node.group_by_field ? dayGroupKeys(rows, node.group_by_field) : undefined;
+        const noun = node.group_noun ?? { one: "item", other: "items" };
+        const favoriteOn = (row: Row) => pressed[keyOf(row)] ?? readField(row, node.favorite!.field) === true;
+        return (
         <>
           <MediaShelf
             items={rows}
             getKey={keyOf}
+            groupBy={groupKeys
+              ? { getKey: (row) => groupKeys.get(row) ?? "undated", label: (key, count) => `${key === "undated" ? "Earlier" : dayHeading(key)}, ${count} ${count === 1 ? noun.one : noun.other}` }
+              : undefined}
+            sizeControl={node.size_control ? { size: tileSize, onChange: setTileSize } : undefined}
+            favorite={node.favorite
+              ? {
+                  isOn: favoriteOn,
+                  label: (row) => `Favorite ${String(readField(row, node.item_label_field))}`,
+                  onToggle: (row) => {
+                    const id = keyOf(row);
+                    const next = !favoriteOn(row);
+                    setPressed((prev) => ({ ...prev, [id]: next }));
+                    dispatch(node.favorite!.action, [writeField(row, node.favorite!.field, next)], () => {
+                      setPressed((prev) => {
+                        const rest = { ...prev };
+                        delete rest[id];
+                        return rest;
+                      });
+                    });
+                  },
+                }
+              : undefined}
             aspect={node.aspect}
             heading={node.heading}
             variant={node.variant}
@@ -1031,7 +1073,8 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
           {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
           <ConfirmDialog pendingConfirm={pendingConfirm} />
         </>
-      )}
+        );
+      }}
     </AsyncState>
   );
 }

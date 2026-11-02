@@ -12,6 +12,16 @@ export function readField(item: unknown, path: string): unknown {
   return value;
 }
 
+/** A copy of `item` with the dotted `path` set to `value` (the row an optimistic toggle hands its action). */
+export function writeField(item: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
+  const [head, ...rest] = path.split(".");
+  if (head === undefined) return item;
+  if (rest.length === 0) return { ...item, [head]: value };
+  const inner = item[head];
+  const base = inner !== null && typeof inner === "object" && !Array.isArray(inner) ? (inner as Record<string, unknown>) : {};
+  return { ...item, [head]: writeField(base, rest.join("."), value) };
+}
+
 /** Substitutes every `{field}` placeholder in `template` with
  * `readField(item, field)`, stringified. Used by action.call's target/
  * args and action.confirm's prompt (spec/ui/schema.json's own

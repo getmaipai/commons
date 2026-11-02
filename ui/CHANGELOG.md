@@ -1,3 +1,7 @@
+## [ui-v0.5.465] - 2026-11-02
+
+- VIDEO-UI-05 / K12 (needs spec-v0.1.303): `media_shelf` gains `group_by_field` (day groups in grid layout, each headed by the shipped `DayDivider`, "Today, 5 clips", then "Yesterday", then "Fri, Oct 30"; `group_noun` sets the counted word), `size_control` (the shipped `CardSizeSlider` above a grid, tile size through `--maipai-card-size`, two columns kept on a phone where the slider is hidden) and `favorite` (`{field, action}`, a heart toggle on each tile: a pressed button beside the tile button, turns at once, sends the row with its new value, and the refresh brings the stored value). `MediaShelf` takes the matching props `groupBy`, `sizeControl` and `favorite`. All optional; a shelf without them draws exactly as before. Opened at 1440 and 390 in both themes.
+
 ## [ui-v0.5.464] - 2026-11-02
 
 - MUSIC-TILES-01: `MediaShelf` frameless rail (`variant="plain"`) honours `density="compact"` (tiles 44% wide on a phone, about four and a fifth from 640, about six and a third from 1280; the default is unchanged). `TopResultCard` title wraps to two lines instead of being cut to one. No spec change.

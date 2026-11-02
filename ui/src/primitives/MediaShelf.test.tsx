@@ -403,4 +403,64 @@ describe("MediaShelf", () => {
       expect(onPlay.mock.calls[0]![0].id).toBe("2");
     });
   });
+
+  describe("library additions (VIDEO-UI-05, K12)", () => {
+    const clips = [
+      { id: "a", title: "Sunrise", day: "2026-11-02" },
+      { id: "b", title: "Harbor", day: "2026-11-02" },
+      { id: "c", title: "Forest", day: "2026-11-01" },
+    ];
+    const base = { items: clips, getKey: (c: (typeof clips)[number]) => c.id, renderItem: () => null, layout: "grid" as const, heading: "My clips", getLabel: (c: (typeof clips)[number]) => c.title };
+
+    test("groupBy draws one DayDivider and one list per run, in the order given", () => {
+      const { getAllByRole, getByRole } = render(
+        <MediaShelf {...base} groupBy={{ getKey: (c) => c.day, label: (key, n) => `${key}, ${n} clips` }} />,
+      );
+      expect(getAllByRole("separator").map((el) => el.getAttribute("aria-label"))).toEqual(["2026-11-02, 2 clips", "2026-11-01, 1 clips"]);
+      expect(getByRole("list", { name: "My clips, 2026-11-02, 2 clips" }).querySelectorAll("li")).toHaveLength(2);
+      expect(getByRole("list", { name: "My clips, 2026-11-01, 1 clips" }).querySelectorAll("li")).toHaveLength(1);
+    });
+
+    test("groupBy and sizeControl are ignored on a rail", () => {
+      const props = { ...base, layout: "rail" as const };
+      const { container, rerender } = render(<MediaShelf {...props} />);
+      const before = container.innerHTML;
+      rerender(<MediaShelf {...props} groupBy={{ getKey: (c) => c.day, label: () => "x" }} sizeControl={{ size: 300, onChange: () => {} }} />);
+      expect(container.innerHTML).toBe(before);
+    });
+
+    test("sizeControl draws the shipped slider, sets the shared tile-size variable and reports a key press", () => {
+      const onChange = mock((_n: number) => {});
+      const { getByRole, container } = render(<MediaShelf {...base} sizeControl={{ size: 300, onChange, label: "Clip size" }} />);
+      const slider = getByRole("slider", { name: "Clip size" });
+      expect((container.querySelector("[data-slot=media-shelf-sized]") as HTMLElement).style.getPropertyValue("--maipai-card-size")).toBe("300px");
+      expect(getByRole("list", { name: "My clips" }).className).toContain("var(--maipai-card-size");
+      expect(getByRole("list", { name: "My clips" }).className).toContain("grid-cols-2");
+      slider.focus();
+      fireEvent.keyDown(slider, { key: "ArrowRight" });
+      expect(onChange).toHaveBeenCalledWith(320);
+    });
+
+    test("favorite is a pressed toggle beside the tile button, never inside it", () => {
+      const onToggle = mock((_c: (typeof clips)[number]) => {});
+      const { getByRole } = render(
+        <MediaShelf {...base} favorite={{ isOn: (c) => c.id === "b", onToggle, label: (c) => `Favorite ${c.title}` }} />,
+      );
+      const off = getByRole("button", { name: "Favorite Sunrise" });
+      const on = getByRole("button", { name: "Favorite Harbor" });
+      expect(off.getAttribute("aria-pressed")).toBe("false");
+      expect(on.getAttribute("aria-pressed")).toBe("true");
+      expect(off.closest("button:not([data-slot=media-tile-favorite])")).toBeNull();
+      fireEvent.click(off);
+      expect(onToggle).toHaveBeenCalledWith(clips[0]);
+    });
+
+    test("without the three props the markup is unchanged", () => {
+      const { container, rerender } = render(<MediaShelf {...base} />);
+      const before = container.innerHTML;
+      rerender(<MediaShelf {...base} groupBy={undefined} sizeControl={undefined} favorite={undefined} />);
+      expect(container.innerHTML).toBe(before);
+      expect(container.querySelector("[data-slot=media-tile-favorite]")).toBeNull();
+    });
+  });
 });

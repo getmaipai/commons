@@ -5,6 +5,8 @@ import { EmptyState } from "@/kit/primitives/EmptyState";
 import { Section } from "@/kit/primitives/Section";
 import { GRID_COLUMNS, SHELF_ITEM_WIDTH, type Density } from "@/kit/responsive";
 import { getIcon } from "@/kit/icons";
+import { DayDivider } from "@/kit/elements/day-separator";
+import { CardSizeSlider, cardSizeStyle } from "@/kit/primitives/CardSizeSlider";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { useSurface } from "@/kit/useSurface";
 
@@ -88,6 +90,16 @@ interface MediaShelfProps<T> {
   onPlay?: (item: T) => void;
   /** MUSIC-KIT-01: the accessible name of the Play button, per item (for example "Play Lanterns"). Falls back to `getLabel`, then "Play". */
   getPlayLabel?: (item: T) => string;
+  /** VIDEO-UI-05: day groups. Grid layout only (ignored elsewhere). Consecutive items with the same `getKey` form a group, in the
+   * order given; each group opens with the kit `DayDivider` (a centred label between hairlines) and is its own list, named
+   * "<shelf name>, <label>". `label(key, count)` is the heading ("Today, 5 clips"). Absent: one ungrouped grid. */
+  groupBy?: { getKey: (item: T) => string; label: (key: string, count: number) => string };
+  /** VIDEO-UI-05: draws the kit `CardSizeSlider` above a grid layout and sets the tile size through the shared
+   * `--maipai-card-size`. The caller holds the size (`useCardSize`). A phone keeps two columns and hides the slider. */
+  sizeControl?: { size: number; onChange: (next: number) => void; label?: string };
+  /** VIDEO-UI-05: a heart toggle pinned to each tile's top-end corner, a sibling of the tile's button. `isOn` draws it filled
+   * and sets `aria-pressed`; `label` is the accessible name, per item ("Favorite Sunset over the bay"). */
+  favorite?: { isOn: (item: T) => boolean; onToggle: (item: T) => void; label: (item: T) => string };
 }
 
 function clampProgress(value: number | undefined): number {
@@ -140,6 +152,9 @@ export function MediaShelf<T>({
   pressScale = false,
   onPlay,
   getPlayLabel,
+  groupBy,
+  sizeControl,
+  favorite,
 }: MediaShelfProps<T>) {
   const name = label ?? heading;
   const { far } = useSurface();
@@ -159,6 +174,7 @@ export function MediaShelf<T>({
   // plain budget fits three/four whole cards instead of peeking the next.
   const gridColumns = circle
     ? "grid-cols-[repeat(auto-fill,minmax(var(--media-artist-size),1fr))]"
+    : sizeControl && layout === "grid" ? SIZED_COLUMNS
     : variant === "plain" ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4" : cn(GRID_COLUMNS[density], "grid-cols-2");
 
   if (items.length === 0 && hideWhenEmpty) return null;
@@ -238,92 +254,135 @@ export function MediaShelf<T>({
     );
   }
 
-  // The heading is Section's, not a second one written here: a shelf is
-  // a section of a page that happens to scroll sideways.
+  // One tile list: the whole shelf, or one day's group.
+  const renderList = (listItems: readonly T[], listName: string | undefined) => (
+    <ul
+      data-slot="media-shelf"
+      data-variant={variant}
+      data-layout={layout}
+      aria-label={listName}
+      // A scrollable region has to be reachable by keyboard (WCAG 2.2
+      // AA, 2.1.1). When the tiles are buttons, tabbing through them
+      // scrolls the rail already; when they are not, the rail itself
+      // is the only thing left to focus, so it takes the tab stop.
+      tabIndex={onSelect || layout === "grid" ? undefined : 0}
+      // The padding is not decoration: `overflow-x-auto` computes
+      // `overflow-y` to `auto` too, so the rail clips on both axes, and
+      // a tile's focus ring (2px ring, 2px offset) would be shaved off
+      // at the top edge and on the leading tile without room to draw
+      // in. Found in a code review, 2026-09-05. The same underlying
+      // quirk collapsed this `<ul>`'s OWN height to zero for a
+      // different flex item elsewhere (HomePage.tsx's `WhoIsHere`,
+      // fixed 2026-09-13 with `min-h-16 shrink-0`) - unverified here
+      // whether this rail needs the same treatment where it's mounted
+      // inside a `flex-col` ancestor (a schema page's `media_shelf`
+      // node, via NodeRenderer.tsx); `scripts/screenshot.ts`'s
+      // `clippedStrips` check (added the same commit as that fix)
+      // covers every `.overflow-x-auto` element on every captured
+      // route, this one included, so a real instance would be caught
+      // there rather than fixed blind here.
+      className={cn(
+        layout === "grid"
+          ? ["grid min-w-0 list-none gap-3 p-1.5", gridColumns]
+          : ["flex min-w-0 list-none snap-x snap-mandatory gap-3 overflow-x-auto p-1.5", variant === "plain" && "[scrollbar-width:none]"],
+        FOCUS_RING,
+      )}
+    >
+      {listItems.map((item) => (
+        <li
+          key={getKey(item)}
+          aria-current={isHighlighted?.(item) ? "true" : undefined}
+          className={cn("flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
+        >
+          <TileFrame
+            onPlay={onPlay ? () => onPlay(item) : undefined}
+            playLabel={playName(item)}
+            favorite={favorite ? { on: favorite.isOn(item), label: favorite.label(item), onToggle: () => favorite.onToggle(item) } : undefined}
+          >
+          <Card
+            onSelect={onSelect ? () => onSelect(item) : undefined}
+            label={getLabel?.(item)}
+            selected={isSelected?.(item)}
+            far={far}
+            className={cn(
+              "border-0 bg-transparent",
+              tileClasses,
+              circle && "rounded-full",
+              // The tile's own selected state. Card draws selection as
+              // a border color, which a borderless artwork tile zeroes
+              // out, so a selected tile was pixel-identical to every
+              // other one (code review, 2026-09-05). Two things this
+              // had to learn from actually looking at it in a browser:
+              // the ring goes on the Card, not on the artwork box
+              // inside it, or Card's own `overflow-hidden` clips it
+              // away entirely; and it needs the offset, because a cyan
+              // ring drawn flush against cyan artwork is invisible.
+              isSelected?.(item) && "ring-2 ring-primary ring-offset-2 ring-offset-background",
+              isHighlighted?.(item) && currentClasses,
+            )}
+          >
+            <div className={artClasses}>
+              {renderItem(item)}
+              <MediaTileOverlay
+                progress={clampProgress(getProgress?.(item))}
+                badge={renderBadge?.(item)}
+                meta={renderMeta?.(item)}
+              />
+            </div>
+          </Card>
+          </TileFrame>
+          {renderCaption ? (
+            // Outside the Card, not inside it: a caption is flow
+            // content, which is invalid inside a button, and a caption
+            // that holds its own control (a channel link, an overflow
+            // menu) would be keyboard-unreachable nested in one. Same
+            // rule List.renderAction follows.
+            <div className={cn("px-1 text-sm text-[var(--foreground)]", circle && "w-full")}>{renderCaption(item)}</div>
+          ) : null}
+        </li>
+      ))}
+    </ul>
+  );
+
+  // Day groups and the size slider are for the grid layout; a rail ignores both.
+  const grouped = layout === "grid" && groupBy !== undefined;
+  const sized = layout === "grid" && sizeControl !== undefined;
+  let content: ReactNode;
+  if (grouped) {
+    const runs: { key: string; items: T[] }[] = [];
+    for (const item of items) {
+      const key = groupBy.getKey(item);
+      const last = runs[runs.length - 1];
+      if (last && last.key === key) last.items.push(item);
+      else runs.push({ key, items: [item] });
+    }
+    content = (
+      <div className="flex min-w-0 flex-col gap-4" data-slot="media-shelf-groups">
+        {runs.map((run) => {
+          const text = groupBy.label(run.key, run.items.length);
+          return (
+            <section key={run.key} aria-label={text} className="flex min-w-0 flex-col gap-2" data-slot="media-shelf-group">
+              <DayDivider label={text} />
+              {renderList(run.items, name ? `${name}, ${text}` : text)}
+            </section>
+          );
+        })}
+      </div>
+    );
+  } else {
+    content = renderList(items, name);
+  }
+
   return (
     <Frame heading={heading} seeAll={seeAll}>
-      <ul
-        data-slot="media-shelf"
-        data-variant={variant}
-        data-layout={layout}
-        aria-label={name}
-        // A scrollable region has to be reachable by keyboard (WCAG 2.2
-        // AA, 2.1.1). When the tiles are buttons, tabbing through them
-        // scrolls the rail already; when they are not, the rail itself
-        // is the only thing left to focus, so it takes the tab stop.
-        tabIndex={onSelect || layout === "grid" ? undefined : 0}
-        // The padding is not decoration: `overflow-x-auto` computes
-        // `overflow-y` to `auto` too, so the rail clips on both axes, and
-        // a tile's focus ring (2px ring, 2px offset) would be shaved off
-        // at the top edge and on the leading tile without room to draw
-        // in. Found in a code review, 2026-09-05. The same underlying
-        // quirk collapsed this `<ul>`'s OWN height to zero for a
-        // different flex item elsewhere (HomePage.tsx's `WhoIsHere`,
-        // fixed 2026-09-13 with `min-h-16 shrink-0`) - unverified here
-        // whether this rail needs the same treatment where it's mounted
-        // inside a `flex-col` ancestor (a schema page's `media_shelf`
-        // node, via NodeRenderer.tsx); `scripts/screenshot.ts`'s
-        // `clippedStrips` check (added the same commit as that fix)
-        // covers every `.overflow-x-auto` element on every captured
-        // route, this one included, so a real instance would be caught
-        // there rather than fixed blind here.
-        className={cn(
-          layout === "grid"
-            ? ["grid min-w-0 list-none gap-3 p-1.5", gridColumns]
-            : ["flex min-w-0 list-none snap-x snap-mandatory gap-3 overflow-x-auto p-1.5", variant === "plain" && "[scrollbar-width:none]"],
-          FOCUS_RING,
-        )}
-      >
-        {items.map((item) => (
-          <li
-            key={getKey(item)}
-            aria-current={isHighlighted?.(item) ? "true" : undefined}
-            className={cn("flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
-          >
-            <TileFrame onPlay={onPlay ? () => onPlay(item) : undefined} playLabel={playName(item)}>
-            <Card
-              onSelect={onSelect ? () => onSelect(item) : undefined}
-              label={getLabel?.(item)}
-              selected={isSelected?.(item)}
-              far={far}
-              className={cn(
-                "border-0 bg-transparent",
-                tileClasses,
-                circle && "rounded-full",
-                // The tile's own selected state. Card draws selection as
-                // a border color, which a borderless artwork tile zeroes
-                // out, so a selected tile was pixel-identical to every
-                // other one (code review, 2026-09-05). Two things this
-                // had to learn from actually looking at it in a browser:
-                // the ring goes on the Card, not on the artwork box
-                // inside it, or Card's own `overflow-hidden` clips it
-                // away entirely; and it needs the offset, because a cyan
-                // ring drawn flush against cyan artwork is invisible.
-                isSelected?.(item) && "ring-2 ring-primary ring-offset-2 ring-offset-background",
-                isHighlighted?.(item) && currentClasses,
-              )}
-            >
-              <div className={artClasses}>
-                {renderItem(item)}
-                <MediaTileOverlay
-                  progress={clampProgress(getProgress?.(item))}
-                  badge={renderBadge?.(item)}
-                  meta={renderMeta?.(item)}
-                />
-              </div>
-            </Card>
-            </TileFrame>
-            {renderCaption ? (
-              // Outside the Card, not inside it: a caption is flow
-              // content, which is invalid inside a button, and a caption
-              // that holds its own control (a channel link, an overflow
-              // menu) would be keyboard-unreachable nested in one. Same
-              // rule List.renderAction follows.
-              <div className={cn("px-1 text-sm text-[var(--foreground)]", circle && "w-full")}>{renderCaption(item)}</div>
-            ) : null}
-          </li>
-        ))}
-      </ul>
+      {sized ? (
+        <div className="flex min-w-0 flex-col gap-3" style={cardSizeStyle(sizeControl.size)} data-slot="media-shelf-sized">
+          <div className="hidden justify-end px-1.5 sm:flex" data-slot="media-shelf-size-control">
+            <CardSizeSlider size={sizeControl.size} onChange={sizeControl.onChange} label={sizeControl.label} />
+          </div>
+          {content}
+        </div>
+      ) : content}
     </Frame>
   );
 }
@@ -331,27 +390,50 @@ export function MediaShelf<T>({
 const PRESS_CLASSES = "motion-safe:transition-[transform,opacity] motion-safe:active:scale-[var(--media-press-scale)]";
 
 const PlayGlyph = getIcon("play");
+const HeartGlyph = getIcon("heart");
 
-/** The tile and, when the shelf has `onPlay`, its hover Play button as a sibling (a button inside a button is invalid). */
-function TileFrame({ onPlay, playLabel, children }: { onPlay?: () => void; playLabel: string; children: ReactNode }) {
-  if (!onPlay) return <>{children}</>;
+/** A grid sized by the slider: two columns on a phone, then as many as fit at the chosen tile size. */
+const SIZED_COLUMNS = "grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(var(--maipai-card-size,220px),1fr))]";
+
+/** The tile and, when the shelf has `onPlay` or `favorite`, its Play button and heart as siblings (a button inside a button is invalid). */
+function TileFrame({ onPlay, playLabel, favorite, children }: { onPlay?: () => void; playLabel: string; favorite?: { on: boolean; label: string; onToggle: () => void }; children: ReactNode }) {
+  if (!onPlay && !favorite) return <>{children}</>;
   return (
     <div className="group/tile relative" data-slot="media-tile">
       {children}
-      <button
-        type="button"
-        aria-label={playLabel}
-        data-slot="media-tile-play"
-        onClick={onPlay}
-        className={cn(
-          "absolute end-2 bottom-2 flex size-[var(--media-play-size)] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md",
-          "translate-y-2 opacity-0 group-hover/tile:translate-y-0 group-hover/tile:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100",
-          "motion-safe:transition-[transform,opacity] motion-safe:duration-200 [@media(hover:none)]:hidden",
-          FOCUS_RING,
-        )}
-      >
-        <PlayGlyph aria-hidden className="size-5" />
-      </button>
+      {favorite ? (
+        <button
+          type="button"
+          aria-label={favorite.label}
+          aria-pressed={favorite.on}
+          data-slot="media-tile-favorite"
+          onClick={favorite.onToggle}
+          className={cn(
+            "absolute end-2 top-2 flex size-9 items-center justify-center rounded-full bg-[var(--art-overlay)] text-[var(--art-foreground)]",
+            "before:absolute before:-inset-1 before:content-['']",
+            "motion-safe:transition-transform motion-safe:active:scale-90",
+            FOCUS_RING,
+          )}
+        >
+          <HeartGlyph aria-hidden className={cn("size-5", favorite.on && "fill-current")} />
+        </button>
+      ) : null}
+      {onPlay ? (
+        <button
+          type="button"
+          aria-label={playLabel}
+          data-slot="media-tile-play"
+          onClick={onPlay}
+          className={cn(
+            "absolute end-2 bottom-2 flex size-[var(--media-play-size)] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md",
+            "translate-y-2 opacity-0 group-hover/tile:translate-y-0 group-hover/tile:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100",
+            "motion-safe:transition-[transform,opacity] motion-safe:duration-200 [@media(hover:none)]:hidden",
+            FOCUS_RING,
+          )}
+        >
+          <PlayGlyph aria-hidden className="size-5" />
+        </button>
+      ) : null}
     </div>
   );
 }
