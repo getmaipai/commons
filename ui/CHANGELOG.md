@@ -1,3 +1,7 @@
+## [ui-v0.5.482] - 2026-11-02
+
+- VIDEO-STUDIO-08 (found building the Home Create page; a token on the existing studio scope, no new part, every default unchanged). `[data-surface="studio"]` sets `--prompt-panel-offset: 14rem` (the plain page's 8rem plus the pane padding and the studio header), so a side-by-side prompt panel under the studio header scrolls inside itself and its pinned Generate stays inside a 900 px window at 1440. Measured in a dev hub: panel bottom 956 px before, 860 px after.
+
 ## [ui-v0.5.481] - 2026-11-02
 
 - ADULT-LOCK-06 (home `docs/design/video-loras-2026-11-02.md` 3.10; `UI-DECISIONS.md` row first), additive, every default unchanged. `AdultLockDialog` takes `title`, `description` and `actionLabel`, so the same modal, passcode field, lockout countdown and plain failure lines also serve the creator's confirm before removing the Adult lock (a fresh passcode for one action). Without them the dialog reads as before.

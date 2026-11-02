@@ -95,6 +95,11 @@ describe("the studio token scope", () => {
     });
   }
 
+  test("a side-by-side prompt panel under the studio header stops its scroll 14rem above the window's foot, in every theme", () => {
+    expect(light).toMatch(/--prompt-panel-offset:\s*14rem;/);
+    for (const block of [dark, systemDark]) expect(block).not.toMatch(/--prompt-panel-offset/);
+  });
+
   test("no look can change it: the scope is set on the element, and no look block names the scope", () => {
     expect(css).not.toMatch(/style-[a-z-]+[^{]*\[data-surface="studio"\]/);
     expect(css).not.toMatch(/data-look[^{]*\[data-surface="studio"\]\s*\{/);

@@ -1918,6 +1918,9 @@ html:has([data-slot="phone-nav"][data-floating]) [data-slot="prompt-bar"][data-m
   --surface-pane: #e7e7ea;
   --surface-sidebar: #e7e7ea;
   --surface-stage: #e4e4e7;
+  /* VIDEO-STUDIO-08: the studio pane's padding and its page header sit above a side-by-side prompt panel, so the panel's own scroll stops 92px
+   * shorter than on a plain page (8rem to 14rem) and its pinned submit button stays inside a 900px window. Not set on the dark blocks: it inherits. */
+  --prompt-panel-offset: 14rem;
 }
 .dark [data-surface="studio"] {
   --background: #0f0f11;
