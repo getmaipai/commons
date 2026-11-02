@@ -8,6 +8,7 @@ import { cn } from "@/kit/utils";
 import { List } from "@/kit/primitives/List";
 import { CardGrid } from "@/kit/primitives/CardGrid";
 import { MediaShelf } from "@/kit/primitives/MediaShelf";
+import { CategoryTiles, QuickTiles, TopResultCard, TrackRows } from "@/kit/primitives/MusicBlocks";
 import { Billboard } from "@/kit/primitives/Billboard";
 import { Player, type PlayerChapter, type PlayerTextTrack, type PlayerUpNext } from "@/kit/primitives/Player";
 import { SafeImage, type ImageFallbackKind } from "@/kit/primitives/SafeImage";
@@ -73,6 +74,10 @@ import type {
   PickerNode,
   SearchNode,
   PromptBarNode,
+  QuickTilesNode,
+  TopResultNode,
+  CategoryTilesNode,
+  TrackRowsNode,
   TabsNode,
   CreationHeaderNode,
   DataState,
@@ -921,6 +926,10 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             layout={node.layout}
             artShape={node.art_shape}
             density={node.density}
+            cardRadius={node.card_radius}
+            pressScale={node.press_scale}
+            onPlay={node.on_play ? (row) => dispatch(node.on_play!, [row]) : undefined}
+            getPlayLabel={node.play_label ? (row) => fillTemplate(node.play_label!, row) : undefined}
             isHighlighted={node.item_highlight_field ? (row) => readField(row, node.item_highlight_field!) === true : undefined}
             renderIndex={node.item_index_field
               ? (row) => {
@@ -989,6 +998,158 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
         </>
       )}
     </AsyncState>
+  );
+}
+
+/** MUSIC-KIT-01: the loading, error and empty states the four music blocks share; `children` gets the rows. */
+function MusicBlockState({ bind, state, hideWhenEmpty, emptyState, errorMessage, children }: {
+  bind: MediaShelfNode["bind"];
+  state: Row;
+  hideWhenEmpty: boolean;
+  emptyState: MediaShelfNode["empty_state"];
+  errorMessage: string;
+  children: (rows: Row[], dispatch: ReturnType<typeof useDispatchAction>["dispatch"]) => ReactNode;
+}) {
+  const query = useBinding<Row[]>(bind, state);
+  const { dispatch, lastError, pendingConfirm } = useDispatchAction();
+  return (
+    <AsyncState
+      data={query.data}
+      error={query.isError}
+      isFetching={query.isFetching}
+      onRetry={() => query.refetch()}
+      errorMessage={errorMessage}
+      isEmpty={(rows) => rows.length === 0 && !hideWhenEmpty}
+      emptyIcon={emptyState?.icon ?? "music"}
+      emptyText={emptyState?.text ?? "Nothing here yet."}
+      emptyActionLabel={emptyState?.action ? (emptyState.action_label ?? actionLabel(emptyState.action)) : undefined}
+      onEmptyAction={emptyState?.action ? () => dispatch(emptyState.action!) : undefined}
+    >
+      {(rows) => (
+        <>
+          {children(rows, dispatch)}
+          {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
+          <ConfirmDialog pendingConfirm={pendingConfirm} />
+        </>
+      )}
+    </AsyncState>
+  );
+}
+
+function stringField(row: Row, path: string | undefined): string | undefined {
+  if (!path) return undefined;
+  const value = readField(row, path);
+  return typeof value === "string" && value !== "" ? value : undefined;
+}
+
+/** A colour the category tile may mix into its card: a hex value or an rgb(), hsl() or oklch() function. Nothing else
+ * (no url(), no var(), no second declaration) reaches a style attribute. */
+export function safeTileColor(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const text = value.trim();
+  if (/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(text)) return text;
+  return /^(?:rgb|hsl|oklch)\([0-9a-z\s.,%/-]{1,60}\)$/i.test(text) ? text : undefined;
+}
+
+function musicArt(row: Row, path: string | undefined) {
+  return <SafeImage src={path ? localPicture(readField(row, path)) : null} kind={pictureKind(readField(row, "kind"))} alt="" className="h-full w-full object-cover" />;
+}
+
+function QuickTilesNodeView({ node, state }: { node: QuickTilesNode; state: Row }) {
+  return (
+    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage="Could not load these tiles.">
+      {(rows, dispatch) => (
+        <QuickTiles
+          items={rows}
+          label={node.label}
+          max={node.max}
+          getKey={(row) => String(readField(row, node.item_key_field))}
+          getTitle={(row) => String(readField(row, node.item_label_field))}
+          renderArt={(row) => musicArt(row, node.item_media_field)}
+          onSelect={node.on_select ? (row) => dispatch(node.on_select!, [row]) : undefined}
+          onPlay={node.on_play ? (row) => dispatch(node.on_play!, [row]) : undefined}
+          getPlayLabel={node.play_label ? (row) => fillTemplate(node.play_label!, row) : undefined}
+        />
+      )}
+    </MusicBlockState>
+  );
+}
+
+function TopResultNodeView({ node, state }: { node: TopResultNode; state: Row }) {
+  return (
+    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage="Could not load the top result.">
+      {(rows, dispatch) => {
+        const row = rows[0];
+        if (!row) return null;
+        return (
+          <TopResultCard
+            title={String(readField(row, node.item_label_field))}
+            eyebrow={node.item_eyebrow_field ? fillTemplate(node.item_eyebrow_field, row) || undefined : undefined}
+            subtitle={node.item_subtitle_field ? fillTemplate(node.item_subtitle_field, row) || undefined : undefined}
+            art={node.item_media_field ? musicArt(row, node.item_media_field) : undefined}
+            circle={node.art_shape === "circle"}
+            onSelect={node.on_select ? () => dispatch(node.on_select!, [row]) : undefined}
+            onPlay={node.on_play ? () => dispatch(node.on_play!, [row]) : undefined}
+            playLabel={node.play_label ? fillTemplate(node.play_label, row) : undefined}
+          />
+        );
+      }}
+    </MusicBlockState>
+  );
+}
+
+function CategoryTilesNodeView({ node, state }: { node: CategoryTilesNode; state: Row }) {
+  return (
+    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage="Could not load these categories.">
+      {(rows, dispatch) => {
+        const byId = new Map(rows.map((row) => [String(readField(row, node.item_key_field)), row]));
+        return (
+          <CategoryTiles
+            label={node.label}
+            items={rows.map((row) => ({
+              id: String(readField(row, node.item_key_field)),
+              title: String(readField(row, node.item_label_field)),
+              color: safeTileColor(node.item_color_field ? readField(row, node.item_color_field) : undefined),
+              art: node.item_media_field && localPicture(readField(row, node.item_media_field)) ? musicArt(row, node.item_media_field) : undefined,
+            }))}
+            onSelect={node.on_select ? (tile) => { const row = byId.get(tile.id); if (row) dispatch(node.on_select!, [row]); } : undefined}
+          />
+        );
+      }}
+    </MusicBlockState>
+  );
+}
+
+function TrackRowsNodeView({ node, state }: { node: TrackRowsNode; state: Row }) {
+  return (
+    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage="Could not load these tracks.">
+      {(rows, dispatch) => (
+        <TrackRows
+          items={rows}
+          label={node.label}
+          getKey={(row) => String(readField(row, node.item_key_field))}
+          getTitle={(row) => String(readField(row, node.item_label_field))}
+          getSubtitle={node.item_subtitle_field ? (row) => fillTemplate(node.item_subtitle_field!, row) || undefined : undefined}
+          getNumber={node.item_number_field
+            ? (row, i) => {
+                const value = readField(row, node.item_number_field!);
+                return typeof value === "string" || typeof value === "number" ? value : i + 1;
+              }
+            : undefined}
+          getMeta={node.item_meta_field
+            ? (row) => {
+                const meta = readField(row, node.item_meta_field!);
+                if (typeof meta === "number" && Number.isFinite(meta) && meta > 0) return formatTime(meta);
+                return typeof meta === "string" && meta !== "" ? meta : null;
+              }
+            : undefined}
+          getGroup={node.item_group_field ? (row) => stringField(row, node.item_group_field) : undefined}
+          isPlaying={node.item_highlight_field ? (row) => readField(row, node.item_highlight_field!) === true : undefined}
+          onPlay={(row) => dispatch(node.on_play, [row])}
+          getPlayLabel={node.play_label ? (row) => fillTemplate(node.play_label!, row) : undefined}
+        />
+      )}
+    </MusicBlockState>
   );
 }
 
@@ -1132,6 +1293,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               poster={localPicture(readField(r, field("poster", "poster"))) ?? undefined}
               lyrics={hasLyrics || node.lyrics_enabled ? lyrics : undefined}
               lyricsLabel="Lyrics"
+              artSpring={node.art_spring}
+              lyricsBlur={node.lyrics_blur}
               lyricsEmptyText={node.lyrics_empty_text}
               lyricsLoading={lyricsLoading}
               onLyricsOpen={node.on_lyrics_open ? () => {
@@ -1594,6 +1757,14 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <SearchNodeView node={node} state={state} />;
     case "prompt_bar":
       return <PromptBarNodeView node={node} state={state} />;
+    case "quick_tiles":
+      return <QuickTilesNodeView node={node} state={state} />;
+    case "top_result":
+      return <TopResultNodeView node={node} state={state} />;
+    case "category_tiles":
+      return <CategoryTilesNodeView node={node} state={state} />;
+    case "track_rows":
+      return <TrackRowsNodeView node={node} state={state} />;
     case "tabs":
       return <TabsNodeView node={node} state={state} />;
     case "form":

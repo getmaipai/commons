@@ -1,3 +1,7 @@
+## [ui-v0.5.454] - 2026-11-01
+
+- MUSIC-KIT-01 (schema): the renderer draws the new nodes `quick_tiles`, `top_result`, `category_tiles` and `track_rows` from `MusicBlocks`, and `media_shelf` passes `card_radius`, `press_scale`, `on_play` (a hover Play that dispatches its action with the tile's row, the same as `on_select`) and `play_label` to `MediaShelf`; `player` passes `art_spring` and `lyrics_blur`. A category tile's colour must be a hex value or an rgb(), hsl() or oklch() function; anything else is dropped. Pairs with spec-v0.1.294. All additive; a page that sets none of them draws as before.
+
 ## [ui-v0.5.453] - 2026-11-01
 
 MUSIC-KIT-01, the modern music look. Every prop is optional and off by default; with none set the markup and look are unchanged. Motion uses `motion-safe:`, so reduced motion gets none.

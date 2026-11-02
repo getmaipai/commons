@@ -209,6 +209,11 @@ export const MediaShelfNodeSchema = z.object({
     label_field: z.string().min(1).optional(),
     action: ActionSchema,
   }).strict()).max(2).optional(),
+  // MUSIC-KIT-01: the modern music look.
+  card_radius: z.enum(["default", "tight"]).optional(),
+  press_scale: z.boolean().optional(),
+  on_play: ActionSchema.optional(),
+  play_label: z.string().min(1).max(80).optional(),
   hide_when_empty: z.boolean().default(false),
   see_all: z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), action: ActionSchema }).optional(),
   on_select: ActionSchema.optional(),
@@ -250,6 +255,9 @@ export const PlayerNodeSchema = z.object({
   kind: z.enum(["video", "audio"]).default("video"),
   layout: z.enum(["video", "audio", "mini"]).optional(),
   lyrics_enabled: z.boolean().optional(),
+  // MUSIC-KIT-01
+  art_spring: z.boolean().optional(),
+  lyrics_blur: z.boolean().optional(),
   lyrics_empty_text: z.string().optional(),
   on_lyrics_open: ActionSchema.optional(),
   autoplay_next: z.boolean().default(false),
@@ -472,6 +480,71 @@ export const PromptBarNodeSchema = z.object({
 });
 export type PromptBarNode = z.infer<typeof PromptBarNodeSchema>;
 
+// MUSIC-KIT-01: the music page blocks (ui/src/primitives/MusicBlocks.tsx) as nodes (spec/ui/schema.json).
+export const QuickTilesNodeSchema = z.object({
+  type: z.literal("quick_tiles"),
+  bind: BindingSchema,
+  label: z.string().min(1).max(60),
+  item_key_field: z.string(),
+  item_label_field: z.string(),
+  item_media_field: z.string(),
+  max: z.number().int().min(1).max(12).optional(),
+  on_select: ActionSchema.optional(),
+  on_play: ActionSchema.optional(),
+  play_label: z.string().min(1).max(80).optional(),
+  hide_when_empty: z.boolean().default(false),
+  empty_state: EmptyStateNodeSchema.optional(),
+});
+export type QuickTilesNode = z.infer<typeof QuickTilesNodeSchema>;
+
+export const TopResultNodeSchema = z.object({
+  type: z.literal("top_result"),
+  bind: BindingSchema,
+  item_label_field: z.string(),
+  item_eyebrow_field: z.string().optional(),
+  item_subtitle_field: z.string().optional(),
+  item_media_field: z.string().optional(),
+  art_shape: z.enum(["default", "circle"]).optional(),
+  on_select: ActionSchema.optional(),
+  on_play: ActionSchema.optional(),
+  play_label: z.string().min(1).max(80).optional(),
+  hide_when_empty: z.boolean().default(false),
+  empty_state: EmptyStateNodeSchema.optional(),
+});
+export type TopResultNode = z.infer<typeof TopResultNodeSchema>;
+
+export const CategoryTilesNodeSchema = z.object({
+  type: z.literal("category_tiles"),
+  bind: BindingSchema,
+  label: z.string().min(1).max(60),
+  item_key_field: z.string(),
+  item_label_field: z.string(),
+  item_color_field: z.string().optional(),
+  item_media_field: z.string().optional(),
+  on_select: ActionSchema.optional(),
+  hide_when_empty: z.boolean().default(false),
+  empty_state: EmptyStateNodeSchema.optional(),
+});
+export type CategoryTilesNode = z.infer<typeof CategoryTilesNodeSchema>;
+
+export const TrackRowsNodeSchema = z.object({
+  type: z.literal("track_rows"),
+  bind: BindingSchema,
+  label: z.string().min(1).max(60),
+  item_key_field: z.string(),
+  item_label_field: z.string(),
+  item_subtitle_field: z.string().optional(),
+  item_number_field: z.string().optional(),
+  item_meta_field: z.string().optional(),
+  item_group_field: z.string().optional(),
+  item_highlight_field: z.string().optional(),
+  on_play: ActionSchema,
+  play_label: z.string().min(1).max(80).optional(),
+  hide_when_empty: z.boolean().default(false),
+  empty_state: EmptyStateNodeSchema.optional(),
+});
+export type TrackRowsNode = z.infer<typeof TrackRowsNodeSchema>;
+
 export const SectionNodeSchema: z.ZodType<SectionNode> = z.lazy(() =>
   z.object({
     type: z.literal("section"),
@@ -541,6 +614,10 @@ export type UiNode =
   | PickerNode
   | SearchNode
   | PromptBarNode
+  | QuickTilesNode
+  | TopResultNode
+  | CategoryTilesNode
+  | TrackRowsNode
   | TabsNode;
 
 export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
@@ -567,6 +644,10 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     PickerNodeSchema,
     SearchNodeSchema,
     PromptBarNodeSchema,
+    QuickTilesNodeSchema,
+    TopResultNodeSchema,
+    CategoryTilesNodeSchema,
+    TrackRowsNodeSchema,
     TabsNodeSchema,
   ]),
 );
@@ -597,4 +678,8 @@ export const NODE_TYPES = [
   "search",
   "tabs",
   "prompt_bar",
+  "quick_tiles",
+  "top_result",
+  "category_tiles",
+  "track_rows",
 ] as const;
