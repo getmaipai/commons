@@ -55,6 +55,27 @@ describe("media shelf variants schema", () => {
   });
 });
 
+describe("media shelf library additions (VIDEO-UI-05, K12)", () => {
+  const heart = { field: "favorite", action: { call: { target: "/api/plugins/videos/favorite", args: { id: "{id}" } } } };
+  test("group_by_field, size_control and favorite validate; defaults stay off", () => {
+    expect(validate(shelf)).toBe(true);
+    expect(validate({ ...shelf, layout: "grid", group_by_field: "made_at", group_noun: { one: "clip", other: "clips" }, size_control: true, favorite: heart })).toBe(true);
+    expect(validate({ ...shelf, group_noun: { one: "clip" } })).toBe(false);
+    expect(validate({ ...shelf, group_by_field: "" })).toBe(false);
+    expect(validate({ ...shelf, size_control: "yes" })).toBe(false);
+    expect(validate({ ...shelf, favorite: { field: "favorite" } })).toBe(false);
+    expect(validate({ ...shelf, favorite: { ...heart, extra: 1 } })).toBe(false);
+  });
+  const contributes: AppContributes = { pages: [{ id: "index", module: "index" }], data: [{ id: "items", rows: "list" }] };
+  const check = (extra: object) => checkAppPackage("videos", contributes, () => ({ type: "page", body: [{ ...shelf, ...extra }] }));
+  test("the favorite call stays in the package and the fields are paths, not addresses", () => {
+    expect(check({ favorite: heart, group_by_field: "made_at" })).toEqual([]);
+    expect(check({ favorite: { ...heart, action: { call: { target: "/api/media/favorite" } } } }).join("\n")).toContain("media_shelf.favorite: call.target");
+    expect(check({ favorite: { ...heart, field: "https://example.com/x" } }).join("\n")).toContain("favorite.field must be a field path");
+    expect(check({ group_by_field: "//example.com/d" }).join("\n")).toContain("group_by_field must be a field path");
+  });
+});
+
 describe("media variants package conformance", () => {
   const contributes: AppContributes = { pages: [{ id: "index", module: "index" }], data: [{ id: "items", rows: "list" }] };
   const check = (row_actions: unknown[]) => checkAppPackage("music", contributes, () => ({ type: "page", body: [{ ...shelf, row_actions }] }));

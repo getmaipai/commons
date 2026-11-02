@@ -97,6 +97,12 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     if (isObject(node.see_all)) checkAction(node.see_all.action, packageId, `${where} media_shelf.see_all`, out);
     checkFieldPath(node.item_media_field, `${where} media_shelf`, "item_media_field", out);
     checkAction(node.on_play, packageId, `${where} media_shelf.on_play`, out, true);
+    // VIDEO-UI-05: the favorite heart's call stays in the package; its field and the day field are paths.
+    if (isObject(node.favorite)) {
+      checkAction(node.favorite.action, packageId, `${where} media_shelf.favorite`, out);
+      checkFieldPath(node.favorite.field, `${where} media_shelf`, "favorite.field", out);
+    }
+    checkFieldPath(node.group_by_field, `${where} media_shelf`, "group_by_field", out);
   }
   // MUSIC-KIT-01: the music page blocks draw the package's own rows; selecting and playing may hand an item to the host.
   if (type === "quick_tiles" || type === "top_result" || type === "category_tiles" || type === "track_rows") {

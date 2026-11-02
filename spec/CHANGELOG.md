@@ -1,3 +1,7 @@
+## [spec-v0.1.303] - 2026-11-02
+
+- VIDEO-UI-05 (K12): `media_shelf` gains the optional `group_by_field` (a date path; day groups headed by the kit DayDivider, grid layout) with `group_noun` (the counted word, `{one, other}`), `size_control` (boolean, default false; the kit CardSizeSlider above a grid) and `favorite` (`{field, action}`, a heart toggle on each tile). `checkAppPackage` keeps the favorite call inside the package and both fields as paths. Additive; a shelf without them is unchanged.
+
 ## [spec-v0.1.302] - 2026-11-02
 
 - MUSIC-LYRICS-KEY-01: the household setting `music.lyrics_online` (boolean, on by default, advanced, honoured by home), the switch for the Music app's one-song lyrics lookup. Home already declares it identically. Additive.

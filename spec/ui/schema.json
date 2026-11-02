@@ -441,6 +441,25 @@
         "play_label": { "type": "string", "minLength": 1, "maxLength": 80, "description": "MUSIC-KIT-01: a `{field}` template for the Play button's accessible name (\"Play {title}\"). Default: the tile's label." },
         "hide_when_empty": { "type": "boolean", "default": false, "description": "MEDIA-POLISH-01: draw nothing (no heading, no empty state) when the bound call returns no rows, so a shelf with nothing in it is simply absent. A load error still shows." },
         "see_all": { "$ref": "#/$defs/billboard_action", "description": "MEDIA-POLISH-01: a link beside the heading (\"See all\"), usually a `navigate` to the app's full list. Fired with no row." },
+        "group_by_field": { "type": "string", "minLength": 1, "description": "VIDEO-UI-05 (K12): dotted path to a date (an ISO string, or epoch seconds or milliseconds). Grid layout only: rows are grouped by local calendar day, in the order the call returns them, and each group opens with the kit's DayDivider, a centred label between hairlines (\"Today, 5 clips\", \"Yesterday, 2 clips\", then \"Mon, Oct 27, 3 clips\"). A row with no readable date joins the group before it. Absent: one ungrouped grid." },
+        "group_noun": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["one", "other"],
+          "description": "VIDEO-UI-05 (K12): the word counted in each day heading (one: \"clip\", other: \"clips\"). Absent: \"item\" and \"items\".",
+          "properties": { "one": { "type": "string", "minLength": 1, "maxLength": 24 }, "other": { "type": "string", "minLength": 1, "maxLength": 24 } }
+        },
+        "size_control": { "type": "boolean", "default": false, "description": "VIDEO-UI-05 (K12): draws the kit's CardSizeSlider above a grid layout; the slider sets the tile size (the shared --maipai-card-size) and is remembered per device. A phone keeps two columns." },
+        "favorite": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["field", "action"],
+          "description": "VIDEO-UI-05 (K12): a heart toggle on each tile. `field` is the dotted path to the row's boolean (true draws a filled heart); a press flips it at once and fires `action` with the row, its `field` set to the new value, so the call can send it. A failed call puts the heart back and says so.",
+          "properties": {
+            "field": { "type": "string", "minLength": 1 },
+            "action": { "$ref": "#/$defs/action" }
+          }
+        },
         "on_select": { "$ref": "#/$defs/action" },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
