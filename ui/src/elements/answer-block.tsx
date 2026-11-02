@@ -15,6 +15,7 @@ import { WeatherCard } from "./weather-card";
 import { StoryFeed } from "../primitives/StoryFeed";
 import { ArticleView } from "../primitives/ArticleView";
 import { MediaCard } from "./media-card";
+import { Band } from "./band";
 import { Confirmation } from "./confirmation";
 import { Countdown } from "./countdown";
 
@@ -149,6 +150,8 @@ function renderKind(
       return <ArticleView data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} ids={{ story_id: props.story_id, item_id: props.item_id }} onBack={onBack} />;
     case "media_card":
       return <MediaCard {...props} resolveImageSrc={resolveImageSrc} onAction={onAction && ((action) => onAction(block.id, action))} />;
+    case "band":
+      return <Band {...props} resolveImageSrc={resolveImageSrc} onAction={onAction && ((action) => onAction(block.id, action))} />;
     case "confirmation":
       return <Confirmation {...props} onUndo={onAction && (() => onAction(block.id, "undo"))} />;
     case "countdown":

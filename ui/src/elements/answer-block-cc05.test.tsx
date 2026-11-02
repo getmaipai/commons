@@ -2,6 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
 import { AnswerBlockView } from "./answer-block";
 import mediaCard from "@maipai/spec/fixtures/answer-block/valid-media_card.json";
+import band from "@maipai/spec/fixtures/answer-block/valid-band.json";
 import confirmation from "@maipai/spec/fixtures/answer-block/valid-confirmation.json";
 import countdown from "@maipai/spec/fixtures/answer-block/valid-countdown.json";
 
@@ -10,6 +11,7 @@ const html = (block: unknown) => render(<div style={{ width: 360 }}><AnswerBlock
 
 describe("CHAT-CARDS-05 phone render snapshots", () => {
   test("media_card", () => expect(html(mediaCard)).toMatchSnapshot());
+  test("band", () => expect(html(band)).toMatchSnapshot());
   test("confirmation", () => expect(html(confirmation)).toMatchSnapshot());
   test("countdown", () => expect(html({ ...countdown, props: { ...countdown.props, endsAt: "2000-01-01T00:00:00Z" } })).toMatchSnapshot());
 });

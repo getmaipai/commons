@@ -98,6 +98,36 @@ describe("AnswerBlockView renders each v1 kind with its Element", () => {
     expect(actions).toEqual(["open_app"]);
   });
 
+  test("band renders a portrait, members and the first single, and reports actions without route data", () => {
+    const actions: string[] = [];
+    const { container, getByText } = render(<AnswerBlockView block={fixture("band")} resolveImageSrc={(src) => `/api/answer-image/${src}`} onAction={(_id, action) => actions.push(action)} />);
+    expect(container.querySelector('[data-slot="band"]')).not.toBeNull();
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/api/answer-image/hubimg-4f2a9c01");
+    expect(container.querySelectorAll("img")).toHaveLength(3);
+    expect(getByText("Lantern Hollow")).toBeTruthy();
+    expect(getByText("Nova Reed")).toBeTruthy();
+    expect(getByText("Salt on the Glass")).toBeTruthy();
+    expect(getByText("Inspired by a song that was playing")).toBeTruthy();
+    fireEvent.click(getByText("make album"));
+    fireEvent.click(getByText("discard"));
+    expect(actions).toEqual(["make_album", "discard"]);
+  });
+
+  test("band shows only what it was given and is read-only without a handler", () => {
+    const block = { ...fixture("band"), props: { name: "Cedar Quill", actions: ["keep"] } };
+    const { container, getByText } = render(<AnswerBlockView block={block} />);
+    expect(container.querySelectorAll("img")).toHaveLength(0);
+    expect(container.querySelector('[data-slot="band-single"]')).toBeNull();
+    expect((getByText("keep") as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  test("a band with a remote image url falls back to its alt sentence", () => {
+    const bad = { ...fixture("band"), props: { ...fixture("band").props, portrait: { src: "https://example.com/x.png", alt: "x" } } };
+    const { container } = render(<AnswerBlockView block={bad} />);
+    expect(container.querySelector('[data-slot="band"]')).toBeNull();
+    expect(container.textContent).toContain("Lantern Hollow");
+  });
+
   test("confirmation reports its data action", () => {
     const actions: string[] = [];
     const { container, getByText } = render(<AnswerBlockView block={fixture("confirmation")} onAction={(_id, action) => actions.push(action)} />);

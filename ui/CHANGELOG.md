@@ -1,3 +1,7 @@
+## [ui-v0.5.459] - 2026-11-02
+
+- MUSIC-LISTEN-C5: new `Band` Element and the `band` answer-block kind (needs spec-v0.1.297): a made band's portrait, logo, name, genres, back story, members, inspired-by line and first single, with up to four semantic actions (make album, remake logo, remake portrait, keep, remake, discard, open app). Tokens only, images through `resolveImageSrc`, no route data. The Player `actionsSlot` and `MusicTrack` `actions` props already exist for the like-this buttons, so no prop was added.
+
 ## [ui-v0.5.458] - 2026-11-02
 
 - `formatBytes` promotes to the next unit when rounding reaches 1024, so 1048575 bytes reads "1 MB" instead of "1024 KB". Bug fix, no API change.
