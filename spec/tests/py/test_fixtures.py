@@ -12,8 +12,6 @@ from _standards import load_standards_module
 from pydantic import ValidationError
 
 from gen.py.alarm_schema import Alarm
-from gen.py.made_artist_schema import MadeArtist
-from gen.py.song_style_schema import SongStyle
 from gen.py.artifact_schema import Artifact
 from gen.py.chat_folder_schema import ChatFolder
 from gen.py.content_ceiling_schema import ContentCeiling
@@ -27,6 +25,7 @@ from gen.py.file_schema import File
 from gen.py.grant_schema import Grant
 from gen.py.issue_schema import Issue
 from gen.py.list_schema import List
+from gen.py.made_artist_schema import MadeArtist
 from gen.py.manifest_schema import PackageManifest
 from gen.py.media_collection_schema import MediaCollection
 from gen.py.media_item_schema import MediaItem
@@ -56,6 +55,7 @@ from gen.py.safety_result_schema import SafetyResult
 from gen.py.setting_value_schema import SettingValue
 from gen.py.settings_key_schema import SettingsKey
 from gen.py.share_schema import Share
+from gen.py.song_style_schema import SongStyle
 from gen.py.source_schema import Source
 from gen.py.stack_fit_plan_schema import StackFitPlan
 from gen.py.subject_ref_schema import Household, Unresolved, World
