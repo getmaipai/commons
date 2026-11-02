@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "../ui/textarea";
 import { useIsPhoneLayout } from "../hooks/useIsPhoneLayout";
 import { useSplitViewLayout } from "../primitives/SplitView";
-import { OptionCards, OptionThumb } from "./option-cards";
+import { OptionCards, OptionThumb, isLockedOption, type LockedOptionCard } from "./option-cards";
 import { SafeImage } from "../primitives/SafeImage";
 import { TierSegment, type TierId, type TierOptionDef } from "./tier-segment";
 
@@ -52,7 +52,8 @@ export interface PromptBarChip {
   id: string;
   /** The chip's accessible name (for example "Shape", "Length", "Camera move"). */
   label: string;
-  options: readonly PromptBarOption[];
+  /** ADULT-LOCK-01: a `{ locked: true, making? }` entry (cards variant) is one lock tile for every locked choice; it has no value or label and is never a choice or shown in a dropdown. */
+  options: readonly (PromptBarOption | LockedOptionCard)[];
   /** `cards` draws the options as a grid of picture cards (one choice) instead of a dropdown. Default `dropdown`. */
   variant?: "dropdown" | "cards";
   value: string | number;
@@ -135,8 +136,13 @@ export interface PromptBarProps {
 
 type Mode = "inline" | "panel" | "dock";
 
+/** The choices of a chip that are not locked. */
+function openOptions(chip: PromptBarChip): PromptBarOption[] {
+  return chip.options.filter((o): o is PromptBarOption => !isLockedOption(o));
+}
+
 function chosenLabel(chip: PromptBarChip): string {
-  return chip.options.find((o) => String(o.value) === String(chip.value))?.label ?? "";
+  return openOptions(chip).find((o) => String(o.value) === String(chip.value))?.label ?? "";
 }
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
@@ -227,14 +233,14 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
 
   const dropdown = (chip: PromptBarChip) => (
     <Select key={chip.id} value={String(chip.value)} disabled={locked} onValueChange={(next) => {
-      const picked = chip.options.find((o) => String(o.value) === next);
+      const picked = openOptions(chip).find((o) => String(o.value) === next);
       if (picked) chip.onValueChange(picked.value);
     }}>
       <SelectTrigger data-chip={chip.id} aria-label={chip.label} shape="pill" className="min-h-[48px] shrink-0">
         <SelectValue placeholder={chip.label} />
       </SelectTrigger>
       <SelectContent>
-        {chip.options.map((option) => (
+        {openOptions(chip).map((option) => (
           <SelectItem key={String(option.value)} value={String(option.value)}>{option.label}</SelectItem>
         ))}
       </SelectContent>
@@ -515,9 +521,9 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
   const banner = chips.find((c) => c.trigger !== undefined)?.trigger === "banner";
   const wide = chips.find((c) => c.popoverSize !== undefined)?.popoverSize === "wide";
   const cardChips = chips.filter((c) => c.variant === "cards");
-  const thumbs = chips.filter((c) => c.variant === "cards").map((c) => c.options.find((o) => String(o.value) === String(c.value))?.media).filter((m): m is string => Boolean(m)).slice(0, 2);
+  const thumbs = chips.filter((c) => c.variant === "cards").map((c) => openOptions(c).find((o) => String(o.value) === String(c.value))?.media).filter((m): m is string => Boolean(m)).slice(0, 2);
   const summary = chips.map(chosenLabel).filter(Boolean).join(", ");
-  const bannerSrc = cardChips.map((c) => c.options.find((o) => String(o.value) === String(c.value))?.media).find((m): m is string => Boolean(m));
+  const bannerSrc = cardChips.map((c) => openOptions(c).find((o) => String(o.value) === String(c.value))?.media).find((m): m is string => Boolean(m));
   const bannerNames = cardChips.map((c) => c.label.toLowerCase());
   const bannerEyebrow = bannerNames.length > 1 ? `${bannerNames.slice(0, -1).join(", ")} and ${bannerNames[bannerNames.length - 1]}` : (bannerNames[0] ?? name.toLowerCase());
   const bannerTrigger = (

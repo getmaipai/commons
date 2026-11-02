@@ -12,6 +12,19 @@ export interface MediaItemRef {
   title: string;
   subtitle?: string;
   poster?: string;
+  /** ADULT-LOCK-01: the item is adult-only. The kit never hands such an item to the host (`mediaFor`, the `play` action): it
+   * plays only inside its own page's player, with no mini player, dock, audio session or Media Session entry. A host that is
+   * handed one anyway (a registration made outside the kit) refuses it with `refuseAdultOnly`. Absent or false: unchanged. */
+  adultOnly?: boolean;
+}
+
+/** ADULT-LOCK-01: the plain line shown when an adult-only item is asked to play anywhere but its own page. */
+export const ADULT_ONLY_PAGE_ONLY = "This item plays only on its own page. Open it there.";
+
+/** ADULT-LOCK-01: the one rule for a host's media store (`createMediaStore`, `mediaFor`): an item that carries `adultOnly: true`
+ * is never registered or given an element. Returns true when the item must be refused. */
+export function refuseAdultOnly(item: { adultOnly?: boolean }): boolean {
+  return item.adultOnly === true;
 }
 
 /** HANDOFF-01c: what the `play` action adds. `position_s` is the action's start position, resolved to a finite number >= 0

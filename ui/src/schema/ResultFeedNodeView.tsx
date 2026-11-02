@@ -1,10 +1,11 @@
-import { useCallback, useContext, type ComponentProps } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { request } from "@/kit/http";
 import { AsyncState } from "@/kit/primitives/AsyncState";
 import { EmptyState } from "@/kit/primitives/EmptyState";
-import { VideoPlayer, type VideoPlayerAction, type VideoPlayerControl, type VideoPlayerControlName, type VideoPlayerStatus } from "@/kit/elements/video-player";
-import { ResultFeed, feedDayLabel, type ResultFeedEntry, type ResultFeedFilter } from "@/kit/elements/result-feed";
+import { type VideoPlayerProps, type VideoPlayerAction, type VideoPlayerControl, type VideoPlayerControlName, type VideoPlayerStatus } from "@/kit/elements/video-player";
+import { ResultFeed, feedDayLabel, type ResultFeedEntry, type ResultFeedFilter, type ResultFeedLockedEntry } from "@/kit/elements/result-feed";
+import { collapseLocked } from "@/kit/elements/adult-lock";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { fillTemplate, fillTemplateDeep, readField } from "@/kit/schema/fieldPath";
@@ -73,8 +74,16 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
     [scope, record, keyOf],
   );
 
+  // ADULT-LOCK-01: a locked row is `{ locked: true, making? }`; it is set aside before any other field is read, polled or drawn.
+  const lockedField = f.locked ?? "locked";
+  const makingField = f.making ?? "making";
+  const { open: openRows, hasLocked, making: lockedMaking } = useMemo(
+    () => collapseLocked(query.data ?? EMPTY, (row) => readField(row, lockedField) === true, (row) => readField(row, makingField) === true),
+    [query.data, lockedField, makingField],
+  );
+
   const rows = useFeedPolling({
-    rows: query.data ?? EMPTY,
+    rows: openRows,
     keyOf,
     statusOf,
     runningStatuses: node.poll_while.statuses,
@@ -110,7 +119,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
     const created = f.created_at ? toDate(readField(row, f.created_at)) : null;
     const tagsRaw = f.tags ? readField(row, f.tags) : undefined;
     const refsRaw = f.references ? readField(row, f.references) : undefined;
-    const player: Partial<ComponentProps<typeof VideoPlayer>> = {
+    const player: Partial<VideoPlayerProps> = {
       status: status as VideoPlayerStatus,
       prompt: words,
       src,
@@ -180,7 +189,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
       {() => (
         <>
           <ResultFeed
-            entries={rows.map(entryFor)}
+            entries={hasLocked ? [...rows.map(entryFor), { key: "locked", locked: true, making: lockedMaking } satisfies ResultFeedLockedEntry] : rows.map(entryFor)}
             filters={filters}
             grouping={grouping}
             look={node.look}

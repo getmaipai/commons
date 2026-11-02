@@ -1057,6 +1057,8 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
                   },
                 }
               : undefined}
+            isLocked={(row) => readField(row, node.locked_field ?? "locked") === true}
+            isMaking={(row) => readField(row, node.making_field ?? "making") === true}
             aspect={node.aspect}
             heading={node.heading}
             variant={node.variant}
@@ -1430,7 +1432,9 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
         const canEdit = node.edit && readField(r, node.edit.visible_field ?? "can_edit") === true;
         const editButton = canEdit && node.edit ? <Button type="button" variant="secondary" size="sm" className="shrink-0 rounded-full px-4" onClick={() => { setEditError(null); setEditValues(Object.fromEntries(node.edit!.fields.map(f => [f.name, readField(r, f.name) ?? ""]))); setEditOpen(true); }}>{node.edit.label}</Button> : null;
         // MEDIA-POLISH-01: the host may own the element, so playback outlives this page (the docked mini bar).
-        const external = host?.mediaFor?.({ id: String(readField(r, field("id", "id")) ?? ""), src, kind: node.kind, title, subtitle, poster }) ?? null;
+        // ADULT-LOCK-01: an adult-only item is never offered to the host: it plays in this page's own element and stops with the page.
+        const adultOnly = readField(r, "adult_only") === true;
+        const external = adultOnly ? null : host?.mediaFor?.({ id: String(readField(r, field("id", "id")) ?? ""), src, kind: node.kind, title, subtitle, poster }) ?? null;
         return (
           <>
             <Player

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentProps } from "react";
+import { useState } from "react";
 import { SlidersHorizontalIcon } from "lucide-react";
 import { cn } from "cn";
 import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/kit/ui/switch";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { DayDivider } from "./day-separator";
-import { VideoPlayer } from "./video-player";
+import { VideoPlayer, type VideoPlayerProps } from "./video-player";
+import { LockTile, type LockedRow } from "./adult-lock";
 
 export interface ResultFeedReference {
   label: string;
@@ -23,7 +24,7 @@ export interface ResultFeedReference {
 
 /** The props of one entry's `VideoPlayer`. Passed straight through, so the player's own built-in actions (Stop, Try again,
  * Make another, Render, Another still, Edit words, Favorite), `notice` and `disabledReason` arrive exactly as the Element names them. */
-export type ResultFeedPlayerProps = ComponentProps<typeof VideoPlayer> | (Record<string, unknown> & { status: string; prompt: string });
+export type ResultFeedPlayerProps = VideoPlayerProps | (Record<string, unknown> & { status: string; prompt: string });
 
 export interface ResultFeedEntry {
   key: string;
@@ -35,6 +36,10 @@ export interface ResultFeedEntry {
   day?: string;
   player: ResultFeedPlayerProps;
 }
+
+/** ADULT-LOCK-01: the redacted entry of a locked clip: `{ key, locked: true, making? }` and nothing else. The feed never reads
+ * any other field of it and draws every locked entry as ONE lock tile after the open entries, whatever their number. */
+export type ResultFeedLockedEntry = LockedRow & { key: string };
 
 export type ResultFeedFilter =
   | { kind: "toggle"; id: string; label: string; value: boolean; onValueChange(next: boolean): void }
@@ -158,15 +163,16 @@ function FilterView({ filters }: { filters: ResultFeedFilter[] }) {
  * string is a prop; the schema node (`result_feed`) fills them and keeps running entries current (`poll_while`).
  */
 export function ResultFeed({
-  entries,
+  entries: allEntries,
   filters = [],
   grouping = "day",
   label = "Results",
   empty,
   look = "default",
   filtersPresentation = "inline",
+  onUnlock,
 }: {
-  entries: ResultFeedEntry[];
+  entries: (ResultFeedEntry | ResultFeedLockedEntry)[];
   filters?: ResultFeedFilter[];
   grouping?: "day" | "words" | "none";
   /** The feed's accessible name. */
@@ -179,7 +185,18 @@ export function ResultFeed({
   look?: "default" | "media";
   /** VIDEO-UI-14: `popover` puts the filters behind one View button (a sheet on a phone). Default `inline`. */
   filtersPresentation?: "inline" | "popover";
+  /** ADULT-LOCK-01: called when the lock tile is pressed. Absent: the tile opens the page's passcode dialog (`AdultLockProvider`). */
+  onUnlock?: () => void;
 }) {
+  const entries: ResultFeedEntry[] = [];
+  let hasLocked = false;
+  let making = false;
+  for (const entry of allEntries) {
+    if ((entry as { locked?: unknown }).locked === true) {
+      hasLocked = true;
+      if ((entry as ResultFeedLockedEntry).making === true) making = true;
+    } else entries.push(entry as ResultFeedEntry);
+  }
   const groups = groupFeedEntries(entries, grouping);
   const media = look === "media";
   return (
@@ -190,14 +207,14 @@ export function ResultFeed({
           <FilterControls filters={filters} idPrefix="result-feed" />
         </div>
       ) : null}
-      {entries.length === 0 ? empty ?? null : null}
+      {entries.length === 0 && !hasLocked ? empty ?? null : null}
       {groups.map((group) => (
         <div key={group.key} data-slot="result-feed-group" className="flex flex-col gap-4">
           {group.label ? <DayDivider label={grouping === "words" ? shorten(group.label) : `${group.label}, ${countLabel(group.entries.length)}`} /> : null}
           {(() => {
             const articles = group.entries.map((entry) => {
               const first = media && entry.key === entries[0]?.key;
-              const player = entry.player as ComponentProps<typeof VideoPlayer>;
+              const player = entry.player as VideoPlayerProps;
               const picked = [...(entry.references?.map((r) => r.label) ?? []), ...(entry.tags ?? [])];
               return (
                 <article key={entry.key} data-slot="result-feed-entry" data-status={entry.player.status} data-first={first ? "true" : undefined} aria-label={shorten(entry.words)} className={cn("flex min-w-0 flex-col gap-2", first && "@2xl:col-span-2")}>
@@ -237,6 +254,11 @@ export function ResultFeed({
           })()}
         </div>
       ))}
+      {hasLocked ? (
+        <div data-slot="result-feed-locked" className="flex flex-col gap-4">
+          <LockTile shape="card" making={making} onUnlock={onUnlock} />
+        </div>
+      ) : null}
     </section>
   );
 }

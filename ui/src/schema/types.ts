@@ -225,6 +225,9 @@ export const MediaShelfNodeSchema = z.object({
   // VIDEO-UI-14: a muted loop over the poster (`item_loop_field` is the clip's same-origin path).
   media_loop: z.boolean().optional(),
   item_loop_field: z.string().optional(),
+  // ADULT-LOCK-01: rows whose `locked_field` (default "locked") is true collapse into one lock tile; `making_field` (default "making") adds its spinner.
+  locked_field: z.string().min(1).optional(),
+  making_field: z.string().min(1).optional(),
   on_select: ActionSchema.optional(),
   empty_state: EmptyStateNodeSchema.optional(),
 });
@@ -641,6 +644,9 @@ export const ResultFeedNodeSchema = z.object({
       created_at: z.string().optional(),
       width: z.string().optional(),
       height: z.string().optional(),
+      // ADULT-LOCK-01: a row whose `locked` path (default "locked") is true is one lock tile; `making` (default "making") adds its spinner.
+      locked: z.string().optional(),
+      making: z.string().optional(),
     })
     .strict(),
   filters: z

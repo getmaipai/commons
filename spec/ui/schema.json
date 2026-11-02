@@ -451,6 +451,8 @@
           "properties": { "one": { "type": "string", "minLength": 1, "maxLength": 24 }, "other": { "type": "string", "minLength": 1, "maxLength": 24 } }
         },
         "size_control": { "type": "boolean", "default": false, "description": "VIDEO-UI-05 (K12): draws the kit's CardSizeSlider above a grid layout; the slider sets the tile size (the shared --maipai-card-size) and is remembered per device. A phone keeps two columns." },
+        "locked_field": { "type": "string", "minLength": 1, "description": "ADULT-LOCK-01: dotted path to a boolean on each row (default `locked`). A row where it is true is a locked item: the kit drops it before reading any other field and the shelf draws ONE identical lock tile after the open items, whatever their number. The host's redacted row is `{ locked: true, making?: boolean }` and nothing else; the tile has no title, description, picture, tags or count. Pressing it opens the page's passcode dialog (the kit `AdultLockProvider`)." },
+        "making_field": { "type": "string", "minLength": 1, "description": "ADULT-LOCK-01: dotted path to a boolean (default `making`) on a locked row: a locked item is still being made, so the one tile shows a small spinner and nothing else." },
         "favorite": {
           "type": "object",
           "additionalProperties": false,
@@ -591,7 +593,9 @@
             "favorite": { "type": "string", "description": "Dotted path to a boolean." },
             "created_at": { "type": "string", "description": "Dotted path to an ISO date or epoch milliseconds; the day headings read it." },
             "width": { "type": "string" },
-            "height": { "type": "string" }
+            "height": { "type": "string" },
+            "locked": { "type": "string", "description": "ADULT-LOCK-01: dotted path to a boolean (default `locked`). A row where it is true is a locked clip: the feed draws ONE identical lock tile after the open entries, whatever their number, and reads no other field of the row (no words, tags, picture or count)." },
+            "making": { "type": "string", "description": "ADULT-LOCK-01: dotted path to a boolean (default `making`) on a locked row: a locked clip is still being made, so the one tile shows a small spinner and nothing else." }
           }
         },
         "filters": {

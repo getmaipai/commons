@@ -12,7 +12,7 @@ import {
   underPluginApi,
   type PackageScope,
 } from "@/kit/schema/packageScope";
-import { MediaHostContext, PLAY_UNAVAILABLE, type MediaHost } from "@/kit/schema/mediaHost";
+import { ADULT_ONLY_PAGE_ONLY, MediaHostContext, PLAY_UNAVAILABLE, type MediaHost } from "@/kit/schema/mediaHost";
 
 /** How a dispatch runs. `quiet`: no refetch of the page's bindings and no error under the node (a player's progress
  * report every 10 s). `keepalive`: a `call` survives the page closing (the last progress report on unload). */
@@ -67,6 +67,8 @@ async function runAction(
     // MEDIA-PLAYER-01: hand the item to the host's player (mediaHost.ts). A package page reaches only its own rows, so
     // the id came from its own data; the host still decides whether this person may play it.
     if (!host) throw new Error(PLAY_UNAVAILABLE);
+    // ADULT-LOCK-01: an adult-only item never goes to the host's player (no dock, no audio session, no Now Playing).
+    if (item.adult_only === true) throw new Error(ADULT_ONLY_PAGE_ONLY);
     // HANDOFF-01c: a start position, a number or a `{field}` string, passed on only when it resolves to a finite number >= 0.
     const raw = action.play.position_s;
     const resolved = typeof raw === "string" ? fillTemplate(raw, item).trim() : raw;

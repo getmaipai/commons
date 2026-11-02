@@ -106,6 +106,9 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     // VIDEO-UI-14: a looping tile needs the path of the clip it loops.
     checkFieldPath(node.item_loop_field, `${where} media_shelf`, "item_loop_field", out);
     if (node.media_loop === true && typeof node.item_loop_field !== "string") out.push(`${where} media_shelf: media_loop needs item_loop_field (the path of the clip to loop)`);
+    // ADULT-LOCK-01: the locked and making flags are paths.
+    checkFieldPath(node.locked_field, `${where} media_shelf`, "locked_field", out);
+    checkFieldPath(node.making_field, `${where} media_shelf`, "making_field", out);
   }
   // MUSIC-KIT-01: the music page blocks draw the package's own rows; selecting and playing may hand an item to the host.
   if (type === "quick_tiles" || type === "top_result" || type === "category_tiles" || type === "track_rows") {

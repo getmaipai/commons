@@ -328,6 +328,18 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, chips: [{ ...look, popover_size: "huge" }] })).toBe(false);
   });
 
+  test("ADULT-LOCK-01: media_shelf locked_field and making_field, result_feed fields.locked and making; defaults unchanged", () => {
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "clips" }, item_key_field: "id", item_label_field: "title", item_media_field: "thumb" };
+    expect(validate(shelf)).toBe(true);
+    expect(validate({ ...shelf, locked_field: "locked", making_field: "making" })).toBe(true);
+    expect(validate({ ...shelf, locked_field: "" })).toBe(false);
+    expect(validate({ ...shelf, locked_field: true })).toBe(false);
+    const feed = { type: "result_feed", bind: { source: "package", path: "recipes" }, fields: { words: "prompt", status: "status" }, poll_while: { statuses: ["queued"], record: { path: "recipes" } } };
+    expect(validate(feed)).toBe(true);
+    expect(validate({ ...feed, fields: { ...feed.fields, locked: "locked", making: "making" } })).toBe(true);
+    expect(validate({ ...feed, fields: { ...feed.fields, locked: 1 } })).toBe(false);
+  });
+
   test("answer_blocks needs a package binding and refuses a route binding", () => {
     expect(validate({ type: "answer_blocks" })).toBe(false);
     expect(validate({ type: "answer_blocks", bind: { source: "route", path: "/api/people" } })).toBe(false);

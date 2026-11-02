@@ -21,6 +21,7 @@ import { Card, CardContent } from "@/kit/ui/card";
 import { Progress } from "@/kit/ui/progress";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { GenerationStage } from "./generation-stage";
+import { LockTile } from "./adult-lock";
 import { PendingActions, type PendingAction } from "./pending-actions";
 import {
   ActionRow,
@@ -146,7 +147,14 @@ function download(url: string, name: string) {
  * `actionsInline` with a More menu, a Favorite toggle, `notice` (visible in every status; `hint` stays live-only),
  * `controls` (`disabledReason` and `starts` for the built-ins) and `size`.
  */
-export function VideoPlayer({
+/** The props of an unlocked player (the whole Element API). */
+export type VideoPlayerProps = Parameters<typeof VideoPlayerBody>[0];
+
+/** ADULT-LOCK-01: the locked state of the player. It renders the one lock tile at the entry's width and loads nothing: no `video`
+ * element, no source, no poster, no prompt, no actions. */
+export type VideoPlayerLockedProps = { locked: true; making?: boolean; size?: VideoPlayerSize; onUnlock?: () => void };
+
+function VideoPlayerBody({
   status,
   prompt,
   src,
@@ -468,4 +476,16 @@ function FavoriteToggle({ label, pressed, icons, disabledReason, onToggle }: { l
       {icons ? null : label}
     </Button>
   );
+}
+
+/** The kit VideoPlayer: the generated clip (see `VideoPlayerBody` above for the whole API) or, with `locked`, the lock tile and nothing else. */
+export function VideoPlayer(props: VideoPlayerProps | VideoPlayerLockedProps) {
+  if ("locked" in props && props.locked === true) {
+    return (
+      <div data-slot="video-player" data-locked="true" className={cn("w-full", SIZE_CLASS[props.size ?? "default"])}>
+        <LockTile shape="card" making={props.making} onUnlock={props.onUnlock} />
+      </div>
+    );
+  }
+  return <VideoPlayerBody {...(props as VideoPlayerProps)} />;
 }

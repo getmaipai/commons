@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { RadioGroup } from "radix-ui";
 import { cn } from "cn";
 import { SafeImage } from "../primitives/SafeImage";
+import { LockTile } from "./adult-lock";
 
 export interface OptionCard {
   value: string | number;
@@ -12,10 +13,19 @@ export interface OptionCard {
   media?: string;
 }
 
+/** ADULT-LOCK-01: the redacted card of a locked choice: `{ locked: true, making? }` and nothing else (no value, label or picture).
+ * Every locked card in a list collapses into ONE lock tile after the open cards, and none of them can be chosen. */
+export interface LockedOptionCard {
+  locked: true;
+  making?: boolean;
+}
+
+export const isLockedOption = (option: object): option is LockedOptionCard => (option as { locked?: unknown }).locked === true;
+
 export interface OptionCardsProps {
   /** Names the group for assistive tech. */
   label: string;
-  options: readonly OptionCard[];
+  options: readonly (OptionCard | LockedOptionCard)[];
   value: string | number;
   onValueChange: (value: string | number) => void;
   disabled?: boolean;
@@ -87,7 +97,29 @@ export function OptionThumb({ src, className }: { src: string; className?: strin
 
 /** A grid of picture cards that chooses one value: a radio group (arrow keys move the choice, Space or Enter selects), the chosen card
  * drawn with the theme's primary border, a visible focus ring, and the grid scrolling sideways on a phone. */
-export function OptionCards({ label, options, value, onValueChange, disabled = false, className, chipId, columns = "auto" }: OptionCardsProps) {
+export function OptionCards({ label, options: allOptions, value, onValueChange, disabled = false, className, chipId, columns = "auto" }: OptionCardsProps) {
+  // ADULT-LOCK-01: locked cards are dropped unread; one lock tile stands for all of them, below the radio group (a tile is a
+  // button, not a choice, so it stays out of the group).
+  const options: OptionCard[] = [];
+  let hasLocked = false;
+  let making = false;
+  for (const option of allOptions) {
+    if (isLockedOption(option)) { hasLocked = true; if (option.making === true) making = true; }
+    else options.push(option);
+  }
+  const grid = (
+    <OptionCardsGrid label={label} options={options} value={value} onValueChange={onValueChange} disabled={disabled} className={className} chipId={chipId} columns={columns} />
+  );
+  if (!hasLocked) return grid;
+  return (
+    <div data-slot="option-cards-with-lock" className="flex min-w-0 flex-col gap-3">
+      {grid}
+      <LockTile shape="row" making={making} />
+    </div>
+  );
+}
+
+function OptionCardsGrid({ label, options, value, onValueChange, disabled = false, className, chipId, columns = "auto" }: Omit<OptionCardsProps, "options"> & { options: readonly OptionCard[] }) {
   const wide = useMatches("(hover: hover) and (min-width: 640px)");
   const reduced = useMatches("(prefers-reduced-motion: reduce)");
   const [hovered, setHovered] = useState<string | null>(null);

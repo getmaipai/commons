@@ -9,6 +9,7 @@ import { DayDivider } from "@/kit/elements/day-separator";
 import { CardSizeSlider, cardSizeStyle } from "@/kit/primitives/CardSizeSlider";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { useSurface } from "@/kit/useSurface";
+import { LockTile, collapseLocked } from "@/kit/elements/adult-lock";
 
 /** The aspect ratios the kit will draw a media tile at. A closed set,
  * not a free string: docs/UI.md requires images and video to be fluid
@@ -100,6 +101,13 @@ interface MediaShelfProps<T> {
   /** VIDEO-UI-05: a heart toggle pinned to each tile's top-end corner, a sibling of the tile's button. `isOn` draws it filled
    * and sets `aria-pressed`; `label` is the accessible name, per item ("Favorite Sunset over the bay"). */
   favorite?: { isOn: (item: T) => boolean; onToggle: (item: T) => void; label: (item: T) => string };
+  /** ADULT-LOCK-01: marks an item as locked. Every locked item is dropped before anything else is read from it (no key, label,
+   * caption or picture) and the whole shelf shows ONE identical lock tile after the open items, whatever their number. Pressing
+   * the tile opens the page's passcode dialog (`AdultLockProvider`) or calls `onUnlock`. Absent: nothing is locked. */
+  isLocked?: (item: T) => boolean;
+  /** ADULT-LOCK-01: true for a locked item that is still being made; the one tile then shows a spinner. */
+  isMaking?: (item: T) => boolean;
+  onUnlock?: () => void;
 }
 
 function clampProgress(value: number | undefined): number {
@@ -122,7 +130,7 @@ function clampProgress(value: number | undefined): number {
 // (a plain, unregistered DOM button is not, however focusable it looks
 // to a keyboard).
 export function MediaShelf<T>({
-  items,
+  items: allItems,
   getKey,
   renderItem,
   renderCaption,
@@ -155,8 +163,14 @@ export function MediaShelf<T>({
   groupBy,
   sizeControl,
   favorite,
+  isLocked,
+  isMaking,
+  onUnlock,
 }: MediaShelfProps<T>) {
+  const { open: items, hasLocked, making } = isLocked ? collapseLocked(allItems, isLocked, isMaking) : { open: allItems, hasLocked: false, making: false };
   const name = label ?? heading;
+  // One identical tile for any number of locked items, in the shelf's own media box (a row in vertical lists).
+  const lockTile = (shape: "fill" | "row") => <LockTile shape={shape} making={making} onUnlock={onUnlock} />;
   const { far } = useSurface();
   // A plain shelf is a section of the page with its own heading row; a card shelf is the kit Section card.
   const Frame = variant === "plain" ? PlainShelfFrame : CardShelfFrame;
@@ -177,9 +191,9 @@ export function MediaShelf<T>({
     : sizeControl && layout === "grid" ? SIZED_COLUMNS
     : variant === "plain" ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4" : cn(GRID_COLUMNS[density], "grid-cols-2");
 
-  if (items.length === 0 && hideWhenEmpty) return null;
+  if (items.length === 0 && !hasLocked && hideWhenEmpty) return null;
 
-  if (items.length === 0 && emptyState) {
+  if (items.length === 0 && !hasLocked && emptyState) {
     return (
       <Frame heading={heading} seeAll={seeAll}>
         <EmptyState icon={emptyState.icon} text={emptyState.text} actionLabel={emptyActionLabel} onAction={onEmptyAction} />
@@ -249,13 +263,24 @@ export function MediaShelf<T>({
               ) : null}
             </li>
           ))}
+          {hasLocked ? <li key="locked" data-slot="media-shelf-locked" className="flex min-w-0">{lockTile("row")}</li> : null}
         </ul>
       </Frame>
     );
   }
 
+  const lockLi = (
+    <li
+      key="locked"
+      data-slot="media-shelf-locked"
+      className={cn("flex flex-col gap-2", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
+    >
+      <div className={cn(artClasses, "bg-transparent")}>{lockTile("fill")}</div>
+    </li>
+  );
+
   // One tile list: the whole shelf, or one day's group.
-  const renderList = (listItems: readonly T[], listName: string | undefined) => (
+  const renderList = (listItems: readonly T[], listName: string | undefined, withLock = false) => (
     <ul
       data-slot="media-shelf"
       data-variant={variant}
@@ -341,8 +366,12 @@ export function MediaShelf<T>({
           ) : null}
         </li>
       ))}
+      {withLock ? lockLi : null}
     </ul>
   );
+
+  // Day groups keep the lock out of every day (its day is not known): its own list after the groups.
+  const renderLockOnly = (listName: string | undefined) => renderList([], listName, true);
 
   // Day groups and the size slider are for the grid layout; a rail ignores both.
   const grouped = layout === "grid" && groupBy !== undefined;
@@ -367,10 +396,11 @@ export function MediaShelf<T>({
             </section>
           );
         })}
+        {hasLocked ? renderLockOnly(name) : null}
       </div>
     );
   } else {
-    content = renderList(items, name);
+    content = renderList(items, name, hasLocked);
   }
 
   return (
