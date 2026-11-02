@@ -1,3 +1,7 @@
+## [ui-v0.5.471] - 2026-11-02
+
+- New Element file `media-tiles` (additive, no spec change): `Cover` (a real picture, or three soft hue lights drawn from the id with the title in big type), `MediaTile` (tall tile with hover lift, play overlay, glass pills, shimmer while busy, progress bar), `MediaCarousel` (snapping row with arrows), `GlassPill`, `Shimmer`, and `seedOf`/`coverVars`. (`ui-v0.5.470` was cut one commit early with the version still 0.5.469; do not pin it.)
+
 ## [ui-v0.5.469] - 2026-11-02
 
 - VIDEO-UI-04 realignment (no spec change; `ResultFeedNodeView` only): `result_feed` entries now pass the real `VideoPlayer` API that VIDEO-UI-02 shipped (ui-v0.5.467). The built-ins go in as `onStop`, `onRetry`, `onMakeAnother`, `onRender`, `onAnotherStill`, `onEditWords` and `onFavorite` with `controls.<name>` carrying `starts` and the K8 `disabledReason` (`makeAnother`, `anotherStill`, `editWords` are the camelCase of the schema's `make_another`, `another_still`, `edit_words`); extra `actions` become `actionItems` (`when`, `starts`, `disabledReason`, `icon`, `onSelect`) instead of hand-built buttons; the host's `makingNotice` goes to `notice`; `actions_variant` and `actions_inline` map to `actionsVariant` and `actionsInline`; entries use `size="lg"` (768 px) and a `draft` row draws its still (the `poster` field). Before this, the guessed prop names (`disabledReasons`, `onRender` and the rest) were ignored by the Element, so K8 disabled nothing and drafts drew no still or actions. Additive; the node's schema and the `ResultFeed` Element are unchanged.
