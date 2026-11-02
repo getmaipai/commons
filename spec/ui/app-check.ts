@@ -41,6 +41,7 @@ function checkAction(action: unknown, packageId: string, where: string, out: str
   if (isObject(call) && typeof call.target === "string" && !call.target.startsWith(`/api/plugins/${packageId}/`)) {
     out.push(`${where}: call.target "${call.target}" must stay under /api/plugins/${packageId}/`);
   }
+  if (isObject(call) && isObject(call.then)) checkAction(call.then, packageId, `${where} then`, out);
   if (isObject(action.confirm)) checkAction(action.confirm.on_confirm, packageId, where, out, allowPlay);
   if (action.play !== undefined && !allowPlay) out.push(`${where}: the play action is not available on a package page`);
 }

@@ -98,6 +98,13 @@
               "type": "object",
               "additionalProperties": true,
               "description": "String values may contain `{field}` placeholders, resolved the same way as `target`."
+            },
+            "then": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["navigate"],
+              "properties": { "navigate": { "$ref": "#/$defs/action/properties/navigate" } },
+              "description": "MUSIC-LIKE-01: after the call succeeds, go to a page. The JSON object the call answers with is merged over the item, so `{band_id}` in `navigate.to` or `navigate.state` reads the answer's own field. A failed call goes nowhere and shows its error. Navigation only: a call never chains into another call."
             }
           }
         },
@@ -622,6 +629,7 @@
               "icon": { "type": "string", "description": "A lucide icon name." },
               "field": { "type": "string", "minLength": 1, "description": "Dotted path to a boolean on the item." },
               "on_label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "busy_label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "MUSIC-LIKE-01: the button's words and disabled state while its action runs (for a slow call such as making a band), so one press cannot start it twice." },
               "action": { "$ref": "#/$defs/action" }
             }
           }

@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { cleanup, fireEvent, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext } from "@/kit/schema/packageScope";
@@ -152,3 +152,31 @@ describe("player cast menu", () => {
     }
   });
 });
+
+describe("call then navigate (MUSIC-LIKE-01)", () => {
+  test("the reply is merged over the item and the page navigates", async () => {
+    cleanup();
+    globalThis.fetch = mock((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/data/")) return Promise.resolve(new Response(JSON.stringify(ROWS), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ band_id: "mband-abc123" }), { status: 200 }));
+    }) as unknown as typeof fetch;
+    const node = { ...(shelf as object), on_select: { call: { target: "/api/plugins/videos/band", args: { media_id: "{id}" }, then: { navigate: { to: "/apps/videos/make/{band_id}" } } } } } as unknown as UiNode;
+    const { findByRole, getByTestId } = renderWithQueryClient(
+      <MemoryRouter initialEntries={["/apps/videos"]}>
+        <PackageScopeContext.Provider value={{ packageId: "videos" }}>
+          <MediaHostContext.Provider value={null}>
+            <NodeRenderer node={node} state={{}} />
+            <LocationProbe />
+          </MediaHostContext.Provider>
+        </PackageScopeContext.Provider>
+      </MemoryRouter>,
+    );
+    fireEvent.click(await findByRole("button", { name: "Building a pizza oven" }));
+    await waitFor(() => expect(getByTestId("loc").textContent).toBe("/apps/videos/make/mband-abc123"));
+  });
+});
+
+function LocationProbe() {
+  return <span data-testid="loc">{useLocation().pathname}</span>;
+}

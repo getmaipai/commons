@@ -450,6 +450,25 @@ export const MediaItem = z
         "MusicBrainz release group id (lowercase UUID) for the album, or null when unmatched.",
       )
       .default(null),
+    /**MUSIC-LIKE-01: the made-artist (a band the household made here) this song belongs to, or null. Set on the first single and later tracks a made band's style produced, so the band's page lists them; the item's `artist` text is still the band's name. Library items found on disk leave it null.*/
+    made_artist_id: z
+      .union([
+        z
+          .string()
+          .regex(new RegExp("^mband-[a-z0-9]{6,}$"))
+          .describe(
+            "MUSIC-LIKE-01: the made-artist (a band the household made here) this song belongs to, or null. Set on the first single and later tracks a made band's style produced, so the band's page lists them; the item's `artist` text is still the band's name. Library items found on disk leave it null.",
+          ),
+        z
+          .null()
+          .describe(
+            "MUSIC-LIKE-01: the made-artist (a band the household made here) this song belongs to, or null. Set on the first single and later tracks a made band's style produced, so the band's page lists them; the item's `artist` text is still the band's name. Library items found on disk leave it null.",
+          ),
+      ])
+      .describe(
+        "MUSIC-LIKE-01: the made-artist (a band the household made here) this song belongs to, or null. Set on the first single and later tracks a made band's style produced, so the band's page lists them; the item's `artist` text is still the band's name. Library items found on disk leave it null.",
+      )
+      .default(null),
     track_no: z.union([z.number().int().gte(0), z.null()]).default(null),
     disc_no: z.union([z.number().int().gte(0), z.null()]).default(null),
     year: z.union([z.number().int().gte(0), z.null()]).default(null),

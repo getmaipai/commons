@@ -80,3 +80,21 @@ describe("music blocks on a package page", () => {
     expect(check({ ...nodes.quick_tiles, item_media_field: "https://example.com/a.jpg" })).toContain("item_media_field must be a field path");
   });
 });
+
+describe("like-this additions (MUSIC-LIKE-01)", () => {
+  const then = { navigate: { to: "/apps/music/make-band", state: { band_id: "{band_id}" } } };
+  const action = { call: { target: "/api/plugins/music/band-like-this", args: { media_id: "{id}" }, then } };
+  const entries: AppContributes = { pages: [{ id: "index", module: "index" }, { id: "x", module: "x" }], data: [{ id: "recent", rows: "list" }] };
+  const check = (node: unknown) => checkAppPackage("music", entries, (m) => (m === "index" ? { type: "page", body: [] } : { type: "page", id: "x", title: "X", body: [node] })).join("\n");
+  const player = { type: "player", kind: "audio", bind, actions: [{ label: "Create a band like this", icon: "users", busy_label: "Making the band", action }] };
+  test("a call may then navigate, and a player action has a busy_label", () => {
+    expect(validate(player)).toBe(true);
+    expect(validate({ ...player, actions: [{ ...player.actions[0], busy_label: "" }] })).toBe(false);
+    expect(validate({ ...player, actions: [{ ...player.actions[0], action: { call: { target: "/x", then: { play: { media_id: "a" } } } } }] })).toBe(false);
+  });
+  test("then stays inside the package", () => {
+    expect(check(player as never)).toBe("");
+    const bad = { ...player, actions: [{ ...player.actions[0], action: { call: { ...action.call, then: { navigate: { to: "/apps/shows" } } } } }] };
+    expect(check(bad as never)).toContain("then");
+  });
+});

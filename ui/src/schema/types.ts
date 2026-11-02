@@ -35,6 +35,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
           target: z.string(),
           method: z.enum(["POST", "PATCH", "DELETE"]).default("POST"),
           args: z.record(z.string(), z.unknown()).optional(),
+          then: z.object({ navigate: z.object({ to: z.string(), state: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional() }) }).optional(),
         }),
       }),
       z.object({ play: z.object({ media_id: z.string().min(1), position_s: z.union([z.number().min(0), z.string()]).optional() }) }),
@@ -45,7 +46,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
 );
 export type Action =
   | { navigate: { to: string; state?: Record<string, string | number | boolean> } }
-  | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown> } }
+  | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown>; then?: { navigate: { to: string; state?: Record<string, string | number | boolean> } } } }
   | { play: { media_id: string; position_s?: number | string } }
   | { confirm: { prompt: string; on_confirm: Action } }
   | { ask: { prompt: string; expects: string } };
@@ -274,6 +275,7 @@ export const PlayerNodeSchema = z.object({
         icon: z.string().optional(),
         field: z.string().min(1).optional(),
         on_label: z.string().min(1).max(40).optional(),
+        busy_label: z.string().min(1).max(40).optional(),
         action: ActionSchema,
       }),
     )

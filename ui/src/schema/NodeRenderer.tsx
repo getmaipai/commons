@@ -1448,6 +1448,7 @@ function PlayerDetails({ title, subtitle, facts, description, chapters, seek, sh
 /** MEDIA-POLISH-01: the actions row under the title (Like, Watch later): pill buttons in one row that scrolls sideways
  * on a phone. A button with a `field` is a toggle, pressed while that field of the item is true. */
 function PlayerActions({ actions, item, dispatch, children }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"]; children?: ReactNode }) {
+  const [busy, setBusy] = useState<string | null>(null);
   return (
     <div className="flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" role="group" aria-label="Actions" data-slot="player-actions">
       {actions.map((a) => {
@@ -1460,10 +1461,14 @@ function PlayerActions({ actions, item, dispatch, children }: { actions: PlayerA
             size="sm"
             className="shrink-0 rounded-full px-4"
             aria-pressed={a.field ? on : undefined}
-            onClick={() => dispatch(a.action, [a.field ? { ...item, on: !on } : item])}
+            disabled={busy !== null && a.busy_label !== undefined && busy === a.label}
+            onClick={() => {
+              if (a.busy_label) setBusy(a.label);
+              dispatch(a.action, [a.field ? { ...item, on: !on } : item], a.busy_label ? () => setBusy(null) : undefined);
+            }}
           >
             {Glyph ? <Glyph aria-hidden className={on ? "fill-current" : undefined} /> : null}
-            {on && a.on_label ? a.on_label : a.label}
+            {busy === a.label && a.busy_label ? a.busy_label : on && a.on_label ? a.on_label : a.label}
           </Button>
         );
       })}

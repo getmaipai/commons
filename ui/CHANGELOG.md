@@ -1,3 +1,7 @@
+## [ui-v0.5.460] - 2026-11-02
+
+- MUSIC-LIKE-01 (needs spec-v0.1.298): an action `call` runs its `then` navigation after the call succeeds with the response merged over the item, and a Player action with a `busy_label` shows it and disables that button while the action runs. No new prop.
+
 ## [ui-v0.5.459] - 2026-11-02
 
 - MUSIC-LISTEN-C5: new `Band` Element and the `band` answer-block kind (needs spec-v0.1.297): a made band's portrait, logo, name, genres, back story, members, inspired-by line and first single, with up to four semantic actions (make album, remake logo, remake portrait, keep, remake, discard, open app). Tokens only, images through `resolveImageSrc`, no route data. The Player `actionsSlot` and `MusicTrack` `actions` props already exist for the like-this buttons, so no prop was added.

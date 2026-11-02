@@ -55,7 +55,12 @@ async function runAction(
       throw new Error(PACKAGE_ACTION_REFUSED);
     }
     const args = action.call.args ? fillTemplateDeep(action.call.args, item, options.typedArgs) : undefined;
-    await request(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined, keepalive: options.keepalive });
+    const reply = await request<unknown>(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined, keepalive: options.keepalive });
+    // Like-this: a call may then navigate, with the response merged over the item (`{band_id}`). Navigation only.
+    if (action.call.then) {
+      const merged = reply && typeof reply === "object" && !Array.isArray(reply) ? { ...item, ...(reply as Record<string, unknown>) } : item;
+      await runAction(action.call.then, merged, navigate, scope, host, options);
+    }
     return;
   }
   if ("play" in action) {

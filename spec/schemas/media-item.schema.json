@@ -403,6 +403,12 @@
       "default": null,
       "description": "MusicBrainz release group id (lowercase UUID) for the album, or null when unmatched."
     },
+    "made_artist_id": {
+      "type": ["string", "null"],
+      "pattern": "^mband-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "MUSIC-LIKE-01: the made-artist (a band the household made here) this song belongs to, or null. Set on the first single and later tracks a made band's style produced, so the band's page lists them; the item's `artist` text is still the band's name. Library items found on disk leave it null."
+    },
     "track_no": {
       "type": [
         "integer",
