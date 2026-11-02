@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/made-artist.schema.json",
+  "title": "MadeArtist",
+  "description": "MUSIC-LISTEN-C5. A band or artist the household made here: name, back story, members, portrait and logo, and the `style` every track of the band reuses so an album sounds like one band. Only what a media-item cannot hold gets this record: a track is a normal made song whose `artist` text is the band's name, and an album is a media-collection, so there is no album record here. Person scope, always labelled 'Made here'. Fictional by default (the creator's prompt asks for a fictional band and fictional people); that is a default, not a block for an adult. Names, back story and member names are a person's words and are never logged (rule 6a). A band made 'like' a playing track keeps that track as its `seed`; the new band's own name, members, back story and lyrics are never a copy of it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "origin",
+    "style",
+    "source",
+    "provenance",
+    "hlc",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^mband-[a-z0-9]{6,}$",
+      "description": "Stable id, never reused."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "The band's name, as shown and as written on each track's artist field. Trimmed; not unique."
+    },
+    "origin": {
+      "type": "string",
+      "const": "made",
+      "description": "Always made: a band found in the library is a media-item artist, not this record."
+    },
+    "owner_person_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^person-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "Who made the band."
+    },
+    "backstory": {
+      "type": "string",
+      "maxLength": 4000,
+      "default": "",
+      "description": "Plain text, never HTML. Passes the same output gate as chat before it is stored (rule 10)."
+    },
+    "genres": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "default": [],
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      },
+      "description": "Genre words for the band's page and for browsing."
+    },
+    "members": {
+      "type": "array",
+      "maxItems": 12,
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "role"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60,
+            "description": "For example 'vocals' or 'drums'."
+          },
+          "portrait_file_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^file-[a-z0-9]{6,}$",
+            "default": null
+          }
+        }
+      }
+    },
+    "portrait_file_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^file-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "The band picture."
+    },
+    "logo_file_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^file-[a-z0-9]{6,}$",
+      "default": null
+    },
+    "style": {
+      "$ref": "song-style.schema.json#/$defs/style"
+    },
+    "seed": {
+      "$ref": "song-style.schema.json#/$defs/seed"
+    },
+    "shared_to": {
+      "$ref": "song-style.schema.json#/$defs/shared_to"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "hub",
+        "local"
+      ],
+      "description": "hub: authoritative on the hub. local: made on a robot, not yet synced."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Free text naming who made the band, for example 'person-a1b2c3 (self)'."
+    },
+    "hlc": {
+      "$ref": "song-style.schema.json#/$defs/hlc"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deleted_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "Set when the band is deleted, so a syncing client drops it. Its tracks stay as songs."
+    }
+  }
+}

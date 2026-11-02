@@ -12,6 +12,8 @@ from _standards import load_standards_module
 from pydantic import ValidationError
 
 from gen.py.alarm_schema import Alarm
+from gen.py.made_artist_schema import MadeArtist
+from gen.py.song_style_schema import SongStyle
 from gen.py.artifact_schema import Artifact
 from gen.py.chat_folder_schema import ChatFolder
 from gen.py.content_ceiling_schema import ContentCeiling
@@ -110,6 +112,27 @@ def test_clock_record_fixtures_round_trip(name, model):
 def test_clock_record_invalid_examples_are_rejected(name, model):
     with pytest.raises(ValidationError):
         model.model_validate(load_fixture(name))
+
+
+@pytest.mark.parametrize(
+    ("name", "model"),
+    [
+        ("song-style.example.json", SongStyle),
+        ("made-artist.example.json", MadeArtist),
+    ],
+)
+def test_music_record_fixtures_round_trip(name, model):
+    data = load_fixture(name)
+    assert (
+        model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
+    )
+
+
+def test_music_records_refuse_a_seed_with_two_ids():
+    data = load_fixture("song-style.example.json")
+    data["seed"] = {"file_id": "file-m4de0001", "media_id": "media-tr4ck001"}
+    with pytest.raises(ValidationError):
+        SongStyle.model_validate(data)
 
 
 def test_clock_record_person_is_required():
@@ -991,6 +1014,7 @@ V1_KINDS = [
     "media_card",
     "confirmation",
     "countdown",
+    "band",
 ]
 
 

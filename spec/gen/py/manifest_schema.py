@@ -1188,6 +1188,7 @@ class PackageManifest(BaseModel):
                 'media_card',
                 'confirmation',
                 'countdown',
+                'band',
             ]
         ]
         | None

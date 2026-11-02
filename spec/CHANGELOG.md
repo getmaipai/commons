@@ -1,3 +1,7 @@
+## [spec-v0.1.297] - 2026-11-02
+
+- MUSIC-STUDIO-S2, MUSIC-LISTEN-C5: new records `SongStyle` (`sstyle-`, a saved way a song should sound: style words, never lyrics) and `MadeArtist` (`mband-`, a band made here: name, back story, genres, members, portrait and logo file ids). Both carry `source`, `provenance`, `hlc`, `created_at`, `updated_at` and `deleted_at`, hold ONE shared `style` definition (`song-style.schema.json#/$defs/style`) and ONE `seed` field (`{file_id}` of a song made here, or `{media_id}` of a library item). New answer-block kind `band` (props mirror the kit Band Element). Additive.
+
 ## [spec-v0.1.296] - 2026-11-02
 
 - MUSIC-ONLINE-01: three household settings for the music package's background lookups, `music.musicbrainz_match`, `music.artist_wikimedia` and `music.album_art_online` (all boolean, on by default, advanced, honoured by home). Additive.

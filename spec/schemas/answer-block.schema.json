@@ -17,12 +17,13 @@
     { "$ref": "#/$defs/article" },
     { "$ref": "#/$defs/media_card" },
     { "$ref": "#/$defs/confirmation" },
-    { "$ref": "#/$defs/countdown" }
+    { "$ref": "#/$defs/countdown" },
+    { "$ref": "#/$defs/band" }
   ],
   "$defs": {
     "kind": {
       "type": "string",
-      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card", "story_feed", "article", "media_card", "confirmation", "countdown"],
+      "enum": ["spec_sheet", "data_table", "chart", "timeline", "todo_list", "image_gallery", "schedule_card", "comparison", "weather_card", "story_feed", "article", "media_card", "confirmation", "countdown", "band"],
       "description": "The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here."
     },
     "block_id": {
@@ -1478,6 +1479,26 @@
         "schema_version": { "$ref": "#/$defs/schema_version" }, "producer": { "$ref": "#/$defs/producer" }, "alt": { "$ref": "#/$defs/alt" },
         "min_band": { "$ref": "#/$defs/min_band" }, "provenance": { "$ref": "#/$defs/provenance" }, "created_at": { "$ref": "#/$defs/created_at" }, "hlc": { "$ref": "#/$defs/hlc" }, "after_paragraph": { "$ref": "#/$defs/after_paragraph" },
         "props": { "type": "object", "additionalProperties": false, "required": ["label", "endsAt"], "properties": { "label": { "type": "string", "minLength": 1 }, "endsAt": { "type": "string", "format": "date-time" } } }
+      }
+    },
+    "band": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "schema_version", "producer", "alt", "provenance", "created_at", "hlc", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/block_id" }, "kind": { "const": "band" },
+        "schema_version": { "$ref": "#/$defs/schema_version" }, "producer": { "$ref": "#/$defs/producer" }, "alt": { "$ref": "#/$defs/alt" },
+        "min_band": { "$ref": "#/$defs/min_band" }, "provenance": { "$ref": "#/$defs/provenance" }, "created_at": { "$ref": "#/$defs/created_at" }, "hlc": { "$ref": "#/$defs/hlc" }, "after_paragraph": { "$ref": "#/$defs/after_paragraph" },
+        "props": { "type": "object", "additionalProperties": false, "required": ["name", "actions"], "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "backstory": { "type": "string", "maxLength": 4000, "description": "Plain text, never HTML." },
+          "genres": { "type": "array", "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 40 } },
+          "portrait": { "type": "object", "additionalProperties": false, "required": ["src", "alt"], "properties": { "src": { "type": "string", "pattern": "^hubimg-[a-f0-9]{8,}$", "description": "Hub cache image reference only; never a remote URL." }, "alt": { "type": "string", "minLength": 1 } } },
+          "logo": { "type": "object", "additionalProperties": false, "required": ["src", "alt"], "properties": { "src": { "type": "string", "pattern": "^hubimg-[a-f0-9]{8,}$", "description": "Hub cache image reference only; never a remote URL." }, "alt": { "type": "string", "minLength": 1 } } },
+          "members": { "type": "array", "maxItems": 12, "items": { "type": "object", "additionalProperties": false, "required": ["name", "role"], "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 80 }, "role": { "type": "string", "minLength": 1, "maxLength": 60 }, "portrait": { "type": "object", "additionalProperties": false, "required": ["src", "alt"], "properties": { "src": { "type": "string", "pattern": "^hubimg-[a-f0-9]{8,}$" }, "alt": { "type": "string", "minLength": 1 } } } } } },
+          "inspiredBy": { "type": "string", "maxLength": 120, "description": "Set when the band was made like a playing track: the card says it was inspired by this, and the band's own name never copies it." },
+          "singleTitle": { "type": "string", "maxLength": 120, "description": "The first single to judge, once it is made." },
+          "actions": { "type": "array", "items": { "type": "string", "enum": ["make_album", "remake_logo", "remake_portrait", "keep", "remake", "discard", "open_app"] }, "uniqueItems": true, "maxItems": 4 }
+        } }
       }
     },
     "article_quote": {

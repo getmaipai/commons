@@ -1151,6 +1151,112 @@ class Countdown(BaseModel):
     props: Props13
 
 
+class Portrait(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    src: constr(pattern=r'^hubimg-[a-f0-9]{8,}$') = Field(
+        ..., description='Hub cache image reference only; never a remote URL.'
+    )
+    alt: constr(min_length=1)
+
+
+class Logo(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    src: constr(pattern=r'^hubimg-[a-f0-9]{8,}$') = Field(
+        ..., description='Hub cache image reference only; never a remote URL.'
+    )
+    alt: constr(min_length=1)
+
+
+class Portrait1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    src: constr(pattern=r'^hubimg-[a-f0-9]{8,}$')
+    alt: constr(min_length=1)
+
+
+class Member(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    name: constr(min_length=1, max_length=80)
+    role: constr(min_length=1, max_length=60)
+    portrait: Portrait1 | None = None
+
+
+class Props14(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    name: constr(min_length=1, max_length=120)
+    backstory: constr(max_length=4000) | None = Field(
+        None, description='Plain text, never HTML.'
+    )
+    genres: list[constr(min_length=1, max_length=40)] | None = Field(None, max_length=8)
+    portrait: Portrait | None = None
+    logo: Logo | None = None
+    members: list[Member] | None = Field(None, max_length=12)
+    inspiredBy: constr(max_length=120) | None = Field(
+        None,
+        description="Set when the band was made like a playing track: the card says it was inspired by this, and the band's own name never copies it.",
+    )
+    singleTitle: constr(max_length=120) | None = Field(
+        None, description='The first single to judge, once it is made.'
+    )
+    actions: list[
+        Literal[
+            'make_album',
+            'remake_logo',
+            'remake_portrait',
+            'keep',
+            'remake',
+            'discard',
+            'open_app',
+        ]
+    ] = Field(..., max_length=4)
+
+
+class Band(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+    kind: Literal['band']
+    schema_version: Literal[1]
+    producer: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+    alt: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+    min_band: Literal['child', 'teen', 'adult'] | None = Field(
+        None,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+    provenance: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+    created_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+    after_paragraph: conint(ge=0) | None = Field(
+        None,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
+    props: Props14
+
+
 class ArticleQuote(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

@@ -29,6 +29,16 @@ uv run datamodel-codegen \
 # field validator self-contained in the committed gen/py package.
 cp scripts/robot_state_validators.py gen/py/_validators.py
 
+# The shared seed oneOf is referenced by name inside its own module (a
+# datamodel-code-generator quirk), which leaves the model "not fully defined".
+# Point those references at the classes defined in the same file.
+python3 - <<'PY'
+from pathlib import Path
+
+path = Path("gen/py/song_style_schema.py")
+path.write_text(path.read_text().replace("song_style_schema.Seed", "Seed"))
+PY
+
 # Stack wire schemas are excluded from the broad sweep because their
 # conditional schemas are not preserved reliably. STT's event uses oneOf,
 # which datamodel-code-generator handles, so keep its Python mirror generated

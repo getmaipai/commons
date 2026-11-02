@@ -3851,6 +3851,181 @@ export const ConversationTurn = z
                                       .strict(),
                                   })
                                   .strict(),
+                                z
+                                  .object({
+                                    /**Stable identity of this block. Unique within a turn's block list.*/
+                                    id: z
+                                      .string()
+                                      .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+                                      .describe(
+                                        "Stable identity of this block. Unique within a turn's block list.",
+                                      ),
+                                    kind: z.literal("band"),
+                                    schema_version: z.literal(1),
+                                    /**The id of the package that returned the block.*/
+                                    producer: z
+                                      .string()
+                                      .min(1)
+                                      .describe(
+                                        "The id of the package that returned the block.",
+                                      ),
+                                    /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+                                    alt: z
+                                      .string()
+                                      .min(1)
+                                      .max(300)
+                                      .describe(
+                                        "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+                                      ),
+                                    /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+                                    min_band: z
+                                      .enum(["child", "teen", "adult"])
+                                      .describe(
+                                        "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+                                      )
+                                      .optional(),
+                                    /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+                                    provenance: z
+                                      .string()
+                                      .min(1)
+                                      .describe(
+                                        "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+                                      ),
+                                    created_at: z
+                                      .string()
+                                      .datetime({ offset: true }),
+                                    /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+                                    hlc: z
+                                      .string()
+                                      .regex(
+                                        new RegExp(
+                                          "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+                                        ),
+                                      )
+                                      .describe(
+                                        "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+                                      ),
+                                    /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+                                    after_paragraph: z
+                                      .number()
+                                      .int()
+                                      .gte(0)
+                                      .describe(
+                                        "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+                                      )
+                                      .optional(),
+                                    props: z
+                                      .object({
+                                        name: z.string().min(1).max(120),
+                                        /**Plain text, never HTML.*/
+                                        backstory: z
+                                          .string()
+                                          .max(4000)
+                                          .describe("Plain text, never HTML.")
+                                          .optional(),
+                                        genres: z
+                                          .array(z.string().min(1).max(40))
+                                          .max(8)
+                                          .optional(),
+                                        portrait: z
+                                          .object({
+                                            /**Hub cache image reference only; never a remote URL.*/
+                                            src: z
+                                              .string()
+                                              .regex(
+                                                new RegExp(
+                                                  "^hubimg-[a-f0-9]{8,}$",
+                                                ),
+                                              )
+                                              .describe(
+                                                "Hub cache image reference only; never a remote URL.",
+                                              ),
+                                            alt: z.string().min(1),
+                                          })
+                                          .strict()
+                                          .optional(),
+                                        logo: z
+                                          .object({
+                                            /**Hub cache image reference only; never a remote URL.*/
+                                            src: z
+                                              .string()
+                                              .regex(
+                                                new RegExp(
+                                                  "^hubimg-[a-f0-9]{8,}$",
+                                                ),
+                                              )
+                                              .describe(
+                                                "Hub cache image reference only; never a remote URL.",
+                                              ),
+                                            alt: z.string().min(1),
+                                          })
+                                          .strict()
+                                          .optional(),
+                                        members: z
+                                          .array(
+                                            z
+                                              .object({
+                                                name: z.string().min(1).max(80),
+                                                role: z.string().min(1).max(60),
+                                                portrait: z
+                                                  .object({
+                                                    src: z
+                                                      .string()
+                                                      .regex(
+                                                        new RegExp(
+                                                          "^hubimg-[a-f0-9]{8,}$",
+                                                        ),
+                                                      ),
+                                                    alt: z.string().min(1),
+                                                  })
+                                                  .strict()
+                                                  .optional(),
+                                              })
+                                              .strict(),
+                                          )
+                                          .max(12)
+                                          .optional(),
+                                        /**Set when the band was made like a playing track: the card says it was inspired by this, and the band's own name never copies it.*/
+                                        inspiredBy: z
+                                          .string()
+                                          .max(120)
+                                          .describe(
+                                            "Set when the band was made like a playing track: the card says it was inspired by this, and the band's own name never copies it.",
+                                          )
+                                          .optional(),
+                                        /**The first single to judge, once it is made.*/
+                                        singleTitle: z
+                                          .string()
+                                          .max(120)
+                                          .describe(
+                                            "The first single to judge, once it is made.",
+                                          )
+                                          .optional(),
+                                        actions: z
+                                          .array(
+                                            z.enum([
+                                              "make_album",
+                                              "remake_logo",
+                                              "remake_portrait",
+                                              "keep",
+                                              "remake",
+                                              "discard",
+                                              "open_app",
+                                            ]),
+                                          )
+                                          .max(4)
+                                          .refine(
+                                            (arr) =>
+                                              arr.every(
+                                                (item, i) =>
+                                                  arr.indexOf(item) == i,
+                                              ),
+                                            "All items must be unique!",
+                                          ),
+                                      })
+                                      .strict(),
+                                  })
+                                  .strict(),
                               ];
                               const { errors, failed } = schemas.reduce<{
                                 errors: z.core.$ZodIssue[];
@@ -6501,6 +6676,156 @@ export const ConversationTurn = z
                     .object({
                       label: z.string().min(1),
                       endsAt: z.string().datetime({ offset: true }),
+                    })
+                    .strict(),
+                })
+                .strict(),
+              z
+                .object({
+                  /**Stable identity of this block. Unique within a turn's block list.*/
+                  id: z
+                    .string()
+                    .regex(new RegExp("^blk-[a-z0-9]{6,}$"))
+                    .describe(
+                      "Stable identity of this block. Unique within a turn's block list.",
+                    ),
+                  kind: z.literal("band"),
+                  schema_version: z.literal(1),
+                  /**The id of the package that returned the block.*/
+                  producer: z
+                    .string()
+                    .min(1)
+                    .describe("The id of the package that returned the block."),
+                  /**One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.*/
+                  alt: z
+                    .string()
+                    .min(1)
+                    .max(300)
+                    .describe(
+                      "One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+                    ),
+                  /**Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.*/
+                  min_band: z
+                    .enum(["child", "teen", "adult"])
+                    .describe(
+                      "Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.",
+                    )
+                    .optional(),
+                  /**Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).*/
+                  provenance: z
+                    .string()
+                    .min(1)
+                    .describe(
+                      "Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).",
+                    ),
+                  created_at: z.string().datetime({ offset: true }),
+                  /**Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.*/
+                  hlc: z
+                    .string()
+                    .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
+                    .describe(
+                      "Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.",
+                    ),
+                  /**GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.*/
+                  after_paragraph: z
+                    .number()
+                    .int()
+                    .gte(0)
+                    .describe(
+                      "GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+                    )
+                    .optional(),
+                  props: z
+                    .object({
+                      name: z.string().min(1).max(120),
+                      /**Plain text, never HTML.*/
+                      backstory: z
+                        .string()
+                        .max(4000)
+                        .describe("Plain text, never HTML.")
+                        .optional(),
+                      genres: z
+                        .array(z.string().min(1).max(40))
+                        .max(8)
+                        .optional(),
+                      portrait: z
+                        .object({
+                          /**Hub cache image reference only; never a remote URL.*/
+                          src: z
+                            .string()
+                            .regex(new RegExp("^hubimg-[a-f0-9]{8,}$"))
+                            .describe(
+                              "Hub cache image reference only; never a remote URL.",
+                            ),
+                          alt: z.string().min(1),
+                        })
+                        .strict()
+                        .optional(),
+                      logo: z
+                        .object({
+                          /**Hub cache image reference only; never a remote URL.*/
+                          src: z
+                            .string()
+                            .regex(new RegExp("^hubimg-[a-f0-9]{8,}$"))
+                            .describe(
+                              "Hub cache image reference only; never a remote URL.",
+                            ),
+                          alt: z.string().min(1),
+                        })
+                        .strict()
+                        .optional(),
+                      members: z
+                        .array(
+                          z
+                            .object({
+                              name: z.string().min(1).max(80),
+                              role: z.string().min(1).max(60),
+                              portrait: z
+                                .object({
+                                  src: z
+                                    .string()
+                                    .regex(new RegExp("^hubimg-[a-f0-9]{8,}$")),
+                                  alt: z.string().min(1),
+                                })
+                                .strict()
+                                .optional(),
+                            })
+                            .strict(),
+                        )
+                        .max(12)
+                        .optional(),
+                      /**Set when the band was made like a playing track: the card says it was inspired by this, and the band's own name never copies it.*/
+                      inspiredBy: z
+                        .string()
+                        .max(120)
+                        .describe(
+                          "Set when the band was made like a playing track: the card says it was inspired by this, and the band's own name never copies it.",
+                        )
+                        .optional(),
+                      /**The first single to judge, once it is made.*/
+                      singleTitle: z
+                        .string()
+                        .max(120)
+                        .describe("The first single to judge, once it is made.")
+                        .optional(),
+                      actions: z
+                        .array(
+                          z.enum([
+                            "make_album",
+                            "remake_logo",
+                            "remake_portrait",
+                            "keep",
+                            "remake",
+                            "discard",
+                            "open_app",
+                          ]),
+                        )
+                        .max(4)
+                        .refine(
+                          (arr) =>
+                            arr.every((item, i) => arr.indexOf(item) == i),
+                          "All items must be unique!",
+                        ),
                     })
                     .strict(),
                 })
