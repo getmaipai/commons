@@ -579,6 +579,99 @@ export const TrackRowsNodeSchema = z.object({
 });
 export type TrackRowsNode = z.infer<typeof TrackRowsNodeSchema>;
 
+/** VIDEO-UI-04 (K9, K10): the result feed. Mirrors spec/ui/schema.json `result_feed`; `starts` is the K8 marker. */
+const FeedStartsSchema = z.enum(["picture", "video"]);
+export const FeedHandlerSchema = z
+  .object({
+    starts: FeedStartsSchema.optional(),
+    navigate: z.object({ to: z.string(), state: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional() }).optional(),
+    call: z
+      .object({
+        target: z.string(),
+        method: z.enum(["POST", "PATCH", "DELETE"]).default("POST"),
+        args: z.record(z.string(), z.unknown()).optional(),
+        then: z.object({ navigate: z.object({ to: z.string(), state: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional() }) }).optional(),
+      })
+      .optional(),
+    confirm: z.object({ prompt: z.string(), on_confirm: ActionSchema }).optional(),
+  })
+  .strict()
+  .refine((h) => [h.navigate, h.call, h.confirm].filter((v) => v !== undefined).length === 1, "exactly one of navigate, call, confirm");
+export type FeedHandler = z.infer<typeof FeedHandlerSchema>;
+export const FEED_HANDLER_KEYS = ["stop", "retry", "make_another", "render", "another_still", "edit_words", "favorite"] as const;
+export type FeedHandlerKey = (typeof FEED_HANDLER_KEYS)[number];
+
+export const ResultFeedNodeSchema = z.object({
+  type: z.literal("result_feed"),
+  bind: BindingSchema,
+  fields: z
+    .object({
+      key: z.string().optional(),
+      words: z.string(),
+      tags: z.string().optional(),
+      references: z.string().optional(),
+      status: z.string(),
+      progress: z.string().optional(),
+      phase: z.string().optional(),
+      queue_position: z.string().optional(),
+      started_at: z.string().optional(),
+      error: z.string().optional(),
+      poster: z.string().optional(),
+      src: z.string().optional(),
+      favorite: z.string().optional(),
+      created_at: z.string().optional(),
+      width: z.string().optional(),
+      height: z.string().optional(),
+    })
+    .strict(),
+  filters: z
+    .array(
+      z.object({
+        kind: z.enum(["toggle", "select"]),
+        state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
+        label: z.string().min(1).max(40),
+        options: z.array(z.object({ value: z.string(), label: z.string().min(1).max(40) }).strict()).min(2).max(8).optional(),
+        group: z.boolean().default(false),
+      }).strict(),
+    )
+    .max(4)
+    .optional(),
+  handlers: z
+    .object({
+      stop: FeedHandlerSchema.optional(),
+      retry: FeedHandlerSchema.optional(),
+      make_another: FeedHandlerSchema.optional(),
+      render: FeedHandlerSchema.optional(),
+      another_still: FeedHandlerSchema.optional(),
+      edit_words: FeedHandlerSchema.optional(),
+      favorite: FeedHandlerSchema.optional(),
+    })
+    .strict()
+    .optional(),
+  actions: z
+    .array(
+      z.object({
+        label: z.string().min(1).max(40),
+        icon: z.string().optional(),
+        starts: FeedStartsSchema.optional(),
+        when: z.array(z.enum(["draft", "ready", "failed", "cancelled"])).min(1).optional(),
+        action: ActionSchema,
+      }).strict(),
+    )
+    .max(4)
+    .optional(),
+  actions_variant: z.enum(["default", "icons"]).default("default"),
+  actions_inline: z.number().int().min(1).max(8).optional(),
+  poll_while: z
+    .object({
+      statuses: z.array(z.enum(["queued", "generating"])).min(1),
+      record: z.object({ path: z.string().regex(/^[a-z][a-z0-9-]*$/).max(40), params: z.record(z.string(), z.unknown()).optional() }).strict(),
+    })
+    .strict(),
+  empty_state: EmptyStateNodeSchema.optional(),
+});
+export type ResultFeedNode = z.infer<typeof ResultFeedNodeSchema>;
+
 export const SectionNodeSchema: z.ZodType<SectionNode> = z.lazy(() =>
   z.object({
     type: z.literal("section"),
@@ -652,6 +745,7 @@ export type UiNode =
   | TopResultNode
   | CategoryTilesNode
   | TrackRowsNode
+  | ResultFeedNode
   | TabsNode;
 
 export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
@@ -682,6 +776,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     TopResultNodeSchema,
     CategoryTilesNodeSchema,
     TrackRowsNodeSchema,
+    ResultFeedNodeSchema,
     TabsNodeSchema,
   ]),
 );
@@ -716,4 +811,5 @@ export const NODE_TYPES = [
   "top_result",
   "category_tiles",
   "track_rows",
+  "result_feed",
 ] as const;

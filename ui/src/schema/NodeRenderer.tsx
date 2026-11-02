@@ -52,6 +52,7 @@ import type { Action } from "@/kit/schema/types";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { ConfirmDialog } from "@/kit/schema/ConfirmDialog";
+import { ResultFeedNodeView } from "@/kit/schema/ResultFeedNodeView";
 import { evaluateCondition } from "@/kit/schema/condition";
 import { fillTemplate, readField, writeField } from "@/kit/schema/fieldPath";
 import type {
@@ -1865,6 +1866,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <CategoryTilesNodeView node={node} state={state} />;
     case "track_rows":
       return <TrackRowsNodeView node={node} state={state} />;
+    case "result_feed":
+      return <ResultFeedNodeView node={node} state={state} />;
     case "tabs":
       return <TabsNodeView node={node} state={state} />;
     case "form":
