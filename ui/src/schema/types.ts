@@ -112,7 +112,7 @@ export const CreationHeaderNodeSchema = z.object({
   variant: z.enum(["full", "byline", "collection"]).default("full"),
   fields: z.object({ art: z.string().min(1).default("art"), meta: z.string().min(1).default("meta"), footer_lines: z.string().min(1).default("footer_lines") }).strict().optional(),
   primary: z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema }).optional(),
-  shuffle: z.object({ label: z.string().min(1), action: ActionSchema }).optional(),
+  shuffle: z.object({ label: z.string().min(1), icon: z.string().optional(), labeled: z.boolean().optional(), action: ActionSchema }).optional(),
   more: z.array(z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema })).optional(),
   part: z.enum(["header", "footer"]).default("header"),
 });
@@ -540,6 +540,11 @@ export const TrackRowsNodeSchema = z.object({
   item_highlight_field: z.string().optional(),
   on_play: ActionSchema,
   play_label: z.string().min(1).max(80).optional(),
+  row_actions: z.array(z.object({
+    icon: z.string().min(1),
+    label: z.string().min(1),
+    action: ActionSchema,
+  }).strict()).max(2).optional(),
   hide_when_empty: z.boolean().default(false),
   empty_state: EmptyStateNodeSchema.optional(),
 });

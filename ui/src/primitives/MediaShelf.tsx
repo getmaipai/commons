@@ -149,7 +149,7 @@ export function MediaShelf<T>({
   const tight = cardRadius === "tight";
   const artClasses = cn(
     "relative w-full overflow-hidden bg-[var(--muted)]",
-    circle ? "aspect-square rounded-full" : [tight ? "rounded-[var(--media-card-radius)]" : "rounded-[var(--radius)]", ASPECT_CLASSES[aspect]],
+    circle ? ["aspect-square rounded-full", orientation === "vertical" ? "" : "w-[var(--media-artist-size)] max-w-full"] : [tight ? "rounded-[var(--media-card-radius)]" : "rounded-[var(--radius)]", ASPECT_CLASSES[aspect]],
   );
   // The Card surface has its own radius; a tight tile clips to the same 8 px so the art and its frame agree.
   const tileClasses = cn(tight && !circle && "rounded-[var(--media-card-radius)]", pressScale && PRESS_CLASSES);
@@ -157,7 +157,9 @@ export function MediaShelf<T>({
   const currentClasses = "ring-2 ring-[var(--media-current-ring)] ring-offset-2 ring-offset-background";
   // Use the existing card budgets, overriding only the phone count. The
   // plain budget fits three/four whole cards instead of peeking the next.
-  const gridColumns = variant === "plain" ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4" : cn(GRID_COLUMNS[density], "grid-cols-2");
+  const gridColumns = circle
+    ? "grid-cols-[repeat(auto-fill,minmax(var(--media-artist-size),1fr))]"
+    : variant === "plain" ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4" : cn(GRID_COLUMNS[density], "grid-cols-2");
 
   if (items.length === 0 && hideWhenEmpty) return null;
 
@@ -276,7 +278,7 @@ export function MediaShelf<T>({
           <li
             key={getKey(item)}
             aria-current={isHighlighted?.(item) ? "true" : undefined}
-            className={cn("flex flex-col gap-2", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", variant === "plain" ? PLAIN_ITEM_WIDTH : SHELF_ITEM_WIDTH[density]])}
+            className={cn("flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? PLAIN_ITEM_WIDTH : SHELF_ITEM_WIDTH[density]])}
           >
             <TileFrame onPlay={onPlay ? () => onPlay(item) : undefined} playLabel={playName(item)}>
             <Card
@@ -317,7 +319,7 @@ export function MediaShelf<T>({
               // that holds its own control (a channel link, an overflow
               // menu) would be keyboard-unreachable nested in one. Same
               // rule List.renderAction follows.
-              <div className="px-1 text-sm text-[var(--foreground)]">{renderCaption(item)}</div>
+              <div className={cn("px-1 text-sm text-[var(--foreground)]", circle && "w-full")}>{renderCaption(item)}</div>
             ) : null}
           </li>
         ))}

@@ -1147,6 +1147,23 @@ function TrackRowsNodeView({ node, state }: { node: TrackRowsNode; state: Row })
           isPlaying={node.item_highlight_field ? (row) => readField(row, node.item_highlight_field!) === true : undefined}
           onPlay={(row) => dispatch(node.on_play, [row])}
           getPlayLabel={node.play_label ? (row) => fillTemplate(node.play_label!, row) : undefined}
+          renderActions={node.row_actions?.length
+            ? (row) => node.row_actions!.map((button, i) => {
+                const Icon = getIcon(button.icon);
+                return (
+                  <Button
+                    key={i}
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`${fillTemplate(button.label, row)}: ${String(readField(row, node.item_label_field))}`}
+                    onClick={() => dispatch(button.action, [row])}
+                  >
+                    <Icon aria-hidden="true" />
+                  </Button>
+                );
+              })
+            : undefined}
         />
       )}
     </MusicBlockState>

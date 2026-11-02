@@ -132,15 +132,15 @@ export function CategoryTiles({ items, onSelect, label }: CategoryTilesProps) {
   return (
     <ul aria-label={label} data-slot="category-tiles" className="grid min-w-0 list-none grid-cols-2 gap-3 p-0 md:grid-cols-3 xl:grid-cols-4">
       {items.map((item) => (
-        <li key={item.id} className="min-w-0">
+        <li key={item.id} className="min-w-0" style={item.color ? ({ "--tile-color": item.color } as CSSProperties) : undefined}>
           <Card
             onSelect={onSelect ? () => onSelect(item) : undefined}
             label={item.title}
             far={far}
-            className={cn("relative aspect-[16/9] rounded-[var(--media-card-radius)] border-0 bg-[color-mix(in_srgb,var(--tile-color,var(--muted))_30%,var(--card))]", PRESS)}
+            className={cn("relative aspect-[16/9] rounded-[var(--media-card-radius)] border-0 bg-[color-mix(in_srgb,var(--tile-color,var(--muted))_58%,var(--card))]", PRESS)}
           >
-            <span style={item.color ? ({ "--tile-color": item.color } as CSSProperties) : undefined} className="contents">
-              <span className="absolute start-3 top-3 text-base font-bold">{item.title}</span>
+            <span className="contents">
+              <span className="absolute start-3 top-3 text-base font-bold text-[var(--art-foreground)]">{item.title}</span>
               {item.art ? <span className="absolute -end-2 -bottom-2 size-14 rotate-12 overflow-hidden rounded-md shadow-md [&>*]:size-full" data-slot="category-tile-art">{item.art}</span> : null}
             </span>
           </Card>
@@ -168,12 +168,14 @@ export interface TrackRowsProps<T> {
   /** Pressing the number, or the row, plays it. On hover or focus the number turns into a play icon. */
   onPlay: (item: T) => void;
   getPlayLabel?: (item: T) => string;
+  /** MUSIC-POLISH-01: quiet icon buttons at the row's end (a Remove x), drawn faint until the row is hovered or focused. */
+  renderActions?: (item: T) => ReactNode;
   /** Accessible name of the list. */
   label: string;
 }
 
 /** Album and Playlist tracklists: number, title and artist, end label; hover turns the number into a play icon. */
-export function TrackRows<T>({ items, getKey, getTitle, getSubtitle, getNumber, getMeta, getGroup, isPlaying, onPlay, getPlayLabel, label }: TrackRowsProps<T>) {
+export function TrackRows<T>({ items, getKey, getTitle, getSubtitle, getNumber, getMeta, getGroup, isPlaying, onPlay, getPlayLabel, renderActions, label }: TrackRowsProps<T>) {
   if (items.length === 0) return null;
   return (
     <ol aria-label={label} data-slot="track-rows" className="m-0 flex min-w-0 list-none flex-col p-0">
@@ -201,6 +203,7 @@ export function TrackRows<T>({ items, getKey, getTitle, getSubtitle, getNumber, 
                 {subtitle ? <span className="text-muted-foreground block truncate text-xs">{subtitle}</span> : null}
               </span>
               {getMeta ? <span data-slot="track-meta" className="text-muted-foreground shrink-0 text-sm tabular-nums">{getMeta(item)}</span> : null}
+              {renderActions ? <span data-slot="track-actions" className="flex shrink-0 items-center opacity-60 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-within:opacity-100">{renderActions(item)}</span> : null}
             </div>
           </li>
         );

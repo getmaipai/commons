@@ -93,6 +93,24 @@ describe("music block nodes", () => {
     await waitFor(() => expect(played.map((p) => p.id)).toEqual(["t2"]));
   });
 
+  test("a circle media_shelf draws a fixed artist-size circle with a centred name, and a category tile carries its colour on the tile (MUSIC-POLISH-01)", async () => {
+    const { view } = draw(parse({ type: "media_shelf", heading: "Artists", bind, item_key_field: "id", item_label_field: "title", item_media_field: "cover", art_shape: "circle", variant: "plain" }));
+    await view.findByRole("list", { name: "Artists" });
+    expect(view.container.innerHTML).toContain("w-[var(--media-artist-size)]");
+    expect(view.container.querySelector("li")?.className).toContain("text-center");
+    const tiles = draw(parse({ type: "category_tiles", label: "Browse", bind, item_key_field: "id", item_label_field: "title", item_color_field: "color" }));
+    await tiles.view.findByRole("list", { name: "Browse" });
+    expect(tiles.view.container.querySelector("li[style*='--tile-color']")).toBeTruthy();
+  });
+
+  test("track_rows row_actions draw a quiet icon button per row that dispatches with the row (MUSIC-POLISH-01)", async () => {
+    const { view } = draw(parse({ type: "track_rows", label: "Tracks", bind, item_key_field: "id", item_label_field: "title", on_play: play, row_actions: [{ icon: "x", label: "Remove", action: play }] }));
+    await view.findByRole("list", { name: "Tracks" });
+    const buttons = view.getAllByRole("button", { name: /^Remove: / });
+    expect(buttons.length).toBeGreaterThan(0);
+    expect(view.container.querySelector("[data-slot=track-actions]")).toBeTruthy();
+  });
+
   test("track_rows without a meta field draws no end label (a child profile binds rows with no count)", async () => {
     const { view } = draw(parse({ type: "track_rows", label: "Tracks", bind, item_key_field: "id", item_label_field: "title", item_meta_field: "plays", on_play: play }));
     await view.findByRole("list", { name: "Tracks" });

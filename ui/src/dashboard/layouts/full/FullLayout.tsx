@@ -95,8 +95,8 @@ function RailPageHeader({ reserveBand, reserveEnd, end, fallbackTitle }: { reser
   return (
     <header data-slot="rail-page-header" className={cn("sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5", end && "pe-3", reserveEnd && !end && "pe-16")}>
       {Left ? <Left /> : fallbackTitle ? <span data-slot="rail-fallback-title" className="min-w-0 truncate">{fallbackTitle}</span> : null}
-      {Right ? <div data-slot="rail-header-right" className="ms-auto flex h-9 min-w-0 shrink items-center gap-2"><Right /></div> : null}
-      {end ? <div data-slot="rail-top-right" className={cn("flex h-9 shrink-0 items-center", !Right && "ms-auto")}>{end}</div> : null}
+      {Right ? <div data-slot="rail-header-right" className="ms-auto flex h-9 min-w-0 shrink items-center gap-2 empty:hidden"><Right /></div> : null}
+      {end ? <div data-slot="rail-top-right" className={cn("flex h-9 shrink-0 items-center [[data-slot=rail-header-right]:empty+&]:ms-auto", !Right && "ms-auto")}>{end}</div> : null}
     </header>
   );
 }

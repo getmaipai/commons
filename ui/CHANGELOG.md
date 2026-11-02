@@ -1,3 +1,13 @@
+## [ui-v0.5.455] - 2026-11-01
+
+MUSIC-POLISH-01 (pairs with spec-v0.1.295). All additive.
+
+- `MediaShelf` with `artShape="circle"` draws a fixed circle of `--media-artist-size` (9.5rem, about 150 px) with a centred name, in a rail or an auto-filling grid, instead of a card-width circle. New token `--media-artist-size`.
+- `CategoryTiles`: the tile colour variable moved to the tile itself (it was set on an inner span, so the background never saw it and every tile drew flat grey); the colour now mixes at 58% and the title uses `--art-foreground`.
+- `TrackRows` gains `renderActions` (and the `track_rows` node `row_actions`): quiet ghost icon buttons at the row's end, dimmed until the row is hovered or focused.
+- `CreationHeader` `shuffle` gains `icon` and `labeled` (an outline pill with the label beside the icon).
+- Rail page header: the right group draws nothing, and gives up its gap, when its slot is empty, so a phone title keeps the room.
+
 ## [ui-v0.5.454] - 2026-11-01
 
 - MUSIC-KIT-01 (schema): the renderer draws the new nodes `quick_tiles`, `top_result`, `category_tiles` and `track_rows` from `MusicBlocks`, and `media_shelf` passes `card_radius`, `press_scale`, `on_play` (a hover Play that dispatches its action with the tile's row, the same as `on_select`) and `play_label` to `MediaShelf`; `player` passes `art_spring` and `lyrics_blur`. A category tile's colour must be a hex value or an rgb(), hsl() or oklch() function; anything else is dropped. Pairs with spec-v0.1.294. All additive; a page that sets none of them draws as before.

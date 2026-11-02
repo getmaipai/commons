@@ -21,7 +21,7 @@ export interface CreationHeaderProps {
   art?: string | null;
   meta?: string | null;
   primary?: { label: string; icon?: string; onSelect: () => void };
-  shuffle?: { label: string; onSelect: () => void };
+  shuffle?: { label: string; onSelect: () => void; /** An icon name from the kit set. Default "shuffle". */ icon?: string; /** Draw the label beside the icon (an outline pill), not an icon alone. */ labeled?: boolean };
   more?: Array<{ label: string; icon?: string; onSelect: () => void }>;
 }
 
@@ -60,7 +60,9 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
         {detail ? <div><div className={expanded ? "text-base text-muted-foreground" : "line-clamp-3 text-base text-muted-foreground"}><LightMarkdown text={detail} /></div><Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? "Show less" : "Show more"}</Button></div> : null}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
           {primary ? <Button type="button" onClick={primary.onSelect}>{primary.icon ? (() => { const ActionIcon = getIcon(primary.icon); return <ActionIcon aria-hidden className="size-4" />; })() : null}{primary.label}</Button> : null}
-          {shuffle ? (() => { const ShuffleIcon = getIcon("shuffle"); return <Button type="button" variant="outline" size="icon" aria-label={shuffle.label} onClick={shuffle.onSelect}><ShuffleIcon aria-hidden /></Button>; })() : null}
+          {shuffle ? (() => { const ShuffleIcon = getIcon(shuffle.icon ?? "shuffle"); return shuffle.labeled
+            ? <Button type="button" variant="outline" onClick={shuffle.onSelect}><ShuffleIcon aria-hidden />{shuffle.label}</Button>
+            : <Button type="button" variant="outline" size="icon" aria-label={shuffle.label} onClick={shuffle.onSelect}><ShuffleIcon aria-hidden /></Button>; })() : null}
           {more.length ? <DropdownMenu><DropdownMenuTrigger asChild><Button type="button" variant="outline" size="icon" aria-label="More">{(() => { const MoreIcon = getIcon("more-horizontal"); return <MoreIcon aria-hidden />; })()}</Button></DropdownMenuTrigger><DropdownMenuContent align="start">{more.map((item, index) => <DropdownMenuItem key={`${item.label}-${index}`} onSelect={item.onSelect}>{item.icon ? (() => { const MoreIcon = getIcon(item.icon); return <MoreIcon aria-hidden className="size-4" />; })() : null}{item.label}</DropdownMenuItem>)}</DropdownMenuContent></DropdownMenu> : null}
         </div>
       </div>

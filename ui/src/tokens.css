@@ -1737,6 +1737,8 @@ html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx] { ani
   --media-press-scale: 0.98;
   /* MediaShelf onPlay: the round Play button's size. */
   --media-play-size: 2.75rem;
+  /* MediaShelf artShape="circle" (artists): the circle's size, about 150 px, as Apple Music and Spotify draw artist rows. */
+  --media-artist-size: 9.5rem;
   /* Player artSpring: the Now Playing art grows to full size on play and settles back on pause. */
   --art-resting-scale: 0.86;
   --art-spring-duration: 420ms;
