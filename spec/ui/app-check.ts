@@ -103,6 +103,7 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     checkAction(node.on_select, packageId, `${where} ${type}.on_select`, out, true);
     checkAction(node.on_play, packageId, `${where} ${type}.on_play`, out, true);
     checkFieldPath(node.item_media_field, `${where} ${type}`, "item_media_field", out);
+    if (type === "track_rows" && Array.isArray(node.row_actions)) node.row_actions.forEach((button, i) => isObject(button) && checkAction(button.action, packageId, `${where} track_rows.row_actions[${i}]`, out, true));
   }
   if (type === "billboard") {
     checkBinding(node.bind, `${where} billboard`, data, "list", out);

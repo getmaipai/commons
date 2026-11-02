@@ -67,7 +67,8 @@
       "item_group_field": "disc_label",
       "item_highlight_field": "playing",
       "hide_when_empty": true,
-      "on_play": { "play": { "media_id": "{id}" } }
+      "on_play": { "play": { "media_id": "{id}" } },
+      "row_actions": [{ "icon": "x", "label": "Remove", "action": { "call": { "target": "/api/plugins/music/playlist", "args": { "op": "remove", "media_id": "{id}" } } } }]
     }
   ]
 }
