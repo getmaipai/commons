@@ -37,6 +37,24 @@ describe("MediaShelf", () => {
     expect(container.innerHTML).toBe(before);
   });
 
+  test("headingStyle eyebrow draws the heading as an uppercase tracked line, in a plain and a card shelf; default is unchanged (VIDEO-STUDIO-03)", () => {
+    const props = { items: tracks, getKey: (t: Track) => t.id, renderItem: (t: Track) => <span>{t.title}</span>, heading: "Try this" };
+    for (const variant of ["plain", "card"] as const) {
+      const plain = render(<MediaShelf {...props} variant={variant} />);
+      const h = plain.getByRole("heading", { name: "Try this" });
+      expect(h.className).not.toContain("uppercase");
+      const before = plain.container.innerHTML;
+      plain.rerender(<MediaShelf {...props} variant={variant} headingStyle="default" />);
+      expect(plain.container.innerHTML).toBe(before);
+      plain.rerender(<MediaShelf {...props} variant={variant} headingStyle="eyebrow" />);
+      const e = plain.getByRole("heading", { name: "Try this" });
+      expect(e.className).toContain("uppercase");
+      expect(e.className).toContain("tracking-widest");
+      expect(e.className).toContain("text-muted-foreground");
+      cleanup();
+    }
+  });
+
   test("grid keeps the existing density budgets above the two-column phone layout", () => {
     const props = { items: tracks, getKey: (t: Track) => t.id, renderItem: () => null, heading: "Music", layout: "grid" as const };
     const { getByRole, rerender } = render(<MediaShelf {...props} />);

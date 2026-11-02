@@ -158,7 +158,17 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
   const fire = (action: Action, personId?: string) => dispatch(action, [{ ...base, ...(personId ? { person_id: personId } : {}) }]);
   return (
     <>
-      {node.variant === "collection" && node.part === "footer" ? (Array.isArray(row[node.fields?.footer_lines ?? "footer_lines"]) ? row[node.fields?.footer_lines ?? "footer_lines"] as unknown[] : []).length ? <footer className="flex flex-col gap-1 text-sm text-muted-foreground">{(row[node.fields?.footer_lines ?? "footer_lines"] as unknown[]).map((line, index) => <p key={index}>{String(line)}</p>)}</footer> : null : node.variant === "collection" ? <CreationHeader
+      {node.variant === "studio" ? <CreationHeader
+        title={typeof row.title === "string" ? row.title : null}
+        headingLevel={node.heading_level}
+        visibility={{ mode, people, canManage: false, onOpen: () => undefined }}
+        variant="studio"
+        eyebrow={node.eyebrow}
+        art={typeof row[node.fields?.art ?? "art"] === "string" ? row[node.fields?.art ?? "art"] as string : null}
+        locked={row[node.fields?.locked ?? "locked"] === true}
+        primary={node.primary ? { ...node.primary, onSelect: () => fire(node.primary!.action) } : undefined}
+        secondary={node.secondary ? { ...node.secondary, onSelect: () => fire(node.secondary!.action) } : undefined}
+      /> : node.variant === "collection" && node.part === "footer" ? (Array.isArray(row[node.fields?.footer_lines ?? "footer_lines"]) ? row[node.fields?.footer_lines ?? "footer_lines"] as unknown[] : []).length ? <footer className="flex flex-col gap-1 text-sm text-muted-foreground">{(row[node.fields?.footer_lines ?? "footer_lines"] as unknown[]).map((line, index) => <p key={index}>{String(line)}</p>)}</footer> : null : node.variant === "collection" ? <CreationHeader
         title={typeof row.title === "string" ? row.title : null}
         creator={{ name: typeof creator.name === "string" ? creator.name : null, avatarUrl: typeof creator.avatar_url === "string" && !/\{[^{}]+\}/.test(creator.avatar_url) ? creator.avatar_url : null, avatarSeed: typeof creator.avatar_seed === "string" && !/\{[^{}]+\}/.test(creator.avatar_seed) ? creator.avatar_seed : null, label: typeof creator.label === "string" ? creator.label : null, href: typeof creator.href === "string" ? creator.href : null, linkLabel: typeof creator.link_label === "string" ? creator.link_label : null }}
         madeAt={typeof row.made_at === "string" ? row.made_at : null}
@@ -1061,6 +1071,7 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             isMaking={(row) => readField(row, node.making_field ?? "making") === true}
             aspect={node.aspect}
             heading={node.heading}
+            headingStyle={node.heading_style}
             variant={node.variant}
             orientation={node.orientation}
             layout={node.layout}

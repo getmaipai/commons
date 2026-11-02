@@ -87,3 +87,56 @@ describe("creation_header schema node", () => {
     }
   });
 });
+
+describe("creation_header studio variant (VIDEO-STUDIO-03)", () => {
+  const studio = (extra: Record<string, unknown> = {}) => CreationHeaderNodeSchema.parse({ ...node, variant: "studio", eyebrow: "Studio", primary: { label: "Export as a new clip", action: { navigate: { to: "/export" } } }, secondary: { label: "Back to the clip", action: { navigate: { to: "/back" } } }, ...extra });
+  const serve = (data: unknown) => { globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify(data), { status: 200 }))) as unknown as typeof fetch; };
+  test("draws the eyebrow, an uppercase title, the art and the end side actions, and none of the creator line or share chip", async () => {
+    const original = globalThis.fetch;
+    serve({ ...row, title: "Paper boat in the rain", art: "/poster.jpg" });
+    try {
+      const view = renderWithQueryClient(<MemoryRouter><NodeRenderer node={studio()} /></MemoryRouter>);
+      const h = await view.findByRole("heading", { name: "Paper boat in the rain" });
+      expect(h.className).toContain("uppercase");
+      expect(h.className).toContain("font-black");
+      const header = view.container.querySelector("header[data-variant=studio]")!;
+      expect(header.querySelector("[data-slot=creation-header-eyebrow]")!.textContent).toBe("Studio");
+      expect(header.querySelector("[data-slot=creation-header-eyebrow]")!.className).toContain("uppercase");
+      expect(header.querySelector("[data-slot=creation-header-art] img")!.getAttribute("src")).toBe("/poster.jpg");
+      const actions = within(header.querySelector("[data-slot=creation-header-actions]") as HTMLElement).getAllByRole("button");
+      expect(actions.map((b) => b.textContent)).toEqual(["Back to the clip", "Export as a new clip"]);
+      expect(view.queryByText("Made at home")).toBeNull();
+      expect(view.queryByRole("button", { name: /manage sharing|Shared|Private/ })).toBeNull();
+    } finally { globalThis.fetch = original; }
+  });
+  test("no art, eyebrow or actions are drawn when they are absent", async () => {
+    const original = globalThis.fetch;
+    serve({ ...row, title: "Make any video" });
+    try {
+      const view = renderWithQueryClient(<MemoryRouter><NodeRenderer node={CreationHeaderNodeSchema.parse({ ...node, variant: "studio" })} /></MemoryRouter>);
+      await view.findByRole("heading", { name: "Make any video" });
+      expect(view.container.querySelector("[data-slot=creation-header-art]")).toBeNull();
+      expect(view.container.querySelector("[data-slot=creation-header-eyebrow]")).toBeNull();
+      expect(view.container.querySelector("[data-slot=creation-header-actions]")).toBeNull();
+    } finally { globalThis.fetch = original; }
+  });
+  test("a locked row draws no art, eyebrow or title, and keeps the actions", async () => {
+    const original = globalThis.fetch;
+    serve({ ...row, title: "Secret clip", art: "/poster.jpg", locked: true });
+    try {
+      const view = renderWithQueryClient(<MemoryRouter><NodeRenderer node={studio()} /></MemoryRouter>);
+      await view.findByRole("button", { name: "Back to the clip" });
+      const header = view.container.querySelector("header[data-variant=studio]")!;
+      expect(header.getAttribute("data-locked")).toBe("true");
+      expect(header.querySelector("img")).toBeNull();
+      expect(header.querySelector("[data-slot=creation-header-art]")).toBeNull();
+      expect(view.queryByText("Studio")).toBeNull();
+      expect(view.queryByText("Secret clip")).toBeNull();
+      expect(view.queryByRole("heading")).toBeNull();
+    } finally { globalThis.fetch = original; }
+  });
+  test("the default variant is unchanged: full still draws the title, creator line and chip", () => {
+    expect(CreationHeaderNodeSchema.parse(node).variant).toBe("full");
+    expect(CreationHeaderNodeSchema.parse(node).secondary).toBeUndefined();
+  });
+});

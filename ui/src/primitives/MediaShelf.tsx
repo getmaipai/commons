@@ -6,6 +6,7 @@ import { Section } from "@/kit/primitives/Section";
 import { GRID_COLUMNS, SHELF_ITEM_WIDTH, type Density } from "@/kit/responsive";
 import { getIcon } from "@/kit/icons";
 import { DayDivider } from "@/kit/elements/day-separator";
+import { eyebrow } from "@/kit/elements/surfaces";
 import { CardSizeSlider, cardSizeStyle } from "@/kit/primitives/CardSizeSlider";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { useSurface } from "@/kit/useSurface";
@@ -41,6 +42,8 @@ interface MediaShelfProps<T> {
    * caption lines in vertical rows, with renderMeta trailing the row. */
   density?: Density;
   heading?: string;
+  /** VIDEO-STUDIO-03 (K5): `eyebrow` draws the heading, and the day group labels, as a small uppercase tracked line. Default `default`. */
+  headingStyle?: "default" | "eyebrow";
   /** Accessible name for the rail. Falls back to `heading`. */
   label?: string;
   emptyState?: { icon: string; text: string };
@@ -140,6 +143,7 @@ export function MediaShelf<T>({
   isSelected,
   density = "default",
   heading,
+  headingStyle = "default",
   label,
   emptyState,
   emptyActionLabel,
@@ -195,7 +199,7 @@ export function MediaShelf<T>({
 
   if (items.length === 0 && !hasLocked && emptyState) {
     return (
-      <Frame heading={heading} seeAll={seeAll}>
+      <Frame heading={heading} headingStyle={headingStyle} seeAll={seeAll}>
         <EmptyState icon={emptyState.icon} text={emptyState.text} actionLabel={emptyActionLabel} onAction={onEmptyAction} />
       </Frame>
     );
@@ -203,7 +207,7 @@ export function MediaShelf<T>({
 
   if (orientation === "vertical") {
     return (
-      <Frame heading={heading} seeAll={seeAll}>
+      <Frame heading={heading} headingStyle={headingStyle} seeAll={seeAll}>
         <ul aria-label={name} className="flex min-w-0 list-none flex-col gap-3 p-0" data-slot="media-shelf" data-orientation="vertical" data-density={density}>
           {items.map((item) => (
             <li
@@ -391,7 +395,7 @@ export function MediaShelf<T>({
           const text = groupBy.label(run.key, run.items.length);
           return (
             <section key={run.key} aria-label={text} className="flex min-w-0 flex-col gap-2" data-slot="media-shelf-group">
-              <DayDivider label={text} />
+              {headingStyle === "eyebrow" ? <h3 data-slot="media-shelf-group-heading" className={eyebrow}>{text}</h3> : <DayDivider label={text} />}
               {renderList(run.items, name ? `${name}, ${text}` : text)}
             </section>
           );
@@ -404,7 +408,7 @@ export function MediaShelf<T>({
   }
 
   return (
-    <Frame heading={heading} seeAll={seeAll}>
+    <Frame heading={heading} headingStyle={headingStyle} seeAll={seeAll}>
       {sized ? (
         <div className="flex min-w-0 flex-col gap-3" style={cardSizeStyle(sizeControl.size)} data-slot="media-shelf-sized">
           <div className="hidden justify-end px-1.5 sm:flex" data-slot="media-shelf-size-control">
@@ -477,22 +481,24 @@ const PLAIN_ITEM_WIDTH_COMPACT = "w-[44%] sm:w-[calc((100%-48px)/4.2)] xl:w-[cal
 
 interface ShelfFrameProps {
   heading?: string;
+  headingStyle?: "default" | "eyebrow";
   seeAll?: { label: string; onSelect: () => void };
   children: ReactNode;
 }
 
 /** The default frame: the kit Section card. A card shelf has no See all link. */
-function CardShelfFrame({ heading, children }: ShelfFrameProps) {
+function CardShelfFrame({ heading, headingStyle, children }: ShelfFrameProps) {
+  if (headingStyle === "eyebrow" && heading) return <Section><h2 className={eyebrow}>{heading}</h2>{children}</Section>;
   return <Section heading={heading}>{children}</Section>;
 }
 
 /** A plain shelf's frame: no card, the heading on the start side and the See all link on the end side. */
-function PlainShelfFrame({ heading, seeAll, children }: ShelfFrameProps) {
+function PlainShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrameProps) {
   return (
     <section className="flex min-w-0 flex-col gap-2" data-slot="media-shelf-plain">
       {heading || seeAll ? (
         <div className="flex items-center justify-between gap-3">
-          {heading ? <h2 className="text-lg font-bold tracking-tight text-foreground">{heading}</h2> : <span />}
+          {heading ? <h2 className={headingStyle === "eyebrow" ? eyebrow : "text-lg font-bold tracking-tight text-foreground"}>{heading}</h2> : <span />}
           {seeAll ? (
             <Button variant="ghost" size="sm" onClick={seeAll.onSelect} className="text-muted-foreground font-semibold">
               {seeAll.label}

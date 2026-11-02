@@ -207,9 +207,11 @@
         "share_change": { "$ref": "#/$defs/share_change" },
         "candidates_bind": { "$ref": "#/$defs/binding", "description": "Optional binding returning candidate people [{id, name, avatar_url?}] for the share panel." },
         "heading_level": { "type": "string", "enum": ["h1", "h2"], "default": "h1" },
-        "variant": { "type": "string", "enum": ["full", "byline", "collection"], "default": "full" },
-        "fields": { "type": "object", "additionalProperties": false, "properties": { "art": { "type": "string", "default": "art" }, "meta": { "type": "string", "default": "meta" }, "footer_lines": { "type": "string", "default": "footer_lines" } } },
+        "variant": { "type": "string", "enum": ["full", "byline", "collection", "studio"], "default": "full", "description": "VIDEO-STUDIO-03 (K2): `studio` is a page header: the optional `eyebrow` as a small uppercase tracked line, the row's title as a huge bold uppercase heading, the row's art (`fields.art`) at the start, and `secondary` then `primary` at the end. It draws no creator line, date, description or visibility chip. Default `full`, unchanged." },
+        "eyebrow": { "type": "string", "minLength": 1, "maxLength": 40, "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. The line above the title (CREATE, STUDIO), drawn uppercase." },
+        "fields": { "type": "object", "additionalProperties": false, "properties": { "art": { "type": "string", "default": "art" }, "meta": { "type": "string", "default": "meta" }, "footer_lines": { "type": "string", "default": "footer_lines" }, "locked": { "type": "string", "default": "locked", "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. Dotted path to a boolean in the row; true draws no art, eyebrow or title (an adult-only item while the lock is on). The actions stay." } } },
         "primary": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string" }, "action": { "$ref": "#/$defs/action" } } },
+        "secondary": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. A quiet pill drawn before `primary` (at most one primary).", "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string" }, "action": { "$ref": "#/$defs/action" } } },
         "shuffle": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string", "description": "MUSIC-POLISH-01: an icon name from the kit set. Default \"shuffle\"." }, "labeled": { "type": "boolean", "default": false, "description": "MUSIC-POLISH-01: draw the label beside the icon, not an icon alone (an Artist's Start radio)." }, "action": { "$ref": "#/$defs/action" } } },
         "more": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string" }, "action": { "$ref": "#/$defs/action" } } } },
         "part": { "type": "string", "enum": ["header", "footer"], "default": "header" }
@@ -405,6 +407,7 @@
       "properties": {
         "type": { "const": "media_shelf" },
         "heading": { "type": "string", "minLength": 1, "maxLength": 60, "description": "MEDIA-PLAYER-01: the shelf's heading (\"Continue watching\"), which also names the rail." },
+        "heading_style": { "type": "string", "enum": ["default", "eyebrow"], "default": "default", "description": "VIDEO-STUDIO-03 (K5): `eyebrow` draws the heading, and the day group labels, as a small uppercase tracked line in the muted text colour. Default `default`, unchanged." },
         "bind": { "$ref": "#/$defs/binding" },
         "item_key_field": { "type": "string" },
         "item_label_field": { "type": "string" },
@@ -655,6 +658,7 @@
         "actions_variant": { "type": "string", "enum": ["default", "icons"], "default": "default", "description": "Passed to each VideoPlayer; `icons` needs VIDEO-UI-02's player." },
         "actions_inline": { "type": "integer", "minimum": 1, "maximum": 8, "description": "Passed to each VideoPlayer; the rest go in its More menu (VIDEO-UI-02)." },
         "look": { "type": "string", "enum": ["default", "media"], "default": "default", "description": "VIDEO-UI-14 (item 2): `media` draws the feed picture first: the newest entry wide and the rest in a grid (two columns only while the feed's own pane gives each at least 320 px, one otherwise), the entry's tags drawn on the picture's top edge, the words shown once under it, and the player's icon row over the picture, shown on hover or keyboard focus and always on touch. A running, failed or stopped entry keeps its progress, Stop, reason and Try again visible. `default` is the single column with the words above the player." },
+        "heading_style": { "type": "string", "enum": ["default", "eyebrow"], "default": "default", "description": "VIDEO-STUDIO-03 (K5): `eyebrow` draws the day headings, and the filter labels, as a small uppercase tracked line in the muted text colour. Default `default`, unchanged." },
         "filters_presentation": { "type": "string", "enum": ["inline", "popover"], "default": "inline", "description": "VIDEO-UI-14 (item 6): `popover` puts the same filter controls behind one View button (a popover, a sheet on a phone); `inline` draws them in a row above the feed." },
         "poll_while": {
           "type": "object",

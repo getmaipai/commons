@@ -269,6 +269,21 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...shelf, media_loop: "yes" })).toBe(false);
     expect(validate({ ...shelf, item_loop_field: 3 })).toBe(false);
   });
+  test("VIDEO-STUDIO-03: creation_header studio variant (eyebrow, secondary, fields.locked) and heading_style on media_shelf and result_feed", () => {
+    const header = { type: "creation_header", bind: { source: "package", path: "clip" }, share_change: { add: { call: { target: "/x" } }, remove: { call: { target: "/x" } }, make_private: { call: { target: "/x" } } } };
+    for (const variant of ["full", "byline", "collection", "studio"]) expect(validate({ ...header, variant })).toBe(true);
+    expect(validate({ ...header, variant: "wide" })).toBe(false);
+    const studio = { ...header, variant: "studio", eyebrow: "STUDIO", fields: { art: "poster", locked: "locked" }, secondary: { label: "Back to the clip", action: { navigate: { to: "/apps/videos" } } }, primary: { label: "Export as a new clip", action: { call: { target: "/x" } } } };
+    expect(validate(studio)).toBe(true);
+    for (const bad of [{ eyebrow: "" }, { eyebrow: 3 }, { secondary: { label: "" , action: { navigate: { to: "/a" } } } }, { secondary: { label: "A" } }, { fields: { nope: "x" } }]) expect(validate({ ...studio, ...bad })).toBe(false);
+    const feed = { type: "result_feed", bind: { source: "package", path: "recipes" }, fields: { words: "prompt", status: "status" }, poll_while: { statuses: ["queued"], record: { path: "recipes" } } };
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "x" }, item_key_field: "id", item_label_field: "t", item_media_field: "m" };
+    for (const node of [feed, shelf]) {
+      expect(validate(node)).toBe(true);
+      for (const heading_style of ["default", "eyebrow"]) expect(validate({ ...node, heading_style })).toBe(true);
+      for (const heading_style of ["large", true, ""]) expect(validate({ ...node, heading_style })).toBe(false);
+    }
+  });
   test("VIDEO-UI-03: prompt_bar placement, suggestions, submit_detail, starts, chip presentation, group and fold, reference placement and kinds", () => {
     const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
     const look = { state: "look", label: "Look", variant: "cards", presentation: "popover", group: "Style", options: [{ value: "a", label: "A" }] };

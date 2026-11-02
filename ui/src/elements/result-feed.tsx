@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/kit/ui/switch";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { DayDivider } from "./day-separator";
+import { eyebrow } from "./surfaces";
 import { VideoPlayer, type VideoPlayerProps } from "./video-player";
 import { LockTile, type LockedRow } from "./adult-lock";
 
@@ -86,18 +87,19 @@ export function groupFeedEntries(entries: ResultFeedEntry[], by: "day" | "words"
   return groups;
 }
 
-function FilterControls({ filters, idPrefix }: { filters: ResultFeedFilter[]; idPrefix: string }) {
+function FilterControls({ filters, idPrefix, headingStyle = "default" }: { filters: ResultFeedFilter[]; idPrefix: string; headingStyle?: "default" | "eyebrow" }) {
+  const labelClass = headingStyle === "eyebrow" ? eyebrow : undefined;
   return (
     <>
       {filters.map((filter) =>
         filter.kind === "toggle" ? (
           <div key={filter.id} className="flex items-center gap-2">
             <Switch id={`${idPrefix}-${filter.id}`} checked={filter.value} onCheckedChange={filter.onValueChange} />
-            <Label htmlFor={`${idPrefix}-${filter.id}`}>{filter.label}</Label>
+            <Label htmlFor={`${idPrefix}-${filter.id}`} className={labelClass}>{filter.label}</Label>
           </div>
         ) : (
           <div key={filter.id} className="flex items-center gap-2">
-            <Label htmlFor={`${idPrefix}-${filter.id}`}>{filter.label}</Label>
+            <Label htmlFor={`${idPrefix}-${filter.id}`} className={labelClass}>{filter.label}</Label>
             <Select value={filter.value} onValueChange={filter.onValueChange}>
               <SelectTrigger id={`${idPrefix}-${filter.id}`} aria-label={filter.label}>
                 <SelectValue />
@@ -121,7 +123,7 @@ function activeFilters(filters: ResultFeedFilter[]): number {
 }
 
 /** VIDEO-UI-14 (item 6): the same controls behind one View button: a popover, and the kit's bottom sheet on a phone. */
-function FilterView({ filters }: { filters: ResultFeedFilter[] }) {
+function FilterView({ filters, headingStyle = "default" }: { filters: ResultFeedFilter[]; headingStyle?: "default" | "eyebrow" }) {
   const phone = useIsPhoneLayout();
   const [open, setOpen] = useState(false);
   const active = activeFilters(filters);
@@ -132,7 +134,7 @@ function FilterView({ filters }: { filters: ResultFeedFilter[] }) {
       {active > 0 ? <span data-slot="result-feed-view-count" aria-label={`${active} on`} className="bg-primary text-primary-foreground inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs tabular-nums">{active}</span> : null}
     </Button>
   );
-  const body = <div role="group" aria-label="Filter results" className="flex flex-col gap-4"><FilterControls filters={filters} idPrefix="result-feed-view" /></div>;
+  const body = <div role="group" aria-label="Filter results" className="flex flex-col gap-4"><FilterControls filters={filters} idPrefix="result-feed-view" headingStyle={headingStyle} /></div>;
   return (
     <div data-slot="result-feed-filters" data-presentation="popover" className="flex min-w-0 items-center gap-3">
       {phone ? (
@@ -171,6 +173,7 @@ export function ResultFeed({
   look = "default",
   filtersPresentation = "inline",
   onUnlock,
+  headingStyle = "default",
 }: {
   entries: (ResultFeedEntry | ResultFeedLockedEntry)[];
   filters?: ResultFeedFilter[];
@@ -187,6 +190,8 @@ export function ResultFeed({
   filtersPresentation?: "inline" | "popover";
   /** ADULT-LOCK-01: called when the lock tile is pressed. Absent: the tile opens the page's passcode dialog (`AdultLockProvider`). */
   onUnlock?: () => void;
+  /** VIDEO-STUDIO-03 (K5): `eyebrow` draws the day headings, and the filter labels, as a small uppercase tracked line. Default `default`. */
+  headingStyle?: "default" | "eyebrow";
 }) {
   const entries: ResultFeedEntry[] = [];
   let hasLocked = false;
@@ -201,16 +206,19 @@ export function ResultFeed({
   const media = look === "media";
   return (
     <section data-slot="result-feed" aria-label={label} className={cn("flex w-full flex-col gap-4", media && "@container")} data-look={media ? "media" : undefined}>
-      {filters.length > 0 && filtersPresentation === "popover" ? <FilterView filters={filters} /> : null}
+      {filters.length > 0 && filtersPresentation === "popover" ? <FilterView filters={filters} headingStyle={headingStyle} /> : null}
       {filters.length > 0 && filtersPresentation !== "popover" ? (
         <div data-slot="result-feed-filters" role="group" aria-label="Filter results" className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          <FilterControls filters={filters} idPrefix="result-feed" />
+          <FilterControls filters={filters} idPrefix="result-feed" headingStyle={headingStyle} />
         </div>
       ) : null}
       {entries.length === 0 && !hasLocked ? empty ?? null : null}
       {groups.map((group) => (
         <div key={group.key} data-slot="result-feed-group" className="flex flex-col gap-4">
-          {group.label ? <DayDivider label={grouping === "words" ? shorten(group.label) : `${group.label}, ${countLabel(group.entries.length)}`} /> : null}
+          {group.label ? (() => {
+            const text = grouping === "words" ? shorten(group.label) : `${group.label}, ${countLabel(group.entries.length)}`;
+            return headingStyle === "eyebrow" ? <h3 data-slot="result-feed-group-heading" className={eyebrow}>{text}</h3> : <DayDivider label={text} />;
+          })() : null}
           {(() => {
             const articles = group.entries.map((entry) => {
               const first = media && entry.key === entries[0]?.key;

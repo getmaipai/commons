@@ -21,6 +21,22 @@ describe("ResultFeed", () => {
     expect(view.getAllByRole("separator").map((s) => s.getAttribute("aria-label"))).toEqual(["Today, 2 clips", "Yesterday, 1 clip"]);
   });
 
+  test("headingStyle eyebrow draws the day headings and filter labels as uppercase tracked text; default keeps the dividers (VIDEO-STUDIO-03)", () => {
+    const entries = [entry("1", "one", "Today"), entry("2", "two", "Yesterday")];
+    const filters = [{ kind: "toggle" as const, id: "fav", label: "Favorites", value: false, onValueChange: () => {} }];
+    const base = render(<ResultFeed entries={entries} filters={filters} />);
+    expect(base.getAllByRole("separator")).toHaveLength(2);
+    expect(base.container.querySelector("[data-slot=result-feed-group-heading]")).toBeNull();
+    expect(base.getByText("Favorites").className).not.toContain("uppercase");
+    cleanup();
+    const view = render(<ResultFeed entries={entries} filters={filters} headingStyle="eyebrow" />);
+    expect(view.queryAllByRole("separator")).toHaveLength(0);
+    const heads = view.getAllByRole("heading", { level: 3 });
+    expect(heads.map((h) => h.textContent)).toEqual(["Today, 1 clip", "Yesterday, 1 clip"]);
+    for (const h of heads) { expect(h.className).toContain("uppercase"); expect(h.className).toContain("tracking-widest"); }
+    expect(view.getByText("Favorites").className).toContain("uppercase");
+  });
+
   test("an entry in each status draws the player's own state", () => {
     const view = render(<ResultFeed grouping="none" entries={["queued", "generating", "ready", "failed", "cancelled"].map((s) => entry(s, `w ${s}`, undefined, s))} />);
     expect(view.getAllByRole("article").map((a) => a.getAttribute("data-status"))).toEqual(["queued", "generating", "ready", "failed", "cancelled"]);

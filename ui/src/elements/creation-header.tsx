@@ -8,6 +8,7 @@ import { LightMarkdown } from "./light-markdown";
 import { VisibilityChip, type VisibilityChipProps } from "./visibility-chip";
 import { diceBearAvatarUri } from "../primitives/Avatar";
 import { SafeImage } from "../primitives/SafeImage";
+import { Cover } from "../ui/media-tiles";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export interface CreationHeaderProps {
@@ -17,12 +18,18 @@ export interface CreationHeaderProps {
   description?: string | null;
   headingLevel?: "h1" | "h2";
   visibility: Omit<VisibilityChipProps, "onOpen"> & { onOpen: () => void };
-  variant?: "full" | "byline" | "collection";
+  variant?: "full" | "byline" | "collection" | "studio";
   art?: string | null;
   meta?: string | null;
   primary?: { label: string; icon?: string; onSelect: () => void };
   shuffle?: { label: string; onSelect: () => void; /** An icon name from the kit set. Default "shuffle". */ icon?: string; /** Draw the label beside the icon (an outline pill), not an icon alone. */ labeled?: boolean };
   more?: Array<{ label: string; icon?: string; onSelect: () => void }>;
+  /** VIDEO-STUDIO-03 (`variant: "studio"` only): the small uppercase line above the title. */
+  eyebrow?: string | null;
+  /** VIDEO-STUDIO-03 (`variant: "studio"` only): a quiet pill beside `primary` on the end side. */
+  secondary?: { label: string; icon?: string; onSelect: () => void };
+  /** VIDEO-STUDIO-03 (`variant: "studio"` only): draw no art, eyebrow or title (an adult-only item while the lock is on); the actions stay. */
+  locked?: boolean;
 }
 
 function plain(value: string | null | undefined, fallback: string) {
@@ -37,7 +44,7 @@ function formattedDate(value?: string | null) {
   return absoluteTime(value);
 }
 
-export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility, variant = "full", art, meta, primary, shuffle, more = [] }: CreationHeaderProps) {
+export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility, variant = "full", art, meta, primary, shuffle, more = [], eyebrow, secondary, locked = false }: CreationHeaderProps) {
   const [expanded, setExpanded] = useState(false);
   const homeLabel = plain(creator?.label, "Made at home");
   const creatorName = plain(creator?.name, homeLabel);
@@ -47,6 +54,26 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
   const Heading = headingLevel;
   const date = formattedDate(madeAt);
   const detail = description?.trim() && !/\{[^{}]+\}/.test(description) ? description.trim() : null;
+  if (variant === "studio") {
+    const eyebrowText = eyebrow?.trim() && !/\{[^{}]+\}/.test(eyebrow) ? eyebrow.trim() : null;
+    const artSrc = art && !/\{[^{}]+\}/.test(art) ? art : null;
+    const pill = (action: NonNullable<CreationHeaderProps["primary"]>, kind: "default" | "secondary") => {
+      const ActionIcon = action.icon ? getIcon(action.icon) : null;
+      return <Button type="button" variant={kind} size="lg" shape="pill" onClick={action.onSelect}>{ActionIcon ? <ActionIcon aria-hidden className="size-4" /> : null}{action.label}</Button>;
+    };
+    return (
+      <header data-slot="creation-header" data-variant="studio" data-locked={locked ? "true" : undefined} className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-3">
+        {!locked && artSrc ? <div data-slot="creation-header-art" aria-hidden className="size-14 shrink-0 overflow-hidden rounded-xl sm:size-[4.5rem]"><Cover id={artSrc} title="" url={artSrc} bare /></div> : null}
+        {locked ? null : (
+          <div className="flex min-w-0 flex-1 basis-60 flex-col gap-1">
+            {eyebrowText ? <span data-slot="creation-header-eyebrow" className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">{eyebrowText}</span> : null}
+            <Heading className="text-foreground min-w-0 text-3xl leading-none font-black tracking-tight break-words uppercase sm:text-[2.5rem]">{plain(title, "Untitled")}</Heading>
+          </div>
+        )}
+        {primary || secondary ? <div data-slot="creation-header-actions" className="ms-auto flex flex-wrap items-center gap-2">{secondary ? pill(secondary, "secondary") : null}{primary ? pill(primary, "default") : null}</div> : null}
+      </header>
+    );
+  }
   if (variant === "collection") return (
     <header data-slot="creation-header" data-variant="collection" className="grid gap-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:items-end">
       <SafeImage src={art ?? undefined} kind="picture" alt="" className="mx-auto aspect-square w-60 rounded-[var(--art-radius)] object-cover sm:mx-0" />

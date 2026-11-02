@@ -80,6 +80,9 @@ export const live = "text-primary-ink";
 
 export const mono = "font-mono text-[11px] tracking-tight";
 
+/** VIDEO-STUDIO-03 (K5): a section heading as a small uppercase tracked eyebrow, in the muted text token. */
+export const eyebrow = "text-muted-foreground text-xs font-semibold tracking-widest uppercase";
+
 export function ShimmerLabel({
   active = true,
   className,

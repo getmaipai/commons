@@ -87,6 +87,10 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     if (isObject(node.share_change)) {
       for (const key of ["add", "remove", "make_private"]) checkAction(node.share_change[key], packageId, `${where} creation_header.share_change.${key}`, out);
     }
+    // VIDEO-STUDIO-03: the studio header's two end-side actions.
+    if (node.variant === "studio") {
+      for (const key of ["primary", "secondary"]) if (isObject(node[key])) checkAction(node[key].action, packageId, `${where} creation_header.${key}.action`, out);
+    }
   }
   // MEDIA-PLAYER-01: the media nodes draw the package's own rows, and are the places a package page may hand an item to
   // the host's player (`play`): a shelf tile, a billboard button, the player's next item.

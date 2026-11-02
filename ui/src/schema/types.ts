@@ -110,8 +110,11 @@ export const CreationHeaderNodeSchema = z.object({
   share_change: ShareChangeSchema,
   candidates_bind: BindingSchema.optional(),
   heading_level: z.enum(["h1", "h2"]).default("h1"),
-  variant: z.enum(["full", "byline", "collection"]).default("full"),
-  fields: z.object({ art: z.string().min(1).default("art"), meta: z.string().min(1).default("meta"), footer_lines: z.string().min(1).default("footer_lines") }).strict().optional(),
+  variant: z.enum(["full", "byline", "collection", "studio"]).default("full"),
+  // VIDEO-STUDIO-03 (K2): the studio page header.
+  eyebrow: z.string().min(1).max(40).optional(),
+  secondary: z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema }).optional(),
+  fields: z.object({ art: z.string().min(1).default("art"), meta: z.string().min(1).default("meta"), footer_lines: z.string().min(1).default("footer_lines"), locked: z.string().min(1).default("locked") }).strict().optional(),
   primary: z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema }).optional(),
   shuffle: z.object({ label: z.string().min(1), icon: z.string().optional(), labeled: z.boolean().optional(), action: ActionSchema }).optional(),
   more: z.array(z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema })).optional(),
@@ -187,6 +190,8 @@ export type CardGridNode = z.infer<typeof CardGridNodeSchema>;
 export const MediaShelfNodeSchema = z.object({
   type: z.literal("media_shelf"),
   heading: z.string().min(1).max(60).optional(),
+  // VIDEO-STUDIO-03 (K5): the heading as a small uppercase tracked eyebrow.
+  heading_style: z.enum(["default", "eyebrow"]).optional(),
   bind: BindingSchema,
   item_key_field: z.string(),
   item_label_field: z.string(),
@@ -690,6 +695,8 @@ export const ResultFeedNodeSchema = z.object({
   // VIDEO-UI-14: the media-first feed and the one View button for the filters.
   look: z.enum(["default", "media"]).default("default"),
   filters_presentation: z.enum(["inline", "popover"]).default("inline"),
+  // VIDEO-STUDIO-03 (K5): the day headings and filter labels as a small uppercase tracked eyebrow.
+  heading_style: z.enum(["default", "eyebrow"]).optional(),
   poll_while: z
     .object({
       statuses: z.array(z.enum(["queued", "generating"])).min(1),

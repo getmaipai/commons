@@ -194,6 +194,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
             grouping={grouping}
             look={node.look}
             filtersPresentation={node.filters_presentation}
+            headingStyle={node.heading_style}
             empty={<EmptyState icon={node.empty_state?.icon ?? "film"} text={node.empty_state?.text ?? "Nothing here yet."} />}
           />
           {lastError ? <p role="alert" className="text-destructive text-sm">{lastError}</p> : null}
