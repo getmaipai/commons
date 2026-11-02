@@ -1,3 +1,7 @@
+## [ui-v0.5.464] - 2026-11-02
+
+- MUSIC-TILES-01: `MediaShelf` frameless rail (`variant="plain"`) honours `density="compact"` (tiles 44% wide on a phone, about four and a fifth from 640, about six and a third from 1280; the default is unchanged). `TopResultCard` title wraps to two lines instead of being cut to one. No spec change.
+
 ## [ui-v0.5.463] - 2026-11-02
 
 - MUSIC-STUDIO-EDIT (needs spec-v0.1.301): new `Album` Element (Apple Music / Spotify shape: large rounded cover, title, band, round play button, numbered track list whose number turns into a play icon on hover) and new `SongStyleCard` Element, both with answer-block kinds `album` and `song_style`. Every generation card now has an edit mode as props: `Band`, `Album` and `SongStyleCard` take `editable` (shows an Edit button), `defaultEditing` and `onEdit(patch)`; edit mode makes name or title, blurb, look, sound and style tags fields (the album also moves, removes and re-covers tracks; the style also has instrumental, tempo, key and length), and Save reports only the changed fields. The answer block reports `edit_band`, `edit_album`, `edit_song_style` and `play_track` through `onAction(blockId, action, detail)` (the new optional third argument carries the patch). Shared parts live in `music-edit.tsx`. Existing cards draw as before.

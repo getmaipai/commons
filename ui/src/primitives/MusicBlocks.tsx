@@ -99,7 +99,7 @@ export function TopResultCard({ title, eyebrow, subtitle, art, circle = false, o
         {art ? <span className={cn("size-24 shrink-0 overflow-hidden bg-muted [&>*]:size-full", circle ? "rounded-full" : "rounded-[var(--media-card-radius)]")} data-slot="top-result-art">{art}</span> : null}
         <span className="min-w-0 flex-1">
           {eyebrow ? <span className="text-muted-foreground block text-xs font-semibold uppercase tracking-wide">{eyebrow}</span> : null}
-          <span className="block truncate text-2xl font-bold tracking-tight">{title}</span>
+          <span className="line-clamp-2 break-words text-2xl font-bold tracking-tight" data-slot="top-result-title">{title}</span>
           {subtitle ? <span className="text-muted-foreground block truncate text-sm">{subtitle}</span> : null}
         </span>
       </Card>

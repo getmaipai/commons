@@ -278,7 +278,7 @@ export function MediaShelf<T>({
           <li
             key={getKey(item)}
             aria-current={isHighlighted?.(item) ? "true" : undefined}
-            className={cn("flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? PLAIN_ITEM_WIDTH : SHELF_ITEM_WIDTH[density]])}
+            className={cn("flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
           >
             <TileFrame onPlay={onPlay ? () => onPlay(item) : undefined} playLabel={playName(item)}>
             <Card
@@ -359,6 +359,9 @@ function TileFrame({ onPlay, playLabel, children }: { onPlay?: () => void; playL
 // The frameless row's tile widths, the approved media mockup's (docs/design/assets/media-apps-2026-10-17 in Home): most of
 // a tile on a phone so the next one peeks, about three and a quarter from 640, about four and a third from 1280.
 const PLAIN_ITEM_WIDTH = "w-[72%] sm:w-[calc((100%-36px)/3.2)] xl:w-[calc((100%-48px)/4.3)]";
+// `density: "compact"` on a frameless row (MUSIC-TILES-01): the same peek, with smaller tiles, for a home screen whose rows are
+// many and short: a bit over two on a phone, about four and a fifth from 640, about six and a third from 1280.
+const PLAIN_ITEM_WIDTH_COMPACT = "w-[44%] sm:w-[calc((100%-48px)/4.2)] xl:w-[calc((100%-72px)/6.3)]";
 
 interface ShelfFrameProps {
   heading?: string;

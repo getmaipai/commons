@@ -319,6 +319,16 @@ describe("MediaShelf", () => {
       expect(section.className).not.toContain("bg-card");
     });
 
+    test("MUSIC-TILES-01: a compact frameless row uses the smaller tile width, the default keeps its own", () => {
+      const props = { items: tracks, getKey: (t: { id: string }) => t.id, renderItem: () => <span>x</span>, heading: "Recently played", variant: "plain" as const };
+      const { container, rerender } = render(<MediaShelf {...props} />);
+      expect(container.querySelector("li")!.className).toContain("w-[72%]");
+      rerender(<MediaShelf {...props} density="compact" />);
+      const li = container.querySelector("li")!;
+      expect(li.className).toContain("w-[44%]");
+      expect(li.className).not.toContain("w-[72%]");
+    });
+
     test("See all sits beside the heading and fires its handler", () => {
       const onSelect = mock(() => {});
       const { getByRole } = render(

@@ -48,6 +48,12 @@ describe("TopResultCard", () => {
     expect(onPlay).toHaveBeenCalledTimes(1);
     expect(view.container.querySelector("[data-slot=top-result-art]")?.className).toContain("rounded-full");
   });
+  test("MUSIC-TILES-01: a long title wraps to two lines instead of being cut to one", () => {
+    const view = render(<TopResultCard title="A very long song title that would not fit on one line of a phone" />);
+    const title = view.container.querySelector("[data-slot=top-result-title]")!;
+    expect(title.className).toContain("line-clamp-2");
+    expect(title.className).not.toContain("truncate");
+  });
   test("without onPlay there is no Play button", () => {
     const view = render(<TopResultCard title="Lanterns" />);
     expect(view.queryByRole("button")).toBeNull();
