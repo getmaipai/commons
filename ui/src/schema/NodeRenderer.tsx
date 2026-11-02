@@ -800,7 +800,7 @@ function pictureKind(value: unknown): ImageFallbackKind {
 
 function RowMedia({ value, kind }: { value: unknown; kind: unknown }) {
   if (typeof value !== "string" || value === "") return <SafeImage kind={pictureKind(kind)} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
-  if (value.startsWith("/") && !value.startsWith("//")) return <SafeImage src={value} kind={pictureKind(kind)} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
+  if ((value.startsWith("/") && !value.startsWith("//")) || isOwnBlobUrl(value)) return <SafeImage src={value} kind={pictureKind(kind)} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
   if (/^[a-z0-9-]+$/i.test(value)) {
     const Icon = getIcon(value);
     return Icon ? <Icon className="text-muted-foreground size-6 shrink-0" aria-hidden /> : null;
@@ -998,7 +998,16 @@ function localVideo(value: unknown): string | null {
 }
 
 function localPicture(value: unknown): string | null {
-  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : null;
+  if (typeof value !== "string") return null;
+  if (value.startsWith("/") && !value.startsWith("//")) return value;
+  return isOwnBlobUrl(value) ? value : null;
+}
+
+/** ADULT-LOCK-03b: a `blob:` object URL this page made for its own origin. An unlocked adult-only picture or clip cannot ride on a plain path (the proof is a
+ * header, and a `<img src>` or `<video src>` cannot send one), so the host fetches it with the header into a Blob and hands the row that object URL. A page can
+ * only make blob URLs for its own origin, so this loads nothing from elsewhere; any other scheme or host is still refused. */
+function isOwnBlobUrl(value: string): boolean {
+  return typeof location !== "undefined" && location.origin !== "null" && value.startsWith(`blob:${location.origin}/`);
 }
 
 /** Each row's day group key, in order. A row with no readable date joins the group before it (the first one, "undated"). */
@@ -1458,6 +1467,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
                 ) : undefined
               }
               src={src}
+              mediaSession={!adultOnly}
               kind={node.kind}
               layout={node.layout}
               title={String(readField(r, field("title", "title")) ?? "")}

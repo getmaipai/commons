@@ -137,3 +137,56 @@ describe("the media host's adult-only rule", () => {
     expect((mediaFor.mock.calls[0]![0] as { adultOnly?: boolean }).adultOnly).toBeUndefined();
   });
 });
+
+describe("an unlocked adult-only item's blob sources (ADULT-LOCK-03b)", () => {
+  // The test document starts at about:blank (origin "null"); a real page has an origin, which the kit's blob rule compares.
+  beforeEach(() => { (window as unknown as { happyDOM: { setURL(url: string): void } }).happyDOM.setURL("http://localhost:3000/apps/videos"); });
+  const blob = () => `blob:${window.location.origin}/0b1c2d3e-aaaa-bbbb-cccc-000000000001`;
+  const shelfOf = () => MediaShelfNodeSchema.parse({
+    type: "media_shelf", bind: { source: "package", path: "clips", stream: false }, item_key_field: "id", item_label_field: "title", item_media_field: "thumbnail", layout: "grid",
+  }) as unknown as UiNode;
+
+  test("a blob: URL of this page's own origin draws as the tile's picture; another origin's, a data: URL and a remote address do not", async () => {
+    rows = [
+      { id: "own", title: "Own blob", thumbnail: blob() },
+      { id: "foreign", title: "Foreign blob", thumbnail: "blob:https://example.com/0b1c2d3e" },
+      { id: "data", title: "Data URL", thumbnail: "data:image/png;base64,AAAA" },
+      { id: "remote", title: "Remote", thumbnail: "https://example.com/a.jpg" },
+    ];
+    const view = mount(shelfOf());
+    await view.findByText("Own blob");
+    const sources = Array.from(view.container.querySelectorAll("img")).map((img) => img.getAttribute("src"));
+    expect(sources).toEqual([blob()]);
+  });
+
+  test("the player node turns the Media Session off for an adult-only item and leaves it on for an ordinary one", async () => {
+    const watch = PageNodeSchema.parse(JSON.parse(readFileSync(join(SPEC_DIR, "ui", "pages", "videos-watch.json"), "utf-8")));
+    const player = (watch.body[0] as { main: UiNode[] }).main[0]!;
+    const seen: boolean[] = [];
+    const original = Object.getOwnPropertyDescriptor(navigator, "mediaSession");
+    for (const adult of [true, false]) {
+      const item = { id: "m1", src: blob(), title: "A clip", adult_only: adult };
+      globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify([item]), { status: 200 }))) as unknown as typeof fetch;
+      const view = renderWithQueryClient(
+        <MemoryRouter initialEntries={["/apps/videos"]}>
+          <PackageScopeContext.Provider value={{ packageId: "videos" }}>
+            <MediaHostContext.Provider value={{ onPlay: () => {}, mediaFor: () => null }}>
+              <NodeRenderer node={player} state={{ id: "m1" }} />
+            </MediaHostContext.Provider>
+          </PackageScopeContext.Provider>
+        </MemoryRouter>,
+      );
+      const video = await waitFor(() => { const el = view.container.querySelector("video"); if (!el) throw new Error("no player yet"); return el; });
+      const session = { metadata: null as unknown, setActionHandler: () => {}, playbackState: "none" };
+      Object.defineProperty(navigator, "mediaSession", { configurable: true, value: session });
+      (globalThis as unknown as { MediaMetadata: unknown }).MediaMetadata = class { constructor(public init: unknown) {} };
+      Object.defineProperty(video, "paused", { configurable: true, get: () => false });
+      fireEvent.play(video);
+      await new Promise((r) => setTimeout(r, 30));
+      seen.push(session.metadata !== null);
+      view.unmount();
+    }
+    if (original) Object.defineProperty(navigator, "mediaSession", original); else delete (navigator as unknown as Record<string, unknown>).mediaSession;
+    expect(seen).toEqual([false, true]);
+  });
+});
