@@ -3,7 +3,8 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const css = readFileSync(resolve(import.meta.dir, "tokens.css"), "utf8");
+// The studio token scope (VIDEO-STUDIO-02) is appended after the three theme blocks and has its own test (studio-surface.test.tsx).
+const css = readFileSync(resolve(import.meta.dir, "tokens.css"), "utf8").split("/* VIDEO-STUDIO-02 (K1)")[0]!;
 const hexes = (name: string) => [...css.matchAll(new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6});`, "g"))].map((m) => m[1]!);
 
 function lum(hex: string): number {

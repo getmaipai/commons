@@ -721,6 +721,7 @@ export const PageNodeSchema: z.ZodType<PageNode> = z.lazy(() =>
     id: z.string().min(1),
     title: z.string().min(1),
     tone: z.enum(["default", "cinema"]).default("default"),
+    surface: z.enum(["page", "studio"]).default("page"),
     body: z.array(UiNodeSchema).min(1),
   }),
 );
@@ -730,6 +731,8 @@ export interface PageNode {
   title: string;
   /** Deprecated: ignored; every page follows the selected theme. */
   tone?: "default" | "cinema";
+  /** VIDEO-STUDIO-02: `studio` draws the body as a rounded pane on the studio token scope. Default `page`. */
+  surface?: "page" | "studio";
   body: UiNode[];
 }
 

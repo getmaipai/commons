@@ -1888,14 +1888,14 @@ function ExternallyMountedNodeView({ label }: { label: string }) {
 
 export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }): React.ReactElement | null {
   switch (node.type) {
-    case "page":
-      return (
-        <>
-          {node.body.map((child, i) => (
-            <NodeRenderer key={i} node={child} state={state} />
-          ))}
-        </>
-      );
+    case "page": {
+      const body = node.body.map((child, i) => <NodeRenderer key={i} node={child} state={state} />);
+      // VIDEO-STUDIO-02 (K1b): the studio pane carries the token scope on its own element, so it outranks the selected look. Full bleed on a phone.
+      if (node.surface === "studio") {
+        return <div data-surface="studio" className="bg-background text-foreground -mx-4 flex min-h-0 flex-1 flex-col gap-4 px-4 py-4 lg:mx-0 lg:rounded-3xl lg:px-6">{body}</div>;
+      }
+      return <>{body}</>;
+    }
     case "section":
       return <SectionNodeView node={node} state={state} />;
     case "list":
