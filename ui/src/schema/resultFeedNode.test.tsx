@@ -189,14 +189,50 @@ describe("result_feed entries", () => {
     await advance(0);
     const max = view.getByRole("button", { name: "Make it Max" }) as HTMLButtonElement;
     expect(max.disabled).toBe(true);
-    expect(max.title).toBe("Video is not ready yet.");
-    await act(async () => { fireEvent.click(view.getByRole("button", { name: /Try again/ })); });
-    await advance(0);
-    expect(calls.some((c) => c.url.endsWith("/actions/another"))).toBe(false);
+    // K8: the reason shows as visible notice text on the entry, and the built-in Try again is disabled through controls.retry.
+    expect(view.getAllByText("Video is not ready yet.").length).toBeGreaterThan(0);
+    expect((view.getByRole("button", { name: /Try again/ }) as HTMLButtonElement).disabled).toBe(true);
     cleanup();
     const ok = renderWithQueryClient(<Harness />);
     await advance(0);
     expect((ok.getAllByRole("button", { name: "Make it Max" })[0] as HTMLButtonElement).disabled).toBe(false);
+    expect((ok.getByRole("button", { name: /Try again/ }) as HTMLButtonElement).disabled).toBe(false);
+    await act(async () => { fireEvent.click(ok.getByRole("button", { name: /Try again/ })); });
+    await advance(0);
+    expect(calls.some((c) => c.url.endsWith("/actions/another"))).toBe(true);
+  });
+
+  test("a draft entry draws the still, its three built-in actions, Favorite, the icons row and the pane width", async () => {
+    server = [{ ...queued("d"), status: "draft", still: "/still.png", favorite: true }];
+    const node = {
+      ...(feed as object),
+      handlers: {
+        render: { starts: "video", call: { target: "/api/plugins/videos/actions/render", args: { draft: "{id}" } } },
+        another_still: { starts: "picture", call: { target: "/api/plugins/videos/actions/still", args: { draft: "{id}" } } },
+        edit_words: { navigate: { to: "/create" } },
+        favorite: { call: { target: "/api/plugins/videos/actions/favorite", args: { id: "{id}" } } },
+      },
+      actions_variant: "icons",
+      actions_inline: 2,
+    } as unknown as UiNode;
+    const host = { onPlay: () => {}, makingNotice: (kind: string) => (kind === "video" ? "Video is not ready yet." : undefined) } as unknown as MediaHost;
+    const view = renderWithQueryClient(<Harness node={node} host={host} />);
+    await advance(0);
+    const card = view.container.querySelector('[data-slot="video-player"]') as HTMLElement;
+    expect(card.getAttribute("data-status")).toBe("draft");
+    expect(card.className).toContain("max-w-3xl");
+    expect(view.container.querySelector('[data-slot="video-player-still"] img')?.getAttribute("src")).toContain("still.png");
+    // Render starts a video (disabled with the notice), Another still starts a picture (enabled).
+    expect((view.getByRole("button", { name: "Make the video from this" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(view.getAllByText("Video is not ready yet.").length).toBeGreaterThan(0);
+    await act(async () => { fireEvent.click(view.getByRole("button", { name: "Another still" })); });
+    await advance(0);
+    expect(calls.find((c) => c.url.endsWith("/actions/still"))?.body).toEqual({ draft: "d" });
+    const fav = view.getByRole("button", { name: "Favorite" });
+    expect(fav.getAttribute("aria-pressed")).toBe("true");
+    await act(async () => { fireEvent.click(fav); });
+    await advance(0);
+    expect(calls.some((c) => c.url.endsWith("/actions/favorite"))).toBe(true);
   });
 
   test("Favorites only writes page state and the data call carries it; Group by words gathers equal words", async () => {

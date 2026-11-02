@@ -1,10 +1,9 @@
-import { useCallback, useContext, type ReactNode } from "react";
+import { useCallback, useContext, type ComponentProps } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { request } from "@/kit/http";
 import { AsyncState } from "@/kit/primitives/AsyncState";
 import { EmptyState } from "@/kit/primitives/EmptyState";
-import { Button } from "@/kit/ui/button";
-import { getIcon } from "@/kit/icons";
+import { VideoPlayer, type VideoPlayerAction, type VideoPlayerControl, type VideoPlayerControlName, type VideoPlayerStatus } from "@/kit/elements/video-player";
 import { ResultFeed, feedDayLabel, type ResultFeedEntry, type ResultFeedFilter } from "@/kit/elements/result-feed";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
@@ -20,6 +19,10 @@ type Starts = "picture" | "video";
 /** K8: the host's one notice while pictures or video are not ready (`MediaHost.makingNotice`, fed by Home's
  * `useMakingAvailability`). Read through a local type until the shared `MediaHost` declares it. */
 type HostWithNotice = MediaHost & { makingNotice?(kind: Starts): string | null | undefined };
+
+const CONTROL_NAME: Record<FeedHandlerKey, VideoPlayerControlName> = {
+  stop: "stop", retry: "retry", make_another: "makeAnother", render: "render", another_still: "anotherStill", edit_words: "editWords", favorite: "favorite",
+};
 
 const KNOWN = ["queued", "generating", "draft", "ready", "failed", "cancelled"] as const;
 
@@ -107,12 +110,13 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
     const created = f.created_at ? toDate(readField(row, f.created_at)) : null;
     const tagsRaw = f.tags ? readField(row, f.tags) : undefined;
     const refsRaw = f.references ? readField(row, f.references) : undefined;
-    const reasons: Partial<Record<FeedHandlerKey, string>> = {};
-    const player: Record<string, unknown> = {
-      status,
+    const player: Partial<ComponentProps<typeof VideoPlayer>> = {
+      status: status as VideoPlayerStatus,
       prompt: words,
       src,
       poster: f.poster ? str(readField(row, f.poster)) : undefined,
+      // A feed entry uses the pane (design K10), not the Element's 576 px default.
+      size: "lg",
       width: f.width ? num(readField(row, f.width)) : undefined,
       height: f.height ? num(readField(row, f.height)) : undefined,
       progress: f.progress ? num(readField(row, f.progress)) ?? null : undefined,
@@ -121,34 +125,43 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
       startedAt: f.started_at ? num(readField(row, f.started_at)) : undefined,
       error: f.error ? str(readField(row, f.error)) : undefined,
     };
-    // The player's own built-in actions, one prop each (VIDEO-UI-02's names); a handler the page does not declare draws no button.
-    const props: Record<FeedHandlerKey, string> = { stop: "onStop", retry: "onRetry", make_another: "onMakeAnother", render: "onRender", another_still: "onAnotherStill", edit_words: "onEditWords", favorite: "onFavorite" };
+    // The player's own built-in actions: a handler the page does not declare draws no button. K8: `controls.<name>.disabledReason`
+    // disables the button and `starts` marks it for the host.
+    const controls: Partial<Record<VideoPlayerControlName, VideoPlayerControl>> = {};
+    const call = (key: FeedHandlerKey) => { const h = node.handlers?.[key]; return h ? () => dispatch(handlerAction(h), [row]) : undefined; };
     for (const key of FEED_HANDLER_KEYS) {
       const handler = node.handlers?.[key];
       if (!handler) continue;
-      const reason = notice(handler.starts);
-      if (reason) reasons[key] = reason;
-      player[props[key]] = () => { if (!reason) dispatch(handlerAction(handler), [row]); };
+      controls[CONTROL_NAME[key]] = { starts: handler.starts, disabledReason: notice(handler.starts) };
     }
+    player.onStop = call("stop");
+    player.onRetry = call("retry");
+    player.onMakeAnother = call("make_another");
+    player.onRender = call("render");
+    player.onAnotherStill = call("another_still");
+    player.onEditWords = call("edit_words");
+    const favorite = call("favorite");
+    if (favorite) player.onFavorite = favorite;
     if (f.favorite) player.favorite = readField(row, f.favorite) === true;
-    if (Object.keys(reasons).length > 0) player.disabledReasons = reasons;
+    // Keep each control's host default `starts` unless the handler names one.
+    for (const key of Object.keys(controls) as VideoPlayerControlName[]) if (controls[key]!.starts === undefined) delete controls[key]!.starts;
+    if (Object.keys(controls).length > 0) player.controls = controls;
     // K8: one visible line while any action that starts a picture or a video is disabled.
-    const anyReason = Object.values(reasons)[0] ?? (node.actions ?? []).map((a) => notice(a.starts)).find(Boolean);
+    const anyReason = Object.values(controls).map((c) => c.disabledReason).find(Boolean) ?? (node.actions ?? []).map((a) => notice(a.starts)).find(Boolean);
     if (anyReason) player.notice = anyReason;
     if (node.actions_variant === "icons") player.actionsVariant = "icons";
     if (node.actions_inline !== undefined) player.actionsInline = node.actions_inline;
-    const extras = (node.actions ?? []).filter((a) => (a.when ?? ["ready"]).includes(status as "ready"));
-    if (extras.length > 0) {
-      player.actions = extras.map((a, i): ReactNode => {
-        const Icon = a.icon ? getIcon(a.icon) : null;
-        const reason = notice(a.starts);
-        return (
-          <Button key={i} type="button" variant="ghost" size="sm" disabled={Boolean(reason)} title={reason} onClick={() => dispatch(a.action, [row])}>
-            {Icon ? <Icon aria-hidden /> : null}
-            {fillTemplate(a.label, row)}
-          </Button>
-        );
-      });
+    const items = node.actions ?? [];
+    if (items.length > 0) {
+      player.actionItems = items.map((a, i): VideoPlayerAction => ({
+        key: `action-${i}`,
+        label: fillTemplate(a.label, row),
+        icon: a.icon,
+        when: a.when,
+        starts: a.starts,
+        disabledReason: notice(a.starts),
+        onSelect: () => dispatch(a.action, [row]),
+      }));
     }
     return {
       key: keyOf(row),
@@ -158,7 +171,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
         ? refsRaw.flatMap((r) => (r && typeof r === "object" && str((r as Row).label) ? [{ label: str((r as Row).label)!, thumb: str((r as Row).thumb) }] : []))
         : undefined,
       day: created ? feedDayLabel(created) : undefined,
-      player: player as unknown as ResultFeedEntry["player"],
+      player: player as ResultFeedEntry["player"],
     };
   }
 
