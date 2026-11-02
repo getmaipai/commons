@@ -62,3 +62,98 @@ describe("ResultFeed", () => {
     expect(feedDayLabel(new Date(2025, 9, 30), now)).toMatch(/2025/);
   });
 });
+
+// VIDEO-UI-14 (items 2 and 6): the media look and the one View button.
+describe("ResultFeed media look", () => {
+  const mediaEntries = () => ["a", "b", "c"].map((k) => ({ ...entry(k, `words ${k}`, "Today"), tags: ["Anime", "Dolly in"] }));
+
+  test("the default look is unchanged when look is left out or default", () => {
+    const base = render(<ResultFeed entries={mediaEntries()} />).container.innerHTML;
+    cleanup();
+    expect(render(<ResultFeed entries={mediaEntries()} look="default" filtersPresentation="inline" />).container.innerHTML).toBe(base);
+    expect(base).not.toContain("result-feed-grid");
+  });
+
+  test("the newest entry is wide, the rest sit in a grid keyed on the pane's own width", () => {
+    const view = render(<ResultFeed look="media" entries={mediaEntries()} />);
+    const section = view.container.querySelector("[data-slot=result-feed]")!;
+    expect(section.className).toContain("@container");
+    const grid = view.container.querySelector("[data-slot=result-feed-grid]")!;
+    // Two columns from the pane's 42 rem (each at least 320 px with the gap), one below it; a window media query is never used.
+    expect(grid.className).toContain("grid-cols-1");
+    expect(grid.className).toContain("@2xl:grid-cols-2");
+    expect(grid.className).not.toMatch(/(^|\s)(sm|md|lg|xl):grid-cols/);
+    const entries = view.getAllByRole("article");
+    expect(entries[0]!.getAttribute("data-first")).toBe("true");
+    expect(entries[0]!.className).toContain("@2xl:col-span-2");
+    expect(entries[1]!.className).not.toContain("col-span");
+    expect(entries.slice(1).some((e) => e.hasAttribute("data-first"))).toBe(false);
+  });
+
+  test("the words show once per entry, as the feed's own paragraph under the player", () => {
+    const view = render(<ResultFeed look="media" entries={mediaEntries()} />);
+    for (const article of view.getAllByRole("article")) {
+      expect(article.querySelectorAll("[data-slot=result-feed-words]").length).toBe(1);
+      const text = article.textContent ?? "";
+      expect(text.split(article.getAttribute("aria-label")!).length - 1).toBe(1);
+      const words = article.querySelector("[data-slot=result-feed-words]")!;
+      const player = article.querySelector("[data-slot=video-player]")!;
+      expect(player.compareDocumentPosition(words) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+  });
+
+  test("tags and the Start frame chip move onto the picture, with no tag list of the feed's own", () => {
+    const view = render(<ResultFeed look="media" entries={mediaEntries()} />);
+    const first = view.getAllByRole("article")[0]!;
+    expect(first.querySelector("[data-slot=result-feed-tags]")).toBeNull();
+    const badges = [...first.querySelectorAll("[data-slot=video-player-badges] li")].map((li) => li.textContent);
+    expect(badges).toEqual(["Start frame", "Anime", "Dolly in"]);
+  });
+
+  test("every entry state draws in the media look and keeps its visible status parts", () => {
+    const statuses = ["queued", "generating", "draft", "ready", "failed", "cancelled"];
+    const view = render(<ResultFeed look="media" grouping="none" entries={statuses.map((s) => ({ ...entry(s, `w ${s}`, undefined, s), player: { status: s, prompt: `w ${s}`, src: s === "ready" ? "/a.mp4" : undefined, still: "/s.jpg", error: "Nope.", onStop: () => {}, onRetry: () => {}, onRender: () => {}, onFavorite: () => {} } as ResultFeedEntry["player"] }))} />);
+    expect(view.getAllByRole("article").map((a) => a.getAttribute("data-status"))).toEqual(statuses);
+    expect(view.getByText("Waiting its turn")).toBeTruthy();
+    expect(view.getAllByRole("button", { name: "Stop" }).length).toBe(2);
+    expect(view.getByRole("button", { name: "Try again" })).toBeTruthy();
+    expect(view.getByText("Nope.")).toBeTruthy();
+    expect(view.getByText("Stopped. Nothing was kept.")).toBeTruthy();
+    expect(view.container.querySelectorAll("video").length).toBe(1);
+    expect(view.container.querySelectorAll("[data-slot=video-player-still]").length).toBe(1);
+    // No entry prints its words twice, whatever its state.
+    for (const article of view.getAllByRole("article")) expect(article.querySelectorAll("[data-slot=result-feed-words]").length).toBe(1);
+    expect(view.container.querySelectorAll("p.line-clamp-2.text-xs").length).toBe(0);
+  });
+});
+
+describe("ResultFeed filters_presentation popover", () => {
+  const filters = (onFav: (next: boolean) => void = () => {}) => [
+    { kind: "toggle" as const, id: "fav", label: "Favorites only", value: true, onValueChange: onFav },
+    { kind: "toggle" as const, id: "words", label: "Group by words", value: false, onValueChange: () => {} },
+    { kind: "select" as const, id: "type", label: "Type", value: "all", options: [{ value: "all", label: "All" }, { value: "video", label: "Videos" }], onValueChange: () => {} },
+  ];
+
+  test("one View button replaces the three controls and opens them in a dialog", () => {
+    const calls: boolean[] = [];
+    const view = render(<ResultFeed entries={[]} filtersPresentation="popover" filters={filters((v) => calls.push(v))} />);
+    expect(view.queryByRole("switch")).toBeNull();
+    expect(view.queryByRole("combobox")).toBeNull();
+    const button = view.getByRole("button", { name: /^View/ });
+    expect(button.getAttribute("aria-haspopup")).toBe("dialog");
+    expect(view.container.querySelector("[data-slot=result-feed-view-count]")!.textContent).toBe("1");
+    fireEvent.click(button);
+    expect(view.getByRole("switch", { name: "Favorites only" })).toBeTruthy();
+    expect(view.getByRole("switch", { name: "Group by words" })).toBeTruthy();
+    expect(view.getByRole("combobox", { name: "Type" })).toBeTruthy();
+    fireEvent.click(view.getByRole("switch", { name: "Favorites only" }));
+    expect(calls).toEqual([false]);
+  });
+
+  test("inline stays the default and draws the three controls", () => {
+    const view = render(<ResultFeed entries={[]} filters={filters()} />);
+    expect(view.getAllByRole("switch").length).toBe(2);
+    expect(view.getByRole("combobox", { name: "Type" })).toBeTruthy();
+    expect(view.queryByRole("button", { name: /^View/ })).toBeNull();
+  });
+});

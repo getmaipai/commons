@@ -373,3 +373,27 @@ describe("media_shelf library additions (VIDEO-UI-05, K12)", () => {
     expect(getByRole("slider", { name: "Card size" })).toBeTruthy();
   });
 });
+
+describe("media_shelf media_loop (VIDEO-UI-14)", () => {
+  const ROWS = [{ id: "r1", title: "Fox", poster: "/p/1.jpg", loop: "/l/1.mp4" }, { id: "r2", title: "Coast", poster: "/p/2.jpg", loop: "https://x.test/l.mp4" }];
+  const rail = { type: "media_shelf", bind: { source: "package", path: "showcase", stream: false }, item_key_field: "id", item_label_field: "title", item_media_field: "poster", aspect: "poster", variant: "plain", hide_when_empty: false, orientation: "horizontal" } as UiNode;
+  beforeEach(() => {
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify(ROWS), { status: 200 }))) as unknown as typeof fetch;
+  });
+
+  test("a shelf without media_loop draws images only, as before", async () => {
+    const { findAllByRole, container } = inVideos(rail, null);
+    await findAllByRole("list");
+    expect(container.querySelectorAll("video").length).toBe(0);
+    expect(container.querySelectorAll("img").length).toBe(2);
+  });
+
+  test("media_loop draws a muted clip over each poster from a same-origin path, and the poster alone for any other address", async () => {
+    const { findAllByRole, container } = inVideos({ ...rail, media_loop: true, item_loop_field: "loop" } as UiNode, null);
+    await findAllByRole("list");
+    const videos = container.querySelectorAll("video");
+    expect(videos.length).toBe(1);
+    expect(videos[0]!.getAttribute("src")).toBe("/l/1.mp4");
+    expect(container.querySelectorAll("img").length).toBe(2);
+  });
+});

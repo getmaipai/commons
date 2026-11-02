@@ -2,6 +2,7 @@
 
 import { useId, useState, type ReactNode } from "react";
 import { MoreHorizontalIcon } from "lucide-react";
+import { cn } from "cn";
 import { getIcon } from "@/kit/icons";
 import { Button } from "@/kit/ui/button";
 import { Checkbox } from "@/kit/ui/checkbox";
@@ -138,6 +139,7 @@ export function ActionRow({
   moreLabel,
   slot,
   trailing,
+  className,
 }: {
   actions: RowAction[];
   icons: boolean;
@@ -145,6 +147,8 @@ export function ActionRow({
   moreLabel: string;
   slot?: ReactNode;
   trailing?: ReactNode;
+  /** Extra classes on the row (VIDEO-UI-14: the hover reveal and the overlay alignment). */
+  className?: string;
 }) {
   const capped = actions.slice(0, VIDEO_PLAYER_ACTION_CAP);
   const limit = typeof inline === "number" ? Math.max(0, Math.min(VIDEO_PLAYER_ACTION_CAP, Math.floor(inline))) : capped.length;
@@ -152,7 +156,7 @@ export function ActionRow({
   const more = capped.length > limit ? capped.slice(limit) : [];
   return (
     <TooltipProvider delayDuration={300}>
-      <div data-slot="video-player-actions" data-variant={icons ? "icons" : "labelled"} className={icons ? "flex flex-wrap items-center gap-1" : "flex flex-wrap items-center gap-2"}>
+      <div data-slot="video-player-actions" data-variant={icons ? "icons" : "labelled"} className={cn(icons ? "flex flex-wrap items-center gap-1" : "flex flex-wrap items-center gap-2", className)}>
         {shown.map(action => <ActionButton key={action.key} action={action} icons={icons} />)}
         {more.length > 0 ? (
           <DropdownMenu>

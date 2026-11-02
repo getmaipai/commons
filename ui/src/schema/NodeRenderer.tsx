@@ -9,6 +9,7 @@ import { cn } from "@/kit/utils";
 import { List } from "@/kit/primitives/List";
 import { CardGrid } from "@/kit/primitives/CardGrid";
 import { MediaShelf } from "@/kit/primitives/MediaShelf";
+import { LoopPoster } from "@/kit/primitives/LoopPoster";
 import { CategoryTiles, QuickTiles, TopResultCard, TrackRows } from "@/kit/primitives/MusicBlocks";
 import { Billboard } from "@/kit/primitives/Billboard";
 import { Player, type PlayerChapter, type PlayerTextTrack, type PlayerUpNext } from "@/kit/primitives/Player";
@@ -981,6 +982,11 @@ function CardGridNodeView({ node }: { node: CardGridNode }) {
 }
 
 /** A same-origin picture path, or nothing: an address with a scheme or a host is never loaded (RowMedia's rule). */
+/** VIDEO-UI-14: a same-origin clip path (starting with one `/`), else none; the tile then shows its poster alone. */
+function localVideo(value: unknown): string | null {
+  return localPicture(value);
+}
+
 function localPicture(value: unknown): string | null {
   return typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : null;
 }
@@ -1104,6 +1110,7 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             )}
             renderItem={(row) => {
               const src = localPicture(readField(row, node.item_media_field));
+              if (node.media_loop && node.item_loop_field) return <LoopPoster poster={src} loop={localVideo(readField(row, node.item_loop_field))} kind={pictureKind(readField(row, "kind"))} />;
               return <SafeImage src={src} kind={pictureKind(readField(row, "kind"))} alt="" className="h-full w-full object-cover" />;
             }}
             getProgress={node.item_progress_field ? (row) => Number(readField(row, node.item_progress_field!)) : undefined}

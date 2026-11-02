@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   AlertCircleIcon,
   DownloadIcon,
+  PlayIcon,
   ImagePlusIcon,
   PencilLineIcon,
   RefreshCwIcon,
@@ -87,6 +88,7 @@ export interface VideoPlayerCopy {
   cancel?: string;
   favorite?: string;
   more?: string;
+  play?: string;
 }
 
 const DEFAULT_COPY: Required<VideoPlayerCopy> = {
@@ -105,6 +107,7 @@ const DEFAULT_COPY: Required<VideoPlayerCopy> = {
   cancel: "Cancel",
   favorite: "Favorite",
   more: "More",
+  play: "Play",
 };
 
 /** m:ss for a count of milliseconds. */
@@ -179,6 +182,10 @@ export function VideoPlayer({
   actionItems,
   actionsVariant = "labelled",
   actionsInline,
+  actionsReveal = "always",
+  chrome = "default",
+  caption = true,
+  badges,
   actions,
   copy,
   className,
@@ -241,6 +248,18 @@ export function VideoPlayer({
   actionsVariant?: "labelled" | "icons";
   /** How many row actions draw as buttons; the rest sit behind a More menu. Default all (up to the cap). */
   actionsInline?: number;
+  /** VIDEO-UI-14: `hover` shows the icon row of a `ready` or `draft` clip on pointer hover and on keyboard focus anywhere in the player,
+   * and always on a touch device (no hover). Only that row hides: the `notice`, progress, Stop, the failed reason and Try again stay
+   * visible in every status. Default `always`. */
+  actionsReveal?: "always" | "hover";
+  /** VIDEO-UI-14: `overlay` draws Favorite, a Play button and the icon row over a `ready` or `draft` picture on `--art-overlay` and
+   * `--art-foreground`, instead of in a row under it. Other statuses keep their row under the picture. Default `default`. */
+  chrome?: "default" | "overlay";
+  /** VIDEO-UI-14: false leaves out the prompt caption under the clip (the host prints the words once itself). The prompt is still the
+   * clip's accessible name. Default true. */
+  caption?: boolean;
+  /** VIDEO-UI-14: short strings drawn on the picture's top edge, in every status. */
+  badges?: string[];
   /** Extra buttons after the standard ones (for example "Animate"). */
   actions?: ReactNode;
   copy?: VideoPlayerCopy;
@@ -260,6 +279,13 @@ export function VideoPlayer({
   const value = barValue(progress, elapsedMs, estimateMs);
   const [sheetAction, setSheetAction] = useState<VideoPlayerAction | null>(null);
   const icons = actionsVariant === "icons";
+  // VIDEO-UI-14: the overlay chrome and the hover reveal reach only a clip with a picture (`ready` with a source, or `draft`).
+  const hasPicture = status === "draft" || (status === "ready" && Boolean(src));
+  const overlay = chrome === "overlay" && hasPicture;
+  const reveal = actionsReveal === "hover" && (status === "ready" || status === "draft");
+  const tags = (badges ?? []).filter(Boolean);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [playing, setPlaying] = useState(false);
   const control = (name: VideoPlayerControlName) => ({ disabledReason: controls?.[name]?.disabledReason, starts: controls?.[name]?.starts ?? DEFAULT_STARTS[name] });
 
   // The row: items placed at the start, the built-ins for this status, then items placed at the end.
@@ -294,9 +320,8 @@ export function VideoPlayer({
     <FavoriteToggle label={text.favorite} pressed={favorite} icons={icons} disabledReason={favoriteControl.disabledReason} onToggle={() => onFavorite(!favorite)} />
   ) : null;
 
-  return (
-    <Card data-slot="video-player" data-status={status} className={cn("w-full gap-0 overflow-hidden py-0", SIZE_CLASS[size], className)}>
-      {status === "draft" ? (
+  const picture = (
+      status === "draft" ? (
         <div data-slot="video-player-still" className="bg-muted relative block w-full overflow-hidden" style={{ aspectRatio: ratio }}>
           <SafeImage src={still ?? poster} alt={prompt} kind="video" className="size-full object-cover" />
         </div>
@@ -305,11 +330,13 @@ export function VideoPlayer({
         // eslint-disable-next-line jsx-a11y/media-has-caption
         <video
           data-slot="video-player-media"
+          ref={videoRef}
           className="bg-muted block w-full"
           style={{ aspectRatio: ratio }}
           src={src}
           poster={poster}
-          controls
+          controls={overlay ? playing : true}
+          {...(overlay ? { onPlay: () => setPlaying(true), onPause: () => setPlaying(false), onEnded: () => setPlaying(false) } : {})}
           loop={loop}
           playsInline
           preload="metadata"
@@ -327,8 +354,56 @@ export function VideoPlayer({
             </div>
           ) : null}
         </GenerationStage>
-      )}
-      <CardContent className="flex flex-col gap-3 py-3">
+      )
+  );
+
+  const REVEAL = "motion-safe:transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/player:opacity-100 group-focus-within/player:opacity-100";
+  const rowHasContent = rowActions.length > 0 || Boolean(actions);
+  const framed = overlay || tags.length > 0 ? (
+    <div data-slot="video-player-picture" className="relative">
+      {picture}
+      {tags.length > 0 ? (
+        <ul data-slot="video-player-badges" aria-label="Details" className={cn("pointer-events-none absolute start-3 top-3 m-0 flex list-none flex-wrap gap-1.5 p-0", overlay && favoriteButton ? "end-14" : "end-3")}>
+          {tags.map((tag, i) => (
+            <li key={`${i}-${tag}`} className="rounded-full bg-[var(--art-overlay)] px-2.5 py-0.5 text-xs font-medium text-[var(--art-foreground)] backdrop-blur-sm">{tag}</li>
+          ))}
+        </ul>
+      ) : null}
+      {overlay && favoriteButton ? (
+        <div data-slot="video-player-overlay-favorite" className="absolute end-3 top-3 rounded-full bg-[var(--art-overlay)] text-[var(--art-foreground)] backdrop-blur-sm">{favoriteButton}</div>
+      ) : null}
+      {overlay && status === "ready" && !playing ? (
+        <button
+          type="button"
+          data-slot="video-player-play"
+          aria-label={text.play}
+          onClick={() => { try { void videoRef.current?.play?.()?.catch?.(() => {}); } catch { /* the native controls remain */ } }}
+          className="absolute start-3 bottom-3 flex size-10 items-center justify-center rounded-full bg-[var(--art-overlay)] text-[var(--art-foreground)] backdrop-blur-sm focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+        >
+          <PlayIcon aria-hidden className="size-5 fill-current" />
+        </button>
+      ) : null}
+      {overlay && rowHasContent ? (
+        <div
+          data-slot="video-player-overlay-actions"
+          className={cn(
+            "absolute end-3 rounded-2xl bg-[var(--art-overlay)] px-1 py-0.5 text-[var(--art-foreground)] backdrop-blur-sm",
+            // A draft has no Play button and a wide main action, so its row takes the picture's full width; a clip leaves room for Play.
+            status === "draft" ? "start-3" : "max-w-[calc(100%-4.5rem)]",
+            playing ? "bottom-14" : "bottom-3",
+            reveal && REVEAL,
+          )}
+        >
+          <ActionRow actions={rowActions} icons={icons} inline={actionsInline} moreLabel={text.more} slot={actions} className="justify-end" />
+        </div>
+      ) : null}
+    </div>
+  ) : picture;
+
+  return (
+    <Card data-slot="video-player" data-status={status} className={cn("w-full gap-0 overflow-hidden py-0", (reveal || overlay) && "group/player", SIZE_CLASS[size], className)}>
+      {framed}
+      {overlay && !notice && !(caption && prompt) ? null : <CardContent className="flex flex-col gap-3 py-3">
         {live ? (
           <>
             <Progress value={value} aria-label={text.generating} aria-valuetext={startedAt ? `${value} percent, ${formatClock(elapsedMs)} so far` : `${value} percent`} />
@@ -356,11 +431,11 @@ export function VideoPlayer({
         ) : null}
         {status === "cancelled" ? <p className="text-muted-foreground text-sm">{text.stopped}</p> : null}
         {notice ? <p data-slot="video-player-notice" className="text-muted-foreground text-xs">{notice}</p> : null}
-        {status === "draft" || status === "ready" || status === "failed" || status === "cancelled" ? (
-          <ActionRow actions={rowActions} icons={icons} inline={actionsInline} moreLabel={text.more} slot={actions} trailing={favoriteButton} />
+        {!overlay && (status === "draft" || status === "ready" || status === "failed" || status === "cancelled") ? (
+          <ActionRow actions={rowActions} icons={icons} inline={actionsInline} moreLabel={text.more} slot={actions} trailing={favoriteButton} className={reveal ? REVEAL : undefined} />
         ) : null}
-        {(status === "ready" || status === "draft") && prompt ? <p className="text-muted-foreground line-clamp-2 text-xs">{prompt}</p> : null}
-      </CardContent>
+        {(status === "ready" || status === "draft") && prompt && caption ? <p className="text-muted-foreground line-clamp-2 text-xs">{prompt}</p> : null}
+      </CardContent>}
       {sheetAction?.sheet ? (
         <ActionSheet
           sheet={sheetAction.sheet}

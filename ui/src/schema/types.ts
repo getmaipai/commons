@@ -222,6 +222,9 @@ export const MediaShelfNodeSchema = z.object({
   group_noun: z.object({ one: z.string().min(1).max(24), other: z.string().min(1).max(24) }).strict().optional(),
   size_control: z.boolean().optional(),
   favorite: z.object({ field: z.string().min(1), action: ActionSchema }).strict().optional(),
+  // VIDEO-UI-14: a muted loop over the poster (`item_loop_field` is the clip's same-origin path).
+  media_loop: z.boolean().optional(),
+  item_loop_field: z.string().optional(),
   on_select: ActionSchema.optional(),
   empty_state: EmptyStateNodeSchema.optional(),
 });
@@ -678,6 +681,9 @@ export const ResultFeedNodeSchema = z.object({
     .optional(),
   actions_variant: z.enum(["default", "icons"]).default("default"),
   actions_inline: z.number().int().min(1).max(8).optional(),
+  // VIDEO-UI-14: the media-first feed and the one View button for the filters.
+  look: z.enum(["default", "media"]).default("default"),
+  filters_presentation: z.enum(["inline", "popover"]).default("inline"),
   poll_while: z
     .object({
       statuses: z.array(z.enum(["queued", "generating"])).min(1),

@@ -1,6 +1,12 @@
 "use client";
 
-import { type ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
+import { SlidersHorizontalIcon } from "lucide-react";
+import { cn } from "cn";
+import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
+import { Button } from "@/kit/ui/button";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/kit/ui/drawer";
+import { Popover, PopoverContent, PopoverTrigger } from "@/kit/ui/popover";
 import { Badge } from "@/kit/ui/badge";
 import { Label } from "@/kit/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
@@ -75,6 +81,76 @@ export function groupFeedEntries(entries: ResultFeedEntry[], by: "day" | "words"
   return groups;
 }
 
+function FilterControls({ filters, idPrefix }: { filters: ResultFeedFilter[]; idPrefix: string }) {
+  return (
+    <>
+      {filters.map((filter) =>
+        filter.kind === "toggle" ? (
+          <div key={filter.id} className="flex items-center gap-2">
+            <Switch id={`${idPrefix}-${filter.id}`} checked={filter.value} onCheckedChange={filter.onValueChange} />
+            <Label htmlFor={`${idPrefix}-${filter.id}`}>{filter.label}</Label>
+          </div>
+        ) : (
+          <div key={filter.id} className="flex items-center gap-2">
+            <Label htmlFor={`${idPrefix}-${filter.id}`}>{filter.label}</Label>
+            <Select value={filter.value} onValueChange={filter.onValueChange}>
+              <SelectTrigger id={`${idPrefix}-${filter.id}`} aria-label={filter.label}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {filter.options.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ),
+      )}
+    </>
+  );
+}
+
+/** How many filters are away from their starting value (a toggle on, a select not on its first option). */
+function activeFilters(filters: ResultFeedFilter[]): number {
+  return filters.filter((f) => (f.kind === "toggle" ? f.value : f.value !== f.options[0]?.value)).length;
+}
+
+/** VIDEO-UI-14 (item 6): the same controls behind one View button: a popover, and the kit's bottom sheet on a phone. */
+function FilterView({ filters }: { filters: ResultFeedFilter[] }) {
+  const phone = useIsPhoneLayout();
+  const [open, setOpen] = useState(false);
+  const active = activeFilters(filters);
+  const trigger = (
+    <Button type="button" variant="outline" size="sm" data-slot="result-feed-view" aria-haspopup="dialog" aria-expanded={open} onClick={phone ? () => setOpen(true) : undefined}>
+      <SlidersHorizontalIcon aria-hidden />
+      View
+      {active > 0 ? <span data-slot="result-feed-view-count" aria-label={`${active} on`} className="bg-primary text-primary-foreground inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs tabular-nums">{active}</span> : null}
+    </Button>
+  );
+  const body = <div role="group" aria-label="Filter results" className="flex flex-col gap-4"><FilterControls filters={filters} idPrefix="result-feed-view" /></div>;
+  return (
+    <div data-slot="result-feed-filters" data-presentation="popover" className="flex min-w-0 items-center gap-3">
+      {phone ? (
+        <>
+          {trigger}
+          <Drawer open={open} onOpenChange={setOpen}>
+            <DrawerContent aria-describedby={undefined}>
+              <DrawerHeader><DrawerTitle>View</DrawerTitle></DrawerHeader>
+              <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">{body}</div>
+            </DrawerContent>
+          </Drawer>
+        </>
+      ) : (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+          <PopoverContent width="auto" align="start" aria-label="View" className="w-[min(92vw,20rem)]">{body}</PopoverContent>
+        </Popover>
+      )}
+      <span className="text-muted-foreground min-w-0 truncate text-sm">{filters.map((f, i) => (i === 0 ? f.label : f.label.toLowerCase())).join(", ")}</span>
+    </div>
+  );
+}
+
 /**
  * VIDEO-UI-04 (K10): a newest-first feed of generated clips. Each entry shows its words, tags and reference chips (a Start
  * frame with its thumbnail), then one `VideoPlayer` in whatever status the job has. A filter bar (toggles and selects)
@@ -87,6 +163,8 @@ export function ResultFeed({
   grouping = "day",
   label = "Results",
   empty,
+  look = "default",
+  filtersPresentation = "inline",
 }: {
   entries: ResultFeedEntry[];
   filters?: ResultFeedFilter[];
@@ -95,63 +173,68 @@ export function ResultFeed({
   label?: string;
   /** Shown instead of the list when there are no entries (the filter bar stays). */
   empty?: React.ReactNode;
+  /** VIDEO-UI-14: `media` draws the feed picture first: the newest entry wide, the rest in a grid (two columns only while the feed's own
+   * pane gives each at least 320 px, one otherwise), the tags on the picture, the words once under it, and the player's icon row over
+   * the picture on hover or focus (always on touch). Default `default`: one column, the words above the player. */
+  look?: "default" | "media";
+  /** VIDEO-UI-14: `popover` puts the filters behind one View button (a sheet on a phone). Default `inline`. */
+  filtersPresentation?: "inline" | "popover";
 }) {
   const groups = groupFeedEntries(entries, grouping);
+  const media = look === "media";
   return (
-    <section data-slot="result-feed" aria-label={label} className="flex w-full flex-col gap-4">
-      {filters.length > 0 ? (
+    <section data-slot="result-feed" aria-label={label} className={cn("flex w-full flex-col gap-4", media && "@container")} data-look={media ? "media" : undefined}>
+      {filters.length > 0 && filtersPresentation === "popover" ? <FilterView filters={filters} /> : null}
+      {filters.length > 0 && filtersPresentation !== "popover" ? (
         <div data-slot="result-feed-filters" role="group" aria-label="Filter results" className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          {filters.map((filter) =>
-            filter.kind === "toggle" ? (
-              <div key={filter.id} className="flex items-center gap-2">
-                <Switch id={`result-feed-${filter.id}`} checked={filter.value} onCheckedChange={filter.onValueChange} />
-                <Label htmlFor={`result-feed-${filter.id}`}>{filter.label}</Label>
-              </div>
-            ) : (
-              <div key={filter.id} className="flex items-center gap-2">
-                <Label htmlFor={`result-feed-${filter.id}`}>{filter.label}</Label>
-                <Select value={filter.value} onValueChange={filter.onValueChange}>
-                  <SelectTrigger id={`result-feed-${filter.id}`} aria-label={filter.label}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filter.options.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            ),
-          )}
+          <FilterControls filters={filters} idPrefix="result-feed" />
         </div>
       ) : null}
       {entries.length === 0 ? empty ?? null : null}
       {groups.map((group) => (
         <div key={group.key} data-slot="result-feed-group" className="flex flex-col gap-4">
           {group.label ? <DayDivider label={grouping === "words" ? shorten(group.label) : `${group.label}, ${countLabel(group.entries.length)}`} /> : null}
-          {group.entries.map((entry) => (
-            <article key={entry.key} data-slot="result-feed-entry" data-status={entry.player.status} aria-label={shorten(entry.words)} className="flex flex-col gap-2">
-              <p data-slot="result-feed-words" className="text-foreground line-clamp-3 text-sm">{entry.words}</p>
-              {(entry.tags?.length ?? 0) > 0 || (entry.references?.length ?? 0) > 0 ? (
-                <ul data-slot="result-feed-tags" aria-label="Details" className="flex flex-wrap items-center gap-1.5">
-                  {entry.references?.map((ref, i) => (
-                    <li key={`ref-${i}`}>
-                      <Badge variant="outline">
-                        {ref.thumb ? <SafeImage src={ref.thumb} alt="" kind="picture" className="size-4 rounded-full object-cover" /> : null}
-                        {ref.label}
-                      </Badge>
-                    </li>
-                  ))}
-                  {entry.tags?.map((tag, i) => (
-                    <li key={`tag-${i}`}>
-                      <Badge variant="secondary">{tag}</Badge>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-              <VideoPlayer {...(entry.player as ComponentProps<typeof VideoPlayer>)} />
-            </article>
-          ))}
+          {(() => {
+            const articles = group.entries.map((entry) => {
+              const first = media && entry.key === entries[0]?.key;
+              const player = entry.player as ComponentProps<typeof VideoPlayer>;
+              const picked = [...(entry.references?.map((r) => r.label) ?? []), ...(entry.tags ?? [])];
+              return (
+                <article key={entry.key} data-slot="result-feed-entry" data-status={entry.player.status} data-first={first ? "true" : undefined} aria-label={shorten(entry.words)} className={cn("flex min-w-0 flex-col gap-2", first && "@2xl:col-span-2")}>
+                  {media ? (
+                    <>
+                      <VideoPlayer {...player} size={first ? "xl" : "full"} caption={false} badges={picked} chrome="overlay" actionsReveal="hover" />
+                      <p data-slot="result-feed-words" className="text-foreground line-clamp-2 text-sm">{entry.words}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p data-slot="result-feed-words" className="text-foreground line-clamp-3 text-sm">{entry.words}</p>
+                      {(entry.tags?.length ?? 0) > 0 || (entry.references?.length ?? 0) > 0 ? (
+                        <ul data-slot="result-feed-tags" aria-label="Details" className="flex flex-wrap items-center gap-1.5">
+                          {entry.references?.map((ref, i) => (
+                            <li key={`ref-${i}`}>
+                              <Badge variant="outline">
+                                {ref.thumb ? <SafeImage src={ref.thumb} alt="" kind="picture" className="size-4 rounded-full object-cover" /> : null}
+                                {ref.label}
+                              </Badge>
+                            </li>
+                          ))}
+                          {entry.tags?.map((tag, i) => (
+                            <li key={`tag-${i}`}>
+                              <Badge variant="secondary">{tag}</Badge>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                      <VideoPlayer {...player} />
+                    </>
+                  )}
+                </article>
+              );
+            });
+            // The media look gathers a group's entries in a grid; the default look keeps them as direct children of the group.
+            return media ? <div data-slot="result-feed-grid" className="grid min-w-0 grid-cols-1 gap-4 @2xl:grid-cols-2">{articles}</div> : articles;
+          })()}
         </div>
       ))}
     </section>

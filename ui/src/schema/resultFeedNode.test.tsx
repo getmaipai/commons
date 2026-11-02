@@ -257,3 +257,29 @@ describe("result_feed entries", () => {
     expect(view.getByRole("switch", { name: "Favorites only" })).toBeTruthy();
   });
 });
+
+describe("result_feed look and filters_presentation (VIDEO-UI-14)", () => {
+  test("the schema defaults leave the node as it was, and the new values parse", () => {
+    const parsed = ResultFeedNodeSchema.parse(feed);
+    expect(parsed.look).toBe("default");
+    expect(parsed.filters_presentation).toBe("inline");
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), look: "media", filters_presentation: "popover" }).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), look: "masonry" }).success).toBe(false);
+  });
+
+  test("look media puts the entry's tags on its picture and its words once, and popover keeps the filters behind View", async () => {
+    server = [queued("a", { status: "ready", src: "/a.mp4", favorite: false }), queued("b", { status: "generating", percent: 30 })];
+    const node = ResultFeedNodeSchema.parse({ ...(feed as object), look: "media", filters_presentation: "popover", actions_variant: "icons", handlers: { ...(feed as { handlers: object }).handlers, favorite: { call: { target: "/api/plugins/videos/actions/favorite", args: { id: "{id}" } } } } }) as unknown as UiNode;
+    const view = renderWithQueryClient(<Harness node={node} />);
+    await advance(0);
+    const articles = view.getAllByRole("article");
+    expect(articles.length).toBe(2);
+    expect(articles[0]!.querySelectorAll("[data-slot=video-player-badges] li").length).toBe(2);
+    expect(articles[0]!.querySelector("[data-slot=video-player-overlay-favorite]")).toBeTruthy();
+    expect(articles[1]!.getAttribute("data-status")).toBe("generating");
+    expect(view.getByRole("button", { name: "Stop" })).toBeTruthy();
+    expect(view.queryByRole("switch", { name: "Favorites only" })).toBeNull();
+    fireEvent.click(view.getByRole("button", { name: /^View/ }));
+    expect(view.getByRole("switch", { name: "Favorites only" })).toBeTruthy();
+  });
+});
