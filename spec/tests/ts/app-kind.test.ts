@@ -208,6 +208,14 @@ describe("the News pages (NEWS-00)", () => {
     expect(run({ ...base, fields: { words: "https://x.test/a", status: "s", src: "https://x.test/a.mp4" } })).toContain("result_feed.fields: src must be a field path");
     expect(run({ ...base, filters: [{ kind: "toggle", state: "a", label: "A" }, { kind: "toggle", state: "a", label: "B" }] })).toContain('filter state key "a" is used twice');
   });
+  test("VIDEO-UI-14: a looping media_shelf names the field of its clip, and that field is a path", () => {
+    const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
+    const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "today" }, item_key_field: "id", item_label_field: "t", item_media_field: "poster" };
+    expect(run({ ...shelf, media_loop: true, item_loop_field: "loop" })).not.toContain("media_loop");
+    expect(run({ ...shelf, media_loop: true })).toContain("media_loop needs item_loop_field");
+    expect(run({ ...shelf, media_loop: true, item_loop_field: "https://x.test/a.mp4" })).toContain("item_loop_field");
+  });
   test("VIDEO-UI-03: one in-field reference, a picture kind only, submit_detail names a bar key, and a panel bar is not combined with the phone aside sheet", () => {
     const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
     const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");

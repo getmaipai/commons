@@ -461,6 +461,8 @@
             "action": { "$ref": "#/$defs/action" }
           }
         },
+        "media_loop": { "type": "boolean", "default": false, "description": "VIDEO-UI-14 (item 8): a tile plays a muted, looped clip over its poster (`item_media_field`, still an image). The clip's same-origin path is read from `item_loop_field`. It plays while the tile is in view, is paused off screen, and under reduced motion only the poster shows. A row with no readable clip shows its poster alone. Rail and grid layouts." },
+        "item_loop_field": { "type": "string", "description": "VIDEO-UI-14: dotted path to the same-origin path of a short silent mp4 (starting with `/`) that `media_loop` plays over the poster. Required when `media_loop` is true." },
         "on_select": { "$ref": "#/$defs/action" },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
@@ -647,6 +649,8 @@
         },
         "actions_variant": { "type": "string", "enum": ["default", "icons"], "default": "default", "description": "Passed to each VideoPlayer; `icons` needs VIDEO-UI-02's player." },
         "actions_inline": { "type": "integer", "minimum": 1, "maximum": 8, "description": "Passed to each VideoPlayer; the rest go in its More menu (VIDEO-UI-02)." },
+        "look": { "type": "string", "enum": ["default", "media"], "default": "default", "description": "VIDEO-UI-14 (item 2): `media` draws the feed picture first: the newest entry wide and the rest in a grid (two columns only while the feed's own pane gives each at least 320 px, one otherwise), the entry's tags drawn on the picture's top edge, the words shown once under it, and the player's icon row over the picture, shown on hover or keyboard focus and always on touch. A running, failed or stopped entry keeps its progress, Stop, reason and Try again visible. `default` is the single column with the words above the player." },
+        "filters_presentation": { "type": "string", "enum": ["inline", "popover"], "default": "inline", "description": "VIDEO-UI-14 (item 6): `popover` puts the same filter controls behind one View button (a popover, a sheet on a phone); `inline` draws them in a row above the feed." },
         "poll_while": {
           "type": "object",
           "additionalProperties": false,

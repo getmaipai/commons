@@ -256,6 +256,19 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, actions: [{ label: "A", starts: "audio", action: { call: { target: "/x" } } }] })).toBe(false);
     expect(validate({ ...ok, actions_variant: "wide" })).toBe(false);
   });
+  test("VIDEO-UI-14: result_feed look and filters_presentation, media_shelf media_loop and item_loop_field (all optional)", () => {
+    const feed = { type: "result_feed", bind: { source: "package", path: "recipes" }, fields: { words: "prompt", status: "status" }, poll_while: { statuses: ["queued"], record: { path: "recipes" } } };
+    expect(validate(feed)).toBe(true);
+    for (const look of ["default", "media"]) expect(validate({ ...feed, look })).toBe(true);
+    for (const look of ["grid", "wide", true]) expect(validate({ ...feed, look })).toBe(false);
+    for (const filters_presentation of ["inline", "popover"]) expect(validate({ ...feed, filters_presentation })).toBe(true);
+    for (const filters_presentation of ["sheet", false]) expect(validate({ ...feed, filters_presentation })).toBe(false);
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "x" }, item_key_field: "id", item_label_field: "t", item_media_field: "m" };
+    expect(validate({ ...shelf, media_loop: true, item_loop_field: "loop" })).toBe(true);
+    expect(validate({ ...shelf, media_loop: false })).toBe(true);
+    expect(validate({ ...shelf, media_loop: "yes" })).toBe(false);
+    expect(validate({ ...shelf, item_loop_field: 3 })).toBe(false);
+  });
   test("VIDEO-UI-03: prompt_bar placement, suggestions, submit_detail, starts, chip presentation, group and fold, reference placement and kinds", () => {
     const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
     const look = { state: "look", label: "Look", variant: "cards", presentation: "popover", group: "Style", options: [{ value: "a", label: "A" }] };
