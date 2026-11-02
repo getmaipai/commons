@@ -1,3 +1,7 @@
+## [spec-v0.1.308] - 2026-11-02
+
+- VIDEO-UI-14: `result_feed` gains the optional `look` (`default`, or `media`: the newest entry wide, a grid keyed on the feed's pane width, the tags on the picture, one caption) and `filters_presentation` (`inline` default, or `popover`: one View button). `media_shelf` gains the optional `media_loop` (boolean) and `item_loop_field` (dotted path to a same-origin mp4 looped over the poster); `checkAppPackage` requires `item_loop_field` when `media_loop` is true and checks it is a field path. All additive; old pages are unchanged.
+
 ## [spec-v0.1.307] - 2026-11-02
 
 - VIDEO-UI-13 (items 4 and 5 of the Videos Create feel note): `prompt_bar` chips in a popover `group` gain `trigger` (`default`, or `banner`: the shared trigger drawn as a poster banner) and `popover_size` (`default`, or `wide`: a wider popover, six cards a row); both are read from the first chip of the group that sets them. `split_view` (main and aside form) gains `main_surface` (`page` default, or `stage`: the main column on the recessed kit surface). All additive; old pages are unchanged.
