@@ -1,3 +1,7 @@
+## [ui-v0.5.457] - 2026-11-01
+
+- MUSIC-POLISH-01: the circle tile centres itself in its grid cell (`mx-auto`), so it stays under its centred name when a large text scale makes one column wider than the circle. Additive.
+
 ## [ui-v0.5.456] - 2026-11-01
 
 - MUSIC-POLISH-01: the kit icon set registers `shuffle` and `radio`. `CreationHeader` asked for `shuffle` all along and drew the unknown-icon question mark in its place. Additive.

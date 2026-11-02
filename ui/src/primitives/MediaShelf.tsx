@@ -149,7 +149,7 @@ export function MediaShelf<T>({
   const tight = cardRadius === "tight";
   const artClasses = cn(
     "relative w-full overflow-hidden bg-[var(--muted)]",
-    circle ? ["aspect-square rounded-full", orientation === "vertical" ? "" : "w-[var(--media-artist-size)] max-w-full"] : [tight ? "rounded-[var(--media-card-radius)]" : "rounded-[var(--radius)]", ASPECT_CLASSES[aspect]],
+    circle ? ["aspect-square rounded-full", orientation === "vertical" ? "" : "mx-auto w-[var(--media-artist-size)] max-w-full"] : [tight ? "rounded-[var(--media-card-radius)]" : "rounded-[var(--radius)]", ASPECT_CLASSES[aspect]],
   );
   // The Card surface has its own radius; a tight tile clips to the same 8 px so the art and its frame agree.
   const tileClasses = cn(tight && !circle && "rounded-[var(--media-card-radius)]", pressScale && PRESS_CLASSES);

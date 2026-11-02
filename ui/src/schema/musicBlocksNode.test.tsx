@@ -96,7 +96,7 @@ describe("music block nodes", () => {
   test("a circle media_shelf draws a fixed artist-size circle with a centred name, and a category tile carries its colour on the tile (MUSIC-POLISH-01)", async () => {
     const { view } = draw(parse({ type: "media_shelf", heading: "Artists", bind, item_key_field: "id", item_label_field: "title", item_media_field: "cover", art_shape: "circle", variant: "plain" }));
     await view.findByRole("list", { name: "Artists" });
-    expect(view.container.innerHTML).toContain("w-[var(--media-artist-size)]");
+    expect(view.container.innerHTML).toContain("mx-auto w-[var(--media-artist-size)]");
     expect(view.container.querySelector("li")?.className).toContain("text-center");
     const tiles = draw(parse({ type: "category_tiles", label: "Browse", bind, item_key_field: "id", item_label_field: "title", item_color_field: "color" }));
     await tiles.view.findByRole("list", { name: "Browse" });
