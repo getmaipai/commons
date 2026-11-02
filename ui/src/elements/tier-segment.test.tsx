@@ -61,3 +61,48 @@ describe("TierChip", () => {
     expect(released).toBe(1);
   });
 });
+
+describe("TierSegment presentation cards (VIDEO-UI-12)", () => {
+  const level: TierOptionDef[] = [
+    { id: "standard", label: "Standard", hint: "Fast, with sound" },
+    { id: "boost", label: "Boost", hint: "Sharper picture" },
+    { id: "max", label: "Max", hint: "Best", disabledReason: "Not set up on this home yet" },
+  ];
+  const details = { standard: "Under a minute", boost: "About a minute", max: "Long" };
+  test("one card per level: label, promise and time; a disabled level shows its reason and no time", () => {
+    const { getAllByRole, getByText, queryByText } = render(<TierSegment presentation="cards" details={details} value="standard" onValueChange={() => {}} tiers={level} />);
+    const radios = getAllByRole("radio");
+    expect(radios.length).toBe(3);
+    expect(radios[0]!.getAttribute("aria-checked")).toBe("true");
+    expect(getByText("Fast, with sound")).toBeTruthy();
+    expect(getByText("Under a minute")).toBeTruthy();
+    expect(getByText("About a minute")).toBeTruthy();
+    expect(getByText("Not set up on this home yet")).toBeTruthy();
+    expect(queryByText("Best")).toBeNull();
+    expect(queryByText("Long")).toBeNull();
+    expect(radios[2]!.getAttribute("aria-disabled")).toBe("true");
+  });
+  test("a card picks like the segment: plain at once, disabled never, keyboard Enter and Space work on the focused card", () => {
+    const picked: string[] = [];
+    const { getAllByRole } = render(<TierSegment presentation="cards" value="standard" onValueChange={(t) => picked.push(t)} tiers={level} />);
+    const radios = getAllByRole("radio");
+    fireEvent.click(radios[2]!);
+    expect(picked).toEqual([]);
+    fireEvent.click(radios[1]!);
+    expect(picked).toEqual(["boost"]);
+    expect(radios[0]!.tagName).toBe("BUTTON");
+  });
+  test("a level with a confirm line still asks once, in cards", () => {
+    const picked: string[] = [];
+    const { getAllByRole, getByRole } = render(<TierSegment presentation="cards" value="standard" onValueChange={(t) => picked.push(t)} tiers={[{ id: "standard", label: "Standard" }, { id: "max", label: "Max", confirm: "Max takes the computer. Continue?" }]} />);
+    fireEvent.click(getAllByRole("radio")[1]!);
+    expect(picked).toEqual([]);
+    fireEvent.click(getByRole("button", { name: "Continue" }));
+    expect(picked).toEqual(["max"]);
+  });
+  test("the default presentation is the unchanged segment", () => {
+    const { container } = render(<TierSegment value="standard" onValueChange={() => {}} tiers={level} details={details} />);
+    expect(container.querySelector('[data-presentation="cards"]')).toBeNull();
+    expect(container.querySelector('[data-slot="tier-card-time"]')).toBeNull();
+  });
+});

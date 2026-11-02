@@ -344,12 +344,13 @@ export const SplitViewNodeSchema: z.ZodType<SplitViewNode> = z.lazy(() =>
       aside_label: z.string().min(1).max(60).optional(),
       aside_sheet: z.literal("phone").optional(),
       aside_side: z.enum(["start", "end"]).optional(),
+      aside_width: z.enum(["default", "wide"]).optional(),
     }),
   ]),
 );
 export type SplitViewNode =
   | { type: "split_view"; list: ListNode | CardGridNode; detail: DetailPaneNode }
-  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string; aside_sheet?: "phone"; aside_side?: "start" | "end" };
+  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string; aside_sheet?: "phone"; aside_side?: "start" | "end"; aside_width?: "default" | "wide" };
 
 export const WidgetCardNodeSchema = z.object({
   type: z.literal("widget_card"),
@@ -485,13 +486,15 @@ export const PromptBarNodeSchema = z.object({
         state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
         label: z.string().min(1).max(40),
         kind: z.enum(["picture", "character", "place", "audio", "video"]),
-        placement: z.enum(["row", "in_field"]).optional(),
+        placement: z.enum(["row", "in_field", "tile"]).optional(),
+        hint: z.string().min(1).max(80).optional(),
       }),
     )
     .max(6)
     .optional(),
   tier: z
     .object({
+      presentation: z.enum(["segment", "cards"]).optional(),
       state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
       label: z.string().min(1).max(40).optional(),
       default: z.enum(["standard", "boost", "max"]).optional(),
@@ -511,8 +514,9 @@ export const PromptBarNodeSchema = z.object({
     .optional(),
   submit_label: z.string().min(1).max(24).optional(),
   placement: z.enum(["inline", "panel"]).optional(),
+  field_size: z.enum(["default", "large"]).optional(),
   suggestions: z.array(z.object({ label: z.string().min(1).max(40), text: z.string().min(1).max(300) })).max(4).optional(),
-  submit_detail: z.object({ state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40), labels: z.record(z.string(), z.string().min(1).max(80)) }).optional(),
+  submit_detail: z.object({ state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40), placement: z.enum(["below", "in_button"]).optional(), labels: z.record(z.string(), z.string().min(1).max(80)) }).optional(),
   starts: z.enum(["picture", "video"]).optional(),
   submit: ActionSchema,
 });

@@ -214,7 +214,9 @@ describe("the News pages (NEWS-00)", () => {
     const bar = { type: "prompt_bar", label: "Describe", placement: "panel", chips: [{ state: "look", label: "Look", options: [{ value: "a", label: "A" }] }], references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "in_field" }, { state: "voice", label: "Voice", kind: "audio" }], submit_detail: { state: "look", labels: { a: "A minute" } }, submit: { call: { target: "/api/plugins/news/make" } } };
     const view = (aside: unknown, extra: object = {}) => ({ type: "split_view", main: [{ type: "empty_state", icon: "x", text: "t" }], aside: [aside], aside_side: "start", ...extra });
     expect(run(view(bar))).toBe("");
-    expect(run(view({ ...bar, references: [{ state: "a", label: "A", kind: "picture", placement: "in_field" }, { state: "b", label: "B", kind: "picture", placement: "in_field" }] }))).toContain('only one reference may have placement "in_field"');
+    expect(run(view({ ...bar, references: [{ state: "a", label: "A", kind: "picture", placement: "in_field" }, { state: "b", label: "B", kind: "picture", placement: "in_field" }] }))).toContain('only one reference may have placement "in_field" or "tile"');
+    expect(run(view({ ...bar, references: [{ state: "a", label: "A", kind: "picture", placement: "in_field" }, { state: "b", label: "B", kind: "picture", placement: "tile" }] }))).toContain('only one reference may have placement "in_field" or "tile"');
+    expect(run(view({ ...bar, references: [{ state: "voice", label: "Voice", kind: "audio", placement: "tile" }] }))).toContain("only a picture, character or place can sit in the field");
     expect(run(view({ ...bar, references: [{ state: "voice", label: "Voice", kind: "audio", placement: "in_field" }] }))).toContain("only a picture, character or place can sit in the field");
     expect(run(view({ ...bar, submit_detail: { state: "nope", labels: {} } }))).toContain('submit_detail.state "nope" is not a chip or tier state');
     expect(run(view(bar, { aside_sheet: "phone" }))).toContain('aside_sheet "phone" is not combined with a prompt_bar of placement "panel"');

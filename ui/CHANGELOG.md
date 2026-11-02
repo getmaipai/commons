@@ -1,3 +1,7 @@
+## [ui-v0.5.473] - 2026-11-02
+
+- VIDEO-UI-12, with spec 0.1.306 (`UI-DECISIONS.md` row first): `SplitView` `asideWidth: "wide"` (420 px at `lg`, `data-aside-width`), `PromptBar` `fieldSize: "large"` (a five row box, not in the phone dock), reference `placement: "tile"` with `hint` (a full-width dashed tile in the box; the chosen file shows as the named thumbnail with a remove control), `TierSegment` `presentation: "cards"` with `details` (three cards: label, hint as the promise, time words; a disabled level shows its reason as visible text) and `PromptBar` `submitDetailPlacement: "in_button"` (the time as the second line inside a 64 px button, which keeps the label as its name and the time as its description). The `split_view` and `prompt_bar` nodes pass them from `aside_width`, `field_size`, `references[].placement` and `hint`, `tier.presentation` and `submit_detail.placement`. Every default is unchanged.
+
 ## [ui-v0.5.472] - 2026-11-02
 
 - `media-tiles` moves from `src/elements/` to `src/ui/` (it is a set of building blocks like `button`, not a page Element, so Home's wrapper lint does not treat a page that composes it as a wrapper). Import `@maipai/ui/src/ui/media-tiles`. Same exports as ui-v0.5.471, which is now unused.

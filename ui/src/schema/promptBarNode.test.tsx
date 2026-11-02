@@ -214,3 +214,19 @@ describe("prompt_bar node, VIDEO-UI-03", () => {
     expect(view.getByRole("button", { name: "Remove Start frame" })).toBeTruthy();
   });
 });
+
+describe("prompt_bar and split_view node, VIDEO-UI-12", () => {
+  test("the roomy props parse and reach the kit: wide aside, large box, tile with hint, tier cards with time, time in the button", () => {
+    stubMatchMedia({ "(min-width: 960px)": true });
+    const bar = { ...(panelNode as object), field_size: "large", submit_detail: { state: "tier", placement: "in_button", labels: { standard: "Under a minute", boost: "About a minute" } }, references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "tile", hint: "Optional. Begin from a picture." }], tier: { state: "tier", presentation: "cards", tiers: [{ id: "standard", label: "Standard", hint: "Fast" }, { id: "boost", label: "Boost", hint: "Sharper" }] } };
+    const split = { type: "split_view", aside_side: "start", aside_width: "wide", main: [{ type: "empty_state", icon: "film", text: "Feed" }], aside: [bar] } as unknown as UiNode;
+    expect(() => PageNodeSchema.parse({ type: "page", id: "x", title: "X", body: [split] })).not.toThrow();
+    const { view } = drawWith(split, {});
+    expect(view.container.querySelector('[data-slot="split-view"]')!.getAttribute("data-aside-width")).toBe("wide");
+    expect(view.container.querySelector("textarea")!.className).toContain("5lh");
+    expect(view.getByRole("button", { name: "Add Start frame" }).getAttribute("data-slot")).toBe("prompt-bar-tile");
+    expect(view.container.querySelector('[data-presentation="cards"]')).toBeTruthy();
+    expect(view.getByRole("button", { name: "Generate" }).textContent).toContain("Under a minute");
+    expect(view.container.querySelector('[data-slot="tier-card-time"]')!.textContent).toBe("Under a minute");
+  });
+});

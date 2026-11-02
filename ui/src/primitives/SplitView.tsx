@@ -49,6 +49,8 @@ interface MainAsideProps {
   /** VIDEO-UI-03: the side the aside takes at `lg` and up. Default `end`; `start` puts it on the left (a control panel beside a feed).
    * Stacked, the aside stays under the main column either way. */
   asideSide?: "start" | "end";
+  /** VIDEO-UI-12: the aside column's width at `lg` and up. Default `default`, 360 px, unchanged; `wide` is 420 px. Stacked, no effect. */
+  asideWidth?: "default" | "wide";
 }
 
 type SplitViewProps = ListDetailProps | MainAsideProps;
@@ -68,16 +70,18 @@ export function SplitView(props: SplitViewProps) {
   return <ListDetail {...props} />;
 }
 
-function MainAside({ main, aside, asideLabel, asideSide = "end" }: MainAsideProps) {
+function MainAside({ main, aside, asideLabel, asideSide = "end", asideWidth = "default" }: MainAsideProps) {
   const side = useSideBySide();
   const start = asideSide === "start";
+  const wide = asideWidth === "wide";
   return (
     <SplitViewLayoutContext.Provider value={side ? "side" : "stacked"}>
       <div
-        className={cn("grid w-full min-w-0 grid-cols-1 gap-x-7 gap-y-6", start ? "lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]")}
+        className={cn("grid w-full min-w-0 grid-cols-1 gap-x-7 gap-y-6", start ? (wide ? "lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]") : (wide ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]" : "lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]"))}
         data-slot="split-view"
         data-layout="main-aside"
         data-aside-side={asideSide}
+        data-aside-width={asideWidth}
       >
         <div className="flex min-w-0 flex-col gap-4">{main}</div>
         <div role={asideLabel ? "region" : undefined} aria-label={asideLabel} className={cn("flex min-w-0 flex-col gap-4", start && "lg:order-first")}>

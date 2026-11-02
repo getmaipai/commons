@@ -31,7 +31,11 @@ export interface PromptBarReference {
   kind: "picture" | "character" | "place" | "audio" | "video";
   /** `row` (default) draws a dashed square under the box. `in_field` draws the chosen file inside the prompt box as a named thumbnail
    * with a remove control, and the empty slot as a small add button in the box's foot. Only a picture, character or place. */
-  placement?: "row" | "in_field";
+  placement?: "row" | "in_field" | "tile";
+  /** VIDEO-UI-12: `tile` draws the empty slot as a full-width dashed tile in the box (an icon, the label and `hint`), and the chosen file
+   * as the named thumbnail with a remove control, as `in_field` does. Only a picture, character or place; shares the one in-field place
+   * with `in_field`. */
+  hint?: string;
   /** The chosen file id; empty or absent while the slot is empty. */
   value?: string | null;
   /** A resolved address for the thumbnail of a filled slot. */
@@ -68,6 +72,10 @@ export interface PromptBarTier {
   label?: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  /** VIDEO-UI-12: `segment` (default) or `cards`. */
+  presentation?: "segment" | "cards";
+  /** VIDEO-UI-12: cards only: the time words for each level, by id. */
+  details?: Readonly<Record<string, string>>;
 }
 
 export interface PromptBarSuggestion {
@@ -87,6 +95,12 @@ export interface PromptBarProps {
   /** Dashed square slots under the prompt box. */
   references?: readonly PromptBarReference[];
   tier?: PromptBarTier;
+  /** VIDEO-UI-12: the prompt box's height. `default` is unchanged; `large` is about 140 px (five rows) in the panel and the inline bar;
+   * the phone dock keeps its compact box. */
+  fieldSize?: "default" | "large";
+  /** VIDEO-UI-12: where `submitDetail` is drawn. `below` (default) is the line under the button; `in_button` is the second line inside it
+   * (a 64 px button). */
+  submitDetailPlacement?: "below" | "in_button";
   /** Words on the button. Default "Make". */
   submitLabel?: string;
   /** Called with Make or Cmd/Ctrl+Enter, only while the prompt is not empty and the bar is not disabled. */
@@ -123,7 +137,7 @@ function chosenLabel(chip: PromptBarChip): string {
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
  * It holds no state of its own. Videos Create draws it through the `prompt_bar` schema node and the chat video card draws it directly. */
-export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = "Make", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", suggestions = [], submitDetail, optionsLabel = "Options", foldLabel = "More settings" }: PromptBarProps) {
+export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = "Make", fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", suggestions = [], submitDetail, optionsLabel = "Options", foldLabel = "More settings" }: PromptBarProps) {
   const layout = useSplitViewLayout();
   const phone = useIsPhoneLayout();
   const mode: Mode = placement === "panel" && layout ? (layout === "side" ? "panel" : "dock") : "inline";
@@ -134,7 +148,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   const empty = value.trim() === "";
   const ready = !blocked && !empty;
   const locked = Boolean(disabledReason);
-  const inField = references.find((r) => r.placement === "in_field" && r.kind !== "audio" && r.kind !== "video");
+  const inField = references.find((r) => (r.placement === "in_field" || r.placement === "tile") && r.kind !== "audio" && r.kind !== "video");
   const rowRefs = references.filter((r) => r !== inField);
   const unfolded = chips.filter((c) => !c.fold);
   const folded = chips.filter((c) => c.fold);
@@ -149,6 +163,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     </>
   );
 
+  const large = fieldSize === "large";
   const textbox = (rows: number, extra?: string) => {
     const bare = mode !== "inline" || Boolean(inField);
     return (
@@ -161,7 +176,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         placeholder={placeholder}
         maxLength={maxLength}
         disabled={locked}
-        className={cn(bare && "rounded-2xl border-0 bg-transparent shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent dark:disabled:bg-transparent", extra)}
+        className={cn(bare && "rounded-2xl border-0 bg-transparent shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent dark:disabled:bg-transparent", extra, large && mode !== "dock" && "min-h-[calc(5lh+1.5rem)]")}
         onChange={(e) => onValueChange(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); trySubmit(); }
@@ -185,7 +200,10 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
       <div data-slot="prompt-bar-field" className="flex min-w-0 flex-1 flex-col rounded-2xl border border-input bg-transparent transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30">
         {inField && filled ? <InFieldThumb reference={inField} locked={locked} compact={dock} /> : null}
         {textbox(rows, dock ? "min-h-12 resize-none py-3" : undefined)}
-        {inField && !filled && !dock ? (
+        {inField && !filled && !dock && inField.placement === "tile" ? (
+          <div className="flex px-3 pb-3"><ReferenceTile reference={inField} locked={locked} /></div>
+        ) : null}
+        {inField && !filled && !dock && inField.placement !== "tile" ? (
           <div className="flex px-2 pb-2">
             <button type="button" aria-label={`Add ${inField.label}`} disabled={locked || inField.disabled} onClick={inField.onPick} className="flex min-h-12 items-center gap-1.5 rounded-lg px-2 text-sm text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
               <ImageIcon className="size-4" aria-hidden="true" />
@@ -199,7 +217,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
 
   const refsRow = (list: readonly PromptBarReference[]) => list.length > 0 ? (
     <div data-slot="prompt-bar-references" className="flex min-w-0 flex-wrap items-start gap-3">
-      {list.map((ref) => <ReferenceSlot key={ref.id} reference={ref} locked={locked} />)}
+      {list.map((ref) => ref.placement === "tile" && !ref.value ? <ReferenceTile key={ref.id} reference={ref} locked={locked} /> : <ReferenceSlot key={ref.id} reference={ref} locked={locked} />)}
     </div>
   ) : null;
 
@@ -263,7 +281,15 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   ) : null;
 
   const tierSegment = tier ? <TierSegment {...tier} /> : null;
+  const inButton = submitDetailPlacement === "in_button" && Boolean(submitDetail);
 
+  // VIDEO-UI-12: the label and the time as two lines inside the button. The button keeps its own name (the label); the time is its description.
+  const buttonFace = (
+    <span className="flex min-w-0 flex-col items-center leading-tight">
+      <span>{submitLabel}</span>
+      <span id={detailId} data-slot="prompt-bar-detail" className="text-sm font-normal opacity-90">{submitDetail}</span>
+    </span>
+  );
   const submitButton = (sheet: boolean) => (
     <Button
       type={sheet ? "button" : "submit"}
@@ -271,10 +297,12 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
       width="full"
       disabled={!ready}
       aria-describedby={submitDetail ? detailId : undefined}
+      aria-label={inButton ? submitLabel : undefined}
+      className={cn(inButton && "h-16")}
       onClick={sheet ? () => { if (ready) { setSheetOpen(false); onSubmit(); } } : undefined}
-    >{submitLabel}</Button>
+    >{inButton ? buttonFace : submitLabel}</Button>
   );
-  const detailLine = submitDetail ? <p id={detailId} data-slot="prompt-bar-detail" className="text-center text-sm text-muted-foreground">{submitDetail}</p> : null;
+  const detailLine = submitDetail && !inButton ? <p id={detailId} data-slot="prompt-bar-detail" className="text-center text-sm text-muted-foreground">{submitDetail}</p> : null;
 
   // ---- inline: the original block, in its original order ----
   if (mode === "inline") {
@@ -300,7 +328,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         {tierSegment}
         {fold}
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={!ready} className="min-h-[48px] px-6" aria-describedby={submitDetail ? detailId : undefined}>{submitLabel}</Button>
+          <Button type="submit" disabled={!ready} className={cn("min-h-[48px] px-6", inButton && "h-16")} aria-describedby={submitDetail ? detailId : undefined} aria-label={inButton ? submitLabel : undefined}>{inButton ? buttonFace : submitLabel}</Button>
         </div>
         {detailLine}
         {notes}
@@ -426,6 +454,27 @@ function ReferenceSlot({ reference: ref, locked }: { reference: PromptBarReferen
         </button>
       )}
     </div>
+  );
+}
+
+/** VIDEO-UI-12: the empty `tile` slot: a full-width dashed tile with an icon, the label and a one-line hint. */
+function ReferenceTile({ reference: ref, locked }: { reference: PromptBarReference; locked: boolean }) {
+  return (
+    <button
+      type="button"
+      data-slot="prompt-bar-tile"
+      data-reference={ref.id}
+      aria-label={`Add ${ref.label}`}
+      disabled={locked || ref.disabled}
+      onClick={ref.onPick}
+      className="flex min-h-16 w-full min-w-0 items-center gap-3 rounded-xl border-2 border-dashed border-border p-3 text-left text-muted-foreground outline-none transition-colors hover:border-primary hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"
+    >
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted"><Plus className="size-5" aria-hidden="true" /></span>
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate text-sm font-medium text-foreground">{ref.label}</span>
+        {ref.hint ? <span className="text-sm text-muted-foreground">{ref.hint}</span> : null}
+      </span>
+    </button>
   );
 }
 

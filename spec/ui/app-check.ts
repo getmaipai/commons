@@ -162,8 +162,8 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     for (const key of keys) { if (seen.has(key)) out.push(`${where} prompt_bar: state key "${key}" is used twice`); seen.add(key); }
     // VIDEO-UI-03: at most one in-field reference, and only a picture-like one; submit_detail names a key the bar owns.
     if (Array.isArray(node.references)) {
-      const inField = node.references.filter((ref) => isObject(ref) && ref.placement === "in_field");
-      if (inField.length > 1) out.push(`${where} prompt_bar: only one reference may have placement "in_field"`);
+      const inField = node.references.filter((ref) => isObject(ref) && (ref.placement === "in_field" || ref.placement === "tile"));
+      if (inField.length > 1) out.push(`${where} prompt_bar: only one reference may have placement "in_field" or "tile"`);
       for (const ref of inField) if (isObject(ref) && (ref.kind === "audio" || ref.kind === "video")) out.push(`${where} prompt_bar: reference "${String(ref.state)}" is ${String(ref.kind)}; only a picture, character or place can sit in the field`);
     }
     if (isObject(node.submit_detail) && !keys.includes(String(node.submit_detail.state))) out.push(`${where} prompt_bar: submit_detail.state "${String(node.submit_detail.state)}" is not a chip or tier state of this bar`);

@@ -87,6 +87,14 @@ describe("SplitView", () => {
       expect(root.className).toContain("grid-cols-1");
       expect(root.className).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]");
     });
+    test("VIDEO-UI-12: aside_width wide is 420 px at lg on either side; the default stays 360 px", () => {
+      const grid = (props: object) => render(<SplitView main={<p>Feed</p>} aside={<p>Panel</p>} {...props} />).container.querySelector('[data-slot="split-view"]')!;
+      expect(grid({ asideWidth: "wide" }).className).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]");
+      expect(grid({ asideWidth: "wide", asideSide: "start" }).className).toContain("lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]");
+      expect(grid({ asideWidth: "wide", asideSide: "start" }).getAttribute("data-aside-width")).toBe("wide");
+      expect(grid({ asideSide: "start" }).className).toContain("lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]");
+      expect(grid({}).getAttribute("data-aside-width")).toBe("default");
+    });
     test("the list and detail form is unchanged", () => {
       const { container } = renderSplit(true);
       expect(container.querySelector('[data-layout="main-aside"]')).toBeNull();

@@ -192,3 +192,59 @@ describe("SplitView layout context", () => {
     expect(end.getByRole("region", { name: "Panel" }).className).not.toContain("order-first");
   });
 });
+
+describe("VIDEO-UI-12 roomy panel props", () => {
+  const tiers = [{ id: "standard" as const, label: "Standard", hint: "Fast" }, { id: "boost" as const, label: "Boost", hint: "Sharper" }];
+  test("fieldSize large makes a five row box in the panel; default and the dock are unchanged", () => {
+    const large = bar("side", { fieldSize: "large" });
+    expect(large.container.querySelector("textarea")!.className).toContain("min-h-[calc(5lh+1.5rem)]");
+    cleanup();
+    expect(bar("side").container.querySelector("textarea")!.className).not.toContain("5lh");
+    cleanup();
+    expect(bar("stacked", { fieldSize: "large" }).container.querySelector("textarea")!.className).not.toContain("5lh");
+  });
+  test("a tile reference is a full-width tile with label and hint in the box, then the named thumbnail with a remove control", () => {
+    let picked = 0;
+    const tile: PromptBarReference = { ...frame, placement: "tile", hint: "Optional. Begin from a picture.", onPick: () => { picked += 1; } };
+    const view = bar("side", { references: [tile] });
+    const button = view.getByRole("button", { name: "Add Start frame" });
+    expect(button.getAttribute("data-slot")).toBe("prompt-bar-tile");
+    expect(button.closest('[data-slot="prompt-bar-field"]')).toBeTruthy();
+    expect(button.textContent).toContain("Optional. Begin from a picture.");
+    fireEvent.click(button);
+    expect(picked).toBe(1);
+    view.rerender(<SplitViewLayoutContext.Provider value="side"><PromptBar label="Describe" placement="panel" value="a fox" onValueChange={() => {}} onSubmit={() => {}} references={[{ ...tile, value: "f1", thumb: "/t.png" }]} /></SplitViewLayoutContext.Provider>);
+    expect(view.container.querySelector('[data-slot="prompt-bar-infield"]')).toBeTruthy();
+    expect(view.getByRole("button", { name: "Remove Start frame" })).toBeTruthy();
+    expect(view.queryByRole("button", { name: "Add Start frame" })).toBeNull();
+  });
+  test("a locked bar disables the tile", () => {
+    const view = bar("side", { disabledReason: "Not ready", references: [{ ...frame, placement: "tile" }] });
+    expect((view.getByRole("button", { name: "Add Start frame" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+  test("in the phone sheet an empty tile shows full width in the references", async () => {
+    const view = bar("stacked", { references: [{ ...frame, placement: "tile", hint: "Optional." }] });
+    fireEvent.click(view.getByRole("button", { name: "Options" }));
+    const tile = await within(document.body).findByRole("button", { name: "Add Start frame" });
+    expect(tile.getAttribute("data-slot")).toBe("prompt-bar-tile");
+  });
+  test("tier cards take their time words from submit detail", () => {
+    const view = bar("side", { tier: { value: "standard", onValueChange: () => {}, tiers, presentation: "cards", details: { standard: "Under a minute", boost: "About a minute" } } });
+    expect(view.container.querySelector('[data-presentation="cards"]')).toBeTruthy();
+    expect(view.getByText("About a minute")).toBeTruthy();
+  });
+  test("submitDetailPlacement in_button puts the time inside the button, keeps the button's name and its description, and draws no line below", () => {
+    const view = bar("side", { tier: undefined, submitDetail: "Standard, about a minute", submitDetailPlacement: "in_button" });
+    const button = view.getByRole("button", { name: "Generate" });
+    expect(button.textContent).toContain("Standard, about a minute");
+    expect(button.className).toContain("h-16");
+    const detail = button.querySelector('[data-slot="prompt-bar-detail"]')!;
+    expect(button.getAttribute("aria-describedby")).toBe(detail.id);
+    expect(view.container.querySelectorAll('[data-slot="prompt-bar-detail"]').length).toBe(1);
+  });
+  test("submitDetailPlacement below (default) is unchanged", () => {
+    const view = bar("side", { submitDetail: "Under a minute" });
+    expect(view.getByRole("button", { name: "Generate" }).textContent).toBe("Generate");
+    expect(view.container.querySelector('[data-slot="prompt-bar-foot"] p[data-slot="prompt-bar-detail"]')).toBeTruthy();
+  });
+});

@@ -34,13 +34,66 @@ export interface TierSegmentProps {
   /** Names the group for assistive tech, for example "Quality". */
   label?: string;
   className?: string;
+  /** VIDEO-UI-12: `segment` (default, unchanged) or `cards`: one card per level with its label, its hint as the promise, and its time
+   * words from `details`; a level with a `disabledReason` shows that reason as visible text in place of its promise. */
+  presentation?: "segment" | "cards";
+  /** VIDEO-UI-12: cards only: the time words by level id ("About a minute"). */
+  details?: Readonly<Record<string, string>>;
 }
 
 /** The Standard, Boost, Max choice on a picture, video or song card, beside Make another. A tier with a `confirm` line asks once before it applies. */
-export function TierSegment({ value, onValueChange, tiers = DEFAULT_TIERS, confirmLabel = "Continue", cancelLabel = "Cancel", label = "Quality", className }: TierSegmentProps) {
+export function TierSegment({ value, onValueChange, tiers = DEFAULT_TIERS, confirmLabel = "Continue", cancelLabel = "Cancel", label = "Quality", className, presentation = "segment", details }: TierSegmentProps) {
   const [pending, setPending] = useState<TierOptionDef | null>(null);
   const shown = tiers.find((t) => t.id === value);
   const note = pending?.confirm ?? undefined;
+  const choose = (tier: TierOptionDef) => {
+    if (tier.disabledReason || tier.id === value) return;
+    if (tier.confirm) setPending(tier);
+    else { setPending(null); onValueChange(tier.id); }
+  };
+  const confirmBlock = pending && note ? (
+    <div data-slot="tier-segment-confirm" role="group" aria-label={`Confirm ${pending.label}`} className="flex flex-col gap-2">
+      <p className="text-[13px] text-muted-foreground">{note}</p>
+      <div className="flex gap-2">
+        <Button type="button" size="sm" onClick={() => { onValueChange(pending.id); setPending(null); }}>{confirmLabel}</Button>
+        <Button type="button" size="sm" variant="outline" onClick={() => setPending(null)}>{cancelLabel}</Button>
+      </div>
+    </div>
+  ) : null;
+  if (presentation === "cards") {
+    return (
+      <div data-slot="tier-segment" data-presentation="cards" className={cn("flex flex-col gap-2", className)}>
+        <div role="radiogroup" aria-label={label} className="grid min-w-0 grid-cols-3 gap-2">
+          {tiers.map((tier) => {
+            const selected = tier.id === value;
+            const blocked = Boolean(tier.disabledReason);
+            const time = !blocked ? details?.[tier.id] : undefined;
+            return (
+              <button
+                key={tier.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                aria-disabled={blocked ? true : undefined}
+                data-tier={tier.id}
+                className={cn(
+                  "flex min-h-[7.5rem] min-w-0 flex-col items-start gap-1 rounded-xl border-2 p-3 text-left outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  selected ? "border-foreground bg-foreground/[0.04]" : "border-border hover:bg-foreground/[0.035]",
+                  blocked && "cursor-not-allowed border-dashed bg-transparent hover:bg-transparent",
+                )}
+                onClick={() => choose(tier)}
+              >
+                <span className={cn("text-[15px] font-semibold", blocked ? "text-muted-foreground" : "text-foreground")}>{tier.label}</span>
+                <span data-slot="tier-card-promise" className="text-[13px] leading-snug text-muted-foreground">{tier.disabledReason ?? tier.hint ?? ""}</span>
+                {time ? <span data-slot="tier-card-time" className="mt-auto text-[13px] text-foreground">{time}</span> : null}
+              </button>
+            );
+          })}
+        </div>
+        {confirmBlock}
+      </div>
+    );
+  }
   return (
     <div data-slot="tier-segment" className={cn("flex flex-col gap-1.5", className)}>
       <div role="radiogroup" aria-label={label} className="inline-flex w-fit rounded-full border border-border p-0.5">
@@ -60,26 +113,14 @@ export function TierSegment({ value, onValueChange, tiers = DEFAULT_TIERS, confi
                 selected ? "bg-foreground/[0.08] text-foreground" : "text-muted-foreground hover:bg-foreground/[0.035]",
                 tier.disabledReason && "cursor-not-allowed opacity-50",
               )}
-              onClick={() => {
-                if (tier.disabledReason || selected) return;
-                if (tier.confirm) setPending(tier);
-                else { setPending(null); onValueChange(tier.id); }
-              }}
+              onClick={() => choose(tier)}
             >
               {tier.label}
             </button>
           );
         })}
       </div>
-      {pending && note ? (
-        <div data-slot="tier-segment-confirm" role="group" aria-label={`Confirm ${pending.label}`} className="flex flex-col gap-2">
-          <p className="text-[13px] text-muted-foreground">{note}</p>
-          <div className="flex gap-2">
-            <Button type="button" size="sm" onClick={() => { onValueChange(pending.id); setPending(null); }}>{confirmLabel}</Button>
-            <Button type="button" size="sm" variant="outline" onClick={() => setPending(null)}>{cancelLabel}</Button>
-          </div>
-        </div>
-      ) : (
+      {confirmBlock ?? (
         <p data-slot="tier-segment-hint" className="text-[12.5px] text-muted-foreground">
           {shown?.disabledReason ?? shown?.hint ?? " "}
         </p>

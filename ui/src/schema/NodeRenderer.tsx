@@ -686,8 +686,10 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       onValueChange={setText}
       submitLabel={node.submit_label}
       placement={node.placement}
+      fieldSize={node.field_size}
       suggestions={node.suggestions}
       submitDetail={submitDetail}
+      submitDetailPlacement={node.submit_detail?.placement}
       disabledReason={notice}
       busy={busy}
       error={lastError}
@@ -711,6 +713,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
         label: ref.label,
         kind: ref.kind,
         placement: ref.placement,
+        hint: ref.hint,
         value: filled[ref.state]?.id ?? null,
         thumb: filled[ref.state]?.thumb,
         disabled: !host?.pickMedia,
@@ -730,6 +733,8 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       tier={node.tier ? {
         value: tier,
         label: node.tier.label,
+        presentation: node.tier.presentation,
+        details: node.submit_detail && node.submit_detail.state === node.tier.state ? node.submit_detail.labels : undefined,
         tiers: node.tier.tiers.map((t) => ({ id: t.id, label: t.label, hint: t.hint, disabledReason: t.disabled_reason, confirm: t.confirm })),
         onValueChange: (next) => { setTier(next); writer?.merge({ [node.tier!.state]: next }); },
       } : undefined}
@@ -1782,6 +1787,7 @@ function SplitViewNodeView({ node, state }: { node: SplitViewNode; state: Row })
         aside={aside}
         asideLabel={node.aside_label}
         asideSide={node.aside_side}
+        asideWidth={node.aside_width}
       />
     );
   }

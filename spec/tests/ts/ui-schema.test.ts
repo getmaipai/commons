@@ -280,6 +280,26 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...view, aside_side: "left" })).toBe(false);
   });
 
+  test("VIDEO-UI-12: aside_width, field_size, reference tile and hint, tier presentation, submit_detail placement; each default stays valid", () => {
+    const view = { type: "split_view", main: [{ type: "empty_state", icon: "x", text: "t" }], aside: [{ type: "empty_state", icon: "x", text: "t" }] };
+    expect(validate({ ...view, aside_width: "wide" })).toBe(true);
+    expect(validate({ ...view, aside_width: "default" })).toBe(true);
+    expect(validate({ ...view, aside_width: "huge" })).toBe(false);
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    expect(validate({ ...ok, field_size: "large" })).toBe(true);
+    expect(validate({ ...ok, field_size: "default" })).toBe(true);
+    expect(validate({ ...ok, field_size: "xl" })).toBe(false);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "tile", hint: "Optional. Begin from a picture." }] })).toBe(true);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "tile", hint: "" }] })).toBe(false);
+    const tier = { state: "tier", tiers: [{ id: "standard", label: "Standard", hint: "Fast" }] };
+    expect(validate({ ...ok, tier: { ...tier, presentation: "cards" } })).toBe(true);
+    expect(validate({ ...ok, tier: { ...tier, presentation: "segment" } })).toBe(true);
+    expect(validate({ ...ok, tier: { ...tier, presentation: "rows" } })).toBe(false);
+    expect(validate({ ...ok, tier, submit_detail: { state: "tier", placement: "in_button", labels: { standard: "About a minute" } } })).toBe(true);
+    expect(validate({ ...ok, tier, submit_detail: { state: "tier", placement: "below", labels: {} } })).toBe(true);
+    expect(validate({ ...ok, tier, submit_detail: { state: "tier", placement: "inside", labels: {} } })).toBe(false);
+  });
+
   test("answer_blocks needs a package binding and refuses a route binding", () => {
     expect(validate({ type: "answer_blocks" })).toBe(false);
     expect(validate({ type: "answer_blocks", bind: { source: "route", path: "/api/people" } })).toBe(false);
