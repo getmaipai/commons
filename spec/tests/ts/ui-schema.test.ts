@@ -214,6 +214,20 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, tier: { state: "tier", tiers: [{ id: "ultra", label: "Ultra" }] } })).toBe(false);
   });
 
+  test("VIDEO-CREATE-02: a chip takes variant cards and an option media path; prompt_bar takes references", () => {
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    const cards = { state: "look", label: "Look", variant: "cards", options: [{ value: "anime", label: "Anime", media: "loops/anime.mp4" }, { value: "none", label: "Natural" }] };
+    expect(validate({ ...ok, chips: [cards] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...cards, variant: "dropdown" }] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...cards, variant: "grid" }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...cards, options: [{ value: "a", label: "A", media: "../x.mp4" }] }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...cards, options: [{ value: "a", label: "A", media: "/abs.mp4" }] }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...cards, options: [{ value: "a", label: "A", media: "https://x.test/a.mp4" }] }] })).toBe(false);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Picture", kind: "picture" }, { state: "who", label: "Character", kind: "character" }, { state: "where", label: "Place", kind: "place" }] })).toBe(true);
+    expect(validate({ ...ok, references: [{ state: "x", label: "X", kind: "video" }] })).toBe(false);
+    expect(validate({ ...ok, references: [{ state: "x", label: "X" }] })).toBe(false);
+  });
+
   test("answer_blocks needs a package binding and refuses a route binding", () => {
     expect(validate({ type: "answer_blocks" })).toBe(false);
     expect(validate({ type: "answer_blocks", bind: { source: "route", path: "/api/people" } })).toBe(false);

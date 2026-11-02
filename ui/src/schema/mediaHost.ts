@@ -39,6 +39,12 @@ export interface MediaHost {
   castTargets?(item: Record<string, unknown>): Promise<CastTarget[]>;
   /** HANDOFF-01c: send `item` to one target at `position_s`. Absent: the `player` node draws no cast menu. A rejection
    * is shown under the player with its message. */
+  /** VIDEO-CREATE-02: opens the host's media picker (the Library, or an upload) for a `prompt_bar` reference slot of this kind and
+   * resolves with the chosen file id and an optional thumbnail address, or null when the person cancels. Absent: the slot
+   * stays empty and is disabled, because the kit has no uploader of its own. */
+  pickMedia?(kind: "picture" | "character" | "place"): Promise<{ id: string; thumb?: string } | null>;
+  /** VIDEO-CREATE-02: turns a package asset path (a card's `media`) into an address. Absent: `/api/plugins/<package>/assets/<path>`. */
+  assetUrl?(packageId: string, path: string): string;
   castTo?(targetId: string, item: Record<string, unknown>, position_s: number): Promise<void>;
 }
 

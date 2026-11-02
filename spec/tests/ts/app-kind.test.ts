@@ -190,6 +190,13 @@ describe("the News pages (NEWS-00)", () => {
     expect(run({ ...ok, submit: { call: { target: "/api/plugins/other/make" } } })).toContain("prompt_bar.submit: call.target");
     expect(run({ ...ok, chips: [{ state: "prompt", label: "Clash", options: [{ value: "a", label: "A" }] }] })).toContain('state key "prompt" is used twice');
   });
+  test("VIDEO-CREATE-02: a reference state key may not repeat a chip, tier or prompt key", () => {
+    const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
+    const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
+    const ok = { type: "prompt_bar", label: "Describe", chips: [{ state: "look", label: "Look", variant: "cards", options: [{ value: "a", label: "A" }] }], references: [{ state: "start_frame", label: "Picture", kind: "picture" }], submit: { call: { target: "/api/plugins/news/make" } } };
+    expect(run(ok)).toBe("");
+    expect(run({ ...ok, references: [{ state: "look", label: "Picture", kind: "picture" }] })).toContain('state key "look" is used twice');
+  });
   test("a list needs a rows entry and a package source; Listen's play is allowed only in the actions map", () => {
     const badList = { type: "page", id: "x", title: "X", body: [{ type: "list", bind: { source: "package", path: "today" }, item_key_field: "k", item_label_field: "l" }] };
     expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? badList : news(m)), "child").join("\n")).toContain("returns blocks, not rows");

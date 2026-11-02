@@ -135,6 +135,7 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     const keys = [typeof node.prompt_state === "string" ? node.prompt_state : "prompt"];
     if (Array.isArray(node.chips)) for (const chip of node.chips) if (isObject(chip)) keys.push(String(chip.state));
     if (isObject(node.tier)) keys.push(String(node.tier.state));
+    if (Array.isArray(node.references)) for (const ref of node.references) if (isObject(ref)) keys.push(String(ref.state));
     const seen = new Set<string>();
     for (const key of keys) { if (seen.has(key)) out.push(`${where} prompt_bar: state key "${key}" is used twice`); seen.add(key); }
   }

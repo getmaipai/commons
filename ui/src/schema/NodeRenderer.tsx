@@ -44,7 +44,7 @@ import { PromptBar } from "@/kit/elements/prompt-bar";
 import type { TierId } from "@/kit/elements/tier-segment";
 import { SharePanel } from "@/kit/elements/share-panel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
-import { PageSidebarContext, PageStateContext } from "@/kit/schema/packageScope";
+import { PackageScopeContext, PageSidebarContext, PageStateContext } from "@/kit/schema/packageScope";
 import { MediaHostContext, type CastTarget, type MediaHost } from "@/kit/schema/mediaHost";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import type { Action } from "@/kit/schema/types";
@@ -598,6 +598,19 @@ function SearchNodeView({ node, state }: { node: SearchNode; state: Row }) {
  * when Make is pressed; Make fires `submit` once with {prompt, <chip states>, <tier state>}. The node sends nothing itself. */
 function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row }) {
   const writer = useContext(PageStateContext);
+  const host = useContext(MediaHostContext);
+  const scope = useContext(PackageScopeContext);
+  const assetSrc = (path: string | undefined): string | undefined => {
+    if (!path) return undefined;
+    if (host?.assetUrl && scope) return host.assetUrl(scope.packageId, path);
+    return scope ? `/api/plugins/${scope.packageId}/assets/${path}` : undefined;
+  };
+  const refs = node.references ?? [];
+  const [filled, setFilled] = useState<Record<string, { id: string; thumb?: string }>>(() => {
+    const out: Record<string, { id: string; thumb?: string }> = {};
+    for (const ref of refs) { const v = state[ref.state]; if (typeof v === "string" && v) out[ref.state] = { id: v }; }
+    return out;
+  });
   const { dispatch, lastError } = useDispatchAction();
   const promptKey = node.prompt_state ?? "prompt";
   const chips = node.chips ?? [];
@@ -618,6 +631,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
   function submit() {
     const item: Record<string, unknown> = { ...picked, [promptKey]: text.trim() };
     if (node.tier) item[node.tier.state] = tier;
+    for (const ref of refs) { const f = filled[ref.state]; if (f) item[ref.state] = f.id; }
     writer?.merge({ [promptKey]: text.trim() });
     setBusy(true);
     dispatch(node.submit, [item], () => setBusy(false), { typedArgs: true });
@@ -636,11 +650,32 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       chips={chips.map((chip) => ({
         id: chip.state,
         label: chip.label,
-        options: chip.options,
+        variant: chip.variant,
+        options: chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media) })),
         value: picked[chip.state]!,
         onValueChange: (value) => {
           setPicked((prev) => ({ ...prev, [chip.state]: value }));
           writer?.merge({ [chip.state]: value });
+        },
+      }))}
+      references={refs.map((ref) => ({
+        id: ref.state,
+        label: ref.label,
+        kind: ref.kind,
+        value: filled[ref.state]?.id ?? null,
+        thumb: filled[ref.state]?.thumb,
+        disabled: !host?.pickMedia,
+        onPick: () => {
+          if (!host?.pickMedia) return;
+          void host.pickMedia(ref.kind).then((got) => {
+            if (!got) return;
+            setFilled((prev) => ({ ...prev, [ref.state]: got }));
+            writer?.merge({ [ref.state]: got.id });
+          }, () => {});
+        },
+        onRemove: () => {
+          setFilled((prev) => { const next = { ...prev }; delete next[ref.state]; return next; });
+          writer?.merge({ [ref.state]: undefined });
         },
       }))}
       tier={node.tier ? {

@@ -1,3 +1,7 @@
+## [spec-v0.1.300] - 2026-11-02
+
+- VIDEO-CREATE-02 U1: `prompt_bar` chips gain the optional `variant` (`dropdown` default, or `cards`: a grid of picture cards, one choice) and each chip option gains the optional `media` (a relative package asset path, no `..`, no scheme, for a short silent mp4 or webp loop or an image). `prompt_bar` gains the optional `references` (up to 6 `{state, label, kind: picture | character | place}` slots; each writes a chosen file id under `state` and joins the submit item). `checkAppPackage` counts reference keys in the distinct-state check. All additive; old pages are unchanged.
+
 ## [spec-v0.1.299] - 2026-11-02
 
 - MUSIC-LIKE-02: `player` gains the optional `actions_wrap` (boolean, default false): the actions row wraps instead of scrolling sideways. Additive.

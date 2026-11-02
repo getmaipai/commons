@@ -1,3 +1,7 @@
+## [ui-v0.5.462] - 2026-11-02
+
+- VIDEO-CREATE-02 U1 (needs spec-v0.1.300): `prompt_bar` chips take `variant: "cards"` (new `OptionCards` Element: a radio group of picture cards, arrow keys move the choice, Space or Enter selects, accent border through the primary token, visible focus ring, sideways scroll on a phone, an optional muted looped inline video per option that plays on hover on a wide pointer screen and while in view on a phone, first frame under reduced motion) and options take `media`. `prompt_bar` takes `references` (dashed square slots, thumbnail and remove control when filled, file id written under `state` into the submit item). `MediaHost` gains the optional `pickMedia` and `assetUrl`. All additive.
+
 ## [ui-v0.5.461] - 2026-11-02
 
 - MUSIC-LIKE-02 (needs spec-v0.1.299): the Player takes `actions_wrap`; the actions row wraps onto more lines instead of scrolling sideways with its scrollbar hidden. Default off, so every other player is unchanged.

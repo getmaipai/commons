@@ -6,6 +6,7 @@ import makePage from "../../../spec/ui/pages/videos-make.json";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext } from "@/kit/schema/packageScope";
+import { MediaHostContext, type MediaHost } from "@/kit/schema/mediaHost";
 import { PageNodeSchema, type UiNode } from "@/kit/schema/types";
 
 afterEach(cleanup);
@@ -25,15 +26,28 @@ afterEach(() => { globalThis.fetch = originalFetch; });
 const page = PageNodeSchema.parse(makePage);
 const node = page.body[0] as UiNode;
 
-function draw(n: UiNode = node) {
+function draw(n: UiNode = node, host: MediaHost | null = null) {
   return renderWithQueryClient(
     <MemoryRouter>
       <PackageScopeContext.Provider value={{ packageId: "videos" }}>
-        <NodeRenderer node={n} state={{}} />
+        <MediaHostContext.Provider value={host}>
+          <NodeRenderer node={n} state={{}} />
+        </MediaHostContext.Provider>
       </PackageScopeContext.Provider>
     </MemoryRouter>,
   );
 }
+
+const cardsNode = {
+  type: "prompt_bar",
+  label: "Describe your video",
+  chips: [
+    { state: "look", label: "Look", variant: "cards", default: "none", options: [{ value: "none", label: "Natural" }, { value: "anime", label: "Anime", media: "loops/anime.mp4" }] },
+    { state: "length", label: "Length", default: 5, options: [{ value: 5, label: "5 s" }, { value: 10, label: "10 s" }] },
+  ],
+  references: [{ state: "start_frame", label: "Picture", kind: "picture" }, { state: "who", label: "Character", kind: "character" }],
+  submit: { call: { target: "/api/plugins/videos/make", args: { prompt: "{prompt}", look: "{look}", start_frame: "{start_frame}" } } },
+} as unknown as UiNode;
 
 describe("prompt_bar node", () => {
   test("the page fixture parses", () => {
@@ -73,5 +87,34 @@ describe("prompt_bar node", () => {
     fireEvent.click(view.getByRole("button", { name: "Make" }));
     await view.findByText("This page can't do that.");
     expect(calls).toEqual([]);
+  });
+
+  test("VIDEO-CREATE-02: a cards chip and references reach one submit; an empty slot is absent; remove clears it", async () => {
+    const host: MediaHost = { onPlay: () => {}, pickMedia: (kind) => Promise.resolve({ id: `file-${kind}`, thumb: `/thumb/${kind}.png` }) };
+    const view = draw(cardsNode, host);
+    expect(view.container.querySelector("video")!.getAttribute("src")).toContain("/api/plugins/videos/assets/loops/anime.mp4");
+    fireEvent.change(view.getByRole("textbox", { name: "Describe your video" }), { target: { value: "a fox" } });
+    fireEvent.click(view.getByRole("radio", { name: "Anime" }));
+    fireEvent.click(view.getByRole("button", { name: "Add Picture" }));
+    await view.findByRole("img", { name: "Picture" });
+    fireEvent.click(view.getByRole("button", { name: "Add Character" }));
+    await view.findByRole("img", { name: "Character" });
+    fireEvent.click(view.getByRole("button", { name: "Remove Character" }));
+    expect(view.getByRole("button", { name: "Add Character" })).toBeTruthy();
+    fireEvent.click(view.getByRole("button", { name: "Make" }));
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/videos/make")).toBe(true));
+    const sent = calls.find((c) => c.url === "/api/plugins/videos/make")!;
+    expect(sent.body).toEqual({ prompt: "a fox", look: "anime", start_frame: "file-picture" });
+  });
+
+  test("VIDEO-CREATE-02: without a host media picker the slots are disabled and nothing is added to the submit", async () => {
+    const view = draw(cardsNode);
+    expect((view.getByRole("button", { name: "Add Picture" }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.change(view.getByRole("textbox", { name: "Describe your video" }), { target: { value: "a fox" } });
+    fireEvent.click(view.getByRole("button", { name: "Make" }));
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/videos/make")).toBe(true));
+    const body = calls.find((c) => c.url === "/api/plugins/videos/make")!.body as Record<string, unknown>;
+    expect(body.start_frame).toBe("{start_frame}"); // the call arg stays unfilled: no file id was chosen
+    expect(body.look).toBe("none");
   });
 });

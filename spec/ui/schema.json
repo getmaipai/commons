@@ -894,7 +894,7 @@
         "label",
         "submit"
       ],
-      "description": "VIDEO-CREATE-01: a prompt box with chips and one Make button. Every chip and the optional tier segment write their chosen value to page state under their own `state` key as it changes; the prompt text is written under `prompt_state` when Make is pressed. Make fires `submit` once with the item {<prompt_state>: text, <each chip state>: value, <tier state>: id}, so `{prompt}` and `{shape}` placeholders in the call args fill from it (a whole-string placeholder keeps a number's type). Make stays off while the prompt is empty. The node sends nothing itself.",
+      "description": "VIDEO-CREATE-01: a prompt box with chips and one Make button. Every chip and the optional tier segment write their chosen value to page state under their own `state` key as it changes; the prompt text is written under `prompt_state` when Make is pressed. Make fires `submit` once with the item {<prompt_state>: text, <each chip state>: value, <tier state>: id}, so `{prompt}` and `{shape}` placeholders in the call args fill from it (a whole-string placeholder keeps a number's type). Make stays off while the prompt is empty. The node sends nothing itself. VIDEO-CREATE-02 (additive): a chip may set `variant: \"cards\"` with an optional `media` per option, and an optional `references` list adds picture slots whose file ids join the item.",
       "properties": {
         "type": {
           "const": "prompt_bar"
@@ -963,14 +963,42 @@
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 40
+                    },
+                    "media": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200,
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_][A-Za-z0-9_./-]*$",
+                      "description": "VIDEO-CREATE-02: a relative package asset path to a short silent mp4 or webp loop, or an image (png, jpg, webp, svg). Used by the `cards` variant only; an option without it draws a plain tile with its label."
                     }
                   }
                 }
+              },
+              "variant": {
+                "type": "string",
+                "enum": ["dropdown", "cards"],
+                "default": "dropdown",
+                "description": "VIDEO-CREATE-02: `cards` draws the options as a grid of picture cards (one choice, a radio group) instead of a dropdown. The value is written to page state under `state` exactly as a dropdown chip's is."
               },
               "default": {
                 "anyOf": [{ "type": "string" }, { "type": "number" }],
                 "description": "The option chosen first; the first option when omitted."
               }
+            }
+          }
+        },
+        "references": {
+          "type": "array",
+          "maxItems": 6,
+          "description": "VIDEO-CREATE-02: dashed square slots under the prompt box. Each takes one picture chosen through the host's media picker, shows it as a thumbnail with a remove control, and writes the chosen file id under `state` (in page state and in the submit item); an empty slot is absent from the item.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["state", "label", "kind"],
+            "properties": {
+              "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+              "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "kind": { "type": "string", "enum": ["picture", "character", "place"] }
             }
           }
         },
