@@ -22,8 +22,8 @@ export interface OptionCardsProps {
   className?: string;
   /** Stamped on the group as `data-chip` so a screen can find it. */
   chipId?: string;
-  /** VIDEO-UI-03: `grid` draws three cards to a row at every width (the prompt bar's bottom sheet) instead of the default sideways scroll on a phone. */
-  columns?: "auto" | "three";
+  /** VIDEO-UI-03: `grid` draws three cards to a row at every width (the prompt bar's bottom sheet) instead; `six` draws six to a row from 640 px, three below (the wide Style popover) of the default sideways scroll on a phone. */
+  columns?: "auto" | "three" | "six";
 }
 
 function useMatches(query: string): boolean {
@@ -103,7 +103,7 @@ export function OptionCards({ label, options, value, onValueChange, disabled = f
         const picked = options.find((o) => String(o.value) === next);
         if (picked) onValueChange(picked.value);
       }}
-      className={cn(columns === "three" ? "grid min-w-0 grid-cols-3 gap-3" : "flex min-w-0 snap-x snap-mandatory gap-3 overflow-x-auto pb-1 sm:grid sm:snap-none sm:grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] sm:overflow-visible", className)}
+      className={cn(columns === "six" ? "grid min-w-0 grid-cols-3 gap-3 sm:grid-cols-6" : columns === "three" ? "grid min-w-0 grid-cols-3 gap-3" : "flex min-w-0 snap-x snap-mandatory gap-3 overflow-x-auto pb-1 sm:grid sm:snap-none sm:grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] sm:overflow-visible", className)}
     >
       {options.map((option) => {
         const key = String(option.value);
@@ -116,7 +116,7 @@ export function OptionCards({ label, options, value, onValueChange, disabled = f
             onMouseEnter={() => setHovered(key)}
             onMouseLeave={() => setHovered((h) => (h === key ? null : h))}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onValueChange(option.value); } }}
-            className={cn("group flex min-h-[48px] shrink-0 flex-col overflow-hidden rounded-lg border-2 border-border bg-card text-left text-card-foreground outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50 data-[state=checked]:border-primary", columns === "three" ? "w-auto min-w-0" : "w-36 snap-start sm:w-auto")}
+            className={cn("group flex min-h-[48px] shrink-0 flex-col overflow-hidden rounded-lg border-2 border-border bg-card text-left text-card-foreground outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50 data-[state=checked]:border-primary", columns === "three" || columns === "six" ? "w-auto min-w-0" : "w-36 snap-start sm:w-auto")}
           >
             <span className="flex aspect-video w-full items-center justify-center bg-muted">
               {option.media ? <CardMedia src={option.media} hovered={hovered === key} wide={wide} reduced={reduced} /> : null}

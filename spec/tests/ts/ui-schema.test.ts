@@ -300,6 +300,21 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, tier, submit_detail: { state: "tier", placement: "inside", labels: {} } })).toBe(false);
   });
 
+  test("VIDEO-UI-13: split_view main_surface and a chip's trigger and popover_size, defaults unchanged", () => {
+    const view = { type: "split_view", main: [{ type: "empty_state", icon: "x", text: "t" }], aside: [{ type: "empty_state", icon: "x", text: "t" }] };
+    expect(validate(view)).toBe(true);
+    expect(validate({ ...view, main_surface: "stage" })).toBe(true);
+    expect(validate({ ...view, main_surface: "page" })).toBe(true);
+    expect(validate({ ...view, main_surface: "dark" })).toBe(false);
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    const look = { state: "look", label: "Look", variant: "cards", presentation: "popover", group: "Style", options: [{ value: "a", label: "A" }] };
+    expect(validate({ ...ok, chips: [look] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...look, trigger: "banner", popover_size: "wide" }] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...look, trigger: "default", popover_size: "default" }] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...look, trigger: "poster" }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...look, popover_size: "huge" }] })).toBe(false);
+  });
+
   test("answer_blocks needs a package binding and refuses a route binding", () => {
     expect(validate({ type: "answer_blocks" })).toBe(false);
     expect(validate({ type: "answer_blocks", bind: { source: "route", path: "/api/people" } })).toBe(false);

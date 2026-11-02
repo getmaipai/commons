@@ -63,6 +63,10 @@ export interface PromptBarChip {
   group?: string;
   /** VIDEO-UI-03: listed under the collapsed "More settings" control. */
   fold?: boolean;
+  /** VIDEO-UI-13: on a popover group, `banner` draws the shared trigger as a poster banner. Read from the first chip of the group that sets it. Default `default`. */
+  trigger?: "default" | "banner";
+  /** VIDEO-UI-13: on a popover group, `wide` opens a wider popover with six cards a row. Read from the first chip of the group that sets it. Default `default`. */
+  popoverSize?: "default" | "wide";
 }
 
 export interface PromptBarTier {
@@ -321,7 +325,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         {leading || groups.length > 0 || plainChips.some((c) => c.variant !== "cards") ? (
           <div data-slot="prompt-bar-chips" className="flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible">
             {leading}
-            {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" dropdown={dropdown} cards={(c) => <OptionCards chipId={c.id} label={c.label} options={c.options} value={c.value} disabled={locked} onValueChange={c.onValueChange} />} />)}
+            {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" dropdown={dropdown} cards={(c, wide) => <OptionCards chipId={c.id} label={c.label} options={c.options} value={c.value} disabled={locked} onValueChange={c.onValueChange} columns={wide ? "six" : "auto"} />} />)}
             {plainChips.filter((c) => c.variant !== "cards").map(dropdown)}
           </div>
         ) : null}
@@ -348,7 +352,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         if (seen.has(name)) continue;
         seen.add(name);
         const g = groups.find((x) => x.name === name)!;
-        ordered.push(<StyleGroup key={`g-${name}`} name={name} chips={g.chips} locked={locked} sheet={false} side="right" block dropdown={dropdown} cards={(c) => <OptionCards chipId={c.id} label={c.label} options={c.options} value={c.value} disabled={locked} onValueChange={c.onValueChange} />} />);
+        ordered.push(<StyleGroup key={`g-${name}`} name={name} chips={g.chips} locked={locked} sheet={false} side="right" block dropdown={dropdown} cards={(c, wide) => <OptionCards chipId={c.id} label={c.label} options={c.options} value={c.value} disabled={locked} onValueChange={c.onValueChange} columns={wide ? "six" : "auto"} />} />);
       } else if (chip.variant === "cards") ordered.push(cardsSection(chip));
     }
     const dropdowns = unfolded.filter((c) => c.presentation !== "popover" && c.variant !== "cards");
@@ -505,12 +509,51 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
   side: "right" | "bottom";
   block?: boolean;
   dropdown: (chip: PromptBarChip) => ReactNode;
-  cards: (chip: PromptBarChip) => ReactNode;
+  cards: (chip: PromptBarChip, wide: boolean) => ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const banner = chips.find((c) => c.trigger !== undefined)?.trigger === "banner";
+  const wide = chips.find((c) => c.popoverSize !== undefined)?.popoverSize === "wide";
+  const cardChips = chips.filter((c) => c.variant === "cards");
   const thumbs = chips.filter((c) => c.variant === "cards").map((c) => c.options.find((o) => String(o.value) === String(c.value))?.media).filter((m): m is string => Boolean(m)).slice(0, 2);
   const summary = chips.map(chosenLabel).filter(Boolean).join(", ");
-  const trigger = (
+  const bannerSrc = cardChips.map((c) => c.options.find((o) => String(o.value) === String(c.value))?.media).find((m): m is string => Boolean(m));
+  const bannerNames = cardChips.map((c) => c.label.toLowerCase());
+  const bannerEyebrow = bannerNames.length > 1 ? `${bannerNames.slice(0, -1).join(", ")} and ${bannerNames[bannerNames.length - 1]}` : (bannerNames[0] ?? name.toLowerCase());
+  const bannerTrigger = (
+    <button
+      type="button"
+      data-slot="prompt-bar-group"
+      data-trigger="banner"
+      data-group={name}
+      disabled={locked}
+      aria-haspopup="dialog"
+      aria-expanded={open}
+      onClick={sheet ? () => setOpen(true) : undefined}
+      className="group/banner relative block aspect-[16/6] w-full min-w-0 overflow-hidden rounded-2xl border border-input bg-muted text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"
+    >
+      {bannerSrc ? <span className="absolute inset-0"><OptionThumb src={bannerSrc} /></span> : null}
+      <span aria-hidden="true" className="absolute inset-0 bg-[image:var(--art-scrim)]" />
+      <span className="absolute inset-x-0 bottom-0 flex min-w-0 items-end justify-between gap-3 p-3 text-[var(--art-foreground)]">
+        <span className="flex min-w-0 flex-col">
+          <span className="truncate text-xs uppercase tracking-wide">{bannerEyebrow}</span>
+          <span className="truncate text-lg font-semibold">{summary}</span>
+        </span>
+        <span className="flex min-h-9 shrink-0 items-center gap-1 rounded-full bg-[var(--art-overlay)] px-3 text-sm font-medium">
+          Change
+          <ChevronDown className="size-4" aria-hidden="true" />
+        </span>
+      </span>
+    </button>
+  );
+  // The banner's visible name sits above it, outside the button, so the popover trigger stays the button itself.
+  const labelled = (node: ReactNode) => banner ? (
+    <div data-slot="prompt-bar-banner" className="flex min-w-0 flex-col gap-1.5">
+      <span className="text-sm font-medium text-muted-foreground">{name}</span>
+      {node}
+    </div>
+  ) : node;
+  const trigger = banner ? bannerTrigger : (
     <button
       type="button"
       data-slot="prompt-bar-group"
@@ -533,21 +576,23 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
       <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
     </button>
   );
+  const wideCards = wide && !sheet;
+  const section = (chip: PromptBarChip) => (
+    <div key={chip.id} data-slot="prompt-bar-cards" className="flex min-w-0 flex-col gap-1.5">
+      <span className="text-sm font-medium text-muted-foreground">{chip.label}</span>
+      {cards(chip, wideCards)}
+    </div>
+  );
   const body = (
-    <div data-slot="prompt-bar-group-body" className="flex min-w-0 flex-col gap-4">
-      {chips.map((chip) => chip.variant === "cards" ? (
-        <div key={chip.id} data-slot="prompt-bar-cards" className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-sm font-medium text-muted-foreground">{chip.label}</span>
-          {cards(chip)}
-        </div>
-      ) : <div key={chip.id} className="flex min-w-0 flex-wrap gap-2">{dropdown(chip)}</div>)}
+    <div data-slot="prompt-bar-group-body" data-size={wideCards ? "wide" : undefined} className="flex min-w-0 flex-col gap-4">
+      {chips.map((chip) => chip.variant === "cards" ? section(chip) : <div key={chip.id} className="flex min-w-0 flex-wrap gap-2">{dropdown(chip)}</div>)}
       <Button type="button" variant="outline" width="full" onClick={() => setOpen(false)}>Done</Button>
     </div>
   );
   if (sheet) {
     return (
       <>
-        {trigger}
+        {labelled(trigger)}
         <Drawer open={open} onOpenChange={setOpen}>
           <DrawerContent aria-describedby={undefined}>
             <DrawerHeader><DrawerTitle>{name}</DrawerTitle></DrawerHeader>
@@ -559,8 +604,8 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
   }
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent width="auto" side={side} align="start" aria-label={name} className="max-h-[min(70dvh,36rem)] w-[min(92vw,32rem)] overflow-y-auto">
+      {labelled(<PopoverTrigger asChild>{trigger}</PopoverTrigger>)}
+      <PopoverContent width="auto" side={side} align="start" aria-label={name} className={cn("max-h-[min(70dvh,36rem)] overflow-y-auto", wide ? "w-[min(92vw,47.5rem)]" : "w-[min(92vw,32rem)]")}>
         {body}
       </PopoverContent>
     </Popover>

@@ -37,8 +37,8 @@ const darkRoot = block(css, ".dark {");
 type Theme = { name: string; primaryText: string; surfaces: Record<string, string> };
 
 const themes: Theme[] = [
-  { name: "light", primaryText: readVar(lightRoot, "--foreground"), surfaces: { canvas: readVar(lightRoot, "--surface-page"), sidebar: readVar(lightRoot, "--surface-sidebar"), panel: readVar(lightRoot, "--surface-card"), "raised panel": readVar(lightRoot, "--surface-pane") } },
-  { name: "dark", primaryText: readVar(darkRoot, "--foreground"), surfaces: { canvas: readVar(darkRoot, "--surface-page"), sidebar: readVar(darkRoot, "--surface-sidebar"), panel: readVar(darkRoot, "--surface-card"), "raised panel": readVar(darkRoot, "--surface-pane") } },
+  { name: "light", primaryText: readVar(lightRoot, "--foreground"), surfaces: { canvas: readVar(lightRoot, "--surface-page"), sidebar: readVar(lightRoot, "--surface-sidebar"), panel: readVar(lightRoot, "--surface-card"), "raised panel": readVar(lightRoot, "--surface-pane"), "recessed stage": readVar(lightRoot, "--surface-stage") } },
+  { name: "dark", primaryText: readVar(darkRoot, "--foreground"), surfaces: { canvas: readVar(darkRoot, "--surface-page"), sidebar: readVar(darkRoot, "--surface-sidebar"), panel: readVar(darkRoot, "--surface-card"), "raised panel": readVar(darkRoot, "--surface-pane"), "recessed stage": readVar(darkRoot, "--surface-stage") } },
 ];
 
 const secondaryText: Record<string, string> = { light: readVar(lightRoot, "--muted-foreground"), dark: readVar(darkRoot, "--muted-foreground") };

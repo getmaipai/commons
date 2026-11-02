@@ -49,7 +49,7 @@ function blend(fg: string, bg: string, alpha: number): string {
 }
 
 type Family = "foreground" | "muted-foreground" | "sidebar-foreground" | "background";
-const PAGE_SURFACES = ["--surface-page", "--surface-card", "--surface-pane", "--surface-sidebar"];
+const PAGE_SURFACES = ["--surface-page", "--surface-card", "--surface-pane", "--surface-sidebar", "--surface-stage"];
 
 /** Every (text, surface) pair the family is drawn on, per theme. */
 function pairs(family: Family): { theme: string; text: string; surface: string }[] {

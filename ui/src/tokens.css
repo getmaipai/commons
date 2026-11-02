@@ -622,6 +622,8 @@
    * surfaces (spec section 1, program decision 5). Dark is the default
    * and the reference; this derivation passes the same AA contrast test. */
   --surface-page: #f4f7fb;
+  /* VIDEO-UI-13: the recessed stage a feed of pictures sits in; one step darker than the page, never the raised --surface-pane. */
+  --surface-stage: #e8edf4;
   --page: #f9fafb;
   --elevation-color: oklch(0.2 0.02 255 / 0.10);
   --elevation-hairline: oklch(0.2 0.02 255 / 0.07);
@@ -950,6 +952,7 @@
     --tint-problem-border: #ff6f68;
     --radius: 12px;
     --surface-page: #07111f;
+    --surface-stage: #02070e;
     --surface-card: #102238;
     --surface-pane: #142a43;
     --surface-sidebar: #0a1a2e;
@@ -1057,6 +1060,7 @@
   --tint-problem-border: #ff6f68;
   --radius: 12px;
   --surface-page: #07111f;
+  --surface-stage: #02070e;
   --surface-card: #102238;
   --surface-pane: #142a43;
   --surface-sidebar: #0a1a2e;

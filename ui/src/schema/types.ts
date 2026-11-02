@@ -345,12 +345,13 @@ export const SplitViewNodeSchema: z.ZodType<SplitViewNode> = z.lazy(() =>
       aside_sheet: z.literal("phone").optional(),
       aside_side: z.enum(["start", "end"]).optional(),
       aside_width: z.enum(["default", "wide"]).optional(),
+      main_surface: z.enum(["page", "stage"]).optional(),
     }),
   ]),
 );
 export type SplitViewNode =
   | { type: "split_view"; list: ListNode | CardGridNode; detail: DetailPaneNode }
-  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string; aside_sheet?: "phone"; aside_side?: "start" | "end"; aside_width?: "default" | "wide" };
+  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string; aside_sheet?: "phone"; aside_side?: "start" | "end"; aside_width?: "default" | "wide"; main_surface?: "page" | "stage" };
 
 export const WidgetCardNodeSchema = z.object({
   type: z.literal("widget_card"),
@@ -476,6 +477,8 @@ export const PromptBarNodeSchema = z.object({
         presentation: z.enum(["inline", "popover"]).optional(),
         group: z.string().min(1).max(24).optional(),
         fold: z.boolean().optional(),
+        trigger: z.enum(["default", "banner"]).optional(),
+        popover_size: z.enum(["default", "wide"]).optional(),
       }),
     )
     .max(6)

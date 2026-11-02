@@ -1,3 +1,7 @@
+## [spec-v0.1.307] - 2026-11-02
+
+- VIDEO-UI-13 (items 4 and 5 of the Videos Create feel note): `prompt_bar` chips in a popover `group` gain `trigger` (`default`, or `banner`: the shared trigger drawn as a poster banner) and `popover_size` (`default`, or `wide`: a wider popover, six cards a row); both are read from the first chip of the group that sets them. `split_view` (main and aside form) gains `main_surface` (`page` default, or `stage`: the main column on the recessed kit surface). All additive; old pages are unchanged.
+
 ## [spec-v0.1.306] - 2026-11-02
 
 - VIDEO-UI-12 (home `docs/design/video-create-feel-2026-11-02.md` change 3): `split_view` gains the optional `aside_width` (`default` 360 px, or `wide` 420 px at `lg`), `prompt_bar` gains `field_size` (`default`, or `large`: a five row box), `references[].placement` gains `tile` and `references[].hint` (a one-line hint on the tile), `tier.presentation` (`segment` default, or `cards`) and `submit_detail.placement` (`below` default, or `in_button`). checkAppPackage counts `tile` with `in_field` (at most one between them, picture, character or place only). Additive; every default is unchanged.

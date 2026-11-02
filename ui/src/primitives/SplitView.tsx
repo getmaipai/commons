@@ -51,6 +51,8 @@ interface MainAsideProps {
   asideSide?: "start" | "end";
   /** VIDEO-UI-12: the aside column's width at `lg` and up. Default `default`, 360 px, unchanged; `wide` is 420 px. Stacked, no effect. */
   asideWidth?: "default" | "wide";
+  /** VIDEO-UI-13: `stage` draws the main column as a recessed pane on `--surface-stage`. Default `page`: no surface. */
+  mainSurface?: "page" | "stage";
 }
 
 type SplitViewProps = ListDetailProps | MainAsideProps;
@@ -70,7 +72,7 @@ export function SplitView(props: SplitViewProps) {
   return <ListDetail {...props} />;
 }
 
-function MainAside({ main, aside, asideLabel, asideSide = "end", asideWidth = "default" }: MainAsideProps) {
+function MainAside({ main, aside, asideLabel, asideSide = "end", asideWidth = "default", mainSurface = "page" }: MainAsideProps) {
   const side = useSideBySide();
   const start = asideSide === "start";
   const wide = asideWidth === "wide";
@@ -83,7 +85,7 @@ function MainAside({ main, aside, asideLabel, asideSide = "end", asideWidth = "d
         data-aside-side={asideSide}
         data-aside-width={asideWidth}
       >
-        <div className="flex min-w-0 flex-col gap-4">{main}</div>
+        <div data-surface={mainSurface === "stage" ? "stage" : undefined} className={cn("flex min-w-0 flex-col gap-4", mainSurface === "stage" && "rounded-2xl border border-border bg-[var(--surface-stage)] p-4 text-foreground sm:p-5")}>{main}</div>
         <div role={asideLabel ? "region" : undefined} aria-label={asideLabel} className={cn("flex min-w-0 flex-col gap-4", start && "lg:order-first")}>
           {aside}
         </div>

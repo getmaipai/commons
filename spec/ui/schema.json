@@ -851,7 +851,8 @@
         "aside_label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The aside column's accessible name (\"Up next\")." },
         "aside_sheet": { "type": "string", "enum": ["phone"], "description": "On phone, hide the aside and open it in a Drawer from a labelled button. Not combined with a `prompt_bar` of `placement: \"panel\"` in the aside (the bar draws its own dock and sheet); checkAppPackage refuses the pair." },
         "aside_side": { "type": "string", "enum": ["start", "end"], "default": "end", "description": "VIDEO-UI-03 (K11): the side the aside takes at `lg` and up. `start` puts it on the left (a control panel beside a results feed); `end` (default) is unchanged. Below `lg` the aside stacks under the main column as before." },
-        "aside_width": { "type": "string", "enum": ["default", "wide"], "default": "default", "description": "VIDEO-UI-12: the aside column's width at `lg` (960 px) and up. `default` is 360 px, unchanged; `wide` is 420 px (a roomy control panel). Below `lg` the aside stacks as before." }
+        "aside_width": { "type": "string", "enum": ["default", "wide"], "default": "default", "description": "VIDEO-UI-12: the aside column's width at `lg` (960 px) and up. `default` is 360 px, unchanged; `wide` is 420 px (a roomy control panel). Below `lg` the aside stacks as before." },
+        "main_surface": { "type": "string", "enum": ["page", "stage"], "default": "page", "description": "VIDEO-UI-13: the surface the main column draws on. `page` (default) is unchanged: the column sits on the page. `stage` draws it as a recessed pane on the kit token `--surface-stage` (darker than the page in dark theme, a soft grey in light theme), the frame a feed of pictures and clips sits in. Tokens only: a colour never comes from the page. Only the main and aside form has it." }
       }
     },
     "widget_card": {
@@ -1142,6 +1143,18 @@
                 "type": "boolean",
                 "default": false,
                 "description": "VIDEO-UI-03 (K3b): list this chip under a collapsed \"More settings\" control."
+              },
+              "trigger": {
+                "type": "string",
+                "enum": ["default", "banner"],
+                "default": "default",
+                "description": "VIDEO-UI-13: on a popover `group`, `banner` draws the shared trigger as a poster banner (the chosen card's picture, the group's chip names, the chosen words and a Change pill) instead of the small row. Read from the first chip of the group that sets it. Default unchanged."
+              },
+              "popover_size": {
+                "type": "string",
+                "enum": ["default", "wide"],
+                "default": "default",
+                "description": "VIDEO-UI-13: on a popover `group`, `wide` opens a wider popover (about 760 px) with six cards a row and each card chip as its own section (tabs when the surface is below `lg`). Read from the first chip of the group that sets it. Default unchanged."
               }
             }
           }

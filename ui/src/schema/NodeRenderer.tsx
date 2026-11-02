@@ -701,6 +701,8 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
         presentation: chip.presentation,
         group: chip.group,
         fold: chip.fold,
+        trigger: chip.trigger,
+        popoverSize: chip.popover_size,
         options: chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media) })),
         value: picked[chip.state]!,
         onValueChange: (value) => {
@@ -1788,6 +1790,7 @@ function SplitViewNodeView({ node, state }: { node: SplitViewNode; state: Row })
         asideLabel={node.aside_label}
         asideSide={node.aside_side}
         asideWidth={node.aside_width}
+        mainSurface={node.main_surface}
       />
     );
   }
