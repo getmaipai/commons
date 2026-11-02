@@ -1,3 +1,7 @@
+## [spec-v0.1.296] - 2026-11-02
+
+- MUSIC-ONLINE-01: three household settings for the music package's background lookups, `music.musicbrainz_match`, `music.artist_wikimedia` and `music.album_art_online` (all boolean, on by default, advanced, honoured by home). Additive.
+
 ## [spec-v0.1.295] - 2026-11-01
 
 - MUSIC-POLISH-01: `track_rows` gains the optional `row_actions` (up to two quiet icon buttons at each row's end, each `{icon, label, action}`; the action receives its row, like `on_play`), and `creation_header.shuffle` gains the optional `icon` (default `shuffle`) and `labeled` (draw the label beside the icon). Both additive; `checkAppPackage` keeps a `row_actions` action inside the package. Fixture `ui/pages/music-listen.json` shows `row_actions`.
