@@ -1,3 +1,7 @@
+## [spec-v0.1.311] - 2026-11-02
+
+- VIDEO-STUDIO-02 (K1b): `page` gains the optional `surface` (`page` default, or `studio`: the page body draws as a rounded pane on the kit's studio token scope). `checkAppPackage` refuses any other `surface` word. Additive; old pages are unchanged.
+
 ## [spec-v0.1.310] - 2026-11-02
 
 - ADULT-LOCK-01 (home `docs/design/video-loras-2026-11-02.md` section 3.8): `media_shelf` gains the optional `locked_field` (dotted path to a boolean, default `locked`) and `making_field` (default `making`); `result_feed` `fields` gains the optional `locked` and `making`. A row whose locked flag is true is a locked item: the kit drops it before reading any other field and draws ONE identical lock tile per list, whatever the number of locked rows, with no title, description, picture, tags or count. `checkAppPackage` checks both media_shelf fields as paths (result_feed `fields` are already checked). Additive; a node without them is unchanged.
