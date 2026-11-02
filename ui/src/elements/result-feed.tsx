@@ -255,7 +255,7 @@ export function ResultFeed({
         </div>
       ))}
       {hasLocked ? (
-        <div data-slot="result-feed-locked" className="flex flex-col gap-4">
+        <div data-slot="result-feed-locked" className="flex max-w-3xl flex-col gap-4">
           <LockTile shape="card" making={making} onUnlock={onUnlock} />
         </div>
       ) : null}
