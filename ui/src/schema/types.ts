@@ -343,12 +343,13 @@ export const SplitViewNodeSchema: z.ZodType<SplitViewNode> = z.lazy(() =>
       aside: z.array(UiNodeSchema).min(1),
       aside_label: z.string().min(1).max(60).optional(),
       aside_sheet: z.literal("phone").optional(),
+      aside_side: z.enum(["start", "end"]).optional(),
     }),
   ]),
 );
 export type SplitViewNode =
   | { type: "split_view"; list: ListNode | CardGridNode; detail: DetailPaneNode }
-  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string; aside_sheet?: "phone" };
+  | { type: "split_view"; main: UiNode[]; aside: UiNode[]; aside_label?: string; aside_sheet?: "phone"; aside_side?: "start" | "end" };
 
 export const WidgetCardNodeSchema = z.object({
   type: z.literal("widget_card"),
@@ -471,6 +472,9 @@ export const PromptBarNodeSchema = z.object({
           .max(24),
         variant: z.enum(["dropdown", "cards"]).optional(),
         default: z.union([z.string(), z.number()]).optional(),
+        presentation: z.enum(["inline", "popover"]).optional(),
+        group: z.string().min(1).max(24).optional(),
+        fold: z.boolean().optional(),
       }),
     )
     .max(6)
@@ -480,7 +484,8 @@ export const PromptBarNodeSchema = z.object({
       z.object({
         state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
         label: z.string().min(1).max(40),
-        kind: z.enum(["picture", "character", "place"]),
+        kind: z.enum(["picture", "character", "place", "audio", "video"]),
+        placement: z.enum(["row", "in_field"]).optional(),
       }),
     )
     .max(6)
@@ -505,6 +510,10 @@ export const PromptBarNodeSchema = z.object({
     })
     .optional(),
   submit_label: z.string().min(1).max(24).optional(),
+  placement: z.enum(["inline", "panel"]).optional(),
+  suggestions: z.array(z.object({ label: z.string().min(1).max(40), text: z.string().min(1).max(300) })).max(4).optional(),
+  submit_detail: z.object({ state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40), labels: z.record(z.string(), z.string().min(1).max(80)) }).optional(),
+  starts: z.enum(["picture", "video"]).optional(),
   submit: ActionSchema,
 });
 export type PromptBarNode = z.infer<typeof PromptBarNodeSchema>;

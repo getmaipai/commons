@@ -630,6 +630,45 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
   });
   const [busy, setBusy] = useState(false);
 
+  // VIDEO-UI-03 (K6): a `navigate` that arrives at this page again (Remix) writes new values into the page state while the bar is
+  // mounted. A value that differs from what the bar holds is taken over, so the bar follows the page, not only its first render.
+  const fromPrompt = state[promptKey];
+  useEffect(() => { if (typeof fromPrompt === "string" && fromPrompt !== "") setText((prev) => (prev === fromPrompt ? prev : fromPrompt)); }, [fromPrompt]);
+  const chipSignature = chips.map((chip) => `${chip.state}=${String(state[chip.state] ?? "")}`).join("&");
+  useEffect(() => {
+    const next: Record<string, string | number> = {};
+    for (const chip of chips) {
+      const known = chip.options.find((o) => o.value === state[chip.state] || (state[chip.state] !== undefined && String(o.value) === String(state[chip.state])));
+      if (known) next[chip.state] = known.value;
+    }
+    if (Object.keys(next).length > 0) setPicked((prev) => (Object.entries(next).every(([k, v]) => prev[k] === v) ? prev : { ...prev, ...next }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chipSignature is the change signal for chips read from state
+  }, [chipSignature]);
+  const fromTier = node.tier ? state[node.tier.state] : undefined;
+  useEffect(() => {
+    const known = node.tier?.tiers.find((t) => t.id === fromTier)?.id;
+    if (known) setTier(known);
+  }, [fromTier, node.tier]);
+  const refSignature = refs.map((ref) => `${ref.state}=${String(state[ref.state] ?? "")}`).join("&");
+  useEffect(() => {
+    setFilled((prev) => {
+      let changed = false;
+      const out = { ...prev };
+      for (const ref of refs) {
+        const v = state[ref.state];
+        if (typeof v === "string" && v && prev[ref.state]?.id !== v) { out[ref.state] = { id: v }; changed = true; }
+      }
+      return changed ? out : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refSignature is the change signal for references read from state
+  }, [refSignature]);
+
+  // K8: the host's one line while the engine this bar starts is not ready; it stops the bar and is shown instead of an error.
+  const notice = node.starts ? host?.makingNotice?.(node.starts) : undefined;
+
+  const detailValue = node.submit_detail ? (node.submit_detail.state === node.tier?.state ? tier : picked[node.submit_detail.state]) : undefined;
+  const submitDetail = node.submit_detail && detailValue !== undefined ? node.submit_detail.labels[String(detailValue)] : undefined;
+
   function submit() {
     const item: Record<string, unknown> = { ...picked, [promptKey]: text.trim() };
     if (node.tier) item[node.tier.state] = tier;
@@ -646,6 +685,10 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       value={text}
       onValueChange={setText}
       submitLabel={node.submit_label}
+      placement={node.placement}
+      suggestions={node.suggestions}
+      submitDetail={submitDetail}
+      disabledReason={notice}
       busy={busy}
       error={lastError}
       onSubmit={submit}
@@ -653,6 +696,9 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
         id: chip.state,
         label: chip.label,
         variant: chip.variant,
+        presentation: chip.presentation,
+        group: chip.group,
+        fold: chip.fold,
         options: chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media) })),
         value: picked[chip.state]!,
         onValueChange: (value) => {
@@ -664,6 +710,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
         id: ref.state,
         label: ref.label,
         kind: ref.kind,
+        placement: ref.placement,
         value: filled[ref.state]?.id ?? null,
         thumb: filled[ref.state]?.thumb,
         disabled: !host?.pickMedia,
@@ -1734,6 +1781,7 @@ function SplitViewNodeView({ node, state }: { node: SplitViewNode; state: Row })
         main={node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}
         aside={aside}
         asideLabel={node.aside_label}
+        asideSide={node.aside_side}
       />
     );
   }

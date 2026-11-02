@@ -836,7 +836,7 @@
       "required": ["type"],
       "dependentRequired": { "list": ["detail"], "detail": ["list"], "main": ["aside"], "aside": ["main"] },
       "minProperties": 3,
-      "description": "The kit's SplitView primitive (ui/src/primitives/SplitView.tsx). Two forms: `list` and `detail` (an index beside one item, taking turns on a phone), or MEDIA-POLISH-01's `main` and `aside` (a wide column with a narrow one beside it from 1024 px, stacked below that: a player with Up next). A package page may use the main and aside form.",
+      "description": "The kit's SplitView primitive (ui/src/primitives/SplitView.tsx). Two forms: `list` and `detail` (an index beside one item, taking turns on a phone), or MEDIA-POLISH-01's `main` and `aside` (a wide column with a narrow one beside it from the kit's desktop breakpoint `lg`, 960 px, stacked below that: a player with Up next). A package page may use the main and aside form.",
       "properties": {
         "type": { "const": "split_view" },
         "list": {
@@ -849,7 +849,8 @@
         "main": { "type": "array", "items": { "$ref": "#" }, "minItems": 1 },
         "aside": { "type": "array", "items": { "$ref": "#" }, "minItems": 1 },
         "aside_label": { "type": "string", "minLength": 1, "maxLength": 60, "description": "The aside column's accessible name (\"Up next\")." },
-        "aside_sheet": { "type": "string", "enum": ["phone"], "description": "On phone, hide the aside and open it in a Drawer from a labelled button." }
+        "aside_sheet": { "type": "string", "enum": ["phone"], "description": "On phone, hide the aside and open it in a Drawer from a labelled button. Not combined with a `prompt_bar` of `placement: \"panel\"` in the aside (the bar draws its own dock and sheet); checkAppPackage refuses the pair." },
+        "aside_side": { "type": "string", "enum": ["start", "end"], "default": "end", "description": "VIDEO-UI-03 (K11): the side the aside takes at `lg` and up. `start` puts it on the left (a control panel beside a results feed); `end` (default) is unchanged. Below `lg` the aside stacks under the main column as before." }
       }
     },
     "widget_card": {
@@ -1034,7 +1035,7 @@
         "label",
         "submit"
       ],
-      "description": "VIDEO-CREATE-01: a prompt box with chips and one Make button. Every chip and the optional tier segment write their chosen value to page state under their own `state` key as it changes; the prompt text is written under `prompt_state` when Make is pressed. Make fires `submit` once with the item {<prompt_state>: text, <each chip state>: value, <tier state>: id}, so `{prompt}` and `{shape}` placeholders in the call args fill from it (a whole-string placeholder keeps a number's type). Make stays off while the prompt is empty. The node sends nothing itself. VIDEO-CREATE-02 (additive): a chip may set `variant: \"cards\"` with an optional `media` per option, and an optional `references` list adds picture slots whose file ids join the item.",
+      "description": "VIDEO-CREATE-01: a prompt box with chips and one Make button. Every chip and the optional tier segment write their chosen value to page state under their own `state` key as it changes; the prompt text is written under `prompt_state` when Make is pressed. Make fires `submit` once with the item {<prompt_state>: text, <each chip state>: value, <tier state>: id}, so `{prompt}` and `{shape}` placeholders in the call args fill from it (a whole-string placeholder keeps a number's type). Make stays off while the prompt is empty. The node sends nothing itself. VIDEO-CREATE-02 (additive): a chip may set `variant: \"cards\"` with an optional `media` per option, and an optional `references` list adds picture slots whose file ids join the item. VIDEO-UI-03 (additive): `placement: \"panel\"` draws the bar as a control panel (left pane that scrolls inside itself, the submit pinned at its foot) when the enclosing `split_view` is side by side, and as a bottom dock (the words, an Options button, a round submit; the controls in a bottom sheet) when it is stacked; the mode comes from that `split_view`, never from a media query of the bar. `suggestions` are idea chips shown while the words are empty; `submit_detail` is the line under the submit; chips may set `presentation`, `group` and `fold`; a reference may set `placement: \"in_field\"` and its `kind` may be `audio` or `video`; `starts` marks that the submit starts a picture or a clip, so the host can disable it with its one reason.",
       "properties": {
         "type": {
           "const": "prompt_bar"
@@ -1123,6 +1124,23 @@
               "default": {
                 "anyOf": [{ "type": "string" }, { "type": "number" }],
                 "description": "The option chosen first; the first option when omitted."
+              },
+              "presentation": {
+                "type": "string",
+                "enum": ["inline", "popover"],
+                "default": "inline",
+                "description": "VIDEO-UI-03 (K3a): `popover` shows the chip as one trigger (its chosen thumbnails and words) that opens its options in a popover, a sheet on a phone. Chips with the same `group` share one trigger. Inside a panel's bottom sheet the options are drawn flat, three to a row."
+              },
+              "group": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24,
+                "description": "VIDEO-UI-03 (K3a): the visible name of a shared popover trigger (\"Style\"). Chips with the same `group` open one popover; a text chip may be in the group."
+              },
+              "fold": {
+                "type": "boolean",
+                "default": false,
+                "description": "VIDEO-UI-03 (K3b): list this chip under a collapsed \"More settings\" control."
               }
             }
           }
@@ -1138,7 +1156,8 @@
             "properties": {
               "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
               "label": { "type": "string", "minLength": 1, "maxLength": 40 },
-              "kind": { "type": "string", "enum": ["picture", "character", "place"] }
+              "kind": { "type": "string", "enum": ["picture", "character", "place", "audio", "video"], "description": "VIDEO-UI-03 (K4): `audio` and `video` slots take a voice clip or a source clip through the host's media picker." },
+              "placement": { "type": "string", "enum": ["row", "in_field"], "default": "row", "description": "VIDEO-UI-03 (K3c): `in_field` shows the chosen file inside the prompt box as a named thumbnail with a remove control. At most one slot, a `picture`, `character` or `place`." }
             }
           }
         },
@@ -1216,6 +1235,45 @@
           "minLength": 1,
           "maxLength": 24,
           "default": "Make"
+        },
+        "placement": {
+          "type": "string",
+          "enum": ["inline", "panel"],
+          "default": "inline",
+          "description": "VIDEO-UI-03 (K2a): `inline` (default) is a block in the page flow, unchanged. `panel` is a control panel beside a feed: it needs an enclosing `split_view` (main and aside form) and reads that split_view's layout, side by side at `lg` (960 px) and up, stacked below. Outside a `split_view` it draws as `inline`."
+        },
+        "suggestions": {
+          "type": "array",
+          "maxItems": 4,
+          "description": "VIDEO-UI-03 (K2b): idea chips shown while the words are empty; pressing one puts its `text` in the box.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "text"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "text": { "type": "string", "minLength": 1, "maxLength": 300 }
+            }
+          }
+        },
+        "submit_detail": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "labels"],
+          "description": "VIDEO-UI-03 (K2c): the small line under the submit button, chosen by the current value of one chip or the tier (`state` names its key); a value with no entry shows no line. Say time, never credits.",
+          "properties": {
+            "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+            "labels": {
+              "type": "object",
+              "maxProperties": 24,
+              "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 80 }
+            }
+          }
+        },
+        "starts": {
+          "type": "string",
+          "enum": ["picture", "video"],
+          "description": "VIDEO-UI-03 (K8): the submit starts a picture or a clip. The host's `makingNotice(kind)`, when it has one and returns a line, becomes the bar's `disabledReason` (the box and the submit stop, the line shows where the person acts). No marker: unchanged."
         },
         "submit": {
           "$ref": "#/$defs/action"

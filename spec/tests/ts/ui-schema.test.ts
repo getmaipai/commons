@@ -224,7 +224,7 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, chips: [{ ...cards, options: [{ value: "a", label: "A", media: "/abs.mp4" }] }] })).toBe(false);
     expect(validate({ ...ok, chips: [{ ...cards, options: [{ value: "a", label: "A", media: "https://x.test/a.mp4" }] }] })).toBe(false);
     expect(validate({ ...ok, references: [{ state: "start_frame", label: "Picture", kind: "picture" }, { state: "who", label: "Character", kind: "character" }, { state: "where", label: "Place", kind: "place" }] })).toBe(true);
-    expect(validate({ ...ok, references: [{ state: "x", label: "X", kind: "video" }] })).toBe(false);
+    expect(validate({ ...ok, references: [{ state: "x", label: "X", kind: "movie" }] })).toBe(false);
     expect(validate({ ...ok, references: [{ state: "x", label: "X" }] })).toBe(false);
   });
 
@@ -255,6 +255,29 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, filters: [{ kind: "radio", state: "x", label: "X" }] })).toBe(false);
     expect(validate({ ...ok, actions: [{ label: "A", starts: "audio", action: { call: { target: "/x" } } }] })).toBe(false);
     expect(validate({ ...ok, actions_variant: "wide" })).toBe(false);
+  });
+  test("VIDEO-UI-03: prompt_bar placement, suggestions, submit_detail, starts, chip presentation, group and fold, reference placement and kinds", () => {
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    const look = { state: "look", label: "Look", variant: "cards", presentation: "popover", group: "Style", options: [{ value: "a", label: "A" }] };
+    expect(validate({ ...ok, placement: "panel", starts: "video", suggestions: [{ label: "Fox", text: "A fox in snow" }], submit_detail: { state: "tier", labels: { standard: "Under a minute" } }, chips: [look, { ...look, state: "voices", fold: true, presentation: "inline" }] })).toBe(true);
+    expect(validate({ ...ok, placement: "dock" })).toBe(false);
+    expect(validate({ ...ok, starts: "song" })).toBe(false);
+    expect(validate({ ...ok, suggestions: [1, 2, 3, 4, 5].map((n) => ({ label: `L${n}`, text: "t" })) })).toBe(false);
+    expect(validate({ ...ok, suggestions: [{ label: "Fox" }] })).toBe(false);
+    expect(validate({ ...ok, submit_detail: { state: "Tier", labels: {} } })).toBe(false);
+    expect(validate({ ...ok, submit_detail: { state: "tier", labels: { standard: "" } } })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...look, presentation: "sheet" }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...look, group: "" }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...look, fold: "yes" }] })).toBe(false);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "in_field" }, { state: "voice", label: "Voice clip", kind: "audio" }, { state: "src", label: "Source", kind: "video", placement: "row" }] })).toBe(true);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "inside" }] })).toBe(false);
+  });
+
+  test("VIDEO-UI-03: split_view takes aside_side start or end", () => {
+    const view = { type: "split_view", main: [{ type: "empty_state", icon: "x", text: "t" }], aside: [{ type: "empty_state", icon: "x", text: "t" }] };
+    expect(validate({ ...view, aside_side: "start" })).toBe(true);
+    expect(validate({ ...view, aside_side: "end" })).toBe(true);
+    expect(validate({ ...view, aside_side: "left" })).toBe(false);
   });
 
   test("answer_blocks needs a package binding and refuses a route binding", () => {

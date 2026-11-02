@@ -208,6 +208,18 @@ describe("the News pages (NEWS-00)", () => {
     expect(run({ ...base, fields: { words: "https://x.test/a", status: "s", src: "https://x.test/a.mp4" } })).toContain("result_feed.fields: src must be a field path");
     expect(run({ ...base, filters: [{ kind: "toggle", state: "a", label: "A" }, { kind: "toggle", state: "a", label: "B" }] })).toContain('filter state key "a" is used twice');
   });
+  test("VIDEO-UI-03: one in-field reference, a picture kind only, submit_detail names a bar key, and a panel bar is not combined with the phone aside sheet", () => {
+    const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
+    const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
+    const bar = { type: "prompt_bar", label: "Describe", placement: "panel", chips: [{ state: "look", label: "Look", options: [{ value: "a", label: "A" }] }], references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "in_field" }, { state: "voice", label: "Voice", kind: "audio" }], submit_detail: { state: "look", labels: { a: "A minute" } }, submit: { call: { target: "/api/plugins/news/make" } } };
+    const view = (aside: unknown, extra: object = {}) => ({ type: "split_view", main: [{ type: "empty_state", icon: "x", text: "t" }], aside: [aside], aside_side: "start", ...extra });
+    expect(run(view(bar))).toBe("");
+    expect(run(view({ ...bar, references: [{ state: "a", label: "A", kind: "picture", placement: "in_field" }, { state: "b", label: "B", kind: "picture", placement: "in_field" }] }))).toContain('only one reference may have placement "in_field"');
+    expect(run(view({ ...bar, references: [{ state: "voice", label: "Voice", kind: "audio", placement: "in_field" }] }))).toContain("only a picture, character or place can sit in the field");
+    expect(run(view({ ...bar, submit_detail: { state: "nope", labels: {} } }))).toContain('submit_detail.state "nope" is not a chip or tier state');
+    expect(run(view(bar, { aside_sheet: "phone" }))).toContain('aside_sheet "phone" is not combined with a prompt_bar of placement "panel"');
+    expect(run(view({ ...bar, placement: "inline" }, { aside_sheet: "phone" }))).toBe("");
+  });
   test("a list needs a rows entry and a package source; Listen's play is allowed only in the actions map", () => {
     const badList = { type: "page", id: "x", title: "X", body: [{ type: "list", bind: { source: "package", path: "today" }, item_key_field: "k", item_label_field: "l" }] };
     expect(checkAppPackage("news", newsContributes, (m) => (m === "today" ? badList : news(m)), "child").join("\n")).toContain("returns blocks, not rows");

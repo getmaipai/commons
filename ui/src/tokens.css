@@ -1837,6 +1837,15 @@ html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx] { ani
   [data-slot="reader"] { position: fixed; inset: 0; z-index: 50; height: 100dvh; min-height: 0; }
 }
 
+/* VIDEO-UI-03: the prompt bar's panel and dock (elements/prompt-bar.tsx, placement "panel").
+ * --prompt-panel-offset is the height the app chrome takes above a side-by-side panel, so the panel's
+ * own scroll stops short of the window's foot. The dock is fixed to the window's bottom edge; where
+ * the phone nav is drawn (PhoneNav) it sits above it, the floating variant included. */
+:root { --prompt-panel-offset: 8rem; }
+[data-slot="prompt-bar"][data-mode="dock"] { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
+html:has([data-slot="phone-nav"]) [data-slot="prompt-bar"][data-mode="dock"] { bottom: calc(49px + env(safe-area-inset-bottom, 0px)); padding-bottom: 0.75rem; }
+html:has([data-slot="phone-nav"][data-floating]) [data-slot="prompt-bar"][data-mode="dock"] { bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+
 /* LIBRARY-REVAMP-06 slice A: the storage bar's segments and swatches are
  * drawn with background colours, which forced colours removes. Keep them
  * as solid system-colour blocks so the bar still reads; the legend names

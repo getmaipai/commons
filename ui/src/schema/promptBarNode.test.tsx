@@ -3,13 +3,16 @@ import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { act, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import makePage from "../../../spec/ui/pages/videos-make.json";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
+import { stubMatchMedia } from "../../tests/stubMatchMedia";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext } from "@/kit/schema/packageScope";
 import { MediaHostContext, type MediaHost } from "@/kit/schema/mediaHost";
 import { PageNodeSchema, type UiNode } from "@/kit/schema/types";
 
-afterEach(cleanup);
+const realMatchMedia = window.matchMedia;
+afterEach(() => { cleanup(); window.matchMedia = realMatchMedia; });
 
 interface Call { url: string; method: string; body: unknown }
 let calls: Call[] = [];
@@ -116,5 +119,98 @@ describe("prompt_bar node", () => {
     const body = calls.find((c) => c.url === "/api/plugins/videos/make")!.body as Record<string, unknown>;
     expect(body.start_frame).toBe("{start_frame}"); // the call arg stays unfilled: no file id was chosen
     expect(body.look).toBe("none");
+  });
+});
+
+// VIDEO-UI-03: the node carries the new props through, and the bar follows the page state (K6).
+const panelNode = {
+  type: "prompt_bar",
+  label: "Describe your video",
+  placement: "panel",
+  starts: "video",
+  submit_label: "Generate",
+  suggestions: [{ label: "Fox", text: "A fox in snow" }],
+  submit_detail: { state: "tier", labels: { standard: "Under a minute", boost: "About a minute" } },
+  chips: [
+    { state: "look", label: "Look", variant: "cards", presentation: "popover", group: "Style", default: "none", options: [{ value: "none", label: "Natural" }, { value: "anime", label: "Anime", media: "loops/anime.mp4" }] },
+    { state: "length", label: "Length", default: 5, options: [{ value: 5, label: "5 s" }, { value: 10, label: "10 s" }] },
+  ],
+  tier: { state: "tier", tiers: [{ id: "standard", label: "Standard" }, { id: "boost", label: "Boost" }] },
+  references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "in_field" }, { state: "voice", label: "Voice clip", kind: "audio" }],
+  submit: { call: { target: "/api/plugins/videos/make", args: { prompt: "{prompt}", look: "{look}", tier: "{tier}", start_frame: "{start_frame}", voice: "{voice}" } } },
+} as unknown as UiNode;
+
+function drawWith(n: UiNode, state: Record<string, unknown>, host: MediaHost | null = null) {
+  const tree = (s: Record<string, unknown>) => (
+    <MemoryRouter>
+      <PackageScopeContext.Provider value={{ packageId: "videos" }}>
+        <MediaHostContext.Provider value={host}>
+          <NodeRenderer node={n} state={s} />
+        </MediaHostContext.Provider>
+      </PackageScopeContext.Provider>
+    </MemoryRouter>
+  );
+  const view = renderWithQueryClient(tree(state));
+  return { view, update: (s: Record<string, unknown>) => view.rerender(<QueryClientProvider client={view.queryClient}>{tree(s)}</QueryClientProvider>) };
+}
+
+describe("prompt_bar node, VIDEO-UI-03", () => {
+  test("the new props parse and a panel bar outside a split_view draws as the inline bar", () => {
+    expect(() => PageNodeSchema.parse({ type: "page", id: "x", title: "X", body: [panelNode] })).not.toThrow();
+    const { view } = drawWith(panelNode, {});
+    expect(view.container.querySelector('[data-slot="prompt-bar"]')!.hasAttribute("data-mode")).toBe(false);
+    expect(view.getByRole("button", { name: "Fox" })).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="prompt-bar-detail"]')!.textContent).toBe("Under a minute");
+  });
+
+  test("inside a split_view at lg it is the panel, Generate sends the in-field and audio ids, the detail follows the tier", async () => {
+    stubMatchMedia({ "(min-width: 960px)": true });
+    const split = { type: "split_view", aside_side: "start", main: [{ type: "empty_state", icon: "film", text: "Feed" }], aside: [panelNode] } as unknown as UiNode;
+    const host: MediaHost = { onPlay: () => {}, pickMedia: (kind) => Promise.resolve({ id: `file-${kind}`, thumb: `/t/${kind}.png` }) };
+    const { view } = drawWith(split, {}, host);
+    expect(view.container.querySelector('[data-slot="prompt-bar"]')!.getAttribute("data-mode")).toBe("panel");
+    fireEvent.change(view.getByRole("textbox", { name: "Describe your video" }), { target: { value: "a fox" } });
+    fireEvent.click(view.getByRole("button", { name: "Add Start frame" }));
+    await view.findByRole("img", { name: "Start frame" });
+    fireEvent.click(view.getByRole("button", { name: "Add Voice clip" }));
+    await view.findByRole("button", { name: "Remove Voice clip" });
+    fireEvent.click(view.getByRole("radio", { name: "Boost" }));
+    expect(view.container.querySelector('[data-slot="prompt-bar-detail"]')!.textContent).toBe("About a minute");
+    fireEvent.click(view.getByRole("button", { name: "Generate" }));
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/videos/make")).toBe(true));
+    expect(calls.find((c) => c.url === "/api/plugins/videos/make")!.body).toEqual({ prompt: "a fox", look: "none", tier: "boost", start_frame: "file-picture", voice: "file-audio" });
+  });
+
+  test("K8: a bar that starts a clip takes the host's making notice as its disabled reason; no notice, no change", () => {
+    const off: MediaHost = { onPlay: () => {}, makingNotice: (kind) => (kind === "video" ? "Video is not ready yet. Try again in a minute." : undefined) };
+    const blocked = drawWith(panelNode, {}, off).view;
+    expect(blocked.getByText("Video is not ready yet. Try again in a minute.")).toBeTruthy();
+    expect((blocked.getByRole("textbox", { name: "Describe your video" }) as HTMLTextAreaElement).disabled).toBe(true);
+    cleanup();
+    const picture = drawWith({ ...(panelNode as object), starts: "picture" } as UiNode, {}, off).view;
+    expect((picture.getByRole("textbox", { name: "Describe your video" }) as HTMLTextAreaElement).disabled).toBe(false);
+    cleanup();
+    const unmarked = drawWith({ ...(panelNode as object), starts: undefined } as UiNode, {}, off).view;
+    expect((unmarked.getByRole("textbox", { name: "Describe your video" }) as HTMLTextAreaElement).disabled).toBe(false);
+  });
+
+  test("K6: chips, tier, references and words arrive from page state on first render", () => {
+    const { view } = drawWith(panelNode, { prompt: "a fox", look: "anime", length: 10, tier: "boost", start_frame: "f9" });
+    expect((view.getByRole("textbox", { name: "Describe your video" }) as HTMLTextAreaElement).value).toBe("a fox");
+    expect(view.getByRole("combobox", { name: "Length" }).textContent).toContain("10 s");
+    expect(view.getByRole("radio", { name: "Boost" }).getAttribute("aria-checked")).toBe("true");
+    expect(view.getByRole("button", { name: "Remove Start frame" })).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="prompt-bar-detail"]')!.textContent).toBe("About a minute");
+    expect(view.getByRole("button", { name: /Style/ }).textContent).toContain("Anime");
+  });
+
+  test("K6: a later navigation to the same page (Remix) refills the bar while it is mounted", () => {
+    const { view, update } = drawWith(panelNode, { prompt: "a fox", look: "none", tier: "standard" });
+    update({ prompt: "a whale", look: "anime", length: 10, tier: "boost", start_frame: "f2" });
+    expect((view.getByRole("textbox", { name: "Describe your video" }) as HTMLTextAreaElement).value).toBe("a whale");
+    expect(view.getByRole("combobox", { name: "Length" }).textContent).toContain("10 s");
+    expect(view.getByRole("radio", { name: "Boost" }).getAttribute("aria-checked")).toBe("true");
+    expect(view.getByRole("button", { name: /Style/ }).textContent).toContain("Anime");
+    expect(view.getByRole("button", { name: "Remove Start frame" })).toBeTruthy();
   });
 });

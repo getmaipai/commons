@@ -1,5 +1,27 @@
-import type { ReactNode } from "react";
+import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { cn, FOCUS_RING } from "@/kit/utils";
+import { SURFACE_MIN_WIDTH_PX } from "@/kit/responsive";
+
+/** VIDEO-UI-03: how the enclosing main and aside form is laid out right now. `side` is the aside beside the main column (the kit's
+ * desktop breakpoint, `lg`, 960 px, and up); `stacked` is the aside under it. A part inside the aside that must change shape with
+ * the layout (the `prompt_bar` panel and dock) reads this instead of running a media query of its own, so there is one definition
+ * of the breakpoint. `null` outside a main and aside SplitView. */
+export type SplitViewLayout = "side" | "stacked";
+export const SplitViewLayoutContext = createContext<SplitViewLayout | null>(null);
+export function useSplitViewLayout(): SplitViewLayout | null {
+  return useContext(SplitViewLayoutContext);
+}
+
+const SIDE_QUERY = `(min-width: ${SURFACE_MIN_WIDTH_PX.desktop}px)`;
+function subscribeSide(onChange: () => void) {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
+  const list = window.matchMedia(SIDE_QUERY);
+  list.addEventListener?.("change", onChange);
+  return () => list.removeEventListener?.("change", onChange);
+}
+function useSideBySide(): boolean {
+  return useSyncExternalStore(subscribeSide, () => typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(SIDE_QUERY).matches, () => false);
+}
 
 interface ListDetailProps {
   /** The index side: a List or a CardGrid, usually. */
@@ -17,13 +39,16 @@ interface ListDetailProps {
 }
 
 /** MEDIA-POLISH-01: the main and aside form: a wide column with a narrow one
- * beside it from 1024 px (a player with Up next, YouTube's watch page), the
- * aside stacked under the main column below that. */
+ * beside it from the kit's `lg` breakpoint, 960 px (a player with Up next,
+ * YouTube's watch page), the aside stacked under the main column below that. */
 interface MainAsideProps {
   main: ReactNode;
   aside: ReactNode;
   /** The aside column's accessible name ("Up next"). */
   asideLabel?: string;
+  /** VIDEO-UI-03: the side the aside takes at `lg` and up. Default `end`; `start` puts it on the left (a control panel beside a feed).
+   * Stacked, the aside stays under the main column either way. */
+  asideSide?: "start" | "end";
 }
 
 type SplitViewProps = ListDetailProps | MainAsideProps;
@@ -43,14 +68,23 @@ export function SplitView(props: SplitViewProps) {
   return <ListDetail {...props} />;
 }
 
-function MainAside({ main, aside, asideLabel }: MainAsideProps) {
+function MainAside({ main, aside, asideLabel, asideSide = "end" }: MainAsideProps) {
+  const side = useSideBySide();
+  const start = asideSide === "start";
   return (
-    <div className="grid w-full min-w-0 grid-cols-1 gap-x-7 gap-y-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]" data-slot="split-view" data-layout="main-aside">
-      <div className="flex min-w-0 flex-col gap-4">{main}</div>
-      <div role={asideLabel ? "region" : undefined} aria-label={asideLabel} className="flex min-w-0 flex-col gap-4">
-        {aside}
+    <SplitViewLayoutContext.Provider value={side ? "side" : "stacked"}>
+      <div
+        className={cn("grid w-full min-w-0 grid-cols-1 gap-x-7 gap-y-6", start ? "lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]")}
+        data-slot="split-view"
+        data-layout="main-aside"
+        data-aside-side={asideSide}
+      >
+        <div className="flex min-w-0 flex-col gap-4">{main}</div>
+        <div role={asideLabel ? "region" : undefined} aria-label={asideLabel} className={cn("flex min-w-0 flex-col gap-4", start && "lg:order-first")}>
+          {aside}
+        </div>
       </div>
-    </div>
+    </SplitViewLayoutContext.Provider>
   );
 }
 
