@@ -340,6 +340,14 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...feed, fields: { ...feed.fields, locked: 1 } })).toBe(false);
   });
 
+  test("VIDEO-STUDIO-02: page surface is page or studio, default unchanged", () => {
+    const page = { type: "page", id: "x", title: "X", body: [{ type: "empty_state", icon: "x", text: "t" }] };
+    expect(validate(page)).toBe(true);
+    expect(validate({ ...page, surface: "studio" })).toBe(true);
+    expect(validate({ ...page, surface: "page" })).toBe(true);
+    expect(validate({ ...page, surface: "dark" })).toBe(false);
+  });
+
   test("answer_blocks needs a package binding and refuses a route binding", () => {
     expect(validate({ type: "answer_blocks" })).toBe(false);
     expect(validate({ type: "answer_blocks", bind: { source: "route", path: "/api/people" } })).toBe(false);

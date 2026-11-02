@@ -187,6 +187,8 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
       if (Array.isArray(tab.body)) tab.body.forEach((kid, j) => walk(kid, packageId, data, `${where}/tabs[${i}]/body[${j}]`, out));
     });
   }
+  // VIDEO-STUDIO-02 (K1b): a page draws as the plain page or as the studio pane; any other word would silently draw as the plain page.
+  if (type === "page" && node.surface !== undefined && node.surface !== "page" && node.surface !== "studio") out.push(`${where} page: surface "${String(node.surface)}" is not "page" or "studio"`);
   const kids = type === "page" ? node.body : type === "section" ? node.children : type === "detail_pane" ? node.body : undefined;
   if (Array.isArray(kids)) kids.forEach((kid, i) => walk(kid, packageId, data, `${where}/${type}[${i}]`, out));
   if (type === "split_view") {

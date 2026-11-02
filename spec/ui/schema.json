@@ -224,6 +224,7 @@
         "id": { "type": "string", "minLength": 1 },
         "title": { "type": "string", "minLength": 1 },
         "tone": { "type": "string", "enum": ["default", "cinema"], "default": "default", "description": "Deprecated: ignored; every page follows the selected theme" },
+        "surface": { "type": "string", "enum": ["page", "studio"], "default": "page", "description": "VIDEO-STUDIO-02: the surface the page body draws on. `page` (default) is unchanged. `studio` draws the body as a rounded pane (full bleed on a phone) carrying `data-surface=\"studio\"`, which sets the kit's studio token scope: near-black neutrals and a lime primary in dark whatever the selected look, a soft grey page, white cards and a deeper lime in light. Tokens only; a colour never comes from the page." },
         "body": {
           "type": "array",
           "items": { "$ref": "#" },

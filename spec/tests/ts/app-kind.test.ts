@@ -208,6 +208,12 @@ describe("the News pages (NEWS-00)", () => {
     expect(run({ ...base, fields: { words: "https://x.test/a", status: "s", src: "https://x.test/a.mp4" } })).toContain("result_feed.fields: src must be a field path");
     expect(run({ ...base, filters: [{ kind: "toggle", state: "a", label: "A" }, { kind: "toggle", state: "a", label: "B" }] })).toContain('filter state key "a" is used twice');
   });
+  test("VIDEO-STUDIO-02: a page surface is page or studio", () => {
+    const run = (surface: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? { type: "page", id: "x", title: "X", surface, body: [{ type: "empty_state", icon: "x", text: "t" }] } : news(m)), "child").join("\n");
+    expect(run("studio")).not.toContain("surface");
+    expect(run("page")).not.toContain("surface");
+    expect(run("dark")).toContain('page: surface "dark" is not "page" or "studio"');
+  });
   test("VIDEO-UI-14: a looping media_shelf names the field of its clip, and that field is a path", () => {
     const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
     const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
