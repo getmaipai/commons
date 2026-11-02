@@ -605,7 +605,7 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
   return (
     <Popover open={open} onOpenChange={setOpen}>
       {labelled(<PopoverTrigger asChild>{trigger}</PopoverTrigger>)}
-      <PopoverContent width="auto" side={side} align="start" aria-label={name} className={cn("max-h-[min(70dvh,36rem)] overflow-y-auto", wide ? "w-[min(92vw,47.5rem)]" : "w-[min(92vw,32rem)]")}>
+      <PopoverContent width="auto" side={side} align="start" aria-label={name} className={cn("max-h-[min(70dvh,36rem)] overflow-y-auto", wide ? "w-[min(92vw,47.5rem,var(--radix-popper-available-width,92vw))]" : "w-[min(92vw,32rem,var(--radix-popper-available-width,92vw))]")}>
         {body}
       </PopoverContent>
     </Popover>

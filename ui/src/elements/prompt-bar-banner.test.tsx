@@ -58,6 +58,8 @@ describe("prompt_bar chip group trigger banner", () => {
     expect(lookGroup.className).toContain("sm:grid-cols-6");
     expect(within(body as HTMLElement).getByRole("radiogroup", { name: "Camera" })).toBeTruthy();
     expect(document.querySelector('[role="dialog"]')!.className).toContain("47.5rem");
+    // ui-v0.5.476: never wider than the room Radix leaves beside the trigger (the panel sits at the left edge, the popover opens to its right).
+    expect(document.querySelector('[role="dialog"]')!.className).toContain("var(--radix-popper-available-width");
     expect(document.querySelector('[role="tablist"]')).toBeNull();
     fireEvent.keyDown(lookGroup, { key: "Escape" });
     await act(async () => { await new Promise((r) => setTimeout(r, 20)); });
