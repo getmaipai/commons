@@ -1,3 +1,7 @@
+## [ui-v0.5.496] - 2026-11-03
+
+- MUSIC-GEN-20b and MUSIC-GEN-20c (home `docs/design/music-generation-2026-10-17.md` 18.5a and 18.5b), additive, every default unchanged. `TimedLyricLine` gains `words` (per-word times; the active line wipes word by word with theme tokens, plain under reduced motion) and `secondary` (a translation or pronunciation line under the line). The active line lights `LYRIC_LEAD_S` (0.55 s) early, never steps back except on a seek over 0.75 s (`nextActiveIndex`), and a kit `Progress` count-in shows over the last 3 s of a gap of 2 s or more. Tests in `elements/lyrics-list.test.tsx`.
+
 ## [ui-v0.5.495] - 2026-11-03
 
 - VIDEO-LORA-09 (needs spec-v0.1.320), additive. A `prompt_bar` chip with `private: true` keeps its choice out of the page address (`SchemaPage` leaves it out of the address mirror, as it does a search box's text); it stays in page state and in the submit item. Test in `schema/promptBarStyles.test.tsx`.
