@@ -1,3 +1,7 @@
+## [ui-v0.5.489] - 2026-11-02
+
+- `DestructiveConfirm` (`primitives/DestructiveConfirm.tsx`) is now a modal dialog (kit `AlertDialog`) instead of an inline bordered block, so every delete, remove or discard confirm in every app looks and behaves the same. Same props; a caller still mounts it while the question is open. Escape or a click outside cancels (not while busy). Not additive in look, no prop changes, so no caller edits are needed. Test beside it.
+
 ## [ui-v0.5.488] - 2026-11-02
 
 - VIDEO-SETTINGS-07 (`UI-DECISIONS.md` row first; home design `settings-media-2026-11-02.md` section 7, kit gap G1), additive. New `PhraseListField` (`settings/PhraseListField.tsx`): free-text chips on the vendored `ComboboxChips` with no option list; props `label`, `help`, `value`, `onChange`, `addLabel`, `maxItems`, `maxItemChars`, `maxTotalChars`, `disabled`, `invalid`. Enter or a comma adds, a paste splits on newlines and commas, Backspace on an empty input removes the last chip, blur adds the pending text, each chip has a "Remove <phrase>" button. Duplicates (any letter case), over-limit phrases and a full list are refused with one plain line and the text stays to fix. A live count line ("120 characters each, 400 in all (n used)") and a polite status region announce adds and removals. New `PhrasePairsField` for avoid with say instead (two inputs, Add, a list of rows with Remove; the avoid side must be unique; both sides count toward the total). Story `PhraseListFieldShowcase`. No spec change: Home draws these inside the Style editor dialog, not from a settings key.
