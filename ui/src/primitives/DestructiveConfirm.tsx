@@ -1,3 +1,4 @@
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/kit/ui/alert-dialog";
 import { Button } from "@/kit/ui/button";
 
 interface DestructiveConfirmProps {
@@ -15,16 +16,10 @@ interface DestructiveConfirmProps {
   cancelLabel?: string;
 }
 
-// The kit's one destructive-confirmation block: a code review, 2026-09-06,
-// found this exact bordered title/detail/buttons shape hand-copied four
-// times (PeoplePage.tsx's batch remove, ConversationsPage.tsx's batch
-// delete and clear-all, MemoryPage.tsx's forget) with nothing sharing an
-// implementation - the same "a second copy of anything is wrong even
-// when it is faster" standard BatchBar.tsx was already pulled out for.
-// Deliberately NOT the per-row inline confirms those same pages also
-// have (PeoplePage/ConversationsPage): those have no buttons of their
-// own (a List's renderAction slot renders them separately), a genuinely
-// different shape, not a fifth copy of this one.
+// The kit's one destructive-confirmation: a modal. Every delete, remove or discard in every app asks the same way, centred over a dimmed
+// page, so nobody learns a second shape (owner, 2026-11-02: an inline bordered block on some pages and a dialog on others was
+// inconsistent). A caller mounts it while the question is open and unmounts it on confirm or cancel; Escape and a click outside
+// cancel. The buttons are plain Buttons, not AlertDialogAction, so a confirm that is still working keeps the dialog open.
 export function DestructiveConfirm({
   message,
   detail,
@@ -36,17 +31,21 @@ export function DestructiveConfirm({
   cancelLabel = "Keep it",
 }: DestructiveConfirmProps) {
   return (
-    <div className="flex flex-col gap-2 rounded-[var(--radius)] border border-destructive p-3">
-      <p className="text-base font-medium">{message}</p>
-      {detail ? <p className="text-base text-muted-foreground">{detail}</p> : null}
-      <div className="flex flex-wrap gap-2">
-        <Button variant="destructive" onClick={onConfirm} disabled={busy}>
-          {busy ? busyLabel : confirmLabel}
-        </Button>
-        <Button variant="secondary" onClick={onCancel}>
-          {cancelLabel}
-        </Button>
-      </div>
-    </div>
+    <AlertDialog open onOpenChange={(open) => { if (!open && !busy) onCancel(); }}>
+      <AlertDialogContent data-testid="destructive-confirm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{message}</AlertDialogTitle>
+          <AlertDialogDescription className={detail ? undefined : "sr-only"}>{detail ?? message}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="secondary" onClick={onCancel} disabled={busy}>
+            {cancelLabel}
+          </Button>
+          <Button variant="destructive" onClick={onConfirm} disabled={busy}>
+            {busy ? busyLabel : confirmLabel}
+          </Button>
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
