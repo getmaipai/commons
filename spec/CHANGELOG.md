@@ -1,3 +1,7 @@
+## [spec-v0.1.319] - 2026-11-03
+
+- VIDEO-LORA-09, additive. A `prompt_bar` takes up to ten chips (was six): the Create page now has Shape, Length, Look, Camera, Voices, Styles, Characters and Strength. Test in `tests/ts/ui-schema.test.ts`.
+
 ## [spec-v0.1.318] - 2026-11-03
 
 - VIDEO-LORA-09 (home `docs/design/video-loras-2026-11-02.md` 6.2 and 6.4), additive, every default unchanged. The `prompt_bar` node's chips gain `locked` (adds the one lock tile to a cards chip), `enabled_tiers` (the levels `standard`, `boost`, `max` at which the chip can be used; elsewhere it is disabled and sends nothing), `disabled_reason` (the one plain line shown while it is disabled) and `quiet_value` (a value that adds nothing to the group's summary); chip options gain `note` (one plain line under the cards while the option is chosen). Test in `tests/ts/ui-schema.test.ts`.

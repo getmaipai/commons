@@ -498,7 +498,7 @@ export const PromptBarNodeSchema = z.object({
         quiet_value: z.union([z.string(), z.number()]).optional(),
       }),
     )
-    .max(6)
+    .max(10)
     .optional(),
   references: z
     .array(
