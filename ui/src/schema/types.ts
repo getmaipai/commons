@@ -707,13 +707,80 @@ export const ResultFeedNodeSchema = z.object({
 });
 export type ResultFeedNode = z.infer<typeof ResultFeedNodeSchema>;
 
-/** VIDEO-STUDIO-04 (K3, K4): the studio (TrackStudio). Mirrors spec/ui/schema.json `studio`. */
+/** VIDEO-STUDIO-04 and -05 (K3, K4): the studio (TrackStudio). Mirrors spec/ui/schema.json `studio`. */
+export const STUDIO_TOOLS = ["split", "delete", "add_clip", "add_voice", "add_music"] as const;
+export const STUDIO_PANELS = ["volume", "fades", "crossfade", "level"] as const;
 export const StudioNodeSchema = z.object({
   type: z.literal("studio"),
   bind: BindingSchema,
   kind: z.enum(["video", "audio"]).default("video"),
   fields: z
-    .object({ key: z.string().optional(), title: z.string().optional(), poster: z.string().optional(), lanes: z.string().optional(), locked: z.string().optional(), making: z.string().optional() })
+    .object({ key: z.string().optional(), title: z.string().optional(), poster: z.string().optional(), lanes: z.string().optional(), locked: z.string().optional() })
+    .strict()
+    .optional(),
+  tools: z.array(z.enum(STUDIO_TOOLS)).max(5).refine((a) => new Set(a).size === a.length, "tools are unique").optional(),
+  tool_reasons: z
+    .object({ add_clip: z.string().min(1).max(120).optional(), add_voice: z.string().min(1).max(120).optional(), add_music: z.string().min(1).max(120).optional() })
+    .strict()
+    .optional(),
+  panels: z.array(z.enum(STUDIO_PANELS)).max(4).refine((a) => new Set(a).size === a.length, "panels are unique").optional(),
+  limits: z
+    .object({
+      video_pieces: z.number().int().min(1).max(24).optional(),
+      audio_pieces: z.number().int().min(1).max(4).optional(),
+      film_s: z.number().positive().max(600).optional(),
+    })
+    .strict()
+    .optional(),
+  level_steps: z
+    .array(
+      z.object({
+        id: z.string().regex(/^[a-z][a-z_]*$/).max(20),
+        label: z.string().min(1).max(20),
+        gain_db: z.number().min(-40).max(20),
+        clip_gain_db: z.number().min(-40).max(20),
+      }).strict(),
+    )
+    .min(2)
+    .max(7)
+    .optional(),
+  handlers: z.object({ export: FeedHandlerSchema.optional(), add: FeedHandlerSchema.optional() }).strict().optional(),
+  export_label: z.string().min(1).max(40).optional(),
+  export_disabled_reason: z.string().min(1).max(120).optional(),
+  make_more: z
+    .array(
+      z.object({
+        label: z.string().min(1).max(40),
+        badge: z.string().min(1).max(12).optional(),
+        starts: FeedStartsSchema.optional(),
+        action: ActionSchema,
+      }).strict(),
+    )
+    .max(3)
+    .optional(),
+  export_result: z
+    .object({
+      bind: BindingSchema,
+      fields: z
+        .object({
+          key: z.string().optional(),
+          status: z.string(),
+          progress: z.string().optional(),
+          phase: z.string().optional(),
+          queue_position: z.string().optional(),
+          started_at: z.string().optional(),
+          error: z.string().optional(),
+          poster: z.string().optional(),
+          src: z.string().optional(),
+          words: z.string().optional(),
+          locked: z.string().optional(),
+          making: z.string().optional(),
+        })
+        .strict(),
+      handlers: z.object({ stop: FeedHandlerSchema.optional(), retry: FeedHandlerSchema.optional() }).strict().optional(),
+      actions: z.array(z.object({ label: z.string().min(1).max(40), action: ActionSchema }).strict()).max(2).optional(),
+      poll_while: ResultFeedNodeSchema.shape.poll_while,
+    })
     .strict()
     .optional(),
 });

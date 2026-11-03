@@ -22,6 +22,10 @@ export interface DispatchOptions {
   /** Whole call-argument placeholders keep JSON types (Reader's locator and percent). */
   typedArgs?: boolean;
   onSuccess?: () => void;
+  /** VIDEO-STUDIO-05: the JSON reply of a `call` (the studio's `add` handler reads the piece it returns). Absent: the reply is dropped. */
+  onReply?: (reply: unknown) => void;
+  /** VIDEO-STUDIO-05: the plain message of a failed dispatch, besides `lastError`. */
+  onError?: (message: string) => void;
 }
 
 // The five declared actions (platform plan 6.2). `play` hands the item to the
@@ -56,6 +60,7 @@ async function runAction(
     }
     const args = action.call.args ? fillTemplateDeep(action.call.args, item, options.typedArgs) : undefined;
     const reply = await request<unknown>(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined, keepalive: options.keepalive });
+    options.onReply?.(reply);
     // Like-this: a call may then navigate, with the response merged over the item (`{band_id}`). Navigation only.
     if (action.call.then) {
       const merged = reply && typeof reply === "object" && !Array.isArray(reply) ? { ...item, ...(reply as Record<string, unknown>) } : item;
@@ -193,7 +198,7 @@ export function useDispatchAction(): {
       setLastError(null);
       void runAndInvalidate(action, items, options)
         .then(() => options.onSuccess?.())
-        .catch((e: unknown) => setLastError(e instanceof Error ? e.message : "Something went wrong."))
+        .catch((e: unknown) => { const message = e instanceof Error ? e.message : "Something went wrong."; setLastError(message); options.onError?.(message); })
         .finally(() => onSettled?.());
     },
     [runAndInvalidate],

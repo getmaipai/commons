@@ -358,11 +358,32 @@ describe("UI schema, package apps", () => {
   test("VIDEO-STUDIO-04: the studio node (TrackStudio) is additive and strict", () => {
     const studio = { type: "studio", bind: { source: "package", path: "studio" } };
     expect(validate(studio)).toBe(true);
-    expect(validate({ ...studio, kind: "video", fields: { key: "id", title: "title", poster: "poster", lanes: "lanes", locked: "locked", making: "making" } })).toBe(true);
+    const full = {
+      ...studio,
+      kind: "video",
+      fields: { key: "id", title: "title", poster: "poster", lanes: "lanes", locked: "locked" },
+      tools: ["split", "delete", "add_clip", "add_voice", "add_music"],
+      tool_reasons: { add_voice: "Voices are not ready yet." },
+      panels: ["volume", "fades", "crossfade", "level"],
+      limits: { video_pieces: 6, audio_pieces: 2, film_s: 60 },
+      level_steps: [{ id: "soft", label: "Soft", gain_db: -8, clip_gain_db: 0 }, { id: "loud", label: "Loud", gain_db: 4, clip_gain_db: -6 }],
+      handlers: { export: { call: { target: "/x", args: { plan: "{plan}" } } }, add: { call: { target: "/y" } } },
+      export_label: "Export as a new clip",
+      export_disabled_reason: "Editing is not ready yet.",
+      make_more: [{ label: "Another take", action: { call: { target: "/z" } } }, { label: "Extend", badge: "Max", starts: "video", action: { call: { target: "/z" } } }],
+      export_result: { bind: { source: "package", path: "job" }, fields: { status: "status", progress: "progress" }, poll_while: { statuses: ["queued", "generating"], record: { path: "job" } }, actions: [{ label: "Open in My clips", action: { navigate: { to: "/apps/videos/clips" } } }] },
+    };
+    expect(validate(full)).toBe(true);
     expect(validate({ ...studio, kind: "audio" })).toBe(true);
-    for (const bad of [{ kind: "film" }, { fields: { nope: "x" } }, { fields: { lanes: 3 } }, { extra: true }, { tools: ["split"] }]) expect(validate({ ...studio, ...bad })).toBe(false);
+    const bad: Record<string, unknown>[] = [
+      { kind: "film" }, { tools: ["trim"] }, { tools: ["split", "split"] }, { panels: ["eq"] }, { limits: { audio_pieces: 5 } }, { limits: { film_s: 0 } },
+      { fields: { nope: "x" } }, { handlers: { play: { call: { target: "/x" } } } }, { handlers: { export: { call: { target: "/x" }, navigate: { to: "/a" } } } },
+      { make_more: [{ label: "A" }] }, { make_more: Array.from({ length: 4 }, () => ({ label: "A", action: { call: { target: "/z" } } })) },
+      { level_steps: [{ id: "a", label: "A", gain_db: 0 }] }, { export_result: { bind: { source: "package", path: "j" }, fields: { status: "s" } } },
+      { tool_reasons: { split: "no" } }, { extra: true },
+    ];
+    for (const patch of bad) expect(validate({ ...full, ...patch })).toBe(false);
     expect(validate({ type: "studio" })).toBe(false);
-    expect(validate({ ...studio, bind: { source: "route" } })).toBe(false);
   });
 
   test("VIDEO-STUDIO-02: page surface is page or studio, default unchanged", () => {

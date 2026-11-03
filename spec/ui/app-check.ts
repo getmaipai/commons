@@ -138,10 +138,24 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
       for (const f of node.filters) if (isObject(f)) { const key = String(f.state); if (seen.has(key)) out.push(`${where} result_feed: filter state key "${key}" is used twice`); seen.add(key); }
     }
   }
-  // VIDEO-STUDIO-04: the studio binds one of the package's own clip rows; its field paths are paths, never addresses.
+  // VIDEO-STUDIO-04 and -05: the studio binds one of the package's own clip rows; its handlers and make_more actions stay under the
+  // package, and the export job it re-reads is another data entry of the same package.
   if (type === "studio") {
     checkBinding(node.bind, `${where} studio`, data, "list", out);
     if (isObject(node.fields)) for (const [name, value] of Object.entries(node.fields)) checkFieldPath(value, `${where} studio.fields`, name, out);
+    if (isObject(node.handlers)) for (const [key, handler] of Object.entries(node.handlers)) checkAction(handler, packageId, `${where} studio.handlers.${key}`, out);
+    if (Array.isArray(node.make_more)) node.make_more.forEach((b, i) => isObject(b) && checkAction(b.action, packageId, `${where} studio.make_more[${i}]`, out));
+    if (isObject(node.export_result)) {
+      const result = node.export_result;
+      checkBinding(result.bind, `${where} studio.export_result`, data, "list", out);
+      if (isObject(result.fields)) for (const [name, value] of Object.entries(result.fields)) checkFieldPath(value, `${where} studio.export_result.fields`, name, out);
+      if (isObject(result.handlers)) for (const [key, handler] of Object.entries(result.handlers)) checkAction(handler, packageId, `${where} studio.export_result.handlers.${key}`, out);
+      if (Array.isArray(result.actions)) result.actions.forEach((b, i) => isObject(b) && checkAction(b.action, packageId, `${where} studio.export_result.actions[${i}]`, out));
+      if (isObject(result.poll_while) && isObject(result.poll_while.record)) {
+        const path = String(result.poll_while.record.path);
+        if (!data.has(path)) out.push(`${where} studio.export_result.poll_while.record: path "${path}" is not a contributes.data id of this package`);
+      }
+    }
   }
   if (type === "billboard") {
     checkBinding(node.bind, `${where} billboard`, data, "list", out);

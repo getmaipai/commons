@@ -686,11 +686,11 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["type", "bind"],
-      "description": "VIDEO-STUDIO-04 (K3, K4): the kit's TrackStudio block, a timeline with a client-side preview. The bound row is one clip: `{ id, title, poster, locked, lanes: [{ id, label, hue, kind, pieces: [{ id, ref, src, label, in_s, out_s, source_s, at_s, level_db, fade_in_s, fade_out_s, crossfade_s, duck }] }] }`; a lane `id` is video, voice or music. `src` is a same-origin path, or a `blob:` object URL of the page's own origin that the host made from an authenticated read (an adult-only file); the Element never fetches an adult-only file itself. The Element draws the ruler, the lanes (thumbnails and waveforms made inside it), one playhead, the transport (Play, Back to start, Loop, zoom), per-lane Level, Mute and Solo, and the Volume panel, which acts on the selected piece. The preview is client side (one video element as the clock, up to four audio elements, Web Audio gains for level, mute, solo, fades and the sound of a crossfade); nothing is rendered. It cuts where the export dissolves, and says so. A row whose `fields.locked` path is true draws ONE lock tile and nothing else: no media element, no request for a source, no peaks, thumbnails or plan. When the row becomes locked the Element stops every media element, removes `src`, calls `load()` and discards what it drew. Nothing is kept in storage, the URL or a cache. Editing (trim, split, delete, add, fades, crossfade, level, export) is VIDEO-STUDIO-05 and adds optional properties.",
+      "description": "VIDEO-STUDIO-04 and -05 (K3, K4): the kit's TrackStudio block, a timeline editor with a preview. The bound row is one clip: `{ id, title, poster, locked, lanes: [{ id, label, hue, kind, pieces: [{ id, ref, src, label, in_s, out_s, source_s, at_s, level_db, fade_in_s, fade_out_s, crossfade_s, duck }] }] }`; a lane `kind` is video, voice or music. `src` is a same-origin path, or a `blob:` object URL of the page's own origin that the host made from an authenticated read (an adult-only file); the Element never fetches an adult-only file itself. The Element draws the ruler, the lanes (thumbnails and waveforms made inside it), one playhead, the transport (Play, Back to start, Loop, zoom), trim handles, Split at playhead, Delete piece, Add a clip, Add a voice, Add music, Undo and Redo, per-lane Level, Mute and Solo, and the panels Volume, Fades, Crossfade and Level, which act on the selected piece. The preview is client side (one video element as the clock, up to four audio elements, Web Audio gains); nothing is rendered until Export. It cuts where the export dissolves, and says so. A row whose `fields.locked` path is true draws ONE lock tile and nothing else: no media element, no request for a source, no peaks, thumbnails or plan. When the row becomes locked the Element stops every media element, removes `src`, calls `load()` and discards the plan, the peaks and the thumbnails. The plan lives in React state only (no storage, URL or cache). `handlers.export` is one action run with `{ plan, clip }` (whole-placeholder `{plan}` keeps its JSON type); `handlers.add` is a `call` whose JSON reply is the added piece `{ ref, src, label, duration_s }`; a `make_more` item is one action run with `{ clip, piece, at_s }`.",
       "properties": {
         "type": { "const": "studio" },
         "bind": { "$ref": "#/$defs/binding" },
-        "kind": { "type": "string", "enum": ["video", "audio"], "default": "video", "description": "`video` draws the monitor and a thumbnail strip on the first lane; `audio` draws no monitor and a clock from the wall." },
+        "kind": { "type": "string", "enum": ["video", "audio"], "default": "video", "description": "`video` draws the monitor and a thumbnail strip on the first lane; `audio` draws no monitor and waveforms only (Music, later)." },
         "fields": {
           "type": "object",
           "additionalProperties": false,
@@ -700,8 +700,126 @@
             "title": { "type": "string" },
             "poster": { "type": "string" },
             "lanes": { "type": "string" },
-            "locked": { "type": "string", "description": "Dotted path to a boolean (default `locked`). True draws the one lock tile and reads no other field." },
-            "making": { "type": "string", "description": "Dotted path to a boolean (default `making`) on a locked row: the one tile shows its small spinner." }
+            "locked": { "type": "string", "description": "Dotted path to a boolean (default `locked`). True draws the one lock tile and reads no other field." }
+          }
+        },
+        "tools": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["split", "delete", "add_clip", "add_voice", "add_music"] },
+          "description": "Which Edit buttons are drawn, in this order. Default: all five. Split and Delete piece are built in; the three Add buttons need `handlers.add`, and one without it is not drawn."
+        },
+        "tool_reasons": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "A plain line that disables an Add button, shown beside it (for example while a locked item or an engine is not ready). A tool with no reason is enabled.",
+          "properties": {
+            "add_clip": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "add_voice": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "add_music": { "type": "string", "minLength": 1, "maxLength": 120 }
+          }
+        },
+        "panels": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["volume", "fades", "crossfade", "level"] },
+          "description": "Which right-hand panels are drawn, in this order. Default: all four. Each has a Reset and says which piece or lane it acts on."
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "video_pieces": { "type": "integer", "minimum": 1, "maximum": 24, "default": 6 },
+            "audio_pieces": { "type": "integer", "minimum": 1, "maximum": 4, "default": 2, "description": "Per audio lane. At most four audio elements exist." },
+            "film_s": { "type": "number", "exclusiveMinimum": 0, "maximum": 600, "default": 60 }
+          }
+        },
+        "level_steps": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 7,
+          "description": "The Level panel's balances. Default is the five of `MIX_LEVELS`: quiet, soft, balanced, loud, very loud.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "gain_db", "clip_gain_db"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z_]*$", "maxLength": 20 },
+              "label": { "type": "string", "minLength": 1, "maxLength": 20 },
+              "gain_db": { "type": "number", "minimum": -40, "maximum": 20 },
+              "clip_gain_db": { "type": "number", "minimum": -40, "maximum": 20 }
+            }
+          }
+        },
+        "handlers": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "export": { "$ref": "#/$defs/feed_handler" },
+            "add": { "$ref": "#/$defs/feed_handler" }
+          }
+        },
+        "export_label": { "type": "string", "minLength": 1, "maxLength": 40, "default": "Export as a new clip" },
+        "export_disabled_reason": { "type": "string", "minLength": 1, "maxLength": 120, "description": "A plain line that disables Export and is shown beside it (for example while the engine cannot take an edit job)." },
+        "make_more": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "action"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "badge": { "type": "string", "minLength": 1, "maxLength": 12 },
+              "starts": { "type": "string", "enum": ["picture", "video"] },
+              "action": { "$ref": "#/$defs/action" }
+            }
+          }
+        },
+        "export_result": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bind", "fields", "poll_while"],
+          "description": "The export job's own card: a bound row drawn by the shipped VideoPlayer in the monitor's place after Export. Polled like `result_feed.poll_while`. When ready it carries `actions` and Keep editing (the plan is kept).",
+          "properties": {
+            "bind": { "$ref": "#/$defs/binding" },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["status"],
+              "properties": {
+                "key": { "type": "string" },
+                "status": { "type": "string" },
+                "progress": { "type": "string" },
+                "phase": { "type": "string" },
+                "queue_position": { "type": "string" },
+                "started_at": { "type": "string" },
+                "error": { "type": "string" },
+                "poster": { "type": "string" },
+                "src": { "type": "string" },
+                "words": { "type": "string" },
+                "locked": { "type": "string" },
+                "making": { "type": "string" }
+              }
+            },
+            "handlers": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": { "stop": { "$ref": "#/$defs/feed_handler" }, "retry": { "$ref": "#/$defs/feed_handler" } }
+            },
+            "actions": {
+              "type": "array",
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "action"],
+                "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" } }
+              }
+            },
+            "poll_while": { "$ref": "#/$defs/result_feed/properties/poll_while" }
           }
         }
       }

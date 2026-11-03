@@ -1,13 +1,13 @@
 "use client";
 
-// VIDEO-STUDIO-04 (K3, K4): TrackStudio, the kit's timeline with a client-side preview. Three fixed lanes (Video, Voice, Music) with a ruler, thumbnails and
-// waveforms drawn inside the Element, one playhead, a transport, per-lane Level, Mute and Solo, and the Volume panel, which acts on the selected piece. The
-// preview plays in the browser (track-studio-engine.ts) and renders nothing: it cuts where the export dissolves, and says so. Draws on the studio tokens only.
-// The peaks, the thumbnails and every media element live in this component's own state and are gone when it unmounts or the clip relocks (K4).
-// Editing (trim, split, delete, add, fades, crossfade, level, export) is VIDEO-STUDIO-05.
+// VIDEO-STUDIO-04 and -05 (K3, K4): TrackStudio, the kit's timeline editor with a client-side preview. Three fixed lanes (Video, Voice, Music) with a
+// ruler, thumbnails and waveforms drawn inside the Element, one playhead, a transport, trim handles, Split, Delete piece, Add a clip, voice and music,
+// per-lane Level, Mute and Solo, and the panels Volume, Fades, Crossfade and Level, which act on the selected piece. The preview plays in the browser
+// (track-studio-engine.ts) and renders nothing: it cuts where the export dissolves, and says so. Draws on the studio tokens only. The plan, the peaks,
+// the thumbnails and every media element live in this component's own state and are gone when it unmounts or the clip relocks (K4).
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
-import { PauseIcon, PlayIcon, RepeatIcon, SkipBackIcon } from "lucide-react";
+import { PauseIcon, PlayIcon, PlusIcon, Redo2Icon, RepeatIcon, ScissorsIcon, SkipBackIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import { cn, FOCUS_RING, hueTintBackground } from "@/kit/utils";
 import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
 import { Button } from "@/kit/ui/button";
@@ -19,34 +19,69 @@ import { LockTile } from "./adult-lock";
 import { PreviewEngine, type EngineStats } from "./track-studio-engine";
 import { THUMB_STEP_S, decodePeaks, makeThumbnails, sliceBars } from "./track-studio-media";
 import {
-  LANE_IDS, LEVEL_DB_MAX, LEVEL_DB_MIN, effectiveCrossfade, filmLength, findPiece, formatTime, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, rulerTicks, setDuck,
-  setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
+  CROSSFADE_MAX_S, FADE_MAX_S, LANE_IDS, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, effectiveCrossfade, filmLength, findPiece, formatTime, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, rulerTicks,
+  setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
 } from "./track-studio-model";
+import {
+  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory,
+  redoHistory, resetPieceFades, resetPieceVolume, setCrossfadeAfter, setFadeIn, setFadeOut, snap, snapEdges, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory,
+  type EditResult, type History, type LevelStep, type StudioLimits, type StudioPlan,
+} from "./track-studio-edit";
 
 export type { StudioPiece, StudioLane, StudioState } from "./track-studio-model";
+export type { StudioPlan, LevelStep, StudioLimits } from "./track-studio-edit";
+export { toPlan } from "./track-studio-edit";
 export { readState } from "./track-studio-model";
+
+export type StudioTool = "split" | "delete" | "add_clip" | "add_voice" | "add_music";
+export type StudioPanel = "volume" | "fades" | "crossfade" | "level";
+export const ALL_TOOLS: readonly StudioTool[] = ["split", "delete", "add_clip", "add_voice", "add_music"];
+export const ALL_PANELS: readonly StudioPanel[] = ["volume", "fades", "crossfade", "level"];
+
+/** What the host answers when the person adds a clip, a voice or a song. */
+export interface StudioAdded { ref: string; src: string; label?: string; duration_s: number; poster?: string }
+export interface StudioMakeMore { key: string; label: string; badge?: string; disabledReason?: string; onSelect: (context: { piece: StudioPiece | null; at_s: number }) => void }
 
 export interface TrackStudioProps {
   /** The clip's raw lanes (see `readState`). Read once per `resetKey`. */
   lanes: unknown;
-  /** Changes when a different clip opens; everything drawn starts over. */
+  /** Changes when a different clip opens; the plan, undo history and everything drawn start over. */
   resetKey?: string;
   title?: string;
   poster?: string;
   /** `video` draws the monitor; `audio` draws no monitor and a clock from the wall. */
   kind?: "video" | "audio";
-  /** A locked clip: draws ONE lock tile and nothing else. No element, request, peak or thumbnail. */
+  /** A locked clip: draws ONE lock tile and nothing else. No element, request, peak, thumbnail or plan. */
   locked?: boolean;
   lockedMaking?: boolean;
   onUnlock?: () => void;
-  /** Measurements for the build: `thumbs_ms` (a strip), `peaks_ms` (a waveform), `seam_ms` (a cut between video pieces), `stats` (drift). */
+  tools?: readonly StudioTool[];
+  toolReasons?: Partial<Record<"add_clip" | "add_voice" | "add_music", string>>;
+  panels?: readonly StudioPanel[];
+  limits?: Partial<StudioLimits>;
+  levelSteps?: readonly LevelStep[];
+  exportLabel?: string;
+  exportDisabledReason?: string;
+  /** Press of Export: the plan. The Element keeps the plan after it. */
+  onExport?: (plan: StudioPlan) => void;
+  /** Press of an Add button: resolves with the piece to add, or null when the person cancels. Absent: the three Add buttons are not drawn. */
+  onAdd?: (kind: "clip" | "voice" | "music") => Promise<StudioAdded | null>;
+  makeMore?: readonly StudioMakeMore[];
+  /** The export job's card, drawn in the monitor's place with Keep editing. */
+  exportCard?: ReactNode;
+  onKeepEditing?: () => void;
+  /** Called with the plan after every change, and whether it differs from the clip as opened. */
+  onPlanChange?: (plan: StudioPlan, changed: boolean) => void;
+  /** Measurements for the build: `thumbs_ms` (a strip), `peaks_ms` (a waveform), `seam_ms` (a cut between video pieces). */
   onMetric?: (name: string, value: number, detail: string) => void;
   /** Tests and the harness: where Web Audio comes from. Return null for none. */
   audioContext?: () => AudioContext | null;
 }
 
 const LANE_WORD: Record<LaneId, string> = { video: "Video", voice: "Voice", music: "Music" };
-export const PREVIEW_LINE = "The preview is what you hear in the Studio. It cuts where the export dissolves, and the final loudness is set at export.";
+export const HELP_LINE = "Drag the handles at each end to trim. Press S to cut at the playhead.";
+export const PREVIEW_LINE = "The preview is what you hear in the Studio. It cuts where the export dissolves, and the final loudness is set at export. Export makes a new clip and keeps the old one.";
+export const SPLIT_LABEL = "Split at playhead";
 
 const NUDGE_S = 0.1;
 const NUDGE_BIG_S = 1;
@@ -69,6 +104,11 @@ function useTime(store: TimeStore, step = 0.05): number {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+// History with coalescing: a drag or a slider is one undo step.
+
+interface Hist { h: History<StudioState>; key: string | null; at: number }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 export function TrackStudio(props: TrackStudioProps) {
   if (props.locked) return <LockTile making={props.lockedMaking} onUnlock={props.onUnlock} shape="card" />;
@@ -76,17 +116,25 @@ export function TrackStudio(props: TrackStudioProps) {
 }
 
 function StudioBody(props: TrackStudioProps) {
-  const { onMetric } = props;
+  const { onPlanChange, onMetric } = props;
+  const tools = props.tools ?? ALL_TOOLS;
+  const panels = props.panels ?? ALL_PANELS;
+  const limits: StudioLimits = useMemo(() => ({ ...DEFAULT_LIMITS, ...props.limits }), [props.limits]);
+  const steps = props.levelSteps ?? DEFAULT_LEVEL_STEPS;
   const isPhone = useIsPhoneLayout();
   const showVideo = (props.kind ?? "video") === "video";
   const initial = useMemo(() => readState(props.lanes), []); // eslint-disable-line react-hooks/exhaustive-deps -- one read per clip (resetKey remounts)
-  const [state, setState] = useState<StudioState>(initial);
+  const [hist, setHist] = useState<Hist>(() => ({ h: startHistory(initial), key: null, at: 0 }));
+  const state = hist.h.present;
   const [selected, setSelected] = useState<string | null>(null);
   const [solo, setSolo] = useState<LaneId | null>(null);
   const [loop, setLoop] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [line, setLine] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [panelTab, setPanelTab] = useState<StudioPanel>(panels[0] ?? "volume");
   const [zoom, setZoom] = useState<number | null>(null);
+  const [showCard, setShowCard] = useState(false);
   const timeStore = useMemo(createTimeStore, []);
   const monitorRef = useRef<HTMLDivElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
@@ -94,6 +142,9 @@ function StudioBody(props: TrackStudioProps) {
   const stateRef = useRef(state);
   stateRef.current = state;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  /** After a split or a delete the piece the person was on may be gone: focus moves to the piece now selected, or to the tracks. */
+  const pendingFocus = useRef<string | null>(null);
   const [viewW, setViewW] = useState(0);
 
   const film = filmLength(state);
@@ -101,7 +152,28 @@ function StudioBody(props: TrackStudioProps) {
   const fitPps = Math.min(80, Math.max(12, Math.floor((viewW - labelW - 16) / (Math.max(film, 10) + 2))));
   const pps = zoom ?? (viewW > 0 ? fitPps : 36);
   const timeW = Math.max(viewW - labelW, (film + 2) * pps);
-  const commit = useCallback((next: StudioState) => setState(next), []);
+
+  // -- history ---------------------------------------------------------------------------------------------------------
+  const commit = useCallback((next: StudioState, key?: string) => {
+    setHist((cur) => {
+      if (next === cur.h.present) return cur;
+      const now = Date.now();
+      if (key && cur.key === key && now - cur.at < 1200 && canUndo(cur.h)) return { h: { ...cur.h, present: next, future: [] }, key, at: now };
+      return { h: pushHistory(cur.h, next), key: key ?? null, at: now };
+    });
+  }, []);
+  const apply = useCallback((result: EditResult, key?: string): boolean => {
+    if (!result.ok) { setLine(result.line); return false; }
+    setLine("");
+    commit(result.state, key);
+    if (result.selected !== undefined) { setSelected(result.selected); pendingFocus.current = result.selected ?? "group"; }
+    if (result.seek !== undefined) void seekTo(result.seek);
+    return true;
+  }, [commit]); // eslint-disable-line react-hooks/exhaustive-deps -- seekTo is stable below
+
+  const changed = useMemo(() => planChanged(initial, state), [initial, state]);
+  const plan = useMemo(() => toPlan(state), [state]);
+  useEffect(() => { onPlanChange?.(plan, changed); }, [plan, changed, onPlanChange]);
 
   // -- engine ----------------------------------------------------------------------------------------------------------
   useEffect(() => {
@@ -121,13 +193,20 @@ function StudioBody(props: TrackStudioProps) {
     void engine.seek(0);
     const metrics = engine.stats;
     return () => {
-      // The relock path (K4): stop, remove every src, release the graph; React then drops the peaks and thumbnails with the component.
+      // The relock path (K4): stop, remove every src, release the graph; React then drops the plan, peaks and thumbnails with the component.
       engineRef.current = null;
       if (onMetric && metrics.seamsMs.length > 0) onMetric("seam_ms", Math.max(...metrics.seamsMs), metrics.seamsMs.join(","));
       engine.dispose();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- one engine per clip
   useEffect(() => { engineRef.current?.setState(state); }, [state]);
+  useEffect(() => {
+    const want = pendingFocus.current;
+    if (!want) return;
+    pendingFocus.current = null;
+    const el = want === "group" ? scrollRef.current : sectionRef.current?.querySelector<HTMLElement>(`[data-piece="${CSS.escape(want)}"]`);
+    el?.focus({ preventScroll: true });
+  }, [state]);
   useEffect(() => { engineRef.current?.setSolo(solo); }, [solo]);
   useEffect(() => { engineRef.current?.setLoop(loop); }, [loop]);
   // The measurement hook for the build: the live engine stats, readable by the harness through `onMetric("stats", ...)`.
@@ -166,88 +245,233 @@ function StudioBody(props: TrackStudioProps) {
     if (x > el.scrollLeft + el.clientWidth - 24 || x < el.scrollLeft + labelW) el.scrollLeft = Math.max(0, x - labelW - 60);
   }), [timeStore, pps, labelW]);
 
+  // -- actions ---------------------------------------------------------------------------------------------------------
+  const playhead = () => timeStore.get();
   const sel = findPiece(state, selected);
+  const doSplit = () => {
+    const t = playhead();
+    const s = sel;
+    // Split the selected piece when the playhead is on it, else the video piece (or the first audio piece) under the playhead.
+    const lanes: LaneId[] = s ? [s.lane.id, ...LANE_IDS.filter((l) => l !== s.lane.id)] : [...LANE_IDS];
+    let last = "";
+    for (const id of lanes) {
+      const r = splitAt(state, id, t, limits);
+      if (r.ok) { apply(r); return; }
+      if (!last && laneOf(state, id).pieces.length > 0) last = r.line;
+      if (id === lanes[0]) last = r.line;
+    }
+    setLine(last || "Move the playhead onto a piece to split it.");
+  };
+  const doDelete = () => { if (!selected) { setLine("Pick a piece first."); return; } apply(deletePiece(state, selected)); };
+  const doAdd = async (kind: "clip" | "voice" | "music") => {
+    if (!props.onAdd || busy) return;
+    setBusy(kind);
+    setLine("");
+    try {
+      const added = await props.onAdd(kind);
+      if (!added) return;
+      const piece: StudioPiece = {
+        id: `${kind}-${added.ref}`, ref: added.ref, src: added.src, label: added.label, poster: added.poster, in_s: 0, out_s: added.duration_s, source_s: added.duration_s,
+        at_s: 0, level_db: 0, fade_in_s: 0, fade_out_s: 0, crossfade_s: 0, duck: false,
+      };
+      apply(addPiece(stateRef.current, kind === "clip" ? "video" : kind, piece, playhead(), limits));
+    } catch (e) {
+      setLine(e instanceof Error && e.message ? e.message : "That could not be added. Try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+  const undo = () => setHist((c) => ({ h: undoHistory(c.h), key: null, at: 0 }));
+  const redo = () => setHist((c) => ({ h: redoHistory(c.h), key: null, at: 0 }));
+  const doExport = () => {
+    if (!props.onExport) return;
+    engineRef.current?.pause();
+    setShowCard(true);
+    props.onExport(plan);
+  };
 
   // -- keyboard --------------------------------------------------------------------------------------------------------
   const onKeyDown = (e: ReactKeyboardEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
-    if (target.closest("input, textarea, select, [role='slider'], [role='radio']")) return;
+    if (target.closest("input, textarea, select, [role='slider'], [role='radio']")) {
+      if (!((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z")) return;
+    }
     const onButton = target.closest("button") && !target.closest("[data-piece]");
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const mod = e.metaKey || e.ctrlKey;
+    if (mod && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
+    if (mod || e.altKey) return;
     if (e.key === " " && !onButton) { e.preventDefault(); togglePlay(); return; }
     if (onButton) return;
     const step = e.shiftKey ? NUDGE_BIG_S : NUDGE_S;
-    if (e.key === "ArrowLeft") { e.preventDefault(); void seekTo(Math.max(0, timeStore.get() - step)); }
-    else if (e.key === "ArrowRight") { e.preventDefault(); void seekTo(Math.min(film, timeStore.get() + step)); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); void seekTo(Math.max(0, playhead() - step)); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); void seekTo(Math.min(film, playhead() + step)); }
     else if (e.key === "Home") { e.preventDefault(); void seekTo(0); }
     else if (e.key === "End") { e.preventDefault(); void seekTo(film); }
+    else if (e.key.toLowerCase() === "s" && tools.includes("split")) { e.preventDefault(); doSplit(); }
+    else if ((e.key === "Delete" || e.key === "Backspace") && tools.includes("delete")) { e.preventDefault(); doDelete(); }
   };
 
-  const volume = { title: "Volume", reset: () => selected && commit(setDuck(setPieceLevel(state, selected, 0), selected, false)), body: <VolumePanel state={state} selected={sel} commit={commit} /> };
+  // -- the parts -------------------------------------------------------------------------------------------------------
+  const toolButtons = (
+    <div className="flex flex-wrap gap-2" role="group" aria-label="Edit">
+      {tools.includes("split") ? <ToolButton icon={<ScissorsIcon />} onClick={doSplit}>{SPLIT_LABEL}</ToolButton> : null}
+      {tools.includes("delete") ? <ToolButton icon={<Trash2Icon />} onClick={doDelete} disabled={!selected}>Delete piece</ToolButton> : null}
+      {props.onAdd && tools.includes("add_clip") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("clip")} disabled={!!busy || !!props.toolReasons?.add_clip} title={props.toolReasons?.add_clip}>Add a clip</ToolButton> : null}
+      {props.onAdd && tools.includes("add_voice") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("voice")} disabled={!!busy || !!props.toolReasons?.add_voice} title={props.toolReasons?.add_voice}>Add a voice</ToolButton> : null}
+      {props.onAdd && tools.includes("add_music") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("music")} disabled={!!busy || !!props.toolReasons?.add_music} title={props.toolReasons?.add_music}>Add music</ToolButton> : null}
+    </div>
+  );
+  const reasons = (["add_clip", "add_voice", "add_music"] as const).map((k) => (props.onAdd && tools.includes(k) ? props.toolReasons?.[k] : undefined)).find(Boolean);
+
+  const panelBodies: Record<StudioPanel, { title: string; reset: () => void; body: ReactNode }> = {
+    volume: {
+      title: "Volume",
+      reset: () => selected && commit(resetPieceVolume(state, selected)),
+      body: <VolumePanel state={state} selected={sel} commit={commit} />,
+    },
+    fades: {
+      title: "Fades",
+      reset: () => selected && commit(resetPieceFades(state, selected)),
+      body: <FadesPanel selected={sel} state={state} commit={commit} />,
+    },
+    crossfade: {
+      title: "Crossfade",
+      reset: () => selected && commit(setCrossfadeAfter(state, selected, 0)),
+      body: <CrossfadePanel state={state} selected={sel} commit={commit} />,
+    },
+    level: {
+      title: "Level",
+      reset: () => commit(applyBalance(state, steps.find((s) => s.id === "balanced") ?? steps[Math.floor(steps.length / 2)]!)),
+      body: <LevelPanel state={state} steps={steps} commit={commit} />,
+    },
+  };
 
   return (
-    <section aria-label="Studio" data-slot="track-studio" className="text-foreground grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" onKeyDown={onKeyDown}>
+    <section ref={sectionRef} aria-label="Studio" data-slot="track-studio" className="text-foreground grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" onKeyDown={onKeyDown}>
       <div ref={hostRef} hidden data-studio-host />
       <div role="status" aria-live="polite" className={cn("lg:col-span-2", line ? "text-destructive text-sm" : "sr-only")} data-slot="track-studio-line">{line}</div>
 
+      <div className="flex min-w-0 flex-col gap-3 lg:col-start-2 lg:row-start-1" data-slot="track-studio-export">
+        {props.onExport ? (
+          <>
+            <Button size="lg" className="rounded-full" onClick={doExport} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-button">
+              {props.exportLabel ?? "Export as a new clip"}
+            </Button>
+            {props.exportDisabledReason ? <p className="text-muted-foreground text-sm">{props.exportDisabledReason}</p> : !changed ? <p className="text-muted-foreground text-sm">Change something to export it.</p> : null}
+          </>
+        ) : null}
+        <p className="text-muted-foreground hidden text-sm lg:block">{PREVIEW_LINE}</p>
+      </div>
+
       <div className="flex min-w-0 flex-col gap-4 lg:col-start-1 lg:row-span-2 lg:row-start-1" data-slot="track-studio-main">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[21rem_minmax(0,1fr)]" data-slot="track-studio-top">
         {showVideo ? (
-          <div className="relative aspect-video w-full max-w-[21rem] overflow-hidden rounded-2xl bg-[var(--surface-stage)]" data-slot="track-studio-monitor">
-            <div ref={monitorRef} className="size-full" data-slot="track-studio-video-host" />
-            <span className="bg-background/70 text-foreground absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold">Preview</span>
-            <TimeChip store={timeStore} film={film} />
+          <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-[var(--surface-stage)]" data-slot="track-studio-monitor">
+            <div ref={monitorRef} className={cn("size-full", showCard && props.exportCard ? "hidden" : "")} data-slot="track-studio-video-host" />
+            {showCard && props.exportCard ? (
+              <div className="absolute inset-0 flex flex-col gap-2 overflow-auto p-2" data-slot="track-studio-export-card">
+                {props.exportCard}
+                <Button variant="secondary" size="sm" className="self-start rounded-full" onClick={() => { setShowCard(false); props.onKeepEditing?.(); }}>Keep editing</Button>
+              </div>
+            ) : (
+              <>
+                <span className="bg-background/70 text-foreground absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold">Preview</span>
+                <TimeChip store={timeStore} film={film} />
+              </>
+            )}
           </div>
         ) : null}
-
-        <div className="bg-card min-w-0 rounded-2xl" data-slot="track-studio-tracks">
-          <div className="flex items-center justify-between gap-4 px-4 pt-3 pb-2"><h3 className={eyebrow}>Tracks</h3>{isPhone ? <div className="w-32"><ZoomControl pps={pps} setZoom={setZoom} compact /></div> : null}</div>
-          {/* A scrollable region must be reachable by keyboard (axe scrollable-region-focusable); arrows then move the playhead. */}
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-          <div ref={scrollRef} className="relative overflow-x-auto pb-2" role="group" aria-label="Tracks. Left and right arrows move the playhead. Space plays." tabIndex={0}>
-            <div className="relative" style={{ width: labelW + timeW }}>
-              <Ruler store={timeStore} film={film} pps={pps} labelW={labelW} timeW={timeW} seek={(t) => void seekTo(t)} engine={engineRef} />
-              {state.lanes.map((lane) => (
-                <LaneRow
-                  key={lane.id}
-                  lane={lane}
-                  state={state}
-                  pps={pps}
-                  labelW={labelW}
-                  timeW={timeW}
-                  selected={selected}
-                  solo={solo}
-                  media={media}
-                  select={setSelected}
-                  commit={commit}
-                  setSolo={(on) => setSolo(on ? lane.id : null)}
-                  seek={(t) => void seekTo(t)}
-                />
-              ))}
-              <Playhead store={timeStore} pps={pps} labelW={labelW} />
+        <div className="bg-card flex min-w-0 flex-col gap-3 rounded-2xl p-4" data-slot="track-studio-tools">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className={eyebrow}>Edit</h3>
+            <div className="flex gap-1">
+              <Button variant="ghost" size="icon-sm" aria-label="Undo" disabled={!canUndo(hist.h)} onClick={undo}><Undo2Icon /></Button>
+              <Button variant="ghost" size="icon-sm" aria-label="Redo" disabled={!canRedo(hist.h)} onClick={redo}><Redo2Icon /></Button>
             </div>
           </div>
-        </div>
-
-        <div className="bg-card z-10 flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3 max-sm:sticky max-sm:shadow-lg" data-slot="track-studio-transport">
-          <Button size={isPhone ? "default" : "lg"} className="rounded-full" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? <PauseIcon /> : <PlayIcon />}{playing ? "Pause" : "Play"}</Button>
-          {isPhone ? (
-            <Button variant="secondary" size="icon" className="rounded-full" aria-label="Back to start" onClick={() => void seekTo(0)}><SkipBackIcon /></Button>
-          ) : (
-            <Button variant="secondary" size="lg" className="rounded-full" onClick={() => void seekTo(0)}><SkipBackIcon />Back to start</Button>
-          )}
-          {isPhone ? (
-            <Button variant="outline" size="icon" className="rounded-full" aria-label="Loop" aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon /></Button>
-          ) : (
-            <Button variant="outline" size="lg" className="rounded-full" aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon />Loop</Button>
-          )}
-          {isPhone ? null : <ZoomControl pps={pps} setZoom={setZoom} />}
-          <TimeText store={timeStore} film={film} />
+          {toolButtons}
+          {reasons ? <p className="text-muted-foreground text-sm">{reasons}</p> : null}
+          {props.makeMore && props.makeMore.length > 0 ? (
+            <>
+              <h3 className={eyebrow}>Make more</h3>
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Make more">
+                {props.makeMore.map((m) => (
+                  <ToolButton key={m.key} onClick={() => m.onSelect({ piece: sel?.piece ?? null, at_s: playhead() })} disabled={!!m.disabledReason} title={m.disabledReason}>
+                    {m.label}
+                    {m.badge ? <span className="border-border rounded-full border px-1.5 text-[10px] leading-4">{m.badge}</span> : null}
+                  </ToolButton>
+                ))}
+              </div>
+            </>
+          ) : null}
+          <p className="text-muted-foreground text-sm">{HELP_LINE}</p>
         </div>
       </div>
 
-      <div className="flex min-w-0 flex-col gap-3 lg:col-start-2 lg:row-start-1" data-slot="track-studio-panels">
-        <section aria-label={volume.title} className="bg-card flex flex-col gap-3 rounded-2xl p-4"><PanelBody panel={volume} /></section>
-        <p className="text-muted-foreground text-sm">{PREVIEW_LINE}</p>
+      <div className="bg-card min-w-0 rounded-2xl" data-slot="track-studio-tracks">
+        <div className="flex items-center justify-between gap-4 px-4 pt-3 pb-2"><h3 className={eyebrow}>Tracks</h3>{isPhone ? <div className="w-32"><ZoomControl pps={pps} setZoom={setZoom} compact /></div> : null}</div>
+        {/* A scrollable region must be reachable by keyboard (axe scrollable-region-focusable); arrows then move the playhead. */}
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+        <div ref={scrollRef} className="relative overflow-x-auto overflow-y-hidden pb-2" role="group" aria-label="Tracks. Left and right arrows move the playhead. Space plays." tabIndex={0}>
+          <div className="relative" style={{ width: labelW + timeW }}>
+            <Ruler store={timeStore} film={film} pps={pps} labelW={labelW} timeW={timeW} seek={(t) => void seekTo(t)} engine={engineRef} />
+            {state.lanes.map((lane) => (
+              <LaneRow
+                key={lane.id}
+                lane={lane}
+                state={state}
+                pps={pps}
+                labelW={labelW}
+                timeW={timeW}
+                selected={selected}
+                solo={solo}
+                media={media}
+                select={setSelected}
+                commit={commit}
+                setSolo={(on) => setSolo(on ? lane.id : null)}
+                seek={(t) => void seekTo(t)}
+                playhead={playhead}
+                setLine={setLine}
+              />
+            ))}
+            <Playhead store={timeStore} pps={pps} labelW={labelW} />
+          </div>
+        </div>
+      </div>
+
+      <div className={cn("bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3", "z-10 max-sm:sticky max-sm:shadow-lg")} data-slot="track-studio-transport">
+        <Button size={isPhone ? "default" : "lg"} className="rounded-full" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? <PauseIcon /> : <PlayIcon />}{playing ? "Pause" : "Play"}</Button>
+        {isPhone ? (
+          <Button variant="secondary" size="icon" className="rounded-full" aria-label="Back to start" onClick={() => void seekTo(0)}><SkipBackIcon /></Button>
+        ) : (
+          <Button variant="secondary" size="lg" className="rounded-full" onClick={() => void seekTo(0)}><SkipBackIcon />Back to start</Button>
+        )}
+        {isPhone ? (
+          <Button variant="outline" size="icon" className="rounded-full" aria-label="Loop" aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon /></Button>
+        ) : (
+          <Button variant="outline" size="lg" className="rounded-full" aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon />Loop</Button>
+        )}
+        {isPhone ? null : <ZoomControl pps={pps} setZoom={setZoom} />}
+        <TimeText store={timeStore} film={film} />
+      </div>
+      </div>
+
+      <div className="min-w-0 lg:col-start-2 lg:row-start-2" data-slot="track-studio-panels">
+        {isPhone ? (
+          <div className="bg-card flex flex-col gap-3 rounded-2xl p-4">
+            <div role="radiogroup" aria-label="Panel" className="grid grid-cols-4 gap-1">
+              {panels.map((p) => (
+                <Button key={p} variant={panelTab === p ? "default" : "secondary"} size="sm" role="radio" aria-checked={panelTab === p} className="rounded-full px-2" onClick={() => setPanelTab(p)}>{panelBodies[p].title}</Button>
+              ))}
+            </div>
+            <PanelBody panel={panelBodies[panelTab] ?? panelBodies[panels[0]!]} />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {panels.map((p) => <section key={p} aria-label={panelBodies[p].title} className="bg-card flex flex-col gap-3 rounded-2xl p-4"><PanelBody panel={panelBodies[p]} /></section>)}
+          </div>
+        )}
+        <p className="text-muted-foreground mt-3 text-sm lg:hidden">{PREVIEW_LINE}</p>
       </div>
     </section>
   );
@@ -271,6 +495,10 @@ function statsSummary(s: EngineStats) {
 // ---------------------------------------------------------------------------------------------------------------------
 // Small parts
 
+function ToolButton({ children, icon, ...rest }: { children: ReactNode; icon?: ReactNode } & Omit<React.ComponentProps<typeof Button>, "children">) {
+  return <Button variant="secondary" size="sm" className="rounded-full" {...rest}>{icon}{children}</Button>;
+}
+
 function PanelBody({ panel }: { panel: { title: string; reset: () => void; body: ReactNode } }) {
   return (
     <>
@@ -293,17 +521,19 @@ function Field({ label, value, children }: { label: string; value: string; child
 }
 
 const dbText = (db: number) => `${db > 0 ? "+" : ""}${db.toFixed(Math.abs(db % 1) < 0.05 ? 0 : 1)} dB`;
+const secText = (s: number) => `${s.toFixed(1)} s`;
+
 function Selected({ sel, none }: { sel: ReturnType<typeof findPiece>; none: string }) {
   return <p className="text-muted-foreground text-sm">{sel ? `Selected: ${sel.piece.label ?? `${LANE_WORD[sel.lane.id]} piece`}` : none}</p>;
 }
 
-function VolumePanel({ state, selected, commit }: { state: StudioState; selected: ReturnType<typeof findPiece>; commit: (s: StudioState) => void }) {
+function VolumePanel({ state, selected, commit }: { state: StudioState; selected: ReturnType<typeof findPiece>; commit: (s: StudioState, key?: string) => void }) {
   const p = selected?.piece;
   return (
     <>
       <Selected sel={selected} none="Pick a piece to change its volume." />
       <Field label="Level" value={p ? dbText(p.level_db) : "—"}>
-        <Slider min={LEVEL_DB_MIN} max={LEVEL_DB_MAX} step={0.5} value={[p?.level_db ?? 0]} disabled={!p} aria-label="Level in decibels" onValueChange={([v]) => p && commit(setPieceLevel(state, p.id, v ?? 0))} />
+        <Slider min={LEVEL_DB_MIN} max={LEVEL_DB_MAX} step={0.5} value={[p?.level_db ?? 0]} disabled={!p} aria-label="Level in decibels" onValueChange={([v]) => p && commit(setPieceLevel(state, p.id, v ?? 0), `level:${p.id}`)} />
       </Field>
       {selected?.lane.id === "music" ? (
         <label className="flex items-center justify-between gap-3 text-sm">
@@ -311,6 +541,50 @@ function VolumePanel({ state, selected, commit }: { state: StudioState; selected
           <Switch checked={p!.duck} onCheckedChange={(v) => commit(setDuck(state, p!.id, v))} aria-label="Lower under speech" />
         </label>
       ) : null}
+    </>
+  );
+}
+
+function FadesPanel({ state, selected, commit }: { state: StudioState; selected: ReturnType<typeof findPiece>; commit: (s: StudioState, key?: string) => void }) {
+  const p = selected?.piece;
+  const max = p ? Math.min(FADE_MAX_S, pieceDuration(p)) : FADE_MAX_S;
+  return (
+    <>
+      <Selected sel={selected} none="Pick a piece to fade it." />
+      <Field label="Fade in" value={p ? secText(p.fade_in_s) : "—"}>
+        <Slider min={0} max={max} step={0.1} value={[p?.fade_in_s ?? 0]} disabled={!p} aria-label="Fade in, seconds" onValueChange={([v]) => p && commit(setFadeIn(state, p.id, v ?? 0), `fi:${p.id}`)} />
+      </Field>
+      <Field label="Fade out" value={p ? secText(p.fade_out_s) : "—"}>
+        <Slider min={0} max={max} step={0.1} value={[p?.fade_out_s ?? 0]} disabled={!p} aria-label="Fade out, seconds" onValueChange={([v]) => p && commit(setFadeOut(state, p.id, v ?? 0), `fo:${p.id}`)} />
+      </Field>
+    </>
+  );
+}
+
+function CrossfadePanel({ state, selected, commit }: { state: StudioState; selected: ReturnType<typeof findPiece>; commit: (s: StudioState, key?: string) => void }) {
+  const x = selected ? crossfadeAfter(state, selected.piece.id) : null;
+  const ready = x !== null;
+  return (
+    <>
+      <p className="text-muted-foreground text-sm">{ready ? `At the seam after ${selected!.piece.label ?? "this clip"}.` : "Pick a clip that has another clip after it."}</p>
+      <Field label="Length at the seam" value={ready ? (x === 0 ? "Cut" : secText(x)) : "—"}>
+        <Slider min={0} max={CROSSFADE_MAX_S} step={0.1} value={[x ?? 0]} disabled={!ready} aria-label="Crossfade length, seconds" onValueChange={([v]) => ready && commit(setCrossfadeAfter(state, selected!.piece.id, v ?? 0), `x:${selected!.piece.id}`)} />
+      </Field>
+      <p className="text-muted-foreground text-sm">Blends the two pictures and their sound where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export dissolves it.</p>
+    </>
+  );
+}
+
+function LevelPanel({ state, steps, commit }: { state: StudioState; steps: readonly LevelStep[]; commit: (s: StudioState, key?: string) => void }) {
+  const current = currentBalance(state, steps);
+  return (
+    <>
+      <div role="radiogroup" aria-label="Level" className="flex flex-wrap gap-1.5">
+        {steps.map((step) => (
+          <Button key={step.id} variant={current === step.id ? "default" : "secondary"} size="sm" role="radio" aria-checked={current === step.id} className="rounded-full px-3" onClick={() => commit(applyBalance(state, step))}>{step.label}</Button>
+        ))}
+      </div>
+      <p className="text-muted-foreground text-sm">How loud the voice and music sit against the clip's own sound.</p>
     </>
   );
 }
@@ -399,12 +673,14 @@ interface LaneRowProps {
   solo: LaneId | null;
   media: MediaState;
   select: (id: string | null) => void;
-  commit: (s: StudioState) => void;
+  commit: (s: StudioState, key?: string) => void;
   setSolo: (on: boolean) => void;
   seek: (t: number) => void;
+  playhead: () => number;
+  setLine: (l: string) => void;
 }
 
-function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, select, commit, setSolo, seek }: LaneRowProps) {
+function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, select, commit, setSolo, seek, playhead, setLine }: LaneRowProps) {
   const placed = layoutLane(lane);
   const hue = `--hue-${lane.hue}`;
   const name = LANE_WORD[lane.id];
@@ -418,7 +694,7 @@ function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, selec
             <span className="min-w-0 flex-1 text-xs leading-tight font-semibold break-words">{lane.label}</span>
             <LaneToggle label={`Solo ${name}`} text="S" on={solo === lane.id} onClick={() => setSolo(solo !== lane.id)} />
           </div>
-          <Slider min={LEVEL_DB_MIN} max={LEVEL_DB_MAX} step={0.5} value={[lane.level_db]} aria-label={`${name} level, decibels`} onValueChange={([v]) => commit(setLaneLevel(state, lane.id, v ?? 0))} />
+          <Slider min={LEVEL_DB_MIN} max={LEVEL_DB_MAX} step={0.5} value={[lane.level_db]} aria-label={`${name} level, decibels`} onValueChange={([v]) => commit(setLaneLevel(state, lane.id, v ?? 0), `lane:${lane.id}`)} />
         </div>
       </div>
       <div
@@ -431,7 +707,7 @@ function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, selec
       >
         {placed.length === 0 ? <span className="text-muted-foreground pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs">{lane.id === "voice" ? "No voice yet." : lane.id === "music" ? "No music yet." : "No clip."}</span> : null}
         {placed.map((pl, i) => (
-          <PieceView key={pl.piece.id} lane={lane} index={i} start={pl.start} piece={pl.piece} pps={pps} hue={hue} selected={selected === pl.piece.id} count={placed.length} media={media} select={select} />
+          <PieceView key={pl.piece.id} lane={lane} state={state} index={i} start={pl.start} piece={pl.piece} pps={pps} hue={hue} selected={selected === pl.piece.id} count={placed.length} media={media} select={select} commit={commit} playhead={playhead} setLine={setLine} />
         ))}
       </div>
     </div>
@@ -445,19 +721,89 @@ function LaneToggle({ label, text, on, onClick }: { label: string; text: string;
 }
 
 interface PieceViewProps {
-  lane: StudioLane; index: number; start: number; piece: StudioPiece; pps: number; hue: string; selected: boolean; count: number; media: MediaState;
-  select: (id: string | null) => void;
+  lane: StudioLane; state: StudioState; index: number; start: number; piece: StudioPiece; pps: number; hue: string; selected: boolean; count: number; media: MediaState;
+  select: (id: string | null) => void; commit: (s: StudioState, key?: string) => void; playhead: () => number; setLine: (l: string) => void;
 }
 
-function PieceView({ lane, index, start, piece, pps, hue, selected, count, media, select }: PieceViewProps) {
+let dragSeq = 0;
+
+function PieceView({ lane, state, index, start, piece, pps, hue, selected, count, media, select, commit, playhead, setLine }: PieceViewProps) {
   const dur = pieceDuration(piece);
   const width = Math.max(8, dur * pps);
   const left = start * pps;
   const name = LANE_WORD[lane.id];
   const label = piece.label ?? `${name} ${index + 1}`;
   const seam = lane.id === "video" && index > 0 ? effectiveCrossfade(lane.pieces[index - 1]!, piece) : 0;
-  const env = useMemo(() => pieceEnvelope(lane, index), [lane, index]);
+  const origin = useRef<StudioState | null>(null);
+
+  // Drag the piece (voice and music only: video pieces keep their order and ripple).
+  const dragMove = useRef<{ x: number; at: number; key: string } | null>(null);
+  const onBodyDown = (e: ReactPointerEvent<HTMLButtonElement>) => {
+    select(piece.id);
+    if (lane.id === "video") return;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    dragMove.current = { x: e.clientX, at: piece.at_s, key: `move:${piece.id}:${++dragSeq}` };
+    origin.current = state;
+  };
+  const onBodyMove = (e: ReactPointerEvent<HTMLButtonElement>) => {
+    const d = dragMove.current;
+    if (!d || !origin.current) return;
+    const raw = d.at + (e.clientX - d.x) / pps;
+    if (Math.abs(e.clientX - d.x) < 3) return;
+    const edges = snapEdges(origin.current, piece.id, playhead());
+    // Snap the start edge, then the end edge, to the other pieces (8 px).
+    const thr = 8 / pps;
+    const a = snap(raw, edges, thr);
+    const b = snap(raw + dur, edges, thr);
+    const at = a !== raw ? a : b !== raw + dur ? b - dur : raw;
+    commit(movePiece(origin.current, piece.id, Math.max(0, at)), d.key);
+  };
+  const onBodyUp = () => { dragMove.current = null; origin.current = null; };
+
+  const nudgeMove = (e: ReactKeyboardEvent<HTMLButtonElement>) => {
+    if (lane.id === "video" || !e.altKey) return;
+    const step = e.shiftKey ? NUDGE_BIG_S : NUDGE_S;
+    if (e.key === "ArrowLeft") { e.preventDefault(); e.stopPropagation(); commit(movePiece(state, piece.id, Math.max(0, piece.at_s - step)), `move:${piece.id}`); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); e.stopPropagation(); commit(movePiece(state, piece.id, piece.at_s + step), `move:${piece.id}`); }
+  };
+
+  // Trim handles.
+  const handle = (side: "start" | "end") => {
+    const apply = (from: StudioState, delta: number): { ok: boolean; line?: string } => {
+      const r = side === "start" ? trimStartBy(from, piece.id, delta) : trimEndBy(from, piece.id, delta);
+      if (!r.ok) return { ok: false, line: r.line };
+      commit(r.state, `trim:${side}:${piece.id}:${dragSeq}`);
+      return { ok: true };
+    };
+    return {
+      onPointerDown: (e: ReactPointerEvent<HTMLElement>) => { e.stopPropagation(); (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); select(piece.id); origin.current = state; dragSeq++; (e.currentTarget as HTMLElement).dataset.x = String(e.clientX); },
+      onPointerMove: (e: ReactPointerEvent<HTMLElement>) => {
+        const x0 = Number((e.currentTarget as HTMLElement).dataset.x);
+        if (!origin.current || Number.isNaN(x0)) return;
+        const r = apply(origin.current, (e.clientX - x0) / pps);
+        if (!r.ok && r.line) setLine(r.line);
+      },
+      onPointerUp: (e: ReactPointerEvent<HTMLElement>) => { delete (e.currentTarget as HTMLElement).dataset.x; origin.current = null; dragSeq++; },
+      onKeyDown: (e: ReactKeyboardEvent<HTMLElement>) => {
+        const step = e.shiftKey ? NUDGE_BIG_S : NUDGE_S;
+        const dir = e.key === "ArrowRight" || e.key === "ArrowUp" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 0;
+        if (!dir) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const r = apply(state, dir * step);
+        if (!r.ok && r.line) setLine(r.line);
+      },
+    };
+  };
+  const hs = handle("start");
+  const he = handle("end");
+  const hasPrev = true;
+
+  const fadeIn = piece.fade_in_s;
+  const fadeOut = piece.fade_out_s;
   const spoken = `${name} piece ${index + 1} of ${count}, ${label}, ${spokenTime(dur)}${selected ? ", selected" : ""}`;
+  const env = useMemo(() => pieceEnvelope(lane, index), [lane, index]);
+
   return (
     <div className="absolute top-1 bottom-1" style={{ left, width }} data-piece-wrap={piece.id}>
       <button
@@ -465,19 +811,46 @@ function PieceView({ lane, index, start, piece, pps, hue, selected, count, media
         data-piece={piece.id}
         aria-pressed={selected}
         aria-label={spoken}
+        onPointerDown={onBodyDown}
+        onPointerMove={onBodyMove}
+        onPointerUp={onBodyUp}
+        onKeyDown={nudgeMove}
         onClick={() => select(piece.id)}
-        className={cn("relative block size-full cursor-pointer overflow-hidden rounded-md border text-left", selected ? "ring-primary ring-2" : "", FOCUS_RING)}
+        className={cn("relative block size-full overflow-hidden rounded-md border text-left", lane.id === "video" ? "cursor-pointer" : "cursor-grab", selected ? "ring-primary ring-2" : "", FOCUS_RING)}
         style={{ borderColor: `var(${hue})`, background: hueTintBackground(hue), color: `var(${hue})` }}
       >
         {lane.id === "video" ? <Thumbs piece={piece} pps={pps} thumbs={media.thumbs[piece.src]} /> : <Wave piece={piece} pps={pps} width={width} peaks={media.peaks[piece.src]} />}
-        <FadeRamps env={env} width={width} piece={piece} fadeIn={piece.fade_in_s} fadeOut={piece.fade_out_s} />
+        <FadeRamps env={env} width={width} piece={piece} fadeIn={fadeIn} fadeOut={fadeOut} />
         <span className="bg-background/70 text-foreground pointer-events-none absolute top-0.5 left-1 max-w-[calc(100%-8px)] truncate rounded px-1 text-[11px] leading-4 font-semibold">{label}</span>
         {seam > 0 ? <span aria-hidden="true" data-seam className="border-primary pointer-events-none absolute inset-y-0 left-0 border-r bg-[repeating-linear-gradient(135deg,var(--primary)_0_2px,transparent_2px_5px)] opacity-70" style={{ width: Math.min(width, seam * pps) }} /> : null}
       </button>
+      {selected && hasPrev ? (
+        <>
+          <TrimHandle side="start" label={`Trim start of ${label}`} valueText={`Starts ${spokenTime(piece.in_s)} into the file`} now={piece.in_s} min={0} max={piece.out_s - MIN_PIECE_S} {...hs} />
+          <TrimHandle side="end" label={`Trim end of ${label}`} valueText={`Ends ${spokenTime(piece.out_s)} into the file`} now={piece.out_s} min={piece.in_s + MIN_PIECE_S} max={piece.source_s ?? piece.out_s + 600} {...he} />
+        </>
+      ) : null}
     </div>
   );
 }
 
+function TrimHandle({ side, label, valueText, now, min, max, ...rest }: { side: "start" | "end"; label: string; valueText: string; now: number; min: number; max: number } & React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      role="slider"
+      tabIndex={0}
+      aria-label={label}
+      aria-orientation="horizontal"
+      aria-valuemin={Math.round(min * 10) / 10}
+      aria-valuemax={Math.round(max * 10) / 10}
+      aria-valuenow={Math.round(now * 10) / 10}
+      aria-valuetext={valueText}
+      data-handle={side}
+      className={cn("bg-primary absolute inset-y-0 z-10 w-2.5 cursor-ew-resize touch-none before:absolute before:-inset-x-3 before:inset-y-0 before:content-[''] after:bg-primary-foreground after:absolute after:inset-y-3 after:left-1/2 after:w-px", side === "start" ? "-left-1 rounded-l-md" : "-right-1 rounded-r-md", FOCUS_RING)}
+      {...rest}
+    />
+  );
+}
 
 function Thumbs({ piece, pps, thumbs }: { piece: StudioPiece; pps: number; thumbs: { frames: string[]; duration: number } | undefined }) {
   const dur = pieceDuration(piece);
