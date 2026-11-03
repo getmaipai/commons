@@ -76,7 +76,6 @@ export function MediaViewerShowcase() {
           src="https://example.com/files/lullaby.m4a"
           cover={picture("#a3481c", "#f0b429")}
           coverAlt="Moonlit lullaby album art"
-          defaultEditOpen
           quickSong
           onMakeFull={() => setNote("Making the full song.")}
           editModes={[
