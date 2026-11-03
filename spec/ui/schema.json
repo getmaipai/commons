@@ -32,7 +32,8 @@
     { "$ref": "#/$defs/top_result" },
     { "$ref": "#/$defs/category_tiles" },
     { "$ref": "#/$defs/track_rows" },
-    { "$ref": "#/$defs/result_feed" }
+    { "$ref": "#/$defs/result_feed" },
+    { "$ref": "#/$defs/studio" }
   ],
   "$defs": {
     "binding": {
@@ -679,6 +680,30 @@
           }
         },
         "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "studio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind"],
+      "description": "VIDEO-STUDIO-04 (K3, K4): the kit's TrackStudio block, a timeline with a client-side preview. The bound row is one clip: `{ id, title, poster, locked, lanes: [{ id, label, hue, kind, pieces: [{ id, ref, src, label, in_s, out_s, source_s, at_s, level_db, fade_in_s, fade_out_s, crossfade_s, duck }] }] }`; a lane `id` is video, voice or music. `src` is a same-origin path, or a `blob:` object URL of the page's own origin that the host made from an authenticated read (an adult-only file); the Element never fetches an adult-only file itself. The Element draws the ruler, the lanes (thumbnails and waveforms made inside it), one playhead, the transport (Play, Back to start, Loop, zoom), per-lane Level, Mute and Solo, and the Volume panel, which acts on the selected piece. The preview is client side (one video element as the clock, up to four audio elements, Web Audio gains for level, mute, solo, fades and the sound of a crossfade); nothing is rendered. It cuts where the export dissolves, and says so. A row whose `fields.locked` path is true draws ONE lock tile and nothing else: no media element, no request for a source, no peaks, thumbnails or plan. When the row becomes locked the Element stops every media element, removes `src`, calls `load()` and discards what it drew. Nothing is kept in storage, the URL or a cache. Editing (trim, split, delete, add, fades, crossfade, level, export) is VIDEO-STUDIO-05 and adds optional properties.",
+      "properties": {
+        "type": { "const": "studio" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "kind": { "type": "string", "enum": ["video", "audio"], "default": "video", "description": "`video` draws the monitor and a thumbnail strip on the first lane; `audio` draws no monitor and a clock from the wall." },
+        "fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Dotted paths into the bound row. Defaults are the names in the node description.",
+          "properties": {
+            "key": { "type": "string" },
+            "title": { "type": "string" },
+            "poster": { "type": "string" },
+            "lanes": { "type": "string" },
+            "locked": { "type": "string", "description": "Dotted path to a boolean (default `locked`). True draws the one lock tile and reads no other field." },
+            "making": { "type": "string", "description": "Dotted path to a boolean (default `making`) on a locked row: the one tile shows its small spinner." }
+          }
+        }
       }
     },
     "feed_handler": {

@@ -208,6 +208,16 @@ describe("the News pages (NEWS-00)", () => {
     expect(run({ ...base, fields: { words: "https://x.test/a", status: "s", src: "https://x.test/a.mp4" } })).toContain("result_feed.fields: src must be a field path");
     expect(run({ ...base, filters: [{ kind: "toggle", state: "a", label: "A" }, { kind: "toggle", state: "a", label: "B" }] })).toContain('filter state key "a" is used twice');
   });
+  test("VIDEO-STUDIO-04: a studio binds a package list row and its field paths are paths", () => {
+    const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
+    const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
+    const base = { type: "studio", bind: { source: "package", path: "topics" }, fields: { poster: "poster", lanes: "lanes", locked: "locked" } };
+    expect(run(base)).toBe("");
+    expect(run({ ...base, bind: { source: "package", path: "nope" } })).toContain("studio: bind.path");
+    expect(run({ ...base, bind: { source: "package", path: "today" } })).toContain("studio: data \"today\" must be a \"rows\": \"list\" entry");
+    expect(run({ ...base, bind: { source: "route", path: "/api/x" } })).toContain('bind.source must be "package"');
+    expect(run({ ...base, fields: { poster: "https://x.test/a.jpg" } })).toContain("studio.fields: poster must be a field path");
+  });
   test("VIDEO-STUDIO-02: a page surface is page or studio", () => {
     const run = (surface: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? { type: "page", id: "x", title: "X", surface, body: [{ type: "empty_state", icon: "x", text: "t" }] } : news(m)), "child").join("\n");
     expect(run("studio")).not.toContain("surface");

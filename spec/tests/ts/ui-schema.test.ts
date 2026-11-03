@@ -355,6 +355,16 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...feed, fields: { ...feed.fields, locked: 1 } })).toBe(false);
   });
 
+  test("VIDEO-STUDIO-04: the studio node (TrackStudio) is additive and strict", () => {
+    const studio = { type: "studio", bind: { source: "package", path: "studio" } };
+    expect(validate(studio)).toBe(true);
+    expect(validate({ ...studio, kind: "video", fields: { key: "id", title: "title", poster: "poster", lanes: "lanes", locked: "locked", making: "making" } })).toBe(true);
+    expect(validate({ ...studio, kind: "audio" })).toBe(true);
+    for (const bad of [{ kind: "film" }, { fields: { nope: "x" } }, { fields: { lanes: 3 } }, { extra: true }, { tools: ["split"] }]) expect(validate({ ...studio, ...bad })).toBe(false);
+    expect(validate({ type: "studio" })).toBe(false);
+    expect(validate({ ...studio, bind: { source: "route" } })).toBe(false);
+  });
+
   test("VIDEO-STUDIO-02: page surface is page or studio, default unchanged", () => {
     const page = { type: "page", id: "x", title: "X", body: [{ type: "empty_state", icon: "x", text: "t" }] };
     expect(validate(page)).toBe(true);

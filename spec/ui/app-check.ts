@@ -20,7 +20,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -137,6 +137,11 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
       const seen = new Set<string>();
       for (const f of node.filters) if (isObject(f)) { const key = String(f.state); if (seen.has(key)) out.push(`${where} result_feed: filter state key "${key}" is used twice`); seen.add(key); }
     }
+  }
+  // VIDEO-STUDIO-04: the studio binds one of the package's own clip rows; its field paths are paths, never addresses.
+  if (type === "studio") {
+    checkBinding(node.bind, `${where} studio`, data, "list", out);
+    if (isObject(node.fields)) for (const [name, value] of Object.entries(node.fields)) checkFieldPath(value, `${where} studio.fields`, name, out);
   }
   if (type === "billboard") {
     checkBinding(node.bind, `${where} billboard`, data, "list", out);
