@@ -707,6 +707,18 @@ export const ResultFeedNodeSchema = z.object({
 });
 export type ResultFeedNode = z.infer<typeof ResultFeedNodeSchema>;
 
+/** VIDEO-STUDIO-04 (K3, K4): the studio (TrackStudio). Mirrors spec/ui/schema.json `studio`. */
+export const StudioNodeSchema = z.object({
+  type: z.literal("studio"),
+  bind: BindingSchema,
+  kind: z.enum(["video", "audio"]).default("video"),
+  fields: z
+    .object({ key: z.string().optional(), title: z.string().optional(), poster: z.string().optional(), lanes: z.string().optional(), locked: z.string().optional(), making: z.string().optional() })
+    .strict()
+    .optional(),
+});
+export type StudioNode = z.infer<typeof StudioNodeSchema>;
+
 export const SectionNodeSchema: z.ZodType<SectionNode> = z.lazy(() =>
   z.object({
     type: z.literal("section"),
@@ -784,6 +796,7 @@ export type UiNode =
   | CategoryTilesNode
   | TrackRowsNode
   | ResultFeedNode
+  | StudioNode
   | TabsNode;
 
 export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
@@ -815,6 +828,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     CategoryTilesNodeSchema,
     TrackRowsNodeSchema,
     ResultFeedNodeSchema,
+    StudioNodeSchema,
     TabsNodeSchema,
   ]),
 );
@@ -850,4 +864,5 @@ export const NODE_TYPES = [
   "category_tiles",
   "track_rows",
   "result_feed",
+  "studio",
 ] as const;

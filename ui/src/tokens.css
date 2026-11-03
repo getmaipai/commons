@@ -1850,6 +1850,11 @@ html[data-ease-motion="calm"] [data-slot="weather-location-sky"] [data-fx] { ani
 html:has([data-slot="phone-nav"]) [data-slot="prompt-bar"][data-mode="dock"] { bottom: calc(49px + env(safe-area-inset-bottom, 0px)); padding-bottom: 0.75rem; }
 html:has([data-slot="phone-nav"][data-floating]) [data-slot="prompt-bar"][data-mode="dock"] { bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
 
+/* VIDEO-STUDIO-04: the Studio's transport (elements/track-studio.tsx) sticks to the foot of a phone, above PhoneNav where it is drawn, the floating variant included. */
+[data-slot="track-studio-transport"] { bottom: env(safe-area-inset-bottom, 0px); }
+html:has([data-slot="phone-nav"]) [data-slot="track-studio-transport"] { bottom: calc(49px + env(safe-area-inset-bottom, 0px)); }
+html:has([data-slot="phone-nav"][data-floating]) [data-slot="track-studio-transport"] { bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+
 /* LIBRARY-REVAMP-06 slice A: the storage bar's segments and swatches are
  * drawn with background colours, which forced colours removes. Keep them
  * as solid system-colour blocks so the bar still reads; the legend names
