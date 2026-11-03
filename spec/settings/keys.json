@@ -1212,7 +1212,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_styles_old",
     "honoured_by": [
       "home"
     ]
@@ -1310,7 +1310,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_styles_old",
     "honoured_by": [
       "home"
     ]
@@ -1320,14 +1320,14 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Adults can make videos",
-    "help": "Adults can ask chat for short videos. Children and teens cannot, whatever this says.",
+    "label": "Video making",
+    "help": "Turns video making on or off for everyone in the home, children and teens too. Children's daily limits are under Pictures.",
     "copy": {
-      "does": "Turns video making on or off for the grown-ups here."
+      "does": "Switches making clips on or off for the whole home."
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_videos",
     "honoured_by": [
       "home"
     ]
@@ -1337,14 +1337,14 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Adults can make music",
-    "help": "Adults can ask chat to write and make songs, and change them. Children and teens cannot, whatever this says.",
+    "label": "Adults can make songs",
+    "help": "Turns song making on or off for adults. Children and teens cannot make songs, whatever this says.",
     "copy": {
       "does": "Turns song making on or off for the grown-ups here."
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.ai_music",
+    "lives_in": "household.media_music",
     "honoured_by": [
       "home"
     ]
@@ -1361,17 +1361,17 @@
     },
     "default": "full",
     "label": "Song length",
-    "help": "What chat makes when nobody says which. Anyone who can make songs can still ask for the other kind. A song is as long as its words.",
+    "help": "What chat makes when nobody says. Anyone can ask for the other kind. A song is as long as its words.",
     "copy": {
       "does": "Picks whether chat sings every part or only the hook when nobody says which.",
       "options": {
-        "quick": "Quick: the hook, the first verse and chorus.",
+        "quick": "Short: the hook, the first verse and the chorus.",
         "full": "Full: every part of the song."
       }
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_music",
     "honoured_by": [
       "home"
     ]
@@ -1385,7 +1385,7 @@
     "help": "When someone opens Lyrics for a song with no words, Home sends its title, artist, album and length once per song to look them up. Never for songs made at home or for a child.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_lookups",
     "honoured_by": [
       "home"
     ]
@@ -1399,7 +1399,7 @@
     "help": "In the background, Home sends each library song's title, artist, album and track number to MusicBrainz, about one song a second, to find its public MusicBrainz id. Nothing else leaves your home. Off stops it; ids already found stay.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_lookups",
     "honoured_by": [
       "home"
     ]
@@ -1413,7 +1413,7 @@
     "help": "In the background, Home asks Wikidata, Wikipedia and Wikimedia Commons about an artist you have songs by, using only the artist's public Wikidata id (found through MusicBrainz), to keep one photo and a two-sentence bio on your computer. Nothing about your home is sent. Never for an artist under 18. Off stops it; photos and bios already kept stay, and artists show the generated cover instead.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_lookups",
     "honoured_by": [
       "home"
     ]
@@ -1427,7 +1427,7 @@
     "help": "In the background, Home asks the Cover Art Archive for the front cover of an album that has no art in its files or folder, using only the album's public MusicBrainz id, and keeps the picture on your computer. Nothing about your home is sent. Art in your files or folders is never replaced. Off stops it; covers already kept stay, and other albums show the generated cover.",
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_lookups",
     "honoured_by": [
       "home"
     ]
@@ -1438,13 +1438,13 @@
     "selector": "boolean",
     "default": true,
     "label": "Adults can make pictures",
-    "help": "Adults can ask chat for pictures. Children and teens cannot, whatever this says.",
+    "help": "Turns picture making on or off for adults. Teens can always make pictures with nothing adult in them. Children are set below.",
     "copy": {
       "does": "Turns picture making on or off for the grown-ups here."
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_pictures",
     "honoured_by": [
       "home"
     ]
@@ -3980,8 +3980,8 @@
     "scope": "household",
     "selector": "text",
     "default": "",
-    "label": "Hugging Face token (for voice cloning)",
-    "help": "Needed to clone a voice from a recording. Accept the terms at huggingface.co/kyutai/pocket-tts, then create a read token at huggingface.co/settings/tokens and paste it here.",
+    "label": "Hugging Face token",
+    "help": "Needed to clone a voice from a recording and to download styles that ask you to accept terms. Create a read token at huggingface.co/settings/tokens and paste it here. Voice cloning also needs the terms accepted at huggingface.co/kyutai/pocket-tts.",
     "level": "advanced",
     "secret": true,
     "lives_in": "household.ai_advanced",
@@ -4386,14 +4386,14 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Family can make pictures and videos of each other",
-    "help": "Anyone in the household may make pictures, videos and songs with or of any household member. An admin can turn this off.",
+    "label": "Family can make pictures, videos and songs of each other",
+    "help": "Anyone in the home may make things with or of any household member. Turn it off to stop that.",
     "copy": {
       "does": "Sets whether household members may include one another in things made here."
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_kids",
     "honoured_by": [
       "home"
     ]
@@ -4410,7 +4410,7 @@
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_retired",
     "honoured_by": [
       "home"
     ]
@@ -4554,14 +4554,14 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Let kids make cartoon pictures and videos",
-    "help": "On by default: every child in this home can make cartoon pictures and videos of safe things, up to 20 pictures and 5 videos a day, as soon as a picture model is installed. Photos, real people and anything scary or grown-up are never made for them. Turn this off to stop it for every child.",
+    "label": "Let children make cartoon pictures and videos",
+    "help": "Children get cartoons with no sound, up to the limits below. Photos, real people and anything scary or grown-up are never made for them.",
     "copy": {
       "does": "Turns the safe cartoon picture and video maker on or off for the home."
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_kids",
     "honoured_by": [
       "home"
     ]
@@ -4572,13 +4572,13 @@
     "selector": "number",
     "default": 20,
     "label": "Cartoon pictures a child can make each day",
-    "help": "How many cartoon pictures each child can make in a day (20 unless you change it). Changing one of their own cartoons counts as one. 0 means none.",
+    "help": "0 means none.",
     "copy": {
       "does": "Sets the most cartoon pictures one child gets per day."
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_kids",
     "honoured_by": [
       "home"
     ]
@@ -4589,13 +4589,13 @@
     "selector": "number",
     "default": 5,
     "label": "Cartoon videos a child can make each day",
-    "help": "How many cartoon videos each child can make in a day (5 unless you change it). 0 means none.",
+    "help": "0 means none.",
     "copy": {
       "does": "Sets the most cartoon videos one child gets per day."
     },
     "level": "basic",
     "secret": false,
-    "lives_in": "household.pictures",
+    "lives_in": "household.media_kids",
     "honoured_by": [
       "home"
     ]
@@ -6250,6 +6250,121 @@
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.picture_tier",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "standard",
+        "boost"
+      ]
+    },
+    "default": "standard",
+    "label": "Level when nobody says",
+    "help": "Standard is fast. Boost has finer detail and takes longer. Anyone can pick a level for one picture.",
+    "copy": {
+      "does": "Picks how chat makes a picture if no level is named.",
+      "options": {
+        "standard": "Fast, best for most requests.",
+        "boost": "Finer detail, and it takes longer."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.media_pictures",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.video_tier",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "standard",
+        "boost"
+      ]
+    },
+    "default": "standard",
+    "label": "Level when nobody says",
+    "help": "Standard is fast and has sound. Boost has a sharper picture and takes a little longer. Anyone can pick a level for one video.",
+    "copy": {
+      "does": "Picks how chat makes a video if no level is named.",
+      "options": {
+        "standard": "Fast, with sound.",
+        "boost": "A sharper picture, a little slower."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.media_videos",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.styles.adult_only",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "allowed",
+        "restricted"
+      ]
+    },
+    "default": "allowed",
+    "label": "Adult-only styles",
+    "help": "Hidden removes every adult-only style for all adults, admins too, until you switch it back. Nothing is deleted.",
+    "copy": {
+      "does": "Decides if styles with an age limit can be used at all.",
+      "options": {
+        "allowed": "Styles with an age limit can be picked.",
+        "restricted": "Styles with an age limit stay hidden."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.media_styles",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.styles.civitai",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Use Civitai",
+    "help": "Off until you turn it on. This computer only contacts civitai.com when you search or install.",
+    "copy": {
+      "does": "Lets Home search Civitai and install styles when you ask."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.media_styles",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "generation.styles.civitai_key",
+    "scope": "household",
+    "selector": "text",
+    "default": "",
+    "label": "Civitai key",
+    "help": "Some downloads need a free Civitai key. Home keeps it private and never shows it again.",
+    "copy": {
+      "does": "Holds what some downloads ask for before they start."
+    },
+    "level": "basic",
+    "secret": true,
+    "lives_in": "household.media_styles",
     "honoured_by": [
       "home"
     ]

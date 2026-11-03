@@ -51,8 +51,8 @@
       },
       "new": {
         "area": "settings",
-        "section": "pictures",
-        "tab": "pictures"
+        "section": "profile",
+        "tab": "profile"
       }
     },
     {
@@ -227,7 +227,7 @@
       "new": {
         "area": "settings",
         "section": "media",
-        "tab": "media-library"
+        "tab": "pictures"
       }
     },
     {

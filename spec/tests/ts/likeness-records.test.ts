@@ -42,11 +42,11 @@ describe("likeness settings keys", () => {
       scope: "household",
       selector: "boolean",
       default: true,
-      label: "Family can make pictures and videos of each other",
-      help: "Anyone in the household may make pictures, videos and songs with or of any household member. An admin can turn this off.",
+      label: "Family can make pictures, videos and songs of each other",
+      help: "Anyone in the home may make things with or of any household member. Turn it off to stop that.",
       level: "basic",
       secret: false,
-      lives_in: "household.pictures",
+      lives_in: "household.media_kids",
       honoured_by: ["home"],
     });
     expect(keys.some((key) => key.key === "likeness.adults")).toBe(false);

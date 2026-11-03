@@ -15,7 +15,6 @@
             "chat",
             "voice",
             "notifications",
-            "pictures",
             "data"
           ]
         },
@@ -261,29 +260,6 @@
             {
               "id": "notifications",
               "label": "Notifications"
-            }
-          ],
-          "scope": "person"
-        },
-        {
-          "id": "pictures",
-          "label": "Pictures and videos",
-          "icon": "camera",
-          "kind": "keys",
-          "cards": [
-            {
-              "label": "Pictures and videos that look like you",
-              "group": "person.likeness",
-              "scope": "person",
-              "tab": "pictures"
-            }
-          ],
-          "tabs": [
-            {
-              "id": "pictures",
-              "label": "Pictures and videos",
-              "min_role": "adult",
-              "view": "account.likeness"
             }
           ],
           "scope": "person"
@@ -728,49 +704,139 @@
           "kind": "keys",
           "cards": [
             {
-              "label": "Pictures, videos and music",
-              "group": "household.pictures",
+              "label": "Pictures",
+              "group": "household.media_pictures",
               "scope": "household",
-              "tab": "pictures"
+              "tab": "pictures",
+              "view": "home.media_pictures",
+              "description": "Who can make pictures, and which models make them.",
+              "copy": {
+                "models_label": "Picture models",
+                "models_help": "Choose which models make Standard and Boost pictures.",
+                "models_button": "Choose models"
+              }
+            },
+            {
+              "label": "Children and teens",
+              "group": "household.media_kids",
+              "scope": "household",
+              "tab": "pictures",
+              "view": "home.media_kids",
+              "description": "Children make safe cartoons. Teens make pictures and videos with nothing adult in them. Neither sees styles."
+            },
+            {
+              "label": "Videos",
+              "group": "household.media_videos",
+              "scope": "household",
+              "tab": "videos",
+              "view": "home.media_videos",
+              "description": "Who can make videos, and how.",
+              "copy": {
+                "models_label": "Video models",
+                "models_help": "Choose which models make Standard, Boost and Max videos.",
+                "models_button": "Choose models",
+                "max_note": "Max is for the people you allow. Videos are never made on a spoken turn, a shared screen or for a guest.",
+                "styles_label": "Styles",
+                "styles_help": "Add, share and remove styles.",
+                "styles_button": "Open Styles"
+              }
+            },
+            {
+              "label": "Music",
+              "group": "household.media_music",
+              "scope": "household",
+              "tab": "music",
+              "view": "home.media_music",
+              "description": "Who can make songs, and how long they are.",
+              "copy": {
+                "models_label": "Song models",
+                "models_help": "Choose which models make songs.",
+                "models_button": "Choose models"
+              }
             },
             {
               "label": "Online radio and podcasts",
               "group": "household.media_online",
               "scope": "household",
-              "tab": "pictures"
+              "tab": "music"
+            },
+            {
+              "label": "Looking up songs online",
+              "group": "household.media_lookups",
+              "scope": "household",
+              "tab": "music",
+              "collapsed": true
+            },
+            {
+              "label": "Styles",
+              "group": "household.media_styles",
+              "scope": "household",
+              "tab": "styles",
+              "view": "home.media_styles",
+              "description": "A style gives pictures and videos a look, like old film or clay. Only admins add styles. A new style is for admins only until you say who else can use it.",
+              "copy": {
+                "browse_button": "Browse styles",
+                "add_file_button": "Add from a file",
+                "empty": "No styles yet. Browse styles to find one, or add one from a file.",
+                "locked_note": "Adult-only styles stay locked until you enter your own passcode.",
+                "unlocked_note": "Unlocked on this page only. It locks again when you leave or after 2 minutes without a touch.",
+                "sources_title": "Where styles come from",
+                "huggingface_note": "On. Search and download styles from Hugging Face. A token is only needed for styles that ask you to accept terms: add it in AI and models, Advanced. Home sends it only for those files.",
+                "civitai_off_note": "Off until you turn it on. This computer only contacts civitai.com when you search or install.",
+                "civitai_notice_title": "Turn on Civitai?",
+                "civitai_notice_body_1": "When you search or install, this computer contacts civitai.com. It sends what you typed and your key, nothing about your family.",
+                "civitai_notice_body_2": "Civitai has its own rules. Some styles there are for adults only, and some may show real people. You choose what to install.",
+                "civitai_notice_cancel": "Not now",
+                "civitai_notice_confirm": "Turn on",
+                "civitai_key_replace": "Replace",
+                "civitai_key_remove": "Remove",
+                "removed_title": "Recently removed",
+                "removed_line": "Removed {days} days ago. Deleted for good in {left} days.",
+                "restore_button": "Restore",
+                "delete_now_button": "Delete now"
+              }
             }
           ],
           "tabs": [
             {
               "id": "pictures",
-              "label": "Pictures, videos and music",
-              "min_role": "admin",
-              "view": "home.pictures_library"
+              "label": "Pictures",
+              "min_role": "admin"
             },
             {
-              "id": "media-library",
-              "label": "Media library",
-              "min_role": "admin",
-              "view": "home.media_library"
+              "id": "videos",
+              "label": "Videos",
+              "min_role": "admin"
+            },
+            {
+              "id": "music",
+              "label": "Music",
+              "min_role": "admin"
+            },
+            {
+              "id": "styles",
+              "label": "Styles",
+              "min_role": "admin"
             }
           ],
           "keywords": [
             "images",
+            "pictures",
             "styles",
             "lora",
             "adapters",
+            "civitai",
             "generate",
             "video",
             "videos",
             "music",
+            "songs",
             "podcasts",
+            "radio",
             "shows",
-            "books",
-            "folder",
-            "nas",
-            "add videos",
-            "add music",
-            "library"
+            "levels",
+            "standard",
+            "boost"
           ],
           "scope": "household",
           "min_role": "admin"
@@ -1163,6 +1229,21 @@
       "scope": "household",
       "group": "household.ai_tiers",
       "reason": "Home draws the tier slot records on the AI and models page in TIER-HOME-04, as options and switches, not as raw JSON text."
+    },
+    {
+      "scope": "household",
+      "group": "household.media_retired",
+      "reason": "generation.people_prompts is retired: nothing reads it and Home asks nothing about people; stored values are dropped at the paired drop tag."
+    },
+    {
+      "scope": "household",
+      "group": "household.media_styles_old",
+      "reason": "The two old adult-only style switches are merged into generation.styles.adult_only; they stay readable for the migration step until the drop tag."
+    },
+    {
+      "scope": "person",
+      "group": "person.likeness",
+      "reason": "A parent or admin sets a child's cartoon making on that child's Family page; a settings area only reads and writes the viewer's own scope, and the Yours page that drew it is removed."
     }
   ],
   "device_cards": [

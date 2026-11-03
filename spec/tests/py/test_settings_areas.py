@@ -64,8 +64,8 @@ OLD_IDS = {
 def test_every_area_parses_and_page_counts_are_correct():
     assert [a["id"] for a in FILE["areas"]] == ["settings"]
     assert len(FILE["areas"][0]["sections"]) == 16
-    assert sum(s["scope"] == "person" for s in FILE["areas"][0]["sections"]) == 7
-    assert sum(s["scope"] == "household" for s in FILE["areas"][0]["sections"]) == 9
+    assert sum(s["scope"] == "person" for s in FILE["areas"][0]["sections"]) == 6
+    assert sum(s["scope"] == "household" for s in FILE["areas"][0]["sections"]) == 10
     for area in FILE["areas"]:
         SettingsArea.model_validate(area)
 
@@ -77,6 +77,8 @@ def test_registry_groups_are_once_or_not_placed():
             for card in section.get("cards", []):
                 if card.get("group"):
                     drawn[(card["scope"], card["group"])] += 1
+                for group in card.get("groups", []):
+                    drawn[(card["scope"], group)] += 1
     for card in FILE.get("device_cards", []):
         drawn[(card["scope"], card["group"])] += 1
     parked = {(n["scope"], n["group"]) for n in FILE["not_placed"]}
@@ -94,6 +96,7 @@ def test_tab_view_and_audience_constraints_and_robot_detail():
         "media",
         "home-voice",
         "search",
+        "offline-data",
         "apps",
         "backups",
         "advanced",
@@ -108,11 +111,13 @@ def test_tab_view_and_audience_constraints_and_robot_detail():
     ai = next(s for s in home["sections"] if s["id"] == "ai")
     assert [t["id"] for t in ai["tabs"]] == [
         "overview",
-        "models",
         "engines",
         "advanced",
         "coding",
     ]
+    media = next(s for s in home["sections"] if s["id"] == "media")
+    assert [t["id"] for t in media["tabs"]] == ["pictures", "videos", "music", "styles"]
+    assert "media-library" not in {t["id"] for t in media["tabs"]}
 
 
 def test_legacy_map_covers_every_old_section_and_targets_existing_page_tabs():
@@ -126,5 +131,5 @@ def test_legacy_map_covers_every_old_section_and_targets_existing_page_tabs():
             continue
         area = next(a for a in FILE["areas"] if a["id"] == target["area"])
         page = next(s for s in area["sections"] if s["id"] == target["section"])
-        if "new" in row:
+        if "new" in row and "tab" in target:
             assert target["tab"] in {t["id"] for t in page["tabs"]}
