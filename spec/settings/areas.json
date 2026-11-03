@@ -469,6 +469,11 @@
                   "description": "Finer detail and more looks to choose from."
                 },
                 {
+                  "id": "picturesdetailed-qwen",
+                  "label": "Qwen-Image (best pictures)",
+                  "description": "The best pictures: clear words and fine detail. Slow, and a very large download."
+                },
+                {
                   "id": "pictures-edit",
                   "label": "Changing pictures",
                   "description": "Needed to change a picture and as the backup."
@@ -489,9 +494,29 @@
                   "description": "Make short videos in chat."
                 },
                 {
+                  "id": "videos-ltx25",
+                  "label": "Videos with sound",
+                  "description": "Clips up to 10 seconds with a sound track and spoken words. A very large download."
+                },
+                {
+                  "id": "videos-ltx25max",
+                  "label": "Best videos with sound",
+                  "description": "The sharpest clips with sound. The largest download of all."
+                },
+                {
                   "id": "music",
                   "label": "Music",
                   "description": "Make songs and tunes."
+                },
+                {
+                  "id": "music-boost",
+                  "label": "Clearer songs",
+                  "description": "A larger song model with clearer voices. About a minute per song."
+                },
+                {
+                  "id": "music-max",
+                  "label": "Best songs",
+                  "description": "The best song model. About three minutes per song."
                 },
                 {
                   "id": "stems",

@@ -1,3 +1,7 @@
+## [spec-v0.1.321] - 2026-11-03
+
+- INSTALL-EVERYTHING-01, additive. The AI and models card lists five more choices with their words, so Settings and Setup can install and name every model the Stack knows: `picturesdetailed-qwen`, `videos-ltx25`, `videos-ltx25max`, `music-boost` and `music-max`. No existing choice changes.
+
 ## [spec-v0.1.320] - 2026-11-03
 
 - VIDEO-LORA-09, additive. A `prompt_bar` chip takes `private`: its choice is never written into the page address (the id of an adult-only style must not reach a link or a history entry). Test in `tests/ts/ui-schema.test.ts`.
