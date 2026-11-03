@@ -141,6 +141,8 @@ describe("the media host's adult-only rule", () => {
 describe("an unlocked adult-only item's blob sources (ADULT-LOCK-03b)", () => {
   // The test document starts at about:blank (origin "null"); a real page has an origin, which the kit's blob rule compares.
   beforeEach(() => { (window as unknown as { happyDOM: { setURL(url: string): void } }).happyDOM.setURL("http://localhost:3000/apps/videos"); });
+  // Leave the document where it started: a later test file in the same process would otherwise load its pictures from a real localhost address.
+  afterEach(() => { (window as unknown as { happyDOM: { setURL(url: string): void } }).happyDOM.setURL("about:blank"); });
   const blob = () => `blob:${window.location.origin}/0b1c2d3e-aaaa-bbbb-cccc-000000000001`;
   const shelfOf = () => MediaShelfNodeSchema.parse({
     type: "media_shelf", bind: { source: "package", path: "clips", stream: false }, item_key_field: "id", item_label_field: "title", item_media_field: "thumbnail", layout: "grid",
