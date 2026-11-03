@@ -83,6 +83,20 @@ describe("MusicTrack compact card", () => {
     expect(view.getByRole("textbox", { name: "How should it change?" })).toBeTruthy();
   });
 
+  test("a host that passes editOpen opens and closes the edit dialog itself", () => {
+    const changes: boolean[] = [];
+    const modes = [{ id: "song", label: "Change the song", content: <Input aria-label="How should it change?" /> }];
+    const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" editModes={modes} editOpen={false} onEditOpenChange={open => changes.push(open)} />);
+    expect(document.querySelector('[data-slot="dialog-content"]')).toBeNull();
+    fireEvent.click(view.getByRole("button", { name: "Edit" }));
+    expect(changes).toEqual([true]);
+    expect(document.querySelector('[data-slot="dialog-content"]')).toBeNull();
+    view.rerender(<MusicTrack status="ready" title="Song" src="/song.m4a" editModes={modes} editOpen onEditOpenChange={open => changes.push(open)} />);
+    expect(document.querySelector('[data-slot="dialog-content"]')).toBeTruthy();
+    view.rerender(<MusicTrack status="ready" title="Song" src="/song.m4a" editModes={modes} editOpen={false} onEditOpenChange={open => changes.push(open)} />);
+    expect(document.querySelector('[data-slot="dialog-content"]')).toBeNull();
+  });
+
   test("legacy host editContent remains available in the dialog", () => {
     const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" editContent={<><Input aria-label="How should it change?" /><Button type="button">Make</Button></>} />);
     fireEvent.click(view.getByRole("button", { name: "Edit" }));

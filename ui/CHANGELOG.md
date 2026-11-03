@@ -1,3 +1,7 @@
+## [ui-v0.5.491] - 2026-11-02
+
+- `MusicTrack`: optional `editOpen` and `onEditOpenChange` let a host open and close the edit dialog (to close it once a change is sent). Without them it keeps its own state as before; additive.
+
 ## [ui-v0.5.490] - 2026-11-02
 
 - `MusicTrack` (`elements/music-track.tsx`): the pencil's edit panel (Remix, New cover, Full song, Quality, Stems, Details) opens in a dialog instead of a 22rem popover, so the tabs and fields have room to read and type. Same props (`editModes`, `editContent`, `editLabel`, `editPanelLabel`, `defaultEditOpen`); the trigger button is unchanged. Test updated beside it.

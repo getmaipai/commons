@@ -64,12 +64,12 @@ function legacyEditLayout(content: ReactNode): { modes: Array<{ id: string; labe
 export function MusicTrack({
   status, title, description, src, progress, phaseLabel, queuePosition, startedAt, estimateMs = 120_000, etaLabel, hint, error, downloadName = "song.m4a", lyrics, timedLyrics, cover, coverAlt, coverActions,
   versions = [], currentId, onSelectVersion, onUseVersion, onStop, onRetry, onDownload, onShare, onSaveToLibrary, onMakeAnother, actions, metadata, copy, width = "default", editContent, editLabel = "Edit", editPanelLabel,
-  stages = DEFAULT_STAGES, currentStage, elapsedSeconds, etaSeconds, waitingForMemory = false, editModes, quickSong = false, onMakeFull, defaultEditOpen = false, byline, pendingActions,
+  stages = DEFAULT_STAGES, currentStage, elapsedSeconds, etaSeconds, waitingForMemory = false, editModes, quickSong = false, onMakeFull, defaultEditOpen = false, editOpen: editOpenProp, onEditOpenChange, byline, pendingActions,
 }: {
   status: MusicTrackStatus; title: string; description?: string; src?: string; progress?: number | null; phaseLabel?: string; queuePosition?: number | null; startedAt?: number; estimateMs?: number; etaLabel?: string; hint?: string; error?: string; downloadName?: string; lyrics?: string; cover?: string; coverAlt?: string; coverActions?: ReactNode; timedLyrics?: { t: number; line: string; section?: string | null }[];
   versions?: Array<VersionLike & { label: string }>; currentId?: string; onSelectVersion?: (id: string) => void; onUseVersion?: (id: string) => void; onStop?: () => void; onRetry?: () => void; onDownload?: () => void; onShare?: () => void; onSaveToLibrary?: () => void; onMakeAnother?: () => void; actions?: ReactNode; metadata?: PlayerMetadata; copy?: Partial<MusicTrackCopy>; width?: "default" | "full"; editContent?: ReactNode; editLabel?: string; editPanelLabel?: string; className?: string;
   stages?: Array<{ id: string; label: string }>; currentStage?: number; elapsedSeconds?: number; etaSeconds?: number | null; waitingForMemory?: boolean;
-  editModes?: Array<{ id: string; label: string; content: ReactNode; disabledReason?: string }>; quickSong?: boolean; onMakeFull?: () => void; defaultEditOpen?: boolean; byline?: ReactNode;
+  editModes?: Array<{ id: string; label: string; content: ReactNode; disabledReason?: string }>; quickSong?: boolean; onMakeFull?: () => void; defaultEditOpen?: boolean; editOpen?: boolean; onEditOpenChange?: (open: boolean) => void; byline?: ReactNode;
   /** Answers to a held job. Drawn only while the status is queued. */
   pendingActions?: PendingAction[];
 }) {
@@ -82,7 +82,10 @@ export function MusicTrack({
   const [duration, setDuration] = useState(0);
   const [rate, setRate] = useState("1");
   const [lyricsOpen, setLyricsOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(defaultEditOpen);
+  // The edit dialog is the host's to open and close when it passes `editOpen` (so a host can close it once a change is sent); otherwise it keeps its own state.
+  const [editOpenOwn, setEditOpenOwn] = useState(defaultEditOpen);
+  const editOpen = editOpenProp ?? editOpenOwn;
+  const setEditOpen = (open: boolean) => { setEditOpenOwn(open); onEditOpenChange?.(open); };
   const live = status === "queued" || status === "generating";
   const adaptedEdit = editModes?.length ? undefined : editContent ? legacyEditLayout(editContent) : undefined;
   const shownEditModes = editModes?.length ? editModes : adaptedEdit?.modes;

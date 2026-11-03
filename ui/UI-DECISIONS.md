@@ -23,6 +23,7 @@
 | `hover-card` | AMBIENT-01, 2026-10-27 | `popover` does not open on pointer hover or trigger focus with a configurable delay. The companion preview needs both behaviors and Escape dismissal. | shadcn registry, Radix Hover Card | `@radix-ui/react-hover-card` 1.1.23 |
 | `primitives` `DestructiveConfirm` becomes a modal (primitives/DestructiveConfirm.tsx) | Owner, 2026-11-02: the inline bordered confirm on some pages and a dialog on others was inconsistent; one delete confirm, a modal, everywhere. Same props, so every caller gets it without edits. |
 | `elements` `MusicTrack` edit panel is a dialog (elements/music-track.tsx) | Owner, 2026-11-02: the edit card was a small popover and too small to use; it opens in a dialog like every other edit form. Props unchanged. |
+| `elements` `MusicTrack` `editOpen` and `onEditOpenChange` (elements/music-track.tsx) | Owner, 2026-11-02: the edit dialog must close once a change is sent, so the host controls it. Additive, optional. |
 
 ## ui-v0.5.420: ProgressRing and bottom tabs
 
