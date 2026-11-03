@@ -210,6 +210,78 @@ describe("AdultLockProvider and the dialog", () => {
     await waitFor(() => expect(document.querySelector('[role="alert"]')!.textContent).toContain("That PIN was not right."));
   });
 
+  test("a password person gets a masked password field with show/hide, not digit boxes; Enter submits the whole password", async () => {
+    const unlock = mock(async (_c: string): Promise<UnlockResult> => ({ status: "ok", proof: "p" }));
+    const { view, state } = setup(unlock, { credentialKind: "password" });
+    fireEvent.click(view.getByRole("button", { name: NAME }));
+    await waitFor(() => expect(codeInput()).toBeTruthy());
+    expect(codeInput().type).toBe("password");
+    expect(codeInput().getAttribute("autocomplete")).toBe("off");
+    expect(dialog()!.textContent).toContain("Enter your password");
+    expect(dialog()!.textContent).not.toContain("passcode");
+    expect(dialog()!.querySelector('[data-slot="passcode-input"]')).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(codeInput()));
+    const submitButton = view.getByRole("button", { name: "Unlock" }) as HTMLButtonElement;
+    expect(submitButton.disabled).toBe(true);
+    const reveal = view.getByRole("button", { name: "Show password" });
+    fireEvent.click(reveal);
+    expect(codeInput().type).toBe("text");
+    expect(view.getByRole("button", { name: "Hide password" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(view.getByRole("button", { name: "Hide password" }));
+    expect(codeInput().type).toBe("password");
+    fireEvent.change(codeInput(), { target: { value: "correct horse 9!" } });
+    expect(unlock).not.toHaveBeenCalled();
+    expect(submitButton.disabled).toBe(false);
+    fireEvent.submit(codeInput().closest("form")!);
+    await waitFor(() => expect(state().unlocked).toBe(true));
+    expect(unlock).toHaveBeenCalledTimes(1);
+    expect(unlock.mock.calls[0]![0]).toBe("correct horse 9!");
+    await waitFor(() => expect(dialog()).toBeNull());
+  });
+
+  test("a wrong password says the plain line with the word password, clears the field and refocuses it", async () => {
+    const unlock = mock(async (_c: string): Promise<UnlockResult> => ({ status: "failed", attemptsLeft: 1 }));
+    const { view, state } = setup(unlock, { credentialKind: "password" });
+    fireEvent.click(view.getByRole("button", { name: NAME }));
+    await waitFor(() => expect(codeInput()).toBeTruthy());
+    fireEvent.change(codeInput(), { target: { value: "nope" } });
+    fireEvent.submit(codeInput().closest("form")!);
+    const alert = await waitFor(() => { const a = document.querySelector('[role="alert"]'); expect(a).toBeTruthy(); return a!; });
+    expect(alert.textContent).toBe("That password was not right. Check it and try again. 1 try left.");
+    expect(state().unlocked).toBe(false);
+    expect(codeInput().value).toBe("");
+    expect(codeInput().getAttribute("aria-invalid")).toBe("true");
+    await waitFor(() => expect(document.activeElement).toBe(codeInput()));
+  });
+
+  test("a password lockout shows the same countdown and disables the field and the toggle", async () => {
+    const unlock = mock(async (_c: string): Promise<UnlockResult> => ({ status: "locked_out", retryAfterSeconds: 1 }));
+    const { view } = setup(unlock, { credentialKind: "password" });
+    fireEvent.click(view.getByRole("button", { name: NAME }));
+    await waitFor(() => expect(codeInput()).toBeTruthy());
+    fireEvent.change(codeInput(), { target: { value: "x" } });
+    fireEvent.submit(codeInput().closest("form")!);
+    await waitFor(() => expect(document.querySelector('[data-slot="adult-lock-wait"]')).toBeTruthy());
+    expect(document.querySelector('[data-slot="adult-lock-wait"]')!.textContent).toBe("Try again in 1 second.");
+    expect(codeInput().disabled).toBe(true);
+    await act(async () => { await new Promise((r) => setTimeout(r, 1300)); });
+    expect(codeInput().disabled).toBe(false);
+  });
+
+  test("a password person with none set sees where to set a password; a passcode kind still gets the digit boxes", async () => {
+    const a = setup(async () => ({ status: "ok" }), { credentialKind: "password", hasCredential: false });
+    fireEvent.click(a.view.getByRole("button", { name: NAME }));
+    await waitFor(() => expect(dialog()).toBeTruthy());
+    expect(dialog()!.textContent).toContain("Set a password in Account to open these.");
+    expect(codeInput()).toBeNull();
+    cleanup();
+    const b = setup(async () => ({ status: "ok" }), { credentialKind: "passcode" });
+    fireEvent.click(b.view.getByRole("button", { name: NAME }));
+    await waitFor(() => expect(codeInput()).toBeTruthy());
+    expect(codeInput().type).not.toBe("password");
+    expect(dialog()!.textContent).toContain("Enter your passcode");
+  });
+
   test("Cancel and Escape close it and return focus to the tile", async () => {
     const { view } = setup(async () => ({ status: "ok" }));
     const tile = view.getByRole("button", { name: NAME });

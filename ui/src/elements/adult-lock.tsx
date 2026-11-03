@@ -10,10 +10,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { LoaderCircleIcon, LockIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, LoaderCircleIcon, LockIcon } from "lucide-react";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { Button } from "@/kit/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/kit/ui/dialog";
+import { Input } from "@/kit/ui/input";
 import { PasscodeInput } from "@/kit/ui/passcode-input";
 
 /*
@@ -69,13 +70,18 @@ export type UnlockResult =
   | { status: "failed"; attemptsLeft?: number }
   | { status: "locked_out"; retryAfterSeconds: number };
 
+/** The kind of secret the person signs in with. `passcode` (default) draws the digit boxes; `password` draws a masked text field. */
+export type CredentialKind = "passcode" | "password";
+
 export interface AdultLockProviderProps {
   /** The host's check of the person's own passcode. Resolves ok, failed or locked_out; a rejection is shown as "could not check". */
   unlock: (passcode: string) => Promise<UnlockResult>;
   /** Number of digits of the passcode. Default 6. */
   digits?: number;
-  /** The person's word for their credential ("passcode" by default; "PIN" for a PIN). */
+  /** The person's word for their credential ("passcode" by default, "password" for a password; "PIN" for a PIN). */
   credentialWord?: string;
+  /** ADULT-LOCK-07: the kind of secret the person has, from the host. `password` draws a masked field with show/hide instead of the digit boxes. Default `passcode`. */
+  credentialKind?: CredentialKind;
   /** False when the person has no passcode or passkey set: the dialog says where to set one and shows no field. Default true. */
   hasCredential?: boolean;
   /** Called after the page's proof is dropped (Lock now, or the provider unmounting while unlocked): the host revokes its side. */
@@ -114,7 +120,7 @@ function fallbackFor(origin: HTMLElement | null): HTMLElement | null {
  * Holds the page's unlock in memory, draws the one passcode dialog and the polite live region. Mount one per page (the host's
  * route decides what a page is). Every `LockTile` below it opens this dialog.
  */
-export function AdultLockProvider({ unlock, digits = 6, credentialWord = "passcode", hasCredential = true, onRelock, onUnlocked, children }: AdultLockProviderProps) {
+export function AdultLockProvider({ unlock, digits = 6, credentialWord, credentialKind = "passcode", hasCredential = true, onRelock, onUnlocked, children }: AdultLockProviderProps) {
   const [proof, setProof] = useState<{ value: string | null } | null>(null);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -165,6 +171,7 @@ export function AdultLockProvider({ unlock, digits = 6, credentialWord = "passco
         onUnlocked={onSuccess}
         digits={digits}
         credentialWord={credentialWord}
+        credentialKind={credentialKind}
         hasCredential={hasCredential}
         onCloseAutoFocus={(event) => {
           // After an unlock the tile that asked is about to leave the page: put focus on its list, not on a vanishing button.
@@ -189,6 +196,8 @@ export interface AdultLockDialogProps {
   onUnlocked: (proof: string | undefined) => void;
   digits?: number;
   credentialWord?: string;
+  /** ADULT-LOCK-07: `password` asks for a password in a masked field; `passcode` (default) asks for digits in boxes. */
+  credentialKind?: CredentialKind;
   hasCredential?: boolean;
   /** Passed to the dialog content: where focus goes when it closes. */
   onCloseAutoFocus?: (event: Event) => void;
@@ -210,8 +219,11 @@ function formatWait(seconds: number): string {
  * and explains a failure in plain words. Modal with a focus trap (the kit `Dialog`), focus on the first box, Escape and Cancel
  * close it. The title, text and messages never name an item.
  */
-export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits = 6, credentialWord = "passcode", hasCredential = true, onCloseAutoFocus, title, description, actionLabel }: AdultLockDialogProps) {
+export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits = 6, credentialWord: word, credentialKind = "passcode", hasCredential = true, onCloseAutoFocus, title, description, actionLabel }: AdultLockDialogProps) {
+  const isPassword = credentialKind === "password";
+  const credentialWord = word ?? (isPassword ? "password" : "passcode");
   const [code, setCode] = useState("");
+  const [shown, setShown] = useState(false);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [waitUntil, setWaitUntil] = useState<number | null>(null);
@@ -224,6 +236,7 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
   useEffect(() => {
     if (open) return;
     setCode("");
+    setShown(false);
     setError(null);
     setChecking(false);
   }, [open]);
@@ -248,7 +261,7 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
   const focusField = () => window.setTimeout(() => field.current?.querySelector("input")?.focus(), 0);
 
   async function submit(value: string) {
-    if (checking || lockedOut || value.length !== digits) return;
+    if (checking || lockedOut || (isPassword ? value.length === 0 : value.length !== digits)) return;
     setChecking(true);
     setError(null);
     let result: UnlockResult | null = null;
@@ -308,22 +321,53 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
               void submit(code);
             }}
           >
-            <div ref={field}>
-              <PasscodeInput
-                digits={digits}
-                value={code}
-                onChange={(next) => { setCode(next); if (error && !lockedOut) setError(null); }}
-                onComplete={(value) => void submit(value)}
-                invalid={Boolean(error) && !lockedOut}
-                disabled={checking || lockedOut}
-                label={`Enter your ${digits}-digit ${credentialWord}`}
-              />
+            <div ref={field} className={isPassword ? "w-full" : undefined}>
+              {isPassword ? (
+                <div className="flex w-full items-center gap-2">
+                  <Input
+                    type={shown ? "text" : "password"}
+                    data-slot="adult-lock-password"
+                    value={code}
+                    onChange={(event) => { setCode(event.target.value); if (error && !lockedOut) setError(null); }}
+                    aria-label={`Enter your ${credentialWord}`}
+                    aria-invalid={Boolean(error) && !lockedOut ? true : undefined}
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    disabled={checking || lockedOut}
+                    className="min-w-0 flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    data-slot="adult-lock-reveal"
+                    aria-label={shown ? `Hide ${credentialWord}` : `Show ${credentialWord}`}
+                    aria-pressed={shown}
+                    disabled={checking || lockedOut}
+                    onClick={() => { setShown((v) => !v); focusField(); }}
+                  >
+                    {shown ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
+                  </Button>
+                </div>
+              ) : (
+                <PasscodeInput
+                  digits={digits}
+                  value={code}
+                  onChange={(next) => { setCode(next); if (error && !lockedOut) setError(null); }}
+                  onComplete={(value) => void submit(value)}
+                  invalid={Boolean(error) && !lockedOut}
+                  disabled={checking || lockedOut}
+                  label={`Enter your ${digits}-digit ${credentialWord}`}
+                />
+              )}
             </div>
             {error ? <p role="alert" data-slot="adult-lock-error" className="text-destructive text-center text-sm">{error}</p> : null}
             {lockedOut ? <p aria-hidden="true" data-slot="adult-lock-wait" className="text-muted-foreground text-sm tabular-nums">Try again in {formatWait(remaining)}.</p> : null}
             <DialogFooter className="w-full">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type="submit" disabled={checking || lockedOut || code.length !== digits}>{checking ? "Checking" : actionLabel ?? "Unlock"}</Button>
+              <Button type="submit" disabled={checking || lockedOut || (isPassword ? code.length === 0 : code.length !== digits)}>{checking ? "Checking" : actionLabel ?? "Unlock"}</Button>
             </DialogFooter>
           </form>
         ) : (
