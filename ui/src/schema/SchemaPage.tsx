@@ -11,6 +11,8 @@ function typedStateKeys(node: unknown, found: Set<string> = new Set()): Set<stri
   if (node && typeof node === "object") {
     const record = node as Record<string, unknown>;
     if (record.type === "search" && typeof record.state === "string") found.add(record.state);
+    // VIDEO-LORA-09: a prompt bar chip marked `private` keeps its choice out of the address.
+    if (record.type === "prompt_bar" && Array.isArray(record.chips)) for (const chip of record.chips as Array<{ state?: unknown; private?: unknown }>) if (chip.private === true && typeof chip.state === "string") found.add(chip.state);
     for (const child of Object.values(record)) typedStateKeys(child, found);
   }
   return found;

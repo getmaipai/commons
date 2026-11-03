@@ -1,3 +1,7 @@
+## [ui-v0.5.495] - 2026-11-03
+
+- VIDEO-LORA-09 (needs spec-v0.1.320), additive. A `prompt_bar` chip with `private: true` keeps its choice out of the page address (`SchemaPage` leaves it out of the address mirror, as it does a search box's text); it stays in page state and in the submit item. Test in `schema/promptBarStyles.test.tsx`.
+
 ## [ui-v0.5.494] - 2026-11-03
 
 - VIDEO-LORA-09 (needs spec-v0.1.319), additive. The `prompt_bar` node accepts up to ten chips (was six). No other change.

@@ -496,6 +496,7 @@ export const PromptBarNodeSchema = z.object({
         enabled_tiers: z.array(z.enum(["standard", "boost", "max"])).min(1).max(3).refine((list) => new Set(list).size === list.length).optional(),
         disabled_reason: z.string().min(1).max(120).optional(),
         quiet_value: z.union([z.string(), z.number()]).optional(),
+        private: z.boolean().optional(),
       }),
     )
     .max(10)

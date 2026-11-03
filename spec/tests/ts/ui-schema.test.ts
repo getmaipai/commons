@@ -351,6 +351,8 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, chips: [{ ...style, enabled_tiers: [] }] })).toBe(false);
     expect(validate({ ...ok, chips: [{ ...style, enabled_tiers: ["huge"] }] })).toBe(false);
     expect(validate({ ...ok, chips: [{ ...style, enabled_tiers: ["max", "max"] }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...style, private: true }] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...style, private: "yes" }] })).toBe(false);
     expect(validate({ ...ok, chips: [{ ...style, locked: "yes" }] })).toBe(false);
     expect(validate({ ...ok, chips: [{ ...style, disabled_reason: "" }] })).toBe(false);
     expect(validate({ ...ok, chips: [{ ...style, options: [{ value: "a", label: "A", note: "" }] }] })).toBe(false);

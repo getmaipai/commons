@@ -1,3 +1,7 @@
+## [spec-v0.1.320] - 2026-11-03
+
+- VIDEO-LORA-09, additive. A `prompt_bar` chip takes `private`: its choice is never written into the page address (the id of an adult-only style must not reach a link or a history entry). Test in `tests/ts/ui-schema.test.ts`.
+
 ## [spec-v0.1.319] - 2026-11-03
 
 - VIDEO-LORA-09, additive. A `prompt_bar` takes up to ten chips (was six): the Create page now has Shape, Length, Look, Camera, Voices, Styles, Characters and Strength. Test in `tests/ts/ui-schema.test.ts`.

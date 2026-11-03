@@ -1337,6 +1337,11 @@
                 "maxLength": 120,
                 "description": "VIDEO-LORA-09: the one plain line shown under a chip's cards while the chip is disabled (with `enabled_tiers`, at a level it cannot use; without it, always disabled)."
               },
+              "private": {
+                "type": "boolean",
+                "default": false,
+                "description": "VIDEO-LORA-09: the chip's choice is never written into the page address (an id of an adult-only style must not reach a link, history or a shared URL). It stays in page state and in the submit item. Default unchanged."
+              },
               "quiet_value": {
                 "anyOf": [{ "type": "string" }, { "type": "number" }],
                 "description": "VIDEO-LORA-09: while this value is chosen the chip adds nothing to the group's summary words and thumbnail row (a \"No style\" or \"Normal\" default). Default unchanged."

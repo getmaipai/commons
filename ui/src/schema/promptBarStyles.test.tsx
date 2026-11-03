@@ -2,7 +2,8 @@
 // a chip that works only at some levels (disabled with one plain line, and sending nothing), and a quiet default in the group's summary.
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { SchemaPage } from "@/kit/schema/SchemaPage";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { stubMatchMedia } from "../../tests/stubMatchMedia";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
@@ -84,5 +85,35 @@ describe("prompt_bar Styles chips", () => {
   test("a bar with no level segment treats a chip with enabled_tiers as the Standard level", () => {
     const view = draw(bar({ tier: false }));
     expect(view.getByText(REASON)).toBeTruthy();
+  });
+});
+
+describe("a private chip stays out of the address", () => {
+  function Where() { const { search } = useLocation(); return <output data-testid="where">{search}</output>; }
+  const page = (isPrivate: boolean) => ({
+    type: "page", id: "p", title: "Create", body: [{
+      type: "prompt_bar", label: "Describe a video",
+      chips: [
+        { state: "style", label: "Styles", variant: "cards", default: "none", ...(isPrivate ? { private: true } : {}), options: [{ value: "none", label: "No style" }, { value: "lora-secret", label: "Clay look" }] },
+        { state: "look", label: "Look", variant: "cards", default: "natural", options: [{ value: "natural", label: "Natural" }, { value: "anime", label: "Anime" }] },
+      ],
+      submit: { call: { target: "/api/plugins/videos/actions/make" } },
+    }],
+  });
+  const open = (isPrivate: boolean) => renderWithQueryClient(<MemoryRouter><Where /><SchemaPage page={page(isPrivate)} packageId="videos" /></MemoryRouter>);
+
+  test("the choice is in page state and the submit, never in the address; an ordinary chip still is", async () => {
+    const view = open(true);
+    fireEvent.click(view.getByRole("radio", { name: "Clay look" }));
+    fireEvent.click(view.getByRole("radio", { name: "Anime" }));
+    await waitFor(() => expect(view.getByTestId("where").textContent).toContain("look=anime"));
+    expect(view.getByTestId("where").textContent).not.toContain("lora-secret");
+    expect(view.getByTestId("where").textContent).not.toContain("style=");
+  });
+
+  test("without private the id would be written (the behaviour the flag exists to stop)", async () => {
+    const view = open(false);
+    fireEvent.click(view.getByRole("radio", { name: "Clay look" }));
+    await waitFor(() => expect(view.getByTestId("where").textContent).toContain("style=lora-secret"));
   });
 });
