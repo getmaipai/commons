@@ -179,6 +179,7 @@ def test_knowledge_search_record_fixtures_round_trip(name, model):
         ("media-item.track-explicit.example.json", MediaItem),
         ("media-item.track-musicbrainz.example.json", MediaItem),
         ("media-item.lyrics-locked.example.json", MediaItem),
+        ("media-item.lyrics-words.example.json", MediaItem),
         ("media-item.podcast-stream.example.json", MediaItem),
         ("media-item.book.example.json", MediaItem),
         ("media-item.audiobook.example.json", MediaItem),

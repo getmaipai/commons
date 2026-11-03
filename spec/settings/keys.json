@@ -1409,11 +1409,70 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Show artist photos and short bios from Wikimedia",
-    "help": "In the background, Home asks Wikidata, Wikipedia and Wikimedia Commons about an artist you have songs by, using only the artist's public Wikidata id (found through MusicBrainz), to keep one photo and a two-sentence bio on your computer. Nothing about your home is sent. Never for an artist under 18. Off stops it; photos and bios already kept stay, and artists show the generated cover instead.",
+    "label": "Show facts and photos from Wikimedia",
+    "help": "In the background, Home asks Wikidata, Wikipedia and Wikimedia Commons about an artist you have songs by, and about each song, using only public ids found through MusicBrainz. It keeps one photo, a short bio and a short fact on your computer. Nothing about your home is sent. Never for an artist under 18. Off stops it; what is already kept stays, and artists show the generated cover instead.",
+    "copy": {
+      "does": "Shows facts and photos about your artists and songs, kept on your computer."
+    },
     "level": "advanced",
     "secret": false,
     "lives_in": "household.media_lookups",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "music.dj",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "off",
+        "minimal",
+        "full"
+      ]
+    },
+    "default": "full",
+    "label": "Music DJ",
+    "help": "A DJ voice can speak between songs. Minimal only says what is playing next. Full also adds a short fact about the song or artist when Home has one.",
+    "copy": {
+      "does": "The DJ talks between songs.",
+      "options": {
+        "off": "No talking between songs.",
+        "minimal": "The DJ only says which song is next.",
+        "full": "The DJ introduces songs and adds a short fact."
+      }
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "band_default": {
+      "child": "off",
+      "teen": "off",
+      "adult": "full"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.music",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "music.lyrics_translate",
+    "scope": "person",
+    "selector": "text",
+    "default": "",
+    "label": "Translate lyrics",
+    "help": "Type a language name, such as Spanish or French, and each lyric line also shows in that language under the original, translated on this computer. Leave it empty to show the original only.",
+    "copy": {
+      "does": "Show each lyric line in another language."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.music",
     "honoured_by": [
       "home"
     ]

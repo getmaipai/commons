@@ -139,6 +139,29 @@ describe("Media records", () => {
     expect((MediaItem.parse(item) as { locked_fields?: string[] }).locked_fields).toEqual([]);
   });
 
+  test("a timed lyric line may carry word times and a second line (MUSIC-GEN-20b, 20c)", () => {
+    const v = schema("media-item");
+    const ok = fixture("media-item.lyrics-words");
+    expect(v(ok), JSON.stringify(v.errors)).toBe(true);
+    expect(MediaItem.parse(ok)).toMatchObject(ok);
+    const line = (ok as any).lyrics.timed[0];
+    const withLine = (patch: object) => ({ ...ok, lyrics: { ...(ok as any).lyrics, timed: [{ ...line, ...patch }] } });
+    for (const bad of [
+      { words: [{ t: -1, end: 1, text: "a" }] },
+      { words: [{ t: 0, end: -1, text: "a" }] },
+      { words: [{ t: 0, text: "a" }] },
+      { words: [{ t: 0, end: 1 }] },
+      { words: [{ t: 0, end: 1, text: "a", extra: 1 }] },
+      { secondary: 3 },
+    ]) {
+      expect(v(withLine(bad)), JSON.stringify(bad)).toBe(false);
+      expect(MediaItem.safeParse(withLine(bad)).success, JSON.stringify(bad)).toBe(false);
+    }
+    const { words: _w, secondary: _s, ...bare } = line;
+    expect(v({ ...ok, lyrics: { ...(ok as any).lyrics, timed: [bare] } })).toBe(true);
+    expect(v(fixture("media-item.invalid-lyrics-word-extra"))).toBe(false);
+  });
+
   test("a progress position is seconds or a reader locator, never both", () => {
     const row = fixture("media-progress.seconds");
     const v = schema("media-progress");

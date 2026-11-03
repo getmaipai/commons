@@ -100,6 +100,18 @@ describe("VIDEO-SETTINGS-03: Pictures, videos and music",()=>{
   for(const [k,g] of Object.entries(homes))expect(keyOf(k)!.lives_in,k).toBe(g);
   expect(registry.filter(r=>r.key==="generation.picture_tier").length).toBe(1);
  });
+ test("MUSIC-FACTS-01, MUSIC-DJ-01, MUSIC-GEN-20c: Wikimedia copy covers songs, music.dj and music.lyrics_translate are placed",()=>{
+  const wiki=keyOf("music.artist_wikimedia")!;
+  expect(wiki).toMatchObject({scope:"household",selector:"boolean",default:true,lives_in:"household.media_lookups"});
+  expect(wiki.label).toBe("Show facts and photos from Wikimedia");
+  expect(wiki.help).toMatch(/artist/);expect(wiki.help).toMatch(/song/);
+  expect((wiki as any).copy.does).toMatch(/artists and songs/);
+  expect(keyOf("music.dj")).toMatchObject({scope:"person",selector:"select",range:{options:["off","minimal","full"]},default:"full",band_default:{child:"off",teen:"off",adult:"full"},lives_in:"person.music"});
+  expect(keyOf("music.lyrics_translate")).toMatchObject({scope:"person",selector:"text",default:"",lives_in:"person.music"});
+  expect((keyOf("music.lyrics_translate") as any).band_default).toBeUndefined();
+  const cards=file.areas.flatMap(a=>a.sections).flatMap(s=>s.cards??[]).filter(c=>c.group==="person.music");
+  expect(cards.length).toBe(1);expect(cards[0]!.scope).toBe("person");
+ });
  test("checkAreas refuses a media tab with no card, a second home for a key and a drawn parked group",()=>{
   const empty=clone(file);page(empty,"media").tabs!.push({id:"extra",label:"Extra",min_role:"admin"});expect(checkAreas(empty,registry).join(" ")).toMatch(/holds nothing/);
   const twice=clone(file);page(twice,"media").cards!.push({label:"Again",group:"household.media_styles",scope:"household",tab:"videos"});expect(checkAreas(twice,registry).join(" ")).toMatch(/more than one card/);

@@ -124,6 +124,12 @@
               "group": "person.companions",
               "scope": "person",
               "tab": "personalization"
+            },
+            {
+              "label": "Music",
+              "group": "person.music",
+              "scope": "person",
+              "tab": "personalization"
             }
           ],
           "tabs": [

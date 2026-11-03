@@ -79,7 +79,22 @@
                 "properties": {
                   "t": { "type": "number", "minimum": 0 },
                   "line": { "type": "string" },
-                  "section": { "type": ["string", "null"] }
+                  "section": { "type": ["string", "null"] },
+                  "words": {
+                    "type": "array",
+                    "description": "Per-word times inside the line, in seconds from the start of the song (forced alignment). Absent when only the line is timed.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["t", "end", "text"],
+                      "properties": {
+                        "t": { "type": "number", "minimum": 0 },
+                        "end": { "type": "number", "minimum": 0 },
+                        "text": { "type": "string" }
+                      }
+                    }
+                  },
+                  "secondary": { "type": "string", "description": "An optional second line under this one: a translation or a pronunciation." }
                 }
               }
             }

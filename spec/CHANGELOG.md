@@ -1,3 +1,7 @@
+## [spec-v0.1.322] - 2026-11-03
+
+- MUSIC-GEN-20b, MUSIC-GEN-20c, MUSIC-FACTS-01, MUSIC-DJ-01 (home `docs/design/music-generation-2026-10-17.md` 18.5a and 18.5b, `docs/design/music-dj-facts-2026-11-03.md`), additive. `media-item` `lyrics.timed[]` lines gain the optional `words` (`{ t, end, text }`, seconds, each closed) for word-by-word timing and the optional `secondary` (one translation or pronunciation line). `music.artist_wikimedia` (same key, default and scope) is reworded to cover artists and songs: label "Show facts and photos from Wikimedia", new help and `copy.does`. New person key `music.dj` (`off`, `minimal`, `full`; `band_default` child `off`, teen `off`, adult `full`; guardian control for child and teen) and new person key `music.lyrics_translate` (a language name, empty means off; no band rule), both in the new person group `person.music`, drawn as the **Music** card on the Chat and AI page, tab Personalization. Fixtures `media-item.lyrics-words` and `media-item.invalid-lyrics-word-extra`; tests in `tests/ts/media-records.test.ts` and `tests/ts/settings-areas.test.ts`.
+
 ## [spec-v0.1.321] - 2026-11-03
 
 - INSTALL-EVERYTHING-01, additive. The AI and models card lists five more choices with their words, so Settings and Setup can install and name every model the Stack knows: `picturesdetailed-qwen`, `videos-ltx25`, `videos-ltx25max`, `music-boost` and `music-max`. No existing choice changes.

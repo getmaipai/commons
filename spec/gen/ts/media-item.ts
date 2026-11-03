@@ -87,6 +87,28 @@ export const MediaItem = z
                       t: z.number().gte(0),
                       line: z.string(),
                       section: z.union([z.string(), z.null()]).optional(),
+                      /**Per-word times inside the line, in seconds from the start of the song (forced alignment). Absent when only the line is timed.*/
+                      words: z
+                        .array(
+                          z
+                            .object({
+                              t: z.number().gte(0),
+                              end: z.number().gte(0),
+                              text: z.string(),
+                            })
+                            .strict(),
+                        )
+                        .describe(
+                          "Per-word times inside the line, in seconds from the start of the song (forced alignment). Absent when only the line is timed.",
+                        )
+                        .optional(),
+                      /**An optional second line under this one: a translation or a pronunciation.*/
+                      secondary: z
+                        .string()
+                        .describe(
+                          "An optional second line under this one: a translation or a pronunciation.",
+                        )
+                        .optional(),
                     })
                     .strict(),
                 )

@@ -17,6 +17,15 @@ from pydantic import (
 )
 
 
+class Word(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    t: confloat(ge=0.0)
+    end: confloat(ge=0.0)
+    text: str
+
+
 class TimedItem(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -24,6 +33,14 @@ class TimedItem(BaseModel):
     t: confloat(ge=0.0)
     line: str
     section: str | None = None
+    words: list[Word] | None = Field(
+        None,
+        description='Per-word times inside the line, in seconds from the start of the song (forced alignment). Absent when only the line is timed.',
+    )
+    secondary: str | None = Field(
+        None,
+        description='An optional second line under this one: a translation or a pronunciation.',
+    )
 
 
 class Lyrics(BaseModel):
