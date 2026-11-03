@@ -24,6 +24,7 @@
 | `primitives` `DestructiveConfirm` becomes a modal (primitives/DestructiveConfirm.tsx) | Owner, 2026-11-02: the inline bordered confirm on some pages and a dialog on others was inconsistent; one delete confirm, a modal, everywhere. Same props, so every caller gets it without edits. |
 | `elements` `MusicTrack` edit panel is a dialog (elements/music-track.tsx) | Owner, 2026-11-02: the edit card was a small popover and too small to use; it opens in a dialog like every other edit form. Props unchanged. |
 | `elements` `MusicTrack` `editOpen` and `onEditOpenChange` (elements/music-track.tsx) | Owner, 2026-11-02: the edit dialog must close once a change is sent, so the host controls it. Additive, optional. |
+| `elements` `MusicTrack` edit dialog phone fit (elements/music-track.tsx) | Owner, 2026-11-02: the new edit dialog clipped its content on a phone; the column is `minmax(0,1fr)` and the tab row scrolls. No prop changes. |
 
 ## ui-v0.5.420: ProgressRing and bottom tabs
 

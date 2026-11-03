@@ -1,3 +1,7 @@
+## [ui-v0.5.492] - 2026-11-02
+
+- `MusicTrack`: the edit dialog fits a phone screen. Its content column no longer grows past the dialog and the tab row scrolls sideways instead of clipping. No prop changes.
+
 ## [ui-v0.5.491] - 2026-11-02
 
 - `MusicTrack`: optional `editOpen` and `onEditOpenChange` let a host open and close the edit dialog (to close it once a change is sent). Without them it keeps its own state as before; additive.
