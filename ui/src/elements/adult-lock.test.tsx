@@ -244,6 +244,8 @@ describe("AdultLockProvider and the dialog", () => {
     const { view, state } = setup(unlock, { credentialKind: "password" });
     fireEvent.click(view.getByRole("button", { name: NAME }));
     await waitFor(() => expect(codeInput()).toBeTruthy());
+    fireEvent.click(view.getByRole("button", { name: "Show password" }));
+    expect(codeInput().type).toBe("text");
     fireEvent.change(codeInput(), { target: { value: "nope" } });
     fireEvent.submit(codeInput().closest("form")!);
     const alert = await waitFor(() => { const a = document.querySelector('[role="alert"]'); expect(a).toBeTruthy(); return a!; });
@@ -251,6 +253,8 @@ describe("AdultLockProvider and the dialog", () => {
     expect(state().unlocked).toBe(false);
     expect(codeInput().value).toBe("");
     expect(codeInput().getAttribute("aria-invalid")).toBe("true");
+    // The next try is masked again, not typed in plain sight.
+    expect(codeInput().type).toBe("password");
     await waitFor(() => expect(document.activeElement).toBe(codeInput()));
   });
 

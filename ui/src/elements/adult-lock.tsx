@@ -273,6 +273,8 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
     if (!alive.current) return;
     setChecking(false);
     setCode("");
+    // The field is cleared, so it goes back to masked: the next try is never typed in plain sight.
+    setShown(false);
     if (result?.status === "ok") {
       onUnlocked(result.proof);
       return;
