@@ -73,17 +73,17 @@ describe("MusicTrack compact card", () => {
     expect(view.container.querySelector('[data-slot="safe-image-fallback"][data-kind="music"]')).toBeTruthy();
   });
 
-  test("edit popover offers separate tabs and the quick-song length action", () => {
+  test("edit dialog offers separate tabs and the quick-song length action", () => {
     const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" quickSong onMakeFull={() => {}} editModes={[{ id: "song", label: "Change the song", content: <Input aria-label="How should it change?" /> }, { id: "cover", label: "New cover", content: <Input aria-label="Describe the new cover" /> }]} />);
     fireEvent.click(view.getByRole("button", { name: "Edit" }));
-    expect(document.querySelector('[data-slot="popover-content"]')?.getAttribute("data-align")).toBe("start");
+    expect(document.querySelector('[data-slot="dialog-content"]')).toBeTruthy();
     expect(view.getByRole("tab", { name: "Change the song" })).toBeTruthy();
     expect(view.getByRole("tab", { name: "New cover" })).toBeTruthy();
     expect(view.getByRole("button", { name: "Make it full" })).toBeTruthy();
     expect(view.getByRole("textbox", { name: "How should it change?" })).toBeTruthy();
   });
 
-  test("legacy host editContent remains available in the popover", () => {
+  test("legacy host editContent remains available in the dialog", () => {
     const view = render(<MusicTrack status="ready" title="Song" src="/song.m4a" editContent={<><Input aria-label="How should it change?" /><Button type="button">Make</Button></>} />);
     fireEvent.click(view.getByRole("button", { name: "Edit" }));
     expect(view.getByRole("textbox", { name: "How should it change?" })).toBeTruthy();
