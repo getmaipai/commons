@@ -63,13 +63,7 @@ export const PluginResult = z
                   .max(8)
                   .optional(),
               })
-              .strict()
-              .and(
-                z.intersection(
-                  z.intersection(z.any(), z.any()),
-                  z.intersection(z.any(), z.intersection(z.any(), z.any())),
-                ),
-              ),
+              .strict(),
           )
           .min(1)
           .max(4)

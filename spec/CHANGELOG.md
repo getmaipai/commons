@@ -1,3 +1,7 @@
+## [spec-v0.1.313] - 2026-11-02
+
+- SPEC-FILE-OBJECT-01 (fix): the TypeScript generator emitted `File` as `object.and(z.any())` since 0.1.309 (the `made_audience` and `lock` if/then), a Zod intersection with no `.shape`, `.extend` or `.pick`, so Home crashed at import on `File.shape.kind`. `gen-ts.ts` now drops an object's `allOf` made only of if/then/else entries (they rendered as `z.any()` and checked nothing), so `File`, `Lora`, `LikenessAdapter` and `ProblemReport` are plain `z.object` again, and nested objects of `manifest`, `recipe`, `result`, `settings-area(s)`, `conversation-turn`, `content-ceiling` and `hero-slide` lose the same no-op. The record contents are unchanged; `lock` and `made_audience` stay ordinary optional fields and the rule that a lock is never on for an all-ages file stays in `validateFileAdultLock`. Python is unchanged. New `tests/ts/object-shape.test.ts` pins `.shape` and `.extend`. Consumers may pin this tag; 0.1.309 to 0.1.312 cannot be imported by anything that reads a File shape.
+
 ## [spec-v0.1.312] - 2026-11-02
 
 - VIDEO-STUDIO-03 (home `docs/design/video-studio-2026-11-02.md` K2 and K5): `creation_header` `variant` gains `studio`, with the optional `eyebrow` (string, 1 to 40 characters), `secondary` (as `primary`) and `fields.locked` (dotted path to a boolean). `media_shelf` and `result_feed` gain the optional `heading_style` (`default`, or `eyebrow`). All additive, defaults unchanged; `app-check` checks the studio header's `primary` and `secondary` actions.

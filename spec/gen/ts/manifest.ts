@@ -2244,12 +2244,6 @@ export const PackageManifest = z
                       .optional(),
                   })
                   .strict()
-                  .and(
-                    z.intersection(
-                      z.intersection(z.any(), z.any()),
-                      z.intersection(z.any(), z.any()),
-                    ),
-                  )
                   .describe(
                     "One section. kind keys needs cards, view needs a view, link needs an href. areas-check.ts refuses fields that belong to another kind.",
                   ),

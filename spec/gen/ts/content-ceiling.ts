@@ -360,7 +360,6 @@ export const ContentCeiling = z
     hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
   })
   .strict()
-  .and(z.intersection(z.any(), z.any()))
   .describe(
     "How explicit a generated reply may be for one age band (session-c-brain-and-voice.md step 7). One record per band (child, teen, adult) - not a per-household custom profile yet (that authoring UI is future, deferred work, docs/BACKLOG.md's own 'nine sliders' entry). Governs REGISTER only: how graphic, how frank, how unfiltered a reply's own generated content may be. It is a completely separate, additive concern from spec/safety/ts/classifier.ts's own hard refuse/allow_with_resources categories (self_harm, harmful_request, csam, credible_threat, grooming, pii_extraction, prompt_injection, jailbreak) - checkSafety() never reads a ceiling and never will; `floor` below documents that invariant, it does not implement it. There is no 'unrestricted' band today: reaching past the adult ceiling needs a one-time signed adult acknowledgment (a Grant, session-f-platform-and-trust.md step 7, not yet built) this record does not yet gate - safe-by-default in the meantime, since nothing can set a ceiling higher than what ships here. `topics` (MINOR-TOPICS-01) governs stance, whether and how a subject is engaged; `dials` govern explicitness. A household setting may only choose within a band's `allowed` range, and a `fixed` family takes no setting. Adult records carry no `topics`.",
   );

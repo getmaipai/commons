@@ -58,7 +58,6 @@ export const LikenessAdapter = z
       .describe("Hybrid logical clock: wall_ms:counter:node (7.3)."),
   })
   .strict()
-  .and(z.any())
   .describe(
     'LIKENESS-SIMPLIFY-01. The subject binding for a saved style (LoRA) in the household library. subject_person_id is a household adult the style looks like, or null for "Nobody (not a real person)". A style of a minor or of anyone who is not an eligible living household adult is refused at import and never has a record. A subject-linked style is always adult-only. The household likeness option controls whether household members may make pictures, videos and songs with or of one another.',
   );

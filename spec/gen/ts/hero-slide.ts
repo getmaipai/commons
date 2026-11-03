@@ -41,7 +41,6 @@ export const HeroSlide = z
     order: z.number().int().gte(0),
   })
   .strict()
-  .and(z.intersection(z.any(), z.intersection(z.any(), z.any())))
   .describe(
     "One slide shown in the setup wait carousel and in What Home can do.",
   );

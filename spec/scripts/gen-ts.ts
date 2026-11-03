@@ -102,9 +102,25 @@ function presentRequiresRule(schema: Record<string, unknown>): PresentRule[] | n
   }
   return rules;
 }
+// Any other `allOf` of bare if/then/else entries on an object (file `lock` vs `made_audience`, lora, likeness-adapter,
+// problem-report) renders as `object.and(z.any())`: an intersection that checks nothing but has no `.shape`, `.extend` or
+// `.pick`, which crashed Home at import (spec 0.1.309). The cross-field rule is carried by that record's hand-written
+// validator in records/ts/validate.ts and, for Python, by its own validators, so the TS record stays the plain object.
+function onlyConditionalAllOf(schema: Record<string, unknown>): boolean {
+  const allOf = schema.allOf;
+  if (schema.type !== "object" || !Array.isArray(allOf) || allOf.length === 0) return false;
+  return (allOf as Record<string, unknown>[]).every(
+    (entry) => entry && typeof entry === "object" && Object.keys(entry).every((k) => k === "if" || k === "then" || k === "else"),
+  );
+}
 const ifPresentOverride: ParserOverride = (schema, refs) => {
   const rules = presentRequiresRule(schema as Record<string, unknown>);
-  if (!rules) return;
+  if (!rules) {
+    if (!onlyConditionalAllOf(schema as Record<string, unknown>)) return;
+    const { allOf: _dropped, description, ...plainObject } = schema as Record<string, unknown>;
+    const describeObject = typeof description === "string" ? `.describe(${JSON.stringify(description)})` : "";
+    return `${parseSchema(plainObject as never, refs, true)}${describeObject}`;
+  }
   const { allOf: _allOf, description, ...plain } = schema as Record<string, unknown>;
   const checks = rules
     .map(

@@ -117,7 +117,6 @@ export const ProblemReport = z
               .optional(),
           })
           .strict()
-          .and(z.intersection(z.any(), z.intersection(z.any(), z.any())))
           .describe(
             "One part of a report. A code part carries code, a timing part carries duration_ms, and a description or excerpt part carries content, which is present only when consented is true.",
           ),
@@ -125,7 +124,6 @@ export const ProblemReport = z
       .max(20),
   })
   .strict()
-  .and(z.any())
   .describe(
     "LOG-PRIV-01a: one problem report a person chose to send about something that went wrong. Owner principle: no log ever carries specifics that reveal what another user did. A report is built from parts, and what a part may carry depends on reporter_mode, the admin-set mode of the person sending it (child, teen or adult; a control the household sets, not a measure of anyone). In the child and teen modes a report may only carry codes and timings, so every part is kind code or timing and none has content. In the adult mode a part may also carry text (kind description or excerpt), but only when that part's consented flag is true, and a part with consented false carries none. The conditions are JSON Schema if/then rules: the generated models check the shapes, and the schema itself enforces the conditions.",
   );

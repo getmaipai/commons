@@ -515,7 +515,6 @@ export const Lora = z
       ),
   })
   .strict()
-  .and(z.any())
   .describe(
     "VIDEO-LORA-02 (home docs/design/video-loras-2026-11-02.md, section 4.1). One LoRA (a saved style, character or motion adapter) in the household library. Home owns this record: who may use it (audience, availability), what its prompt add-ins are, its preview and its trash state. The Stack owns the file bytes and the facts read from them (`file`: hash, size, rank, modules). `media` says what it is for: `video` now, `picture` when pictures move onto this record (VIDEO-LORA-12). Defaults are the safe side everywhere: availability is admins only, audience is adult-only until an admin says otherwise (a source can only raise it), and a base model that is `unknown` blocks use. A minor never sees or uses any LoRA: availability never names one (the writer refuses it, because the record holds no ages) and the access function reads the person's age, never this record alone. Rules JSON Schema cannot carry in the generators (audience all-ages needs an admin's choice, availability `people` only when availability.who is `people`, strength order and bounds, add-in length totals, compatible_with contains the base) are in spec/records/ts/validate.ts `validateLora`, and the audience rule is also an if/then below (the generated models drop it; Ajv enforces it).",
   );
