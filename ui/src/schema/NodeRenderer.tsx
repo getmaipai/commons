@@ -608,6 +608,12 @@ function SearchNodeView({ node, state }: { node: SearchNode; state: Row }) {
   return sidebar && !node.recents ? <div data-slot="search-under-sidebar" className="lg:hidden">{view}</div> : view;
 }
 
+/** VIDEO-LORA-09: whether a chip cannot be used at the chosen level: always when it has a `disabled_reason` and no `enabled_tiers`, else at a level outside `enabled_tiers`. */
+function chipUnusable(chip: PromptBarNode["chips"] extends (infer C)[] | undefined ? C : never, tier: TierId): boolean {
+  if (chip.enabled_tiers) return !chip.enabled_tiers.includes(tier);
+  return Boolean(chip.disabled_reason);
+}
+
 /** VIDEO-CREATE-01: the prompt bar as a schema node. Chip and tier choices go to page state as they change, the prompt text
  * when Make is pressed; Make fires `submit` once with {prompt, <chip states>, <tier state>}. The node sends nothing itself. */
 function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row }) {
@@ -683,6 +689,8 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
 
   function submit() {
     const item: Record<string, unknown> = { ...picked, [promptKey]: text.trim() };
+    // VIDEO-LORA-09: a chip that cannot be used at the chosen level sends nothing.
+    for (const chip of chips) if (chipUnusable(chip, tier)) delete item[chip.state];
     if (node.tier) item[node.tier.state] = tier;
     for (const ref of refs) { const f = filled[ref.state]; if (f) item[ref.state] = f.id; }
     writer?.merge({ [promptKey]: text.trim() });
@@ -706,22 +714,31 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       busy={busy}
       error={lastError}
       onSubmit={submit}
-      chips={chips.map((chip) => ({
-        id: chip.state,
-        label: chip.label,
-        variant: chip.variant,
-        presentation: chip.presentation,
-        group: chip.group,
-        fold: chip.fold,
-        trigger: chip.trigger,
-        popoverSize: chip.popover_size,
-        options: chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media) })),
-        value: picked[chip.state]!,
-        onValueChange: (value) => {
-          setPicked((prev) => ({ ...prev, [chip.state]: value }));
-          writer?.merge({ [chip.state]: value });
-        },
-      }))}
+      chips={chips.map((chip) => {
+        // VIDEO-LORA-09: a chip that works only at some levels is disabled at the others, with its one plain line.
+        const unusable = chipUnusable(chip, tier);
+        return {
+          id: chip.state,
+          label: chip.label,
+          variant: chip.variant,
+          presentation: chip.presentation,
+          group: chip.group,
+          fold: chip.fold,
+          trigger: chip.trigger,
+          popoverSize: chip.popover_size,
+          ...(unusable && chip.disabled_reason ? { disabledReason: chip.disabled_reason } : {}),
+          ...(chip.quiet_value !== undefined ? { quietValue: chip.quiet_value } : {}),
+          options: [
+            ...chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media), ...(o.note ? { note: o.note } : {}) })),
+            ...(chip.locked === true && !unusable ? [{ locked: true as const }] : []),
+          ],
+          value: picked[chip.state]!,
+          onValueChange: (value: string | number) => {
+            setPicked((prev) => ({ ...prev, [chip.state]: value }));
+            writer?.merge({ [chip.state]: value });
+          },
+        };
+      })}
       references={refs.map((ref) => ({
         id: ref.state,
         label: ref.label,

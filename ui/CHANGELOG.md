@@ -1,3 +1,7 @@
+## [ui-v0.5.493] - 2026-11-03
+
+- VIDEO-LORA-09 (needs spec-v0.1.318; `UI-DECISIONS.md` row first; home `docs/design/video-loras-2026-11-02.md` 6.2 and 6.4), additive, every default unchanged. `prompt_bar` chips gain `locked` (the cards chip ends with the one `LockTile`, which opens the page's `AdultLockProvider` dialog), `enabled_tiers` and `disabled_reason` (at a level outside the list the chip is drawn disabled, shows its one plain line under the cards, and sends nothing in the submit item; a bar with no level segment counts as Standard) and `quiet_value` (while that value is chosen the chip adds nothing to its group's summary). Options gain `note`, one plain line shown under the chip's cards while the option is chosen. `PromptBarChip` has `disabledReason` and `quietValue`, `PromptBarOption` has `note`; a new private `ChipCards` draws the cards and the line in every layout (popover, sheet, flat). Tests in `schema/promptBarStyles.test.tsx`.
+
 ## [ui-v0.5.492] - 2026-11-02
 
 - `MusicTrack`: the edit dialog fits a phone screen. Its content column no longer grows past the dialog and the tab row scrolls sideways instead of clipping. No prop changes.

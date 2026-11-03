@@ -21,6 +21,8 @@ export interface PromptBarOption {
   label: string;
   /** Cards variant only: a resolved address of a short silent mp4 loop or an image. Absent: a plain tile. */
   media?: string;
+  /** VIDEO-LORA-09: one plain line shown under the chip's cards while this option is chosen. */
+  note?: string;
 }
 
 /** VIDEO-CREATE-02: one file slot under the prompt box. VIDEO-UI-03 adds the `audio` and `video` kinds and the in-field placement. */
@@ -68,6 +70,10 @@ export interface PromptBarChip {
   trigger?: "default" | "banner";
   /** VIDEO-UI-13: on a popover group, `wide` opens a wider popover with six cards a row. Read from the first chip of the group that sets it. Default `default`. */
   popoverSize?: "default" | "wide";
+  /** VIDEO-LORA-09: while set, the chip is drawn disabled and this plain line is shown under its cards instead of a choice's note (the host sets it when the chip cannot be used at the chosen level). */
+  disabledReason?: string;
+  /** VIDEO-LORA-09: while this value is chosen the chip adds nothing to its group's summary words and thumbnails (a "No style" or "Normal" default). */
+  quietValue?: string | number;
 }
 
 export interface PromptBarTier {
@@ -143,6 +149,17 @@ function openOptions(chip: PromptBarChip): PromptBarOption[] {
 
 function chosenLabel(chip: PromptBarChip): string {
   return openOptions(chip).find((o) => String(o.value) === String(chip.value))?.label ?? "";
+}
+
+/** VIDEO-LORA-09: the cards of one chip, then one plain line under them: why the chip is disabled, else the chosen option's note. */
+function ChipCards({ chip, locked, columns }: { chip: PromptBarChip; locked: boolean; columns: "auto" | "three" | "six" }) {
+  const note = chip.disabledReason ?? openOptions(chip).find((o) => String(o.value) === String(chip.value))?.note;
+  return (
+    <>
+      <OptionCards chipId={chip.id} label={chip.label} options={chip.options} value={chip.value} disabled={locked || Boolean(chip.disabledReason)} columns={columns} onValueChange={chip.onValueChange} />
+      {note ? <p role="status" data-slot="prompt-bar-chip-note" data-disabled={chip.disabledReason ? "true" : undefined} className="text-sm text-muted-foreground">{note}</p> : null}
+    </>
+  );
 }
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
@@ -232,7 +249,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   ) : null;
 
   const dropdown = (chip: PromptBarChip) => (
-    <Select key={chip.id} value={String(chip.value)} disabled={locked} onValueChange={(next) => {
+    <Select key={chip.id} value={String(chip.value)} disabled={locked || Boolean(chip.disabledReason)} onValueChange={(next) => {
       const picked = openOptions(chip).find((o) => String(o.value) === next);
       if (picked) chip.onValueChange(picked.value);
     }}>
@@ -250,7 +267,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   const cardsSection = (chip: PromptBarChip, columns: "auto" | "three" = "auto") => (
     <div key={chip.id} data-slot="prompt-bar-cards" className="flex min-w-0 flex-col gap-1.5">
       <span className="text-sm font-medium text-muted-foreground">{chip.label}</span>
-      <OptionCards chipId={chip.id} label={chip.label} options={chip.options} value={chip.value} disabled={locked} columns={columns} onValueChange={chip.onValueChange} />
+      <ChipCards chip={chip} locked={locked} columns={columns} />
     </div>
   );
 
@@ -331,7 +348,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         {leading || groups.length > 0 || plainChips.some((c) => c.variant !== "cards") ? (
           <div data-slot="prompt-bar-chips" className="flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible">
             {leading}
-            {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" dropdown={dropdown} cards={(c, wide) => <OptionCards chipId={c.id} label={c.label} options={c.options} value={c.value} disabled={locked} onValueChange={c.onValueChange} columns={wide ? "six" : "auto"} />} />)}
+            {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" dropdown={dropdown} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
             {plainChips.filter((c) => c.variant !== "cards").map(dropdown)}
           </div>
         ) : null}
@@ -358,7 +375,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         if (seen.has(name)) continue;
         seen.add(name);
         const g = groups.find((x) => x.name === name)!;
-        ordered.push(<StyleGroup key={`g-${name}`} name={name} chips={g.chips} locked={locked} sheet={false} side="right" block dropdown={dropdown} cards={(c, wide) => <OptionCards chipId={c.id} label={c.label} options={c.options} value={c.value} disabled={locked} onValueChange={c.onValueChange} columns={wide ? "six" : "auto"} />} />);
+        ordered.push(<StyleGroup key={`g-${name}`} name={name} chips={g.chips} locked={locked} sheet={false} side="right" block dropdown={dropdown} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />);
       } else if (chip.variant === "cards") ordered.push(cardsSection(chip));
     }
     const dropdowns = unfolded.filter((c) => c.presentation !== "popover" && c.variant !== "cards");
@@ -521,9 +538,10 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
   const banner = chips.find((c) => c.trigger !== undefined)?.trigger === "banner";
   const wide = chips.find((c) => c.popoverSize !== undefined)?.popoverSize === "wide";
   const cardChips = chips.filter((c) => c.variant === "cards");
-  const thumbs = chips.filter((c) => c.variant === "cards").map((c) => openOptions(c).find((o) => String(o.value) === String(c.value))?.media).filter((m): m is string => Boolean(m)).slice(0, 2);
-  const summary = chips.map(chosenLabel).filter(Boolean).join(", ");
-  const bannerSrc = cardChips.map((c) => openOptions(c).find((o) => String(o.value) === String(c.value))?.media).find((m): m is string => Boolean(m));
+  const shownChips = chips.filter((c) => c.quietValue === undefined || String(c.quietValue) !== String(c.value));
+  const thumbs = shownChips.filter((c) => c.variant === "cards").map((c) => openOptions(c).find((o) => String(o.value) === String(c.value))?.media).filter((m): m is string => Boolean(m)).slice(0, 2);
+  const summary = (shownChips.length > 0 ? shownChips : chips.slice(0, 1)).map(chosenLabel).filter(Boolean).join(", ");
+  const bannerSrc = cardChips.filter((c) => shownChips.includes(c)).map((c) => openOptions(c).find((o) => String(o.value) === String(c.value))?.media).find((m): m is string => Boolean(m));
   const bannerNames = cardChips.map((c) => c.label.toLowerCase());
   const bannerEyebrow = bannerNames.length > 1 ? `${bannerNames.slice(0, -1).join(", ")} and ${bannerNames[bannerNames.length - 1]}` : (bannerNames[0] ?? name.toLowerCase());
   const bannerTrigger = (

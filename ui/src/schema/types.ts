@@ -479,6 +479,7 @@ export const PromptBarNodeSchema = z.object({
               value: z.union([z.string(), z.number()]),
               label: z.string().min(1).max(40),
               media: z.string().min(1).max(200).regex(/^(?!.*\.\.)[A-Za-z0-9_][A-Za-z0-9_./-]*$/).optional(),
+              note: z.string().min(1).max(300).optional(),
             }),
           )
           .min(1)
@@ -490,6 +491,11 @@ export const PromptBarNodeSchema = z.object({
         fold: z.boolean().optional(),
         trigger: z.enum(["default", "banner"]).optional(),
         popover_size: z.enum(["default", "wide"]).optional(),
+        // VIDEO-LORA-09: the Styles chips of the Create page (docs/design/video-loras-2026-11-02.md 6.2).
+        locked: z.boolean().optional(),
+        enabled_tiers: z.array(z.enum(["standard", "boost", "max"])).min(1).max(3).refine((list) => new Set(list).size === list.length).optional(),
+        disabled_reason: z.string().min(1).max(120).optional(),
+        quiet_value: z.union([z.string(), z.number()]).optional(),
       }),
     )
     .max(6)

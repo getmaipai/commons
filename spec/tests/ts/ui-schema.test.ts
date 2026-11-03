@@ -343,6 +343,19 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, chips: [{ ...look, popover_size: "huge" }] })).toBe(false);
   });
 
+  test("VIDEO-LORA-09: a chip's locked, enabled_tiers, disabled_reason and quiet_value and an option's note; defaults unchanged", () => {
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    const style = { state: "style", label: "Styles", variant: "cards", presentation: "popover", group: "Style", options: [{ value: "none", label: "No style" }, { value: "a", label: "Clay", note: "Makes it look like clay. It adds two phrases." }] };
+    expect(validate({ ...ok, chips: [style] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...style, locked: true, enabled_tiers: ["max"], disabled_reason: "Styles are for Max for now.", quiet_value: "none" }] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...style, enabled_tiers: [] }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...style, enabled_tiers: ["huge"] }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...style, enabled_tiers: ["max", "max"] }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...style, locked: "yes" }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...style, disabled_reason: "" }] })).toBe(false);
+    expect(validate({ ...ok, chips: [{ ...style, options: [{ value: "a", label: "A", note: "" }] }] })).toBe(false);
+  });
+
   test("ADULT-LOCK-01: media_shelf locked_field and making_field, result_feed fields.locked and making; defaults unchanged", () => {
     const shelf = { type: "media_shelf", bind: { source: "package", path: "clips" }, item_key_field: "id", item_label_field: "title", item_media_field: "thumb" };
     expect(validate(shelf)).toBe(true);

@@ -1269,6 +1269,12 @@
                       "maxLength": 200,
                       "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_][A-Za-z0-9_./-]*$",
                       "description": "VIDEO-CREATE-02: a relative package asset path to a short silent mp4 or webp loop, or an image (png, jpg, webp, svg). Used by the `cards` variant only; an option without it draws a plain tile with its label."
+                    },
+                    "note": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300,
+                      "description": "VIDEO-LORA-09: one plain line shown under the chip's cards while this option is chosen (what it does, and what it adds to the person's words). Plain text, never markup."
                     }
                   }
                 }
@@ -1311,6 +1317,29 @@
                 "enum": ["default", "wide"],
                 "default": "default",
                 "description": "VIDEO-UI-13: on a popover `group`, `wide` opens a wider popover (about 760 px) with six cards a row and each card chip as its own section (tabs when the surface is below `lg`). Read from the first chip of the group that sets it. Default unchanged."
+              },
+              "locked": {
+                "type": "boolean",
+                "default": false,
+                "description": "VIDEO-LORA-09 (cards variant): adds the one lock tile to the chip's cards, standing for every choice the Adult lock hides (no name, no count). Pressing it opens the page's passcode dialog (`AdultLockProvider`); once unlocked, the host's page refetch returns the real cards and the tile is gone. Default unchanged."
+              },
+              "enabled_tiers": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 3,
+                "uniqueItems": true,
+                "items": { "type": "string", "enum": ["standard", "boost", "max"] },
+                "description": "VIDEO-LORA-09: the levels (the bar's `tier` segment) at which this chip can be used. At any other level the chip is drawn disabled, its choice is left out of the submit item, and `disabled_reason` is shown under its cards. Absent: usable at every level. Default unchanged."
+              },
+              "disabled_reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120,
+                "description": "VIDEO-LORA-09: the one plain line shown under a chip's cards while the chip is disabled (with `enabled_tiers`, at a level it cannot use; without it, always disabled)."
+              },
+              "quiet_value": {
+                "anyOf": [{ "type": "string" }, { "type": "number" }],
+                "description": "VIDEO-LORA-09: while this value is chosen the chip adds nothing to the group's summary words and thumbnail row (a \"No style\" or \"Normal\" default). Default unchanged."
               }
             }
           }
