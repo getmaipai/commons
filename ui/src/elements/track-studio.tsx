@@ -13,6 +13,7 @@ import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
 import { Button } from "@/kit/ui/button";
 import { Slider } from "@/kit/ui/slider";
 import { Switch } from "@/kit/ui/switch";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import { eyebrow } from "./surfaces";
 import { LockTile } from "./adult-lock";
 import { PreviewEngine, type EngineStats } from "./track-studio-engine";
@@ -488,7 +489,7 @@ function Thumbs({ piece, pps, thumbs }: { piece: StudioPiece; pps: number; thumb
       {Array.from({ length: n }, (_, k) => {
         const t = piece.in_s + (k + 0.5) * tileS;
         const frame = thumbs?.frames[Math.min(thumbs.frames.length - 1, Math.max(0, Math.floor(t / THUMB_STEP_S)))];
-        return frame ? <img key={k} src={frame} alt="" draggable={false} className="h-full shrink-0 object-cover" style={{ width: (dur * pps) / n }} /> : <span key={k} className="bg-muted/60 h-full shrink-0" style={{ width: (dur * pps) / n }} />;
+        return frame ? <SafeImage key={k} src={frame} alt="" kind="video" loading="eager" draggable={false} className="h-full shrink-0 object-cover" style={{ width: (dur * pps) / n }} /> : <span key={k} className="bg-muted/60 h-full shrink-0" style={{ width: (dur * pps) / n }} />;
       })}
     </span>
   );

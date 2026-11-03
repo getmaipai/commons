@@ -29,6 +29,7 @@ const clipRow = (extra: Row = {}): Row => ({
 });
 
 beforeEach(() => {
+  document.body.replaceChildren(); // other test files leave elements behind; these tests count media elements in the whole document
   restore = installFakeMedia();
   stubMatchMedia({});
   calls = [];

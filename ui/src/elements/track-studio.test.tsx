@@ -23,6 +23,7 @@ let signals: AbortSignal[];
 const realMatchMedia = window.matchMedia;
 const realFetch = globalThis.fetch;
 beforeEach(() => {
+  document.body.replaceChildren(); // other test files leave elements behind; these tests count media elements in the whole document
   restore = installFakeMedia();
   stubMatchMedia({});
   signals = [];
@@ -100,14 +101,16 @@ describe("the leak test: a locked clip draws and loads nothing", () => {
 
   test("nothing of the plan is kept in storage, the URL or a cache", async () => {
     const setItem = spyOn(Storage.prototype, "setItem");
+    const search = window.location.search;
+    const cookie = document.cookie;
     const { container } = open();
     fireEvent.click(pieces(container, "voice")[0]!);
     key(within(container).getByRole("slider", { name: "Level in decibels" }), "ArrowDown");
     fireEvent.click(within(container).getByRole("button", { name: "Mute Voice" }));
     await flush();
     expect(setItem).not.toHaveBeenCalled();
-    expect(window.location.search).toBe("");
-    expect(document.cookie).toBe("");
+    expect(window.location.search).toBe(search);
+    expect(document.cookie).toBe(cookie);
   });
 
   test("no looping, no controls, no remote playback and no picture in picture on the monitor video", async () => {

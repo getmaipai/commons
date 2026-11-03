@@ -20,6 +20,7 @@ let playing: boolean[];
 let clockMs: number;
 let errors: string[];
 beforeEach(() => {
+  document.body.replaceChildren(); // other test files leave elements behind; these tests count media elements in the whole document
   restore = installFakeMedia();
   host = document.createElement("div");
   videoHost = document.createElement("div");
