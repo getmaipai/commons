@@ -80,6 +80,31 @@ class Strength(BaseModel):
     max: confloat(ge=0.0, le=2.0)
 
 
+class AdultCheck(BaseModel):
+    """
+    Design revision 2, section 15.1. What the source's own data said about adult content, when it was read. Evidence only: it never decides access (audience does) and is never lowered by an admin's choice. `unknown` and `adult` are both treated as adult-only. Decided from source fields only (Civitai nsfw flag and per-image nsfwLevel, the Hugging Face tag not-for-all-audiences), never from a word list. Absent reads as state unknown, basis none.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    state: Literal['normal', 'unknown', 'adult']
+    basis: Literal['source_flag', 'source_levels', 'source_tag', 'none'] = Field(
+        ...,
+        description='Which source field made the state; none when the source gave nothing usable.',
+    )
+    flag: bool | None = Field(
+        ..., description="The source's model-level adult flag when it has one."
+    )
+    levels_seen: conint(ge=0) = Field(
+        ..., description='How many preview pictures carried a usable level.'
+    )
+    adult_levels: conint(ge=0) = Field(
+        ..., description='How many of them were adult level.'
+    )
+    checked_at: AwareDatetime
+
+
 class Availability(BaseModel):
     """
     Who besides admins may use it. Default `admins`. Never includes a minor (the writer refuses one) and never widens what the Adult lock and the household adult-adapters switch hide.
@@ -234,7 +259,7 @@ class Lora(BaseModel):
     )
     audience: Literal['all-ages', 'adult-only'] = Field(
         ...,
-        description="Design D4. Uncertain is `adult-only`. A source (import metadata, tags) can only raise it to adult-only; `all-ages` is only ever an owner's or admin's explicit choice, so it needs audience_set_by.",
+        description="Design D4. Uncertain is `adult-only`. A source can only raise it to adult-only; `all-ages` is only ever an owner's or admin's explicit choice (an Install click or a Styles tab change), so it needs audience_set_by and audience_set_at. Lowering from adult needs an Adult unlock proof, which the Home writer checks.",
     )
     audience_set_by: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(
         ...,
@@ -242,6 +267,10 @@ class Lora(BaseModel):
     )
     audience_set_at: AwareDatetime | None = Field(
         ..., description='When audience was last set, by import or by an admin.'
+    )
+    adult_check: AdultCheck | None = Field(
+        None,
+        description="Design revision 2, section 15.1. What the source's own data said about adult content, when it was read. Evidence only: it never decides access (audience does) and is never lowered by an admin's choice. `unknown` and `adult` are both treated as adult-only. Decided from source fields only (Civitai nsfw flag and per-image nsfwLevel, the Hugging Face tag not-for-all-audiences), never from a word list. Absent reads as state unknown, basis none.",
     )
     availability: Availability = Field(
         ...,

@@ -623,8 +623,15 @@ export function validateLora(lora: Lora): Problems {
   if (!(st.min <= st.default && st.default <= st.max)) {
     problems.push(`strength must satisfy min <= default <= max (got ${st.min}, ${st.default}, ${st.max})`);
   }
-  if (lora.audience === "all-ages" && !lora.audience_set_by) {
-    problems.push("an all-ages LoRA needs audience_set_by: only an owner or admin can choose all-ages, a source can only raise to adult-only");
+  if (lora.audience === "all-ages" && (!lora.audience_set_by || !lora.audience_set_at)) {
+    problems.push("an all-ages LoRA needs audience_set_by and audience_set_at: only an owner or admin can choose all-ages, a source can only raise to adult-only");
+  }
+  const ac = lora.adult_check;
+  if (ac) {
+    if (ac.adult_levels > ac.levels_seen) problems.push("adult_check.adult_levels cannot exceed levels_seen");
+    if (ac.state === "normal" && (ac.flag === true || ac.adult_levels > 0 || ac.levels_seen === 0)) {
+      problems.push("adult_check.state normal needs a false or absent flag, no adult levels, and at least one level seen on a source with levels");
+    }
   }
   const { who, people } = lora.availability;
   if (who === "people" && people.length === 0) problems.push("availability.who is people but names nobody");

@@ -200,11 +200,11 @@ export const Lora = z
       .describe(
         "LoRA strength, 0 to 2, with min <= default <= max (validateLora). Characters default to their min of 0.8.",
       ),
-    /**Design D4. Uncertain is `adult-only`. A source (import metadata, tags) can only raise it to adult-only; `all-ages` is only ever an owner's or admin's explicit choice, so it needs audience_set_by.*/
+    /**Design D4. Uncertain is `adult-only`. A source can only raise it to adult-only; `all-ages` is only ever an owner's or admin's explicit choice (an Install click or a Styles tab change), so it needs audience_set_by and audience_set_at. Lowering from adult needs an Adult unlock proof, which the Home writer checks.*/
     audience: z
       .enum(["all-ages", "adult-only"])
       .describe(
-        "Design D4. Uncertain is `adult-only`. A source (import metadata, tags) can only raise it to adult-only; `all-ages` is only ever an owner's or admin's explicit choice, so it needs audience_set_by.",
+        "Design D4. Uncertain is `adult-only`. A source can only raise it to adult-only; `all-ages` is only ever an owner's or admin's explicit choice (an Install click or a Styles tab change), so it needs audience_set_by and audience_set_at. Lowering from adult needs an Adult unlock proof, which the Home writer checks.",
       )
       .default("adult-only"),
     /**The owner or admin who last chose the audience. Null while it is still what import set (always adult-only then).*/
@@ -237,6 +237,46 @@ export const Lora = z
           .describe("When audience was last set, by import or by an admin."),
       ])
       .describe("When audience was last set, by import or by an admin."),
+    /**Design revision 2, section 15.1. What the source's own data said about adult content, when it was read. Evidence only: it never decides access (audience does) and is never lowered by an admin's choice. `unknown` and `adult` are both treated as adult-only. Decided from source fields only (Civitai nsfw flag and per-image nsfwLevel, the Hugging Face tag not-for-all-audiences), never from a word list. Absent reads as state unknown, basis none.*/
+    adult_check: z
+      .object({
+        state: z.enum(["normal", "unknown", "adult"]),
+        /**Which source field made the state; none when the source gave nothing usable.*/
+        basis: z
+          .enum(["source_flag", "source_levels", "source_tag", "none"])
+          .describe(
+            "Which source field made the state; none when the source gave nothing usable.",
+          ),
+        /**The source's model-level adult flag when it has one.*/
+        flag: z
+          .union([
+            z
+              .boolean()
+              .describe("The source's model-level adult flag when it has one."),
+            z
+              .null()
+              .describe("The source's model-level adult flag when it has one."),
+          ])
+          .describe("The source's model-level adult flag when it has one."),
+        /**How many preview pictures carried a usable level.*/
+        levels_seen: z
+          .number()
+          .int()
+          .gte(0)
+          .describe("How many preview pictures carried a usable level."),
+        /**How many of them were adult level.*/
+        adult_levels: z
+          .number()
+          .int()
+          .gte(0)
+          .describe("How many of them were adult level."),
+        checked_at: z.string().datetime({ offset: true }),
+      })
+      .strict()
+      .describe(
+        "Design revision 2, section 15.1. What the source's own data said about adult content, when it was read. Evidence only: it never decides access (audience does) and is never lowered by an admin's choice. `unknown` and `adult` are both treated as adult-only. Decided from source fields only (Civitai nsfw flag and per-image nsfwLevel, the Hugging Face tag not-for-all-audiences), never from a word list. Absent reads as state unknown, basis none.",
+      )
+      .optional(),
     /**Who besides admins may use it. Default `admins`. Never includes a minor (the writer refuses one) and never widens what the Adult lock and the household adult-adapters switch hide.*/
     availability: z
       .object({

@@ -31,7 +31,7 @@ const mut = (f: (l: any) => void) => {
 
 describe("Lora record", () => {
   test("there are fixtures and each validates in the schema, generated zod and validateLora", () => {
-    expect(loraFixtures.length).toBe(3);
+    expect(loraFixtures.length).toBe(4);
     for (const name of loraFixtures) {
       expect(both(fixture(name))).toBe(true);
       expect(validateLora(Lora.parse(fixture(name)))).toEqual([]);
@@ -103,6 +103,34 @@ describe("Lora record", () => {
 
   test("a licence acknowledgment names who acknowledged", () => {
     expect(validateLora(mut((l) => (l.licence.acknowledged_at = "2026-11-02T17:00:00.000Z")))).toContainEqual(expect.stringContaining("acknowledged_by"));
+  });
+});
+
+describe("Lora adult_check (VIDEO-LORA-02b, additive)", () => {
+  const check = (o: object = {}) => ({ state: "unknown", basis: "source_levels", flag: false, levels_seen: 3, adult_levels: 0, checked_at: "2026-11-02T14:54:00.000Z", ...o });
+  test("a record without adult_check still validates (absent reads as unknown)", () => {
+    expect(both(mut(() => {}))).toBe(true);
+  });
+  test("all three states validate in schema and zod; other states and fields do not", () => {
+    for (const state of ["normal", "unknown", "adult"]) {
+      expect(both(mut((x) => { x.adult_check = check({ state, adult_levels: state === "adult" ? 1 : 0 }); }))).toBe(true);
+    }
+    expect(both(mut((x) => { x.adult_check = check({ state: "teen" }); }))).toBe(false);
+    expect(both(mut((x) => { x.adult_check = check({ basis: "keyword" }); }))).toBe(false);
+    expect(both(mut((x) => { x.adult_check = { ...check(), words: ["x"] }; }))).toBe(false);
+    expect(both(mut((x) => { const c: any = check(); delete c.checked_at; x.adult_check = c; }))).toBe(false);
+  });
+  test("normal needs a clean read, and adult levels cannot exceed levels seen", () => {
+    const bad = (o: object) => validateLora(Lora.parse(mut((x) => { x.adult_check = check(o); })));
+    expect(bad({ state: "normal" })).toEqual([]);
+    expect(bad({ state: "normal", flag: true }).length).toBe(1);
+    expect(bad({ state: "normal", adult_levels: 1 }).length).toBe(1);
+    expect(bad({ state: "normal", levels_seen: 0 }).length).toBe(1);
+    expect(bad({ state: "adult", adult_levels: 4 }).length).toBe(1);
+  });
+  test("all-ages needs both audience_set_by and audience_set_at", () => {
+    expect(both(mut((x) => { x.audience_set_at = null; }))).toBe(false);
+    expect(validateLora(Lora.parse(mut((x) => { x.audience_set_at = null; }))).length).toBe(1);
   });
 });
 
