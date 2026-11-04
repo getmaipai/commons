@@ -4731,6 +4731,101 @@
     ]
   },
   {
+    "key": "host.guard.hard_minutes",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 2,
+      "max": 30,
+      "step": 1
+    },
+    "default": 3,
+    "label": "Minutes of failure before a restart",
+    "help": "Choose how long the Mac's account lookup or service start must keep failing before it restarts.",
+    "copy": {
+      "does": "Sets how long account or service failures must last before the Mac restarts."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "host.guard.max_reboots_per_12h",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 0,
+      "max": 3,
+      "step": 1
+    },
+    "default": 2,
+    "label": "Most restarts per 12 hours",
+    "help": "Choose how many times the guard may restart the Mac in 12 hours. Choose 0 so the guard never restarts it.",
+    "copy": {
+      "does": "Caps how many times the guard may act in half a day."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "host.guard.metal_minutes",
+    "scope": "household",
+    "selector": "number",
+    "range": {
+      "min": 5,
+      "max": 120,
+      "step": 1
+    },
+    "default": 10,
+    "label": "Minutes of graphics failure before a restart",
+    "help": "Choose how long the graphics compiler must keep failing while the Mac is quiet before it restarts.",
+    "copy": {
+      "does": "Sets how long a failing graphics compiler and a quiet Mac trigger a restart."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "host.guard.mode",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "off",
+        "dry",
+        "live"
+      ]
+    },
+    "default": "live",
+    "label": "Restart the Mac when it stops responding",
+    "help": "Choose off so it never watches or restarts, dry to watch and record but never restart, or live to restart the Mac when the system stops answering.",
+    "copy": {
+      "does": "Decides whether this Mac may recover on its own when it hangs.",
+      "options": {
+        "off": "The guard never watches or restarts the Mac.",
+        "dry": "The guard watches and records failures but never restarts the Mac.",
+        "live": "The Mac restarts itself after it has been stuck for a few minutes."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "household.resources",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "coding.enabled",
     "scope": "household",
     "selector": "boolean",
