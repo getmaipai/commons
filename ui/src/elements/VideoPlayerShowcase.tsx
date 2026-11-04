@@ -7,17 +7,6 @@ import { VideoPlayer, type VideoPlayerAction } from "./video-player";
 
 const STILL = "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="832" height="480" viewBox="0 0 832 480"><rect width="832" height="480" fill="currentColor" fill-opacity=".35"/><circle cx="600" cy="140" r="60" fill="currentColor" fill-opacity=".2"/><path d="M0 380 Q200 320 420 380 T832 360 V480 H0Z" fill="currentColor" fill-opacity=".5"/></svg>`);
 
-const trim: VideoPlayerAction = {
-  label: "Trim",
-  icon: "scissors",
-  sheet: { title: "Trim this clip", submitLabel: "Trim", fields: [{ name: "start", label: "Start (seconds)", kind: "number", min: 0, defaultValue: 0 }, { name: "end", label: "End (seconds)", kind: "number", min: 1, max: 10, required: true }] },
-};
-const join: VideoPlayerAction = {
-  label: "Join",
-  icon: "film",
-  sheet: { title: "Join clips", submitLabel: "Join", fields: [{ name: "clips", label: "Clips", kind: "clips", required: true, options: [{ value: "a", label: "Paper boat in the rain" }, { value: "b", label: "A fox in the snow" }, { value: "c", label: "City lights at dusk" }] }] },
-};
-
 function Heading({ children }: { children: string }) {
   return <h2 className="text-muted-foreground mt-6 mb-2 text-sm font-medium first:mt-0">{children}</h2>;
 }
@@ -30,8 +19,6 @@ export function VideoPlayerShowcase({ size = "default", disabled = false }: { si
   const feedItems: VideoPlayerAction[] = [
     { label: "Remix", icon: "pencil", placement: "start", onSelect: note("Remix") },
     { label: "Make it Max", icon: "sparkles", starts: "video", disabledReason: reason, onSelect: note("Make it Max") },
-    { ...trim, onSubmit: values => setLast(`Trim ${JSON.stringify(values)}`) },
-    { ...join, onSubmit: values => setLast(`Join ${JSON.stringify(values)}`) },
   ];
   const feed = {
     size,

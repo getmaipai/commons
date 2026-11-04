@@ -1,8 +1,13 @@
-import { describe, expect, test, mock, afterEach } from "bun:test";
+import { describe, expect, test, mock, afterEach, afterAll } from "bun:test";
 import { render, cleanup } from "@testing-library/react";
 import { Avatar, diceBearAvatarUri } from "@/kit/primitives/Avatar";
 
 afterEach(cleanup);
+
+// bun's module mocks last for the whole process, so the real DiceBear module is put back after this file (a later file that draws a generated face must not get the thrower).
+// The namespace object is live and follows the mock, so the real exports are copied by value first.
+const realDicebear = { ...(await import("@dicebear/core")) };
+afterAll(() => { mock.module("@dicebear/core", () => realDicebear); });
 
 describe("Avatar", () => {
   // Radix's own Fallback mounts on a timer even with `delayMs={0}` (an
@@ -78,8 +83,8 @@ describe("Avatar", () => {
 
   // A generation failure (a future DiceBear bump, a malformed seed) is
   // never allowed to crash the avatar - `@dicebear/core` is the only
-  // importer of this module in the whole kit, so mocking it here can't
-  // leak into an unrelated file's tests.
+  // importer of this module in the whole kit, and the afterAll above restores it, so the mock
+  // does not leak into an unrelated file's tests.
   test("a DiceBear failure returns no picture, not a thrown error", () => {
     mock.module("@dicebear/core", () => ({
       createAvatar: () => {

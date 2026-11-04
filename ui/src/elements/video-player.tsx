@@ -25,7 +25,6 @@ import { LockTile } from "./adult-lock";
 import { PendingActions, type PendingAction } from "./pending-actions";
 import {
   ActionRow,
-  ActionSheet,
   VIDEO_PLAYER_ACTION_CAP,
   iconFor,
   type RowAction,
@@ -36,9 +35,6 @@ import {
 export type {
   VideoPlayerAction,
   VideoPlayerActionWhen,
-  VideoPlayerSheet,
-  VideoPlayerSheetField,
-  VideoPlayerSheetValues,
   VideoPlayerStarts,
 } from "./video-player-actions";
 export { VIDEO_PLAYER_ACTION_CAP } from "./video-player-actions";
@@ -143,7 +139,7 @@ function download(url: string, name: string) {
  * every source, handler and string is a prop.
  *
  * Additive (VIDEO-UI-02, every default unchanged): a `draft` status (the still plus onRender, onAnotherStill,
- * onEditWords), `actionItems` (per-action `when`, `disabledReason`, `starts`, `sheet`), `actionsVariant="icons"`,
+ * onEditWords), `actionItems` (per-action `when`, `disabledReason`, `starts`), `actionsVariant="icons"`,
  * `actionsInline` with a More menu, a Favorite toggle, `notice` (visible in every status; `hint` stays live-only),
  * `controls` (`disabledReason` and `starts` for the built-ins) and `size`.
  */
@@ -250,7 +246,7 @@ function VideoPlayerBody({
   onFavorite?: (next: boolean) => void;
   /** `disabledReason` and `starts` per built-in control (stop, retry, makeAnother, render, anotherStill, editWords, favorite). */
   controls?: Partial<Record<VideoPlayerControlName, VideoPlayerControl>>;
-  /** Structured row actions: per-action `when` (default `["ready"]`), `disabledReason`, `starts`, and a `sheet` form. At most VIDEO_PLAYER_ACTION_CAP are drawn. */
+  /** Structured row actions: per-action `when` (default `["ready"]`), `disabledReason` and `starts`. At most VIDEO_PLAYER_ACTION_CAP are drawn. */
   actionItems?: VideoPlayerAction[];
   /** `icons`: icon buttons, the label is the accessible name and tooltip. Default labelled buttons. */
   actionsVariant?: "labelled" | "icons";
@@ -285,7 +281,6 @@ function VideoPlayerBody({
   const elapsedMs = startedAt ? Math.max(0, now - startedAt) : 0;
   const ratio = width > 0 && height > 0 ? `${width} / ${height}` : "832 / 480";
   const value = barValue(progress, elapsedMs, estimateMs);
-  const [sheetAction, setSheetAction] = useState<VideoPlayerAction | null>(null);
   const icons = actionsVariant === "icons";
   // VIDEO-UI-14: the overlay chrome and the hover reveal reach only a clip with a picture (`ready` with a source, or `draft`).
   const hasPicture = status === "draft" || (status === "ready" && Boolean(src));
@@ -320,7 +315,7 @@ function VideoPlayerBody({
       disabledReason: item.disabledReason,
       starts: item.starts,
       placement: item.placement ?? "end",
-      onSelect: () => (item.sheet ? setSheetAction(item) : item.onSelect?.()),
+      onSelect: () => item.onSelect?.(),
     }));
   const rowActions: RowAction[] = [...items.filter(item => item.placement === "start"), ...builtIns, ...items.filter(item => item.placement === "end")];
   const favoriteControl = control("favorite");
@@ -444,17 +439,6 @@ function VideoPlayerBody({
         ) : null}
         {(status === "ready" || status === "draft") && prompt && caption ? <p className="text-muted-foreground line-clamp-2 text-xs">{prompt}</p> : null}
       </CardContent>}
-      {sheetAction?.sheet ? (
-        <ActionSheet
-          sheet={sheetAction.sheet}
-          onClose={() => setSheetAction(null)}
-          onSubmit={values => {
-            const done = sheetAction.onSubmit;
-            setSheetAction(null);
-            done?.(values);
-          }}
-        />
-      ) : null}
     </Card>
   );
 }

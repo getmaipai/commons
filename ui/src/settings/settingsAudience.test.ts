@@ -74,7 +74,7 @@ describe("single Settings area audience", () => {
   test("a non-admin sees Yours only; admins see both headings", () => {
     expect(settings.groups.map((g) => g.label)).toEqual(["Yours", "The home"]);
     expect(visibleGroups(settings, ADULT, REGISTRY, "home").map((g) => g.label)).toEqual(["Yours"]);
-    expect(ids(visibleGroups(settings, ADULT, REGISTRY, "home"))).toEqual(["profile", "appearance", "chat", "voice", "notifications", "pictures", "data"]);
+    expect(ids(visibleGroups(settings, ADULT, REGISTRY, "home"))).toEqual(["profile", "appearance", "chat", "voice", "notifications", "data"]);
     expect(visibleGroups(settings, ADMIN, REGISTRY, "home").map((g) => g.label)).toEqual(["Yours", "The home"]);
   });
 
@@ -115,7 +115,7 @@ describe("every viewer, every area: never a section they may not see", () => {
     const liveAreas = (liveAreasFile as unknown as { areas: SettingsAreaDef[] }).areas;
     expect(liveAreas.map((a) => a.id)).toEqual(["settings"]);
     expect(liveAreas[0]!.sections.filter((s) => s.scope === "household")).toHaveLength(10);
-    expect(liveAreas[0]!.sections.filter((s) => s.scope === "person")).toHaveLength(7);
+    expect(liveAreas[0]!.sections.filter((s) => s.scope === "person")).toHaveLength(6);
   });
 });
 
