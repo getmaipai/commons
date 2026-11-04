@@ -4,6 +4,99 @@ import { Player, type PlayerProgress } from "@/kit/primitives/Player";
 
 afterEach(cleanup);
 
+describe("Player voiceover", () => {
+  const mockAudio = (voices: HTMLAudioElement[]) => {
+    const original = globalThis.Audio;
+    globalThis.Audio = function AudioMock() { return voices.shift()!; } as unknown as typeof Audio;
+    return () => { globalThis.Audio = original; };
+  };
+  test("plays over music at a bed level, restores changed music volume, and follows pause/resume", async () => {
+    const voice = fakeMedia(document.createElement("audio"), 4);
+    const restore = mockAudio([voice]);
+    const { el, unmount } = setup({ voiceover: { src: "/dj", at: 1 } });
+    el.volume = 0.8;
+    act(() => { void el.play(); el.currentTime = 1; fireEvent.timeUpdate(el); });
+    await waitFor(() => expect(voice.play).toHaveBeenCalled());
+    await new Promise((resolve) => setTimeout(resolve, 320));
+    expect(el.volume).toBeCloseTo(0.28);
+    el.volume = 0.6;
+    el.pause();
+    expect(voice.pause).toHaveBeenCalled();
+    act(() => { void el.play(); });
+    expect(voice.play).toHaveBeenCalledTimes(2);
+    act(() => fireEvent.ended(voice));
+    expect(el.volume).toBe(0.6);
+    unmount();
+    restore();
+  });
+
+  test("cuts at the first lyric and reports once", async () => {
+    const voice = fakeMedia(document.createElement("audio"), 8);
+    const restore = mockAudio([voice]);
+    const onDone = mock(() => {});
+    const { el } = setup({ voiceover: { src: "/dj", at: "start", firstLyricS: 2, onDone } });
+    act(() => { void el.play(); });
+    await waitFor(() => expect(voice.play).toHaveBeenCalled());
+    act(() => { el.currentTime = 2; fireEvent.timeUpdate(el); });
+    await waitFor(() => expect(onDone).toHaveBeenCalledWith("cut"));
+    await new Promise((resolve) => setTimeout(resolve, 220));
+    expect(voice.pause).toHaveBeenCalled();
+    restore();
+  });
+
+  test("replaces a source and reports load errors without UI", async () => {
+    const voices = [fakeMedia(document.createElement("audio")), fakeMedia(document.createElement("audio"))];
+    const created: HTMLAudioElement[] = [];
+    const original = globalThis.Audio;
+    globalThis.Audio = function AudioMock() { const voice = voices.shift()!; created.push(voice); return voice; } as unknown as typeof Audio;
+    const failed = mock(() => {});
+    const view = render(<Player src="/song" kind="audio" title="Song" voiceover={{ src: "/one" }} />);
+    const el = fakeMedia(view.container.querySelector("[data-slot=player-media]") as HTMLMediaElement);
+    act(() => { void el.play(); });
+    await new Promise((resolve) => setTimeout(resolve, 320));
+    expect(view.container.querySelector("[data-slot=player-media]")).not.toBeNull();
+    view.rerender(<Player src="/song" kind="audio" title="Song" voiceover={{ src: "/two", onDone: failed }} />);
+    await waitFor(() => expect(created).toHaveLength(2));
+    created[1]?.dispatchEvent(new Event("error"));
+    expect(failed).toHaveBeenCalledWith("error");
+    expect(view.container.querySelector("[role=alert]")).toBeNull();
+    view.unmount();
+    globalThis.Audio = original;
+  });
+
+  test("speaks over a host-owned element and pauses with it", async () => {
+    const voice = fakeMedia(document.createElement("audio"), 4);
+    const restore = mockAudio([voice]);
+    const owned = fakeMedia(document.createElement("audio"));
+    const view = render(<Player src="/song" kind="audio" title="Song" media={owned} voiceover={{ src: "/dj" }} />);
+    act(() => { void owned.play(); owned.dispatchEvent(new Event("timeupdate")); });
+    await waitFor(() => expect(voice.play).toHaveBeenCalled());
+    act(() => { owned.pause(); });
+    expect(voice.pause).toHaveBeenCalled();
+    view.unmount();
+    restore();
+  });
+
+  test("does not create Audio without a voiceover and restores music volume on unmount", async () => {
+    const restore = mockAudio([]);
+    const ctor = mock(function(this: HTMLAudioElement) { return document.createElement("audio"); });
+    globalThis.Audio = ctor as unknown as typeof Audio;
+    const plain = render(<Player src="/song" kind="audio" title="Song" />);
+    expect(ctor).not.toHaveBeenCalled();
+    plain.unmount();
+    const voice = fakeMedia(document.createElement("audio"));
+    globalThis.Audio = function AudioMock() { return voice; } as unknown as typeof Audio;
+    const { el, unmount } = setup({ voiceover: { src: "/dj", at: 0 } });
+    el.volume = 0.5;
+    act(() => { void el.play(); });
+    await new Promise((resolve) => setTimeout(resolve, 320));
+    expect(el.volume).toBeCloseTo(0.175);
+    unmount();
+    expect(el.volume).toBe(0.5);
+    restore();
+  });
+});
+
 /** happy-dom's media element has no real playback: give it a duration, a paused flag and play/pause that fire events. */
 function fakeMedia(el: HTMLMediaElement, duration = 1200) {
   let paused = true;

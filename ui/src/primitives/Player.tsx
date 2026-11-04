@@ -99,6 +99,19 @@ export interface PlayerProgress {
   completed: boolean;
 }
 
+export interface PlayerVoiceover {
+  /** Address of the spoken line (a hub file route). */
+  src: string;
+  /** Track time at which to speak; defaults to the beginning. */
+  at?: "start" | number;
+  /** Cut the line if it would continue into the first lyric. */
+  firstLyricS?: number;
+  /** Independent voice level, from 0 to 1. */
+  volume?: number;
+  /** Called once when playback ends, is cut, or fails. */
+  onDone?: (reason: "ended" | "cut" | "error") => void;
+}
+
 /** Every word the Player says, so a kid-mode or translated copy can replace them. */
 export interface PlayerCopy {
   play: string;
@@ -170,6 +183,8 @@ export interface PlayerProps {
   /** MIME type of `src`, when the address does not say it. */
   type?: string;
   title: string;
+  /** Optional spoken line mixed over the music. */
+  voiceover?: PlayerVoiceover;
   subtitle?: string;
   /** The video poster, or the art for audio and the mini bar. */
   poster?: string;
@@ -352,6 +367,7 @@ export function Player(props: PlayerProps) {
     swipeUpToExpand = false,
     artSpring = false,
     lyricsBlur = false,
+    voiceover,
   } = props;
   const copy = useMemo(() => ({ ...DEFAULT_PLAYER_COPY, ...props.copy }), [props.copy]);
   const liveProp = props.live === true;
@@ -384,6 +400,148 @@ export function Player(props: PlayerProps) {
   const [flash, setFlash] = useState<string | null>(null);
   const [holding, setHolding] = useState(false);
   const [chaptersUrl, setChaptersUrl] = useState<string | null>(null);
+
+  // The voice element is deliberately detached from React's rendered tree. Its source and event lifecycle belong to
+  // this Player instance, including when the music element is supplied by a host.
+  const voiceRef = useRef<HTMLAudioElement | null>(null);
+  const voiceStarted = useRef(false);
+  const voiceDone = useRef(false);
+  const bedTarget = useRef<number | null>(null);
+  const musicVolume = useRef(1);
+  const fadeTimers = useRef(new Map<HTMLMediaElement, ReturnType<typeof setInterval>>());
+  const cutTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const voiceConfig = useRef(voiceover);
+  voiceConfig.current = voiceover;
+  const voiceVersion = useRef(0);
+
+  const stopFade = (el?: HTMLMediaElement) => {
+    if (el) {
+      const timer = fadeTimers.current.get(el);
+      if (timer) clearInterval(timer);
+      fadeTimers.current.delete(el);
+      return;
+    }
+    fadeTimers.current.forEach(clearInterval);
+    fadeTimers.current.clear();
+  };
+  const ramp = (el: HTMLMediaElement, from: number, to: number, ms: number, done?: () => void) => {
+    stopFade(el);
+    const startedAt = Date.now();
+    const timer = setInterval(() => {
+      const p = Math.min(1, (Date.now() - startedAt) / ms);
+      el.volume = from + (to - from) * p;
+      if (p >= 1) {
+        stopFade(el);
+        done?.();
+      }
+    }, 16);
+    fadeTimers.current.set(el, timer);
+  };
+  const restoreBed = () => {
+    const el = media.current;
+    if (!el || bedTarget.current === null) return;
+    const target = bedTarget.current;
+    bedTarget.current = null;
+    ramp(el, el.volume, target, 300);
+  };
+  const finishVoice = (reason: "ended" | "cut" | "error") => {
+    if (voiceDone.current) return;
+    voiceDone.current = true;
+    if (cutTimer.current) clearTimeout(cutTimer.current);
+    cutTimer.current = null;
+    const voice = voiceRef.current;
+    if (reason !== "ended") {
+      if (reason === "cut" && voice) ramp(voice, voice.volume, 0, 200, () => voice.pause());
+      else voice?.pause();
+    }
+    restoreBed();
+    try { voiceConfig.current?.onDone?.(reason); } catch { /* caller errors never escape Player */ }
+  };
+  const finishVoiceRef = useRef(finishVoice);
+  finishVoiceRef.current = finishVoice;
+  const syncVoiceover = () => {
+    const music = media.current;
+    const voice = voiceRef.current;
+    const config = voiceConfig.current;
+    if (!music || !voice || !config || voiceDone.current) return;
+    if (music.paused) { voice.pause(); return; }
+    const trigger = config.at === undefined || config.at === "start" ? 0 : config.at;
+    if (!voiceStarted.current && music.currentTime >= trigger) {
+      voiceStarted.current = true;
+      bedTarget.current = music.volume;
+      ramp(music, music.volume, music.volume * 0.35, 300);
+      voice.volume = Math.max(0, Math.min(1, config.volume ?? 1));
+      void voice.play().catch(() => finishVoice("error"));
+      if (config.firstLyricS !== undefined) {
+        const until = config.firstLyricS - music.currentTime;
+        if (until <= 0) finishVoice("cut");
+        else cutTimer.current = setTimeout(() => finishVoice("cut"), until * 1000);
+      }
+    } else if (voiceStarted.current && voice.paused) void voice.play().catch(() => finishVoice("error"));
+  };
+
+  useEffect(() => {
+    if (!voiceConfig.current) return;
+    const voice = new Audio();
+    const version = ++voiceVersion.current;
+    voiceRef.current = voice;
+    voice.preload = "metadata";
+    voice.volume = Math.max(0, Math.min(1, voiceConfig.current?.volume ?? 1));
+    voice.src = voiceConfig.current!.src;
+    const onEnded = () => { if (version === voiceVersion.current) finishVoiceRef.current("ended"); };
+    const onError = () => { if (version === voiceVersion.current) finishVoiceRef.current("error"); };
+    const onMetadata = () => {
+      const firstLyric = voiceConfig.current?.firstLyricS;
+      const music = media.current;
+      if (version !== voiceVersion.current || firstLyric === undefined || !music || !Number.isFinite(voice.duration)) return;
+      const trigger = voiceConfig.current?.at === "start" || voiceConfig.current?.at === undefined ? 0 : voiceConfig.current.at;
+      const until = firstLyric - trigger;
+      if (until <= 0) return finishVoiceRef.current("cut");
+      if (voice.duration > until && voiceStarted.current) {
+        if (cutTimer.current) clearTimeout(cutTimer.current);
+        cutTimer.current = setTimeout(() => finishVoiceRef.current("cut"), Math.max(0, (until - voice.currentTime) * 1000));
+      }
+    };
+    voice.addEventListener("ended", onEnded);
+    voice.addEventListener("error", onError);
+    voice.addEventListener("loadedmetadata", onMetadata);
+    voiceDone.current = false;
+    voiceStarted.current = false;
+    const detach = () => {
+      voiceVersion.current++;
+      voice.removeEventListener("ended", onEnded);
+      voice.removeEventListener("error", onError);
+      voice.removeEventListener("loadedmetadata", onMetadata);
+      if (cutTimer.current) clearTimeout(cutTimer.current);
+      stopFade();
+      voice.pause();
+      if (media.current && bedTarget.current !== null) media.current.volume = bedTarget.current;
+      bedTarget.current = null;
+      voiceRef.current = null;
+    };
+    return detach;
+  }, [voiceover?.src]);
+
+  useEffect(() => {
+    const music = media.current;
+    if (!music || bedTarget.current === null) return;
+    const onVolume = () => {
+      if (voiceRef.current && !voiceRef.current.paused && !voiceDone.current) {
+        musicVolume.current = music.volume;
+        bedTarget.current = music.volume;
+      }
+    };
+    music.addEventListener("volumechange", onVolume);
+    return () => music.removeEventListener("volumechange", onVolume);
+  }, [playing]);
+
+  useEffect(() => () => {
+    stopFade();
+    if (cutTimer.current) clearTimeout(cutTimer.current);
+    voiceRef.current?.pause();
+    if (media.current && bedTarget.current !== null) media.current.volume = bedTarget.current;
+    bedTarget.current = null;
+  }, []);
 
   const attachMedia = useCallback(
     (el: HTMLMediaElement | null) => {
@@ -490,6 +648,16 @@ export function Player(props: PlayerProps) {
     setPlaying(true);
     setEnded(false);
     setCountdown(null);
+    setTime(media.current?.currentTime ?? 0);
+    syncVoiceover();
+  };
+  const onTimeUpdate = (e: React.SyntheticEvent<HTMLMediaElement>) => {
+    setTime(e.currentTarget.currentTime);
+    syncVoiceover();
+  };
+  const onPauseMedia = () => {
+    voiceRef.current?.pause();
+    onPause();
   };
   const onEndedEvent = () => {
     setPlaying(false);
@@ -704,9 +872,9 @@ export function Player(props: PlayerProps) {
   const mediaHandlers = {
     loadedmetadata: () => onLoadedMetadata(),
     durationchange: () => media.current && setDuration(media.current.duration),
-    timeupdate: () => media.current && setTime(media.current.currentTime),
+    timeupdate: () => { if (media.current) { setTime(media.current.currentTime); syncVoiceover(); } },
     play: () => onPlay(),
-    pause: () => onPause(),
+    pause: () => onPauseMedia(),
     seeked: () => onSeeked(),
     ended: () => onEndedEvent(),
     ratechange: () => {
@@ -781,9 +949,9 @@ export function Player(props: PlayerProps) {
       crossOrigin="anonymous"
       onLoadedMetadata={onLoadedMetadata}
       onDurationChange={(e) => setDuration((e.currentTarget as HTMLMediaElement).duration)}
-      onTimeUpdate={(e) => setTime((e.currentTarget as HTMLMediaElement).currentTime)}
+      onTimeUpdate={onTimeUpdate}
       onPlay={onPlay}
-      onPause={onPause}
+      onPause={onPauseMedia}
       onSeeked={onSeeked}
       onEnded={onEndedEvent}
       onRateChange={(e) => {
