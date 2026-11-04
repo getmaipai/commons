@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import type { PlayerVoiceover } from "@/kit/primitives/Player";
 
 // MEDIA-PLAYER-01: the schema `play` action hands a media item to the host. The page never
 // plays anything itself: Home's shell (its one audio session, AUDIO-SESSION-01) provides this
@@ -47,6 +48,8 @@ export interface MediaHost {
    * session keeps it playing in the docked mini bar after the page closes); the same item must get the same element.
    * Absent, or null: the Player makes its own element and playback stops with the page. Called during render. */
   mediaFor?(item: MediaItemRef): HTMLMediaElement | null;
+  /** The spoken DJ line (a hub audio address) the Player plays over this item, or undefined for none; called during render for an item the host owns the element of; must return the same object while the line is unchanged so the Player does not restart it. */
+  voiceoverFor?(item: MediaItemRef): PlayerVoiceover | undefined;
   /** HANDOFF-01c: the other screens this person could continue `item` on. Called each time the player's cast menu opens.
    * Absent: the `player` node draws no cast menu. */
   castTargets?(item: Record<string, unknown>): Promise<CastTarget[]>;

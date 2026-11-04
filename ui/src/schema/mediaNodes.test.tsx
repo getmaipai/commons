@@ -288,6 +288,46 @@ describe("MEDIA-POLISH-01", () => {
     expect(owned.getAttribute("src")).toBe("/api/media/m1/file");
   });
 
+  test("a host voiceover creates its spoken audio element", async () => {
+    const voice = document.createElement("audio");
+    const original = globalThis.Audio;
+    globalThis.Audio = function AudioMock() { return voice; } as unknown as typeof Audio;
+    const voiceoverFor = mock((_item: MediaItemRef) => ({ src: "/dj" }));
+    const { findByRole, container, unmount } = inVideos(playerNode, { onPlay: () => {}, voiceoverFor }, { id: "m1" });
+    await findByRole("button", { name: "Chapters" });
+    expect(voiceoverFor.mock.calls[0]![0]).toMatchObject({ id: "m1", src: "/api/media/m1/file", kind: "video" });
+    const video = container.querySelector("video")!;
+    fireEvent.play(video);
+    await waitFor(() => expect(voice.getAttribute("src")).toBe("/dj"));
+    unmount();
+    globalThis.Audio = original;
+  });
+
+  test("without a host voiceover, Player does not create a spoken audio element", async () => {
+    const original = globalThis.Audio;
+    const ctor = mock(function(this: HTMLAudioElement) { return document.createElement("audio"); });
+    globalThis.Audio = ctor as unknown as typeof Audio;
+    const { findByRole, unmount } = inVideos(playerNode, { onPlay: () => {} }, { id: "m1" });
+    await findByRole("button", { name: "Chapters" });
+    expect(ctor).not.toHaveBeenCalled();
+    unmount();
+    globalThis.Audio = original;
+  });
+
+  test("an adult-only item never gets a host voiceover", async () => {
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify([{ ...ITEM, adult_only: true }]), { status: 200 }))) as unknown as typeof fetch;
+    const voiceoverFor = mock((_item: MediaItemRef) => ({ src: "/dj" }));
+    const original = globalThis.Audio;
+    const ctor = mock(function(this: HTMLAudioElement) { return document.createElement("audio"); });
+    globalThis.Audio = ctor as unknown as typeof Audio;
+    const { findByRole, unmount } = inVideos(playerNode, { onPlay: () => {}, voiceoverFor }, { id: "m1" });
+    await findByRole("button", { name: "Chapters" });
+    expect(voiceoverFor).not.toHaveBeenCalled();
+    expect(ctor).not.toHaveBeenCalled();
+    unmount();
+    globalThis.Audio = original;
+  });
+
   test("details show facts, expand a safe description into seekable chapters, and omit unsafe or absent descriptions", async () => {
     const player: UiNode = {
       type: "player", kind: "video", autoplay_next: false, bind: { source: "route", path: "/api/plugins/videos/data/item", stream: false }, details: true,

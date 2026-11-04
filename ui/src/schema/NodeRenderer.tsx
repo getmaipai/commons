@@ -1472,12 +1472,15 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
         // MEDIA-POLISH-01: the host may own the element, so playback outlives this page (the docked mini bar).
         // ADULT-LOCK-01: an adult-only item is never offered to the host: it plays in this page's own element and stops with the page.
         const adultOnly = readField(r, "adult_only") === true;
-        const external = adultOnly ? null : host?.mediaFor?.({ id: String(readField(r, field("id", "id")) ?? ""), src, kind: node.kind, title, subtitle, poster }) ?? null;
+        const mediaItem = { id: String(readField(r, field("id", "id")) ?? ""), src, kind: node.kind, title, subtitle, poster };
+        const external = adultOnly ? null : host?.mediaFor?.(mediaItem) ?? null;
+        const voiceover = adultOnly ? undefined : host?.voiceoverFor?.(mediaItem);
         return (
           <>
             <Player
               live={r.live === true}
               media={external}
+              voiceover={voiceover}
               mediaRef={mediaEl}
               castSlot={
                 host?.castTargets && host.castTo ? (
