@@ -1,4 +1,6 @@
-## [spec-v0.1.323] - 2026-11-04
+## [spec-v0.1.324] - 2026-11-04
+
+(spec-v0.1.323 was cut before its package version was bumped; use this tag.)
 
 - HOST-GUARD-00: add four household settings for the Mac host guard: mode,
   account and service failure time, graphics failure time and restart limit.
