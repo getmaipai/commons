@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from gen.py.media_template_schema import MediaTemplate
-from gen.py.media_subject_schema import MediaSubject
 from gen.py.media_production_schema import MediaProduction
+from gen.py.media_subject_schema import MediaSubject
+from gen.py.media_template_schema import MediaTemplate
 
 SPEC = Path(__file__).resolve().parents[2]
 RECORDS = SPEC / "fixtures" / "records"
