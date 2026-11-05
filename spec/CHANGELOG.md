@@ -1,3 +1,7 @@
+## [spec-v0.1.325] - 2026-11-04
+
+- SPEC-MEDIA-01, additive: add `MediaTemplate` (picture or video prompt skeleton, category, audience, Library references, styles, aspect and transparency), `MediaSubject` (private-by-default character, prop or place with look words and approved Library picture ids), and `MediaProduction` (cast roles, sets, props, script, media and finished cuts). Real-person subjects carry `real`; `subject_age_band` is deliberately absent. File references are Library file ids, never paths. Add `media-template-categories.json` and roster-only round-trip fixtures in TypeScript and Python.
+
 ## [spec-v0.1.324] - 2026-11-04
 
 (spec-v0.1.323 was cut before its package version was bumped; use this tag.)

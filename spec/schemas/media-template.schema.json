@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/media-template.schema.json",
+  "title": "MediaTemplate",
+  "description": "MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "title", "category", "audience", "prompt", "provenance", "created_at", "updated_at", "hlc"],
+  "properties": {
+    "id": {"type":"string","pattern":"^mtpl-[a-z0-9]{6,}$"},
+    "kind": {"type":"string","enum":["picture","video"]},
+    "title": {"type":"string","minLength":1,"maxLength":120},
+    "summary": {"type":"string","maxLength":500,"default":""},
+    "category": {"type":"string","minLength":1,"maxLength":60,"description":"A category id from vocab/media-template-categories.json."},
+    "audience": {"type":"string","enum":["all-ages","adult-only"],"description":"Strictest intended audience wins."},
+    "prompt": {"type":"string","minLength":1,"maxLength":10000,"description":"Prompt skeleton with named blanks in braces."},
+    "references": {"type":"array","maxItems":20,"uniqueItems":true,"items":{"type":"string","pattern":"^file-[a-z0-9]{6,}$"},"default":[],"description":"Library file ids only."},
+    "styles": {"type":"array","maxItems":20,"uniqueItems":true,"items":{"type":"string","pattern":"^lora-[a-z0-9]{6,}$"},"default":[]},
+    "aspect": {"type":["string","null"],"enum":["1:1","3:2","2:3","16:9","9:16",null],"default":null},
+    "transparent": {"type":"boolean","default":false},
+    "provenance": {"type":"string","minLength":1},
+    "created_at": {"type":"string","format":"date-time"},
+    "updated_at": {"type":"string","format":"date-time"},
+    "hlc": {"type":"string","pattern":"^[0-9]+:[0-9]+:[a-z0-9]{6,}$"}
+  }
+}

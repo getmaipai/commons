@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "description": "MEDIA-01 categories for saved picture and video templates.",
+  "categories": [
+    {"id":"portrait","label":"Portraits"},
+    {"id":"character","label":"Characters"},
+    {"id":"place","label":"Places"},
+    {"id":"product","label":"Products"},
+    {"id":"story","label":"Stories"},
+    {"id":"art","label":"Art and illustration"},
+    {"id":"social","label":"Social media"},
+    {"id":"other","label":"Other"}
+  ]
+}
