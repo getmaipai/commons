@@ -26,7 +26,9 @@ def fixture(name: str) -> dict:
 )
 def test_media_records_round_trip(name, model):
     data = fixture(name)
-    assert model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
+    assert (
+        model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
+    )
     for field in ("id", "provenance", "hlc"):
         broken = dict(data)
         del broken[field]
