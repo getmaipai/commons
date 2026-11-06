@@ -1,3 +1,7 @@
+## [spec-v0.1.328] - 2026-11-06
+
+- HOUSE-01a, additive. Four grant actions for smart-home control by room and item: `house.see:<target>`, `house.control:<target>` and `house.confirm:<target>` (target is `area:<id>` or `entity:<id>`), and `house.server` (restart Home Assistant, owner only, never callable by the model). Parameter rows by device class (lock, alarm, garage, entry_cover, camera, server) keep a child at `never` on every sensitive class and a teen at `never` on cameras and the server. Design: Home `docs/design/smart-home-controls-2026-11-06.md` (SMART-HOME-CONTROLS-01).
+
 ## [spec-v0.1.327] - 2026-11-06
 
 - STYLES-04, additive. `Lora` gains optional `allow_suggesting`; missing values read as true for all-ages styles and false for adult-only styles, while admins may set the value per style. New roster-only fixture `lora.suggesting-off.example.json`.

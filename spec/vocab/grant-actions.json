@@ -407,6 +407,76 @@
       }
     },
     {
+      "id": "house.see:<target>",
+      "parameterized": true,
+      "description": "See the state of one room or item in the home, such as whether a door is locked or a light is on.",
+      "policy": {
+        "risk": "read",
+        "outbound": false,
+        "reversible": true,
+        "approver": { "child": "none", "teen": "none", "adult": "none" },
+        "by_parameter": {
+          "camera": { "child": "never", "teen": "never", "adult": "none" },
+          "lock": { "child": "never", "teen": "self", "adult": "none" },
+          "alarm": { "child": "never", "teen": "self", "adult": "none" },
+          "garage": { "child": "never", "teen": "self", "adult": "none" },
+          "entry_cover": { "child": "never", "teen": "self", "adult": "none" },
+          "server": { "child": "never", "teen": "never", "adult": "none" }
+        }
+      }
+    },
+    {
+      "id": "house.control:<target>",
+      "parameterized": true,
+      "description": "Control one room or item in the home, such as turning on a light or opening a shade.",
+      "policy": {
+        "risk": "write_own",
+        "outbound": false,
+        "reversible": true,
+        "approver": { "child": "none", "teen": "none", "adult": "none" },
+        "by_parameter": {
+          "lock": { "child": "never", "teen": "self", "adult": "self" },
+          "alarm": { "child": "never", "teen": "self", "adult": "self" },
+          "garage": { "child": "never", "teen": "self", "adult": "self" },
+          "entry_cover": { "child": "never", "teen": "self", "adult": "self" },
+          "camera": { "child": "never", "teen": "never", "adult": "self" },
+          "server": { "child": "never", "teen": "never", "adult": "self" }
+        }
+      }
+    },
+    {
+      "id": "house.confirm:<target>",
+      "parameterized": true,
+      "description": "Confirm a sensitive home action before it runs, such as unlocking a door or changing an alarm.",
+      "policy": {
+        "risk": "write_own",
+        "outbound": false,
+        "reversible": true,
+        "approver": { "child": "never", "teen": "self", "adult": "self" },
+        "by_parameter": {
+          "lock": { "child": "never", "teen": "self", "adult": "self" },
+          "alarm": { "child": "never", "teen": "self", "adult": "self" },
+          "garage": { "child": "never", "teen": "self", "adult": "self" },
+          "entry_cover": { "child": "never", "teen": "self", "adult": "self" },
+          "camera": { "child": "never", "teen": "never", "adult": "self" },
+          "server": { "child": "never", "teen": "never", "adult": "self" }
+        }
+      }
+    },
+    {
+      "id": "house.server",
+      "parameterized": false,
+      "description": "Restart Home Assistant, a named add-on or the Home Assistant host. Only the owner can do this, and the model can never call it.",
+      "policy": {
+        "risk": "admin",
+        "outbound": false,
+        "reversible": false,
+        "approver": { "child": "never", "teen": "never", "adult": "none" },
+        "limits": ["assigned_by_admin"],
+        "model_callable": false
+      }
+    },
+    {
       "id": "notify.person",
       "parameterized": false,
       "description": "Send a notification to another household member. The `admin` parameter value means the recipient is a household admin.",
