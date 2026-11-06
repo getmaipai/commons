@@ -194,11 +194,11 @@ export const File = z
             const schemas = [
               z
                 .object({
-                  /**What was generated. Only music today; pictures and videos may adopt this record later.*/
+                  /**What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later.*/
                   kind: z
-                    .literal("music")
+                    .enum(["music", "sound"])
                     .describe(
-                      "What was generated. Only music today; pictures and videos may adopt this record later.",
+                      "What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later.",
                     ),
                   /**The Stack job (stack-job.schema.json) that produced the file.*/
                   job_id: z
@@ -219,6 +219,7 @@ export const File = z
                       "trim",
                       "fade",
                       "loudness",
+                      "sfx",
                     ])
                     .describe(
                       "What the job did: a new song (text2music), or a change to an existing version (the rest).",

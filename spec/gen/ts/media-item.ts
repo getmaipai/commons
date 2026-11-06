@@ -12,7 +12,7 @@ export const MediaItem = z
       .string()
       .regex(new RegExp("^media-[a-z0-9]{6,}$"))
       .describe("Stable id, never reused."),
-    /**`chapter` is one file of a folder audiobook (a folder of numbered mp3s); its parent is `parent_id`.*/
+    /**`chapter` is one file of a folder audiobook (a folder of numbered mp3s); its parent is `parent_id`. `sound` is a short sound effect or ambience made here (MUSIC-GEN-11); its provenance names the engine and job.*/
     kind: z
       .enum([
         "video",
@@ -23,9 +23,10 @@ export const MediaItem = z
         "book",
         "audiobook",
         "chapter",
+        "sound",
       ])
       .describe(
-        "`chapter` is one file of a folder audiobook (a folder of numbered mp3s); its parent is `parent_id`.",
+        "`chapter` is one file of a folder audiobook (a folder of numbered mp3s); its parent is `parent_id`. `sound` is a short sound effect or ambience made here (MUSIC-GEN-11); its provenance names the engine and job.",
       ),
     title: z.string().min(1),
     /**A second line: the channel, show, artist or author as the app shows it. Books and audiobooks of the same title in one folder are linked when their subtitles match.*/

@@ -1,3 +1,7 @@
+## [spec-v0.1.326] - 2026-11-05
+
+- MUSIC-GEN-11 (home `docs/design/music-listen-create-2026-11-01.md` slice C7, `docs/design/audio-parity-2026-11-05.md`), additive. `media-item` `kind` gains `sound` (a short sound effect or ambience made here); `generation-provenance` `kind` gains `sound` and `task` gains `sfx`. No existing value changes.
+
 ## [spec-v0.1.325] - 2026-11-04
 
 - SPEC-MEDIA-01, additive: add `MediaTemplate` (picture or video prompt skeleton, category, audience, Library references, styles, aspect and transparency), `MediaSubject` (private-by-default character, prop or place with look words and approved Library picture ids), and `MediaProduction` (cast roles, sets, props, script, media and finished cuts). Real-person subjects carry `real`; `subject_age_band` is deliberately absent. File references are Library file ids, never paths. Add `media-template-categories.json` and roster-only round-trip fixtures in TypeScript and Python.

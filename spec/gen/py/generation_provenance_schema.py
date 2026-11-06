@@ -53,9 +53,9 @@ class GenerationProvenance(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    kind: Literal['music'] = Field(
+    kind: Literal['music', 'sound'] = Field(
         ...,
-        description='What was generated. Only music today; pictures and videos may adopt this record later.',
+        description='What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later.',
     )
     job_id: constr(min_length=1) = Field(
         ..., description='The Stack job (stack-job.schema.json) that produced the file.'
@@ -70,6 +70,7 @@ class GenerationProvenance(BaseModel):
         'trim',
         'fade',
         'loudness',
+        'sfx',
     ] = Field(
         ...,
         description='What the job did: a new song (text2music), or a change to an existing version (the rest).',

@@ -196,9 +196,10 @@ class MediaItem(BaseModel):
         'book',
         'audiobook',
         'chapter',
+        'sound',
     ] = Field(
         ...,
-        description='`chapter` is one file of a folder audiobook (a folder of numbered mp3s); its parent is `parent_id`.',
+        description='`chapter` is one file of a folder audiobook (a folder of numbered mp3s); its parent is `parent_id`. `sound` is a short sound effect or ambience made here (MUSIC-GEN-11); its provenance names the engine and job.',
     )
     title: constr(min_length=1)
     subtitle: str | None = Field(
