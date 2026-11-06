@@ -539,6 +539,15 @@ export const PromptBarNodeSchema = z.object({
   suggestions: z.array(z.object({ label: z.string().min(1).max(40), text: z.string().min(1).max(300) })).max(4).optional(),
   submit_detail: z.object({ state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40), placement: z.enum(["below", "in_button"]).optional(), labels: z.record(z.string(), z.string().min(1).max(80)) }).optional(),
   starts: z.enum(["picture", "video"]).optional(),
+  /** STYLES-04: up to `max` removable "suggested style" chips under the prompt, from a bound list of {id, name, kind}. */
+  style_suggest: z
+    .object({
+      rows: PackageBindingSchema,
+      style_state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40).optional(),
+      character_state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40).optional(),
+      max: z.number().int().min(1).max(2).optional(),
+    })
+    .optional(),
   submit: ActionSchema,
 });
 export type PromptBarNode = z.infer<typeof PromptBarNodeSchema>;

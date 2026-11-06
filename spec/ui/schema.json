@@ -1483,6 +1483,18 @@
             }
           }
         },
+        "style_suggest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rows"],
+          "description": "STYLES-04: up to `max` removable suggested-style chips under the prompt. `rows` is a package binding (source `package`) whose rows are {id, name, kind: \"style\" | \"character\"}; its `params` may read the prompt with \"$state.<prompt_state>\" (the bar's current text is supplied). The bar asks about 500 ms after typing stops, only with 3 or more characters, and ignores out-of-date or failed answers. A chip showing is ON: Make sends its id under `style_state` (kind style, default `style`) or `character_state` (kind character, default `character`), unless the person already chose a value for that key by hand, in which case no chip shows for that kind. Removing a chip sends nothing and it does not return for that prompt. Those two keys are private (never in the address).",
+          "properties": {
+            "rows": { "$ref": "#/$defs/binding" },
+            "style_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+            "character_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+            "max": { "type": "integer", "minimum": 1, "maximum": 2, "default": 2 }
+          }
+        },
         "starts": {
           "type": "string",
           "enum": ["picture", "video"],

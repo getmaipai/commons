@@ -13,6 +13,12 @@ function typedStateKeys(node: unknown, found: Set<string> = new Set()): Set<stri
     if (record.type === "search" && typeof record.state === "string") found.add(record.state);
     // VIDEO-LORA-09: a prompt bar chip marked `private` keeps its choice out of the address.
     if (record.type === "prompt_bar" && Array.isArray(record.chips)) for (const chip of record.chips as Array<{ state?: unknown; private?: unknown }>) if (chip.private === true && typeof chip.state === "string") found.add(chip.state);
+    // STYLES-04: the keys a suggested style or character is sent under are private too.
+    if (record.type === "prompt_bar" && record.style_suggest && typeof record.style_suggest === "object") {
+      const cfg = record.style_suggest as { style_state?: unknown; character_state?: unknown };
+      found.add(typeof cfg.style_state === "string" ? cfg.style_state : "style");
+      found.add(typeof cfg.character_state === "string" ? cfg.character_state : "character");
+    }
     for (const child of Object.values(record)) typedStateKeys(child, found);
   }
   return found;

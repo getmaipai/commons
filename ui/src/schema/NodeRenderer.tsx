@@ -46,7 +46,7 @@ import { PromptBar } from "@/kit/elements/prompt-bar";
 import type { TierId } from "@/kit/elements/tier-segment";
 import { SharePanel } from "@/kit/elements/share-panel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
-import { PackageScopeContext, PageSidebarContext, PageStateContext } from "@/kit/schema/packageScope";
+import { PackageScopeContext, PageSidebarContext, PageStateContext, resolveParams } from "@/kit/schema/packageScope";
 import { MediaHostContext, type CastTarget, type MediaHost } from "@/kit/schema/mediaHost";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import type { Action } from "@/kit/schema/types";
@@ -614,6 +614,43 @@ function chipUnusable(chip: PromptBarNode["chips"] extends (infer C)[] | undefin
   return Boolean(chip.disabled_reason);
 }
 
+const SUGGEST_DEBOUNCE_MS = 500;
+const SUGGEST_MIN_CHARS = 3;
+type Suggested = { id: string; name: string; kind: "style" | "character" };
+
+/** STYLES-04: the suggested styles for what is typed. Asks the bound list about 500 ms after typing stops, from 3 characters, and
+ * keeps only the newest answer. A failed or malformed answer is no chips. Nothing leaves the package's own data route. */
+function useStyleSuggestions(node: PromptBarNode, text: string, state: Row, promptKey: string): Suggested[] {
+  const scope = useContext(PackageScopeContext);
+  const config = node.style_suggest;
+  const [found, setFound] = useState<Suggested[]>([]);
+  const trimmed = text.trim();
+  const packageId = scope?.packageId;
+  const stateSignature = JSON.stringify(config ? resolveParams(config.rows.params, { ...state, [promptKey]: trimmed }).body : null);
+  useEffect(() => {
+    if (!config || !packageId || trimmed.length < SUGGEST_MIN_CHARS) { setFound([]); return; }
+    let current = true;
+    const timer = setTimeout(() => {
+      const { body } = resolveParams(config.rows.params, { ...state, [promptKey]: trimmed });
+      request<{ rows?: unknown }>(`/api/plugins/${packageId}/data/${config.rows.path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(
+        (answer) => {
+          if (!current) return;
+          const rows = Array.isArray(answer?.rows) ? answer.rows : [];
+          const clean: Suggested[] = [];
+          for (const row of rows as Array<Record<string, unknown>>) {
+            if (row && typeof row.id === "string" && row.id !== "" && typeof row.name === "string" && row.name !== "" && (row.kind === "style" || row.kind === "character")) clean.push({ id: row.id, name: row.name, kind: row.kind });
+          }
+          setFound(clean);
+        },
+        () => { if (current) setFound([]); },
+      );
+    }, SUGGEST_DEBOUNCE_MS);
+    return () => { current = false; clearTimeout(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- trimmed text and the resolved body are the change signals
+  }, [config, packageId, trimmed, stateSignature]);
+  return found;
+}
+
 /** VIDEO-CREATE-01: the prompt bar as a schema node. Chip and tier choices go to page state as they change, the prompt text
  * when Make is pressed; Make fires `submit` once with {prompt, <chip states>, <tier state>}. The node sends nothing itself. */
 function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row }) {
@@ -647,6 +684,23 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
     return node.tier?.tiers.find((t) => t.id === fromState)?.id ?? node.tier?.default ?? node.tier?.tiers[0]?.id ?? "standard";
   });
   const [busy, setBusy] = useState(false);
+
+  // STYLES-04: suggested chips. A chip showing is ON for the submit; a hand pick (a value other than the quiet one) always wins.
+  const suggestCfg = node.style_suggest;
+  const suggestStates = { style: suggestCfg?.style_state ?? "style", character: suggestCfg?.character_state ?? "character" };
+  const fetched = useStyleSuggestions(node, text, state, promptKey);
+  const [dismissed, setDismissed] = useState<string[]>([]);
+  const handPicked = (kind: "style" | "character"): boolean => {
+    const key = suggestStates[kind];
+    const chip = chips.find((c) => c.state === key);
+    if (chip) {
+      if (chipUnusable(chip, tier)) return true;
+      const quiet = chip.quiet_value ?? chip.default ?? chip.options[0]!.value;
+      return String(picked[key]) !== String(quiet);
+    }
+    return Boolean(filled[key]);
+  };
+  const suggested: Suggested[] = suggestCfg ? fetched.filter((row) => !dismissed.includes(row.id) && !handPicked(row.kind)).slice(0, suggestCfg.max ?? 2) : [];
 
   // VIDEO-UI-03 (K6): a `navigate` that arrives at this page again (Remix) writes new values into the page state while the bar is
   // mounted. A value that differs from what the bar holds is taken over, so the bar follows the page, not only its first render.
@@ -693,7 +747,11 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
     for (const chip of chips) if (chipUnusable(chip, tier)) delete item[chip.state];
     if (node.tier) item[node.tier.state] = tier;
     for (const ref of refs) { const f = filled[ref.state]; if (f) item[ref.state] = f.id; }
+    // STYLES-04: a suggested chip left on is the person's yes. Only the submit carries the id (never page state, so never the address).
+    const taken = new Set<"style" | "character">();
+    for (const row of suggested) if (!taken.has(row.kind)) { taken.add(row.kind); item[suggestStates[row.kind]] = row.id; }
     writer?.merge({ [promptKey]: text.trim() });
+    setDismissed([]);
     setBusy(true);
     dispatch(node.submit, [item], () => setBusy(false), { typedArgs: true });
   }
@@ -714,6 +772,8 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       busy={busy}
       error={lastError}
       onSubmit={submit}
+      suggestedStyles={suggested}
+      onDismissSuggestion={(id) => setDismissed((prev) => (prev.includes(id) ? prev : [...prev, id]))}
       chips={chips.map((chip) => {
         // VIDEO-LORA-09: a chip that works only at some levels is disabled at the others, with its one plain line.
         const unusable = chipUnusable(chip, tier);

@@ -195,6 +195,8 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
       if (inField.length > 1) out.push(`${where} prompt_bar: only one reference may have placement "in_field" or "tile"`);
       for (const ref of inField) if (isObject(ref) && (ref.kind === "audio" || ref.kind === "video")) out.push(`${where} prompt_bar: reference "${String(ref.state)}" is ${String(ref.kind)}; only a picture, character or place can sit in the field`);
     }
+    // STYLES-04: the suggestion list is one of this package's own row data entries.
+    if (node.style_suggest !== undefined) checkBinding(isObject(node.style_suggest) ? node.style_suggest.rows : undefined, `${where} prompt_bar.style_suggest.rows`, data, "rows", out);
     if (isObject(node.submit_detail) && !keys.includes(String(node.submit_detail.state))) out.push(`${where} prompt_bar: submit_detail.state "${String(node.submit_detail.state)}" is not a chip or tier state of this bar`);
   }
   if (type === "picker" && node.bind !== undefined) checkBinding(node.bind, `${where} picker`, data, "rows", out);

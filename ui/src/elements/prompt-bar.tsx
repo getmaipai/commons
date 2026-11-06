@@ -95,6 +95,13 @@ export interface PromptBarSuggestion {
   text: string;
 }
 
+/** STYLES-04: one suggested style or character shown as a removable chip under the prompt box. */
+export interface PromptBarSuggestedStyle {
+  id: string;
+  name: string;
+  kind: "style" | "character";
+}
+
 export interface PromptBarProps {
   /** Names the text box for assistive tech. */
   label: string;
@@ -138,6 +145,10 @@ export interface PromptBarProps {
   optionsLabel?: string;
   /** VIDEO-UI-03: words on the fold. Default "More settings". */
   foldLabel?: string;
+  /** STYLES-04: up to 2 chips drawn under the box as "Style: <name>" with a remove button. A chip left on is the person's yes; the host decides what that sends. */
+  suggestedStyles?: readonly PromptBarSuggestedStyle[];
+  /** STYLES-04: called with the id when the person removes a suggested chip. */
+  onDismissSuggestion?: (id: string) => void;
 }
 
 type Mode = "inline" | "panel" | "dock";
@@ -164,7 +175,7 @@ function ChipCards({ chip, locked, columns }: { chip: PromptBarChip; locked: boo
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
  * It holds no state of its own. Videos Create draws it through the `prompt_bar` schema node and the chat video card draws it directly. */
-export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = "Make", fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", suggestions = [], submitDetail, optionsLabel = "Options", foldLabel = "More settings" }: PromptBarProps) {
+export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = "Make", fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", suggestions = [], submitDetail, optionsLabel = "Options", foldLabel = "More settings", suggestedStyles = [], onDismissSuggestion }: PromptBarProps) {
   const layout = useSplitViewLayout();
   const phone = useIsPhoneLayout();
   const mode: Mode = placement === "panel" && layout ? (layout === "side" ? "panel" : "dock") : "inline";
@@ -217,6 +228,23 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
       {shown.map((s) => (
         <Button key={s.label} type="button" variant="outline" shape="pill" size="sm" className="shrink-0" onClick={() => { onValueChange(s.text); field.current?.focus(); }}>{s.label}</Button>
       ))}
+    </div>
+  ) : null;
+
+  const suggested = suggestedStyles.slice(0, 2);
+  const suggestedRow = suggested.length > 0 && !locked ? (
+    <div role="group" aria-label="Suggested styles" data-slot="prompt-bar-suggested" className="flex min-w-0 flex-wrap items-center gap-2">
+      {suggested.map((s) => {
+        const noun = s.kind === "character" ? "character" : "style";
+        return (
+          <span key={s.id} data-suggested={s.id} className="inline-flex min-h-9 max-w-full items-center gap-1 rounded-full border border-input bg-muted py-1 pl-3 pr-1 text-sm text-foreground">
+            <span className="min-w-0 truncate">{s.kind === "character" ? "Character" : "Style"}: {s.name}</span>
+            <button type="button" aria-label={`Remove ${noun} ${s.name}`} onClick={() => onDismissSuggestion?.(s.id)} className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-background hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50">
+              <X className="size-4" aria-hidden="true" />
+            </button>
+          </span>
+        );
+      })}
     </div>
   ) : null;
 
@@ -343,6 +371,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
       >
         {fieldBox(8, false)}
         {suggestionRow}
+        {suggestedRow}
         {refsRow(rowRefs)}
         {plainChips.filter((c) => c.variant === "cards").map((c) => cardsSection(c))}
         {leading || groups.length > 0 || plainChips.some((c) => c.variant !== "cards") ? (
@@ -391,6 +420,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         <div data-slot="prompt-bar-body" tabIndex={0} aria-label={optionsLabel} role="group" className={cn("flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4", FOCUS_RING_INSET)}>
           {fieldBox(10, false)}
           {suggestionRow}
+          {suggestedRow}
           {refsRow(rowRefs)}
           {ordered}
           {tierSegment}
@@ -423,6 +453,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         onSubmit={(e) => { e.preventDefault(); trySubmit(); }}
       >
         {suggestionRow}
+        {suggestedRow}
         {disabledReason || error ? <div className="flex flex-col gap-1">{notes}</div> : null}
         <div className="flex min-w-0 items-end gap-2">
           {fieldBox(4, true)}

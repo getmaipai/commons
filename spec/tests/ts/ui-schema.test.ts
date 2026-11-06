@@ -284,6 +284,17 @@ describe("UI schema, package apps", () => {
       for (const heading_style of ["large", true, ""]) expect(validate({ ...node, heading_style })).toBe(false);
     }
   });
+  test("STYLES-04: prompt_bar style_suggest takes a binding, state names and a max of 1 or 2", () => {
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    const rows = { source: "package", path: "suggest", params: { text: "$state.prompt" } };
+    expect(validate({ ...ok, style_suggest: { rows } })).toBe(true);
+    expect(validate({ ...ok, style_suggest: { rows, style_state: "style", character_state: "character", max: 1 } })).toBe(true);
+    expect(validate({ ...ok, style_suggest: { rows, max: 3 } })).toBe(false);
+    expect(validate({ ...ok, style_suggest: { rows, max: 0 } })).toBe(false);
+    expect(validate({ ...ok, style_suggest: { rows, style_state: "Style" } })).toBe(false);
+    expect(validate({ ...ok, style_suggest: {} })).toBe(false);
+    expect(validate({ ...ok, style_suggest: { rows, extra: 1 } })).toBe(false);
+  });
   test("VIDEO-UI-03: prompt_bar placement, suggestions, submit_detail, starts, chip presentation, group and fold, reference placement and kinds", () => {
     const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
     const look = { state: "look", label: "Look", variant: "cards", presentation: "popover", group: "Style", options: [{ value: "a", label: "A" }] };

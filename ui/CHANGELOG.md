@@ -1,3 +1,7 @@
+## [ui-v0.5.503] - 2026-11-06
+
+- STYLES-04 (needs spec-v0.1.329), additive, every default unchanged. `prompt_bar` gains `style_suggest` `{ rows, style_state?, character_state?, max? }`: up to two removable "Style: <name>" or "Character: <name>" chips under the prompt, from a bound list of `{id, name, kind}`. The bar asks about 500 ms after typing stops (3 or more characters), ignores stale and failed answers, and never replaces a value the person chose by hand. A chip left on sends its id under `style_state` (default `style`) or `character_state` (default `character`); a removed chip sends nothing and stays away for that prompt. Those keys stay out of the address. `PromptBar` gains `suggestedStyles` and `onDismissSuggestion`. Tests in `schema/promptBarSuggest.test.tsx` and `elements/prompt-bar-suggested.test.tsx`.
+
 ## [ui-v0.5.502] - 2026-11-06
 
 - HOUSE-08a. Adds platform-neutral device cards `LightTile`, `SwitchTile`, `SceneTile` and `LockTile` (hold to confirm, with a Confirm button alternative) and a `DeviceCardsShowcase`. Props are plain values and callbacks, so any smart-home source (Home Assistant, HomeKit, SmartThings or a later one) can feed them. Transform and opacity motion only, with reduced-motion fallbacks; a light's own colour comes in as the `swatch` prop.
