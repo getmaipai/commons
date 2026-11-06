@@ -29,6 +29,7 @@ export * from "./generation-provenance.js";
 export * from "./grant.js";
 export * from "./hero-slide.js";
 export * from "./household-voice.js";
+export * from "./integration.js";
 export * from "./issue.js";
 export * from "./likeness-adapter.js";
 export * from "./link-state.js";

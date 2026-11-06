@@ -1,0 +1,14 @@
+{
+  "id": "integ-badtype",
+  "type": "jellyfin",
+  "instance": "default",
+  "label": "Bad",
+  "address": "http://192.0.2.20:8096",
+  "credential_ref": "cred-badtype",
+  "enabled": true,
+  "deleted_at": null,
+  "provenance": "admin",
+  "created_at": "2026-11-06T12:00:00.000Z",
+  "updated_at": "2026-11-06T12:00:00.000Z",
+  "hlc": "1793980800000:0:hub001"
+}

@@ -1,5 +1,5 @@
 {
-  "$comment": "The grant vocabulary: everything a household can allow or deny per person. Closed, like capabilities.json and permissions.json, so a grant can be rendered, explained and audited rather than being an opaque string.\n\nAn entry containing a `<placeholder>` is parameterized: a grant writes it out with a real target (`use:<package>` becomes `use:videos`), the same way a manifest writes `net:api.open-meteo.com` against permissions.json's `net:<host>`. Every other entry is used verbatim. (permissions.json's own comment says 'entries ending in a colon', which describes no entry in either file; the placeholder is the real convention and what the matcher implements.)\n\nRead this next to what it deliberately does NOT contain. There is no action that weakens the safety floor, no 'bypass_safety', no 'disable_filters'. The org's Safety invariants make those non-removable by anyone including the owner, so an action for them would be a lie in a list a family is meant to trust. `chat.unrestricted` and `generate.unrestricted` below are the adult-freedom unlock the standard DOES describe - unfiltered answering for an adult who has acknowledged it - and they still run under the same floor. POLICY (SPEC-CAP-01): every entry carries `policy` (or, for a duplicate id, `policy_ref` naming the file that owns it). `approver` gives, per age band, who must say yes before this runs: none (it runs), self (the person confirms), parent (a household admin must approve; the person's own answer never counts), never (denied). Strictness runs none < self < parent < never. A child's cell is never looser than a teen's, a teen's never looser than an adult's, and `parent` is invalid for an adult. `by_parameter` overrides the cells for one parameter value and is monotonic too. `consequential: true` in a manifest raises a `none` cell to `self` in every band. An id with no policy decides `unknown_default`. `limits` names conditions the gate applies on an allow. `model_callable: false` means no tool, package or host call may hold the id. The adult column records what the hub does today.",
+  "$comment": "The grant vocabulary: everything a household can allow or deny per person. Closed, like capabilities.json and permissions.json, so a grant can be rendered, explained and audited rather than being an opaque string.\n\nAn entry containing a `<placeholder>` is parameterized: a grant writes it out with a real target (`use:<package>` becomes `use:videos`), the same way a manifest writes `net:api.open-meteo.com` against permissions.json's `net:<host>`. Every other entry is used verbatim. (permissions.json's own comment says 'entries ending in a colon', which describes no entry in either file; the placeholder is the real convention and what the matcher implements.)\n\nRead this next to what it deliberately does NOT contain. There is no action that weakens the safety floor, no 'bypass_safety', no 'disable_filters'. The org's Safety invariants make those non-removable by anyone including the owner, so an action for them would be a lie in a list a family is meant to trust. `chat.unrestricted` and `generate.unrestricted` below are the adult-freedom unlock the standard DOES describe - unfiltered answering for an adult who has acknowledged it - and they still run under the same floor. POLICY (SPEC-CAP-01): every entry carries `policy` (or, for a duplicate id, `policy_ref` naming the file that owns it). `approver` gives, per age band, who must say yes before this runs: none (it runs), self (the person confirms), parent (a household admin must approve; the person's own answer never counts), never (denied). Strictness runs none < self < parent < never. A child's cell is never looser than a teen's, a teen's never looser than an adult's, and `parent` is invalid for an adult. `by_parameter` overrides the cells for one parameter value and is monotonic too. `consequential: true` in a manifest raises a `none` cell to `self` in every band. An id with no policy decides `unknown_default`. `limits` names conditions the gate applies on an allow. `model_callable: false` means no tool, package or host call may hold the id. The adult column records what the hub does today. GRANT TARGETS WITH INSTANCES (SPEC-INSTANCES-01): a connector grant target may be written `<instance>/<native target>`, split at the first `/`; an unprefixed target means the `default` instance (see integration.schema.json).",
   "actions": [
     {
       "id": "tier.max",
@@ -409,7 +409,7 @@
     {
       "id": "house.see:<target>",
       "parameterized": true,
-      "description": "See the state of one room or item in the home, such as whether a door is locked or a light is on.",
+      "description": "See the state of one room or item in the home, such as whether a door is locked or a light is on. The target may be `<instance>/<native target>`, split at the first `/` (instance slugs never contain `/` or `:`); an unprefixed target means the `default` instance. The by_parameter device class is passed separately and is never parsed from the target.",
       "policy": {
         "risk": "read",
         "outbound": false,
@@ -428,7 +428,7 @@
     {
       "id": "house.control:<target>",
       "parameterized": true,
-      "description": "Control one room or item in the home, such as turning on a light or opening a shade.",
+      "description": "Control one room or item in the home, such as turning on a light or opening a shade. The target may be `<instance>/<native target>`, split at the first `/` (instance slugs never contain `/` or `:`); an unprefixed target means the `default` instance. The by_parameter device class is passed separately and is never parsed from the target.",
       "policy": {
         "risk": "write_own",
         "outbound": false,
@@ -447,7 +447,7 @@
     {
       "id": "house.confirm:<target>",
       "parameterized": true,
-      "description": "Confirm a sensitive home action before it runs, such as unlocking a door or changing an alarm.",
+      "description": "Confirm a sensitive home action before it runs, such as unlocking a door or changing an alarm. The target may be `<instance>/<native target>`, split at the first `/` (instance slugs never contain `/` or `:`); an unprefixed target means the `default` instance. The by_parameter device class is passed separately and is never parsed from the target.",
       "policy": {
         "risk": "write_own",
         "outbound": false,

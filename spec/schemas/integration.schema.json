@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/integration.schema.json",
+  "title": "Integration",
+  "description": "SPEC-INSTANCES-01: one connected service instance, such as a Home Assistant server or an Uptime Kuma monitor. One record per instance, not one per type, so a household can connect two Uptime Kuma monitors. Design: Home docs/design/connector-instances-2026-11-06.md.\n\nUNIQUENESS: the pair (type, instance) is unique across all records, tombstoned ones included, so a slug is never reused for the same type. Schemas cannot express this; validateIntegrations in records/ts/validate.ts checks it. At most 8 live instances per type is a hub rule, not a schema rule.\n\nREMOVAL: removing an instance sets deleted_at (a tombstone). The record is kept so the slug stays taken.\n\nGRANT TARGETS: a grant target for an integration action may be `<instance>/<native target>`, split at the first `/` (the slug never contains `/` or `:`, and a native target may, as Gitea's `owner/repo` does). A target without an instance prefix means the `default` instance. The `by_parameter` device class is passed separately and is never parsed out of the target.\n\nSECRETS: this record never holds a secret. `credential_ref` is an opaque reference into the credentials center.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "instance",
+    "label",
+    "address",
+    "credential_ref",
+    "enabled",
+    "provenance",
+    "created_at",
+    "updated_at",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^integ-[a-z0-9]{6,}$",
+      "description": "Stable record id, never reused."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "home_assistant",
+        "uptime_kuma",
+        "gitea",
+        "immich",
+        "unifi",
+        "plex"
+      ],
+      "description": "Which kind of service this is."
+    },
+    "instance": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,30}$",
+      "description": "Short slug, unique within the type, chosen once and never reused. Never contains `/` or `:`. The first instance of a type is `default`."
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "description": "What people call this instance, for example \"Cabin\"."
+    },
+    "address": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The URL an admin set for this instance."
+    },
+    "credential_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Opaque reference into the credentials center. It names where the secret is kept and is never the secret itself."
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "False keeps the instance configured but unused."
+    },
+    "deleted_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null,
+      "description": "Tombstone. Set when an admin removes the instance; null while it exists. The record is kept so the slug is never reused."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1,
+      "description": "How this record came to exist, for example \"admin\" or \"migrated:home.base_url\"."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node."
+    }
+  }
+}

@@ -38,6 +38,7 @@ import type { File as FileRecord } from "../../gen/ts/file.js";
 import type { Transcript } from "../../gen/ts/transcript.js";
 import type { TranscriptRevision } from "../../gen/ts/transcript-revision.js";
 import type { CaptionTrack } from "../../gen/ts/caption-track.js";
+import type { Integration } from "../../gen/ts/integration.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -700,4 +701,26 @@ export function validateTranscriptRevision(record: TranscriptRevision): Problems
 
 export function validateCaptionTrack(record: CaptionTrack): Problems {
   return record.cues.flatMap((cue, i) => cue.end < cue.start ? [`cues[${i}].end must be >= start`] : []);
+}
+
+/** SPEC-INSTANCES-01: the pair (type, instance) is unique across every
+ * integration record, tombstoned ones included, so a slug is never reused.
+ * JSON Schema cannot express a cross-record rule. */
+export function validateIntegrations(records: Integration[]): Problems {
+  const seen = new Set<string>();
+  const problems: Problems = [];
+  records.forEach((record, i) => {
+    const key = `${record.type}/${record.instance}`;
+    if (seen.has(key)) problems.push(`integrations[${i}] repeats type and instance ${key}`);
+    seen.add(key);
+  });
+  return problems;
+}
+
+/** Splits a grant target at the first `/` into its instance and native
+ * target. An unprefixed target means the `default` instance. */
+export function splitGrantTarget(target: string): { instance: string; native: string } {
+  const slash = target.indexOf("/");
+  if (slash <= 0) return { instance: "default", native: target };
+  return { instance: target.slice(0, slash), native: target.slice(slash + 1) };
 }

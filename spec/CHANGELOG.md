@@ -1,3 +1,7 @@
+## [spec-v0.1.331] - 2026-11-06
+
+- SPEC-INSTANCES-01, additive. New `Integration` record, one per connected service instance: `type` (home_assistant, uptime_kuma, gitea, immich, unifi, plex), `instance` slug (no `/` or `:`), `label`, `address`, `credential_ref` (an opaque reference, never a secret), `enabled`, tombstone `deleted_at`, plus provenance and clock stamp. `validateIntegrations` checks (type, instance) uniqueness. Grant targets for connector actions may be `<instance>/<native target>` split at the first `/`; an unprefixed target means `default` (documented in `grant-actions.json`). Design: Home `docs/design/connector-instances-2026-11-06.md`.
+
 ## [spec-v0.1.330] - 2026-11-06
 
 - CAPTION-01a, additive. Adds strict `Transcript`, `TranscriptRevision`, and `CaptionTrack` records with generated/imported provenance, clock stamps, stable segments, revision operations, caption cues, and optional style. Timing order and speaker references are checked by the record validators; overlapping cues remain allowed.
