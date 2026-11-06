@@ -111,4 +111,13 @@ describe("LyricsList", () => {
     fireEvent.click(view.getByRole("textbox", { name: "Edit Next" }));
     expect(seek).toEqual([]);
   });
+  test("a renderLine line is not inside a button, so its controls take focus and typing in a browser", () => {
+    const view = render(<LyricsList lines={[{ t: 0, line: "Original" }]} currentTime={0} renderLine={(line) => <textarea aria-label={`Edit ${line.line}`} defaultValue={line.line} />} />);
+    expect(view.getByRole("textbox", { name: "Edit Original" }).closest("button")).toBeNull();
+    expect(view.container.querySelector("[aria-current='true']")).not.toBeNull();
+  });
+  test("lines without renderLine still render as buttons", () => {
+    const view = render(<LyricsList lines={[{ t: 0, line: "Plain" }]} currentTime={0} />);
+    expect(view.getByRole("button", { name: "Plain" })).toBeTruthy();
+  });
 });

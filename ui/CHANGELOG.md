@@ -1,3 +1,7 @@
+## [ui-v0.5.506] - 2026-11-06
+
+- CAPTION-01e fix. `LyricsList` with `renderLine` now draws each line in a plain container instead of a button. A text box inside a button cannot take focus or typing in a real browser, so the transcript editor could not save. Lines without `renderLine` are unchanged. Tests: the custom line is not inside a button; plain lines still are.
+
 ## [ui-v0.5.505] - 2026-11-06
 
 - CAPTION-01d: add native WebVTT tracks and captions copy forwarding to `VideoPlayer`, plus speaker labels, literal case-insensitive highlighting, and a custom line renderer to `LyricsList`. Defaults and timed lyric behavior stay unchanged.

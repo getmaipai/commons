@@ -53,6 +53,7 @@ export function lyricDistance(index: number, activeIndex: number): number {
 
 export function LyricsList({ lines, text, currentTime = 0, onSeek, labels = { label: "Lyrics" }, largeCurrent = false, blurByDistance = false, highlight, renderLine }: LyricsListProps) {
   const activeRef = useRef<HTMLButtonElement | null>(null);
+  const activeBoxRef = useRef<HTMLDivElement | null>(null);
   const lead = currentTime + LYRIC_LEAD_S;
   const rawIndex = lines?.findIndex((entry, i) => entry.t <= lead && (!lines[i + 1] || lead < lines[i + 1]!.t)) ?? -1;
   const prev = useRef({ index: -1, time: 0 });
@@ -60,8 +61,9 @@ export function LyricsList({ lines, text, currentTime = 0, onSeek, labels = { la
   prev.current = { index: activeIndex, time: currentTime };
   const reduced = typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   useEffect(() => {
-    if (!activeRef.current || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    activeRef.current.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+    const target = activeRef.current ?? activeBoxRef.current;
+    if (!target || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    target.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
   }, [activeIndex]);
   if (lines?.length) return <ol aria-label={labels.label} className="space-y-1">
     {lines.map((entry, i) => {
@@ -81,11 +83,11 @@ export function LyricsList({ lines, text, currentTime = 0, onSeek, labels = { la
       return <li key={`${t}-${i}`}>
       {showCount ? <Progress aria-hidden="true" value={countValue} className="mx-4 my-1 w-16" /> : null}
       {section && section !== lines[i - 1]?.section ? <p role="heading" aria-level={3} className="text-muted-foreground pt-2 text-xs">{section}</p> : null}
-      <Button ref={i === activeIndex ? activeRef : undefined} type="button" variant="ghost" data-distance={blurByDistance ? lyricDistance(i, activeIndex) : undefined} style={blurByDistance ? ({ "--lyric-distance": lyricDistance(i, activeIndex) } as CSSProperties) : undefined} className={`h-auto w-full justify-start whitespace-pre-wrap py-2 text-left ${largeCurrent && i === activeIndex ? "text-2xl font-semibold text-foreground" : largeCurrent ? "text-muted-foreground" : ""}${blurByDistance && activeIndex >= 0 ? ` ${BLUR_CLASSES}` : ""}`} aria-current={i === activeIndex ? "true" : undefined} aria-label={wiping || secondary ? `${speaker && speaker !== previousSpeaker ? `${speaker}: ` : ""}${line}` : undefined} onClick={() => { if (!renderLine) onSeek?.(t); }}>{speaker && speaker !== previousSpeaker ? <span className="text-muted-foreground me-2 text-xs font-medium" aria-label={`Speaker: ${speaker}`}>{speaker}</span> : null}{customContent ?? (wiping ? words!.map((w, k) => {
+      {customContent != null ? <div ref={i === activeIndex ? activeBoxRef : undefined} data-active={active ? "true" : undefined} aria-current={active ? "true" : undefined} className="flex w-full items-start gap-2 rounded-md px-4 py-2 text-left whitespace-pre-wrap">{speaker && speaker !== previousSpeaker ? <span className="text-muted-foreground me-2 text-xs font-medium" aria-label={`Speaker: ${speaker}`}>{speaker}</span> : null}{customContent}</div> : <Button ref={i === activeIndex ? activeRef : undefined} type="button" variant="ghost" data-distance={blurByDistance ? lyricDistance(i, activeIndex) : undefined} style={blurByDistance ? ({ "--lyric-distance": lyricDistance(i, activeIndex) } as CSSProperties) : undefined} className={`h-auto w-full justify-start whitespace-pre-wrap py-2 text-left ${largeCurrent && i === activeIndex ? "text-2xl font-semibold text-foreground" : largeCurrent ? "text-muted-foreground" : ""}${blurByDistance && activeIndex >= 0 ? ` ${BLUR_CLASSES}` : ""}`} aria-current={i === activeIndex ? "true" : undefined} aria-label={wiping || secondary ? `${speaker && speaker !== previousSpeaker ? `${speaker}: ` : ""}${line}` : undefined} onClick={() => { if (!renderLine) onSeek?.(t); }}>{speaker && speaker !== previousSpeaker ? <span className="text-muted-foreground me-2 text-xs font-medium" aria-label={`Speaker: ${speaker}`}>{speaker}</span> : null}{customContent ?? (wiping ? words!.map((w, k) => {
         const fill = reduced ? (currentTime >= w.t && currentTime < w.end ? 1 : 0) : wordFill(w, currentTime);
         const gap = k > 0 && !/\s$/.test(words![k - 1]!.text) && !/^\s/.test(w.text) ? " " : "";
         return <span key={k}>{gap}<span data-word="" className={WORD_CLASS} style={{ "--word-fill": fill } as CSSProperties}>{w.text}</span></span>;
-      }) : lineContent)}{!customContent && secondary ? <span className="text-muted-foreground block text-sm font-normal">{secondary}</span> : null}</Button>
+      }) : lineContent)}{!customContent && secondary ? <span className="text-muted-foreground block text-sm font-normal">{secondary}</span> : null}</Button>}
     </li>;
     })}
   </ol>;
