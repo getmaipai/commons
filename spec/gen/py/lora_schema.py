@@ -269,7 +269,8 @@ class Lora(BaseModel):
         ..., description='When audience was last set, by import or by an admin.'
     )
     allow_suggesting: bool | None = Field(
-        None, description='Whether this style may be suggested. When absent, defaults to true for all-ages and false for adult-only.'
+        None,
+        description='Whether this style may be suggested. When absent, defaults to true for all-ages and false for adult-only.',
     )
     adult_check: AdultCheck | None = Field(
         None,
