@@ -71,6 +71,14 @@ describe("prompt_bar style_suggest behaviour", () => {
     expect(group.textContent).toContain("Style: Clay look");
   });
 
+  test("a bare list answer, as the package data route sends it, shows the chip", async () => {
+    answer = () => Promise.resolve(json([STYLE]));
+    const view = draw(bar());
+    type(view, "a clay fox");
+    const group = await view.findByRole("group", { name: "Suggested styles" }, { timeout: 2000 });
+    expect(group.textContent).toContain("Style: Clay look");
+  });
+
   test("an out-of-date answer is ignored", async () => {
     const pending: Array<(r: Response) => void> = [];
     answer = () => new Promise<Response>((resolve) => { pending.push(resolve); });

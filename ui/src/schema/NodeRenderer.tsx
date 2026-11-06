@@ -632,10 +632,11 @@ function useStyleSuggestions(node: PromptBarNode, text: string, state: Row, prom
     let current = true;
     const timer = setTimeout(() => {
       const { body } = resolveParams(config.rows.params, { ...state, [promptKey]: trimmed });
-      request<{ rows?: unknown }>(`/api/plugins/${packageId}/data/${config.rows.path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(
+      request<unknown>(`/api/plugins/${packageId}/data/${config.rows.path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(
         (answer) => {
           if (!current) return;
-          const rows = Array.isArray(answer?.rows) ? answer.rows : [];
+          // The package data route answers a bare list; `{ rows }` is accepted too.
+          const rows = Array.isArray(answer) ? answer : Array.isArray((answer as { rows?: unknown } | null)?.rows) ? (answer as { rows: unknown[] }).rows : [];
           const clean: Suggested[] = [];
           for (const row of rows as Array<Record<string, unknown>>) {
             if (row && typeof row.id === "string" && row.id !== "" && typeof row.name === "string" && row.name !== "" && (row.kind === "style" || row.kind === "character")) clean.push({ id: row.id, name: row.name, kind: row.kind });
