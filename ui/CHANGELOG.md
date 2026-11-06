@@ -1,3 +1,7 @@
+## [ui-v0.5.502] - 2026-11-06
+
+- HOUSE-08a. Adds platform-neutral device cards `LightTile`, `SwitchTile`, `SceneTile` and `LockTile` (hold to confirm, with a Confirm button alternative) and a `DeviceCardsShowcase`. Props are plain values and callbacks, so any smart-home source (Home Assistant, HomeKit, SmartThings or a later one) can feed them. Transform and opacity motion only, with reduced-motion fallbacks; a light's own colour comes in as the `swatch` prop.
+
 ## [ui-v0.5.501] - 2026-11-06
 
 - `JobProgress` gains `notes` (plain text lines under the bar) and `actions` (named buttons beside Cancel) so a job card can show a short plan and Go, Resume or Redo. (ui-v0.5.500 was cut on a commit whose package version was still 0.5.499 and is unusable; use this tag.)

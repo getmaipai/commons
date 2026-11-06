@@ -1,0 +1,5 @@
+"use client";
+import { FanIcon } from "lucide-react";
+import { Switch } from "@/kit/ui/switch";
+export interface SwitchTileProps {name:string;room:string;on:boolean;pending?:boolean;unavailable?:boolean;onToggle:()=>void}
+export function SwitchTile({name,room,on,pending=false,unavailable=false,onToggle}:SwitchTileProps){const disabled=pending||unavailable;return <article data-slot="switch-tile" className="flex w-full max-w-sm items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-card-foreground"><div className="flex min-w-0 items-center gap-3"><span className="flex size-11 items-center justify-center rounded-xl bg-muted text-foreground"><FanIcon aria-hidden className={`size-5 transition-transform duration-300 motion-reduce:transition-none ${on?"rotate-45":"rotate-0"}`}/></span><div><h3 className="text-sm font-medium">{name}</h3><p className="text-muted-foreground text-xs">{room}</p><p className="text-muted-foreground text-xs">{unavailable?`Last known: ${on?"on":"off"}`:on?"On":"Off"}</p></div></div><Switch aria-label={name} checked={on} disabled={disabled} onCheckedChange={onToggle}/></article>}
