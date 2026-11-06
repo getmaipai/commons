@@ -1,3 +1,7 @@
+## [ui-v0.5.501] - 2026-11-06
+
+- `JobProgress` gains `notes` (plain text lines under the bar) and `actions` (named buttons beside Cancel) so a job card can show a short plan and Go, Resume or Redo. (ui-v0.5.500 was cut on a commit whose package version was still 0.5.499 and is unusable; use this tag.)
+
 ## [ui-v0.5.499] - 2026-11-04
 
 - VIDEO-STUDIO-12. Removes the `VideoPlayer` action `sheet` (K7: `sheet` and `onSubmit` on `actionItems`, the `VideoPlayerSheet*` types and their exports); it never had a user once VIDEO-UI-08 was dropped. Every other prop is unchanged.
