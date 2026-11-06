@@ -1,0 +1,27 @@
+{
+  "id": "revision-000001",
+  "transcript_id": "transcript-000001",
+  "n": 1,
+  "author": "person-abcdef01",
+  "reason": "Corrected a word",
+  "ops": [
+    {
+      "kind": "edit_text",
+      "segment_id": "seg-000001",
+      "text": "Hello everyone"
+    }
+  ],
+  "provenance": {
+    "engine": "whisper",
+    "model_id": "large-v3",
+    "source_kind": "generated"
+  },
+  "clock": {
+    "created_at": "2026-11-06T12:00:00.000Z",
+    "updated_at": "2026-11-06T12:00:00.000Z",
+    "hlc": "1793980800000:0:hub001"
+  },
+  "created_at": "2026-11-06T12:00:00.000Z",
+  "updated_at": "2026-11-06T12:00:00.000Z",
+  "hlc": "1793980800000:0:hub001"
+}

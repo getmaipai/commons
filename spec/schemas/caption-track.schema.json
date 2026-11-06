@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/captiontrack.schema.json",
+  "title": "CaptionTrack",
+  "description": "CAPTION-01a: captions for a transcript revision. Cue overlap is permitted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "transcript_id",
+    "language",
+    "based_on_revision",
+    "provenance",
+    "clock",
+    "cues"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "transcript_id": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "minLength": 1
+    },
+    "based_on_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_kind",
+        "engine"
+      ],
+      "properties": {
+        "source_kind": {
+          "type": "string",
+          "enum": [
+            "generated",
+            "imported",
+            "translated"
+          ]
+        },
+        "engine": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "created_at",
+        "updated_at",
+        "hlc"
+      ],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+          "description": "Hybrid logical clock: wall_ms:counter:node."
+        }
+      }
+    },
+    "cues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "start",
+          "end",
+          "text",
+          "text_overridden"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "segment_id": {
+            "type": "string"
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end": {
+            "type": "number",
+            "minimum": 0
+          },
+          "text": {
+            "type": "string"
+          },
+          "text_overridden": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "style": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "font_size": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "color": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "background": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "outline": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "align": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "position": {
+          "type": [
+            "string",
+            "number"
+          ]
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node."
+    }
+  }
+}

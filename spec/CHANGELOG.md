@@ -1,3 +1,7 @@
+## [spec-v0.1.330] - 2026-11-06
+
+- CAPTION-01a, additive. Adds strict `Transcript`, `TranscriptRevision`, and `CaptionTrack` records with generated/imported provenance, clock stamps, stable segments, revision operations, caption cues, and optional style. Timing order and speaker references are checked by the record validators; overlapping cues remain allowed.
+
 ## [spec-v0.1.329] - 2026-11-06
 
 - STYLES-04, additive. `prompt_bar` gains optional `style_suggest` `{ rows, style_state, character_state, max }`: a package binding of `{id, name, kind}` rows that drives up to two removable suggested style or character chips. The app check requires `rows` to name one of the package's own row data entries.

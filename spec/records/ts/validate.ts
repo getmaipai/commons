@@ -35,6 +35,9 @@ import type { NewsSearchRecent } from "../../gen/ts/news-search-recent.js";
 import type { FirmwareFlashManifest } from "../../gen/ts/firmware-flash-manifest.js";
 import type { Lora } from "../../gen/ts/lora.js";
 import type { File as FileRecord } from "../../gen/ts/file.js";
+import type { Transcript } from "../../gen/ts/transcript.js";
+import type { TranscriptRevision } from "../../gen/ts/transcript-revision.js";
+import type { CaptionTrack } from "../../gen/ts/caption-track.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -671,4 +674,30 @@ export function validateFileAdultLock(file: FileRecord): Problems {
     return ["lock is on but made_audience is all-ages: the Adult lock only applies to an adult-only file"];
   }
   return [];
+}
+
+/** Cross-field time and operation rules for CAPTION-01a. */
+export function validateTranscript(record: Transcript): Problems {
+  const problems: Problems = [];
+  const speakerIds = new Set(record.speakers.map((s) => s.id));
+  record.segments.forEach((segment, i) => {
+    if (segment.end < segment.start) problems.push(`segments[${i}].end must be >= start`);
+    if (segment.speaker !== undefined && !speakerIds.has(segment.speaker)) problems.push(`segments[${i}].speaker must name a speakers[].id`);
+    segment.words?.forEach((word, j) => { if (word.end < word.start) problems.push(`segments[${i}].words[${j}].end must be >= start`); });
+  });
+  return problems;
+}
+
+export function validateTranscriptRevision(record: TranscriptRevision): Problems {
+  const problems: Problems = [];
+  record.ops.forEach((op, i) => {
+    if (op.kind === "retime" && op.end < op.start) problems.push(`ops[${i}].end must be >= start`);
+    if (op.kind === "replace_range" && op.end < op.start) problems.push(`ops[${i}].end must be >= start`);
+    if (op.kind === "replace_range") op.segments.forEach((seg: { start: number; end: number }, j: number) => { if (seg.end < seg.start) problems.push(`ops[${i}].segments[${j}].end must be >= start`); });
+  });
+  return problems;
+}
+
+export function validateCaptionTrack(record: CaptionTrack): Problems {
+  return record.cues.flatMap((cue, i) => cue.end < cue.start ? [`cues[${i}].end must be >= start`] : []);
 }
