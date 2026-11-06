@@ -4,8 +4,10 @@
 // Favorite, notice) next to the chat card's default look. Rendered by hand to check 1440 and 390 in both themes.
 import { useState } from "react";
 import { VideoPlayer, type VideoPlayerAction } from "./video-player";
+import type { PlayerTextTrack } from "@/kit/primitives/Player";
 
 const STILL = "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="832" height="480" viewBox="0 0 832 480"><rect width="832" height="480" fill="currentColor" fill-opacity=".35"/><circle cx="600" cy="140" r="60" fill="currentColor" fill-opacity=".2"/><path d="M0 380 Q200 320 420 380 T832 360 V480 H0Z" fill="currentColor" fill-opacity=".5"/></svg>`);
+const TRACKS: readonly PlayerTextTrack[] = [{ src: "/captions.vtt", srclang: "en", label: "English", kind: "captions", default: true }];
 
 function Heading({ children }: { children: string }) {
   return <h2 className="text-muted-foreground mt-6 mb-2 text-sm font-medium first:mt-0">{children}</h2>;
@@ -40,7 +42,7 @@ export function VideoPlayerShowcase({ size = "default", disabled = false }: { si
       <Heading>Feed entry, generating</Heading>
       <VideoPlayer {...feed} status="generating" prompt="a fox in the snow" progress={58} startedAt={Date.now() - 95_000} phaseLabel="Drawing the frames" etaLabel="about 1 minute left" onStop={note("Stop")} />
       <Heading>Feed entry, ready</Heading>
-      <VideoPlayer {...feed} status="ready" prompt="a paper boat in the rain" src="/none.mp4" poster={STILL} onShare={note("Share")} onMakeAnother={note("Another take")} controls={{ makeAnother: { disabledReason: reason } }} actionItems={feedItems} />
+      <VideoPlayer {...feed} status="ready" prompt="a paper boat in the rain" src="/none.mp4" poster={STILL} tracks={TRACKS} onShare={note("Share")} onMakeAnother={note("Another take")} controls={{ makeAnother: { disabledReason: reason } }} actionItems={feedItems} />
       <Heading>Feed entry, failed</Heading>
       <VideoPlayer {...feed} status="failed" prompt="city lights at dusk" error="I couldn't make that video. The engine stopped partway. Try again." onRetry={note("Retry")} controls={{ retry: { disabledReason: reason } }} />
       <Heading>Feed entry, cancelled</Heading>

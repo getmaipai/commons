@@ -1,3 +1,7 @@
+## [ui-v0.5.505] - 2026-11-06
+
+- CAPTION-01d: add native WebVTT tracks and captions copy forwarding to `VideoPlayer`, plus speaker labels, literal case-insensitive highlighting, and a custom line renderer to `LyricsList`. Defaults and timed lyric behavior stay unchanged.
+
 ## [ui-v0.5.504] - 2026-11-06
 
 - STYLES-04 fix. `prompt_bar` `style_suggest` read only `{ rows }`, but the package data route answers a bare list, so no chip ever showed on a real page. It now accepts both. Test: a bare list shows the chip.

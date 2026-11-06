@@ -20,6 +20,7 @@ import { Button } from "@/kit/ui/button";
 import { Card, CardContent } from "@/kit/ui/card";
 import { Progress } from "@/kit/ui/progress";
 import { SafeImage } from "@/kit/primitives/SafeImage";
+import type { PlayerTextTrack } from "@/kit/primitives/Player";
 import { GenerationStage } from "./generation-stage";
 import { LockTile } from "./adult-lock";
 import { PendingActions, type PendingAction } from "./pending-actions";
@@ -37,6 +38,7 @@ export type {
   VideoPlayerActionWhen,
   VideoPlayerStarts,
 } from "./video-player-actions";
+export type { PlayerTextTrack } from "@/kit/primitives/Player";
 export { VIDEO_PLAYER_ACTION_CAP } from "./video-player-actions";
 
 /** `draft` is the still waiting for the person (Make the video from this, Another still, Edit words); the rest are the job's states. */
@@ -141,7 +143,7 @@ function download(url: string, name: string) {
  * Additive (VIDEO-UI-02, every default unchanged): a `draft` status (the still plus onRender, onAnotherStill,
  * onEditWords), `actionItems` (per-action `when`, `disabledReason`, `starts`), `actionsVariant="icons"`,
  * `actionsInline` with a More menu, a Favorite toggle, `notice` (visible in every status; `hint` stays live-only),
- * `controls` (`disabledReason` and `starts` for the built-ins) and `size`.
+ * `controls` (`disabledReason` and `starts` for the built-ins), `size`, and optional WebVTT `tracks`.
  */
 /** The props of an unlocked player (the whole Element API). */
 export type VideoPlayerProps = Parameters<typeof VideoPlayerBody>[0];
@@ -189,6 +191,7 @@ function VideoPlayerBody({
   actionsReveal = "always",
   chrome = "default",
   caption = true,
+  tracks,
   badges,
   actions,
   copy,
@@ -262,6 +265,7 @@ function VideoPlayerBody({
   /** VIDEO-UI-14: false leaves out the prompt caption under the clip (the host prints the words once itself). The prompt is still the
    * clip's accessible name. Default true. */
   caption?: boolean;
+  tracks?: readonly PlayerTextTrack[];
   /** VIDEO-UI-14: short strings drawn on the picture's top edge, in every status. */
   badges?: string[];
   /** Extra buttons after the standard ones (for example "Animate"). */
@@ -344,7 +348,9 @@ function VideoPlayerBody({
           playsInline
           preload="metadata"
           aria-label={prompt}
-        />
+        >
+          {tracks?.map((track, index) => <track key={`${track.srclang}-${index}`} src={track.src} kind={track.kind ?? "subtitles"} label={track.label} srcLang={track.srclang} default={track.default} />)}
+        </video>
       ) : (
         <GenerationStage generating={live} previewSrc={status === "generating" ? previewSrc : undefined} aspectRatio={ratio} className="rounded-none border-0">
           {live ? (

@@ -91,4 +91,24 @@ describe("LyricsList", () => {
     fireEvent.click(sec);
     expect(onSeek).toEqual([4]);
   });
+  test("speaker labels appear once per run and are exposed to assistive tech", () => {
+    const view = render(<LyricsList lines={[{ t: 0, line: "A", speaker: "Ari" }, { t: 2, line: "B", speaker: "Ari" }, { t: 4, line: "C", speaker: "Bo" }]} />);
+    expect(view.container.querySelectorAll('[aria-label="Speaker: Ari"]')).toHaveLength(1);
+    expect(view.container.querySelectorAll('[aria-label="Speaker: Bo"]')).toHaveLength(1);
+  });
+  test("highlight matches case insensitively and treats regex characters literally", () => {
+    const view = render(<LyricsList lines={[{ t: 0, line: "Song (LIVE) song" }]} highlight="(live)" />);
+    expect(view.container.querySelectorAll("mark")).toHaveLength(1);
+    expect(view.container.querySelector("mark")?.textContent).toBe("(LIVE)");
+  });
+  test("renderLine replaces default content and gets active state without seeking", () => {
+    const seen: Array<{ index: number; active: boolean }> = [];
+    const seek: number[] = [];
+    const view = render(<LyricsList lines={[{ t: 0, line: "Original" }, { t: 5, line: "Next" }]} currentTime={5} onSeek={(t) => seek.push(t)} renderLine={(line, index, state) => { seen.push({ index, active: state.active }); return <input aria-label={`Edit ${line.line}`} defaultValue={line.line} />; }} />);
+    expect(view.getByRole("textbox", { name: "Edit Next" })).toBeTruthy();
+    expect(view.queryByText("Next")).toBeNull();
+    expect(seen).toContainEqual({ index: 1, active: true });
+    fireEvent.click(view.getByRole("textbox", { name: "Edit Next" }));
+    expect(seek).toEqual([]);
+  });
 });

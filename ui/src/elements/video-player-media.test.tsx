@@ -25,6 +25,20 @@ describe("VideoPlayer media look props", () => {
     expect(view.container.querySelector("video")!.getAttribute("aria-label")).toBe("a paper boat");
   });
 
+  test("tracks render as native track children; omitted and locked players load no tracks", () => {
+    const tracks = [{ src: "/en.vtt", srclang: "en", label: "English", kind: "captions" as const, default: true }];
+    const view = render(<VideoPlayer {...ready} tracks={tracks} />);
+    const track = view.container.querySelector("video track")!;
+    expect(track.getAttribute("kind")).toBe("captions");
+    expect(track.getAttribute("label")).toBe("English");
+    expect(track.getAttribute("srclang")).toBe("en");
+    expect(track.hasAttribute("default")).toBe(true);
+    view.rerender(<VideoPlayer {...ready} />);
+    expect(view.container.querySelector("track")).toBeNull();
+    view.rerender(<VideoPlayer locked />);
+    expect(view.container.querySelector("track")).toBeNull();
+  });
+
   test("badges are drawn on the picture's top edge in every status, and not at all when empty", () => {
     const view = render(<VideoPlayer {...ready} badges={["Anime", "Dolly in"]} />);
     const list = view.container.querySelector("[data-slot=video-player-badges]")!;
