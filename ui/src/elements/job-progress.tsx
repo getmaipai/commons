@@ -30,6 +30,14 @@ export interface JobProgressCopy {
   retry?: string;
 }
 
+export interface JobProgressAction {
+  id: string;
+  label: string;
+  onSelect: () => void;
+  disabled?: boolean;
+  primary?: boolean;
+}
+
 function formatBytes(bytes: number): string {
   const safe = Math.max(0, bytes);
   const units = ["B", "KB", "MB", "GB", "TB"];
@@ -65,6 +73,8 @@ export function JobProgress({
   onResume,
   onRetry,
   copy,
+  notes,
+  actions,
   variant = "full",
   cancelable = true,
   className,
@@ -92,6 +102,8 @@ export function JobProgress({
   | "onResume"
   | "onRetry"
   | "copy"
+  | "notes"
+  | "actions"
   | "variant"
   | "cancelable"
 > & {
@@ -118,6 +130,8 @@ export function JobProgress({
   onResume?: () => void;
   onRetry?: () => void;
   copy?: JobProgressCopy;
+  notes?: readonly string[];
+  actions?: readonly JobProgressAction[];
   variant?: "compact" | "full";
   /** Hide the cancel control when the producer has no cancellation action. */
   cancelable?: boolean;
@@ -201,6 +215,14 @@ export function JobProgress({
       {finished && elapsedLabel && <time className={cn(mono, "text-muted-foreground")} dateTime={`PT${Math.max(0, Math.round(elapsedMs! / 1000))}S`}>{elapsedLabel}</time>}
       {outcome?.summary && <p className="text-muted-foreground text-xs">{outcome.summary}</p>}
 
+      {notes && notes.length > 0 && (
+        <div className="flex flex-col gap-1 text-muted-foreground text-xs">
+          {(variant === "compact" ? notes.slice(0, 1) : notes).map((note, index) => (
+            <p key={`${index}-${note}`}>{note}</p>
+          ))}
+        </div>
+      )}
+
       {completedBytes !== undefined && totalBytes !== undefined && (
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs">
           <span className={cn(mono, "text-muted-foreground tabular-nums")}>{formatBytes(completedBytes)} of {formatBytes(totalBytes)}</span>
@@ -223,6 +245,22 @@ export function JobProgress({
         <Progress mode="determinate" value={completedBytes !== undefined && totalBytes ? completedBytes / totalBytes * 100 : overall} label={`${title} progress`} />
         {completedBytes !== undefined && totalBytes !== undefined && <span className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}>{announced(completedBytes / Math.max(1, totalBytes) * 100)}%</span>}
       </div>
+
+      {actions && actions.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {actions.map((action) => (
+            <button
+              key={action.id}
+              type="button"
+              className={cn(ghostButton, "px-3 py-1.5 text-xs", action.primary && "text-foreground")}
+              disabled={action.disabled}
+              onClick={action.onSelect}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-x-3 gap-y-1">
         {stages.map((item, i) => (

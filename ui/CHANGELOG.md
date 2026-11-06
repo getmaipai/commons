@@ -998,6 +998,10 @@ Fixes centered intro titles and content with an aside so they stay within the le
 
 Adds an intro presentation to `Wizard` centered layout, with a full-width header and footer, vertically centered left-side copy, a large title and lead text, and theme-aware typography and action tokens. Question steps keep a centered 40rem column with 32px headings. `WizardCenteredShowcase` demonstrates the intro layout.
 
+## [0.5.220] - ui-v0.5.220
+
+Adds optional `notes` and `actions` to `JobProgress`. Notes render as muted paragraphs, with one line in compact mode. Actions render as accessible buttons beside the progress content and support disabled and primary emphasis. Existing callers render unchanged.
+
 ## [0.5.219] - ui-v0.5.219
 
 Adds an optional `aside` picture to `Wizard`. At the `lg` breakpoint and wider, the wizard uses the left half and the picture fills a sticky right half. Below `lg`, the picture is not mounted, so its image is not requested on phone screens. Without `aside`, existing layouts stay the same.

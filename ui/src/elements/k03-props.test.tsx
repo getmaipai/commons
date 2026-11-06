@@ -273,6 +273,43 @@ describe("JobProgress", () => {
     expect(view.queryByRole("button", { name: "Cancel the job" })).toBeNull();
   });
 
+  test("renders notes as paragraphs and limits compact notes to one line", () => {
+    const full = render(<JobProgress title="Plan" stages={stages} stageIndex={0} stageProgress={0.1} notes={["Choose a style", "Generate the film"]} />);
+    expect(full.container.textContent).toContain("Choose a style");
+    expect(full.container.textContent).toContain("Generate the film");
+    const paragraphs = Array.from(full.container.querySelectorAll("p"));
+    expect(paragraphs.map((paragraph) => paragraph.textContent)).toEqual(["Choose a style", "Generate the film"]);
+    cleanup();
+    const compact = render(<JobProgress title="Plan" stages={stages} stageIndex={0} stageProgress={0.1} notes={["First line", "Second line"]} variant="compact" />);
+    expect(compact.container.textContent).toContain("First line");
+    expect(compact.container.textContent).not.toContain("Second line");
+  });
+
+  test("renders action buttons and honors disabled state", () => {
+    const select = mock(() => {});
+    const disabledSelect = mock(() => {});
+    const view = render(<JobProgress title="Plan" stages={stages} stageIndex={0} stageProgress={0.1} actions={[
+      { id: "start", label: "Go", onSelect: select, primary: true },
+      { id: "later", label: "Redo", onSelect: disabledSelect, disabled: true },
+    ]} />);
+    const go = view.getByRole("button", { name: "Go" }) as HTMLButtonElement;
+    const redo = view.getByRole("button", { name: "Redo" }) as HTMLButtonElement;
+    expect(go.type).toBe("button");
+    expect(redo.disabled).toBe(true);
+    fireEvent.click(go);
+    fireEvent.click(redo);
+    expect(select).toHaveBeenCalledTimes(1);
+    expect(disabledSelect).not.toHaveBeenCalled();
+  });
+
+  test("keeps output unchanged when notes and actions are unset", () => {
+    const view = render(<JobProgress title="Job" stages={stages} stageIndex={0} stageProgress={0.1} />);
+    expect(view.container.querySelectorAll("p")).toHaveLength(0);
+    expect(view.getByRole("progressbar")).toBeTruthy();
+    expect(view.getByRole("button", { name: "Cancel the job" })).toBeTruthy();
+    expect(view.getAllByRole("button")).toHaveLength(1);
+  });
+
   test("queued, running and verifying per-file states are rendered", () => {
     const states = ["queued", "running", "verifying"] as const;
     const view = render(<JobProgress title="Files" stages={stages} stageIndex={0} stageProgress={0.5} items={states.map((state) => ({ id: state, label: `${state}.gguf`, completedBytes: 10, totalBytes: 100, state }))} />);
