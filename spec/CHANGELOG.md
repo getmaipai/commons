@@ -1,3 +1,7 @@
+## [spec-v0.1.327] - 2026-11-06
+
+- STYLES-04, additive. `Lora` gains optional `allow_suggesting`; missing values read as true for all-ages styles and false for adult-only styles, while admins may set the value per style. New roster-only fixture `lora.suggesting-off.example.json`.
+
 ## [spec-v0.1.326] - 2026-11-05
 
 - MUSIC-GEN-11 (home `docs/design/music-listen-create-2026-11-01.md` slice C7, `docs/design/audio-parity-2026-11-05.md`), additive. `media-item` `kind` gains `sound` (a short sound effect or ambience made here); `generation-provenance` `kind` gains `sound` and `task` gains `sfx`. No existing value changes.

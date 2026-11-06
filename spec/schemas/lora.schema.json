@@ -160,6 +160,10 @@
       "format": "date-time",
       "description": "When audience was last set, by import or by an admin."
     },
+    "allow_suggesting": {
+      "type": "boolean",
+      "description": "Whether this style may be suggested. When absent, defaults to true for all-ages and false for adult-only."
+    },
     "adult_check": {
       "type": "object",
       "additionalProperties": false,

@@ -8,7 +8,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { Lora } from "../../gen/ts/lora.js";
 import { File } from "../../gen/ts/file.js";
-import { validateLora, validateFileAdultLock } from "../../records/ts/validate.js";
+import { validateLora, validateFileAdultLock, loraAllowsSuggesting } from "../../records/ts/validate.js";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const read = (path: string) => JSON.parse(readFileSync(join(SPEC, path), "utf-8"));
@@ -31,7 +31,7 @@ const mut = (f: (l: any) => void) => {
 
 describe("Lora record", () => {
   test("there are fixtures and each validates in the schema, generated zod and validateLora", () => {
-    expect(loraFixtures.length).toBe(4);
+    expect(loraFixtures.length).toBe(5);
     for (const name of loraFixtures) {
       expect(both(fixture(name))).toBe(true);
       expect(validateLora(Lora.parse(fixture(name)))).toEqual([]);
@@ -69,6 +69,19 @@ describe("Lora record", () => {
     expect(validateSchema(l)).toBe(false);
     expect(validateLora(l)).toContainEqual(expect.stringContaining("only an owner or admin can choose all-ages"));
     expect(both(mut((x) => { x.audience = "adult-only"; x.audience_set_by = null; x.audience_set_at = null; }))).toBe(true);
+  });
+
+  test("allow_suggesting is optional, boolean, and defaults by audience", () => {
+    expect(both(mut((l) => { l.allow_suggesting = true; }))).toBe(true);
+    expect(both(mut((l) => { l.allow_suggesting = false; }))).toBe(true);
+    expect(both(mut((l) => { l.allow_suggesting = "yes"; }))).toBe(false);
+    const allAges = Lora.parse(mut((l) => { delete l.allow_suggesting; }));
+    const adultOnly = Lora.parse(mut((l) => { l.audience = "adult-only"; l.allow_suggesting = undefined; }));
+    expect(loraAllowsSuggesting(allAges)).toBe(true);
+    expect(loraAllowsSuggesting(adultOnly)).toBe(false);
+    expect(loraAllowsSuggesting(Lora.parse(mut((l) => { l.allow_suggesting = true; })))).toBe(true);
+    expect(loraAllowsSuggesting(Lora.parse(mut((l) => { l.allow_suggesting = false; })))).toBe(false);
+    expect(both(mut(() => {}))).toBe(true);
   });
 
   test("availability is admins by default, and people only when who is people", () => {

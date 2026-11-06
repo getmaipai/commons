@@ -659,6 +659,11 @@ export function validateLora(lora: Lora): Problems {
   return problems;
 }
 
+/** Whether this LoRA may be suggested; legacy records follow their audience default. */
+export function loraAllowsSuggesting(lora: Lora): boolean {
+  return lora.allow_suggesting ?? lora.audience === "all-ages";
+}
+
 /** ADULT-LOCK-06: made_audience is the minor ceiling and lock is the
  * creator-clearable lock; a lock on an all-ages file has no meaning. */
 export function validateFileAdultLock(file: FileRecord): Problems {

@@ -268,6 +268,9 @@ class Lora(BaseModel):
     audience_set_at: AwareDatetime | None = Field(
         ..., description='When audience was last set, by import or by an admin.'
     )
+    allow_suggesting: bool | None = Field(
+        None, description='Whether this style may be suggested. When absent, defaults to true for all-ages and false for adult-only.'
+    )
     adult_check: AdultCheck | None = Field(
         None,
         description="Design revision 2, section 15.1. What the source's own data said about adult content, when it was read. Evidence only: it never decides access (audience does) and is never lowered by an admin's choice. `unknown` and `adult` are both treated as adult-only. Decided from source fields only (Civitai nsfw flag and per-image nsfwLevel, the Hugging Face tag not-for-all-audiences), never from a word list. Absent reads as state unknown, basis none.",
