@@ -1,3 +1,7 @@
+## [ui-v0.5.508] - 2026-11-06
+
+- WEATHER-SCENE-01 fix: the sky gradient's `color-mix` calls had the mix percentage after a comma, which is invalid CSS, so every sky fell back to the registered navy. The percentage now follows the second colour, and a test checks the shape of every `color-mix` in the sky rule.
+
 ## [ui-v0.5.507] - 2026-11-06
 
 - WEATHER-SCENE-01 scene foundation: phase-aware sky palettes, time-derived elevation and light positioning, sky-owned gradient and scrims, and WMO intensity mapping. Clouds, precipitation, and orchestration remain on their existing behavior.
