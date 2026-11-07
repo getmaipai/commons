@@ -35,8 +35,8 @@ from records.py.validate import (
     validate_relationship_endpoints,
     validate_reply_constraint,
     validate_subject_ref,
-    validate_turn_signal,
     validate_synth,
+    validate_turn_signal,
 )
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "records"
