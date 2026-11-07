@@ -1,3 +1,7 @@
+## [spec-v0.1.338] - 2026-11-07
+
+- I18N-K2, additive. The TypeScript `describeSetting` takes an optional third argument `t?: (id, fallback) => string`, applied to every copy field it returns (`does`, `title`, `what_is_stored`, `consent`, `reason`; ids `setting.<key>.<field>`, `.does.child`, `.does.teen`, `.label` when the label stands in, `.reason.<code>`; reason lines are translated before {admin} and {person} are filled in). Without it the output is byte-identical to before. The Python runtime is unchanged.
+
 ## [spec-v0.1.337] - 2026-11-07
 
 - i18n, additive. `household.locale` gains the option `es` (Spanish). New person key `person.locale` (select; `household`, `en-US`, `en-GB`, `es`; default `household`; lives in `person.profile`; honoured by home and bot): `household` follows the home's language, anything else is the person's own choice. No record shape changes.

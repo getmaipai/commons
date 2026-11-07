@@ -80,3 +80,49 @@ describe("COPY-LINT-01", () => {
     }).band_default).toEqual({ child: 0, teen: 3, adult: 5 });
   });
 });
+
+describe("describeSetting translator (I18N-K2)", () => {
+  const contexts = (band: DescribeSettingContext["subjectBand"]): DescribeSettingContext[] =>
+    (["self", "guardian", "admin"] as const).flatMap((viewer) =>
+      ([[true, true, "user"], [false, false, "default"], [true, false, "user"], [false, false, "user"]] as const).map(([value, effective, source]) => ({
+        subjectBand: band, viewer, value, effective, source, adminName: "Dad", personName: "Nova",
+      })),
+    );
+
+  test("an identity translator is byte-identical to no translator over every key, band and reader", () => {
+    const identity = (_id: string, fallback: string) => fallback;
+    for (const setting of registry) {
+      for (const band of ["child", "teen", "adult"] as const) {
+        for (const context of contexts(band)) {
+          expect(JSON.stringify(describeSetting(setting, context, identity))).toBe(JSON.stringify(describeSetting(setting, context)));
+        }
+      }
+    }
+    for (const row of rows) expect(JSON.stringify(describeSetting(row.setting, row.context))).toBe(JSON.stringify(row.expected));
+  });
+
+  test("a translator sees stable ids and the English text, and its result is used", () => {
+    const seen: [string, string][] = [];
+    const t = (id: string, fallback: string) => { seen.push([id, fallback]); return `[es] ${fallback}`; };
+    const setting: SettingDefinition = {
+      key: "demo.key", label: "Demo", scope: "person", selector: "toggle", default: true,
+      copy: { does: "Does a thing.", does_child: "Kid thing.", title: "Title", what_is_stored: "Stored.", consent_adult_self: "OK?" },
+      control: { child: "guardian", teen: "self", adult: "self" },
+      band_default: { child: false, teen: true, adult: true },
+    };
+    const adult = describeSetting(setting, { subjectBand: "adult", viewer: "self", value: true, source: "user", effective: true }, t);
+    expect(adult).toEqual({ does: "[es] Does a thing.", title: "[es] Title", what_is_stored: "[es] Stored.", consent: "[es] OK?" });
+    expect(seen.map(([id]) => id)).toEqual(["setting.demo.key.does", "setting.demo.key.title", "setting.demo.key.what_is_stored", "setting.demo.key.consent"]);
+    const child = describeSetting(setting, { subjectBand: "child", viewer: "admin", value: false, source: "default", effective: false, adminName: "Dad", personName: "Nova" }, t);
+    expect(child.does).toBe("[es] Kid thing.");
+    expect(seen.some(([id]) => id === "setting.demo.key.does.child")).toBe(true);
+    expect(child.reason).toStartWith("[es] ");
+    expect(seen.some(([id]) => id.startsWith("setting.demo.key.reason."))).toBe(true);
+  });
+
+  test("the label is the fallback copy and is translated too", () => {
+    const setting: SettingDefinition = { key: "bare.key", label: "Bare", scope: "person", selector: "toggle", default: false };
+    const t = (id: string, fallback: string) => (id === "setting.bare.key.label" ? "Desnudo" : fallback);
+    expect(describeSetting(setting, { subjectBand: "adult", viewer: "self", value: false, source: "default", effective: false }, t).does).toBe("Desnudo");
+  });
+});

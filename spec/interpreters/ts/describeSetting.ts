@@ -54,25 +54,34 @@ function render(line: string, context: DescribeSettingContext): string {
     .replaceAll("{person}", context.personName ?? "{person}");
 }
 
-function reasonLine(code: string, context: DescribeSettingContext): string | undefined {
+/** Optional translator: receives a stable id and the English text, returns the text to show. */
+export type SettingCopyTranslator = (id: string, fallback: string) => string;
+
+function reasonLine(code: string, context: DescribeSettingContext, key: string, t?: SettingCopyTranslator): string | undefined {
   const reader = context.viewer === "admin" || context.viewer === "guardian" ? "admin" : context.subjectBand;
   const entry = VOCAB[code]?.[reader];
   if (!entry) return undefined;
   const keyed = entry[context.effective === true ? "on" : "off"];
-  return render(keyed ?? entry.line ?? "", context) || undefined;
+  const template = keyed ?? entry.line ?? "";
+  // Translate the template before the names are filled in, so {admin} and {person} survive.
+  const text = t && template ? t(`setting.${key}.reason.${code}`, template) : template;
+  return render(text, context) || undefined;
 }
 
 /** Compose one setting description from its spec declaration and this reader's context. */
-export function describeSetting(setting: SettingDefinition, context: DescribeSettingContext): SettingDescription {
-  const does =
-    (context.subjectBand === "child" ? setting.copy?.does_child : undefined) ??
-    (context.subjectBand === "teen" ? setting.copy?.does_teen : undefined) ??
-    setting.copy?.does ??
-    setting.label;
+export function describeSetting(setting: SettingDefinition, context: DescribeSettingContext, t?: SettingCopyTranslator): SettingDescription {
+  const id = (field: string) => `setting.${setting.key}.${field}`;
+  const tr = (field: string, text: string) => (t ? t(id(field), text) : text);
+  const childDoes = context.subjectBand === "child" ? setting.copy?.does_child : undefined;
+  const teenDoes = context.subjectBand === "teen" ? setting.copy?.does_teen : undefined;
+  const does = childDoes != null ? tr("does.child", childDoes)
+    : teenDoes != null ? tr("does.teen", teenDoes)
+      : setting.copy?.does != null ? tr("does", setting.copy.does)
+        : tr("label", setting.label);
   const result: SettingDescription = { does };
   const copy = setting.copy;
-  if (copy?.title) result.title = copy.title;
-  if (copy?.what_is_stored) result.what_is_stored = copy.what_is_stored;
+  if (copy?.title) result.title = tr("title", copy.title);
+  if (copy?.what_is_stored) result.what_is_stored = tr("what_is_stored", copy.what_is_stored);
   const consent = context.viewer === "self"
     ? context.subjectBand === "adult" ? copy?.consent_adult_self
       : context.subjectBand === "teen" ? copy?.consent_teen_self
@@ -80,12 +89,12 @@ export function describeSetting(setting: SettingDefinition, context: DescribeSet
     : context.viewer === "guardian" && context.subjectBand === "child" ? copy?.consent_child_parent
       : context.viewer === "admin" && context.subjectBand === "child" ? copy?.consent_child_parent
         : copy?.consent_guest;
-  if (consent) result.consent = consent;
+  if (consent) result.consent = tr("consent", consent);
 
   if (context.subjectBand === "teen" && context.viewer !== "self") return result;
   if (context.effective !== context.value && context.value === true && context.effective === false) {
     result.state = stateText(context.effective);
-    result.reason = reasonLine("stricter_robot", context);
+    result.reason = reasonLine("stricter_robot", context, setting.key, t);
     return result;
   }
 
@@ -104,7 +113,7 @@ export function describeSetting(setting: SettingDefinition, context: DescribeSet
           : undefined;
   if (locked || reason === "stricter_robot") {
     result.state = stateText(context.effective);
-    if (reason) result.reason = reasonLine(reason, context);
+    if (reason) result.reason = reasonLine(reason, context, setting.key, t);
   }
   return result;
 }
