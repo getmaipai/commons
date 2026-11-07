@@ -342,7 +342,9 @@ def test_reachy_eye_capability_is_only_on_the_fitted_fixture():
 
 def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
     commands = load_fixture("device-command.kinds.example.json")
-    assert len(commands) == 16
+    # 16 kinds; notify appears twice (the text form and the waiting form).
+    assert len(commands) == 17
+    assert len({command["kind"] for command in commands}) == 16
     for command in commands:
         DeviceCommand.model_validate(command)
     invalid = {**commands[0], "kind": "capture_request"}

@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import (
+    field_validator,
     AnyUrl,
     AwareDatetime,
     BaseModel,
@@ -218,6 +219,13 @@ class MediaItem(BaseModel):
         [],
         description='A rescan updates every field except these; an edit adds the field name here.',
     )
+
+    @field_validator('locked_fields')
+    @classmethod
+    def locked_fields_must_be_unique(cls, value):
+        if len(value) != len(set(value)):
+            raise ValueError('locked_fields must contain unique values')
+        return value
     source_id: constr(pattern=r'^msrc-[a-z0-9]{6,}$') = Field(
         ...,
         description='The media-source this item came from (a root, a feed, a channel or a pasted link).',

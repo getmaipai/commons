@@ -1,3 +1,7 @@
+## [spec-v0.1.336] - 2026-11-06
+
+- Python baseline, no schema change. `gen-py.sh` re-adds the `locked_fields` uniqueness check on the generated `MediaItem` (datamodel-code-generator drops `uniqueItems`; a regeneration had silently lost the validator, so Python accepted a duplicate like the TypeScript validator rejects). The Python device-command fixture test now expects 17 entries (16 kinds, `notify` twice) matching the TypeScript test.
+
 ## [spec-v0.1.335] - 2026-11-06
 
 - WEATHER-SCENE-07, additive. The `weather_card` answer block gains three optional props: `sunrise` and `sunset` (ISO 8601 local date-time strings in the place's zone, the shape of `hourly[].time`, for example `2026-10-16T07:12`) and `wind_speed` (number, km/h, 0 to 400). Absent reads as before (fixed dawn and dusk, calm air), so every existing block validates unchanged.

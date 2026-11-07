@@ -51,6 +51,30 @@ assert old in text, "integration.options field shape changed; update gen-py.sh"
 path.write_text(text.replace(old, "    ) = Field(\n        None,\n        max_length=8,\n        description=\"Non-secret per-instance", 1))
 PY
 
+# datamodel-code-generator drops `uniqueItems` for Pydantic. MediaItem.locked_fields
+# is unique in the schema (and in the TypeScript validator), so re-add the check
+# (MEDIA-DETAIL-00; the invalid-locked-duplicate fixture proves it).
+python3 - <<'PY'
+from pathlib import Path
+
+path = Path("gen/py/media_item_schema.py")
+text = path.read_text()
+anchor = "        description='A rescan updates every field except these; an edit adds the field name here.',\n    )\n"
+assert anchor in text, "media-item locked_fields field shape changed; update gen-py.sh"
+check = (
+    "\n    @field_validator('locked_fields')\n"
+    "    @classmethod\n"
+    "    def locked_fields_must_be_unique(cls, value):\n"
+    "        if len(value) != len(set(value)):\n"
+    "            raise ValueError('locked_fields must contain unique values')\n"
+    "        return value\n"
+)
+text = text.replace(anchor, anchor + check, 1)
+if "field_validator" not in text.split("class ", 1)[0]:
+    text = text.replace("from pydantic import (\n", "from pydantic import (\n    field_validator,\n", 1)
+path.write_text(text)
+PY
+
 # Stack wire schemas are excluded from the broad sweep because their
 # conditional schemas are not preserved reliably. STT's event uses oneOf,
 # which datamodel-code-generator handles, so keep its Python mirror generated
