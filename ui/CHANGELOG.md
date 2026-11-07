@@ -1,3 +1,7 @@
+## [ui-v0.5.523] - 2026-11-07
+
+- WEATHER-SCENE-08 fix: the cloud shelf was cut with a mask-composite list (`intersect, add, ...`) that the browser computed as all `add`, so every cloud rendered as a solid rectangular slab. The soft puff mask stays; the flat bottom is now `clip-path: inset(...)` driven by a per-shape `--shelf`, with no mask compositing. (ui-v0.5.517 has the broken clouds; use this tag.)
+
 ## [ui-v0.5.522] - 2026-11-07
 
 - PHONE-KIT-02: the phone `page-controls` row no longer pulls past the page edge and its buttons use the same round card look as the article toolbar.

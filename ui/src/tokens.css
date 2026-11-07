@@ -2143,6 +2143,7 @@ body {
   width: var(--s);
   aspect-ratio: 2.6 / 1;
   transform-origin: top center;
+  clip-path: inset(0 0 calc(100% - var(--shelf, 76%)) 0);
   --cloud-lit: var(--wx-cloud-lit);
   --cloud-shade: var(--wx-cloud-shade);
   opacity: var(--o);
@@ -2159,8 +2160,6 @@ body {
   -webkit-mask-repeat: no-repeat;
   mask-size: 100% 100%;
   -webkit-mask-size: 100% 100%;
-  mask-composite: var(--cloud-mc);
-  -webkit-mask-composite: var(--cloud-mc-webkit);
 }
 [data-slot="weather-sky"] [data-fx="cloud"]::before { translate: 0 5%; background: color-mix(in oklab, var(--cloud-shade), transparent 45%); }
 [data-slot="weather-sky"] [data-fx="cloud"]::after { background: radial-gradient(110% 80% at 88% 0%, color-mix(in oklab, var(--cloud-lit), var(--wx-glow) 55%) 0, transparent 52%), linear-gradient(to top, var(--cloud-shade) 0 24%, var(--cloud-lit) 62%); }
