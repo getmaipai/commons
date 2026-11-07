@@ -1,3 +1,7 @@
+## [spec-v0.1.337] - 2026-11-07
+
+- i18n, additive. `household.locale` gains the option `es` (Spanish). New person key `person.locale` (select; `household`, `en-US`, `en-GB`, `es`; default `household`; lives in `person.profile`; honoured by home and bot): `household` follows the home's language, anything else is the person's own choice. No record shape changes.
+
 ## [spec-v0.1.336] - 2026-11-06
 
 - Python baseline, no schema change. `gen-py.sh` re-adds the `locked_fields` uniqueness check on the generated `MediaItem` (datamodel-code-generator drops `uniqueItems`; a regeneration had silently lost the validator, so Python accepted a duplicate like the TypeScript validator rejects). The Python device-command fixture test now expects 17 entries (16 kinds, `notify` twice) matching the TypeScript test.

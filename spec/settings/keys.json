@@ -1594,7 +1594,8 @@
     "range": {
       "options": [
         "en-US",
-        "en-GB"
+        "en-GB",
+        "es"
       ]
     },
     "default": "en-US",
@@ -3821,6 +3822,38 @@
     "lives_in": "profile.appearance",
     "honoured_by": [
       "home"
+    ]
+  },
+  {
+    "key": "person.locale",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "household",
+        "en-US",
+        "en-GB",
+        "es"
+      ]
+    },
+    "default": "household",
+    "label": "Language",
+    "help": "The language Home uses for you. When this is set to household, the household language is used. Spanish is translated by Home's own model and checked at home; if a line reads wrong, tell the person who runs your home.",
+    "level": "basic",
+    "secret": false,
+    "copy": {
+      "does": "Sets how Home talks and writes to you, or follows the home.",
+      "options": {
+        "household": "Use whatever the home uses.",
+        "en-US": "English, with United States dates and units.",
+        "en-GB": "English, with United Kingdom dates and units.",
+        "es": "Spanish, translated by Home's own model."
+      }
+    },
+    "lives_in": "person.profile",
+    "honoured_by": [
+      "home",
+      "bot"
     ]
   },
   {
