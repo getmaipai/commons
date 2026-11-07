@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test"
-import { render } from "@testing-library/react"
+import { cleanup, render } from "@testing-library/react"
 import { i18n as lingui } from "@lingui/core"
 import { i18n, loadKitCatalog, kitLocaleTag } from "@/kit/i18n"
 import { kitChain } from "@/kit/kitLocales"
@@ -11,6 +11,8 @@ import { BatchBar } from "@/kit/primitives/BatchBar"
 // back to English for anything a catalog does not have.
 
 afterEach(() => {
+  // Without this the English test's toolbar stays mounted when another file in the same run turns RTL's auto-cleanup off.
+  cleanup()
   // Lingui keeps the last activated locale; an empty id is the "nothing active" state the kit must survive.
   ;(lingui as unknown as { _locale: string })._locale = ""
 })
