@@ -1,28 +1,28 @@
 {
-  "phase": { "nightBelow": -6, "dayAbove": 4, "smoothstepSpan": 10, "elevationClamp": 12, "degreesPerMinute": 0.2 },
-  "strength": { "overcastFactor": 0.7 },
-  "night": { "lightnessFloor": 0.14, "lightnessFactor": 0.42, "chromaHigh": 0.75, "chromaLow": 0.5, "huePull": 0.45, "hueTarget": 264 },
-  "dusk": { "topMix": 0.5, "midMix": 0.42, "bottomMix": 0.72, "glowMix": 1 },
-  "dawn": { "topMix": 0.4, "midMix": 0.3, "bottomMix": 0.62, "glowMix": 1 },
-  "caps": { "top": 0.46, "mid": 0.5, "bottom": 0.5 },
-  "scrim": { "alphaClear": 0.46, "alphaOvercast": 0.28 },
-  "effects": { "vignetteOpacity": 0.24, "grainOpacity": 0.06, "grainFrequency": 0.9, "grainOctaves": 2, "grainTile": 160, "effectWhite": 0.22 },
-  "light": { "fullXStart": 88, "fullXTravel": 28, "fullYStart": 40, "fullYTravel": 30, "compactX": 86, "compactYStart": 50, "compactYTravel": 24, "minimumY": 40, "minimumX": 60 },
-  "variants": ["full", "compact", "wide", "lite"],
+  "phase": {"nightBelow":-6,"dayAbove":4,"smoothstepSpan":10,"elevationClamp":12,"degreesPerMinute":0.2},
+  "strength": {"overcastFactor":0.7},
+  "night": {"lightnessFloor":0.14,"lightnessFactor":0.42,"chromaHigh":0.75,"chromaLow":0.5,"huePull":0.45,"hueTarget":264},
+  "dusk": {"topMix":0.5,"midMix":0.42,"bottomMix":0.72,"glowMix":1},
+  "dawn": {"topMix":0.4,"midMix":0.3,"bottomMix":0.62,"glowMix":1},
+  "caps": {"top":0.46,"mid":0.5,"bottom":0.5},
+  "scrim": {"alphaClear":0.46,"alphaOvercast":0.28},
+  "effects": {"vignetteOpacity":0.24,"grainOpacity":0.06,"grainFrequency":0.9,"grainOctaves":2,"grainTile":160,"effectWhite":0.22},
+  "light": {"fullXStart":88,"fullXTravel":28,"fullYStart":40,"fullYTravel":30,"compactX":86,"compactYStart":50,"compactYTravel":24,"minimumY":40,"minimumX":60},
+  "variants": ["full","compact","wide","lite"],
   "clouds": {
-    "wind": { "base": 0.6, "perKmh": 0.03333333333333333, "min": 0.6, "max": 2.4 },
+    "wind": {"base":0.6,"perKmh":0.03333333333333333,"min":0.6,"max":2.4},
     "defaultWidth": 420,
     "depths": {
-      "far": { "scale": 0.62, "opacity": 0.34, "speed": 7, "y": [0, 22], "z": 21, "width": 160 },
-      "mid": { "scale": 0.88, "opacity": 0.56, "speed": 13, "y": [8, 40], "z": 22, "width": 220 },
-      "near": { "scale": 1.15, "opacity": 0.72, "speed": 22, "y": [20, 56], "z": 23, "width": 300 }
+      "far": {"scale":0.62,"opacity":0.34,"speed":7,"y":[0,22],"z":21,"width":160,"widthCqw":38,"minWidth":56},
+      "mid": {"scale":0.88,"opacity":0.56,"speed":13,"y":[8,40],"z":22,"width":220,"widthCqw":52,"minWidth":76},
+      "near": {"scale":1.15,"opacity":0.72,"speed":22,"y":[20,56],"z":23,"width":300,"widthCqw":71,"minWidth":100}
     },
-    "counts": { "clear": 2, "partly-cloudy": 4, "overcast": 6, "drizzle": 4, "rain": 5, "snow": 3, "thunderstorm": 6, "fog": 0 },
+    "counts": {"clear":2,"partly-cloudy":4,"overcast":6,"drizzle":4,"rain":5,"snow":3,"thunderstorm":6,"fog":0},
     "puffs": {
-      "a": [[18,62,16],[34,50,22],[52,44,24],[70,52,20],[86,64,14],[44,72,20],[62,74,18]],
-      "b": [[22,66,18],[38,46,24],[56,38,26],[72,52,22],[84,68,16],[48,74,22],[30,80,16]],
-      "c": [[30,60,20],[50,42,28],[70,58,22],[44,78,20],[62,80,18]]
+      "a": [[40.7,48.19,4.13],[45.61,45.1,5.68],[50.26,43.54,6.2],[54.9,46.13,5.17],[59.04,49.74,3.61],[48.19,51.29,5.17],[52.84,51.81,4.65]],
+      "b": [[43.97,48.12,7.01],[50.19,43.45,9.34],[57.2,40.33,10.12],[63.43,46.56,8.56],[68.1,52.79,6.23],[54.09,54.35,8.56],[47.08,56.68,6.23]],
+      "c": [[41.35,47.48,11.53],[52.88,41.71,16.14],[64.41,50.93,12.69],[49.43,62.46,11.53],[59.8,63.62,10.38]]
     }
   },
-  "intensity": { "51": 0.4, "53": 0.7, "55": 1, "56": 0.4, "57": 1, "61": 0.45, "63": 0.75, "65": 1, "66": 0.45, "67": 1, "71": 0.4, "73": 0.7, "75": 1, "77": 1, "80": 0.45, "81": 0.75, "82": 1, "85": 0.4, "86": 1, "95": 0.8, "96": 1, "99": 1 }
+  "intensity": {"51":0.4,"53":0.7,"55":1,"56":0.4,"57":1,"61":0.45,"63":0.75,"65":1,"66":0.45,"67":1,"71":0.4,"73":0.7,"75":1,"77":1,"80":0.45,"81":0.75,"82":1,"85":0.4,"86":1,"95":0.8,"96":1,"99":1}
 }

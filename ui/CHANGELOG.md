@@ -1,3 +1,7 @@
+## [ui-v0.5.511] - 2026-11-06
+
+- WEATHER-SCENE-02 cloud fix pass: circular soft puff masks fit inside each silhouette, cloud widths scale with the sky container, cloud bottoms stay above the text area, and night and twilight tints meet the palette limits in every theme.
+
 ## [ui-v0.5.510] - 2026-11-06
 
 - WEATHER-SCENE-02 clouds: the hand-placed blob stacks (and their `filter` blur) become mask-image clouds in three depth layers (far, mid, near) with three silhouettes, phase-tinted by new `--weather-*-cloud-*` tokens in all three theme blocks, per-class and per-variant counts, drift that always enters and leaves off the card, and wind-driven retiming at each cloud's next iteration. (ui-v0.5.509 was tagged by mistake on an old commit and is unusable; use this tag.)

@@ -16,6 +16,7 @@ const parse = (text: string): Lab => { const m = /oklch\(([\d.]+)\s+([\d.]+)\s+(
 const token = (src: string, name: string): Lab => { const m = new RegExp(`--weather-${name}:\\s*(oklch\\([^;]+\\))`).exec(src); if (!m) throw new Error(`Missing --weather-${name}`); return parse(m[1]!); };
 const resolvedToken = (src: string, name: string): Lab => { const direct=new RegExp(`--weather-${name}:\\s*(oklch\\([^;]+\\))`).exec(src); if(direct)return parse(direct[1]!); const alias=new RegExp(`--weather-${name}:\\s*var\\(--weather-([\\w-]+)\\)`).exec(src); if(!alias)throw new Error(`Missing --weather-${name}`); return token(src,alias[1]!); };
 const mixLab = (a: Lab,b: Lab,t: number): Lab => ({l:a.l*(1-t)+b.l*t,a:a.a*(1-t)+b.a*t,b:a.b*(1-t)+b.b*t,alpha:a.alpha*(1-t)+b.alpha*t});
+const polar = (c: Lab) => ({ chroma: Math.hypot(c.a,c.b), hue: (Math.atan2(c.b,c.a)*180/Math.PI+360)%360 });
 const rgb = (c: Lab): RGB => { const l=c.l+.3963377774*c.a+.2158037573*c.b, m=c.l-.1055613458*c.a-.0638541728*c.b, s=c.l-.0894841775*c.a-1.291485548*c.b; const f=(v:number)=>{v=v**3;return 255*(v<=.0031308?12.92*v:1.055*v**(1/2.4)-.055)}; return [f(l),f(m),f(s)]; };
 const linear=(v:number)=>{v=Math.max(0,Math.min(255,v))/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4};
 const luminance=(c:RGB)=>.2126*linear(c[0])+.7152*linear(c[1])+.0722*linear(c[2]);
@@ -50,7 +51,21 @@ describe("weather scene token contrast",()=>{
  test("registered weather properties keep the transition",()=>{for(const p of ["--wx-top","--wx-mid","--wx-bottom","--wx-glow","--wx-scrim","--wx-t"])expect(css).toContain(`@property ${p}`);expect(css).toContain("--wx-top 3200ms cubic-bezier(.37, 0, .63, 1)");});
  test("cloud day, night and twilight tints exist in all themes and stay out of the text band",()=>{
   const weatherClassList=["clear","partly-cloudy","overcast","drizzle","rain","snow","thunderstorm"];
-  for(const src of themes) for(const cls of weatherClassList) for(const suffix of ["lit","shade","night-lit","night-shade","twilight-lit","twilight-shade"]) expect(token(src,`${cls}-cloud-${suffix}`).l).toBeGreaterThan(0);
+  for(const src of themes) for(const cls of weatherClassList) {
+   const dayLit=token(src,`${cls}-cloud-lit`), dayShade=token(src,`${cls}-cloud-shade`);
+   const nightLit=token(src,`${cls}-cloud-night-lit`), nightShade=token(src,`${cls}-cloud-night-shade`);
+   const twilightLit=token(src,`${cls}-cloud-twilight-lit`), twilightShade=token(src,`${cls}-cloud-twilight-shade`);
+   expect(dayLit.l).toBeGreaterThan(0); expect(dayShade.l).toBeGreaterThan(0);
+   expect(nightLit.l).toBeLessThanOrEqual(.46); expect(nightShade.l).toBeLessThanOrEqual(.34);
+   expect(twilightLit.l).toBeLessThanOrEqual(.66); expect(twilightShade.l).toBeLessThanOrEqual(.42);
+   const lit=polar(twilightLit), shade=polar(twilightShade);
+   expect(lit.hue).toBeGreaterThanOrEqual(20); expect(lit.hue).toBeLessThanOrEqual(80); expect(lit.chroma).toBeGreaterThanOrEqual(.02); expect(lit.chroma).toBeLessThanOrEqual(.10);
+   expect(shade.hue<=60 || shade.hue>=330).toBe(true); expect(shade.chroma).toBeLessThanOrEqual(.07);
+   for(const [a,b] of [[nightLit,twilightLit],[twilightLit,dayLit],[nightShade,twilightShade],[twilightShade,dayShade]] as const) for(const t of [.25,.5,.75]) {
+    const blend=polar(mixLab(a,b,t));
+    expect(blend.hue<100 || blend.hue>200 || blend.chroma<=.03,`${cls} blended hue ${blend.hue.toFixed(1)} chroma ${blend.chroma.toFixed(3)}`).toBe(true);
+   }
+  }
   expect(css).toContain("--wx-cloud-lit 3200ms cubic-bezier(.37, 0, .63, 1)");
   const cloudRules=css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"] {'),css.indexOf('[data-slot="weather-sky"] [data-fx="fog"] {'));
   expect(cloudRules).toContain("20% 56%"); expect(cloudRules).toContain("0% 22%"); expect(cloudRules).toContain("8% 40%");

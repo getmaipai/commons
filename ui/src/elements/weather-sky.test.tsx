@@ -4,8 +4,10 @@ import { WeatherSky } from "./weather-sky";
 import { cloudWindFactor } from "./weather-scene";
 import { readFileSync } from "node:fs";
 import type { WeatherClass } from "./weather-condition";
+import scene from "./weather-scene.json";
 
 const css = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
+const skySource = readFileSync(new URL("./weather-sky.tsx", import.meta.url), "utf8");
 
 afterEach(cleanup);
 
@@ -28,9 +30,38 @@ describe("WeatherSky moon disc", () => {
     const rule = css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"] {'), css.indexOf('[data-slot="weather-sky"] [data-fx="fog"] {'));
     expect(rule).not.toContain("filter:"); expect(rule).not.toContain("blur(");
     expect(rule).toContain("mask-image:"); expect(rule).toContain("-webkit-mask-image:");
-    for (const text of ["scale(.62)", "opacity: .34", "scale(.88)", "opacity: .56", "scale(1.15)", "opacity: .72", "z-index: 21", "z-index: 22", "z-index: 23", "7px", "13px", "22px", "0% 22%", "8% 40%", "20% 56%"])
+    for (const text of ["scale: .62", "opacity: .34", "scale: .88", "opacity: .56", "scale: 1.15", "opacity: .72", "z-index: 21", "z-index: 22", "z-index: 23", "7px", "13px", "22px", "0% 22%", "8% 40%", "20% 56%"])
       expect(rule).toContain(text);
     expect(css).toContain("translate3d(100cqw, 0, 0)");
+  });
+  test("cloud puff circles fit their boxes and widths use container-relative clamps", () => {
+    const ratios: Record<string, number> = { a: 2.6, b: 1.9, c: 1.5 };
+    for (const [shape, puffList] of Object.entries(scene.clouds.puffs)) for (const [x = 0, y = 0, radius = 0] of puffList) {
+      const outerRadius = radius + 9;
+      expect(x - outerRadius).toBeGreaterThanOrEqual(4);
+      expect(y - outerRadius * ratios[shape]!).toBeGreaterThanOrEqual(4);
+      expect(100 - x - outerRadius).toBeGreaterThanOrEqual(4);
+      expect(100 - y - outerRadius * ratios[shape]!).toBeGreaterThanOrEqual(4);
+      expect(shape).toMatch(/^[abc]$/);
+    }
+    const cloudRules = css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"] {'), css.indexOf('[data-slot="weather-sky"] [data-fx="fog"] {'));
+    expect(cloudRules).not.toContain("ellipse");
+    expect(skySource).toMatch(/widthCqw[^\n]+cqw[^\n]+width/);
+    expect(skySource).toContain('"--s": p.size');
+    for (const depth of Object.values(scene.clouds.depths)) {
+      expect(depth.widthCqw).toBeGreaterThan(0);
+      expect(depth.width).toBeGreaterThan(depth.minWidth);
+      expect(skySource).toContain("clamp(${d.minWidth}px, ${d.widthCqw}cqw, ${d.width}px)");
+    }
+  });
+  test("cloud bottoms stay above the text zone at the far edge of every y band", () => {
+    const shapeRatio: Record<string, number> = { a: 2.6, b: 1.9, c: 1.5 };
+    for (const [width, height] of [[218, 170], [360, 220], [470, 230]] as const) for (const [depthName, depth] of Object.entries(scene.clouds.depths)) for (const [shape, ratio] of Object.entries(shapeRatio)) {
+      const cloudWidth = Math.max(depth.minWidth, Math.min(depth.widthCqw * width / 100, depth.width));
+      const cloudHeight = cloudWidth / ratio * depth.scale / height * 100;
+      const visualBottom = Math.min(depth.y[1] ?? 0, 56 - cloudHeight) + cloudHeight;
+      expect(visualBottom, `${width}x${height} ${depthName} ${shape}`).toBeLessThanOrEqual(56);
+    }
   });
   test("cloud windows have populated negative delays and wind retimes only at iteration", () => {
     expect(cloudWindFactor()).toBe(1); expect(cloudWindFactor(-100)).toBe(0.6); expect(cloudWindFactor(1000)).toBe(2.4);

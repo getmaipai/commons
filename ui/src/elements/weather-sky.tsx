@@ -31,7 +31,7 @@ function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: Wea
   const data = Array.from({ length: count }, (_, i) => {
     const depth = cloudDepths[i % 3]!; const d = scene.clouds.depths[depth];
     const shapes = classShapes[cls]; const shape = shapes[i % Math.max(1, shapes.length)] ?? "a";
-    const size = d.width; const duration = cloudDuration(width, size * d.scale, d.speed, factor);
+    const size = `clamp(${d.minWidth}px, ${d.widthCqw}cqw, ${d.width}px)`; const duration = cloudDuration(width, d.width * d.scale, d.speed, factor);
     const yMin = d.y[0] ?? 0; const yMax = d.y[1] ?? yMin;
     const y = yMin + ((i * 7 + 4) % (yMax - yMin + 1));
     return { depth, shape, size, duration, delay: -(i / count) * duration, y, mask: cloudMask(shape) };
@@ -40,13 +40,14 @@ function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: Wea
   const retime = (el: HTMLSpanElement, i: number) => {
     const p = data[i]; if (!p) return;
     const nextFactor = cloudWindFactor(pendingWind.current);
-    el.style.setProperty("--d", `${cloudDuration(width, p.size * scene.clouds.depths[p.depth].scale, scene.clouds.depths[p.depth].speed, nextFactor)}s`);
+    const depth = scene.clouds.depths[p.depth];
+    el.style.setProperty("--d", `${cloudDuration(width, depth.width * depth.scale, depth.speed, nextFactor)}s`);
   };
-  return <>{data.map((p, i) => <span ref={el => { refs.current[i] = el; }} key={i} data-fx="cloud" data-shape={p.shape} data-depth={p.depth} aria-hidden="true" onAnimationIteration={e => retime(e.currentTarget, i)} style={{ "--y": p.y, "--s": `${p.size}px`, "--d": `${p.duration}s`, "--dl": `${p.delay}s`, "--o": scene.clouds.depths[p.depth].opacity, "--z": scene.clouds.depths[p.depth].z, "--cloud-mask": p.mask } as Style}/>)}</>;
+  return <>{data.map((p, i) => <span ref={el => { refs.current[i] = el; }} key={i} data-fx="cloud" data-shape={p.shape} data-depth={p.depth} aria-hidden="true" onAnimationIteration={e => retime(e.currentTarget, i)} style={{ "--y": p.y, "--s": p.size, "--d": `${p.duration}s`, "--dl": `${p.delay}s`, "--o": scene.clouds.depths[p.depth].opacity, "--z": scene.clouds.depths[p.depth].z, "--cloud-mask": p.mask } as Style}/>)}</>;
 }
 function cloudMask(shape: "a" | "b" | "c") {
   const puffs = scene.clouds.puffs[shape] as number[][];
-  return puffs.map(puff => { const [x = 0, y = 0, r = 0] = puff; return `radial-gradient(ellipse ${r + 9}% ${r + 9}% at ${x}% ${y}%, var(--weather-ink) 82%, transparent 100%)`; }).join(", ");
+  return puffs.map(puff => { const [x = 0, y = 0, r = 0] = puff; return `radial-gradient(circle calc(var(--s) * ${(r + 9) / 100}) at ${x}% ${y}%, var(--weather-ink) 40%, transparent 100%)`; }).join(", ");
 }
 
 /** Shared decorative scene. Paused previews keep the same still composition. */
