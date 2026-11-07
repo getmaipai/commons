@@ -1,0 +1,22 @@
+{
+  "id": "sched-bad000007",
+  "person": "person-sage0001",
+  "kind": "remind",
+  "executor": "hub",
+  "time": "07:30",
+  "days": [],
+  "zone": "America/New_York",
+  "what": {
+    "targets": [],
+    "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "enabled": true,
+  "state": "active",
+  "grant_snapshot": [],
+  "deliver_on": "hub",
+  "deleted_at": null,
+  "provenance": "chat",
+  "created_at": "2026-11-06T12:00:00.000Z",
+  "updated_at": "2026-11-06T12:00:00.000Z",
+  "hlc": "1793980800000:0:hub001"
+}

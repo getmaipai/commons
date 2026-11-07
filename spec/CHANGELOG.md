@@ -1,3 +1,7 @@
+## [spec-v0.1.333] - 2026-11-06
+
+- SCHED-02 / HOUSE-01, additive. New `ScheduledTask` record (`sched-` ids): `person`, `kind` (remind, timer, turn, device_action, scene), `executor` (hub, home_assistant), a recurrence in the alarm's shape (`once_at`, or `time` with `days` and `zone`; ISO weekdays 1 to 7 as in `alarm`, empty `days` means every day), `what` (`targets`, `action`, `value` 1 to 100, `text` up to 200), `enabled`, `state`, `paused_reason`, an opaque `external_ref` that is never the id, `grant_snapshot`, `deliver_on` (hub, robot, both; default hub), tombstone `deleted_at`, provenance and clock stamp. `validateScheduledTask` (TypeScript) and `validate_scheduled_task` (Python) check: exactly one recurrence form; device_action and scene need targets and an action; remind, timer and turn need executor hub; `external_ref` differs from `id`. `grant-actions.json` is unchanged.
+
 ## [spec-v0.1.332] - 2026-11-06
 
 - SPEC-INSTANCES-02, additive. `Integration` gains optional `options`: an object of at most 8 non-secret per-instance settings (keys `^[a-z][a-z0-9_]{0,30}$`, string values of at most 200 characters), for example Uptime Kuma's `status_page` slug. The keys `token`, `password`, `secret` and `api_key` are rejected; secrets stay in the credentials center behind `credential_ref`.

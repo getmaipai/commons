@@ -1,0 +1,28 @@
+{
+  "id": "sched-daily0001",
+  "person": "person-sage0001",
+  "kind": "device_action",
+  "executor": "home_assistant",
+  "time": "07:30",
+  "days": [],
+  "zone": "America/New_York",
+  "what": {
+    "targets": [
+      "default/light.kitchen"
+    ],
+    "action": "turn_on",
+    "value": 60
+  },
+  "enabled": true,
+  "state": "active",
+  "external_ref": "ha-auto-7q3k9x",
+  "grant_snapshot": [
+    "default/light.kitchen"
+  ],
+  "deliver_on": "hub",
+  "deleted_at": null,
+  "provenance": "chat",
+  "created_at": "2026-11-06T12:00:00.000Z",
+  "updated_at": "2026-11-06T12:00:00.000Z",
+  "hlc": "1793980800000:0:hub001"
+}

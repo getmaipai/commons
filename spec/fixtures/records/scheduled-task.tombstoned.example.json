@@ -1,0 +1,24 @@
+{
+  "id": "sched-gone00001",
+  "person": "person-sage0001",
+  "kind": "remind",
+  "executor": "hub",
+  "time": "08:00",
+  "days": [
+    1
+  ],
+  "zone": "UTC",
+  "what": {
+    "targets": [],
+    "text": "Old reminder"
+  },
+  "enabled": false,
+  "state": "done",
+  "grant_snapshot": [],
+  "deliver_on": "hub",
+  "deleted_at": "2026-11-06T13:00:00.000Z",
+  "provenance": "chat",
+  "created_at": "2026-11-06T12:00:00.000Z",
+  "updated_at": "2026-11-06T12:00:00.000Z",
+  "hlc": "1793980800000:0:hub001"
+}

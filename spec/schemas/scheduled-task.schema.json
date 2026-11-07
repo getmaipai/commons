@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/scheduled-task.schema.json",
+  "title": "ScheduledTask",
+  "description": "SCHED-02 / HOUSE-01: one thing a person asked to happen later or on a repeat: a reminder, a timer, a turn run as the person, a device action or a scene. Design: Home docs/design/smart-home-controls (section 4) and the SCHED-HA-01 conditions D1 to D6 in SCHED-02.\n\nRECURRENCE: exactly one of two forms. A one-shot sets `once_at` (a timestamp) and none of `time`, `days`, `zone`. A repeat sets `time` (HH:MM local wall clock), `days` and `zone` (IANA zone) and no `once_at`. `days` uses the alarm record's weekday numbering (ISO, Monday is 1, Sunday is 7), and an empty array means every day (a one-shot uses `once_at`, so empty is not needed for that here). The next-occurrence semantics are Home's `nextOccurrence({ time, days, zone, after })` in backend/src/lib/scheduler.ts; this record adds no second recurrence grammar.\n\nCROSS-FIELD RULES (enforced by validateScheduledTask in records/ts/validate.ts and validate_scheduled_task in records/py/validate.py, not by this schema, because neither generator preserves JSON Schema conditionals): (1) exactly one recurrence form; (2) kind `device_action` or `scene` allows executor `hub` or `home_assistant` and requires non-empty `what.targets` and a `what.action`; (3) kind `remind`, `timer` or `turn` requires executor `hub`; (4) `external_ref` never equals `id`.\n\nTARGETS: each entry in `what.targets` and `grant_snapshot` is `<instance>/<native id>` per the connector-instances rule (split at the first `/`; no prefix means the `default` instance).\n\nEXTERNAL REF: `external_ref` is an opaque random token (for example the id of the Home Assistant automation that runs this task). It is NEVER derived from `id`, so knowing one tells nobody the other.\n\nREMOVAL: deleting sets `deleted_at` (a tombstone); the record and its id are kept.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "person",
+    "kind",
+    "executor",
+    "what",
+    "enabled",
+    "state",
+    "grant_snapshot",
+    "provenance",
+    "created_at",
+    "updated_at",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^sched-[a-z0-9]{6,}$",
+      "description": "Stable record id, never reused."
+    },
+    "person": {
+      "type": "string",
+      "pattern": "^person-[a-z0-9]{6,}$",
+      "description": "The person who owns this task."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["remind", "timer", "turn", "device_action", "scene"],
+      "description": "What the task does when it fires."
+    },
+    "executor": {
+      "type": "string",
+      "enum": ["hub", "home_assistant"],
+      "description": "Who fires it. `home_assistant` is only valid for device_action and scene."
+    },
+    "once_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "One-shot form: when it fires. Mutually exclusive with time, days and zone."
+    },
+    "time": {
+      "type": "string",
+      "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+      "description": "Repeat form: local wall-clock time in 24-hour HH:MM, same as the alarm record."
+    },
+    "days": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "integer", "minimum": 1, "maximum": 7 },
+      "description": "Repeat form: ISO weekdays, Monday is 1 (the alarm record's numbering). Empty means every day."
+    },
+    "zone": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Repeat form: IANA time zone name accepted by Intl.DateTimeFormat."
+    },
+    "what": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targets"],
+      "properties": {
+        "targets": {
+          "type": "array",
+          "maxItems": 50,
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "description": "Entity or scene ids, each `<instance>/<native id>`. Required non-empty for device_action and scene."
+        },
+        "action": {
+          "type": "string",
+          "enum": ["turn_on", "turn_off", "set_brightness", "activate"],
+          "description": "Required for device_action and scene."
+        },
+        "value": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Optional level, for example a brightness percent."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "For remind, timer and turn: what to say or ask."
+        }
+      }
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "state": {
+      "type": "string",
+      "enum": ["active", "paused", "failed", "done"]
+    },
+    "paused_reason": {
+      "type": "string",
+      "enum": ["grant_revoked", "scene_changed", "automation_unavailable", "owner_removed"],
+      "description": "Why the task is paused. Absent unless state is paused."
+    },
+    "external_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Opaque reference to the thing outside the hub that runs this task, such as a Home Assistant automation id. A random token, NEVER derived from `id`, and never equal to it."
+    },
+    "grant_snapshot": {
+      "type": "array",
+      "maxItems": 50,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+      "description": "The targets the creator could control when the task was created (`<instance>/<native id>`)."
+    },
+    "deliver_on": {
+      "type": "string",
+      "enum": ["hub", "robot", "both"],
+      "default": "hub",
+      "description": "Where a reminder or timer is delivered. The bot design's field. Absent means hub."
+    },
+    "deleted_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "default": null,
+      "description": "Tombstone. Null while the task exists."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1,
+      "description": "How this record came to exist, for example \"chat\" or \"routine\"."
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node."
+    }
+  }
+}

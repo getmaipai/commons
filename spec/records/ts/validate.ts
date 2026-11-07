@@ -39,6 +39,7 @@ import type { Transcript } from "../../gen/ts/transcript.js";
 import type { TranscriptRevision } from "../../gen/ts/transcript-revision.js";
 import type { CaptionTrack } from "../../gen/ts/caption-track.js";
 import type { Integration } from "../../gen/ts/integration.js";
+import type { ScheduledTask } from "../../gen/ts/scheduled-task.js";
 
 const VOCAB_DIR = join(import.meta.dir, "..", "..", "vocab");
 
@@ -723,4 +724,27 @@ export function splitGrantTarget(target: string): { instance: string; native: st
   const slash = target.indexOf("/");
   if (slash <= 0) return { instance: "default", native: target };
   return { instance: target.slice(0, slash), native: target.slice(slash + 1) };
+}
+
+/** SCHED-02: the ScheduledTask cross-field rules JSON Schema cannot carry.
+ * Mirrored by validate_scheduled_task in records/py/validate.py. */
+export function validateScheduledTask(record: ScheduledTask): Problems {
+  const problems: Problems = [];
+  const once = record.once_at !== undefined;
+  const repeat = record.time !== undefined || record.days !== undefined || record.zone !== undefined;
+  if (once && repeat) problems.push("once_at excludes time, days and zone");
+  if (!once && !repeat) problems.push("one of once_at or time, days and zone is required");
+  if (repeat && !once && (record.time === undefined || record.days === undefined || record.zone === undefined)) {
+    problems.push("time, days and zone are all required for a repeat");
+  }
+  if (record.kind === "device_action" || record.kind === "scene") {
+    if (record.what.targets.length === 0) problems.push(`kind ${record.kind} requires non-empty what.targets`);
+    if (record.what.action === undefined) problems.push(`kind ${record.kind} requires what.action`);
+  } else if (record.executor !== "hub") {
+    problems.push(`kind ${record.kind} requires executor hub`);
+  }
+  if (record.external_ref !== undefined && record.external_ref === record.id) {
+    problems.push("external_ref must not equal id");
+  }
+  return problems;
 }

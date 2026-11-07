@@ -522,3 +522,35 @@ def firmware_flash_manifest_signing_payload(record) -> bytes:
     return json.dumps(
         payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
     ).encode("utf-8")
+
+
+def validate_scheduled_task(record) -> Problems:
+    """SCHED-02: the ScheduledTask cross-field rules, mirroring validateScheduledTask in records/ts/validate.ts."""
+    data = (
+        record
+        if isinstance(record, dict)
+        else record.model_dump(mode="json", exclude_unset=True)
+    )
+    problems: Problems = []
+    once = data.get("once_at") is not None
+    repeat_keys = [k for k in ("time", "days", "zone") if data.get(k) is not None]
+    if once and repeat_keys:
+        problems.append("once_at excludes time, days and zone")
+    if not once and not repeat_keys:
+        problems.append("one of once_at or time, days and zone is required")
+    if repeat_keys and not once and len(repeat_keys) < 3:
+        problems.append("time, days and zone are all required for a repeat")
+    kind = data.get("kind")
+    what = data.get("what") or {}
+    if kind in ("device_action", "scene"):
+        if not what.get("targets"):
+            problems.append(f"kind {kind} requires non-empty what.targets")
+        if what.get("action") is None:
+            problems.append(f"kind {kind} requires what.action")
+    elif data.get("executor") != "hub":
+        problems.append(f"kind {kind} requires executor hub")
+    if data.get("external_ref") is not None and data.get("external_ref") == data.get(
+        "id"
+    ):
+        problems.append("external_ref must not equal id")
+    return problems
