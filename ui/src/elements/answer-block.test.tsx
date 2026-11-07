@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test, setSystemTime } from "bun:test";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { AnswerBlockView } from "./answer-block";
 import afterParagraph from "@maipai/spec/fixtures/answer-block/valid-after-paragraph.json";
@@ -149,6 +149,31 @@ describe("AnswerBlockView weather_card", () => {
     expect(container.querySelector('[data-slot="weather-card"]')?.getAttribute("data-class")).toBe("partly-cloudy");
     expect(getByText("Springfield")).toBeTruthy();
     expect(container.querySelectorAll('[data-slot="weather-day"]')).toHaveLength(3);
+  });
+  describe("sunrise, sunset and wind_speed (WEATHER-SCENE-07 UI half)", () => {
+    const base = fixture("weather_card") as { props: Record<string, unknown> };
+    const withSun = (extra: Record<string, unknown>) => ({ ...base, props: { ...base.props, ...extra } });
+    const sky = (block: unknown) => { const v = render(<AnswerBlockView block={block} />); const el = v.container.querySelector<HTMLElement>("[data-slot=weather-sky]")!; return { v, el }; };
+    afterEach(() => setSystemTime());
+    test("the phase follows the sunrise and sunset, not is_day", () => {
+      const times = { sunrise: "2026-10-17T07:00", sunset: "2026-10-17T18:00" };
+      setSystemTime(new Date("2026-10-17T12:00:00")); const noon = sky(withSun({ ...times, current: { ...(base.props.current as object), is_day: false } }));
+      expect(noon.el.dataset.phase).toBe("day"); noon.v.unmount();
+      setSystemTime(new Date("2026-10-17T03:00:00")); const night = sky(withSun({ ...times, current: { ...(base.props.current as object), is_day: true } }));
+      expect(night.el.dataset.phase).toBe("night"); night.v.unmount();
+    });
+    test("a block without the times still renders from is_day", () => {
+      const day = sky(withSun({ current: { ...(base.props.current as object), is_day: true } }));
+      expect(day.el.dataset.phase).toBe("day"); day.v.unmount();
+      const night = sky(withSun({ current: { ...(base.props.current as object), is_day: false } }));
+      expect(night.el.dataset.phase).toBe("night"); night.v.unmount();
+    });
+    test("wind_speed reaches the sky as wind and never lands on the DOM", () => {
+      const calm = sky(withSun({ wind_speed: 0 })); const calmDuration = calm.el.querySelector<HTMLElement>('[data-fx="cloud"]')!.style.getPropertyValue("--d"); calm.v.unmount();
+      const windy = sky(withSun({ wind_speed: 30 })); const windyDuration = windy.el.querySelector<HTMLElement>('[data-fx="cloud"]')!.style.getPropertyValue("--d");
+      expect(parseFloat(windyDuration)).toBeLessThan(parseFloat(calmDuration));
+      expect(windy.v.container.querySelector("[wind_speed], [wind-speed]")).toBeNull();
+    });
   });
 });
 

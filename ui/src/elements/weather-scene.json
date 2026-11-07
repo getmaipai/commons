@@ -84,6 +84,25 @@
     "referenceNewMoon": "2000-01-06T18:14:00Z",
     "phaseNames": ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"]
   },
+  "crossFade": {
+    "leaveMs": 400,
+    "leaveUnmountMs": 500,
+    "enterDelayMs": 300,
+    "enterMs": 800,
+    "cloudLeaveMs": 1200
+  },
+  "starCaps": {
+    "full": 54,
+    "wide": 54,
+    "compact": 30,
+    "lite": 18
+  },
+  "budgets": {
+    "full": 90,
+    "wide": 110,
+    "compact": 50,
+    "lite": 24
+  },
   "variants": [
     "full",
     "compact",

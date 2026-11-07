@@ -151,6 +151,13 @@ function HourColumn({ hour, unit }: { hour: WeatherHour; unit: string }) {
  * and day or night), and a strip of up to 8 daily columns beneath it. The `wide`
  * variant (package pages) is full width up to max-w-3xl, has a taller hero and draws
  * the next 24 `hourly` entries above the daily strip; `full` and `compact` ignore `hourly`.
+ *
+ * Props: `place`, `unit`, `current`, `daily`, `attribution` (required); `hourly`, `advice`, `alert`, `moon`;
+ * `sunrise` and `sunset` (ISO local strings) with `now` make the sky follow the real sun (else `current.is_day`);
+ * `wind` (km/h) speeds clouds, snow and fog; `thunderJolt` shakes the hero on a strike; `locale`; `variant`.
+ * Variants and the running-animation budgets of the sky behind them: `full` 90, `wide` 110, `compact` 50. The
+ * location cards of the forecast page use `WeatherSky variant="lite"` (24). The sky pauses off screen and in a
+ * hidden tab, cross-fades when the condition changes, and freezes mid-cycle under reduced motion.
  */
 export function WeatherCard({
   place,

@@ -144,8 +144,11 @@ function renderKind(
       );
     case "comparison":
       return <ComparisonCard {...props} />;
-    case "weather_card":
-      return <WeatherCard {...props} variant={compact ? "compact" : wide ? "wide" : "full"} />;
+    case "weather_card": {
+      // The block carries wind as `wind_speed` (km/h); the card calls it `wind`. sunrise and sunset keep their names.
+      const { wind_speed: windSpeed, ...card } = props;
+      return <WeatherCard {...card} wind={windSpeed} variant={compact ? "compact" : wide ? "wide" : "full"} />;
+    }
     case "story_feed":
       return <StoryFeed data={props} available={news?.available as never} onAction={news && ((action, ids) => news.onAction(action, ids))} />;
     case "article":

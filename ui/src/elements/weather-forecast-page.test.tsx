@@ -123,7 +123,7 @@ describe("WeatherForecastPage", () => {
     expect(container.querySelector('[data-slot="weather-moon-disk"]')).not.toBeNull();
   });
 
-  test("the sky CSS defines visible scene keyframes and freezes them for reduced motion", () => {
+  test("the sky CSS defines visible scene keyframes and freezes them mid-cycle for reduced motion", () => {
     expect(tokens).toContain("@keyframes wx-corona");
     expect(tokens).not.toMatch(/wx-rays|wx-sun-pulse|conic-gradient/);
     expect(tokens).toContain("#ffd75e");
@@ -136,11 +136,12 @@ describe("WeatherForecastPage", () => {
     expect(tokens).not.toContain("wx-flash");
     expect(tokens).toContain("@keyframes wx-fog");
     expect(tokens).toContain("@media (prefers-reduced-motion: reduce)");
-    expect(tokens).toContain("animation: none !important");
+    expect(tokens).toContain("animation-play-state: paused !important");
+    expect(tokens).toContain("animation-duration: var(--d) !important");
     expect(tokens).toContain(".weather-remove-chip");
   });
 
-  test("clear day has drifting clouds and a radial corona, with motion disabled for reduced motion", () => {
+  test("clear day has drifting clouds and a radial corona, with motion frozen for reduced motion", () => {
     const clear = [{ id: "sun", city: "Sun", detail: { temp: 82, condition: "Clear", code: 0, isDay: true } }];
     const { container } = render(<WeatherForecastPage locations={clear} selectedId="sun"/>);
     const sky = container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
@@ -149,7 +150,7 @@ describe("WeatherForecastPage", () => {
     expect(tokens).toContain("@keyframes wx-drift");
     expect(tokens).toContain("animation:wx-corona 7s cubic-bezier(.37,0,.63,1) infinite alternate");
     expect(tokens).toContain("@media (prefers-reduced-motion: reduce)");
-    expect(tokens).toContain("animation: none !important");
+    expect(tokens).toContain("animation-play-state: paused !important");
   });
 
   test("clear hero scenes contain sun and night stars", () => {

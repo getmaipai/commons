@@ -311,3 +311,131 @@ describe("lightPosition keeps the disc inside the card", () => {
     }
   });
 });
+
+describe("WEATHER-SCENE-06 cross-fade", () => {
+  const groups = (container: HTMLElement) => [...container.querySelectorAll<HTMLElement>("[data-weather-group]")];
+  test("first paint has no fade", () => {
+    const { container } = render(<WeatherSky cls="rain" isDay={true} code={63} running={true} />);
+    const [only] = groups(container);
+    expect(groups(container)).toHaveLength(1);
+    expect(only!.hasAttribute("data-entering")).toBe(false);
+    expect(only!.hasAttribute("data-leaving")).toBe(false);
+  });
+  test("a class change mounts the new group entering and keeps the old one leaving for 500 ms", () => {
+    jest.useFakeTimers();
+    const view = render(<WeatherSky cls="rain" isDay={true} code={63} running={true} />);
+    view.rerender(<WeatherSky cls="snow" isDay={true} code={73} running={true} />);
+    const both = groups(view.container);
+    expect(both.map(g => [g.dataset.class, g.dataset.leaving ?? "", g.dataset.entering ?? ""])).toEqual([["rain", "true", ""], ["snow", "", "true"]]);
+    expect(both[0]!.querySelector('[data-fx="fall"]')).not.toBeNull();
+    expect(both[1]!.querySelector('[data-fx="flake"]')).not.toBeNull();
+    act(() => { jest.advanceTimersByTime(499); });
+    expect(groups(view.container)).toHaveLength(2);
+    act(() => { jest.advanceTimersByTime(2); });
+    const after = groups(view.container);
+    expect(after).toHaveLength(1);
+    expect(after[0]!.dataset.class).toBe("snow");
+    expect(view.container.querySelector('[data-fx="fall"]')).toBeNull();
+  });
+  test("clouds persist across a change between classes that both have clouds, and extras fade for 1.2 s", () => {
+    jest.useFakeTimers();
+    const view = render(<WeatherSky cls="overcast" isDay={true} running={true} />);
+    const first = [...view.container.querySelectorAll('[data-fx="cloud"]')];
+    expect(first).toHaveLength(6);
+    view.rerender(<WeatherSky cls="snow" isDay={true} code={73} running={true} />);
+    const during = [...view.container.querySelectorAll('[data-fx="cloud"]')];
+    expect(during).toHaveLength(6);
+    for (let i = 0; i < 6; i++) expect(during[i]).toBe(first[i]);
+    expect(during.filter(c => c.getAttribute("data-leaving") === "true")).toHaveLength(3);
+    act(() => { jest.advanceTimersByTime(1250); });
+    expect(view.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(3);
+    expect(view.container.querySelectorAll('[data-fx="cloud"][data-leaving]')).toHaveLength(0);
+    expect([...view.container.querySelectorAll('[data-fx="cloud"]')].every((c, i) => c === first[i])).toBe(true);
+  });
+  test("a phase change alone never swaps groups", () => {
+    const view = render(<WeatherSky cls="clear" isDay={true} running={true} />);
+    view.rerender(<WeatherSky cls="clear" isDay={false} running={true} />);
+    expect(groups(view.container)).toHaveLength(1);
+    expect(groups(view.container)[0]!.hasAttribute("data-entering")).toBe(false);
+  });
+  test("CSS: the group is sized, enters with an opacity-only keyframe and leaves with a 400 ms fade", () => {
+    const sized = skyRule('[data-slot="weather-sky"] [data-weather-group]');
+    expect(sized).toMatch(/position:\s*absolute;[^}]*inset:\s*0/);
+    expect(sized).toContain("pointer-events: none");
+    expect(skyRule('[data-slot="weather-sky"] [data-weather-group][data-entering="true"]')).toContain("animation: wx-enter 800ms ease-out 300ms backwards");
+    const leave = skyRule('[data-slot="weather-sky"] [data-weather-group][data-leaving="true"]');
+    expect(leave).toContain("opacity: 0"); expect(leave).toContain("transition: opacity 400ms");
+    expect(keyframe("wx-enter")).toBe("@keyframes wx-enter { from { opacity: 0; } to { opacity: 1; } }");
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="cloud"][data-leaving="true"]')).toContain("transition: opacity 1200ms");
+  });
+});
+
+describe("WEATHER-SCENE-06 running pause and reduced motion CSS", () => {
+  test("data-running=false pauses every animation, once", () => {
+    const rule = '[data-slot="weather-sky"][data-running="false"] [data-fx], [data-slot="weather-sky"][data-running="false"] [data-fx] * { animation-play-state: paused; }';
+    expect(css.split(rule)).toHaveLength(2);
+    expect(css).toContain('[data-slot="weather-sky"][data-running="false"] [data-weather-group] { animation-play-state: paused; }');
+  });
+  const exception = /\[data-slot="weather-sky"\] \[data-fx\] \{\s*animation-duration: var\(--d\) !important;\s*animation-iteration-count: infinite !important;\s*animation-play-state: paused !important;\s*transition: none !important;\s*\}/g;
+  test("the scoped exception exists once in the media query and once for calm mode, and merges the old copies", () => {
+    const media = css.slice(css.indexOf("WEATHER-SCENE-06 reduced motion"), css.indexOf("WEATHER-SCENE-06 end"));
+    expect(media.length).toBeGreaterThan(100);
+    const blocks = media.match(exception) ?? [];
+    expect(blocks).toHaveLength(2);
+    expect(media).toContain("@media (prefers-reduced-motion: reduce) {");
+    expect(media).toContain('html[data-ease-motion="calm"] [data-slot="weather-sky"] [data-fx"]'.replace('data-fx"]', 'data-fx]'));
+    expect(media).toContain("scoped exception");
+    expect(media).not.toContain("animation: none");
+    expect(css.match(/html\[data-ease-motion="calm"\] \[data-slot="weather-card"\] \[data-fx\]/g) ?? []).toHaveLength(0);
+  });
+  test("the group wrapper keeps its fade-in from hiding the scene under reduced motion", () => {
+    const media = css.slice(css.indexOf("WEATHER-SCENE-06 reduced motion"), css.indexOf("WEATHER-SCENE-06 end"));
+    expect(media).toContain('[data-slot="weather-sky"] [data-weather-group] { animation-delay: 0s !important; }');
+  });
+  test("every wx loop keyframe starts at its resting look; only strike, sheet, splash and enter start hidden", () => {
+    const frames = [...css.matchAll(/@keyframes (wx-[a-z-]+) \{([^\n]*)\}\s*\n|@keyframes (wx-[a-z-]+)\s*\{\n([^}]*)\}/g)];
+    expect(frames.length).toBeGreaterThan(15);
+    const allowed = new Set(["wx-strike", "wx-sheet", "wx-splash", "wx-enter", "wx-star-in"]);
+    for (const m of frames) {
+      const name = (m[1] ?? m[3])!; const body = m[0];
+      expect(body, name).not.toMatch(/filter:|box-shadow:|background:/);
+      const first = /(?:from|0%)[^{]*\{([^}]*)\}/.exec(body)?.[1] ?? "";
+      if (!allowed.has(name)) expect(first, name).not.toMatch(/opacity:\s*0\s*[;}]|opacity:\s*0$/);
+    }
+  });
+});
+
+describe("WEATHER-SCENE-06 variants and budgets", () => {
+  const classes_: WeatherClass[] = ["clear", "partly-cloudy", "overcast", "fog", "drizzle", "rain", "snow", "thunderstorm"];
+  const codes: Record<WeatherClass, number> = { clear: 0, "partly-cloudy": 2, overcast: 3, fog: 45, drizzle: 53, rain: 65, snow: 75, thunderstorm: 99 };
+  const animated = '[data-fx="cloud"], [data-fx="star"], [data-fx="fall"], [data-fx="flake"], [data-fx="splash"], [data-fx="fog"], [data-fx="sun"], [data-fx="sun-corona"], [data-fx="sun-halo-a"], [data-fx="sun-halo-b"], [data-fx="moon-halo"], [data-fx="sway"], [data-fx="pile"], [data-fx="star-field"]';
+  test("the budgets in weather-scene.json match the design", () => {
+    expect(scene.budgets).toEqual({ full: 90, wide: 110, compact: 50, lite: 24 });
+  });
+  for (const size of [{ name: "reference", w: 420, h: 230 }, { name: "large (s = 2.2)", w: 924, h: 506 }])
+    test(`every class and variant stays within its animation budget at the ${size.name} size`, () => {
+      for (const variant of ["full", "wide", "compact", "lite"] as const) for (const cls of classes_) for (const isDay of [true, false]) {
+        const view = render(<WeatherSky cls={cls} isDay={isDay} code={codes[cls]} variant={variant} width={size.w} height={size.h} running={true} />);
+        const total = view.container.querySelectorAll(animated).length;
+        expect(total, `${cls} ${isDay ? "day" : "night"} ${variant}`).toBeLessThanOrEqual(scene.budgets[variant]);
+        view.unmount();
+      }
+    });
+  test("lite has no corona, grain, pendulum, pile or splashes", () => {
+    const snow = render(<WeatherSky cls="snow" isDay={true} code={75} variant="lite" running={true} />);
+    expect(snow.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(10);
+    expect(snow.container.querySelector('[data-fx="sway"]')).toBeNull(); expect(snow.container.querySelector('[data-fx="pile"]')).toBeNull();
+    snow.unmount();
+    const rain = render(<WeatherSky cls="rain" isDay={true} code={65} variant="lite" width={924} height={506} running={true} />);
+    expect(rain.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(8); expect(rain.container.querySelector('[data-fx="splash"]')).toBeNull();
+    expect(rain.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(2); rain.unmount();
+    const clear = render(<WeatherSky cls="clear" isDay={true} variant="lite" running={true} />);
+    expect(clear.container.querySelector('[data-fx="sun-corona"]')).toBeNull(); expect(clear.container.querySelector(".weather-sky-grain")).toBeNull();
+    clear.unmount();
+    const night = render(<WeatherSky cls="rain" isDay={false} code={65} variant="lite" running={true} />);
+    expect(night.container.querySelector('[data-fx="star"]')).toBeNull();
+  });
+  test("paused is documented as deprecated for variant lite", () => {
+    expect(skySource).toContain("@deprecated use variant=\"lite\"");
+  });
+});
