@@ -19,3 +19,9 @@ test("the music header icons are registered: shuffle and radio (MUSIC-POLISH-01)
   for (const name of ["shuffle", "radio"]) expect((iconNames as readonly string[]).includes(name)).toBe(true);
   expect(getIcon("shuffle")).toBe(icons.shuffle);
 });
+
+test("the key icon name Home asks for resolves to its own icon, not the unknown-name fallback", () => {
+  expect(iconNames).toContain("key");
+  expect(getIcon("key")).toBe(icons.key);
+  expect(icons.key).not.toBe(icons["key-round"]);
+});

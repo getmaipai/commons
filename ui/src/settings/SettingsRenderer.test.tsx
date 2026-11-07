@@ -273,6 +273,19 @@ describe("SettingsRenderer - writes", () => {
     expect((await view.findByRole("status")).textContent).toBe("Saved.");
   });
 
+  test("the Saved. line holds its space before and after a save, so no row moves", async () => {
+    mockApi(DEFS);
+    const view = renderWithQueryClient(<SettingsRenderer {...props} />);
+    await view.findByRole("switch", { name: "Send photos in chat" });
+    const slot = () => view.container.querySelector('[data-slot="settings-saved"]') as HTMLElement;
+    expect(slot().className).toContain("h-5");
+    expect(slot().textContent).toBe("");
+    await act(async () => { fireEvent.click(view.getByRole("switch", { name: "Send photos in chat" })); });
+    expect((await view.findByRole("status")).textContent).toBe("Saved.");
+    expect(slot().className).toContain("h-5");
+    expect(slot().contains(view.getByRole("status"))).toBe(true);
+  });
+
   test("a rejected write shows the server's sentence in an alert above the cards", async () => {
     mockApi(DEFS, {}, 422);
     const view = renderWithQueryClient(<SettingsRenderer {...props} />);

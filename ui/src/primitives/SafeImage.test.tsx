@@ -50,4 +50,21 @@ describe("SafeImage", () => {
       view.unmount();
     }
   });
+
+  test("a class that sizes the tile beats the width and height hints, so the icon stays inside a narrow tile", () => {
+    const sized = render(<SafeImage kind="music" width={320} height={240} className="absolute inset-0 size-full" />);
+    const tile = sized.container.querySelector('[data-slot="safe-image-fallback"]') as HTMLElement;
+    expect(tile.style.width).toBe("");
+    expect(tile.style.height).toBe("");
+    sized.unmount();
+    const hinted = render(<SafeImage kind="music" width={320} height={240} />);
+    const plain = hinted.container.querySelector('[data-slot="safe-image-fallback"]') as HTMLElement;
+    expect(plain.style.width).toBe("320px");
+    expect(plain.style.height).toBe("240px");
+    hinted.unmount();
+    const wide = render(<SafeImage kind="music" width={320} height={240} className="w-full" />);
+    const half = wide.container.querySelector('[data-slot="safe-image-fallback"]') as HTMLElement;
+    expect(half.style.width).toBe("");
+    expect(half.style.height).toBe("240px");
+  });
 });

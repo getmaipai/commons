@@ -431,12 +431,12 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
         {rowSummary ? <p data-slot="setting-summary" className="text-[13px] leading-4 text-settings-helper">{rowSummary}</p> : null}
         {lockedReason ? <p data-slot="setting-locked" className="text-[13px] leading-4 text-settings-helper">{lockedReason}</p> : null}
         {action ? (
-          <Button type="button" variant="link" size="row" onClick={action.onPress} disabled={disabledProp} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">
+          <Button type="button" variant="link" size="row" onClick={action.onPress} disabled={disabledProp} className="h-auto w-fit max-w-full justify-start whitespace-normal p-0 text-left text-[13px] leading-4 before:-inset-y-3.5">
             {action.label}
           </Button>
         ) : null}
         {canReset ? (
-          <Button type="button" variant="link" size="row" onClick={reset} disabled={disabled} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">
+          <Button type="button" variant="link" size="row" onClick={reset} disabled={disabled} title={i18n._({ id: "ui.Reset to default", message: "Reset to default" })} className="h-auto w-fit max-w-full justify-start whitespace-normal p-0 text-left text-[13px] leading-4 before:-inset-y-3.5">
             {i18n._({ id: "ui.Reset to default", message: "Reset to default" })}
           </Button>
         ) : null}

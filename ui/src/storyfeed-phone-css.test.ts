@@ -42,4 +42,11 @@ describe("StoryFeed phone tokens and strip", () => {
     expect(css).toContain("pointer-events: none");
     expect(css).toContain("z-index: 40");
   });
+
+  test("the chips bar spans the row so the avatar sits at the right and the chips keep clear of the controls", () => {
+    expect(css).toContain('[data-slot="story-filters"]) [data-slot="rail-page-header"] { position: fixed; inset: 0 0 auto 0;');
+    expect(css).toContain('[data-slot="rail-page-header"] > * { pointer-events: auto; }');
+    expect(css).toContain("padding: 0 3.75rem 0 3.75rem;");
+    expect(css).toContain("padding-inline-end: 6.5rem;");
+  });
 });

@@ -3,9 +3,15 @@ import Logo from "../../../../assets/images/logos/darklogo.svg";
 import Logowhite from "../../../../assets/images/logos/whitelogo.svg";
 import { cn, hitArea } from "../../../../../utils";
 
-const FullLogo = () => {
+interface FullLogoProps {
+  /** Show the whole wordmark at every width. Unset, the logo is cropped to its 40 px mark below the `lg` breakpoint, which suits the
+   * header and the collapsed rail but cuts the logo off on a phone sign-in page. */
+  full?: boolean;
+}
+
+const FullLogo = ({ full = false }: FullLogoProps = {}) => {
   return (
-    <Link to={'/'} className={cn("relative max-w-[40px] block lg:max-w-[120px] overflow-hidden", hitArea(2))}>
+    <Link to={'/'} data-full={full ? "" : undefined} className={cn("relative block overflow-hidden", full ? "max-w-[120px]" : "max-w-[40px] lg:max-w-[120px]", hitArea(2))}>
       {/* Dark Logo   */}
       <img
         src={Logo}

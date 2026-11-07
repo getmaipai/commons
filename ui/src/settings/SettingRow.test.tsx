@@ -696,6 +696,24 @@ describe("SettingRow - unknown selector and reset", () => {
     expect(getByText("Not supported in this hub version yet.")).toBeTruthy();
   });
 
+  test("a settings row title may wrap to two lines inside its column instead of running under a badge", () => {
+    const { getByText } = render(<SettingRow setting={makeSetting({ selector: "text", value: "x" })} onChange={async () => true} onReset={() => {}} />);
+    const title = getByText("Sample setting");
+    expect(title.className).toContain("min-w-0");
+    expect(title.className).toContain("max-w-full");
+    expect(title.className).toContain("line-clamp-2");
+    expect(title.className).not.toContain("line-clamp-1");
+  });
+
+  test("Reset to default wraps and carries a title, so a long translation is never clipped at 375 px", () => {
+    const { getByRole } = render(<SettingRow setting={makeSetting({ selector: "boolean", value: true, source: "user" })} onChange={async () => true} onReset={() => {}} />);
+    const reset = getByRole("button", { name: "Reset to default" });
+    expect(reset.getAttribute("title")).toBe("Reset to default");
+    expect(reset.className).toContain("whitespace-normal");
+    expect(reset.className).toContain("max-w-full");
+    expect(reset.className).not.toContain("whitespace-nowrap");
+  });
+
   test("Reset to default shows only for a changed value and calls onReset", () => {
     const onReset = mock(() => {});
     const { getByRole, queryByRole, rerender } = render(

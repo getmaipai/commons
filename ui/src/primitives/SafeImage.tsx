@@ -24,6 +24,9 @@ const ICONS = {
   picture: "camera",
 } as const satisfies Record<ImageFallbackKind, string>;
 
+const CLASS_SIZES_WIDTH = /(?:^|\s)(?:size-|w-)/;
+const CLASS_SIZES_HEIGHT = /(?:^|\s)(?:size-|h-)/;
+
 export interface SafeImageProps extends Omit<ImageProps, "src" | "onError"> {
   src?: string | null;
   kind?: ImageFallbackKind;
@@ -49,8 +52,11 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
         aria-label={alt || undefined}
         aria-hidden={alt ? undefined : true}
         style={{
-          ...(props.width !== undefined ? { width: typeof props.width === "number" ? `${props.width}px` : props.width } : {}),
-          ...(props.height !== undefined ? { height: typeof props.height === "number" ? `${props.height}px` : props.height } : {}),
+          // A width and height prop are the picture's intrinsic hints. When the class already sizes that axis (`size-full`,
+          // `w-full`, `h-full`, a fixed `w-` or `h-`), the inline pixels would beat it, so a 320 x 240 hint on a 164 px tile drew the
+          // box wider than the tile and pushed the centred icon out of view at 375 px. The class wins; the hint only fills a gap.
+          ...(props.width !== undefined && !CLASS_SIZES_WIDTH.test(className ?? "") ? { width: typeof props.width === "number" ? `${props.width}px` : props.width } : {}),
+          ...(props.height !== undefined && !CLASS_SIZES_HEIGHT.test(className ?? "") ? { height: typeof props.height === "number" ? `${props.height}px` : props.height } : {}),
           ...props.style,
         }}
       >

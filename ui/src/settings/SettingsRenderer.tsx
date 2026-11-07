@@ -270,7 +270,10 @@ export function SettingsRenderer({
           <AlertDescription>{writeError}</AlertDescription>
         </Alert>
       ) : null}
-      {writeSaved ? <p role="status">{i18n._({ id: "ui.Saved.", message: "Saved." })}</p> : null}
+      {/* The line's 20 px are always in the layout, so "Saved." appearing never moves a row. */}
+      <div data-slot="settings-saved" className="h-5 text-sm leading-5">
+        {writeSaved ? <p role="status">{i18n._({ id: "ui.Saved.", message: "Saved." })}</p> : null}
+      </div>
       <AsyncState
         data={data}
         error={error}

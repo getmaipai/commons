@@ -182,7 +182,8 @@ function ItemTitle({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="item-title"
       className={cn(
         "line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4",
-        setting && "leading-5 text-foreground",
+        // A settings title may wrap to two lines inside its column (never run past it under a badge or a button beside it).
+        setting && "line-clamp-2 min-w-0 max-w-full leading-5 text-foreground [overflow-wrap:anywhere]",
         story && "block w-auto line-clamp-3 text-base",
         className
       )}
