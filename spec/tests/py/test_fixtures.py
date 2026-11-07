@@ -1035,6 +1035,8 @@ def test_answer_block_has_a_valid_fixture_per_v1_kind():
         "valid-story_feed-section-style.json",
         "valid-weather_card-advice.json",
         "valid-weather_card-moon.json",
+        "valid-weather_card-sun-wind.json",
+        "valid-weather_card-sun.json",
     }
 
 

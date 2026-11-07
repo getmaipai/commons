@@ -613,6 +613,24 @@ class Props8(BaseModel):
     hourly: list[HourlyItem] | None = Field(None, max_length=24)
     daily: list[DailyItem] = Field(..., max_length=8, min_length=1)
     attribution: str
+    sunrise: (
+        constr(pattern=r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$')
+        | None
+    ) = Field(
+        None,
+        description="Today's sunrise as an ISO 8601 local date-time in the place's zone, the same shape as hourly[].time (e.g. 2026-10-16T07:12). Absent: the card keeps its fixed dawn.",
+    )
+    sunset: (
+        constr(pattern=r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$')
+        | None
+    ) = Field(
+        None,
+        description="Today's sunset as an ISO 8601 local date-time in the place's zone, the same shape as hourly[].time (e.g. 2026-10-16T18:31). Absent: the card keeps its fixed dusk.",
+    )
+    wind_speed: confloat(ge=0.0, le=400.0) | None = Field(
+        None,
+        description='Current wind speed in km/h, whatever the temperature unit. Absent: the card draws calm air.',
+    )
     moon: Moon | None = Field(
         None,
         description="The moon's phase for a night card. Absent: the card keeps its generic moon.",

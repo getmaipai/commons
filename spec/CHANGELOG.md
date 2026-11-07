@@ -1,3 +1,7 @@
+## [spec-v0.1.335] - 2026-11-06
+
+- WEATHER-SCENE-07, additive. The `weather_card` answer block gains three optional props: `sunrise` and `sunset` (ISO 8601 local date-time strings in the place's zone, the shape of `hourly[].time`, for example `2026-10-16T07:12`) and `wind_speed` (number, km/h, 0 to 400). Absent reads as before (fixed dawn and dusk, calm air), so every existing block validates unchanged.
+
 ## [spec-v0.1.334] - 2026-11-06
 
 - LTXD, additive. The `Lora` record gains two optional fields: `tested_on_25` (`tested`, `no_effect` or null; only a record whose `base_model` is `ltx-2.3` holds a value, the Stack enforces that) and `untested_on_25` (boolean, derived by the Stack on read). Absent reads as null and false, so every existing record validates unchanged. The Stack's generation reply may also carry `lora_warnings` (`id`, `code` of `untested_on_25` or `tested_on_25`, `message`); that reply has no spec schema yet, so nothing changes for it here.

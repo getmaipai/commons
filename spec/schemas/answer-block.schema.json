@@ -554,6 +554,9 @@
               }
             },
             "attribution": { "type": "string" },
+            "sunrise": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$", "description": "Today's sunrise as an ISO 8601 local date-time in the place's zone, the same shape as hourly[].time (e.g. 2026-10-16T07:12). Absent: the card keeps its fixed dawn." },
+            "sunset": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$", "description": "Today's sunset as an ISO 8601 local date-time in the place's zone, the same shape as hourly[].time (e.g. 2026-10-16T18:31). Absent: the card keeps its fixed dusk." },
+            "wind_speed": { "type": "number", "minimum": 0, "maximum": 400, "description": "Current wind speed in km/h, whatever the temperature unit. Absent: the card draws calm air." },
             "moon": {
               "type": "object",
               "additionalProperties": false,

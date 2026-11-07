@@ -81,6 +81,20 @@ describe("answer-block fixtures", () => {
     expect(validate(moon)).toBe(true);
     expect(AnswerBlock.safeParse(moon).success).toBe(true);
   });
+
+  test("weather card sunrise, sunset and wind_speed are optional and bounded (WEATHER-SCENE-07)", () => {
+    for (const name of ["valid-weather_card-sun-wind.json", "valid-weather_card-sun.json"]) {
+      const block = read("fixtures", "answer-block", name);
+      expect(validate(block)).toBe(true);
+      expect(AnswerBlock.safeParse(block).success).toBe(true);
+    }
+    expect(read("fixtures", "answer-block", "valid-weather_card.json").props.wind_speed).toBeUndefined();
+    for (const name of ["invalid-weather-wind-negative.json", "invalid-weather-wind-401.json", "invalid-weather-sunrise-not-datetime.json"]) {
+      const block = read("fixtures", "answer-block", name);
+      expect(validate(block)).toBe(false);
+      expect(AnswerBlock.safeParse(block).success).toBe(false);
+    }
+  });
 });
 
 describe("after_paragraph (GENUI-13a)", () => {

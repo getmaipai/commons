@@ -1061,6 +1061,39 @@ export const AnswerBlock = z
                 .min(1)
                 .max(8),
               attribution: z.string(),
+              /**Today's sunrise as an ISO 8601 local date-time in the place's zone, the same shape as hourly[].time (e.g. 2026-10-16T07:12). Absent: the card keeps its fixed dawn.*/
+              sunrise: z
+                .string()
+                .regex(
+                  new RegExp(
+                    "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$",
+                  ),
+                )
+                .describe(
+                  "Today's sunrise as an ISO 8601 local date-time in the place's zone, the same shape as hourly[].time (e.g. 2026-10-16T07:12). Absent: the card keeps its fixed dawn.",
+                )
+                .optional(),
+              /**Today's sunset as an ISO 8601 local date-time in the place's zone, the same shape as hourly[].time (e.g. 2026-10-16T18:31). Absent: the card keeps its fixed dusk.*/
+              sunset: z
+                .string()
+                .regex(
+                  new RegExp(
+                    "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$",
+                  ),
+                )
+                .describe(
+                  "Today's sunset as an ISO 8601 local date-time in the place's zone, the same shape as hourly[].time (e.g. 2026-10-16T18:31). Absent: the card keeps its fixed dusk.",
+                )
+                .optional(),
+              /**Current wind speed in km/h, whatever the temperature unit. Absent: the card draws calm air.*/
+              wind_speed: z
+                .number()
+                .gte(0)
+                .lte(400)
+                .describe(
+                  "Current wind speed in km/h, whatever the temperature unit. Absent: the card draws calm air.",
+                )
+                .optional(),
               /**The moon's phase for a night card. Absent: the card keeps its generic moon.*/
               moon: z
                 .object({
