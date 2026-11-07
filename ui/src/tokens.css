@@ -854,6 +854,10 @@
   --weather-fallback-top: var(--weather-clear-night-top); --weather-fallback-mid: var(--weather-clear-night-mid); --weather-fallback-bottom: var(--weather-clear-night-bottom); --weather-fallback-scrim: var(--weather-clear-night-scrim);
 
   --weather-ink: #ffffff;
+  --weather-rain-streak: color-mix(in oklab, var(--weather-ink), transparent 22%);
+  --weather-snow-flake: color-mix(in oklab, var(--weather-ink), transparent 8%);
+  --weather-snow-pile: color-mix(in oklab, var(--weather-ink), transparent 18%);
+  --weather-fog-mist: color-mix(in oklab, var(--weather-ink), transparent 48%);
   --weather-range-end: var(--hue-orange);
   --weather-scrim: rgb(0 0 0 / 0.16);
   --weather-text-scrim: rgb(0 0 0 / 0.45);
@@ -1246,6 +1250,10 @@
     --weather-scrim-base: #000000;
     --weather-vignette: rgb(0 0 0 / .24);
   --weather-ink: #ffffff;
+  --weather-rain-streak: color-mix(in oklab, var(--weather-ink), transparent 22%);
+  --weather-snow-flake: color-mix(in oklab, var(--weather-ink), transparent 8%);
+  --weather-snow-pile: color-mix(in oklab, var(--weather-ink), transparent 18%);
+  --weather-fog-mist: color-mix(in oklab, var(--weather-ink), transparent 48%);
     --weather-sun-core: #ffd75e;
     --weather-sun-edge: #ffb02e;
     --weather-sun-ray: rgb(255 232 174 / 0.72);
@@ -2077,36 +2085,34 @@ body {
   outline-color: transparent;
 }
 
-/* Weather scenes use compositor-friendly transforms and opacity. */
-[data-slot="weather-card"] [data-fx] {
-  position: absolute;
-  pointer-events: none;
-}
-[data-slot="weather-forecast-hero"] [data-fx],
-[data-slot="weather-location-sky"] [data-fx] {
-  position: absolute;
-  pointer-events: none;
-}
+/* Weather scenes are styled by the sky itself so standalone WeatherSky works. */
+[data-slot="weather-sky"] [data-fx] { position: absolute; pointer-events: none; }
 [data-slot="weather-sky"] [data-fx="fall"] {
-  top: -24px;
-  left: calc(var(--x) * 1%);
-  width: 1px;
-  height: calc(var(--s) * 1px);
-  opacity: var(--o);
-  transform: rotate(12deg);
-  background: linear-gradient(to bottom, transparent, var(--weather-ink));
-  animation: wx-rain var(--d) linear var(--dl) infinite;
+  top: -48px; left: calc(var(--x) * 1%); width: calc(var(--w) * 1px); height: calc(var(--s) * 1px);
+  opacity: var(--o); transform: rotate(var(--tilt, 0deg)); transform-origin: center top;
+  background: linear-gradient(to bottom, transparent, var(--weather-rain-streak));
+  animation: wx-fall var(--d) linear var(--dl) infinite;
 }
+[data-slot="weather-sky"] [data-fx="fall"] > [data-fx="splash"] {
+  position: absolute; left: 50%; bottom: 0; width: 2px; height: 2px; border-radius: 50%;
+  opacity: 0; background: var(--weather-rain-streak); animation: wx-splash var(--d) linear var(--dl) infinite;
+}
+[data-slot="weather-sky"] [data-fx="fall"] > [data-fx="splash"]::before,
+[data-slot="weather-sky"] [data-fx="fall"] > [data-fx="splash"]::after { content: ""; position: absolute; width: 2px; height: 2px; border-radius: 50%; background: var(--weather-rain-streak); }
+[data-slot="weather-sky"] [data-fx="fall"] > [data-fx="splash"]::before { animation: wx-splash var(--d) linear var(--dl) infinite; }
+[data-slot="weather-sky"] [data-fx="fall"] > [data-fx="splash"]::after { animation: wx-splash var(--d) linear var(--dl) infinite reverse; }
 [data-slot="weather-sky"] [data-fx="flake"] {
-  top: -12px;
-  left: calc(var(--x) * 1%);
-  width: calc(var(--s) * 1px);
-  height: calc(var(--s) * 1px);
-  border-radius: 9999px;
-  opacity: var(--o);
-  background: var(--weather-ink);
-  animation: wx-snow var(--d) linear var(--dl) infinite;
+  top: -12px; left: calc(var(--x) * 1%); width: calc(var(--s) * 1px); height: calc(var(--s) * 1px);
+  border-radius: 50%; opacity: var(--o); background: radial-gradient(circle, var(--weather-snow-flake) 0%, transparent 78%);
+  animation: wx-flake var(--d) linear var(--dl) infinite;
 }
+[data-slot="weather-sky"] [data-fx="sway"] { position: absolute; inset: 0; animation: wx-sway var(--d) cubic-bezier(.37,0,.63,1) var(--dl) infinite alternate; transform-origin: 50% -400%; }
+[data-slot="weather-sky"] [data-fx="pile"] {
+  left: 0; right: 0; bottom: 0; height: 12px; transform: scaleY(var(--pile-cap)); transform-origin: bottom;
+  background: linear-gradient(to top, var(--weather-snow-pile), transparent); animation: wx-pile 90s cubic-bezier(.22,1,.36,1) -90s both;
+}
+[data-slot="weather-sky"] [data-fx="pile"][data-leaving="true"] { animation: wx-pile 1.2s ease-out reverse both; }
+[data-slot="weather-sky"] [data-fx="snow-core"] { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--weather-snow-flake) 0%, transparent 78%); }
 [data-slot="weather-sky"] [data-fx="star"] {
   top: calc(var(--y) * 1%);
   left: calc(var(--x) * 1%);
@@ -2143,14 +2149,13 @@ body {
 [data-slot="weather-sky"] [data-fx="cloud"][data-depth="mid"] { scale: .88; --cloud-scale: .88; opacity: .56; z-index: 22; --depth-speed: 13px; --depth-y-band: 8% 40%; --depth-width: 220px; }
 [data-slot="weather-sky"] [data-fx="cloud"][data-depth="near"] { scale: 1.15; --cloud-scale: 1.15; opacity: .72; z-index: 23; --depth-speed: 22px; --depth-y-band: 20% 56%; --depth-width: 300px; }
 [data-slot="weather-sky"] [data-fx="fog"] {
-  top: calc(var(--y) * 1%);
-  left: -20%;
-  width: 140%;
-  height: calc(var(--s) * 1%);
-  background: linear-gradient(to right, transparent, color-mix(in srgb, var(--weather-ink) calc(var(--o) * 100%), transparent), transparent);
-  filter: blur(10px);
-  animation: wx-fog var(--d) ease-in-out var(--dl) infinite alternate;
+  top: calc(var(--y) * 1%); left: -40%; width: 180%; height: 42%; z-index: 5; opacity: var(--o);
+  background: radial-gradient(ellipse at 12% 50%, var(--weather-fog-mist) 0 18%, transparent 44%), radial-gradient(ellipse at 38% 50%, var(--weather-fog-mist) 0 18%, transparent 44%), radial-gradient(ellipse at 64% 50%, var(--weather-fog-mist) 0 18%, transparent 44%), radial-gradient(ellipse at 90% 50%, var(--weather-fog-mist) 0 18%, transparent 44%);
+  transform: scale(var(--fog-scale, 1)); animation: wx-fog var(--d) cubic-bezier(.37,0,.63,1) var(--dl) infinite alternate, wx-breathe var(--breath, 7s) ease-in-out var(--dl) infinite alternate;
 }
+[data-slot="weather-sky"][data-class="drizzle"] [data-fx="fog"] { --o: .10; --d: 7s; --breath: 7s; }
+[data-slot="weather-sky"][data-class="snow"][data-variant="lite"] [data-fx="pile"] { display: none; }
+[data-slot="weather-sky"][data-class="snow"][data-variant="lite"] [data-fx="sway"] { display: none; }
 [data-slot="weather-sky"] [data-fx="sun"],
 [data-slot="weather-sky"] [data-fx="moon"],
 [data-slot="weather-sky"] [data-fx="moon-glow"] {
@@ -2197,11 +2202,6 @@ body {
   animation: wx-flash 6.5s linear infinite;
 }
 [data-slot="weather-sky"] [data-fx="bolt"] { top: 16%; left: 48%; width: 64px; height: 110px; fill: var(--weather-bolt-fill); filter: drop-shadow(0 0 10px var(--weather-bolt-glow)); opacity: 0; animation: wx-bolt 6.5s linear infinite; }
-[data-slot="weather-sky"] [data-fx="splash"] {
-  left: 0; right: 0; bottom: 0; height: 22%;
-  background: linear-gradient(to top, color-mix(in srgb, var(--weather-ink) 28%, transparent), transparent);
-  animation: wx-splash 0.75s ease-out infinite;
-}
 @property --wx-top { syntax: "<color>"; inherits: true; initial-value: navy; }
 @property --wx-mid { syntax: "<color>"; inherits: true; initial-value: navy; }
 @property --wx-bottom { syntax: "<color>"; inherits: true; initial-value: navy; }
@@ -2220,14 +2220,13 @@ body {
 [data-slot="weather-sky"] .weather-sky-scrim { position:absolute; inset:0; background:var(--weather-scrim); }
 [data-slot="weather-sky"] .weather-sky-text-scrim { position:absolute; inset:0; background:linear-gradient(to top,var(--wx-scrim) 0%,transparent 60%); }
 
-@keyframes wx-rain {
-  to { transform: translate3d(-54px, 390px, 0); }
-}
-@keyframes wx-snow {
-  from { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(18px, 140px, 0); }
-  to { transform: translate3d(-9px, 290px, 0); }
-}
+@keyframes wx-fall { from { transform: translate3d(0, -48px, 0) rotate(var(--tilt, 0deg)); } to { transform: translate3d(0, calc(100cqh + 48px), 0) rotate(var(--tilt, 0deg)); } }
+@keyframes wx-flake { from { transform: translate3d(0, -12px, 0); } to { transform: translate3d(calc(var(--wind, 0) * 40px), calc(100cqh + 12px), 0); } }
+@keyframes wx-sway { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+@keyframes wx-pile { from { transform: scaleY(0); opacity: 1; } to { transform: scaleY(var(--pile-cap, 1)); opacity: 1; } }
+@keyframes wx-splash { 0%, 92% { opacity: 0; transform: translate(0, 0); } 96% { opacity: .8; transform: translate(-8px, -7px); } 100% { opacity: 0; transform: translate(8px, -7px); } }
+@keyframes wx-fog { from { transform: translateX(-10%) scale(var(--fog-scale, 1)); } to { transform: translateX(10%) scale(var(--fog-scale, 1)); } }
+@keyframes wx-breathe { from { opacity: calc(var(--o) * .7); } to { opacity: var(--o); } }
 @keyframes wx-twinkle {
   from { opacity: 0.15; }
   to { opacity: 1; }
@@ -2235,10 +2234,6 @@ body {
 @keyframes wx-drift {
   from { transform: translate3d(-100%, 0, 0); }
   to { transform: translate3d(100cqw, 0, 0); }
-}
-@keyframes wx-fog {
-  from { transform: translate3d(-8%, 0, 0); }
-  to { transform: translate3d(8%, 0, 0); }
 }
 @keyframes wx-sun-pulse {
   from { opacity: 0.55; transform: scale(.72); }
@@ -2250,10 +2245,6 @@ body {
 }
 @keyframes wx-rays { to { transform: rotate(360deg); } }
 @keyframes wx-bolt { 0%, 91%, 100% { opacity: 0; } 92%, 94% { opacity: .95; } 95% { opacity: .12; } 96% { opacity: .9; } 98% { opacity: 0; } }
-@keyframes wx-splash {
-  0%, 100% { opacity: .08; transform: translateY(8px); }
-  45% { opacity: .42; transform: translateY(0); }
-}
 /* Two soft flashes close together, then quiet: never more than three flashes in a second. */
 @keyframes wx-flash {
   0%, 91%, 100% { opacity: 0; }

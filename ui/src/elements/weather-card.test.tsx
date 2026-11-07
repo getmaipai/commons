@@ -95,11 +95,11 @@ describe("WeatherCard", () => {
     expect(night.container.querySelector('[data-fx="moon"]')).not.toBeNull();
     cleanup();
     const rainy = render(<WeatherCard {...props} current={{ ...props.current, code: 61 }} />);
-    expect(rainy.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(76);
-    expect(rainy.container.querySelector('[data-fx="splash"]')).not.toBeNull();
+    expect(rainy.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(12);
+    expect(rainy.container.querySelectorAll('[data-fx="splash"]')).toHaveLength(3);
     cleanup();
     const snowy = render(<WeatherCard {...props} current={{ ...props.current, code: 71 }} />);
-    expect(snowy.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(60);
+    expect(snowy.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(30);
     expect(snowy.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(3);
   });
 
@@ -131,7 +131,7 @@ describe("WeatherCard", () => {
     cleanup();
     const storm = render(<WeatherCard {...props} current={{ ...props.current, code: 95 }} />);
     expect(storm.container.querySelector('[data-fx="bolt"]')).not.toBeNull();
-    expect(storm.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(76);
+    expect(storm.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(18);
   });
 
   test("the same props draw the same markup", () => {

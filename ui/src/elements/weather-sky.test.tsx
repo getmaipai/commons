@@ -75,6 +75,34 @@ describe("WeatherSky moon disc", () => {
     near.dispatchEvent(new Event("animationiteration"));
     expect(near.style.getPropertyValue("--d")).not.toBe(before);
   });
+  test("precipitation pools scale by intensity, area and variant", () => {
+    const cases = [["rain", 61, 12], ["rain", 63, 18], ["thunderstorm", 95, 18], ["thunderstorm", 96, 28]] as const;
+    for (const [cls, code, expected] of cases) {
+      const { container, unmount } = render(<WeatherSky cls={cls} isDay={true} code={code} width={420} height={230} variant="full" />);
+      expect(container.querySelectorAll('[data-fx="fall"]')).toHaveLength(expected); unmount();
+    }
+    const drizzle = render(<WeatherSky cls="drizzle" isDay={true} code={55} width={420} height={230} />);
+    expect(drizzle.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(16);
+    expect(drizzle.container.querySelectorAll('[data-fx="splash"]')).toHaveLength(0);
+    expect(drizzle.container.querySelectorAll('[data-fx="fog"]')).toHaveLength(1); drizzle.unmount();
+    const snow = render(<WeatherSky cls="snow" isDay={true} code={75} width={420} height={230} />);
+    expect(snow.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(30);
+    expect(snow.container.querySelectorAll('[data-fx="sway"]')).toHaveLength(15);
+    expect(snow.container.querySelectorAll('[data-fx="pile"]')).toHaveLength(1);
+    for (const variant of ["full", "lite", "compact", "wide"] as const) {
+      const view = render(<WeatherSky cls="thunderstorm" isDay={true} code={96} width={420} height={230} variant={variant} />);
+      expect(view.container.querySelectorAll('[data-fx="fall"]').length).toBeLessThanOrEqual(({ full: 28, lite: 8, compact: 18, wide: 34 })[variant]); view.unmount();
+    }
+  });
+  test("precipitation and fog CSS keyframes are transform and opacity only", () => {
+    for (const name of ["wx-fall", "wx-flake", "wx-sway", "wx-pile", "wx-splash", "wx-fog", "wx-breathe"]) expect(css).toContain(`@keyframes ${name}`);
+    const blocks = css.match(/@keyframes wx-[^{]+\{[^}]*\}/g) ?? [];
+    for (const block of blocks) expect(block).not.toMatch(/filter:|box-shadow:|background:/);
+    expect(css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="fog"]'), css.indexOf('[data-slot="weather-sky"] [data-fx="sun"]'))).not.toContain("blur(");
+    expect(css).not.toContain('[data-slot="weather-card"] [data-fx="fall"]');
+    expect(css).not.toContain('[data-slot="weather-card"] [data-fx="flake"]');
+    expect(css).not.toContain('[data-slot="weather-card"] [data-fx="fog"]');
+  });
   test("publishes phase, intensity and variant with inline phase values", () => {
     const { container } = render(<WeatherSky cls="rain" isDay={true} code={63}/>);
     const sky = container.querySelector<HTMLElement>("[data-slot=weather-sky]")!;

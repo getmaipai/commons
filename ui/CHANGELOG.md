@@ -1,3 +1,7 @@
+## [ui-v0.5.512] - 2026-11-06
+
+- WEATHER-SCENE-03 precipitation and fog: intensity and area-scaled rain pools, per-drop splashes, depth-based snow with a settling pile, and three soft token-colored fog layers.
+
 ## [ui-v0.5.511] - 2026-11-06
 
 - WEATHER-SCENE-02 cloud fix pass: circular soft puff masks fit inside each silhouette, cloud widths scale with the sky container, cloud bottoms stay above the text area, and night and twilight tints meet the palette limits in every theme.

@@ -38,3 +38,5 @@ export function lightPosition(variant: WeatherVariant, fraction: number, kind: "
 export function weatherIntensityOf(code: number) { return scene.intensity[String(code) as keyof typeof scene.intensity] ?? 0; }
 export function cloudWindFactor(wind?: number) { return wind === undefined ? 1 : clamp(scene.clouds.wind.base + wind * scene.clouds.wind.perKmh, scene.clouds.wind.min, scene.clouds.wind.max); }
 export function cloudDuration(width: number, cloudWidth: number, speed: number, windFactor: number) { return (width + cloudWidth) / (speed * windFactor); }
+export function precipitationScale(width: number, height: number) { return clamp(Math.sqrt((width * height) / (scene.precipitation.area.width * scene.precipitation.area.height)), scene.precipitation.area.minScale, scene.precipitation.area.maxScale); }
+export function precipitationCount(base: number, intensity: number, scale: number, cap: number) { return Math.min(cap, Math.max(0, Math.round(base * intensity * scale))); }
