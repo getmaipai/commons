@@ -5,9 +5,13 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, constr
 
 from . import song_style_schema
+
+
+class Genre(RootModel[constr(min_length=1, max_length=40)]):
+    root: constr(min_length=1, max_length=40)
 
 
 class Member(BaseModel):
@@ -19,6 +23,7 @@ class Member(BaseModel):
         ..., description="For example 'vocals' or 'drums'."
     )
     portrait_file_id: constr(pattern=r'^file-[a-z0-9]{6,}$') | None = None
+    synth_id: constr(pattern=r'^[a-z0-9][a-z0-9-]{0,39}$') | None = None
 
 
 class MadeArtist(BaseModel):

@@ -103,7 +103,9 @@ design record left a choice:
 
 | Path | What it is | Hand-written or generated |
 |---|---|---|
-| `schemas/*.schema.json` | JSON Schema 2020-12, the source of truth for every record and package shape, including Feed, NewsItem and NewsStory | hand-written |
+| `schemas/*.schema.json` | JSON Schema 2020-12, the source of truth for every record and package shape, including Feed, NewsItem, NewsStory, Synth and ShowFormat | hand-written |
+| `schemas/synth.schema.json` | Synth identity and life metadata, with the shared persona definition referenced by manifests | hand-written |
+| `schemas/show-format.schema.json` | The part, timing, source and audience rules for a show format | hand-written |
 | `schemas.resolved/` | A local-only copy of `schemas/` with the cross-repo standards `$ref` swapped for a local file; not committed, `gen-py.sh`'s input | generated build output, gitignored |
 | `gen/ts/` | Zod schemas + TS types, one file per `schemas/*.schema.json` | generated, committed. `bun run gen:ts` |
 | `gen/py/` | Pydantic v2 models, same schemas | generated, committed. `bash scripts/gen-py.sh` |

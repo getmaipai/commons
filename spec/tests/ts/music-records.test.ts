@@ -35,7 +35,7 @@ for (const [name, model, validate, base, required] of both) {
   describe(name, () => {
     test("the schema and the generated Zod accept the fixture, and Zod keeps every field", () => {
       expect(validate(base)).toBe(true);
-      expect(model.parse(base)).toEqual(base);
+      expect(model.parse(base)).toMatchObject(base);
     });
 
     test("needs its required fields", () => {

@@ -5,21 +5,117 @@
   "description": "MEDIA-01. A saved character, prop or place for consistent use in media. Sharing is private unless explicitly granted to named people. Real people are labelled; subject_age_band is deliberately absent.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "kind", "owner_person_id", "shared_to", "look_words", "reference_file_ids", "real", "provenance", "created_at", "updated_at", "hlc"],
+  "required": [
+    "id",
+    "name",
+    "kind",
+    "owner_person_id",
+    "shared_to",
+    "look_words",
+    "reference_file_ids",
+    "real",
+    "provenance",
+    "created_at",
+    "updated_at",
+    "hlc"
+  ],
   "properties": {
-    "id": {"type":"string","pattern":"^msub-[a-z0-9]{6,}$"},
-    "name": {"type":"string","minLength":1,"maxLength":120},
-    "kind": {"type":"string","enum":["character","prop","place"]},
-    "owner_person_id": {"type":"string","pattern":"^person-[a-z0-9]{6,}$"},
-    "shared_to": {"type":"array","uniqueItems":true,"items":{"type":"string","pattern":"^person-[a-z0-9]{6,}$"},"default":[],"description":"Private to owner unless explicitly shared to these named people."},
-    "look_words": {"type":"array","minItems":1,"maxItems":30,"items":{"type":"string","minLength":1,"maxLength":80}},
-    "reference_file_ids": {"type":"array","maxItems":20,"uniqueItems":true,"items":{"type":"string","pattern":"^file-[a-z0-9]{6,}$"},"default":[],"description":"Approved Library picture file ids only; never paths."},
-    "voice": {"type":["string","null"],"maxLength":500,"default":null},
-    "real": {"type":"boolean","default":false,"description":"Label that the subject represents a real person or place when applicable."},
-    "trained_style_id": {"type":["string","null"],"pattern":"^lora-[a-z0-9]{6,}$","default":null},
-    "provenance": {"type":"string","minLength":1},
-    "created_at": {"type":"string","format":"date-time"},
-    "updated_at": {"type":"string","format":"date-time"},
-    "hlc": {"type":"string","pattern":"^[0-9]+:[0-9]+:[a-z0-9]{6,}$"}
+    "id": {
+      "type": "string",
+      "pattern": "^msub-[a-z0-9]{6,}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "character",
+        "prop",
+        "place"
+      ]
+    },
+    "owner_person_id": {
+      "type": "string",
+      "pattern": "^person-[a-z0-9]{6,}$"
+    },
+    "shared_to": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^person-[a-z0-9]{6,}$"
+      },
+      "default": [],
+      "description": "Private to owner unless explicitly shared to these named people."
+    },
+    "look_words": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      }
+    },
+    "reference_file_ids": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^file-[a-z0-9]{6,}$"
+      },
+      "default": [],
+      "description": "Approved Library picture file ids only; never paths."
+    },
+    "voice": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 500,
+      "default": null
+    },
+    "real": {
+      "type": "boolean",
+      "default": false,
+      "description": "Label that the subject represents a real person or place when applicable."
+    },
+    "trained_style_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^lora-[a-z0-9]{6,}$",
+      "default": null
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+    },
+    "synth_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+      "default": null
+    }
   }
 }

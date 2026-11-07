@@ -748,3 +748,13 @@ export function validateScheduledTask(record: ScheduledTask): Problems {
   }
   return problems;
 }
+
+/** Cross-field rules for synth identity and life settings. */
+export interface SynthLike { based_on: { kind: string; person_id?: string | null; name?: string | null }; life: { enabled: boolean } }
+export function validateSynth(synth: SynthLike): Problems {
+  const problems: Problems = [];
+  if (synth.based_on.kind === "household_member" && !synth.based_on.person_id) problems.push("a household-member synth must name its person_id");
+  if (synth.based_on.kind === "real_person" && !synth.based_on.name) problems.push("a real-person synth must name the person");
+  if (synth.based_on.kind !== "none" && synth.life.enabled) problems.push("a synth based on a person must have life.enabled false");
+  return problems;
+}

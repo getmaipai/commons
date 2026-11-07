@@ -3,7 +3,110 @@
 
 from __future__ import annotations
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, constr
+from typing import Literal
+
+from pydantic import AwareDatetime, BaseModel, ConfigDict, RootModel, conint, constr
+
+
+class SharedToItem(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^person-[a-z0-9]{6,}$')
+
+
+class Set(RootModel[constr(pattern=r'^msub-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^msub-[a-z0-9]{6,}$')
+
+
+class Prop(RootModel[constr(pattern=r'^msub-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^msub-[a-z0-9]{6,}$')
+
+
+class ClipFileId(RootModel[constr(pattern=r'^file-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^file-[a-z0-9]{6,}$')
+
+
+class PictureFileId(RootModel[constr(pattern=r'^file-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^file-[a-z0-9]{6,}$')
+
+
+class MusicLineId(RootModel[constr(pattern=r'^musicline-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^musicline-[a-z0-9]{6,}$')
+
+
+class VoiceLineId(RootModel[constr(pattern=r'^voiceline-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^voiceline-[a-z0-9]{6,}$')
+
+
+class FinishedCutFileId(RootModel[constr(pattern=r'^file-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^file-[a-z0-9]{6,}$')
+
+
+class Source(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal[
+        'news', 'weather', 'household', 'documents', 'media_item', 'bookmarks'
+    ]
+    topics: list[constr(max_length=60)] = []
+    file_ids: list[constr(pattern=r'^file-[a-z0-9]{6,}$')] = []
+    media_item_id: str | None = None
+
+
+class Schedule(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    every: Literal['1d', '7d']
+    at: constr(pattern=r'^([01][0-9]|2[0-3]):[0-5][0-9]$')
+    days: list[conint(ge=0, le=6)] = []
+
+
+class State(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    episode_id: str | None = None
+    stage: (
+        Literal[
+            'brief',
+            'outline',
+            'script',
+            'check',
+            'voices',
+            'mix',
+            'keep',
+            'done',
+            'failed',
+        ]
+        | None
+    ) = None
+    reason: str | None = None
+    started_at: AwareDatetime | None = None
+    last_make_ms: int | None = None
+
+
+class Show(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    format_id: Literal[
+        'news_briefing',
+        'kids_news',
+        'round_table',
+        'debate',
+        'review',
+        'discussion',
+        'dj_links',
+        'narration',
+        'announcer',
+    ]
+    audience: Literal['all', 'teen', 'adult']
+    household_facts: bool
+    sources: list[Source]
+    schedule: Schedule | None
+    length_s: conint(ge=60, le=1800)
+    state: State | None = None
+    stand_in_synth_id: str | None = None
 
 
 class Cast(BaseModel):
@@ -15,6 +118,28 @@ class Cast(BaseModel):
     wardrobe_variant_ids: list[constr(pattern=r'^msub-[a-z0-9]{6,}$')] = []
     voice_choice: constr(max_length=500) | None = None
     notes: constr(max_length=2000) = ''
+    synth_id: constr(pattern=r'^[a-z0-9][a-z0-9-]{0,39}$') | None = None
+    part: (
+        Literal[
+            'anchor',
+            'reporter',
+            'host',
+            'co_host',
+            'guest',
+            'moderator',
+            'side',
+            'critic',
+            'dj',
+            'narrator',
+            'announcer',
+            'actor',
+        ]
+        | None
+    ) = None
+
+
+class SubjectId(RootModel[constr(pattern=r'^msub-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^msub-[a-z0-9]{6,}$')
 
 
 class Shot(BaseModel):
@@ -73,3 +198,4 @@ class MediaProduction(BaseModel):
     created_at: AwareDatetime
     updated_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    show: Show | None = None

@@ -130,6 +130,12 @@
               "group": "person.music",
               "scope": "person",
               "tab": "personalization"
+            },
+            {
+              "label": "Synth controls",
+              "group": "synths",
+              "scope": "person",
+              "tab": "personalization"
             }
           ],
           "tabs": [
@@ -826,6 +832,12 @@
                 "restore_button": "Restore",
                 "delete_now_button": "Delete now"
               }
+            },
+            {
+              "label": "Synths",
+              "group": "synths",
+              "scope": "household",
+              "tab": "music"
             }
           ],
           "tabs": [

@@ -72,6 +72,12 @@ export const MadeArtist = z
                 z.null(),
               ])
               .default(null),
+            synth_id: z
+              .union([
+                z.string().regex(new RegExp("^[a-z0-9][a-z0-9-]{0,39}$")),
+                z.null(),
+              ])
+              .default(null),
           })
           .strict(),
       )

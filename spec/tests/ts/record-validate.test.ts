@@ -23,6 +23,7 @@ import {
   validateArtifact,
   validateBiometricPrint,
   inverseRelationship,
+  validateSynth,
 } from "../../records/ts/validate.js";
 import { Entity as EntitySchema, type Entity } from "../../gen/ts/entity.js";
 import type { Relationship } from "../../gen/ts/relationship.js";
@@ -706,5 +707,15 @@ describe("MemoryRecord.archived_reason (NAT-07b)", () => {
 
   test("rejects an unknown reason", () => {
     expect(MemoryRecordSchema.safeParse({ ...memoryRecord(), archived_reason: "expired" }).success).toBe(false);
+  });
+});
+
+
+describe("synth cross-field rules", () => {
+  const synth = () => load<any>("synth.example.json");
+  test("invented synth with an enabled life is valid", () => expect(validateSynth(synth())).toEqual([]));
+  test("based-on person cases require their identifier and a static life", () => {
+    expect(validateSynth({ ...synth(), based_on: { kind: "household_member", person_id: null }, life: { enabled: true } })).toHaveLength(2);
+    expect(validateSynth({ ...synth(), based_on: { kind: "real_person", name: null }, life: { enabled: false } })).toHaveLength(1);
   });
 });

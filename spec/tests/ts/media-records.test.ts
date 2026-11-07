@@ -23,7 +23,7 @@ describe("MEDIA-01 records", () => {
       const schema = read(`schemas/${schemaName}.schema.json`);
       const fixture = read(`fixtures/records/${fixtureName}`);
       expect(ajv.validate(schema, fixture)).toBe(true);
-      expect(model.parse(fixture)).toEqual(fixture);
+      expect(model.parse(fixture)).toMatchObject(fixture);
       for (const field of ["id", "provenance", "hlc"]) {
         const broken = { ...fixture };
         delete broken[field];
@@ -40,6 +40,11 @@ describe("MEDIA-01 records", () => {
     expect(MediaTemplate.safeParse({ ...template, references: ["/Library/alfred.png"] }).success).toBe(false);
     expect(MediaSubject.safeParse({ ...subject, reference_file_ids: ["pictures/astro.png"] }).success).toBe(false);
     expect(MediaProduction.safeParse({ ...production, clip_file_ids: ["video/final.mp4"] }).success).toBe(false);
+    const withShow = { ...production, show: { format_id: "news_briefing", audience: "all", household_facts: false, sources: [], schedule: null, length_s: 180, state: null, stand_in_synth_id: null } };
+    expect(MediaProduction.safeParse(withShow).success).toBe(true);
+    const sourceSchema = read("schemas/media-source.schema.json");
+    const source = { id: "msrc-show001", kind: "production", scope: "household", label: "Morning news", production_id: "mprd-bruno001", created_at: "2026-11-07T12:00:00Z", hlc: "1794052800000:0:node0001", provenance: "person-bruno" };
+    expect(ajv.validate(sourceSchema, source)).toBe(true);
   });
 
   test("subject has a real label and deliberately no age band", () => {

@@ -1,3 +1,7 @@
+## [spec-v0.1.339] - 2026-11-07
+
+- TALENT-00, additive. Manifests can reference shared synth persona and metadata; Synth and ShowFormat records are added, with show data on productions, synth links on media records, production media sources, show provenance, and five synth settings. Existing companion manifests retain their shape.
+
 ## [spec-v0.1.338] - 2026-11-07
 
 - I18N-K2, additive. The TypeScript `describeSetting` takes an optional third argument `t?: (id, fallback) => string`, applied to every copy field it returns (`does`, `title`, `what_is_stored`, `consent`, `reason`; ids `setting.<key>.<field>`, `.does.child`, `.does.teen`, `.label` when the label stands in, `.reason.<code>`; reason lines are translated before {admin} and {person} are filled in). Without it the output is byte-identical to before. The Python runtime is unchanged.

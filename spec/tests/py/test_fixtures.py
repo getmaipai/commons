@@ -57,12 +57,16 @@ from gen.py.setting_value_schema import SettingValue
 from gen.py.settings_key_schema import SettingsKey
 from gen.py.share_schema import Share
 from gen.py.song_style_schema import SongStyle
+from gen.py.synth_schema import Synth
+from gen.py.show_format_schema import ShowFormat
 from gen.py.source_schema import Source
 from gen.py.stack_fit_plan_schema import StackFitPlan
 from gen.py.subject_ref_schema import Household, Unresolved, World
 from gen.py.turn_artifact_schema import TurnArtifact
 from gen.py.turn_signal_schema import TurnSignal
 from gen.py.world_place_schema import WorldPlace
+from gen.py.synth_schema import Synth
+from gen.py.show_format_schema import ShowFormat
 
 # ErrorEntry is standards-owned (std-v0.2.0), not generated here; loaded
 # from the sibling .github checkout the same way spec/schemas/manifest
@@ -77,6 +81,12 @@ ASSETS_FILE = SPEC_DIR / "assets" / "robot-assets.json"
 
 def load_fixture(name: str) -> dict:
     return json.loads((FIXTURES_DIR / name).read_text())
+
+
+def test_talent_record_fixtures_round_trip():
+    for name, model in [("synth.example.json", Synth), ("show-format.example.json", ShowFormat)]:
+        data = load_fixture(name)
+        assert model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
 
 
 def test_person_fixture():

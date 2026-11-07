@@ -70,7 +70,7 @@ describe("VIDEO-SETTINGS-03: Pictures, videos and music",()=>{
   for(const [g,v] of Object.entries(views)){const c=cards.filter(x=>x.group===g);expect(c,g).toHaveLength(1);expect(c[0]!.view).toBe(v);expect(ALLOWED_VIEW_IDS).toContain(v);}
   expect(cards.find(c=>c.group==="household.media_styles")!.tab).toBe("styles");
   expect(cards.filter(c=>c.tab==="pictures").map(c=>c.group)).toEqual(["household.media_pictures","household.media_kids"]);
-  expect(cards.filter(c=>c.tab==="music").map(c=>c.group)).toEqual(["household.media_music","household.media_online","household.media_lookups"]);
+  expect(cards.filter(c=>c.tab==="music").map(c=>c.group)).toEqual(["household.media_music","household.media_online","household.media_lookups","synths"]);
   expect(cards.find(c=>c.group==="household.media_lookups")!.collapsed).toBe(true);
   for(const g of ["household.media_pictures","household.media_videos","household.media_music"])expect(Object.keys(cards.find(c=>c.group===g)!.copy!)).toEqual(expect.arrayContaining(["models_label","models_help","models_button"]));
  });

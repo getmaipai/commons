@@ -194,11 +194,11 @@ export const File = z
             const schemas = [
               z
                 .object({
-                  /**What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later.*/
+                  /**What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later. A show is a made episode of a show.*/
                   kind: z
-                    .enum(["music", "sound"])
+                    .enum(["music", "sound", "show"])
                     .describe(
-                      "What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later.",
+                      "What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later. A show is a made episode of a show.",
                     ),
                   /**The Stack job (stack-job.schema.json) that produced the file.*/
                   job_id: z
@@ -372,7 +372,7 @@ export const File = z
                 })
                 .strict()
                 .describe(
-                  "MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; pictures and videos may adopt it later by adding to the kind enum.",
+                  "MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; a show is a made episode of a show. Pictures and videos may adopt it later by adding to the kind enum.",
                 ),
               z.null(),
             ];

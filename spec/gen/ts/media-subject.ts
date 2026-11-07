@@ -48,6 +48,12 @@ export const MediaSubject = z
     created_at: z.string().datetime({ offset: true }),
     updated_at: z.string().datetime({ offset: true }),
     hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+    synth_id: z
+      .union([
+        z.string().regex(new RegExp("^[a-z0-9][a-z0-9-]{0,39}$")),
+        z.null(),
+      ])
+      .default(null),
   })
   .strict()
   .describe(

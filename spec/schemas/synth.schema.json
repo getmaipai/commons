@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/synth.schema.json",
+  "title": "Synth",
+  "description": "An artificial being: one personality with a voice, a look, an audience and a life. A companion is a synth assigned to a person; a cast entry is a synth assigned to a part (talent-2026-11-07.md section 2).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "persona",
+    "based_on",
+    "life",
+    "owner_person_id",
+    "subject_id",
+    "pins",
+    "phrase_sources",
+    "forked_from",
+    "private_to",
+    "provenance",
+    "created_at",
+    "updated_at",
+    "hlc"
+  ],
+  "$defs": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "based_on",
+        "life",
+        "owner_person_id",
+        "subject_id",
+        "pins",
+        "phrase_sources",
+        "forked_from",
+        "private_to",
+        "provenance",
+        "created_at",
+        "updated_at",
+        "hlc"
+      ],
+      "properties": {
+        "based_on": {
+          "$ref": "#/properties/based_on"
+        },
+        "life": {
+          "$ref": "#/properties/life"
+        },
+        "subject_id": {
+          "$ref": "#/properties/subject_id"
+        },
+        "pins": {
+          "$ref": "#/properties/pins"
+        },
+        "phrase_sources": {
+          "$ref": "#/properties/phrase_sources"
+        },
+        "forked_from": {
+          "$ref": "#/properties/forked_from"
+        },
+        "private_to": {
+          "$ref": "#/properties/private_to"
+        },
+        "owner_person_id": {
+          "$ref": "#/properties/owner_person_id"
+        },
+        "provenance": {
+          "$ref": "#/properties/provenance"
+        },
+        "created_at": {
+          "$ref": "#/properties/created_at"
+        },
+        "updated_at": {
+          "$ref": "#/properties/updated_at"
+        },
+        "hlc": {
+          "$ref": "#/properties/hlc"
+        }
+      }
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+      "description": "The companion package or household companion id (hc-...)."
+    },
+    "persona": {
+      "$ref": "manifest.schema.json#/$defs/persona"
+    },
+    "based_on": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "none",
+            "household_member",
+            "real_person"
+          ]
+        },
+        "person_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^person-[a-z0-9]{6,}$",
+          "default": null,
+          "description": "Required when kind is household_member."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 120,
+          "default": null,
+          "description": "The real name when kind is real_person; always shown as Based on <name>. persona.display_name defaults to it and may differ (Donnie for a synth based on Donald Trump)."
+        },
+        "refresh": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "1d",
+            "7d",
+            null
+          ],
+          "default": "7d",
+          "description": "How often the researcher refreshes a real person's history; null means never after the first run."
+        },
+        "minor": {
+          "type": "boolean",
+          "default": false,
+          "description": "Set by the researcher when a real person's dated birth fact makes them under 18; carried into the CSAM check (rule 10). Never set by hand."
+        }
+      }
+    },
+    "life": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "False keeps the synth static. Always false when based_on.kind is not none."
+        },
+        "seed": {
+          "type": "string",
+          "maxLength": 200,
+          "default": ""
+        }
+      }
+    },
+    "owner_person_id": {
+      "type": "string",
+      "pattern": "^person-[a-z0-9]{6,}$"
+    },
+    "subject_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^msub-[a-z0-9]{6,}$",
+      "description": "The saved subject that is this synth's look for pictures and films; null until one is made."
+    },
+    "pins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dials",
+        "examples"
+      ],
+      "default": {
+        "dials": [],
+        "examples": []
+      },
+      "properties": {
+        "dials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "description": "What the researcher must not overwrite (TALENT-13, TALENT-14)."
+    },
+    "phrase_sources": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "format": "uri"
+      },
+      "default": {},
+      "description": "For a synth based on a real person: each known phrase in persona.examples to the page it came from (TALENT-14)."
+    },
+    "forked_from": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+      "default": null,
+      "description": "The base synth this one was copied from when a person made it their companion (design 2.3). Null for a base."
+    },
+    "private_to": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^person-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "Set on a companion fork: only this person (and a parent or admin for a minor) may see or use it. Null means household-wide by audience."
+    },
+    "provenance": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+    }
+  }
+}

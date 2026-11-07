@@ -554,3 +554,15 @@ def validate_scheduled_task(record) -> Problems:
     ):
         problems.append("external_ref must not equal id")
     return problems
+
+
+def validate_synth(synth) -> Problems:
+    """Checks the synth rules that depend on more than one field."""
+    problems: Problems = []
+    if synth.based_on.kind == "household_member" and not synth.based_on.person_id:
+        problems.append("a household-member synth must name its person_id")
+    if synth.based_on.kind == "real_person" and not synth.based_on.name:
+        problems.append("a real-person synth must name the person")
+    if synth.based_on.kind != "none" and synth.life.enabled:
+        problems.append("a synth based on a person must have life.enabled false")
+    return problems

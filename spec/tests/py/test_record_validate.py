@@ -36,6 +36,7 @@ from records.py.validate import (
     validate_reply_constraint,
     validate_subject_ref,
     validate_turn_signal,
+    validate_synth,
 )
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "records"
@@ -857,3 +858,14 @@ def test_relationship_called_fixture_and_nonempty_constraint():
         Relationship.model_validate(
             {**load("relationship.called.example.json"), "called": ""}
         )
+
+
+def test_synth_cross_field_rules():
+    from gen.py.synth_schema import Synth
+    data = load("synth.example.json")
+    assert validate_synth(Synth.model_validate(data)) == []
+    data["based_on"] = {"kind": "household_member", "person_id": None}
+    assert len(validate_synth(Synth.model_validate(data))) == 2
+    data["based_on"] = {"kind": "real_person", "name": None}
+    data["life"] = {"enabled": False}
+    assert len(validate_synth(Synth.model_validate(data))) == 1

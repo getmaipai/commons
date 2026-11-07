@@ -90,6 +90,14 @@
             ],
             "pattern": "^file-[a-z0-9]{6,}$",
             "default": null
+          },
+          "synth_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+            "default": null
           }
         }
       }

@@ -1,0 +1,53 @@
+{
+  "id": "news_briefing",
+  "label": "News briefing",
+  "parts": [
+    {
+      "id": "anchor",
+      "label": "Anchor",
+      "min": 1,
+      "max": 1,
+      "leads": true,
+      "dials": {}
+    },
+    {
+      "id": "reporter",
+      "label": "Reporter",
+      "min": 0,
+      "max": 2,
+      "leads": false,
+      "dials": {}
+    }
+  ],
+  "structure": [
+    {
+      "kind": "hook",
+      "share": 0.1
+    },
+    {
+      "kind": "segment",
+      "share": 0.7,
+      "repeat": true
+    },
+    {
+      "kind": "closing",
+      "share": 0.2
+    }
+  ],
+  "length_s": {
+    "min": 60,
+    "default": 180,
+    "max": 300
+  },
+  "talk_over": "light",
+  "gap_ms": 400,
+  "sources_allowed": [
+    "news",
+    "weather"
+  ],
+  "min_audience": "all",
+  "substitute": "stand_in",
+  "stingers": false,
+  "words_per_minute": 150,
+  "first_app": "home"
+}

@@ -88,17 +88,11 @@ describe("CMEDIA-SPEC-01 companion media", () => {
 
   test("the schema state list and required states track the vocabulary", () => {
     const schema = JSON.parse(readFileSync(join(SPEC, "schemas", "manifest.schema.json"), "utf8")) as {
-      properties: {
-        companion: {
-          properties: {
-            animation: {
-              properties: { states: { required: string[]; properties: Record<string, unknown> } };
-            };
-          };
-        };
-      };
+      $defs: { persona: { properties: { animation: { properties: { states: { required: string[]; properties: Record<string, unknown> } } } } } };
+      properties: { companion: { $ref: string } };
     };
-    const stateSchema = schema.properties.companion.properties.animation.properties.states;
+    expect(schema.properties.companion.$ref).toBe("#/$defs/persona");
+    const stateSchema = schema.$defs.persona.properties.animation.properties.states;
     expect(Object.keys(stateSchema.properties).sort()).toEqual([...COMPANION_MEDIA_STATES].sort());
     expect(COMPANION_MEDIA.states.map((state) => state.id)).toEqual(COMPANION_MEDIA_STATES);
     expect(COMPANION_MEDIA.states.filter((state) => state.creator).map((state) => state.id)).toHaveLength(13);

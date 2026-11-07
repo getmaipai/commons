@@ -26,7 +26,8 @@
         "feed",
         "channel",
         "link",
-        "station"
+        "station",
+        "production"
       ]
     },
     "scope": {
@@ -377,6 +378,14 @@
     "provenance": {
       "type": "string",
       "minLength": 1
+    },
+    "production_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^mprd-[a-z0-9]{6,}$",
+      "default": null
     }
   }
 }

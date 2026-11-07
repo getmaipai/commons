@@ -2962,6 +2962,150 @@ export const PackageManifest = z
       .strict()
       .describe("For a package that graduated to its own repo (5.1).")
       .optional(),
+    synth: z
+      .object({
+        based_on: z
+          .object({
+            kind: z.enum(["none", "household_member", "real_person"]),
+            /**Required when kind is household_member.*/
+            person_id: z
+              .union([
+                z
+                  .string()
+                  .regex(new RegExp("^person-[a-z0-9]{6,}$"))
+                  .describe("Required when kind is household_member."),
+                z.null().describe("Required when kind is household_member."),
+              ])
+              .describe("Required when kind is household_member.")
+              .default(null),
+            /**The real name when kind is real_person; always shown as Based on <name>. persona.display_name defaults to it and may differ (Donnie for a synth based on Donald Trump).*/
+            name: z
+              .union([
+                z
+                  .string()
+                  .max(120)
+                  .describe(
+                    "The real name when kind is real_person; always shown as Based on <name>. persona.display_name defaults to it and may differ (Donnie for a synth based on Donald Trump).",
+                  ),
+                z
+                  .null()
+                  .describe(
+                    "The real name when kind is real_person; always shown as Based on <name>. persona.display_name defaults to it and may differ (Donnie for a synth based on Donald Trump).",
+                  ),
+              ])
+              .describe(
+                "The real name when kind is real_person; always shown as Based on <name>. persona.display_name defaults to it and may differ (Donnie for a synth based on Donald Trump).",
+              )
+              .default(null),
+            /**How often the researcher refreshes a real person's history; null means never after the first run.*/
+            refresh: z
+              .union([z.literal("1d"), z.literal("7d"), z.literal(null)])
+              .describe(
+                "How often the researcher refreshes a real person's history; null means never after the first run.",
+              )
+              .default("7d"),
+            /**Set by the researcher when a real person's dated birth fact makes them under 18; carried into the CSAM check (rule 10). Never set by hand.*/
+            minor: z
+              .boolean()
+              .describe(
+                "Set by the researcher when a real person's dated birth fact makes them under 18; carried into the CSAM check (rule 10). Never set by hand.",
+              )
+              .default(false),
+          })
+          .strict(),
+        life: z
+          .object({
+            /**False keeps the synth static. Always false when based_on.kind is not none.*/
+            enabled: z
+              .boolean()
+              .describe(
+                "False keeps the synth static. Always false when based_on.kind is not none.",
+              ),
+            seed: z.string().max(200).default(""),
+          })
+          .strict(),
+        /**The saved subject that is this synth's look for pictures and films; null until one is made.*/
+        subject_id: z
+          .union([
+            z
+              .string()
+              .regex(new RegExp("^msub-[a-z0-9]{6,}$"))
+              .describe(
+                "The saved subject that is this synth's look for pictures and films; null until one is made.",
+              ),
+            z
+              .null()
+              .describe(
+                "The saved subject that is this synth's look for pictures and films; null until one is made.",
+              ),
+          ])
+          .describe(
+            "The saved subject that is this synth's look for pictures and films; null until one is made.",
+          ),
+        /**What the researcher must not overwrite (TALENT-13, TALENT-14).*/
+        pins: z
+          .object({
+            dials: z.array(z.string()).default([]),
+            examples: z.array(z.string()).default([]),
+          })
+          .strict()
+          .describe(
+            "What the researcher must not overwrite (TALENT-13, TALENT-14).",
+          )
+          .default({ dials: [], examples: [] }),
+        /**For a synth based on a real person: each known phrase in persona.examples to the page it came from (TALENT-14).*/
+        phrase_sources: z
+          .record(z.string(), z.string().url())
+          .describe(
+            "For a synth based on a real person: each known phrase in persona.examples to the page it came from (TALENT-14).",
+          )
+          .default({}),
+        /**The base synth this one was copied from when a person made it their companion (design 2.3). Null for a base.*/
+        forked_from: z
+          .union([
+            z
+              .string()
+              .regex(new RegExp("^[a-z0-9][a-z0-9-]{0,39}$"))
+              .describe(
+                "The base synth this one was copied from when a person made it their companion (design 2.3). Null for a base.",
+              ),
+            z
+              .null()
+              .describe(
+                "The base synth this one was copied from when a person made it their companion (design 2.3). Null for a base.",
+              ),
+          ])
+          .describe(
+            "The base synth this one was copied from when a person made it their companion (design 2.3). Null for a base.",
+          )
+          .default(null),
+        /**Set on a companion fork: only this person (and a parent or admin for a minor) may see or use it. Null means household-wide by audience.*/
+        private_to: z
+          .union([
+            z
+              .string()
+              .regex(new RegExp("^person-[a-z0-9]{6,}$"))
+              .describe(
+                "Set on a companion fork: only this person (and a parent or admin for a minor) may see or use it. Null means household-wide by audience.",
+              ),
+            z
+              .null()
+              .describe(
+                "Set on a companion fork: only this person (and a parent or admin for a minor) may see or use it. Null means household-wide by audience.",
+              ),
+          ])
+          .describe(
+            "Set on a companion fork: only this person (and a parent or admin for a minor) may see or use it. Null means household-wide by audience.",
+          )
+          .default(null),
+        owner_person_id: z.string().regex(new RegExp("^person-[a-z0-9]{6,}$")),
+        provenance: z.string(),
+        created_at: z.string().datetime({ offset: true }),
+        updated_at: z.string().datetime({ offset: true }),
+        hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
   .describe(

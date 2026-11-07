@@ -5,7 +5,19 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, constr
+
+
+class SharedToItem(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^person-[a-z0-9]{6,}$')
+
+
+class LookWord(RootModel[constr(min_length=1, max_length=80)]):
+    root: constr(min_length=1, max_length=80)
+
+
+class ReferenceFileId(RootModel[constr(pattern=r'^file-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^file-[a-z0-9]{6,}$')
 
 
 class MediaSubject(BaseModel):
@@ -42,3 +54,4 @@ class MediaSubject(BaseModel):
     created_at: AwareDatetime
     updated_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    synth_id: constr(pattern=r'^[a-z0-9][a-z0-9-]{0,39}$') | None = None

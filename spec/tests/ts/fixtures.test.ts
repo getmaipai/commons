@@ -48,6 +48,8 @@ import { QuickAction } from "../../gen/ts/quick-action.js";
 import { Alarm } from "../../gen/ts/alarm.js";
 import { WorldPlace } from "../../gen/ts/world-place.js";
 import { QuickTimer } from "../../gen/ts/quick-timer.js";
+import { Synth } from "../../gen/ts/synth.js";
+import { ShowFormat } from "../../gen/ts/show-format.js";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 
@@ -90,7 +92,7 @@ describe("record fixtures validate against their generated Zod models", () => {
   const ajv = new Ajv2020({ allErrors: true, strict: false });
   addFormats(ajv);
   const manifestSchema = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "schemas.resolved", "manifest.schema.json"), "utf8"));
-  for (const schemaName of ["answer-block.schema.json", "settings-key.schema.json", "settings-area.schema.json", "tour.schema.json", "privacy-row.schema.json"]) {
+  for (const schemaName of ["answer-block.schema.json", "settings-key.schema.json", "settings-area.schema.json", "tour.schema.json", "privacy-row.schema.json", "synth.schema.json"]) {
     const schema = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "schemas.resolved", schemaName), "utf8"));
     ajv.addSchema(schema, schemaName === "privacy-row.schema.json" ? "https://getmaipai.github.io/shared/spec/schemas/privacy-row.schema.json" : schema.$id);
   }
@@ -119,6 +121,8 @@ describe("record fixtures validate against their generated Zod models", () => {
   test("alarm.example.json", () => expect(() => Alarm.parse(loadFixture("alarm.example.json"))).not.toThrow());
   test("world-place.example.json", () => expect(() => WorldPlace.parse(loadFixture("world-place.example.json"))).not.toThrow());
   test("quick-timer.example.json", () => expect(() => QuickTimer.parse(loadFixture("quick-timer.example.json"))).not.toThrow());
+  test("synth.example.json", () => expect(() => Synth.parse(loadFixture("synth.example.json"))).not.toThrow());
+  test("show-format.example.json", () => expect(() => ShowFormat.parse(loadFixture("show-format.example.json"))).not.toThrow());
   test("clock record invalid examples are rejected", () => {
     for (const [model, name] of [[Alarm, "alarm.invalid.example.json"], [WorldPlace, "world-place.invalid.example.json"], [QuickTimer, "quick-timer.invalid.example.json"]] as const) {
       expect(() => model.parse(loadFixture(name))).toThrow();

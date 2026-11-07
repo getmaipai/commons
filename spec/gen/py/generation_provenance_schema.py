@@ -47,15 +47,15 @@ class Engine(BaseModel):
 
 class GenerationProvenance(BaseModel):
     """
-    MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; pictures and videos may adopt it later by adding to the kind enum.
+    MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; a show is a made episode of a show. Pictures and videos may adopt it later by adding to the kind enum.
     """
 
     model_config = ConfigDict(
         extra='forbid',
     )
-    kind: Literal['music', 'sound'] = Field(
+    kind: Literal['music', 'sound', 'show'] = Field(
         ...,
-        description='What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later.',
+        description='What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later. A show is a made episode of a show.',
     )
     job_id: constr(min_length=1) = Field(
         ..., description='The Stack job (stack-job.schema.json) that produced the file.'

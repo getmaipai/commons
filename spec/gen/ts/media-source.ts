@@ -8,7 +8,7 @@ import { z } from "zod";
 export const MediaSource = z
   .object({
     id: z.string().regex(new RegExp("^msrc-[a-z0-9]{6,}$")),
-    kind: z.enum(["root", "feed", "channel", "link", "station"]),
+    kind: z.enum(["root", "feed", "channel", "link", "station", "production"]),
     scope: z.enum(["household", "person"]),
     /**Set when scope is person; the adult who created a household source otherwise (for saved copies' ownership).*/
     owner_person_id: z
@@ -313,6 +313,9 @@ export const MediaSource = z
       .regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$"))
       .describe("Hybrid logical clock: wall_ms:counter:node (7.3)."),
     provenance: z.string().min(1),
+    production_id: z
+      .union([z.string().regex(new RegExp("^mprd-[a-z0-9]{6,}$")), z.null()])
+      .default(null),
   })
   .strict()
   .describe(

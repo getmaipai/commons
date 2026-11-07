@@ -12,6 +12,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    RootModel,
     confloat,
     conint,
     constr,
@@ -30,6 +31,10 @@ class Root(BaseModel):
     kinds: list[Literal['video', 'episode', 'film', 'track', 'book', 'audiobook']] = (
         Field(..., min_length=1)
     )
+
+
+class Tag(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
 
 
 class Station(BaseModel):
@@ -63,6 +68,14 @@ class Auto(BaseModel):
     quality_max_height: conint(ge=144) | None = None
 
 
+class VisibleToItem(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^person-[a-z0-9]{6,}$')
+
+
+class ArchiveItem(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
 class MediaSource(BaseModel):
     """
     MEDIA-SPEC-01 (media design section 7). Where media items come from: a library root folder on the hub or a mounted share, a podcast feed, a web channel followed at a person's pace, or a pasted link. Roots of different kinds may not overlap (enforced at save). A child never adds a source. RADIO-01: a station is a live internet radio stream; its stream address is url, its name is label, and the station object holds the rest.
@@ -72,7 +85,7 @@ class MediaSource(BaseModel):
         extra='forbid',
     )
     id: constr(pattern=r'^msrc-[a-z0-9]{6,}$')
-    kind: Literal['root', 'feed', 'channel', 'link', 'station']
+    kind: Literal['root', 'feed', 'channel', 'link', 'station', 'production']
     scope: Literal['household', 'person']
     owner_person_id: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(
         None,
@@ -138,3 +151,4 @@ class MediaSource(BaseModel):
         ..., description='Hybrid logical clock: wall_ms:counter:node (7.3).'
     )
     provenance: constr(min_length=1)
+    production_id: constr(pattern=r'^mprd-[a-z0-9]{6,}$') | None = None

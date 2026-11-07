@@ -168,934 +168,7 @@
       }
     },
     "companion": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Required when kind is \"companion\" (session-a-intelligence.md step 8), unused otherwise. Composed by home/backend/src/lib/persona.ts into the turn engine's identity line and system-prompt fragment: display_name replaces the hardcoded \"MaiPai\" in \"You are {display_name}, ...\", the four style dials are the same ones lib/persona.ts already had before companions were packages, and examples is a short few-shot block (legacy's own finding: \"the single biggest lever for small-model voice fidelity\").",
-      "required": [
-        "display_name",
-        "formality",
-        "complexity",
-        "engagement",
-        "filler_density"
-      ],
-      "properties": {
-        "display_name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 40
-        },
-        "pronouns": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 20
-        },
-        "tagline": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "backstory": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 400,
-          "description": "Short by design: no authoring UI exists yet to keep a longer one consistent with itself turn to turn (docs/dev.md's persona research)."
-        },
-        "interests": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "maxItems": 8
-        },
-        "audience": {
-          "type": "string",
-          "enum": [
-            "all",
-            "teen",
-            "adult"
-          ],
-          "description": "DYNAMIC-COMPANION-01: who this companion is for. \"all\" is a dynamic companion: it adapts its words, topics and tone to the age band of whoever it speaks to, and may be used on any robot. \"teen\" and \"adult\" are explicit companions: their own style may be edgier, and a robot can use one only when its controls are at or above that level. A companion never loosens a filter: the band of a turn is the person's or robot's own, whatever the companion. Absent: read from the manifest's min_role (child or guest: all, teen: teen, anything higher: adult)."
-        },
-        "behavior": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          },
-          "maxItems": 6,
-          "description": "DYNAMIC-COMPANION-01: short style rules in the character's own terms, composed after the style dials. Used for what the dials cannot say (for example: react before asking, never invent a memory)."
-        },
-        "examples_child": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "minItems": 2,
-          "maxItems": 5,
-          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is child (simple words, gentle). Fewer than `examples`, then topped up from `examples`."
-        },
-        "examples_teen": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "minItems": 2,
-          "maxItems": 5,
-          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is teen."
-        },
-        "examples_adult": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "minItems": 2,
-          "maxItems": 5,
-          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is adult."
-        },
-        "examples": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "minItems": 3,
-          "maxItems": 5,
-          "description": "3 to 5 lines in the character's own voice, composed as a few-shot block."
-        },
-        "voice_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "formality": {
-          "type": "string",
-          "enum": [
-            "casual",
-            "neutral",
-            "formal"
-          ]
-        },
-        "complexity": {
-          "type": "string",
-          "enum": [
-            "simple",
-            "standard",
-            "advanced"
-          ]
-        },
-        "engagement": {
-          "type": "string",
-          "enum": [
-            "brief",
-            "balanced",
-            "curious"
-          ]
-        },
-        "filler_density": {
-          "type": "string",
-          "enum": [
-            "none",
-            "light",
-            "frequent"
-          ]
-        },
-        "clock_style": {
-          "type": "string",
-          "enum": [
-            "formal",
-            "plain",
-            "loose"
-          ],
-          "description": "NAT-06: how this companion says a clock time aloud. formal keeps the part of day and says \"four P M\"; plain says \"four o'clock\"; loose is read by the prompt as \"like four\". Absent means plain on a spoken turn, today's behavior for a companion that sets nothing. The normalizer never rounds; loose maps to timeStyle plain."
-        },
-        "hedging": {
-          "type": "string",
-          "enum": [
-            "low",
-            "medium",
-            "high"
-          ],
-          "description": "NAT-06: how often a hedge (\"probably\", \"I think\") appears when the evidence's certainty band is below sure. Absent means medium."
-        },
-        "social": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "NAT-06: three baselines the turn's signal can override (a joke is dropped when the person is upset). Three steps, not percentages. Absent fields mean medium.",
-          "properties": {
-            "humor": {
-              "type": "string",
-              "enum": [
-                "low",
-                "medium",
-                "high"
-              ]
-            },
-            "warmth": {
-              "type": "string",
-              "enum": [
-                "low",
-                "medium",
-                "high"
-              ]
-            },
-            "initiative": {
-              "type": "string",
-              "enum": [
-                "low",
-                "medium",
-                "high"
-              ]
-            }
-          }
-        },
-        "status_phrases": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.",
-          "properties": {
-            "thinking": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 40,
-                "pattern": "\u2026$"
-              },
-              "minItems": 1
-            },
-            "searching": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 40,
-                "pattern": "\u2026$"
-              },
-              "minItems": 1
-            },
-            "checking": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 40,
-                "pattern": "\u2026$"
-              },
-              "minItems": 1
-            }
-          }
-        },
-        "style_adapters": {
-          "type": "array",
-          "maxItems": 8,
-          "description": "Trained per-companion voice adapters by base model, as designed in the EVAL-03 design pass.",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "base_model",
-              "format",
-              "url",
-              "sha256",
-              "approx_bytes",
-              "corpus_sha256"
-            ],
-            "properties": {
-              "base_model": {
-                "type": "string"
-              },
-              "format": {
-                "type": "string",
-                "enum": [
-                  "gguf-lora"
-                ]
-              },
-              "url": {
-                "type": "string",
-                "pattern": "^https://"
-              },
-              "sha256": {
-                "type": "string",
-                "pattern": "^[a-f0-9]{64}$"
-              },
-              "approx_bytes": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "corpus_sha256": {
-                "type": "string",
-                "pattern": "^[a-f0-9]{64}$"
-              }
-            }
-          }
-        },
-        "look_prompt": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 600,
-          "description": "The words the image and video tools start from for this character."
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "draft",
-            "rendering",
-            "needs_review",
-            "ready"
-          ],
-          "description": "Absent means ready."
-        },
-        "review": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "confirmed_by",
-            "confirmed_at"
-          ],
-          "properties": {
-            "confirmed_by": {
-              "type": "string",
-              "minLength": 1
-            },
-            "confirmed_at": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        },
-        "animation": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "kind",
-            "spec_version",
-            "key",
-            "states"
-          ],
-          "properties": {
-            "kind": {
-              "const": "video"
-            },
-            "spec_version": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "key": {
-              "type": "string",
-              "pattern": "^#[0-9A-Fa-f]{6}$"
-            },
-            "sheet": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "rest",
-                "card"
-              ],
-              "properties": {
-                "rest": {
-                  "type": "string",
-                  "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
-                },
-                "card": {
-                  "type": "string",
-                  "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
-                }
-              }
-            },
-            "states": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "idle"
-              ],
-              "properties": {
-                "idle": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "researching": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "writing": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "done": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "laughing": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "surprised": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "sad": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "confused": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "idle_look": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "listening": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "thinking": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "working": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "speaking": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "needs_you": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "greeting": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "happy": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "oops": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "celebrate": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                },
-                "sleeping": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "still",
-                    "loop"
-                  ],
-                  "properties": {
-                    "h264": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "av1": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
-                    },
-                    "still": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    },
-                    "loop": {
-                      "type": "boolean"
-                    },
-                    "keyframe": {
-                      "type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
-                    }
-                  }
-                }
-              }
-            },
-            "provenance": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "tool": {
-                  "type": "string"
-                },
-                "model_sha256": {
-                  "type": "string",
-                  "pattern": "^[0-9A-Fa-f]{64}$"
-                },
-                "prompt_hash": {
-                  "type": "string",
-                  "pattern": "^[0-9A-Fa-f]{64}$"
-                },
-                "seed": {
-                  "type": "integer"
-                },
-                "approved_by": {
-                  "type": "string"
-                },
-                "approved_at": {
-                  "type": "string",
-                  "format": "date-time"
-                }
-              }
-            }
-          }
-        }
-      }
+      "$ref": "#/$defs/persona"
     },
     "knowledge_source": {
       "type": "object",
@@ -2075,6 +1148,941 @@
         }
       },
       "description": "For a package that graduated to its own repo (5.1)."
+    },
+    "synth": {
+      "$ref": "synth.schema.json#/$defs/meta"
+    }
+  },
+  "$defs": {
+    "persona": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Required when kind is \"companion\" (session-a-intelligence.md step 8), unused otherwise. Composed by home/backend/src/lib/persona.ts into the turn engine's identity line and system-prompt fragment: display_name replaces the hardcoded \"MaiPai\" in \"You are {display_name}, ...\", the four style dials are the same ones lib/persona.ts already had before companions were packages, and examples is a short few-shot block (legacy's own finding: \"the single biggest lever for small-model voice fidelity\").",
+      "required": [
+        "display_name",
+        "formality",
+        "complexity",
+        "engagement",
+        "filler_density"
+      ],
+      "properties": {
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "pronouns": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "tagline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "backstory": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400,
+          "description": "Short by design: no authoring UI exists yet to keep a longer one consistent with itself turn to turn (docs/dev.md's persona research)."
+        },
+        "interests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxItems": 8
+        },
+        "audience": {
+          "type": "string",
+          "enum": [
+            "all",
+            "teen",
+            "adult"
+          ],
+          "description": "DYNAMIC-COMPANION-01: who this companion is for. \"all\" is a dynamic companion: it adapts its words, topics and tone to the age band of whoever it speaks to, and may be used on any robot. \"teen\" and \"adult\" are explicit companions: their own style may be edgier, and a robot can use one only when its controls are at or above that level. A companion never loosens a filter: the band of a turn is the person's or robot's own, whatever the companion. Absent: read from the manifest's min_role (child or guest: all, teen: teen, anything higher: adult)."
+        },
+        "behavior": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "maxItems": 6,
+          "description": "DYNAMIC-COMPANION-01: short style rules in the character's own terms, composed after the style dials. Used for what the dials cannot say (for example: react before asking, never invent a memory)."
+        },
+        "examples_child": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 2,
+          "maxItems": 5,
+          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is child (simple words, gentle). Fewer than `examples`, then topped up from `examples`."
+        },
+        "examples_teen": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 2,
+          "maxItems": 5,
+          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is teen."
+        },
+        "examples_adult": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 2,
+          "maxItems": 5,
+          "description": "DYNAMIC-COMPANION-01: few-shot lines used first when the turn's age band is adult."
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 3,
+          "maxItems": 5,
+          "description": "3 to 5 lines in the character's own voice, composed as a few-shot block."
+        },
+        "voice_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "formality": {
+          "type": "string",
+          "enum": [
+            "casual",
+            "neutral",
+            "formal"
+          ]
+        },
+        "complexity": {
+          "type": "string",
+          "enum": [
+            "simple",
+            "standard",
+            "advanced"
+          ]
+        },
+        "engagement": {
+          "type": "string",
+          "enum": [
+            "brief",
+            "balanced",
+            "curious"
+          ]
+        },
+        "filler_density": {
+          "type": "string",
+          "enum": [
+            "none",
+            "light",
+            "frequent"
+          ]
+        },
+        "clock_style": {
+          "type": "string",
+          "enum": [
+            "formal",
+            "plain",
+            "loose"
+          ],
+          "description": "NAT-06: how this companion says a clock time aloud. formal keeps the part of day and says \"four P M\"; plain says \"four o'clock\"; loose is read by the prompt as \"like four\". Absent means plain on a spoken turn, today's behavior for a companion that sets nothing. The normalizer never rounds; loose maps to timeStyle plain."
+        },
+        "hedging": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "description": "NAT-06: how often a hedge (\"probably\", \"I think\") appears when the evidence's certainty band is below sure. Absent means medium."
+        },
+        "social": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "NAT-06: three baselines the turn's signal can override (a joke is dropped when the person is upset). Three steps, not percentages. Absent fields mean medium.",
+          "properties": {
+            "humor": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ]
+            },
+            "warmth": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ]
+            },
+            "initiative": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ]
+            }
+          }
+        },
+        "status_phrases": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "STATUS-PHRASES-01: this companion's own waiting-line phrases, replacing status-phrases/default.json's set one moment at a time - a moment left out here falls back to the default set for that moment. `thinking` shows before the first token, `searching` while a lookup or tool runs (a tool's own real label, TOOL-EVENTS-01/02, wins over any of these), `checking` during the phrasing round after a tool. Written chat only; the spoken surface keeps its own thinking-cue mechanism unchanged. Each property inlines the identical array shape rather than a same-file $ref - gen-ts.ts's own header warns that $RefParser.dereference() has corrupted an internal oneOf here before (recipe.schema.json's own steps); not worth risking on three short arrays.",
+          "properties": {
+            "thinking": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40,
+                "pattern": "\u2026$"
+              },
+              "minItems": 1
+            },
+            "searching": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40,
+                "pattern": "\u2026$"
+              },
+              "minItems": 1
+            },
+            "checking": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40,
+                "pattern": "\u2026$"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        "style_adapters": {
+          "type": "array",
+          "maxItems": 8,
+          "description": "Trained per-companion voice adapters by base model, as designed in the EVAL-03 design pass.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "base_model",
+              "format",
+              "url",
+              "sha256",
+              "approx_bytes",
+              "corpus_sha256"
+            ],
+            "properties": {
+              "base_model": {
+                "type": "string"
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "gguf-lora"
+                ]
+              },
+              "url": {
+                "type": "string",
+                "pattern": "^https://"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "approx_bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "corpus_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        "look_prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "The words the image and video tools start from for this character."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "rendering",
+            "needs_review",
+            "ready"
+          ],
+          "description": "Absent means ready."
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "confirmed_by",
+            "confirmed_at"
+          ],
+          "properties": {
+            "confirmed_by": {
+              "type": "string",
+              "minLength": 1
+            },
+            "confirmed_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "animation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "spec_version",
+            "key",
+            "states"
+          ],
+          "properties": {
+            "kind": {
+              "const": "video"
+            },
+            "spec_version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "sheet": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "rest",
+                "card"
+              ],
+              "properties": {
+                "rest": {
+                  "type": "string",
+                  "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+                },
+                "card": {
+                  "type": "string",
+                  "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+                }
+              }
+            },
+            "states": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "idle"
+              ],
+              "properties": {
+                "idle": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "researching": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "writing": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "done": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "laughing": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "surprised": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "sad": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "confused": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "idle_look": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "listening": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "thinking": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "working": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "speaking": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "needs_you": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "greeting": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "happy": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "oops": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "celebrate": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                },
+                "sleeping": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "still",
+                    "loop"
+                  ],
+                  "properties": {
+                    "h264": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "av1": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.mp4$"
+                    },
+                    "still": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "loop": {
+                      "type": "boolean"
+                    },
+                    "keyframe": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                }
+              }
+            },
+            "provenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "tool": {
+                  "type": "string"
+                },
+                "model_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9A-Fa-f]{64}$"
+                },
+                "prompt_hash": {
+                  "type": "string",
+                  "pattern": "^[0-9A-Fa-f]{64}$"
+                },
+                "seed": {
+                  "type": "integer"
+                },
+                "approved_by": {
+                  "type": "string"
+                },
+                "approved_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

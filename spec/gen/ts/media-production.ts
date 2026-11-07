@@ -31,6 +31,29 @@ export const MediaProduction = z
               .union([z.string().max(500), z.null()])
               .default(null),
             notes: z.string().max(2000).default(""),
+            synth_id: z
+              .union([
+                z.string().regex(new RegExp("^[a-z0-9][a-z0-9-]{0,39}$")),
+                z.null(),
+              ])
+              .default(null),
+            part: z
+              .union([
+                z.literal("anchor"),
+                z.literal("reporter"),
+                z.literal("host"),
+                z.literal("co_host"),
+                z.literal("guest"),
+                z.literal("moderator"),
+                z.literal("side"),
+                z.literal("critic"),
+                z.literal("dj"),
+                z.literal("narrator"),
+                z.literal("announcer"),
+                z.literal("actor"),
+                z.literal(null),
+              ])
+              .default(null),
           })
           .strict(),
       )
@@ -166,6 +189,90 @@ export const MediaProduction = z
     created_at: z.string().datetime({ offset: true }),
     updated_at: z.string().datetime({ offset: true }),
     hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+    show: z
+      .union([
+        z
+          .object({
+            format_id: z.enum([
+              "news_briefing",
+              "kids_news",
+              "round_table",
+              "debate",
+              "review",
+              "discussion",
+              "dj_links",
+              "narration",
+              "announcer",
+            ]),
+            audience: z.enum(["all", "teen", "adult"]),
+            household_facts: z.boolean(),
+            sources: z
+              .array(
+                z
+                  .object({
+                    kind: z.enum([
+                      "news",
+                      "weather",
+                      "household",
+                      "documents",
+                      "media_item",
+                      "bookmarks",
+                    ]),
+                    topics: z.array(z.string().max(60)),
+                    file_ids: z.array(
+                      z.string().regex(new RegExp("^file-[a-z0-9]{6,}$")),
+                    ),
+                    media_item_id: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+              )
+              .refine(
+                (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+                "All items must be unique!",
+              ),
+            schedule: z.union([
+              z
+                .object({
+                  every: z.enum(["1d", "7d"]),
+                  at: z
+                    .string()
+                    .regex(new RegExp("^([01][0-9]|2[0-3]):[0-5][0-9]$")),
+                  days: z.array(z.number().int().gte(0).lte(6)),
+                })
+                .strict(),
+              z.null(),
+            ]),
+            length_s: z.number().int().gte(60).lte(1800),
+            state: z.union([
+              z
+                .object({
+                  episode_id: z.string().optional(),
+                  stage: z
+                    .enum([
+                      "brief",
+                      "outline",
+                      "script",
+                      "check",
+                      "voices",
+                      "mix",
+                      "keep",
+                      "done",
+                      "failed",
+                    ])
+                    .optional(),
+                  reason: z.union([z.string(), z.null()]).optional(),
+                  started_at: z.string().datetime({ offset: true }).optional(),
+                  last_make_ms: z.union([z.number().int(), z.null()]),
+                })
+                .strict(),
+              z.null(),
+            ]),
+            stand_in_synth_id: z.union([z.string(), z.null()]),
+          })
+          .strict(),
+        z.null(),
+      ])
+      .default(null),
   })
   .strict()
   .describe(

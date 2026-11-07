@@ -6555,5 +6555,153 @@
     "honoured_by": [
       "home"
     ]
+  },
+  {
+    "key": "talent.shows.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Made shows",
+    "help": "Lets your household make audio shows.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "synths",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Lets your household make audio shows.",
+      "does_child": "Your household can make audio shows.",
+      "does_teen": "Your household can make audio shows."
+    }
+  },
+  {
+    "key": "talent.life.enabled",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Synths have lives",
+    "help": "Lets invented characters change over time.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "synths",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Lets invented characters change over time.",
+      "does_child": "Made-up characters can grow over time.",
+      "does_teen": "Made-up characters can grow over time."
+    }
+  },
+  {
+    "key": "talent.minors.make",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Children and teens can make shows",
+    "help": "Allows young people to make shows.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "synths",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Allows young family members to make audio programs.",
+      "does_child": "A guardian chooses if you can make audio programs.",
+      "does_teen": "A guardian chooses if you can make audio programs."
+    }
+  },
+  {
+    "key": "synths.of_me",
+    "scope": "person",
+    "selector": "boolean",
+    "default": true,
+    "label": "Synths can be based on me",
+    "help": "Allows your likeness and public facts in a character.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "synths",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Allows your likeness and public facts in a character.",
+      "does_child": "A guardian chooses whether to use your likeness.",
+      "does_teen": "A guardian chooses whether to use your likeness."
+    }
+  },
+  {
+    "key": "synths.real_people",
+    "scope": "person",
+    "selector": "select",
+    "default": "ask",
+    "label": "Synths based on real people",
+    "help": "Off hides every synth based on a real person. Ask means each one needs a parent to say yes first, and a yes lasts for that synth. All means every one is allowed. A parent or admin sets this for a child or teen.",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "synths",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Allows chats with lookalikes of well-known figures.",
+      "does_child": "Someone at home decides which lookalikes you can talk with.",
+      "does_teen": "Someone at home says yes, for all of them or one at a time.",
+      "options": {
+        "off": "None are shown.",
+        "ask": "Each one needs a yes first, and the yes lasts.",
+        "all": "Every one is allowed."
+      }
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "self_service": false,
+    "band_default": {
+      "child": "ask",
+      "teen": "ask",
+      "adult": "all"
+    },
+    "range": {
+      "options": [
+        "off",
+        "ask",
+        "all"
+      ]
+    }
+  },
+  {
+    "key": "synths.real_people_allowed",
+    "scope": "person",
+    "selector": "entity",
+    "default": [],
+    "label": "Real-person synths a parent allowed",
+    "help": "The synths based on real people that a parent said yes to for this person. A yes is added when a parent allows an ask; it can be removed here.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "synths",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "The lookalikes someone at home already said yes to.",
+      "does_child": "The lookalikes you already have a yes for.",
+      "does_teen": "The lookalikes you already have a yes for."
+    },
+    "control": {
+      "child": "guardian",
+      "teen": "guardian",
+      "adult": "self"
+    },
+    "self_service": false,
+    "band_default": {
+      "child": [],
+      "teen": [],
+      "adult": []
+    }
   }
 ]
