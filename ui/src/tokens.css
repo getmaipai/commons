@@ -915,7 +915,8 @@
   html:has([data-slot="phone-nav"]):not(:has([data-slot="story-filters"])) [data-slot="rail-body"], html:has([data-header-flat]) [data-slot="rail-body"] { padding-top: 0; }
   [data-slot="article-sticky-header"] { top: 0; margin-bottom: 0; }
   [data-slot="article-toolbar"], [data-slot="page-controls"] { display: flex; align-items: center; gap: 0.25rem; height: auto; min-height: 3rem; margin-top: 0; padding: 0.25rem 0.5rem; background: var(--background); }
-  [data-slot="page-controls"] { position: sticky; top: 0; z-index: 30; margin-inline: -1rem; }
+  [data-slot="page-controls"] { position: sticky; top: 0; z-index: 30; }
+  [data-slot="page-controls"] button { min-width: 44px; min-height: 44px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }
   [data-slot="article-toolbar-title"] { display: none; }
   [data-slot="article-toolbar"] > button { min-width: 44px; min-height: 44px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }
   [data-slot="article-actions"] { height: 44px; gap: 0; margin-inline-start: auto; border-radius: 999px; background: var(--card); box-shadow: var(--shadow-sm); }

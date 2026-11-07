@@ -1,3 +1,7 @@
+## [ui-v0.5.522] - 2026-11-07
+
+- PHONE-KIT-02: the phone `page-controls` row no longer pulls past the page edge and its buttons use the same round card look as the article toolbar.
+
 ## [ui-v0.5.521] - 2026-11-07
 
 - PHONE-KIT-01: keep the mini player dismissible on phones, switch a playing billboard action to Pause, contain small billboard and article artwork, align related thumbnails, use two phone header rows with a `page-controls` slot for detail pages, show a failed block as one compact error row with no reserved height (AsyncState errorLayout="row"), and ensure an empty Up next sheet button is not drawn.

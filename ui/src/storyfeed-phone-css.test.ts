@@ -34,7 +34,9 @@ describe("StoryFeed phone tokens and strip", () => {
 
   test("reader and detail controls form a second row and provider labels wrap below it", () => {
     expect(css).toContain('[data-slot="article-toolbar"], [data-slot="page-controls"] { display: flex; align-items: center; gap: 0.25rem; height: auto; min-height: 3rem; margin-top: 0; padding: 0.25rem 0.5rem; background: var(--background); }');
-    expect(css).toContain('[data-slot="page-controls"] { position: sticky; top: 0; z-index: 30; margin-inline: -1rem; }');
+    expect(css).toContain('[data-slot="page-controls"] { position: sticky; top: 0; z-index: 30; }');
+    expect(css).not.toContain('[data-slot="page-controls"] { position: sticky; top: 0; z-index: 30; margin-inline');
+    expect(css).toContain('[data-slot="page-controls"] button { min-width: 44px; min-height: 44px; border-radius: 999px;');
     expect(css).toContain('[data-slot="article-sticky-header"] { top: 0; margin-bottom: 0; }');
     expect(css).toContain('[data-slot="article-toolbar-title"] { display: none; }');
     expect(css).toContain('[data-slot="article-provider"] { top: 3.25rem; justify-content: center; padding-inline: 1rem;');
