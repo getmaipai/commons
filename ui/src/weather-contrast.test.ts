@@ -49,8 +49,8 @@ describe("weather scene token contrast",()=>{
  });
  test("registered weather properties keep the transition",()=>{for(const p of ["--wx-top","--wx-mid","--wx-bottom","--wx-glow","--wx-scrim","--wx-t"])expect(css).toContain(`@property ${p}`);expect(css).toContain("--wx-top 3200ms cubic-bezier(.37, 0, .63, 1)");});
  test("cloud day, night and twilight tints exist in all themes and stay out of the text band",()=>{
-  const classes=["clear","partly-cloudy","overcast","drizzle","rain","snow","thunderstorm"];
-  for(const src of themes) for(const cls of classes) for(const suffix of ["lit","shade","night-lit","night-shade","twilight-lit","twilight-shade"]) expect(token(src,`${cls}-cloud-${suffix}`).l).toBeGreaterThan(0);
+  const weatherClassList=["clear","partly-cloudy","overcast","drizzle","rain","snow","thunderstorm"];
+  for(const src of themes) for(const cls of weatherClassList) for(const suffix of ["lit","shade","night-lit","night-shade","twilight-lit","twilight-shade"]) expect(token(src,`${cls}-cloud-${suffix}`).l).toBeGreaterThan(0);
   expect(css).toContain("--wx-cloud-lit 3200ms cubic-bezier(.37, 0, .63, 1)");
   const cloudRules=css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"] {'),css.indexOf('[data-slot="weather-sky"] [data-fx="fog"] {'));
   expect(cloudRules).toContain("20% 56%"); expect(cloudRules).toContain("0% 22%"); expect(cloudRules).toContain("8% 40%");

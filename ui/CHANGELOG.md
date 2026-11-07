@@ -1,3 +1,7 @@
+## [ui-v0.5.510] - 2026-11-06
+
+- WEATHER-SCENE-02 clouds: the hand-placed blob stacks (and their `filter` blur) become mask-image clouds in three depth layers (far, mid, near) with three silhouettes, phase-tinted by new `--weather-*-cloud-*` tokens in all three theme blocks, per-class and per-variant counts, drift that always enters and leaves off the card, and wind-driven retiming at each cloud's next iteration. (ui-v0.5.509 was tagged by mistake on an old commit and is unusable; use this tag.)
+
 ## [ui-v0.5.508] - 2026-11-06
 
 - WEATHER-SCENE-01 fix: the sky gradient's `color-mix` calls had the mix percentage after a comma, which is invalid CSS, so every sky fell back to the registered navy. The percentage now follows the second colour, and a test checks the shape of every `color-mix` in the sky rule.
@@ -3735,7 +3739,6 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 - Weather forecast page: location cards give the local time and remove action a dedicated right-side header row beside a shrinkable city name; the remove target is 44 px. The shared sky now has visible, condition-specific scenes (sun pulse, 72 night stars, drifting clouds, 64 rain streaks with a splash, snow, storm flash and fog bands), reduced particle counts for paused list previews and reduced-motion support. Forecast details add optional AQI, UV, wind dial, sunrise/sunset, feels-like, humidity/dew point, precipitation, visibility, pressure and moon tiles plus an hourly Conditions metric switcher. Unsupported details stay omitted. Showcase and focused layout, data omission, switcher and animation tests included.
 - Data for optional detail tiles: `airQuality: { aqi, category }`, `wind: { speed, direction, gust? }`, `sunrise`, `sunset`, `uvIndex`, `feelsLike`, `humidity`, `dewPoint?`, `precipitation`, `precipitationAmount?`, `precipitationLast24h?`, `precipitationNext24h?`, `visibility`, `visibilityDescription?`, `pressure`, `pressureTrend?`, and `moon: { phase, illumination }`. The hourly chart uses `hourly[].temp`, `pop?`, and `windSpeed?`.
 ## Unreleased
-- WEATHER-SCENE-02: replace hand placed cloud blobs with three soft masked silhouettes, depth based drift and phase tinted cloud tokens; add per-class and variant counts plus wind speed retiming at animation iteration.
 - PHONE-01 and PHONE-03: add a phone story grid and steady pill strips.
 - MOON-LOOK-01: add a phase-accurate `MoonDisc` element and optional `nextFull` / `nextNew` dates to the Weather Moon Phase tile.
 
