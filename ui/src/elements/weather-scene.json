@@ -1,0 +1,13 @@
+{
+  "phase": { "nightBelow": -6, "dayAbove": 4, "smoothstepSpan": 10, "elevationClamp": 12, "degreesPerMinute": 0.2 },
+  "strength": { "overcastFactor": 0.7 },
+  "night": { "lightnessFloor": 0.14, "lightnessFactor": 0.42, "chromaHigh": 0.75, "chromaLow": 0.5, "huePull": 0.45, "hueTarget": 264 },
+  "dusk": { "topMix": 0.5, "midMix": 0.42, "bottomMix": 0.72, "glowMix": 1 },
+  "dawn": { "topMix": 0.4, "midMix": 0.3, "bottomMix": 0.62, "glowMix": 1 },
+  "caps": { "top": 0.46, "mid": 0.5, "bottom": 0.5 },
+  "scrim": { "alphaClear": 0.46, "alphaOvercast": 0.28 },
+  "effects": { "vignetteOpacity": 0.24, "grainOpacity": 0.06, "grainFrequency": 0.9, "grainOctaves": 2, "grainTile": 160, "effectWhite": 0.22 },
+  "light": { "fullXStart": 88, "fullXTravel": 28, "fullYStart": 40, "fullYTravel": 30, "compactX": 86, "compactYStart": 50, "compactYTravel": 24, "minimumY": 40, "minimumX": 60 },
+  "variants": ["full", "compact", "wide", "lite"],
+  "intensity": { "51": 0.4, "53": 0.7, "55": 1, "56": 0.4, "57": 1, "61": 0.45, "63": 0.75, "65": 1, "66": 0.45, "67": 1, "71": 0.4, "73": 0.7, "75": 1, "77": 1, "80": 0.45, "81": 0.75, "82": 1, "85": 0.4, "86": 1, "95": 0.8, "96": 1, "99": 1 }
+}

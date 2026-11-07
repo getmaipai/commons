@@ -54,6 +54,17 @@ export function weatherClassOf(code: number): WeatherClass {
   return WMO_CLASS[code] ?? "overcast";
 }
 
+/** Intensity of precipitation represented by a WMO weather code. */
+export function weatherIntensityOf(code: number): number {
+  const values: Readonly<Record<number, number>> = {
+    51: 0.4, 53: 0.7, 55: 1, 56: 0.4, 57: 1,
+    61: 0.45, 63: 0.75, 65: 1, 66: 0.45, 67: 1,
+    71: 0.4, 73: 0.7, 75: 1, 77: 1, 80: 0.45, 81: 0.75,
+    82: 1, 85: 0.4, 86: 1, 95: 0.8, 96: 1, 99: 1,
+  };
+  return values[code] ?? 0;
+}
+
 /** A seeded generator (mulberry32), so a card draws the same particles on every render. */
 export function seeded(seed: number): () => number {
   let a = seed >>> 0;

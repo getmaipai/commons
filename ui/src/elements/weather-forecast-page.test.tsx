@@ -23,7 +23,9 @@ describe("WeatherForecastPage", () => {
     expect(getByText("Wind", { selector: "span" })).toBeTruthy();
     expect(getByText("Humidity")).toBeTruthy();
     expect(container.querySelectorAll('[data-slot="weather-tile"]')).toHaveLength(6);
-    expect(container.querySelector('[data-slot="weather-forecast-hero"]')?.getAttribute("style")).toContain("--weather-partly-cloudy-day-from");
+    const sky = container.querySelector<HTMLElement>('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
+    expect(sky.dataset.phase).toBe("day");
+    expect(sky.style.getPropertyValue("--wx-t")).toBe("1");
   });
 
   test("deduplicates by id and rounded coordinates while keeping My Location first", () => {
@@ -214,13 +216,13 @@ describe("WeatherForecastPage", () => {
 });
 
 describe("hero sky layer layout (regression: the text-lift rule must not turn the sky wrapper into a zero-height box)", () => {
-  test("the hero's text-lift rule skips the sky and scrim layers", () => {
+  test("the hero's text-lift rule skips the sky layer", () => {
     expect(tokens).toContain('[data-slot="weather-forecast-hero"] > :not([data-weather-layer]) { position: relative; z-index: 2; }');
   });
-  test("the sky wrapper and the scrim are marked as layers and stay absolutely positioned over the hero", () => {
+  test("the sky wrapper is marked as a layer and stays absolutely positioned over the hero", () => {
     const { container } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
     const layers = container.querySelectorAll('[data-slot="weather-forecast-hero"] > [data-weather-layer]');
-    expect(layers.length).toBe(2);
+    expect(layers.length).toBe(1);
     for (const layer of Array.from(layers)) expect(layer.className).toContain("absolute inset-0");
   });
 });

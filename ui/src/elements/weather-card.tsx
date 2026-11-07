@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps, CSSProperties } from "react";
+import type { ComponentProps } from "react";
 import {
   CloudDrizzleIcon,
   CloudFogIcon,
@@ -162,6 +162,11 @@ export function WeatherCard({
   advice,
   alert,
   moon,
+  sunrise,
+  sunset,
+  wind,
+  now,
+  thunderJolt,
   locale = "en-US",
   variant = "full",
   className,
@@ -182,6 +187,11 @@ export function WeatherCard({
   alert?: WeatherAlert;
   /** Moon phase shown on a clear night. */
   moon?: WeatherMoon;
+  sunrise?: string;
+  sunset?: string;
+  wind?: number;
+  now?: Date | string | number;
+  thunderJolt?: boolean;
   /** Locale for the weekday names. Render-only; not part of the spec block. */
   locale?: string;
   /** `compact` draws the hero alone, shorter, for a dashboard card. Render-only; not part of the spec block. */
@@ -196,12 +206,8 @@ export function WeatherCard({
     `Weather in ${place}: ${Math.round(current.temp)} ${unitWord} and ${current.condition.toLowerCase()}` +
     (today ? `. High ${Math.round(today.high)}, low ${Math.round(today.low)}.` : ".");
   const cls = weatherClassOf(current.code);
-  const tod = current.is_day ? "day" : "night";
   const ConditionIcon = current.is_day ? ICONS[cls] : cls === "clear" ? MoonIcon : ICONS[cls];
-  const heroStyle: CSSProperties = {
-    backgroundImage: `linear-gradient(to bottom, var(--weather-${cls}-${tod}-from), var(--weather-${cls}-${tod}-to))`,
-    color: "var(--weather-ink)",
-  };
+  const heroStyle = { color: "var(--weather-ink)" };
   return (
     <div
       data-slot="weather-card"
@@ -222,9 +228,8 @@ export function WeatherCard({
       >
         <p className="sr-only" data-slot="weather-summary">{summary}</p>
         <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
-          <WeatherSky cls={cls} isDay={current.is_day} intensity={1} moon={moon} />
+          <WeatherSky cls={cls} isDay={current.is_day} code={current.code} moon={moon} variant={variant} sunrise={sunrise} sunset={sunset} wind={wind} now={now} thunderJolt={thunderJolt} />
         </div>
-        <div aria-hidden className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--weather-scrim)" }} />
         <div aria-hidden className="flex items-start justify-between gap-3">
           <span className="text-[11px] font-medium tracking-[0.14em] uppercase">{place}</span>
           {attribution ? <span className="text-end text-[11px]">{attribution}</span> : null}

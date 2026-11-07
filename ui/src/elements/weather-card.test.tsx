@@ -19,18 +19,19 @@ describe("WeatherCard", () => {
     expect(container.querySelector('[data-slot="weather-hero"]')?.textContent).toContain("72°F");
   });
 
-  test("the hero gradient comes from the class and time of day tokens", () => {
+  test("the sky owns the phase palette and the hero keeps ink", () => {
     const day = render(<WeatherCard {...props} current={{ ...props.current, code: 61, is_day: true }} />);
-    expect(day.container.querySelector<HTMLElement>('[data-slot="weather-hero"]')!.style.backgroundImage).toContain(
-      "var(--weather-rain-day-from)",
-    );
+    const daySky = day.container.querySelector<HTMLElement>('[data-slot="weather-sky"]')!;
+    expect(daySky.dataset.phase).toBe("day");
+    expect(daySky.style.getPropertyValue("--wx-t")).toBe("1");
+    expect(day.container.querySelector<HTMLElement>('[data-slot="weather-hero"]')!.style.color).toBe("var(--weather-ink)");
     cleanup();
     const night = render(<WeatherCard {...props} current={{ ...props.current, code: 61, is_day: false }} />);
     const root = night.container.querySelector('[data-slot="weather-card"]')!;
     expect(root.getAttribute("data-day")).toBe("false");
-    expect(night.container.querySelector<HTMLElement>('[data-slot="weather-hero"]')!.style.backgroundImage).toContain(
-      "var(--weather-rain-night-to)",
-    );
+    const nightSky = night.container.querySelector<HTMLElement>('[data-slot="weather-sky"]')!;
+    expect(nightSky.dataset.phase).toBe("night");
+    expect(nightSky.style.getPropertyValue("--wx-t")).toBe("0");
   });
 
   test("shows one column per day, at most 8, in order", () => {

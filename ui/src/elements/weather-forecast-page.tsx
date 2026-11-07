@@ -11,6 +11,7 @@ export { MoonDisc } from "./moon-disc";
 import { WeatherAdviceChips, WeatherAlertBanner, type WeatherAdvice, type WeatherAlert } from "./weather-advice";
 export type { WeatherAdvice, WeatherAlert } from "./weather-advice";
 import { weatherClassOf, type WeatherClass } from "./weather-condition";
+import { phaseOf } from "./weather-scene";
 
 export interface ForecastHour { time: string; temp: number; condition?: string; code?: number; pop?: number; windSpeed?: number; isDay?: boolean }
 export interface ForecastDay { date: string; high: number; low: number; code: number; pop?: number }
@@ -122,7 +123,10 @@ function hourIsDay(hour: ForecastHour, detail: WeatherLocationDetail, timeZone?:
   if (dateKey && minutes !== undefined) {
     const sunrise = timeValueForDate(detail.sunrise);
     const sunset = timeValueForDate(detail.sunset);
-    if (sunrise !== undefined && sunset !== undefined) return minutes >= sunrise && minutes < sunset;
+    if (sunrise !== undefined && sunset !== undefined) {
+      const at = new Date(`${dateKey}T${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}:00`);
+      return phaseOf({ sunrise: `${dateKey}T${String(Math.floor(sunrise / 60)).padStart(2, "0")}:${String(sunrise % 60).padStart(2, "0")}`, sunset: `${dateKey}T${String(Math.floor(sunset / 60)).padStart(2, "0")}:${String(sunset % 60).padStart(2, "0")}`, now: at, isDay: detail.isDay }).phase === "day";
+    }
   }
   return detail.isDay;
 }
@@ -149,9 +153,9 @@ function PlaceLine({ location, labels }: { location: WeatherLocation; labels: We
 }
 function LocationSky({ location, labels }: { location: WeatherLocation; labels: WeatherForecastPageLabels }) {
   const detail = location.detail ?? { temp: 0, condition: labels.weatherUnavailable, code: 3, isDay: true };
-  const cls = weatherClassOf(detail.code); const tod = detail.isDay ? "day" : "night";
-  return <div data-slot="weather-location-sky" data-class={cls} style={{ backgroundImage: `linear-gradient(150deg,var(--weather-${cls}-${tod}-from),var(--weather-${cls}-${tod}-to))`, color: "var(--weather-ink)" }} className="relative isolate flex h-40 w-full flex-col justify-between overflow-hidden rounded-2xl p-4 text-left">
-    <div className="absolute inset-0 -z-10 overflow-hidden"><WeatherSky cls={cls} isDay={detail.isDay} paused intensity={0.55}/></div><div className="absolute inset-0 -z-10 bg-[var(--weather-scrim-soft)]"/>
+  const cls = weatherClassOf(detail.code);
+  return <div data-slot="weather-location-sky" data-class={cls} style={{ color: "var(--weather-ink)" }} className="relative isolate flex h-40 w-full flex-col justify-between overflow-hidden rounded-2xl p-4 text-left">
+    <div className="absolute inset-0 -z-10 overflow-hidden"><WeatherSky cls={cls} isDay={detail.isDay} code={detail.code} variant="lite" sunrise={detail.sunrise?.includes("T") ? detail.sunrise : undefined} sunset={detail.sunset?.includes("T") ? detail.sunset : undefined} wind={detail.wind?.speed}/></div>
     <div data-slot="weather-location-header" className="flex min-w-0 items-start gap-2"><div data-slot="weather-location-name" className="min-w-0 flex-1 truncate"><PlaceLine location={location} labels={labels}/></div><div data-slot="weather-location-actions" className="ml-auto flex shrink-0 items-center gap-2"><span data-slot="weather-location-time" className="shrink-0 whitespace-nowrap text-right text-xs tabular-nums">{location.localTime ?? ""}</span>{!location.isMyLocation && <span data-slot="weather-location-remove-space" className="size-7 shrink-0" aria-hidden="true" />}</div></div>
     <div><span className="block text-4xl font-light tabular-nums">{deg(detail.temp)}</span><span className="text-xs">{detail.condition}{detail.high !== undefined && detail.low !== undefined ? ` · H ${deg(detail.high)} L ${deg(detail.low)}` : ""}</span></div>
   </div>;
@@ -160,7 +164,7 @@ export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch,
   const labels = { ...weatherForecastPageDefaultLabels, ...labelsProp }; const [mobileDetail, setMobileDetail] = useState(false); const [metric, setMetric] = useState<"temperature" | "precipitation" | "wind">("temperature");
   const uniqueLocations = useMemo(() => dedupeLocations(locations), [locations]);
   const selected = uniqueLocations.find((l) => l.id === selectedId) ?? uniqueLocations.find((l) => l.isMyLocation) ?? uniqueLocations[0]; const d = selected?.detail;
-  const cls = d ? weatherClassOf(d.code) : "overcast"; const tod = d?.isDay ? "day" : "night";
+  const cls = d ? weatherClassOf(d.code) : "overcast";
   const keyDown = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => { if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return; event.preventDefault(); const next = uniqueLocations[(index + (event.key === "ArrowDown" ? 1 : -1) + uniqueLocations.length) % uniqueLocations.length]; if (next) { onSelect?.(next.id); document.querySelector<HTMLElement>(`[data-location-id="${CSS.escape(next.id)}"]`)?.focus(); } };
   const daily = d?.daily?.slice(0, 10) ?? []; const globalMin = daily.length ? Math.min(...daily.map(x => x.low)) : 0; const globalMax = daily.length ? Math.max(...daily.map(x => x.high)) : 1;
   const fmt = (v: number, suffix = "") => `${Math.round(v)}${suffix}`;
@@ -179,8 +183,8 @@ export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch,
       <Button type="button" variant="ghost" size="sm" data-slot="weather-back" aria-label={labels.backToLocations} onClick={() => { setMobileDetail(false); onSelect?.(""); }} className="mb-3 flex items-center gap-2 text-sm lg:hidden"><ArrowLeft className="size-4"/>{labels.backToLocations}</Button>
       {d ? <>
         {alert ? <div className="mb-4"><WeatherAlertBanner alert={alert}/></div> : null}
-        <section data-slot="weather-forecast-hero" data-class={cls} style={{ backgroundImage: `linear-gradient(150deg,var(--weather-${cls}-${tod}-from),var(--weather-${cls}-${tod}-to))`, color: "var(--weather-ink)" }} className="relative isolate mb-4 flex min-h-72 flex-col justify-end overflow-hidden rounded-3xl p-7">
-          <div data-weather-layer="sky" className="absolute inset-0 z-0 overflow-hidden"><WeatherSky cls={cls} isDay={d.isDay} intensity={1}/></div><div data-weather-layer="scrim" className="absolute inset-0 z-[1] bg-gradient-to-t from-[var(--weather-text-scrim)] via-transparent to-transparent"/>
+        <section data-slot="weather-forecast-hero" data-class={cls} style={{ color: "var(--weather-ink)" }} className="relative isolate mb-4 flex min-h-72 flex-col justify-end overflow-hidden rounded-3xl p-7">
+          <div data-weather-layer="sky" className="absolute inset-0 z-0 overflow-hidden"><WeatherSky cls={cls} isDay={d.isDay} code={d.code} sunrise={d.sunrise?.includes("T") ? d.sunrise : undefined} sunset={d.sunset?.includes("T") ? d.sunset : undefined} wind={d.wind?.speed}/></div>
           <div className="mb-7 flex items-start justify-between gap-4"><div><p className="text-xl font-medium">{selected.city}{selected.state ? `, ${selected.state}` : ""}</p><p className="text-sm opacity-80">{selected.localTime ?? ""}{selected.timezone ? ` · ${selected.timezone}` : ""}</p></div><p className="text-xs opacity-80">Updated {d.hourly?.[0]?.time ? formatLocalTime(d.hourly[0].time, selected.timezone, locale) : "recently"}</p></div>
           <p className="text-7xl leading-none font-light tabular-nums">{deg(d.temp)}<span className="text-3xl">{unit}</span></p><p className="mt-3 text-lg">{d.condition}</p><p className="mt-1 text-sm">{d.high !== undefined && d.low !== undefined ? `H ${deg(d.high)} · L ${deg(d.low)}` : ""}</p>
         </section>

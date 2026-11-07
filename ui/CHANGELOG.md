@@ -1,3 +1,7 @@
+## [ui-v0.5.507] - 2026-11-06
+
+- WEATHER-SCENE-01 scene foundation: phase-aware sky palettes, time-derived elevation and light positioning, sky-owned gradient and scrims, and WMO intensity mapping. Clouds, precipitation, and orchestration remain on their existing behavior.
+
 ## [ui-v0.5.506] - 2026-11-06
 
 - CAPTION-01e fix. `LyricsList` with `renderLine` now draws each line in a plain container instead of a button. A text box inside a button cannot take focus or typing in a real browser, so the transcript editor could not save. Lines without `renderLine` are unchanged. Tests: the custom line is not inside a button; plain lines still are.

@@ -5,6 +5,7 @@ import {
   particles,
   seeded,
   weatherClassOf,
+  weatherIntensityOf,
 } from "./weather-condition";
 
 // Every weather_code Open-Meteo can emit (https://open-meteo.com/en/docs, "WMO Weather interpretation codes").
@@ -13,6 +14,10 @@ const OPEN_METEO_CODES = [
 ];
 
 describe("WMO code to sky class", () => {
+  test("weather intensity matches all 28 WMO codes", () => {
+    const values: Record<number, number> = { 51:.4,53:.7,55:1,56:.4,57:1,61:.45,63:.75,65:1,66:.45,67:1,71:.4,73:.7,75:1,77:1,80:.45,81:.75,82:1,85:.4,86:1,95:.8,96:1,99:1 };
+    for (const code of OPEN_METEO_CODES) expect(weatherIntensityOf(code), `code ${code}`).toBe(values[code] ?? 0);
+  });
   test("every code Open-Meteo emits maps to a known class", () => {
     for (const code of OPEN_METEO_CODES) {
       expect(WMO_CLASS[code], `code ${code}`).toBeDefined();
