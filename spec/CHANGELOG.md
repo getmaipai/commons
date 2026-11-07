@@ -1,3 +1,7 @@
+## [spec-v0.1.341] - 2026-11-07
+
+- UI-ACTION-CAPS, additive. `ui/schema.json`: a `result_feed` takes up to 5 `actions` (was 4) and a `studio` `export_result` up to 3 (was 2), so a page can carry a second entry that posts its own `call.args` (for example `{ surround: true }`). Pages valid before stay valid. Pairs with ui-v0.5.520.
+
 ## [spec-v0.1.340] - 2026-11-07
 
 - AUDIT-DEAD-01, no schema change. Retired keys, parked the way `generation.people_prompts` already was: `engines.stack.use_chat`, `use_embeddings`, `use_stt` and `use_tts` (the Stack decides which engine does each role) move from `household.ai_developer` to the new parked group `household.ai_retired`, listed in `not_placed`, so no settings card draws them. They stay registered and writable; a stored value still reads and is ignored, never an error. Migration note: nothing to migrate; the paired drop tag removes the keys and any stored rows. `generation.people_prompts` (already parked in `household.media_retired`) gets help text that says it is retired. `robot.greetings.mode` is NOT retired: the robot body (`body/maipai_body/app.py`) reads it. Reworded the `chat.search_assist` help, which still said Rescue was not active yet: it now says the model decides when to search and the setting only picks Off, Shadow or Rescue for the assist.
