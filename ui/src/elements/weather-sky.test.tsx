@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, jest } from "bun:test";
-import { cleanup, render } from "@testing-library/react";
+import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { WeatherSky } from "./weather-sky";
-import { cloudWindFactor, moonFromDate } from "./weather-scene";
+import { cloudWindFactor, lightPosition, moonFromDate, type WeatherVariant } from "./weather-scene";
 import { readFileSync } from "node:fs";
 import type { WeatherClass } from "./weather-condition";
 import scene from "./weather-scene.json";
@@ -185,6 +185,129 @@ describe("sky wrappers are sized", () => {
     for (const name of wrappers) {
       const rule = new RegExp(`\\[data-slot="weather-sky"\\] \\[data-fx="${name}"\\]\\s*\\{[^}]*inset:\\s*0`).exec(css);
       expect(rule, `${name} needs [data-slot="weather-sky"] [data-fx="${name}"] { inset: 0 }`).not.toBeNull();
+    }
+  });
+});
+
+const keyframe = (name: string) => { const start = css.indexOf(`@keyframes ${name}`); return css.slice(start, css.indexOf("\n", start)); };
+const skyRule = (selector: string) => { const start = css.indexOf(`${selector} {`); return start < 0 ? "" : css.slice(start, css.indexOf("}", start)); };
+
+describe("WEATHER-SCENE-05 lightning markup and CSS", () => {
+  test("a thunderstorm renders three bolts, the sheet and the cloud light, and no old flash or bolt", () => {
+    const { container } = render(<WeatherSky cls="thunderstorm" isDay={true} />);
+    expect([...container.querySelectorAll('[data-fx="strike-bolt"]')].map(b => b.getAttribute("data-bolt"))).toEqual(["a", "b", "c"]);
+    for (const bolt of container.querySelectorAll('[data-fx="strike-bolt"] polyline')) expect(bolt.getAttribute("points")!.split(" ")).toHaveLength(21);
+    expect(container.querySelector('[data-fx="strike-sheet"]')).not.toBeNull();
+    expect(container.querySelector('[data-fx="cloud-light"]')).not.toBeNull();
+    expect(container.querySelector('[data-fx="flash"]')).toBeNull();
+    expect(container.querySelector('[data-fx="bolt"]')).toBeNull();
+    cleanup();
+    const rain = render(<WeatherSky cls="rain" isDay={true} />);
+    expect(rain.container.querySelector('[data-fx="strike-bolt"]')).toBeNull();
+  });
+  test("keyframes exist, animate opacity or transform only, and the glow is static", () => {
+    for (const name of ["wx-strike", "wx-sheet", "wx-cloudlight", "wx-jolt"]) {
+      const frames = keyframe(name);
+      expect(frames, name).toContain("{");
+      expect(frames, name).not.toMatch(/filter|box-shadow|background/);
+    }
+    expect(keyframe("wx-strike")).toContain(".95");
+    expect(css).not.toMatch(/@keyframes wx-(flash|bolt)/);
+    const bolt = skyRule('[data-slot="weather-sky"] [data-fx="strike-bolt"]');
+    expect(bolt).toContain("filter: var(--weather-bolt-filter)");
+    expect(css).toMatch(/--weather-bolt-filter: drop-shadow\(/);
+    expect(bolt).toContain("stroke: var(--weather-bolt-fill)");
+  });
+  test("every new lightning wrapper has a sizing rule and sits under the weather-sky slot", () => {
+    for (const name of ["strike-sheet", "cloud-light"]) {
+      const rule = skyRule(`[data-slot="weather-sky"] [data-fx="${name}"]`);
+      expect(rule, name).toMatch(/inset:\s*0|(left:\s*0;[^}]*right:\s*0;[^}]*height:)/);
+      expect(rule, name).toContain("opacity: 0");
+    }
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="strike-bolt"]')).toMatch(/width:\s*72px[^}]*height:\s*58%/);
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="cloud-light"]')).toContain("mix-blend-mode: screen");
+    const lightningRules = css.slice(css.indexOf("WEATHER-SCENE-05 lightning"), css.indexOf("@property --wx-top")).split("\n").filter(l => l.includes("{") && !l.startsWith("/*"));
+    expect(lightningRules.length).toBeGreaterThan(5);
+    for (const line of lightningRules) expect(line.trimStart().startsWith('[data-slot="weather-sky"]'), line).toBe(true);
+  });
+  test("the snow pile fades in from a transparent top at no more than 45 percent", () => {
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="pile"]')).toContain("linear-gradient(to top, color-mix(in oklab, var(--weather-snow-pile) 45%, transparent), transparent)");
+  });
+  test("the sun and moon groups are centered on their anchor", () => {
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="sun-group"]')).toContain("translate(-50%,-50%)");
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="moon-group"]')).toContain("translate(-50%,-50%)");
+  });
+});
+
+describe("WEATHER-SCENE-05 strikes in the component", () => {
+  const originalMedia = window.matchMedia;
+  const originalRandom = Math.random;
+  afterEach(() => { window.matchMedia = originalMedia; Math.random = originalRandom; delete document.documentElement.dataset.easeMotion; jest.useRealTimers(); });
+  test("a strike sets data-strike and the bolt position, and animationend clears it", () => {
+    jest.useFakeTimers(); Math.random = () => 0.5;
+    const { container } = render(<WeatherSky cls="thunderstorm" isDay={true} />);
+    const sky = container.querySelector('[data-slot="weather-sky"]') as HTMLElement;
+    expect(sky.hasAttribute("data-strike")).toBe(false);
+    act(() => { jest.advanceTimersByTime(3800); });
+    expect(sky.getAttribute("data-strike")).toBe("b");
+    expect(sky.style.getPropertyValue("--wx-bolt-x")).toBe("50%");
+    fireEvent.animationEnd(container.querySelector('[data-fx="strike-bolt"][data-bolt="b"]')!);
+    expect(sky.hasAttribute("data-strike")).toBe(false);
+  });
+  test("the 700 ms fallback clears it when no animationend arrives", () => {
+    jest.useFakeTimers(); Math.random = () => 0.5;
+    const { container } = render(<WeatherSky cls="thunderstorm" isDay={true} />);
+    const sky = container.querySelector('[data-slot="weather-sky"]') as HTMLElement;
+    act(() => { jest.advanceTimersByTime(3800); });
+    expect(sky.hasAttribute("data-strike")).toBe(true);
+    act(() => { jest.advanceTimersByTime(700); });
+    expect(sky.hasAttribute("data-strike")).toBe(false);
+  });
+  test("nothing is scheduled when not running, paused, unmounted, or under reduced motion", () => {
+    jest.useFakeTimers(); Math.random = () => 0.5;
+    const quiet = (node: React.ReactElement) => { const v = render(node); act(() => { jest.advanceTimersByTime(30_000); }); const hit = v.container.querySelector('[data-slot="weather-sky"]')!.hasAttribute("data-strike"); v.unmount(); return hit; };
+    expect(quiet(<WeatherSky cls="thunderstorm" isDay={true} running={false} />)).toBe(false);
+    expect(quiet(<WeatherSky cls="thunderstorm" isDay={true} paused />)).toBe(false);
+    expect(quiet(<WeatherSky cls="rain" isDay={true} />)).toBe(false);
+    window.matchMedia = ((q: string) => ({ matches: q.includes("reduce"), media: q })) as typeof window.matchMedia;
+    expect(quiet(<WeatherSky cls="thunderstorm" isDay={true} />)).toBe(false);
+    window.matchMedia = ((q: string) => ({ matches: false, media: q })) as typeof window.matchMedia;
+    document.documentElement.dataset.easeMotion = "calm";
+    expect(quiet(<WeatherSky cls="thunderstorm" isDay={true} />)).toBe(false);
+    delete document.documentElement.dataset.easeMotion;
+    const live = render(<WeatherSky cls="thunderstorm" isDay={true} />);
+    live.unmount();
+    expect(jest.getTimerCount()).toBe(0);
+  });
+  test("running turning false cancels a pending strike", () => {
+    jest.useFakeTimers(); Math.random = () => 0.5;
+    const view = render(<WeatherSky cls="thunderstorm" isDay={true} />);
+    view.rerender(<WeatherSky cls="thunderstorm" isDay={true} running={false} />);
+    act(() => { jest.advanceTimersByTime(30_000); });
+    expect(view.container.querySelector('[data-slot="weather-sky"]')!.hasAttribute("data-strike")).toBe(false);
+  });
+  test("reduced motion marks the sky for the still frame", () => {
+    window.matchMedia = ((q: string) => ({ matches: q.includes("reduce"), media: q })) as typeof window.matchMedia;
+    const view = render(<WeatherSky cls="thunderstorm" isDay={true} />);
+    expect(view.container.querySelector('[data-slot="weather-sky"]')!.getAttribute("data-reduced")).toBe("true");
+    expect(css).toContain('[data-slot="weather-sky"][data-reduced="true"] [data-fx="strike-bolt"][data-bolt="a"] { opacity: .7; }');
+    expect(css).toContain('[data-slot="weather-sky"][data-reduced="true"] [data-fx="strike-sheet"] { opacity: .25; }');
+  });
+  test("the jolt defaults on for full and wide and off for compact and lite, and the prop overrides", () => {
+    const joltOf = (variant: WeatherVariant, thunderJolt?: boolean) => { const v = render(<WeatherSky cls="thunderstorm" isDay={true} variant={variant} thunderJolt={thunderJolt} />); const r = v.container.querySelector('[data-slot="weather-sky"]')!.getAttribute("data-jolt"); v.unmount(); return r; };
+    expect(joltOf("full")).toBe("true"); expect(joltOf("wide")).toBe("true");
+    expect(joltOf("compact")).toBeNull(); expect(joltOf("lite")).toBeNull();
+    expect(joltOf("full", false)).toBeNull(); expect(joltOf("compact", true)).toBe("true");
+    expect(skyRule('[data-slot="weather-sky"][data-jolt="true"][data-strike]')).toContain("wx-jolt 420ms cubic-bezier(.34, 1.56, .64, 1) 160ms");
+  });
+});
+
+describe("lightPosition keeps the disc inside the card", () => {
+  test("x stays within 12 to 88 percent and y within 14 to 70 percent for every variant and fraction", () => {
+    for (const variant of ["full", "compact", "wide", "lite"] as const) for (const kind of ["sun", "moon"] as const) for (let i = 0; i <= 200; i++) {
+      const p = lightPosition(variant, i / 200, kind);
+      expect(p.x).toBeGreaterThanOrEqual(12); expect(p.x).toBeLessThanOrEqual(88);
+      expect(p.y).toBeGreaterThanOrEqual(14); expect(p.y).toBeLessThanOrEqual(70);
     }
   });
 });

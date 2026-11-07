@@ -32,8 +32,10 @@ export function phaseOf(input: PhaseInput): PhaseResult {
 }
 export function lightPosition(variant: WeatherVariant, fraction: number, kind: "sun" | "moon" = "sun") {
   const arcFraction = kind === "moon" ? 1 - fraction : fraction;
-  if (variant === "compact" || variant === "lite") return { x: scene.light.compactX, y: scene.light.compactYStart - scene.light.compactYTravel * Math.sin(Math.PI * arcFraction) };
-  return { x: scene.light.fullXStart - scene.light.fullXTravel * arcFraction, y: scene.light.fullYStart - scene.light.fullYTravel * Math.sin(Math.PI * arcFraction) };
+  const [minX = 12, maxX = 88] = scene.light.clampX; const [minY = 14, maxY = 70] = scene.light.clampY;
+  const place = (x: number, y: number) => ({ x: clamp(x, minX, maxX), y: clamp(y, minY, maxY) });
+  if (variant === "compact" || variant === "lite") return place(scene.light.compactX, scene.light.compactYStart - scene.light.compactYTravel * Math.sin(Math.PI * arcFraction));
+  return place(scene.light.fullXStart - scene.light.fullXTravel * arcFraction, scene.light.fullYStart - scene.light.fullYTravel * Math.sin(Math.PI * arcFraction));
 }
 export function moonFromDate(now: Date | string | number = Date.now()) {
   const timestamp = now instanceof Date ? now.getTime() : typeof now === "number" ? now : new Date(now).getTime();

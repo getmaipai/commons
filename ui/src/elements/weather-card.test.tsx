@@ -130,7 +130,8 @@ describe("WeatherCard", () => {
     expect(partly.container.querySelector('[data-fx="cloud"][data-shape]')).not.toBeNull();
     cleanup();
     const storm = render(<WeatherCard {...props} current={{ ...props.current, code: 95 }} />);
-    expect(storm.container.querySelector('[data-fx="bolt"]')).not.toBeNull();
+    expect(storm.container.querySelectorAll('[data-fx="strike-bolt"]')).toHaveLength(3);
+    expect(storm.container.querySelector('[data-fx="flash"], [data-fx="bolt"]')).toBeNull();
     expect(storm.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(18);
   });
 

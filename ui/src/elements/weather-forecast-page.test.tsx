@@ -132,7 +132,8 @@ describe("WeatherForecastPage", () => {
     expect(tokens).toContain("@keyframes wx-twinkle");
     expect(tokens).toContain("@keyframes wx-fall");
     expect(tokens).toContain("@keyframes wx-flake");
-    expect(tokens).toContain("@keyframes wx-flash");
+    expect(tokens).toContain("@keyframes wx-strike");
+    expect(tokens).not.toContain("wx-flash");
     expect(tokens).toContain("@keyframes wx-fog");
     expect(tokens).toContain("@media (prefers-reduced-motion: reduce)");
     expect(tokens).toContain("animation: none !important");

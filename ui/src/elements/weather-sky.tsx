@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { particles, type Particle, type WeatherClass, weatherIntensityOf } from "./weather-condition";
 import { MoonDisc } from "./moon-disc";
+import { lightningReducedMotion, scheduleStrike } from "./weather-lightning";
 import scene from "./weather-scene.json";
 import { cloudDuration, cloudWindFactor, lightPosition, moonFromDate, phaseOf, precipitationCount, precipitationScale, type WeatherVariant } from "./weather-scene";
 
@@ -48,7 +49,7 @@ function cloudMask(shape: "a" | "b" | "c") {
 }
 
 /** Shared decorative scene. Paused previews keep the same still composition. */
-export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise, sunset, now, wind, width, height, paused = false, variant: variantProp, thunderJolt: _thunderJolt, seed: _seed, running = true, moon }: { cls: WeatherClass; isDay: boolean; code?: number; intensity?: number; elevation?: number; sunrise?: string; sunset?: string; now?: Date | string | number; wind?: number; width?: number; height?: number; paused?: boolean; variant?: WeatherVariant; thunderJolt?: boolean; seed?: number; running?: boolean; moon?: WeatherMoon }) {
+export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise, sunset, now, wind, width, height, paused = false, variant: variantProp, thunderJolt, seed: _seed, running = true, moon }: { cls: WeatherClass; isDay: boolean; code?: number; intensity?: number; elevation?: number; sunrise?: string; sunset?: string; now?: Date | string | number; wind?: number; width?: number; height?: number; paused?: boolean; variant?: WeatherVariant; thunderJolt?: boolean; seed?: number; running?: boolean; moon?: WeatherMoon }) {
   const variant = paused ? "lite" : (variantProp ?? "full");
   const skyRef = useRef<HTMLDivElement>(null);
   const [measuredWidth, setMeasuredWidth] = useState(width ?? scene.clouds.defaultWidth);
@@ -60,6 +61,23 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
     observer.observe(el); return () => observer.disconnect();
   }, [width]);
   useEffect(() => { if (height !== undefined) setMeasuredHeight(height); }, [height]);
+  const [reduced, setReduced] = useState(lightningReducedMotion);
+  const storm = cls === "thunderstorm";
+  const jolt = thunderJolt ?? (variant === "full" || variant === "wide");
+  useEffect(() => {
+    const el = skyRef.current; if (!storm || !el) return;
+    const reducedNow = lightningReducedMotion(); setReduced(reducedNow);
+    if (reducedNow || !running || paused) return;
+    let fallback: ReturnType<typeof setTimeout> | undefined;
+    const clear = () => { el.removeAttribute("data-strike"); if (fallback !== undefined) clearTimeout(fallback); fallback = undefined; };
+    const cancel = scheduleStrike(strike => {
+      clear();
+      el.style.setProperty("--wx-bolt-x", `${strike.x}%`);
+      el.setAttribute("data-strike", strike.bolt);
+      fallback = setTimeout(clear, scene.lightning.clearMs);
+    });
+    return () => { cancel(); clear(); };
+  }, [storm, running, paused]);
   const actualIntensity = intensity ?? weatherIntensityOf(code);
   const [clock, setClock] = useState(now ?? new Date());
   useEffect(() => { if (now !== undefined) setClock(now); }, [now]);
@@ -96,7 +114,7 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
   const hasMoon = timing.phase === "night" && (cls === "clear" || cls === "partly-cloudy");
   const hasMoonHalo = timing.phase === "night" && (cls === "overcast" || cls === "snow");
   const starCount = variant === "lite" ? 18 : cls === "clear" ? 54 : cls === "partly-cloudy" ? 30 : cls === "overcast" ? 8 : 0;
-  return <div ref={skyRef} data-slot="weather-sky" data-class={cls} data-phase={timing.phase} data-intensity={actualIntensity} data-running={running ? "true" : "false"} data-variant={variant} data-mounted="true" data-paused={paused ? "true" : "false"} style={skyStyle} aria-hidden="true">
+  return <div ref={skyRef} data-slot="weather-sky" data-class={cls} data-phase={timing.phase} data-intensity={actualIntensity} data-running={running ? "true" : "false"} data-variant={variant} data-mounted="true" data-paused={paused ? "true" : "false"} data-jolt={storm && jolt ? "true" : undefined} data-reduced={storm && reduced ? "true" : undefined} style={skyStyle} aria-hidden="true" onAnimationEnd={e => { if (e.target instanceof Element && e.target.getAttribute("data-fx") === "strike-bolt") e.currentTarget.removeAttribute("data-strike"); }}>
     <span data-weather-layer="base" className="weather-sky-base" aria-hidden="true"/>
     <span data-weather-layer="glow" className="weather-sky-glow" aria-hidden="true"/>
     <span data-weather-layer="vignette" className="weather-sky-vignette" aria-hidden="true"/>
@@ -110,6 +128,6 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
     {(cls === "fog" || cls === "drizzle") && fog.slice(0, cls === "drizzle" ? 1 : 3).map((p, i) => <span key={i} data-fx="fog" aria-hidden="true" style={{ ...style({ ...p, dur: cls === "drizzle" ? 7 : p.dur / snowWind }), "--fog-scale": [1.6,1.3,1][i]!, "--breath": [5,7,9][i]! + "s" } as Style}/>)}
     {(cls === "rain" || cls === "drizzle" || cls === "thunderstorm") && <>{rain.slice(0, rainCount).map((p, i) => <span key={i} data-fx="fall" aria-hidden="true" style={{ "--x": p.x, "--s": cls === "drizzle" ? 6 + (i % 4) : heavy ? 30 + (i % 15) : actualIntensity < 0.6 ? 16 + (i % 7) : 20 + (i % 11), "--tilt": heavy ? "-8deg" : "0deg", "--d": `${Math.max(0.2, (measuredHeight + 96) / (heavy ? 520 + (i % 7) * 30 : cls === "drizzle" ? 180 + (i % 5) * 20 : actualIntensity < 0.6 ? 300 + (i % 5) * 20 : 380 + (i % 7) * 20))}s`, "--dl": `${-p.delay - (i / Math.max(1, rainCount)) * Math.max(0.2, (measuredHeight + 96) / 340)}s`, "--o": heavy ? 0.5 + 0.45 * ((1.4 + ((p.size - 12) / 32)) - 1) / 1.4 : cls === "drizzle" ? 0.3 + (i % 4) * 0.05 : p.opacity, "--w": p.size < 12 ? 1 : heavy ? 1.4 + ((p.size - 12) / 32) : 1 + ((p.size - 12) / 32) } as Style}>{i < splashCount && <i data-fx="splash" aria-hidden="true"/>}</span>)}</>}
     {(cls === "snow" || snowLeaving) && <><span data-fx="snow-field">{snow.slice(0, snowCount).map((p, i) => <span key={i} data-fx="flake" style={{ ...style(p), "--wind": wind ?? 0 } as Style}>{i >= 15 && variant !== "lite" ? <span data-fx="sway" style={{ "--d": `${1.6 + (i % 5) * 0.2}s`, "--dl": `${p.delay}s` } as Style}><span data-fx="snow-core"/></span> : null}</span>)}</span><span data-fx="pile" data-leaving={snowLeaving ? "true" : undefined} style={{ "--pile-cap": actualIntensity < 0.5 ? 0.5 : 1 } as Style} aria-hidden="true"/></>}
-    {cls === "thunderstorm" && <><span data-fx="flash"/><svg data-fx="bolt" viewBox="0 0 80 130" aria-hidden="true"><path d="M47 0 12 70h25l-8 60 39-80H43z"/></svg></>}
+    {storm && <>{(["a", "b", "c"] as const).map(name => <svg key={name} data-fx="strike-bolt" data-bolt={name} viewBox={`0 0 80 ${scene.lightning.boltStepY * 20}`} preserveAspectRatio="xMidYMin meet" aria-hidden="true"><polyline points={scene.lightning.bolts[name].map((x, i) => `${x},${i * scene.lightning.boltStepY}`).join(" ")}/></svg>)}<span data-fx="strike-sheet"/><span data-fx="cloud-light"/></>}
   </div>;
 }

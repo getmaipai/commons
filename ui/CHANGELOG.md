@@ -1,3 +1,7 @@
+## [ui-v0.5.515] - 2026-11-07
+
+- WEATHER-SCENE-05 lightning: storms now strike at random (first strike 1.5 to 6 s in, then every 6 to 18 s, one in four a double at least 1 s apart, so no flash repeats more than three times a second). Each strike plays one of three authored 20-segment bolts at a random spot, a sky sheet and a cloud-light overlay, with an optional small thunder jolt (`thunderJolt`, on for full and wide). The old fixed-loop `flash` and `bolt` and their `wx-flash` and `wx-bolt` keyframes are gone. Strikes stop when the scene is not running, paused, unmounted, or under reduced motion (which shows a still bolt). The sun and moon position is clamped to 12 to 88 percent across and 14 to 70 percent down so the disc is never cut by the card edge, and the snow pile now fades in from a transparent top.
+
 ## [ui-v0.5.514] - 2026-11-07
 
 - WEATHER-SCENE-04: replace rotating sun rays with a breathing radial corona, render `MoonDisc` from date-derived phases, and add phase-aware light placement and night-scaled star fields.

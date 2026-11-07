@@ -886,6 +886,7 @@
   --weather-mask-ink: #000;
   --weather-bolt-fill: #fff3bd;
   --weather-bolt-glow: #fff;
+  --weather-bolt-filter: drop-shadow(0 0 8px var(--weather-bolt-glow));
   --weather-cloud-highlight: rgb(255 255 255 / 0.96);
   --weather-cloud-shadow: rgb(229 236 244 / 0.78);
   --weather-scrim-remove: rgb(0 0 0 / 0.3);
@@ -1264,6 +1265,7 @@
     --weather-mask-ink: #000;
     --weather-bolt-fill: #fff3bd;
     --weather-bolt-glow: #fff;
+    --weather-bolt-filter: drop-shadow(0 0 8px var(--weather-bolt-glow));
     --weather-cloud-highlight: rgb(255 255 255 / 0.96);
     --weather-cloud-shadow: rgb(229 236 244 / 0.78);
     --weather-scrim-remove: rgb(0 0 0 / 0.3);
@@ -2110,7 +2112,7 @@ body {
 [data-slot="weather-sky"] [data-fx="sway"] { position: absolute; inset: 0; animation: wx-sway var(--d) cubic-bezier(.37,0,.63,1) var(--dl) infinite alternate; transform-origin: 50% -400%; }
 [data-slot="weather-sky"] [data-fx="pile"] {
   left: 0; right: 0; bottom: 0; height: 12px; transform: scaleY(var(--pile-cap)); transform-origin: bottom;
-  background: linear-gradient(to top, var(--weather-snow-pile), transparent); animation: wx-pile 90s cubic-bezier(.22,1,.36,1) -90s both;
+  background: linear-gradient(to top, color-mix(in oklab, var(--weather-snow-pile) 45%, transparent), transparent); animation: wx-pile 90s cubic-bezier(.22,1,.36,1) -90s both;
 }
 [data-slot="weather-sky"] [data-fx="pile"][data-leaving="true"] { animation: wx-pile 1.2s ease-out reverse both; }
 [data-slot="weather-sky"] [data-fx="snow-core"] { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--weather-snow-flake) 0%, transparent 78%); }
@@ -2166,13 +2168,20 @@ body {
 [data-slot="weather-sky"] [data-fx="star"][data-twinkle="true"] { animation:wx-twinkle var(--d) ease-in-out var(--dl) infinite alternate; }
 [data-slot="weather-sky"][data-class="overcast"] [data-fx="star"] { opacity:.25; }
 [data-slot="weather-sky"][data-class="overcast"] [data-fx="star"] { top:calc(var(--y) * 5%); }
-[data-slot="weather-sky"] [data-fx="flash"] {
-  inset: 0;
-  opacity: 0;
-  background: var(--weather-ink);
-  animation: wx-flash 6.5s linear infinite;
-}
-[data-slot="weather-sky"] [data-fx="bolt"] { top: 16%; left: 48%; width: 64px; height: 110px; fill: var(--weather-bolt-fill); filter: drop-shadow(0 0 10px var(--weather-bolt-glow)); opacity: 0; animation: wx-bolt 6.5s linear infinite; }
+/* WEATHER-SCENE-05 lightning: three authored bolts, a sky sheet and a cloud-light overlay, played by data-strike. */
+[data-slot="weather-sky"] [data-fx="strike-bolt"] { top: 0; left: var(--wx-bolt-x, 50%); width: 72px; height: 58%; margin-left: -36px; opacity: 0; z-index: 20; fill: none; stroke: var(--weather-bolt-fill); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; filter: var(--weather-bolt-filter); }
+[data-slot="weather-sky"] [data-fx="strike-bolt"] polyline { vector-effect: non-scaling-stroke; }
+[data-slot="weather-sky"] [data-fx="strike-sheet"] { inset: 0; opacity: 0; z-index: 24; background: radial-gradient(ellipse 90% 100% at var(--wx-bolt-x, 50%) 0%, color-mix(in oklab, var(--weather-bolt-glow), transparent 30%), transparent 72%); }
+[data-slot="weather-sky"] [data-fx="cloud-light"] { top: 0; left: 0; right: 0; height: 55%; opacity: 0; z-index: 24; mix-blend-mode: screen; background: radial-gradient(ellipse 80% 100% at var(--wx-bolt-x, 50%) 0%, var(--weather-bolt-fill), transparent 70%); }
+[data-slot="weather-sky"][data-strike="a"] [data-fx="strike-bolt"][data-bolt="a"],
+[data-slot="weather-sky"][data-strike="b"] [data-fx="strike-bolt"][data-bolt="b"],
+[data-slot="weather-sky"][data-strike="c"] [data-fx="strike-bolt"][data-bolt="c"] { animation: wx-strike 560ms cubic-bezier(.16, 1, .3, 1) both; }
+[data-slot="weather-sky"][data-strike] [data-fx="strike-sheet"] { animation: wx-sheet 560ms cubic-bezier(.16, 1, .3, 1) both; }
+[data-slot="weather-sky"][data-strike] [data-fx="cloud-light"] { animation: wx-cloudlight 560ms cubic-bezier(.16, 1, .3, 1) both; }
+[data-slot="weather-sky"][data-jolt="true"][data-strike] { animation: wx-jolt 420ms cubic-bezier(.34, 1.56, .64, 1) 160ms forwards; }
+/* Reduced motion: no strikes are scheduled, so the card shows one still frame (bolt A and a faint sheet). */
+[data-slot="weather-sky"][data-reduced="true"] [data-fx="strike-bolt"][data-bolt="a"] { opacity: .7; }
+[data-slot="weather-sky"][data-reduced="true"] [data-fx="strike-sheet"] { opacity: .25; }
 @property --wx-top { syntax: "<color>"; inherits: true; initial-value: navy; }
 @property --wx-mid { syntax: "<color>"; inherits: true; initial-value: navy; }
 @property --wx-bottom { syntax: "<color>"; inherits: true; initial-value: navy; }
@@ -2211,15 +2220,10 @@ body {
   from { transform: translate3d(-100%, 0, 0); }
   to { transform: translate3d(100cqw, 0, 0); }
 }
-@keyframes wx-bolt { 0%, 91%, 100% { opacity: 0; } 92%, 94% { opacity: .95; } 95% { opacity: .12; } 96% { opacity: .9; } 98% { opacity: 0; } }
-/* Two soft flashes close together, then quiet: never more than three flashes in a second. */
-@keyframes wx-flash {
-  0%, 91%, 100% { opacity: 0; }
-  92% { opacity: 0.26; }
-  93.5% { opacity: 0.04; }
-  95% { opacity: 0.2; }
-  98% { opacity: 0; }
-}
+@keyframes wx-strike { 0% { opacity: .95; } 10.7% { opacity: .30; } 17.9% { opacity: .85; } 100% { opacity: 0; } }
+@keyframes wx-sheet { 0% { opacity: .55; } 10.7% { opacity: .17; } 17.9% { opacity: .49; } 100% { opacity: 0; } }
+@keyframes wx-cloudlight { 0% { opacity: .5; } 10.7% { opacity: .16; } 17.9% { opacity: .45; } 100% { opacity: 0; } }
+@keyframes wx-jolt { from { transform: translateY(-4px); } to { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
   [data-slot="weather-sky"] [data-fx],
   [data-slot="weather-forecast-hero"] [data-fx],
