@@ -1280,6 +1280,11 @@
     },
     {
       "scope": "household",
+      "group": "household.ai_retired",
+      "reason": "The four engines.stack.use_* switches are retired: the Stack decides which engine does each role. Kept registered and writable so a stored value reads and a write still succeeds; no settings screen draws them."
+    },
+    {
+      "scope": "household",
       "group": "household.media_styles_old",
       "reason": "The two old adult-only style switches are merged into generation.styles.adult_only; they stay readable for the migration step until the drop tag."
     },

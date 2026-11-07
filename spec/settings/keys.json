@@ -1099,7 +1099,7 @@
     },
     "default": "shadow",
     "label": "Help the chat remember to search the web",
-    "help": "\"Off\" is the kill switch: nothing is scored. \"Shadow\" (the default) only counts, as a number, how often a web search looked needed, and changes no reply. \"Rescue\" is not active yet; for now it behaves like shadow. Children and teens are never scored.",
+    "help": "The model decides when to search the web; this setting only chooses whether Home also counts the searches it skipped that looked needed (Shadow, the default), makes up for them (Rescue), or does neither (Off).",
     "level": "advanced",
     "secret": false,
     "lives_in": "household.ai_advanced",
@@ -1113,10 +1113,10 @@
     "selector": "boolean",
     "default": false,
     "label": "Use the MaiPai Stack for chat",
-    "help": "Off, Home's own engine does this. Turn on only after the Stack has been proven for it. The memory judge and background worker follow this switch because they share chat's model.",
+    "help": "Retired. The MaiPai Stack now decides which engine does each job, so this switch does nothing. The key stays so a stored value still reads and a write still succeeds.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai_developer",
+    "lives_in": "household.ai_retired",
     "honoured_by": [
       "home"
     ]
@@ -1127,10 +1127,10 @@
     "selector": "boolean",
     "default": false,
     "label": "Use the MaiPai Stack for search (embeddings)",
-    "help": "Off, Home's own engine does this. Turn on only after the Stack has been proven for it.",
+    "help": "Retired. The MaiPai Stack now decides which engine does each job, so this switch does nothing. The key stays so a stored value still reads and a write still succeeds.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai_developer",
+    "lives_in": "household.ai_retired",
     "honoured_by": [
       "home"
     ]
@@ -1141,10 +1141,10 @@
     "selector": "boolean",
     "default": false,
     "label": "Use the MaiPai Stack for listening (speech to text)",
-    "help": "Off, Home's own engine does this. Turn on only after the Stack has been proven for it.",
+    "help": "Retired. The MaiPai Stack now decides which engine does each job, so this switch does nothing. The key stays so a stored value still reads and a write still succeeds.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai_developer",
+    "lives_in": "household.ai_retired",
     "honoured_by": [
       "home"
     ]
@@ -1155,10 +1155,10 @@
     "selector": "boolean",
     "default": false,
     "label": "Use the MaiPai Stack for speaking (text to speech)",
-    "help": "Off, Home's own engine does this. Turn on only after the Stack has been proven for it.",
+    "help": "Retired. The MaiPai Stack now decides which engine does each job, so this switch does nothing. The key stays so a stored value still reads and a write still succeeds.",
     "level": "expert",
     "secret": false,
-    "lives_in": "household.ai_developer",
+    "lives_in": "household.ai_retired",
     "honoured_by": [
       "home"
     ]
@@ -4496,9 +4496,9 @@
     "selector": "boolean",
     "default": false,
     "label": "Ask me before making pictures and videos of people",
-    "help": "When off, Home makes what you ask for without extra questions or warnings. Safety rules for children and for real people never turn off.",
+    "help": "Retired. Home asks nothing extra about people in pictures and videos, so this switch does nothing. Safety rules for children and for real people never turn off.",
     "copy": {
-      "does": "Turns the extra questions and warnings about people in pictures and videos on or off."
+      "does": "Does nothing now and is kept only so a stored value still reads."
     },
     "level": "basic",
     "secret": false,

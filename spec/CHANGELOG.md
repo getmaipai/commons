@@ -1,3 +1,7 @@
+## [spec-v0.1.340] - 2026-11-07
+
+- AUDIT-DEAD-01, no schema change. Retired keys, parked the way `generation.people_prompts` already was: `engines.stack.use_chat`, `use_embeddings`, `use_stt` and `use_tts` (the Stack decides which engine does each role) move from `household.ai_developer` to the new parked group `household.ai_retired`, listed in `not_placed`, so no settings card draws them. They stay registered and writable; a stored value still reads and is ignored, never an error. Migration note: nothing to migrate; the paired drop tag removes the keys and any stored rows. `generation.people_prompts` (already parked in `household.media_retired`) gets help text that says it is retired. `robot.greetings.mode` is NOT retired: the robot body (`body/maipai_body/app.py`) reads it. Reworded the `chat.search_assist` help, which still said Rescue was not active yet: it now says the model decides when to search and the setting only picks Off, Shadow or Rescue for the assist.
+
 ## [spec-v0.1.339] - 2026-11-07
 
 - TALENT-00, additive. Manifests can reference shared synth persona and metadata; Synth and ShowFormat records are added, with show data on productions, synth links on media records, production media sources, show provenance, and five synth settings. Existing companion manifests retain their shape.
