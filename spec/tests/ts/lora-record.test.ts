@@ -147,6 +147,25 @@ describe("Lora adult_check (VIDEO-LORA-02b, additive)", () => {
   });
 });
 
+describe("Lora tested_on_25 and untested_on_25 (additive)", () => {
+  test("a record without the fields still validates", () => {
+    expect(both(mut(() => {}))).toBe(true);
+  });
+  test("tested, no_effect and null validate; other values do not", () => {
+    for (const v of ["tested", "no_effect", null]) {
+      expect(both(mut((x) => { x.tested_on_25 = v; }))).toBe(true);
+    }
+    expect(both(mut((x) => { x.tested_on_25 = "maybe"; }))).toBe(false);
+    expect(both(mut((x) => { x.tested_on_25 = true; }))).toBe(false);
+  });
+  test("untested_on_25 is a boolean", () => {
+    expect(both(mut((x) => { x.untested_on_25 = true; }))).toBe(true);
+    expect(both(mut((x) => { x.untested_on_25 = false; }))).toBe(true);
+    expect(both(mut((x) => { x.untested_on_25 = "yes"; }))).toBe(false);
+    expect(both(mut((x) => { x.untested_on_25 = null; }))).toBe(false);
+  });
+});
+
 describe("File made_audience and lock (additive)", () => {
   const file = (extra: Record<string, unknown> = {}) => ({
     id: "file-ab12cd34",

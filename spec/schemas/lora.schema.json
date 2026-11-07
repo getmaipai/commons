@@ -178,6 +178,15 @@
         "checked_at": { "type": "string", "format": "date-time" }
       }
     },
+    "tested_on_25": {
+      "type": ["string", "null"],
+      "enum": ["tested", "no_effect", null],
+      "description": "Bench result for running an `ltx-2.3` LoRA on `ltx-2.5`: `tested` (it works there), `no_effect` (it loads but changes nothing), or null (not tested). Only a record whose base_model is `ltx-2.3` holds a value; the Stack enforces that. Absent reads as null."
+    },
+    "untested_on_25": {
+      "type": "boolean",
+      "description": "Derived by the Stack on read: true when the LoRA would be used on `ltx-2.5` without a bench result. Never stored by Home as a decision. Absent reads as false."
+    },
     "availability": {
       "type": "object",
       "additionalProperties": false,

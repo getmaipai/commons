@@ -1,3 +1,7 @@
+## [spec-v0.1.334] - 2026-11-06
+
+- LTXD, additive. The `Lora` record gains two optional fields: `tested_on_25` (`tested`, `no_effect` or null; only a record whose `base_model` is `ltx-2.3` holds a value, the Stack enforces that) and `untested_on_25` (boolean, derived by the Stack on read). Absent reads as null and false, so every existing record validates unchanged. The Stack's generation reply may also carry `lora_warnings` (`id`, `code` of `untested_on_25` or `tested_on_25`, `message`); that reply has no spec schema yet, so nothing changes for it here.
+
 ## [spec-v0.1.333] - 2026-11-06
 
 - SCHED-02 / HOUSE-01, additive. New `ScheduledTask` record (`sched-` ids): `person`, `kind` (remind, timer, turn, device_action, scene), `executor` (hub, home_assistant), a recurrence in the alarm's shape (`once_at`, or `time` with `days` and `zone`; ISO weekdays 1 to 7 as in `alarm`, empty `days` means every day), `what` (`targets`, `action`, `value` 1 to 100, `text` up to 200), `enabled`, `state`, `paused_reason`, an opaque `external_ref` that is never the id, `grant_snapshot`, `deliver_on` (hub, robot, both; default hub), tombstone `deleted_at`, provenance and clock stamp. `validateScheduledTask` (TypeScript) and `validate_scheduled_task` (Python) check: exactly one recurrence form; device_action and scene need targets and an action; remind, timer and turn need executor hub; `external_ref` differs from `id`. `grant-actions.json` is unchanged.

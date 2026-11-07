@@ -276,6 +276,14 @@ class Lora(BaseModel):
         None,
         description="Design revision 2, section 15.1. What the source's own data said about adult content, when it was read. Evidence only: it never decides access (audience does) and is never lowered by an admin's choice. `unknown` and `adult` are both treated as adult-only. Decided from source fields only (Civitai nsfw flag and per-image nsfwLevel, the Hugging Face tag not-for-all-audiences), never from a word list. Absent reads as state unknown, basis none.",
     )
+    tested_on_25: Literal['tested', 'no_effect'] | None = Field(
+        None,
+        description='Bench result for running an `ltx-2.3` LoRA on `ltx-2.5`: `tested` (it works there), `no_effect` (it loads but changes nothing), or null (not tested). Only a record whose base_model is `ltx-2.3` holds a value; the Stack enforces that. Absent reads as null.',
+    )
+    untested_on_25: bool | None = Field(
+        None,
+        description='Derived by the Stack on read: true when the LoRA would be used on `ltx-2.5` without a bench result. Never stored by Home as a decision. Absent reads as false.',
+    )
     availability: Availability = Field(
         ...,
         description='Who besides admins may use it. Default `admins`. Never includes a minor (the writer refuses one) and never widens what the Adult lock and the household adult-adapters switch hide.',
