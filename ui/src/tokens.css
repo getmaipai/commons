@@ -2106,6 +2106,7 @@ body {
   border-radius: 50%; opacity: var(--o); background: radial-gradient(circle, var(--weather-snow-flake) 0%, transparent 78%);
   animation: wx-flake var(--d) linear var(--dl) infinite;
 }
+[data-slot="weather-sky"] [data-fx="snow-field"] { inset: 0; }
 [data-slot="weather-sky"] [data-fx="sway"] { position: absolute; inset: 0; animation: wx-sway var(--d) cubic-bezier(.37,0,.63,1) var(--dl) infinite alternate; transform-origin: 50% -400%; }
 [data-slot="weather-sky"] [data-fx="pile"] {
   left: 0; right: 0; bottom: 0; height: 12px; transform: scaleY(var(--pile-cap)); transform-origin: bottom;

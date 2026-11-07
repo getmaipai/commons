@@ -1,3 +1,7 @@
+## [ui-v0.5.513] - 2026-11-07
+
+- WEATHER-SCENE-03 fix: the snow container had no CSS, so it collapsed to zero width and every flake sat at the left edge. It now fills the sky (`inset: 0`), and a test checks that every `*-field` wrapper in the sky has a sizing rule.
+
 ## [ui-v0.5.512] - 2026-11-06
 
 - WEATHER-SCENE-03 precipitation and fog: intensity and area-scaled rain pools, per-drop splashes, depth-based snow with a settling pile, and three soft token-colored fog layers.

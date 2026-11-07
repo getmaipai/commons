@@ -135,3 +135,14 @@ describe("WeatherSky moon disc", () => {
     expect(container.querySelector('[data-slot="weather-moon-disk"]')).toBeNull();
   });
 });
+
+describe("sky wrappers are sized", () => {
+  test("every data-fx wrapper named *-field in weather-sky.tsx has a CSS rule that gives it an inset (a collapsed wrapper puts every child at left 0)", () => {
+    const wrappers = [...new Set([...skySource.matchAll(/data-fx="([a-z-]+-field)"/g)].map((m) => m[1]!))];
+    expect(wrappers.length).toBeGreaterThan(0);
+    for (const name of wrappers) {
+      const rule = new RegExp(`\\[data-slot="weather-sky"\\] \\[data-fx="${name}"\\]\\s*\\{[^}]*inset:\\s*0`).exec(css);
+      expect(rule, `${name} needs [data-slot="weather-sky"] [data-fx="${name}"] { inset: 0 }`).not.toBeNull();
+    }
+  });
+});
