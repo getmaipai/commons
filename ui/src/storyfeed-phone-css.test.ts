@@ -28,19 +28,34 @@ describe("StoryFeed phone tokens and strip", () => {
     expect(css).toContain("[data-top-row-hide]");
   });
 
-  test("the reader's sticky header keeps its resting offset and a section-bar app starts its page under the menu button", () => {
-    expect(css).toContain('html[data-app-reading] [data-slot="article-sticky-header"] { top: 1rem; }');
-    expect(css).toContain(':has([data-slot="phone-nav"]) [data-slot="rail-body"] { padding-top: 0; }');
+  test("section-bar apps start their page under the menu button", () => {
+    expect(css).toContain('html:has([data-slot="phone-nav"]):not(:has([data-slot="story-filters"])) [data-slot="rail-body"], html:has([data-header-flat]) [data-slot="rail-body"] { padding-top: 0; }');
   });
 
-  test("a phone video watch page uses a floating shell header and full-bleed player", () => {
-    expect(css).toContain('html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-page-header"]');
-    expect(css).toContain('html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-body"] { padding-top: 0; }');
+  test("reader and detail controls form a second row and provider labels wrap below it", () => {
+    expect(css).toContain('[data-slot="article-toolbar"], [data-slot="page-controls"] { display: flex; align-items: center; gap: 0.25rem; height: auto; min-height: 3rem; margin-top: 0; padding: 0.25rem 0.5rem; background: var(--background); }');
+    expect(css).toContain('[data-slot="page-controls"] { position: sticky; top: 0; z-index: 30; margin-inline: -1rem; }');
+    expect(css).toContain('[data-slot="article-sticky-header"] { top: 0; margin-bottom: 0; }');
+    expect(css).toContain('[data-slot="article-toolbar-title"] { display: none; }');
+    expect(css).toContain('[data-slot="article-provider"] { top: 3.25rem; justify-content: center; padding-inline: 1rem;');
+    expect(css).toContain('[data-slot="article-column"] { margin-top: 0; padding-top: 1rem; }');
+    expect(css).toContain('[data-slot="article-provider-label"] { white-space: normal; display: -webkit-box;');
+  });
+
+  test("a phone video watch page keeps the shell header and uses a full-bleed player", () => {
     expect(css).toContain('html:has([data-slot="player"][data-layout="video"]) [data-slot="player"]');
     expect(css).toContain("margin-inline: -1rem");
-    expect(css).toContain("margin-top: -1rem");
-    expect(css).toContain("pointer-events: none");
-    expect(css).toContain("z-index: 40");
+    expect(css).toContain("width: auto");
+    const phone = css.slice(css.indexOf('@media (max-width: 639.98px)'), css.indexOf('@media', css.indexOf('@media (max-width: 639.98px)') + 1));
+    expect(phone).not.toContain("data-app-reading");
+    expect(phone).not.toContain('html:has([data-slot="player"][data-layout="video"]) [data-slot="rail-page-header"]');
+    expect(phone).not.toContain('html:has([data-slot="player"][data-layout="video"]) [data-top-row-hide]');
+    expect(phone).not.toContain('[data-slot="mobile-menu-button"] { z-index: 50; }');
+  });
+
+  test("data-header-flat gets the flat phone bar geometry", () => {
+    expect(css).toContain('html:has([data-header-flat]) [data-slot="rail-page-header"]');
+    expect(css).toContain('html:has([data-header-flat]) [data-slot="rail-body"]');
   });
 
   test("the chips bar spans the row so the avatar sits at the right and the chips keep clear of the controls", () => {

@@ -26,6 +26,25 @@ describe("AsyncState", () => {
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
+  test("a row error is one compact line with no reserved height", () => {
+    const { container, getByRole } = render(
+      <AsyncState data={undefined} error errorLayout="row" errorMessage="Could not load this shelf." onRetry={() => {}}>
+        {() => <p>never rendered</p>}
+      </AsyncState>,
+    );
+    const wrap = container.querySelector('[data-slot="async-error"]')!;
+    expect(wrap.getAttribute("data-layout")).toBe("row");
+    expect(wrap.className).not.toContain("flex-1");
+    expect(wrap.className).not.toContain("p-8");
+    expect(container.querySelector('[data-slot="error-state"]')!.className).toContain("flex-wrap");
+    expect(getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+
+  test("a page error still centres in the free space by default", () => {
+    const { container } = render(<AsyncState data={undefined} error onRetry={() => {}}>{() => <p>x</p>}</AsyncState>);
+    expect(container.querySelector('[data-slot="async-error"]')!.className).toContain("flex-1");
+  });
+
   test("shows the empty state when data is null", () => {
     const { getByText } = render(
       <AsyncState data={null} onRetry={() => {}} emptyText="Nothing remembered yet.">

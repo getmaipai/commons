@@ -140,6 +140,22 @@ describe("ArticleView", () => {
     expect(frame.querySelector("img")!.className).toContain("absolute");
   });
 
+  test("a narrow lead picture gets a contained foreground while a wide one does not", () => {
+    const small = render(<ArticleView data={{ ...data, image: { w480: "/small", w1280: "/small", alt: "Small" } }} />);
+    const img = small.container.querySelector('[data-slot="article-lead"] img')!;
+    Object.defineProperty(img.parentElement, "clientWidth", { configurable: true, value: 800 });
+    Object.defineProperty(img, "naturalWidth", { configurable: true, value: 300 });
+    fireEvent.load(img);
+    expect(small.container.querySelector('[data-slot="article-lead-fit"]')).not.toBeNull();
+    cleanup();
+    const large = render(<ArticleView data={{ ...data, image: { w480: "/large", w1280: "/large", alt: "Large" } }} />);
+    const largeImg = large.container.querySelector('[data-slot="article-lead"] img')!;
+    Object.defineProperty(largeImg.parentElement, "clientWidth", { configurable: true, value: 800 });
+    Object.defineProperty(largeImg, "naturalWidth", { configurable: true, value: 2000 });
+    fireEvent.load(largeImg);
+    expect(large.container.querySelector('[data-slot="article-lead-fit"]')).toBeNull();
+  });
+
   test("a teen or adult copy keeps its outbound link, opened in a new tab without the referrer", () => {
     const { getByText } = render(<ArticleView data={data} />);
     const link = getByText("a source") as HTMLAnchorElement;
@@ -501,6 +517,7 @@ describe("ArticleView mockup parts", () => {
     expect(links.map((a) => a.textContent)).toEqual(["Solar wind", "Night sky"]);
     expect(links.map((a) => a.getAttribute("href"))).toEqual(["#Solar_wind", "#Night_sky"]);
     expect(related.querySelectorAll("img").length).toBe(1);
+    expect(related.querySelectorAll("li > span.size-12")).toHaveLength(2);
   });
 
   test("Related without a link renderer shows the titles as plain text", () => {

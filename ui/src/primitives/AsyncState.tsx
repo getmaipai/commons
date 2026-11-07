@@ -28,6 +28,8 @@ interface AsyncStateProps<T> {
    * there is nothing to look up here. This is only the fallback for a
    * failure that never reached the API layer at all. */
   errorMessage?: string;
+  /** `page` (default) centres the failure in the free space. `row` is one compact line (icon, message, Try again, wrapping under the message on a phone) that reserves no height: for a shelf or block inside a page. */
+  errorLayout?: "page" | "row";
   emptyIcon?: string;
   emptyText?: string;
   emptyActionLabel?: string;
@@ -48,6 +50,7 @@ export function AsyncState<T>({
   error,
   isFetching,
   onRetry,
+  errorLayout = "page",
   errorMessage = i18n._({ id: "ui.Something went wrong.", message: "Something went wrong." }),
   emptyIcon = "inbox",
   emptyText = i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." }),
@@ -66,9 +69,10 @@ export function AsyncState<T>({
 
   if (error) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center p-8">
+      <div data-slot="async-error" data-layout={errorLayout} className={errorLayout === "row" ? "flex w-full py-2" : "flex flex-1 flex-col items-center justify-center p-8"}>
         <ErrorState
           layout="inline"
+          className={errorLayout === "row" ? "flex-wrap items-center" : undefined}
           title={errorMessage}
           retrying={false}
           onRetry={onRetry}

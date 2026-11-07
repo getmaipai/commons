@@ -301,7 +301,7 @@ function ArticleRelated({ items, renderTargetLink }: { items: NonNullable<Articl
       <ul className="flex flex-col gap-1">
         {items.map((item) => (
           <li key={`${item.target.book}/${item.target.path}`} className="bg-card text-card-foreground hover:bg-muted relative flex items-center gap-3 overflow-hidden rounded-lg border">
-            {item.thumbnail ? <SafeImage src={item.thumbnail.src} alt={item.thumbnail.alt} loading="lazy" className="size-12 shrink-0 object-cover" fallbackContent={<RelatedInitial title={item.title} />} /> : <RelatedInitial title={item.title} />}
+            {item.thumbnail ? <span className="size-12 shrink-0 overflow-hidden"><SafeImage src={item.thumbnail.src} alt={item.thumbnail.alt} loading="lazy" className="size-full object-cover" fallbackContent={<RelatedInitial title={item.title} />} /></span> : <span className="size-12 shrink-0"><RelatedInitial title={item.title} /></span>}
             <span className="min-w-0 flex-1 truncate text-sm [&_a]:after:absolute [&_a]:after:inset-0">{renderTargetLink ? renderTargetLink(item.target, item.title) : item.title}</span>
           </li>
         ))}
@@ -343,6 +343,7 @@ function FoldedBody({ blocks, renderTargetLink, open, onToggle }: { blocks: Arti
 }
 
 export function ArticleView({ data, onAction, available = [], ids, onBack, renderTargetLink, footer, loadPreview, className }: ArticleViewProps) {
+  const [leadFit, setLeadFit] = useState<{ width: number; contained: boolean } | null>(null);
   const can = (a: ArticleAction) => onAction !== undefined && available.includes(a);
   const fire = (a: ArticleAction, extra?: Partial<StoryActionIds>) => onAction?.(a, { ...ids, ...extra });
   const onKicker = data.onKicker ?? (data.kicker_channel && onAction ? () => fire("open_channel", { channel_kind: data.kicker_channel!.kind, channel_key: data.kicker_channel!.key }) : undefined);
@@ -465,7 +466,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       {hasToolbar ? (
         <div ref={toolbarRef} data-slot="article-toolbar" className="flex h-14 items-center gap-1 bg-transparent px-0 py-1">
           {onBack ? <Button variant="ghost" size="icon-lg" aria-label={i18n._({ id: "ui.Back", message: "Back" })} className="rounded-full" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
-          {!data.byline && condensed ? <span data-slot="article-toolbar-title" className="min-w-0 flex-1 truncate px-2 text-base font-semibold">{data.title}</span> : null}
+          {!data.byline && condensed ? <span data-slot="article-toolbar-title" className="min-w-0 flex-1 line-clamp-2 whitespace-normal break-words px-2 text-base font-semibold">{data.title}</span> : null}
           <div data-slot="article-actions" className="ml-auto flex items-center gap-1">
             <ReadingSettingsButton prefs={reading} onChange={setReading} />
             {canShare ? <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label={i18n._({ id: "ui.Share", message: "Share" })} onClick={shareNow}><ShareIcon aria-hidden /></Button> : null}
@@ -489,7 +490,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       {data.byline ? (
         <div ref={providerRef} data-slot="article-provider" data-condensed={condensed ? "true" : undefined} className={cn("sticky top-0 z-20 flex h-14 w-full items-center justify-center gap-3 bg-muted py-0 text-center text-2xl font-semibold", "transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", condensed ? "px-16 md:px-48" : "px-4")}>
           <SafeImage src={iconFailed ? undefined : data.sourceIconUrl} alt="" aria-hidden className={cn("shrink-0 rounded-xl transition-[width,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", condensed ? "size-8" : "size-11")} onError={() => setIconFailed(true)} fallbackContent={<NewspaperIcon aria-hidden className="size-5 text-muted-foreground" />} />
-          <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0", (condensed || data.providerLabel) && "truncate leading-tight", condensed && "text-lg")}>{condensed ? data.title : data.providerLabel ?? data.byline.publisher}</span>
+          <span key={condensed ? "title" : "publisher"} data-slot="article-provider-label" className={cn("min-w-0 leading-tight", condensed && "text-lg")}>{condensed ? data.title : data.providerLabel ?? data.byline.publisher}</span>
         </div>
       ) : null}
       <div data-slot="article-column" className={cn("mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 md:px-6", hasToolbar && data.breadcrumb && data.breadcrumb.length > 0 ? "pt-16 lg:pt-6" : "pt-6", "lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 lg:gap-y-0 lg:px-8 lg:[&>*]:mb-4 lg:[&>*:not([data-slot=article-rail])]:col-start-1 lg:[&>*:not([data-slot=article-rail])]:w-full lg:[&>*:not([data-slot=article-rail])]:max-w-[80ch] lg:[&>*:not([data-slot=article-rail])]:justify-self-center")}>
@@ -550,7 +551,15 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         <div data-slot="article-lead">
           <AspectRatio ratio={16 / 9} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-lg" style={{ "--ratio": 16 / 9, maxHeight: "var(--article-lead-max-h, 24rem)" } as CSSProperties}>
             {data.image.badge ? <Badge data-slot="article-image-badge" variant="secondary" className="absolute top-3 left-3 z-10 max-w-[70%] truncate">{data.image.badge}</Badge> : null}
-            <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} focal={data.image.focal} className="absolute inset-0 size-full object-cover" />
+            <FocalImage aspectRatio={16 / 9} src={data.image.w1280} srcSet={`${data.image.w480} 480w, ${data.image.w1280} 1280w`} sizes="(min-width: 768px) 720px, 100vw" alt={data.image.alt} focal={data.image.focal} onLoad={(event) => {
+              const image = event.currentTarget;
+              const boxWidth = image.parentElement?.clientWidth ?? 0;
+              setLeadFit({ width: image.naturalWidth, contained: image.naturalWidth < boxWidth });
+            }} className={cn("absolute inset-0 size-full object-cover", leadFit?.contained && "opacity-0")} />
+            {leadFit?.contained ? <>
+              <FocalImage aria-hidden aspectRatio={16 / 9} src={data.image.w1280} className="absolute inset-0 size-full object-cover blur-2xl scale-125 opacity-60" />
+              <SafeImage data-slot="article-lead-fit" src={data.image.w1280} alt={data.image.alt} className="absolute inset-0 m-auto max-h-full max-w-full size-auto object-contain" style={{ maxWidth: `min(100%, ${leadFit.width}px)` }} />
+            </> : null}
           </AspectRatio>
         </div>
       ) : null}

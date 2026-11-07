@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { ApiError, request } from "@/kit/http";
@@ -345,6 +345,7 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
   }
   return (
     <AsyncState
+      errorLayout="row"
       data={query.isError ? null : blocks}
       error={query.isError}
       isFetching={query.isFetching}
@@ -954,6 +955,7 @@ function ListNodeView({ node }: { node: ListNode }) {
       ) : null}
 
       <AsyncState
+      errorLayout="row"
         data={filteredRows}
         error={query.isError}
         isFetching={query.isFetching}
@@ -1047,6 +1049,7 @@ function CardGridNodeView({ node }: { node: CardGridNode }) {
   }
   return (
     <AsyncState
+      errorLayout="row"
       data={query.data}
       error={query.isError}
       isFetching={query.isFetching}
@@ -1113,6 +1116,7 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
   }
   return (
     <AsyncState
+      errorLayout="row"
       data={query.data}
       error={query.isError}
       isFetching={query.isFetching}
@@ -1256,6 +1260,7 @@ function MusicBlockState({ bind, state, hideWhenEmpty, emptyState, errorMessage,
   const { dispatch, lastError, pendingConfirm } = useDispatchAction();
   return (
     <AsyncState
+      errorLayout="row"
       data={query.data}
       error={query.isError}
       isFetching={query.isFetching}
@@ -1415,8 +1420,19 @@ function TrackRowsNodeView({ node, state }: { node: TrackRowsNode; state: Row })
 function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row }) {
   const query = useBinding<Row[]>(node.bind, state);
   const { dispatch, lastError } = useDispatchAction();
+  const host = useContext(MediaHostContext);
+  const rows = query.data ?? [];
+  const playingSnapshot = () => rows.flatMap((row) => {
+    const action = node.primary.action;
+    if (!action || !("play" in action) || !action.play?.media_id) return [];
+    const id = fillTemplate(action.play.media_id, row);
+    return host?.playback?.isPlaying(id) ? [id] : [];
+  }).join("|");
+  const subscribePlayback = useCallback((listener: () => void) => host?.playback ? host.playback.subscribe(listener) : () => {}, [host?.playback]);
+  useSyncExternalStore(subscribePlayback, playingSnapshot, playingSnapshot);
   return (
     <AsyncState
+      errorLayout="row"
       data={query.data}
       error={query.isError}
       isFetching={query.isFetching}
@@ -1440,7 +1456,12 @@ function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row })
               subtitle: node.item_subtitle_field ? fillTemplate(node.item_subtitle_field, row) : undefined,
               eyebrow: node.item_eyebrow_field ? fillTemplate(node.item_eyebrow_field, row) : undefined,
               art: node.item_art_field ? (localPicture(readField(row, node.item_art_field)) ?? undefined) : undefined,
-              primary: { label: node.primary.label, icon: node.primary.icon, onSelect: () => dispatch(node.primary.action, [row]) },
+              primary: (() => {
+                const action = node.primary.action;
+                const mediaId = action && "play" in action && action.play?.media_id ? fillTemplate(action.play.media_id, row) : undefined;
+                if (mediaId && host?.playback?.isPlaying(mediaId)) return { label: i18n._({ id: "ui.Pause", message: "Pause" }), icon: "pause", onSelect: () => host.playback!.pause(mediaId) };
+                return { label: node.primary.label, icon: node.primary.icon, onSelect: () => dispatch(action, [row]) };
+              })(),
               secondary: node.secondary?.map((b) => ({ label: b.label, icon: b.icon, onSelect: () => dispatch(b.action, [row]) })),
             }))}
           />
@@ -1459,6 +1480,7 @@ function ReaderNodeView({ node, state }: { node: ReaderNode; state: Row }) {
   const formatFor = (row: unknown) => node.format ?? readField(row, field("format"));
   return (
     <AsyncState
+      errorLayout="row"
       data={item === undefined && query.data !== undefined ? null : item}
       error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()}
       errorMessage={i18n._({ id: "ui.Could not load this book.", message: "Could not load this book." })}
@@ -1503,6 +1525,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const item = Array.isArray(query.data) ? query.data[0] : query.data;
   return (
     <AsyncState
+      errorLayout="row"
       data={item === undefined && query.data !== undefined ? null : item}
       error={query.isError}
       isFetching={query.isFetching}
@@ -1822,6 +1845,7 @@ function WidgetsNodeView({
   const list = useWidgetList(node);
   return (
     <AsyncState
+      errorLayout="row"
       data={list.data}
       error={list.isError}
       isFetching={list.isFetching}
@@ -1895,9 +1919,24 @@ function DetailPaneNodeView({ node, state }: { node: DetailPaneNode; state: Row 
 function SplitViewNodeView({ node, state }: { node: SplitViewNode; state: Row }) {
   const phone = useIsPhoneLayout();
   const [asideOpen, setAsideOpen] = useState(false);
+  const [hasAside, setHasAside] = useState(false);
+  const probeRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const probe = probeRef.current;
+    if (!probe) return;
+    const update = () => setHasAside(probe.childElementCount > 0);
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(probe, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  });
   if ("main" in node) {
     const aside = node.aside.map((child, i) => <NodeRenderer key={i} node={child} state={state} />);
-    if (node.aside_sheet === "phone" && phone) return <div data-slot="split-view" data-layout="main-aside"><div className="flex min-w-0 flex-col gap-4">{node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}<Button type="button" variant="outline" className="w-full" onClick={() => setAsideOpen(true)}>{node.aside_label ?? i18n._({ id: "ui.More", message: "More" })}</Button><Drawer open={asideOpen} onOpenChange={setAsideOpen}><DrawerContent><DrawerHeader><DrawerTitle>{node.aside_label ?? i18n._({ id: "ui.More", message: "More" })}</DrawerTitle></DrawerHeader><div className="overflow-y-auto p-4">{aside}</div></DrawerContent></Drawer></div></div>;
+    if (node.aside_sheet === "phone" && phone) {
+      const label = node.aside_label ?? i18n._({ id: "ui.More", message: "More" });
+      const ChevronUp = getIcon("chevron-up");
+      return <div data-slot="split-view" data-layout="main-aside"><div className="flex min-w-0 flex-col gap-4">{node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}<div hidden ref={probeRef}>{aside}</div>{hasAside ? <Button type="button" variant="ghost" className="w-full justify-between" onClick={() => setAsideOpen(true)}>{label}<ChevronUp aria-hidden="true" /></Button> : null}<Drawer open={asideOpen} onOpenChange={setAsideOpen}><DrawerContent><DrawerHeader><DrawerTitle>{label}</DrawerTitle></DrawerHeader><div className="overflow-y-auto p-4">{aside}</div></DrawerContent></Drawer></div></div>;
+    }
     return (
       <SplitView
         main={node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}

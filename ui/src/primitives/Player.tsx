@@ -128,6 +128,7 @@ export interface PlayerCopy {
   cast: string;
   dock: string;
   expand: string;
+  close: string;
   previous: string;
   next: string;
   resumedFrom: (time: string) => string;
@@ -156,6 +157,7 @@ export const defaultPlayerCopy = (): PlayerCopy => ({
   cast: i18n._({ id: "ui.Play on another screen", message: "Play on another screen" }),
   dock: i18n._({ id: "ui.Shrink the player", message: "Shrink the player" }),
   expand: i18n._({ id: "ui.Open the player", message: "Open the player" }),
+  close: i18n._({ id: "ui.Close player", message: "Close player" }),
   previous: i18n._({ id: "ui.Previous", message: "Previous" }),
   next: i18n._({ id: "ui.Next", message: "Next" }),
   resumedFrom: (time) => i18n._({ id: "ui.Resuming from {time}", message: "Resuming from {time}", values: { time } }),
@@ -223,6 +225,7 @@ export interface PlayerProps {
   onDock?: () => void;
   /** Leave the mini bar for the full player. */
   onExpand?: () => void;
+  onClose?: () => void;
   /** Extra cast targets (the household's screens), drawn beside the browser's own cast and AirPlay buttons. */
   castSlot?: ReactNode;
   /** Extra controls in the audio and mini layouts (shuffle, sleep timer, like). */
@@ -358,6 +361,7 @@ export function Player(props: PlayerProps) {
     onPrevious,
     onDock,
     onExpand,
+    onClose,
     castSlot,
     actionsSlot,
     mediaSession = true,
@@ -1343,6 +1347,7 @@ export function Player(props: PlayerProps) {
               {actionsSlot}
               {castButtons}
             </div>
+            {onClose ? <Button variant="ghost" size="icon" aria-label={`${copy.close}: ${title}`} title={`${copy.close}: ${title}`} onClick={onClose}><Icon name="x" /></Button> : null}
           </div>
         </MediaController>
       </div>

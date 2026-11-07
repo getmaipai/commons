@@ -71,7 +71,7 @@ msgid "ui.{count, plural, one {# second} other {# seconds}}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:527
+#: src/primitives/ArticleView.tsx:528
 #: src/primitives/StoryFeed.tsx:121
 msgid "ui.{count, plural, one {# source} other {# sources}}"
 msgstr ""
@@ -347,7 +347,7 @@ msgid "ui.{position} of {total}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Billboard.tsx:136
+#: src/primitives/Billboard.tsx:137
 msgid "ui.{position} of {total}: {title}"
 msgstr ""
 
@@ -491,7 +491,7 @@ msgid "ui.2. Voice"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:169
+#: src/primitives/Player.tsx:171
 msgid "ui.2x speed"
 msgstr ""
 
@@ -572,7 +572,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/data-table.tsx:217
-#: src/schema/NodeRenderer.tsx:1701
+#: src/schema/NodeRenderer.tsx:1716
 msgid "ui.Actions"
 msgstr ""
 
@@ -615,7 +615,7 @@ msgid "ui.Add a person…"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1738
+#: src/schema/NodeRenderer.tsx:1753
 msgid "ui.Add a picture"
 msgstr ""
 
@@ -676,7 +676,7 @@ msgid "ui.agent"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:149
+#: src/primitives/Player.tsx:150
 msgid "ui.Ahead {seconds} seconds"
 msgstr ""
 
@@ -740,7 +740,7 @@ msgid "ui.Allowance"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:565
+#: src/primitives/ArticleView.tsx:574
 msgid "ui.Also covering this story"
 msgstr ""
 
@@ -816,7 +816,7 @@ msgid "ui.AQI {aqi}: {category}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1284
+#: src/elements/thread-list.aui.tsx:1286
 msgid "ui.Archive"
 msgstr ""
 
@@ -831,7 +831,7 @@ msgid "ui.Arrow"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:456
+#: src/primitives/ArticleView.tsx:457
 msgid "ui.Article actions"
 msgstr ""
 
@@ -918,7 +918,7 @@ msgstr ""
 #: src/elements/question-flow.tsx:48
 #: src/elements/thread-list.aui.tsx:177
 #: src/elements/tool-fallback.aui.tsx:567
-#: src/primitives/ArticleView.tsx:467
+#: src/primitives/ArticleView.tsx:468
 #: src/primitives/DetailPane.tsx:31
 #: src/primitives/Tour.tsx:45
 #: src/primitives/Wizard.tsx:344
@@ -926,7 +926,7 @@ msgid "ui.Back"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:148
+#: src/primitives/Player.tsx:149
 msgid "ui.Back {seconds} seconds"
 msgstr ""
 
@@ -990,7 +990,7 @@ msgid "ui.Boost"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:507
+#: src/primitives/ArticleView.tsx:508
 msgid "ui.Breadcrumb"
 msgstr ""
 
@@ -1051,9 +1051,9 @@ msgstr ""
 #: src/elements/thread.aui.tsx:1582
 #: src/elements/tier-segment.tsx:46
 #: src/elements/video-player.tsx:107
-#: src/primitives/Player.tsx:168
+#: src/primitives/Player.tsx:170
 #: src/schema/ConfirmDialog.tsx:52
-#: src/schema/NodeRenderer.tsx:1742
+#: src/schema/NodeRenderer.tsx:1757
 #: src/settings/LocationField.tsx:179
 #: src/settings/SettingRow.tsx:196
 #: src/settings/SettingRow.tsx:222
@@ -1090,7 +1090,7 @@ msgid "ui.Cancelled. Nothing was changed."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:152
+#: src/primitives/Player.tsx:153
 msgid "ui.Captions"
 msgstr ""
 
@@ -1135,9 +1135,9 @@ msgid "ui.Changed as described"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:151
-#: src/schema/NodeRenderer.tsx:1685
-#: src/schema/NodeRenderer.tsx:1691
+#: src/primitives/Player.tsx:152
+#: src/schema/NodeRenderer.tsx:1700
+#: src/schema/NodeRenderer.tsx:1706
 msgid "ui.Chapters"
 msgstr ""
 
@@ -1237,6 +1237,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:761
 msgid "ui.Close editor"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/primitives/Player.tsx:160
+msgid "ui.Close player"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1413,12 +1418,12 @@ msgid "ui.Could not find your location just now. Try again, or choose a saved pl
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/settings/SettingsRenderer.tsx:284
+#: src/settings/SettingsRenderer.tsx:287
 msgid "ui.Could not load settings."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1424
+#: src/schema/NodeRenderer.tsx:1434
 msgid "ui.Could not load the featured items."
 msgstr ""
 
@@ -1443,7 +1448,7 @@ msgid "ui.Could not load these tracks."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1464
+#: src/schema/NodeRenderer.tsx:1479
 msgid "ui.Could not load this book."
 msgstr ""
 
@@ -1453,7 +1458,7 @@ msgid "ui.Could not load this grid."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1510
+#: src/schema/NodeRenderer.tsx:1525
 msgid "ui.Could not load this item."
 msgstr ""
 
@@ -1473,12 +1478,12 @@ msgid "ui.Could not load this. Try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1844
+#: src/schema/NodeRenderer.tsx:1859
 msgid "ui.Could not load today's cards."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1868
+#: src/schema/NodeRenderer.tsx:1883
 msgid "ui.Could not load today's rows."
 msgstr ""
 
@@ -1488,7 +1493,7 @@ msgid "ui.Could not load your results."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1607
+#: src/schema/NodeRenderer.tsx:1622
 msgid "ui.Could not look for other screens. Check that you are online, then open the menu again."
 msgstr ""
 
@@ -1503,7 +1508,7 @@ msgid "ui.Could not open this clip."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1608
+#: src/schema/NodeRenderer.tsx:1623
 msgid "ui.Could not play this on the other screen. Make sure it is on and signed in, then try again."
 msgstr ""
 
@@ -1518,13 +1523,13 @@ msgid "ui.Could not save that change."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1501
+#: src/schema/NodeRenderer.tsx:1516
 msgid "ui.Could not save. Check that you are online, then try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1737
-#: src/schema/NodeRenderer.tsx:1737
+#: src/schema/NodeRenderer.tsx:1752
+#: src/schema/NodeRenderer.tsx:1752
 msgid "ui.Cover"
 msgstr ""
 
@@ -1597,7 +1602,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:180
-#: src/elements/thread-list.aui.tsx:1293
+#: src/elements/thread-list.aui.tsx:1295
 msgid "ui.Delete"
 msgstr ""
 
@@ -1706,7 +1711,7 @@ msgid "ui.Discard the draft"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:539
+#: src/primitives/ArticleView.tsx:540
 msgid "ui.Discuss"
 msgstr ""
 
@@ -1815,7 +1820,7 @@ msgid "ui.Each side can be at most {max} pixels."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:376
+#: src/elements/thread-list.aui.tsx:377
 #: src/schema/NodeRenderer.tsx:1138
 msgid "ui.Earlier"
 msgstr ""
@@ -2038,7 +2043,7 @@ msgid "ui.Favorites"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1434
+#: src/schema/NodeRenderer.tsx:1444
 msgid "ui.Featured"
 msgstr ""
 
@@ -2196,7 +2201,7 @@ msgid "ui.Full Moon"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:154
+#: src/primitives/Player.tsx:155
 msgid "ui.Full screen"
 msgstr ""
 
@@ -2301,7 +2306,7 @@ msgid "ui.Helpful"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/settings/SettingsRenderer.tsx:345
+#: src/settings/SettingsRenderer.tsx:348
 msgid "ui.Hide {count} advanced settings"
 msgstr ""
 
@@ -2702,8 +2707,8 @@ msgid "ui.Line spacing"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:437
-#: src/primitives/ArticleView.tsx:536
+#: src/primitives/ArticleView.tsx:438
+#: src/primitives/ArticleView.tsx:537
 msgid "ui.Listen"
 msgstr ""
 
@@ -2714,8 +2719,8 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/voice-conversation.tsx:15
-#: src/primitives/ArticleView.tsx:437
-#: src/primitives/ArticleView.tsx:536
+#: src/primitives/ArticleView.tsx:438
+#: src/primitives/ArticleView.tsx:537
 msgid "ui.Listening"
 msgstr ""
 
@@ -2725,7 +2730,7 @@ msgid "ui.Listening for you"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:170
+#: src/primitives/Player.tsx:172
 msgid "ui.Live"
 msgstr ""
 
@@ -2749,12 +2754,12 @@ msgid "ui.Loading conversation"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/settings/SettingsRenderer.tsx:285
+#: src/settings/SettingsRenderer.tsx:288
 msgid "ui.Loading settings"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:994
+#: src/elements/thread-list.aui.tsx:996
 msgid "ui.Loading threads"
 msgstr ""
 
@@ -2814,12 +2819,12 @@ msgid "ui.Look"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:1360
+#: src/primitives/Player.tsx:1365
 msgid "ui.Looking for lyrics..."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1646
+#: src/schema/NodeRenderer.tsx:1661
 msgid "ui.Looking for screens"
 msgstr ""
 
@@ -2848,8 +2853,8 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/lyrics-list.tsx:55
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:341
-#: src/schema/NodeRenderer.tsx:1560
+#: src/primitives/Player.tsx:344
+#: src/schema/NodeRenderer.tsx:1575
 msgid "ui.Lyrics"
 msgstr ""
 
@@ -3030,9 +3035,9 @@ msgstr ""
 #: src/elements/video-player.tsx:109
 #: src/PhoneNav.tsx:101
 #: src/PhoneNav.tsx:109
-#: src/primitives/ArticleView.tsx:479
-#: src/schema/NodeRenderer.tsx:1900
-#: src/schema/NodeRenderer.tsx:1900
+#: src/primitives/ArticleView.tsx:480
+#: src/schema/NodeRenderer.tsx:1915
+#: src/schema/NodeRenderer.tsx:1915
 #: src/ui/breadcrumb.tsx:102
 msgid "ui.More"
 msgstr ""
@@ -3053,7 +3058,7 @@ msgid "ui.More like this"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1194
+#: src/elements/thread-list.aui.tsx:1196
 msgid "ui.More options"
 msgstr ""
 
@@ -3110,7 +3115,7 @@ msgid "ui.Music"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:155
+#: src/primitives/Player.tsx:156
 msgid "ui.Mute"
 msgstr ""
 
@@ -3166,14 +3171,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:242
-#: src/elements/thread-list.aui.tsx:947
+#: src/elements/thread-list.aui.tsx:949
 msgid "ui.New chat"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:409
-#: src/elements/thread-list.aui.tsx:1083
-#: src/elements/thread-list.aui.tsx:1089
+#: src/elements/thread-list.aui.tsx:411
+#: src/elements/thread-list.aui.tsx:1085
+#: src/elements/thread-list.aui.tsx:1091
 msgid "ui.New Chat"
 msgstr ""
 
@@ -3218,7 +3223,7 @@ msgstr ""
 #: src/elements/music-track.tsx:35
 #: src/elements/question-flow.tsx:47
 #: src/elements/thread.aui.tsx:1622
-#: src/primitives/Player.tsx:160
+#: src/primitives/Player.tsx:162
 #: src/primitives/Tour.tsx:46
 msgid "ui.Next"
 msgstr ""
@@ -3336,7 +3341,7 @@ msgid "ui.No one else in the household."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1650
+#: src/schema/NodeRenderer.tsx:1665
 msgid "ui.No other screens are on"
 msgstr ""
 
@@ -3361,12 +3366,12 @@ msgid "ui.No saved places yet."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/settings/SettingsRenderer.tsx:319
+#: src/settings/SettingsRenderer.tsx:322
 msgid "ui.No settings match that search."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/settings/SettingsRenderer.tsx:319
+#: src/settings/SettingsRenderer.tsx:322
 msgid "ui.No settings yet."
 msgstr ""
 
@@ -3386,7 +3391,7 @@ msgid "ui.No thread matches “{query}”"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:489
+#: src/elements/thread-list.aui.tsx:491
 msgid "ui.No threads found"
 msgstr ""
 
@@ -3451,7 +3456,7 @@ msgid "ui.Note"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1427
+#: src/schema/NodeRenderer.tsx:1437
 msgid "ui.Nothing featured yet."
 msgstr ""
 
@@ -3463,7 +3468,7 @@ msgstr ""
 #: src/schema/NodeRenderer.tsx:1057
 #: src/schema/NodeRenderer.tsx:1124
 #: src/schema/NodeRenderer.tsx:1266
-#: src/schema/NodeRenderer.tsx:1832
+#: src/schema/NodeRenderer.tsx:1847
 #: src/schema/ResultFeedNodeView.tsx:199
 msgid "ui.Nothing here yet."
 msgstr ""
@@ -3611,7 +3616,7 @@ msgid "ui.Open menu"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:481
+#: src/primitives/ArticleView.tsx:482
 #: src/primitives/StoryFeed.tsx:93
 msgid "ui.Open original"
 msgstr ""
@@ -3632,7 +3637,7 @@ msgid "ui.Open the assistant"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:158
+#: src/primitives/Player.tsx:159
 msgid "ui.Open the player"
 msgstr ""
 
@@ -3752,7 +3757,8 @@ msgstr ""
 #: src/elements/music-track.tsx:35
 #: src/elements/track-studio.tsx:448
 #: src/elements/track-studio.tsx:448
-#: src/primitives/Player.tsx:147
+#: src/primitives/Player.tsx:148
+#: src/schema/NodeRenderer.tsx:1456
 msgid "ui.Pause"
 msgstr ""
 
@@ -3768,8 +3774,8 @@ msgid "ui.paused"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:437
-#: src/primitives/ArticleView.tsx:536
+#: src/primitives/ArticleView.tsx:438
+#: src/primitives/ArticleView.tsx:537
 msgid "ui.Paused"
 msgstr ""
 
@@ -3862,7 +3868,7 @@ msgid "ui.Picture editing tools"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:153
+#: src/primitives/Player.tsx:154
 msgid "ui.Picture in picture"
 msgstr ""
 
@@ -3939,7 +3945,7 @@ msgstr ""
 #: src/elements/track-studio.tsx:448
 #: src/elements/video-player.tsx:110
 #: src/primitives/MediaShelf.tsx:190
-#: src/primitives/Player.tsx:146
+#: src/primitives/Player.tsx:147
 #: src/schema/NodeRenderer.tsx:128
 msgid "ui.Play"
 msgstr ""
@@ -3963,20 +3969,20 @@ msgid "ui.play all"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:167
+#: src/primitives/Player.tsx:169
 msgid "ui.Play now"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:156
-#: src/schema/NodeRenderer.tsx:1639
-#: src/schema/NodeRenderer.tsx:1644
+#: src/primitives/Player.tsx:157
+#: src/schema/NodeRenderer.tsx:1654
+#: src/schema/NodeRenderer.tsx:1659
 msgid "ui.Play on another screen"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:150
+#: src/primitives/Player.tsx:151
 msgid "ui.Playback speed"
 msgstr ""
 
@@ -3991,7 +3997,7 @@ msgid "ui.Playhead"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/mediaHost.ts:81
+#: src/schema/mediaHost.ts:83
 msgid "ui.Playing is not set up on this screen. Open the item from its app."
 msgstr ""
 
@@ -4062,7 +4068,7 @@ msgstr ""
 #: src/elements/media-viewer.tsx:112
 #: src/elements/music-track.tsx:35
 #: src/elements/thread.aui.tsx:1614
-#: src/primitives/Player.tsx:159
+#: src/primitives/Player.tsx:161
 msgid "ui.Previous"
 msgstr ""
 
@@ -4166,8 +4172,8 @@ msgid "ui.Queued"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:543
-#: src/primitives/ArticleView.tsx:543
+#: src/primitives/ArticleView.tsx:544
+#: src/primitives/ArticleView.tsx:544
 msgid "ui.Quick fact"
 msgstr ""
 
@@ -4187,13 +4193,13 @@ msgid "ui.Read aloud"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:532
+#: src/primitives/ArticleView.tsx:533
 msgid "ui.Read it another way"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/primitives/Reader.tsx:36
-#: src/schema/NodeRenderer.tsx:1478
+#: src/schema/NodeRenderer.tsx:1493
 msgid "ui.Reader"
 msgstr ""
 
@@ -4429,7 +4435,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:179
-#: src/elements/thread-list.aui.tsx:1239
+#: src/elements/thread-list.aui.tsx:1241
 #: src/settings/LocationField.tsx:298
 msgid "ui.Rename"
 msgstr ""
@@ -4440,7 +4446,7 @@ msgid "ui.Rename place"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1147
+#: src/elements/thread-list.aui.tsx:1149
 msgid "ui.Rename thread"
 msgstr ""
 
@@ -4471,6 +4477,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/primitives/ReadingSettings.tsx:90
+#: src/settings/SettingRow.tsx:439
 #: src/settings/SettingRow.tsx:440
 msgid "ui.Reset to default"
 msgstr ""
@@ -4539,7 +4546,7 @@ msgid "ui.Resume {name}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:161
+#: src/primitives/Player.tsx:163
 msgid "ui.Resuming from {time}"
 msgstr ""
 
@@ -4573,7 +4580,7 @@ msgid "ui.running"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1093
+#: src/elements/thread-list.aui.tsx:1095
 msgid "ui.Running"
 msgstr ""
 
@@ -4606,10 +4613,10 @@ msgstr ""
 #: src/elements/image-editor.tsx:955
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-settings.tsx:71
-#: src/primitives/ArticleView.tsx:457
-#: src/primitives/ArticleView.tsx:473
+#: src/primitives/ArticleView.tsx:458
+#: src/primitives/ArticleView.tsx:474
 #: src/primitives/StoryFeed.tsx:90
-#: src/schema/NodeRenderer.tsx:1742
+#: src/schema/NodeRenderer.tsx:1757
 #: src/settings/LocationField.tsx:176
 #: src/settings/SettingRow.tsx:184
 #: src/settings/SettingRow.tsx:276
@@ -4628,14 +4635,14 @@ msgid "ui.saved"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:457
-#: src/primitives/ArticleView.tsx:473
+#: src/primitives/ArticleView.tsx:458
+#: src/primitives/ArticleView.tsx:474
 #: src/primitives/StoryFeed.tsx:123
 msgid "ui.Saved"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/settings/SettingsRenderer.tsx:273
+#: src/settings/SettingsRenderer.tsx:275
 msgid "ui.Saved."
 msgstr ""
 
@@ -4946,8 +4953,8 @@ msgstr ""
 #: src/elements/music-track.tsx:35
 #: src/elements/share-dialog.tsx:125
 #: src/elements/video-player.tsx:99
-#: src/primitives/ArticleView.tsx:459
-#: src/primitives/ArticleView.tsx:471
+#: src/primitives/ArticleView.tsx:460
+#: src/primitives/ArticleView.tsx:472
 msgid "ui.Share"
 msgstr ""
 
@@ -4972,12 +4979,12 @@ msgid "ui.Shared, view sharing"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/settings/SettingsRenderer.tsx:345
+#: src/settings/SettingsRenderer.tsx:348
 msgid "ui.Show {count} advanced settings"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Billboard.tsx:195
+#: src/primitives/Billboard.tsx:212
 msgid "ui.Show {title}"
 msgstr ""
 
@@ -5000,7 +5007,7 @@ msgstr ""
 #: src/elements/creation-header.tsx:88
 #: src/elements/creation-header.tsx:126
 #: src/elements/thread-list.aui.tsx:184
-#: src/schema/NodeRenderer.tsx:1683
+#: src/schema/NodeRenderer.tsx:1698
 msgid "ui.Show less"
 msgstr ""
 
@@ -5008,7 +5015,7 @@ msgstr ""
 #: src/elements/creation-header.tsx:88
 #: src/elements/creation-header.tsx:126
 #: src/elements/thread-list.aui.tsx:183
-#: src/schema/NodeRenderer.tsx:1683
+#: src/schema/NodeRenderer.tsx:1698
 msgid "ui.Show more"
 msgstr ""
 
@@ -5044,7 +5051,7 @@ msgid "ui.Show the character"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:157
+#: src/primitives/Player.tsx:158
 msgid "ui.Shrink the player"
 msgstr ""
 
@@ -5065,12 +5072,12 @@ msgid "ui.Skip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:164
+#: src/primitives/Player.tsx:166
 msgid "ui.Skip credits"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:163
+#: src/primitives/Player.tsx:165
 msgid "ui.Skip intro"
 msgstr ""
 
@@ -5191,7 +5198,7 @@ msgid "ui.Start a conversation"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:162
+#: src/primitives/Player.tsx:164
 msgid "ui.Start over"
 msgstr ""
 
@@ -5209,8 +5216,8 @@ msgid "ui.Starting the export."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/ArticleView.tsx:437
-#: src/primitives/ArticleView.tsx:536
+#: src/primitives/ArticleView.tsx:438
+#: src/primitives/ArticleView.tsx:537
 msgid "ui.Starting…"
 msgstr ""
 
@@ -5343,7 +5350,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/elicitation-form.tsx:167
 #: src/elements/question-flow.tsx:46
-#: src/schema/NodeRenderer.tsx:1966
+#: src/schema/NodeRenderer.tsx:1981
 msgid "ui.Submit"
 msgstr ""
 
@@ -5586,7 +5593,7 @@ msgid "ui.This audio could not be drawn. It still plays."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1469
+#: src/schema/NodeRenderer.tsx:1484
 msgid "ui.This book is not available."
 msgstr ""
 
@@ -5611,7 +5618,7 @@ msgid "ui.This file cannot be previewed here."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1513
+#: src/schema/NodeRenderer.tsx:1528
 msgid "ui.This item is not available."
 msgstr ""
 
@@ -5677,7 +5684,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/result-feed.tsx:54
-#: src/elements/thread-list.aui.tsx:374
+#: src/elements/thread-list.aui.tsx:375
 #: src/elements/weather-forecast-page.tsx:220
 #: src/relativeTime.ts:56
 msgid "ui.Today"
@@ -5918,12 +5925,12 @@ msgid "ui.Untitled"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:165
+#: src/primitives/Player.tsx:167
 msgid "ui.Up next"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:166
+#: src/primitives/Player.tsx:168
 msgid "ui.Up next in {seconds}"
 msgstr ""
 
@@ -6240,7 +6247,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/Wizard.tsx:354
 #: src/schema/ConfirmDialog.tsx:55
-#: src/schema/NodeRenderer.tsx:1966
+#: src/schema/NodeRenderer.tsx:1981
 msgid "ui.Working…"
 msgstr ""
 
@@ -6273,7 +6280,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/result-feed.tsx:55
-#: src/elements/thread-list.aui.tsx:375
+#: src/elements/thread-list.aui.tsx:376
 #: src/relativeTime.ts:15
 #: src/relativeTime.ts:57
 msgid "ui.Yesterday"

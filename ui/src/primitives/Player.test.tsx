@@ -420,6 +420,17 @@ describe("Player", () => {
     expect(view.container.querySelector("audio")).toBeTruthy();
   });
 
+  test("mini close control stays outside the hidden actions group and dismisses", () => {
+    const onClose = mock(() => {});
+    const view = render(<Player src="/a" kind="audio" layout="mini" title="Lanterns" onClose={onClose} />);
+    const close = view.getByRole("button", { name: "Close player: Lanterns" });
+    expect(close.closest(".max-sm\\:hidden")).toBeNull();
+    fireEvent.click(close);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    view.rerender(<Player src="/a" kind="audio" layout="mini" title="Lanterns" />);
+    expect(view.queryByRole("button", { name: "Close player: Lanterns" })).toBeNull();
+  });
+
   describe("MUSIC-KIT-01 props", () => {
     const touch = (el: Element, type: "pointerdown" | "pointerup", y: number, pointerType = "touch") => {
       const event = new Event(type, { bubbles: true }) as Event & Record<string, unknown>;

@@ -114,6 +114,15 @@ describe("billboard", () => {
     await findByText("New from Ember Workshop");
     await findByText("Part 3.");
   });
+
+  test("the billboard primary action pauses the matching playing item", async () => {
+    const paused = mock((_id: string) => {});
+    const host: MediaHost = { onPlay: () => {}, playback: { subscribe: () => () => {}, isPlaying: (id) => id === "m1", pause: paused } };
+    const { findByRole, getAllByRole } = inVideos(billboard, host);
+    await findByRole("region", { name: "Featured videos" });
+    fireEvent.click(getAllByRole("button", { name: "Pause" })[0]!);
+    expect(paused).toHaveBeenCalledWith("m1");
+  });
 });
 
 describe("player", () => {

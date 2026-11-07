@@ -47,6 +47,8 @@ export interface CastTarget {
 }
 
 export interface MediaHost {
+  /** Lets a Play button show Pause for the item that is playing now. */
+  playback?: { subscribe(listener: () => void): () => void; isPlaying(mediaId: string): boolean; pause(mediaId: string): void };
   /** `mediaId` is the action's `media_id` with its `{field}` placeholders filled; `item` is the bound row it fired for. */
   onPlay(mediaId: string, item: Record<string, unknown>, options?: MediaPlayOptions): void | Promise<void>;
   /** MEDIA-POLISH-01: the element a `player` node plays this item in. A host that returns one owns it (Home's audio

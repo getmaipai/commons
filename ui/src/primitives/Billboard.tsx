@@ -49,7 +49,7 @@ export interface BillboardProps {
 
 function Icon({ name }: { name: string }) {
   const Glyph = getIcon(name);
-  return <Glyph className={name === "play" ? "size-5 fill-current" : "size-5"} aria-hidden />;
+  return <Glyph className={name === "play" || name === "pause" ? "size-5 fill-current" : "size-5"} aria-hidden />;
 }
 
 function usePrefersReducedMotion(): boolean {
@@ -78,6 +78,7 @@ export function Billboard({
   onSlideChange,
 }: BillboardProps) {
   const [api, setApi] = useState<CarouselApi>();
+  const [containedArt, setContainedArt] = useState<Record<string, boolean>>({});
   const [current, setCurrent] = useState(0);
   const [previewing, setPreviewing] = useState<string | null>(null);
   const dwell = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -149,12 +150,28 @@ export function Billboard({
             }}
           >
             <div
+              data-art={containedArt[slide.id] ? "contained" : undefined}
               className={cn(
                 "relative isolate flex w-full flex-col justify-end overflow-hidden bg-[var(--art-surface)]",
                 hero ? "min-h-[28rem] sm:min-h-[36rem]" : size === "banner" ? "min-h-72 pt-14 sm:h-[340px] sm:min-h-0 sm:pt-0" : "aspect-[4/3] sm:aspect-[21/8]",
               )}
             >
-              <SafeImage src={slide.art} alt="" kind="video" className="absolute inset-0 -z-20 size-full object-cover" />
+              {slide.art ? (
+                <>
+                  {containedArt[slide.id] ? <>
+                    <SafeImage src={slide.art} alt="" aria-hidden kind="video" className="absolute inset-0 -z-20 size-full object-cover scale-125 blur-2xl opacity-60" />
+                    <div aria-hidden className="absolute inset-x-0 top-0 bottom-1/2 -z-[15] flex items-center justify-center p-6">
+                      <SafeImage src={slide.art} alt="" kind="video" onLoad={(event) => {
+                        const image = event.currentTarget;
+                        setContainedArt((previous) => ({ ...previous, [slide.id]: image.naturalWidth < 480 || image.naturalWidth / image.naturalHeight < 1.4 }));
+                      }} className="max-h-full max-w-full object-contain" />
+                    </div>
+                  </> : <SafeImage src={slide.art} alt="" kind="video" onLoad={(event) => {
+                    const image = event.currentTarget;
+                    setContainedArt((previous) => ({ ...previous, [slide.id]: image.naturalWidth < 480 || image.naturalWidth / image.naturalHeight < 1.4 }));
+                  }} className="absolute inset-0 -z-20 size-full object-cover" />}
+                </>
+              ) : <SafeImage src={undefined} alt="" kind="video" className="absolute inset-0 -z-20 size-full object-cover" />}
               {previewing === slide.id && renderPreview ? (
                 <div className="absolute inset-0 -z-10" data-slot="billboard-preview">
                   {renderPreview(slide)}
@@ -162,7 +179,7 @@ export function Billboard({
               ) : null}
               {/* The scrim that keeps the words readable over any art. */}
               <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-[var(--background)] via-[color-mix(in_srgb,var(--background)_45%,transparent)] to-transparent" />
-              <div className={cn("flex max-w-2xl flex-col gap-3", hero ? "p-6 sm:p-10" : "p-4 sm:p-6")}>
+              <div className={cn("flex max-w-2xl flex-col gap-3", hero ? "p-6 sm:p-10" : "p-4 sm:p-6", slides.length > 1 && (size === "banner" || size === "card") && "pb-14 sm:pb-0")}>
                 {slide.eyebrow ? (
                   <p className="text-sm font-semibold tracking-widest text-[var(--art-eyebrow)] uppercase">{slide.eyebrow}</p>
                 ) : null}
@@ -187,7 +204,7 @@ export function Billboard({
         ))}
       </CarouselContent>
       {slides.length > 1 ? (
-        <div className="absolute end-2 top-2 flex sm:top-auto sm:bottom-2" data-slot="billboard-dots">
+        <div className="absolute end-2 bottom-2 flex" data-slot="billboard-dots">
           {slides.map((slide, index) => (
             <button
               key={slide.id}

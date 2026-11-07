@@ -90,6 +90,31 @@ describe("Billboard", () => {
     }
   });
 
+  test("contains small art, leaves wide art as cover, and puts dots at the bottom", () => {
+    const restore = reducedMotion(false);
+    try {
+      const { container } = render(<Billboard label="Featured" slides={SLIDES} />);
+      const art = container.querySelector('img[src="/art/a.jpg"]') as HTMLImageElement;
+      Object.defineProperty(art, "naturalWidth", { configurable: true, value: 64 });
+      Object.defineProperty(art, "naturalHeight", { configurable: true, value: 64 });
+      fireEvent.load(art);
+      const card = container.querySelector('[data-art="contained"]')!;
+      expect(card).toBeTruthy();
+      const foreground = card.querySelector("img:last-child")!;
+      expect(foreground.className).not.toMatch(/(?:^| )(?:w-full|h-full|size-full)(?: |$)/);
+      const dots = container.querySelector('[data-slot="billboard-dots"]')!;
+      expect(dots.className).toContain("bottom-2");
+      expect(dots.className).not.toContain("top-2");
+      cleanup();
+      const wide = render(<Billboard label="Featured" slides={[SLIDES[0]!]} />);
+      const wideArt = wide.container.querySelector("img")!;
+      Object.defineProperty(wideArt, "naturalWidth", { configurable: true, value: 1600 });
+      Object.defineProperty(wideArt, "naturalHeight", { configurable: true, value: 900 });
+      fireEvent.load(wideArt);
+      expect(wide.container.querySelector("[data-art]")).toBeNull();
+    } finally { restore(); }
+  });
+
   test("autoplays with the Embla autoplay plugin, and not under reduced motion", async () => {
     let restore = reducedMotion(false);
     try {

@@ -398,18 +398,55 @@ describe("NodeRenderer > list", () => {
 });
 
 describe("split_view phone aside sheet", () => {
-  test("opens the labelled aside in a drawer on the phone layout", async () => {
+  const phoneLayout = () => {
     const original = window.matchMedia;
     Object.defineProperty(window, "matchMedia", { configurable: true, value: (query: string) => ({ matches: query.includes("max-width"), media: query, onchange: null, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, dispatchEvent() { return false; } }) });
+    return () => Object.defineProperty(window, "matchMedia", { configurable: true, value: original });
+  };
+
+  test("opens the labelled aside in a drawer on the phone layout", async () => {
+    const restorePhone = phoneLayout();
     try {
       const node = { type: "split_view", main: [{ type: "empty_state", icon: "music", text: "Player" }], aside: [{ type: "empty_state", icon: "list-music", text: "Queue contents" }], aside_label: "Up next", aside_sheet: "phone" } as const as unknown as Parameters<typeof NodeRenderer>[0]["node"];
       const view = renderNode(node);
       await view.findByText("Player");
       fireEvent.click(view.getByRole("button", { name: "Up next" }));
-      expect(await view.findByText("Queue contents")).toBeTruthy();
+      expect((await view.findAllByText("Queue contents")).length).toBeGreaterThan(0);
       expect(document.querySelector('[data-slot="drawer-content"]')).not.toBeNull();
     } finally {
-      Object.defineProperty(window, "matchMedia", { configurable: true, value: original });
+      restorePhone();
+    }
+  });
+
+  const shelfAside = { type: "media_shelf" as const, bind: { source: "route" as const, path: "/api/test-items", stream: false }, item_key_field: "id", item_label_field: "name", item_media_field: "picture", aspect: "wide" as const, variant: "card" as const, orientation: "horizontal" as const, hide_when_empty: true };
+  const splitWithShelf = { type: "split_view" as const, main: [{ type: "empty_state" as const, icon: "music", text: "Player" }], aside: [shelfAside], aside_label: "Up next", aside_sheet: "phone" as const } as unknown as Parameters<typeof NodeRenderer>[0]["node"];
+
+  test("does not show the opener when the hidden aside shelf is empty", async () => {
+    const env = stubFetch([]);
+    const restorePhone = phoneLayout();
+    try {
+      const view = renderNode(splitWithShelf);
+      await waitFor(() => expect(view.queryByLabelText("Loading")).toBeNull());
+      expect(view.queryByRole("button", { name: "Up next" })).toBeNull();
+    } finally {
+      env.restore();
+      restorePhone();
+    }
+  });
+
+  test("shows a ghost opener for a populated aside shelf and opens it", async () => {
+    const env = stubFetch([{ id: "next", name: "Next video", category: "video" }]);
+    const restorePhone = phoneLayout();
+    try {
+      const view = renderNode(splitWithShelf);
+      const opener = await view.findByRole("button", { name: "Up next" });
+      expect(opener.getAttribute("data-variant")).toBe("ghost");
+      fireEvent.click(opener);
+      expect((await view.findAllByText("Next video")).length).toBeGreaterThan(0);
+      expect(document.querySelector('[data-slot="drawer-content"]')).not.toBeNull();
+    } finally {
+      env.restore();
+      restorePhone();
     }
   });
 });
