@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { fileURLToPath } from "node:url"
 import { findColors, listSourceFiles, scanKit, type AllowEntry } from "./fixedColors"
+import { readFileSync } from "node:fs"
 
 // NO-FIXED-COLORS-01. Every color the kit draws is a theme token (or a color-mix
 // of tokens), so the person's look and mode (light, dark, every look including
@@ -60,6 +61,11 @@ const ALLOW: AllowEntry[] = [
 const uiRoot = fileURLToPath(new URL("./", import.meta.url))
 
 describe("fixed colors in the kit", () => {
+  test("wx keyframes do not animate filters", () => {
+    const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8")
+    const keyframes = [...css.matchAll(/@keyframes\s+(wx-[\w-]+)\s*\{([\s\S]*?)\n\}/g)]
+    for (const [, name, body] of keyframes) expect(body, `${name} keyframe`).not.toMatch(/\bfilter\s*:/)
+  })
   const { violations, unusedAllow } = scanKit(uiRoot, ALLOW)
 
   test("the scan actually covers the kit", () => {

@@ -100,7 +100,7 @@ describe("WeatherCard", () => {
     cleanup();
     const snowy = render(<WeatherCard {...props} current={{ ...props.current, code: 71 }} />);
     expect(snowy.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(60);
-    expect(snowy.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(0);
+    expect(snowy.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(3);
   });
 
   test("moon data changes only the clear night hero icon", () => {
@@ -126,8 +126,8 @@ describe("WeatherCard", () => {
     expect(clear.container.querySelector('[data-fx="sun-rays"]')).not.toBeNull();
     cleanup();
     const partly = render(<WeatherCard {...props} current={{ ...props.current, code: 2, is_day: true }} />);
-    expect(partly.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(2);
-    expect(partly.container.querySelector('[data-fx="cloud"] i')).not.toBeNull();
+    expect(partly.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(4);
+    expect(partly.container.querySelector('[data-fx="cloud"][data-shape]')).not.toBeNull();
     cleanup();
     const storm = render(<WeatherCard {...props} current={{ ...props.current, code: 95 }} />);
     expect(storm.container.querySelector('[data-fx="bolt"]')).not.toBeNull();

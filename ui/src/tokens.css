@@ -718,6 +718,48 @@
   --chart-4: hsl(240 6% 30%);
   --chart-5: hsl(240 10% 4%);
   /* WEATHER-SCENE-01: phase palette targets (OKLCH L C H values). */
+  --weather-clear-cloud-lit: oklch(0.980 0.005 240);
+  --weather-clear-cloud-shade: oklch(0.860 0.020 240);
+  --weather-clear-cloud-night-lit: oklch(0.539 0.005 249.9);
+  --weather-clear-cloud-twilight-lit: oklch(0.934 0.038 177.0);
+  --weather-clear-cloud-night-shade: oklch(0.516 0.020 249.9);
+  --weather-clear-cloud-twilight-shade: oklch(0.737 0.035 273.0);
+  --weather-partly-cloudy-cloud-lit: oklch(0.970 0.006 240);
+  --weather-partly-cloudy-cloud-shade: oklch(0.800 0.025 245);
+  --weather-partly-cloudy-cloud-night-lit: oklch(0.533 0.006 249.9);
+  --weather-partly-cloudy-cloud-twilight-lit: oklch(0.928 0.039 177.0);
+  --weather-partly-cloudy-cloud-night-shade: oklch(0.480 0.025 252.7);
+  --weather-partly-cloudy-cloud-twilight-shade: oklch(0.695 0.038 276.5);
+  --weather-overcast-cloud-lit: oklch(0.780 0.012 250);
+  --weather-overcast-cloud-shade: oklch(0.580 0.015 252);
+  --weather-overcast-cloud-night-lit: oklch(0.429 0.012 255.4);
+  --weather-overcast-cloud-twilight-lit: oklch(0.804 0.043 183.5);
+  --weather-overcast-cloud-night-shade: oklch(0.348 0.015 256.5);
+  --weather-overcast-cloud-twilight-shade: oklch(0.541 0.032 281.4);
+  --weather-drizzle-cloud-lit: oklch(0.740 0.015 248);
+  --weather-drizzle-cloud-shade: oklch(0.550 0.020 250);
+  --weather-drizzle-cloud-night-lit: oklch(0.407 0.015 254.3);
+  --weather-drizzle-cloud-twilight-lit: oklch(0.778 0.045 182.2);
+  --weather-drizzle-cloud-night-shade: oklch(0.330 0.020 255.4);
+  --weather-drizzle-cloud-twilight-shade: oklch(0.520 0.035 280.0);
+  --weather-rain-cloud-lit: oklch(0.660 0.018 250);
+  --weather-rain-cloud-shade: oklch(0.460 0.022 252);
+  --weather-rain-cloud-night-lit: oklch(0.363 0.018 255.4);
+  --weather-rain-cloud-twilight-lit: oklch(0.727 0.047 183.5);
+  --weather-rain-cloud-night-shade: oklch(0.276 0.022 256.5);
+  --weather-rain-cloud-twilight-shade: oklch(0.457 0.036 281.4);
+  --weather-snow-cloud-lit: oklch(0.900 0.008 235);
+  --weather-snow-cloud-shade: oklch(0.720 0.012 235);
+  --weather-snow-cloud-night-lit: oklch(0.495 0.008 247.2);
+  --weather-snow-cloud-twilight-lit: oklch(0.883 0.040 173.8);
+  --weather-snow-cloud-night-shade: oklch(0.432 0.012 247.2);
+  --weather-snow-cloud-twilight-shade: oklch(0.639 0.029 269.5);
+  --weather-thunderstorm-cloud-lit: oklch(0.520 0.040 285);
+  --weather-thunderstorm-cloud-shade: oklch(0.300 0.050 282);
+  --weather-thunderstorm-cloud-night-lit: oklch(0.286 0.040 274.6);
+  --weather-thunderstorm-cloud-twilight-lit: oklch(0.635 0.061 206.2);
+  --weather-thunderstorm-cloud-night-shade: oklch(0.180 0.050 273.0);
+  --weather-thunderstorm-cloud-twilight-shade: oklch(0.345 0.056 302.4);
   --weather-clear-day-top: oklch(0.42 0.14 258); --weather-clear-day-mid: oklch(0.47 0.13 252); --weather-clear-day-bottom: oklch(0.50 0.11 240); --weather-clear-glow: oklch(0.86 0.08 220 / 0.40);
   --weather-partly-cloudy-day-top: oklch(0.42 0.10 256); --weather-partly-cloudy-day-mid: oklch(0.47 0.09 250); --weather-partly-cloudy-day-bottom: oklch(0.50 0.08 242); --weather-partly-cloudy-glow: oklch(0.86 0.07 222 / 0.32);
   --weather-overcast-day-top: oklch(0.40 0.025 250); --weather-overcast-day-mid: oklch(0.44 0.024 248); --weather-overcast-day-bottom: oklch(0.49 0.022 244); --weather-overcast-glow: oklch(0.84 0.014 250 / 0.22);
@@ -951,6 +993,48 @@
     --page: #141414;
 
     /* WEATHER-SCENE-01 dark palette values. */
+  --weather-clear-cloud-lit: oklch(0.940 0.005 240);
+  --weather-clear-cloud-shade: oklch(0.820 0.020 240);
+  --weather-clear-cloud-night-lit: oklch(0.517 0.005 249.9);
+  --weather-clear-cloud-twilight-lit: oklch(0.908 0.038 177.0);
+  --weather-clear-cloud-night-shade: oklch(0.492 0.020 249.9);
+  --weather-clear-cloud-twilight-shade: oklch(0.709 0.035 273.0);
+  --weather-partly-cloudy-cloud-lit: oklch(0.930 0.006 240);
+  --weather-partly-cloudy-cloud-shade: oklch(0.760 0.025 245);
+  --weather-partly-cloudy-cloud-night-lit: oklch(0.511 0.006 249.9);
+  --weather-partly-cloudy-cloud-twilight-lit: oklch(0.902 0.039 177.0);
+  --weather-partly-cloudy-cloud-night-shade: oklch(0.456 0.025 252.7);
+  --weather-partly-cloudy-cloud-twilight-shade: oklch(0.667 0.038 276.5);
+  --weather-overcast-cloud-lit: oklch(0.740 0.012 250);
+  --weather-overcast-cloud-shade: oklch(0.540 0.015 252);
+  --weather-overcast-cloud-night-lit: oklch(0.407 0.012 255.4);
+  --weather-overcast-cloud-twilight-lit: oklch(0.778 0.043 183.5);
+  --weather-overcast-cloud-night-shade: oklch(0.324 0.015 256.5);
+  --weather-overcast-cloud-twilight-shade: oklch(0.513 0.032 281.4);
+  --weather-drizzle-cloud-lit: oklch(0.700 0.015 248);
+  --weather-drizzle-cloud-shade: oklch(0.510 0.020 250);
+  --weather-drizzle-cloud-night-lit: oklch(0.385 0.015 254.3);
+  --weather-drizzle-cloud-twilight-lit: oklch(0.752 0.045 182.2);
+  --weather-drizzle-cloud-night-shade: oklch(0.306 0.020 255.4);
+  --weather-drizzle-cloud-twilight-shade: oklch(0.492 0.035 280.0);
+  --weather-rain-cloud-lit: oklch(0.620 0.018 250);
+  --weather-rain-cloud-shade: oklch(0.420 0.022 252);
+  --weather-rain-cloud-night-lit: oklch(0.341 0.018 255.4);
+  --weather-rain-cloud-twilight-lit: oklch(0.701 0.047 183.5);
+  --weather-rain-cloud-night-shade: oklch(0.252 0.022 256.5);
+  --weather-rain-cloud-twilight-shade: oklch(0.429 0.036 281.4);
+  --weather-snow-cloud-lit: oklch(0.860 0.008 235);
+  --weather-snow-cloud-shade: oklch(0.680 0.012 235);
+  --weather-snow-cloud-night-lit: oklch(0.473 0.008 247.2);
+  --weather-snow-cloud-twilight-lit: oklch(0.857 0.040 173.8);
+  --weather-snow-cloud-night-shade: oklch(0.408 0.012 247.2);
+  --weather-snow-cloud-twilight-shade: oklch(0.611 0.029 269.5);
+  --weather-thunderstorm-cloud-lit: oklch(0.480 0.040 285);
+  --weather-thunderstorm-cloud-shade: oklch(0.260 0.050 282);
+  --weather-thunderstorm-cloud-night-lit: oklch(0.264 0.040 274.6);
+  --weather-thunderstorm-cloud-twilight-lit: oklch(0.610 0.061 206.2);
+  --weather-thunderstorm-cloud-night-shade: oklch(0.156 0.050 273.0);
+  --weather-thunderstorm-cloud-twilight-shade: oklch(0.317 0.056 302.4);
     --weather-clear-day-top: oklch(0.365 0.134 258);
     --weather-clear-day-mid: oklch(0.415 0.125 252);
     --weather-clear-day-bottom: oklch(0.445 0.106 240);
@@ -1324,6 +1408,48 @@
   --sidebar-ring: #21a6ff;
 
   /* WEATHER-SCENE-01 dark palette values. */
+  --weather-clear-cloud-lit: oklch(0.940 0.005 240);
+  --weather-clear-cloud-shade: oklch(0.820 0.020 240);
+  --weather-clear-cloud-night-lit: oklch(0.517 0.005 249.9);
+  --weather-clear-cloud-twilight-lit: oklch(0.908 0.038 177.0);
+  --weather-clear-cloud-night-shade: oklch(0.492 0.020 249.9);
+  --weather-clear-cloud-twilight-shade: oklch(0.709 0.035 273.0);
+  --weather-partly-cloudy-cloud-lit: oklch(0.930 0.006 240);
+  --weather-partly-cloudy-cloud-shade: oklch(0.760 0.025 245);
+  --weather-partly-cloudy-cloud-night-lit: oklch(0.511 0.006 249.9);
+  --weather-partly-cloudy-cloud-twilight-lit: oklch(0.902 0.039 177.0);
+  --weather-partly-cloudy-cloud-night-shade: oklch(0.456 0.025 252.7);
+  --weather-partly-cloudy-cloud-twilight-shade: oklch(0.667 0.038 276.5);
+  --weather-overcast-cloud-lit: oklch(0.740 0.012 250);
+  --weather-overcast-cloud-shade: oklch(0.540 0.015 252);
+  --weather-overcast-cloud-night-lit: oklch(0.407 0.012 255.4);
+  --weather-overcast-cloud-twilight-lit: oklch(0.778 0.043 183.5);
+  --weather-overcast-cloud-night-shade: oklch(0.324 0.015 256.5);
+  --weather-overcast-cloud-twilight-shade: oklch(0.513 0.032 281.4);
+  --weather-drizzle-cloud-lit: oklch(0.700 0.015 248);
+  --weather-drizzle-cloud-shade: oklch(0.510 0.020 250);
+  --weather-drizzle-cloud-night-lit: oklch(0.385 0.015 254.3);
+  --weather-drizzle-cloud-twilight-lit: oklch(0.752 0.045 182.2);
+  --weather-drizzle-cloud-night-shade: oklch(0.306 0.020 255.4);
+  --weather-drizzle-cloud-twilight-shade: oklch(0.492 0.035 280.0);
+  --weather-rain-cloud-lit: oklch(0.620 0.018 250);
+  --weather-rain-cloud-shade: oklch(0.420 0.022 252);
+  --weather-rain-cloud-night-lit: oklch(0.341 0.018 255.4);
+  --weather-rain-cloud-twilight-lit: oklch(0.701 0.047 183.5);
+  --weather-rain-cloud-night-shade: oklch(0.252 0.022 256.5);
+  --weather-rain-cloud-twilight-shade: oklch(0.429 0.036 281.4);
+  --weather-snow-cloud-lit: oklch(0.860 0.008 235);
+  --weather-snow-cloud-shade: oklch(0.680 0.012 235);
+  --weather-snow-cloud-night-lit: oklch(0.473 0.008 247.2);
+  --weather-snow-cloud-twilight-lit: oklch(0.857 0.040 173.8);
+  --weather-snow-cloud-night-shade: oklch(0.408 0.012 247.2);
+  --weather-snow-cloud-twilight-shade: oklch(0.611 0.029 269.5);
+  --weather-thunderstorm-cloud-lit: oklch(0.480 0.040 285);
+  --weather-thunderstorm-cloud-shade: oklch(0.260 0.050 282);
+  --weather-thunderstorm-cloud-night-lit: oklch(0.264 0.040 274.6);
+  --weather-thunderstorm-cloud-twilight-lit: oklch(0.610 0.061 206.2);
+  --weather-thunderstorm-cloud-night-shade: oklch(0.156 0.050 273.0);
+  --weather-thunderstorm-cloud-twilight-shade: oklch(0.317 0.056 302.4);
   --weather-clear-day-top: oklch(0.365 0.134 258);
   --weather-clear-day-mid: oklch(0.415 0.125 252);
   --weather-clear-day-bottom: oklch(0.445 0.106 240);
@@ -1991,27 +2117,30 @@ body {
   background: var(--weather-star);
   animation: wx-twinkle var(--d) ease-in-out var(--dl) infinite alternate;
 }
+/* Cloud depth table: scale, opacity, speed, y band, z-index, unscaled width. */
 [data-slot="weather-sky"] [data-fx="cloud"] {
+  position: absolute;
   top: calc(var(--y) * 1%);
-  left: calc(var(--x) * 1%);
-  width: calc(var(--s) * 1px);
-  height: calc(var(--s) * .54px);
-  border-radius: 9999px;
-  background: linear-gradient(180deg, var(--weather-cloud-highlight), var(--weather-cloud-shadow));
+  left: 0;
+  width: var(--s);
+  aspect-ratio: 2.6 / 1;
+  background: linear-gradient(to top, var(--wx-cloud-shade) 0, var(--wx-cloud-lit) 60%);
+  mask-image: var(--cloud-mask);
+  -webkit-mask-image: var(--cloud-mask);
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
   opacity: var(--o);
-  filter: blur(1.5px);
+  z-index: var(--z);
   animation: wx-drift var(--d) linear var(--dl) infinite;
 }
-[data-slot="weather-sky"] [data-fx="cloud"] i { position: absolute; bottom: 12%; width: 39%; height: 78%; border-radius: 50%; background: inherit; }
-[data-slot="weather-sky"] [data-fx="cloud"] i:nth-child(1) { left: 12%; width: 35%; height: 70%; }
-[data-slot="weather-sky"] [data-fx="cloud"] i:nth-child(2) { left: 28%; bottom: 30%; width: 38%; height: 100%; }
-[data-slot="weather-sky"] [data-fx="cloud"] i:nth-child(3) { left: 47%; bottom: 35%; width: 34%; height: 90%; }
-[data-slot="weather-sky"] [data-fx="cloud"] i:nth-child(4) { left: 66%; width: 30%; height: 68%; }
-[data-slot="weather-sky"] [data-fx="cloud"] i:nth-child(5) { left: 2%; width: 28%; height: 54%; }
-[data-slot="weather-sky"] [data-fx="cloud"] i:nth-child(6) { left: 36%; width: 43%; height: 45%; }
-[data-slot="weather-sky"] [data-fx="cloud"][data-depth="far"] { animation-duration: calc(var(--d) * 1.35); opacity: .35; transform: scale(.72); }
-[data-slot="weather-sky"] [data-fx="cloud"][data-depth="mid"] { opacity: .52; transform: scale(.88); }
-[data-slot="weather-sky"] [data-fx="cloud"][data-depth="near"] { opacity: .7; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-shape="a"] { aspect-ratio: 2.6 / 1; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-shape="b"] { aspect-ratio: 1.9 / 1; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-shape="c"] { aspect-ratio: 1.5 / 1; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-depth="far"] { transform: scale(.62); opacity: .34; z-index: 21; --depth-speed: 7px; --depth-y-band: 0% 22%; --depth-width: 160px; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-depth="mid"] { transform: scale(.88); opacity: .56; z-index: 22; --depth-speed: 13px; --depth-y-band: 8% 40%; --depth-width: 220px; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-depth="near"] { transform: scale(1.15); opacity: .72; z-index: 23; --depth-speed: 22px; --depth-y-band: 20% 56%; --depth-width: 300px; }
 [data-slot="weather-sky"] [data-fx="fog"] {
   top: calc(var(--y) * 1%);
   left: -20%;
@@ -2077,9 +2206,11 @@ body {
 @property --wx-bottom { syntax: "<color>"; inherits: true; initial-value: navy; }
 @property --wx-glow { syntax: "<color>"; inherits: true; initial-value: transparent; }
 @property --wx-scrim { syntax: "<color>"; inherits: true; initial-value: black; }
+@property --wx-cloud-lit { syntax: "<color>"; inherits: true; initial-value: white; }
+@property --wx-cloud-shade { syntax: "<color>"; inherits: true; initial-value: gray; }
 @property --wx-t { syntax: "<number>"; inherits: true; initial-value: 0; }
-[data-slot="weather-sky"] { position: absolute; inset: 0; overflow: hidden; container-type: size; --wx-top: color-mix(in oklab, var(--wx-night-top), color-mix(in oklab, var(--wx-twilight-top), var(--wx-day-top) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-mid: color-mix(in oklab, var(--wx-night-mid), color-mix(in oklab, var(--wx-twilight-mid), var(--wx-day-mid) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-bottom: color-mix(in oklab, var(--wx-night-bottom), color-mix(in oklab, var(--wx-twilight-bottom), var(--wx-day-bottom) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-scrim: color-mix(in oklab, var(--wx-top), var(--weather-scrim-base) 78%); }
-[data-slot="weather-sky"][data-mounted="true"] { transition: --wx-top 3200ms cubic-bezier(.37, 0, .63, 1), --wx-mid 3200ms cubic-bezier(.37, 0, .63, 1), --wx-bottom 3200ms cubic-bezier(.37, 0, .63, 1), --wx-glow 3200ms cubic-bezier(.37, 0, .63, 1), --wx-scrim 3200ms cubic-bezier(.37, 0, .63, 1), --wx-t 3200ms cubic-bezier(.37, 0, .63, 1); }
+[data-slot="weather-sky"] { position: absolute; inset: 0; overflow: hidden; container-type: size; --wx-top: color-mix(in oklab, var(--wx-night-top), color-mix(in oklab, var(--wx-twilight-top), var(--wx-day-top) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-mid: color-mix(in oklab, var(--wx-night-mid), color-mix(in oklab, var(--wx-twilight-mid), var(--wx-day-mid) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-bottom: color-mix(in oklab, var(--wx-night-bottom), color-mix(in oklab, var(--wx-twilight-bottom), var(--wx-day-bottom) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-scrim: color-mix(in oklab, var(--wx-top), var(--weather-scrim-base) 78%); --wx-cloud-lit: color-mix(in oklab, var(--wx-cloud-night-lit), color-mix(in oklab, var(--wx-cloud-twilight-lit), var(--wx-cloud-day-lit) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-cloud-shade: color-mix(in oklab, var(--wx-cloud-night-shade), color-mix(in oklab, var(--wx-cloud-twilight-shade), var(--wx-cloud-day-shade) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); }
+[data-slot="weather-sky"][data-mounted="true"] { transition: --wx-top 3200ms cubic-bezier(.37, 0, .63, 1), --wx-mid 3200ms cubic-bezier(.37, 0, .63, 1), --wx-bottom 3200ms cubic-bezier(.37, 0, .63, 1), --wx-glow 3200ms cubic-bezier(.37, 0, .63, 1), --wx-scrim 3200ms cubic-bezier(.37, 0, .63, 1), --wx-cloud-lit 3200ms cubic-bezier(.37, 0, .63, 1), --wx-cloud-shade 3200ms cubic-bezier(.37, 0, .63, 1), --wx-t 3200ms cubic-bezier(.37, 0, .63, 1); }
 [data-slot="weather-sky"] .weather-sky-base { position:absolute; inset:0; background:linear-gradient(to bottom, oklch(from var(--wx-top) min(l, .46) c h) 0%, oklch(from var(--wx-mid) min(l, .50) c h) 55%, oklch(from var(--wx-bottom) min(l, .50) c h) 100%); }
 [data-slot="weather-sky"] .weather-sky-glow { position:absolute; inset:0; background:radial-gradient(46% 70% at var(--wx-light-x, 88%) var(--wx-light-y, 40%), var(--wx-glow), transparent 64%); }
 [data-slot="weather-sky"] .weather-sky-vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center, transparent 48%, var(--weather-vignette)); }
@@ -2101,8 +2232,8 @@ body {
   to { opacity: 1; }
 }
 @keyframes wx-drift {
-  from { transform: translate3d(-110%, 0, 0); }
-  to { transform: translate3d(110vw, 0, 0); }
+  from { transform: translate3d(-100%, 0, 0); }
+  to { transform: translate3d(100cqw, 0, 0); }
 }
 @keyframes wx-fog {
   from { transform: translate3d(-8%, 0, 0); }

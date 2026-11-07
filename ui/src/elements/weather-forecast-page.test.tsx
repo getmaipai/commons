@@ -144,7 +144,7 @@ describe("WeatherForecastPage", () => {
     const clear = [{ id: "sun", city: "Sun", detail: { temp: 82, condition: "Clear", code: 0, isDay: true } }];
     const { container } = render(<WeatherForecastPage locations={clear} selectedId="sun"/>);
     const sky = container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
-    expect(sky.querySelectorAll('[data-fx="cloud"]')).toHaveLength(3);
+    expect(sky.querySelectorAll('[data-fx="cloud"]')).toHaveLength(2);
     expect(sky.querySelector('[data-fx="sun-rays"]')).not.toBeNull();
     expect(tokens).toContain("@keyframes wx-drift");
     expect(tokens).toContain("animation: wx-rays 60s linear infinite");

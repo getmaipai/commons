@@ -48,13 +48,19 @@ describe("weather scene token contrast",()=>{
   for(const stops of paletteSamples) for(const x of [4,30,55]) for(const y of [58,72,86,98]) expect(sample(src,cls,stops,x,y),`${cls} ${x},${y}`).toBeGreaterThanOrEqual(4.5);
  });
  test("registered weather properties keep the transition",()=>{for(const p of ["--wx-top","--wx-mid","--wx-bottom","--wx-glow","--wx-scrim","--wx-t"])expect(css).toContain(`@property ${p}`);expect(css).toContain("--wx-top 3200ms cubic-bezier(.37, 0, .63, 1)");});
- test("every color-mix in the sky rule has the percentage on the second colour, not after a comma (an invalid mix silently falls back to navy)",()=>{
-  const line=css.split("\n").find((l)=>l.startsWith('[data-slot="weather-sky"] { position: absolute;'))!;
+ test("cloud day, night and twilight tints exist in all themes and stay out of the text band",()=>{
+  const classes=["clear","partly-cloudy","overcast","drizzle","rain","snow","thunderstorm"];
+  for(const src of themes) for(const cls of classes) for(const suffix of ["lit","shade","night-lit","night-shade","twilight-lit","twilight-shade"]) expect(token(src,`${cls}-cloud-${suffix}`).l).toBeGreaterThan(0);
+  expect(css).toContain("--wx-cloud-lit 3200ms cubic-bezier(.37, 0, .63, 1)");
+  const cloudRules=css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"] {'),css.indexOf('[data-slot="weather-sky"] [data-fx="fog"] {'));
+  expect(cloudRules).toContain("20% 56%"); expect(cloudRules).toContain("0% 22%"); expect(cloudRules).toContain("8% 40%");
+ });
+ test("every color-mix in the sky rules has three top-level parts and the percentage on the second colour",()=>{
   const topLevelParts=(body:string)=>{const parts:string[]=[];let depth=0,cur="";for(const ch of body){if(ch==="(")depth++;if(ch===")")depth--;if(ch===","&&depth===0){parts.push(cur);cur="";}else cur+=ch;}parts.push(cur);return parts;};
-  let found=0;
-  for(let i=line.indexOf("color-mix(");i>=0;i=line.indexOf("color-mix(",i+1)){
-   let depth=0,end=-1;for(let j=i+"color-mix".length;j<line.length;j++){if(line[j]==="(")depth++;if(line[j]===")"){depth--;if(depth===0){end=j;break;}}}
-   const body=line.slice(i+"color-mix(".length,end);expect(topLevelParts(body).length).toBe(3);found++;
+  let found=0; const rules=css.split("\n").filter(l=>l.startsWith('[data-slot="weather-sky"] { position: absolute;'));
+  for(const rule of rules) for(let i=rule.indexOf("color-mix(");i>=0;i=rule.indexOf("color-mix(",i+1)){
+   let depth=0,end=-1;for(let j=i+"color-mix".length;j<rule.length;j++){if(rule[j]==="(")depth++;if(rule[j]===")"){depth--;if(depth===0){end=j;break;}}}
+   const body=rule.slice(i+"color-mix(".length,end);expect(topLevelParts(body).length).toBe(3);found++;
   }
   expect(found).toBeGreaterThanOrEqual(6);
  });
