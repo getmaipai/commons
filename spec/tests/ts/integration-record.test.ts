@@ -16,12 +16,20 @@ const valid = [
   "integration.default-home-assistant.example.json",
   "integration.second-uptime-kuma.example.json",
   "integration.tombstoned.example.json",
+  "integration.options-uptime-kuma.example.json",
 ];
 const invalid = [
   "integration.invalid-slug-slash.example.json",
   "integration.invalid-slug-colon.example.json",
   "integration.invalid-unknown-type.example.json",
   "integration.invalid-secret-field.example.json",
+  "integration.invalid-options-uppercase-key.example.json",
+  "integration.invalid-options-long-value.example.json",
+  "integration.invalid-options-too-many.example.json",
+  "integration.invalid-options-token-key.example.json",
+  "integration.invalid-options-password-key.example.json",
+  "integration.invalid-options-secret-key.example.json",
+  "integration.invalid-options-api-key-key.example.json",
 ];
 
 describe("SPEC-INSTANCES-01 integration record", () => {
@@ -42,7 +50,7 @@ describe("SPEC-INSTANCES-01 integration record", () => {
   });
 
   test("(type, instance) must be unique, tombstones included", () => {
-    const [a, b, c] = valid.map(read);
+    const [a, b, c] = valid.slice(0, 3).map(read);
     expect(validateIntegrations([a, b, c])).toEqual([]);
     expect(validateIntegrations([c, { ...c, id: "integ-giteanew" }]).join(" ")).toContain("gitea/old-forge");
     expect(validateIntegrations([a, { ...a, type: "plex", id: "integ-plexdefault" }])).toEqual([]);

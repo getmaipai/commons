@@ -154,7 +154,7 @@ async function main() {
     const title = (dereferenced as { title?: string }).title;
     const typeName = title ? title.replace(/[^a-zA-Z0-9]/g, "") : pascalCase(fileBase);
 
-    const code = jsonSchemaToZod(dereferenced as Record<string, unknown>, {
+    let code = jsonSchemaToZod(dereferenced as Record<string, unknown>, {
       name: typeName,
       module: "esm",
       type: true,
@@ -162,6 +162,17 @@ async function main() {
       zodVersion: 4,
       parserOverride: ifPresentOverride,
     });
+
+    // json-schema-to-zod drops `maxProperties` on a record (SPEC-INSTANCES-02:
+    // Integration.options allows at most 8 keys). Re-add it as a refine.
+    if (fileBase === "integration") {
+      const record = ".record(z.string(), z.union([z.string().max(200), z.never()]))";
+      if (!code.includes(record)) throw new Error("integration.options record shape changed; update gen-ts.ts");
+      code = code.replace(
+        record,
+        `${record}.refine((value) => Object.keys(value).length <= 8, { message: "options allows at most 8 keys" })`,
+      );
+    }
 
     const header = `// GENERATED FILE. Do not edit by hand.\n// Source: spec/schemas/${file}\n// Regenerate with: cd spec && bun run gen:ts\n\n`;
     const formatted = await prettier.format(header + code + "\n", { parser: "typescript" });

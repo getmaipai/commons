@@ -19,6 +19,7 @@ def fixture(name: str) -> dict:
         "integration.default-home-assistant.example.json",
         "integration.second-uptime-kuma.example.json",
         "integration.tombstoned.example.json",
+        "integration.options-uptime-kuma.example.json",
     ],
 )
 def test_valid_integration_round_trips(name):
@@ -39,6 +40,13 @@ def test_valid_integration_round_trips(name):
         "integration.invalid-slug-colon.example.json",
         "integration.invalid-unknown-type.example.json",
         "integration.invalid-secret-field.example.json",
+        "integration.invalid-options-uppercase-key.example.json",
+        "integration.invalid-options-long-value.example.json",
+        "integration.invalid-options-too-many.example.json",
+        "integration.invalid-options-token-key.example.json",
+        "integration.invalid-options-password-key.example.json",
+        "integration.invalid-options-secret-key.example.json",
+        "integration.invalid-options-api-key-key.example.json",
     ],
 )
 def test_invalid_integration_is_rejected(name):

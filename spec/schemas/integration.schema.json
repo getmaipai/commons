@@ -62,6 +62,18 @@
       "default": true,
       "description": "False keeps the instance configured but unused."
     },
+    "options": {
+      "type": "object",
+      "maxProperties": 8,
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(?!(token|password|secret|api_key)$)[a-z][a-z0-9_]{0,30}$": {
+          "type": "string",
+          "maxLength": 200
+        }
+      },
+      "description": "Non-secret per-instance settings a connector needs, for example Uptime Kuma's `status_page` slug. Keys are short lowercase names; values are strings of at most 200 characters; at most 8 keys. Never a credential: the key names token, password, secret and api_key are rejected, and secrets stay in the credentials center behind `credential_ref`. Absent when there are none."
+    },
     "deleted_at": {
       "type": [
         "string",

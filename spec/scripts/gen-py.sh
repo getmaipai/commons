@@ -39,6 +39,18 @@ path = Path("gen/py/song_style_schema.py")
 path.write_text(path.read_text().replace("song_style_schema.Seed", "Seed"))
 PY
 
+# datamodel-code-generator drops `maxProperties` (SPEC-INSTANCES-02:
+# Integration.options allows at most 8 keys). Re-add it as a length bound.
+python3 - <<'PY'
+from pathlib import Path
+
+path = Path("gen/py/integration_schema.py")
+text = path.read_text()
+old = "    ) = Field(\n        None,\n        description=\"Non-secret per-instance"
+assert old in text, "integration.options field shape changed; update gen-py.sh"
+path.write_text(text.replace(old, "    ) = Field(\n        None,\n        max_length=8,\n        description=\"Non-secret per-instance", 1))
+PY
+
 # Stack wire schemas are excluded from the broad sweep because their
 # conditional schemas are not preserved reliably. STT's event uses oneOf,
 # which datamodel-code-generator handles, so keep its Python mirror generated

@@ -23,6 +23,7 @@ class Integration(BaseModel):
 
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     id: constr(pattern=r'^integ-[a-z0-9]{6,}$') = Field(
         ..., description='Stable record id, never reused.'
@@ -46,6 +47,19 @@ class Integration(BaseModel):
     )
     enabled: bool = Field(
         ..., description='False keeps the instance configured but unused.'
+    )
+    options: (
+        dict[
+            constr(
+                pattern=r'^(?!(token|password|secret|api_key)$)[a-z][a-z0-9_]{0,30}$'
+            ),
+            constr(max_length=200),
+        ]
+        | None
+    ) = Field(
+        None,
+        max_length=8,
+        description="Non-secret per-instance settings a connector needs, for example Uptime Kuma's `status_page` slug. Keys are short lowercase names; values are strings of at most 200 characters; at most 8 keys. Never a credential: the key names token, password, secret and api_key are rejected, and secrets stay in the credentials center behind `credential_ref`. Absent when there are none.",
     )
     deleted_at: AwareDatetime | None = Field(
         None,

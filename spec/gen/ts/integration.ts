@@ -63,6 +63,54 @@ export const Integration = z
       .boolean()
       .describe("False keeps the instance configured but unused.")
       .default(true),
+    /**Non-secret per-instance settings a connector needs, for example Uptime Kuma's `status_page` slug. Keys are short lowercase names; values are strings of at most 200 characters; at most 8 keys. Never a credential: the key names token, password, secret and api_key are rejected, and secrets stay in the credentials center behind `credential_ref`. Absent when there are none.*/
+    options: z
+      .record(z.string(), z.union([z.string().max(200), z.never()]))
+      .refine((value) => Object.keys(value).length <= 8, {
+        message: "options allows at most 8 keys",
+      })
+      .superRefine((value, ctx) => {
+        for (const key in value) {
+          let evaluated = false;
+          if (
+            key.match(
+              new RegExp(
+                "^(?!(token|password|secret|api_key)$)[a-z][a-z0-9_]{0,30}$",
+              ),
+            )
+          ) {
+            evaluated = true;
+            const result = z.string().max(200).safeParse(value[key]);
+            if (!result.success) {
+              ctx.addIssue({
+                path: [key],
+                code: "custom",
+                message: `Invalid input: Key matching regex /${key}/ must match schema`,
+                params: {
+                  issues: result.error.issues,
+                },
+              });
+            }
+          }
+          if (!evaluated) {
+            const result = z.never().safeParse(value[key]);
+            if (!result.success) {
+              ctx.addIssue({
+                path: [key],
+                code: "custom",
+                message: `Invalid input: must match catchall schema`,
+                params: {
+                  issues: result.error.issues,
+                },
+              });
+            }
+          }
+        }
+      })
+      .describe(
+        "Non-secret per-instance settings a connector needs, for example Uptime Kuma's `status_page` slug. Keys are short lowercase names; values are strings of at most 200 characters; at most 8 keys. Never a credential: the key names token, password, secret and api_key are rejected, and secrets stay in the credentials center behind `credential_ref`. Absent when there are none.",
+      )
+      .optional(),
     /**Tombstone. Set when an admin removes the instance; null while it exists. The record is kept so the slug is never reused.*/
     deleted_at: z
       .union([

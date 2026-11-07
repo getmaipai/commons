@@ -1,3 +1,7 @@
+## [spec-v0.1.332] - 2026-11-06
+
+- SPEC-INSTANCES-02, additive. `Integration` gains optional `options`: an object of at most 8 non-secret per-instance settings (keys `^[a-z][a-z0-9_]{0,30}$`, string values of at most 200 characters), for example Uptime Kuma's `status_page` slug. The keys `token`, `password`, `secret` and `api_key` are rejected; secrets stay in the credentials center behind `credential_ref`.
+
 ## [spec-v0.1.331] - 2026-11-06
 
 - SPEC-INSTANCES-01, additive. New `Integration` record, one per connected service instance: `type` (home_assistant, uptime_kuma, gitea, immich, unifi, plex), `instance` slug (no `/` or `:`), `label`, `address`, `credential_ref` (an opaque reference, never a secret), `enabled`, tombstone `deleted_at`, plus provenance and clock stamp. `validateIntegrations` checks (type, instance) uniqueness. Grant targets for connector actions may be `<instance>/<native target>` split at the first `/`; an unprefixed target means `default` (documented in `grant-actions.json`). Design: Home `docs/design/connector-instances-2026-11-06.md`.
