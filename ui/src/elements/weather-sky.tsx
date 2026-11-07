@@ -12,7 +12,7 @@ export interface WeatherMoon {
 }
 
 const rain = particles(11, 40, { size: [6, 44], dur: [0.2, 1.5], opacity: [0.3, 0.95] });
-const snow = particles(41, 30, { y: [-10, 0], size: [2, 6], dur: [4, 10], opacity: [0.45, 0.9] });
+const snow = particles(41, 36, { y: [-10, 0], size: scene.precipitation.snow.size as [number, number], dur: [4, 10], opacity: [0.45, 0.9] });
 const stars = particles(51, 54, { y: [0, 70], size: [1.5, 3.5], dur: [3, 7], opacity: [0.65, 1] });
 const cloudDepths = ["far", "mid", "near"] as const;
 const classShapes: Record<WeatherClass, readonly ("a" | "b" | "c")[]> = { clear: ["a", "c"], "partly-cloudy": ["a", "b", "c", "b"], overcast: ["a", "b", "c", "a", "b", "c"], fog: [], drizzle: ["a", "b", "c", "a"], rain: ["a", "b", "c", "a", "b"], snow: ["a", "b", "c"], thunderstorm: ["a", "b", "c", "a", "b", "c"] };
@@ -20,6 +20,33 @@ const fog = [18, 48, 72].map((y, i) => ({ x: 0, y, size: 30, dur: [46, 34, 26][i
 type Style = CSSProperties & Record<`--${string}`, string | number>;
 function style(p: Partial<Particle>): Style {
   return { "--x": p.x ?? 0, "--y": p.y ?? 0, "--s": p.size ?? 0, "--d": `${p.dur ?? 1}s`, "--dl": `${p.delay ?? 0}s`, "--o": p.opacity ?? 0.2 };
+}
+/**
+ * One rain streak. Three depths by index: near (every 4th, x 55 to 100 percent so the long bright ones avoid the text zone),
+ * far (every 4th from 2) and mid. Drizzle stays fine: 1.5 px wide, 6 to 9 px long.
+ */
+function rainDrop(p: Particle, i: number, drizzle: boolean, heavy: boolean, height: number) {
+  const cfg = scene.precipitation.rain.drops;
+  const depth = drizzle ? "far" : i % cfg.near.every === 0 ? "near" : i % 4 === 2 ? "far" : "mid";
+  const spec = depth === "near" ? cfg.near : depth === "mid" ? cfg.mid : cfg.far;
+  const u = Math.max(0, Math.min(1, (p.size - 6) / 38));
+  const [lo = 0, hi = 0] = spec.length;
+  const length = drizzle ? 6 + (i % 4) : Math.round((lo + u * (hi - lo)) * 10) / 10;
+  const speed = drizzle ? 180 + (i % 5) * 20 : spec.speed;
+  const [nearLo = 55, nearHi = 100] = cfg.near.x;
+  const x = depth === "near" && !drizzle ? nearLo + (p.x / 100) * (nearHi - nearLo) : p.x;
+  const duration = (height + length + 8) / speed;
+  const tilt = drizzle ? 0 : heavy ? cfg.tilt.heavy : cfg.tilt.steady;
+  const opacity = drizzle ? 0.3 + (i % 4) * 0.05 : spec.opacity;
+  return { depth, style: { "--x": x, "--s": length, "--w": drizzle ? cfg.drizzleWidth : spec.width, "--o": opacity, "--tilt": `${tilt}deg`, "--d": `${duration}s`, "--dl": `${-((i * 0.618034) % 1) * duration}s` } as Style };
+}
+/** One snow flake: size is depth, so bigger flakes are faster and more opaque. */
+function snowFlake(p: Particle, i: number, height: number) {
+  const cfg = scene.precipitation.snow;
+  const [sizeLo = 2, sizeHi = 11] = cfg.size; const [speedLo = 18, speedHi = 60] = cfg.speed; const [opLo = 0.55, opHi = 0.95] = cfg.opacity;
+  const u = Math.max(0, Math.min(1, (p.size - sizeLo) / (sizeHi - sizeLo)));
+  const duration = (height + 24) / (speedLo + u * (speedHi - speedLo));
+  return { "--x": p.x, "--s": p.size, "--d": `${duration}s`, "--dl": `${-((i * 0.618034) % 1) * duration}s`, "--o": opLo + u * (opHi - opLo) } as Style;
 }
 function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: WeatherVariant; wind?: number; width: number }) {
   const refs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -42,7 +69,7 @@ function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: Wea
     const size = `clamp(${d.minWidth}px, ${d.widthCqw}cqw, ${d.width}px)`; const duration = cloudDuration(width, d.width * d.scale, d.speed, factor);
     const yMin = d.y[0] ?? 0; const yMax = d.y[1] ?? yMin;
     const y = yMin + ((i * 7 + 4) % (yMax - yMin + 1));
-    return { depth, shape, size, duration, delay: -(i / total) * duration, y, mask: cloudMask(shape), leaving: i >= count };
+    return { depth, shape, size, duration, delay: -(i / total) * duration, y, mask: cloudMask(shape, depth), composite: cloudComposite(shape), leaving: i >= count };
   });
   useEffect(() => { pendingWind.current = wind; }, [wind]);
   const retime = (el: HTMLSpanElement, i: number) => {
@@ -51,11 +78,25 @@ function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: Wea
     const depth = scene.clouds.depths[p.depth];
     el.style.setProperty("--d", `${cloudDuration(width, depth.width * depth.scale, depth.speed, nextFactor)}s`);
   };
-  return <>{data.map((p, i) => <span ref={el => { refs.current[i] = el; }} key={i} data-fx="cloud" data-shape={p.shape} data-depth={p.depth} data-leaving={p.leaving ? "true" : undefined} aria-hidden="true" onAnimationIteration={e => retime(e.currentTarget, i)} style={{ "--y": p.y, "--s": p.size, "--d": `${p.duration}s`, "--dl": `${p.delay}s`, "--o": scene.clouds.depths[p.depth].opacity, "--z": scene.clouds.depths[p.depth].z, "--cloud-mask": p.mask } as Style}/>)}</>;
+  return <>{data.map((p, i) => <span ref={el => { refs.current[i] = el; }} key={i} data-fx="cloud" data-shape={p.shape} data-depth={p.depth} data-leaving={p.leaving ? "true" : undefined} aria-hidden="true" onAnimationIteration={e => retime(e.currentTarget, i)} style={{ "--y": p.y, "--s": p.size, "--d": `${p.duration}s`, "--dl": `${p.delay}s`, "--o": scene.clouds.depths[p.depth].opacity, "--z": scene.clouds.depths[p.depth].z, "--cloud-mask": p.mask, "--cloud-mc": p.composite.standard, "--cloud-mc-webkit": p.composite.webkit } as Style}/>)}</>;
 }
-function cloudMask(shape: "a" | "b" | "c") {
+/**
+ * The cloud silhouette: lobed puffs that sit on one flat shelf. Layer order (top first): the shelf clip, the puffs,
+ * the base ellipse. The clip intersects everything below it and the rest add, so the lobes keep their tops and the
+ * bottom is cut flat. Puff stops give a 3 to 10 px soft rim without any blur.
+ */
+function cloudMask(shape: "a" | "b" | "c", depth: "far" | "mid" | "near") {
   const puffs = scene.clouds.puffs[shape] as number[][];
-  return puffs.map(puff => { const [x = 0, y = 0, r = 0] = puff; return `radial-gradient(circle calc(var(--s) * ${(r + 9) / 100}) at ${x}% ${y}%, var(--weather-ink) 40%, transparent 100%)`; }).join(", ");
+  const stop = scene.clouds.mask[depth]; const shelf = scene.clouds.shelf[shape];
+  const lobes = puffs.map(puff => { const [x = 0, y = 0, r = 0] = puff; return `radial-gradient(circle calc(var(--s) * ${r / 100}) at ${x}% ${y}%, var(--weather-ink) 0 ${stop}%, transparent 100%)`; });
+  const base = `radial-gradient(ellipse 46% 13% at 50% ${shelf}%, var(--weather-ink) 0 92%, transparent)`;
+  const clip = `linear-gradient(to bottom, var(--weather-ink) 0 ${shelf}%, transparent ${shelf}%)`;
+  return [clip, ...lobes, base].join(", ");
+}
+/** mask-composite lists for cloudMask: the first (clip) layer intersects, every other layer adds. */
+function cloudComposite(shape: "a" | "b" | "c") {
+  const rest = (scene.clouds.puffs[shape] as number[][]).length + 1;
+  return { standard: ["intersect", ...Array(rest).fill("add")].join(", "), webkit: ["source-in", ...Array(rest).fill("source-over")].join(", ") };
 }
 
 interface SceneSnapshot { cls: WeatherClass; intensity: number }
@@ -145,7 +186,7 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
   const { leaving, changed } = useCrossFade(current);
   const side = timing.phase === "dawn" || (timing.phase === "night" && timing.elevation < 0 && timing.dayFraction < 0.5) ? "dawn" : "dusk";
   const twilight = timing.phase === "dawn" || timing.phase === "dusk" ? timing.phase : side;
-  const skyStyle = { "--wx-t": timing.t, "--wx-night": Math.max(0, Math.min(1, 1 - timing.t * 2)), "--wx-night-top": `var(--weather-${cls}-night-top)`, "--wx-night-mid": `var(--weather-${cls}-night-mid)`, "--wx-night-bottom": `var(--weather-${cls}-night-bottom)`, "--wx-twilight-top": `var(--weather-${cls}-${twilight}-top)`, "--wx-twilight-mid": `var(--weather-${cls}-${twilight}-mid)`, "--wx-twilight-bottom": `var(--weather-${cls}-${twilight}-bottom)`, "--wx-day-top": `var(--weather-${cls}-day-top)`, "--wx-day-mid": `var(--weather-${cls}-day-mid)`, "--wx-day-bottom": `var(--weather-${cls}-day-bottom)`, "--wx-glow": `var(--weather-${cls}-${timing.phase}-glow)`, "--wx-scrim": `var(--weather-${cls}-${timing.phase}-scrim)`, "--wx-light-x": `${position.x}%`, "--wx-light-y": `${Math.max(40,position.y)}%`, "--wx-moon-x": `${moonPosition.x}%`, "--wx-moon-y": `${Math.max(12,moonPosition.y)}%`, "--weather-intensity": actualIntensity } as CSSProperties;
+  const skyStyle = { "--wx-t": timing.t, "--wx-night": Math.max(0, Math.min(1, 1 - timing.t * 2)), "--wx-night-top": `var(--weather-${cls}-night-top)`, "--wx-night-mid": `var(--weather-${cls}-night-mid)`, "--wx-night-bottom": `var(--weather-${cls}-night-bottom)`, "--wx-twilight-top": `var(--weather-${cls}-${twilight}-top)`, "--wx-twilight-mid": `var(--weather-${cls}-${twilight}-mid)`, "--wx-twilight-bottom": `var(--weather-${cls}-${twilight}-bottom)`, "--wx-day-top": `var(--weather-${cls}-day-top)`, "--wx-day-mid": `var(--weather-${cls}-day-mid)`, "--wx-day-bottom": `var(--weather-${cls}-day-bottom)`, "--wx-glow": `var(--weather-${cls}-${timing.phase}-glow)`, "--wx-scrim": `var(--weather-${cls}-${timing.phase}-scrim)`, "--wx-light-x": `${position.x}%`, "--wx-light-y": `${timing.phase === "dawn" || timing.phase === "dusk" ? scene.sun.twilightY : Math.max(40, position.y)}%`, "--wx-moon-x": `${moonPosition.x}%`, "--wx-moon-y": `${Math.max(12,moonPosition.y)}%`, "--weather-intensity": actualIntensity } as CSSProperties;
   Object.assign(skyStyle, { "--wx-cloud-day-lit": `var(--weather-${cls}-cloud-lit)`, "--wx-cloud-day-shade": `var(--weather-${cls}-cloud-shade)`, "--wx-cloud-night-lit": `var(--weather-${cls}-cloud-night-lit)`, "--wx-cloud-night-shade": `var(--weather-${cls}-cloud-night-shade)`, "--wx-cloud-twilight-lit": `var(--weather-${cls}-cloud-twilight-lit)`, "--wx-cloud-twilight-shade": `var(--weather-${cls}-cloud-twilight-shade)` });
   // One condition group: the sun or moon, stars, fog, precipitation and lightning of one class.
   // Clouds sit outside it because they persist across class changes.
@@ -156,6 +197,9 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
     const rainCount = intensity !== undefined ? precipitationCount(rainBase, ai, areaScale, cap) : precipitationCount(rainBase, ai > 0 ? 1 : 0, areaScale, cap);
     const snowBase = variant === "lite" ? scene.precipitation.snow.lite : scene.precipitation.snow.count;
     const snowCount = precipitationCount(snowBase, intensity !== undefined ? ai : ai > 0 ? 1 : 0, areaScale, snowBase);
+    const flakes = snow.slice(0, snowCount);
+    // The largest flakes are the near ones: soft, and on the pendulum (never in lite).
+    const soft = new Set(variant === "lite" ? [] : flakes.map((p, i) => [p.size, i] as const).sort((a, b) => b[0] - a[0]).slice(0, scene.precipitation.snow.pendulum).map(([, i]) => i));
     const splashCount = c === "drizzle" || variant === "lite" ? 0 : Math.floor(rainCount * (heavy ? scene.precipitation.rain.heavySplashRatio : scene.precipitation.rain.splashRatio));
     const hasSun = timing.phase !== "night" && (c === "clear" || c === "partly-cloudy" || c === "fog");
     const hasMoon = timing.phase === "night" && (c === "clear" || c === "partly-cloudy");
@@ -167,15 +211,17 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
       {hasSun && <span data-fx="sun-group" data-dimmed={c === "fog" ? "true" : undefined}><span data-fx="sun-halo-a"/><span data-fx="sun-halo-b"/>{corona && <span data-fx="sun-corona"/>}<span data-fx="sun"/></span>}
       {(hasMoon || hasMoonHalo) && <span data-fx="moon-group" data-halo-only={hasMoonHalo ? "true" : undefined}><span data-fx="moon-halo"/>{hasMoon && <span data-fx="moon-disc"><MoonDisc phase={moonData.phase} illumination={moonData.illumination} size={variant === "lite" ? 28 : variant === "compact" ? 40 : variant === "wide" ? 64 : 54}/></span>}</span>}
       {timing.phase === "night" && starCount > 0 && <span data-fx="star-field">{stars.slice(0, starCount).map((p, i) => <span key={i} data-fx="star" data-twinkle={i % 3 === 0 ? "true" : undefined} aria-hidden="true" style={{ ...style({ ...p, y: c === "overcast" ? p.y % 20 : p.y }), "--dl": `${-(i % 7) * 0.7}s` } as Style}/>)}</span>}
-      {(c === "fog" || c === "drizzle") && fog.slice(0, c === "drizzle" ? 1 : 3).map((p, i) => <span key={i} data-fx="fog" aria-hidden="true" style={{ ...style({ ...p, dur: c === "drizzle" ? 7 : p.dur / snowWind }), "--fog-scale": [1.6,1.3,1][i]!, "--breath": [5,7,9][i]! + "s" } as Style}/>)}
-      {(c === "rain" || c === "drizzle" || isStorm) && <>{rain.slice(0, rainCount).map((p, i) => <span key={i} data-fx="fall" aria-hidden="true" style={{ "--x": p.x, "--s": c === "drizzle" ? 6 + (i % 4) : heavy ? 30 + (i % 15) : ai < 0.6 ? 16 + (i % 7) : 20 + (i % 11), "--tilt": heavy ? "-8deg" : "0deg", "--d": `${Math.max(0.2, (measuredHeight + 96) / (heavy ? 520 + (i % 7) * 30 : c === "drizzle" ? 180 + (i % 5) * 20 : ai < 0.6 ? 300 + (i % 5) * 20 : 380 + (i % 7) * 20))}s`, "--dl": `${-p.delay - (i / Math.max(1, rainCount)) * Math.max(0.2, (measuredHeight + 96) / 340)}s`, "--o": heavy ? 0.5 + 0.45 * ((1.4 + ((p.size - 12) / 32)) - 1) / 1.4 : c === "drizzle" ? 0.3 + (i % 4) * 0.05 : p.opacity, "--w": p.size < 12 ? 1 : heavy ? 1.4 + ((p.size - 12) / 32) : 1 + ((p.size - 12) / 32) } as Style}>{i < splashCount && <i data-fx="splash" aria-hidden="true"/>}</span>)}</>}
-      {c === "snow" && <><span data-fx="snow-field">{snow.slice(0, snowCount).map((p, i) => <span key={i} data-fx="flake" style={{ ...style(p), "--wind": wind ?? 0 } as Style}>{i >= 15 && variant !== "lite" ? <span data-fx="sway" style={{ "--d": `${1.6 + (i % 5) * 0.2}s`, "--dl": `${p.delay}s` } as Style}><span data-fx="snow-core"/></span> : null}</span>)}</span>{variant !== "lite" && <span data-fx="pile" style={{ "--pile-cap": ai < 0.5 ? 0.5 : 1 } as Style} aria-hidden="true"/>}</>}
+      {(c === "fog" || c === "drizzle" || (c === "snow" && variant !== "lite")) && fog.slice(0, c === "fog" ? 3 : 1).map((p, i) => <span key={i} data-fx="fog" aria-hidden="true" style={{ ...style({ ...p, dur: c === "drizzle" ? 7 : p.dur / snowWind, opacity: c === "snow" ? scene.precipitation.snow.haze : p.opacity }), "--fog-scale": [1.6,1.3,1][i]!, "--breath": [5,7,9][i]! + "s" } as Style}/>)}
+      {(c === "rain" || c === "drizzle" || isStorm) && <>{rain.slice(0, rainCount).map((p, i) => { const drop = rainDrop(p, i, c === "drizzle", heavy, measuredHeight); return <span key={i} data-fx="fall" data-drop={drop.depth} aria-hidden="true" style={drop.style}>{i < splashCount && <i data-fx="splash" aria-hidden="true"/>}</span>; })}</>}
+      {c === "snow" && <><span data-fx="snow-field">{flakes.map((p, i) => <span key={i} data-fx="flake" data-soft={soft.has(i) ? "true" : undefined} style={{ ...snowFlake(p, i, measuredHeight), "--wind": wind ?? 0 } as Style}>{soft.has(i) ? <span data-fx="sway" style={{ "--d": `${1.6 + (i % 5) * 0.2}s`, "--dl": `${p.delay}s` } as Style}><span data-fx="snow-core"/></span> : null}</span>)}</span>{variant !== "lite" && <span data-fx="pile" style={{ "--pile-cap": ai < 0.5 ? 0.5 : 1 } as Style} aria-hidden="true"/>}</>}
       {isStorm && <>{(["a", "b", "c"] as const).map(name => <svg key={name} data-fx="strike-bolt" data-bolt={name} viewBox={`0 0 80 ${scene.lightning.boltStepY * 20}`} preserveAspectRatio="xMidYMin meet" aria-hidden="true"><polyline points={scene.lightning.bolts[name].map((x, i) => `${x},${i * scene.lightning.boltStepY}`).join(" ")}/></svg>)}<span data-fx="strike-sheet"/><span data-fx="cloud-light"/></>}
     </span>;
   };
   return <div ref={skyRef} data-slot="weather-sky" data-class={cls} data-phase={timing.phase} data-intensity={actualIntensity} data-running={running ? "true" : "false"} data-variant={variant} data-mounted="true" data-paused={paused ? "true" : "false"} data-jolt={storm && jolt ? "true" : undefined} data-reduced={storm && reduced ? "true" : undefined} style={skyStyle} aria-hidden="true" onAnimationEnd={e => { if (e.target instanceof Element && e.target.getAttribute("data-fx") === "strike-bolt") e.currentTarget.removeAttribute("data-strike"); }}>
     <span data-weather-layer="base" className="weather-sky-base" aria-hidden="true"/>
     <span data-weather-layer="glow" className="weather-sky-glow" aria-hidden="true"/>
+    <span data-weather-layer="horizon" className="weather-sky-horizon" aria-hidden="true"/>
+    <span data-weather-layer="horizon-day" className="weather-sky-horizon-day" aria-hidden="true"/>
     <span data-weather-layer="vignette" className="weather-sky-vignette" aria-hidden="true"/>
     {variant !== "lite" ? <span data-weather-layer="grain" className="weather-sky-grain" aria-hidden="true"/> : null}
     <span data-weather-layer="scrim" className="weather-sky-scrim" aria-hidden="true"/>

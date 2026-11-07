@@ -731,7 +731,7 @@
   --weather-partly-cloudy-cloud-night-shade: oklch(0.300 0.012 255);
   --weather-partly-cloudy-cloud-twilight-shade: oklch(0.360 0.035 35);
   --weather-overcast-cloud-lit: oklch(0.780 0.012 250);
-  --weather-overcast-cloud-shade: oklch(0.580 0.015 252);
+  --weather-overcast-cloud-shade: oklch(0.500 0.015 252);
   --weather-overcast-cloud-night-lit: oklch(0.420 0.006 250);
   --weather-overcast-cloud-twilight-lit: oklch(0.600 0.050 45);
   --weather-overcast-cloud-night-shade: oklch(0.300 0.012 255);
@@ -743,31 +743,31 @@
   --weather-drizzle-cloud-night-shade: oklch(0.300 0.012 255);
   --weather-drizzle-cloud-twilight-shade: oklch(0.360 0.035 35);
   --weather-rain-cloud-lit: oklch(0.660 0.018 250);
-  --weather-rain-cloud-shade: oklch(0.460 0.022 252);
+  --weather-rain-cloud-shade: oklch(0.380 0.022 252);
   --weather-rain-cloud-night-lit: oklch(0.420 0.006 250);
   --weather-rain-cloud-twilight-lit: oklch(0.600 0.050 45);
   --weather-rain-cloud-night-shade: oklch(0.300 0.012 255);
   --weather-rain-cloud-twilight-shade: oklch(0.360 0.035 35);
-  --weather-snow-cloud-lit: oklch(0.900 0.008 235);
+  --weather-snow-cloud-lit: oklch(0.920 0.008 235);
   --weather-snow-cloud-shade: oklch(0.720 0.012 235);
   --weather-snow-cloud-night-lit: oklch(0.420 0.006 250);
   --weather-snow-cloud-twilight-lit: oklch(0.600 0.050 45);
   --weather-snow-cloud-night-shade: oklch(0.300 0.012 255);
   --weather-snow-cloud-twilight-shade: oklch(0.360 0.035 35);
   --weather-thunderstorm-cloud-lit: oklch(0.520 0.040 285);
-  --weather-thunderstorm-cloud-shade: oklch(0.300 0.050 282);
+  --weather-thunderstorm-cloud-shade: oklch(0.240 0.050 282);
   --weather-thunderstorm-cloud-night-lit: oklch(0.420 0.006 250);
   --weather-thunderstorm-cloud-twilight-lit: oklch(0.490 0.050 45);
   --weather-thunderstorm-cloud-night-shade: oklch(0.300 0.012 255);
   --weather-thunderstorm-cloud-twilight-shade: oklch(0.300 0.035 35);
-  --weather-clear-day-top: oklch(0.42 0.14 258); --weather-clear-day-mid: oklch(0.47 0.13 252); --weather-clear-day-bottom: oklch(0.50 0.11 240); --weather-clear-glow: oklch(0.86 0.08 220 / 0.40);
-  --weather-partly-cloudy-day-top: oklch(0.42 0.10 256); --weather-partly-cloudy-day-mid: oklch(0.47 0.09 250); --weather-partly-cloudy-day-bottom: oklch(0.50 0.08 242); --weather-partly-cloudy-glow: oklch(0.86 0.07 222 / 0.32);
+  --weather-clear-day-top: oklch(0.42 0.14 258); --weather-clear-day-mid: oklch(0.44 0.13 252); --weather-clear-day-bottom: oklch(0.47 0.11 240); --weather-clear-glow: oklch(0.86 0.08 220 / 0.40);
+  --weather-partly-cloudy-day-top: oklch(0.42 0.10 256); --weather-partly-cloudy-day-mid: oklch(0.45 0.09 250); --weather-partly-cloudy-day-bottom: oklch(0.48 0.08 242); --weather-partly-cloudy-glow: oklch(0.86 0.07 222 / 0.32);
   --weather-overcast-day-top: oklch(0.40 0.025 250); --weather-overcast-day-mid: oklch(0.44 0.024 248); --weather-overcast-day-bottom: oklch(0.49 0.022 244); --weather-overcast-glow: oklch(0.84 0.014 250 / 0.22);
   --weather-fog-day-top: oklch(0.42 0.012 214); --weather-fog-day-mid: oklch(0.46 0.012 216); --weather-fog-day-bottom: oklch(0.50 0.012 220); --weather-fog-glow: oklch(0.86 0.010 212 / 0.26);
   --weather-drizzle-day-top: oklch(0.39 0.034 246); --weather-drizzle-day-mid: oklch(0.44 0.032 243); --weather-drizzle-day-bottom: oklch(0.49 0.030 238); --weather-drizzle-glow: oklch(0.82 0.020 246 / 0.18);
-  --weather-rain-day-top: oklch(0.34 0.034 248); --weather-rain-day-mid: oklch(0.39 0.034 244); --weather-rain-day-bottom: oklch(0.44 0.032 240); --weather-rain-glow: oklch(0.78 0.020 246 / 0.14);
+  --weather-rain-day-top: oklch(0.38 0.034 248); --weather-rain-day-mid: oklch(0.43 0.034 244); --weather-rain-day-bottom: oklch(0.48 0.032 240); --weather-rain-glow: oklch(0.78 0.020 246 / 0.14);
   --weather-snow-day-top: oklch(0.42 0.040 238); --weather-snow-day-mid: oklch(0.46 0.036 234); --weather-snow-day-bottom: oklch(0.50 0.030 228); --weather-snow-glow: oklch(0.92 0.020 230 / 0.28);
-  --weather-thunderstorm-day-top: oklch(0.25 0.036 282); --weather-thunderstorm-day-mid: oklch(0.30 0.038 274); --weather-thunderstorm-day-bottom: oklch(0.35 0.036 264); --weather-thunderstorm-glow: oklch(0.70 0.030 282 / 0.12);
+  --weather-thunderstorm-day-top: oklch(0.30 0.036 282); --weather-thunderstorm-day-mid: oklch(0.35 0.038 274); --weather-thunderstorm-day-bottom: oklch(0.40 0.036 264); --weather-thunderstorm-glow: oklch(0.70 0.030 282 / 0.12);
   --weather-clear-night-top: oklch(0.258 0.105 260.7); --weather-clear-night-mid: oklch(0.279 0.098 257.4); --weather-clear-night-bottom: oklch(0.292 0.083 250.8); --weather-clear-night-glow: oklch(0.86 0.03 250 / 0.14);
   --weather-partly-cloudy-night-top: oklch(0.258 0.067 259.6); --weather-partly-cloudy-night-mid: oklch(0.279 0.060 256.3); --weather-partly-cloudy-night-bottom: oklch(0.292 0.053 251.9); --weather-partly-cloudy-night-glow: oklch(0.86 0.03 250 / 0.116);
   --weather-overcast-night-top: oklch(0.249 0.018 256.3); --weather-overcast-night-mid: oklch(0.266 0.018 255.2); --weather-overcast-night-bottom: oklch(0.287 0.017 253.5); --weather-overcast-night-glow: oklch(0.86 0.03 250 / 0.072);
@@ -776,80 +776,82 @@
   --weather-rain-night-top: oklch(0.224 0.026 237.2); --weather-rain-night-mid: oklch(0.245 0.026 235.2); --weather-rain-night-bottom: oklch(0.266 0.024 233.4); --weather-rain-night-glow: oklch(0.86 0.03 250 / 0.068);
   --weather-snow-night-top: oklch(0.258 0.030 232.8); --weather-snow-night-mid: oklch(0.275 0.027 230.6); --weather-snow-night-bottom: oklch(0.292 0.023 228.3); --weather-snow-night-glow: oklch(0.86 0.03 250 / 0.098);
   --weather-thunderstorm-night-top: oklch(0.186 0.027 273.9); --weather-thunderstorm-night-mid: oklch(0.207 0.029 270.8); --weather-thunderstorm-night-bottom: oklch(0.228 0.027 266.4); --weather-thunderstorm-night-glow: oklch(0.86 0.03 250 / 0.06);
-  --weather-clear-dusk-top: oklch(0.168 0.075 281); --weather-clear-dusk-mid: oklch(0.206 0.065 294); --weather-clear-dusk-bottom: oklch(0.306 0.115 52); --weather-clear-dawn-top: oklch(0.399 0.119 259); --weather-clear-dawn-mid: oklch(0.447 0.050 330); --weather-clear-dawn-bottom: oklch(0.480 0.085 32);
-  --weather-partly-cloudy-dusk-top: oklch(0.179 0.066 278); --weather-partly-cloudy-dusk-mid: oklch(0.213 0.061 292); --weather-partly-cloudy-dusk-bottom: oklch(0.310 0.103 52); --weather-partly-cloudy-dawn-top: oklch(0.399 0.085 258); --weather-partly-cloudy-dawn-mid: oklch(0.447 0.050 330); --weather-partly-cloudy-dawn-bottom: oklch(0.480 0.085 32);
-  --weather-overcast-dusk-top: oklch(0.160 0.075 292); --weather-overcast-dusk-mid: oklch(0.196 0.065 350); --weather-overcast-dusk-bottom: oklch(0.300 0.115 52); --weather-overcast-dawn-top: oklch(0.380 0.022 262); --weather-overcast-dawn-mid: oklch(0.418 0.050 330); --weather-overcast-dawn-bottom: oklch(0.466 0.085 32);
-  --weather-fog-dusk-top: oklch(0.168 0.075 292); --weather-fog-dusk-mid: oklch(0.205 0.065 350); --weather-fog-dusk-bottom: oklch(0.306 0.115 52); --weather-fog-dawn-top: oklch(0.399 0.010 262); --weather-fog-dawn-mid: oklch(0.437 0.050 330); --weather-fog-dawn-bottom: oklch(0.480 0.085 32);
-  --weather-drizzle-dusk-top: oklch(0.156 0.075 292); --weather-drizzle-dusk-mid: oklch(0.194 0.065 350); --weather-drizzle-dusk-bottom: oklch(0.300 0.115 52); --weather-drizzle-dawn-top: oklch(0.371 0.029 262); --weather-drizzle-dawn-mid: oklch(0.418 0.050 330); --weather-drizzle-dawn-bottom: oklch(0.466 0.085 32);
-  --weather-rain-dusk-top: oklch(0.136 0.075 292); --weather-rain-dusk-mid: oklch(0.172 0.065 350); --weather-rain-dusk-bottom: oklch(0.280 0.115 52); --weather-rain-dawn-top: oklch(0.323 0.029 262); --weather-rain-dawn-mid: oklch(0.371 0.050 330); --weather-rain-dawn-bottom: oklch(0.418 0.085 32);
-  --weather-snow-dusk-top: oklch(0.168 0.075 292); --weather-snow-dusk-mid: oklch(0.203 0.065 350); --weather-snow-dusk-bottom: oklch(0.306 0.115 52); --weather-snow-dawn-top: oklch(0.399 0.034 262); --weather-snow-dawn-mid: oklch(0.437 0.050 330); --weather-snow-dawn-bottom: oklch(0.480 0.085 32);
-  --weather-thunderstorm-dusk-top: oklch(0.100 0.075 292); --weather-thunderstorm-dusk-mid: oklch(0.130 0.065 350); --weather-thunderstorm-dusk-bottom: oklch(0.230 0.115 52); --weather-thunderstorm-dawn-top: oklch(0.238 0.031 262); --weather-thunderstorm-dawn-mid: oklch(0.285 0.050 330); --weather-thunderstorm-dawn-bottom: oklch(0.333 0.085 32);
+  --weather-clear-dusk-top: oklch(0.260 0.070 285); --weather-clear-dusk-mid: oklch(0.360 0.090 15); --weather-clear-dusk-bottom: oklch(0.440 0.130 48); --weather-clear-dawn-top: oklch(0.399 0.119 259); --weather-clear-dawn-mid: oklch(0.440 0.060 340); --weather-clear-dawn-bottom: oklch(0.500 0.100 35);
+  --weather-partly-cloudy-dusk-top: oklch(0.271 0.062 285); --weather-partly-cloudy-dusk-mid: oklch(0.367 0.079 15); --weather-partly-cloudy-dusk-bottom: oklch(0.444 0.114 48); --weather-partly-cloudy-dawn-top: oklch(0.399 0.085 258); --weather-partly-cloudy-dawn-mid: oklch(0.440 0.053 340); --weather-partly-cloudy-dawn-bottom: oklch(0.500 0.088 35);
+  --weather-overcast-dusk-top: oklch(0.252 0.070 285); --weather-overcast-dusk-mid: oklch(0.350 0.090 15); --weather-overcast-dusk-bottom: oklch(0.434 0.130 48); --weather-overcast-dawn-top: oklch(0.380 0.022 262); --weather-overcast-dawn-mid: oklch(0.411 0.060 340); --weather-overcast-dawn-bottom: oklch(0.486 0.100 35);
+  --weather-fog-dusk-top: oklch(0.260 0.070 285); --weather-fog-dusk-mid: oklch(0.359 0.090 15); --weather-fog-dusk-bottom: oklch(0.440 0.130 48); --weather-fog-dawn-top: oklch(0.399 0.010 262); --weather-fog-dawn-mid: oklch(0.430 0.060 340); --weather-fog-dawn-bottom: oklch(0.500 0.100 35);
+  --weather-drizzle-dusk-top: oklch(0.248 0.070 285); --weather-drizzle-dusk-mid: oklch(0.348 0.090 15); --weather-drizzle-dusk-bottom: oklch(0.434 0.130 48); --weather-drizzle-dawn-top: oklch(0.371 0.029 262); --weather-drizzle-dawn-mid: oklch(0.411 0.060 340); --weather-drizzle-dawn-bottom: oklch(0.486 0.100 35);
+  --weather-rain-dusk-top: oklch(0.228 0.070 285); --weather-rain-dusk-mid: oklch(0.326 0.090 15); --weather-rain-dusk-bottom: oklch(0.414 0.130 48); --weather-rain-dawn-top: oklch(0.323 0.029 262); --weather-rain-dawn-mid: oklch(0.364 0.060 340); --weather-rain-dawn-bottom: oklch(0.438 0.100 35);
+  --weather-snow-dusk-top: oklch(0.260 0.070 285); --weather-snow-dusk-mid: oklch(0.357 0.090 15); --weather-snow-dusk-bottom: oklch(0.440 0.130 48); --weather-snow-dawn-top: oklch(0.399 0.034 262); --weather-snow-dawn-mid: oklch(0.430 0.060 340); --weather-snow-dawn-bottom: oklch(0.500 0.100 35);
+  --weather-thunderstorm-dusk-top: oklch(0.192 0.070 285); --weather-thunderstorm-dusk-mid: oklch(0.284 0.090 15); --weather-thunderstorm-dusk-bottom: oklch(0.364 0.130 48); --weather-thunderstorm-dawn-top: oklch(0.238 0.031 262); --weather-thunderstorm-dawn-mid: oklch(0.278 0.060 340); --weather-thunderstorm-dawn-bottom: oklch(0.353 0.100 35);
   --weather-scrim: rgb(0 0 0 / 0.16);
   --weather-scrim-base: #000000;
+  --weather-horizon-twilight: oklch(0.72 0.15 50 / 0.50);
+  --weather-horizon-day: oklch(0.80 0.05 230 / 0.18);
   --weather-clear-day-glow: var(--weather-clear-glow);
   --weather-clear-dawn-glow: var(--weather-clear-glow);
   --weather-clear-dusk-glow: var(--weather-clear-glow);
   --weather-clear-night-glow: var(--weather-clear-glow);
-  --weather-clear-day-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-clear-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-clear-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-clear-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-clear-day-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-clear-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-clear-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-clear-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-partly-cloudy-day-glow: var(--weather-partly-cloudy-glow);
   --weather-partly-cloudy-dawn-glow: var(--weather-partly-cloudy-glow);
   --weather-partly-cloudy-dusk-glow: var(--weather-partly-cloudy-glow);
   --weather-partly-cloudy-night-glow: var(--weather-partly-cloudy-glow);
-  --weather-partly-cloudy-day-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-partly-cloudy-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-partly-cloudy-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-partly-cloudy-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-partly-cloudy-day-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-partly-cloudy-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-partly-cloudy-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-partly-cloudy-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-overcast-day-glow: var(--weather-overcast-glow);
   --weather-overcast-dawn-glow: var(--weather-overcast-glow);
   --weather-overcast-dusk-glow: var(--weather-overcast-glow);
   --weather-overcast-night-glow: var(--weather-overcast-glow);
-  --weather-overcast-day-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-overcast-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-overcast-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-overcast-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-overcast-day-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-overcast-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-overcast-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-overcast-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-fog-day-glow: var(--weather-fog-glow);
   --weather-fog-dawn-glow: var(--weather-fog-glow);
   --weather-fog-dusk-glow: var(--weather-fog-glow);
   --weather-fog-night-glow: var(--weather-fog-glow);
-  --weather-fog-day-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-fog-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-fog-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-fog-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-fog-day-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-fog-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-fog-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-fog-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-drizzle-day-glow: var(--weather-drizzle-glow);
   --weather-drizzle-dawn-glow: var(--weather-drizzle-glow);
   --weather-drizzle-dusk-glow: var(--weather-drizzle-glow);
   --weather-drizzle-night-glow: var(--weather-drizzle-glow);
-  --weather-drizzle-day-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-drizzle-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-drizzle-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-drizzle-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-drizzle-day-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-drizzle-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-drizzle-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-drizzle-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-rain-day-glow: var(--weather-rain-glow);
   --weather-rain-dawn-glow: var(--weather-rain-glow);
   --weather-rain-dusk-glow: var(--weather-rain-glow);
   --weather-rain-night-glow: var(--weather-rain-glow);
-  --weather-rain-day-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-rain-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-rain-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-rain-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-rain-day-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-rain-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-rain-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-rain-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-snow-day-glow: var(--weather-snow-glow);
   --weather-snow-dawn-glow: var(--weather-snow-glow);
   --weather-snow-dusk-glow: var(--weather-snow-glow);
   --weather-snow-night-glow: var(--weather-snow-glow);
-  --weather-snow-day-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-snow-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-snow-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-snow-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-snow-day-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-snow-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-snow-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-snow-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-thunderstorm-day-glow: var(--weather-thunderstorm-glow);
   --weather-thunderstorm-dawn-glow: var(--weather-thunderstorm-glow);
   --weather-thunderstorm-dusk-glow: var(--weather-thunderstorm-glow);
   --weather-thunderstorm-night-glow: var(--weather-thunderstorm-glow);
-  --weather-thunderstorm-day-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-thunderstorm-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-thunderstorm-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
-  --weather-thunderstorm-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-thunderstorm-day-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-thunderstorm-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-thunderstorm-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
+  --weather-thunderstorm-night-scrim: oklch(0.16 0.01 260 / 0.50);
 
   --weather-fallback-top: var(--weather-clear-night-top); --weather-fallback-mid: var(--weather-clear-night-mid); --weather-fallback-bottom: var(--weather-clear-night-bottom); --weather-fallback-scrim: var(--weather-clear-night-scrim);
 
@@ -878,6 +880,9 @@
   --weather-moon-glow: rgb(215 228 255 / 0.2);
   --weather-sun-core: #ffd75e;
   --weather-sun-edge: #ffb02e;
+  --weather-sun-disc-core: oklch(0.97 0.08 95);
+  --weather-sun-disc-edge: oklch(0.86 0.16 75);
+  --weather-sun-twilight: oklch(0.80 0.17 45);
   --weather-sun-ray: rgb(255 232 174 / 0.72);
   --weather-sun-shadow: rgb(255 177 54 / 0.24);
   --weather-moon-core: #f5f0d5;
@@ -1011,7 +1016,7 @@
   --weather-partly-cloudy-cloud-night-shade: oklch(0.270 0.012 255);
   --weather-partly-cloudy-cloud-twilight-shade: oklch(0.330 0.035 35);
   --weather-overcast-cloud-lit: oklch(0.740 0.012 250);
-  --weather-overcast-cloud-shade: oklch(0.540 0.015 252);
+  --weather-overcast-cloud-shade: oklch(0.460 0.015 252);
   --weather-overcast-cloud-night-lit: oklch(0.390 0.006 250);
   --weather-overcast-cloud-twilight-lit: oklch(0.570 0.050 45);
   --weather-overcast-cloud-night-shade: oklch(0.270 0.012 255);
@@ -1023,19 +1028,19 @@
   --weather-drizzle-cloud-night-shade: oklch(0.270 0.012 255);
   --weather-drizzle-cloud-twilight-shade: oklch(0.330 0.035 35);
   --weather-rain-cloud-lit: oklch(0.620 0.018 250);
-  --weather-rain-cloud-shade: oklch(0.420 0.022 252);
+  --weather-rain-cloud-shade: oklch(0.340 0.022 252);
   --weather-rain-cloud-night-lit: oklch(0.390 0.006 250);
   --weather-rain-cloud-twilight-lit: oklch(0.570 0.050 45);
   --weather-rain-cloud-night-shade: oklch(0.270 0.012 255);
   --weather-rain-cloud-twilight-shade: oklch(0.330 0.035 35);
-  --weather-snow-cloud-lit: oklch(0.860 0.008 235);
+  --weather-snow-cloud-lit: oklch(0.880 0.008 235);
   --weather-snow-cloud-shade: oklch(0.680 0.012 235);
   --weather-snow-cloud-night-lit: oklch(0.390 0.006 250);
   --weather-snow-cloud-twilight-lit: oklch(0.570 0.050 45);
   --weather-snow-cloud-night-shade: oklch(0.270 0.012 255);
   --weather-snow-cloud-twilight-shade: oklch(0.330 0.035 35);
   --weather-thunderstorm-cloud-lit: oklch(0.480 0.040 285);
-  --weather-thunderstorm-cloud-shade: oklch(0.260 0.050 282);
+  --weather-thunderstorm-cloud-shade: oklch(0.200 0.050 282);
   --weather-thunderstorm-cloud-night-lit: oklch(0.390 0.006 250);
   --weather-thunderstorm-cloud-twilight-lit: oklch(0.460 0.050 45);
   --weather-thunderstorm-cloud-night-shade: oklch(0.270 0.012 255);
@@ -1104,151 +1109,153 @@
     --weather-thunderstorm-night-mid: oklch(0.192 0.028 270.8);
     --weather-thunderstorm-night-bottom: oklch(0.213 0.026 266.4);
     --weather-thunderstorm-night-glow: oklch(0.835 0.029 250 / 0.06);
-    --weather-clear-dusk-top: oklch(0.153 0.072 281);
-    --weather-clear-dusk-mid: oklch(0.191 0.062 294);
-    --weather-clear-dusk-bottom: oklch(0.291 0.110 52);
+    --weather-clear-dusk-top: oklch(0.245 0.067 285);
+    --weather-clear-dusk-mid: oklch(0.345 0.086 15);
+    --weather-clear-dusk-bottom: oklch(0.425 0.125 48);
     --weather-clear-dawn-top: oklch(0.344 0.114 259);
-    --weather-clear-dawn-mid: oklch(0.392 0.048 330);
-    --weather-clear-dawn-bottom: oklch(0.425 0.082 32);
-    --weather-partly-cloudy-dusk-top: oklch(0.164 0.063 278);
-    --weather-partly-cloudy-dusk-mid: oklch(0.198 0.059 292);
-    --weather-partly-cloudy-dusk-bottom: oklch(0.295 0.099 52);
+    --weather-clear-dawn-mid: oklch(0.385 0.058 340);
+    --weather-clear-dawn-bottom: oklch(0.445 0.096 35);
+    --weather-partly-cloudy-dusk-top: oklch(0.256 0.060 285);
+    --weather-partly-cloudy-dusk-mid: oklch(0.352 0.076 15);
+    --weather-partly-cloudy-dusk-bottom: oklch(0.429 0.109 48);
     --weather-partly-cloudy-dawn-top: oklch(0.344 0.082 258);
-    --weather-partly-cloudy-dawn-mid: oklch(0.392 0.048 330);
-    --weather-partly-cloudy-dawn-bottom: oklch(0.425 0.082 32);
-    --weather-overcast-dusk-top: oklch(0.145 0.072 292);
-    --weather-overcast-dusk-mid: oklch(0.181 0.062 350);
-    --weather-overcast-dusk-bottom: oklch(0.285 0.110 52);
+    --weather-partly-cloudy-dawn-mid: oklch(0.385 0.051 340);
+    --weather-partly-cloudy-dawn-bottom: oklch(0.445 0.084 35);
+    --weather-overcast-dusk-top: oklch(0.237 0.067 285);
+    --weather-overcast-dusk-mid: oklch(0.335 0.086 15);
+    --weather-overcast-dusk-bottom: oklch(0.419 0.125 48);
     --weather-overcast-dawn-top: oklch(0.325 0.021 262);
-    --weather-overcast-dawn-mid: oklch(0.363 0.048 330);
-    --weather-overcast-dawn-bottom: oklch(0.411 0.082 32);
-    --weather-fog-dusk-top: oklch(0.153 0.072 292);
-    --weather-fog-dusk-mid: oklch(0.190 0.062 350);
-    --weather-fog-dusk-bottom: oklch(0.291 0.110 52);
+    --weather-overcast-dawn-mid: oklch(0.356 0.058 340);
+    --weather-overcast-dawn-bottom: oklch(0.431 0.096 35);
+    --weather-fog-dusk-top: oklch(0.245 0.067 285);
+    --weather-fog-dusk-mid: oklch(0.344 0.086 15);
+    --weather-fog-dusk-bottom: oklch(0.425 0.125 48);
     --weather-fog-dawn-top: oklch(0.344 0.010 262);
-    --weather-fog-dawn-mid: oklch(0.382 0.048 330);
-    --weather-fog-dawn-bottom: oklch(0.425 0.082 32);
-    --weather-drizzle-dusk-top: oklch(0.141 0.072 292);
-    --weather-drizzle-dusk-mid: oklch(0.179 0.062 350);
-    --weather-drizzle-dusk-bottom: oklch(0.285 0.110 52);
+    --weather-fog-dawn-mid: oklch(0.375 0.058 340);
+    --weather-fog-dawn-bottom: oklch(0.445 0.096 35);
+    --weather-drizzle-dusk-top: oklch(0.233 0.067 285);
+    --weather-drizzle-dusk-mid: oklch(0.333 0.086 15);
+    --weather-drizzle-dusk-bottom: oklch(0.419 0.125 48);
     --weather-drizzle-dawn-top: oklch(0.316 0.028 262);
-    --weather-drizzle-dawn-mid: oklch(0.363 0.048 330);
-    --weather-drizzle-dawn-bottom: oklch(0.411 0.082 32);
-    --weather-rain-dusk-top: oklch(0.140 0.072 292);
-    --weather-rain-dusk-mid: oklch(0.157 0.062 350);
-    --weather-rain-dusk-bottom: oklch(0.265 0.110 52);
+    --weather-drizzle-dawn-mid: oklch(0.356 0.058 340);
+    --weather-drizzle-dawn-bottom: oklch(0.431 0.096 35);
+    --weather-rain-dusk-top: oklch(0.213 0.067 285);
+    --weather-rain-dusk-mid: oklch(0.311 0.086 15);
+    --weather-rain-dusk-bottom: oklch(0.399 0.125 48);
     --weather-rain-dawn-top: oklch(0.268 0.028 262);
-    --weather-rain-dawn-mid: oklch(0.316 0.048 330);
-    --weather-rain-dawn-bottom: oklch(0.363 0.082 32);
-    --weather-snow-dusk-top: oklch(0.153 0.072 292);
-    --weather-snow-dusk-mid: oklch(0.188 0.062 350);
-    --weather-snow-dusk-bottom: oklch(0.291 0.110 52);
+    --weather-rain-dawn-mid: oklch(0.309 0.058 340);
+    --weather-rain-dawn-bottom: oklch(0.383 0.096 35);
+    --weather-snow-dusk-top: oklch(0.245 0.067 285);
+    --weather-snow-dusk-mid: oklch(0.342 0.086 15);
+    --weather-snow-dusk-bottom: oklch(0.425 0.125 48);
     --weather-snow-dawn-top: oklch(0.344 0.033 262);
-    --weather-snow-dawn-mid: oklch(0.382 0.048 330);
-    --weather-snow-dawn-bottom: oklch(0.425 0.082 32);
-    --weather-thunderstorm-dusk-top: oklch(0.140 0.072 292);
-    --weather-thunderstorm-dusk-mid: oklch(0.140 0.062 350);
-    --weather-thunderstorm-dusk-bottom: oklch(0.215 0.110 52);
+    --weather-snow-dawn-mid: oklch(0.375 0.058 340);
+    --weather-snow-dawn-bottom: oklch(0.445 0.096 35);
+    --weather-thunderstorm-dusk-top: oklch(0.177 0.067 285);
+    --weather-thunderstorm-dusk-mid: oklch(0.269 0.086 15);
+    --weather-thunderstorm-dusk-bottom: oklch(0.349 0.125 48);
     --weather-thunderstorm-dawn-top: oklch(0.183 0.030 262);
-    --weather-thunderstorm-dawn-mid: oklch(0.230 0.048 330);
-    --weather-thunderstorm-dawn-bottom: oklch(0.278 0.082 32);
-    --weather-clear-day-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-clear-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-clear-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-clear-night-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-partly-cloudy-day-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-partly-cloudy-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-partly-cloudy-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-partly-cloudy-night-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-overcast-day-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-overcast-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-overcast-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-overcast-night-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-fog-day-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-fog-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-fog-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-fog-night-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-drizzle-day-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-drizzle-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-drizzle-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-drizzle-night-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-rain-day-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-rain-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-rain-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-rain-night-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-snow-day-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-snow-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-snow-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-snow-night-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-thunderstorm-day-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-thunderstorm-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-    --weather-thunderstorm-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-    --weather-thunderstorm-night-scrim: oklch(0.145 0.010 260 / 0.40);
+    --weather-thunderstorm-dawn-mid: oklch(0.223 0.058 340);
+    --weather-thunderstorm-dawn-bottom: oklch(0.298 0.096 35);
+    --weather-clear-day-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-clear-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-clear-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-clear-night-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-partly-cloudy-day-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-partly-cloudy-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-partly-cloudy-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-partly-cloudy-night-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-overcast-day-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-overcast-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-overcast-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-overcast-night-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-fog-day-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-fog-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-fog-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-fog-night-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-drizzle-day-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-drizzle-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-drizzle-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-drizzle-night-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-rain-day-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-rain-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-rain-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-rain-night-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-snow-day-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-snow-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-snow-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-snow-night-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-thunderstorm-day-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-thunderstorm-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+    --weather-thunderstorm-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+    --weather-thunderstorm-night-scrim: oklch(0.145 0.010 260 / 0.50);
     --weather-clear-day-glow: var(--weather-clear-glow);
-    --weather-clear-day-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-clear-day-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-clear-dawn-glow: var(--weather-clear-glow);
-    --weather-clear-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-clear-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-clear-dusk-glow: var(--weather-clear-glow);
-    --weather-clear-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-clear-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-clear-night-glow: var(--weather-clear-glow);
-    --weather-clear-night-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-clear-night-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-partly-cloudy-day-glow: var(--weather-partly-cloudy-glow);
-    --weather-partly-cloudy-day-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-partly-cloudy-day-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-partly-cloudy-dawn-glow: var(--weather-partly-cloudy-glow);
-    --weather-partly-cloudy-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-partly-cloudy-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-partly-cloudy-dusk-glow: var(--weather-partly-cloudy-glow);
-    --weather-partly-cloudy-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-partly-cloudy-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-partly-cloudy-night-glow: var(--weather-partly-cloudy-glow);
-    --weather-partly-cloudy-night-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-partly-cloudy-night-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-overcast-day-glow: var(--weather-overcast-glow);
-    --weather-overcast-day-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-overcast-day-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-overcast-dawn-glow: var(--weather-overcast-glow);
-    --weather-overcast-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-overcast-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-overcast-dusk-glow: var(--weather-overcast-glow);
-    --weather-overcast-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-overcast-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-overcast-night-glow: var(--weather-overcast-glow);
-    --weather-overcast-night-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-overcast-night-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-fog-day-glow: var(--weather-fog-glow);
-    --weather-fog-day-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-fog-day-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-fog-dawn-glow: var(--weather-fog-glow);
-    --weather-fog-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-fog-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-fog-dusk-glow: var(--weather-fog-glow);
-    --weather-fog-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-fog-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-fog-night-glow: var(--weather-fog-glow);
-    --weather-fog-night-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-fog-night-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-drizzle-day-glow: var(--weather-drizzle-glow);
-    --weather-drizzle-day-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-drizzle-day-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-drizzle-dawn-glow: var(--weather-drizzle-glow);
-    --weather-drizzle-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-drizzle-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-drizzle-dusk-glow: var(--weather-drizzle-glow);
-    --weather-drizzle-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-drizzle-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-drizzle-night-glow: var(--weather-drizzle-glow);
-    --weather-drizzle-night-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-drizzle-night-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-rain-day-glow: var(--weather-rain-glow);
-    --weather-rain-day-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-rain-day-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-rain-dawn-glow: var(--weather-rain-glow);
-    --weather-rain-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-rain-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-rain-dusk-glow: var(--weather-rain-glow);
-    --weather-rain-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-rain-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-rain-night-glow: var(--weather-rain-glow);
-    --weather-rain-night-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-rain-night-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-snow-day-glow: var(--weather-snow-glow);
-    --weather-snow-day-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-snow-day-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-snow-dawn-glow: var(--weather-snow-glow);
-    --weather-snow-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-snow-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-snow-dusk-glow: var(--weather-snow-glow);
-    --weather-snow-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-snow-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-snow-night-glow: var(--weather-snow-glow);
-    --weather-snow-night-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-snow-night-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-thunderstorm-day-glow: var(--weather-thunderstorm-glow);
-    --weather-thunderstorm-day-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-thunderstorm-day-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-thunderstorm-dawn-glow: var(--weather-thunderstorm-glow);
-    --weather-thunderstorm-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-thunderstorm-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-thunderstorm-dusk-glow: var(--weather-thunderstorm-glow);
-    --weather-thunderstorm-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-thunderstorm-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-thunderstorm-night-glow: var(--weather-thunderstorm-glow);
-    --weather-thunderstorm-night-scrim: oklch(0.16 0.01 260 / 0.40);
+    --weather-thunderstorm-night-scrim: oklch(0.16 0.01 260 / 0.50);
     --weather-scrim-base: #000000;
+    --weather-horizon-twilight: oklch(0.695 0.15 50 / 0.50);
+    --weather-horizon-day: oklch(0.775 0.05 230 / 0.18);
     --weather-vignette: rgb(0 0 0 / .24);
   --weather-ink: #ffffff;
   --weather-rain-streak: color-mix(in oklab, var(--weather-ink), transparent 22%);
@@ -1257,6 +1264,9 @@
   --weather-fog-mist: color-mix(in oklab, var(--weather-ink), transparent 48%);
     --weather-sun-core: #ffd75e;
     --weather-sun-edge: #ffb02e;
+    --weather-sun-disc-core: oklch(0.97 0.08 95);
+    --weather-sun-disc-edge: oklch(0.86 0.16 75);
+    --weather-sun-twilight: oklch(0.80 0.17 45);
     --weather-sun-ray: rgb(255 232 174 / 0.72);
     --weather-sun-shadow: rgb(255 177 54 / 0.24);
     --weather-moon-core: #f5f0d5;
@@ -1431,7 +1441,7 @@
   --weather-partly-cloudy-cloud-night-shade: oklch(0.270 0.012 255);
   --weather-partly-cloudy-cloud-twilight-shade: oklch(0.330 0.035 35);
   --weather-overcast-cloud-lit: oklch(0.740 0.012 250);
-  --weather-overcast-cloud-shade: oklch(0.540 0.015 252);
+  --weather-overcast-cloud-shade: oklch(0.460 0.015 252);
   --weather-overcast-cloud-night-lit: oklch(0.390 0.006 250);
   --weather-overcast-cloud-twilight-lit: oklch(0.570 0.050 45);
   --weather-overcast-cloud-night-shade: oklch(0.270 0.012 255);
@@ -1443,19 +1453,19 @@
   --weather-drizzle-cloud-night-shade: oklch(0.270 0.012 255);
   --weather-drizzle-cloud-twilight-shade: oklch(0.330 0.035 35);
   --weather-rain-cloud-lit: oklch(0.620 0.018 250);
-  --weather-rain-cloud-shade: oklch(0.420 0.022 252);
+  --weather-rain-cloud-shade: oklch(0.340 0.022 252);
   --weather-rain-cloud-night-lit: oklch(0.390 0.006 250);
   --weather-rain-cloud-twilight-lit: oklch(0.570 0.050 45);
   --weather-rain-cloud-night-shade: oklch(0.270 0.012 255);
   --weather-rain-cloud-twilight-shade: oklch(0.330 0.035 35);
-  --weather-snow-cloud-lit: oklch(0.860 0.008 235);
+  --weather-snow-cloud-lit: oklch(0.880 0.008 235);
   --weather-snow-cloud-shade: oklch(0.680 0.012 235);
   --weather-snow-cloud-night-lit: oklch(0.390 0.006 250);
   --weather-snow-cloud-twilight-lit: oklch(0.570 0.050 45);
   --weather-snow-cloud-night-shade: oklch(0.270 0.012 255);
   --weather-snow-cloud-twilight-shade: oklch(0.330 0.035 35);
   --weather-thunderstorm-cloud-lit: oklch(0.480 0.040 285);
-  --weather-thunderstorm-cloud-shade: oklch(0.260 0.050 282);
+  --weather-thunderstorm-cloud-shade: oklch(0.200 0.050 282);
   --weather-thunderstorm-cloud-night-lit: oklch(0.390 0.006 250);
   --weather-thunderstorm-cloud-twilight-lit: oklch(0.460 0.050 45);
   --weather-thunderstorm-cloud-night-shade: oklch(0.270 0.012 255);
@@ -1524,151 +1534,156 @@
   --weather-thunderstorm-night-mid: oklch(0.192 0.028 270.8);
   --weather-thunderstorm-night-bottom: oklch(0.213 0.026 266.4);
   --weather-thunderstorm-night-glow: oklch(0.835 0.029 250 / 0.06);
-  --weather-clear-dusk-top: oklch(0.153 0.072 281);
-  --weather-clear-dusk-mid: oklch(0.191 0.062 294);
-  --weather-clear-dusk-bottom: oklch(0.291 0.110 52);
+  --weather-clear-dusk-top: oklch(0.245 0.067 285);
+  --weather-clear-dusk-mid: oklch(0.345 0.086 15);
+  --weather-clear-dusk-bottom: oklch(0.425 0.125 48);
   --weather-clear-dawn-top: oklch(0.344 0.114 259);
-  --weather-clear-dawn-mid: oklch(0.392 0.048 330);
-  --weather-clear-dawn-bottom: oklch(0.425 0.082 32);
-  --weather-partly-cloudy-dusk-top: oklch(0.164 0.063 278);
-  --weather-partly-cloudy-dusk-mid: oklch(0.198 0.059 292);
-  --weather-partly-cloudy-dusk-bottom: oklch(0.295 0.099 52);
+  --weather-clear-dawn-mid: oklch(0.385 0.058 340);
+  --weather-clear-dawn-bottom: oklch(0.445 0.096 35);
+  --weather-partly-cloudy-dusk-top: oklch(0.256 0.060 285);
+  --weather-partly-cloudy-dusk-mid: oklch(0.352 0.076 15);
+  --weather-partly-cloudy-dusk-bottom: oklch(0.429 0.109 48);
   --weather-partly-cloudy-dawn-top: oklch(0.344 0.082 258);
-  --weather-partly-cloudy-dawn-mid: oklch(0.392 0.048 330);
-  --weather-partly-cloudy-dawn-bottom: oklch(0.425 0.082 32);
-  --weather-overcast-dusk-top: oklch(0.145 0.072 292);
-  --weather-overcast-dusk-mid: oklch(0.181 0.062 350);
-  --weather-overcast-dusk-bottom: oklch(0.285 0.110 52);
+  --weather-partly-cloudy-dawn-mid: oklch(0.385 0.051 340);
+  --weather-partly-cloudy-dawn-bottom: oklch(0.445 0.084 35);
+  --weather-overcast-dusk-top: oklch(0.237 0.067 285);
+  --weather-overcast-dusk-mid: oklch(0.335 0.086 15);
+  --weather-overcast-dusk-bottom: oklch(0.419 0.125 48);
   --weather-overcast-dawn-top: oklch(0.325 0.021 262);
-  --weather-overcast-dawn-mid: oklch(0.363 0.048 330);
-  --weather-overcast-dawn-bottom: oklch(0.411 0.082 32);
-  --weather-fog-dusk-top: oklch(0.153 0.072 292);
-  --weather-fog-dusk-mid: oklch(0.190 0.062 350);
-  --weather-fog-dusk-bottom: oklch(0.291 0.110 52);
+  --weather-overcast-dawn-mid: oklch(0.356 0.058 340);
+  --weather-overcast-dawn-bottom: oklch(0.431 0.096 35);
+  --weather-fog-dusk-top: oklch(0.245 0.067 285);
+  --weather-fog-dusk-mid: oklch(0.344 0.086 15);
+  --weather-fog-dusk-bottom: oklch(0.425 0.125 48);
   --weather-fog-dawn-top: oklch(0.344 0.010 262);
-  --weather-fog-dawn-mid: oklch(0.382 0.048 330);
-  --weather-fog-dawn-bottom: oklch(0.425 0.082 32);
-  --weather-drizzle-dusk-top: oklch(0.141 0.072 292);
-  --weather-drizzle-dusk-mid: oklch(0.179 0.062 350);
-  --weather-drizzle-dusk-bottom: oklch(0.285 0.110 52);
+  --weather-fog-dawn-mid: oklch(0.375 0.058 340);
+  --weather-fog-dawn-bottom: oklch(0.445 0.096 35);
+  --weather-drizzle-dusk-top: oklch(0.233 0.067 285);
+  --weather-drizzle-dusk-mid: oklch(0.333 0.086 15);
+  --weather-drizzle-dusk-bottom: oklch(0.419 0.125 48);
   --weather-drizzle-dawn-top: oklch(0.316 0.028 262);
-  --weather-drizzle-dawn-mid: oklch(0.363 0.048 330);
-  --weather-drizzle-dawn-bottom: oklch(0.411 0.082 32);
-  --weather-rain-dusk-top: oklch(0.140 0.072 292);
-  --weather-rain-dusk-mid: oklch(0.157 0.062 350);
-  --weather-rain-dusk-bottom: oklch(0.265 0.110 52);
+  --weather-drizzle-dawn-mid: oklch(0.356 0.058 340);
+  --weather-drizzle-dawn-bottom: oklch(0.431 0.096 35);
+  --weather-rain-dusk-top: oklch(0.213 0.067 285);
+  --weather-rain-dusk-mid: oklch(0.311 0.086 15);
+  --weather-rain-dusk-bottom: oklch(0.399 0.125 48);
   --weather-rain-dawn-top: oklch(0.268 0.028 262);
-  --weather-rain-dawn-mid: oklch(0.316 0.048 330);
-  --weather-rain-dawn-bottom: oklch(0.363 0.082 32);
-  --weather-snow-dusk-top: oklch(0.153 0.072 292);
-  --weather-snow-dusk-mid: oklch(0.188 0.062 350);
-  --weather-snow-dusk-bottom: oklch(0.291 0.110 52);
+  --weather-rain-dawn-mid: oklch(0.309 0.058 340);
+  --weather-rain-dawn-bottom: oklch(0.383 0.096 35);
+  --weather-snow-dusk-top: oklch(0.245 0.067 285);
+  --weather-snow-dusk-mid: oklch(0.342 0.086 15);
+  --weather-snow-dusk-bottom: oklch(0.425 0.125 48);
   --weather-snow-dawn-top: oklch(0.344 0.033 262);
-  --weather-snow-dawn-mid: oklch(0.382 0.048 330);
-  --weather-snow-dawn-bottom: oklch(0.425 0.082 32);
-  --weather-thunderstorm-dusk-top: oklch(0.140 0.072 292);
-  --weather-thunderstorm-dusk-mid: oklch(0.140 0.062 350);
-  --weather-thunderstorm-dusk-bottom: oklch(0.215 0.110 52);
+  --weather-snow-dawn-mid: oklch(0.375 0.058 340);
+  --weather-snow-dawn-bottom: oklch(0.445 0.096 35);
+  --weather-thunderstorm-dusk-top: oklch(0.177 0.067 285);
+  --weather-thunderstorm-dusk-mid: oklch(0.269 0.086 15);
+  --weather-thunderstorm-dusk-bottom: oklch(0.349 0.125 48);
   --weather-thunderstorm-dawn-top: oklch(0.183 0.030 262);
-  --weather-thunderstorm-dawn-mid: oklch(0.230 0.048 330);
-  --weather-thunderstorm-dawn-bottom: oklch(0.278 0.082 32);
-  --weather-clear-day-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-clear-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-clear-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-clear-night-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-partly-cloudy-day-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-partly-cloudy-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-partly-cloudy-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-partly-cloudy-night-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-overcast-day-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-overcast-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-overcast-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-overcast-night-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-fog-day-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-fog-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-fog-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-fog-night-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-drizzle-day-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-drizzle-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-drizzle-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-drizzle-night-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-rain-day-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-rain-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-rain-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-rain-night-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-snow-day-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-snow-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-snow-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-snow-night-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-thunderstorm-day-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-thunderstorm-dawn-scrim: oklch(0.140 0.010 260 / 0.40);
-  --weather-thunderstorm-dusk-scrim: oklch(0.145 0.010 260 / 0.40);
-  --weather-thunderstorm-night-scrim: oklch(0.145 0.010 260 / 0.40);
+  --weather-thunderstorm-dawn-mid: oklch(0.223 0.058 340);
+  --weather-thunderstorm-dawn-bottom: oklch(0.298 0.096 35);
+  --weather-clear-day-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-clear-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-clear-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-clear-night-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-partly-cloudy-day-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-partly-cloudy-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-partly-cloudy-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-partly-cloudy-night-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-overcast-day-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-overcast-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-overcast-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-overcast-night-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-fog-day-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-fog-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-fog-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-fog-night-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-drizzle-day-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-drizzle-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-drizzle-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-drizzle-night-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-rain-day-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-rain-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-rain-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-rain-night-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-snow-day-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-snow-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-snow-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-snow-night-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-thunderstorm-day-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-thunderstorm-dawn-scrim: oklch(0.140 0.010 260 / 0.50);
+  --weather-thunderstorm-dusk-scrim: oklch(0.145 0.010 260 / 0.50);
+  --weather-thunderstorm-night-scrim: oklch(0.145 0.010 260 / 0.50);
   --weather-clear-day-glow: var(--weather-clear-glow);
-  --weather-clear-day-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-clear-day-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-clear-dawn-glow: var(--weather-clear-glow);
-  --weather-clear-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-clear-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-clear-dusk-glow: var(--weather-clear-glow);
-  --weather-clear-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-clear-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-clear-night-glow: var(--weather-clear-glow);
-  --weather-clear-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-clear-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-partly-cloudy-day-glow: var(--weather-partly-cloudy-glow);
-  --weather-partly-cloudy-day-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-partly-cloudy-day-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-partly-cloudy-dawn-glow: var(--weather-partly-cloudy-glow);
-  --weather-partly-cloudy-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-partly-cloudy-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-partly-cloudy-dusk-glow: var(--weather-partly-cloudy-glow);
-  --weather-partly-cloudy-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-partly-cloudy-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-partly-cloudy-night-glow: var(--weather-partly-cloudy-glow);
-  --weather-partly-cloudy-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-partly-cloudy-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-overcast-day-glow: var(--weather-overcast-glow);
-  --weather-overcast-day-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-overcast-day-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-overcast-dawn-glow: var(--weather-overcast-glow);
-  --weather-overcast-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-overcast-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-overcast-dusk-glow: var(--weather-overcast-glow);
-  --weather-overcast-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-overcast-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-overcast-night-glow: var(--weather-overcast-glow);
-  --weather-overcast-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-overcast-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-fog-day-glow: var(--weather-fog-glow);
-  --weather-fog-day-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-fog-day-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-fog-dawn-glow: var(--weather-fog-glow);
-  --weather-fog-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-fog-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-fog-dusk-glow: var(--weather-fog-glow);
-  --weather-fog-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-fog-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-fog-night-glow: var(--weather-fog-glow);
-  --weather-fog-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-fog-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-drizzle-day-glow: var(--weather-drizzle-glow);
-  --weather-drizzle-day-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-drizzle-day-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-drizzle-dawn-glow: var(--weather-drizzle-glow);
-  --weather-drizzle-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-drizzle-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-drizzle-dusk-glow: var(--weather-drizzle-glow);
-  --weather-drizzle-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-drizzle-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-drizzle-night-glow: var(--weather-drizzle-glow);
-  --weather-drizzle-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-drizzle-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-rain-day-glow: var(--weather-rain-glow);
-  --weather-rain-day-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-rain-day-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-rain-dawn-glow: var(--weather-rain-glow);
-  --weather-rain-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-rain-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-rain-dusk-glow: var(--weather-rain-glow);
-  --weather-rain-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-rain-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-rain-night-glow: var(--weather-rain-glow);
-  --weather-rain-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-rain-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-snow-day-glow: var(--weather-snow-glow);
-  --weather-snow-day-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-snow-day-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-snow-dawn-glow: var(--weather-snow-glow);
-  --weather-snow-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-snow-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-snow-dusk-glow: var(--weather-snow-glow);
-  --weather-snow-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-snow-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-snow-night-glow: var(--weather-snow-glow);
-  --weather-snow-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-snow-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-thunderstorm-day-glow: var(--weather-thunderstorm-glow);
-  --weather-thunderstorm-day-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-thunderstorm-day-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-thunderstorm-dawn-glow: var(--weather-thunderstorm-glow);
-  --weather-thunderstorm-dawn-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-thunderstorm-dawn-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-thunderstorm-dusk-glow: var(--weather-thunderstorm-glow);
-  --weather-thunderstorm-dusk-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-thunderstorm-dusk-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-thunderstorm-night-glow: var(--weather-thunderstorm-glow);
-  --weather-thunderstorm-night-scrim: oklch(0.16 0.01 260 / 0.40);
+  --weather-thunderstorm-night-scrim: oklch(0.16 0.01 260 / 0.50);
   --weather-scrim-base: #000000;
+  --weather-horizon-twilight: oklch(0.695 0.15 50 / 0.50);
+  --weather-horizon-day: oklch(0.775 0.05 230 / 0.18);
+  --weather-sun-disc-core: oklch(0.97 0.08 95);
+  --weather-sun-disc-edge: oklch(0.86 0.16 75);
+  --weather-sun-twilight: oklch(0.80 0.17 45);
   --weather-vignette: rgb(0 0 0 / .24);
 
 }
@@ -2096,9 +2111,9 @@ body {
 [data-slot="weather-sky"] [data-weather-group][data-entering="true"] { animation: wx-enter 800ms ease-out 300ms backwards; }
 [data-slot="weather-sky"] [data-weather-group][data-leaving="true"] { opacity: 0; transition: opacity 400ms ease-out; }
 [data-slot="weather-sky"] [data-fx="fall"] {
-  top: -48px; left: calc(var(--x) * 1%); width: calc(var(--w) * 1px); height: calc(var(--s) * 1px);
+  top: 0; left: calc(var(--x) * 1%); width: calc(var(--w) * 1px); height: calc(var(--s) * 1px);
   opacity: var(--o); transform: rotate(var(--tilt, 0deg)); transform-origin: center top;
-  background: linear-gradient(to bottom, transparent, var(--weather-rain-streak));
+  background: linear-gradient(to bottom, transparent 0, var(--weather-rain-streak) 72%, var(--weather-ink) 100%);
   animation: wx-fall var(--d) linear var(--dl) infinite;
 }
 [data-slot="weather-sky"] [data-fx="fall"] > [data-fx="splash"] {
@@ -2111,16 +2126,17 @@ body {
 [data-slot="weather-sky"] [data-fx="fall"] > [data-fx="splash"]::after { animation: wx-splash var(--d) linear var(--dl) infinite reverse; }
 [data-slot="weather-sky"] [data-fx="flake"] {
   top: -12px; left: calc(var(--x) * 1%); width: calc(var(--s) * 1px); height: calc(var(--s) * 1px);
-  border-radius: 50%; opacity: var(--o); background: radial-gradient(circle, var(--weather-snow-flake) 0%, transparent 78%);
+  border-radius: 50%; opacity: var(--o); background: radial-gradient(circle, var(--weather-ink) 0 70%, transparent 100%);
   animation: wx-flake var(--d) linear var(--dl) infinite;
 }
+[data-slot="weather-sky"] [data-fx="flake"][data-soft="true"] { background: none; }
 [data-slot="weather-sky"] [data-fx="snow-field"] { inset: 0; }
 [data-slot="weather-sky"] [data-fx="sway"] { position: absolute; inset: 0; animation: wx-sway var(--d) cubic-bezier(.37,0,.63,1) var(--dl) infinite alternate; transform-origin: 50% -400%; }
 [data-slot="weather-sky"] [data-fx="pile"] {
   left: 0; right: 0; bottom: 0; height: 12px; transform: scaleY(var(--pile-cap)); transform-origin: bottom;
   background: linear-gradient(to top, color-mix(in oklab, var(--weather-snow-pile) 45%, transparent), transparent); animation: wx-pile 90s cubic-bezier(.22,1,.36,1) -90s both;
 }
-[data-slot="weather-sky"] [data-fx="snow-core"] { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--weather-snow-flake) 0%, transparent 78%); }
+[data-slot="weather-sky"] [data-fx="snow-core"] { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--weather-ink) 0 50%, transparent); }
 /* Cloud depth table: scale, opacity, speed, y band, z-index, unscaled width. */
 [data-slot="weather-sky"] [data-fx="cloud"] {
   position: absolute;
@@ -2129,23 +2145,33 @@ body {
   width: var(--s);
   aspect-ratio: 2.6 / 1;
   transform-origin: top center;
-  background: linear-gradient(to top, var(--wx-cloud-shade) 0, var(--wx-cloud-lit) 60%);
+  --cloud-lit: var(--wx-cloud-lit);
+  --cloud-shade: var(--wx-cloud-shade);
+  opacity: var(--o);
+  z-index: var(--z);
+  animation: wx-drift var(--d) linear var(--dl) infinite;
+}
+/* Both pseudo-elements carry the silhouette (lobed puffs on a flat shelf), so the underside shadow can be offset. */
+[data-slot="weather-sky"] [data-fx="cloud"]::before,
+[data-slot="weather-sky"] [data-fx="cloud"]::after {
+  content: ""; position: absolute; inset: 0;
   mask-image: var(--cloud-mask);
   -webkit-mask-image: var(--cloud-mask);
   mask-repeat: no-repeat;
   -webkit-mask-repeat: no-repeat;
   mask-size: 100% 100%;
   -webkit-mask-size: 100% 100%;
-  opacity: var(--o);
-  z-index: var(--z);
-  animation: wx-drift var(--d) linear var(--dl) infinite;
+  mask-composite: var(--cloud-mc);
+  -webkit-mask-composite: var(--cloud-mc-webkit);
 }
+[data-slot="weather-sky"] [data-fx="cloud"]::before { translate: 0 5%; background: color-mix(in oklab, var(--cloud-shade), transparent 45%); }
+[data-slot="weather-sky"] [data-fx="cloud"]::after { background: radial-gradient(110% 80% at 88% 0%, color-mix(in oklab, var(--cloud-lit), var(--wx-glow) 55%) 0, transparent 52%), linear-gradient(to top, var(--cloud-shade) 0 24%, var(--cloud-lit) 62%); }
 [data-slot="weather-sky"] [data-fx="cloud"][data-shape="a"] { aspect-ratio: 2.6 / 1; --cloud-height-factor: .38462; }
 [data-slot="weather-sky"] [data-fx="cloud"][data-shape="b"] { aspect-ratio: 1.9 / 1; --cloud-height-factor: .52632; }
 [data-slot="weather-sky"] [data-fx="cloud"][data-shape="c"] { aspect-ratio: 1.5 / 1; --cloud-height-factor: .66667; }
-[data-slot="weather-sky"] [data-fx="cloud"][data-depth="far"] { scale: .62; --cloud-scale: .62; opacity: .34; z-index: 21; --depth-speed: 7px; --depth-y-band: 0% 22%; --depth-width: 160px; }
-[data-slot="weather-sky"] [data-fx="cloud"][data-depth="mid"] { scale: .88; --cloud-scale: .88; opacity: .56; z-index: 22; --depth-speed: 13px; --depth-y-band: 8% 40%; --depth-width: 220px; }
-[data-slot="weather-sky"] [data-fx="cloud"][data-depth="near"] { scale: 1.15; --cloud-scale: 1.15; opacity: .72; z-index: 23; --depth-speed: 22px; --depth-y-band: 20% 56%; --depth-width: 300px; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-depth="far"] { --cloud-lit: color-mix(in oklab, var(--wx-cloud-lit), var(--wx-mid) 40%); --cloud-shade: color-mix(in oklab, var(--wx-cloud-shade), var(--wx-mid) 40%); scale: .62; --cloud-scale: .62; opacity: .42; z-index: 21; --depth-speed: 7px; --depth-y-band: 0% 22%; --depth-width: 160px; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-depth="mid"] { scale: .88; --cloud-scale: .88; opacity: .74; z-index: 22; --depth-speed: 13px; --depth-y-band: 8% 40%; --depth-width: 220px; }
+[data-slot="weather-sky"] [data-fx="cloud"][data-depth="near"] { scale: 1.15; --cloud-scale: 1.15; opacity: .96; z-index: 23; --depth-speed: 22px; --depth-y-band: 20% 56%; --depth-width: 300px; }
 [data-slot="weather-sky"] [data-fx="cloud"][data-leaving="true"] { opacity: 0; transition: opacity 1200ms ease-out; }
 [data-slot="weather-sky"] [data-fx="fog"] {
   top: calc(var(--y) * 1%); left: -40%; width: 180%; height: 42%; z-index: 5; opacity: var(--o);
@@ -2153,14 +2179,13 @@ body {
   transform: scale(var(--fog-scale, 1)); animation: wx-fog var(--d) cubic-bezier(.37,0,.63,1) var(--dl) infinite alternate, wx-breathe var(--breath, 7s) ease-in-out var(--dl) infinite alternate;
 }
 [data-slot="weather-sky"] [data-weather-group][data-class="drizzle"] [data-fx="fog"] { --o: .10; --d: 7s; --breath: 7s; }
-[data-slot="weather-sky"] [data-fx="sun-group"] { position:absolute; left:var(--wx-light-x); top:var(--wx-light-y); width:220px; height:220px; transform:translate(-50%,-50%); transition:transform 3200ms cubic-bezier(.37,0,.63,1); z-index:20; }
-[data-slot="weather-sky"] [data-fx="sun-halo-a"], [data-slot="weather-sky"] [data-fx="sun-halo-b"], [data-slot="weather-sky"] [data-fx="sun-corona"], [data-slot="weather-sky"] [data-fx="sun"] { position:absolute; left:50%; top:50%; border-radius:50%; transform:translate(-50%,-50%); }
-[data-slot="weather-sky"] [data-fx="sun-halo-a"] { width:96px; height:96px; opacity:.55; background:radial-gradient(circle,var(--weather-sun-glow),transparent 70%); }
-[data-slot="weather-sky"] [data-fx="sun-halo-b"] { width:220px; height:220px; opacity:.30; background:radial-gradient(circle,var(--weather-sun-shadow),transparent 70%); }
+[data-slot="weather-sky"] [data-fx="sun-group"] { position:absolute; left:var(--wx-light-x); top:var(--wx-light-y); width:300px; height:300px; transform:translate(-50%,-50%); transition:transform 3200ms cubic-bezier(.37,0,.63,1); z-index:20; }
+[data-slot="weather-sky"] [data-fx="sun-halo-a"], [data-slot="weather-sky"] [data-fx="sun-halo-b"], [data-slot="weather-sky"] [data-fx="sun-corona"], [data-slot="weather-sky"] [data-fx="sun"] { position:absolute; left:50%; top:50%; border-radius:50%; translate:-50% -50%; }
+[data-slot="weather-sky"] [data-fx="sun-halo-a"] { width:140px; height:140px; opacity:.5; background:radial-gradient(circle,var(--weather-sun-glow),transparent 70%); }
+[data-slot="weather-sky"] [data-fx="sun-halo-b"] { width:300px; height:300px; opacity:.22; background:radial-gradient(circle,var(--weather-sun-shadow),transparent 70%); }
 [data-slot="weather-sky"] [data-fx="sun-corona"] { width:150px; height:150px; opacity:.55; background:radial-gradient(circle,var(--weather-sun-glow) 0 24%,transparent 72%); animation:wx-corona 7s cubic-bezier(.37,0,.63,1) infinite alternate; }
-[data-slot="weather-sky"] [data-fx="sun"] { width:40px; height:40px; opacity:1; background:radial-gradient(circle at 35% 35%,var(--weather-sun-core),var(--weather-sun-edge) 78%); animation:wx-sun-breathe 9s cubic-bezier(.37,0,.63,1) infinite alternate; }
-[data-slot="weather-sky"][data-phase="dawn"] [data-fx="sun"] { background:radial-gradient(circle at 35% 35%,color-mix(in oklab,var(--weather-sun-core),var(--wx-glow) 42%),color-mix(in oklab,var(--weather-sun-edge),var(--wx-glow) 42%) 78%); }
-[data-slot="weather-sky"][data-phase="dusk"] [data-fx="sun"] { background:radial-gradient(circle at 35% 35%,color-mix(in oklab,var(--weather-sun-core),var(--wx-glow) 42%),color-mix(in oklab,var(--weather-sun-edge),var(--wx-glow) 42%) 78%); }
+[data-slot="weather-sky"] [data-fx="sun"] { width:56px; height:56px; opacity:1; background:radial-gradient(circle at 35% 35%,var(--weather-sun-disc-core),var(--weather-sun-disc-edge) 78%); animation:wx-sun-breathe 9s cubic-bezier(.37,0,.63,1) infinite alternate; }
+[data-slot="weather-sky"][data-phase="dawn"] [data-fx="sun"], [data-slot="weather-sky"][data-phase="dusk"] [data-fx="sun"] { width:64px; height:64px; background:radial-gradient(circle at 35% 35%,color-mix(in oklab,var(--weather-sun-disc-core),var(--weather-sun-twilight) 55%),var(--weather-sun-twilight) 78%); }
 [data-slot="weather-sky"] [data-fx="sun-group"][data-dimmed="true"] { opacity:.35; }
 [data-slot="weather-sky"] [data-fx="moon-group"] { position:absolute; left:var(--wx-moon-x); top:var(--wx-moon-y); width:150px; height:150px; transform:translate(-50%,-50%); transition:transform 3200ms cubic-bezier(.37,0,.63,1); z-index:20; }
 [data-slot="weather-sky"] [data-fx="moon-halo"] { position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle,var(--weather-moon-glow),transparent 70%); opacity:.95; animation:wx-moon-halo 6s ease-in-out infinite alternate; }
@@ -2197,15 +2222,21 @@ body {
 @property --wx-night { syntax: "<number>"; inherits: true; initial-value: 0; }
 [data-slot="weather-sky"] { position: absolute; inset: 0; overflow: hidden; container-type: size; --wx-top: color-mix(in oklab, var(--wx-night-top), color-mix(in oklab, var(--wx-twilight-top), var(--wx-day-top) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-mid: color-mix(in oklab, var(--wx-night-mid), color-mix(in oklab, var(--wx-twilight-mid), var(--wx-day-mid) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-bottom: color-mix(in oklab, var(--wx-night-bottom), color-mix(in oklab, var(--wx-twilight-bottom), var(--wx-day-bottom) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-scrim: color-mix(in oklab, var(--wx-top), var(--weather-scrim-base) 78%); --wx-cloud-lit: color-mix(in oklab, var(--wx-cloud-night-lit), color-mix(in oklab, var(--wx-cloud-twilight-lit), var(--wx-cloud-day-lit) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-cloud-shade: color-mix(in oklab, var(--wx-cloud-night-shade), color-mix(in oklab, var(--wx-cloud-twilight-shade), var(--wx-cloud-day-shade) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); }
 [data-slot="weather-sky"][data-mounted="true"] { transition: --wx-top 3200ms cubic-bezier(.37, 0, .63, 1), --wx-mid 3200ms cubic-bezier(.37, 0, .63, 1), --wx-bottom 3200ms cubic-bezier(.37, 0, .63, 1), --wx-glow 3200ms cubic-bezier(.37, 0, .63, 1), --wx-scrim 3200ms cubic-bezier(.37, 0, .63, 1), --wx-cloud-lit 3200ms cubic-bezier(.37, 0, .63, 1), --wx-cloud-shade 3200ms cubic-bezier(.37, 0, .63, 1), --wx-t 3200ms cubic-bezier(.37, 0, .63, 1); }
-[data-slot="weather-sky"] .weather-sky-base { position:absolute; inset:0; background:linear-gradient(to bottom, oklch(from var(--wx-top) min(l, .46) c h) 0%, oklch(from var(--wx-mid) min(l, .50) c h) 55%, oklch(from var(--wx-bottom) min(l, .50) c h) 100%); }
+[data-slot="weather-sky"] .weather-sky-base { position:absolute; inset:0; background:linear-gradient(to bottom, oklch(from var(--wx-top) min(l, .50) c h) 0%, oklch(from var(--wx-mid) min(l, .56) c h) 55%, oklch(from var(--wx-bottom) min(l, .58) c h) 100%); }
 [data-slot="weather-sky"] .weather-sky-glow { position:absolute; inset:0; background:radial-gradient(46% 70% at var(--wx-light-x, 88%) var(--wx-light-y, 40%), var(--wx-glow), transparent 64%); }
-[data-slot="weather-sky"] .weather-sky-vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center, transparent 48%, var(--weather-vignette)); }
+/* WEATHER-SCENE-08 horizon: a static glow in the lower right corner, outside the text zone. The twilight layer peaks at
+ * --wx-t .5 and is gone at night and by day; the day layer is the pale horizon of a clear sky and grows with --wx-t. */
+[data-slot="weather-sky"] .weather-sky-horizon { position:absolute; inset:0; pointer-events:none; opacity:calc(1 - abs(var(--wx-t) - .5) * 2); background:radial-gradient(85% 48% at 92% 100%, var(--weather-horizon-twilight), transparent 70%); }
+[data-slot="weather-sky"] .weather-sky-horizon-day { position:absolute; inset:0; pointer-events:none; opacity:clamp(0, (var(--wx-t) - .5) * 2, 1); background:radial-gradient(85% 48% at 92% 100%, var(--weather-horizon-day), transparent 70%); }
+[data-slot="weather-sky"] .weather-sky-vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center, transparent 62%, var(--weather-vignette)); }
 [data-slot="weather-sky"] .weather-sky-grain { position:absolute; inset:0; opacity:.06; mix-blend-mode:overlay; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E"); }
 [data-slot="weather-sky"][data-variant="lite"] .weather-sky-grain { display:none; }
-[data-slot="weather-sky"] .weather-sky-scrim { position:absolute; inset:0; background:var(--weather-scrim); }
-[data-slot="weather-sky"] .weather-sky-text-scrim { position:absolute; inset:0; background:linear-gradient(to top,var(--wx-scrim) 0%,transparent 60%); }
+[data-slot="weather-sky"] .weather-sky-scrim { position:absolute; inset:0; display:none; background:var(--weather-scrim); }
+/* The flat scrim is only for the small cards; the full and wide pictures rely on the text scrim. */
+[data-slot="weather-sky"][data-variant="compact"] .weather-sky-scrim, [data-slot="weather-sky"][data-variant="lite"] .weather-sky-scrim { display:block; }
+[data-slot="weather-sky"] .weather-sky-text-scrim { position:absolute; inset:0; background:linear-gradient(to top right,var(--wx-scrim) 0%,transparent 58%); }
 
-@keyframes wx-fall { from { transform: translate3d(0, -48px, 0) rotate(var(--tilt, 0deg)); } to { transform: translate3d(0, calc(100cqh + 48px), 0) rotate(var(--tilt, 0deg)); } }
+@keyframes wx-fall { from { transform: translate3d(0, calc(var(--s) * -1px), 0) rotate(var(--tilt, 0deg)); } to { transform: translate3d(0, calc(100cqh + 8px), 0) rotate(var(--tilt, 0deg)); } }
 @keyframes wx-flake { from { transform: translate3d(0, -12px, 0); } to { transform: translate3d(calc(var(--wind, 0) * 40px), calc(100cqh + 12px), 0); } }
 @keyframes wx-sway { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
 @keyframes wx-pile { from { transform: scaleY(0); opacity: 1; } to { transform: scaleY(var(--pile-cap, 1)); opacity: 1; } }

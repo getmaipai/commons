@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { WEATHER_CLASSES } from "./elements/weather-condition";
 import { phaseOf } from "./elements/weather-scene";
+import scene from "./elements/weather-scene.json";
 
 const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
 const rootAt = css.indexOf("/* WEATHER-SCENE-01: phase palette targets");
@@ -22,31 +23,48 @@ const linear=(v:number)=>{v=Math.max(0,Math.min(255,v))/255;return v<=.04045?v/1
 const luminance=(c:RGB)=>.2126*linear(c[0])+.7152*linear(c[1])+.0722*linear(c[2]);
 const contrast=(c:RGB)=>(1.05)/(luminance(c)+.05);
 const mixRgb=(a:RGB,b:RGB,t:number):RGB=>a.map((v,i)=>v*(1-t)+b[i]!*t) as RGB;
-const caps=[.46,.50,.50];
+const caps=[scene.caps.top,scene.caps.mid,scene.caps.bottom];
 const capsOk=(values: Lab[][]) => values.every((stops)=>stops.every((c,i)=>c.l<=caps[i]!));
 const readStops=(src:string,cls:string,phase:"night"|"dawn"|"day"|"dusk")=>["top","mid","bottom"].map(stop=>token(src,`${cls}-${phase}-${stop}`));
 const palette=(src:string,cls:string,t:number,twilight:"dawn"|"dusk")=>[0,1,2].map(i=>{const n=readStops(src,cls,"night")[i]!, w=readStops(src,cls,twilight)[i]!, d=readStops(src,cls,"day")[i]!; const stage=mixLab(w,d,Math.max(0,Math.min(1,(t-.5)*2))); return mixLab(n,stage,Math.max(0,Math.min(1,t*2)));});
-const sample=(src:string,cls:string,stops:Lab[],x:number,y:number)=>{
- const idx=y<55?0:y<100?1:2; let c=rgb(stops[idx]!);
+const clamp01=(v:number)=>Math.max(0,Math.min(1,v));
+// Stops are capped like the CSS (min(l, cap)); the base gradient runs top 0%, mid 55%, bottom 100% and mixes in sRGB.
+const capped=(stops:Lab[]):RGB[]=>stops.map((c,i)=>rgb({...c,l:Math.min(c.l,caps[i]!)}));
+const baseAt=(stops:Lab[],y:number):RGB=>{const [top,mid,bottom]=capped(stops) as [RGB,RGB,RGB];return y<=55?mixRgb(top,mid,y/55):mixRgb(mid,bottom,(y-55)/45);};
+/** Horizon layers as the CSS paints them: radial-gradient(85% 48% at 92% 100%, colour, transparent 70%) at the --wx-t opacity. */
+const horizonAlpha=(x:number,y:number)=>Math.max(0,1-Math.hypot((x-92)/85,(y-100)/48)/.7);
+/** Text scrim: linear-gradient(to top right, scrim 0%, transparent 58%). Position along the corner gradient is (x + (1 - y)) / 2. */
+const textScrimAlpha=(alpha:number,x:number,y:number)=>alpha*Math.max(0,1-((x/100+(1-y/100))/2)/.58);
+const variants=[{name:"full",flat:false},{name:"wide",flat:false},{name:"compact",flat:true},{name:"lite",flat:true}] as const;
+const sample=(src:string,cls:string,stops:Lab[],t:number,x:number,y:number,flat:boolean,horizon=true)=>{
+ let c=baseAt(stops,y);
  const glow=token(src,`${cls}-glow`); const g=rgb(glow); c=mixRgb(c,g,Math.max(0,.12*(1-x/100))*glow.alpha);
- c=mixRgb(c,[255,255,255],.22);
- const flat=/--weather-scrim:\s*rgb\(0 0 0 \/ ([.\d]+)\)/.exec(src); c=mixRgb(c,[0,0,0],Number(flat?.[1]??.16));
- const text=token(src,`${cls}-dusk-scrim`); c=mixRgb(c,[0,0,0],text.alpha*(1-y/100)); return contrast(c);
+ if(horizon){
+  const tw=token(src,"horizon-twilight"), day=token(src,"horizon-day");
+  c=mixRgb(c,rgb(tw),tw.alpha*clamp01(1-Math.abs(t-.5)*2)*horizonAlpha(x,y));
+  c=mixRgb(c,rgb(day),day.alpha*clamp01((t-.5)*2)*horizonAlpha(x,y));
+ }
+ c=mixRgb(c,[255,255,255],scene.effects.effectWhite);
+ if(flat){const f=/--weather-scrim:\s*rgb\(0 0 0 \/ ([.\d]+)\)/.exec(src); c=mixRgb(c,[0,0,0],Number(f?.[1]??.16));}
+ const text=token(src,`${cls}-dusk-scrim`); c=mixRgb(c,rgb({...text,alpha:1}),textScrimAlpha(text.alpha,x,y)); return contrast(c);
 };
 describe("weather scene token contrast",()=>{
  test("phase thresholds and fallback",()=>{expect(phaseOf({elevation:-30,isDay:false}).phase).toBe("night");expect(phaseOf({elevation:-3,isDay:true}).phase).toBe("dusk");expect(phaseOf({elevation:1,isDay:false}).phase).toBe("dawn");expect(phaseOf({elevation:30,isDay:true}).phase).toBe("day");expect(phaseOf({isDay:true}).elevation).toBe(30);});
- test("the shared cap validator rejects a deliberately raised parsed stop",()=>{const p=readStops(themes[0]!,"clear","day");expect(capsOk([p])).toBe(true);p[0]={...p[0]!,l:.461};expect(capsOk([p])).toBe(false);});
+ test("the shared cap validator rejects a deliberately raised parsed stop",()=>{const p=readStops(themes[0]!,"clear","day");expect(capsOk([p])).toBe(true);p[0]={...p[0]!,l:scene.caps.top+.001};expect(capsOk([p])).toBe(false);});
  for(let theme=0;theme<themes.length;theme++) for(const cls of WEATHER_CLASSES) test(`theme ${theme} ${cls}: parsed palettes meet caps and contrast`,()=>{
-  const src=themes[theme]!; const elevations=[-30,-3,1,30]; const paletteSamples:Lab[][]=[];
-  for(const elevation of elevations){const result=phaseOf({elevation,isDay:elevation>0});const twilight=elevation>=0?"dawn":"dusk";paletteSamples.push(palette(src,cls,result.t,twilight));}
-  paletteSamples.push(palette(src,cls,.25,"dusk"),palette(src,cls,.75,"dawn"));
+  const src=themes[theme]!; const elevations=[-30,-3,1,30]; const paletteSamples:Lab[][]=[]; const sampleT:number[]=[];
+  for(const elevation of elevations){const result=phaseOf({elevation,isDay:elevation>0});const twilight=elevation>=0?"dawn":"dusk";paletteSamples.push(palette(src,cls,result.t,twilight));sampleT.push(result.t);}
+  for(const [tv,tw] of [[.25,"dusk"],[.75,"dawn"],[.5,"dusk"],[.5,"dawn"]] as const){paletteSamples.push(palette(src,cls,tv,tw));sampleT.push(tv);}
   expect(capsOk(paletteSamples),"blended stops respect L caps").toBe(true);
   for(const phase of ["night","dawn","day","dusk"] as const) {
    const authored=readStops(src,cls,phase); expect(capsOk([authored]),`${cls} ${phase} authored caps`).toBe(true);
    resolvedToken(src,`${cls}-${phase}-glow`);
    const scrim=token(src,`${cls}-${phase}-scrim`); expect(scrim.alpha).toBeGreaterThan(0);
   }
-  for(const stops of paletteSamples) for(const x of [4,30,55]) for(const y of [58,72,86,98]) expect(sample(src,cls,stops,x,y),`${cls} ${x},${y}`).toBeGreaterThanOrEqual(4.5);
+  const low:string[]=[]; let worst=Infinity;
+  for(const v of variants) paletteSamples.forEach((stops,k)=>{for(const x of [4,30,55]) for(const y of [58,72,86,98]){const ratio=sample(src,cls,stops,sampleT[k]!,x,y,v.flat); worst=Math.min(worst,ratio); if(ratio<4.5) low.push(`${v.name} t=${sampleT[k]!.toFixed(2)} ${x},${y}: ${ratio.toFixed(2)}`);}});
+  if(process.env.WEATHER_CONTRAST_REPORT) console.log(`theme ${theme} ${cls}: worst ${worst.toFixed(2)}`);
+  expect(low.slice(0,6),`${cls} points under 4.5:1`).toEqual([]);
  });
  test("registered weather properties keep the transition",()=>{for(const p of ["--wx-top","--wx-mid","--wx-bottom","--wx-glow","--wx-scrim","--wx-t"])expect(css).toContain(`@property ${p}`);expect(css).toContain("--wx-top 3200ms cubic-bezier(.37, 0, .63, 1)");});
  test("cloud day, night and twilight tints exist in all themes and stay out of the text band",()=>{
@@ -78,5 +96,43 @@ describe("weather scene token contrast",()=>{
    const body=rule.slice(i+"color-mix(".length,end);expect(topLevelParts(body).length).toBe(3);found++;
   }
   expect(found).toBeGreaterThanOrEqual(6);
+ });
+});
+
+describe("WEATHER-SCENE-08 tokens exist in all three blocks and the proof can fail",()=>{
+ test("the proof rejects a sky painted at the caps (it is not vacuous)",()=>{
+  const bright:Lab[]=[{l:scene.caps.top,a:0,b:0,alpha:1},{l:scene.caps.mid,a:0,b:0,alpha:1},{l:scene.caps.bottom,a:0,b:0,alpha:1}];
+  const worst=Math.min(...[4,30,55].flatMap(x=>[58,72,86,98].map(y=>sample(themes[0]!,"clear",bright,1,x,y,false))));
+  expect(worst).toBeLessThan(4.5);
+ });
+ test("the text scrim and horizon shapes used by the proof match the CSS gradients",()=>{
+  expect(textScrimAlpha(.5,0,100)).toBeCloseTo(.5,6);
+  expect(textScrimAlpha(.5,100,0)).toBe(0);
+  expect(textScrimAlpha(.5,50,50)).toBeCloseTo(.5*(1-.5/.58),6);
+  expect(horizonAlpha(92,100)).toBe(1); expect(horizonAlpha(4,58)).toBe(0);
+ });
+ test("every changed or new colour token is defined in the light, system dark and explicit dark blocks",()=>{
+  for(const src of themes){
+   for(const name of ["horizon-twilight","horizon-day"]) token(src,name);
+   for(const cls of WEATHER_CLASSES){
+    for(const phase of ["dusk","dawn"] as const) readStops(src,cls,phase);
+    expect(token(src,`${cls}-dusk-scrim`).alpha).toBeCloseTo(.5,6);
+   }
+  }
+  const sunBlocks=[block(rootAt,"--weather-star:"),block(systemAt,"--weather-star:"),css.slice(explicitAt)];
+  for(const src of sunBlocks) for(const name of ["sun-disc-core","sun-disc-edge","sun-twilight"]) token(src,name);
+  expect(css).toContain("--weather-sun-core: #ffd75e"); expect(css).toContain("--weather-sun-edge: #ffb02e");
+ });
+ test("dusk and dawn use the authored clear palette in the light block and the same offsets in the dark blocks",()=>{
+  const l=(name:string,src=themes[0]!)=>token(src,name);
+  const near=(c:Lab,L:number,C:number,H:number)=>{const p=polar(c);expect(c.l).toBeCloseTo(L,3);expect(p.chroma).toBeCloseTo(C,3);expect(p.hue).toBeCloseTo(H,0);};
+  near(l("clear-dusk-top"),.26,.07,285); near(l("clear-dusk-mid"),.36,.09,15); near(l("clear-dusk-bottom"),.44,.13,48);
+  near(l("clear-dawn-mid"),.44,.06,340); near(l("clear-dawn-bottom"),.50,.10,35);
+  for(const src of themes.slice(1)){ expect(l("clear-dusk-bottom",src).l).toBeCloseTo(.425,3); expect(l("clear-dawn-bottom",src).l).toBeCloseTo(.445,3); }
+  expect(token(themes[0]!,"clear-dusk-mid").l).toBeGreaterThan(token(themes[0]!,"clear-dusk-top").l);
+ });
+ test("overcast, rain and storm cloud shades are darker so grey reads against grey; the snow cloud is lighter",()=>{
+  const want:[string,number,number][]=[["overcast-cloud-shade",.50,.46],["rain-cloud-shade",.38,.34],["thunderstorm-cloud-shade",.24,.20],["snow-cloud-lit",.92,.88]];
+  for(const [name,light,dark] of want){ expect(token(themes[0]!,name).l).toBeCloseTo(light,3); expect(token(themes[1]!,name).l).toBeCloseTo(dark,3); expect(token(themes[2]!,name).l).toBeCloseTo(dark,3); }
  });
 });

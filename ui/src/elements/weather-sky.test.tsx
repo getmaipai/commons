@@ -30,18 +30,17 @@ describe("WeatherSky moon disc", () => {
     const rule = css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"] {'), css.indexOf('[data-slot="weather-sky"] [data-fx="fog"] {'));
     expect(rule).not.toContain("filter:"); expect(rule).not.toContain("blur(");
     expect(rule).toContain("mask-image:"); expect(rule).toContain("-webkit-mask-image:");
-    for (const text of ["scale: .62", "opacity: .34", "scale: .88", "opacity: .56", "scale: 1.15", "opacity: .72", "z-index: 21", "z-index: 22", "z-index: 23", "7px", "13px", "22px", "0% 22%", "8% 40%", "20% 56%"])
+    for (const text of ["scale: .62", "opacity: .42", "scale: .88", "opacity: .74", "scale: 1.15", "opacity: .96", "z-index: 21", "z-index: 22", "z-index: 23", "7px", "13px", "22px", "0% 22%", "8% 40%", "20% 56%"])
       expect(rule).toContain(text);
     expect(css).toContain("translate3d(100cqw, 0, 0)");
   });
   test("cloud puff circles fit their boxes and widths use container-relative clamps", () => {
     const ratios: Record<string, number> = { a: 2.6, b: 1.9, c: 1.5 };
     for (const [shape, puffList] of Object.entries(scene.clouds.puffs)) for (const [x = 0, y = 0, radius = 0] of puffList) {
-      const outerRadius = radius + 9;
-      expect(x - outerRadius).toBeGreaterThanOrEqual(4);
-      expect(y - outerRadius * ratios[shape]!).toBeGreaterThanOrEqual(4);
-      expect(100 - x - outerRadius).toBeGreaterThanOrEqual(4);
-      expect(100 - y - outerRadius * ratios[shape]!).toBeGreaterThanOrEqual(4);
+      expect(x - radius).toBeGreaterThanOrEqual(4);
+      expect(y - radius * ratios[shape]!).toBeGreaterThanOrEqual(4 - 0.01);
+      expect(100 - x - radius).toBeGreaterThanOrEqual(4);
+      expect(100 - y - radius * ratios[shape]!).toBeGreaterThanOrEqual(4 - 0.01);
       expect(shape).toMatch(/^[abc]$/);
     }
     const cloudRules = css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"] {'), css.indexOf('[data-slot="weather-sky"] [data-fx="fog"] {'));
@@ -76,7 +75,7 @@ describe("WeatherSky moon disc", () => {
     expect(near.style.getPropertyValue("--d")).not.toBe(before);
   });
   test("precipitation pools scale by intensity, area and variant", () => {
-    const cases = [["rain", 61, 12], ["rain", 63, 18], ["thunderstorm", 95, 18], ["thunderstorm", 96, 28]] as const;
+    const cases = [["rain", 61, 12], ["rain", 63, 22], ["thunderstorm", 95, 22], ["thunderstorm", 96, 32]] as const;
     for (const [cls, code, expected] of cases) {
       const { container, unmount } = render(<WeatherSky cls={cls} isDay={true} code={code} width={420} height={230} variant="full" />);
       expect(container.querySelectorAll('[data-fx="fall"]')).toHaveLength(expected); unmount();
@@ -86,12 +85,12 @@ describe("WeatherSky moon disc", () => {
     expect(drizzle.container.querySelectorAll('[data-fx="splash"]')).toHaveLength(0);
     expect(drizzle.container.querySelectorAll('[data-fx="fog"]')).toHaveLength(1); drizzle.unmount();
     const snow = render(<WeatherSky cls="snow" isDay={true} code={75} width={420} height={230} />);
-    expect(snow.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(30);
-    expect(snow.container.querySelectorAll('[data-fx="sway"]')).toHaveLength(15);
+    expect(snow.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(36);
+    expect(snow.container.querySelectorAll('[data-fx="sway"]')).toHaveLength(6);
     expect(snow.container.querySelectorAll('[data-fx="pile"]')).toHaveLength(1);
     for (const variant of ["full", "lite", "compact", "wide"] as const) {
       const view = render(<WeatherSky cls="thunderstorm" isDay={true} code={96} width={420} height={230} variant={variant} />);
-      expect(view.container.querySelectorAll('[data-fx="fall"]').length).toBeLessThanOrEqual(({ full: 28, lite: 8, compact: 18, wide: 34 })[variant]); view.unmount();
+      expect(view.container.querySelectorAll('[data-fx="fall"]').length).toBeLessThanOrEqual(({ full: 32, lite: 8, compact: 18, wide: 34 })[variant]); view.unmount();
     }
   });
   test("precipitation and fog CSS keyframes are transform and opacity only", () => {
@@ -149,7 +148,8 @@ describe("WeatherSky moon disc", () => {
     expect(css).toContain("@keyframes wx-corona");
     expect(css).toContain("@keyframes wx-twinkle");
     expect(css).toContain("--wx-night");
-    expect(css).toMatch(/radial-gradient\(circle at 35% 35%,\s*var\(--weather-sun-core\),\s*var\(--weather-sun-edge\) 78%\)/);
+    // WEATHER-SCENE-08: the disc uses the new disc tokens; the legacy hex tokens below stay defined.
+    expect(css).toMatch(/radial-gradient\(circle at 35% 35%,\s*var\(--weather-sun-disc-core\),\s*var\(--weather-sun-disc-edge\) 78%\)/);
     expect(css).toContain("#ffd75e");
     expect(css).toContain("#ffb02e");
     expect(skySource).not.toContain('data-fx="sun-rays"');
@@ -437,5 +437,171 @@ describe("WEATHER-SCENE-06 variants and budgets", () => {
   });
   test("paused is documented as deprecated for variant lite", () => {
     expect(skySource).toContain("@deprecated use variant=\"lite\"");
+  });
+});
+
+const lastRule = (selector: string) => { const start = css.lastIndexOf(`${selector} {`); return start < 0 ? "" : css.slice(start, css.indexOf("}", start)); };
+describe("WEATHER-SCENE-08 picture polish: clouds", () => {
+  const authored: Record<string, number[][]> = {
+    a: [[18, 62, 16], [34, 50, 22], [52, 44, 24], [70, 52, 20], [86, 64, 14], [44, 72, 20], [62, 74, 18]],
+    b: [[22, 66, 18], [38, 46, 24], [56, 38, 26], [72, 52, 22], [84, 68, 16], [48, 74, 22], [30, 80, 16]],
+    c: [[30, 60, 20], [50, 42, 28], [70, 58, 22], [44, 78, 20], [62, 80, 18]],
+  };
+  const ratios: Record<string, number> = { a: 2.6, b: 1.9, c: 1.5 };
+  test("the authored puff tables are restored, shrunk uniformly just enough to fit with a 4 percent margin", () => {
+    for (const shape of ["a", "b", "c"] as const) {
+      const table = scene.clouds.puffs[shape] as number[][]; const source = authored[shape]!;
+      expect(table).toHaveLength(source.length);
+      const k = table[0]![2]! / source[0]![2]!;
+      expect(k).toBeGreaterThan(0.5); expect(k).toBeLessThanOrEqual(1);
+      let slack = Infinity;
+      table.forEach(([x = 0, y = 0, radius = 0], i) => {
+        const [sx = 0, sy = 0, sr = 0] = source[i]!;
+        expect(radius / sr).toBeCloseTo(k, 1);
+        expect(x).toBeCloseTo(sx, 0);
+        expect(y - 50).toBeCloseTo((sy - 50) * k, 0);
+        slack = Math.min(slack, x - radius, 100 - x - radius, y - radius * ratios[shape]!, 100 - y - radius * ratios[shape]!);
+      });
+      expect(slack, `${shape} fits tightly, not loosely`).toBeLessThan(4.5);
+      expect(slack, `${shape} keeps the margin`).toBeGreaterThanOrEqual(4 - 0.01);
+    }
+  });
+  test("depth opacities are near .96, mid .74, far .42 in the table and the CSS", () => {
+    expect(scene.clouds.depths.near.opacity).toBe(0.96); expect(scene.clouds.depths.mid.opacity).toBe(0.74); expect(scene.clouds.depths.far.opacity).toBe(0.42);
+    for (const [depth, value] of [["near", ".96"], ["mid", ".74"], ["far", ".42"]] as const) expect(skyRule(`[data-slot="weather-sky"] [data-fx="cloud"][data-depth="${depth}"]`)).toContain(`opacity: ${value}`);
+  });
+  test("each cloud mask has soft stops per depth, no outer fade, a shelf clip and an intersecting composite", () => {
+    const { container } = render(<WeatherSky cls="overcast" isDay={true} width={420} height={230} />);
+    const clouds = [...container.querySelectorAll<HTMLElement>('[data-fx="cloud"]')];
+    expect(new Set(clouds.map(el => el.getAttribute("data-depth"))).size).toBe(3);
+    for (const el of clouds) {
+      const shape = el.getAttribute("data-shape") as "a" | "b" | "c"; const depth = el.getAttribute("data-depth")!;
+      const mask = el.style.getPropertyValue("--cloud-mask"); const shelf = scene.clouds.shelf[shape];
+      expect(mask).toContain(`var(--weather-ink) 0 ${depth === "far" ? 62 : 86}%, transparent 100%`);
+      expect(mask).not.toContain("40%, transparent");
+      const puffs = scene.clouds.puffs[shape] as number[][];
+      for (const [, , radius = 0] of puffs) expect(mask).toContain(`calc(var(--s) * ${radius / 100})`);
+      expect(mask).toContain(`radial-gradient(ellipse 46% 13% at 50% ${shelf}%, var(--weather-ink) 0 92%, transparent)`);
+      expect(mask).toContain(`linear-gradient(to bottom, var(--weather-ink) 0 ${shelf}%, transparent ${shelf}%)`);
+      expect(mask.startsWith("linear-gradient(to bottom")).toBe(true);
+      const layers = puffs.length + 2;
+      const standard = el.style.getPropertyValue("--cloud-mc").split(", "); const webkit = el.style.getPropertyValue("--cloud-mc-webkit").split(", ");
+      expect(standard).toHaveLength(layers); expect(webkit).toHaveLength(layers);
+      expect(standard[0]).toBe("intersect"); expect(standard.slice(1).every(v => v === "add")).toBe(true);
+      expect(webkit[0]).toBe("source-in"); expect(webkit.slice(1).every(v => v === "source-over")).toBe(true);
+    }
+    expect(scene.clouds.shelf).toEqual({ a: 74, b: 78, c: 80 });
+  });
+  test("the clouds paint in two pseudo-elements that carry the mask: a shaded body with a rim light and an offset shadow", () => {
+    const base = skyRule('[data-slot="weather-sky"] [data-fx="cloud"]');
+    expect(base).not.toContain("mask-image"); expect(base).not.toContain("background:");
+    const both = css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"]::before,'), css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"]::before {'));
+    for (const text of ["content: \"\"", "position: absolute", "inset: 0", "mask-image: var(--cloud-mask)", "-webkit-mask-image: var(--cloud-mask)", "mask-composite: var(--cloud-mc)", "-webkit-mask-composite: var(--cloud-mc-webkit)", "mask-size: 100% 100%"]) expect(both, text).toContain(text);
+    const shadow = skyRule('[data-slot="weather-sky"] [data-fx="cloud"]::before'); const body = lastRule('[data-slot="weather-sky"] [data-fx="cloud"]::after');
+    expect(shadow).toContain("translate: 0 5%"); expect(shadow).toContain("color-mix(in oklab, var(--cloud-shade), transparent 45%)");
+    expect(body).toContain("linear-gradient(to top, var(--cloud-shade) 0 24%, var(--cloud-lit) 62%)");
+    expect(body).toContain("radial-gradient(110% 80% at 88% 0%, color-mix(in oklab, var(--cloud-lit), var(--wx-glow) 55%) 0, transparent 52%)");
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="cloud"]')).toContain("--cloud-lit: var(--wx-cloud-lit)");
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="cloud"][data-depth="far"]')).toContain("color-mix(in oklab, var(--wx-cloud-lit), var(--wx-mid) 40%)");
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="cloud"][data-depth="far"]')).toContain("color-mix(in oklab, var(--wx-cloud-shade), var(--wx-mid) 40%)");
+  });
+});
+
+describe("WEATHER-SCENE-08 picture polish: brightness and sky", () => {
+  test("caps are .50, .56, .58 in the table and the base gradient", () => {
+    expect(scene.caps).toEqual({ top: 0.5, mid: 0.56, bottom: 0.58 });
+    const base = skyRule('[data-slot="weather-sky"] .weather-sky-base');
+    expect(base).toContain("min(l, .50)"); expect(base).toContain("min(l, .56)"); expect(base).toContain("min(l, .58)");
+  });
+  test("the flat scrim is only on compact and lite; the vignette starts at 62 percent; the text scrim is the corner gradient", () => {
+    expect(skyRule('[data-slot="weather-sky"] .weather-sky-scrim')).toContain("display:none");
+    expect(css).toContain('[data-slot="weather-sky"][data-variant="compact"] .weather-sky-scrim, [data-slot="weather-sky"][data-variant="lite"] .weather-sky-scrim { display:block; }');
+    expect(skyRule('[data-slot="weather-sky"] .weather-sky-vignette')).toContain("transparent 62%");
+    expect(skyRule('[data-slot="weather-sky"] .weather-sky-text-scrim')).toContain("linear-gradient(to top right,var(--wx-scrim) 0%,transparent 58%)");
+  });
+  test("the horizon layers are sized wrappers under the clouds, driven by --wx-t", () => {
+    const twilight = skyRule('[data-slot="weather-sky"] .weather-sky-horizon'); const day = skyRule('[data-slot="weather-sky"] .weather-sky-horizon-day');
+    for (const rule of [twilight, day]) { expect(rule).toContain("inset:0"); expect(rule).toContain("pointer-events:none"); expect(rule).toContain("radial-gradient(85% 48% at 92% 100%"); expect(rule).toContain("transparent 70%"); }
+    expect(twilight).toContain("opacity:calc(1 - abs(var(--wx-t) - .5) * 2)"); expect(twilight).toContain("var(--weather-horizon-twilight)");
+    expect(day).toContain("opacity:clamp(0, (var(--wx-t) - .5) * 2, 1)"); expect(day).toContain("var(--weather-horizon-day)");
+    const { container } = render(<WeatherSky cls="clear" isDay={true} />);
+    const order = [...container.querySelectorAll("[data-weather-layer], [data-fx='cloud']")].map(el => el.getAttribute("data-weather-layer") ?? "cloud");
+    expect(order.indexOf("horizon")).toBeGreaterThan(order.indexOf("glow")); expect(order.indexOf("horizon-day")).toBeGreaterThan(order.indexOf("horizon"));
+    expect(order.indexOf("horizon-day")).toBeLessThan(order.indexOf("cloud"));
+    for (const name of ["sun-disc-core", "sun-disc-edge", "sun-twilight", "horizon-twilight", "horizon-day"]) expect(css).toContain(`--weather-${name}:`);
+  });
+  test("the sun is a 56 px disc with halos of 140 px and 300 px, 64 px at twilight, sitting at 66 percent down", () => {
+    expect(lastRule('[data-slot="weather-sky"] [data-fx="sun"]')).toContain("width:56px; height:56px");
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="sun-halo-a"]')).toMatch(/width:140px; height:140px; opacity:\.5;/);
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="sun-halo-b"]')).toMatch(/width:300px; height:300px; opacity:\.22;/);
+    expect(css).toMatch(/\[data-phase="dawn"\] \[data-fx="sun"\], \[data-slot="weather-sky"\]\[data-phase="dusk"\] \[data-fx="sun"\] \{ width:64px; height:64px;[^}]*var\(--weather-sun-twilight\)/);
+    expect(css).toMatch(/--weather-sun-disc-core: oklch\(0\.97 0\.08 95\)/); expect(css).toMatch(/--weather-sun-disc-edge: oklch\(0\.86 0\.16 75\)/); expect(css).toMatch(/--weather-sun-twilight: oklch\(0\.80 0\.17 45\)/);
+    expect(scene.sun).toMatchObject({ disc: 56, twilightDisc: 64, twilightY: 66 }); expect(scene.light.clampY).toEqual([14, 70]);
+    const dusk = render(<WeatherSky cls="clear" isDay={true} elevation={-1} />);
+    expect(dusk.container.querySelector<HTMLElement>('[data-slot="weather-sky"]')!.style.getPropertyValue("--wx-light-y")).toBe("66%"); dusk.unmount();
+    const noon = render(<WeatherSky cls="clear" isDay={true} elevation={30} />);
+    expect(Number.parseFloat(noon.container.querySelector<HTMLElement>('[data-slot="weather-sky"]')!.style.getPropertyValue("--wx-light-y"))).toBeLessThanOrEqual(70);
+  });
+});
+
+describe("WEATHER-SCENE-08 picture polish: rain and snow", () => {
+  const drops = (view: ReturnType<typeof render>) => [...view.container.querySelectorAll<HTMLElement>('[data-fx="fall"]')].map(el => ({ depth: el.getAttribute("data-drop")!, v: (name: string) => Number.parseFloat(el.style.getPropertyValue(name)) }));
+  test("rain has three drop classes with their widths, lengths, speeds, opacities and the near drops on the right", () => {
+    const cfg = scene.precipitation.rain.drops;
+    const view = render(<WeatherSky cls="rain" isDay={true} code={63} width={420} height={230} />);
+    const list = drops(view); expect(list).toHaveLength(22);
+    const near = list.filter(d => d.depth === "near"); const mid = list.filter(d => d.depth === "mid"); const far = list.filter(d => d.depth === "far");
+    expect(near.length).toBeGreaterThanOrEqual(5); expect(mid.length).toBeGreaterThan(0); expect(far.length).toBeGreaterThan(0);
+    for (const [group, spec] of [[near, cfg.near], [mid, cfg.mid], [far, cfg.far]] as const) for (const d of group) {
+      expect(d.v("--w")).toBe(spec.width); expect(d.v("--o")).toBe(spec.opacity);
+      expect(d.v("--s")).toBeGreaterThanOrEqual(spec.length[0]!); expect(d.v("--s")).toBeLessThanOrEqual(spec.length[1]!);
+      expect((230 + d.v("--s") + 8) / d.v("--d")).toBeCloseTo(spec.speed, 3);
+    }
+    expect([cfg.near.width, cfg.mid.width, cfg.far.width]).toEqual([2.5, 2, 1.5]); expect([cfg.near.speed, cfg.mid.speed, cfg.far.speed]).toEqual([520, 420, 320]);
+    expect([cfg.near.opacity, cfg.mid.opacity, cfg.far.opacity]).toEqual([0.9, 0.7, 0.45]); expect(cfg.near.length).toEqual([72, 100]); expect(cfg.mid.length).toEqual([40, 56]); expect(cfg.far.length).toEqual([22, 30]);
+    for (const d of near) { expect(d.v("--x")).toBeGreaterThanOrEqual(55); expect(d.v("--x")).toBeLessThanOrEqual(100); }
+    expect(near.length / list.length).toBeCloseTo(0.25, 1);
+    const tilts = [...view.container.querySelectorAll<HTMLElement>('[data-fx="fall"]')].map(el => el.style.getPropertyValue("--tilt")); expect(new Set(tilts)).toEqual(new Set(["-4deg"]));
+  });
+  test("heavy rain tilts -10 degrees, counts stay 18 to 24 steady and 28 to 34 heavy, and drizzle stays fine at 1.5 px", () => {
+    const heavy = render(<WeatherSky cls="thunderstorm" isDay={true} code={96} width={420} height={230} />);
+    const heavyDrops = [...heavy.container.querySelectorAll<HTMLElement>('[data-fx="fall"]')];
+    expect(heavyDrops.length).toBeGreaterThanOrEqual(28); expect(heavyDrops.length).toBeLessThanOrEqual(34);
+    expect(new Set(heavyDrops.map(el => el.style.getPropertyValue("--tilt")))).toEqual(new Set(["-10deg"])); heavy.unmount();
+    const steady = render(<WeatherSky cls="rain" isDay={true} code={63} width={420} height={230} />);
+    expect(steady.container.querySelectorAll('[data-fx="fall"]').length).toBeGreaterThanOrEqual(18); expect(steady.container.querySelectorAll('[data-fx="fall"]').length).toBeLessThanOrEqual(24); steady.unmount();
+    const drizzle = render(<WeatherSky cls="drizzle" isDay={true} code={55} width={420} height={230} />);
+    for (const d of drops(drizzle)) { expect(d.v("--w")).toBe(1.5); expect(d.v("--s")).toBeLessThanOrEqual(9); }
+  });
+  test("the streak has a bright head and the fall keyframes move by transform only", () => {
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="fall"]')).toContain("linear-gradient(to bottom, transparent 0, var(--weather-rain-streak) 72%, var(--weather-ink) 100%)");
+    expect(keyframe("wx-fall")).toContain("translate3d"); expect(keyframe("wx-fall")).not.toMatch(/filter|box-shadow|background/);
+  });
+  test("snow flakes run from 2 to 11 px, the six largest are soft on the pendulum, speeds grow with size, and a haze sits behind", () => {
+    const cfg = scene.precipitation.snow;
+    const view = render(<WeatherSky cls="snow" isDay={true} code={75} width={420} height={230} />);
+    const flakes = [...view.container.querySelectorAll<HTMLElement>('[data-fx="flake"]')];
+    expect(flakes).toHaveLength(36);
+    const rows = flakes.map(el => ({ size: Number.parseFloat(el.style.getPropertyValue("--s")), speed: (230 + 24) / Number.parseFloat(el.style.getPropertyValue("--d")), o: Number.parseFloat(el.style.getPropertyValue("--o")), soft: el.getAttribute("data-soft") === "true", sway: el.querySelector('[data-fx="sway"]') !== null }));
+    for (const r of rows) { expect(r.size).toBeGreaterThanOrEqual(2); expect(r.size).toBeLessThanOrEqual(11); expect(r.speed).toBeGreaterThanOrEqual(18 - 0.01); expect(r.speed).toBeLessThanOrEqual(60 + 0.01); expect(r.o).toBeGreaterThanOrEqual(0.55); expect(r.o).toBeLessThanOrEqual(0.95); }
+    expect(Math.max(...rows.map(r => r.size))).toBeGreaterThan(9); expect(Math.min(...rows.map(r => r.size))).toBeLessThan(4);
+    const sorted = [...rows].sort((x, y) => x.size - y.size);
+    for (let i = 1; i < sorted.length; i++) expect(sorted[i]!.speed).toBeGreaterThanOrEqual(sorted[i - 1]!.speed - 0.01);
+    const soft = rows.filter(r => r.soft); expect(soft).toHaveLength(6);
+    expect(soft.every(r => r.sway)).toBe(true); expect(rows.filter(r => !r.soft).every(r => !r.sway)).toBe(true);
+    const threshold = Math.min(...soft.map(r => r.size)); expect(rows.filter(r => !r.soft).every(r => r.size <= threshold)).toBe(true);
+    expect(cfg).toMatchObject({ count: 36, size: [2, 11], soft: 6, speed: [18, 60], opacity: [0.55, 0.95], haze: 0.08 });
+    const haze = view.container.querySelectorAll<HTMLElement>('[data-fx="fog"]'); expect(haze).toHaveLength(1);
+    expect(haze[0]!.style.getPropertyValue("--o")).toBe("0.08");
+    const order = [...view.container.querySelectorAll('[data-fx="fog"], [data-fx="snow-field"]')].map(el => el.getAttribute("data-fx"));
+    expect(order).toEqual(["fog", "snow-field"]);
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="flake"]')).toContain("radial-gradient(circle, var(--weather-ink) 0 70%, transparent 100%)");
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="snow-core"]')).toContain("radial-gradient(circle, var(--weather-ink) 0 50%, transparent)");
+    expect(skyRule('[data-slot="weather-sky"] [data-fx="flake"][data-soft="true"]')).toContain("background: none");
+  });
+  test("lite snow keeps 10 hard flakes, no haze and no pendulum", () => {
+    const lite = render(<WeatherSky cls="snow" isDay={true} code={75} variant="lite" running={true} />);
+    expect(lite.container.querySelectorAll('[data-fx="flake"]')).toHaveLength(10);
+    expect(lite.container.querySelector('[data-soft="true"]')).toBeNull(); expect(lite.container.querySelector('[data-fx="fog"]')).toBeNull(); expect(lite.container.querySelector('[data-fx="sway"]')).toBeNull();
   });
 });
