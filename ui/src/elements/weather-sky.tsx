@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { particles, type Particle, type WeatherClass, weatherIntensityOf } from "./weather-condition";
 import { MoonDisc } from "./moon-disc";
 import scene from "./weather-scene.json";
-import { cloudDuration, cloudWindFactor, lightPosition, phaseOf, precipitationCount, precipitationScale, type WeatherVariant } from "./weather-scene";
+import { cloudDuration, cloudWindFactor, lightPosition, moonFromDate, phaseOf, precipitationCount, precipitationScale, type WeatherVariant } from "./weather-scene";
 
 export interface WeatherMoon {
   phase: string;
@@ -11,16 +11,13 @@ export interface WeatherMoon {
 
 const rain = particles(11, 40, { size: [6, 44], dur: [0.2, 1.5], opacity: [0.3, 0.95] });
 const snow = particles(41, 30, { y: [-10, 0], size: [2, 6], dur: [4, 10], opacity: [0.45, 0.9] });
-const stars = particles(51, 72, { y: [0, 90], size: [1.5, 3.5], dur: [2, 5], opacity: [0.65, 1] });
+const stars = particles(51, 54, { y: [0, 70], size: [1.5, 3.5], dur: [3, 7], opacity: [0.65, 1] });
 const cloudDepths = ["far", "mid", "near"] as const;
 const classShapes: Record<WeatherClass, readonly ("a" | "b" | "c")[]> = { clear: ["a", "c"], "partly-cloudy": ["a", "b", "c", "b"], overcast: ["a", "b", "c", "a", "b", "c"], fog: [], drizzle: ["a", "b", "c", "a"], rain: ["a", "b", "c", "a", "b"], snow: ["a", "b", "c"], thunderstorm: ["a", "b", "c", "a", "b", "c"] };
 const fog = [18, 48, 72].map((y, i) => ({ x: 0, y, size: 30, dur: [46, 34, 26][i]!, delay: -11 * i, opacity: [0.14, 0.18, 0.12][i]! }));
 type Style = CSSProperties & Record<`--${string}`, string | number>;
 function style(p: Partial<Particle>): Style {
   return { "--x": p.x ?? 0, "--y": p.y ?? 0, "--s": p.size ?? 0, "--d": `${p.dur ?? 1}s`, "--dl": `${p.delay ?? 0}s`, "--o": p.opacity ?? 0.2 };
-}
-function Layer({ list, kind, count }: { list: readonly Particle[]; kind: string; count: number }) {
-  return <>{list.slice(0, count).map((p, i) => <span key={`${kind}-${i}`} data-fx={kind} aria-hidden="true" style={style(p)} />)}</>;
 }
 function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: WeatherVariant; wind?: number; width: number }) {
   const refs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -73,6 +70,8 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
   }, [sunrise, sunset, now, running]);
   const timing = phaseOf({ elevation, sunrise, sunset, now: clock, isDay });
   const position = lightPosition(variant, timing.dayFraction);
+  const moonPosition = lightPosition(variant, timing.dayFraction, "moon");
+  const moonData = moon ?? moonFromDate(clock);
   const areaScale = precipitationScale(measuredWidth, measuredHeight);
   const cap = scene.precipitation.rain.pools[variant];
   const heavy = cls === "thunderstorm" && actualIntensity >= 0.9;
@@ -90,9 +89,13 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
   }, [cls]);
   const side = timing.phase === "dawn" || (timing.phase === "night" && timing.elevation < 0 && timing.dayFraction < 0.5) ? "dawn" : "dusk";
   const twilight = timing.phase === "dawn" || timing.phase === "dusk" ? timing.phase : side;
-  const skyStyle = { "--wx-t": timing.t, "--wx-night-top": `var(--weather-${cls}-night-top)`, "--wx-night-mid": `var(--weather-${cls}-night-mid)`, "--wx-night-bottom": `var(--weather-${cls}-night-bottom)`, "--wx-twilight-top": `var(--weather-${cls}-${twilight}-top)`, "--wx-twilight-mid": `var(--weather-${cls}-${twilight}-mid)`, "--wx-twilight-bottom": `var(--weather-${cls}-${twilight}-bottom)`, "--wx-day-top": `var(--weather-${cls}-day-top)`, "--wx-day-mid": `var(--weather-${cls}-day-mid)`, "--wx-day-bottom": `var(--weather-${cls}-day-bottom)`, "--wx-glow": `var(--weather-${cls}-${timing.phase}-glow)`, "--wx-scrim": `var(--weather-${cls}-${timing.phase}-scrim)`, "--wx-light-x": `${position.x}%`, "--wx-light-y": `${Math.max(40,position.y)}%`, "--weather-intensity": actualIntensity } as CSSProperties;
+  const skyStyle = { "--wx-t": timing.t, "--wx-night": Math.max(0, Math.min(1, 1 - timing.t * 2)), "--wx-night-top": `var(--weather-${cls}-night-top)`, "--wx-night-mid": `var(--weather-${cls}-night-mid)`, "--wx-night-bottom": `var(--weather-${cls}-night-bottom)`, "--wx-twilight-top": `var(--weather-${cls}-${twilight}-top)`, "--wx-twilight-mid": `var(--weather-${cls}-${twilight}-mid)`, "--wx-twilight-bottom": `var(--weather-${cls}-${twilight}-bottom)`, "--wx-day-top": `var(--weather-${cls}-day-top)`, "--wx-day-mid": `var(--weather-${cls}-day-mid)`, "--wx-day-bottom": `var(--weather-${cls}-day-bottom)`, "--wx-glow": `var(--weather-${cls}-${timing.phase}-glow)`, "--wx-scrim": `var(--weather-${cls}-${timing.phase}-scrim)`, "--wx-light-x": `${position.x}%`, "--wx-light-y": `${Math.max(40,position.y)}%`, "--wx-moon-x": `${moonPosition.x}%`, "--wx-moon-y": `${Math.max(12,moonPosition.y)}%`, "--weather-intensity": actualIntensity } as CSSProperties;
   Object.assign(skyStyle, { "--wx-cloud-day-lit": `var(--weather-${cls}-cloud-lit)`, "--wx-cloud-day-shade": `var(--weather-${cls}-cloud-shade)`, "--wx-cloud-night-lit": `var(--weather-${cls}-cloud-night-lit)`, "--wx-cloud-night-shade": `var(--weather-${cls}-cloud-night-shade)`, "--wx-cloud-twilight-lit": `var(--weather-${cls}-cloud-twilight-lit)`, "--wx-cloud-twilight-shade": `var(--weather-${cls}-cloud-twilight-shade)` });
-  const hasSun = isDay && (cls === "clear" || cls === "partly-cloudy");
+  const sunClass = cls === "clear" || cls === "partly-cloudy" || cls === "fog";
+  const hasSun = timing.phase !== "night" && sunClass;
+  const hasMoon = timing.phase === "night" && (cls === "clear" || cls === "partly-cloudy");
+  const hasMoonHalo = timing.phase === "night" && (cls === "overcast" || cls === "snow");
+  const starCount = variant === "lite" ? 18 : cls === "clear" ? 54 : cls === "partly-cloudy" ? 30 : cls === "overcast" ? 8 : 0;
   return <div ref={skyRef} data-slot="weather-sky" data-class={cls} data-phase={timing.phase} data-intensity={actualIntensity} data-running={running ? "true" : "false"} data-variant={variant} data-mounted="true" data-paused={paused ? "true" : "false"} style={skyStyle} aria-hidden="true">
     <span data-weather-layer="base" className="weather-sky-base" aria-hidden="true"/>
     <span data-weather-layer="glow" className="weather-sky-glow" aria-hidden="true"/>
@@ -100,8 +103,9 @@ export function WeatherSky({ cls, isDay, code = 0, intensity, elevation, sunrise
     {variant !== "lite" ? <span data-weather-layer="grain" className="weather-sky-grain" aria-hidden="true"/> : null}
     <span data-weather-layer="scrim" className="weather-sky-scrim" aria-hidden="true"/>
     <span data-weather-layer="text-scrim" className="weather-sky-text-scrim" aria-hidden="true"/>
-    {hasSun && <><span data-fx="sun"/><span data-fx="sun-rays"/></>}
-    {!isDay && cls === "clear" && <>{moon ? <span data-fx="moon-glow" aria-hidden="true"><span data-fx="moon-disc"><MoonDisc phase={moon.phase} illumination={moon.illumination} size={54}/></span></span> : <span data-fx="moon"/>}<Layer list={stars} kind="star" count={paused ? 12 : 72}/></>}
+    {hasSun && <span data-fx="sun-group" data-dimmed={cls === "fog" ? "true" : undefined}><span data-fx="sun-halo-a"/><span data-fx="sun-halo-b"/><span data-fx="sun-corona"/><span data-fx="sun"/></span>}
+    {(hasMoon || hasMoonHalo) && <span data-fx="moon-group" data-halo-only={hasMoonHalo ? "true" : undefined}><span data-fx="moon-halo"/>{hasMoon && <span data-fx="moon-disc"><MoonDisc phase={moonData.phase} illumination={moonData.illumination} size={variant === "lite" ? 28 : variant === "compact" ? 40 : variant === "wide" ? 64 : 54}/></span>}</span>}
+    {timing.phase === "night" && starCount > 0 && <span data-fx="star-field">{stars.slice(0, starCount).map((p, i) => <span key={i} data-fx="star" data-twinkle={i % 3 === 0 ? "true" : undefined} aria-hidden="true" style={{ ...style({ ...p, y: cls === "overcast" ? p.y % 20 : p.y }), "--dl": `${-(i % 7) * 0.7}s` } as Style}/>)}</span>}
     {(cls !== "clear" || isDay) && <Clouds cls={cls} variant={variant} wind={wind} width={measuredWidth}/>}
     {(cls === "fog" || cls === "drizzle") && fog.slice(0, cls === "drizzle" ? 1 : 3).map((p, i) => <span key={i} data-fx="fog" aria-hidden="true" style={{ ...style({ ...p, dur: cls === "drizzle" ? 7 : p.dur / snowWind }), "--fog-scale": [1.6,1.3,1][i]!, "--breath": [5,7,9][i]! + "s" } as Style}/>)}
     {(cls === "rain" || cls === "drizzle" || cls === "thunderstorm") && <>{rain.slice(0, rainCount).map((p, i) => <span key={i} data-fx="fall" aria-hidden="true" style={{ "--x": p.x, "--s": cls === "drizzle" ? 6 + (i % 4) : heavy ? 30 + (i % 15) : actualIntensity < 0.6 ? 16 + (i % 7) : 20 + (i % 11), "--tilt": heavy ? "-8deg" : "0deg", "--d": `${Math.max(0.2, (measuredHeight + 96) / (heavy ? 520 + (i % 7) * 30 : cls === "drizzle" ? 180 + (i % 5) * 20 : actualIntensity < 0.6 ? 300 + (i % 5) * 20 : 380 + (i % 7) * 20))}s`, "--dl": `${-p.delay - (i / Math.max(1, rainCount)) * Math.max(0.2, (measuredHeight + 96) / 340)}s`, "--o": heavy ? 0.5 + 0.45 * ((1.4 + ((p.size - 12) / 32)) - 1) / 1.4 : cls === "drizzle" ? 0.3 + (i % 4) * 0.05 : p.opacity, "--w": p.size < 12 ? 1 : heavy ? 1.4 + ((p.size - 12) / 32) : 1 + ((p.size - 12) / 32) } as Style}>{i < splashCount && <i data-fx="splash" aria-hidden="true"/>}</span>)}</>}

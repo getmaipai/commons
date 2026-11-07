@@ -57,6 +57,11 @@
     "minimumY": 40,
     "minimumX": 60
   },
+  "moon": {
+    "synodicMonthDays": 29.530588853,
+    "referenceNewMoon": "2000-01-06T18:14:00Z",
+    "phaseNames": ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"]
+  },
   "variants": [
     "full",
     "compact",

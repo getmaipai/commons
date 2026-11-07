@@ -31,9 +31,17 @@ export function phaseOf(input: PhaseInput): PhaseResult {
   return { phase, elevation, t, dayFraction };
 }
 export function lightPosition(variant: WeatherVariant, fraction: number, kind: "sun" | "moon" = "sun") {
-  void kind;
-  if (variant === "compact" || variant === "lite") return { x: scene.light.compactX, y: scene.light.compactYStart - scene.light.compactYTravel * Math.sin(Math.PI * fraction) };
-  return { x: scene.light.fullXStart - scene.light.fullXTravel * fraction, y: scene.light.fullYStart - scene.light.fullYTravel * Math.sin(Math.PI * fraction) };
+  const arcFraction = kind === "moon" ? 1 - fraction : fraction;
+  if (variant === "compact" || variant === "lite") return { x: scene.light.compactX, y: scene.light.compactYStart - scene.light.compactYTravel * Math.sin(Math.PI * arcFraction) };
+  return { x: scene.light.fullXStart - scene.light.fullXTravel * arcFraction, y: scene.light.fullYStart - scene.light.fullYTravel * Math.sin(Math.PI * arcFraction) };
+}
+export function moonFromDate(now: Date | string | number = Date.now()) {
+  const timestamp = now instanceof Date ? now.getTime() : typeof now === "number" ? now : new Date(now).getTime();
+  const reference = new Date(scene.moon.referenceNewMoon).getTime();
+  const cycle = ((timestamp - reference) / 86400000 / scene.moon.synodicMonthDays % 1 + 1) % 1;
+  const illumination = (1 - Math.cos(2 * Math.PI * cycle)) * 50;
+  const phaseIndex = Math.round(cycle * 8) % 8;
+  return { phase: scene.moon.phaseNames[phaseIndex]!, illumination };
 }
 export function weatherIntensityOf(code: number) { return scene.intensity[String(code) as keyof typeof scene.intensity] ?? 0; }
 export function cloudWindFactor(wind?: number) { return wind === undefined ? 1 : clamp(scene.clouds.wind.base + wind * scene.clouds.wind.perKmh, scene.clouds.wind.min, scene.clouds.wind.max); }

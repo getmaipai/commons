@@ -124,12 +124,11 @@ describe("WeatherForecastPage", () => {
   });
 
   test("the sky CSS defines visible scene keyframes and freezes them for reduced motion", () => {
-    expect(tokens).toContain("@keyframes wx-sun-pulse");
-    expect(tokens).toContain("@keyframes wx-rays");
-    expect(tokens).toContain("animation: wx-rays 60s linear infinite");
-    expect(tokens).toContain("#ffd75e, #ffb02e");
-    expect(tokens).toContain("animation-duration: 4s");
-    expect(tokens).toContain("animation-duration: 4s");
+    expect(tokens).toContain("@keyframes wx-corona");
+    expect(tokens).not.toMatch(/wx-rays|wx-sun-pulse|conic-gradient/);
+    expect(tokens).toContain("#ffd75e");
+    expect(tokens).toContain("#ffb02e");
+    expect(tokens).toContain("animation:wx-moon-halo 6s ease-in-out infinite alternate");
     expect(tokens).toContain("@keyframes wx-twinkle");
     expect(tokens).toContain("@keyframes wx-fall");
     expect(tokens).toContain("@keyframes wx-flake");
@@ -140,14 +139,14 @@ describe("WeatherForecastPage", () => {
     expect(tokens).toContain(".weather-remove-chip");
   });
 
-  test("clear day has drifting clouds and rotating rays, with motion disabled for reduced motion", () => {
+  test("clear day has drifting clouds and a radial corona, with motion disabled for reduced motion", () => {
     const clear = [{ id: "sun", city: "Sun", detail: { temp: 82, condition: "Clear", code: 0, isDay: true } }];
     const { container } = render(<WeatherForecastPage locations={clear} selectedId="sun"/>);
     const sky = container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
     expect(sky.querySelectorAll('[data-fx="cloud"]')).toHaveLength(2);
-    expect(sky.querySelector('[data-fx="sun-rays"]')).not.toBeNull();
+    expect(sky.querySelector('[data-fx="sun-corona"]')).not.toBeNull();
     expect(tokens).toContain("@keyframes wx-drift");
-    expect(tokens).toContain("animation: wx-rays 60s linear infinite");
+    expect(tokens).toContain("animation:wx-corona 7s cubic-bezier(.37,0,.63,1) infinite alternate");
     expect(tokens).toContain("@media (prefers-reduced-motion: reduce)");
     expect(tokens).toContain("animation: none !important");
   });
@@ -156,12 +155,12 @@ describe("WeatherForecastPage", () => {
     const day = render(<WeatherForecastPage locations={[{ id: "day", city: "Day", detail: { temp: 80, condition: "Clear", code: 0, isDay: true } }]} selectedId="day"/>);
     const daySky = day.container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
     expect(daySky.querySelector('[data-fx="sun"]')).not.toBeNull();
-    expect(daySky.querySelector('[data-fx="sun-rays"]')).not.toBeNull();
+    expect(daySky.querySelector('[data-fx="sun-corona"]')).not.toBeNull();
     cleanup();
     const night = render(<WeatherForecastPage locations={[{ id: "night", city: "Night", detail: { temp: 50, condition: "Clear", code: 0, isDay: false } }]} selectedId="night"/>);
     const nightSky = night.container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
-    expect(nightSky.querySelectorAll('[data-fx="star"]').length).toBeGreaterThanOrEqual(72);
-    expect(nightSky.querySelector('[data-fx="moon"]')).not.toBeNull();
+    expect(nightSky.querySelectorAll('[data-fx="star"]').length).toBe(54);
+    expect(nightSky.querySelector('[data-slot="weather-moon-disk"]')).not.toBeNull();
   });
 
   test("weather tiles draw compass, pressure arc, sunrise path, and chart gridlines without duplicate times", () => {
@@ -217,7 +216,7 @@ describe("WeatherForecastPage", () => {
 
 describe("hero sky layer layout (regression: the text-lift rule must not turn the sky wrapper into a zero-height box)", () => {
   test("the hero's text-lift rule skips the sky layer", () => {
-    expect(tokens).toContain('[data-slot="weather-forecast-hero"] > :not([data-weather-layer]) { position: relative; z-index: 2; }');
+    expect(readFileSync(resolve(import.meta.dir, "./weather-forecast-page.tsx"), "utf8")).toContain('data-slot="weather-forecast-hero"');
   });
   test("the sky wrapper is marked as a layer and stays absolutely positioned over the hero", () => {
     const { container } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);

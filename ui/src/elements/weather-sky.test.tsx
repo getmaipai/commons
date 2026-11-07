@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, jest } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
 import { WeatherSky } from "./weather-sky";
-import { cloudWindFactor } from "./weather-scene";
+import { cloudWindFactor, moonFromDate } from "./weather-scene";
 import { readFileSync } from "node:fs";
 import type { WeatherClass } from "./weather-condition";
 import scene from "./weather-scene.json";
@@ -129,10 +129,52 @@ describe("WeatherSky moon disc", () => {
     expect(disc?.getAttribute("width")).toBe("54");
   });
 
-  test("keeps the generic crescent when moon data is absent", () => {
-    const { container } = render(<WeatherSky cls="clear" isDay={false} />);
-    expect(container.querySelector('[data-fx="moon"]')).not.toBeNull();
-    expect(container.querySelector('[data-slot="weather-moon-disk"]')).toBeNull();
+  test("calculates moon phases and always renders MoonDisc on clear and partly cloudy nights", () => {
+    const newMoon = moonFromDate("2000-01-06T18:14:00Z");
+    const fullMoon = moonFromDate("2000-01-21T04:40:00Z");
+    expect(newMoon.illumination).toBeLessThan(3);
+    expect(fullMoon.illumination).toBeGreaterThan(97);
+    expect(moonFromDate("2000-01-12T00:00:00Z").phase.startsWith("Waxing")).toBe(true);
+    expect(moonFromDate("2000-02-02T00:00:00Z").phase.startsWith("Waning")).toBe(true);
+    for (const cls of ["clear", "partly-cloudy"] as const) {
+      const { container, unmount } = render(<WeatherSky cls={cls} isDay={false} now="2000-01-21T04:40:00Z" />);
+      expect(container.querySelector('[data-slot="weather-moon-disk"]')).not.toBeNull();
+      expect(container.querySelector('[data-fx="moon"]')).toBeNull();
+      unmount();
+    }
+  });
+
+  test("light and star source CSS has the required shapes", () => {
+    expect(css).not.toMatch(/sun-rays|wx-rays|wx-sun-pulse|moon-glow-pulse|conic-gradient/);
+    expect(css).toContain("@keyframes wx-corona");
+    expect(css).toContain("@keyframes wx-twinkle");
+    expect(css).toContain("--wx-night");
+    expect(css).toMatch(/radial-gradient\(circle at 35% 35%,\s*var\(--weather-sun-core\),\s*var\(--weather-sun-edge\) 78%\)/);
+    expect(css).toContain("#ffd75e");
+    expect(css).toContain("#ffb02e");
+    expect(skySource).not.toContain('data-fx="sun-rays"');
+    expect(skySource).not.toContain('data-fx="moon"');
+  });
+
+  test("light source visibility and star pools follow class, phase and variant", () => {
+    const night = (cls: WeatherClass, variant: "full" | "lite" = "full") => render(<WeatherSky cls={cls} isDay={false} variant={variant} />);
+    for (const [cls, count] of [["clear", 54], ["partly-cloudy", 30], ["overcast", 8], ["snow", 0], ["fog", 0], ["rain", 0], ["drizzle", 0], ["thunderstorm", 0]] as const) {
+      const view = night(cls);
+      expect(view.container.querySelectorAll('[data-fx="star"]')).toHaveLength(count);
+      view.unmount();
+    }
+    const compactField = night("clear", "lite");
+    expect(compactField.container.querySelectorAll('[data-fx="star"]')).toHaveLength(18);
+    compactField.unmount();
+    const dimSun = render(<WeatherSky cls="fog" isDay={true} />);
+    expect(dimSun.container.querySelector('[data-fx="sun-group"]')?.getAttribute("data-dimmed")).toBe("true");
+    dimSun.unmount();
+    for (const cls of ["overcast", "snow"] as const) {
+      const halo = night(cls);
+      expect(halo.container.querySelector('[data-fx="moon-halo"]')).not.toBeNull();
+      expect(halo.container.querySelector('[data-fx="moon-disc"]')).toBeNull();
+      halo.unmount();
+    }
   });
 });
 

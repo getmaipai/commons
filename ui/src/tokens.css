@@ -2114,16 +2114,6 @@ body {
 }
 [data-slot="weather-sky"] [data-fx="pile"][data-leaving="true"] { animation: wx-pile 1.2s ease-out reverse both; }
 [data-slot="weather-sky"] [data-fx="snow-core"] { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--weather-snow-flake) 0%, transparent 78%); }
-[data-slot="weather-sky"] [data-fx="star"] {
-  top: calc(var(--y) * 1%);
-  left: calc(var(--x) * 1%);
-  width: calc(var(--s) * 1px);
-  height: calc(var(--s) * 1px);
-  border-radius: 9999px;
-  opacity: var(--o);
-  background: var(--weather-star);
-  animation: wx-twinkle var(--d) ease-in-out var(--dl) infinite alternate;
-}
 /* Cloud depth table: scale, opacity, speed, y band, z-index, unscaled width. */
 [data-slot="weather-sky"] [data-fx="cloud"] {
   position: absolute;
@@ -2157,45 +2147,25 @@ body {
 [data-slot="weather-sky"][data-class="drizzle"] [data-fx="fog"] { --o: .10; --d: 7s; --breath: 7s; }
 [data-slot="weather-sky"][data-class="snow"][data-variant="lite"] [data-fx="pile"] { display: none; }
 [data-slot="weather-sky"][data-class="snow"][data-variant="lite"] [data-fx="sway"] { display: none; }
-[data-slot="weather-sky"] [data-fx="sun"],
-[data-slot="weather-sky"] [data-fx="moon"],
-[data-slot="weather-sky"] [data-fx="moon-glow"] {
-  top: -70px;
-  right: 14%;
-  width: 200px;
-  height: 200px;
-  border-radius: 9999px;
-  background: radial-gradient(circle, var(--weather-sun-glow), transparent 68%);
-  animation: wx-moon-glow 4s ease-in-out infinite alternate;
-}
-[data-slot="weather-moon-disk"] {
-  overflow: visible;
-  filter: drop-shadow(0 0 5px var(--weather-moon-glow));
-  animation: moon-glow-pulse 5.5s ease-in-out infinite alternate;
-}
-@keyframes moon-glow-pulse {
-  from { filter: drop-shadow(0 0 3px var(--weather-moon-glow)); }
-  to { filter: drop-shadow(0 0 8px var(--weather-moon-glow)); }
-}
-@media (prefers-reduced-motion: reduce) {
-  [data-slot="weather-moon-disk"] { animation: none; }
-}
-[data-slot="weather-sky"] [data-fx="sun"] { animation-name: wx-sun-pulse; animation-duration: 4s; }
-[data-slot="weather-location-sky"] [data-fx="sun"], [data-slot="weather-location-sky"] [data-fx="sun-rays"] { right: -80px; top: -82px; }
-[data-slot="weather-forecast-hero"] [data-fx="sun"], [data-slot="weather-forecast-hero"] [data-fx="sun-rays"] { left: 62%; top: 18%; right: auto; }
-[data-slot="weather-forecast-hero"] > :not([data-weather-layer]) { position: relative; z-index: 2; }
-/* The sun core keeps the original #ffd75e, #ffb02e gradient stops. */
-[data-slot="weather-sky"] [data-fx="sun"]::after { content: ""; position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--weather-sun-core), var(--weather-sun-edge) 78%); box-shadow: 0 0 46px 20px var(--weather-sun-glow), 0 0 96px 32px var(--weather-sun-shadow); }
-[data-slot="weather-sky"] [data-fx="sun-rays"] { top: -55px; right: 3%; width: 170px; height: 170px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg 8deg, var(--weather-sun-ray) 9deg 11deg, transparent 12deg 30deg); mask: radial-gradient(circle, transparent 0 38%, var(--weather-mask-ink) 40% 65%, transparent 67%); animation: wx-rays 60s linear infinite; }
-[data-slot="weather-sky"] [data-fx="moon"],
-[data-slot="weather-sky"] [data-fx="moon-glow"] {
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, var(--weather-moon-glow), transparent 68%);
-}
-[data-slot="weather-sky"] [data-fx="moon"]::after { content: ""; position: absolute; top: 20%; left: 30%; width: 54px; height: 54px; border-radius: 50%; background: var(--weather-moon-core); box-shadow: 0 0 25px 8px var(--weather-moon-glow); }
-[data-slot="weather-sky"] [data-fx="moon"]::before { content: ""; position: absolute; z-index: 1; top: 15%; left: 39%; width: 52px; height: 52px; border-radius: 50%; background: var(--weather-moon-night); }
-[data-slot="weather-sky"] [data-fx="moon-disc"] { position: absolute; top: 52%; left: 30%; width: 54px; height: 54px; line-height: 0; }
+[data-slot="weather-sky"] [data-fx="sun-group"] { position:absolute; left:var(--wx-light-x); top:var(--wx-light-y); width:220px; height:220px; transform:translate(-50%,-50%); transition:transform 3200ms cubic-bezier(.37,0,.63,1); z-index:20; }
+[data-slot="weather-sky"] [data-fx="sun-halo-a"], [data-slot="weather-sky"] [data-fx="sun-halo-b"], [data-slot="weather-sky"] [data-fx="sun-corona"], [data-slot="weather-sky"] [data-fx="sun"] { position:absolute; left:50%; top:50%; border-radius:50%; transform:translate(-50%,-50%); }
+[data-slot="weather-sky"] [data-fx="sun-halo-a"] { width:96px; height:96px; opacity:.55; background:radial-gradient(circle,var(--weather-sun-glow),transparent 70%); }
+[data-slot="weather-sky"] [data-fx="sun-halo-b"] { width:220px; height:220px; opacity:.30; background:radial-gradient(circle,var(--weather-sun-shadow),transparent 70%); }
+[data-slot="weather-sky"] [data-fx="sun-corona"] { width:150px; height:150px; opacity:.55; background:radial-gradient(circle,var(--weather-sun-glow) 0 24%,transparent 72%); animation:wx-corona 7s cubic-bezier(.37,0,.63,1) infinite alternate; }
+[data-slot="weather-sky"] [data-fx="sun"] { width:40px; height:40px; opacity:1; background:radial-gradient(circle at 35% 35%,var(--weather-sun-core),var(--weather-sun-edge) 78%); animation:wx-sun-breathe 9s cubic-bezier(.37,0,.63,1) infinite alternate; }
+[data-slot="weather-sky"][data-phase="dawn"] [data-fx="sun"] { background:radial-gradient(circle at 35% 35%,color-mix(in oklab,var(--weather-sun-core),var(--wx-glow) 42%),color-mix(in oklab,var(--weather-sun-edge),var(--wx-glow) 42%) 78%); }
+[data-slot="weather-sky"][data-phase="dusk"] [data-fx="sun"] { background:radial-gradient(circle at 35% 35%,color-mix(in oklab,var(--weather-sun-core),var(--wx-glow) 42%),color-mix(in oklab,var(--weather-sun-edge),var(--wx-glow) 42%) 78%); }
+[data-slot="weather-sky"] [data-fx="sun-group"][data-dimmed="true"] { opacity:.35; }
+[data-slot="weather-sky"] [data-fx="moon-group"] { position:absolute; left:var(--wx-moon-x); top:var(--wx-moon-y); width:150px; height:150px; transform:translate(-50%,-50%); transition:transform 3200ms cubic-bezier(.37,0,.63,1); z-index:20; }
+[data-slot="weather-sky"] [data-fx="moon-halo"] { position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle,var(--weather-moon-glow),transparent 70%); opacity:.95; animation:wx-moon-halo 6s ease-in-out infinite alternate; }
+[data-slot="weather-sky"] [data-fx="moon-group"][data-halo-only="true"] [data-fx="moon-halo"] { opacity:.25; animation:none; }
+[data-slot="weather-sky"] [data-fx="moon-disc"] { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; line-height:0; }
+[data-slot="weather-sky"] [data-slot="weather-moon-disk"] { filter:none; animation:none; }
+[data-slot="weather-sky"] [data-fx="star-field"] { position:absolute; inset:0; opacity:var(--wx-night); animation:wx-star-in 1.2s ease-out both; z-index:19; }
+[data-slot="weather-sky"] [data-fx="star"] { position:absolute; top:calc(var(--y) * 1%); left:calc(var(--x) * 1%); width:calc(var(--s) * 1px); height:calc(var(--s) * 1px); border-radius:50%; opacity:.85; background:var(--weather-star); }
+[data-slot="weather-sky"] [data-fx="star"][data-twinkle="true"] { animation:wx-twinkle var(--d) ease-in-out var(--dl) infinite alternate; }
+[data-slot="weather-sky"][data-class="overcast"] [data-fx="star"] { opacity:.25; }
+[data-slot="weather-sky"][data-class="overcast"] [data-fx="star"] { top:calc(var(--y) * 5%); }
 [data-slot="weather-sky"] [data-fx="flash"] {
   inset: 0;
   opacity: 0;
@@ -2211,6 +2181,7 @@ body {
 @property --wx-cloud-lit { syntax: "<color>"; inherits: true; initial-value: white; }
 @property --wx-cloud-shade { syntax: "<color>"; inherits: true; initial-value: gray; }
 @property --wx-t { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --wx-night { syntax: "<number>"; inherits: true; initial-value: 0; }
 [data-slot="weather-sky"] { position: absolute; inset: 0; overflow: hidden; container-type: size; --wx-top: color-mix(in oklab, var(--wx-night-top), color-mix(in oklab, var(--wx-twilight-top), var(--wx-day-top) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-mid: color-mix(in oklab, var(--wx-night-mid), color-mix(in oklab, var(--wx-twilight-mid), var(--wx-day-mid) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-bottom: color-mix(in oklab, var(--wx-night-bottom), color-mix(in oklab, var(--wx-twilight-bottom), var(--wx-day-bottom) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-scrim: color-mix(in oklab, var(--wx-top), var(--weather-scrim-base) 78%); --wx-cloud-lit: color-mix(in oklab, var(--wx-cloud-night-lit), color-mix(in oklab, var(--wx-cloud-twilight-lit), var(--wx-cloud-day-lit) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); --wx-cloud-shade: color-mix(in oklab, var(--wx-cloud-night-shade), color-mix(in oklab, var(--wx-cloud-twilight-shade), var(--wx-cloud-day-shade) clamp(0%, (var(--wx-t) - .5) * 200%, 100%)) clamp(0%, var(--wx-t) * 200%, 100%)); }
 [data-slot="weather-sky"][data-mounted="true"] { transition: --wx-top 3200ms cubic-bezier(.37, 0, .63, 1), --wx-mid 3200ms cubic-bezier(.37, 0, .63, 1), --wx-bottom 3200ms cubic-bezier(.37, 0, .63, 1), --wx-glow 3200ms cubic-bezier(.37, 0, .63, 1), --wx-scrim 3200ms cubic-bezier(.37, 0, .63, 1), --wx-cloud-lit 3200ms cubic-bezier(.37, 0, .63, 1), --wx-cloud-shade 3200ms cubic-bezier(.37, 0, .63, 1), --wx-t 3200ms cubic-bezier(.37, 0, .63, 1); }
 [data-slot="weather-sky"] .weather-sky-base { position:absolute; inset:0; background:linear-gradient(to bottom, oklch(from var(--wx-top) min(l, .46) c h) 0%, oklch(from var(--wx-mid) min(l, .50) c h) 55%, oklch(from var(--wx-bottom) min(l, .50) c h) 100%); }
@@ -2229,22 +2200,17 @@ body {
 @keyframes wx-fog { from { transform: translateX(-10%) scale(var(--fog-scale, 1)); } to { transform: translateX(10%) scale(var(--fog-scale, 1)); } }
 @keyframes wx-breathe { from { opacity: calc(var(--o) * .7); } to { opacity: var(--o); } }
 @keyframes wx-twinkle {
-  from { opacity: 0.15; }
-  to { opacity: 1; }
+  from { opacity: 1; }
+  to { opacity: .65; }
 }
+@keyframes wx-corona { from { transform:scale(.96); opacity:.45; } to { transform:scale(1.08); opacity:.65; } }
+@keyframes wx-sun-breathe { from { transform:scale(1); } to { transform:scale(1.04); } }
+@keyframes wx-moon-halo { from { opacity:.85; } to { opacity:1; } }
+@keyframes wx-star-in { from { opacity:0; } to { opacity:var(--wx-night); } }
 @keyframes wx-drift {
   from { transform: translate3d(-100%, 0, 0); }
   to { transform: translate3d(100cqw, 0, 0); }
 }
-@keyframes wx-sun-pulse {
-  from { opacity: 0.55; transform: scale(.72); }
-  to { opacity: 1; transform: scale(1.08); }
-}
-@keyframes wx-moon-glow {
-  from { opacity: .62; transform: scale(.92); }
-  to { opacity: 1; transform: scale(1.04); }
-}
-@keyframes wx-rays { to { transform: rotate(360deg); } }
 @keyframes wx-bolt { 0%, 91%, 100% { opacity: 0; } 92%, 94% { opacity: .95; } 95% { opacity: .12; } 96% { opacity: .9; } 98% { opacity: 0; } }
 /* Two soft flashes close together, then quiet: never more than three flashes in a second. */
 @keyframes wx-flash {

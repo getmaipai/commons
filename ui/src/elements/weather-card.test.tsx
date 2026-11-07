@@ -91,8 +91,8 @@ describe("WeatherCard", () => {
 
   test("night, rain and snow scenes contain enough particles for visible motion", () => {
     const night = render(<WeatherCard {...props} current={{ ...props.current, code: 0, is_day: false }} />);
-    expect(night.container.querySelectorAll('[data-fx="star"]')).toHaveLength(72);
-    expect(night.container.querySelector('[data-fx="moon"]')).not.toBeNull();
+    expect(night.container.querySelectorAll('[data-fx="star"]')).toHaveLength(54);
+    expect(night.container.querySelector('[data-slot="weather-moon-disk"]')).not.toBeNull();
     cleanup();
     const rainy = render(<WeatherCard {...props} current={{ ...props.current, code: 61 }} />);
     expect(rainy.container.querySelectorAll('[data-fx="fall"]')).toHaveLength(12);
@@ -123,7 +123,7 @@ describe("WeatherCard", () => {
   test("sun, shaped clouds and storm bolt render for their weather classes", () => {
     const clear = render(<WeatherCard {...props} current={{ ...props.current, code: 0, is_day: true }} />);
     expect(clear.container.querySelector('[data-fx="sun"]')).not.toBeNull();
-    expect(clear.container.querySelector('[data-fx="sun-rays"]')).not.toBeNull();
+    expect(clear.container.querySelector('[data-fx="sun-corona"]')).not.toBeNull();
     cleanup();
     const partly = render(<WeatherCard {...props} current={{ ...props.current, code: 2, is_day: true }} />);
     expect(partly.container.querySelectorAll('[data-fx="cloud"]')).toHaveLength(4);
