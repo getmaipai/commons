@@ -57,6 +57,7 @@ import { StudioNodeView } from "@/kit/schema/StudioNodeView";
 import { ResultFeedNodeView } from "@/kit/schema/ResultFeedNodeView";
 import { evaluateCondition } from "@/kit/schema/condition";
 import { fillTemplate, readField, writeField } from "@/kit/schema/fieldPath";
+import { i18n } from "@/kit/i18n";
 import type {
   UiNode,
   SectionNode,
@@ -120,11 +121,11 @@ function EmptyStateNodeView({ node }: { node: EmptyStateNode }) {
 // A page names its own words with `action_label` ("Add a folder"); this plain label is the fallback.
 function actionLabel(action: EmptyStateNode["action"]): string {
   if (!action) return "";
-  if ("navigate" in action) return "Go";
-  if ("call" in action) return "Continue";
-  if ("confirm" in action) return "Continue";
-  if ("ask" in action) return "Continue";
-  return "Play";
+  if ("navigate" in action) return i18n._({ id: "ui.Go", message: "Go" });
+  if ("call" in action) return i18n._({ id: "ui.Continue", message: "Continue" });
+  if ("confirm" in action) return i18n._({ id: "ui.Continue", message: "Continue" });
+  if ("ask" in action) return i18n._({ id: "ui.Continue", message: "Continue" });
+  return i18n._({ id: "ui.Play", message: "Play" });
 }
 
 function ProgressNodeView({ node }: { node: ProgressNode }) {
@@ -145,7 +146,7 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
     const value = person as Row;
     if (typeof value.id !== "string") return null;
     const rawName = typeof value.name === "string" ? value.name.trim() : "";
-    const name = !rawName || /\{[^{}]+\}/.test(rawName) ? "Someone" : rawName;
+    const name = !rawName || /\{[^{}]+\}/.test(rawName) ? i18n._({ id: "ui.Someone", message: "Someone" }) : rawName;
     const avatarUrl = typeof value.avatar_url === "string" && !/\{[^{}]+\}/.test(value.avatar_url) ? value.avatar_url : undefined;
     const avatarSeed = typeof value.avatar_seed === "string" && !/\{[^{}]+\}/.test(value.avatar_seed) ? value.avatar_seed : undefined;
     return { id: value.id, name, avatarUrl, avatarSeed };
@@ -336,7 +337,7 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
   const blocks = query.data
     ? (query.data.blocks ?? []).filter((block) => !kinds || kinds.includes(String((block as { kind?: unknown } | null)?.kind)))
     : undefined;
-  const emptyText = node.empty_state?.text ?? "Nothing to show right now.";
+  const emptyText = node.empty_state?.text ?? i18n._({ id: "ui.Nothing to show right now.", message: "Nothing to show right now." });
   const stated = dataStateKey(query);
   const notice = stated ? node.states?.[stated] : undefined;
   if (notice && !(query.isFetching && query.data === undefined)) {
@@ -348,7 +349,7 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
       error={query.isError}
       isFetching={query.isFetching}
       onRetry={() => query.refetch()}
-      errorMessage={node.empty_state?.text ?? "Could not load this. Try again."}
+      errorMessage={node.empty_state?.text ?? i18n._({ id: "ui.Could not load this. Try again.", message: "Could not load this. Try again." })}
       isEmpty={(list) => list.length === 0}
       emptyIcon={node.empty_state?.icon ?? "inbox"}
       emptyText={emptyText}
@@ -370,7 +371,7 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
 
 
 
-const GEOLOCATION_UNSUPPORTED = "This browser cannot share its location. Choose a saved place instead.";
+const GEOLOCATION_UNSUPPORTED = "unsupported";
 
 // The device location, on the choice that asked for it and never before. Two decimals is
 // about a kilometre, which is all a forecast needs; the hub coarsens further for a child.
@@ -410,7 +411,7 @@ function useDeviceLocation(stateName: string, state: Row) {
       .catch((e: unknown) => {
         if (ticket !== latest.current) return;
         const reason = e instanceof Error ? e.message : "";
-        setNote(reason === GEOLOCATION_UNSUPPORTED ? GEOLOCATION_UNSUPPORTED : reason === "unavailable" ? "Could not find your location just now. Try again, or choose a saved place." : locationBlockedHelp());
+        setNote(reason === GEOLOCATION_UNSUPPORTED ? i18n._({ id: "ui.This browser cannot share its location. Choose a saved place instead.", message: "This browser cannot share its location. Choose a saved place instead." }) : reason === "unavailable" ? i18n._({ id: "ui.Could not find your location just now. Try again, or choose a saved place.", message: "Could not find your location just now. Try again, or choose a saved place." }) : locationBlockedHelp());
       })
       .finally(() => {
         if (ticket === latest.current) setBusy(false);
@@ -566,7 +567,7 @@ function SearchControl({ node, state, recents }: { node: SearchNode; state: Row;
       <Input
         type="search"
         value={text}
-        aria-label={node.label ?? "Search"}
+        aria-label={node.label ?? i18n._({ id: "ui.Search", message: "Search" })}
         placeholder={node.placeholder}
         autoComplete="off"
         onChange={(e) => change(e.target.value)}
@@ -587,7 +588,7 @@ function SearchControl({ node, state, recents }: { node: SearchNode; state: Row;
             </Button>
           ))}
           {node.clear_recents ? (
-            <Button type="button" variant="ghost" size="sm" onClick={() => dispatch(node.clear_recents!, [{}])}>Clear</Button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => dispatch(node.clear_recents!, [{}])}>{i18n._({ id: "ui.Clear", message: "Clear" })}</Button>
           ) : null}
         </div>
       ) : null}
@@ -948,7 +949,7 @@ function ListNodeView({ node }: { node: ListNode }) {
             ))}
           </BatchBar>
         ) : (
-          <SelectModeToggle label={node.batch.select_label ?? "Select"} onClick={() => setSelectMode(true)} />
+          <SelectModeToggle label={node.batch.select_label ?? i18n._({ id: "ui.Select", message: "Select" })} onClick={() => setSelectMode(true)} />
         )
       ) : null}
 
@@ -957,10 +958,10 @@ function ListNodeView({ node }: { node: ListNode }) {
         error={query.isError}
         isFetching={query.isFetching}
         onRetry={() => query.refetch()}
-        errorMessage="Could not load this list."
+        errorMessage={i18n._({ id: "ui.Could not load this list.", message: "Could not load this list." })}
         isEmpty={(rows) => rows.length === 0}
         emptyIcon={node.empty_state?.icon ?? "inbox"}
-        emptyText={node.empty_state?.text ?? "Nothing here yet."}
+        emptyText={node.empty_state?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
         emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
         onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
       >
@@ -983,7 +984,7 @@ function ListNodeView({ node }: { node: ListNode }) {
                   <Checkbox
                     checked={selected.has(keyOf(row))}
                     onCheckedChange={() => toggle(keyOf(row))}
-                    aria-label={`Select ${String(readField(row, node.item_label_field))}`}
+                    aria-label={i18n._({ id: "ui.Select {name}", message: "Select {name}", values: { name: String(readField(row, node.item_label_field)) } })}
                     className="shrink-0"
                   />
                 ) : null}
@@ -1050,10 +1051,10 @@ function CardGridNodeView({ node }: { node: CardGridNode }) {
       error={query.isError}
       isFetching={query.isFetching}
       onRetry={() => query.refetch()}
-      errorMessage="Could not load this grid."
+      errorMessage={i18n._({ id: "ui.Could not load this grid.", message: "Could not load this grid." })}
       isEmpty={(rows) => rows.length === 0}
       emptyIcon={node.empty_state?.icon ?? "inbox"}
-      emptyText={node.empty_state?.text ?? "Nothing here yet."}
+      emptyText={node.empty_state?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
@@ -1116,17 +1117,17 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
       error={query.isError}
       isFetching={query.isFetching}
       onRetry={() => query.refetch()}
-      errorMessage="Could not load this shelf."
+      errorMessage={i18n._({ id: "ui.Could not load this shelf.", message: "Could not load this shelf." })}
       // MEDIA-POLISH-01: a shelf that hides when empty gets its rows either way and draws nothing for none.
       isEmpty={(rows) => rows.length === 0 && !node.hide_when_empty}
       emptyIcon={node.empty_state?.icon ?? "inbox"}
-      emptyText={node.empty_state?.text ?? "Nothing here yet."}
+      emptyText={node.empty_state?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(rows) => {
         const groupKeys = node.group_by_field ? dayGroupKeys(rows, node.group_by_field) : undefined;
-        const noun = node.group_noun ?? { one: "item", other: "items" };
+        const noun = node.group_noun ?? { one: i18n._({ id: "ui.item", message: "item" }), other: i18n._({ id: "ui.items", message: "items" }) };
         const favoriteOn = (row: Row) => pressed[keyOf(row)] ?? readField(row, node.favorite!.field) === true;
         return (
         <>
@@ -1134,13 +1135,13 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             items={rows}
             getKey={keyOf}
             groupBy={groupKeys
-              ? { getKey: (row) => groupKeys.get(row) ?? "undated", label: (key, count) => `${key === "undated" ? "Earlier" : dayHeading(key)}, ${count} ${count === 1 ? noun.one : noun.other}` }
+              ? { getKey: (row) => groupKeys.get(row) ?? "undated", label: (key, count) => i18n._({ id: "ui.{day}, {count} {noun}", message: "{day}, {count} {noun}", values: { day: key === "undated" ? i18n._({ id: "ui.Earlier", message: "Earlier" }) : dayHeading(key), count, noun: count === 1 ? noun.one : noun.other } }) }
               : undefined}
             sizeControl={node.size_control ? { size: tileSize, onChange: setTileSize } : undefined}
             favorite={node.favorite
               ? {
                   isOn: favoriteOn,
-                  label: (row) => `Favorite ${String(readField(row, node.item_label_field))}`,
+                  label: (row) => i18n._({ id: "ui.Favorite {name}", message: "Favorite {name}", values: { name: String(readField(row, node.item_label_field)) } }),
                   onToggle: (row) => {
                     const id = keyOf(row);
                     const next = !favoriteOn(row);
@@ -1262,7 +1263,7 @@ function MusicBlockState({ bind, state, hideWhenEmpty, emptyState, errorMessage,
       errorMessage={errorMessage}
       isEmpty={(rows) => rows.length === 0 && !hideWhenEmpty}
       emptyIcon={emptyState?.icon ?? "music"}
-      emptyText={emptyState?.text ?? "Nothing here yet."}
+      emptyText={emptyState?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
       emptyActionLabel={emptyState?.action ? (emptyState.action_label ?? actionLabel(emptyState.action)) : undefined}
       onEmptyAction={emptyState?.action ? () => dispatch(emptyState.action!) : undefined}
     >
@@ -1298,7 +1299,7 @@ function musicArt(row: Row, path: string | undefined) {
 
 function QuickTilesNodeView({ node, state }: { node: QuickTilesNode; state: Row }) {
   return (
-    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage="Could not load these tiles.">
+    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage={i18n._({ id: "ui.Could not load these tiles.", message: "Could not load these tiles." })}>
       {(rows, dispatch) => (
         <QuickTiles
           items={rows}
@@ -1318,7 +1319,7 @@ function QuickTilesNodeView({ node, state }: { node: QuickTilesNode; state: Row 
 
 function TopResultNodeView({ node, state }: { node: TopResultNode; state: Row }) {
   return (
-    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage="Could not load the top result.">
+    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage={i18n._({ id: "ui.Could not load the top result.", message: "Could not load the top result." })}>
       {(rows, dispatch) => {
         const row = rows[0];
         if (!row) return null;
@@ -1341,7 +1342,7 @@ function TopResultNodeView({ node, state }: { node: TopResultNode; state: Row })
 
 function CategoryTilesNodeView({ node, state }: { node: CategoryTilesNode; state: Row }) {
   return (
-    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage="Could not load these categories.">
+    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage={i18n._({ id: "ui.Could not load these categories.", message: "Could not load these categories." })}>
       {(rows, dispatch) => {
         const byId = new Map(rows.map((row) => [String(readField(row, node.item_key_field)), row]));
         return (
@@ -1363,7 +1364,7 @@ function CategoryTilesNodeView({ node, state }: { node: CategoryTilesNode; state
 
 function TrackRowsNodeView({ node, state }: { node: TrackRowsNode; state: Row }) {
   return (
-    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage="Could not load these tracks.">
+    <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage={i18n._({ id: "ui.Could not load these tracks.", message: "Could not load these tracks." })}>
       {(rows, dispatch) => (
         <TrackRows
           items={rows}
@@ -1420,17 +1421,17 @@ function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row })
       error={query.isError}
       isFetching={query.isFetching}
       onRetry={() => query.refetch()}
-      errorMessage="Could not load the featured items."
+      errorMessage={i18n._({ id: "ui.Could not load the featured items.", message: "Could not load the featured items." })}
       isEmpty={(rows) => rows.length === 0 && !node.hide_when_empty}
       emptyIcon={node.empty_state?.icon ?? "film"}
-      emptyText={node.empty_state?.text ?? "Nothing featured yet."}
+      emptyText={node.empty_state?.text ?? i18n._({ id: "ui.Nothing featured yet.", message: "Nothing featured yet." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(rows) => rows.length === 0 ? null : (
         <>
           <Billboard
-            label={node.label ?? "Featured"}
+            label={node.label ?? i18n._({ id: "ui.Featured", message: "Featured" })}
             size={node.size}
             autoplay={node.autoplay}
             slides={rows.map((row) => ({
@@ -1460,12 +1461,12 @@ function ReaderNodeView({ node, state }: { node: ReaderNode; state: Row }) {
     <AsyncState
       data={item === undefined && query.data !== undefined ? null : item}
       error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()}
-      errorMessage="Could not load this book."
+      errorMessage={i18n._({ id: "ui.Could not load this book.", message: "Could not load this book." })}
       isEmpty={(row) => {
         const src = readField(row, field("src"));
         return row === null || typeof src !== "string" || !sameOriginBookUrl(src, document.baseURI) || !["epub", "pdf"].includes(String(formatFor(row)));
       }}
-      emptyIcon={node.empty_state?.icon ?? "book"} emptyText={node.empty_state?.text ?? "This book is not available."}
+      emptyIcon={node.empty_state?.icon ?? "book"} emptyText={node.empty_state?.text ?? i18n._({ id: "ui.This book is not available.", message: "This book is not available." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
@@ -1474,7 +1475,7 @@ function ReaderNodeView({ node, state }: { node: ReaderNode; state: Row }) {
         const format = formatFor(r) as "epub" | "pdf";
         return <>
           <Reader key={String(readField(r, field("id")) ?? readField(r, field("src")))} src={String(readField(r, field("src")))} format={format}
-            title={String(readField(r, field("title")) ?? "Reader")} theme={node.theme} fontSize={node.font_size}
+            title={String(readField(r, field("title")) ?? i18n._({ id: "ui.Reader", message: "Reader" }))} theme={node.theme} fontSize={node.font_size}
             locator={readerLocator(readField(r, field("locator")), format)}
             onLocatorChange={node.on_locator ? (locator, percent) => dispatch(node.on_locator!, [{ ...r, locator, percent }], undefined, { quiet: true, keepalive: true, typedArgs: true }) : undefined}
             onClose={node.on_close ? () => dispatch(node.on_close!, [r]) : undefined} />
@@ -1497,7 +1498,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const [editOpen, setEditOpen] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, unknown>>({});
   const [editError, setEditError] = useState<string | null>(null);
-  useEffect(() => { if (lastError !== null && editOpen) setEditError("Could not save. Check that you are online, then try again."); }, [lastError, editOpen]);
+  useEffect(() => { if (lastError !== null && editOpen) setEditError(i18n._({ id: "ui.Could not save. Check that you are online, then try again.", message: "Could not save. Check that you are online, then try again." })); }, [lastError, editOpen]);
   const field = (name: keyof NonNullable<PlayerNode["fields"]>, fallback: string) => node.fields?.[name] ?? fallback;
   const item = Array.isArray(query.data) ? query.data[0] : query.data;
   return (
@@ -1506,10 +1507,10 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
       error={query.isError}
       isFetching={query.isFetching}
       onRetry={() => query.refetch()}
-      errorMessage="Could not load this item."
+      errorMessage={i18n._({ id: "ui.Could not load this item.", message: "Could not load this item." })}
       isEmpty={(row) => row === null || localPicture(readField(row, field("src", "src"))) === null}
       emptyIcon={node.empty_state?.icon ?? "film"}
-      emptyText={node.empty_state?.text ?? "This item is not available."}
+      emptyText={node.empty_state?.text ?? i18n._({ id: "ui.This item is not available.", message: "This item is not available." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
@@ -1556,7 +1557,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               subtitle={(readField(r, field("subtitle", "subtitle")) as string | undefined) ?? undefined}
               poster={localPicture(readField(r, field("poster", "poster"))) ?? undefined}
               lyrics={hasLyrics || node.lyrics_enabled ? lyrics : undefined}
-              lyricsLabel="Lyrics"
+              lyricsLabel={i18n._({ id: "ui.Lyrics", message: "Lyrics" })}
               artSpring={node.art_spring}
               lyricsBlur={node.lyrics_blur}
               lyricsEmptyText={node.lyrics_empty_text}
@@ -1603,8 +1604,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   );
 }
 
-const CAST_LOAD_FAILED = "Could not look for other screens. Check that you are online, then open the menu again.";
-const CAST_SEND_FAILED = "Could not play this on the other screen. Make sure it is on and signed in, then try again.";
+const castLoadFailed = () => i18n._({ id: "ui.Could not look for other screens. Check that you are online, then open the menu again.", message: "Could not look for other screens. Check that you are online, then open the menu again." });
+const castSendFailed = () => i18n._({ id: "ui.Could not play this on the other screen. Make sure it is on and signed in, then try again.", message: "Could not play this on the other screen. Make sure it is on and signed in, then try again." });
 
 /** HANDOFF-01c: the Player's `castSlot`: the kit's own DropdownMenu listing the household's other screens. Targets load
  * each time the menu opens. Choosing one sends the item with the player's current time. */
@@ -1630,23 +1631,23 @@ function PlayerCastMenu({ host, item, getPosition, onError }: { host: MediaHost;
     onError(null);
     Promise.resolve()
       .then(() => host.castTo!(target.id, item, getPosition()))
-      .catch((e) => onError(e instanceof Error && e.message ? e.message : CAST_SEND_FAILED));
+      .catch((e) => onError(e instanceof Error && e.message ? e.message : castSendFailed()));
   };
   return (
     <DropdownMenu onOpenChange={load}>
       <DropdownMenuTrigger asChild>
-        <Button ref={trigger} variant="ghost" size="icon" aria-label="Play on another screen" data-slot="player-cast-targets">
+        <Button ref={trigger} variant="ghost" size="icon" aria-label={i18n._({ id: "ui.Play on another screen", message: "Play on another screen" })} data-slot="player-cast-targets">
           {Glyph ? <Glyph /> : null}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent container={trigger.current?.closest<HTMLElement>('[data-slot="player"]') ?? undefined} align="end">
-        <DropdownMenuLabel>Play on another screen</DropdownMenuLabel>
+        <DropdownMenuLabel>{i18n._({ id: "ui.Play on another screen", message: "Play on another screen" })}</DropdownMenuLabel>
         {targets === null ? (
-          <DropdownMenuItem disabled>Looking for screens</DropdownMenuItem>
+          <DropdownMenuItem disabled>{i18n._({ id: "ui.Looking for screens", message: "Looking for screens" })}</DropdownMenuItem>
         ) : loadFailed ? (
-          <DropdownMenuItem disabled>{CAST_LOAD_FAILED}</DropdownMenuItem>
+          <DropdownMenuItem disabled>{castLoadFailed()}</DropdownMenuItem>
         ) : targets.length === 0 ? (
-          <DropdownMenuItem disabled>No other screens are on</DropdownMenuItem>
+          <DropdownMenuItem disabled>{i18n._({ id: "ui.No other screens are on", message: "No other screens are on" })}</DropdownMenuItem>
         ) : (
           targets.map((t) => (
             <DropdownMenuItem key={t.id} onSelect={() => send(t)}>
@@ -1679,15 +1680,15 @@ function PlayerDetails({ title, subtitle, facts, description, chapters, seek, sh
       {(show ?? ["title", "facts", "description", "chapters"]).includes("description") && detail ? (
         <div>
           <p className={expanded ? "text-base text-muted-foreground" : "line-clamp-2 text-base text-muted-foreground"}>{detail}</p>
-          <Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? "Show less" : "Show more"}</Button>
+          <Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? i18n._({ id: "ui.Show less", message: "Show less" }) : i18n._({ id: "ui.Show more", message: "Show more" })}</Button>
           {expanded && (show ?? ["title", "facts", "description", "chapters"]).includes("chapters") && chapters?.length ? (
-            <div className="flex flex-col" aria-label="Chapters">
+            <div className="flex flex-col" aria-label={i18n._({ id: "ui.Chapters", message: "Chapters" })}>
               {chapters.map((chapter) => <Button key={`${chapter.start_s}-${chapter.title}`} type="button" variant="ghost" size="sm" className="justify-start" onClick={() => seek(chapter.start_s)}>{formatTime(chapter.start_s)} {chapter.title}</Button>)}
             </div>
           ) : null}
         </div>
       ) : null}
-      {(show ?? ["title", "facts", "description", "chapters"]).includes("chapters") && !detail && chapters?.length ? <div className="flex flex-col" aria-label="Chapters">{chapters.map((chapter) => <Button key={`${chapter.start_s}-${chapter.title}`} type="button" variant="ghost" size="sm" className="justify-start" onClick={() => seek(chapter.start_s)}>{formatTime(chapter.start_s)} {chapter.title}</Button>)}</div> : null}
+      {(show ?? ["title", "facts", "description", "chapters"]).includes("chapters") && !detail && chapters?.length ? <div className="flex flex-col" aria-label={i18n._({ id: "ui.Chapters", message: "Chapters" })}>{chapters.map((chapter) => <Button key={`${chapter.start_s}-${chapter.title}`} type="button" variant="ghost" size="sm" className="justify-start" onClick={() => seek(chapter.start_s)}>{formatTime(chapter.start_s)} {chapter.title}</Button>)}</div> : null}
     </div>
   );
 }
@@ -1697,7 +1698,7 @@ function PlayerDetails({ title, subtitle, facts, description, chapters, seek, sh
 function PlayerActions({ actions, item, dispatch, wrap, children }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"]; wrap?: boolean; children?: ReactNode }) {
   const [busy, setBusy] = useState<string | null>(null);
   return (
-    <div className={wrap ? "flex min-w-0 flex-wrap gap-2 pb-1" : "flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"} role="group" aria-label="Actions" data-slot="player-actions">
+    <div className={wrap ? "flex min-w-0 flex-wrap gap-2 pb-1" : "flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"} role="group" aria-label={i18n._({ id: "ui.Actions", message: "Actions" })} data-slot="player-actions">
       {actions.map((a) => {
         const on = a.field ? readField(item, a.field) === true : false;
         const Glyph = a.icon ? getIcon(a.icon) : null;
@@ -1733,12 +1734,12 @@ function EditPlayerSheet({ open, onOpenChange, phone, definition, item, values, 
     {definition.fields.map(field => <div key={field.name} className="grid gap-2">
       <label className="text-sm font-medium" htmlFor={`player-edit-${field.name}`}>{field.label}</label>
       {field.kind === "cover" ? <>
-        <FileGrid label={field.label} density="compact" selectionMode items={((readField(item, definition.cover_choices_field ?? "cover_choices") as Array<{file_id:string;url:string;alt?:string}>) ?? []).map(choice => ({ id: choice.file_id, name: choice.alt ?? "Cover", kind: "image" as const, thumbnailUrl: choice.url, label: choice.alt ?? "Cover" }))} selectedIds={values[field.name] ? [String(values[field.name])] : []} onSelectionChange={ids => setValues({ ...values, [field.name]: ids[0] ?? "" })} />
-        {definition.on_upload ? <Dropzone accept="image/*" label="Add a picture" onFile={async file => { const dataUrl = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = reject; reader.readAsDataURL(file); }); const upload = definition.on_upload!; const action: Action = "call" in upload ? { call: { ...upload.call, args: { ...upload.call.args, file: "{file}" } } } : upload; dispatch(action, [{ ...item, file: { name: file.name, type: file.type, size: file.size, data_url: dataUrl } }], undefined, { typedArgs: true }); }} /> : null}
+        <FileGrid label={field.label} density="compact" selectionMode items={((readField(item, definition.cover_choices_field ?? "cover_choices") as Array<{file_id:string;url:string;alt?:string}>) ?? []).map(choice => ({ id: choice.file_id, name: choice.alt ?? i18n._({ id: "ui.Cover", message: "Cover" }), kind: "image" as const, thumbnailUrl: choice.url, label: choice.alt ?? i18n._({ id: "ui.Cover", message: "Cover" }) }))} selectedIds={values[field.name] ? [String(values[field.name])] : []} onSelectionChange={ids => setValues({ ...values, [field.name]: ids[0] ?? "" })} />
+        {definition.on_upload ? <Dropzone accept="image/*" label={i18n._({ id: "ui.Add a picture", message: "Add a picture" })} onFile={async file => { const dataUrl = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = reject; reader.readAsDataURL(file); }); const upload = definition.on_upload!; const action: Action = "call" in upload ? { call: { ...upload.call, args: { ...upload.call.args, file: "{file}" } } } : upload; dispatch(action, [{ ...item, file: { name: file.name, type: file.type, size: file.size, data_url: dataUrl } }], undefined, { typedArgs: true }); }} /> : null}
       </> : field.kind === "textarea" ? <Textarea id={`player-edit-${field.name}`} value={String(values[field.name] ?? "")} onChange={event => setValues({ ...values, [field.name]: event.currentTarget.value })} /> : <Input id={`player-edit-${field.name}`} value={String(values[field.name] ?? "")} onChange={event => setValues({ ...values, [field.name]: event.currentTarget.value })} />}
     </div>)}
     {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
-    <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="button" onClick={onSave}>Save</Button></div>
+    <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{i18n._({ id: "ui.Cancel", message: "Cancel" })}</Button><Button type="button" onClick={onSave}>{i18n._({ id: "ui.Save", message: "Save" })}</Button></div>
   </div>;
   return phone ? <Drawer open={open} onOpenChange={onOpenChange}><DrawerContent><DrawerHeader><DrawerTitle>{definition.title ?? definition.label}</DrawerTitle></DrawerHeader>{body}</DrawerContent></Drawer> : <Dialog open={open} onOpenChange={onOpenChange}><DialogContent><DialogHeader><DialogTitle>{definition.title ?? definition.label}</DialogTitle></DialogHeader>{body}</DialogContent></Dialog>;
 }
@@ -1828,7 +1829,7 @@ function WidgetsNodeView({
       errorMessage={errorMessage}
       isEmpty={(widgets) => widgets.filter((w) => w.size === size).length === 0}
       emptyIcon="sparkles"
-      emptyText="Nothing here yet."
+      emptyText={i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
     >
       {(widgets) => renderWidgets(widgets.filter((w) => w.size === size))}
     </AsyncState>
@@ -1840,7 +1841,7 @@ function WidgetCardNodeView({ node }: { node: WidgetCardNode }) {
     <WidgetsNodeView
       node={node}
       size="card"
-      errorMessage="Could not load today's cards."
+      errorMessage={i18n._({ id: "ui.Could not load today's cards.", message: "Could not load today's cards." })}
       renderWidgets={(widgets) => (
         <ul className="grid list-none gap-3 p-0" style={{ gridTemplateColumns: cardSizeGridTemplateColumns() }}>
           {widgets.map((widget) => (
@@ -1864,7 +1865,7 @@ function WidgetRowNodeView({ node }: { node: WidgetRowNode }) {
     <WidgetsNodeView
       node={node}
       size="row"
-      errorMessage="Could not load today's rows."
+      errorMessage={i18n._({ id: "ui.Could not load today's rows.", message: "Could not load today's rows." })}
       renderWidgets={(widgets) => (
         <div className="flex flex-col gap-2">
           {widgets.map((widget) => (
@@ -1896,7 +1897,7 @@ function SplitViewNodeView({ node, state }: { node: SplitViewNode; state: Row })
   const [asideOpen, setAsideOpen] = useState(false);
   if ("main" in node) {
     const aside = node.aside.map((child, i) => <NodeRenderer key={i} node={child} state={state} />);
-    if (node.aside_sheet === "phone" && phone) return <div data-slot="split-view" data-layout="main-aside"><div className="flex min-w-0 flex-col gap-4">{node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}<Button type="button" variant="outline" className="w-full" onClick={() => setAsideOpen(true)}>{node.aside_label ?? "More"}</Button><Drawer open={asideOpen} onOpenChange={setAsideOpen}><DrawerContent><DrawerHeader><DrawerTitle>{node.aside_label ?? "More"}</DrawerTitle></DrawerHeader><div className="overflow-y-auto p-4">{aside}</div></DrawerContent></Drawer></div></div>;
+    if (node.aside_sheet === "phone" && phone) return <div data-slot="split-view" data-layout="main-aside"><div className="flex min-w-0 flex-col gap-4">{node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}<Button type="button" variant="outline" className="w-full" onClick={() => setAsideOpen(true)}>{node.aside_label ?? i18n._({ id: "ui.More", message: "More" })}</Button><Drawer open={asideOpen} onOpenChange={setAsideOpen}><DrawerContent><DrawerHeader><DrawerTitle>{node.aside_label ?? i18n._({ id: "ui.More", message: "More" })}</DrawerTitle></DrawerHeader><div className="overflow-y-auto p-4">{aside}</div></DrawerContent></Drawer></div></div>;
     return (
       <SplitView
         main={node.main.map((child, i) => <NodeRenderer key={i} node={child} state={state} />)}
@@ -1962,7 +1963,7 @@ function FormNodeView({ node }: { node: FormNode }) {
         );
       })}
       <Button type="submit" disabled={submitting}>
-        {submitting ? "Working…" : "Submit"}
+        {submitting ? i18n._({ id: "ui.Working…", message: "Working…" }) : i18n._({ id: "ui.Submit", message: "Submit" })}
       </Button>
     </form>
   );

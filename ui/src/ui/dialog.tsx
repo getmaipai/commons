@@ -1,4 +1,5 @@
 import * as React from "react"
+import { i18n } from "@/kit/i18n";
 import { cn } from "@/kit/utils"
 import { XIcon } from "lucide-react"
 import { Dialog as DialogPrimitive } from "radix-ui"
@@ -105,7 +106,7 @@ function DialogContent({
               className={variant === "flow" ? "absolute top-4 right-4 sm:top-6 sm:right-6" : "absolute top-2 right-2"}
             >
               <XIcon />
-              <span className="sr-only">Close</span>
+              <span className="sr-only">{i18n._({ id: "ui.Close", message: "Close" })}</span>
             </Button>
           </DialogPrimitive.Close>
         )}
@@ -150,7 +151,7 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="outline">Close</Button>
+          <Button variant="outline">{i18n._({ id: "ui.Close", message: "Close" })}</Button>
         </DialogPrimitive.Close>
       )}
     </div>

@@ -64,6 +64,7 @@ import { Input } from "@/elements/ui/input";
 import { Textarea } from "@/elements/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/elements/ui/tooltip";
 import { formatRelative } from "../relativeTime";
+import { i18n } from "@/kit/i18n";
 import {
   BRUSH_MAX,
   BRUSH_MIN,
@@ -165,25 +166,25 @@ const DEFAULT_COLOR = "red";
 const DEFAULT_MARKUP_SIZE = 4;
 const DEFAULT_BRUSH = 40;
 
-const TOOL_META: ReadonlyArray<{ key: ImageEditorToolKey; label: string; icon: ReactNode; text?: string }> = [
-  { key: "markup", label: "Markup", icon: <PenLineIcon aria-hidden /> },
-  { key: "comment", label: "Comment", icon: <MessageSquareIcon aria-hidden /> },
-  { key: "remove_background", label: "Remove BG", icon: <WandSparklesIcon aria-hidden />, text: "Remove BG" },
-  { key: "erase", label: "Erase", icon: <EraserIcon aria-hidden /> },
-  { key: "resize", label: "Resize", icon: <ScalingIcon aria-hidden /> },
+const toolMeta = (): ReadonlyArray<{ key: ImageEditorToolKey; label: string; icon: ReactNode; text?: string }> => [
+  { key: "markup", label: i18n._({ id: "ui.Markup", message: "Markup" }), icon: <PenLineIcon aria-hidden /> },
+  { key: "comment", label: i18n._({ id: "ui.Comment", message: "Comment" }), icon: <MessageSquareIcon aria-hidden /> },
+  { key: "remove_background", label: i18n._({ id: "ui.Remove BG", message: "Remove BG" }), icon: <WandSparklesIcon aria-hidden />, text: i18n._({ id: "ui.Remove BG", message: "Remove BG" }) },
+  { key: "erase", label: i18n._({ id: "ui.Erase", message: "Erase" }), icon: <EraserIcon aria-hidden /> },
+  { key: "resize", label: i18n._({ id: "ui.Resize", message: "Resize" }), icon: <ScalingIcon aria-hidden /> },
 ];
 
-const MARKUP_TOOLS: ReadonlyArray<{ key: MarkupTool; label: string; icon: ReactNode }> = [
-  { key: "pen", label: "Pen", icon: <PenLineIcon aria-hidden /> },
-  { key: "highlighter", label: "Highlighter", icon: <HighlighterIcon aria-hidden /> },
-  { key: "arrow", label: "Arrow", icon: <MoveUpRightIcon aria-hidden /> },
-  { key: "rectangle", label: "Rectangle", icon: <SquareIcon aria-hidden /> },
-  { key: "ellipse", label: "Ellipse", icon: <CircleIcon aria-hidden /> },
-  { key: "text", label: "Text", icon: <TypeIcon aria-hidden /> },
+const markupTools = (): ReadonlyArray<{ key: MarkupTool; label: string; icon: ReactNode }> => [
+  { key: "pen", label: i18n._({ id: "ui.Pen", message: "Pen" }), icon: <PenLineIcon aria-hidden /> },
+  { key: "highlighter", label: i18n._({ id: "ui.Highlighter", message: "Highlighter" }), icon: <HighlighterIcon aria-hidden /> },
+  { key: "arrow", label: i18n._({ id: "ui.Arrow", message: "Arrow" }), icon: <MoveUpRightIcon aria-hidden /> },
+  { key: "rectangle", label: i18n._({ id: "ui.Rectangle", message: "Rectangle" }), icon: <SquareIcon aria-hidden /> },
+  { key: "ellipse", label: i18n._({ id: "ui.Ellipse", message: "Ellipse" }), icon: <CircleIcon aria-hidden /> },
+  { key: "text", label: i18n._({ id: "ui.Text", message: "Text" }), icon: <TypeIcon aria-hidden /> },
 ];
 
 const messageOf = (error: unknown) =>
-  error instanceof Error && error.message ? error.message : "Something went wrong. Try again.";
+  error instanceof Error && error.message ? error.message : i18n._({ id: "ui.Something went wrong. Try again.", message: "Something went wrong. Try again." });
 
 const isEditable = (target: EventTarget | null) =>
   target instanceof Element && target.closest("input, textarea, select, [contenteditable='true']") !== null;
@@ -268,7 +269,7 @@ function ResizeBar({
     <div className="flex flex-wrap items-end justify-center gap-x-3 gap-y-2" data-slot="image-editor-resize">
       <div className="flex items-end gap-2">
         <div className="grid gap-1">
-          <Label htmlFor={ids.w} className="text-xs">Width</Label>
+          <Label htmlFor={ids.w} className="text-xs">{i18n._({ id: "ui.Width", message: "Width" })}</Label>
           <Input
             id={ids.w}
             type="number"
@@ -288,17 +289,17 @@ function ResizeBar({
             <Toggle
               pressed={lock}
               onPressedChange={setLock}
-              aria-label="Keep proportions"
+              aria-label={i18n._({ id: "ui.Keep proportions", message: "Keep proportions" })}
               variant="outline"
               disabled={locked}
             >
               {lock ? <LockIcon aria-hidden /> : <LockOpenIcon aria-hidden />}
             </Toggle>
           </TooltipTrigger>
-          <TooltipContent side="top">Keep proportions</TooltipContent>
+          <TooltipContent side="top">{i18n._({ id: "ui.Keep proportions", message: "Keep proportions" })}</TooltipContent>
         </Tooltip>
         <div className="grid gap-1">
-          <Label htmlFor={ids.h} className="text-xs">Height</Label>
+          <Label htmlFor={ids.h} className="text-xs">{i18n._({ id: "ui.Height", message: "Height" })}</Label>
           <Input
             id={ids.h}
             type="number"
@@ -317,15 +318,15 @@ function ResizeBar({
       <ToggleGroup
         type="single"
         variant="outline"
-        aria-label="Resize unit"
+        aria-label={i18n._({ id: "ui.Resize unit", message: "Resize unit" })}
         value={unit}
         onValueChange={(value) => {
           if (value === "px" || value === "%") changeUnit(value);
         }}
         spacing={0}
       >
-        <ToggleGroupItem value="px" aria-label="Pixels" disabled={locked}>px</ToggleGroupItem>
-        <ToggleGroupItem value="%" aria-label="Percent" disabled={locked}>%</ToggleGroupItem>
+        <ToggleGroupItem value="px" aria-label={i18n._({ id: "ui.Pixels", message: "Pixels" })} disabled={locked}>px</ToggleGroupItem>
+        <ToggleGroupItem value="%" aria-label={i18n._({ id: "ui.Percent", message: "Percent" })} disabled={locked}>%</ToggleGroupItem>
       </ToggleGroup>
       <Button
         type="button"
@@ -335,19 +336,19 @@ function ResizeBar({
           if (check.ok) onResize(check.width, check.height);
         }}
       >
-        Resize
+        {i18n._({ id: "ui.Resize (verb)", message: "Resize" })}
       </Button>
       <Separator orientation="vertical" className="hidden h-6 sm:block" />
       <div className="flex items-center gap-2">
         <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(2)}>
-          Upscale 2x
+          {i18n._({ id: "ui.Upscale 2x", message: "Upscale 2x" })}
         </Button>
         <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(4)}>
-          Upscale 4x
+          {i18n._({ id: "ui.Upscale 4x", message: "Upscale 4x" })}
         </Button>
       </div>
       <p className="text-muted-foreground w-full text-center text-xs">
-        Upscaling adds detail the picture did not have; faces may change.
+        {i18n._({ id: "ui.Upscaling adds detail the picture did not have; faces may change.", message: "Upscaling adds detail the picture did not have; faces may change." })}
       </p>
       {!check.ok ? (
         <p className="text-destructive w-full text-center text-xs" data-slot="image-editor-resize-error">
@@ -525,7 +526,7 @@ export function ImageEditor({
     setNotice(null);
     const controller = new AbortController();
     abortRef.current = controller;
-    setBusy({ percent: null, label: "Working on it", cancelable: true });
+    setBusy({ percent: null, label: i18n._({ id: "ui.Working on it", message: "Working on it" }), cancelable: true });
     try {
       const result = await onRunOperation(op, {
         signal: controller.signal,
@@ -550,13 +551,13 @@ export function ImageEditor({
     controller.abort();
     abortRef.current = null;
     setBusy(null);
-    setNotice("Cancelled. Nothing was changed.");
+    setNotice(i18n._({ id: "ui.Cancelled. Nothing was changed.", message: "Cancelled. Nothing was changed." }));
   }
 
   async function applyPending() {
     if (!pending) return;
     setError(null);
-    setBusy({ percent: null, label: "Saving the new version", cancelable: false });
+    setBusy({ percent: null, label: i18n._({ id: "ui.Saving the new version", message: "Saving the new version" }), cancelable: false });
     try {
       const version = await onApplyPending(pending.value, pending.label);
       setPending(null);
@@ -578,19 +579,19 @@ export function ImageEditor({
     if (!natural || mask.strokes.length === 0) return;
     const blob = await renderMaskPng(mask.strokes, natural);
     if (!blob) {
-      failWith(new Error("The area to erase could not be prepared. Try drawing it again."));
+      failWith(new Error(i18n._({ id: "ui.The area to erase could not be prepared. Try drawing it again.", message: "The area to erase could not be prepared. Try drawing it again." })));
       return;
     }
-    await run({ operation: "erase", mask: blob }, "Object erased");
+    await run({ operation: "erase", mask: blob }, i18n._({ id: "ui.Object erased", message: "Object erased" }));
   }
 
   async function saveMarkup() {
     if (!natural || !current || markup.strokes.length === 0) return;
     setError(null);
-    setBusy({ percent: null, label: "Saving the markup", cancelable: false });
+    setBusy({ percent: null, label: i18n._({ id: "ui.Saving the markup", message: "Saving the markup" }), cancelable: false });
     try {
       const blob = await renderMarkupPng(current.url, markup.strokes, natural, (key) => resolveColor(key, rootRef.current));
-      if (!blob) throw new Error("The markup could not be saved on this picture. Try again.");
+      if (!blob) throw new Error(i18n._({ id: "ui.The markup could not be saved on this picture. Try again.", message: "The markup could not be saved on this picture. Try again." }));
       const version = await onSaveMarkup(blob);
       clearLayers();
       onSelectVersion(version.id);
@@ -607,7 +608,7 @@ export function ImageEditor({
     setError(null);
     const controller = new AbortController();
     abortRef.current = controller;
-    setBusy({ percent: null, label: "Sending your comment", cancelable: true });
+    setBusy({ percent: null, label: i18n._({ id: "ui.Sending your comment", message: "Sending your comment" }), cancelable: true });
     try {
       const answer = await onComment(request, {
         signal: controller.signal,
@@ -617,7 +618,7 @@ export function ImageEditor({
       });
       if (controller.signal.aborted) return;
       setReply(answer.message);
-      if (answer.pending) setPending({ value: answer.pending, label: "Changed as described" });
+      if (answer.pending) setPending({ value: answer.pending, label: i18n._({ id: "ui.Changed as described", message: "Changed as described" }) });
       if (request.region) setPins((existing) => [...existing, request.region as Region]);
       setComment({ region: request.region, prompt: "" });
     } catch (err) {
@@ -641,18 +642,18 @@ export function ImageEditor({
     const key = value as ImageEditorToolKey;
     const state = tools[key];
     if (!state.enabled) {
-      setNotice(state.reason ?? "That tool is not available right now.");
+      setNotice(state.reason ?? i18n._({ id: "ui.That tool is not available right now.", message: "That tool is not available right now." }));
       return;
     }
     if (!interactive) {
-      setNotice("Finish or cancel the current step first.");
+      setNotice(i18n._({ id: "ui.Finish or cancel the current step first.", message: "Finish or cancel the current step first." }));
       return;
     }
     setNotice(null);
     setError(null);
     clearLayers();
     setMode(key);
-    if (key === "remove_background") void run({ operation: "remove_background" }, "Background removed");
+    if (key === "remove_background") void run({ operation: "remove_background" }, i18n._({ id: "ui.Background removed", message: "Background removed" }));
   }
 
   function undo() {
@@ -745,11 +746,11 @@ export function ImageEditor({
   const strokeLayerDispatch = mode === "markup" ? dispatchMarkup : dispatchMask;
 
   const undoRedo = (
-    <div className={pill} role="group" aria-label="History">
-      <ToolButton label="Undo" disabled={!canUndo} onClick={undo}>
+    <div className={pill} role="group" aria-label={i18n._({ id: "ui.History", message: "History" })}>
+      <ToolButton label={i18n._({ id: "ui.Undo", message: "Undo" })} disabled={!canUndo} onClick={undo}>
         <Undo2Icon aria-hidden />
       </ToolButton>
-      <ToolButton label="Redo" disabled={!canRedo} onClick={redo}>
+      <ToolButton label={i18n._({ id: "ui.Redo", message: "Redo" })} disabled={!canRedo} onClick={redo}>
         <Redo2Icon aria-hidden />
       </ToolButton>
     </div>
@@ -757,7 +758,7 @@ export function ImageEditor({
 
   const header = (
     <header className="flex items-center gap-2 px-2 py-1" data-slot="image-editor-header">
-      <ToolButton label="Close editor" side="bottom" onClick={onClose}>
+      <ToolButton label={i18n._({ id: "ui.Close editor", message: "Close editor" })} side="bottom" onClick={onClose}>
         <XIcon aria-hidden />
       </ToolButton>
       <h2 className="min-w-0 flex-1 truncate text-sm font-medium">{title}</h2>
@@ -766,16 +767,16 @@ export function ImageEditor({
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button type="button" variant="ghost" size={compact ? "icon-sm" : "sm"} aria-label="Versions">
+              <Button type="button" variant="ghost" size={compact ? "icon-sm" : "sm"} aria-label={i18n._({ id: "ui.Versions", message: "Versions" })}>
                 <HistoryIcon aria-hidden />
-                {compact ? null : "Versions"}
+                {compact ? null : i18n._({ id: "ui.Versions", message: "Versions" })}
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Versions</TooltipContent>
+          <TooltipContent side="bottom">{i18n._({ id: "ui.Versions", message: "Versions" })}</TooltipContent>
         </Tooltip>
         <PopoverContent align="end" width="auto" className="w-72 max-w-[calc(100vw-2rem)]">
-          <ul className="grid gap-1" aria-label="Versions">
+          <ul className="grid gap-1" aria-label={i18n._({ id: "ui.Versions", message: "Versions" })}>
             {versions.map((version) => (
               <li key={version.id}>
                 <Button
@@ -804,25 +805,25 @@ export function ImageEditor({
       </Popover>
       {current ? (
         compact ? (
-          <ToolButton label="Download" side="bottom" onClick={() => download(current.url, downloadName ?? title)}>
+          <ToolButton label={i18n._({ id: "ui.Download", message: "Download" })} side="bottom" onClick={() => download(current.url, downloadName ?? title)}>
             <DownloadIcon aria-hidden />
           </ToolButton>
         ) : (
           <Button type="button" variant="ghost" size="sm" onClick={() => download(current.url, downloadName ?? title)}>
             <DownloadIcon aria-hidden />
-            Download
+            {i18n._({ id: "ui.Download", message: "Download" })}
           </Button>
         )
       ) : null}
       {onShare && current ? (
         compact ? (
-          <ToolButton label="Share" side="bottom" onClick={() => onShare(current)}>
+          <ToolButton label={i18n._({ id: "ui.Share", message: "Share" })} side="bottom" onClick={() => onShare(current)}>
             <Share2Icon aria-hidden />
           </ToolButton>
         ) : (
           <Button type="button" variant="ghost" size="sm" onClick={() => onShare(current)}>
             <Share2Icon aria-hidden />
-            Share
+            {i18n._({ id: "ui.Share", message: "Share" })}
           </Button>
         )
       ) : null}
@@ -833,14 +834,14 @@ export function ImageEditor({
     <ToggleGroup
       type="single"
       role="toolbar"
-      aria-label="Picture editing tools"
+      aria-label={i18n._({ id: "ui.Picture editing tools", message: "Picture editing tools" })}
       variant="default"
       spacing={1}
       value={mode ?? ""}
       onValueChange={chooseMode}
       className={cn(pill, "max-w-full overflow-x-auto")}
     >
-      {TOOL_META.map((tool) => {
+      {toolMeta().map((tool) => {
         const state = tools[tool.key];
         return (
           <Tooltip key={tool.key}>
@@ -857,7 +858,7 @@ export function ImageEditor({
               </ToggleGroupItem>
             </TooltipTrigger>
             <TooltipContent side={compact ? "top" : "bottom"}>
-              {state.enabled ? tool.label : `${tool.label}: ${state.reason ?? "Not available right now."}`}
+              {state.enabled ? tool.label : i18n._({ id: "ui.{tool}: {reason}", message: "{tool}: {reason}", values: { tool: tool.label, reason: state.reason ?? i18n._({ id: "ui.Not available right now.", message: "Not available right now." }) } })}
             </TooltipContent>
           </Tooltip>
         );
@@ -869,14 +870,14 @@ export function ImageEditor({
     <div className={cn(pill, "max-w-full flex-wrap justify-center overflow-x-auto rounded-2xl")} data-slot="image-editor-markup-bar">
       <ToggleGroup
         type="single"
-        aria-label="Markup tool"
+        aria-label={i18n._({ id: "ui.Markup tool", message: "Markup tool" })}
         spacing={1}
         value={markupTool}
         onValueChange={(value) => {
           if (value) setMarkupTool(value as MarkupTool);
         }}
       >
-        {MARKUP_TOOLS.map((tool) => (
+        {markupTools().map((tool) => (
           <Tooltip key={tool.key}>
             <TooltipTrigger asChild>
               <ToggleGroupItem value={tool.key} aria-label={tool.label} disabled={locked} className="rounded-full">
@@ -891,7 +892,7 @@ export function ImageEditor({
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button type="button" variant="ghost" size="icon-sm" aria-label={`Color: ${selectedColor.label}`} disabled={locked}>
+              <Button type="button" variant="ghost" size="icon-sm" aria-label={i18n._({ id: "ui.Color: {color}", message: "Color: {color}", values: { color: selectedColor.label } })} disabled={locked}>
                 <span
                   aria-hidden
                   className="border-border size-5 rounded-full border"
@@ -900,10 +901,10 @@ export function ImageEditor({
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>
-          <TooltipContent side={compact ? "top" : "bottom"}>Color</TooltipContent>
+          <TooltipContent side={compact ? "top" : "bottom"}>{i18n._({ id: "ui.Color", message: "Color" })}</TooltipContent>
         </Tooltip>
         <PopoverContent width="auto" align="center">
-          <div role="group" aria-label="Colors" className="grid grid-cols-4 gap-1">
+          <div role="group" aria-label={i18n._({ id: "ui.Colors", message: "Colors" })} className="grid grid-cols-4 gap-1">
             {PALETTE.map((color) => (
               <Toggle
                 key={color.key}
@@ -925,7 +926,7 @@ export function ImageEditor({
         </PopoverContent>
       </Popover>
       <Slider
-        aria-label="Stroke size"
+        aria-label={i18n._({ id: "ui.Stroke size", message: "Stroke size" })}
         min={MARKUP_SIZE_MIN}
         max={MARKUP_SIZE_MAX}
         step={1}
@@ -934,10 +935,10 @@ export function ImageEditor({
         onValueChange={([value]) => setMarkupSize(value ?? DEFAULT_MARKUP_SIZE)}
         className="mx-2 w-24"
       />
-      <ToolButton label="Undo stroke" disabled={locked || !canUndoStroke(markup)} onClick={() => dispatchMarkup({ type: "undo" })}>
+      <ToolButton label={i18n._({ id: "ui.Undo stroke", message: "Undo stroke" })} disabled={locked || !canUndoStroke(markup)} onClick={() => dispatchMarkup({ type: "undo" })}>
         <Undo2Icon aria-hidden />
       </ToolButton>
-      <ToolButton label="Redo stroke" disabled={locked || !canRedoStroke(markup)} onClick={() => dispatchMarkup({ type: "redo" })}>
+      <ToolButton label={i18n._({ id: "ui.Redo stroke", message: "Redo stroke" })} disabled={locked || !canRedoStroke(markup)} onClick={() => dispatchMarkup({ type: "redo" })}>
         <Redo2Icon aria-hidden />
       </ToolButton>
       <Button
@@ -948,19 +949,19 @@ export function ImageEditor({
         onClick={() => dispatchMarkup({ type: "clear" })}
       >
         <Trash2Icon aria-hidden />
-        Clear
+        {i18n._({ id: "ui.Clear", message: "Clear" })}
       </Button>
       <Button type="button" size="sm" disabled={locked || markup.strokes.length === 0} onClick={() => void saveMarkup()}>
-        Save
+        {i18n._({ id: "ui.Save", message: "Save" })}
       </Button>
     </div>
   );
 
   const eraseBar = (
     <div className={cn(pill, "max-w-full flex-wrap justify-center overflow-x-auto rounded-2xl")} data-slot="image-editor-erase-bar">
-      <span className="text-muted-foreground px-2 text-xs">Paint over what to erase</span>
+      <span className="text-muted-foreground px-2 text-xs">{i18n._({ id: "ui.Paint over what to erase", message: "Paint over what to erase" })}</span>
       <Slider
-        aria-label="Brush size"
+        aria-label={i18n._({ id: "ui.Brush size", message: "Brush size" })}
         min={BRUSH_MIN}
         max={BRUSH_MAX}
         step={1}
@@ -970,25 +971,25 @@ export function ImageEditor({
         className="mx-2 w-28"
       />
       <span className="text-muted-foreground w-14 text-xs tabular-nums" data-slot="image-editor-brush-size">{brush} px</span>
-      <ToolButton label="Undo stroke" disabled={locked || !canUndoStroke(mask)} onClick={() => dispatchMask({ type: "undo" })}>
+      <ToolButton label={i18n._({ id: "ui.Undo stroke", message: "Undo stroke" })} disabled={locked || !canUndoStroke(mask)} onClick={() => dispatchMask({ type: "undo" })}>
         <Undo2Icon aria-hidden />
       </ToolButton>
-      <ToolButton label="Redo stroke" disabled={locked || !canRedoStroke(mask)} onClick={() => dispatchMask({ type: "redo" })}>
+      <ToolButton label={i18n._({ id: "ui.Redo stroke", message: "Redo stroke" })} disabled={locked || !canRedoStroke(mask)} onClick={() => dispatchMask({ type: "redo" })}>
         <Redo2Icon aria-hidden />
       </ToolButton>
       <Button type="button" variant="ghost" size="sm" disabled={locked || mask.strokes.length === 0} onClick={() => dispatchMask({ type: "clear" })}>
         <Trash2Icon aria-hidden />
-        Clear
+        {i18n._({ id: "ui.Clear", message: "Clear" })}
       </Button>
       <Button type="button" size="sm" disabled={locked || mask.strokes.length === 0} onClick={() => void runErase()}>
-        Erase
+        {i18n._({ id: "ui.Erase", message: "Erase" })}
       </Button>
     </div>
   );
 
   const commentBar = (
     <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-comment-bar">
-      <span className="text-muted-foreground px-2 text-xs">Click a spot or drag a box on the picture</span>
+      <span className="text-muted-foreground px-2 text-xs">{i18n._({ id: "ui.Click a spot or drag a box on the picture", message: "Click a spot or drag a box on the picture" })}</span>
       <Button
         type="button"
         variant="outline"
@@ -999,16 +1000,16 @@ export function ImageEditor({
           setComment({ region: null, prompt: comment?.prompt ?? "" });
         }}
       >
-        Whole picture
+        {i18n._({ id: "ui.Whole picture", message: "Whole picture" })}
       </Button>
     </div>
   );
 
   const removeBar = (
     <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-remove-bar">
-      <Button type="button" size="sm" disabled={locked} onClick={() => void run({ operation: "remove_background" }, "Background removed")}>
+      <Button type="button" size="sm" disabled={locked} onClick={() => void run({ operation: "remove_background" }, i18n._({ id: "ui.Background removed", message: "Background removed" }))}>
         <WandSparklesIcon aria-hidden />
-        Remove background
+        {i18n._({ id: "ui.Remove background", message: "Remove background" })}
       </Button>
     </div>
   );
@@ -1016,14 +1017,14 @@ export function ImageEditor({
   const pendingBar = pending ? (
     <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-pending-bar">
       <span className="px-2 text-sm" role="status">
-        Preview: {pending.label}
-        {pending.value.transparent ? " (transparent areas show as a checkerboard)" : ""}
+        {i18n._({ id: "ui.Preview: {label}", message: "Preview: {label}", values: { label: pending.label } })}
+        {pending.value.transparent ? " " + i18n._({ id: "ui.(transparent areas show as a checkerboard)", message: "(transparent areas show as a checkerboard)" }) : ""}
       </span>
       <Button type="button" size="sm" disabled={locked} onClick={() => void applyPending()}>
-        Apply
+        {i18n._({ id: "ui.Apply", message: "Apply" })}
       </Button>
-      <Button type="button" size="sm" variant="outline" aria-label="Undo preview" disabled={locked} onClick={discardPending}>
-        Undo
+      <Button type="button" size="sm" variant="outline" aria-label={i18n._({ id: "ui.Undo preview", message: "Undo preview" })} disabled={locked} onClick={discardPending}>
+        {i18n._({ id: "ui.Undo", message: "Undo" })}
       </Button>
     </div>
   ) : null;
@@ -1046,7 +1047,7 @@ export function ImageEditor({
               base={natural}
               locked={locked}
               onResize={(width, height) => void run({ operation: "resize", width, height }, resizeLabel(width, height))}
-              onUpscale={(factor) => void run({ operation: "upscale", scale: factor }, `Upscaled ${factor}x`)}
+              onUpscale={(factor) => void run({ operation: "upscale", scale: factor }, i18n._({ id: "ui.Upscaled {factor}x", message: "Upscaled {factor}x", values: { factor } }))}
             />
           </div>
         ) : null;
@@ -1077,7 +1078,7 @@ export function ImageEditor({
           </div>
           {busy.cancelable ? (
             <Button type="button" size="sm" variant="outline" onClick={cancelRun}>
-              Cancel
+              {i18n._({ id: "ui.Cancel", message: "Cancel" })}
             </Button>
           ) : null}
         </div>
@@ -1098,7 +1099,7 @@ export function ImageEditor({
                   retry?.();
                 }}
               >
-                Try again
+                {i18n._({ id: "ui.Try again", message: "Try again" })}
               </Button>
             ) : null}
           </AlertDescription>
@@ -1114,8 +1115,8 @@ export function ImageEditor({
         <Card className="w-full max-w-md py-3" data-slot="image-editor-comment-card">
           <CardContent className="grid gap-2 px-3">
             <Textarea
-              aria-label="Describe the change"
-              placeholder="Describe the change"
+              aria-label={i18n._({ id: "ui.Describe the change", message: "Describe the change" })}
+              placeholder={i18n._({ id: "ui.Describe the change", message: "Describe the change" })}
               value={comment.prompt}
               disabled={locked}
               autoFocus
@@ -1131,10 +1132,10 @@ export function ImageEditor({
                   setReply(null);
                 }}
               >
-                Cancel
+                {i18n._({ id: "ui.Cancel", message: "Cancel" })}
               </Button>
               <Button type="button" size="sm" disabled={locked || comment.prompt.trim().length === 0} onClick={() => void sendComment()}>
-                Send
+                {i18n._({ id: "ui.Send", message: "Send" })}
               </Button>
             </div>
           </CardContent>
@@ -1156,19 +1157,19 @@ export function ImageEditor({
   );
 
   const zoomControl = (
-    <div className={pill} role="group" aria-label="Zoom">
-      <ToolButton label="Zoom out" disabled={zoom <= 10} onClick={() => setZoom(stepZoom(zoom, -1))}>
+    <div className={pill} role="group" aria-label={i18n._({ id: "ui.Zoom", message: "Zoom" })}>
+      <ToolButton label={i18n._({ id: "ui.Zoom out", message: "Zoom out" })} disabled={zoom <= 10} onClick={() => setZoom(stepZoom(zoom, -1))}>
         <MinusIcon aria-hidden />
       </ToolButton>
-      <span className="min-w-12 text-center text-sm tabular-nums" data-slot="image-editor-zoom" aria-label={`Zoom ${zoom} percent`}>
+      <span className="min-w-12 text-center text-sm tabular-nums" data-slot="image-editor-zoom" aria-label={i18n._({ id: "ui.Zoom {zoom} percent", message: "Zoom {zoom} percent", values: { zoom } })}>
         {zoom}%
       </span>
-      <ToolButton label="Zoom in" disabled={zoom >= 400} onClick={() => setZoom(stepZoom(zoom, 1))}>
+      <ToolButton label={i18n._({ id: "ui.Zoom in", message: "Zoom in" })} disabled={zoom >= 400} onClick={() => setZoom(stepZoom(zoom, 1))}>
         <PlusIcon aria-hidden />
       </ToolButton>
       <Button type="button" variant="ghost" size="sm" aria-pressed={fit} onClick={() => setFit(true)}>
         <MaximizeIcon aria-hidden />
-        Fit
+        {i18n._({ id: "ui.Fit", message: "Fit" })}
       </Button>
     </div>
   );
@@ -1203,7 +1204,7 @@ export function ImageEditor({
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         role="region"
-        aria-label="Picture stage"
+        aria-label={i18n._({ id: "ui.Picture stage", message: "Picture stage" })}
         data-slot="image-editor-stage"
         className="bg-muted focus-visible:ring-ring/50 absolute inset-0 overflow-auto outline-none focus-visible:ring-[3px] focus-visible:ring-inset"
       >
@@ -1261,8 +1262,8 @@ export function ImageEditor({
               >
                 <Input
                   autoFocus
-                  aria-label="Text to add"
-                  placeholder="Type, then press Enter"
+                  aria-label={i18n._({ id: "ui.Text to add", message: "Text to add" })}
+                  placeholder={i18n._({ id: "ui.Type, then press Enter", message: "Type, then press Enter" })}
                   value={textDraft.value}
                   onChange={(event) => setTextDraft({ ...textDraft, value: event.target.value })}
                   onKeyDown={(event) => {
@@ -1293,7 +1294,7 @@ export function ImageEditor({
     <TooltipProvider delayDuration={300}>
       <section
         ref={rootRef}
-        aria-label={`Edit picture: ${title}`}
+        aria-label={i18n._({ id: "ui.Edit picture: {title}", message: "Edit picture: {title}", values: { title } })}
         data-slot="image-editor"
         data-variant={variant}
         data-layout={compact ? "compact" : "wide"}

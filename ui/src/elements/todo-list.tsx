@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { CheckIcon, Loader2Icon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { mono } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export type TodoStatus = "pending" | "active" | "done" | "failed";
 
@@ -15,10 +16,19 @@ export interface TodoItem {
   description?: string;
 }
 
+const statusLabel = (status: TodoStatus): string => {
+  switch (status) {
+    case "pending": return i18n._({ id: "ui.pending", message: "pending" });
+    case "active": return i18n._({ id: "ui.active", message: "active" });
+    case "done": return i18n._({ id: "ui.done", message: "done" });
+    case "failed": return i18n._({ id: "ui.failed", message: "failed" });
+  }
+};
+
 export function TodoList({
   items,
   revision,
-  title = "Todos",
+  title = i18n._({ id: "ui.Todos", message: "Todos" }),
   description,
   maxVisible,
   className,
@@ -44,7 +54,7 @@ export function TodoList({
         <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {revision === undefined
             ? `${done}/${items.length}`
-            : `${done}/${items.length} · rev ${revision}`}
+            : i18n._({ id: "ui.{done}/{total} · rev {revision}", message: "{done}/{total} · rev {revision}", values: { done, total: items.length, revision } })}
         </span>
       </div>
       {description && <p className="text-muted-foreground text-xs">{description}</p>}
@@ -72,7 +82,7 @@ export function TodoList({
                 <span className="border-foreground/15 size-3.5 rounded-[5px] border" />
               )}
             </span>
-            <span className="sr-only">{item.status}</span>
+            <span className="sr-only">{statusLabel(item.status)}</span>
             <div className="min-w-0 flex-1 leading-5 break-words">
               <span
                 className={cn(

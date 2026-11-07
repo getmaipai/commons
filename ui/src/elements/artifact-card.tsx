@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentProps, ReactNode } from "react";
+import { i18n } from "@/kit/i18n";
 import { ArrowUpRightIcon, FileTextIcon } from "lucide-react";
 import { cn } from "cn";
 import { mono, paper, ShimmerLabel } from "./surfaces";
@@ -48,10 +49,10 @@ export function ArtifactCard({
         {generating ? (
           <p className={cn(mono, "text-muted-foreground flex items-center gap-1")}>
             <ShimmerLabel className="relative inline-block leading-none">
-              Writing
+              {i18n._({ id: "ui.Writing", message: "Writing" })}
             </ShimmerLabel>
             <span>·</span>
-            <span className="tabular-nums">{words} words</span>
+            <span className="tabular-nums">{i18n._({ id: "ui.{words} words", message: "{words} words", values: { words } })}</span>
           </p>
         ) : (
           <p

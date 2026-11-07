@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 import { getIcon } from "@/kit/icons";
 import { cn, FOCUS_RING } from "@/kit/utils";
+import { i18n } from "@/kit/i18n"
 
 interface DetailPaneProps {
   title: string;
@@ -27,7 +28,7 @@ interface DetailPaneProps {
 // The body scrolls on its own rather than the page: in SplitView the
 // list beside it has to stay put while the detail scrolls, which is only
 // true if the scroll container is here.
-export function DetailPane({ title, subtitle, onClose, closeLabel = "Back", actions, children }: DetailPaneProps) {
+export function DetailPane({ title, subtitle, onClose, closeLabel = i18n._({ id: "ui.Back", message: "Back" }), actions, children }: DetailPaneProps) {
   const BackIcon = getIcon("chevron-left");
 
   return (

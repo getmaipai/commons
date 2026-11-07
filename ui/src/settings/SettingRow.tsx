@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { MergedSetting } from "@/kit/settings/groupSettings";
+import { i18n } from "@/kit/i18n";
 import { Button } from "../dashboard/components/ui/button";
 import { Input } from "../dashboard/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "../dashboard/components/ui/item";
@@ -164,7 +165,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
   let control: ReactNode;
   let rowSummary = summary;
   if (resolved.secret && SECRETS_WITH_DEDICATED_FLOWS.has(def.key)) {
-    control = <span className="text-sm text-settings-helper">{resolved.isSet ? "Set" : "Not set"}</span>;
+    control = <span className="text-sm text-settings-helper">{resolved.isSet ? i18n._({ id: "ui.Set", message: "Set" }) : i18n._({ id: "ui.Not set", message: "Not set" })}</span>;
   } else if (resolved.secret) {
     control = secretEditing ? (
       <>
@@ -172,7 +173,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
           size="row"
           type="password"
           className="w-56"
-          placeholder="Paste the new value"
+          placeholder={i18n._({ id: "ui.Paste the new value", message: "Paste the new value" })}
           value={secretDraft}
           disabled={secretSaving}
           onChange={(e) => setSecretDraft(e.target.value)}
@@ -180,7 +181,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
           autoComplete="off"
         /></HitField>
         <Button type="button" size="row" disabled={secretSaving || !secretDraft} onClick={commitSecret}>
-          {secretSaving ? "Saving…" : "Save"}
+          {secretSaving ? i18n._({ id: "ui.Saving…", message: "Saving…" }) : i18n._({ id: "ui.Save", message: "Save" })}
         </Button>
         <Button
           type="button"
@@ -192,14 +193,14 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
             setSecretEditing(false);
           }}
         >
-          Cancel
+          {i18n._({ id: "ui.Cancel", message: "Cancel" })}
         </Button>
       </>
     ) : (
       <>
-        <span className="text-sm text-settings-helper">{resolved.isSet ? "Set" : "Not set"}</span>
+        <span className="text-sm text-settings-helper">{resolved.isSet ? i18n._({ id: "ui.Set", message: "Set" }) : i18n._({ id: "ui.Not set", message: "Not set" })}</span>
         <Button type="button" size="row" variant="secondary" disabled={disabled} aria-describedby={titleId} onClick={() => setSecretEditing(true)}>
-          {resolved.isSet ? "Change" : "Set"}
+          {resolved.isSet ? i18n._({ id: "ui.Change", message: "Change" }) : i18n._({ id: "ui.Set (verb)", message: "Set" })}
         </Button>
       </>
     );
@@ -218,7 +219,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
               <AlertDialogDescription>{confirmOff.body}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{i18n._({ id: "ui.Cancel", message: "Cancel" })}</AlertDialogCancel>
               <AlertDialogAction onClick={() => { setConfirmingOff(false); void write(false); }}>{confirmOff.action}</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -257,7 +258,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
       control = (
         <>
           <span className="text-sm text-settings-helper">{selectedLabel}</span>
-          <Button type="button" variant="outline" size="row" disabled={disabled || unavailable} aria-label={`Change ${def.label}`} onClick={() => { setChoiceDraft(current); setChoiceOpen(true); }}>Change</Button>
+          <Button type="button" variant="outline" size="row" disabled={disabled || unavailable} aria-label={i18n._({ id: "ui.Change {label}", message: "Change {label}", values: { label: def.label } })} onClick={() => { setChoiceDraft(current); setChoiceOpen(true); }}>{i18n._({ id: "ui.Change", message: "Change" })}</Button>
           <Dialog open={choiceOpen} onOpenChange={setChoiceOpen}>
             <DialogContent>
               <DialogHeader>
@@ -271,8 +272,8 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
                 </label>)}
               </RadioGroup>
               <DialogFooter>
-                <Button type="button" variant="outline" size="row" onClick={() => setChoiceOpen(false)}>Cancel</Button>
-                <Button type="button" size="row" onClick={async () => { const ok = await write(choiceDraft); if (ok) setChoiceOpen(false); }}>Save</Button>
+                <Button type="button" variant="outline" size="row" onClick={() => setChoiceOpen(false)}>{i18n._({ id: "ui.Cancel", message: "Cancel" })}</Button>
+                <Button type="button" size="row" onClick={async () => { const ok = await write(choiceDraft); if (ok) setChoiceOpen(false); }}>{i18n._({ id: "ui.Save", message: "Save" })}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -299,7 +300,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
         </SelectContent>
       </Select>
     );
-    if (unavailable) rowSummary = "Options are not available here.";
+    if (unavailable) rowSummary = i18n._({ id: "ui.Options are not available here.", message: "Options are not available here." });
   } else if (def.selector === "number") {
     const range = def.range as { min?: number; max?: number } | undefined;
     control = (
@@ -328,9 +329,9 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
         /></HitField>
         {resolved.value == null ? (
           <>
-            <span className="text-sm text-settings-helper">Inheriting household hours</span>
+            <span className="text-sm text-settings-helper">{i18n._({ id: "ui.Inheriting household hours", message: "Inheriting household hours" })}</span>
             <Button type="button" variant="link" size="row" onClick={reset} disabled={disabled}>
-              Use household hours
+              {i18n._({ id: "ui.Use household hours", message: "Use household hours" })}
             </Button>
           </>
         ) : null}
@@ -359,7 +360,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
           aria-label={def.label}
         /></HitField>
         <Button type="button" size="row" disabled={disabled} onClick={() => void commitDraft().then((ok) => ok && setEditing(false))}>
-          Save
+          {i18n._({ id: "ui.Save", message: "Save" })}
         </Button>
         <Button
           type="button"
@@ -370,16 +371,16 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
             setEditing(false);
           }}
         >
-          Cancel
+          {i18n._({ id: "ui.Cancel", message: "Cancel" })}
         </Button>
       </>
     ) : (
       <>
         <span title={current} className="min-w-0 max-w-full truncate font-mono text-[13px] text-settings-helper">
-          {current ? middleEllipsis(current) : "Not set"}
+          {current ? middleEllipsis(current) : i18n._({ id: "ui.Not set", message: "Not set" })}
         </span>
         <Button type="button" size="row" variant="secondary" disabled={disabled} aria-describedby={titleId} onClick={() => setEditing(true)}>
-          Change
+          {i18n._({ id: "ui.Change", message: "Change" })}
         </Button>
       </>
     );
@@ -410,7 +411,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
   } else {
     // duration, entity, area, media, and a scalar `person`: typed by the
     // spec's selector vocabulary but with no real registry key yet.
-    control = <span className="text-sm text-settings-helper">Not supported in this hub version yet.</span>;
+    control = <span className="text-sm text-settings-helper">{i18n._({ id: "ui.Not supported in this hub version yet.", message: "Not supported in this hub version yet." })}</span>;
   }
 
   // A switch is small enough to stay beside the text on a phone; every other
@@ -436,7 +437,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
         ) : null}
         {canReset ? (
           <Button type="button" variant="link" size="row" onClick={reset} disabled={disabled} className="h-auto w-fit p-0 text-[13px] before:-inset-y-3.5">
-            Reset to default
+            {i18n._({ id: "ui.Reset to default", message: "Reset to default" })}
           </Button>
         ) : null}
       </ItemContent>

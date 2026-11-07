@@ -17,6 +17,7 @@ import {
   CollapsibleTrigger,
 } from "@/elements/ui/collapsible";
 import { cn } from "cn";
+import { i18n } from "@/kit/i18n"
 
 export const ANIMATION_DURATION = 200;
 
@@ -163,7 +164,7 @@ function ReasoningFade({
 
 /** "Thought for 4s": whole seconds, never below 1. Pass your own function as `doneLabel` to localize. */
 export function thoughtForLabel(seconds: number): string {
-  return `Thought for ${Math.max(1, Math.round(seconds))}s`;
+  return i18n._({ id: "ui.Thought for {seconds}s", message: "Thought for {seconds}s", values: { seconds: Math.max(1, Math.round(seconds)) } });
 }
 
 function ReasoningTrigger({
@@ -196,11 +197,13 @@ function ReasoningTrigger({
    */
   announce?: string;
 }) {
-  const durationText = duration ? ` (${duration}s)` : "";
+  const baseLabel = label ?? i18n._({ id: "ui.Reasoning", message: "Reasoning" });
   const text =
     duration && doneLabel
       ? doneLabel(duration)
-      : `${label ?? "Reasoning"}${durationText}`;
+      : duration
+        ? i18n._({ id: "ui.{label} ({duration}s)", message: "{label} ({duration}s)", values: { label: baseLabel, duration } })
+        : baseLabel;
 
   return (
     <CollapsibleTrigger

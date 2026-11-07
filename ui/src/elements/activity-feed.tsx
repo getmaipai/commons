@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { DayDivider } from "./day-separator";
 import { cn } from "@/kit/utils";
+import { i18n } from "@/kit/i18n"
 
 export type ActivityTone = "needs_you" | "working" | "done" | "plain";
 
@@ -26,12 +27,12 @@ export interface ActivityFeedProps {
   label: string;
 }
 
-const toneText: Record<ActivityTone, string> = {
-  needs_you: "Needs you",
-  working: "Working",
-  done: "Done",
+const toneText = (): Record<ActivityTone, string> => ({
+  needs_you: i18n._({ id: "ui.Needs you", message: "Needs you" }),
+  working: i18n._({ id: "ui.Working", message: "Working" }),
+  done: i18n._({ id: "ui.Done", message: "Done" }),
   plain: "",
-};
+});
 
 export function ActivityFeed({ groups, aside, empty, label }: ActivityFeedProps) {
   return (
@@ -53,7 +54,7 @@ export function ActivityFeed({ groups, aside, empty, label }: ActivityFeedProps)
                           tone === "needs_you" && "bg-primary",
                           tone === "working" && "animate-pulse motion-reduce:animate-none",
                         )} />
-                        <span className="sr-only">{toneText[tone]}</span>
+                        <span className="sr-only">{toneText()[tone]}</span>
                         <div className="min-w-0 flex-1">
                           <div className="font-medium">{item.title}</div>
                           {item.line != null ? <div className="text-muted-foreground">{item.line}</div> : null}

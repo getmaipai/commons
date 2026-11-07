@@ -1,5 +1,6 @@
 import { formatBytes as defaultFormatBytes } from "@/kit/format";
 import { cn } from "@/kit/utils";
+import { i18n } from "@/kit/i18n";
 
 export interface StorageBarSegment {
   id: string;
@@ -27,11 +28,11 @@ export interface StorageBarLabels {
 
 export const DEFAULT_STORAGE_BAR_LABELS: StorageBarLabels = {
   summary: ({ kinds, used, capacity }) => {
-    if (kinds.length === 0) return capacity ? `Nothing is stored yet. ${capacity} is available.` : "Nothing is stored yet.";
+    if (kinds.length === 0) return capacity ? i18n._({ id: "ui.Nothing is stored yet. {capacity} is available.", message: "Nothing is stored yet. {capacity} is available.", values: { capacity } }) : i18n._({ id: "ui.Nothing is stored yet.", message: "Nothing is stored yet." });
     const list = kinds.map((kind) => `${kind.label} ${kind.size}`).join(", ");
-    return `Storage used: ${list}. ${used} in total${capacity ? ` of ${capacity}` : ""}.`;
+    return capacity ? i18n._({ id: "ui.Storage used: {list}. {used} in total of {capacity}.", message: "Storage used: {list}. {used} in total of {capacity}.", values: { list, used, capacity } }) : i18n._({ id: "ui.Storage used: {list}. {used} in total.", message: "Storage used: {list}. {used} in total.", values: { list, used } });
   },
-  free: "Free",
+  get free() { return i18n._({ id: "ui.Free", message: "Free" }); },
 };
 
 export interface StorageBarProps {

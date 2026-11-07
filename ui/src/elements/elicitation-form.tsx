@@ -9,6 +9,7 @@ import { Calendar } from "../dashboard/components/ui/calendar";
 import { OptionList } from "./option-list";
 import { QuestionFlow } from "./question-flow";
 import { mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export type ElicitationState = "request" | "accepted" | "declined";
 export type AskFieldKind = "text" | "number" | "date_time" | "choice" | "yes_no";
@@ -51,7 +52,8 @@ function inputValue(field: Field): string {
 }
 
 function optionListOptions(field: Field) {
-  return (field.options ?? (kindOf(field) === "yes_no" ? ["Yes", "No"] : [])).map((label) => ({ id: label, label }));
+  if (!field.options && kindOf(field) === "yes_no") return [{ id: "Yes", label: i18n._({ id: "ui.Yes", message: "Yes" }) }, { id: "No", label: i18n._({ id: "ui.No", message: "No" }) }];
+  return (field.options ?? []).map((label) => ({ id: label, label }));
 }
 
 export function ElicitationForm({
@@ -94,14 +96,14 @@ export function ElicitationForm({
       const value = values[item.name];
       const kind = kindOf(item);
       if (item.required && (value === undefined || value === "")) {
-        next[item.name] = "This field is required.";
+        next[item.name] = i18n._({ id: "ui.This field is required.", message: "This field is required." });
       } else if (kind === "text" && typeof value === "string" && value.length > (item.max_length ?? 500)) {
-        next[item.name] = `Enter no more than ${item.max_length ?? 500} characters.`;
+        next[item.name] = i18n._({ id: "ui.Enter no more than {count} characters.", message: "Enter no more than {count} characters.", values: { count: item.max_length ?? 500 } });
       } else if (kind === "number" && value !== "" && value !== undefined) {
         const numeric = Number(value);
-        if (!Number.isFinite(numeric)) next[item.name] = "Enter a valid number.";
-        else if ("min" in item && item.min !== undefined && numeric < item.min) next[item.name] = `Enter a number at least ${item.min}.`;
-        else if ("max" in item && item.max !== undefined && numeric > item.max) next[item.name] = `Enter a number no greater than ${item.max}.`;
+        if (!Number.isFinite(numeric)) next[item.name] = i18n._({ id: "ui.Enter a valid number.", message: "Enter a valid number." });
+        else if ("min" in item && item.min !== undefined && numeric < item.min) next[item.name] = i18n._({ id: "ui.Enter a number at least {min}.", message: "Enter a number at least {min}.", values: { min: item.min } });
+        else if ("max" in item && item.max !== undefined && numeric > item.max) next[item.name] = i18n._({ id: "ui.Enter a number no greater than {max}.", message: "Enter a number no greater than {max}.", values: { max: item.max } });
       }
     }
     setErrors(next);
@@ -132,7 +134,7 @@ export function ElicitationForm({
       <div className="flex items-center gap-2.5">
         <span className="bg-foreground/[0.05] text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded-lg"><PlugIcon className="size-3.5" /></span>
         <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">{server}</span>
-        <span className={cn(mono, "text-muted-foreground shrink-0")}>needs input</span>
+        <span className={cn(mono, "text-muted-foreground shrink-0")}>{i18n._({ id: "ui.needs input", message: "needs input" })}</span>
       </div>
       <p className="text-muted-foreground text-xs leading-relaxed">{message}</p>
       <div className="flex min-w-0 flex-col gap-3">
@@ -161,9 +163,9 @@ export function ElicitationForm({
       {error ? <div role="alert" data-slot="alert" className="border-destructive/30 text-destructive rounded-lg border px-3 py-2 text-xs">{error}</div> : null}
       <div className="flex flex-wrap items-center justify-end gap-2">
         {state === "request" ? <>
-          <Button type="button" variant="ghost" onClick={onDecline} disabled={isSubmitting}>Decline</Button>
-          {onSubmit ? <Button type="button" onClick={() => void submit()} disabled={isSubmitting || fields.some((item) => item.required && (values[item.name] === "" || values[item.name] === undefined))}>{isSubmitting ? "Submitting…" : "Submit"}</Button> : <Button type="button" onClick={onAccept}>Send</Button>}
-        </> : <span className="text-muted-foreground flex items-center gap-2 text-xs">{state === "accepted" ? <><CheckIcon className="size-3.5 text-status-ok" />Sent to {server}</> : <><XIcon className="size-3.5" />Declined</>}</span>}
+          <Button type="button" variant="ghost" onClick={onDecline} disabled={isSubmitting}>{i18n._({ id: "ui.Decline", message: "Decline" })}</Button>
+          {onSubmit ? <Button type="button" onClick={() => void submit()} disabled={isSubmitting || fields.some((item) => item.required && (values[item.name] === "" || values[item.name] === undefined))}>{isSubmitting ? i18n._({ id: "ui.Submitting…", message: "Submitting…" }) : i18n._({ id: "ui.Submit", message: "Submit" })}</Button> : <Button type="button" onClick={onAccept}>{i18n._({ id: "ui.Send", message: "Send" })}</Button>}
+        </> : <span className="text-muted-foreground flex items-center gap-2 text-xs">{state === "accepted" ? <><CheckIcon className="size-3.5 text-status-ok" />{i18n._({ id: "ui.Sent to {server}", message: "Sent to {server}", values: { server } })}</> : <><XIcon className="size-3.5" />{i18n._({ id: "ui.Declined", message: "Declined" })}</>}</span>}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { MicIcon, SquareIcon } from "lucide-react";
 import { cn } from "cn";
 import { ghostButton, inkButton, mono, ShimmerLabel } from "./surfaces";
 import { clamp } from "./range";
+import { i18n } from "@/kit/i18n";
 
 /**
  * Runtime form of dictation, vendored from assistant-ui's `composer-voice`
@@ -14,8 +15,8 @@ import { clamp } from "./range";
  * renders nothing when no adapter is configured.
  */
 export function DictationControl({
-  startLabel = "Start voice input",
-  stopLabel = "Stop voice input",
+  startLabel = i18n._({ id: "ui.Start voice input", message: "Start voice input" }),
+  stopLabel = i18n._({ id: "ui.Stop voice input", message: "Stop voice input" }),
 }: {
   startLabel?: string;
   stopLabel?: string;
@@ -77,7 +78,7 @@ export function ComposerVoiceLevels({
   levels,
   recording,
   seconds,
-  transcribingLabel = "Transcribing",
+  transcribingLabel = i18n._({ id: "ui.Transcribing", message: "Transcribing" }),
   className,
   ...props
 }: Omit<ComponentProps<"div">, "children"> & {

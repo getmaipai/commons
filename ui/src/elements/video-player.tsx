@@ -38,6 +38,7 @@ export type {
   VideoPlayerActionWhen,
   VideoPlayerStarts,
 } from "./video-player-actions";
+import { i18n } from "@/kit/i18n";
 export type { PlayerTextTrack } from "@/kit/primitives/Player";
 export { VIDEO_PLAYER_ACTION_CAP } from "./video-player-actions";
 
@@ -90,24 +91,24 @@ export interface VideoPlayerCopy {
   play?: string;
 }
 
-const DEFAULT_COPY: Required<VideoPlayerCopy> = {
-  queued: "Waiting its turn",
-  generating: "Making your video",
-  stop: "Stop",
-  download: "Download",
-  share: "Share",
-  makeAnother: "Make another",
-  retry: "Try again",
-  stopped: "Stopped. Nothing was kept.",
-  failed: "I couldn't make that video.",
-  render: "Make the video from this",
-  anotherStill: "Another still",
-  editWords: "Edit words",
-  cancel: "Cancel",
-  favorite: "Favorite",
-  more: "More",
-  play: "Play",
-};
+const defaultCopy = (): Required<VideoPlayerCopy> => ({
+  queued: i18n._({ id: "ui.Waiting its turn", message: "Waiting its turn" }),
+  generating: i18n._({ id: "ui.Making your video", message: "Making your video" }),
+  stop: i18n._({ id: "ui.Stop", message: "Stop" }),
+  download: i18n._({ id: "ui.Download", message: "Download" }),
+  share: i18n._({ id: "ui.Share", message: "Share" }),
+  makeAnother: i18n._({ id: "ui.Make another", message: "Make another" }),
+  retry: i18n._({ id: "ui.Try again", message: "Try again" }),
+  stopped: i18n._({ id: "ui.Stopped. Nothing was kept.", message: "Stopped. Nothing was kept." }),
+  failed: i18n._({ id: "ui.I couldn't make that video.", message: "I couldn't make that video." }),
+  render: i18n._({ id: "ui.Make the video from this", message: "Make the video from this" }),
+  anotherStill: i18n._({ id: "ui.Another still", message: "Another still" }),
+  editWords: i18n._({ id: "ui.Edit words", message: "Edit words" }),
+  cancel: i18n._({ id: "ui.Cancel", message: "Cancel" }),
+  favorite: i18n._({ id: "ui.Favorite", message: "Favorite" }),
+  more: i18n._({ id: "ui.More", message: "More" }),
+  play: i18n._({ id: "ui.Play", message: "Play" }),
+});
 
 /** m:ss for a count of milliseconds. */
 export function formatClock(ms: number): string {
@@ -273,7 +274,7 @@ function VideoPlayerBody({
   copy?: VideoPlayerCopy;
   className?: string;
 }) {
-  const text = { ...DEFAULT_COPY, ...copy };
+  const text = { ...defaultCopy(), ...copy };
   const live = status === "queued" || status === "generating";
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -356,7 +357,7 @@ function VideoPlayerBody({
           {live ? (
             <div data-slot="video-player-stage" role="status" className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-6 text-center text-sm">
               {status === "queued" ? <span className="text-muted-foreground">{text.queued}</span> : null}
-              {status === "queued" && typeof queuePosition === "number" && queuePosition > 0 ? <span className="text-muted-foreground">{`Place in line: ${queuePosition}`}</span> : null}
+              {status === "queued" && typeof queuePosition === "number" && queuePosition > 0 ? <span className="text-muted-foreground">{i18n._({ id: "ui.Place in line: {position}", message: "Place in line: {position}", values: { position: queuePosition } })}</span> : null}
               {status === "generating" ? <span className="sr-only">{text.generating}</span> : null}
               {status === "generating" && phaseLabel ? <span className="sr-only">{phaseLabel}</span> : null}
               {status === "generating" && !previewSrc ? <span className="text-muted-foreground line-clamp-3 max-w-md text-balance">{prompt}</span> : null}
@@ -372,7 +373,7 @@ function VideoPlayerBody({
     <div data-slot="video-player-picture" className="relative">
       {picture}
       {tags.length > 0 ? (
-        <ul data-slot="video-player-badges" aria-label="Details" className={cn("pointer-events-none absolute start-3 top-3 m-0 flex list-none flex-wrap gap-1.5 p-0", overlay && favoriteButton ? "end-14" : "end-3")}>
+        <ul data-slot="video-player-badges" aria-label={i18n._({ id: "ui.Details", message: "Details" })} className={cn("pointer-events-none absolute start-3 top-3 m-0 flex list-none flex-wrap gap-1.5 p-0", overlay && favoriteButton ? "end-14" : "end-3")}>
           {tags.map((tag, i) => (
             <li key={`${i}-${tag}`} className="rounded-full bg-[var(--art-overlay)] px-2.5 py-0.5 text-xs font-medium text-[var(--art-foreground)] backdrop-blur-sm">{tag}</li>
           ))}
@@ -415,7 +416,7 @@ function VideoPlayerBody({
       {overlay && !notice && !(caption && prompt) ? null : <CardContent className="flex flex-col gap-3 py-3">
         {live ? (
           <>
-            <Progress value={value} aria-label={text.generating} aria-valuetext={startedAt ? `${value} percent, ${formatClock(elapsedMs)} so far` : `${value} percent`} />
+            <Progress value={value} aria-label={text.generating} aria-valuetext={startedAt ? i18n._({ id: "ui.{value} percent, {time} so far", message: "{value} percent, {time} so far", values: { value, time: formatClock(elapsedMs) } }) : i18n._({ id: "ui.{value} percent", message: "{value} percent", values: { value } })} />
             <div className="flex items-center justify-between gap-3">
               <p className="text-muted-foreground text-xs tabular-nums">
                 {[startedAt ? formatClock(elapsedMs) : "", typeof progress === "number" ? `${value}%` : "", status === "generating" ? etaLabel ?? "" : ""].filter(Boolean).join(" · ")}

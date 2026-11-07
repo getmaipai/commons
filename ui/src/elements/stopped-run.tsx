@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
+import { i18n } from "@/kit/i18n";
 import { ArrowRightIcon, SquareIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, mono } from "./surfaces";
@@ -53,7 +54,7 @@ export function StoppedRun({
           onClick={onContinue}
           className="text-foreground/70 hover:bg-foreground/[0.06] hover:text-foreground/95 ms-auto flex h-7 items-center gap-1 rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
         >
-          Continue
+          {i18n._({ id: "ui.Continue", message: "Continue" })}
           <ArrowRightIcon className="size-3" />
         </button>
         {onDiscard ? (
@@ -62,7 +63,7 @@ export function StoppedRun({
             onClick={onDiscard}
             className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 flex h-7 items-center rounded-full px-2.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
           >
-            Discard
+            {i18n._({ id: "ui.Discard", message: "Discard" })}
           </button>
         ) : null}
       </div>

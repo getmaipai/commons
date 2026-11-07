@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { i18n } from "@/kit/i18n";
 
 export type RobotFaceColor = "mint" | "sky" | "peach" | "lavender" | "lemon" | "rose" | "cloud";
 export type RobotFaceExpression = "idle" | "present" | "listening" | "thinking" | "working" | "speaking" | "asking" | "done" | "concerned" | "sleeping" | "offline";
@@ -22,6 +23,22 @@ export const ROBOT_FACE_COLORS: Record<RobotFaceColor, { background: string; ink
   cloud: { background: "#E8ECEA", ink: "#18241F" },
 };
 
+function expressionLabel(expression: RobotFaceExpression): string {
+  switch (expression) {
+    case "idle": return i18n._({ id: "ui.idle", message: "idle" });
+    case "present": return i18n._({ id: "ui.present", message: "present" });
+    case "listening": return i18n._({ id: "ui.listening", message: "listening" });
+    case "thinking": return i18n._({ id: "ui.thinking", message: "thinking" });
+    case "working": return i18n._({ id: "ui.working", message: "working" });
+    case "speaking": return i18n._({ id: "ui.speaking", message: "speaking" });
+    case "asking": return i18n._({ id: "ui.asking", message: "asking" });
+    case "done": return i18n._({ id: "ui.done", message: "done" });
+    case "concerned": return i18n._({ id: "ui.concerned", message: "concerned" });
+    case "sleeping": return i18n._({ id: "ui.sleeping", message: "sleeping" });
+    case "offline": return i18n._({ id: "ui.offline", message: "offline" });
+  }
+}
+
 export function RobotFace({ color = "mint", night = false, expression = "idle", size = "stage", name }: RobotFaceProps) {
   const palette = ROBOT_FACE_COLORS[color];
   const ink = night ? "#C4F0DA" : palette.ink;
@@ -40,7 +57,7 @@ export function RobotFace({ color = "mint", night = false, expression = "idle", 
     : expression === "asking" ? <path d="M35 54 Q41 58 47 54" />
     : <path d="M35 54 Q41 57 47 54" />;
   const style: CSSProperties = size === "header" ? { width: 36, height: 36, flex: "none" } : { width: "100%", height: "100%", aspectRatio: "4 / 3" };
-  return <svg data-slot="robot-face" data-expression={expression} data-color={color} role="img" aria-label={`${name}'s face, ${expression}`} viewBox="0 0 82 62" style={style} className={`block overflow-hidden ${size === "header" ? "rounded-xl" : "rounded-[12%]"} transition-colors duration-300 motion-reduce:transition-none`}>
+  return <svg data-slot="robot-face" data-expression={expression} data-color={color} role="img" aria-label={i18n._({ id: "ui.{name}'s face, {expression}", message: "{name}'s face, {expression}", values: { name, expression: expressionLabel(expression) } })} viewBox="0 0 82 62" style={style} className={`block overflow-hidden ${size === "header" ? "rounded-xl" : "rounded-[12%]"} transition-colors duration-300 motion-reduce:transition-none`}>
     <rect width="82" height="62" fill={background} />
     <g fill={closed ? "none" : ink} stroke={ink} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" opacity={expression === "offline" ? 0.4 : 1}>
       {closed ? <><path d="M25 37 Q31 43 37 37" fill="none" /><path d="M45 37 Q51 43 57 37" fill="none" /></> : <>

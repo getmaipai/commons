@@ -1,6 +1,7 @@
 // VIDEO-STUDIO-05 (K3): the TrackStudio editing model. Pure functions over the timeline model (track-studio-model.ts): split, delete, add, trim, move, fades,
 // crossfade, balances, history and the plan Export hands the host. No DOM, so trim, split, delete, join order, ripple and the limits are tested without a browser.
 
+import { i18n } from "@/kit/i18n"
 import {
   FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, clamp, effectiveCrossfade, filmLength, findPiece, laneOf, layoutLane, mapLane, mapPiece, normalizeCrossfade,
   pieceAt, pieceDuration, round, type LaneId, type StudioPiece, type StudioState,
@@ -16,11 +17,11 @@ export const DEFAULT_LIMITS: StudioLimits = { video_pieces: 6, audio_pieces: 2, 
 export interface LevelStep { id: string; label: string; gain_db: number; clip_gain_db: number }
 /** The five balances of Home's `MIX_LEVELS` (the default; a page may pass its own `level_steps`). */
 export const DEFAULT_LEVEL_STEPS: readonly LevelStep[] = [
-  { id: "quiet", label: "Quiet", gain_db: -14, clip_gain_db: 0 },
-  { id: "soft", label: "Soft", gain_db: -8, clip_gain_db: 0 },
-  { id: "balanced", label: "Balanced", gain_db: 0, clip_gain_db: -3 },
-  { id: "loud", label: "Loud", gain_db: 4, clip_gain_db: -6 },
-  { id: "very_loud", label: "Very loud", gain_db: 8, clip_gain_db: -9 },
+  { id: "quiet", get label() { return i18n._({ id: "ui.Quiet", message: "Quiet" }) }, gain_db: -14, clip_gain_db: 0 },
+  { id: "soft", get label() { return i18n._({ id: "ui.Soft", message: "Soft" }) }, gain_db: -8, clip_gain_db: 0 },
+  { id: "balanced", get label() { return i18n._({ id: "ui.Balanced", message: "Balanced" }) }, gain_db: 0, clip_gain_db: -3 },
+  { id: "loud", get label() { return i18n._({ id: "ui.Loud", message: "Loud" }) }, gain_db: 4, clip_gain_db: -6 },
+  { id: "very_loud", get label() { return i18n._({ id: "ui.Very loud", message: "Very loud" }) }, gain_db: 8, clip_gain_db: -9 },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -29,11 +30,11 @@ export const DEFAULT_LEVEL_STEPS: readonly LevelStep[] = [
 export type EditResult = { ok: true; state: StudioState; selected?: string | null; seek?: number } | { ok: false; line: string };
 const fail = (line: string): EditResult => ({ ok: false, line });
 
-export const FILM_FULL_LINE = (limits: StudioLimits) => `A film can be ${limits.film_s} seconds long. Shorten a piece to add more.`;
-export const VIDEO_FULL_LINE = (limits: StudioLimits) => `A film can have ${wordNumber(limits.video_pieces)} clips. Delete one to add another.`;
-export const AUDIO_FULL_LINE = (limits: StudioLimits, lane: LaneId) => `A film can have ${wordNumber(limits.audio_pieces)} ${lane === "voice" ? "voices" : "songs"}. Delete one to add another.`;
-const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
-function wordNumber(n: number): string { return WORDS[n] ?? String(n); }
+export const FILM_FULL_LINE = (limits: StudioLimits) => i18n._({ id: "ui.A film can be {seconds} seconds long. Shorten a piece to add more.", message: "A film can be {seconds} seconds long. Shorten a piece to add more.", values: { seconds: limits.film_s } });
+export const VIDEO_FULL_LINE = (limits: StudioLimits) => i18n._({ id: "ui.A film can have {count} clips. Delete one to add another.", message: "A film can have {count} clips. Delete one to add another.", values: { count: wordNumber(limits.video_pieces) } });
+export const AUDIO_FULL_LINE = (limits: StudioLimits, lane: LaneId) => (lane === "voice" ? i18n._({ id: "ui.A film can have {count} voices. Delete one to add another.", message: "A film can have {count} voices. Delete one to add another.", values: { count: wordNumber(limits.audio_pieces) } }) : i18n._({ id: "ui.A film can have {count} songs. Delete one to add another.", message: "A film can have {count} songs. Delete one to add another.", values: { count: wordNumber(limits.audio_pieces) } }));
+const words = (): string[] => [i18n._({ id: "ui.zero", message: "zero" }), i18n._({ id: "ui.one", message: "one" }), i18n._({ id: "ui.two", message: "two" }), i18n._({ id: "ui.three", message: "three" }), i18n._({ id: "ui.four", message: "four" }), i18n._({ id: "ui.five", message: "five" }), i18n._({ id: "ui.six", message: "six" }), i18n._({ id: "ui.seven", message: "seven" }), i18n._({ id: "ui.eight", message: "eight" }), i18n._({ id: "ui.nine", message: "nine" }), i18n._({ id: "ui.ten", message: "ten" })];
+function wordNumber(n: number): string { return words()[n] ?? String(n); }
 
 let counter = 0;
 /** A fresh piece id that no piece of the state uses. */
@@ -48,10 +49,10 @@ export function newPieceId(state: StudioState, prefix: string): string {
 export function splitAt(state: StudioState, laneId: LaneId, t: number, limits: StudioLimits = DEFAULT_LIMITS): EditResult {
   const lane = laneOf(state, laneId);
   const placed = pieceAt(lane, t);
-  if (!placed) return fail("Move the playhead onto a piece to split it.");
+  if (!placed) return fail(i18n._({ id: "ui.Move the playhead onto a piece to split it.", message: "Move the playhead onto a piece to split it." }));
   const { piece } = placed;
   const local = piece.in_s + (t - placed.start);
-  if (local - piece.in_s < MIN_PIECE_S || piece.out_s - local < MIN_PIECE_S) return fail("Move the playhead further from the edge of the piece to split it.");
+  if (local - piece.in_s < MIN_PIECE_S || piece.out_s - local < MIN_PIECE_S) return fail(i18n._({ id: "ui.Move the playhead further from the edge of the piece to split it.", message: "Move the playhead further from the edge of the piece to split it." }));
   if (laneId === "video" && lane.pieces.length >= limits.video_pieces) return fail(VIDEO_FULL_LINE(limits));
   if (laneId !== "video" && lane.pieces.length >= limits.audio_pieces) return fail(AUDIO_FULL_LINE(limits, laneId));
   const left: StudioPiece = { ...piece, out_s: round(local), fade_out_s: 0 };
@@ -68,7 +69,7 @@ export function splitAt(state: StudioState, laneId: LaneId, t: number, limits: S
 /** Delete a piece. A video lane closes up (the rest ripple); an audio lane leaves the others where they are. */
 export function deletePiece(state: StudioState, pieceId: string): EditResult {
   const found = findPiece(state, pieceId);
-  if (!found) return fail("Pick a piece first.");
+  if (!found) return fail(i18n._({ id: "ui.Pick a piece first.", message: "Pick a piece first." }));
   const { lane, index } = found;
   const removedStart = found.placed.start;
   const next = mapLane(state, lane.id, (l) => {
@@ -86,7 +87,7 @@ export function deletePiece(state: StudioState, pieceId: string): EditResult {
 export function addPiece(state: StudioState, laneId: LaneId, piece: StudioPiece, atS: number, limits: StudioLimits = DEFAULT_LIMITS): EditResult {
   const lane = laneOf(state, laneId);
   const dur = pieceDuration(piece);
-  if (dur < MIN_PIECE_S) return fail("That one is too short to add.");
+  if (dur < MIN_PIECE_S) return fail(i18n._({ id: "ui.That one is too short to add.", message: "That one is too short to add." }));
   if (laneId === "video" && lane.pieces.length >= limits.video_pieces) return fail(VIDEO_FULL_LINE(limits));
   if (laneId !== "video" && lane.pieces.length >= limits.audio_pieces) return fail(AUDIO_FULL_LINE(limits, laneId));
   const id = state.lanes.some((l) => l.pieces.some((p) => p.id === piece.id)) ? newPieceId(state, laneId) : piece.id;
@@ -101,7 +102,7 @@ export function addPiece(state: StudioState, laneId: LaneId, piece: StudioPiece,
  * a voice or music piece keeps its sound where it was, so its left edge moves. */
 export function trimStartBy(state: StudioState, pieceId: string, delta: number): EditResult {
   const found = findPiece(state, pieceId);
-  if (!found) return fail("Pick a piece first.");
+  if (!found) return fail(i18n._({ id: "ui.Pick a piece first.", message: "Pick a piece first." }));
   const p = found.piece;
   const newIn = clamp(p.in_s + delta, 0, p.out_s - MIN_PIECE_S);
   const applied = newIn - p.in_s;
@@ -116,7 +117,7 @@ export function trimStartBy(state: StudioState, pieceId: string, delta: number):
 /** Move the end of a piece by `delta` seconds of source (positive keeps more; it cannot pass the source's own end). */
 export function trimEndBy(state: StudioState, pieceId: string, delta: number, limits: StudioLimits = DEFAULT_LIMITS): EditResult {
   const found = findPiece(state, pieceId);
-  if (!found) return fail("Pick a piece first.");
+  if (!found) return fail(i18n._({ id: "ui.Pick a piece first.", message: "Pick a piece first." }));
   const p = found.piece;
   const max = p.source_s ?? Infinity;
   const newOut = clamp(p.out_s + delta, p.in_s + MIN_PIECE_S, max);

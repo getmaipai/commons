@@ -10,6 +10,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "../dashboard/components/ui/combobox";
+import { i18n } from "@/kit/i18n";
 
 export interface PersonOption {
   id: string;
@@ -67,10 +68,10 @@ function Chips({ value, onValueChange, disabled, excludePersonId, ariaLabel, ros
         {value.map((id) => (
           <ComboboxChip key={id}>{getLabel(id)}</ComboboxChip>
         ))}
-        <ComboboxChipsInput placeholder={value.length === 0 ? (placeholder ?? "Add a person\u2026") : undefined} />
+        <ComboboxChipsInput placeholder={value.length === 0 ? (placeholder ?? i18n._({ id: "ui.Add a person…", message: "Add a person…" })) : undefined} />
       </ComboboxChips>
       <ComboboxContent>
-        <ComboboxEmpty>{emptyText ?? "No one else in the household."}</ComboboxEmpty>
+        <ComboboxEmpty>{emptyText ?? i18n._({ id: "ui.No one else in the household.", message: "No one else in the household." })}</ComboboxEmpty>
         <ComboboxList>{(id: string) => <ComboboxItem key={id} value={id}>{getLabel(id)}</ComboboxItem>}</ComboboxList>
       </ComboboxContent>
     </Combobox>

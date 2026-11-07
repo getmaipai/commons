@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { i18n } from "@/kit/i18n"
 import { useMediaQuery } from "usehooks-ts";
 import { Button } from "@/kit/ui/button";
 import { getIcon } from "@/kit/icons";
@@ -85,7 +86,7 @@ export function Wizard({
   onNext,
   skipLabel,
   onSkip,
-  nextLabel = "Continue",
+  nextLabel = i18n._({ id: "ui.Continue", message: "Continue" }),
   nextDisabled,
   busy,
   phaseMode = false,
@@ -110,7 +111,7 @@ export function Wizard({
       : "lg:ml-[12vw] lg:max-w-[40rem]"
     : undefined;
   const sticky = stickyFooter ?? split;
-  const progressLabel = progress ? (progress.label ?? `Step ${progress.current} of ${progress.total}`) : undefined;
+  const progressLabel = progress ? (progress.label ?? i18n._({ id: "ui.Step {current} of {total}", message: "Step {current} of {total}", values: { current: progress.current, total: progress.total } })) : undefined;
   const progressBar = progress ? (
     <Progress
       mode="determinate"
@@ -178,7 +179,7 @@ export function Wizard({
     const content = (
       <>
         {!progress ? (
-          <ol className="flex flex-wrap items-center gap-x-1 gap-y-2 lg:col-span-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
+          <ol className="flex flex-wrap items-center gap-x-1 gap-y-2 lg:col-span-2" aria-label={phaseMode ? i18n._({ id: "ui.Setup phases", message: "Setup phases" }) : i18n._({ id: "ui.Setup steps", message: "Setup steps" })}>
             {stepItems()}
           </ol>
         ) : null}
@@ -221,7 +222,7 @@ export function Wizard({
             </div>
           ) : null}
           {!progress ? (
-            <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
+            <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? i18n._({ id: "ui.Setup phases", message: "Setup phases" }) : i18n._({ id: "ui.Setup steps", message: "Setup steps" })}>
               {stepItems()}
             </ol>
           ) : null}
@@ -255,7 +256,7 @@ export function Wizard({
         </div>
       ) : null}
       {!progress ? (
-        <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? "Setup phases" : "Setup steps"}>
+        <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label={phaseMode ? i18n._({ id: "ui.Setup phases", message: "Setup phases" }) : i18n._({ id: "ui.Setup steps", message: "Setup steps" })}>
           {stepItems()}
         </ol>
       ) : null}
@@ -340,17 +341,17 @@ function Footer({
     <div className={cn("flex items-center gap-2 border-t border-border pt-4", centered && "min-h-20 px-6 text-base", className)}>
       {onBack ? (
         <Button type="button" variant={split || centered ? "link" : "ghost"} className={centered ? "font-semibold text-[var(--wizard-title-color)] underline" : undefined} onClick={onBack} disabled={busy}>
-          Back
+          {i18n._({ id: "ui.Back", message: "Back" })}
         </Button>
       ) : null}
       <div className="flex-1" />
       {onSkip ? (
         <Button type="button" variant="ghost" onClick={onSkip} disabled={busy}>
-          {skipLabel ?? "Skip"}
+          {skipLabel ?? i18n._({ id: "ui.Skip", message: "Skip" })}
         </Button>
       ) : null}
       <Button type="button" className={centered ? "rounded-full bg-[var(--wizard-primary-background)] font-semibold text-[var(--wizard-primary-foreground)] hover:opacity-90 disabled:bg-[var(--wizard-primary-disabled)] disabled:text-[var(--wizard-primary-disabled-foreground)]" : undefined} onClick={onNext} disabled={busy || nextDisabled}>
-        {busy ? "Working…" : nextLabel}
+        {busy ? i18n._({ id: "ui.Working…", message: "Working…" }) : nextLabel}
       </Button>
     </div>
   );

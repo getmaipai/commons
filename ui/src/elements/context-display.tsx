@@ -15,6 +15,7 @@ import {
   type FC,
   type ReactNode,
 } from "react";
+import { i18n } from "@/kit/i18n";
 
 export type TokenUsage = {
   totalTokens?: number | undefined;
@@ -204,10 +205,10 @@ const getContextSegments = (
 ): ContextSegment[] => {
   if (!usage) return [];
   return [
-    { label: "Input", tokens: usage.inputTokens ?? 0 },
-    { label: "Cached input", tokens: usage.cachedInputTokens ?? 0 },
-    { label: "Output", tokens: usage.outputTokens ?? 0 },
-    { label: "Reasoning", tokens: usage.reasoningTokens ?? 0 },
+    { label: i18n._({ id: "ui.Input", message: "Input" }), tokens: usage.inputTokens ?? 0 },
+    { label: i18n._({ id: "ui.Cached input", message: "Cached input" }), tokens: usage.cachedInputTokens ?? 0 },
+    { label: i18n._({ id: "ui.Output", message: "Output" }), tokens: usage.outputTokens ?? 0 },
+    { label: i18n._({ id: "ui.Reasoning", message: "Reasoning" }), tokens: usage.reasoningTokens ?? 0 },
   ].filter((segment) => segment.tokens > 0);
 };
 
@@ -235,7 +236,7 @@ function ContextDisplayContent({
       <div className="text-xs">
         <div className="flex items-baseline justify-between gap-6 whitespace-nowrap">
           <span className={getPercentColor(percent)}>
-            {Math.round(percent)}% full
+            {i18n._({ id: "ui.{percent}% full", message: "{percent}% full", values: { percent: Math.round(percent) } })}
           </span>
           <span className="font-mono tabular-nums">
             {formatTokenCount(Math.min(totalTokens, modelContextWindow))} /{" "}
@@ -337,7 +338,7 @@ const ContextDisplayRing: FC<PresetProps> = ({
         "text-muted-foreground hover:text-foreground gap-1.5 px-1.5 py-1 text-xs",
         className,
       )}
-      aria-label="Context usage"
+      aria-label={i18n._({ id: "ui.Context usage", message: "Context usage" })}
     >
       <RingVisual />
       <RingPercentLabel />
@@ -381,7 +382,7 @@ const ContextDisplayBar: FC<PresetProps> = ({
   >
     <ContextDisplayTrigger
       className={cn("px-2 py-1", className)}
-      aria-label="Context usage"
+      aria-label={i18n._({ id: "ui.Context usage", message: "Context usage" })}
     >
       <BarVisual />
     </ContextDisplayTrigger>
@@ -412,7 +413,7 @@ const ContextDisplayText: FC<PresetProps> = ({
     resetKey={resetKey}
   >
     <ContextDisplayTrigger
-      aria-label="Context usage"
+      aria-label={i18n._({ id: "ui.Context usage", message: "Context usage" })}
       className={cn(
         "text-muted-foreground hover:bg-accent hover:text-accent-foreground px-2 py-1 font-mono text-xs tabular-nums",
         className,

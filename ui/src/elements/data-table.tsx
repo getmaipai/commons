@@ -6,6 +6,7 @@ import { cn } from "cn";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { safeHref } from "./href";
+import { i18n, kitLocaleTag } from "@/kit/i18n";
 import { mono, paper } from "./surfaces";
 
 export interface ModelUsage {
@@ -55,15 +56,15 @@ export interface DataTableSelectionLabels {
   selectRow: (label: string) => string;
 }
 
-export const DEFAULT_DATA_TABLE_SELECTION_LABELS: DataTableSelectionLabels = {
-  selectAll: "Select all rows",
-  selectRow: (label) => `Select ${label}`,
-};
+export const defaultDataTableSelectionLabels = (): DataTableSelectionLabels => ({
+  selectAll: i18n._({ id: "ui.Select all rows", message: "Select all rows" }),
+  selectRow: (label) => i18n._({ id: "ui.Select {label}", message: "Select {label}", values: { label } }),
+});
 
-export const MODEL_USAGE_COLUMNS: readonly DataTableColumn<ModelUsage>[] = [
-  { id: "name", header: "Model" },
-  { id: "context", header: "Context", align: "end" },
-  { id: "cost", header: "Cost", align: "end" },
+export const modelUsageColumns = (): readonly DataTableColumn<ModelUsage>[] => [
+  { id: "name", header: i18n._({ id: "ui.Model", message: "Model" }) },
+  { id: "context", header: i18n._({ id: "ui.Context", message: "Context" }), align: "end" },
+  { id: "cost", header: i18n._({ id: "ui.Cost", message: "Cost" }), align: "end" },
 ];
 
 export interface DataTableProps<Row = ModelUsage> extends Omit<
@@ -136,7 +137,7 @@ function formatCell<Row>(column: DataTableColumn<Row>, row: Row, locale: string,
   const value = (row as Record<string, unknown>)[column.id];
   if (value === undefined || value === null) return "";
   const raw = Array.isArray(value) ? value.join(", ") : String(value);
-  if (format.kind === "boolean") return value ? (format.trueLabel ?? "Yes") : (format.falseLabel ?? "No");
+  if (format.kind === "boolean") return value ? (format.trueLabel ?? i18n._({ id: "ui.Yes", message: "Yes" })) : (format.falseLabel ?? i18n._({ id: "ui.No", message: "No" }));
   if (format.kind === "list") {
     const values = Array.isArray(value) ? value : [value];
     const shown = values.slice(0, Math.max(0, format.max ?? values.length));
@@ -213,7 +214,7 @@ export function DataTable<Row = ModelUsage>({
   onSortChange,
   toolbar,
   rowActions,
-  rowActionsLabel = "Actions",
+  rowActionsLabel = i18n._({ id: "ui.Actions", message: "Actions" }),
   formats,
   emptyLabel,
   locale,
@@ -228,12 +229,12 @@ export function DataTable<Row = ModelUsage>({
 }: DataTableProps<Row>) {
   const { "aria-label": inheritedLabel, ...rootProps } = props;
   const genericMode = columns !== undefined;
-  const formatLocale = locale ?? Intl.DateTimeFormat().resolvedOptions().locale;
+  const formatLocale = locale ?? kitLocaleTag();
   const formatRelativeTo = relativeTo ?? Date.now();
   const cols = (columns ??
-    (MODEL_USAGE_COLUMNS as unknown as readonly DataTableColumn<Row>[]));
+    (modelUsageColumns() as unknown as readonly DataTableColumn<Row>[]));
   const selectable = onSelectionChange !== undefined;
-  const selectCopy: DataTableSelectionLabels = { ...DEFAULT_DATA_TABLE_SELECTION_LABELS, ...selectionLabels };
+  const selectCopy: DataTableSelectionLabels = { ...defaultDataTableSelectionLabels(), ...selectionLabels };
   const anchor = useRef<string | null>(null);
   const rowIds = rows.map((row, index) => getRowId(row, index));
   const rowIdSet = new Set(rowIds);
@@ -317,7 +318,7 @@ export function DataTable<Row = ModelUsage>({
         type="button"
         variant="ghost"
         size="xs"
-        aria-label={`Sort by ${headerText(column.header, column.id)}`}
+        aria-label={i18n._({ id: "ui.Sort by {column}", message: "Sort by {column}", values: { column: headerText(column.header, column.id) } })}
         onClick={() => onSortChange?.(nextSort(sort, column.id))}
       >
         {column.header}

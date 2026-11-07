@@ -14,6 +14,7 @@ import {
 import type { FileMessagePartComponent } from "@assistant-ui/react";
 import { cn } from "cn";
 import { hitArea } from "../utils";
+import { i18n, kitLocaleTag } from "@/kit/i18n";
 
 const fileVariants = cva(
   "aui-file-root inline-flex items-center gap-3 rounded-lg transition-colors",
@@ -117,14 +118,18 @@ function getDataUrlSize(data: string): number {
     .byteLength;
 }
 
+function formatOneDecimal(value: number): string {
+  return new Intl.NumberFormat(kitLocaleTag(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value);
+}
+
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) {
     return `${bytes} B`;
   }
   if (bytes < 1024 * 1024) {
-    return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${formatOneDecimal(bytes / 1024)} KB`;
   }
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${formatOneDecimal(bytes / (1024 * 1024))} MB`;
 }
 
 export type FileRootProps = React.ComponentProps<"div"> &
@@ -185,7 +190,7 @@ function FileName({
       className={cn("min-w-0 flex-1 truncate font-medium", className)}
       {...props}
     >
-      {children || "Unnamed file"}
+      {children || i18n._({ id: "ui.Unnamed file", message: "Unnamed file" })}
     </span>
   );
 }
@@ -241,7 +246,7 @@ function FileDownload({
         hitArea48 && hitArea(3),
         className,
       )}
-      aria-label={!children ? `Download ${filename || "file"}` : undefined}
+      aria-label={!children ? i18n._({ id: "ui.Download {name}", message: "Download {name}", values: { name: filename || i18n._({ id: "ui.file", message: "file" }) } }) : undefined}
       {...props}
     >
       {children || <DownloadIcon className="size-4" />}

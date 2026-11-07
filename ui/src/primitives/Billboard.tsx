@@ -4,6 +4,7 @@ import { Button } from "@/kit/ui/button";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/kit/ui/carousel";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { SafeImage } from "@/kit/primitives/SafeImage";
+import { i18n } from "@/kit/i18n";
 
 /** One action on a slide. */
 export interface BillboardAction {
@@ -132,7 +133,7 @@ export function Billboard({
         {slides.map((slide, index) => (
           <CarouselItem
             key={slide.id}
-            aria-label={`${index + 1} of ${slides.length}: ${slide.title}`}
+            aria-label={i18n._({ id: "ui.{position} of {total}: {title}", message: "{position} of {total}: {title}", values: { position: index + 1, total: slides.length, title: slide.title } })}
             aria-current={index === current ? "true" : undefined}
             onMouseEnter={() => startDwell(slide.id)}
             onMouseLeave={() => {
@@ -191,7 +192,7 @@ export function Billboard({
             <button
               key={slide.id}
               type="button"
-              aria-label={`Show ${slide.title}`}
+              aria-label={i18n._({ id: "ui.Show {title}", message: "Show {title}", values: { title: slide.title } })}
               aria-current={index === current ? "true" : undefined}
               onClick={() => api?.scrollTo(index)}
               className={cn("flex size-12 items-center justify-center rounded-full", FOCUS_RING)}

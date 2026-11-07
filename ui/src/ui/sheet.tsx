@@ -2,6 +2,7 @@
 "use client"
 
 import * as React from "react"
+import { i18n } from "@/kit/i18n";
 import { cn } from "@/kit/utils"
 import { XIcon } from "lucide-react"
 import { Dialog as SheetPrimitive } from "radix-ui"
@@ -82,7 +83,7 @@ function SheetContent({
           <SheetPrimitive.Close data-slot="sheet-close" asChild>
             <Button variant="ghost" size="icon-sm" className="absolute top-3 right-3">
               <XIcon />
-              <span className="sr-only">Close</span>
+              <span className="sr-only">{i18n._({ id: "ui.Close", message: "Close" })}</span>
             </Button>
           </SheetPrimitive.Close>
         )}

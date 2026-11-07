@@ -17,6 +17,7 @@ import { cn } from "../dashboard/lib/utils";
 import { HitField } from "../settings/HitField";
 import { Chip } from "./Chip";
 import { SafeImage } from "./SafeImage";
+import { i18n } from "@/kit/i18n";
 
 const SearchIcon = getIcon("search");
 const HideIcon = getIcon("panel-left-close");
@@ -177,7 +178,7 @@ export function SectionSidebar({
   standalone,
   sidebarProps,
 }: SectionSidebarProps) {
-  const labels: SectionSidebarCollapseLabels = { hide: "Hide sidebar", show: "Show sidebar", pin: "Keep sidebar open", ...collapseLabels };
+  const labels: SectionSidebarCollapseLabels = { hide: i18n._({ id: "ui.Hide sidebar", message: "Hide sidebar" }), show: i18n._({ id: "ui.Show sidebar", message: "Show sidebar" }), pin: i18n._({ id: "ui.Keep sidebar open", message: "Keep sidebar open" }), ...collapseLabels };
   const generatedId = useId();
   const columnId = sidebarProps?.id ?? `section-sidebar-${generatedId}`;
   const compact = density === "compact";
@@ -461,7 +462,7 @@ export function SectionSidebar({
           </HitField>
         ) : null}
         {!rail && search?.recents && search.recents.length > 0 ? (
-          <ul aria-label="Recent searches" className="flex list-none flex-wrap gap-1 px-2">
+          <ul aria-label={i18n._({ id: "ui.Recent searches", message: "Recent searches" })} className="flex list-none flex-wrap gap-1 px-2">
             {search.recents.map((recent) => (
               <li key={recent.key}>
                 <Chip onClick={() => search.onRecent?.(recent.label)}>{recent.label}</Chip>
@@ -546,7 +547,7 @@ export function SectionSidebar({
 }
 
 /** The button a host puts in its page header while the column is hidden, to bring it back. 48 px target, labelled, `aria-expanded`. */
-export function SectionSidebarShowButton({ onClick, label = "Show sidebar", controls }: { onClick: () => void; label?: string; controls?: string }) {
+export function SectionSidebarShowButton({ onClick, label = i18n._({ id: "ui.Show sidebar", message: "Show sidebar" }), controls }: { onClick: () => void; label?: string; controls?: string }) {
   // With `controls` (the column's id) resting the pointer on it, or tabbing to it, peeks the column like Chat's header toggle; a click still pins.
   const tell = (open: boolean) => {
     if (controls) window.dispatchEvent(new CustomEvent(PEEK_EVENT, { detail: { controls, open } }));

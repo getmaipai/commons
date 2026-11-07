@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { i18n } from "@/kit/i18n"
 import { Pin, PinOff } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import LogoIcon from "../../../../assets/images/logos/logoicon.svg";
@@ -98,7 +99,7 @@ const railButton =
  * come from the same sidebaritems data the folded sidebar renders. */
 function itemLabel(item: { name: string }, status: ReturnType<RailItemStatus>): string {
   if (!status?.ariaLabel) return item.name;
-  return status.ariaLabel.toLocaleLowerCase().startsWith(`${item.name.toLocaleLowerCase()}:`) ? status.ariaLabel : `${item.name}: ${status.ariaLabel}`;
+  return status.ariaLabel.toLocaleLowerCase().startsWith(`${item.name.toLocaleLowerCase()}:`) ? status.ariaLabel : i18n._({ id: "ui.{name}: {label}", message: "{name}: {label}", values: { name: item.name, label: status.ariaLabel } });
 }
 
 function StatusMark({ status }: { status: ReturnType<RailItemStatus> }) {
@@ -122,13 +123,13 @@ function AppLauncher({ apps, onTogglePin, isActive }: { apps: RailApp[]; onToggl
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <Tooltip>
-        <TooltipTrigger render={<PopoverTrigger data-slot="app-rail-launcher" aria-label="All apps" className={cn(railButton, hitArea(1), open && "bg-foreground/10 text-foreground")} />}>
+        <TooltipTrigger render={<PopoverTrigger data-slot="app-rail-launcher" aria-label={i18n._({ id: "ui.All apps", message: "All apps" })} className={cn(railButton, hitArea(1), open && "bg-foreground/10 text-foreground")} />}>
           <GridIcon className="size-5" aria-hidden />
         </TooltipTrigger>
-        <TooltipContent side="right">All apps</TooltipContent>
+        <TooltipContent side="right">{i18n._({ id: "ui.All apps", message: "All apps" })}</TooltipContent>
       </Tooltip>
-      <PopoverContent side="right" align="end" width="auto" className="w-72 max-w-[calc(100vw-5rem)]" aria-label="All apps">
-        <p className="px-1 text-sm font-medium">All apps</p>
+      <PopoverContent side="right" align="end" width="auto" className="w-72 max-w-[calc(100vw-5rem)]" aria-label={i18n._({ id: "ui.All apps", message: "All apps" })}>
+        <p className="px-1 text-sm font-medium">{i18n._({ id: "ui.All apps", message: "All apps" })}</p>
         <ul className="flex flex-col gap-0.5">
           {apps.map((app) => {
             const Icon = getIcon(app.icon);
@@ -149,7 +150,7 @@ function AppLauncher({ apps, onTogglePin, isActive }: { apps: RailApp[]; onToggl
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={app.pinned ? `Unpin ${app.name} from the rail` : `Pin ${app.name} to the rail`}
+                    aria-label={app.pinned ? i18n._({ id: "ui.Unpin {name} from the rail", message: "Unpin {name} from the rail", values: { name: app.name } }) : i18n._({ id: "ui.Pin {name} to the rail", message: "Pin {name} to the rail", values: { name: app.name } })}
                     aria-pressed={app.pinned}
                     onClick={() => onTogglePin(app.url, !app.pinned)}
                   >
@@ -173,7 +174,7 @@ function AllAppsLink({ href, active }: { href: string; active: boolean }) {
         render={
           <Link
             to={railHref(href)}
-            aria-label="All apps"
+            aria-label={i18n._({ id: "ui.All apps", message: "All apps" })}
             aria-current={active ? "page" : undefined}
             data-active={active ? "" : undefined}
             data-slot="app-rail-launcher"
@@ -183,7 +184,7 @@ function AllAppsLink({ href, active }: { href: string; active: boolean }) {
       >
         <GridIcon className="size-5" aria-hidden />
       </TooltipTrigger>
-      <TooltipContent side="right">All apps</TooltipContent>
+      <TooltipContent side="right">{i18n._({ id: "ui.All apps", message: "All apps" })}</TooltipContent>
     </Tooltip>
   );
 }
@@ -250,9 +251,9 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
         <TooltipTrigger render={<div data-slot="app-rail-search" className="flex size-[var(--rail-button,40px)] items-center justify-center" />}>
           <HeaderSearch remote={searchRemote} triggerClassName="rounded-lg text-muted-foreground hover:bg-foreground/5 hover:text-foreground [&_svg]:size-5" />
         </TooltipTrigger>
-        <TooltipContent side="right">Search</TooltipContent>
+        <TooltipContent side="right">{i18n._({ id: "ui.Search", message: "Search" })}</TooltipContent>
       </Tooltip>
-      {mobile ? <span aria-hidden>Search</span> : null}
+      {mobile ? <span aria-hidden>{i18n._({ id: "ui.Search", message: "Search" })}</span> : null}
       </div>
 
       <ul className={cn("mt-2 flex flex-col gap-1", !mobile && "items-center")}>
@@ -289,7 +290,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
 
       {pinnedApps.length ? (
         <div data-slot="app-rail-pinned" className={cn(!mobile && "min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:thin]")}>
-        <ul data-slot="app-rail-apps" aria-label={mobile ? "Installed apps" : "Pinned apps"} className={cn("mt-1 flex flex-col gap-1 border-t border-border pt-2", !mobile && "items-center")}>
+        <ul data-slot="app-rail-apps" aria-label={mobile ? i18n._({ id: "ui.Installed apps", message: "Installed apps" }) : i18n._({ id: "ui.Pinned apps", message: "Pinned apps" })} className={cn("mt-1 flex flex-col gap-1 border-t border-border pt-2", !mobile && "items-center")}>
           {pinnedApps.map((app) => {
             const active = isActive(app.url);
             const Icon = getIcon(app.icon);
@@ -332,7 +333,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
 }
 
 export default function AppRail(props: AppRailProps) {
-  return <nav aria-label="Primary navigation" data-slot="app-rail" data-tour={props.tourId}
+  return <nav aria-label={i18n._({ id: "ui.Primary navigation", message: "Primary navigation" })} data-slot="app-rail" data-tour={props.tourId}
     className="sticky top-0 flex h-svh min-h-0 w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)] shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2">
     <RailEntries {...props} />
   </nav>;

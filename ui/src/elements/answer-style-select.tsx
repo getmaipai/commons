@@ -3,6 +3,7 @@
 import type { ComponentType } from "react";
 import { Button } from "@/elements/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
+import { i18n } from "@/kit/i18n";
 
 export type AnswerStyleChoice = {
   id: string;
@@ -44,7 +45,7 @@ function ChoiceIcon({ choice, filled = false }: { choice: AnswerStyleChoice; fil
  * 44 px square, named for screen readers by its current word; the open menu shows icon, word and one plain line per choice.
  * Quiet when the current choice is off, filled (the primary token, like Send) when it is on. Colors come from theme tokens only.
  */
-export function AnswerStyleSelect({ choices, value, onValueChange, name = "Answer style", side = "top", align = "start" }: AnswerStyleSelectProps) {
+export function AnswerStyleSelect({ choices, value, onValueChange, name = i18n._({ id: "ui.Answer style", message: "Answer style" }), side = "top", align = "start" }: AnswerStyleSelectProps) {
   const current = choices.find((choice) => choice.id === value) ?? choices[0];
   if (!current) return null;
   const label = `${name}: ${current.label}`;

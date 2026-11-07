@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { ChevronDownIcon, ChevronUpIcon, SearchIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, ghostButton, mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export interface SearchHit {
   id: string;
@@ -55,8 +56,8 @@ export function ConversationSearch({
           <input
             value={query}
             onChange={(event) => onQueryChange?.(event.target.value)}
-            placeholder="Find in conversation"
-            aria-label="Find in conversation"
+            placeholder={i18n._({ id: "ui.Find in conversation", message: "Find in conversation" })}
+            aria-label={i18n._({ id: "ui.Find in conversation", message: "Find in conversation" })}
             className="text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[13px] outline-none"
           />
           <span
@@ -68,7 +69,7 @@ export function ConversationSearch({
             <>
               <button
                 type="button"
-                aria-label="Previous match"
+                aria-label={i18n._({ id: "ui.Previous match", message: "Previous match" })}
                 onClick={() => onStep(-1)}
                 className={cn(ghostButton, "size-6 shrink-0")}
               >
@@ -76,7 +77,7 @@ export function ConversationSearch({
               </button>
               <button
                 type="button"
-                aria-label="Next match"
+                aria-label={i18n._({ id: "ui.Next match", message: "Next match" })}
                 onClick={() => onStep(1)}
                 className={cn(ghostButton, "size-6 shrink-0")}
               >

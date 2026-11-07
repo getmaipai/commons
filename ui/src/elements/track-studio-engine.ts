@@ -4,6 +4,7 @@
 // none with a `src` (the relock path, K4).
 
 import { LANE_IDS, gainAt, laneGain, laneOf, layoutLane, pieceEnvelope, previewEnd, type LaneId, type StudioPiece, type StudioState } from "./track-studio-model";
+import { i18n } from "@/kit/i18n";
 
 /** An audio element is corrected when it drifts from the clock by more than this (the design's proposal, measured in VIDEO-STUDIO-04). */
 export const DRIFT_LIMIT_S = 0.12;
@@ -49,8 +50,8 @@ interface AudioSlot {
   lastCorrectionMs: number;
 }
 
-export const PLAY_FAILED_LINE = "The preview could not start. Press Play again.";
-export const MEDIA_FAILED_LINE = "One of the files could not be played. The rest still can.";
+export const playFailedLine = (): string => i18n._({ id: "ui.The preview could not start. Press Play again.", message: "The preview could not start. Press Play again." });
+export const mediaFailedLine = (): string => i18n._({ id: "ui.One of the files could not be played. The rest still can.", message: "One of the files could not be played. The rest still can." });
 
 function whenEvent(el: HTMLMediaElement, names: string[], timeoutMs: number): Promise<void> {
   return new Promise((resolve) => {
@@ -233,7 +234,7 @@ export class PreviewEngine {
       v.load();
       await whenEvent(v, ["loadedmetadata", "error"], 4000);
       if (my !== this.token || this.disposed) return false;
-      if (v.error) { this.o.onError(MEDIA_FAILED_LINE); return false; }
+      if (v.error) { this.o.onError(mediaFailedLine()); return false; }
     }
     this.vIndex = index;
     if (Math.abs(v.currentTime - local) > 0.03) {
@@ -251,7 +252,7 @@ export class PreviewEngine {
     try {
       await this.video!.play();
     } catch {
-      this.o.onError(PLAY_FAILED_LINE);
+      this.o.onError(playFailedLine());
       return false;
     }
     return my === this.token && !this.disposed;
@@ -316,7 +317,7 @@ export class PreviewEngine {
       const started = this.now();
       const ok = await this.loadVideoPiece(next, at, my);
       if (!ok || my !== this.token) { this.seamBusy = false; return; }
-      if (v.paused) { try { await v.play(); } catch { this.o.onError(PLAY_FAILED_LINE); this.seamBusy = false; this.pause(); return; } }
+      if (v.paused) { try { await v.play(); } catch { this.o.onError(playFailedLine()); this.seamBusy = false; this.pause(); return; } }
       this.stats.seamsMs.push(Math.round(this.now() - started));
       this.seamBusy = false;
     }
@@ -384,7 +385,7 @@ export class PreviewEngine {
       el.hidden = true;
       el.setAttribute("data-studio-media", w.lane);
       el.src = w.piece.src;
-      el.addEventListener("error", () => this.o.onError(MEDIA_FAILED_LINE));
+      el.addEventListener("error", () => this.o.onError(mediaFailedLine()));
       this.o.host?.appendChild(el);
       const slot: AudioSlot = { pieceId: id, lane: w.lane, el, src: w.piece.src, active: false, lastCorrectionMs: 0 };
       this.slots.set(id, slot);
@@ -407,7 +408,7 @@ export class PreviewEngine {
         if (inside && !slot.active) {
           slot.active = true;
           try { slot.el.currentTime = desired; } catch { /* not ready yet */ }
-          void slot.el.play()?.catch(() => this.o.onError(MEDIA_FAILED_LINE));
+          void slot.el.play()?.catch(() => this.o.onError(mediaFailedLine()));
           this.scheduleEnvelope(slot.gain, pieceEnvelope(lane, i), t - start);
         } else if (!inside && slot.active) {
           slot.active = false;

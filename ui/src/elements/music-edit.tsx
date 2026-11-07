@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import { useId, type ReactNode } from "react";
 import { cn } from "cn";
 import { Input } from "@/kit/ui/input";
@@ -54,11 +55,11 @@ export function TextEdit({ label, value, onChange, maxLength, multiline, hint }:
     : <Input id={id} value={value} maxLength={maxLength} onChange={(event) => onChange(event.target.value)} />}</EditField>;
 }
 
-export function TagsEdit({ label = "Style tags", value, onChange }: { label?: string; value: string; onChange: (value: string) => void }) {
-  return <TextEdit label={label} value={value} onChange={onChange} hint="Separate with commas. Up to eight." />;
+export function TagsEdit({ label = i18n._({ id: "ui.Style tags", message: "Style tags" }), value, onChange }: { label?: string; value: string; onChange: (value: string) => void }) {
+  return <TextEdit label={label} value={value} onChange={onChange} hint={i18n._({ id: "ui.Separate with commas. Up to eight.", message: "Separate with commas. Up to eight." })} />;
 }
 
-export function EditActions({ onSave, onCancel, saveDisabled, saveLabel = "Save", cancelLabel = "Cancel" }: { onSave: () => void; onCancel: () => void; saveDisabled?: boolean; saveLabel?: string; cancelLabel?: string }) {
+export function EditActions({ onSave, onCancel, saveDisabled, saveLabel = i18n._({ id: "ui.Save", message: "Save" }), cancelLabel = i18n._({ id: "ui.Cancel", message: "Cancel" }) }: { onSave: () => void; onCancel: () => void; saveDisabled?: boolean; saveLabel?: string; cancelLabel?: string }) {
   return <div data-slot="edit-actions" className="flex flex-wrap justify-end gap-2 pt-1">
     <button type="button" onClick={onCancel} className={pillButton}>{cancelLabel}</button>
     <button type="button" onClick={onSave} disabled={saveDisabled} className={inkPill}>{saveLabel}</button>

@@ -12,6 +12,7 @@ import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "../ui/breadcrumb";
 import { resolveHref, visibleGroups, type Section, type SettingsAreaDef, type SettingsViewer, type SettingsTab } from "./settingsAudience";
+import { i18n } from "@/kit/i18n";
 
 const ArrowUpRight = getIcon("arrow-up-right");
 const ChevronLeft = getIcon("chevron-left");
@@ -128,8 +129,8 @@ export function SettingsShell({
   const searching = searchQuery.trim().length > 0;
   const groups = visibleGroups(area, viewer, registry, honouredBy);
   const active = groups.flatMap((g) => g.sections).find((s) => s.id === activeSection);
-  const searchLabel = labels?.search ?? "Search";
-  const title = searching ? (labels?.results ?? "Results") : (active?.label ?? area.title);
+  const searchLabel = labels?.search ?? i18n._({ id: "ui.Search", message: "Search" });
+  const title = searching ? (labels?.results ?? i18n._({ id: "ui.Results", message: "Results" })) : (active?.label ?? area.title);
   const showColumn = !active || searching;
   const showContent = Boolean(active) || searching;
   const collapsed = Boolean(collapsible?.collapsed);
@@ -162,7 +163,7 @@ export function SettingsShell({
       )}
     >
       <span id={describedId} className="sr-only">
-        {labels?.opensAnotherPage ?? "Opens another page"}
+        {labels?.opensAnotherPage ?? i18n._({ id: "ui.Opens another page", message: "Opens another page" })}
       </span>
       {collapsed && !peeking ? (
         <div
@@ -247,7 +248,7 @@ export function SettingsShell({
           {tabs && tabs.length >= 2 ? (
             <div data-slot="settings-tabs-scroll" className="-mx-6 mt-2 overflow-x-auto px-6 lg:overflow-visible">
               <Tabs defaultValue={tabs[0]!.id} value={tab} onValueChange={(id) => { if (id) onTabChange?.(id); }}>
-                <TabsList variant="line" aria-label={`${title} sections`} className="min-w-max">
+                <TabsList variant="line" aria-label={i18n._({ id: "ui.{title} sections", message: "{title} sections", values: { title } })} className="min-w-max">
                   {tabs.map((item) => <TabsTrigger key={item.id} value={item.id} aria-controls={undefined} className="min-h-12">{item.label}</TabsTrigger>)}
                 </TabsList>
               </Tabs>
@@ -263,7 +264,7 @@ export function SettingsShell({
 }
 
 function SettingsColumnToggle({ collapsed, peek = false, onToggle, buttonRef }: { collapsed: boolean; peek?: boolean; onToggle: () => void; buttonRef?: RefObject<HTMLButtonElement | null> }) {
-  const label = peek ? "Keep settings sidebar open" : collapsed ? "Show settings sidebar" : "Hide settings sidebar";
+  const label = peek ? i18n._({ id: "ui.Keep settings sidebar open", message: "Keep settings sidebar open" }) : collapsed ? i18n._({ id: "ui.Show settings sidebar", message: "Show settings sidebar" }) : i18n._({ id: "ui.Hide settings sidebar", message: "Hide settings sidebar" });
   const Icon = collapsed && !peek ? PanelLeftOpen : PanelLeftClose;
   return (
     <TooltipProvider>

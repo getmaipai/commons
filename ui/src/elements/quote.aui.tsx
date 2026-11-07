@@ -8,6 +8,7 @@ import {
 } from "@assistant-ui/react";
 import { QuoteIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
+import { i18n } from "@/kit/i18n"
 
 function QuoteBlockRoot({ className, ...props }: ComponentProps<"div">) {
   return (
@@ -101,7 +102,7 @@ function SelectionToolbarRoot({
 function SelectionToolbarQuote({
   className,
   children,
-  label = "Quote",
+  label = i18n._({ id: "ui.Quote", message: "Quote" }),
   ...props
 }: ComponentProps<typeof SelectionToolbarPrimitive.Quote> & {
   /** The button's words when no children are given. */
@@ -212,7 +213,7 @@ function ComposerQuotePreviewText({
 function ComposerQuotePreviewDismiss({
   className,
   children,
-  label = "Dismiss quote",
+  label = i18n._({ id: "ui.Dismiss quote", message: "Dismiss quote" }),
   ...props
 }: ComponentProps<typeof ComposerPrimitive.QuoteDismiss> & {
   /** The dismiss button's accessible name when no children are given. */

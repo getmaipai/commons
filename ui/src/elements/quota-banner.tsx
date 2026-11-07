@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { cn } from "cn";
 import { inkButton, mono, paper } from "./surfaces";
 import { announced, pct } from "./range";
+import { i18n } from "@/kit/i18n";
 
 export function QuotaBanner({
   used,
@@ -60,24 +61,24 @@ export function QuotaBanner({
             tight && "text-status-warning-ink",
           )}
         >
-          {amountWithUnit(left)} left
+          {i18n._({ id: "ui.{amount} left", message: "{amount} left", values: { amount: amountWithUnit(left) } })}
         </span>
         {resetsIn !== undefined && (
           <span className={cn(mono, "text-muted-foreground ms-auto tabular-nums")}>
-            resets in {resetsIn}
+            {i18n._({ id: "ui.resets in {resetsIn}", message: "resets in {resetsIn}", values: { resetsIn } })}
           </span>
         )}
       </div>
 
       <span
         role="meter"
-        aria-label={`${unit} used`}
+        aria-label={i18n._({ id: "ui.{unit} used", message: "{unit} used", values: { unit } })}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={announced(pct(used, limit))}
         aria-valuetext={formatAmount
-          ? `${formatAmount(used)} of ${formatAmount(limit)} used`
-          : `${used} of ${limit} ${unit} used`}
+          ? i18n._({ id: "ui.{used} of {limit} used", message: "{used} of {limit} used", values: { used: formatAmount(used), limit: formatAmount(limit) } })
+          : i18n._({ id: "ui.{used} of {limit} {unit} used", message: "{used} of {limit} {unit} used", values: { used, limit, unit } })}
         className="bg-foreground/[0.06] h-1 w-full overflow-hidden rounded-full"
       >
         <span
@@ -92,8 +93,8 @@ export function QuotaBanner({
       <div className="flex items-center gap-2">
         <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {formatAmount
-            ? `${formatAmount(used)} of ${formatAmount(limit)} used`
-            : `${used} of ${limit} used`}
+            ? i18n._({ id: "ui.{used} of {limit} used", message: "{used} of {limit} used", values: { used: formatAmount(used), limit: formatAmount(limit) } })
+            : i18n._({ id: "ui.{used} of {limit} used", message: "{used} of {limit} used", values: { used, limit } })}
         </span>
         {onUpgrade && upgradeLabel !== undefined && (
           <button

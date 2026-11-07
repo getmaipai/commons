@@ -4,6 +4,7 @@ import { useEffect, useRef, type ComponentProps } from "react";
 import { PinIcon, SearchIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n"
 
 export interface SearchableThread {
   id: string;
@@ -177,8 +178,8 @@ export function ThreadSearch({
         value={query}
         onChange={(event) => onQueryChange?.(event.target.value)}
         onKeyDown={onKeyDown}
-        placeholder="Search threads"
-        aria-label="Search threads"
+        placeholder={i18n._({ id: "ui.Search threads", message: "Search threads" })}
+        aria-label={i18n._({ id: "ui.Search threads", message: "Search threads" })}
         className={
           density === "compact" && inputOnly
             ? "text-foreground/85 placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-[14px] outline-none"
@@ -216,7 +217,7 @@ export function ThreadSearch({
       {pinned.length > 0 && (
         <div className="flex flex-col">
           <span className={cn(mono, "text-muted-foreground px-2 pb-1")}>
-            pinned
+            {i18n._({ id: "ui.pinned", message: "pinned" })}
           </span>
           {pinned.map(row)}
         </div>
@@ -233,7 +234,7 @@ export function ThreadSearch({
 
       {ordered.length === 0 && (
         <span className="text-muted-foreground px-2 py-4 text-center text-xs">
-          No thread matches “{query}”
+          {i18n._({ id: "ui.No thread matches “{query}”", message: "No thread matches “{query}”", values: { query } })}
         </span>
       )}
     </div>

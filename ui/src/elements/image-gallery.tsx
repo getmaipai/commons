@@ -28,6 +28,7 @@ import { safeHref } from "./href";
 import { clamp } from "./range";
 import { field, ghostButton, imageEditRevealClass, mono } from "./surfaces";
 import { SafeImage } from "../primitives/SafeImage";
+import { i18n } from "@/kit/i18n"
 
 export interface GalleryImage {
   id: string;
@@ -110,7 +111,7 @@ export function ImageGallery({
   onEditImage,
   editAlwaysVisible = false,
   canEditImage,
-  editLabel = "Edit picture",
+  editLabel = i18n._({ id: "ui.Edit picture", message: "Edit picture" }),
   size = "default",
   actions,
   layout = "row",
@@ -226,7 +227,7 @@ export function ImageGallery({
             <button
               key={image.id}
               type="button"
-              aria-label={`Open image: ${image.alt}`}
+              aria-label={i18n._({ id: "ui.Open image: {alt}", message: "Open image: {alt}", values: { alt: image.alt } })}
               onClick={(event) => open(imageIndex, event.currentTarget)}
               className={cn(
                 field,
@@ -298,7 +299,7 @@ export function ImageGallery({
         >
           <DialogContent className="gap-3 p-3 duration-150 motion-reduce:animate-none sm:max-w-4xl">
             <DialogTitle className="sr-only">
-              Image {index + 1} of {images.length}
+              {i18n._({ id: "ui.Image {current} of {total}", message: "Image {current} of {total}", values: { current: index + 1, total: images.length } })}
             </DialogTitle>
             <div className="flex min-h-0 items-center justify-center px-10">
               <SafeImage
@@ -311,7 +312,7 @@ export function ImageGallery({
             <div className="flex min-w-0 items-center gap-2">
               <button
                 type="button"
-                aria-label="Previous image"
+                aria-label={i18n._({ id: "ui.Previous image", message: "Previous image" })}
                 disabled={index === 0}
                 onClick={() => setActiveId(images[index - 1]?.id ?? null)}
                 className={cn(
@@ -342,7 +343,7 @@ export function ImageGallery({
                         aria-hidden
                         className="size-3 shrink-0"
                       />
-                      <span className="sr-only">(opens in a new tab)</span>
+                      <span className="sr-only">{i18n._({ id: "ui.(opens in a new tab)", message: "(opens in a new tab)" })}</span>
                     </a>
                   ) : (
                     <span className="text-muted-foreground truncate">
@@ -356,7 +357,7 @@ export function ImageGallery({
               </span>
               <button
                 type="button"
-                aria-label="Next image"
+                aria-label={i18n._({ id: "ui.Next image", message: "Next image" })}
                 disabled={index === images.length - 1}
                 onClick={() => setActiveId(images[index + 1]?.id ?? null)}
                 className={cn(

@@ -14,6 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "cn";
+import { i18n } from "@/kit/i18n"
 
 export type MermaidDiagramProps = {
   code: string;
@@ -166,7 +167,7 @@ function MermaidZoom({ svg, children }: MermaidZoomProps) {
         ref={triggerRef}
         type="button"
         data-slot="mermaid-zoom-trigger"
-        aria-label="Expand diagram"
+        aria-label={i18n._({ id: "ui.Expand diagram", message: "Expand diagram" })}
         onClick={() => setIsOpen(true)}
         className="aui-mermaid-zoom-trigger text-muted-foreground hover:text-foreground hover:border-muted-foreground/70 border-border bg-background absolute top-2 right-2 cursor-pointer rounded-md border p-1.5 opacity-0 transition group-hover/mermaid:opacity-100 focus-visible:opacity-100"
       >
@@ -179,7 +180,7 @@ function MermaidZoom({ svg, children }: MermaidZoomProps) {
             data-slot="mermaid-zoom-overlay"
             role="dialog"
             aria-modal="true"
-            aria-label="Diagram"
+            aria-label={i18n._({ id: "ui.Diagram", message: "Diagram" })}
             className="aui-mermaid-zoom-overlay fade-in animate-in bg-background fixed inset-0 z-50 duration-200"
           >
             <div
@@ -207,7 +208,7 @@ function MermaidZoom({ svg, children }: MermaidZoomProps) {
             >
               <button
                 type="button"
-                aria-label="Zoom in"
+                aria-label={i18n._({ id: "ui.Zoom in", message: "Zoom in" })}
                 onClick={() => zoomBy(1.25)}
                 className="text-muted-foreground hover:text-foreground cursor-pointer rounded-sm p-1.5"
               >
@@ -215,7 +216,7 @@ function MermaidZoom({ svg, children }: MermaidZoomProps) {
               </button>
               <button
                 type="button"
-                aria-label="Zoom out"
+                aria-label={i18n._({ id: "ui.Zoom out", message: "Zoom out" })}
                 onClick={() => zoomBy(0.8)}
                 className="text-muted-foreground hover:text-foreground cursor-pointer rounded-sm p-1.5"
               >
@@ -223,7 +224,7 @@ function MermaidZoom({ svg, children }: MermaidZoomProps) {
               </button>
               <button
                 type="button"
-                aria-label="Reset zoom"
+                aria-label={i18n._({ id: "ui.Reset zoom", message: "Reset zoom" })}
                 onClick={() => setTransform({ x: 0, y: 0, scale: 1 })}
                 className="text-muted-foreground hover:text-foreground cursor-pointer rounded-sm p-1.5"
               >
@@ -232,7 +233,7 @@ function MermaidZoom({ svg, children }: MermaidZoomProps) {
               <button
                 ref={closeRef}
                 type="button"
-                aria-label="Close"
+                aria-label={i18n._({ id: "ui.Close", message: "Close" })}
                 onClick={handleClose}
                 className="text-muted-foreground hover:text-foreground cursor-pointer rounded-sm p-1.5"
               >
@@ -277,7 +278,7 @@ const MermaidDiagramImpl: FC<MermaidDiagramProps> = ({
     return (
       <div
         data-slot="mermaid-skeleton"
-        aria-label="Rendering diagram"
+        aria-label={i18n._({ id: "ui.Rendering diagram", message: "Rendering diagram" })}
         className={cn(
           "aui-mermaid-skeleton bg-muted flex h-32 animate-pulse items-center justify-center gap-3 rounded-b-lg p-4",
           className,
@@ -303,7 +304,7 @@ const MermaidDiagramImpl: FC<MermaidDiagramProps> = ({
       >
         <pre className="overflow-x-auto p-4 text-sm">{code.trim()}</pre>
         <p className="text-muted-foreground border-border border-t px-4 py-1.5 text-xs">
-          diagram could not be rendered
+          {i18n._({ id: "ui.diagram could not be rendered", message: "diagram could not be rendered" })}
         </p>
       </div>
     );

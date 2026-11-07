@@ -4,6 +4,7 @@ import { useEffect, useRef, type ComponentProps } from "react";
 import { CheckIcon, ThumbsDownIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, ghostButton, inkButton, mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export function FeedbackDialog({
   reasons,
@@ -92,7 +93,7 @@ export function FeedbackDialog({
         {sent && (
           <>
             <CheckIcon className="size-4 shrink-0 text-status-ok" />
-            Thanks. That helps us tune the model.
+            {i18n._({ id: "ui.Thanks. That helps us tune the model.", message: "Thanks. That helps us tune the model." })}
           </>
         )}
       </div>
@@ -103,9 +104,9 @@ export function FeedbackDialog({
             <span className="bg-foreground/[0.05] text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded-lg">
               <ThumbsDownIcon className="size-3.5" />
             </span>
-            <span className="text-[13.5px] font-medium">What went wrong?</span>
+            <span className="text-[13.5px] font-medium">{i18n._({ id: "ui.What went wrong?", message: "What went wrong?" })}</span>
             <span className={cn(mono, "text-muted-foreground ms-auto")}>
-              optional
+              {i18n._({ id: "ui.optional", message: "optional" })}
             </span>
           </div>
 
@@ -151,8 +152,8 @@ export function FeedbackDialog({
             value={note}
             onChange={(event) => onNoteChange?.(event.target.value)}
             rows={2}
-            placeholder="Anything else?"
-            aria-label="Anything else?"
+            placeholder={i18n._({ id: "ui.Anything else?", message: "Anything else?" })}
+            aria-label={i18n._({ id: "ui.Anything else?", message: "Anything else?" })}
             className={cn(
               field,
               "text-foreground/80 placeholder:text-muted-foreground focus-visible:ring-foreground/20 resize-none rounded-xl px-3 py-2 text-xs outline-none focus-visible:ring-1",
@@ -170,7 +171,7 @@ export function FeedbackDialog({
                     "h-8 px-3.5 text-xs font-medium",
                   )}
                 >
-                  Cancel
+                  {i18n._({ id: "ui.Cancel", message: "Cancel" })}
                 </button>
               )}
               {onSubmit && (
@@ -182,7 +183,7 @@ export function FeedbackDialog({
                     "flex h-8 items-center justify-center rounded-full px-3.5 text-xs font-medium",
                   )}
                 >
-                  Send feedback
+                  {i18n._({ id: "ui.Send feedback", message: "Send feedback" })}
                 </button>
               )}
             </div>

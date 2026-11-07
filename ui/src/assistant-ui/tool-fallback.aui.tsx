@@ -26,6 +26,7 @@ import {
 import { cn } from "@/kit/utils";
 import { Button } from "@/kit/ui/button";
 import { Textarea } from "@/kit/ui/textarea";
+import { i18n } from "@/kit/i18n";
 
 const ANIMATION_DURATION = 200;
 
@@ -144,7 +145,7 @@ function ToolFallbackTrigger({
     status?.type === "incomplete" && status.reason === "cancelled";
 
   const Icon = statusIconMap[statusType];
-  const label = isCancelled ? "Cancelled tool" : "Used tool";
+  const label = isCancelled ? i18n._({ id: "ui.Cancelled tool", message: "Cancelled tool" }) : i18n._({ id: "ui.Used tool", message: "Used tool" });
 
   return (
     <CollapsibleTrigger
@@ -268,7 +269,7 @@ function ToolFallbackResult({
           moving just the label to the floor would look like a large
           caption over small data. */}
       <p className="aui-tool-fallback-result-header text-muted-foreground text-xs font-medium">
-        Result:
+        {i18n._({ id: "ui.Result:", message: "Result:" })}
       </p>
       <pre className="aui-tool-fallback-result-content bg-muted/50 text-foreground/90 mt-1 rounded-md p-2.5 text-xs whitespace-pre-wrap">
         {typeof result === "string" ? result : JSON.stringify(result, null, 2)}
@@ -296,7 +297,7 @@ function ToolFallbackError({
   if (!errorText) return null;
 
   const isCancelled = status.reason === "cancelled";
-  const headerText = isCancelled ? "Cancelled reason:" : "Error:";
+  const headerText = isCancelled ? i18n._({ id: "ui.Cancelled reason:", message: "Cancelled reason:" }) : i18n._({ id: "ui.Error:", message: "Error:" });
 
   return (
     <div
@@ -317,15 +318,15 @@ function ToolFallbackError({
 const APPROVED_RESULT = "Approved by user";
 const DENIED_RESULT = "User denied tool execution";
 
-const APPROVAL_OPTION_DEFAULT_LABELS: Record<string, string> = {
-  "allow-once": "Allow",
-  "allow-always": "Always allow",
-  "reject-once": "Deny",
-  "reject-always": "Always deny",
-};
+const approvalOptionDefaultLabels = (): Record<string, string> => ({
+  "allow-once": i18n._({ id: "ui.Allow", message: "Allow" }),
+  "allow-always": i18n._({ id: "ui.Always allow", message: "Always allow" }),
+  "reject-once": i18n._({ id: "ui.Deny", message: "Deny" }),
+  "reject-always": i18n._({ id: "ui.Always deny", message: "Always deny" }),
+});
 
 const isKnownKind = (kind: string) =>
-  Object.hasOwn(APPROVAL_OPTION_DEFAULT_LABELS, kind);
+  Object.hasOwn(approvalOptionDefaultLabels(), kind);
 
 const isAllowKind = (kind: string) =>
   kind === "allow-once" || kind === "allow-always";
@@ -333,7 +334,7 @@ const isAllowKind = (kind: string) =>
 const approvalOptionLabel = (option: ToolApprovalOption) =>
   option.label ??
   (isKnownKind(option.kind)
-    ? APPROVAL_OPTION_DEFAULT_LABELS[option.kind]
+    ? approvalOptionDefaultLabels()[option.kind]
     : undefined) ??
   option.id;
 
@@ -498,9 +499,9 @@ function ToolFallbackApproval({
         value={answer}
         onChange={(event) => setAnswer(event.target.value)}
         disabled={submitted}
-        aria-label={question ? (approval?.prompt ?? "Answer") : "Note"}
+        aria-label={question ? (approval?.prompt ?? i18n._({ id: "ui.Answer", message: "Answer" })) : i18n._({ id: "ui.Note", message: "Note" })}
         placeholder={
-          question ? "Type your answer" : "Add a note to your decision"
+          question ? i18n._({ id: "ui.Type your answer", message: "Type your answer" }) : i18n._({ id: "ui.Add a note to your decision", message: "Add a note to your decision" })
         }
       />
       {question && (
@@ -510,7 +511,7 @@ function ToolFallbackApproval({
           onClick={submitAnswer}
           disabled={submitted || !answer.trim()}
         >
-          Send
+          {i18n._({ id: "ui.Send", message: "Send" })}
         </Button>
       )}
     </div>
@@ -531,7 +532,7 @@ function ToolFallbackApproval({
         {...props}
       >
         <p className="aui-tool-fallback-approval-confirm-title font-semibold">
-          {confirmMeta?.title ?? `${approvalOptionLabel(confirming)}?`}
+          {confirmMeta?.title ?? i18n._({ id: "ui.{label}?", message: "{label}?", values: { label: approvalOptionLabel(confirming) } })}
         </p>
         {confirmDescription && (
           <p className="aui-tool-fallback-approval-confirm-description text-muted-foreground">
@@ -560,7 +561,7 @@ function ToolFallbackApproval({
             onClick={() => respondWithOption(confirming)}
             disabled={submitted}
           >
-            Confirm
+            {i18n._({ id: "ui.Confirm", message: "Confirm" })}
           </Button>
           <Button
             size="sm"
@@ -569,7 +570,7 @@ function ToolFallbackApproval({
             onClick={() => setConfirmingId(null)}
             disabled={submitted}
           >
-            Back
+            {i18n._({ id: "ui.Back", message: "Back" })}
           </Button>
         </div>
       </div>
@@ -616,7 +617,7 @@ function ToolFallbackApproval({
               onClick={() => respond(false)}
               disabled={submitted}
             >
-              Deny
+              {i18n._({ id: "ui.Deny", message: "Deny" })}
             </Button>
           )}
         </div>
@@ -662,7 +663,7 @@ function ToolFallbackApproval({
           onClick={() => respond(true)}
           disabled={submitted}
         >
-          Allow
+          {i18n._({ id: "ui.Allow", message: "Allow" })}
           {primaryHint}
         </Button>
         <Button
@@ -672,7 +673,7 @@ function ToolFallbackApproval({
           onClick={() => respond(false)}
           disabled={submitted}
         >
-          Deny
+          {i18n._({ id: "ui.Deny", message: "Deny" })}
         </Button>
       </div>
       {answerField}

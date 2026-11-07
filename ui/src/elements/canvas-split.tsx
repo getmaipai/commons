@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { CheckIcon, CopyIcon, FileTextIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, ghostButton, mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n"
 
 export function CanvasSplit({
   variant = "card",
@@ -125,15 +126,15 @@ export function CanvasSplitHeader({
         {saved ? (
           <span className="flex items-center gap-1">
             <CheckIcon className="size-3" />
-            saved
+            {i18n._({ id: "ui.saved", message: "saved" })}
           </span>
         ) : (
-          "editing"
+          i18n._({ id: "ui.editing", message: "editing" })
         )}
       </span>
       <button
         type="button"
-        aria-label={`Copy ${title}`}
+        aria-label={i18n._({ id: "ui.Copy {title}", message: "Copy {title}", values: { title } })}
         onClick={onCopy}
         disabled={!onCopy}
         className={cn(
@@ -145,7 +146,7 @@ export function CanvasSplitHeader({
       </button>
       <button
         type="button"
-        aria-label="Close the canvas"
+        aria-label={i18n._({ id: "ui.Close the canvas", message: "Close the canvas" })}
         onClick={onClose}
         disabled={!onClose}
         className={cn(

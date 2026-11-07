@@ -18,6 +18,7 @@ import HeaderSearch, { type HeaderSearchProps } from "./HeaderSearch";
 import { useHeaderExtraLeft } from "./HeaderExtraContext";
 import { hitArea } from "../../../../../utils";
 import type { ReactNode } from "react";
+import { i18n } from "@/kit/i18n";
 
 export interface HeaderProps {
   /** SHELL-SEARCH-02 (home, 2026-09-23): threaded straight through to
@@ -60,14 +61,14 @@ export function IncognitoToggle({ on, onChange, tourId }: { on: boolean; onChang
         type="button"
         variant="ghost"
         className="h-9 gap-1.5 rounded-full border border-hue-violet bg-hue-violet px-3 text-sm font-medium text-hue-violet-foreground cursor-pointer hover:bg-hue-violet/90 hover:text-hue-violet-foreground focus-visible:ring-hue-violet"
-        aria-label="Incognito On"
+        aria-label={i18n._({ id: "ui.Incognito On", message: "Incognito On" })}
         data-tour={tourId}
         aria-pressed="true"
-        title="Incognito on"
+        title={i18n._({ id: "ui.Incognito on", message: "Incognito on" })}
         onClick={() => onChange(false)}
       >
         <VenetianMask className="size-4" />
-        Incognito
+        {i18n._({ id: "ui.Incognito", message: "Incognito" })}
       </Button>
     );
   }
@@ -80,10 +81,10 @@ export function IncognitoToggle({ on, onChange, tourId }: { on: boolean; onChang
       // docs/BACKLOG.md SHELL-09. Keep the existing 40px visual control;
       // the shared kit's hitArea(1) gives it a 48px tappable area.
       className={cn("h-10 w-10 rounded-full cursor-pointer hover:bg-hue-violet/10 focus-visible:ring-hue-violet text-muted-foreground", hitArea(1))}
-      aria-label="Incognito Off"
+      aria-label={i18n._({ id: "ui.Incognito Off", message: "Incognito Off" })}
       data-tour={tourId}
       aria-pressed="false"
-      title="Incognito off"
+      title={i18n._({ id: "ui.Incognito off", message: "Incognito off" })}
       onClick={() => onChange(true)}
     >
       <VenetianMask className="size-5" />
@@ -146,7 +147,7 @@ const Header = ({ headerSearchRemote, profileDisplayName, incognito, onIncognito
                     already has exactly this sr-only span and nothing
                     else (no aria-label alongside it); mirrored, not
                     invented. */}
-                Toggle Sidebar
+                {i18n._({ id: "ui.Toggle Sidebar", message: "Toggle Sidebar" })}
                 </SidebarTrigger> : null}
 
 

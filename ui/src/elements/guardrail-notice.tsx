@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { HeartHandshakeIcon, ShieldIcon } from "lucide-react";
 import { cn } from "cn";
 import { mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n"
 
 /** A link the notice offers as a next step (a crisis line to call or text,
  * a page to open), drawn as a plain link in the notice's own row. */
@@ -107,7 +108,7 @@ export function GuardrailNotice({
 
       {alternatives.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <span className={cn(mono, "text-muted-foreground")}>try instead</span>
+          <span className={cn(mono, "text-muted-foreground")}>{i18n._({ id: "ui.try instead", message: "try instead" })}</span>
           {alternatives.map((alternative) =>
             onPick ? (
               <button

@@ -1,4 +1,19 @@
 import type { CSSProperties } from "react";
+import { i18n } from "@/kit/i18n"
+
+function phaseLabel(phase: string): string {
+  switch (phase) {
+    case "New Moon": return i18n._({ id: "ui.New Moon", message: "New Moon" })
+    case "Waxing Crescent": return i18n._({ id: "ui.Waxing Crescent", message: "Waxing Crescent" })
+    case "First Quarter": return i18n._({ id: "ui.First Quarter", message: "First Quarter" })
+    case "Waxing Gibbous": return i18n._({ id: "ui.Waxing Gibbous", message: "Waxing Gibbous" })
+    case "Full Moon": return i18n._({ id: "ui.Full Moon", message: "Full Moon" })
+    case "Waning Gibbous": return i18n._({ id: "ui.Waning Gibbous", message: "Waning Gibbous" })
+    case "Last Quarter": return i18n._({ id: "ui.Last Quarter", message: "Last Quarter" })
+    case "Waning Crescent": return i18n._({ id: "ui.Waning Crescent", message: "Waning Crescent" })
+    default: return phase
+  }
+}
 
 export function MoonDisc({ phase, illumination, size }: { phase: string; illumination: number; size: number }) {
   const lit = Math.max(0, Math.min(100, Number.isFinite(illumination) ? illumination : 0));
@@ -14,7 +29,7 @@ export function MoonDisc({ phase, illumination, size }: { phase: string; illumin
   const litFill = "var(--weather-moon-lit)";
   const darkFill = "var(--weather-moon-dark)";
   const style = { "--moon-glow": "var(--weather-moon-glow)" } as CSSProperties;
-  return <svg data-slot="weather-moon-disk" data-lit-side={litSide} data-phase-extreme={lit === 100 ? "full" : lit === 0 ? "new" : undefined} viewBox="0 0 100 100" width={size} height={size} role="img" aria-label={`${phase}, ${lit}% illuminated`} style={style}>
+  return <svg data-slot="weather-moon-disk" data-lit-side={litSide} data-phase-extreme={lit === 100 ? "full" : lit === 0 ? "new" : undefined} viewBox="0 0 100 100" width={size} height={size} role="img" aria-label={i18n._({ id: "ui.{phaseName}, {lit}% illuminated", message: "{phaseName}, {lit}% illuminated", values: { phaseName: phaseLabel(phase), lit } })} style={style}>
     <circle cx="50" cy="50" r="45" fill={darkFill} />
     {lit > 0 && lit < 100 && <path data-lit-path={litSide} d={sidePath} fill={litFill} />}
     {lit > 0 && lit < 100 && <ellipse cx="50" cy="50" rx={rx} ry="45" fill={k < 0 ? litFill : darkFill} />}

@@ -29,6 +29,7 @@ import {
   ShimmerLabel,
 } from "./surfaces";
 import { clamp, pct } from "./range";
+import { i18n } from "@/kit/i18n";
 
 export interface ComposerAttachment {
   name: string;
@@ -241,7 +242,7 @@ export function ComposerPersonItem({
         {person.name[0]}
       </span>
       <span className="flex-1 truncate text-start">{person.name}</span>
-      <span className={cn(mono, "text-muted-foreground")}>{person.role}</span>
+      <span className={cn(mono, "text-muted-foreground")}>{person.role === "agent" ? i18n._({ id: "ui.agent", message: "agent" }) : i18n._({ id: "ui.human", message: "human" })}</span>
     </ComposerMenuItem>
   );
 }
@@ -304,7 +305,7 @@ export function ComposerAttachmentChip({
         ) : attachment.state === "done" && onRemove ? (
           <button
             type="button"
-            aria-label={`Remove ${attachment.name}`}
+            aria-label={i18n._({ id: "ui.Remove {name}", message: "Remove {name}", values: { name: attachment.name } })}
             onClick={() => onRemove(attachment.name)}
             className={cn(ghostButton, "size-5 [&_svg]:size-3")}
           >
@@ -389,7 +390,7 @@ export function ComposerVoice({
         </span>
       ) : (
         <ShimmerLabel className="text-muted-foreground relative text-[13px]">
-          Transcribing
+          {i18n._({ id: "ui.Transcribing", message: "Transcribing" })}
         </ShimmerLabel>
       )}
     </div>
@@ -429,7 +430,7 @@ export function ComposerAttachButton({
   return (
     <button
       type="button"
-      aria-label="Add attachment"
+      aria-label={i18n._({ id: "ui.Add attachment", message: "Add attachment" })}
       data-slot="composer-attach"
       disabled={!props.onClick}
       className={cn(
@@ -503,9 +504,9 @@ export function ComposerContext({
   const warn = fraction > 0.85;
   const circumference = 2 * Math.PI * 6;
   const segments = [
-    { label: "System", value: usage.system, className: "bg-foreground/25" },
-    { label: "Tools", value: usage.tools, className: "bg-foreground/45" },
-    { label: "Messages", value: usage.messages, className: "bg-foreground/80" },
+    { label: i18n._({ id: "ui.System", message: "System" }), value: usage.system, className: "bg-foreground/25" },
+    { label: i18n._({ id: "ui.Tools", message: "Tools" }), value: usage.tools, className: "bg-foreground/45" },
+    { label: i18n._({ id: "ui.Messages", message: "Messages" }), value: usage.messages, className: "bg-foreground/80" },
   ];
 
   return (
@@ -525,7 +526,7 @@ export function ComposerContext({
         )}
       >
         <div className="flex items-baseline justify-between">
-          <p className="text-[13.5px] font-medium">Context</p>
+          <p className="text-[13.5px] font-medium">{i18n._({ id: "ui.Context", message: "Context" })}</p>
           <p
             className={cn(
               mono,
@@ -567,7 +568,7 @@ export function ComposerContext({
         </div>
         <div className="bg-foreground/[0.06] h-px" />
         <div className="text-muted-foreground flex items-center justify-between text-[13px]">
-          <span>Total</span>
+          <span>{i18n._({ id: "ui.Total", message: "Total" })}</span>
           <span className={cn(mono, "text-muted-foreground tabular-nums")}>
             {used}k / {usage.total}k
           </span>
@@ -575,7 +576,7 @@ export function ComposerContext({
       </div>
       <button
         type="button"
-        aria-label="Context usage"
+        aria-label={i18n._({ id: "ui.Context usage", message: "Context usage" })}
         className={cn(
           ghostButton,
           "size-8",
@@ -616,7 +617,7 @@ export function ComposerVoiceButton({
   return (
     <button
       type="button"
-      aria-label={active ? "Stop recording" : "Start voice input"}
+      aria-label={active ? i18n._({ id: "ui.Stop recording", message: "Stop recording" }) : i18n._({ id: "ui.Start voice input", message: "Start voice input" })}
       data-slot="composer-voice-button"
       className={cn(
         active
@@ -650,7 +651,7 @@ export function ComposerSend({
   return (
     <button
       type="button"
-      aria-label={streaming ? "Stop generating" : "Send message"}
+      aria-label={streaming ? i18n._({ id: "ui.Stop generating", message: "Stop generating" }) : i18n._({ id: "ui.Send message", message: "Send message" })}
       data-slot="composer-send"
       className={cn(
         "grid size-8 place-items-center rounded-full",

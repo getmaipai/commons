@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/kit/ui/sheet";
 import { getIcon } from "@/kit/icons";
 import { cn } from "@/kit/utils";
 import { isActiveNavPath, type NavEntry } from "@/kit/nav";
+import { i18n } from "@/kit/i18n"
 
 const BOTTOM_BAR_MAX = 5;
 
@@ -22,7 +23,7 @@ export function PhoneNav({
   entries,
   max = BOTTOM_BAR_MAX,
   variant = "bar",
-  label = "Primary",
+  label = i18n._({ id: "ui.Primary", message: "Primary" }),
   trailing,
   more = [],
 }: {
@@ -97,7 +98,7 @@ export function PhoneNav({
               : "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base text-muted-foreground"}
           >
             <MoreIcon className="h-5 w-5" aria-hidden />
-            <span>More</span>
+            <span>{i18n._({ id: "ui.More", message: "More" })}</span>
           </button>
         ) : null}
       </nav>
@@ -105,7 +106,7 @@ export function PhoneNav({
         <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
           <SheetContent side="bottom">
             <SheetHeader>
-              <SheetTitle>More</SheetTitle>
+              <SheetTitle>{i18n._({ id: "ui.More", message: "More" })}</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-1 p-2">
               {sheetEntries.map((entry) => {

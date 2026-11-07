@@ -15,6 +15,7 @@ import { useSplitViewLayout } from "../primitives/SplitView";
 import { OptionCards, OptionThumb, isLockedOption, type LockedOptionCard } from "./option-cards";
 import { SafeImage } from "../primitives/SafeImage";
 import { TierSegment, type TierId, type TierOptionDef } from "./tier-segment";
+import { i18n } from "@/kit/i18n"
 
 export interface PromptBarOption {
   value: string | number;
@@ -175,7 +176,7 @@ function ChipCards({ chip, locked, columns }: { chip: PromptBarChip; locked: boo
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
  * It holds no state of its own. Videos Create draws it through the `prompt_bar` schema node and the chat video card draws it directly. */
-export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = "Make", fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", suggestions = [], submitDetail, optionsLabel = "Options", foldLabel = "More settings", suggestedStyles = [], onDismissSuggestion }: PromptBarProps) {
+export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion }: PromptBarProps) {
   const layout = useSplitViewLayout();
   const phone = useIsPhoneLayout();
   const mode: Mode = placement === "panel" && layout ? (layout === "side" ? "panel" : "dock") : "inline";
@@ -224,7 +225,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   };
 
   const suggestionRow = shown.length > 0 && empty && !locked ? (
-    <div role="group" aria-label="Ideas" data-slot="prompt-bar-suggestions" className={cn("flex min-w-0 gap-2", mode === "dock" ? "flex-nowrap overflow-x-auto" : "flex-wrap")}>
+    <div role="group" aria-label={i18n._({ id: "ui.Ideas", message: "Ideas" })} data-slot="prompt-bar-suggestions" className={cn("flex min-w-0 gap-2", mode === "dock" ? "flex-nowrap overflow-x-auto" : "flex-wrap")}>
       {shown.map((s) => (
         <Button key={s.label} type="button" variant="outline" shape="pill" size="sm" className="shrink-0" onClick={() => { onValueChange(s.text); field.current?.focus(); }}>{s.label}</Button>
       ))}
@@ -233,13 +234,12 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
 
   const suggested = suggestedStyles.slice(0, 2);
   const suggestedRow = suggested.length > 0 && !locked ? (
-    <div role="group" aria-label="Suggested styles" data-slot="prompt-bar-suggested" className="flex min-w-0 flex-wrap items-center gap-2">
+    <div role="group" aria-label={i18n._({ id: "ui.Suggested styles", message: "Suggested styles" })} data-slot="prompt-bar-suggested" className="flex min-w-0 flex-wrap items-center gap-2">
       {suggested.map((s) => {
-        const noun = s.kind === "character" ? "character" : "style";
         return (
           <span key={s.id} data-suggested={s.id} className="inline-flex min-h-9 max-w-full items-center gap-1 rounded-full border border-input bg-muted py-1 pl-3 pr-1 text-sm text-foreground">
-            <span className="min-w-0 truncate">{s.kind === "character" ? "Character" : "Style"}: {s.name}</span>
-            <button type="button" aria-label={`Remove ${noun} ${s.name}`} onClick={() => onDismissSuggestion?.(s.id)} className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-background hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50">
+            <span className="min-w-0 truncate">{s.kind === "character" ? i18n._({ id: "ui.Character: {name}", message: "Character: {name}", values: { name: s.name } }) : i18n._({ id: "ui.Style: {name}", message: "Style: {name}", values: { name: s.name } })}</span>
+            <button type="button" aria-label={s.kind === "character" ? i18n._({ id: "ui.Remove character {name}", message: "Remove character {name}", values: { name: s.name } }) : i18n._({ id: "ui.Remove style {name}", message: "Remove style {name}", values: { name: s.name } })} onClick={() => onDismissSuggestion?.(s.id)} className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-background hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50">
               <X className="size-4" aria-hidden="true" />
             </button>
           </span>
@@ -260,7 +260,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         ) : null}
         {inField && !filled && !dock && inField.placement !== "tile" ? (
           <div className="flex px-2 pb-2">
-            <button type="button" aria-label={`Add ${inField.label}`} disabled={locked || inField.disabled} onClick={inField.onPick} className="flex min-h-12 items-center gap-1.5 rounded-lg px-2 text-sm text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
+            <button type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: inField.label } })} disabled={locked || inField.disabled} onClick={inField.onPick} className="flex min-h-12 items-center gap-1.5 rounded-lg px-2 text-sm text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
               <ImageIcon className="size-4" aria-hidden="true" />
               <span>{inField.label}</span>
             </button>
@@ -501,12 +501,12 @@ function ReferenceSlot({ reference: ref, locked }: { reference: PromptBarReferen
           <div className="flex size-20 items-center justify-center overflow-hidden rounded-lg border bg-muted">
             {ref.thumb ? <SafeImage src={ref.thumb} alt={ref.label} className="size-full object-cover" /> : <span className="px-1 text-center text-xs text-muted-foreground">{ref.label}</span>}
           </div>
-          <button type="button" aria-label={`Remove ${ref.label}`} disabled={locked} onClick={ref.onRemove} className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full border bg-background text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
+          <button type="button" aria-label={i18n._({ id: "ui.Remove {label}", message: "Remove {label}", values: { label: ref.label } })} disabled={locked} onClick={ref.onRemove} className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full border bg-background text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
             <X className="size-3.5" aria-hidden="true" />
           </button>
         </>
       ) : (
-        <button type="button" aria-label={`Add ${ref.label}`} disabled={locked || ref.disabled} onClick={ref.onPick} className="flex size-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border text-muted-foreground outline-none transition-colors hover:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
+        <button type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: ref.label } })} disabled={locked || ref.disabled} onClick={ref.onPick} className="flex size-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border text-muted-foreground outline-none transition-colors hover:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
           {ref.kind === "audio" || ref.kind === "video" ? <KindIcon kind={ref.kind} className="size-5" /> : <Plus className="size-5" aria-hidden="true" />}
           <span className="max-w-full truncate px-1 text-xs">{ref.label}</span>
         </button>
@@ -522,7 +522,7 @@ function ReferenceTile({ reference: ref, locked }: { reference: PromptBarReferen
       type="button"
       data-slot="prompt-bar-tile"
       data-reference={ref.id}
-      aria-label={`Add ${ref.label}`}
+      aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: ref.label } })}
       disabled={locked || ref.disabled}
       onClick={ref.onPick}
       className="flex min-h-16 w-full min-w-0 items-center gap-3 rounded-xl border-2 border-dashed border-border p-3 text-left text-muted-foreground outline-none transition-colors hover:border-primary hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"
@@ -545,7 +545,7 @@ function InFieldThumb({ reference: ref, locked, compact }: { reference: PromptBa
           {ref.thumb ? <SafeImage src={ref.thumb} alt={ref.label} className="size-full object-cover" /> : <KindIcon kind={ref.kind} className="size-4 text-muted-foreground" />}
         </span>
         <span className="min-w-0 max-w-40 truncate text-sm">{ref.label}</span>
-        <button type="button" aria-label={`Remove ${ref.label}`} disabled={locked} onClick={ref.onRemove} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
+        <button type="button" aria-label={i18n._({ id: "ui.Remove {label}", message: "Remove {label}", values: { label: ref.label } })} disabled={locked} onClick={ref.onRemove} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
           <Trash2 className="size-4" aria-hidden="true" />
         </button>
       </span>
@@ -574,7 +574,7 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
   const summary = (shownChips.length > 0 ? shownChips : chips.slice(0, 1)).map(chosenLabel).filter(Boolean).join(", ");
   const bannerSrc = cardChips.filter((c) => shownChips.includes(c)).map((c) => openOptions(c).find((o) => String(o.value) === String(c.value))?.media).find((m): m is string => Boolean(m));
   const bannerNames = cardChips.map((c) => c.label.toLowerCase());
-  const bannerEyebrow = bannerNames.length > 1 ? `${bannerNames.slice(0, -1).join(", ")} and ${bannerNames[bannerNames.length - 1]}` : (bannerNames[0] ?? name.toLowerCase());
+  const bannerEyebrow = bannerNames.length > 1 ? i18n._({ id: "ui.{names} and {last}", message: "{names} and {last}", values: { names: bannerNames.slice(0, -1).join(", "), last: bannerNames[bannerNames.length - 1] } }) : (bannerNames[0] ?? name.toLowerCase());
   const bannerTrigger = (
     <button
       type="button"
@@ -595,7 +595,7 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
           <span className="truncate text-lg font-semibold">{summary}</span>
         </span>
         <span className="flex min-h-9 shrink-0 items-center gap-1 rounded-full bg-[var(--art-overlay)] px-3 text-sm font-medium">
-          Change
+          {i18n._({ id: "ui.Change", message: "Change" })}
           <ChevronDown className="size-4" aria-hidden="true" />
         </span>
       </span>
@@ -641,7 +641,7 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
   const body = (
     <div data-slot="prompt-bar-group-body" data-size={wideCards ? "wide" : undefined} className="flex min-w-0 flex-col gap-4">
       {chips.map((chip) => chip.variant === "cards" ? section(chip) : <div key={chip.id} className="flex min-w-0 flex-wrap gap-2">{dropdown(chip)}</div>)}
-      <Button type="button" variant="outline" width="full" onClick={() => setOpen(false)}>Done</Button>
+      <Button type="button" variant="outline" width="full" onClick={() => setOpen(false)}>{i18n._({ id: "ui.Done", message: "Done" })}</Button>
     </div>
   );
   if (sheet) {

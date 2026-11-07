@@ -1,4 +1,5 @@
 import { Skeleton } from "@/kit/ui/skeleton";
+import { i18n } from "@/kit/i18n";
 
 // Lane 10 item 2's real code-splitting: `App.tsx` wraps every lazy
 // route in a `Suspense` boundary, and this is its fallback, so a chunk
@@ -11,7 +12,7 @@ import { Skeleton } from "@/kit/ui/skeleton";
 // opened, a section a click away) never blinks a skeleton across the whole panel, and a slow one still shows it.
 export const ROUTE_SKELETON_DELAY_MS = 200;
 
-export function RouteSkeleton({ label = "Loading" }: { label?: string }) {
+export function RouteSkeleton({ label = i18n._({ id: "ui.Loading", message: "Loading" }) }: { label?: string }) {
   return (
     <div className="flex flex-col gap-3 p-4" role="status" aria-label={label} style={{ opacity: 0, animation: `route-skeleton-in 0s linear ${ROUTE_SKELETON_DELAY_MS}ms forwards` }}>
       <Skeleton className="h-12 w-full" />

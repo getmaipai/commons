@@ -4,7 +4,7 @@ import { request } from "@/kit/http";
 import type { Binding } from "@/kit/schema/types";
 import {
   PackageScopeContext,
-  PACKAGE_BINDING_REFUSED,
+  packageBindingRefused,
   reportPageRejected,
   resolveParams,
   underPluginApi,
@@ -45,7 +45,7 @@ export function useBinding<T>(binding: Binding, state: Record<string, unknown> =
     queryFn: () => {
       if (!allowed || (binding.source === "package" && !scope)) {
         reportPageRejected();
-        throw new Error(PACKAGE_BINDING_REFUSED);
+        throw new Error(packageBindingRefused());
       }
       if (binding.source === "package") {
         return request<T>(`/api/plugins/${scope!.packageId}/data/${binding.path}`, {

@@ -11,6 +11,7 @@ import { CardSizeSlider, cardSizeStyle } from "@/kit/primitives/CardSizeSlider";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { useSurface } from "@/kit/useSurface";
 import { LockTile, collapseLocked } from "@/kit/elements/adult-lock";
+import { i18n } from "@/kit/i18n"
 
 /** The aspect ratios the kit will draw a media tile at. A closed set,
  * not a free string: docs/UI.md requires images and video to be fluid
@@ -186,7 +187,7 @@ export function MediaShelf<T>({
   );
   // The Card surface has its own radius; a tight tile clips to the same 8 px so the art and its frame agree.
   const tileClasses = cn(tight && !circle && "rounded-[var(--media-card-radius)]", pressScale && PRESS_CLASSES);
-  const playName = (item: T) => getPlayLabel?.(item) ?? getLabel?.(item) ?? "Play";
+  const playName = (item: T) => getPlayLabel?.(item) ?? getLabel?.(item) ?? i18n._({ id: "ui.Play", message: "Play" });
   const currentClasses = "ring-2 ring-[var(--media-current-ring)] ring-offset-2 ring-offset-background";
   // Use the existing card budgets, overriding only the phone count. The
   // plain budget fits three/four whole cards instead of peeking the next.
@@ -396,7 +397,7 @@ export function MediaShelf<T>({
           return (
             <section key={run.key} aria-label={text} className="flex min-w-0 flex-col gap-2" data-slot="media-shelf-group">
               {headingStyle === "eyebrow" ? <h3 data-slot="media-shelf-group-heading" className={eyebrow}>{text}</h3> : <DayDivider label={text} />}
-              {renderList(run.items, name ? `${name}, ${text}` : text)}
+              {renderList(run.items, name ? i18n._({ id: "ui.{name}, {text}", message: "{name}, {text}", values: { name, text } }) : text)}
             </section>
           );
         })}
@@ -527,7 +528,7 @@ export function MediaTileOverlay({ progress = 0, badge, meta }: { progress?: num
       {progress > 0 ? (
         <span
           role="progressbar"
-          aria-label="Played"
+          aria-label={i18n._({ id: "ui.Played", message: "Played" })}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress * 100)}

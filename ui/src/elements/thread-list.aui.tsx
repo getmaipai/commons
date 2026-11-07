@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n, kitLocaleTag } from "@/kit/i18n"
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Skeleton } from "./ui/skeleton";
@@ -67,14 +68,14 @@ type ThreadListPinConfig = {
   pinned: string;
 };
 
-const defaultPinConfig: ThreadListPinConfig = {
+const defaultPinConfig = (): ThreadListPinConfig => ({
   pinnable: false,
-  pin: "Pin",
-  unpin: "Unpin",
-  pinned: "Pinned",
-};
+  pin: i18n._({ id: "ui.Pin", message: "Pin" }),
+  unpin: i18n._({ id: "ui.Unpin", message: "Unpin" }),
+  pinned: i18n._({ id: "ui.Pinned", message: "Pinned" }),
+});
 
-const ThreadListPinContext = createContext<ThreadListPinConfig>(defaultPinConfig);
+const ThreadListPinContext = createContext<ThreadListPinConfig | null>(null);
 
 /** Words the projects mode shows; every one has an English default. */
 export type ThreadListProjectLabels = {
@@ -167,28 +168,28 @@ export type ThreadListPageRow = {
   projectIcon?: { icon?: string; color?: string };
 };
 
-const PROJECT_LABEL_DEFAULTS: Required<ThreadListProjectLabels> = {
-  projects: "Projects",
-  newProject: "New project",
-  projectName: "Project name",
-  moveTo: "Move to project",
-  removeFromProject: "Remove from project",
-  back: "Back",
-  newChatInProject: "New chat in project",
-  rename: "Rename",
-  delete: "Delete",
-  confirmDelete: "Delete this project? Its chats stay.",
-  cancel: "Cancel",
-  showMore: "Show more",
-  showLess: "Show less",
-  empty: "No chats yet",
-  projectOptions: "Project options",
-  editProject: "Edit project",
-  seeAll: "See all projects",
-  pinProject: "Pin project",
-  unpinProject: "Unpin project",
-  toggleChats: "Show or hide chats",
-};
+const projectLabelDefaults = (): Required<ThreadListProjectLabels> => ({
+  projects: i18n._({ id: "ui.Projects", message: "Projects" }),
+  newProject: i18n._({ id: "ui.New project", message: "New project" }),
+  projectName: i18n._({ id: "ui.Project name", message: "Project name" }),
+  moveTo: i18n._({ id: "ui.Move to project", message: "Move to project" }),
+  removeFromProject: i18n._({ id: "ui.Remove from project", message: "Remove from project" }),
+  back: i18n._({ id: "ui.Back", message: "Back" }),
+  newChatInProject: i18n._({ id: "ui.New chat in project", message: "New chat in project" }),
+  rename: i18n._({ id: "ui.Rename", message: "Rename" }),
+  delete: i18n._({ id: "ui.Delete", message: "Delete" }),
+  confirmDelete: i18n._({ id: "ui.Delete this project? Its chats stay.", message: "Delete this project? Its chats stay." }),
+  cancel: i18n._({ id: "ui.Cancel", message: "Cancel" }),
+  showMore: i18n._({ id: "ui.Show more", message: "Show more" }),
+  showLess: i18n._({ id: "ui.Show less", message: "Show less" }),
+  empty: i18n._({ id: "ui.No chats yet", message: "No chats yet" }),
+  projectOptions: i18n._({ id: "ui.Project options", message: "Project options" }),
+  editProject: i18n._({ id: "ui.Edit project", message: "Edit project" }),
+  seeAll: i18n._({ id: "ui.See all projects", message: "See all projects" }),
+  pinProject: i18n._({ id: "ui.Pin project", message: "Pin project" }),
+  unpinProject: i18n._({ id: "ui.Unpin project", message: "Unpin project" }),
+  toggleChats: i18n._({ id: "ui.Show or hide chats", message: "Show or hide chats" }),
+});
 
 type ResolvedProjects = Omit<ThreadListProjects, "labels"> & {
   labels: Required<ThreadListProjectLabels>;
@@ -222,9 +223,9 @@ const resolvePinConfig = (
   labels: ThreadListLabels | undefined,
 ): ThreadListPinConfig => ({
   pinnable: pinnable ?? false,
-  pin: labels?.pin ?? defaultPinConfig.pin,
-  unpin: labels?.unpin ?? defaultPinConfig.unpin,
-  pinned: labels?.pinned ?? defaultPinConfig.pinned,
+  pin: labels?.pin ?? defaultPinConfig().pin,
+  unpin: labels?.unpin ?? defaultPinConfig().unpin,
+  pinned: labels?.pinned ?? defaultPinConfig().pinned,
 });
 
 /** Reads the `pinned` flag a host keeps in a thread's custom metadata. */
@@ -238,8 +239,8 @@ export const ThreadList: FC<{ labels?: ThreadListLabels; pinnable?: boolean }> =
 }) => {
   const [search, setSearch] = useState("");
   const hasThreads = useAuiState((s) => s.threads.threadIds.length > 0);
-  const newChatLabel = labels?.newChat ?? "New chat";
-  const searchChatsLabel = labels?.searchChats ?? "Search chats";
+  const newChatLabel = labels?.newChat ?? i18n._({ id: "ui.New chat", message: "New chat" });
+  const searchChatsLabel = labels?.searchChats ?? i18n._({ id: "ui.Search chats", message: "Search chats" });
 
   return (
     <ThreadListRoot>
@@ -264,7 +265,7 @@ export const ThreadListSearch = forwardRef<
     label?: string;
     density?: ThreadListDensity;
   }
->(({ className, value, onValueChange, label = "Search chats", density = "default", ...props }, ref) => {
+>(({ className, value, onValueChange, label = i18n._({ id: "ui.Search chats", message: "Search chats" }), density = "default", ...props }, ref) => {
   return (
     <div data-slot="aui_thread-list-search" data-density={density} className={cn("relative px-0.5", density === "compact" ? "py-0" : "py-1")}>
       <SearchIcon
@@ -314,6 +315,7 @@ export const ThreadListItems: FC<
   }
 > = ({ className, searchQuery = "", pinnable, labels, projects, density = "default", ...props }) => {
   const { pin: pinLabel, unpin: unpinLabel, pinned: pinnedLabel } = labels ?? {};
+  const lang = kitLocaleTag();
   const pin = useMemo(
     () =>
       resolvePinConfig(pinnable, {
@@ -321,7 +323,7 @@ export const ThreadListItems: FC<
         unpin: unpinLabel,
         pinned: pinnedLabel,
       }),
-    [pinnable, pinLabel, unpinLabel, pinnedLabel],
+    [pinnable, pinLabel, unpinLabel, pinnedLabel, lang],
   );
   const resolvedProjects = useMemo<ResolvedProjects | null>(
     () =>
@@ -330,10 +332,10 @@ export const ThreadListItems: FC<
             ...projects,
             canManage: projects.canManage ?? false,
             canMove: projects.canMove ?? true,
-            labels: { ...PROJECT_LABEL_DEFAULTS, ...projects.labels },
+            labels: { ...projectLabelDefaults(), ...projects.labels },
           }
         : null,
-    [projects],
+    [projects, lang],
   );
   return (
     <ThreadListDensityContext.Provider value={density}>
@@ -370,9 +372,9 @@ export const dateGroupLabel = (
   date: Date | undefined,
   startOfToday: number,
 ): string => {
-  if (!date || date.getTime() >= startOfToday) return "Today";
-  if (date.getTime() >= startOfToday - DAY_IN_MS) return "Yesterday";
-  return "Earlier";
+  if (!date || date.getTime() >= startOfToday) return i18n._({ id: "ui.Today", message: "Today" });
+  if (date.getTime() >= startOfToday - DAY_IN_MS) return i18n._({ id: "ui.Yesterday", message: "Yesterday" });
+  return i18n._({ id: "ui.Earlier", message: "Earlier" });
 };
 
 export type ThreadListGroup = { label: string; indices: number[] };
@@ -391,11 +393,12 @@ export const useThreadListGroups = (
 ) => {
   const pinnable = options.pinnable ?? false;
   const folderIds = options.folderIds ?? null;
-  const pinnedLabel = options.pinnedLabel ?? defaultPinConfig.pinned;
+  const pinnedLabel = options.pinnedLabel ?? defaultPinConfig().pinned;
   const threadIds = useAuiState((s) => s.threads.threadIds);
   const threadItems = useAuiState((s) => s.threads.threadItems);
 
   const query = searchQuery.trim().toLowerCase();
+  const lang = kitLocaleTag();
 
   return useMemo(() => {
     const itemsById = new Map(threadItems.map((item) => [item.id, item]));
@@ -405,7 +408,7 @@ export const useThreadListGroups = (
       .filter(
         ({ id }) =>
           !query ||
-          (itemsById.get(id)?.title || "New Chat")
+          (itemsById.get(id)?.title || i18n._({ id: "ui.New Chat", message: "New Chat" }))
             .toLowerCase()
             .includes(query),
       )
@@ -460,13 +463,13 @@ export const useThreadListGroups = (
       }
     }
     return { threadIds, filteredIndices, groups: result, looseIndices, byFolder };
-  }, [threadIds, threadItems, query, pinnable, pinnedLabel, folderIds]);
+  }, [threadIds, threadItems, query, pinnable, pinnedLabel, folderIds, lang]);
 };
 
 const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
   searchQuery = "",
 }) => {
-  const pin = useContext(ThreadListPinContext);
+  const pin = useContext(ThreadListPinContext) ?? defaultPinConfig();
   const projects = useContext(ThreadListProjectsContext);
   const density = useContext(ThreadListDensityContext);
   const folderIds = useMemo(
@@ -485,7 +488,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
         data-slot="aui_thread-list-empty"
         className="text-muted-foreground px-2.5 py-4 text-sm"
       >
-        No threads found
+        {i18n._({ id: "ui.No threads found", message: "No threads found" })}
       </div>
     );
   }
@@ -943,7 +946,7 @@ const ThreadListProjectRow: FC<{
 export const ThreadListNew = forwardRef<
   HTMLButtonElement,
   ComponentPropsWithoutRef<typeof Button> & { labelClassName?: string; label?: string; density?: ThreadListDensity; tourId?: string }
->(({ className, labelClassName, children, label = "New chat", density = "default", tourId, ...props }, ref) => {
+>(({ className, labelClassName, children, label = i18n._({ id: "ui.New chat", message: "New chat" }), density = "default", tourId, ...props }, ref) => {
   return (
     <ThreadListPrimitive.New asChild>
       <Button
@@ -990,7 +993,7 @@ const ThreadListSkeleton: FC = () => {
         <div
           key={i}
           role="status"
-          aria-label="Loading threads"
+          aria-label={i18n._({ id: "ui.Loading threads", message: "Loading threads" })}
           data-slot="aui_thread-list-skeleton-wrapper"
           data-density={density}
           className={cn("flex items-center px-2.5", density === "compact" ? "h-9 min-h-9" : "h-8")}
@@ -1012,7 +1015,7 @@ export const ThreadListItem: FC = () => {
   const threadId = useAuiState((s) => s.threadListItem.id);
   const pageRow = projects?.rowVariant === "page" ? projects.pageRows?.[threadId] : undefined;
   const draggable = Boolean(projects?.canMove && projects.folders.length > 0);
-  const { pinnable } = useContext(ThreadListPinContext);
+  const { pinnable } = useContext(ThreadListPinContext) ?? defaultPinConfig();
   const isPinned = useAuiState((s) => isThreadPinned(s.threadListItem.custom));
   const [isRenaming, setIsRenaming] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -1079,17 +1082,17 @@ export const ThreadListItem: FC = () => {
           {pageRow ? (
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span data-slot="aui_thread-list-item-title" className="truncate font-medium">
-                <ThreadListItemPrimitive.Title fallback="New Chat" />
+                <ThreadListItemPrimitive.Title fallback={i18n._({ id: "ui.New Chat", message: "New Chat" })} />
               </span>
               {pageRow.preview ? <span data-slot="aui_thread-list-item-preview" className="text-muted-foreground truncate text-sm">{pageRow.preview}</span> : null}
             </span>
           ) : (
             <span data-slot="aui_thread-list-item-title" className="min-w-0 flex-1 truncate">
-              <ThreadListItemPrimitive.Title fallback="New Chat" />
+              <ThreadListItemPrimitive.Title fallback={i18n._({ id: "ui.New Chat", message: "New Chat" })} />
             </span>
           )}
           {pageRow?.date ? <time data-slot="aui_thread-list-item-date" dateTime={pageRow.date} className="text-muted-foreground shrink-0 text-sm">{formatRelative(pageRow.date)}</time> : null}
-          {isRunning && <span className="sr-only">Running</span>}
+          {isRunning && <span className="sr-only">{i18n._({ id: "ui.Running", message: "Running" })}</span>}
         </ThreadListItemPrimitive.Trigger>
       )}
       <ThreadListItemMore onRename={() => setIsRenaming(true)} />
@@ -1143,7 +1146,7 @@ const ThreadListItemRename: FC<{
       ref={inputRef}
       autoFocus
       data-slot="aui_thread-list-item-rename"
-      aria-label="Rename thread"
+      aria-label={i18n._({ id: "ui.Rename thread", message: "Rename thread" })}
       value={value}
       className="h-7 min-w-0 flex-1 ps-2.5 pe-9 text-sm"
       onChange={(event) => setValue(event.target.value)}
@@ -1163,7 +1166,7 @@ const ThreadListItemRename: FC<{
 
 const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
   const aui = useAui();
-  const { pinnable, pin, unpin } = useContext(ThreadListPinContext);
+  const { pinnable, pin, unpin } = useContext(ThreadListPinContext) ?? defaultPinConfig();
   const isPinned = useAuiState((s) => isThreadPinned(s.threadListItem.custom));
   const projects = useContext(ThreadListProjectsContext);
   const folderId = useAuiState((s) => threadFolderId(s.threadListItem.custom));
@@ -1190,7 +1193,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
           className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100 before:absolute before:-inset-3 before:content-['']"
         >
           <MoreHorizontalIcon className="size-3.5" />
-          <span className="sr-only">More options</span>
+          <span className="sr-only">{i18n._({ id: "ui.More options", message: "More options" })}</span>
         </Button>
       </ThreadListItemMorePrimitive.Trigger>
       <ThreadListItemMorePrimitive.Content
@@ -1235,7 +1238,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
           onSelect={onRename}
         >
           <PencilIcon className="size-4" />
-          Rename
+          {i18n._({ id: "ui.Rename", message: "Rename" })}
         </ThreadListItemMorePrimitive.Item>
         {pinnable && (
           <ThreadListItemMorePrimitive.Item
@@ -1280,7 +1283,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
             className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none"
           >
             <ArchiveIcon className="size-4" />
-            Archive
+            {i18n._({ id: "ui.Archive", message: "Archive" })}
           </ThreadListItemMorePrimitive.Item>
         </ThreadListItemPrimitive.Archive>
         <ThreadListItemPrimitive.Delete asChild>
@@ -1289,7 +1292,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
             className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none"
           >
             <TrashIcon className="size-4" />
-            Delete
+            {i18n._({ id: "ui.Delete", message: "Delete" })}
           </ThreadListItemMorePrimitive.Item>
         </ThreadListItemPrimitive.Delete>
         </>

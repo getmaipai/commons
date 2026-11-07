@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import { useState, type ComponentProps } from "react";
 import { CheckIcon, Loader2Icon } from "lucide-react";
 import { cn } from "cn";
@@ -74,10 +75,10 @@ export function OptionList({
   minSelections = 1,
   maxSelections,
   onConfirm,
-  confirmLabel = "Confirm",
-  countLabel = (count, max) => `${count} of ${max}`,
-  emptyLabel = "Nothing selected",
-  selectedLabel = "Selected:",
+  confirmLabel = i18n._({ id: "ui.Confirm", message: "Confirm" }),
+  countLabel = (count, max) => i18n._({ id: "ui.{count} of {max}", message: "{count} of {max}", values: { count, max } }),
+  emptyLabel = i18n._({ id: "ui.Nothing selected", message: "Nothing selected" }),
+  selectedLabel = i18n._({ id: "ui.Selected:", message: "Selected:" }),
   choice,
   className,
   ...props

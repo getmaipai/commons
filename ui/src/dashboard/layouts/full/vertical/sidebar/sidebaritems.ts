@@ -33,6 +33,7 @@ export interface MenuItem {
 }
 
 import { uniqueId } from "lodash";
+import { i18n } from "@/kit/i18n";
 
 import {
   House,
@@ -52,36 +53,37 @@ import {
 // Household tab - just not as permanent rail weight for four pages a
 // household visits rarely. Labels and routes only - the template's own
 // nav-items/Sidebar components render this unmodified.
+// Labels are getters so they read the active language each time a consumer renders them.
 const SidebarContent: MenuItem[] = [
   {
-    heading: "Home",
+    get heading() { return i18n._({ id: "ui.Home", message: "Home" }) },
     items: [
       {
         id: uniqueId(),
-        name: "Home",
+        get name() { return i18n._({ id: "ui.Home", message: "Home" }) },
         icon: House,
         url: "/",
       },
       {
         id: uniqueId(),
-        name: "Chat",
+        get name() { return i18n._({ id: "ui.Chat", message: "Chat" }) },
         icon: MessageCircle,
         url: "/chat",
       },
       {
         id: uniqueId(),
-        name: "Library",
+        get name() { return i18n._({ id: "ui.Library", message: "Library" }) },
         icon: Folder,
         url: "/files",
       },
     ],
   },
   {
-    heading: "Household",
+    get heading() { return i18n._({ id: "ui.Household", message: "Household" }) },
     items: [
       {
         id: uniqueId(),
-        name: "Family",
+        get name() { return i18n._({ id: "ui.Family", message: "Family" }) },
         icon: Users,
         url: "/people",
       },

@@ -1,3 +1,4 @@
+import { i18n } from "@/kit/i18n"
 /**
  * Pure state and math for the ImageEditor Element: undo/redo of strokes,
  * zoom steps, aspect-locked resize, region and coordinate conversion, and the
@@ -145,14 +146,14 @@ export interface PaletteColor {
 
 /** Eight swatches, all from the kit's own tokens. */
 export const PALETTE: readonly PaletteColor[] = [
-  { key: "red", label: "Red", cssVar: "--hue-red" },
-  { key: "orange", label: "Orange", cssVar: "--hue-orange" },
-  { key: "yellow", label: "Yellow", cssVar: "--hue-yellow" },
-  { key: "green", label: "Green", cssVar: "--hue-green" },
-  { key: "blue", label: "Blue", cssVar: "--hue-blue" },
-  { key: "violet", label: "Violet", cssVar: "--hue-violet" },
-  { key: "pink", label: "Pink", cssVar: "--hue-pink" },
-  { key: "ink", label: "Black or white", cssVar: "--foreground" },
+  { key: "red", get label() { return i18n._({ id: "ui.Red", message: "Red" }) }, cssVar: "--hue-red" },
+  { key: "orange", get label() { return i18n._({ id: "ui.Orange", message: "Orange" }) }, cssVar: "--hue-orange" },
+  { key: "yellow", get label() { return i18n._({ id: "ui.Yellow", message: "Yellow" }) }, cssVar: "--hue-yellow" },
+  { key: "green", get label() { return i18n._({ id: "ui.Green", message: "Green" }) }, cssVar: "--hue-green" },
+  { key: "blue", get label() { return i18n._({ id: "ui.Blue", message: "Blue" }) }, cssVar: "--hue-blue" },
+  { key: "violet", get label() { return i18n._({ id: "ui.Violet", message: "Violet" }) }, cssVar: "--hue-violet" },
+  { key: "pink", get label() { return i18n._({ id: "ui.Pink", message: "Pink" }) }, cssVar: "--hue-pink" },
+  { key: "ink", get label() { return i18n._({ id: "ui.Black or white", message: "Black or white" }) }, cssVar: "--foreground" },
 ];
 
 export type Stroke =
@@ -273,13 +274,14 @@ export function validateResize(widthText: string, heightText: string, unit: Resi
   const width = parseWhole(widthText);
   const height = parseWhole(heightText);
   if (width === null || height === null) {
-    return { ok: false, error: "Width and height must be whole numbers above zero." };
+    return { ok: false, error: i18n._({ id: "ui.Width and height must be whole numbers above zero.", message: "Width and height must be whole numbers above zero." }) };
   }
   const px = toPixels(width, height, unit, base);
   if (px.width > RESIZE_MAX || px.height > RESIZE_MAX) {
-    return { ok: false, error: `Each side can be at most ${RESIZE_MAX} pixels.` };
+    return { ok: false, error: i18n._({ id: "ui.Each side can be at most {max} pixels.", message: "Each side can be at most {max} pixels.", values: { max: RESIZE_MAX } }) };
   }
   return { ok: true, width: px.width, height: px.height };
 }
 
-export const resizeLabel = (width: number, height: number) => `Resized to ${width} x ${height}`;
+export const resizeLabel = (width: number, height: number) => i18n._({ id: "ui.Resized to {width} x {height}", message: "Resized to {width} x {height}", values: { width, height } });
+

@@ -4,6 +4,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/kit/dashboard/c
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/kit/ui/table";
 import { SafeImage } from "./SafeImage";
 import { cn } from "@/kit/utils";
+import { i18n } from "@/kit/i18n";
 
 const ChevronIcon = getIcon("chevron-down");
 
@@ -77,8 +78,8 @@ function Disclosure({ slot, title, children, className }: { slot: string; title:
 
 export function ArticleInfoboxCard({ infobox }: { infobox: ArticleInfobox }) {
   return (
-    <aside data-slot="article-infobox" aria-label={infobox.title ?? "At a glance"}>
-      <Disclosure slot="article-infobox-box" title={infobox.title ?? "At a glance"}>
+    <aside data-slot="article-infobox" aria-label={infobox.title ?? i18n._({ id: "ui.At a glance", message: "At a glance" })}>
+      <Disclosure slot="article-infobox-box" title={infobox.title ?? i18n._({ id: "ui.At a glance", message: "At a glance" })}>
         {infobox.image ? <SafeImage src={infobox.image.src} alt={infobox.image.alt} loading="lazy" className="mx-3 mb-2 w-[calc(100%-1.5rem)] rounded-md object-cover" /> : null}
         <Table className="text-sm">
           <TableBody>
@@ -92,8 +93,8 @@ export function ArticleInfoboxCard({ infobox }: { infobox: ArticleInfobox }) {
 
 export function ArticleContentsNav({ items, activeId, onPick }: { items: readonly ArticleContentsItem[]; activeId: string | null; onPick: (id: string) => void }) {
   return (
-    <nav data-slot="article-contents" aria-label="Contents">
-      <Disclosure slot="article-contents-box" title="Contents">
+    <nav data-slot="article-contents" aria-label={i18n._({ id: "ui.Contents", message: "Contents" })}>
+      <Disclosure slot="article-contents-box" title={i18n._({ id: "ui.Contents", message: "Contents" })}>
         <ul className="flex flex-col gap-0.5 px-1 pb-2 text-sm">
           {items.map((item) => (
             <li key={item.id} style={{ paddingInlineStart: `${(item.level - 2) * 0.75}rem` }}>
@@ -119,8 +120,8 @@ function PreviewBody({ target }: { target: { book: string; path: string } }) {
     void Promise.resolve(load?.(target)).then((value) => { if (live) setState(value ?? "none"); }, () => { if (live) setState("none"); });
     return () => { live = false; };
   }, [load, target.book, target.path]);
-  if (state === "loading") return <p className="text-muted-foreground" aria-live="polite">Loading…</p>;
-  if (state === "none") return <p className="text-muted-foreground">No preview for this page.</p>;
+  if (state === "loading") return <p className="text-muted-foreground" aria-live="polite">{i18n._({ id: "ui.Loading…", message: "Loading…" })}</p>;
+  if (state === "none") return <p className="text-muted-foreground">{i18n._({ id: "ui.No preview for this page.", message: "No preview for this page." })}</p>;
   return (
     <div data-slot="article-preview" className="flex flex-col gap-2">
       {state.thumbnail ? <SafeImage src={state.thumbnail.src} alt={state.thumbnail.alt} loading="lazy" className="max-h-32 w-full rounded-md object-cover" /> : null}

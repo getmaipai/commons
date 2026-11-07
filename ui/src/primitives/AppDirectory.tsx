@@ -5,6 +5,7 @@ import { EmptyState } from "@/kit/primitives/EmptyState";
 import { Button } from "@/kit/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "../dashboard/components/ui/input-group";
 import { cn } from "@/kit/utils";
+import { i18n } from "@/kit/i18n";
 
 /** One app the host lists. `favorite` is the person's own choice; `builtIn` apps are always in the rail and have no
  * star. */
@@ -43,6 +44,8 @@ export function matchesApp(app: DirectoryApp, query: string): boolean {
   return words.every((word) => haystack.includes(word));
 }
 
+const favoritesHeading = () => i18n._({ id: "ui.Favorites", message: "Favorites" });
+
 const byName = (a: DirectoryApp, b: DirectoryApp) => a.name.localeCompare(b.name);
 
 /** The sections for an empty query: Favorites first (in the person's order), then one section per category,
@@ -55,16 +58,16 @@ export function groupApps(apps: readonly DirectoryApp[]): Array<{ heading: strin
   const sections = [...categories.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([heading, list]) => ({ heading, apps: list.sort(byName) }));
   const builtIn = rest.filter((app) => app.builtIn).sort(byName);
   return [
-    ...(favorites.length ? [{ heading: "Favorites", apps: favorites }] : []),
+    ...(favorites.length ? [{ heading: favoritesHeading(), apps: favorites }] : []),
     ...sections,
-    ...(builtIn.length ? [{ heading: "Built in", apps: builtIn }] : []),
+    ...(builtIn.length ? [{ heading: i18n._({ id: "ui.Built in", message: "Built in" }), apps: builtIn }] : []),
   ];
 }
 
 function Tile({ app, current, starDisabled, onToggle }: { app: DirectoryApp; current: boolean; starDisabled: boolean; onToggle: () => void }) {
   const Icon = getIcon(app.icon);
   const StarIcon = getIcon("star");
-  const starLabel = app.favorite ? `Remove ${app.name} from favorites` : `Add ${app.name} to favorites`;
+  const starLabel = app.favorite ? i18n._({ id: "ui.Remove {name} from favorites", message: "Remove {name} from favorites", values: { name: app.name } }) : i18n._({ id: "ui.Add {name} to favorites", message: "Add {name} to favorites", values: { name: app.name } });
   return (
     <li data-slot="app-directory-tile" className="relative min-w-0">
       <Link
@@ -117,7 +120,7 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
 
   const trimmed = query.trim();
   const results = useMemo(() => apps.filter((app) => matchesApp(app, query)).sort((a, b) => Number(b.favorite) - Number(a.favorite) || byName(a, b)), [apps, query]);
-  const sections = useMemo(() => (trimmed ? [{ heading: "Results", apps: results }] : groupApps(apps)), [apps, results, trimmed]);
+  const sections = useMemo(() => (trimmed ? [{ heading: i18n._({ id: "ui.Results", message: "Results" }), apps: results }] : groupApps(apps)), [apps, results, trimmed]);
   const favoriteCount = apps.filter((app) => app.favorite && !app.builtIn).length;
   const full = favoritesLimit !== undefined && favoriteCount >= favoritesLimit;
 
@@ -160,7 +163,7 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
   return (
     <div data-slot="app-directory" className="flex min-w-0 flex-col gap-5">
       <div className="sticky top-0 z-10 -mx-1 flex flex-col gap-2 bg-[var(--page,var(--background))] px-1 pt-1 pb-3">
-        <h1 className={hideTitle ? "sr-only" : "text-3xl font-bold tracking-tight"}>All apps</h1>
+        <h1 className={hideTitle ? "sr-only" : "text-3xl font-bold tracking-tight"}>{i18n._({ id: "ui.All apps", message: "All apps" })}</h1>
         <InputGroup className="h-11 max-w-xl">
           <InputGroupAddon><SearchIcon aria-hidden /></InputGroupAddon>
           <InputGroupInput
@@ -173,26 +176,26 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
               if (event.key === "ArrowDown") { event.preventDefault(); focusTile(0); }
               if (event.key === "Enter" && trimmed && results.length === 1) tiles()[0]?.click();
             }}
-            placeholder="Search apps"
-            aria-label="Search apps"
+            placeholder={i18n._({ id: "ui.Search apps", message: "Search apps" })}
+            aria-label={i18n._({ id: "ui.Search apps", message: "Search apps" })}
             autoComplete="off"
             className="text-base"
           />
         </InputGroup>
         <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
-          {notice || (trimmed ? `${results.length} ${results.length === 1 ? "app matches" : "apps match"} "${trimmed}"` : `${apps.length} ${apps.length === 1 ? "app" : "apps"}`)}
+          {notice || (trimmed ? i18n._({ id: "ui.{count, plural, one {# app matches \"{query}\"} other {# apps match \"{query}\"}}", message: "{count, plural, one {# app matches \"{query}\"} other {# apps match \"{query}\"}}", values: { count: results.length, query: trimmed } }) : i18n._({ id: "ui.{count, plural, one {# app} other {# apps}}", message: "{count, plural, one {# app} other {# apps}}", values: { count: apps.length } }))}
         </p>
       </div>
 
       {trimmed && results.length === 0 ? (
-        <EmptyState icon="search" text={`No apps match "${trimmed}". Check the spelling or try a shorter word.`} actionLabel="Clear search" onAction={() => { setQuery(""); searchRef.current?.focus(); }} />
+        <EmptyState icon="search" text={i18n._({ id: "ui.No apps match \"{query}\". Check the spelling or try a shorter word.", message: "No apps match \"{query}\". Check the spelling or try a shorter word.", values: { query: trimmed } })} actionLabel={i18n._({ id: "ui.Clear search", message: "Clear search" })} onAction={() => { setQuery(""); searchRef.current?.focus(); }} />
       ) : (
         <div ref={gridRef} role="presentation" onKeyDown={onGridKeyDown} className="flex min-w-0 flex-col gap-7">
           {sections.map((section) => (
             <section key={section.heading} aria-label={section.heading} className="flex min-w-0 flex-col gap-3">
               <h2 className="flex items-baseline gap-2 text-sm font-semibold text-muted-foreground">
                 {section.heading}{" "}
-                {section.heading === "Favorites" && favoritesLimit !== undefined ? <span className="font-normal">{favoriteCount} of {favoritesLimit} in the left rail</span> : null}
+                {section.heading === favoritesHeading() && favoritesLimit !== undefined ? <span className="font-normal">{i18n._({ id: "ui.{favoriteCount} of {favoritesLimit} in the left rail", message: "{favoriteCount} of {favoritesLimit} in the left rail", values: { favoriteCount, favoritesLimit } })}</span> : null}
               </h2>
               <ul className="grid min-w-0 grid-cols-[repeat(auto-fill,minmax(min(100%,15rem),1fr))] gap-3">
                 {section.apps.map((app) => (
@@ -204,7 +207,7 @@ export function AppDirectory({ apps, onToggleFavorite, favoritesLimit, busy, cur
                     onToggle={() => {
                       if (busy) return;
                       if (!app.favorite && full) {
-                        setNotice(`The left rail holds ${favoritesLimit} apps. Remove one from Favorites first.`);
+                        setNotice(i18n._({ id: "ui.The left rail holds {favoritesLimit} apps. Remove one from Favorites first.", message: "The left rail holds {favoritesLimit} apps. Remove one from Favorites first.", values: { favoritesLimit } }));
                         return;
                       }
                       setNotice("");

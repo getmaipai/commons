@@ -4,6 +4,7 @@ import { useEffect, useState, type ComponentProps } from "react";
 import { Clock3Icon } from "lucide-react";
 import { cn } from "cn";
 import { mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 function remaining(endsAt: string, now: number): number { return Math.max(0, Math.ceil((Date.parse(endsAt) - now) / 1000)); }
 function display(seconds: number): string { const h = Math.floor(seconds / 3600); const m = Math.floor((seconds % 3600) / 60); const s = seconds % 60; return h ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`; }
@@ -21,6 +22,6 @@ export function Countdown({ label, endsAt, now: suppliedNow, className, ...props
   const seconds = remaining(endsAt, now);
   return <div data-slot="countdown" data-expired={seconds === 0 ? "" : undefined} className={cn(paper, "flex w-full max-w-sm items-center gap-3 rounded-2xl p-4", className)} {...props}>
     <span className="bg-foreground/[0.05] text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-full"><Clock3Icon aria-hidden="true" className="size-4" /></span>
-    <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-medium">{label}</span>{seconds === 0 ? <span role="status" aria-live="polite" className="text-muted-foreground text-xs">Time is up</span> : <span className={cn(mono, "text-muted-foreground text-xs")} aria-label={`${seconds} seconds remaining`}>{display(seconds)}</span>}</span>
+    <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-medium">{label}</span>{seconds === 0 ? <span role="status" aria-live="polite" className="text-muted-foreground text-xs">{i18n._({ id: "ui.Time is up", message: "Time is up" })}</span> : <span className={cn(mono, "text-muted-foreground text-xs")} aria-label={i18n._({ id: "ui.{seconds} seconds remaining", message: "{seconds} seconds remaining", values: { seconds } })}>{display(seconds)}</span>}</span>
   </div>;
 }

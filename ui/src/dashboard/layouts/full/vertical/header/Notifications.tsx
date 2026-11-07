@@ -13,6 +13,7 @@ import { Button } from "../../../../components/ui/button";
 import { cn } from "../../../../lib/utils";
 import { Link } from "react-router";
 import { hitArea } from "../../../../../utils";
+import { i18n } from "@/kit/i18n";
 
 const Notifications = ({ className }: { className?: string }) => {
     const [notifications, setNotifications] = useState(NotificationData.Notification);
@@ -33,7 +34,7 @@ const Notifications = ({ className }: { className?: string }) => {
     return (
         <div className={cn("", className)}>
             <DropdownMenu>
-                <DropdownMenuTrigger aria-label="Notifications" className={cn("relative cursor-pointer", hitArea(1))}>
+                <DropdownMenuTrigger aria-label={i18n._({ id: "ui.Notifications", message: "Notifications" })} className={cn("relative cursor-pointer", hitArea(1))}>
                         {unreadCount > 0 && (
                             <>
                                 <span className="h-2.5 w-2.5 bg-destructive rounded-full absolute top-1 end-2 text-xs text-center text-destructive-foreground z-1 animate-ping" />
@@ -51,9 +52,9 @@ const Notifications = ({ className }: { className?: string }) => {
                     className="w-screen sm:w-[360px] py-6 px-0"
                 >
                     <div className="flex items-center px-6 justify-between">
-                        <h3 className="text-lg font-semibold">Notifications</h3>
+                        <h3 className="text-lg font-semibold">{i18n._({ id: "ui.Notifications", message: "Notifications" })}</h3>
                         {unreadCount > 0 && (
-                            <Badge className="px-3 bg-primary dark:bg-primary hover:bg-primary">{unreadCount} new</Badge>
+                            <Badge className="px-3 bg-primary dark:bg-primary hover:bg-primary">{i18n._({ id: "ui.{count} new", message: "{count} new", values: { count: unreadCount } })}</Badge>
                         )}
                     </div>
 
@@ -101,7 +102,7 @@ const Notifications = ({ className }: { className?: string }) => {
                     {/* Footer Button */}
                     <div className="pt-5 px-6">
                         <Button className="w-full" render={<Link to="#" />}>
-                            See All Notifications
+                            {i18n._({ id: "ui.See All Notifications", message: "See All Notifications" })}
                         </Button>
                     </div>
                 </DropdownMenuContent>

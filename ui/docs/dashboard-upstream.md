@@ -416,3 +416,10 @@ enforces the no-URL rule on every file above. No new dependency:
 the parts used exist in both).
 
 **Pieces with no data surface (found wiring Home, 2026-09-21).** These vendored views are demo compositions with their content hardcoded in place, so a consumer cannot bind data to them as shipped and instead composes the same structure from the template's primitives (Card, Table, Badge, the chart wrapper), mirroring the view's markup and naming the gap in its own program record: the modern dashboard's widgets (`views/dashboard/*`: no props, no fetch hook, the numbers are literals), `components/user-profile/index.tsx` (all local `useState` demo data), `DataTable`'s title (a literal "Employee Data Table", no prop), its search box and download icon (demo controls with no handler or prop) and its per-row action icons (no click handler), which is why Home composes its own table from the template's Table primitives (TABLES-01). An upstream merge re-checks each of these; if a newer snapshot adds a real prop or handler, the consumer's mirror retires in favour of the shipped part.
+
+## Departure: translated strings (I18N-K1, 2026-11-07)
+
+The user-visible English in the snapshots Home renders (`src/dashboard/`, `src/elements/`, `src/ui/`) now goes through `i18n._` from
+`@/kit/i18n`, with ids and catalogs under `ui/locales/`. The edits touch only string spots (JSX text, aria-labels, placeholders, option
+labels); structure, classes and behavior are as shipped. A re-sync from upstream re-applies them with `bun run i18n:extract` and the
+`src/i18nLints.test.ts` gate, which names every string that came back untranslated.

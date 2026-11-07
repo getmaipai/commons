@@ -27,6 +27,7 @@ import {
   redoHistory, resetPieceFades, resetPieceVolume, setCrossfadeAfter, setFadeIn, setFadeOut, snap, snapEdges, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory,
   type EditResult, type History, type LevelStep, type StudioLimits, type StudioPlan,
 } from "./track-studio-edit";
+import { i18n, kitLocaleTag } from "@/kit/i18n";
 
 export type { StudioPiece, StudioLane, StudioState } from "./track-studio-model";
 export type { StudioPlan, LevelStep, StudioLimits } from "./track-studio-edit";
@@ -78,10 +79,14 @@ export interface TrackStudioProps {
   audioContext?: () => AudioContext | null;
 }
 
-const LANE_WORD: Record<LaneId, string> = { video: "Video", voice: "Voice", music: "Music" };
-export const HELP_LINE = "Drag the handles at each end to trim. Press S to cut at the playhead.";
-export const PREVIEW_LINE = "The preview is what you hear in the Studio. It cuts where the export dissolves, and the final loudness is set at export. Export makes a new clip and keeps the old one.";
-export const SPLIT_LABEL = "Split at playhead";
+const laneWord = (): Record<LaneId, string> => ({ video: i18n._({ id: "ui.Video", message: "Video" }), voice: i18n._({ id: "ui.Voice", message: "Voice" }), music: i18n._({ id: "ui.Music", message: "Music" }) });
+const helpLine = (): string => i18n._({ id: "ui.Drag the handles at each end to trim. Press S to cut at the playhead.", message: "Drag the handles at each end to trim. Press S to cut at the playhead." });
+const previewLine = (): string => i18n._({ id: "ui.The preview is what you hear in the Studio. It cuts where the export dissolves, and the final loudness is set at export. Export makes a new clip and keeps the old one.", message: "The preview is what you hear in the Studio. It cuts where the export dissolves, and the final loudness is set at export. Export makes a new clip and keeps the old one." });
+const splitLabel = (): string => i18n._({ id: "ui.Split at playhead", message: "Split at playhead" });
+// Constant forms for callers and tests that want the English text; rendering uses the functions above.
+export const HELP_LINE = helpLine();
+export const PREVIEW_LINE = previewLine();
+export const SPLIT_LABEL = splitLabel();
 
 const NUDGE_S = 0.1;
 const NUDGE_BIG_S = 1;
@@ -180,7 +185,7 @@ function StudioBody(props: TrackStudioProps) {
     const engine = new PreviewEngine(stateRef.current, {
       videoHost: showVideo ? monitorRef.current : null,
       poster: props.poster,
-      videoLabel: props.title ? `Preview of ${props.title}` : "Preview",
+      videoLabel: props.title ? i18n._({ id: "ui.Preview of {title}", message: "Preview of {title}", values: { title: props.title } }) : i18n._({ id: "ui.Preview", message: "Preview" }),
       videoClass: "size-full object-contain",
       host: hostRef.current,
       audioContext: props.audioContext,
@@ -260,9 +265,9 @@ function StudioBody(props: TrackStudioProps) {
       if (!last && laneOf(state, id).pieces.length > 0) last = r.line;
       if (id === lanes[0]) last = r.line;
     }
-    setLine(last || "Move the playhead onto a piece to split it.");
+    setLine(last || i18n._({ id: "ui.Move the playhead onto a piece to split it.", message: "Move the playhead onto a piece to split it." }));
   };
-  const doDelete = () => { if (!selected) { setLine("Pick a piece first."); return; } apply(deletePiece(state, selected)); };
+  const doDelete = () => { if (!selected) { setLine(i18n._({ id: "ui.Pick a piece first.", message: "Pick a piece first." })); return; } apply(deletePiece(state, selected)); };
   const doAdd = async (kind: "clip" | "voice" | "music") => {
     if (!props.onAdd || busy) return;
     setBusy(kind);
@@ -276,7 +281,7 @@ function StudioBody(props: TrackStudioProps) {
       };
       apply(addPiece(stateRef.current, kind === "clip" ? "video" : kind, piece, playhead(), limits));
     } catch (e) {
-      setLine(e instanceof Error && e.message ? e.message : "That could not be added. Try again.");
+      setLine(e instanceof Error && e.message ? e.message : i18n._({ id: "ui.That could not be added. Try again.", message: "That could not be added. Try again." }));
     } finally {
       setBusy(null);
     }
@@ -313,41 +318,41 @@ function StudioBody(props: TrackStudioProps) {
 
   // -- the parts -------------------------------------------------------------------------------------------------------
   const toolButtons = (
-    <div className="flex flex-wrap gap-2" role="group" aria-label="Edit">
-      {tools.includes("split") ? <ToolButton icon={<ScissorsIcon />} onClick={doSplit}>{SPLIT_LABEL}</ToolButton> : null}
-      {tools.includes("delete") ? <ToolButton icon={<Trash2Icon />} onClick={doDelete} disabled={!selected}>Delete piece</ToolButton> : null}
-      {props.onAdd && tools.includes("add_clip") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("clip")} disabled={!!busy || !!props.toolReasons?.add_clip} title={props.toolReasons?.add_clip}>Add a clip</ToolButton> : null}
-      {props.onAdd && tools.includes("add_voice") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("voice")} disabled={!!busy || !!props.toolReasons?.add_voice} title={props.toolReasons?.add_voice}>Add a voice</ToolButton> : null}
-      {props.onAdd && tools.includes("add_music") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("music")} disabled={!!busy || !!props.toolReasons?.add_music} title={props.toolReasons?.add_music}>Add music</ToolButton> : null}
+    <div className="flex flex-wrap gap-2" role="group" aria-label={i18n._({ id: "ui.Edit", message: "Edit" })}>
+      {tools.includes("split") ? <ToolButton icon={<ScissorsIcon />} onClick={doSplit}>{splitLabel()}</ToolButton> : null}
+      {tools.includes("delete") ? <ToolButton icon={<Trash2Icon />} onClick={doDelete} disabled={!selected}>{i18n._({ id: "ui.Delete piece", message: "Delete piece" })}</ToolButton> : null}
+      {props.onAdd && tools.includes("add_clip") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("clip")} disabled={!!busy || !!props.toolReasons?.add_clip} title={props.toolReasons?.add_clip}>{i18n._({ id: "ui.Add a clip", message: "Add a clip" })}</ToolButton> : null}
+      {props.onAdd && tools.includes("add_voice") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("voice")} disabled={!!busy || !!props.toolReasons?.add_voice} title={props.toolReasons?.add_voice}>{i18n._({ id: "ui.Add a voice", message: "Add a voice" })}</ToolButton> : null}
+      {props.onAdd && tools.includes("add_music") ? <ToolButton icon={<PlusIcon />} onClick={() => void doAdd("music")} disabled={!!busy || !!props.toolReasons?.add_music} title={props.toolReasons?.add_music}>{i18n._({ id: "ui.Add music", message: "Add music" })}</ToolButton> : null}
     </div>
   );
   const reasons = (["add_clip", "add_voice", "add_music"] as const).map((k) => (props.onAdd && tools.includes(k) ? props.toolReasons?.[k] : undefined)).find(Boolean);
 
   const panelBodies: Record<StudioPanel, { title: string; reset: () => void; body: ReactNode }> = {
     volume: {
-      title: "Volume",
+      title: i18n._({ id: "ui.Volume", message: "Volume" }),
       reset: () => selected && commit(resetPieceVolume(state, selected)),
       body: <VolumePanel state={state} selected={sel} commit={commit} />,
     },
     fades: {
-      title: "Fades",
+      title: i18n._({ id: "ui.Fades", message: "Fades" }),
       reset: () => selected && commit(resetPieceFades(state, selected)),
       body: <FadesPanel selected={sel} state={state} commit={commit} />,
     },
     crossfade: {
-      title: "Crossfade",
+      title: i18n._({ id: "ui.Crossfade", message: "Crossfade" }),
       reset: () => selected && commit(setCrossfadeAfter(state, selected, 0)),
       body: <CrossfadePanel state={state} selected={sel} commit={commit} />,
     },
     level: {
-      title: "Level",
+      title: i18n._({ id: "ui.Level", message: "Level" }),
       reset: () => commit(applyBalance(state, steps.find((s) => s.id === "balanced") ?? steps[Math.floor(steps.length / 2)]!)),
       body: <LevelPanel state={state} steps={steps} commit={commit} />,
     },
   };
 
   return (
-    <section ref={sectionRef} aria-label="Studio" data-slot="track-studio" className="text-foreground grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" onKeyDown={onKeyDown}>
+    <section ref={sectionRef} aria-label={i18n._({ id: "ui.Studio", message: "Studio" })} data-slot="track-studio" className="text-foreground grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]" onKeyDown={onKeyDown}>
       <div ref={hostRef} hidden data-studio-host />
       <div role="status" aria-live="polite" className={cn("lg:col-span-2", line ? "text-destructive text-sm" : "sr-only")} data-slot="track-studio-line">{line}</div>
 
@@ -355,12 +360,12 @@ function StudioBody(props: TrackStudioProps) {
         {props.onExport ? (
           <>
             <Button size="lg" className="rounded-full" onClick={doExport} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-button">
-              {props.exportLabel ?? "Export as a new clip"}
+              {props.exportLabel ?? i18n._({ id: "ui.Export as a new clip", message: "Export as a new clip" })}
             </Button>
-            {props.exportDisabledReason ? <p className="text-muted-foreground text-sm">{props.exportDisabledReason}</p> : !changed ? <p className="text-muted-foreground text-sm">Change something to export it.</p> : null}
+            {props.exportDisabledReason ? <p className="text-muted-foreground text-sm">{props.exportDisabledReason}</p> : !changed ? <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Change something to export it.", message: "Change something to export it." })}</p> : null}
           </>
         ) : null}
-        <p className="text-muted-foreground hidden text-sm lg:block">{PREVIEW_LINE}</p>
+        <p className="text-muted-foreground hidden text-sm lg:block">{previewLine()}</p>
       </div>
 
       <div className="flex min-w-0 flex-col gap-4 lg:col-start-1 lg:row-span-2 lg:row-start-1" data-slot="track-studio-main">
@@ -371,11 +376,11 @@ function StudioBody(props: TrackStudioProps) {
             {showCard && props.exportCard ? (
               <div className="absolute inset-0 flex flex-col gap-2 overflow-auto p-2" data-slot="track-studio-export-card">
                 {props.exportCard}
-                <Button variant="secondary" size="sm" className="self-start rounded-full" onClick={() => { setShowCard(false); props.onKeepEditing?.(); }}>Keep editing</Button>
+                <Button variant="secondary" size="sm" className="self-start rounded-full" onClick={() => { setShowCard(false); props.onKeepEditing?.(); }}>{i18n._({ id: "ui.Keep editing", message: "Keep editing" })}</Button>
               </div>
             ) : (
               <>
-                <span className="bg-background/70 text-foreground absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold">Preview</span>
+                <span className="bg-background/70 text-foreground absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold">{i18n._({ id: "ui.Preview", message: "Preview" })}</span>
                 <TimeChip store={timeStore} film={film} />
               </>
             )}
@@ -383,18 +388,18 @@ function StudioBody(props: TrackStudioProps) {
         ) : null}
         <div className="bg-card flex min-w-0 flex-col gap-3 rounded-2xl p-4" data-slot="track-studio-tools">
           <div className="flex items-center justify-between gap-2">
-            <h3 className={eyebrow}>Edit</h3>
+            <h3 className={eyebrow}>{i18n._({ id: "ui.Edit", message: "Edit" })}</h3>
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon-sm" aria-label="Undo" disabled={!canUndo(hist.h)} onClick={undo}><Undo2Icon /></Button>
-              <Button variant="ghost" size="icon-sm" aria-label="Redo" disabled={!canRedo(hist.h)} onClick={redo}><Redo2Icon /></Button>
+              <Button variant="ghost" size="icon-sm" aria-label={i18n._({ id: "ui.Undo", message: "Undo" })} disabled={!canUndo(hist.h)} onClick={undo}><Undo2Icon /></Button>
+              <Button variant="ghost" size="icon-sm" aria-label={i18n._({ id: "ui.Redo", message: "Redo" })} disabled={!canRedo(hist.h)} onClick={redo}><Redo2Icon /></Button>
             </div>
           </div>
           {toolButtons}
           {reasons ? <p className="text-muted-foreground text-sm">{reasons}</p> : null}
           {props.makeMore && props.makeMore.length > 0 ? (
             <>
-              <h3 className={eyebrow}>Make more</h3>
-              <div className="flex flex-wrap gap-2" role="group" aria-label="Make more">
+              <h3 className={eyebrow}>{i18n._({ id: "ui.Make more", message: "Make more" })}</h3>
+              <div className="flex flex-wrap gap-2" role="group" aria-label={i18n._({ id: "ui.Make more", message: "Make more" })}>
                 {props.makeMore.map((m) => (
                   <ToolButton key={m.key} onClick={() => m.onSelect({ piece: sel?.piece ?? null, at_s: playhead() })} disabled={!!m.disabledReason} title={m.disabledReason}>
                     {m.label}
@@ -404,15 +409,15 @@ function StudioBody(props: TrackStudioProps) {
               </div>
             </>
           ) : null}
-          <p className="text-muted-foreground text-sm">{HELP_LINE}</p>
+          <p className="text-muted-foreground text-sm">{helpLine()}</p>
         </div>
       </div>
 
       <div className="bg-card min-w-0 rounded-2xl" data-slot="track-studio-tracks">
-        <div className="flex items-center justify-between gap-4 px-4 pt-3 pb-2"><h3 className={eyebrow}>Tracks</h3>{isPhone ? <div className="w-32"><ZoomControl pps={pps} setZoom={setZoom} compact /></div> : null}</div>
+        <div className="flex items-center justify-between gap-4 px-4 pt-3 pb-2"><h3 className={eyebrow}>{i18n._({ id: "ui.Tracks", message: "Tracks" })}</h3>{isPhone ? <div className="w-32"><ZoomControl pps={pps} setZoom={setZoom} compact /></div> : null}</div>
         {/* A scrollable region must be reachable by keyboard (axe scrollable-region-focusable); arrows then move the playhead. */}
         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-        <div ref={scrollRef} className="relative overflow-x-auto overflow-y-hidden pb-2" role="group" aria-label="Tracks. Left and right arrows move the playhead. Space plays." tabIndex={0}>
+        <div ref={scrollRef} className="relative overflow-x-auto overflow-y-hidden pb-2" role="group" aria-label={i18n._({ id: "ui.Tracks. Left and right arrows move the playhead. Space plays.", message: "Tracks. Left and right arrows move the playhead. Space plays." })} tabIndex={0}>
           <div className="relative" style={{ width: labelW + timeW }}>
             <Ruler store={timeStore} film={film} pps={pps} labelW={labelW} timeW={timeW} seek={(t) => void seekTo(t)} engine={engineRef} />
             {state.lanes.map((lane) => (
@@ -440,16 +445,16 @@ function StudioBody(props: TrackStudioProps) {
       </div>
 
       <div className={cn("bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3", "z-10 max-sm:sticky max-sm:shadow-lg")} data-slot="track-studio-transport">
-        <Button size={isPhone ? "default" : "lg"} className="rounded-full" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? <PauseIcon /> : <PlayIcon />}{playing ? "Pause" : "Play"}</Button>
+        <Button size={isPhone ? "default" : "lg"} className="rounded-full" onClick={togglePlay} aria-label={playing ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Play", message: "Play" })}>{playing ? <PauseIcon /> : <PlayIcon />}{playing ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Play", message: "Play" })}</Button>
         {isPhone ? (
-          <Button variant="secondary" size="icon" className="rounded-full" aria-label="Back to start" onClick={() => void seekTo(0)}><SkipBackIcon /></Button>
+          <Button variant="secondary" size="icon" className="rounded-full" aria-label={i18n._({ id: "ui.Back to start", message: "Back to start" })} onClick={() => void seekTo(0)}><SkipBackIcon /></Button>
         ) : (
-          <Button variant="secondary" size="lg" className="rounded-full" onClick={() => void seekTo(0)}><SkipBackIcon />Back to start</Button>
+          <Button variant="secondary" size="lg" className="rounded-full" onClick={() => void seekTo(0)}><SkipBackIcon />{i18n._({ id: "ui.Back to start", message: "Back to start" })}</Button>
         )}
         {isPhone ? (
-          <Button variant="outline" size="icon" className="rounded-full" aria-label="Loop" aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon /></Button>
+          <Button variant="outline" size="icon" className="rounded-full" aria-label={i18n._({ id: "ui.Loop", message: "Loop" })} aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon /></Button>
         ) : (
-          <Button variant="outline" size="lg" className="rounded-full" aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon />Loop</Button>
+          <Button variant="outline" size="lg" className="rounded-full" aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon />{i18n._({ id: "ui.Loop", message: "Loop" })}</Button>
         )}
         {isPhone ? null : <ZoomControl pps={pps} setZoom={setZoom} />}
         <TimeText store={timeStore} film={film} />
@@ -459,7 +464,7 @@ function StudioBody(props: TrackStudioProps) {
       <div className="min-w-0 lg:col-start-2 lg:row-start-2" data-slot="track-studio-panels">
         {isPhone ? (
           <div className="bg-card flex flex-col gap-3 rounded-2xl p-4">
-            <div role="radiogroup" aria-label="Panel" className="grid grid-cols-4 gap-1">
+            <div role="radiogroup" aria-label={i18n._({ id: "ui.Panel", message: "Panel" })} className="grid grid-cols-4 gap-1">
               {panels.map((p) => (
                 <Button key={p} variant={panelTab === p ? "default" : "secondary"} size="sm" role="radio" aria-checked={panelTab === p} className="rounded-full px-2" onClick={() => setPanelTab(p)}>{panelBodies[p].title}</Button>
               ))}
@@ -471,7 +476,7 @@ function StudioBody(props: TrackStudioProps) {
             {panels.map((p) => <section key={p} aria-label={panelBodies[p].title} className="bg-card flex flex-col gap-3 rounded-2xl p-4"><PanelBody panel={panelBodies[p]} /></section>)}
           </div>
         )}
-        <p className="text-muted-foreground mt-3 text-sm lg:hidden">{PREVIEW_LINE}</p>
+        <p className="text-muted-foreground mt-3 text-sm lg:hidden">{previewLine()}</p>
       </div>
     </section>
   );
@@ -480,8 +485,8 @@ function StudioBody(props: TrackStudioProps) {
 function ZoomControl({ pps, setZoom, compact = false }: { pps: number; setZoom: (v: number) => void; compact?: boolean }) {
   return (
     <div className={cn("flex min-w-32 flex-1 flex-col gap-1", compact && "min-w-0")}>
-      {compact ? null : <span className={eyebrow} aria-hidden="true">Zoom</span>}
-      <Slider min={12} max={120} step={1} value={[pps]} onValueChange={([v]) => setZoom(v ?? pps)} aria-label="Zoom" />
+      {compact ? null : <span className={eyebrow} aria-hidden="true">{i18n._({ id: "ui.Zoom", message: "Zoom" })}</span>}
+      <Slider min={12} max={120} step={1} value={[pps]} onValueChange={([v]) => setZoom(v ?? pps)} aria-label={i18n._({ id: "ui.Zoom", message: "Zoom" })} />
     </div>
   );
 }
@@ -504,7 +509,7 @@ function PanelBody({ panel }: { panel: { title: string; reset: () => void; body:
     <>
       <div className="flex items-center justify-between gap-2">
         <h3 className={cn(eyebrow, "text-foreground")}>{panel.title}</h3>
-        <Button variant="ghost" size="sm" onClick={panel.reset}>Reset<span className="sr-only"> {panel.title}</span></Button>
+        <Button variant="ghost" size="sm" onClick={panel.reset}>{i18n._({ id: "ui.Reset", message: "Reset" })}<span className="sr-only"> {panel.title}</span></Button>
       </div>
       {panel.body}
     </>
@@ -520,25 +525,26 @@ function Field({ label, value, children }: { label: string; value: string; child
   );
 }
 
-const dbText = (db: number) => `${db > 0 ? "+" : ""}${db.toFixed(Math.abs(db % 1) < 0.05 ? 0 : 1)} dB`;
-const secText = (s: number) => `${s.toFixed(1)} s`;
+const formatFixed = (value: number, digits: number) => new Intl.NumberFormat(kitLocaleTag(), { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+const dbText = (db: number) => `${db > 0 ? "+" : ""}${formatFixed(db, Math.abs(db % 1) < 0.05 ? 0 : 1)} dB`;
+const secText = (s: number) => `${formatFixed(s, 1)} s`;
 
 function Selected({ sel, none }: { sel: ReturnType<typeof findPiece>; none: string }) {
-  return <p className="text-muted-foreground text-sm">{sel ? `Selected: ${sel.piece.label ?? `${LANE_WORD[sel.lane.id]} piece`}` : none}</p>;
+  return <p className="text-muted-foreground text-sm">{sel ? i18n._({ id: "ui.Selected: {name}", message: "Selected: {name}", values: { name: sel.piece.label ?? i18n._({ id: "ui.{lane} piece", message: "{lane} piece", values: { lane: laneWord()[sel.lane.id] } }) } }) : none}</p>;
 }
 
 function VolumePanel({ state, selected, commit }: { state: StudioState; selected: ReturnType<typeof findPiece>; commit: (s: StudioState, key?: string) => void }) {
   const p = selected?.piece;
   return (
     <>
-      <Selected sel={selected} none="Pick a piece to change its volume." />
-      <Field label="Level" value={p ? dbText(p.level_db) : "—"}>
-        <Slider min={LEVEL_DB_MIN} max={LEVEL_DB_MAX} step={0.5} value={[p?.level_db ?? 0]} disabled={!p} aria-label="Level in decibels" onValueChange={([v]) => p && commit(setPieceLevel(state, p.id, v ?? 0), `level:${p.id}`)} />
+      <Selected sel={selected} none={i18n._({ id: "ui.Pick a piece to change its volume.", message: "Pick a piece to change its volume." })} />
+      <Field label={i18n._({ id: "ui.Level", message: "Level" })} value={p ? dbText(p.level_db) : "—"}>
+        <Slider min={LEVEL_DB_MIN} max={LEVEL_DB_MAX} step={0.5} value={[p?.level_db ?? 0]} disabled={!p} aria-label={i18n._({ id: "ui.Level in decibels", message: "Level in decibels" })} onValueChange={([v]) => p && commit(setPieceLevel(state, p.id, v ?? 0), `level:${p.id}`)} />
       </Field>
       {selected?.lane.id === "music" ? (
         <label className="flex items-center justify-between gap-3 text-sm">
-          <span className={eyebrow}>Lower under speech</span>
-          <Switch checked={p!.duck} onCheckedChange={(v) => commit(setDuck(state, p!.id, v))} aria-label="Lower under speech" />
+          <span className={eyebrow}>{i18n._({ id: "ui.Lower under speech", message: "Lower under speech" })}</span>
+          <Switch checked={p!.duck} onCheckedChange={(v) => commit(setDuck(state, p!.id, v))} aria-label={i18n._({ id: "ui.Lower under speech", message: "Lower under speech" })} />
         </label>
       ) : null}
     </>
@@ -550,12 +556,12 @@ function FadesPanel({ state, selected, commit }: { state: StudioState; selected:
   const max = p ? Math.min(FADE_MAX_S, pieceDuration(p)) : FADE_MAX_S;
   return (
     <>
-      <Selected sel={selected} none="Pick a piece to fade it." />
-      <Field label="Fade in" value={p ? secText(p.fade_in_s) : "—"}>
-        <Slider min={0} max={max} step={0.1} value={[p?.fade_in_s ?? 0]} disabled={!p} aria-label="Fade in, seconds" onValueChange={([v]) => p && commit(setFadeIn(state, p.id, v ?? 0), `fi:${p.id}`)} />
+      <Selected sel={selected} none={i18n._({ id: "ui.Pick a piece to fade it.", message: "Pick a piece to fade it." })} />
+      <Field label={i18n._({ id: "ui.Fade in", message: "Fade in" })} value={p ? secText(p.fade_in_s) : "—"}>
+        <Slider min={0} max={max} step={0.1} value={[p?.fade_in_s ?? 0]} disabled={!p} aria-label={i18n._({ id: "ui.Fade in, seconds", message: "Fade in, seconds" })} onValueChange={([v]) => p && commit(setFadeIn(state, p.id, v ?? 0), `fi:${p.id}`)} />
       </Field>
-      <Field label="Fade out" value={p ? secText(p.fade_out_s) : "—"}>
-        <Slider min={0} max={max} step={0.1} value={[p?.fade_out_s ?? 0]} disabled={!p} aria-label="Fade out, seconds" onValueChange={([v]) => p && commit(setFadeOut(state, p.id, v ?? 0), `fo:${p.id}`)} />
+      <Field label={i18n._({ id: "ui.Fade out", message: "Fade out" })} value={p ? secText(p.fade_out_s) : "—"}>
+        <Slider min={0} max={max} step={0.1} value={[p?.fade_out_s ?? 0]} disabled={!p} aria-label={i18n._({ id: "ui.Fade out, seconds", message: "Fade out, seconds" })} onValueChange={([v]) => p && commit(setFadeOut(state, p.id, v ?? 0), `fo:${p.id}`)} />
       </Field>
     </>
   );
@@ -566,11 +572,11 @@ function CrossfadePanel({ state, selected, commit }: { state: StudioState; selec
   const ready = x !== null;
   return (
     <>
-      <p className="text-muted-foreground text-sm">{ready ? `At the seam after ${selected!.piece.label ?? "this clip"}.` : "Pick a clip that has another clip after it."}</p>
-      <Field label="Length at the seam" value={ready ? (x === 0 ? "Cut" : secText(x)) : "—"}>
-        <Slider min={0} max={CROSSFADE_MAX_S} step={0.1} value={[x ?? 0]} disabled={!ready} aria-label="Crossfade length, seconds" onValueChange={([v]) => ready && commit(setCrossfadeAfter(state, selected!.piece.id, v ?? 0), `x:${selected!.piece.id}`)} />
+      <p className="text-muted-foreground text-sm">{ready ? i18n._({ id: "ui.At the seam after {name}.", message: "At the seam after {name}.", values: { name: selected!.piece.label ?? i18n._({ id: "ui.this clip", message: "this clip" }) } }) : i18n._({ id: "ui.Pick a clip that has another clip after it.", message: "Pick a clip that has another clip after it." })}</p>
+      <Field label={i18n._({ id: "ui.Length at the seam", message: "Length at the seam" })} value={ready ? (x === 0 ? i18n._({ id: "ui.Cut", message: "Cut" }) : secText(x)) : "—"}>
+        <Slider min={0} max={CROSSFADE_MAX_S} step={0.1} value={[x ?? 0]} disabled={!ready} aria-label={i18n._({ id: "ui.Crossfade length, seconds", message: "Crossfade length, seconds" })} onValueChange={([v]) => ready && commit(setCrossfadeAfter(state, selected!.piece.id, v ?? 0), `x:${selected!.piece.id}`)} />
       </Field>
-      <p className="text-muted-foreground text-sm">Blends the two pictures and their sound where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export dissolves it.</p>
+      <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Blends the two pictures and their sound where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export dissolves it.", message: "Blends the two pictures and their sound where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export dissolves it." })}</p>
     </>
   );
 }
@@ -579,12 +585,12 @@ function LevelPanel({ state, steps, commit }: { state: StudioState; steps: reado
   const current = currentBalance(state, steps);
   return (
     <>
-      <div role="radiogroup" aria-label="Level" className="flex flex-wrap gap-1.5">
+      <div role="radiogroup" aria-label={i18n._({ id: "ui.Level", message: "Level" })} className="flex flex-wrap gap-1.5">
         {steps.map((step) => (
           <Button key={step.id} variant={current === step.id ? "default" : "secondary"} size="sm" role="radio" aria-checked={current === step.id} className="rounded-full px-3" onClick={() => commit(applyBalance(state, step))}>{step.label}</Button>
         ))}
       </div>
-      <p className="text-muted-foreground text-sm">How loud the voice and music sit against the clip's own sound.</p>
+      <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.How loud the voice and music sit against the clip's own sound.", message: "How loud the voice and music sit against the clip's own sound." })}</p>
     </>
   );
 }
@@ -595,7 +601,7 @@ function TimeChip({ store, film }: { store: TimeStore; film: number }) {
 }
 function TimeText({ store, film }: { store: TimeStore; film: number }) {
   const t = useTime(store, 0.25);
-  return <span className="ml-auto font-mono text-sm tabular-nums" role="timer" aria-label={`${spokenTime(t)} of ${spokenTime(film)}`}>{formatTime(t)} / {formatTime(film)}</span>;
+  return <span className="ml-auto font-mono text-sm tabular-nums" role="timer" aria-label={i18n._({ id: "ui.{current} of {total}", message: "{current} of {total}", values: { current: spokenTime(t), total: spokenTime(film) } })}>{formatTime(t)} / {formatTime(film)}</span>;
 }
 
 function Playhead({ store, pps, labelW }: { store: TimeStore; pps: number; labelW: number }) {
@@ -635,11 +641,11 @@ function Ruler({ store, film, pps, labelW, timeW, seek, engine }: { store: TimeS
         <div
           role="slider"
           tabIndex={0}
-          aria-label="Playhead"
+          aria-label={i18n._({ id: "ui.Playhead", message: "Playhead" })}
           aria-valuemin={0}
           aria-valuemax={Math.round(film * 10) / 10}
           aria-valuenow={Math.round(t * 10) / 10}
-          aria-valuetext={`${spokenTime(t)} of ${spokenTime(film)}`}
+          aria-valuetext={i18n._({ id: "ui.{current} of {total}", message: "{current} of {total}", values: { current: spokenTime(t), total: spokenTime(film) } })}
           className={cn("bg-foreground absolute top-0 z-10 h-3 w-3 -translate-x-1/2 rounded-b-sm [clip-path:polygon(0_0,100%_0,50%_100%)]", FOCUS_RING)}
           style={{ left: t * pps }}
           onKeyDown={(e) => {
@@ -683,29 +689,29 @@ interface LaneRowProps {
 function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, select, commit, setSolo, seek, playhead, setLine }: LaneRowProps) {
   const placed = layoutLane(lane);
   const hue = `--hue-${lane.hue}`;
-  const name = LANE_WORD[lane.id];
+  const name = laneWord()[lane.id];
   const bodyRef = useRef<HTMLDivElement>(null);
   return (
     <div className="border-border flex border-b last:border-b-0" data-lane={lane.id}>
       <div className="bg-card sticky left-0 z-30 flex shrink-0 gap-2 px-2 py-1.5" style={{ width: labelW, height: LANE_H, boxShadow: `inset 4px 0 0 var(${hue})` }}>
         <div className="flex min-w-0 flex-1 flex-col justify-between pl-2">
           <div className="flex items-start gap-1.5">
-            <LaneToggle label={`Mute ${name}`} text="M" on={lane.muted} onClick={() => commit(setLaneMuted(state, lane.id, !lane.muted))} />
+            <LaneToggle label={i18n._({ id: "ui.Mute {lane}", message: "Mute {lane}", values: { lane: name } })} text="M" on={lane.muted} onClick={() => commit(setLaneMuted(state, lane.id, !lane.muted))} />
             <span className="min-w-0 flex-1 text-xs leading-tight font-semibold break-words">{lane.label}</span>
-            <LaneToggle label={`Solo ${name}`} text="S" on={solo === lane.id} onClick={() => setSolo(solo !== lane.id)} />
+            <LaneToggle label={i18n._({ id: "ui.Solo {lane}", message: "Solo {lane}", values: { lane: name } })} text="S" on={solo === lane.id} onClick={() => setSolo(solo !== lane.id)} />
           </div>
-          <Slider min={LEVEL_DB_MIN} max={LEVEL_DB_MAX} step={0.5} value={[lane.level_db]} aria-label={`${name} level, decibels`} onValueChange={([v]) => commit(setLaneLevel(state, lane.id, v ?? 0), `lane:${lane.id}`)} />
+          <Slider min={LEVEL_DB_MIN} max={LEVEL_DB_MAX} step={0.5} value={[lane.level_db]} aria-label={i18n._({ id: "ui.{lane} level, decibels", message: "{lane} level, decibels", values: { lane: name } })} onValueChange={([v]) => commit(setLaneLevel(state, lane.id, v ?? 0), `lane:${lane.id}`)} />
         </div>
       </div>
       <div
         ref={bodyRef}
         role="group"
-        aria-label={`${name} pieces`}
+        aria-label={i18n._({ id: "ui.{lane} pieces", message: "{lane} pieces", values: { lane: name } })}
         className={cn("relative", lane.muted && "opacity-50")}
         style={{ width: timeW, height: LANE_H }}
         onPointerDown={(e) => { if (e.target === e.currentTarget) { select(null); const r = e.currentTarget.getBoundingClientRect(); seek(Math.max(0, (e.clientX - r.left) / pps)); } }}
       >
-        {placed.length === 0 ? <span className="text-muted-foreground pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs">{lane.id === "voice" ? "No voice yet." : lane.id === "music" ? "No music yet." : "No clip."}</span> : null}
+        {placed.length === 0 ? <span className="text-muted-foreground pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs">{lane.id === "voice" ? i18n._({ id: "ui.No voice yet.", message: "No voice yet." }) : lane.id === "music" ? i18n._({ id: "ui.No music yet.", message: "No music yet." }) : i18n._({ id: "ui.No clip.", message: "No clip." })}</span> : null}
         {placed.map((pl, i) => (
           <PieceView key={pl.piece.id} lane={lane} state={state} index={i} start={pl.start} piece={pl.piece} pps={pps} hue={hue} selected={selected === pl.piece.id} count={placed.length} media={media} select={select} commit={commit} playhead={playhead} setLine={setLine} />
         ))}
@@ -731,8 +737,8 @@ function PieceView({ lane, state, index, start, piece, pps, hue, selected, count
   const dur = pieceDuration(piece);
   const width = Math.max(8, dur * pps);
   const left = start * pps;
-  const name = LANE_WORD[lane.id];
-  const label = piece.label ?? `${name} ${index + 1}`;
+  const name = laneWord()[lane.id];
+  const label = piece.label ?? i18n._({ id: "ui.{lane} {number}", message: "{lane} {number}", values: { lane: name, number: index + 1 } });
   const seam = lane.id === "video" && index > 0 ? effectiveCrossfade(lane.pieces[index - 1]!, piece) : 0;
   const origin = useRef<StudioState | null>(null);
 
@@ -801,7 +807,8 @@ function PieceView({ lane, state, index, start, piece, pps, hue, selected, count
 
   const fadeIn = piece.fade_in_s;
   const fadeOut = piece.fade_out_s;
-  const spoken = `${name} piece ${index + 1} of ${count}, ${label}, ${spokenTime(dur)}${selected ? ", selected" : ""}`;
+  const spokenVals = { lane: name, position: index + 1, count, label, time: spokenTime(dur) };
+  const spoken = selected ? i18n._({ id: "ui.{lane} piece {position} of {count}, {label}, {time}, selected", message: "{lane} piece {position} of {count}, {label}, {time}, selected", values: spokenVals }) : i18n._({ id: "ui.{lane} piece {position} of {count}, {label}, {time}", message: "{lane} piece {position} of {count}, {label}, {time}", values: spokenVals });
   const env = useMemo(() => pieceEnvelope(lane, index), [lane, index]);
 
   return (
@@ -826,8 +833,8 @@ function PieceView({ lane, state, index, start, piece, pps, hue, selected, count
       </button>
       {selected && hasPrev ? (
         <>
-          <TrimHandle side="start" label={`Trim start of ${label}`} valueText={`Starts ${spokenTime(piece.in_s)} into the file`} now={piece.in_s} min={0} max={piece.out_s - MIN_PIECE_S} {...hs} />
-          <TrimHandle side="end" label={`Trim end of ${label}`} valueText={`Ends ${spokenTime(piece.out_s)} into the file`} now={piece.out_s} min={piece.in_s + MIN_PIECE_S} max={piece.source_s ?? piece.out_s + 600} {...he} />
+          <TrimHandle side="start" label={i18n._({ id: "ui.Trim start of {label}", message: "Trim start of {label}", values: { label } })} valueText={i18n._({ id: "ui.Starts {time} into the file", message: "Starts {time} into the file", values: { time: spokenTime(piece.in_s) } })} now={piece.in_s} min={0} max={piece.out_s - MIN_PIECE_S} {...hs} />
+          <TrimHandle side="end" label={i18n._({ id: "ui.Trim end of {label}", message: "Trim end of {label}", values: { label } })} valueText={i18n._({ id: "ui.Ends {time} into the file", message: "Ends {time} into the file", values: { time: spokenTime(piece.out_s) } })} now={piece.out_s} min={piece.in_s + MIN_PIECE_S} max={piece.source_s ?? piece.out_s + 600} {...he} />
         </>
       ) : null}
     </div>
@@ -870,7 +877,7 @@ function Thumbs({ piece, pps, thumbs }: { piece: StudioPiece; pps: number; thumb
 
 function Wave({ piece, pps, width, peaks }: { piece: StudioPiece; pps: number; width: number; peaks: { peaks: number[]; duration: number } | "failed" | undefined }) {
   const H = LANE_H - 8;
-  if (peaks === "failed") return <span className="text-muted-foreground absolute inset-0 flex items-center justify-center px-2 text-center text-[11px] leading-tight">This audio could not be drawn. It still plays.</span>;
+  if (peaks === "failed") return <span className="text-muted-foreground absolute inset-0 flex items-center justify-center px-2 text-center text-[11px] leading-tight">{i18n._({ id: "ui.This audio could not be drawn. It still plays.", message: "This audio could not be drawn. It still plays." })}</span>;
   const bars = Math.max(1, Math.min(600, Math.floor(width / 3)));
   const data = peaks ? sliceBars(peaks.peaks, peaks.duration, piece.in_s, piece.out_s, bars) : [];
   const step = width / bars;

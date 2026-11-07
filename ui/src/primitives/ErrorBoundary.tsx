@@ -1,3 +1,4 @@
+import { i18n } from "@/kit/i18n"
 import { Component, type ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 
@@ -36,11 +37,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div className="flex h-screen items-center justify-center p-6 text-center">
           <div className="flex max-w-md flex-col items-center gap-4">
-            <h1 className="text-xl font-semibold">Something went wrong</h1>
+            <h1 className="text-xl font-semibold">{i18n._({ id: "ui.Something went wrong", message: "Something went wrong" })}</h1>
             <p className="text-base text-muted-foreground">
-              MaiPai ran into a problem showing this page. Reloading usually fixes it.
+              {i18n._({ id: "ui.MaiPai ran into a problem showing this page. Reloading usually fixes it.", message: "MaiPai ran into a problem showing this page. Reloading usually fixes it." })}
             </p>
-            <Button onClick={() => window.location.reload()}>Reload</Button>
+            <Button onClick={() => window.location.reload()}>{i18n._({ id: "ui.Reload", message: "Reload" })}</Button>
           </div>
         </div>
       );

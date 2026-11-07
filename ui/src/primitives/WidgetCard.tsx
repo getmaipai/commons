@@ -4,6 +4,7 @@ import { Skeleton } from "@/kit/ui/skeleton";
 import { getIcon } from "@/kit/icons";
 import type { WidgetItem } from "@/kit/widgets";
 import { SafeImage } from "@/kit/primitives/SafeImage";
+import { i18n } from "@/kit/i18n"
 
 function WidgetItemRow({ item }: { item: WidgetItem }) {
   const Icon = item.icon ? getIcon(item.icon) : null;
@@ -62,7 +63,7 @@ export function WidgetCard({ title, items, isLoading }: WidgetCardProps) {
           <Skeleton className="h-4 w-1/2" />
         </div>
       ) : !items || items.length === 0 ? (
-        <span className="text-sm text-muted-foreground">Nothing here yet.</span>
+        <span className="text-sm text-muted-foreground">{i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}</span>
       ) : (
         <List
           items={items.map((item, i) => ({ item, key: String(i) }))}

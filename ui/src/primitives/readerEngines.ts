@@ -1,4 +1,5 @@
 import { pdfPercent, readerPercent, type ReaderFormat, type ReaderLocator } from "@/kit/primitives/readerLogic";
+import { i18n } from "@/kit/i18n";
 
 export interface ReaderAppearance { background: string; foreground: string; fontPercent: number; pdfFilter: string }
 export interface ReaderTocEntry { id: string; label: string; target: string; depth: number }
@@ -180,7 +181,7 @@ export async function openPdf(
       canvas.height = Math.ceil(viewport.height);
       canvas.style.width = `${viewport.width / ratio}px`;
       canvas.style.height = `${viewport.height / ratio}px`;
-      canvas.setAttribute("aria-label", `Page ${requested} of ${doc.numPages}`);
+      canvas.setAttribute("aria-label", i18n._({ id: "ui.Page {page} of {pages}", message: "Page {page} of {pages}", values: { page: requested, pages: doc.numPages } }));
       const context = canvas.getContext("2d");
       if (!context) throw new Error("Canvas is not available.");
       const task = pageObject.render({ canvasContext: context, viewport });

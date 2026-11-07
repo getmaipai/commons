@@ -9,6 +9,7 @@ import {
 } from "@/kit/ui/alert-dialog";
 import { Button } from "@/kit/ui/button";
 import type { PendingConfirm } from "@/kit/schema/actions";
+import { i18n } from "@/kit/i18n"
 
 /** Renders `useDispatchAction()`'s own pending-confirm state as a real
  * dialog (docs/UI.md > Dialog: "AlertDialog... for destructive confirms,
@@ -48,10 +49,10 @@ export function ConfirmDialog({ pendingConfirm }: { pendingConfirm: PendingConfi
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => pendingConfirm?.cancel()} disabled={pendingConfirm?.busy}>
-            Cancel
+            {i18n._({ id: "ui.Cancel", message: "Cancel" })}
           </AlertDialogCancel>
           <Button onClick={() => pendingConfirm?.confirm()} disabled={pendingConfirm?.busy}>
-            {pendingConfirm?.busy ? "Working…" : "Confirm"}
+            {pendingConfirm?.busy ? i18n._({ id: "ui.Working…", message: "Working…" }) : i18n._({ id: "ui.Confirm", message: "Confirm" })}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

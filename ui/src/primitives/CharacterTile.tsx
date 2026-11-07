@@ -3,6 +3,7 @@ import { Avatar } from "@/kit/primitives/Avatar";
 import { Checkbox } from "@/kit/ui/checkbox";
 import { icons } from "@/kit/icons";
 import { cn } from "@/kit/utils";
+import { i18n } from "@/kit/i18n";
 
 export interface CharacterTileProps {
   name: string;
@@ -32,7 +33,7 @@ export interface CharacterTileProps {
   lockLabel?: string;
 }
 
-export function CharacterTile({ name, seed, media, line, status, selected = false, menu, onSelect, variant = "default", locked = false, checked = false, onCheckedChange, checkLabel, lockLabel = "Required" }: CharacterTileProps) {
+export function CharacterTile({ name, seed, media, line, status, selected = false, menu, onSelect, variant = "default", locked = false, checked = false, onCheckedChange, checkLabel, lockLabel = i18n._({ id: "ui.Required", message: "Required" }) }: CharacterTileProps) {
   const isAdd = variant === "add";
   const Check = icons.check;
   if (variant === "picture" || variant === "animation") {
@@ -50,7 +51,7 @@ export function CharacterTile({ name, seed, media, line, status, selected = fals
         </button>
         {locked ? <span role="img" aria-label={lockLabel} className="pointer-events-none absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-background/80 text-foreground"><Lock className="size-3.5" aria-hidden="true" /></span> : null}
         {!locked && onCheckedChange ? <span className="absolute left-3 top-3 flex size-6 items-center justify-center rounded-md bg-background/80">
-          <Checkbox aria-label={checkLabel ?? `Select ${name}`} checked={checked} onCheckedChange={(value) => onCheckedChange(value === true)} />
+          <Checkbox aria-label={checkLabel ?? i18n._({ id: "ui.Select {name}", message: "Select {name}", values: { name } })} checked={checked} onCheckedChange={(value) => onCheckedChange(value === true)} />
         </span> : null}
         {line ? <div className="mt-1 text-center text-sm text-muted-foreground">{line}</div> : null}
         {status ? <div className="text-center">{status}</div> : null}

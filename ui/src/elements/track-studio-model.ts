@@ -1,6 +1,8 @@
 // VIDEO-STUDIO-04 and -05 (K3): the TrackStudio timeline model. Pure functions and plain data, no DOM, so the math of trim, split,
 // delete, join order, ripple, crossfade overlap, level and fade curves is tested without a browser. The Element (track-studio.tsx)
 // draws this model; the preview engine (track-studio-engine.ts) plays it; `toPlan` is what Export hands the host.
+import { i18n } from "@/kit/i18n"
+
 
 export type LaneId = "video" | "voice" | "music";
 export const LANE_IDS: readonly LaneId[] = ["video", "voice", "music"];
@@ -52,11 +54,11 @@ export interface StudioState {
   lanes: StudioLane[];
 }
 
-export const LANE_DEFAULTS: Record<LaneId, { label: string; hue: string }> = {
-  video: { label: "1. Video", hue: "blue" },
-  voice: { label: "2. Voice", hue: "pink" },
-  music: { label: "3. Music", hue: "orange" },
-};
+export const laneDefaults = (): Record<LaneId, { label: string; hue: string }> => ({
+  video: { label: i18n._({ id: "ui.1. Video", message: "1. Video" }), hue: "blue" },
+  voice: { label: i18n._({ id: "ui.2. Voice", message: "2. Voice" }), hue: "pink" },
+  music: { label: i18n._({ id: "ui.3. Music", message: "3. Music" }), hue: "orange" },
+});
 
 export const round = (n: number, places = 3) => Math.round(n * 10 ** places) / 10 ** places;
 export const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
@@ -118,8 +120,8 @@ export function readState(rawLanes: unknown): StudioState {
     if (id === "video" && pieces[0]) pieces[0] = { ...pieces[0], crossfade_s: 0 };
     return {
       id,
-      label: typeof raw?.label === "string" && raw.label ? raw.label : LANE_DEFAULTS[id].label,
-      hue: typeof raw?.hue === "string" && /^[a-z]+$/.test(raw.hue) ? raw.hue : LANE_DEFAULTS[id].hue,
+      label: typeof raw?.label === "string" && raw.label ? raw.label : laneDefaults()[id].label,
+      hue: typeof raw?.hue === "string" && /^[a-z]+$/.test(raw.hue) ? raw.hue : laneDefaults()[id].hue,
       level_db: clamp(finite(raw?.level_db, 0), LEVEL_DB_MIN, LEVEL_DB_MAX),
       muted: raw?.muted === true,
       pieces,
@@ -293,8 +295,9 @@ export function spokenTime(t: number): string {
   const s = Math.max(0, Math.round(t));
   const m = Math.floor(s / 60);
   const r = s % 60;
-  const part = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
-  return m > 0 ? (r > 0 ? `${part(m, "minute")} ${part(r, "second")}` : part(m, "minute")) : part(r, "second");
+  const minutes = (n: number) => i18n._({ id: "ui.{count, plural, one {# minute} other {# minutes}}", message: "{count, plural, one {# minute} other {# minutes}}", values: { count: n } });
+  const seconds = (n: number) => i18n._({ id: "ui.{count, plural, one {# second} other {# seconds}}", message: "{count, plural, one {# second} other {# seconds}}", values: { count: n } });
+  return m > 0 ? (r > 0 ? i18n._({ id: "ui.{minutes} {seconds}", message: "{minutes} {seconds}", values: { minutes: minutes(m), seconds: seconds(r) } }) : minutes(m)) : seconds(r);
 }
 /** The ruler's tick step in seconds for a scale, so ticks stay at least 44 px apart. */
 export function rulerStep(pxPerSec: number): number {

@@ -2,7 +2,9 @@
 // functions). Pure string functions; tabular-figure styling is the
 // caller's CSS, not this file's job.
 
-const NOT_REPORTED = "Not reported";
+import { i18n, kitLocaleTag } from "@/kit/i18n";
+
+const notReported = () => i18n._({ id: "ui.Not reported", message: "Not reported" });
 
 function trimmed(value: number, digits: number): string {
   const rounded = Number(value.toFixed(digits));
@@ -21,14 +23,14 @@ function byteMagnitude(bytes: number, digits = 1): { value: number; unit: (typeo
 }
 
 export function formatBytes(bytes: number | null, digits = 1): string {
-  if (bytes === null) return NOT_REPORTED;
+  if (bytes === null) return notReported();
   if (bytes === 0) return "0 B";
   const { value, unit } = byteMagnitude(bytes, digits);
   return `${trimmed(value, digits)} ${unit}`;
 }
 
 export function formatPercent(value: number | null): string {
-  if (value === null) return NOT_REPORTED;
+  if (value === null) return notReported();
   const clamped = Math.min(100, Math.max(0, value));
   return clamped < 10 ? `${clamped.toFixed(1)}%` : `${Math.round(clamped)}%`;
 }
@@ -36,13 +38,13 @@ export function formatPercent(value: number | null): string {
 const ONE_DECIMAL_RATE_UNITS = new Set(["Gbps", "Mbps"]);
 
 export function formatRate(value: number | null, unit: "tok/s" | "req/s" | "Gbps" | "Mbps" | "ms"): string {
-  if (value === null) return NOT_REPORTED;
+  if (value === null) return notReported();
   const number = ONE_DECIMAL_RATE_UNITS.has(unit) ? trimmed(value, 1) : String(Math.round(value));
   return `${number} ${unit}`;
 }
 
 export function formatDuration(seconds: number | null): string {
-  if (seconds === null) return NOT_REPORTED;
+  if (seconds === null) return notReported();
   const whole = Math.max(0, Math.floor(seconds));
   if (whole < 60) return `${whole}s`;
   if (whole < 3600) return `${Math.floor(whole / 60)}m`;
@@ -57,7 +59,7 @@ export function formatDuration(seconds: number | null): string {
 }
 
 export function formatUsedOfTotal(used: number | null, total: number | null): string {
-  if (used === null || total === null || total === 0) return NOT_REPORTED;
+  if (used === null || total === null || total === 0) return notReported();
   const { unit, value: totalValue } = byteMagnitude(total);
   const exponent = BYTE_UNITS.indexOf(unit);
   const usedValue = used / 1024 ** exponent;
@@ -65,11 +67,11 @@ export function formatUsedOfTotal(used: number | null, total: number | null): st
 }
 
 export function formatVersion(current: string | null, available: string | null): string {
-  if (current === null) return NOT_REPORTED;
+  if (current === null) return notReported();
   if (available && available !== current) return `v${current} → v${available}`;
   return `v${current}`;
 }
 
 export function absoluteTime(iso: string): string {
-  return new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+  return new Date(iso).toLocaleString(kitLocaleTag(), { dateStyle: "medium", timeStyle: "short" });
 }

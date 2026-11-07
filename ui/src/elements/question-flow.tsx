@@ -10,6 +10,7 @@ import {
 import { cn } from "cn";
 import { OptionList, type OptionListOption } from "./option-list";
 import { ghostButton, mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n"
 
 export interface QuestionFlowStep {
   id: string;
@@ -42,10 +43,10 @@ export function QuestionFlow({
   steps,
   defaultValue,
   onComplete,
-  completeLabel = "Submit",
-  nextLabel = "Next",
-  backLabel = "Back",
-  progressLabel = (current, total) => `${current} of ${total}`,
+  completeLabel = i18n._({ id: "ui.Submit", message: "Submit" }),
+  nextLabel = i18n._({ id: "ui.Next", message: "Next" }),
+  backLabel = i18n._({ id: "ui.Back", message: "Back" }),
+  progressLabel = (current, total) => i18n._({ id: "ui.{current} of {total}", message: "{current} of {total}", values: { current, total } }),
   choice,
   className,
   ...props

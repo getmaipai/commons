@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import { Children, Fragment, isValidElement, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { DownloadIcon, PauseIcon, PlayIcon, Share2Icon, BookOpenIcon, PencilIcon, LibraryIcon, WandSparklesIcon, SquareIcon, RefreshCwIcon, ChevronLeftIcon, ChevronRightIcon, GaugeIcon } from "lucide-react";
 import { PendingActions, type PendingAction } from "./pending-actions";
@@ -30,11 +31,11 @@ export interface MusicTrackCopy {
   versionOf: (n: number, total: number) => string; queuePosition: (position: number) => string; progress: (value: number, elapsed: string | undefined) => string;
   player: Partial<PlayerCopy>;
 }
-const DEFAULT_COPY: MusicTrackCopy = {
-  queued: "Waiting its turn", generating: "Making the music", stop: "Stop", download: "Download", share: "Share", saveToLibrary: "Save to Music", makeAnother: "Make another", retry: "Try again", stopped: "Stopped. Nothing was kept.", failed: "I couldn't make that song.", lyrics: "Lyrics", previous: "Previous", next: "Next", useVersion: "Use this version", edit: "Edit", play: "Play", pause: "Pause", speed: "Playback speed", waitingForMemory: "Waiting for memory, your song starts when there is room",
-  versionOf: (n, total) => `Version ${n} of ${total}`, queuePosition: (position) => `Place in line: ${position}`, progress: (value, elapsed) => `${value} percent${elapsed ? `, ${elapsed} so far` : ""}`, player: {},
-};
-const DEFAULT_STAGES = ["Queued", "Loading", "Planning", "Making", "Mixing", "Finishing"].map((label, i) => ({ id: String(i), label }));
+const defaultCopy = (): MusicTrackCopy => ({
+  queued: i18n._({ id: "ui.Waiting its turn", message: "Waiting its turn" }), generating: i18n._({ id: "ui.Making the music", message: "Making the music" }), stop: i18n._({ id: "ui.Stop", message: "Stop" }), download: i18n._({ id: "ui.Download", message: "Download" }), share: i18n._({ id: "ui.Share", message: "Share" }), saveToLibrary: i18n._({ id: "ui.Save to Music", message: "Save to Music" }), makeAnother: i18n._({ id: "ui.Make another", message: "Make another" }), retry: i18n._({ id: "ui.Try again", message: "Try again" }), stopped: i18n._({ id: "ui.Stopped. Nothing was kept.", message: "Stopped. Nothing was kept." }), failed: i18n._({ id: "ui.I couldn't make that song.", message: "I couldn't make that song." }), lyrics: i18n._({ id: "ui.Lyrics", message: "Lyrics" }), previous: i18n._({ id: "ui.Previous", message: "Previous" }), next: i18n._({ id: "ui.Next", message: "Next" }), useVersion: i18n._({ id: "ui.Use this version", message: "Use this version" }), edit: i18n._({ id: "ui.Edit", message: "Edit" }), play: i18n._({ id: "ui.Play", message: "Play" }), pause: i18n._({ id: "ui.Pause", message: "Pause" }), speed: i18n._({ id: "ui.Playback speed", message: "Playback speed" }), waitingForMemory: i18n._({ id: "ui.Waiting for memory, your song starts when there is room", message: "Waiting for memory, your song starts when there is room" }),
+  versionOf: (n, total) => i18n._({ id: "ui.Version {n} of {total}", message: "Version {n} of {total}", values: { n, total } }), queuePosition: (position) => i18n._({ id: "ui.Place in line: {position}", message: "Place in line: {position}", values: { position } }), progress: (value, elapsed) => (elapsed ? i18n._({ id: "ui.{value} percent, {elapsed} so far", message: "{value} percent, {elapsed} so far", values: { value, elapsed } }) : i18n._({ id: "ui.{value} percent", message: "{value} percent", values: { value } })), player: {},
+});
+const defaultStages = () => [i18n._({ id: "ui.Queued", message: "Queued" }), i18n._({ id: "ui.Loading", message: "Loading" }), i18n._({ id: "ui.Planning", message: "Planning" }), i18n._({ id: "ui.Making", message: "Making" }), i18n._({ id: "ui.Mixing", message: "Mixing" }), i18n._({ id: "ui.Finishing", message: "Finishing" })].map((label, i) => ({ id: String(i), label }));
 const formatSeconds = (seconds: number) => `${Math.floor(Math.max(0, seconds) / 60)}:${String(Math.floor(Math.max(0, seconds) % 60)).padStart(2, "0")}`;
 function download(src: string, name: string) { const link = document.createElement("a"); link.href = src; link.download = name; link.rel = "noopener"; document.body.append(link); link.click(); link.remove(); }
 function legacyEditLayout(content: ReactNode): { modes: Array<{ id: string; label: string; content: ReactNode; disabledReason?: string }>; full?: ReactNode; extra: ReactNode[] } | undefined {
@@ -51,8 +52,8 @@ function legacyEditLayout(content: ReactNode): { modes: Array<{ id: string; labe
       taken.add(i);
       if (make) taken.add(i + 1);
       const hasPrompt = typeof node.props.value === "string" && node.props.value.trim().length > 0;
-      const disabledReason = make?.props.disabled ? hasPrompt ? "Wait for the current change to finish." : isCover ? "Describe a new cover to enable Make." : "Describe a song change to enable Make." : undefined;
-      prompts.push({ id: isCover ? "cover" : "song", label: isCover ? "New cover" : "Change the song", content: <div className="grid gap-2">{node}{make}</div>, ...(disabledReason ? { disabledReason } : {}) });
+      const disabledReason = make?.props.disabled ? hasPrompt ? i18n._({ id: "ui.Wait for the current change to finish.", message: "Wait for the current change to finish." }) : isCover ? i18n._({ id: "ui.Describe a new cover to enable Make.", message: "Describe a new cover to enable Make." }) : i18n._({ id: "ui.Describe a song change to enable Make.", message: "Describe a song change to enable Make." }) : undefined;
+      prompts.push({ id: isCover ? "cover" : "song", label: isCover ? i18n._({ id: "ui.New cover", message: "New cover" }) : i18n._({ id: "ui.Change the song", message: "Change the song" }), content: <div className="grid gap-2">{node}{make}</div>, ...(disabledReason ? { disabledReason } : {}) });
     }
     if (node.props.children === "Make it full") { full = node; taken.add(i); }
   });
@@ -63,8 +64,8 @@ function legacyEditLayout(content: ReactNode): { modes: Array<{ id: string; labe
 /** A generated song. The host owns sources, version selection and all I/O. */
 export function MusicTrack({
   status, title, description, src, progress, phaseLabel, queuePosition, startedAt, estimateMs = 120_000, etaLabel, hint, error, downloadName = "song.m4a", lyrics, timedLyrics, cover, coverAlt, coverActions,
-  versions = [], currentId, onSelectVersion, onUseVersion, onStop, onRetry, onDownload, onShare, onSaveToLibrary, onMakeAnother, actions, metadata, copy, width = "default", editContent, editLabel = "Edit", editPanelLabel,
-  stages = DEFAULT_STAGES, currentStage, elapsedSeconds, etaSeconds, waitingForMemory = false, editModes, quickSong = false, onMakeFull, defaultEditOpen = false, editOpen: editOpenProp, onEditOpenChange, byline, pendingActions,
+  versions = [], currentId, onSelectVersion, onUseVersion, onStop, onRetry, onDownload, onShare, onSaveToLibrary, onMakeAnother, actions, metadata, copy, width = "default", editContent, editLabel = i18n._({ id: "ui.Edit", message: "Edit" }), editPanelLabel,
+  stages = defaultStages(), currentStage, elapsedSeconds, etaSeconds, waitingForMemory = false, editModes, quickSong = false, onMakeFull, defaultEditOpen = false, editOpen: editOpenProp, onEditOpenChange, byline, pendingActions,
 }: {
   status: MusicTrackStatus; title: string; description?: string; src?: string; progress?: number | null; phaseLabel?: string; queuePosition?: number | null; startedAt?: number; estimateMs?: number; etaLabel?: string; hint?: string; error?: string; downloadName?: string; lyrics?: string; cover?: string; coverAlt?: string; coverActions?: ReactNode; timedLyrics?: { t: number; line: string; section?: string | null }[];
   versions?: Array<VersionLike & { label: string }>; currentId?: string; onSelectVersion?: (id: string) => void; onUseVersion?: (id: string) => void; onStop?: () => void; onRetry?: () => void; onDownload?: () => void; onShare?: () => void; onSaveToLibrary?: () => void; onMakeAnother?: () => void; actions?: ReactNode; metadata?: PlayerMetadata; copy?: Partial<MusicTrackCopy>; width?: "default" | "full"; editContent?: ReactNode; editLabel?: string; editPanelLabel?: string; className?: string;
@@ -73,7 +74,7 @@ export function MusicTrack({
   /** Answers to a held job. Drawn only while the status is queued. */
   pendingActions?: PendingAction[];
 }) {
-  const text = { ...DEFAULT_COPY, ...copy };
+  const text = { ...defaultCopy(), ...copy };
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const editId = useId();
   const [now, setNow] = useState(() => Date.now());
@@ -120,15 +121,15 @@ export function MusicTrack({
     </Collapsible> : null}
     {(editModes?.length || editContent !== undefined && editContent !== null) ? <Dialog open={editOpen} onOpenChange={setEditOpen}><DialogTrigger asChild><TooltipIconButton tooltip={editLabel || text.edit} aria-label={editLabel || text.edit} hitArea48><PencilIcon aria-hidden /></TooltipIconButton></DialogTrigger><DialogContent size="xl" scroll="viewport" className="grid-cols-[minmax(0,1fr)]" aria-label={editPanelLabel ?? editLabel}>
       <DialogHeader><DialogTitle>{editPanelLabel ?? (editLabel || text.edit)}</DialogTitle><DialogDescription className="sr-only">{title}</DialogDescription></DialogHeader>
-      {shownEditModes?.length ? <Tabs defaultValue={shownEditModes[0]!.id}><TabsList className="w-full justify-start overflow-x-auto">{shownEditModes.map(mode => <TabsTrigger key={mode.id} value={mode.id}>{mode.label}</TabsTrigger>)}</TabsList>{shownEditModes.map(mode => <TabsContent key={mode.id} value={mode.id} className="pt-2">{mode.content}{mode.disabledReason ? <p className="text-muted-foreground pt-1 text-xs">{mode.disabledReason}</p> : null}</TabsContent>)}{adaptedEdit?.full ?? (quickSong && onMakeFull ? <div className="pt-3"><Button type="button" variant="outline" className="w-full" onClick={onMakeFull}>Make it full</Button></div> : null)}{adaptedEdit?.extra.map((node, i) => <div key={i} className="pt-2">{node}</div>)}</Tabs> : <div id={editId} className="flex min-w-0 flex-col gap-3">{quickSong && onMakeFull ? <Button type="button" variant="outline" onClick={onMakeFull}>Make it full</Button> : null}{editContent}</div>}
+      {shownEditModes?.length ? <Tabs defaultValue={shownEditModes[0]!.id}><TabsList className="w-full justify-start overflow-x-auto">{shownEditModes.map(mode => <TabsTrigger key={mode.id} value={mode.id}>{mode.label}</TabsTrigger>)}</TabsList>{shownEditModes.map(mode => <TabsContent key={mode.id} value={mode.id} className="pt-2">{mode.content}{mode.disabledReason ? <p className="text-muted-foreground pt-1 text-xs">{mode.disabledReason}</p> : null}</TabsContent>)}{adaptedEdit?.full ?? (quickSong && onMakeFull ? <div className="pt-3"><Button type="button" variant="outline" className="w-full" onClick={onMakeFull}>{i18n._({ id: "ui.Make it full", message: "Make it full" })}</Button></div> : null)}{adaptedEdit?.extra.map((node, i) => <div key={i} className="pt-2">{node}</div>)}</Tabs> : <div id={editId} className="flex min-w-0 flex-col gap-3">{quickSong && onMakeFull ? <Button type="button" variant="outline" onClick={onMakeFull}>{i18n._({ id: "ui.Make it full", message: "Make it full" })}</Button> : null}{editContent}</div>}
     </DialogContent></Dialog> : null}
-    <DropdownMenu><DropdownMenuTrigger asChild><TooltipIconButton tooltip={`${text.speed}: ${rate}x`} aria-label={`${text.speed}: ${rate}x`} hitArea48><GaugeIcon aria-hidden /></TooltipIconButton></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuLabel>{text.speed}</DropdownMenuLabel><DropdownMenuRadioGroup value={rate} onValueChange={nextRate => { setRate(nextRate); if (audioRef.current) audioRef.current.playbackRate = Number(nextRate); }}><DropdownMenuRadioItem value="0.75">0.75x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1">1x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1.25">1.25x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1.5">1.5x</DropdownMenuRadioItem><DropdownMenuRadioItem value="2">2x</DropdownMenuRadioItem></DropdownMenuRadioGroup></DropdownMenuContent></DropdownMenu>
+    <DropdownMenu><DropdownMenuTrigger asChild><TooltipIconButton tooltip={i18n._({ id: "ui.{speed}: {rate}x", message: "{speed}: {rate}x", values: { speed: text.speed, rate } })} aria-label={i18n._({ id: "ui.{speed}: {rate}x", message: "{speed}: {rate}x", values: { speed: text.speed, rate } })} hitArea48><GaugeIcon aria-hidden /></TooltipIconButton></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuLabel>{text.speed}</DropdownMenuLabel><DropdownMenuRadioGroup value={rate} onValueChange={nextRate => { setRate(nextRate); if (audioRef.current) audioRef.current.playbackRate = Number(nextRate); }}><DropdownMenuRadioItem value="0.75">0.75x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1">1x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1.25">1.25x</DropdownMenuRadioItem><DropdownMenuRadioItem value="1.5">1.5x</DropdownMenuRadioItem><DropdownMenuRadioItem value="2">2x</DropdownMenuRadioItem></DropdownMenuRadioGroup></DropdownMenuContent></DropdownMenu>
     {onSaveToLibrary ? <TooltipIconButton tooltip={text.saveToLibrary} aria-label={text.saveToLibrary} hitArea48 onClick={onSaveToLibrary}><LibraryIcon aria-hidden /></TooltipIconButton> : null}{onMakeAnother ? <TooltipIconButton tooltip={text.makeAnother} aria-label={text.makeAnother} hitArea48 onClick={onMakeAnother}><WandSparklesIcon aria-hidden /></TooltipIconButton> : null}{cover && coverActions ? coverActions : null}{actions}
   </div>;
   const coverTile = <GenerationStage
     generating={live}
     previewSrc={cover ?? undefined}
-    previewAlt={coverAlt ?? (cover ? `Cover art for ${title}` : undefined)}
+    previewAlt={coverAlt ?? (cover ? i18n._({ id: "ui.Cover art for {title}", message: "Cover art for {title}", values: { title } }) : undefined)}
     fallbackKind="music"
     showPreviewWhenSettled
     aspectRatio="1 / 1"
@@ -143,8 +144,8 @@ export function MusicTrack({
           <p className="break-words text-sm font-semibold leading-tight">{title}</p>{description ? <p className="text-muted-foreground line-clamp-2 break-words text-xs">{plainMarkdown(description)}</p> : null}
           {live ? waitingForMemory ? <p role="status" className="text-muted-foreground mt-1 text-xs">{text.waitingForMemory}</p> : <div className="mt-1 flex min-w-0 flex-col gap-1.5">
             {stages.length > 0 ? <>
-              <p role="status" className="text-muted-foreground truncate text-xs sm:hidden">Step {Math.min(doneStages + 1, stages.length)} of {stages.length} · {currentStageLabel ?? phaseLabel ?? stages.at(-1)?.label}</p>
-              <div data-slot="generation-stages" role="group" aria-label="Generation stages" className="hidden min-w-0 gap-1 sm:grid" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))` }}>
+              <p role="status" className="text-muted-foreground truncate text-xs sm:hidden">{i18n._({ id: "ui.Step {step} of {total} · {label}", message: "Step {step} of {total} · {label}", values: { step: Math.min(doneStages + 1, stages.length), total: stages.length, label: currentStageLabel ?? phaseLabel ?? stages.at(-1)?.label } })}</p>
+              <div data-slot="generation-stages" role="group" aria-label={i18n._({ id: "ui.Generation stages", message: "Generation stages" })} className="hidden min-w-0 gap-1 sm:grid" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))` }}>
                 {stages.map((stage, i) => {
                   const isDone = i < doneStages;
                   const isCurrent = i === doneStages && doneStages < stages.length;
@@ -159,9 +160,9 @@ export function MusicTrack({
                 })}
               </div>
             </> : null}
-            <p className="text-muted-foreground text-xs tabular-nums">{[`${value}%`, elapsed, etaSeconds !== undefined && etaSeconds !== null ? `about ${Math.max(1, Math.round(etaSeconds))} seconds left` : etaSeconds === undefined ? etaLabel : undefined].filter(Boolean).join(" · ")}</p>
+            <p className="text-muted-foreground text-xs tabular-nums">{[`${value}%`, elapsed, etaSeconds !== undefined && etaSeconds !== null ? i18n._({ id: "ui.about {seconds} seconds left", message: "about {seconds} seconds left", values: { seconds: Math.max(1, Math.round(etaSeconds)) } }) : etaSeconds === undefined ? etaLabel : undefined].filter(Boolean).join(" · ")}</p>
           </div> : null}
-          {status === "ready" && src ? <div className="mt-1 flex min-w-0 flex-col gap-1"><Slider aria-label={`Seek ${title}`} min={0} max={duration || 1} step={1} value={[Math.min(currentTime, duration || 1)]} onValueChange={seek} disabled={!duration} /><div className="text-muted-foreground flex justify-between text-xs tabular-nums"><span>{formatSeconds(currentTime)}</span><span>{formatSeconds(duration)}</span></div></div> : null}
+          {status === "ready" && src ? <div className="mt-1 flex min-w-0 flex-col gap-1"><Slider aria-label={i18n._({ id: "ui.Seek {title}", message: "Seek {title}", values: { title } })} min={0} max={duration || 1} step={1} value={[Math.min(currentTime, duration || 1)]} onValueChange={seek} disabled={!duration} /><div className="text-muted-foreground flex justify-between text-xs tabular-nums"><span>{formatSeconds(currentTime)}</span><span>{formatSeconds(duration)}</span></div></div> : null}
           {status === "ready" && src ? (
             // Song lyrics are exposed through the Lyrics action instead of an always-on caption track.
             // eslint-disable-next-line jsx-a11y/media-has-caption

@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { CheckIcon, ClockIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export interface ScheduleRun {
   id: string;
@@ -60,7 +61,7 @@ export function ScheduleCard({
           type="button"
           role="switch"
           aria-checked={enabled}
-          aria-label={`${enabled ? "Pause" : "Resume"} ${name}`}
+          aria-label={enabled ? i18n._({ id: "ui.Pause {name}", message: "Pause {name}", values: { name } }) : i18n._({ id: "ui.Resume {name}", message: "Resume {name}", values: { name } })}
           onClick={onToggle}
           className={cn(
             "flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200",
@@ -83,14 +84,14 @@ export function ScheduleCard({
           !enabled && "opacity-45",
         )}
       >
-        <span className={cn(mono, "text-muted-foreground")}>next</span>
+        <span className={cn(mono, "text-muted-foreground")}>{i18n._({ id: "ui.next", message: "next" })}</span>
         <span className="text-foreground/80 text-[13px]">
-          {enabled ? nextRun : "paused"}
+          {enabled ? nextRun : i18n._({ id: "ui.paused", message: "paused" })}
         </span>
       </div>
 
       <div className="flex flex-col gap-1">
-        <span className={cn(mono, "text-muted-foreground")}>recent runs</span>
+        <span className={cn(mono, "text-muted-foreground")}>{i18n._({ id: "ui.recent runs", message: "recent runs" })}</span>
         {history.map((run) => (
           <div key={run.id} className="flex items-baseline gap-2">
             {run.ok ? (
@@ -102,7 +103,7 @@ export function ScheduleCard({
               {run.at}
             </span>
             <span className={cn(mono, "text-muted-foreground shrink-0")}>
-              {run.ok ? "ok" : "failed"}
+              {run.ok ? i18n._({ id: "ui.ok", message: "ok" }) : i18n._({ id: "ui.failed", message: "failed" })}
             </span>
           </div>
         ))}

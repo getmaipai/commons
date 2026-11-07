@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import type { PlayerVoiceover } from "@/kit/primitives/Player";
+import { i18n } from "@/kit/i18n";
 
 // MEDIA-PLAYER-01: the schema `play` action hands a media item to the host. The page never
 // plays anything itself: Home's shell (its one audio session, AUDIO-SESSION-01) provides this
@@ -21,6 +22,10 @@ export interface MediaItemRef {
 
 /** ADULT-LOCK-01: the plain line shown when an adult-only item is asked to play anywhere but its own page. */
 export const ADULT_ONLY_PAGE_ONLY = "This item plays only on its own page. Open it there.";
+
+export function adultOnlyPageOnly(): string {
+  return i18n._({ id: "ui.This item plays only on its own page. Open it there.", message: "This item plays only on its own page. Open it there." });
+}
 
 /** ADULT-LOCK-01: the one rule for a host's media store (`createMediaStore`, `mediaFor`): an item that carries `adultOnly: true`
  * is never registered or given an element. Returns true when the item must be refused. */
@@ -71,3 +76,7 @@ export interface MediaHost {
 export const MediaHostContext = createContext<MediaHost | null>(null);
 
 export const PLAY_UNAVAILABLE = "Playing is not set up on this screen. Open the item from its app.";
+
+export function playUnavailable(): string {
+  return i18n._({ id: "ui.Playing is not set up on this screen. Open the item from its app.", message: "Playing is not set up on this screen. Open the item from its app." });
+}

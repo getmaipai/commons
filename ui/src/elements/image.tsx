@@ -25,6 +25,7 @@ import type {
 } from "@assistant-ui/react";
 import { cn } from "cn";
 import { SafeImage } from "../primitives/SafeImage";
+import { i18n } from "@/kit/i18n";
 
 const extensionForMimeType = (mimeType?: string): string => {
   switch (mimeType) {
@@ -172,7 +173,7 @@ function ImagePreview({
   containerClassName,
   onLoad,
   onError,
-  alt = "Image content",
+  alt = i18n._({ id: "ui.Image content", message: "Image content" }),
   src,
   ...props
 }: ImagePreviewProps) {
@@ -243,7 +244,7 @@ type ImageZoomProps = PropsWithChildren<{
   alt?: string;
 }>;
 
-function ImageZoom({ src, alt = "Image preview", children }: ImageZoomProps) {
+function ImageZoom({ src, alt = i18n._({ id: "ui.Image preview", message: "Image preview" }), children }: ImageZoomProps) {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -313,7 +314,7 @@ function ImageZoom({ src, alt = "Image preview", children }: ImageZoomProps) {
         role="button"
         tabIndex={0}
         className="aui-image-zoom-trigger cursor-zoom-in"
-        aria-label="Click to zoom image"
+        aria-label={i18n._({ id: "ui.Click to zoom image", message: "Click to zoom image" })}
       >
         {children}
       </div>
@@ -326,7 +327,7 @@ function ImageZoom({ src, alt = "Image preview", children }: ImageZoomProps) {
             aria-modal="true"
             className="aui-image-zoom-overlay fade-in animate-in fixed inset-0 z-50 flex items-center justify-center bg-background/90 duration-200"
             onClick={handleClose}
-            aria-label="Zoomed image"
+            aria-label={i18n._({ id: "ui.Zoomed image", message: "Zoomed image" })}
           >
             <SafeImage
               data-slot="image-zoom-content"
@@ -341,7 +342,7 @@ function ImageZoom({ src, alt = "Image preview", children }: ImageZoomProps) {
             <button
               ref={closeRef}
               type="button"
-              aria-label="Close zoomed image"
+              aria-label={i18n._({ id: "ui.Close zoomed image", message: "Close zoomed image" })}
               onClick={(e) => {
                 e.stopPropagation();
                 handleClose();
@@ -367,7 +368,7 @@ function ImageGenerating({ className }: { className?: string }) {
       )}
     >
       <Loader2Icon className="text-muted-foreground size-8 animate-spin" />
-      <span className="sr-only">Generating image…</span>
+      <span className="sr-only">{i18n._({ id: "ui.Generating image…", message: "Generating image…" })}</span>
     </div>
   );
 }
@@ -388,7 +389,7 @@ function ImageContentFilterError({
       )}
     >
       <ShieldAlertIcon className="text-muted-foreground size-8" />
-      <p className="text-sm font-medium">Image could not be generated</p>
+      <p className="text-sm font-medium">{i18n._({ id: "ui.Image could not be generated", message: "Image could not be generated" })}</p>
       {reason && <p className="text-muted-foreground text-xs">{reason}</p>}
     </div>
   );
@@ -424,7 +425,7 @@ function RegenerateButton({
       }}
       disabled={isRegenerating}
       data-slot="image-regenerate"
-      aria-label="Regenerate image"
+      aria-label={i18n._({ id: "ui.Regenerate image", message: "Regenerate image" })}
       className="hover:bg-muted inline-flex size-7 items-center justify-center rounded disabled:opacity-50"
     >
       <RefreshCwIcon
@@ -444,7 +445,7 @@ function ImageActions({ part, onRegenerate, className }: ImageActionsProps) {
         type="button"
         onClick={() => downloadImagePart(part)}
         data-slot="image-download"
-        aria-label="Download image"
+        aria-label={i18n._({ id: "ui.Download image", message: "Download image" })}
         className="hover:bg-muted inline-flex size-7 items-center justify-center rounded"
       >
         <DownloadIcon className="size-4" />
@@ -455,7 +456,7 @@ function ImageActions({ part, onRegenerate, className }: ImageActionsProps) {
           copyImagePart(part).catch(() => {});
         }}
         data-slot="image-copy"
-        aria-label="Copy image"
+        aria-label={i18n._({ id: "ui.Copy image", message: "Copy image" })}
         className="hover:bg-muted inline-flex size-7 items-center justify-center rounded"
       >
         <CopyIcon className="size-4" />
@@ -480,15 +481,15 @@ const ImageImpl: ImageMessagePartComponent = (props) => {
   if (status?.type === "incomplete" && status.reason === "content-filter") {
     return (
       <ImageRoot>
-        <ImageContentFilterError reason="The provider blocked this image." />
+        <ImageContentFilterError reason={i18n._({ id: "ui.The provider blocked this image.", message: "The provider blocked this image." })} />
       </ImageRoot>
     );
   }
 
   return (
     <ImageRoot>
-      <ImageZoom src={image} alt={filename || "Image content"}>
-        <ImagePreview src={image} alt={filename || "Image content"} />
+      <ImageZoom src={image} alt={filename || i18n._({ id: "ui.Image content", message: "Image content" })}>
+        <ImagePreview src={image} alt={filename || i18n._({ id: "ui.Image content", message: "Image content" })} />
       </ImageZoom>
       <ImageFilename>{filename}</ImageFilename>
     </ImageRoot>

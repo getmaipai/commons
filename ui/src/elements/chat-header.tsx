@@ -1,3 +1,4 @@
+import { i18n } from "@/kit/i18n"
 import { useState, type ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/kit/ui/avatar";
@@ -48,7 +49,7 @@ export interface ChatHeaderProps {
   identityFooter?: ReactNode;
 }
 
-export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, end, menuExpanded, menuControls, identityMenu, identityChoices, identityValue, onIdentityChange, identityLabel = "Change companion", identityIntro, identitySearchLabel, identityNotice, identityFooter }: ChatHeaderProps) {
+export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, end, menuExpanded, menuControls, identityMenu, identityChoices, identityValue, onIdentityChange, identityLabel = i18n._({ id: "ui.Change companion", message: "Change companion" }), identityIntro, identitySearchLabel, identityNotice, identityFooter }: ChatHeaderProps) {
   const [search, setSearch] = useState("");
   const searchable = Boolean(identityChoices && identitySearchLabel && identityChoices.length > 5);
   const filteredChoices = identityChoices?.filter((choice) => `${choice.label} ${choice.description ?? ""}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
@@ -68,11 +69,11 @@ export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, e
         <span className="flex min-w-0 flex-1 flex-col text-left"><span className="truncate">{choice.label}</span>{choice.description ? <span className="truncate text-xs font-normal text-muted-foreground">{choice.description}</span> : null}</span>
         {choice.hint ? <span className="shrink-0 text-xs font-normal text-muted-foreground">{choice.hint}</span> : null}
       </DropdownMenuRadioItem>)}
-    </DropdownMenuRadioGroup> : searchable && search ? <p className="px-3 py-2 text-sm text-muted-foreground">No companion matches. Clear the search to see them all.</p> : null}
+    </DropdownMenuRadioGroup> : searchable && search ? <p className="px-3 py-2 text-sm text-muted-foreground">{i18n._({ id: "ui.No companion matches. Clear the search to see them all.", message: "No companion matches. Clear the search to see them all." })}</p> : null}
     {identityFooter ? <><DropdownMenuSeparator />{identityFooter}</> : null}
   </> : identityMenu;
   return <header className={cn("grid h-14 w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4", reserveEnd && "pe-16")}>
-    <div className="flex items-center justify-self-start">{onMenu ? <Button variant="ghost" size="icon" aria-label="Open menu" aria-expanded={menuExpanded} aria-controls={menuControls} onClick={onMenu}><MenuIcon aria-hidden="true" /></Button> : null}</div>
+    <div className="flex items-center justify-self-start">{onMenu ? <Button variant="ghost" size="icon" aria-label={i18n._({ id: "ui.Open menu", message: "Open menu" })} aria-expanded={menuExpanded} aria-controls={menuControls} onClick={onMenu}><MenuIcon aria-hidden="true" /></Button> : null}</div>
     {picker ? <DropdownMenu onOpenChange={(open) => { if (open) setSearch(""); }}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" aria-label={identityLabel} className="min-w-0 justify-center gap-2 px-2">
@@ -83,7 +84,7 @@ export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, e
     </DropdownMenu> : <div className="flex min-w-0 items-center justify-center gap-2">{identity}</div>}
     <div className="flex items-center justify-self-end gap-1">
       {actions}
-      {onCall ? <Button variant="ghost" size="icon" aria-label={`Call ${name}`} onClick={onCall}><CallIcon aria-hidden="true" /></Button> : null}
+      {onCall ? <Button variant="ghost" size="icon" aria-label={i18n._({ id: "ui.Call {name}", message: "Call {name}", values: { name } })} onClick={onCall}><CallIcon aria-hidden="true" /></Button> : null}
       {end}
     </div>
   </header>;

@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import {
   useCallback,
   useRef,
@@ -79,7 +80,7 @@ export function ConversationMap({
     <nav
       data-slot="conversation-map"
       ref={railRef}
-      aria-label="Conversation map"
+      aria-label={i18n._({ id: "ui.Conversation map", message: "Conversation map" })}
       onKeyDown={handleKeyDown}
       className={cn(
         "group/rail flex h-full w-6 flex-col justify-center",

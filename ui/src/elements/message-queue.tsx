@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { ArrowUpIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, ghostButton, mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export interface QueuedMessage {
   id: string;
@@ -39,16 +40,16 @@ export function MessageQueue({
         <span className="text-foreground/90 min-w-0 flex-1 truncate text-[13.5px]">
           {running}
         </span>
-        <span className={cn(mono, "text-muted-foreground shrink-0")}>running</span>
+        <span className={cn(mono, "text-muted-foreground shrink-0")}>{i18n._({ id: "ui.running", message: "running" })}</span>
       </div>
 
       {queued.length > 0 && (
         <div className="flex items-baseline justify-between px-1">
           <span className={cn(mono, "text-muted-foreground")}>
-            {queued.length} queued
+            {i18n._({ id: "ui.{count} queued", message: "{count} queued", values: { count: queued.length } })}
           </span>
           <span className={cn(mono, "text-muted-foreground")}>
-            sends when this finishes
+            {i18n._({ id: "ui.sends when this finishes", message: "sends when this finishes" })}
           </span>
         </div>
       )}
@@ -77,7 +78,7 @@ export function MessageQueue({
             {onCancel && (
               <button
                 type="button"
-                aria-label={`Remove "${message.text}" from the queue`}
+                aria-label={i18n._({ id: "ui.Remove \"{text}\" from the queue", message: "Remove \"{text}\" from the queue", values: { text: message.text } })}
                 onClick={() => onCancel(message.id)}
                 className={cn(ghostButton, "size-6 shrink-0")}
               >

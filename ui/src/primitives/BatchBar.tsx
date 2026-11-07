@@ -1,3 +1,4 @@
+import { i18n } from "@/kit/i18n"
 import type { ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 
@@ -32,11 +33,11 @@ export function BatchBar({ count, onExit, children }: BatchBarProps) {
     // an oversized, wrongly-centered heading rather than a compact
     // toolbar row. Neither component should ever depend on its caller
     // remembering `items-start`.
-    <div className="flex flex-wrap items-center gap-2 self-start" role="toolbar" aria-label="Batch actions">
-      <span className="text-base text-muted-foreground">{count} selected</span>
+    <div className="flex flex-wrap items-center gap-2 self-start" role="toolbar" aria-label={i18n._({ id: "ui.Batch actions", message: "Batch actions" })}>
+      <span className="text-base text-muted-foreground">{i18n._({ id: "ui.{count} selected", message: "{count} selected", values: { count } })}</span>
       {children}
       <Button variant="ghost" onClick={onExit}>
-        Done
+        {i18n._({ id: "ui.Done", message: "Done" })}
       </Button>
     </div>
   );

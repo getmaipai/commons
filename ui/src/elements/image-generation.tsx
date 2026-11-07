@@ -7,6 +7,7 @@ import { ghostButton, mono, ShimmerLabel } from "./surfaces";
 import { Progress } from "@/primitives/Progress";
 import { GenerationStage } from "./generation-stage";
 import { PendingActions, type PendingAction } from "./pending-actions";
+import { i18n } from "@/kit/i18n";
 
 export function ImageGeneration({
   prompt,
@@ -14,9 +15,9 @@ export function ImageGeneration({
   onRegenerate,
   onStop,
   progress,
-  statusLabel = "Generating",
+  statusLabel = i18n._({ id: "ui.Generating", message: "Generating" }),
   elapsedLabel,
-  stopLabel = "Stop",
+  stopLabel = i18n._({ id: "ui.Stop", message: "Stop" }),
   sizeLabel = "1024 × 1024",
   size = "default",
   previewSrc,
@@ -123,7 +124,7 @@ export function ImageGeneration({
         ) : null}
         <button
           type="button"
-          aria-label="Regenerate image"
+          aria-label={i18n._({ id: "ui.Regenerate image", message: "Regenerate image" })}
           aria-hidden={generating || undefined}
           tabIndex={generating ? -1 : undefined}
           disabled={generating}

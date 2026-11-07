@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "cn";
 import { Button } from "../ui/button";
+import { i18n } from "@/kit/i18n"
 
 export type TierId = "standard" | "boost" | "max";
 
@@ -17,10 +18,10 @@ export interface TierOptionDef {
   confirm?: string;
 }
 
-export const DEFAULT_TIERS: readonly TierOptionDef[] = [
-  { id: "standard", label: "Standard" },
-  { id: "boost", label: "Boost" },
-  { id: "max", label: "Max" },
+export const defaultTiers = (): readonly TierOptionDef[] => [
+  { id: "standard", label: i18n._({ id: "ui.Standard", message: "Standard" }) },
+  { id: "boost", label: i18n._({ id: "ui.Boost", message: "Boost" }) },
+  { id: "max", label: i18n._({ id: "ui.Max", message: "Max" }) },
 ];
 
 export interface TierSegmentProps {
@@ -42,7 +43,7 @@ export interface TierSegmentProps {
 }
 
 /** The Standard, Boost, Max choice on a picture, video or song card, beside Make another. A tier with a `confirm` line asks once before it applies. */
-export function TierSegment({ value, onValueChange, tiers = DEFAULT_TIERS, confirmLabel = "Continue", cancelLabel = "Cancel", label = "Quality", className, presentation = "segment", details }: TierSegmentProps) {
+export function TierSegment({ value, onValueChange, tiers = defaultTiers(), confirmLabel = i18n._({ id: "ui.Continue", message: "Continue" }), cancelLabel = i18n._({ id: "ui.Cancel", message: "Cancel" }), label = i18n._({ id: "ui.Quality", message: "Quality" }), className, presentation = "segment", details }: TierSegmentProps) {
   const [pending, setPending] = useState<TierOptionDef | null>(null);
   const shown = tiers.find((t) => t.id === value);
   const note = pending?.confirm ?? undefined;
@@ -52,7 +53,7 @@ export function TierSegment({ value, onValueChange, tiers = DEFAULT_TIERS, confi
     else { setPending(null); onValueChange(tier.id); }
   };
   const confirmBlock = pending && note ? (
-    <div data-slot="tier-segment-confirm" role="group" aria-label={`Confirm ${pending.label}`} className="flex flex-col gap-2">
+    <div data-slot="tier-segment-confirm" role="group" aria-label={i18n._({ id: "ui.Confirm {label}", message: "Confirm {label}", values: { label: pending.label } })} className="flex flex-col gap-2">
       <p className="text-[13px] text-muted-foreground">{note}</p>
       <div className="flex gap-2">
         <Button type="button" size="sm" onClick={() => { onValueChange(pending.id); setPending(null); }}>{confirmLabel}</Button>
@@ -139,12 +140,12 @@ export interface TierChipProps {
 }
 
 /** The composer model chip's tier marker. Standard draws nothing; Boost and Max name the level, and a held Max can be tapped to release. */
-export function TierChip({ tier, label, onRelease, releaseLabel = "Release Max", className }: TierChipProps) {
+export function TierChip({ tier, label, onRelease, releaseLabel = i18n._({ id: "ui.Release Max", message: "Release Max" }), className }: TierChipProps) {
   if (tier === "standard") return null;
-  const words = label ?? (tier === "max" ? "Max" : "Boost");
+  const words = label ?? (tier === "max" ? i18n._({ id: "ui.Max", message: "Max" }) : i18n._({ id: "ui.Boost", message: "Boost" }));
   const classes = cn("inline-flex min-h-[24px] items-center rounded-full border border-border px-2 text-[12px] text-muted-foreground", className);
   if (tier === "max" && onRelease) {
-    return <button type="button" data-slot="tier-chip" data-tier={tier} aria-label={`${releaseLabel}: ${words}`} className={cn(classes, "min-h-[48px]")} onClick={onRelease}>{words}</button>;
+    return <button type="button" data-slot="tier-chip" data-tier={tier} aria-label={i18n._({ id: "ui.{releaseLabel}: {words}", message: "{releaseLabel}: {words}", values: { releaseLabel, words } })} className={cn(classes, "min-h-[48px]")} onClick={onRelease}>{words}</button>;
   }
   return <span data-slot="tier-chip" data-tier={tier} className={classes}>{words}</span>;
 }

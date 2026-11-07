@@ -9,10 +9,11 @@ import { cn } from "../../../../lib/utils";
 import { LifeBuoy, Settings, X } from "lucide-react";
 import { Link } from "react-router";
 import { hitArea } from "../../../../../utils";
+import { i18n } from "@/kit/i18n"
 
-const navItems = [
-  { title: "Settings", href: "/settings", icon: Settings },
-  { title: "Help", href: "https://github.com/getmaipai/home/blob/main/docs/user/README.md", icon: LifeBuoy },
+const navItems = () => [
+  { title: i18n._({ id: "ui.Settings", message: "Settings" }), href: "/settings", icon: Settings },
+  { title: i18n._({ id: "ui.Help", message: "Help" }), href: "https://github.com/getmaipai/home/blob/main/docs/user/README.md", icon: LifeBuoy },
 ];
 
 // Home's account sheet uses the signed-in person's real name and its own
@@ -30,7 +31,7 @@ export default function ProfileSheet({ displayName = "" }: { displayName?: strin
   return (
     <Sheet>
       <SheetTrigger
-        aria-label={displayName ? `Open account menu for ${displayName}` : "Open account menu"}
+        aria-label={displayName ? i18n._({ id: "ui.Open account menu for {name}", message: "Open account menu for {name}", values: { name: displayName } }) : i18n._({ id: "ui.Open account menu", message: "Open account menu" })}
         // Owner ruling, 2026-09-27, accessibility touch-target fix - see
         // docs/BACKLOG.md SHELL-09. Keep the 40px avatar and extend its
         // tappable area to the shared 48px floor.
@@ -62,7 +63,7 @@ export default function ProfileSheet({ displayName = "" }: { displayName?: strin
 
         <div className="border-t border-border">
           <ul className="flex flex-col gap-2 p-6">
-            {navItems.map((item) => (
+            {navItems().map((item) => (
               <li key={item.title} className="group">
                 <Link
                   to={item.href}

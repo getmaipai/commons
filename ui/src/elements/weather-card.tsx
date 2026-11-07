@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "cn";
 import { paper } from "./surfaces";
+import { i18n, kitLocaleTag } from "@/kit/i18n";
 import {
   weatherClassOf,
 } from "./weather-condition";
@@ -64,7 +65,7 @@ const ICONS = {
 const WEEKDAYS = new Map<string, Intl.DateTimeFormat>();
 
 /** The short weekday for a YYYY-MM-DD date, read as that calendar day wherever the reader is. */
-export function weekdayOf(date: string, locale = "en-US"): string {
+export function weekdayOf(date: string, locale = kitLocaleTag()): string {
   const [y, m, d] = date.split("-").map(Number);
   if (!y || !m || !d) return date;
   let fmt = WEEKDAYS.get(locale);
@@ -80,6 +81,8 @@ export function weekdayOf(date: string, locale = "en-US"): string {
 }
 
 const degrees = (n: number) => `${Math.round(n)}°`;
+
+const unitWordOf = (unit: string) => unit === "C" ? i18n._({ id: "ui.degrees Celsius", message: "degrees Celsius" }) : i18n._({ id: "ui.degrees Fahrenheit", message: "degrees Fahrenheit" });
 
 function DayColumn({
   day,
@@ -98,7 +101,7 @@ function DayColumn({
     <li
       data-slot="weather-day"
       data-class={cls}
-      aria-label={`${weekday}: high ${Math.round(day.high)}, low ${Math.round(day.low)} ${unit === "C" ? "degrees Celsius" : "degrees Fahrenheit"}${rain ? `, ${day.pop} percent chance of rain` : ""}`}
+      aria-label={rain ? i18n._({ id: "ui.{weekday}: high {high}, low {low} {unit}, {pop} percent chance of rain", message: "{weekday}: high {high}, low {low} {unit}, {pop} percent chance of rain", values: { weekday, high: Math.round(day.high), low: Math.round(day.low), unit: unitWordOf(unit), pop: day.pop } }) : i18n._({ id: "ui.{weekday}: high {high}, low {low} {unit}", message: "{weekday}: high {high}, low {low} {unit}", values: { weekday, high: Math.round(day.high), low: Math.round(day.low), unit: unitWordOf(unit) } })}
       className="flex min-w-10 flex-1 flex-col items-center gap-1.5"
     >
       <span className="text-muted-foreground text-xs">{weekday}</span>
@@ -120,6 +123,10 @@ export function hourLabelOf(time: string): string {
   const m = /T(\d{2})/.exec(time);
   if (!m) return time;
   const h = Number(m[1]) % 24;
+  const tag = kitLocaleTag();
+  if (!tag.startsWith("en")) {
+    try { return new Intl.DateTimeFormat(tag, { hour: "numeric", timeZone: "UTC" }).format(Date.UTC(2000, 0, 1, h)); } catch { /* English below */ }
+  }
   return `${h % 12 === 0 ? 12 : h % 12} ${h < 12 ? "AM" : "PM"}`;
 }
 
@@ -129,7 +136,7 @@ function HourColumn({ hour, unit }: { hour: WeatherHour; unit: string }) {
   return (
     <li
       data-slot="weather-hour"
-      aria-label={`${label}: ${Math.round(hour.temp)} ${unit === "C" ? "degrees Celsius" : "degrees Fahrenheit"}${rain ? `, ${hour.pop} percent chance of rain` : ""}`}
+      aria-label={rain ? i18n._({ id: "ui.{label}: {temp} {unit}, {pop} percent chance of rain", message: "{label}: {temp} {unit}, {pop} percent chance of rain", values: { label, temp: Math.round(hour.temp), unit: unitWordOf(unit), pop: hour.pop } }) : i18n._({ id: "ui.{label}: {temp} {unit}", message: "{label}: {temp} {unit}", values: { label, temp: Math.round(hour.temp), unit: unitWordOf(unit) } })}
     className="flex w-16 min-w-16 shrink-0 flex-col items-center gap-1.5"
     >
       <span aria-hidden className="text-muted-foreground text-xs whitespace-nowrap">{label}</span>
@@ -174,7 +181,7 @@ export function WeatherCard({
   wind,
   now,
   thunderJolt,
-  locale = "en-US",
+  locale = kitLocaleTag(),
   variant = "full",
   className,
   ...props
@@ -208,10 +215,10 @@ export function WeatherCard({
   const wide = variant === "wide";
   const hours = wide ? (hourly ?? []).slice(0, 24) : [];
   const today = daily[0];
-  const unitWord = unit === "C" ? "degrees Celsius" : "degrees Fahrenheit";
-  const summary =
-    `Weather in ${place}: ${Math.round(current.temp)} ${unitWord} and ${current.condition.toLowerCase()}` +
-    (today ? `. High ${Math.round(today.high)}, low ${Math.round(today.low)}.` : ".");
+  const unitWord = unitWordOf(unit);
+  const summary = today
+    ? i18n._({ id: "ui.Weather in {place}: {temp} {unitWord} and {condition}. High {high}, low {low}.", message: "Weather in {place}: {temp} {unitWord} and {condition}. High {high}, low {low}.", values: { place, temp: Math.round(current.temp), unitWord, condition: current.condition.toLowerCase(), high: Math.round(today.high), low: Math.round(today.low) } })
+    : i18n._({ id: "ui.Weather in {place}: {temp} {unitWord} and {condition}.", message: "Weather in {place}: {temp} {unitWord} and {condition}.", values: { place, temp: Math.round(current.temp), unitWord, condition: current.condition.toLowerCase() } });
   const cls = weatherClassOf(current.code);
   const ConditionIcon = current.is_day ? ICONS[cls] : cls === "clear" ? MoonIcon : ICONS[cls];
   const heroStyle = { color: "var(--weather-ink)" };
@@ -253,7 +260,7 @@ export function WeatherCard({
             </span>
             {today ? (
               <span data-slot="weather-range" className="text-xs tabular-nums">
-                H {degrees(today.high)} L {degrees(today.low)}
+                {i18n._({ id: "ui.H {high} L {low}", message: "H {high} L {low}", values: { high: degrees(today.high), low: degrees(today.low) } })}
               </span>
             ) : null}
           </span>
@@ -265,7 +272,7 @@ export function WeatherCard({
         </div>
       ) : null}
       {hours.length > 0 ? (
-        <ul data-slot="weather-hourly" aria-label="Next 24 hours" className="border-border flex overflow-x-auto border-b px-1.5 py-3">
+        <ul data-slot="weather-hourly" aria-label={i18n._({ id: "ui.Next 24 hours", message: "Next 24 hours" })} className="border-border flex overflow-x-auto border-b px-1.5 py-3">
           {hours.map((hour) => (
             <HourColumn key={hour.time} hour={hour} unit={unit} />
           ))}

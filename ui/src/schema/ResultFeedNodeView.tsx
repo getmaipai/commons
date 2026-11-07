@@ -1,6 +1,7 @@
 import { useCallback, useContext, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { request } from "@/kit/http";
+import { i18n } from "@/kit/i18n";
 import { AsyncState } from "@/kit/primitives/AsyncState";
 import { EmptyState } from "@/kit/primitives/EmptyState";
 import { type VideoPlayerProps, type VideoPlayerAction, type VideoPlayerControl, type VideoPlayerControlName, type VideoPlayerStatus } from "@/kit/elements/video-player";
@@ -185,7 +186,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
   }
 
   return (
-    <AsyncState data={query.data} error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()} errorMessage="Could not load your results." isEmpty={() => false}>
+    <AsyncState data={query.data} error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()} errorMessage={i18n._({ id: "ui.Could not load your results.", message: "Could not load your results." })} isEmpty={() => false}>
       {() => (
         <>
           <ResultFeed
@@ -195,7 +196,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
             look={node.look}
             filtersPresentation={node.filters_presentation}
             headingStyle={node.heading_style}
-            empty={<EmptyState icon={node.empty_state?.icon ?? "film"} text={node.empty_state?.text ?? "Nothing here yet."} />}
+            empty={<EmptyState icon={node.empty_state?.icon ?? "film"} text={node.empty_state?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })} />}
           />
           {lastError ? <p role="alert" className="text-destructive text-sm">{lastError}</p> : null}
         </>

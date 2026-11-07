@@ -23,6 +23,19 @@ shadcn's seven base colors, `neutral` the default, plus `navy`), and
 the only departures from the source are three kit-side rules in
 `src/tokens.css` recorded in the upstream note.
 
+## Language (I18N-K1)
+
+The kit speaks the person's language through Lingui's global `i18n` from `@lingui/core`, a peer dependency Home shares, so there is one
+mechanism and no second singleton. Kit code writes `i18n._({ id: "ui.Send message", message: "Send message" })` with
+`import { i18n } from "@/kit/i18n"` (the id is `ui.` plus the English text, so a Home id can never shadow a kit id; call it while
+rendering, never in a module-level constant). With no Home around, no locale active and no catalog loaded, the kit shows its English
+from a private English instance and never throws. Home calls `await loadKitCatalog(locale)` (from `@maipai/ui/src/i18n`) once before
+`i18n.activate(locale)`; it loads `locales/<locale>/messages.ts` (compiled from the `.po` beside it, chains in `src/kitLocales.ts`:
+`en-GB` and `es` fall through to `en-US`) into the same locale id, and a mode locale such as `es-x-child` loads its base language.
+Dates and numbers use `Intl` with `kitLocaleTag()`. Edit strings in source, then `bun run i18n:extract` and `bun run i18n:compile`;
+`src/i18nLints.test.ts` fails on a new hardcoded string (`src/i18n-baseline.json` only shrinks, `src/i18n-allowlist.json` needs a
+reason per entry). Spanish entries are written by the household's own model and carry `#, needs-review` until a person accepts them.
+
 ## Importing
 
 No barrel export, the same convention `@maipai/spec` and `@maipai/core`

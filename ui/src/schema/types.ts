@@ -1,3 +1,4 @@
+import { i18n } from "@/kit/i18n";
 import { z } from "zod";
 
 // Mirrors spec/ui/schema.json field-for-field (docs/plans/session-b-ui.md
@@ -169,7 +170,7 @@ export const ListNodeSchema = z.object({
     .optional(),
   batch: z
     .object({
-      select_label: z.string().default("Select"),
+      select_label: z.string().default(() => i18n._({ id: "ui.Select", message: "Select" })),
       actions: z.array(BatchActionSchema).min(1),
     })
     .optional(),

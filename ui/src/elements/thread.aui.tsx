@@ -88,6 +88,7 @@ import {
 } from "react";
 import { formatRelative } from "../relativeTime";
 import { DraftRestoreRegionContext } from "./draft-restore-context";
+import { i18n } from "@/kit/i18n"
 
 export type ThreadGroupPart = MessagePrimitive.GroupedParts.GroupPart;
 
@@ -384,7 +385,7 @@ function useEngineDown() {
   const { engineDown } = useContext(ThreadComponentsContext);
   return {
     down: engineDown !== undefined,
-    label: (name: string) => (engineDown === undefined ? name : `${name}. ${engineDown}`),
+    label: (name: string) => (engineDown === undefined ? name : i18n._({ id: "ui.{name}. {reason}", message: "{name}. {reason}", values: { name, reason: engineDown } })),
   };
 }
 
@@ -409,7 +410,7 @@ const ThreadHistorySkeleton: FC = () => (
     role="status"
     className="animate-in fade-in fill-mode-both flex flex-col gap-y-6 [animation-delay:150ms] [animation-duration:200ms]"
   >
-    <span className="sr-only">Loading conversation</span>
+    <span className="sr-only">{i18n._({ id: "ui.Loading conversation", message: "Loading conversation" })}</span>
     <Skeleton className="ml-auto h-9 w-2/5 rounded-xl motion-reduce:animate-none" />
     <div className="flex flex-col gap-y-2">
       <Skeleton className="h-4 w-11/12 motion-reduce:animate-none" />
@@ -566,7 +567,7 @@ const sameIds = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((id, i) => id === b[i]);
 
 /** The compact talk pill on its own: the thread's composer in its pill variant (microphone at the left, the input, send or stop at the right), for a host that has an assistant-ui runtime but no thread to draw (the companion stage). Same primitives and behaviour as the thread's composer. */
-export const TalkPill: FC<{ placeholder?: string; autoFocus?: boolean }> = ({ placeholder = "Talk...", autoFocus = false }) => (
+export const TalkPill: FC<{ placeholder?: string; autoFocus?: boolean }> = ({ placeholder = i18n._({ id: "ui.Talk...", message: "Talk..." }), autoFocus = false }) => (
   <ThreadComponentsContext.Provider value={{ ...EMPTY_COMPONENTS, composerVariant: "pill", composerPlaceholder: placeholder }}>
     <Composer autoFocus={autoFocus} />
   </ThreadComponentsContext.Provider>
@@ -761,7 +762,7 @@ const SpokenMessage: FC = () => {
           className="text-muted-foreground mb-1.5 flex items-center gap-1.5 text-xs"
         >
           <PhoneIcon className="size-3" aria-hidden />
-          <span>Voice conversation</span>
+          <span>{i18n._({ id: "ui.Voice conversation", message: "Voice conversation" })}</span>
         </div>
       )}
       <div
@@ -776,7 +777,7 @@ const SpokenMessage: FC = () => {
           )}
         </span>
         <span className="sr-only">
-          {role === "user" ? "You said" : "Assistant said"}
+          {role === "user" ? i18n._({ id: "ui.You said", message: "You said" }) : i18n._({ id: "ui.Assistant said", message: "Assistant said" })}
         </span>
         <div className="min-w-0 flex-1 wrap-break-word">
           <MessagePrimitive.Parts components={{ Text: SpokenText }} />
@@ -785,7 +786,7 @@ const SpokenMessage: FC = () => {
               data-slot="aui_spoken-message-indicator"
               role="status"
               className="text-muted-foreground ms-1 animate-pulse font-sans"
-              aria-label="Assistant is speaking"
+              aria-label={i18n._({ id: "ui.Assistant is speaking", message: "Assistant is speaking" })}
             >
               ●
             </span>
@@ -819,7 +820,7 @@ const SpokenActionBar: FC = () => {
       className="aui-spoken-action-bar text-muted-foreground flex shrink-0 gap-1"
     >
       <ActionBarPrimitive.Copy asChild>
-        <TooltipIconButton tooltip="Copy" className="size-6">
+        <TooltipIconButton tooltip={i18n._({ id: "ui.Copy", message: "Copy" })} className="size-6">
           <CopyIconSwap />
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
@@ -831,7 +832,7 @@ const ThreadScrollToBottom: FC = () => {
   return (
     <ThreadPrimitive.ScrollToBottom asChild>
       <TooltipIconButton
-        tooltip="Scroll to bottom"
+        tooltip={i18n._({ id: "ui.Scroll to bottom", message: "Scroll to bottom" })}
         variant="outline"
         className="aui-thread-scroll-to-bottom dark:border-border dark:bg-background dark:hover:bg-accent absolute z-10 self-center rounded-full p-4 disabled:invisible"
         style={{ top: `calc(-3rem - var(--thread-scroll-to-bottom-offset, 0px))` }}
@@ -846,7 +847,7 @@ const ThreadWelcome: FC = () => {
   return (
     <div className="aui-thread-welcome-root mb-6 flex flex-col px-2">
       <p className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-2xl font-medium tracking-tight duration-200">
-        How can I help you today?
+        {i18n._({ id: "ui.How can I help you today?", message: "How can I help you today?" })}
       </p>
     </div>
   );
@@ -931,7 +932,7 @@ const ThreadSuggestionItem: FC = () => {
             <SuggestionPrimitive.Title className="aui-thread-welcome-suggestion-text-1 text-foreground" />{" "}
             <SuggestionPrimitive.Description className="aui-thread-welcome-suggestion-text-2 text-muted-foreground empty:hidden" />
           </span>
-          {engine.down ? <span className="sr-only">{engine.label("Unavailable")}</span> : null}
+          {engine.down ? <span className="sr-only">{engine.label(i18n._({ id: "ui.Unavailable", message: "Unavailable" }))}</span> : null}
         </button>
       </SuggestionPrimitive.Trigger>
     </div>
@@ -967,7 +968,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
   <ComposerPrimitive.Input
     rows={1}
     enterKeyHint="send"
-    aria-label="Message input"
+    aria-label={i18n._({ id: "ui.Message input", message: "Message input" })}
     {...props}
     className={cn(
       "aui-composer-input caret-primary placeholder:text-muted-foreground max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none",
@@ -1005,18 +1006,18 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
             {composerVariant === "pill" ? <>
               <AuiIf condition={(s) => s.composer.dictation == null}>
                 <ComposerPrimitive.Dictate asChild>
-                <TooltipIconButton tooltip="Voice input" side="top" type="button" variant="ghost" size="icon" className="size-9 shrink-0 rounded-full" aria-label="Start voice input"><MicIcon aria-hidden="true" className="size-4" /></TooltipIconButton>
+                <TooltipIconButton tooltip={i18n._({ id: "ui.Voice input", message: "Voice input" })} side="top" type="button" variant="ghost" size="icon" className="size-9 shrink-0 rounded-full" aria-label={i18n._({ id: "ui.Start voice input", message: "Start voice input" })}><MicIcon aria-hidden="true" className="size-4" /></TooltipIconButton>
                 </ComposerPrimitive.Dictate>
               </AuiIf>
               <AuiIf condition={(s) => s.composer.dictation != null}>
-                <ComposerPrimitive.StopDictation asChild><TooltipIconButton tooltip="Stop dictation" side="top" type="button" variant="ghost" size="icon" className="size-9 shrink-0 rounded-full" aria-label="Stop dictation"><SquareIcon aria-hidden="true" className="size-4" /></TooltipIconButton></ComposerPrimitive.StopDictation>
+                <ComposerPrimitive.StopDictation asChild><TooltipIconButton tooltip={i18n._({ id: "ui.Stop dictation", message: "Stop dictation" })} side="top" type="button" variant="ghost" size="icon" className="size-9 shrink-0 rounded-full" aria-label={i18n._({ id: "ui.Stop dictation", message: "Stop dictation" })}><SquareIcon aria-hidden="true" className="size-4" /></TooltipIconButton></ComposerPrimitive.StopDictation>
               </AuiIf>
             </> : null}
             {ComposerInputOverride && composerVariant !== "pill" ? (
               <ComposerInputOverride />
             ) : (
               <ComposerInputField
-                placeholder={composerPlaceholder ?? "Send a message..."}
+                placeholder={composerPlaceholder ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
                 autoFocus={autoFocus}
                 submitMode={sendHeld ? "none" : undefined}
                 className={composerVariant === "pill" ? "min-h-9 flex-1 px-2 text-sm" : undefined}
@@ -1049,10 +1050,10 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
   const sendHeld = sendHeldProp || engineDownNow;
   if (pill) return <div className="flex shrink-0 items-center gap-1">
     <AuiIf condition={(s) => !s.thread.isRunning || s.thread.voice !== undefined}>
-      {sendHeld ? <TooltipIconButton tooltip="Send message" side="top" type="button" variant="default" size="icon" className="size-9 rounded-full" data-tour={sendButtonTourId} aria-label="Send message" disabled><ArrowUpIcon aria-hidden="true" className="size-4" /></TooltipIconButton> : <ComposerPrimitive.Send asChild><TooltipIconButton tooltip="Send message" side="top" type="button" variant="default" size="icon" className="size-9 rounded-full" data-tour={sendButtonTourId} aria-label="Send message"><ArrowUpIcon aria-hidden="true" className="size-4" /></TooltipIconButton></ComposerPrimitive.Send>}
+      {sendHeld ? <TooltipIconButton tooltip={i18n._({ id: "ui.Send message", message: "Send message" })} side="top" type="button" variant="default" size="icon" className="size-9 rounded-full" data-tour={sendButtonTourId} aria-label={i18n._({ id: "ui.Send message", message: "Send message" })} disabled><ArrowUpIcon aria-hidden="true" className="size-4" /></TooltipIconButton> : <ComposerPrimitive.Send asChild><TooltipIconButton tooltip={i18n._({ id: "ui.Send message", message: "Send message" })} side="top" type="button" variant="default" size="icon" className="size-9 rounded-full" data-tour={sendButtonTourId} aria-label={i18n._({ id: "ui.Send message", message: "Send message" })}><ArrowUpIcon aria-hidden="true" className="size-4" /></TooltipIconButton></ComposerPrimitive.Send>}
     </AuiIf>
     <AuiIf condition={(s) => s.thread.isRunning && s.thread.voice === undefined}>
-      <ComposerPrimitive.Cancel asChild><Button type="button" variant="default" size="icon" className="size-9 rounded-full" aria-label="Stop generating"><SquareIcon aria-hidden="true" className="size-4 fill-current" /></Button></ComposerPrimitive.Cancel>
+      <ComposerPrimitive.Cancel asChild><Button type="button" variant="default" size="icon" className="size-9 rounded-full" aria-label={i18n._({ id: "ui.Stop generating", message: "Stop generating" })}><SquareIcon aria-hidden="true" className="size-4 fill-current" /></Button></ComposerPrimitive.Cancel>
     </AuiIf>
   </div>;
   return (
@@ -1067,13 +1068,13 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
           <AuiIf condition={(s) => s.composer.dictation == null}>
             <ComposerPrimitive.Dictate asChild>
               <TooltipIconButton
-                tooltip="Voice input"
+                tooltip={i18n._({ id: "ui.Voice input", message: "Voice input" })}
                 side="bottom"
                 type="button"
                 variant="ghost"
                 size="icon"
                 className="aui-composer-dictate text-muted-foreground hover:text-foreground size-7 rounded-full"
-                aria-label="Start voice input"
+                aria-label={i18n._({ id: "ui.Start voice input", message: "Start voice input" })}
                 aria-pressed={false}
               >
                 <MicIcon className="aui-composer-dictate-icon size-4" />
@@ -1083,13 +1084,13 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
           <AuiIf condition={(s) => s.composer.dictation != null}>
             <ComposerPrimitive.StopDictation asChild>
               <TooltipIconButton
-                tooltip="Stop dictation"
+                tooltip={i18n._({ id: "ui.Stop dictation", message: "Stop dictation" })}
                 side="bottom"
                 type="button"
                 variant="default"
                 size="icon"
                 className="aui-composer-stop-dictation size-7 rounded-full"
-                aria-label="Stop voice input"
+                aria-label={i18n._({ id: "ui.Stop voice input", message: "Stop voice input" })}
                 aria-pressed={true}
               >
                 <SquareIcon className="aui-composer-stop-dictation-icon size-3.5 animate-pulse fill-current" />
@@ -1102,14 +1103,14 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
         >
           {sendHeld ? (
             <TooltipIconButton
-              tooltip="Send message"
+              tooltip={i18n._({ id: "ui.Send message", message: "Send message" })}
               side="bottom"
               type="button"
               variant="default"
               size="icon"
               className="aui-composer-send size-7 rounded-full"
               data-tour={sendButtonTourId}
-              aria-label="Send message"
+              aria-label={i18n._({ id: "ui.Send message", message: "Send message" })}
               disabled
             >
               <ArrowUpIcon className="aui-composer-send-icon size-4" />
@@ -1117,14 +1118,14 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
           ) : (
             <ComposerPrimitive.Send asChild>
               <TooltipIconButton
-                tooltip="Send message"
+                tooltip={i18n._({ id: "ui.Send message", message: "Send message" })}
                 side="bottom"
                 type="button"
                 variant="default"
                 size="icon"
                 className="aui-composer-send size-7 rounded-full"
                 data-tour={sendButtonTourId}
-                aria-label="Send message"
+                aria-label={i18n._({ id: "ui.Send message", message: "Send message" })}
               >
                 <ArrowUpIcon className="aui-composer-send-icon size-4" />
               </TooltipIconButton>
@@ -1140,7 +1141,7 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
               variant="default"
               size="icon"
               className="aui-composer-cancel size-7 rounded-full"
-              aria-label="Stop generating"
+              aria-label={i18n._({ id: "ui.Stop generating", message: "Stop generating" })}
             >
               <SquareIcon className="aui-composer-cancel-icon size-3.5 fill-current" />
             </Button>
@@ -1294,7 +1295,7 @@ const AssistantMessage: FC = () => {
                     data-slot="aui_assistant-message-indicator"
                     role="status"
                     aria-live="polite"
-                    label="Thinking…"
+                    label={i18n._({ id: "ui.Thinking…", message: "Thinking…" })}
                   />
                 );
               default:
@@ -1329,21 +1330,21 @@ const AssistantActionBar: FC = () => {
       className="aui-assistant-action-bar-root text-muted-foreground animate-in fade-in col-start-3 row-start-2 -ms-1 flex gap-1 duration-200"
     >
       <ActionBarPrimitive.Copy asChild>
-        <TooltipIconButton tooltip="Copy">
+        <TooltipIconButton tooltip={i18n._({ id: "ui.Copy", message: "Copy" })}>
           <CopyIconSwap />
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
       <AuiIf condition={(s) => s.thread.capabilities.speech}>
         <AuiIf condition={(s) => s.message.speech == null}>
           <ActionBarPrimitive.Speak asChild>
-            <TooltipIconButton tooltip="Read aloud">
+            <TooltipIconButton tooltip={i18n._({ id: "ui.Read aloud", message: "Read aloud" })}>
               <Volume2Icon />
             </TooltipIconButton>
           </ActionBarPrimitive.Speak>
         </AuiIf>
         <AuiIf condition={(s) => s.message.speech != null}>
           <ActionBarPrimitive.StopSpeaking asChild>
-            <TooltipIconButton tooltip="Stop reading">
+            <TooltipIconButton tooltip={i18n._({ id: "ui.Stop reading", message: "Stop reading" })}>
               <SquareIcon className="fill-current" />
             </TooltipIconButton>
           </ActionBarPrimitive.StopSpeaking>
@@ -1352,7 +1353,7 @@ const AssistantActionBar: FC = () => {
       <AuiIf condition={(s) => s.thread.capabilities.feedback}>
         <ActionBarPrimitive.FeedbackPositive asChild>
           <TooltipIconButton
-            tooltip="Helpful"
+            tooltip={i18n._({ id: "ui.Helpful", message: "Helpful" })}
             className="data-[submitted=true]:bg-accent data-[submitted=true]:text-accent-foreground"
           >
             <ThumbsUpIcon />
@@ -1360,7 +1361,7 @@ const AssistantActionBar: FC = () => {
         </ActionBarPrimitive.FeedbackPositive>
         <ActionBarPrimitive.FeedbackNegative asChild>
           <TooltipIconButton
-            tooltip="Not helpful"
+            tooltip={i18n._({ id: "ui.Not helpful", message: "Not helpful" })}
             className="data-[submitted=true]:bg-accent data-[submitted=true]:text-accent-foreground"
           >
             <ThumbsDownIcon />
@@ -1368,14 +1369,14 @@ const AssistantActionBar: FC = () => {
         </ActionBarPrimitive.FeedbackNegative>
       </AuiIf>
       <ActionBarPrimitive.Reload asChild disabled={engine.down}>
-        <TooltipIconButton tooltip={engine.label("Refresh")}>
+        <TooltipIconButton tooltip={engine.label(i18n._({ id: "ui.Refresh", message: "Refresh" }))}>
           <RefreshCwIcon />
         </TooltipIconButton>
       </ActionBarPrimitive.Reload>
       <ActionBarMorePrimitive.Root>
         <ActionBarMorePrimitive.Trigger asChild>
           <TooltipIconButton
-            tooltip="More"
+            tooltip={i18n._({ id: "ui.More", message: "More" })}
             className="data-[state=open]:bg-accent"
           >
             <MoreHorizontalIcon />
@@ -1390,7 +1391,7 @@ const AssistantActionBar: FC = () => {
           <ActionBarPrimitive.ExportMarkdown asChild>
             <ActionBarMorePrimitive.Item className="aui-action-bar-more-item hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none">
               <DownloadIcon className="size-4" />
-              Export as Markdown
+              {i18n._({ id: "ui.Export as Markdown", message: "Export as Markdown" })}
             </ActionBarMorePrimitive.Item>
           </ActionBarPrimitive.ExportMarkdown>
           {AssistantMoreItems ? <AssistantMoreItems /> : null}
@@ -1518,7 +1519,7 @@ const UserRetryButton: FC = () => {
   if (!canReload) return null;
   return (
     <TooltipIconButton
-      tooltip={engine.label("Retry")}
+      tooltip={engine.label(i18n._({ id: "ui.Retry", message: "Retry" }))}
       disabled={engine.down}
       className="aui-user-action-retry"
       onClick={() => {
@@ -1542,12 +1543,12 @@ const UserActionBar: FC = () => {
       <UserMessageTimestamp />
       <UserRetryButton />
       <ActionBarPrimitive.Edit asChild disabled={engine.down}>
-        <TooltipIconButton tooltip={engine.label("Edit")} className="aui-user-action-edit">
+        <TooltipIconButton tooltip={engine.label(i18n._({ id: "ui.Edit", message: "Edit" }))} className="aui-user-action-edit">
           <PencilIcon />
         </TooltipIconButton>
       </ActionBarPrimitive.Edit>
       <ActionBarPrimitive.Copy asChild>
-        <TooltipIconButton tooltip="Copy" className="aui-user-action-copy">
+        <TooltipIconButton tooltip={i18n._({ id: "ui.Copy", message: "Copy" })} className="aui-user-action-copy">
           <CopyIconSwap />
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
@@ -1578,7 +1579,7 @@ const EditComposer: FC = () => {
         <div className="aui-edit-composer-footer mx-2.5 mb-2.5 flex items-center gap-1.5 self-end">
           <ComposerPrimitive.Cancel asChild>
             <Button variant="ghost" size="sm" className="h-8 px-3">
-              Cancel
+              {i18n._({ id: "ui.Cancel", message: "Cancel" })}
             </Button>
           </ComposerPrimitive.Cancel>
           <ComposerPrimitive.Send asChild disabled={engine.down}>
@@ -1587,7 +1588,7 @@ const EditComposer: FC = () => {
               className="h-8 px-3"
               onClick={() => onEditSend?.(messageId, turnId)}
             >
-              {engine.label("Update")}
+              {engine.label(i18n._({ id: "ui.Update", message: "Update" }))}
             </Button>
           </ComposerPrimitive.Send>
         </div>
@@ -1610,7 +1611,7 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
       {...rest}
     >
       <BranchPickerPrimitive.Previous asChild>
-        <TooltipIconButton tooltip="Previous">
+        <TooltipIconButton tooltip={i18n._({ id: "ui.Previous", message: "Previous" })}>
           <ChevronLeftIcon />
         </TooltipIconButton>
       </BranchPickerPrimitive.Previous>
@@ -1618,7 +1619,7 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
         <BranchPickerPrimitive.Number /> / <BranchPickerPrimitive.Count />
       </span>
       <BranchPickerPrimitive.Next asChild>
-        <TooltipIconButton tooltip="Next">
+        <TooltipIconButton tooltip={i18n._({ id: "ui.Next", message: "Next" })}>
           <ChevronRightIcon />
         </TooltipIconButton>
       </BranchPickerPrimitive.Next>

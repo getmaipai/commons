@@ -6,6 +6,7 @@ import { PencilLineIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { ghostButton, mono, paper } from "./surfaces";
 import { DraftRestoreRegionContext } from "./draft-restore-context";
+import { i18n } from "@/kit/i18n"
 
 export function DraftRestore({
   draft,
@@ -39,7 +40,7 @@ export function DraftRestore({
       <div className="flex min-w-0 flex-1 items-baseline gap-2">
         <span className="text-foreground/70 min-w-0 flex-1 truncate whitespace-nowrap text-[13px]">{draft}</span>
         <span className={cn(mono, "text-muted-foreground shrink-0 whitespace-nowrap")}>
-          unsent draft · {savedAt}
+          {i18n._({ id: "ui.unsent draft · {savedAt}", message: "unsent draft · {savedAt}", values: { savedAt } })}
         </span>
       </div>
       <button
@@ -47,11 +48,11 @@ export function DraftRestore({
         onClick={onRestore}
         className="text-foreground/70 hover:bg-foreground/[0.06] hover:text-foreground/95 min-h-12 shrink-0 rounded-full px-3 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
       >
-        Restore
+        {i18n._({ id: "ui.Restore", message: "Restore" })}
       </button>
       <button
         type="button"
-        aria-label="Discard the draft"
+        aria-label={i18n._({ id: "ui.Discard the draft", message: "Discard the draft" })}
         onClick={onDiscard}
         className={cn(ghostButton, "size-12 shrink-0")}
       >

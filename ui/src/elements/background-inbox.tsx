@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { CheckIcon, Loader2Icon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { mono, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export type BackgroundState = "running" | "ready" | "failed";
 
@@ -51,7 +52,7 @@ export function BackgroundInbox({
             size === "comfortable" ? "text-base" : "text-[13.5px]",
           )}
         >
-          Running elsewhere
+          {i18n._({ id: "ui.Running elsewhere", message: "Running elsewhere" })}
         </span>
         <span
           className={cn(
@@ -63,7 +64,7 @@ export function BackgroundInbox({
             size === "comfortable" && "text-base",
           )}
         >
-          {ready > 0 ? `${ready} ready` : `${running} in flight`}
+          {ready > 0 ? i18n._({ id: "ui.{ready} ready", message: "{ready} ready", values: { ready } }) : i18n._({ id: "ui.{running} in flight", message: "{running} in flight", values: { running } })}
         </span>
       </div>
 

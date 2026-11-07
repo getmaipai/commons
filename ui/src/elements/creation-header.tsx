@@ -10,6 +10,7 @@ import { diceBearAvatarUri } from "../primitives/Avatar";
 import { SafeImage } from "../primitives/SafeImage";
 import { Cover } from "../ui/media-tiles";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { i18n } from "@/kit/i18n"
 
 export interface CreationHeaderProps {
   title: string | null | undefined; // ignored when variant is "byline" (the host card already shows the title)
@@ -46,7 +47,7 @@ function formattedDate(value?: string | null) {
 
 export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility, variant = "full", art, meta, primary, shuffle, more = [], eyebrow, secondary, locked = false }: CreationHeaderProps) {
   const [expanded, setExpanded] = useState(false);
-  const homeLabel = plain(creator?.label, "Made at home");
+  const homeLabel = plain(creator?.label, i18n._({ id: "ui.Made at home", message: "Made at home" }));
   const creatorName = plain(creator?.name, homeLabel);
   const isHome = creatorName === homeLabel;
   const creatorHref = creator?.href && !/\{[^{}]+\}/.test(creator.href) ? creator.href : null;
@@ -67,7 +68,7 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
         {locked ? null : (
           <div className="flex min-w-0 flex-1 basis-60 flex-col gap-1">
             {eyebrowText ? <span data-slot="creation-header-eyebrow" className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">{eyebrowText}</span> : null}
-            <Heading className="text-foreground min-w-0 text-3xl leading-none font-black tracking-tight break-words uppercase sm:text-[2.5rem]">{plain(title, "Untitled")}</Heading>
+            <Heading className="text-foreground min-w-0 text-3xl leading-none font-black tracking-tight break-words uppercase sm:text-[2.5rem]">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
           </div>
         )}
         {primary || secondary ? <div data-slot="creation-header-actions" className="ms-auto flex flex-wrap items-center gap-2">{secondary ? pill(secondary, "secondary") : null}{primary ? pill(primary, "default") : null}</div> : null}
@@ -78,19 +79,19 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
     <header data-slot="creation-header" data-variant="collection" className="grid gap-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:items-end">
       <SafeImage src={art ?? undefined} kind="picture" alt="" className="mx-auto aspect-square w-60 rounded-[var(--art-radius)] object-cover sm:mx-0" />
       <div className="flex min-w-0 flex-col items-center gap-3 text-center sm:items-start sm:text-start">
-        <Heading className="text-3xl font-bold tracking-tight text-foreground">{plain(title, "Untitled")}</Heading>
+        <Heading className="text-3xl font-bold tracking-tight text-foreground">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
         <span className="inline-flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
-          {creatorHref && !isHome ? <Link to={creatorHref} aria-label={plain(creator?.linkLabel, `${creatorName}, open profile`)} className="rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">{creatorName}</Link> : <span>{creatorName}</span>}
+          {creatorHref && !isHome ? <Link to={creatorHref} aria-label={plain(creator?.linkLabel, i18n._({ id: "ui.{creatorName}, open profile", message: "{creatorName}, open profile", values: { creatorName } }))} className="rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">{creatorName}</Link> : <span>{creatorName}</span>}
         </span>
         {meta ? <p className="text-sm text-muted-foreground">{meta}</p> : null}
         <VisibilityChip {...visibility} />
-        {detail ? <div><div className={expanded ? "text-base text-muted-foreground" : "line-clamp-3 text-base text-muted-foreground"}><LightMarkdown text={detail} /></div><Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? "Show less" : "Show more"}</Button></div> : null}
+        {detail ? <div><div className={expanded ? "text-base text-muted-foreground" : "line-clamp-3 text-base text-muted-foreground"}><LightMarkdown text={detail} /></div><Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? i18n._({ id: "ui.Show less", message: "Show less" }) : i18n._({ id: "ui.Show more", message: "Show more" })}</Button></div> : null}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
           {primary ? <Button type="button" onClick={primary.onSelect}>{primary.icon ? (() => { const ActionIcon = getIcon(primary.icon); return <ActionIcon aria-hidden className="size-4" />; })() : null}{primary.label}</Button> : null}
           {shuffle ? (() => { const ShuffleIcon = getIcon(shuffle.icon ?? "shuffle"); return shuffle.labeled
             ? <Button type="button" variant="outline" onClick={shuffle.onSelect}><ShuffleIcon aria-hidden />{shuffle.label}</Button>
             : <Button type="button" variant="outline" size="icon" aria-label={shuffle.label} onClick={shuffle.onSelect}><ShuffleIcon aria-hidden /></Button>; })() : null}
-          {more.length ? <DropdownMenu><DropdownMenuTrigger asChild><Button type="button" variant="outline" size="icon" aria-label="More">{(() => { const MoreIcon = getIcon("more-horizontal"); return <MoreIcon aria-hidden />; })()}</Button></DropdownMenuTrigger><DropdownMenuContent align="start">{more.map((item, index) => <DropdownMenuItem key={`${item.label}-${index}`} onSelect={item.onSelect}>{item.icon ? (() => { const MoreIcon = getIcon(item.icon); return <MoreIcon aria-hidden className="size-4" />; })() : null}{item.label}</DropdownMenuItem>)}</DropdownMenuContent></DropdownMenu> : null}
+          {more.length ? <DropdownMenu><DropdownMenuTrigger asChild><Button type="button" variant="outline" size="icon" aria-label={i18n._({ id: "ui.More", message: "More" })}>{(() => { const MoreIcon = getIcon("more-horizontal"); return <MoreIcon aria-hidden />; })()}</Button></DropdownMenuTrigger><DropdownMenuContent align="start">{more.map((item, index) => <DropdownMenuItem key={`${item.label}-${index}`} onSelect={item.onSelect}>{item.icon ? (() => { const MoreIcon = getIcon(item.icon); return <MoreIcon aria-hidden className="size-4" />; })() : null}{item.label}</DropdownMenuItem>)}</DropdownMenuContent></DropdownMenu> : null}
         </div>
       </div>
     </header>
@@ -111,18 +112,18 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
   );
   return (
     <header data-slot="creation-header" data-variant={variant} className="grid gap-3">
-      {variant === "full" ? <Heading className="text-3xl font-bold tracking-tight">{plain(title, "Untitled")}</Heading> : null}
+      {variant === "full" ? <Heading className="text-3xl font-bold tracking-tight">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading> : null}
       <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
         <span className="inline-flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
-          {creatorHref && !isHome ? <Link to={creatorHref} aria-label={plain(creator?.linkLabel, `${creatorName}, open profile`)} className="inline-flex min-w-0 items-center gap-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">{identity}</Link> : identity}
-          {date ? <><span aria-hidden>·</span><time dateTime={madeAt ?? undefined}>Made {date}</time></> : null}
+          {creatorHref && !isHome ? <Link to={creatorHref} aria-label={plain(creator?.linkLabel, i18n._({ id: "ui.{creatorName}, open profile", message: "{creatorName}, open profile", values: { creatorName } }))} className="inline-flex min-w-0 items-center gap-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">{identity}</Link> : identity}
+          {date ? <><span aria-hidden>·</span><time dateTime={madeAt ?? undefined}>{i18n._({ id: "ui.Made {date}", message: "Made {date}", values: { date } })}</time></> : null}
         </span>
         <VisibilityChip {...visibility} />
       </div>
       {variant === "full" && detail ? (
         <div>
           <div className={expanded ? "text-base text-muted-foreground" : "line-clamp-3 text-base text-muted-foreground"}><LightMarkdown text={detail} /></div>
-          <Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? "Show less" : "Show more"}</Button>
+          <Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? i18n._({ id: "ui.Show less", message: "Show less" }) : i18n._({ id: "ui.Show more", message: "Show more" })}</Button>
         </div>
       ) : null}
     </header>

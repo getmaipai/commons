@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
+import { i18n } from "@/kit/i18n";
 import { CheckIcon, MinusIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, mono, paper } from "./surfaces";
@@ -65,7 +66,7 @@ export function ComparisonCard({
                         "shrink-0 text-primary-ink",
                       )}
                     >
-                      pick
+                      {i18n._({ id: "ui.pick", message: "pick" })}
                     </span>
                   )}
                 </span>

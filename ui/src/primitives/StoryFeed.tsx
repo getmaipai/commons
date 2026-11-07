@@ -16,6 +16,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/kit/dashboard/components/ui/tabs"
 import { cn, HIT_AREA_ROW } from "@/kit/utils";
 import { FocalImage } from "./FocalImage";
 import { SafeImage } from "./SafeImage";
+import { i18n } from "@/kit/i18n"
 
 const BookmarkIcon = getIcon("bookmark");
 const EllipsisIcon = getIcon("more-horizontal");
@@ -86,15 +87,15 @@ function CardMenu({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
   const can = (a: StoryAction) => ctx.available.includes(a) && ctx.onAction !== undefined;
   const fire = (a: StoryAction, on?: boolean) => ctx.onAction?.(a, { story_id: story.story_id, item_id: story.item_id, ...(on === undefined ? {} : { on }), ...(a === "open_site" && story.open_url ? { url: story.open_url } : {}) });
   const entries: ReactNode[] = [];
-  if (can("save")) entries.push(<DropdownMenuItem key="save" onClick={() => fire("save", !story.saved)}>{story.saved ? "Remove from Saved" : "Save"}</DropdownMenuItem>);
-  if (can("feedback_more")) entries.push(<DropdownMenuItem key="more" onClick={() => fire("feedback_more")}>More like this</DropdownMenuItem>);
-  if (can("feedback_less")) entries.push(<DropdownMenuItem key="less" onClick={() => fire("feedback_less")}>Less like this</DropdownMenuItem>);
-  if (story.open_url && can("open_site")) entries.push(<DropdownMenuItem key="site" onClick={() => fire("open_site")}>Open original</DropdownMenuItem>);
+  if (can("save")) entries.push(<DropdownMenuItem key="save" onClick={() => fire("save", !story.saved)}>{story.saved ? i18n._({ id: "ui.Remove from Saved", message: "Remove from Saved" }) : i18n._({ id: "ui.Save", message: "Save" })}</DropdownMenuItem>);
+  if (can("feedback_more")) entries.push(<DropdownMenuItem key="more" onClick={() => fire("feedback_more")}>{i18n._({ id: "ui.More like this", message: "More like this" })}</DropdownMenuItem>);
+  if (can("feedback_less")) entries.push(<DropdownMenuItem key="less" onClick={() => fire("feedback_less")}>{i18n._({ id: "ui.Less like this", message: "Less like this" })}</DropdownMenuItem>);
+  if (story.open_url && can("open_site")) entries.push(<DropdownMenuItem key="site" onClick={() => fire("open_site")}>{i18n._({ id: "ui.Open original", message: "Open original" })}</DropdownMenuItem>);
   if (entries.length === 0) return null;
   return (
     <div data-slot="story-menu" className="relative z-10 shrink-0">
       <DropdownMenu>
-        <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" aria-label={`More for ${story.title}`} className={HIT_AREA_ROW} />}>
+        <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" aria-label={i18n._({ id: "ui.More for {title}", message: "More for {title}", values: { title: story.title } })} className={HIT_AREA_ROW} />}>
           <EllipsisIcon aria-hidden />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">{entries}</DropdownMenuContent>
@@ -117,9 +118,9 @@ function SourceLine({ story }: { story: StoryCardData }) {
         <SafeImage src={iconFailed ? undefined : story.sourceIconUrl} alt="" aria-hidden kind="picture" className="size-4 shrink-0 rounded bg-muted text-muted-foreground object-cover" onError={() => setIconFailed(true)} />
         <span className="truncate">{story.publisher}</span>
       </span>
-      {story.outlets > 1 ? <Badge variant="secondary">{story.outlets} sources</Badge> : null}
+      {story.outlets > 1 ? <Badge variant="secondary">{i18n._({ id: "ui.{count, plural, one {# source} other {# sources}}", message: "{count, plural, one {# source} other {# sources}}", values: { count: story.outlets } })}</Badge> : null}
       {story.saved ? (
-        <Badge variant="outline"><BookmarkIcon aria-hidden data-icon="inline-start" />Saved</Badge>
+        <Badge variant="outline"><BookmarkIcon aria-hidden data-icon="inline-start" />{i18n._({ id: "ui.Saved", message: "Saved" })}</Badge>
       ) : null}
     </div>
   );
@@ -242,15 +243,15 @@ function StorySide({ story, ctx }: { story: StoryCardData; ctx: Ctx }) {
 
 /** The counts and headings of each section style: `tall` large picture-over-text cards, then `side` picture-right cards, then
  * (todays_news only) one wide split card under its own heading. Whatever remains falls to the list. */
-const SECTION_STYLES: Record<SectionStyle, { heading: string; tall: number; tallCols: string; side: number; sideCols: string; wide: number; wideHeading: string }> = {
-  top_stories: { heading: "Top Stories", tall: 3, tallCols: "sm:grid-cols-2 lg:grid-cols-3", side: 3, sideCols: "sm:grid-cols-2 lg:grid-cols-3", wide: 0, wideHeading: "" },
-  special: { heading: "Top Stories", tall: 2, tallCols: "sm:grid-cols-2", side: 2, sideCols: "sm:grid-cols-2", wide: 0, wideHeading: "" },
-  todays_news: { heading: "Today's News", tall: 3, tallCols: "sm:grid-cols-2 lg:grid-cols-3", side: 0, sideCols: "", wide: 1, wideHeading: "More for you" },
-};
+const sectionStyles = (): Record<SectionStyle, { heading: string; tall: number; tallCols: string; side: number; sideCols: string; wide: number; wideHeading: string }> => ({
+  top_stories: { heading: i18n._({ id: "ui.Top Stories", message: "Top Stories" }), tall: 3, tallCols: "sm:grid-cols-2 lg:grid-cols-3", side: 3, sideCols: "sm:grid-cols-2 lg:grid-cols-3", wide: 0, wideHeading: "" },
+  special: { heading: i18n._({ id: "ui.Top Stories", message: "Top Stories" }), tall: 2, tallCols: "sm:grid-cols-2", side: 2, sideCols: "sm:grid-cols-2", wide: 0, wideHeading: "" },
+  todays_news: { heading: i18n._({ id: "ui.Today's News", message: "Today's News" }), tall: 3, tallCols: "sm:grid-cols-2 lg:grid-cols-3", side: 0, sideCols: "", wide: 1, wideHeading: i18n._({ id: "ui.More for you", message: "More for you" }) },
+});
 
 /** The styled arrangement of a section page. Fewer stories than a style asks for fill what is there and draw no empty heading. */
 function StyledSection({ style, stories, ctx }: { style: SectionStyle; stories: StoryCardData[]; ctx: Ctx }) {
-  const plan = SECTION_STYLES[style];
+  const plan = sectionStyles()[style];
   const tall = stories.slice(0, plan.tall);
   const side = stories.slice(plan.tall, plan.tall + plan.side);
   const wide = stories.slice(plan.tall + plan.side, plan.tall + plan.side + plan.wide);
@@ -310,7 +311,7 @@ function FilterChips({ filters, ctx }: { filters: StoryFilter[]; ctx: Ctx }) {
   const chosen = filters.find((f) => f.selected);
   return (
     <Tabs value={chosen ? `f:${chosen.id}` : ""} onValueChange={(value) => ctx.onAction?.("filter", { filter_id: String(value).slice(2) })} className="min-w-0 max-w-full">
-      <TabsList variant="pill" aria-label="Filter stories" data-slot="story-filters">
+      <TabsList variant="pill" aria-label={i18n._({ id: "ui.Filter stories", message: "Filter stories" })} data-slot="story-filters">
         {filters.map((filter) => (
           <TabsTrigger key={filter.id} value={`f:${filter.id}`} aria-pressed={filter.selected === true} className="min-h-[48px] min-w-[48px]">
             {filter.label}
@@ -350,16 +351,16 @@ function ChannelHeader({ header, ctx }: { header: NonNullable<StoryFeedData["hea
             aria-pressed={channel.followed}
             onClick={() => ctx.onAction?.("follow", { channel_kind: channel.kind, channel_key: channel.key, on: !channel.followed })}
           >
-            {channel.followed ? "Following" : "Follow"}
+            {channel.followed ? i18n._({ id: "ui.Following", message: "Following" }) : i18n._({ id: "ui.Follow", message: "Follow" })}
           </Button>
         ) : null}
         {canReset ? (
           <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label="Page options" className={HIT_AREA_ROW} />}>
+            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={i18n._({ id: "ui.Page options", message: "Page options" })} className={HIT_AREA_ROW} />}>
               <EllipsisIcon aria-hidden />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => ctx.onAction?.("reset_mix", {})}>Reset My Mix</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => ctx.onAction?.("reset_mix", {})}>{i18n._({ id: "ui.Reset My Mix", message: "Reset My Mix" })}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : null}
@@ -407,19 +408,19 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
   // A section page: the lead story wide, then everything else as one list (the featured stories join the rows).
   const styled = section && data.section_style !== undefined ? data.section_style : undefined;
   const lead = section ? [...(data.hero ? [data.hero] : []), ...featured, ...(data.rows ?? [])] : [];
-  const used = styled ? SECTION_STYLES[styled].tall + SECTION_STYLES[styled].side + SECTION_STYLES[styled].wide : 0;
+  const used = styled ? sectionStyles()[styled].tall + sectionStyles()[styled].side + sectionStyles()[styled].wide : 0;
   const rows = styled ? lead.slice(used) : section ? [...featured, ...(data.rows ?? [])] : (data.rows ?? []);
   const empty = !data.hero && featured.length === 0 && rows.length === 0 && (data.shelves ?? []).every((s) => s.stories.length === 0);
   return (
-    <section data-slot="story-feed" data-layout={data.layout} data-density={density === "kid" ? "kid" : undefined} aria-label={data.header?.title ?? "Stories"} className={cn("flex min-w-0 flex-col gap-6", className)}>
+    <section data-slot="story-feed" data-layout={data.layout} data-density={density === "kid" ? "kid" : undefined} aria-label={data.header?.title ?? i18n._({ id: "ui.Stories", message: "Stories" })} className={cn("flex min-w-0 flex-col gap-6", className)}>
       {data.header ? <ChannelHeader header={data.header} ctx={ctx} /> : null}
       <FilterChips filters={data.filters ?? []} ctx={ctx} />
       {empty ? (
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon"><NewspaperIcon aria-hidden /></EmptyMedia>
-            <EmptyTitle>No stories yet</EmptyTitle>
-            <EmptyDescription>New stories from your sources show up here.</EmptyDescription>
+            <EmptyTitle>{i18n._({ id: "ui.No stories yet", message: "No stories yet" })}</EmptyTitle>
+            <EmptyDescription>{i18n._({ id: "ui.New stories from your sources show up here.", message: "New stories from your sources show up here." })}</EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : null}
@@ -434,7 +435,7 @@ export function StoryFeed({ data, onAction, available = DEFAULT_AVAILABLE, class
         </div>
       ) : null}
       {(data.shelves ?? []).filter((shelf) => shelf.stories.length > 0).map((shelf) => <Shelf key={shelf.title} shelf={shelf} ctx={ctx} />)}
-      {styled && rows.length > 0 && !rows[0]!.group ? <h3 data-slot="story-more" className="-mb-3 text-lg font-semibold">More stories</h3> : null}
+      {styled && rows.length > 0 && !rows[0]!.group ? <h3 data-slot="story-more" className="-mb-3 text-lg font-semibold">{i18n._({ id: "ui.More stories", message: "More stories" })}</h3> : null}
       {groupRows(rows).map((segment, index) => (
         <div key={`${segment.group ?? ""}:${index}`} data-slot="story-group" className="flex min-w-0 flex-col gap-2">
           {segment.group ? (

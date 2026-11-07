@@ -1,19 +1,20 @@
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+import { i18n, kitLocaleTag } from "@/kit/i18n";
 
+/** "now", "5m", "3h", "Yesterday", "3d", then a short date ("Nov 3", with the year when it is not this year). Words and date order follow the active locale. */
 export function formatRelative(iso: string, now: Date = new Date()): string {
   const then = new Date(iso).getTime();
   const diffMs = now.getTime() - then;
   if (diffMs < 0) return shortDate(then, now);
   const diffSec = Math.floor(diffMs / 1000);
-  if (diffSec < 60) return "now";
+  if (diffSec < 60) return i18n._({ id: "ui.now", message: "now" });
   const diffMin = Math.floor(diffMs / 60_000);
-  if (diffMin < 60) return `${diffMin}m`;
+  if (diffMin < 60) return i18n._({ id: "ui.{minutes}m", message: "{minutes}m", values: { minutes: diffMin } });
   const diffH = Math.floor(diffMs / 3_600_000);
-  if (diffH < 24) return `${diffH}h`;
+  if (diffH < 24) return i18n._({ id: "ui.{hours}h", message: "{hours}h", values: { hours: diffH } });
   const dayDiff = calendarDayDiff(now, new Date(then));
-  if (dayDiff === 1) return "Yesterday";
+  if (dayDiff === 1) return i18n._({ id: "ui.Yesterday", message: "Yesterday" });
   const diffD = Math.floor(diffMs / 86_400_000);
-  if (diffD < 7) return `${diffD}d`;
+  if (diffD < 7) return i18n._({ id: "ui.{days}d", message: "{days}d", values: { days: diffD } });
   return shortDate(then, now);
 }
 
@@ -24,11 +25,9 @@ function calendarDayDiff(later: Date, earlier: Date): number {
 
 function shortDate(ms: number, now: Date): string {
   const date = new Date(ms);
-  const year = date.getFullYear() === now.getFullYear() ? "" : ` ${date.getFullYear()}`;
-  return `${MONTHS[date.getMonth()]} ${date.getDate()}${year}`;
+  const sameYear = date.getFullYear() === now.getFullYear();
+  return new Intl.DateTimeFormat(kitLocaleTag(), { month: "short", day: "numeric", ...(sameYear ? {} : { year: "numeric" }) }).format(date);
 }
-
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 /** Milliseconds for a date field: an ISO string, or epoch seconds or milliseconds. Undefined when it is not a date. */
 export function dateMs(value: unknown): number | undefined {
@@ -54,8 +53,7 @@ export function dayHeading(key: string, now: Date = new Date()): string {
   if (y === undefined || m === undefined || d === undefined) return key;
   const day = new Date(y, m - 1, d);
   const diff = calendarDayDiff(now, day);
-  if (diff === 0) return "Today";
-  if (diff === 1) return "Yesterday";
-  const year = y === now.getFullYear() ? "" : `, ${y}`;
-  return `${WEEKDAYS[day.getDay()]}, ${MONTHS[m - 1]} ${d}${year}`;
+  if (diff === 0) return i18n._({ id: "ui.Today", message: "Today" });
+  if (diff === 1) return i18n._({ id: "ui.Yesterday", message: "Yesterday" });
+  return new Intl.DateTimeFormat(kitLocaleTag(), { weekday: "short", month: "short", day: "numeric", ...(y === now.getFullYear() ? {} : { year: "numeric" }) }).format(day);
 }

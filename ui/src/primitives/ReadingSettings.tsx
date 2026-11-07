@@ -3,6 +3,7 @@ import { getIcon } from "@/kit/icons";
 import { Button } from "@/kit/dashboard/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/kit/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/kit/ui/toggle-group";
+import { i18n } from "@/kit/i18n";
 
 const TypeIcon = getIcon("a-large-small");
 
@@ -52,21 +53,23 @@ export const READING_CLASSES = {
   width: { narrow: "max-w-[52ch]", normal: "" },
 } as const;
 
-const LABELS: Record<keyof ReadingPrefs, Record<string, string>> = {
-  size: { small: "Small", medium: "Default", large: "Large", xlarge: "Largest" },
-  font: { serif: "Serif", sans: "Sans" },
-  spacing: { tight: "Tight", normal: "Normal", relaxed: "Roomy" },
-  width: { narrow: "Narrow", normal: "Normal" },
-};
-const TITLES = { font: "Typeface", size: "Text size", spacing: "Line spacing", width: "Page width" } as const;
+const labels = (): Record<keyof ReadingPrefs, Record<string, string>> => ({
+  size: { small: i18n._({ id: "ui.Small", message: "Small" }), medium: i18n._({ id: "ui.Default", message: "Default" }), large: i18n._({ id: "ui.Large", message: "Large" }), xlarge: i18n._({ id: "ui.Largest", message: "Largest" }) },
+  font: { serif: i18n._({ id: "ui.Serif", message: "Serif" }), sans: i18n._({ id: "ui.Sans", message: "Sans" }) },
+  spacing: { tight: i18n._({ id: "ui.Tight", message: "Tight" }), normal: i18n._({ id: "ui.Normal", message: "Normal" }), relaxed: i18n._({ id: "ui.Roomy", message: "Roomy" }) },
+  width: { narrow: i18n._({ id: "ui.Narrow", message: "Narrow" }), normal: i18n._({ id: "ui.Normal", message: "Normal" }) },
+});
+const titles = () => ({ font: i18n._({ id: "ui.Typeface", message: "Typeface" }), size: i18n._({ id: "ui.Text size", message: "Text size" }), spacing: i18n._({ id: "ui.Line spacing", message: "Line spacing" }), width: i18n._({ id: "ui.Page width", message: "Page width" }) }) as const;
 
 function Row<K extends keyof ReadingPrefs>({ field, prefs, onChange }: { field: K; prefs: ReadingPrefs; onChange: <J extends keyof ReadingPrefs>(key: J, value: ReadingPrefs[J]) => void }) {
+  const title = titles()[field];
+  const choiceLabels = labels()[field];
   return (
     <div className="flex flex-col gap-1.5">
-      <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{TITLES[field]}</p>
-      <ToggleGroup type="single" variant="segmented" fill value={prefs[field]} aria-label={TITLES[field]}
+      <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{title}</p>
+      <ToggleGroup type="single" variant="segmented" fill value={prefs[field]} aria-label={title}
         onValueChange={(value) => { const next = CHOICES[field].find((choice) => choice === value); if (next) onChange(field, next); }}>
-        {CHOICES[field].map((choice) => <ToggleGroupItem key={choice} value={choice} aria-label={`${TITLES[field]}: ${LABELS[field][choice]}`}>{LABELS[field][choice]}</ToggleGroupItem>)}
+        {CHOICES[field].map((choice) => <ToggleGroupItem key={choice} value={choice} aria-label={i18n._({ id: "ui.{title}: {label}", message: "{title}: {label}", values: { title, label: choiceLabels[choice] ?? "" } })}>{choiceLabels[choice]}</ToggleGroupItem>)}
       </ToggleGroup>
     </div>
   );
@@ -77,14 +80,14 @@ export function ReadingSettingsButton({ prefs, onChange }: { prefs: ReadingPrefs
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label="Reading settings" title="Reading settings"><TypeIcon aria-hidden /></Button>
+        <Button variant="ghost" size="icon-lg" className="rounded-full" aria-label={i18n._({ id: "ui.Reading settings", message: "Reading settings" })} title={i18n._({ id: "ui.Reading settings", message: "Reading settings" })}><TypeIcon aria-hidden /></Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="flex w-80 flex-col gap-4">
         <Row field="font" prefs={prefs} onChange={onChange} />
         <Row field="size" prefs={prefs} onChange={onChange} />
         <Row field="spacing" prefs={prefs} onChange={onChange} />
         <Row field="width" prefs={prefs} onChange={onChange} />
-        <Button variant="ghost" size="sm" onClick={() => (Object.keys(DEFAULT_READING) as (keyof ReadingPrefs)[]).forEach((key) => onChange(key, DEFAULT_READING[key] as never))}>Reset to default</Button>
+        <Button variant="ghost" size="sm" onClick={() => (Object.keys(DEFAULT_READING) as (keyof ReadingPrefs)[]).forEach((key) => onChange(key, DEFAULT_READING[key] as never))}>{i18n._({ id: "ui.Reset to default", message: "Reset to default" })}</Button>
       </PopoverContent>
     </Popover>
   );

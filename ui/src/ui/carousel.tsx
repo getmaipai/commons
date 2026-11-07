@@ -9,6 +9,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 
 import { cn } from "@/kit/utils"
 import { Button } from "@/kit/ui/button"
+import { i18n } from "@/kit/i18n"
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -245,7 +246,7 @@ function CarouselPrevious({
       {...props}
     >
       <ArrowLeft />
-      <span className="sr-only">Previous slide</span>
+      <span className="sr-only">{i18n._({ id: "ui.Previous slide", message: "Previous slide" })}</span>
     </Button>
   )
 }
@@ -275,7 +276,7 @@ function CarouselNext({
       {...props}
     >
       <ArrowRight />
-      <span className="sr-only">Next slide</span>
+      <span className="sr-only">{i18n._({ id: "ui.Next slide", message: "Next slide" })}</span>
     </Button>
   )
 }

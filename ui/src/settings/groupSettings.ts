@@ -1,5 +1,6 @@
 import type { SettingsKey } from "@maipai/spec/gen/ts/settings-key.js";
 import type { ResolvedSetting } from "@/kit/settings/resolvedSetting";
+import { i18n } from "@/kit/i18n"
 
 export interface MergedSetting {
   def: SettingsKey;
@@ -20,41 +21,41 @@ export interface SettingsGroup {
 // key available today; a real `section.order`/`collapsed` sort is a real,
 // separate gap for whenever a key actually declares one.
 export const SECTION_TITLES: Record<string, string> = {
-  "household.system": "System",
-  "household.blocked_sites": "Blocked sites",
-  "person.voice": "Voice",
-  "person.persona": "Personality",
+  get "household.system"() { return i18n._({ id: "ui.System", message: "System" }); },
+  get "household.blocked_sites"() { return i18n._({ id: "ui.Blocked sites", message: "Blocked sites" }); },
+  get "person.voice"() { return i18n._({ id: "ui.Voice", message: "Voice" }); },
+  get "person.persona"() { return i18n._({ id: "ui.Personality", message: "Personality" }); },
   // Not the same as ModelsSection.tsx's own "AI models" heading
   // (hardware/download management, a different component entirely) -
   // this is aiKeys.ts's own chat.* override keys (model, context size,
   // flash attention, KV cache precision), already found showing its raw
   // lives_in id the same way person.persona was before this fix, live in
   // the browser (2026-09-05).
-  "household.ai": "AI model tuning",
-  "household.integrations": "Integrations",
-  "household.notifications": "Notifications",
-  "household.storage": "Storage",
-  "person.storage": "My storage",
+  get "household.ai"() { return i18n._({ id: "ui.AI model tuning", message: "AI model tuning" }); },
+  get "household.integrations"() { return i18n._({ id: "ui.Integrations", message: "Integrations" }); },
+  get "household.notifications"() { return i18n._({ id: "ui.Notifications", message: "Notifications" }); },
+  get "household.storage"() { return i18n._({ id: "ui.Storage", message: "Storage" }); },
+  get "person.storage"() { return i18n._({ id: "ui.My storage", message: "My storage" }); },
   // reference.library_dir (SOURCE-SPEC-01) - found showing its raw
   // lives_in id before landing, the same "bare id, not household.*"
   // slip household.ai/profile.appearance already caught (2026-09-05).
-  "household.reference": "Reference library",
+  get "household.reference"() { return i18n._({ id: "ui.Reference library", message: "Reference library" }); },
   // search.safe_search (SEARCH-SAFE-01).
-  "person.search": "Search",
+  get "person.search"() { return i18n._({ id: "ui.Search", message: "Search" }); },
   // chat.photo_uploads (IMG-SPEC-KEYS).
-  "person.chat": "Chat",
+  get "person.chat"() { return i18n._({ id: "ui.Chat", message: "Chat" }); },
   // Deliberately NOT the same string as "household.notifications": a
   // design review (2026-09-05) found both sections rendering as
   // "Notifications" back to back (SettingsPage.tsx stacks a household-
   // scope and a person-scope SettingsRenderer as siblings), reading as a
   // duplicated/broken section rather than two different scopes.
-  "person.notifications": "My notifications",
+  get "person.notifications"() { return i18n._({ id: "ui.My notifications", message: "My notifications" }); },
   // `ui.pinned_apps`/`ui.appearance` (uiKeys.ts) - found showing its raw
   // lives_in id ("profile.appearance") in the running app, a design
   // review, 2026-09-05, same class of bug `household.ai` above was
   // already caught for once.
-  "profile.appearance": "Appearance",
-  "person.allowance": "Allowance",
+  get "profile.appearance"() { return i18n._({ id: "ui.Appearance", message: "Appearance" }); },
+  get "person.allowance"() { return i18n._({ id: "ui.Allowance", message: "Allowance" }); },
 };
 
 export function sectionTitle(id: string): string {

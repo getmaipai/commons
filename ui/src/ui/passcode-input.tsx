@@ -1,6 +1,7 @@
 import * as React from "react"
 import { OTPInput } from "input-otp"
 import { cn } from "@/kit/utils"
+import { i18n } from "@/kit/i18n"
 
 /**
  * PasscodeInput: a row of exactly `digits` separate boxes for a numeric passcode (the iCloud code
@@ -51,7 +52,7 @@ function PasscodeInput({
     if (invalid && !wasInvalid.current) setShaking(true)
     wasInvalid.current = invalid
   }, [invalid])
-  const groupLabel = label ?? `Enter your ${digits}-digit passcode`
+  const groupLabel = label ?? i18n._({ id: "ui.Enter your {digits}-digit passcode", message: "Enter your {digits}-digit passcode", values: { digits } })
 
   return (
     <OTPInput
@@ -115,7 +116,7 @@ function PasscodeSlot({
   return (
     <div
       role="img"
-      aria-label={`Digit ${index + 1} of ${total}, ${char ? "filled" : "empty"}`}
+      aria-label={char ? i18n._({ id: "ui.Digit {position} of {total}, filled", message: "Digit {position} of {total}, filled", values: { position: index + 1, total } }) : i18n._({ id: "ui.Digit {position} of {total}, empty", message: "Digit {position} of {total}, empty", values: { position: index + 1, total } })}
       data-slot="passcode-input-slot"
       data-active={active || undefined}
       data-filled={char ? "true" : undefined}

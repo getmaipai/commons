@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { EarIcon, MessageCircleIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, floating, inkButton, mono } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export function LauncherBubble({
   open,
@@ -98,7 +99,7 @@ export function LauncherBubble({
           <div className="flex flex-col gap-1">
             <span className="text-[13.5px] font-medium">{greeting}</span>
             <span className={cn(mono, "text-muted-foreground")}>
-              typically replies in a minute
+              {i18n._({ id: "ui.typically replies in a minute", message: "typically replies in a minute" })}
             </span>
           </div>
 
@@ -139,7 +140,7 @@ export function LauncherBubble({
                 "flex h-8 items-center justify-center rounded-full text-xs font-medium",
               )}
             >
-              Start a conversation
+              {i18n._({ id: "ui.Start a conversation", message: "Start a conversation" })}
             </button>
           )}
         </div>
@@ -162,13 +163,13 @@ export function LauncherBubble({
             <button
               type="button"
               onClick={onTurnOff}
-              aria-label="Turn off wake word listening"
+              aria-label={i18n._({ id: "ui.Turn off wake word listening", message: "Turn off wake word listening" })}
               className={cn(
                 inkButton,
                 "flex h-8 items-center justify-center rounded-full px-3 text-xs font-medium",
               )}
             >
-              Turn off
+              {i18n._({ id: "ui.Turn off", message: "Turn off" })}
             </button>
           )}
         </div>
@@ -178,7 +179,7 @@ export function LauncherBubble({
         <button
           type="button"
           aria-expanded={open}
-          aria-label={open ? "Close the assistant" : "Open the assistant"}
+          aria-label={open ? i18n._({ id: "ui.Close the assistant", message: "Close the assistant" }) : i18n._({ id: "ui.Open the assistant", message: "Open the assistant" })}
           onClick={onToggle}
           className={cn(
             inkButton,

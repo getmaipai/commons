@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { BrainIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { field, ghostButton, mono } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export type MemoryChange = "added" | "updated" | "existing";
 
@@ -34,7 +35,7 @@ export function MemoryChips({
       <div className="flex items-center gap-1.5">
         <BrainIcon className="text-foreground/30 size-3.5" />
         <span className={cn(mono, "text-muted-foreground")}>
-          {fresh > 0 ? `remembered ${fresh}` : "memory"}
+          {fresh > 0 ? i18n._({ id: "ui.remembered {fresh}", message: "remembered {fresh}", values: { fresh } }) : i18n._({ id: "ui.memory", message: "memory" })}
         </span>
       </div>
 
@@ -53,7 +54,7 @@ export function MemoryChips({
             {onForget && (
               <button
                 type="button"
-                aria-label={`Forget "${chip.text}"`}
+                aria-label={i18n._({ id: "ui.Forget \"{text}\"", message: "Forget \"{text}\"", values: { text: chip.text } })}
                 onClick={() => onForget(chip.id)}
                 className={cn(ghostButton, "size-4")}
               >

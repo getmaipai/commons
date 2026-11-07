@@ -3,6 +3,7 @@ import { Button } from "@/kit/ui/button";
 import { cn } from "@/kit/utils";
 import { checkerStyle } from "./generation-stage";
 import "./companion-stage.css";
+import { i18n } from "@/kit/i18n"
 
 export type StageMode = "idle" | "listening" | "thinking" | "speaking" | "working";
 
@@ -59,9 +60,9 @@ function AudioWave({ className }: { className?: string }) {
   </div>;
 }
 
-export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = "Dismiss message", workingLine, actions = [], talk, heard, history, historyLabel = "Conversation", showHeader = true, surface = "plain", frame = "default", transparency = "plain", className }: CompanionStageProps) {
+export function CompanionStage({ name, stateWord, mode, character, bubble, onDismissBubble, dismissLabel = i18n._({ id: "ui.Dismiss message", message: "Dismiss message" }), workingLine, actions = [], talk, heard, history, historyLabel = i18n._({ id: "ui.Conversation", message: "Conversation" }), showHeader = true, surface = "plain", frame = "default", transparency = "plain", className }: CompanionStageProps) {
   const panel = surface === "panel";
-  return <section data-slot="companion-stage" data-mode={mode} data-surface={panel ? "panel" : undefined} data-frame={frame === "strong" ? "strong" : undefined} data-transparency={transparency === "checker" ? "checker" : undefined} aria-label={`${name} companion`} className={cn("flex h-full min-h-0 flex-col gap-3", panel && "rounded-3xl border border-border bg-card p-4 text-card-foreground", frame === "strong" && "border-2 border-foreground/30 bg-muted text-foreground", className)}>
+  return <section data-slot="companion-stage" data-mode={mode} data-surface={panel ? "panel" : undefined} data-frame={frame === "strong" ? "strong" : undefined} data-transparency={transparency === "checker" ? "checker" : undefined} aria-label={i18n._({ id: "ui.{name} companion", message: "{name} companion", values: { name } })} className={cn("flex h-full min-h-0 flex-col gap-3", panel && "rounded-3xl border border-border bg-card p-4 text-card-foreground", frame === "strong" && "border-2 border-foreground/30 bg-muted text-foreground", className)}>
     <header className={cn("flex min-w-0 flex-col", !showHeader && "sr-only")}>
       <h2 className="min-w-0 truncate font-medium">{name}</h2>
       {stateWord ? <span role="status" aria-live="polite" className="truncate text-sm text-muted-foreground">{stateWord}</span> : null}
@@ -92,7 +93,7 @@ export function CompanionStage({ name, stateWord, mode, character, bubble, onDis
     </div> : null}
 
     {mode === "working" && workingLine ? <div className="min-w-0 text-sm text-muted-foreground" data-slot="companion-stage-working-line">{workingLine}</div> : null}
-    {mode === "working" ? <div data-slot="companion-stage-working-progress" role="progressbar" aria-label="Working" className="h-0.5 w-full overflow-hidden rounded-full bg-muted"><span className="block h-full w-1/3 rounded-sm bg-primary" /></div> : null}
+    {mode === "working" ? <div data-slot="companion-stage-working-progress" role="progressbar" aria-label={i18n._({ id: "ui.Working", message: "Working" })} className="h-0.5 w-full overflow-hidden rounded-full bg-muted"><span className="block h-full w-1/3 rounded-sm bg-primary" /></div> : null}
     {actions.length ? <div data-slot="companion-stage-actions" className="flex w-full flex-col gap-2">
       {actions.map((action) => <Button key={action.id} type="button" variant={action.primary ? "default" : "outline"} shape={panel ? "pill" : undefined} className={panel ? "w-full gap-2" : "w-full justify-start gap-2"} disabled={action.disabled} onClick={action.onSelect}>{action.icon ? <span className="shrink-0">{action.icon}</span> : null}<span className="truncate">{action.label}</span></Button>)}
     </div> : null}

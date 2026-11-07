@@ -54,6 +54,7 @@ import {
   type Point,
   type ViewTransform,
 } from "./media-viewer-logic";
+import { i18n } from "@/kit/i18n";
 
 /**
  * LIBRARY-REVAMP-06 slice B. A full-screen viewer for a list of files: a zoomable picture stage, the kit `Player` for video
@@ -106,24 +107,24 @@ export interface MediaViewerLabels {
   kind: Record<MediaViewerKind, string>;
 }
 
-export const DEFAULT_MEDIA_VIEWER_LABELS: MediaViewerLabels = {
-  close: "Close",
-  previous: "Previous",
-  next: "Next",
-  zoomIn: "Zoom in",
-  zoomOut: "Zoom out",
-  resetZoom: "Fit to screen",
-  details: "Details",
-  counter: (position, total) => `${position} of ${total}`,
-  announce: (name, position, total) => `${name}, ${position} of ${total}`,
-  help: "Use the left and right arrow keys to move between files. Plus and minus zoom a picture. Escape closes.",
-  loading: "Loading",
-  loadFailed: (name) => `${name} could not be loaded. Check that Home is running, then try again.`,
-  retry: "Try again",
-  unsupported: "This file cannot be previewed here.",
-  open: "Open",
-  kind: { image: "picture", video: "video", audio: "audio", document: "document", other: "file" },
-};
+export const defaultMediaViewerLabels = (): MediaViewerLabels => ({
+  close: i18n._({ id: "ui.Close", message: "Close" }),
+  previous: i18n._({ id: "ui.Previous", message: "Previous" }),
+  next: i18n._({ id: "ui.Next", message: "Next" }),
+  zoomIn: i18n._({ id: "ui.Zoom in", message: "Zoom in" }),
+  zoomOut: i18n._({ id: "ui.Zoom out", message: "Zoom out" }),
+  resetZoom: i18n._({ id: "ui.Fit to screen", message: "Fit to screen" }),
+  details: i18n._({ id: "ui.Details", message: "Details" }),
+  counter: (position, total) => i18n._({ id: "ui.{position} of {total}", message: "{position} of {total}", values: { position, total } }),
+  announce: (name, position, total) => i18n._({ id: "ui.{name}, {position} of {total}", message: "{name}, {position} of {total}", values: { name, position, total } }),
+  help: i18n._({ id: "ui.Use the left and right arrow keys to move between files. Plus and minus zoom a picture. Escape closes.", message: "Use the left and right arrow keys to move between files. Plus and minus zoom a picture. Escape closes." }),
+  loading: i18n._({ id: "ui.Loading", message: "Loading" }),
+  loadFailed: (name) => i18n._({ id: "ui.{name} could not be loaded. Check that Home is running, then try again.", message: "{name} could not be loaded. Check that Home is running, then try again.", values: { name } }),
+  retry: i18n._({ id: "ui.Try again", message: "Try again" }),
+  unsupported: i18n._({ id: "ui.This file cannot be previewed here.", message: "This file cannot be previewed here." }),
+  open: i18n._({ id: "ui.Open", message: "Open" }),
+  kind: { image: i18n._({ id: "ui.picture", message: "picture" }), video: i18n._({ id: "ui.video", message: "video" }), audio: i18n._({ id: "ui.audio", message: "audio" }), document: i18n._({ id: "ui.document", message: "document" }), other: i18n._({ id: "ui.file", message: "file" }) },
+});
 
 export interface MediaViewerProps {
   open: boolean;
@@ -199,7 +200,7 @@ export function MediaViewer({
   maxZoom = DEFAULT_MAX_SCALE,
   labels,
 }: MediaViewerProps) {
-  const copy: MediaViewerLabels = { ...DEFAULT_MEDIA_VIEWER_LABELS, ...labels, kind: { ...DEFAULT_MEDIA_VIEWER_LABELS.kind, ...labels?.kind } };
+  const copy: MediaViewerLabels = { ...defaultMediaViewerLabels(), ...labels, kind: { ...defaultMediaViewerLabels().kind, ...labels?.kind } };
   const ids = useId();
   const isDesktop = useIsDesktop();
   const index = items.findIndex((candidate) => candidate.id === currentId);

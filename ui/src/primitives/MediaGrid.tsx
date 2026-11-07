@@ -6,6 +6,7 @@ import { EmptyState } from "@/kit/primitives/EmptyState";
 import { GRID_COLUMNS } from "@/kit/responsive";
 import { useSurface } from "@/kit/useSurface";
 import { SafeImage } from "@/kit/primitives/SafeImage";
+import { i18n } from "@/kit/i18n";
 
 export interface MediaGridItem {
   id: string;
@@ -31,10 +32,10 @@ export function MediaGrid({ items, emptyMessage }: MediaGridProps) {
   return (
     <Dialog open={selectedItem !== null} onOpenChange={(open) => !open && setSelectedItem(null)}>
       <>
-        <ul aria-label="Media" className={`grid list-none gap-3 p-0 ${GRID_COLUMNS.default}`}>
+        <ul aria-label={i18n._({ id: "ui.Media", message: "Media" })} className={`grid list-none gap-3 p-0 ${GRID_COLUMNS.default}`}>
           {items.map((item) => (
             <li key={item.id} className="min-w-0">
-              <Card onSelect={() => setSelectedItem(item)} label={`Open media: ${item.altText}`} far={far}>
+              <Card onSelect={() => setSelectedItem(item)} label={i18n._({ id: "ui.Open media: {altText}", message: "Open media: {altText}", values: { altText: item.altText } })} far={far}>
                 <AspectRatio ratio={4 / 3} className="bg-muted">
                   {item.mediaType === "image" ? (
                     <SafeImage src={item.thumbnailUrl} alt="" className="size-full object-cover" />

@@ -10,6 +10,7 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon, SparklesIcon } from "lucide-react";
 import { cn } from "cn";
 import { floating } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 type IconComponent = FC<{ className?: string }>;
 
@@ -190,10 +191,10 @@ const Items: FC<ItemsProps> = ({
 const ComposerTriggerPopoverImpl: FC<ComposerTriggerPopoverProps> = ({
   iconMap,
   fallbackIcon = SparklesIcon,
-  backLabel = "Back",
-  emptyCategoriesLabel = "No items available",
-  emptyItemsLabel = "No matching items",
-  loadingLabel = "Loading…",
+  backLabel = i18n._({ id: "ui.Back", message: "Back" }),
+  emptyCategoriesLabel = i18n._({ id: "ui.No items available", message: "No items available" }),
+  emptyItemsLabel = i18n._({ id: "ui.No matching items", message: "No matching items" }),
+  loadingLabel = i18n._({ id: "ui.Loading…", message: "Loading…" }),
   isLoading = false,
   className,
   directive,

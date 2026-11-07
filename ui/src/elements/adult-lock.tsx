@@ -16,6 +16,7 @@ import { Button } from "@/kit/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/kit/ui/dialog";
 import { Input } from "@/kit/ui/input";
 import { PasscodeInput } from "@/kit/ui/passcode-input";
+import { i18n } from "@/kit/i18n";
 
 /*
  * ADULT-LOCK-01: the Adult lock kit pattern (home docs/design/video-loras-2026-11-02.md section 3.8).
@@ -143,7 +144,7 @@ export function AdultLockProvider({ unlock, digits = 6, credentialWord, credenti
     if (!unlockedRef.current) return;
     unlockedRef.current = false;
     setProof(null);
-    setMessage(RELOCKED_ANNOUNCEMENT);
+    setMessage(i18n._({ id: "ui.Locked items hidden", message: "Locked items hidden" }));
     onRelockRef.current?.();
   }, []);
 
@@ -153,7 +154,7 @@ export function AdultLockProvider({ unlock, digits = 6, credentialWord, credenti
   const onSuccess = useCallback((value: string | undefined) => {
     succeeded.current = true;
     setProof({ value: value ?? null });
-    setMessage(UNLOCKED_ANNOUNCEMENT);
+    setMessage(i18n._({ id: "ui.Unlocked", message: "Unlocked" }));
     onUnlockedRef.current?.(value ?? null);
     setOpen(false);
   }, []);
@@ -209,9 +210,9 @@ export interface AdultLockDialogProps {
 }
 
 function formatWait(seconds: number): string {
-  if (seconds < 60) return `${seconds} ${seconds === 1 ? "second" : "seconds"}`;
+  if (seconds < 60) return i18n._({ id: "ui.{count, plural, one {# second} other {# seconds}}", message: "{count, plural, one {# second} other {# seconds}}", values: { count: seconds } });
   const minutes = Math.ceil(seconds / 60);
-  return `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+  return i18n._({ id: "ui.{count, plural, one {# minute} other {# minutes}}", message: "{count, plural, one {# minute} other {# minutes}}", values: { count: minutes } });
 }
 
 /**
@@ -221,7 +222,7 @@ function formatWait(seconds: number): string {
  */
 export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits = 6, credentialWord: word, credentialKind = "passcode", hasCredential = true, onCloseAutoFocus, title, description, actionLabel }: AdultLockDialogProps) {
   const isPassword = credentialKind === "password";
-  const credentialWord = word ?? (isPassword ? "password" : "passcode");
+  const credentialWord = word ?? (isPassword ? i18n._({ id: "ui.password", message: "password" }) : i18n._({ id: "ui.passcode", message: "passcode" }));
   const [code, setCode] = useState("");
   const [shown, setShown] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -283,14 +284,14 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
       const t = Date.now();
       setNow(t);
       setWaitUntil(t + Math.max(1, Math.ceil(result.retryAfterSeconds)) * 1000);
-      setError(`Too many wrong tries. Unlocking is paused: wait for the timer, then try again.`);
+      setError(i18n._({ id: "ui.Too many wrong tries. Unlocking is paused: wait for the timer, then try again.", message: "Too many wrong tries. Unlocking is paused: wait for the timer, then try again." }));
       return;
     }
     if (result?.status === "failed") {
       const left = result.attemptsLeft;
-      setError(`That ${credentialWord} was not right. Check it and try again.${typeof left === "number" && left > 0 && left <= 3 ? ` ${left} ${left === 1 ? "try" : "tries"} left.` : ""}`);
+      setError(`${i18n._({ id: "ui.That {word} was not right. Check it and try again.", message: "That {word} was not right. Check it and try again.", values: { word: credentialWord } })}${typeof left === "number" && left > 0 && left <= 3 ? ` ${i18n._({ id: "ui.{count, plural, one {# try left.} other {# tries left.}}", message: "{count, plural, one {# try left.} other {# tries left.}}", values: { count: left } })}` : ""}`);
     } else {
-      setError(`We could not check your ${credentialWord}. Check your connection and try again.`);
+      setError(i18n._({ id: "ui.We could not check your {word}. Check your connection and try again.", message: "We could not check your {word}. Check your connection and try again.", values: { word: credentialWord } }));
     }
     focusField();
   }
@@ -308,11 +309,11 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
         }}
       >
         <DialogHeader>
-          <DialogTitle>{hasCredential ? title ?? `Enter your ${credentialWord}` : "Locked items"}</DialogTitle>
+          <DialogTitle>{hasCredential ? title ?? i18n._({ id: "ui.Enter your {word}", message: "Enter your {word}", values: { word: credentialWord } }) : i18n._({ id: "ui.Locked items", message: "Locked items" })}</DialogTitle>
           <DialogDescription>
             {hasCredential
-              ? description ?? "These items stay hidden until you do. Only your own code opens them."
-              : "These items stay hidden until you set a code. Nothing opens without one."}
+              ? description ?? i18n._({ id: "ui.These items stay hidden until you do. Only your own code opens them.", message: "These items stay hidden until you do. Only your own code opens them." })
+              : i18n._({ id: "ui.These items stay hidden until you set a code. Nothing opens without one.", message: "These items stay hidden until you set a code. Nothing opens without one." })}
           </DialogDescription>
         </DialogHeader>
         {hasCredential ? (
@@ -331,7 +332,7 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
                     data-slot="adult-lock-password"
                     value={code}
                     onChange={(event) => { setCode(event.target.value); if (error && !lockedOut) setError(null); }}
-                    aria-label={`Enter your ${credentialWord}`}
+                    aria-label={i18n._({ id: "ui.Enter your {word}", message: "Enter your {word}", values: { word: credentialWord } })}
                     aria-invalid={Boolean(error) && !lockedOut ? true : undefined}
                     autoComplete="off"
                     autoCapitalize="off"
@@ -345,7 +346,7 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
                     variant="ghost"
                     size="icon"
                     data-slot="adult-lock-reveal"
-                    aria-label={shown ? `Hide ${credentialWord}` : `Show ${credentialWord}`}
+                    aria-label={shown ? i18n._({ id: "ui.Hide {word}", message: "Hide {word}", values: { word: credentialWord } }) : i18n._({ id: "ui.Show {word}", message: "Show {word}", values: { word: credentialWord } })}
                     aria-pressed={shown}
                     disabled={checking || lockedOut}
                     onClick={() => { setShown((v) => !v); focusField(); }}
@@ -361,22 +362,22 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
                   onComplete={(value) => void submit(value)}
                   invalid={Boolean(error) && !lockedOut}
                   disabled={checking || lockedOut}
-                  label={`Enter your ${digits}-digit ${credentialWord}`}
+                  label={i18n._({ id: "ui.Enter your {digits}-digit {word}", message: "Enter your {digits}-digit {word}", values: { digits, word: credentialWord } })}
                 />
               )}
             </div>
             {error ? <p role="alert" data-slot="adult-lock-error" className="text-destructive text-center text-sm">{error}</p> : null}
-            {lockedOut ? <p aria-hidden="true" data-slot="adult-lock-wait" className="text-muted-foreground text-sm tabular-nums">Try again in {formatWait(remaining)}.</p> : null}
+            {lockedOut ? <p aria-hidden="true" data-slot="adult-lock-wait" className="text-muted-foreground text-sm tabular-nums">{i18n._({ id: "ui.Try again in {wait}.", message: "Try again in {wait}.", values: { wait: formatWait(remaining) } })}</p> : null}
             <DialogFooter className="w-full">
-              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type="submit" disabled={checking || lockedOut || (isPassword ? code.length === 0 : code.length !== digits)}>{checking ? "Checking" : actionLabel ?? "Unlock"}</Button>
+              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>{i18n._({ id: "ui.Cancel", message: "Cancel" })}</Button>
+              <Button type="submit" disabled={checking || lockedOut || (isPassword ? code.length === 0 : code.length !== digits)}>{checking ? i18n._({ id: "ui.Checking", message: "Checking" }) : actionLabel ?? i18n._({ id: "ui.Unlock", message: "Unlock" })}</Button>
             </DialogFooter>
           </form>
         ) : (
           <>
-            <p role="status" data-slot="adult-lock-no-credential" className="text-foreground text-sm">Set a {credentialWord} in Account to open these.</p>
+            <p role="status" data-slot="adult-lock-no-credential" className="text-foreground text-sm">{i18n._({ id: "ui.Set a {word} in Account to open these.", message: "Set a {word} in Account to open these.", values: { word: credentialWord } })}</p>
             <DialogFooter>
-              <Button type="button" onClick={() => onOpenChange(false)}>Close</Button>
+              <Button type="button" onClick={() => onOpenChange(false)}>{i18n._({ id: "ui.Close", message: "Close" })}</Button>
             </DialogFooter>
           </>
         )}
@@ -407,7 +408,7 @@ export function LockTile({ making = false, onUnlock, shape = "card" }: { making?
   return (
     <button
       type="button"
-      aria-label={LOCK_TILE_NAME}
+      aria-label={i18n._({ id: "ui.Locked items. Press to enter your passcode.", message: "Locked items. Press to enter your passcode." })}
       data-slot="lock-tile"
       onClick={(event) => (onUnlock ? onUnlock() : requestUnlock(event.currentTarget))}
       className={cn(
@@ -418,7 +419,7 @@ export function LockTile({ making = false, onUnlock, shape = "card" }: { making?
       )}
     >
       <LockIcon aria-hidden className="size-6 shrink-0" />
-      <span aria-hidden="true">{LOCK_TILE_TEXT}</span>
+      <span aria-hidden="true">{i18n._({ id: "ui.Locked items", message: "Locked items" })}</span>
       {making ? <LoaderCircleIcon aria-hidden className="size-4 shrink-0 motion-safe:animate-spin" /> : null}
     </button>
   );

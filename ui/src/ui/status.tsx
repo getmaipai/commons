@@ -12,6 +12,7 @@ import type { ComponentProps, HTMLAttributes } from "react";
 import { Badge } from "@/kit/ui/badge";
 import { cn } from "@/kit/utils";
 import { STATUS_GROUP_BG, STATUS_TONE_BG } from "./status-colors";
+import { i18n } from "@/kit/i18n";
 
 export type StatusKind = "online" | "offline" | "maintenance" | "degraded";
 
@@ -26,12 +27,12 @@ const indicatorColors: Record<StatusKind, string> = {
   degraded: STATUS_TONE_BG.warning,
 };
 
-const statusLabels: Record<StatusKind, string> = {
-  online: "Online",
-  offline: "Offline",
-  maintenance: "Maintenance",
-  degraded: "Degraded",
-};
+const statusLabels = (): Record<StatusKind, string> => ({
+  online: i18n._({ id: "ui.Online", message: "Online" }),
+  offline: i18n._({ id: "ui.Offline", message: "Offline" }),
+  maintenance: i18n._({ id: "ui.Maintenance", message: "Maintenance" }),
+  degraded: i18n._({ id: "ui.Degraded", message: "Degraded" }),
+});
 
 const statusLabelClasses: Record<StatusKind, string> = {
   online: "group-[.online]:inline",
@@ -92,9 +93,9 @@ function StatusLabel({ className, children, ...props }: StatusLabelProps) {
     <span className={cn("text-muted-foreground", className)} {...props}>
       {children ?? (
         <>
-          {(Object.keys(statusLabels) as StatusKind[]).map((status) => (
+          {(Object.keys(statusLabels()) as StatusKind[]).map((status) => (
             <span key={status} className={cn("hidden", statusLabelClasses[status])}>
-              {statusLabels[status]}
+              {statusLabels()[status]}
             </span>
           ))}
         </>

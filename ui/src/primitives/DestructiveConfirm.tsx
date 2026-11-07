@@ -1,5 +1,6 @@
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/kit/ui/alert-dialog";
 import { Button } from "@/kit/ui/button";
+import { i18n } from "@/kit/i18n";
 
 interface DestructiveConfirmProps {
   /** The bold question line, e.g. "Remove 3 people from your household?" */
@@ -28,7 +29,7 @@ export function DestructiveConfirm({
   busy,
   onConfirm,
   onCancel,
-  cancelLabel = "Keep it",
+  cancelLabel = i18n._({ id: "ui.Keep it", message: "Keep it" }),
 }: DestructiveConfirmProps) {
   return (
     <AlertDialog open onOpenChange={(open) => { if (!open && !busy) onCancel(); }}>

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { i18n } from "@/kit/i18n";
 import { ChevronDownIcon } from "lucide-react";
 import {
   Collapsible,
@@ -86,7 +87,7 @@ export function Sources({
             "group/trigger text-muted-foreground hover:text-foreground/90 inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-xs outline-none",
           )}
         >
-          <span>Sources</span>
+          <span>{i18n._({ id: "ui.Sources", message: "Sources" })}</span>
           <span className={cn(mono, "text-muted-foreground tabular-nums")}>
             {sources.length}
           </span>

@@ -6,6 +6,7 @@ import { cn } from "cn";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { field, floating, mono } from "./surfaces";
 import { SafeImage } from "../primitives/SafeImage";
+import { i18n } from "@/kit/i18n";
 
 export interface PaletteCommand {
   id: string;
@@ -86,7 +87,7 @@ export function CommandPalette({
   onActiveChange,
   onRun,
   size = "default",
-  placeholder = "Type a command",
+  placeholder = i18n._({ id: "ui.Type a command", message: "Type a command" }),
   prefiltered = false,
   emptyMessage,
   tabs,
@@ -222,12 +223,12 @@ export function CommandPalette({
             "text-muted-foreground rounded px-1.5 py-0.5",
           )}
         >
-          esc
+          {i18n._({ id: "ui.esc", message: "esc" })}
         </span>
       </div>
 
       {tabs && tabs.length > 0 ? (
-        <div role="tablist" aria-label="Result type" className="border-foreground/[0.07] flex gap-5 overflow-x-auto border-b px-6">
+        <div role="tablist" aria-label={i18n._({ id: "ui.Result type", message: "Result type" })} className="border-foreground/[0.07] flex gap-5 overflow-x-auto border-b px-6">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -251,7 +252,7 @@ export function CommandPalette({
       <div
         id={listId}
         role="listbox"
-        aria-label="Commands"
+        aria-label={i18n._({ id: "ui.Commands", message: "Commands" })}
         className={cn(
           "flex flex-col overflow-y-auto px-3 py-2",
           size === "lg" ? "min-h-0 flex-1" : "max-h-72",
@@ -352,7 +353,7 @@ export function CommandPalette({
       {matches.length === 0 && (
         <div className="border-foreground/[0.07] border-t p-1.5">
           <span className="text-muted-foreground block px-2 py-4 text-center text-xs break-words">
-            {emptyMessage ?? `No command matches “${query}”`}
+            {emptyMessage ?? i18n._({ id: "ui.No command matches “{query}”", message: "No command matches “{query}”", values: { query } })}
           </span>
         </div>
       )}

@@ -1,7 +1,8 @@
 import { Skeleton } from "@/kit/ui/skeleton";
 import { ROUTE_SKELETON_DELAY_MS } from "@/kit/primitives/RouteSkeleton";
+import { i18n } from "@/kit/i18n"
 
-export function ArticleSkeleton({ label = "Loading article" }: { label?: string }) {
+export function ArticleSkeleton({ label = i18n._({ id: "ui.Loading article", message: "Loading article" }) }: { label?: string }) {
   return (
     <div
       className="mx-auto flex w-full min-w-0 max-w-[72ch] flex-col gap-4 px-4 md:px-6 pt-6"

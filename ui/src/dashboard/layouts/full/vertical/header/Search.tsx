@@ -9,6 +9,7 @@ import SidebarContent from "../../vertical/sidebar/sidebaritems";
 
 import { Input } from "../../../../components/ui/input";
 import { Link } from "react-router";
+import { i18n } from "@/kit/i18n"
 
 function Search() {
   const [query, setQuery] = useState("");
@@ -58,7 +59,7 @@ function Search() {
           className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
         />
         <Input
-          placeholder="Search...."
+          placeholder={i18n._({ id: "ui.Search....", message: "Search...." })}
           className="rounded-lg pl-10!"
           required
           value={query}
@@ -94,7 +95,7 @@ function Search() {
           ) : (
             <div className="flex items-center justify-center h-full">
               <h1 className="text-medium font-medium ">
-                No Components Found!
+                {i18n._({ id: "ui.No Components Found!", message: "No Components Found!" })}
               </h1>
             </div>
           )}

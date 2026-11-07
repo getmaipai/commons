@@ -11,6 +11,7 @@ import { Button } from "../dashboard/components/ui/button";
 import { Input } from "../dashboard/components/ui/input";
 import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput } from "../dashboard/components/ui/combobox";
 import { Field, FieldDescription, FieldError, FieldLabel } from "../dashboard/components/ui/field";
+import { i18n } from "@/kit/i18n";
 
 export interface PhraseLimits {
   /** Most items the list holds. Absent: no cap on the count. */
@@ -37,16 +38,17 @@ export function splitPhrases(text: string): string[] {
  * the list (the caller's own count, so the pairs form can count both sides). `cost` is what the
  * phrase adds to that count. */
 function refusal(phrase: string, existing: readonly string[], limits: PhraseLimits, used: number, cost: number): string | null {
-  if (existing.some((e) => same(e, phrase))) return `"${phrase}" is already in the list. Type a different one.`;
-  if (phrase.length > limits.maxItemChars) return `That is ${phrase.length} characters and each phrase can have ${limits.maxItemChars}. Shorten it.`;
-  if (limits.maxItems !== undefined && existing.length >= limits.maxItems) return `The list holds ${limits.maxItems} at most. Remove one to add another.`;
-  if (limits.maxTotalChars !== undefined && used + cost > limits.maxTotalChars) return `The list can hold ${limits.maxTotalChars} characters in all and this would make ${used + cost}. Remove a phrase or shorten this one.`;
+  if (existing.some((e) => same(e, phrase))) return i18n._({ id: "ui.\"{phrase}\" is already in the list. Type a different one.", message: "\"{phrase}\" is already in the list. Type a different one.", values: { phrase } });
+  if (phrase.length > limits.maxItemChars) return i18n._({ id: "ui.That is {length} characters and each phrase can have {max}. Shorten it.", message: "That is {length} characters and each phrase can have {max}. Shorten it.", values: { length: phrase.length, max: limits.maxItemChars } });
+  if (limits.maxItems !== undefined && existing.length >= limits.maxItems) return i18n._({ id: "ui.The list holds {max} at most. Remove one to add another.", message: "The list holds {max} at most. Remove one to add another.", values: { max: limits.maxItems } });
+  if (limits.maxTotalChars !== undefined && used + cost > limits.maxTotalChars) return i18n._({ id: "ui.The list can hold {max} characters in all and this would make {total}. Remove a phrase or shorten this one.", message: "The list can hold {max} characters in all and this would make {total}. Remove a phrase or shorten this one.", values: { max: limits.maxTotalChars, total: used + cost } });
   return null;
 }
 
 function countLine(limits: PhraseLimits, used: number): string {
-  const each = `${limits.maxItemChars} characters each`;
-  return limits.maxTotalChars === undefined ? each : `${each}, ${limits.maxTotalChars} in all (${used} used)`;
+  return limits.maxTotalChars === undefined
+    ? i18n._({ id: "ui.{max} characters each", message: "{max} characters each", values: { max: limits.maxItemChars } })
+    : i18n._({ id: "ui.{max} characters each, {total} in all ({used} used)", message: "{max} characters each, {total} in all ({used} used)", values: { max: limits.maxItemChars, total: limits.maxTotalChars, used } });
 }
 
 interface FrameProps {
@@ -121,8 +123,8 @@ export function PhraseListField({ label, help, value, onChange, addLabel, disabl
       added += 1;
     }
     if (added) onChange(next);
-    setError(skipped.length > 1 ? `${firstError} ${skipped.length - 1} more were skipped.` : firstError);
-    if (added) setAnnouncement(`Added ${added === 1 ? `"${phrases.find((p) => !skipped.includes(p))}"` : `${added} phrases`}. ${next.length} in the list.`);
+    setError(skipped.length > 1 ? i18n._({ id: "ui.{error} {count} more were skipped.", message: "{error} {count} more were skipped.", values: { error: firstError, count: skipped.length - 1 } }) : firstError);
+    if (added) setAnnouncement(added === 1 ? i18n._({ id: "ui.Added \"{phrase}\". {count} in the list.", message: "Added \"{phrase}\". {count} in the list.", values: { phrase: phrases.find((p) => !skipped.includes(p)), count: next.length } }) : i18n._({ id: "ui.Added {added} phrases. {count} in the list.", message: "Added {added} phrases. {count} in the list.", values: { added, count: next.length } }));
     return skipped;
   }
 
@@ -141,7 +143,7 @@ export function PhraseListField({ label, help, value, onChange, addLabel, disabl
     } else if (event.key === "Backspace" && draft === "" && value.length) {
       // The chips root removes the last chip itself; only the announcement is ours.
       setError(null);
-      setAnnouncement(`Removed "${value[value.length - 1]}". ${value.length - 1} in the list.`);
+      setAnnouncement(i18n._({ id: "ui.Removed \"{phrase}\". {count} in the list.", message: "Removed \"{phrase}\". {count} in the list.", values: { phrase: value[value.length - 1], count: value.length - 1 } }));
     } else if (error) {
       setError(null);
     }
@@ -158,7 +160,7 @@ export function PhraseListField({ label, help, value, onChange, addLabel, disabl
     const gone = value[index];
     onChange(value.filter((_, i) => i !== index));
     setError(null);
-    setAnnouncement(`Removed "${gone}". ${value.length - 1} in the list.`);
+    setAnnouncement(i18n._({ id: "ui.Removed \"{phrase}\". {count} in the list.", message: "Removed \"{phrase}\". {count} in the list.", values: { phrase: gone, count: value.length - 1 } }));
     inputRef.current?.focus();
   }
 
@@ -178,7 +180,7 @@ export function PhraseListField({ label, help, value, onChange, addLabel, disabl
           {value.map((phrase, index) => (
             <ComboboxChip key={phrase.toLocaleLowerCase()} showRemove={false} className="h-6 pr-0">
               <span>{phrase}</span>
-              <Button type="button" variant="ghost" size="icon-xs" disabled={disabled} aria-label={`Remove ${phrase}`} className="-ml-0.5 opacity-60 hover:opacity-100 focus-visible:opacity-100" onClick={(e) => { e.stopPropagation(); remove(index); }}>
+              <Button type="button" variant="ghost" size="icon-xs" disabled={disabled} aria-label={i18n._({ id: "ui.Remove {phrase}", message: "Remove {phrase}", values: { phrase } })} className="-ml-0.5 opacity-60 hover:opacity-100 focus-visible:opacity-100" onClick={(e) => { e.stopPropagation(); remove(index); }}>
                 <icons.x aria-hidden="true" className="pointer-events-none" />
               </Button>
             </ComboboxChip>
@@ -239,19 +241,19 @@ export function PhrasePairsField({ label, help, value, onChange, firstLabel, sec
     const b = normalizePhrase(second);
     if (!a && !b) return;
     if (!a || !b) {
-      setError(`Fill in both "${firstLabel}" and "${secondLabel}", then add the pair.`);
+      setError(i18n._({ id: "ui.Fill in both \"{first}\" and \"{second}\", then add the pair.", message: "Fill in both \"{first}\" and \"{second}\", then add the pair.", values: { first: firstLabel, second: secondLabel } }));
       return;
     }
     const secondTooLong = b.length > maxItemChars;
     const why = secondTooLong
-      ? `That is ${b.length} characters and each phrase can have ${maxItemChars}. Shorten it.`
+      ? i18n._({ id: "ui.That is {length} characters and each phrase can have {max}. Shorten it.", message: "That is {length} characters and each phrase can have {max}. Shorten it.", values: { length: b.length, max: maxItemChars } })
       : refusal(a, value.map((p) => p.avoid), limits, used, a.length + b.length);
     if (why) { setError(why); return; }
     onChange([...value, { avoid: a, say: b }]);
     setFirst("");
     setSecond("");
     setError(null);
-    setAnnouncement(`Added "${a}" with "${b}". ${value.length + 1} in the list.`);
+    setAnnouncement(i18n._({ id: "ui.Added \"{a}\" with \"{b}\". {count} in the list.", message: "Added \"{a}\" with \"{b}\". {count} in the list.", values: { a, b, count: value.length + 1 } }));
     firstRef.current?.focus();
   }
 
@@ -260,7 +262,7 @@ export function PhrasePairsField({ label, help, value, onChange, firstLabel, sec
     if (!gone) return;
     onChange(value.filter((_, i) => i !== index));
     setError(null);
-    setAnnouncement(`Removed "${gone.avoid}". ${value.length - 1} in the list.`);
+    setAnnouncement(i18n._({ id: "ui.Removed \"{phrase}\". {count} in the list.", message: "Removed \"{phrase}\". {count} in the list.", values: { phrase: gone.avoid, count: value.length - 1 } }));
     firstRef.current?.focus();
   }
 
@@ -272,13 +274,13 @@ export function PhrasePairsField({ label, help, value, onChange, firstLabel, sec
   return (
     <Frame label={label} help={help} limits={limits} used={used} error={error} announcement={announcement} invalid={invalid} disabled={disabled} ids={ids}>
       {value.length ? (
-        <ul aria-label={`${label}, ${value.length} added`} className="flex flex-col gap-1" data-slot="phrase-pairs-list">
+        <ul aria-label={i18n._({ id: "ui.{label}, {count} added", message: "{label}, {count} added", values: { label, count: value.length } })} className="flex flex-col gap-1" data-slot="phrase-pairs-list">
           {value.map((pair, index) => (
             <li key={pair.avoid.toLocaleLowerCase()} className="flex items-center gap-2 rounded-lg bg-muted px-2.5 py-1 text-sm">
               <span className="min-w-0 flex-1 break-words"><span className="sr-only">{firstLabel}: </span>{pair.avoid}</span>
-              <span aria-hidden="true" className="text-muted-foreground">to</span>
+              <span aria-hidden="true" className="text-muted-foreground">{i18n._({ id: "ui.to", message: "to" })}</span>
               <span className="min-w-0 flex-1 break-words"><span className="sr-only">{secondLabel}: </span>{pair.say}</span>
-              <Button type="button" variant="ghost" size="icon-xs" disabled={disabled} aria-label={`Remove ${pair.avoid}`} onClick={() => remove(index)}>
+              <Button type="button" variant="ghost" size="icon-xs" disabled={disabled} aria-label={i18n._({ id: "ui.Remove {phrase}", message: "Remove {phrase}", values: { phrase: pair.avoid } })} onClick={() => remove(index)}>
                 <icons.x aria-hidden="true" className="pointer-events-none" />
               </Button>
             </li>

@@ -6,6 +6,7 @@ import { cn } from "cn";
 import { SafeImage } from "../primitives/SafeImage";
 import { paper } from "./surfaces";
 import { EditActions, TagsEdit, TextEdit, diffPatch, parseTags, pillButton, tagsText } from "./music-edit";
+import { i18n } from "@/kit/i18n";
 
 export interface BandImage { src: string; alt: string }
 export interface BandMember { name: string; role: string; portrait?: BandImage }
@@ -25,6 +26,18 @@ export interface BandPatch { name?: string; backstory?: string; look?: string; s
  * report the existing `remake_portrait` and `remake_logo` actions. Save calls
  * `onEdit` with only the changed fields.
  */
+function actionLabel(action: BandAction): string {
+  switch (action) {
+    case "make_album": return i18n._({ id: "ui.make album", message: "make album" });
+    case "remake_logo": return i18n._({ id: "ui.remake logo", message: "remake logo" });
+    case "remake_portrait": return i18n._({ id: "ui.remake portrait", message: "remake portrait" });
+    case "keep": return i18n._({ id: "ui.keep", message: "keep" });
+    case "remake": return i18n._({ id: "ui.remake", message: "remake" });
+    case "discard": return i18n._({ id: "ui.discard", message: "discard" });
+    case "open_app": return i18n._({ id: "ui.open app", message: "open app" });
+  }
+}
+
 export function Band({ name, backstory, genres = [], portrait, logo, members = [], inspiredBy, singleTitle, look = "", sound = "", actions, onAction, editable, defaultEditing, onEdit, resolveImageSrc, className, ...props }: Omit<ComponentProps<"div">, "children" | "title" | "translate"> & {
   name: string; backstory?: string; genres?: readonly string[]; portrait?: BandImage; logo?: BandImage;
   members?: readonly BandMember[]; inspiredBy?: string; singleTitle?: string; look?: string; sound?: string; actions: readonly BandAction[];
@@ -42,12 +55,12 @@ export function Band({ name, backstory, genres = [], portrait, logo, members = [
   const remake = (action: BandAction, label: string) => <button type="button" onClick={() => onAction?.(action)} disabled={!onAction} className={pillButton}>{label}</button>;
 
   if (editable && editing) return <article data-slot="band" data-mode="edit" className={cn(paper, "flex w-full max-w-md flex-col gap-3 rounded-2xl p-4", className)} {...props}>
-    <TextEdit label="Band name" value={draft.name} onChange={set("name")} maxLength={120} />
-    <TextEdit label="About the band" value={draft.backstory} onChange={set("backstory")} maxLength={4000} multiline />
-    <TextEdit label="Look" value={draft.look} onChange={set("look")} maxLength={1000} multiline hint="What the band picture and logo should look like." />
-    <TextEdit label="Sound" value={draft.sound} onChange={set("sound")} maxLength={1000} multiline hint="Style words for every song. Never lyrics." />
+    <TextEdit label={i18n._({ id: "ui.Band name", message: "Band name" })} value={draft.name} onChange={set("name")} maxLength={120} />
+    <TextEdit label={i18n._({ id: "ui.About the band", message: "About the band" })} value={draft.backstory} onChange={set("backstory")} maxLength={4000} multiline />
+    <TextEdit label={i18n._({ id: "ui.Look", message: "Look" })} value={draft.look} onChange={set("look")} maxLength={1000} multiline hint={i18n._({ id: "ui.What the band picture and logo should look like.", message: "What the band picture and logo should look like." })} />
+    <TextEdit label={i18n._({ id: "ui.Sound", message: "Sound" })} value={draft.sound} onChange={set("sound")} maxLength={1000} multiline hint={i18n._({ id: "ui.Style words for every song. Never lyrics.", message: "Style words for every song. Never lyrics." })} />
     <TagsEdit value={draft.genres} onChange={set("genres")} />
-    <div className="flex flex-wrap gap-2">{remake("remake_portrait", "New band picture")}{remake("remake_logo", "New logo")}</div>
+    <div className="flex flex-wrap gap-2">{remake("remake_portrait", i18n._({ id: "ui.New band picture", message: "New band picture" }))}{remake("remake_logo", i18n._({ id: "ui.New logo", message: "New logo" }))}</div>
     <EditActions onSave={save} onCancel={() => setEditing(false)} saveDisabled={!draft.name.trim() || !Object.keys(patch).length} />
   </article>;
 
@@ -58,16 +71,16 @@ export function Band({ name, backstory, genres = [], portrait, logo, members = [
       <div className="min-w-0 flex-1">
         <h3 className="truncate text-[16px] font-semibold">{name}</h3>
         {genres.length ? <p className="text-muted-foreground truncate text-xs">{genres.join(" · ")}</p> : null}
-        {inspiredBy ? <p className="text-muted-foreground truncate text-xs">Inspired by {inspiredBy}</p> : null}
+        {inspiredBy ? <p className="text-muted-foreground truncate text-xs">{i18n._({ id: "ui.Inspired by {inspiredBy}", message: "Inspired by {inspiredBy}", values: { inspiredBy } })}</p> : null}
       </div>
-      {editable ? <button type="button" aria-label="Edit band" onClick={open} className={cn(pillButton, "flex shrink-0 items-center gap-1")}><PencilIcon className="size-3" aria-hidden="true" />Edit</button> : null}
+      {editable ? <button type="button" aria-label={i18n._({ id: "ui.Edit band", message: "Edit band" })} onClick={open} className={cn(pillButton, "flex shrink-0 items-center gap-1")}><PencilIcon className="size-3" aria-hidden="true" />{i18n._({ id: "ui.Edit", message: "Edit" })}</button> : null}
     </div>
     {backstory ? <p className="text-[14px] leading-relaxed">{backstory}</p> : null}
     {members.length ? <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs">{members.map((member) => <li key={`${member.name}:${member.role}`} className="flex min-w-0 items-center gap-2">
       {member.portrait ? <SafeImage src={url(member.portrait.src)} alt={member.portrait.alt} className="size-8 shrink-0 rounded-full object-cover" /> : null}
       <span className="min-w-0"><span className="block truncate font-medium">{member.name}</span><span className="text-muted-foreground block truncate">{member.role}</span></span>
     </li>)}</ul> : null}
-    {singleTitle ? <p data-slot="band-single" className="border-border/70 rounded-xl border px-3 py-2 text-xs"><span className="text-muted-foreground">First single</span> <span className="font-medium">{singleTitle}</span></p> : null}
-    {actions.length ? <div className="flex flex-wrap gap-2 pt-1">{actions.map((action) => <button key={action} type="button" onClick={() => onAction?.(action)} disabled={!onAction} className={pillButton}>{action.replaceAll("_", " ")}</button>)}</div> : null}
+    {singleTitle ? <p data-slot="band-single" className="border-border/70 rounded-xl border px-3 py-2 text-xs"><span className="text-muted-foreground">{i18n._({ id: "ui.First single", message: "First single" })}</span> <span className="font-medium">{singleTitle}</span></p> : null}
+    {actions.length ? <div className="flex flex-wrap gap-2 pt-1">{actions.map((action) => <button key={action} type="button" onClick={() => onAction?.(action)} disabled={!onAction} className={pillButton}>{actionLabel(action)}</button>)}</div> : null}
   </article>;
 }

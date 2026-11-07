@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { CheckIcon, CircleAlertIcon, CircleSlashIcon, Loader2Icon, XIcon } from "lucide-react";
 import { cn } from "cn";
@@ -47,9 +48,21 @@ function formatBytes(bytes: number): string {
   return `${unit === 0 ? Math.round(value) : value.toFixed(1)} ${units[unit]}`;
 }
 
+function stateLabel(state: JobProgressItem["state"]): string {
+  switch (state) {
+    case "queued": return i18n._({ id: "ui.queued", message: "queued" });
+    case "running": return i18n._({ id: "ui.running", message: "running" });
+    case "paused": return i18n._({ id: "ui.paused", message: "paused" });
+    case "stalled": return i18n._({ id: "ui.stalled", message: "stalled" });
+    case "verifying": return i18n._({ id: "ui.verifying", message: "verifying" });
+    case "failed": return i18n._({ id: "ui.failed", message: "failed" });
+    case "done": return i18n._({ id: "ui.done", message: "done" });
+  }
+}
+
 function formatEta(seconds: number): string {
   const minutes = Math.max(1, Math.ceil(seconds / 60));
-  return minutes < 60 ? `About ${minutes} ${minutes === 1 ? "minute" : "minutes"} left` : `About ${Math.ceil(minutes / 60)} ${Math.ceil(minutes / 60) === 1 ? "hour" : "hours"} left`;
+  return minutes < 60 ? i18n._({ id: "ui.About {count, plural, one {# minute} other {# minutes}} left", message: "About {count, plural, one {# minute} other {# minutes}} left", values: { count: minutes } }) : i18n._({ id: "ui.About {count, plural, one {# hour} other {# hours}} left", message: "About {count, plural, one {# hour} other {# hours}} left", values: { count: Math.ceil(minutes / 60) } });
 }
 
 export function JobProgress({
@@ -59,8 +72,8 @@ export function JobProgress({
   stageProgress,
   eta,
   onCancel,
-  doneLabel = "done",
-  cancelLabel = "Cancel the job",
+  doneLabel = i18n._({ id: "ui.done", message: "done" }),
+  cancelLabel = i18n._({ id: "ui.Cancel the job", message: "Cancel the job" }),
   outcome,
   elapsedMs,
   completedBytes,
@@ -164,7 +177,7 @@ export function JobProgress({
     totalWeight,
   );
   const finished = stage >= stages.length || outcome !== undefined;
-  const outcomeLabel = outcome?.status === "success" ? doneLabel : outcome?.status;
+  const outcomeLabel = outcome?.status === "success" ? doneLabel : outcome?.status === "partial" ? i18n._({ id: "ui.partial", message: "partial" }) : outcome?.status === "failed" ? i18n._({ id: "ui.failed", message: "failed" }) : outcome?.status === "cancelled" ? i18n._({ id: "ui.cancelled", message: "cancelled" }) : outcome?.status;
   const elapsedLabel = elapsedMs === undefined ? undefined : `${Math.max(0, Math.round(elapsedMs / 1000))}s`;
 
   return (
@@ -225,24 +238,24 @@ export function JobProgress({
 
       {completedBytes !== undefined && totalBytes !== undefined && (
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs">
-          <span className={cn(mono, "text-muted-foreground tabular-nums")}>{formatBytes(completedBytes)} of {formatBytes(totalBytes)}</span>
+          <span className={cn(mono, "text-muted-foreground tabular-nums")}>{i18n._({ id: "ui.{done} of {total}", message: "{done} of {total}", values: { done: formatBytes(completedBytes), total: formatBytes(totalBytes) } })}</span>
           {bytesPerSecond !== undefined && bytesPerSecond > 0 && <span className={cn(mono, "text-muted-foreground tabular-nums")}>{formatBytes(bytesPerSecond)}/s</span>}
           {stableEta !== undefined && !finished && <span className="text-muted-foreground">{formatEta(stableEta)}</span>}
         </div>
       )}
 
       {(downloadState === "paused" || downloadState === "stalled") && onResume && (
-        <button type="button" className={ghostButton} onClick={onResume}>{copy?.resume ?? "Resume"}</button>
+        <button type="button" className={ghostButton} onClick={onResume}>{copy?.resume ?? i18n._({ id: "ui.Resume", message: "Resume" })}</button>
       )}
       {downloadState === "failed" && onRetry && (
-        <button type="button" className={ghostButton} onClick={onRetry}>{copy?.retry ?? "Retry"}</button>
+        <button type="button" className={ghostButton} onClick={onRetry}>{copy?.retry ?? i18n._({ id: "ui.Retry", message: "Retry" })}</button>
       )}
-      {downloadState === "stalled" && <p className="text-muted-foreground text-xs">{copy?.stalled ?? "Download paused after the connection stalled."}</p>}
+      {downloadState === "stalled" && <p className="text-muted-foreground text-xs">{copy?.stalled ?? i18n._({ id: "ui.Download paused after the connection stalled.", message: "Download paused after the connection stalled." })}</p>}
       {downloadState === "failed" && copy?.checksumFailed && downloadStatus?.toLowerCase().includes("checksum") && <p className="text-muted-foreground text-xs">{copy.checksumFailed}</p>}
       {downloadState === "failed" && copy?.outOfSpace && downloadStatus?.toLowerCase().includes("space") && <p className="text-muted-foreground text-xs">{copy.outOfSpace}</p>}
 
       <div className="flex items-center gap-2">
-        <Progress mode="determinate" value={completedBytes !== undefined && totalBytes ? completedBytes / totalBytes * 100 : overall} label={`${title} progress`} />
+        <Progress mode="determinate" value={completedBytes !== undefined && totalBytes ? completedBytes / totalBytes * 100 : overall} label={i18n._({ id: "ui.{title} progress", message: "{title} progress", values: { title } })} />
         {completedBytes !== undefined && totalBytes !== undefined && <span className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}>{announced(completedBytes / Math.max(1, totalBytes) * 100)}%</span>}
       </div>
 
@@ -281,17 +294,17 @@ export function JobProgress({
       </div>
       {items && items.length > 0 && (
         <Sheet open={detailsOpen} onOpenChange={setDetailsOpen}>
-          <SheetTrigger asChild><button type="button" className={ghostButton}>{copy?.details ?? "File details"}</button></SheetTrigger>
+          <SheetTrigger asChild><button type="button" className={ghostButton}>{copy?.details ?? i18n._({ id: "ui.File details", message: "File details" })}</button></SheetTrigger>
           <SheetContent>
             <SheetHeader>
               <SheetTitle>{title}</SheetTitle>
-              <SheetDescription>{copy?.details ?? "Download file progress"}</SheetDescription>
+              <SheetDescription>{copy?.details ?? i18n._({ id: "ui.Download file progress", message: "Download file progress" })}</SheetDescription>
             </SheetHeader>
             <div className="flex flex-col gap-3 px-4">
               {items.map((item) => <div key={item.id} className="flex flex-col gap-1">
-                <div className="flex justify-between gap-3 text-sm"><span className="min-w-0 truncate">{item.label}</span><span className="text-muted-foreground shrink-0">{item.state}</span></div>
-                <Progress mode="determinate" value={item.totalBytes ? item.completedBytes / item.totalBytes * 100 : item.state === "done" ? 100 : 0} label={`${item.label} progress`} />
-                <span className={cn(mono, "text-muted-foreground text-xs")}>{formatBytes(item.completedBytes)} of {formatBytes(item.totalBytes)}</span>
+                <div className="flex justify-between gap-3 text-sm"><span className="min-w-0 truncate">{item.label}</span><span className="text-muted-foreground shrink-0">{stateLabel(item.state)}</span></div>
+                <Progress mode="determinate" value={item.totalBytes ? item.completedBytes / item.totalBytes * 100 : item.state === "done" ? 100 : 0} label={i18n._({ id: "ui.{label} progress", message: "{label} progress", values: { label: item.label } })} />
+                <span className={cn(mono, "text-muted-foreground text-xs")}>{i18n._({ id: "ui.{done} of {total}", message: "{done} of {total}", values: { done: formatBytes(item.completedBytes), total: formatBytes(item.totalBytes) } })}</span>
               </div>)}
             </div>
           </SheetContent>

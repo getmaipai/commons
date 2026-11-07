@@ -4,6 +4,7 @@ import { AlertTriangleIcon, InfoIcon } from "lucide-react";
 import { getIcon, icons } from "../icons";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Badge } from "../ui/badge";
+import { i18n } from "@/kit/i18n"
 
 /** One advice chip ("Bring a jacket"). `icon` is a kit icon name; an unknown or absent name draws no icon. */
 export interface WeatherAdvice {
@@ -24,8 +25,8 @@ export interface WeatherAlert {
 export function WeatherAdviceChips({ advice }: { advice?: readonly WeatherAdvice[] }) {
   if (!advice?.length) return null;
   return (
-    <ul data-slot="weather-advice" aria-label="Recommended" className="flex flex-wrap items-center gap-2">
-      <li data-slot="weather-advice-lead" aria-hidden className="text-xs font-medium tracking-wide uppercase opacity-70">Recommended</li>
+    <ul data-slot="weather-advice" aria-label={i18n._({ id: "ui.Recommended", message: "Recommended" })} className="flex flex-wrap items-center gap-2">
+      <li data-slot="weather-advice-lead" aria-hidden className="text-xs font-medium tracking-wide uppercase opacity-70">{i18n._({ id: "ui.Recommended", message: "Recommended" })}</li>
       {advice.map((item) => {
         const Icon = item.icon && item.icon in icons ? getIcon(item.icon) : null;
         return (

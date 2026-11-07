@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { cn } from "cn";
 import { mono, paper } from "./surfaces";
 import { pct, take } from "./range";
+import { i18n } from "@/kit/i18n";
 
 export type SpanStatus = "running" | "completed" | "failed" | "skipped";
 
@@ -22,6 +23,15 @@ const TONE: Record<SpanStatus, string> = {
   failed: "bg-destructive/80",
   skipped: "bg-muted-foreground/30",
 };
+
+function statusLabel(status: SpanStatus): string {
+  switch (status) {
+    case "running": return i18n._({ id: "ui.running", message: "running" });
+    case "completed": return i18n._({ id: "ui.completed", message: "completed" });
+    case "failed": return i18n._({ id: "ui.failed", message: "failed" });
+    case "skipped": return i18n._({ id: "ui.skipped", message: "skipped" });
+  }
+}
 
 export function TraceWaterfall({
   spans,
@@ -51,7 +61,7 @@ export function TraceWaterfall({
       {...props}
     >
       <div className="flex items-baseline justify-between">
-        <span className="text-[13.5px] font-medium">Trace</span>
+        <span className="text-[13.5px] font-medium">{i18n._({ id: "ui.Trace", message: "Trace" })}</span>
         <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {totalMs}ms
         </span>
@@ -74,7 +84,7 @@ export function TraceWaterfall({
               </span>
               <span
                 role="img"
-                aria-label={`${item.status}, starts at ${item.startMs}ms, runs ${item.durationMs}ms`}
+                aria-label={i18n._({ id: "ui.{status}, starts at {start}ms, runs {duration}ms", message: "{status}, starts at {start}ms, runs {duration}ms", values: { status: statusLabel(item.status), start: item.startMs, duration: item.durationMs } })}
                 className="relative flex h-4 min-w-0 items-center"
               >
                 <span

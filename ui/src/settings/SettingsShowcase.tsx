@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/kit/dashboard/components/ui/select";
 import { Switch } from "@/kit/dashboard/components/ui/switch";
+import { i18n } from "@/kit/i18n";
 
 type Row = {
   title: string;
@@ -28,12 +29,12 @@ type Row = {
   control: "switch-on" | "switch-off" | "select" | "change" | "input";
 };
 
-const ROWS: Row[] = [
-  { title: "Send photos in chat", help: "Let people in this home attach pictures to a message.", control: "switch-on" },
-  { title: "Show pictures in answers", help: "Answers can include images found on the web. Turn this off to see text only, which also keeps the page quieter on a slow connection.", control: "switch-off" },
-  { title: "Safe search", help: "How strictly web results are filtered.", control: "select" },
-  { title: "Library folder", help: "Where the reference library lives.", control: "change" },
-  { title: "Reply length", help: "A number of words to aim for.", control: "input" },
+const rows = (): Row[] => [
+  { title: i18n._({ id: "ui.Send photos in chat", message: "Send photos in chat" }), help: i18n._({ id: "ui.Let people in this home attach pictures to a message.", message: "Let people in this home attach pictures to a message." }), control: "switch-on" },
+  { title: i18n._({ id: "ui.Show pictures in answers", message: "Show pictures in answers" }), help: i18n._({ id: "ui.Answers can include images found on the web. Turn this off to see text only, which also keeps the page quieter on a slow connection.", message: "Answers can include images found on the web. Turn this off to see text only, which also keeps the page quieter on a slow connection." }), control: "switch-off" },
+  { title: i18n._({ id: "ui.Safe search", message: "Safe search" }), help: i18n._({ id: "ui.How strictly web results are filtered.", message: "How strictly web results are filtered." }), control: "select" },
+  { title: i18n._({ id: "ui.Library folder", message: "Library folder" }), help: i18n._({ id: "ui.Where the reference library lives.", message: "Where the reference library lives." }), control: "change" },
+  { title: i18n._({ id: "ui.Reply length", message: "Reply length" }), help: i18n._({ id: "ui.A number of words to aim for.", message: "A number of words to aim for." }), control: "input" },
 ];
 
 function Control({ row }: { row: Row }) {
@@ -49,8 +50,8 @@ function Control({ row }: { row: Row }) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="moderate">Moderate</SelectItem>
-            <SelectItem value="strict">Strict</SelectItem>
+            <SelectItem value="moderate">{i18n._({ id: "ui.Moderate", message: "Moderate" })}</SelectItem>
+            <SelectItem value="strict">{i18n._({ id: "ui.Strict", message: "Strict" })}</SelectItem>
           </SelectContent>
         </Select>
       );
@@ -58,7 +59,7 @@ function Control({ row }: { row: Row }) {
       return (
         <>
           <span className="max-w-48 truncate font-mono text-[13px] text-settings-helper">/srv/library/reference</span>
-          <Button variant="secondary" size="row">Change</Button>
+          <Button variant="secondary" size="row">{i18n._({ id: "ui.Change", message: "Change" })}</Button>
         </>
       );
     case "input":
@@ -68,10 +69,10 @@ function Control({ row }: { row: Row }) {
 
 export function SettingsShowcase() {
   return (
-    <section aria-label="Settings card" className="mx-auto flex w-full max-w-(--settings-content-max) flex-col gap-3">
-      <h3 className="text-[length:var(--settings-section-heading-size)] font-medium">Chat</h3>
+    <section aria-label={i18n._({ id: "ui.Settings card", message: "Settings card" })} className="mx-auto flex w-full max-w-(--settings-content-max) flex-col gap-3">
+      <h3 className="text-[length:var(--settings-section-heading-size)] font-medium">{i18n._({ id: "ui.Chat", message: "Chat" })}</h3>
       <ItemGroup variant="card">
-        {ROWS.map((row, i) => (
+        {rows().map((row, i) => (
           <Fragment key={row.title}>
             {i > 0 && <ItemSeparator variant="inset" />}
             <Item size="setting" className="flex-wrap sm:flex-nowrap">

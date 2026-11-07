@@ -13,6 +13,7 @@
  */
 import type { ReactNode } from "react";
 import { cn } from "@/kit/utils";
+import { i18n } from "@/kit/i18n"
 import { STATUS_TONE_BG } from "./status-colors";
 import {
   Tooltip,
@@ -52,7 +53,7 @@ function UptimeStrip({
   return (
     <div
       role="img"
-      aria-label={ariaLabel ?? summary ?? `Uptime history, ${data.length} days`}
+      aria-label={ariaLabel ?? summary ?? i18n._({ id: "ui.Uptime history, {count, plural, one {# day} other {# days}}", message: "Uptime history, {count, plural, one {# day} other {# days}}", values: { count: data.length } })}
       className={cn("flex w-full items-center gap-1", className)}
     >
       {data.map(({ status, label, detail }, index) => (

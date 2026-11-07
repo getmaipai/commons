@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n, kitLocaleTag } from "@/kit/i18n"
 import { useState } from "react";
 import { SlidersHorizontalIcon } from "lucide-react";
 import { cn } from "cn";
@@ -50,13 +51,9 @@ export type ResultFeedFilter =
 export function feedDayLabel(date: Date, now: Date = new Date()): string {
   const start = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const days = Math.round((start(now) - start(date)) / 86_400_000);
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
-  return date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: date.getFullYear() === now.getFullYear() ? undefined : "numeric" });
-}
-
-function countLabel(n: number): string {
-  return `${n} ${n === 1 ? "clip" : "clips"}`;
+  if (days === 0) return i18n._({ id: "ui.Today", message: "Today" });
+  if (days === 1) return i18n._({ id: "ui.Yesterday", message: "Yesterday" });
+  return date.toLocaleDateString(kitLocaleTag(), { weekday: "short", month: "short", day: "numeric", year: date.getFullYear() === now.getFullYear() ? undefined : "numeric" });
 }
 
 function shorten(text: string, max = 60): string {
@@ -130,11 +127,11 @@ function FilterView({ filters, headingStyle = "default" }: { filters: ResultFeed
   const trigger = (
     <Button type="button" variant="outline" size="sm" data-slot="result-feed-view" aria-haspopup="dialog" aria-expanded={open} onClick={phone ? () => setOpen(true) : undefined}>
       <SlidersHorizontalIcon aria-hidden />
-      View
-      {active > 0 ? <span data-slot="result-feed-view-count" aria-label={`${active} on`} className="bg-primary text-primary-foreground inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs tabular-nums">{active}</span> : null}
+      {i18n._({ id: "ui.View", message: "View" })}
+      {active > 0 ? <span data-slot="result-feed-view-count" aria-label={i18n._({ id: "ui.{active} on", message: "{active} on", values: { active } })} className="bg-primary text-primary-foreground inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs tabular-nums">{active}</span> : null}
     </Button>
   );
-  const body = <div role="group" aria-label="Filter results" className="flex flex-col gap-4"><FilterControls filters={filters} idPrefix="result-feed-view" headingStyle={headingStyle} /></div>;
+  const body = <div role="group" aria-label={i18n._({ id: "ui.Filter results", message: "Filter results" })} className="flex flex-col gap-4"><FilterControls filters={filters} idPrefix="result-feed-view" headingStyle={headingStyle} /></div>;
   return (
     <div data-slot="result-feed-filters" data-presentation="popover" className="flex min-w-0 items-center gap-3">
       {phone ? (
@@ -142,7 +139,7 @@ function FilterView({ filters, headingStyle = "default" }: { filters: ResultFeed
           {trigger}
           <Drawer open={open} onOpenChange={setOpen}>
             <DrawerContent aria-describedby={undefined}>
-              <DrawerHeader><DrawerTitle>View</DrawerTitle></DrawerHeader>
+              <DrawerHeader><DrawerTitle>{i18n._({ id: "ui.View", message: "View" })}</DrawerTitle></DrawerHeader>
               <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">{body}</div>
             </DrawerContent>
           </Drawer>
@@ -150,7 +147,7 @@ function FilterView({ filters, headingStyle = "default" }: { filters: ResultFeed
       ) : (
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-          <PopoverContent width="auto" align="start" aria-label="View" className="w-[min(92vw,20rem)]">{body}</PopoverContent>
+          <PopoverContent width="auto" align="start" aria-label={i18n._({ id: "ui.View", message: "View" })} className="w-[min(92vw,20rem)]">{body}</PopoverContent>
         </Popover>
       )}
       <span className="text-muted-foreground min-w-0 truncate text-sm">{filters.map((f, i) => (i === 0 ? f.label : f.label.toLowerCase())).join(", ")}</span>
@@ -168,7 +165,7 @@ export function ResultFeed({
   entries: allEntries,
   filters = [],
   grouping = "day",
-  label = "Results",
+  label = i18n._({ id: "ui.Results", message: "Results" }),
   empty,
   look = "default",
   filtersPresentation = "inline",
@@ -208,7 +205,7 @@ export function ResultFeed({
     <section data-slot="result-feed" aria-label={label} className={cn("flex w-full flex-col gap-4", media && "@container")} data-look={media ? "media" : undefined}>
       {filters.length > 0 && filtersPresentation === "popover" ? <FilterView filters={filters} headingStyle={headingStyle} /> : null}
       {filters.length > 0 && filtersPresentation !== "popover" ? (
-        <div data-slot="result-feed-filters" role="group" aria-label="Filter results" className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <div data-slot="result-feed-filters" role="group" aria-label={i18n._({ id: "ui.Filter results", message: "Filter results" })} className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <FilterControls filters={filters} idPrefix="result-feed" headingStyle={headingStyle} />
         </div>
       ) : null}
@@ -216,7 +213,7 @@ export function ResultFeed({
       {groups.map((group) => (
         <div key={group.key} data-slot="result-feed-group" className="flex flex-col gap-4">
           {group.label ? (() => {
-            const text = grouping === "words" ? shorten(group.label) : `${group.label}, ${countLabel(group.entries.length)}`;
+            const text = grouping === "words" ? shorten(group.label) : i18n._({ id: "ui.{label}, {count, plural, one {# clip} other {# clips}}", message: "{label}, {count, plural, one {# clip} other {# clips}}", values: { label: group.label, count: group.entries.length } });
             return headingStyle === "eyebrow" ? <h3 data-slot="result-feed-group-heading" className={eyebrow}>{text}</h3> : <DayDivider label={text} />;
           })() : null}
           {(() => {
@@ -235,7 +232,7 @@ export function ResultFeed({
                     <>
                       <p data-slot="result-feed-words" className="text-foreground line-clamp-3 text-sm">{entry.words}</p>
                       {(entry.tags?.length ?? 0) > 0 || (entry.references?.length ?? 0) > 0 ? (
-                        <ul data-slot="result-feed-tags" aria-label="Details" className="flex flex-wrap items-center gap-1.5">
+                        <ul data-slot="result-feed-tags" aria-label={i18n._({ id: "ui.Details", message: "Details" })} className="flex flex-wrap items-center gap-1.5">
                           {entry.references?.map((ref, i) => (
                             <li key={`ref-${i}`}>
                               <Badge variant="outline">

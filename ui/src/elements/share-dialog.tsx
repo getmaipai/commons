@@ -10,6 +10,7 @@ import { Switch } from "../ui/switch";
 import { Avatar } from "../primitives/Avatar";
 import { Avatar as AvatarRoot, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Select } from "../primitives/Select";
+import { i18n } from "@/kit/i18n"
 
 /**
  * LIBRARY-REVAMP-06 slice B. One Share dialog for the household, in the shape ChatGPT's project Share dialog set
@@ -26,8 +27,8 @@ export interface ShareRole {
 
 /** A file is either shared or it is not. */
 export const FILE_SHARE_ROLES: readonly ShareRole[] = [
-  { id: "off", label: "No access" },
-  { id: "view", label: "Can view" },
+  { id: "off", get label() { return i18n._({ id: "ui.No access", message: "No access" }); } },
+  { id: "view", get label() { return i18n._({ id: "ui.Can view", message: "Can view" }); } },
 ];
 
 /** One person, or the whole household, in the dialog. */
@@ -120,18 +121,18 @@ export interface ShareDialogProps {
   className?: string | undefined;
 }
 
-const DEFAULT_LABELS = {
-  title: "Share",
-  description: "Choose who in your home can see this. Nothing is sent outside your home, and you can stop at any time.",
-  empty: "There is no one to share with yet.",
-  household: "Everyone in the home",
-  householdDescription: "People who join later can see it too.",
-  done: "Done",
-  saving: "Saving...",
-  people: "People",
-  confirm: "Share anyway",
-  goBack: "Go back",
-};
+const defaultLabels = () => ({
+  title: i18n._({ id: "ui.Share", message: "Share" }),
+  description: i18n._({ id: "ui.Choose who in your home can see this. Nothing is sent outside your home, and you can stop at any time.", message: "Choose who in your home can see this. Nothing is sent outside your home, and you can stop at any time." }),
+  empty: i18n._({ id: "ui.There is no one to share with yet.", message: "There is no one to share with yet." }),
+  household: i18n._({ id: "ui.Everyone in the home", message: "Everyone in the home" }),
+  householdDescription: i18n._({ id: "ui.People who join later can see it too.", message: "People who join later can see it too." }),
+  done: i18n._({ id: "ui.Done", message: "Done" }),
+  saving: i18n._({ id: "ui.Saving...", message: "Saving..." }),
+  people: i18n._({ id: "ui.People", message: "People" }),
+  confirm: i18n._({ id: "ui.Share anyway", message: "Share anyway" }),
+  goBack: i18n._({ id: "ui.Go back", message: "Go back" }),
+});
 
 function quiet(call: () => void | Promise<void>) {
   // A failed change is the host's to report; the row stays on the stored role.
@@ -170,7 +171,7 @@ export const ShareDialog: FC<ShareDialogProps> = ({
   dataSlot = "share-dialog",
   className,
 }) => {
-  const copy = { ...DEFAULT_LABELS, ...labels };
+  const copy = { ...defaultLabels(), ...labels };
   const ids = useId();
   const confirmRef = useRef<HTMLDivElement | null>(null);
   const before = useRef<HTMLElement | null>(null);

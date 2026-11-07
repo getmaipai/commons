@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/
 import { cn } from "../../../../lib/utils";
 import { hitArea } from "../../../../../utils";
 import { STATUS_TONE_BG } from "../../../../../ui/status-colors";
+import { i18n } from "@/kit/i18n";
 
 export type RailStatusLevel = "online" | "maintenance" | "degraded" | "offline";
 
@@ -61,12 +62,12 @@ const STATUS_DOT: Record<RailStatusLevel, string> = {
 };
 
 /** What the avatar's status dot says, for its tooltip and accessible name. */
-export const STATUS_WORDS: Record<RailStatusLevel, string> = {
-  online: "all good",
-  maintenance: "maintenance",
-  degraded: "degraded",
-  offline: "down",
-};
+export const statusWords = (): Record<RailStatusLevel, string> => ({
+  online: i18n._({ id: "ui.all good", message: "all good" }),
+  maintenance: i18n._({ id: "ui.maintenance", message: "maintenance" }),
+  degraded: i18n._({ id: "ui.degraded", message: "degraded" }),
+  offline: i18n._({ id: "ui.down", message: "down" }),
+});
 
 const rowClass = "h-10 gap-3 rounded-md px-2.5 text-sm [&_svg:not([class*='size-'])]:size-[18px]";
 
@@ -93,7 +94,7 @@ export default function RailProfileMenu({
 }: RailProfileMenuProps) {
   const statusProblem = status !== undefined && (status.level === "degraded" || status.level === "offline");
   const count = (notifications?.count ?? 0) + extraAttention;
-  const systemLine = status ? `System: ${STATUS_WORDS[status.level]}` : null;
+  const systemLine = status ? i18n._({ id: "ui.System: {status}", message: "System: {status}", values: { status: statusWords()[status.level] } }) : null;
   // A count is red only when something urgent waits (CHAT-CALM-ERRORS-01d);
   // anything else gets a neutral count.
   const countTone = notifications?.urgent ? "bg-destructive text-destructive-foreground" : "bg-foreground text-background";
@@ -102,12 +103,13 @@ export default function RailProfileMenu({
   // badge in dark mode. Important keeps the badge's own pair readable.
   const menuCountTone = notifications?.urgent ? "bg-destructive text-destructive-foreground!" : "bg-foreground text-background!";
   const reasons = [
-    notifications && notifications.count > 0 ? `${notifications.count} notification${notifications.count === 1 ? "" : "s"}` : null,
+    notifications && notifications.count > 0 ? i18n._({ id: "ui.{count, plural, one {# notification} other {# notifications}}", message: "{count, plural, one {# notification} other {# notifications}}", values: { count: notifications.count } }) : null,
     systemLine,
-    extraAttention > 0 ? `${extraAttention} waiting for you` : null,
-    incognito?.on ? "Incognito on" : null,
+    extraAttention > 0 ? i18n._({ id: "ui.{count} waiting for you", message: "{count} waiting for you", values: { count: extraAttention } }) : null,
+    incognito?.on ? i18n._({ id: "ui.Incognito on", message: "Incognito on" }) : null,
   ].filter(Boolean);
-  const label = `Open profile menu for ${displayName || "you"}${reasons.length ? ` (${reasons.join(", ")})` : ""}`;
+  const who = displayName || i18n._({ id: "ui.you", message: "you" });
+  const label = reasons.length ? i18n._({ id: "ui.Open profile menu for {who} ({reasons})", message: "Open profile menu for {who} ({reasons})", values: { who, reasons: reasons.join(", ") } }) : i18n._({ id: "ui.Open profile menu for {who}", message: "Open profile menu for {who}", values: { who } });
 
   return (
     <div data-slot="rail-profile" className="relative">
@@ -153,7 +155,7 @@ export default function RailProfileMenu({
           </TooltipTrigger>
           <TooltipContent side="right">
             <span className="flex flex-col">
-              <span>{displayName || "Profile"}</span>
+              <span>{displayName || i18n._({ id: "ui.Profile", message: "Profile" })}</span>
               {systemLine ? <span data-slot="rail-profile-system" className="text-[11px] opacity-75">{systemLine}</span> : null}
             </span>
           </TooltipContent>
@@ -177,18 +179,18 @@ export default function RailProfileMenu({
           {notifications ? (
             <DropdownMenuItem className={rowClass} onClick={notifications.onOpen}>
               <Bell aria-hidden />
-              <span className="flex-1">Notifications</span>
+              <span className="flex-1">{i18n._({ id: "ui.Notifications", message: "Notifications" })}</span>
               {notifications.count > 0 ? (
                 <span data-slot="rail-profile-menu-badge" className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-medium", menuCountTone)}>{notifications.count}</span>
               ) : (
-                <span className="text-[13px] text-muted-foreground">None</span>
+                <span className="text-[13px] text-muted-foreground">{i18n._({ id: "ui.None", message: "None" })}</span>
               )}
             </DropdownMenuItem>
           ) : null}
           {status ? (
             <DropdownMenuItem className={rowClass} render={<Link to={status.href} />}>
               <Activity aria-hidden />
-              <span className="flex-1">System status</span>
+              <span className="flex-1">{i18n._({ id: "ui.System status", message: "System status" })}</span>
               <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
                 <span aria-hidden className={cn("size-2 rounded-full", STATUS_DOT[status.level])} />
                 {status.label}
@@ -203,14 +205,14 @@ export default function RailProfileMenu({
               onClick={() => incognito.onChange(!incognito.on)}
             >
               <VenetianMask aria-hidden className={cn(incognito.on && "text-hue-violet")} />
-              <span className="flex-1">Incognito</span>
-              <span className={cn("text-[13px]", incognito.on ? "font-medium text-hue-violet" : "text-muted-foreground")}>{incognito.on ? "On" : "Off"}</span>
+              <span className="flex-1">{i18n._({ id: "ui.Incognito", message: "Incognito" })}</span>
+              <span className={cn("text-[13px]", incognito.on ? "font-medium text-hue-violet" : "text-muted-foreground")}>{incognito.on ? i18n._({ id: "ui.On", message: "On" }) : i18n._({ id: "ui.Off", message: "Off" })}</span>
             </DropdownMenuItem>
           ) : null}
           <DropdownMenuSeparator className="my-1.5" />
           <DropdownMenuItem className={rowClass} render={<Link to={settingsHref} />}>
             <Settings aria-hidden />
-            Settings
+            {i18n._({ id: "ui.Settings", message: "Settings" })}
           </DropdownMenuItem>
           {homeSettings ? (
             <DropdownMenuItem className={rowClass} render={<Link to={homeSettings.href} />}>
@@ -221,14 +223,14 @@ export default function RailProfileMenu({
           {helpHref ? (
             <DropdownMenuItem className={rowClass} render={<Link to={helpHref} />}>
               <CircleHelp aria-hidden />
-              Help
+              {i18n._({ id: "ui.Help", message: "Help" })}
             </DropdownMenuItem>
           ) : null}
           {helpEntries?.items.length ? (
             <>
               <DropdownMenuItem disabled className="h-8 rounded-md px-2.5 text-xs font-medium text-muted-foreground opacity-100!">{helpEntries.label}</DropdownMenuItem>
               {helpEntries.items.map((item, index) => (
-                <DropdownMenuItem key={`${item.label}-${index}`} className={rowClass} onClick={item.onSelect} aria-label={`${helpEntries.label}: ${item.label}`}>
+                <DropdownMenuItem key={`${item.label}-${index}`} className={rowClass} onClick={item.onSelect} aria-label={i18n._({ id: "ui.{group}: {item}", message: "{group}: {item}", values: { group: helpEntries.label, item: item.label } })}>
                   <CircleHelp aria-hidden />
                   <span className="flex-1">{item.label}</span>
                 </DropdownMenuItem>
@@ -240,7 +242,7 @@ export default function RailProfileMenu({
               <DropdownMenuSeparator className="my-1.5" />
               <DropdownMenuItem className={rowClass} onClick={onLogout}>
                 <LogOut aria-hidden />
-                Log out
+                {i18n._({ id: "ui.Log out", message: "Log out" })}
               </DropdownMenuItem>
             </>
           ) : null}

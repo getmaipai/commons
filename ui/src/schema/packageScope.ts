@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import { i18n } from "@/kit/i18n";
 import { readField } from "@/kit/schema/fieldPath";
 
 // APP-KIND-02: what lets a package's own page run through the interpreter
@@ -26,8 +27,8 @@ export const PageStateContext = createContext<PageStateWriter | null>(null);
  * `recents`) is the sidebar's search box said again, so it is hidden from the kit's `lg` breakpoint up and a phone keeps it. */
 export const PageSidebarContext = createContext(false);
 
-export const PACKAGE_BINDING_REFUSED = "This page can't load that.";
-export const PACKAGE_ACTION_REFUSED = "This page can't do that.";
+export const packageBindingRefused = () => i18n._({ id: "ui.This page can't load that.", message: "This page can't load that." });
+export const packageActionRefused = () => i18n._({ id: "ui.This page can't do that.", message: "This page can't do that." });
 
 /** Dot segments, backslashes, doubled slashes and their percent-encoded forms: anything that could leave a prefix. */
 function climbs(path: string): boolean {

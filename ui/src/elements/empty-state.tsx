@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { ArrowUpIcon } from "lucide-react";
 import { cn } from "cn";
 import { inkButton, paper } from "./surfaces";
+import { i18n } from "@/kit/i18n";
 
 export function EmptyState({ className, ...props }: ComponentProps<"div">) {
   return (
@@ -97,7 +98,7 @@ export function EmptyStateComposer({
       <span className="text-muted-foreground text-[15px]">{placeholder}</span>
       <button
         type="button"
-        aria-label="Send"
+        aria-label={i18n._({ id: "ui.Send", message: "Send" })}
         onClick={onSend}
         disabled={!onSend}
         className={cn(

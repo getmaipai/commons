@@ -10,6 +10,7 @@ import { CircleAlertIcon, RefreshCwIcon } from "lucide-react";
 import { cn } from "cn";
 import { ShimmerLabel } from "./surfaces";
 import { Button } from "./ui/button";
+import { i18n } from "@/kit/i18n";
 
 export interface ErrorStateProps extends Omit<
   ComponentProps<"div">,
@@ -36,9 +37,9 @@ export function ErrorState({
   retrying,
   onRetry,
   layout = "stacked",
-  retryLabel = "Retry",
+  retryLabel = i18n._({ id: "ui.Retry", message: "Retry" }),
   retryDisabled,
-  retryingLabel = "Retrying",
+  retryingLabel = i18n._({ id: "ui.Retrying", message: "Retrying" }),
   className,
   ...props
 }: ErrorStateProps) {

@@ -1,5 +1,6 @@
 import { useCallback, useContext, useMemo, useState } from "react";
 import { request } from "@/kit/http";
+import { i18n } from "@/kit/i18n";
 import { AsyncState } from "@/kit/primitives/AsyncState";
 import { VideoPlayer, type VideoPlayerAction, type VideoPlayerProps, type VideoPlayerStatus } from "@/kit/elements/video-player";
 import { LockTile } from "@/kit/elements/adult-lock";
@@ -34,7 +35,7 @@ export function StudioNodeView({ node, state }: { node: StudioNode; state: Row }
   const query = useBinding<Row | Row[]>(node.bind, state);
   const row = Array.isArray(query.data) ? query.data[0] : query.data;
   return (
-    <AsyncState data={query.data} error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()} errorMessage="Could not open this clip." isEmpty={() => !row} emptyIcon="film" emptyText="Pick a clip to open it in the Studio.">
+    <AsyncState data={query.data} error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()} errorMessage={i18n._({ id: "ui.Could not open this clip.", message: "Could not open this clip." })} isEmpty={() => !row} emptyIcon="film" emptyText={i18n._({ id: "ui.Pick a clip to open it in the Studio.", message: "Pick a clip to open it in the Studio." })}>
       {() => (row ? <StudioRow node={node} state={state} row={row} /> : null)}
     </AsyncState>
   );
@@ -91,7 +92,7 @@ function StudioOpen({ node, state, row }: { node: StudioNode; state: Row; row: R
             const r = reply && typeof reply === "object" ? (reply as Row) : {};
             const src = str(r.src);
             const duration = num(r.duration_s);
-            if (!src || duration === undefined) { reject(new Error("That could not be added. Try again.")); return; }
+            if (!src || duration === undefined) { reject(new Error(i18n._({ id: "ui.That could not be added. Try again.", message: "That could not be added. Try again." }))); return; }
             resolve({ ref: String(r.ref ?? picked?.id ?? kind), src, label: str(r.label), duration_s: duration, poster: str(r.poster) });
           },
           onError: (message) => reject(new Error(message)),
@@ -157,7 +158,7 @@ function ExportCard({ result, state }: { result: NonNullable<StudioNode["export_
   );
   const polled = useFeedPolling({ rows, keyOf, statusOf, runningStatuses: result.poll_while.statuses, readRecord });
   const row = polled[0];
-  if (!row) return <p className="text-muted-foreground p-3 text-sm">Starting the export.</p>;
+  if (!row) return <p className="text-muted-foreground p-3 text-sm">{i18n._({ id: "ui.Starting the export.", message: "Starting the export." })}</p>;
   if (f.locked && readField(row, f.locked) === true) return <LockTile making={f.making ? readField(row, f.making) === true : false} shape="card" />;
   const raw = statusOf(row);
   const src = f.src ? str(readField(row, f.src)) : undefined;

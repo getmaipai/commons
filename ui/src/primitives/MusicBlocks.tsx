@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { i18n } from "@/kit/i18n";
 import { Card } from "@/kit/primitives/Card";
 import { getIcon } from "@/kit/icons";
 import { cn, FOCUS_RING } from "@/kit/utils";
@@ -62,7 +63,7 @@ export function QuickTiles<T>({ items, getKey, getTitle, renderArt, onSelect, on
           </Card>
           {onPlay ? (
             <RoundPlay
-              label={getPlayLabel?.(item) ?? `Play ${getTitle(item)}`}
+              label={getPlayLabel?.(item) ?? i18n._({ id: "ui.Play {title}", message: "Play {title}", values: { title: getTitle(item) } })}
               onPlay={() => onPlay(item)}
               className="absolute end-2 top-1/2 size-9 -translate-y-1/2 opacity-0 group-hover/tile:opacity-100 focus-visible:opacity-100 motion-safe:transition-opacity [@media(hover:none)]:hidden"
             />
@@ -103,7 +104,7 @@ export function TopResultCard({ title, eyebrow, subtitle, art, circle = false, o
           {subtitle ? <span className="text-muted-foreground block truncate text-sm">{subtitle}</span> : null}
         </span>
       </Card>
-      {onPlay ? <RoundPlay label={playLabel ?? `Play ${title}`} onPlay={onPlay} className="absolute end-4 top-1/2 -translate-y-1/2" /> : null}
+      {onPlay ? <RoundPlay label={playLabel ?? i18n._({ id: "ui.Play {title}", message: "Play {title}", values: { title } })} onPlay={onPlay} className="absolute end-4 top-1/2 -translate-y-1/2" /> : null}
     </div>
   );
 }
@@ -183,7 +184,7 @@ export function TrackRows<T>({ items, getKey, getTitle, getSubtitle, getNumber, 
         const group = getGroup?.(item);
         const showGroup = group !== undefined && (i === 0 || group !== getGroup?.(items[i - 1] as T));
         const playing = isPlaying?.(item) ?? false;
-        const name = getPlayLabel?.(item) ?? `Play ${getTitle(item)}`;
+        const name = getPlayLabel?.(item) ?? i18n._({ id: "ui.Play {title}", message: "Play {title}", values: { title: getTitle(item) } });
         const subtitle = getSubtitle?.(item);
         return (
           <li key={getKey(item)} aria-current={playing ? "true" : undefined} className="min-w-0">

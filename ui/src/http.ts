@@ -1,3 +1,4 @@
+import { i18n } from "@/kit/i18n";
 // The one fetch client the kit's own schema interpreter (kit/schema/
 // binding.ts, kit/schema/actions.ts) and settings renderer build on: a
 // `route`-sourced binding or a `call` action target a JSON page authors
@@ -69,7 +70,7 @@ export async function request<T>(path: string, init?: RequestInit & { timeoutMs?
       // Only the timeout's own abort is reported as a timeout - a
       // caller's own signal aborting (a deliberate cancellation) stays
       // a plain AbortError, not a misleading "timed out".
-      if (didTimeOut()) throw new ApiError(`Timed out after ${(timeoutMs ?? 0) / 1000}s`, 0, "timeout");
+      if (didTimeOut()) throw new ApiError(i18n._({ id: "ui.Timed out after {seconds}s", message: "Timed out after {seconds}s", values: { seconds: (timeoutMs ?? 0) / 1000 } }), 0, "timeout");
       throw err;
     }
     throw err;

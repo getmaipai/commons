@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router";
 import { Menu, Settings } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../../../../components/ui/sheet";
 import { RailEntries, type AppRailProps } from "./AppRail";
+import { i18n } from "@/kit/i18n";
 
 export default function MobileNavDrawer({ mobileSections, settingsHref, hideMobileMenu, ...props }: AppRailProps & { mobileSections?: ReactNode; settingsHref?: string; hideMobileMenu?: boolean }) {
   const [open, setOpen] = useState(false);
@@ -33,18 +34,18 @@ export default function MobileNavDrawer({ mobileSections, settingsHref, hideMobi
     };
   }, [hideMobileMenu]);
   return <Sheet open={open} onOpenChange={setOpen}>
-    {!hideMobileMenu ? <SheetTrigger ref={trigger} aria-label="Open menu" data-slot="mobile-menu-button"
+    {!hideMobileMenu ? <SheetTrigger ref={trigger} aria-label={i18n._({ id: "ui.Open menu", message: "Open menu" })} data-slot="mobile-menu-button"
       className="fixed z-40 flex size-12 items-center justify-center rounded-full border border-border bg-sidebar text-sidebar-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-ring"
       style={{ top: "calc(env(safe-area-inset-top, 0px) + 8px)", left: "calc(env(safe-area-inset-left, 0px) + 8px)" }}><Menu aria-hidden className="size-5" /></SheetTrigger> : null}
     <SheetContent side="left" data-slot="mobile-nav-drawer" finalFocus={trigger} className="max-w-full gap-1 overflow-y-auto bg-sidebar p-4 text-sidebar-foreground"
       onClick={(event) => { if ((event.target as Element).closest("a")) setOpen(false); }}>
-      <SheetTitle className="sr-only">App menu</SheetTitle>
+      <SheetTitle className="sr-only">{i18n._({ id: "ui.App menu", message: "App menu" })}</SheetTitle>
       <RailEntries {...props} profile={undefined} mobile>
         {mobileSections ? <div className="mt-3 border-t border-border pt-3">{mobileSections}</div> : null}
       </RailEntries>
       <div className="mt-auto flex shrink-0 items-center justify-between border-t border-border pt-3">
         {props.profile}
-        {settingsHref ? <Link to={settingsHref} aria-label="Settings" className="flex size-12 items-center justify-center rounded-lg hover:bg-foreground/5"><Settings aria-hidden className="size-5" /></Link> : null}
+        {settingsHref ? <Link to={settingsHref} aria-label={i18n._({ id: "ui.Settings", message: "Settings" })} className="flex size-12 items-center justify-center rounded-lg hover:bg-foreground/5"><Settings aria-hidden className="size-5" /></Link> : null}
       </div>
     </SheetContent>
   </Sheet>;

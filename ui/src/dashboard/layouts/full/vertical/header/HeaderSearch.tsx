@@ -6,6 +6,7 @@ import { cn } from "../../../../lib/utils";
 import { CommandPaletteDialog, type PaletteCommand, type PaletteTab } from "../../../../../elements/command-palette";
 import SidebarContent, { type ChildItem } from "../../vertical/sidebar/sidebaritems";
 import { hitArea } from "../../../../../utils";
+import { i18n } from "@/kit/i18n";
 
 interface FlatItem {
   key: string;
@@ -116,17 +117,16 @@ const KIND_ICONS: Record<string, ReactNode> = {
 };
 
 const ASK_ID = "ask";
-const WEB_TAB: PaletteTab = { id: "web", label: "Web", submit: true };
-const WEB_HINT = "Press Enter to search the web";
-const WEB_IDLE = "Nothing is sent to the web until you press Enter.";
-const WEB_FAILED = "Web search did not answer. Try again in a moment.";
+const webTab = (): PaletteTab => ({ id: "web", label: i18n._({ id: "ui.Web", message: "Web" }), submit: true });
+const webIdle = () => i18n._({ id: "ui.Nothing is sent to the web until you press Enter.", message: "Nothing is sent to the web until you press Enter." });
+const webFailed = () => i18n._({ id: "ui.Web search did not answer. Try again in a moment.", message: "Web search did not answer. Try again in a moment." });
 type WebState = { status: "idle" } | { status: "loading" | "done"; query: string; results: SearchResult[]; note?: string };
 
 // A result's kind decides its tab; every kind not named here is a page or record in Home.
-const TABS: readonly PaletteTab[] = [
-  { id: "all", label: "All" },
-  { id: "chats", label: "Chats" },
-  { id: "files", label: "Files" },
+const tabs = (): readonly PaletteTab[] => [
+  { id: "all", label: i18n._({ id: "ui.All", message: "All" }) },
+  { id: "chats", label: i18n._({ id: "ui.Chats", message: "Chats" }) },
+  { id: "files", label: i18n._({ id: "ui.Files", message: "Files" }) },
   { id: "wikipedia", label: "Wikipedia" },
   { id: "home", label: "Home" },
 ];
@@ -210,7 +210,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
       if (web.status === "done" && web.query.toLowerCase() === trimmed) {
         for (const result of web.results) {
           const id = `web:${result.id}`;
-          out.push({ id, label: result.title, group: "Web", keys: [], icon: <Globe />, ...richOf(result) });
+          out.push({ id, label: result.title, group: i18n._({ id: "ui.Web", message: "Web" }), keys: [], icon: <Globe />, ...richOf(result) });
           to.set(id, result.href);
         }
       }
@@ -218,11 +218,11 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
     }
     if (trimmed === "") {
       for (const { item, heading } of pages) {
-        out.push({ id: `page:${item.key}`, label: item.name, group: heading || "Pages", keys: [], icon: item.icon ? <item.icon /> : undefined });
+        out.push({ id: `page:${item.key}`, label: item.name, group: heading || i18n._({ id: "ui.Pages", message: "Pages" }), keys: [], icon: item.icon ? <item.icon /> : undefined });
         to.set(`page:${item.key}`, item.url);
       }
       for (const result of recents ?? []) {
-        out.push({ id: `recent:${result.id}`, label: result.title, group: "Recent", keys: [], subtitle: result.subtitle, icon: KIND_ICONS[result.kind] });
+        out.push({ id: `recent:${result.id}`, label: result.title, group: i18n._({ id: "ui.Recent", message: "Recent" }), keys: [], subtitle: result.subtitle, icon: KIND_ICONS[result.kind] });
         to.set(`recent:${result.id}`, result.href);
       }
       return { commands: out, hrefs: to };
@@ -230,7 +230,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
     for (const { item } of tab === "all" || tab === "home" ? pages : []) {
       const at = item.name.toLowerCase().indexOf(trimmed);
       if (at < 0) continue;
-      out.push({ id: `page:${item.key}`, label: item.name, group: "Pages", keys: [], icon: item.icon ? <item.icon /> : undefined, match: [at, at + trimmed.length] });
+      out.push({ id: `page:${item.key}`, label: item.name, group: i18n._({ id: "ui.Pages", message: "Pages" }), keys: [], icon: item.icon ? <item.icon /> : undefined, match: [at, at + trimmed.length] });
       to.set(`page:${item.key}`, item.url);
     }
     for (const group of remoteGroups) {
@@ -241,7 +241,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
         to.set(id, result.href);
       }
     }
-    if (onAsk && tab === "all") out.push({ id: ASK_ID, label: `Ask: ${query.trim()}`, group: "Ask", keys: [], icon: <MessageCircle /> });
+    if (onAsk && tab === "all") out.push({ id: ASK_ID, label: i18n._({ id: "ui.Ask: {query}", message: "Ask: {query}", values: { query: query.trim() } }), group: i18n._({ id: "ui.Ask", message: "Ask" }), keys: [], icon: <MessageCircle /> });
     return { commands: out, hrefs: to };
   }, [query, pages, recents, remoteGroups, onAsk, tab, web]);
 
@@ -277,7 +277,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
         if (webRequestRef.current === id) setWeb({ status: "done", query: text, results: response.results, note: response.note });
       })
       .catch(() => {
-        if (webRequestRef.current === id) setWeb({ status: "done", query: text, results: [], note: WEB_FAILED });
+        if (webRequestRef.current === id) setWeb({ status: "done", query: text, results: [], note: webFailed() });
       });
   }
 
@@ -298,20 +298,20 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
   const onWebTab = tab === "web" && query.trim() !== "";
   const webMatches = web.status !== "idle" && web.query.toLowerCase() === query.trim().toLowerCase();
   const emptyMessage = scope && query.trim() === ""
-    ? `Type to search ${scope.label}.`
+    ? i18n._({ id: "ui.Type to search {label}.", message: "Type to search {label}.", values: { label: scope.label } })
     : !onWebTab
-    ? "No results found."
+    ? i18n._({ id: "ui.No results found.", message: "No results found." })
     : !webMatches
-      ? WEB_IDLE
+      ? webIdle()
       : web.status === "loading"
-        ? "Searching the web..."
-        : (web.status === "done" && web.note) || "No web results found.";
+        ? i18n._({ id: "ui.Searching the web...", message: "Searching the web..." })
+        : (web.status === "done" && web.note) || i18n._({ id: "ui.No web results found.", message: "No web results found." });
 
   return (
     <>
       <Button
         variant={scope ? "outline" : "ghost"}
-        aria-label={scope ? `Search ${scope.label}` : "Search"}
+        aria-label={scope ? i18n._({ id: "ui.Search {label}", message: "Search {label}", values: { label: scope.label } }) : i18n._({ id: "ui.Search", message: "Search" })}
         // 40px artwork plus the shared kit's 48px hit area (owner ruling 2026-09-27, SHELL-09). A scoped trigger is a
         // 288 px field from 900 px up and the same 40 px circle below it.
         className={cn(
@@ -323,13 +323,13 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
         onClick={() => setOpen(true)}
       >
         <SearchIcon className="size-5 shrink-0" />
-        {scope && <span className="hidden min-[900px]:inline truncate">Search {scope.label}</span>}
+        {scope && <span className="hidden min-[900px]:inline truncate">{i18n._({ id: "ui.Search {label}", message: "Search {label}", values: { label: scope.label } })}</span>}
       </Button>
       <CommandPaletteDialog
         open={open}
         onOpenChange={onOpenChange}
-        title={scope ? `Search ${scope.label}` : "Search"}
-        placeholder={scope ? `Search ${scope.label}...` : "Search..."}
+        title={scope ? i18n._({ id: "ui.Search {label}", message: "Search {label}", values: { label: scope.label } }) : i18n._({ id: "ui.Search", message: "Search" })}
+        placeholder={scope ? i18n._({ id: "ui.Search {label}...", message: "Search {label}...", values: { label: scope.label } }) : i18n._({ id: "ui.Search...", message: "Search..." })}
         emptyMessage={emptyMessage}
         prefiltered
         size={size}
@@ -339,12 +339,12 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
         onQueryChange={setQuery}
         onActiveChange={setActiveId}
         onRun={run}
-        tabs={scope || query.trim() === "" ? undefined : webSearch ? [...TABS, WEB_TAB] : TABS}
+        tabs={scope || query.trim() === "" ? undefined : webSearch ? [...tabs(), webTab()] : tabs()}
         activeTab={tab}
         onTabChange={setTab}
         onSubmitQuery={submitWeb}
         submittedQuery={webMatches ? web.query : undefined}
-        footer={onWebTab ? `${WEB_HINT} · Esc to close` : scope ? `Search ${scope.label} · Esc to close` : "Search anywhere in Home · Esc to close"}
+        footer={onWebTab ? i18n._({ id: "ui.Press Enter to search the web · Esc to close", message: "Press Enter to search the web · Esc to close" }) : scope ? i18n._({ id: "ui.Search {label} · Esc to close", message: "Search {label} · Esc to close", values: { label: scope.label } }) : i18n._({ id: "ui.Search anywhere in Home · Esc to close", message: "Search anywhere in Home · Esc to close" })}
       />
     </>
   );

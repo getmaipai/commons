@@ -3,6 +3,7 @@ import { Skeleton } from "@/kit/ui/skeleton";
 import { getIcon } from "@/kit/icons";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import type { WidgetItem } from "@/kit/widgets";
+import { i18n } from "@/kit/i18n";
 
 interface WidgetRowProps {
   title: string;
@@ -38,7 +39,7 @@ export function WidgetRow({ title, items, isLoading }: WidgetRowProps) {
       {isLoading ? (
         <Skeleton className="h-4 flex-1" />
       ) : !items || items.length === 0 ? (
-        <span className="text-sm text-muted-foreground">Nothing here yet.</span>
+        <span className="text-sm text-muted-foreground">{i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}</span>
       ) : (
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane.tsx's own precedent).
         <ul tabIndex={0} className={cn("flex min-w-0 flex-1 items-center gap-4 overflow-x-auto", FOCUS_RING)}>

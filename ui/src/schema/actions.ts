@@ -1,4 +1,5 @@
 import { useCallback, useContext, useState } from "react";
+import { i18n } from "@/kit/i18n"
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { request } from "@/kit/http";
@@ -6,13 +7,13 @@ import { fillTemplate, fillTemplateDeep } from "@/kit/schema/fieldPath";
 import type { Action } from "@/kit/schema/types";
 import {
   PackageScopeContext,
-  PACKAGE_ACTION_REFUSED,
+  packageActionRefused,
   reportPageRejected,
   underAppRoute,
   underPluginApi,
   type PackageScope,
 } from "@/kit/schema/packageScope";
-import { ADULT_ONLY_PAGE_ONLY, MediaHostContext, PLAY_UNAVAILABLE, type MediaHost } from "@/kit/schema/mediaHost";
+import { adultOnlyPageOnly, MediaHostContext, playUnavailable, type MediaHost } from "@/kit/schema/mediaHost";
 
 /** How a dispatch runs. `quiet`: no refetch of the page's bindings and no error under the node (a player's progress
  * report every 10 s). `keepalive`: a `call` survives the page closing (the last progress report on unload). */
@@ -46,7 +47,7 @@ async function runAction(
     // APP-KIND-02: a package page navigates only inside its own app.
     if (scope && !underAppRoute(to, scope.packageId)) {
       reportPageRejected();
-      throw new Error(PACKAGE_ACTION_REFUSED);
+      throw new Error(packageActionRefused());
     }
     navigate(to, action.navigate.state ? { state: { pageState: fillTemplateDeep(action.navigate.state, item) } } : undefined);
     return;
@@ -56,7 +57,7 @@ async function runAction(
     // APP-KIND-02: and calls only under its own API prefix.
     if (scope && !underPluginApi(target, scope.packageId)) {
       reportPageRejected();
-      throw new Error(PACKAGE_ACTION_REFUSED);
+      throw new Error(packageActionRefused());
     }
     const args = action.call.args ? fillTemplateDeep(action.call.args, item, options.typedArgs) : undefined;
     const reply = await request<unknown>(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined, keepalive: options.keepalive });
@@ -71,9 +72,9 @@ async function runAction(
   if ("play" in action) {
     // MEDIA-PLAYER-01: hand the item to the host's player (mediaHost.ts). A package page reaches only its own rows, so
     // the id came from its own data; the host still decides whether this person may play it.
-    if (!host) throw new Error(PLAY_UNAVAILABLE);
+    if (!host) throw new Error(playUnavailable());
     // ADULT-LOCK-01: an adult-only item never goes to the host's player (no dock, no audio session, no Now Playing).
-    if (item.adult_only === true) throw new Error(ADULT_ONLY_PAGE_ONLY);
+    if (item.adult_only === true) throw new Error(adultOnlyPageOnly());
     // HANDOFF-01c: a start position, a number or a `{field}` string, passed on only when it resolves to a finite number >= 0.
     const raw = action.play.position_s;
     const resolved = typeof raw === "string" ? fillTemplate(raw, item).trim() : raw;
@@ -198,7 +199,7 @@ export function useDispatchAction(): {
       setLastError(null);
       void runAndInvalidate(action, items, options)
         .then(() => options.onSuccess?.())
-        .catch((e: unknown) => { const message = e instanceof Error ? e.message : "Something went wrong."; setLastError(message); options.onError?.(message); })
+        .catch((e: unknown) => { const message = e instanceof Error ? e.message : i18n._({ id: "ui.Something went wrong.", message: "Something went wrong." }); setLastError(message); options.onError?.(message); })
         .finally(() => onSettled?.());
     },
     [runAndInvalidate],
@@ -220,7 +221,7 @@ export function useDispatchAction(): {
               pending.onSettled?.();
               setPending(null);
             })
-            .catch((e: unknown) => setError(e instanceof Error ? e.message : "Something went wrong."))
+            .catch((e: unknown) => setError(e instanceof Error ? e.message : i18n._({ id: "ui.Something went wrong.", message: "Something went wrong." })))
             .finally(() => setBusy(false));
         },
         cancel() {

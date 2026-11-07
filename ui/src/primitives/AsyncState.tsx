@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { ErrorState } from "@/kit/elements/error-state";
 import { EmptyState } from "@/kit/primitives/EmptyState";
 import { RouteSkeleton } from "@/kit/primitives/RouteSkeleton";
+import { i18n } from "@/kit/i18n"
 
 interface AsyncStateProps<T> {
   /** `undefined` means still loading, `null` means the fetch itself
@@ -47,13 +48,13 @@ export function AsyncState<T>({
   error,
   isFetching,
   onRetry,
-  errorMessage = "Something went wrong.",
+  errorMessage = i18n._({ id: "ui.Something went wrong.", message: "Something went wrong." }),
   emptyIcon = "inbox",
-  emptyText = "Nothing here yet.",
+  emptyText = i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." }),
   emptyActionLabel,
   onEmptyAction,
   isEmpty,
-  loadingLabel = "Loading",
+  loadingLabel = i18n._({ id: "ui.Loading", message: "Loading" }),
   children,
 }: AsyncStateProps<T>) {
   const loading = <RouteSkeleton label={loadingLabel} />;
@@ -71,7 +72,7 @@ export function AsyncState<T>({
           title={errorMessage}
           retrying={false}
           onRetry={onRetry}
-          retryLabel="Try again"
+          retryLabel={i18n._({ id: "ui.Try again", message: "Try again" })}
         />
       </div>
     );

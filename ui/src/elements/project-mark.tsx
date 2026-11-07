@@ -5,6 +5,7 @@ import { cn } from "cn";
 import { getIcon } from "../icons";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { i18n } from "@/kit/i18n";
 
 /**
  * PROJECTS-KIT-01. The one drawing of a project's icon and colour: the
@@ -68,7 +69,48 @@ export type ProjectIconPickerLabels = {
   hues?: Partial<Record<ProjectHue, string>>;
 };
 
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const hueName = (hue: ProjectHue): string => {
+  switch (hue) {
+    case "neutral": return i18n._({ id: "ui.Neutral", message: "Neutral" });
+    case "blue": return i18n._({ id: "ui.Blue", message: "Blue" });
+    case "violet": return i18n._({ id: "ui.Violet", message: "Violet" });
+    case "teal": return i18n._({ id: "ui.Teal", message: "Teal" });
+    case "orange": return i18n._({ id: "ui.Orange", message: "Orange" });
+    case "pink": return i18n._({ id: "ui.Pink", message: "Pink" });
+    case "red": return i18n._({ id: "ui.Red", message: "Red" });
+    case "green": return i18n._({ id: "ui.Green", message: "Green" });
+    case "yellow": return i18n._({ id: "ui.Yellow", message: "Yellow" });
+  }
+};
+
+const iconName = (name: ProjectIconName): string => {
+  switch (name) {
+    case "folder": return i18n._({ id: "ui.Folder", message: "Folder" });
+    case "book": return i18n._({ id: "ui.Book", message: "Book" });
+    case "briefcase": return i18n._({ id: "ui.Briefcase", message: "Briefcase" });
+    case "home": return i18n._({ id: "ui.Home", message: "Home" });
+    case "heart": return i18n._({ id: "ui.Heart", message: "Heart" });
+    case "star": return i18n._({ id: "ui.Star", message: "Star" });
+    case "graduation-cap": return i18n._({ id: "ui.Graduation cap", message: "Graduation cap" });
+    case "calendar": return i18n._({ id: "ui.Calendar", message: "Calendar" });
+    case "camera": return i18n._({ id: "ui.Camera", message: "Camera" });
+    case "music": return i18n._({ id: "ui.Music", message: "Music" });
+    case "code": return i18n._({ id: "ui.Code", message: "Code" });
+    case "chef-hat": return i18n._({ id: "ui.Chef hat", message: "Chef hat" });
+    case "plane": return i18n._({ id: "ui.Plane", message: "Plane" });
+    case "dumbbell": return i18n._({ id: "ui.Dumbbell", message: "Dumbbell" });
+    case "leaf": return i18n._({ id: "ui.Leaf", message: "Leaf" });
+    case "paw-print": return i18n._({ id: "ui.Paw print", message: "Paw print" });
+    case "gamepad": return i18n._({ id: "ui.Gamepad", message: "Gamepad" });
+    case "palette": return i18n._({ id: "ui.Palette", message: "Palette" });
+    case "wrench": return i18n._({ id: "ui.Wrench", message: "Wrench" });
+    case "file-text": return i18n._({ id: "ui.File text", message: "File text" });
+    case "sparkles": return i18n._({ id: "ui.Sparkles", message: "Sparkles" });
+    case "globe": return i18n._({ id: "ui.Globe", message: "Globe" });
+    case "baby": return i18n._({ id: "ui.Baby", message: "Baby" });
+    case "gift": return i18n._({ id: "ui.Gift", message: "Gift" });
+  }
+};
 
 /**
  * The icon button beside a project's name field (ChatGPT's project
@@ -84,9 +126,9 @@ export const ProjectIconPicker: FC<{
 }> = ({ icon, color, onChange, disabled, labels }) => {
   const [open, setOpen] = useState(false);
   const text = {
-    open: labels?.open ?? "Choose icon and colour",
-    icon: labels?.icon ?? "Icon",
-    color: labels?.color ?? "Colour",
+    open: labels?.open ?? i18n._({ id: "ui.Choose icon and colour", message: "Choose icon and colour" }),
+    icon: labels?.icon ?? i18n._({ id: "ui.Icon", message: "Icon" }),
+    color: labels?.color ?? i18n._({ id: "ui.Colour", message: "Colour" }),
   };
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -111,7 +153,7 @@ export const ProjectIconPicker: FC<{
           className="flex flex-wrap gap-1"
         >
           {PROJECT_HUES.map((hue) => (
-            <ToggleGroupItem key={hue} value={hue} aria-label={labels?.hues?.[hue] ?? cap(hue)} size="sm">
+            <ToggleGroupItem key={hue} value={hue} aria-label={labels?.hues?.[hue] ?? hueName(hue)} size="sm">
               <span aria-hidden className="size-4 rounded-full" style={{ backgroundColor: projectHueVar(hue) }} />
             </ToggleGroupItem>
           ))}
@@ -125,7 +167,7 @@ export const ProjectIconPicker: FC<{
           className="flex flex-wrap gap-1"
         >
           {PROJECT_ICON_NAMES.map((name) => (
-            <ToggleGroupItem key={name} value={name} aria-label={cap(name.replace(/-/g, " "))} size="sm">
+            <ToggleGroupItem key={name} value={name} aria-label={iconName(name)} size="sm">
               <ProjectMark icon={name} color={color} />
             </ToggleGroupItem>
           ))}

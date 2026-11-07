@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as Rea
 import { Button } from "@/kit/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import { getIcon } from "@/kit/icons";
+import { i18n } from "@/kit/i18n";
 import { openReader, type ReaderAppearance, type ReaderEngine, type ReaderPosition, type ReaderTocEntry } from "@/kit/primitives/readerEngines";
 import { READER_DEBOUNCE_MS, READER_FONT_SIZES, readerLocator, readerShortcut, sameOriginBookUrl, type ReaderFormat, type ReaderLocator, type ReaderTheme } from "@/kit/primitives/readerLogic";
 
@@ -32,7 +33,7 @@ function readAppearance(root: HTMLElement, step: number): ReaderAppearance {
   };
 }
 
-export function Reader({ src, format, locator, onLocatorChange, theme = "paper", fontSize = 1, onClose, title = "Reader" }: ReaderProps) {
+export function Reader({ src, format, locator, onLocatorChange, theme = "paper", fontSize = 1, onClose, title = i18n._({ id: "ui.Reader", message: "Reader" }) }: ReaderProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<ReaderEngine | null>(null);
@@ -146,22 +147,22 @@ export function Reader({ src, format, locator, onLocatorChange, theme = "paper",
     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-noninteractive-element-interactions
     <div ref={rootRef} data-slot="reader" data-reader-theme={theme} role="region" aria-label={title} tabIndex={0} onKeyDown={key}>
       <div data-slot="reader-topbar" hidden={!barVisible}>
-        {onClose ? <Button variant="ghost" size="icon" aria-label="Close reader" onClick={() => { flushRef.current(); onClose(); }}><Close /></Button> : null}
+        {onClose ? <Button variant="ghost" size="icon" aria-label={i18n._({ id: "ui.Close reader", message: "Close reader" })} onClick={() => { flushRef.current(); onClose(); }}><Close /></Button> : null}
         <span className="min-w-0 flex-1 truncate text-base font-semibold">{title}</span>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Table of contents" disabled={!ready || toc.length === 0}><Contents /></Button></DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={i18n._({ id: "ui.Table of contents", message: "Table of contents" })} disabled={!ready || toc.length === 0}><Contents /></Button></DropdownMenuTrigger>
           <DropdownMenuContent container={rootRef.current} data-reader-toc>
             {toc.map((entry) => <DropdownMenuItem key={entry.id} className="min-h-[48px]" style={{ paddingInlineStart: `${12 + entry.depth * 16}px` }} onSelect={() => { void engineRef.current?.goTo(entry.target).catch(() => setError(true)); }}>{entry.label}</DropdownMenuItem>)}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
       <div ref={viewportRef} data-slot="reader-pages" aria-busy={!ready && !error} />
-      {error ? <p role="alert" data-slot="reader-notice">Could not open this book. Close it and try again.</p> : !ready ? <p role="status" data-slot="reader-notice">Opening book...</p> : null}
+      {error ? <p role="alert" data-slot="reader-notice">{i18n._({ id: "ui.Could not open this book. Close it and try again.", message: "Could not open this book. Close it and try again." })}</p> : !ready ? <p role="status" data-slot="reader-notice">{i18n._({ id: "ui.Opening book...", message: "Opening book..." })}</p> : null}
       <div data-slot="reader-footer">
-        <Button variant="ghost" size="icon" aria-label="Previous page" disabled={!ready || position?.atStart} onClick={() => move(-1)}><Previous /></Button>
-        <span role="status" aria-live="polite" className="flex-1 text-center text-base tabular-nums">{position ? `${position.page ? `Page ${position.page} of ${position.pages} · ` : ""}${Math.round(position.percent)}%` : ""}</span>
-        <Button variant="ghost" aria-label={barVisible ? "Hide reader toolbar" : "Show reader toolbar"} aria-expanded={barVisible} onClick={() => setBarVisible((visible) => !visible)}>Menu</Button>
-        <Button variant="ghost" size="icon" aria-label="Next page" disabled={!ready || position?.atEnd} onClick={() => move(1)}><Next /></Button>
+        <Button variant="ghost" size="icon" aria-label={i18n._({ id: "ui.Previous page", message: "Previous page" })} disabled={!ready || position?.atStart} onClick={() => move(-1)}><Previous /></Button>
+        <span role="status" aria-live="polite" className="flex-1 text-center text-base tabular-nums">{position ? (position.page ? i18n._({ id: "ui.Page {page} of {pages} · {percent}%", message: "Page {page} of {pages} · {percent}%", values: { page: position.page, pages: position.pages, percent: Math.round(position.percent) } }) : i18n._({ id: "ui.{percent}%", message: "{percent}%", values: { percent: Math.round(position.percent) } })) : ""}</span>
+        <Button variant="ghost" aria-label={barVisible ? i18n._({ id: "ui.Hide reader toolbar", message: "Hide reader toolbar" }) : i18n._({ id: "ui.Show reader toolbar", message: "Show reader toolbar" })} aria-expanded={barVisible} onClick={() => setBarVisible((visible) => !visible)}>{i18n._({ id: "ui.Menu", message: "Menu" })}</Button>
+        <Button variant="ghost" size="icon" aria-label={i18n._({ id: "ui.Next page", message: "Next page" })} disabled={!ready || position?.atEnd} onClick={() => move(1)}><Next /></Button>
       </div>
     </div>
   );

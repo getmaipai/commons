@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
+import { i18n } from "@/kit/i18n";
 import type { ReactNode } from "react";
 import { CheckIcon } from "lucide-react";
 import { cn } from "cn";
@@ -87,7 +88,7 @@ export function RecommendationCard({
                   onClick={onAlternatives}
                   className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
                 >
-                  Alternatives
+                  {i18n._({ id: "ui.Alternatives", message: "Alternatives" })}
                 </button>
               )}
               {onAccept && (
@@ -99,7 +100,7 @@ export function RecommendationCard({
                     "flex h-8 items-center rounded-full px-3.5 text-xs font-medium",
                   )}
                 >
-                  Accept
+                  {i18n._({ id: "ui.Accept", message: "Accept" })}
                 </button>
               )}
             </div>

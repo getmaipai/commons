@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import { Button } from "@/kit/ui/button";
 
 /** One answer the host offers while a job is held (queued). The host owns what it does. */
@@ -15,7 +16,7 @@ export type PendingAction = {
 export function PendingActions({ actions, className }: { actions?: PendingAction[]; className?: string }) {
   if (!actions || actions.length === 0) return null;
   return (
-    <div data-slot="pending-actions" role="group" aria-label="Choose what happens" className={`flex flex-wrap items-center gap-2 ${className ?? ""}`.trim()}>
+    <div data-slot="pending-actions" role="group" aria-label={i18n._({ id: "ui.Choose what happens", message: "Choose what happens" })} className={`flex flex-wrap items-center gap-2 ${className ?? ""}`.trim()}>
       {actions.map(action => (
         <Button key={action.label} type="button" size="sm" variant={action.variant ?? "outline"} disabled={action.disabled} className="min-h-10" onClick={action.onSelect}>
           {action.label}

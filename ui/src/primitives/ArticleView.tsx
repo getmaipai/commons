@@ -1,4 +1,5 @@
 import { getIcon } from "@/kit/icons";
+import { i18n, kitLocaleTag } from "@/kit/i18n";
 import { Fragment, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Badge } from "@/kit/dashboard/components/ui/badge";
 import { Button } from "@/kit/dashboard/components/ui/button";
@@ -102,7 +103,7 @@ export function formatBylineDate(publishedAt: string): string {
   const date = dateOnly
     ? new Date(Number(publishedAt.slice(0, 4)), Number(publishedAt.slice(5, 7)) - 1, Number(publishedAt.slice(8, 10)))
     : new Date(publishedAt);
-  return new Intl.DateTimeFormat(undefined, dateOnly
+  return new Intl.DateTimeFormat(kitLocaleTag(), dateOnly
     ? { month: "short", day: "numeric", year: "numeric" }
     : { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(date);
 }
@@ -249,10 +250,10 @@ function KeyPoints({ text, loading }: { text?: string; loading: boolean }) {
   const bullets = lines.map(bulletOf).filter((line): line is string => line !== null);
   const shown = all ? bullets : bullets.slice(0, KEY_POINTS_SHOWN);
   return (
-    <section data-slot="key-points" aria-label="Key points" className="bg-muted/60 border-border flex w-full flex-col gap-3 rounded-xl border p-4">
+    <section data-slot="key-points" aria-label={i18n._({ id: "ui.Key points", message: "Key points" })} className="bg-muted/60 border-border flex w-full flex-col gap-3 rounded-xl border p-4">
       <div className="flex items-center gap-2">
         <SparklesIcon aria-hidden className="text-primary size-4" />
-        <h3 className="text-sm font-semibold">Key points</h3>
+        <h3 className="text-sm font-semibold">{i18n._({ id: "ui.Key points", message: "Key points" })}</h3>
       </div>
       {text ? (
         <>
@@ -268,17 +269,17 @@ function KeyPoints({ text, loading }: { text?: string; loading: boolean }) {
             </ul>
           ) : null}
           {bullets.length > KEY_POINTS_SHOWN ? (
-            <Button variant="ghost" size="sm" className="-ml-2 w-fit" aria-expanded={all} onClick={() => setAll((was) => !was)}>{all ? "Show fewer" : `Show all ${bullets.length}`}</Button>
+            <Button variant="ghost" size="sm" className="-ml-2 w-fit" aria-expanded={all} onClick={() => setAll((was) => !was)}>{all ? i18n._({ id: "ui.Show fewer", message: "Show fewer" }) : i18n._({ id: "ui.Show all {count}", message: "Show all {count}", values: { count: bullets.length } })}</Button>
           ) : null}
         </>
-      ) : loading ? <p className="text-muted-foreground text-sm" aria-live="polite">Writing the key points…</p> : null}
+      ) : loading ? <p className="text-muted-foreground text-sm" aria-live="polite">{i18n._({ id: "ui.Writing the key points…", message: "Writing the key points…" })}</p> : null}
     </section>
   );
 }
 
 function minutes(seconds: number): string {
   const m = Math.max(1, Math.round(seconds / 60));
-  return `${m} min read`;
+  return i18n._({ id: "ui.{minutes} min read", message: "{minutes} min read", values: { minutes: m } });
 }
 
 /**
@@ -295,8 +296,8 @@ function RelatedInitial({ title }: { title: string }) {
 /** The rail's Related list: a thumbnail and a title per row; the title is the book link and stretches over the row. */
 function ArticleRelated({ items, renderTargetLink }: { items: NonNullable<ArticleViewData["related"]>; renderTargetLink?: ArticleViewProps["renderTargetLink"] }) {
   return (
-    <section data-slot="article-related" aria-label="Related" className="flex flex-col gap-2">
-      <h3 className="text-lg font-semibold">Related</h3>
+    <section data-slot="article-related" aria-label={i18n._({ id: "ui.Related", message: "Related" })} className="flex flex-col gap-2">
+      <h3 className="text-lg font-semibold">{i18n._({ id: "ui.Related", message: "Related" })}</h3>
       <ul className="flex flex-col gap-1">
         {items.map((item) => (
           <li key={`${item.target.book}/${item.target.path}`} className="bg-card text-card-foreground hover:bg-muted relative flex items-center gap-3 overflow-hidden rounded-lg border">
@@ -433,7 +434,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [summarizing, askKey]);
   const listenLoading = speakingThis && speech.phase === "loading";
-  const listenText = listenLoading ? "Starting…" : speakingThis && speech.phase === "playing" ? "Listening" : speakingThis && speech.phase === "paused" ? "Paused" : "Listen";
+  const listenText = listenLoading ? i18n._({ id: "ui.Starting…", message: "Starting…" }) : speakingThis && speech.phase === "playing" ? i18n._({ id: "ui.Listening", message: "Listening" }) : speakingThis && speech.phase === "paused" ? i18n._({ id: "ui.Paused", message: "Paused" }) : i18n._({ id: "ui.Listen", message: "Listen" });
   const shareNow = () => { void navigator.share({ title: data.title, url: data.open_url }).catch(() => {}); };
   const rowPlace = data.actionRow === "top" ? "top" : data.actionRow ? "under-hero" : null;
   const hasActionRow = rowPlace !== null && (can("save") || can("listen") || canShare);
@@ -452,10 +453,10 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
     </>
   ) : data.blocks.map((block, index) => <Block key={index} block={block} renderTargetLink={renderTargetLink} />);
   const actionRowEl = hasActionRow ? (
-        <div data-slot="article-action-row" role="group" aria-label="Article actions" className={cn("hidden items-center gap-2 md:flex", rowPlace === "under-hero" && "border-b pb-2")}>
-      {can("save") ? <Button variant="ghost" aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}><BookmarkIcon aria-hidden fill={saved ? "currentColor" : "none"} />{saved ? "Saved" : "Save"}</Button> : null}
+        <div data-slot="article-action-row" role="group" aria-label={i18n._({ id: "ui.Article actions", message: "Article actions" })} className={cn("hidden items-center gap-2 md:flex", rowPlace === "under-hero" && "border-b pb-2")}>
+      {can("save") ? <Button variant="ghost" aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}><BookmarkIcon aria-hidden fill={saved ? "currentColor" : "none"} />{saved ? i18n._({ id: "ui.Saved", message: "Saved" }) : i18n._({ id: "ui.Save", message: "Save" })}</Button> : null}
       {can("listen") ? <Button variant="ghost" aria-busy={listenLoading} onClick={() => fire("listen")}>{listenLoading ? <LoaderIcon aria-hidden className="animate-spin" /> : speakingThis && speech.phase ? <AudioIcon aria-hidden className="text-primary" /> : <PlayIcon aria-hidden />}{listenText}</Button> : null}
-      {canShare ? <Button variant="ghost" onClick={shareNow}><ShareIcon aria-hidden />Share</Button> : null}
+      {canShare ? <Button variant="ghost" onClick={shareNow}><ShareIcon aria-hidden />{i18n._({ id: "ui.Share", message: "Share" })}</Button> : null}
     </div>
   ) : null;
   return (
@@ -463,21 +464,21 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       <div data-slot="article-sticky-header" className="sticky top-0 z-30 -mb-14 flex flex-col">
       {hasToolbar ? (
         <div ref={toolbarRef} data-slot="article-toolbar" className="flex h-14 items-center gap-1 bg-transparent px-0 py-1">
-          {onBack ? <Button variant="ghost" size="icon-lg" aria-label="Back" className="rounded-full" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
+          {onBack ? <Button variant="ghost" size="icon-lg" aria-label={i18n._({ id: "ui.Back", message: "Back" })} className="rounded-full" onClick={onBack}><ArrowLeftIcon aria-hidden /></Button> : null}
           {!data.byline && condensed ? <span data-slot="article-toolbar-title" className="min-w-0 flex-1 truncate px-2 text-base font-semibold">{data.title}</span> : null}
           <div data-slot="article-actions" className="ml-auto flex items-center gap-1">
             <ReadingSettingsButton prefs={reading} onChange={setReading} />
-            {canShare ? <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label="Share" onClick={shareNow}><ShareIcon aria-hidden /></Button> : null}
+            {canShare ? <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label={i18n._({ id: "ui.Share", message: "Share" })} onClick={shareNow}><ShareIcon aria-hidden /></Button> : null}
             {can("save") ? (
-              <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label={saved ? "Saved" : "Save"} aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}>
+              <Button variant="ghost" size="icon-lg" className={cn("rounded-full", hasActionRow && "md:hidden")} aria-label={saved ? i18n._({ id: "ui.Saved", message: "Saved" }) : i18n._({ id: "ui.Save", message: "Save" })} aria-pressed={saved} onClick={() => { setSaved(!saved); fire("save", { on: !saved }); }}>
                 <BookmarkIcon aria-hidden fill={saved ? "currentColor" : "none"} className={cn("transition-transform duration-200", saved && "text-primary scale-110")} />
               </Button>
             ) : null}
             {hasMore ? (
               <DropdownMenu>
-                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" className="rounded-full" aria-label="More" />}><EllipsisIcon aria-hidden /></DropdownMenuTrigger>
+                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" className="rounded-full" aria-label={i18n._({ id: "ui.More", message: "More" })} />}><EllipsisIcon aria-hidden /></DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {can("open_site") && data.open_url ? <DropdownMenuItem onClick={() => fire("open_site", { url: data.open_url })}>Open original</DropdownMenuItem> : null}
+                  {can("open_site") && data.open_url ? <DropdownMenuItem onClick={() => fire("open_site", { url: data.open_url })}>{i18n._({ id: "ui.Open original", message: "Open original" })}</DropdownMenuItem> : null}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : null}
@@ -503,7 +504,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
           </div>
         ) : null}
         {data.breadcrumb && data.breadcrumb.length > 0 ? (
-          <Breadcrumb data-slot="article-breadcrumb" aria-label="Breadcrumb">
+          <Breadcrumb data-slot="article-breadcrumb" aria-label={i18n._({ id: "ui.Breadcrumb", message: "Breadcrumb" })}>
             <BreadcrumbList>
               {data.breadcrumb.map((item, i) => {
                 const last = i === data.breadcrumb!.length - 1;
@@ -523,23 +524,23 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
         <h2 ref={titleRef} data-slot="article-title" className="text-4xl leading-[1.05] font-extrabold tracking-[-0.03em] md:text-5xl">{data.title}</h2>
         {data.hatnote ? <p data-slot="article-hatnote" className="text-muted-foreground text-sm italic">{data.hatnote}</p> : null}
         {data.description ? <p data-slot="article-dek" className="text-muted-foreground text-sm">{data.description}</p> : null}
-        {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{data.byline.outlets} sources</Badge> : null}
+        {data.byline && data.byline.outlets > 1 ? <Badge variant="secondary" className="w-fit">{i18n._({ id: "ui.{count, plural, one {# source} other {# sources}}", message: "{count, plural, one {# source} other {# sources}}", values: { count: data.byline.outlets } })}</Badge> : null}
       </header>
       {hasAssist || data.key_points || summarizing || data.quick_fact || (data.related && data.related.length > 0) || data.infobox || (data.contents && data.contents.length > 0) ? (
         <div ref={railRef} data-slot="article-rail" className="flex flex-col gap-4 lg:sticky lg:top-20 lg:max-h-[var(--article-rail-max,calc(100vh-6rem))] lg:self-start lg:overflow-y-auto lg:[grid-row:1/span_99] lg:col-start-2">
         {hasAssist ? (
-          <div data-slot="article-assist" role="group" aria-label="Read it another way" className="flex gap-2 [&>*]:flex-1">
+          <div data-slot="article-assist" role="group" aria-label={i18n._({ id: "ui.Read it another way", message: "Read it another way" })} className="flex gap-2 [&>*]:flex-1">
             {can("listen") ? (
               <Button variant="outline" size="sm" className={hasActionRow ? "md:hidden" : undefined} aria-busy={speakingThis && speech.phase === "loading"} data-state={speakingThis ? speech.phase ?? undefined : undefined} onClick={() => fire("listen")}>
                 {speakingThis && speech.phase === "loading" ? <LoaderIcon aria-hidden className="animate-spin" /> : speakingThis && speech.phase ? <AudioIcon aria-hidden className="text-primary" /> : <HeadphonesIcon aria-hidden />}
-                {speakingThis && speech.phase === "loading" ? "Starting…" : speakingThis && speech.phase === "playing" ? "Listening" : speakingThis && speech.phase === "paused" ? "Paused" : "Listen"}
+                {speakingThis && speech.phase === "loading" ? i18n._({ id: "ui.Starting…", message: "Starting…" }) : speakingThis && speech.phase === "playing" ? i18n._({ id: "ui.Listening", message: "Listening" }) : speakingThis && speech.phase === "paused" ? i18n._({ id: "ui.Paused", message: "Paused" }) : i18n._({ id: "ui.Listen", message: "Listen" })}
               </Button>
             ) : null}
-            {can("discuss") ? <Button variant="outline" size="sm" onClick={() => fire("discuss")}><MessageIcon aria-hidden />Discuss</Button> : null}
+            {can("discuss") ? <Button variant="outline" size="sm" onClick={() => fire("discuss")}><MessageIcon aria-hidden />{i18n._({ id: "ui.Discuss", message: "Discuss" })}</Button> : null}
           </div>
         ) : null}
         {data.key_points || summarizing ? <KeyPoints text={data.key_points?.text} loading={summarizing} /> : null}
-        {data.quick_fact ? <section data-slot="article-quick-fact" aria-label="Quick fact" className="flex flex-col gap-1 rounded-lg border bg-card p-4 text-card-foreground"><h3 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">Quick fact</h3><p className="text-lg leading-snug">{data.quick_fact}</p></section> : null}
+        {data.quick_fact ? <section data-slot="article-quick-fact" aria-label={i18n._({ id: "ui.Quick fact", message: "Quick fact" })} className="flex flex-col gap-1 rounded-lg border bg-card p-4 text-card-foreground"><h3 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{i18n._({ id: "ui.Quick fact", message: "Quick fact" })}</h3><p className="text-lg leading-snug">{data.quick_fact}</p></section> : null}
         {data.related && data.related.length > 0 ? <ArticleRelated items={data.related} renderTargetLink={renderTargetLink} /> : null}
         {data.infobox && data.infobox.rows.length > 0 ? <ArticleInfoboxCard infobox={data.infobox} /> : null}
         {data.contents && data.contents.length > 0 ? <ArticleContentsNav items={data.contents} activeId={activeSection} onPick={pickSection} /> : null}
@@ -561,7 +562,7 @@ export function ArticleView({ data, onAction, available = [], ids, onBack, rende
       {data.also_covering && data.also_covering.length > 0 ? (
         <section data-slot="also-covering" className="flex flex-col gap-2">
           <Separator />
-          <h3 className="text-lg font-semibold">Also covering this story</h3>
+          <h3 className="text-lg font-semibold">{i18n._({ id: "ui.Also covering this story", message: "Also covering this story" })}</h3>
           <StoryFeed
             data={{ layout: "rows", rows: data.also_covering, as_of: data.byline?.published_at ?? new Date(0).toISOString() }}
             available={["open"]}

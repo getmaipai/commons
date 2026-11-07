@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from "react";
 import { Slider } from "@/kit/ui/slider";
 import { getIcon } from "@/kit/icons";
+import { i18n } from "@/kit/i18n"
 
 export const CARD_SIZE_MIN = 180;
 export const CARD_SIZE_MAX = 560;
@@ -84,7 +85,7 @@ const LargeIcon = getIcon("grid-2x2");
 export function CardSizeSlider({
   size,
   onChange,
-  label = "Card size",
+  label = i18n._({ id: "ui.Card size", message: "Card size" }),
 }: {
   size: number;
   onChange: (next: number) => void;

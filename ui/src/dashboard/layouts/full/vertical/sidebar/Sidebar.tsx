@@ -13,6 +13,7 @@ import {
 } from '../../../../components/ui/sidebar';
 import { NavUser } from './NavUser';
 import sidebaritems from './sidebaritems';
+import { i18n } from "@/kit/i18n";
 
 const SidebarLayout = ({ showTrigger = false, sidebarItemStatus, ...props }: React.ComponentProps<typeof Sidebar> & { showTrigger?: boolean; sidebarItemStatus?: (item: { name: string; url?: string }) => { title: string; ariaLabel: string } | undefined }) => {
 
@@ -24,13 +25,13 @@ const SidebarLayout = ({ showTrigger = false, sidebarItemStatus, ...props }: Rea
             collapsible="icon"
             {...props}
             role="navigation"
-            aria-label="Primary navigation"
+            aria-label={i18n._({ id: "ui.Primary navigation", message: "Primary navigation" })}
             className="sidebar-box **:data-[slot=sidebar-inner]:bg-background **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-border group-data-[state=collapsed]:hover:shadow-xl"
             side="left"
         >
             <SidebarHeader className="p-3 group-data-[state=collapsed]:px-2.5 flex flex-row items-center justify-between border-b border-border">
                 <FullLogo />
-                {showTrigger ? <SidebarTrigger aria-label="Toggle app menu">Toggle app menu</SidebarTrigger> : null}
+                {showTrigger ? <SidebarTrigger aria-label={i18n._({ id: "ui.Toggle app menu", message: "Toggle app menu" })}>{i18n._({ id: "ui.Toggle app menu", message: "Toggle app menu" })}</SidebarTrigger> : null}
             </SidebarHeader>
 
             <SidebarContent>

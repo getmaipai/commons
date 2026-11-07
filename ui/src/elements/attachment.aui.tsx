@@ -40,6 +40,7 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "./ui/avatar";
+import { i18n } from "@/kit/i18n";
 import { TooltipIconButton } from "./tooltip-icon-button";
 import { useAttachmentSrc } from "./hooks/use-attachment-src";
 import { cn } from "cn";
@@ -81,7 +82,7 @@ const AttachmentPreview: FC<AttachmentPreviewProps> = ({ src }) => {
   return (
     <SafeImage
       src={src}
-      alt="Attachment preview"
+      alt={i18n._({ id: "ui.Attachment preview", message: "Attachment preview" })}
       className={cn(
         "block h-auto max-h-[80vh] w-auto max-w-full rounded-sm object-contain transition-opacity duration-300 motion-reduce:transition-none",
         isLoaded
@@ -113,7 +114,7 @@ const AttachmentPreviewDialog: FC<PropsWithChildren> = ({ children }) => {
       </DialogTrigger>
       <DialogContent className="aui-attachment-preview-dialog-content [&>button]:bg-foreground/60 [&>button]:hover:bg-foreground/80 [&_svg]:text-background p-2 sm:max-w-3xl [&>button]:rounded-full [&>button]:p-1 [&>button]:opacity-100 [&>button]:ring-0!">
         <DialogTitle className="aui-sr-only sr-only">
-          Image Attachment Preview
+          {i18n._({ id: "ui.Image Attachment Preview", message: "Image Attachment Preview" })}
         </DialogTitle>
         <div className="aui-attachment-preview bg-background relative mx-auto flex max-h-[80dvh] w-full items-center justify-center overflow-hidden rounded-sm">
           <AttachmentPreview src={src} />
@@ -130,7 +131,7 @@ const AttachmentThumb: FC = () => {
     <Avatar className="aui-attachment-tile-avatar h-full w-full rounded-none">
       <AvatarImage
         src={src}
-        alt="Attachment preview"
+        alt={i18n._({ id: "ui.Attachment preview", message: "Attachment preview" })}
         className="aui-attachment-tile-image rounded-none object-cover"
       />
       <AvatarFallback>
@@ -149,11 +150,11 @@ const AttachmentUI: FC = () => {
     const type = s.attachment.type;
     switch (type) {
       case "image":
-        return "Image";
+        return i18n._({ id: "ui.Image", message: "Image" });
       case "document":
-        return "Document";
+        return i18n._({ id: "ui.Document", message: "Document" });
       case "file":
-        return "File";
+        return i18n._({ id: "ui.File", message: "File" });
       default:
         return type;
     }
@@ -173,7 +174,7 @@ const AttachmentUI: FC = () => {
   const errorMessage = useAuiState((s) =>
     s.attachment.status.type === "incomplete" &&
     s.attachment.status.reason === "error"
-      ? (s.attachment.status.message ?? "Upload failed")
+      ? (s.attachment.status.message ?? i18n._({ id: "ui.Upload failed", message: "Upload failed" }))
       : undefined,
   );
 
@@ -211,9 +212,13 @@ const AttachmentUI: FC = () => {
                 onKeyUp={(e) => {
                   if (e.key === " ") e.currentTarget.click();
                 }}
-                aria-label={`${typeLabel} attachment${
-                  isError ? ", upload failed" : isUploading ? ", uploading" : ""
-                }`}
+                aria-label={
+                  isError
+                    ? i18n._({ id: "ui.{type} attachment, upload failed", message: "{type} attachment, upload failed", values: { type: typeLabel } })
+                    : isUploading
+                      ? i18n._({ id: "ui.{type} attachment, uploading", message: "{type} attachment, uploading", values: { type: typeLabel } })
+                      : i18n._({ id: "ui.{type} attachment", message: "{type} attachment", values: { type: typeLabel } })
+                }
               >
                 <AttachmentThumb />
                 {isUploading && (
@@ -257,7 +262,7 @@ const AttachmentEdit: FC = () => {
   if (!edit || !src) return null;
   const target: ImageEditTarget = { id, name, src };
   if (edit.canEdit && !edit.canEdit(target)) return null;
-  const label = edit.label ?? "Edit picture";
+  const label = edit.label ?? i18n._({ id: "ui.Edit picture", message: "Edit picture" });
   return (
     <TooltipIconButton
       tooltip={label}
@@ -283,7 +288,7 @@ const AttachmentRemove: FC = () => {
   return (
     <AttachmentPrimitive.Remove asChild>
       <TooltipIconButton
-        tooltip="Remove file"
+        tooltip={i18n._({ id: "ui.Remove file", message: "Remove file" })}
         className="aui-attachment-tile-remove absolute end-1 top-1 size-5 rounded-full bg-background/70! text-foreground after:absolute after:-inset-1.5 hover:bg-background/90! hover:text-foreground! active:scale-[0.96] motion-reduce:transition-none"
         side="top"
       >
@@ -317,12 +322,12 @@ export const ComposerAddAttachment: FC = () => {
   return (
     <ComposerPrimitive.AddAttachment asChild>
       <TooltipIconButton
-        tooltip="Add Attachment"
+        tooltip={i18n._({ id: "ui.Add Attachment", message: "Add Attachment" })}
         side="bottom"
         variant="ghost"
         size="icon"
         className="aui-composer-add-attachment text-muted-foreground hover:text-foreground hover:bg-muted-foreground/15 dark:border-muted-foreground/15 dark:hover:bg-muted-foreground/30 size-7 rounded-full active:scale-[0.96] motion-reduce:transition-none"
-        aria-label="Add Attachment"
+        aria-label={i18n._({ id: "ui.Add Attachment", message: "Add Attachment" })}
       >
         <PlusIcon className="aui-attachment-add-icon size-4" />
       </TooltipIconButton>

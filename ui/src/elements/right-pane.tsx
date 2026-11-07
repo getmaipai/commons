@@ -4,6 +4,7 @@ import { Pin, X } from "lucide-react";
 import { Button } from "@/kit/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/kit/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/kit/ui/tabs";
+import { i18n } from "@/kit/i18n";
 
 export interface RightPaneTab { id: string; label: string; content: ReactNode; }
 
@@ -39,7 +40,7 @@ export function RightPane({ open, onOpenChange, pinned, onPinnedChange, companio
       <div className="shrink-0">{avatar}</div>
     </header>
     <Tabs value={selected} onValueChange={onActiveTabChange} className="min-h-0 flex-1 gap-0">
-      <TabsList aria-label={`${label} tabs`} variant="line" className="w-full justify-start overflow-x-auto rounded-none border-b border-sidebar-border px-2">
+      <TabsList aria-label={i18n._({ id: "ui.{label} tabs", message: "{label} tabs", values: { label } })} variant="line" className="w-full justify-start overflow-x-auto rounded-none border-b border-sidebar-border px-2">
         {allTabs.map((tab) => <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>)}
       </TabsList>
       {allTabs.map((tab) => <TabsContent key={tab.id} value={tab.id} className="min-h-0 flex-1 overflow-y-auto p-3">{tab.content}</TabsContent>)}

@@ -2,6 +2,7 @@
 // song has one, otherwise a gradient drawn from the song's id and its title in big type), media tiles that lift on hover with a play button and glass
 // pills, a shimmer while a song is being made, carousels with arrows, and the floating glass prompt bar. Colors are the kit's hue tokens through
 // custom properties, so nothing here carries a raw color.
+import { i18n } from "@/kit/i18n"
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import { Button } from "@/kit/ui/button";
 import { getIcon } from "@/kit/icons";
@@ -49,11 +50,11 @@ export function GlassPill({ children }: { children: ReactNode }) {
 }
 
 /** One tall tile: the cover fills it, a play button and a lift on hover, glass pills on the corners, the title and its line under it. */
-export function MediaTile({ id, title, line, coverUrl, selected = false, busy = false, playable = false, pills, progress, verb = "Open", onOpen, children }: {
+export function MediaTile({ id, title, line, coverUrl, selected = false, busy = false, playable = false, pills, progress, verb = i18n._({ id: "ui.Open", message: "Open" }), onOpen, children }: {
   verb?: string; id: string; title: string; line?: string; coverUrl: string | null; selected?: boolean; busy?: boolean; playable?: boolean; pills?: ReactNode; progress?: number; onOpen: () => void; children?: ReactNode;
 }) {
   return <li className="group flex w-44 shrink-0 snap-start flex-col gap-2 sm:w-52" data-testid="music-song-tile">
-    <button type="button" onClick={onOpen} aria-label={`${verb} ${title}`} aria-current={selected ? "true" : undefined}
+    <button type="button" onClick={onOpen} aria-label={i18n._({ id: "ui.{verb} {title}", message: "{verb} {title}", values: { verb, title } })} aria-current={selected ? "true" : undefined}
       className={`relative block aspect-3/4 w-full overflow-hidden rounded-2xl transition duration-200 motion-safe:group-hover:-translate-y-1 motion-safe:group-focus-within:-translate-y-1 ${selected ? "ring-(--accent-lime) ring-2" : ""}`}>
       <Cover id={id} title={title} url={coverUrl} />
       {busy ? <Shimmer /> : null}
@@ -75,8 +76,8 @@ export function MediaCarousel({ title, line, children, label }: { title: string;
     <div className="flex items-end justify-between gap-3">
       <div className="flex flex-col gap-1"><h2 className="text-2xl font-black tracking-wide uppercase">{title}</h2>{line ? <p className="text-muted-foreground text-sm">{line}</p> : null}</div>
       <div className="hidden gap-2 sm:flex">
-        <Button type="button" variant="secondary" size="icon" aria-label={`Earlier in ${label}`} onClick={() => move(-1)}><LeftIcon className="size-4" aria-hidden="true" /></Button>
-        <Button type="button" variant="secondary" size="icon" aria-label={`Later in ${label}`} onClick={() => move(1)}><RightIcon className="size-4" aria-hidden="true" /></Button>
+        <Button type="button" variant="secondary" size="icon" aria-label={i18n._({ id: "ui.Earlier in {label}", message: "Earlier in {label}", values: { label } })} onClick={() => move(-1)}><LeftIcon className="size-4" aria-hidden="true" /></Button>
+        <Button type="button" variant="secondary" size="icon" aria-label={i18n._({ id: "ui.Later in {label}", message: "Later in {label}", values: { label } })} onClick={() => move(1)}><RightIcon className="size-4" aria-hidden="true" /></Button>
       </div>
     </div>
     <ul ref={track} aria-label={label} className="-mx-4 flex snap-x list-none gap-4 overflow-x-auto scroll-smooth px-4 pb-2 lg:-mx-6 lg:px-6">{children}</ul>

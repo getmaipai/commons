@@ -18,6 +18,7 @@ import { OptionMatrix } from "./OptionMatrix";
 import type { AreaMatrix } from "./settingsAudience";
 import blocklistPolicy from "@maipai/spec/search/blocklists.json";
 import feedListPolicy from "@maipai/spec/news/feed-lists.json";
+import { i18n } from "@/kit/i18n";
 
 interface MatrixRowSource { id: string; label: string; does?: string; locked_for?: readonly string[]; offered_for?: readonly string[] }
 // The shared row sources a card's `matrix.rows` may name: the spec's own
@@ -26,6 +27,8 @@ const MATRIX_ROWS: Record<string, readonly MatrixRowSource[]> = {
   "search/blocklists": blocklistPolicy.lists,
   "news/feed-lists": feedListPolicy.lists,
 };
+
+const saveFailedMessage = () => i18n._({ id: "ui.Could not save that change.", message: "Could not save that change." });
 
 interface SettingsRendererProps {
   scope: "household" | "person" | "device";
@@ -163,7 +166,7 @@ export function SettingsRenderer({
       setWriteSaved(true);
       return true;
     } catch (e) {
-      setWriteError(e instanceof ApiError ? e.message : "Could not save that change.");
+      setWriteError(e instanceof ApiError ? e.message : saveFailedMessage());
       return false;
     } finally {
       setPendingKey(null);
@@ -182,7 +185,7 @@ export function SettingsRenderer({
       replaceValue(restored);
       setWriteSaved(true);
     } catch (e) {
-      setWriteError(e instanceof ApiError ? e.message : "Could not reset that setting.");
+      setWriteError(e instanceof ApiError ? e.message : i18n._({ id: "ui.Could not reset that setting.", message: "Could not reset that setting." }));
     } finally {
       setPendingKey(null);
     }
@@ -235,7 +238,7 @@ export function SettingsRenderer({
     });
     return (
       <OptionMatrix
-        rowsLabel={m.rows_label ?? "Kind of site"}
+        rowsLabel={m.rows_label ?? i18n._({ id: "ui.Kind of site", message: "Kind of site" })}
         rows={source}
         columns={columns}
         lockedNote={m.locked_note}
@@ -245,7 +248,7 @@ export function SettingsRenderer({
           const current = columns.find((c) => c.key === columnKey)?.value ?? [];
           const next = checked ? [...current.filter((id) => id !== rowId), rowId] : current.filter((id) => id !== rowId);
           const ok = await handleChange(columnKey, next);
-          if (!ok) setWriteError((prev) => (prev && prev !== "Could not save that change." ? prev : m.save_error));
+          if (!ok) setWriteError((prev) => (prev && prev !== saveFailedMessage() ? prev : m.save_error));
         }}
       />
     );
@@ -267,7 +270,7 @@ export function SettingsRenderer({
           <AlertDescription>{writeError}</AlertDescription>
         </Alert>
       ) : null}
-      {writeSaved ? <p role="status">Saved.</p> : null}
+      {writeSaved ? <p role="status">{i18n._({ id: "ui.Saved.", message: "Saved." })}</p> : null}
       <AsyncState
         data={data}
         error={error}
@@ -278,8 +281,8 @@ export function SettingsRenderer({
           if (registryQuery.isError) registryQuery.refetch();
           if (valuesQuery.isError) valuesQuery.refetch();
         }}
-        errorMessage="Could not load settings."
-        loadingLabel="Loading settings"
+        errorMessage={i18n._({ id: "ui.Could not load settings.", message: "Could not load settings." })}
+        loadingLabel={i18n._({ id: "ui.Loading settings", message: "Loading settings" })}
       >
         {({ registry, values }) => {
           const needle = filter?.trim().toLowerCase();
@@ -313,7 +316,7 @@ export function SettingsRenderer({
             return (
               <Empty>
                 <EmptyHeader>
-                  <EmptyDescription>{needle ? "No settings match that search." : "No settings yet."}</EmptyDescription>
+                  <EmptyDescription>{needle ? i18n._({ id: "ui.No settings match that search.", message: "No settings match that search." }) : i18n._({ id: "ui.No settings yet.", message: "No settings yet." })}</EmptyDescription>
                 </EmptyHeader>
               </Empty>
             );
@@ -339,7 +342,7 @@ export function SettingsRenderer({
                           >
                             <ItemContent>
                               <ItemTitle className="text-muted-foreground">
-                                {open ? "Hide" : "Show"} {group.advanced.length} advanced settings
+                                {open ? i18n._({ id: "ui.Hide {count} advanced settings", message: "Hide {count} advanced settings", values: { count: group.advanced.length } }) : i18n._({ id: "ui.Show {count} advanced settings", message: "Show {count} advanced settings", values: { count: group.advanced.length } })}
                               </ItemTitle>
                             </ItemContent>
                             <ChevronDown aria-hidden className={`size-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />

@@ -1,0 +1,67 @@
+[
+  {
+    "file": "settings/SettingsShell.tsx",
+    "text": "⌘/Ctrl+B",
+    "reason": "A keyboard shortcut glyph string, the same in every language."
+  },
+  {
+    "file": "settings/SettingsShowcase.tsx",
+    "text": "/srv/library/reference",
+    "reason": "A sample file path in the showcase, not a sentence."
+  },
+  {
+    "file": "dashboard/layouts/full/vertical/rail/AppRail.tsx",
+    "text": "MaiPai Home",
+    "reason": "The product name; brand names are never translated."
+  },
+  {
+    "file": "dashboard/layouts/full/vertical/header/HeaderSearch.tsx",
+    "text": "Wikipedia",
+    "reason": "A product or site name shown as a tab label; names are never translated."
+  },
+  {
+    "file": "dashboard/layouts/full/vertical/header/HeaderSearch.tsx",
+    "text": "Home",
+    "reason": "A product or site name shown as a tab label; names are never translated."
+  },
+  {
+    "file": "schema/NodeRenderer.tsx",
+    "text": "mounts its own page component directly (see NodeRenderer.tsx's own comment).",
+    "reason": "Developer-only text in a code path a person never reaches."
+  },
+  {
+    "file": "elements/inline-citation.tsx",
+    "text": "Optimistic updates keep the thread responsive while the server confirms the write",
+    "reason": "Showcase demo sentence; Home renders only Citation."
+  },
+  {
+    "file": "elements/inline-citation.tsx",
+    "text": ". The store already exposes a consistent snapshot for every subscriber",
+    "reason": "Showcase demo sentence; Home renders only Citation."
+  },
+  {
+    "file": "elements/inline-citation.tsx",
+    "text": ", so no extra reconciliation pass is needed.",
+    "reason": "Showcase demo sentence; Home renders only Citation."
+  },
+  {
+    "file": "elements/trace-waterfall.tsx",
+    "text": "ms",
+    "reason": "A unit symbol after a number, the same in every language."
+  },
+  {
+    "file": "elements/weather-forecast-page.tsx",
+    "text": "1050 hPa",
+    "reason": "A pressure unit symbol (hPa) or its sample, not a sentence."
+  },
+  {
+    "file": "elements/weather-forecast-page.tsx",
+    "text": "hPa",
+    "reason": "A pressure unit symbol (hPa) or its sample, not a sentence."
+  },
+  {
+    "file": "elements/image-editor.tsx",
+    "text": "px",
+    "reason": "A pixel unit symbol (px) after a number, the same in every language."
+  }
+]

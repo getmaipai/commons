@@ -1,5 +1,6 @@
 // Copied by the shadcn registry for MaiPai Stack dashboard.
 import * as React from "react"
+import { i18n } from "@/kit/i18n";
 import { cn } from "@/kit/utils"
 import { ChevronRight, MoreHorizontal } from "lucide-react"
 import { Slot } from "radix-ui"
@@ -98,7 +99,7 @@ function BreadcrumbEllipsis({
       {...props}
     >
       <MoreHorizontal className="size-4" />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{i18n._({ id: "ui.More", message: "More" })}</span>
     </span>
   )
 }

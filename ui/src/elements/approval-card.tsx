@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import type { ComponentProps, ReactNode } from "react";
 import { CheckIcon, Loader2Icon, TerminalIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
@@ -106,7 +107,7 @@ export function ApprovalCard({
                   onClick={onDeny}
                   className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
                 >
-                  Deny
+                  {i18n._({ id: "ui.Deny", message: "Deny" })}
                 </button>
               )}
               {onAlwaysAllow && (
@@ -115,7 +116,7 @@ export function ApprovalCard({
                   onClick={onAlwaysAllow}
                   className="text-muted-foreground hover:bg-foreground/[0.06] hover:text-foreground/90 h-8 rounded-full px-3.5 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
                 >
-                  Always allow
+                  {i18n._({ id: "ui.Always allow", message: "Always allow" })}
                 </button>
               )}
               {onAllowOnce && (
@@ -127,7 +128,7 @@ export function ApprovalCard({
                     "flex h-8 items-center rounded-full px-3.5 text-xs font-medium",
                   )}
                 >
-                  Allow once
+                  {i18n._({ id: "ui.Allow once", message: "Allow once" })}
                   {allowHint}
                 </button>
               )}
@@ -140,17 +141,17 @@ export function ApprovalCard({
               {state === "running" ? (
                 <>
                   <Loader2Icon className="text-foreground/45 size-3.5 animate-spin" />
-                  {statusLabels?.running ?? "Approved, running"}
+                  {statusLabels?.running ?? i18n._({ id: "ui.Approved, running", message: "Approved, running" })}
                 </>
               ) : state === "denied" ? (
                 <>
                   <XIcon className="text-foreground/45 size-3.5" />
-                  {statusLabels?.denied ?? "Denied"}
+                  {statusLabels?.denied ?? i18n._({ id: "ui.Denied", message: "Denied" })}
                 </>
               ) : (
                 <>
                   <CheckIcon className="size-3.5 text-status-ok" />
-                  {statusLabels?.done ?? "Finished with exit 0"}
+                  {statusLabels?.done ?? i18n._({ id: "ui.Finished with exit 0", message: "Finished with exit 0" })}
                 </>
               )}
             </div>

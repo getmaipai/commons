@@ -1,3 +1,4 @@
+import { i18n } from "@/kit/i18n"
 import type { ReactNode } from "react";
 import { getIcon } from "@/kit/icons";
 import { cn, FOCUS_RING_INSET } from "@/kit/utils";
@@ -67,7 +68,7 @@ export function Chip({ children, selected, onClick, onRemove, removeLabel }: Chi
             e.stopPropagation();
             onRemove();
           }}
-          aria-label={removeLabel ?? "Remove"}
+          aria-label={removeLabel ?? i18n._({ id: "ui.Remove", message: "Remove" })}
           className={cn("relative -mr-1 flex h-4 w-4 items-center justify-center rounded-full", FOCUS_RING_INSET)}
         >
           <span className="absolute -inset-3" aria-hidden />

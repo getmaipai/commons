@@ -1,6 +1,7 @@
 import { LifeBuoy, Settings } from 'lucide-react';
 import { Link } from 'react-router';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroupContent, SidebarGroup } from "../../../../components/ui/sidebar"
+import { i18n } from "@/kit/i18n"
 
 
 // Home's own bottom-of-rail items, as data (owner ruling, ui-v0.5.23) -
@@ -14,12 +15,12 @@ import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroupContent, S
 export function NavUser() {
     const navItems = [
         {
-            title: "Settings",
+            title: i18n._({ id: "ui.Settings", message: "Settings" }),
             url: "/settings",
             icon: Settings,
         },
         {
-            title: "Help",
+            title: i18n._({ id: "ui.Help", message: "Help" }),
             url: "https://github.com/getmaipai/home/blob/main/docs/user/README.md",
             icon: LifeBuoy,
         },

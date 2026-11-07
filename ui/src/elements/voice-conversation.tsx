@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import type { ComponentProps, ReactNode } from "react";
 import { MicIcon, MicOffIcon, PhoneOffIcon } from "lucide-react";
 import { cn } from "cn";
@@ -9,19 +10,19 @@ import { clamp } from "./range";
 
 export type VoiceMode = "connecting" | "listening" | "thinking" | "speaking";
 
-const CAPTION: Record<VoiceMode, string> = {
-  connecting: "Connecting",
-  listening: "Listening",
-  thinking: "Thinking",
-  speaking: "Speaking",
-};
+const captions = (): Record<VoiceMode, string> => ({
+  connecting: i18n._({ id: "ui.Connecting", message: "Connecting" }),
+  listening: i18n._({ id: "ui.Listening", message: "Listening" }),
+  thinking: i18n._({ id: "ui.Thinking", message: "Thinking" }),
+  speaking: i18n._({ id: "ui.Speaking", message: "Speaking" }),
+});
 
-const HINT: Record<VoiceMode, string> = {
-  connecting: "Opening the mic",
-  listening: "Listening for you",
-  thinking: "Working on it",
-  speaking: "Playing the reply",
-};
+const hints = (): Record<VoiceMode, string> => ({
+  connecting: i18n._({ id: "ui.Opening the mic", message: "Opening the mic" }),
+  listening: i18n._({ id: "ui.Listening for you", message: "Listening for you" }),
+  thinking: i18n._({ id: "ui.Working on it", message: "Working on it" }),
+  speaking: i18n._({ id: "ui.Playing the reply", message: "Playing the reply" }),
+});
 
 export function VoiceConversation({
   mode,
@@ -107,7 +108,7 @@ export function VoiceConversation({
             type="button"
             onClick={onInterrupt}
             disabled={!canInterrupt}
-            aria-label="Interrupt the assistant"
+            aria-label={i18n._({ id: "ui.Interrupt the assistant", message: "Interrupt the assistant" })}
             className="focus-visible:ring-foreground/20 relative flex size-40 items-center justify-center rounded-full outline-none focus-visible:ring-1 disabled:cursor-default sm:size-48"
           >
             <span
@@ -165,9 +166,9 @@ export function VoiceConversation({
         )}
 
         <div className="flex flex-col items-center gap-1">
-          <span className="text-[13.5px] font-medium">{CAPTION[mode]}</span>
+          <span className="text-[13.5px] font-medium">{captions()[mode]}</span>
           <span className={cn(mono, "text-muted-foreground")}>
-            {muted ? "Mic off" : canInterrupt ? "Tap to interrupt" : HINT[mode]}
+            {muted ? i18n._({ id: "ui.Mic off", message: "Mic off" }) : canInterrupt ? i18n._({ id: "ui.Tap to interrupt", message: "Tap to interrupt" }) : hints()[mode]}
           </span>
         </div>
       </div>
@@ -185,9 +186,9 @@ export function VoiceConversation({
             liveVoiceSession.tsx's own gear already uses), never a
             hand-styled <button>. */}
         <TooltipIconButton
-          tooltip={muted ? "Turn the microphone on" : "Turn the microphone off"}
+          tooltip={muted ? i18n._({ id: "ui.Turn the microphone on", message: "Turn the microphone on" }) : i18n._({ id: "ui.Turn the microphone off", message: "Turn the microphone off" })}
           aria-label={
-            muted ? "Turn the microphone on" : "Turn the microphone off"
+            muted ? i18n._({ id: "ui.Turn the microphone on", message: "Turn the microphone on" }) : i18n._({ id: "ui.Turn the microphone off", message: "Turn the microphone off" })
           }
           aria-pressed={muted}
           variant={muted ? "secondary" : "ghost"}
@@ -203,8 +204,8 @@ export function VoiceConversation({
           )}
         </TooltipIconButton>
         <TooltipIconButton
-          tooltip="End the call"
-          aria-label="End the call"
+          tooltip={i18n._({ id: "ui.End the call", message: "End the call" })}
+          aria-label={i18n._({ id: "ui.End the call", message: "End the call" })}
           variant="destructive"
           size="icon"
           onClick={onEnd}

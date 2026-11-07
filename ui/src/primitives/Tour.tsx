@@ -3,6 +3,7 @@ import { Joyride, type EventData, type TooltipRenderProps, type Step } from "rea
 import { Button } from "@/kit/ui/button";
 import { Card } from "@/kit/primitives/Card";
 import { Progress } from "@/kit/primitives/Progress";
+import { i18n } from "@/kit/i18n";
 
 export interface TourStep {
   target?: string | HTMLElement | null;
@@ -24,7 +25,7 @@ function TourTooltip(props: TooltipRenderProps) {
   useEffect(() => bubbleRef.current?.focus({ preventScroll: true }), []);
   const title = String(props.step.title ?? "");
   const body = String(props.step.content ?? "");
-  const count = `Step ${props.index + 1} of ${props.size}`;
+  const count = i18n._({ id: "ui.Step {current} of {total}", message: "Step {current} of {total}", values: { current: props.index + 1, total: props.size } });
 
   return (
     <Card
@@ -39,10 +40,10 @@ function TourTooltip(props: TooltipRenderProps) {
           <Progress mode="determinate" value={((props.index + 1) / props.size) * 100} label={count} />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Button variant="ghost" {...props.skipProps}>Skip</Button>
+          <Button variant="ghost" {...props.skipProps}>{i18n._({ id: "ui.Skip", message: "Skip" })}</Button>
           <div className="flex gap-2">
-            {props.index > 0 ? <Button variant="outline" {...props.backProps}>Back</Button> : null}
-            <Button {...props.primaryProps}>{props.isLastStep ? "Finish" : "Next"}</Button>
+            {props.index > 0 ? <Button variant="outline" {...props.backProps}>{i18n._({ id: "ui.Back", message: "Back" })}</Button> : null}
+            <Button {...props.primaryProps}>{props.isLastStep ? i18n._({ id: "ui.Finish", message: "Finish" }) : i18n._({ id: "ui.Next", message: "Next" })}</Button>
           </div>
         </div>
       </div>

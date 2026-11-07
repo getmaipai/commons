@@ -1,6 +1,7 @@
 import { Button } from "../ui/button";
 import { ShareDialog } from "./share-dialog";
 import type { VisibilityPerson } from "./visibility-chip";
+import { i18n } from "@/kit/i18n";
 
 export interface SharePanelProps {
   open: boolean;
@@ -32,11 +33,11 @@ export function SharePanel({ open, onOpenChange, people, candidates, canManage, 
       disabled={!canManage}
       showDone
       labels={{
-        title: "Who can see this?",
-        description: canManage ? "Choose who can see this." : "These people can see this.",
-        empty: "No one else can see this yet.",
+        title: i18n._({ id: "ui.Who can see this?", message: "Who can see this?" }),
+        description: canManage ? i18n._({ id: "ui.Choose who can see this.", message: "Choose who can see this." }) : i18n._({ id: "ui.These people can see this.", message: "These people can see this." }),
+        empty: i18n._({ id: "ui.No one else can see this yet.", message: "No one else can see this yet." }),
       }}
-      restrictions={canManage ? <Button type="button" variant="link" height="auto" onClick={() => void onMakePrivate()}>Make private</Button> : undefined}
+      restrictions={canManage ? <Button type="button" variant="link" height="auto" onClick={() => void onMakePrivate()}>{i18n._({ id: "ui.Make private", message: "Make private" })}</Button> : undefined}
       onRoleChange={(personId, role) => role === "view" ? onAdd(personId) : onRemove(personId)}
     />
   );

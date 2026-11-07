@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Input } from "../dashboard/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../dashboard/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../dashboard/components/ui/select";
+import { i18n } from "@/kit/i18n";
 
 const PlusIcon = getIcon("plus");
 const EllipsisIcon = getIcon("more-horizontal");
@@ -101,10 +102,10 @@ function AddPlace({ adapter, disabled, label, onPick }: { adapter: PlaceAdapter;
         setOpen(false);
         setQuery("");
       } else {
-        setAddError("That place was not saved. Try again in a moment.");
+        setAddError(i18n._({ id: "ui.That place was not saved. Try again in a moment.", message: "That place was not saved. Try again in a moment." }));
       }
     } catch {
-      setAddError("That place was not saved. Check your connection and try again.");
+      setAddError(i18n._({ id: "ui.That place was not saved. Check your connection and try again.", message: "That place was not saved. Check your connection and try again." }));
     } finally {
       setBusy(false);
     }
@@ -121,16 +122,16 @@ function AddPlace({ adapter, disabled, label, onPick }: { adapter: PlaceAdapter;
       />
       <PopoverContent width="wide" align="start">
         <Command shouldFilter={false}>
-          <CommandInput value={query} onValueChange={setQuery} placeholder="Search for a place" aria-label="Search for a place" />
+          <CommandInput value={query} onValueChange={setQuery} placeholder={i18n._({ id: "ui.Search for a place", message: "Search for a place" })} aria-label={i18n._({ id: "ui.Search for a place", message: "Search for a place" })} />
           <CommandList>
             <CommandEmpty aria-live="polite">
               {failed
-                ? "Search is not available right now. Try again in a moment."
+                ? i18n._({ id: "ui.Search is not available right now. Try again in a moment.", message: "Search is not available right now. Try again in a moment." })
                 : query.trim().length < 2
-                  ? "Type at least two letters."
+                  ? i18n._({ id: "ui.Type at least two letters.", message: "Type at least two letters." })
                   : searching
-                    ? "Searching"
-                    : "No places match. Try a nearby town."}
+                    ? i18n._({ id: "ui.Searching", message: "Searching" })
+                    : i18n._({ id: "ui.No places match. Try a nearby town.", message: "No places match. Try a nearby town." })}
             </CommandEmpty>
             {addError ? <p role="status" className="px-2 py-1 text-sm">{addError}</p> : null}
             <CommandGroup>
@@ -156,10 +157,10 @@ function RenameDialog({ name, onClose, onSave }: { name: string; onClose: () => 
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Rename place</DialogTitle>
-          <DialogDescription>The name is only for you. It does not change where the place is.</DialogDescription>
+          <DialogTitle>{i18n._({ id: "ui.Rename place", message: "Rename place" })}</DialogTitle>
+          <DialogDescription>{i18n._({ id: "ui.The name is only for you. It does not change where the place is.", message: "The name is only for you. It does not change where the place is." })}</DialogDescription>
         </DialogHeader>
-        <Input value={draft} onChange={(e) => setDraft(e.target.value)} aria-label="Place name" maxLength={80} />
+        <Input value={draft} onChange={(e) => setDraft(e.target.value)} aria-label={i18n._({ id: "ui.Place name", message: "Place name" })} maxLength={80} />
         {error ? <p role="status">{error}</p> : null}
         <DialogFooter>
           <Button
@@ -168,14 +169,14 @@ function RenameDialog({ name, onClose, onSave }: { name: string; onClose: () => 
             onClick={() =>
               void onSave(draft.trim()).then((ok) => {
                 if (ok) onClose();
-                else setError("The name was not saved. Check your connection and try again.");
+                else setError(i18n._({ id: "ui.The name was not saved. Check your connection and try again.", message: "The name was not saved. Check your connection and try again." }));
               })
             }
           >
-            Save
+            {i18n._({ id: "ui.Save", message: "Save" })}
           </Button>
           <Button type="button" variant="secondary" onClick={onClose}>
-            Cancel
+            {i18n._({ id: "ui.Cancel", message: "Cancel" })}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -210,10 +211,10 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
           )
         }
       >
-        Use current location
+        {i18n._({ id: "ui.Use current location", message: "Use current location" })}
       </Button>
     ) : null;
-  const deniedNote = denied ? <p role="status" className="min-w-0 max-w-prose text-sm text-muted-foreground">{locationBlockedHelp()} Or pick a saved place instead.</p> : null;
+  const deniedNote = denied ? <p role="status" className="min-w-0 max-w-prose text-sm text-muted-foreground">{locationBlockedHelp()} {i18n._({ id: "ui.Or pick a saved place instead.", message: "Or pick a saved place instead." })}</p> : null;
 
   if (!multiple) {
     const id = typeof value === "string" && value ? value : null;
@@ -224,10 +225,10 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
         <div className="flex w-full min-w-0 flex-col items-start gap-2">
           <Select value={id ?? "current"} onValueChange={(v) => onValueChange(v)} disabled={disabled}>
             <SelectTrigger aria-label={ariaLabel}>
-              <SelectValue>{(v: string) => (v === "current" ? "Current location" : adapter.labelFor(v))}</SelectValue>
+              <SelectValue>{(v: string) => (v === "current" ? i18n._({ id: "ui.Current location", message: "Current location" }) : adapter.labelFor(v))}</SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="current">Current location</SelectItem>
+              <SelectItem value="current">{i18n._({ id: "ui.Current location", message: "Current location" })}</SelectItem>
               {ids.map((p) => (
                 <SelectItem key={p} value={p}>
                   {adapter.labelFor(p)}
@@ -243,12 +244,12 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
     return (
       <>
         <span className="min-w-0 max-w-full truncate text-sm" data-slot="location-label">
-          {id ? adapter.labelFor(id) : "Not set"}
+          {id ? adapter.labelFor(id) : i18n._({ id: "ui.Not set", message: "Not set" })}
         </span>
-        <AddPlace adapter={adapter} disabled={disabled} label={id ? "Change" : "Set place"} onPick={(p) => onValueChange(p)} />
+        <AddPlace adapter={adapter} disabled={disabled} label={id ? i18n._({ id: "ui.Change", message: "Change" }) : i18n._({ id: "ui.Set place", message: "Set place" })} onPick={(p) => onValueChange(p)} />
         {id ? (
           <Button type="button" size="row" variant="secondary" disabled={disabled} onClick={() => onValueChange(null)}>
-            Clear
+            {i18n._({ id: "ui.Clear", message: "Clear" })}
           </Button>
         ) : null}
       </>
@@ -268,15 +269,15 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
         label={ariaLabel}
         getKey={(p) => p}
         renderItem={(p) => <span className="min-w-0 truncate">{adapter.labelFor(p)}</span>}
-        emptyState={{ icon: "pin", text: "No saved places yet." }}
+        emptyState={{ icon: "pin", text: i18n._({ id: "ui.No saved places yet.", message: "No saved places yet." }) }}
         renderAction={(p) => {
           const i = ids.indexOf(p);
           return removing === p ? (
             <DestructiveConfirm
-              message={`Remove ${adapter.labelFor(p)}?`}
-              detail="It is deleted from your places. You can add it again by searching."
-              confirmLabel="Remove"
-              busyLabel="Removing"
+              message={i18n._({ id: "ui.Remove {place}?", message: "Remove {place}?", values: { place: adapter.labelFor(p) } })}
+              detail={i18n._({ id: "ui.It is deleted from your places. You can add it again by searching.", message: "It is deleted from your places. You can add it again by searching." })}
+              confirmLabel={i18n._({ id: "ui.Remove", message: "Remove" })}
+              busyLabel={i18n._({ id: "ui.Removing", message: "Removing" })}
               onConfirm={() => {
                 onValueChange(ids.filter((x) => x !== p));
                 void adapter.remove?.(p);
@@ -288,22 +289,22 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <Button type="button" size="icon" variant="ghost" disabled={disabled} aria-label={`Actions for ${adapter.labelFor(p)}`}>
+                  <Button type="button" size="icon" variant="ghost" disabled={disabled} aria-label={i18n._({ id: "ui.Actions for {place}", message: "Actions for {place}", values: { place: adapter.labelFor(p) } })}>
                     <EllipsisIcon aria-hidden />
                   </Button>
                 }
               />
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setRenaming(p)}>Rename</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setRenaming(p)}>{i18n._({ id: "ui.Rename", message: "Rename" })}</DropdownMenuItem>
                 <DropdownMenuItem disabled={i <= 0} onClick={() => move(i, -1)}>
-                  Move up
+                  {i18n._({ id: "ui.Move up", message: "Move up" })}
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled={i >= ids.length - 1} onClick={() => move(i, 1)}>
-                  Move down
+                  {i18n._({ id: "ui.Move down", message: "Move down" })}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onClick={() => setRemoving(p)}>
-                  Remove
+                  {i18n._({ id: "ui.Remove", message: "Remove" })}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -311,7 +312,7 @@ export function LocationField({ value, multiple, allowCurrent, adapter, onValueC
         }}
       />
       <div className="flex flex-wrap gap-2">
-        <AddPlace adapter={adapter} disabled={disabled} label="Add a place" onPick={(p) => !ids.includes(p) && onValueChange([...ids, p])} />
+        <AddPlace adapter={adapter} disabled={disabled} label={i18n._({ id: "ui.Add a place", message: "Add a place" })} onPick={(p) => !ids.includes(p) && onValueChange([...ids, p])} />
         {useCurrentButton}
       </div>
       {deniedNote}

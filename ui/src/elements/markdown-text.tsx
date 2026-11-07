@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import "@assistant-ui/react-markdown/styles/dot.css";
 import "streamdown/styles.css";
 import "./markdown-text.css";
@@ -365,7 +366,7 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({
   }, [stableComponents]);
 
   return (
-    <Suspense fallback={<span className="aui-md" aria-label="Formatting message" />}>
+    <Suspense fallback={<span className="aui-md" aria-label={i18n._({ id: "ui.Formatting message", message: "Formatting message" })} />}>
       {isStandalone ? <Streamdown
         mode="static"
         parseIncompleteMarkdown={true}
@@ -411,7 +412,7 @@ const CodeHeader: FC<CodeHeaderProps> = ({ language, code }) => {
       <span className="aui-code-header-language text-muted-foreground font-medium lowercase">
         {language}
       </span>
-      <TooltipIconButton tooltip="Copy" onClick={onCopy}>
+      <TooltipIconButton tooltip={i18n._({ id: "ui.Copy", message: "Copy" })} onClick={onCopy}>
         {!isCopied && (
           <CopyIcon className="animate-in zoom-in-75 fade-in duration-150" />
         )}

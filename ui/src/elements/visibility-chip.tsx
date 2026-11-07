@@ -2,6 +2,7 @@ import { LockKeyholeIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { diceBearAvatarUri } from "../primitives/Avatar";
+import { i18n } from "@/kit/i18n"
 
 export interface VisibilityPerson {
   id: string;
@@ -25,7 +26,7 @@ export function VisibilityChip({ mode, people, canManage, onOpen }: VisibilityCh
   const visible = people.slice(0, 3);
   const remainder = Math.max(0, people.length - visible.length);
   return (
-    <Button type="button" variant="outline" size="sm" aria-label={`${mode === "private" ? "Private" : "Shared"}${canManage ? ", manage sharing" : ", view sharing"}`} onClick={onOpen}>
+    <Button type="button" variant="outline" size="sm" aria-label={mode === "private" ? (canManage ? i18n._({ id: "ui.Private, manage sharing", message: "Private, manage sharing" }) : i18n._({ id: "ui.Private, view sharing", message: "Private, view sharing" })) : (canManage ? i18n._({ id: "ui.Shared, manage sharing", message: "Shared, manage sharing" }) : i18n._({ id: "ui.Shared, view sharing", message: "Shared, view sharing" }))} onClick={onOpen}>
       {mode === "private" ? <LockKeyholeIcon aria-hidden className="size-4" /> : (
         <AvatarGroup aria-hidden>
           {visible.map((person) => (
@@ -40,7 +41,7 @@ export function VisibilityChip({ mode, people, canManage, onOpen }: VisibilityCh
           {remainder > 0 ? <AvatarGroupCount>+{remainder}</AvatarGroupCount> : null}
         </AvatarGroup>
       )}
-      <span>{mode === "private" ? "Private" : "Shared"}</span>
+      <span>{mode === "private" ? i18n._({ id: "ui.Private", message: "Private" }) : i18n._({ id: "ui.Shared", message: "Shared" })}</span>
     </Button>
   );
 }

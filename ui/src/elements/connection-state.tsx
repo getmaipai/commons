@@ -1,5 +1,6 @@
 "use client";
 
+import { i18n } from "@/kit/i18n"
 import type { ComponentProps } from "react";
 import { CheckIcon, CloudOffIcon, Loader2Icon } from "lucide-react";
 import { cn } from "cn";
@@ -40,14 +41,14 @@ export function ConnectionState({
         <>
           <CloudOffIcon className="size-3.5 shrink-0 text-status-warning-ink" />
           <span className="min-w-0 flex-1 text-[13px]">
-            Connection lost. The run kept going on the server.
+            {i18n._({ id: "ui.Connection lost. The run kept going on the server.", message: "Connection lost. The run kept going on the server." })}
           </span>
           <button
             type="button"
             onClick={onRetry}
             className="text-foreground/70 hover:bg-foreground/[0.06] hover:text-foreground/95 shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-[background-color,color,scale] duration-150 active:scale-[0.96]"
           >
-            Reconnect
+            {i18n._({ id: "ui.Reconnect", message: "Reconnect" })}
           </button>
         </>
       )}
@@ -55,12 +56,12 @@ export function ConnectionState({
       {phase === "reconnecting" && (
         <>
           <Loader2Icon className="text-foreground/40 size-3.5 shrink-0 animate-spin motion-reduce:animate-none" />
-          <span className="min-w-0 flex-1 text-[13px]">Reconnecting</span>
+          <span className="min-w-0 flex-1 text-[13px]">{i18n._({ id: "ui.Reconnecting", message: "Reconnecting" })}</span>
           {attempt !== undefined && (
             <span
               className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
             >
-              attempt {attempt}
+              {i18n._({ id: "ui.attempt {attempt}", message: "attempt {attempt}", values: { attempt } })}
             </span>
           )}
         </>
@@ -70,13 +71,13 @@ export function ConnectionState({
         <>
           <CheckIcon className="size-3.5 shrink-0 text-status-ok" />
           <span className="min-w-0 flex-1 text-[13px]">
-            Picked the stream back up.
+            {i18n._({ id: "ui.Picked the stream back up.", message: "Picked the stream back up." })}
           </span>
           {resumedTokens !== undefined && (
             <span
               className={cn(mono, "text-muted-foreground shrink-0 tabular-nums")}
             >
-              +{resumedTokens} tokens
+              {i18n._({ id: "ui.+{resumedTokens} tokens", message: "+{resumedTokens} tokens", values: { resumedTokens } })}
             </span>
           )}
         </>

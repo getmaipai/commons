@@ -63,6 +63,7 @@ import {
   type PlayerChapter,
   type ProgressReason,
 } from "@/kit/primitives/playerLogic";
+import { i18n } from "@/kit/i18n";
 
 export type { PlayerChapter, ProgressReason } from "@/kit/primitives/playerLogic";
 
@@ -141,33 +142,33 @@ export interface PlayerCopy {
   live: string;
 }
 
-export const DEFAULT_PLAYER_COPY: PlayerCopy = {
-  play: "Play",
-  pause: "Pause",
-  back: (s) => `Back ${s} seconds`,
-  ahead: (s) => `Ahead ${s} seconds`,
-  speed: "Playback speed",
-  chapters: "Chapters",
-  captions: "Captions",
-  pip: "Picture in picture",
-  fullscreen: "Full screen",
-  mute: "Mute",
-  cast: "Play on another screen",
-  dock: "Shrink the player",
-  expand: "Open the player",
-  previous: "Previous",
-  next: "Next",
-  resumedFrom: (time) => `Resuming from ${time}`,
-  startOver: "Start over",
-  skipIntro: "Skip intro",
-  skipCredits: "Skip credits",
-  upNext: "Up next",
-  upNextIn: (s) => `Up next in ${s}`,
-  playNow: "Play now",
-  cancel: "Cancel",
-  holdSpeed: "2x speed",
-  live: "Live",
-};
+export const defaultPlayerCopy = (): PlayerCopy => ({
+  play: i18n._({ id: "ui.Play", message: "Play" }),
+  pause: i18n._({ id: "ui.Pause", message: "Pause" }),
+  back: (s) => i18n._({ id: "ui.Back {seconds} seconds", message: "Back {seconds} seconds", values: { seconds: s } }),
+  ahead: (s) => i18n._({ id: "ui.Ahead {seconds} seconds", message: "Ahead {seconds} seconds", values: { seconds: s } }),
+  speed: i18n._({ id: "ui.Playback speed", message: "Playback speed" }),
+  chapters: i18n._({ id: "ui.Chapters", message: "Chapters" }),
+  captions: i18n._({ id: "ui.Captions", message: "Captions" }),
+  pip: i18n._({ id: "ui.Picture in picture", message: "Picture in picture" }),
+  fullscreen: i18n._({ id: "ui.Full screen", message: "Full screen" }),
+  mute: i18n._({ id: "ui.Mute", message: "Mute" }),
+  cast: i18n._({ id: "ui.Play on another screen", message: "Play on another screen" }),
+  dock: i18n._({ id: "ui.Shrink the player", message: "Shrink the player" }),
+  expand: i18n._({ id: "ui.Open the player", message: "Open the player" }),
+  previous: i18n._({ id: "ui.Previous", message: "Previous" }),
+  next: i18n._({ id: "ui.Next", message: "Next" }),
+  resumedFrom: (time) => i18n._({ id: "ui.Resuming from {time}", message: "Resuming from {time}", values: { time } }),
+  startOver: i18n._({ id: "ui.Start over", message: "Start over" }),
+  skipIntro: i18n._({ id: "ui.Skip intro", message: "Skip intro" }),
+  skipCredits: i18n._({ id: "ui.Skip credits", message: "Skip credits" }),
+  upNext: i18n._({ id: "ui.Up next", message: "Up next" }),
+  upNextIn: (s) => i18n._({ id: "ui.Up next in {seconds}", message: "Up next in {seconds}", values: { seconds: s } }),
+  playNow: i18n._({ id: "ui.Play now", message: "Play now" }),
+  cancel: i18n._({ id: "ui.Cancel", message: "Cancel" }),
+  holdSpeed: i18n._({ id: "ui.2x speed", message: "2x speed" }),
+  live: i18n._({ id: "ui.Live", message: "Live" }),
+});
 
 export type PlayerLayout = "video" | "audio" | "mini";
 
@@ -337,7 +338,7 @@ export function Player(props: PlayerProps) {
     poster,
     posterAlt = "",
     lyrics,
-    lyricsLabel = "Lyrics",
+    lyricsLabel = i18n._({ id: "ui.Lyrics", message: "Lyrics" }),
     lyricsEmptyText,
     lyricsLoading = false,
     onLyricsOpen,
@@ -369,7 +370,7 @@ export function Player(props: PlayerProps) {
     lyricsBlur = false,
     voiceover,
   } = props;
-  const copy = useMemo(() => ({ ...DEFAULT_PLAYER_COPY, ...props.copy }), [props.copy]);
+  const copy = { ...defaultPlayerCopy(), ...props.copy };
   const liveProp = props.live === true;
   const chapters = useMemo(() => normalizeChapters(props.chapters), [props.chapters]);
 
@@ -1356,7 +1357,7 @@ export function Player(props: PlayerProps) {
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
         <div className={audioLayout === "container" ? "grid w-full gap-6 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-6 sm:grid-cols-2 sm:items-center"}>
-          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? "Looking for lyrics..." : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center", artSpring)}
+          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? i18n._({ id: "ui.Looking for lyrics...", message: "Looking for lyrics..." }) : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center", artSpring)}
           <div className="flex min-w-0 flex-col gap-4">
             <div className="min-w-0">
               <p className="truncate text-2xl font-semibold">{title}</p>

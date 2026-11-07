@@ -3,6 +3,7 @@ import { Button } from "@/kit/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/kit/ui/hover-card";
 import { Input } from "@/kit/ui/input";
 import { icons } from "@/kit/icons";
+import { i18n } from "@/kit/i18n"
 
 export interface CompanionPreviewProps {
   name: string;
@@ -37,19 +38,19 @@ export function CompanionPreview({ name, trigger, ready, context, lastLine, askP
     <HoverCardContent align="end" className="w-80">
       {listeningLine ? <div className="mb-3 flex items-center justify-between gap-3 border-b border-border pb-3">
         <p className="text-sm text-foreground">{listeningLine}</p>
-        {onTurnOff ? <Button type="button" variant="outline" size="sm" onClick={onTurnOff}>Turn off</Button> : null}
+        {onTurnOff ? <Button type="button" variant="outline" size="sm" onClick={onTurnOff}>{i18n._({ id: "ui.Turn off", message: "Turn off" })}</Button> : null}
       </div> : null}
       <div className="flex items-center gap-2">
         <h3 className="min-w-0 flex-1 truncate font-medium">{name}</h3>
-        {ready ? <span className="text-sm text-muted-foreground">Ready</span> : null}
+        {ready ? <span className="text-sm text-muted-foreground">{i18n._({ id: "ui.Ready", message: "Ready" })}</span> : null}
       </div>
       {context ? <p className="mt-1 text-sm text-muted-foreground">{context}</p> : null}
       {lastLine ? <p className="mt-2 text-sm text-foreground">{lastLine}</p> : null}
       {action ? <div className="mt-3">{action}</div> : null}
       <form className="mt-3 flex items-center gap-2" onSubmit={submit}>
-        <Input aria-label={`Ask ${name}`} placeholder={askPlaceholder} value={text} onChange={(event) => setText(event.target.value)} />
-        {onMic ? <Button type="button" variant="ghost" size="icon-sm" aria-label="Use microphone" onClick={onMic}><Mic aria-hidden="true" /></Button> : null}
-        <Button type="submit" size="icon-sm" aria-label={`Send to ${name}`} disabled={!text.trim()}><icons.send aria-hidden="true" /></Button>
+        <Input aria-label={i18n._({ id: "ui.Ask {name}", message: "Ask {name}", values: { name } })} placeholder={askPlaceholder} value={text} onChange={(event) => setText(event.target.value)} />
+        {onMic ? <Button type="button" variant="ghost" size="icon-sm" aria-label={i18n._({ id: "ui.Use microphone", message: "Use microphone" })} onClick={onMic}><Mic aria-hidden="true" /></Button> : null}
+        <Button type="submit" size="icon-sm" aria-label={i18n._({ id: "ui.Send to {name}", message: "Send to {name}", values: { name } })} disabled={!text.trim()}><icons.send aria-hidden="true" /></Button>
       </form>
     </HoverCardContent>
   </HoverCard>;

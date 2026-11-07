@@ -1,4 +1,5 @@
 import * as React from "react"
+import { i18n } from "@/kit/i18n";
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 
@@ -109,7 +110,7 @@ function BreadcrumbEllipsis({
     >
       <MoreHorizontalIcon
       />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{i18n._({ id: "ui.More", message: "More" })}</span>
     </span>
   )
 }
