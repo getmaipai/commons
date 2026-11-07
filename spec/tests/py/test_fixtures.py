@@ -82,9 +82,15 @@ def load_fixture(name: str) -> dict:
 
 
 def test_talent_record_fixtures_round_trip():
-    for name, model in [("synth.example.json", Synth), ("show-format.example.json", ShowFormat)]:
+    for name, model in [
+        ("synth.example.json", Synth),
+        ("show-format.example.json", ShowFormat),
+    ]:
         data = load_fixture(name)
-        assert model.model_validate(data).model_dump(mode="json", exclude_unset=True) == data
+        assert (
+            model.model_validate(data).model_dump(mode="json", exclude_unset=True)
+            == data
+        )
 
 
 def test_person_fixture():

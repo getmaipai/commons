@@ -862,6 +862,7 @@ def test_relationship_called_fixture_and_nonempty_constraint():
 
 def test_synth_cross_field_rules():
     from gen.py.synth_schema import Synth
+
     data = load("synth.example.json")
     assert validate_synth(Synth.model_validate(data)) == []
     data["based_on"] = {"kind": "household_member", "person_id": None}

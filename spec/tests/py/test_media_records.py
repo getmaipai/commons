@@ -50,8 +50,25 @@ def test_media_records_reject_paths_where_file_ids_are_required():
     with pytest.raises(ValidationError):
         MediaProduction.model_validate(production)
     data = fixture("media-production.bruno.example.json")
-    data["show"] = {"format_id":"news_briefing","audience":"all","household_facts":False,"sources":[],"schedule":None,"length_s":180}
+    data["show"] = {
+        "format_id": "news_briefing",
+        "audience": "all",
+        "household_facts": False,
+        "sources": [],
+        "schedule": None,
+        "length_s": 180,
+    }
     assert MediaProduction.model_validate(data).show is not None
     from gen.py.media_source_schema import MediaSource
-    source = {"id":"msrc-show001","kind":"production","scope":"household","label":"Morning news","production_id":"mprd-bruno001","created_at":"2026-11-07T12:00:00Z","hlc":"1794052800000:0:node0001","provenance":"person-bruno"}
+
+    source = {
+        "id": "msrc-show001",
+        "kind": "production",
+        "scope": "household",
+        "label": "Morning news",
+        "production_id": "mprd-bruno001",
+        "created_at": "2026-11-07T12:00:00Z",
+        "hlc": "1794052800000:0:node0001",
+        "provenance": "person-bruno",
+    }
     MediaSource.model_validate(source)
