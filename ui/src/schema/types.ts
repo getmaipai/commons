@@ -705,7 +705,7 @@ export const ResultFeedNodeSchema = z.object({
         action: ActionSchema,
       }).strict(),
     )
-    .max(4)
+    .max(5)
     .optional(),
   actions_variant: z.enum(["default", "icons"]).default("default"),
   actions_inline: z.number().int().min(1).max(8).optional(),
@@ -795,7 +795,7 @@ export const StudioNodeSchema = z.object({
         })
         .strict(),
       handlers: z.object({ stop: FeedHandlerSchema.optional(), retry: FeedHandlerSchema.optional() }).strict().optional(),
-      actions: z.array(z.object({ label: z.string().min(1).max(40), action: ActionSchema }).strict()).max(2).optional(),
+      actions: z.array(z.object({ label: z.string().min(1).max(40), action: ActionSchema }).strict()).max(3).optional(),
       poll_while: ResultFeedNodeSchema.shape.poll_while,
     })
     .strict()
