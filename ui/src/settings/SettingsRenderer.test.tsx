@@ -354,6 +354,18 @@ describe("SettingsRenderer - option matrix card", () => {
     expect(JSON.parse(put.body!)).toEqual({ scope: "household", key: "search.blocklists.child", value: ["blp-gambling"] });
   });
 
+  test("house/exposure rows come from the host and a locked cell follows the band", async () => {
+    const hmatrix = { ...MATRIX, rows: "house/exposure" };
+    mockApi(mdefs);
+    const rows = { "house/exposure": [{ id: "light-porch", label: "Porch light", locked_for: ["child"] }, { id: "lock-front", label: "Front door lock", offered_for: ["adult"] }] };
+    const { findByLabelText } = renderWithQueryClient(<SettingsRenderer {...mprops} matrix={hmatrix} matrixRowSources={rows} />);
+    const locked = (await findByLabelText("Porch light for Kids")) as HTMLElement;
+    expect(locked.getAttribute("aria-checked")).toBe("true");
+    const off = (await findByLabelText("Front door lock for Teens")) as HTMLElement;
+    expect(off.hasAttribute("disabled") || off.getAttribute("aria-disabled") === "true" || off.hasAttribute("data-disabled")).toBe(true);
+    expect(((await findByLabelText("Front door lock for Adults")) as HTMLElement).getAttribute("aria-checked")).toBe("false");
+  });
+
   test("a failed tick shows the card's own what-to-do message when the server gave none", async () => {
     mockApi(mdefs);
     const real = globalThis.fetch;

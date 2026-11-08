@@ -320,9 +320,10 @@
               "type": "string",
               "enum": [
                 "search/blocklists",
-                "news/feed-lists"
+                "news/feed-lists",
+                "house/exposure"
               ],
-              "description": "The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note."
+              "description": "The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). house/exposure has no spec file: the host supplies the rows at run time from the household's Home Assistant exposure list. A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note."
             },
             "rows_label": {
               "type": "string",

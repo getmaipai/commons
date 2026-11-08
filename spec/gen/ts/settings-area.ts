@@ -245,11 +245,15 @@ export const SettingsArea = z
                     /**Draw the card's list-choice keys as one checkbox grid: a row per list, a column per user type. The rows come from the named policy file (one definition); each column is the existing multi-select key for that user type, so the grid reads and writes the same values and keeps no second store. Those keys are hidden from the card's ordinary rows (each key is drawn once). The card's other keys still draw as rows under the grid.*/
                     matrix: z
                       .object({
-                        /**The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.*/
+                        /**The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). house/exposure has no spec file: the host supplies the rows at run time from the household's Home Assistant exposure list. A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.*/
                         rows: z
-                          .enum(["search/blocklists", "news/feed-lists"])
+                          .enum([
+                            "search/blocklists",
+                            "news/feed-lists",
+                            "house/exposure",
+                          ])
                           .describe(
-                            "The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.",
+                            "The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). house/exposure has no spec file: the host supplies the rows at run time from the household's Home Assistant exposure list. A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.",
                           ),
                         /**The heading over the row labels. Omitted, the renderer says Kind of site.*/
                         rows_label: z

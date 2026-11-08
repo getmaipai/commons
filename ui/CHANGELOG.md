@@ -1,3 +1,7 @@
+## [ui-v0.5.530] - 2026-11-08
+
+- HOUSE-08b, additive. New device card Elements `FanTile` (spinning icon, speed follows the percentage, slider commits on release), `CoverTile` (fill follows position, open, stop and close), `ClimateTile` (dial with a rotating setpoint thumb, heat or cool glow, plus and minus buttons as the accessible control) and `RoomHeader` (master toggle, "N of M on" counter, then the room's tiles). `SwitchTile`, `FanTile`, `CoverTile` and `ClimateTile` show a pulsing pending ring; `LockTile` gains a hold-fill (a scaleX transform over 700 ms) while pressed. `LightTile` glow is capped near 30% opacity so the card stays readable. Motion is transform and opacity only, with `motion-reduce` fallbacks; every colour is a theme token. `SettingsRenderer` takes an optional `matrixRowSources` prop that supplies rows for the `house/exposure` matrix source (the grants grid). `DeviceCardsShowcase` shows every card. Spec: `settings-area` `matrix.rows` accepts `house/exposure` (spec-v0.1.344).
+
 ## [ui-v0.5.529] - 2026-11-07
 
 - PhoneNav `docked` variant: 0.5rem side inset on the bar so the first and last entries and the active pill sit inside the screen edge. Height stays 49px; the bar, prompt-bar and transport offsets are unchanged.

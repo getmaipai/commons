@@ -191,9 +191,9 @@ class Matrix(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    rows: Literal['search/blocklists', 'news/feed-lists'] = Field(
+    rows: Literal['search/blocklists', 'news/feed-lists', 'house/exposure'] = Field(
         ...,
-        description="The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.",
+        description="The policy file the rows come from (spec/search/blocklists.json or spec/news/feed-lists.json). house/exposure has no spec file: the host supplies the rows at run time from the household's Home Assistant exposure list. A list in its locked_for for a column's band shows checked and disabled. A list whose offered_for leaves a column's band out shows unchecked and disabled, with the unavailable_note.",
     )
     rows_label: constr(min_length=1, max_length=40) | None = Field(
         None,

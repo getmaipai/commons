@@ -20,7 +20,7 @@ import blocklistPolicy from "@maipai/spec/search/blocklists.json";
 import feedListPolicy from "@maipai/spec/news/feed-lists.json";
 import { i18n } from "@/kit/i18n";
 
-interface MatrixRowSource { id: string; label: string; does?: string; locked_for?: readonly string[]; offered_for?: readonly string[] }
+export interface MatrixRowSource { id: string; label: string; does?: string; locked_for?: readonly string[]; offered_for?: readonly string[] }
 // The shared row sources a card's `matrix.rows` may name: the spec's own
 // files, imported once, so a row is declared in one place.
 const MATRIX_ROWS: Record<string, readonly MatrixRowSource[]> = {
@@ -82,6 +82,8 @@ interface SettingsRendererProps {
    * group named by `only`, replaces that group's column keys as rows, and
    * writes the same keys the rows would. */
   matrix?: AreaMatrix;
+  /** Rows for a `matrix.rows` source that has no spec file (`house/exposure`): the host supplies them at run time. Omitted, such a grid draws no rows. */
+  matrixRowSources?: Record<string, readonly MatrixRowSource[]>;
   /** Extra display for single rows, by key: a summary line, a lock reason
    * (control disabled) and one extra button. Data and handlers from the host;
    * additive, absent means unchanged. */
@@ -121,6 +123,7 @@ export function SettingsRenderer({
   focusKey,
   headingLevel,
   matrix,
+  matrixRowSources,
   rowExtras,
 }: SettingsRendererProps) {
   const Heading = `h${useSettingsHeadingLevel(headingLevel)}` as "h2" | "h3";
@@ -225,7 +228,7 @@ export function SettingsRenderer({
   }
 
   function renderMatrix(m: AreaMatrix, valueRows: ResolvedSetting[]) {
-    const source = MATRIX_ROWS[m.rows] ?? [];
+    const source = MATRIX_ROWS[m.rows] ?? matrixRowSources?.[m.rows] ?? [];
     const columns = m.columns.map((c) => {
       const v = valueRows.find((r) => r.key === c.key)?.value;
       return {
