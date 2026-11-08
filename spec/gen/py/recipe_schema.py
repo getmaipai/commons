@@ -378,6 +378,39 @@ class LlmCompleteStep(BaseModel):
     )
 
 
+class TranslateStep(BaseModel):
+    """
+    Goes through host.translate (permission llm:complete): the household's one translation service, which keeps names, brand words, URLs and placeholders as written and applies the host's own output gate. Prefer it to an llm_complete step whenever a recipe translates text.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    op: Literal['translate']
+    as_: str = Field(
+        ...,
+        alias='as',
+        description='Binds the result ({"text": string}, the same raw-object shape llm_complete binds). Read the reply out with a `pick` step (`path: "text"`).',
+    )
+    text: str = Field(
+        ...,
+        description='A template with {variable} interpolation: the text to translate, exactly as the person wants it translated.',
+    )
+    to: str = Field(
+        ...,
+        description='A template with {variable} interpolation: the target language as a BCP-47 code such as es or ja.',
+    )
+    from_: str | None = Field(
+        None,
+        alias='from',
+        description='Optional template: the source language code. Omitted means the host detects it.',
+    )
+    unless_set: constr(pattern=r'^[a-z][a-z0-9_]*$') | None = Field(
+        None,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
+
+
 class ListAddStep(BaseModel):
     """
     Calls host.lists.add (permission lists:write, session-d-packages-and-store.md step 8's own list-add package) - fire-and-forget, the same shape remember_step already takes: nothing is bound, a recipe's own format step confirms using the input it already has.
@@ -569,6 +602,7 @@ class Step(
         | IntegrationCallStep
         | ComputeStep
         | LlmCompleteStep
+        | TranslateStep
         | ListAddStep
         | ListViewStep
         | RemindStep
@@ -591,6 +625,7 @@ class Step(
         | IntegrationCallStep
         | ComputeStep
         | LlmCompleteStep
+        | TranslateStep
         | ListAddStep
         | ListViewStep
         | RemindStep
@@ -627,6 +662,7 @@ class Recipe(BaseModel):
         | IntegrationCallStep
         | ComputeStep
         | LlmCompleteStep
+        | TranslateStep
         | ListAddStep
         | ListViewStep
         | RemindStep

@@ -1,3 +1,7 @@
+## [spec-v0.1.343] - 2026-11-08
+
+- TRANSLATE-06, additive. Recipe step `translate` (`as`, `text`, `to`, optional `from`, all templates) calls `host.translate({text, to, from?})` and binds `{text}` like `llm_complete`. A host owns keep-terms and its output gate; the TS and Python emulators echo `[emulator: translate to <to>] <text>`. Interpreters, generated TS and Python and fixture `translate-step` updated. No existing recipe changes.
+
 ## [spec-v0.1.342] - 2026-11-07
 
 - SPEC-GEN-PY-01, no schema change. `spec/gen/py` regenerated with the pinned generator (datamodel-code-generator 0.76.1, uv.lock): TALENT-00 had changed the broad sweep to modular output without regenerating the other modules, so `check` failed on drift. Adds the `presence_state` and `status_component` Python modules, unused RootModel wrapper classes (`Act`, `Stance`, `Subject`, `Day`, `Kind` and similar) and no removals. `gen-py.sh` now strips a module's own-name prefix from its union references (answer_block, conversation_turn, result and subject_ref failed at import without it).

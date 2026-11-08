@@ -50,6 +50,7 @@
         { "$ref": "#/$defs/integration_call_step" },
         { "$ref": "#/$defs/compute_step" },
         { "$ref": "#/$defs/llm_complete_step" },
+        { "$ref": "#/$defs/translate_step" },
         { "$ref": "#/$defs/list_add_step" },
         { "$ref": "#/$defs/list_view_step" },
         { "$ref": "#/$defs/remind_step" },
@@ -251,6 +252,20 @@
 
       },
       "description": "Goes through host.llm.complete (permission llm:complete) - the household's own local chat model (session-d-packages-and-store.md step 7's own translate package is the first caller). A network translation service is explicitly opt-in per the platform plan and not this step's concern: a recipe that wants one calls it through its own fetch step instead."
+    },
+    "translate_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "as", "text", "to"],
+      "properties": {
+        "op": { "const": "translate" },
+        "as": { "type": "string", "description": "Binds the result ({\"text\": string}, the same raw-object shape llm_complete binds). Read the reply out with a `pick` step (`path: \"text\"`)." },
+        "text": { "type": "string", "description": "A template with {variable} interpolation: the text to translate, exactly as the person wants it translated." },
+        "to": { "type": "string", "description": "A template with {variable} interpolation: the target language as a BCP-47 code such as es or ja." },
+        "from": { "type": "string", "description": "Optional template: the source language code. Omitted means the host detects it." },
+        "unless_set": {"$ref": "#/$defs/unless_set"}
+      },
+      "description": "Goes through host.translate (permission llm:complete): the household's one translation service, which keeps names, brand words, URLs and placeholders as written and applies the host's own output gate. Prefer it to an llm_complete step whenever a recipe translates text."
     },
     "list_add_step": {
       "type": "object",

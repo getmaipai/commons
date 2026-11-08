@@ -405,6 +405,47 @@ export const Recipe = z
               ),
             z
               .object({
+                op: z.literal("translate"),
+                /**Binds the result ({"text": string}, the same raw-object shape llm_complete binds). Read the reply out with a `pick` step (`path: "text"`).*/
+                as: z
+                  .string()
+                  .describe(
+                    'Binds the result ({"text": string}, the same raw-object shape llm_complete binds). Read the reply out with a `pick` step (`path: "text"`).',
+                  ),
+                /**A template with {variable} interpolation: the text to translate, exactly as the person wants it translated.*/
+                text: z
+                  .string()
+                  .describe(
+                    "A template with {variable} interpolation: the text to translate, exactly as the person wants it translated.",
+                  ),
+                /**A template with {variable} interpolation: the target language as a BCP-47 code such as es or ja.*/
+                to: z
+                  .string()
+                  .describe(
+                    "A template with {variable} interpolation: the target language as a BCP-47 code such as es or ja.",
+                  ),
+                /**Optional template: the source language code. Omitted means the host detects it.*/
+                from: z
+                  .string()
+                  .describe(
+                    "Optional template: the source language code. Omitted means the host detects it.",
+                  )
+                  .optional(),
+                /**Skip this step when that variable is bound, non-null and non-empty.*/
+                unless_set: z
+                  .string()
+                  .regex(new RegExp("^[a-z][a-z0-9_]*$"))
+                  .describe(
+                    "Skip this step when that variable is bound, non-null and non-empty.",
+                  )
+                  .optional(),
+              })
+              .strict()
+              .describe(
+                "Goes through host.translate (permission llm:complete): the household's one translation service, which keeps names, brand words, URLs and placeholders as written and applies the host's own output gate. Prefer it to an llm_complete step whenever a recipe translates text.",
+              ),
+            z
+              .object({
                 op: z.literal("list_add"),
                 /**May reference input/variable names in {braces}. The item text added to the household's own default shopping list.*/
                 text: z

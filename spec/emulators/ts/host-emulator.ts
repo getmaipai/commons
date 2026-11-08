@@ -148,6 +148,8 @@ export interface Host {
     // real model-inference call, so callers must await it.
     complete(opts: unknown): Promise<unknown>;
   };
+  // The household translation service. Promise-typed like llm.complete.
+  translate(opts: { text: string; to: string; from?: string }): Promise<unknown>;
   camera: {
     still(): unknown;
   };
@@ -368,6 +370,10 @@ export class HostEmulator implements Host {
     complete: async (_opts: unknown): Promise<unknown> => {
       return { text: "[emulator: no model loaded, this is a canned reply]" };
     },
+  };
+
+  readonly translate = async (opts: { text: string; to: string; from?: string }): Promise<unknown> => {
+    return { text: `[emulator: translate to ${opts.to}] ${opts.text}` };
   };
 
   readonly camera = {

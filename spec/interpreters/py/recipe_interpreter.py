@@ -247,6 +247,16 @@ async def run_recipe(recipe: Any, inputs: dict[str, Any], host: Any) -> dict[str
             scope[step.as_] = await host.llm.complete(
                 {"messages": [{"role": "user", "content": prompt}]}
             )
+        elif op == "translate":
+            # Must stay behaviorally identical to recipe-interpreter.ts's
+            # own twin case.
+            request = {
+                "text": interpolate(step.text, scope),
+                "to": interpolate(step.to, scope),
+            }
+            if step.from_ is not None:
+                request["from"] = interpolate(step.from_, scope)
+            scope[step.as_] = await host.translate(request)
         elif op == "list_add":
             # Fire-and-forget, same shape `remember` already takes.
             # Must stay behaviorally identical to recipe-interpreter.ts's

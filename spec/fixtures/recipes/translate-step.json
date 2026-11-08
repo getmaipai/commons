@@ -1,0 +1,25 @@
+{
+  "description": "translate + pick + format: the translate step goes through host.translate (the household's one translation service); the emulator echoes the target language and the text.",
+  "recipe": {
+    "id": "translate-step",
+    "inputs": [{ "name": "phrase", "selector": "text" }],
+    "steps": [
+      { "op": "translate", "as": "result", "text": "{phrase}", "to": "es" },
+      { "op": "pick", "as": "translation", "from": "result", "path": "text" },
+      { "op": "format", "as": "reply", "text": "{translation}", "speech": "{translation}", "language": "es" }
+    ]
+  },
+  "inputs": { "phrase": "good morning" },
+  "host_setup": {},
+  "expected": {
+    "reply": {
+      "text": "[emulator: translate to es] good morning",
+      "speech": "[emulator: translate to es] good morning",
+      "language": "es"
+    },
+    "actions": [],
+    "scheduled_jobs": [],
+    "home_calls": [],
+    "memory_added": []
+  }
+}

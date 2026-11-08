@@ -66,6 +66,7 @@ type RecipeStep =
   | { op: "integration.call"; as: string; id: string; method: string; args?: Record<string, unknown>; unless_set?: string }
   | { op: "compute"; as: string; expression: string; unless_set?: string }
   | { op: "llm_complete"; as: string; prompt: string; unless_set?: string }
+  | { op: "translate"; as: string; text: string; to: string; from?: string; unless_set?: string }
   | { op: "list_add"; text: string; unless_set?: string }
   | { op: "list_view"; as: string; unless_set?: string }
   | { op: "remind"; as: string; text: string; unless_set?: string }
@@ -287,6 +288,17 @@ export async function runRecipe(recipe: Recipe, inputs: Scope, host: Host): Prom
         // package is the first caller), not a chat turn.
         const prompt = interpolate(step.prompt, scope);
         scope[step.as] = await host.llm.complete({ messages: [{ role: "user", content: prompt }] });
+        break;
+      }
+      case "translate": {
+        // Raw-object binding like `llm_complete`; the host owns the
+        // keep-terms, batching and output gate (one translation service).
+        // Must stay behaviorally identical to recipe_interpreter.py's twin.
+        scope[step.as] = await host.translate({
+          text: interpolate(step.text, scope),
+          to: interpolate(step.to, scope),
+          ...(step.from !== undefined ? { from: interpolate(step.from, scope) } : {}),
+        });
         break;
       }
       case "list_add": {

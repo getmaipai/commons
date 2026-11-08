@@ -218,6 +218,11 @@ class _LlmNamespace:
         return {"text": "[emulator: no model loaded, this is a canned reply]"}
 
 
+class _TranslateNamespace:
+    async def __call__(self, opts: dict[str, Any]) -> dict[str, Any]:
+        return {"text": f"[emulator: translate to {opts['to']}] {opts['text']}"}
+
+
 class _ListsNamespace:
     def __init__(self, host: HostEmulator):
         self._host = host
@@ -352,6 +357,7 @@ class HostEmulator:
         self.integration = _IntegrationNamespace(self)
         self.speak = _SpeakNamespace(self)
         self.llm = _LlmNamespace()
+        self.translate = _TranslateNamespace()
         self.lists = _ListsNamespace(self)
         self.reminders = _RemindersNamespace(self)
         self.timers = _TimersNamespace(self)
