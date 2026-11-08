@@ -1,3 +1,7 @@
+## [ui-v0.5.534] - 2026-11-08
+
+- PRO-LOOK-GALLERY-01: add `KitGalleryShowcase`, a scrollable baseline of existing kit parts, their states, token swatches and type/radius samples. Additive; all existing part defaults stay unchanged.
+
 ## [ui-v0.5.533] - 2026-11-08
 
 - WEATHER-APPLE-LOOK pass 3: the Weather summary and advice row use the sky ink so they read on every sky; the Temperature/Precipitation/Wind switch has readable labels; one hourly strip on top (the duplicate is gone).

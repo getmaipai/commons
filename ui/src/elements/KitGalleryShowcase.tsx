@@ -1,0 +1,85 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { MemoryRouter } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/kit/ui/alert";
+import { Badge } from "@/kit/ui/badge";
+import { Button } from "@/kit/ui/button";
+import { Card as UiCard, CardContent, CardHeader, CardTitle } from "@/kit/ui/card";
+import { Input } from "@/kit/ui/input";
+import { Skeleton } from "@/kit/ui/skeleton";
+import { Status } from "@/kit/ui/status";
+import { Textarea } from "@/kit/ui/textarea";
+import { Card } from "@/kit/primitives/Card";
+import { Chip } from "@/kit/primitives/Chip";
+import { List } from "@/kit/primitives/List";
+import { MediaShelf, MediaTileOverlay } from "@/kit/primitives/MediaShelf";
+import { Billboard } from "@/kit/primitives/Billboard";
+import { PhoneNav } from "@/kit/PhoneNav";
+import { PromptBar } from "@/kit/elements/prompt-bar";
+import { EmptyState, EmptyStateGreeting, EmptyStateSuggestions } from "@/kit/elements/empty-state";
+import { JobProgress } from "@/kit/elements/job-progress";
+import { ImageGeneration } from "@/kit/elements/image-generation";
+import { ToastProvider, useToast } from "@/kit/primitives/Toast";
+import { SettingsShowcase } from "@/kit/settings/SettingsShowcase";
+import { VideoPlayerShowcase } from "./VideoPlayerShowcase";
+
+const LONG_COPY = "Sage keeps this thoughtful collection close for a quiet evening together.";
+const longLine = `${LONG_COPY} ${LONG_COPY}`;
+const STAGES = [{ name: "Prepare", weight: 1 }, { name: "Create", weight: 3 }];
+const shelfItems = [
+  { id: "sage", title: "A quiet garden", note: "Sage · saved today" },
+  { id: "marlow", title: "Window light", note: "Marlow · saved yesterday" },
+];
+const navEntries = [
+  { to: "/gallery", icon: "home", label: "Gallery", exact: true },
+  { to: "/gallery/saved", icon: "bookmark", label: "Saved" },
+  { to: "/gallery/recent", icon: "clock", label: "Recent" },
+];
+const tokenNames = ["--background", "--card", "--muted", "--primary", "--accent", "--border", "--hue-blue", "--hue-violet", "--hue-teal", "--hue-orange", "--hue-pink", "--hue-red", "--hue-green", "--hue-yellow", "--surface-page", "--surface-card", "--surface-pane", "--surface-sidebar", "--surface-stage"];
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return <section className="flex flex-col gap-4 border-t border-border pt-6" aria-labelledby={`gallery-${title.toLowerCase().replaceAll(" ", "-")}`}>
+    <div><h2 id={`gallery-${title.toLowerCase().replaceAll(" ", "-")}`} className="text-2xl font-semibold">{title}</h2><p className="text-sm text-muted-foreground">Existing kit parts and their current states.</p></div>
+    {children}
+  </section>;
+}
+
+function Example({ label, children }: { label: string; children: React.ReactNode }) {
+  return <div className="flex min-w-0 flex-col gap-2 rounded-xl border border-border bg-card p-4"><p className="text-sm text-muted-foreground">{label}</p>{children}</div>;
+}
+
+function ToastDemo() {
+  const { push } = useToast();
+  return <Button variant="outline" onClick={() => push("Sage's collection is saved.")}>Show toast</Button>;
+}
+
+export function KitGalleryShowcase() {
+  const [prompt, setPrompt] = useState("A clover field in soft morning light");
+  const [showLargeText, setShowLargeText] = useState(false);
+  useEffect(() => {
+    if (!showLargeText) return;
+    const root = document.documentElement;
+    const previous = root.getAttribute("data-ease-text");
+    root.setAttribute("data-ease-text", "160");
+    return () => {
+      if (previous === null) root.removeAttribute("data-ease-text");
+      else root.setAttribute("data-ease-text", previous);
+    };
+  }, [showLargeText]);
+  return <ToastProvider><MemoryRouter initialEntries={["/gallery"]}><main className="mx-auto flex w-full max-w-6xl flex-col gap-8 bg-background p-4 text-foreground sm:p-6" data-testid="kit-gallery">
+    <header><p className="text-sm text-muted-foreground">Commons UI · baseline</p><h1 className="text-3xl font-bold">Kit gallery</h1><p className="max-w-3xl text-base text-muted-foreground">A scrollable view of existing parts, their states, and the tokens they use.</p></header>
+    <Section title="Buttons"><div className="flex flex-wrap items-center gap-3">
+      <Example label="Default"><Button>Save collection</Button></Example><Example label="Outline"><Button variant="outline">Open details</Button></Example><Example label="Inverse cream"><Button variant="inverse">Make a copy</Button></Example><Example label="Ghost"><Button variant="ghost">More options</Button></Example><Example label="Destructive"><Button variant="destructive">Remove item</Button></Example><Example label="Pill shape"><Button variant="outline" shape="pill">Sage's picks</Button></Example><Example label="Icon size"><Button variant="outline" size="icon" aria-label="Open search"><span aria-hidden>⌕</span></Button></Example><Example label="Disabled"><Button disabled>Save collection</Button></Example>
+    </div></Section>
+    <Section title="Chips and badges"><div className="flex flex-wrap items-center gap-3"><Example label="Chip, unselected"><Chip onClick={() => {}}>Garden</Chip></Example><Example label="Chip, selected"><Chip selected onClick={() => {}}>Garden</Chip></Example>{(["default", "secondary", "destructive", "outline", "ghost", "link"] as const).map((variant) => <Example key={variant} label={`Badge ${variant}, unselected and selected`}><div className="flex gap-2"><Badge variant={variant}>New work</Badge><Badge variant={variant} aria-pressed="true">Selected</Badge></div></Example>)}<Example label="Status badge"><Status status="online">Ready</Status></Example></div></Section>
+    <Section title="Fields"><div className="grid gap-4 md:grid-cols-2"><Example label="Input default"><Input aria-label="Collection name" defaultValue="Sage's garden" /></Example><Example label="Input pill"><Input aria-label="Search collection" shape="pill" placeholder="Search saved items" /></Example><Example label="Textarea"><Textarea aria-label="Description" defaultValue="A calm place for the pictures Sage returns to." /></Example><Example label="PromptBar default"><PromptBar label="Image prompt" value={prompt} onValueChange={setPrompt} onSubmit={() => {}} /></Example></div></Section>
+    <Section title="Cards and surfaces"><div className="grid gap-4 md:grid-cols-2"><Example label="Generated UI Card"><UiCard><CardHeader><CardTitle>Evening garden</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">A quiet collection gathered by Sage.</p></CardContent></UiCard></Example><Example label="Pattern Card"><Card label="Marlow's saved collection"><div className="p-4"><h3 className="font-semibold">Marlow's saved collection</h3><p className="mt-2 text-sm text-muted-foreground">{longLine}</p></div></Card></Example><Example label="Settings card surface"><SettingsShowcase /></Example><Example label="EmptyState"><EmptyState className="py-4"><EmptyStateGreeting>No saved clips yet</EmptyStateGreeting><p className="text-center text-sm text-muted-foreground">Nova can add a first clip whenever one feels right.</p><EmptyStateSuggestions><Button variant="outline" size="sm">Browse recent</Button></EmptyStateSuggestions></EmptyState></Example><Example label="Skeleton row"><div className="flex items-center gap-3"><Skeleton className="size-12 shrink-0 rounded-lg" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div></div></Example><Example label="Skeleton tile"><Skeleton className="aspect-square w-32" /></Example></div></Section>
+    <Section title="Media"><div className="grid gap-5 md:grid-cols-2">{(["plain", "card"] as const).map((variant) => <Example key={variant} label={`MediaShelf ${variant}; See all`}><MediaShelf items={shelfItems} getKey={(item) => item.id} getLabel={(item) => item.title} heading="Sage's garden" variant={variant} seeAll={{ label: "See all", onSelect: () => {} }} renderItem={(item) => <div className="flex h-full w-full items-end rounded-lg bg-gradient-to-br from-primary/50 via-accent to-muted p-3 text-sm font-medium text-foreground">{item.title}</div>} renderCaption={(item) => <><p>{item.title}</p><p className="text-muted-foreground">{item.note}</p></>} /></Example>)}<Example label="MediaTileOverlay with duration badge"><div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gradient-to-br from-primary/60 via-accent to-muted"><MediaTileOverlay badge={<Badge>02:18</Badge>} meta="Clover's field recording" /></div></Example><Example label="List row with thumbnail"><List items={[{ title: "Window after rain", person: "Indigo", id: "indigo" }]} getKey={(item) => item.id} label="Recent media" renderItem={(item) => <><div className="size-14 shrink-0 rounded-lg bg-gradient-to-br from-primary/50 to-accent" /><div className="min-w-0"><p className="font-medium">{item.title}</p><p className="text-sm text-muted-foreground">{item.person} · today</p><p className="text-sm text-muted-foreground">{longLine}</p></div></>} /></Example><Example label="Billboard"><Billboard autoplay={false} label="Featured creations" slides={[{ id: "featured-sage", eyebrow: "New from Sage", title: "A garden after rain", subtitle: "A small collection of quiet moments", primary: { label: "Play", icon: "play", onSelect: () => {} }, secondary: [{ label: "Save", icon: "bookmark", onSelect: () => {} }] }]} /></Example></div></Section>
+    <Section title="Navigation"><div className="flex flex-wrap gap-5"><div className="w-[390px] rounded-xl border border-border bg-muted p-4 pb-24"><p className="mb-3 text-sm text-muted-foreground">390 px · bar</p><PhoneNav entries={navEntries} variant="bar" /></div><div className="w-[390px] rounded-xl border border-border bg-muted p-4 pb-24"><p className="mb-3 text-sm text-muted-foreground">390 px · floating with trailing Search</p><PhoneNav entries={navEntries} variant="floating" trailing={{ to: "/gallery/search", icon: "search", label: "Search" }} /></div><div className="w-[390px] rounded-xl border border-border bg-muted p-4 pb-24"><p className="mb-3 text-sm text-muted-foreground">390 px · docked</p><PhoneNav entries={navEntries} variant="docked" /></div></div><p className="text-sm text-muted-foreground">App rail and sidebar require the host shell context, so they are not mounted here.</p></Section>
+    <Section title="Status"><div className="grid gap-4 md:grid-cols-2"><Example label="Destructive Alert"><Alert variant="destructive"><AlertTitle>Couldn't save the picture</AlertTitle><AlertDescription>Nova's change is still on this device. Try again when the connection is ready.</AlertDescription></Alert></Example><Example label="Status Element"><Status status="degraded">Working slowly</Status></Example>{(["queued", "running", "paused", "stalled", "verifying", "failed", "done"] as const).map((state) => <Example key={state} label={`JobProgress · ${state}`}><JobProgress title={`Clover's image · ${state}`} stages={STAGES} stageIndex={state === "done" ? 2 : 1} stageProgress={state === "running" ? 0.45 : 0} outcome={state === "failed" ? { status: "failed", summary: "The image stopped before it was ready." } : state === "done" ? { status: "success", summary: "Sage's image is ready to view." } : undefined} downloadState={state} downloadStatus={state === "failed" ? "Could not finish" : undefined} cancelable={false} /></Example>)}<Example label="Toast"><ToastDemo /></Example></div></Section>
+    <Section title="Media players"><div className="grid gap-6 xl:grid-cols-2"><Example label="VideoPlayer states from the existing showcase"><VideoPlayerShowcase /></Example><Example label="image-generation queued"><ImageGeneration prompt="A paper lantern on a quiet porch, made for Marlow" generating statusLabel="Waiting its turn" progress={0} /></Example><Example label="image-generation generating"><ImageGeneration prompt="Clover in a field of flowers at sunrise" generating statusLabel="Painting the soft morning light" progress={48} elapsedLabel="18s" etaLabel="about 1 minute left" /></Example><Example label="image-generation done"><ImageGeneration prompt="Indigo's blue hour garden" generating={false} onRegenerate={() => {}} /></Example><Example label="image-generation failed"><ImageGeneration prompt="Nova's garden in the rain" generating={false} onRegenerate={() => {}} aria-label="Failed image preview" /></Example></div></Section>
+    <Section title="Tokens"><div className="grid gap-5 md:grid-cols-2">{tokenNames.map((name) => <div key={name} className="flex items-center gap-3 rounded-xl border border-border p-3"><span aria-hidden className="size-10 shrink-0 rounded-md border border-border" style={{ backgroundColor: `var(${name})` }} /><code className="text-sm">{name}</code></div>)}<Example label="Art family over a token gradient"><div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-accent to-muted p-6"><div className="absolute inset-0 bg-[var(--art-scrim)]" /><div className="relative"><h3 className="text-[var(--art-foreground)] font-semibold">A little light after rain</h3><p className="text-[var(--art-foreground)]">A gradient picture in Sage's collection</p><span className="text-[var(--art-overlay)]">Featured</span></div></div><div className="mt-3 flex gap-3"><code>--art-foreground</code><code>--art-scrim</code><code>--art-overlay</code></div></Example><Example label="Type ramp tokens"><div className="space-y-2">{(["title", "section", "row", "body", "supporting", "badge", "hero"] as const).map((size) => <p key={size} style={{ fontSize: `var(--font-size-${size})` }}>--font-size-{size}: The quiet garden · Sage</p>)}</div></Example><Example label="Tailwind type ramp"><div className="space-y-2">{(["sm", "base", "lg", "xl", "2xl", "3xl"] as const).map((size) => <p key={size} className={`text-${size}`}>text-{size}: A garden after rain</p>)}</div></Example><Example label="Radii"><div className="flex flex-wrap gap-3">{(["card", "control", "pill"] as const).map((radius) => <div key={radius} className="flex h-16 w-28 items-center justify-center border border-border bg-card text-sm" style={{ borderRadius: `var(--radius-${radius})` }}>--radius-{radius}</div>)}</div></Example></div></Section>
+    <Section title="Long copy and large text"><div className="grid gap-4 md:grid-cols-2"><Example label="Long card and row copy"><Card label="Long copy sample"><div className="p-4"><h3 className="font-semibold">Sage's quiet collection</h3><p>{longLine}</p></div></Card><List items={[{ id: "long", title: "Marlow's window light", copy: longLine }]} getKey={(item) => item.id} label="Long media rows" renderItem={(item) => <div className="min-w-0"><p className="font-medium">{item.title}</p><p className="text-sm text-muted-foreground">{item.copy}</p></div>} /></Example><Example label="Large-text frame · ease step 160"><Button variant="outline" onClick={() => setShowLargeText((visible) => !visible)} aria-pressed={showLargeText}>{showLargeText ? "Restore default text" : "Preview largest text"}</Button><div className="space-y-3"><Button variant="outline">Keep Clover's picture in this collection</Button><Card><div className="p-4"><h3 className="font-semibold">Indigo's long title should wrap without crowding</h3><p>{longLine}</p></div></Card></div></Example></div></Section>
+  </main></MemoryRouter></ToastProvider>;
+}
