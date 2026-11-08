@@ -1779,6 +1779,7 @@ body {
 
 @theme inline {
   --color-background: var(--background);
+  --color-subtle-foreground: var(--subtle-foreground);
   --color-status-ok: var(--status-ok);
   --color-status-warning: var(--status-warning);
   --color-status-error: var(--status-error);
@@ -1938,6 +1939,58 @@ body {
     }
   }
 }
+
+/* PRO-LOOK-TOKENS-01a. Additive look layer: no current component reads these. */
+body {
+  --subtle-foreground: color-mix(in srgb, var(--foreground) 50%, var(--background));
+  --space-1: calc(var(--spacing) * 1);
+  --space-2: calc(var(--spacing) * 2);
+  --space-3: calc(var(--spacing) * 3);
+  --space-4: calc(var(--spacing) * 4);
+  --space-5: calc(var(--spacing) * 6);
+  --space-6: calc(var(--spacing) * 8);
+  --space-7: calc(var(--spacing) * 12);
+  --gutter: 16px;
+  --radius-thumb: 10px;
+  --font-size-row: 16px;
+  --font-size-badge: 12px;
+  --font-size-hero: 56px;
+  --font-weight-row: 600;
+  --font-weight-badge: 500;
+  --font-weight-hero: 700;
+  --line-height-title: 1.25;
+  --line-height-body: 1.4;
+  /* 92/84% foreground mixes create visible, restrained steps in both schemes. */
+  --surface-0: var(--background);
+  --surface-1: color-mix(in oklab, var(--background) 92%, var(--foreground));
+  --surface-2: color-mix(in oklab, var(--background) 84%, var(--foreground));
+  --surface-glass: color-mix(in oklab, var(--surface-1) 70%, transparent);
+  --glass-blur: 24px;
+  --shadow-glass: 0 8px 28px color-mix(in oklab, var(--foreground) 12%, transparent);
+  --hairline: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --scrim-hero: linear-gradient(to top, var(--surface-0), transparent 70%);
+  --accent-hero: var(--hero-accent, var(--primary));
+  --accent-hero-strength: 40%;
+  --accent-create: var(--hue-yellow);
+  --accent-app: var(--primary);
+  --accent-companion: var(--person-accent, var(--primary));
+  --motion-pill: 200ms;
+  --motion-sheet: 250ms;
+  --motion-expand: 300ms;
+  --control-height: 44px;
+  --icon-16: 16px;
+  --icon-20: 20px;
+  --icon-22: 22px;
+  --icon-24: 24px;
+  --icon-26: 26px;
+  --icon-28: 28px;
+}
+@media (min-width: 720px) {
+  body { --font-size-row: 16px; --font-size-hero: 56px; --gutter: 24px; }
+}
+@media (min-width: 1280px) { body { --gutter: 28px; } }
+@media (max-width: 719.98px) { body { --font-size-row: 17px; --font-size-hero: 40px; } }
+html[data-ease-motion="calm"] body { --motion-pill: 0ms; --motion-sheet: 0ms; --motion-expand: 0ms; }
 
 @layer base {
   * {
@@ -2588,6 +2641,19 @@ html[data-ease-text="100"] {
   --font-size-metric: 28px;
   --font-size-body: 13.5px;
   --font-size-supporting: 12px;
+  --font-size-badge: 12px;
+  --font-size-row: 16px;
+  --font-size-hero: 56px;
+}
+html[data-ease-text="100"] body {
+  --font-size-row: 16px;
+  --font-size-hero: 56px;
+}
+@media (max-width: 719.98px) {
+  html[data-ease-text="100"] body {
+  --font-size-row: 17px;
+  --font-size-hero: 40px;
+  }
 }
 html[data-ease-text="120"] {
   font-size: 19.2px;
@@ -2596,6 +2662,19 @@ html[data-ease-text="120"] {
   --font-size-metric: 33.6px;
   --font-size-body: 16.2px;
   --font-size-supporting: 14.4px;
+  --font-size-badge: 14.4px;
+  --font-size-row: 19.2px;
+  --font-size-hero: 67.2px;
+}
+html[data-ease-text="120"] body {
+  --font-size-row: 19.2px;
+  --font-size-hero: 67.2px;
+}
+@media (max-width: 719.98px) {
+  html[data-ease-text="120"] body {
+  --font-size-row: 20.4px;
+  --font-size-hero: 48px;
+  }
 }
 html[data-ease-text="140"] {
   font-size: 22.4px;
@@ -2604,6 +2683,19 @@ html[data-ease-text="140"] {
   --font-size-metric: 39.2px;
   --font-size-body: 18.9px;
   --font-size-supporting: 16.8px;
+  --font-size-badge: 16.8px;
+  --font-size-row: 22.4px;
+  --font-size-hero: 78.4px;
+}
+html[data-ease-text="140"] body {
+  --font-size-row: 22.4px;
+  --font-size-hero: 78.4px;
+}
+@media (max-width: 719.98px) {
+  html[data-ease-text="140"] body {
+  --font-size-row: 23.8px;
+  --font-size-hero: 56px;
+  }
 }
 html[data-ease-text="160"] {
   font-size: 25.6px;
@@ -2612,6 +2704,19 @@ html[data-ease-text="160"] {
   --font-size-metric: 44.8px;
   --font-size-body: 21.6px;
   --font-size-supporting: 19.2px;
+  --font-size-badge: 19.2px;
+  --font-size-row: 25.6px;
+  --font-size-hero: 89.6px;
+}
+html[data-ease-text="160"] body {
+  --font-size-row: 25.6px;
+  --font-size-hero: 89.6px;
+}
+@media (max-width: 719.98px) {
+  html[data-ease-text="160"] body {
+  --font-size-row: 27.2px;
+  --font-size-hero: 64px;
+  }
 }
 /* Spacing: Tailwind's spacing unit (0.25rem). */
 html[data-ease-spacing="roomy"] {

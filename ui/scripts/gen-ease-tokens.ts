@@ -40,7 +40,7 @@ export function stripBlock(css: string): string {
 
 export function renderEaseBlock(presets: Presets, css: string): string {
   const base = stripBlock(css);
-  const fonts = [...base.matchAll(/--font-size-(title|section|metric|body|supporting):\s*([\d.]+)px;/g)].map((m) => [m[1]!, Number(m[2])] as const);
+  const fonts = [...new Map([...base.matchAll(/--font-size-(title|section|metric|body|supporting|row|badge|hero):\s*([\d.]+)px;/g)].reverse().map((m) => [m[1]!, Number(m[2])] as const)).entries()].reverse(); // first match of each name wins: the desktop value, never a later phone copy
   const hues = FIXED_HUES.map((h) => {
     const m = new RegExp(`--hue-${h}:\\s*(#[0-9a-fA-F]{6});`).exec(base);
     if (!m) throw new Error(`--hue-${h} not found in tokens.css`);
@@ -61,7 +61,10 @@ export function renderEaseBlock(presets: Presets, css: string): string {
   out.push("/* Text size: the root font size scales every rem utility; the px type tokens scale with it. */");
   for (const [name, { scale }] of Object.entries(v.text_size)) {
     const lines = [`  font-size: ${px(16 * scale)};`, ...fonts.map(([n, size]) => `  --font-size-${n}: ${px(size * scale)};`)];
+    const phoneLines = fonts.filter(([n]) => ["row", "hero"].includes(n)).map(([n]) => `  --font-size-${n}: ${px((n === "row" ? 17 : 40) * scale)};`);
     out.push(`html[data-ease-text="${name}"] {\n${lines.join("\n")}\n}`);
+    out.push(`html[data-ease-text="${name}"] body {\n${fonts.filter(([n]) => ["row", "hero"].includes(n)).map(([n, size]) => `  --font-size-${n}: ${px(size * scale)};`).join("\n")}\n}`);
+    out.push(`@media (max-width: 719.98px) {\n  html[data-ease-text="${name}"] body {\n${phoneLines.join("\n")}\n  }\n}`);
   }
 
   out.push("/* Spacing: Tailwind's spacing unit (0.25rem). */");

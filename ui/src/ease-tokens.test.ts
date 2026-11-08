@@ -49,6 +49,10 @@ describe("ease tokens", () => {
     expect(body).toContain("font-size: 22.4px")
     expect(body).toContain("--font-size-body: 18.9px")
     expect(body).toContain("--font-size-title: 42px")
+    expect(body).toContain("--font-size-row: 22.4px")
+    expect(body).toContain("--font-size-badge: 16.8px")
+    expect(body).toContain("--font-size-hero: 78.4px")
+    expect(css).toContain('@media (max-width: 719.98px) {\n  html[data-ease-text="140"] body')
   })
 
   test("standard targets keep today's 48 px floor and the 56 px rail", () => {

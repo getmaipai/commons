@@ -1,3 +1,7 @@
+## [ui-v0.5.535] - 2026-11-08
+
+- PRO-LOOK-TOKENS-01a: add additive type, spacing, surface, accent, motion, control and icon tokens derived from each Look; extend ease scaling and add 16-pair token resolution coverage.
+
 ## [ui-v0.5.534] - 2026-11-08
 
 - PRO-LOOK-GALLERY-01: add `KitGalleryShowcase`, a scrollable baseline of existing kit parts, their states, token swatches and type/radius samples. Additive; all existing part defaults stay unchanged.
