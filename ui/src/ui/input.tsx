@@ -7,10 +7,11 @@ import { cn } from "@/kit/utils"
  * ring take the success hue (--hue-teal) and `data-valid` is set. It never carries meaning alone:
  * pair it with visible text or an icon. `aria-invalid` wins when both are set.
  */
-function Input({ className, type, valid, shape = "default", ...props }: React.ComponentProps<"input"> & {
+function Input({ className, type, valid, shape = "default", fill = "outline", ...props }: React.ComponentProps<"input"> & {
   valid?: boolean
   /** "pill" draws a fully rounded field (KIT-3S-01, the companion flow). Default keeps the rounded-md field. */
   shape?: "default" | "pill"
+  fill?: "outline" | "surface"
 }) {
   return (
     <input
@@ -23,7 +24,7 @@ function Input({ className, type, valid, shape = "default", ...props }: React.Co
         // body-text floors apply on phone AND desktop, so there is no
         // `md:` demotion to a smaller size the way the unmodified generated
         // component would ship.
-        "h-12 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30",
+        fill === "surface" ? "h-12 w-full min-w-0 rounded-md border border-transparent bg-[var(--surface-1)] px-3 py-1 text-base outline-none shadow-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50" : "h-12 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30",
         "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
         "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
         "data-[valid=true]:border-[color:var(--hue-teal)] data-[valid=true]:ring-[color:var(--hue-teal)]/30 data-[valid=true]:aria-invalid:border-destructive",

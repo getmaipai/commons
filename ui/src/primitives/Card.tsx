@@ -26,6 +26,7 @@ interface CardProps {
    * WidgetCard, Home's own single cards) can pass `false` - the value is
    * only ever read on the interactive branch below. */
   far?: boolean;
+  surface?: "default" | "flat";
 }
 
 // The one card surface in the kit. CardGrid and MediaShelf both draw
@@ -87,10 +88,10 @@ function TvCardButton({
   );
 }
 
-export function Card({ children, onSelect, label, selected, className, far = false }: CardProps) {
+export function Card({ children, onSelect, label, selected, className, far = false, surface = "default" }: CardProps) {
   const surfaceClasses = cn(
-    "overflow-hidden rounded-lg border bg-card text-left text-card-foreground",
-    selected ? "border-primary" : "border-border",
+    surface === "flat" ? "overflow-hidden rounded-[var(--radius-card)] bg-[var(--surface-1)] p-4 text-left text-card-foreground shadow-none" : "overflow-hidden rounded-lg border bg-card text-left text-card-foreground",
+    surface === "flat" ? null : selected ? "border-primary" : "border-border",
   );
 
   if (!onSelect) {

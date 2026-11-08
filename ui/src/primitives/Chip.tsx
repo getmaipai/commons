@@ -21,6 +21,9 @@ interface ChipProps {
   /** For a removable chip, the accessible name of the remove button (e.g.
    * "Remove Sage" rather than a bare "Remove" every chip in a row shares). */
   removeLabel?: string;
+  tone?: "outline" | "surface";
+  selectedTone?: "tint" | "inverse";
+  size?: "default" | "strip";
 }
 
 /** docs/UI.md names Material 3's chip as the pattern to follow where
@@ -33,7 +36,7 @@ interface ChipProps {
  * for a dense chip) rather than growing the visible icon or the chip's
  * height to 48 px, which would blow out row height everywhere a chip is
  * used inline with text. */
-export function Chip({ children, selected, onClick, onRemove, removeLabel }: ChipProps) {
+export function Chip({ children, selected, onClick, onRemove, removeLabel, tone = "outline", selectedTone = "tint", size = "default" }: ChipProps) {
   const interactive = onClick !== undefined;
   return (
     <span
@@ -52,10 +55,10 @@ export function Chip({ children, selected, onClick, onRemove, removeLabel }: Chi
       }
       aria-pressed={interactive && selected !== undefined ? selected : undefined}
       className={cn(
-        "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-base transition-colors",
+        size === "strip" ? "inline-flex h-10 items-center gap-1.5 rounded-full border px-4 text-sm transition-colors" : "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-base transition-colors",
         selected
-          ? "border-primary bg-primary/10 text-primary"
-          : "border-border bg-transparent text-foreground",
+          ? selectedTone === "inverse" ? "bg-foreground text-background" : "border-primary bg-primary/10 text-primary"
+          : tone === "surface" ? "border-0 bg-[var(--surface-1)] text-muted-foreground" : "border-border bg-transparent text-foreground",
         interactive && ["cursor-pointer hover:bg-accent", FOCUS_RING_INSET],
       )}
     >

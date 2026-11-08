@@ -7,6 +7,7 @@ afterEach(cleanup);
 describe("Chip", () => {
   test("a non-interactive chip renders as plain content, not a button", () => {
     const { getByText, queryByRole } = render(<Chip>Sage</Chip>);
+    expect(getByText("Sage").closest("span")?.className).toBe("inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-base transition-colors border-border bg-transparent text-foreground");
     expect(getByText("Sage")).toBeTruthy();
     expect(queryByRole("button")).toBeNull();
   });
@@ -59,5 +60,15 @@ describe("Chip", () => {
     fireEvent.click(getByRole("button", { name: "Remove Sage" }));
     expect(onRemove).toHaveBeenCalledTimes(1);
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  test("surface inverse strip options add their documented classes", () => {
+    const { getByRole } = render(<Chip tone="surface" selected selectedTone="inverse" size="strip" onClick={() => {}}>Garden</Chip>);
+    const chip = getByRole("button", { name: "Garden" });
+    expect(chip.className).toContain("h-10");
+    expect(chip.className).toContain("px-4");
+    expect(chip.className).toContain("text-sm");
+    expect(chip.className).toContain("bg-foreground text-background");
+    expect(chip.className).not.toContain("border-primary");
   });
 });

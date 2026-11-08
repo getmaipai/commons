@@ -1,3 +1,11 @@
+## [ui-v0.5.540] - 2026-11-08
+
+- PRO-LOOK-KIT-01b (renumbered from 0.5.537, which was tagged by mistake and is never to be pinned): add optional chip, field, flat card, skeleton and empty-state tile styles; defaults unchanged.
+
+## [ui-v0.5.538] - 2026-11-08
+
+- PRO-LOOK-KIT-01c: PhoneNav `surface`, `inset`, `activePill` and `labels` options (glass floating bar, icon-only entries keep an accessible name); PromptBar `shape="pill"` and `accent="create"`; additive, defaults unchanged.
+
 ## [ui-v0.5.536] - 2026-11-08
 
 - PRO-LOOK-KIT-01a: Button variant glass, sizes control and icon-control; additive, defaults unchanged
