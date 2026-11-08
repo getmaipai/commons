@@ -39,6 +39,21 @@ path = Path("gen/py/song_style_schema.py")
 path.write_text(path.read_text().replace("song_style_schema.Seed", "Seed"))
 PY
 
+# Once the broad sweep is modular (the cross-file manifest persona $ref), the
+# generator also qualifies a union's references to classes in its own module
+# with the module's name (answer_block_schema.X inside answer_block_schema.py),
+# a NameError at import. Strip every module's own prefix, not just song_style's.
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+for path in Path("gen/py").glob("*_schema.py"):
+    text = path.read_text()
+    fixed = re.sub(rf"(?<![\w.]){re.escape(path.stem)}\.(?=[A-Z])", "", text)
+    if fixed != text:
+        path.write_text(fixed)
+PY
+
 # datamodel-code-generator drops `maxProperties` (SPEC-INSTANCES-02:
 # Integration.options allows at most 8 keys). Re-add it as a length bound.
 python3 - <<'PY'
