@@ -1131,6 +1131,13 @@ export const PluginResult = z
                         .describe(
                           "The unit of every temperature in the block.",
                         ),
+                      /**The unit of every precipitation amount in the block.*/
+                      precip_unit: z
+                        .enum(["mm", "in"])
+                        .describe(
+                          "The unit of every precipitation amount in the block.",
+                        )
+                        .optional(),
                       current: z
                         .object({
                           temp: z.number(),
@@ -1165,10 +1172,47 @@ export const PluginResult = z
                                 .lte(100)
                                 .describe("Chance of precipitation, percent.")
                                 .optional(),
+                              /**Rain amount in this hour, in precip_unit.*/
+                              amount: z
+                                .number()
+                                .gte(0)
+                                .describe(
+                                  "Rain amount in this hour, in precip_unit.",
+                                )
+                                .optional(),
                             })
                             .strict(),
                         )
                         .max(24)
+                        .optional(),
+                      /**Rain amounts for the next 15-minute slots.*/
+                      minutely: z
+                        .array(
+                          z
+                            .object({
+                              /**ISO 8601 local date-time, the same shape as hourly[].time.*/
+                              time: z
+                                .string()
+                                .regex(
+                                  new RegExp(
+                                    "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$",
+                                  ),
+                                )
+                                .describe(
+                                  "ISO 8601 local date-time, the same shape as hourly[].time.",
+                                ),
+                              /**Rain amount in this 15-minute slot, in precip_unit.*/
+                              amount: z
+                                .number()
+                                .gte(0)
+                                .describe(
+                                  "Rain amount in this 15-minute slot, in precip_unit.",
+                                ),
+                            })
+                            .strict(),
+                        )
+                        .max(12)
+                        .describe("Rain amounts for the next 15-minute slots.")
                         .optional(),
                       daily: z
                         .array(
@@ -1197,6 +1241,14 @@ export const PluginResult = z
                                 .gte(0)
                                 .lte(100)
                                 .describe("Chance of precipitation, percent.")
+                                .optional(),
+                              /**Rain total for this day, in precip_unit.*/
+                              amount: z
+                                .number()
+                                .gte(0)
+                                .describe(
+                                  "Rain total for this day, in precip_unit.",
+                                )
                                 .optional(),
                             })
                             .strict(),

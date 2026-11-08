@@ -679,6 +679,23 @@ class HourlyItem(BaseModel):
     pop: conint(ge=0, le=100) | None = Field(
         None, description='Chance of precipitation, percent.'
     )
+    amount: confloat(ge=0.0) | None = Field(
+        None, description='Rain amount in this hour, in precip_unit.'
+    )
+
+
+class MinutelyItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    time: constr(
+        pattern=r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$'
+    ) = Field(
+        ..., description='ISO 8601 local date-time, the same shape as hourly[].time.'
+    )
+    amount: confloat(ge=0.0) = Field(
+        ..., description='Rain amount in this 15-minute slot, in precip_unit.'
+    )
 
 
 class DailyItem(BaseModel):
@@ -693,6 +710,9 @@ class DailyItem(BaseModel):
     code: conint(ge=0, le=99) = Field(..., description='WMO weather code.')
     pop: conint(ge=0, le=100) | None = Field(
         None, description='Chance of precipitation, percent.'
+    )
+    amount: confloat(ge=0.0) | None = Field(
+        None, description='Rain total for this day, in precip_unit.'
     )
 
 
@@ -747,8 +767,14 @@ class Props8(BaseModel):
     unit: Literal['F', 'C'] = Field(
         ..., description='The unit of every temperature in the block.'
     )
+    precip_unit: Literal['mm', 'in'] | None = Field(
+        None, description='The unit of every precipitation amount in the block.'
+    )
     current: Current
     hourly: list[HourlyItem] | None = Field(None, max_length=24)
+    minutely: list[MinutelyItem] | None = Field(
+        None, description='Rain amounts for the next 15-minute slots.', max_length=12
+    )
     daily: list[DailyItem] = Field(..., max_length=8, min_length=1)
     attribution: str
     sunrise: (
