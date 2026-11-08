@@ -52,6 +52,7 @@ export function PhoneNav({
   const hasMore = sheetEntries.length > 0;
   const MoreIcon = getIcon("more-horizontal");
   const floating = variant === "floating";
+  // The docked bar is exactly 49px (48px entries + 1px border): the prompt bar and track transport dock at that height.
   const compact = variant !== "bar";
 
   const renderEntry = (entry: NavEntry) => {
@@ -64,7 +65,8 @@ export function PhoneNav({
         aria-current={active ? "page" : undefined}
         className={compact
           ? cn(
-              "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs",
+              "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 text-xs",
+              floating ? "py-2" : "py-1",
               active ? "rounded-full bg-muted text-foreground" : "text-muted-foreground",
             )
           : cn(
@@ -95,7 +97,7 @@ export function PhoneNav({
             type="button"
             onClick={() => setMoreOpen(true)}
             className={compact
-              ? "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs text-muted-foreground"
+              ? cn("flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 text-xs text-muted-foreground", floating ? "py-2" : "py-1")
               : "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base text-muted-foreground"}
           >
             <MoreIcon className="h-5 w-5" aria-hidden />

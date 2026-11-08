@@ -132,7 +132,7 @@ describe("PhoneNav", () => {
     expect(nav).toHaveClass("fixed", "inset-x-0", "bottom-0", "border-t", "bg-background", "sm:hidden");
     expect(nav).not.toHaveClass("rounded-full", "shadow-lg");
     expect(nav).not.toHaveAttribute("data-floating");
-    expect(activeLink).toHaveClass("bg-muted", "text-foreground", "text-xs");
+    expect(activeLink).toHaveClass("bg-muted", "text-foreground", "text-xs", "py-1");
   });
 
   test("draws trailing last and keeps it out of More when entries overflow", () => {
