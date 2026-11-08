@@ -2,7 +2,7 @@
 // environment has no `document`/`window` at all, which every
 // @testing-library/react component test here needs.
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { expect } from "bun:test";
+import { afterEach, expect, jest } from "bun:test";
 import * as matchers from "@testing-library/jest-dom/matchers";
 
 // happy-dom's own ReadableStream/WritableStream/TransformStream are
@@ -29,3 +29,11 @@ mock.module("media-chrome/react", () => mediaChromeStub);
 // while passing alone. 4 s stays under bun's 5 s per-test timeout.
 import { configure } from "@testing-library/dom";
 configure({ asyncUtilTimeout: 4000 });
+
+// Fake timers are process-wide in bun, and a batch runs many files in one process. A file that ends with jest.useFakeTimers()
+// still on (weather-sky.test.tsx did) makes the next file's first await never settle: the gate batch hung at 0% CPU with no
+// output (weather-sky then http.test.ts, or weather-scene-running then i18n.test.tsx). Restoring real timers after every test
+// makes that impossible for any file, present or future.
+afterEach(() => {
+  jest.useRealTimers();
+});
