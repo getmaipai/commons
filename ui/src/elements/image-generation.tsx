@@ -8,6 +8,7 @@ import { Progress } from "@/primitives/Progress";
 import { GenerationStage } from "./generation-stage";
 import { PendingActions, type PendingAction } from "./pending-actions";
 import { i18n } from "@/kit/i18n";
+import { StatusCard } from "./status-card";
 
 export function ImageGeneration({
   prompt,
@@ -26,11 +27,14 @@ export function ImageGeneration({
   etaLabel,
   aspectRatio = "1 / 1",
   pendingActions,
+  stateTreatment = "default",
+  accent = "app",
+  stateWords,
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "prompt" | "generating" | "onRegenerate" | "onStop" | "progress" | "statusLabel" | "elapsedLabel" | "stopLabel" | "sizeLabel" | "size" | "previewSrc" | "previewStep" | "steps" | "etaLabel" | "aspectRatio" | "pendingActions"
+  "children" | "prompt" | "generating" | "onRegenerate" | "onStop" | "progress" | "statusLabel" | "elapsedLabel" | "stopLabel" | "sizeLabel" | "size" | "previewSrc" | "previewStep" | "steps" | "etaLabel" | "aspectRatio" | "pendingActions" | "stateTreatment" | "accent" | "stateWords"
 > & {
   prompt: string;
   generating: boolean;
@@ -59,6 +63,9 @@ export function ImageGeneration({
   aspectRatio?: string;
   /** Answers to a held job. Drawn under the caption only while `generating`; the host passes them only while the job is held. */
   pendingActions?: PendingAction[];
+  stateTreatment?: "default" | "pro";
+  accent?: "app" | "create";
+  stateWords?: Partial<Record<"waiting" | "progress" | "done" | "problem" | "cancelled", string>>;
 }) {
   // While the job asks a question the caption is the question, so it wraps instead of being cut off.
   const asking = generating && !!pendingActions && pendingActions.length > 0;
@@ -105,7 +112,7 @@ export function ImageGeneration({
           </div>
         ) : null}
       </GenerationStage>
-      <div className="flex items-center justify-between gap-2">
+      {stateTreatment === "pro" ? <StatusCard kind={generating ? "progress" : "done"} stateWord={stateWords?.[generating ? "progress" : "done"]} title={generating ? statusLabel : prompt} line={generating ? etaLabel : undefined} progress={generating && !previewSrc ? progress ?? 0 : undefined} lead={generating && previewSrc ? <span className="sr-only">{statusLabel}</span> : undefined} accent={accent} action={generating && onStop ? { label: stopLabel, onSelect: onStop, tone: "quiet" } : !generating && onRegenerate ? { label: i18n._({ id: "ui.Regenerate image", message: "Regenerate image" }), onSelect: onRegenerate } : undefined} /> : <div className="flex items-center justify-between gap-2">
         <p className={cn("text-muted-foreground min-w-0 flex-1 text-xs", asking ? "text-foreground" : "truncate")} title={prompt}>
           {generating ? (
             <>
@@ -138,7 +145,7 @@ export function ImageGeneration({
         >
           <RefreshCwIcon className="size-3" />
         </button>
-      </div>
+      </div>}
       {generating ? <PendingActions actions={pendingActions} /> : null}
     </div>
   );

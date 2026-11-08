@@ -1,3 +1,7 @@
+## [ui-v0.5.545] - 2026-11-08
+
+- PRO-LOOK-KIT-01h-1: add opt-in `ImageGeneration` status-card treatment, caller-supplied state words and accent; default rendering is unchanged.
+
 ## [ui-v0.5.544] - 2026-11-08
 
 - PRO-LOOK-KIT-01g: add shared status card anatomy with opt-in Alert, JobProgress and recovery toast presentations; defaults unchanged.

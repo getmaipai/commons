@@ -47,3 +47,22 @@ describe("ImageGeneration progress, Stop and size", () => {
     expect(dots.every((dot) => dot.className.includes("motion-reduce:animate-none"))).toBe(true);
   });
 });
+
+describe("ImageGeneration state treatment", () => {
+  test("default has no status card; pro renders one with the caller's state word and keeps Stop", () => {
+    const def = render(<ImageGeneration prompt="Garden" generating progress={40} statusLabel="Drawing" onStop={() => {}} />);
+    expect(def.container.querySelector("[data-status-kind]")).toBeNull();
+    cleanup();
+    let stops = 0;
+    const pro = render(<ImageGeneration prompt="Garden" generating progress={40} statusLabel="Drawing" stateTreatment="pro" stateWords={{ progress: "MAKING NOW" }} onStop={() => stops++} />);
+    const card = pro.container.querySelector("[data-status-kind]");
+    expect(card?.getAttribute("data-status-kind")).toBe("progress");
+    expect(pro.getByText("MAKING NOW")).toBeTruthy();
+    fireEvent.click(pro.getByRole("button", { name: "Stop" }));
+    expect(stops).toBe(1);
+    cleanup();
+    const done = render(<ImageGeneration prompt="Garden" generating={false} stateTreatment="pro" stateWords={{ done: "DONE" }} />);
+    expect(done.container.querySelector("[data-status-kind]")?.getAttribute("data-status-kind")).toBe("done");
+    expect(done.getByText("DONE")).toBeTruthy();
+  });
+});
