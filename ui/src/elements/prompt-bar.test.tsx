@@ -10,6 +10,17 @@ const shape = (onValueChange: (v: string | number) => void = () => {}): PromptBa
 });
 
 describe("PromptBar", () => {
+  test("default field classes stay unchanged; pill and create are opt-in", () => {
+    const props = { label: "Describe", value: "a fox", onValueChange: () => {}, onSubmit: () => {}, references: [{ id: "image", label: "Image", kind: "picture" as const, placement: "in_field" as const, onPick: () => {}, onRemove: () => {} }] };
+    const baseline = render(<PromptBar {...props} />);
+    const baselineField = baseline.container.querySelector('[data-slot="prompt-bar-field"]') ?? baseline.container.querySelector("textarea")!;
+    expect(baselineField).toHaveClass("rounded-2xl", "border-input", "bg-transparent", "focus-within:ring-3", "focus-within:ring-ring/50");
+    baseline.unmount();
+    const { container, getByRole } = render(<PromptBar {...props} shape="pill" accent="create" />);
+    expect(container.querySelector('[data-slot="prompt-bar-field"]')).toHaveClass("rounded-[28px]", "border-[var(--hairline)]", "bg-[var(--surface-2)]", "focus-within:ring-[var(--accent-create)]/50");
+    expect(getByRole("button", { name: "Make" })).toHaveClass("rounded-full", "bg-primary");
+  });
+
   test("Make stays off until there is text, then submits once", () => {
     let made = 0;
     const { getByRole, rerender } = render(<PromptBar label="Describe" value="" onValueChange={() => {}} onSubmit={() => { made += 1; }} />);

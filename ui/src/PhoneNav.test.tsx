@@ -122,6 +122,27 @@ describe("PhoneNav", () => {
     expect(getByRole("link", { name: /Apps/ })).toHaveClass("bg-muted", "text-foreground");
   });
 
+  test("optional PRO surface, inset, active pill and label modes", () => {
+    const { getByRole, queryByText, rerender } = render(<MemoryRouter initialEntries={["/apps"]}><PhoneNav entries={SIX_ENTRIES} variant="floating" surface="glass" inset="pro" activePill="wide" labels="primary" /></MemoryRouter>);
+    const nav = getByRole("navigation");
+    expect(nav).toHaveClass("bg-[var(--surface-glass)]", "backdrop-blur-[var(--glass-blur)]", "shadow-[var(--shadow-glass)]", "ring-1", "inset-x-4", "h-[68px]");
+    expect(nav.style.getPropertyValue("--phone-nav-height")).toBe("68px");
+    expect(queryByText("Gallery")).not.toBeInTheDocument();
+    expect(nav.querySelector('a[href="/apps"]')).toHaveClass("bg-[var(--surface-2)]", "ring-[var(--hairline)]", "text-foreground");
+    expect(getByRole("link", { name: "Apps" })).toBeInTheDocument(); // icon-only entries keep an accessible name
+    expect(getByRole("button", { name: "More" })).toBeInTheDocument();
+    rerender(<MemoryRouter><PhoneNav entries={FIVE_ENTRIES} variant="floating" labels="primary" /></MemoryRouter>);
+    expect(getByRole("link", { name: "Home" })).toBeInTheDocument();
+  });
+
+  test("default classes and computed nav height remain the old values", () => {
+    const { getByRole } = render(<MemoryRouter><PhoneNav entries={FIVE_ENTRIES} variant="floating" /></MemoryRouter>);
+    const nav = getByRole("navigation");
+    expect(nav).toHaveClass("inset-x-3", "max-h-16", "bg-card", "shadow-lg");
+    expect(nav.style.getPropertyValue("--phone-nav-height")).toBe("5rem");
+    expect(getByRole("link", { name: "Home" })).toHaveClass("bg-muted");
+  });
+
   test("docked variant is the flush bar with the floating entries", () => {
     const { getByRole } = render(
       <MemoryRouter initialEntries={["/apps"]}>

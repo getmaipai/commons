@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/kit/ui/sheet";
 import { getIcon } from "@/kit/icons";
@@ -26,6 +27,10 @@ export function PhoneNav({
   label = i18n._({ id: "ui.Primary", message: "Primary" }),
   trailing,
   more = [],
+  surface = "card",
+  inset = "default",
+  activePill = "muted",
+  labels = "all",
 }: {
   entries: readonly NavEntry[];
   max?: number;
@@ -33,6 +38,10 @@ export function PhoneNav({
   label?: string;
   trailing?: NavEntry;
   more?: readonly NavEntry[];
+  surface?: "card" | "glass";
+  inset?: "default" | "pro";
+  activePill?: "muted" | "wide";
+  labels?: "all" | "primary";
 }) {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -54,6 +63,7 @@ export function PhoneNav({
   const floating = variant === "floating";
   // The docked bar is exactly 49px (48px entries + 1px border): the prompt bar and track transport dock at that height.
   const compact = variant !== "bar";
+  const showLabels = labels === "all" || entries.length + (trailing ? 1 : 0) <= BOTTOM_BAR_MAX;
 
   const renderEntry = (entry: NavEntry) => {
     const Icon = getIcon(entry.icon);
@@ -63,11 +73,15 @@ export function PhoneNav({
         key={entry.to}
         to={entry.to}
         aria-current={active ? "page" : undefined}
+        aria-label={showLabels ? undefined : entry.label}
         className={compact
           ? cn(
               "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 text-xs",
               floating ? "py-2" : "py-1",
-              active ? "rounded-full bg-muted text-foreground" : "text-muted-foreground",
+              active ? activePill === "wide"
+                ? "rounded-full bg-[var(--surface-2)] text-foreground ring-1 ring-inset ring-[var(--hairline)]"
+                : "rounded-full bg-muted text-foreground"
+                : "text-muted-foreground",
             )
           : cn(
               "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base",
@@ -75,7 +89,7 @@ export function PhoneNav({
             )}
       >
         <Icon className="h-5 w-5" aria-hidden />
-        <span>{entry.label}</span>
+        {showLabels ? <span>{entry.label}</span> : null}
       </Link>
     );
   };
@@ -86,8 +100,9 @@ export function PhoneNav({
         data-slot="phone-nav"
         data-floating={floating ? "" : undefined}
         aria-label={label}
+        style={floating ? { "--phone-nav-height": inset === "pro" ? "68px" : "5rem" } as CSSProperties : undefined}
         className={floating
-          ? "fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-30 flex max-h-16 rounded-full bg-card p-1 shadow-lg sm:hidden"
+          ? cn("fixed z-30 flex rounded-full sm:hidden", inset === "pro" ? "inset-x-4 bottom-[calc(1.5rem+env(safe-area-inset-bottom))] h-[68px] p-1" : "inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] max-h-16 p-1", surface === "glass" ? "bg-[var(--surface-glass)] backdrop-blur-[var(--glass-blur)] shadow-[var(--shadow-glass)] ring-1 ring-inset ring-[var(--hairline)]" : "bg-card shadow-lg")
           : cn("fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-background pb-[env(safe-area-inset-bottom)] sm:hidden", variant === "docked" && "px-2")}
       >
         {shown.map(renderEntry)}
@@ -95,13 +110,14 @@ export function PhoneNav({
         {hasMore ? (
           <button
             type="button"
+            aria-label={showLabels ? undefined : i18n._({ id: "ui.More", message: "More" })}
             onClick={() => setMoreOpen(true)}
             className={compact
               ? cn("flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 text-xs text-muted-foreground", floating ? "py-2" : "py-1")
               : "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base text-muted-foreground"}
           >
             <MoreIcon className="h-5 w-5" aria-hidden />
-            <span>{i18n._({ id: "ui.More", message: "More" })}</span>
+            {showLabels ? <span>{i18n._({ id: "ui.More", message: "More" })}</span> : null}
           </button>
         ) : null}
       </nav>
