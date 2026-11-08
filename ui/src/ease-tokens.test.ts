@@ -53,6 +53,23 @@ describe("ease tokens", () => {
     expect(body).toContain("--font-size-badge: 16.8px")
     expect(body).toContain("--font-size-hero: 78.4px")
     expect(css).toContain('@media (max-width: 719.98px) {\n  html[data-ease-text="140"] body')
+    const gatedDesktop = block('html[data-pro-look][data-ease-text="140"] body')
+    expect(gatedDesktop).toContain('--font-size-title: 56px')
+    expect(gatedDesktop).toContain('--font-size-section: 33.6px')
+    expect(gatedDesktop).toContain('--font-size-body: 21px')
+    expect(gatedDesktop).toContain('--font-size-supporting: 18.2px')
+    // The standard step must not write any pro-look values; its presence above
+    // is the separate baseline block, not an ease override.
+    expect(block('html[data-pro-look][data-ease-text="100"] body')).toBe('')
+    expect(css).toContain('--font-size-title: 47.6px')
+    expect(css).toContain('--font-size-section: 30.8px')
+    expect(css).toContain('--font-size-body: 23.8px')
+    expect(css).toContain('--font-size-supporting: 19.6px')
+    const gatedPhone = /@media \(max-width: 719\.98px\) \{\n  html\[data-pro-look\]\[data-ease-text="140"\] body \{([^}]*)\}/.exec(css)?.[1] ?? ""
+    expect(gatedPhone).toContain('--font-size-title: 47.6px')
+    expect(gatedPhone).toContain('--font-size-section: 30.8px')
+    expect(gatedPhone).toContain('--font-size-body: 23.8px')
+    expect(gatedPhone).toContain('--font-size-supporting: 19.6px')
   })
 
   test("standard targets keep today's 48 px floor and the 56 px rail", () => {

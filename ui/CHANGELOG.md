@@ -1,3 +1,7 @@
+## [ui-v0.5.546] - 2026-11-08
+
+- PRO-LOOK-TOKENS-01b: add gated PRO type, card radius, settings and sidebar surfaces, semantic Tailwind text utilities, and ease scaling.
+
 ## [ui-v0.5.545] - 2026-11-08
 
 - PRO-LOOK-KIT-01h-1: add opt-in `ImageGeneration` status-card treatment, caller-supplied state words and accent; default rendering is unchanged.

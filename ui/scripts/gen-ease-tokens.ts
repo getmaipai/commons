@@ -64,6 +64,15 @@ export function renderEaseBlock(presets: Presets, css: string): string {
     const phoneLines = fonts.filter(([n]) => ["row", "hero"].includes(n)).map(([n]) => `  --font-size-${n}: ${px((n === "row" ? 17 : 40) * scale)};`);
     out.push(`html[data-ease-text="${name}"] {\n${lines.join("\n")}\n}`);
     out.push(`html[data-ease-text="${name}"] body {\n${fonts.filter(([n]) => ["row", "hero"].includes(n)).map(([n, size]) => `  --font-size-${n}: ${px(size * scale)};`).join("\n")}\n}`);
+    // PRO-LOOK type has a separate 34/40, 22/24, 17/15, 14/13
+    // phone/desktop baseline. Keep the 100% preset silent under the gate;
+    // larger presets scale that baseline without changing legacy values.
+    if (scale !== 1) {
+      const proDesktop = [["title", 40], ["section", 24], ["body", 15], ["supporting", 13]] as const;
+      const proPhone = [["title", 34], ["section", 22], ["body", 17], ["supporting", 14]] as const;
+      out.push(`html[data-pro-look][data-ease-text="${name}"] body {\n${proDesktop.map(([n, size]) => `  --font-size-${n}: ${px(size * scale)};`).join("\n")}\n}`);
+      out.push(`@media (max-width: 719.98px) {\n  html[data-pro-look][data-ease-text="${name}"] body {\n${proPhone.map(([n, size]) => `    --font-size-${n}: ${px(size * scale)};`).join("\n")}\n  }\n}`);
+    }
     out.push(`@media (max-width: 719.98px) {\n  html[data-ease-text="${name}"] body {\n${phoneLines.join("\n")}\n  }\n}`);
   }
 

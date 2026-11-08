@@ -1778,6 +1778,22 @@ body {
 }
 
 @theme inline {
+  /* PRO-LOOK-TOKENS-01b semantic type utilities. Values only take effect
+   * when a caller opts into these utility names; their tokens are gated below. */
+  --text-title: var(--font-size-title);
+  --text-title--line-height: var(--line-height-title);
+  --text-section: var(--font-size-section);
+  --text-section--line-height: var(--line-height-title);
+  --text-row: var(--font-size-row);
+  --text-row--line-height: var(--line-height-body);
+  --text-body: var(--font-size-body);
+  --text-body--line-height: var(--line-height-body);
+  --text-supporting: var(--font-size-supporting);
+  --text-supporting--line-height: var(--line-height-body);
+  --text-badge: var(--font-size-badge);
+  --text-badge--line-height: var(--line-height-body);
+  --text-hero: var(--font-size-hero);
+  --text-hero--line-height: var(--line-height-title);
   --color-background: var(--background);
   --color-subtle-foreground: var(--subtle-foreground);
   --color-status-ok: var(--status-ok);
@@ -1984,6 +2000,35 @@ body {
   --icon-24: 24px;
   --icon-26: 26px;
   --icon-28: 28px;
+}
+/* PRO-LOOK-TOKENS-01b. Token re-values stay opt-in on the document root.
+ * Body declarations outrank the ease scale's inherited root values. */
+html[data-pro-look] body {
+  --font-size-title: 34px;
+  --font-size-section: 22px;
+  --font-size-body: 17px;
+  --font-size-supporting: 14px;
+  --font-weight-title: 700;
+  --font-weight-section: 600;
+  --font-weight-body: 400;
+  --radius-card: 20px;
+  --sidebar: var(--surface-0);
+  --settings-card: var(--surface-1);
+  --settings-card-radius: var(--radius-card);
+}
+@media (min-width: 720px) {
+  html[data-pro-look] body {
+    --font-size-title: 40px;
+    --font-size-section: 24px;
+    --font-size-body: 15px;
+    --font-size-supporting: 13px;
+    --radius-card: 16px;
+  }
+}
+html[data-pro-look] [data-slot="sidebar-inset"] {
+  background: var(--surface-1);
+  border-radius: var(--radius-card);
+  box-shadow: inset 0 0 0 1px var(--hairline);
 }
 @media (min-width: 720px) {
   body { --font-size-row: 16px; --font-size-hero: 56px; --gutter: 24px; }
@@ -2636,12 +2681,12 @@ html[data-ease-targets="large"] [data-slot="toggle"] {
 /* Text size: the root font size scales every rem utility; the px type tokens scale with it. */
 html[data-ease-text="100"] {
   font-size: 16px;
+  --font-size-metric: 28px;
+  --font-size-badge: 12px;
   --font-size-title: 30px;
   --font-size-section: 18px;
-  --font-size-metric: 28px;
   --font-size-body: 13.5px;
   --font-size-supporting: 12px;
-  --font-size-badge: 12px;
   --font-size-row: 16px;
   --font-size-hero: 56px;
 }
@@ -2657,18 +2702,32 @@ html[data-ease-text="100"] body {
 }
 html[data-ease-text="120"] {
   font-size: 19.2px;
+  --font-size-metric: 33.6px;
+  --font-size-badge: 14.4px;
   --font-size-title: 36px;
   --font-size-section: 21.6px;
-  --font-size-metric: 33.6px;
   --font-size-body: 16.2px;
   --font-size-supporting: 14.4px;
-  --font-size-badge: 14.4px;
   --font-size-row: 19.2px;
   --font-size-hero: 67.2px;
 }
 html[data-ease-text="120"] body {
   --font-size-row: 19.2px;
   --font-size-hero: 67.2px;
+}
+html[data-pro-look][data-ease-text="120"] body {
+  --font-size-title: 48px;
+  --font-size-section: 28.8px;
+  --font-size-body: 18px;
+  --font-size-supporting: 15.6px;
+}
+@media (max-width: 719.98px) {
+  html[data-pro-look][data-ease-text="120"] body {
+    --font-size-title: 40.8px;
+    --font-size-section: 26.4px;
+    --font-size-body: 20.4px;
+    --font-size-supporting: 16.8px;
+  }
 }
 @media (max-width: 719.98px) {
   html[data-ease-text="120"] body {
@@ -2678,18 +2737,32 @@ html[data-ease-text="120"] body {
 }
 html[data-ease-text="140"] {
   font-size: 22.4px;
+  --font-size-metric: 39.2px;
+  --font-size-badge: 16.8px;
   --font-size-title: 42px;
   --font-size-section: 25.2px;
-  --font-size-metric: 39.2px;
   --font-size-body: 18.9px;
   --font-size-supporting: 16.8px;
-  --font-size-badge: 16.8px;
   --font-size-row: 22.4px;
   --font-size-hero: 78.4px;
 }
 html[data-ease-text="140"] body {
   --font-size-row: 22.4px;
   --font-size-hero: 78.4px;
+}
+html[data-pro-look][data-ease-text="140"] body {
+  --font-size-title: 56px;
+  --font-size-section: 33.6px;
+  --font-size-body: 21px;
+  --font-size-supporting: 18.2px;
+}
+@media (max-width: 719.98px) {
+  html[data-pro-look][data-ease-text="140"] body {
+    --font-size-title: 47.6px;
+    --font-size-section: 30.8px;
+    --font-size-body: 23.8px;
+    --font-size-supporting: 19.6px;
+  }
 }
 @media (max-width: 719.98px) {
   html[data-ease-text="140"] body {
@@ -2699,18 +2772,32 @@ html[data-ease-text="140"] body {
 }
 html[data-ease-text="160"] {
   font-size: 25.6px;
+  --font-size-metric: 44.8px;
+  --font-size-badge: 19.2px;
   --font-size-title: 48px;
   --font-size-section: 28.8px;
-  --font-size-metric: 44.8px;
   --font-size-body: 21.6px;
   --font-size-supporting: 19.2px;
-  --font-size-badge: 19.2px;
   --font-size-row: 25.6px;
   --font-size-hero: 89.6px;
 }
 html[data-ease-text="160"] body {
   --font-size-row: 25.6px;
   --font-size-hero: 89.6px;
+}
+html[data-pro-look][data-ease-text="160"] body {
+  --font-size-title: 64px;
+  --font-size-section: 38.4px;
+  --font-size-body: 24px;
+  --font-size-supporting: 20.8px;
+}
+@media (max-width: 719.98px) {
+  html[data-pro-look][data-ease-text="160"] body {
+    --font-size-title: 54.4px;
+    --font-size-section: 35.2px;
+    --font-size-body: 27.2px;
+    --font-size-supporting: 22.4px;
+  }
 }
 @media (max-width: 719.98px) {
   html[data-ease-text="160"] body {
