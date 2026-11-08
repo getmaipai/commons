@@ -3880,3 +3880,6 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 
 - WEATHER-PRECIP-01: add a precipitation forecast tile with 15-minute or hourly intensity bars and daily amount and chance rows.
 
+## [ui-v0.5.549] - 2026-11-08
+
+- WEATHER-PRECIP-01: the Precipitation tile shows 0 for a dry day (not .00) and leaves quiet 15-minute slots blank.

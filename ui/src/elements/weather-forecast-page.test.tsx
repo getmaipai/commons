@@ -324,7 +324,7 @@ describe("weather page polish", () => {
   test("the Precipitation tile draws 15-minute bars with amounts, then hourly chance, and the daily rows", () => {
     const base = locations[0]!.detail!;
     const minutely = [{ time: "2026-10-22T10:00", amount: 0 }, { time: "2026-10-22T10:15", amount: 1.25 }, { time: "2026-10-22T10:30", amount: 9 }];
-    const daily = [{ date: "2026-10-22", high: 70, low: 55, code: 61, pop: 35, amount: 0.05 }, { date: "2026-10-23", high: 70, low: 55, code: 61, pop: 60, amount: 0.1 }];
+    const daily = [{ date: "2026-10-22", high: 70, low: 55, code: 61, pop: 35, amount: 0.05 }, { date: "2026-10-23", high: 70, low: 55, code: 61, pop: 60, amount: 0.1 }, { date: "2026-10-24", high: 70, low: 55, code: 1, pop: 5, amount: 0 }];
     const { container, rerender } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail: { ...base, minutely, daily, precipUnit: "mm" } }]} selectedId="home"/>);
     const bars = [...container.querySelectorAll<HTMLElement>('[data-slot="weather-precipitation-bar"]')];
     expect(bars).toHaveLength(3);
@@ -332,12 +332,15 @@ describe("weather page polish", () => {
     expect(parseFloat(bars[1]!.style.height)).toBeCloseTo(50, 0);
     expect(bars[2]!.style.height).toBe("100%");
     expect(container.querySelector('[data-slot="weather-precipitation-hours"]')!.textContent).toContain("1.25 mm");
+    expect(container.querySelector('[data-slot="weather-precipitation-hours"]')!.textContent).not.toContain("0 mm");
     const rows = container.querySelector('[data-slot="weather-precipitation-daily"]')!.textContent!;
     expect(rows).toContain("35%");
     expect(rows).toContain("60%");
     rerender(<WeatherForecastPage locations={[{ ...locations[0]!, detail: { ...base, daily, precipUnit: "in", hourly: [{ time: "2026-10-22T10:00", temp: 69, pop: 25 }] } }]} selectedId="home"/>);
     expect(container.querySelector('[data-slot="weather-precipitation-hours"]')!.textContent).toContain("25%");
     expect(container.querySelector('[data-slot="weather-precipitation-daily"]')!.textContent).toContain(".05 in");
+    expect(container.querySelector('[data-slot="weather-precipitation-daily"]')!.textContent).toContain("0 in");
+    expect(container.querySelector('[data-slot="weather-precipitation-daily"]')!.textContent).not.toContain(".00");
   });
 
   test("the Precipitation tile is hidden when there is no rain data", () => {
