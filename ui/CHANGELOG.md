@@ -1,3 +1,7 @@
+## [ui-v0.5.542] - 2026-11-08
+
+- PRO-LOOK-KIT-01e: `CreationHeader variant="hero"` (art under the shell header row, scrim, `stats`, `accent`); `FullLayout` `headerSurface="glass-on-scroll"` and `headerOverArt`; new `useScrolled` hook; additive, defaults unchanged.
+
 ## [ui-v0.5.541] - 2026-11-08
 
 - PRO-LOOK-KIT-01d (renumbered from 0.5.539, which was tagged by mistake and is never to be pinned): MediaShelf `headingStyle="section"`, `tileSize="pro"`, `bleed`, `cardRadius="card"`; tile overlay options; List `rowSize="media"`, `renderThumb`, `hover="surface"`; additive, defaults unchanged.
@@ -3851,3 +3855,4 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 
 - Add token themed `ProgressRing` with accessible percentage, reduced motion support, primary and muted tones, and a showcase.
 - Add the `TabsList` bottom bar variant with equal width touch targets, safe-area padding and optional sticky positioning, plus a showcase. Default and line variants remain unchanged.
+

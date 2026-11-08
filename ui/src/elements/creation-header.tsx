@@ -19,7 +19,7 @@ export interface CreationHeaderProps {
   description?: string | null;
   headingLevel?: "h1" | "h2";
   visibility: Omit<VisibilityChipProps, "onOpen"> & { onOpen: () => void };
-  variant?: "full" | "byline" | "collection" | "studio";
+  variant?: "full" | "byline" | "collection" | "studio" | "hero";
   art?: string | null;
   meta?: string | null;
   primary?: { label: string; icon?: string; onSelect: () => void };
@@ -31,6 +31,8 @@ export interface CreationHeaderProps {
   secondary?: { label: string; icon?: string; onSelect: () => void };
   /** VIDEO-STUDIO-03 (`variant: "studio"` only): draw no art, eyebrow or title (an adult-only item while the lock is on); the actions stay. */
   locked?: boolean;
+  stats?: { label: string; value: string }[];
+  accent?: string;
 }
 
 function plain(value: string | null | undefined, fallback: string) {
@@ -45,7 +47,7 @@ function formattedDate(value?: string | null) {
   return absoluteTime(value);
 }
 
-export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility, variant = "full", art, meta, primary, shuffle, more = [], eyebrow, secondary, locked = false }: CreationHeaderProps) {
+export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility, variant = "full", art, meta, primary, shuffle, more = [], eyebrow, secondary, locked = false, stats, accent = "var(--accent-hero)" }: CreationHeaderProps) {
   const [expanded, setExpanded] = useState(false);
   const homeLabel = plain(creator?.label, i18n._({ id: "ui.Made at home", message: "Made at home" }));
   const creatorName = plain(creator?.name, homeLabel);
@@ -55,6 +57,27 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
   const Heading = headingLevel;
   const date = formattedDate(madeAt);
   const detail = description?.trim() && !/\{[^{}]+\}/.test(description) ? description.trim() : null;
+  if (variant === "hero") {
+    const artSrc = art && !/\{[^{}]+\}/.test(art) ? art : null;
+    const HeroShuffle = shuffle ? getIcon(shuffle.icon ?? "shuffle") : null;
+    const HeroMore = getIcon("more-horizontal");
+    const creatorLine = [creator?.name, madeAt, meta].filter((part): part is string => Boolean(part?.trim())).join(" · ");
+    return <header data-slot="creation-header" data-variant="hero" className="relative isolate flex min-h-[26rem] flex-col justify-end overflow-hidden px-6 pb-8 pt-20 md:min-h-[22rem]">
+      <div data-slot="creation-header-art" aria-hidden className="absolute inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: artSrc ? `url(${JSON.stringify(artSrc).slice(1, -1)})` : `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 45%, transparent))` }} />
+      <div aria-hidden className="absolute inset-0 -z-10 bg-[image:var(--scrim-hero)]" />
+      <div className="flex flex-col items-start gap-3">
+        {eyebrow ? <span className="text-[13px] tracking-widest text-[color:var(--art-foreground)]/75 uppercase">{eyebrow}</span> : null}
+        <Heading className="text-[length:var(--font-size-hero)] font-[var(--font-weight-hero)] tracking-tight text-[color:var(--art-foreground)]">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
+        {creatorLine ? <p className="text-sm text-[color:var(--art-foreground)]/75">{creatorLine}</p> : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {primary ? <Button type="button" variant="inverse" shape="pill" onClick={primary.onSelect}>{primary.icon ? (() => { const ActionIcon = getIcon(primary.icon); return <ActionIcon aria-hidden className="size-4" />; })() : null}{primary.label}</Button> : null}
+          {shuffle && HeroShuffle ? <Button type="button" variant="glass" size="icon-control" aria-label={shuffle.label} onClick={shuffle.onSelect}><HeroShuffle aria-hidden /></Button> : null}
+          {more.length ? <DropdownMenu><DropdownMenuTrigger asChild><Button type="button" variant="glass" size="icon-control" aria-label={more[0]?.label ?? i18n._({ id: "ui.More", message: "More" })}><HeroMore aria-hidden /></Button></DropdownMenuTrigger><DropdownMenuContent align="start">{more.map((item, index) => <DropdownMenuItem key={`${item.label}-${index}`} onSelect={item.onSelect}>{item.label}</DropdownMenuItem>)}</DropdownMenuContent></DropdownMenu> : null}
+        </div>
+        {stats?.length ? <div className="flex flex-wrap gap-x-8 gap-y-3">{stats.map((stat, index) => <div key={`${stat.label}-${index}`} className="flex flex-col"><span className="text-xl font-semibold text-[color:var(--art-foreground)]">{stat.value}</span><span className="text-[13px] text-[color:var(--art-foreground)]/75">{stat.label}</span></div>)}</div> : null}
+      </div>
+    </header>;
+  }
   if (variant === "studio") {
     const eyebrowText = eyebrow?.trim() && !/\{[^{}]+\}/.test(eyebrow) ? eyebrow.trim() : null;
     const artSrc = art && !/\{[^{}]+\}/.test(art) ? art : null;

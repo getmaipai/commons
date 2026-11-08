@@ -11,6 +11,7 @@ import { SidebarInset, SidebarProvider } from '../../components/ui/sidebar';
 import { cn } from '../../lib/utils';
 import Footer from './shared/footer/Footer';
 import { Outlet } from 'react-router';
+import { useScrolled } from '../../../hooks/useScrolled';
 
 export interface FullLayoutProps {
   /** SHELL-SEARCH-02 (home, 2026-09-23): threaded straight through to
@@ -81,19 +82,22 @@ export interface FullLayoutProps {
   fallbackTitle?: string;
   /** The host's right pane (the standard RightPane), drawn beside the workspace; a pinned pane takes its own width and the workspace shrinks. */
   rightPane?: ReactNode;
+  headerSurface?: "solid" | "glass-on-scroll";
+  headerOverArt?: boolean;
 }
 
 /** The slim title bar of the rail layout: the page's own header content
  * only, 52px tall, one bottom divider. A page that draws its own header
  * (chat, beside its history column) places nothing and gets none. */
-function RailPageHeader({ reserveBand, reserveEnd, end, fallbackTitle }: { reserveBand: boolean; reserveEnd: boolean; end?: ReactNode; fallbackTitle?: string }) {
+function RailPageHeader({ reserveBand, reserveEnd, end, fallbackTitle, headerSurface = "solid", headerOverArt = false }: { reserveBand: boolean; reserveEnd: boolean; end?: ReactNode; fallbackTitle?: string; headerSurface?: "solid" | "glass-on-scroll"; headerOverArt?: boolean }) {
   const Left = useHeaderExtraLeft();
   const Right = useHeaderExtraRight();
+  const scrolled = useScrolled();
   // On a phone with the floating menu button, the band is always drawn so the
   // button sits in it and no page content can start under the button.
   if (!Left && !reserveBand && !end && !fallbackTitle) return null;
   return (
-    <header data-slot="rail-page-header" className={cn("sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 border-b border-border px-5", end && "pe-3", reserveEnd && !end && "pe-16")}>
+    <header data-slot="rail-page-header" data-scrolled={headerSurface === "glass-on-scroll" && scrolled ? "true" : undefined} className={cn("sticky top-0 z-2 flex h-13 shrink-0 items-center gap-2 px-5", headerSurface === "solid" ? "border-b border-border" : cn("transition-colors duration-[var(--motion-pill)]", scrolled && "bg-[var(--surface-glass)] backdrop-blur-[var(--glass-blur)] ring-1 ring-inset ring-[var(--hairline)]"), headerOverArt && "-mb-13", end && "pe-3", reserveEnd && !end && "pe-16")}>
       {Left ? <Left /> : fallbackTitle ? <span data-slot="rail-fallback-title" className="min-w-0 truncate">{fallbackTitle}</span> : null}
       {Right ? <div data-slot="rail-header-right" className="ms-auto flex h-9 min-w-0 shrink items-center gap-2 empty:hidden"><Right /></div> : null}
       {end ? <div data-slot="rail-top-right" className={cn("flex h-9 shrink-0 items-center [[data-slot=rail-header-right]:empty+&]:ms-auto", !Right && "ms-auto")}>{end}</div> : null}
@@ -101,7 +105,7 @@ function RailPageHeader({ reserveBand, reserveEnd, end, fallbackTitle }: { reser
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, topRightBand, fallbackTitle, rightPane }: FullLayoutProps) {
+function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, topRightBand, fallbackTitle, rightPane, headerSurface, headerOverArt }: FullLayoutProps) {
   const phone = useIsPhoneLayout();
   const Navigation = phone ? MobileNavDrawer : AppRail;
   return (
@@ -113,7 +117,7 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
         <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} coreDestinations={railCoreDestinations} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
         <main data-slot="rail-workspace" data-phone-menu={phone && !hideMobileMenu ? "" : undefined} className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
           {topRight && !topRightBand ? <div data-slot="rail-top-right" className="pointer-events-none sticky top-2 z-30 h-0"><div className="flex h-9 justify-end pe-3 *:pointer-events-auto">{topRight}</div></div> : null}
-          <RailPageHeader reserveBand={phone && !hideMobileMenu || Boolean(topRightBand)} reserveEnd={Boolean(topRight)} end={topRightBand ? topRight : undefined} fallbackTitle={fallbackTitle} />
+          <RailPageHeader reserveBand={phone && !hideMobileMenu || Boolean(topRightBand)} reserveEnd={Boolean(topRight)} end={topRightBand ? topRight : undefined} fallbackTitle={fallbackTitle} headerSurface={headerSurface} headerOverArt={headerOverArt} />
           <div data-slot="rail-body" className="min-w-0 max-w-full flex-1">
             <div className={cn("box-border min-w-0 max-w-full w-full mx-auto p-4", "container")}>
               <Outlet />

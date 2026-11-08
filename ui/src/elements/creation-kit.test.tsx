@@ -57,6 +57,16 @@ describe("CreationHeader", () => {
     expect(view.getByRole("button", { name: "Show more" })).toBeTruthy();
   });
 
+  test("hero renders art title, stats and actions without page foreground text", () => {
+    const view = render(<CreationHeader title="A quiet garden" variant="hero" eyebrow="Collection" creator={{ name: "Sage" }} stats={[{ value: "20", label: "Saved" }]} primary={{ label: "Play", onSelect: () => {} }} shuffle={{ label: "Shuffle", onSelect: () => {} }} more={[{ label: "More options", onSelect: () => {} }]} visibility={{ mode: "private", people: [], canManage: false, onOpen: () => {} }} />);
+    expect(view.getByRole("heading", { name: "A quiet garden" })).toBeTruthy();
+    expect(view.getByText("20")).toBeTruthy();
+    expect(view.getByRole("button", { name: "Play" })).toBeTruthy();
+    const header = view.container.querySelector('[data-variant="hero"]')!;
+    expect(header.textContent).toContain("Saved");
+    expect(header.querySelector("h1")?.className).not.toContain("text-foreground");
+  });
+
   test("links the avatar and name together through the host router when creator href is present", () => {
     const view = render(<MemoryRouter initialEntries={["/"]}><Routes>
       <Route path="/" element={<CreationHeader title="Song" creator={{ name: "Aster", href: "/people/aster" }} visibility={{ mode: "private", people: [], canManage: false, onOpen: () => {} }} />} />

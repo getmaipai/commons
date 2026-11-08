@@ -36,6 +36,20 @@ function renderRail(path: string, profile = <RailProfileMenu displayName="Sage W
 }
 
 describe("RAIL-01 app rail", () => {
+  test("rail header defaults to solid and supports glass-on-scroll and over-art", () => {
+    const baseline = renderRail("/settings");
+    const header = baseline.container.querySelector('[data-slot="rail-page-header"]')!;
+    expect(header.className).toContain("border-b border-border");
+    baseline.unmount();
+    const view = render(<MemoryRouter initialEntries={["/settings"]}><TooltipProvider><Routes><Route element={<FullLayout rail headerSurface="glass-on-scroll" headerOverArt />}><Route path="/settings" element={<Titled />} /></Route></Routes></TooltipProvider></MemoryRouter>);
+    const glassHeader = view.container.querySelector('[data-slot="rail-page-header"]')!;
+    expect(glassHeader.className).toContain("-mb-13");
+    expect(glassHeader.className).not.toContain("border-b");
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 10 });
+    fireEvent.scroll(window);
+    expect(glassHeader.getAttribute("data-scrolled")).toBe("true");
+    expect(glassHeader.className).toContain("backdrop-blur-[var(--glass-blur)]");
+  });
   test("shell rail renders data-tour when tourId is set; renders no data-tour attribute otherwise", () => {
     const view = render(<MemoryRouter><TooltipProvider><AppRail tourId="shell.rail" /></TooltipProvider></MemoryRouter>);
     expect(view.getByRole("navigation", { name: "Primary navigation" }).getAttribute("data-tour")).toBe("shell.rail");
