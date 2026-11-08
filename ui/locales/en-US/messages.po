@@ -186,7 +186,7 @@ msgid "ui.{label}, {count} added"
 msgstr "{label}, {count} added"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:204
+#: src/elements/weather-forecast-page.tsx:205
 msgid "ui.{label}: {city}"
 msgstr "{label}: {city}"
 
@@ -2093,6 +2093,11 @@ msgid "ui.Feels like the air temperature"
 msgstr "Feels like the air temperature"
 
 #. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:214
+msgid "ui.Feels Like: {temp}"
+msgstr "Feels Like: {temp}"
+
+#. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:224
 msgid "ui.Feels warmer than {temp}{unit}"
 msgstr "Feels warmer than {temp}{unit}"
@@ -2298,15 +2303,15 @@ msgid "ui.Gust {speed} {unit}"
 msgstr "Gust {speed} {unit}"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:214
-msgid "ui.H {high} · L {low}"
-msgstr "H {high} · L {low}"
-
-#. js-lingui-explicit-id
 #: src/elements/weather-card.tsx:263
 #: src/elements/weather-forecast-page.tsx:185
 msgid "ui.H {high} L {low}"
 msgstr "H {high} L {low}"
+
+#. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:214
+msgid "ui.H:{high} L:{low}"
+msgstr "H:{high} L:{low}"
 
 #. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:227
@@ -2819,7 +2824,7 @@ msgstr "Location is blocked. In Safari, choose Safari > Settings > Websites > Lo
 
 #. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:40
-#: src/elements/weather-forecast-page.tsx:202
+#: src/elements/weather-forecast-page.tsx:203
 msgid "ui.Locations"
 msgstr "Locations"
 
@@ -4302,11 +4307,6 @@ msgstr "recent runs"
 #: src/primitives/SectionSidebar.tsx:465
 msgid "ui.Recent searches"
 msgstr "Recent searches"
-
-#. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:213
-msgid "ui.recently"
-msgstr "recently"
 
 #. js-lingui-explicit-id
 #: src/elements/weather-advice.tsx:28
@@ -6016,11 +6016,6 @@ msgstr "Up next in {seconds}"
 #: src/elements/thread.aui.tsx:1591
 msgid "ui.Update"
 msgstr "Update"
-
-#. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:213
-msgid "ui.Updated {time}"
-msgstr "Updated {time}"
 
 #. js-lingui-explicit-id
 #: src/elements/climate-tile.tsx:56

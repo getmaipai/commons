@@ -219,7 +219,7 @@ msgid "ui.{label}, {count} added"
 msgstr "{label}, {count} añadidos"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:204
+#: src/elements/weather-forecast-page.tsx:205
 #, needs-review
 msgid "ui.{label}: {city}"
 msgstr "{label}: {city}"
@@ -2472,6 +2472,12 @@ msgid "ui.Feels like the air temperature"
 msgstr "Se siente como la temperatura del aire"
 
 #. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:214
+#, needs-review
+msgid "ui.Feels Like: {temp}"
+msgstr "Sensación térmica: {temp}"
+
+#. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:224
 #, needs-review
 msgid "ui.Feels warmer than {temp}{unit}"
@@ -2717,17 +2723,17 @@ msgid "ui.Gust {speed} {unit}"
 msgstr "Ráfaga {speed} {unit}"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:214
-#, needs-review
-msgid "ui.H {high} · L {low}"
-msgstr "Máx {high} · Mín {low}"
-
-#. js-lingui-explicit-id
 #: src/elements/weather-card.tsx:263
 #: src/elements/weather-forecast-page.tsx:185
 #, needs-review
 msgid "ui.H {high} L {low}"
 msgstr "Máx. {high} Mín. {low}"
+
+#. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:214
+#, needs-review
+msgid "ui.H:{high} L:{low}"
+msgstr "Máx:{high} Mín:{low}"
 
 #. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:227
@@ -3334,7 +3340,7 @@ msgstr "La ubicación está bloqueada. En Safari, elige Safari > Configuración 
 
 #. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:40
-#: src/elements/weather-forecast-page.tsx:202
+#: src/elements/weather-forecast-page.tsx:203
 #, needs-review
 msgid "ui.Locations"
 msgstr "Ubicaciones"
@@ -5091,12 +5097,6 @@ msgstr "ejecuciones recientes"
 #, needs-review
 msgid "ui.Recent searches"
 msgstr "Búsquedas recientes"
-
-#. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:213
-#, needs-review
-msgid "ui.recently"
-msgstr "recientemente"
 
 #. js-lingui-explicit-id
 #: src/elements/weather-advice.tsx:28
@@ -7117,12 +7117,6 @@ msgstr "A continuación en {seconds}"
 #, needs-review
 msgid "ui.Update"
 msgstr "Actualizar"
-
-#. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:213
-#, needs-review
-msgid "ui.Updated {time}"
-msgstr "Actualizado {time}"
 
 #. js-lingui-explicit-id
 #: src/elements/climate-tile.tsx:56

@@ -186,7 +186,7 @@ msgid "ui.{label}, {count} added"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:204
+#: src/elements/weather-forecast-page.tsx:205
 msgid "ui.{label}: {city}"
 msgstr ""
 
@@ -2093,6 +2093,11 @@ msgid "ui.Feels like the air temperature"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:214
+msgid "ui.Feels Like: {temp}"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:224
 msgid "ui.Feels warmer than {temp}{unit}"
 msgstr ""
@@ -2298,14 +2303,14 @@ msgid "ui.Gust {speed} {unit}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:214
-msgid "ui.H {high} · L {low}"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/elements/weather-card.tsx:263
 #: src/elements/weather-forecast-page.tsx:185
 msgid "ui.H {high} L {low}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:214
+msgid "ui.H:{high} L:{low}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2819,7 +2824,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:40
-#: src/elements/weather-forecast-page.tsx:202
+#: src/elements/weather-forecast-page.tsx:203
 msgid "ui.Locations"
 msgstr ""
 
@@ -4301,11 +4306,6 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/SectionSidebar.tsx:465
 msgid "ui.Recent searches"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:213
-msgid "ui.recently"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6015,11 +6015,6 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/thread.aui.tsx:1591
 msgid "ui.Update"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:213
-msgid "ui.Updated {time}"
 msgstr ""
 
 #. js-lingui-explicit-id
