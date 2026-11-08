@@ -1,3 +1,7 @@
+## [ui-v0.5.547] - 2026-11-08
+
+- PRO-LOOK-ART-01: gate fixed light-on-dark art foreground, muted text, track, scrim and overlay tokens behind `html[data-pro-look]`; default art values remain unchanged.
+
 ## [ui-v0.5.546] - 2026-11-08
 
 - PRO-LOOK-TOKENS-01b: add gated PRO type, card radius, settings and sidebar surfaces, semantic Tailwind text utilities, and ease scaling.

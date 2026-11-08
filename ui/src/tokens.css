@@ -2015,6 +2015,20 @@ html[data-pro-look] body {
   --sidebar: var(--surface-0);
   --settings-card: var(--surface-1);
   --settings-card-radius: var(--radius-card);
+  /* PRO art rule: artwork text and controls stay fixed light-on-dark in every Look. */
+  --art-foreground: #f8fafc;
+  --art-foreground-muted: color-mix(in srgb, #f8fafc 72%, transparent);
+  --art-track: color-mix(in srgb, #f8fafc 28%, transparent);
+  --art-scrim: linear-gradient(to top, color-mix(in srgb, #000000 55%, transparent), transparent);
+  --art-overlay: color-mix(in srgb, #000000 55%, transparent);
+}
+html[data-pro-look] {
+  /* Documented fixed-color exception: PRO art uses the same near-white foreground for every Look. */
+  --art-foreground: #f8fafc;
+  --art-foreground-muted: color-mix(in srgb, #f8fafc 72%, transparent);
+  --art-track: color-mix(in srgb, #f8fafc 28%, transparent);
+  --art-scrim: linear-gradient(to top, color-mix(in srgb, #000000 55%, transparent), transparent);
+  --art-overlay: color-mix(in srgb, #000000 55%, transparent);
 }
 @media (min-width: 720px) {
   html[data-pro-look] body {

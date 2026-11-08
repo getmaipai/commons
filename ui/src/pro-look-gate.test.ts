@@ -36,6 +36,14 @@ describe("PRO look gate", () => {
     expect(value(inset, "box-shadow")).toBeUndefined()
   })
 
+  test("attribute absence preserves the existing art token values", () => {
+    const art = css.slice(css.indexOf(":root {", css.indexOf("MEDIA-PLAYER-01")), css.indexOf("}", css.indexOf(":root {", css.indexOf("MEDIA-PLAYER-01"))));
+    expect(value(art, "--art-foreground")).toBe("var(--foreground)")
+    expect(value(art, "--art-track")).toBe("color-mix(in srgb, var(--foreground) 30%, transparent)")
+    expect(value(art, "--art-scrim")).toBe("linear-gradient(to top, color-mix(in srgb, var(--background) 78%, transparent), transparent)")
+    expect(value(art, "--art-overlay")).toBe("color-mix(in srgb, var(--background) 62%, transparent)")
+  })
+
   test("the gate applies the phone and desktop values, including the inset surface", () => {
     const phone = block("html[data-pro-look] body")
     expect(value(phone, "--font-size-title")).toBe("34px")

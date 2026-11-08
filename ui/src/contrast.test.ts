@@ -340,6 +340,50 @@ describe("WCAG contrast for MediaViewer, ShareDialog and the selected DataTable 
     });
   }
 
+  describe("PRO art", () => {
+    const gate = block(css, "html[data-pro-look] {", "@media (min-width: 720px)");
+    const gateBody = block(css, "html[data-pro-look] body {", "@media (min-width: 720px)");
+    const fixedHex = (source: string, name: string) => {
+      const match = new RegExp(`${name}:.*?(#[0-9a-fA-F]{6})`).exec(source);
+      if (!match) throw new Error(`${name} not found`);
+      return match[1]!;
+    };
+    const alpha = (source: string, name: string) => {
+      const match = new RegExp(`${name}:.*?(\\d+)%`).exec(source);
+      if (!match) throw new Error(`${name} opacity not found`);
+      return Number(match[1]) / 100;
+    };
+    const looks = ["neutral", "studio", "ocean", "forest", "sunset", "lavender", "rose", "mono"];
+    let worstForeground = Number.POSITIVE_INFINITY;
+    let worstMuted = Number.POSITIVE_INFINITY;
+    for (const look of looks) for (const scheme of ["light", "dark"]) {
+      test(`${look} ${scheme}: fixed art text clears contrast over white and black pictures`, () => {
+        const foreground = fixedHex(gateBody, "--art-foreground");
+        const muted = fixedHex(gateBody, "--art-foreground-muted");
+        const scrimAlpha = alpha(gateBody, "--art-scrim");
+        const foregroundAlpha = alpha(gateBody, "--art-foreground-muted");
+        for (const picture of ["#ffffff", "#000000"]) {
+          const background = over("#000000", scrimAlpha, picture);
+          const fgRatio = contrastRatio(foreground, background);
+          const mutedRatio = contrastRatio(muted, background);
+          worstForeground = Math.min(worstForeground, fgRatio);
+          worstMuted = Math.min(worstMuted, mutedRatio);
+          expect(fgRatio).toBeGreaterThanOrEqual(4.5);
+          expect(mutedRatio).toBeGreaterThanOrEqual(3);
+        }
+        expect(fixedHex(gate, "--art-foreground")).toBe(foreground);
+        expect(look).toBeTruthy();
+        expect(scheme).toMatch(/^(light|dark)$/);
+        expect(foregroundAlpha).toBe(0.72);
+      });
+    }
+    // Measured across every Look and scheme: foreground 4.53:1, muted 3.20:1 (linear-RGB blend).
+    test("worst measured ratios clear the documented floors", () => {
+      expect(worstForeground).toBeGreaterThanOrEqual(4.5);
+      expect(worstMuted).toBeGreaterThanOrEqual(3);
+    });
+  });
+
   for (const theme of [
     { name: "light", block: lightRoot },
     { name: "dark", block: darkRoot },
