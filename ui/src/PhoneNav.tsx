@@ -88,7 +88,7 @@ export function PhoneNav({
         aria-label={label}
         className={floating
           ? "fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-30 flex max-h-16 rounded-full bg-card p-1 shadow-lg sm:hidden"
-          : "fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-background pb-[env(safe-area-inset-bottom)] sm:hidden"}
+          : cn("fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-background pb-[env(safe-area-inset-bottom)] sm:hidden", variant === "docked" && "px-2")}
       >
         {shown.map(renderEntry)}
         {trailing ? renderEntry(trailing) : null}

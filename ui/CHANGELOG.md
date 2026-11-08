@@ -1,3 +1,7 @@
+## [ui-v0.5.529] - 2026-11-07
+
+- PhoneNav `docked` variant: 0.5rem side inset on the bar so the first and last entries and the active pill sit inside the screen edge. Height stays 49px; the bar, prompt-bar and transport offsets are unchanged.
+
 ## [ui-v0.5.528] - 2026-11-07
 
 - NEWS-TODAY-PHONE: a phone story feed with topic chips that has something above it (a briefing row or shelf) now uses a flat layout: the header stays in the page flow so nothing sits under the menu button or companion, and the chips strip starts at the page margin, spans the full width and fades at the right edge. The in-the-bar chips look is kept when the feed is the first thing on the page. Also versions the docked PhoneNav variant that ui-v0.5.526 and ui-v0.5.527 shipped without a version bump.

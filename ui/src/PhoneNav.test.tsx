@@ -107,6 +107,7 @@ describe("PhoneNav", () => {
   test("keeps the default bar classes and Primary label", () => {
     const { getByRole } = render(<MemoryRouter><PhoneNav entries={FIVE_ENTRIES} /></MemoryRouter>);
     const nav = getByRole("navigation", { name: "Primary" });
+    expect(nav).not.toHaveClass("px-2");
     expect(nav).toHaveClass("fixed", "inset-x-0", "bottom-0", "border-t", "bg-background", "sm:hidden");
   });
 
@@ -132,6 +133,8 @@ describe("PhoneNav", () => {
     expect(nav).toHaveClass("fixed", "inset-x-0", "bottom-0", "border-t", "bg-background", "sm:hidden");
     expect(nav).not.toHaveClass("rounded-full", "shadow-lg");
     expect(nav).not.toHaveAttribute("data-floating");
+    // The entries and their active pill sit inside the screen edge (equal 0.5rem margins), never touching it.
+    expect(nav).toHaveClass("px-2");
     expect(activeLink).toHaveClass("bg-muted", "text-foreground", "text-xs", "py-1");
   });
 
