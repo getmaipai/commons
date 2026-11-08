@@ -108,14 +108,28 @@ describe("WeatherForecastPage", () => {
     expect(controls.className).toContain("h-[calc(49px+env(safe-area-inset-bottom))]");
   });
 
-  test("phone tile order puts conditions and ten-day first, followed by requested paired rows", () => {
+  test("phone tile order keeps one hourly strip before Conditions, then ten-day and the detail grid", () => {
     const detail = { ...locations[0]!.detail!, airQuality: { aqi: 22, category: "Good" }, uvIndex: 3, feelsLike: 70, precipitation: 25,
       visibility: 9, pressure: 1012, moon: { phase: "First Quarter", illumination: 50 }, hourly: [{ time: "2026-10-22T10:00", temp: 69, pop: 25, windSpeed: 8 }] };
     const { container } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail }]} selectedId="home"/>);
     const titles = [...container.querySelectorAll<HTMLElement>('[data-slot="weather-tile"] h3 span:last-child')].map(x => x.textContent);
-    const order = ["Conditions", "10-Day Forecast", "UV Index", "Sunrise & Sunset", "Precipitation", "Visibility", "Humidity", "Pressure", "Air Quality", "Feels Like", "Wind", "Moon Phase"];
-    expect(titles.filter(x => x !== "Hourly Forecast")).toEqual(order);
+    expect(titles).toEqual(["Hourly Forecast", "Conditions", "10-Day Forecast", "UV Index", "Sunrise & Sunset", "Precipitation", "Visibility", "Humidity", "Pressure", "Air Quality", "Feels Like", "Wind", "Moon Phase"]);
+    expect(container.querySelectorAll('[data-slot="weather-hourly-strip"]')).toHaveLength(1);
+    expect(titles.indexOf("Hourly Forecast")).toBeLessThan(titles.indexOf("Conditions"));
     expect(titles.indexOf("Conditions")).toBeLessThan(titles.indexOf("10-Day Forecast"));
+  });
+
+  test("summary, recommendations, and Conditions switcher use their sky and card ink tokens", () => {
+    const { container } = render(<WeatherForecastPage locations={locations} selectedId="home" summary="It is 68°F and partly cloudy." advice={[{ id: "jacket", label: "Bring a jacket" }]} />);
+    const heroText = container.querySelector<HTMLElement>("[data-slot=weather-forecast-summary]")?.parentElement;
+    expect(heroText?.style.color).toBe("var(--weather-ink)");
+    expect(container.querySelector("[data-slot=weather-advice-lead]")?.textContent).toBe("Recommended");
+    const selected = container.querySelector<HTMLElement>('[data-slot="weather-condition-switcher"] button[aria-pressed="true"]');
+    const inactive = container.querySelector<HTMLElement>('[data-slot="weather-condition-switcher"] button[aria-pressed="false"]');
+    expect(selected?.className).toContain("bg-primary");
+    expect(selected?.className).toContain("text-[var(--primary-foreground)]");
+    expect(inactive?.className).toContain("text-[var(--card-foreground)]");
+    expect(selected?.getAttribute("aria-pressed")).toBe("true");
   });
 
   test("data-backed tiles appear only with fields and the Conditions switcher changes chart data", () => {

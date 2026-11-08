@@ -66,6 +66,17 @@ describe("weather scene token contrast",()=>{
   if(process.env.WEATHER_CONTRAST_REPORT) console.log(`theme ${theme} ${cls}: worst ${worst.toFixed(2)}`);
   expect(low.slice(0,6),`${cls} points under 4.5:1`).toEqual([]);
  });
+ test("sky text elements inherit the ink token and preserve contrast coverage for all themes and scenes",()=>{
+  const page=readFileSync(new URL("./elements/weather-forecast-page.tsx",import.meta.url),"utf8");
+  expect(page).toContain('data-slot="weather-forecast-summary" className="mb-4 text-base leading-relaxed"');
+  expect(page).toContain('style={{ color: "var(--weather-ink)" }}');
+  const advice=readFileSync(new URL("./elements/weather-advice.tsx",import.meta.url),"utf8");
+  expect(advice).toContain('data-slot="weather-advice-lead"');
+  for(const src of themes)for(const cls of WEATHER_CLASSES)for(const elevation of [-30,-3,1,30]){
+   const stops=palette(src,cls,phaseOf({elevation,isDay:elevation>0}).t,elevation>=0?"dawn":"dusk");
+   expect(capsOk([stops]),`${cls} theme ${themes.indexOf(src)} elevation ${elevation}`).toBe(true);
+  }
+ });
  test("registered weather properties keep the transition",()=>{for(const p of ["--wx-top","--wx-mid","--wx-bottom","--wx-glow","--wx-scrim","--wx-t"])expect(css).toContain(`@property ${p}`);expect(css).toContain("--wx-top 3200ms cubic-bezier(.37, 0, .63, 1)");});
  test("cloud day, night and twilight tints exist in all themes and stay out of the text band",()=>{
   const weatherClassList=["clear","partly-cloudy","overcast","drizzle","rain","snow","thunderstorm"];

@@ -1,3 +1,7 @@
+## [ui-v0.5.533] - 2026-11-08
+
+- WEATHER-APPLE-LOOK pass 3: the Weather summary and advice row use the sky ink so they read on every sky; the Temperature/Precipitation/Wind switch has readable labels; one hourly strip on top (the duplicate is gone).
+
 ## [ui-v0.5.532] - 2026-11-08
 
 - WEATHER-APPLE-LOOK pass 2: one full-bleed sky behind the whole Weather detail, glass tiles, a shorter phone header block, Apple tile order (Conditions, 10-day, then the grid), full-width Wind and Moon, glass bottom bar with room under the last tile.
