@@ -47,3 +47,23 @@ describe("RAIL-01 pinned apps", () => {
     expect(view.queryByText(/rail holds/i)).toBeNull();
   });
 });
+
+describe("PRO-LOOK labelled rail variant", () => {
+  test("default remains the icon-only 56px rail", () => {
+    const view = rail(0);
+    const nav = view.container.querySelector('[data-slot="app-rail"]');
+    expect(nav?.className).toContain("w-[var(--rail-width,56px)]");
+    expect(view.queryByText("Chat")).toBeNull();
+  });
+
+  test("labelled variant shows names and uses the active surface pill", () => {
+    const view = render(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail variant="labelled" /></TooltipProvider></MemoryRouter>);
+    const nav = view.container.querySelector('[data-slot="app-rail"]');
+    const chat = view.getByRole("link", { name: /^Chat/ });
+    expect(nav?.className).toContain("w-[var(--rail-width-labelled)]");
+    expect(nav?.getAttribute("style")).toContain("--rail-width-labelled: 80px");
+    expect(chat.textContent).toContain("Chat");
+    expect(chat.className).toContain("bg-[var(--surface-2)]");
+    expect(chat.className).toContain("rounded-2xl");
+  });
+});

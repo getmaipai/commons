@@ -160,6 +160,20 @@ import {
   Terminal,
   UserRound,
   Clock,
+  Ellipsis,
+  EllipsisVertical,
+  Library,
+  Music2,
+  Clapperboard,
+  WandSparkles,
+  Image,
+  Paperclip,
+  Tv,
+  ListPlus,
+  SquarePen,
+  Compass,
+  CircleAlert,
+  Layers,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -336,6 +350,21 @@ export const icons = {
   phone: Phone,
   menu: Menu,
   "volume-1": Volume1,
+  "ellipsis": Ellipsis,
+  "ellipsis-vertical": EllipsisVertical,
+  library: Library,
+  "music-2": Music2,
+  clapperboard: Clapperboard,
+  "wand-sparkles": WandSparkles,
+  image: Image,
+  paperclip: Paperclip,
+  tv: Tv,
+  "list-plus": ListPlus,
+  "square-pen": SquarePen,
+  compass: Compass,
+  "circle-alert": CircleAlert,
+  layers: Layers,
+  "book-open": BookOpen,
 } as const;
 
 export type IconName = keyof typeof icons;

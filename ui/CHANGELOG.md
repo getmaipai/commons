@@ -1,3 +1,7 @@
+## [ui-v0.5.543] - 2026-11-08
+
+- PRO-LOOK-KIT-01f: add an opt-in labelled AppRail, complete the requested icon registry names, and show existing interactive controls in the kit gallery; defaults remain unchanged.
+
 ## [ui-v0.5.542] - 2026-11-08
 
 - PRO-LOOK-KIT-01e: `CreationHeader variant="hero"` (art under the shell header row, scrim, `stats`, `accent`); `FullLayout` `headerSurface="glass-on-scroll"` and `headerOverArt`; new `useScrolled` hook; additive, defaults unchanged.

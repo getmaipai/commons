@@ -38,6 +38,8 @@ export interface RailCoreDestination {
 export const RAIL_APPS_MAX = 6;
 
 export interface AppRailProps {
+  /** Optional labelled destinations; defaults to the compact icon-only rail. */
+  variant?: "icons" | "labelled";
   tourId?: string;
   itemTourId?: (item: { name: string; url?: string }) => string | undefined;
   /** The host's own search over its records, threaded to the shipped
@@ -189,7 +191,7 @@ function AllAppsLink({ href, active }: { href: string; active: boolean }) {
   );
 }
 
-export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, itemTourId, apps, coreDestinations, onTogglePin, allAppsHref, mobile = false, children }: AppRailProps & { mobile?: boolean; children?: ReactNode }) {
+export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, itemTourId, apps, coreDestinations, onTogglePin, allAppsHref, variant = "icons", mobile = false, children }: AppRailProps & { mobile?: boolean; children?: ReactNode }) {
   const { pathname } = useLocation();
   const all = SidebarContent.flatMap((section) => flatten(section.items));
   // The brand mark is the Home destination (owner, 2026-10-06: "replace
@@ -207,7 +209,8 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
   ];
   const isActive = (url: string) => (activeAppHref ? railHref(activeAppHref) === railHref(url) : isRailItemActive(pathname, url));
   const pinnedApps = mobile ? (apps ?? []) : (apps ?? []).filter((app) => app.pinned);
-  const entryClass = mobile ? "relative flex min-h-12 w-full items-center gap-3 rounded-lg px-3 text-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring" : railButton;
+  const labelled = !mobile && variant === "labelled";
+  const entryClass = mobile ? "relative flex min-h-12 w-full items-center gap-3 rounded-lg px-3 text-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring" : labelled ? "relative flex h-[60px] w-[68px] flex-col items-center justify-center gap-1 rounded-2xl text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" : railButton;
   const homeActive = home?.url ? (activeAppHref ? railHref(activeAppHref) === railHref(home.url) : isRailItemActive(pathname, home.url)) : false;
   const homeStatus = home ? itemStatus?.(home) : undefined;
   const logo = (
@@ -230,12 +233,12 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                 data-active={homeActive ? "" : undefined}
                       data-slot="app-rail-home"
                       data-tour={itemTourId?.(home)}
-                className={cn(entryClass, "mb-1", !mobile && hitArea(1), homeActive && "bg-foreground/10")}
+                className={cn(entryClass, "mb-1", !mobile && !labelled && hitArea(1), homeActive && (labelled ? "bg-[var(--surface-2)] ring-1 ring-border" : "bg-foreground/10"))}
               />
             }
           >
             {logo}
-            {mobile ? <span>{home.name}</span> : null}
+            {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{home.name}</span> : null}
             <StatusMark status={homeStatus} />
           </TooltipTrigger>
           <ItemTooltip name={home.name} status={homeStatus} />
@@ -273,12 +276,12 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                       data-active={active ? "" : undefined}
                       data-slot={item.fixed ? "app-rail-core-destination" : "app-rail-item"}
                       data-tour={itemTourId?.(item)}
-                      className={cn(entryClass, !mobile && hitArea(1), active && "bg-foreground/10 text-foreground")}
+                      className={cn(entryClass, !mobile && !labelled && hitArea(1), active && (labelled ? "bg-[var(--surface-2)] ring-1 ring-border text-foreground" : "bg-foreground/10 text-foreground"))}
                     />
                   }
                 >
-                  {Icon ? <Icon className="size-5 shrink-0" aria-hidden /> : null}
-                  {mobile ? <span>{item.name}</span> : null}
+                  {Icon ? <Icon className={labelled ? "size-[var(--rail-icon-size,20px)] shrink-0" : "size-5 shrink-0"} aria-hidden /> : null}
+                  {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{item.name}</span> : null}
                   <StatusMark status={status} />
                 </TooltipTrigger>
                 <ItemTooltip name={item.name} status={status} />
@@ -306,12 +309,12 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                         data-active={active ? "" : undefined}
                         data-slot="app-rail-app"
                         data-tour={itemTourId?.({ name: app.name, url: app.url })}
-                        className={cn(entryClass, !mobile && hitArea(1), active && "bg-foreground/10 text-foreground")}
+                        className={cn(entryClass, !mobile && !labelled && hitArea(1), active && (labelled ? "bg-[var(--surface-2)] ring-1 ring-border text-foreground" : "bg-foreground/10 text-foreground"))}
                       />
                     }
                   >
-                    <Icon className="size-5 shrink-0" aria-hidden />
-                    {mobile ? <span>{app.name}</span> : null}
+                    <Icon className={labelled ? "size-[var(--rail-icon-size,20px)] shrink-0" : "size-5 shrink-0"} aria-hidden />
+                    {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{app.name}</span> : null}
                     <StatusMark status={itemStatus?.(app)} />
                   </TooltipTrigger>
                   <ItemTooltip name={app.name} status={itemStatus?.(app)} />
@@ -333,8 +336,10 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
 }
 
 export default function AppRail(props: AppRailProps) {
+  const labelled = props.variant === "labelled";
   return <nav aria-label={i18n._({ id: "ui.Primary navigation", message: "Primary navigation" })} data-slot="app-rail" data-tour={props.tourId}
-    className="sticky top-0 flex h-svh min-h-0 w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)] shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2">
+    style={{ "--rail-icon-size": "20px", "--rail-width-labelled": "80px", ...(labelled ? { width: "var(--rail-width-labelled)", minWidth: "var(--rail-width-labelled)", maxWidth: "var(--rail-width-labelled)" } : {}) } as React.CSSProperties}
+    className={cn("sticky top-0 flex h-svh min-h-0 shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2", labelled ? "w-[var(--rail-width-labelled)] min-w-[var(--rail-width-labelled)] max-w-[var(--rail-width-labelled)]" : "w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)]")}>
     <RailEntries {...props} />
   </nav>;
 }
