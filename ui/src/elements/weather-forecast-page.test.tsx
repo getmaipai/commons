@@ -113,10 +113,11 @@ describe("WeatherForecastPage", () => {
       visibility: 9, pressure: 1012, moon: { phase: "First Quarter", illumination: 50 }, hourly: [{ time: "2026-10-22T10:00", temp: 69, pop: 25, windSpeed: 8 }] };
     const { container } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail }]} selectedId="home"/>);
     const titles = [...container.querySelectorAll<HTMLElement>('[data-slot="weather-tile"] h3 span:last-child')].map(x => x.textContent);
-    expect(titles).toEqual(["Hourly Forecast", "Conditions", "10-Day Forecast", "UV Index", "Sunrise & Sunset", "Precipitation", "Visibility", "Humidity", "Pressure", "Air Quality", "Feels Like", "Wind", "Moon Phase"]);
+    expect(titles).toEqual(["Hourly Forecast", "Conditions", "Precipitation", "10-Day Forecast", "UV Index", "Sunrise & Sunset", "Visibility", "Humidity", "Pressure", "Air Quality", "Feels Like", "Wind", "Moon Phase"]);
     expect(container.querySelectorAll('[data-slot="weather-hourly-strip"]')).toHaveLength(1);
     expect(titles.indexOf("Hourly Forecast")).toBeLessThan(titles.indexOf("Conditions"));
-    expect(titles.indexOf("Conditions")).toBeLessThan(titles.indexOf("10-Day Forecast"));
+    expect(titles.indexOf("Conditions")).toBeLessThan(titles.indexOf("Precipitation"));
+    expect(titles.indexOf("Precipitation")).toBeLessThan(titles.indexOf("10-Day Forecast"));
   });
 
   test("summary, recommendations, and Conditions switcher use their sky and card ink tokens", () => {
@@ -319,5 +320,29 @@ describe("weather page polish", () => {
     const paths = [...container.querySelectorAll("[data-slot=weather-pressure-gauge] path")].map((p) => p.getAttribute("d"));
     expect(paths.length).toBe(2);
     expect(paths[1]).toMatch(/A82 82 0 0 1 /);
+  });
+  test("the Precipitation tile draws 15-minute bars with amounts, then hourly chance, and the daily rows", () => {
+    const base = locations[0]!.detail!;
+    const minutely = [{ time: "2026-10-22T10:00", amount: 0 }, { time: "2026-10-22T10:15", amount: 1.25 }, { time: "2026-10-22T10:30", amount: 9 }];
+    const daily = [{ date: "2026-10-22", high: 70, low: 55, code: 61, pop: 35, amount: 0.05 }, { date: "2026-10-23", high: 70, low: 55, code: 61, pop: 60, amount: 0.1 }];
+    const { container, rerender } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail: { ...base, minutely, daily, precipUnit: "mm" } }]} selectedId="home"/>);
+    const bars = [...container.querySelectorAll<HTMLElement>('[data-slot="weather-precipitation-bar"]')];
+    expect(bars).toHaveLength(3);
+    expect(bars[0]!.style.height).toBe("0%");
+    expect(parseFloat(bars[1]!.style.height)).toBeCloseTo(50, 0);
+    expect(bars[2]!.style.height).toBe("100%");
+    expect(container.querySelector('[data-slot="weather-precipitation-hours"]')!.textContent).toContain("1.25 mm");
+    const rows = container.querySelector('[data-slot="weather-precipitation-daily"]')!.textContent!;
+    expect(rows).toContain("35%");
+    expect(rows).toContain("60%");
+    rerender(<WeatherForecastPage locations={[{ ...locations[0]!, detail: { ...base, daily, precipUnit: "in", hourly: [{ time: "2026-10-22T10:00", temp: 69, pop: 25 }] } }]} selectedId="home"/>);
+    expect(container.querySelector('[data-slot="weather-precipitation-hours"]')!.textContent).toContain("25%");
+    expect(container.querySelector('[data-slot="weather-precipitation-daily"]')!.textContent).toContain(".05 in");
+  });
+
+  test("the Precipitation tile is hidden when there is no rain data", () => {
+    const base = locations[0]!.detail!;
+    const { container } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail: { ...base, hourly: [{ time: "2026-10-22T10:00", temp: 69 }], daily: [{ date: "2026-10-22", high: 70, low: 55, code: 1 }] } }]} selectedId="home"/>);
+    expect(container.querySelector('[data-slot="weather-precipitation-hours"]')).toBeNull();
   });
 });

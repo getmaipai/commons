@@ -7579,3 +7579,9 @@ msgstr "Alejar"
 #, needs-review
 msgid "ui.Zoomed image"
 msgstr "Imagen ampliada"
+
+#. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:55
+#, needs-review
+msgid "ui.Intensity - Chance of rain"
+msgstr ""

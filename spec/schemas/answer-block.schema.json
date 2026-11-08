@@ -511,6 +511,7 @@
           "properties": {
             "place": { "type": "string", "minLength": 1, "description": "The place label, shown small caps on the hero." },
             "unit": { "enum": ["F", "C"], "description": "The unit of every temperature in the block." },
+            "precip_unit": { "enum": ["mm", "in"], "description": "The unit of every precipitation amount in the block." },
             "current": {
               "type": "object",
               "additionalProperties": false,
@@ -532,9 +533,18 @@
                 "properties": {
                   "time": { "type": "string", "minLength": 1, "description": "ISO 8601 time." },
                   "temp": { "type": "number" },
-                  "pop": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Chance of precipitation, percent." }
+                  "pop": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Chance of precipitation, percent." },
+                  "amount": { "type": "number", "minimum": 0, "description": "Rain amount in this hour, in precip_unit." }
                 }
               }
+            },
+            "minutely": {
+              "type": "array", "maxItems": 12,
+              "description": "Rain amounts for the next 15-minute slots.",
+              "items": { "type": "object", "additionalProperties": false, "required": ["time", "amount"], "properties": {
+                "time": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?$", "description": "ISO 8601 local date-time, the same shape as hourly[].time." },
+                "amount": { "type": "number", "minimum": 0, "description": "Rain amount in this 15-minute slot, in precip_unit." }
+              }}
             },
             "daily": {
               "type": "array",
@@ -549,7 +559,8 @@
                   "high": { "type": "number" },
                   "low": { "type": "number" },
                   "code": { "type": "integer", "minimum": 0, "maximum": 99, "description": "WMO weather code." },
-                  "pop": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Chance of precipitation, percent." }
+                  "pop": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Chance of precipitation, percent." },
+                  "amount": { "type": "number", "minimum": 0, "description": "Rain total for this day, in precip_unit." }
                 }
               }
             },

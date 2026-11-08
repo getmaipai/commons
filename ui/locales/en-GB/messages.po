@@ -6407,3 +6407,9 @@ msgstr ""
 #: src/elements/image.tsx:330
 msgid "ui.Zoomed image"
 msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:55
+#, needs-review
+msgid "ui.Intensity - Chance of rain"
+msgstr ""

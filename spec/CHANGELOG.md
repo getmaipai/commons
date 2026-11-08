@@ -1697,3 +1697,7 @@ Additive throughout; every existing fixture still validates unchanged.
   per-person limit.
 - Optional List `icon` from the fixed built-in icon set. Built-in lists
   have fixed icons; custom lists choose one from the set.
+## [spec-v0.1.345] - 2026-11-08
+
+- WEATHER-PRECIP-01: weather cards gain optional precipitation units, 15-minute amounts and hourly and daily rain amounts; existing cards remain valid.
+

@@ -10,16 +10,18 @@
   "props": {
     "place": "Springfield",
     "unit": "F",
+    "precip_unit": "in",
     "current": { "temp": 72, "condition": "Partly cloudy", "code": 2, "is_day": true },
     "hourly": [
-      { "time": "2026-10-16T15:00", "temp": 73, "pop": 5 },
+      { "time": "2026-10-16T15:00", "temp": 73, "pop": 5, "amount": 0.02 },
       { "time": "2026-10-16T16:00", "temp": 74 }
     ],
     "daily": [
-      { "date": "2026-10-16", "high": 75, "low": 58, "code": 2, "pop": 10 },
+      { "date": "2026-10-16", "high": 75, "low": 58, "code": 2, "pop": 10, "amount": 0.05 },
       { "date": "2026-10-17", "high": 78, "low": 60, "code": 0 },
       { "date": "2026-10-18", "high": 69, "low": 55, "code": 61, "pop": 70 }
     ],
+    "minutely": [{ "time": "2026-10-16T14:15", "amount": 0.01 }],
     "attribution": "Open-Meteo"
   }
 }

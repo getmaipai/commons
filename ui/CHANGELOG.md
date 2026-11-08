@@ -3876,3 +3876,7 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 - Add token themed `ProgressRing` with accessible percentage, reduced motion support, primary and muted tones, and a showcase.
 - Add the `TabsList` bottom bar variant with equal width touch targets, safe-area padding and optional sticky positioning, plus a showcase. Default and line variants remain unchanged.
 
+## [ui-v0.5.548] - 2026-11-08
+
+- WEATHER-PRECIP-01: add a precipitation forecast tile with 15-minute or hourly intensity bars and daily amount and chance rows.
+

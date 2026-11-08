@@ -82,6 +82,16 @@ describe("answer-block fixtures", () => {
     expect(AnswerBlock.safeParse(moon).success).toBe(true);
   });
 
+  test("weather cards accept optional rain amounts and reject bad units, negative amounts and too many slots", () => {
+    const rain = read("fixtures", "answer-block", "valid-weather_card.json");
+    expect(rain.props.precip_unit).toBe("in");
+    expect(AnswerBlock.safeParse(rain).success).toBe(true);
+    for (const name of ["invalid-weather-amount-negative.json", "invalid-weather-minutely-thirteen.json", "invalid-weather-precip-unit.json"]) {
+      expect(validate(read("fixtures", "answer-block", name))).toBe(false);
+      expect(AnswerBlock.safeParse(read("fixtures", "answer-block", name)).success).toBe(false);
+    }
+  });
+
   test("weather card sunrise, sunset and wind_speed are optional and bounded (WEATHER-SCENE-07)", () => {
     for (const name of ["valid-weather_card-sun-wind.json", "valid-weather_card-sun.json"]) {
       const block = read("fixtures", "answer-block", name);

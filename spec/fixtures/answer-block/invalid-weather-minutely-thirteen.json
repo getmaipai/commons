@@ -1,0 +1,5 @@
+{
+  "id": "blk-w3a7k1", "kind": "weather_card", "schema_version": 1, "producer": "weather",
+  "alt": "Weather in Springfield.", "provenance": "weather call turn-k3m9x2:call0", "created_at": "2026-10-16T14:03:11Z", "hlc": "1791468191000:0:hub001",
+  "props": { "place": "Springfield", "unit": "F", "current": { "temp": 72, "condition": "Rain", "code": 61, "is_day": true }, "daily": [{ "date": "2026-10-16", "high": 75, "low": 58, "code": 61 }], "minutely": [{"time":"2026-10-16T14:00","amount":0},{"time":"2026-10-16T14:15","amount":0},{"time":"2026-10-16T14:30","amount":0},{"time":"2026-10-16T14:45","amount":0},{"time":"2026-10-16T15:00","amount":0},{"time":"2026-10-16T15:15","amount":0},{"time":"2026-10-16T15:30","amount":0},{"time":"2026-10-16T15:45","amount":0},{"time":"2026-10-16T16:00","amount":0},{"time":"2026-10-16T16:15","amount":0},{"time":"2026-10-16T16:30","amount":0},{"time":"2026-10-16T16:45","amount":0},{"time":"2026-10-16T17:00","amount":0}], "attribution": "Open-Meteo" }
+}
