@@ -1,3 +1,7 @@
+## [ui-v0.5.532] - 2026-11-08
+
+- WEATHER-APPLE-LOOK pass 2: one full-bleed sky behind the whole Weather detail, glass tiles, a shorter phone header block, Apple tile order (Conditions, 10-day, then the grid), full-width Wind and Moon, glass bottom bar with room under the last tile.
+
 ## [ui-v0.5.531] - 2026-11-08
 
 - WEATHER-APPLE-LOOK: on a phone the Weather page opens straight into the selected place (sky, big temperature, Feels Like, H/L, two-column tiles) instead of a list that needed a tap; a bottom control opens the place list. Clouds lose the hard flat shelf and get a feathered underside.

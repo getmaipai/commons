@@ -23,7 +23,7 @@ describe("WeatherForecastPage", () => {
     expect(getByText("Wind", { selector: "span" })).toBeTruthy();
     expect(getByText("Humidity")).toBeTruthy();
     expect(container.querySelectorAll('[data-slot="weather-tile"]')).toHaveLength(6);
-    const sky = container.querySelector<HTMLElement>('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
+    const sky = container.querySelector<HTMLElement>('[data-weather-layer="detail-sky"] [data-slot="weather-sky"]')!;
     expect(sky.dataset.phase).toBe("day");
     expect(sky.style.getPropertyValue("--wx-t")).toBe("1");
   });
@@ -87,9 +87,35 @@ describe("WeatherForecastPage", () => {
     expect(hourly?.className).toContain("min-w-0");
     expect(hourly?.className).toContain("w-full");
     expect(container.querySelector<HTMLElement>("[data-slot=weather-hourly-strip]")?.className).toContain("overflow-x-auto");
-    expect(container.querySelector<HTMLElement>("[data-slot=weather-daily-list] li")?.className).toContain("grid-cols-[3rem_2rem_2.4rem_minmax(0,1fr)_2.4rem]");
     expect([...container.querySelectorAll<HTMLElement>("[data-slot=weather-tile]")].every(tile => tile.className.includes("min-w-0") && tile.className.includes("w-full"))).toBe(true);
     expect(hourly?.className).not.toMatch(/(?:^|\s)h-(?:[0-9]|full)(?:\s|$)|aspect-/);
+  });
+
+  test("renders one shared sky behind a transparent, compact hero and glass tiles", () => {
+    const { container } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
+    expect(container.querySelectorAll('[data-weather-layer="detail-sky"] [data-slot="weather-sky"]')).toHaveLength(1);
+    expect(container.querySelector('[data-weather-layer="detail-sky"]')?.className).toContain("fixed");
+    const hero = container.querySelector<HTMLElement>('[data-slot="weather-forecast-hero"]')!;
+    expect(hero.className).toContain("min-h-[42svh]");
+    expect(hero.className).toContain("bg-transparent");
+    expect(hero.querySelector('[data-slot="weather-sky"]')).toBeNull();
+    const tile = container.querySelector<HTMLElement>('[data-slot="weather-tile"]')!;
+    expect(tile.style.color).toBe("var(--weather-ink)");
+    expect(tile.className).toContain("bg-card/50");
+    const controls = container.querySelector<HTMLElement>('[data-slot="weather-mobile-controls"]')!;
+    expect(controls.className).toContain("backdrop-blur-xl");
+    expect(controls.className).toContain("bg-card/50");
+    expect(controls.className).toContain("h-[calc(49px+env(safe-area-inset-bottom))]");
+  });
+
+  test("phone tile order puts conditions and ten-day first, followed by requested paired rows", () => {
+    const detail = { ...locations[0]!.detail!, airQuality: { aqi: 22, category: "Good" }, uvIndex: 3, feelsLike: 70, precipitation: 25,
+      visibility: 9, pressure: 1012, moon: { phase: "First Quarter", illumination: 50 }, hourly: [{ time: "2026-10-22T10:00", temp: 69, pop: 25, windSpeed: 8 }] };
+    const { container } = render(<WeatherForecastPage locations={[{ ...locations[0]!, detail }]} selectedId="home"/>);
+    const titles = [...container.querySelectorAll<HTMLElement>('[data-slot="weather-tile"] h3 span:last-child')].map(x => x.textContent);
+    const order = ["Conditions", "10-Day Forecast", "UV Index", "Sunrise & Sunset", "Precipitation", "Visibility", "Humidity", "Pressure", "Air Quality", "Feels Like", "Wind", "Moon Phase"];
+    expect(titles.filter(x => x !== "Hourly Forecast")).toEqual(order);
+    expect(titles.indexOf("Conditions")).toBeLessThan(titles.indexOf("10-Day Forecast"));
   });
 
   test("data-backed tiles appear only with fields and the Conditions switcher changes chart data", () => {
@@ -144,7 +170,7 @@ describe("WeatherForecastPage", () => {
   test("clear day has drifting clouds and a radial corona, with motion frozen for reduced motion", () => {
     const clear = [{ id: "sun", city: "Sun", detail: { temp: 82, condition: "Clear", code: 0, isDay: true } }];
     const { container } = render(<WeatherForecastPage locations={clear} selectedId="sun"/>);
-    const sky = container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
+    const sky = container.querySelector('[data-weather-layer="detail-sky"] [data-slot="weather-sky"]')!;
     expect(sky.querySelectorAll('[data-fx="cloud"]')).toHaveLength(2);
     expect(sky.querySelector('[data-fx="sun-corona"]')).not.toBeNull();
     expect(tokens).toContain("@keyframes wx-drift");
@@ -155,12 +181,12 @@ describe("WeatherForecastPage", () => {
 
   test("clear hero scenes contain sun and night stars", () => {
     const day = render(<WeatherForecastPage locations={[{ id: "day", city: "Day", detail: { temp: 80, condition: "Clear", code: 0, isDay: true } }]} selectedId="day"/>);
-    const daySky = day.container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
+    const daySky = day.container.querySelector('[data-weather-layer="detail-sky"] [data-slot="weather-sky"]')!;
     expect(daySky.querySelector('[data-fx="sun"]')).not.toBeNull();
     expect(daySky.querySelector('[data-fx="sun-corona"]')).not.toBeNull();
     cleanup();
     const night = render(<WeatherForecastPage locations={[{ id: "night", city: "Night", detail: { temp: 50, condition: "Clear", code: 0, isDay: false } }]} selectedId="night"/>);
-    const nightSky = night.container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')!;
+    const nightSky = night.container.querySelector('[data-weather-layer="detail-sky"] [data-slot="weather-sky"]')!;
     expect(nightSky.querySelectorAll('[data-fx="star"]').length).toBe(54);
     expect(nightSky.querySelector('[data-slot="weather-moon-disk"]')).not.toBeNull();
   });
@@ -216,15 +242,13 @@ describe("WeatherForecastPage", () => {
   });
 });
 
-describe("hero sky layer layout (regression: the text-lift rule must not turn the sky wrapper into a zero-height box)", () => {
-  test("the hero's text-lift rule skips the sky layer", () => {
-    expect(readFileSync(resolve(import.meta.dir, "./weather-forecast-page.tsx"), "utf8")).toContain('data-slot="weather-forecast-hero"');
-  });
-  test("the sky wrapper is marked as a layer and stays absolutely positioned over the hero", () => {
+describe("shared detail sky layer layout", () => {
+  test("the hero has no sky child and the shared detail layer covers the pane", () => {
     const { container } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
-    const layers = container.querySelectorAll('[data-slot="weather-forecast-hero"] > [data-weather-layer]');
-    expect(layers.length).toBe(1);
-    for (const layer of Array.from(layers)) expect(layer.className).toContain("absolute inset-0");
+    expect(container.querySelector('[data-slot="weather-forecast-hero"] [data-slot="weather-sky"]')).toBeNull();
+    const layer = container.querySelector<HTMLElement>('[data-weather-layer="detail-sky"]');
+    expect(layer).not.toBeNull();
+    expect(layer?.className).toContain("fixed inset-0");
   });
 });
 
