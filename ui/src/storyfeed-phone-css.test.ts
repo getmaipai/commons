@@ -72,6 +72,7 @@ describe("StoryFeed phone tokens and strip", () => {
     expect(css).toContain('html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]):has([data-slot="schema-page-body"] > * ~ * [data-slot="story-filters"]) [data-slot="story-feed"] > [data-slot="tabs"]');
     expect(css).toContain(' [data-slot="story-filters"] { display: flex; width: 100%; max-width: 100%; justify-content: flex-start; overflow-x: auto; padding-inline: 1rem;');
     expect(css).toContain('mask-image: linear-gradient(to right');
+    expect(css).toContain("margin: 0 -1rem; width: calc(100% + 2rem); max-width: none;");
     expect(css).toContain('[data-slot="story-filters"]):not(:has([data-slot="schema-page-body"] > * ~ * [data-slot="story-filters"]))');
   });
 });
