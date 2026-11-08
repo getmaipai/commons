@@ -1,3 +1,7 @@
+## [spec-v0.1.344] - 2026-11-08
+
+- HOUSE-08b, additive. `settings-area` `matrix.rows` accepts `house/exposure`: a grid whose rows the host supplies at run time from the household's Home Assistant exposure list (no spec file). `spec/gen/ts` and `spec/gen/py` regenerated (landed with ui 0.5.530).
+
 ## [spec-v0.1.343] - 2026-11-08
 
 - TRANSLATE-06, additive. Recipe step `translate` (`as`, `text`, `to`, optional `from`, all templates) calls `host.translate({text, to, from?})` and binds `{text}` like `llm_complete`. A host owns keep-terms and its output gate; the TS and Python emulators echo `[emulator: translate to <to>] <text>`. Interpreters, generated TS and Python and fixture `translate-step` updated. No existing recipe changes.
