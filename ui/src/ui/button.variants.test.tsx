@@ -71,3 +71,30 @@ describe("Button inverse variant (MEDIA-PLAYER-01)", () => {
     expect(cls).toContain("h-12");
   });
 });
+
+describe("Button glass and control options (PRO-LOOK-KIT-01a)", () => {
+  test("glass uses the shared glass surface tokens", () => {
+    const c = cls(render(<Button variant="glass">Play</Button>).getByRole("button"));
+    expect(c).toEqual(expect.arrayContaining([
+      "rounded-full", "bg-[var(--surface-glass)]", "text-foreground",
+      "backdrop-blur-[var(--glass-blur)]", "shadow-[var(--shadow-glass)]",
+      "hover:bg-[var(--surface-glass)]/80",
+    ]));
+  });
+
+  test("control and icon-control sizes keep the 48px hit area", () => {
+    const control = cls(render(<Button size="control">Save</Button>).getByRole("button"));
+    expect(control).toContain("h-[var(--control-height)]");
+    expect(control).toContain("before:-inset-0.5");
+    cleanup();
+    const icon = cls(render(<Button size="icon-control" aria-label="Search" />).getByRole("button"));
+    expect(icon).toContain("size-[var(--control-height)]");
+    expect(icon).toContain("before:-inset-0.5");
+  });
+
+  test("default options retain their previous classes", () => {
+    const el = render(<Button>Save</Button>).getByRole("button");
+    expect(buttonVariants({ variant: "default", size: "default" })).toBe(buttonVariants({}));
+    expect(el.className).toContain("rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-4 py-2 text-base has-[>svg]:px-3");
+  });
+});

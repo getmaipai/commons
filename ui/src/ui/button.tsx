@@ -10,6 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "rounded-full bg-primary text-primary-foreground hover:bg-primary/90",
+        glass: "rounded-full bg-[var(--surface-glass)] text-foreground backdrop-blur-[var(--glass-blur)] shadow-[var(--shadow-glass)] hover:bg-[var(--surface-glass)]/80",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
         outline:
@@ -43,6 +44,8 @@ const buttonVariants = cva(
         sm: `h-8 gap-1.5 px-3 ${hitArea(2)} has-[>svg]:px-2.5`,
         lg: "h-14 px-6 text-lg has-[>svg]:px-4",
         icon: "size-12",
+        control: "h-[var(--control-height)] px-5 text-base has-[>svg]:px-4 relative before:absolute before:-inset-0.5 before:content-['']",
+        "icon-control": "size-[var(--control-height)] relative before:absolute before:-inset-0.5 before:content-['']",
         "icon-xs": `size-6 ${hitArea(3)} [&_svg:not([class*='size-'])]:size-3`,
         "icon-sm": `size-8 ${hitArea(2)}`,
         "icon-lg": `size-10 ${hitArea(1)}`,

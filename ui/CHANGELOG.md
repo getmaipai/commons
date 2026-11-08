@@ -1,3 +1,7 @@
+## [ui-v0.5.536] - 2026-11-08
+
+- PRO-LOOK-KIT-01a: Button variant glass, sizes control and icon-control; additive, defaults unchanged
+
 ## [ui-v0.5.535] - 2026-11-08
 
 - PRO-LOOK-TOKENS-01a: add additive type, spacing, surface, accent, motion, control and icon tokens derived from each Look; extend ease scaling and add 16-pair token resolution coverage.
