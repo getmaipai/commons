@@ -2146,14 +2146,13 @@ body {
   width: var(--s);
   aspect-ratio: 2.6 / 1;
   transform-origin: top center;
-  clip-path: inset(0 0 calc(100% - var(--shelf, 76%)) 0);
   --cloud-lit: var(--wx-cloud-lit);
   --cloud-shade: var(--wx-cloud-shade);
   opacity: var(--o);
   z-index: var(--z);
   animation: wx-drift var(--d) linear var(--dl) infinite;
 }
-/* Both pseudo-elements carry the silhouette (lobed puffs on a flat shelf), so the underside shadow can be offset. */
+/* Both pseudo-elements carry the feathered puff silhouette, so the underside shadow can be offset. */
 [data-slot="weather-sky"] [data-fx="cloud"]::before,
 [data-slot="weather-sky"] [data-fx="cloud"]::after {
   content: ""; position: absolute; inset: 0;

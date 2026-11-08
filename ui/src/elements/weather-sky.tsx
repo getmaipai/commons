@@ -69,7 +69,7 @@ function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: Wea
     const size = `clamp(${d.minWidth}px, ${d.widthCqw}cqw, ${d.width}px)`; const duration = cloudDuration(width, d.width * d.scale, d.speed, factor);
     const yMin = d.y[0] ?? 0; const yMax = d.y[1] ?? yMin;
     const y = yMin + ((i * 7 + 4) % (yMax - yMin + 1));
-    return { depth, shape, size, duration, delay: -(i / total) * duration, y, mask: cloudMask(shape, depth), shelf: scene.clouds.shelf[shape], leaving: i >= count };
+    return { depth, shape, size, duration, delay: -(i / total) * duration, y, mask: cloudMask(shape, depth), leaving: i >= count };
   });
   useEffect(() => { pendingWind.current = wind; }, [wind]);
   const retime = (el: HTMLSpanElement, i: number) => {
@@ -78,7 +78,7 @@ function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: Wea
     const depth = scene.clouds.depths[p.depth];
     el.style.setProperty("--d", `${cloudDuration(width, depth.width * depth.scale, depth.speed, nextFactor)}s`);
   };
-  return <>{data.map((p, i) => <span ref={el => { refs.current[i] = el; }} key={i} data-fx="cloud" data-shape={p.shape} data-depth={p.depth} data-leaving={p.leaving ? "true" : undefined} aria-hidden="true" onAnimationIteration={e => retime(e.currentTarget, i)} style={{ "--y": p.y, "--s": p.size, "--d": `${p.duration}s`, "--dl": `${p.delay}s`, "--o": scene.clouds.depths[p.depth].opacity, "--z": scene.clouds.depths[p.depth].z, "--cloud-mask": p.mask, "--shelf": `${p.shelf}%` } as Style}/>)}</>;
+  return <>{data.map((p, i) => <span ref={el => { refs.current[i] = el; }} key={i} data-fx="cloud" data-shape={p.shape} data-depth={p.depth} data-leaving={p.leaving ? "true" : undefined} aria-hidden="true" onAnimationIteration={e => retime(e.currentTarget, i)} style={{ "--y": p.y, "--s": p.size, "--d": `${p.duration}s`, "--dl": `${p.delay}s`, "--o": scene.clouds.depths[p.depth].opacity, "--z": scene.clouds.depths[p.depth].z, "--cloud-mask": p.mask } as Style}/>)}</>;
 }
 /**
  * The cloud silhouette: lobed puffs and a base ellipse added together (soft 3 to 10 px rim, no blur). The flat shelf is cut
@@ -87,10 +87,10 @@ function Clouds({ cls, variant, wind, width }: { cls: WeatherClass; variant: Wea
  */
 function cloudMask(shape: "a" | "b" | "c", depth: "far" | "mid" | "near") {
   const puffs = scene.clouds.puffs[shape] as number[][];
-  const stop = scene.clouds.mask[depth]; const shelf = scene.clouds.shelf[shape];
+  const stop = scene.clouds.mask[depth];
   const lobes = puffs.map(puff => { const [x = 0, y = 0, r = 0] = puff; return `radial-gradient(circle calc(var(--s) * ${r / 100}) at ${x}% ${y}%, var(--weather-ink) 0 ${stop}%, transparent 100%)`; });
-  const base = `radial-gradient(ellipse 46% 13% at 50% ${shelf}%, var(--weather-ink) 0 92%, transparent)`;
-  return [...lobes, base].join(", ");
+  const underside = `radial-gradient(ellipse 49% 24% at 50% 70%, var(--weather-ink) 0 42%, transparent 100%), radial-gradient(ellipse 44% 30% at 50% 74%, var(--weather-ink) 0 24%, transparent 100%)`;
+  return [...lobes, underside].join(", ");
 }
 
 interface SceneSnapshot { cls: WeatherClass; intensity: number }

@@ -470,23 +470,23 @@ describe("WEATHER-SCENE-08 picture polish: clouds", () => {
     expect(scene.clouds.depths.near.opacity).toBe(0.96); expect(scene.clouds.depths.mid.opacity).toBe(0.74); expect(scene.clouds.depths.far.opacity).toBe(0.42);
     for (const [depth, value] of [["near", ".96"], ["mid", ".74"], ["far", ".42"]] as const) expect(skyRule(`[data-slot="weather-sky"] [data-fx="cloud"][data-depth="${depth}"]`)).toContain(`opacity: ${value}`);
   });
-  test("each cloud mask has soft stops per depth, no outer fade, and the flat shelf is a clip-path, not a mask composite", () => {
+  test("each cloud mask uses soft stops and feathered lower puffs with no hard shelf layer", () => {
     const { container } = render(<WeatherSky cls="overcast" isDay={true} width={420} height={230} />);
     const clouds = [...container.querySelectorAll<HTMLElement>('[data-fx="cloud"]')];
     expect(new Set(clouds.map(el => el.getAttribute("data-depth"))).size).toBe(3);
     for (const el of clouds) {
       const shape = el.getAttribute("data-shape") as "a" | "b" | "c"; const depth = el.getAttribute("data-depth")!;
-      const mask = el.style.getPropertyValue("--cloud-mask"); const shelf = scene.clouds.shelf[shape];
+      const mask = el.style.getPropertyValue("--cloud-mask");
       expect(mask).toContain(`var(--weather-ink) 0 ${depth === "far" ? 62 : 86}%, transparent 100%`);
       expect(mask).not.toContain("40%, transparent");
       const puffs = scene.clouds.puffs[shape] as number[][];
       for (const [, , radius = 0] of puffs) expect(mask).toContain(`calc(var(--s) * ${radius / 100})`);
-      expect(mask).toContain(`radial-gradient(ellipse 46% 13% at 50% ${shelf}%, var(--weather-ink) 0 92%, transparent)`);
+      expect(mask).toContain("ellipse 49% 24% at 50% 70%");
+      expect(mask).toContain("ellipse 44% 30% at 50% 74%");
+      expect(mask).toContain("transparent 100%");
       expect(mask).not.toContain("linear-gradient(to bottom");
-      expect(el.style.getPropertyValue("--shelf")).toBe(`${shelf}%`);
       expect(el.style.getPropertyValue("--cloud-mc")).toBe(""); expect(el.style.getPropertyValue("--cloud-mc-webkit")).toBe("");
     }
-    expect(scene.clouds.shelf).toEqual({ a: 74, b: 78, c: 80 });
   });
   test("the clouds paint in two pseudo-elements that carry the mask: a shaded body with a rim light and an offset shadow", () => {
     const base = skyRule('[data-slot="weather-sky"] [data-fx="cloud"]');
@@ -494,7 +494,7 @@ describe("WEATHER-SCENE-08 picture polish: clouds", () => {
     const both = css.slice(css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"]::before,'), css.indexOf('[data-slot="weather-sky"] [data-fx="cloud"]::before {'));
     for (const text of ["content: \"\"", "position: absolute", "inset: 0", "mask-image: var(--cloud-mask)", "-webkit-mask-image: var(--cloud-mask)", "mask-size: 100% 100%"]) expect(both, text).toContain(text);
     expect(both).not.toContain("mask-composite");
-    expect(base).toContain("clip-path: inset(0 0 calc(100% - var(--shelf, 76%)) 0)");
+    expect(base).not.toContain("clip-path");
     const shadow = skyRule('[data-slot="weather-sky"] [data-fx="cloud"]::before'); const body = lastRule('[data-slot="weather-sky"] [data-fx="cloud"]::after');
     expect(shadow).toContain("translate: 0 5%"); expect(shadow).toContain("color-mix(in oklab, var(--cloud-shade), transparent 45%)");
     expect(body).toContain("linear-gradient(to top, var(--cloud-shade) 0 24%, var(--cloud-lit) 62%)");

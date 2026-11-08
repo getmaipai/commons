@@ -74,7 +74,7 @@ describe("WeatherForecastPage", () => {
   test("detail grid uses content-sized rows and hourly card is not stretched", () => {
     const { container } = render(<WeatherForecastPage locations={locations} selectedId="home"/>);
     const grid = container.querySelector<HTMLElement>("[data-slot=weather-detail-grid]")!;
-    expect(grid.className).toContain("grid-cols-1");
+    expect(grid.className).toContain("grid-cols-2");
     expect(grid.className).toContain("sm:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]");
     expect(grid.className).toContain("min-w-0");
     expect(grid.className).toContain("w-full");
@@ -203,16 +203,16 @@ describe("WeatherForecastPage", () => {
     expect(container.querySelector("[data-slot=weather-forecast-hour] svg")?.getAttribute("class")).toContain("lucide-sun");
   });
 
-  test("searches and opens then closes the mobile detail", () => {
+  test("narrow layout starts with the selected location detail and exposes location controls", () => {
     const onSearch = mock(() => {}); const onSelect = mock(() => {});
-    const { container, getByLabelText, getByRole } = render(<WeatherForecastPage locations={locations} selectedId="home" onSearch={onSearch} onSelect={onSelect}/>);
-    fireEvent.change(getByLabelText("Search locations"), { target: { value: "Spring" } });
+    const { container, getByRole } = render(<WeatherForecastPage locations={locations} selectedId="home" onSearch={onSearch} onSelect={onSelect}/>);
+    fireEvent.change(container.querySelector('[data-slot="weather-location-list"] input')!, { target: { value: "Spring" } });
     expect(onSearch).toHaveBeenCalledWith("Spring");
-    fireEvent.click(container.querySelector('[data-slot="weather-location"]')!);
-    expect(onSelect).toHaveBeenCalledWith("home");
-    expect(container.querySelector('[data-slot="weather-location-detail"]')?.className).not.toContain("hidden");
+    expect(container.querySelector('[data-slot="weather-location-detail"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="weather-forecast-hero"]')?.textContent).toContain("Springfield");
+    expect(container.querySelector('[data-slot="weather-mobile-controls"]')).not.toBeNull();
     fireEvent.click(getByRole("button", { name: /Locations/ }));
-    expect(onSelect).toHaveBeenLastCalledWith("");
+    expect(container.querySelector('[data-slot="weather-location-list"]')?.className).toContain("fixed");
   });
 });
 
