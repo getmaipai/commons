@@ -14,7 +14,7 @@ const BOTTOM_BAR_MAX = 5;
 // "Home, Chat, Apps, More" - owner ruling, "Navigation, corrected,"
 // 2026-09-20: three real destinations, not four, before More) without
 // changing the default every other consumer's own tests and behavior
-// already rely on. `variant="floating"`, `label` and `trailing` are for
+// already rely on. `variant="floating"` or `variant="docked"`, `label` and `trailing` are for
 // an app's own sections bar (phone-minimal-2026-10-25 P2): the same part,
 // inset and filled, with a trailing Search item that is never folded under More.
 // `more` entries (an app's settings, say) always live under the last item, the
@@ -29,7 +29,7 @@ export function PhoneNav({
 }: {
   entries: readonly NavEntry[];
   max?: number;
-  variant?: "bar" | "floating";
+  variant?: "bar" | "floating" | "docked";
   label?: string;
   trailing?: NavEntry;
   more?: readonly NavEntry[];
@@ -52,6 +52,7 @@ export function PhoneNav({
   const hasMore = sheetEntries.length > 0;
   const MoreIcon = getIcon("more-horizontal");
   const floating = variant === "floating";
+  const compact = variant !== "bar";
 
   const renderEntry = (entry: NavEntry) => {
     const Icon = getIcon(entry.icon);
@@ -61,7 +62,7 @@ export function PhoneNav({
         key={entry.to}
         to={entry.to}
         aria-current={active ? "page" : undefined}
-        className={floating
+        className={compact
           ? cn(
               "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs",
               active ? "rounded-full bg-muted text-foreground" : "text-muted-foreground",
@@ -93,7 +94,7 @@ export function PhoneNav({
           <button
             type="button"
             onClick={() => setMoreOpen(true)}
-            className={floating
+            className={compact
               ? "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs text-muted-foreground"
               : "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base text-muted-foreground"}
           >

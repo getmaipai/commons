@@ -121,6 +121,20 @@ describe("PhoneNav", () => {
     expect(getByRole("link", { name: /Apps/ })).toHaveClass("bg-muted", "text-foreground");
   });
 
+  test("docked variant is the flush bar with the floating entries", () => {
+    const { getByRole } = render(
+      <MemoryRouter initialEntries={["/apps"]}>
+        <PhoneNav entries={FIVE_ENTRIES} variant="docked" />
+      </MemoryRouter>,
+    );
+    const nav = getByRole("navigation");
+    const activeLink = getByRole("link", { name: /Apps/ });
+    expect(nav).toHaveClass("fixed", "inset-x-0", "bottom-0", "border-t", "bg-background", "sm:hidden");
+    expect(nav).not.toHaveClass("rounded-full", "shadow-lg");
+    expect(nav).not.toHaveAttribute("data-floating");
+    expect(activeLink).toHaveClass("bg-muted", "text-foreground", "text-xs");
+  });
+
   test("draws trailing last and keeps it out of More when entries overflow", () => {
     const trailing: NavEntry = { to: "/search", icon: "search", label: "Search" };
     const { getByRole, getByText } = render(
