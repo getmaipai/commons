@@ -526,7 +526,7 @@ function PlainShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrame
 export function MediaTileOverlay({ progress = 0, badge, meta, metaPlacement = "end", badgeStyle = "default" }: { progress?: number; badge?: ReactNode; meta?: ReactNode; metaPlacement?: "end" | "start"; badgeStyle?: "default" | "mono" }) {
   return (
     <>
-      {badge ? <span className={cn("absolute start-2 top-2 flex", badgeStyle === "mono" && "rounded-md bg-black/55 px-1.5 py-1 font-mono text-[length:var(--font-size-badge)] font-semibold text-white backdrop-blur-sm")} data-slot="media-tile-badge">{badge}</span> : null}
+      {badge ? <span className={cn("absolute start-2 top-2 flex", badgeStyle === "mono" && "rounded-md bg-[var(--art-overlay)] px-1.5 py-1 font-mono text-[length:var(--font-size-badge)] font-semibold text-[var(--art-foreground)] backdrop-blur-sm")} data-slot="media-tile-badge">{badge}</span> : null}
       {meta ? (
         <span
           className={cn("absolute bottom-2 rounded-md bg-[var(--art-overlay)] px-1.5 py-0.5 text-xs font-semibold text-[var(--art-foreground)] tabular-nums", metaPlacement === "start" ? "start-2" : "end-2")}

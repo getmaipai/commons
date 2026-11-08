@@ -503,7 +503,7 @@ describe("MediaShelf", () => {
     const { container } = render(<div className="relative"><MediaTileOverlay badge="HD" meta="03:14" metaPlacement="start" badgeStyle="mono" /></div>);
     const badge = container.querySelector('[data-slot="media-tile-badge"]')!;
     expect(badge.className).toContain("font-mono text-[length:var(--font-size-badge)] font-semibold");
-    expect(badge.className).toContain("bg-black/55");
+    expect(badge.className).toContain("bg-[var(--art-overlay)]");
     expect(badge.className).toContain("backdrop-blur-sm");
     expect(container.querySelector('[data-slot="media-tile-meta"]')!.className).toContain("start-2");
   });
