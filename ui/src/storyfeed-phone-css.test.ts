@@ -29,7 +29,7 @@ describe("StoryFeed phone tokens and strip", () => {
   });
 
   test("section-bar apps start their page under the menu button", () => {
-    expect(css).toContain('html:has([data-slot="phone-nav"]):not(:has([data-slot="story-filters"])) [data-slot="rail-body"], html:has([data-header-flat]) [data-slot="rail-body"] { padding-top: 0; }');
+    expect(css).toContain('html:has([data-slot="phone-nav"]):not(:has([data-slot="story-filters"]):not(:has([data-slot="schema-page-body"] > * ~ * [data-slot="story-filters"]))) [data-slot="rail-body"], html:has([data-header-flat]) [data-slot="rail-body"] { padding-top: 0; }');
   });
 
   test("reader and detail controls form a second row and provider labels wrap below it", () => {
@@ -61,9 +61,17 @@ describe("StoryFeed phone tokens and strip", () => {
   });
 
   test("the chips bar spans the row so the avatar sits at the right and the chips keep clear of the controls", () => {
-    expect(css).toContain('[data-slot="story-filters"]) [data-slot="rail-page-header"] { position: fixed; inset: 0 0 auto 0;');
+    expect(css).toContain('[data-slot="story-filters"]):not(:has([data-slot="schema-page-body"] > * ~ * [data-slot="story-filters"])) [data-slot="rail-page-header"] { position: fixed; inset: 0 0 auto 0;');
     expect(css).toContain('[data-slot="rail-page-header"] > * { pointer-events: auto; }');
     expect(css).toContain("padding: 0 3.75rem 0 3.75rem;");
     expect(css).toContain("padding-inline-end: 6.5rem;");
+    expect(css).toContain('):not(:has([data-slot="schema-page-body"] > * ~ * [data-slot="story-filters"])):has([data-slot="rail-header-right"]) [data-slot="story-feed"] > [data-slot="tabs"] { padding-inline-end: 6.5rem;');
+  });
+
+  test("a feed with something above it is flat", () => {
+    expect(css).toContain('html:has([data-slot="story-feed"] > [data-slot="tabs"] [data-slot="story-filters"]):has([data-slot="schema-page-body"] > * ~ * [data-slot="story-filters"]) [data-slot="story-feed"] > [data-slot="tabs"]');
+    expect(css).toContain(' [data-slot="story-filters"] { display: flex; width: 100%; max-width: 100%; justify-content: flex-start; overflow-x: auto; padding-inline: 1rem;');
+    expect(css).toContain('mask-image: linear-gradient(to right');
+    expect(css).toContain('[data-slot="story-filters"]):not(:has([data-slot="schema-page-body"] > * ~ * [data-slot="story-filters"]))');
   });
 });
