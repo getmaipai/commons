@@ -44,7 +44,7 @@ interface MediaShelfProps<T> {
   density?: Density;
   heading?: string;
   /** VIDEO-STUDIO-03 (K5): `eyebrow` draws the heading, and the day group labels, as a small uppercase tracked line. Default `default`. */
-  headingStyle?: "default" | "eyebrow";
+  headingStyle?: "default" | "eyebrow" | "section";
   /** Accessible name for the rail. Falls back to `heading`. */
   label?: string;
   emptyState?: { icon: string; text: string };
@@ -85,7 +85,11 @@ interface MediaShelfProps<T> {
   /** MEDIA-POLISH-01: a link beside the heading ("See all"). */
   seeAll?: { label: string; onSelect: () => void };
   /** MUSIC-KIT-01: `tight` draws the art with the 8 px `--media-card-radius` instead of the card radius. Default `default`. */
-  cardRadius?: "default" | "tight";
+  cardRadius?: "default" | "tight" | "card";
+  /** PRO-LOOK-KIT-01d: square, fixed-size tiles for image-led shelves. */
+  tileSize?: "default" | "pro";
+  /** Let a horizontal rail reach the container's right edge. */
+  bleed?: boolean;
   /** MUSIC-KIT-01: a pressed tile shrinks to `--media-press-scale` (0.98). Not applied under reduced motion. Default off. */
   pressScale?: boolean;
   /** MUSIC-KIT-01: draws a round Play button. On a rail or grid tile it slides up over the art's bottom-end corner on
@@ -145,6 +149,8 @@ export function MediaShelf<T>({
   density = "default",
   heading,
   headingStyle = "default",
+  tileSize = "default",
+  bleed = false,
   label,
   emptyState,
   emptyActionLabel,
@@ -181,12 +187,13 @@ export function MediaShelf<T>({
   const Frame = variant === "plain" ? PlainShelfFrame : CardShelfFrame;
   const circle = artShape === "circle";
   const tight = cardRadius === "tight";
+  const proTiles = tileSize === "pro" && orientation === "horizontal" && layout === "rail";
   const artClasses = cn(
     "relative w-full overflow-hidden bg-[var(--muted)]",
-    circle ? ["aspect-square rounded-full", orientation === "vertical" ? "" : "mx-auto w-[var(--media-artist-size)] max-w-full"] : [tight ? "rounded-[var(--media-card-radius)]" : "rounded-[var(--radius)]", ASPECT_CLASSES[aspect]],
+    circle ? ["aspect-square rounded-full", orientation === "vertical" ? "" : "mx-auto w-[var(--media-artist-size)] max-w-full"] : [tight ? "rounded-[var(--media-card-radius)]" : cardRadius === "card" || proTiles ? "rounded-[var(--radius-card)]" : "rounded-[var(--radius)]", proTiles ? "aspect-square" : ASPECT_CLASSES[aspect]],
   );
   // The Card surface has its own radius; a tight tile clips to the same 8 px so the art and its frame agree.
-  const tileClasses = cn(tight && !circle && "rounded-[var(--media-card-radius)]", pressScale && PRESS_CLASSES);
+  const tileClasses = cn(tight && !circle && "rounded-[var(--media-card-radius)]", cardRadius === "card" && !circle && "rounded-[var(--radius-card)]", proTiles && "rounded-[var(--radius-card)]", pressScale && PRESS_CLASSES);
   const playName = (item: T) => getPlayLabel?.(item) ?? getLabel?.(item) ?? i18n._({ id: "ui.Play", message: "Play" });
   const currentClasses = "ring-2 ring-[var(--media-current-ring)] ring-offset-2 ring-offset-background";
   // Use the existing card budgets, overriding only the phone count. The
@@ -314,7 +321,7 @@ export function MediaShelf<T>({
       className={cn(
         layout === "grid"
           ? ["grid min-w-0 list-none gap-3 p-1.5", gridColumns]
-          : ["flex min-w-0 list-none snap-x snap-mandatory gap-3 overflow-x-auto p-1.5", variant === "plain" && "[scrollbar-width:none]"],
+          : ["flex min-w-0 list-none snap-x snap-mandatory gap-3 overflow-x-auto p-1.5", proTiles && "gap-3", bleed && "-mr-4 pr-4", proTiles && "-mr-4 pr-4", variant === "plain" && "[scrollbar-width:none]"],
         FOCUS_RING,
       )}
     >
@@ -322,7 +329,7 @@ export function MediaShelf<T>({
         <li
           key={getKey(item)}
           aria-current={isHighlighted?.(item) ? "true" : undefined}
-          className={cn("flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
+          className={cn("flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", proTiles ? "w-[156px] md:w-[176px]" : circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
         >
           <TileFrame
             onPlay={onPlay ? () => onPlay(item) : undefined}
@@ -482,27 +489,30 @@ const PLAIN_ITEM_WIDTH_COMPACT = "w-[44%] sm:w-[calc((100%-48px)/4.2)] xl:w-[cal
 
 interface ShelfFrameProps {
   heading?: string;
-  headingStyle?: "default" | "eyebrow";
+  headingStyle?: "default" | "eyebrow" | "section";
   seeAll?: { label: string; onSelect: () => void };
   children: ReactNode;
 }
 
 /** The default frame: the kit Section card. A card shelf has no See all link. */
-function CardShelfFrame({ heading, headingStyle, children }: ShelfFrameProps) {
+function CardShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrameProps) {
+  const Chevron = getIcon("chevron-right");
+  if (headingStyle === "section" && (heading || seeAll)) return <Section><div className="flex items-center justify-between gap-3">{heading ? <h2 className="text-[22px] md:text-2xl font-semibold tracking-tight text-foreground">{heading}</h2> : <span />}{seeAll ? <Button variant="ghost" size="sm" onClick={seeAll.onSelect} className="text-sm font-normal text-muted-foreground">{seeAll.label}<Chevron aria-hidden className="ms-1 size-4" /></Button> : null}</div>{children}</Section>;
   if (headingStyle === "eyebrow" && heading) return <Section><h2 className={eyebrow}>{heading}</h2>{children}</Section>;
   return <Section heading={heading}>{children}</Section>;
 }
 
 /** A plain shelf's frame: no card, the heading on the start side and the See all link on the end side. */
 function PlainShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrameProps) {
+  const Chevron = getIcon("chevron-right");
   return (
     <section className="flex min-w-0 flex-col gap-2" data-slot="media-shelf-plain">
       {heading || seeAll ? (
         <div className="flex items-center justify-between gap-3">
-          {heading ? <h2 className={headingStyle === "eyebrow" ? eyebrow : "text-lg font-bold tracking-tight text-foreground"}>{heading}</h2> : <span />}
+          {heading ? <h2 className={headingStyle === "eyebrow" ? eyebrow : headingStyle === "section" ? "text-[22px] md:text-2xl font-semibold tracking-tight text-foreground" : "text-lg font-bold tracking-tight text-foreground"}>{heading}</h2> : <span />}
           {seeAll ? (
-            <Button variant="ghost" size="sm" onClick={seeAll.onSelect} className="text-muted-foreground font-semibold">
-              {seeAll.label}
+            <Button variant="ghost" size="sm" onClick={seeAll.onSelect} className={cn("text-muted-foreground font-semibold", headingStyle === "section" && "text-sm font-normal")}>
+              {seeAll.label}{headingStyle === "section" ? <Chevron aria-hidden className="ms-1 size-4" /> : null}
             </Button>
           ) : null}
         </div>
@@ -513,13 +523,13 @@ function PlainShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrame
 }
 
 /** The tile's corners and bottom edge: badge, running time and progress. Shared with any media tile the kit draws. */
-export function MediaTileOverlay({ progress = 0, badge, meta }: { progress?: number; badge?: ReactNode; meta?: ReactNode }) {
+export function MediaTileOverlay({ progress = 0, badge, meta, metaPlacement = "end", badgeStyle = "default" }: { progress?: number; badge?: ReactNode; meta?: ReactNode; metaPlacement?: "end" | "start"; badgeStyle?: "default" | "mono" }) {
   return (
     <>
-      {badge ? <span className="absolute start-2 top-2 flex" data-slot="media-tile-badge">{badge}</span> : null}
+      {badge ? <span className={cn("absolute start-2 top-2 flex", badgeStyle === "mono" && "rounded-md bg-black/55 px-1.5 py-1 font-mono text-[length:var(--font-size-badge)] font-semibold text-white backdrop-blur-sm")} data-slot="media-tile-badge">{badge}</span> : null}
       {meta ? (
         <span
-          className="absolute end-2 bottom-2 rounded-md bg-[var(--art-overlay)] px-1.5 py-0.5 text-xs font-semibold text-[var(--art-foreground)] tabular-nums"
+          className={cn("absolute bottom-2 rounded-md bg-[var(--art-overlay)] px-1.5 py-0.5 text-xs font-semibold text-[var(--art-foreground)] tabular-nums", metaPlacement === "start" ? "start-2" : "end-2")}
           data-slot="media-tile-meta"
         >
           {meta}

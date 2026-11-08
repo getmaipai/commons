@@ -139,4 +139,23 @@ describe("List", () => {
     );
     expect(getByLabelText("People").className).not.toContain("divide-y");
   });
+
+  test("media rows render the thumbnail, omit dividers, and use surface hover and selection", () => {
+    const { getByLabelText, getByRole } = render(
+      <List items={people.slice(0, 1)} getKey={(p) => p.id} label="Recent media" rowSize="media" hover="surface" dividers
+        isSelected={(p) => p.id === "p1"}
+        renderThumb={(p) => <img alt={`${p.name} cover`} src="/cover.png" />}
+        renderItem={(p) => <div className="min-w-0"><p>{p.name}</p><p className="text-muted-foreground">Today</p></div>}
+        renderAction={() => <button type="button" aria-label="More">•••</button>} />,
+    );
+    const list = getByLabelText("Recent media");
+    expect(list.className).not.toContain("divide-y");
+    const row = list.querySelector("li")!;
+    expect(row.className).toContain("h-[76px]");
+    expect(row.querySelector("[class*=size-16]")!.className).toContain("rounded-[var(--radius-thumb)]");
+    expect(getByRole("button", { name: "More" }).parentElement!.className).toContain("size-11");
+    const selected = Array.from(row.querySelectorAll("div")).find((element) => element.className.includes("bg-[var(--surface-2)]"))!;
+    expect(selected.className).toContain("bg-[var(--surface-2)]");
+    expect(selected.className).toContain("hover:bg-[var(--surface-1)]");
+  });
 });

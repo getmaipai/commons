@@ -1,6 +1,6 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
 import { render, cleanup, fireEvent } from "@testing-library/react";
-import { MediaShelf } from "@/kit/primitives/MediaShelf";
+import { MediaShelf, MediaTileOverlay } from "@/kit/primitives/MediaShelf";
 
 afterEach(cleanup);
 
@@ -480,5 +480,31 @@ describe("MediaShelf", () => {
       expect(container.innerHTML).toBe(before);
       expect(container.querySelector("[data-slot=media-tile-favorite]")).toBeNull();
     });
+  });
+
+  test("section heading, pro tile size, bleed and card radius add their documented classes", () => {
+    const props = { items: tracks, getKey: (t: Track) => t.id, renderItem: () => null, heading: "Music", variant: "plain" as const, seeAll: { label: "See all", onSelect: () => {} } };
+    const { getByRole, container, rerender } = render(<MediaShelf {...props} />);
+    rerender(<MediaShelf {...props} headingStyle="section" />);
+    expect(getByRole("heading", { name: "Music" }).className).toContain("text-[22px] md:text-2xl font-semibold tracking-tight");
+    expect(getByRole("button", { name: /See all/ }).textContent).toContain("See all");
+    rerender(<MediaShelf {...props} tileSize="pro" />);
+    const list = getByRole("list", { name: "Music" });
+    expect(list.className).toContain("-mr-4 pr-4");
+    expect(list.querySelector("li")!.className).toContain("w-[156px] md:w-[176px]");
+    expect(container.querySelector("[class*=aspect-square]")!.className).toContain("rounded-[var(--radius-card)]");
+    rerender(<MediaShelf {...props} bleed />);
+    expect(getByRole("list", { name: "Music" }).className).toContain("-mr-4 pr-4");
+    rerender(<MediaShelf {...props} cardRadius="card" />);
+    expect(container.querySelector("[class*=aspect-video]")!.className).toContain("rounded-[var(--radius-card)]");
+  });
+
+  test("tile overlay combines start metadata with the mono duration badge", () => {
+    const { container } = render(<div className="relative"><MediaTileOverlay badge="HD" meta="03:14" metaPlacement="start" badgeStyle="mono" /></div>);
+    const badge = container.querySelector('[data-slot="media-tile-badge"]')!;
+    expect(badge.className).toContain("font-mono text-[length:var(--font-size-badge)] font-semibold");
+    expect(badge.className).toContain("bg-black/55");
+    expect(badge.className).toContain("backdrop-blur-sm");
+    expect(container.querySelector('[data-slot="media-tile-meta"]')!.className).toContain("start-2");
   });
 });

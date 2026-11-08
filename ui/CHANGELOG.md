@@ -1,3 +1,7 @@
+## [ui-v0.5.541] - 2026-11-08
+
+- PRO-LOOK-KIT-01d (renumbered from 0.5.539, which was tagged by mistake and is never to be pinned): MediaShelf `headingStyle="section"`, `tileSize="pro"`, `bleed`, `cardRadius="card"`; tile overlay options; List `rowSize="media"`, `renderThumb`, `hover="surface"`; additive, defaults unchanged.
+
 ## [ui-v0.5.540] - 2026-11-08
 
 - PRO-LOOK-KIT-01b (renumbered from 0.5.537, which was tagged by mistake and is never to be pinned): add optional chip, field, flat card, skeleton and empty-state tile styles; defaults unchanged.
@@ -3835,7 +3839,6 @@ the kit" (home/docs/design/home-pages-2026-09-20.md, HOME-UI-01).
 - Weather forecast page: location cards give the local time and remove action a dedicated right-side header row beside a shrinkable city name; the remove target is 44 px. The shared sky now has visible, condition-specific scenes (sun pulse, 72 night stars, drifting clouds, 64 rain streaks with a splash, snow, storm flash and fog bands), reduced particle counts for paused list previews and reduced-motion support. Forecast details add optional AQI, UV, wind dial, sunrise/sunset, feels-like, humidity/dew point, precipitation, visibility, pressure and moon tiles plus an hourly Conditions metric switcher. Unsupported details stay omitted. Showcase and focused layout, data omission, switcher and animation tests included.
 - Data for optional detail tiles: `airQuality: { aqi, category }`, `wind: { speed, direction, gust? }`, `sunrise`, `sunset`, `uvIndex`, `feelsLike`, `humidity`, `dewPoint?`, `precipitation`, `precipitationAmount?`, `precipitationLast24h?`, `precipitationNext24h?`, `visibility`, `visibilityDescription?`, `pressure`, `pressureTrend?`, and `moon: { phase, illumination }`. The hourly chart uses `hourly[].temp`, `pop?`, and `windSpeed?`.
 ## Unreleased
-- PRO-LOOK-KIT-01c: add optional glass/pro/wide/primary-label PhoneNav styling and pill/create PromptBar styling.
 - PHONE-01 and PHONE-03: add a phone story grid and steady pill strips.
 - MOON-LOOK-01: add a phase-accurate `MoonDisc` element and optional `nextFull` / `nextNew` dates to the Weather Moon Phase tile.
 

@@ -20,6 +20,10 @@ interface ListProps<T> {
    * outside the row button, because a control inside a button is not
    * reachable and not valid HTML. */
   renderAction?: (item: T) => ReactNode;
+  /** Optional leading thumbnail for media rows. */
+  renderThumb?: (item: T) => ReactNode;
+  rowSize?: "default" | "media";
+  hover?: "default" | "surface";
   /** Accessible name for the list as a whole. */
   label?: string;
   emptyState?: { icon: string; text: string };
@@ -41,11 +45,15 @@ function TvListRowButton({
   ariaLabel,
   selected,
   onActivate,
+  rowSize,
+  hover,
 }: {
   content: ReactNode;
   ariaLabel?: string;
   selected: boolean;
   onActivate: () => void;
+  rowSize?: "default" | "media";
+  hover?: "default" | "surface";
 }) {
   const { ref, focused } = useFocusable<HTMLButtonElement>({ onEnterPress: onActivate });
   return (
@@ -57,9 +65,11 @@ function TvListRowButton({
       aria-current={selected ? "true" : undefined}
       className={cn(
         "flex min-h-12 min-w-0 flex-1 items-center rounded-[var(--radius)] text-left",
-        "hover:bg-[var(--muted)]",
+        rowSize === "media" && "h-[76px] min-h-0 rounded-xl",
+        hover === "surface" && "rounded-xl",
+        hover === "surface" ? "hover:bg-[var(--surface-1)]" : "hover:bg-[var(--muted)]",
         focused && "ring-2 ring-ring",
-        selected && "bg-[var(--muted)]",
+        selected && (hover === "surface" ? "bg-[var(--surface-2)]" : "bg-[var(--muted)]"),
       )}
     >
       {content}
@@ -84,8 +94,12 @@ export function List<T>({
   label,
   emptyState,
   dividers = true,
+  renderThumb,
+  rowSize = "default",
+  hover = "default",
 }: ListProps<T>) {
   const { far } = useSurface();
+  const media = rowSize === "media";
 
   if (items.length === 0 && emptyState) {
     return <EmptyState icon={emptyState.icon} text={emptyState.text} />;
@@ -96,22 +110,27 @@ export function List<T>({
       aria-label={label}
       className={cn(
         "flex list-none flex-col p-0",
-        dividers && "divide-y divide-[var(--border)]",
+        dividers && !media && "divide-y divide-[var(--border)]",
       )}
     >
       {items.map((item) => {
         const selected = isSelected?.(item) ?? false;
         const content = (
-          <div className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2">{renderItem(item)}</div>
+          <div className={cn("flex min-w-0 flex-1 items-center gap-3 px-3 py-2", media && "h-full gap-3 px-0 py-0")}>
+            {media && renderThumb ? <div className="size-16 shrink-0 overflow-hidden rounded-[var(--radius-thumb)]">{renderThumb(item)}</div> : null}
+            {renderItem(item)}
+          </div>
         );
         return (
-          <li key={getKey(item)} className="flex min-w-0 items-center gap-1">
+          <li key={getKey(item)} className={cn("flex min-w-0 items-center gap-1", media && "h-[76px] gap-3")}>
             {onSelect ? (
               far ? (
                 <TvListRowButton
                   content={content}
                   ariaLabel={getLabel?.(item)}
                   selected={selected}
+                  rowSize={rowSize}
+                  hover={hover}
                   onActivate={() => onSelect(item)}
                 />
               ) : (
@@ -124,18 +143,20 @@ export function List<T>({
                   // floor, WCAG 2.2 AA 2.5.5 and 2.4.13.
                   className={cn(
                     "flex min-h-12 min-w-0 flex-1 items-center rounded-[var(--radius)] text-left",
-                    "hover:bg-[var(--muted)]",
+                    media && "h-[76px] min-h-0 rounded-xl",
+                    hover === "surface" && "rounded-xl",
+                    hover === "surface" ? "hover:bg-[var(--surface-1)]" : "hover:bg-[var(--muted)]",
                     FOCUS_RING,
-                    selected && "bg-[var(--muted)]",
+                    selected && (hover === "surface" ? "bg-[var(--surface-2)]" : "bg-[var(--muted)]"),
                   )}
                 >
                   {content}
                 </button>
               )
             ) : (
-              <div className="flex min-h-12 min-w-0 flex-1 items-center">{content}</div>
+              <div className={cn("flex min-h-12 min-w-0 flex-1 items-center", media && "h-[76px] min-h-0 rounded-xl", hover === "surface" && "rounded-xl hover:bg-[var(--surface-1)]", selected && hover === "surface" && "bg-[var(--surface-2)]")}>{content}</div>
             )}
-            {renderAction ? <div className="shrink-0 pr-2">{renderAction(item)}</div> : null}
+            {renderAction ? <div className={cn("shrink-0 pr-2", media && "flex size-11 items-center justify-center p-0")}>{renderAction(item)}</div> : null}
           </li>
         );
       })}
