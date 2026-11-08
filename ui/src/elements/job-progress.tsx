@@ -8,6 +8,7 @@ import { ghostButton, mono, paper } from "./surfaces";
 import { announced, clamp, pct, progressOf, take } from "./range";
 import { Progress } from "@/primitives/Progress";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/ui/sheet";
+import { StatusCard } from "@/kit/elements/status-card";
 
 export interface JobStage {
   name: string;
@@ -90,6 +91,7 @@ export function JobProgress({
   actions,
   variant = "full",
   cancelable = true,
+  presentation = "default",
   className,
   ...props
 }: Omit<
@@ -119,6 +121,7 @@ export function JobProgress({
   | "actions"
   | "variant"
   | "cancelable"
+  | "presentation"
 > & {
   title: string;
   stages: readonly JobStage[];
@@ -148,6 +151,7 @@ export function JobProgress({
   variant?: "compact" | "full";
   /** Hide the cancel control when the producer has no cancellation action. */
   cancelable?: boolean;
+  presentation?: "default" | "card";
 }) {
   const rates = useRef<number[]>([]);
   const [stableEta, setStableEta] = useState<number | undefined>(undefined);
@@ -179,6 +183,18 @@ export function JobProgress({
   const finished = stage >= stages.length || outcome !== undefined;
   const outcomeLabel = outcome?.status === "success" ? doneLabel : outcome?.status === "partial" ? i18n._({ id: "ui.partial", message: "partial" }) : outcome?.status === "failed" ? i18n._({ id: "ui.failed", message: "failed" }) : outcome?.status === "cancelled" ? i18n._({ id: "ui.cancelled", message: "cancelled" }) : outcome?.status;
   const elapsedLabel = elapsedMs === undefined ? undefined : `${Math.max(0, Math.round(elapsedMs / 1000))}s`;
+
+  if (presentation === "card") {
+    const state = downloadState ?? (outcome?.status === "success" ? "done" : outcome?.status === "failed" ? "failed" : "running");
+    const selected = items?.[0];
+    const fraction = selected ? (selected.totalBytes ? selected.completedBytes / selected.totalBytes : selected.state === "done" ? 1 : 0) : (totalBytes ? completedBytes! / totalBytes : overall / 100);
+    const kind = state === "queued" || state === "paused" ? "waiting" : state === "stalled" ? "attention" : state === "failed" ? "problem" : state === "done" ? "done" : "progress";
+    const line = downloadStatus ?? (completedBytes !== undefined && totalBytes !== undefined ? `${formatBytes(completedBytes)} of ${formatBytes(totalBytes)}${stableEta !== undefined ? ` · ${formatEta(stableEta)}` : ""}` : outcome?.summary ?? (elapsedLabel ? `${elapsedLabel} elapsed` : undefined));
+    const onAction = state === "paused" || state === "stalled" ? onResume : state === "failed" ? onRetry : !finished && cancelable ? onCancel : undefined;
+    const actionLabel = state === "paused" || state === "stalled" ? copy?.resume ?? i18n._({ id: "ui.Resume", message: "Resume" }) : state === "failed" ? copy?.retry ?? i18n._({ id: "ui.Retry", message: "Retry" }) : state === "running" || state === "verifying" ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Cancel", message: "Cancel" });
+    const stateCopy = state === "stalled" ? copy?.stalled : state === "failed" ? copy?.checksumFailed : state === "paused" ? copy?.resume : state === "done" ? doneLabel : undefined;
+    return <StatusCard kind={kind} stateWord={stateCopy ?? stateLabel(state)} title={title || selected?.label || downloadStatus || ""} line={line} progress={kind === "progress" ? fraction * 100 : undefined} bar={(completedBytes !== undefined && totalBytes !== undefined) || selected ? fraction * 100 : undefined} action={onAction ? { label: actionLabel, onSelect: onAction, tone: kind === "problem" ? "quiet" : "primary" } : undefined} className={className} />
+  }
 
   return (
     <div

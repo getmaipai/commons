@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/kit/utils"
+import { StatusCard, type StatusCardKind } from "@/kit/elements/status-card"
 
 const alertVariants = cva(
   "relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
@@ -12,6 +13,7 @@ const alertVariants = cva(
           "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 [&>svg]:text-current",
         warning:
           "border-[color:var(--hue-orange)]/40 bg-[color-mix(in_srgb,var(--hue-orange)_10%,var(--card))] text-card-foreground [&>svg]:text-[color:var(--hue-orange)]",
+        card: "",
       },
     },
     defaultVariants: {
@@ -23,8 +25,23 @@ const alertVariants = cva(
 function Alert({
   className,
   variant,
+  kind = "problem", stateWord, lead, action, secondary,
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
+}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants> & {
+  kind?: StatusCardKind
+  stateWord?: string
+  lead?: React.ReactNode
+  action?: { label: string; onSelect: () => void; tone?: "primary" | "quiet" }
+  secondary?: { label: string; onSelect: () => void }
+}) {
+  if (variant === "card") {
+    const children = React.Children.toArray(props.children)
+    const title = children.find((child) => React.isValidElement<{ "data-slot"?: string }>(child) && child.props["data-slot"] === "alert-title")
+    const description = children.find((child) => React.isValidElement<{ "data-slot"?: string }>(child) && child.props["data-slot"] === "alert-description")
+    const inForm = typeof document !== "undefined" && Boolean((document.activeElement as HTMLElement | null)?.closest("form"))
+    const cardAction = action && { ...action, tone: action.tone ?? (inForm ? "quiet" : "primary") as "quiet" | "primary" }
+    return <StatusCard kind={kind} stateWord={stateWord} title={title ?? props.children} line={description} lead={lead} action={cardAction} secondary={secondary} className={className} />
+  }
   return (
     <div
       data-slot="alert"

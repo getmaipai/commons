@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/kit/ui/sonner";
 
 interface ToastContextValue {
-  push: (text: string) => void;
+  push: (text: string, options?: { kind?: "default" | "recovery"; action?: { label: string; onSelect: () => void } }) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -16,8 +16,9 @@ const ToastContext = createContext<ToastContextValue | null>(null);
  * already owns queueing, swipe-to-dismiss, and the ARIA live region.
  * `useToast().push(text)` keeps every existing call site unchanged. */
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const push = useCallback((text: string) => {
-    toast(text);
+  const push = useCallback((text: string, options?: { kind?: "default" | "recovery"; action?: { label: string; onSelect: () => void } }) => {
+    if (options?.kind === "recovery") toast(text, { className: "rounded-[var(--radius-card)] bg-[var(--surface-2)] text-foreground ring-1 ring-inset ring-[var(--hairline)]", action: options.action ? { label: options.action.label, onClick: options.action.onSelect } : undefined });
+    else toast(text);
   }, []);
 
   return (

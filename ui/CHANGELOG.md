@@ -1,3 +1,7 @@
+## [ui-v0.5.544] - 2026-11-08
+
+- PRO-LOOK-KIT-01g: add shared status card anatomy with opt-in Alert, JobProgress and recovery toast presentations; defaults unchanged.
+
 ## [ui-v0.5.543] - 2026-11-08
 
 - PRO-LOOK-KIT-01f: add an opt-in labelled AppRail, complete the requested icon registry names, and show existing interactive controls in the kit gallery; defaults remain unchanged.
