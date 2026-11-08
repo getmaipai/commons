@@ -335,6 +335,7 @@ msgstr "No se pudo cargar {name}. Revisa que Home esté en marcha e inténtalo d
 
 #. js-lingui-explicit-id
 #: src/elements/fan-tile.tsx:47
+#, needs-review
 msgid "ui.{name} speed"
 msgstr "Velocidad de {name}"
 
@@ -381,6 +382,7 @@ msgstr "{names} y {last}"
 
 #. js-lingui-explicit-id
 #: src/elements/room-header.tsx:26
+#, needs-review
 msgid "ui.{on} of {total} on"
 msgstr "{on} de {total} encendidos"
 
@@ -868,6 +870,7 @@ msgstr "todo bien"
 
 #. js-lingui-explicit-id
 #: src/elements/room-header.tsx:28
+#, needs-review
 msgid "ui.All of {name}"
 msgstr "Todo en {name}"
 
@@ -1474,6 +1477,7 @@ msgstr "Cerrar"
 
 #. js-lingui-explicit-id
 #: src/elements/cover-tile.tsx:41
+#, needs-review
 msgid "ui.Close {name}"
 msgstr "Cerrar {name}"
 
@@ -1514,6 +1518,7 @@ msgstr "Cerrar imagen ampliada"
 
 #. js-lingui-explicit-id
 #: src/elements/cover-tile.tsx:21
+#, needs-review
 msgid "ui.Closed"
 msgstr "Cerrado"
 
@@ -1665,6 +1670,7 @@ msgstr "Mapa de conversación"
 
 #. js-lingui-explicit-id
 #: src/elements/climate-tile.tsx:32
+#, needs-review
 msgid "ui.Cooling"
 msgstr "Enfriando"
 
@@ -2737,6 +2743,7 @@ msgstr "Corazón"
 
 #. js-lingui-explicit-id
 #: src/elements/climate-tile.tsx:32
+#, needs-review
 msgid "ui.Heating"
 msgstr "Calentando"
 
@@ -3404,6 +3411,7 @@ msgstr "Mínima"
 
 #. js-lingui-explicit-id
 #: src/elements/climate-tile.tsx:59
+#, needs-review
 msgid "ui.Lower {name}"
 msgstr "Bajar {name}"
 
@@ -4206,6 +4214,7 @@ msgstr "Ahora"
 
 #. js-lingui-explicit-id
 #: src/elements/climate-tile.tsx:51
+#, needs-review
 msgid "ui.Now {current}{unit}"
 msgstr "Ahora {current}{unit}"
 
@@ -4293,11 +4302,13 @@ msgstr "Abrir"
 
 #. js-lingui-explicit-id
 #: src/elements/cover-tile.tsx:39
+#, needs-review
 msgid "ui.Open {name}"
 msgstr "Abrir {name}"
 
 #. js-lingui-explicit-id
 #: src/elements/cover-tile.tsx:21
+#, needs-review
 msgid "ui.Open {percent}%"
 msgstr "Abierto {percent}%"
 
@@ -5020,6 +5031,7 @@ msgstr "Cotización"
 
 #. js-lingui-explicit-id
 #: src/elements/climate-tile.tsx:60
+#, needs-review
 msgid "ui.Raise {name}"
 msgstr "Subir {name}"
 
@@ -5877,6 +5889,7 @@ msgstr "Configurar lugar"
 
 #. js-lingui-explicit-id
 #: src/elements/climate-tile.tsx:42
+#, needs-review
 msgid "ui.Set to {target}{unit}, now {current}{unit}"
 msgstr "Ajustado a {target}{unit}, ahora {current}{unit}"
 
@@ -6282,6 +6295,7 @@ msgstr "Detener"
 
 #. js-lingui-explicit-id
 #: src/elements/cover-tile.tsx:40
+#, needs-review
 msgid "ui.Stop {name}"
 msgstr "Detener {name}"
 
