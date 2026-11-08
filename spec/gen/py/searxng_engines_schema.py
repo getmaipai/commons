@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, conint, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, conint, constr
 
 
 class Minimums(BaseModel):
@@ -16,6 +16,10 @@ class Minimums(BaseModel):
     childWebEngines: conint(ge=1)
     childImageEngines: conint(ge=1)
     pictureEngines: conint(ge=1)
+
+
+class NeededByItem(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
 
 
 class Engine(BaseModel):

@@ -10,6 +10,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    RootModel,
     confloat,
     conint,
     constr,
@@ -67,6 +68,22 @@ class File(BaseModel):
     format: Literal['safetensors']
 
 
+class TriggerWord(RootModel[constr(min_length=1, max_length=80)]):
+    root: constr(min_length=1, max_length=80)
+
+
+class PositiveAddin(RootModel[constr(min_length=1, max_length=120)]):
+    root: constr(min_length=1, max_length=120)
+
+
+class NegativeAddin(RootModel[constr(min_length=1, max_length=120)]):
+    root: constr(min_length=1, max_length=120)
+
+
+class AvoidAsPositiveItem(RootModel[constr(min_length=1, max_length=120)]):
+    root: constr(min_length=1, max_length=120)
+
+
 class Strength(BaseModel):
     """
     LoRA strength, 0 to 2, with min <= default <= max (validateLora). Characters default to their min of 0.8.
@@ -103,6 +120,10 @@ class AdultCheck(BaseModel):
         ..., description='How many of them were adult level.'
     )
     checked_at: AwareDatetime
+
+
+class Person(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^person-[a-z0-9]{6,}$')
 
 
 class Availability(BaseModel):

@@ -10,6 +10,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    RootModel,
     ValidationInfo,
     confloat,
     conint,
@@ -18,6 +19,14 @@ from pydantic import (
 )
 
 from . import media_presence_schema
+
+
+class MotorsLatchedItem(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
+class MotorsRebootOfferItem(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
 
 
 class Thermal(BaseModel):

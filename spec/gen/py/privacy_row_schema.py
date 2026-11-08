@@ -3,7 +3,11 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, constr
+
+
+class Host(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
 
 
 class PrivacyRow(BaseModel):

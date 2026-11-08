@@ -5,7 +5,11 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, constr
+
+
+class Band(RootModel[Literal['child', 'teen', 'adult']]):
+    root: Literal['child', 'teen', 'adult']
 
 
 class List(BaseModel):

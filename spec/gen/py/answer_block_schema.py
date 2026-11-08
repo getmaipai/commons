@@ -12,10 +12,114 @@ from pydantic import (
     ConfigDict,
     Field,
     PositiveFloat,
+    RootModel,
     confloat,
     conint,
     constr,
 )
+
+
+class Kind(
+    RootModel[
+        Literal[
+            'spec_sheet',
+            'data_table',
+            'chart',
+            'timeline',
+            'todo_list',
+            'image_gallery',
+            'schedule_card',
+            'comparison',
+            'weather_card',
+            'story_feed',
+            'article',
+            'media_card',
+            'confirmation',
+            'countdown',
+            'band',
+            'album',
+            'song_style',
+        ]
+    ]
+):
+    root: Literal[
+        'spec_sheet',
+        'data_table',
+        'chart',
+        'timeline',
+        'todo_list',
+        'image_gallery',
+        'schedule_card',
+        'comparison',
+        'weather_card',
+        'story_feed',
+        'article',
+        'media_card',
+        'confirmation',
+        'countdown',
+        'band',
+        'album',
+        'song_style',
+    ] = Field(
+        ...,
+        description='The v1 answer-block kinds. Closed and additive: a later kind (series_chart, stat, split_bar, media_list, place_cards, map, swatches, tabs, filter_chips, calculator) lands with its kit Element and is appended here.',
+    )
+
+
+class BlockId(RootModel[constr(pattern=r'^blk-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^blk-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="Stable identity of this block. Unique within a turn's block list.",
+    )
+
+
+class SchemaVersion(RootModel[Literal[1]]):
+    root: Literal[1]
+
+
+class Producer(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1) = Field(
+        ..., description='The id of the package that returned the block.'
+    )
+
+
+class Alt(RootModel[constr(min_length=1, max_length=300)]):
+    root: constr(min_length=1, max_length=300) = Field(
+        ...,
+        description="One plain sentence that says what the block shows, for a screen reader, a client with no renderer for this kind, or the robot's voice.",
+    )
+
+
+class MinBand(RootModel[Literal['child', 'teen', 'adult']]):
+    root: Literal['child', 'teen', 'adult'] = Field(
+        ...,
+        description='Optional. The youngest age band that may be shown this block; absent means every band. The output floor still applies to each string.',
+    )
+
+
+class Provenance(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1) = Field(
+        ...,
+        description='Free-text provenance for the block, such as the producing call or the data it was built from (the same shape TurnArtifact uses).',
+    )
+
+
+class CreatedAt(RootModel[AwareDatetime]):
+    root: AwareDatetime
+
+
+class Hlc(RootModel[constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ...,
+        description='Hybrid logical clock: wall_ms:counter:node (7.3), the same shape every other synced record type uses.',
+    )
+
+
+class AfterParagraph(RootModel[conint(ge=0)]):
+    root: conint(ge=0) = Field(
+        ...,
+        description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
+    )
 
 
 class Row(BaseModel):
@@ -79,6 +183,12 @@ class Sort(BaseModel):
     )
     columnId: constr(min_length=1)
     direction: Literal['asc', 'desc']
+
+
+class Cell(RootModel[str | float | bool | None]):
+    root: str | float | bool | None = Field(
+        ..., description='One table cell: plain data, never markup.'
+    )
 
 
 class DataTableFormat1(BaseModel):
@@ -166,6 +276,34 @@ class DataTableFormat10(BaseModel):
     )
     kind: Literal['list']
     max: conint(ge=1) | None = None
+
+
+class DataTableFormat(
+    RootModel[
+        DataTableFormat1
+        | DataTableFormat2
+        | DataTableFormat3
+        | DataTableFormat4
+        | DataTableFormat5
+        | DataTableFormat6
+        | DataTableFormat7
+        | DataTableFormat8
+        | DataTableFormat9
+        | DataTableFormat10
+    ]
+):
+    root: (
+        DataTableFormat1
+        | DataTableFormat2
+        | DataTableFormat3
+        | DataTableFormat4
+        | DataTableFormat5
+        | DataTableFormat6
+        | DataTableFormat7
+        | DataTableFormat8
+        | DataTableFormat9
+        | DataTableFormat10
+    )
 
 
 class Props2(BaseModel):
@@ -930,6 +1068,12 @@ class ArticleInline2(BaseModel):
     )
 
 
+class ArticleInline(RootModel[ArticleInline1 | ArticleInline2]):
+    root: ArticleInline1 | ArticleInline2 = Field(
+        ..., description='One run of text inside a paragraph, list item or quote.'
+    )
+
+
 class ArticleHeading(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1167,6 +1311,10 @@ class Countdown(BaseModel):
         description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
     )
     props: Props13
+
+
+class Genre(RootModel[constr(min_length=1, max_length=40)]):
+    root: constr(min_length=1, max_length=40)
 
 
 class Portrait(BaseModel):
@@ -1535,6 +1683,33 @@ class DataTable(BaseModel):
     props: Props1
 
 
+class ArticleBlock(
+    RootModel[
+        ArticleHeading
+        | ArticleParagraph
+        | ArticleList
+        | ArticleRows
+        | ArticleTable
+        | ArticleFigure
+        | ArticleNote
+        | ArticleQuote
+    ]
+):
+    root: (
+        ArticleHeading
+        | ArticleParagraph
+        | ArticleList
+        | ArticleRows
+        | ArticleTable
+        | ArticleFigure
+        | ArticleNote
+        | ArticleQuote
+    ) = Field(
+        ...,
+        description='NEWS-00: one block of a cleaned article, defined once here so the hub, the web kit and Go render the same list. The closed model the one reader (`extractFullArticle`) returns: headings with ids, paragraphs of inline runs, lists, label and value rows, tables, figures, notes and quotes. Links: `target` names a book page on the reference reader; `href` is an outbound address and appears only in a teen or adult copy (the hub removes it for a child, who gets plain text). Additive after the first release: a new block type is a new `oneOf` member.',
+    )
+
+
 class Props10(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1602,3 +1777,49 @@ class Article(BaseModel):
         description="GENUI-13a: where the block sits in the released reply text, the same meaning as `AnswerImageSet.after_paragraph`: how many paragraphs of released text come before it. 0 is before any text; absent means after the whole reply, so a record written before this field renders as it always did. Stamped by the hub only (a package returns blocks before any prose exists and never sets it; the host drops a value a package sends). Paragraphs are counted and split by `paragraphCount` and `splitAfterParagraph` in `spec/interpreters` (TS and Python), so the hub and every client count alike. Placement is by readiness and paragraph boundary, never by matching the block's words to the prose.",
     )
     props: Props10
+
+
+class AnswerBlock(
+    RootModel[
+        SpecSheet
+        | DataTable
+        | Chart
+        | Timeline
+        | TodoList
+        | ImageGallery
+        | ScheduleCard
+        | Comparison
+        | WeatherCard
+        | StoryFeed
+        | Article
+        | MediaCard
+        | Confirmation
+        | Countdown
+        | Band
+        | Album
+        | SongStyle
+    ]
+):
+    root: (
+        SpecSheet
+        | DataTable
+        | Chart
+        | Timeline
+        | TodoList
+        | ImageGallery
+        | ScheduleCard
+        | Comparison
+        | WeatherCard
+        | StoryFeed
+        | Article
+        | MediaCard
+        | Confirmation
+        | Countdown
+        | Band
+        | Album
+        | SongStyle
+    ) = Field(
+        ...,
+        description="GENUI-01: one typed, renderable part of an answer, defined once here. A package returns blocks on `PluginResult.blocks`; the hub validates them, applies the output floor to each string by band, streams each as a `block` turn-stream event and stores them on the turn's `blocks`. Every client renders the same record: the web kit dispatches `kind` to the Element of the same name, Go renders it natively, the robot says `alt` when it has no screen. A client that does not know a `kind` falls back to `alt`. Envelope: `id`, `kind`, `schema_version`, `producer` (package id), `alt` (one plain sentence a screen reader, a TV fallback or the robot can say), optional `min_band`, `provenance`, `created_at`, `hlc` (the clock stamp every synced record carries) and `after_paragraph` (hub-stamped placement in the reply text), and the kind's `props`. Each kind's `props` mirror the props of the kit Element of the same name, so the web render is a pass-through; render-only Element props (visible counts, animation flags, callbacks, nodes) are not part of the record. Prop names are the Element's own (camelCase). Flat, never recursive: no block holds another block. The v1 kinds are a closed, additive list; a later kind is a new enum value and a new `props` shape, never a change to an existing one.",
+        title='AnswerBlock',
+    )

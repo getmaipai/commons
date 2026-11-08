@@ -1,3 +1,7 @@
+## [spec-v0.1.342] - 2026-11-07
+
+- SPEC-GEN-PY-01, no schema change. `spec/gen/py` regenerated with the pinned generator (datamodel-code-generator 0.76.1, uv.lock): TALENT-00 had changed the broad sweep to modular output without regenerating the other modules, so `check` failed on drift. Adds the `presence_state` and `status_component` Python modules, unused RootModel wrapper classes (`Act`, `Stance`, `Subject`, `Day`, `Kind` and similar) and no removals. `gen-py.sh` now strips a module's own-name prefix from its union references (answer_block, conversation_turn, result and subject_ref failed at import without it).
+
 ## [spec-v0.1.341] - 2026-11-07
 
 - UI-ACTION-CAPS, additive. `ui/schema.json`: a `result_feed` takes up to 5 `actions` (was 4) and a `studio` `export_result` up to 3 (was 2), so a page can carry a second entry that posts its own `call.args` (for example `{ surround: true }`). Pages valid before stay valid. Pairs with ui-v0.5.520.

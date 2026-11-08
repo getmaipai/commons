@@ -5,7 +5,15 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
 
 
 class Item(BaseModel):
@@ -18,6 +26,14 @@ class Item(BaseModel):
     status: Literal['want', 'watching', 'completed'] | None = Field(
         None, description='Watchlist only.'
     )
+
+
+class SharedToItem(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^person-[a-z0-9]{6,}$')
+
+
+class SourceId(RootModel[constr(pattern=r'^msrc-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^msrc-[a-z0-9]{6,}$')
 
 
 class Rules(BaseModel):

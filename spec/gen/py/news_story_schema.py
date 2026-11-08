@@ -10,10 +10,15 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    RootModel,
     confloat,
     conint,
     constr,
 )
+
+
+class Topic(RootModel[constr(pattern=r'^[a-z][a-z0-9-]*$')]):
+    root: constr(pattern=r'^[a-z][a-z0-9-]*$')
 
 
 class NewsStory(BaseModel):

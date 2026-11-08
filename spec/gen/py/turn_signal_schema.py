@@ -5,7 +5,47 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, confloat, conint, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, confloat, conint, constr
+
+
+class Act(
+    RootModel[
+        Literal[
+            'inform',
+            'question',
+            'directive',
+            'commissive',
+            'greeting',
+            'closing',
+            'backchannel',
+        ]
+    ]
+):
+    root: Literal[
+        'inform',
+        'question',
+        'directive',
+        'commissive',
+        'greeting',
+        'closing',
+        'backchannel',
+    ] = Field(
+        ...,
+        description="DailyDialog's four (inform, question, directive, commissive) plus the three management acts the findings need (greeting, closing, backchannel), which DailyDialog folds into inform.",
+    )
+
+
+class Stance(
+    RootModel[
+        Literal['asserted', 'reported', 'quoted', 'hypothetical', 'joke', 'unknown']
+    ]
+):
+    root: Literal[
+        'asserted', 'reported', 'quoted', 'hypothetical', 'joke', 'unknown'
+    ] = Field(
+        ...,
+        description='Whose claim a clause is, and how literally to take it. `unknown` writes nothing about anyone (MEM-06): precision wins on an uncertain label.',
+    )
 
 
 class Subject1(BaseModel):
@@ -76,6 +116,15 @@ class Subject6(BaseModel):
     entity_id: constr(pattern=r'^ent-[a-z0-9]{6,}$') | None = Field(
         ...,
         description='Null when the name resolved to an unresolved SubjectRef rather than a household entity yet.',
+    )
+
+
+class Subject(
+    RootModel[Subject1 | Subject2 | Subject3 | Subject4 | Subject5 | Subject6]
+):
+    root: Subject1 | Subject2 | Subject3 | Subject4 | Subject5 | Subject6 = Field(
+        ...,
+        description="Who or what a clause is about. A reference into the turn's own SubjectRef list (subject-ref.schema.json), never a third name-carrying shape: `named` repeats the entity id a SubjectRef on the same turn already resolved.",
     )
 
 

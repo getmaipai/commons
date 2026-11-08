@@ -5,7 +5,20 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
+from pydantic import (
+    AnyUrl,
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
+
+
+class TopicsHintItem(RootModel[constr(pattern=r'^[a-z][a-z0-9-]*$')]):
+    root: constr(pattern=r'^[a-z][a-z0-9-]*$')
 
 
 class Feed(BaseModel):

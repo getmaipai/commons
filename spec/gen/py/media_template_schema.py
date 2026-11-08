@@ -5,7 +5,15 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, constr
+
+
+class Reference(RootModel[constr(pattern=r'^file-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^file-[a-z0-9]{6,}$')
+
+
+class Style(RootModel[constr(pattern=r'^lora-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^lora-[a-z0-9]{6,}$')
 
 
 class MediaTemplate(BaseModel):

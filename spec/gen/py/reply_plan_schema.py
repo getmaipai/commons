@@ -5,7 +5,11 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, conint, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, conint, constr
+
+
+class MoveState(RootModel[Literal['required', 'allowed', 'forbidden']]):
+    root: Literal['required', 'allowed', 'forbidden']
 
 
 class Moves(BaseModel):

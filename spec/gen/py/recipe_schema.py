@@ -38,6 +38,13 @@ class Input(BaseModel):
     required: bool = True
 
 
+class UnlessSet(RootModel[constr(pattern=r'^[a-z][a-z0-9_]*$')]):
+    root: constr(pattern=r'^[a-z][a-z0-9_]*$') = Field(
+        ...,
+        description='Skip this step when that variable is bound, non-null and non-empty.',
+    )
+
+
 class FetchStep(BaseModel):
     """
     Goes through host.fetch (the rate limiter's single choke point). A recipe never bypasses it.
@@ -140,6 +147,10 @@ class FormatStep2(BaseModel):
         None,
         description='Skip this step when that variable is bound, non-null and non-empty.',
     )
+
+
+class FormatStep(RootModel[FormatStep1 | FormatStep2]):
+    root: FormatStep1 | FormatStep2
 
 
 class LookupStep(BaseModel):
@@ -454,6 +465,10 @@ class TimerStep(BaseModel):
     )
 
 
+class Option(RootModel[constr(min_length=1, max_length=80)]):
+    root: constr(min_length=1, max_length=80)
+
+
 class AskField(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -539,6 +554,52 @@ class AskStep(BaseModel):
 
 class AskFields(RootModel[list[AskField]]):
     root: list[AskField] = Field(..., max_length=4, min_length=1)
+
+
+class Step(
+    RootModel[
+        FetchStep
+        | PickStep
+        | LookupStep
+        | HomeCallServiceStep
+        | ActionStep
+        | RememberStep
+        | RecallStep
+        | ScheduleStep
+        | IntegrationCallStep
+        | ComputeStep
+        | LlmCompleteStep
+        | ListAddStep
+        | ListViewStep
+        | RemindStep
+        | TimerStep
+        | AskStep
+        | ArtifactStep
+        | FormatStep1
+        | FormatStep2
+    ]
+):
+    root: (
+        FetchStep
+        | PickStep
+        | LookupStep
+        | HomeCallServiceStep
+        | ActionStep
+        | RememberStep
+        | RecallStep
+        | ScheduleStep
+        | IntegrationCallStep
+        | ComputeStep
+        | LlmCompleteStep
+        | ListAddStep
+        | ListViewStep
+        | RemindStep
+        | TimerStep
+        | AskStep
+        | ArtifactStep
+        | FormatStep1
+        | FormatStep2
+    )
 
 
 class Recipe(BaseModel):

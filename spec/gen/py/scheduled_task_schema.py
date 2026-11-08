@@ -10,10 +10,19 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    RootModel,
     confloat,
     conint,
     constr,
 )
+
+
+class Day(RootModel[conint(ge=1, le=7)]):
+    root: conint(ge=1, le=7)
+
+
+class Target(RootModel[constr(min_length=1, max_length=200)]):
+    root: constr(min_length=1, max_length=200)
 
 
 class What(BaseModel):
@@ -34,6 +43,10 @@ class What(BaseModel):
     text: constr(min_length=1, max_length=200) | None = Field(
         None, description='For remind, timer and turn: what to say or ask.'
     )
+
+
+class GrantSnapshotItem(RootModel[constr(min_length=1, max_length=200)]):
+    root: constr(min_length=1, max_length=200)
 
 
 class ScheduledTask(BaseModel):

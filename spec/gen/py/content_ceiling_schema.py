@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, constr
 
 
 class Dials(BaseModel):
@@ -26,6 +26,10 @@ class Dials(BaseModel):
     privacy: Literal['off', 'public', 'unrestricted']
 
 
+class Name(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
 class FamilyStories(BaseModel):
     """
     Child band only: whether Santa Claus, the Tooth Fairy and similar stories are kept (never confirmed or denied). A parent can switch it off per child.
@@ -40,6 +44,14 @@ class FamilyStories(BaseModel):
         description='The built-in story names; a parent may add more.',
         min_length=1,
     )
+
+
+class Stance(
+    RootModel[
+        Literal['informative', 'gentle', 'redirect', 'support', 'protect', 'neutral']
+    ]
+):
+    root: Literal['informative', 'gentle', 'redirect', 'support', 'protect', 'neutral']
 
 
 class Family(BaseModel):

@@ -5,7 +5,11 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, constr
+
+
+class ToolNeedItem(RootModel[constr(pattern=r'^[a-z][a-z0-9_]*$')]):
+    root: constr(pattern=r'^[a-z][a-z0-9_]*$')
 
 
 class Provenance(BaseModel):

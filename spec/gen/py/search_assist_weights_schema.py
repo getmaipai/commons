@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, confloat, conint, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, confloat, conint, constr
 
 
 class Embed(BaseModel):
@@ -21,6 +21,14 @@ class Embed(BaseModel):
     prefix: str = Field(
         ..., description='Text prefix added before embedding; empty string for raw.'
     )
+
+
+class Class(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
+class CoefItem(RootModel[list[float]]):
+    root: list[float]
 
 
 class SearchAssistWeights(BaseModel):

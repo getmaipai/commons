@@ -5,7 +5,19 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
+
+
+class Day(RootModel[conint(ge=1, le=7)]):
+    root: conint(ge=1, le=7)
 
 
 class Alarm(BaseModel):

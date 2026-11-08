@@ -5,9 +5,24 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
 
 from . import source_schema
+
+
+class SourceId(RootModel[constr(pattern=r'^src-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^src-[a-z0-9]{6,}$') = Field(
+        ...,
+        description="The id of a citation in the document's top-level sources array.",
+    )
 
 
 class ArtifactSubject(BaseModel):
@@ -166,6 +181,10 @@ class Comparison(BaseModel):
     title: constr(min_length=1)
     subjects: list[ArtifactSubject] = Field(..., min_length=2)
     rows: list[ArtifactRow] = Field(..., min_length=1)
+
+
+class Card(RootModel[FilmCard | PersonCard | PlaceCard]):
+    root: FilmCard | PersonCard | PlaceCard
 
 
 class TurnArtifact(BaseModel):

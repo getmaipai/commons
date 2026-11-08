@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, constr
 
 
 class TracePolicy(BaseModel):
@@ -18,6 +18,47 @@ class TracePolicy(BaseModel):
     )
     length: Literal[6]
     expires: Literal[True]
+
+
+class Component(
+    RootModel[
+        Literal[
+            'hub',
+            'engine',
+            'stt',
+            'turn',
+            'tool',
+            'safety',
+            'search',
+            'backup',
+            'update',
+            'log',
+        ]
+    ]
+):
+    root: Literal[
+        'hub',
+        'engine',
+        'stt',
+        'turn',
+        'tool',
+        'safety',
+        'search',
+        'backup',
+        'update',
+        'log',
+    ] = Field(..., description='The part of the system that writes the event.')
+
+
+class SnakeName(RootModel[constr(pattern=r'^[a-z][a-z0-9_]*$')]):
+    root: constr(pattern=r'^[a-z][a-z0-9_]*$')
+
+
+class FieldName(RootModel[constr(pattern=r'^[a-z][a-z0-9_]*$')]):
+    root: constr(pattern=r'^[a-z][a-z0-9_]*$') = Field(
+        ...,
+        description='A field name. The names of the things a log must never carry are refused outright, as a second guard behind the closed list of field types. The refusal is a JSON Schema not-enum rule: the TypeScript and Python models check the name pattern, and the schema itself enforces the refusal.',
+    )
 
 
 class EnumField(BaseModel):

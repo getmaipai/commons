@@ -5,7 +5,14 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, confloat, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, confloat, constr
+
+
+class CarriedQuestion(RootModel[str | None]):
+    root: str | None = Field(
+        None,
+        description="CHAT-13's rejected-subject rule (dev.md section 4): after a correction replaces the active subject, the unresolved question from before the correction is carried here (its text) so the engine re-asks it against the corrected subject on the next turn, or on a bare 'do it'/'go on', without the person repeating it. Null once answered, and always null outside a stack entry.",
+    )
 
 
 class Household(BaseModel):
@@ -77,4 +84,22 @@ class Unresolved(BaseModel):
     carried_question: str | None = Field(
         ...,
         description="CHAT-13's rejected-subject rule (dev.md section 4): after a correction replaces the active subject, the unresolved question from before the correction is carried here (its text) so the engine re-asks it against the corrected subject on the next turn, or on a bare 'do it'/'go on', without the person repeating it. Null once answered, and always null outside a stack entry.",
+    )
+
+
+class SubjectRef(
+    RootModel[
+        Household
+        | World
+        | Unresolved
+    ]
+):
+    root: (
+        Household
+        | World
+        | Unresolved
+    ) = Field(
+        ...,
+        description="SPEC-01, folded in from ASK-01 and CHAT-13's own design by the coherence review, 2026-09-14 (dev.md section 3 part 1, section 4's CHAT-13 amendment, 'Coherence review' question 1). One shape for what a conversation is about, shared by the hub, the robot and Go: a household reference (an authoritative entity_id - a world subject never becomes a household entity, on any path), a world reference (a real-world thing the household does not own an entity for: a film, an album, a place that is not the household's own), or an unresolved reference (a name the turn could not resolve yet). `TurnContext.subjects: SubjectRef[]` is the stack CHAT-13 keeps (depth two to start); `carried_question` is meaningful only on a stack entry, not on a SubjectRef embedded elsewhere (a TurnSignal clause's `subject`, MEM-06's grounding), where it is always null.",
+        title='SubjectRef',
     )

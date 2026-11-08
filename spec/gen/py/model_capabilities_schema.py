@@ -14,6 +14,7 @@ from pydantic import (
     Field,
     PositiveFloat,
     PositiveInt,
+    RootModel,
     confloat,
     conint,
     constr,
@@ -76,6 +77,13 @@ class Component(BaseModel):
         description="The file name as published, e.g. 'mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf'.",
     )
     download: Download1
+
+
+class KvCacheType(RootModel[Literal['f16', 'q8_0', 'q4_0']]):
+    root: Literal['f16', 'q8_0', 'q4_0'] = Field(
+        ...,
+        description='Element type of the KV cache (the per-token attention memory) for llama.cpp-family engines. f16 is the default. q8_0 and q4_0 are block-quantized (34 bytes per 32 elements and 18 bytes per 32 elements, respectively).',
+    )
 
 
 class Tool(BaseModel):
@@ -259,6 +267,47 @@ class DiffusionSizing(BaseModel):
     )
 
 
+class Role(
+    RootModel[
+        Literal[
+            'chat',
+            'router',
+            'embed',
+            'rerank',
+            'vision',
+            'image',
+            'video',
+            'music',
+            'coding',
+            'judge',
+            'tts',
+            'stt',
+            'wakeword',
+            'turn-signal',
+        ]
+    ]
+):
+    root: Literal[
+        'chat',
+        'router',
+        'embed',
+        'rerank',
+        'vision',
+        'image',
+        'video',
+        'music',
+        'coding',
+        'judge',
+        'tts',
+        'stt',
+        'wakeword',
+        'turn-signal',
+    ] = Field(
+        ...,
+        description="Matches backend/src/lib/llm.ts's LlmRole, with one addition ahead of that hub code: turn-signal (SPEC-01, dev.md section 12 part 2, the small classifier heads over the turn's existing embedding that ACT-02 fetches on demand, not wired to a real backend yet, same as image/video below). The Stack roles also include judge, rerank and music. A code review on this migration caught the original wording claiming an exact match already - ACT-02 is what adds turn-signal to LlmRole itself; this is spec-only, declared here first per the migration's own no-hub-code scope.",
+    )
+
+
 class ImageInput(BaseModel):
     """
     VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).
@@ -268,6 +317,10 @@ class ImageInput(BaseModel):
         extra='forbid',
     )
     projector: Component
+
+
+class Sizing(RootModel[TransformerGgufSizing | DiffusionSizing]):
+    root: TransformerGgufSizing | DiffusionSizing
 
 
 class ModelCapabilities(BaseModel):

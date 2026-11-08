@@ -55,6 +55,87 @@ class ReservedIds(
     )
 
 
+class Role(RootModel[Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest']]):
+    root: Literal['owner', 'admin', 'adult', 'teen', 'child', 'guest'] = Field(
+        ...,
+        description='The role ladder, most to least privileged. min_role is the lowest role that may see the thing.',
+    )
+
+
+class Band(RootModel[Literal['child', 'teen', 'adult']]):
+    root: Literal['child', 'teen', 'adult']
+
+
+class Level(RootModel[Literal['basic', 'advanced', 'expert']]):
+    root: Literal['basic', 'advanced', 'expert']
+
+
+class View(
+    RootModel[
+        Literal[
+            'account.profile',
+            'account.voice',
+            'account.likeness',
+            'account.device_appearance',
+            'chat.skills',
+            'chat.shortcuts',
+            'home.commands',
+            'home.voice_catalog',
+            'home.engine_admin',
+            'home.devices_admin',
+            'home.routing_stats',
+            'home.reference_library',
+            'home.pictures_library',
+            'home.media_library',
+            'home.media_pictures',
+            'home.media_kids',
+            'home.media_videos',
+            'home.media_music',
+            'home.media_styles',
+            'account.coding_keys',
+            'ai.job_choices',
+            'ai.always_on',
+            'ai.glance',
+        ]
+    ]
+):
+    root: Literal[
+        'account.profile',
+        'account.voice',
+        'account.likeness',
+        'account.device_appearance',
+        'chat.skills',
+        'chat.shortcuts',
+        'home.commands',
+        'home.voice_catalog',
+        'home.engine_admin',
+        'home.devices_admin',
+        'home.routing_stats',
+        'home.reference_library',
+        'home.pictures_library',
+        'home.media_library',
+        'home.media_pictures',
+        'home.media_kids',
+        'home.media_videos',
+        'home.media_music',
+        'home.media_styles',
+        'account.coding_keys',
+        'ai.job_choices',
+        'ai.always_on',
+        'ai.glance',
+    ] = Field(
+        ...,
+        description="A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
+    )
+
+
+class Href(RootModel[constr(pattern=r'^/([^{}]|\{self\})*$')]):
+    root: constr(pattern=r'^/([^{}]|\{self\})*$') = Field(
+        ...,
+        description="An in-app path. {self} is the only placeholder, resolved on the client to the viewer's own id; no other person id can appear.",
+    )
+
+
 class Link(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -73,6 +154,10 @@ class Link(BaseModel):
     )
 
 
+class Group2(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
 class Choice(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -80,6 +165,10 @@ class Choice(BaseModel):
     id: constr(pattern=r'^[a-z][a-z0-9_-]*$')
     label: constr(min_length=1, max_length=60)
     description: constr(min_length=1, max_length=160)
+
+
+class Need(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
 
 
 class Column(BaseModel):
@@ -307,6 +396,10 @@ class Detail(BaseModel):
         description="A named view in Home's view table. The list is closed so a package cannot name one Home does not have.",
     )
     tabs: list[Tab] | None = Field(None, max_length=5, min_length=2)
+
+
+class Keyword(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
 
 
 class Section(BaseModel):

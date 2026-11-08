@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, constr
 
 
 class Engine(BaseModel):
@@ -19,6 +19,12 @@ class Engine(BaseModel):
     link_id: constr(min_length=1) | None = None
     hardware: dict[str, Any] = Field(
         ..., description='Hardware facts reported by the selected engine computer.'
+    )
+
+
+class Role(RootModel[constr(pattern=r'^engines\.[a-z_]+\.choice$')]):
+    root: constr(pattern=r'^engines\.[a-z_]+\.choice$') = Field(
+        ..., description='The key of a per-role Setting record, not its copied value.'
     )
 
 

@@ -54,6 +54,10 @@ class Error(BaseModel):
     )
 
 
+class Option(RootModel[constr(min_length=1, max_length=80)]):
+    root: constr(min_length=1, max_length=80)
+
+
 class AskField(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

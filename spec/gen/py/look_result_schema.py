@@ -5,7 +5,11 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, confloat, conint, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, confloat, conint, constr
+
+
+class Colour(RootModel[constr(min_length=1, max_length=32)]):
+    root: constr(min_length=1, max_length=32)
 
 
 class Cost(BaseModel):
@@ -14,6 +18,10 @@ class Cost(BaseModel):
     )
     ms: confloat(ge=0.0)
     tier: Literal['fast', 'detailed']
+
+
+class BoxItem(RootModel[confloat(ge=0.0, le=1.0)]):
+    root: confloat(ge=0.0, le=1.0)
 
 
 class Attributes(BaseModel):

@@ -5,7 +5,15 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
 
 
 class Provenance(BaseModel):
@@ -122,6 +130,10 @@ class PlanStep5(BaseModel):
     kind: Literal['gate']
     needs: list[str]
     params: Params4
+
+
+class PlanStep(RootModel[PlanStep1 | PlanStep2 | PlanStep3 | PlanStep4 | PlanStep5]):
+    root: PlanStep1 | PlanStep2 | PlanStep3 | PlanStep4 | PlanStep5
 
 
 class StepState(BaseModel):

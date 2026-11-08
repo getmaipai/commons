@@ -5,7 +5,25 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
+
+
+class Hlc(RootModel[constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(
+        ..., description='Hybrid logical clock: wall_ms:counter:node (7.3).'
+    )
+
+
+class Genre(RootModel[constr(min_length=1, max_length=40)]):
+    root: constr(min_length=1, max_length=40)
 
 
 class Style(BaseModel):
@@ -62,6 +80,30 @@ class Seed2(BaseModel):
     )
     media_id: constr(pattern=r'^media-[a-z0-9]{6,}$') = Field(
         ..., description='A library media-item (a track).'
+    )
+
+
+class Seed(RootModel[Seed1 | Seed2 | None]):
+    root: Seed1 | Seed2 | None = Field(
+        None,
+        description="The ONE field that says what a style or a band was made 'like': a file made here (a song the household made) or a library item (a track the household holds). An input description only: the original audio is never sent to the engine (voice, cover and edit sources stay closed, MUSIC-GEN-14), and the seed's lyrics, melody and voice are never copied. Exactly one of the two ids; the property that holds it is null when there is none.",
+    )
+
+
+class SharedToItem(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^person-[a-z0-9]{6,}$')
+
+
+class SharedTo(
+    RootModel[
+        Literal['household'] | list[constr(pattern=r'^person-[a-z0-9]{6,}$')] | None
+    ]
+):
+    root: (
+        Literal['household'] | list[constr(pattern=r'^person-[a-z0-9]{6,}$')] | None
+    ) = Field(
+        None,
+        description="Null is private. 'household' shares with everyone in the household; a list shares with those people. A child's records are never shared outside the household.",
     )
 
 

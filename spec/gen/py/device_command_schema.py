@@ -346,6 +346,10 @@ class DeviceCommand14(BaseModel):
     payload: Payload12
 
 
+class Motor(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
 class Payload13(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

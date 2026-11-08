@@ -3,7 +3,11 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, constr
+
+
+class TopicsHintItem(RootModel[constr(pattern=r'^[a-z][a-z0-9-]*$')]):
+    root: constr(pattern=r'^[a-z][a-z0-9-]*$')
 
 
 class Feed(BaseModel):

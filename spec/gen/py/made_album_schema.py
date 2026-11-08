@@ -5,9 +5,21 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
 
 from . import song_style_schema
+
+
+class TrackMediaId(RootModel[constr(pattern=r'^media-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^media-[a-z0-9]{6,}$')
 
 
 class MadeAlbum(BaseModel):

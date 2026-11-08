@@ -6,7 +6,15 @@ from __future__ import annotations
 from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, PositiveInt, conint, constr
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    PositiveInt,
+    RootModel,
+    conint,
+    constr,
+)
 
 
 class KnownFigure(BaseModel):
@@ -27,6 +35,24 @@ class UnknownFigure(BaseModel):
     high: None
     source: Literal['unknown']
     as_of: date
+
+
+class Figure(RootModel[KnownFigure | UnknownFigure]):
+    root: KnownFigure | UnknownFigure = Field(
+        ...,
+        description='Bytes; a range with its source and date, never a bare number; unknown is a first-class answer and is never filled with a guess.',
+    )
+
+
+class Verdict(RootModel[Literal['yes', 'slow', 'no', 'unknown']]):
+    root: Literal['yes', 'slow', 'no', 'unknown'] = Field(
+        ...,
+        description='slow means the cpu-offload path is the only one that fits; unknown means no measured record, dry run or verified architecture exists for this model.',
+    )
+
+
+class PathName(RootModel[Literal['unified', 'gpu', 'multi-gpu', 'cpu-offload', 'cpu']]):
+    root: Literal['unified', 'gpu', 'multi-gpu', 'cpu-offload', 'cpu']
 
 
 class Role(BaseModel):
