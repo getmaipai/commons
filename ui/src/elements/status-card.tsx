@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Button } from "@/kit/ui/button"
 import { cn } from "@/kit/utils"
+import { SafeImage } from "../primitives/SafeImage"
 
 export type StatusCardKind = "progress" | "waiting" | "done" | "attention" | "problem" | "info"
 
@@ -40,7 +41,7 @@ export function StatusCard({ kind, stateWord, title, line, lead, icon, progress,
     <div aria-label={`${ringProgress}%`} className="flex size-14 shrink-0 items-center justify-center rounded-full" style={{ background: `conic-gradient(${accentColor} ${ringProgress}%, var(--surface-1) 0)` }}>
       <span className="flex size-11 items-center justify-center rounded-full bg-[var(--surface-2)] text-xs font-semibold tabular-nums">{ringProgress}%</span>
     </div>
-  ) : thumb && kind === "done" ? <img src={thumb} alt="" className="size-14 shrink-0 rounded-xl object-cover" /> : (
+  ) : thumb && kind === "done" ? <SafeImage src={thumb} alt="" kind="picture" width={56} height={56} className="size-14 shrink-0 rounded-xl object-cover" /> : (
     <div className="flex size-14 shrink-0 items-center justify-center rounded-full" style={{ background: bg[kind], color: ink }}>{icon}</div>
   )
   return <section role={roles[kind]} data-status-kind={kind} className={cn("@container flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-[var(--surface-2)] p-4 ring-1 ring-inset ring-[var(--hairline)]", className)}>
