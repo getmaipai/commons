@@ -1,3 +1,7 @@
+## [ui-v0.5.557] - 2026-11-09
+
+- TALK-04c: `CompanionAvatar` mouth shapes choose openness only from the level (A closed under 0.06, B, C, D; the round E and pursed F come only from `mouth.cue`), a shown shape is held 70 ms and opens at most two steps or closes one at a time, so shapes no longer flicker. While the mouth path is active the whole figure (still, mouth and eye crops) gets a subtle breathing, sway and drift, with a small nod on loud syllables, pivoting at the neck; `mouth.life` scales it (0 off, default 1). Still off under reduced motion, `animated=false`, a hidden page and the header size.
+
 ## [ui-v0.5.556] - 2026-11-09
 
 - KIT-POLISH: `MusicTrack`'s queued line no longer talks about memory or room ("Waiting its turn. Your song starts soon."). The Favorite toggle (`VideoPlayer`) and the `MediaShelf` tile heart pop briefly when turned on (motion-safe only) and call `navigator.vibrate?.(10)` (guarded). The `Player` mini bar draws its progress as a hairline along its bottom edge instead of the top and takes an optional `swipeToSkip` (a mostly-sideways touch drag calls `onNext` left or `onPrevious` right; off by default, never fights `swipeUpToExpand`). `SheetContent side="bottom"` draws a small `aria-hidden` grabber at the top. Defaults remain unchanged except the hairline moving to the bottom edge.
