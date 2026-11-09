@@ -1,3 +1,7 @@
+## [ui-v0.5.550] - 2026-11-08
+
+- PRO-LOOK-KIT-02: accessible status card progress, phone player art sizing and transparent title controls, plus an optional leading Input slot; defaults remain unchanged.
+
 ## [ui-v0.5.547] - 2026-11-08
 
 - PRO-LOOK-ART-01: gate fixed light-on-dark art foreground, muted text, track, scrim and overlay tokens behind `html[data-pro-look]`; default art values remain unchanged.

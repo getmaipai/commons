@@ -7,13 +7,14 @@ import { cn } from "@/kit/utils"
  * ring take the success hue (--hue-teal) and `data-valid` is set. It never carries meaning alone:
  * pair it with visible text or an icon. `aria-invalid` wins when both are set.
  */
-function Input({ className, type, valid, shape = "default", fill = "outline", ...props }: React.ComponentProps<"input"> & {
+function Input({ className, type, valid, leading, shape = "default", fill = "outline", ...props }: React.ComponentProps<"input"> & {
+  leading?: React.ReactNode
   valid?: boolean
   /** "pill" draws a fully rounded field (KIT-3S-01, the companion flow). Default keeps the rounded-md field. */
   shape?: "default" | "pill"
   fill?: "outline" | "surface"
 }) {
-  return (
+  const input = (
     <input
       type={type}
       data-valid={valid ? "true" : undefined}
@@ -28,12 +29,13 @@ function Input({ className, type, valid, shape = "default", fill = "outline", ..
         "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
         "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
         "data-[valid=true]:border-[color:var(--hue-teal)] data-[valid=true]:ring-[color:var(--hue-teal)]/30 data-[valid=true]:aria-invalid:border-destructive",
-        shape === "pill" && "rounded-full px-5",
+        shape === "pill" && (leading ? "rounded-full pe-5 ps-11" : "rounded-full px-5"),
         className
       )}
       {...props}
     />
   )
+  return leading ? <span data-slot="input-leading" className="relative block w-full">{input}<span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-4 flex items-center text-muted-foreground [&>svg]:size-4">{leading}</span></span> : input
 }
 
 export { Input }

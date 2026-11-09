@@ -28,6 +28,11 @@ describe("Alert", () => {
     expect(getByRole("alert")).toBeTruthy();
   });
 
+  test("card notice uses the shared info status treatment", () => {
+    const { container } = render(<Alert variant="card" kind="info" stateWord="Notice"><AlertTitle>Ready</AlertTitle><AlertDescription>Three new pictures.</AlertDescription></Alert>);
+    expect(container.querySelector("[data-status-kind=info]")).toBeTruthy();
+  });
+
   test("the warning variant uses the existing orange status hue token", () => {
     const { getByRole } = render(<Alert variant="warning">Needs attention</Alert>);
     const alert = getByRole("alert");

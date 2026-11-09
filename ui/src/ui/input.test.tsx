@@ -21,3 +21,11 @@ test("Input defaults retain the exact class list and surface fill combines with 
   expect(surface.className).toContain("rounded-full px-5");
   expect(surface.className).toContain("focus-visible:ring-[3px]");
 });
+
+
+test("Input leading content sits inside a pill and adjusts its start padding", () => {
+  const { getByLabelText, getByTestId } = render(<Input aria-label="Ask" shape="pill" leading={<svg data-testid="sparkle" />} />);
+  expect(getByTestId("sparkle").parentElement?.className).toContain("absolute");
+  expect(getByLabelText("Ask").className).toContain("ps-11");
+  expect(getByLabelText("Ask").className).toContain("pe-5");
+});

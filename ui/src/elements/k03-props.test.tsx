@@ -244,6 +244,18 @@ describe("JobProgress", () => {
     expect(done.container.textContent).toContain("listo");
   });
 
+  test("card presentation exposes named progress and distinct done and problem states", () => {
+    const running = render(<JobProgress presentation="card" title="Export" stages={stages} stageIndex={0} stageProgress={0.5} />);
+    expect(running.getByRole("progressbar", { name: "Export progress" })).toBeTruthy();
+    expect(running.container.querySelector("[data-status-kind=progress]")).toBeTruthy();
+    cleanup();
+    const done = render(<JobProgress presentation="card" title="Export" stages={stages} stageIndex={1} stageProgress={1} outcome={{ status: "success" }} />);
+    expect(done.container.querySelector("[data-status-kind=done]")).toBeTruthy();
+    cleanup();
+    const problem = render(<JobProgress presentation="card" title="Export" stages={stages} stageIndex={0} stageProgress={0} downloadState="failed" />);
+    expect(problem.container.querySelector("[data-status-kind=problem]")).toBeTruthy();
+  });
+
   test("download progress exposes bytes, speed and resume for paused and stalled jobs", () => {
     const items = [{ id: "weights", label: "model.gguf", completedBytes: 2_100_000_000, totalBytes: 9_400_000_000, state: "stalled" as const }];
     const paused = render(<JobProgress title="Model" stages={stages} stageIndex={0} stageProgress={0.2} completedBytes={2_100_000_000} totalBytes={9_400_000_000} bytesPerSecond={1_000_000} items={items} downloadState="paused" onResume={() => {}} />);

@@ -1168,7 +1168,7 @@ export function Player(props: PlayerProps) {
             </div>
           ) : null}
           {ended && upNext ? null : <div slot="centered-chrome">{playButton(true)}</div>}
-          <div className="dark flex w-full flex-col bg-[image:var(--art-scrim)] pt-8" data-slot="player-controls">
+          <div className="dark flex w-full flex-col bg-transparent pt-8" data-slot="player-controls">
             {live ? null : <MediaTimeRange aria-label={title} className="p-2.5 w-full" />}
             <MediaControlBar className="w-full">
               {playButton()}
@@ -1362,7 +1362,7 @@ export function Player(props: PlayerProps) {
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
         <div className={audioLayout === "container" ? "grid w-full gap-6 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-6 sm:grid-cols-2 sm:items-center"}>
-          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? i18n._({ id: "ui.Looking for lyrics...", message: "Looking for lyrics..." }) : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center", artSpring)}
+          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw] overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? i18n._({ id: "ui.Looking for lyrics...", message: "Looking for lyrics..." }) : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw]", artSpring)}
           <div className="flex min-w-0 flex-col gap-4">
             <div className="min-w-0">
               <p className="truncate text-2xl font-semibold">{title}</p>

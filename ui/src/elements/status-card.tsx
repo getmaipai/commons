@@ -1,4 +1,5 @@
 import * as React from "react"
+import { CheckIcon, CircleAlertIcon, InfoIcon, LoaderCircleIcon, PauseCircleIcon } from "lucide-react"
 import { Button } from "@/kit/ui/button"
 import { cn } from "@/kit/utils"
 import { SafeImage } from "../primitives/SafeImage"
@@ -15,6 +16,8 @@ export interface StatusCardProps {
   progress?: number
   thumb?: string
   bar?: number
+  progressLabel?: string
+  textStyle?: "default" | "status"
   action?: { label: string; onSelect: () => void; tone?: "primary" | "quiet" }
   secondary?: { label: string; onSelect: () => void }
   accent?: "app" | "create"
@@ -33,11 +36,14 @@ const roles: Record<StatusCardKind, "status" | "alert"> = {
   progress: "status", waiting: "status", done: "status", attention: "alert", problem: "alert", info: "status",
 }
 
-export function StatusCard({ kind, stateWord, title, line, lead, icon, progress, thumb, bar, action, secondary, accent = "app", className }: StatusCardProps) {
+export function StatusCard({ kind, stateWord, title, line, lead, icon, progress, thumb, bar, progressLabel, textStyle = "default", action, secondary, accent = "app", className }: StatusCardProps) {
   const accentColor = accent === "create" ? "var(--accent-create)" : "var(--accent-app)"
   const ink = kind === "progress" ? accentColor : tint[kind]
   const ringProgress = Math.max(0, Math.min(100, progress ?? 0))
-  const defaultLead = kind === "progress" && progress !== undefined ? (
+  const stateIcon = kind === "progress" ? <LoaderCircleIcon aria-hidden className="size-5" /> : kind === "done" ? <CheckIcon aria-hidden className="size-5" /> : kind === "problem" || kind === "attention" ? <CircleAlertIcon aria-hidden className="size-5" /> : kind === "info" ? <InfoIcon aria-hidden className="size-5" /> : <PauseCircleIcon aria-hidden className="size-5" />
+  const defaultLead = textStyle === "status" ? (
+    <div className="flex size-12 shrink-0 items-center justify-center rounded-full" style={{ background: bg[kind], color: ink }}>{icon ?? stateIcon}</div>
+  ) : kind === "progress" && progress !== undefined ? (
     <div aria-label={`${ringProgress}%`} className="flex size-14 shrink-0 items-center justify-center rounded-full" style={{ background: `conic-gradient(${accentColor} ${ringProgress}%, var(--surface-1) 0)` }}>
       <span className="flex size-11 items-center justify-center rounded-full bg-[var(--surface-2)] text-xs font-semibold tabular-nums">{ringProgress}%</span>
     </div>
@@ -48,9 +54,9 @@ export function StatusCard({ kind, stateWord, title, line, lead, icon, progress,
     {lead ?? defaultLead}
     <div className="min-w-0 flex-1">
       {stateWord && <div className="text-[11px] font-medium uppercase tracking-[.1em]" style={{ color: ink }}>{stateWord}</div>}
-      <div className="truncate text-base font-semibold">{title}</div>
-      {line && <div className="line-clamp-3 text-sm text-muted-foreground">{line}</div>}
-      {bar !== undefined && <div className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--surface-1)]"><div className="h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, bar))}%`, background: accentColor }} /></div>}
+      <div className={cn("truncate", textStyle === "status" ? "text-row font-semibold" : "text-base font-semibold")}>{title}</div>
+      {line && <div className={cn("line-clamp-3 text-muted-foreground", textStyle === "status" ? "text-supporting" : "text-sm")}>{line}</div>}
+      {bar !== undefined && <div role={progressLabel ? "progressbar" : undefined} aria-label={progressLabel} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.max(0, Math.min(100, bar))} className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--surface-1)]"><div className="h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, bar))}%`, background: accentColor }} /></div>}
     </div>
     {(action || secondary) ? <div className="flex shrink-0 items-center gap-2 @max-[430px]:order-last @max-[430px]:basis-full @max-[430px]:ps-[72px]">
         {action && <Button type="button" size="xs" shape="pill" variant={action.tone === "quiet" ? "outline" : "inverse"} onClick={action.onSelect}>{action.label}</Button>}

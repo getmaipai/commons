@@ -171,6 +171,16 @@ describe("Player > live stream (RADIO-07)", () => {
 });
 
 describe("Player", () => {
+
+  test("audio artwork stays square and is capped on narrow screens", () => {
+    const { container } = render(<Player src="/song" kind="audio" title="Song" poster="/cover.png" />);
+    const cover = container.querySelector("img");
+    expect(String(cover?.className)).toContain("aspect-square");
+    expect(String(cover?.className)).toContain("max-sm:w-[60vw]");
+    const video = render(<Player src="/clip" kind="video" title="Clip" />);
+    expect(video.container.querySelector("[data-slot=player-controls]")?.getAttribute("class") ?? "").toContain("bg-transparent");
+  });
+
   test("shows a music placeholder when an audio poster is absent", () => {
     const view = render(<Player src="/a" kind="audio" layout="mini" title="Song" />);
     expect(view.container.querySelector('[data-slot="safe-image-fallback"][data-kind="music"]')).not.toBeNull();

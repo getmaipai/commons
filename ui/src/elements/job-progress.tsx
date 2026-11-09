@@ -91,7 +91,7 @@ export function JobProgress({
   actions,
   variant = "full",
   cancelable = true,
-  presentation = "default",
+  presentation = "inline",
   className,
   ...props
 }: Omit<
@@ -151,7 +151,7 @@ export function JobProgress({
   variant?: "compact" | "full";
   /** Hide the cancel control when the producer has no cancellation action. */
   cancelable?: boolean;
-  presentation?: "default" | "card";
+  presentation?: "inline" | "card";
 }) {
   const rates = useRef<number[]>([]);
   const [stableEta, setStableEta] = useState<number | undefined>(undefined);
@@ -193,7 +193,7 @@ export function JobProgress({
     const onAction = state === "paused" || state === "stalled" ? onResume : state === "failed" ? onRetry : !finished && cancelable ? onCancel : undefined;
     const actionLabel = state === "paused" || state === "stalled" ? copy?.resume ?? i18n._({ id: "ui.Resume", message: "Resume" }) : state === "failed" ? copy?.retry ?? i18n._({ id: "ui.Retry", message: "Retry" }) : state === "running" || state === "verifying" ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Cancel", message: "Cancel" });
     const stateCopy = state === "stalled" ? copy?.stalled : state === "failed" ? copy?.checksumFailed : state === "paused" ? copy?.resume : state === "done" ? doneLabel : undefined;
-    return <StatusCard kind={kind} stateWord={stateCopy ?? stateLabel(state)} title={title || selected?.label || downloadStatus || ""} line={line} progress={kind === "progress" ? fraction * 100 : undefined} bar={(completedBytes !== undefined && totalBytes !== undefined) || selected ? fraction * 100 : undefined} action={onAction ? { label: actionLabel, onSelect: onAction, tone: kind === "problem" ? "quiet" : "primary" } : undefined} className={className} />
+    return <StatusCard kind={kind} stateWord={stateCopy ?? stateLabel(state)} title={title || selected?.label || downloadStatus || ""} line={line} progress={kind === "progress" ? fraction * 100 : undefined} bar={fraction * 100} action={onAction ? { label: actionLabel, onSelect: onAction, tone: kind === "problem" ? "quiet" : "primary" } : undefined} progressLabel={`${title || selected?.label || downloadStatus || ""} progress`} textStyle="status" className={className} />
   }
 
   return (
