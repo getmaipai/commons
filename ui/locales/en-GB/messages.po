@@ -506,7 +506,7 @@ msgid "ui.2. Voice"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:177
+#: src/primitives/Player.tsx:186
 msgid "ui.2x speed"
 msgstr ""
 
@@ -587,7 +587,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/data-table.tsx:217
-#: src/schema/NodeRenderer.tsx:1836
+#: src/schema/NodeRenderer.tsx:1841
 msgid "ui.Actions"
 msgstr ""
 
@@ -630,7 +630,7 @@ msgid "ui.Add a person…"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1876
+#: src/schema/NodeRenderer.tsx:1881
 msgid "ui.Add a picture"
 msgstr ""
 
@@ -691,7 +691,7 @@ msgid "ui.agent"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:156
+#: src/primitives/Player.tsx:165
 msgid "ui.Ahead {seconds} seconds"
 msgstr ""
 
@@ -946,7 +946,7 @@ msgid "ui.Back"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:155
+#: src/primitives/Player.tsx:164
 msgid "ui.Back {seconds} seconds"
 msgstr ""
 
@@ -1072,9 +1072,9 @@ msgstr ""
 #: src/elements/thread.aui.tsx:1582
 #: src/elements/tier-segment.tsx:46
 #: src/elements/video-player.tsx:109
-#: src/primitives/Player.tsx:176
+#: src/primitives/Player.tsx:185
 #: src/schema/ConfirmDialog.tsx:52
-#: src/schema/NodeRenderer.tsx:1880
+#: src/schema/NodeRenderer.tsx:1885
 #: src/settings/LocationField.tsx:179
 #: src/settings/SettingRow.tsx:196
 #: src/settings/SettingRow.tsx:222
@@ -1111,7 +1111,7 @@ msgid "ui.Cancelled. Nothing was changed."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:159
+#: src/primitives/Player.tsx:168
 msgid "ui.Captions"
 msgstr ""
 
@@ -1156,9 +1156,9 @@ msgid "ui.Changed as described"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:158
-#: src/schema/NodeRenderer.tsx:1819
-#: src/schema/NodeRenderer.tsx:1826
+#: src/primitives/Player.tsx:167
+#: src/schema/NodeRenderer.tsx:1824
+#: src/schema/NodeRenderer.tsx:1831
 msgid "ui.Chapters"
 msgstr ""
 
@@ -1266,7 +1266,7 @@ msgid "ui.Close editor"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:166
+#: src/primitives/Player.tsx:175
 msgid "ui.Close player"
 msgstr ""
 
@@ -1469,7 +1469,7 @@ msgid "ui.Could not load the top result."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1772
+#: src/schema/NodeRenderer.tsx:1777
 msgid "ui.Could not load the transcript. Check that you are online, then try again."
 msgstr ""
 
@@ -1519,12 +1519,12 @@ msgid "ui.Could not load this. Try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1983
+#: src/schema/NodeRenderer.tsx:1988
 msgid "ui.Could not load today's cards."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2007
+#: src/schema/NodeRenderer.tsx:2012
 msgid "ui.Could not load today's rows."
 msgstr ""
 
@@ -1534,7 +1534,7 @@ msgid "ui.Could not load your results."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1708
+#: src/schema/NodeRenderer.tsx:1713
 msgid "ui.Could not look for other screens. Check that you are online, then open the menu again."
 msgstr ""
 
@@ -1549,7 +1549,7 @@ msgid "ui.Could not open this clip."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1709
+#: src/schema/NodeRenderer.tsx:1714
 msgid "ui.Could not play this on the other screen. Make sure it is on and signed in, then try again."
 msgstr ""
 
@@ -1574,8 +1574,8 @@ msgid "ui.Could not share this link. Copy the address from the browser bar inste
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1875
-#: src/schema/NodeRenderer.tsx:1875
+#: src/schema/NodeRenderer.tsx:1880
+#: src/schema/NodeRenderer.tsx:1880
 msgid "ui.Cover"
 msgstr ""
 
@@ -2258,7 +2258,7 @@ msgid "ui.Full Moon"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:161
+#: src/primitives/Player.tsx:170
 msgid "ui.Full screen"
 msgstr ""
 
@@ -2773,6 +2773,11 @@ msgid "ui.Library folder"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/primitives/Player.tsx:192
+msgid "ui.Like"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/primitives/ReadingSettings.tsx:62
 msgid "ui.Line spacing"
 msgstr ""
@@ -2806,7 +2811,7 @@ msgid "ui.Listening for you"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:178
+#: src/primitives/Player.tsx:187
 msgid "ui.Live"
 msgstr ""
 
@@ -2895,12 +2900,12 @@ msgid "ui.Look"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:1459
+#: src/primitives/Player.tsx:1507
 msgid "ui.Looking for lyrics..."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1747
+#: src/schema/NodeRenderer.tsx:1752
 msgid "ui.Looking for screens"
 msgstr ""
 
@@ -2934,7 +2939,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/lyrics-list.tsx:55
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:384
+#: src/primitives/Player.tsx:413
 #: src/schema/NodeRenderer.tsx:1655
 msgid "ui.Lyrics"
 msgstr ""
@@ -3119,7 +3124,7 @@ msgstr ""
 #: src/PhoneNav.tsx:137
 #: src/PhoneNav.tsx:145
 #: src/primitives/ArticleView.tsx:480
-#: src/schema/NodeRenderer.tsx:2051
+#: src/schema/NodeRenderer.tsx:2056
 #: src/ui/breadcrumb.tsx:102
 msgid "ui.More"
 msgstr ""
@@ -3197,7 +3202,7 @@ msgid "ui.Music"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:162
+#: src/primitives/Player.tsx:171
 msgid "ui.Mute"
 msgstr ""
 
@@ -3305,7 +3310,7 @@ msgstr ""
 #: src/elements/music-track.tsx:35
 #: src/elements/question-flow.tsx:47
 #: src/elements/thread.aui.tsx:1622
-#: src/primitives/Player.tsx:168
+#: src/primitives/Player.tsx:177
 #: src/primitives/Tour.tsx:46
 msgid "ui.Next"
 msgstr ""
@@ -3423,7 +3428,7 @@ msgid "ui.No one else in the household."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1751
+#: src/schema/NodeRenderer.tsx:1756
 msgid "ui.No other screens are on"
 msgstr ""
 
@@ -3555,7 +3560,7 @@ msgstr ""
 #: src/schema/NodeRenderer.tsx:1098
 #: src/schema/NodeRenderer.tsx:1181
 #: src/schema/NodeRenderer.tsx:1343
-#: src/schema/NodeRenderer.tsx:1971
+#: src/schema/NodeRenderer.tsx:1976
 #: src/schema/ResultFeedNodeView.tsx:199
 msgid "ui.Nothing here yet."
 msgstr ""
@@ -3753,7 +3758,7 @@ msgid "ui.Open the assistant"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:165
+#: src/primitives/Player.tsx:174
 msgid "ui.Open the player"
 msgstr ""
 
@@ -3874,7 +3879,7 @@ msgstr ""
 #: src/elements/music-track.tsx:35
 #: src/elements/track-studio.tsx:448
 #: src/elements/track-studio.tsx:448
-#: src/primitives/Player.tsx:154
+#: src/primitives/Player.tsx:163
 #: src/schema/NodeRenderer.tsx:1534
 msgid "ui.Pause"
 msgstr ""
@@ -3985,7 +3990,7 @@ msgid "ui.Picture editing tools"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:160
+#: src/primitives/Player.tsx:169
 msgid "ui.Picture in picture"
 msgstr ""
 
@@ -4063,7 +4068,7 @@ msgstr ""
 #: src/elements/track-studio.tsx:448
 #: src/elements/video-player.tsx:112
 #: src/primitives/MediaShelf.tsx:198
-#: src/primitives/Player.tsx:153
+#: src/primitives/Player.tsx:162
 #: src/schema/NodeRenderer.tsx:132
 msgid "ui.Play"
 msgstr ""
@@ -4087,20 +4092,20 @@ msgid "ui.play all"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:175
+#: src/primitives/Player.tsx:184
 msgid "ui.Play now"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:163
-#: src/schema/NodeRenderer.tsx:1740
+#: src/primitives/Player.tsx:172
 #: src/schema/NodeRenderer.tsx:1745
+#: src/schema/NodeRenderer.tsx:1750
 msgid "ui.Play on another screen"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:157
+#: src/primitives/Player.tsx:166
 msgid "ui.Playback speed"
 msgstr ""
 
@@ -4115,7 +4120,7 @@ msgid "ui.Playhead"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/mediaHost.ts:83
+#: src/schema/mediaHost.ts:88
 msgid "ui.Playing is not set up on this screen. Open the item from its app."
 msgstr ""
 
@@ -4186,7 +4191,7 @@ msgstr ""
 #: src/elements/media-viewer.tsx:112
 #: src/elements/music-track.tsx:35
 #: src/elements/thread.aui.tsx:1614
-#: src/primitives/Player.tsx:167
+#: src/primitives/Player.tsx:176
 msgid "ui.Previous"
 msgstr ""
 
@@ -4575,6 +4580,21 @@ msgid "ui.Rendering diagram"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/primitives/Player.tsx:190
+msgid "ui.Repeat all"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/primitives/Player.tsx:189
+msgid "ui.Repeat off"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/primitives/Player.tsx:191
+msgid "ui.Repeat one"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/settings/SettingsShowcase.tsx:37
 msgid "ui.Reply length"
 msgstr ""
@@ -4666,7 +4686,7 @@ msgid "ui.Resume {name}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:169
+#: src/primitives/Player.tsx:178
 msgid "ui.Resuming from {time}"
 msgstr ""
 
@@ -4737,7 +4757,7 @@ msgstr ""
 #: src/primitives/ArticleView.tsx:458
 #: src/primitives/ArticleView.tsx:474
 #: src/primitives/StoryFeed.tsx:90
-#: src/schema/NodeRenderer.tsx:1880
+#: src/schema/NodeRenderer.tsx:1885
 #: src/settings/LocationField.tsx:176
 #: src/settings/SettingRow.tsx:184
 #: src/settings/SettingRow.tsx:276
@@ -5087,6 +5107,7 @@ msgstr ""
 #: src/elements/video-player.tsx:101
 #: src/primitives/ArticleView.tsx:460
 #: src/primitives/ArticleView.tsx:472
+#: src/primitives/Player.tsx:194
 msgid "ui.Share"
 msgstr ""
 
@@ -5139,7 +5160,7 @@ msgstr ""
 #: src/elements/creation-header.tsx:111
 #: src/elements/creation-header.tsx:149
 #: src/elements/thread-list.aui.tsx:184
-#: src/schema/NodeRenderer.tsx:1817
+#: src/schema/NodeRenderer.tsx:1822
 msgid "ui.Show less"
 msgstr ""
 
@@ -5147,7 +5168,7 @@ msgstr ""
 #: src/elements/creation-header.tsx:111
 #: src/elements/creation-header.tsx:149
 #: src/elements/thread-list.aui.tsx:183
-#: src/schema/NodeRenderer.tsx:1817
+#: src/schema/NodeRenderer.tsx:1822
 msgid "ui.Show more"
 msgstr ""
 
@@ -5183,8 +5204,13 @@ msgid "ui.Show the character"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:164
+#: src/primitives/Player.tsx:173
 msgid "ui.Shrink the player"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/primitives/Player.tsx:188
+msgid "ui.Shuffle"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5204,12 +5230,12 @@ msgid "ui.Skip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:172
+#: src/primitives/Player.tsx:181
 msgid "ui.Skip credits"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:171
+#: src/primitives/Player.tsx:180
 msgid "ui.Skip intro"
 msgstr ""
 
@@ -5335,7 +5361,7 @@ msgid "ui.Start a conversation"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:170
+#: src/primitives/Player.tsx:179
 msgid "ui.Start over"
 msgstr ""
 
@@ -5492,7 +5518,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/elicitation-form.tsx:167
 #: src/elements/question-flow.tsx:46
-#: src/schema/NodeRenderer.tsx:2120
+#: src/schema/NodeRenderer.tsx:2125
 msgid "ui.Submit"
 msgstr ""
 
@@ -5909,9 +5935,9 @@ msgid "ui.Transcribing"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:422
+#: src/primitives/Player.tsx:451
 #: src/primitives/TranscriptPanel.tsx:75
-#: src/schema/NodeRenderer.tsx:1779
+#: src/schema/NodeRenderer.tsx:1784
 msgid "ui.Transcript"
 msgstr ""
 
@@ -6032,6 +6058,11 @@ msgid "ui.Undo stroke"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/primitives/Player.tsx:193
+msgid "ui.Unlike"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/adult-lock.tsx:373
 msgid "ui.Unlock"
 msgstr ""
@@ -6076,12 +6107,12 @@ msgid "ui.Untitled"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:173
+#: src/primitives/Player.tsx:182
 msgid "ui.Up next"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:174
+#: src/primitives/Player.tsx:183
 msgid "ui.Up next in {seconds}"
 msgstr ""
 
@@ -6396,7 +6427,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/Wizard.tsx:354
 #: src/schema/ConfirmDialog.tsx:55
-#: src/schema/NodeRenderer.tsx:2120
+#: src/schema/NodeRenderer.tsx:2125
 msgid "ui.Working…"
 msgstr ""
 

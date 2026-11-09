@@ -65,6 +65,8 @@ import {
   type PlayerChapter,
   type ProgressReason,
 } from "@/kit/primitives/playerLogic";
+import { ArtGradient } from "@/kit/primitives/ArtGradient";
+import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
 import { SleepTimer } from "@/kit/primitives/SleepTimer";
 import type { SleepState } from "@/kit/primitives/sleepLogic";
 import { TranscriptPanel, type TranscriptLine } from "@/kit/primitives/TranscriptPanel";
@@ -147,6 +149,13 @@ export interface PlayerCopy {
   cancel: string;
   holdSpeed: string;
   live: string;
+  shuffle: string;
+  repeatOff: string;
+  repeatAll: string;
+  repeatOne: string;
+  like: string;
+  unlike: string;
+  share: string;
 }
 
 export const defaultPlayerCopy = (): PlayerCopy => ({
@@ -176,6 +185,13 @@ export const defaultPlayerCopy = (): PlayerCopy => ({
   cancel: i18n._({ id: "ui.Cancel", message: "Cancel" }),
   holdSpeed: i18n._({ id: "ui.2x speed", message: "2x speed" }),
   live: i18n._({ id: "ui.Live", message: "Live" }),
+  shuffle: i18n._({ id: "ui.Shuffle", message: "Shuffle" }),
+  repeatOff: i18n._({ id: "ui.Repeat off", message: "Repeat off" }),
+  repeatAll: i18n._({ id: "ui.Repeat all", message: "Repeat all" }),
+  repeatOne: i18n._({ id: "ui.Repeat one", message: "Repeat one" }),
+  like: i18n._({ id: "ui.Like", message: "Like" }),
+  unlike: i18n._({ id: "ui.Unlike", message: "Unlike" }),
+  share: i18n._({ id: "ui.Share", message: "Share" }),
 });
 
 export type PlayerLayout = "video" | "audio" | "mini";
@@ -265,6 +281,19 @@ export interface PlayerProps {
   artSpring?: boolean;
   /** MUSIC-KIT-01: in the `audio` layout, lyrics blur and fade by distance from the active line (LyricsList `blurByDistance`). Default off. */
   lyricsBlur?: boolean;
+  /** NOW-PLAYING-01: in the `audio` layout, the Now Playing controls a music host wires up. `shuffle` and `repeat` are the
+   * host's play mode (`repeat` is "off", "all" or "one"; "one" draws a 1 badge); the buttons appear when their callback is
+   * passed. Passing either callback also drops the default 15 and 30 second skip buttons (pass `skip` to keep them). */
+  shuffle?: boolean;
+  repeat?: "off" | "all" | "one";
+  onShuffle?: () => void;
+  onRepeat?: () => void;
+  /** NOW-PLAYING-01: the heart (with the kit's like pop) appears when `onLike` is passed; `liked` is its state. */
+  liked?: boolean;
+  onLike?: () => void;
+  /** NOW-PLAYING-01: the Up next (queue) and Share buttons in the secondary row appear when their callback is passed. */
+  onQueue?: () => void;
+  onShare?: () => void;
   /** PARITY-01: draw the sleep timer (Off, End of episode, 5 to 60 minutes) with a live countdown. Off by default. */
   sleepTimer?: boolean;
   /** PARITY-01: called when the sleep timer ends playback: "end" when the item finished, "timer" when the countdown ran out.
@@ -423,6 +452,14 @@ export function Player(props: PlayerProps) {
     doubleTapSeek = true,
     longPressSpeed = true,
     pip = true,
+    shuffle,
+    repeat,
+    onShuffle,
+    onRepeat,
+    liked = false,
+    onLike,
+    onQueue,
+    onShare,
   } = props;
   const copy = { ...defaultPlayerCopy(), ...props.copy };
   const liveProp = props.live === true;
@@ -434,6 +471,7 @@ export function Player(props: PlayerProps) {
   const [time, setTime] = useState(0);
   const [lyricsOpen, setLyricsOpen] = useState(false);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const likePops = useLikePop(liked);
   const [sleep, setSleep] = useState<SleepState>(null);
   const sleepRef = useRef<SleepState>(null);
   sleepRef.current = sleep;
@@ -1299,13 +1337,14 @@ export function Player(props: PlayerProps) {
     return withAmbient(videoNode);
   }
 
-  const art = (size: string, spring = false) => (
+  const art = (size: string, spring = false, radius = "rounded-[var(--art-radius)]") => (
     <SafeImage
       src={poster}
       alt={posterAlt}
       kind={kind === "video" ? "video" : "music"}
       className={cn(
-        "shrink-0 rounded-[var(--art-radius)] bg-muted object-cover",
+        "shrink-0 bg-muted object-cover",
+        radius,
         spring && "motion-safe:transition-transform motion-safe:duration-[var(--art-spring-duration)] motion-safe:ease-[var(--art-spring-ease)]",
         spring && (playing ? "motion-safe:scale-100" : "motion-safe:scale-[var(--art-resting-scale)]"),
         size,
@@ -1448,41 +1487,99 @@ export function Player(props: PlayerProps) {
     );
   }
 
-  // layout === "audio": Now playing.
+  // layout === "audio": Now playing (NOW-PLAYING-01). A large square cover over a static gradient from its colors, the title
+  // and artist, the scrubber with elapsed and remaining time, shuffle, previous, a large play disc, next and repeat, then a
+  // quiet row of tools. Wide screens put the cover on the left and the controls on the right.
+  const musicMode = onShuffle !== undefined || onRepeat !== undefined;
+  const seekButtons = !live && (skip !== undefined || !musicMode);
+  const tool = "";
+  const repeatMode = repeat ?? "off";
+  const repeatLabel = repeatMode === "one" ? copy.repeatOne : repeatMode === "all" ? copy.repeatAll : copy.repeatOff;
+  const HeartGlyph = getIcon("heart");
   return withAmbient(
     // Shortcuts are delegated from the focused control inside, the way a media player takes them.
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-    <div ref={rootRef} data-slot="player" data-layout="audio" onKeyDown={onKeyDown} className={audioLayout === "container" ? "@container/player relative w-full" : "relative w-full"}>
+    <div ref={rootRef} data-slot="player" data-layout="audio" onKeyDown={onKeyDown} className={cn("relative isolate w-full", audioLayout === "container" && "@container/player")}>
+      <ArtGradient art={poster} className="h-full" />
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
-        <div className={audioLayout === "container" ? "grid w-full gap-6 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-6 sm:grid-cols-2 sm:items-center"}>
-          {transcriptOpen && transcript?.length ? <div className="aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw] overflow-hidden rounded-[var(--art-radius)] bg-card p-4" data-slot="player-transcript"><TranscriptPanel lines={transcript} getMedia={() => media.current} onSeek={seekTo} label={transcriptLabel} className="h-full" /></div> : lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw] overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? i18n._({ id: "ui.Looking for lyrics...", message: "Looking for lyrics..." }) : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw]", artSpring)}
-          <div className="flex min-w-0 flex-col gap-4">
-            <div className="min-w-0">
-              <p className="truncate text-2xl font-semibold">{title}</p>
+        <div className={audioLayout === "container" ? "grid w-full gap-8 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-8 sm:grid-cols-2 sm:items-center"}>
+          {transcriptOpen && transcript?.length ? <div className="aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw] overflow-hidden rounded-[var(--radius-card)] bg-card p-4" data-slot="player-transcript"><TranscriptPanel lines={transcript} getMedia={() => media.current} onSeek={seekTo} label={transcriptLabel} className="h-full" /></div> : lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw] overflow-y-auto rounded-[var(--radius-card)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? i18n._({ id: "ui.Looking for lyrics...", message: "Looking for lyrics..." }) : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw]", artSpring, "rounded-[var(--radius-card)]")}
+          <div className="flex min-w-0 flex-col gap-5">
+            <div className="min-w-0" data-slot="player-titles">
+              <p className="truncate text-2xl font-bold tracking-tight">{title}</p>
               {subtitle ? <p className="text-muted-foreground truncate text-lg">{subtitle}</p> : null}
               {chapterIndex >= 0 ? <p className="text-muted-foreground truncate text-sm">{chapters[chapterIndex]!.title}</p> : null}
             </div>
             {live ? (
               <div className="flex justify-center">{liveBadge}</div>
             ) : (
-              <>
+              <div className="flex flex-col" data-slot="player-scrubber">
                 <MediaTimeRange aria-label={title} className="p-2.5 w-full" />
-                <div className="text-muted-foreground flex justify-between text-sm tabular-nums">
+                <div className="text-muted-foreground flex justify-between px-2.5 text-sm tabular-nums">
                   <span>{formatTime(time)}</span>
                   <span>-{formatTime(Number.isFinite(duration) ? Math.max(0, duration - time) : 0)}</span>
                 </div>
-              </>
+              </div>
             )}
-            <div className="flex flex-wrap items-center justify-center gap-2">{transport(true)}</div>
-            <div className="flex flex-wrap items-center justify-center gap-1">
+            <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-3" data-slot="player-transport">
+              {onShuffle ? (
+                <Button type="button" variant="ghost" size="icon" className={cn(tool, shuffle && "text-primary")} aria-label={copy.shuffle} aria-pressed={shuffle === true} data-slot="player-shuffle" onClick={onShuffle}>
+                  <Icon name="shuffle" />
+                </Button>
+              ) : null}
+              {onPrevious ? (
+                <Button variant="ghost" size="icon" className={tool} aria-label={copy.previous} onClick={onPrevious}>
+                  <Icon name="skip-back" />
+                </Button>
+              ) : null}
+              {seekButtons ? (
+                <MediaSeekBackwardButton className="p-3" seekOffset={skip?.back ?? 15} aria-label={copy.back(skip?.back ?? 15)}>
+                  <SkipGlyph name="rotate-ccw" seconds={skip?.back} />
+                </MediaSeekBackwardButton>
+              ) : null}
+              {playButton(true)}
+              {seekButtons ? (
+                <MediaSeekForwardButton className="p-3" seekOffset={skip?.forward ?? 30} aria-label={copy.ahead(skip?.forward ?? 30)}>
+                  <SkipGlyph name="rotate-cw" seconds={skip?.forward} />
+                </MediaSeekForwardButton>
+              ) : null}
+              {onNext ? (
+                <Button variant="ghost" size="icon" className={tool} aria-label={copy.next} onClick={() => onNext(upNext?.id)}>
+                  <Icon name="skip-forward" />
+                </Button>
+              ) : null}
+              {onRepeat ? (
+                <Button type="button" variant="ghost" size="icon" className={cn(tool, "relative", repeatMode !== "off" && "text-primary")} aria-label={repeatLabel} aria-pressed={repeatMode !== "off"} data-slot="player-repeat" data-mode={repeatMode} onClick={onRepeat}>
+                  <Icon name="repeat" />
+                  {repeatMode === "one" ? <span aria-hidden data-slot="player-repeat-one" className="absolute top-1.5 right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] leading-none font-bold text-primary-foreground">1</span> : null}
+                </Button>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-1" data-slot="player-tools">
+              {onLike ? (
+                <Button type="button" variant="ghost" size="icon" className={tool} aria-label={liked ? copy.unlike : copy.like} aria-pressed={liked} data-slot="player-like" onClick={() => { if (!liked) likeHaptic(); onLike(); }}>
+                  <HeartGlyph key={likePops} aria-hidden className={cn("size-6", liked && "fill-current text-primary", liked && likePops > 0 && LIKE_POP_CLASS)} />
+                </Button>
+              ) : null}
               {actionsSlot}
-              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => { if (!lyricsOpen && !lyrics?.text && !lyrics?.lines?.length && requestedLyricsFor.current !== src) { requestedLyricsFor.current = src; onLyricsOpen?.(); } setTranscriptOpen(false); setLyricsOpen(value => !value); }}>{(() => { const Icon = getIcon("book"); return <Icon aria-hidden />; })()}</Button> : null}
-              {transcript?.length ? <Button type="button" variant={transcriptOpen ? "secondary" : "ghost"} size="icon" aria-label={transcriptLabel} aria-pressed={transcriptOpen} data-slot="player-transcript-toggle" onClick={() => { setLyricsOpen(false); setTranscriptOpen((value) => !value); }}><Icon name="scroll-text" /></Button> : null}
+              {onQueue ? <Button type="button" variant="ghost" size="icon" className={tool} aria-label={copy.upNext} data-slot="player-queue" onClick={onQueue}><Icon name="list-music" /></Button> : null}
+              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" className={tool} aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => { if (!lyricsOpen && !lyrics?.text && !lyrics?.lines?.length && requestedLyricsFor.current !== src) { requestedLyricsFor.current = src; onLyricsOpen?.(); } setTranscriptOpen(false); setLyricsOpen(value => !value); }}><Icon name="mic-vocal" /></Button> : null}
+              {transcript?.length ? <Button type="button" variant={transcriptOpen ? "secondary" : "ghost"} size="icon" className={tool} aria-label={transcriptLabel} aria-pressed={transcriptOpen} data-slot="player-transcript-toggle" onClick={() => { setLyricsOpen(false); setTranscriptOpen((value) => !value); }}><Icon name="scroll-text" /></Button> : null}
               {sleepControl}
+              {onShare ? <Button type="button" variant="ghost" size="icon" className={tool} aria-label={copy.share} data-slot="player-share" onClick={onShare}><Icon name="share" /></Button> : null}
               {rateMenu}
               {chapterMenu}
               {castButtons}
+              <span className="flex items-center max-sm:hidden" data-slot="player-volume">
+                <MediaMuteButton aria-label={copy.mute} className="p-3">
+                  <Icon slot="off" name="volume-x" />
+                  <Icon slot="low" name="volume-1" />
+                  <Icon slot="medium" name="volume-1" />
+                  <Icon slot="high" name="volume-2" />
+                </MediaMuteButton>
+                <MediaVolumeRange className="p-2.5 max-md:hidden" />
+              </span>
             </div>
             {resumeLine !== null ? (
               <div role="status" data-slot="player-resume" className="flex items-center justify-center gap-3 text-base">

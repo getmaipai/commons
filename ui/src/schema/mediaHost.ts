@@ -73,6 +73,11 @@ export interface MediaHost {
   /** VIDEO-CREATE-02: turns a package asset path (a card's `media`) into an address. Absent: `/api/plugins/<package>/assets/<path>`. */
   assetUrl?(packageId: string, path: string): string;
   castTo?(targetId: string, item: Record<string, unknown>, position_s: number): Promise<void>;
+  /** NOW-PLAYING-01: the host's play mode. When present, a `player` node in the audio layout draws shuffle and repeat buttons
+   * (repeat "one" shows a 1 badge) and calls these to change it; the host re-provides this context when the mode changes. */
+  playMode?: { shuffle: boolean; repeat: "off" | "all" | "one"; onShuffle(): void; onRepeat(): void };
+  /** NOW-PLAYING-01: opens the host's Up next list. When present, an audio `player` node draws the queue button. */
+  openQueue?(): void;
 }
 
 export const MediaHostContext = createContext<MediaHost | null>(null);

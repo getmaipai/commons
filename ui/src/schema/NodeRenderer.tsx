@@ -1668,6 +1668,11 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               completed={readField(r, field("completed", "completed")) === true}
               upNext={upNext && typeof upNext.id === "string" ? upNext : undefined}
               autoplayNext={node.autoplay_next}
+              shuffle={audioLayout ? host?.playMode?.shuffle : undefined}
+              repeat={audioLayout ? host?.playMode?.repeat : undefined}
+              onShuffle={audioLayout && host?.playMode ? () => host.playMode!.onShuffle() : undefined}
+              onRepeat={audioLayout && host?.playMode ? () => host.playMode!.onRepeat() : undefined}
+              onQueue={audioLayout && host?.openQueue ? () => host.openQueue!() : undefined}
               sleepTimer={node.sleep_timer}
               skip={node.skip}
               doubleTapSeek={node.double_tap_seek}
