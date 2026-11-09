@@ -13,6 +13,7 @@ from pydantic import (
     ConfigDict,
     Field,
     RootModel,
+    confloat,
     conint,
     constr,
 )
@@ -1014,6 +1015,67 @@ class Provenance(BaseModel):
     approved_at: AwareDatetime | None = None
 
 
+class Anchor(BaseModel):
+    """
+    Fractions of the rest picture; x+w and y+h must each be at most 1.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    x: confloat(ge=0.0, le=1.0)
+    y: confloat(ge=0.0, le=1.0)
+    w: confloat(ge=0.0, le=1.0)
+    h: confloat(ge=0.0, le=1.0)
+
+
+class Shapes(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    A: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    B: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    C: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    D: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    E: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    F: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+
+
+class Mouth(BaseModel):
+    """
+    Optional TALK-04 mouth crops. The anchor is fractions of the rest picture; x+w and y+h must be at most 1.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    anchor: Anchor = Field(
+        ...,
+        description='Fractions of the rest picture; x+w and y+h must each be at most 1.',
+    )
+    shapes: Shapes
+
+
+class Eyes(BaseModel):
+    """
+    Optional TALK-04 eye crops for blinking.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    anchor: Anchor = Field(
+        ...,
+        description='Fractions of the rest picture; x+w and y+h must each be at most 1.',
+    )
+    closed: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$')
+    half: constr(pattern=r'^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\.png$') | None = (
+        None
+    )
+
+
 class Animation(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1024,6 +1086,13 @@ class Animation(BaseModel):
     sheet: Sheet | None = None
     states: States
     provenance: Provenance | None = None
+    mouth: Mouth | None = Field(
+        None,
+        description='Optional TALK-04 mouth crops. The anchor is fractions of the rest picture; x+w and y+h must be at most 1.',
+    )
+    eyes: Eyes | None = Field(
+        None, description='Optional TALK-04 eye crops for blinking.'
+    )
 
 
 class Persona(BaseModel):

@@ -3,6 +3,7 @@
 
 from ._internal import (
     Actions,
+    Anchor,
     Animation,
     BehaviorItem,
     Cache,
@@ -17,6 +18,7 @@ from ._internal import (
     ExamplesChildItem,
     ExamplesTeenItem,
     Exposes,
+    Eyes,
     FallbackReply,
     Flavour,
     Greeting,
@@ -34,6 +36,7 @@ from ._internal import (
     Manage,
     Mode,
     MoreItem,
+    Mouth,
     Need,
     NeedsYou,
     Notification,
@@ -53,6 +56,7 @@ from ._internal import (
     Sad,
     Search,
     SearchingItem,
+    Shapes,
     Sheet,
     Sidebar,
     Sleeping,
@@ -74,6 +78,7 @@ from ._internal import (
 
 __all__ = [
     "Actions",
+    "Anchor",
     "Animation",
     "BehaviorItem",
     "Cache",
@@ -88,6 +93,7 @@ __all__ = [
     "ExamplesChildItem",
     "ExamplesTeenItem",
     "Exposes",
+    "Eyes",
     "FallbackReply",
     "Flavour",
     "Greeting",
@@ -105,6 +111,7 @@ __all__ = [
     "Manage",
     "Mode",
     "MoreItem",
+    "Mouth",
     "Need",
     "NeedsYou",
     "Notification",
@@ -124,6 +131,7 @@ __all__ = [
     "Sad",
     "Search",
     "SearchingItem",
+    "Shapes",
     "Sheet",
     "Sidebar",
     "Sleeping",
