@@ -2677,6 +2677,55 @@ html[data-ease-contrast="more"] [data-surface="studio"] {
 /* The PRO look draws a section title bare: no brand rule beside it. */
 html[data-pro-look] [data-slot="section-heading"] { border-left-width: 0; padding-left: 0; }
 
+/* PRO-LOOK-PHONE-2: the phone bar's height as one variable (0 where no bar is drawn, safe area included), so a part that sits above the bar reads it instead of repeating the numbers. */
+:root { --phone-nav-offset: 0px; }
+html:has([data-slot="phone-nav"]) { --phone-nav-offset: calc(49px + env(safe-area-inset-bottom, 0px)); }
+html:has([data-slot="phone-nav"][data-floating]) { --phone-nav-offset: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+html[data-pro-look]:has([data-slot="phone-nav"][data-floating]) { --phone-nav-offset: calc(5.75rem + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 640px) { :root, html:has([data-slot="phone-nav"]), html[data-pro-look]:has([data-slot="phone-nav"][data-floating]) { --phone-nav-offset: 0px; } }
+html[data-pro-look] [data-slot="global-mini-player"] { bottom: var(--phone-nav-offset); }
+
+/* PRO-LOOK-PHONE-2: with no section open, the phone's settings column fills the screen (no blank box under the rows). */
+@media (max-width: 1023.98px) {
+  html[data-pro-look] [data-slot="settings-shell"] { min-height: calc(100dvh - var(--phone-nav-offset)); }
+  html[data-pro-look] [data-slot="settings-column"] { flex: 1 1 auto; min-height: 100%; }
+}
+
+/* PRO-LOOK-PHONE-2: a section is flat (no card, no rule) unless it asks for variant="card". */
+html[data-pro-look] [data-slot="section"]:not([data-variant="card"]) { border-width: 0; background: transparent; padding: 0; border-radius: 0; }
+html[data-pro-look] [data-slot="section"]:not([data-variant="card"]) > [data-slot="section-heading"] { font-size: var(--font-size-section); font-weight: var(--font-weight-section); line-height: var(--line-height-title); }
+
+/* PRO-LOOK-PHONE-2: a companion card is a flat, compact block. */
+html[data-pro-look] [data-slot="companion-card"] { border-width: 0; background: transparent; padding: 0; border-radius: 0; }
+html[data-pro-look] [data-slot="companion-card-heading"] { font-size: var(--font-size-row); font-weight: var(--font-weight-section); }
+
+/* PRO-LOOK-PHONE-2: a chip strip (pill tabs) keeps each chip's width and scrolls sideways with no scrollbar; scroll={false} opts out. */
+html[data-pro-look] [data-slot="tabs-list"][data-variant="pill"]:not([data-scroll="false"]),
+[data-slot="tabs-list"][data-scroll="true"] { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+html[data-pro-look] [data-slot="tabs-list"][data-variant="pill"]:not([data-scroll="false"])::-webkit-scrollbar,
+[data-slot="tabs-list"][data-scroll="true"]::-webkit-scrollbar { display: none; }
+html[data-pro-look] [data-slot="tabs-list"][data-variant="pill"]:not([data-scroll="false"]) > [data-slot="tabs-trigger"],
+[data-slot="tabs-list"][data-scroll="true"] > [data-slot="tabs-trigger"] { flex-shrink: 0; }
+
+/* PRO-LOOK-PHONE-2: a tabs list wider than its box scrolls, and the clipped edge fades (edge shades that appear only while there is more to scroll to). */
+html[data-pro-look] [data-slot="tabs-list"][data-variant="line"], html[data-pro-look] [data-slot="tabs-list"][data-variant="pill"] {
+  max-width: 100%; overflow-x: auto; scrollbar-width: none;
+  background:
+    linear-gradient(to right, var(--background) 30%, transparent) left center / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--background) 30%, transparent) right center / 2rem 100% no-repeat local,
+    linear-gradient(to right, color-mix(in srgb, var(--foreground) 14%, transparent), transparent) left center / 1.25rem 100% no-repeat scroll,
+    linear-gradient(to left, color-mix(in srgb, var(--foreground) 14%, transparent), transparent) right center / 1.25rem 100% no-repeat scroll;
+}
+html[data-pro-look] [data-slot="tabs-list"][data-variant="line"]::-webkit-scrollbar { display: none; }
+
+/* PRO-LOOK-PHONE-2: a generic table's phone card row: first column is the title, the rest are small "label value" lines. */
+html[data-pro-look] [data-slot="data-table-card-row"] { gap: 0.125rem; }
+html[data-pro-look] [data-slot="data-table-card-field"] { justify-content: flex-start; gap: 0.5rem; text-align: start; font-size: var(--font-size-supporting); color: var(--muted-foreground); }
+html[data-pro-look] [data-slot="data-table-card-label"], html[data-pro-look] [data-slot="data-table-card-value"] { font-family: inherit; text-align: start; font-size: var(--font-size-supporting); letter-spacing: normal; text-transform: none; color: var(--muted-foreground); }
+html[data-pro-look] [data-slot="data-table-card-field"][data-first] [data-slot="data-table-card-label"] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+html[data-pro-look] [data-slot="data-table-card-field"][data-first] [data-slot="data-table-card-value"] { font-size: var(--font-size-row); font-weight: 600; color: var(--foreground); }
+html[data-pro-look] [data-slot="data-table-mobile-sort"] { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+
 /* The PRO look draws a shelf row action as a ghost icon button; its label stays as the accessible name and tooltip. */
 html[data-pro-look] [data-slot="row-action"]:not([data-variant="inverse"]) { border-color: transparent; background: transparent; box-shadow: none; width: 3rem; min-width: 3rem; padding: 0; }
 html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { display: none; }

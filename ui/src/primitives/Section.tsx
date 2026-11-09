@@ -6,6 +6,8 @@ interface SectionProps {
    * scrollIntoView`) rather than the tree owning a second copy of each
    * section's content. */
   id?: string;
+  /** `flat`: no border, card background or accent bar; a semantic section heading. Under `html[data-pro-look]` it is the default; pass `card` to keep the card. */
+  variant?: "card" | "flat";
   children: ReactNode;
 }
 
@@ -17,9 +19,9 @@ interface SectionProps {
 // the fix, in one place: every page that composes from `Section` -
 // Settings' groups and Memory's schema-driven sections alike - gets a
 // visible boundary for free.
-export function Section({ heading, id, children }: SectionProps) {
+export function Section({ heading, id, variant, children }: SectionProps) {
   return (
-    <section id={id} className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 scroll-mt-4">
+    <section id={id} data-slot="section" data-variant={variant} className={variant === "flat" ? "flex flex-col gap-4 scroll-mt-4" : "flex flex-col gap-4 rounded-xl border border-border bg-card p-5 scroll-mt-4"}>
       {heading ? (
         // A thin brand-colored left rule beside the heading, not the
         // whole card - the same restrained accent placement Jesse's own
@@ -29,7 +31,7 @@ export function Section({ heading, id, children }: SectionProps) {
         // title scale (2026-09-06 visual pass): a section heading this
         // size reads as a real heading on its own, not just a slightly
         // heavier line of body text.
-        <h2 data-slot="section-heading" className="border-l-2 border-primary pl-2 text-lg font-bold text-foreground">{heading}</h2>
+        <h2 data-slot="section-heading" className={variant === "flat" ? "text-section text-foreground" : "border-l-2 border-primary pl-2 text-lg font-bold text-foreground"}>{heading}</h2>
       ) : null}
       {children}
     </section>

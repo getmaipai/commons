@@ -46,12 +46,17 @@ const tabsListVariants = cva(
 function TabsList({
   className,
   variant = "default",
+  scroll,
   ...props
-}: TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants>) {
+}: TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants> & {
+  /** Chip strip: triggers keep their width and the row scrolls sideways with no scrollbar. Under `html[data-pro-look]` the pill variant does this by default; `false` opts out. */
+  scroll?: boolean
+}) {
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
       data-variant={variant}
+      data-scroll={scroll === undefined ? undefined : String(scroll)}
       className={cn("cn-tabs-list", tabsListVariants({ variant }), className)}
       {...props}
     />
