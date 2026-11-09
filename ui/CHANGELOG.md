@@ -1,3 +1,7 @@
+## [ui-v0.5.551] - 2026-11-08
+
+- TALK-01: optional `mouth` prop on `CompanionAvatar` (`{ still, level }`). While speaking, the rest still is shown with the mouth picture crossfaded by the speech level; ignored under reduced motion or `animated={false}`. Defaults remain unchanged.
+
 ## [ui-v0.5.550] - 2026-11-08
 
 - PRO-LOOK-KIT-02: accessible status card progress, phone player art sizing and transparent title controls, plus an optional leading Input slot; defaults remain unchanged.
