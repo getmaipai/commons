@@ -914,6 +914,107 @@ export const Synth = z
               })
               .strict()
               .optional(),
+            /**Optional TALK-04 mouth crops. The anchor is fractions of the rest picture; x+w and y+h must be at most 1.*/
+            mouth: z
+              .object({
+                /**Fractions of the rest picture; x+w and y+h must each be at most 1.*/
+                anchor: z
+                  .object({
+                    x: z.number().gte(0).lte(1),
+                    y: z.number().gte(0).lte(1),
+                    w: z.number().gte(0).lte(1),
+                    h: z.number().gte(0).lte(1),
+                  })
+                  .strict()
+                  .describe(
+                    "Fractions of the rest picture; x+w and y+h must each be at most 1.",
+                  ),
+                shapes: z
+                  .object({
+                    A: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    B: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    C: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    D: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    E: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                    F: z
+                      .string()
+                      .regex(
+                        new RegExp(
+                          "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                        ),
+                      ),
+                  })
+                  .strict(),
+              })
+              .strict()
+              .describe(
+                "Optional TALK-04 mouth crops. The anchor is fractions of the rest picture; x+w and y+h must be at most 1.",
+              )
+              .optional(),
+            /**Optional TALK-04 eye crops for blinking.*/
+            eyes: z
+              .object({
+                /**Fractions of the rest picture; x+w and y+h must each be at most 1.*/
+                anchor: z
+                  .object({
+                    x: z.number().gte(0).lte(1),
+                    y: z.number().gte(0).lte(1),
+                    w: z.number().gte(0).lte(1),
+                    h: z.number().gte(0).lte(1),
+                  })
+                  .strict()
+                  .describe(
+                    "Fractions of the rest picture; x+w and y+h must each be at most 1.",
+                  ),
+                closed: z
+                  .string()
+                  .regex(
+                    new RegExp(
+                      "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                    ),
+                  ),
+                half: z
+                  .string()
+                  .regex(
+                    new RegExp(
+                      "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$",
+                    ),
+                  )
+                  .optional(),
+              })
+              .strict()
+              .describe("Optional TALK-04 eye crops for blinking.")
+              .optional(),
           })
           .strict()
           .optional(),

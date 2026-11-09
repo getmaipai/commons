@@ -2079,6 +2079,140 @@
                   "format": "date-time"
                 }
               }
+            },
+            "mouth": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "anchor",
+                "shapes"
+              ],
+              "description": "Optional TALK-04 mouth crops. The anchor is fractions of the rest picture; x+w and y+h must be at most 1.",
+              "properties": {
+                "anchor": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "x",
+                    "y",
+                    "w",
+                    "h"
+                  ],
+                  "description": "Fractions of the rest picture; x+w and y+h must each be at most 1.",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "w": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "h": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  }
+                },
+                "shapes": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E",
+                    "F"
+                  ],
+                  "properties": {
+                    "A": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "B": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "C": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "D": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "E": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    },
+                    "F": {
+                      "type": "string",
+                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                    }
+                  }
+                }
+              }
+            },
+            "eyes": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "anchor",
+                "closed"
+              ],
+              "description": "Optional TALK-04 eye crops for blinking.",
+              "properties": {
+                "anchor": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "x",
+                    "y",
+                    "w",
+                    "h"
+                  ],
+                  "description": "Fractions of the rest picture; x+w and y+h must each be at most 1.",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "w": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "h": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  }
+                },
+                "closed": {
+                  "type": "string",
+                  "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                },
+                "half": {
+                  "type": "string",
+                  "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.png$"
+                }
+              }
             }
           }
         }

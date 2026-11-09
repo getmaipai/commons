@@ -1,3 +1,7 @@
+## [spec-v0.1.348] - 2026-11-09
+
+- TALK-04, additive. The companion `animation` object accepts optional `mouth` (`anchor` as fractions 0 to 1 of the rest picture, and `shapes` with the six keys A to F, each a png filename) and optional `eyes` (`anchor`, `closed`, optional `half`). Rest is the rest picture; shape X draws nothing. Pairs with ui 0.5.555.
+
 ## [spec-v0.1.347] - 2026-11-09
 
 - 0.1.347: re-release of 0.1.346; the 0.1.346 tag points at the wrong commit, use this one. No schema change.

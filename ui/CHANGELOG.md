@@ -1,3 +1,7 @@
+## [ui-v0.5.555] - 2026-11-09
+
+- TALK-04: `CompanionAvatar`'s `mouth` prop takes optional `shapes` (A to F crop pictures), `anchor` (fractions of the rest picture) and `cue` (the current shape letter from timed speech, or null; X draws no crop); without `shapes` it is unchanged. New optional `eyes` prop (`closed`, `half`, `anchor`, `random`) draws a blink every 3 to 6 s, only while the keyed still is shown during speech, never over a playing clip, never at the header size, and not under reduced motion. The kit draws every crop. Pairs with spec 0.1.348.
+
 ## [ui-v0.5.554] - 2026-11-09
 
 - `PhoneNav` takes an optional `leading` button (`{ label, icon?, onClick, disabled? }`, icon defaults to `arrow-left`) drawn first in the bar. It takes one slot like `trailing`. Defaults remain unchanged.

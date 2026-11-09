@@ -8,17 +8,19 @@ import { icons } from "@/kit/icons";
 import { i18n } from "@/kit/i18n"
 
 type Wanted = Partial<Record<"needs_you" | "speaking" | "working" | "thinking" | "listening" | "sleeping", boolean>>;
-type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl" | "header" | "fill"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "idle" | "listening" | "thinking" | "speaking" | null; animated?: boolean; mouth?: { still: string; level: () => number } | null };
+type Letter = "A" | "B" | "C" | "D" | "E" | "F";
+type Anchor = { x: number; y: number; w: number; h: number };
+type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl" | "header" | "fill"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "idle" | "listening" | "thinking" | "speaking" | null; animated?: boolean; mouth?: { still: string; level: () => number; shapes?: Partial<Record<Letter, string>>; anchor?: Anchor; cue?: () => Letter | "X" | null } | null; eyes?: { closed: string; half?: string; anchor: Anchor; random?: () => number } | null };
 const SIZES = { xs: "size-7", sm: "size-16", md: "size-24", lg: "size-40", xl: "size-52", header: "size-10", fill: "size-full" } as const;
 
-export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null, animated = true, mouth = null }: Props) {
+export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null, animated = true, mouth = null, eyes = null }: Props) {
   const corner = placement === "corner";
   const wrapperClass = corner ? "group pointer-events-none absolute right-3 top-3 z-10" : size === "fill" ? "group relative size-full" : "group relative";
   const ToggleIcon = hidden ? icons.eye : icons["eye-off"];
   const toggleLabel = hidden ? i18n._({ id: "ui.Show the character", message: "Show the character" }) : i18n._({ id: "ui.Hide the character", message: "Hide the character" });
 
   return <div className={cn(wrapperClass)}>
-    {!hidden ? <CompanionAvatarVisual name={name} clips={clips} state={state} wanted={wanted} once={once} size={size} onFail={onFail} className={className} ring={ring} animated={animated} mouth={mouth} /> : null}
+    {!hidden ? <CompanionAvatarVisual name={name} clips={clips} state={state} wanted={wanted} once={once} size={size} onFail={onFail} className={className} ring={ring} animated={animated} mouth={mouth} eyes={eyes} /> : null}
     {onHiddenChange ? <Button
       type="button"
       variant="ghost"
@@ -30,7 +32,7 @@ export function CompanionAvatar({ name, clips, state, wanted, once, size = "md",
   </div>;
 }
 
-function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", onFail, className, ring = null, animated = true, mouth = null }: Omit<Props, "placement" | "hidden" | "onHiddenChange">) {
+function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", onFail, className, ring = null, animated = true, mouth = null, eyes = null }: Omit<Props, "placement" | "hidden" | "onHiddenChange">) {
   const machine = useMemo(() => createCompanionAvatarMachine(clips), [clips]);
   const [current, setCurrent] = useState<StateId>(state ?? "idle");
   const [failed, setFailed] = useState(false);
@@ -71,9 +73,12 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
   const clip = clips[current] ?? clips.idle;
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mouthLayerRef = useRef<HTMLImageElement | null>(null);
-  const mouthActive = Boolean(mouth && wantedState === "speaking" && animated && !reduced && documentVisible && !failed);
+  const [shapeLetter, setShapeLetter] = useState<Letter | null>(null);
+  const [blink, setBlink] = useState<"half" | "closed" | null>(null);
+  const mouthActive = Boolean(mouth && wantedState === "speaking" && animated && !reduced && documentVisible && !failed && size !== "header");
+  const shapeMode = Boolean(mouth?.shapes && mouth.anchor);
   useEffect(() => {
-    if (!mouthActive || !mouth || !mouthLayerRef.current) return;
+    if (!mouthActive || !mouth || shapeMode || !mouthLayerRef.current) return;
     let frame = 0;
     const update = () => {
       const layer = mouthLayerRef.current;
@@ -88,7 +93,44 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
     };
     frame = window.requestAnimationFrame(update);
     return () => window.cancelAnimationFrame(frame);
-  }, [mouthActive, mouth]);
+  }, [mouthActive, mouth, shapeMode]);
+  useEffect(() => {
+    if (!mouthActive || !mouth || !shapeMode) { setShapeLetter(null); return; }
+    let frame = 0;
+    const update = () => {
+      let chosen: Letter | null = null;
+      try {
+        const cue = mouth.cue?.();
+        if (cue && cue !== "X") chosen = cue;
+        else if (!cue) {
+          const value = mouth.level();
+          if (Number.isFinite(value)) chosen = value < 0.06 ? null : value < 0.18 ? "B" : value < 0.35 ? "C" : value < 0.6 ? "D" : "E";
+        }
+      } catch { /* Missing audio data leaves the base still visible. */ }
+      setShapeLetter(chosen);
+      frame = window.requestAnimationFrame(update);
+    };
+    frame = window.requestAnimationFrame(update);
+    return () => window.cancelAnimationFrame(frame);
+  }, [mouthActive, mouth, shapeMode]);
+  const blinkTimer = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    window.clearTimeout(blinkTimer.current);
+    blinkTimer.current = undefined;
+    setBlink(null);
+    const active = Boolean(eyes && mouthActive && animated && !reduced && documentVisible && !failed && wantedState === "speaking" && size !== "header");
+    if (!active || !eyes) return () => window.clearTimeout(blinkTimer.current);
+    let phase: number | undefined;
+    const schedule = () => {
+      const random = eyes.random ?? Math.random;
+      blinkTimer.current = window.setTimeout(() => {
+        if (eyes.half) { setBlink("half"); phase = window.setTimeout(() => { setBlink("closed"); phase = window.setTimeout(() => { setBlink(null); schedule(); }, 110); }, 50); }
+        else { setBlink("closed"); phase = window.setTimeout(() => { setBlink(null); schedule(); }, 110); }
+      }, 3000 + Math.floor(Math.max(0, Math.min(0.999999, random())) * 3001));
+    };
+    schedule();
+    return () => { window.clearTimeout(blinkTimer.current); window.clearTimeout(phase); blinkTimer.current = undefined; };
+    }, [eyes, mouthActive, animated, reduced, documentVisible, failed, wantedState, size]);
   useEffect(() => {
     const video = videoRef.current;
     const canAv1 = !!clip.av1 && video?.canPlayType('video/mp4; codecs="av01.0.05M.08"') === "probably";
@@ -116,6 +158,7 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
     if (result.failed) { setFailed(true); onFail?.(); }
   }, [clip.h264, machine, onFail, source]);
   const movable = animated && !reduced && documentVisible && !failed && Boolean(clip?.h264 || clip?.av1);
+  const cropStyle = (anchor: Anchor) => ({ left: `${anchor.x * 100}%`, top: `${anchor.y * 100}%`, width: `${anchor.w * 100}%`, height: `${anchor.h * 100}%` });
   // Four rings that differ in shape and motion, not only colour: idle is a thin dotted ring, listening a solid ring with an outward ripple,
   // thinking a dashed ring that turns slowly, speaking a thick solid ring with a pulsing glow. Reduced motion keeps every shape, still.
   const ringClass = ring === "idle" ? "-inset-1 border-2 border-dotted border-muted-foreground/60"
@@ -125,7 +168,7 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
   return <div role="img" aria-label={ring ? i18n._({ id: "ui.{name}, {ring}", message: "{name}, {ring}", values: { name, ring } }) : name} data-ring={ring ?? undefined} className={cn(SIZES[size], "pointer-events-none relative", className)}>
     {ring ? <span aria-hidden="true" className={cn("absolute rounded-full", ringClass)} /> : null}
     {ring === "listening" && !reduced ? <span aria-hidden="true" data-ring-ripple="" className="absolute -inset-1.5 animate-ping rounded-full border-2 border-primary/50" /> : null}
-    {mouthActive && mouth ? <div aria-hidden="true" data-mouth="active" className="relative size-full"><SafeImage src={clips.idle.still} alt="" className="size-full object-contain" /><SafeImage imageRef={mouthLayerRef} src={mouth.still} alt="" className="absolute inset-0 size-full object-contain transition-opacity duration-[60ms]" style={{ opacity: 0 }} /></div>
+    {mouthActive && mouth ? <div aria-hidden="true" data-mouth="active" className="relative size-full"><SafeImage src={clips.idle.still} alt="" className="size-full object-contain" />{shapeMode && mouth.shapes && mouth.anchor ? <>{(Object.entries(mouth.shapes) as [Letter, string][]).map(([letter, src]) => <SafeImage key={letter} src={src} alt="" data-mouth-shape={letter} className="absolute object-contain transition-opacity duration-[60ms]" style={{ ...cropStyle(mouth.anchor!), opacity: shapeLetter === letter ? 1 : 0 }} />)}</> : <SafeImage imageRef={mouthLayerRef} src={mouth.still} alt="" className="absolute inset-0 size-full object-contain transition-opacity duration-[60ms]" style={{ opacity: 0 }} />}{eyes && mouthActive && size !== "header" ? <SafeImage src={blink === "half" ? eyes.half ?? eyes.closed : blink === "closed" ? eyes.closed : ""} alt="" className={cn("absolute object-contain", blink ? "" : "hidden")} style={cropStyle(eyes.anchor)} /> : null}</div>
       : movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264 || ""} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <SafeImage src={clip.still} alt="" className="size-full object-contain" />}
   </div>;
 }

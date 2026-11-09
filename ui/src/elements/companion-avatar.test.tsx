@@ -279,3 +279,70 @@ test("a throwing mouth level is treated as zero", () => {
   window.requestAnimationFrame = oldRaf; window.cancelAnimationFrame = oldCancel;
   restore();
 });
+
+test("mouth shapes follow cue letters and X hides the crop", () => {
+  const restore = setup();
+  const oldRaf = window.requestAnimationFrame; const oldCancel = window.cancelAnimationFrame;
+  let callback: FrameRequestCallback | undefined;
+  window.requestAnimationFrame = ((next: FrameRequestCallback) => { callback = next; return 1; }) as typeof window.requestAnimationFrame;
+  window.cancelAnimationFrame = (() => {}) as typeof window.cancelAnimationFrame;
+  let cue: "A" | "B" | "C" | "D" | "E" | "F" | "X" | null = "C";
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={{ still: "legacy.png", level: () => 0, cue: () => cue, anchor: { x: .2, y: .3, w: .4, h: .2 }, shapes: { B: "b.png", C: "c.png" } }} />);
+  act(() => callback!(0));
+  expect((view.container.querySelector('[data-mouth-shape="C"]') as HTMLImageElement).style.opacity).toBe("1");
+  expect((view.container.querySelector('[data-mouth-shape="B"]') as HTMLImageElement).style.opacity).toBe("0");
+  expect((view.container.querySelector('[data-mouth-shape="C"]') as HTMLImageElement).style.cssText).toContain("left: 20%");
+  cue = "X"; act(() => callback!(16));
+  expect(Array.from(view.container.querySelectorAll("[data-mouth-shape]")).every((img) => (img as HTMLElement).style.opacity === "0")).toBe(true);
+  view.unmount(); window.requestAnimationFrame = oldRaf; window.cancelAnimationFrame = oldCancel; restore();
+});
+
+test("mouth shape levels choose threshold crops", () => {
+  const restore = setup(); const oldRaf = window.requestAnimationFrame; const oldCancel = window.cancelAnimationFrame;
+  let callback: FrameRequestCallback | undefined;
+  window.requestAnimationFrame = ((next: FrameRequestCallback) => { callback = next; return 1; }) as typeof window.requestAnimationFrame; window.cancelAnimationFrame = (() => {}) as typeof window.cancelAnimationFrame;
+  let level = .2;
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={{ still: "legacy.png", level: () => level, anchor: { x: 0, y: 0, w: .5, h: .5 }, shapes: { B: "b.png", C: "c.png", D: "d.png", E: "e.png" } }} />);
+  act(() => callback!(0)); expect((view.container.querySelector('[data-mouth-shape="C"]') as HTMLElement).style.opacity).toBe("1");
+  level = .04; act(() => callback!(16)); expect(Array.from(view.container.querySelectorAll("[data-mouth-shape]")).every((img) => (img as HTMLElement).style.opacity === "0")).toBe(true);
+  level = .7; act(() => callback!(32)); expect((view.container.querySelector('[data-mouth-shape="E"]') as HTMLElement).style.opacity).toBe("1");
+  view.unmount(); window.requestAnimationFrame = oldRaf; window.cancelAnimationFrame = oldCancel; restore();
+});
+
+test("eye blink follows the delay and is suppressed when motion is unavailable", () => {
+  const restore = setup();
+  const oldSetTimeout = window.setTimeout; const oldClearTimeout = window.clearTimeout;
+  let nextId = 1; const timers = new Map<number, { fn: TimerHandler; delay: number }>();
+  window.setTimeout = ((fn: TimerHandler, delay = 0) => { const id = nextId++; timers.set(id, { fn, delay }); return id; }) as typeof window.setTimeout;
+  window.clearTimeout = ((id?: number) => { if (id !== undefined) timers.delete(id); }) as typeof window.clearTimeout;
+  const runNext = () => { const next = [...timers].sort((a, b) => a[1].delay - b[1].delay)[0]; if (!next) throw new Error("No scheduled timer"); const [id, timer] = next; timers.delete(id); act(() => (timer.fn as () => void)()); };
+  const eyes = { closed: "closed.png", half: "half.png", anchor: { x: .1, y: .2, w: .3, h: .2 }, random: () => 0 };
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={{ still: "mouth.png", level: () => 0 }} eyes={eyes} />);
+  expect(timers.size).toBe(1); runNext();
+  expect(view.container.querySelector('img[src="half.png"]')).toBeTruthy();
+  runNext(); expect(view.container.querySelector('img[src="closed.png"]')).toBeTruthy();
+  view.unmount();
+  window.setTimeout = oldSetTimeout; window.clearTimeout = oldClearTimeout; restore();
+});
+
+test("shape crops and blinks are disabled for reduced motion, hidden docs, static mode, and header", () => {
+  const restore = setup();
+  const oldVisibility = Object.getOwnPropertyDescriptor(document, "hidden");
+  const mouth = { still: "mouth.png", level: () => 1, anchor: { x: 0, y: 0, w: 1, h: 1 }, shapes: { E: "e.png" } };
+  const eyes = { closed: "closed.png", anchor: { x: 0, y: 0, w: 1, h: 1 } };
+  window.matchMedia = (() => ({ matches: true, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  const reduced = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={mouth} eyes={eyes} />);
+  expect(reduced.container.querySelector("[data-mouth-shape]")).toBeNull(); reduced.unmount();
+  window.matchMedia = (() => ({ matches: false, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  Object.defineProperty(document, "hidden", { configurable: true, value: true });
+  const hidden = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={mouth} eyes={eyes} />);
+  expect(hidden.container.querySelector("[data-mouth-shape]")).toBeNull(); hidden.unmount();
+  Object.defineProperty(document, "hidden", { configurable: true, value: false });
+  const staticView = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={mouth} eyes={eyes} animated={false} />);
+  expect(staticView.container.querySelector("[data-mouth-shape]")).toBeNull(); staticView.unmount();
+  const header = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" size="header" mouth={mouth} eyes={eyes} />);
+  expect(header.container.querySelector("[data-mouth-shape]")).toBeNull(); expect(header.container.querySelector('img[src="closed.png"]')).toBeNull();
+  header.unmount();
+  if (oldVisibility) Object.defineProperty(document, "hidden", oldVisibility); else delete (document as { hidden?: boolean }).hidden;
+  restore();
+});
