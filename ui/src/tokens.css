@@ -2674,6 +2674,13 @@ html[data-ease-contrast="more"] [data-surface="studio"] {
   --muted-foreground: color-mix(in srgb, var(--background), var(--foreground) 80%);
 }
 
+/* The PRO look draws a section title bare: no brand rule beside it. */
+html[data-pro-look] [data-slot="section-heading"] { border-left-width: 0; padding-left: 0; }
+
+/* The PRO look draws a shelf row action as a ghost icon button; its label stays as the accessible name and tooltip. */
+html[data-pro-look] [data-slot="row-action"]:not([data-variant="inverse"]) { border-color: transparent; background: transparent; box-shadow: none; width: 3rem; min-width: 3rem; padding: 0; }
+html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { display: none; }
+
 /* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */
 /* Targets: --target-min is the smallest control size; the rail reads --rail-button and --rail-width. */
 :root {

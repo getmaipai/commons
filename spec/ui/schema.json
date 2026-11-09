@@ -437,6 +437,8 @@
               "icon": { "type": "string", "minLength": 1 },
               "label": { "type": "string", "minLength": 1 },
               "label_field": { "type": "string", "minLength": 1 },
+              "show_when_field": { "type": "string", "minLength": 1, "description": "Draw this button only when this row field is truthy." },
+              "hide_when_field": { "type": "string", "minLength": 1, "description": "Draw this button only when this row field is falsy." },
               "action": { "$ref": "#/$defs/action" }
             }
           }

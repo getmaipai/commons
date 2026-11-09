@@ -1183,6 +1183,8 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
               : undefined}
             renderActions={node.row_actions?.length
               ? (row) => node.row_actions!.map((button, i) => {
+                  if (button.show_when_field && !readField(row, button.show_when_field)) return null;
+                  if (button.hide_when_field && readField(row, button.hide_when_field)) return null;
                   const Icon = getIcon(button.icon);
                   const fieldLabel = button.label_field ? readField(row, button.label_field) : undefined;
                   const label = typeof fieldLabel === "string" && fieldLabel !== "" ? fieldLabel : fillTemplate(button.label, row);
@@ -1191,13 +1193,15 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
                     <Button
                       key={i}
                       type="button"
+                      data-slot="row-action"
+                      title={label}
                       variant={iconOnly ? "inverse" : "outline"}
                       size={iconOnly ? "icon" : "default"}
                       className={iconOnly ? "size-[48px] rounded-full" : "h-auto min-h-[48px] rounded-full whitespace-normal"}
                       aria-label={`${label}: ${String(readField(row, node.item_label_field))}`}
                       onClick={() => dispatch(button.action, [row])}
                     >
-                      <Icon aria-hidden="true" />{iconOnly ? null : label}
+                      <Icon aria-hidden="true" />{iconOnly ? null : <span data-slot="row-action-label">{label}</span>}
                     </Button>
                   );
                 })
@@ -1721,7 +1725,9 @@ function PlayerDetails({ title, subtitle, facts, description, chapters, seek, sh
 function PlayerActions({ actions, item, dispatch, wrap, children }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"]; wrap?: boolean; children?: ReactNode }) {
   const [busy, setBusy] = useState<string | null>(null);
   return (
-    <div className={wrap ? "flex min-w-0 flex-wrap gap-2 pb-1" : "flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"} role="group" aria-label={i18n._({ id: "ui.Actions", message: "Actions" })} data-slot="player-actions">
+    <div className={wrap ? "flex min-w-0 flex-wrap gap-2 pb-1" : "flex min-w-0 items-center gap-2 pb-1"} role="group" aria-label={i18n._({ id: "ui.Actions", message: "Actions" })} data-slot="player-actions">
+      {/* The buttons scroll sideways in their own strip; the trailing child (Edit) sits outside it so it is never scrolled away. */}
+      <div className={wrap ? "contents" : "flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none]"} data-slot="player-actions-strip">
       {actions.map((a) => {
         const on = a.field ? readField(item, a.field) === true : false;
         const Glyph = a.icon ? getIcon(a.icon) : null;
@@ -1743,7 +1749,8 @@ function PlayerActions({ actions, item, dispatch, wrap, children }: { actions: P
           </Button>
         );
       })}
-      {children}
+      </div>
+      {children ? <div className="flex shrink-0 items-center gap-2">{children}</div> : null}
     </div>
   );
 }

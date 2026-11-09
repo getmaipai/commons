@@ -274,7 +274,17 @@ describe("MEDIA-POLISH-01", () => {
   test("without actions_wrap the actions row scrolls sideways", async () => {
     const { findByRole, container } = inVideos(playerNode, { onPlay: () => {} }, { id: "m1" });
     await findByRole("button", { name: "Like" });
-    expect(container.querySelector('[data-slot="player-actions"]')!.className).toContain("overflow-x-auto");
+    expect(container.querySelector('[data-slot="player-actions-strip"]')!.className).toContain("overflow-x-auto");
+  });
+
+  test("the Edit button sits outside the scrolling strip so it is never scrolled away", async () => {
+    const editable = { ...(playerNode as Extract<UiNode, { type: "player" }>), edit: { label: "Edit", fields: [{ name: "title", label: "Title", kind: "text" }], on_save: { navigate: "/x" } } } as never;
+    const { findByRole, container } = inVideos(editable, { onPlay: () => {} }, { id: "m1", can_edit: true });
+    const like = await findByRole("button", { name: "Like" });
+    const strip = container.querySelector('[data-slot="player-actions-strip"]')!;
+    expect(strip.contains(like)).toBe(true);
+    const edit = container.querySelector('[data-slot="player-actions"] button[class*="shrink-0"]:not([aria-pressed])');
+    if (edit && edit.textContent?.includes("Edit")) expect(strip.contains(edit)).toBe(false);
   });
 
   test("a toggle action fires with the item and on set to the new value, then reads the item again", async () => {

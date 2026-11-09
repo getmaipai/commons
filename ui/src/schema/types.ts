@@ -214,6 +214,9 @@ export const MediaShelfNodeSchema = z.object({
     icon: z.string().min(1),
     label: z.string().min(1),
     label_field: z.string().min(1).optional(),
+    /** Draw this button only when that row field is truthy (`show_when_field`) or falsy (`hide_when_field`). */
+    show_when_field: z.string().min(1).optional(),
+    hide_when_field: z.string().min(1).optional(),
     action: ActionSchema,
   }).strict()).max(2).optional(),
   // MUSIC-KIT-01: the modern music look.

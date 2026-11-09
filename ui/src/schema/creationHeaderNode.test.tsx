@@ -91,17 +91,17 @@ describe("creation_header schema node", () => {
 describe("creation_header studio variant (VIDEO-STUDIO-03)", () => {
   const studio = (extra: Record<string, unknown> = {}) => CreationHeaderNodeSchema.parse({ ...node, variant: "studio", eyebrow: "Studio", primary: { label: "Export as a new clip", action: { navigate: { to: "/export" } } }, secondary: { label: "Back to the clip", action: { navigate: { to: "/back" } } }, ...extra });
   const serve = (data: unknown) => { globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify(data), { status: 200 }))) as unknown as typeof fetch; };
-  test("draws the eyebrow, an uppercase title, the art and the end side actions, and none of the creator line or share chip", async () => {
+  test("draws the eyebrow, a sentence-case title, the art and the end side actions, and none of the creator line or share chip", async () => {
     const original = globalThis.fetch;
     serve({ ...row, title: "Paper boat in the rain", art: "/poster.jpg" });
     try {
       const view = renderWithQueryClient(<MemoryRouter><NodeRenderer node={studio()} /></MemoryRouter>);
       const h = await view.findByRole("heading", { name: "Paper boat in the rain" });
-      expect(h.className).toContain("uppercase");
-      expect(h.className).toContain("font-black");
+      expect(h.className).not.toContain("uppercase");
+      expect(h.className).toContain("font-semibold");
       const header = view.container.querySelector("header[data-variant=studio]")!;
       expect(header.querySelector("[data-slot=creation-header-eyebrow]")!.textContent).toBe("Studio");
-      expect(header.querySelector("[data-slot=creation-header-eyebrow]")!.className).toContain("uppercase");
+      expect(header.querySelector("[data-slot=creation-header-eyebrow]")!.className).not.toContain("uppercase");
       expect(header.querySelector("[data-slot=creation-header-art] img")!.getAttribute("src")).toBe("/poster.jpg");
       const actions = within(header.querySelector("[data-slot=creation-header-actions]") as HTMLElement).getAllByRole("button");
       expect(actions.map((b) => b.textContent)).toEqual(["Back to the clip", "Export as a new clip"]);

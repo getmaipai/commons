@@ -1137,7 +1137,8 @@ export function Player(props: PlayerProps) {
         // buttons below the fold. The width stops where the picture is as tall as the window less the header and the title
         // block (never under 22rem), so the title shows under the picture the way it does on a video site.
         style={{ maxWidth: "max(22rem, calc((100dvh - 14rem) * 16 / 9))" }}
-        className="relative w-full overflow-hidden rounded-[var(--player-radius)] bg-[var(--art-surface)]"
+        // shrink-0: overflow-hidden lets a flex or grid parent squeeze the box below its 16:9 height, which clipped the control bar on a phone.
+        className="relative h-auto w-full shrink-0 overflow-hidden rounded-[var(--player-radius)] bg-[var(--art-surface)]"
       >
         <MediaController
           key="controller"
@@ -1145,7 +1146,8 @@ export function Player(props: PlayerProps) {
           noHotkeys
           gesturesDisabled
           defaultStreamType="on-demand"
-          style={{ ...controllerStyle, aspectRatio: "16 / 9", display: "block" }}
+          // minHeight keeps the whole bar (seek line, buttons) inside the box on a 320 px wide screen, where 16:9 is only 180 px.
+          style={{ ...controllerStyle, aspectRatio: "16 / 9", display: "block", minHeight: "11rem" }}
           aria-label={title}
         >
           {mediaElement}

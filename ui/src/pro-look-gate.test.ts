@@ -81,4 +81,10 @@ describe("PRO look gate", () => {
     }
     expect(css).not.toContain("text-pro-look-")
   })
+
+  test("the PRO look draws a section title without the brand rule", () => {
+    const rule = /html\[data-pro-look\] \[data-slot="section-heading"\] \{([^}]*)\}/.exec(css)?.[1] ?? ""
+    expect(rule).toContain("border-left-width: 0")
+    expect(rule).toContain("padding-left: 0")
+  })
 })

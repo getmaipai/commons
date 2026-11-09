@@ -161,6 +161,17 @@ describe("media variant node rendering", () => {
     expect(calls).toHaveLength(0);
   });
 
+  test("show_when_field and hide_when_field draw each row action for one state of that field", async () => {
+    const action = { call: { target: "/api/plugins/music/x", args: {} } };
+    const node = MediaShelfNodeSchema.parse({ ...music.body[1], row_actions: [{ icon: "circle-dot", label: "Save", show_when_field: "playing", action }, { icon: "square", label: "Keep", hide_when_field: "playing", action }] });
+    const { findAllByRole, queryAllByRole } = mount(node);
+    await findAllByRole("button", { name: /^(Save|Keep): / });
+    const saves = queryAllByRole("button", { name: /^Save: / }).length;
+    const keeps = queryAllByRole("button", { name: /^Keep: / }).length;
+    expect(saves + keeps).toBeGreaterThan(0);
+    expect(saves).toBeLessThan(saves + keeps);
+  });
+
   test("a confirmed row action keeps its row fields through the confirmation", async () => {
     const node = MediaShelfNodeSchema.parse({ ...music.body[1], row_actions: [{ icon: "bookmark", label: "Save", action: { confirm: { prompt: "Save {title}?", on_confirm: { call: { target: "/api/plugins/music/save", args: { media_id: "{id}" } } } } } }] });
     const { findByRole } = mount(node);

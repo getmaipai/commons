@@ -173,6 +173,7 @@ import {
   SquarePen,
   Compass,
   CircleAlert,
+  CircleDot,
   Layers,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -292,6 +293,7 @@ export const icons = {
   zap: Zap,
   speech: Speech,
   square: Square,
+  "circle-dot": CircleDot,
   sun: Sun,
   "thumbs-down": ThumbsDown,
   "thumbs-up": ThumbsUp,

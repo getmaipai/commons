@@ -405,6 +405,12 @@ describe("Player", () => {
     expect(onNext).toHaveBeenCalledWith("m2");
   });
 
+  test("the video box never shrinks below its 16:9 height", () => {
+    const view = render(<Player src="/a" title="Lanterns" kind="video" layout="video" />);
+    const root = view.container.querySelector("[data-slot=player]") as HTMLElement;
+    expect(root.className).toContain("shrink-0");
+  });
+
   test("the video layout is never taller than the window, so the title stays on screen under it", () => {
     const view = render(<Player src="/a" title="Lanterns" kind="video" layout="video" />);
     const root = view.container.querySelector("[data-slot=player]") as HTMLElement;

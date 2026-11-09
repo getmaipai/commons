@@ -66,7 +66,7 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
       <div data-slot="creation-header-art" aria-hidden className="absolute inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: artSrc ? `url(${JSON.stringify(artSrc).slice(1, -1)})` : `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 45%, transparent))` }} />
       <div aria-hidden className="absolute inset-0 -z-10 bg-[image:var(--scrim-hero)]" />
       <div className="flex flex-col items-start gap-3">
-        {eyebrow ? <span className="text-[13px] tracking-widest text-[color:var(--art-foreground)]/75 uppercase">{eyebrow}</span> : null}
+        {eyebrow ? <span className="text-[13px] text-[color:var(--art-foreground)]/75">{eyebrow}</span> : null}
         <Heading className="text-[length:var(--font-size-hero)] font-[var(--font-weight-hero)] tracking-tight text-[color:var(--art-foreground)]">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
         {creatorLine ? <p className="text-sm text-[color:var(--art-foreground)]/75">{creatorLine}</p> : null}
         <div className="flex flex-wrap items-center gap-2">
@@ -90,8 +90,8 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
         {!locked && artSrc ? <div data-slot="creation-header-art" aria-hidden className="size-14 shrink-0 overflow-hidden rounded-xl sm:size-[4.5rem]"><Cover id={artSrc} title="" url={artSrc} bare /></div> : null}
         {locked ? null : (
           <div className="flex min-w-0 flex-1 basis-60 flex-col gap-1">
-            {eyebrowText ? <span data-slot="creation-header-eyebrow" className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">{eyebrowText}</span> : null}
-            <Heading className="text-foreground min-w-0 text-3xl leading-none font-black tracking-tight break-words uppercase sm:text-[2.5rem]">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
+            {eyebrowText ? <span data-slot="creation-header-eyebrow" className="text-muted-foreground text-xs font-semibold">{eyebrowText}</span> : null}
+            <Heading className="text-foreground min-w-0 text-2xl leading-tight font-semibold tracking-tight break-words sm:text-3xl">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
           </div>
         )}
         {primary || secondary ? <div data-slot="creation-header-actions" className="ms-auto flex flex-wrap items-center gap-2">{secondary ? pill(secondary, "secondary") : null}{primary ? pill(primary, "default") : null}</div> : null}

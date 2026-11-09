@@ -75,6 +75,17 @@ describe("PromptBar", () => {
     expect(getByText("Video is not ready yet. Try again in a minute.")).toBeTruthy();
   });
 
+  test("an error is an in-flow status row above the field, not floating text", () => {
+    const { getByRole, container } = render(<PromptBar label="Describe" value="x" onValueChange={() => {}} onSubmit={() => {}} error="You already have a video being made." />);
+    const row = getByRole("alert");
+    expect(row.getAttribute("data-slot")).toBe("prompt-bar-error");
+    expect(row.getAttribute("data-status-kind")).toBe("problem");
+    expect(row.className).not.toMatch(/\b(absolute|fixed)\b/);
+    expect(row.className).toContain("--tint-problem");
+    const field = container.querySelector("textarea")!;
+    expect(row.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   test("the leading slot is drawn at the start of the chip row", () => {
     const { getByTestId, container } = render(<PromptBar label="Describe" value="x" onValueChange={() => {}} onSubmit={() => {}} chips={[shape()]} leading={<span data-testid="frame">Start frame</span>} />);
     const row = container.querySelector('[data-slot="prompt-bar-chips"]')!;

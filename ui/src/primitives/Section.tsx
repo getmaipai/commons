@@ -29,7 +29,7 @@ export function Section({ heading, id, children }: SectionProps) {
         // title scale (2026-09-06 visual pass): a section heading this
         // size reads as a real heading on its own, not just a slightly
         // heavier line of body text.
-        <h2 className="border-l-2 border-primary pl-2 text-lg font-bold text-foreground">{heading}</h2>
+        <h2 data-slot="section-heading" className="border-l-2 border-primary pl-2 text-lg font-bold text-foreground">{heading}</h2>
       ) : null}
       {children}
     </section>

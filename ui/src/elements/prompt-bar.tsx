@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, type ReactNode } from "react";
-import { ChevronDown, Film, Image as ImageIcon, Mic, Plus, SlidersHorizontal, Trash2, ArrowUp, X } from "lucide-react";
+import { ChevronDown, Film, Image as ImageIcon, Mic, Plus, SlidersHorizontal, Trash2, ArrowUp, X, CircleAlert } from "lucide-react";
 import { cn } from "cn";
 import { FOCUS_RING_INSET } from "../utils";
 import { Button } from "../ui/button";
@@ -197,12 +197,20 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
 
   function trySubmit() { if (ready) onSubmit(); }
 
-  const notes = (
+  const errorRow = (
     <>
-      {disabledReason ? <p role="status" data-slot="prompt-bar-note" className="text-sm text-muted-foreground">{disabledReason}</p> : null}
-      {error ? <p role="status" data-slot="prompt-bar-error" className="text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        // An in-flow status row (the status card's problem tokens), never floating text over the field.
+        <p role="alert" data-slot="prompt-bar-error" data-status-kind="problem" className="flex w-full min-w-0 items-start gap-2 rounded-xl bg-[var(--tint-problem)] px-3 py-2 text-sm text-[var(--destructive)] ring-1 ring-inset ring-[var(--tint-problem-border)]">
+          <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          <span className="min-w-0 flex-1">{error}</span>
+        </p>
+      ) : null}
     </>
   );
+  const disabledNote = disabledReason ? <p role="status" data-slot="prompt-bar-note" className="text-sm text-muted-foreground">{disabledReason}</p> : null;
+  // The dock keeps both together above its field; the inline and panel placements draw the error above the field and the reason under it.
+  const notes = <>{disabledNote}{errorRow}</>;
 
   const large = fieldSize === "large";
   const textbox = (rows: number, extra?: string) => {
@@ -371,6 +379,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         className={cn("flex w-full min-w-0 flex-col gap-3", className)}
         onSubmit={(e) => { e.preventDefault(); trySubmit(); }}
       >
+        {errorRow}
         {fieldBox(8, false)}
         {suggestionRow}
         {suggestedRow}
@@ -389,7 +398,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
           <Button type="submit" shape={shape === "pill" ? "pill" : undefined} disabled={!ready} className={cn("min-h-[48px] px-6", inButton && "h-16")} aria-describedby={submitDetail ? detailId : undefined} aria-label={inButton ? submitLabel : undefined}>{inButton ? buttonFace : submitLabel}</Button>
         </div>
         {detailLine}
-        {notes}
+        {disabledNote}
       </form>
     );
   }
@@ -420,6 +429,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
       >
         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a keyboard-scrollable region, not a widget (DetailPane's own precedent). */}
         <div data-slot="prompt-bar-body" tabIndex={0} aria-label={optionsLabel} role="group" className={cn("flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4", FOCUS_RING_INSET)}>
+          {errorRow}
           {fieldBox(10, false)}
           {suggestionRow}
           {suggestedRow}
@@ -437,7 +447,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         <div data-slot="prompt-bar-foot" className="flex shrink-0 flex-col gap-2 border-t border-border p-4">
           {submitButton(false)}
           {detailLine}
-          {notes}
+          {disabledNote}
         </div>
       </form>
     );
