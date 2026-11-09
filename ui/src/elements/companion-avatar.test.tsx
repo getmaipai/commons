@@ -2,8 +2,18 @@ import { afterEach, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { CompanionAvatar } from "./companion-avatar";
 import type { CompanionClips } from "./companion-avatar-machine";
+import { levelMouthLetter, nextMouthLetter } from "./companion-avatar-motion";
 
 afterEach(cleanup);
+test("mouth openness mapping and stepping stay within the legal sequence", () => {
+  expect([0, .059, .06, .199, .2, .399, .4, 1].map((v) => levelMouthLetter(v, true))).toEqual(["A", "A", "B", "B", "C", "C", "D", "D"]);
+  expect(levelMouthLetter(0, false)).toBeNull();
+  expect(levelMouthLetter(1, true)).not.toBe("E");
+  expect(levelMouthLetter(1, true)).not.toBe("F");
+  expect(nextMouthLetter("A", "D", 70)).toBe("C");
+  expect(nextMouthLetter("D", "A", 70)).toBe("C");
+  expect(nextMouthLetter("A", "D", 69)).toBe("A");
+});
 const clip = (name: string, loop = true) => ({ h264: `${name}.mp4`, av1: `${name}.av1.mp4`, still: `${name}.png`, loop });
 const clips: CompanionClips = { idle: clip("idle"), thinking: clip("thinking"), needs_you: clip("needs"), happy: clip("happy", false), greeting: clip("greeting", false) };
 function setup() {
@@ -304,8 +314,8 @@ test("mouth shape levels choose threshold crops", () => {
   let level = .2;
   const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={{ still: "legacy.png", level: () => level, anchor: { x: 0, y: 0, w: .5, h: .5 }, shapes: { B: "b.png", C: "c.png", D: "d.png", E: "e.png" } }} />);
   act(() => callback!(0)); expect((view.container.querySelector('[data-mouth-shape="C"]') as HTMLElement).style.opacity).toBe("1");
-  level = .04; act(() => callback!(16)); expect(Array.from(view.container.querySelectorAll("[data-mouth-shape]")).every((img) => (img as HTMLElement).style.opacity === "0")).toBe(true);
-  level = .7; act(() => callback!(32)); expect((view.container.querySelector('[data-mouth-shape="E"]') as HTMLElement).style.opacity).toBe("1");
+  level = .04; act(() => callback!(16)); expect((view.container.querySelector('[data-mouth-shape="C"]') as HTMLElement).style.opacity).toBe("1");
+  level = .7; act(() => callback!(32)); expect((view.container.querySelector('[data-mouth-shape="C"]') as HTMLElement).style.opacity).toBe("1");
   view.unmount(); window.requestAnimationFrame = oldRaf; window.cancelAnimationFrame = oldCancel; restore();
 });
 
@@ -345,4 +355,26 @@ test("shape crops and blinks are disabled for reduced motion, hidden docs, stati
   header.unmount();
   if (oldVisibility) Object.defineProperty(document, "hidden", oldVisibility); else delete (document as { hidden?: boolean }).hidden;
   restore();
+});
+
+test("life motion moves the whole figure and stays off for life 0", () => {
+  const restore = setup(); const oldRaf = window.requestAnimationFrame; const oldCancel = window.cancelAnimationFrame;
+  let queue: FrameRequestCallback[] = [];
+  window.requestAnimationFrame = ((next: FrameRequestCallback) => { queue.push(next); return queue.length; }) as typeof window.requestAnimationFrame;
+  const tick = (at: number) => { const run = queue; queue = []; for (const next of run) act(() => next(at)); };
+  window.cancelAnimationFrame = (() => {}) as typeof window.cancelAnimationFrame;
+  const shapes = { B: "b.png", C: "c.png", D: "d.png" }, anchor = { x: 0, y: 0, w: .5, h: .5 };
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={{ still: "legacy.png", level: () => .3, anchor, shapes }} />);
+  const box = () => view.container.querySelector('[data-mouth="active"]') as HTMLElement;
+  tick(performance.now() + 1000);
+  const first = box().style.transform;
+  expect(first).toContain("rotate("); expect(first).toContain("scale(");
+  expect(box().style.transformOrigin).toBe("50% 85%");
+  tick(performance.now() + 4000);
+  expect(box().style.transform).not.toBe(first);
+  view.unmount();
+  const still = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" mouth={{ still: "legacy.png", level: () => .3, anchor, shapes, life: 0 }} />);
+  tick(performance.now() + 1000);
+  expect((still.container.querySelector('[data-mouth="active"]') as HTMLElement).style.transform).toBe("none");
+  still.unmount(); window.requestAnimationFrame = oldRaf; window.cancelAnimationFrame = oldCancel; restore();
 });
