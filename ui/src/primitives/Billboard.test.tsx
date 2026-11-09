@@ -65,6 +65,20 @@ function reducedMotion(on: boolean) {
   };
 }
 
+describe("Billboard ambient wash", () => {
+  test("a slide with art gets a still wash behind its words; ambient={false} draws none; no art, none", () => {
+    const on = render(<Billboard slides={SLIDES} label="Featured" />);
+    const wash = on.container.querySelectorAll('[data-slot="ambient-glow"]');
+    expect(wash.length).toBe(1);
+    expect(wash[0]!.getAttribute("data-still")).toBe("true");
+    expect(wash[0]!.getAttribute("aria-hidden")).toBe("true");
+    expect(wash[0]!.className).not.toContain("transition-opacity");
+    cleanup();
+    const off = render(<Billboard slides={SLIDES} label="Featured" ambient={false} />);
+    expect(off.container.querySelector('[data-slot="ambient-glow"]')).toBeNull();
+  });
+});
+
 describe("Billboard", () => {
   test("shows the video placeholder when a slide has no artwork", () => {
     const restore = reducedMotion(false);

@@ -3,6 +3,7 @@ import { getIcon } from "@/kit/icons";
 import { Button } from "@/kit/ui/button";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/kit/ui/carousel";
 import { cn, FOCUS_RING } from "@/kit/utils";
+import { AmbientGlow } from "@/kit/primitives/AmbientGlow";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { i18n } from "@/kit/i18n";
 
@@ -45,6 +46,9 @@ export interface BillboardProps {
   dwellMs?: number;
   /** Reports the slide in view (for a page that shows its details elsewhere). */
   onSlideChange?: (slide: BillboardSlide) => void;
+  /** Plex-style backdrop: a soft blurred color wash sampled once from each slide's art, behind the words at low opacity.
+   * Static, silent on failure. Default on; `false` draws none. */
+  ambient?: boolean;
 }
 
 function Icon({ name }: { name: string }) {
@@ -76,6 +80,7 @@ export function Billboard({
   renderPreview,
   dwellMs = 1500,
   onSlideChange,
+  ambient = true,
 }: BillboardProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [containedArt, setContainedArt] = useState<Record<string, boolean>>({});
@@ -172,6 +177,7 @@ export function Billboard({
                   }} className="absolute inset-0 -z-20 size-full object-cover" />}
                 </>
               ) : <SafeImage src={undefined} alt="" kind="video" className="absolute inset-0 -z-20 size-full object-cover" />}
+              {ambient && slide.art ? <AmbientGlow still poster={slide.art} className="inset-0 -z-[12] data-[ready=true]:opacity-30" /> : null}
               {previewing === slide.id && renderPreview ? (
                 <div className="absolute inset-0 -z-10" data-slot="billboard-preview">
                   {renderPreview(slide)}

@@ -45,11 +45,13 @@ function sample(source: CanvasImageSource, canvas: HTMLCanvasElement): AmbientCo
  * current frame. Purely presentational (`aria-hidden`), drawn behind its parent (`-z-10`, so the parent needs `isolate`),
  * and silent on any canvas or cross-origin failure. While playing it samples about once a second; paused it holds the poster
  * (or the last frame). Under reduced motion it uses the poster once and never samples frames. `ambient={false}` draws nothing. */
-export function AmbientGlow({ getVideo, poster, ambient = true, className }: {
+export function AmbientGlow({ getVideo, poster, ambient = true, still = false, className }: {
   /** Returns the playing video element, when there is one. Read on each sample, so a ref's `.current` works. */
   getVideo?: () => HTMLVideoElement | null | undefined;
   poster?: string;
   ambient?: boolean;
+  /** Still art (a Billboard or detail hero): one sample of `poster`, no frame sampling, no color transition. */
+  still?: boolean;
   className?: string;
 }) {
   const [colors, setColors] = useState<AmbientColors | null>(null);
@@ -72,7 +74,7 @@ export function AmbientGlow({ getVideo, poster, ambient = true, className }: {
         image.src = poster;
       } catch { /* the glow just stays off */ }
     }
-    if (reduced) return () => { dead = true; };
+    if (reduced || still) return () => { dead = true; };
     const tick = () => {
       const video = getter.current?.();
       if (!video || video.paused || video.ended || video.readyState < 2) return;
@@ -81,14 +83,14 @@ export function AmbientGlow({ getVideo, poster, ambient = true, className }: {
     const id: ReturnType<typeof setInterval> = setInterval(tick, 1000);
     const stop = () => clearInterval(id);
     return () => { dead = true; stop(); };
-  }, [ambient, poster]);
+  }, [ambient, poster, still]);
 
   if (!ambient) return null;
   const style = (colors ? { "--ambient-1": colors[0], "--ambient-2": colors[1], "--ambient-3": colors[2], "--ambient-4": colors[3] } : {}) as CSSProperties;
-  const blob = "absolute size-3/5 rounded-full blur-3xl motion-safe:transition-colors motion-safe:duration-1000";
+  const blob = cn("absolute size-3/5 rounded-full blur-3xl", !still && "motion-safe:transition-colors motion-safe:duration-1000");
   return (
-    <div aria-hidden="true" data-slot="ambient-glow" data-ready={colors ? "true" : "false"} style={style}
-      className={cn("pointer-events-none absolute -inset-[6%] -z-10 opacity-0 transition-opacity duration-1000 data-[ready=true]:opacity-60", className)}>
+    <div aria-hidden="true" data-slot="ambient-glow" data-ready={colors ? "true" : "false"} data-still={still ? "true" : undefined} style={style}
+      className={cn("pointer-events-none absolute -inset-[6%] -z-10 opacity-0 data-[ready=true]:opacity-60", !still && "transition-opacity duration-1000", className)}>
       <span className={cn(blob, "start-0 top-0 bg-(--ambient-1)")} />
       <span className={cn(blob, "end-0 top-0 bg-(--ambient-2)")} />
       <span className={cn(blob, "start-0 bottom-0 bg-(--ambient-3)")} />

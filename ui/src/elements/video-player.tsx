@@ -160,7 +160,7 @@ function VideoPlayerBody({
   prompt,
   src,
   poster,
-  ambient = false,
+  ambient = true,
   width = 832,
   height = 480,
   progress,
@@ -206,7 +206,7 @@ function VideoPlayerBody({
   prompt: string;
   src?: string;
   poster?: string;
-  /** A soft blurred glow behind the card that takes its colors from the poster and the playing frame (poster only under reduced motion). Presentational, default off. */
+  /** A soft blurred glow behind the card that takes its colors from the poster and the playing frame (poster only under reduced motion). Presentational. On by default; `false` opts out. */
   ambient?: boolean;
   width?: number;
   height?: number;

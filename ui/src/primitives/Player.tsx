@@ -262,7 +262,7 @@ export interface PlayerProps {
   /** MUSIC-KIT-01: in the `audio` layout, lyrics blur and fade by distance from the active line (LyricsList `blurByDistance`). Default off. */
   lyricsBlur?: boolean;
   /** In the `video` layout, a soft blurred glow behind the player takes its colors from the poster and the playing frame
-   * (about once a second; poster only under reduced motion). Presentational, off by default. */
+   * (about once a second; poster only under reduced motion). Presentational. On by default; `false` opts out. */
   ambient?: boolean;
 }
 
@@ -378,7 +378,7 @@ export function Player(props: PlayerProps) {
     media: external = null,
     placement = "inline",
     swipeUpToExpand = false,
-    ambient = false,
+    ambient = true,
     swipeToSkip = false,
     artSpring = false,
     lyricsBlur = false,
@@ -1134,6 +1134,16 @@ export function Player(props: PlayerProps) {
 
   const controllerStyle = { ...MEDIA_VARS, width: "100%" } as CSSProperties;
 
+  // The glow's wrapper is in every layout (layout-neutral `contents` when the glow is off), so docking to the mini bar and
+  // back keeps the same keyed MediaController and the playing element is never remounted.
+  const ambientOn = ambient && layout === "video" && !(external instanceof HTMLAudioElement);
+  const withAmbient = (node: ReactNode) => (
+    <div data-slot={ambientOn ? "player-ambient" : undefined} className={ambientOn ? "relative isolate w-full" : "contents"} style={ambientOn ? { maxWidth: "max(22rem, calc((100dvh - 14rem) * 16 / 9))" } : undefined}>
+      {ambientOn ? <AmbientGlow ambient getVideo={() => (media.current instanceof HTMLVideoElement ? media.current : null)} poster={poster} /> : null}
+      {node}
+    </div>
+  );
+
   if (layout === "video") {
     const videoNode = (
       // Shortcuts are delegated from the focused control inside, the way a media player takes them.
@@ -1226,13 +1236,7 @@ export function Player(props: PlayerProps) {
         {overlays}
       </div>
     );
-    if (!ambient) return videoNode;
-    return (
-      <div data-slot="player-ambient" className="relative isolate w-full" style={{ maxWidth: "max(22rem, calc((100dvh - 14rem) * 16 / 9))" }}>
-        <AmbientGlow ambient getVideo={() => (media.current instanceof HTMLVideoElement ? media.current : null)} poster={poster} />
-        {videoNode}
-      </div>
-    );
+    return withAmbient(videoNode);
   }
 
   const art = (size: string, spring = false) => (
@@ -1319,7 +1323,7 @@ export function Player(props: PlayerProps) {
   } as CSSProperties;
 
   if (layout === "mini") {
-    return (
+    return withAmbient(
       // Shortcuts are delegated from the focused control inside, the way a media player takes them.
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
@@ -1385,7 +1389,7 @@ export function Player(props: PlayerProps) {
   }
 
   // layout === "audio": Now playing.
-  return (
+  return withAmbient(
     // Shortcuts are delegated from the focused control inside, the way a media player takes them.
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div ref={rootRef} data-slot="player" data-layout="audio" onKeyDown={onKeyDown} className={audioLayout === "container" ? "@container/player relative w-full" : "relative w-full"}>

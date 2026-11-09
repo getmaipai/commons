@@ -2,6 +2,8 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { AmbientGlow, averageQuadrants } from "@/kit/primitives/AmbientGlow";
+import { Player } from "@/kit/primitives/Player";
+import { VideoPlayer } from "@/kit/elements/video-player";
 import { Chip } from "@/kit/primitives/Chip";
 import { MediaCarousel, MediaTile } from "@/kit/ui/media-tiles";
 
@@ -58,5 +60,23 @@ describe("kit polish 0.5.558", () => {
   test("pill tab strips are flat (no fade patch) in the pro look", () => {
     const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
     expect(css).toContain('html[data-pro-look] [data-slot="tabs-list"][data-variant="pill"] { background: none; }');
+  });
+});
+
+describe("ambient glow is on by default", () => {
+  test("the video Player draws it; ambient={false}, audio and mini do not", () => {
+    expect(render(<Player src="/v.mp4" kind="video" title="Clip" poster="/p.jpg" />).container.querySelector('[data-slot="ambient-glow"]')).not.toBeNull();
+    cleanup();
+    expect(render(<Player src="/v.mp4" kind="video" title="Clip" ambient={false} />).container.querySelector('[data-slot="ambient-glow"]')).toBeNull();
+    cleanup();
+    expect(render(<Player src="/s.mp3" kind="audio" title="Song" layout="audio" />).container.querySelector('[data-slot="ambient-glow"]')).toBeNull();
+    cleanup();
+    expect(render(<Player src="/s.mp3" kind="audio" title="Song" layout="mini" />).container.querySelector('[data-slot="ambient-glow"]')).toBeNull();
+  });
+  test("VideoPlayer draws it when ready; ambient={false} opts out", () => {
+    const base = { status: "ready", prompt: "A cat", src: "/v.mp4", poster: "/p.jpg" } as const;
+    expect(render(<VideoPlayer {...base} />).container.querySelector('[data-slot="ambient-glow"]')).not.toBeNull();
+    cleanup();
+    expect(render(<VideoPlayer {...base} ambient={false} />).container.querySelector('[data-slot="ambient-glow"]')).toBeNull();
   });
 });
