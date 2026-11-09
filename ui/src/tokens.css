@@ -637,6 +637,10 @@
   --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
   --elevation-4: 0 24px 64px -16px var(--elevation-color);
   --elevation-accent: 0 6px 16px -10px var(--primary);
+  /* STATUS-CARD-TINT-01: StatusCard and JobProgress kinds. progress = lime family, done = teal; both are AA text on the card and on their own 12% wash. */
+  --status-progress-ink: #365000;
+  --status-done-ink: #004f3d;
+  --status-waiting-ink: #3a4d68;
   --tint-attention: #fbf5e6;
   --tint-attention-fg: #6e5a2b;
   --tint-attention-border: #866100;
@@ -1295,6 +1299,9 @@
     --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
     --elevation-4: 0 24px 64px -16px var(--elevation-color);
     --elevation-accent: 0 6px 16px -10px var(--primary);
+    --status-progress-ink: #c0f447;
+    --status-done-ink: #00e3ae;
+    --status-waiting-ink: #a9bed7;
     --tint-attention: #31240e;
     --tint-attention-fg: #ffe08a;
     --tint-attention-border: #b88a21;
@@ -1371,6 +1378,9 @@
   --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
   --elevation-4: 0 24px 64px -16px var(--elevation-color);
   --elevation-accent: 0 6px 16px -10px var(--primary);
+  --status-progress-ink: #c0f447;
+  --status-done-ink: #00e3ae;
+  --status-waiting-ink: #a9bed7;
   --tint-attention: #31240e;
   --tint-attention-fg: #ffe08a;
   --tint-attention-border: #b88a21;
