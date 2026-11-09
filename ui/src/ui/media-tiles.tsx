@@ -53,7 +53,7 @@ export function GlassPill({ children }: { children: ReactNode }) {
 export function MediaTile({ id, title, line, coverUrl, selected = false, busy = false, playable = false, pills, progress, verb = i18n._({ id: "ui.Open", message: "Open" }), onOpen, children }: {
   verb?: string; id: string; title: string; line?: string; coverUrl: string | null; selected?: boolean; busy?: boolean; playable?: boolean; pills?: ReactNode; progress?: number; onOpen: () => void; children?: ReactNode;
 }) {
-  return <li className="group flex w-44 shrink-0 snap-start flex-col gap-2 sm:w-52" data-testid="music-song-tile">
+  return <li className="group flex w-full min-w-0 snap-start flex-col gap-2" data-testid="music-song-tile">
     <button type="button" onClick={onOpen} aria-label={i18n._({ id: "ui.{verb} {title}", message: "{verb} {title}", values: { verb, title } })} aria-current={selected ? "true" : undefined}
       className={`relative block aspect-3/4 w-full overflow-hidden rounded-2xl transition duration-200 motion-safe:group-hover:-translate-y-1 motion-safe:group-focus-within:-translate-y-1 ${selected ? "ring-(--accent-lime) ring-2" : ""}`}>
       <Cover id={id} title={title} url={coverUrl} />
@@ -74,12 +74,12 @@ export function MediaCarousel({ title, line, children, label }: { title: string;
   const move = (direction: 1 | -1) => track.current?.scrollBy({ left: direction * Math.max(240, track.current.clientWidth * 0.8), behavior: "smooth" });
   return <div className="flex min-w-0 shrink-0 flex-col gap-3">
     <div className="flex items-end justify-between gap-3">
-      <div className="flex flex-col gap-1"><h2 className="text-2xl font-black tracking-wide uppercase">{title}</h2>{line ? <p className="text-muted-foreground text-sm">{line}</p> : null}</div>
+      <div className="flex flex-col gap-1"><h2 data-slot="section-heading" className="text-[22px] font-semibold tracking-tight md:text-2xl">{title}</h2>{line ? <p className="text-muted-foreground text-sm">{line}</p> : null}</div>
       <div className="hidden gap-2 sm:flex">
         <Button type="button" variant="secondary" size="icon" aria-label={i18n._({ id: "ui.Earlier in {label}", message: "Earlier in {label}", values: { label } })} onClick={() => move(-1)}><LeftIcon className="size-4" aria-hidden="true" /></Button>
         <Button type="button" variant="secondary" size="icon" aria-label={i18n._({ id: "ui.Later in {label}", message: "Later in {label}", values: { label } })} onClick={() => move(1)}><RightIcon className="size-4" aria-hidden="true" /></Button>
       </div>
     </div>
-    <ul ref={track} aria-label={label} className="-mx-4 flex snap-x list-none gap-4 overflow-x-auto scroll-smooth px-4 pb-2 lg:-mx-6 lg:px-6">{children}</ul>
+    <ul ref={track} aria-label={label} className="-mx-4 flex snap-x list-none gap-4 overflow-x-auto scroll-smooth px-4 pb-2 lg:-mx-6 lg:px-6 [&>li]:w-44 [&>li]:shrink-0 sm:[&>li]:w-52">{children}</ul>
   </div>;
 }

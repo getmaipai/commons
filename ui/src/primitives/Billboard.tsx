@@ -160,11 +160,11 @@ export function Billboard({
                 <>
                   {containedArt[slide.id] ? <>
                     <SafeImage src={slide.art} alt="" aria-hidden kind="video" className="absolute inset-0 -z-20 size-full object-cover scale-125 blur-2xl opacity-60" />
-                    <div aria-hidden className="absolute inset-x-0 top-0 bottom-1/2 -z-[15] flex items-center justify-center p-6">
+                    <div aria-hidden data-slot="billboard-art" className="absolute inset-0 -z-[15]">
                       <SafeImage src={slide.art} alt="" kind="video" onLoad={(event) => {
                         const image = event.currentTarget;
                         setContainedArt((previous) => ({ ...previous, [slide.id]: image.naturalWidth < 480 || image.naturalWidth / image.naturalHeight < 1.4 }));
-                      }} className="max-h-full max-w-full object-contain" />
+                      }} className="size-full object-cover object-top" />
                     </div>
                   </> : <SafeImage src={slide.art} alt="" kind="video" onLoad={(event) => {
                     const image = event.currentTarget;

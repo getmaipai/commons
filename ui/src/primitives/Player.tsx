@@ -28,6 +28,7 @@ import {
   MediaVolumeRange,
 } from "media-chrome/react";
 import { getIcon } from "@/kit/icons";
+import { AmbientGlow } from "@/kit/primitives/AmbientGlow";
 import { LyricsList, type TimedLyricLine } from "@/kit/elements/lyrics-list";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Badge } from "@/kit/ui/badge";
@@ -260,6 +261,9 @@ export interface PlayerProps {
   artSpring?: boolean;
   /** MUSIC-KIT-01: in the `audio` layout, lyrics blur and fade by distance from the active line (LyricsList `blurByDistance`). Default off. */
   lyricsBlur?: boolean;
+  /** In the `video` layout, a soft blurred glow behind the player takes its colors from the poster and the playing frame
+   * (about once a second; poster only under reduced motion). Presentational, off by default. */
+  ambient?: boolean;
 }
 
 /** MEDIA-POLISH-01: where a host-owned media element waits between Players: a hidden spot at the end of the body.
@@ -374,6 +378,7 @@ export function Player(props: PlayerProps) {
     media: external = null,
     placement = "inline",
     swipeUpToExpand = false,
+    ambient = false,
     swipeToSkip = false,
     artSpring = false,
     lyricsBlur = false,
@@ -1130,7 +1135,7 @@ export function Player(props: PlayerProps) {
   const controllerStyle = { ...MEDIA_VARS, width: "100%" } as CSSProperties;
 
   if (layout === "video") {
-    return (
+    const videoNode = (
       // Shortcuts are delegated from the focused control inside, the way a media player takes them.
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
@@ -1219,6 +1224,13 @@ export function Player(props: PlayerProps) {
           </div>
         </MediaController>
         {overlays}
+      </div>
+    );
+    if (!ambient) return videoNode;
+    return (
+      <div data-slot="player-ambient" className="relative isolate w-full" style={{ maxWidth: "max(22rem, calc((100dvh - 14rem) * 16 / 9))" }}>
+        <AmbientGlow ambient getVideo={() => (media.current instanceof HTMLVideoElement ? media.current : null)} poster={poster} />
+        {videoNode}
       </div>
     );
   }

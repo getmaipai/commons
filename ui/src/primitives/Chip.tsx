@@ -55,7 +55,7 @@ export function Chip({ children, selected, onClick, onRemove, removeLabel, tone 
       }
       aria-pressed={interactive && selected !== undefined ? selected : undefined}
       className={cn(
-        size === "strip" ? "inline-flex h-10 items-center gap-1.5 rounded-full border px-4 text-sm transition-colors" : "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-base transition-colors",
+        size === "strip" ? "inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-sm transition-colors" : "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-base transition-colors",
         selected
           ? selectedTone === "inverse" ? "bg-foreground text-background" : "border-primary bg-primary/10 text-primary"
           : tone === "surface" ? "border-0 bg-[var(--surface-1)] text-muted-foreground" : "border-border bg-transparent text-foreground",

@@ -12,6 +12,11 @@ import { readFileSync } from "node:fs"
 /** The only places a fixed color may stay. Keyed by file and the matched text; a stale entry (nothing matches it any more) fails too. */
 const ALLOW: AllowEntry[] = [
   {
+    file: "src/primitives/AmbientGlow.tsx",
+    match: /^color\($/,
+    reason: "The ambient glow's colors are averaged from the video's own pixels at run time; they are media content, not interface colors, and no theme token could name them.",
+  },
+  {
     file: "src/ui/qr-code.tsx",
     match: /^#(?:ffffff|000000)$/,
     reason: "QR codes need a true white quiet zone and black modules to scan; the fallback applies only when a host sets no --qr-* token.",

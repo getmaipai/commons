@@ -101,7 +101,9 @@ describe("Billboard", () => {
       const card = container.querySelector('[data-art="contained"]')!;
       expect(card).toBeTruthy();
       const foreground = card.querySelector("img:last-child")!;
-      expect(foreground.className).not.toMatch(/(?:^| )(?:w-full|h-full|size-full)(?: |$)/);
+      // KIT-POLISH-2: contained art fills the hero width, top-aligned, behind the scrim.
+      expect(foreground.className).toContain("size-full");
+      expect(foreground.className).toContain("object-top");
       const dots = container.querySelector('[data-slot="billboard-dots"]')!;
       expect(dots.className).toContain("bottom-2");
       expect(dots.className).not.toContain("top-2");

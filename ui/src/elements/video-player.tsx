@@ -20,6 +20,7 @@ import { Button } from "@/kit/ui/button";
 import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
 import { Card, CardContent } from "@/kit/ui/card";
 import { Progress } from "@/kit/ui/progress";
+import { AmbientGlow } from "@/kit/primitives/AmbientGlow";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import type { PlayerTextTrack } from "@/kit/primitives/Player";
 import { GenerationStage } from "./generation-stage";
@@ -159,6 +160,7 @@ function VideoPlayerBody({
   prompt,
   src,
   poster,
+  ambient = false,
   width = 832,
   height = 480,
   progress,
@@ -204,6 +206,8 @@ function VideoPlayerBody({
   prompt: string;
   src?: string;
   poster?: string;
+  /** A soft blurred glow behind the card that takes its colors from the poster and the playing frame (poster only under reduced motion). Presentational, default off. */
+  ambient?: boolean;
   width?: number;
   height?: number;
   /** 0 to 100 as the engine reports it; leave out when it does not. */
@@ -411,7 +415,7 @@ function VideoPlayerBody({
     </div>
   ) : picture;
 
-  return (
+  const card = (
     <Card data-slot="video-player" data-status={status} className={cn("w-full gap-0 overflow-hidden py-0", (reveal || overlay) && "group/player", SIZE_CLASS[size], className)}>
       {framed}
       {overlay && !notice && !(caption && prompt) ? null : <CardContent className="flex flex-col gap-3 py-3">
@@ -448,6 +452,13 @@ function VideoPlayerBody({
         {(status === "ready" || status === "draft") && prompt && caption ? <p className="text-muted-foreground line-clamp-2 text-xs">{prompt}</p> : null}
       </CardContent>}
     </Card>
+  );
+  if (!ambient || status !== "ready" || !src) return card;
+  return (
+    <div data-slot="video-player-ambient" className={cn("relative isolate w-full", SIZE_CLASS[size])}>
+      <AmbientGlow ambient getVideo={() => videoRef.current} poster={poster} />
+      {card}
+    </div>
   );
 }
 

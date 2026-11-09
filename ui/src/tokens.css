@@ -2730,6 +2730,8 @@ html[data-pro-look] [data-slot="tabs-list"][data-variant="line"], html[data-pro-
     linear-gradient(to left, color-mix(in srgb, var(--foreground) 14%, transparent), transparent) right center / 1.25rem 100% no-repeat scroll;
 }
 html[data-pro-look] [data-slot="tabs-list"][data-variant="line"]::-webkit-scrollbar { display: none; }
+/* A pill strip (chip tabs) is flat on every surface: the scroll-fade patches painted with --background would show as a light box behind the pills in a header or any band whose surface is not the page background. Only the line variant keeps its edge fades. */
+html[data-pro-look] [data-slot="tabs-list"][data-variant="pill"] { background: none; }
 
 /* PRO-LOOK-PHONE-2: a generic table's phone card row: first column is the title, the rest are small "label value" lines. */
 html[data-pro-look] [data-slot="data-table-card-row"] { gap: 0.125rem; }
