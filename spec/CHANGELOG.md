@@ -1,3 +1,7 @@
+## [spec-v0.1.346] - 2026-11-09
+
+- UI-ROW-ACTION-WHEN-01, additive (landed in ui 0.5.552 without a spec tag). `media_shelf` `row_actions` accept optional `show_when_field` and `hide_when_field` (a row field name; the button is drawn only when it is truthy, or falsy). The `circle-dot` icon is a kit icon name, no schema enum. No existing page changes.
+
 ## [spec-v0.1.344] - 2026-11-08
 
 - HOUSE-08b, additive. `settings-area` `matrix.rows` accepts `house/exposure`: a grid whose rows the host supplies at run time from the household's Home Assistant exposure list (no spec file). `spec/gen/ts` and `spec/gen/py` regenerated (landed with ui 0.5.530).
