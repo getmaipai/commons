@@ -1,3 +1,7 @@
+## [spec-v0.1.347] - 2026-11-09
+
+- 0.1.347: re-release of 0.1.346; the 0.1.346 tag points at the wrong commit, use this one. No schema change.
+
 ## [spec-v0.1.346] - 2026-11-09
 
 - UI-ROW-ACTION-WHEN-01, additive (landed in ui 0.5.552 without a spec tag). `media_shelf` `row_actions` accept optional `show_when_field` and `hide_when_field` (a row field name; the button is drawn only when it is truthy, or falsy). The `circle-dot` icon is a kit icon name, no schema enum. No existing page changes.
