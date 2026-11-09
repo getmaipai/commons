@@ -1,3 +1,7 @@
+## [ui-v0.5.554] - 2026-11-09
+
+- `PhoneNav` takes an optional `leading` button (`{ label, icon?, onClick, disabled? }`, icon defaults to `arrow-left`) drawn first in the bar. It takes one slot like `trailing`. Defaults remain unchanged.
+
 ## [ui-v0.5.552] - 2026-11-09
 
 - PRO-LOOK-PHONE-FIX: the video `Player` box no longer shrinks below 16:9 (the control bar was clipped on a phone) and keeps a minimum height; `PromptBar` draws its error as an in-flow status row above the field (status-card problem tokens); `section` headings carry `data-slot="section-heading"` and drop the brand rule under `html[data-pro-look]`; the watch page action buttons scroll in their own strip while Edit stays pinned outside it. `media_shelf` `row_actions` take optional `show_when_field` and `hide_when_field` (also added to spec/ui/schema.json) and draw as ghost icon-only buttons in the PRO look; `circle-dot` icon added; `CreationHeader` studio heading is now `text-2xl font-semibold` sentence case and eyebrows drop uppercase. Defaults remain unchanged.

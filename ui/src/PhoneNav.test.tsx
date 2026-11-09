@@ -209,4 +209,85 @@ describe("PhoneNav", () => {
     expect(getByText("Settings")).toBeInTheDocument();
     expect(getByText("Prefs")).toBeInTheDocument();
   });
+
+  describe("leading", () => {
+    const back = (over: Partial<{ onClick: () => void; disabled: boolean }> = {}) => ({ label: "Back", onClick: () => {}, ...over });
+
+    test("renders as the first item, before the entries", () => {
+      const { container } = render(
+        <MemoryRouter>
+          <PhoneNav entries={FIVE_ENTRIES.slice(0, 3)} leading={back()} />
+        </MemoryRouter>,
+      );
+      const labels = Array.from(container.querySelectorAll("nav a, nav button")).map((el) => el.textContent);
+      expect(labels).toEqual(["Back", "Home", "Apps", "Chat"]);
+      expect(container.querySelector("nav button")?.getAttribute("type")).toBe("button");
+    });
+
+    test("calls onClick", () => {
+      let n = 0;
+      const { getByRole } = render(
+        <MemoryRouter>
+          <PhoneNav entries={FIVE_ENTRIES.slice(0, 2)} leading={back({ onClick: () => { n += 1; } })} />
+        </MemoryRouter>,
+      );
+      fireEvent.click(getByRole("button", { name: "Back" }));
+      expect(n).toBe(1);
+    });
+
+    test("disabled sets the attribute and does not call onClick", () => {
+      let n = 0;
+      const { getByRole } = render(
+        <MemoryRouter>
+          <PhoneNav entries={FIVE_ENTRIES.slice(0, 2)} leading={back({ disabled: true, onClick: () => { n += 1; } })} />
+        </MemoryRouter>,
+      );
+      const btn = getByRole("button", { name: "Back" });
+      expect(btn).toBeDisabled();
+      expect(btn.className).toContain("disabled:opacity-40");
+      fireEvent.click(btn);
+      expect(n).toBe(0);
+    });
+
+    test("takes a slot: with max=5, leading plus four entries fit, five fold the last two under More", () => {
+      const four = render(
+        <MemoryRouter>
+          <PhoneNav variant="floating" max={5} entries={FIVE_ENTRIES.slice(0, 4)} leading={back()} />
+        </MemoryRouter>,
+      );
+      expect(Array.from(four.container.querySelectorAll("nav a, nav button")).map((el) => el.textContent)).toEqual(["Back", "Home", "Apps", "Chat", "People"]);
+      cleanup();
+      const { container, getByText, queryByText } = render(
+        <MemoryRouter>
+          <PhoneNav variant="floating" max={5} entries={FIVE_ENTRIES} leading={back()} />
+        </MemoryRouter>,
+      );
+      const labels = Array.from(container.querySelectorAll("nav a, nav button")).map((el) => el.textContent);
+      expect(labels).toEqual(["Back", "Home", "Apps", "Chat", "More"]);
+      expect(queryByText("People")).not.toBeInTheDocument();
+      fireEvent.click(getByText("More"));
+      expect(getByText("People")).toBeInTheDocument();
+      expect(getByText("Settings")).toBeInTheDocument();
+    });
+
+    test("hides the label (aria-label only) when labels is primary and the row is crowded", () => {
+      const { getByRole, queryByText } = render(
+        <MemoryRouter>
+          <PhoneNav labels="primary" variant="floating" entries={FIVE_ENTRIES} leading={back()} />
+        </MemoryRouter>,
+      );
+      expect(queryByText("Back")).not.toBeInTheDocument();
+      expect(getByRole("button", { name: "Back" })).toBeInTheDocument();
+    });
+
+    test("without leading nothing changes: no extra button and the same fold", () => {
+      const { container } = render(
+        <MemoryRouter>
+          <PhoneNav variant="floating" entries={FIVE_ENTRIES} />
+        </MemoryRouter>,
+      );
+      const labels = Array.from(container.querySelectorAll("nav a, nav button")).map((el) => el.textContent);
+      expect(labels).toEqual(["Home", "Apps", "Chat", "People", "Settings"]);
+    });
+  });
 });

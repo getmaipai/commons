@@ -26,6 +26,7 @@ export function PhoneNav({
   variant = "bar",
   label = i18n._({ id: "ui.Primary", message: "Primary" }),
   trailing,
+  leading,
   more = [],
   surface = "card",
   inset = "default",
@@ -37,6 +38,7 @@ export function PhoneNav({
   variant?: "bar" | "floating" | "docked";
   label?: string;
   trailing?: NavEntry;
+  leading?: { label: string; icon?: string; onClick: () => void; disabled?: boolean };
   more?: readonly NavEntry[];
   surface?: "card" | "glass";
   inset?: "default" | "pro";
@@ -53,17 +55,18 @@ export function PhoneNav({
   // caller passing max=0 means. Clamped to 1 (More alone, nothing
   // shown directly) as the lowest sane value.
   const safeMax = Math.max(1, max);
-  const slots = safeMax - (trailing ? 1 : 0);
+  const slots = safeMax - (trailing ? 1 : 0) - (leading ? 1 : 0);
   const overflowing = entries.length + (more.length > 0 ? 1 : 0) > slots;
   const entryLimit = Math.max(0, slots - 1);
   const shown = overflowing ? entries.slice(0, entryLimit) : entries;
   const sheetEntries = [...(overflowing ? entries.slice(entryLimit) : []), ...more];
   const hasMore = sheetEntries.length > 0;
   const MoreIcon = getIcon("more-horizontal");
+  const LeadingIcon = getIcon(leading?.icon ?? "arrow-left");
   const floating = variant === "floating";
   // The docked bar is exactly 49px (48px entries + 1px border): the prompt bar and track transport dock at that height.
   const compact = variant !== "bar";
-  const showLabels = labels === "all" || entries.length + (trailing ? 1 : 0) <= BOTTOM_BAR_MAX;
+  const showLabels = labels === "all" || entries.length + (trailing ? 1 : 0) + (leading ? 1 : 0) <= BOTTOM_BAR_MAX;
 
   const renderEntry = (entry: NavEntry) => {
     const Icon = getIcon(entry.icon);
@@ -105,6 +108,20 @@ export function PhoneNav({
           ? cn("fixed z-30 flex rounded-full sm:hidden", inset === "pro" ? "inset-x-4 bottom-[calc(1.5rem+env(safe-area-inset-bottom))] h-[68px] p-1" : "inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] max-h-16 p-1", surface === "glass" ? "bg-[var(--surface-glass)] backdrop-blur-[var(--glass-blur)] shadow-[var(--shadow-glass)] ring-1 ring-inset ring-[var(--hairline)]" : "bg-card shadow-lg")
           : cn("fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-background pb-[env(safe-area-inset-bottom)] sm:hidden", variant === "docked" && "px-2")}
       >
+        {leading ? (
+          <button
+            type="button"
+            aria-label={leading.label}
+            disabled={leading.disabled}
+            onClick={leading.onClick}
+            className={compact
+              ? cn("flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 text-xs text-muted-foreground disabled:opacity-40", floating ? "py-2" : "py-1")
+              : "flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-base text-muted-foreground disabled:opacity-40"}
+          >
+            <LeadingIcon className="h-5 w-5" aria-hidden />
+            {showLabels ? <span>{leading.label}</span> : null}
+          </button>
+        ) : null}
         {shown.map(renderEntry)}
         {trailing ? renderEntry(trailing) : null}
         {hasMore ? (
