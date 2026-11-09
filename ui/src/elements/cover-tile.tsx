@@ -1,6 +1,7 @@
 "use client";
 import { ArrowDownIcon, ArrowUpIcon, SquareIcon } from "lucide-react";
 import { i18n } from "@/kit/i18n";
+import { PRESS } from "@/kit/utils";
 
 export interface CoverTileProps {
   name: string;
@@ -36,9 +37,9 @@ export function CoverTile({ name, room, position, pending = false, unavailable =
         {pending ? ` · ${i18n._({ id: "ui.Updating…", message: "Updating…" })}` : ""}
       </p>
       <div className="grid grid-cols-3 gap-2">
-        <button type="button" aria-label={i18n._({ id: "ui.Open {name}", message: "Open {name}", values: { name } })} disabled={disabled || open === 100} onClick={onOpen} className="flex min-h-12 items-center justify-center rounded-xl bg-muted text-foreground transition-transform duration-200 active:scale-95 disabled:opacity-50 motion-reduce:transition-none"><ArrowUpIcon className="size-5" aria-hidden /></button>
-        <button type="button" aria-label={i18n._({ id: "ui.Stop {name}", message: "Stop {name}", values: { name } })} disabled={unavailable} onClick={onStop} className="flex min-h-12 items-center justify-center rounded-xl bg-muted text-foreground transition-transform duration-200 active:scale-95 disabled:opacity-50 motion-reduce:transition-none"><SquareIcon className="size-4" aria-hidden /></button>
-        <button type="button" aria-label={i18n._({ id: "ui.Close {name}", message: "Close {name}", values: { name } })} disabled={disabled || open === 0} onClick={onClose} className="flex min-h-12 items-center justify-center rounded-xl bg-muted text-foreground transition-transform duration-200 active:scale-95 disabled:opacity-50 motion-reduce:transition-none"><ArrowDownIcon className="size-5" aria-hidden /></button>
+        <button type="button" aria-label={i18n._({ id: "ui.Open {name}", message: "Open {name}", values: { name } })} disabled={disabled || open === 100} onClick={onOpen} className={`flex min-h-12 items-center justify-center rounded-xl bg-muted text-foreground ${PRESS} disabled:opacity-50`}><ArrowUpIcon className="size-5" aria-hidden /></button>
+        <button type="button" aria-label={i18n._({ id: "ui.Stop {name}", message: "Stop {name}", values: { name } })} disabled={unavailable} onClick={onStop} className={`flex min-h-12 items-center justify-center rounded-xl bg-muted text-foreground ${PRESS} disabled:opacity-50`}><SquareIcon className="size-4" aria-hidden /></button>
+        <button type="button" aria-label={i18n._({ id: "ui.Close {name}", message: "Close {name}", values: { name } })} disabled={disabled || open === 0} onClick={onClose} className={`flex min-h-12 items-center justify-center rounded-xl bg-muted text-foreground ${PRESS} disabled:opacity-50`}><ArrowDownIcon className="size-5" aria-hidden /></button>
       </div>
     </article>
   );

@@ -1,6 +1,8 @@
 "use client";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { i18n } from "@/kit/i18n";
+import { PRESS } from "@/kit/utils";
+import { formatTileNumber } from "@/kit/format";
 
 export type ClimateMode = "heat" | "cool" | "off";
 
@@ -47,7 +49,7 @@ export function ClimateTile({ name, room, mode, current, target, min, max, step 
           <span className={`absolute left-1/2 top-[3px] size-4 -translate-x-1/2 rounded-full border-2 border-card ${mode === "off" ? "bg-muted-foreground" : "bg-primary"}`} />
         </span>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-semibold tabular-nums">{target}{unit}</span>
+          <span className="text-3xl font-semibold tabular-nums">{formatTileNumber(target, { unit })}</span>
           <span className="text-muted-foreground text-xs">{i18n._({ id: "ui.Now {current}{unit}", message: "Now {current}{unit}", values: { current, unit } })}</span>
         </div>
       </div>
@@ -56,8 +58,8 @@ export function ClimateTile({ name, room, mode, current, target, min, max, step 
         {pending ? ` · ${i18n._({ id: "ui.Updating…", message: "Updating…" })}` : ""}
       </p>
       <div className="flex gap-2">
-        <button type="button" aria-label={i18n._({ id: "ui.Lower {name}", message: "Lower {name}", values: { name } })} disabled={disabled || target <= min} onClick={() => nudge(-step)} className="flex size-12 items-center justify-center rounded-full bg-muted transition-transform duration-200 active:scale-95 disabled:opacity-50 motion-reduce:transition-none"><MinusIcon className="size-5" aria-hidden /></button>
-        <button type="button" aria-label={i18n._({ id: "ui.Raise {name}", message: "Raise {name}", values: { name } })} disabled={disabled || target >= max} onClick={() => nudge(step)} className="flex size-12 items-center justify-center rounded-full bg-muted transition-transform duration-200 active:scale-95 disabled:opacity-50 motion-reduce:transition-none"><PlusIcon className="size-5" aria-hidden /></button>
+        <button type="button" aria-label={i18n._({ id: "ui.Lower {name}", message: "Lower {name}", values: { name } })} disabled={disabled || target <= min} onClick={() => nudge(-step)} className={`flex size-12 items-center justify-center rounded-full bg-muted ${PRESS} disabled:opacity-50`}><MinusIcon className="size-5" aria-hidden /></button>
+        <button type="button" aria-label={i18n._({ id: "ui.Raise {name}", message: "Raise {name}", values: { name } })} disabled={disabled || target >= max} onClick={() => nudge(step)} className={`flex size-12 items-center justify-center rounded-full bg-muted ${PRESS} disabled:opacity-50`}><PlusIcon className="size-5" aria-hidden /></button>
       </div>
     </article>
   );

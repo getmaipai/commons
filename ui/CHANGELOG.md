@@ -1,3 +1,7 @@
+## [ui-v0.5.560] - 2026-11-09
+
+- PRESS-01 one press feel, an idea from a review of an open-source dashboard theme, built our way. New tokens `--press-scale` (0.96), `--press-duration` (150 ms) and `--press-ease`, collapsing to no scale and no duration under `prefers-reduced-motion`. `Button` and the cover, climate, lock and scene tiles press through them (shared `PRESS` class in `utils`), and shelf cards (`--media-press-scale`) now read the same scale (was 0.98). New `formatTileNumber(value, { unit, maximumFractionDigits })` in `format` (locale-aware decimals; a degree or percent unit hugs the number); the climate tile shows its setpoint and current value through it.
+
 ## [ui-v0.5.559] - 2026-11-09
 
 - Ambient glow is on by default. `Player` (video layout) and `VideoPlayer` draw the blurred backdrop without a prop, so Home gets it for free through the schema `NodeRenderer` (page JSON has no field for it and needs none). `ambient={false}` opts out. Never on the `mini` layout or an audio-only element; still honors prefers-reduced-motion (poster only) and stays silent on cross-origin or canvas errors. `Billboard` gets a Plex-style backdrop: a soft blurred color wash sampled once from each slide's art (new `still` mode of `AmbientGlow`: one sample, no frame sampling, no animation), drawn behind the words at 30 percent opacity under the scrim, so text keeps its theme-token contrast. `Billboard ambient={false}` draws none.

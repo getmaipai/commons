@@ -75,3 +75,11 @@ export function formatVersion(current: string | null, available: string | null):
 export function absoluteTime(iso: string): string {
   return new Date(iso).toLocaleString(kitLocaleTag(), { dateStyle: "medium", timeStyle: "short" });
 }
+
+/** A tile value (21.5 degrees) in the person's language: decimal mark and grouping follow the active kit locale. A degree or percent unit hugs the number; any other unit follows a space. */
+export function formatTileNumber(value: number, options: { unit?: string; maximumFractionDigits?: number } = {}): string {
+  if (!Number.isFinite(value)) return notReported();
+  const { unit = "", maximumFractionDigits = 1 } = options;
+  const number = new Intl.NumberFormat(kitLocaleTag(), { maximumFractionDigits }).format(value);
+  return unit === "" ? number : /^[°%]/.test(unit) ? `${number}${unit}` : `${number} ${unit}`;
+}

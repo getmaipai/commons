@@ -82,3 +82,7 @@ export const HUE_PILL_TINT = 0.15;
 export function hueTintBackground(hue: string): string {
   return `color-mix(in srgb, var(${hue}) ${HUE_PILL_TINT * 100}%, transparent)`;
 }
+
+/** PRESS-01: the shared press feel. Scale to `--press-scale` (0.96) over `--press-duration` (150 ms) on `--press-ease`; the
+ * tokens collapse to no motion under prefers-reduced-motion. Add it to a button or tile class list. */
+export const PRESS = "transition-transform duration-[var(--press-duration)] ease-[var(--press-ease)] active:scale-[var(--press-scale)]"

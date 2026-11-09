@@ -627,6 +627,10 @@
   --page: #f9fafb;
   --elevation-color: oklch(0.2 0.02 255 / 0.10);
   --elevation-hairline: oklch(0.2 0.02 255 / 0.07);
+  /* PRESS-01: one press feel for every tappable tile and button: a 150 ms scale to 0.96 on one shared easing. */
+  --press-scale: 0.96;
+  --press-duration: 150ms;
+  --press-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --elevation-0: none;
   --elevation-1: 0 1px 2px -1px var(--elevation-color);
   --elevation-2: 0 1px 2px -1px var(--elevation-color), 0 8px 24px -16px var(--elevation-color);
@@ -895,6 +899,9 @@
   --weather-cloud-highlight: rgb(255 255 255 / 0.96);
   --weather-cloud-shadow: rgb(229 236 244 / 0.78);
   --weather-scrim-remove: rgb(0 0 0 / 0.3);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:root{ --press-scale: 1; --press-duration: 0ms; }
 }
 
 @media (max-width: 639.98px) {
@@ -2441,7 +2448,7 @@ html[data-ease-motion="calm"] [data-slot="weather-sky"] [data-weather-group] { a
   /* MediaShelf cardRadius="tight": the 8 px card. */
   --media-card-radius: 8px;
   /* MediaShelf pressScale: how small a pressed tile gets. */
-  --media-press-scale: 0.98;
+  --media-press-scale: var(--press-scale);
   /* MediaShelf onPlay: the round Play button's size. */
   --media-play-size: 2.75rem;
   /* MediaShelf artShape="circle" (artists): the circle's size, about 150 px, as Apple Music and Spotify draw artist rows. */
