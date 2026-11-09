@@ -13,6 +13,7 @@ import {
   underPluginApi,
   type PackageScope,
 } from "@/kit/schema/packageScope";
+import { shareHubLink } from "@/kit/schema/shareLink";
 import { adultOnlyPageOnly, MediaHostContext, playUnavailable, type MediaHost } from "@/kit/schema/mediaHost";
 
 /** How a dispatch runs. `quiet`: no refetch of the page's bindings and no error under the node (a player's progress
@@ -81,6 +82,16 @@ async function runAction(
     const position = typeof resolved === "number" ? resolved : typeof resolved === "string" && resolved !== "" ? Number(resolved) : NaN;
     const options = Number.isFinite(position) && position >= 0 ? { position_s: position } : undefined;
     await host.onPlay(fillTemplate(action.play.media_id, item), item, options);
+    return;
+  }
+  if ("share" in action) {
+    // PARITY-01: a link to a page of this hub. A package page shares only its own pages.
+    const to = fillTemplate(action.share.to, item);
+    if (scope && !underAppRoute(to.split(/[?#]/)[0]!, scope.packageId)) {
+      reportPageRejected();
+      throw new Error(packageActionRefused());
+    }
+    await shareHubLink(to, action.share.title ? fillTemplate(action.share.title, item) : undefined);
     return;
   }
   if ("confirm" in action) {

@@ -65,8 +65,12 @@ import {
   type PlayerChapter,
   type ProgressReason,
 } from "@/kit/primitives/playerLogic";
+import { SleepTimer } from "@/kit/primitives/SleepTimer";
+import type { SleepState } from "@/kit/primitives/sleepLogic";
+import { TranscriptPanel, type TranscriptLine } from "@/kit/primitives/TranscriptPanel";
 import { i18n } from "@/kit/i18n";
 
+export type { TranscriptLine } from "@/kit/primitives/TranscriptPanel";
 export type { PlayerChapter, ProgressReason } from "@/kit/primitives/playerLogic";
 
 /** A captions or subtitles track (WebVTT). */
@@ -261,6 +265,23 @@ export interface PlayerProps {
   artSpring?: boolean;
   /** MUSIC-KIT-01: in the `audio` layout, lyrics blur and fade by distance from the active line (LyricsList `blurByDistance`). Default off. */
   lyricsBlur?: boolean;
+  /** PARITY-01: draw the sleep timer (Off, End of episode, 5 to 60 minutes) with a live countdown. Off by default. */
+  sleepTimer?: boolean;
+  /** PARITY-01: called when the sleep timer ends playback: "end" when the item finished, "timer" when the countdown ran out.
+   * "End of episode" also keeps `onEnded` and the Up next countdown from running, so the host does not start another item. */
+  onSleep?: (reason: "end" | "timer") => void;
+  /** PARITY-01: skip buttons that jump back and forward by these many seconds (a podcast: 15 and 30). Drawn on every
+   * screen size in the `video` layout; the `audio` layout defaults to 15 and 30. */
+  skip?: { back: number; forward: number };
+  /** PARITY-01: transcript paragraphs. In the `audio` layout a Transcript button swaps the art for the reader (current
+   * paragraph bright, the others dim, tap a paragraph to seek, a search box). */
+  transcript?: readonly TranscriptLine[];
+  transcriptLabel?: string;
+  /** PARITY-01: video touch gestures and the Picture in picture button. All on by default (the Player's existing
+   * behavior); `false` turns one off. Double taps on the sides seek and stack; holding the picture plays at 2x. */
+  doubleTapSeek?: boolean;
+  longPressSpeed?: boolean;
+  pip?: boolean;
   /** In the `video` layout, a soft blurred glow behind the player takes its colors from the poster and the playing frame
    * (about once a second; poster only under reduced motion). Presentational. On by default; `false` opts out. */
   ambient?: boolean;
@@ -290,6 +311,17 @@ function Icon({ name, className = "size-6", slot }: { name: string; className?: 
   // Slotted straight into a Media Chrome button, the svg takes its --media-button-icon-height. Media Chrome fills
   // slotted icons; lucide draws with strokes, so only play and pause keep a fill.
   return <Glyph slot={slot} className={cn(className, name === "play" || name === "pause" ? "fill-current" : "fill-none")} aria-hidden />;
+}
+
+/** A seek button's icon. With `seconds` it carries the number inside the arrow (Apple's 15 and 30), as a slotted icon. */
+function SkipGlyph({ name, seconds }: { name: string; seconds?: number }) {
+  if (seconds === undefined) return <Icon slot="icon" name={name} />;
+  return (
+    <span slot="icon" className="relative inline-flex size-6 items-center justify-center" data-slot="player-skip-glyph">
+      <Icon name={name} />
+      <span aria-hidden className="absolute text-[9px] leading-none font-bold tabular-nums">{seconds}</span>
+    </span>
+  );
 }
 
 // Media Chrome's own theme variables, set from kit tokens only (Kibo UI's video-player mapping, extended).
@@ -383,6 +415,14 @@ export function Player(props: PlayerProps) {
     artSpring = false,
     lyricsBlur = false,
     voiceover,
+    sleepTimer = false,
+    onSleep,
+    skip,
+    transcript,
+    transcriptLabel = i18n._({ id: "ui.Transcript", message: "Transcript" }),
+    doubleTapSeek = true,
+    longPressSpeed = true,
+    pip = true,
   } = props;
   const copy = { ...defaultPlayerCopy(), ...props.copy };
   const liveProp = props.live === true;
@@ -393,6 +433,10 @@ export function Player(props: PlayerProps) {
   const media = useRef<HTMLMediaElement | null>(null);
   const [time, setTime] = useState(0);
   const [lyricsOpen, setLyricsOpen] = useState(false);
+  const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [sleep, setSleep] = useState<SleepState>(null);
+  const sleepRef = useRef<SleepState>(null);
+  sleepRef.current = sleep;
   const requestedLyricsFor = useRef<string | null>(null);
   const previousLyricsSrc = useRef(src);
   if (previousLyricsSrc.current !== src) {
@@ -678,6 +722,12 @@ export function Player(props: PlayerProps) {
     setPlaying(false);
     setEnded(true);
     report("ended");
+    // "End of episode": the sleep timer stops here, so neither the host's onEnded nor the Up next countdown runs.
+    if (sleepRef.current?.kind === "end") {
+      setSleep(null);
+      onSleep?.("end");
+      return;
+    }
     onEnded?.();
     if (upNext && autoplayNext) setCountdown(Math.max(1, countdownSeconds));
   };
@@ -826,6 +876,7 @@ export function Player(props: PlayerProps) {
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     press.current = { x: event.clientX, y: event.clientY, type: event.pointerType, id: event.pointerId, moved: false, pulled: false };
     endHold();
+    if (!longPressSpeed) return;
     holdTimer.current = setTimeout(() => {
       const el = media.current;
       if (!press.current || press.current.moved || !el || el.paused) return;
@@ -863,6 +914,7 @@ export function Player(props: PlayerProps) {
       togglePlay();
       return;
     }
+    if (!doubleTapSeek) return;
     const box = event.currentTarget.getBoundingClientRect();
     const zone = tapZone(event.clientX - box.left, box.width);
     const skip = chain.current.tap(zone, event.timeStamp || performance.now());
@@ -985,6 +1037,11 @@ export function Player(props: PlayerProps) {
 
   const container = rootRef.current;
 
+  const sleepControl = sleepTimer ? (
+    <SleepTimer value={sleep} onChange={setSleep} getMedia={() => media.current} container={container} onFire={() => onSleep?.("timer")} />
+  ) : null;
+  const skipBack = skip?.back ?? 10;
+  const skipForward = skip?.forward ?? 10;
   const rateMenu = (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -1195,13 +1252,13 @@ export function Player(props: PlayerProps) {
             <MediaControlBar className="w-full">
               {playButton()}
               {live ? null : (
-                <MediaSeekBackwardButton className="p-3 max-sm:hidden" seekOffset={10} aria-label={copy.back(10)}>
-                  <Icon slot="icon" name="rotate-ccw" />
+                <MediaSeekBackwardButton className={skip ? "p-3" : "p-3 max-sm:hidden"} seekOffset={skipBack} aria-label={copy.back(skipBack)}>
+                  <SkipGlyph name="rotate-ccw" seconds={skip ? skipBack : undefined} />
                 </MediaSeekBackwardButton>
               )}
               {live ? null : (
-                <MediaSeekForwardButton className="p-3 max-sm:hidden" seekOffset={10} aria-label={copy.ahead(10)}>
-                  <Icon slot="icon" name="rotate-cw" />
+                <MediaSeekForwardButton className={skip ? "p-3" : "p-3 max-sm:hidden"} seekOffset={skipForward} aria-label={copy.ahead(skipForward)}>
+                  <SkipGlyph name="rotate-cw" seconds={skip ? skipForward : undefined} />
                 </MediaSeekForwardButton>
               )}
               <MediaMuteButton aria-label={copy.mute} className="p-3 max-sm:hidden">
@@ -1213,6 +1270,7 @@ export function Player(props: PlayerProps) {
               <MediaVolumeRange className="p-2.5 max-md:hidden" />
               {live ? <span className="p-2.5">{liveBadge}</span> : <MediaTimeDisplay showDuration className="p-2.5 tabular-nums" />}
               <span className="flex-1" aria-hidden />
+              {sleepControl}
               {rateMenu}
               <span className="contents max-sm:hidden">{chapterMenu}</span>
               {captions.length > 0 ? (
@@ -1222,10 +1280,12 @@ export function Player(props: PlayerProps) {
                 </MediaCaptionsButton>
               ) : null}
               {castButtons}
-              <MediaPipButton aria-label={copy.pip} className="p-3 max-sm:hidden [&[mediapipunavailable]]:hidden">
-                <Icon slot="enter" name="picture-in-picture" />
-                <Icon slot="exit" name="picture-in-picture" />
-              </MediaPipButton>
+              {pip ? (
+                <MediaPipButton aria-label={copy.pip} className="p-3 max-sm:hidden [&[mediapipunavailable]]:hidden">
+                  <Icon slot="enter" name="picture-in-picture" />
+                  <Icon slot="exit" name="picture-in-picture" />
+                </MediaPipButton>
+              ) : null}
               <MediaFullscreenButton className="p-3" aria-label={copy.fullscreen}>
                 <Icon slot="enter" name="maximize" />
                 <Icon slot="exit" name="minimize" />
@@ -1292,14 +1352,14 @@ export function Player(props: PlayerProps) {
         </Button>
       ) : null}
       {big && !live ? (
-        <MediaSeekBackwardButton className="p-3" seekOffset={15} aria-label={copy.back(15)}>
-          <Icon slot="icon" name="rotate-ccw" />
+        <MediaSeekBackwardButton className="p-3" seekOffset={skip?.back ?? 15} aria-label={copy.back(skip?.back ?? 15)}>
+          <SkipGlyph name="rotate-ccw" seconds={skip?.back} />
         </MediaSeekBackwardButton>
       ) : null}
       {playButton(big)}
       {big && !live ? (
-        <MediaSeekForwardButton className="p-3" seekOffset={30} aria-label={copy.ahead(30)}>
-          <Icon slot="icon" name="rotate-cw" />
+        <MediaSeekForwardButton className="p-3" seekOffset={skip?.forward ?? 30} aria-label={copy.ahead(skip?.forward ?? 30)}>
+          <SkipGlyph name="rotate-cw" seconds={skip?.forward} />
         </MediaSeekForwardButton>
       ) : null}
       {onNext ? (
@@ -1396,7 +1456,7 @@ export function Player(props: PlayerProps) {
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
         <div className={audioLayout === "container" ? "grid w-full gap-6 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-6 sm:grid-cols-2 sm:items-center"}>
-          {lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw] overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? i18n._({ id: "ui.Looking for lyrics...", message: "Looking for lyrics..." }) : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw]", artSpring)}
+          {transcriptOpen && transcript?.length ? <div className="aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw] overflow-hidden rounded-[var(--art-radius)] bg-card p-4" data-slot="player-transcript"><TranscriptPanel lines={transcript} getMedia={() => media.current} onSeek={seekTo} label={transcriptLabel} className="h-full" /></div> : lyricsOpen ? <div className="aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw] overflow-y-auto rounded-[var(--art-radius)] bg-card p-5" data-slot="player-lyrics"><LyricsList lines={lyrics?.lines} text={lyrics?.text} currentTime={time} onSeek={t => { if (media.current) media.current.currentTime = t; }} labels={{ label: lyricsLabel, empty: lyricsLoading ? i18n._({ id: "ui.Looking for lyrics...", message: "Looking for lyrics..." }) : lyricsEmptyText }} largeCurrent blurByDistance={lyricsBlur} /></div> : art("aspect-square w-full max-w-md justify-self-center max-sm:w-[60vw]", artSpring)}
           <div className="flex min-w-0 flex-col gap-4">
             <div className="min-w-0">
               <p className="truncate text-2xl font-semibold">{title}</p>
@@ -1417,7 +1477,9 @@ export function Player(props: PlayerProps) {
             <div className="flex flex-wrap items-center justify-center gap-2">{transport(true)}</div>
             <div className="flex flex-wrap items-center justify-center gap-1">
               {actionsSlot}
-              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => { if (!lyricsOpen && !lyrics?.text && !lyrics?.lines?.length && requestedLyricsFor.current !== src) { requestedLyricsFor.current = src; onLyricsOpen?.(); } setLyricsOpen(value => !value); }}>{(() => { const Icon = getIcon("book"); return <Icon aria-hidden />; })()}</Button> : null}
+              {lyrics ? <Button type="button" variant={lyricsOpen ? "secondary" : "ghost"} size="icon" aria-label={lyricsLabel} aria-pressed={lyricsOpen} onClick={() => { if (!lyricsOpen && !lyrics?.text && !lyrics?.lines?.length && requestedLyricsFor.current !== src) { requestedLyricsFor.current = src; onLyricsOpen?.(); } setTranscriptOpen(false); setLyricsOpen(value => !value); }}>{(() => { const Icon = getIcon("book"); return <Icon aria-hidden />; })()}</Button> : null}
+              {transcript?.length ? <Button type="button" variant={transcriptOpen ? "secondary" : "ghost"} size="icon" aria-label={transcriptLabel} aria-pressed={transcriptOpen} data-slot="player-transcript-toggle" onClick={() => { setLyricsOpen(false); setTranscriptOpen((value) => !value); }}><Icon name="scroll-text" /></Button> : null}
+              {sleepControl}
               {rateMenu}
               {chapterMenu}
               {castButtons}

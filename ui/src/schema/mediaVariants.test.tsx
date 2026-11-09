@@ -195,7 +195,7 @@ describe("media variant interpreter schemas", () => {
       { layout: "masonry" }, { art_shape: "oval" }, { density: "tiny" },
       { item_index_field: 1 }, { item_highlight_field: true },
       { row_actions: [{ icon: "play", label: "Play" }] },
-      { row_actions: Array.from({ length: 3 }, () => ({ icon: "play", label: "Play", action: { play: { media_id: "{id}" } } })) },
+      { row_actions: Array.from({ length: 4 }, () => ({ icon: "play", label: "Play", action: { play: { media_id: "{id}" } } })) },
     ]) expect(UiNodeSchema.safeParse({ ...music.body[1], ...patch }).success).toBe(false);
     expect(PickerNodeSchema.safeParse({ type: "picker", state: "season", label: "Seasons", variant: "chips" }).success).toBe(false);
   });

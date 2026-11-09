@@ -41,6 +41,29 @@ function sample(source: CanvasImageSource, canvas: HTMLCanvasElement): AmbientCo
   }
 }
 
+/** PARITY-01: one sample of a still picture's four quadrant colors, or null when it cannot be read (cross-origin, broken, no canvas). */
+export function loadArtColors(url: string): Promise<AmbientColors | null> {
+  return new Promise((resolve) => {
+    if (typeof document === "undefined") return resolve(null);
+    try {
+      const image = document.createElement("img");
+      image.crossOrigin = "anonymous";
+      image.onload = () => resolve(sample(image, document.createElement("canvas")));
+      image.onerror = () => resolve(null);
+      image.src = url;
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+/** The mean of the four quadrant colors as one `color(srgb ...)` string. */
+export function meanColor(colors: AmbientColors): string {
+  const parts = colors.map((c) => c.match(/color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)\)/)).map((m) => (m ? [Number(m[1]), Number(m[2]), Number(m[3])] : [0, 0, 0]));
+  const avg = [0, 1, 2].map((i) => (parts.reduce((sum, p) => sum + p[i]!, 0) / parts.length).toFixed(3));
+  return `color(srgb ${avg[0]} ${avg[1]} ${avg[2]})`;
+}
+
 /** YouTube/Plex style ambient light: a soft blurred backdrop behind a player that takes its colors from the poster or the
  * current frame. Purely presentational (`aria-hidden`), drawn behind its parent (`-z-10`, so the parent needs `isolate`),
  * and silent on any canvas or cross-origin failure. While playing it samples about once a second; paused it holds the poster

@@ -40,6 +40,8 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
         }),
       }),
       z.object({ play: z.object({ media_id: z.string().min(1), position_s: z.union([z.number().min(0), z.string()]).optional() }) }),
+      // PARITY-01: share a link to a hub route (the device share sheet, or copy).
+      z.object({ share: z.object({ to: z.string().regex(/^\//), title: z.string().max(120).optional() }) }),
       z.object({ confirm: z.object({ prompt: z.string(), on_confirm: ActionSchema }) }),
       z.object({ ask: z.object({ prompt: z.string(), expects: z.string() }) }),
     ])
@@ -49,6 +51,7 @@ export type Action =
   | { navigate: { to: string; state?: Record<string, string | number | boolean> } }
   | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown>; then?: { navigate: { to: string; state?: Record<string, string | number | boolean> } } } }
   | { play: { media_id: string; position_s?: number | string } }
+  | { share: { to: string; title?: string } }
   | { confirm: { prompt: string; on_confirm: Action } }
   | { ask: { prompt: string; expects: string } };
 
@@ -112,6 +115,8 @@ export const CreationHeaderNodeSchema = z.object({
   candidates_bind: BindingSchema.optional(),
   heading_level: z.enum(["h1", "h2"]).default("h1"),
   variant: z.enum(["full", "byline", "collection", "studio"]).default("full"),
+  // PARITY-01: a static gradient from the art's dominant colour behind the header.
+  backdrop: z.enum(["none", "art_gradient"]).optional(),
   // VIDEO-STUDIO-03 (K2): the studio page header.
   eyebrow: z.string().min(1).max(40).optional(),
   secondary: z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema }).optional(),
@@ -188,6 +193,14 @@ export const CardGridNodeSchema = z.object({
 });
 export type CardGridNode = z.infer<typeof CardGridNodeSchema>;
 
+/** PARITY-01: a one-of-many control (sort, filter chips, search type chips) that writes its value to page state. */
+export const ChoiceControlSchema = z.object({
+  state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
+  label: z.string().min(1).max(40),
+  options: z.array(z.object({ value: z.string().min(1).max(40), label: z.string().min(1).max(40) }).strict()).min(2).max(10),
+}).strict();
+export type ChoiceControl = z.infer<typeof ChoiceControlSchema>;
+
 export const MediaShelfNodeSchema = z.object({
   type: z.literal("media_shelf"),
   heading: z.string().min(1).max(60).optional(),
@@ -199,6 +212,7 @@ export const MediaShelfNodeSchema = z.object({
   item_subtitle_field: z.string().optional(),
   item_media_field: z.string(),
   item_progress_field: z.string().optional(),
+  item_avatar_field: z.string().optional(),
   item_badge_field: z.string().optional(),
   item_meta_field: z.string().optional(),
   aspect: z.enum(["wide", "square", "poster"]).default("wide"),
@@ -218,7 +232,13 @@ export const MediaShelfNodeSchema = z.object({
     show_when_field: z.string().min(1).optional(),
     hide_when_field: z.string().min(1).optional(),
     action: ActionSchema,
-  }).strict()).max(2).optional(),
+  }).strict()).max(3).optional(),
+  // PARITY-01: a sort control, filter chips and a pinned row.
+  sort: ChoiceControlSchema.optional(),
+  chips: ChoiceControlSchema.optional(),
+  pinned_field: z.string().min(1).optional(),
+  pinned_max: z.number().int().min(1).max(12).optional(),
+  pinned_heading: z.string().min(1).max(40).optional(),
   // MUSIC-KIT-01: the modern music look.
   card_radius: z.enum(["default", "tight"]).optional(),
   press_scale: z.boolean().optional(),
@@ -268,7 +288,7 @@ export const BillboardNodeSchema = z.object({
 });
 export type BillboardNode = z.infer<typeof BillboardNodeSchema>;
 
-export const PLAYER_FIELDS = ["id", "src", "title", "subtitle", "poster", "chapters", "captions", "thumbnails", "position", "completed", "up_next", "description", "facts", "lyrics", "timed_lyrics"] as const;
+export const PLAYER_FIELDS = ["id", "src", "title", "subtitle", "poster", "chapters", "captions", "thumbnails", "position", "completed", "up_next", "description", "facts", "lyrics", "timed_lyrics", "transcript"] as const;
 
 export const PlayerNodeSchema = z.object({
   type: z.literal("player"),
@@ -287,7 +307,14 @@ export const PlayerNodeSchema = z.object({
   on_next: ActionSchema.optional(),
   // MEDIA-POLISH-01: the title block and the actions row under the picture.
   details: z.boolean().default(false),
-  details_show: z.array(z.enum(["title", "facts", "description", "chapters"])).default(["title", "facts", "description", "chapters"]).refine((items) => new Set(items).size === items.length, "details_show items must be unique").optional(),
+  // PARITY-01: sleep timer, skip buttons, transcript source and the video gestures.
+  sleep_timer: z.boolean().optional(),
+  skip: z.object({ back: z.number().min(1).max(120), forward: z.number().min(1).max(120) }).strict().optional(),
+  transcript_bind: BindingSchema.optional(),
+  double_tap_seek: z.boolean().optional(),
+  long_press_speed: z.boolean().optional(),
+  pip: z.boolean().optional(),
+  details_show: z.array(z.enum(["title", "facts", "description", "chapters", "transcript"])).default(["title", "facts", "description", "chapters"]).refine((items) => new Set(items).size === items.length, "details_show items must be unique").optional(),
   actions: z
     .array(
       z.object({
@@ -462,6 +489,8 @@ export const SearchNodeSchema = z.object({
   item_label_field: z.string().optional(),
   submit: ActionSchema.optional(),
   clear_recents: ActionSchema.optional(),
+  // PARITY-01: type chips that write a page-state key; sections below use `condition` on it.
+  type_chips: ChoiceControlSchema.optional(),
 });
 export type SearchNode = z.infer<typeof SearchNodeSchema>;
 
@@ -620,7 +649,7 @@ export const TrackRowsNodeSchema = z.object({
     icon: z.string().min(1),
     label: z.string().min(1),
     action: ActionSchema,
-  }).strict()).max(2).optional(),
+  }).strict()).max(3).optional(),
   hide_when_empty: z.boolean().default(false),
   empty_state: EmptyStateNodeSchema.optional(),
 });

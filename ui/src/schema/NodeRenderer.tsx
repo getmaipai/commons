@@ -12,6 +12,9 @@ import { MediaShelf } from "@/kit/primitives/MediaShelf";
 import { LoopPoster } from "@/kit/primitives/LoopPoster";
 import { CategoryTiles, QuickTiles, TopResultCard, TrackRows } from "@/kit/primitives/MusicBlocks";
 import { Billboard } from "@/kit/primitives/Billboard";
+import { ArtGradient } from "@/kit/primitives/ArtGradient";
+import { Chip } from "@/kit/primitives/Chip";
+import { TranscriptPanel, type TranscriptLine } from "@/kit/primitives/TranscriptPanel";
 import { Player, type PlayerChapter, type PlayerTextTrack, type PlayerUpNext } from "@/kit/primitives/Player";
 import { SafeImage, type ImageFallbackKind } from "@/kit/primitives/SafeImage";
 import { Reader } from "@/kit/primitives/Reader";
@@ -85,6 +88,7 @@ import type {
   TrackRowsNode,
   TabsNode,
   CreationHeaderNode,
+  ChoiceControl,
   DataState,
 } from "@/kit/schema/types";
 import type { WidgetData, WidgetDescriptor } from "@/kit/widgets";
@@ -158,8 +162,10 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
   const mode = rawVisibility.mode === "shared" ? "shared" : "private";
   const base = { ...row };
   const fire = (action: Action, personId?: string) => dispatch(action, [{ ...base, ...(personId ? { person_id: personId } : {}) }]);
+  const artValue = row[node.fields?.art ?? "art"];
   return (
-    <>
+    <div className={node.backdrop === "art_gradient" ? "relative isolate" : "contents"} data-slot={node.backdrop === "art_gradient" ? "creation-backdrop" : undefined}>
+      {node.backdrop === "art_gradient" ? <ArtGradient art={typeof artValue === "string" ? localPicture(artValue) : null} /> : null}
       {node.variant === "studio" ? <CreationHeader
         title={typeof row.title === "string" ? row.title : null}
         headingLevel={node.heading_level}
@@ -191,7 +197,7 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
         visibility={{ mode, people, canManage: rawVisibility.can_manage === true, onOpen: () => setOpen(true) }} variant={node.variant === "byline" ? "byline" : "full"} />}
       <SharePanel open={open} onOpenChange={setOpen} people={people} candidates={candidates} canManage={rawVisibility.can_manage === true}
         onAdd={(id) => fire(node.share_change.add, id)} onRemove={(id) => fire(node.share_change.remove, id)} onMakePrivate={() => fire(node.share_change.make_private)} />
-    </>
+    </div>
   );
 }
 
@@ -528,6 +534,37 @@ const SEARCH_DEBOUNCE_MS = 250;
 /** NEWS-LOOK-02: the typed text goes to page state after a short pause; Enter fires `submit` with {q}. Recents (a bound
  * list of rows) show as chips while the field is empty. This node sends nothing itself: every request is the page's
  * own data call (it reads the state) or the declared action. */
+/** PARITY-01: one-of-many neutral kit chips writing page state `control.state`; the first option is the default. */
+function ChoiceChips({ control, state, slot }: { control: ChoiceControl; state: Row; slot: string }) {
+  const writer = useContext(PageStateContext);
+  const chosen = typeof state[control.state] === "string" ? (state[control.state] as string) : control.options[0]!.value;
+  return (
+    <div role="group" aria-label={control.label} data-slot={slot} className="flex min-w-0 items-center gap-2 overflow-x-auto [scrollbar-width:none]">
+      {control.options.map((option) => (
+        <Chip key={option.value} size="strip" selected={chosen === option.value} onClick={() => writer?.merge({ [control.state]: option.value === control.options[0]!.value ? undefined : option.value })}>
+          {option.label}
+        </Chip>
+      ))}
+    </div>
+  );
+}
+
+/** PARITY-01: a sort control (kit select) writing page state `control.state`; the first option is the default. */
+function SortSelect({ control, state }: { control: ChoiceControl; state: Row }) {
+  const writer = useContext(PageStateContext);
+  const chosen = typeof state[control.state] === "string" ? (state[control.state] as string) : control.options[0]!.value;
+  return (
+    <Select value={chosen} onValueChange={(value) => writer?.merge({ [control.state]: value === control.options[0]!.value ? undefined : value })}>
+      <SelectTrigger aria-label={control.label} data-slot="shelf-sort" className="w-auto min-w-36">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {control.options.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
+      </SelectContent>
+    </Select>
+  );
+}
+
 function SearchControl({ node, state, recents }: { node: SearchNode; state: Row; recents: Row[] }) {
   const writer = useContext(PageStateContext);
   const { dispatch, lastError } = useDispatchAction();
@@ -574,6 +611,7 @@ function SearchControl({ node, state, recents }: { node: SearchNode; state: Row;
         onChange={(e) => change(e.target.value)}
         onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); submit(text); } }}
       />
+      {node.type_chips ? <ChoiceChips control={node.type_chips} state={state} slot="search-type-chips" /> : null}
       {chips.length > 0 ? (
         <div data-slot="search-recents" className="flex min-w-0 flex-wrap items-center gap-2">
           {chips.map((chip) => (
@@ -1104,7 +1142,22 @@ function dayGroupKeys(rows: readonly Row[], field: string): Map<Row, string> {
   return keys;
 }
 
+/** PARITY-01: the sort select and filter chips sit outside the shelf's loading and empty states, so a filter that
+ * matches nothing can still be changed back. */
 function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row }) {
+  if (!node.sort && !node.chips) return <MediaShelfBody node={node} state={state} />;
+  return (
+    <div className="flex min-w-0 flex-col gap-3" data-slot="shelf-with-controls">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2" data-slot="shelf-controls">
+        {node.chips ? <ChoiceChips control={node.chips} state={state} slot="shelf-chips" /> : <span />}
+        {node.sort ? <SortSelect control={node.sort} state={state} /> : null}
+      </div>
+      <MediaShelfBody node={node} state={state} />
+    </div>
+  );
+}
+
+function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
   const query = useBinding<Row[]>(node.bind, state);
   const { dispatch, lastError, pendingConfirm } = useDispatchAction();
   // The slider's size is per shelf and per device (the card-size hook's own storage), whether or not a slider is drawn.
@@ -1133,15 +1186,16 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
         const groupKeys = node.group_by_field ? dayGroupKeys(rows, node.group_by_field) : undefined;
         const noun = node.group_noun ?? { one: i18n._({ id: "ui.item", message: "item" }), other: i18n._({ id: "ui.items", message: "items" }) };
         const favoriteOn = (row: Row) => pressed[keyOf(row)] ?? readField(row, node.favorite!.field) === true;
-        return (
-        <>
+        const pinned = node.pinned_field ? rows.filter((row) => readField(row, node.pinned_field!) === true).slice(0, node.pinned_max ?? 6) : [];
+        const rest = pinned.length > 0 ? rows.filter((row) => !pinned.includes(row)) : rows;
+        const shelf = (items: Row[], pinnedRow: boolean) => (
           <MediaShelf
-            items={rows}
+            items={items}
             getKey={keyOf}
-            groupBy={groupKeys
+            groupBy={groupKeys && !pinnedRow
               ? { getKey: (row) => groupKeys.get(row) ?? "undated", label: (key, count) => i18n._({ id: "ui.{day}, {count} {noun}", message: "{day}, {count} {noun}", values: { day: key === "undated" ? i18n._({ id: "ui.Earlier", message: "Earlier" }) : dayHeading(key), count, noun: count === 1 ? noun.one : noun.other } }) }
               : undefined}
-            sizeControl={node.size_control ? { size: tileSize, onChange: setTileSize } : undefined}
+            sizeControl={node.size_control && !pinnedRow ? { size: tileSize, onChange: setTileSize } : undefined}
             favorite={node.favorite
               ? {
                   isOn: favoriteOn,
@@ -1163,11 +1217,11 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             isLocked={(row) => readField(row, node.locked_field ?? "locked") === true}
             isMaking={(row) => readField(row, node.making_field ?? "making") === true}
             aspect={node.aspect}
-            heading={node.heading}
+            heading={pinnedRow ? (node.pinned_heading ?? i18n._({ id: "ui.Pinned", message: "Pinned" })) : node.heading}
             headingStyle={node.heading_style}
-            variant={node.variant}
-            orientation={node.orientation}
-            layout={node.layout}
+            variant={pinnedRow ? "plain" : node.variant}
+            orientation={pinnedRow ? "horizontal" : node.orientation}
+            layout={pinnedRow ? "rail" : node.layout}
             artShape={node.art_shape}
             density={node.density}
             cardRadius={node.card_radius}
@@ -1181,7 +1235,7 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
                   return typeof value === "string" || typeof value === "number" ? value : null;
                 }
               : undefined}
-            renderActions={node.row_actions?.length
+            renderActions={node.row_actions?.length && !pinnedRow
               ? (row) => node.row_actions!.map((button, i) => {
                   if (button.show_when_field && !readField(row, button.show_when_field)) return null;
                   if (button.hide_when_field && readField(row, button.hide_when_field)) return null;
@@ -1210,14 +1264,23 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
             seeAll={node.see_all ? { label: node.see_all.label, onSelect: () => dispatch(node.see_all!.action) } : undefined}
             onSelect={node.on_select ? (row) => dispatch(node.on_select!, [row]) : undefined}
             getLabel={(row) => String(readField(row, node.item_label_field))}
-            renderCaption={(row) => (
-              <span className="flex min-w-0 flex-col">
-                <span className={node.orientation === "vertical" && node.density !== "compact" ? "line-clamp-2 text-sm font-semibold" : "truncate text-sm font-semibold"}>{String(readField(row, node.item_label_field))}</span>
-                {node.item_subtitle_field ? (
-                  <span className="text-muted-foreground truncate text-sm">{fillTemplate(node.item_subtitle_field, row)}</span>
-                ) : null}
-              </span>
-            )}
+            renderCaption={(row) => {
+              const avatar = node.item_avatar_field ? localPicture(readField(row, node.item_avatar_field)) : null;
+              const words = (
+                <span className="flex min-w-0 flex-col">
+                  <span className={node.orientation === "vertical" && node.density !== "compact" ? "line-clamp-2 text-sm font-semibold" : "truncate text-sm font-semibold"}>{String(readField(row, node.item_label_field))}</span>
+                  {node.item_subtitle_field ? (
+                    <span className="text-muted-foreground truncate text-sm">{fillTemplate(node.item_subtitle_field, row)}</span>
+                  ) : null}
+                </span>
+              );
+              return avatar ? (
+                <span className="flex min-w-0 items-center gap-2" data-slot="shelf-avatar-caption">
+                  <SafeImage src={avatar} kind="music" alt="" className="size-9 shrink-0 rounded-full object-cover" />
+                  {words}
+                </span>
+              ) : words;
+            }}
             renderItem={(row) => {
               const src = localPicture(readField(row, node.item_media_field));
               if (node.media_loop && node.item_loop_field) return <LoopPoster poster={src} loop={localVideo(readField(row, node.item_loop_field))} kind={pictureKind(readField(row, "kind"))} />;
@@ -1242,6 +1305,11 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
                 : undefined
             }
           />
+        );
+        return (
+        <>
+          {pinned.length > 0 ? shelf(pinned, true) : null}
+          {rest.length > 0 || pinned.length === 0 ? shelf(rest, false) : null}
           {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
           <ConfirmDialog pendingConfirm={pendingConfirm} />
         </>
@@ -1600,6 +1668,11 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               completed={readField(r, field("completed", "completed")) === true}
               upNext={upNext && typeof upNext.id === "string" ? upNext : undefined}
               autoplayNext={node.autoplay_next}
+              sleepTimer={node.sleep_timer}
+              skip={node.skip}
+              doubleTapSeek={node.double_tap_seek}
+              longPressSpeed={node.long_press_speed}
+              pip={node.pip}
               onProgress={
                 node.on_progress
                   ? (p) =>
@@ -1618,6 +1691,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
                 chapters={(readField(r, field("chapters", "chapters")) as PlayerChapter[] | undefined) ?? undefined}
                 seek={(time) => { if (mediaEl.current) mediaEl.current.currentTime = time; }}
                 show={node.details_show}
+                transcript={node.details_show?.includes("transcript") ? { bind: node.transcript_bind, state, fallback: readField(r, field("transcript", "transcript")), getMedia: () => mediaEl.current, phone } : undefined}
               />
             ) : null}
             {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatch} wrap={node.actions_wrap === true}>{!audioLayout ? editButton : null}</PlayerActions> : null}
@@ -1688,14 +1762,47 @@ function PlayerCastMenu({ host, item, getPosition, onError }: { host: MediaHost;
 }
 
 /** MEDIA-DETAIL-01: the watch page's title, facts and expandable description under the picture. */
-function PlayerDetails({ title, subtitle, facts, description, chapters, seek, show }: {
+function toTranscriptLines(value: unknown): TranscriptLine[] {
+  const rows = Array.isArray(value) ? value : value && typeof value === "object" && Array.isArray((value as Row).rows) ? (value as Row).rows as unknown[] : [];
+  return rows.filter((row): row is TranscriptLine => !!row && typeof row === "object" && typeof (row as Row).start_s === "number" && typeof (row as Row).text === "string");
+}
+
+function BoundTranscript({ bind, state, ...rest }: { bind: NonNullable<PlayerNode["transcript_bind"]>; state: Row; getMedia: () => HTMLMediaElement | null | undefined; onSeek: (s: number) => void }) {
+  const query = useBinding<unknown>(bind, state);
+  if (query.isError) return <p role="status" className="text-base text-destructive">{i18n._({ id: "ui.Could not load the transcript. Check that you are online, then try again.", message: "Could not load the transcript. Check that you are online, then try again." })}</p>;
+  return <TranscriptPanel lines={toTranscriptLines(query.data)} {...rest} />;
+}
+
+/** PARITY-01: the Transcript button under the player; it opens the reader in a dialog (a sheet on a phone). */
+function TranscriptButton({ transcript, seek }: { transcript: NonNullable<Parameters<typeof PlayerDetails>[0]["transcript"]>; seek: (time: number) => void }) {
+  const [open, setOpen] = useState(false);
+  const label = i18n._({ id: "ui.Transcript", message: "Transcript" });
+  const body = open ? (
+    <div className="flex max-h-[70dvh] min-h-0 flex-col p-4">
+      {transcript.bind
+        ? <BoundTranscript bind={transcript.bind} state={transcript.state} getMedia={transcript.getMedia} onSeek={seek} />
+        : <TranscriptPanel lines={toTranscriptLines(transcript.fallback)} getMedia={transcript.getMedia} onSeek={seek} />}
+    </div>
+  ) : null;
+  return (
+    <>
+      <Button type="button" variant="secondary" size="sm" className="self-start rounded-full px-4" data-slot="player-transcript-open" onClick={() => setOpen(true)}>{label}</Button>
+      {transcript.phone
+        ? <Drawer open={open} onOpenChange={setOpen}><DrawerContent><DrawerHeader><DrawerTitle>{label}</DrawerTitle></DrawerHeader>{body}</DrawerContent></Drawer>
+        : <Dialog open={open} onOpenChange={setOpen}><DialogContent><DialogHeader><DialogTitle>{label}</DialogTitle></DialogHeader>{body}</DialogContent></Dialog>}
+    </>
+  );
+}
+
+function PlayerDetails({ title, subtitle, facts, description, chapters, seek, show, transcript }: {
+  transcript?: { bind?: PlayerNode["transcript_bind"]; state: Row; fallback: unknown; getMedia: () => HTMLMediaElement | null | undefined; phone: boolean };
   title: string;
   subtitle?: string;
   facts?: string;
   description?: string;
   chapters?: PlayerChapter[];
   seek: (time: number) => void;
-  show?: Array<"title" | "facts" | "description" | "chapters">;
+  show?: Array<"title" | "facts" | "description" | "chapters" | "transcript">;
 }) {
   const [expanded, setExpanded] = useState(false);
   const detail = description?.trim() && !/\{[^{}]+\}/.test(description) ? description.trim() : null;
@@ -1715,6 +1822,7 @@ function PlayerDetails({ title, subtitle, facts, description, chapters, seek, sh
           ) : null}
         </div>
       ) : null}
+      {transcript ? <TranscriptButton transcript={transcript} seek={seek} /> : null}
       {(show ?? ["title", "facts", "description", "chapters"]).includes("chapters") && !detail && chapters?.length ? <div className="flex flex-col" aria-label={i18n._({ id: "ui.Chapters", message: "Chapters" })}>{chapters.map((chapter) => <Button key={`${chapter.start_s}-${chapter.title}`} type="button" variant="ghost" size="sm" className="justify-start" onClick={() => seek(chapter.start_s)}>{formatTime(chapter.start_s)} {chapter.title}</Button>)}</div> : null}
     </div>
   );
