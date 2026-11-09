@@ -8,17 +8,17 @@ import { icons } from "@/kit/icons";
 import { i18n } from "@/kit/i18n"
 
 type Wanted = Partial<Record<"needs_you" | "speaking" | "working" | "thinking" | "listening" | "sleeping", boolean>>;
-type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl" | "header" | "fill"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "idle" | "listening" | "thinking" | "speaking" | null; animated?: boolean };
+type Props = { name: string; clips: CompanionClips; state?: StateId | undefined; wanted?: Wanted; once?: { state: StateId; nonce: number } | null; size?: "xs" | "sm" | "md" | "lg" | "xl" | "header" | "fill"; onFail?(): void; className?: string; placement?: "inline" | "corner"; hidden?: boolean; onHiddenChange?: (hidden: boolean) => void; ring?: "idle" | "listening" | "thinking" | "speaking" | null; animated?: boolean; mouth?: { still: string; level: () => number } | null };
 const SIZES = { xs: "size-7", sm: "size-16", md: "size-24", lg: "size-40", xl: "size-52", header: "size-10", fill: "size-full" } as const;
 
-export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null, animated = true }: Props) {
+export function CompanionAvatar({ name, clips, state, wanted, once, size = "md", onFail, className, placement = "inline", hidden = false, onHiddenChange, ring = null, animated = true, mouth = null }: Props) {
   const corner = placement === "corner";
   const wrapperClass = corner ? "group pointer-events-none absolute right-3 top-3 z-10" : size === "fill" ? "group relative size-full" : "group relative";
   const ToggleIcon = hidden ? icons.eye : icons["eye-off"];
   const toggleLabel = hidden ? i18n._({ id: "ui.Show the character", message: "Show the character" }) : i18n._({ id: "ui.Hide the character", message: "Hide the character" });
 
   return <div className={cn(wrapperClass)}>
-    {!hidden ? <CompanionAvatarVisual name={name} clips={clips} state={state} wanted={wanted} once={once} size={size} onFail={onFail} className={className} ring={ring} animated={animated} /> : null}
+    {!hidden ? <CompanionAvatarVisual name={name} clips={clips} state={state} wanted={wanted} once={once} size={size} onFail={onFail} className={className} ring={ring} animated={animated} mouth={mouth} /> : null}
     {onHiddenChange ? <Button
       type="button"
       variant="ghost"
@@ -30,7 +30,7 @@ export function CompanionAvatar({ name, clips, state, wanted, once, size = "md",
   </div>;
 }
 
-function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", onFail, className, ring = null, animated = true }: Omit<Props, "placement" | "hidden" | "onHiddenChange">) {
+function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", onFail, className, ring = null, animated = true, mouth = null }: Omit<Props, "placement" | "hidden" | "onHiddenChange">) {
   const machine = useMemo(() => createCompanionAvatarMachine(clips), [clips]);
   const [current, setCurrent] = useState<StateId>(state ?? "idle");
   const [failed, setFailed] = useState(false);
@@ -70,6 +70,25 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
 
   const clip = clips[current] ?? clips.idle;
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const mouthLayerRef = useRef<HTMLImageElement | null>(null);
+  const mouthActive = Boolean(mouth && wantedState === "speaking" && animated && !reduced && documentVisible && !failed);
+  useEffect(() => {
+    if (!mouthActive || !mouth || !mouthLayerRef.current) return;
+    let frame = 0;
+    const update = () => {
+      const layer = mouthLayerRef.current;
+      if (!layer) return;
+      let level = 0;
+      try {
+        const reading = mouth.level();
+        if (Number.isFinite(reading)) level = reading;
+      } catch { /* A missing analyser reading means a closed mouth. */ }
+      layer.style.opacity = String(Math.min(1, Math.max(0, level * 2.5)));
+      frame = window.requestAnimationFrame(update);
+    };
+    frame = window.requestAnimationFrame(update);
+    return () => window.cancelAnimationFrame(frame);
+  }, [mouthActive, mouth]);
   useEffect(() => {
     const video = videoRef.current;
     const canAv1 = !!clip.av1 && video?.canPlayType('video/mp4; codecs="av01.0.05M.08"') === "probably";
@@ -106,6 +125,7 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
   return <div role="img" aria-label={ring ? i18n._({ id: "ui.{name}, {ring}", message: "{name}, {ring}", values: { name, ring } }) : name} data-ring={ring ?? undefined} className={cn(SIZES[size], "pointer-events-none relative", className)}>
     {ring ? <span aria-hidden="true" className={cn("absolute rounded-full", ringClass)} /> : null}
     {ring === "listening" && !reduced ? <span aria-hidden="true" data-ring-ripple="" className="absolute -inset-1.5 animate-ping rounded-full border-2 border-primary/50" /> : null}
-    {movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264 || ""} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <SafeImage src={clip.still} alt="" className="size-full object-contain" />}
+    {mouthActive && mouth ? <div aria-hidden="true" data-mouth="active" className="relative size-full"><SafeImage src={clips.idle.still} alt="" className="size-full object-contain" /><SafeImage imageRef={mouthLayerRef} src={mouth.still} alt="" className="absolute inset-0 size-full object-contain transition-opacity duration-[60ms]" style={{ opacity: 0 }} /></div>
+      : movable && clip ? <div aria-hidden="true" className="size-full"><StackedAlphaVideo videoRef={videoRef} src={source || clip.h264 || ""} loop={clip.loop} label="" onEnded={handleEnded} onError={handleError} /></div> : <SafeImage src={clip.still} alt="" className="size-full object-contain" />}
   </div>;
 }

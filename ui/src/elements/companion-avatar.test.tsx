@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { CompanionAvatar } from "./companion-avatar";
 import type { CompanionClips } from "./companion-avatar-machine";
 
@@ -207,5 +207,75 @@ test("each ring differs in shape or motion, not only colour", () => {
   expect(classes.thinking).toContain("animate-");
   expect(classes.speaking).toContain("shadow-lg");
   expect(new Set(Object.values(classes)).size).toBe(4);
+  restore();
+});
+
+test("mouth mode uses idle and mouth stills without a speaking video", () => {
+  const restore = setup();
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" wanted={{ speaking: true }} mouth={{ still: "mouth.png", level: () => 0 }} />);
+  const wrapper = view.container.querySelector('[data-mouth="active"]')!;
+  expect(wrapper).toBeTruthy();
+  expect(wrapper.querySelectorAll("img").length).toBe(2);
+  expect(Array.from(wrapper.querySelectorAll("img")).map((img) => img.getAttribute("src"))).toEqual(["idle.png", "mouth.png"]);
+  expect(view.container.querySelector("video")).toBeNull();
+  restore();
+});
+
+test("mouth opacity follows level readings on animation frames", () => {
+  const restore = setup();
+  const oldRaf = window.requestAnimationFrame;
+  const oldCancel = window.cancelAnimationFrame;
+  let callback: FrameRequestCallback | undefined;
+  window.requestAnimationFrame = ((next: FrameRequestCallback) => { callback = next; return 1; }) as typeof window.requestAnimationFrame;
+  window.cancelAnimationFrame = (() => {}) as typeof window.cancelAnimationFrame;
+  let level = 0;
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" wanted={{ speaking: true }} mouth={{ still: "mouth.png", level: () => level }} />);
+  const layer = view.container.querySelector('[data-mouth="active"] img:last-child') as HTMLImageElement;
+  act(() => callback!(0));
+  expect(layer.style.opacity).toBe("0");
+  level = 0.2; act(() => callback!(16));
+  expect(layer.style.opacity).toBe("0.5");
+  level = 1; act(() => callback!(32));
+  expect(layer.style.opacity).toBe("1");
+  view.unmount();
+  window.requestAnimationFrame = oldRaf; window.cancelAnimationFrame = oldCancel;
+  restore();
+});
+
+test("mouth mode is inactive when not speaking or when animation is disabled", () => {
+  const restore = setup();
+  const mouth = { still: "mouth.png", level: () => 0 };
+  const idle = render(<CompanionAvatar name="Mimi" clips={clips} wanted={{ thinking: true }} mouth={mouth} animated={false} />);
+  expect(idle.container.querySelector("[data-mouth]")).toBeNull();
+  expect(idle.container.querySelector("img")?.getAttribute("src")).toBe("idle.png");
+  idle.unmount();
+  const speaking = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" wanted={{ speaking: true }} mouth={mouth} animated={false} />);
+  expect(speaking.container.querySelector("[data-mouth]")).toBeNull();
+  expect(speaking.container.querySelector("img")?.getAttribute("src")).toBe("idle.png");
+  restore();
+});
+
+test("reduced motion ignores mouth mode and keeps the still", () => {
+  const restore = setup();
+  window.matchMedia = (() => ({ matches: true, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" wanted={{ speaking: true }} mouth={{ still: "mouth.png", level: () => 0 }} />);
+  expect(view.container.querySelector("[data-mouth]")).toBeNull();
+  expect(view.container.querySelector("img")?.getAttribute("src")).toBe("idle.png");
+  restore();
+});
+
+test("a throwing mouth level is treated as zero", () => {
+  const restore = setup();
+  const oldRaf = window.requestAnimationFrame;
+  const oldCancel = window.cancelAnimationFrame;
+  let callback: FrameRequestCallback | undefined;
+  window.requestAnimationFrame = ((next: FrameRequestCallback) => { callback = next; return 1; }) as typeof window.requestAnimationFrame;
+  window.cancelAnimationFrame = (() => {}) as typeof window.cancelAnimationFrame;
+  const view = render(<CompanionAvatar name="Mimi" clips={clips} state="speaking" wanted={{ speaking: true }} mouth={{ still: "mouth.png", level: () => { throw new Error("unavailable"); } }} />);
+  const layer = view.container.querySelector('[data-mouth="active"] img:last-child') as HTMLImageElement;
+  expect(() => act(() => callback!(0))).not.toThrow();
+  expect(layer.style.opacity).toBe("0");
+  view.unmount();
+  window.requestAnimationFrame = oldRaf; window.cancelAnimationFrame = oldCancel;
   restore();
 });
