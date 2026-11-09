@@ -1,3 +1,7 @@
+## [spec-v0.1.350] - 2026-11-09
+
+- 0.1.350: re-release of 0.1.349 (the 0.1.349 tag points at a commit still versioned 0.1.348). No schema change.
+
 ## [spec-v0.1.349] - 2026-11-09
 
 - PARITY-01, additive (Podcasts, Music and Videos parity). `player`: `sleep_timer`, `skip {back, forward}`, `double_tap_seek`, `long_press_speed`, `pip` (booleans except skip), `transcript_bind` and `fields.transcript` (rows `{start_s, text}`), and `details_show` accepts `transcript`; the duplicate `details_show` key is gone. `media_shelf`: `sort {state, label, options}`, `chips {state, label, options}`, `item_avatar_field`, `pinned_field` with `pinned_max` and `pinned_heading`, and `row_actions` up to 3 (also on `track_rows`); `item_badge_field` already existed. `creation_header.backdrop: "art_gradient"`. `search.type_chips {state, label, options}` (`recents` already existed). New action `share {to, title?}` (a hub-route link). Play next, Add to queue, Mark played, Unfollow and Go to need no new op: they are a `call` or `navigate`. Fixture `ui/pages/media-parity.json`. Pairs with the next ui tag.
