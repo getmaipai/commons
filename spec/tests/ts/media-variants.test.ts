@@ -36,10 +36,10 @@ describe("media shelf variants schema", () => {
     expect(validate(shelf)).toBe(true);
   });
 
-  test("row actions allow zero to two complete actions, with an optional label field", () => {
-    for (const row_actions of [[], [play], [play, save]]) expect(validate({ ...shelf, row_actions })).toBe(true);
+  test("row actions allow zero to three complete actions, with an optional label field", () => {
+    for (const row_actions of [[], [play], [play, save], [play, save, play]]) expect(validate({ ...shelf, row_actions })).toBe(true);
     for (const row_actions of [
-      [play, save, play], [{ ...play, action: undefined }], [{ ...play, label: "" }],
+      [play, save, play, save], [{ ...play, action: undefined }], [{ ...play, label: "" }],
       [{ ...play, icon: "" }], [{ ...save, label_field: false }], [{ ...save, label_field: "" }],
       [{ ...play, unexpected: true }], [{ ...play, action: { launch: {} } }],
     ]) expect(validate({ ...shelf, row_actions })).toBe(false);

@@ -37,6 +37,12 @@ function checkAction(action: unknown, packageId: string, where: string, out: str
     const inside = (root: string) => navigate.to === root || (navigate.to as string).startsWith(`${root}/`);
     if (!inside(base) && !inside(settings)) out.push(`${where}: navigate.to "${navigate.to}" must stay under ${base} (or ${settings}, the app's own settings)`);
   }
+  const share = action.share;
+  if (isObject(share) && typeof share.to === "string") {
+    const base = `/apps/${packageId}`;
+    const path = share.to.split(/[?#]/)[0]!;
+    if (path !== base && !path.startsWith(`${base}/`)) out.push(`${where}: share.to "${share.to}" must stay under ${base}`);
+  }
   const call = action.call;
   if (isObject(call) && typeof call.target === "string" && !call.target.startsWith(`/api/plugins/${packageId}/`)) {
     out.push(`${where}: call.target "${call.target}" must stay under /api/plugins/${packageId}/`);

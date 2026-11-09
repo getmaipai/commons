@@ -62,6 +62,8 @@ describe("music blocks on a package page", () => {
   test("each block may play and stays inside the package", () => {
     for (const node of Object.values(nodes)) expect(check({ ...node, on_play: play })).toBe("");
     expect(check({ ...nodes.track_rows, on_play: { call: { target: "/api/plugins/other/x" } } })).toContain("track_rows.on_play: call.target");
+    expect(check({ ...nodes.track_rows, on_play: { share: { to: "/apps/music/album?id={id}" } } })).toBe("");
+    expect(check({ ...nodes.track_rows, on_play: { share: { to: "/apps/other/x" } } })).toContain("share.to");
     expect(check({ ...nodes.quick_tiles, on_select: { navigate: { to: "/apps/shows" } } })).toContain("quick_tiles.on_select: navigate.to");
     expect(check({ ...shelf, on_play: { call: { target: "/api/plugins/other/x" } } })).toContain("media_shelf.on_play: call.target");
   });
@@ -69,7 +71,7 @@ describe("music blocks on a package page", () => {
     const remove = { icon: "x", label: "Remove", action: { call: { target: "/api/plugins/music/playlist", args: { op: "remove", media_id: "{id}" } } } };
     expect(check({ ...nodes.track_rows, row_actions: [remove] })).toBe("");
     expect(validate({ ...nodes.track_rows, row_actions: [remove] })).toBe(true);
-    expect(validate({ ...nodes.track_rows, row_actions: [remove, remove, remove] })).toBe(false);
+    expect(validate({ ...nodes.track_rows, row_actions: [remove, remove, remove, remove] })).toBe(false);
     expect(validate({ ...nodes.track_rows, row_actions: [{ icon: "x", label: "Remove" }] })).toBe(false);
     expect(check({ ...nodes.track_rows, row_actions: [{ ...remove, action: { call: { target: "/api/plugins/other/x" } } }] })).toContain("track_rows.row_actions[0]");
     const header = { type: "creation_header", bind, share_change: { add: { call: { target: "/api/plugins/music/x" } }, remove: { call: { target: "/api/plugins/music/x" } }, make_private: { call: { target: "/api/plugins/music/x" } } }, shuffle: { label: "Start radio", icon: "radio", labeled: true, action: play } };
