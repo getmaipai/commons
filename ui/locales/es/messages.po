@@ -125,8 +125,8 @@ msgid "ui.{count} waiting for you"
 msgstr "{count} te están esperando"
 
 #. js-lingui-explicit-id
-#: src/elements/creation-header.tsx:84
-#: src/elements/creation-header.tsx:118
+#: src/elements/creation-header.tsx:107
+#: src/elements/creation-header.tsx:141
 #, needs-review
 msgid "ui.{creatorName}, open profile"
 msgstr "{creatorName}, abre el perfil"
@@ -152,8 +152,8 @@ msgid "ui.{days}d"
 msgstr "{days} d"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:241
-#: src/elements/job-progress.tsx:307
+#: src/elements/job-progress.tsx:257
+#: src/elements/job-progress.tsx:323
 #, needs-review
 msgid "ui.{done} of {total}"
 msgstr "{done} de {total}"
@@ -195,7 +195,7 @@ msgid "ui.{label} ({duration}s)"
 msgstr "{label} ({duration}s)"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:306
+#: src/elements/job-progress.tsx:322
 #, needs-review
 msgid "ui.{label} progress"
 msgstr "Progreso de {label}"
@@ -219,13 +219,13 @@ msgid "ui.{label}, {count} added"
 msgstr "{label}, {count} añadidos"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:205
+#: src/elements/weather-forecast-page.tsx:207
 #, needs-review
 msgid "ui.{label}: {city}"
 msgstr "{label}: {city}"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:233
+#: src/elements/weather-forecast-page.tsx:228
 #, needs-review
 msgid "ui.{label}: {metric}"
 msgstr "{label}: {metric}"
@@ -346,19 +346,19 @@ msgid "ui.{name}, {position} of {total}"
 msgstr "{name}, {position} de {total}"
 
 #. js-lingui-explicit-id
-#: src/elements/companion-avatar.tsx:106
+#: src/elements/companion-avatar.tsx:168
 #, needs-review
 msgid "ui.{name}, {ring}"
 msgstr "{name}, {ring}"
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:400
+#: src/primitives/MediaShelf.tsx:408
 #, needs-review
 msgid "ui.{name}, {text}"
 msgstr "{name}, {text}"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:102
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:104
 #, needs-review
 msgid "ui.{name}: {label}"
 msgstr "{name}: {label}"
@@ -375,7 +375,7 @@ msgid "ui.{name}'s face, {expression}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:577
+#: src/elements/prompt-bar.tsx:589
 #, needs-review
 msgid "ui.{names} and {last}"
 msgstr "{names} y {last}"
@@ -393,7 +393,7 @@ msgid "ui.{percent}%"
 msgstr "{percent}%"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:226
+#: src/elements/weather-forecast-page.tsx:243
 #, needs-review
 msgid "ui.{percent}% chance"
 msgstr "{percent}% de probabilidad"
@@ -405,7 +405,7 @@ msgid "ui.{percent}% full"
 msgstr "{percent}% lleno"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:240
+#: src/elements/weather-forecast-page.tsx:252
 #, needs-review
 msgid "ui.{percent}% illuminated"
 msgstr "{percent}% iluminada"
@@ -466,7 +466,7 @@ msgid "ui.{status}, starts at {start}ms, runs {duration}ms"
 msgstr "{status}, empieza en {start} ms, dura {duration} ms"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:258
+#: src/elements/job-progress.tsx:274
 #, needs-review
 msgid "ui.{title} progress"
 msgstr "Progreso de {title}"
@@ -529,7 +529,7 @@ msgstr "{used} de {limit} usados"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:36
-#: src/elements/video-player.tsx:419
+#: src/elements/video-player.tsx:420
 #, needs-review
 msgid "ui.{value} percent"
 msgstr "{value} por ciento"
@@ -541,7 +541,7 @@ msgid "ui.{value} percent, {elapsed} so far"
 msgstr "{value} por ciento, {elapsed} hasta ahora"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:419
+#: src/elements/video-player.tsx:420
 #, needs-review
 msgid "ui.{value} percent, {time} so far"
 msgstr "{value} por ciento, {time} hasta ahora"
@@ -583,7 +583,7 @@ msgid "ui.1. Video"
 msgstr "1. Vídeo"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:42
+#: src/elements/weather-forecast-page.tsx:43
 #, needs-review
 msgid "ui.10-Day Forecast"
 msgstr "Pronóstico a 10 días"
@@ -595,7 +595,7 @@ msgid "ui.2. Voice"
 msgstr "2. Voz"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:171
+#: src/primitives/Player.tsx:172
 #, needs-review
 msgid "ui.2x speed"
 msgstr "Velocidad 2x"
@@ -648,13 +648,13 @@ msgid "ui.A short note about what this project is for. It is for people only; th
 msgstr "Una nota breve sobre para qué sirve este proyecto. Solo es para las personas, el asistente no lo lee."
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:65
+#: src/elements/job-progress.tsx:66
 #, needs-review
 msgid "ui.About {count, plural, one {# hour} other {# hours}} left"
 msgstr "Quedan unas {count, plural, one {# hora} other {# horas}}"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:65
+#: src/elements/job-progress.tsx:66
 #, needs-review
 msgid "ui.About {count, plural, one {# minute} other {# minutes}} left"
 msgstr "Quedan unos {count, plural, one {# minuto} other {# minutos}}"
@@ -691,7 +691,7 @@ msgstr "Cuenta"
 
 #. js-lingui-explicit-id
 #: src/elements/data-table.tsx:217
-#: src/schema/NodeRenderer.tsx:1724
+#: src/schema/NodeRenderer.tsx:1728
 #, needs-review
 msgid "ui.Actions"
 msgstr "Acciones"
@@ -709,9 +709,9 @@ msgid "ui.active"
 msgstr "activa"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:263
-#: src/elements/prompt-bar.tsx:509
-#: src/elements/prompt-bar.tsx:525
+#: src/elements/prompt-bar.tsx:273
+#: src/elements/prompt-bar.tsx:521
+#: src/elements/prompt-bar.tsx:537
 #, needs-review
 msgid "ui.Add {label}"
 msgstr "Añadir {label}"
@@ -742,7 +742,7 @@ msgid "ui.Add a person…"
 msgstr "Añade una persona…"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1761
+#: src/schema/NodeRenderer.tsx:1768
 #, needs-review
 msgid "ui.Add a picture"
 msgstr "Añade una foto"
@@ -773,7 +773,7 @@ msgid "ui.Add Attachment"
 msgstr "Añadir adjunto"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:61
+#: src/elements/weather-forecast-page.tsx:63
 #, needs-review
 msgid "ui.Add location"
 msgstr "Agregar ubicación"
@@ -815,7 +815,7 @@ msgid "ui.agent"
 msgstr "agente"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:150
+#: src/primitives/Player.tsx:151
 #, needs-review
 msgid "ui.Ahead {seconds} seconds"
 msgstr "{seconds} segundos adelante"
@@ -827,7 +827,7 @@ msgid "ui.AI model tuning"
 msgstr "Ajuste del modelo de IA"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:43
+#: src/elements/weather-forecast-page.tsx:44
 #, needs-review
 msgid "ui.Air Quality"
 msgstr "Calidad del aire"
@@ -851,12 +851,12 @@ msgid "ui.All"
 msgstr "Todo"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:126
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:129
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:128
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:131
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:132
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:177
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:187
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:133
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:134
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:179
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:189
 #: src/primitives/AppDirectory.tsx:166
 #, needs-review
 msgid "ui.All apps"
@@ -923,7 +923,7 @@ msgid "ui.Always deny"
 msgstr "Siempre denegar"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:105
+#: src/elements/video-player.tsx:106
 #, needs-review
 msgid "ui.Another still"
 msgstr "Otra imagen fija"
@@ -980,7 +980,7 @@ msgid "ui.Approved, running"
 msgstr "Aprobado, en ejecución"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:229
+#: src/elements/weather-forecast-page.tsx:247
 #, needs-review
 msgid "ui.AQI {aqi}: {category}"
 msgstr "AQI {aqi}: {category}"
@@ -1070,7 +1070,7 @@ msgid "ui.At the seam after {name}."
 msgstr "En la costura después de {name}."
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:228
+#: src/elements/weather-forecast-page.tsx:246
 #, needs-review
 msgid "ui.Atmospheric pressure"
 msgstr "Presión atmosférica"
@@ -1115,7 +1115,7 @@ msgid "ui.Back"
 msgstr "Volver"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:149
+#: src/primitives/Player.tsx:150
 #, needs-review
 msgid "ui.Back {seconds} seconds"
 msgstr "{seconds} segundos atrás"
@@ -1255,16 +1255,17 @@ msgstr "Puede ver"
 #: src/elements/feedback-dialog.tsx:174
 #: src/elements/image-editor.tsx:1081
 #: src/elements/image-editor.tsx:1135
+#: src/elements/job-progress.tsx:194
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-home-page.tsx:29
 #: src/elements/project-settings.tsx:72
 #: src/elements/thread-list.aui.tsx:182
 #: src/elements/thread.aui.tsx:1582
 #: src/elements/tier-segment.tsx:46
-#: src/elements/video-player.tsx:107
-#: src/primitives/Player.tsx:170
+#: src/elements/video-player.tsx:108
+#: src/primitives/Player.tsx:171
 #: src/schema/ConfirmDialog.tsx:52
-#: src/schema/NodeRenderer.tsx:1765
+#: src/schema/NodeRenderer.tsx:1772
 #: src/settings/LocationField.tsx:179
 #: src/settings/SettingRow.tsx:196
 #: src/settings/SettingRow.tsx:222
@@ -1275,13 +1276,13 @@ msgid "ui.Cancel"
 msgstr "Cancelar"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:76
+#: src/elements/job-progress.tsx:77
 #, needs-review
 msgid "ui.Cancel the job"
 msgstr "Cancelar la tarea"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:180
+#: src/elements/job-progress.tsx:184
 #, needs-review
 msgid "ui.cancelled"
 msgstr "cancelada"
@@ -1307,7 +1308,7 @@ msgid "ui.Cancelled. Nothing was changed."
 msgstr "Cancelado. No se cambió nada."
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:153
+#: src/primitives/Player.tsx:154
 #, needs-review
 msgid "ui.Captions"
 msgstr "Subtítulos"
@@ -1319,7 +1320,7 @@ msgid "ui.Card size"
 msgstr "Tamaño de la tarjeta"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:598
+#: src/elements/prompt-bar.tsx:610
 #: src/settings/LocationField.tsx:249
 #: src/settings/SettingRow.tsx:203
 #: src/settings/SettingRow.tsx:261
@@ -1360,15 +1361,15 @@ msgid "ui.Changed as described"
 msgstr "Cambiado como se describió"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:152
-#: src/schema/NodeRenderer.tsx:1708
-#: src/schema/NodeRenderer.tsx:1714
+#: src/primitives/Player.tsx:153
+#: src/schema/NodeRenderer.tsx:1712
+#: src/schema/NodeRenderer.tsx:1718
 #, needs-review
 msgid "ui.Chapters"
 msgstr "Capítulos"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:241
+#: src/elements/prompt-bar.tsx:251
 #, needs-review
 msgid "ui.Character: {name}"
 msgstr "Personaje: {name}"
@@ -1442,7 +1443,7 @@ msgid "ui.Clear search"
 msgstr "Borrar búsqueda"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:227
+#: src/elements/weather-forecast-page.tsx:244
 #, needs-review
 msgid "ui.Clear view"
 msgstr "Visibilidad clara"
@@ -1470,7 +1471,7 @@ msgstr "Toca para ampliar la imagen"
 #: src/elements/ui/dialog.tsx:113
 #: src/ui/dialog.tsx:109
 #: src/ui/dialog.tsx:154
-#: src/ui/sheet.tsx:86
+#: src/ui/sheet.tsx:89
 #, needs-review
 msgid "ui.Close"
 msgstr "Cerrar"
@@ -1488,7 +1489,7 @@ msgid "ui.Close editor"
 msgstr "Cerrar editor"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:160
+#: src/primitives/Player.tsx:161
 msgid "ui.Close player"
 msgstr ""
 
@@ -1553,7 +1554,7 @@ msgid "ui.Colour"
 msgstr "Color"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:225
+#: src/elements/weather-forecast-page.tsx:245
 #, needs-review
 msgid "ui.Comfortable humidity"
 msgstr "Humedad cómoda"
@@ -1588,7 +1589,7 @@ msgid "ui.concerned"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:45
+#: src/elements/weather-forecast-page.tsx:46
 #, needs-review
 msgid "ui.Conditions"
 msgstr "Condiciones"
@@ -1714,37 +1715,37 @@ msgid "ui.Could not load settings."
 msgstr "No se pudieron cargar los ajustes."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1440
+#: src/schema/NodeRenderer.tsx:1444
 #, needs-review
 msgid "ui.Could not load the featured items."
 msgstr "No se pudieron cargar los artículos destacados."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1327
+#: src/schema/NodeRenderer.tsx:1331
 #, needs-review
 msgid "ui.Could not load the top result."
 msgstr "No se pudo cargar el mejor resultado."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1350
+#: src/schema/NodeRenderer.tsx:1354
 #, needs-review
 msgid "ui.Could not load these categories."
 msgstr "No se pudieron cargar estas categorías."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1307
+#: src/schema/NodeRenderer.tsx:1311
 #, needs-review
 msgid "ui.Could not load these tiles."
 msgstr "No se pudieron cargar estos bloques."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1372
+#: src/schema/NodeRenderer.tsx:1376
 #, needs-review
 msgid "ui.Could not load these tracks."
 msgstr "No se pudieron cargar estas pistas."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1486
+#: src/schema/NodeRenderer.tsx:1490
 #, needs-review
 msgid "ui.Could not load this book."
 msgstr "No se pudo cargar este libro."
@@ -1756,7 +1757,7 @@ msgid "ui.Could not load this grid."
 msgstr "No se pudo cargar esta cuadrícula."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1533
+#: src/schema/NodeRenderer.tsx:1537
 #, needs-review
 msgid "ui.Could not load this item."
 msgstr "No se pudo cargar este artículo."
@@ -1780,13 +1781,13 @@ msgid "ui.Could not load this. Try again."
 msgstr "No se pudo cargar esto. Inténtalo de nuevo."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1868
+#: src/schema/NodeRenderer.tsx:1875
 #, needs-review
 msgid "ui.Could not load today's cards."
 msgstr "No se pudieron cargar las tarjetas de hoy."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1892
+#: src/schema/NodeRenderer.tsx:1899
 #, needs-review
 msgid "ui.Could not load today's rows."
 msgstr "No se pudieron cargar las filas de hoy."
@@ -1798,7 +1799,7 @@ msgid "ui.Could not load your results."
 msgstr "No pudimos cargar tus resultados."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1630
+#: src/schema/NodeRenderer.tsx:1634
 #, needs-review
 msgid "ui.Could not look for other screens. Check that you are online, then open the menu again."
 msgstr "No pudimos buscar otras pantallas. Comprueba que tienes conexión y abre el menú de nuevo."
@@ -1816,7 +1817,7 @@ msgid "ui.Could not open this clip."
 msgstr "No se pudo abrir este clip."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1631
+#: src/schema/NodeRenderer.tsx:1635
 #, needs-review
 msgid "ui.Could not play this on the other screen. Make sure it is on and signed in, then try again."
 msgstr "No se pudo reproducir esto en la otra pantalla. Asegúrate de que está encendida y con sesión iniciada, y luego inténtalo de nuevo."
@@ -1834,14 +1835,14 @@ msgid "ui.Could not save that change."
 msgstr "No se pudo guardar ese cambio."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1523
+#: src/schema/NodeRenderer.tsx:1527
 #, needs-review
 msgid "ui.Could not save. Check that you are online, then try again."
 msgstr "No se pudo guardar. Comprueba que tienes conexión e inténtalo de nuevo."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1760
-#: src/schema/NodeRenderer.tsx:1760
+#: src/schema/NodeRenderer.tsx:1767
+#: src/schema/NodeRenderer.tsx:1767
 #, needs-review
 msgid "ui.Cover"
 msgstr "Portada"
@@ -1872,7 +1873,7 @@ msgid "ui.Current location"
 msgstr "Ubicación actual"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:59
+#: src/elements/weather-forecast-page.tsx:61
 #, needs-review
 msgid "ui.Current temperature"
 msgstr "Temperatura actual"
@@ -2006,7 +2007,7 @@ msgstr "Descripción"
 #. js-lingui-explicit-id
 #: src/elements/media-viewer.tsx:117
 #: src/elements/result-feed.tsx:235
-#: src/elements/video-player.tsx:376
+#: src/elements/video-player.tsx:377
 #, needs-review
 msgid "ui.Details"
 msgstr "Detalles"
@@ -2092,8 +2093,8 @@ msgid "ui.Document"
 msgstr "Documento"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:59
-#: src/elements/job-progress.tsx:75
+#: src/elements/job-progress.tsx:60
+#: src/elements/job-progress.tsx:76
 #: src/elements/robot-face.tsx:35
 #: src/elements/todo-list.tsx:23
 msgid "ui.done"
@@ -2101,7 +2102,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/activity-feed.tsx:33
-#: src/elements/prompt-bar.tsx:644
+#: src/elements/prompt-bar.tsx:656
 #: src/elements/share-dialog.tsx:130
 #: src/primitives/BatchBar.tsx:40
 #, needs-review
@@ -2118,7 +2119,7 @@ msgstr "caído"
 #: src/elements/image-editor.tsx:808
 #: src/elements/image-editor.tsx:814
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:98
+#: src/elements/video-player.tsx:99
 #, needs-review
 msgid "ui.Download"
 msgstr "Descargar"
@@ -2130,7 +2131,7 @@ msgid "ui.Download {name}"
 msgstr "Descargar {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:301
+#: src/elements/job-progress.tsx:317
 #, needs-review
 msgid "ui.Download file progress"
 msgstr "Progreso de descarga del archivo"
@@ -2142,7 +2143,7 @@ msgid "ui.Download image"
 msgstr "Descargar imagen"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:253
+#: src/elements/job-progress.tsx:269
 #, needs-review
 msgid "ui.Download paused after the connection stalled."
 msgstr "Descarga en pausa tras el fallo de conexión."
@@ -2154,7 +2155,7 @@ msgid "ui.Drag the handles at each end to trim. Press S to cut at the playhead."
 msgstr "Arrastra los tiradores en cada extremo para recortar. Pulsa S para cortar en el cabezal de reproducción."
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:225
+#: src/elements/weather-forecast-page.tsx:245
 #, needs-review
 msgid "ui.Dry air"
 msgstr "Aire seco"
@@ -2166,7 +2167,7 @@ msgid "ui.Dumbbell"
 msgstr "Mancuerna"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:239
+#: src/elements/weather-forecast-page.tsx:251
 #, needs-review
 msgid "ui.E (compass east)"
 msgstr "E"
@@ -2254,7 +2255,7 @@ msgid "ui.Edit this project's name, icon, instructions and memory."
 msgstr "Edita el nombre, el icono, las instrucciones y la memoria de este proyecto."
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:106
+#: src/elements/video-player.tsx:107
 #, needs-review
 msgid "ui.Edit words"
 msgstr "Editar palabras"
@@ -2408,8 +2409,8 @@ msgid "ui.Fades"
 msgstr "Fundidos"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:58
-#: src/elements/job-progress.tsx:180
+#: src/elements/job-progress.tsx:59
+#: src/elements/job-progress.tsx:184
 #: src/elements/schedule-card.tsx:106
 #: src/elements/todo-list.tsx:24
 #: src/elements/trace-waterfall.tsx:31
@@ -2418,7 +2419,7 @@ msgid "ui.failed"
 msgstr "fallida"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:105
+#: src/elements/weather-forecast-page.tsx:107
 #, needs-review
 msgid "ui.falling"
 msgstr "bajando"
@@ -2430,7 +2431,7 @@ msgid "ui.Family"
 msgstr "Familia"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:108
+#: src/elements/video-player.tsx:109
 #, needs-review
 msgid "ui.Favorite"
 msgstr "Favorito"
@@ -2448,37 +2449,37 @@ msgid "ui.Favorites"
 msgstr "Favoritos"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1450
+#: src/schema/NodeRenderer.tsx:1454
 #, needs-review
 msgid "ui.Featured"
 msgstr "Destacados"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:224
+#: src/elements/weather-forecast-page.tsx:249
 #, needs-review
 msgid "ui.Feels cooler than {temp}{unit}"
 msgstr "Se siente más frío que {temp}{unit}"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:51
+#: src/elements/weather-forecast-page.tsx:52
 #, needs-review
 msgid "ui.Feels Like"
 msgstr "Sensación térmica"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:224
+#: src/elements/weather-forecast-page.tsx:249
 #, needs-review
 msgid "ui.Feels like the air temperature"
 msgstr "Se siente como la temperatura del aire"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:214
+#: src/elements/weather-forecast-page.tsx:216
 #, needs-review
 msgid "ui.Feels Like: {temp}"
 msgstr "Sensación térmica: {temp}"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:224
+#: src/elements/weather-forecast-page.tsx:249
 #, needs-review
 msgid "ui.Feels warmer than {temp}{unit}"
 msgstr "Se siente más cálido que {temp}{unit}"
@@ -2497,7 +2498,7 @@ msgid "ui.File"
 msgstr "Archivo"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:297
+#: src/elements/job-progress.tsx:313
 #, needs-review
 msgid "ui.File details"
 msgstr "Detalles del archivo"
@@ -2643,7 +2644,7 @@ msgid "ui.Full Moon"
 msgstr "Luna llena"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:155
+#: src/primitives/Player.tsx:156
 #, needs-review
 msgid "ui.Full screen"
 msgstr "Pantalla completa"
@@ -2662,7 +2663,7 @@ msgid "ui.General"
 msgstr "General"
 
 #. js-lingui-explicit-id
-#: src/elements/image-generation.tsx:18
+#: src/elements/image-generation.tsx:19
 #, needs-review
 msgid "ui.Generating"
 msgstr "Generando"
@@ -2717,26 +2718,26 @@ msgid "ui.Green"
 msgstr "Verde"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:239
+#: src/elements/weather-forecast-page.tsx:251
 #, needs-review
 msgid "ui.Gust {speed} {unit}"
 msgstr "Ráfaga {speed} {unit}"
 
 #. js-lingui-explicit-id
 #: src/elements/weather-card.tsx:263
-#: src/elements/weather-forecast-page.tsx:185
+#: src/elements/weather-forecast-page.tsx:187
 #, needs-review
 msgid "ui.H {high} L {low}"
 msgstr "Máx. {high} Mín. {low}"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:214
+#: src/elements/weather-forecast-page.tsx:216
 #, needs-review
 msgid "ui.H:{high} L:{low}"
 msgstr "Máx:{high} Mín:{low}"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:227
+#: src/elements/weather-forecast-page.tsx:244
 #, needs-review
 msgid "ui.Hazy"
 msgstr "Bruma"
@@ -2804,13 +2805,13 @@ msgid "ui.Hide sidebar"
 msgstr "Ocultar barra lateral"
 
 #. js-lingui-explicit-id
-#: src/elements/companion-avatar.tsx:18
+#: src/elements/companion-avatar.tsx:20
 #, needs-review
 msgid "ui.Hide the character"
 msgstr "Ocultar el personaje"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:222
+#: src/elements/weather-forecast-page.tsx:241
 #, needs-review
 msgid "ui.High"
 msgstr "Máxima"
@@ -2860,7 +2861,7 @@ msgid "ui.Home"
 msgstr "Home"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:41
+#: src/elements/weather-forecast-page.tsx:42
 #, needs-review
 msgid "ui.Hourly Forecast"
 msgstr "Pronóstico por hora"
@@ -2897,7 +2898,7 @@ msgid "ui.human"
 msgstr "humano"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:52
+#: src/elements/weather-forecast-page.tsx:53
 #, needs-review
 msgid "ui.Humidity"
 msgstr "Humedad"
@@ -2909,7 +2910,7 @@ msgid "ui.I couldn't make that song."
 msgstr "No pude crear esa canción."
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:103
+#: src/elements/video-player.tsx:104
 #, needs-review
 msgid "ui.I couldn't make that video."
 msgstr "No pude crear ese video."
@@ -2921,7 +2922,7 @@ msgid "ui.Icon"
 msgstr "Icono"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:228
+#: src/elements/prompt-bar.tsx:238
 #, needs-review
 msgid "ui.Ideas"
 msgstr "Ideas"
@@ -3022,7 +3023,7 @@ msgid "ui.Inspired by {inspiredBy}"
 msgstr "Inspirado por {inspiredBy}"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:293
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:296
 #, needs-review
 msgid "ui.Installed apps"
 msgstr "Apps instaladas"
@@ -3051,6 +3052,12 @@ msgstr "Instrumental, sin voz"
 #, needs-review
 msgid "ui.Integrations"
 msgstr "Integraciones"
+
+#. js-lingui-explicit-id
+#: src/elements/weather-forecast-page.tsx:55
+#, needs-review
+msgid "ui.Intensity - Chance of rain"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/voice-conversation.tsx:111
@@ -3280,7 +3287,7 @@ msgid "ui.Listening for you"
 msgstr "Te escucho"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:172
+#: src/primitives/Player.tsx:173
 #, needs-review
 msgid "ui.Live"
 msgstr "En vivo"
@@ -3339,8 +3346,8 @@ msgid "ui.Location is blocked. In Safari, choose Safari > Settings > Websites > 
 msgstr "La ubicación está bloqueada. En Safari, elige Safari > Configuración > Sitios web > Ubicación, pon {host} en Permitir y vuelve a intentarlo."
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:40
-#: src/elements/weather-forecast-page.tsx:203
+#: src/elements/weather-forecast-page.tsx:41
+#: src/elements/weather-forecast-page.tsx:205
 #, needs-review
 msgid "ui.Locations"
 msgstr "Ubicaciones"
@@ -3385,13 +3392,13 @@ msgid "ui.Look"
 msgstr "Apariencia"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:1365
+#: src/primitives/Player.tsx:1383
 #, needs-review
 msgid "ui.Looking for lyrics..."
 msgstr "Buscando letra..."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1669
+#: src/schema/NodeRenderer.tsx:1673
 #, needs-review
 msgid "ui.Looking for screens"
 msgstr "Buscando pantallas"
@@ -3410,7 +3417,7 @@ msgid "ui.Loud"
 msgstr "Fuerte"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:222
+#: src/elements/weather-forecast-page.tsx:241
 #, needs-review
 msgid "ui.Low"
 msgstr "Mínima"
@@ -3431,20 +3438,20 @@ msgstr "Bajar bajo el habla"
 #. js-lingui-explicit-id
 #: src/elements/lyrics-list.tsx:55
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:344
-#: src/schema/NodeRenderer.tsx:1583
+#: src/primitives/Player.tsx:348
+#: src/schema/NodeRenderer.tsx:1587
 #, needs-review
 msgid "ui.Lyrics"
 msgstr "Letra"
 
 #. js-lingui-explicit-id
-#: src/elements/creation-header.tsx:119
+#: src/elements/creation-header.tsx:142
 #, needs-review
 msgid "ui.Made {date}"
 msgstr "Hecho el {date}"
 
 #. js-lingui-explicit-id
-#: src/elements/creation-header.tsx:50
+#: src/elements/creation-header.tsx:52
 #, needs-review
 msgid "ui.Made at home"
 msgstr "Hecho en casa"
@@ -3468,7 +3475,7 @@ msgid "ui.MaiPai ran into a problem showing this page. Reloading usually fixes i
 msgstr "MaiPai tuvo un problema al mostrar esta página. Recargar suele arreglarlo."
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:179
+#: src/elements/prompt-bar.tsx:181
 #, needs-review
 msgid "ui.Make"
 msgstr "Crear"
@@ -3481,7 +3488,7 @@ msgstr "hacer álbum"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:100
+#: src/elements/video-player.tsx:101
 #, needs-review
 msgid "ui.Make another"
 msgstr "Crear otra"
@@ -3513,7 +3520,7 @@ msgid "ui.make song"
 msgstr "crear canción"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:104
+#: src/elements/video-player.tsx:105
 #, needs-review
 msgid "ui.Make the video from this"
 msgstr "Crear el video desde esto"
@@ -3531,7 +3538,7 @@ msgid "ui.Making the music"
 msgstr "Creando la música"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:96
+#: src/elements/video-player.tsx:97
 #, needs-review
 msgid "ui.Making your video"
 msgstr "Creando tu video"
@@ -3549,7 +3556,7 @@ msgid "ui.Markup tool"
 msgstr "Herramienta de marcas"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:234
+#: src/elements/weather-forecast-page.tsx:229
 #, needs-review
 msgid "ui.max"
 msgstr "máx"
@@ -3628,27 +3635,29 @@ msgid "ui.Models"
 msgstr "Modelos"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:222
+#: src/elements/weather-forecast-page.tsx:241
 #: src/settings/SettingsShowcase.tsx:53
 #, needs-review
 msgid "ui.Moderate"
 msgstr "Moderado"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:56
+#: src/elements/weather-forecast-page.tsx:58
 #, needs-review
 msgid "ui.Moon Phase"
 msgstr "Fase lunar"
 
 #. js-lingui-explicit-id
 #: src/dashboard/components/ui/breadcrumb.tsx:113
-#: src/elements/creation-header.tsx:94
+#: src/elements/creation-header.tsx:75
+#: src/elements/creation-header.tsx:117
 #: src/elements/thread.aui.tsx:1379
-#: src/elements/video-player.tsx:109
-#: src/PhoneNav.tsx:104
-#: src/PhoneNav.tsx:112
+#: src/elements/video-player.tsx:110
+#: src/PhoneNav.tsx:130
+#: src/PhoneNav.tsx:137
+#: src/PhoneNav.tsx:145
 #: src/primitives/ArticleView.tsx:480
-#: src/schema/NodeRenderer.tsx:1936
+#: src/schema/NodeRenderer.tsx:1943
 #: src/ui/breadcrumb.tsx:102
 #, needs-review
 msgid "ui.More"
@@ -3679,7 +3688,7 @@ msgid "ui.More options"
 msgstr "Más opciones"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:179
+#: src/elements/prompt-bar.tsx:181
 #, needs-review
 msgid "ui.More settings"
 msgstr "Más ajustes"
@@ -3741,7 +3750,7 @@ msgid "ui.Music"
 msgstr "Música"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:156
+#: src/primitives/Player.tsx:157
 #, needs-review
 msgid "ui.Mute"
 msgstr "Silenciar"
@@ -3753,7 +3762,7 @@ msgid "ui.Mute {lane}"
 msgstr "Silenciar {lane}"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:38
+#: src/elements/weather-forecast-page.tsx:39
 #, needs-review
 msgid "ui.My Location"
 msgstr "Mi ubicación"
@@ -3771,7 +3780,7 @@ msgid "ui.My storage"
 msgstr "Mi almacenamiento"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:239
+#: src/elements/weather-forecast-page.tsx:251
 #, needs-review
 msgid "ui.N (compass north)"
 msgstr "N"
@@ -3869,7 +3878,7 @@ msgstr "siguiente"
 #: src/elements/music-track.tsx:35
 #: src/elements/question-flow.tsx:47
 #: src/elements/thread.aui.tsx:1622
-#: src/primitives/Player.tsx:162
+#: src/primitives/Player.tsx:163
 #: src/primitives/Tour.tsx:46
 #, needs-review
 msgid "ui.Next"
@@ -3882,7 +3891,7 @@ msgid "ui.Next 24 hours"
 msgstr "Próximas 24 horas"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:57
+#: src/elements/weather-forecast-page.tsx:59
 #, needs-review
 msgid "ui.Next full moon"
 msgstr "Próxima luna llena"
@@ -3900,7 +3909,7 @@ msgid "ui.Next match"
 msgstr "Siguiente coincidencia"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:58
+#: src/elements/weather-forecast-page.tsx:60
 #, needs-review
 msgid "ui.Next new moon"
 msgstr "Próxima luna nueva"
@@ -4010,7 +4019,7 @@ msgid "ui.No one else in the household."
 msgstr "No hay nadie más en el hogar."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1673
+#: src/schema/NodeRenderer.tsx:1677
 #, needs-review
 msgid "ui.No other screens are on"
 msgstr "Ninguna otra pantalla está encendida"
@@ -4147,7 +4156,7 @@ msgid "ui.Note"
 msgstr "Nota"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1443
+#: src/schema/NodeRenderer.tsx:1447
 #, needs-review
 msgid "ui.Nothing featured yet."
 msgstr "Todavía no hay nada destacado."
@@ -4159,8 +4168,8 @@ msgstr "Todavía no hay nada destacado."
 #: src/schema/NodeRenderer.tsx:966
 #: src/schema/NodeRenderer.tsx:1060
 #: src/schema/NodeRenderer.tsx:1128
-#: src/schema/NodeRenderer.tsx:1271
-#: src/schema/NodeRenderer.tsx:1856
+#: src/schema/NodeRenderer.tsx:1275
+#: src/schema/NodeRenderer.tsx:1863
 #: src/schema/ResultFeedNodeView.tsx:199
 #, needs-review
 msgid "ui.Nothing here yet."
@@ -4213,7 +4222,9 @@ msgid "ui.now"
 msgstr "ahora"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:219
+#: src/elements/weather-forecast-page.tsx:223
+#: src/elements/weather-forecast-page.tsx:236
+#: src/elements/weather-forecast-page.tsx:236
 #, needs-review
 msgid "ui.Now"
 msgstr "Ahora"
@@ -4383,7 +4394,7 @@ msgid "ui.Open the assistant"
 msgstr "Abrir el asistente"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:159
+#: src/primitives/Player.tsx:160
 #, needs-review
 msgid "ui.Open the player"
 msgstr "Abrir el reproductor"
@@ -4413,7 +4424,7 @@ msgid "ui.optional"
 msgstr "opcional"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:179
+#: src/elements/prompt-bar.tsx:181
 #, needs-review
 msgid "ui.Options"
 msgstr "Opciones"
@@ -4499,7 +4510,7 @@ msgid "ui.Panel"
 msgstr "Panel"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:180
+#: src/elements/job-progress.tsx:184
 #, needs-review
 msgid "ui.partial"
 msgstr "parcial"
@@ -4523,11 +4534,12 @@ msgid "ui.Paste the new value"
 msgstr "Pega el nuevo valor"
 
 #. js-lingui-explicit-id
+#: src/elements/job-progress.tsx:194
 #: src/elements/music-track.tsx:35
 #: src/elements/track-studio.tsx:448
 #: src/elements/track-studio.tsx:448
-#: src/primitives/Player.tsx:148
-#: src/schema/NodeRenderer.tsx:1462
+#: src/primitives/Player.tsx:149
+#: src/schema/NodeRenderer.tsx:1466
 #, needs-review
 msgid "ui.Pause"
 msgstr "Pausa"
@@ -4539,7 +4551,7 @@ msgid "ui.Pause {name}"
 msgstr "Pausar {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:55
+#: src/elements/job-progress.tsx:56
 #: src/elements/schedule-card.tsx:89
 #, needs-review
 msgid "ui.paused"
@@ -4658,7 +4670,7 @@ msgid "ui.Picture editing tools"
 msgstr "Herramientas para editar imágenes"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:154
+#: src/primitives/Player.tsx:155
 #, needs-review
 msgid "ui.Picture in picture"
 msgstr "Imagen en imagen"
@@ -4676,7 +4688,7 @@ msgid "ui.Pin"
 msgstr "Fijar"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:153
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:155
 #, needs-review
 msgid "ui.Pin {name} to the rail"
 msgstr "Fijar {name} en la barra"
@@ -4707,7 +4719,7 @@ msgid "ui.Pinned"
 msgstr "Fijado"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:293
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:296
 #, needs-review
 msgid "ui.Pinned apps"
 msgstr "Apps fijadas"
@@ -4720,7 +4732,7 @@ msgstr "Píxeles"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:36
-#: src/elements/video-player.tsx:360
+#: src/elements/video-player.tsx:361
 #, needs-review
 msgid "ui.Place in line: {position}"
 msgstr "Posición en la cola: {position}"
@@ -4747,9 +4759,9 @@ msgstr "Planeando"
 #: src/elements/music-track.tsx:35
 #: src/elements/track-studio.tsx:448
 #: src/elements/track-studio.tsx:448
-#: src/elements/video-player.tsx:110
-#: src/primitives/MediaShelf.tsx:190
-#: src/primitives/Player.tsx:147
+#: src/elements/video-player.tsx:111
+#: src/primitives/MediaShelf.tsx:198
+#: src/primitives/Player.tsx:148
 #: src/schema/NodeRenderer.tsx:128
 #, needs-review
 msgid "ui.Play"
@@ -4777,28 +4789,28 @@ msgid "ui.play all"
 msgstr "reproducir todo"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:169
+#: src/primitives/Player.tsx:170
 #, needs-review
 msgid "ui.Play now"
 msgstr "Reproducir ahora"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:157
-#: src/schema/NodeRenderer.tsx:1662
-#: src/schema/NodeRenderer.tsx:1667
+#: src/primitives/Player.tsx:158
+#: src/schema/NodeRenderer.tsx:1666
+#: src/schema/NodeRenderer.tsx:1671
 #, needs-review
 msgid "ui.Play on another screen"
 msgstr "Reproducir en otra pantalla"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:151
+#: src/primitives/Player.tsx:152
 #, needs-review
 msgid "ui.Playback speed"
 msgstr "Velocidad de reproducción"
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:531
+#: src/primitives/MediaShelf.tsx:543
 #, needs-review
 msgid "ui.Played"
 msgstr "Visto"
@@ -4829,20 +4841,20 @@ msgid "ui.Plugins"
 msgstr "Complementos"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:227
+#: src/elements/weather-forecast-page.tsx:244
 #, needs-review
 msgid "ui.Poor"
 msgstr "Pobre"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:106
+#: src/elements/weather-forecast-page.tsx:108
 #, needs-review
 msgid "ui.precipitation"
 msgstr "precipitación"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:47
-#: src/elements/weather-forecast-page.tsx:53
+#: src/elements/weather-forecast-page.tsx:48
+#: src/elements/weather-forecast-page.tsx:54
 #, needs-review
 msgid "ui.Precipitation"
 msgstr "Precipitación"
@@ -4859,13 +4871,13 @@ msgid "ui.Press Enter to search the web · Esc to close"
 msgstr "Presiona Enter para buscar en la web · Esc para cerrar"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:55
+#: src/elements/weather-forecast-page.tsx:57
 #, needs-review
 msgid "ui.Pressure"
 msgstr "Presión"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:93
+#: src/elements/weather-forecast-page.tsx:95
 #, needs-review
 msgid "ui.Pressure {value} hPa"
 msgstr "Presión {value} hPa"
@@ -4893,7 +4905,7 @@ msgstr "Vista previa: {label}"
 #: src/elements/media-viewer.tsx:112
 #: src/elements/music-track.tsx:35
 #: src/elements/thread.aui.tsx:1614
-#: src/primitives/Player.tsx:161
+#: src/primitives/Player.tsx:162
 #, needs-review
 msgid "ui.Previous"
 msgstr "Anterior"
@@ -4923,13 +4935,13 @@ msgid "ui.Previous slide"
 msgstr "Diapositiva anterior"
 
 #. js-lingui-explicit-id
-#: src/PhoneNav.tsx:26
+#: src/PhoneNav.tsx:27
 #, needs-review
 msgid "ui.Primary"
 msgstr "Principal"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:336
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:340
 #: src/dashboard/layouts/full/vertical/sidebar/Sidebar.tsx:28
 #, needs-review
 msgid "ui.Primary navigation"
@@ -5005,7 +5017,7 @@ msgid "ui.Quality"
 msgstr "Calidad"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:53
+#: src/elements/job-progress.tsx:54
 #, needs-review
 msgid "ui.queued"
 msgstr "en cola"
@@ -5055,7 +5067,7 @@ msgstr "Léelo de otra forma"
 
 #. js-lingui-explicit-id
 #: src/primitives/Reader.tsx:36
-#: src/schema/NodeRenderer.tsx:1500
+#: src/schema/NodeRenderer.tsx:1504
 #, needs-review
 msgid "ui.Reader"
 msgstr "Lector"
@@ -5157,7 +5169,8 @@ msgid "ui.Refresh"
 msgstr "Actualizar"
 
 #. js-lingui-explicit-id
-#: src/elements/image-generation.tsx:127
+#: src/elements/image-generation.tsx:115
+#: src/elements/image-generation.tsx:134
 #: src/elements/image.tsx:428
 #, needs-review
 msgid "ui.Regenerate image"
@@ -5213,7 +5226,7 @@ msgid "ui.remembered {fresh}"
 msgstr "recordado {fresh}"
 
 #. js-lingui-explicit-id
-#: src/primitives/Chip.tsx:71
+#: src/primitives/Chip.tsx:74
 #: src/settings/LocationField.tsx:279
 #: src/settings/LocationField.tsx:307
 #, needs-review
@@ -5227,8 +5240,8 @@ msgid "ui.Remove \"{text}\" from the queue"
 msgstr "Quitar \"{text}\" de la cola"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:504
-#: src/elements/prompt-bar.tsx:548
+#: src/elements/prompt-bar.tsx:516
+#: src/elements/prompt-bar.tsx:560
 #, needs-review
 msgid "ui.Remove {label}"
 msgstr "Quitar {label}"
@@ -5278,7 +5291,7 @@ msgid "ui.Remove BG"
 msgstr "Quitar fondo"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:242
+#: src/elements/prompt-bar.tsx:252
 #, needs-review
 msgid "ui.Remove character {name}"
 msgstr "Quitar el personaje {name}"
@@ -5302,13 +5315,13 @@ msgid "ui.Remove from Saved"
 msgstr "Quitar de Guardados"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:62
+#: src/elements/weather-forecast-page.tsx:64
 #, needs-review
 msgid "ui.Remove location"
 msgstr "Quitar ubicación"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:242
+#: src/elements/prompt-bar.tsx:252
 #, needs-review
 msgid "ui.Remove style {name}"
 msgstr "Quitar el estilo {name}"
@@ -5449,7 +5462,8 @@ msgid "ui.Results"
 msgstr "Resultados"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:248
+#: src/elements/job-progress.tsx:194
+#: src/elements/job-progress.tsx:264
 #, needs-review
 msgid "ui.Resume"
 msgstr "Reanudar"
@@ -5461,14 +5475,15 @@ msgid "ui.Resume {name}"
 msgstr "Reanudar {name}"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:163
+#: src/primitives/Player.tsx:164
 #, needs-review
 msgid "ui.Resuming from {time}"
 msgstr "Reanudando desde {time}"
 
 #. js-lingui-explicit-id
 #: src/elements/error-state.tsx:40
-#: src/elements/job-progress.tsx:251
+#: src/elements/job-progress.tsx:194
+#: src/elements/job-progress.tsx:267
 #: src/elements/thread.aui.tsx:1522
 #, needs-review
 msgid "ui.Retry"
@@ -5481,7 +5496,7 @@ msgid "ui.Retrying"
 msgstr "Reintentando"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:105
+#: src/elements/weather-forecast-page.tsx:107
 #, needs-review
 msgid "ui.rising"
 msgstr "subiendo"
@@ -5493,7 +5508,7 @@ msgid "ui.Roomy"
 msgstr "Amplio"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:54
+#: src/elements/job-progress.tsx:55
 #: src/elements/message-queue.tsx:43
 #: src/elements/trace-waterfall.tsx:29
 #, needs-review
@@ -5513,7 +5528,7 @@ msgid "ui.Running elsewhere"
 msgstr "En ejecución en otro lugar"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:239
+#: src/elements/weather-forecast-page.tsx:251
 #, needs-review
 msgid "ui.S (compass south)"
 msgstr "S"
@@ -5543,7 +5558,7 @@ msgstr "guardar"
 #: src/primitives/ArticleView.tsx:458
 #: src/primitives/ArticleView.tsx:474
 #: src/primitives/StoryFeed.tsx:90
-#: src/schema/NodeRenderer.tsx:1765
+#: src/schema/NodeRenderer.tsx:1772
 #: src/settings/LocationField.tsx:176
 #: src/settings/SettingRow.tsx:184
 #: src/settings/SettingRow.tsx:276
@@ -5611,8 +5626,8 @@ msgstr "Ir al final"
 #. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:314
 #: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:331
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:254
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:256
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:257
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:259
 #: src/schema/NodeRenderer.tsx:571
 #: src/settings/groupSettings.ts:44
 #: src/settings/SettingsShell.tsx:132
@@ -5680,7 +5695,7 @@ msgid "ui.Search is not available right now. Try again in a moment."
 msgstr "La búsqueda no está disponible ahora. Vuelve a intentarlo en un momento."
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:37
+#: src/elements/weather-forecast-page.tsx:38
 #, needs-review
 msgid "ui.Search locations"
 msgstr "Buscar ubicaciones"
@@ -5943,7 +5958,7 @@ msgstr "siete"
 #: src/elements/image-editor.tsx:826
 #: src/elements/music-track.tsx:35
 #: src/elements/share-dialog.tsx:125
-#: src/elements/video-player.tsx:99
+#: src/elements/video-player.tsx:100
 #: src/primitives/ArticleView.tsx:460
 #: src/primitives/ArticleView.tsx:472
 #, needs-review
@@ -6005,19 +6020,19 @@ msgid "ui.Show fewer"
 msgstr "Mostrar menos"
 
 #. js-lingui-explicit-id
-#: src/elements/creation-header.tsx:88
-#: src/elements/creation-header.tsx:126
+#: src/elements/creation-header.tsx:111
+#: src/elements/creation-header.tsx:149
 #: src/elements/thread-list.aui.tsx:184
-#: src/schema/NodeRenderer.tsx:1706
+#: src/schema/NodeRenderer.tsx:1710
 #, needs-review
 msgid "ui.Show less"
 msgstr "Mostrar menos"
 
 #. js-lingui-explicit-id
-#: src/elements/creation-header.tsx:88
-#: src/elements/creation-header.tsx:126
+#: src/elements/creation-header.tsx:111
+#: src/elements/creation-header.tsx:149
 #: src/elements/thread-list.aui.tsx:183
-#: src/schema/NodeRenderer.tsx:1706
+#: src/schema/NodeRenderer.tsx:1710
 #, needs-review
 msgid "ui.Show more"
 msgstr "Mostrar más"
@@ -6054,13 +6069,13 @@ msgid "ui.Show sidebar"
 msgstr "Mostrar barra lateral"
 
 #. js-lingui-explicit-id
-#: src/elements/companion-avatar.tsx:18
+#: src/elements/companion-avatar.tsx:20
 #, needs-review
 msgid "ui.Show the character"
 msgstr "Mostrar el personaje"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:158
+#: src/primitives/Player.tsx:159
 #, needs-review
 msgid "ui.Shrink the player"
 msgstr "Reducir el reproductor"
@@ -6085,13 +6100,13 @@ msgid "ui.Skip"
 msgstr "Omitir"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:166
+#: src/primitives/Player.tsx:167
 #, needs-review
 msgid "ui.Skip credits"
 msgstr "Saltar créditos"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:165
+#: src/primitives/Player.tsx:166
 #, needs-review
 msgid "ui.Skip intro"
 msgstr "Saltar introducción"
@@ -6203,7 +6218,7 @@ msgid "ui.Split at playhead"
 msgstr "Dividir en el cabezal de reproducción"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:56
+#: src/elements/job-progress.tsx:57
 #, needs-review
 msgid "ui.stalled"
 msgstr "detenida"
@@ -6233,7 +6248,7 @@ msgid "ui.Start a conversation"
 msgstr "Iniciar una conversación"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:164
+#: src/primitives/Player.tsx:165
 #, needs-review
 msgid "ui.Start over"
 msgstr "Empezar de nuevo"
@@ -6267,7 +6282,7 @@ msgid "ui.Starts {time} into the file"
 msgstr "Empieza a {time} dentro del archivo"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:105
+#: src/elements/weather-forecast-page.tsx:107
 #, needs-review
 msgid "ui.steady"
 msgstr "estable"
@@ -6286,9 +6301,9 @@ msgid "ui.Step {step} of {total} · {label}"
 msgstr "Paso {step} de {total} · {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-generation.tsx:20
+#: src/elements/image-generation.tsx:21
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:97
+#: src/elements/video-player.tsx:98
 #, needs-review
 msgid "ui.Stop"
 msgstr "Detener"
@@ -6336,7 +6351,7 @@ msgstr "Detener entrada de voz"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:102
+#: src/elements/video-player.tsx:103
 #, needs-review
 msgid "ui.Stopped. Nothing was kept."
 msgstr "Detenido. No se guardó nada."
@@ -6410,7 +6425,7 @@ msgid "ui.Style words for the song. Never lyrics."
 msgstr "Palabras de estilo para la canción. Nunca letras."
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:241
+#: src/elements/prompt-bar.tsx:251
 #, needs-review
 msgid "ui.Style: {name}"
 msgstr "Estilo: {name}"
@@ -6418,7 +6433,7 @@ msgstr "Estilo: {name}"
 #. js-lingui-explicit-id
 #: src/elements/elicitation-form.tsx:167
 #: src/elements/question-flow.tsx:46
-#: src/schema/NodeRenderer.tsx:2005
+#: src/schema/NodeRenderer.tsx:2012
 #, needs-review
 msgid "ui.Submit"
 msgstr "Enviar"
@@ -6430,25 +6445,25 @@ msgid "ui.Submitting…"
 msgstr "Enviando…"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:237
+#: src/elements/prompt-bar.tsx:247
 #, needs-review
 msgid "ui.Suggested styles"
 msgstr "Estilos sugeridos"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:223
+#: src/elements/weather-forecast-page.tsx:242
 #, needs-review
 msgid "ui.Sunrise"
 msgstr "Amanecer"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:49
+#: src/elements/weather-forecast-page.tsx:50
 #, needs-review
 msgid "ui.Sunrise & Sunset"
 msgstr "Amanecer y atardecer"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:223
+#: src/elements/weather-forecast-page.tsx:242
 #, needs-review
 msgid "ui.Sunset"
 msgstr "Atardecer"
@@ -6497,13 +6512,13 @@ msgid "ui.Teal"
 msgstr "Azul verdoso"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:106
+#: src/elements/weather-forecast-page.tsx:108
 #, needs-review
 msgid "ui.temperature"
 msgstr "temperatura"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:46
+#: src/elements/weather-forecast-page.tsx:47
 #, needs-review
 msgid "ui.Temperature"
 msgstr "Temperatura"
@@ -6589,7 +6604,7 @@ msgid "ui.That tool is not available right now."
 msgstr "Esa herramienta no está disponible ahora mismo."
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:225
+#: src/elements/weather-forecast-page.tsx:245
 #, needs-review
 msgid "ui.The air feels humid"
 msgstr "El aire se siente húmedo"
@@ -6708,7 +6723,7 @@ msgid "ui.This audio could not be drawn. It still plays."
 msgstr "Este audio no se pudo dibujar. Sigue sonando."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1491
+#: src/schema/NodeRenderer.tsx:1495
 #, needs-review
 msgid "ui.This book is not available."
 msgstr "Este libro no está disponible."
@@ -6738,7 +6753,7 @@ msgid "ui.This file cannot be previewed here."
 msgstr "No puedes ver una vista previa de este archivo aquí."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1536
+#: src/schema/NodeRenderer.tsx:1540
 #, needs-review
 msgid "ui.This item is not available."
 msgstr "Este artículo no está disponible."
@@ -6818,7 +6833,8 @@ msgstr "a"
 #. js-lingui-explicit-id
 #: src/elements/result-feed.tsx:54
 #: src/elements/thread-list.aui.tsx:375
-#: src/elements/weather-forecast-page.tsx:220
+#: src/elements/weather-forecast-page.tsx:237
+#: src/elements/weather-forecast-page.tsx:239
 #: src/relativeTime.ts:56
 #, needs-review
 msgid "ui.Today"
@@ -6928,7 +6944,7 @@ msgstr "Recortar inicio de {label}"
 #: src/elements/image-editor.tsx:1102
 #: src/elements/media-viewer.tsx:123
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:101
+#: src/elements/video-player.tsx:102
 #: src/primitives/AsyncState.tsx:79
 #, needs-review
 msgid "ui.Try again"
@@ -7075,7 +7091,7 @@ msgid "ui.Unpin"
 msgstr "Desfijar"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:153
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:155
 #, needs-review
 msgid "ui.Unpin {name} from the rail"
 msgstr "Desfijar {name} de la barra"
@@ -7093,21 +7109,22 @@ msgid "ui.unsent draft · {savedAt}"
 msgstr "borrador sin enviar · {savedAt}"
 
 #. js-lingui-explicit-id
-#: src/elements/creation-header.tsx:71
-#: src/elements/creation-header.tsx:82
-#: src/elements/creation-header.tsx:115
+#: src/elements/creation-header.tsx:70
+#: src/elements/creation-header.tsx:94
+#: src/elements/creation-header.tsx:105
+#: src/elements/creation-header.tsx:138
 #, needs-review
 msgid "ui.Untitled"
 msgstr "Sin título"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:167
+#: src/primitives/Player.tsx:168
 #, needs-review
 msgid "ui.Up next"
 msgstr "A continuación"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:168
+#: src/primitives/Player.tsx:169
 #, needs-review
 msgid "ui.Up next in {seconds}"
 msgstr "A continuación en {seconds}"
@@ -7202,13 +7219,13 @@ msgid "ui.Used tool"
 msgstr "Herramienta usada"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:50
+#: src/elements/weather-forecast-page.tsx:51
 #, needs-review
 msgid "ui.UV Index"
 msgstr "Índice UV"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:57
+#: src/elements/job-progress.tsx:58
 #, needs-review
 msgid "ui.verifying"
 msgstr "verificando"
@@ -7229,7 +7246,7 @@ msgid "ui.Versions"
 msgstr "Versiones"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:222
+#: src/elements/weather-forecast-page.tsx:241
 #, needs-review
 msgid "ui.Very high"
 msgstr "Muy alta"
@@ -7268,7 +7285,7 @@ msgid "ui.Violet"
 msgstr "Violeta"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:54
+#: src/elements/weather-forecast-page.tsx:56
 #, needs-review
 msgid "ui.Visibility"
 msgstr "Visibilidad"
@@ -7300,7 +7317,7 @@ msgid "ui.Volume"
 msgstr "Volumen"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:239
+#: src/elements/weather-forecast-page.tsx:251
 #, needs-review
 msgid "ui.W (compass west)"
 msgstr "O"
@@ -7313,16 +7330,16 @@ msgstr "Espera a que termine el cambio actual."
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#, needs-review
-msgid "ui.Waiting for memory, your song starts when there is room"
-msgstr "Esperando memoria, tu canción empieza cuando haya espacio"
-
-#. js-lingui-explicit-id
-#: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:95
+#: src/elements/video-player.tsx:96
 #, needs-review
 msgid "ui.Waiting its turn"
 msgstr "Esperando su turno"
+
+#. js-lingui-explicit-id
+#: src/elements/music-track.tsx:35
+#, needs-review
+msgid "ui.Waiting its turn. Your song starts soon."
+msgstr "Esperando su turno. Tu canción empieza pronto."
 
 #. js-lingui-explicit-id
 #: src/elements/moon-disc.tsx:13
@@ -7355,7 +7372,7 @@ msgid "ui.We could not check your {word}. Check your connection and try again."
 msgstr "No pudimos comprobar tu {word}. Revisa tu conexión e inténtalo de nuevo."
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:60
+#: src/elements/weather-forecast-page.tsx:62
 #, needs-review
 msgid "ui.Weather details unavailable."
 msgstr "Detalles del clima no disponibles."
@@ -7373,7 +7390,7 @@ msgid "ui.Weather in {place}: {temp} {unitWord} and {condition}. High {high}, lo
 msgstr "El tiempo en {place}: {temp} {unitWord} y {condition}. Máx. {high}, mín. {low}."
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:39
+#: src/elements/weather-forecast-page.tsx:40
 #, needs-review
 msgid "ui.Weather unavailable"
 msgstr "Clima no disponible"
@@ -7440,20 +7457,20 @@ msgid "ui.Width and height must be whole numbers above zero."
 msgstr "El ancho y la altura deben ser números enteros mayores que cero."
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:106
+#: src/elements/weather-forecast-page.tsx:108
 #, needs-review
 msgid "ui.wind"
 msgstr "viento"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:44
-#: src/elements/weather-forecast-page.tsx:48
+#: src/elements/weather-forecast-page.tsx:45
+#: src/elements/weather-forecast-page.tsx:49
 #, needs-review
 msgid "ui.Wind"
 msgstr "Viento"
 
 #. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:239
+#: src/elements/weather-forecast-page.tsx:251
 #, needs-review
 msgid "ui.Wind direction"
 msgstr "Dirección del viento"
@@ -7480,7 +7497,7 @@ msgstr "Trabajando en ello"
 #. js-lingui-explicit-id
 #: src/primitives/Wizard.tsx:354
 #: src/schema/ConfirmDialog.tsx:55
-#: src/schema/NodeRenderer.tsx:2005
+#: src/schema/NodeRenderer.tsx:2012
 #, needs-review
 msgid "ui.Working…"
 msgstr "Trabajando…"
@@ -7579,9 +7596,3 @@ msgstr "Alejar"
 #, needs-review
 msgid "ui.Zoomed image"
 msgstr "Imagen ampliada"
-
-#. js-lingui-explicit-id
-#: src/elements/weather-forecast-page.tsx:55
-#, needs-review
-msgid "ui.Intensity - Chance of rain"
-msgstr ""

@@ -469,6 +469,37 @@ describe("Player", () => {
       fireEvent.click(view.getByRole("button", { name: "Open the player: Lanterns" }));
       expect(onExpand).toHaveBeenCalledTimes(2);
     });
+    test("swipeToSkip: a sideways touch drag skips next (left) or previous (right); vertical, short, mouse and the default do nothing", () => {
+      const onNext = mock(() => {});
+      const onPrevious = mock(() => {});
+      const view = render(<Player src="/a" kind="audio" layout="mini" title="Lanterns" onNext={onNext} onPrevious={onPrevious} swipeToSkip />);
+      const bar = view.container.querySelector("[data-slot=player]")!;
+      expect(bar.getAttribute("data-swipe-skip")).toBe("true");
+      const drag = (x0: number, y0: number, x1: number, y1: number, pointerType = "touch") => {
+        for (const [type, x, y] of [["pointerdown", x0, y0], ["pointerup", x1, y1]] as const) {
+          const event = new Event(type, { bubbles: true }) as Event & Record<string, unknown>;
+          Object.assign(event, { clientX: x, clientY: y, pointerId: 1, pointerType });
+          bar.dispatchEvent(event);
+        }
+      };
+      drag(200, 100, 190, 100);
+      drag(200, 100, 100, 100, "mouse");
+      drag(200, 100, 120, 190);
+      expect(onNext).not.toHaveBeenCalled();
+      expect(onPrevious).not.toHaveBeenCalled();
+      drag(200, 100, 100, 110);
+      expect(onNext).toHaveBeenCalledTimes(1);
+      drag(100, 100, 200, 90);
+      expect(onPrevious).toHaveBeenCalledTimes(1);
+    });
+    test("swipeToSkip off: no swipe markup; the mini bar draws a hairline progress line along its bottom edge", () => {
+      const view = render(<Player src="/a" kind="audio" layout="mini" title="Lanterns" onNext={() => {}} />);
+      const bar = view.container.querySelector("[data-slot=player]")!;
+      expect(bar.getAttribute("data-swipe-skip")).toBeNull();
+      const line = bar.querySelector("[data-slot=player-hairline]")!;
+      expect(line.className).toContain("bottom-0");
+      expect(line.className).toContain("h-px");
+    });
     test("without swipeUpToExpand the mini bar ignores a swipe and keeps its markup", () => {
       const onExpand = mock(() => {});
       const view = render(<Player src="/a" kind="audio" layout="mini" title="Lanterns" onExpand={onExpand} />);

@@ -24,6 +24,11 @@ export const SWIPE_UP_PX = 40;
 export function isSwipeUp(dx: number, dy: number): boolean {
   return dy <= -SWIPE_UP_PX && Math.abs(dx) < Math.abs(dy);
 }
+/** True when a drag moved mostly sideways by at least SWIPE_UP_PX; returns -1 (left, next) or 1 (right, previous), else 0. */
+export function swipeSideways(dx: number, dy: number): -1 | 0 | 1 {
+  if (Math.abs(dx) < SWIPE_UP_PX || Math.abs(dx) <= Math.abs(dy)) return 0;
+  return dx < 0 ? -1 : 1;
+}
 /** The keyboard's arrow seek. */
 export const ARROW_SEEK_S = 5;
 /** onProgress cadence while playing. */

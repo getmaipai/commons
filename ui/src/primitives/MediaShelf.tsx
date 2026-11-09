@@ -11,6 +11,7 @@ import { CardSizeSlider, cardSizeStyle } from "@/kit/primitives/CardSizeSlider";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { useSurface } from "@/kit/useSurface";
 import { LockTile, collapseLocked } from "@/kit/elements/adult-lock";
+import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
 import { i18n } from "@/kit/i18n"
 
 /** The aspect ratios the kit will draw a media tile at. A closed set,
@@ -439,6 +440,7 @@ const SIZED_COLUMNS = "grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(var(--m
 
 /** The tile and, when the shelf has `onPlay` or `favorite`, its Play button and heart as siblings (a button inside a button is invalid). */
 function TileFrame({ onPlay, playLabel, favorite, children }: { onPlay?: () => void; playLabel: string; favorite?: { on: boolean; label: string; onToggle: () => void }; children: ReactNode }) {
+  const pops = useLikePop(favorite?.on ?? false);
   if (!onPlay && !favorite) return <>{children}</>;
   return (
     <div className="group/tile relative" data-slot="media-tile">
@@ -449,7 +451,7 @@ function TileFrame({ onPlay, playLabel, favorite, children }: { onPlay?: () => v
           aria-label={favorite.label}
           aria-pressed={favorite.on}
           data-slot="media-tile-favorite"
-          onClick={favorite.onToggle}
+          onClick={() => { if (!favorite.on) likeHaptic(); favorite.onToggle(); }}
           className={cn(
             "absolute end-2 top-2 flex size-9 items-center justify-center rounded-full bg-[var(--art-overlay)] text-[var(--art-foreground)]",
             "before:absolute before:-inset-1 before:content-['']",
@@ -457,7 +459,7 @@ function TileFrame({ onPlay, playLabel, favorite, children }: { onPlay?: () => v
             FOCUS_RING,
           )}
         >
-          <HeartGlyph aria-hidden className={cn("size-5", favorite.on && "fill-current")} />
+          <HeartGlyph key={pops} aria-hidden className={cn("size-5", favorite.on && "fill-current", favorite.on && pops > 0 && LIKE_POP_CLASS)} />
         </button>
       ) : null}
       {onPlay ? (

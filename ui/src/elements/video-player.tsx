@@ -17,6 +17,7 @@ import {
 import { cn } from "cn";
 import { Alert, AlertDescription } from "@/kit/ui/alert";
 import { Button } from "@/kit/ui/button";
+import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
 import { Card, CardContent } from "@/kit/ui/card";
 import { Progress } from "@/kit/ui/progress";
 import { SafeImage } from "@/kit/primitives/SafeImage";
@@ -451,6 +452,7 @@ function VideoPlayerBody({
 }
 
 function FavoriteToggle({ label, pressed, icons, disabledReason, onToggle }: { label: string; pressed: boolean; icons: boolean; disabledReason?: string; onToggle: () => void }) {
+  const pops = useLikePop(pressed);
   return (
     <Button
       type="button"
@@ -461,9 +463,9 @@ function FavoriteToggle({ label, pressed, icons, disabledReason, onToggle }: { l
       title={disabledReason ?? (icons ? label : undefined)}
       disabled={Boolean(disabledReason)}
       data-slot="video-player-favorite"
-      onClick={onToggle}
+      onClick={() => { if (!pressed) likeHaptic(); onToggle(); }}
     >
-      <StarIcon aria-hidden className={pressed ? "fill-current" : undefined} />
+      <StarIcon key={pops} aria-hidden className={cn(pressed && "fill-current", pressed && pops > 0 && LIKE_POP_CLASS)} />
       {icons ? null : label}
     </Button>
   );

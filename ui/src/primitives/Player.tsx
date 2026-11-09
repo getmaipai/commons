@@ -54,6 +54,7 @@ import {
   PROGRESS_INTERVAL_MS,
   PULL_DOCK_PX,
   isSwipeUp,
+  swipeSideways,
   RESUME_LINE_MS,
   shouldResume,
   skipOffer,
@@ -251,6 +252,9 @@ export interface PlayerProps {
   /** MUSIC-KIT-01: in the `mini` layout, dragging up on the bar (touch or pen) calls `onExpand`, like tapping it. The
    * bar keeps its horizontal scroll; the swipe never fires a tap. Default off. */
   swipeUpToExpand?: boolean;
+  /** In the `mini` layout, a horizontal swipe (touch or pen) on the bar calls `onNext` (left) or `onPrevious` (right) when the
+   * host passes them. Only acts when the travel is mostly sideways, so it never fights the swipe up. Default off. */
+  swipeToSkip?: boolean;
   /** MUSIC-KIT-01: in the `audio` layout, the art rests smaller (`--art-resting-scale`) while paused and springs to full
    * size on play (`--art-spring-duration`, `--art-spring-ease`). Under reduced motion the art stays full size. Default off. */
   artSpring?: boolean;
@@ -370,6 +374,7 @@ export function Player(props: PlayerProps) {
     media: external = null,
     placement = "inline",
     swipeUpToExpand = false,
+    swipeToSkip = false,
     artSpring = false,
     lyricsBlur = false,
     voiceover,
@@ -1232,7 +1237,9 @@ export function Player(props: PlayerProps) {
     />
   );
   // MUSIC-KIT-01: a drag up on the mini bar opens the full player. Mouse is left alone (it has the expand button).
-  const swipeHandlers = swipeUpToExpand && onExpand
+  const upOn = Boolean(swipeUpToExpand && onExpand);
+  const skipOn = Boolean(swipeToSkip && (onNext || onPrevious));
+  const swipeHandlers = upOn || skipOn
     ? {
         onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) => {
           swiped.current = false;
@@ -1242,10 +1249,16 @@ export function Player(props: PlayerProps) {
           const start = swipe.current;
           swipe.current = null;
           if (!start || start.id !== event.pointerId) return;
-          if (isSwipeUp(event.clientX - start.x, event.clientY - start.y)) {
+          const dx = event.clientX - start.x;
+          const dy = event.clientY - start.y;
+          if (upOn && isSwipeUp(dx, dy)) {
             swiped.current = true;
-            onExpand();
+            onExpand?.();
+            return;
           }
+          const side = skipOn ? swipeSideways(dx, dy) : 0;
+          if (side === -1 && onNext) { swiped.current = true; onNext(upNext?.id); }
+          else if (side === 1 && onPrevious) { swiped.current = true; onPrevious(); }
         },
         onPointerCancel: () => { swipe.current = null; },
         // The click that follows a swipe on the expand button must not open it a second time.
@@ -1302,17 +1315,20 @@ export function Player(props: PlayerProps) {
         data-slot="player"
         data-layout="mini"
         data-placement={placement}
-        data-swipe-up={swipeUpToExpand && onExpand ? "true" : undefined}
+        data-swipe-up={upOn ? "true" : undefined}
+        data-swipe-skip={skipOn ? "true" : undefined}
         onKeyDown={onKeyDown}
         {...swipeHandlers}
         className={cn(
           "relative w-full bg-card text-card-foreground",
-          swipeUpToExpand && onExpand && "touch-pan-x",
+          upOn && !skipOn && "touch-pan-x",
+          skipOn && !upOn && "touch-pan-y",
+          upOn && skipOn && "touch-none",
           placement === "dock" && "sticky bottom-0 z-30 border-t border-border bg-[color-mix(in_srgb,var(--card)_94%,transparent)] backdrop-blur-md",
         )}
       >
         {live ? null : (
-          <div aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-muted">
+          <div aria-hidden data-slot="player-hairline" className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-px bg-border">
             <div className="h-full bg-[var(--progress-accent)]" style={{ width: `${progressPct}%` }} />
           </div>
         )}

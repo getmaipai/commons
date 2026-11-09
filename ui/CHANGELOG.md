@@ -1,3 +1,7 @@
+## [ui-v0.5.556] - 2026-11-09
+
+- KIT-POLISH: `MusicTrack`'s queued line no longer talks about memory or room ("Waiting its turn. Your song starts soon."). The Favorite toggle (`VideoPlayer`) and the `MediaShelf` tile heart pop briefly when turned on (motion-safe only) and call `navigator.vibrate?.(10)` (guarded). The `Player` mini bar draws its progress as a hairline along its bottom edge instead of the top and takes an optional `swipeToSkip` (a mostly-sideways touch drag calls `onNext` left or `onPrevious` right; off by default, never fights `swipeUpToExpand`). `SheetContent side="bottom"` draws a small `aria-hidden` grabber at the top. Defaults remain unchanged except the hairline moving to the bottom edge.
+
 ## [ui-v0.5.555] - 2026-11-09
 
 - TALK-04: `CompanionAvatar`'s `mouth` prop takes optional `shapes` (A to F crop pictures), `anchor` (fractions of the rest picture) and `cue` (the current shape letter from timed speech, or null; X draws no crop); without `shapes` it is unchanged. New optional `eyes` prop (`closed`, `half`, `anchor`, `random`) draws a blink every 3 to 6 s, only while the keyed still is shown during speech, never over a playing clip, never at the header size, and not under reduced motion. The kit draws every crop. Pairs with spec 0.1.348.

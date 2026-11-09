@@ -27,7 +27,7 @@ describe("MusicTrack compact card", () => {
 
   test("waiting for memory is calm and omits ETA when the host gives none", () => {
     const view = render(<MusicTrack status="queued" title="Song" waitingForMemory progress={0.1} />);
-    expect(view.getByRole("status").textContent).toBe("Waiting for memory, your song starts when there is room");
+    expect(view.getByRole("status").textContent).toBe("Waiting its turn. Your song starts soon.");
     expect(view.container.textContent).not.toContain("left");
     expect(view.queryByRole("progressbar")).toBeNull();
     expect(view.container.querySelector('[data-slot="generation-stages"]')).toBeNull();

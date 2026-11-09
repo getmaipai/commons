@@ -76,6 +76,9 @@ function SheetContent({
         )}
         {...props}
       >
+        {side === "bottom" && (
+          <span data-slot="sheet-grabber" aria-hidden className="mx-auto mt-2 -mb-2 h-1 w-10 shrink-0 rounded-full bg-border" />
+        )}
         {children}
         {showCloseButton && (
           // Routed through the kit's own Button (icon-sm) for its 48px
