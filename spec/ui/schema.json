@@ -123,6 +123,16 @@
             }
           }
         },
+        "share": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["to"],
+          "description": "PARITY-01: share a link to a page of this hub. `to` is a route inside the hub (starting with `/`, `{field}` placeholders allowed); the kit builds the full hub address, hands it to the device share sheet when there is one, and otherwise copies it. Nothing is sent to any service.",
+          "properties": {
+            "to": { "type": "string", "pattern": "^/" },
+            "title": { "type": "string", "maxLength": 120, "description": "Optional share title; may contain `{field}` placeholders." }
+          }
+        },
         "confirm": {
           "type": "object",
           "additionalProperties": false,
@@ -147,7 +157,7 @@
       },
       "minProperties": 1,
       "maxProperties": 1,
-      "description": "Exactly one of the five declared actions (6.2)."
+      "description": "Exactly one of the declared actions (6.2). PARITY-01: row-menu operations need no new op. Play next, Add to queue, Mark played and Unfollow are a `call` to the package route with the row in `args`; Go to artist or album is a `navigate`; Share is `share`."
     },
     "share_change": {
       "type": "object",
@@ -209,6 +219,7 @@
         "candidates_bind": { "$ref": "#/$defs/binding", "description": "Optional binding returning candidate people [{id, name, avatar_url?}] for the share panel." },
         "heading_level": { "type": "string", "enum": ["h1", "h2"], "default": "h1" },
         "variant": { "type": "string", "enum": ["full", "byline", "collection", "studio"], "default": "full", "description": "VIDEO-STUDIO-03 (K2): `studio` is a page header: the optional `eyebrow` as a small uppercase tracked line, the row's title as a huge bold uppercase heading, the row's art (`fields.art`) at the start, and `secondary` then `primary` at the end. It draws no creator line, date, description or visibility chip. Default `full`, unchanged." },
+        "backdrop": { "type": "string", "enum": ["none", "art_gradient"], "default": "none", "description": "PARITY-01: `art_gradient` draws a soft static gradient behind the header, taken from the dominant colour of the row's art (`fields.art`), falling back to the theme tokens when the art is missing or cannot be read. Default `none`, unchanged." },
         "eyebrow": { "type": "string", "minLength": 1, "maxLength": 40, "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. The line above the title (CREATE, STUDIO), drawn uppercase." },
         "fields": { "type": "object", "additionalProperties": false, "properties": { "art": { "type": "string", "default": "art" }, "meta": { "type": "string", "default": "meta" }, "footer_lines": { "type": "string", "default": "footer_lines" }, "locked": { "type": "string", "default": "locked", "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. Dotted path to a boolean in the row; true draws no art, eyebrow or title (an adult-only item while the lock is on). The actions stay." } } },
         "primary": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string" }, "action": { "$ref": "#/$defs/action" } } },
@@ -415,6 +426,7 @@
         "item_subtitle_field": { "type": "string", "description": "MEDIA-PLAYER-01: a `{field}` template for the caption's second line (the channel, the artist), as list.item_subtitle_field." },
         "item_media_field": { "type": "string", "description": "Dotted path to the tile's same-origin image path (starting with `/`). An address with a scheme or a host is not loaded." },
         "item_progress_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to the played share, a number 0 to 1, drawn as a bar along the tile's bottom edge." },
+        "item_avatar_field": { "type": "string", "description": "PARITY-01: dotted path to a same-origin image path (starting with `/`) drawn as a small round avatar (channel, artist) beside the caption. Empty draws none." },
         "item_badge_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to a short string drawn as the tile's corner badge (\"Saved\", \"On this phone\", \"Not saved\"); empty draws none." },
         "item_meta_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to the running time, a number of seconds (drawn as 18:42) or a short string." },
         "aspect": { "type": "string", "enum": ["wide", "square", "poster"], "default": "wide" },
@@ -425,9 +437,40 @@
         "density": { "type": "string", "enum": ["default", "compact"], "default": "default", "description": "Compact vertical rows have 72 px artwork, two caption lines and trailing item_meta_field running time. Horizontal shelves use the existing card-size budget." },
         "item_highlight_field": { "type": "string", "description": "Dotted path to a boolean; true marks the current track or next episode with the media current ring token and aria-current." },
         "item_index_field": { "type": "string", "description": "Dotted path to the leading track index in a vertical row; zero is displayed." },
+        "sort": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "label", "options"],
+          "description": "PARITY-01: a sort control above the shelf (Recents, A to Z, Creator). The chosen option's `value` is written to page state `state`; put `$state.<state>` in the bind params so the backend sorts. The first option is the default.",
+          "properties": {
+            "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+            "label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "The control's accessible name." },
+            "options": {
+              "type": "array", "minItems": 2, "maxItems": 6,
+              "items": { "type": "object", "additionalProperties": false, "required": ["value", "label"], "properties": { "value": { "type": "string", "minLength": 1, "maxLength": 40 }, "label": { "type": "string", "minLength": 1, "maxLength": 40 } } }
+            }
+          }
+        },
+        "chips": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "label", "options"],
+          "description": "PARITY-01: a filter chip row above the shelf, one chip chosen at a time (Songs, Albums). The chosen `value` is written to page state `state`; the first option is the default and normally means All. Put `$state.<state>` in the bind params so the backend filters.",
+          "properties": {
+            "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+            "label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "The chip row's accessible name." },
+            "options": {
+              "type": "array", "minItems": 2, "maxItems": 10,
+              "items": { "type": "object", "additionalProperties": false, "required": ["value", "label"], "properties": { "value": { "type": "string", "minLength": 1, "maxLength": 40 }, "label": { "type": "string", "minLength": 1, "maxLength": 40 } } }
+            }
+          }
+        },
+        "pinned_field": { "type": "string", "minLength": 1, "description": "PARITY-01: dotted path to a boolean on each row; rows where it is true are drawn first in a Pinned row, then the rest. At most `pinned_max` pins are drawn." },
+        "pinned_max": { "type": "integer", "minimum": 1, "maximum": 12, "default": 6, "description": "PARITY-01: how many pinned rows are drawn." },
+        "pinned_heading": { "type": "string", "minLength": 1, "maxLength": 40, "description": "PARITY-01: the Pinned row's heading. Default: Pinned." },
         "row_actions": {
           "type": "array",
-          "maxItems": 2,
+          "maxItems": 3,
           "description": "Vertical row controls outside the artwork button. Play is icon-only; other actions are labelled pills. Labels may contain {field} placeholders; a nonempty label_field value overrides the label. Each action receives its row, just like on_select.",
           "items": {
             "type": "object",
@@ -554,7 +597,7 @@
         "play_label": { "type": "string", "minLength": 1, "maxLength": 80, "description": "A `{field}` template for the Play button's accessible name (\"Play {title}\")." },
         "row_actions": {
           "type": "array",
-          "maxItems": 2,
+          "maxItems": 3,
           "description": "MUSIC-POLISH-01: quiet icon buttons at each row's end (a Playlist's Remove x), faint until the row is hovered or focused. Each action receives its row, as on_play does. Labels may contain {field} placeholders.",
           "items": {
             "type": "object",
@@ -906,14 +949,24 @@
             "description": { "type": "string", "minLength": 1, "description": "Row field containing the optional description; defaults to description." },
             "facts": { "type": "string", "minLength": 1, "description": "Row field containing the muted facts line; defaults to facts and falls back to subtitle." },
             "lyrics": { "type": "string", "minLength": 1, "description": "Lyrics text field, default lyrics; reads lyrics.text from a nested lyrics object." },
-            "timed_lyrics": { "type": "string", "minLength": 1, "description": "Timed lyric lines field, default timed_lyrics; reads lyrics.timed from a nested lyrics object." }
+            "timed_lyrics": { "type": "string", "minLength": 1, "description": "Timed lyric lines field, default timed_lyrics; reads lyrics.timed from a nested lyrics object." },
+            "transcript": { "type": "string", "minLength": 1, "description": "PARITY-01: field with transcript rows [{start_s, text}]; default transcript." }
           }
         },
         "on_progress": { "$ref": "#/$defs/action", "description": "Fired every 10 s while playing, on pause, on seek, at the end and on unload. Placeholders: the item's own fields plus {position_s}, {duration_s}, {reason} and {completed}." },
         "on_next": { "$ref": "#/$defs/action", "description": "Fired with the up_next item's fields (a `play`, or a `navigate` to its watch page)." },
         "details": { "type": "boolean", "default": false, "description": "MEDIA-DETAIL-01: draw the item's title, facts, expandable description and chapters under the picture (a watch page's details block)." },
-        "details_show": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["title", "facts", "description", "chapters"] }, "default": ["title", "facts", "description", "chapters"], "description": "Optional detail parts. Absent means all four." },
-        "details_show": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["title", "facts", "description", "chapters"] }, "default": ["title", "facts", "description", "chapters"], "description": "Optional parts of the details block to draw. Absent means all parts." },
+        "details_show": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["title", "facts", "description", "chapters", "transcript"] }, "default": ["title", "facts", "description", "chapters"], "description": "Optional parts of the details block to draw. Absent means title, facts, description and chapters. PARITY-01: `transcript` adds a Transcript button that opens the reader panel (needs `transcript_bind` or the row's transcript field)." },
+        "sleep_timer": { "type": "boolean", "default": false, "description": "PARITY-01: draw a sleep timer control (End of episode, 5, 10, 15, 30, 45 or 60 minutes) in the player's extra controls." },
+        "skip": {
+          "type": "object", "additionalProperties": false, "required": ["back", "forward"],
+          "description": "PARITY-01: skip buttons that jump back and forward by this many seconds (a podcast: 15 and 30).",
+          "properties": { "back": { "type": "number", "minimum": 1, "maximum": 120 }, "forward": { "type": "number", "minimum": 1, "maximum": 120 } }
+        },
+        "transcript_bind": { "$ref": "#/$defs/binding", "description": "PARITY-01: the call returning the transcript as rows [{start_s, text}] (or {rows}); the first row of the bound item is not used. Absent: the item's own `transcript` field, if any." },
+        "double_tap_seek": { "type": "boolean", "default": false, "description": "PARITY-01: video only. A double tap on the left or right third of the picture seeks 10 s back or forward; further quick taps stack." },
+        "long_press_speed": { "type": "boolean", "default": false, "description": "PARITY-01: video only. Holding the picture plays at 2x until release." },
+        "pip": { "type": "boolean", "default": false, "description": "PARITY-01: video only. Draw a Picture in picture button (shown only where the browser supports it)." },
         "actions_wrap": { "type": "boolean", "default": false, "description": "MUSIC-LIKE-02: the actions row wraps onto more lines instead of scrolling sideways with its scrollbar hidden. Use it where the column is narrow or the row has more than three buttons." },
         "actions": {
           "type": "array",
@@ -1521,7 +1574,21 @@
         "item_key_field": { "type": "string", "description": "The recents row's key field. Default `key`." },
         "item_label_field": { "type": "string", "description": "The recents row's label field. Default `label`." },
         "submit": { "$ref": "#/$defs/action" },
-        "clear_recents": { "$ref": "#/$defs/action" }
+        "clear_recents": { "$ref": "#/$defs/action" },
+        "type_chips": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "label", "options"],
+          "description": "PARITY-01: type chips under the field (All, Songs, Artists, Albums). The chosen `value` is written to page state `state`; sections below use `condition` on that key to show only the matching shelves. The first option is the default.",
+          "properties": {
+            "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+            "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "options": {
+              "type": "array", "minItems": 2, "maxItems": 8,
+              "items": { "type": "object", "additionalProperties": false, "required": ["value", "label"], "properties": { "value": { "type": "string", "minLength": 1, "maxLength": 40 }, "label": { "type": "string", "minLength": 1, "maxLength": 40 } } }
+            }
+          }
+        }
       }
     },
     "nav_entry": {

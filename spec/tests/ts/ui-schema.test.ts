@@ -46,6 +46,28 @@ describe("UI schema", () => {
     expect(validate({ type: "page", id: "detail", title: "Detail", body: [node] })).toBe(true);
     expect(validate({ type: "page", id: "detail", title: "Detail", body: [{ ...node, share_change: { ...node.share_change, add: { navigate: { to: "/apps/media" } } } }] })).toBe(false);
   });
+  test("PARITY-01: media parity fields validate and reject malformed values", () => {
+    const player = { type: "player", bind: { source: "package", path: "item" } };
+    expect(validate({ ...player, sleep_timer: true, skip: { back: 15, forward: 30 }, double_tap_seek: true, long_press_speed: true, pip: true, details_show: ["transcript"], transcript_bind: { source: "package", path: "transcript" }, fields: { transcript: "tr" } })).toBe(true);
+    for (const bad of [{ skip: { back: 15 } }, { skip: { back: 0, forward: 30 } }, { sleep_timer: "yes" }, { details_show: ["lyrics"] }, { pip: 1 }]) expect(validate({ ...player, ...bad })).toBe(false);
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "x" }, item_key_field: "id", item_label_field: "t", item_media_field: "m" };
+    const opts = [{ value: "a", label: "A" }, { value: "b", label: "B" }];
+    expect(validate({ ...shelf, sort: { state: "sort", label: "Sort", options: opts }, chips: { state: "k", label: "Filter", options: opts }, item_avatar_field: "av", pinned_field: "pinned", pinned_max: 6, pinned_heading: "Pinned" })).toBe(true);
+    for (const bad of [{ sort: { state: "Sort", label: "Sort", options: opts } }, { chips: { state: "k", label: "F", options: [opts[0]] } }, { pinned_max: 13 }, { row_actions: Array.from({ length: 4 }, () => ({ icon: "play", label: "x", action: { navigate: { to: "/a" } } })) }]) expect(validate({ ...shelf, ...bad })).toBe(false);
+    const three = Array.from({ length: 3 }, () => ({ icon: "play", label: "x", action: { navigate: { to: "/a" } } }));
+    expect(validate({ ...shelf, row_actions: three })).toBe(true);
+    expect(validate({ type: "track_rows", bind: { source: "package", path: "x" }, label: "T", item_key_field: "id", item_label_field: "t", on_play: { navigate: { to: "/a" } }, row_actions: three })).toBe(true);
+    const action = ajv.compile({ $schema: schema.$schema, $id: "https://example.com/action2.schema.json", $defs: schema.$defs, $ref: "#/$defs/action" });
+    expect(action({ share: { to: "/apps/music/album?id={id}", title: "{title}" } })).toBe(true);
+    for (const bad of [{ share: { to: "https://example.com" } }, { share: {} }, { share: { to: "/a" }, navigate: { to: "/b" } }]) expect(action(bad)).toBe(false);
+    const header = { type: "creation_header", bind: { source: "package", path: "h" }, share_change: { add: { call: { target: "/a" } }, remove: { call: { target: "/a" } }, make_private: { call: { target: "/a" } } } };
+    expect(validate({ ...header, backdrop: "art_gradient" })).toBe(true);
+    expect(validate({ ...header, backdrop: "blue" })).toBe(false);
+    const opt = { state: "kind", label: "Type", options: opts };
+    expect(validate({ type: "search", type_chips: opt })).toBe(true);
+    expect(validate({ type: "search", type_chips: { ...opt, options: [] } })).toBe(false);
+  });
+
   test("at least one page exists to validate", () => {
     expect(pageFiles.length).toBeGreaterThan(0);
   });

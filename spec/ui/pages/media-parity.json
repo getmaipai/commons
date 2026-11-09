@@ -1,0 +1,83 @@
+{
+  "type": "page",
+  "id": "media-parity",
+  "title": "Library",
+  "body": [
+    {
+      "type": "search",
+      "label": "Search",
+      "recents": { "source": "package", "path": "recent-searches" },
+      "type_chips": {
+        "state": "kind",
+        "label": "Result type",
+        "options": [
+          { "value": "all", "label": "All" },
+          { "value": "songs", "label": "Songs" },
+          { "value": "albums", "label": "Albums" }
+        ]
+      }
+    },
+    {
+      "type": "creation_header",
+      "bind": { "source": "package", "path": "header" },
+      "backdrop": "art_gradient",
+      "share_change": {
+        "add": { "call": { "target": "/api/plugins/music/share", "args": { "person_id": "{person_id}" } } },
+        "remove": { "call": { "target": "/api/plugins/music/share", "method": "DELETE", "args": { "person_id": "{person_id}" } } },
+        "make_private": { "call": { "target": "/api/plugins/music/private" } }
+      }
+    },
+    {
+      "type": "media_shelf",
+      "heading": "Your library",
+      "bind": { "source": "package", "path": "library", "params": { "sort": "$state.sort", "kind": "$state.library_kind" } },
+      "item_key_field": "id",
+      "item_label_field": "title",
+      "item_subtitle_field": "{creator}",
+      "item_media_field": "cover",
+      "item_avatar_field": "creator_avatar",
+      "item_badge_field": "badge",
+      "pinned_field": "pinned",
+      "pinned_max": 6,
+      "pinned_heading": "Pinned",
+      "sort": {
+        "state": "sort",
+        "label": "Sort by",
+        "options": [
+          { "value": "recents", "label": "Recents" },
+          { "value": "a-z", "label": "A to Z" },
+          { "value": "creator", "label": "Creator" }
+        ]
+      },
+      "chips": {
+        "state": "library_kind",
+        "label": "Filter",
+        "options": [
+          { "value": "all", "label": "All" },
+          { "value": "albums", "label": "Albums" },
+          { "value": "playlists", "label": "Playlists" }
+        ]
+      },
+      "orientation": "vertical",
+      "row_actions": [
+        { "icon": "list-plus", "label": "Play next", "action": { "call": { "target": "/api/plugins/music/queue", "args": { "op": "play_next", "media_id": "{id}" } } } },
+        { "icon": "user", "label": "Go to artist", "action": { "navigate": { "to": "/apps/music/artist", "state": { "id": "{artist_id}" } } } },
+        { "icon": "share", "label": "Share", "action": { "share": { "to": "/apps/music/album?id={id}", "title": "{title}" } } }
+      ],
+      "on_select": { "play": { "media_id": "{id}" } }
+    },
+    {
+      "type": "player",
+      "bind": { "source": "package", "path": "episode" },
+      "kind": "video",
+      "sleep_timer": true,
+      "skip": { "back": 15, "forward": 30 },
+      "double_tap_seek": true,
+      "long_press_speed": true,
+      "pip": true,
+      "details": true,
+      "details_show": ["title", "description", "transcript"],
+      "transcript_bind": { "source": "package", "path": "transcript", "params": { "id": "$state.id" } }
+    }
+  ]
+}
