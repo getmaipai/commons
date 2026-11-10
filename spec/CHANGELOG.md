@@ -1,3 +1,7 @@
+## [spec-v0.1.360] - 2026-11-10
+
+- PACK-01b, breaking for the unreleased companion pack schema only. `companion-pack.schema.json` now matches the real demo packs: mouth is a `calm` and optional `shout` folder each with a `meta.json`, `head`, `eyes` and `emotion` are folders, `rest` is a file, a clip may name a `phone` twin and a `trackFile`, flow files may be deflate-compressed (`flowEncoding`), `life` takes demo channel gains. The validator checks phone twins, folder meta files, flow encoding and counts the desktop tier. No other schema changes; no consumer used the 0.1.359 shape yet.
+
 ## [spec-v0.1.359] - 2026-11-10
 
 - PACK-01, additive. New `companion-pack.schema.json` (states with arrays of clips, mouth atlas and flows, eyes, emotion layers, life channels, budget, provenance), generated TypeScript and Python types, and a pure `validateCompanionPack` validator with fixtures for the three demo characters. Replaces the unbuilt TALK-04 `animation.mouth` plan; `manifest.schema.json` is untouched.

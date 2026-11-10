@@ -14,6 +14,7 @@ def validate_companion_pack(
             problems.append(
                 f"states.{state} clips must use frame rates within 1 fps; make the clips match."
             )
+        paths: set[str] = set()
         for index, clip in enumerate(clips):
             field = f"states.{state}[{index}]"
             if clip["id"] in seen:
@@ -21,9 +22,22 @@ def validate_companion_pack(
                     f"{field}.id repeats clip id {clip['id']}; give every clip a unique id."
                 )
             seen.add(clip["id"])
+            if clip["file"] in paths:
+                problems.append(
+                    f"{field}.file repeats a file in states.{state}; give each clip in a state its own file."
+                )
+            paths.add(clip["file"])
             if clip["file"].lower().endswith(".webm"):
                 problems.append(
                     f"{field}.file uses WebM; use an .mp4 stacked-alpha H.264 clip."
+                )
+            if not clip["trackFile"].endswith(".json"):
+                problems.append(
+                    f"{field}.trackFile must end in .json; use the track sidecar filename."
+                )
+            if clip.get("phone") and not clip["phone"].endswith(".mp4"):
+                problems.append(
+                    f"{field}.phone must end in .mp4; use the phone clip filename."
                 )
             if len(clip["track"]) != clip["frames"]:
                 problems.append(
@@ -34,25 +48,38 @@ def validate_companion_pack(
                     problems.append(
                         f"{field}.rest.{edge} is outside [0, frames); choose a frame from 0 through {clip['frames'] - 1}."
                     )
+            if files is not None and clip.get("phone") and clip["phone"] not in files:
+                problems.append(
+                    f"{field}.phone has no matching file in files; include the phone twin."
+                )
     if len(pack["states"]["idle"]) < 2:
         problems.append("states.idle needs at least 2 clips; add another idle clip.")
-    if "wide" not in pack["mouth"]["letters"]:
-        problems.append(
-            "mouth.letters.wide is missing; add the wide shape index used by the atlas."
-        )
-    for kind, emotion in pack["emotion"].items():
-        if not emotion.get("flow") or not emotion.get("residual"):
-            problems.append(
-                f"emotion.{kind} needs both flow and residual files; add both filenames."
-            )
+    dirs = [
+        pack["mouth"]["calm"]["dir"],
+        pack["head"]["dir"],
+        pack["eyes"]["dir"],
+        pack["emotion"]["dir"],
+    ]
+    if pack["mouth"].get("shout"):
+        dirs.append(pack["mouth"]["shout"]["dir"])
     if files is not None:
-        total = sum(files.values())
+        for directory in dirs:
+            if f"{directory}/meta.json" not in files:
+                problems.append(
+                    f"{directory} needs meta.json; include the directory metadata file."
+                )
+        desktop_files = {
+            path: size
+            for path, size in files.items()
+            if not path.endswith(".phone.mp4") and path != "build-report.json"
+        }
+        total = sum(desktop_files.values())
         if total > pack["budget"]["bytes"]:
             problems.append(
-                f"budget.bytes is {pack['budget']['bytes']} but files total {total} bytes; raise the budget or reduce file sizes."
+                f"budget.bytes is {pack['budget']['bytes']} but desktop files total {total} bytes; raise the budget or reduce file sizes."
             )
         if pack["tile"].get("desktop") == 480 and total > 12_582_912:
             problems.append(
-                f"budget.bytes files total {total} bytes, over the desktop limit of 12582912; reduce file sizes."
+                f"budget.bytes desktop files total {total} bytes, over the desktop limit of 12582912; reduce file sizes."
             )
     return problems

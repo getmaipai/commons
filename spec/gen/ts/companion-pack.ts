@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-/**PACK-01: a portable animation and expression pack for one companion.*/
+/**PACK-01b: a portable animation and expression pack for one companion.*/
 export const CompanionPack = z
   .object({
     version: z.literal(1),
@@ -28,6 +28,12 @@ export const CompanionPack = z
                   .regex(
                     new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.mp4$"),
                   ),
+                phone: z
+                  .string()
+                  .regex(
+                    new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.mp4$"),
+                  )
+                  .optional(),
                 fps: z.number().gt(0),
                 frames: z.number().int().gte(1),
                 rest: z
@@ -37,6 +43,11 @@ export const CompanionPack = z
                   })
                   .strict(),
                 track: z.array(z.number()).min(1),
+                trackFile: z
+                  .string()
+                  .regex(
+                    new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.json$"),
+                  ),
                 encoding: z.literal("stacked-alpha-h264"),
                 weight: z.number().gte(0).optional(),
               })
@@ -54,6 +65,12 @@ export const CompanionPack = z
                   .regex(
                     new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.mp4$"),
                   ),
+                phone: z
+                  .string()
+                  .regex(
+                    new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.mp4$"),
+                  )
+                  .optional(),
                 fps: z.number().gt(0),
                 frames: z.number().int().gte(1),
                 rest: z
@@ -63,6 +80,11 @@ export const CompanionPack = z
                   })
                   .strict(),
                 track: z.array(z.number()).min(1),
+                trackFile: z
+                  .string()
+                  .regex(
+                    new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.json$"),
+                  ),
                 encoding: z.literal("stacked-alpha-h264"),
                 weight: z.number().gte(0).optional(),
               })
@@ -80,6 +102,12 @@ export const CompanionPack = z
                   .regex(
                     new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.mp4$"),
                   ),
+                phone: z
+                  .string()
+                  .regex(
+                    new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.mp4$"),
+                  )
+                  .optional(),
                 fps: z.number().gt(0),
                 frames: z.number().int().gte(1),
                 rest: z
@@ -89,6 +117,11 @@ export const CompanionPack = z
                   })
                   .strict(),
                 track: z.array(z.number()).min(1),
+                trackFile: z
+                  .string()
+                  .regex(
+                    new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.json$"),
+                  ),
                 encoding: z.literal("stacked-alpha-h264"),
                 weight: z.number().gte(0).optional(),
               })
@@ -106,6 +139,12 @@ export const CompanionPack = z
                   .regex(
                     new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.mp4$"),
                   ),
+                phone: z
+                  .string()
+                  .regex(
+                    new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.mp4$"),
+                  )
+                  .optional(),
                 fps: z.number().gt(0),
                 frames: z.number().int().gte(1),
                 rest: z
@@ -115,6 +154,11 @@ export const CompanionPack = z
                   })
                   .strict(),
                 track: z.array(z.number()).min(1),
+                trackFile: z
+                  .string()
+                  .regex(
+                    new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+\\.json$"),
+                  ),
                 encoding: z.literal("stacked-alpha-h264"),
                 weight: z.number().gte(0).optional(),
               })
@@ -126,19 +170,6 @@ export const CompanionPack = z
       .strict(),
     mouth: z
       .object({
-        shapes: z.string().min(1),
-        grid: z
-          .object({
-            cols: z.number().int().gte(1),
-            rows: z.number().int().gte(1),
-            tile: z
-              .object({
-                width: z.number().int().gte(1),
-                height: z.number().int().gte(1),
-              })
-              .strict(),
-          })
-          .strict(),
         letters: z
           .object({
             A: z.number().int().gte(0),
@@ -152,9 +183,6 @@ export const CompanionPack = z
             wide: z.number().int().gte(0),
           })
           .strict(),
-        flows: z
-          .object({ file: z.string().min(1), flowScale: z.number().gt(0) })
-          .strict(),
         anchor: z
           .object({
             x: z.number(),
@@ -163,144 +191,82 @@ export const CompanionPack = z
             h: z.number().gt(0),
           })
           .strict(),
-        warp: z.string().min(1).optional(),
+        calm: z
+          .object({
+            dir: z
+              .string()
+              .regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
+          })
+          .strict(),
+        shout: z
+          .object({
+            dir: z
+              .string()
+              .regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
+          })
+          .strict()
+          .optional(),
+        warp: z.boolean().optional(),
+        flowEncoding: z.enum(["int16", "int16-deflate"]).optional(),
+      })
+      .strict(),
+    head: z
+      .object({
+        dir: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
+        flowEncoding: z.enum(["int16", "int16-deflate"]).optional(),
       })
       .strict(),
     eyes: z
       .object({
-        closed: z
-          .object({
-            file: z.string().min(1),
-            box: z
-              .object({
-                x: z.number(),
-                y: z.number(),
-                w: z.number().gt(0),
-                h: z.number().gt(0),
-              })
-              .strict(),
-          })
-          .strict(),
-        half: z
-          .object({
-            file: z.string().min(1),
-            box: z
-              .object({
-                x: z.number(),
-                y: z.number(),
-                w: z.number().gt(0),
-                h: z.number().gt(0),
-              })
-              .strict(),
-          })
-          .strict(),
-        wide: z
-          .object({
-            file: z.string().min(1),
-            box: z
-              .object({
-                x: z.number(),
-                y: z.number(),
-                w: z.number().gt(0),
-                h: z.number().gt(0),
-              })
-              .strict(),
-          })
-          .strict()
-          .optional(),
+        dir: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
       })
       .strict(),
     emotion: z
       .object({
-        angry: z
-          .object({
-            flow: z.string().min(1),
-            residual: z.string().min(1),
-            region: z
-              .object({
-                x: z.number(),
-                y: z.number(),
-                w: z.number().gt(0),
-                h: z.number().gt(0),
-              })
-              .strict(),
-            flowFull: z.number().gte(0),
-          })
-          .strict(),
-        excited: z
-          .object({
-            flow: z.string().min(1),
-            residual: z.string().min(1),
-            region: z
-              .object({
-                x: z.number(),
-                y: z.number(),
-                w: z.number().gt(0),
-                h: z.number().gt(0),
-              })
-              .strict(),
-            flowFull: z.number().gte(0),
-          })
-          .strict(),
-        alarmed: z
-          .object({
-            flow: z.string().min(1),
-            residual: z.string().min(1),
-            region: z
-              .object({
-                x: z.number(),
-                y: z.number(),
-                w: z.number().gt(0),
-                h: z.number().gt(0),
-              })
-              .strict(),
-            flowFull: z.number().gte(0),
-          })
-          .strict(),
-        sad: z
-          .object({
-            flow: z.string().min(1),
-            residual: z.string().min(1),
-            region: z
-              .object({
-                x: z.number(),
-                y: z.number(),
-                w: z.number().gt(0),
-                h: z.number().gt(0),
-              })
-              .strict(),
-            flowFull: z.number().gte(0),
-          })
-          .strict(),
+        dir: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
+        kinds: z
+          .array(z.enum(["angry", "excited", "alarmed", "sad"]))
+          .min(1)
+          .refine(
+            (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+            "All items must be unique!",
+          ),
+        flowEncoding: z.enum(["int16", "int16-deflate"]).optional(),
       })
       .strict(),
+    rest: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
     life: z
       .object({
-        nod: z.number(),
-        brow: z.number(),
-        gazeL: z.number(),
-        gazeR: z.number(),
-        gazeU: z.number(),
-        eyeWide: z.number(),
-        eyeSquint: z.number(),
-        eyeClosed: z.number(),
-        eyeHalf: z.number(),
-        mCorner: z.number(),
-        mAsymL: z.number(),
-        mAsymR: z.number(),
-        mUpper: z.number(),
-        mPress: z.number(),
-        mNostril: z.number(),
-        mWrinkle: z.number(),
-        smile: z.number(),
-        mBrow: z.number(),
+        nod: z.number().gte(0).lte(4).optional(),
+        brow: z.number().gte(0).lte(4).optional(),
+        gazeL: z.number().gte(0).lte(4).optional(),
+        gazeR: z.number().gte(0).lte(4).optional(),
+        gazeU: z.number().gte(0).lte(4).optional(),
+        eyeWide: z.number().gte(0).lte(4).optional(),
+        eyeSquint: z.number().gte(0).lte(4).optional(),
+        eyeClosed: z.number().gte(0).lte(4).optional(),
+        eyeHalf: z.number().gte(0).lte(4).optional(),
+        mCorner: z.number().gte(0).lte(4).optional(),
+        mAsymL: z.number().gte(0).lte(4).optional(),
+        mAsymR: z.number().gte(0).lte(4).optional(),
+        mUpper: z.number().gte(0).lte(4).optional(),
+        mPress: z.number().gte(0).lte(4).optional(),
+        mNostril: z.number().gte(0).lte(4).optional(),
+        mWrinkle: z.number().gte(0).lte(4).optional(),
+        smile: z.number().gte(0).lte(4).optional(),
+        mBrow: z.number().gte(0).lte(4).optional(),
       })
       .strict(),
-    budget: z.object({ bytes: z.number().int().gte(1).lte(12582912) }).strict(),
+    budget: z
+      .object({
+        bytes: z.number().int().gte(1).lte(12582912),
+        phoneBytes: z.number().int().gte(0).optional(),
+      })
+      .strict(),
     provenance: z
       .object({
         maker: z.string().min(1),
-        makerVersion: z.string().min(1),
+        makerVersion: z.string(),
         source: z.enum(["photo", "stylised", "generated"]),
         created: z.string().datetime({ offset: true }),
       })
@@ -308,6 +274,6 @@ export const CompanionPack = z
   })
   .strict()
   .describe(
-    "PACK-01: a portable animation and expression pack for one companion.",
+    "PACK-01b: a portable animation and expression pack for one companion.",
   );
 export type CompanionPack = z.infer<typeof CompanionPack>;

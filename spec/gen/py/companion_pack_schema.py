@@ -26,45 +26,34 @@ class Tile(BaseModel):
     phone: Literal[320] | None = None
 
 
-class Life(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    nod: float
-    brow: float
-    gazeL: float
-    gazeR: float
-    gazeU: float
-    eyeWide: float
-    eyeSquint: float
-    eyeClosed: float
-    eyeHalf: float
-    mCorner: float
-    mAsymL: float
-    mAsymR: float
-    mUpper: float
-    mPress: float
-    mNostril: float
-    mWrinkle: float
-    smile: float
-    mBrow: float
-
-
 class Budget(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     bytes: conint(ge=1, le=12582912)
+    phoneBytes: conint(ge=0) | None = None
 
 
-class Box(BaseModel):
+class File(RootModel[str]):
+    model_config = ConfigDict(
+        regex_engine="python-re",
+    )
+    root: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
+
+
+class Dir(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    x: float
-    y: float
-    w: PositiveFloat
-    h: PositiveFloat
+    dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
+
+
+class FlowEncoding(RootModel[Literal['int16', 'int16-deflate']]):
+    root: Literal['int16', 'int16-deflate']
+
+
+class Gain(RootModel[confloat(ge=0.0, le=4.0)]):
+    root: confloat(ge=0.0, le=4.0)
 
 
 class Rest(BaseModel):
@@ -82,10 +71,12 @@ class Clip(BaseModel):
     )
     id: constr(min_length=1)
     file: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.mp4$')
+    phone: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.mp4$') | None = None
     fps: PositiveFloat
     frames: conint(ge=1)
     rest: Rest
     track: list[float] = Field(..., min_length=1)
+    trackFile: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.json$')
     encoding: Literal['stacked-alpha-h264']
     weight: confloat(ge=0.0) | None = None
 
@@ -98,21 +89,8 @@ class Idle(RootModel[list[Clip]]):
     root: list[Clip] = Field(..., max_length=8, min_length=2)
 
 
-class Tile1(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    width: conint(ge=1)
-    height: conint(ge=1)
-
-
-class Grid(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    cols: conint(ge=1)
-    rows: conint(ge=1)
-    tile: Tile1
+class MouthSet(RootModel[Dir]):
+    root: Dir
 
 
 class Letters(BaseModel):
@@ -130,51 +108,37 @@ class Letters(BaseModel):
     wide: conint(ge=0)
 
 
-class Flows(BaseModel):
+class Anchor(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    file: constr(min_length=1)
-    flowScale: PositiveFloat
+    x: float
+    y: float
+    w: PositiveFloat
+    h: PositiveFloat
 
 
 class Mouth(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    shapes: constr(min_length=1)
-    grid: Grid
     letters: Letters
-    flows: Flows
-    anchor: Box
-    warp: constr(min_length=1) | None = None
+    anchor: Anchor
+    calm: MouthSet
+    shout: MouthSet | None = None
+    warp: bool | None = None
+    flowEncoding: Literal['int16', 'int16-deflate'] | None = None
 
 
-class EyePicture(BaseModel):
+class Emotion(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    file: constr(min_length=1)
-    box: Box
-
-
-class Eyes(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
+    dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
+    kinds: list[Literal['angry', 'excited', 'alarmed', 'sad']] = Field(
+        ..., min_length=1
     )
-    closed: EyePicture
-    half: EyePicture
-    wide: EyePicture | None = None
-
-
-class EmotionKind(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    flow: constr(min_length=1)
-    residual: constr(min_length=1)
-    region: Box
-    flowFull: confloat(ge=0.0)
+    flowEncoding: Literal['int16', 'int16-deflate'] | None = None
 
 
 class Provenance(BaseModel):
@@ -182,7 +146,7 @@ class Provenance(BaseModel):
         extra='forbid',
     )
     maker: constr(min_length=1)
-    makerVersion: constr(min_length=1)
+    makerVersion: str
     source: Literal['photo', 'stylised', 'generated']
     created: AwareDatetime
 
@@ -197,19 +161,41 @@ class States(BaseModel):
     speak: list[Clip]
 
 
-class Emotion(BaseModel):
+class Life(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    angry: EmotionKind
-    excited: EmotionKind
-    alarmed: EmotionKind
-    sad: EmotionKind
+    nod: confloat(ge=0.0, le=4.0) | None = None
+    brow: confloat(ge=0.0, le=4.0) | None = None
+    gazeL: confloat(ge=0.0, le=4.0) | None = None
+    gazeR: confloat(ge=0.0, le=4.0) | None = None
+    gazeU: confloat(ge=0.0, le=4.0) | None = None
+    eyeWide: confloat(ge=0.0, le=4.0) | None = None
+    eyeSquint: confloat(ge=0.0, le=4.0) | None = None
+    eyeClosed: confloat(ge=0.0, le=4.0) | None = None
+    eyeHalf: confloat(ge=0.0, le=4.0) | None = None
+    mCorner: confloat(ge=0.0, le=4.0) | None = None
+    mAsymL: confloat(ge=0.0, le=4.0) | None = None
+    mAsymR: confloat(ge=0.0, le=4.0) | None = None
+    mUpper: confloat(ge=0.0, le=4.0) | None = None
+    mPress: confloat(ge=0.0, le=4.0) | None = None
+    mNostril: confloat(ge=0.0, le=4.0) | None = None
+    mWrinkle: confloat(ge=0.0, le=4.0) | None = None
+    smile: confloat(ge=0.0, le=4.0) | None = None
+    mBrow: confloat(ge=0.0, le=4.0) | None = None
+
+
+class FlowDir(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
+    flowEncoding: Literal['int16', 'int16-deflate'] | None = None
 
 
 class CompanionPack(BaseModel):
     """
-    PACK-01: a portable animation and expression pack for one companion.
+    PACK-01b: a portable animation and expression pack for one companion.
     """
 
     model_config = ConfigDict(
@@ -221,8 +207,10 @@ class CompanionPack(BaseModel):
     tile: Tile
     states: States
     mouth: Mouth
-    eyes: Eyes
+    head: FlowDir
+    eyes: Dir
     emotion: Emotion
+    rest: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
     life: Life
     budget: Budget
     provenance: Provenance

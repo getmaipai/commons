@@ -14,57 +14,44 @@ addFormats(ajv);
 const check = ajv.compile(schema);
 const files = readdirSync(DIR).filter((name) => name.endsWith(".json")).sort();
 const read = (name: string) => JSON.parse(readFileSync(join(DIR, name), "utf8"));
+const structuralInvalid = new Set(["invalid-idle-count.json", "invalid-wide-shape.json", "invalid-emotion-files.json", "invalid-webm.json"]);
+const expected: Record<string, string> = {
+  "invalid-track-length.json": "states.listen[0].track has 1 values but frames is 117; make the track length equal frames.",
+  "invalid-duplicate-id.json": "states.listen[0].id repeats clip id man-idle1; give every clip a unique id.",
+  "invalid-fps-mismatch.json": "states.speak clips must use frame rates within 1 fps; make the clips match.",
+  "invalid-rest-first.json": "states.listen[0].rest.first is outside [0, frames); choose a frame from 0 through 116.",
+  "invalid-rest-last.json": "states.think[0].rest.last is outside [0, frames); choose a frame from 0 through 116.",
+  "invalid-duplicate-state-file.json": "states.listen[1].file repeats a file in states.listen; give each clip in a state its own file.",
+};
 
-describe("PACK-01 CompanionPack fixtures", () => {
+describe("PACK-01b CompanionPack fixtures", () => {
   for (const name of files) {
     test(`${name} agrees with JSON Schema and generated Zod`, () => {
       const value = read(name);
-      const valid = name.startsWith("valid-");
-      if (valid) {
+      if (name.startsWith("valid-")) {
         expect(check(value)).toBe(true);
         expect(CompanionPack.safeParse(value).success).toBe(true);
-      } else if ([
-        "invalid-track-length.json",
-        "invalid-duplicate-id.json",
-        "invalid-fps-mismatch.json",
-        "invalid-rest-first.json",
-        "invalid-rest-last.json",
-      ].includes(name)) {
-        expect(validateCompanionPack(value as never).length).toBeGreaterThan(0);
-      } else {
+      } else if (structuralInvalid.has(name)) {
         expect(check(value)).toBe(false);
         expect(CompanionPack.safeParse(value).success).toBe(false);
+      } else {
+        expect(check(value)).toBe(true);
+        expect(CompanionPack.safeParse(value).success).toBe(true);
       }
     });
   }
-});
-
-const expected: Record<string, string> = {
-  "invalid-track-length.json": "states.listen[0].track has 1 values but frames is 117; make the track length equal frames.",
-  "invalid-rest-first.json": "states.listen[0].rest.first is outside [0, frames); choose a frame from 0 through 116.",
-  "invalid-rest-last.json": "states.think[0].rest.last is outside [0, frames); choose a frame from 0 through 116.",
-  "invalid-idle-count.json": "states.idle needs at least 2 clips; add another idle clip.",
-  "invalid-webm.json": "states.listen[0].file uses WebM; use an .mp4 stacked-alpha H.264 clip.",
-  "invalid-duplicate-id.json": "states.listen[0].id repeats clip id man-idle1; give every clip a unique id.",
-  "invalid-fps-mismatch.json": "states.speak clips must use frame rates within 1 fps; make the clips match.",
-  "invalid-wide-shape.json": "mouth.letters.wide is missing; add the wide shape index used by the atlas.",
-  "invalid-emotion-files.json": "emotion.sad needs both flow and residual files; add both filenames.",
-};
-
-describe("PACK-01 plain-words validator", () => {
-  test("valid demo packs have no problems", () => {
+  test("valid demo packs have no validator problems", () => {
     for (const name of files.filter((entry) => entry.startsWith("valid-"))) {
       expect(validateCompanionPack(read(name))).toEqual([]);
     }
   });
   for (const [name, problem] of Object.entries(expected)) {
-    test(`${name} returns its precise problem`, () => {
-      expect(validateCompanionPack(read(name))).toContain(problem);
-    });
+    test(`${name} returns its precise problem`, () => expect(validateCompanionPack(read(name))).toContain(problem));
   }
-  test("files over the budget name the field and the repair", () => {
-    const problems = validateCompanionPack(read("valid-man.json"), { "clip.mp4": 12_582_913 });
-    expect(problems).toContain("budget.bytes is 12582912 but files total 12582913 bytes; raise the budget or reduce file sizes.");
-    expect(problems).toContain("budget.bytes files total 12582913 bytes, over the desktop limit of 12582912; reduce file sizes.");
+  test("file-aware checks enforce phone twins and directory metadata", () => {
+    const pack = read("valid-man.json");
+    const result = validateCompanionPack(pack, { "clips/idle1.phone.mp4": 1 });
+    expect(result).toContain("mouth/calm needs meta.json; include the directory metadata file.");
+    expect(result).toContain("states.idle[1].phone has no matching file in files; include the phone twin.");
   });
 });
