@@ -1,4 +1,4 @@
-## [ui-v0.5.579] - 2026-11-10
+## [ui-v0.5.581] - 2026-11-10
 
 - VIDEO-COMPOSER-03. The chat prompt toolbar adds a compact Image / Video selector and distributes the existing choices to the leading and trailing sides. The mode keeps its icon and word; compact Sound and Shape choices show only their icons when closed. The Quality dropdown reuses Chat’s icon-only answer-style control and explains each level in one line. Image prompts hand off to Chat for the real image-generation tool; sending remains the person’s choice. Existing block and composer layouts are unchanged.
 
