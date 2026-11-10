@@ -1,7 +1,7 @@
 // CLIPS-FEED-01: the vertical clip feed (a composition of the carousel and the VideoPlayer Element) and the `clip_feed` node.
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
-import { ClipFeed, CLIP_FEED_MUTE_KEY, type ClipFeedClip } from "@/kit/elements/clip-feed";
+import { ClipFeed, CLIP_FEED_MUTE_KEY, clipFeedRetry, resetClipFeedFailures, type ClipFeedClip } from "@/kit/elements/clip-feed";
 import { stubMatchMedia } from "../../tests/stubMatchMedia";
 
 const realMatchMedia = window.matchMedia;
@@ -19,6 +19,8 @@ const realPlay = proto.play;
 const realPause = proto.pause;
 beforeEach(() => {
   stubMatchMedia({});
+  resetClipFeedFailures();
+  clipFeedRetry.delayMs = 20;
   plays = []; pauses = [];
   try { window.localStorage.removeItem(CLIP_FEED_MUTE_KEY); } catch { /* none */ }
   proto.play = function (this: HTMLVideoElement) { plays.push(this.getAttribute("src") ?? ""); return Promise.resolve(); };
@@ -215,6 +217,46 @@ describe("ClipFeed failure and empty", () => {
     expect(view.container.querySelector("img[src='/p/1.jpg']")).not.toBeNull();
     expect(view.queryByRole("alert")).toBeNull();
     expect(view.container.querySelector("[data-slot=clip-feed-play]")).toBeNull();
+  });
+  test("a source that always fails is requested at most twice, then stays a poster", async () => {
+    // Every <video src> that mounts is one request; count mounts of the first clip's file while it keeps failing.
+    let mounts = 0;
+    const seen = new WeakSet<Element>();
+    const view = draw({ clips: clips.slice(0, 1) });
+    const fail = () => {
+      for (const v of videos(view.container)) {
+        if (!seen.has(v)) { seen.add(v); mounts++; fireEvent.error(v); }
+      }
+    };
+    fail();
+    await waitFor(() => expect(videos(view.container).length).toBe(1)); // the one retry
+    fail();
+    await new Promise((r) => setTimeout(r, 120));
+    fail();
+    await new Promise((r) => setTimeout(r, 120));
+    expect(mounts).toBe(2);
+    expect(videos(view.container)).toHaveLength(0);
+    expect(view.container.querySelector("img[src='/p/1.jpg']")).not.toBeNull();
+    // a remounted feed does not start over
+    cleanup();
+    const again = draw({ clips: clips.slice(0, 1) });
+    await new Promise((r) => setTimeout(r, 60));
+    expect(videos(again.container)).toHaveLength(0);
+  });
+  test("the feed takes focus on load, without scrolling", () => {
+    const view = draw();
+    expect(document.activeElement).toBe(view.getByRole("region", { name: "Clips" }));
+  });
+  test("it is sized from the available height and the phone nav, not a fixed chrome guess", () => {
+    const view = draw();
+    const feed = view.getByRole("region", { name: "Clips" });
+    expect(feed.className).toContain("var(--clip-feed-top");
+    expect(feed.className).toContain("var(--phone-nav-offset");
+    expect(feed.style.getPropertyValue("--clip-feed-top")).toBe("0px");
+  });
+  test("the progress track is drawn in a high-contrast art token", () => {
+    const view = draw();
+    expect(view.container.querySelector("[data-slot=clip-feed-progress]")!.innerHTML).toContain("--art-foreground-muted");
   });
   test("an empty feed shows the status card and still has Close", () => {
     const view = draw({ clips: [] });

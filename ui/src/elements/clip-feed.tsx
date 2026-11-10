@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { HeartIcon, PlayIcon, Volume2Icon, VolumeXIcon, WandSparklesIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { i18n } from "@/kit/i18n";
@@ -99,6 +99,61 @@ function useTabVisible(): boolean {
   return visible;
 }
 
+/**
+ * REQUEST-STORM GUARD: how often each clip file has failed to load, kept for the page (a remount of the feed must not start the
+ * requests over). A file gets one retry after a pause; after the second failure it is its poster only, until the window ends.
+ */
+/** The pause before the one retry (a field so a test can shorten it). */
+export const clipFeedRetry = { delayMs: 1500 };
+const MEDIA_GIVE_UP_AFTER = 2;
+const MEDIA_FAILURE_WINDOW_MS = 60_000;
+const mediaFailures = new Map<string, { count: number; at: number }>();
+function failureCount(src: string): number {
+  const seen = mediaFailures.get(src);
+  if (!seen) return 0;
+  if (Date.now() - seen.at > MEDIA_FAILURE_WINDOW_MS) { mediaFailures.delete(src); return 0; }
+  return seen.count;
+}
+/** Test hook: forget what failed. */
+export function resetClipFeedFailures(): void { mediaFailures.clear(); }
+
+/** The nearest ancestor that scrolls (the window when none does). */
+function scrollParent(el: HTMLElement): HTMLElement | null {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const overflow = getComputedStyle(node).overflowY;
+    if (overflow === "auto" || overflow === "scroll") return node;
+  }
+  return null;
+}
+
+/**
+ * The feed is an immersive screen inside the shell's page body, which pads it. So it measures where it starts in its scroller and
+ * cancels the padding after it, and takes the rest of the screen above the phone nav: the whole stage, progress bar included, is visible.
+ */
+function useFitToScreen(ref: React.RefObject<HTMLElement | null>): CSSProperties {
+  const [fit, setFit] = useState<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const scroller = scrollParent(el);
+      const rect = el.getBoundingClientRect();
+      const viewTop = scroller ? scroller.getBoundingClientRect().top : 0;
+      const scrolled = scroller ? scroller.scrollTop : window.scrollY;
+      const top = Math.max(0, Math.round(rect.top - viewTop + scrolled));
+      let bottom = 0;
+      for (let node = el.parentElement; node && node !== scroller && node !== document.documentElement; node = node.parentElement) {
+        bottom += parseFloat(getComputedStyle(node).paddingBottom) || 0;
+      }
+      setFit((prev) => (prev.top === top + viewTop && prev.bottom === bottom ? prev : { top: top + viewTop, bottom }));
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [ref]);
+  return { ["--clip-feed-top" as string]: `${fit.top}px`, marginBottom: fit.bottom ? `-${fit.bottom}px` : undefined };
+}
+
 const RAIL_BUTTON = "size-12 rounded-full bg-[var(--art-overlay)] text-[var(--art-foreground)] backdrop-blur-sm hover:bg-[var(--art-overlay)] hover:text-[var(--art-foreground)]";
 const WHEEL_LOCK_MS = 500;
 
@@ -118,6 +173,39 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
   const [muted, setMuted] = useState(readMuted);
   const [wantPlay, setWantPlay] = useState(mayAutoplay);
   const [failed, setFailed] = useState<ReadonlySet<string>>(new Set());
+  // Clips whose file failed once and wait out the pause before their one retry; `attempt` remounts the player for it.
+  const [pausedIds, setPausedIds] = useState<ReadonlySet<string>>(new Set());
+  const [attempt, setAttempt] = useState<Record<string, number>>({});
+  const timers = useRef(new Set<number>());
+  useEffect(() => { const held = timers.current; return () => { for (const t of held) window.clearTimeout(t); held.clear(); }; }, []);
+  const sectionRef = useRef<HTMLElement>(null);
+  const fitStyle = useFitToScreen(sectionRef);
+  const dead = (clip: ClipFeedClip) => failed.has(clip.id) || failureCount(clip.src) >= MEDIA_GIVE_UP_AFTER;
+  const onClipError = (clip: ClipFeedClip) => {
+    const count = failureCount(clip.src) + 1;
+    mediaFailures.set(clip.src, { count, at: Date.now() });
+    if (count >= MEDIA_GIVE_UP_AFTER) {
+      setPausedIds((prev) => { const next = new Set(prev); next.delete(clip.id); return next; });
+      setFailed((prev) => new Set(prev).add(clip.id));
+      return;
+    }
+    // First failure: show the poster, wait, then load the file once more.
+    setPausedIds((prev) => new Set(prev).add(clip.id));
+    const timer = window.setTimeout(() => {
+      timers.current.delete(timer);
+      setAttempt((prev) => ({ ...prev, [clip.id]: (prev[clip.id] ?? 0) + 1 }));
+      setPausedIds((prev) => { const next = new Set(prev); next.delete(clip.id); return next; });
+    }, clipFeedRetry.delayMs);
+    timers.current.add(timer);
+  };
+
+  // Arrow keys and Space work at once: the feed takes focus when it opens (without scrolling the page).
+  useEffect(() => {
+    const el = sectionRef.current;
+    const active = document.activeElement;
+    if (!el || (active && active !== document.body && (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || (active as HTMLElement).isContentEditable))) return;
+    el.focus({ preventScroll: true });
+  }, []);
   const [likedNow, setLikedNow] = useState<Record<string, boolean>>({});
   const [time, setTime] = useState({ t: 0, d: 0 });
   const [mountTick, setMountTick] = useState(0);
@@ -143,7 +231,7 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
   // Exactly one clip plays: the visible one, while the tab is shown and the person has not paused it.
   useEffect(() => {
     for (const [id, el] of videos.current) {
-      if (id === activeId && wantPlay && tabVisible && !failed.has(id)) {
+      if (id === activeId && wantPlay && tabVisible && !failed.has(id) && !pausedIds.has(id)) {
         el.muted = muted;
         try {
           const started = el.play();
@@ -159,7 +247,7 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
         try { el.pause(); } catch { /* nothing to pause */ }
       }
     }
-  }, [activeId, wantPlay, tabVisible, muted, failed, mountTick]);
+  }, [activeId, wantPlay, tabVisible, muted, failed, pausedIds, mountTick]);
 
   // The progress bar follows the visible clip.
   useEffect(() => {
@@ -203,7 +291,7 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
 
   const frame = cn(
     "relative isolate flex w-full flex-col overflow-hidden bg-background text-[var(--art-foreground)]",
-    "h-[calc(100dvh-var(--phone-header-height,0px)-var(--phone-nav-offset,0px))] sm:h-[calc(100dvh-4rem)]",
+    "h-[calc(100dvh-var(--clip-feed-top,0px)-var(--phone-nav-offset,0px))] focus-visible:outline-none",
     className,
   );
   const closeButton = (
@@ -214,7 +302,7 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
 
   if (clips.length === 0) {
     return (
-      <section data-slot="clip-feed" data-state="empty" aria-label={i18n._({ id: "ui.Clips", message: "Clips" })} className={cn(frame, "items-center justify-center text-foreground")}>
+      <section ref={sectionRef} tabIndex={-1} style={fitStyle} data-slot="clip-feed" data-state="empty" aria-label={i18n._({ id: "ui.Clips", message: "Clips" })} className={cn(frame, "items-center justify-center text-foreground")}>
         {closeButton}
         {empty}
       </section>
@@ -222,7 +310,7 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
   }
 
   return (
-    <section data-slot="clip-feed" aria-label={i18n._({ id: "ui.Clips", message: "Clips" })} className={frame} onKeyDown={onKeyDown} onWheel={onWheel}>
+    <section ref={sectionRef} tabIndex={-1} style={fitStyle} data-slot="clip-feed" aria-label={i18n._({ id: "ui.Clips", message: "Clips" })} className={frame} onKeyDown={onKeyDown} onWheel={onWheel}>
       <Carousel
         orientation="vertical"
         opts={{ startIndex, align: "start", loop: false, containScroll: false }}
@@ -232,13 +320,14 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
         <CarouselContent className="mt-0 size-full">
           {clips.map((clip, index) => {
             const isActive = index === active;
-            const loaded = (isActive || index === active + 1) && !failed.has(clip.id);
+            const loaded = (isActive || index === active + 1) && !dead(clip) && !pausedIds.has(clip.id);
             const liked = likedNow[clip.id] ?? clip.liked ?? false;
             return (
               <CarouselItem key={clip.id} aria-label={i18n._({ id: "ui.Clip {n} of {total}", message: "Clip {n} of {total}", values: { n: index + 1, total: clips.length } })} className="size-full min-h-0 pt-0">
                 <div data-slot="clip-feed-stage" data-active={isActive ? "true" : "false"} className="relative mx-auto size-full overflow-hidden bg-muted sm:aspect-[9/16] sm:h-full sm:w-auto sm:max-w-full">
                   {loaded ? (
                     <VideoPlayer
+                      key={`${clip.id}:${attempt[clip.id] ?? 0}`}
                       bare
                       status="ready"
                       prompt={clip.title}
@@ -248,7 +337,7 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
                       preload="auto"
                       loop
                       mediaRef={register(clip.id)}
-                      onMediaError={() => setFailed((prev) => new Set(prev).add(clip.id))}
+                      onMediaError={() => onClipError(clip)}
                     />
                   ) : (
                     <SafeImage src={clip.poster} alt="" kind="video" className="size-full object-cover" />
@@ -262,7 +351,7 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
                       className="absolute inset-0 z-0 cursor-pointer focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     />
                   ) : null}
-                  {isActive && !wantPlay && !failed.has(clip.id) ? (
+                  {isActive && !wantPlay && !dead(clip) ? (
                     <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
                       <Button type="button" variant="ghost" size="icon" data-slot="clip-feed-play" aria-label={text.play} onClick={() => setWantPlay(true)} className={cn(RAIL_BUTTON, "pointer-events-auto size-16")}>
                         <PlayIcon aria-hidden className="size-8 fill-current" />
@@ -296,7 +385,7 @@ export function ClipFeed({ clips, startId, autoplay = true, onClose, onLike, onR
                           const el = videos.current.get(clip.id);
                           if (el && value !== undefined) { el.currentTime = value; setTime((prev) => ({ ...prev, t: value })); }
                         }}
-                        className="h-4 [&_[data-slot=slider-track]]:h-0.5"
+                        className="h-4 [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-track]]:bg-[var(--art-foreground-muted)]"
                       />
                     </div>
                   ) : null}

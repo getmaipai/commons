@@ -123,6 +123,12 @@ describe("clip_feed node", () => {
     await view.findByText("No clips yet.");
     expect(view.getByRole("button", { name: "Close" })).toBeTruthy();
   });
+  test("no rows: the empty_state action is drawn and runs", async () => {
+    answer([]);
+    const view = draw(feed({ empty_state: { type: "empty_state", icon: "film", text: "No clips yet.", action: { navigate: { to: "/apps/videos" } }, action_label: "Back to Videos" } }));
+    await view.findByText("No clips yet.");
+    expect(view.getByRole("button", { name: "Back to Videos" })).toBeTruthy();
+  });
   test("Close runs on_close", async () => {
     answer(rows);
     const view = draw(feed({ on_close: { call: { target: "/api/plugins/clips/closed", method: "POST" } } }));

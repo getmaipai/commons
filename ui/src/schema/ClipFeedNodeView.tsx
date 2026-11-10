@@ -16,6 +16,16 @@ type Row = Record<string, unknown>;
 /** The host's one notice while video is not ready (`MediaHost.makingNotice`, fed by Home's `useMakingAvailability`). */
 type HostWithNotice = MediaHost & { makingNotice?(kind: "picture" | "video"): string | null | undefined };
 
+/** The empty state's button words: the page's `action_label`, else a plain word for the kind of action (the same fallback the `empty_state` node uses). */
+function emptyActionLabel(node: ClipFeedNode["empty_state"]): string | undefined {
+  const action = node.action;
+  if (!action) return undefined;
+  if (node.action_label) return node.action_label;
+  if ("navigate" in action) return i18n._({ id: "ui.Go", message: "Go" });
+  if ("call" in action || "confirm" in action || "ask" in action) return i18n._({ id: "ui.Continue", message: "Continue" });
+  return i18n._({ id: "ui.Play", message: "Play" });
+}
+
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
 const EMPTY: Row[] = [];
 
@@ -83,7 +93,7 @@ export function ClipFeedNodeView({ node, state }: { node: ClipFeedNode; state: R
             onLike={like ? (clip, liked) => dispatch(handlerAction(like), [{ ...rowOf(clip), liked }], undefined, { quiet: true, typedArgs: true }) : undefined}
             onRemake={remake ? (clip) => dispatch(handlerAction(remake), [rowOf(clip)]) : undefined}
             remakeNotice={notice}
-            empty={<EmptyState icon={node.empty_state.icon} text={node.empty_state.text} />}
+            empty={<EmptyState icon={node.empty_state.icon} text={node.empty_state.text} actionLabel={emptyActionLabel(node.empty_state)} onAction={node.empty_state.action ? () => dispatch(node.empty_state.action!) : undefined} />}
           />
           {lastError ? <p role="alert" className="text-destructive px-4 text-sm">{lastError}</p> : null}
         </>

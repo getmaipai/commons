@@ -1,3 +1,7 @@
+## [ui-v0.5.571] - 2026-11-10
+
+- CLIPS-FEED-02, fixes to `clip_feed` from a browser QA of Home. The feed measures where it starts in its scroller and cancels the shell's padding after it (`--clip-feed-top`, a negative bottom margin), then takes `100dvh` minus that start minus `--phone-nav-offset`, so the whole stage, the notice and the progress bar are visible on desktop and clear of the bottom nav on phones. The feed takes focus on load (no scroll), so arrows and Space work at once. The progress track is drawn in `--art-foreground-muted`, thicker, for contrast on the scrim. The node draws the page's `empty_state` action (`action_label`, else a plain word). Request-storm guard: a clip file that fails to load is retried once after 1.5 s, then stays its poster; failures are remembered for the page for 60 s so a remounted feed does not start requesting again (a source that always fails costs two requests). No new strings.
+
 ## [ui-v0.5.570] - 2026-11-10
 
 - VIDEO-UI-15 (pairs with spec-v0.1.356). A `call` action may carry `fresh_confirm`: the kit asks the host (`MediaHost.confirmFresh`) for a fresh secret ticket for the row before the call and merges it as `{ticket}`. A result feed action may carry `show_when` (a truthy row field) and a feed now allows eight actions. `AdultLockDialog` and `AdultLockProvider` take an optional `onPasskey`, drawing a "Use a passkey" button. Default unchanged.
