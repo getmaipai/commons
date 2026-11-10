@@ -117,3 +117,23 @@ describe("a private chip stays out of the address", () => {
     await waitFor(() => expect(view.getByTestId("where").textContent).toContain("style=lora-secret"));
   });
 });
+
+describe("VIDEO-COMPOSER-04: a level-bound icon chip shows its quiet value while disabled", () => {
+  test("Sound is off and disabled at Standard, and open at Boost", () => {
+    const node = PromptBarNodeSchema.parse({
+      type: "prompt_bar",
+      label: "Describe a video",
+      chips: [{ state: "voices", label: "Sound", icon_only: true, default: "full", quiet_value: "clean", enabled_tiers: ["boost"], disabled_reason: "Silent at this level.",
+        options: [{ value: "clean", label: "No music or effects", icon: "volume-x" }, { value: "full", label: "Music and effects", icon: "volume-2" }] }],
+      tier: { state: "tier", default: "standard", tiers: [{ id: "standard", label: "Standard" }, { id: "boost", label: "Boost" }] },
+      submit: { call: { target: "/api/plugins/videos/actions/make", args: { prompt: "{prompt}", voices: "{voices}" } } },
+    });
+    const view = renderWithQueryClient(<MemoryRouter><NodeRenderer node={node} /></MemoryRouter>);
+    const trigger = () => view.container.querySelector('[data-chip="voices"]') as HTMLButtonElement;
+    expect(trigger().disabled).toBe(true);
+    expect(trigger().getAttribute("title")).toContain("No music or effects");
+    fireEvent.click(view.getByRole("radio", { name: /Boost/ }));
+    expect(trigger().disabled).toBe(false);
+    expect(trigger().getAttribute("title")).toContain("Music and effects");
+  });
+});

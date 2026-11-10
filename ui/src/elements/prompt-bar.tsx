@@ -320,7 +320,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
       const picked = openOptions(chip).find((o) => String(o.value) === next);
       if (picked) chip.onValueChange(picked.value);
     }}>
-      <SelectTrigger data-chip={chip.id} aria-label={chip.label} title={chip.iconOnly ? `${chip.label}: ${selected?.label ?? ""}` : undefined} shape="pill" className={cn("shrink-0", chip.iconOnly ? "size-11 justify-center px-2 sm:size-9" : compact ? "min-h-11 px-3 text-sm sm:min-h-9" : "min-h-[48px]")}>
+      <SelectTrigger data-chip={chip.id} aria-label={chip.label} title={chip.iconOnly ? `${chip.label}: ${selected?.label ?? ""}` : undefined} shape="pill" className={cn("shrink-0", chip.iconOnly ? "gap-1 px-3 text-sm data-[size=default]:h-11 sm:data-[size=default]:h-9" : compact ? "px-3 text-sm data-[size=default]:h-11 sm:data-[size=default]:h-9" : "min-h-[48px]")}>
         {SelectedIcon ? <SelectedIcon className="size-4 shrink-0" aria-hidden="true" /> : null}{chip.iconOnly ? <SelectValue className="sr-only">{selected?.label}</SelectValue> : <SelectValue placeholder={chip.label}>{selected?.label}</SelectValue>}
       </SelectTrigger>
       <SelectContent>
@@ -334,7 +334,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
 
   const modeControl = modeSelector ? (() => {
     return <Select value={modeSelector.value} onValueChange={(next) => modeSelector.onValueChange(next)}>
-      <SelectTrigger data-slot="prompt-bar-mode" aria-label={modeSelector.label} shape="pill" className="min-h-11 shrink-0 px-3 text-sm sm:min-h-9">
+      <SelectTrigger data-slot="prompt-bar-mode" aria-label={modeSelector.label} shape="pill" className="shrink-0 px-3 text-sm data-[size=default]:h-11 sm:data-[size=default]:h-9">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>{modeSelector.options.map((option) => {
@@ -442,7 +442,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
               <div data-slot="prompt-bar-composer-controls" className={cn("flex min-w-0 flex-wrap items-center gap-1.5", inChat ? "pt-1" : "border-t border-border/70 pt-2")}>
                 {inChat && inField && !inField.value && inField.placement !== "tile" ? (
                   <button type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: inField.label } })} title={inField.label} disabled={locked || inField.disabled} onClick={inField.onPick} className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50 sm:size-9">
-                    <ImageIcon className="size-4" aria-hidden="true" />
+                    <Plus className="size-5" aria-hidden="true" />
                   </button>
                 ) : null}
                 {leading}

@@ -1,3 +1,7 @@
+## [ui-v0.5.584] - 2026-11-10
+
+- VIDEO-COMPOSER-04, additive. Chat prompt toolbar dropdowns share one height (pill, icon-only chips keep their chevron inside the pill instead of a clipped ring); the in-field image control is a Plus button; a chip that is unusable at the chosen level and has a `quiet_value` shows that value while disabled.
+
 ## [ui-v0.5.583] - 2026-11-10
 
 - MAKER-G, additive. `CompanionPackPlayer` plays a still-plus-parts pack (no `states`, a `voice` layer): a 2D canvas draws the base picture and the reactive parts, driven by the same `state` and `speech` props (heart pulse and glow, eye squash and blink, visor sheen in the MaiPai pack). No video element and no WebGL; reduced motion, pause and sizes of 36 px or less show the plain rest picture. New pure module `voice-layer.ts` (curves, attack and release smoothing, per-state drives, `VoiceRuntime`, `drawVoiceFrame`) and `voice-player.tsx`; `CompanionPackData.states` is now optional. Packs with `states` behave as before (a `voice` layer on a video pack is ignored for now). Pairs with spec-v0.1.365.

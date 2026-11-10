@@ -950,7 +950,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
             ...chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media), icon: o.icon, ...(o.note ? { note: o.note } : {}) })),
             ...(chip.locked === true && !unusable ? [{ locked: true as const }] : []),
           ],
-          value: picked[chip.state]!,
+          value: unusable && chip.quiet_value !== undefined ? chip.quiet_value : picked[chip.state]!,
           onValueChange: (value: string | number) => {
             setPicked((prev) => ({ ...prev, [chip.state]: value }));
             writer?.merge({ [chip.state]: value });
