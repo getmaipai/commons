@@ -146,6 +146,15 @@ describe("UI schema", () => {
     expect(withCall({ target: "/api/x", success_label: 3 })).toBe(false);
   });
 
+  test("PODCAST-RATE-01: player.rate takes field, value and on_change", () => {
+    const player = { type: "player", bind: { source: "package", path: "episode" } };
+    const change = { call: { target: "/api/x/{id}", args: { rate: "{rate}" } } };
+    expect(validate({ ...player, rate: { field: "show_rate", value: 1.25, on_change: change } })).toBe(true);
+    expect(validate({ ...player, rate: { value: 2 } })).toBe(true);
+    expect(validate(player)).toBe(true);
+    for (const rate of [{}, { value: 9 }, { value: "fast" }, { field: "" }, { speed: 1 }, { on_change: { bogus: 1 } }]) expect(validate({ ...player, rate })).toBe(false);
+  });
+
   test("a node with an unknown type is rejected", () => {
     const bad = { type: "not_a_real_type" };
     expect(validate(bad)).toBe(false);

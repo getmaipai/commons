@@ -1,3 +1,7 @@
+## [spec-v0.1.354] - 2026-11-10
+
+- PODCAST-RATE-01, additive. `player.rate {field?, value?, on_change?}`: the initial playback speed from a row field (dotted path to a number) or a constant `value`, and an action (a `call`) fired with the new `{rate}` whenever the person picks a speed. Absent: unchanged. Fixture `ui/pages/podcast-rate.json`. Pairs with the next ui tag.
+
 ## [spec-v0.1.353] - 2026-11-10
 
 - QA-FINISH-01, additive. `list.hide_when_empty` (boolean, default false): the list draws nothing, not even the empty text, when its bound call returns no rows (`media_shelf` already has it). `action.call.success_label` (string, 1 to 40 characters, `{field}` placeholders allowed): after the call succeeds the kit shows it as a brief toast; absent means no toast.

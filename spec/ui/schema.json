@@ -985,6 +985,15 @@
         "on_next": { "$ref": "#/$defs/action", "description": "Fired with the up_next item's fields (a `play`, or a `navigate` to its watch page)." },
         "details": { "type": "boolean", "default": false, "description": "MEDIA-DETAIL-01: draw the item's title, facts, expandable description and chapters under the picture (a watch page's details block)." },
         "details_show": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["title", "facts", "description", "chapters", "transcript"] }, "default": ["title", "facts", "description", "chapters"], "description": "Optional parts of the details block to draw. Absent means title, facts, description and chapters. PARITY-01: `transcript` adds a Transcript button that opens the reader panel (needs `transcript_bind` or the row's transcript field)." },
+        "rate": {
+          "type": "object", "additionalProperties": false, "minProperties": 1,
+          "description": "PODCAST-RATE-01: remembered playback speed. `field` is a dotted row path to a number (the person's saved rate for this show or book) and `value` a constant used when the field is absent or not a number; the field wins. The kit starts at that rate, clamped to its nearest speed option. `on_change` is an action (a `call`) fired when the person picks a speed; placeholders are the item's own fields plus {rate} (a number such as 1.5), so a call body can carry `rate`. Absent: the player starts at 1x and reports nothing.",
+          "properties": {
+            "field": { "type": "string", "minLength": 1 },
+            "value": { "type": "number", "minimum": 0.25, "maximum": 4 },
+            "on_change": { "$ref": "#/$defs/action" }
+          }
+        },
         "sleep_timer": { "type": "boolean", "default": false, "description": "PARITY-01: draw a sleep timer control (End of episode, 5, 10, 15, 30, 45 or 60 minutes) in the player's extra controls." },
         "skip": {
           "type": "object", "additionalProperties": false, "required": ["back", "forward"],

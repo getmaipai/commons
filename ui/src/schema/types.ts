@@ -321,6 +321,8 @@ export const PlayerNodeSchema = z.object({
   details: z.boolean().default(false),
   // PARITY-01: sleep timer, skip buttons, transcript source and the video gestures.
   sleep_timer: z.boolean().optional(),
+  // PODCAST-RATE-01: remembered playback speed.
+  rate: z.object({ field: z.string().min(1).optional(), value: z.number().min(0.25).max(4).optional(), on_change: ActionSchema.optional() }).strict().refine((r) => r.field !== undefined || r.value !== undefined || r.on_change !== undefined, "rate needs field, value or on_change").optional(),
   skip: z.object({ back: z.number().min(1).max(120), forward: z.number().min(1).max(120) }).strict().optional(),
   transcript_bind: BindingSchema.optional(),
   double_tap_seek: z.boolean().optional(),

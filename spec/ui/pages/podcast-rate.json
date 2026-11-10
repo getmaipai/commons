@@ -1,0 +1,18 @@
+{
+  "type": "page",
+  "id": "podcast-rate",
+  "title": "Episode",
+  "body": [
+    {
+      "type": "player",
+      "bind": { "source": "package", "path": "episode", "params": { "id": "$state.id" } },
+      "kind": "audio",
+      "skip": { "back": 15, "forward": 30 },
+      "rate": {
+        "field": "show_rate",
+        "value": 1,
+        "on_change": { "call": { "target": "/api/plugins/podcasts/shows/{show_id}/rate", "method": "PATCH", "args": { "rate": "{rate}" } } }
+      }
+    }
+  ]
+}
