@@ -39,6 +39,7 @@ describe("music blocks schema", () => {
   });
   test("media_shelf takes card_radius, press_scale, on_play and play_label; player takes art_spring and lyrics_blur", () => {
     expect(validate({ ...shelf, card_radius: "tight", press_scale: true, on_play: play, play_label: "Play {title}" })).toBe(true);
+    expect(validate({ ...shelf, card_radius: "soft" })).toBe(true);
     expect(validate({ ...shelf, card_radius: "round" })).toBe(false);
     expect(validate({ ...shelf, press_scale: "yes" })).toBe(false);
     const player = { type: "player", bind: { source: "package", path: "item" }, kind: "audio" };

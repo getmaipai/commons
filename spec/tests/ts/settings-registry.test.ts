@@ -116,6 +116,21 @@ describe("spec/settings/keys.json", () => {
     });
   });
 
+  test("Home card order is a person-scoped advanced JSON list", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const matches = entries.filter((row) => row.key === "ui.home_order");
+    expect(matches).toHaveLength(1);
+    expect(SettingsKey.parse(matches[0])).toMatchObject({
+      scope: "person",
+      selector: "text",
+      default: "[]",
+      level: "expert",
+      lives_in: "profile.appearance.internal",
+      honoured_by: ["home"],
+      secret: false,
+    });
+  });
+
   test("guided tours use the automatic-start switch in Account Appearance", () => {
     const entry = (loadRegistry() as Record<string, unknown>[]).find((row) => row.key === "tours.autostart.enabled");
     expect(entry).toMatchObject({ scope: "person", selector: "boolean", default: true, label: "Start tours automatically", lives_in: "profile.appearance" });

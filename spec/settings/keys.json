@@ -3978,6 +3978,23 @@
     ]
   },
   {
+    "key": "ui.home_order",
+    "scope": "person",
+    "selector": "text",
+    "default": "[]",
+    "label": "Home card order (advanced)",
+    "help": "A JSON list of Home card ids in the order this person arranged them. Normally set by moving cards on Home, not by editing this directly.",
+    "copy": {
+      "does": "Controls the order of this person's Home cards."
+    },
+    "level": "expert",
+    "secret": false,
+    "lives_in": "profile.appearance.internal",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "setup.checklist_dismissed",
     "scope": "person",
     "selector": "text",

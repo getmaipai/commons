@@ -1,3 +1,7 @@
+## [spec-v0.1.351] - 2026-11-09
+
+- PRO-LOOK-01, additive. `media_shelf.card_radius` also accepts `soft` (the 18 pt soft card radius, section 17). New person setting `ui.home_order` (expert text, default `[]`, `profile.appearance.internal`): the ordered list of Home card ids, declared like `ui.home_hidden`. Card size is not added. `media_shelf` already expresses an empty-state action through `empty_state.action` and `action_label`, so no `empty_action` field. Pairs with the next ui tag.
+
 ## [spec-v0.1.350] - 2026-11-09
 
 - 0.1.350: re-release of 0.1.349 (the 0.1.349 tag points at a commit still versioned 0.1.348). No schema change.

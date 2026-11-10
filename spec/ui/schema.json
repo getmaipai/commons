@@ -486,7 +486,7 @@
             }
           }
         },
-        "card_radius": { "type": "string", "enum": ["default", "tight"], "default": "default", "description": "MUSIC-KIT-01: tight draws the tiles with the 8 px media card radius token (the modern music look). Round art (art_shape circle) stays round." },
+        "card_radius": { "type": "string", "enum": ["default", "tight", "soft"], "default": "default", "description": "PRO-LOOK-01 (section 17): soft draws the tiles with the 18 pt soft card radius. MUSIC-KIT-01: tight draws the tiles with the 8 px media card radius token (the modern music look). Round art (art_shape circle) stays round." },
         "press_scale": { "type": "boolean", "default": false, "description": "MUSIC-KIT-01: a tile shrinks slightly while pressed. Gated on reduced motion by the kit." },
         "on_play": { "$ref": "#/$defs/action", "description": "MUSIC-KIT-01: draws a round Play button over each tile on hover or focus (never on touch screens). It fires this action with the tile's row, the same as a `play` on_select. Horizontal shelves only." },
         "play_label": { "type": "string", "minLength": 1, "maxLength": 80, "description": "MUSIC-KIT-01: a `{field}` template for the Play button's accessible name (\"Play {title}\"). Default: the tile's label." },
