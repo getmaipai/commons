@@ -410,10 +410,11 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "inside" }] })).toBe(false);
   });
 
-  test("VIDEO-COMPOSER-01: prompt_bar composer keeps its input mechanism as one layout", () => {
+  test("VIDEO-COMPOSER-02: prompt_bar supports the compact Chat input layout", () => {
     const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
     expect(validate({ ...ok, layout: "block" })).toBe(true);
     expect(validate({ ...ok, layout: "composer" })).toBe(true);
+    expect(validate({ ...ok, layout: "chat" })).toBe(true);
     expect(validate({ ...ok, layout: "columns" })).toBe(false);
   });
 

@@ -85,6 +85,26 @@ describe("PromptBar", () => {
     expect(composer.contains(view.getByRole("button", { name: "Make" }))).toBe(true);
   });
 
+  test("chat layout follows the compact Chat composer with one expanding field and one toolbar", () => {
+    const length: PromptBarChip = { id: "length", label: "Length", value: 5, onValueChange: () => {}, options: [{ value: 5, label: "5 seconds" }] };
+    let picks = 0;
+    const view = render(<PromptBar layout="chat" label="Describe a video" value="a fox" onValueChange={() => {}} onSubmit={() => {}} chips={[shape(), length]} references={[{ id: "start_frame", label: "Start frame", kind: "picture", placement: "in_field", onPick: () => { picks += 1; }, onRemove: () => {} }]} tier={{ value: "standard", onValueChange: () => {}, tiers: [{ id: "standard", label: "Standard", hint: "Fast" }, { id: "boost", label: "Boost" }] }} />);
+    const composer = view.container.querySelector('[data-slot="prompt-bar-composer"][data-chat-input="true"]')!;
+    const field = view.getByRole("textbox", { name: "Describe a video" }) as HTMLTextAreaElement;
+    const toolbar = composer.querySelector('[data-slot="prompt-bar-composer-controls"]')!;
+    expect(view.container.querySelector('[data-slot="prompt-bar"]')?.getAttribute("data-layout")).toBe("chat");
+    expect(field.getAttribute("rows")).toBe("1");
+    expect(toolbar.contains(view.getByRole("combobox", { name: "Shape" }))).toBe(true);
+    expect(toolbar.contains(view.getByRole("combobox", { name: "Length" }))).toBe(true);
+    expect(toolbar.contains(view.getByRole("radio", { name: "Boost" }))).toBe(true);
+    expect(toolbar.contains(view.getByRole("button", { name: "Make" }))).toBe(true);
+    const attach = view.getByRole("button", { name: "Add Start frame" });
+    expect(toolbar.contains(attach)).toBe(true);
+    fireEvent.click(attach);
+    expect(picks).toBe(1);
+    expect(view.queryByText("Fast")).toBeNull();
+  });
+
   test("an error is an in-flow status row above the field, not floating text", () => {
     const { getByRole, container } = render(<PromptBar label="Describe" value="x" onValueChange={() => {}} onSubmit={() => {}} error="You already have a video being made." />);
     const row = getByRole("alert");

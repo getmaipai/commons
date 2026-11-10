@@ -11,6 +11,12 @@ const tiers: TierOptionDef[] = [
 ];
 
 describe("TierSegment", () => {
+  test("compact density keeps the levels in the toolbar and drops the extra hint row", () => {
+    const { getByRole, queryByText, container } = render(<TierSegment density="compact" value="standard" onValueChange={() => {}} tiers={[{ id: "standard", label: "Standard", hint: "Fast" }, { id: "boost", label: "Boost" }]} />);
+    expect(getByRole("radio", { name: "Standard" }).className).toContain("sm:min-h-9");
+    expect(container.querySelector('[data-slot="tier-segment"]')?.getAttribute("data-density")).toBe("compact");
+    expect(queryByText("Fast")).toBeNull();
+  });
   test("draws only the tiers it is given and keeps a 48 px touch target", () => {
     const { getAllByRole } = render(<TierSegment value="standard" onValueChange={() => {}} tiers={tiers.slice(0, 2)} />);
     const radios = getAllByRole("radio");

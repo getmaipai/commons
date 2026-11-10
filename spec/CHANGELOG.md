@@ -1,3 +1,7 @@
+## [spec-v0.1.362] - 2026-11-10
+
+- VIDEO-COMPOSER-02. `prompt_bar.layout` adds the optional `chat` presentation for a compact input and toolbar; defaults and earlier layouts are unchanged.
+
 ## [spec-v0.1.361] - 2026-11-10
 
 - VIDEO-COMPOSER-01. `prompt_bar.layout` adds the optional `block` (default) and `composer` presentations. Engine-unavailable `starts` reasons disable only submit; prompt and choices remain editable.

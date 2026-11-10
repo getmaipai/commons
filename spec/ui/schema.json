@@ -1594,15 +1594,9 @@
         },
         "layout": {
           "type": "string",
-          "enum": ["block", "composer"],
+          "enum": ["block", "composer", "chat"],
           "default": "block",
-          "description": "VIDEO-COMPOSER-01: `composer` groups the prompt, references, option chips, tier selector and Generate button inside one bordered composer; `block` preserves the original stacked layout."
-        },
-        "layout": {
-          "type": "string",
-          "enum": ["block", "composer"],
-          "default": "block",
-          "description": "VIDEO-COMPOSER-01: `composer` groups the prompt, references, option chips, tier selector and Generate button inside one bordered composer; `block` preserves the original stacked layout."
+          "description": "VIDEO-COMPOSER-02: `chat` adapts Home's compact Chat composer to a prompt field with reference attachment, compact option controls and a round submit action in one toolbar; `composer` is the earlier grouped layout; `block` preserves the original stacked layout."
         },
         "field_size": {
           "type": "string",

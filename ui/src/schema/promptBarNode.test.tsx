@@ -62,9 +62,12 @@ describe("prompt_bar node", () => {
     const composerNode = composerPage.body[0] as UiNode;
     const view = draw(composerNode);
     expect(view.container.querySelector('[data-slot="prompt-bar"]')?.getAttribute("data-layout")).toBe("composer");
+    const chatPage = PageNodeSchema.parse({ type: "page", id: "x", title: "X", body: [{ ...node, layout: "chat" }] });
+    const chatView = draw(chatPage.body[0] as UiNode);
+    expect(chatView.container.querySelector('[data-slot="prompt-bar"]')?.getAttribute("data-layout")).toBe("chat");
     const composer = view.container.querySelector('[data-slot="prompt-bar-composer"]')!;
-    expect(composer.contains(view.getByRole("textbox", { name: "Describe your video" }))).toBe(true);
-    expect(composer.contains(view.getByRole("button", { name: "Make" }))).toBe(true);
+    expect(composer.querySelector('textarea[aria-label="Describe your video"]')).toBeTruthy();
+    expect(composer.querySelector('button[type="submit"]')).toBeTruthy();
   });
 
   test("Make sends prompt, shape, length, tier and recipe in one call with their types", async () => {

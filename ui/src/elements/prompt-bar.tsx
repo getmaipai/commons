@@ -138,8 +138,8 @@ export interface PromptBarProps {
    * (the box, an Options button and a round submit) with the controls in a bottom sheet. The mode comes from the SplitView's layout
    * context; the bar runs no media query of its own. Outside a SplitView `panel` draws as `inline`. */
   placement?: "inline" | "panel";
-  /** VIDEO-COMPOSER-01: `composer` keeps the prompt, reference, options, tier and submit in one bordered input mechanism. */
-  layout?: "block" | "composer";
+  /** VIDEO-COMPOSER-02: `chat` adapts the compact Chat composer interaction for a make prompt and its inline choices. `composer` is the earlier grouped layout. */
+  layout?: "block" | "composer" | "chat";
   /** VIDEO-UI-03: up to 4 idea chips shown while the box is empty. */
   suggestions?: readonly PromptBarSuggestion[];
   /** VIDEO-UI-03: the small line under the submit button (a time, never credits). */
@@ -193,7 +193,8 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   // Engine availability disables the submit action, not composition. People can draft words and
   // choose settings while an engine is stopped or being installed.
   const locked = false;
-  const inComposer = mode === "inline" && barLayout === "composer";
+  const inComposer = mode === "inline" && (barLayout === "composer" || barLayout === "chat");
+  const inChat = mode === "inline" && barLayout === "chat";
   const inField = references.find((r) => (r.placement === "in_field" || r.placement === "tile") && r.kind !== "audio" && r.kind !== "video");
   const rowRefs = references.filter((r) => r !== inField);
   const unfolded = chips.filter((c) => !c.fold);
@@ -223,14 +224,15 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     return (
       <Textarea
         ref={field}
-        shape="rounded"
+        shape={inChat ? "default" : "rounded"}
         maxRows={rows}
+        rows={inChat ? 1 : undefined}
         value={value}
         aria-label={label}
         placeholder={placeholder}
         maxLength={maxLength}
         disabled={locked}
-        className={cn(bare && "rounded-2xl border-0 bg-transparent shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent dark:disabled:bg-transparent", extra, large && mode !== "dock" && "min-h-[calc(5lh+1.5rem)]")}
+        className={cn(bare && "rounded-2xl border-0 bg-transparent shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent dark:disabled:bg-transparent", inChat && "aui-composer-input min-h-10 max-h-48 resize-none rounded-none px-2.5 py-1 text-base leading-6", extra, large && mode !== "dock" && "min-h-[calc(5lh+1.5rem)]")}
         onChange={(e) => onValueChange(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); trySubmit(); }
@@ -269,12 +271,12 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     const filled = Boolean(inField?.value);
     return (
       <div data-slot="prompt-bar-field" className={cn("flex min-w-0 flex-1 flex-col border transition-colors", inComposer ? "rounded-xl border-0 bg-transparent p-0 shadow-none" : shape === "pill" ? "rounded-[28px] border-[var(--hairline)] bg-[var(--surface-2)] p-1" : "rounded-2xl border-input bg-transparent dark:bg-input/30", !inComposer && "focus-within:border-ring focus-within:ring-3", accent === "create" ? "focus-within:ring-[var(--accent-create)]/50" : "focus-within:ring-ring/50", shape === "default" && "") }>
-        {inField && filled ? <InFieldThumb reference={inField} locked={locked} compact={dock} /> : null}
+        {inField && filled && !inChat ? <InFieldThumb reference={inField} locked={locked} compact={dock} /> : null}
         {textbox(rows, dock ? "min-h-12 resize-none py-3" : undefined)}
-        {inField && !filled && !dock && inField.placement === "tile" ? (
+        {inField && !filled && !dock && !inChat && inField.placement === "tile" ? (
           <div className="flex px-3 pb-3"><ReferenceTile reference={inField} locked={locked} /></div>
         ) : null}
-        {inField && !filled && !dock && inField.placement !== "tile" ? (
+        {inField && !filled && !dock && !inChat && inField.placement !== "tile" ? (
           <div className="flex px-2 pb-2">
             <button type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: inField.label } })} disabled={locked || inField.disabled} onClick={inField.onPick} className="flex min-h-12 items-center gap-1.5 rounded-lg px-2 text-sm text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
               <ImageIcon className="size-4" aria-hidden="true" />
@@ -292,12 +294,12 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     </div>
   ) : null;
 
-  const dropdown = (chip: PromptBarChip) => (
+  const dropdown = (chip: PromptBarChip, compact = false) => (
     <Select key={chip.id} value={String(chip.value)} disabled={locked || Boolean(chip.disabledReason)} onValueChange={(next) => {
       const picked = openOptions(chip).find((o) => String(o.value) === next);
       if (picked) chip.onValueChange(picked.value);
     }}>
-      <SelectTrigger data-chip={chip.id} aria-label={chip.label} shape="pill" className="min-h-[48px] shrink-0">
+      <SelectTrigger data-chip={chip.id} aria-label={chip.label} shape="pill" className={cn("shrink-0", compact ? "min-h-11 px-3 text-sm sm:min-h-9" : "min-h-[48px]")}>
         <SelectValue placeholder={chip.label} />
       </SelectTrigger>
       <SelectContent>
@@ -321,7 +323,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     return (
       <>
         {list.filter((c) => c.variant === "cards").map((c) => cardsSection(c, columns))}
-        {dropdowns.length > 0 ? <div data-slot="prompt-bar-chips" className="flex min-w-0 flex-wrap items-center gap-2">{dropdowns.map(dropdown)}</div> : null}
+        {dropdowns.length > 0 ? <div data-slot="prompt-bar-chips" className="flex min-w-0 flex-wrap items-center gap-2">{dropdowns.map((chip) => dropdown(chip))}</div> : null}
       </>
     );
   };
@@ -351,7 +353,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     </Collapsible>
   ) : null;
 
-  const tierSegment = tier ? <TierSegment {...tier} /> : null;
+  const tierSegment = tier ? <TierSegment {...tier} density={inChat ? "compact" : undefined} /> : null;
   const inButton = submitDetailPlacement === "in_button" && Boolean(submitDetail);
 
   // VIDEO-UI-12: the label and the time as two lines inside the button. The button keeps its own name (the label); the time is its description.
@@ -381,23 +383,36 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     const plainChips = unfolded.filter((c) => c.presentation !== "popover");
     if (inComposer) {
       return (
-        <form data-slot="prompt-bar" data-layout="composer" className={cn("flex w-full min-w-0 flex-col gap-2", className)} onSubmit={(e) => { e.preventDefault(); trySubmit(); }}>
+        <form data-slot="prompt-bar" data-layout={barLayout} className={cn("flex w-full min-w-0 flex-col gap-2", className)} onSubmit={(e) => { e.preventDefault(); trySubmit(); }}>
           {errorRow}
-          <div data-slot="prompt-bar-composer" className="flex min-w-0 flex-col gap-2 rounded-2xl border border-input bg-background p-2 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
+          <div data-slot="prompt-bar-composer" data-chat-input={inChat ? "true" : undefined} className={cn("flex min-w-0 flex-col rounded-2xl border border-input bg-background p-2 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30", inChat ? "gap-1" : "gap-2")}>
+            {refsRow(rowRefs)}
+            {inChat && inField?.value ? <InFieldThumb reference={inField} locked={locked} compact /> : null}
             {fieldBox(5, false)}
             {suggestionRow}
             {suggestedRow}
-            {refsRow(rowRefs)}
-            {leading || groups.length > 0 || plainChips.length > 0 || tierSegment ? (
-              <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-wrap items-center gap-1.5 border-t border-border/70 pt-2">
+            {inChat || leading || groups.length > 0 || plainChips.length > 0 || tierSegment ? (
+              <div data-slot="prompt-bar-composer-controls" className={cn("flex min-w-0 flex-wrap items-center gap-1.5", inChat ? "pt-1" : "border-t border-border/70 pt-2")}>
+                {inChat && inField && !inField.value && inField.placement !== "tile" ? (
+                  <button type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: inField.label } })} title={inField.label} disabled={locked || inField.disabled} onClick={inField.onPick} className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50 sm:size-9">
+                    <ImageIcon className="size-4" aria-hidden="true" />
+                  </button>
+                ) : null}
                 {leading}
-                {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" dropdown={dropdown} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
-                {plainChips.filter((c) => c.variant !== "cards").map(dropdown)}
+                {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" compact={inChat} dropdown={(chip) => dropdown(chip, inChat)} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
+                {plainChips.filter((c) => c.variant !== "cards").map((chip) => dropdown(chip, inChat))}
                 {plainChips.filter((c) => c.variant === "cards").map((c) => cardsSection(c))}
                 {tierSegment}
-                <Button type="submit" shape={shape === "pill" ? "pill" : undefined} disabled={!ready} className="ml-auto min-h-12 shrink-0 px-4" aria-describedby={submitDetail ? detailId : undefined} aria-label={inButton ? submitLabel : undefined}>
-                  {inButton ? buttonFace : submitLabel}
-                </Button>
+                {inChat && submitDetail ? <span id={detailId} className="sr-only min-w-0 truncate px-1 text-xs text-muted-foreground lg:not-sr-only">{submitDetail}</span> : null}
+                {inChat ? (
+                  <Button type="submit" size="icon" shape="pill" disabled={!ready} className="ml-auto size-11 shrink-0 sm:size-9" aria-describedby={submitDetail ? detailId : undefined} aria-label={submitLabel} title={submitDetail ? `${submitLabel} · ${submitDetail}` : submitLabel}>
+                    <ArrowUp className="size-5" aria-hidden="true" />
+                  </Button>
+                ) : (
+                  <Button type="submit" shape={shape === "pill" ? "pill" : undefined} disabled={!ready} className="ml-auto min-h-12 shrink-0 px-4" aria-describedby={submitDetail ? detailId : undefined} aria-label={inButton ? submitLabel : undefined}>
+                    {inButton ? buttonFace : submitLabel}
+                  </Button>
+                )}
               </div>
             ) : null}
             {fold}
@@ -423,7 +438,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
           <div data-slot="prompt-bar-chips" className="flex min-w-0 flex-nowrap touch-pan-x items-center gap-2 overflow-x-auto overflow-y-hidden sm:flex-wrap sm:overflow-visible">
             {leading}
             {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" dropdown={dropdown} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
-            {plainChips.filter((c) => c.variant !== "cards").map(dropdown)}
+            {plainChips.filter((c) => c.variant !== "cards").map((chip) => dropdown(chip))}
           </div>
         ) : null}
         {tierSegment}
@@ -473,7 +488,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
           {leading || dropdowns.length > 0 ? (
             <div data-slot="prompt-bar-chips" className="flex min-w-0 flex-wrap items-center gap-2">
               {leading}
-              {dropdowns.map(dropdown)}
+              {dropdowns.map((chip) => dropdown(chip))}
             </div>
           ) : null}
           {fold}
@@ -601,13 +616,14 @@ function InFieldThumb({ reference: ref, locked, compact }: { reference: PromptBa
 
 /** One trigger for several chips (Look, Camera, Sound): two small thumbnails and the chosen words, opening one popover, or a sheet
  * on a phone. A text chip may be in the group. */
-function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }: {
+function StyleGroup({ name, chips, locked, sheet, side, block, compact = false, dropdown, cards }: {
   name: string;
   chips: readonly PromptBarChip[];
   locked: boolean;
   sheet: boolean;
   side: "right" | "bottom";
   block?: boolean;
+  compact?: boolean;
   dropdown: (chip: PromptBarChip) => ReactNode;
   cards: (chip: PromptBarChip, wide: boolean) => ReactNode;
 }) {
@@ -663,16 +679,17 @@ function StyleGroup({ name, chips, locked, sheet, side, block, dropdown, cards }
       aria-haspopup="dialog"
       aria-expanded={open}
       onClick={sheet ? () => setOpen(true) : undefined}
-      className={cn("flex min-h-12 min-w-0 items-center gap-3 rounded-2xl border border-input bg-transparent p-2 pr-3 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50", block ? "w-full" : "shrink-0")}
+      aria-label={compact ? `${name}: ${summary}` : undefined}
+      className={cn("flex min-w-0 items-center border border-input bg-transparent text-left outline-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50", compact ? "min-h-11 shrink-0 gap-1.5 rounded-full px-3 py-1 text-sm sm:min-h-9" : "min-h-12 gap-3 rounded-2xl p-2 pr-3", block ? "w-full" : "shrink-0")}
     >
-      {thumbs.length > 0 ? (
+      {!compact && thumbs.length > 0 ? (
         <span className="flex shrink-0 gap-1">
           {thumbs.map((src, i) => <span key={i} className="size-10 overflow-hidden rounded-lg bg-muted"><OptionThumb src={src} /></span>)}
         </span>
       ) : null}
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="text-xs font-medium text-muted-foreground">{name}</span>
-        <span className="truncate text-sm">{summary}</span>
+      <span className={cn("flex min-w-0", compact ? "items-center" : "flex-1 flex-col")}>
+        {!compact ? <span className="text-xs font-medium text-muted-foreground">{name}</span> : null}
+        <span className={cn("truncate", compact ? "text-sm" : "text-sm")}>{compact ? `${name}: ${summary}` : summary}</span>
       </span>
       <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
     </button>

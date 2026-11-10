@@ -1,3 +1,7 @@
+## [ui-v0.5.578] - 2026-11-10
+
+- VIDEO-COMPOSER-02. `prompt_bar.layout: "chat"` adapts the Chat input pattern for video creation: one growing prompt field, frame attachment and compact option and tier controls in a shared toolbar, with a round Generate action. Existing block and composer layouts are unchanged.
+
 ## [ui-v0.5.577] - 2026-11-10
 
 - VIDEO-COMPOSER-01. `prompt_bar.layout: "composer"` puts the prompt, references, choices, tier and Generate inside one compact bordered composer. A host availability reason now disables Generate only; people can still type, choose options and attach references while an engine is unavailable. Default block layout is unchanged.

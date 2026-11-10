@@ -40,10 +40,12 @@ export interface TierSegmentProps {
   presentation?: "segment" | "cards";
   /** VIDEO-UI-12: cards only: the time words by level id ("About a minute"). */
   details?: Readonly<Record<string, string>>;
+  /** VIDEO-COMPOSER-02: compact toolbar layout without the per-tier hint line. */
+  density?: "default" | "compact";
 }
 
 /** The Standard, Boost, Max choice on a picture, video or song card, beside Make another. A tier with a `confirm` line asks once before it applies. */
-export function TierSegment({ value, onValueChange, tiers = defaultTiers(), confirmLabel = i18n._({ id: "ui.Continue", message: "Continue" }), cancelLabel = i18n._({ id: "ui.Cancel", message: "Cancel" }), label = i18n._({ id: "ui.Quality", message: "Quality" }), className, presentation = "segment", details }: TierSegmentProps) {
+export function TierSegment({ value, onValueChange, tiers = defaultTiers(), confirmLabel = i18n._({ id: "ui.Continue", message: "Continue" }), cancelLabel = i18n._({ id: "ui.Cancel", message: "Cancel" }), label = i18n._({ id: "ui.Quality", message: "Quality" }), className, presentation = "segment", details, density = "default" }: TierSegmentProps) {
   const [pending, setPending] = useState<TierOptionDef | null>(null);
   const shown = tiers.find((t) => t.id === value);
   const note = pending?.confirm ?? undefined;
@@ -96,7 +98,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
     );
   }
   return (
-    <div data-slot="tier-segment" className={cn("flex flex-col gap-1.5", className)}>
+    <div data-slot="tier-segment" data-density={density === "compact" ? "compact" : undefined} className={cn("flex flex-col gap-1.5", className)}>
       <div role="radiogroup" aria-label={label} className="inline-flex w-fit rounded-full border border-border p-0.5">
         {tiers.map((tier) => {
           const selected = tier.id === value;
@@ -110,7 +112,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
               data-tier={tier.id}
               title={tier.disabledReason}
               className={cn(
-                "min-h-[48px] rounded-full px-4 text-[13.5px] transition-colors",
+                density === "compact" ? "min-h-11 rounded-full px-3 text-xs transition-colors sm:min-h-9 sm:px-2.5" : "min-h-[48px] rounded-full px-4 text-[13.5px] transition-colors",
                 selected ? "bg-foreground/[0.08] text-foreground" : "text-muted-foreground hover:bg-foreground/[0.035]",
                 tier.disabledReason && "cursor-not-allowed opacity-50",
               )}
@@ -121,11 +123,11 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
           );
         })}
       </div>
-      {confirmBlock ?? (
+      {confirmBlock ?? (density === "compact" ? null : (
         <p data-slot="tier-segment-hint" className="text-[12.5px] text-muted-foreground">
           {shown?.disabledReason ?? shown?.hint ?? " "}
         </p>
-      )}
+      ))}
     </div>
   );
 }
