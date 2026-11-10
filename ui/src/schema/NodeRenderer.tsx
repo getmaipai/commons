@@ -903,6 +903,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       onValueChange={setText}
       submitLabel={node.submit_label}
       placement={node.placement}
+      layout={node.layout}
       fieldSize={node.field_size}
       suggestions={node.suggestions}
       submitDetail={submitDetail}

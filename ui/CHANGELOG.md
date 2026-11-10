@@ -1,7 +1,10 @@
+## [ui-v0.5.577] - 2026-11-10
+
+- VIDEO-COMPOSER-01. `prompt_bar.layout: "composer"` puts the prompt, references, choices, tier and Generate inside one compact bordered composer. A host availability reason now disables Generate only; people can still type, choose options and attach references while an engine is unavailable. Default block layout is unchanged.
+
 ## [ui-v0.5.576] - 2026-11-10
 
 - PACK-03, additive. New kit element `CompanionPackPlayer` (`ui/src/elements/companion-pack/`): plays a companion pack (spec-v0.1.360): several clips per state picked at random and never the same twice in a row, switches only at rest frames, Safari-safe transparent video (matte stacked under the colour, one small WebGL pass), lazy loading, pauses when hidden, still for reduced motion and tiny sizes, a `layers` hook for the next slice. Not used by Home yet; `CompanionStage` and `CompanionAvatar` are unchanged.
-
 ## [ui-v0.5.571] - 2026-11-10
 
 - CLIPS-FEED-02, fixes to `clip_feed` from a browser QA of Home. The feed measures where it starts in its scroller and cancels the shell's padding after it (`--clip-feed-top`, a negative bottom margin), then takes `100dvh` minus that start minus `--phone-nav-offset`, so the whole stage, the notice and the progress bar are visible on desktop and clear of the bottom nav on phones. The feed takes focus on load (no scroll), so arrows and Space work at once. The progress track is drawn in `--art-foreground-muted`, thicker, for contrast on the scrim. The node draws the page's `empty_state` action (`action_label`, else a plain word). Request-storm guard: a clip file that fails to load is retried once after 1.5 s, then stays its poster; failures are remembered for the page for 60 s so a remounted feed does not start requesting again (a source that always fails costs two requests). No new strings.

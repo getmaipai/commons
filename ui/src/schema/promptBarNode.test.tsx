@@ -57,6 +57,16 @@ describe("prompt_bar node", () => {
     expect(node.type).toBe("prompt_bar");
   });
 
+  test("composer layout reaches the shared Element", () => {
+    const composerPage = PageNodeSchema.parse({ type: "page", id: "x", title: "X", body: [{ ...node, layout: "composer" }] });
+    const composerNode = composerPage.body[0] as UiNode;
+    const view = draw(composerNode);
+    expect(view.container.querySelector('[data-slot="prompt-bar"]')?.getAttribute("data-layout")).toBe("composer");
+    const composer = view.container.querySelector('[data-slot="prompt-bar-composer"]')!;
+    expect(composer.contains(view.getByRole("textbox", { name: "Describe your video" }))).toBe(true);
+    expect(composer.contains(view.getByRole("button", { name: "Make" }))).toBe(true);
+  });
+
   test("Make sends prompt, shape, length, tier and recipe in one call with their types", async () => {
     const view = draw();
     const make = view.getByRole("button", { name: "Make" }) as HTMLButtonElement;
@@ -181,11 +191,12 @@ describe("prompt_bar node, VIDEO-UI-03", () => {
     expect(calls.find((c) => c.url === "/api/plugins/videos/make")!.body).toEqual({ prompt: "a fox", look: "none", tier: "boost", start_frame: "file-picture", voice: "file-audio" });
   });
 
-  test("K8: a bar that starts a clip takes the host's making notice as its disabled reason; no notice, no change", () => {
+  test("K8: a making notice disables Generate but leaves the prompt and choices available", () => {
     const off: MediaHost = { onPlay: () => {}, makingNotice: (kind) => (kind === "video" ? "Video is not ready yet. Try again in a minute." : undefined) };
     const blocked = drawWith(panelNode, {}, off).view;
     expect(blocked.getByText("Video is not ready yet. Try again in a minute.")).toBeTruthy();
-    expect((blocked.getByRole("textbox", { name: "Describe your video" }) as HTMLTextAreaElement).disabled).toBe(true);
+    expect((blocked.getByRole("textbox", { name: "Describe your video" }) as HTMLTextAreaElement).disabled).toBe(false);
+    expect((blocked.getByRole("button", { name: /Style/ }) as HTMLButtonElement).disabled).toBe(false);
     cleanup();
     const picture = drawWith({ ...(panelNode as object), starts: "picture" } as UiNode, {}, off).view;
     expect((picture.getByRole("textbox", { name: "Describe your video" }) as HTMLTextAreaElement).disabled).toBe(false);

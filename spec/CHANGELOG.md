@@ -1,3 +1,7 @@
+## [spec-v0.1.361] - 2026-11-10
+
+- VIDEO-COMPOSER-01. `prompt_bar.layout` adds the optional `block` (default) and `composer` presentations. Engine-unavailable `starts` reasons disable only submit; prompt and choices remain editable.
+
 ## [spec-v0.1.360] - 2026-11-10
 
 - PACK-01b, breaking for the unreleased companion pack schema only. `companion-pack.schema.json` now matches the real demo packs: mouth is a `calm` and optional `shout` folder each with a `meta.json`, `head`, `eyes` and `emotion` are folders, `rest` is a file, a clip may name a `phone` twin and a `trackFile`, flow files may be deflate-compressed (`flowEncoding`), `life` takes demo channel gains. The validator checks phone twins, folder meta files, flow encoding and counts the desktop tier. No other schema changes; no consumer used the 0.1.359 shape yet.

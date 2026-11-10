@@ -597,6 +597,7 @@ export const PromptBarNodeSchema = z.object({
     .optional(),
   submit_label: z.string().min(1).max(24).optional(),
   placement: z.enum(["inline", "panel"]).optional(),
+  layout: z.enum(["block", "composer"]).optional(),
   field_size: z.enum(["default", "large"]).optional(),
   suggestions: z.array(z.object({ label: z.string().min(1).max(40), text: z.string().min(1).max(300) })).max(4).optional(),
   submit_detail: z.object({ state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40), placement: z.enum(["below", "in_button"]).optional(), labels: z.record(z.string(), z.string().min(1).max(80)) }).optional(),

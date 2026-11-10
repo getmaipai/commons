@@ -66,13 +66,23 @@ describe("PromptBar", () => {
     expect(tiers).toEqual(["boost"]);
   });
 
-  test("busy or a disabled reason turns Make off and the reason is shown instead of an error", () => {
+  test("busy or an unavailable engine turns Make off; the reason stays visible and the text field stays editable", () => {
     const { getByRole, getByText, rerender } = render(<PromptBar label="Describe" value="x" onValueChange={() => {}} onSubmit={() => {}} busy />);
     expect((getByRole("button", { name: "Make" }) as HTMLButtonElement).disabled).toBe(true);
-    rerender(<PromptBar label="Describe" value="x" onValueChange={() => {}} onSubmit={() => {}} disabledReason="Video is not ready yet. Try again in a minute." />);
+    rerender(<PromptBar label="Describe" value="x" onValueChange={() => {}} onSubmit={() => {}} disabledReason="Video is not ready yet. Try again in a minute." chips={[shape()]} />);
     expect((getByRole("button", { name: "Make" }) as HTMLButtonElement).disabled).toBe(true);
-    expect((getByRole("textbox", { name: "Describe" }) as HTMLTextAreaElement).disabled).toBe(true);
+    expect((getByRole("textbox", { name: "Describe" }) as HTMLTextAreaElement).disabled).toBe(false);
+    expect((getByRole("combobox", { name: "Shape" }) as HTMLButtonElement).disabled).toBe(false);
     expect(getByText("Video is not ready yet. Try again in a minute.")).toBeTruthy();
+  });
+
+  test("composer keeps prompt, controls, tier and Generate inside one input mechanism", () => {
+    const view = render(<PromptBar layout="composer" label="Describe" value="a fox" onValueChange={() => {}} onSubmit={() => {}} chips={[shape()]} tier={{ value: "standard", onValueChange: () => {}, tiers: [{ id: "standard", label: "Standard" }, { id: "boost", label: "Boost" }] }} />);
+    const composer = view.container.querySelector('[data-slot="prompt-bar-composer"]')!;
+    expect(composer.contains(view.getByRole("textbox", { name: "Describe" }))).toBe(true);
+    expect(composer.contains(view.getByRole("combobox", { name: "Shape" }))).toBe(true);
+    expect(composer.contains(view.getByRole("radio", { name: "Boost" }))).toBe(true);
+    expect(composer.contains(view.getByRole("button", { name: "Make" }))).toBe(true);
   });
 
   test("an error is an in-flow status row above the field, not floating text", () => {

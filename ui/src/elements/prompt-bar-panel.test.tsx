@@ -114,11 +114,11 @@ describe("PromptBar placement panel", () => {
     expect(view.container.querySelector('[data-slot="prompt-bar-references"]')).toBeTruthy();
   });
 
-  test("a disabled reason stops the panel, shows its line, and a control stays reachable by keyboard order", () => {
+  test("an unavailable engine disables only Generate; the prompt and options remain usable", () => {
     const view = bar("side", { chips: [look, length], disabledReason: "Video is not ready yet. Try again in a minute." });
     expect((view.getByRole("button", { name: "Generate" }) as HTMLButtonElement).disabled).toBe(true);
-    expect((view.getByRole("textbox", { name: "Describe" }) as HTMLTextAreaElement).disabled).toBe(true);
-    expect((view.getByRole("button", { name: /Style/ }) as HTMLButtonElement).disabled).toBe(true);
+    expect((view.getByRole("textbox", { name: "Describe" }) as HTMLTextAreaElement).disabled).toBe(false);
+    expect((view.getByRole("button", { name: /Style/ }) as HTMLButtonElement).disabled).toBe(false);
     expect(view.getByText("Video is not ready yet. Try again in a minute.")).toBeTruthy();
   });
 });
@@ -152,7 +152,7 @@ describe("PromptBar placement panel, stacked (the dock)", () => {
   test("the dock's Generate is off while the box is empty or a reason is set, and the reason shows in the dock", () => {
     const view = bar("stacked", { value: "", disabledReason: "Video is not ready yet." });
     expect((view.getByRole("button", { name: "Generate" }) as HTMLButtonElement).disabled).toBe(true);
-    expect((view.getByRole("button", { name: "Options" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((view.getByRole("button", { name: "Options" }) as HTMLButtonElement).disabled).toBe(false);
     expect(view.getByText("Video is not ready yet.")).toBeTruthy();
   });
 
@@ -220,7 +220,7 @@ describe("VIDEO-UI-12 roomy panel props", () => {
   });
   test("a locked bar disables the tile", () => {
     const view = bar("side", { disabledReason: "Not ready", references: [{ ...frame, placement: "tile" }] });
-    expect((view.getByRole("button", { name: "Add Start frame" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((view.getByRole("button", { name: "Add Start frame" }) as HTMLButtonElement).disabled).toBe(false);
   });
   test("in the phone sheet an empty tile shows full width in the references", async () => {
     const view = bar("stacked", { references: [{ ...frame, placement: "tile", hint: "Optional." }] });

@@ -410,6 +410,13 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, references: [{ state: "start_frame", label: "Start frame", kind: "picture", placement: "inside" }] })).toBe(false);
   });
 
+  test("VIDEO-COMPOSER-01: prompt_bar composer keeps its input mechanism as one layout", () => {
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    expect(validate({ ...ok, layout: "block" })).toBe(true);
+    expect(validate({ ...ok, layout: "composer" })).toBe(true);
+    expect(validate({ ...ok, layout: "columns" })).toBe(false);
+  });
+
   test("VIDEO-UI-03: split_view takes aside_side start or end", () => {
     const view = { type: "split_view", main: [{ type: "empty_state", icon: "x", text: "t" }], aside: [{ type: "empty_state", icon: "x", text: "t" }] };
     expect(validate({ ...view, aside_side: "start" })).toBe(true);

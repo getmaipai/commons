@@ -138,6 +138,8 @@ export interface PromptBarProps {
    * (the box, an Options button and a round submit) with the controls in a bottom sheet. The mode comes from the SplitView's layout
    * context; the bar runs no media query of its own. Outside a SplitView `panel` draws as `inline`. */
   placement?: "inline" | "panel";
+  /** VIDEO-COMPOSER-01: `composer` keeps the prompt, reference, options, tier and submit in one bordered input mechanism. */
+  layout?: "block" | "composer";
   /** VIDEO-UI-03: up to 4 idea chips shown while the box is empty. */
   suggestions?: readonly PromptBarSuggestion[];
   /** VIDEO-UI-03: the small line under the submit button (a time, never credits). */
@@ -178,7 +180,7 @@ function ChipCards({ chip, locked, columns }: { chip: PromptBarChip; locked: boo
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
  * It holds no state of its own. Videos Create draws it through the `prompt_bar` schema node and the chat video card draws it directly. */
-export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion, shape = "default", accent }: PromptBarProps) {
+export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", layout: barLayout = "block", suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion, shape = "default", accent }: PromptBarProps) {
   const layout = useSplitViewLayout();
   const phone = useIsPhoneLayout();
   const mode: Mode = placement === "panel" && layout ? (layout === "side" ? "panel" : "dock") : "inline";
@@ -188,7 +190,10 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   const blocked = busy || Boolean(disabledReason);
   const empty = value.trim() === "";
   const ready = !blocked && !empty;
-  const locked = Boolean(disabledReason);
+  // Engine availability disables the submit action, not composition. People can draft words and
+  // choose settings while an engine is stopped or being installed.
+  const locked = false;
+  const inComposer = mode === "inline" && barLayout === "composer";
   const inField = references.find((r) => (r.placement === "in_field" || r.placement === "tile") && r.kind !== "audio" && r.kind !== "video");
   const rowRefs = references.filter((r) => r !== inField);
   const unfolded = chips.filter((c) => !c.fold);
@@ -214,7 +219,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
 
   const large = fieldSize === "large";
   const textbox = (rows: number, extra?: string) => {
-    const bare = mode !== "inline" || Boolean(inField);
+    const bare = mode !== "inline" || Boolean(inField) || inComposer;
     return (
       <Textarea
         ref={field}
@@ -259,10 +264,11 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   ) : null;
 
   const fieldBox = (rows: number, dock: boolean) => {
-    if (mode === "inline" && !inField) return textbox(rows);
+    if (mode === "inline" && !inField && !inComposer) return textbox(rows);
+    if (inComposer && !inField) return textbox(rows);
     const filled = Boolean(inField?.value);
     return (
-      <div data-slot="prompt-bar-field" className={cn("flex min-w-0 flex-1 flex-col border transition-colors", shape === "pill" ? "rounded-[28px] border-[var(--hairline)] bg-[var(--surface-2)] p-1" : "rounded-2xl border-input bg-transparent dark:bg-input/30", "focus-within:border-ring focus-within:ring-3", accent === "create" ? "focus-within:ring-[var(--accent-create)]/50" : "focus-within:ring-ring/50", shape === "default" && "") }>
+      <div data-slot="prompt-bar-field" className={cn("flex min-w-0 flex-1 flex-col border transition-colors", inComposer ? "rounded-xl border-0 bg-transparent p-0 shadow-none" : shape === "pill" ? "rounded-[28px] border-[var(--hairline)] bg-[var(--surface-2)] p-1" : "rounded-2xl border-input bg-transparent dark:bg-input/30", !inComposer && "focus-within:border-ring focus-within:ring-3", accent === "create" ? "focus-within:ring-[var(--accent-create)]/50" : "focus-within:ring-ring/50", shape === "default" && "") }>
         {inField && filled ? <InFieldThumb reference={inField} locked={locked} compact={dock} /> : null}
         {textbox(rows, dock ? "min-h-12 resize-none py-3" : undefined)}
         {inField && !filled && !dock && inField.placement === "tile" ? (
@@ -373,6 +379,34 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   if (mode === "inline") {
     const groups = groupsOf(unfolded);
     const plainChips = unfolded.filter((c) => c.presentation !== "popover");
+    if (inComposer) {
+      return (
+        <form data-slot="prompt-bar" data-layout="composer" className={cn("flex w-full min-w-0 flex-col gap-2", className)} onSubmit={(e) => { e.preventDefault(); trySubmit(); }}>
+          {errorRow}
+          <div data-slot="prompt-bar-composer" className="flex min-w-0 flex-col gap-2 rounded-2xl border border-input bg-background p-2 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
+            {fieldBox(5, false)}
+            {suggestionRow}
+            {suggestedRow}
+            {refsRow(rowRefs)}
+            {leading || groups.length > 0 || plainChips.length > 0 || tierSegment ? (
+              <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-wrap items-center gap-1.5 border-t border-border/70 pt-2">
+                {leading}
+                {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" dropdown={dropdown} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
+                {plainChips.filter((c) => c.variant !== "cards").map(dropdown)}
+                {plainChips.filter((c) => c.variant === "cards").map((c) => cardsSection(c))}
+                {tierSegment}
+                <Button type="submit" shape={shape === "pill" ? "pill" : undefined} disabled={!ready} className="ml-auto min-h-12 shrink-0 px-4" aria-describedby={submitDetail ? detailId : undefined} aria-label={inButton ? submitLabel : undefined}>
+                  {inButton ? buttonFace : submitLabel}
+                </Button>
+              </div>
+            ) : null}
+            {fold}
+          </div>
+          {detailLine}
+          {disabledNote}
+        </form>
+      );
+    }
     return (
       <form
         data-slot="prompt-bar"

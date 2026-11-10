@@ -1337,7 +1337,7 @@
         "label",
         "submit"
       ],
-      "description": "VIDEO-CREATE-01: a prompt box with chips and one Make button. Every chip and the optional tier segment write their chosen value to page state under their own `state` key as it changes; the prompt text is written under `prompt_state` when Make is pressed. Make fires `submit` once with the item {<prompt_state>: text, <each chip state>: value, <tier state>: id}, so `{prompt}` and `{shape}` placeholders in the call args fill from it (a whole-string placeholder keeps a number's type). Make stays off while the prompt is empty. The node sends nothing itself. VIDEO-CREATE-02 (additive): a chip may set `variant: \"cards\"` with an optional `media` per option, and an optional `references` list adds picture slots whose file ids join the item. VIDEO-UI-03 (additive): `placement: \"panel\"` draws the bar as a control panel (left pane that scrolls inside itself, the submit pinned at its foot) when the enclosing `split_view` is side by side, and as a bottom dock (the words, an Options button, a round submit; the controls in a bottom sheet) when it is stacked; the mode comes from that `split_view`, never from a media query of the bar. `suggestions` are idea chips shown while the words are empty; `submit_detail` is the line under the submit; chips may set `presentation`, `group` and `fold`; a reference may set `placement: \"in_field\"` and its `kind` may be `audio` or `video`; `starts` marks that the submit starts a picture or a clip, so the host can disable it with its one reason.",
+      "description": "VIDEO-CREATE-01: a prompt box with chips and one Make button. Every chip and the optional tier segment write their chosen value to page state under their own `state` key as it changes; the prompt text is written under `prompt_state` when Make is pressed. Make fires `submit` once with the item {<prompt_state>: text, <each chip state>: value, <tier state>: id}, so `{prompt}` and `{shape}` placeholders in the call args fill from it (a whole-string placeholder keeps a number's type). Make stays off while the prompt is empty. The node sends nothing itself. VIDEO-CREATE-02 (additive): a chip may set `variant: \"cards\"` with an optional `media` per option, and an optional `references` list adds picture slots whose file ids join the item. VIDEO-UI-03 (additive): `placement: \"panel\"` draws the bar as a control panel when an enclosing `split_view` provides its mode. `layout: \"composer\"` groups prompt, references, controls, tier and submit inside one bordered input mechanism. `suggestions` are idea chips shown while the words are empty; `submit_detail` is the line under the submit; chips may set `presentation`, `group` and `fold`; a reference may set `placement: \"in_field\"` and its `kind` may be `audio` or `video`; `starts` lets the host disable only the submit with its availability reason while keeping the prompt and options editable.",
       "properties": {
         "type": {
           "const": "prompt_bar"
@@ -1592,6 +1592,18 @@
           "default": "inline",
           "description": "VIDEO-UI-03 (K2a): `inline` (default) is a block in the page flow, unchanged. `panel` is a control panel beside a feed: it needs an enclosing `split_view` (main and aside form) and reads that split_view's layout, side by side at `lg` (960 px) and up, stacked below. Outside a `split_view` it draws as `inline`."
         },
+        "layout": {
+          "type": "string",
+          "enum": ["block", "composer"],
+          "default": "block",
+          "description": "VIDEO-COMPOSER-01: `composer` groups the prompt, references, option chips, tier selector and Generate button inside one bordered composer; `block` preserves the original stacked layout."
+        },
+        "layout": {
+          "type": "string",
+          "enum": ["block", "composer"],
+          "default": "block",
+          "description": "VIDEO-COMPOSER-01: `composer` groups the prompt, references, option chips, tier selector and Generate button inside one bordered composer; `block` preserves the original stacked layout."
+        },
         "field_size": {
           "type": "string",
           "enum": ["default", "large"],
@@ -1642,7 +1654,7 @@
         "starts": {
           "type": "string",
           "enum": ["picture", "video"],
-          "description": "VIDEO-UI-03 (K8): the submit starts a picture or a clip. The host's `makingNotice(kind)`, when it has one and returns a line, becomes the bar's `disabledReason` (the box and the submit stop, the line shows where the person acts). No marker: unchanged."
+          "description": "VIDEO-UI-03 (K8): the submit starts a picture or a clip. The host's `makingNotice(kind)`, when it has one and returns a line, disables only the submit and shows the reason; the prompt and options stay editable. No marker: unchanged."
         },
         "submit": {
           "$ref": "#/$defs/action"
