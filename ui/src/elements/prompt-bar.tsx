@@ -386,7 +386,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         {refsRow(rowRefs)}
         {plainChips.filter((c) => c.variant === "cards").map((c) => cardsSection(c))}
         {leading || groups.length > 0 || plainChips.some((c) => c.variant !== "cards") ? (
-          <div data-slot="prompt-bar-chips" className="flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible">
+          <div data-slot="prompt-bar-chips" className="flex min-w-0 flex-nowrap touch-pan-x items-center gap-2 overflow-x-auto overflow-y-hidden sm:flex-wrap sm:overflow-visible">
             {leading}
             {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" dropdown={dropdown} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
             {plainChips.filter((c) => c.variant !== "cards").map(dropdown)}

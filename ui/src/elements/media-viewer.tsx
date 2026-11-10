@@ -493,11 +493,11 @@ export function MediaViewer({
           }
         }}
         className={cn(
-          "dark top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-background p-0 text-foreground shadow-none sm:max-w-none",
+          "dark [--art-surface:var(--background)] [--art-overlay:color-mix(in_srgb,#000_55%,transparent)] top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-background p-0 text-foreground shadow-none sm:max-w-none",
           "data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 motion-reduce:animate-none motion-reduce:duration-0",
         )}
       >
-        <header data-slot="media-viewer-bar" className="flex shrink-0 flex-wrap items-center gap-2 p-2">
+        <header data-slot="media-viewer-bar" className="flex shrink-0 flex-wrap items-center gap-2 bg-background px-3 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
           <DialogClose asChild>
             <Button type="button" variant="ghost" size="icon" data-slot="media-viewer-close" aria-label={copy.close}>
               <XIcon aria-hidden />
@@ -514,7 +514,7 @@ export function MediaViewer({
           {zoomable || toolbarContent ? (
             // One row with the title from 640 px wide; on a phone it drops to its own row that scrolls sideways, so the
             // title, counter and Details button keep the first row.
-            <div data-slot="media-viewer-actions" className="order-last flex w-full items-center gap-2 overflow-x-auto sm:order-none sm:w-auto sm:overflow-visible">
+            <div data-slot="media-viewer-actions" className="order-last flex w-full touch-pan-x items-center gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain sm:order-none sm:w-auto sm:overflow-visible">
               {zoomable ? (
                 <div role="group" aria-label={`${copy.zoomIn} / ${copy.zoomOut}`} data-slot="media-viewer-zoom" className="flex items-center gap-1">
                   <Button type="button" variant="ghost" size="icon" aria-label={copy.zoomOut} disabled={view.scale <= 1} onClick={() => zoomStep(1 / ZOOM_STEP)}>
@@ -529,7 +529,7 @@ export function MediaViewer({
                 </div>
               ) : null}
               {toolbarContent ? (
-                <div data-slot="media-viewer-toolbar" className="flex items-center gap-2 sm:flex-wrap [&_a]:min-h-12 [&_button]:min-h-12 [&_button]:min-w-12">
+                <div data-slot="media-viewer-toolbar" className="flex items-center gap-2 sm:flex-wrap [&_a]:min-h-12 [&_button]:min-h-12 [&_button]:min-w-12 [&_button]:rounded-full [&_a]:rounded-full">
                   {toolbarContent}
                 </div>
               ) : null}
@@ -646,8 +646,8 @@ export function MediaViewer({
                 )}
               </>
             ) : item.kind === "video" || item.kind === "audio" ? (
-              <div data-slot="media-viewer-player" className="flex size-full items-center justify-center overflow-auto p-4 sm:px-20">
-                <div className="w-full max-w-5xl">
+              <div data-slot="media-viewer-player" className="flex size-full items-center justify-center overflow-auto sm:p-4 sm:px-20">
+                <div className="w-full sm:max-w-5xl">
                   <Player
                     key={item.id}
                     src={item.url}

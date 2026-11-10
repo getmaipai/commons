@@ -1982,7 +1982,7 @@ function PlayerActions({ actions, item, dispatch, wrap, children }: { actions: P
   return (
     <div className={wrap ? "flex min-w-0 flex-wrap gap-2 pb-1" : "flex min-w-0 items-center gap-2 pb-1"} role="group" aria-label={i18n._({ id: "ui.Actions", message: "Actions" })} data-slot="player-actions">
       {/* The buttons scroll sideways in their own strip; the trailing child (Edit) sits outside it so it is never scrolled away. */}
-      <div className={wrap ? "contents" : "flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none]"} data-slot="player-actions-strip">
+      <div className={wrap ? "contents" : "flex min-w-0 flex-1 touch-pan-x gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 [scrollbar-width:none]"} data-slot="player-actions-strip">
       {actions.map((a) => {
         const on = a.field ? readField(item, a.field) === true : false;
         const Glyph = a.icon ? getIcon(a.icon) : null;
