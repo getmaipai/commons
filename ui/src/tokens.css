@@ -2642,94 +2642,17 @@ html:has([data-slot="phone-nav"][data-floating]) [data-slot="track-studio-transp
 ::highlight(article-spoken) { color: color-mix(in oklab, var(--foreground) 55%, transparent); }
 ::highlight(article-speaking) { background-color: color-mix(in oklab, var(--primary) 30%, transparent); color: var(--foreground); }
 
-/* VIDEO-STUDIO-02 (K1): the studio token scope, the Music look for the Videos Create page and the Video Studio. Owner ruling (Jesse, 2026-11-02):
- * near-black neutrals at hue 285 and a lime --primary in dark, whatever `ui.look` is selected. The dark values are the Music app's `music-surface`
- * values (oklch 0.17, 0.21, 0.26, 0.3 at chroma 0.003; lime oklch(0.9 0.2 125), written as the hex the CSS engine gamut-maps them to, so the
- * contrast tests can read them). The values sit on the scope's own element, so they outrank every look and theme set on html or body above it.
- * Light is a soft grey page, white cards and a deeper lime: --primary is the slider fill and the focus ring, so it must clear 3:1 against the
- * card and the track, not only carry its near-black label at 4.5:1 (`studio-surface.test.tsx`). The light block is the default; dark follows the
- * kit's own dark class, or the device when no class is set. --surface-* are mapped too, so kit parts that read them follow the pane. */
+/* PRO-LOOK-STUDIOS-01: the studio is a mode of the selected Look. The
+ * shell's body.style-* and html light/dark tokens flow into this scope;
+ * only stage depth is derived locally. Creation accents remain app-owned
+ * and the docked prompt layout stays studio-only. */
 [data-surface="studio"] {
-  --background: #f0f0f3;
-  --card: #ffffff;
-  --popover: #ffffff;
-  --muted: #e7e7ea;
-  --secondary: #e7e7ea;
-  --accent: #dddde1;
-  --border: #d4d4d7;
-  --input: #d4d4d7;
-  --foreground: #0f0f11;
-  --card-foreground: #0f0f11;
-  --popover-foreground: #0f0f11;
-  --secondary-foreground: #0f0f11;
-  --accent-foreground: #0f0f11;
-  --muted-foreground: #54555b;
-  --primary: #648e00;
-  --primary-foreground: #0f0f11;
-  --ring: #648e00;
-  --kicker: #4a6900;
-  --surface-page: #f0f0f3;
-  --surface-card: #ffffff;
-  --surface-pane: #e7e7ea;
-  --surface-sidebar: #e7e7ea;
-  --surface-stage: #e4e4e7;
-  /* VIDEO-STUDIO-08: the studio pane's padding and its page header sit above a side-by-side prompt panel, so the panel's own scroll stops 92px
-   * shorter than on a plain page (8rem to 14rem) and its pinned submit button stays inside a 900px window. Not set on the dark blocks: it inherits. */
+  --surface-stage: color-mix(in srgb, var(--surface-page), var(--foreground) 6%);
   --prompt-panel-offset: 14rem;
 }
-.dark [data-surface="studio"] {
-  --background: #0f0f11;
-  --card: #18181a;
-  --popover: #18181a;
-  --muted: #242425;
-  --secondary: #242425;
-  --accent: #2e2e2f;
-  --border: #2e2e2f;
-  --input: #2e2e2f;
-  --foreground: #f5f5f7;
-  --card-foreground: #f5f5f7;
-  --popover-foreground: #f5f5f7;
-  --secondary-foreground: #f5f5f7;
-  --accent-foreground: #f5f5f7;
-  --muted-foreground: #a9a9b1;
-  --primary: #c0f447;
-  --primary-foreground: #0f0f11;
-  --ring: #c0f447;
-  --kicker: #c0f447;
-  --surface-page: #0f0f11;
-  --surface-card: #18181a;
-  --surface-pane: #242425;
-  --surface-sidebar: #18181a;
-  --surface-stage: #070708;
+html.dark [data-surface="studio"] {
+  --surface-stage: color-mix(in srgb, var(--surface-page), black 40%);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not(.light):not(.dark) [data-surface="studio"] {
-    --background: #0f0f11;
-    --card: #18181a;
-    --popover: #18181a;
-    --muted: #242425;
-    --secondary: #242425;
-    --accent: #2e2e2f;
-    --border: #2e2e2f;
-    --input: #2e2e2f;
-    --foreground: #f5f5f7;
-    --card-foreground: #f5f5f7;
-    --popover-foreground: #f5f5f7;
-    --secondary-foreground: #f5f5f7;
-    --accent-foreground: #f5f5f7;
-    --muted-foreground: #a9a9b1;
-    --primary: #c0f447;
-    --primary-foreground: #0f0f11;
-    --ring: #c0f447;
-    --kicker: #c0f447;
-    --surface-page: #0f0f11;
-    --surface-card: #18181a;
-    --surface-pane: #242425;
-    --surface-sidebar: #18181a;
-    --surface-stage: #070708;
-  }
-}
-/* The ease "more contrast" setting still applies inside the studio: its mix resolves against the pane's own --background and --foreground. */
 html[data-ease-contrast="more"] [data-surface="studio"] {
   --muted-foreground: color-mix(in srgb, var(--background), var(--foreground) 80%);
 }

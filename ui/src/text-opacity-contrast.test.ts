@@ -26,10 +26,6 @@ function block(source: string, from: string, to?: string): string {
 }
 const lightRoot = block(css, ":root {", "@media (max-width: 639px)");
 const darkRoot = block(css, ".dark {");
-// VIDEO-STUDIO-02: the studio token scope is a third and fourth place kit text is drawn (the Videos pages), light and dark.
-const studioLight = block(css, '[data-surface="studio"] {', "}");
-const studioDark = block(css, '.dark [data-surface="studio"] {', "}");
-const STUDIO_SURFACES = ["--background", "--card", "--popover", "--muted", "--secondary", "--accent", "--surface-stage"];
 
 function readVar(source: string, name: string): string {
   const match = new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6});`).exec(source);
@@ -58,14 +54,7 @@ const PAGE_SURFACES = ["--surface-page", "--surface-card", "--surface-pane", "--
 /** Every (text, surface) pair the family is drawn on, per theme. */
 function pairs(family: Family): { theme: string; text: string; surface: string }[] {
   const out: { theme: string; text: string; surface: string }[] = [];
-  for (const [theme, root] of [["light", lightRoot], ["dark", darkRoot], ["studio light", studioLight], ["studio dark", studioDark]] as const) {
-    if (theme.startsWith("studio")) {
-      if (family === "foreground" || family === "muted-foreground") {
-        const text = readVar(root, family === "foreground" ? "--foreground" : "--muted-foreground");
-        for (const s of STUDIO_SURFACES) out.push({ theme, text, surface: readVar(root, s) });
-      }
-      continue;
-    }
+  for (const [theme, root] of [["light", lightRoot], ["dark", darkRoot]] as const) {
     if (family === "background") {
       // Inverted ink surfaces (TerminalBlock `ink`): light theme text-background on bg-foreground.
       // The dark theme paints those with explicit `dark:` overrides on real tokens.
