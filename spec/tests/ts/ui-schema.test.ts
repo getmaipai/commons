@@ -155,6 +155,29 @@ describe("UI schema", () => {
     for (const rate of [{}, { value: 9 }, { value: "fast" }, { field: "" }, { speed: 1 }, { on_change: { bogus: 1 } }]) expect(validate({ ...player, rate })).toBe(false);
   });
 
+  test("CLIPS-FEED-01: clip_feed takes item_fields, like and remake, an empty state and autoplay switches", () => {
+    const fields = { src: "s", poster: "p", title: "t", duration_s: "d", id: "id" };
+    const feed = { type: "clip_feed", bind: { source: "package", path: "clips" }, item_fields: fields, empty_state: { type: "empty_state", icon: "film", text: "None" } };
+    expect(validate(feed)).toBe(true);
+    const good = { ...feed, item_fields: { ...fields, subtitle: "u", liked: "l" }, start_id: "c1", on_close: { navigate: { to: "/x" } }, autoplay: false, autoplay_field: "autoplay",
+      actions: { like: { call: { target: "/api/x/{id}", args: { liked: "{liked}" } } }, remake: { starts: "video", navigate: { to: "/y" } } } };
+    expect(validate(good)).toBe(true);
+    const bad: unknown[] = [
+      { ...feed, bind: { source: "route", path: "/api/clips" } },
+      { ...feed, item_fields: { src: "s", poster: "p", title: "t", id: "id" } },
+      { ...feed, item_fields: { ...fields, extra: "x" } },
+      { ...feed, actions: { save: { call: { target: "/x" } } } },
+      { ...feed, actions: { share: { call: { target: "/x" } } } },
+      { ...feed, actions: { like: {} } },
+      { ...feed, actions: { remake: { starts: "audio", navigate: { to: "/y" } } } },
+      { ...feed, empty_state: undefined },
+      { ...feed, autoplay: "no" },
+      { ...feed, start_id: "" },
+      { ...feed, speed: 2 },
+    ];
+    for (const invalid of bad) expect(validate(invalid)).toBe(false);
+  });
+
   test("a node with an unknown type is rejected", () => {
     const bad = { type: "not_a_real_type" };
     expect(validate(bad)).toBe(false);

@@ -1,0 +1,21 @@
+{
+  "type": "page",
+  "id": "clips-feed",
+  "title": "Clips",
+  "body": [
+    {
+      "type": "clip_feed",
+      "bind": { "source": "package", "path": "clips", "params": { "id": "$state.id" } },
+      "item_fields": { "src": "file.url", "poster": "poster.url", "title": "title", "subtitle": "made_by", "duration_s": "duration_s", "id": "id", "liked": "liked" },
+      "actions": {
+        "like": { "call": { "target": "/api/plugins/clips/like/{id}", "method": "PATCH", "args": { "liked": "{liked}" } } },
+        "remake": { "starts": "video", "navigate": { "to": "/apps/videos/make?from={id}" } }
+      },
+      "empty_state": { "type": "empty_state", "icon": "film", "text": "No clips yet. Make one and it shows up here." },
+      "start_id": "c1",
+      "on_close": { "navigate": { "to": "/apps/videos" } },
+      "autoplay": true,
+      "autoplay_field": "autoplay"
+    }
+  ]
+}

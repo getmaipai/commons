@@ -1,3 +1,7 @@
+## [spec-v0.1.355] - 2026-11-10
+
+- CLIPS-FEED-01, additive. New page node `clip_feed`: a full-screen vertical feed of the household's own short clips. `bind` (package data call, the existing `clips` rows), `item_fields {src, poster, title, duration_s, id, subtitle?, liked?}` (dotted paths), `actions {like?, remake?}` (each a `feed_handler`: navigate, call or confirm; `like` also receives the typed `{liked}`; `remake` carries `starts`, default `video`, so the host's making notice disables it), `empty_state`, `start_id?`, `on_close?` (Close button action; absent: back one page), `autoplay` (default true) and `autoplay_field` (a boolean on the first row; false turns autoplay off for a child band). Save and Share are deliberately not in the schema. Fixture `ui/pages/clips-feed.json`. Pairs with the next ui tag.
+
 ## [spec-v0.1.354] - 2026-11-10
 
 - PODCAST-RATE-01, additive. `player.rate {field?, value?, on_change?}`: the initial playback speed from a row field (dotted path to a number) or a constant `value`, and an action (a `call`) fired with the new `{rate}` whenever the person picks a speed. Absent: unchanged. Fixture `ui/pages/podcast-rate.json`. Pairs with the next ui tag.

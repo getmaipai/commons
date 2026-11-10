@@ -2404,6 +2404,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <TrackRowsNodeView node={node} state={state} />;
     case "result_feed":
       return <ResultFeedNodeView node={node} state={state} />;
+    case "clip_feed":
+      return <ExternallyMountedNodeView label="clip_feed" />;
     case "studio":
       return <StudioNodeView node={node} state={state} />;
     case "tabs":

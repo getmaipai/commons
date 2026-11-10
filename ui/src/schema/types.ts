@@ -786,6 +786,28 @@ export const ResultFeedNodeSchema = z.object({
 });
 export type ResultFeedNode = z.infer<typeof ResultFeedNodeSchema>;
 
+/** CLIPS-FEED-01: the vertical clip feed. Mirrors spec/ui/schema.json `clip_feed`; `starts` on `remake` is the K8 marker. */
+export const ClipFeedNodeSchema = z.object({
+  type: z.literal("clip_feed"),
+  bind: BindingSchema,
+  item_fields: z.object({
+    src: z.string().min(1),
+    poster: z.string().min(1),
+    title: z.string().min(1),
+    subtitle: z.string().min(1).optional(),
+    duration_s: z.string().min(1),
+    id: z.string().min(1),
+    liked: z.string().min(1).optional(),
+  }).strict(),
+  actions: z.object({ like: FeedHandlerSchema.optional(), remake: FeedHandlerSchema.optional() }).strict().optional(),
+  empty_state: EmptyStateNodeSchema,
+  start_id: z.string().min(1).optional(),
+  on_close: ActionSchema.optional(),
+  autoplay: z.boolean().default(true),
+  autoplay_field: z.string().min(1).optional(),
+});
+export type ClipFeedNode = z.infer<typeof ClipFeedNodeSchema>;
+
 /** VIDEO-STUDIO-04 and -05 (K3, K4): the studio (TrackStudio). Mirrors spec/ui/schema.json `studio`. */
 export const STUDIO_TOOLS = ["split", "delete", "add_clip", "add_voice", "add_music"] as const;
 export const STUDIO_PANELS = ["volume", "fades", "crossfade", "level"] as const;
@@ -943,6 +965,7 @@ export type UiNode =
   | CategoryTilesNode
   | TrackRowsNode
   | ResultFeedNode
+  | ClipFeedNode
   | StudioNode
   | TabsNode;
 
@@ -976,6 +999,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     CategoryTilesNodeSchema,
     TrackRowsNodeSchema,
     ResultFeedNodeSchema,
+    ClipFeedNodeSchema,
     StudioNodeSchema,
     TabsNodeSchema,
   ]),
@@ -1013,5 +1037,6 @@ export const NODE_TYPES = [
   "category_tiles",
   "track_rows",
   "result_feed",
+  "clip_feed",
   "studio",
 ] as const;

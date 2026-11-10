@@ -18,6 +18,7 @@
     { "$ref": "#/$defs/billboard" },
     { "$ref": "#/$defs/player" },
     { "$ref": "#/$defs/reader" },
+    { "$ref": "#/$defs/clip_feed" },
     { "$ref": "#/$defs/detail_pane" },
     { "$ref": "#/$defs/split_view" },
     { "$ref": "#/$defs/widget_card" },
@@ -1060,6 +1061,45 @@
         "on_locator": { "$ref": "#/$defs/action", "description": "Debounced 250 ms after relocation, flushed on close, hide and unmount. Receives the item's fields plus {locator} (a JSON object) and {percent} (number, 0 to 100); nested placeholders such as {locator.cfi} work too. Quiet calls do not refetch the binding." },
         "on_close": { "$ref": "#/$defs/action", "description": "Draw Close and fire with the book's fields after flushing pending progress." },
         "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "clip_feed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "item_fields", "empty_state"],
+      "description": "CLIPS-FEED-01: a full-screen vertical feed of the household's OWN short clips, one per screen (the kit's ClipFeed, composed from the shipped carousel in its vertical orientation and the VideoPlayer Element; no new player). `bind` is a package data call returning the clips as rows (the existing `clips` scope rows; nothing new is stored). The visible clip plays muted and loops (unless autoplay is off), the next one is preloaded and every other clip is only its poster. One tap pauses or plays; a mute button remembers the person's choice; a thin bar scrubs; a right-hand rail holds Like and Make another; the feed has its own Close button. Under prefers-reduced-motion, or when autoplay is off, nothing plays by itself: the poster and a Play button show. A clip file that cannot load falls back to its poster. `empty_state` is the status card for a feed with no clips.",
+      "properties": {
+        "type": { "const": "clip_feed" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "item_fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["src", "poster", "title", "duration_s", "id"],
+          "description": "Dotted paths into each row. `src` and `poster` are same-origin paths; `duration_s` is seconds (a number); `liked` is a boolean.",
+          "properties": {
+            "src": { "type": "string", "minLength": 1 },
+            "poster": { "type": "string", "minLength": 1 },
+            "title": { "type": "string", "minLength": 1 },
+            "subtitle": { "type": "string", "minLength": 1 },
+            "duration_s": { "type": "string", "minLength": 1 },
+            "id": { "type": "string", "minLength": 1 },
+            "liked": { "type": "string", "minLength": 1 }
+          }
+        },
+        "actions": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The rail. Each is one action (navigate, call or confirm) run with the row; an undeclared one draws no button. `like` also gets `{liked}` (the new boolean, typed) beside the row's own fields. `remake` (Make another) may carry the K8 `starts` marker; it defaults to `video`, so the host's `makingNotice` disables the button, with that notice beside it, while making is unavailable.",
+          "properties": {
+            "like": { "$ref": "#/$defs/feed_handler" },
+            "remake": { "$ref": "#/$defs/feed_handler" }
+          }
+        },
+        "empty_state": { "$ref": "#/$defs/empty_state" },
+        "start_id": { "type": "string", "minLength": 1, "description": "The id of the clip to open on. Absent or not found: the first clip." },
+        "on_close": { "$ref": "#/$defs/action", "description": "Fired by the feed's always-visible Close button. Absent: Close goes back one page." },
+        "autoplay": { "type": "boolean", "default": true, "description": "False: nothing plays or advances by itself (poster and a Play button), the setting for a child band. Prefers-reduced-motion does the same whatever this says." },
+        "autoplay_field": { "type": "string", "minLength": 1, "description": "Dotted path to a boolean on the first row; false turns autoplay off, so the data call can decide per person (a child band). Combined with `autoplay`: autoplay happens only when both allow it." }
       }
     },
     "detail_pane": {
