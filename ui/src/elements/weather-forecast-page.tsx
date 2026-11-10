@@ -211,11 +211,11 @@ export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch,
       {d && <div data-weather-layer="detail-sky" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden lg:absolute"><WeatherSky cls={cls} isDay={d.isDay} code={d.code} sunrise={d.sunrise?.includes("T") ? d.sunrise : undefined} sunset={d.sunset?.includes("T") ? d.sunset : undefined} wind={d.wind?.speed}/></div>}
       {d ? <>
         {alert ? <div className="mb-4"><WeatherAlertBanner alert={alert}/></div> : null}
-        <section data-slot="weather-forecast-hero" data-class={cls} style={{ color: "var(--weather-ink)" }} className="relative -mx-4 mb-4 flex min-h-[42svh] flex-col items-center justify-center overflow-hidden bg-transparent p-6 text-center sm:mx-0 sm:min-h-72 sm:items-start sm:justify-end sm:rounded-3xl sm:p-7">
+        <section data-slot="weather-forecast-hero" data-class={cls} style={{ color: "var(--weather-ink)" }} className="relative -mx-4 mb-4 flex min-h-[42svh] flex-col items-center justify-center overflow-hidden bg-transparent p-6 text-center sm:mx-0 sm:min-h-72 sm:items-start sm:justify-end sm:rounded-3xl sm:p-7 sm:text-left">
           <div className="mb-5"><p className="text-xs font-semibold tracking-[.18em] uppercase">{selected.isMyLocation ? labels.myLocation : selected.city}</p><p className="mt-1 text-2xl font-medium sm:text-xl">{selected.isMyLocation ? `${selected.city}${selected.state ? `, ${selected.state}` : ""}` : selected.state ? `${selected.city}, ${selected.state}` : selected.country ? `${selected.city}, ${selected.country}` : selected.city}</p></div>
           <p className="text-[5.5rem] leading-none font-extralight tabular-nums sm:text-7xl">{deg(d.temp)}<span className="text-3xl">{unit}</span></p><p className="mt-2 text-lg">{d.condition}</p><p className="mt-1 text-sm">{d.feelsLike !== undefined ? i18n._({ id: "ui.Feels Like: {temp}", message: "Feels Like: {temp}", values: { temp: `${deg(d.feelsLike)}${unit}` } }) : ""}</p><p className="mt-1 text-sm">{d.high !== undefined && d.low !== undefined ? i18n._({ id: "ui.H:{high} L:{low}", message: "H:{high} L:{low}", values: { high: deg(d.high), low: deg(d.low) } }) : ""}</p>
         </section>
-        {(summary || advice?.length) ? <div style={{ color: "var(--weather-ink)" }}>
+        {(summary || advice?.length) ? <div style={{ color: "var(--weather-ink)" }} className="px-1 sm:px-7">
           {summary ? <p data-slot="weather-forecast-summary" className="mb-4 text-base leading-relaxed">{summary}</p> : null}
           {advice?.length ? <div className="mb-4"><WeatherAdviceChips advice={advice}/></div> : null}
         </div> : null}
