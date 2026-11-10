@@ -11,6 +11,12 @@ export interface PlayerChapter {
 /** The playback rates the rate menu offers (0.5 to 2). */
 export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] as const;
 
+/** The menu rate nearest to a remembered one; a value that is not a positive number is 1x. */
+export function snapRate(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) return 1;
+  return PLAYBACK_RATES.reduce((best, r) => (Math.abs(r - value) < Math.abs(best - value) ? r : best), 1 as number);
+}
+
 /** FileTube's gesture timings. */
 export const DOUBLE_TAP_SKIP_S = 15;
 export const TAP_CHAIN_MS = 800;

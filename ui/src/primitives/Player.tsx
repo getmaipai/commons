@@ -52,6 +52,7 @@ import {
   HOLD_RATE,
   normalizeChapters,
   PLAYBACK_RATES,
+  snapRate,
   PROGRESS_INTERVAL_MS,
   PULL_DOCK_PX,
   isSwipeUp,
@@ -490,7 +491,7 @@ export function Player(props: PlayerProps) {
   // MUSIC-KIT-01: the touch that may become a swipe up on the mini bar.
   const swipe = useRef<{ x: number; y: number; id: number } | null>(null);
   const swiped = useRef(false);
-  const [currentRate, setCurrentRate] = useState(rate ?? 1);
+  const [currentRate, setCurrentRate] = useState(rate === undefined ? 1 : snapRate(rate));
   const [resumeLine, setResumeLine] = useState<number | null>(null);
   const [ended, setEnded] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -692,7 +693,10 @@ export function Player(props: PlayerProps) {
 
   // ---- rate ----
   useEffect(() => {
-    if (rate !== undefined && media.current && !holding) media.current.playbackRate = rate;
+    if (rate === undefined) return;
+    const snapped = snapRate(rate);
+    if (media.current && !holding) media.current.playbackRate = snapped;
+    setCurrentRate(snapped);
   }, [rate, holding]);
 
   const chooseRate = useCallback(
@@ -720,7 +724,7 @@ export function Player(props: PlayerProps) {
     const el = media.current;
     if (!el) return;
     setDuration(el.duration);
-    if (rate !== undefined) el.playbackRate = rate;
+    if (rate !== undefined) el.playbackRate = snapRate(rate);
     if (shouldResume(resumeFrom, el.duration, completed)) {
       resumingRef.current = true;
       el.currentTime = clampTime(resumeFrom!, el.duration);

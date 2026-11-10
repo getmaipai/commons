@@ -1824,6 +1824,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               onShuffle={audioLayout && host?.playMode ? () => host.playMode!.onShuffle() : undefined}
               onRepeat={audioLayout && host?.playMode ? () => host.playMode!.onRepeat() : undefined}
               onQueue={audioLayout && host?.openQueue ? () => host.openQueue!() : undefined}
+              rate={node.rate ? (() => { const saved = node.rate.field ? readField(r, node.rate.field) : undefined; return typeof saved === "number" && saved > 0 ? saved : node.rate.value; })() : undefined}
+              onRateChange={node.rate?.on_change ? (rate) => dispatch(node.rate!.on_change!, [{ ...r, rate }], undefined, { quiet: true, typedArgs: true }) : undefined}
               sleepTimer={node.sleep_timer}
               skip={node.skip}
               doubleTapSeek={node.double_tap_seek}
