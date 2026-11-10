@@ -30,7 +30,6 @@ export const CompanionPack = z
                   ),
                 fps: z.number().gt(0),
                 frames: z.number().int().gte(1),
-                "x-frames-positive": z.any().optional(),
                 rest: z
                   .object({
                     first: z.number().int().gte(0),
@@ -57,7 +56,6 @@ export const CompanionPack = z
                   ),
                 fps: z.number().gt(0),
                 frames: z.number().int().gte(1),
-                "x-frames-positive": z.any().optional(),
                 rest: z
                   .object({
                     first: z.number().int().gte(0),
@@ -84,7 +82,6 @@ export const CompanionPack = z
                   ),
                 fps: z.number().gt(0),
                 frames: z.number().int().gte(1),
-                "x-frames-positive": z.any().optional(),
                 rest: z
                   .object({
                     first: z.number().int().gte(0),
@@ -111,7 +108,6 @@ export const CompanionPack = z
                   ),
                 fps: z.number().gt(0),
                 frames: z.number().int().gte(1),
-                "x-frames-positive": z.any().optional(),
                 rest: z
                   .object({
                     first: z.number().int().gte(0),

@@ -11,6 +11,7 @@ from pydantic import (
     ConfigDict,
     Field,
     PositiveFloat,
+    RootModel,
     confloat,
     conint,
     constr,
@@ -87,6 +88,14 @@ class Clip(BaseModel):
     track: list[float] = Field(..., min_length=1)
     encoding: Literal['stacked-alpha-h264']
     weight: confloat(ge=0.0) | None = None
+
+
+class Clips(RootModel[list[Clip]]):
+    root: list[Clip] = Field(..., max_length=8, min_length=1)
+
+
+class Idle(RootModel[list[Clip]]):
+    root: list[Clip] = Field(..., max_length=8, min_length=2)
 
 
 class Tile1(BaseModel):
