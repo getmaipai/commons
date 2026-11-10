@@ -215,12 +215,14 @@ export const CompanionPack = z
         dir: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
         flowEncoding: z.enum(["int16", "int16-deflate"]).optional(),
       })
-      .strict(),
+      .strict()
+      .optional(),
     eyes: z
       .object({
         dir: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
       })
-      .strict(),
+      .strict()
+      .optional(),
     emotion: z
       .object({
         dir: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),

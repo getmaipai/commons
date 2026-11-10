@@ -133,3 +133,18 @@ path.write_text(source)
 PY
 
 echo "Generated Pydantic v2 models into spec/gen/py/."
+
+# The companion pack schema uses look-around path patterns, which pydantic's
+# default Rust regex engine rejects at import. Give every model in that module
+# the Python regex engine (the generator only does it for root models).
+python3 - <<'PY'
+from pathlib import Path
+
+path = Path("gen/py/companion_pack_schema.py")
+text = path.read_text()
+text = text.replace(
+    "        extra='forbid',\n    )",
+    "        extra='forbid',\n        regex_engine=\"python-re\",\n    )",
+)
+path.write_text(text)
+PY

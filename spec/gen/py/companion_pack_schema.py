@@ -21,6 +21,7 @@ from pydantic import (
 class Tile(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     desktop: Literal[480] | None = None
     phone: Literal[320] | None = None
@@ -29,6 +30,7 @@ class Tile(BaseModel):
 class Budget(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     bytes: conint(ge=1, le=12582912)
     phoneBytes: conint(ge=0) | None = None
@@ -44,6 +46,7 @@ class File(RootModel[str]):
 class Dir(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
 
@@ -59,6 +62,7 @@ class Gain(RootModel[confloat(ge=0.0, le=4.0)]):
 class Rest(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     first: conint(ge=0)
     last: conint(ge=0)
@@ -96,6 +100,7 @@ class MouthSet(RootModel[Dir]):
 class Letters(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     A: conint(ge=0)
     B: conint(ge=0)
@@ -111,6 +116,7 @@ class Letters(BaseModel):
 class Anchor(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     x: float
     y: float
@@ -121,6 +127,7 @@ class Anchor(BaseModel):
 class Mouth(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     letters: Letters
     anchor: Anchor
@@ -133,6 +140,7 @@ class Mouth(BaseModel):
 class Emotion(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
     kinds: list[Literal['angry', 'excited', 'alarmed', 'sad']] = Field(
@@ -144,6 +152,7 @@ class Emotion(BaseModel):
 class Provenance(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     maker: constr(min_length=1)
     makerVersion: str
@@ -154,6 +163,7 @@ class Provenance(BaseModel):
 class States(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     idle: list[Clip]
     listen: list[Clip]
@@ -164,6 +174,7 @@ class States(BaseModel):
 class Life(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     nod: confloat(ge=0.0, le=4.0) | None = None
     brow: confloat(ge=0.0, le=4.0) | None = None
@@ -188,6 +199,7 @@ class Life(BaseModel):
 class FlowDir(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
     flowEncoding: Literal['int16', 'int16-deflate'] | None = None
@@ -200,6 +212,7 @@ class CompanionPack(BaseModel):
 
     model_config = ConfigDict(
         extra='forbid',
+        regex_engine="python-re",
     )
     version: Literal[1]
     id: constr(pattern=r'^[a-z][a-z0-9-]*$')
@@ -207,8 +220,8 @@ class CompanionPack(BaseModel):
     tile: Tile
     states: States
     mouth: Mouth
-    head: FlowDir
-    eyes: Dir
+    head: FlowDir | None = None
+    eyes: Dir | None = None
     emotion: Emotion
     rest: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
     life: Life

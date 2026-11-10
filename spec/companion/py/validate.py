@@ -56,8 +56,8 @@ def validate_companion_pack(
         problems.append("states.idle needs at least 2 clips; add another idle clip.")
     dirs = [
         pack["mouth"]["calm"]["dir"],
-        pack["head"]["dir"],
-        pack["eyes"]["dir"],
+        *([pack["head"]["dir"]] if pack.get("head") else []),
+        *([pack["eyes"]["dir"]] if pack.get("eyes") else []),
         pack["emotion"]["dir"],
     ]
     if pack["mouth"].get("shout"):

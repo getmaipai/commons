@@ -1,3 +1,7 @@
+## [spec-v0.1.364] - 2026-11-10
+
+- PACK-01c, additive. `companion-pack.schema.json` makes `head` and `eyes` optional (their shapes are unchanged), so a pack without the head flow layer or the eyelid pictures is valid; the validator skips the head and eyes checks when a layer is absent and runs them all when it is listed. New fixtures `valid-no-head-eyes.json` and `invalid-head-missing-meta.json`. `scripts/gen-py.sh` now sets the Python regex engine on the companion pack models (pydantic rejects the look-around path patterns otherwise), and the Python pack tests match the 0.1.360 shape.
+
 ## [spec-v0.1.363] - 2026-11-10
 
 - VIDEO-COMPOSER-03. `prompt_bar` supports a compact Image / Video mode selector, mode-specific submit actions, leading and trailing control alignment, icon-only closed choices, dropdown quality presentation and icons on option choices. Defaults are unchanged.

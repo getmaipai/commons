@@ -30,7 +30,7 @@ export function validateCompanionPack(pack: CompanionPack, files?: CompanionPack
   }
 
   if (pack.states.idle.length < 2) problems.push("states.idle needs at least 2 clips; add another idle clip.");
-  const dirs = [pack.mouth.calm.dir, ...(pack.mouth.shout ? [pack.mouth.shout.dir] : []), pack.head.dir, pack.eyes.dir, pack.emotion.dir];
+  const dirs = [pack.mouth.calm.dir, ...(pack.mouth.shout ? [pack.mouth.shout.dir] : []), ...(pack.head ? [pack.head.dir] : []), ...(pack.eyes ? [pack.eyes.dir] : []), pack.emotion.dir];
   if (files) for (const dir of dirs) {
     if (!(`${dir}/meta.json` in files)) problems.push(`${dir} needs meta.json; include the directory metadata file.`);
   }
@@ -39,7 +39,7 @@ export function validateCompanionPack(pack: CompanionPack, files?: CompanionPack
     const total = desktop.reduce((sum, [, size]) => sum + size, 0);
     if (total > pack.budget.bytes) problems.push(`budget.bytes is ${pack.budget.bytes} but desktop files total ${total} bytes; raise the budget or reduce file sizes.`);
     if (pack.tile.desktop === 480 && total > 12582912) problems.push(`budget.bytes desktop files total ${total} bytes, over the desktop limit of 12582912; reduce file sizes.`);
-    for (const [asset, encoding] of [[pack.mouth.calm.dir, pack.mouth.flowEncoding], [pack.head.dir, pack.head.flowEncoding], [pack.emotion.dir, pack.emotion.flowEncoding]] as const) {
+    for (const [asset, encoding] of [[pack.mouth.calm.dir, pack.mouth.flowEncoding] as const, ...(pack.head ? [[pack.head.dir, pack.head.flowEncoding] as const] : []), [pack.emotion.dir, pack.emotion.flowEncoding]] as const) {
       const flows = Object.keys(files).filter((path) => path.startsWith(`${asset}/`) && (path.endsWith(".flow.bin") || path.endsWith(".flow.bin.z")));
       if (encoding === "int16-deflate" && flows.some((path) => !path.endsWith(".z"))) problems.push(`${asset} uses int16-deflate but a flow file lacks .z; match the encoding to the file extension.`);
       if (encoding !== "int16-deflate" && flows.some((path) => path.endsWith(".z"))) problems.push(`${asset} uses int16 but a flow file ends in .z; match the encoding to the file extension.`);

@@ -163,6 +163,36 @@ describe("loader and compositor", () => {
     expect(pack.head?.poses).toEqual(["nod"]); expect(pack.head?.flow.length).toBe(8);
     expect(pack.tracks.a?.m.length).toBe(1); expect(pack.eyes).toBeUndefined(); expect(warnings.length).toBe(2);
   });
+  test("a pack without head and eyes fetches no head or eyes file and keeps the other layers", async () => {
+    const enc = (v: unknown) => new TextEncoder().encode(JSON.stringify(v));
+    const files: Record<string, Uint8Array> = {
+      "emotion/meta.json": enc({ region: [0, 0, 4, 4], kinds: { sad: {} } }),
+      "emotion/sad.flow.bin.z": deflateSync(Buffer.from(new Int16Array(8).buffer)),
+      "clips/a.track.json": enc({ m: [[1, 0, 0, 0, 1, 0]], res: [0] }),
+    };
+    const asked: string[] = [];
+    restore = setPackIO({
+      bytes: async (url) => { asked.push(url); const f = files[url.replace("http://localhost/p/", "")]; if (!f) throw new Error("404"); return f; },
+      raster: async (url) => { asked.push(url); return { w: 4, h: 4, data: new Uint8ClampedArray(64).fill(255) }; }, inflate: async (d) => new Uint8Array(inflateSync(d)),
+    });
+    const clip = { id: "a", file: "clips/a.mp4", fps: 24, frames: 1, rest: { first: 0, last: 0 } };
+    const warnings: string[] = [];
+    const data = { states: { idle: [clip], listen: [], think: [], speak: [] }, rest: "r.webp", emotion: { dir: "emotion", kinds: ["sad"] } };
+    const pack = await loadPackLayers(data, "/p/", (m) => warnings.push(m));
+    expect(asked.some((url) => /\/(head|eyes)\//.test(url))).toBe(false);
+    expect(pack.head).toBeUndefined(); expect(pack.eyes).toBeUndefined();
+    expect(pack.emotion?.kinds.sad?.flow.length).toBe(8); expect(pack.tracks.a?.m.length).toBe(1);
+    expect(warnings.filter((m) => /head|eyes/.test(m))).toEqual([]);
+  });
+  test("speaking runs with only mouth and emotion layers: no lids, no head draw", () => {
+    restore = setSurfaceFactory(() => { throw new Error("no surface expected"); });
+    const draws: string[] = []; const ctx = ctxOf(draws);
+    const comp = new SpeechCompositor({ id: "man", tracks: {}, life: {}, emotion: { region: [0, 0, 4, 4], kinds: {} }, loadShout: async () => undefined }, undefined, () => 0);
+    comp.setSpeech({ cues: [], loudness: new Float32Array(10), events: [], clock: () => 0.1 });
+    for (const now of [16, 32, 48]) expect(() => comp.draw(ctx, { clipId: "x", frameIndex: 0, now })).not.toThrow();
+    expect(comp.active).toBe(true);
+    expect(draws).toEqual([]);
+  });
   test("no speech means no work; fade out finishes inside 90 ms", () => {
     restore = setSurfaceFactory(() => { throw new Error("no surface expected"); });
     const draws: string[] = []; const ctx = ctxOf(draws);

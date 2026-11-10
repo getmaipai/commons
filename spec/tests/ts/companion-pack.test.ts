@@ -54,4 +54,16 @@ describe("PACK-01b CompanionPack fixtures", () => {
     expect(result).toContain("mouth/calm needs meta.json; include the directory metadata file.");
     expect(result).toContain("states.idle[1].phone has no matching file in files; include the phone twin.");
   });
+  test("a pack without head and eyes needs no head or eyes folders", () => {
+    const pack = read("valid-no-head-eyes.json");
+    expect(pack.head).toBeUndefined();
+    expect(pack.eyes).toBeUndefined();
+    const result = validateCompanionPack(pack, { "mouth/calm/meta.json": 1, "mouth/shout/meta.json": 1, "emotion/meta.json": 1 });
+    expect(result.filter((problem) => problem.includes("meta.json"))).toEqual([]);
+  });
+  test("a listed but broken head still fails", () => {
+    const pack = read("invalid-head-missing-meta.json");
+    const result = validateCompanionPack(pack, { "mouth/calm/meta.json": 1, "mouth/shout/meta.json": 1, "emotion/meta.json": 1 });
+    expect(result).toContain("head needs meta.json; include the directory metadata file.");
+  });
 });

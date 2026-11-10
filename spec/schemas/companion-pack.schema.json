@@ -5,7 +5,7 @@
   "description": "PACK-01b: a portable animation and expression pack for one companion.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "id", "name", "tile", "states", "mouth", "head", "eyes", "emotion", "rest", "life", "budget", "provenance"],
+  "required": ["version", "id", "name", "tile", "states", "mouth", "emotion", "rest", "life", "budget", "provenance"],
   "properties": {
     "version": {"type":"integer", "const":1},
     "id": {"type":"string", "pattern":"^[a-z][a-z0-9-]*$"},

@@ -1,3 +1,7 @@
+## [ui-v0.5.582] - 2026-11-10
+
+- PACK-05b, additive. `CompanionPackPlayer` loads and speaks a pack that has no `head` and/or no `eyes` layer: the loader fetches no `head/` or `eyes/` file, no head or eyelid layer is created, and the mouth, emotion and shoulder layers run as before. Pairs with spec-v0.1.364, where those two layers are optional.
+
 ## [ui-v0.5.581] - 2026-11-10
 
 - VIDEO-COMPOSER-03. The chat prompt toolbar adds a compact Image / Video selector and distributes the existing choices to the leading and trailing sides. The mode keeps its icon and word; compact Sound and Shape choices show only their icons when closed. The Quality dropdown reuses Chat’s icon-only answer-style control and explains each level in one line. Image prompts hand off to Chat for the real image-generation tool; sending remains the person’s choice. Existing block and composer layouts are unchanged.
