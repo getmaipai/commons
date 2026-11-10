@@ -1,3 +1,7 @@
+## [ui-v0.5.579] - 2026-11-10
+
+- PACK-05, additive. `CompanionPackPlayer` speaks: an optional `speech` prop (cues, loudness, events, emotion, audio clock) drives the mouth (photo warp or tile morph), head and brow flows, eyelids, the four emotion looks and the shoulder shift on a 2D canvas over the matte video, ported from the proof of concept and checked on three real packs in WebKit. Each layer fades when the head track is unreliable. The player keeps the picture's aspect ratio in any container (it stretched in a tall pane before) and the speech canvas sits exactly over the video canvas. Not yet used by Home for speech.
+
 ## [ui-v0.5.578] - 2026-11-10
 
 - VIDEO-COMPOSER-02. `prompt_bar.layout: "chat"` adapts the Chat input pattern for video creation: one growing prompt field, frame attachment and compact option and tier controls in a shared toolbar, with a round Generate action. Existing block and composer layouts are unchanged.

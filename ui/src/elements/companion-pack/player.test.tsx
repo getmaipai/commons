@@ -206,7 +206,8 @@ test("still image is used when WebGL setup fails", () => {
 // Regressions found by running the real packs in WebKit (2026-11-10): a relative base failed as a URL, and the drawing buffer stayed 300x150.
 test("a relative baseUrl resolves against the page", () => {
   const view = render(<CompanionPackPlayer pack={pack} baseUrl="/packs/man/" state="idle" reducedMotion />);
-  expect(view.container.querySelector("img")?.getAttribute("src")).toBe(new URL("/packs/man/rest.webp", /^https?:/.test(window.location.href) ? window.location.href : "http://localhost/").href);
+  const origin = /^https?:/.test(window.location.href) ? window.location.href : "http://localhost/";
+  expect(view.container.querySelector("img")?.getAttribute("src")).toBe(new URL("/packs/man/rest.webp", origin).href);
   view.unmount();
 });
 
@@ -222,4 +223,22 @@ test("the drawing buffer matches the tile size of the tier", () => {
   phone.unmount();
   restore();
   window.requestAnimationFrame = oldRaf;
+});
+
+test("a non-square container keeps the tile aspect and the speech overlay shares the base canvas box", () => {
+  const view = render(<div style={{ width: 327, height: 579 }}>
+    <CompanionPackPlayer pack={pack} baseUrl="https://example.test/p/" state="idle" size="100%" />
+  </div>);
+  const canvases = view.container.querySelectorAll("canvas");
+  expect(canvases.length).toBe(2);
+  const [base, overlay] = Array.from(canvases) as HTMLCanvasElement[];
+  for (const canvas of [base!, overlay!]) {
+    expect(canvas.style.objectFit).toBe("contain");
+    expect(canvas.style.objectPosition).toBe("center");
+    expect(canvas.style.width).toBe("100%");
+    expect(canvas.style.height).toBe("100%");
+  }
+  expect(overlay!.style.position).toBe("absolute");
+  expect(overlay!.style.inset).toBe("0");
+  expect(view.container.querySelector("[data-pack-player]")?.getAttribute("style")).toContain("100%");
 });

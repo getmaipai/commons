@@ -8,10 +8,20 @@ export type PackClip = {
   frames: number;
   rest: { first: number; last: number };
   weight?: number;
+  /** Per-frame head track (clips/<name>.track.json: affines `m` and a residual `res`), relative to the pack folder. */
+  trackFile?: string;
 };
 export type CompanionPackData = {
   states: Record<PackState, PackClip[]>;
   rest: string;
+  /** Pack id; picks the speaking render profile (man, clay, pixar) when no profile is given. */
+  id?: string;
+  /** Speaking layers (PACK-05); every part is optional and a missing folder simply turns that layer off. */
+  mouth?: { warp?: boolean; calm?: { dir: string }; shout?: { dir: string } };
+  head?: { dir: string };
+  eyes?: { dir: string };
+  emotion?: { dir: string; kinds?: string[] };
+  life?: Record<string, number>;
 };
 export type PlayerTier = "desktop" | "phone";
 export type PlayerFrame = {

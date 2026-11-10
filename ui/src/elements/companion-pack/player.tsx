@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { SpeechCompositor } from "./compositor";
+import { loadPackLayers } from "./pack-loader";
+import type { SpeechInput } from "./speech";
 import { createSequencer, planSwitch, restHoldMs } from "./sequencer";
 import { stackedAlphaRendererFactory, type StackedAlphaRenderer } from "./stacked-alpha";
 import type { CompanionPackData, PackClip, PackState, PlayerFrame, PlayerLayer, PlayerTier } from "./types";
@@ -14,17 +17,25 @@ export type CompanionPackPlayerProps = {
   paused?: boolean;
   onStateSettled?: (state: PackState, clipId: string) => void;
   layers?: PlayerLayer[];
+  /** A spoken line to animate: mouth, eyelids, head, emotion and shoulder layers run on a 2D overlay while it is present. */
+  speech?: SpeechInput;
+  /** Milliseconds the speaking layers took on each composited frame. */
+  onSpeechFrame?: (ms: number) => void;
 };
 
-type LoadedClip = { clip: PackClip; video: HTMLVideoElement; state: PackState; ready: boolean };
+type LoadedClip = { clip: PackClip; video: HTMLVideoElement; state: PackState; ready: boolean; shown?: number };
 type PendingSwitch = { item?: LoadedClip; state: PackState; untilFrame: number };
-type Controller = { setState(state: PackState): void; setPaused(paused: boolean): void; setLayers(layers: PlayerLayer[]): void };
+type Controller = {
+  setState(state: PackState): void; setPaused(paused: boolean): void; setLayers(layers: PlayerLayer[]): void; setSpeech(speech: SpeechInput | undefined): void;
+};
 export let packVideoFactory = () => document.createElement("video");
 export function setPackVideoFactory(factory: typeof packVideoFactory): () => void {
   const previous = packVideoFactory;
   packVideoFactory = factory;
   return () => { packVideoFactory = previous; };
 }
+/** The tile is square: in any container it keeps its aspect ratio and sits centred; the overlay shares this exact box. */
+export const TILE_CANVAS_STYLE = { width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" } as const;
 const STATES: PackState[] = ["idle", "listen", "think", "speak"];
 const EMPTY_LAYERS: PlayerLayer[] = [];
 Object.freeze(EMPTY_LAYERS);
@@ -37,9 +48,14 @@ const absolute = (base: string, file: string) => {
 
 export function CompanionPackPlayer({
   pack, baseUrl, state, tier = "auto", size, seed = 1, reducedMotion, paused = false,
-  onStateSettled, layers = EMPTY_LAYERS,
+  onStateSettled, layers = EMPTY_LAYERS, speech, onSpeechFrame,
 }: CompanionPackPlayerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const overlayRef = useRef<HTMLCanvasElement>(null);
+  const speechRef = useRef(speech);
+  const speechFrameRef = useRef(onSpeechFrame);
+  speechRef.current = speech;
+  speechFrameRef.current = onSpeechFrame;
   const controllerRef = useRef<Controller | null>(null);
   const stateRef = useRef(state);
   const pausedRef = useRef(paused);
@@ -111,6 +127,27 @@ export function CompanionPackPlayer({
     let lastVideoTime = -1;
     let frameArrived = false;
     let layersToDispose = new Set<PlayerLayer>();
+    let compositor: SpeechCompositor | undefined;
+    let loadingLayers = false;
+    let overlayCtx: CanvasRenderingContext2D | null = null;
+    let overlayShown = false;
+    const showOverlay = (show: boolean) => {
+      const overlay = overlayRef.current;
+      if (!overlay || show === overlayShown) return;
+      overlayShown = show;
+      overlay.style.display = show ? "block" : "none";
+      canvas.style.visibility = show ? "hidden" : "visible";
+    };
+    const startSpeech = (line: SpeechInput | undefined) => {
+      compositor?.setSpeech(line);
+      if (!line || compositor || loadingLayers) return;
+      loadingLayers = true;
+      void loadPackLayers(pack, baseUrl).then((loaded) => {
+        if (disposed) return;
+        compositor = new SpeechCompositor(loaded);
+        compositor.setSpeech(speechRef.current);
+      }).catch(() => { loadingLayers = false; });
+    };
     let requestedState = stateRef.current;
     let initializedState = requestedState;
     const frameCap = () => tierRef.current === "phone" ? 30 : 60;
@@ -128,6 +165,11 @@ export function CompanionPackPlayer({
       } catch { /* Relative paths inherit the document origin. */ }
       const item: LoadedClip = { clip, video, state: clipState, ready: false };
       clips.push(item);
+      // The head track must follow the frame actually on screen, not the (possibly newer) currentTime.
+      if (video.requestVideoFrameCallback) {
+        const onFrame = (_now: number, metadata: VideoFrameCallbackMetadata) => { item.shown = metadata.mediaTime; video.requestVideoFrameCallback(onFrame); };
+        video.requestVideoFrameCallback(onFrame);
+      }
       if (video.readyState >= 2) item.ready = true;
       loading += 1;
       const loaded = () => { item.ready = true; loading = Math.max(0, loading - 1); setReady(true); };
@@ -215,8 +257,22 @@ export function CompanionPackPlayer({
       const video = active.video;
       const frameIndex = Math.round(video.currentTime * active.clip.fps);
       const hasNewFrame = video.currentTime !== lastVideoTime || frameArrived;
-      if (video.readyState >= 2 && hasNewFrame && now - lastDrawTime >= 1000 / frameCap()) {
+      const compositing = Boolean(compositor?.active);
+      if (video.readyState >= 2 && (hasNewFrame || compositing) && now - lastDrawTime >= 1000 / frameCap()) {
         renderer.draw(video);
+        if (compositing && compositor) {
+          const overlay = overlayRef.current;
+          overlayCtx ??= overlay?.getContext("2d", { willReadFrequently: true }) ?? null;
+          if (overlay && overlayCtx) {
+            if (overlay.width !== canvas.width) { overlay.width = canvas.width; overlay.height = canvas.height; }
+            overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
+            overlayCtx.drawImage(canvas, 0, 0);
+            const shownTime = (active.shown ?? 0) > 0 || video.currentTime < 0.05 ? (active.shown ?? 0) : video.currentTime;
+            const drawn = compositor.draw(overlayCtx, { clipId: active.clip.id, frameIndex: Math.round(shownTime * active.clip.fps), now });
+            showOverlay(drawn || compositor.active);
+            if (drawn) speechFrameRef.current?.(compositor.lastMs);
+          }
+        } else showOverlay(false);
         lastDrawTime = now;
         lastVideoTime = video.currentTime;
         frameArrived = false;
@@ -289,6 +345,7 @@ export function CompanionPackPlayer({
           if (!raf) raf = window.requestAnimationFrame(tick);
         }
       },
+      setSpeech(line) { startSpeech(line); },
       setLayers(nextLayers) {
         const nextSet = new Set(nextLayers);
         layersToDispose.forEach((layer) => { if (!nextSet.has(layer)) layer.dispose?.(); });
@@ -297,9 +354,11 @@ export function CompanionPackPlayer({
     };
     layersToDispose = new Set(layersRef.current);
     controllerRef.current = controller;
+    startSpeech(speechRef.current);
     if (!hidden && !pausedRef.current) raf = window.requestAnimationFrame(tick);
     return () => {
       disposed = true;
+      compositor = undefined;
       document.removeEventListener("visibilitychange", onVisibility);
       if (raf) window.cancelAnimationFrame(raf);
       clips.forEach(({ video }) => { video.pause(); video.removeAttribute("src"); video.load(); });
@@ -315,9 +374,15 @@ export function CompanionPackPlayer({
     controllerRef.current?.setLayers(layers);
   }, [state, paused, layers]);
 
+  useEffect(() => { controllerRef.current?.setSpeech(speech); }, [speech]);
+
   const stillUrl = absolute(baseUrl, pack.rest);
   const dimension = typeof size === "number" ? `${size}px` : size ?? "100%";
   return <div style={{ width: dimension, height: dimension, position: "relative" }} data-pack-player data-clip={currentClipId}>
-    {staticMode ? <img src={stillUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <canvas ref={canvasRef} aria-hidden="true" style={{ width: "100%", height: "100%", display: "block" }} data-ready={ready} />}
+    {staticMode ? <img src={stillUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <>
+      <canvas ref={canvasRef} aria-hidden="true" style={{ ...TILE_CANVAS_STYLE, display: "block" }} data-ready={ready} />
+      <canvas ref={overlayRef} aria-hidden="true" data-pack-speech
+        style={{ ...TILE_CANVAS_STYLE, position: "absolute", inset: 0, display: "none", pointerEvents: "none" }} />
+    </>}
   </div>;
 }

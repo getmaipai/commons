@@ -25,7 +25,8 @@ export function createStillRenderer(canvas: HTMLCanvasElement, stillUrl?: string
 
 export const stackedAlphaShaderSources = {
   vertex: "attribute vec2 p; varying vec2 u; void main(){u=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}",
-  fragment: "precision mediump float;uniform sampler2D t;varying vec2 u;void main(){vec3 c=texture2D(t,vec2(u.x,u.y*.5)).rgb;float a=texture2D(t,vec2(u.x,.5+u.y*.5)).r;gl_FragColor=vec4(min(c,vec3(a)),a);}",
+  fragment: "precision mediump float;uniform sampler2D t;varying vec2 u;void main(){vec3 c=texture2D(t,vec2(u.x,u.y*.5)).rgb;"
+    + "float a=texture2D(t,vec2(u.x,.5+u.y*.5)).r;gl_FragColor=vec4(min(c,vec3(a)),a);}",
 };
 
 function compile(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
