@@ -1,3 +1,7 @@
+## [spec-v0.1.357] - 2026-11-10
+
+- CLIPS-FEED-02, no schema change. `PACKAGE_PAGE_NODE_TYPES` in `ui/app-check.ts` did not list `clip_feed` (added in 0.1.355), so a package page using it was refused and the whole app failed to register. It is now allowed, and the checker applies the package rules to it: `bind` is a package list entry, `item_fields` are field paths, and `actions` and `on_close` stay under the app. `widget_tiles` stays refused on purpose (it reads another route, like `widget_card`). Pages valid before stay valid.
+
 ## [spec-v0.1.356] - 2026-11-10
 
 - VIDEO-UI-15, additive. `action.call.fresh_confirm` asks the host for a fresh secret and merges its ticket for call argument templates; `result_feed.actions[].show_when` gates an action on a truthy dotted row field, and actions now allow up to eight. Existing pages remain unchanged. Pairs with ui-v0.5.570.

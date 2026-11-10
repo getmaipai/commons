@@ -20,7 +20,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio", "clip_feed"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -162,6 +162,13 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
         if (!data.has(path)) out.push(`${where} studio.export_result.poll_while.record: path "${path}" is not a contributes.data id of this package`);
       }
     }
+  }
+  // CLIPS-FEED-01: the clip feed binds the package's own clip rows; its field paths are paths, and its rail actions and Close stay under the package.
+  if (type === "clip_feed") {
+    checkBinding(node.bind, `${where} clip_feed`, data, "list", out);
+    if (isObject(node.item_fields)) for (const [name, value] of Object.entries(node.item_fields)) checkFieldPath(value, `${where} clip_feed.item_fields`, name, out);
+    if (isObject(node.actions)) for (const [key, handler] of Object.entries(node.actions)) checkAction(handler, packageId, `${where} clip_feed.actions.${key}`, out);
+    checkAction(node.on_close, packageId, `${where} clip_feed.on_close`, out);
   }
   if (type === "billboard") {
     checkBinding(node.bind, `${where} billboard`, data, "list", out);

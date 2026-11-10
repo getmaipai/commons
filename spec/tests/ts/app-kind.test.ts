@@ -454,3 +454,27 @@ describe("contributes.header (MEDIA-HEADER-01)", () => {
     }
   });
 });
+
+describe("CLIPS-FEED-02: a clip_feed on a package page", () => {
+  // The fixture's links point at the videos app; the app under test is "clips", so only those two links are repointed.
+  const raw = readFileSync(join(import.meta.dir, "..", "..", "ui", "pages", "clips-feed.json"), "utf-8");
+  const clips = JSON.parse(raw.replace("/apps/videos/make", "/apps/clips/make").replace("/apps/videos", "/apps/clips"));
+  const clipsContributes: AppContributes = {
+    pages: [{ id: "index", label: "Clips", icon: "film", nav: true, kind: "schema", module: "clips-feed" }],
+    data: [{ id: "clips", rows: "list" }],
+  };
+  const withBody = (body: unknown[]) => () => ({ type: "page", id: "index", title: "Clips", body });
+  test("the clips-feed fixture passes the package-page checker", () => {
+    expect(checkAppPackage("clips", clipsContributes, () => clips)).toEqual([]);
+  });
+  test("a clip_feed keeps the package rules: own data, own routes", () => {
+    const feed = clips.body[0];
+    const foreign = { ...feed, bind: { source: "route", path: "/api/media" } };
+    expect(checkAppPackage("clips", clipsContributes, withBody([foreign])).join("\n")).toContain('clip_feed: bind.source must be "package"');
+    const outside = { ...feed, on_close: { navigate: { to: "/apps/news" } } };
+    expect(checkAppPackage("clips", clipsContributes, withBody([outside])).join("\n")).toContain("clip_feed.on_close: navigate.to");
+  });
+  test("an unknown node type is still refused", () => {
+    expect(checkAppPackage("clips", clipsContributes, withBody([{ type: "clip_reel" }])).join("\n")).toContain('node type "clip_reel" is not allowed');
+  });
+});
