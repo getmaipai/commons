@@ -200,6 +200,11 @@ function VideoPlayerBody({
   actions,
   copy,
   className,
+  bare = false,
+  muted,
+  preload = "metadata",
+  mediaRef,
+  onMediaError,
 }: {
   status: VideoPlayerStatus;
   /** What the person asked for: the caption and the player's accessible name. */
@@ -278,6 +283,17 @@ function VideoPlayerBody({
   actions?: ReactNode;
   copy?: VideoPlayerCopy;
   className?: string;
+  /** CLIPS-FEED-01: the picture alone for a ready clip (a `video` that fills its parent, covers it, no card, caption, controls or
+   * row), so a feed can lay its own stage and rail over it. Other statuses draw as usual. */
+  bare?: boolean;
+  /** CLIPS-FEED-01: sets the `video`'s muted property (bare and normal). Absent: the browser default. */
+  muted?: boolean;
+  /** CLIPS-FEED-01: the `video`'s preload; default "metadata" (today's behaviour). */
+  preload?: "none" | "metadata" | "auto";
+  /** CLIPS-FEED-01: receives the ready clip's `video` element (null on unmount). */
+  mediaRef?: (el: HTMLVideoElement | null) => void;
+  /** CLIPS-FEED-01: called when the clip's file cannot load. */
+  onMediaError?: () => void;
 }) {
   const text = { ...defaultCopy(), ...copy };
   const live = status === "queued" || status === "generating";
@@ -333,6 +349,27 @@ function VideoPlayerBody({
     <FavoriteToggle label={text.favorite} pressed={favorite} icons={icons} disabledReason={favoriteControl.disabledReason} onToggle={() => onFavorite(!favorite)} />
   ) : null;
 
+  const setVideo = (el: HTMLVideoElement | null) => { videoRef.current = el; mediaRef?.(el); };
+  if (bare && status === "ready" && src) {
+    return (
+      // Clips carry no captions here; the feed's title is drawn by the feed.
+      // eslint-disable-next-line jsx-a11y/media-has-caption
+      <video
+        data-slot="video-player-media"
+        data-bare=""
+        ref={setVideo}
+        className={cn("block size-full object-cover", className)}
+        src={src}
+        poster={poster}
+        muted={muted}
+        loop={loop}
+        playsInline
+        preload={preload}
+        aria-label={prompt}
+        onError={onMediaError}
+      />
+    );
+  }
   const picture = (
       status === "draft" ? (
         <div data-slot="video-player-still" className="bg-muted relative block w-full overflow-hidden" style={{ aspectRatio: ratio }}>
@@ -343,16 +380,18 @@ function VideoPlayerBody({
         // eslint-disable-next-line jsx-a11y/media-has-caption
         <video
           data-slot="video-player-media"
-          ref={videoRef}
+          ref={setVideo}
           className="bg-muted block w-full"
           style={{ aspectRatio: ratio }}
           src={src}
           poster={poster}
+          muted={muted}
+          preload={preload}
+          onError={onMediaError}
           controls={overlay ? playing : true}
           {...(overlay ? { onPlay: () => setPlaying(true), onPause: () => setPlaying(false), onEnded: () => setPlaying(false) } : {})}
           loop={loop}
           playsInline
-          preload="metadata"
           aria-label={prompt}
         >
           {tracks?.map((track, index) => <track key={`${track.srclang}-${index}`} src={track.src} kind={track.kind ?? "subtitles"} label={track.label} srcLang={track.srclang} default={track.default} />)}

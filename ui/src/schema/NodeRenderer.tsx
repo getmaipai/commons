@@ -60,6 +60,8 @@ import { ReorderFailure, type ReorderConfig } from "@/kit/primitives/reorder";
 import { DeviceTiles, type DeviceCommand } from "@/kit/elements/device-tiles";
 import { StudioNodeView } from "@/kit/schema/StudioNodeView";
 import { ResultFeedNodeView } from "@/kit/schema/ResultFeedNodeView";
+import { ClipFeedNodeView } from "@/kit/schema/ClipFeedNodeView";
+import { isOwnBlobUrl, localPicture } from "@/kit/schema/mediaPath";
 import { evaluateCondition } from "@/kit/schema/condition";
 import { fillTemplate, readField, writeField } from "@/kit/schema/fieldPath";
 import { i18n } from "@/kit/i18n";
@@ -1216,19 +1218,6 @@ function CardGridNodeView({ node }: { node: CardGridNode }) {
 /** VIDEO-UI-14: a same-origin clip path (starting with one `/`), else none; the tile then shows its poster alone. */
 function localVideo(value: unknown): string | null {
   return localPicture(value);
-}
-
-function localPicture(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  if (value.startsWith("/") && !value.startsWith("//")) return value;
-  return isOwnBlobUrl(value) ? value : null;
-}
-
-/** ADULT-LOCK-03b: a `blob:` object URL this page made for its own origin. An unlocked adult-only picture or clip cannot ride on a plain path (the proof is a
- * header, and a `<img src>` or `<video src>` cannot send one), so the host fetches it with the header into a Blob and hands the row that object URL. A page can
- * only make blob URLs for its own origin, so this loads nothing from elsewhere; any other scheme or host is still refused. */
-function isOwnBlobUrl(value: string): boolean {
-  return typeof location !== "undefined" && location.origin !== "null" && value.startsWith(`blob:${location.origin}/`);
 }
 
 /** Each row's day group key, in order. A row with no readable date joins the group before it (the first one, "undated"). */
@@ -2405,7 +2394,7 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
     case "result_feed":
       return <ResultFeedNodeView node={node} state={state} />;
     case "clip_feed":
-      return <ExternallyMountedNodeView label="clip_feed" />;
+      return <ClipFeedNodeView node={node} state={state} />;
     case "studio":
       return <StudioNodeView node={node} state={state} />;
     case "tabs":
