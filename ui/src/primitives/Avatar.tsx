@@ -24,7 +24,7 @@ interface AvatarProps {
    * separate, not-yet-spec'd field and out of scope here. */
   seed?: string | null;
   className?: string;
-  size?: "default" | "profile";
+  size?: "default" | "profile" | "hero";
   accent?: ProfileAccent;
   /** A small filled dot on the avatar's own corner - the phone header
    * fold's own stand-in for a separate notification badge (owner
@@ -88,7 +88,7 @@ export function Avatar({ name, seed, className, size = "default", accent, dot, t
       // The caller's text size (SignIn's `text-xl`, Shell's `text-sm`,
       // MessageThread's `text-sm`) sets the font-size here, on the root.
       className={cn(
-        size === "profile" ? "size-16 text-xl" : "size-12",
+        size === "hero" ? "size-24 text-3xl" : size === "profile" ? "size-16 text-xl" : "size-12",
         "bg-primary text-primary-foreground font-semibold text-base after:hidden",
         accent && "ring-2 ring-offset-2 ring-offset-card ring-[var(--profile-accent-active)]",
         className,
