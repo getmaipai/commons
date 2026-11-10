@@ -1,3 +1,7 @@
+## [spec-v0.1.359] - 2026-11-10
+
+- PACK-01, additive. New `companion-pack.schema.json` (states with arrays of clips, mouth atlas and flows, eyes, emotion layers, life channels, budget, provenance), generated TypeScript and Python types, and a pure `validateCompanionPack` validator with fixtures for the three demo characters. Replaces the unbuilt TALK-04 `animation.mouth` plan; `manifest.schema.json` is untouched.
+
 ## [spec-v0.1.358] - 2026-11-10
 
 - STYLES-CIVITAI-01, additive default change. `generation.styles.civitai` now defaults to true (Civitai search and install on) and its help and the Styles area note say Home contacts civitai.com only when an admin searches or installs a style. A household that set it explicitly keeps its value.
