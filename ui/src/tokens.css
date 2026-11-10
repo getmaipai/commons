@@ -1715,6 +1715,25 @@
 
 }
 
+/* PRO-LOOK-THEMES-01: map shared surface roles from the active Look.
+ * Look classes live on body; place these derivations there so var() resolves
+ * against that Look instead of the root fallback palette. */
+body[class*="style-"] {
+  --surface-page: var(--background);
+  --surface-card: var(--card);
+  --surface-pane: color-mix(in oklab, var(--card) 68%, var(--muted));
+  --surface-sidebar: var(--sidebar);
+  --surface-stage: color-mix(in oklab, var(--background), var(--foreground) 6%);
+  --surface-0: var(--surface-page);
+  --surface-1: var(--surface-card);
+  --surface-2: var(--surface-pane);
+  --surface-glass: color-mix(in srgb, var(--surface-card) 84%, transparent);
+  --accent-create: var(--primary);
+}
+html.dark body[class*="style-"] {
+  --surface-stage: color-mix(in srgb, var(--background), black 34%);
+}
+
 /* Settings tokens (KIT-SET-01, 2026-10-06). The look of the one settings
  * shell, measured from the ChatGPT settings reference (design note
  * APP-SETTINGS-DESIGN.md section 4.1), declared once for light, dark and

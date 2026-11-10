@@ -462,20 +462,16 @@ function StudioBody(props: TrackStudioProps) {
       </div>
 
       <div className="min-w-0 lg:col-start-2 lg:row-start-2" data-slot="track-studio-panels">
-        {isPhone ? (
-          <div className="bg-card flex flex-col gap-3 rounded-2xl p-4">
-            <div role="radiogroup" aria-label={i18n._({ id: "ui.Panel", message: "Panel" })} className="grid grid-cols-4 gap-1">
-              {panels.map((p) => (
-                <Button key={p} variant={panelTab === p ? "default" : "secondary"} size="sm" role="radio" aria-checked={panelTab === p} className="rounded-full px-2" onClick={() => setPanelTab(p)}>{panelBodies[p].title}</Button>
-              ))}
-            </div>
+        <div className="bg-card flex flex-col gap-3 rounded-2xl p-4">
+          <div role="radiogroup" aria-label={i18n._({ id: "ui.Panel", message: "Panel" })} className="grid grid-cols-2 gap-2">
+            {panels.map((p) => (
+              <Button key={p} variant={panelTab === p ? "default" : "secondary"} size={isPhone ? "sm" : "default"} role="radio" aria-checked={panelTab === p} className="rounded-full px-2" onClick={() => setPanelTab(p)}>{panelBodies[p].title}</Button>
+            ))}
+          </div>
+          <section aria-label={panelBodies[panelTab]?.title ?? panelBodies[panels[0]!]!.title}>
             <PanelBody panel={panelBodies[panelTab] ?? panelBodies[panels[0]!]} />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            {panels.map((p) => <section key={p} aria-label={panelBodies[p].title} className="bg-card flex flex-col gap-3 rounded-2xl p-4"><PanelBody panel={panelBodies[p]} /></section>)}
-          </div>
-        )}
+          </section>
+        </div>
         <p className="text-muted-foreground mt-3 text-sm lg:hidden">{previewLine()}</p>
       </div>
     </section>

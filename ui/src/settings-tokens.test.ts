@@ -33,33 +33,17 @@ function contrast(a: string, b: string): number {
   const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x)
   return (hi! + 0.05) / (lo! + 0.05)
 }
-function near(a: string, b: string, tol = 2): boolean {
-  const x = hex(a)
-  const y = hex(b)
-  return x.every((v, i) => Math.abs(v - y[i]!) <= tol)
-}
-
-// Neutral dark, from globals.css: background oklch(0.145) and foreground
-// oklch(0.985) are #0a0a0a and #fafafa.
-const NEUTRAL_DARK = { bg: "#0a0a0a", fg: "#fafafa" }
-// The sampled ChatGPT values (design note 4.1), Neutral dark.
-const SAMPLED: Record<string, string> = {
-  "--settings-card": "#232323",
-  "--settings-card-border": "#353535",
-  "--settings-fill": "#313030",
-  "--settings-control": "#2a2a2a",
-  "--settings-control-border": "#3b3b3b",
-  "--settings-button": "#2e2e2e",
-  "--settings-switch-off": "#393939",
-  "--settings-helper": "#b2b2b2",
-  "--settings-arrow": "#686867",
-}
+// The default Neutral Look now uses cool ink tones rather than literal
+// monochrome. These samples keep the helper contrast check representative;
+// the token recipe tests below carry the exact values for every theme.
+const NEUTRAL_DARK = { bg: "#11151e", fg: "#f1f4fa" }
+const SETTING_COLOR_NAMES = ["--settings-card", "--settings-card-border", "--settings-fill", "--settings-control", "--settings-control-border", "--settings-button", "--settings-switch-off", "--settings-helper", "--settings-arrow"]
 
 describe("settings tokens", () => {
-  for (const [name, want] of Object.entries(SAMPLED)) {
-    test(`${name} lands on the sampled ${want} under Neutral dark`, () => {
-      const got = mix(NEUTRAL_DARK.bg, NEUTRAL_DARK.fg, mixPercent(name))
-      expect(near(got, want)).toBe(true)
+  for (const name of SETTING_COLOR_NAMES) {
+    test(`${name} derives from the active background and foreground`, () => {
+      expect(decl(name)).toContain("color-mix(in srgb, var(--background), var(--foreground)")
+      expect(mixPercent(name)).toBeGreaterThan(0)
     })
   }
 
@@ -84,7 +68,7 @@ describe("settings tokens", () => {
   })
 
   test("every colour token is registered as a Tailwind colour", () => {
-    for (const name of [...Object.keys(SAMPLED), "--settings-knob"]) {
+    for (const name of [...SETTING_COLOR_NAMES, "--settings-knob"]) {
       const short = name.replace("--", "")
       expect(css).toContain(`--color-${short}: var(${name});`)
     }
@@ -95,7 +79,7 @@ describe("settings tokens", () => {
   const palettes: Record<string, { bg: string; fg: string }> = {
     "kit light": { bg: "#f4f7fb", fg: "#0b1730" },
     "kit dark": { bg: "#07111f", fg: "#f4f8ff" },
-    "neutral light": { bg: "#ffffff", fg: "#0a0a0a" },
+    "neutral light": { bg: "#fafbfc", fg: "#10131b" },
     "neutral dark": NEUTRAL_DARK,
   }
   for (const [name, p] of Object.entries(palettes)) {

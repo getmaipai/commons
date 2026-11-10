@@ -129,7 +129,7 @@ describe("the leak test: a locked clip draws and loads nothing", () => {
 });
 
 describe("what is drawn", () => {
-  test("three lanes in order, pieces named for a screen reader, a ruler, a transport and the four panels", async () => {
+  test("three lanes in order, pieces named for a screen reader, a ruler, a transport and one chosen edit panel", async () => {
     const { container, getByRole } = open();
     await flush();
     expect([...container.querySelectorAll("[data-lane]")].map((l) => l.getAttribute("data-lane"))).toEqual(["video", "voice", "music"]);
@@ -138,7 +138,12 @@ describe("what is drawn", () => {
     expect(getByRole("button", { name: "Play" })).toBeTruthy();
     expect(getByRole("button", { name: /Back to start/ })).toBeTruthy();
     expect(getByRole("button", { name: /Loop/ })).toBeTruthy();
-    for (const panel of ["Volume", "Fades", "Crossfade", "Level"]) expect(container.querySelector(`section[aria-label="${panel}"]`)).toBeTruthy();
+    expect(container.querySelector(`section[aria-label="Volume"]`)).toBeTruthy();
+    const panelChoice = getByRole("radiogroup", { name: "Panel" });
+    for (const panel of ["Volume", "Fades", "Crossfade", "Level"]) expect(within(panelChoice).getByRole("radio", { name: panel })).toBeTruthy();
+    fireEvent.click(within(panelChoice).getByRole("radio", { name: "Crossfade" }));
+    expect(container.querySelector(`section[aria-label="Crossfade"]`)).toBeTruthy();
+    expect(container.querySelector(`section[aria-label="Volume"]`)).toBeNull();
     expect(container.textContent).toContain(HELP_LINE);
     expect(container.textContent).toContain(PREVIEW_LINE);
     expect(container.textContent).toContain("0:00 / 0:13");
@@ -337,6 +342,7 @@ describe("the Edit tools and panels", () => {
   });
   test("Fades: sliders are bounded by the piece's length and drawn on the piece", async () => {
     const { container, getByRole } = open();
+    fireEvent.click(getByRole("radio", { name: "Fades" }));
     fireEvent.click(pieces(container, "music")[0]!);
     key(getByRole("slider", { name: "Fade out, seconds" }), "End");
     expect(getByRole("slider", { name: "Fade out, seconds" }).getAttribute("aria-valuenow")).toBe("5");
@@ -345,6 +351,7 @@ describe("the Edit tools and panels", () => {
   test("Crossfade: a clip with another after it has a length; the last clip says to pick another; the plan carries the seam", async () => {
     const onPlanChange = mock((_p: StudioPlan, _c: boolean) => undefined);
     const { container, getByRole, getByText } = open({ onPlanChange });
+    fireEvent.click(getByRole("radio", { name: "Crossfade" }));
     fireEvent.click(pieces(container, "video")[2]!);
     expect(getByText("Pick a clip that has another clip after it.")).toBeTruthy();
     expect((getByRole("slider", { name: "Crossfade length, seconds" }) as HTMLElement).getAttribute("aria-disabled") ?? (getByRole("slider", { name: "Crossfade length, seconds" }) as HTMLElement).getAttribute("data-disabled")).not.toBeNull();
@@ -359,6 +366,7 @@ describe("the Edit tools and panels", () => {
   test("Level: five balances; choosing one sets every piece; the chosen one is checked", async () => {
     const onPlanChange = mock((_p: StudioPlan, _c: boolean) => undefined);
     const { getByRole } = open({ onPlanChange });
+    fireEvent.click(getByRole("radio", { name: "Level" }));
     for (const name of ["Quiet", "Soft", "Balanced", "Loud", "Very loud"]) expect(getByRole("radio", { name })).toBeTruthy();
     fireEvent.click(getByRole("radio", { name: "Loud" }));
     expect(getByRole("radio", { name: "Loud" }).getAttribute("aria-checked")).toBe("true");
@@ -367,7 +375,8 @@ describe("the Edit tools and panels", () => {
     expect(plan.video.pieces[0]!.level_db).toBe(-6);
   });
   test("a page's own level steps replace the five", async () => {
-    const { queryByRole } = open({ levelSteps: [{ id: "a", label: "Low", gain_db: -10, clip_gain_db: 0 }, { id: "b", label: "High", gain_db: 3, clip_gain_db: -3 }] });
+    const { queryByRole, getByRole } = open({ levelSteps: [{ id: "a", label: "Low", gain_db: -10, clip_gain_db: 0 }, { id: "b", label: "High", gain_db: 3, clip_gain_db: -3 }] });
+    fireEvent.click(getByRole("radio", { name: "Level" }));
     expect(queryByRole("radio", { name: "Low" })).toBeTruthy();
     expect(queryByRole("radio", { name: "Quiet" })).toBeNull();
   });

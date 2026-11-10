@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
 const css = readFileSync(new URL("./dashboard/css/globals.css", import.meta.url), "utf8");
+const tokens = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
 const LOOKS = ["neutral", "stone", "zinc", "mauve", "olive", "mist", "taupe", "navy"];
 // Existing Olive dark muted foreground is a known upstream palette defect (audit B-kit 0.15).
 const expectedFailures: Array<{ look: string; scheme: string; token: string; ratio: number; reason: string }> = [
@@ -49,6 +50,17 @@ function decl(selector: string) {
 }
 
 describe("PRO-LOOK token resolution", () => {
+  test("shared surface roles are derived on the Look scope and follow the selected palette", () => {
+    const scope = tokens.match(/body\[class\*="style-"\]\s*\{([^}]*)\}/)?.[1] ?? "";
+    expect(scope).toContain("--surface-page: var(--background);");
+    expect(scope).toContain("--surface-card: var(--card);");
+    expect(scope).toContain("--surface-pane: color-mix(in oklab, var(--card) 68%, var(--muted));");
+    expect(scope).toContain("--surface-sidebar: var(--sidebar);");
+    expect(scope).toContain("--surface-glass: color-mix(in srgb, var(--surface-card) 84%, transparent);");
+    expect(scope).toContain("--accent-create: var(--primary);");
+    expect(tokens).toMatch(/html\.dark body\[class\*="style-"\]\s*\{[^}]*--surface-stage:/);
+  });
+
   test("resolves new surface, text and accent roles across all 16 Look/scheme pairs", () => {
     for (const look of LOOKS) for (const scheme of ["light", "dark"] as const) {
       const t = decl(scheme === "light" ? `.style-${look}` : `.dark .style-${look}`);
