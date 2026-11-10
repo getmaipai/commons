@@ -63,17 +63,24 @@ describe("StatusCard contrast", () => {
       const surface2 = mix(rgb(hex(block, "--background")), rgb(hex(block, "--foreground")), 0.16)
       const inks: Record<StatusCardKind, string> = {
         progress: hex(block, "--status-progress-ink"), done: hex(block, "--status-done-ink"), waiting: hex(block, "--status-waiting-ink"),
-        attention: hex(block, "--tint-attention-fg"), problem: hex(block, "--tint-problem-border"), info: hex(block, "--tint-info-border"),
+        attention: hex(block, "--status-attention-ink"), problem: hex(block, "--tint-problem-border"), info: hex(block, "--tint-info-border"),
       }
       const washes: Record<StatusCardKind, number[]> = {
         progress: mix(surface2, rgb(inks.progress), 0.12), done: mix(surface2, rgb(inks.done), 0.12), waiting: mix(surface2, rgb(inks.waiting), 0.08),
-        attention: rgb(hex(block, "--tint-attention")), problem: rgb(hex(block, "--tint-problem")), info: rgb(hex(block, "--tint-info")),
+        attention: rgb(hex(block, "--status-attention-wash")), problem: rgb(hex(block, "--tint-problem")), info: rgb(hex(block, "--tint-info")),
       }
       for (const k of Object.keys(inks) as StatusCardKind[]) {
         expect(inks[k], `${k} ink literal in ${theme}`).toMatch(/^#/)
         expect(ratio(rgb(inks[k]), washes[k]), `${k} on its wash`).toBeGreaterThanOrEqual(4.5)
         expect(statusCardWash[k]).toBeTruthy()
       }
+    })
+    test(`${theme}: the attention wash reads amber, not gray`, () => {
+      const [r, g, b] = rgb(hex(block, "--status-attention-wash"))
+      // Amber: red above green above blue, with a clear red-to-blue spread (a gray has none).
+      expect(r!).toBeGreaterThan(g!)
+      expect(g!).toBeGreaterThan(b!)
+      expect(r! - b!).toBeGreaterThanOrEqual(theme === "light" ? 0.25 : 0.1)
     })
   }
 })

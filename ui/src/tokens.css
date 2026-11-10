@@ -641,6 +641,9 @@
   --status-progress-ink: #365000;
   --status-done-ink: #004f3d;
   --status-waiting-ink: #3a4d68;
+  /* PRO-LOOK-01: attention reads amber in light mode (the cream --tint-attention washed to gray on the gray card). Ink is AA on this wash. */
+  --status-attention-ink: #6b4500;
+  --status-attention-wash: #f6dfa0;
   --tint-attention: #fbf5e6;
   --tint-attention-fg: #6e5a2b;
   --tint-attention-border: #866100;
@@ -1302,6 +1305,8 @@
     --status-progress-ink: #c0f447;
     --status-done-ink: #00e3ae;
     --status-waiting-ink: #a9bed7;
+    --status-attention-ink: #ffd36a;
+    --status-attention-wash: #4a3510;
     --tint-attention: #31240e;
     --tint-attention-fg: #ffe08a;
     --tint-attention-border: #b88a21;
@@ -1381,6 +1386,8 @@
   --status-progress-ink: #c0f447;
   --status-done-ink: #00e3ae;
   --status-waiting-ink: #a9bed7;
+  --status-attention-ink: #ffd36a;
+  --status-attention-wash: #4a3510;
   --tint-attention: #31240e;
   --tint-attention-fg: #ffe08a;
   --tint-attention-border: #b88a21;
@@ -2457,6 +2464,8 @@ html[data-ease-motion="calm"] [data-slot="weather-sky"] [data-weather-group] { a
   /* MUSIC-KIT-01: the modern music look. All used only when a prop opts in, so the old look is unchanged. */
   /* MediaShelf cardRadius="tight": the 8 px card. */
   --media-card-radius: 8px;
+  /* MediaShelf cardRadius="soft": the PRO-LOOK-01 18 pt soft card. */
+  --media-soft-radius: 18px;
   /* MediaShelf pressScale: how small a pressed tile gets. */
   --media-press-scale: var(--press-scale);
   /* MediaShelf onPlay: the round Play button's size. */

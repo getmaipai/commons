@@ -85,8 +85,8 @@ interface MediaShelfProps<T> {
   hideWhenEmpty?: boolean;
   /** MEDIA-POLISH-01: a link beside the heading ("See all"). */
   seeAll?: { label: string; onSelect: () => void };
-  /** MUSIC-KIT-01: `tight` draws the art with the 8 px `--media-card-radius` instead of the card radius. Default `default`. */
-  cardRadius?: "default" | "tight" | "card";
+  /** MUSIC-KIT-01: `tight` draws the art with the 8 px `--media-card-radius` instead of the card radius; `soft` (PRO-LOOK-01) with the 18 px `--media-soft-radius`. Default `default`. */
+  cardRadius?: "default" | "tight" | "card" | "soft";
   /** PRO-LOOK-KIT-01d: square, fixed-size tiles for image-led shelves. */
   tileSize?: "default" | "pro";
   /** Let a horizontal rail reach the container's right edge. */
@@ -188,13 +188,14 @@ export function MediaShelf<T>({
   const Frame = variant === "plain" ? PlainShelfFrame : CardShelfFrame;
   const circle = artShape === "circle";
   const tight = cardRadius === "tight";
+  const soft = cardRadius === "soft";
   const proTiles = tileSize === "pro" && orientation === "horizontal" && layout === "rail";
   const artClasses = cn(
     "relative w-full overflow-hidden bg-[var(--muted)]",
-    circle ? ["aspect-square rounded-full", orientation === "vertical" ? "" : "mx-auto w-[var(--media-artist-size)] max-w-full"] : [tight ? "rounded-[var(--media-card-radius)]" : cardRadius === "card" || proTiles ? "rounded-[var(--radius-card)]" : "rounded-[var(--radius)]", proTiles ? "aspect-square" : ASPECT_CLASSES[aspect]],
+    circle ? ["aspect-square rounded-full", orientation === "vertical" ? "" : "mx-auto w-[var(--media-artist-size)] max-w-full"] : [tight ? "rounded-[var(--media-card-radius)]" : soft ? "rounded-[var(--media-soft-radius)]" : cardRadius === "card" || proTiles ? "rounded-[var(--radius-card)]" : "rounded-[var(--radius)]", proTiles ? "aspect-square" : ASPECT_CLASSES[aspect]],
   );
   // The Card surface has its own radius; a tight tile clips to the same 8 px so the art and its frame agree.
-  const tileClasses = cn(tight && !circle && "rounded-[var(--media-card-radius)]", cardRadius === "card" && !circle && "rounded-[var(--radius-card)]", proTiles && "rounded-[var(--radius-card)]", pressScale && PRESS_CLASSES);
+  const tileClasses = cn(tight && !circle && "rounded-[var(--media-card-radius)]", soft && !circle && "rounded-[var(--media-soft-radius)]", cardRadius === "card" && !circle && "rounded-[var(--radius-card)]", proTiles && "rounded-[var(--radius-card)]", pressScale && PRESS_CLASSES);
   const playName = (item: T) => getPlayLabel?.(item) ?? getLabel?.(item) ?? i18n._({ id: "ui.Play", message: "Play" });
   const currentClasses = "ring-2 ring-[var(--media-current-ring)] ring-offset-2 ring-offset-background";
   // Use the existing card budgets, overriding only the phone count. The

@@ -28,11 +28,11 @@ export interface StatusCardProps {
 // attention amber, problem red, info blue. A person's accent only recolors progress, and only when the consumer passes `accent`.
 export const statusCardInk: Record<StatusCardKind, string> = {
   progress: "var(--status-progress-ink)", waiting: "var(--status-waiting-ink)", done: "var(--status-done-ink)",
-  attention: "var(--tint-attention-fg)", problem: "var(--tint-problem-border)", info: "var(--tint-info-border)",
+  attention: "var(--status-attention-ink)", problem: "var(--tint-problem-border)", info: "var(--tint-info-border)",
 }
 export const statusCardWash: Record<StatusCardKind, string> = {
   progress: "color-mix(in srgb, var(--status-progress-ink) 12%, transparent)", waiting: "color-mix(in srgb, var(--status-waiting-ink) 8%, transparent)", done: "color-mix(in srgb, var(--status-done-ink) 12%, transparent)",
-  attention: "var(--tint-attention)", problem: "var(--tint-problem)", info: "var(--tint-info)",
+  attention: "var(--status-attention-wash)", problem: "var(--tint-problem)", info: "var(--tint-info)",
 }
 const tint = statusCardInk
 const bg = statusCardWash

@@ -240,7 +240,7 @@ export const MediaShelfNodeSchema = z.object({
   pinned_max: z.number().int().min(1).max(12).optional(),
   pinned_heading: z.string().min(1).max(40).optional(),
   // MUSIC-KIT-01: the modern music look.
-  card_radius: z.enum(["default", "tight"]).optional(),
+  card_radius: z.enum(["default", "tight", "soft"]).optional(),
   press_scale: z.boolean().optional(),
   on_play: ActionSchema.optional(),
   play_label: z.string().min(1).max(80).optional(),

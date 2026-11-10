@@ -391,6 +391,10 @@ describe("MediaShelf", () => {
       rerender(<MediaShelf {...base} cardRadius="tight" />);
       expect(container.querySelector("li button > div")?.className).toContain("rounded-[var(--media-card-radius)]");
     });
+    test("cardRadius soft uses the 18 px soft token on the art", () => {
+      const { container } = render(<MediaShelf {...base} cardRadius="soft" />);
+      expect(container.querySelector("li button > div")?.className).toContain("rounded-[var(--media-soft-radius)]");
+    });
     test("pressScale adds the motion-safe press class only when asked", () => {
       const { container, rerender } = render(<MediaShelf {...base} />);
       expect(container.innerHTML).not.toContain("media-press-scale");

@@ -27,26 +27,46 @@ const ICONS = {
 const CLASS_SIZES_WIDTH = /(?:^|\s)(?:size-|w-)/;
 const CLASS_SIZES_HEIGHT = /(?:^|\s)(?:size-|h-)/;
 
+// Theme tokens only: each tile mixes one of these into the card colour, so every theme and accent gets its own soft tints.
+const SOFT_TINTS = ["--primary", "--status-progress-ink", "--status-done-ink", "--status-attention-ink", "--tint-info-border", "--status-waiting-ink"] as const;
+function tintHash(text: string): number {
+  let h = 0;
+  for (const ch of text) h = (h * 31 + ch.codePointAt(0)!) >>> 0;
+  return h;
+}
+/** The first letters of the first two words, upper-cased ("Blue Hour" is "BH"); empty when the name has no letters. */
+export function initials(name: string): string {
+  const words = name.match(/[\p{L}\p{N}]+/gu) ?? [];
+  return words.slice(0, 2).map((w) => [...w][0]!.toUpperCase()).join("");
+}
+
 export interface SafeImageProps extends Omit<ImageProps, "src" | "onError"> {
   src?: string | null;
   kind?: ImageFallbackKind;
   fallbackContent?: ReactNode;
   fallbackAfterIcon?: ReactNode;
+  /** PRO-LOOK-01: with a seed (the item's name) the empty or broken picture is a soft tinted tile (a theme-token tint picked from the
+   * seed, the first letters of the name, or the kind's icon when it has none) instead of the flat gray square. */
+  tintSeed?: string;
   onError?: ImageProps["onError"];
   imageRef?: Ref<HTMLImageElement>;
 }
 
 /** An image which always occupies its box, using the kit's themed icon tile when absent or broken. */
-export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fallbackAfterIcon, className, onError, imageRef, loading = "lazy", ...props }: SafeImageProps) {
+export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fallbackAfterIcon, tintSeed, className, onError, imageRef, loading = "lazy", ...props }: SafeImageProps) {
   const fallback = useImageFallback(src);
   const Icon = getIcon(ICONS[kind]);
   const hasBoxSizing = /(?:^|\s)(?:size-|w-full|w-\[|h-full|h-\[|aspect-)/.test(className ?? "") || props.width !== undefined || props.height !== undefined;
-  const fallbackClass = cn("bg-muted text-muted-foreground flex items-center justify-center", !hasBoxSizing && "aspect-video w-full min-h-16", className);
+  const tinted = tintSeed !== undefined;
+  const tintIndex = tinted ? tintHash(tintSeed) % SOFT_TINTS.length : 0;
+  const letters = tinted ? initials(tintSeed) : "";
+  const fallbackClass = cn(tinted ? "bg-[color-mix(in_oklab,var(--tile-tint)_22%,var(--card))] text-foreground flex items-center justify-center" : "bg-muted text-muted-foreground flex items-center justify-center", !hasBoxSizing && "aspect-video w-full min-h-16", className);
   if (fallback.hasFallback) {
     return (
       <span
         data-slot="safe-image-fallback"
         data-kind={kind}
+        data-tinted={tinted ? "" : undefined}
         className={fallbackClass}
         role={alt ? "img" : undefined}
         aria-label={alt || undefined}
@@ -57,10 +77,11 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
           // box wider than the tile and pushed the centred icon out of view at 375 px. The class wins; the hint only fills a gap.
           ...(props.width !== undefined && !CLASS_SIZES_WIDTH.test(className ?? "") ? { width: typeof props.width === "number" ? `${props.width}px` : props.width } : {}),
           ...(props.height !== undefined && !CLASS_SIZES_HEIGHT.test(className ?? "") ? { height: typeof props.height === "number" ? `${props.height}px` : props.height } : {}),
+          ...(tinted ? { ["--tile-tint" as string]: `var(${SOFT_TINTS[tintIndex]})` } : {}),
           ...props.style,
         }}
       >
-        {fallbackContent ?? <><Icon aria-hidden className="size-1/3" />{fallbackAfterIcon}</>}
+        {fallbackContent ?? (tinted && letters ? <span data-slot="safe-image-initials" className="text-3xl font-semibold tracking-tight opacity-80">{letters}</span> : null) ?? <><Icon aria-hidden className="size-1/3" />{fallbackAfterIcon}</>}
       </span>
     );
   }

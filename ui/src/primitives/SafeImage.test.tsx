@@ -1,6 +1,28 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, test } from "bun:test";
-import { SafeImage } from "./SafeImage";
+import { SafeImage, initials } from "./SafeImage";
+
+describe("SafeImage tinted fallback", () => {
+  test("a seeded fallback is a soft theme-token tint with the first letters, never the flat gray", () => {
+    const view = render(<SafeImage kind="music" tintSeed="Blue Hour" alt="" />);
+    const tile = view.container.querySelector('[data-slot="safe-image-fallback"]') as HTMLElement;
+    expect(tile.getAttribute("data-tinted")).toBe("");
+    expect(tile.className).not.toContain("bg-muted");
+    expect(tile.className).toContain("color-mix(in_oklab,var(--tile-tint)_22%,var(--card))");
+    expect(tile.style.getPropertyValue("--tile-tint")).toMatch(/^var\(--[a-z-]+\)$/);
+    expect(tile.textContent).toBe("BH");
+  });
+  test("a seed with no letters falls back to the kind icon; initials skips punctuation", () => {
+    const view = render(<SafeImage kind="video" tintSeed="" alt="" />);
+    expect(view.container.querySelector("svg")).not.toBeNull();
+    expect(initials("  the-quiet  Hours ")).toBe("TQ");
+    expect(initials("!!!")).toBe("");
+  });
+  test("without a seed the old muted tile is unchanged", () => {
+    const view = render(<SafeImage alt="" />);
+    expect(view.container.querySelector('[data-slot="safe-image-fallback"]')?.className).toContain("bg-muted");
+  });
+});
 
 describe("SafeImage", () => {
   test("uses the picture tile without a source and names it when alt is meaningful", () => {

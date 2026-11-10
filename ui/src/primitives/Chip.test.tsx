@@ -5,6 +5,17 @@ import { Chip } from "@/kit/primitives/Chip";
 afterEach(cleanup);
 
 describe("Chip", () => {
+  test("quiet tone: text-only pill with a hairline ring, lightly filled and no check when selected", () => {
+    const { getByText, rerender, container } = render(<Chip tone="quiet" selected={false} onClick={() => {}}>Jazz</Chip>);
+    const cls = () => getByText("Jazz").closest("span")!.className;
+    expect(cls()).toContain("bg-transparent");
+    expect(cls()).toContain("ring-[var(--hairline)]");
+    expect(cls()).not.toContain("bg-muted");
+    rerender(<Chip tone="quiet" selected onClick={() => {}}>Jazz</Chip>);
+    expect(cls()).toContain("bg-foreground/10");
+    expect(container.querySelector("svg")).toBeNull();
+  });
+
   test("a non-interactive chip renders as plain content, not a button", () => {
     const { getByText, queryByRole } = render(<Chip>Sage</Chip>);
     expect(getByText("Sage").closest("span")?.className).toBe("inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-base transition-colors border-border bg-transparent text-foreground");

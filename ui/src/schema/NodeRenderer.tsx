@@ -541,7 +541,7 @@ function ChoiceChips({ control, state, slot }: { control: ChoiceControl; state: 
   return (
     <div role="group" aria-label={control.label} data-slot={slot} className="flex min-w-0 items-center gap-2 overflow-x-auto [scrollbar-width:none]">
       {control.options.map((option) => (
-        <Chip key={option.value} size="strip" selected={chosen === option.value} onClick={() => writer?.merge({ [control.state]: option.value === control.options[0]!.value ? undefined : option.value })}>
+        <Chip key={option.value} size="strip" tone="quiet" selected={chosen === option.value} onClick={() => writer?.merge({ [control.state]: option.value === control.options[0]!.value ? undefined : option.value })}>
           {option.label}
         </Chip>
       ))}
@@ -1284,7 +1284,7 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
             renderItem={(row) => {
               const src = localPicture(readField(row, node.item_media_field));
               if (node.media_loop && node.item_loop_field) return <LoopPoster poster={src} loop={localVideo(readField(row, node.item_loop_field))} kind={pictureKind(readField(row, "kind"))} />;
-              return <SafeImage src={src} kind={pictureKind(readField(row, "kind"))} alt="" className="h-full w-full object-cover" />;
+              return <SafeImage src={src} kind={pictureKind(readField(row, "kind"))} tintSeed={String(readField(row, node.item_label_field) ?? "")} alt="" className="h-full w-full object-cover" />;
             }}
             getProgress={node.item_progress_field ? (row) => Number(readField(row, node.item_progress_field!)) : undefined}
             renderBadge={
@@ -1371,7 +1371,7 @@ export function safeTileColor(value: unknown): string | undefined {
 }
 
 function musicArt(row: Row, path: string | undefined) {
-  return <SafeImage src={path ? localPicture(readField(row, path)) : null} kind={pictureKind(readField(row, "kind"))} alt="" className="h-full w-full object-cover" />;
+  return <SafeImage src={path ? localPicture(readField(row, path)) : null} kind={pictureKind(readField(row, "kind"))} tintSeed={String(readField(row, "title") ?? readField(row, "name") ?? "")} alt="" className="h-full w-full object-cover" />;
 }
 
 function QuickTilesNodeView({ node, state }: { node: QuickTilesNode; state: Row }) {
