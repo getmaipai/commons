@@ -148,6 +148,8 @@
  * design choice. The reference's own 12px square, not the emergent
  * circle `--radius-xl` on a 40px/32px tile used to produce. */
 :root {
+  /* QA-FINISH-01: popovers and menus draw above the shell header and the page controls. */
+  --z-popover: 70;
   --wizard-column-max: 36rem;
   --wizard-section-gap: 2rem;
   --wizard-bar-height: 6rem;

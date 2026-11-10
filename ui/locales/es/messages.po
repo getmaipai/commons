@@ -140,7 +140,7 @@ msgid "ui.{current} of {total}"
 msgstr "{current} de {total}"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1322
+#: src/schema/NodeRenderer.tsx:1326
 #, needs-review
 msgid "ui.{day}, {count} {noun}"
 msgstr "{day}, {count} {noun}"
@@ -696,7 +696,7 @@ msgstr "Cuenta"
 
 #. js-lingui-explicit-id
 #: src/elements/data-table.tsx:217
-#: src/schema/NodeRenderer.tsx:1977
+#: src/schema/NodeRenderer.tsx:1992
 #, needs-review
 msgid "ui.Actions"
 msgstr "Acciones"
@@ -747,7 +747,7 @@ msgid "ui.Add a person…"
 msgstr "Añade una persona…"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2017
+#: src/schema/NodeRenderer.tsx:2032
 #, needs-review
 msgid "ui.Add a picture"
 msgstr "Añade una foto"
@@ -1270,7 +1270,7 @@ msgstr "Puede ver"
 #: src/elements/video-player.tsx:109
 #: src/primitives/Player.tsx:185
 #: src/schema/ConfirmDialog.tsx:83
-#: src/schema/NodeRenderer.tsx:2021
+#: src/schema/NodeRenderer.tsx:2036
 #: src/settings/LocationField.tsx:179
 #: src/settings/SettingRow.tsx:196
 #: src/settings/SettingRow.tsx:222
@@ -1367,8 +1367,8 @@ msgstr "Cambiado como se describió"
 
 #. js-lingui-explicit-id
 #: src/primitives/Player.tsx:167
-#: src/schema/NodeRenderer.tsx:1960
-#: src/schema/NodeRenderer.tsx:1967
+#: src/schema/NodeRenderer.tsx:1975
+#: src/schema/NodeRenderer.tsx:1982
 #, needs-review
 msgid "ui.Chapters"
 msgstr "Capítulos"
@@ -1435,7 +1435,7 @@ msgstr "Elige quién en tu hogar puede ver esto. Nada se envía fuera de tu hoga
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:952
 #: src/elements/image-editor.tsx:982
-#: src/schema/NodeRenderer.tsx:725
+#: src/schema/NodeRenderer.tsx:726
 #: src/settings/LocationField.tsx:252
 #, needs-review
 msgid "ui.Clear"
@@ -1708,7 +1708,7 @@ msgid "ui.Cost"
 msgstr "Costo"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:426
+#: src/schema/NodeRenderer.tsx:427
 #, needs-review
 msgid "ui.Could not find your location just now. Try again, or choose a saved place."
 msgstr "No pudimos encontrar tu ubicación ahora mismo. Inténtalo de nuevo o elige un lugar guardado."
@@ -1720,90 +1720,90 @@ msgid "ui.Could not load settings."
 msgstr "No se pudieron cargar los ajustes."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1647
+#: src/schema/NodeRenderer.tsx:1662
 #, needs-review
 msgid "ui.Could not load the featured items."
 msgstr "No se pudieron cargar los artículos destacados."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1529
+#: src/schema/NodeRenderer.tsx:1533
 #, needs-review
 msgid "ui.Could not load the top result."
 msgstr "No se pudo cargar el mejor resultado."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1913
+#: src/schema/NodeRenderer.tsx:1928
 msgid "ui.Could not load the transcript. Check that you are online, then try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1552
+#: src/schema/NodeRenderer.tsx:1556
 #, needs-review
 msgid "ui.Could not load these categories."
 msgstr "No se pudieron cargar estas categorías."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2187
+#: src/schema/NodeRenderer.tsx:2202
 #, needs-review
 msgid "ui.Could not load these devices."
 msgstr "No se pudieron cargar estos dispositivos."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1509
+#: src/schema/NodeRenderer.tsx:1513
 #, needs-review
 msgid "ui.Could not load these tiles."
 msgstr "No se pudieron cargar estos bloques."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1576
+#: src/schema/NodeRenderer.tsx:1580
 #, needs-review
 msgid "ui.Could not load these tracks."
 msgstr "No se pudieron cargar estas pistas."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1694
+#: src/schema/NodeRenderer.tsx:1709
 #, needs-review
 msgid "ui.Could not load this book."
 msgstr "No se pudo cargar este libro."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1191
+#: src/schema/NodeRenderer.tsx:1195
 #, needs-review
 msgid "ui.Could not load this grid."
 msgstr "No se pudo cargar esta cuadrícula."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1741
+#: src/schema/NodeRenderer.tsx:1756
 #, needs-review
 msgid "ui.Could not load this item."
 msgstr "No se pudo cargar este artículo."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1097
+#: src/schema/NodeRenderer.tsx:1101
 #, needs-review
 msgid "ui.Could not load this list."
 msgstr "No se pudo cargar esta lista."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1303
+#: src/schema/NodeRenderer.tsx:1307
 #, needs-review
 msgid "ui.Could not load this shelf."
 msgstr "No se pudo cargar este estante."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:364
+#: src/schema/NodeRenderer.tsx:365
 #, needs-review
 msgid "ui.Could not load this. Try again."
 msgstr "No se pudo cargar esto. Inténtalo de nuevo."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2124
+#: src/schema/NodeRenderer.tsx:2139
 #, needs-review
 msgid "ui.Could not load today's cards."
 msgstr "No se pudieron cargar las tarjetas de hoy."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2148
+#: src/schema/NodeRenderer.tsx:2163
 #, needs-review
 msgid "ui.Could not load today's rows."
 msgstr "No se pudieron cargar las filas de hoy."
@@ -1815,7 +1815,7 @@ msgid "ui.Could not load your results."
 msgstr "No pudimos cargar tus resultados."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1849
+#: src/schema/NodeRenderer.tsx:1864
 #, needs-review
 msgid "ui.Could not look for other screens. Check that you are online, then open the menu again."
 msgstr "No pudimos buscar otras pantallas. Comprueba que tienes conexión y abre el menú de nuevo."
@@ -1833,7 +1833,7 @@ msgid "ui.Could not open this clip."
 msgstr "No se pudo abrir este clip."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1850
+#: src/schema/NodeRenderer.tsx:1865
 #, needs-review
 msgid "ui.Could not play this on the other screen. Make sure it is on and signed in, then try again."
 msgstr "No se pudo reproducir esto en la otra pantalla. Asegúrate de que está encendida y con sesión iniciada, y luego inténtalo de nuevo."
@@ -1857,7 +1857,7 @@ msgid "ui.Could not save the new order."
 msgstr "No se pudo guardar el nuevo orden."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1731
+#: src/schema/NodeRenderer.tsx:1746
 #, needs-review
 msgid "ui.Could not save. Check that you are online, then try again."
 msgstr "No se pudo guardar. Comprueba que tienes conexión e inténtalo de nuevo."
@@ -1868,8 +1868,8 @@ msgid "ui.Could not share this link. Copy the address from the browser bar inste
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2016
-#: src/schema/NodeRenderer.tsx:2016
+#: src/schema/NodeRenderer.tsx:2031
+#: src/schema/NodeRenderer.tsx:2031
 #, needs-review
 msgid "ui.Cover"
 msgstr "Portada"
@@ -2232,7 +2232,7 @@ msgstr "Cada lado puede medir como máximo {max} píxeles."
 
 #. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:377
-#: src/schema/NodeRenderer.tsx:1322
+#: src/schema/NodeRenderer.tsx:1326
 #, needs-review
 msgid "ui.Earlier"
 msgstr "Antes"
@@ -2489,7 +2489,7 @@ msgid "ui.Favorite"
 msgstr "Favorito"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1328
+#: src/schema/NodeRenderer.tsx:1332
 #, needs-review
 msgid "ui.Favorite {name}"
 msgstr "Favorito {name}"
@@ -2501,7 +2501,7 @@ msgid "ui.Favorites"
 msgstr "Favoritos"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1657
+#: src/schema/NodeRenderer.tsx:1672
 #, needs-review
 msgid "ui.Featured"
 msgstr "Destacados"
@@ -3125,13 +3125,13 @@ msgstr "Se eliminó de tus lugares. Puedes añadirlo de nuevo buscando."
 
 #. js-lingui-explicit-id
 #: src/primitives/MediaShelf.tsx:195
-#: src/schema/NodeRenderer.tsx:1313
+#: src/schema/NodeRenderer.tsx:1317
 #, needs-review
 msgid "ui.item"
 msgstr "artículo"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1313
+#: src/schema/NodeRenderer.tsx:1317
 #, needs-review
 msgid "ui.items"
 msgstr "artículos"
@@ -3461,7 +3461,7 @@ msgid "ui.Looking for lyrics..."
 msgstr "Buscando letra..."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1888
+#: src/schema/NodeRenderer.tsx:1903
 #, needs-review
 msgid "ui.Looking for screens"
 msgstr "Buscando pantallas"
@@ -3502,7 +3502,7 @@ msgstr "Bajar bajo el habla"
 #: src/elements/lyrics-list.tsx:55
 #: src/elements/music-track.tsx:35
 #: src/primitives/Player.tsx:413
-#: src/schema/NodeRenderer.tsx:1791
+#: src/schema/NodeRenderer.tsx:1806
 #, needs-review
 msgid "ui.Lyrics"
 msgstr "Letra"
@@ -3720,11 +3720,16 @@ msgstr "Fase lunar"
 #: src/PhoneNav.tsx:137
 #: src/PhoneNav.tsx:145
 #: src/primitives/ArticleView.tsx:480
-#: src/schema/NodeRenderer.tsx:2242
+#: src/schema/NodeRenderer.tsx:2257
 #: src/ui/breadcrumb.tsx:102
 #, needs-review
 msgid "ui.More"
 msgstr "Más"
+
+#. js-lingui-explicit-id
+#: src/primitives/MusicBlocks.tsx:229
+msgid "ui.More actions for {title}"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/primitives/StoryFeed.tsx:98
@@ -4094,7 +4099,7 @@ msgid "ui.No one else in the household."
 msgstr "No hay nadie más en el hogar."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1892
+#: src/schema/NodeRenderer.tsx:1907
 #, needs-review
 msgid "ui.No other screens are on"
 msgstr "Ninguna otra pantalla está encendida"
@@ -4208,7 +4213,7 @@ msgid "ui.Not helpful"
 msgstr "No útil"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1266
+#: src/schema/NodeRenderer.tsx:1270
 #, needs-review
 msgid "ui.Not played yet"
 msgstr "Sin reproducir"
@@ -4242,7 +4247,7 @@ msgid "ui.Note"
 msgstr "Nota"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1650
+#: src/schema/NodeRenderer.tsx:1665
 #, needs-review
 msgid "ui.Nothing featured yet."
 msgstr "Todavía no hay nada destacado."
@@ -4251,12 +4256,12 @@ msgstr "Todavía no hay nada destacado."
 #: src/primitives/AsyncState.tsx:56
 #: src/primitives/WidgetCard.tsx:66
 #: src/primitives/WidgetRow.tsx:42
-#: src/schema/NodeRenderer.tsx:1100
-#: src/schema/NodeRenderer.tsx:1194
-#: src/schema/NodeRenderer.tsx:1307
-#: src/schema/NodeRenderer.tsx:1473
-#: src/schema/NodeRenderer.tsx:2112
-#: src/schema/NodeRenderer.tsx:2190
+#: src/schema/NodeRenderer.tsx:1104
+#: src/schema/NodeRenderer.tsx:1198
+#: src/schema/NodeRenderer.tsx:1311
+#: src/schema/NodeRenderer.tsx:1477
+#: src/schema/NodeRenderer.tsx:2127
+#: src/schema/NodeRenderer.tsx:2205
 #: src/schema/ResultFeedNodeView.tsx:199
 #, needs-review
 msgid "ui.Nothing here yet."
@@ -4292,7 +4297,7 @@ msgid "ui.Nothing selected"
 msgstr "Nada seleccionado"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:351
+#: src/schema/NodeRenderer.tsx:352
 #, needs-review
 msgid "ui.Nothing to show right now."
 msgstr "No hay nada que mostrar ahora mismo."
@@ -4632,7 +4637,7 @@ msgstr "Pega el nuevo valor"
 #: src/elements/track-studio.tsx:448
 #: src/elements/track-studio.tsx:448
 #: src/primitives/Player.tsx:163
-#: src/schema/NodeRenderer.tsx:1670
+#: src/schema/NodeRenderer.tsx:1685
 #, needs-review
 msgid "ui.Pause"
 msgstr "Pausa"
@@ -4807,7 +4812,7 @@ msgstr "fijado"
 
 #. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:75
-#: src/schema/NodeRenderer.tsx:1346
+#: src/schema/NodeRenderer.tsx:1350
 #, needs-review
 msgid "ui.Pinned"
 msgstr "Fijado"
@@ -4863,9 +4868,9 @@ msgstr "Reproducir"
 
 #. js-lingui-explicit-id
 #: src/elements/album.tsx:103
-#: src/primitives/MusicBlocks.tsx:67
-#: src/primitives/MusicBlocks.tsx:108
-#: src/primitives/MusicBlocks.tsx:194
+#: src/primitives/MusicBlocks.tsx:70
+#: src/primitives/MusicBlocks.tsx:111
+#: src/primitives/MusicBlocks.tsx:204
 #, needs-review
 msgid "ui.Play {title}"
 msgstr "Reproducir {title}"
@@ -4890,8 +4895,8 @@ msgstr "Reproducir ahora"
 
 #. js-lingui-explicit-id
 #: src/primitives/Player.tsx:172
-#: src/schema/NodeRenderer.tsx:1881
-#: src/schema/NodeRenderer.tsx:1886
+#: src/schema/NodeRenderer.tsx:1896
+#: src/schema/NodeRenderer.tsx:1901
 #, needs-review
 msgid "ui.Play on another screen"
 msgstr "Reproducir en otra pantalla"
@@ -5161,7 +5166,7 @@ msgstr "Léelo de otra forma"
 
 #. js-lingui-explicit-id
 #: src/primitives/Reader.tsx:36
-#: src/schema/NodeRenderer.tsx:1708
+#: src/schema/NodeRenderer.tsx:1723
 #, needs-review
 msgid "ui.Reader"
 msgstr "Lector"
@@ -5673,7 +5678,7 @@ msgstr "guardar"
 #: src/primitives/ArticleView.tsx:458
 #: src/primitives/ArticleView.tsx:474
 #: src/primitives/StoryFeed.tsx:90
-#: src/schema/NodeRenderer.tsx:2021
+#: src/schema/NodeRenderer.tsx:2036
 #: src/settings/LocationField.tsx:176
 #: src/settings/SettingRow.tsx:184
 #: src/settings/SettingRow.tsx:276
@@ -5744,7 +5749,7 @@ msgstr "Ir al final"
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:257
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:259
 #: src/elements/weather-forecast-page.tsx:256
-#: src/schema/NodeRenderer.tsx:669
+#: src/schema/NodeRenderer.tsx:670
 #: src/settings/groupSettings.ts:44
 #: src/settings/SettingsShell.tsx:132
 #, needs-review
@@ -5878,8 +5883,8 @@ msgid "ui.Seek {title}"
 msgstr "Buscar {title}"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1087
-#: src/schema/types.ts:178
+#: src/schema/NodeRenderer.tsx:1091
+#: src/schema/types.ts:180
 #, needs-review
 msgid "ui.Select"
 msgstr "Seleccionar"
@@ -5892,7 +5897,7 @@ msgstr "Selecciona {label}"
 
 #. js-lingui-explicit-id
 #: src/primitives/CharacterTile.tsx:54
-#: src/schema/NodeRenderer.tsx:1123
+#: src/schema/NodeRenderer.tsx:1127
 #, needs-review
 msgid "ui.Select {name}"
 msgstr "Selecciona {name}"
@@ -6146,7 +6151,7 @@ msgstr "Mostrar menos"
 #: src/elements/creation-header.tsx:111
 #: src/elements/creation-header.tsx:149
 #: src/elements/thread-list.aui.tsx:184
-#: src/schema/NodeRenderer.tsx:1958
+#: src/schema/NodeRenderer.tsx:1973
 #, needs-review
 msgid "ui.Show less"
 msgstr "Mostrar menos"
@@ -6155,7 +6160,7 @@ msgstr "Mostrar menos"
 #: src/elements/creation-header.tsx:111
 #: src/elements/creation-header.tsx:149
 #: src/elements/thread-list.aui.tsx:183
-#: src/schema/NodeRenderer.tsx:1958
+#: src/schema/NodeRenderer.tsx:1973
 #, needs-review
 msgid "ui.Show more"
 msgstr "Mostrar más"
@@ -6287,9 +6292,9 @@ msgstr "Algo salió mal"
 
 #. js-lingui-explicit-id
 #: src/primitives/AsyncState.tsx:54
-#: src/schema/actions.ts:215
-#: src/schema/actions.ts:238
-#: src/schema/NodeRenderer.tsx:1255
+#: src/schema/actions.ts:218
+#: src/schema/actions.ts:241
+#: src/schema/NodeRenderer.tsx:1259
 #, needs-review
 msgid "ui.Something went wrong."
 msgstr "Algo salió mal."
@@ -6567,7 +6572,7 @@ msgstr "Estilo: {name}"
 #. js-lingui-explicit-id
 #: src/elements/elicitation-form.tsx:167
 #: src/elements/question-flow.tsx:46
-#: src/schema/NodeRenderer.tsx:2311
+#: src/schema/NodeRenderer.tsx:2326
 #, needs-review
 msgid "ui.Submit"
 msgstr "Enviar"
@@ -6585,7 +6590,7 @@ msgid "ui.Suggested styles"
 msgstr "Estilos sugeridos"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:690
+#: src/schema/NodeRenderer.tsx:691
 #, needs-review
 msgid "ui.Suggestions"
 msgstr "Sugerencias"
@@ -6863,13 +6868,13 @@ msgid "ui.This audio could not be drawn. It still plays."
 msgstr "Este audio no se pudo dibujar. Sigue sonando."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1699
+#: src/schema/NodeRenderer.tsx:1714
 #, needs-review
 msgid "ui.This book is not available."
 msgstr "Este libro no está disponible."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:426
+#: src/schema/NodeRenderer.tsx:427
 #, needs-review
 msgid "ui.This browser cannot share its location. Choose a saved place instead."
 msgstr "Este navegador no puede compartir su ubicación. Elige un lugar guardado en su lugar."
@@ -6893,7 +6898,7 @@ msgid "ui.This file cannot be previewed here."
 msgstr "No puedes ver una vista previa de este archivo aquí."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1744
+#: src/schema/NodeRenderer.tsx:1759
 #, needs-review
 msgid "ui.This item is not available."
 msgstr "Este artículo no está disponible."
@@ -7071,7 +7076,7 @@ msgstr "Transcribiendo"
 #. js-lingui-explicit-id
 #: src/primitives/Player.tsx:451
 #: src/primitives/TranscriptPanel.tsx:75
-#: src/schema/NodeRenderer.tsx:1920
+#: src/schema/NodeRenderer.tsx:1935
 msgid "ui.Transcript"
 msgstr ""
 
@@ -7649,7 +7654,7 @@ msgstr "Trabajando en ello"
 #. js-lingui-explicit-id
 #: src/primitives/Wizard.tsx:354
 #: src/schema/ConfirmDialog.tsx:86
-#: src/schema/NodeRenderer.tsx:2311
+#: src/schema/NodeRenderer.tsx:2326
 #, needs-review
 msgid "ui.Working…"
 msgstr "Trabajando…"

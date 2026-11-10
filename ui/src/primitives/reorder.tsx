@@ -112,7 +112,7 @@ export function useReorder<T>(items: readonly T[], getKey: (item: T) => string, 
         type="button"
         data-slot="reorder-handle"
         aria-label={i18n._({ id: "ui.Drag {name} to reorder", message: "Drag {name} to reorder", values: { name } })}
-        className={cn("flex size-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground active:cursor-grabbing", FOCUS_RING)}
+        className={cn("flex size-11 shrink-0 cursor-grab sm:size-8 touch-none items-center justify-center rounded-md text-muted-foreground active:cursor-grabbing", FOCUS_RING)}
         onPointerDown={(e: PointerEvent<HTMLButtonElement>) => {
           if (e.pointerType === "mouse" && e.button !== 0) return;
           try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* not every environment can capture */ }
@@ -141,10 +141,10 @@ export function useReorder<T>(items: readonly T[], getKey: (item: T) => string, 
     ),
     moveButtons: (index, name) => (editing ? (
       <span data-slot="reorder-move" className="flex shrink-0 items-center">
-        <Button type="button" variant="ghost" size="icon-sm" disabled={index === 0} aria-label={i18n._({ id: "ui.Move {name} up", message: "Move {name} up", values: { name } })} onClick={() => move(index, index - 1)}>
+        <Button type="button" variant="ghost" size="icon-sm" className="size-11 sm:size-8" disabled={index === 0} aria-label={i18n._({ id: "ui.Move {name} up", message: "Move {name} up", values: { name } })} onClick={() => move(index, index - 1)}>
           <UpGlyph aria-hidden />
         </Button>
-        <Button type="button" variant="ghost" size="icon-sm" disabled={index === count - 1} aria-label={i18n._({ id: "ui.Move {name} down", message: "Move {name} down", values: { name } })} onClick={() => move(index, index + 1)}>
+        <Button type="button" variant="ghost" size="icon-sm" className="size-11 sm:size-8" disabled={index === count - 1} aria-label={i18n._({ id: "ui.Move {name} down", message: "Move {name} down", values: { name } })} onClick={() => move(index, index + 1)}>
           <DownGlyph aria-hidden />
         </Button>
       </span>

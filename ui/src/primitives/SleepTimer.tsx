@@ -70,7 +70,7 @@ export function SleepTimer({ value, onChange, getMedia, container, onFire, label
           {value?.kind === "at" ? <span className="text-sm font-semibold tabular-nums" data-slot="player-sleep-left">{status}</span> : null}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent container={container} align="end">
+      <DropdownMenuContent container={container} align="end" collisionPadding={{ top: 72, right: 8, bottom: 8, left: 8 }} className="z-[var(--z-popover)]">
         <DropdownMenuLabel>{name}</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={sleepValue(value)} onValueChange={(v) => onChange(v === "off" ? null : sleepFromValue(v, Date.now()))}>
           <DropdownMenuRadioItem value="off">{i18n._({ id: "ui.Off", message: "Off" })}</DropdownMenuRadioItem>

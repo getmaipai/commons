@@ -1,4 +1,7 @@
 import type { CSSProperties, ReactNode, RefObject } from "react";
+import { useMediaQuery } from "usehooks-ts";
+import { Button } from "@/kit/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import { useReorder, type ReorderConfig } from "@/kit/primitives/reorder";
 import { i18n } from "@/kit/i18n";
 import { Card } from "@/kit/primitives/Card";
@@ -172,6 +175,9 @@ export interface TrackRowsProps<T> {
   getPlayLabel?: (item: T) => string;
   /** MUSIC-POLISH-01: quiet icon buttons at the row's end (a Remove x), drawn faint until the row is hovered or focused. */
   renderActions?: (item: T) => ReactNode;
+  /** QA-FINISH-01: the same secondary actions as `DropdownMenuItem`s. Under `sm` (a phone) they replace `renderActions` with one
+   * "More actions" button (44 px), so the title keeps its room; from `sm` up `renderActions` is drawn as before. */
+  renderMenu?: (item: T) => ReactNode;
   /** MEDIA-PARITY-02: rows can be reordered. Each row gets a drag handle (a pointer drag with a drop line, or the arrow keys),
    * and a quiet Reorder button above the list turns on Move up and Move down buttons. `onReorder` gets the complete new key
    * order and a `revert`; the list shows the new order at once. Absent: no handles. */
@@ -181,10 +187,14 @@ export interface TrackRowsProps<T> {
 }
 
 /** Album and Playlist tracklists: number, title and artist, end label; hover turns the number into a play icon. */
-export function TrackRows<T>({ items: given, getKey, getTitle, getSubtitle, getNumber, getMeta, getGroup, isPlaying, onPlay, getPlayLabel, renderActions, reorder: reorderConfig, label }: TrackRowsProps<T>) {
+export function TrackRows<T>({ items: given, getKey, getTitle, getSubtitle, getNumber, getMeta, getGroup, isPlaying, onPlay, getPlayLabel, renderActions, renderMenu, reorder: reorderConfig, label }: TrackRowsProps<T>) {
+  const phone = useMediaQuery("(max-width: 39.999rem)", { defaultValue: false, initializeWithValue: false });
   const reorder = useReorder(given, getKey, reorderConfig, "y");
   const items = reorder.items;
   if (items.length === 0) return null;
+  // On a phone in reorder mode the row is only the handle, the title and the Move buttons, so the title keeps over 40 percent of the row.
+  const compactReorder = phone && reorder.editing;
+  const MoreGlyph = getIcon("ellipsis");
   const list = (
     <ol ref={reorder.containerRef as RefObject<HTMLOListElement>} aria-label={label} data-slot="track-rows" className="m-0 flex min-w-0 list-none flex-col p-0">
       {items.map((item, i) => {
@@ -202,7 +212,7 @@ export function TrackRows<T>({ items: given, getKey, getTitle, getSubtitle, getN
                 type="button"
                 aria-label={name}
                 onClick={() => onPlay(item)}
-                className={cn("relative flex size-8 shrink-0 items-center justify-center rounded-md text-sm tabular-nums text-muted-foreground", FOCUS_RING)}
+                className={cn("relative flex size-8 shrink-0 items-center justify-center rounded-md text-sm tabular-nums text-muted-foreground", compactReorder && "hidden", FOCUS_RING)}
               >
                 <span aria-hidden data-slot="track-number" className={cn("group-hover/row:opacity-0 group-focus-within/row:opacity-0", playing && "text-[var(--progress-accent)]")}>{playing ? <PlayGlyph className="size-4" /> : (getNumber?.(item, i) ?? i + 1)}</span>
                 <PlayGlyph aria-hidden data-slot="track-play" className="absolute size-4 text-foreground opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100" />
@@ -211,9 +221,18 @@ export function TrackRows<T>({ items: given, getKey, getTitle, getSubtitle, getN
                 <span className={cn("block truncate text-sm font-semibold", playing && "text-[var(--progress-accent)]")}>{getTitle(item)}</span>
                 {subtitle ? <span className="text-muted-foreground block truncate text-xs">{subtitle}</span> : null}
               </span>
-              {getMeta ? <span data-slot="track-meta" className="text-muted-foreground shrink-0 text-sm tabular-nums">{getMeta(item)}</span> : null}
+              {getMeta && !compactReorder ? <span data-slot="track-meta" className="text-muted-foreground shrink-0 text-sm tabular-nums">{getMeta(item)}</span> : null}
               {reorder.moveButtons(i, getTitle(item))}
-              {renderActions ? <span data-slot="track-actions" className="flex shrink-0 items-center opacity-60 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-within:opacity-100">{renderActions(item)}</span> : null}
+              {renderMenu && phone ? (compactReorder ? null : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="button" variant="ghost" size="icon" data-slot="track-more" className="size-11 shrink-0" aria-label={i18n._({ id: "ui.More actions for {title}", message: "More actions for {title}", values: { title: getTitle(item) } })}>
+                      <MoreGlyph aria-hidden />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">{renderMenu(item)}</DropdownMenuContent>
+                </DropdownMenu>
+              )) : renderActions && !compactReorder ? <span data-slot="track-actions" className="flex shrink-0 items-center opacity-60 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-within:opacity-100">{renderActions(item)}</span> : null}
             </div>
           </li>
         );

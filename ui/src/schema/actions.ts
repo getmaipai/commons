@@ -2,6 +2,7 @@ import { useCallback, useContext, useState } from "react";
 import { i18n } from "@/kit/i18n"
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { request } from "@/kit/http";
 import { fillTemplate, fillTemplateDeep } from "@/kit/schema/fieldPath";
 import type { Action, Binding } from "@/kit/schema/types";
@@ -63,6 +64,8 @@ async function runAction(
     const args = action.call.args ? fillTemplateDeep(action.call.args, item, options.typedArgs) : undefined;
     const reply = await request<unknown>(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined, keepalive: options.keepalive });
     options.onReply?.(reply);
+    // QA-FINISH-01: a call that names a `success_label` says so once it worked. A quiet call (progress reports) stays silent.
+    if (action.call.success_label && !options.quiet) toast(fillTemplate(action.call.success_label, item));
     // Like-this: a call may then navigate, with the response merged over the item (`{band_id}`). Navigation only.
     if (action.call.then) {
       const merged = reply && typeof reply === "object" && !Array.isArray(reply) ? { ...item, ...(reply as Record<string, unknown>) } : item;

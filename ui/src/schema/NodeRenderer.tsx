@@ -162,7 +162,8 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
   };
   const people = Array.isArray(rawVisibility.people) ? rawVisibility.people.map(toPerson).filter((person): person is NonNullable<typeof person> => person !== null) : [];
   const candidatesData = Array.isArray(candidatesQuery.data) ? candidatesQuery.data[0] : candidatesQuery.data;
-  const rawCandidates = Array.isArray(candidatesQuery.data) ? candidatesQuery.data : Array.isArray(candidatesData?.candidates) ? candidatesData.candidates : Array.isArray(candidatesData?.rows) ? candidatesData.rows : people;
+  // QA-FINISH-01: a `candidates_bind` array is the candidate list ({id, name} rows); without one, an array from `bind` is the header row, never the candidates.
+  const rawCandidates = node.candidates_bind && Array.isArray(candidatesQuery.data) ? candidatesQuery.data : Array.isArray(candidatesData?.candidates) ? candidatesData.candidates : Array.isArray(candidatesData?.rows) ? candidatesData.rows : people;
   const candidates = rawCandidates.map(toPerson).filter((person): person is NonNullable<typeof person> => person !== null);
   const mode = rawVisibility.mode === "shared" ? "shared" : "private";
   const base = { ...row };
@@ -1050,6 +1051,9 @@ function ListNodeView({ node }: { node: ListNode }) {
 
   const RowActionIcon = node.row_action ? getIcon(node.row_action.icon) : null;
 
+  // QA-FINISH-01: a list that hides when empty draws nothing, not even its empty text. A load error still shows.
+  if (node.hide_when_empty && query.data && !query.isError && !hasRows) return null;
+
   return (
     <div className="flex min-w-0 flex-col gap-3">
       <ConfirmDialog pendingConfirm={pendingConfirm} />
@@ -1613,6 +1617,17 @@ function TrackRowsNodeView({ node, state }: { node: TrackRowsNode; state: Row })
                   >
                     <Icon aria-hidden="true" />
                   </Button>
+                );
+              })
+            : undefined}
+          renderMenu={node.row_actions?.length
+            ? (row) => node.row_actions!.map((button, i) => {
+                const Icon = getIcon(button.icon);
+                return (
+                  <DropdownMenuItem key={i} className="min-h-11" onSelect={() => dispatch(button.action, [row])}>
+                    <Icon aria-hidden="true" />
+                    {fillTemplate(button.label, row)}
+                  </DropdownMenuItem>
                 );
               })
             : undefined}
