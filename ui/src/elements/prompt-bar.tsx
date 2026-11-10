@@ -321,7 +321,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
       if (picked) chip.onValueChange(picked.value);
     }}>
       <SelectTrigger data-chip={chip.id} aria-label={chip.label} title={chip.iconOnly ? `${chip.label}: ${selected?.label ?? ""}` : undefined} shape="pill" className={cn("shrink-0", chip.iconOnly ? "gap-1 px-3 text-sm data-[size=default]:h-11 sm:data-[size=default]:h-9" : compact ? "px-3 text-sm data-[size=default]:h-11 sm:data-[size=default]:h-9" : "min-h-[48px]")}>
-        {SelectedIcon ? <SelectedIcon className="size-4 shrink-0" aria-hidden="true" /> : null}{chip.iconOnly ? <SelectValue className="sr-only">{selected?.label}</SelectValue> : <SelectValue placeholder={chip.label}>{selected?.label}</SelectValue>}
+        {SelectedIcon ? <SelectedIcon className="size-4 shrink-0" aria-hidden="true" /> : null}{chip.iconOnly ? <span className="sr-only"><SelectValue>{selected?.label}</SelectValue></span> : <SelectValue placeholder={chip.label}>{selected?.label}</SelectValue>}
       </SelectTrigger>
       <SelectContent>
         {openOptions(chip).map((option) => {

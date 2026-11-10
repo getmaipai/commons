@@ -1,3 +1,7 @@
+## [ui-v0.5.585] - 2026-11-10
+
+- VIDEO-COMPOSER-04 fix. An icon-only chat toolbar dropdown hides its words visually (they stay in the accessible name).
+
 ## [ui-v0.5.584] - 2026-11-10
 
 - VIDEO-COMPOSER-04, additive. Chat prompt toolbar dropdowns share one height (pill, icon-only chips keep their chevron inside the pill instead of a clipped ring); the in-field image control is a Plus button; a chip that is unusable at the chosen level and has a `quiet_value` shows that value while disabled.
