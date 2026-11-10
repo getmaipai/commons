@@ -105,6 +105,25 @@ describe("PromptBar", () => {
     expect(view.queryByText("Fast")).toBeNull();
   });
 
+  test("Grok-style distribution keeps the left and right choices compact and leaves Generate usable while offline", () => {
+    const length: PromptBarChip = { id: "length", label: "Length", value: 10, align: "end", onValueChange: () => {}, options: [{ value: 5, label: "5 seconds" }, { value: 10, label: "10 seconds" }] };
+    const shapeChip = { ...shape(), align: "start" as const };
+    let submitted = 0;
+    const view = render(<PromptBar layout="chat" chatDistribution="start_end" label="Describe" submitLabel="Generate" value="a fox" disabledReason="Video is offline" onValueChange={() => {}} onSubmit={() => { submitted += 1; }} chips={[shapeChip, length]} tier={{ value: "standard", label: "Quality", onValueChange: () => {}, presentation: "dropdown", tiers: [{ id: "standard", label: "Standard", hint: "Fast, sound, up to 10 seconds" }, { id: "boost", label: "Boost", hint: "Sharper picture, sound, up to 5 seconds" }] }} />);
+    const toolbar = view.container.querySelector('[data-slot="prompt-bar-composer-controls"]')!;
+    const shapePicker = view.getByRole("combobox", { name: "Shape" });
+    const len = view.getByRole("combobox", { name: "Length" });
+    const quality = view.getByRole("combobox", { name: "Quality: Standard" });
+    const generate = view.getByRole("button", { name: "Generate" }) as HTMLButtonElement;
+    expect(toolbar.firstElementChild).toBe(shapePicker);
+    expect(toolbar.contains(len)).toBe(true);
+    expect(toolbar.contains(quality)).toBe(true);
+    expect(generate.disabled).toBe(false);
+    fireEvent.click(generate);
+    expect(submitted).toBe(1);
+    expect(view.getByRole("status").textContent).toContain("Video is offline");
+  });
+
   test("an error is an in-flow status row above the field, not floating text", () => {
     const { getByRole, container } = render(<PromptBar label="Describe" value="x" onValueChange={() => {}} onSubmit={() => {}} error="You already have a video being made." />);
     const row = getByRole("alert");

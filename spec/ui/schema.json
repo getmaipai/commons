@@ -1419,7 +1419,8 @@
                       "minLength": 1,
                       "maxLength": 300,
                       "description": "VIDEO-LORA-09: one plain line shown under the chip's cards while this option is chosen (what it does, and what it adds to the person's words). Plain text, never markup."
-                    }
+                    },
+                    "icon": { "type": "string", "description": "VIDEO-COMPOSER-03: optional compact Lucide icon name shown with this dropdown choice." }
                   }
                 }
               },
@@ -1489,10 +1490,25 @@
               "quiet_value": {
                 "anyOf": [{ "type": "string" }, { "type": "number" }],
                 "description": "VIDEO-LORA-09: while this value is chosen the chip adds nothing to the group's summary words and thumbnail row (a \"No style\" or \"Normal\" default). Default unchanged."
-              }
+              },
+              "align": { "type": "string", "enum": ["start", "end"], "description": "VIDEO-COMPOSER-03: place this control at the leading or trailing side of a distributed chat toolbar." },
+              "icon_only": { "type": "boolean", "description": "VIDEO-COMPOSER-03: show the selected icon in the closed control without its text label; the accessible name and open choices keep their words." }
             }
           }
         },
+        "mode_selector": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "label", "default", "options"],
+          "description": "VIDEO-COMPOSER-03: a compact media kind selector in the Chat-style prompt toolbar.",
+          "properties": {
+            "state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+            "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "default": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "options": { "type": "array", "minItems": 2, "maxItems": 4, "items": { "type": "object", "additionalProperties": false, "required": ["value", "label"], "properties": { "value": { "type": "string", "minLength": 1, "maxLength": 40 }, "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "icon": { "type": "string", "minLength": 1, "maxLength": 40 } } } }
+          }
+        },
+        "mode_actions": { "type": "object", "description": "VIDEO-COMPOSER-03: submit action overrides by mode value; modes without an override use `submit`.", "additionalProperties": { "$ref": "#/$defs/action" } },
         "references": {
           "type": "array",
           "maxItems": 6,
@@ -1519,7 +1535,7 @@
           ],
           "description": "The kit tier segment (Standard, Boost, Max).",
           "properties": {
-            "presentation": { "type": "string", "enum": ["segment", "cards"], "default": "segment", "description": "VIDEO-UI-12: `segment` (default) is the pill segment with one hint line. `cards` draws one card per level: its label, its `hint` as the promise, and the time words from `submit_detail.labels` when `submit_detail.state` is this tier's `state`; a level with a `disabled_reason` shows that reason as visible text in place of its promise." },
+            "presentation": { "type": "string", "enum": ["segment", "cards", "dropdown"], "default": "segment", "description": "VIDEO-UI-12: `segment` (default) is the pill segment with one hint line. `cards` draws one card per level. `dropdown` uses the compact chat answer-style control, with one plain benefit line per choice." },
             "state": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_]*$",
@@ -1596,8 +1612,9 @@
           "type": "string",
           "enum": ["block", "composer", "chat"],
           "default": "block",
-          "description": "VIDEO-COMPOSER-02: `chat` adapts Home's compact Chat composer to a prompt field with reference attachment, compact option controls and a round submit action in one toolbar; `composer` is the earlier grouped layout; `block` preserves the original stacked layout."
+          "description": "VIDEO-COMPOSER-02/03: `chat` adapts Home's compact Chat composer to a prompt field with reference attachment, compact option controls and a round submit action in one toolbar; `chat_distribution` places compact choices at opposite ends of its toolbar; `composer` is the earlier grouped layout; `block` preserves the original stacked layout."
         },
+        "chat_distribution": { "type": "string", "enum": ["start_end"], "description": "VIDEO-COMPOSER-03: distribute compact chat composer controls between start and end of its toolbar." },
         "field_size": {
           "type": "string",
           "enum": ["default", "large"],

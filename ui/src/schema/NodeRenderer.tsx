@@ -818,6 +818,13 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
   }
   const [text, setText] = useState(typeof state[promptKey] === "string" ? (state[promptKey] as string) : "");
   const [picked, setPicked] = useState<Record<string, string | number>>(initial);
+  const modeConfig = node.mode_selector;
+  const [mode, setMode] = useState(() => {
+    const fromState = modeConfig ? state[modeConfig.state] : undefined;
+    return typeof fromState === "string" && modeConfig?.options.some((option) => option.value === fromState)
+      ? fromState
+      : modeConfig?.default ?? modeConfig?.options[0]?.value ?? "";
+  });
   const [tier, setTier] = useState<TierId>(() => {
     const fromState = node.tier ? state[node.tier.state] : undefined;
     return node.tier?.tiers.find((t) => t.id === fromState)?.id ?? node.tier?.default ?? node.tier?.tiers[0]?.id ?? "standard";
@@ -875,7 +882,8 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
   }, [refSignature]);
 
   // K8: the host's one line while the engine this bar starts is not ready; it stops the bar and is shown instead of an error.
-  const notice = node.starts ? host?.makingNotice?.(node.starts) : undefined;
+  const modeAction = node.mode_actions?.[mode];
+  const notice = node.starts && !modeAction ? host?.makingNotice?.(node.starts) : undefined;
 
   const detailValue = node.submit_detail ? (node.submit_detail.state === node.tier?.state ? tier : picked[node.submit_detail.state]) : undefined;
   const submitDetail = node.submit_detail && detailValue !== undefined ? node.submit_detail.labels[String(detailValue)] : undefined;
@@ -892,7 +900,8 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
     writer?.merge({ [promptKey]: text.trim() });
     setDismissed([]);
     setBusy(true);
-    dispatch(node.submit, [item], () => setBusy(false), { typedArgs: true });
+    if (modeConfig) item[modeConfig.state] = mode;
+    dispatch(modeAction ?? node.submit, [item], () => setBusy(false), { typedArgs: true });
   }
   return (
     <PromptBar
@@ -904,6 +913,13 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       submitLabel={node.submit_label}
       placement={node.placement}
       layout={node.layout}
+      chatDistribution={node.chat_distribution}
+      modeSelector={modeConfig ? {
+        label: modeConfig.label,
+        value: mode,
+        options: modeConfig.options,
+        onValueChange: (next) => { setMode(next); writer?.merge({ [modeConfig.state]: next }); },
+      } : undefined}
       fieldSize={node.field_size}
       suggestions={node.suggestions}
       submitDetail={submitDetail}
@@ -923,13 +939,15 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
           variant: chip.variant,
           presentation: chip.presentation,
           group: chip.group,
+          align: chip.align,
+          iconOnly: chip.icon_only,
           fold: chip.fold,
           trigger: chip.trigger,
           popoverSize: chip.popover_size,
           ...(unusable && chip.disabled_reason ? { disabledReason: chip.disabled_reason } : {}),
           ...(chip.quiet_value !== undefined ? { quietValue: chip.quiet_value } : {}),
           options: [
-            ...chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media), ...(o.note ? { note: o.note } : {}) })),
+            ...chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media), icon: o.icon, ...(o.note ? { note: o.note } : {}) })),
             ...(chip.locked === true && !unusable ? [{ locked: true as const }] : []),
           ],
           value: picked[chip.state]!,

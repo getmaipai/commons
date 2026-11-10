@@ -181,6 +181,8 @@ import {
   ScrollText,
   CircleDot,
   Layers,
+  RectangleHorizontal,
+  RectangleVertical,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -267,6 +269,8 @@ export const icons = {
   mic: Mic,
   "mic-vocal": MicVocal,
   monitor: Monitor,
+  "rectangle-horizontal": RectangleHorizontal,
+  "rectangle-vertical": RectangleVertical,
   moon: Moon,
   network: Network,
   "more-horizontal": MoreHorizontal,

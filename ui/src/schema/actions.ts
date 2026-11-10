@@ -32,10 +32,8 @@ export interface DispatchOptions {
 }
 
 // The five declared actions (platform plan 6.2). `play` hands the item to the
-// host's player (MEDIA-PLAYER-01, mediaHost.ts). `ask` has no consumer
-// yet (nothing this session builds is voice-driven) - dispatching it
-// throws rather than silently no-oping, the same "loud, not quiet" gap
-// binding.ts's `host` source leaves.
+// host's player (MEDIA-PLAYER-01, mediaHost.ts). `ask` is the explicit,
+// review-before-send handoff into Chat for a prompt created on another page.
 async function runAction(
   action: Action,
   item: Record<string, unknown>,
@@ -115,7 +113,12 @@ async function runAction(
     throw new Error("kit/schema: confirm must be dispatched through useDispatchAction, not runAction directly");
   }
   if ("ask" in action) {
-    throw new Error(`kit/schema: action "ask" has no interpreter support yet (prompt: ${action.ask.prompt})`);
+    // An explicit platform handoff from a package page into Chat. Packages
+    // cannot navigate to other apps directly; this typed action is the one
+    // deliberate exception, and Chat still sends nothing until the person
+    // reviews and submits the prompt in its own composer.
+    navigate("/chat", { state: { pageState: { ask: fillTemplate(action.ask.prompt, item) } } });
+    return;
   }
 }
 

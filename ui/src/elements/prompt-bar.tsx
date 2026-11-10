@@ -16,6 +16,7 @@ import { OptionCards, OptionThumb, isLockedOption, type LockedOptionCard } from 
 import { SafeImage } from "../primitives/SafeImage";
 import { TierSegment, type TierId, type TierOptionDef } from "./tier-segment";
 import { i18n } from "@/kit/i18n"
+import { getIcon } from "../icons";
 
 export interface PromptBarOption {
   value: string | number;
@@ -24,6 +25,8 @@ export interface PromptBarOption {
   media?: string;
   /** VIDEO-LORA-09: one plain line shown under the chip's cards while this option is chosen. */
   note?: string;
+  /** VIDEO-COMPOSER-03: an optional compact icon in dropdown choices, resolved from the kit's Lucide icon set. */
+  icon?: string;
 }
 
 /** VIDEO-CREATE-02: one file slot under the prompt box. VIDEO-UI-03 adds the `audio` and `video` kinds and the in-field placement. */
@@ -75,6 +78,10 @@ export interface PromptBarChip {
   disabledReason?: string;
   /** VIDEO-LORA-09: while this value is chosen the chip adds nothing to its group's summary words and thumbnails (a "No style" or "Normal" default). */
   quietValue?: string | number;
+  /** VIDEO-COMPOSER-03: put this compact control on the trailing side of the chat toolbar. */
+  align?: "start" | "end";
+  /** VIDEO-COMPOSER-03: keep the selected icon visible and the selected words in the accessible name/menu only. */
+  iconOnly?: boolean;
 }
 
 export interface PromptBarTier {
@@ -85,7 +92,7 @@ export interface PromptBarTier {
   confirmLabel?: string;
   cancelLabel?: string;
   /** VIDEO-UI-12: `segment` (default) or `cards`. */
-  presentation?: "segment" | "cards";
+  presentation?: "segment" | "cards" | "dropdown";
   /** VIDEO-UI-12: cards only: the time words for each level, by id. */
   details?: Readonly<Record<string, string>>;
 }
@@ -94,6 +101,13 @@ export interface PromptBarSuggestion {
   label: string;
   /** Put in the box when the chip is pressed. */
   text: string;
+}
+
+export interface PromptBarModeSelector {
+  label: string;
+  value: string;
+  options: readonly PromptBarOption[];
+  onValueChange: (value: string) => void;
 }
 
 /** STYLES-04: one suggested style or character shown as a removable chip under the prompt box. */
@@ -111,6 +125,8 @@ export interface PromptBarProps {
   onValueChange: (text: string) => void;
   maxLength?: number;
   chips?: readonly PromptBarChip[];
+  /** VIDEO-COMPOSER-03: the media kind selector built into the same Chat-style composer toolbar. */
+  modeSelector?: PromptBarModeSelector;
   /** Dashed square slots under the prompt box. */
   references?: readonly PromptBarReference[];
   tier?: PromptBarTier;
@@ -140,6 +156,8 @@ export interface PromptBarProps {
   placement?: "inline" | "panel";
   /** VIDEO-COMPOSER-02: `chat` adapts the compact Chat composer interaction for a make prompt and its inline choices. `composer` is the earlier grouped layout. */
   layout?: "block" | "composer" | "chat";
+  /** VIDEO-COMPOSER-03: distribute compact toolbar controls on either side like Grok Imagine. */
+  chatDistribution?: "start_end";
   /** VIDEO-UI-03: up to 4 idea chips shown while the box is empty. */
   suggestions?: readonly PromptBarSuggestion[];
   /** VIDEO-UI-03: the small line under the submit button (a time, never credits). */
@@ -180,7 +198,7 @@ function ChipCards({ chip, locked, columns }: { chip: PromptBarChip; locked: boo
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
  * It holds no state of its own. Videos Create draws it through the `prompt_bar` schema node and the chat video card draws it directly. */
-export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", layout: barLayout = "block", suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion, shape = "default", accent }: PromptBarProps) {
+export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], modeSelector, references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", layout: barLayout = "block", chatDistribution, suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion, shape = "default", accent }: PromptBarProps) {
   const layout = useSplitViewLayout();
   const phone = useIsPhoneLayout();
   const mode: Mode = placement === "panel" && layout ? (layout === "side" ? "panel" : "dock") : "inline";
@@ -190,6 +208,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   const blocked = busy || Boolean(disabledReason);
   const empty = value.trim() === "";
   const ready = !blocked && !empty;
+  const canChatSubmit = !busy && !empty;
   // Engine availability disables the submit action, not composition. People can draft words and
   // choose settings while an engine is stopped or being installed.
   const locked = false;
@@ -201,7 +220,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   const folded = chips.filter((c) => c.fold);
   const shown = suggestions.slice(0, 4);
 
-  function trySubmit() { if (ready) onSubmit(); }
+  function trySubmit() { if (chatDistribution === "start_end" && inChat ? canChatSubmit : ready) onSubmit(); }
 
   const errorRow = (
     <>
@@ -294,21 +313,36 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     </div>
   ) : null;
 
-  const dropdown = (chip: PromptBarChip, compact = false) => (
-    <Select key={chip.id} value={String(chip.value)} disabled={locked || Boolean(chip.disabledReason)} onValueChange={(next) => {
+  const dropdown = (chip: PromptBarChip, compact = false) => {
+    const selected = openOptions(chip).find((o) => String(o.value) === String(chip.value));
+    const SelectedIcon = selected?.icon ? getIcon(selected.icon) : null;
+    return <Select key={chip.id} value={String(chip.value)} disabled={locked || Boolean(chip.disabledReason)} onValueChange={(next) => {
       const picked = openOptions(chip).find((o) => String(o.value) === next);
       if (picked) chip.onValueChange(picked.value);
     }}>
-      <SelectTrigger data-chip={chip.id} aria-label={chip.label} shape="pill" className={cn("shrink-0", compact ? "min-h-11 px-3 text-sm sm:min-h-9" : "min-h-[48px]")}>
-        <SelectValue placeholder={chip.label} />
+      <SelectTrigger data-chip={chip.id} aria-label={chip.label} title={chip.iconOnly ? `${chip.label}: ${selected?.label ?? ""}` : undefined} shape="pill" className={cn("shrink-0", chip.iconOnly ? "size-11 justify-center px-2 sm:size-9" : compact ? "min-h-11 px-3 text-sm sm:min-h-9" : "min-h-[48px]")}>
+        {SelectedIcon ? <SelectedIcon className="size-4 shrink-0" aria-hidden="true" /> : null}{chip.iconOnly ? <SelectValue className="sr-only">{selected?.label}</SelectValue> : <SelectValue placeholder={chip.label}>{selected?.label}</SelectValue>}
       </SelectTrigger>
       <SelectContent>
-        {openOptions(chip).map((option) => (
-          <SelectItem key={String(option.value)} value={String(option.value)}>{option.label}</SelectItem>
-        ))}
+        {openOptions(chip).map((option) => {
+          const Icon = option.icon ? getIcon(option.icon) : null;
+          return <SelectItem key={String(option.value)} value={String(option.value)}><span className="flex items-center gap-2">{Icon ? <Icon className="size-4 shrink-0" aria-hidden="true" /> : null}{option.label}</span></SelectItem>;
+        })}
       </SelectContent>
-    </Select>
-  );
+    </Select>;
+  };
+
+  const modeControl = modeSelector ? (() => {
+    return <Select value={modeSelector.value} onValueChange={(next) => modeSelector.onValueChange(next)}>
+      <SelectTrigger data-slot="prompt-bar-mode" aria-label={modeSelector.label} shape="pill" className="min-h-11 shrink-0 px-3 text-sm sm:min-h-9">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>{modeSelector.options.map((option) => {
+        const OptionIcon = option.icon ? getIcon(option.icon) : null;
+        return <SelectItem key={String(option.value)} value={String(option.value)}><span className="flex items-center gap-2">{OptionIcon ? <OptionIcon className="size-4 shrink-0" aria-hidden="true" /> : null}{option.label}</span></SelectItem>;
+      })}</SelectContent>
+    </Select>;
+  })() : null;
 
   const cardsSection = (chip: PromptBarChip, columns: "auto" | "three" = "auto") => (
     <div key={chip.id} data-slot="prompt-bar-cards" className="flex min-w-0 flex-col gap-1.5">
@@ -354,6 +388,19 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   ) : null;
 
   const tierSegment = tier ? <TierSegment {...tier} density={inChat ? "compact" : undefined} /> : null;
+  const toolbarChips = chatDistribution === "start_end" && inChat
+    ? [...unfolded.filter((c) => c.align !== "end"), ...unfolded.filter((c) => c.align === "end")]
+    : unfolded;
+  const startChips = toolbarChips.filter((c) => c.align !== "end");
+  const endChips = toolbarChips.filter((c) => c.align === "end");
+  const renderChatChips = (list: readonly PromptBarChip[]) => {
+    const groupsForList = groupsOf(list);
+    return <>
+      {groupsForList.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" compact dropdown={(chip) => dropdown(chip, true)} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
+      {list.filter((c) => c.presentation !== "popover" && c.variant !== "cards").map((chip) => dropdown(chip, true))}
+      {list.filter((c) => c.presentation !== "popover" && c.variant === "cards").map((c) => cardsSection(c))}
+    </>;
+  };
   const inButton = submitDetailPlacement === "in_button" && Boolean(submitDetail);
 
   // VIDEO-UI-12: the label and the time as two lines inside the button. The button keeps its own name (the label); the time is its description.
@@ -399,13 +446,29 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
                   </button>
                 ) : null}
                 {leading}
-                {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" compact={inChat} dropdown={(chip) => dropdown(chip, inChat)} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
-                {plainChips.filter((c) => c.variant !== "cards").map((chip) => dropdown(chip, inChat))}
-                {plainChips.filter((c) => c.variant === "cards").map((c) => cardsSection(c))}
-                {tierSegment}
+                {modeControl}
+                {chatDistribution === "start_end" && inChat ? (
+                  <>
+                    {renderChatChips(startChips)}
+                    <span className="flex-1" aria-hidden="true" />
+                    {renderChatChips(endChips)}
+                  </>
+                ) : <>
+                    {groups.map((g) => <StyleGroup key={g.name} name={g.name} chips={g.chips} locked={locked} sheet={phone} side="bottom" compact={inChat} dropdown={(chip) => dropdown(chip, inChat)} cards={(c, wide) => <ChipCards chip={c} locked={locked} columns={wide ? "six" : "auto"} />} />)}
+                    {plainChips.filter((c) => c.variant !== "cards").map((chip) => dropdown(chip, inChat))}
+                    {plainChips.filter((c) => c.variant === "cards").map((c) => cardsSection(c))}
+                  </>}
+                {!(inChat && chatDistribution === "start_end") ? tierSegment : null}
                 {inChat && submitDetail ? <span id={detailId} className="sr-only min-w-0 truncate px-1 text-xs text-muted-foreground lg:not-sr-only">{submitDetail}</span> : null}
                 {inChat ? (
-                  <Button type="submit" size="icon" shape="pill" disabled={!ready} className="ml-auto size-11 shrink-0 sm:size-9" aria-describedby={submitDetail ? detailId : undefined} aria-label={submitLabel} title={submitDetail ? `${submitLabel} · ${submitDetail}` : submitLabel}>
+                  chatDistribution === "start_end" ? (
+                    <div data-slot="prompt-bar-trailing-controls" className="ml-auto flex shrink-0 items-center gap-1">
+                      {tierSegment}
+                      <Button type="submit" size="icon" shape="pill" disabled={!canChatSubmit} className="size-11 shrink-0 sm:size-9" aria-describedby={submitDetail ? detailId : undefined} aria-label={submitLabel} title={submitDetail ? `${submitLabel} · ${submitDetail}` : submitLabel}>
+                        <ArrowUp className="size-5" aria-hidden="true" />
+                      </Button>
+                    </div>
+                  ) : <Button type="submit" size="icon" shape="pill" disabled={!ready} className="ml-auto size-11 shrink-0 sm:size-9" aria-describedby={submitDetail ? detailId : undefined} aria-label={submitLabel} title={submitDetail ? `${submitLabel} · ${submitDetail}` : submitLabel}>
                     <ArrowUp className="size-5" aria-hidden="true" />
                   </Button>
                 ) : (

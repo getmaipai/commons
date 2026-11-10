@@ -4,6 +4,8 @@ import { useState } from "react";
 import { cn } from "cn";
 import { Button } from "../ui/button";
 import { i18n } from "@/kit/i18n"
+import { AnswerStyleSelect } from "./answer-style-select";
+import { getIcon } from "../icons";
 
 export type TierId = "standard" | "boost" | "max";
 
@@ -37,7 +39,7 @@ export interface TierSegmentProps {
   className?: string;
   /** VIDEO-UI-12: `segment` (default, unchanged) or `cards`: one card per level with its label, its hint as the promise, and its time
    * words from `details`; a level with a `disabledReason` shows that reason as visible text in place of its promise. */
-  presentation?: "segment" | "cards";
+  presentation?: "segment" | "cards" | "dropdown";
   /** VIDEO-UI-12: cards only: the time words by level id ("About a minute"). */
   details?: Readonly<Record<string, string>>;
   /** VIDEO-COMPOSER-02: compact toolbar layout without the per-tier hint line. */
@@ -63,6 +65,31 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
       </div>
     </div>
   ) : null;
+  if (presentation === "dropdown") {
+    const choices = tiers.map((tier) => ({
+      id: tier.id,
+      label: tier.label,
+      description: `${tier.disabledReason ?? tier.hint ?? ""}${!tier.disabledReason && details?.[tier.id] ? ` · ${details[tier.id]}` : ""}`,
+      icon: getIcon(tier.id === "max" ? "brain" : "zap"),
+      ...(tier.disabledReason ? { disabled: true } : {}),
+      ...(tier.id === "max" ? { accent: getIcon("sparkles") } : {}),
+    }));
+    return <div className="flex flex-col items-end gap-1">
+      <AnswerStyleSelect
+        choices={choices}
+        value={value}
+        name={label}
+        align="end"
+        onValueChange={(id) => {
+          const tier = tiers.find((item) => item.id === id);
+          if (!tier || tier.disabledReason || tier.id === value) return;
+          if (tier.confirm) setPending(tier);
+          else onValueChange(tier.id);
+        }}
+      />
+      {confirmBlock}
+    </div>;
+  }
   if (presentation === "cards") {
     return (
       <div data-slot="tier-segment" data-presentation="cards" className={cn("flex flex-col gap-2", className)}>

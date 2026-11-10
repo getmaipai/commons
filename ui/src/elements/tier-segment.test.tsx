@@ -11,6 +11,14 @@ const tiers: TierOptionDef[] = [
 ];
 
 describe("TierSegment", () => {
+  test("dropdown shows concise level benefits and applies a choice", () => {
+    const picked: string[] = [];
+    const { getByRole, getByText } = render(<TierSegment presentation="dropdown" value="standard" onValueChange={(tier) => picked.push(tier)} label="Level" tiers={[{ id: "standard", label: "Standard", hint: "Sound · up to 10 seconds" }, { id: "boost", label: "Boost", hint: "Sharper · sound · up to 5 seconds" }]} />);
+    fireEvent.click(getByRole("combobox", { name: "Level: Standard" }));
+    expect(getByText("Sound · up to 10 seconds")).toBeTruthy();
+    fireEvent.click(getByRole("menuitemradio", { name: /Boost/ }));
+    expect(picked).toEqual(["boost"]);
+  });
   test("compact density keeps the levels in the toolbar and drops the extra hint row", () => {
     const { getByRole, queryByText, container } = render(<TierSegment density="compact" value="standard" onValueChange={() => {}} tiers={[{ id: "standard", label: "Standard", hint: "Fast" }, { id: "boost", label: "Boost" }]} />);
     expect(getByRole("radio", { name: "Standard" }).className).toContain("sm:min-h-9");

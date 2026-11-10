@@ -542,6 +542,7 @@ export const PromptBarNodeSchema = z.object({
               label: z.string().min(1).max(40),
               media: z.string().min(1).max(200).regex(/^(?!.*\.\.)[A-Za-z0-9_][A-Za-z0-9_./-]*$/).optional(),
               note: z.string().min(1).max(300).optional(),
+              icon: z.string().min(1).max(40).optional(),
             }),
           )
           .min(1)
@@ -558,11 +559,20 @@ export const PromptBarNodeSchema = z.object({
         enabled_tiers: z.array(z.enum(["standard", "boost", "max"])).min(1).max(3).refine((list) => new Set(list).size === list.length).optional(),
         disabled_reason: z.string().min(1).max(120).optional(),
         quiet_value: z.union([z.string(), z.number()]).optional(),
+        align: z.enum(["start", "end"]).optional(),
+        icon_only: z.boolean().optional(),
         private: z.boolean().optional(),
       }),
     )
     .max(10)
     .optional(),
+  mode_selector: z.object({
+    state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
+    label: z.string().min(1).max(40),
+    default: z.string().min(1).max(40),
+    options: z.array(z.object({ value: z.string().min(1).max(40), label: z.string().min(1).max(40), icon: z.string().min(1).max(40).optional() })).min(2).max(4),
+  }).optional(),
+  mode_actions: z.record(z.string().min(1).max(40), ActionSchema).optional(),
   references: z
     .array(
       z.object({
@@ -577,7 +587,7 @@ export const PromptBarNodeSchema = z.object({
     .optional(),
   tier: z
     .object({
-      presentation: z.enum(["segment", "cards"]).optional(),
+      presentation: z.enum(["segment", "cards", "dropdown"]).optional(),
       state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
       label: z.string().min(1).max(40).optional(),
       default: z.enum(["standard", "boost", "max"]).optional(),
@@ -598,6 +608,7 @@ export const PromptBarNodeSchema = z.object({
   submit_label: z.string().min(1).max(24).optional(),
   placement: z.enum(["inline", "panel"]).optional(),
   layout: z.enum(["block", "composer", "chat"]).optional(),
+  chat_distribution: z.enum(["start_end"]).optional(),
   field_size: z.enum(["default", "large"]).optional(),
   suggestions: z.array(z.object({ label: z.string().min(1).max(40), text: z.string().min(1).max(300) })).max(4).optional(),
   submit_detail: z.object({ state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40), placement: z.enum(["below", "in_button"]).optional(), labels: z.record(z.string(), z.string().min(1).max(80)) }).optional(),

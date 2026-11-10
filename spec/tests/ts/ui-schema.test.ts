@@ -415,6 +415,7 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, layout: "block" })).toBe(true);
     expect(validate({ ...ok, layout: "composer" })).toBe(true);
     expect(validate({ ...ok, layout: "chat" })).toBe(true);
+    expect(validate({ ...ok, layout: "chat", chat_distribution: "start_end", chips: [{ state: "sound", label: "Sound", align: "end", options: [{ value: "off", label: "Off", icon: "volume-x" }] }], tier: { state: "tier", presentation: "dropdown", tiers: [{ id: "standard", label: "Standard", hint: "Fast, sound, up to 10 seconds" }] } })).toBe(true);
     expect(validate({ ...ok, layout: "columns" })).toBe(false);
   });
 

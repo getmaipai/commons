@@ -1,3 +1,7 @@
+## [spec-v0.1.363] - 2026-11-10
+
+- VIDEO-COMPOSER-03. `prompt_bar` supports a compact Image / Video mode selector, mode-specific submit actions, leading and trailing control alignment, icon-only closed choices, dropdown quality presentation and icons on option choices. Defaults are unchanged.
+
 ## [spec-v0.1.362] - 2026-11-10
 
 - VIDEO-COMPOSER-02. `prompt_bar.layout` adds the optional `chat` presentation for a compact input and toolbar; defaults and earlier layouts are unchanged.
