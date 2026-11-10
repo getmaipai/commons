@@ -15,6 +15,8 @@ export type AnswerStyleChoice = {
   /** A small mark drawn on the icon's corner in the accent token (a glow or sparkle). */
   accent?: ComponentType<{ className?: string; "aria-hidden"?: boolean | "true" | "false" }>;
   disabled?: boolean;
+  /** Testable description for the radio row (also useful for automation). */
+  dataDescription?: string;
   /** This choice is a switched-on state (Thinking, Max): the closed control then wears the filled look. Unset or false: the quiet look. */
   on?: boolean;
 };
@@ -59,7 +61,7 @@ export function AnswerStyleSelect({ choices, value, onValueChange, name = i18n._
       <DropdownMenuContent side={side} align={align} data-slot="answer-style-select-content">
         <DropdownMenuRadioGroup value={current.id} onValueChange={onValueChange}>
           {choices.map((choice) => (
-            <DropdownMenuRadioItem key={choice.id} value={choice.id} disabled={choice.disabled}>
+            <DropdownMenuRadioItem key={choice.id} value={choice.id} disabled={choice.disabled} data-description={choice.dataDescription}>
               <ChoiceIcon choice={choice} />
               <span className="flex flex-col">
                 <span className="font-medium">{choice.label}</span>

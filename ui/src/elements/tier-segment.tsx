@@ -70,6 +70,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
       id: tier.id,
       label: tier.label,
       description: `${tier.disabledReason ?? tier.hint ?? ""}${!tier.disabledReason && details?.[tier.id] ? ` · ${details[tier.id]}` : ""}`,
+      dataDescription: `${tier.disabledReason ?? tier.hint ?? ""}${!tier.disabledReason && details?.[tier.id] ? ` · ${details[tier.id]}` : ""}`,
       icon: getIcon(tier.id === "max" ? "brain" : "zap"),
       ...(tier.disabledReason ? { disabled: true } : {}),
       ...(tier.id === "max" ? { accent: getIcon("sparkles") } : {}),
