@@ -11,6 +11,7 @@ export * from "./blocklists.js";
 export * from "./caption-track.js";
 export * from "./chat-folder.js";
 export * from "./coding-mode-readiness.js";
+export * from "./companion-pack.js";
 export * from "./content-ceiling.js";
 export * from "./conversation-turn.js";
 export * from "./conversation.js";
