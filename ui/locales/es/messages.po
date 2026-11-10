@@ -62,7 +62,7 @@ msgid "ui.{count, plural, one {# app} other {# apps}}"
 msgstr "{count, plural, one {# app} other {# apps}}"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:215
+#: src/elements/adult-lock.tsx:218
 #: src/elements/track-studio-model.ts:298
 #, needs-review
 msgid "ui.{count, plural, one {# minute} other {# minutes}}"
@@ -75,7 +75,7 @@ msgid "ui.{count, plural, one {# notification} other {# notifications}}"
 msgstr "{count, plural, one {# notificación} other {# notificaciones}}"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:213
+#: src/elements/adult-lock.tsx:216
 #: src/elements/track-studio-model.ts:299
 #, needs-review
 msgid "ui.{count, plural, one {# second} other {# seconds}}"
@@ -89,7 +89,7 @@ msgid "ui.{count, plural, one {# source} other {# sources}}"
 msgstr "{count, plural, one {# fuente} other {# fuentes}}"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:292
+#: src/elements/adult-lock.tsx:295
 #, needs-review
 msgid "ui.{count, plural, one {# try left.} other {# tries left.}}"
 msgstr "{count, plural, one {queda # intento.} other {quedan # intentos.}}"
@@ -1256,7 +1256,7 @@ msgid "ui.Can view"
 msgstr "Puede ver"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:372
+#: src/elements/adult-lock.tsx:376
 #: src/elements/feedback-dialog.tsx:174
 #: src/elements/image-editor.tsx:1081
 #: src/elements/image-editor.tsx:1135
@@ -1397,7 +1397,7 @@ msgid "ui.Chats"
 msgstr "Chats"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:373
+#: src/elements/adult-lock.tsx:377
 #, needs-review
 msgid "ui.Checking"
 msgstr "Comprobando"
@@ -1480,7 +1480,7 @@ msgstr ""
 #: src/dashboard/components/ui/dialog.tsx:91
 #: src/dashboard/components/ui/dialog.tsx:129
 #: src/dashboard/components/ui/sheet.tsx:76
-#: src/elements/adult-lock.tsx:380
+#: src/elements/adult-lock.tsx:384
 #: src/elements/clip-feed.tsx:38
 #: src/elements/media-viewer.tsx:111
 #: src/elements/mermaid-diagram.tsx:236
@@ -2385,7 +2385,7 @@ msgid "ui.Enter no more than {count} characters."
 msgstr "Escribe como máximo {count} caracteres."
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:365
+#: src/elements/adult-lock.tsx:368
 #, needs-review
 msgid "ui.Enter your {digits}-digit {word}"
 msgstr "Introduce tu {word} de {digits} dígitos"
@@ -2397,8 +2397,8 @@ msgid "ui.Enter your {digits}-digit passcode"
 msgstr "Introduce tu código de {digits} dígitos"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:312
-#: src/elements/adult-lock.tsx:335
+#: src/elements/adult-lock.tsx:315
+#: src/elements/adult-lock.tsx:338
 #, needs-review
 msgid "ui.Enter your {word}"
 msgstr "Introduce tu {word}"
@@ -2850,7 +2850,7 @@ msgid "ui.Hide {count} advanced settings"
 msgstr "Ocultar {count} ajustes avanzados"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:349
+#: src/elements/adult-lock.tsx:352
 #, needs-review
 msgid "ui.Hide {word}"
 msgstr "Ocultar {word}"
@@ -3440,20 +3440,20 @@ msgid "ui.Locked"
 msgstr "Bloqueado"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:312
-#: src/elements/adult-lock.tsx:422
+#: src/elements/adult-lock.tsx:315
+#: src/elements/adult-lock.tsx:426
 #, needs-review
 msgid "ui.Locked items"
 msgstr "Elementos bloqueados"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:147
+#: src/elements/adult-lock.tsx:148
 #, needs-review
 msgid "ui.Locked items hidden"
 msgstr "Elementos bloqueados ocultos"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:411
+#: src/elements/adult-lock.tsx:415
 #, needs-review
 msgid "ui.Locked items. Press to enter your passcode."
 msgstr "Elementos bloqueados. Toca para introducir tu código."
@@ -4634,13 +4634,13 @@ msgid "ui.partial"
 msgstr "parcial"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:225
+#: src/elements/adult-lock.tsx:228
 #, needs-review
 msgid "ui.passcode"
 msgstr "código"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:225
+#: src/elements/adult-lock.tsx:228
 #, needs-review
 msgid "ui.password"
 msgstr "contraseña"
@@ -4943,7 +4943,7 @@ msgid "ui.Playhead"
 msgstr "Cabezal de reproducción"
 
 #. js-lingui-explicit-id
-#: src/schema/mediaHost.ts:88
+#: src/schema/mediaHost.ts:90
 #, needs-review
 msgid "ui.Playing is not set up on this screen. Open the item from its app."
 msgstr "La reproducción no está configurada en esta pantalla. Abre el elemento desde su app."
@@ -5911,7 +5911,7 @@ msgstr "Buscar {title}"
 
 #. js-lingui-explicit-id
 #: src/schema/NodeRenderer.tsx:1093
-#: src/schema/types.ts:180
+#: src/schema/types.ts:181
 #, needs-review
 msgid "ui.Select"
 msgstr "Seleccionar"
@@ -6039,7 +6039,7 @@ msgid "ui.Set (verb)"
 msgstr "Fijar"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:378
+#: src/elements/adult-lock.tsx:382
 #, needs-review
 msgid "ui.Set a {word} in Account to open these."
 msgstr "Configura un {word} en Cuenta para abrirlos."
@@ -6157,7 +6157,7 @@ msgid "ui.Show {title}"
 msgstr "Mostrar {title}"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:349
+#: src/elements/adult-lock.tsx:352
 #, needs-review
 msgid "ui.Show {word}"
 msgstr "Mostrar {word}"
@@ -6319,8 +6319,8 @@ msgstr "Algo salió mal"
 
 #. js-lingui-explicit-id
 #: src/primitives/AsyncState.tsx:54
-#: src/schema/actions.ts:218
-#: src/schema/actions.ts:241
+#: src/schema/actions.ts:228
+#: src/schema/actions.ts:251
 #: src/schema/NodeRenderer.tsx:1248
 #, needs-review
 msgid "ui.Something went wrong."
@@ -6732,7 +6732,7 @@ msgid "ui.Thanks. That helps us tune the model."
 msgstr "Gracias. Eso nos ayuda a ajustar el modelo."
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:292
+#: src/elements/adult-lock.tsx:295
 #, needs-review
 msgid "ui.That {word} was not right. Check it and try again."
 msgstr "Ese {word} no era correcto. Revísalo e inténtalo de nuevo."
@@ -6854,13 +6854,13 @@ msgid "ui.These instructions shape answers in this project."
 msgstr "Estas instrucciones dan forma a las respuestas en este proyecto."
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:315
+#: src/elements/adult-lock.tsx:318
 #, needs-review
 msgid "ui.These items stay hidden until you do. Only your own code opens them."
 msgstr "Estos elementos se mantienen ocultos hasta que lo hagas. Solo tu código los abre."
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:316
+#: src/elements/adult-lock.tsx:319
 #, needs-review
 msgid "ui.These items stay hidden until you set a code. Nothing opens without one."
 msgstr "Estos elementos se mantienen ocultos hasta que configures un código. Nada se abre sin uno."
@@ -7041,7 +7041,7 @@ msgid "ui.Toggle Sidebar"
 msgstr "Mostrar u ocultar barra lateral"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:287
+#: src/elements/adult-lock.tsx:290
 #, needs-review
 msgid "ui.Too many wrong tries. Unlocking is paused: wait for the timer, then try again."
 msgstr "Demasiados intentos fallidos. El desbloqueo está pausado: espera al temporizador y vuelve a intentarlo."
@@ -7130,7 +7130,7 @@ msgid "ui.Try again"
 msgstr "Inténtalo de nuevo"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:370
+#: src/elements/adult-lock.tsx:373
 #, needs-review
 msgid "ui.Try again in {wait}."
 msgstr "Vuelve a intentarlo en {wait}."
@@ -7250,13 +7250,13 @@ msgid "ui.Unlike"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:373
+#: src/elements/adult-lock.tsx:377
 #, needs-review
 msgid "ui.Unlock"
 msgstr "Desbloquear"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:157
+#: src/elements/adult-lock.tsx:158
 #: src/elements/lock-tile.tsx:7
 #, needs-review
 msgid "ui.Unlocked"
@@ -7369,6 +7369,13 @@ msgstr "Ampliar añade detalles que la imagen no tenía. Las caras pueden cambia
 #, needs-review
 msgid "ui.Uptime history, {count, plural, one {# day} other {# days}}"
 msgstr "Historial de actividad, {count, plural, one {# día} other {# días}}"
+
+#. js-lingui-explicit-id
+#: src/elements/adult-lock.tsx:375
+#: src/elements/adult-lock.tsx:375
+#, needs-review
+msgid "ui.Use a passkey"
+msgstr "Usar una llave de acceso"
 
 #. js-lingui-explicit-id
 #: src/settings/LocationField.tsx:214
@@ -7555,7 +7562,7 @@ msgid "ui.Waxing Gibbous"
 msgstr "Gibosa creciente"
 
 #. js-lingui-explicit-id
-#: src/elements/adult-lock.tsx:294
+#: src/elements/adult-lock.tsx:297
 #, needs-review
 msgid "ui.We could not check your {word}. Check your connection and try again."
 msgstr "No pudimos comprobar tu {word}. Revisa tu conexión e inténtalo de nuevo."
