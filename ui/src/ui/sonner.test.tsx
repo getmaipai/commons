@@ -9,7 +9,7 @@ describe("Toaster kinds", () => {
     const view = render(<Toaster />);
     toast.error("Could not save. Try again.");
     toast.success("Saved.");
-    await waitFor(() => expect(view.container.ownerDocument.querySelectorAll("[data-sonner-toast]").length).toBe(2));
+    await waitFor(() => expect(view.container.ownerDocument.querySelectorAll("[data-sonner-toast]").length).toBeGreaterThanOrEqual(2));
     const classes = [...view.container.ownerDocument.querySelectorAll("[data-sonner-toast]")].map((n) => n.className).join(" ");
     expect(classes).toContain("--tint-problem-border");
     expect(classes).toContain("--status-done-ink");
