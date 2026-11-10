@@ -136,6 +136,16 @@ describe("UI schema", () => {
     expect(validate({ ...shelf, orientation: "diagonal" })).toBe(false);
   });
 
+  test("QA-FINISH-01: list.hide_when_empty and call.success_label", () => {
+    const list = { type: "list", bind: { source: "package", path: "x" }, item_key_field: "id", item_label_field: "t" };
+    expect(validate({ ...list, hide_when_empty: true })).toBe(true);
+    expect(validate({ ...list, hide_when_empty: "yes" })).toBe(false);
+    const withCall = (call: unknown) => validate({ ...list, row_action: { icon: "plus", label: "Save", action: { call } } });
+    expect(withCall({ target: "/api/x", success_label: "Saved" })).toBe(true);
+    expect(withCall({ target: "/api/x", success_label: "" })).toBe(false);
+    expect(withCall({ target: "/api/x", success_label: 3 })).toBe(false);
+  });
+
   test("a node with an unknown type is rejected", () => {
     const bad = { type: "not_a_real_type" };
     expect(validate(bad)).toBe(false);

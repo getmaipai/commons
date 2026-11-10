@@ -102,6 +102,7 @@
               "additionalProperties": true,
               "description": "String values may contain `{field}` placeholders, resolved the same way as `target`."
             },
+            "success_label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "QA-FINISH-01: after the call succeeds, the kit shows this text as a brief toast (\"Saved\"). May contain `{field}` placeholders. Absent: no toast. A failed call shows its error instead." },
             "then": {
               "type": "object",
               "additionalProperties": false,
@@ -363,6 +364,7 @@
         },
         "item_badge_field": { "type": "string", "description": "Dotted path to a boolean; true shows a small badge (item_badge_label) next to the subtitle." },
         "item_badge_label": { "type": "string" },
+        "hide_when_empty": { "type": "boolean", "default": false, "description": "QA-FINISH-01: draw nothing (not even the empty text) when the bound call returns no rows, so a list with nothing in it is simply absent. A load error still shows." },
         "item_media_field": { "type": "string", "description": "NEWS-00: dotted path to a lucide icon name or a same-origin image path (starting with `/`); drawn as the row's leading media. An address with a scheme or host is refused, so a row never loads another site's picture." },
         "row_toggle": {
           "type": "object",

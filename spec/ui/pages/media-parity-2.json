@@ -99,6 +99,29 @@
         "source": "route",
         "path": "/api/widgets"
       }
+    },
+    {
+      "type": "list",
+      "bind": {
+        "source": "package",
+        "path": "playlist-people"
+      },
+      "item_key_field": "id",
+      "item_label_field": "name",
+      "hide_when_empty": true,
+      "row_action": {
+        "icon": "plus",
+        "label": "Save {name}",
+        "action": {
+          "call": {
+            "target": "/api/plugins/music/playlists/save",
+            "args": {
+              "id": "{id}"
+            },
+            "success_label": "Saved"
+          }
+        }
+      }
     }
   ]
 }

@@ -36,6 +36,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
           target: z.string(),
           method: z.enum(["POST", "PATCH", "DELETE"]).default("POST"),
           args: z.record(z.string(), z.unknown()).optional(),
+          success_label: z.string().min(1).max(40).optional(),
           then: z.object({ navigate: z.object({ to: z.string(), state: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional() }) }).optional(),
         }),
       }),
@@ -49,7 +50,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
 );
 export type Action =
   | { navigate: { to: string; state?: Record<string, string | number | boolean> } }
-  | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown>; then?: { navigate: { to: string; state?: Record<string, string | number | boolean> } } } }
+  | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown>; success_label?: string; then?: { navigate: { to: string; state?: Record<string, string | number | boolean> } } } }
   | { play: { media_id: string; position_s?: number | string } }
   | { share: { to: string; title?: string } }
   | { confirm: { prompt: string; on_confirm: Action; status?: Binding } }
@@ -158,6 +159,7 @@ export const ListNodeSchema = z.object({
   item_badge_field: z.string().optional(),
   item_badge_label: z.string().optional(),
   item_media_field: z.string().optional(),
+  hide_when_empty: z.boolean().optional(),
   row_toggle: z
     .object({
       field: z.string().min(1),
