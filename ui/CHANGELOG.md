@@ -1,3 +1,7 @@
+## [ui-v0.5.583] - 2026-11-10
+
+- MAKER-G, additive. `CompanionPackPlayer` plays a still-plus-parts pack (no `states`, a `voice` layer): a 2D canvas draws the base picture and the reactive parts, driven by the same `state` and `speech` props (heart pulse and glow, eye squash and blink, visor sheen in the MaiPai pack). No video element and no WebGL; reduced motion, pause and sizes of 36 px or less show the plain rest picture. New pure module `voice-layer.ts` (curves, attack and release smoothing, per-state drives, `VoiceRuntime`, `drawVoiceFrame`) and `voice-player.tsx`; `CompanionPackData.states` is now optional. Packs with `states` behave as before (a `voice` layer on a video pack is ignored for now). Pairs with spec-v0.1.365.
+
 ## [ui-v0.5.582] - 2026-11-10
 
 - PACK-05b, additive. `CompanionPackPlayer` loads and speaks a pack that has no `head` and/or no `eyes` layer: the loader fetches no `head/` or `eyes/` file, no head or eyelid layer is created, and the mouth, emotion and shoulder layers run as before. Pairs with spec-v0.1.364, where those two layers are optional.

@@ -1,0 +1,249 @@
+{
+  "version": 1,
+  "id": "maipai",
+  "name": "MaiPai",
+  "tile": {
+    "desktop": 480
+  },
+  "rest": "rest.webp",
+  "voice": {
+    "base": "voice/base.webp",
+    "parts": [
+      {
+        "id": "visor-sheen",
+        "file": "voice/visor-sheen.webp",
+        "box": {
+          "x": 129,
+          "y": 59,
+          "w": 223,
+          "h": 183
+        },
+        "z": 1,
+        "effects": [
+          {
+            "channel": "level",
+            "curve": "smooth",
+            "smoothing": {
+              "attackMs": 120,
+              "releaseMs": 450
+            },
+            "opacity": [
+              0,
+              0.3
+            ]
+          }
+        ]
+      },
+      {
+        "id": "heart",
+        "file": "voice/heart.webp",
+        "box": {
+          "x": 183,
+          "y": 280,
+          "w": 104,
+          "h": 88
+        },
+        "anchor": {
+          "x": 0.5,
+          "y": 0.55
+        },
+        "z": 2,
+        "glow": {
+          "color": "#ff3b30",
+          "blur": 26
+        },
+        "effects": [
+          {
+            "channel": "level",
+            "curve": "linear",
+            "smoothing": {
+              "attackMs": 40,
+              "releaseMs": 200
+            },
+            "scale": [
+              1,
+              1.12
+            ],
+            "glow": [
+              0,
+              1
+            ]
+          },
+          {
+            "channel": "state",
+            "curve": "pulse",
+            "scale": [
+              1,
+              1.06
+            ],
+            "glow": [
+              0,
+              0.5
+            ],
+            "drive": {
+              "idle": {
+                "hz": 0.25,
+                "depth": 0.35
+              },
+              "think": {
+                "amount": 0.15,
+                "hz": 0.9,
+                "depth": 0.6
+              },
+              "listen": {
+                "beat": true,
+                "depth": 1
+              },
+              "interrupt": {
+                "beat": true,
+                "depth": 0.6
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "eye-left",
+        "file": "voice/eye-left.webp",
+        "box": {
+          "x": 114,
+          "y": 128,
+          "w": 104,
+          "h": 62
+        },
+        "z": 2,
+        "effects": [
+          {
+            "channel": "level",
+            "curve": "ease-out",
+            "smoothing": {
+              "attackMs": 50,
+              "releaseMs": 220
+            },
+            "scaleY": [
+              1,
+              0.9
+            ],
+            "scaleX": [
+              1,
+              1.04
+            ],
+            "translate": {
+              "y": [
+                0,
+                -3
+              ]
+            }
+          },
+          {
+            "channel": "state",
+            "curve": "blink",
+            "blinkMs": 150,
+            "scaleY": [
+              1,
+              0.12
+            ],
+            "drive": {
+              "idle": {
+                "hz": 0.22
+              },
+              "listen": {
+                "hz": 0.28
+              },
+              "think": {
+                "hz": 0.16
+              },
+              "speak": {
+                "hz": 0.3
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "heart",
+        "file": "voice/eye-right.webp",
+        "box": {
+          "x": 259,
+          "y": 126,
+          "w": 101,
+          "h": 61
+        },
+        "z": 2,
+        "effects": [
+          {
+            "channel": "level",
+            "curve": "ease-out",
+            "smoothing": {
+              "attackMs": 50,
+              "releaseMs": 220
+            },
+            "scaleY": [
+              1,
+              0.9
+            ],
+            "scaleX": [
+              1,
+              1.04
+            ],
+            "translate": {
+              "y": [
+                0,
+                -3
+              ]
+            }
+          },
+          {
+            "channel": "state",
+            "curve": "blink",
+            "blinkMs": 150,
+            "scaleY": [
+              1,
+              0.12
+            ],
+            "drive": {
+              "idle": {
+                "hz": 0.22
+              },
+              "listen": {
+                "hz": 0.28
+              },
+              "think": {
+                "hz": 0.16
+              },
+              "speak": {
+                "hz": 0.3
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "presets": {
+      "idle": {
+        "gain": 1
+      },
+      "listen": {
+        "gain": 1
+      },
+      "think": {
+        "gain": 1
+      },
+      "speak": {
+        "gain": 1
+      },
+      "interrupt": {
+        "gain": 0.8
+      }
+    }
+  },
+  "budget": {
+    "bytes": 1048576
+  },
+  "provenance": {
+    "maker": "make_maipai_pack.py",
+    "makerVersion": "1",
+    "source": "generated",
+    "created": "2026-11-10T00:00:00Z"
+  }
+}

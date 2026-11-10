@@ -2,10 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/companion-pack.schema.json",
   "title": "CompanionPack",
-  "description": "PACK-01b: a portable animation and expression pack for one companion.",
+  "description": "PACK-01b: a portable animation and expression pack for one companion. MAKER-G: a pack with a voice layer may be a still picture plus reactive parts (no video). `states`, `mouth`, `emotion` and `life` are required unless `voice` is present; validateCompanionPack enforces that.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "id", "name", "tile", "states", "mouth", "emotion", "rest", "life", "budget", "provenance"],
+  "required": ["version", "id", "name", "tile", "rest", "budget", "provenance"],
   "properties": {
     "version": {"type":"integer", "const":1},
     "id": {"type":"string", "pattern":"^[a-z][a-z0-9-]*$"},
@@ -19,6 +19,7 @@
     "rest": {"$ref":"#/$defs/file"},
     "life": {"type":"object","additionalProperties":false,"minProperties":1,"properties":{"nod":{"$ref":"#/$defs/gain"},"brow":{"$ref":"#/$defs/gain"},"gazeL":{"$ref":"#/$defs/gain"},"gazeR":{"$ref":"#/$defs/gain"},"gazeU":{"$ref":"#/$defs/gain"},"eyeWide":{"$ref":"#/$defs/gain"},"eyeSquint":{"$ref":"#/$defs/gain"},"eyeClosed":{"$ref":"#/$defs/gain"},"eyeHalf":{"$ref":"#/$defs/gain"},"mCorner":{"$ref":"#/$defs/gain"},"mAsymL":{"$ref":"#/$defs/gain"},"mAsymR":{"$ref":"#/$defs/gain"},"mUpper":{"$ref":"#/$defs/gain"},"mPress":{"$ref":"#/$defs/gain"},"mNostril":{"$ref":"#/$defs/gain"},"mWrinkle":{"$ref":"#/$defs/gain"},"smile":{"$ref":"#/$defs/gain"},"mBrow":{"$ref":"#/$defs/gain"}}},
     "budget": {"type":"object","additionalProperties":false,"required":["bytes"],"properties":{"bytes":{"type":"integer","minimum":1,"maximum":12582912},"phoneBytes":{"type":"integer","minimum":0}}},
+    "voice": {"$ref":"#/$defs/voice"},
     "provenance": {"$ref":"#/$defs/provenance"}
   },
   "$defs": {
@@ -33,6 +34,35 @@
     "mouthSet": {"$ref":"#/$defs/dir"},
     "mouth": {"type":"object","additionalProperties":false,"required":["letters","anchor","calm"],"properties":{"letters":{"type":"object","additionalProperties":false,"required":["A","B","C","D","E","F","G","H","wide"],"properties":{"A":{"type":"integer","minimum":0},"B":{"type":"integer","minimum":0},"C":{"type":"integer","minimum":0},"D":{"type":"integer","minimum":0},"E":{"type":"integer","minimum":0},"F":{"type":"integer","minimum":0},"G":{"type":"integer","minimum":0},"H":{"type":"integer","minimum":0},"wide":{"type":"integer","minimum":0}}},"anchor":{"type":"object","additionalProperties":false,"required":["x","y","w","h"],"properties":{"x":{"type":"number"},"y":{"type":"number"},"w":{"type":"number","exclusiveMinimum":0},"h":{"type":"number","exclusiveMinimum":0}}},"calm":{"$ref":"#/$defs/mouthSet"},"shout":{"$ref":"#/$defs/mouthSet"},"warp":{"type":"boolean"},"flowEncoding":{"$ref":"#/$defs/flowEncoding"}}},
     "emotion": {"type":"object","additionalProperties":false,"required":["dir","kinds"],"properties":{"dir":{"$ref":"#/$defs/file"},"kinds":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","enum":["angry","excited","alarmed","sad"]}},"flowEncoding":{"$ref":"#/$defs/flowEncoding"}}},
+    "voiceState": {"type":"string","enum":["idle","listen","think","speak","interrupt"]},
+    "range": {"type":"array","minItems":2,"maxItems":2,"items":{"type":"number"}},
+    "voiceSmoothing": {"type":"object","additionalProperties":false,"properties":{"attackMs":{"type":"number","minimum":0,"maximum":2000},"releaseMs":{"type":"number","minimum":0,"maximum":5000}}},
+    "voiceDrive": {"type":"object","additionalProperties":false,"properties":{"amount":{"type":"number","minimum":0,"maximum":1},"hz":{"type":"number","minimum":0,"maximum":4},"depth":{"type":"number","minimum":0,"maximum":1},"beat":{"type":"boolean"}}},
+    "voiceEffect": {"type":"object","additionalProperties":false,"required":["channel"],"properties":{
+      "channel":{"type":"string","enum":["level","cue_energy","state"]},
+      "curve":{"type":"string","enum":["linear","ease-in","ease-out","smooth","pulse","blink"]},
+      "smoothing":{"$ref":"#/$defs/voiceSmoothing"},
+      "drive":{"type":"object","additionalProperties":false,"properties":{"idle":{"$ref":"#/$defs/voiceDrive"},"listen":{"$ref":"#/$defs/voiceDrive"},"think":{"$ref":"#/$defs/voiceDrive"},"speak":{"$ref":"#/$defs/voiceDrive"},"interrupt":{"$ref":"#/$defs/voiceDrive"}}},
+      "blinkMs":{"type":"number","minimum":40,"maximum":1000},
+      "scale":{"$ref":"#/$defs/range"},"scaleX":{"$ref":"#/$defs/range"},"scaleY":{"$ref":"#/$defs/range"},"rotate":{"$ref":"#/$defs/range"},
+      "translate":{"type":"object","additionalProperties":false,"minProperties":1,"properties":{"x":{"$ref":"#/$defs/range"},"y":{"$ref":"#/$defs/range"}}},
+      "opacity":{"$ref":"#/$defs/range"},"brightness":{"$ref":"#/$defs/range"},"glow":{"$ref":"#/$defs/range"}
+    }},
+    "voicePart": {"type":"object","additionalProperties":false,"required":["id","file","box","effects"],"properties":{
+      "id":{"type":"string","pattern":"^[a-z][a-z0-9-]*$"},
+      "file":{"type":"string","pattern":"^(?!/)(?!.*\\.\\.).+\\.(webp|png)$"},
+      "box":{"type":"object","additionalProperties":false,"required":["x","y","w","h"],"properties":{"x":{"type":"number"},"y":{"type":"number"},"w":{"type":"number","exclusiveMinimum":0},"h":{"type":"number","exclusiveMinimum":0}}},
+      "anchor":{"type":"object","additionalProperties":false,"required":["x","y"],"properties":{"x":{"type":"number","minimum":0,"maximum":1},"y":{"type":"number","minimum":0,"maximum":1}}},
+      "z":{"type":"integer","minimum":0,"maximum":99},
+      "glow":{"type":"object","additionalProperties":false,"required":["color"],"properties":{"color":{"type":"string","pattern":"^#[0-9a-fA-F]{6}$"},"blur":{"type":"number","minimum":0,"maximum":96}}},
+      "effects":{"type":"array","minItems":1,"maxItems":8,"items":{"$ref":"#/$defs/voiceEffect"}}
+    }},
+    "voice": {"type":"object","additionalProperties":false,"required":["parts"],"properties":{
+      "base":{"$ref":"#/$defs/file"},
+      "parts":{"type":"array","minItems":1,"maxItems":12,"items":{"$ref":"#/$defs/voicePart"}},
+      "presets":{"type":"object","additionalProperties":false,"properties":{"idle":{"$ref":"#/$defs/voicePreset"},"listen":{"$ref":"#/$defs/voicePreset"},"think":{"$ref":"#/$defs/voicePreset"},"speak":{"$ref":"#/$defs/voicePreset"},"interrupt":{"$ref":"#/$defs/voicePreset"}}}
+    }},
+    "voicePreset": {"type":"object","additionalProperties":false,"properties":{"gain":{"type":"number","minimum":0,"maximum":2}}},
     "provenance": {"type":"object","additionalProperties":false,"required":["maker","makerVersion","source","created"],"properties":{"maker":{"type":"string","minLength":1},"makerVersion":{"type":"string"},"source":{"type":"string","enum":["photo","stylised","generated"]},"created":{"type":"string","format":"date-time"}}}
   }
 }

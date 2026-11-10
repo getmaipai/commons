@@ -8,7 +8,15 @@ def validate_companion_pack(
 ) -> list[str]:
     problems: list[str] = []
     seen: set[str] = set()
-    for state, clips in pack["states"].items():
+    if "voice" not in pack:
+        for field in ("states", "mouth", "emotion", "life"):
+            if field not in pack:
+                problems.append(
+                    f"{field} is required unless the pack has a voice layer; add {field} or add a voice layer with parts."
+                )
+    else:
+        problems.extend(_validate_voice(pack, files))
+    for state, clips in pack.get("states", {}).items():
         rates = [clip["fps"] for clip in clips]
         if rates and max(rates) - min(rates) > 1:
             problems.append(
@@ -52,15 +60,15 @@ def validate_companion_pack(
                 problems.append(
                     f"{field}.phone has no matching file in files; include the phone twin."
                 )
-    if len(pack["states"]["idle"]) < 2:
+    if "states" in pack and len(pack["states"]["idle"]) < 2:
         problems.append("states.idle needs at least 2 clips; add another idle clip.")
     dirs = [
-        pack["mouth"]["calm"]["dir"],
+        *([pack["mouth"]["calm"]["dir"]] if pack.get("mouth") else []),
         *([pack["head"]["dir"]] if pack.get("head") else []),
         *([pack["eyes"]["dir"]] if pack.get("eyes") else []),
-        pack["emotion"]["dir"],
+        *([pack["emotion"]["dir"]] if pack.get("emotion") else []),
     ]
-    if pack["mouth"].get("shout"):
+    if pack.get("mouth", {}).get("shout"):
         dirs.append(pack["mouth"]["shout"]["dir"])
     if files is not None:
         for directory in dirs:
@@ -82,4 +90,76 @@ def validate_companion_pack(
             problems.append(
                 f"budget.bytes desktop files total {total} bytes, over the desktop limit of 12582912; reduce file sizes."
             )
+    return problems
+
+
+def _validate_voice(pack: Mapping, files: Mapping[str, int] | None) -> list[str]:
+    """MAKER-G: checks across the fields of a voice layer (reactive parts over a still picture)."""
+    problems: list[str] = []
+    voice = pack["voice"]
+    tile = pack["tile"].get("desktop", 480)
+    ids: set[str] = set()
+    base = voice.get("base")
+    if files is not None and base and base not in files:
+        problems.append(
+            f"voice.base names {base}, which is not in files; include the picture."
+        )
+    for index, part in enumerate(voice["parts"]):
+        field = f"voice.parts[{index}]"
+        if part["id"] in ids:
+            problems.append(
+                f"{field}.id repeats part id {part['id']}; give every part a unique id."
+            )
+        ids.add(part["id"])
+        if files is not None and part["file"] not in files:
+            problems.append(
+                f"{field}.file names {part['file']}, which is not in files; include the picture."
+            )
+        box = part["box"]
+        if (
+            box["x"] < 0
+            or box["y"] < 0
+            or box["x"] + box["w"] > tile
+            or box["y"] + box["h"] > tile
+        ):
+            problems.append(
+                f"{field}.box leaves the {tile} pixel tile; move or shrink the box."
+            )
+        for e, effect in enumerate(part["effects"]):
+            at = f"{field}.effects[{e}]"
+            curve = effect.get("curve")
+            channel = effect["channel"]
+            if curve in ("pulse", "blink") and channel != "state":
+                problems.append(
+                    f"{at} uses the {curve} curve, which only works on the state channel; set channel to state."
+                )
+            if channel == "state" and "drive" not in effect:
+                problems.append(
+                    f"{at} uses the state channel without drive; add a drive for the states it should follow."
+                )
+            if channel != "state" and "drive" in effect:
+                problems.append(
+                    f"{at} has drive but its channel is {channel}; drive only applies to the state channel."
+                )
+            if "glow" in effect and "glow" not in part:
+                problems.append(
+                    f"{at} drives glow but the part has no glow colour; add glow.color to {field}."
+                )
+            moves = any(
+                key in effect
+                for key in (
+                    "scale",
+                    "scaleX",
+                    "scaleY",
+                    "rotate",
+                    "translate",
+                    "opacity",
+                    "brightness",
+                    "glow",
+                )
+            )
+            if not moves:
+                problems.append(
+                    f"{at} changes nothing; add scale, rotate, translate, opacity, brightness or glow."
+                )
     return problems

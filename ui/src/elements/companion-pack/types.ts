@@ -1,3 +1,4 @@
+import type { VoiceLayerData } from "./voice-layer";
 /** Clip data follows spec/gen/ts/companion-pack.ts; player needs only these fields. */
 export type PackState = "idle" | "listen" | "think" | "speak";
 export type PackClip = {
@@ -12,7 +13,9 @@ export type PackClip = {
   trackFile?: string;
 };
 export type CompanionPackData = {
-  states: Record<PackState, PackClip[]>;
+  /** Absent for a still-plus-parts pack (MAKER-G): the player then draws `rest` (or `voice.base`) and the parts on a 2D canvas, with no video. */
+  states?: Record<PackState, PackClip[]>;
+  voice?: VoiceLayerData;
   rest: string;
   /** Pack id; picks the speaking render profile (man, clay, pixar) when no profile is given. */
   id?: string;

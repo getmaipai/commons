@@ -162,7 +162,7 @@ export async function loadEmotion(base: string, dir: string, only?: string[]): P
 const trackName = (clip: PackClip) => clip.trackFile ?? clip.file.replace(/\.phone\.mp4$|\.mp4$/, ".track.json");
 export async function loadTracks(base: string, pack: CompanionPackData): Promise<Record<string, Track>> {
   const out: Record<string, Track> = {}; const byFile = new Map<string, Promise<Track | undefined>>();
-  const clips = Object.values(pack.states).flat();
+  const clips = Object.values(pack.states ?? {}).flat();
   await Promise.all(clips.map(async (clip) => {
     const file = trackName(clip);
     if (!byFile.has(file)) byFile.set(file, json<Track>(join(base, file)).catch(() => undefined));

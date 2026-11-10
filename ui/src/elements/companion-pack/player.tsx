@@ -5,7 +5,9 @@ import type { SpeechInput } from "./speech";
 import { createSequencer, planSwitch, restHoldMs } from "./sequencer";
 import { stackedAlphaRendererFactory, type StackedAlphaRenderer } from "./stacked-alpha";
 import type { CompanionPackData, PackClip, PackState, PlayerFrame, PlayerLayer, PlayerTier } from "./types";
+import { StillPartsPlayer } from "./voice-player";
 
+type VideoPackData = CompanionPackData & { states: Record<PackState, PackClip[]> };
 export type CompanionPackPlayerProps = {
   pack: CompanionPackData;
   baseUrl: string;
@@ -46,10 +48,16 @@ const absolute = (base: string, file: string) => {
   return new URL(file, root).href;
 };
 
-export function CompanionPackPlayer({
+/** A pack with `states` plays its clips (a `voice` layer is then ignored); a pack without them is a still plus reactive parts and draws on a 2D canvas. */
+export function CompanionPackPlayer(props: CompanionPackPlayerProps) {
+  if (!props.pack.states) return <StillPartsPlayer {...props} />;
+  return <VideoPackPlayer {...props} pack={props.pack as VideoPackData} />;
+}
+
+function VideoPackPlayer({
   pack, baseUrl, state, tier = "auto", size, seed = 1, reducedMotion, paused = false,
   onStateSettled, layers = EMPTY_LAYERS, speech, onSpeechFrame,
-}: CompanionPackPlayerProps) {
+}: CompanionPackPlayerProps & { pack: VideoPackData }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
   const speechRef = useRef(speech);

@@ -149,6 +149,128 @@ class Emotion(BaseModel):
     flowEncoding: Literal['int16', 'int16-deflate'] | None = None
 
 
+class VoiceState(RootModel[Literal['idle', 'listen', 'think', 'speak', 'interrupt']]):
+    root: Literal['idle', 'listen', 'think', 'speak', 'interrupt']
+
+
+class Range(RootModel[list[float]]):
+    root: list[float] = Field(..., max_length=2, min_length=2)
+
+
+class VoiceSmoothing(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    attackMs: confloat(ge=0.0, le=2000.0) | None = None
+    releaseMs: confloat(ge=0.0, le=5000.0) | None = None
+
+
+class VoiceDrive(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    amount: confloat(ge=0.0, le=1.0) | None = None
+    hz: confloat(ge=0.0, le=4.0) | None = None
+    depth: confloat(ge=0.0, le=1.0) | None = None
+    beat: bool | None = None
+
+
+class Drive(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    idle: VoiceDrive | None = None
+    listen: VoiceDrive | None = None
+    think: VoiceDrive | None = None
+    speak: VoiceDrive | None = None
+    interrupt: VoiceDrive | None = None
+
+
+class Translate(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    x: list[float] | None = None
+    y: list[float] | None = None
+
+
+class VoiceEffect(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    channel: Literal['level', 'cue_energy', 'state']
+    curve: (
+        Literal['linear', 'ease-in', 'ease-out', 'smooth', 'pulse', 'blink'] | None
+    ) = None
+    smoothing: VoiceSmoothing | None = None
+    drive: Drive | None = None
+    blinkMs: confloat(ge=40.0, le=1000.0) | None = None
+    scale: list[float] | None = None
+    scaleX: list[float] | None = None
+    scaleY: list[float] | None = None
+    rotate: list[float] | None = None
+    translate: Translate | None = None
+    opacity: list[float] | None = None
+    brightness: list[float] | None = None
+    glow: list[float] | None = None
+
+
+class Box(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    x: float
+    y: float
+    w: PositiveFloat
+    h: PositiveFloat
+
+
+class Anchor1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    x: confloat(ge=0.0, le=1.0)
+    y: confloat(ge=0.0, le=1.0)
+
+
+class Glow(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    color: constr(pattern=r'^#[0-9a-fA-F]{6}$')
+    blur: confloat(ge=0.0, le=96.0) | None = None
+
+
+class VoicePart(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    id: constr(pattern=r'^[a-z][a-z0-9-]*$')
+    file: constr(pattern=r'^(?!/)(?!.*\.\.).+\.(webp|png)$')
+    box: Box
+    anchor: Anchor1 | None = None
+    z: conint(ge=0, le=99) | None = None
+    glow: Glow | None = None
+    effects: list[VoiceEffect] = Field(..., max_length=8, min_length=1)
+
+
+class VoicePreset(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    gain: confloat(ge=0.0, le=2.0) | None = None
+
+
 class Provenance(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -205,9 +327,31 @@ class FlowDir(BaseModel):
     flowEncoding: Literal['int16', 'int16-deflate'] | None = None
 
 
+class Presets(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    idle: VoicePreset | None = None
+    listen: VoicePreset | None = None
+    think: VoicePreset | None = None
+    speak: VoicePreset | None = None
+    interrupt: VoicePreset | None = None
+
+
+class Voice(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    base: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+') | None = None
+    parts: list[VoicePart] = Field(..., max_length=12, min_length=1)
+    presets: Presets | None = None
+
+
 class CompanionPack(BaseModel):
     """
-    PACK-01b: a portable animation and expression pack for one companion.
+    PACK-01b: a portable animation and expression pack for one companion. MAKER-G: a pack with a voice layer may be a still picture plus reactive parts (no video). `states`, `mouth`, `emotion` and `life` are required unless `voice` is present; validateCompanionPack enforces that.
     """
 
     model_config = ConfigDict(
@@ -218,12 +362,13 @@ class CompanionPack(BaseModel):
     id: constr(pattern=r'^[a-z][a-z0-9-]*$')
     name: constr(min_length=1)
     tile: Tile
-    states: States
-    mouth: Mouth
+    states: States | None = None
+    mouth: Mouth | None = None
     head: FlowDir | None = None
     eyes: Dir | None = None
-    emotion: Emotion
+    emotion: Emotion | None = None
     rest: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
-    life: Life
+    life: Life | None = None
     budget: Budget
+    voice: Voice | None = None
     provenance: Provenance

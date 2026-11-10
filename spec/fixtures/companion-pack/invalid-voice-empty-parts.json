@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "maipai",
+  "name": "MaiPai",
+  "tile": {
+    "desktop": 480
+  },
+  "rest": "rest.webp",
+  "voice": {
+    "base": "voice/base.webp",
+    "parts": [],
+    "presets": {
+      "idle": {
+        "gain": 1
+      },
+      "listen": {
+        "gain": 1
+      },
+      "think": {
+        "gain": 1
+      },
+      "speak": {
+        "gain": 1
+      },
+      "interrupt": {
+        "gain": 0.8
+      }
+    }
+  },
+  "budget": {
+    "bytes": 1048576
+  },
+  "provenance": {
+    "maker": "make_maipai_pack.py",
+    "makerVersion": "1",
+    "source": "generated",
+    "created": "2026-11-10T00:00:00Z"
+  }
+}

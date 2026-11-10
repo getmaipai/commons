@@ -8,3 +8,5 @@ export { activeVocal, audioFeatures, detectEvents, hasTaggedSigh, mixSlot, split
 export type { AudioFeatures, EventWindow, MorphMix, MouthMix, VocalTag } from "./tags";
 export { emotionFor, emotionKind, LIFE, LIFE_CHARACTER_PROFILE, lifeAt, planBlinks, planFx, planInhales, planLife, planMicro, PROFILE } from "./life";
 export type { BlinkEvent, LifeEvent, LifePlan, LifeProfile, MicroEvent, MicroPose } from "./life";
+export { applyCurve, cueEnergyAt, drawVoiceFrame, envelopeAt, followLevel, stateValue, VoiceRuntime } from "./voice-layer";
+export type { PartPose, VoiceEffect, VoiceLayerData, VoicePart, VoiceState } from "./voice-layer";

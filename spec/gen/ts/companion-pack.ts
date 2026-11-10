@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-/**PACK-01b: a portable animation and expression pack for one companion.*/
+/**PACK-01b: a portable animation and expression pack for one companion. MAKER-G: a pack with a voice layer may be a still picture plus reactive parts (no video). `states`, `mouth`, `emotion` and `life` are required unless `voice` is present; validateCompanionPack enforces that.*/
 export const CompanionPack = z
   .object({
     version: z.literal(1),
@@ -167,7 +167,8 @@ export const CompanionPack = z
           .min(1)
           .max(8),
       })
-      .strict(),
+      .strict()
+      .optional(),
     mouth: z
       .object({
         letters: z
@@ -209,7 +210,8 @@ export const CompanionPack = z
         warp: z.boolean().optional(),
         flowEncoding: z.enum(["int16", "int16-deflate"]).optional(),
       })
-      .strict(),
+      .strict()
+      .optional(),
     head: z
       .object({
         dir: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
@@ -235,7 +237,8 @@ export const CompanionPack = z
           ),
         flowEncoding: z.enum(["int16", "int16-deflate"]).optional(),
       })
-      .strict(),
+      .strict()
+      .optional(),
     rest: z.string().regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+")),
     life: z
       .object({
@@ -258,13 +261,180 @@ export const CompanionPack = z
         smile: z.number().gte(0).lte(4).optional(),
         mBrow: z.number().gte(0).lte(4).optional(),
       })
-      .strict(),
+      .strict()
+      .optional(),
     budget: z
       .object({
         bytes: z.number().int().gte(1).lte(12582912),
         phoneBytes: z.number().int().gte(0).optional(),
       })
       .strict(),
+    voice: z
+      .object({
+        base: z
+          .string()
+          .regex(new RegExp("^(?!/)(?!.*\\.\\.)(?!.*\\.webm$).+"))
+          .optional(),
+        parts: z
+          .array(
+            z
+              .object({
+                id: z.string().regex(new RegExp("^[a-z][a-z0-9-]*$")),
+                file: z
+                  .string()
+                  .regex(new RegExp("^(?!/)(?!.*\\.\\.).+\\.(webp|png)$")),
+                box: z
+                  .object({
+                    x: z.number(),
+                    y: z.number(),
+                    w: z.number().gt(0),
+                    h: z.number().gt(0),
+                  })
+                  .strict(),
+                anchor: z
+                  .object({
+                    x: z.number().gte(0).lte(1),
+                    y: z.number().gte(0).lte(1),
+                  })
+                  .strict()
+                  .optional(),
+                z: z.number().int().gte(0).lte(99).optional(),
+                glow: z
+                  .object({
+                    color: z.string().regex(new RegExp("^#[0-9a-fA-F]{6}$")),
+                    blur: z.number().gte(0).lte(96).optional(),
+                  })
+                  .strict()
+                  .optional(),
+                effects: z
+                  .array(
+                    z
+                      .object({
+                        channel: z.enum(["level", "cue_energy", "state"]),
+                        curve: z
+                          .enum([
+                            "linear",
+                            "ease-in",
+                            "ease-out",
+                            "smooth",
+                            "pulse",
+                            "blink",
+                          ])
+                          .optional(),
+                        smoothing: z
+                          .object({
+                            attackMs: z.number().gte(0).lte(2000).optional(),
+                            releaseMs: z.number().gte(0).lte(5000).optional(),
+                          })
+                          .strict()
+                          .optional(),
+                        drive: z
+                          .object({
+                            idle: z
+                              .object({
+                                amount: z.number().gte(0).lte(1).optional(),
+                                hz: z.number().gte(0).lte(4).optional(),
+                                depth: z.number().gte(0).lte(1).optional(),
+                                beat: z.boolean().optional(),
+                              })
+                              .strict()
+                              .optional(),
+                            listen: z
+                              .object({
+                                amount: z.number().gte(0).lte(1).optional(),
+                                hz: z.number().gte(0).lte(4).optional(),
+                                depth: z.number().gte(0).lte(1).optional(),
+                                beat: z.boolean().optional(),
+                              })
+                              .strict()
+                              .optional(),
+                            think: z
+                              .object({
+                                amount: z.number().gte(0).lte(1).optional(),
+                                hz: z.number().gte(0).lte(4).optional(),
+                                depth: z.number().gte(0).lte(1).optional(),
+                                beat: z.boolean().optional(),
+                              })
+                              .strict()
+                              .optional(),
+                            speak: z
+                              .object({
+                                amount: z.number().gte(0).lte(1).optional(),
+                                hz: z.number().gte(0).lte(4).optional(),
+                                depth: z.number().gte(0).lte(1).optional(),
+                                beat: z.boolean().optional(),
+                              })
+                              .strict()
+                              .optional(),
+                            interrupt: z
+                              .object({
+                                amount: z.number().gte(0).lte(1).optional(),
+                                hz: z.number().gte(0).lte(4).optional(),
+                                depth: z.number().gte(0).lte(1).optional(),
+                                beat: z.boolean().optional(),
+                              })
+                              .strict()
+                              .optional(),
+                          })
+                          .strict()
+                          .optional(),
+                        blinkMs: z.number().gte(40).lte(1000).optional(),
+                        scale: z.array(z.number()).min(2).max(2).optional(),
+                        scaleX: z.array(z.number()).min(2).max(2).optional(),
+                        scaleY: z.array(z.number()).min(2).max(2).optional(),
+                        rotate: z.array(z.number()).min(2).max(2).optional(),
+                        translate: z
+                          .object({
+                            x: z.array(z.number()).min(2).max(2).optional(),
+                            y: z.array(z.number()).min(2).max(2).optional(),
+                          })
+                          .strict()
+                          .optional(),
+                        opacity: z.array(z.number()).min(2).max(2).optional(),
+                        brightness: z
+                          .array(z.number())
+                          .min(2)
+                          .max(2)
+                          .optional(),
+                        glow: z.array(z.number()).min(2).max(2).optional(),
+                      })
+                      .strict(),
+                  )
+                  .min(1)
+                  .max(8),
+              })
+              .strict(),
+          )
+          .min(1)
+          .max(12),
+        presets: z
+          .object({
+            idle: z
+              .object({ gain: z.number().gte(0).lte(2).optional() })
+              .strict()
+              .optional(),
+            listen: z
+              .object({ gain: z.number().gte(0).lte(2).optional() })
+              .strict()
+              .optional(),
+            think: z
+              .object({ gain: z.number().gte(0).lte(2).optional() })
+              .strict()
+              .optional(),
+            speak: z
+              .object({ gain: z.number().gte(0).lte(2).optional() })
+              .strict()
+              .optional(),
+            interrupt: z
+              .object({ gain: z.number().gte(0).lte(2).optional() })
+              .strict()
+              .optional(),
+          })
+          .strict()
+          .optional(),
+      })
+      .strict()
+      .optional(),
     provenance: z
       .object({
         maker: z.string().min(1),
@@ -276,6 +446,6 @@ export const CompanionPack = z
   })
   .strict()
   .describe(
-    "PACK-01b: a portable animation and expression pack for one companion.",
+    "PACK-01b: a portable animation and expression pack for one companion. MAKER-G: a pack with a voice layer may be a still picture plus reactive parts (no video). `states`, `mouth`, `emotion` and `life` are required unless `voice` is present; validateCompanionPack enforces that.",
   );
 export type CompanionPack = z.infer<typeof CompanionPack>;

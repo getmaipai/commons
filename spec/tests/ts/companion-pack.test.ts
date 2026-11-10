@@ -14,7 +14,7 @@ addFormats(ajv);
 const check = ajv.compile(schema);
 const files = readdirSync(DIR).filter((name) => name.endsWith(".json")).sort();
 const read = (name: string) => JSON.parse(readFileSync(join(DIR, name), "utf8"));
-const structuralInvalid = new Set(["invalid-idle-count.json", "invalid-wide-shape.json", "invalid-emotion-files.json", "invalid-webm.json"]);
+const structuralInvalid = new Set(["invalid-idle-count.json", "invalid-wide-shape.json", "invalid-emotion-files.json", "invalid-webm.json", "invalid-voice-empty-parts.json"]);
 const expected: Record<string, string> = {
   "invalid-track-length.json": "states.listen[0].track has 1 values but frames is 117; make the track length equal frames.",
   "invalid-duplicate-id.json": "states.listen[0].id repeats clip id man-idle1; give every clip a unique id.",
@@ -22,6 +22,11 @@ const expected: Record<string, string> = {
   "invalid-rest-first.json": "states.listen[0].rest.first is outside [0, frames); choose a frame from 0 through 116.",
   "invalid-rest-last.json": "states.think[0].rest.last is outside [0, frames); choose a frame from 0 through 116.",
   "invalid-duplicate-state-file.json": "states.listen[1].file repeats a file in states.listen; give each clip in a state its own file.",
+  "invalid-no-states-no-voice.json": "states is required unless the pack has a voice layer; add states or add a voice layer with parts.",
+  "invalid-voice-glow-without-colour.json": "voice.parts[1].effects[0] drives glow but the part has no glow colour; add glow.color to voice.parts[1].",
+  "invalid-voice-pulse-on-level.json": "voice.parts[1].effects[1] uses the pulse curve, which only works on the state channel; set channel to state.",
+  "invalid-voice-box-outside-tile.json": "voice.parts[1].box leaves the 480 pixel tile; move or shrink the box.",
+  "invalid-voice-duplicate-part.json": "voice.parts[3].id repeats part id heart; give every part a unique id.",
 };
 
 describe("PACK-01b CompanionPack fixtures", () => {
@@ -65,5 +70,18 @@ describe("PACK-01b CompanionPack fixtures", () => {
     const pack = read("invalid-head-missing-meta.json");
     const result = validateCompanionPack(pack, { "mouth/calm/meta.json": 1, "mouth/shout/meta.json": 1, "emotion/meta.json": 1 });
     expect(result).toContain("head needs meta.json; include the directory metadata file.");
+  });
+  test("a still-plus-parts pack has no states, mouth, emotion or life and needs only its pictures", () => {
+    const pack = read("valid-still-parts-maipai.json");
+    for (const field of ["states", "mouth", "emotion", "life", "head", "eyes"]) expect(pack[field]).toBeUndefined();
+    const sizes = Object.fromEntries([pack.rest, pack.voice.base, ...pack.voice.parts.map((part: { file: string }) => part.file)].map((file: string) => [file, 1000]));
+    expect(validateCompanionPack(pack, sizes)).toEqual([]);
+    delete sizes[pack.voice.parts[1].file];
+    expect(validateCompanionPack(pack, sizes)).toContain("voice.parts[1].file names voice/heart.webp, which is not in files; include the picture.");
+  });
+  test("a still-plus-parts pack over its budget is still refused", () => {
+    const pack = read("valid-still-parts-maipai.json");
+    pack.budget.bytes = 10;
+    expect(validateCompanionPack(pack, { "rest.webp": 5000 }).some((problem: string) => problem.startsWith("budget.bytes is 10"))).toBe(true);
   });
 });
