@@ -9,7 +9,37 @@ import {
 } from "@/kit/ui/alert-dialog";
 import { Button } from "@/kit/ui/button";
 import type { PendingConfirm } from "@/kit/schema/actions";
+import { StatusCard, type StatusCardKind } from "@/kit/elements/status-card";
+import { useBinding } from "@/kit/schema/binding";
+import type { Binding } from "@/kit/schema/types";
 import { i18n } from "@/kit/i18n"
+
+const STATUS_KINDS: readonly StatusCardKind[] = ["progress", "waiting", "done", "attention", "problem", "info"];
+const STATUS_ALIASES: Record<string, StatusCardKind> = {
+  ok: "done", success: "done", ready: "done", error: "problem", failed: "problem", failure: "problem", down: "problem",
+  warn: "attention", warning: "attention", running: "progress", busy: "progress", working: "progress", idle: "waiting",
+};
+
+/** MEDIA-PARITY-02: the status-card row (`{state, title, detail}`) as a card, or null when the row has no title. Accepts one row,
+ * a one-row list, or `{rows: [row]}`; an unknown state reads as `info`. */
+export function statusCardFromRow(answer: unknown): { kind: StatusCardKind; title: string; line?: string } | null {
+  const first = Array.isArray(answer) ? answer[0] : (answer as { rows?: unknown } | null)?.rows !== undefined ? (answer as { rows: unknown[] }).rows[0] : answer;
+  if (!first || typeof first !== "object") return null;
+  const row = first as Record<string, unknown>;
+  const rawState = String(row.state ?? row.kind ?? "").toLowerCase();
+  const kind = (STATUS_KINDS as readonly string[]).includes(rawState) ? (rawState as StatusCardKind) : (STATUS_ALIASES[rawState] ?? "info");
+  const title = typeof row.title === "string" ? row.title : typeof row.text === "string" ? row.text : "";
+  if (title === "") return null;
+  const detail = typeof row.detail === "string" ? row.detail : typeof row.line === "string" ? row.line : undefined;
+  return { kind, title, line: detail && detail !== "" ? detail : undefined };
+}
+
+/** The dialog's status slot: reads the bound row and draws it as a StatusCard. Mounted only while the dialog is open. */
+function ConfirmStatus({ binding }: { binding: Binding }) {
+  const query = useBinding<unknown>(binding);
+  const card = statusCardFromRow(query.data);
+  return card ? <div data-slot="confirm-status"><StatusCard kind={card.kind} title={card.title} line={card.line} textStyle="status" /></div> : null;
+}
 
 /** Renders `useDispatchAction()`'s own pending-confirm state as a real
  * dialog (docs/UI.md > Dialog: "AlertDialog... for destructive confirms,
@@ -47,6 +77,7 @@ export function ConfirmDialog({ pendingConfirm }: { pendingConfirm: PendingConfi
           <AlertDialogTitle>{pendingConfirm?.prompt}</AlertDialogTitle>
           {pendingConfirm?.error ? <AlertDialogDescription>{pendingConfirm.error}</AlertDialogDescription> : null}
         </AlertDialogHeader>
+        {pendingConfirm?.status ? <ConfirmStatus binding={pendingConfirm.status} /> : null}
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => pendingConfirm?.cancel()} disabled={pendingConfirm?.busy}>
             {i18n._({ id: "ui.Cancel", message: "Cancel" })}

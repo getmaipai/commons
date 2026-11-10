@@ -42,7 +42,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
       z.object({ play: z.object({ media_id: z.string().min(1), position_s: z.union([z.number().min(0), z.string()]).optional() }) }),
       // PARITY-01: share a link to a hub route (the device share sheet, or copy).
       z.object({ share: z.object({ to: z.string().regex(/^\//), title: z.string().max(120).optional() }) }),
-      z.object({ confirm: z.object({ prompt: z.string(), on_confirm: ActionSchema }) }),
+      z.object({ confirm: z.object({ prompt: z.string(), on_confirm: ActionSchema, status: z.lazy(() => PackageBindingSchema).optional() }) }),
       z.object({ ask: z.object({ prompt: z.string(), expects: z.string() }) }),
     ])
     .refine((a) => Object.keys(a).length === 1, "exactly one action kind"),
@@ -52,7 +52,7 @@ export type Action =
   | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown>; then?: { navigate: { to: string; state?: Record<string, string | number | boolean> } } } }
   | { play: { media_id: string; position_s?: number | string } }
   | { share: { to: string; title?: string } }
-  | { confirm: { prompt: string; on_confirm: Action } }
+  | { confirm: { prompt: string; on_confirm: Action; status?: Binding } }
   | { ask: { prompt: string; expects: string } };
 
 export const BatchActionSchema = z.object({
@@ -201,6 +201,13 @@ export const ChoiceControlSchema = z.object({
 }).strict();
 export type ChoiceControl = z.infer<typeof ChoiceControlSchema>;
 
+/** MEDIA-PARITY-02: a reorderable list. After a move the kit fires `call` once with the complete new key order under `id_param` in its body. */
+export const ReorderSchema = z.object({
+  call: ActionSchema.refine((a) => "call" in a, "reorder.call is a call action"),
+  id_param: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
+}).strict();
+export type ReorderSpec = z.infer<typeof ReorderSchema>;
+
 export const MediaShelfNodeSchema = z.object({
   type: z.literal("media_shelf"),
   heading: z.string().min(1).max(60).optional(),
@@ -214,6 +221,9 @@ export const MediaShelfNodeSchema = z.object({
   item_progress_field: z.string().optional(),
   item_avatar_field: z.string().optional(),
   item_badge_field: z.string().optional(),
+  // MEDIA-PARITY-02: `dot` draws the badge field as a small unplayed dot instead of a label; `reorder` adds drag handles and Move buttons.
+  item_badge_presentation: z.enum(["label", "dot"]).optional(),
+  reorder: ReorderSchema.optional(),
   item_meta_field: z.string().optional(),
   aspect: z.enum(["wide", "square", "poster"]).default("wide"),
   // MEDIA-POLISH-01: the frameless row, the vertical (Up next) list, hiding an empty shelf and the See all link.
@@ -407,6 +417,12 @@ export const WidgetRowNodeSchema = z.object({
 });
 export type WidgetRowNode = z.infer<typeof WidgetRowNodeSchema>;
 
+export const WidgetTilesNodeSchema = z.object({
+  type: z.literal("widget_tiles"),
+  bind: BindingSchema,
+});
+export type WidgetTilesNode = z.infer<typeof WidgetTilesNodeSchema>;
+
 // APP-KIND-01/02: the two nodes a package app adds. Both bind to a package data call.
 export const PackageBindingSchema = BindingSchema.refine((b) => b.source === "package", "a package node binds source package");
 
@@ -491,6 +507,14 @@ export const SearchNodeSchema = z.object({
   clear_recents: ActionSchema.optional(),
   // PARITY-01: type chips that write a page-state key; sections below use `condition` on it.
   type_chips: ChoiceControlSchema.optional(),
+  // MEDIA-PARITY-02: suggestions under the field while typing, from a package data call that reads `$state.<state>`.
+  suggest: z.object({
+    bind: PackageBindingSchema,
+    item_key_field: z.string().optional(),
+    item_label_field: z.string().optional(),
+    max: z.number().int().min(1).max(10).optional(),
+    min_chars: z.number().int().min(1).max(5).optional(),
+  }).strict().optional(),
 });
 export type SearchNode = z.infer<typeof SearchNodeSchema>;
 
@@ -650,6 +674,8 @@ export const TrackRowsNodeSchema = z.object({
     label: z.string().min(1),
     action: ActionSchema,
   }).strict()).max(3).optional(),
+  // MEDIA-PARITY-02: drag handles and Move up / Move down buttons.
+  reorder: ReorderSchema.optional(),
   hide_when_empty: z.boolean().default(false),
   empty_state: EmptyStateNodeSchema.optional(),
 });
@@ -903,6 +929,7 @@ export type UiNode =
   | SplitViewNode
   | WidgetCardNode
   | WidgetRowNode
+  | WidgetTilesNode
   | AnswerBlocksNode
   | PickerNode
   | SearchNode
@@ -935,6 +962,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     SplitViewNodeSchema,
     WidgetCardNodeSchema,
     WidgetRowNodeSchema,
+    WidgetTilesNodeSchema,
     AnswerBlocksNodeSchema,
     PickerNodeSchema,
     SearchNodeSchema,
@@ -970,6 +998,7 @@ export const NODE_TYPES = [
   "split_view",
   "widget_card",
   "widget_row",
+  "widget_tiles",
   "answer_blocks",
   "picker",
   "search",

@@ -5,6 +5,7 @@ import { XIcon } from "lucide-react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { Button } from "@/kit/ui/button"
+import { StatusCard, type StatusCardProps } from "@/kit/elements/status-card"
 
 function Dialog({
   ...props
@@ -53,8 +54,12 @@ function DialogContent({
   size = "default",
   scroll = "none",
   showCloseButton = true,
+  error,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  // MEDIA-PARITY-02: a failure shown in place. A StatusCard (default kind "problem") drawn after the children, so a dialog
+  // that keeps its footer last in `children` can pass `error` and let the card sit at the foot of the content.
+  error?: Omit<StatusCardProps, "kind"> & { kind?: StatusCardProps["kind"] }
   // "flow" (KIT-3S-01) is the large rounded multi-step dialog of the
   // companion screens: it fills the phone screen and is a centred rounded
   // card from sm up. Its colours are the theme's tokens only. Its "xl" size
@@ -93,6 +98,7 @@ function DialogContent({
         {...props}
       >
         {children}
+        {error ? <div data-slot="dialog-error" className="min-w-0"><StatusCard {...error} kind={error.kind ?? "problem"} /></div> : null}
         {showCloseButton && (
           // A plain `<DialogPrimitive.Close>` with an icon and no explicit
           // size has no real touch target; routing it through the kit's

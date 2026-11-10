@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { Card } from "@/kit/primitives/Card";
 import { Button } from "@/kit/ui/button";
 import { EmptyState } from "@/kit/primitives/EmptyState";
@@ -12,6 +12,7 @@ import { cn, FOCUS_RING } from "@/kit/utils";
 import { useSurface } from "@/kit/useSurface";
 import { LockTile, collapseLocked } from "@/kit/elements/adult-lock";
 import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
+import { useReorder, type ReorderConfig } from "@/kit/primitives/reorder";
 import { i18n } from "@/kit/i18n"
 
 /** The aspect ratios the kit will draw a media tile at. A closed set,
@@ -117,6 +118,12 @@ interface MediaShelfProps<T> {
   /** ADULT-LOCK-01: true for a locked item that is still being made; the one tile then shows a spinner. */
   isMaking?: (item: T) => boolean;
   onUnlock?: () => void;
+  /** MEDIA-PARITY-02: tiles can be reordered. Each gets a drag handle under it (a pointer drag with a drop line, or the arrow keys),
+   * and a quiet Reorder button above the shelf turns on Move up and Move down buttons. `onReorder` gets the complete new key
+   * order and a `revert`; the shelf shows the new order at once. Needs `getLabel` or `getReorderLabel` for the buttons' names. Absent: no handles. */
+  reorder?: ReorderConfig;
+  /** MEDIA-PARITY-02: the item's name in the reorder buttons ("Drag Lanterns to reorder"). Falls back to `getLabel`, then "item". */
+  getReorderLabel?: (item: T) => string;
 }
 
 function clampProgress(value: number | undefined): number {
@@ -178,8 +185,18 @@ export function MediaShelf<T>({
   isLocked,
   isMaking,
   onUnlock,
+  reorder: reorderConfig,
+  getReorderLabel,
 }: MediaShelfProps<T>) {
-  const { open: items, hasLocked, making } = isLocked ? collapseLocked(allItems, isLocked, isMaking) : { open: allItems, hasLocked: false, making: false };
+  const collapsed = isLocked ? collapseLocked(allItems, isLocked, isMaking) : { open: allItems, hasLocked: false, making: false };
+  const { hasLocked, making } = collapsed;
+  const reorder = useReorder(collapsed.open, getKey, reorderConfig, orientation === "vertical" ? "y" : "x");
+  const items = reorder.items;
+  const reorderName = (item: T) => getReorderLabel?.(item) ?? getLabel?.(item) ?? i18n._({ id: "ui.item", message: "item" });
+  // The handle and the Move buttons under (or, in rows, beside) a tile; nothing when reordering is off.
+  const reorderControls = (item: T, i: number) => (reorder.enabled ? (
+    <div data-slot="media-shelf-reorder" className="flex items-center justify-center gap-1">{reorder.handle(i, reorderName(item))}{reorder.moveButtons(i, reorderName(item))}</div>
+  ) : null);
   const name = label ?? heading;
   // One identical tile for any number of locked items, in the shelf's own media box (a row in vertical lists).
   const lockTile = (shape: "fill" | "row") => <LockTile shape={shape} making={making} onUnlock={onUnlock} />;
@@ -218,13 +235,16 @@ export function MediaShelf<T>({
   if (orientation === "vertical") {
     return (
       <Frame heading={heading} headingStyle={headingStyle} seeAll={seeAll}>
-        <ul aria-label={name} className="flex min-w-0 list-none flex-col gap-3 p-0" data-slot="media-shelf" data-orientation="vertical" data-density={density}>
-          {items.map((item) => (
+        {reorder.toggle}
+        <ul ref={reorder.containerRef as RefObject<HTMLUListElement>} aria-label={name} className="flex min-w-0 list-none flex-col gap-3 p-0" data-slot="media-shelf" data-orientation="vertical" data-density={density}>
+          {items.map((item, i) => (
             <li
               key={getKey(item)}
               aria-current={isHighlighted?.(item) ? "true" : undefined}
-              className={cn("group/row flex min-w-0 items-start gap-3", density === "compact" && "items-center")}
+              {...reorder.itemProps(i)}
+              className={cn("group/row flex min-w-0 items-start gap-3", density === "compact" && "items-center", reorder.itemProps(i).className)}
             >
+              {reorder.enabled ? <span className="flex shrink-0 items-center self-center">{reorder.handle(i, reorderName(item))}</span> : null}
               {renderIndex ? (
                 <span data-slot="media-shelf-index" className="group/index relative w-6 shrink-0 text-right text-sm tabular-nums text-muted-foreground">
                   {onPlay ? (
@@ -275,6 +295,7 @@ export function MediaShelf<T>({
               {density === "compact" && renderMeta ? (
                 <span data-slot="media-shelf-duration" className="shrink-0 text-sm tabular-nums text-muted-foreground">{renderMeta(item)}</span>
               ) : null}
+              {reorder.enabled ? <span className="flex shrink-0 items-center self-center">{reorder.moveButtons(i, reorderName(item))}</span> : null}
             </li>
           ))}
           {hasLocked ? <li key="locked" data-slot="media-shelf-locked" className="flex min-w-0">{lockTile("row")}</li> : null}
@@ -296,6 +317,7 @@ export function MediaShelf<T>({
   // One tile list: the whole shelf, or one day's group.
   const renderList = (listItems: readonly T[], listName: string | undefined, withLock = false) => (
     <ul
+      ref={reorder.containerRef as RefObject<HTMLUListElement>}
       data-slot="media-shelf"
       data-variant={variant}
       data-layout={layout}
@@ -331,7 +353,8 @@ export function MediaShelf<T>({
         <li
           key={getKey(item)}
           aria-current={isHighlighted?.(item) ? "true" : undefined}
-          className={cn("flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", proTiles ? "w-[156px] md:w-[176px]" : circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
+          {...reorder.itemProps(items.indexOf(item))}
+          className={cn(reorder.itemProps(items.indexOf(item)).className, "flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", proTiles ? "w-[156px] md:w-[176px]" : circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
         >
           <TileFrame
             onPlay={onPlay ? () => onPlay(item) : undefined}
@@ -378,6 +401,7 @@ export function MediaShelf<T>({
             // rule List.renderAction follows.
             <div className={cn("px-1 text-sm text-[var(--foreground)]", circle && "w-full")}>{renderCaption(item)}</div>
           ) : null}
+          {reorderControls(item, items.indexOf(item))}
         </li>
       ))}
       {withLock ? lockLi : null}
@@ -419,6 +443,7 @@ export function MediaShelf<T>({
 
   return (
     <Frame heading={heading} headingStyle={headingStyle} seeAll={seeAll}>
+      {reorder.toggle}
       {sized ? (
         <div className="flex min-w-0 flex-col gap-3" style={cardSizeStyle(sizeControl.size)} data-slot="media-shelf-sized">
           <div className="hidden justify-end px-1.5 sm:flex" data-slot="media-shelf-size-control">

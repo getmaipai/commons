@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, RefObject } from "react";
+import { useReorder, type ReorderConfig } from "@/kit/primitives/reorder";
 import { i18n } from "@/kit/i18n";
 import { Card } from "@/kit/primitives/Card";
 import { getIcon } from "@/kit/icons";
@@ -171,15 +172,21 @@ export interface TrackRowsProps<T> {
   getPlayLabel?: (item: T) => string;
   /** MUSIC-POLISH-01: quiet icon buttons at the row's end (a Remove x), drawn faint until the row is hovered or focused. */
   renderActions?: (item: T) => ReactNode;
+  /** MEDIA-PARITY-02: rows can be reordered. Each row gets a drag handle (a pointer drag with a drop line, or the arrow keys),
+   * and a quiet Reorder button above the list turns on Move up and Move down buttons. `onReorder` gets the complete new key
+   * order and a `revert`; the list shows the new order at once. Absent: no handles. */
+  reorder?: ReorderConfig;
   /** Accessible name of the list. */
   label: string;
 }
 
 /** Album and Playlist tracklists: number, title and artist, end label; hover turns the number into a play icon. */
-export function TrackRows<T>({ items, getKey, getTitle, getSubtitle, getNumber, getMeta, getGroup, isPlaying, onPlay, getPlayLabel, renderActions, label }: TrackRowsProps<T>) {
+export function TrackRows<T>({ items: given, getKey, getTitle, getSubtitle, getNumber, getMeta, getGroup, isPlaying, onPlay, getPlayLabel, renderActions, reorder: reorderConfig, label }: TrackRowsProps<T>) {
+  const reorder = useReorder(given, getKey, reorderConfig, "y");
+  const items = reorder.items;
   if (items.length === 0) return null;
-  return (
-    <ol aria-label={label} data-slot="track-rows" className="m-0 flex min-w-0 list-none flex-col p-0">
+  const list = (
+    <ol ref={reorder.containerRef as RefObject<HTMLOListElement>} aria-label={label} data-slot="track-rows" className="m-0 flex min-w-0 list-none flex-col p-0">
       {items.map((item, i) => {
         const group = getGroup?.(item);
         const showGroup = group !== undefined && (i === 0 || group !== getGroup?.(items[i - 1] as T));
@@ -187,9 +194,10 @@ export function TrackRows<T>({ items, getKey, getTitle, getSubtitle, getNumber, 
         const name = getPlayLabel?.(item) ?? i18n._({ id: "ui.Play {title}", message: "Play {title}", values: { title: getTitle(item) } });
         const subtitle = getSubtitle?.(item);
         return (
-          <li key={getKey(item)} aria-current={playing ? "true" : undefined} className="min-w-0">
+          <li key={getKey(item)} aria-current={playing ? "true" : undefined} {...reorder.itemProps(i)} className={cn("min-w-0", reorder.itemProps(i).className)}>
             {showGroup ? <p role="heading" aria-level={3} className="text-muted-foreground px-3 pt-4 pb-1 text-xs font-semibold uppercase tracking-wide">{group}</p> : null}
             <div data-slot="track-row" className="group/row hover:bg-muted/60 flex min-h-12 min-w-0 items-center gap-3 rounded-[var(--media-card-radius)] px-3 py-1">
+              {reorder.handle(i, getTitle(item))}
               <button
                 type="button"
                 aria-label={name}
@@ -204,6 +212,7 @@ export function TrackRows<T>({ items, getKey, getTitle, getSubtitle, getNumber, 
                 {subtitle ? <span className="text-muted-foreground block truncate text-xs">{subtitle}</span> : null}
               </span>
               {getMeta ? <span data-slot="track-meta" className="text-muted-foreground shrink-0 text-sm tabular-nums">{getMeta(item)}</span> : null}
+              {reorder.moveButtons(i, getTitle(item))}
               {renderActions ? <span data-slot="track-actions" className="flex shrink-0 items-center opacity-60 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-within:opacity-100">{renderActions(item)}</span> : null}
             </div>
           </li>
@@ -211,4 +220,5 @@ export function TrackRows<T>({ items, getKey, getTitle, getSubtitle, getNumber, 
       })}
     </ol>
   );
+  return reorder.enabled ? <div className="flex min-w-0 flex-col gap-1">{reorder.toggle}{list}</div> : list;
 }

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { request } from "@/kit/http";
 import { fillTemplate, fillTemplateDeep } from "@/kit/schema/fieldPath";
-import type { Action } from "@/kit/schema/types";
+import type { Action, Binding } from "@/kit/schema/types";
 import {
   PackageScopeContext,
   packageActionRefused,
@@ -108,6 +108,8 @@ async function runAction(
 
 export interface PendingConfirm {
   prompt: string;
+  /** MEDIA-PARITY-02: the package binding of a status-card row the dialog draws above its buttons. */
+  status?: Binding;
   busy: boolean;
   error: string | null;
   confirm(): void;
@@ -222,6 +224,7 @@ export function useDispatchAction(): {
           fillCount((pending.action as { confirm: { prompt: string } }).confirm.prompt, pending.items.length),
           pending.items[0] ?? {},
         ),
+        status: (pending.action as { confirm: { status?: Binding } }).confirm.status,
         busy,
         error,
         confirm() {

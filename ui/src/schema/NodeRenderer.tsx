@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { ApiError, request } from "@/kit/http";
@@ -56,6 +56,8 @@ import type { Action } from "@/kit/schema/types";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { ConfirmDialog } from "@/kit/schema/ConfirmDialog";
+import { ReorderFailure, type ReorderConfig } from "@/kit/primitives/reorder";
+import { DeviceTiles, type DeviceCommand } from "@/kit/elements/device-tiles";
 import { StudioNodeView } from "@/kit/schema/StudioNodeView";
 import { ResultFeedNodeView } from "@/kit/schema/ResultFeedNodeView";
 import { evaluateCondition } from "@/kit/schema/condition";
@@ -78,6 +80,8 @@ import type {
   ProgressNode,
   WidgetCardNode,
   WidgetRowNode,
+  WidgetTilesNode,
+  ReorderSpec,
   AnswerBlocksNode,
   PickerNode,
   SearchNode,
@@ -91,6 +95,7 @@ import type {
   ChoiceControl,
   DataState,
 } from "@/kit/schema/types";
+import { ActionSchema } from "@/kit/schema/types";
 import type { WidgetData, WidgetDescriptor } from "@/kit/widgets";
 
 type Row = Record<string, unknown>;
@@ -554,7 +559,7 @@ function SortSelect({ control, state }: { control: ChoiceControl; state: Row }) 
   const writer = useContext(PageStateContext);
   const chosen = typeof state[control.state] === "string" ? (state[control.state] as string) : control.options[0]!.value;
   return (
-    <Select value={chosen} onValueChange={(value) => writer?.merge({ [control.state]: value === control.options[0]!.value ? undefined : value })}>
+    <Select value={chosen} onValueChange={(value) => writer?.merge({ [control.state]: value })}>
       <SelectTrigger aria-label={control.label} data-slot="shelf-sort" className="w-auto min-w-36">
         <SelectValue />
       </SelectTrigger>
@@ -563,6 +568,50 @@ function SortSelect({ control, state }: { control: ChoiceControl; state: Row }) 
       </SelectContent>
     </Select>
   );
+}
+
+const SUGGEST_ROWS_DEBOUNCE_MS = 250;
+type SearchSuggestion = { key: string; label: string };
+
+/** MEDIA-PARITY-02: search suggestions. Asks the bound package data call about 250 ms after typing stops, from `min_chars`
+ * characters (default 2), reading the typed text as `$state.<state>`; keeps only the newest answer, and a failed or malformed
+ * answer is no suggestions. */
+function useSearchSuggestions(config: SearchNode["suggest"], text: string, state: Row, stateKey: string): SearchSuggestion[] {
+  const scope = useContext(PackageScopeContext);
+  const [found, setFound] = useState<SearchSuggestion[]>([]);
+  const trimmed = text.trim();
+  const packageId = scope?.packageId;
+  const minChars = config?.min_chars ?? 2;
+  const max = config?.max ?? 6;
+  const keyField = config?.item_key_field ?? "key";
+  const labelField = config?.item_label_field ?? "label";
+  const signature = JSON.stringify(config ? resolveParams(config.bind.params, { ...state, [stateKey]: trimmed }).body : null);
+  useEffect(() => {
+    if (!config || !packageId || trimmed.length < minChars) { setFound([]); return; }
+    let current = true;
+    const timer = setTimeout(() => {
+      const { body } = resolveParams(config.bind.params, { ...state, [stateKey]: trimmed });
+      request<unknown>(`/api/plugins/${packageId}/data/${config.bind.path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(
+        (answer) => {
+          if (!current) return;
+          const rows = Array.isArray(answer) ? answer : Array.isArray((answer as { rows?: unknown } | null)?.rows) ? (answer as { rows: unknown[] }).rows : [];
+          const clean: SearchSuggestion[] = [];
+          for (const row of rows as Row[]) {
+            if (!row || typeof row !== "object") continue;
+            const label = readField(row, labelField);
+            if (typeof label !== "string" || label === "") continue;
+            const key = readField(row, keyField);
+            clean.push({ key: typeof key === "string" || typeof key === "number" ? String(key) : label, label });
+          }
+          setFound(clean.slice(0, max));
+        },
+        () => { if (current) setFound([]); },
+      );
+    }, SUGGEST_ROWS_DEBOUNCE_MS);
+    return () => { current = false; clearTimeout(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- trimmed text and the resolved body are the change signals
+  }, [config, packageId, trimmed, signature, minChars, max, keyField, labelField]);
+  return found;
 }
 
 function SearchControl({ node, state, recents }: { node: SearchNode; state: Row; recents: Row[] }) {
@@ -599,6 +648,18 @@ function SearchControl({ node, state, recents }: { node: SearchNode; state: Row;
   }
   const keyField = node.item_key_field ?? "key";
   const labelField = node.item_label_field ?? "label";
+  // MEDIA-PARITY-02: suggestions under the field while typing; arrow keys move, Enter takes the active one, a tap fills and submits.
+  const suggestions = useSearchSuggestions(node.suggest, text, state, key);
+  const [suggestOpen, setSuggestOpen] = useState(true);
+  const [active, setActive] = useState(-1);
+  const listId = useId();
+  const showSuggestions = node.suggest !== undefined && suggestOpen && suggestions.length > 0 && text.trim().length >= (node.suggest.min_chars ?? 2);
+  function pick(label: string) {
+    setText(label);
+    setActive(-1);
+    setSuggestOpen(false);
+    submit(label);
+  }
   const chips = text === "" ? recents.map((row) => ({ key: String(readField(row, keyField) ?? ""), label: String(readField(row, labelField) ?? "") })).filter((c) => c.label !== "") : [];
   return (
     <div role="search" data-slot="search-node" className="flex min-w-0 flex-col gap-2">
@@ -608,9 +669,43 @@ function SearchControl({ node, state, recents }: { node: SearchNode; state: Row;
         aria-label={node.label ?? i18n._({ id: "ui.Search", message: "Search" })}
         placeholder={node.placeholder}
         autoComplete="off"
-        onChange={(e) => change(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); submit(text); } }}
+        onChange={(e) => { setSuggestOpen(true); setActive(-1); change(e.target.value); }}
+        role={node.suggest ? "combobox" : undefined}
+        aria-expanded={node.suggest ? showSuggestions : undefined}
+        aria-controls={showSuggestions ? listId : undefined}
+        aria-autocomplete={node.suggest ? "list" : undefined}
+        aria-activedescendant={showSuggestions && active >= 0 ? `${listId}-${active}` : undefined}
+        onKeyDown={(e) => {
+          if (showSuggestions && e.key === "ArrowDown") { e.preventDefault(); setActive((i) => (i + 1) % suggestions.length); return; }
+          if (showSuggestions && e.key === "ArrowUp") { e.preventDefault(); setActive((i) => (i <= 0 ? suggestions.length - 1 : i - 1)); return; }
+          if (showSuggestions && e.key === "Escape") { e.preventDefault(); setSuggestOpen(false); setActive(-1); return; }
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (showSuggestions && active >= 0 && suggestions[active]) pick(suggestions[active]!.label);
+            else { setSuggestOpen(false); submit(text); }
+          }
+        }}
       />
+      {showSuggestions ? (
+        <ul id={listId} role="listbox" data-slot="search-suggestions" aria-label={i18n._({ id: "ui.Suggestions", message: "Suggestions" })} className="m-0 flex min-w-0 list-none flex-col overflow-hidden rounded-[var(--radius-card)] bg-[var(--surface-2)] p-1 ring-1 ring-inset ring-[var(--hairline)]">
+          {suggestions.map((suggestion, i) => (
+            <li
+              key={suggestion.key}
+              id={`${listId}-${i}`}
+              role="option"
+              aria-selected={i === active}
+              data-active={i === active ? "true" : undefined}
+              className="min-h-11 cursor-pointer truncate rounded-md px-3 py-2.5 text-sm text-foreground hover:bg-muted data-[active=true]:bg-muted"
+              // The mouse down stays off the field so the list is still there when the click lands.
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => pick(suggestion.label)}
+              onKeyDown={(e) => { if (e.key === "Enter") pick(suggestion.label); }}
+            >
+              {suggestion.label}
+            </li>
+          ))}
+        </ul>
+      ) : null}
       {node.type_chips ? <ChoiceChips control={node.type_chips} state={state} slot="search-type-chips" /> : null}
       {chips.length > 0 ? (
         <div data-slot="search-recents" className="flex min-w-0 flex-wrap items-center gap-2">
@@ -1143,6 +1238,35 @@ function dayGroupKeys(rows: readonly Row[], field: string): Map<Row, string> {
   return keys;
 }
 
+/** MEDIA-PARITY-02: turns a node's `reorder` spec into the kit's `ReorderConfig`. After a move the action fires once with the whole
+ * new key order under `id_param`; on failure the old order is put back (`revert`) and `failure` is a status card to draw. */
+function useReorderWiring(spec: ReorderSpec | undefined): { config: ReorderConfig | undefined; failure: ReactNode } {
+  const { dispatch } = useDispatchAction();
+  const [error, setError] = useState<string | null>(null);
+  if (!spec || !("call" in spec.call)) return { config: undefined, failure: null };
+  const call = spec.call.call;
+  const config: ReorderConfig = {
+    onReorder: (keys, revert) => {
+      setError(null);
+      // The ordered keys travel as a typed array: the whole-string placeholder keeps the item's own value.
+      const action = { call: { ...call, args: { ...call.args, [spec.id_param]: `{${spec.id_param}}` } } };
+      dispatch(action, [{ [spec.id_param]: keys }], undefined, {
+        typedArgs: true,
+        onError: (message) => { revert(); setError(message || i18n._({ id: "ui.Something went wrong.", message: "Something went wrong." })); },
+      });
+    },
+  };
+  return { config, failure: error ? <ReorderFailure message={error} onDismiss={() => setError(null)} /> : null };
+}
+
+/** MEDIA-PARITY-02: `item_badge_presentation: "dot"`: a truthy badge field is a small accent dot (an unplayed mark). A string field is its accessible name. */
+function badgeDot(value: unknown): ReactNode {
+  const on = value === true || (typeof value === "string" && value !== "") || (typeof value === "number" && value > 0);
+  if (!on) return null;
+  const name = typeof value === "string" ? value : i18n._({ id: "ui.Not played yet", message: "Not played yet" });
+  return <span role="img" aria-label={name} data-slot="media-tile-badge-dot" className="block size-2.5 rounded-full bg-primary ring-2 ring-background" />;
+}
+
 /** PARITY-01: the sort select and filter chips sit outside the shelf's loading and empty states, so a filter that
  * matches nothing can still be changed back. */
 function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row }) {
@@ -1161,6 +1285,7 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
 function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
   const query = useBinding<Row[]>(node.bind, state);
   const { dispatch, lastError, pendingConfirm } = useDispatchAction();
+  const reorderWiring = useReorderWiring(node.reorder);
   // The slider's size is per shelf and per device (the card-size hook's own storage), whether or not a slider is drawn.
   const [tileSize, setTileSize] = useCardSize(`shelf:${node.bind.path}`);
   // The heart turns at once; the action's refresh then brings the stored value, which is the truth (a failed call puts it back).
@@ -1227,6 +1352,8 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
             density={node.density}
             cardRadius={node.card_radius}
             pressScale={node.press_scale}
+            reorder={pinnedRow || pinned.length > 0 ? undefined : reorderWiring.config}
+            getReorderLabel={(row) => String(readField(row, node.item_label_field) ?? "")}
             onPlay={node.on_play ? (row) => dispatch(node.on_play!, [row]) : undefined}
             getPlayLabel={node.play_label ? (row) => fillTemplate(node.play_label!, row) : undefined}
             isHighlighted={node.item_highlight_field ? (row) => readField(row, node.item_highlight_field!) === true : undefined}
@@ -1292,6 +1419,7 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
               node.item_badge_field
                 ? (row) => {
                     const text = readField(row, node.item_badge_field!);
+                    if (node.item_badge_presentation === "dot") return badgeDot(text);
                     return typeof text === "string" && text !== "" ? <Badge variant="secondary">{text}</Badge> : null;
                   }
                 : undefined
@@ -1311,6 +1439,7 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
         <>
           {pinned.length > 0 ? shelf(pinned, true) : null}
           {rest.length > 0 || pinned.length === 0 ? shelf(rest, false) : null}
+          {reorderWiring.failure}
           {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
           <ConfirmDialog pendingConfirm={pendingConfirm} />
         </>
@@ -1441,7 +1570,9 @@ function CategoryTilesNodeView({ node, state }: { node: CategoryTilesNode; state
 }
 
 function TrackRowsNodeView({ node, state }: { node: TrackRowsNode; state: Row }) {
+  const reorderWiring = useReorderWiring(node.reorder);
   return (
+    <>
     <MusicBlockState bind={node.bind} state={state} hideWhenEmpty={node.hide_when_empty} emptyState={node.empty_state} errorMessage={i18n._({ id: "ui.Could not load these tracks.", message: "Could not load these tracks." })}>
       {(rows, dispatch) => (
         <TrackRows
@@ -1467,6 +1598,7 @@ function TrackRowsNodeView({ node, state }: { node: TrackRowsNode; state: Row })
           isPlaying={node.item_highlight_field ? (row) => readField(row, node.item_highlight_field!) === true : undefined}
           onPlay={(row) => dispatch(node.on_play, [row])}
           getPlayLabel={node.play_label ? (row) => fillTemplate(node.play_label!, row) : undefined}
+          reorder={reorderWiring.config}
           renderActions={node.row_actions?.length
             ? (row) => node.row_actions!.map((button, i) => {
                 const Icon = getIcon(button.icon);
@@ -1487,6 +1619,8 @@ function TrackRowsNodeView({ node, state }: { node: TrackRowsNode; state: Row })
         />
       )}
     </MusicBlockState>
+    {reorderWiring.failure}
+    </>
   );
 }
 
@@ -2028,6 +2162,56 @@ function WidgetRowInstance({ widget }: { widget: WidgetDescriptor }) {
   return <WidgetRow title={widget.title} items={data.data?.items} isLoading={data.isLoading} />;
 }
 
+/** MEDIA-PARITY-02: one tap action for a device row. The row's own `actions[<command>]` wins over its `action`; the slider or setpoint
+ * value joins the row as `value` for the call's `{value}` placeholders. */
+function deviceAction(row: Row, command: DeviceCommand) {
+  const per = row.actions && typeof row.actions === "object" ? (row.actions as Row)[command] : undefined;
+  const parsed = ActionSchema.safeParse(per ?? row.action);
+  return parsed.success ? parsed.data : null;
+}
+
+function WidgetTilesNodeView({ node, state }: { node: WidgetTilesNode; state: Row }) {
+  const list = useBinding<Row[]>(node.bind, state);
+  const { dispatch, lastError } = useDispatchAction();
+  const onCommand = (row: Row, command: DeviceCommand, value?: number) => {
+    const action = deviceAction(row, command);
+    if (action) dispatch(action, [value === undefined ? row : { ...row, value }]);
+  };
+  return (
+    <AsyncState
+      errorLayout="row"
+      data={list.data}
+      error={list.isError}
+      isFetching={list.isFetching}
+      onRetry={() => list.refetch()}
+      errorMessage={i18n._({ id: "ui.Could not load these devices.", message: "Could not load these devices." })}
+      isEmpty={(rows) => !Array.isArray(rows) || rows.length === 0 || rows.every((r) => r.package !== undefined && r.size !== "tiles")}
+      emptyIcon="sparkles"
+      emptyText={i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
+    >
+      {(rows) => {
+        // A widget list (`size: "tiles"` descriptors, each with its own data) or the device rows themselves.
+        const widgets = rows.filter((r) => r.package !== undefined && r.size === "tiles") as unknown as WidgetDescriptor[];
+        return (
+          <div className="flex min-w-0 flex-col gap-3" data-slot="widget-tiles">
+            {widgets.length > 0
+              ? widgets.map((widget) => <WidgetTilesInstance key={`${widget.package}/${widget.id}`} widget={widget} onCommand={onCommand} />)
+              : <DeviceTiles devices={rows} onCommand={onCommand} />}
+            {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
+          </div>
+        );
+      }}
+    </AsyncState>
+  );
+}
+
+function WidgetTilesInstance({ widget, onCommand }: { widget: WidgetDescriptor; onCommand: (row: Row, command: DeviceCommand, value?: number) => void }) {
+  const data = useWidgetData(widget);
+  const devices = (data.data?.items ?? []) as unknown as Row[];
+  if (devices.length === 0) return null;
+  return <DeviceTiles devices={devices} onCommand={onCommand} label={widget.title} />;
+}
+
 function DetailPaneNodeView({ node, state }: { node: DetailPaneNode; state: Row }) {
   return (
     <DetailPane title={node.title} subtitle={node.subtitle}>
@@ -2183,6 +2367,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <WidgetCardNodeView node={node} />;
     case "widget_row":
       return <WidgetRowNodeView node={node} />;
+    case "widget_tiles":
+      return <WidgetTilesNodeView node={node} state={state} />;
     case "answer_blocks":
       return <AnswerBlocksNodeView node={node} state={state} />;
     case "picker":

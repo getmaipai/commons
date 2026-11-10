@@ -73,6 +73,8 @@ import {
   Camera,
   CheckCircle2,
   ChevronDown,
+  ChevronUp,
+  GripVertical,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -225,6 +227,8 @@ export const icons = {
   // MEDIA-POLISH-01: Watch later on the watch page's actions row.
   clock: Clock,
   "chevron-down": ChevronDown,
+  "chevron-up": ChevronUp,
+  "grip-vertical": GripVertical,
   "chevron-left": ChevronLeft,
   "chevron-right": ChevronRight,
   "chevrons-left": ChevronsLeft,
