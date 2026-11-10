@@ -60,7 +60,9 @@ def test_valid_demo_packs_have_no_problems():
 
 
 def test_file_sizes_are_checked_against_the_budget():
-    assert validate_companion_pack(load("valid-man.json"), {"clip.mp4": 12_582_913}) == [
+    assert validate_companion_pack(
+        load("valid-man.json"), {"clip.mp4": 12_582_913}
+    ) == [
         "budget.bytes is 12582912 but files total 12582913 bytes; raise the budget or reduce file sizes.",
         "budget.bytes files total 12582913 bytes, over the desktop limit of 12582912; reduce file sizes.",
     ]

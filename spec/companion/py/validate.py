@@ -3,7 +3,9 @@
 from collections.abc import Mapping
 
 
-def validate_companion_pack(pack: Mapping, files: Mapping[str, int] | None = None) -> list[str]:
+def validate_companion_pack(
+    pack: Mapping, files: Mapping[str, int] | None = None
+) -> list[str]:
     problems: list[str] = []
     seen: set[str] = set()
     for state, clips in pack["states"].items():
