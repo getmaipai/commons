@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { afterEach, describe, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, within } from "@testing-library/react";
 import { SettingsShell, type SettingsShellProps } from "./SettingsShell";
@@ -316,7 +318,7 @@ describe("SettingsShell keyboard", () => {
 
 describe("SettingsShell phone full bleed (KIT-QA-01)", () => {
   test("tokens.css drops the rail body's padding around the default shell below lg, and defines the header height", () => {
-    const css = require("node:fs").readFileSync(require("node:path").resolve(import.meta.dir, "../tokens.css"), "utf8") as string;
+    const css = readFileSync(resolve(import.meta.dir, "../tokens.css"), "utf8");
     const at = css.indexOf('[data-slot="rail-body"]:has([data-slot="settings-shell"][data-layout="default"])');
     expect(at).toBeGreaterThan(0);
     expect(css.slice(css.lastIndexOf("@media", at), at)).toContain("max-width: 1023.98px");
