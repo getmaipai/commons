@@ -25,6 +25,15 @@ describe("manifest Home widget placement fields", () => {
     }), ajv.errorsText(check.errors)).toBe(true);
   });
 
+  test("MEDIA-PARITY-02: a tiles size is accepted and unknown sizes are not", () => {
+    const ajv = new Ajv2020({ strict: false, allErrors: true });
+    addFormats(ajv);
+    const check = ajv.compile(read("manifest.schema.json").properties.contributes.properties.widgets.items);
+    const base = { id: "house-devices", title: "Devices", refresh_s: 30 };
+    for (const size of ["card", "row", "tiles"]) expect(check({ ...base, size }), ajv.errorsText(check.errors)).toBe(true);
+    expect(check({ ...base, size: "grid" })).toBe(false);
+  });
+
   test("rejects out-of-range priority, unknown surfaces, and undeclared data ids", () => {
     const ajv = new Ajv2020({ strict: false, allErrors: true });
     addFormats(ajv);

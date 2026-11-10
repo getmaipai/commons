@@ -1260,6 +1260,11 @@
     },
     {
       "scope": "person",
+      "group": "person.podcasts",
+      "reason": "Home draws the automatic download choice and its size cap on the Podcasts page; the spec declares each key once first."
+    },
+    {
+      "scope": "person",
       "group": "profile.appearance.internal",
       "reason": "Pinned app order and checklist dismissal are internal UI state and are not user-facing settings."
     },

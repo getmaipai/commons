@@ -3995,6 +3995,179 @@
     ]
   },
   {
+    "key": "ui.activity_seen_at",
+    "scope": "person",
+    "selector": "text",
+    "default": null,
+    "label": "Activity last seen (advanced)",
+    "help": "The date and time this person last opened the activity list, as an ISO string. Items newer than this show as unseen. Set by opening the list, not by editing this directly.",
+    "copy": {
+      "does": "Remembers when this person last looked at their activity."
+    },
+    "level": "expert",
+    "secret": false,
+    "lives_in": "profile.appearance.internal",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "music.library_sort",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "recents",
+        "az",
+        "creator"
+      ]
+    },
+    "default": "recents",
+    "label": "Music library order (advanced)",
+    "help": "How this person's Music library is sorted: most recent first, A to Z, or by creator. Normally set from the sort control on the library page.",
+    "copy": {
+      "does": "Remembers how this person sorts their Music library.",
+      "options": {
+        "recents": "Most recently added first.",
+        "az": "Alphabetical by title.",
+        "creator": "Grouped by artist or creator."
+      }
+    },
+    "level": "expert",
+    "secret": false,
+    "lives_in": "profile.appearance.internal",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "videos.library_sort",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "recents",
+        "az"
+      ]
+    },
+    "default": "recents",
+    "label": "Video library order (advanced)",
+    "help": "How this person's Videos library is sorted: most recent first or A to Z. Normally set from the sort control on the library page.",
+    "copy": {
+      "does": "Remembers how this person sorts their Videos library.",
+      "options": {
+        "recents": "Most recently added first.",
+        "az": "Alphabetical by title."
+      }
+    },
+    "level": "expert",
+    "secret": false,
+    "lives_in": "profile.appearance.internal",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "music.crossfade_s",
+    "scope": "person",
+    "selector": "number",
+    "range": {
+      "min": 0,
+      "max": 12
+    },
+    "default": 0,
+    "label": "Crossfade between songs (seconds)",
+    "help": "How many seconds one song fades into the next. 0 plays songs back to back with no overlap.",
+    "copy": {
+      "does": "Blends the end of one song into the start of the next."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.music",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "music.eq_preset",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "flat",
+        "bass",
+        "treble",
+        "vocal"
+      ]
+    },
+    "default": "flat",
+    "label": "Sound preset",
+    "help": "Shapes the music sound. Flat leaves it as recorded; the others lift bass, treble or voices.",
+    "copy": {
+      "does": "Changes the tone of the music you play.",
+      "options": {
+        "flat": "The sound as recorded.",
+        "bass": "More low notes.",
+        "treble": "More high notes.",
+        "vocal": "Clearer voices."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.music",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "podcasts.auto_download",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "off",
+        "followed"
+      ]
+    },
+    "default": "off",
+    "label": "Automatic podcast saving",
+    "help": "Whether Home saves new episodes of the shows this person follows to the household file store ahead of time. Off saves nothing until asked.",
+    "copy": {
+      "does": "Saves new episodes of followed shows so they play without waiting.",
+      "options": {
+        "off": "Nothing is saved ahead of time.",
+        "followed": "New episodes of shows you follow are saved."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.podcasts",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "podcasts.auto_download_max_gb",
+    "scope": "person",
+    "selector": "number",
+    "range": {
+      "min": 1,
+      "max": 100
+    },
+    "default": 10,
+    "label": "Podcast downloads limit (GB)",
+    "help": "The most space, in gigabytes, that this person's automatic podcast downloads may use. The oldest played episodes are removed first once it is reached.",
+    "copy": {
+      "does": "Caps how much space automatic podcast downloads can use."
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.podcasts",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "setup.checklist_dismissed",
     "scope": "person",
     "selector": "text",

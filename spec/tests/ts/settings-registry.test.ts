@@ -131,6 +131,22 @@ describe("spec/settings/keys.json", () => {
     });
   });
 
+  test("MEDIA-PARITY-02: media library and podcast download keys are declared with defaults", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const get = (key: string) => {
+      const rows = entries.filter((row) => row.key === key);
+      expect(rows).toHaveLength(1);
+      return SettingsKey.parse(rows[0]);
+    };
+    expect(get("ui.activity_seen_at")).toMatchObject({ scope: "person", selector: "text", default: null, level: "expert", lives_in: "profile.appearance.internal" });
+    expect(get("music.library_sort")).toMatchObject({ scope: "person", selector: "select", default: "recents", range: { options: ["recents", "az", "creator"] } });
+    expect(get("videos.library_sort")).toMatchObject({ scope: "person", selector: "select", default: "recents", range: { options: ["recents", "az"] } });
+    expect(get("music.crossfade_s")).toMatchObject({ scope: "person", selector: "number", default: 0, range: { min: 0, max: 12 }, lives_in: "person.music" });
+    expect(get("music.eq_preset")).toMatchObject({ scope: "person", selector: "select", default: "flat", range: { options: ["flat", "bass", "treble", "vocal"] } });
+    expect(get("podcasts.auto_download")).toMatchObject({ scope: "person", selector: "select", default: "off", range: { options: ["off", "followed"] } });
+    expect(get("podcasts.auto_download_max_gb")).toMatchObject({ scope: "person", selector: "number", default: 10, range: { min: 1, max: 100 } });
+  });
+
   test("guided tours use the automatic-start switch in Account Appearance", () => {
     const entry = (loadRegistry() as Record<string, unknown>[]).find((row) => row.key === "tours.autostart.enabled");
     expect(entry).toMatchObject({ scope: "person", selector: "boolean", default: true, label: "Start tours automatically", lives_in: "profile.appearance" });

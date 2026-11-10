@@ -795,7 +795,8 @@
                 "type": "string",
                 "enum": [
                   "card",
-                  "row"
+                  "row",
+                  "tiles"
                 ]
               },
               "refresh_s": {

@@ -1,0 +1,34 @@
+{
+  "id": "mcol-plvid01",
+  "person_id": "person-atlas01",
+  "kind": "playlist",
+  "title": "Family movie night",
+  "items": [
+    {
+      "media_id": "media-vid001",
+      "added_at": "2026-10-17T11:00:00Z",
+      "position": 0,
+      "status": null
+    },
+    {
+      "media_id": "media-vid002",
+      "added_at": "2026-10-17T11:01:00Z",
+      "position": 1,
+      "status": null
+    }
+  ],
+  "shared_to": "household",
+  "rules": null,
+  "deleted_at": null,
+  "trash_until": null,
+  "created_at": "2026-10-17T11:00:00Z",
+  "hlc": "1791547200000:0:hub001",
+  "provenance": "hub",
+  "media_kind": "video",
+  "members": [
+    "person-nova001",
+    "person-iris001"
+  ],
+  "cover_file_id": "file-cover01",
+  "pointer": null
+}

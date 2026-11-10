@@ -381,7 +381,7 @@ class Widget(BaseModel):
     )
     id: constr(min_length=1)
     title: constr(min_length=1, max_length=40)
-    size: Literal['card', 'row']
+    size: Literal['card', 'row', 'tiles']
     refresh_s: conint(ge=1) = Field(
         ...,
         description="How often Home should re-fetch this widget's data; the data itself still only ever comes from lib/packageCache.ts (step 3's own rule: never a live fetch in the request path).",

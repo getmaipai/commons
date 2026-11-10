@@ -22,6 +22,7 @@
     { "$ref": "#/$defs/split_view" },
     { "$ref": "#/$defs/widget_card" },
     { "$ref": "#/$defs/widget_row" },
+    { "$ref": "#/$defs/widget_tiles" },
     { "$ref": "#/$defs/answer_blocks" },
     { "$ref": "#/$defs/picker" },
     { "$ref": "#/$defs/search" },
@@ -142,7 +143,11 @@
               "type": "string",
               "description": "May contain `{field}`/`{count}` placeholders, resolved against the same item(s) `on_confirm` will act on."
             },
-            "on_confirm": { "$ref": "#/$defs/action" }
+            "on_confirm": { "$ref": "#/$defs/action" },
+            "status": {
+              "$ref": "#/$defs/package_binding",
+              "description": "MEDIA-PARITY-02: a status slot inside the dialog. The binding reads one status-card row ({state, title, detail}, as the S6 health rows); the dialog draws it as a card above its buttons, so a failed confirm shows its error in place instead of closing. Omitted: no card, as before. (Dialogs are declared only as `confirm`; no separate dialog node exists.)"
+            }
           }
         },
         "ask": {
@@ -428,6 +433,7 @@
         "item_progress_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to the played share, a number 0 to 1, drawn as a bar along the tile's bottom edge." },
         "item_avatar_field": { "type": "string", "description": "PARITY-01: dotted path to a same-origin image path (starting with `/`) drawn as a small round avatar (channel, artist) beside the caption. Empty draws none." },
         "item_badge_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to a short string drawn as the tile's corner badge (\"Saved\", \"On this phone\", \"Not saved\"); empty draws none." },
+        "item_badge_presentation": { "type": "string", "enum": ["label", "dot"], "default": "label", "description": "MEDIA-PARITY-02: `dot` draws `item_badge_field` as a small unplayed dot on the tile (shown when the field is truthy, with the field's string as its accessible name when it is one) instead of a corner label. Default `label`, unchanged." },
         "item_meta_field": { "type": "string", "description": "MEDIA-PLAYER-01: dotted path to the running time, a number of seconds (drawn as 18:42) or a short string." },
         "aspect": { "type": "string", "enum": ["wide", "square", "poster"], "default": "wide" },
         "variant": { "type": "string", "enum": ["card", "plain"], "default": "card", "description": "MEDIA-POLISH-01: card draws the shelf inside a bordered section card; plain draws a frameless row (a heading, the optional See all link, then the tiles), as the media apps and News do." },
@@ -515,6 +521,16 @@
         },
         "media_loop": { "type": "boolean", "default": false, "description": "VIDEO-UI-14 (item 8): a tile plays a muted, looped clip over its poster (`item_media_field`, still an image). The clip's same-origin path is read from `item_loop_field`. It plays while the tile is in view, is paused off screen, and under reduced motion only the poster shows. A row with no readable clip shows its poster alone. Rail and grid layouts." },
         "item_loop_field": { "type": "string", "description": "VIDEO-UI-14: dotted path to the same-origin path of a short silent mp4 (starting with `/`) that `media_loop` plays over the poster. Required when `media_loop` is true." },
+        "reorder": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["call", "id_param"],
+          "description": "MEDIA-PARITY-02: rows can be reordered. Each row shows a drag handle and keyboard move controls (Move up, Move down). After a move the kit fires `call` once with the complete new order as an array of row keys (`item_key_field`) under the name `id_param` in the call's body, then keeps the new order if the call succeeds and puts the old order back with a plain notice if it fails.",
+          "properties": {
+            "call": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
+            "id_param": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "The body field that carries the ordered key array (for example `ids`)." }
+          }
+        },
         "on_select": { "$ref": "#/$defs/action" },
         "empty_state": { "$ref": "#/$defs/empty_state" }
       }
@@ -608,6 +624,16 @@
               "label": { "type": "string", "minLength": 1 },
               "action": { "$ref": "#/$defs/action" }
             }
+          }
+        },
+        "reorder": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["call", "id_param"],
+          "description": "MEDIA-PARITY-02: rows can be reordered. Each row shows a drag handle and keyboard move controls (Move up, Move down). After a move the kit fires `call` once with the complete new order as an array of row keys (`item_key_field`) under the name `id_param` in the call's body, then keeps the new order if the call succeeds and puts the old order back with a plain notice if it fails.",
+          "properties": {
+            "call": { "allOf": [{ "$ref": "#/$defs/action" }, { "type": "object", "required": ["call"], "properties": { "call": {} } }] },
+            "id_param": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "The body field that carries the ordered key array (for example `ids`)." }
           }
         },
         "hide_when_empty": { "type": "boolean", "default": false, "description": "Draw nothing when the bound call returns no rows." },
@@ -1083,6 +1109,16 @@
       "description": "The `size: \"row\"` counterpart to `widget_card`: same binding and per-widget data fetch, a slim horizontal row instead of a sized grid tile - no card-size slider applies (a row's height is fixed; only a grid of cards has a size to pick).",
       "properties": {
         "type": { "const": "widget_row" },
+        "bind": { "$ref": "#/$defs/binding" }
+      }
+    },
+    "widget_tiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind"],
+      "description": "MEDIA-PARITY-02: the `size: \"tiles\"` counterpart to `widget_card` and `widget_row`, for a device widget (lights, locks, sensors): the widget draws a compact grid of small device tiles, each one a name, a state and one tap action, filling one card-width cell of the page. Same binding and per-widget data fetch as `widget_card`; the widget's data is a list of {id, name, state, icon?, on?}.",
+      "properties": {
+        "type": { "const": "widget_tiles" },
         "bind": { "$ref": "#/$defs/binding" }
       }
     },
@@ -1575,6 +1611,19 @@
         "item_label_field": { "type": "string", "description": "The recents row's label field. Default `label`." },
         "submit": { "$ref": "#/$defs/action" },
         "clear_recents": { "$ref": "#/$defs/action" },
+        "suggest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bind"],
+          "description": "MEDIA-PARITY-02: search suggestions. While the field has at least `min_chars` characters the kit asks `bind` (a package data call; put `$state.<state>` in its params to read the typed text) about 250 ms after typing stops, ignores out-of-date or failed answers, and draws the rows under the field. Pressing a row sets the state key to its label and fires `submit`. With the field empty, `recents` is drawn as before.",
+          "properties": {
+            "bind": { "$ref": "#/$defs/package_binding" },
+            "item_key_field": { "type": "string", "description": "The suggestion row's key field. Default `key`." },
+            "item_label_field": { "type": "string", "description": "The suggestion row's label field. Default `label`." },
+            "max": { "type": "integer", "minimum": 1, "maximum": 10, "default": 6 },
+            "min_chars": { "type": "integer", "minimum": 1, "maximum": 5, "default": 2 }
+          }
+        },
         "type_chips": {
           "type": "object",
           "additionalProperties": false,

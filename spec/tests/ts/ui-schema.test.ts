@@ -68,6 +68,31 @@ describe("UI schema", () => {
     expect(validate({ type: "search", type_chips: { ...opt, options: [] } })).toBe(false);
   });
 
+  test("MEDIA-PARITY-02: reorder, dot badge, search suggest, confirm status and widget_tiles", () => {
+    const opts = { call: { call: { target: "/api/x/order" } }, id_param: "ids" };
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "x" }, item_key_field: "id", item_label_field: "t", item_media_field: "m" };
+    const rows = { type: "track_rows", bind: { source: "package", path: "x" }, label: "T", item_key_field: "id", item_label_field: "t", on_play: { navigate: { to: "/a" } } };
+    for (const node of [shelf, rows]) {
+      expect(validate(node)).toBe(true);
+      expect(validate({ ...node, reorder: opts })).toBe(true);
+      for (const bad of [{ id_param: "Ids" }, { id_param: undefined }, { call: { navigate: { to: "/a" } } }, { call: undefined }, { extra: 1 }]) expect(validate({ ...node, reorder: { ...opts, ...bad } })).toBe(false);
+    }
+    expect(validate({ ...shelf, item_badge_field: "unplayed", item_badge_presentation: "dot" })).toBe(true);
+    expect(validate({ ...shelf, item_badge_field: "unplayed", item_badge_presentation: "label" })).toBe(true);
+    expect(validate({ ...shelf, item_badge_presentation: "ring" })).toBe(false);
+    const suggest = { bind: { source: "package", path: "suggest", params: { q: "$state.q" } }, max: 6, min_chars: 2 };
+    expect(validate({ type: "search", suggest })).toBe(true);
+    expect(validate({ type: "search" })).toBe(true);
+    for (const bad of [{ bind: { source: "route", path: "/x" } }, { ...suggest, max: 11 }, { ...suggest, min_chars: 0 }, { max: 3 }]) expect(validate({ type: "search", suggest: bad })).toBe(false);
+    const action = ajv.compile({ $schema: schema.$schema, $id: "https://example.com/action3.schema.json", $defs: schema.$defs, $ref: "#/$defs/action" });
+    const confirm = { prompt: "Remove {title}?", on_confirm: { call: { target: "/x" } } };
+    expect(action({ confirm })).toBe(true);
+    expect(action({ confirm: { ...confirm, status: { source: "package", path: "remove-status" } } })).toBe(true);
+    expect(action({ confirm: { ...confirm, status: { source: "route", path: "/x" } } })).toBe(false);
+    expect(validate({ type: "widget_tiles", bind: { source: "route", path: "/api/widgets" } })).toBe(true);
+    expect(validate({ type: "widget_tiles" })).toBe(false);
+  });
+
   test("at least one page exists to validate", () => {
     expect(pageFiles.length).toBeGreaterThan(0);
   });

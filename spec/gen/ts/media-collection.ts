@@ -38,6 +38,43 @@ export const MediaCollection = z
         })
         .strict(),
     ),
+    /**MEDIA-PARITY-02. What a playlist holds. A record without it is a music playlist.*/
+    media_kind: z
+      .enum(["music", "video"])
+      .describe(
+        "MEDIA-PARITY-02. What a playlist holds. A record without it is a music playlist.",
+      )
+      .default("music"),
+    /**MEDIA-PARITY-02. People other than the owner who may add items to a shared playlist. The owner always may. Empty by default; it grants adding only, and who can see the playlist stays with shared_to.*/
+    members: z
+      .array(z.string().regex(new RegExp("^person-[a-z0-9]{6,}$")))
+      .refine(
+        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+        "All items must be unique!",
+      )
+      .describe(
+        "MEDIA-PARITY-02. People other than the owner who may add items to a shared playlist. The owner always may. Empty by default; it grants adding only, and who can see the playlist stays with shared_to.",
+      )
+      .default([]),
+    /**MEDIA-PARITY-02. A household file used as the playlist's cover picture. Null draws the cover from the first items.*/
+    cover_file_id: z
+      .union([
+        z
+          .string()
+          .regex(new RegExp("^file-[a-z0-9]{6,}$"))
+          .describe(
+            "MEDIA-PARITY-02. A household file used as the playlist's cover picture. Null draws the cover from the first items.",
+          ),
+        z
+          .null()
+          .describe(
+            "MEDIA-PARITY-02. A household file used as the playlist's cover picture. Null draws the cover from the first items.",
+          ),
+      ])
+      .describe(
+        "MEDIA-PARITY-02. A household file used as the playlist's cover picture. Null draws the cover from the first items.",
+      )
+      .default(null),
     /**The queue's current entry (an index into items).*/
     pointer: z
       .union([

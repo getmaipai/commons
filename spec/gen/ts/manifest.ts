@@ -2632,7 +2632,7 @@ export const PackageManifest = z
               .object({
                 id: z.string().min(1),
                 title: z.string().min(1).max(40),
-                size: z.enum(["card", "row"]),
+                size: z.enum(["card", "row", "tiles"]),
                 /**How often Home should re-fetch this widget's data; the data itself still only ever comes from lib/packageCache.ts (step 3's own rule: never a live fetch in the request path).*/
                 refresh_s: z
                   .number()

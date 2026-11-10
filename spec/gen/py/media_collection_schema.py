@@ -28,6 +28,10 @@ class Item(BaseModel):
     )
 
 
+class Member(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^person-[a-z0-9]{6,}$')
+
+
 class SharedToItem(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
     root: constr(pattern=r'^person-[a-z0-9]{6,}$')
 
@@ -80,6 +84,18 @@ class MediaCollection(BaseModel):
     ]
     title: constr(min_length=1)
     items: list[Item]
+    media_kind: Literal['music', 'video'] = Field(
+        'music',
+        description='MEDIA-PARITY-02. What a playlist holds. A record without it is a music playlist.',
+    )
+    members: list[constr(pattern=r'^person-[a-z0-9]{6,}$')] = Field(
+        [],
+        description='MEDIA-PARITY-02. People other than the owner who may add items to a shared playlist. The owner always may. Empty by default; it grants adding only, and who can see the playlist stays with shared_to.',
+    )
+    cover_file_id: constr(pattern=r'^file-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description="MEDIA-PARITY-02. A household file used as the playlist's cover picture. Null draws the cover from the first items.",
+    )
     pointer: conint(ge=0) | None = Field(
         None, description="The queue's current entry (an index into items)."
     )
