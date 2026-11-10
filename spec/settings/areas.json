@@ -819,7 +819,7 @@
                 "unlocked_note": "Unlocked on this page only. It locks again when you leave or after 2 minutes without a touch.",
                 "sources_title": "Where styles come from",
                 "huggingface_note": "On. Search and download styles from Hugging Face. A token is only needed for styles that ask you to accept terms: add it in AI and models, Advanced. Home sends it only for those files.",
-                "civitai_off_note": "Off until you turn it on. This computer only contacts civitai.com when you search or install.",
+                "civitai_off_note": "On by default. This computer contacts civitai.com only when an admin searches or installs a style.",
                 "civitai_notice_title": "Turn on Civitai?",
                 "civitai_notice_body_1": "When you search or install, this computer contacts civitai.com. It sends what you typed and your key, nothing about your family.",
                 "civitai_notice_body_2": "Civitai has its own rules. Some styles there are for adults only, and some may show real people. You choose what to install.",

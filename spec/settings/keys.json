@@ -6716,9 +6716,9 @@
     "key": "generation.styles.civitai",
     "scope": "household",
     "selector": "boolean",
-    "default": false,
+    "default": true,
     "label": "Use Civitai",
-    "help": "Off until you turn it on. This computer only contacts civitai.com when you search or install.",
+    "help": "On by default. This computer contacts civitai.com only when an admin searches or installs a style.",
     "copy": {
       "does": "Lets Home search Civitai and install styles when you ask."
     },

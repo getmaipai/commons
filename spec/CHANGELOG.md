@@ -1,3 +1,7 @@
+## [spec-v0.1.358] - 2026-11-10
+
+- STYLES-CIVITAI-01, additive default change. `generation.styles.civitai` now defaults to true (Civitai search and install on) and its help and the Styles area note say Home contacts civitai.com only when an admin searches or installs a style. A household that set it explicitly keeps its value.
+
 ## [spec-v0.1.357] - 2026-11-10
 
 - CLIPS-FEED-02, no schema change. `PACKAGE_PAGE_NODE_TYPES` in `ui/app-check.ts` did not list `clip_feed` (added in 0.1.355), so a package page using it was refused and the whole app failed to register. It is now allowed, and the checker applies the package rules to it: `bind` is a package list entry, `item_fields` are field paths, and `actions` and `on_close` stay under the app. `widget_tiles` stays refused on purpose (it reads another route, like `widget_card`). Pages valid before stay valid.

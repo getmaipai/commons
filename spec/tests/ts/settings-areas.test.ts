@@ -78,7 +78,7 @@ describe("VIDEO-SETTINGS-03: Pictures, videos and music",()=>{
   expect(keyOf("generation.picture_tier")).toMatchObject({selector:"select",range:{options:["standard","boost"]},default:"standard",lives_in:"household.media_pictures"});
   expect(keyOf("generation.video_tier")).toMatchObject({selector:"select",range:{options:["standard","boost"]},default:"standard",lives_in:"household.media_videos"});
   expect(keyOf("generation.styles.adult_only")).toMatchObject({selector:"select",range:{options:["allowed","restricted"]},default:"allowed",lives_in:"household.media_styles"});
-  expect(keyOf("generation.styles.civitai")).toMatchObject({selector:"boolean",default:false,lives_in:"household.media_styles"});
+  expect(keyOf("generation.styles.civitai")).toMatchObject({selector:"boolean",default:true,lives_in:"household.media_styles"});
   expect(keyOf("generation.styles.civitai_key")).toMatchObject({selector:"text",secret:true,default:"",lives_in:"household.media_styles"});
   for(const k of ["generation.picture_tier","generation.video_tier","generation.styles.adult_only","generation.styles.civitai","generation.styles.civitai_key"])expect(JSON.stringify(keyOf(k))).not.toMatch(/quick|detailed|wan|ltx/i);
  });
