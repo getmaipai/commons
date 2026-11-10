@@ -1,5 +1,4 @@
-// Feed `actions` take up to 5 entries and the Studio `export_result.actions` up to 3 (SPATIAL-REACH: a second
-// "Spatial sound" entry that posts { surround: true } through the action's own call.args). Six and four still fail.
+// Feed actions take up to 8 entries and Studio export actions up to 3.
 import { describe, expect, test } from "bun:test";
 import { ResultFeedNodeSchema, StudioNodeSchema } from "@/kit/schema/types";
 
@@ -26,9 +25,9 @@ const studio = (actions: unknown[]) => ({
 });
 
 describe("action caps", () => {
-  test("a feed takes 5 actions, not 6", () => {
-    expect(ResultFeedNodeSchema.safeParse(feed(many(5))).success).toBe(true);
-    expect(ResultFeedNodeSchema.safeParse(feed(many(6))).success).toBe(false);
+  test("a feed takes 8 actions, not 9", () => {
+    expect(ResultFeedNodeSchema.safeParse(feed(many(8))).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse(feed(many(9))).success).toBe(false);
   });
   test("the Studio export card takes 3 actions, not 4", () => {
     expect(StudioNodeSchema.safeParse(studio(many(3))).success).toBe(true);
@@ -37,5 +36,10 @@ describe("action caps", () => {
   test("an action carries its own body through call.args", () => {
     const parsed = ResultFeedNodeSchema.parse(feed([call("Spatial sound with 5.1 file", { id: "{id}", surround: true })]));
     expect((parsed.actions![0]!.action as { call: { args: Record<string, unknown> } }).call.args).toEqual({ id: "{id}", surround: true });
+  });
+  test("fresh_confirm and show_when are accepted and validated", () => {
+    const parsed = ResultFeedNodeSchema.parse(feed([{ label: "Unmark", show_when: "adult.nsfw", action: { call: { target: "/unmark", args: { id: "{id}", ticket: "{ticket}" }, fresh_confirm: { title: "Confirm", description: "Fresh check", action_label: "Continue" } } } }]));
+    expect(parsed.actions?.[0]?.show_when).toBe("adult.nsfw");
+    expect(ResultFeedNodeSchema.safeParse(feed([{ label: "Unmark", show_when: "", action: { call: { target: "/unmark" } } }])).success).toBe(false);
   });
 });

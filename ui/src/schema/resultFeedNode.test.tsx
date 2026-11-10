@@ -162,6 +162,19 @@ describe("result_feed poll_while", () => {
 });
 
 describe("result_feed entries", () => {
+  test("show_when only draws a row action for a truthy dotted field", async () => {
+    server = [queued("a", { flags: { nsfw: true }, status: "failed" }), queued("b", { flags: { nsfw: false }, status: "failed" })];
+    const node = { ...(feed as object), actions: [
+      { label: "Unmark as NSFW", show_when: "flags.nsfw", when: ["failed"], action: { call: { target: "/api/plugins/videos/actions/unmark" } } },
+      { label: "Mark as NSFW", show_when: "flags.not_nsfw", when: ["failed"], action: { call: { target: "/api/plugins/videos/actions/mark" } } },
+    ] } as unknown as UiNode;
+    const view = renderWithQueryClient(<Harness node={node} />);
+    await advance(0);
+    const actionLabels = Array.from(view.container.querySelectorAll('[data-slot="video-player-actions"] button')).map((button) => button.textContent);
+    expect(actionLabels.filter((label) => label?.includes("Unmark as NSFW"))).toHaveLength(1);
+    expect(actionLabels.some((label) => label?.includes("Mark as NSFW"))).toBe(false);
+  });
+
   test("words, tags, a Start frame chip and a day heading draw for each entry", async () => {
     server = [queued("a"), queued("b")];
     const view = renderWithQueryClient(<Harness />);

@@ -77,6 +77,7 @@ export type CredentialKind = "passcode" | "password";
 export interface AdultLockProviderProps {
   /** The host's check of the person's own passcode. Resolves ok, failed or locked_out; a rejection is shown as "could not check". */
   unlock: (passcode: string) => Promise<UnlockResult>;
+  onPasskey?: () => Promise<UnlockResult>;
   /** Number of digits of the passcode. Default 6. */
   digits?: number;
   /** The person's word for their credential ("passcode" by default, "password" for a password; "PIN" for a PIN). */
@@ -121,7 +122,7 @@ function fallbackFor(origin: HTMLElement | null): HTMLElement | null {
  * Holds the page's unlock in memory, draws the one passcode dialog and the polite live region. Mount one per page (the host's
  * route decides what a page is). Every `LockTile` below it opens this dialog.
  */
-export function AdultLockProvider({ unlock, digits = 6, credentialWord, credentialKind = "passcode", hasCredential = true, onRelock, onUnlocked, children }: AdultLockProviderProps) {
+export function AdultLockProvider({ unlock, onPasskey, digits = 6, credentialWord, credentialKind = "passcode", hasCredential = true, onRelock, onUnlocked, children }: AdultLockProviderProps) {
   const [proof, setProof] = useState<{ value: string | null } | null>(null);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -169,6 +170,7 @@ export function AdultLockProvider({ unlock, digits = 6, credentialWord, credenti
         open={open}
         onOpenChange={setOpen}
         unlock={unlock}
+        onPasskey={onPasskey}
         onUnlocked={onSuccess}
         digits={digits}
         credentialWord={credentialWord}
@@ -193,6 +195,7 @@ export interface AdultLockDialogProps {
   onOpenChange: (open: boolean) => void;
   /** The host's check. Resolves ok, failed or locked_out. */
   unlock: (passcode: string) => Promise<UnlockResult>;
+  onPasskey?: () => Promise<UnlockResult>;
   /** Called with the proof (if any) after an ok result; the host closes the dialog (`AdultLockProvider` does). */
   onUnlocked: (proof: string | undefined) => void;
   digits?: number;
@@ -220,7 +223,7 @@ function formatWait(seconds: number): string {
  * and explains a failure in plain words. Modal with a focus trap (the kit `Dialog`), focus on the first box, Escape and Cancel
  * close it. The title, text and messages never name an item.
  */
-export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits = 6, credentialWord: word, credentialKind = "passcode", hasCredential = true, onCloseAutoFocus, title, description, actionLabel }: AdultLockDialogProps) {
+export function AdultLockDialog({ open, onOpenChange, unlock, onPasskey, onUnlocked, digits = 6, credentialWord: word, credentialKind = "passcode", hasCredential = true, onCloseAutoFocus, title, description, actionLabel }: AdultLockDialogProps) {
   const isPassword = credentialKind === "password";
   const credentialWord = word ?? (isPassword ? i18n._({ id: "ui.password", message: "password" }) : i18n._({ id: "ui.passcode", message: "passcode" }));
   const [code, setCode] = useState("");
@@ -261,13 +264,13 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
   const lockedOut = remaining > 0;
   const focusField = () => window.setTimeout(() => field.current?.querySelector("input")?.focus(), 0);
 
-  async function submit(value: string) {
-    if (checking || lockedOut || (isPassword ? value.length === 0 : value.length !== digits)) return;
+  async function submit(value: string, usePasskey = false) {
+    if (checking || lockedOut || (!usePasskey && (isPassword ? value.length === 0 : value.length !== digits))) return;
     setChecking(true);
     setError(null);
     let result: UnlockResult | null = null;
     try {
-      result = await unlock(value);
+      result = usePasskey ? await onPasskey?.() ?? null : await unlock(value);
     } catch {
       result = null;
     }
@@ -369,6 +372,7 @@ export function AdultLockDialog({ open, onOpenChange, unlock, onUnlocked, digits
             {error ? <p role="alert" data-slot="adult-lock-error" className="text-destructive text-center text-sm">{error}</p> : null}
             {lockedOut ? <p aria-hidden="true" data-slot="adult-lock-wait" className="text-muted-foreground text-sm tabular-nums">{i18n._({ id: "ui.Try again in {wait}.", message: "Try again in {wait}.", values: { wait: formatWait(remaining) } })}</p> : null}
             <DialogFooter className="w-full">
+              {onPasskey ? <Button type="button" variant="outline" aria-label={i18n._({ id: "ui.Use a passkey", message: "Use a passkey" })} disabled={checking || lockedOut} onClick={() => void submit(code, true)}>{i18n._({ id: "ui.Use a passkey", message: "Use a passkey" })}</Button> : null}
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>{i18n._({ id: "ui.Cancel", message: "Cancel" })}</Button>
               <Button type="submit" disabled={checking || lockedOut || (isPassword ? code.length === 0 : code.length !== digits)}>{checking ? i18n._({ id: "ui.Checking", message: "Checking" }) : actionLabel ?? i18n._({ id: "ui.Unlock", message: "Unlock" })}</Button>
             </DialogFooter>

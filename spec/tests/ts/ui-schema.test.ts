@@ -15,6 +15,15 @@ const validate = ajv.compile(schema);
 const pageFiles = readdirSync(join(UI_DIR, "pages")).filter((f) => f.endsWith(".json"));
 
 describe("UI schema", () => {
+  test("VIDEO-UI-15: fresh_confirm and conditional result-feed actions validate", () => {
+    const callAction = ajv.compile({ $schema: schema.$schema, $id: "https://example.com/fresh-action.schema.json", $defs: schema.$defs, $ref: "#/$defs/action" });
+    expect(callAction({ call: { target: "/mark", args: { id: "{id}", ticket: "{ticket}" }, fresh_confirm: { title: "Confirm", description: "Fresh check", action_label: "Continue" } } })).toBe(true);
+    expect(callAction({ call: { target: "/mark", fresh_confirm: { unknown: true } } })).toBe(false);
+    const node = { type: "result_feed", bind: { source: "route", path: "/results" }, fields: { words: "words", status: "status" }, actions: [{ label: "Unmark", show_when: "adult.nsfw", action: { call: { target: "/unmark", fresh_confirm: { title: "Confirm" } } } }], poll_while: { statuses: ["queued"], record: { path: "job" } } };
+    expect(validate(node)).toBe(true);
+    expect(validate({ ...node, actions: Array.from({ length: 9 }, () => node.actions[0]) })).toBe(false);
+    expect(validate({ ...node, actions: [{ ...node.actions[0], show_when: "" }] })).toBe(false);
+  });
   test("HANDOFF-01a: play accepts an optional start position or placeholder", () => {
     const action = ajv.compile({ $schema: schema.$schema, $id: "https://example.com/action.schema.json", $defs: schema.$defs, $ref: "#/$defs/action" });
     for (const play of [{ media_id: "media-atlas" }, { media_id: "media-atlas", position_s: 0 }, { media_id: "media-atlas", position_s: 12.5 }, { media_id: "{id}", position_s: "{position_s}" }]) {

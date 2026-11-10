@@ -37,6 +37,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
           method: z.enum(["POST", "PATCH", "DELETE"]).default("POST"),
           args: z.record(z.string(), z.unknown()).optional(),
           success_label: z.string().min(1).max(40).optional(),
+          fresh_confirm: z.object({ title: z.string().optional(), description: z.string().optional(), action_label: z.string().optional() }).strict().optional(),
           then: z.object({ navigate: z.object({ to: z.string(), state: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional() }) }).optional(),
         }),
       }),
@@ -50,7 +51,7 @@ export const ActionSchema: z.ZodType<Action> = z.lazy(() =>
 );
 export type Action =
   | { navigate: { to: string; state?: Record<string, string | number | boolean> } }
-  | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown>; success_label?: string; then?: { navigate: { to: string; state?: Record<string, string | number | boolean> } } } }
+  | { call: { target: string; method?: "POST" | "PATCH" | "DELETE"; args?: Record<string, unknown>; success_label?: string; fresh_confirm?: { title?: string; description?: string; action_label?: string }; then?: { navigate: { to: string; state?: Record<string, string | number | boolean> } } } }
   | { play: { media_id: string; position_s?: number | string } }
   | { share: { to: string; title?: string } }
   | { confirm: { prompt: string; on_confirm: Action; status?: Binding } }
@@ -696,6 +697,7 @@ export const FeedHandlerSchema = z
         target: z.string(),
         method: z.enum(["POST", "PATCH", "DELETE"]).default("POST"),
         args: z.record(z.string(), z.unknown()).optional(),
+        fresh_confirm: z.object({ title: z.string().optional(), description: z.string().optional(), action_label: z.string().optional() }).strict().optional(),
         then: z.object({ navigate: z.object({ to: z.string(), state: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional() }) }).optional(),
       })
       .optional(),
@@ -764,10 +766,11 @@ export const ResultFeedNodeSchema = z.object({
         icon: z.string().optional(),
         starts: FeedStartsSchema.optional(),
         when: z.array(z.enum(["draft", "ready", "failed", "cancelled"])).min(1).optional(),
+        show_when: z.string().min(1).optional(),
         action: ActionSchema,
       }).strict(),
     )
-    .max(5)
+    .max(8)
     .optional(),
   actions_variant: z.enum(["default", "icons"]).default("default"),
   actions_inline: z.number().int().min(1).max(8).optional(),

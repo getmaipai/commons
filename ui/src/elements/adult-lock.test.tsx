@@ -493,6 +493,16 @@ describe("the locked state on every list part", () => {
 });
 
 describe("AdultLockDialog as a confirm (ADULT-LOCK-06)", () => {
+  test("passkey is absent without a callback and uses the shared result handling when supplied", async () => {
+    const base = render(<AdultLockDialog open onOpenChange={() => {}} unlock={async () => ({ status: "failed" })} onUnlocked={() => {}} />);
+    expect(base.queryByRole("button", { name: "Use a passkey" })).toBeNull();
+    cleanup();
+    const onPasskey = mock(async () => ({ status: "failed" as const, attemptsLeft: 2 }));
+    const view = render(<AdultLockDialog open onOpenChange={() => {}} unlock={async () => ({ status: "failed" })} onPasskey={onPasskey} onUnlocked={() => {}} />);
+    fireEvent.click(view.getByRole("button", { name: "Use a passkey" }));
+    await waitFor(() => expect(onPasskey).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(view.getByRole("alert").textContent).toContain("2 tries left"));
+  });
   test("title, description and actionLabel replace the unlock words; the field, the check and the failure lines are the same", async () => {
     const unlock = mock(async (): Promise<UnlockResult> => ({ status: "failed" }));
     const view = render(<AdultLockDialog open onOpenChange={() => {}} unlock={unlock} onUnlocked={() => {}} digits={4} title="Remove the lock" description="This changes who can see it." actionLabel="Remove lock" />);

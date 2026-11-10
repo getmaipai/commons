@@ -103,6 +103,7 @@
               "additionalProperties": true,
               "description": "String values may contain `{field}` placeholders, resolved the same way as `target`."
             },
+            "fresh_confirm": { "type": "object", "additionalProperties": false, "properties": { "title": { "type": "string" }, "description": { "type": "string" }, "action_label": { "type": "string" } }, "description": "Before the call, the host asks for a fresh secret for this row's id. A returned ticket is merged into the row as `{ticket}` for args templating. The kit draws no dialog." },
             "success_label": { "type": "string", "minLength": 1, "maxLength": 40, "description": "QA-FINISH-01: after the call succeeds, the kit shows this text as a brief toast (\"Saved\"). May contain `{field}` placeholders. Absent: no toast. A failed call shows its error instead." },
             "then": {
               "type": "object",
@@ -715,7 +716,7 @@
         },
         "actions": {
           "type": "array",
-          "maxItems": 5,
+          "maxItems": 8,
           "description": "Extra buttons after the built-in ones. With no `when`, an action shows in `ready`.",
           "items": {
             "type": "object",
@@ -726,6 +727,7 @@
               "icon": { "type": "string" },
               "starts": { "type": "string", "enum": ["picture", "video"] },
               "when": { "type": "array", "minItems": 1, "items": { "type": "string", "enum": ["draft", "ready", "failed", "cancelled"] } },
+              "show_when": { "type": "string", "minLength": 1, "description": "Dotted row-field path; truthy shows this action, falsy or missing hides it." },
               "action": { "$ref": "#/$defs/action" }
             }
           }

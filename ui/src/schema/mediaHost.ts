@@ -47,6 +47,8 @@ export interface CastTarget {
 }
 
 export interface MediaHost {
+  /** Asks the host for a fresh secret tied to one row. The host owns the dialog and credential check; null means cancelled. */
+  confirmFresh?(item: { id: string }, opts: { title?: string; description?: string; actionLabel?: string }): Promise<{ ticket: string } | null>;
   /** Lets a Play button show Pause for the item that is playing now. */
   playback?: { subscribe(listener: () => void): () => void; isPlaying(mediaId: string): boolean; pause(mediaId: string): void };
   /** `mediaId` is the action's `media_id` with its `{field}` placeholders filled; `item` is the bound row it fired for. */

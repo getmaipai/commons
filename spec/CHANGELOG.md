@@ -1,3 +1,7 @@
+## [spec-v0.1.356] - 2026-11-10
+
+- VIDEO-UI-15, additive. `action.call.fresh_confirm` asks the host for a fresh secret and merges its ticket for call argument templates; `result_feed.actions[].show_when` gates an action on a truthy dotted row field, and actions now allow up to eight. Existing pages remain unchanged. Pairs with ui-v0.5.570.
+
 ## [spec-v0.1.355] - 2026-11-10
 
 - CLIPS-FEED-01, additive. New page node `clip_feed`: a full-screen vertical feed of the household's own short clips. `bind` (package data call, the existing `clips` rows), `item_fields {src, poster, title, duration_s, id, subtitle?, liked?}` (dotted paths), `actions {like?, remake?}` (each a `feed_handler`: navigate, call or confirm; `like` also receives the typed `{liked}`; `remake` carries `starts`, default `video`, so the host's making notice disables it), `empty_state`, `start_id?`, `on_close?` (Close button action; absent: back one page), `autoplay` (default true) and `autoplay_field` (a boolean on the first row; false turns autoplay off for a child band). Save and Share are deliberately not in the schema. Fixture `ui/pages/clips-feed.json`. Pairs with the next ui tag.

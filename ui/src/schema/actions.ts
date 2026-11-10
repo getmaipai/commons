@@ -55,20 +55,30 @@ async function runAction(
     return;
   }
   if ("call" in action) {
-    const target = fillTemplate(action.call.target, item);
+    let callItem = item;
+    if (action.call.fresh_confirm) {
+      if (!host?.confirmFresh) throw new Error("Fresh confirmation is not available on this screen.");
+      const fresh = action.call.fresh_confirm;
+      const id = item.id;
+      if (typeof id !== "string") throw new Error("Fresh confirmation requires a row id.");
+      const confirmed = await host.confirmFresh({ id }, { title: fresh.title, description: fresh.description, actionLabel: fresh.action_label });
+      if (!confirmed) return;
+      callItem = { ...item, ticket: confirmed.ticket };
+    }
+    const target = fillTemplate(action.call.target, callItem);
     // APP-KIND-02: and calls only under its own API prefix.
     if (scope && !underPluginApi(target, scope.packageId)) {
       reportPageRejected();
       throw new Error(packageActionRefused());
     }
-    const args = action.call.args ? fillTemplateDeep(action.call.args, item, options.typedArgs) : undefined;
+    const args = action.call.args ? fillTemplateDeep(action.call.args, callItem, options.typedArgs) : undefined;
     const reply = await request<unknown>(target, { method: action.call.method ?? "POST", body: args ? JSON.stringify(args) : undefined, keepalive: options.keepalive });
     options.onReply?.(reply);
     // QA-FINISH-01: a call that names a `success_label` says so once it worked. A quiet call (progress reports) stays silent.
-    if (action.call.success_label && !options.quiet) toast(fillTemplate(action.call.success_label, item));
+    if (action.call.success_label && !options.quiet) toast(fillTemplate(action.call.success_label, callItem));
     // Like-this: a call may then navigate, with the response merged over the item (`{band_id}`). Navigation only.
     if (action.call.then) {
-      const merged = reply && typeof reply === "object" && !Array.isArray(reply) ? { ...item, ...(reply as Record<string, unknown>) } : item;
+      const merged = reply && typeof reply === "object" && !Array.isArray(reply) ? { ...callItem, ...(reply as Record<string, unknown>) } : callItem;
       await runAction(action.call.then, merged, navigate, scope, host, options);
     }
     return;

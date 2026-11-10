@@ -9,6 +9,7 @@ import { createQueryClient } from "@/kit/queryClient";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { SchemaPage } from "@/kit/schema/SchemaPage";
 import { useDispatchAction } from "@/kit/schema/actions";
+import { MediaHostContext } from "@/kit/schema/mediaHost";
 import { PackageScopeContext, resolveParams, underAppRoute, underPluginApi } from "@/kit/schema/packageScope";
 import type { UiNode } from "@/kit/schema/types";
 
@@ -143,6 +144,19 @@ describe("package scope guard", () => {
     await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/demo/data/refresh")).toBe(true));
     act(() => hook.result.current.dispatch({ navigate: { to: "/settings" } }));
     await waitFor(() => expect(hook.result.current.lastError).toBe("This page can't do that."));
+  });
+
+  test("fresh confirmation cancel aborts the call; confirmation templates the returned ticket", async () => {
+    const cancelConfirm = mock(async () => null);
+    const hostCancel = renderHook(() => useDispatchAction(), { wrapper: ({ children }) => <QueryClientProvider client={createQueryClient()}><MemoryRouter><MediaHostContext.Provider value={{ onPlay: () => {}, confirmFresh: cancelConfirm }}>{children}</MediaHostContext.Provider></MemoryRouter></QueryClientProvider> });
+    act(() => hostCancel.result.current.dispatch({ call: { target: "/api/fresh", args: { id: "{id}", ticket: "{ticket}" }, fresh_confirm: { title: "Confirm" } } }, [{ id: "row" }]));
+    await waitFor(() => expect(cancelConfirm).toHaveBeenCalledTimes(1));
+    expect(calls.some((c) => c.url === "/api/fresh")).toBe(false);
+    const confirmFresh = mock(async () => ({ ticket: "one-time" }));
+    const hook = renderHook(() => useDispatchAction(), { wrapper: ({ children }) => <QueryClientProvider client={createQueryClient()}><MemoryRouter><MediaHostContext.Provider value={{ onPlay: () => {}, confirmFresh }}>{children}</MediaHostContext.Provider></MemoryRouter></QueryClientProvider> });
+    act(() => hook.result.current.dispatch({ call: { target: "/api/fresh", args: { id: "{id}", ticket: "{ticket}" }, fresh_confirm: { action_label: "Continue" } } }, [{ id: "row" }]));
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/fresh")).toBe(true));
+    expect(calls.find((c) => c.url === "/api/fresh")?.body).toEqual({ id: "row", ticket: "one-time" });
   });
 });
 

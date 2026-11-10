@@ -161,7 +161,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
     if (anyReason) player.notice = anyReason;
     if (node.actions_variant === "icons") player.actionsVariant = "icons";
     if (node.actions_inline !== undefined) player.actionsInline = node.actions_inline;
-    const items = node.actions ?? [];
+    const items = (node.actions ?? []).filter((a) => !a.show_when || Boolean(readField(row, a.show_when)));
     if (items.length > 0) {
       player.actionItems = items.map((a, i): VideoPlayerAction => ({
         key: `action-${i}`,
