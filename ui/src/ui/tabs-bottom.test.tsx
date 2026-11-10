@@ -21,3 +21,15 @@ test("sticky bottom tabs expose a sticky position marker", () => {
   const { container } = render(<Tabs defaultValue="home"><TabsList variant="bottom" position="sticky"><TabsTrigger value="home">Home</TabsTrigger></TabsList></Tabs>);
   expect(container.querySelector('[data-slot="tabs-list"]')?.getAttribute("data-position")).toBe("sticky");
 });
+
+test("the active bottom tab is a pill with no square outline, and the list stays keyboard reachable (KIT-QA-01)", () => {
+  const { container } = render(<Tabs defaultValue="home"><TabsList variant="bottom" aria-label="Main"><TabsTrigger value="home">Home</TabsTrigger><TabsTrigger value="search">Search</TabsTrigger></TabsList></Tabs>);
+  const trigger = container.querySelector('[data-slot="tabs-trigger"]')!;
+  expect(trigger.className).toContain("group-data-[variant=bottom]/tabs-list:rounded-full");
+  expect(trigger.className).not.toContain("group-data-[variant=bottom]/tabs-list:rounded-none");
+  expect(trigger.className).toContain("group-data-[variant=bottom]/tabs-list:data-[state=active]:border-transparent");
+  expect(trigger.className).toContain("dark:group-data-[variant=bottom]/tabs-list:data-[state=active]:border-transparent");
+  expect(trigger.className).toContain("focus-visible:ring-[3px]");
+  expect(trigger.getAttribute("role")).toBe("tab");
+  expect(container.querySelectorAll('[role="tab"]').length).toBe(2);
+});

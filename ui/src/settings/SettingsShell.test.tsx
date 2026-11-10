@@ -313,3 +313,14 @@ describe("SettingsShell keyboard", () => {
     expect(view.getByTestId("settings").textContent).toBe("open");
   });
 });
+
+describe("SettingsShell phone full bleed (KIT-QA-01)", () => {
+  test("tokens.css drops the rail body's padding around the default shell below lg, and defines the header height", () => {
+    const css = require("node:fs").readFileSync(require("node:path").resolve(import.meta.dir, "../tokens.css"), "utf8") as string;
+    const at = css.indexOf('[data-slot="rail-body"]:has([data-slot="settings-shell"][data-layout="default"])');
+    expect(at).toBeGreaterThan(0);
+    expect(css.slice(css.lastIndexOf("@media", at), at)).toContain("max-width: 1023.98px");
+    expect(css.slice(at, at + 200)).toContain("padding-inline: 0");
+    expect(css).toContain("--phone-header-height: 3.5rem");
+  });
+});

@@ -34,6 +34,11 @@ export const statusCardWash: Record<StatusCardKind, string> = {
   progress: "color-mix(in srgb, var(--status-progress-ink) 12%, transparent)", waiting: "color-mix(in srgb, var(--status-waiting-ink) 8%, transparent)", done: "color-mix(in srgb, var(--status-done-ink) 12%, transparent)",
   attention: "var(--status-attention-wash)", problem: "var(--tint-problem)", info: "var(--tint-info)",
 }
+/** The card's own surface: a very light wash (about 8 percent) of the kind's ink over `--surface-2`, so the whole card carries its color while text keeps its AA contrast. */
+export const statusCardSurface: Record<StatusCardKind, string> = {
+  progress: "color-mix(in srgb, var(--status-progress-ink) 8%, var(--surface-2))", waiting: "color-mix(in srgb, var(--status-waiting-ink) 8%, var(--surface-2))", done: "color-mix(in srgb, var(--status-done-ink) 8%, var(--surface-2))",
+  attention: "color-mix(in srgb, var(--status-attention-ink) 8%, var(--surface-2))", problem: "color-mix(in srgb, var(--tint-problem-border) 8%, var(--surface-2))", info: "color-mix(in srgb, var(--tint-info-border) 8%, var(--surface-2))",
+}
 const tint = statusCardInk
 const bg = statusCardWash
 const roles: Record<StatusCardKind, "status" | "alert"> = {
@@ -55,7 +60,7 @@ export function StatusCard({ kind, stateWord, title, line, lead, icon, progress,
   ) : thumb && kind === "done" ? <SafeImage src={thumb} alt="" kind="picture" width={56} height={56} className="size-14 shrink-0 rounded-xl object-cover" /> : (
     <div className="flex size-14 shrink-0 items-center justify-center rounded-full" style={{ background: bg[kind], color: ink }}>{icon}</div>
   )
-  return <section role={roles[kind]} data-status-kind={kind} className={cn("@container flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-[var(--surface-2)] p-4 ring-1 ring-inset ring-[var(--hairline)]", className)}>
+  return <section role={roles[kind]} data-status-kind={kind} style={{ background: statusCardSurface[kind] }} className={cn("@container flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] p-4 ring-1 ring-inset ring-[var(--hairline)]", className)}>
     {lead ?? defaultLead}
     <div className="min-w-0 flex-1">
       {stateWord && <div className="text-[11px] font-medium uppercase tracking-[.1em]" style={{ color: ink }}>{stateWord}</div>}

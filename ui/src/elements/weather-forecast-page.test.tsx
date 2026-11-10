@@ -349,3 +349,18 @@ describe("weather page polish", () => {
     expect(container.querySelector('[data-slot="weather-precipitation-hours"]')).toBeNull();
   });
 });
+
+describe("WeatherForecastPage phone controls (KIT-QA-01)", () => {
+  test("the search field takes the flexible width, the buttons are small icons, and the phone placeholder is short", () => {
+    const { container } = render(<WeatherForecastPage locations={locations} selectedId="home" />);
+    const bar = container.querySelector<HTMLElement>('[data-slot="weather-mobile-controls"]')!;
+    const search = bar.querySelector<HTMLElement>('[data-slot="weather-mobile-search"]')!;
+    expect(search.className).toContain("flex-1");
+    expect(bar.querySelector("input")!.getAttribute("placeholder")).toBe("Search");
+    expect(bar.querySelector("input")!.getAttribute("aria-label")).toBe("Search locations");
+    const here = bar.querySelector<HTMLElement>('[data-slot="weather-mobile-locations"]')!;
+    expect(here.className).toContain("size-8");
+    expect(here.textContent).toBe("");
+    expect(here.getAttribute("aria-label")).toBe("Locations");
+  });
+});

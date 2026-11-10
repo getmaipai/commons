@@ -911,6 +911,7 @@ function TabsNodeView({ node, state }: { node: TabsNode; state: Row }) {
 /** A list row's leading media: a lucide icon by name, or a same-origin image path. An address with a scheme or a host
  * is never loaded, so a row cannot pull a picture from another site. */
 function pictureKind(value: unknown): ImageFallbackKind {
+  if (["podcast", "podcast_show"].includes(String(value))) return "podcast";
   if (["audio", "track", "podcast_episode", "audiobook", "chapter"].includes(String(value))) return "music";
   if (["video", "episode", "film"].includes(String(value))) return "video";
   if (["document", "file", "book"].includes(String(value))) return "file";
@@ -1524,6 +1525,7 @@ function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row })
             autoplay={node.autoplay}
             slides={rows.map((row) => ({
               id: String(readField(row, node.item_key_field)),
+              kind: readField(row, "kind") ? pictureKind(readField(row, "kind")) : undefined,
               title: String(readField(row, node.item_title_field) ?? ""),
               subtitle: node.item_subtitle_field ? fillTemplate(node.item_subtitle_field, row) : undefined,
               eyebrow: node.item_eyebrow_field ? fillTemplate(node.item_eyebrow_field, row) : undefined,

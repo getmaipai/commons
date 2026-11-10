@@ -215,3 +215,17 @@ describe("Billboard", () => {
     expect(container.innerHTML).toContain("text-[var(--art-eyebrow)]");
   });
 });
+
+describe("Billboard placeholder kind (KIT-QA-01)", () => {
+  const bare = [{ id: "m", title: "Good evening", primary: { label: "Play", onSelect: () => {} } }];
+  const kindOf = (props: Record<string, unknown>) => render(<Billboard slides={bare} label="Featured" {...props} />).container.querySelector('[data-slot="safe-image-fallback"]')!.getAttribute("data-kind");
+  test("defaults to the film icon, a billboard kind picks music or podcast, a slide kind wins", () => {
+    expect(kindOf({})).toBe("video");
+    cleanup();
+    expect(kindOf({ kind: "music" })).toBe("music");
+    cleanup();
+    expect(kindOf({ kind: "podcast" })).toBe("podcast");
+    cleanup();
+    expect(kindOf({ kind: "music", slides: [{ ...bare[0], kind: "podcast" }] })).toBe("podcast");
+  });
+});

@@ -28,3 +28,14 @@ test("a textarea with maxRows scrolls inside itself past that height instead of 
   const plain = render(<Textarea />).container.querySelector<HTMLTextAreaElement>("textarea")!;
   expect(plain.className).not.toContain("overflow-y-auto");
 });
+
+test("on a phone the flow dialog sits under the safe area and the header height, with a visible Close (KIT-QA-01)", () => {
+  render(<Dialog open><DialogContent variant="flow"><span /></DialogContent></Dialog>);
+  const cls = document.body.querySelector<HTMLElement>("[data-slot='dialog-content']")?.className ?? "";
+  expect(cls).toContain("var(--phone-header-height");
+  expect(cls).toContain("env(safe-area-inset-top");
+  expect(cls).toContain("sm:top-[50%]");
+  const close = document.body.querySelector<HTMLElement>("[data-slot='dialog-close']")!;
+  expect(close.textContent).toContain("Close");
+  expect(close.className).toContain("bg-muted");
+});

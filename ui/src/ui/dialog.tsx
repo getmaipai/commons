@@ -78,7 +78,7 @@ function DialogContent({
           variant === "call"
             ? "top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-transparent p-0 shadow-none sm:top-[50%] sm:left-[50%] sm:h-auto sm:w-auto sm:max-w-xs sm:translate-x-[-50%] sm:translate-y-[-50%]"
             : variant === "flow"
-              ? cn("top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-6 overflow-y-auto rounded-none border-0 bg-background p-5 shadow-lg sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-full sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border sm:p-8 [&_[data-slot=dialog-header]]:pr-12", size === "xl" ? "sm:max-w-7xl" : "sm:max-w-5xl")
+              ? cn("top-[calc(env(safe-area-inset-top,0px)+var(--phone-header-height,3.5rem))] left-0 flex h-[calc(100dvh-env(safe-area-inset-top,0px)-var(--phone-header-height,3.5rem))] w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-6 overflow-y-auto rounded-none border-0 bg-background p-5 shadow-lg sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-full sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border sm:p-8 [&_[data-slot=dialog-header]]:pr-12", size === "xl" ? "sm:max-w-7xl" : "sm:max-w-5xl")
             : variant === "command"
               ? cn(
                 "flex flex-col gap-0 border-0 bg-transparent p-0 shadow-none",
@@ -103,7 +103,7 @@ function DialogContent({
             <Button
               variant="ghost"
               size="icon-sm"
-              className={variant === "flow" ? "absolute top-4 right-4 sm:top-6 sm:right-6" : "absolute top-2 right-2"}
+              className={variant === "flow" ? "absolute top-4 right-4 rounded-full bg-muted text-foreground sm:top-6 sm:right-6" : "absolute top-2 right-2"}
             >
               <XIcon />
               <span className="sr-only">{i18n._({ id: "ui.Close", message: "Close" })}</span>

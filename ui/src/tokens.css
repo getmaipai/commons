@@ -2771,6 +2771,19 @@ html[data-pro-look] [data-slot="data-table-mobile-sort"] { flex-wrap: nowrap; ov
 html[data-pro-look] [data-slot="row-action"]:not([data-variant="inverse"]) { border-color: transparent; background: transparent; box-shadow: none; width: 3rem; min-width: 3rem; padding: 0; }
 html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { display: none; }
 
+/* KIT-QA-01: the phone header's height as one variable, so a full-screen flow dialog sits under it (and the safe area) instead of over it. */
+:root { --phone-header-height: 3.5rem; }
+
+/* KIT-QA-01: the default settings shell is full bleed on a phone, like other pages: the rail body's side padding and width cap give way, so
+ * the panel is not a lighter box inset inside the page padding. From lg the two-pane shell keeps the page's own frame. */
+@media (max-width: 1023.98px) {
+  [data-slot="rail-body"]:has([data-slot="settings-shell"][data-layout="default"]) > .container {
+    max-width: none;
+    margin: 0;
+    padding-inline: 0;
+  }
+}
+
 /* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */
 /* Targets: --target-min is the smallest control size; the rail reads --rail-button and --rail-width. */
 :root {

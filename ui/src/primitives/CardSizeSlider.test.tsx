@@ -82,3 +82,9 @@ describe("cardSizeStyle / cardSizeGridTemplateColumns", () => {
     expect(template).toContain(`${CARD_SIZE_DEFAULT}px`);
   });
 });
+
+describe("two columns on a phone (KIT-QA-01)", () => {
+  test("the minimum track width is capped at just under half the grid", () => {
+    expect(cardSizeGridTemplateColumns()).toContain("min(var(--maipai-card-size, 220px), calc(50% - 0.5rem))");
+  });
+});

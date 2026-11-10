@@ -68,7 +68,9 @@ export function cardSizeStyle(size: number): CSSProperties {
  * content in `cardSizeStyle` (no slider on screen) still gets a sane
  * grid instead of a bare `var()` falling through to `auto`. */
 export function cardSizeGridTemplateColumns(): string {
-  return `repeat(auto-fill, minmax(var(${CARD_SIZE_VAR}, ${CARD_SIZE_DEFAULT}px), 1fr))`;
+  // The minimum is capped at just under half the grid, so a phone (375 px, where 220 px would leave one huge cover per
+  // screen) always gets two columns; a wide grid still follows the chosen size.
+  return `repeat(auto-fill, minmax(min(var(${CARD_SIZE_VAR}, ${CARD_SIZE_DEFAULT}px), calc(50% - 0.5rem)), 1fr))`;
 }
 
 const SmallIcon = getIcon("layout-grid");

@@ -90,3 +90,19 @@ describe("SafeImage", () => {
     expect(half.style.height).toBe("240px");
   });
 });
+
+describe("small tinted covers keep the kind icon (KIT-QA-01)", () => {
+  test("a tinted fallback carries the kind icon beside the initials, the container query picks one", () => {
+    const { container } = render(<SafeImage kind="music" tintSeed="Blue Hour" className="size-10" />);
+    const tile = container.querySelector('[data-slot="safe-image-fallback"]')!;
+    expect(tile.className).toContain("@container/safe-art");
+    const icon = tile.querySelector('[data-slot="safe-image-icon"]')!;
+    expect(icon).not.toBeNull();
+    expect(icon.getAttribute("class")).toContain("@[6rem]/safe-art:hidden");
+    expect(tile.querySelector('[data-slot="safe-image-initials"]')!.getAttribute("class")).toContain("hidden");
+  });
+  test("a podcast placeholder is a mic", () => {
+    const { container } = render(<SafeImage kind="podcast" className="size-10" />);
+    expect(container.querySelector('[data-slot="safe-image-fallback"]')!.getAttribute("data-kind")).toBe("podcast");
+  });
+});

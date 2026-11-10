@@ -109,6 +109,21 @@ describe("billboard", () => {
     await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/videos/watch-later" && (c.body as { media_id: string }).media_id === "m2")).toBe(true));
   });
 
+  test("an artless slide shows the icon of the row's kind: music a note, a podcast a mic, no kind a film (KIT-QA-01)", async () => {
+    const node = { ...(billboard as Record<string, unknown>), item_art_field: undefined } as UiNode;
+    const kinds = async (kind?: string) => {
+      ROWS.forEach((r) => { if (kind) (r as Record<string, unknown>).kind = kind; else delete (r as Record<string, unknown>).kind; });
+      const view = inVideos(node, { onPlay: () => {} });
+      await view.findByRole("region", { name: "Featured videos" });
+      const found = [...view.container.querySelectorAll('[data-slot="safe-image-fallback"]')].map((e) => e.getAttribute("data-kind"));
+      view.unmount();
+      return found;
+    };
+    expect((await kinds("audio"))[0]).toBe("music");
+    expect((await kinds("podcast"))[0]).toBe("podcast");
+    expect((await kinds())[0]).toBe("video");
+  });
+
   test("eyebrow and subtitle fill from the row", async () => {
     const { findByText } = inVideos(billboard, { onPlay: () => {} });
     await findByText("New from Ember Workshop");

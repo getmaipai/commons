@@ -4,7 +4,7 @@ import { Button } from "@/kit/ui/button";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/kit/ui/carousel";
 import { cn, FOCUS_RING } from "@/kit/utils";
 import { AmbientGlow } from "@/kit/primitives/AmbientGlow";
-import { SafeImage } from "@/kit/primitives/SafeImage";
+import { SafeImage, type ImageFallbackKind } from "@/kit/primitives/SafeImage";
 import { i18n } from "@/kit/i18n";
 
 /** One action on a slide. */
@@ -23,6 +23,8 @@ export interface BillboardSlide {
   /** Small line over the title ("New from Nova Skywatch"). */
   eyebrow?: string;
   title: string;
+  /** What the slide is (music, podcast, video...): picks the placeholder icon when the art is missing or broken. Overrides the billboard's `kind`. */
+  kind?: ImageFallbackKind;
   subtitle?: string;
   /** Extra facts under the title (year, rating badge, seasons). */
   meta?: ReactNode;
@@ -39,6 +41,8 @@ export interface BillboardProps {
    * media mockup); on a phone it grows with its words, with room on top for the dots. */
   size?: "card" | "hero" | "banner";
   autoplay?: boolean;
+  /** The placeholder icon for slides without art, by what the page shows: music a note, podcast a mic, video a film (default). */
+  kind?: ImageFallbackKind;
   autoplayDelay?: number;
   /** The dwell preview slot: what to draw over a slide's backdrop after the person rests on it (a muted trailer).
    * Never shown under reduced motion. */
@@ -75,6 +79,7 @@ export function Billboard({
   slides,
   label,
   size = "card",
+  kind: billboardKind = "video",
   autoplay = true,
   autoplayDelay = 8000,
   renderPreview,
@@ -164,19 +169,19 @@ export function Billboard({
               {slide.art ? (
                 <>
                   {containedArt[slide.id] ? <>
-                    <SafeImage src={slide.art} alt="" aria-hidden kind="video" className="absolute inset-0 -z-20 size-full object-cover scale-125 blur-2xl opacity-60" />
+                    <SafeImage src={slide.art} alt="" aria-hidden kind={slide.kind ?? billboardKind} className="absolute inset-0 -z-20 size-full object-cover scale-125 blur-2xl opacity-60" />
                     <div aria-hidden data-slot="billboard-art" className="absolute inset-0 -z-[15]">
-                      <SafeImage src={slide.art} alt="" kind="video" onLoad={(event) => {
+                      <SafeImage src={slide.art} alt="" kind={slide.kind ?? billboardKind} onLoad={(event) => {
                         const image = event.currentTarget;
                         setContainedArt((previous) => ({ ...previous, [slide.id]: image.naturalWidth < 480 || image.naturalWidth / image.naturalHeight < 1.4 }));
                       }} className="size-full object-cover object-top" />
                     </div>
-                  </> : <SafeImage src={slide.art} alt="" kind="video" onLoad={(event) => {
+                  </> : <SafeImage src={slide.art} alt="" kind={slide.kind ?? billboardKind} onLoad={(event) => {
                     const image = event.currentTarget;
                     setContainedArt((previous) => ({ ...previous, [slide.id]: image.naturalWidth < 480 || image.naturalWidth / image.naturalHeight < 1.4 }));
                   }} className="absolute inset-0 -z-20 size-full object-cover" />}
                 </>
-              ) : <SafeImage src={undefined} alt="" kind="video" className="absolute inset-0 -z-20 size-full object-cover" />}
+              ) : <SafeImage src={undefined} alt="" kind={slide.kind ?? billboardKind} className="absolute inset-0 -z-20 size-full object-cover" />}
               {ambient && slide.art ? <AmbientGlow still poster={slide.art} className="inset-0 -z-[12] data-[ready=true]:opacity-30" /> : null}
               {previewing === slide.id && renderPreview ? (
                 <div className="absolute inset-0 -z-10" data-slot="billboard-preview">

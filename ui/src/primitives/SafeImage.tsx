@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentProps, type ReactNode, type Ref, typ
 import { cn } from "@/kit/utils";
 import { getIcon } from "@/kit/icons";
 
-export type ImageFallbackKind = "music" | "video" | "file" | "person" | "picture";
+export type ImageFallbackKind = "music" | "podcast" | "video" | "file" | "person" | "picture";
 type ImageProps = ComponentProps<"img">;
 
 /** Tracks a failed source and clears the failure when the address changes. */
@@ -18,6 +18,7 @@ export function useImageFallback(src: string | undefined | null) {
 
 const ICONS = {
   music: "music",
+  podcast: "mic",
   video: "film",
   file: "file-text",
   person: "user-round",
@@ -60,7 +61,7 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
   const tinted = tintSeed !== undefined;
   const tintIndex = tinted ? tintHash(tintSeed) % SOFT_TINTS.length : 0;
   const letters = tinted ? initials(tintSeed) : "";
-  const fallbackClass = cn(tinted ? "bg-[color-mix(in_oklab,var(--tile-tint)_22%,var(--card))] text-foreground flex items-center justify-center" : "bg-muted text-muted-foreground flex items-center justify-center", !hasBoxSizing && "aspect-video w-full min-h-16", className);
+  const fallbackClass = cn(tinted ? "@container/safe-art bg-[color-mix(in_oklab,var(--tile-tint)_22%,var(--card))] text-foreground flex items-center justify-center" : "bg-muted text-muted-foreground flex items-center justify-center", !hasBoxSizing && "aspect-video w-full min-h-16", className);
   if (fallback.hasFallback) {
     return (
       <span
@@ -81,7 +82,11 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
           ...props.style,
         }}
       >
-        {fallbackContent ?? (tinted && letters ? <span data-slot="safe-image-initials" className="text-3xl font-semibold tracking-tight opacity-80">{letters}</span> : null) ?? <><Icon aria-hidden className="size-1/3" />{fallbackAfterIcon}</>}
+        {fallbackContent ?? (tinted && letters ? <>
+          {/* A big tile shows the initials; a small one (a row's cover) shows the kind icon, so it is never a blank square. */}
+          <span data-slot="safe-image-initials" className="hidden text-3xl font-semibold tracking-tight opacity-80 @[6rem]/safe-art:block">{letters}</span>
+          <Icon data-slot="safe-image-icon" aria-hidden className="size-[clamp(14px,40%,28px)] opacity-80 @[6rem]/safe-art:hidden" />
+        </> : <><Icon aria-hidden className="size-1/3" />{fallbackAfterIcon}</>)}
       </span>
     );
   }
