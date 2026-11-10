@@ -1,5 +1,8 @@
 export { buildCues, joinCues, provisionalCues } from "./cues";
 export type { Cue, MouthLetter, PhonesFor } from "./cues";
+export { CompanionPackPlayer } from "./player";
+export type { CompanionPackPlayerProps } from "./player";
+export type { CompanionPackData, PackClip, PackState, PlayerFrame, PlayerLayer, PlayerTier } from "./types";
 export { buildLoud, loudAt, loudMean, promoteLoud, shoutGain } from "./loud";
 export { activeVocal, audioFeatures, detectEvents, hasTaggedSigh, mixSlot, splitTags, vocalMouth } from "./tags";
 export type { AudioFeatures, EventWindow, MorphMix, MouthMix, VocalTag } from "./tags";
