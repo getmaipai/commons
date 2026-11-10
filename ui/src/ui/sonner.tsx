@@ -9,6 +9,9 @@ import {
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 
+const toastKind = (ink: string): string =>
+  `!border-[var(${ink})] !bg-[color-mix(in_srgb,var(${ink})_8%,var(--surface-2))] [&_[data-icon]]:text-[var(${ink})]`
+
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
 
@@ -22,6 +25,15 @@ const Toaster = ({ ...props }: ToasterProps) => {
         warning: <TriangleAlertIcon className="size-4" />,
         error: <OctagonXIcon className="size-4" />,
         loading: <Loader2Icon className="size-4 animate-spin" />,
+      }}
+      toastOptions={{
+        classNames: {
+          // STATUS-TOAST-01: a toast carries the same kind colors as the StatusCard (done teal, attention amber, problem red, info blue) so a failure that has no card slot still reads as one.
+          success: toastKind("--status-done-ink"),
+          warning: toastKind("--status-attention-ink"),
+          error: toastKind("--tint-problem-border"),
+          info: toastKind("--tint-info-border"),
+        },
       }}
       style={
         {
