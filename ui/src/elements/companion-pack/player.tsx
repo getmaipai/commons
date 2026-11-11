@@ -125,6 +125,7 @@ function VideoPackPlayer({
     let active: LoadedClip | undefined;
     let pending: PendingSwitch | undefined;
     let raf = 0;
+    let warnedDraw = false;
     let hidden = document.hidden;
     let isPaused = pausedRef.current;
     let disposed = false;
@@ -314,14 +315,15 @@ function VideoPackPlayer({
     const tick = (now: number) => {
       raf = 0;
       if (disposed || hidden || isPaused) return;
-      drawFrame(now);
+      // A throwing draw (a speech clock on a suspended audio context, a host callback) must not end the loop: re-arm first.
       raf = window.requestAnimationFrame(tick);
+      try { drawFrame(now); } catch (error) { if (!warnedDraw) { warnedDraw = true; console.warn(`Companion pack frame skipped: ${String(error)}`); } }
     };
     const onVisibility = () => {
       hidden = document.hidden;
       if (hidden) clips.forEach(({ video }) => video.pause());
       else if (!isPaused) active?.video.play().catch(() => undefined);
-      if (hidden && raf) window.cancelAnimationFrame(raf);
+      if (hidden && raf) { window.cancelAnimationFrame(raf); raf = 0; } // a stale id would make the `!raf` restart below never run
       if (!hidden && !isPaused && !raf) raf = window.requestAnimationFrame(tick);
     };
     const firstIdle = sequencer.next("idle") ?? pack.states.idle[0];
