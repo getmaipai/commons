@@ -46,6 +46,10 @@ export const PICTURE_ALLOWLIST: PictureAllowEntry[] = [
   { file: "src/elements/image-editor-surface.tsx", match: /^new\s+Image\s*\(/, reason: "The canvas editor decodes source pixels offscreen before drawing them into its editing canvas." },
   { file: "src/elements/companion-pack/pack-loader.ts", match: /^new\s+Image\s*\(/, reason: "The pack loader decodes a character pack's sprite sheets offscreen before the canvas player draws them." },
   { file: "src/elements/companion-pack/player.tsx", match: /^new\s+Image\s*\(/, reason: "The canvas player decodes the pack's still frames offscreen and draws them into its canvas; no content picture is shown through an image element." },
+  { file: "src/elements/companion-pack/player.tsx", match: /^<img\b/, reason: "The static fallback shows the character pack's own still frame with no alt text because the character is decorative beside its name; the pack has no failure state to show." },
+  { file: "src/elements/companion-pack/stacked-alpha.ts", match: /^new\s+Image\s*\(/, reason: "The stacked-alpha decoder loads the pack's color and alpha frames offscreen to composite them on a canvas." },
+  { file: "src/elements/companion-pack/voice-player.tsx", match: /^new\s+Image\s*\(/, reason: "The voice-reactive player decodes the character's layers offscreen before drawing them on its canvas." },
+  { file: "src/elements/companion-pack/voice-player.tsx", match: /^<img\b/, reason: "The voice-reactive player's resting fallback is the character's own still frame, decorative beside the character's name." },
   { file: "src/elements/generation-stage.tsx", match: /^new\s+Image\s*\(/, reason: "The generation stage preloads the next preview before its crossfade to avoid an empty frame." },
 ];
 
