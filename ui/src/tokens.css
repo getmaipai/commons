@@ -1827,8 +1827,12 @@ body {
    * when a caller opts into these utility names; their tokens are gated below. */
   --text-title: var(--font-size-title);
   --text-title--line-height: var(--line-height-title);
+  --text-title--font-weight: var(--look-weight-title, inherit);
+  --text-title--letter-spacing: var(--look-tracking-title, inherit);
   --text-section: var(--font-size-section);
   --text-section--line-height: var(--line-height-title);
+  --text-section--font-weight: var(--look-weight-section, inherit);
+  --text-section--letter-spacing: var(--look-tracking-section, inherit);
   --text-row: var(--font-size-row);
   --text-row--line-height: var(--line-height-body);
   --text-body: var(--font-size-body);
@@ -1839,6 +1843,8 @@ body {
   --text-badge--line-height: var(--line-height-body);
   --text-hero: var(--font-size-hero);
   --text-hero--line-height: var(--line-height-title);
+  --text-hero--font-weight: var(--look-weight-hero, inherit);
+  --text-hero--letter-spacing: var(--look-tracking-hero, inherit);
   --color-background: var(--background);
   --color-subtle-foreground: var(--subtle-foreground);
   --color-status-ok: var(--status-ok);
@@ -2748,6 +2754,12 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --nav-active: edge;
   --motion-pill: 150ms;
   --hover-lift: 0px;
+  --look-weight-title: 400;
+  --look-tracking-title: -0.03em;
+  --look-weight-hero: 400;
+  --look-tracking-hero: -0.035em;
+  --look-weight-section: 500;
+  --look-tracking-section: -0.01em;
   --radius: var(--radius-card);
   --radius-sm: calc(var(--radius-card) - 4px);
   --radius-md: calc(var(--radius-card) - 2px);
@@ -2756,12 +2768,6 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --radius-2xl: calc(var(--radius-card) + 8px);
   --radius-3xl: calc(var(--radius-card) + 12px);
   --radius-4xl: calc(var(--radius-card) + 16px);
-  --text-title--font-weight: var(--font-weight-title);
-  --text-title--letter-spacing: var(--letter-spacing-title);
-  --text-section--font-weight: var(--font-weight-title);
-  --text-section--letter-spacing: var(--letter-spacing-title);
-  --text-hero--font-weight: var(--font-weight-title);
-  --text-hero--letter-spacing: var(--letter-spacing-title);
 }
 :root body.style-stone {
   --type-scale: 1;

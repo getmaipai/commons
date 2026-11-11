@@ -70,3 +70,5 @@ Schema player hosts can supply that line with `MediaHost.voiceoverFor(item)` whe
 # Look bundles
 
 Non-color styling bundles live in `../spec/ui/looks.json`. Map each Look to a bundle there, then run `bun run gen:looks` from this directory to refresh the marked token block in `src/tokens.css`.
+
+Pages should not hard-code `font-bold` or `tracking-*` on `text-title`, `text-hero`, or `text-section`; the active Look sets their weight and tracking.
