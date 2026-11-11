@@ -27,7 +27,7 @@ test("the key icon name Home asks for resolves to its own icon, not the unknown-
 });
 
 test("PRO-LOOK icon names resolve through the registry", () => {
-  const names = ["menu", "house", "message-circle", "play", "library", "users", "search", "music", "music-2", "heart", "shuffle", "ellipsis", "ellipsis-vertical", "share", "chevron-left", "chevron-right", "cloud-rain", "settings", "mic", "arrow-up", "arrow-up-right", "plus", "newspaper", "clapperboard", "folder", "sparkles", "wand-sparkles", "bell", "film", "image", "pause", "skip-forward", "skip-back", "panel-left", "paperclip", "layers", "tv", "lock", "list-music", "grid-2x2", "sliders-horizontal", "book-open", "clock", "sun", "download", "list-plus", "star", "square-pen", "headphones", "compass", "bookmark", "circle-alert"];
+  const names = ["menu", "house", "message-circle", "play", "library", "users", "search", "music", "music-2", "heart", "shuffle", "ellipsis", "ellipsis-vertical", "share", "chevron-left", "chevron-right", "cloud-rain", "settings", "mic", "arrow-up", "arrow-up-right", "plus", "newspaper", "clapperboard", "folder", "sparkles", "wand-sparkles", "bell", "film", "image", "pause", "skip-forward", "skip-back", "panel-left", "paperclip", "layers", "tv", "lock", "lock-open", "list-music", "grid-2x2", "sliders-horizontal", "book-open", "clock", "sun", "download", "list-plus", "star", "square-pen", "headphones", "compass", "bookmark", "circle-alert"];
   for (const name of names) {
     expect(getIcon(name), name).toBe(icons[name as IconName]);
     expect((iconNames as readonly string[])).toContain(name);
