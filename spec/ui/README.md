@@ -116,3 +116,13 @@ package, a `page` document written against this schema. Three things are added f
 
 `app-check.ts` is the cross-file lint a host runs when it loads the package: `pages/weather.json` is the conforming example. A
 package page may use only `page`, `section`, `empty_state`, `progress`, `answer_blocks`, `picker` and `detail_pane`.
+
+## Look token bundles
+
+`looks.json` maps every Look name to a named bundle. Each bundle declares the token keys
+from the Look token generator; a value of `null` means the Look inherits that token from
+the base stylesheet. The `standard` bundle intentionally sets only `type_scale` and
+`density_scale`, preserving existing base/pro-look typography and shape values. Generated
+rules use `:root body.style-<look>` so explicit Look values override the pro-look body
+token defaults. Studio values are explicit; title and section utilities consume the
+bundle's weight and letter-spacing theme variables.

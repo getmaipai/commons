@@ -6,7 +6,7 @@ import { PRESETS_PATH, generateFrom as generateEase } from "../scripts/gen-ease-
 const css = readFileSync(TOKENS_PATH, "utf8");
 const spec = JSON.parse(readFileSync(LOOKS_PATH, "utf8")) as { bundles: Record<string, Record<string, unknown>>; looks: Record<string, string> };
 const block = css.slice(css.indexOf("LOOKS-GENERATED:BEGIN"), css.indexOf("LOOKS-GENERATED:END"));
-const rule = (look: string) => new RegExp(`body\\.style-${look} \\{([^}]*)\\}`).exec(block)?.[1] ?? "";
+const rule = (look: string) => new RegExp(`:root body\\.style-${look} \\{([^}]*)\\}`).exec(block)?.[1] ?? "";
 
 describe("Look bundles", () => {
   test("generated block matches its source", () => expect(css).toBe(render()));
@@ -17,14 +17,9 @@ describe("Look bundles", () => {
   test("generated block contains no color literals", () => {
     expect(block).not.toMatch(/#|\brgb\s*\(|\bhsl\s*\(|\boklch\s*\(/i);
   });
-  test("standard pins the replaced values", () => {
-    expect(spec.bundles.standard).toMatchObject({ font_weight_title: 600, font_weight_body: 500, radius_card: 16, radius_thumb: 10, radius_pill: 999, glass_blur: 24, motion_pill_ms: 200, density_scale: 1, type_scale: 1 });
-    expect(rule("stone")).toContain("--radius-card: 16px");
-    expect(rule("stone")).toContain("--radius-thumb: 10px");
-    expect(rule("stone")).toContain("--glass-blur: 24px");
-    expect(rule("stone")).toContain("--motion-pill: 200ms");
-    expect(rule("stone")).toContain("--radius: var(--radius-card)");
-    expect(rule("stone")).toContain("--text-title--font-weight: var(--font-weight-title)");
+  test("standard defers every token except scale", () => {
+    expect(Object.entries(spec.bundles.standard ?? {}).filter(([, value]) => value !== null)).toEqual([["type_scale", 1], ["density_scale", 1]]);
+    expect(rule("stone").trim().split("\n").map((line) => line.trim().split(":")[0])).toEqual(["--type-scale", "--density-scale"]);
     expect(css).toContain("--spacing: calc(0.25rem * var(--density-scale, 1) * var(--ease-spacing-scale, 1))");
     const easeBlock = css.slice(css.indexOf("EASE-GENERATED:BEGIN"), css.indexOf("EASE-GENERATED:END"));
     expect(easeBlock.match(/--sidebar-row-height:/g)).toHaveLength(1);
@@ -56,5 +51,17 @@ describe("Look bundles", () => {
     const looksTwice = generateLooks(looksOnce, spec as never);
     expect(looksTwice).toBe(looksOnce);
     expect(render()).toBe(css);
+  });
+  test("Look selector specificity beats both pro-look body rules", () => {
+    const specificity = (selector: string) => {
+      const ids = (selector.match(/#[\w-]+/g) ?? []).length;
+      const classes = (selector.match(/\.[\w-]+|\[[^\]]+\]|:[\w-]+/g) ?? []).length;
+      const elements = (selector.match(/(^|\s|>)([a-z][\w-]*)/gi) ?? []).length;
+      return [ids, classes, elements];
+    };
+    const greater = (a: number[], b: number[]) => { for (let i = 0; i < a.length; i++) { if (a[i] !== b[i]) return a[i]! > b[i]!; } return false; };
+    const look = specificity(":root body.style-neutral");
+    expect(greater(look, specificity("html[data-pro-look] body"))).toBe(true);
+    expect(greater(look, specificity("html[data-pro-look] body"))).toBe(true); // same selector in the 720px media rule
   });
 });

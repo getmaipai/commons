@@ -8,7 +8,7 @@ const UI = join(import.meta.dir, "..");
 export const LOOKS_PATH = join(UI, "..", "spec", "ui", "looks.json");
 export const TOKENS_PATH = join(UI, "src", "tokens.css");
 const vars = [["--font-sans", "font_sans"], ["--font-display", "font_display"], ["--font-weight-title", "font_weight_title"], ["--font-weight-body", "font_weight_body"], ["--letter-spacing-title", "letter_spacing_title"], ["--type-scale", "type_scale"], ["--density-scale", "density_scale"], ["--radius-card", "radius_card"], ["--radius-thumb", "radius_thumb"], ["--radius-pill", "radius_pill"], ["--tile-aspect", "tile_aspect"], ["--surface-step", "surface_step"], ["--hairline-alpha", "hairline_alpha"], ["--card-edge", "card_edge"], ["--glass-blur", "glass_blur"], ["--nav-active", "nav_active"], ["--motion-pill", "motion_pill_ms"], ["--hover-lift", "hover_lift"]] as const;
-type Bundle = Record<string, string | number | { light: number; dark: number }>;
+type Bundle = Record<string, string | number | { light: number; dark: number } | null>;
 type Looks = { bundles: Record<string, Bundle>; looks: Record<string, string> };
 
 export function stripBlock(css: string): string {
@@ -32,6 +32,7 @@ export function renderLookBlock(data: Looks): string {
     const linesOut = vars.map(([variable, key]) => {
       const value = b[key];
       if (value === undefined) throw new Error(`Bundle ${bundleName} is missing ${key}`);
+      if (value === null) return null;
       if (key === "surface_step") return `  ${variable}: light-dark(${(value as {light:number}).light}%, ${(value as {dark:number}).dark}%);`;
       if (["radius_card", "radius_thumb", "radius_pill"].includes(key)) return `  ${variable}: ${value}px;`;
       if (key === "glass_blur") return `  ${variable}: ${value}px;`;
@@ -40,21 +41,11 @@ export function renderLookBlock(data: Looks): string {
       if (key === "hover_lift") return `  ${variable}: ${value}px;`;
       return `  ${variable}: ${value};`;
     });
-    linesOut.push("  --radius: var(--radius-card);");
-    linesOut.push("  --radius-sm: calc(var(--radius-card) - 4px);");
-    linesOut.push("  --radius-md: calc(var(--radius-card) - 2px);");
-    linesOut.push("  --radius-lg: var(--radius-card);");
-    linesOut.push("  --radius-xl: calc(var(--radius-card) + 4px);");
-    linesOut.push("  --radius-2xl: calc(var(--radius-card) + 8px);");
-    linesOut.push("  --radius-3xl: calc(var(--radius-card) + 12px);");
-    linesOut.push("  --radius-4xl: calc(var(--radius-card) + 16px);");
-    linesOut.push("  --text-title--font-weight: var(--font-weight-title);");
-    linesOut.push("  --text-title--letter-spacing: var(--letter-spacing-title);");
-    linesOut.push("  --text-section--font-weight: var(--font-weight-title);");
-    linesOut.push("  --text-section--letter-spacing: var(--letter-spacing-title);");
-    linesOut.push("  --text-hero--font-weight: var(--font-weight-title);");
-    linesOut.push("  --text-hero--letter-spacing: var(--letter-spacing-title);");
-    lines.push(`body.style-${look} {\n${linesOut.join("\n")}\n}`);
+    const emitted = linesOut.filter((line): line is string => line !== null);
+    if (bundleName !== "standard") {
+      emitted.push("  --radius: var(--radius-card);", "  --radius-sm: calc(var(--radius-card) - 4px);", "  --radius-md: calc(var(--radius-card) - 2px);", "  --radius-lg: var(--radius-card);", "  --radius-xl: calc(var(--radius-card) + 4px);", "  --radius-2xl: calc(var(--radius-card) + 8px);", "  --radius-3xl: calc(var(--radius-card) + 12px);", "  --radius-4xl: calc(var(--radius-card) + 16px);", "  --text-title--font-weight: var(--font-weight-title);", "  --text-title--letter-spacing: var(--letter-spacing-title);", "  --text-section--font-weight: var(--font-weight-title);", "  --text-section--letter-spacing: var(--letter-spacing-title);", "  --text-hero--font-weight: var(--font-weight-title);", "  --text-hero--letter-spacing: var(--letter-spacing-title);");
+    }
+    lines.push(`:root body.style-${look} {\n${emitted.join("\n")}\n}`);
   }
   lines.push(END);
   return lines.join("\n");
