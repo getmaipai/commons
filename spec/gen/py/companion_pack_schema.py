@@ -20,7 +20,7 @@ from pydantic import (
 
 class Source(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     x0: Annotated[float, Field(ge=0.0)]
@@ -29,7 +29,7 @@ class Source(BaseModel):
 
 class Tile(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     desktop: Literal[480] | None = None
@@ -38,7 +38,7 @@ class Tile(BaseModel):
 
 class Budget(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     bytes: conint(ge=1, le=12582912)
@@ -49,19 +49,19 @@ class File(RootModel[str]):
     model_config = ConfigDict(
         regex_engine="python-re",
     )
-    root: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
+    root: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+")
 
 
 class Dir(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
-    dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
+    dir: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+")
 
 
-class FlowEncoding(RootModel[Literal['int16', 'int16-deflate']]):
-    root: Literal['int16', 'int16-deflate']
+class FlowEncoding(RootModel[Literal["int16", "int16-deflate"]]):
+    root: Literal["int16", "int16-deflate"]
 
 
 class Gain(RootModel[confloat(ge=0.0, le=4.0)]):
@@ -70,7 +70,7 @@ class Gain(RootModel[confloat(ge=0.0, le=4.0)]):
 
 class Rest(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     first: conint(ge=0)
@@ -79,18 +79,18 @@ class Rest(BaseModel):
 
 class Clip(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     id: constr(min_length=1)
-    file: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.mp4$')
-    phone: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.mp4$') | None = None
+    file: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.mp4$")
+    phone: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.mp4$") | None = None
     fps: PositiveFloat
     frames: conint(ge=1)
     rest: Rest
     track: list[float] = Field(..., min_length=1)
-    trackFile: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.json$')
-    encoding: Literal['stacked-alpha-h264']
+    trackFile: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.json$")
+    encoding: Literal["stacked-alpha-h264"]
     weight: confloat(ge=0.0) | None = None
 
 
@@ -108,7 +108,7 @@ class MouthSet(RootModel[Dir]):
 
 class Letters(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     A: conint(ge=0)
@@ -124,7 +124,7 @@ class Letters(BaseModel):
 
 class Anchor(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     x: float
@@ -135,7 +135,7 @@ class Anchor(BaseModel):
 
 class Mouth(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     letters: Letters
@@ -143,23 +143,23 @@ class Mouth(BaseModel):
     calm: MouthSet
     shout: MouthSet | None = None
     warp: bool | None = None
-    flowEncoding: Literal['int16', 'int16-deflate'] | None = None
+    flowEncoding: Literal["int16", "int16-deflate"] | None = None
 
 
 class Emotion(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
-    dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
-    kinds: list[Literal['angry', 'excited', 'alarmed', 'sad']] = Field(
+    dir: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+")
+    kinds: list[Literal["angry", "excited", "alarmed", "sad"]] = Field(
         ..., min_length=1
     )
-    flowEncoding: Literal['int16', 'int16-deflate'] | None = None
+    flowEncoding: Literal["int16", "int16-deflate"] | None = None
 
 
-class VoiceState(RootModel[Literal['idle', 'listen', 'think', 'speak', 'interrupt']]):
-    root: Literal['idle', 'listen', 'think', 'speak', 'interrupt']
+class VoiceState(RootModel[Literal["idle", "listen", "think", "speak", "interrupt"]]):
+    root: Literal["idle", "listen", "think", "speak", "interrupt"]
 
 
 class Range(RootModel[list[float]]):
@@ -168,7 +168,7 @@ class Range(RootModel[list[float]]):
 
 class VoiceSmoothing(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     attackMs: confloat(ge=0.0, le=2000.0) | None = None
@@ -177,7 +177,7 @@ class VoiceSmoothing(BaseModel):
 
 class VoiceDrive(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     amount: confloat(ge=0.0, le=1.0) | None = None
@@ -188,7 +188,7 @@ class VoiceDrive(BaseModel):
 
 class Drive(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     idle: VoiceDrive | None = None
@@ -200,7 +200,7 @@ class Drive(BaseModel):
 
 class Translate(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     x: list[float] | None = None
@@ -209,12 +209,12 @@ class Translate(BaseModel):
 
 class VoiceEffect(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
-    channel: Literal['level', 'cue_energy', 'state']
+    channel: Literal["level", "cue_energy", "state"]
     curve: (
-        Literal['linear', 'ease-in', 'ease-out', 'smooth', 'pulse', 'blink'] | None
+        Literal["linear", "ease-in", "ease-out", "smooth", "pulse", "blink"] | None
     ) = None
     smoothing: VoiceSmoothing | None = None
     drive: Drive | None = None
@@ -231,7 +231,7 @@ class VoiceEffect(BaseModel):
 
 class Box(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     x: float
@@ -242,7 +242,7 @@ class Box(BaseModel):
 
 class Anchor1(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     x: confloat(ge=0.0, le=1.0)
@@ -251,20 +251,20 @@ class Anchor1(BaseModel):
 
 class Glow(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
-    color: constr(pattern=r'^#[0-9a-fA-F]{6}$')
+    color: constr(pattern=r"^#[0-9a-fA-F]{6}$")
     blur: confloat(ge=0.0, le=96.0) | None = None
 
 
 class VoicePart(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
-    id: constr(pattern=r'^[a-z][a-z0-9-]*$')
-    file: constr(pattern=r'^(?!/)(?!.*\.\.).+\.(webp|png)$')
+    id: constr(pattern=r"^[a-z][a-z0-9-]*$")
+    file: constr(pattern=r"^(?!/)(?!.*\.\.).+\.(webp|png)$")
     box: Box
     anchor: Anchor1 | None = None
     z: conint(ge=0, le=99) | None = None
@@ -274,7 +274,7 @@ class VoicePart(BaseModel):
 
 class VoicePreset(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     gain: confloat(ge=0.0, le=2.0) | None = None
@@ -282,18 +282,18 @@ class VoicePreset(BaseModel):
 
 class Provenance(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     maker: constr(min_length=1)
     makerVersion: str
-    source: Literal['photo', 'stylised', 'generated']
+    source: Literal["photo", "stylised", "generated"]
     created: AwareDatetime
 
 
 class States(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     idle: list[Clip]
@@ -304,7 +304,7 @@ class States(BaseModel):
 
 class Life(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     nod: confloat(ge=0.0, le=4.0) | None = None
@@ -329,16 +329,16 @@ class Life(BaseModel):
 
 class FlowDir(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
-    dir: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
-    flowEncoding: Literal['int16', 'int16-deflate'] | None = None
+    dir: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+")
+    flowEncoding: Literal["int16", "int16-deflate"] | None = None
 
 
 class Presets(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     idle: VoicePreset | None = None
@@ -350,10 +350,10 @@ class Presets(BaseModel):
 
 class Voice(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
-    base: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+') | None = None
+    base: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+") | None = None
     parts: list[VoicePart] = Field(..., max_length=12, min_length=1)
     presets: Presets | None = None
 
@@ -364,15 +364,15 @@ class CompanionPack(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
         regex_engine="python-re",
     )
     version: Literal[1]
-    id: constr(pattern=r'^[a-z][a-z0-9-]*$')
+    id: constr(pattern=r"^[a-z][a-z0-9-]*$")
     name: constr(min_length=1)
     source: Source | None = Field(
         None,
-        description='Optional frame the layer coordinates are pixels of: the visible tile is the square starting at (x0, 0) with side size. Absent means x0 224 and size 576 (the demo packs).',
+        description="Optional frame the layer coordinates are pixels of: the visible tile is the square starting at (x0, 0) with side size. Absent means x0 224 and size 576 (the demo packs).",
     )
     tile: Tile
     states: States | None = None
@@ -380,7 +380,7 @@ class CompanionPack(BaseModel):
     head: FlowDir | None = None
     eyes: Dir | None = None
     emotion: Emotion | None = None
-    rest: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+')
+    rest: constr(pattern=r"^(?!/)(?!.*\.\.)(?!.*\.webm$).+")
     life: Life | None = None
     budget: Budget
     voice: Voice | None = None

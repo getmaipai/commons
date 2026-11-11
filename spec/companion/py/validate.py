@@ -11,10 +11,23 @@ def validate_companion_pack(
     source = pack.get("source")
     if source is not None:
         x0, size = source.get("x0"), source.get("size")
-        if not isinstance(x0, (int, float)) or isinstance(x0, bool) or not x0 >= 0 or x0 == float("inf"):
-            problems.append("source.x0 must be a number of 0 or more; use the left edge of the tile in the layer frame.")
-        if not isinstance(size, (int, float)) or isinstance(size, bool) or not 0 < size < float("inf"):
-            problems.append("source.size must be a number above 0; use the side of the square tile in the layer frame.")
+        if (
+            not isinstance(x0, (int, float))
+            or isinstance(x0, bool)
+            or not x0 >= 0
+            or x0 == float("inf")
+        ):
+            problems.append(
+                "source.x0 must be a number of 0 or more; use the left edge of the tile in the layer frame."
+            )
+        if (
+            not isinstance(size, (int, float))
+            or isinstance(size, bool)
+            or not 0 < size < float("inf")
+        ):
+            problems.append(
+                "source.size must be a number above 0; use the side of the square tile in the layer frame."
+            )
     if "voice" not in pack:
         for field in ("states", "mouth", "emotion", "life"):
             if field not in pack:
