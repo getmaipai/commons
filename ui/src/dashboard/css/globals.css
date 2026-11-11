@@ -758,13 +758,15 @@
   }
 
   /*heading text color*/
+  /* A plain declaration, not `@apply font-semibold`: the apply also set --tw-font-weight on every heading, and the text-title, text-hero and
+     text-section utilities read `var(--tw-font-weight, <the Look's weight>)`, so a Look's weight could never reach a heading. */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    @apply font-semibold;
+    font-weight: var(--font-weight-semibold);
   }
 
   input[type="radio"]:focus {
