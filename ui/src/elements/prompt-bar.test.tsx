@@ -140,4 +140,48 @@ describe("PromptBar", () => {
     const row = container.querySelector('[data-slot="prompt-bar-chips"]')!;
     expect(row.firstElementChild).toBe(getByTestId("frame"));
   });
+
+  test("mode changes keep the prompt text area mounted and focused", async () => {
+    const modes = [{ id: "image", label: "Image", icon: "image" as const, primaryLabel: "Generate image" }, { id: "video", label: "Video", icon: "film" as const, primaryLabel: "Generate video" }];
+    let mode = "image";
+    const onModeChange = (next: string) => { mode = next; };
+    const view = render(<PromptBar label="Describe" value="a fox" onValueChange={() => {}} onSubmit={() => {}} modes={modes} mode={mode} onModeChange={onModeChange} />);
+    const field = view.getByRole("textbox", { name: "Describe" }) as HTMLTextAreaElement;
+    field.focus();
+    field.setSelectionRange(2, 4);
+    fireEvent.click(view.getByRole("button", { name: "Mode: Image" }));
+    fireEvent.click(view.getByRole("option", { name: "Video" }));
+    expect(mode).toBe("video");
+    expect(view.getByRole("textbox", { name: "Describe" })).toBe(field);
+    await act(async () => { await new Promise((resolve) => requestAnimationFrame(resolve)); });
+    expect(document.activeElement).toBe(field);
+    expect(field.selectionStart).toBe(2);
+    expect(field.value).toBe("a fox");
+  });
+
+  test("mode options report choices and Enter submits while Shift+Enter remains a newline", () => {
+    const picked: string[] = [];
+    let submitted = 0;
+    const modes = [{ id: "video", label: "Video", icon: "film" as const, primaryLabel: "Generate video", options: [{ id: "length", label: "Length", value: "short", choices: [{ value: "short", label: "Short" }, { value: "long", label: "Long" }], onValueChange: (next: string) => picked.push(next) }] }];
+    const view = render(<PromptBar label="Describe" value="a fox" onValueChange={() => {}} onSubmit={() => { submitted += 1; }} modes={modes} mode="video" onModeChange={() => {}} />);
+    fireEvent.click(view.getByRole("button", { name: "Length: Short" }));
+    fireEvent.click(view.getByRole("option", { name: "Long" }));
+    expect(picked).toEqual(["long"]);
+    const field = view.getByRole("textbox", { name: "Describe" });
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(submitted).toBe(1);
+    fireEvent.keyDown(field, { key: "Enter", shiftKey: true });
+    expect(submitted).toBe(1);
+  });
+
+  test("mode menu lists every mode, supports arrows, and Escape closes it", () => {
+    const modes = [{ id: "image", label: "Image", icon: "image" as const, primaryLabel: "Generate image" }, { id: "video", label: "Video", icon: "film" as const, primaryLabel: "Generate video" }, { id: "music", label: "Music", icon: "music" as const, primaryLabel: "Create music" }];
+    const view = render(<PromptBar label="Describe" value="a fox" onValueChange={() => {}} onSubmit={() => {}} modes={modes} mode="image" onModeChange={() => {}} />);
+    fireEvent.click(view.getByRole("button", { name: "Mode: Image" }));
+    const listbox = view.getByRole("listbox", { name: "Composer modes" });
+    expect(view.getAllByRole("option").map((item) => item.textContent)).toEqual(["Image", "Video", "Music"]);
+    fireEvent.keyDown(listbox, { key: "ArrowDown" });
+    fireEvent.keyDown(listbox, { key: "Escape" });
+    expect(view.queryByRole("listbox", { name: "Composer modes" })).toBeNull();
+  });
 });
