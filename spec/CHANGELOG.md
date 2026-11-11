@@ -1,3 +1,7 @@
+## [spec-v0.1.368] - 2026-11-11
+
+- STT-SMARTTURN-01, additive. Settings registry gains `voice.speculative_start` (household, boolean, default off, advanced, honoured by home). spec-v0.1.367 carried the key but its package version still read 0.1.366, so the tag was cut against the wrong version; use this tag.
+
 ## [spec-v0.1.366] - 2026-11-11
 
 - PACK-SOURCE-01, additive. `companion-pack.schema.json` gains an optional top-level `source: { x0, size }` (`x0` a number of 0 or more, `size` a number above 0): the frame the pack's layer coordinates are pixels of, a square tile starting at `(x0, 0)` with side `size`. Absent means `{ x0: 224, size: 576 }`, exactly the old behaviour, so every existing pack is unchanged. A pack made in a plain 480 tile declares `{ x0: 0, size: 480 }`. Generated TS and Python readers and both validators (plain-words problems for a bad x0 or size) updated; new fixtures `valid-source-frame.json` and `invalid-source-frame.json`. Pairs with ui-v0.5.595.
