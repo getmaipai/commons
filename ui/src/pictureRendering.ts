@@ -44,6 +44,8 @@ export const PICTURE_ALLOWLIST: PictureAllowEntry[] = [
   { file: "src/dashboard/views/auth/authforms/auth-login.tsx", match: /^<img\b/, reason: "The imported SVG brand marks are decorative authentication logos that switch for the active theme." },
   { file: "src/dashboard/views/auth/authforms/social-buttons.tsx", match: /^<img\b/, reason: "The imported Google and GitHub SVG marks are decorative; each button already names its provider." },
   { file: "src/elements/image-editor-surface.tsx", match: /^new\s+Image\s*\(/, reason: "The canvas editor decodes source pixels offscreen before drawing them into its editing canvas." },
+  { file: "src/elements/companion-pack/pack-loader.ts", match: /^new\s+Image\s*\(/, reason: "The pack loader decodes a character pack's sprite sheets offscreen before the canvas player draws them." },
+  { file: "src/elements/companion-pack/player.tsx", match: /^new\s+Image\s*\(/, reason: "The canvas player decodes the pack's still frames offscreen and draws them into its canvas; no content picture is shown through an image element." },
   { file: "src/elements/generation-stage.tsx", match: /^new\s+Image\s*\(/, reason: "The generation stage preloads the next preview before its crossfade to avoid an empty frame." },
 ];
 

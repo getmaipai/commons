@@ -37,6 +37,11 @@ const ALLOW: AllowEntry[] = [
     reason: "The inpainting mask raster: black means keep, white means edit. Data sent to the model, not interface color.",
   },
   {
+    file: "src/elements/companion-pack/voice-layer.ts",
+    match: /rgba\(/,
+    reason: "The voice-reactive layer builds a canvas glow color from the pack's own authored hex value; a canvas shadow needs a concrete rgba, and the color is the character's art, not interface color.",
+  },
+  {
     file: "src/elements/robot-face.tsx",
     match: /^#[0-9a-f]{6}$/i,
     reason: "The robot face mirrors the physical display's fixed palette (firmware colors), so it must not follow the theme.",
