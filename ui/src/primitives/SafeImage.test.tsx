@@ -2,25 +2,29 @@ import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, test } from "bun:test";
 import { SafeImage, initials } from "./SafeImage";
 
-describe("SafeImage tinted fallback", () => {
-  test("a seeded fallback is a soft theme-token tint with the first letters, never the flat gray", () => {
-    const view = render(<SafeImage kind="music" tintSeed="Blue Hour" alt="" />);
-    const tile = view.container.querySelector('[data-slot="safe-image-fallback"]') as HTMLElement;
-    expect(tile.getAttribute("data-tinted")).toBe("");
-    expect(tile.className).not.toContain("bg-muted");
-    expect(tile.className).toContain("color-mix(in_oklab,var(--tile-tint)_22%,var(--card))");
-    expect(tile.style.getPropertyValue("--tile-tint")).toMatch(/^var\(--[a-z-]+\)$/);
-    expect(tile.textContent).toBe("BH");
+describe("SafeImage seeded art fallback", () => {
+  test("stable seeds choose stable hue pairs and distinct seeds choose different art", () => {
+    const renderTile = (seed: string) => render(<SafeImage kind="music" tintSeed={seed} />);
+    const first = renderTile("Blue Hour");
+    const originalPair = first.container.querySelector("[data-slot=safe-image-fallback]")!.getAttribute("style") ?? "";
+    const same = renderTile("Blue Hour");
+    expect(same.container.querySelector("[data-slot=safe-image-fallback]")!.getAttribute("style") ?? "").toBe(originalPair);
+    const different = renderTile("Night Drive");
+    expect(different.container.querySelector("[data-slot=safe-image-fallback]")!.getAttribute("style") ?? "").not.toBe(originalPair);
   });
-  test("a seed with no letters falls back to the kind icon; initials skips punctuation", () => {
-    const view = render(<SafeImage kind="video" tintSeed="" alt="" />);
-    expect(view.container.querySelector("svg")).not.toBeNull();
+  test("shows a kind glyph and optional label without initials", () => {
+    const view = render(<SafeImage kind="video" tintSeed="Blue Hour" label="Blue Hour" alt="" />);
+    const tile = view.container.querySelector('[data-slot="safe-image-fallback"]')!;
+    expect(tile.querySelector('[data-slot="safe-image-icon"]')).not.toBeNull();
+    expect(tile.querySelector('[data-slot="safe-image-label"]')?.textContent).toBe("Blue Hour");
+    expect(tile.querySelector('[data-slot="safe-image-initials"]')).toBeNull();
     expect(initials("  the-quiet  Hours ")).toBe("TQ");
     expect(initials("!!!")).toBe("");
   });
-  test("without a seed the old muted tile is unchanged", () => {
-    const view = render(<SafeImage alt="" />);
-    expect(view.container.querySelector('[data-slot="safe-image-fallback"]')?.className).toContain("bg-muted");
+  test("the art fallback has no fixed color literals", async () => {
+    const { readFileSync } = await import("node:fs");
+    const source = readFileSync(new URL("./SafeImage.tsx", import.meta.url), "utf8");
+    expect(source).not.toMatch(/(?:#[\da-f]{3,8}\b|\b(?:rgb|rgba|hsl|hsla)\s*\()/i);
   });
 });
 
@@ -41,7 +45,7 @@ describe("SafeImage", () => {
   test("keeps an unbounded picture slot visible with a stable fallback frame", () => {
     const view = render(<SafeImage alt="Article picture" className="max-w-full" />);
     const fallback = view.container.querySelector('[data-slot="safe-image-fallback"]') as HTMLElement;
-    expect(fallback.className).toContain("aspect-video");
+    expect(fallback.className).toContain("aspect-square");
     expect(fallback.className).toContain("min-h-16");
   });
 
@@ -91,15 +95,15 @@ describe("SafeImage", () => {
   });
 });
 
-describe("small tinted covers keep the kind icon (KIT-QA-01)", () => {
-  test("a tinted fallback carries the kind icon beside the initials, the container query picks one", () => {
+describe("art covers keep the kind icon (KIT-QA-01)", () => {
+  test("a cover fallback carries the kind icon", () => {
     const { container } = render(<SafeImage kind="music" tintSeed="Blue Hour" className="size-10" />);
     const tile = container.querySelector('[data-slot="safe-image-fallback"]')!;
     expect(tile.className).toContain("@container/safe-art");
     const icon = tile.querySelector('[data-slot="safe-image-icon"]')!;
     expect(icon).not.toBeNull();
-    expect(icon.getAttribute("class")).toContain("@[6rem]/safe-art:hidden");
-    expect(tile.querySelector('[data-slot="safe-image-initials"]')!.getAttribute("class")).toContain("hidden");
+    expect(icon.getAttribute("class")).toContain("bottom-2");
+    expect(tile.querySelector('[data-slot="safe-image-initials"]')).toBeNull();
   });
   test("a podcast placeholder is a mic", () => {
     const { container } = render(<SafeImage kind="podcast" className="size-10" />);
