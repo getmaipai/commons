@@ -1,6 +1,6 @@
 import { createSurface, imageData, type Surface } from "./canvas-util";
-import { regionBlock, SRC_X, toCanvas } from "./geometry";
-import type { Affine } from "./geometry";
+import { DEFAULT_FRAME, regionBlock, toCanvas } from "./geometry";
+import type { Affine, PackFrame } from "./geometry";
 import type { EyesData, Raster } from "./pack-loader";
 
 export type Lid = { half: number; closed: number };
@@ -49,16 +49,16 @@ export function ringOffsets(
 
 /** Half-closed or closed eye picture pasted inside the eye mask, colour matched to the live skin, moving with the head. */
 export function drawLids(
-  ctx: CanvasRenderingContext2D, k: number, m: Affine, eyes: EyesData, lid: Lid | null, st: LidState, lift: number, alpha: number,
+  ctx: CanvasRenderingContext2D, k: number, m: Affine, eyes: EyesData, lid: Lid | null, st: LidState, lift: number, alpha: number, frame: PackFrame = DEFAULT_FRAME,
 ): boolean {
   const pick = pickLid(lid);
   if (!pick || alpha <= 0.01) return false;
   const [X0, Y0, W, H] = eyes.region; const { width, height } = ctx.canvas;
-  const block = regionBlock(m, eyes.region, k, width, height, 1);
+  const block = regionBlock(m, eyes.region, k, width, height, 1, frame);
   if (block.BW < 4 || block.BH < 4) return false;
   const [a, b, tx, c, d, ty] = m as [number, number, number, number, number, number];
   const live = ctx.getImageData(block.bx0, block.by0, block.BW, block.BH).data;
-  const found = ringOffsets(live, block.BW, block.BH, eyes.pts, eyes.ref.data, W, (x, y) => toCanvas(m, k, X0 + x, Y0 + y), block.bx0, block.by0);
+  const found = ringOffsets(live, block.BW, block.BH, eyes.pts, eyes.ref.data, W, (x, y) => toCanvas(m, k, X0 + x, Y0 + y, frame), block.bx0, block.by0);
   const prev = st.off;
   const off = found ? found.off : (prev ?? [0, 0, 0]);
   st.off = prev ? prev.map((v, i) => v + (off[i]! - v) * 0.5) : off;
@@ -70,7 +70,7 @@ export function drawLids(
   const out = new Uint8ClampedArray(pic.data.length);
   for (let q = 0; q < out.length; q += 4) { out[q + 3] = pic.data[q + 3]!; for (let ch = 0; ch < 3; ch++) out[q + ch] = pic.data[q + ch]! + shift![ch]!; }
   st.tile.ctx.putImageData(imageData(out, W, H), 0, 0);
-  ctx.setTransform(k * a, k * c, k * b, k * d, k * (tx - SRC_X), k * ty);
+  ctx.setTransform(k * a, k * c, k * b, k * d, k * (tx - frame.x0), k * ty);
   ctx.globalAlpha = Math.min(1, alpha); ctx.drawImage(st.tile.canvas, X0, Y0);
   ctx.globalAlpha = 1; ctx.setTransform(1, 0, 0, 1, 0, 0);
   return true;

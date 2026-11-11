@@ -7,6 +7,11 @@ export function validateCompanionPack(pack: CompanionPack, files?: CompanionPack
   const problems: string[] = [];
   const ids = new Set<string>();
 
+  if (pack.source) {
+    const { x0, size } = pack.source;
+    if (!Number.isFinite(x0) || x0 < 0) problems.push("source.x0 must be a number of 0 or more; use the left edge of the tile in the layer frame.");
+    if (!Number.isFinite(size) || size <= 0) problems.push("source.size must be a number above 0; use the side of the square tile in the layer frame.");
+  }
   const stillPlusParts = Boolean(pack.voice);
   if (!stillPlusParts) {
     for (const field of ["states", "mouth", "emotion", "life"] as const) {

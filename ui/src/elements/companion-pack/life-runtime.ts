@@ -8,11 +8,14 @@ import type { PoseWeights } from "./head";
 import { tickTime } from "./speech";
 import type { EventWindow } from "./tags";
 
-const W_PX = 1.2; // canvas px at 480 to frame px (576 / 480): poses are baked at 1 frame px peak
+/** Canvas px at 480 to frame px (size / 480; 1.2 for the 576 px demo frame): poses are baked at 1 frame px peak. */
+export const wPx = (frameSize: number): number => frameSize / 480;
 export type LifeSample = { fx: PoseWeights; loud: number; express: number; lid: Lid | null; wide: boolean; shoulder: number };
 export type LifeOptions = {
   cues: Cue[]; loudness: Float32Array; envelope?: Float32Array; events: EventWindow[]; duration?: number; seed?: number;
   packId: string; poses: string[]; life: Record<string, number>; cadence: number; profile?: LifeProfile;
+  /** Side of the pack frame in pixels; 576 (the demo frame) when absent. */
+  frameSize?: number;
 };
 export type LifeContext = { emoSum: number; alive?: number; intensity?: number; sa?: number };
 export type LifeRuntime = {
@@ -40,7 +43,7 @@ export function blinkAt(blinks: BlinkEvent[], time: number): number {
 }
 
 export function createLifeRuntime(o: LifeOptions): LifeRuntime {
-  const duration = o.duration ?? o.cues[o.cues.length - 1]?.t1 ?? 0; const seed = o.seed ?? 1; const env = o.envelope ?? o.loudness;
+  const duration = o.duration ?? o.cues[o.cues.length - 1]?.t1 ?? 0; const seed = o.seed ?? 1; const W_PX = wPx(o.frameSize ?? 576); const env = o.envelope ?? o.loudness;
   const profile = o.profile ?? LIFE_CHARACTER_PROFILE(o.packId); const loudCfg = profile.loud ?? {};
   const plan = {
     fx: planFx(o.cues, env, duration, seed), micro: planMicro(o.cues, env, duration, seed, profile.micro),

@@ -10,6 +10,14 @@ export const CompanionPack = z
     version: z.literal(1),
     id: z.string().regex(new RegExp("^[a-z][a-z0-9-]*$")),
     name: z.string().min(1),
+    /**Optional frame the layer coordinates are pixels of: the visible tile is the square starting at (x0, 0) with side size. Absent means x0 224 and size 576 (the demo packs).*/
+    source: z
+      .object({ x0: z.number().gte(0), size: z.number().gt(0) })
+      .strict()
+      .describe(
+        "Optional frame the layer coordinates are pixels of: the visible tile is the square starting at (x0, 0) with side size. Absent means x0 224 and size 576 (the demo packs).",
+      )
+      .optional(),
     tile: z
       .object({
         desktop: z.literal(480).optional(),

@@ -1,6 +1,7 @@
 import { imageData, smooth } from "./canvas-util";
 import type { Affine } from "./geometry";
 import { regionBlock, warpRegion } from "./geometry";
+import type { PackFrame } from "./geometry";
 import type { EmotionData } from "./pack-loader";
 import { emotionFor } from "./life";
 import type { EmotionName, SpeechInput } from "./speech";
@@ -39,10 +40,10 @@ export function stepEmotionWeights(w: EmotionWeights, kind: EmotionName | null, 
 }
 
 /** Upper-face emotion: flows of every active kind add in one warp, signed residuals (shading, wrinkles) add linearly. */
-export function drawEmotionMix(ctx: CanvasRenderingContext2D, k: number, m: Affine, data: EmotionData, weights: Record<string, number>): boolean {
+export function drawEmotionMix(ctx: CanvasRenderingContext2D, k: number, m: Affine, data: EmotionData, weights: Record<string, number>, frame?: PackFrame): boolean {
   const act = Object.entries(weights).filter(([kind, w]) => data.kinds[kind] && w > 0.005);
   if (!act.length) return false;
-  const { width, height } = ctx.canvas; const block = regionBlock(m, data.region, k, width, height, 2);
+  const { width, height } = ctx.canvas; const block = regionBlock(m, data.region, k, width, height, 2, frame);
   if (block.BW < 4 || block.BH < 4) return false;
   const [, , W] = data.region;
   const kinds = act.map(([kind, w]) => {
@@ -51,7 +52,7 @@ export function drawEmotionMix(ctx: CanvasRenderingContext2D, k: number, m: Affi
   });
   const src = ctx.getImageData(block.bx0, block.by0, block.BW, block.BH);
   const out = warpRegion({
-    src: src.data, block, k, m, region: data.region, weight: null, margin: 0, onlyOpaque: true,
+    src: src.data, block, k, m, region: data.region, weight: null, margin: 0, onlyOpaque: true, frame,
     displace(rx, ry, _wv, d) {
       const x0 = rx | 0;
       const y0 = ry | 0;

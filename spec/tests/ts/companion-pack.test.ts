@@ -14,7 +14,7 @@ addFormats(ajv);
 const check = ajv.compile(schema);
 const files = readdirSync(DIR).filter((name) => name.endsWith(".json")).sort();
 const read = (name: string) => JSON.parse(readFileSync(join(DIR, name), "utf8"));
-const structuralInvalid = new Set(["invalid-idle-count.json", "invalid-wide-shape.json", "invalid-emotion-files.json", "invalid-webm.json", "invalid-voice-empty-parts.json"]);
+const structuralInvalid = new Set(["invalid-idle-count.json", "invalid-wide-shape.json", "invalid-emotion-files.json", "invalid-webm.json", "invalid-voice-empty-parts.json", "invalid-source-frame.json"]);
 const expected: Record<string, string> = {
   "invalid-track-length.json": "states.listen[0].track has 1 values but frames is 117; make the track length equal frames.",
   "invalid-duplicate-id.json": "states.listen[0].id repeats clip id man-idle1; give every clip a unique id.",
@@ -26,6 +26,7 @@ const expected: Record<string, string> = {
   "invalid-voice-glow-without-colour.json": "voice.parts[1].effects[0] drives glow but the part has no glow colour; add glow.color to voice.parts[1].",
   "invalid-voice-pulse-on-level.json": "voice.parts[1].effects[1] uses the pulse curve, which only works on the state channel; set channel to state.",
   "invalid-voice-box-outside-tile.json": "voice.parts[1].box leaves the 480 pixel tile; move or shrink the box.",
+  "invalid-source-frame.json": "source.x0 must be a number of 0 or more; use the left edge of the tile in the layer frame.",
   "invalid-voice-duplicate-part.json": "voice.parts[3].id repeats part id heart; give every part a unique id.",
 };
 
@@ -53,6 +54,13 @@ describe("PACK-01b CompanionPack fixtures", () => {
   for (const [name, problem] of Object.entries(expected)) {
     test(`${name} returns its precise problem`, () => expect(validateCompanionPack(read(name))).toContain(problem));
   }
+  test("source frame: valid with a frame, plain problems for a bad one", () => {
+    const pack = read("valid-source-frame.json");
+    expect(pack.source).toEqual({ x0: 0, size: 480 });
+    expect(validateCompanionPack(pack)).toEqual([]);
+    expect(validateCompanionPack(read("invalid-source-frame.json"))).toContain("source.size must be a number above 0; use the side of the square tile in the layer frame.");
+    expect(read("valid-man.json").source).toBeUndefined();
+  });
   test("file-aware checks enforce phone twins and directory metadata", () => {
     const pack = read("valid-man.json");
     const result = validateCompanionPack(pack, { "clips/idle1.phone.mp4": 1 });

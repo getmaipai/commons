@@ -1,8 +1,8 @@
 import { clamp01 } from "./canvas-util";
 import type { Cue } from "./cues";
 import { drawEmotionMix, chooseEmotion, emotionLevel, newEmotionWeights, stepEmotionWeights } from "./emotion";
-import { frameScale, trackAt } from "./geometry";
-import type { Affine } from "./geometry";
+import { frameOf, frameScale, trackAt } from "./geometry";
+import type { Affine, PackFrame } from "./geometry";
 import { drawHead } from "./head";
 import { drawLids, newLidState } from "./lids";
 import { applyShoulder, createLifeRuntime } from "./life-runtime";
@@ -46,9 +46,11 @@ export class SpeechCompositor {
   private lidState = newLidState();
   private gate = 1;
   private profile: RenderProfile;
+  private readonly frame: PackFrame;
 
   constructor(private readonly pack: LoadedPack, profile?: Partial<RenderProfile>, private readonly now: () => number = () => performance.now()) {
     this.profile = profileFor(pack.id, profile);
+    this.frame = frameOf(pack.source);
   }
 
   setSpeech(speech: SpeechInput | undefined): void {
@@ -69,7 +71,7 @@ export class SpeechCompositor {
     if (this.lifeFor !== speech.cues || !this.life) {
       this.life = createLifeRuntime({
         cues: speech.cues, loudness: speech.loudness, envelope: speech.envelope, events: speech.events, seed: speech.seed,
-        packId: this.pack.id, poses: this.pack.head?.poses ?? [], life: this.pack.life, cadence: this.profile.cadence,
+        packId: this.pack.id, poses: this.pack.head?.poses ?? [], life: this.pack.life, cadence: this.profile.cadence, frameSize: this.frame.size,
       });
       this.lifeFor = speech.cues;
     }
@@ -85,7 +87,7 @@ export class SpeechCompositor {
     if (!speech || this.fade <= 0) { if (!this.current) this.last = undefined; return false; }
     this.ensurePlan(speech);
     const clock = this.current ? speech.clock() : this.frozenClock; this.frozenClock = clock;
-    const k = frameScale(ctx.canvas.width); const track = this.pack.tracks[frame.clipId];
+    const k = frameScale(ctx.canvas.width, this.frame); const track = this.pack.tracks[frame.clipId];
     const m: Affine = trackAt(track?.m, frame.frameIndex);
     const residual = track?.res?.[Math.max(0, Math.min(track.res.length - 1, Math.round(frame.frameIndex)))];
     const gateTarget = trackGate(residual);
@@ -101,7 +103,7 @@ export class SpeechCompositor {
     const set: MouthSet | undefined = wantsShout && this.pack.shout ? this.pack.shout : this.pack.calm;
     if (set) {
       const sel = mouthAt(this.segs, speech.events, clock, set, this.profile);
-      drawMouth({ ctx, k, m, slot: sel.slot, amt: sa * this.gate, profile: this.profile }, set, this.mouthState);
+      drawMouth({ ctx, k, m, slot: sel.slot, amt: sa * this.gate, profile: this.profile, frame: this.frame }, set, this.mouthState);
     }
     // Where the 2D head track fits the face poorly (a 3D head turn in the clip) every picture layer fades with the track confidence,
     // and the eyelid pictures switch off: a lid pasted at a wrong place reads as a wink.
@@ -110,12 +112,12 @@ export class SpeechCompositor {
     const fx = life.fx; if (trust < 1) for (const key of Object.keys(fx)) fx[key] = fx[key]! * trust;
     if (this.pack.eyes && emoSum <= 0.6 && sure >= LID_TRACK_GATE) {
       const lid = life.lid && sa < 1 ? { half: life.lid.half * sa, closed: life.lid.closed * sa } : life.lid;
-      drawLids(ctx, k, m, this.pack.eyes, lid, this.lidState, this.profile.eyeLift, sa);
+      drawLids(ctx, k, m, this.pack.eyes, lid, this.lidState, this.profile.eyeLift, sa, this.frame);
     }
-    if (this.pack.head) drawHead(ctx, k, m, this.pack.head, fx);
+    if (this.pack.head) drawHead(ctx, k, m, this.pack.head, fx, this.frame);
     if (this.pack.emotion && emoSum > 0.004) {
       const scaled = { ...this.weights }; if (trust < 1) for (const key of Object.keys(scaled)) scaled[key as keyof typeof scaled] *= trust;
-      drawEmotionMix(ctx, k, m, this.pack.emotion, scaled);
+      drawEmotionMix(ctx, k, m, this.pack.emotion, scaled, this.frame);
     }
     if (Math.abs(life.shoulder * trust) > 0.12) applyShoulder(ctx, life.shoulder * trust, this.profile.shoulderBand);
     if (!this.current && this.fade <= 0) this.last = undefined;

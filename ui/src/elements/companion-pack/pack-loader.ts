@@ -76,7 +76,7 @@ export type EmotionKindData = { flow: Int16Array; patch: Raster; ease: [number, 
 export type EmotionData = { region: Region; kinds: Record<string, EmotionKindData> };
 export type Track = { m: Affine[]; res: number[] };
 export type LoadedPack = {
-  id: string; calm?: MouthSet; head?: HeadData; eyes?: EyesData; emotion?: EmotionData;
+  id: string; source?: { x0: number; size: number }; calm?: MouthSet; head?: HeadData; eyes?: EyesData; emotion?: EmotionData;
   tracks: Record<string, Track>; life: Record<string, number>; loadShout(): Promise<MouthSet | undefined>; shout?: MouthSet;
 };
 
@@ -192,7 +192,7 @@ export async function loadPackLayers(pack: CompanionPackData, base: string, warn
   ]);
   let shoutTask: Promise<MouthSet | undefined> | undefined;
   const loaded: LoadedPack = {
-    id: pack.id ?? "", calm, head, eyes, emotion, tracks, life: pack.life ?? {},
+    id: pack.id ?? "", source: pack.source, calm, head, eyes, emotion, tracks, life: pack.life ?? {},
     loadShout() {
       if (!pack.mouth?.shout) return Promise.resolve(undefined);
       shoutTask ??= optional("shout mouth", loadMouthSet(base, pack.mouth.shout.dir, warp)).then((set) => { loaded.shout = set; return set; });

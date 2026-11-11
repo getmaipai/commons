@@ -22,6 +22,7 @@ STRUCTURAL_INVALID = {
     "invalid-emotion-files.json",
     "invalid-webm.json",
     "invalid-voice-empty-parts.json",
+    "invalid-source-frame.json",
 }
 
 
@@ -47,6 +48,7 @@ EXPECTED = {
     "invalid-voice-glow-without-colour.json": "voice.parts[1].effects[0] drives glow but the part has no glow colour; add glow.color to voice.parts[1].",
     "invalid-voice-pulse-on-level.json": "voice.parts[1].effects[1] uses the pulse curve, which only works on the state channel; set channel to state.",
     "invalid-voice-box-outside-tile.json": "voice.parts[1].box leaves the 480 pixel tile; move or shrink the box.",
+    "invalid-source-frame.json": "source.x0 must be a number of 0 or more; use the left edge of the tile in the layer frame.",
     "invalid-voice-duplicate-part.json": "voice.parts[3].id repeats part id heart; give every part a unique id.",
 }
 

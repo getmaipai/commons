@@ -17,6 +17,8 @@ export type CompanionPackData = {
   states?: Record<PackState, PackClip[]>;
   voice?: VoiceLayerData;
   rest: string;
+  /** Frame the layer coordinates are pixels of (spec `source`); absent means { x0: 224, size: 576 }. */
+  source?: { x0: number; size: number };
   /** Pack id; picks the speaking render profile (man, clay, pixar) when no profile is given. */
   id?: string;
   /** Speaking layers (PACK-05); every part is optional and a missing folder simply turns that layer off. */

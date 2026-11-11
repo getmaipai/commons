@@ -5,11 +5,12 @@ import { FADE_SECONDS, SpeechCompositor, trackGate } from "./compositor";
 import type { Cue } from "./cues";
 import { chooseEmotion, emotionLevel, newEmotionWeights, stepEmotionWeights } from "./emotion";
 import golden from "./fixtures/golden-fast-lines.json";
-import { IDENTITY, regionBlock, warpRegion } from "./geometry";
-import { activePoses, headDisplace } from "./head";
-import { pickLid } from "./lids";
-import { blinkAt, createLifeRuntime, eventShape, shiftRows } from "./life-runtime";
-import { harmonize, newMouthState, sampleOffsets, slotWeights, tilePixels } from "./mouth";
+import { DEFAULT_FRAME, frameOf, frameScale, IDENTITY, regionBlock, toCanvas, warpRegion } from "./geometry";
+import type { PackFrame } from "./geometry";
+import { activePoses, drawHead, headDisplace } from "./head";
+import { drawLids, newLidState, pickLid } from "./lids";
+import { blinkAt, createLifeRuntime, eventShape, shiftRows, wPx } from "./life-runtime";
+import { drawTileMouth, harmonize, newMouthState, sampleOffsets, slotWeights, tilePixels } from "./mouth";
 import { loadPackLayers, setPackIO, tileStat } from "./pack-loader";
 import { profileFor } from "./profile";
 import { buildSegments, mouthAt, segmentShape } from "./speech";
@@ -211,5 +212,128 @@ describe("loader and compositor", () => {
   });
   test("region block of an identity track", () => {
     expect(regionBlock(IDENTITY, [224, 0, 100, 100], 1, 480, 480, 0)).toEqual({ bx0: 0, by0: 0, BW: 100, BH: 100 });
+  });
+});
+
+/** PACK-SOURCE-01: the frame a pack's layer coordinates are in, at every size the companion appears at. */
+describe("pack source frame", () => {
+  const F480: PackFrame = { x0: 0, size: 480 };
+  const WIDTHS = [36, 64, 120, 327, 480];
+  type Call = { name: string; args: unknown[] };
+  /** A canvas that records the calls the layers make; reads give transparent pixels of the asked size. */
+  const recorder = (width: number) => {
+    const calls: Call[] = [];
+    const ctx = new Proxy({ canvas: { width, height: width } }, {
+      get(t, key) {
+        if (key in t) return (t as Record<string | symbol, unknown>)[key];
+        if (key === "getImageData") return (_x: number, _y: number, w: number, h: number) => { calls.push({ name: "getImageData", args: [_x, _y, w, h] }); return { data: new Uint8ClampedArray(Math.max(0, w) * Math.max(0, h) * 4) }; };
+        return (...args: unknown[]) => { calls.push({ name: String(key), args }); };
+      },
+      set: () => true,
+    }) as unknown as CanvasRenderingContext2D;
+    return { ctx, calls };
+  };
+  const tileMouth = () => ({
+    kind: "tile" as const, tw: 184, th: 118, cols: 1, base: 1, ts: [], box: [147, 319, 184, 118] as [number, number, number, number],
+    atlas: { w: 184, h: 118, data: new Uint8ClampedArray(184 * 118 * 4) }, mask: new Float32Array(184 * 118), ring: [], core: [],
+    ringRef: { mean: [0, 0, 0] }, coreRef: { mean: [0, 0, 0] }, tile0: new Uint8ClampedArray(184 * 118 * 4),
+  }) as never;
+  const finite = (calls: Call[]) => calls.every((c) => c.args.every((a) => typeof a !== "number" || Number.isFinite(a)));
+  let restore: (() => void) | undefined;
+  afterEach(() => restore?.());
+  const fakeSurface = () => { restore = setSurfaceFactory(() => ({ canvas: {} as HTMLCanvasElement, ctx: new Proxy({}, { get: () => () => undefined }) as unknown as CanvasRenderingContext2D })); };
+
+  test("no source: the default frame gives the numbers the demo constants always gave", () => {
+    expect(DEFAULT_FRAME).toEqual({ x0: 224, size: 576 });
+    expect(frameOf(undefined)).toBe(DEFAULT_FRAME);
+    expect(frameScale(480)).toBeCloseTo(480 / 576, 12);
+    const k = frameScale(480);
+    const [x, y] = toCanvas([1, 0, 0, 0, 1, 0], k, 351, 319);
+    expect(x).toBeCloseTo((480 / 576) * (351 - 224), 9); expect(x).toBeCloseTo(105.8333333, 6); expect(y).toBeCloseTo(265.8333333, 6);
+    expect(regionBlock(IDENTITY, [224, 0, 100, 100], 1, 480, 480, 0, DEFAULT_FRAME)).toEqual({ bx0: 0, by0: 0, BW: 100, BH: 100 });
+    // the drawn mouth tile of the default frame sits where the old code put it: transform e = k * (tx - 224)
+    fakeSurface();
+    const { ctx, calls } = recorder(480);
+    expect(drawTileMouth({ ctx, k, m: [1, 0, 0, 0, 1, 0], slot: 0, amt: 1, profile: profileFor("clay") }, tileMouth(), newMouthState())).toBe(true);
+    const t = calls.find((c) => c.name === "setTransform")!.args as number[];
+    expect(t[4]).toBeCloseTo(k * -224, 9); expect(t[5]).toBe(0); expect(t[0]).toBeCloseTo(k, 12);
+  });
+  test("an unusable source falls back to the default frame", () => {
+    for (const bad of [{ x0: 0, size: 0 }, { x0: Number.NaN, size: 480 }, { x0: 0, size: -1 }, { x0: 0, size: Infinity }]) expect(frameOf(bad)).toBe(DEFAULT_FRAME);
+  });
+  test("life micro scale is size / 480: 1 for a 480 frame, 1.2 for the default", () => {
+    expect(wPx(480)).toBe(1); expect(wPx(576)).toBeCloseTo(1.2, 12);
+    const line = golden[2]!;
+    const run = (frameSize?: number) => {
+      const life = createLifeRuntime({ cues: line.cues as Cue[], loudness: new Float32Array(line.env.length), envelope: new Float32Array(line.env), events: [],
+        seed: 3, packId: "man", poses: ["mWrinkle", "nod", "tilt", "brow", "eyeClosed", "eyeHalf", "eyeSquint", "eyeWide", "gazeU", "gazeD", "gazeL", "gazeR"], life: {}, cadence: 0, frameSize });
+      const micro = life.plan.micro[0]!;
+      return { micro, v: life.sample(micro.t0 + micro.rise + 0.001, { emoSum: 0 }).fx[micro.pose] ?? 0 };
+    };
+    const def = run(); const small = run(480);
+    expect(def.micro).toEqual(small.micro);
+    if (def.micro.px !== 0 && Math.abs(small.v) > 0) expect(Math.abs(def.v / small.v)).toBeCloseTo(1.2, 3);
+  });
+  for (const width of WIDTHS) {
+    const k480 = width / 480; const kDef = width / 576;
+    test(`mouth lands on k * (layer coords - x0) at canvas width ${width} (480 frame and default frame)`, () => {
+      fakeSurface();
+      for (const [frame, k, x0] of [[F480, k480, 0], [DEFAULT_FRAME, kDef, 224]] as const) {
+        const { ctx, calls } = recorder(width);
+        drawTileMouth({ ctx, k, m: IDENTITY, slot: 0, amt: 1, profile: profileFor("clay"), frame }, tileMouth(), newMouthState());
+        const t = calls.find((c) => c.name === "setTransform")!.args as number[];
+        const draw = calls.find((c) => c.name === "drawImage")!.args as number[];
+        // canvas position of the tile corner = transform applied to the draw origin
+        const cx = t[0]! * draw[1]! + t[2]! * draw[2]! + t[4]!; const cy = t[1]! * draw[1]! + t[3]! * draw[2]! + t[5]!;
+        expect(cx).toBeCloseTo(k * (147 - x0), 9); expect(cy).toBeCloseTo(k * 319, 9);
+        if (frame === F480 && width === 480) { expect(cx).toBeCloseTo(147, 9); expect(cy).toBeCloseTo(319, 9); }
+        expect(finite(calls)).toBe(true);
+      }
+    });
+    test(`lids and head use x0 and k at canvas width ${width}`, () => {
+      fakeSurface();
+      const eyes = { region: [100, 90, 60, 30], closed: { w: 60, h: 30, data: new Uint8ClampedArray(60 * 30 * 4) }, half: { w: 60, h: 30, data: new Uint8ClampedArray(60 * 30 * 4) },
+        ref: { w: 60, h: 30, data: new Uint8ClampedArray(60 * 30 * 4) }, pts: [] } as never;
+      const head = { region: [100, 60, 120, 120], flowHalf: [60, 60], flowScale: 64, poses: ["nod"], weight: new Float32Array(120 * 120).fill(1), flow: new Int16Array(60 * 60 * 2) } as never;
+      for (const [frame, k, x0] of [[F480, k480, 0], [DEFAULT_FRAME, kDef, 224]] as const) {
+        const lids = recorder(width);
+        drawLids(lids.ctx, k, IDENTITY, eyes, { half: 0, closed: 1 }, newLidState(), 0, 1, frame);
+        const t = lids.calls.find((c) => c.name === "setTransform" && (c.args as number[])[4] !== 0);
+        if (t) { expect((t.args as number[])[4]).toBeCloseTo(k * -x0, 9); expect((t.args as number[])[0]).toBeCloseTo(k, 12); }
+        expect(finite(lids.calls)).toBe(true);
+        const h = recorder(width);
+        const drew = drawHead(h.ctx, k, IDENTITY, head, { nod: 1 }, frame);
+        const put = h.calls.find((c) => c.name === "putImageData");
+        if (drew) {
+          expect(put!.args[1]).toBe(Math.max(0, Math.floor(k * (100 - x0)) - 2));
+          expect(put!.args[2]).toBe(Math.max(0, Math.floor(k * 60) - 2));
+        }
+        expect(finite(h.calls)).toBe(true);
+        // block of the lid region sits at k * (X0 - x0), clipped to the canvas
+        const b = regionBlock(IDENTITY, [100, 90, 60, 30], k, width, width, 1, frame);
+        expect(b.bx0).toBe(Math.max(0, Math.floor(k * (100 - x0)) - 1));
+        expect(Number.isFinite(b.BW) && b.BW >= 0 && Number.isFinite(b.BH) && b.BH >= 0).toBe(true);
+      }
+    });
+  }
+  test("the same face feature gets the same fraction of the canvas at every width", () => {
+    for (const [frame, size] of [[F480, 480], [DEFAULT_FRAME, 576]] as const) {
+      const fractions = WIDTHS.map((w) => toCanvas(IDENTITY, frameScale(w, frame), 147 + frame.x0 - (frame === F480 ? 0 : 0), 319, frame)[0] / w);
+      for (const f of fractions) expect(f).toBeCloseTo(147 / size, 9);
+    }
+  });
+  test("a canvas of 0 or 1 pixel, and 36 px, never throws and never asks for a bad rectangle", () => {
+    fakeSurface();
+    for (const width of [0, 1, 2, 36]) for (const frame of [F480, DEFAULT_FRAME]) {
+      const k = frameScale(width, frame);
+      const { ctx, calls } = recorder(width);
+      expect(() => drawTileMouth({ ctx, k, m: IDENTITY, slot: 0, amt: 1, profile: profileFor("clay"), frame }, tileMouth(), newMouthState())).not.toThrow();
+      expect(() => drawLids(ctx, k, IDENTITY, { region: [100, 90, 60, 30], closed: { w: 60, h: 30, data: new Uint8ClampedArray(7200) }, half: { w: 60, h: 30, data: new Uint8ClampedArray(7200) }, ref: { w: 60, h: 30, data: new Uint8ClampedArray(7200) }, pts: [] } as never, { half: 0, closed: 1 }, newLidState(), 0, 1, frame)).not.toThrow();
+      expect(finite(calls)).toBe(true);
+      for (const c of calls.filter((x) => x.name === "getImageData")) expect((c.args as number[]).every((n) => Number.isFinite(n) && n >= 0)).toBe(true);
+      const comp = new SpeechCompositor({ id: "clay", source: frame === F480 ? F480 : undefined, tracks: {}, life: {}, calm: tileMouth(), loadShout: async () => undefined }, undefined, () => 0);
+      comp.setSpeech({ cues: [], loudness: new Float32Array(10), events: [], clock: () => 0.1 });
+      for (const now of [16, 32]) expect(() => comp.draw(recorder(width).ctx, { clipId: "x", frameIndex: 0, now })).not.toThrow();
+    }
   });
 });

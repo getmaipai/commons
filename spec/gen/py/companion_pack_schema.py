@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import (
     AwareDatetime,
@@ -16,6 +16,15 @@ from pydantic import (
     conint,
     constr,
 )
+
+
+class Source(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    x0: Annotated[float, Field(ge=0.0)]
+    size: Annotated[float, Field(gt=0.0)]
 
 
 class Tile(BaseModel):
@@ -361,6 +370,10 @@ class CompanionPack(BaseModel):
     version: Literal[1]
     id: constr(pattern=r'^[a-z][a-z0-9-]*$')
     name: constr(min_length=1)
+    source: Source | None = Field(
+        None,
+        description='Optional frame the layer coordinates are pixels of: the visible tile is the square starting at (x0, 0) with side size. Absent means x0 224 and size 576 (the demo packs).',
+    )
     tile: Tile
     states: States | None = None
     mouth: Mouth | None = None

@@ -7,8 +7,16 @@ export type Region = readonly [number, number, number, number];
 export const IDENTITY: Affine = [1, 0, 0, 0, 1, 0];
 export type Block = { bx0: number; by0: number; BW: number; BH: number };
 
-/** The canvas scale of the 576 px source frame. */
-export const frameScale = (canvasWidth: number): number => canvasWidth / SRC_W;
+/** The frame a pack's layer coordinates are pixels of: the tile is the square starting at (x0, 0) with side `size`. */
+export type PackFrame = { readonly x0: number; readonly size: number };
+/** The frame of the demo packs, used when a pack declares no `source`. */
+export const DEFAULT_FRAME: PackFrame = { x0: SRC_X, size: SRC_W };
+/** The pack's own frame, or the default when it declares none or a unusable one. */
+export const frameOf = (source: PackFrame | undefined): PackFrame =>
+  source && Number.isFinite(source.x0) && Number.isFinite(source.size) && source.size > 0 ? source : DEFAULT_FRAME;
+
+/** The canvas scale of the pack's source frame (576 px wide for the demo packs). */
+export const frameScale = (canvasWidth: number, frame: PackFrame = DEFAULT_FRAME): number => canvasWidth / frame.size;
 
 export function invert(m: Affine): { ia: number; ib: number; ic: number; id: number } {
   const [a, b, , c, d] = m as [number, number, number, number, number];
@@ -17,15 +25,15 @@ export function invert(m: Affine): { ia: number; ib: number; ic: number; id: num
 }
 
 /** Where a rest-frame point lands on the canvas. */
-export function toCanvas(m: Affine, k: number, x: number, y: number): [number, number] {
+export function toCanvas(m: Affine, k: number, x: number, y: number, frame: PackFrame = DEFAULT_FRAME): [number, number] {
   const [a, b, tx, c, d, ty] = m as [number, number, number, number, number, number];
-  return [k * (a * x + b * y + tx - SRC_X), k * (c * x + d * y + ty)];
+  return [k * (a * x + b * y + tx - frame.x0), k * (c * x + d * y + ty)];
 }
 
 /** Canvas bounding box of a rest-frame region under the head track, clipped to the canvas. */
-export function regionBlock(m: Affine, region: Region, k: number, width: number, height: number, pad: number): Block {
+export function regionBlock(m: Affine, region: Region, k: number, width: number, height: number, pad: number, frame: PackFrame = DEFAULT_FRAME): Block {
   const [x0, y0, w, h] = region;
-  const corners = [toCanvas(m, k, x0, y0), toCanvas(m, k, x0 + w, y0), toCanvas(m, k, x0, y0 + h), toCanvas(m, k, x0 + w, y0 + h)];
+  const corners = [toCanvas(m, k, x0, y0, frame), toCanvas(m, k, x0 + w, y0, frame), toCanvas(m, k, x0, y0 + h, frame), toCanvas(m, k, x0 + w, y0 + h, frame)];
   const xs = corners.map((p) => p[0]); const ys = corners.map((p) => p[1]);
   const bx0 = Math.max(0, Math.floor(Math.min(...xs)) - pad); const by0 = Math.max(0, Math.floor(Math.min(...ys)) - pad);
   const bx1 = Math.min(width, Math.ceil(Math.max(...xs)) + pad); const by1 = Math.min(height, Math.ceil(Math.max(...ys)) + pad);
@@ -65,6 +73,8 @@ export type WarpSpec = {
   /** Skip destination pixels whose alpha is below 250 (keyed background). */
   onlyOpaque?: boolean;
   /** Writes the region-pixel displacement for (rx, ry) into d (already scaled by the weight); zeros leave the pixel alone. */
+  /** Frame of the pack's layer coordinates; defaults to the demo frame. */
+  frame?: PackFrame;
   displace(rx: number, ry: number, wv: number, d: Float64Array): void;
   /** Adds an extra colour residual after the warp (value space 0..255). */
   residual?(rx: number, ry: number, rgb: Float64Array): void;
@@ -75,7 +85,7 @@ export type WarpSpec = {
  * `src` is the block read from the canvas; the result is a new block to put back.
  */
 export function warpRegion(spec: WarpSpec): Uint8ClampedArray {
-  const { src, block, k, m, region, weight, margin } = spec;
+  const { src, block, k, m, region, weight, margin } = spec; const x0f = (spec.frame ?? DEFAULT_FRAME).x0;
   const { bx0, by0, BW, BH } = block; const [X0, Y0, W, H] = region;
   const [a, b, tx, c, d, ty] = m as [number, number, number, number, number, number]; const { ia, ib, ic, id } = invert(m);
   const out = new Uint8ClampedArray(src); const disp = new Float64Array(2); const rgb = new Float64Array(3);
@@ -83,7 +93,7 @@ export function warpRegion(spec: WarpSpec): Uint8ClampedArray {
     for (let x = 0; x < BW; x++) {
       const o4 = (y * BW + x) * 4;
       if (spec.onlyOpaque && src[o4 + 3]! < 250) continue;
-      const px = (x + bx0 + 0.5) / k + SRC_X - tx; const py = (y + by0 + 0.5) / k - ty;
+      const px = (x + bx0 + 0.5) / k + x0f - tx; const py = (y + by0 + 0.5) / k - ty;
       const rx = ia * px + ib * py - X0; const ry = ic * px + id * py - Y0;
       if (rx < margin || ry < margin || rx >= W - 1 || ry >= H - 1) continue;
       const wv = weight ? bilinear(weight, W, rx, ry) : 1;
@@ -92,7 +102,7 @@ export function warpRegion(spec: WarpSpec): Uint8ClampedArray {
       let r = src[o4]!; let g = src[o4 + 1]!; let bl = src[o4 + 2]!;
       if (disp[0] !== 0 || disp[1] !== 0) {
         const rx2 = rx + X0 + disp[0]!; const ry2 = ry + Y0 + disp[1]!;
-        const scx = k * (a * rx2 + b * ry2 + tx - SRC_X) - bx0 - 0.5; const scy = k * (c * rx2 + d * ry2 + ty) - by0 - 0.5;
+        const scx = k * (a * rx2 + b * ry2 + tx - x0f) - bx0 - 0.5; const scy = k * (c * rx2 + d * ry2 + ty) - by0 - 0.5;
         if (scx < 0 || scy < 0 || scx >= BW - 1 || scy >= BH - 1) continue;
         const xi = scx | 0; const yi = scy | 0; const fx = scx - xi; const fy = scy - yi;
         const q00 = (yi * BW + xi) * 4; const q10 = q00 + 4; const q01 = q00 + BW * 4; const q11 = q01 + 4;

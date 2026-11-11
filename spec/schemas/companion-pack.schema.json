@@ -10,6 +10,7 @@
     "version": {"type":"integer", "const":1},
     "id": {"type":"string", "pattern":"^[a-z][a-z0-9-]*$"},
     "name": {"type":"string", "minLength":1},
+    "source": {"type":"object", "additionalProperties":false, "required":["x0","size"], "description":"Optional frame the layer coordinates are pixels of: the visible tile is the square starting at (x0, 0) with side size. Absent means x0 224 and size 576 (the demo packs).", "properties":{"x0":{"type":"number","minimum":0},"size":{"type":"number","exclusiveMinimum":0}}},
     "tile": {"type":"object", "additionalProperties":false, "minProperties":1, "properties":{"desktop":{"type":"integer","const":480},"phone":{"type":"integer","const":320}}},
     "states": {"type":"object","additionalProperties":false,"required":["idle","listen","think","speak"],"properties":{"idle":{"$ref":"#/$defs/idle"},"listen":{"$ref":"#/$defs/clips"},"think":{"$ref":"#/$defs/clips"},"speak":{"$ref":"#/$defs/clips"}}},
     "mouth": {"$ref":"#/$defs/mouth"},

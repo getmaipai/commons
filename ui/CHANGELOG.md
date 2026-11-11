@@ -1,3 +1,7 @@
+## [ui-v0.5.595] - 2026-11-11
+
+- PACK-SOURCE-01, additive. `CompanionPackPlayer` reads the optional pack field `source: { x0, size }` once and draws every speaking layer (mouth, eyelids, head flows, emotion mix) in that frame: canvas scale is canvas width / size and x is offset by x0, and the life micro-motion scale is size / 480. Absent means `{ x0: 224, size: 576 }`, the old constants, so existing packs render identically. A pack made by the maker in a plain 480 tile declares `{ x0: 0, size: 480 }` and its mouth now lands on the face. `geometry.ts` exports `DEFAULT_FRAME` and `PackFrame`; `frameScale`, `toCanvas`, `regionBlock` and `WarpSpec` take the frame as an optional last argument. Pairs with spec-v0.1.366.
+
 ## [ui-v0.5.588] - 2026-11-10
 
 - Additive. Icon registry: `lock-open` (the Library marks an item that is locked but open right now). `ui-v0.5.587` was cut one commit early with the version still 0.5.586 and is not used.

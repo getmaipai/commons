@@ -1,5 +1,6 @@
 import { createSurface, imageData, setBlur, type Surface } from "./canvas-util";
-import { addHalfFlow, regionBlock, SRC_X, toCanvas, warpRegion } from "./geometry";
+import { addHalfFlow, DEFAULT_FRAME, regionBlock, toCanvas, warpRegion } from "./geometry";
+import type { PackFrame } from "./geometry";
 import type { Affine } from "./geometry";
 import type { MouthSet, Stat, TileMouth, WarpMouth } from "./pack-loader";
 import type { RenderProfile } from "./profile";
@@ -85,18 +86,18 @@ export function composeCartoonTile(td: Uint8ClampedArray, out: Uint8ClampedArray
   }
 }
 
-export type MouthFrame = { ctx: CanvasRenderingContext2D; k: number; m: Affine; slot: number; amt: number; profile: RenderProfile };
+export type MouthFrame = { ctx: CanvasRenderingContext2D; k: number; m: Affine; slot: number; amt: number; profile: RenderProfile; frame?: PackFrame };
 
 /** The man: his live lower face is displaced by baked flow fields; only the mouth interior is pasted. */
 export function drawWarpMouth(f: MouthFrame, set: WarpMouth, state: MouthState): boolean {
-  const { ctx, k, m, amt } = f; const weights = slotWeights(f.slot, set.base, set.ts);
+  const { ctx, k, m, amt } = f; const frame = f.frame ?? DEFAULT_FRAME; const weights = slotWeights(f.slot, set.base, set.ts);
   if (!weights.length || amt <= 0.01) return false;
-  const { width, height } = ctx.canvas; const region = set.region; const block = regionBlock(m, region, k, width, height, 2);
+  const { width, height } = ctx.canvas; const region = set.region; const block = regionBlock(m, region, k, width, height, 2, frame);
   if (block.BW < 4 || block.BH < 4) return false;
   const [hw, hh] = set.flowHalf; const plane = hh * hw * 2; const scale = (1 / set.flowScale) * amt;
   const src = ctx.getImageData(block.bx0, block.by0, block.BW, block.BH);
   const warped = warpRegion({
-    src: src.data, block, k, m, region, weight: set.weight, margin: 1,
+    src: src.data, block, k, m, region, weight: set.weight, margin: 1, frame,
     displace(rx, ry, wv, d) {
       for (const [shape, w] of weights) addHalfFlow(set.flow, plane, shape, hw, hh, rx, ry, w, d);
       d[0]! *= scale * wv; d[1]! *= scale * wv;
@@ -104,7 +105,7 @@ export function drawWarpMouth(f: MouthFrame, set: WarpMouth, state: MouthState):
   });
   const [a, b, tx, c, d, ty] = m as [number, number, number, number, number, number];
   const mapTile = (x: number, y: number): [number, number] => {
-    const [cx, cy] = toCanvas(m, k, set.tx + x, set.ty + y);
+    const [cx, cy] = toCanvas(m, k, set.tx + x, set.ty + y, frame);
     return [cx - block.bx0, cy - block.by0];
   };
   const ring = sampleOffsets(src.data, block.BW, block.BH, set.ring, set.rest.data, set.tw, mapTile, 12, false);
@@ -115,7 +116,7 @@ export function drawWarpMouth(f: MouthFrame, set: WarpMouth, state: MouthState):
   scratchFor(state, set.tw, set.th);
   composeWarpTile(tilePixels(set.atlas, set.cols, set.tw, set.th, f.slot, state.pixels!), state.out!, h, f.profile.hi, amt);
   state.tile!.ctx.putImageData(imageData(state.out!, set.tw, set.th), 0, 0);
-  ctx.setTransform(k * a, k * c, k * b, k * d, k * (tx - SRC_X), k * ty);
+  ctx.setTransform(k * a, k * c, k * b, k * d, k * (tx - frame.x0), k * ty);
   setBlur(ctx, f.profile.blur); ctx.drawImage(state.tile!.canvas, set.tx, set.ty); setBlur(ctx, 0);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   return true;
@@ -123,14 +124,14 @@ export function drawWarpMouth(f: MouthFrame, set: WarpMouth, state: MouthState):
 
 /** Claymation and Pixar: the whole lower-face tile for the chosen shape is pasted over the live face. */
 export function drawTileMouth(f: MouthFrame, set: TileMouth, state: MouthState): boolean {
-  const { ctx, k, m, amt } = f;
+  const { ctx, k, m, amt } = f; const frame = f.frame ?? DEFAULT_FRAME;
   if (amt <= 0.01) return false;
   const [bx, by] = set.box; const TW = set.tw; const TH = set.th; const { width, height } = ctx.canvas;
-  const block = regionBlock(m, [bx, by, TW, TH], k, width, height, 1);
+  const block = regionBlock(m, [bx, by, TW, TH], k, width, height, 1, frame);
   if (block.BW < 4 || block.BH < 4) return false;
   const [a, b, tx, c, d, ty] = m as [number, number, number, number, number, number];
   const mapTile = (x: number, y: number): [number, number] => {
-    const [cx, cy] = toCanvas(m, k, bx + x, by + y);
+    const [cx, cy] = toCanvas(m, k, bx + x, by + y, frame);
     return [cx - block.bx0, cy - block.by0];
   };
   const live = ctx.getImageData(block.bx0, block.by0, block.BW, block.BH).data;
@@ -141,7 +142,7 @@ export function drawTileMouth(f: MouthFrame, set: TileMouth, state: MouthState):
   scratchFor(state, TW, TH);
   composeCartoonTile(tilePixels(set.atlas, set.cols, TW, TH, f.slot, state.pixels!), state.out!, set.mask, set.coreRef.mean, h, f.profile.hi);
   state.tile!.ctx.putImageData(imageData(state.out!, TW, TH), 0, 0);
-  ctx.setTransform(k * a, k * c, k * b, k * d, k * (tx - SRC_X), k * ty);
+  ctx.setTransform(k * a, k * c, k * b, k * d, k * (tx - frame.x0), k * ty);
   setBlur(ctx, f.profile.blur); ctx.globalAlpha = Math.min(1, f.amt); ctx.drawImage(state.tile!.canvas, bx, by);
   ctx.globalAlpha = 1; setBlur(ctx, 0); ctx.setTransform(1, 0, 0, 1, 0, 0);
   return true;
