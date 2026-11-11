@@ -4272,6 +4272,20 @@
     ]
   },
   {
+    "key": "voice.speculative_start",
+    "scope": "household",
+    "selector": "boolean",
+    "default": false,
+    "label": "Start answering early",
+    "help": "While you are still finishing a sentence, Home begins working out its answer from what it has heard so far. If the words change, the early start is thrown away and nothing is kept. Adults only. Off until it is measured.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_advanced",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "voice.wakeword.enabled",
     "scope": "device",
     "selector": "boolean",
