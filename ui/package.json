@@ -1,6 +1,6 @@
 {
   "name": "@maipai/ui",
-  "version": "0.5.588",
+  "version": "0.5.589",
   "private": true,
   "description": "MaiPai's shell contract and kit: tokens, layout primitives, settings and permission renderers, pattern components. See ../docs/dev.md.",
   "license": "AGPL-3.0",
@@ -8,6 +8,7 @@
   "scripts": {
     "test": "bun test",
     "gen:ease": "bun scripts/gen-ease-tokens.ts",
+    "gen:looks": "bun scripts/gen-looks.ts",
     "lint": "tsc --noEmit && eslint src",
     "i18n:extract": "lingui extract --clean",
     "i18n:compile": "lingui compile --typescript"

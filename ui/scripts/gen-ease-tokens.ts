@@ -32,10 +32,14 @@ type Presets = { values: {
 const px = (n: number) => `${Math.round(n * 100) / 100}px`;
 
 export function stripBlock(css: string): string {
-  const a = css.indexOf(BEGIN);
-  if (a < 0) return css;
-  const b = css.indexOf(END, a);
-  return (css.slice(0, a) + css.slice(b + END.length)).replace(/\n+$/, "\n");
+  let base = css;
+  while (base.includes(BEGIN)) {
+    const a = base.indexOf(BEGIN);
+    const b = base.indexOf(END, a);
+    if (b < 0) throw new Error("EASE-GENERATED block has no END marker");
+    base = base.slice(0, a) + base.slice(b + END.length);
+  }
+  return base.replace(/\n+$/, "\n");
 }
 
 export function renderEaseBlock(presets: Presets, css: string): string {
@@ -76,11 +80,12 @@ export function renderEaseBlock(presets: Presets, css: string): string {
     out.push(`@media (max-width: 719.98px) {\n  html[data-ease-text="${name}"] body {\n${phoneLines.join("\n")}\n  }\n}`);
   }
 
-  out.push("/* Spacing: Tailwind's spacing unit (0.25rem). */");
+  out.push("/* Spacing: Tailwind's spacing unit (0.25rem); density and ease compose independently. */");
+  out.push("html { --ease-spacing-scale: 1; }");
   for (const [name, { scale }] of Object.entries(v.spacing)) {
-    if (scale === 1) continue;
-    out.push(`html[data-ease-spacing="${name}"] {\n  --spacing: ${Math.round(0.25 * scale * 10000) / 10000}rem;\n}`);
+    out.push(`html[data-ease-spacing="${name}"] { --ease-spacing-scale: ${scale}; }`);
   }
+  out.push("body {\n  --spacing: calc(0.25rem * var(--density-scale, 1) * var(--ease-spacing-scale, 1));\n  --sidebar-row-height: calc(40px * var(--density-scale, 1) * var(--ease-spacing-scale, 1));\n  --aui-thread-list-item-min-height: max(48px, calc(48px * var(--density-scale, 1) * var(--ease-spacing-scale, 1)));\n}");
 
   out.push("/* Contrast: secondary text moves toward the page's strongest text color. */");
   for (const [name, { ratio }] of Object.entries(v.contrast)) {
@@ -102,6 +107,10 @@ export function renderEaseBlock(presets: Presets, css: string): string {
 export function render(): string {
   const presets = JSON.parse(readFileSync(PRESETS_PATH, "utf8")) as Presets;
   const css = readFileSync(TOKENS_PATH, "utf8");
+  return stripBlock(css).replace(/\n*$/, "\n\n") + renderEaseBlock(presets, css) + "\n";
+}
+
+export function generateFrom(css: string, presets: Presets): string {
   return stripBlock(css).replace(/\n*$/, "\n\n") + renderEaseBlock(presets, css) + "\n";
 }
 

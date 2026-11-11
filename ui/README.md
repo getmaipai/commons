@@ -67,3 +67,6 @@ A consumer adds `"@maipai/ui": "file:../../shared/ui"` to its `package.json` (ad
 **Cutting a tag is two edits, not one** (found live, ui-v0.5.21: cut with the tag name bumped but `package.json`'s own `"version"` field left at the old value - a consumer's `check.sh` refused it immediately, correctly, since the two are meant to agree; the tag was deleted rather than patched, since nothing had a working pin to it yet). `ui-vX.Y.Z` and `package.json`'s `"version": "X.Y.Z"` move together, in the same commit, every time - check `git show <tag> -- package.json` before pushing a tag if there's any doubt.
 **Player voiceover.** `Player`'s optional `voiceover` prop plays a spoken audio line over music, with an independent volume, trigger time, and optional first-lyric cutoff. See `PlayerVoiceover` in `src/primitives/Player.tsx` for its TypeScript contract.
 Schema player hosts can supply that line with `MediaHost.voiceoverFor(item)` when they own the item's media element.
+# Look bundles
+
+Non-color styling bundles live in `../spec/ui/looks.json`. Map each Look to a bundle there, then run `bun run gen:looks` from this directory to refresh the marked token block in `src/tokens.css`.

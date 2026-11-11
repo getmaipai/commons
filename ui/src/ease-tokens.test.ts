@@ -38,10 +38,20 @@ describe("ease tokens", () => {
   test("every text size, spacing, targets and motion value in presets.json has a block", () => {
     for (const k of Object.keys(presets.values.text_size)) expect(css).toContain(`html[data-ease-text="${k}"]`)
     for (const [k, { scale }] of Object.entries(presets.values.spacing) as [string, { scale: number }][]) if (scale !== 1) expect(css).toContain(`html[data-ease-spacing="${k}"]`)
+    for (const k of Object.keys(presets.values.spacing)) {
+      const selector = `html[data-ease-spacing="${k}"]`
+      expect(css.match(new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).toHaveLength(1)
+    }
     for (const [k, { min_px }] of Object.entries(presets.values.targets) as [string, { min_px: number }][]) {
       if (min_px > 48) expect(block(`html[data-ease-targets="${k}"]`)).toContain(`--target-min: ${min_px}px`)
     }
     expect(css).toContain('html[data-ease-motion="calm"]')
+  })
+
+  test("spacing is composed once and owned by ease", () => {
+    const generated = css.slice(css.indexOf("EASE-GENERATED:BEGIN"), css.indexOf("EASE-GENERATED:END"))
+    expect(generated.match(/--spacing\s*:/g) ?? []).toHaveLength(1)
+    expect(generated.match(/body\s*\{\s*--spacing\s*:/g) ?? []).toHaveLength(1)
   })
 
   test("text size scales the root and the px type tokens by the record's scale", () => {
