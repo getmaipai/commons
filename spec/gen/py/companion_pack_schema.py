@@ -72,6 +72,15 @@ class Gain(RootModel[confloat(ge=0.0, le=4.0)]):
     root: confloat(ge=0.0, le=4.0)
 
 
+class Gesture(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        regex_engine="python-re",
+    )
+    kind: Literal['nod', 'tilt', 'glance', 'settle']
+    amp: Literal[1, 2, 3]
+
+
 class Rest(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -96,6 +105,7 @@ class Clip(BaseModel):
     trackFile: constr(pattern=r'^(?!/)(?!.*\.\.)(?!.*\.webm$).+\.json$')
     encoding: Literal['stacked-alpha-h264']
     weight: confloat(ge=0.0) | None = None
+    gesture: Gesture | None = None
 
 
 class Clips(RootModel[list[Clip]]):
