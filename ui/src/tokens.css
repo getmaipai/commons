@@ -1827,11 +1827,11 @@ body {
    * when a caller opts into these utility names; their tokens are gated below. */
   --text-title: var(--font-size-title);
   --text-title--line-height: var(--line-height-title);
-  --text-title--font-weight: var(--look-weight-title, inherit);
+  --text-title--font-weight: var(--look-weight-title, var(--font-weight-title));
   --text-title--letter-spacing: var(--look-tracking-title, inherit);
   --text-section: var(--font-size-section);
   --text-section--line-height: var(--line-height-title);
-  --text-section--font-weight: var(--look-weight-section, inherit);
+  --text-section--font-weight: var(--look-weight-section, var(--font-weight-section));
   --text-section--letter-spacing: var(--look-tracking-section, inherit);
   --text-row: var(--font-size-row);
   --text-row--line-height: var(--line-height-body);
@@ -1843,7 +1843,7 @@ body {
   --text-badge--line-height: var(--line-height-body);
   --text-hero: var(--font-size-hero);
   --text-hero--line-height: var(--line-height-title);
-  --text-hero--font-weight: var(--look-weight-hero, inherit);
+  --text-hero--font-weight: var(--look-weight-hero, var(--font-weight-title));
   --text-hero--letter-spacing: var(--look-tracking-hero, inherit);
   --color-background: var(--background);
   --color-subtle-foreground: var(--subtle-foreground);

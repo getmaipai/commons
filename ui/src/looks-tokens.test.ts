@@ -36,9 +36,9 @@ describe("Look bundles", () => {
   });
   test("semantic text utilities defer weight and tracking to Look tokens", () => {
     for (const declaration of [
-      "--text-title--font-weight: var(--look-weight-title, inherit)", "--text-title--letter-spacing: var(--look-tracking-title, inherit)",
-      "--text-hero--font-weight: var(--look-weight-hero, inherit)", "--text-hero--letter-spacing: var(--look-tracking-hero, inherit)",
-      "--text-section--font-weight: var(--look-weight-section, inherit)", "--text-section--letter-spacing: var(--look-tracking-section, inherit)",
+      "--text-title--font-weight: var(--look-weight-title, var(--font-weight-title))", "--text-title--letter-spacing: var(--look-tracking-title, inherit)",
+      "--text-hero--font-weight: var(--look-weight-hero, var(--font-weight-title))", "--text-hero--letter-spacing: var(--look-tracking-hero, inherit)",
+      "--text-section--font-weight: var(--look-weight-section, var(--font-weight-section))", "--text-section--letter-spacing: var(--look-tracking-section, inherit)",
     ]) expect(css).toContain(declaration);
   });
   test("all looks retain type and touch target floors at standard and large ease settings", () => {
