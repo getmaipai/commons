@@ -67,3 +67,44 @@ describe("PRO-LOOK labelled rail variant", () => {
     expect(chat.className).toContain("rounded-2xl");
   });
 });
+
+describe("grouped expanding AppRail", () => {
+  const items = [
+    { id: "home", label: "Home", icon: "house", href: "/" },
+    { id: "chat", label: "Chat", icon: "message-circle", href: "/chat", group: "work" },
+    { id: "media", label: "Media", icon: "film", href: "/media", group: "create" },
+    { id: "settings", label: "Settings", icon: "settings", href: "/settings", group: "manage" },
+  ];
+  const groups = [{ id: "default" }, { id: "work", label: "Work" }, { id: "create", label: "Create" }, { id: "manage", label: "Manage" }];
+  const groupedRail = (props: React.ComponentProps<typeof AppRail> = {}) => render(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail items={items} groups={groups} {...props} /></TooltipProvider></MemoryRouter>);
+
+  test("collapsed default preserves 56px icon rail and labels become visible when expanded", () => {
+    const view = groupedRail();
+    const nav = view.container.querySelector('[data-slot="app-rail"]');
+    expect(nav?.getAttribute("data-expanded")).toBe("false");
+    expect(nav?.getAttribute("style")).toContain("56px");
+    expect(view.getByRole("link", { name: "Chat" }).className).toContain("min-h-12");
+    fireEvent.click(view.getByRole("button", { name: "Show sidebar" }));
+    expect(view.container.querySelector('[data-slot="app-rail"]')?.getAttribute("data-expanded")).toBe("true");
+    expect(view.getByText("Work")).toBeTruthy();
+    expect(view.getByText("Create")).toBeTruthy();
+  });
+
+  test("groups show separators only between nonempty groups and fold callback receives state", () => {
+    const changed: boolean[] = [];
+    const view = groupedRail({ expanded: true, onExpandedChange: (value) => changed.push(value), groups: [...groups, { id: "empty", label: "Empty" }] });
+    const sections = [...view.container.querySelectorAll("[data-rail-group]")];
+    expect(sections).toHaveLength(4);
+    expect(sections.filter((section) => section.className.includes("border-t"))).toHaveLength(3);
+    fireEvent.click(view.getByRole("button", { name: "Hide sidebar" }));
+    expect(changed).toEqual([false]);
+  });
+
+  test("autoCollapse overrides expanded, has reduced-motion class and context back", () => {
+    const back = () => {};
+    const view = groupedRail({ expanded: true, autoCollapse: true, context: { title: "Chat modes", items, onBack: back } });
+    expect(view.container.querySelector('[data-slot="app-rail"]')?.getAttribute("data-expanded")).toBe("false");
+    expect(view.container.querySelector('[data-slot="app-rail"]')?.className).toContain("motion-reduce:transition-none");
+    expect(view.getByRole("button", { name: "Show sidebar" })).toBeTruthy();
+  });
+});

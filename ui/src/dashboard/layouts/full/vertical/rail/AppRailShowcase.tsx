@@ -8,7 +8,12 @@ export default function AppRailShowcase() {
     <MemoryRouter initialEntries={["/media"]}>
       <TooltipProvider>
         <div className="h-96 overflow-hidden rounded-lg border border-border">
-          <AppRail coreDestinations={[{ name: "Media", url: "/media", icon: "film" }]} />
+          <AppRail expanded items={[
+            { id: "home", label: "Home", icon: "house", href: "/" },
+            { id: "chat", label: "Chat", icon: "message-circle", href: "/chat", group: "work" },
+            { id: "media", label: "Media", icon: "film", href: "/media", group: "create" },
+            { id: "settings", label: "Settings", icon: "settings", href: "/settings", group: "manage" },
+          ]} groups={[{ id: "default" }, { id: "work", label: "Work" }, { id: "create", label: "Create" }, { id: "manage", label: "Manage" }]} />
         </div>
       </TooltipProvider>
     </MemoryRouter>

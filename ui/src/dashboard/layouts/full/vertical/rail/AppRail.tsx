@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { i18n } from "@/kit/i18n"
-import { Pin, PinOff } from "lucide-react";
+import { Pin, PinOff, PanelLeftClose, PanelLeftOpen, ArrowLeft } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import LogoIcon from "../../../../assets/images/logos/logoicon.svg";
 import LogoIconDark from "../../../../assets/images/logos/logoicon-dark.svg";
@@ -34,10 +34,26 @@ export interface RailCoreDestination {
   icon: string;
 }
 
+export interface AppRailItem {
+  id: string;
+  label: string;
+  icon: string | React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  href: string;
+  group?: string;
+}
+export interface AppRailGroup { id: string; label?: string }
+export interface AppRailContext { title?: string; items: AppRailItem[]; onBack: () => void }
+
 /** @deprecated Pinned apps now scroll in the rail; there is no cap. */
 export const RAIL_APPS_MAX = 6;
 
 export interface AppRailProps {
+  items?: AppRailItem[];
+  groups?: AppRailGroup[];
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
+  autoCollapse?: boolean;
+  context?: AppRailContext;
   /** Optional labelled destinations; defaults to the compact icon-only rail. */
   variant?: "icons" | "labelled";
   tourId?: string;
@@ -336,10 +352,49 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
 }
 
 export default function AppRail(props: AppRailProps) {
+  const { pathname } = useLocation();
   const labelled = props.variant === "labelled";
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const expanded = props.autoCollapse ? false : (props.expanded ?? internalExpanded);
+  const grouped = props.items !== undefined;
+  const toggleExpanded = () => {
+    const next = !expanded;
+    if (props.expanded === undefined) setInternalExpanded(next);
+    props.onExpandedChange?.(next);
+  };
+  const Icon = (item: AppRailItem) => typeof item.icon === "string" ? getIcon(item.icon) : item.icon;
+  const reducedMotion = "motion-reduce:transition-none";
+  const groupedItems = props.context?.items ?? props.items ?? [];
+  const groups = props.groups ?? [];
+  const groupIds = [...new Set([...groups.map((group) => group.id), ...groupedItems.map((item) => item.group ?? "default")])];
+  const groupLabel = (id: string) => groups.find((group) => group.id === id)?.label;
+  const expandedHeader = expanded && grouped ? (
+    <div className="flex w-full shrink-0 items-center justify-between gap-1">
+      <Link to="/" aria-label="MaiPai Home" className="flex size-12 items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-ring">{<img src={LogoIcon} alt="" className="size-7 dark:hidden" />}<img src={LogoIconDark} alt="" className="hidden size-7 dark:block" /></Link>
+      {props.context ? <div className="flex min-w-0 flex-1 items-center gap-1"><button type="button" aria-label={i18n._({ id: "ui.Back", message: "Back" })} onClick={props.context.onBack} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><ArrowLeft aria-hidden className="size-5" /></button>{props.context.title ? <span className="truncate text-sm font-medium">{props.context.title}</span> : null}</div> : null}
+      <button type="button" aria-label={i18n._({ id: "ui.Hide sidebar", message: "Hide sidebar" })} onClick={toggleExpanded} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftClose aria-hidden className="size-5" /></button>
+    </div>
+  ) : grouped ? <div className="flex w-full shrink-0 justify-center"><button type="button" aria-label={i18n._({ id: "ui.Show sidebar", message: "Show sidebar" })} onClick={toggleExpanded} className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftOpen aria-hidden className="size-5" /></button></div> : null;
+  const groupedNavigation = grouped ? <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto">
+    {groupIds.map((id, index) => {
+      const groupItems = groupedItems.filter((item) => (item.group ?? "default") === id);
+      if (!groupItems.length) return null;
+      return <section key={id} data-rail-group={id} className={cn(index > 0 && "mt-2 border-t border-border pt-2")}>
+        {expanded && index > 0 && groupLabel(id) ? <h2 className="px-3 pb-1 text-xs font-medium normal-case text-muted-foreground" data-slot="app-rail-group-label">{groupLabel(id)}</h2> : null}
+        <ul className="flex w-full flex-col gap-0.5">{groupItems.map((item) => {
+          const ItemIcon = Icon(item);
+          const active = isRailItemActive(pathname, item.href);
+          return <li key={item.id}><Link to={railHref(item.href)} aria-label={item.label} aria-current={active ? "page" : undefined} data-slot="app-rail-item" className={cn("flex min-h-12 w-full min-w-0 items-center gap-3 rounded-lg px-3 text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", expanded && "h-[calc(36px*var(--density-scale,1))] min-h-12", active && "bg-[var(--nav-active-bg,var(--surface-2))] text-foreground")}>
+            {ItemIcon ? <ItemIcon className="size-5 shrink-0" aria-hidden /> : null}<span className={cn("min-w-0 truncate whitespace-nowrap text-sm transition-opacity duration-200 ease-out", reducedMotion, expanded ? "opacity-100" : "w-0 overflow-hidden opacity-0")} aria-hidden={!expanded}>{item.label}</span>
+          </Link></li>;
+        })}</ul>
+      </section>;
+    })}
+  </div> : null;
   return <nav aria-label={i18n._({ id: "ui.Primary navigation", message: "Primary navigation" })} data-slot="app-rail" data-tour={props.tourId}
-    style={{ "--rail-icon-size": "20px", "--rail-width-labelled": "80px", ...(labelled ? { width: "var(--rail-width-labelled)", minWidth: "var(--rail-width-labelled)", maxWidth: "var(--rail-width-labelled)" } : {}) } as React.CSSProperties}
-    className={cn("sticky top-0 flex h-svh min-h-0 shrink-0 flex-col items-center gap-1 bg-[color:var(--app-rail-bg,var(--sidebar))] p-2", labelled ? "w-[var(--rail-width-labelled)] min-w-[var(--rail-width-labelled)] max-w-[var(--rail-width-labelled)]" : "w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)]")}>
-    <RailEntries {...props} />
+    data-expanded={expanded ? "true" : "false"} data-auto-collapse={props.autoCollapse ? "true" : undefined}
+    style={{ "--rail-icon-size": "20px", "--rail-width-labelled": "80px", ...(grouped ? { width: expanded ? "240px" : "var(--rail-width,56px)", minWidth: expanded ? "240px" : "var(--rail-width,56px)", maxWidth: expanded ? "240px" : "var(--rail-width,56px)" } : labelled ? { width: "var(--rail-width-labelled)", minWidth: "var(--rail-width-labelled)", maxWidth: "var(--rail-width-labelled)" } : {}) } as React.CSSProperties}
+    className={cn("sticky top-0 flex h-svh min-h-0 shrink-0 flex-col gap-1 overflow-hidden bg-[color:var(--app-rail-bg,var(--sidebar))] p-2", grouped ? "items-stretch transition-[width,min-width,max-width] duration-200 ease-out motion-reduce:transition-none [[html[data-ease-motion=calm]_&]]:duration-0" : "items-center", labelled ? "w-[var(--rail-width-labelled)] min-w-[var(--rail-width-labelled)] max-w-[var(--rail-width-labelled)]" : !grouped ? "w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)]" : "")}>
+    {grouped ? <>{expandedHeader}{groupedNavigation}<div className="mt-auto flex w-full shrink-0 justify-center">{props.profile}</div></> : <RailEntries {...props} />}
   </nav>;
 }
