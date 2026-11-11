@@ -1,3 +1,7 @@
+## [ui-v0.5.601] - 2026-11-11
+
+- PACK-GESTURE-01, additive. Add the standalone `synth-motion` module for pitch accent analysis and gesture clip selection; the ordinary clip sequencer skips gesture clips.
+
 ## [ui-v0.5.595] - 2026-11-11
 
 - PACK-SOURCE-01, additive. `CompanionPackPlayer` reads the optional pack field `source: { x0, size }` once and draws every speaking layer (mouth, eyelids, head flows, emotion mix) in that frame: canvas scale is canvas width / size and x is offset by x0, and the life micro-motion scale is size / 480. Absent means `{ x0: 224, size: 576 }`, the old constants, so existing packs render identically. A pack made by the maker in a plain 480 tile declares `{ x0: 0, size: 480 }` and its mouth now lands on the face. `geometry.ts` exports `DEFAULT_FRAME` and `PackFrame`; `frameScale`, `toCanvas`, `regionBlock` and `WarpSpec` take the frame as an optional last argument. Pairs with spec-v0.1.366.

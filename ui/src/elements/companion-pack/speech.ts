@@ -15,6 +15,9 @@ export type SpeechInput = {
   emotion?: EmotionName | "auto" | "none" | null;
   voiceMode?: VoiceMode;
   clock: () => number;
+  /** Optional decoded mono reply audio, used only by synth-motion. */
+  samples?: Float32Array;
+  sampleRate?: number;
   /** 100 Hz normalised voice envelope, used by the life planners (the loudness track is used when absent). */
   envelope?: Float32Array;
   text?: string;

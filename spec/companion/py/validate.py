@@ -37,6 +37,8 @@ def validate_companion_pack(
     else:
         problems.extend(_validate_voice(pack, files))
     for state, clips in pack.get("states", {}).items():
+        if clips and not any("gesture" not in clip for clip in clips):
+            problems.append(f"states.{state} needs at least one ordinary clip; add a clip without gesture.")
         rates = [clip["fps"] for clip in clips]
         if rates and max(rates) - min(rates) > 1:
             problems.append(
@@ -45,6 +47,8 @@ def validate_companion_pack(
         paths: set[str] = set()
         for index, clip in enumerate(clips):
             field = f"states.{state}[{index}]"
+            if "gesture" in clip and (clip["rest"]["first"] != 0 or clip["rest"]["last"] != clip["frames"] - 1):
+                problems.append(f"{field}.gesture must start and end on the rest pose; set rest.first to 0 and rest.last to frames - 1.")
             if clip["id"] in seen:
                 problems.append(
                     f"{field}.id repeats clip id {clip['id']}; give every clip a unique id."

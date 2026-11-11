@@ -58,6 +58,13 @@ export const CompanionPack = z
                   ),
                 encoding: z.literal("stacked-alpha-h264"),
                 weight: z.number().gte(0).optional(),
+                gesture: z
+                  .object({
+                    kind: z.enum(["nod", "tilt", "glance", "settle"]),
+                    amp: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+                  })
+                  .strict()
+                  .optional(),
               })
               .strict(),
           )
@@ -95,6 +102,13 @@ export const CompanionPack = z
                   ),
                 encoding: z.literal("stacked-alpha-h264"),
                 weight: z.number().gte(0).optional(),
+                gesture: z
+                  .object({
+                    kind: z.enum(["nod", "tilt", "glance", "settle"]),
+                    amp: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+                  })
+                  .strict()
+                  .optional(),
               })
               .strict(),
           )
@@ -132,6 +146,13 @@ export const CompanionPack = z
                   ),
                 encoding: z.literal("stacked-alpha-h264"),
                 weight: z.number().gte(0).optional(),
+                gesture: z
+                  .object({
+                    kind: z.enum(["nod", "tilt", "glance", "settle"]),
+                    amp: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+                  })
+                  .strict()
+                  .optional(),
               })
               .strict(),
           )
@@ -169,6 +190,13 @@ export const CompanionPack = z
                   ),
                 encoding: z.literal("stacked-alpha-h264"),
                 weight: z.number().gte(0).optional(),
+                gesture: z
+                  .object({
+                    kind: z.enum(["nod", "tilt", "glance", "settle"]),
+                    amp: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+                  })
+                  .strict()
+                  .optional(),
               })
               .strict(),
           )

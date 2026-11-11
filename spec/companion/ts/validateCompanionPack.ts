@@ -21,6 +21,7 @@ export function validateCompanionPack(pack: CompanionPack, files?: CompanionPack
   if (pack.voice) problems.push(...validateVoice(pack, files));
 
   for (const [state, clips] of Object.entries(pack.states ?? {})) {
+    if (clips.length && !clips.some((clip) => !clip.gesture)) problems.push(`states.${state} needs at least one ordinary clip; add a clip without gesture.`);
     const fps = clips.map((clip) => clip.fps);
     const paths = new Set<string>();
     if (fps.length > 1 && Math.max(...fps) - Math.min(...fps) > 1) {
@@ -28,6 +29,7 @@ export function validateCompanionPack(pack: CompanionPack, files?: CompanionPack
     }
     for (const [index, clip] of clips.entries()) {
       const field = `states.${state}[${index}]`;
+      if (clip.gesture && (clip.rest.first !== 0 || clip.rest.last !== clip.frames - 1)) problems.push(`${field}.gesture must start and end on the rest pose; set rest.first to 0 and rest.last to frames - 1.`);
       if (ids.has(clip.id)) problems.push(`${field}.id repeats clip id ${clip.id}; give every clip a unique id.`);
       ids.add(clip.id);
       if (paths.has(clip.file)) problems.push(`${field}.file repeats a file in states.${state}; give each clip in a state its own file.`);

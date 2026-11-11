@@ -6,6 +6,7 @@ import { createSequencer, planSwitch, restHoldMs } from "./sequencer";
 import { stackedAlphaRendererFactory, type StackedAlphaRenderer } from "./stacked-alpha";
 import type { CompanionPackData, PackClip, PackState, PlayerFrame, PlayerLayer, PlayerTier } from "./types";
 import { StillPartsPlayer } from "./voice-player";
+import { createGestureScheduler, pitchAccents } from "../synth-motion/index";
 
 type VideoPackData = CompanionPackData & { states: Record<PackState, PackClip[]> };
 export type CompanionPackPlayerProps = {
@@ -122,6 +123,13 @@ function VideoPackPlayer({
 
     const clips: LoadedClip[] = [];
     const sequencer = createSequencer(pack.states, seedRef.current);
+    const gesturesOf = (state: PackState) => (pack.states[state] ?? []).filter((clip) => clip.gesture).map((clip) => ({ id: clip.id, kind: clip.gesture!.kind, amp: clip.gesture!.amp, frames: clip.frames, fps: clip.fps, weight: clip.weight }));
+    const gestureClips = gesturesOf("speak");
+    const idleGestureClips = gesturesOf("idle");
+    const gestureScheduler = createGestureScheduler({ rng: Math.random, clock: () => { try { return speechRef.current?.clock() ?? 0; } catch { return 0; } }, clips: gestureClips });
+    // Idle gestures are spaced in wall-clock milliseconds, not on the speech clock.
+    const idleGestureScheduler = createGestureScheduler({ rng: Math.random, clock: () => performance.now(), clips: idleGestureClips });
+    let gestureQueue: { at: number; clipId: string }[] = [];
     let active: LoadedClip | undefined;
     let pending: PendingSwitch | undefined;
     let raf = 0;
@@ -237,6 +245,15 @@ function VideoPackPlayer({
       if (!hidden && !pausedRef.current) void item.video.play().catch(() => undefined);
       settledRef.current?.(clipState, item.clip.id);
     };
+    const playGesture = (clipId: string) => {
+      if (reducedMotion || hidden || isPaused || document.hidden) return;
+      const item = readyFor(stateRef.current).find((entry) => entry.clip.id === clipId);
+      if (!item || !active) return;
+      const frame = Math.round(active.video.currentTime * active.clip.fps);
+      const plan = planSwitch({ frame, clip: active.clip, nextClip: item.clip, fps: active.clip.fps, urgent: true });
+      pending = { item, state: stateRef.current, untilFrame: plan.untilFrame };
+      active.video.playbackRate = plan.speedUp;
+    };
     const requestChange = (nextState: PackState) => {
       requestedState = nextState;
       pending = undefined;
@@ -263,6 +280,14 @@ function VideoPackPlayer({
     };
     const drawFrame = (now: number) => {
       if (!active || !renderer.gl) return;
+      if (stateRef.current === "speak" && !reducedMotion && !hidden && !isPaused) {
+        const audioTime = speechRef.current?.clock() ?? 0;
+        const due = gestureQueue.findIndex((entry) => entry.at <= audioTime);
+        if (due >= 0) { const [entry] = gestureQueue.splice(due, 1); if (entry) playGesture(entry.clipId); }
+      } else if (stateRef.current === "idle" && idleGestureClips.length && !reducedMotion && !hidden && !isPaused && !pending) {
+        const [idle] = idleGestureScheduler.plan([], { speaking: false });
+        if (idle) playGesture(idle.clipId);
+      }
       const video = active.video;
       const frameIndex = Math.round(video.currentTime * active.clip.fps);
       const hasNewFrame = video.currentTime !== lastVideoTime || frameArrived;
@@ -355,7 +380,13 @@ function VideoPackPlayer({
           if (!raf) raf = window.requestAnimationFrame(tick);
         }
       },
-      setSpeech(line) { startSpeech(line); },
+      setSpeech(line) {
+        startSpeech(line);
+        if (!line || stateRef.current !== "speak" || reducedMotion || pausedRef.current || document.hidden || !line.samples || !line.sampleRate || !gestureClips.length) { gestureQueue = []; return; }
+        const now = speechRef.current?.clock() ?? 0;
+        // A new sentence replans the whole reply: keep only gestures still ahead of the audio clock.
+        gestureQueue = gestureScheduler.plan(pitchAccents(line.samples, line.sampleRate), { speaking: true }).filter((entry) => entry.at > now + 0.05);
+      },
       setLayers(nextLayers) {
         const nextSet = new Set(nextLayers);
         layersToDispose.forEach((layer) => { if (!nextSet.has(layer)) layer.dispose?.(); });
@@ -376,7 +407,7 @@ function VideoPackPlayer({
       renderer.dispose();
       controllerRef.current = null;
     };
-  }, [pack, baseUrl, staticMode, tier]);
+  }, [pack, baseUrl, staticMode, tier, reducedMotion]);
 
   useEffect(() => {
     controllerRef.current?.setState(state);

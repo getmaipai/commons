@@ -1,3 +1,7 @@
+## [spec-v0.1.369] - 2026-11-11
+
+- PACK-GESTURE-01, additive. Companion pack clips may declare `gesture: { kind, amp }`; gesture clips must cover the full rest pose, and each state keeps an ordinary clip for its loop.
+
 ## [spec-v0.1.368] - 2026-11-11
 
 - STT-SMARTTURN-01, additive. Settings registry gains `voice.speculative_start` (household, boolean, default off, advanced, honoured by home). spec-v0.1.367 carried the key but its package version still read 0.1.366, so the tag was cut against the wrong version; use this tag.
@@ -1788,4 +1792,3 @@ Additive throughout; every existing fixture still validates unchanged.
 ## [spec-v0.1.345] - 2026-11-08
 
 - WEATHER-PRECIP-01: weather cards gain optional precipitation units, 15-minute amounts and hourly and daily rain amounts; existing cards remain valid.
-

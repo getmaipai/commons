@@ -23,7 +23,7 @@ export function createSequencer(states: PackStates, seed = 1) {
   const previous = new Map<PackState, string>();
   return {
     next(state: PackState): PackClip | undefined {
-      const clips = states[state] ?? [];
+      const clips = (states[state] ?? []).filter((clip) => !clip.gesture);
       if (!clips.length) return undefined;
       let choices = clips;
       const last = previous.get(state);

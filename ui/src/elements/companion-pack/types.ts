@@ -1,6 +1,7 @@
 import type { VoiceLayerData } from "./voice-layer";
 /** Clip data follows spec/gen/ts/companion-pack.ts; player needs only these fields. */
 export type PackState = "idle" | "listen" | "think" | "speak";
+export type GestureKind = "nod" | "tilt" | "glance" | "settle";
 export type PackClip = {
   id: string;
   file: string;
@@ -9,6 +10,7 @@ export type PackClip = {
   frames: number;
   rest: { first: number; last: number };
   weight?: number;
+  gesture?: { kind: GestureKind; amp: 1 | 2 | 3 };
   /** Per-frame head track (clips/<name>.track.json: affines `m` and a residual `res`), relative to the pack folder. */
   trackFile?: string;
 };
