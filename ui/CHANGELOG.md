@@ -1,3 +1,7 @@
+## [ui-v0.5.588] - 2026-11-10
+
+- Additive. Icon registry: `lock-open` (the Library marks an item that is locked but open right now). `ui-v0.5.587` was cut one commit early with the version still 0.5.586 and is not used.
+
 ## [ui-v0.5.586] - 2026-11-10
 
 - PACK-06c, additive. `CompanionPackPlayer`: the speech overlay stopped drawing for good after the document was hidden and shown again (a stale animation-frame id kept the frame loop from restarting), and a frame that threw (a speech clock on a suspended audio context, a host `onSpeechFrame`) ended the loop. The loop now restarts when the tab is shown and survives a throwing frame (one console warning). Speech draws whenever `speech` is defined, with the clip playing or held at a rest frame.
