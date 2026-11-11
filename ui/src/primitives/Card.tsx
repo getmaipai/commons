@@ -76,6 +76,7 @@ function TvCardButton({
       onClick={onSelect}
       aria-label={label}
       aria-current={selected ? "true" : undefined}
+      data-slot="kit-card"
       className={cn(
         surfaceClasses,
         "block min-h-12 w-full text-left transition-opacity hover:opacity-90",
@@ -97,7 +98,7 @@ export function Card({ children, onSelect, label, selected, className, far = fal
   if (!onSelect) {
     return (
       // `aria-label` on a bare div is ignored; it needs a role to land on.
-      <div role={label ? "group" : undefined} aria-label={label} className={cn(surfaceClasses, className)}>
+      <div data-slot="kit-card" role={label ? "group" : undefined} aria-label={label} className={cn(surfaceClasses, className)}>
         {children}
       </div>
     );
@@ -114,6 +115,7 @@ export function Card({ children, onSelect, label, selected, className, far = fal
   return (
     <button
       type="button"
+      data-slot="kit-card"
       onClick={onSelect}
       aria-label={label}
       aria-current={selected ? "true" : undefined}

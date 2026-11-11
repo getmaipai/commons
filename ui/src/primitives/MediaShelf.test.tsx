@@ -511,4 +511,15 @@ describe("MediaShelf", () => {
     expect(badge.className).toContain("backdrop-blur-sm");
     expect(container.querySelector('[data-slot="media-tile-meta"]')!.className).toContain("start-2");
   });
+
+  test("tile overlay draws an opted-in name once and keeps opt-out empty", () => {
+    const { container, rerender } = render(<div className="relative"><MediaTileOverlay label="Blue Hour" /></div>);
+    expect(container.querySelectorAll('[data-slot="media-tile-label"]')).toHaveLength(1);
+    expect(container.querySelector('[data-slot="media-tile-label"]')!.textContent).toBe("Blue Hour");
+    expect(container.querySelector('[data-slot="media-tile-label"]')!.className).toContain("bg-[var(--art-scrim)]");
+    rerender(<div className="relative"><MediaTileOverlay label="Blue Hour" hasSafeImageLabel /></div>);
+    expect(container.querySelectorAll('[data-slot="media-tile-label"]')).toHaveLength(0);
+    rerender(<div className="relative"><MediaTileOverlay /></div>);
+    expect(container.querySelectorAll('[data-slot="media-tile-label"]')).toHaveLength(0);
+  });
 });

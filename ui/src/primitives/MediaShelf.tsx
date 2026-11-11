@@ -1,5 +1,6 @@
-import type { ReactNode, RefObject } from "react";
+import { Children, isValidElement, type ReactNode, type RefObject } from "react";
 import { Card } from "@/kit/primitives/Card";
+import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "@/kit/ui/button";
 import { EmptyState } from "@/kit/primitives/EmptyState";
 import { Section } from "@/kit/primitives/Section";
@@ -237,7 +238,9 @@ export function MediaShelf<T>({
       <Frame heading={heading} headingStyle={headingStyle} seeAll={seeAll}>
         {reorder.toggle}
         <ul ref={reorder.containerRef as RefObject<HTMLUListElement>} aria-label={name} className="flex min-w-0 list-none flex-col gap-3 p-0" data-slot="media-shelf" data-orientation="vertical" data-density={density}>
-          {items.map((item, i) => (
+          {items.map((item, i) => {
+            const media = renderItem(item);
+            return (
             <li
               key={getKey(item)}
               aria-current={isHighlighted?.(item) ? "true" : undefined}
@@ -278,11 +281,13 @@ export function MediaShelf<T>({
                 )}
               >
                 <div className={cn(artClasses, density === "compact" && !circle && "rounded-[var(--media-compact-radius)]")}>
-                  {renderItem(item)}
+                  {media}
                   <MediaTileOverlay
                     progress={clampProgress(getProgress?.(item))}
                     badge={renderBadge?.(item)}
                     meta={density === "compact" ? undefined : renderMeta?.(item)}
+                    label={variant === "plain" && !renderCaption && !renderActions && hasArtTile(media) ? getLabel?.(item) : undefined}
+                    hasSafeImageLabel={hasSafeImageTileLabel(media)}
                   />
                 </div>
               </Card>
@@ -297,7 +302,8 @@ export function MediaShelf<T>({
               ) : null}
               {reorder.enabled ? <span className="flex shrink-0 items-center self-center">{reorder.moveButtons(i, reorderName(item))}</span> : null}
             </li>
-          ))}
+            );
+          })}
           {hasLocked ? <li key="locked" data-slot="media-shelf-locked" className="flex min-w-0">{lockTile("row")}</li> : null}
         </ul>
       </Frame>
@@ -349,7 +355,9 @@ export function MediaShelf<T>({
         FOCUS_RING,
       )}
     >
-      {listItems.map((item) => (
+      {listItems.map((item) => {
+        const media = renderItem(item);
+        return (
         <li
           key={getKey(item)}
           aria-current={isHighlighted?.(item) ? "true" : undefined}
@@ -384,11 +392,13 @@ export function MediaShelf<T>({
             )}
           >
             <div className={artClasses}>
-              {renderItem(item)}
+              {media}
               <MediaTileOverlay
                 progress={clampProgress(getProgress?.(item))}
                 badge={renderBadge?.(item)}
                 meta={renderMeta?.(item)}
+                label={variant === "plain" && !renderCaption && hasArtTile(media) ? getLabel?.(item) : undefined}
+                hasSafeImageLabel={hasSafeImageTileLabel(media)}
               />
             </div>
           </Card>
@@ -403,7 +413,8 @@ export function MediaShelf<T>({
           ) : null}
           {reorderControls(item, items.indexOf(item))}
         </li>
-      ))}
+        );
+      })}
       {withLock ? lockLi : null}
     </ul>
   );
@@ -551,9 +562,10 @@ function PlainShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrame
 }
 
 /** The tile's corners and bottom edge: badge, running time and progress. Shared with any media tile the kit draws. */
-export function MediaTileOverlay({ progress = 0, badge, meta, metaPlacement = "end", badgeStyle = "default" }: { progress?: number; badge?: ReactNode; meta?: ReactNode; metaPlacement?: "end" | "start"; badgeStyle?: "default" | "mono" }) {
+export function MediaTileOverlay({ progress = 0, badge, meta, label, hasSafeImageLabel = false, metaPlacement = "end", badgeStyle = "default" }: { progress?: number; badge?: ReactNode; meta?: ReactNode; label?: string; hasSafeImageLabel?: boolean; metaPlacement?: "end" | "start"; badgeStyle?: "default" | "mono" }) {
   return (
     <>
+      {label && !hasSafeImageLabel ? <span data-slot="media-tile-label" className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-[var(--art-scrim)] px-3 pb-2 pt-6 text-left text-base leading-5 text-[var(--art-foreground)]" style={{ fontSize: "16px", fontWeight: "var(--look-weight-section, 500)", letterSpacing: "var(--look-tracking-section, normal)" }}>{label}</span> : null}
       {badge ? <span className={cn("absolute start-2 top-2 flex", badgeStyle === "mono" && "rounded-md bg-[var(--art-overlay)] px-1.5 py-1 font-mono text-[length:var(--font-size-badge)] font-semibold text-[var(--art-foreground)] backdrop-blur-sm")} data-slot="media-tile-badge">{badge}</span> : null}
       {meta ? (
         <span
@@ -578,4 +590,20 @@ export function MediaTileOverlay({ progress = 0, badge, meta, metaPlacement = "e
       ) : null}
     </>
   );
+}
+
+function hasSafeImageTileLabel(node: ReactNode): boolean {
+  return Children.toArray(node).some((child) => {
+    if (!isValidElement(child)) return false;
+    if (child.type === SafeImage) return Boolean((child.props as { label?: unknown }).label);
+    return hasSafeImageTileLabel((child.props as { children?: ReactNode }).children);
+  });
+}
+
+function hasArtTile(node: ReactNode): boolean {
+  return Children.toArray(node).some((child) => {
+    if (!isValidElement(child)) return false;
+    if (child.type === "img" || child.type === SafeImage) return true;
+    return hasArtTile((child.props as { children?: ReactNode }).children);
+  });
 }

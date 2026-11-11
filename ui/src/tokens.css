@@ -2760,6 +2760,8 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --look-tracking-hero: -0.035em;
   --look-weight-section: 500;
   --look-tracking-section: -0.01em;
+  --card-edge-border: transparent;
+  --card-edge-shadow: none;
   --radius: var(--radius-card);
   --radius-sm: calc(var(--radius-card) - 4px);
   --radius-md: calc(var(--radius-card) - 2px);
@@ -2768,6 +2770,11 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --radius-2xl: calc(var(--radius-card) + 8px);
   --radius-3xl: calc(var(--radius-card) + 12px);
   --radius-4xl: calc(var(--radius-card) + 16px);
+}
+:root body.style-neutral [data-slot="kit-card"],
+:root body.style-neutral [data-slot="card"] {
+  border-color: var(--card-edge-border);
+  box-shadow: var(--card-edge-shadow);
 }
 :root body.style-stone {
   --type-scale: 1;

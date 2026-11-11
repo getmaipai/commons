@@ -48,10 +48,16 @@ export function renderLookBlock(data: Looks): string {
       if (value === undefined) throw new Error(`Bundle ${bundleName} is missing ${key}`);
       if (value !== null) emitted.push(`  ${variable}: ${value};`);
     }
+    if (b.card_edge === "none") emitted.push("  --card-edge-border: transparent;", "  --card-edge-shadow: none;");
+    if (b.card_edge === "hairline") emitted.push("  --card-edge-border: var(--hairline);", "  --card-edge-shadow: none;");
+    if (b.card_edge === "shadow") emitted.push("  --card-edge-border: transparent;", "  --card-edge-shadow: var(--elevation-2);");
     if (bundleName !== "standard") {
       emitted.push("  --radius: var(--radius-card);", "  --radius-sm: calc(var(--radius-card) - 4px);", "  --radius-md: calc(var(--radius-card) - 2px);", "  --radius-lg: var(--radius-card);", "  --radius-xl: calc(var(--radius-card) + 4px);", "  --radius-2xl: calc(var(--radius-card) + 8px);", "  --radius-3xl: calc(var(--radius-card) + 12px);", "  --radius-4xl: calc(var(--radius-card) + 16px);");
     }
     lines.push(`:root body.style-${look} {\n${emitted.join("\n")}\n}`);
+    if (b.card_edge !== null) {
+      lines.push(`:root body.style-${look} [data-slot="kit-card"],\n:root body.style-${look} [data-slot="card"] {\n  border-color: var(--card-edge-border);\n  box-shadow: var(--card-edge-shadow);\n}`);
+    }
   }
   lines.push(END);
   return lines.join("\n");
