@@ -1765,6 +1765,9 @@ html.dark body[class*="style-"] {
  * The shell tones (--shell-main, --shell-history) stay in Home's
  * shell/tokens.css; these mixes reference the same background/foreground
  * pair directly. */
+/* GeneratedCover draws the name through CSS, so the cover adds no second copy of the text for readers or search. */
+[data-slot="generated-cover-title"]::before { content: attr(data-title); }
+
 :root {
   --settings-column-width: 208px;
   /* The collapsed icon-only rail of SectionSidebar. */
@@ -3070,6 +3073,3 @@ html[data-ease-motion="calm"] *::after {
   }
 }
 /* EASE-GENERATED:END */
-
-/* GeneratedCover draws the name through CSS, so the cover adds no second copy of the text for readers or search. */
-[data-slot="generated-cover-title"]::before { content: attr(data-title); }
