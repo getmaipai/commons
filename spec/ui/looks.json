@@ -35,8 +35,8 @@
       "hover_lift": null
     },
     "studio": {
-      "font_sans": "Inter, ui-sans-serif, system-ui, sans-serif",
-      "font_display": "Fraunces, ui-serif, Georgia, serif",
+      "font_sans": "\"Inter Variable\", Inter, ui-sans-serif, system-ui, sans-serif",
+      "font_display": "\"Fraunces Variable\", Fraunces, ui-serif, Georgia, serif",
       "font_weight_title": 400,
       "font_weight_body": 400,
       "letter_spacing_title": "-0.03em",

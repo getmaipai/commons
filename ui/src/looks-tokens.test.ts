@@ -9,6 +9,17 @@ const block = css.slice(css.indexOf("LOOKS-GENERATED:BEGIN"), css.indexOf("LOOKS
 const rule = (look: string) => new RegExp(`:root body\\.style-${look} \\{([^}]*)\\}`).exec(block)?.[1] ?? "";
 
 describe("Look bundles", () => {
+  test("self-hosted fonts come from the installed variable packages, outside generated Looks", () => {
+    expect(css).toContain('@import "@fontsource-variable/inter/wght.css";');
+    expect(css).toContain('@import "@fontsource-variable/fraunces/wght.css";');
+    expect(css).toContain('@import "@fontsource-variable/fraunces/wght-italic.css";');
+    expect(css).not.toMatch(/@font-face/);
+    expect(block).not.toMatch(/url\s*\(/i);
+    expect(css).toContain('body { font-family: var(--font-sans); }');
+    expect(css).toContain('font-family: var(--font-display)');
+    expect(rule("stone")).not.toContain("Inter");
+    expect(rule("stone")).not.toContain("Fraunces");
+  });
   test("generated block matches its source", () => expect(css).toBe(render()));
   test("each Look maps to a declared bundle", () => {
     expect(Object.keys(spec.looks).sort()).toEqual(["mauve", "mist", "navy", "neutral", "olive", "stone", "taupe", "zinc"]);
@@ -58,7 +69,7 @@ describe("Look bundles", () => {
     expect(css).toContain("border-bottom-color: var(--header-edge-color, var(--border))");
   });
   test("studio bundle matches the approved values", () => {
-    expect(spec.bundles.studio).toMatchObject({ font_sans: "Inter, ui-sans-serif, system-ui, sans-serif", font_display: "Fraunces, ui-serif, Georgia, serif", font_weight_title: 400, font_weight_body: 400, letter_spacing_title: "-0.03em", title_weight: 400, title_tracking: "-0.03em", hero_weight: 400, hero_tracking: "-0.035em", section_weight: 500, section_tracking: "-0.01em", type_scale: 1, density_scale: 0.9, radius_card: 12, radius_thumb: 8, radius_pill: 999, tile_aspect: "auto", surface_step: { light: 3, dark: 5 }, hairline_alpha: 8, card_edge: "none", glass_blur: 14, nav_active: "edge", motion_pill_ms: 150, hover_lift: 0 });
+    expect(spec.bundles.studio).toMatchObject({ font_sans: "\"Inter Variable\", Inter, ui-sans-serif, system-ui, sans-serif", font_display: "\"Fraunces Variable\", Fraunces, ui-serif, Georgia, serif", font_weight_title: 400, font_weight_body: 400, letter_spacing_title: "-0.03em", title_weight: 400, title_tracking: "-0.03em", hero_weight: 400, hero_tracking: "-0.035em", section_weight: 500, section_tracking: "-0.01em", type_scale: 1, density_scale: 0.9, radius_card: 12, radius_thumb: 8, radius_pill: 999, tile_aspect: "auto", surface_step: { light: 3, dark: 5 }, hairline_alpha: 8, card_edge: "none", glass_blur: 14, nav_active: "edge", motion_pill_ms: 150, hover_lift: 0 });
     expect(rule("neutral")).toContain("--radius-card: 12px");
     expect(rule("neutral")).toContain("--density-scale: 0.9");
     expect(rule("neutral")).toContain("--radius-pill: 999px");

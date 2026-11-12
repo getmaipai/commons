@@ -16,6 +16,9 @@ getmaipai/.github.
 
 ## ui
 
+- @fontsource-variable/inter (OFL-1.1) - https://github.com/fontsource/font-files
+- @fontsource-variable/fraunces (OFL-1.1) - https://github.com/fontsource/font-files
+
 - React, React DOM (MIT) - https://react.dev (peer dependencies)
 - Radix UI: react-popover, and the consolidated `radix-ui` package (MIT) -
   https://www.radix-ui.com
