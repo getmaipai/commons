@@ -207,7 +207,7 @@ function AllAppsLink({ href, active }: { href: string; active: boolean }) {
   );
 }
 
-export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, itemTourId, apps, coreDestinations, onTogglePin, allAppsHref, onExpandedChange, variant = "icons", mobile = false, children }: AppRailProps & { mobile?: boolean; children?: ReactNode }) {
+export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, itemTourId, apps, coreDestinations, onTogglePin, allAppsHref, onExpandedChange, variant = "icons", mobile = false, children, grouped = false, expanded = false, brandSlot }: AppRailProps & { mobile?: boolean; children?: ReactNode; grouped?: boolean; expanded?: boolean; brandSlot?: ReactNode }) {
   const { pathname } = useLocation();
   const all = SidebarContent.flatMap((section) => flatten(section.items));
   // The brand mark is the Home destination (owner, 2026-10-06: "replace
@@ -243,6 +243,21 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
       <span aria-hidden className="col-start-1 row-start-1 grid size-7 place-items-center rounded-lg bg-foreground/5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"><ExpandIcon className="size-5" aria-hidden /></span>
     </span>
   ) : logo;
+
+  if (grouped) {
+    return <>
+      {brandSlot ?? (home ? <Tooltip><TooltipTrigger render={<Link to={railHref(home.url ?? "/")} aria-label={itemLabel(home, homeStatus)} aria-current={homeActive ? "page" : undefined} data-slot="app-rail-home" className={cn("group flex min-h-12 w-full items-center gap-3 rounded-lg px-3 focus-visible:ring-2 focus-visible:ring-ring", !expanded && "justify-center", homeActive && "bg-foreground/10")} />}>{brandVisual}{expanded ? <span className="text-sm">{home.name}</span> : null}<StatusMark status={homeStatus} /></TooltipTrigger><ItemTooltip name={home.name} status={homeStatus} /></Tooltip> : null)}
+      <div className="flex w-full shrink-0 items-center gap-2 px-1">
+        <div data-slot="app-rail-search" className={cn("flex size-[var(--rail-button,40px)] shrink-0 items-center justify-center", expanded && "justify-start")}><HeaderSearch remote={searchRemote} triggerClassName="size-[var(--rail-button,40px)] rounded-lg text-muted-foreground hover:bg-foreground/5 hover:text-foreground [&_svg]:size-5" /></div>
+        {expanded ? <span className="text-sm text-muted-foreground">{i18n._({ id: "ui.Search", message: "Search" })}</span> : null}
+      </div>
+      <div className="min-h-0 w-full flex-1 overflow-y-auto">{children}</div>
+      <div className={cn("mt-auto flex w-full shrink-0 flex-col gap-1", expanded ? "items-stretch" : "items-center")}>
+        {apps?.length ? allAppsHref ? <AllAppsLink href={allAppsHref} active={isRailItemActive(pathname, allAppsHref)} /> : <AppLauncher apps={apps} onTogglePin={onTogglePin} isActive={isActive} /> : null}
+        {profile}
+      </div>
+    </>;
+  }
 
   return (
     <>
@@ -408,6 +423,6 @@ export default function AppRail(props: AppRailProps) {
     data-expanded={expanded ? "true" : "false"} data-auto-collapse={props.autoCollapse ? "true" : undefined}
     style={{ "--rail-width-labelled": "80px", ...(grouped ? { width: expanded ? "240px" : "var(--rail-width,56px)", minWidth: expanded ? "240px" : "var(--rail-width,56px)", maxWidth: expanded ? "240px" : "var(--rail-width,56px)" } : labelled ? { width: "var(--rail-width-labelled)", minWidth: "var(--rail-width-labelled)", maxWidth: "var(--rail-width-labelled)" } : {}) } as React.CSSProperties}
     className={cn("sticky top-0 flex h-svh min-h-0 shrink-0 flex-col gap-1 overflow-hidden bg-[color:var(--app-rail-bg,var(--sidebar))] p-2", grouped ? "items-stretch transition-[width,min-width,max-width] duration-200 ease-out motion-reduce:transition-none [[html[data-ease-motion=calm]_&]]:duration-0" : "items-center", labelled ? "w-[var(--rail-width-labelled)] min-w-[var(--rail-width-labelled)] max-w-[var(--rail-width-labelled)]" : !grouped ? "w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)]" : "")}>
-    {grouped ? <>{expandedHeader}{groupedNavigation}<div className="mt-auto flex w-full shrink-0 justify-center">{props.profile}</div></> : <RailEntries {...props} />}
+    {grouped ? <RailEntries {...props} grouped expanded={expanded} brandSlot={expandedHeader ?? (!props.onExpandedChange ? <div className="group relative flex w-full shrink-0 justify-center"><button type="button" aria-label={i18n._({ id: "ui.Show sidebar", message: "Show sidebar" })} onClick={toggleExpanded} className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftOpen aria-hidden className="size-5" /></button></div> : null)}>{groupedNavigation}</RailEntries> : <RailEntries {...props} />}
   </nav>;
 }

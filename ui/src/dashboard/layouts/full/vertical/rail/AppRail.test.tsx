@@ -113,6 +113,27 @@ describe("grouped expanding AppRail", () => {
     expect(changed).toEqual([true]);
   });
 
+  test("host core destinations remain present with grouped items", () => {
+    const core = {
+      coreDestinations: [{ name: "Library", url: "/library", icon: "library" }],
+      apps: [{ name: "Notes", url: "/apps/notes", icon: "layout-grid", pinned: true }],
+      profile: <button aria-label="Jesse profile">Profile</button>,
+    };
+    const renderCore = (grouped: boolean) => render(<MemoryRouter><TooltipProvider><AppRail {...core} {...(grouped ? { items: [{ id: "custom", label: "Custom", icon: "house", href: "/custom" }], groups: [{ id: "default" }] } : {})} /></TooltipProvider></MemoryRouter>);
+    const plain = renderCore(false);
+    const assertCore = (view: ReturnType<typeof render>) => {
+      expect(view.container.querySelector('[data-slot="app-rail-home"]') || view.container.querySelector('[aria-label="Show sidebar"], [aria-label="Expand navigation"]')).toBeTruthy();
+      expect(view.getAllByRole("button", { name: "Search" }).length).toBeGreaterThan(0);
+      if (view === plain) expect(view.container.querySelector('[aria-label="Library"]')).toBeTruthy();
+      expect(view.getByRole("button", { name: "All apps" })).toBeTruthy();
+      expect(view.getByRole("button", { name: "Jesse profile" })).toBeTruthy();
+    };
+    assertCore(plain);
+    plain.unmount();
+    const grouped = renderCore(true);
+    assertCore(grouped);
+  });
+
   test("autoCollapse overrides expanded, has reduced-motion class and context back", () => {
     const back = () => {};
     const view = groupedRail({ expanded: true, autoCollapse: true, context: { title: "Chat modes", items, onBack: back } });
