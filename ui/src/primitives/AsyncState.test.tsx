@@ -15,10 +15,10 @@ describe("AsyncState", () => {
   });
 
   test("loadingShape page draws the hero and tile boxes instead of three bars", () => {
-    const view = render(<AsyncState data={undefined} error={false} isFetching loadingShape="page">{() => null}</AsyncState>);
+    const view = render(<AsyncState data={undefined} error={false} isFetching onRetry={() => {}} loadingShape="page">{() => null}</AsyncState>);
     expect(view.container.querySelector('[data-slot="page-skeleton"]')).not.toBeNull();
     cleanup();
-    const bars = render(<AsyncState data={undefined} error={false} isFetching>{() => null}</AsyncState>);
+    const bars = render(<AsyncState data={undefined} error={false} isFetching onRetry={() => {}}>{() => null}</AsyncState>);
     expect(bars.container.querySelector('[data-slot="page-skeleton"]')).toBeNull();
   });
   test("shows the catalogue message and a retry button on error", () => {
