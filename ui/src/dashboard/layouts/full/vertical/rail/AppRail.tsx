@@ -403,7 +403,7 @@ export default function AppRail(props: AppRailProps) {
       <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-foreground/5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"><PanelLeftOpen className="size-5" /></span>
     </button> : <button type="button" aria-label={i18n._({ id: "ui.Show sidebar", message: "Show sidebar" })} onClick={toggleExpanded} className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftOpen aria-hidden className="size-5" /></button>}
   </div> : null;
-  const groupedNavigation = grouped ? <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto">
+  const groupedNavigation = grouped ? <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
     {groupIds.map((id, index) => {
       const groupItems = groupedItems.filter((item) => (item.group ?? "default") === id);
       if (!groupItems.length) return null;

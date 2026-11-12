@@ -78,6 +78,13 @@ describe("grouped expanding AppRail", () => {
   const groups = [{ id: "default" }, { id: "work", label: "Work" }, { id: "create", label: "Create" }, { id: "manage", label: "Manage" }];
   const groupedRail = (props: React.ComponentProps<typeof AppRail> = {}) => render(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail items={items} groups={groups} {...props} /></TooltipProvider></MemoryRouter>);
 
+  test("the grouped list scrolls without a visible scrollbar so it never narrows the rows", () => {
+    const view = groupedRail();
+    const list = view.container.querySelector('[data-rail-group]')!.parentElement!;
+    expect(list.className).toContain("[scrollbar-width:none]");
+    expect(list.className).toContain("[&::-webkit-scrollbar]:hidden");
+  });
+
   test("grouped items draw their status mark and name it in the accessible label", () => {
     const view = groupedRail({ itemStatus: (item) => item.name === "Chat" ? { title: "Something is running", ariaLabel: "Chat: running", level: "maintenance" } : undefined });
     expect(view.getByRole("link", { name: "Chat: running" }).querySelector('[data-slot="rail-status-mark"]')?.getAttribute("data-status-level")).toBe("maintenance");
