@@ -64,6 +64,8 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
   const hasBoxSizing = /(?:^|\s)(?:size-|w-full|w-\[|h-full|h-\[|aspect-)/.test(className ?? "") || props.width !== undefined || props.height !== undefined;
   const seedHash = tintHash(tintSeed ?? alt ?? kind);
   const tintIndex = seedHash % SOFT_TINTS.length;
+  const thirdTintIndex = (tintIndex + 2 + ((seedHash >>> 12) % (SOFT_TINTS.length - 2))) % SOFT_TINTS.length;
+  const fourthTintIndex = (tintIndex + 3 + ((seedHash >>> 4) % (SOFT_TINTS.length - 3))) % SOFT_TINTS.length;
   const secondTintIndex = (tintIndex + 1 + ((seedHash >>> 8) % (SOFT_TINTS.length - 1))) % SOFT_TINTS.length;
   const ratio = kind === "video" ? "aspect-video" : kind === "person" ? "aspect-[3/4]" : "aspect-square";
   const fallbackClass = cn("@container/safe-art relative isolate overflow-hidden bg-[color-mix(in_oklab,var(--art-tint-a)_56%,var(--art-tint-b))] text-[var(--art-foreground)] flex items-center justify-center", !hasBoxSizing && `${ratio} w-full min-h-16`, className);
@@ -85,6 +87,8 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
           ...(props.height !== undefined && !CLASS_SIZES_HEIGHT.test(className ?? "") ? { height: typeof props.height === "number" ? `${props.height}px` : props.height } : {}),
           ["--art-tint-a" as string]: `var(${SOFT_TINTS[tintIndex]})`,
           ["--art-tint-b" as string]: `var(${SOFT_TINTS[secondTintIndex]})`,
+          ["--art-tint-c" as string]: `var(${SOFT_TINTS[thirdTintIndex]})`,
+          ["--art-tint-d" as string]: `var(${SOFT_TINTS[fourthTintIndex]})`,
           ...props.style,
         }}
       >
