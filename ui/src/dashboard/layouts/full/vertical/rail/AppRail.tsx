@@ -407,8 +407,8 @@ export default function AppRail(props: AppRailProps) {
     {groupIds.map((id, index) => {
       const groupItems = groupedItems.filter((item) => (item.group ?? "default") === id);
       if (!groupItems.length) return null;
-      return <section key={id} data-rail-group={id} className={cn(index > 0 && "mt-2 border-t border-border pt-2")}>
-        {index > 0 && expanded && groupLabel(id) ? <h2 className="px-[var(--rail-padding,12px)] pb-1 text-[length:var(--rail-group-heading-size,12px)] font-medium normal-case text-muted-foreground" data-slot="app-rail-group-label">{groupLabel(id)}</h2> : null}
+      return <section key={id} data-rail-group={id} className={cn(index > 0 && (expanded ? "mt-3" : "mt-2 border-t border-border pt-2"))}>
+        {index > 0 && expanded && groupLabel(id) ? <h2 className="px-[var(--rail-padding,12px)] pb-1 text-[length:var(--rail-group-heading-size,12px)] font-normal normal-case text-muted-foreground" data-slot="app-rail-group-label">{groupLabel(id)}</h2> : null}
         <ul className="flex w-full flex-col gap-0">{groupItems.map((item) => {
           const ItemIcon = Icon(item);
           const active = isRailItemActive(pathname, item.href);

@@ -120,7 +120,7 @@ describe("grouped expanding AppRail", () => {
     const view = groupedRail({ expanded: true, onExpandedChange: (value) => changed.push(value), groups: [...groups, { id: "empty", label: "Empty" }] });
     const expandedSections = [...view.container.querySelectorAll("[data-rail-group]")];
     expect(expandedSections).toHaveLength(4);
-    expect(expandedSections.filter((section) => section.className.includes("border-t"))).toHaveLength(3);
+    expect(expandedSections.filter((section) => section.className.includes("border-t"))).toHaveLength(0);
     view.rerender(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail items={items} groups={groups} expanded={false} /></TooltipProvider></MemoryRouter>);
     const collapsedSections = [...view.container.querySelectorAll("[data-rail-group]")];
     expect(collapsedSections.filter((section) => section.className.includes("border-t"))).toHaveLength(3);

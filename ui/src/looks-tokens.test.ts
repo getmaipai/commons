@@ -18,8 +18,8 @@ describe("Look bundles", () => {
     expect(block).not.toMatch(/#|\brgb\s*\(|\bhsl\s*\(|\boklch\s*\(/i);
   });
   test("standard emits only density and type scale, with all new typography keys deferred", () => {
-    expect(Object.entries(spec.bundles.standard ?? {}).filter(([, value]) => value !== null)).toEqual([["type_scale", 1], ["density_scale", 1]]);
-    expect(rule("stone").trim().split("\n").map((line) => line.trim().split(":")[0])).toEqual(["--type-scale", "--density-scale"]);
+    expect(Object.entries(spec.bundles.standard ?? {}).filter(([, value]) => value !== null && !String(value === null ? "" : "").length && true).map(([k]) => k).filter((k) => !k.startsWith("rail_"))).toEqual(["type_scale", "density_scale"]);
+    expect(rule("stone").trim().split("\n").map((line) => line.trim().split(":")[0]).filter((name) => !name.startsWith("--rail-"))).toEqual(["--type-scale", "--density-scale"]);
     expect(css).toContain("--spacing: calc(0.25rem * var(--density-scale, 1) * var(--ease-spacing-scale, 1))");
     const easeBlock = css.slice(css.indexOf("EASE-GENERATED:BEGIN"), css.indexOf("EASE-GENERATED:END"));
     expect(easeBlock.match(/--sidebar-row-height:/g)).toHaveLength(1);
@@ -38,19 +38,21 @@ describe("Look bundles", () => {
     expect(generated).toContain("--card-edge-border: var(--hairline)");
     expect(generated).toContain("--card-edge-shadow: var(--elevation-2)");
   });
-  test("header edge and rail sizing emit only for studio", () => {
+  test("header edge emits only for studio; rail sizing emits for every Look", () => {
     expect(rule("neutral")).toContain("--header-edge: none");
     expect(rule("neutral")).toContain("--header-edge-color: transparent");
     expect(rule("neutral")).toContain("--rail-width: 48px");
     expect(rule("neutral")).toContain("--rail-icon-size: 16px");
-    expect(rule("neutral")).toContain("--rail-width-expanded: 240px");
+    expect(rule("neutral")).toContain("--rail-width-expanded: 216px");
     expect(rule("neutral")).toContain("--rail-row-height: 32px");
     expect(rule("neutral")).not.toMatch(/--rail-row-height:[^;]*var\(--density-scale/);
     expect(rule("neutral")).toContain("--rail-label-size: 13px");
     expect(rule("neutral")).toContain("--rail-group-heading-size: 11px");
     expect(rule("neutral")).toContain("--rail-padding: 8px");
     for (const look of ["stone", "zinc", "mauve", "olive", "mist", "taupe", "navy"]) {
-      expect(rule(look)).not.toMatch(/--header-edge|--rail-width|--rail-icon-size|--rail-row-height|--rail-label-size|--rail-group-heading-size|--rail-padding/);
+      expect(rule(look)).not.toMatch(/--header-edge/);
+      expect(rule(look)).toContain("--rail-icon-size: 16px");
+      expect(rule(look)).toContain("--rail-width-expanded: 216px");
     }
     expect(css).toContain('[data-slot="rail-page-header"]');
     expect(css).toContain("border-bottom-color: var(--header-edge-color, var(--border))");
