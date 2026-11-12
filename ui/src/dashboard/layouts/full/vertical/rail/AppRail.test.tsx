@@ -100,6 +100,19 @@ describe("grouped expanding AppRail", () => {
     expect(changed).toEqual([false]);
   });
 
+  test("collapsed brand becomes an accessible expand control on hover and keyboard focus", () => {
+    const changed: boolean[] = [];
+    const view = groupedRail({ onExpandedChange: (value) => changed.push(value) });
+    const expand = view.getByRole("button", { name: "Expand navigation" });
+    expect(expand.className).toContain("focus-visible:ring-2");
+    expect(expand.innerHTML).toContain("group-hover:opacity-100");
+    expect(expand.innerHTML).toContain("motion-reduce:transition-none");
+    fireEvent.mouseEnter(expand);
+    fireEvent.focus(expand);
+    fireEvent.click(expand);
+    expect(changed).toEqual([true]);
+  });
+
   test("autoCollapse overrides expanded, has reduced-motion class and context back", () => {
     const back = () => {};
     const view = groupedRail({ expanded: true, autoCollapse: true, context: { title: "Chat modes", items, onBack: back } });

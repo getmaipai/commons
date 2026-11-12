@@ -38,6 +38,17 @@ describe("Look bundles", () => {
     expect(generated).toContain("--card-edge-border: var(--hairline)");
     expect(generated).toContain("--card-edge-shadow: var(--elevation-2)");
   });
+  test("header edge and rail sizing emit only for studio", () => {
+    expect(rule("neutral")).toContain("--header-edge: none");
+    expect(rule("neutral")).toContain("--header-edge-color: transparent");
+    expect(rule("neutral")).toContain("--rail-width: 48px");
+    expect(rule("neutral")).toContain("--rail-icon-size: 18px");
+    for (const look of ["stone", "zinc", "mauve", "olive", "mist", "taupe", "navy"]) {
+      expect(rule(look)).not.toMatch(/--header-edge|--rail-width|--rail-icon-size/);
+    }
+    expect(css).toContain('[data-slot="rail-page-header"]');
+    expect(css).toContain("border-bottom-color: var(--header-edge-color, var(--border))");
+  });
   test("studio bundle matches the approved values", () => {
     expect(spec.bundles.studio).toMatchObject({ font_sans: "Inter, ui-sans-serif, system-ui, sans-serif", font_display: "Fraunces, ui-serif, Georgia, serif", font_weight_title: 400, font_weight_body: 400, letter_spacing_title: "-0.03em", title_weight: 400, title_tracking: "-0.03em", hero_weight: 400, hero_tracking: "-0.035em", section_weight: 500, section_tracking: "-0.01em", type_scale: 1, density_scale: 0.9, radius_card: 12, radius_thumb: 8, radius_pill: 999, tile_aspect: "auto", surface_step: { light: 3, dark: 5 }, hairline_alpha: 8, card_edge: "none", glass_blur: 14, nav_active: "edge", motion_pill_ms: 150, hover_lift: 0 });
     expect(rule("neutral")).toContain("--radius-card: 12px");

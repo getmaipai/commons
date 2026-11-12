@@ -357,7 +357,7 @@ msgid "ui.{name}, {ring}"
 msgstr "{name}, {ring}"
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:433
+#: src/primitives/MediaShelf.tsx:444
 #, needs-review
 msgid "ui.{name}, {text}"
 msgstr "{name}, {text}"
@@ -1116,7 +1116,7 @@ msgstr "Bebé"
 
 #. js-lingui-explicit-id
 #: src/assistant-ui/tool-fallback.aui.tsx:573
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:374
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:382
 #: src/elements/composer-trigger-popover.aui.tsx:194
 #: src/elements/question-flow.tsx:48
 #: src/elements/thread-list.aui.tsx:177
@@ -2452,6 +2452,11 @@ msgid "ui.Expand diagram"
 msgstr "Ampliar diagrama"
 
 #. js-lingui-explicit-id
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:386
+msgid "ui.Expand navigation"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:363
 #, needs-review
 msgid "ui.Export as a new clip"
@@ -2885,7 +2890,7 @@ msgid "ui.Hide settings sidebar"
 msgstr "Ocultar barra lateral de ajustes"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:375
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:383
 #: src/primitives/SectionSidebar.tsx:181
 #, needs-review
 msgid "ui.Hide sidebar"
@@ -3110,7 +3115,7 @@ msgid "ui.Inspired by {inspiredBy}"
 msgstr "Inspirado por {inspiredBy}"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:312
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:320
 #, needs-review
 msgid "ui.Installed apps"
 msgstr "Apps instaladas"
@@ -3159,7 +3164,7 @@ msgid "ui.It is deleted from your places. You can add it again by searching."
 msgstr "Se eliminó de tus lugares. Puedes añadirlo de nuevo buscando."
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:195
+#: src/primitives/MediaShelf.tsx:196
 #: src/schema/NodeRenderer.tsx:1325
 #, needs-review
 msgid "ui.item"
@@ -4857,7 +4862,7 @@ msgid "ui.Pinned"
 msgstr "Fijado"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:312
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:320
 #, needs-review
 msgid "ui.Pinned apps"
 msgstr "Apps fijadas"
@@ -4899,7 +4904,7 @@ msgstr "Planeando"
 #: src/elements/track-studio.tsx:448
 #: src/elements/track-studio.tsx:448
 #: src/elements/video-player.tsx:112
-#: src/primitives/MediaShelf.tsx:216
+#: src/primitives/MediaShelf.tsx:217
 #: src/primitives/Player.tsx:163
 #: src/schema/ClipFeedNodeView.tsx:26
 #: src/schema/NodeRenderer.tsx:139
@@ -4950,7 +4955,7 @@ msgid "ui.Playback speed"
 msgstr "Velocidad de reproducción"
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:569
+#: src/primitives/MediaShelf.tsx:581
 #, needs-review
 msgid "ui.Played"
 msgstr "Visto"
@@ -5081,7 +5086,7 @@ msgid "ui.Primary"
 msgstr "Principal"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:394
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:407
 #: src/dashboard/layouts/full/vertical/sidebar/Sidebar.tsx:28
 #, needs-review
 msgid "ui.Primary navigation"
@@ -5788,8 +5793,8 @@ msgstr "Ir al final"
 #. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:314
 #: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:331
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:273
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:275
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:281
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:283
 #: src/elements/weather-forecast-page.tsx:256
 #: src/schema/NodeRenderer.tsx:672
 #: src/settings/groupSettings.ts:44
@@ -6237,7 +6242,7 @@ msgid "ui.Show settings sidebar"
 msgstr "Mostrar barra lateral de ajustes"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:377
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:389
 #: src/primitives/SectionSidebar.tsx:181
 #: src/primitives/SectionSidebar.tsx:550
 #, needs-review

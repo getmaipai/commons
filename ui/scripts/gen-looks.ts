@@ -7,7 +7,7 @@ export const END = "/* LOOKS-GENERATED:END */";
 const UI = join(import.meta.dir, "..");
 export const LOOKS_PATH = join(UI, "..", "spec", "ui", "looks.json");
 export const TOKENS_PATH = join(UI, "src", "tokens.css");
-const vars = [["--font-sans", "font_sans"], ["--font-display", "font_display"], ["--font-weight-title", "font_weight_title"], ["--font-weight-body", "font_weight_body"], ["--letter-spacing-title", "letter_spacing_title"], ["--type-scale", "type_scale"], ["--density-scale", "density_scale"], ["--radius-card", "radius_card"], ["--radius-thumb", "radius_thumb"], ["--radius-pill", "radius_pill"], ["--tile-aspect", "tile_aspect"], ["--surface-step", "surface_step"], ["--hairline-alpha", "hairline_alpha"], ["--card-edge", "card_edge"], ["--glass-blur", "glass_blur"], ["--nav-active", "nav_active"], ["--motion-pill", "motion_pill_ms"], ["--hover-lift", "hover_lift"]] as const;
+const vars = [["--font-sans", "font_sans"], ["--font-display", "font_display"], ["--font-weight-title", "font_weight_title"], ["--font-weight-body", "font_weight_body"], ["--letter-spacing-title", "letter_spacing_title"], ["--type-scale", "type_scale"], ["--density-scale", "density_scale"], ["--radius-card", "radius_card"], ["--radius-thumb", "radius_thumb"], ["--radius-pill", "radius_pill"], ["--tile-aspect", "tile_aspect"], ["--surface-step", "surface_step"], ["--hairline-alpha", "hairline_alpha"], ["--card-edge", "card_edge"], ["--header-edge", "header_edge"], ["--rail-width", "rail_width"], ["--rail-icon-size", "rail_icon"], ["--glass-blur", "glass_blur"], ["--nav-active", "nav_active"], ["--motion-pill", "motion_pill_ms"], ["--hover-lift", "hover_lift"]] as const;
 const typeVars = [["--look-weight-title", "title_weight"], ["--look-tracking-title", "title_tracking"], ["--look-weight-hero", "hero_weight"], ["--look-tracking-hero", "hero_tracking"], ["--look-weight-section", "section_weight"], ["--look-tracking-section", "section_tracking"]] as const;
 type Bundle = Record<string, string | number | { light: number; dark: number } | null>;
 type Looks = { bundles: Record<string, Bundle>; looks: Record<string, string> };
@@ -36,6 +36,7 @@ export function renderLookBlock(data: Looks): string {
       if (value === null) return null;
       if (key === "surface_step") return `  ${variable}: light-dark(${(value as {light:number}).light}%, ${(value as {dark:number}).dark}%);`;
       if (["radius_card", "radius_thumb", "radius_pill"].includes(key)) return `  ${variable}: ${value}px;`;
+      if (["rail_width", "rail_icon"].includes(key)) return `  ${variable}: ${value}px;`;
       if (key === "glass_blur") return `  ${variable}: ${value}px;`;
       if (key === "motion_pill_ms") return `  ${variable}: ${value}ms;`;
       if (key === "hairline_alpha") return `  ${variable}: ${value}%;`;
@@ -51,6 +52,8 @@ export function renderLookBlock(data: Looks): string {
     if (b.card_edge === "none") emitted.push("  --card-edge-border: transparent;", "  --card-edge-shadow: none;");
     if (b.card_edge === "hairline") emitted.push("  --card-edge-border: var(--hairline);", "  --card-edge-shadow: none;");
     if (b.card_edge === "shadow") emitted.push("  --card-edge-border: transparent;", "  --card-edge-shadow: var(--elevation-2);");
+    if (b.header_edge === "none") emitted.push("  --header-edge-color: transparent;");
+    if (b.header_edge === "hairline") emitted.push("  --header-edge-color: var(--hairline);");
     if (bundleName !== "standard") {
       emitted.push("  --radius: var(--radius-card);", "  --radius-sm: calc(var(--radius-card) - 4px);", "  --radius-md: calc(var(--radius-card) - 2px);", "  --radius-lg: var(--radius-card);", "  --radius-xl: calc(var(--radius-card) + 4px);", "  --radius-2xl: calc(var(--radius-card) + 8px);", "  --radius-3xl: calc(var(--radius-card) + 12px);", "  --radius-4xl: calc(var(--radius-card) + 16px);");
     }

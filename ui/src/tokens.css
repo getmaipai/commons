@@ -2734,6 +2734,14 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   }
 }
 
+
+
+
+
+:root [data-slot="rail-page-header"] {
+  border-bottom-color: var(--header-edge-color, var(--border));
+}
+
 /* LOOKS-GENERATED:BEGIN (ui/scripts/gen-looks.ts, from spec/ui/looks.json; do not edit) */
 :root body.style-neutral {
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
@@ -2750,6 +2758,9 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --surface-step: light-dark(3%, 5%);
   --hairline-alpha: 8%;
   --card-edge: none;
+  --header-edge: none;
+  --rail-width: 48px;
+  --rail-icon-size: 18px;
   --glass-blur: 14px;
   --nav-active: edge;
   --motion-pill: 150ms;
@@ -2762,6 +2773,7 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --look-tracking-section: -0.01em;
   --card-edge-border: transparent;
   --card-edge-shadow: none;
+  --header-edge-color: transparent;
   --radius: var(--radius-card);
   --radius-sm: calc(var(--radius-card) - 4px);
   --radius-md: calc(var(--radius-card) - 2px);

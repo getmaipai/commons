@@ -70,6 +70,19 @@ describe("RAIL-01 app rail", () => {
     expect(view.getByRole("link", { name: "Chat" }).getAttribute("data-tour")).toBe("rail.chat");
   });
 
+  test("FullLayout passes grouped rail state and keeps the workspace beside its animated width", () => {
+    const onExpandedChange = () => {};
+    const items = [{ id: "one", label: "One", icon: "house", href: "/", group: "main" }];
+    const view = render(<MemoryRouter><TooltipProvider><Routes><Route element={<FullLayout rail={{ items, groups: [{ id: "main", label: "Main" }], expanded: false, onExpandedChange, autoCollapse: false }} />}><Route path="/" element={<div>Home</div>} /></Route></Routes></TooltipProvider></MemoryRouter>);
+    const nav = view.container.querySelector('[data-slot="app-rail"]')!;
+    expect(view.getByRole("link", { name: "One" })).toBeTruthy();
+    expect(nav.getAttribute("style")).toContain("var(--rail-width, 56px)");
+    expect(view.container.querySelector('[data-slot="rail-workspace"]')).toBeTruthy();
+    view.rerender(<MemoryRouter><TooltipProvider><Routes><Route element={<FullLayout rail={{ items, groups: [{ id: "main", label: "Main" }], expanded: true, onExpandedChange, autoCollapse: false }} />}><Route path="/" element={<div>Home</div>} /></Route></Routes></TooltipProvider></MemoryRouter>);
+    expect(view.container.querySelector('[data-slot="app-rail"]')?.getAttribute("style")).toContain("240px");
+    expect(view.container.querySelector('[data-slot="rail-workspace"]')).toBeTruthy();
+  });
+
   test("a 56px rail with each app named, the current one marked, Search and the profile at the foot", () => {
     const view = renderRail("/chat");
     const rail = view.getByRole("navigation", { name: "Primary navigation" });

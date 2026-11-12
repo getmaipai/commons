@@ -2,7 +2,7 @@ import { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
 export { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
 import MobileNavDrawer from "./vertical/rail/MobileNavDrawer";
 import { FC, useState, type ReactNode } from 'react';
-import AppRail, { type RailApp, type RailCoreDestination } from './vertical/rail/AppRail';
+import AppRail, { type AppRailProps, type RailApp, type RailCoreDestination } from './vertical/rail/AppRail';
 import { useHeaderExtraLeft, useHeaderExtraRight } from './vertical/header/HeaderExtraContext';
 import Sidebar from './vertical/sidebar/Sidebar';
 import Header, { type HeaderProps } from './vertical/header/Header';
@@ -54,7 +54,7 @@ export interface FullLayoutProps {
    * bottom; the header becomes a slim, page-only title bar drawn only
    * when a page places content in it. Off by default, so every other
    * consumer keeps the sidebar layout unchanged. */
-  rail?: boolean;
+  rail?: boolean | Pick<AppRailProps, "items" | "groups" | "expanded" | "onExpandedChange" | "autoCollapse">;
   mobileSections?: ReactNode;
   settingsHref?: string;
   hideMobileMenu?: boolean;
@@ -105,7 +105,7 @@ function RailPageHeader({ reserveBand, reserveEnd, end, fallbackTitle, headerSur
   );
 }
 
-function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, topRightBand, fallbackTitle, rightPane, headerSurface, headerOverArt }: FullLayoutProps) {
+function RailLayout({ rail, headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, topRightBand, fallbackTitle, rightPane, headerSurface, headerOverArt }: FullLayoutProps) {
   const phone = useIsPhoneLayout();
   const Navigation = phone ? MobileNavDrawer : AppRail;
   return (
@@ -114,7 +114,7 @@ function RailLayout({ headerSearchRemote, sidebarItemStatus, railProfile, active
           the rail stays put (sticky, full viewport height). A full-height
           page (a chat) bounds the workspace to the viewport itself. */}
       <div data-slot="rail-shell" className="flex min-h-svh w-full min-w-0 max-w-full overflow-x-clip">
-        <Navigation mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} coreDestinations={railCoreDestinations} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
+        <Navigation {...(rail && typeof rail === "object" ? rail : {})} mobileSections={mobileSections} settingsHref={settingsHref} hideMobileMenu={hideMobileMenu} searchRemote={headerSearchRemote} itemStatus={sidebarItemStatus} profile={railProfile} activeAppHref={activeAppHref} tourId={railTourId} itemTourId={railItemTourId} apps={railApps} coreDestinations={railCoreDestinations} onTogglePin={onRailAppPinChange} allAppsHref={railAllAppsHref} />
         <main data-slot="rail-workspace" data-phone-menu={phone && !hideMobileMenu ? "" : undefined} className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
           {topRight && !topRightBand ? <div data-slot="rail-top-right" className="pointer-events-none sticky top-2 z-30 h-0"><div className="flex h-9 justify-end pe-3 *:pointer-events-auto">{topRight}</div></div> : null}
           <RailPageHeader reserveBand={phone && !hideMobileMenu || Boolean(topRightBand)} reserveEnd={Boolean(topRight)} end={topRightBand ? topRight : undefined} fallbackTitle={fallbackTitle} headerSurface={headerSurface} headerOverArt={headerOverArt} />
