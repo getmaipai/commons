@@ -35,6 +35,30 @@ function tintHash(text: string): number {
   for (const ch of text) h = (h * 31 + ch.codePointAt(0)!) >>> 0;
   return h;
 }
+
+/** Generated cover art: six drawn motifs, picked by the name's hash and tinted with the same two theme tokens as the tile. */
+const MOTIFS: readonly ((n: number) => ReactNode)[] = [
+  // concentric rings
+  (n) => <>{[10, 22, 34, 46].map((r) => <circle key={r} cx={30 + (n % 40)} cy={70 - (n % 30)} r={r + 8} fill="none" stroke="var(--art-tint-b)" strokeWidth="3" opacity={0.55 - r / 120} />)}</>,
+  // flowing waves
+  (n) => <>{[0, 1, 2, 3].map((i) => <path key={i} d={`M-5 ${48 + i * 14} C 20 ${30 + i * 14 + (n % 9)}, 45 ${70 + i * 14 - (n % 7)}, 70 ${50 + i * 14} S 100 ${40 + i * 14}, 110 ${56 + i * 14}`} fill="none" stroke="var(--art-foreground)" strokeWidth="2.2" opacity={0.42 - i * 0.07} />)}</>,
+  // soft diagonal bands
+  (n) => <>{[0, 1, 2].map((i) => <rect key={i} x={-20 + i * 38 + (n % 12)} y="-30" width="22" height="170" fill="var(--art-tint-b)" opacity={0.34 - i * 0.07} transform="rotate(28 50 50)" />)}</>,
+  // half sun over a horizon
+  (n) => <><circle cx={34 + (n % 32)} cy="58" r="26" fill="var(--art-tint-b)" opacity="0.6" /><rect x="-5" y="58" width="110" height="50" fill="var(--art-tint-a)" opacity="0.8" />{[66, 74, 82].map((y) => <rect key={y} x="-5" y={y} width="110" height="2.2" fill="var(--art-foreground)" opacity="0.22" />)}</>,
+  // dot grid fading out
+  (n) => <>{Array.from({ length: 36 }, (_, i) => <circle key={i} cx={14 + (i % 6) * 14} cy={14 + Math.floor(i / 6) * 14} r={1.4 + (((i * 7 + n) % 5) / 5) * 3.4} fill="var(--art-foreground)" opacity={0.18 + (((i * 5 + n) % 7) / 7) * 0.3} />)}</>,
+  // overlapping arcs
+  (n) => <>{[0, 1, 2].map((i) => <path key={i} d={`M ${-10 + i * 6} 100 A ${50 + i * 14} ${50 + i * 14} 0 0 1 ${60 + (n % 20) + i * 16} ${100 - 70 - i * 10}`} fill="none" stroke="var(--art-tint-b)" strokeWidth={9 - i * 2} strokeLinecap="round" opacity={0.5 - i * 0.1} />)}</>,
+];
+function CoverArt({ hash }: { hash: number }) {
+  const motif = MOTIFS[(hash >>> 16) % MOTIFS.length]!;
+  return (
+    <svg data-slot="safe-image-art" aria-hidden viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" className="pointer-events-none absolute inset-0 -z-10 size-full">
+      {motif(hash % 97)}
+    </svg>
+  );
+}
 /** The first letters of the first two words, upper-cased ("Blue Hour" is "BH"); empty when the name has no letters. */
 export function initials(name: string): string {
   const words = name.match(/[\p{L}\p{N}]+/gu) ?? [];
@@ -86,6 +110,7 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
           ...props.style,
         }}
       >
+          {tintSeed ? <CoverArt hash={seedHash} /> : null}
           <span aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_22%_20%,color-mix(in_oklab,var(--art-tint-b)_48%,transparent),transparent_72%)]" />
           {fallbackContent ?? <Icon data-slot="safe-image-icon" aria-hidden className="absolute bottom-2 right-2 size-[clamp(14px,16%,28px)] opacity-75" />}
           {fallbackAfterIcon}
