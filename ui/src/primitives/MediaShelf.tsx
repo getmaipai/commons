@@ -536,7 +536,7 @@ interface ShelfFrameProps {
 /** The default frame: the kit Section card. A card shelf has no See all link. */
 function CardShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrameProps) {
   const Chevron = getIcon("chevron-right");
-  if (headingStyle === "section" && (heading || seeAll)) return <Section><div className="flex items-center justify-between gap-3">{heading ? <h2 className="text-[22px] md:text-2xl font-semibold tracking-tight text-foreground">{heading}</h2> : <span />}{seeAll ? <Button variant="ghost" size="sm" onClick={seeAll.onSelect} className="text-sm font-normal text-muted-foreground">{seeAll.label}<Chevron aria-hidden className="ms-1 size-4" /></Button> : null}</div>{children}</Section>;
+  if (headingStyle === "section" && (heading || seeAll)) return <Section><div className="flex items-center justify-between gap-3">{heading ? <h2 className="text-lg md:text-xl font-semibold tracking-tight text-foreground">{heading}</h2> : <span />}{seeAll ? <Button variant="ghost" size="sm" onClick={seeAll.onSelect} className="text-sm font-normal text-muted-foreground">{seeAll.label}<Chevron aria-hidden className="ms-1 size-4" /></Button> : null}</div>{children}</Section>;
   if (headingStyle === "eyebrow" && heading) return <Section><h2 className={eyebrow}>{heading}</h2>{children}</Section>;
   return <Section heading={heading}>{children}</Section>;
 }
@@ -548,7 +548,7 @@ function PlainShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrame
     <section className="flex min-w-0 flex-col gap-2" data-slot="media-shelf-plain">
       {heading || seeAll ? (
         <div className="flex items-center justify-between gap-3">
-          {heading ? <h2 className={headingStyle === "eyebrow" ? eyebrow : headingStyle === "section" ? "text-[22px] md:text-2xl font-semibold tracking-tight text-foreground" : "text-lg font-bold tracking-tight text-foreground"}>{heading}</h2> : <span />}
+          {heading ? <h2 className={headingStyle === "eyebrow" ? eyebrow : headingStyle === "section" ? "text-lg md:text-xl font-semibold tracking-tight text-foreground" : "text-lg font-bold tracking-tight text-foreground"}>{heading}</h2> : <span />}
           {seeAll ? (
             <Button variant="ghost" size="sm" onClick={seeAll.onSelect} className={cn("text-muted-foreground font-semibold", headingStyle === "section" && "text-sm font-normal")}>
               {seeAll.label}{headingStyle === "section" ? <Chevron aria-hidden className="ms-1 size-4" /> : null}

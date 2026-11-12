@@ -490,7 +490,7 @@ describe("MediaShelf", () => {
     const props = { items: tracks, getKey: (t: Track) => t.id, renderItem: () => null, heading: "Music", variant: "plain" as const, seeAll: { label: "See all", onSelect: () => {} } };
     const { getByRole, container, rerender } = render(<MediaShelf {...props} />);
     rerender(<MediaShelf {...props} headingStyle="section" />);
-    expect(getByRole("heading", { name: "Music" }).className).toContain("text-[22px] md:text-2xl font-semibold tracking-tight");
+    expect(getByRole("heading", { name: "Music" }).className).toContain("text-lg md:text-xl font-semibold tracking-tight");
     expect(getByRole("button", { name: /See all/ }).textContent).toContain("See all");
     rerender(<MediaShelf {...props} tileSize="pro" />);
     const list = getByRole("list", { name: "Music" });
