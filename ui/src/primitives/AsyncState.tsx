@@ -1,3 +1,4 @@
+import { PageSkeleton } from "./PageSkeleton";
 import type { ReactNode } from "react";
 import { ErrorState } from "@/kit/elements/error-state";
 import { EmptyState } from "@/kit/primitives/EmptyState";
@@ -36,6 +37,8 @@ interface AsyncStateProps<T> {
   onEmptyAction?: () => void;
   isEmpty?: (data: T) => boolean;
   loadingLabel?: string;
+  /** "page" draws a hero box and tile rows instead of three bars, for a page that is mostly media. */
+  loadingShape?: "bars" | "page";
   children: (data: T) => ReactNode;
 }
 
@@ -58,9 +61,10 @@ export function AsyncState<T>({
   onEmptyAction,
   isEmpty,
   loadingLabel = i18n._({ id: "ui.Loading", message: "Loading" }),
+  loadingShape = "bars",
   children,
 }: AsyncStateProps<T>) {
-  const loading = <RouteSkeleton label={loadingLabel} />;
+  const loading = loadingShape === "page" ? <PageSkeleton label={loadingLabel} /> : <RouteSkeleton label={loadingLabel} />;
 
   // Checked before `error`: a query's `isError` stays true until a
   // retry actually settles, so without this a retry in flight looked
