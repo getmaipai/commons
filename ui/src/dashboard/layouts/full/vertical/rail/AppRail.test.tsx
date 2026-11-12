@@ -78,6 +78,12 @@ describe("grouped expanding AppRail", () => {
   const groups = [{ id: "default" }, { id: "work", label: "Work" }, { id: "create", label: "Create" }, { id: "manage", label: "Manage" }];
   const groupedRail = (props: React.ComponentProps<typeof AppRail> = {}) => render(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail items={items} groups={groups} {...props} /></TooltipProvider></MemoryRouter>);
 
+  test("grouped items draw their status mark and name it in the accessible label", () => {
+    const view = groupedRail({ itemStatus: (item) => item.name === "Chat" ? { title: "Something is running", ariaLabel: "Chat: running", level: "maintenance" } : undefined });
+    expect(view.getByRole("link", { name: "Chat: running" }).querySelector('[data-slot="rail-status-mark"]')?.getAttribute("data-status-level")).toBe("maintenance");
+    expect(view.getByRole("link", { name: "Media" }).querySelector('[data-slot="rail-status-mark"]')).toBeNull();
+  });
+
   test("collapsed default preserves 56px icon rail and labels become visible when expanded", () => {
     const view = groupedRail();
     const nav = view.container.querySelector('[data-slot="app-rail"]');

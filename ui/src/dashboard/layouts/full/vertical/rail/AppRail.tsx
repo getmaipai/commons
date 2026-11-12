@@ -412,8 +412,10 @@ export default function AppRail(props: AppRailProps) {
         <ul className="flex w-full flex-col gap-0.5">{groupItems.map((item) => {
           const ItemIcon = Icon(item);
           const active = isRailItemActive(pathname, item.href);
-          return <li key={item.id}><Link to={railHref(item.href)} aria-label={item.label} aria-current={active ? "page" : undefined} data-slot="app-rail-item" className={cn("flex min-h-12 w-full min-w-0 items-center gap-3 rounded-lg px-3 text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", expanded && "h-[calc(36px*var(--density-scale,1))] min-h-12", active && "bg-[var(--nav-active-bg,var(--surface-2))] text-foreground")}>
+          const status = props.itemStatus?.({ name: item.label, url: item.href });
+          return <li key={item.id}><Link to={railHref(item.href)} aria-label={itemLabel({ name: item.label }, status)} aria-current={active ? "page" : undefined} data-slot="app-rail-item" className={cn("relative flex min-h-12 w-full min-w-0 items-center gap-3 rounded-lg px-3 text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", expanded && "h-[calc(36px*var(--density-scale,1))] min-h-12", active && "bg-[var(--nav-active-bg,var(--surface-2))] text-foreground")}>
             {ItemIcon ? <ItemIcon className="size-[var(--rail-icon-size,20px)] shrink-0" aria-hidden /> : null}<span className={cn("min-w-0 truncate whitespace-nowrap text-sm transition-opacity duration-200 ease-out", reducedMotion, expanded ? "opacity-100" : "w-0 overflow-hidden opacity-0")} aria-hidden={!expanded}>{item.label}</span>
+            <StatusMark status={status} />
           </Link></li>;
         })}</ul>
       </section>;
