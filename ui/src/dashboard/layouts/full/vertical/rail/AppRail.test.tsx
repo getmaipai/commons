@@ -89,21 +89,49 @@ describe("grouped expanding AppRail", () => {
     const nav = view.container.querySelector('[data-slot="app-rail"]');
     expect(nav?.getAttribute("data-expanded")).toBe("false");
     expect(nav?.getAttribute("style")).toContain("56px");
-    expect(view.getByRole("link", { name: "Chat" }).className).toContain("min-h-12");
+    expect(view.getByRole("link", { name: "Chat" }).className).toContain("--rail-row-height");
     fireEvent.click(view.getByRole("button", { name: "Show sidebar" }));
     expect(view.container.querySelector('[data-slot="app-rail"]')?.getAttribute("data-expanded")).toBe("true");
     expect(view.getByText("Work")).toBeTruthy();
     expect(view.getByText("Create")).toBeTruthy();
+    view.rerender(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail items={items} groups={groups} expanded={false} /></TooltipProvider></MemoryRouter>);
+    expect(view.container.querySelector('[data-slot="app-rail-group-label"]')).toBeNull();
   });
 
-  test("groups show separators only between nonempty groups and fold callback receives state", () => {
+  test("groups show separators in both states and fold callback receives state", () => {
     const changed: boolean[] = [];
     const view = groupedRail({ expanded: true, onExpandedChange: (value) => changed.push(value), groups: [...groups, { id: "empty", label: "Empty" }] });
-    const sections = [...view.container.querySelectorAll("[data-rail-group]")];
-    expect(sections).toHaveLength(4);
-    expect(sections.filter((section) => section.className.includes("border-t"))).toHaveLength(3);
-    fireEvent.click(view.getByRole("button", { name: "Hide sidebar" }));
-    expect(changed).toEqual([false]);
+    const expandedSections = [...view.container.querySelectorAll("[data-rail-group]")];
+    expect(expandedSections).toHaveLength(4);
+    expect(expandedSections.filter((section) => section.className.includes("border-t"))).toHaveLength(3);
+    view.rerender(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail items={items} groups={groups} expanded={false} /></TooltipProvider></MemoryRouter>);
+    const collapsedSections = [...view.container.querySelectorAll("[data-rail-group]")];
+    expect(collapsedSections.filter((section) => section.className.includes("border-t"))).toHaveLength(3);
+    const search = view.container.querySelector('[data-slot="app-rail-search-trigger"]');
+    const chat = view.container.querySelector('[data-slot="app-rail-item"]');
+    const classes = (value: Element | null) => (value?.getAttribute("class") ?? "").split(/\s+/);
+    expect(classes(search)).toContain("hover:bg-foreground/5");
+    expect(classes(search)).toContain("focus-visible:ring-2");
+    expect(classes(search)).toContain("before:-inset-2");
+    expect(classes(search)).toContain("h-[var(--rail-row-height,36px)]");
+    expect(classes(search)).toContain("px-[var(--rail-padding,12px)]");
+    expect(search?.querySelector("svg")?.getAttribute("class")).toContain("size-[var(--rail-icon-size,20px)]");
+    expect(classes(search)).toContain("justify-center");
+    expect(classes(chat)).toContain("hover:bg-foreground/5");
+    expect(classes(chat)).toContain("focus-visible:ring-2");
+    expect(classes(chat)).toContain("before:-inset-2");
+    expect(classes(chat)).toContain("justify-center");
+    expect(changed).toEqual([]);
+  });
+
+  test("grouped rows use variable label and icon sizes", () => {
+    const view = groupedRail({ expanded: true });
+    const chat = view.getByRole("link", { name: "Chat" });
+    expect(chat.className).toContain("--rail-row-height");
+    expect(chat.querySelector("svg")?.getAttribute("class")).toContain("--rail-icon-size");
+    expect(chat.querySelector("span")?.getAttribute("class")).toContain("--rail-label-size");
+    expect(chat.className).not.toContain("text-sm");
+    expect(chat.querySelector("svg")?.getAttribute("class")).not.toContain("size-5");
   });
 
   test("collapsed brand becomes an accessible expand control on hover and keyboard focus", () => {

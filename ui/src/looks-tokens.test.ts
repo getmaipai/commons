@@ -42,9 +42,15 @@ describe("Look bundles", () => {
     expect(rule("neutral")).toContain("--header-edge: none");
     expect(rule("neutral")).toContain("--header-edge-color: transparent");
     expect(rule("neutral")).toContain("--rail-width: 48px");
-    expect(rule("neutral")).toContain("--rail-icon-size: 18px");
+    expect(rule("neutral")).toContain("--rail-icon-size: 16px");
+    expect(rule("neutral")).toContain("--rail-width-expanded: 240px");
+    expect(rule("neutral")).toContain("--rail-row-height: 30px");
+    expect(rule("neutral")).not.toMatch(/--rail-row-height:[^;]*var\(--density-scale/);
+    expect(rule("neutral")).toContain("--rail-label-size: 13px");
+    expect(rule("neutral")).toContain("--rail-group-heading-size: 11px");
+    expect(rule("neutral")).toContain("--rail-padding: 8px");
     for (const look of ["stone", "zinc", "mauve", "olive", "mist", "taupe", "navy"]) {
-      expect(rule(look)).not.toMatch(/--header-edge|--rail-width|--rail-icon-size/);
+      expect(rule(look)).not.toMatch(/--header-edge|--rail-width|--rail-icon-size|--rail-row-height|--rail-label-size|--rail-group-heading-size|--rail-padding/);
     }
     expect(css).toContain('[data-slot="rail-page-header"]');
     expect(css).toContain("border-bottom-color: var(--header-edge-color, var(--border))");
