@@ -213,4 +213,17 @@ describe("FileTile", () => {
     expect(container.querySelector('[data-slot="file-tile-main"]')!.innerHTML).not.toMatch(/text-(xs|sm)\b/);
     expect(container.innerHTML).toContain("motion-reduce:transition-none");
   });
+
+  test("captionOnArt draws the name and second line on the picture and no footer", () => {
+    const view = render(<FileTile id="a" name="Night Bus" kind="image" secondary="2 MB" captionOnArt />);
+    const caption = view.container.querySelector('[data-slot="file-tile-caption"]')!;
+    expect(caption.textContent).toContain("Night Bus");
+    expect(caption.textContent).toContain("2 MB");
+    expect(view.container.querySelectorAll('[data-slot="file-tile-name"]')).toHaveLength(1);
+  });
+  test("without captionOnArt the name stays in the footer", () => {
+    const view = render(<FileTile id="a" name="Night Bus" kind="image" />);
+    expect(view.container.querySelector('[data-slot="file-tile-caption"]')).toBeNull();
+    expect(view.container.querySelector('[data-slot="file-tile-name"]')!.textContent).toBe("Night Bus");
+  });
 });

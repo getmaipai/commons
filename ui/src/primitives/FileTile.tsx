@@ -85,6 +85,8 @@ export interface FileTileProps extends FileTileData {
   wrapActions?: (button: ReactElement) => ReactElement;
   /** Avatars shown before "+N". Default 3. */
   maxAvatars?: number;
+  /** The name and second line sit on the picture over a gradient, with no footer. Avatars stay in the corner. */
+  captionOnArt?: boolean;
   labels?: Partial<FileTileLabels>;
   /** Defaults to `formatClock`. */
   formatDuration?: (seconds: number) => string;
@@ -120,6 +122,7 @@ export function FileTile({
   onActionsClick,
   wrapActions,
   maxAvatars = 3,
+  captionOnArt = false,
   labels,
   formatDuration = formatClock,
   tabbable = true,
@@ -223,8 +226,14 @@ export function FileTile({
                 {durationText}
               </span>
             ) : null}
+            {captionOnArt ? (
+              <div data-slot="file-tile-caption" className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-3 pb-2 pt-8 text-white">
+                <p data-slot="file-tile-name" className="truncate text-sm font-medium">{name}</p>
+                {secondary ? <p data-slot="file-tile-secondary" className="truncate text-xs text-white/75">{secondary}</p> : null}
+              </div>
+            ) : null}
           </div>
-          <div className="flex items-center gap-2 p-3">
+          {captionOnArt ? null : <div className="flex items-center gap-2 p-3">
             <div className="min-w-0 flex-1">
               <p data-slot="file-tile-name" className="truncate text-base font-medium text-card-foreground">
                 {name}
@@ -247,7 +256,7 @@ export function FileTile({
                 ) : null}
               </AvatarGroup>
             ) : null}
-          </div>
+          </div>}
         </button>
         {onToggleSelect ? (
           <span className={cn("absolute left-3 top-3 flex size-6 items-center justify-center rounded-md bg-background", checkboxVisible ? SHOWN : REVEAL)}>

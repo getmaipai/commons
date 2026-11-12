@@ -29,6 +29,8 @@ export interface FileGridProps {
   labels?: Partial<FileTileLabels>;
   formatDuration?: (seconds: number) => string;
   maxAvatars?: number;
+  /** Draws each tile's name and second line on the picture, over a gradient, instead of in a footer. */
+  captionOnArt?: boolean;
   className?: string;
 }
 
@@ -71,6 +73,7 @@ export function FileGrid({
   labels,
   formatDuration,
   maxAvatars,
+  captionOnArt,
   className,
 }: FileGridProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -216,6 +219,7 @@ export function FileGrid({
             labels={labels}
             formatDuration={formatDuration}
             maxAvatars={maxAvatars}
+            captionOnArt={captionOnArt}
             tabbable={item.id === tabId}
             controlsTabbable={false}
             onTileFocus={() => setActiveId(item.id)}
