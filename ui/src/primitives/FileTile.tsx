@@ -227,9 +227,9 @@ export function FileTile({
               </span>
             ) : null}
             {captionOnArt ? (
-              <div data-slot="file-tile-caption" className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-3 pb-2 pt-8 text-white">
+              <div data-slot="file-tile-caption" className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/85 via-background/40 to-transparent px-3 pb-2 pt-8 text-foreground">
                 <p data-slot="file-tile-name" className="truncate text-sm font-medium">{name}</p>
-                {secondary ? <p data-slot="file-tile-secondary" className="truncate text-xs text-white/75">{secondary}</p> : null}
+                {secondary ? <p data-slot="file-tile-secondary" className="truncate text-xs text-foreground/75">{secondary}</p> : null}
               </div>
             ) : null}
           </div>
