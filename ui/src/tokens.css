@@ -1766,11 +1766,11 @@ html.dark body[class*="style-"] {
  * shell/tokens.css; these mixes reference the same background/foreground
  * pair directly. */
 :root {
-  --settings-column-width: 260px;
+  --settings-column-width: 208px;
   /* The collapsed icon-only rail of SectionSidebar. */
   --settings-rail-width: 64px;
-  --settings-column-title-size: 18px;
-  --settings-group-label-size: 14px;
+  --settings-column-title-size: 15px;
+  --settings-group-label-size: 11px;
   --settings-page-title-size: 28px;
   --settings-section-heading-size: 14px;
   --settings-content-max: 760px;

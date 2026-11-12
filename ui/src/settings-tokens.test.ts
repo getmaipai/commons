@@ -48,8 +48,8 @@ describe("settings tokens", () => {
   }
 
   test("sizes are the measured ones", () => {
-    expect(decl("--settings-column-width")).toBe("260px")
-    expect(decl("--settings-column-title-size")).toBe("18px")
+    expect(decl("--settings-column-width")).toBe("208px")
+    expect(decl("--settings-column-title-size")).toBe("15px")
     expect(decl("--settings-page-title-size")).toBe("28px")
     expect(decl("--settings-section-heading-size")).toBe("14px")
     expect(decl("--settings-content-max")).toBe("760px")

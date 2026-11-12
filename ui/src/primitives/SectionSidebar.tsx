@@ -25,7 +25,7 @@ const ShowIcon = getIcon("panel-left-open");
 const PinIcon = getIcon("pin");
 const PlusIcon = getIcon("plus");
 /** Chat's New chat pill: a 36px row, 10px inset, 8px icon gap, 14px label. */
-const primaryClass = "relative flex h-9 w-full items-center gap-2.5 rounded-lg px-2.5 text-sm font-normal text-sidebar-foreground outline-none hover:bg-settings-fill/60 focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:pointer-events-none disabled:opacity-50";
+const primaryClass = "relative flex h-8 w-full items-center gap-2 rounded-lg px-2 text-[13px] font-normal text-sidebar-foreground outline-none hover:bg-settings-fill/60 focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:pointer-events-none disabled:opacity-50";
 
 /** The pointer must rest on the hidden column's edge zone this long before it peeks; it closes this long after the pointer leaves
  * (the same numbers as Chat's column, COLUMN-02). */
@@ -330,7 +330,7 @@ export function SectionSidebar({
         <SidebarMenuButton
           size="settings"
           isActive={item.active === true}
-          className={cn(compact && "h-9 rounded-lg px-2.5 before:-inset-y-1.5", rail && "justify-center gap-0 px-0", item.active && "font-semibold bg-settings-selected")}
+          className={cn(compact && "h-8 rounded-lg px-2 text-[13px] before:-inset-y-1.5", rail && "justify-center gap-0 px-0", item.active && "font-semibold bg-settings-selected")}
           render={(props) => (
             <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); }} title={rail ? item.label : undefined}>
               {props.children}
@@ -341,8 +341,8 @@ export function SectionSidebar({
           aria-describedby={item.describedBy}
         >
           {item.active ? <span aria-hidden data-active="true" className="absolute inset-y-0 start-0 w-[3px] rounded-full bg-settings-accent" /> : null}
-          <span className={cn("relative flex shrink-0", !rail && item.icon && !item.media && "size-7 items-center justify-center rounded-lg bg-settings-icon-tile", item.active && item.icon && !item.media && "bg-settings-accent/15")}>
-            {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className={cn("size-[18px]", item.icon ? "text-settings-helper" : "text-settings-helper", item.active && item.icon && "text-settings-accent")} />}
+          <span className={cn("relative flex shrink-0", !rail && !compact && item.icon && !item.media && "size-7 items-center justify-center rounded-lg bg-settings-icon-tile", item.active && item.icon && !item.media && "bg-settings-accent/15")}>
+            {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className={cn(compact ? "size-4" : "size-[18px]", item.icon ? "text-settings-helper" : "text-settings-helper", item.active && item.icon && "text-settings-accent")} />}
             {rail && item.dot ? <span data-slot="section-sidebar-dot" aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary" /> : null}
           </span>
           <span className={cn("flex-1 truncate", rail && "sr-only")}>{item.label}</span>

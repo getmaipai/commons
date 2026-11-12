@@ -218,7 +218,7 @@ describe("SectionSidebar", () => {
       expect(within(header).getByRole("button", { name: "Chat settings" })).toBeTruthy();
       cleanup();
       const compact = standalone({ density: "compact" });
-      expect(within(compact.container).getByRole("link", { name: "Today" }).className).toContain("h-9");
+      expect(within(compact.container).getByRole("link", { name: "Today" }).className).toContain("h-8");
     });
 
     test("the show button and the drawer sections", () => {
@@ -466,7 +466,7 @@ describe("SectionSidebar", () => {
     expect(row.tagName).toBe("A");
     expect(row.getAttribute("href")).toBe("/apps/news/new");
     expect(row.textContent).toBe("New chat");
-    expect(row.className).toContain("h-9");
+    expect(row.className).toContain("h-8");
   });
 
   test("Escape in an empty search field closes it and returns focus to the header icon that opened it", () => {
