@@ -248,6 +248,7 @@ describe("ClipFeed failure and empty", () => {
     expect(document.activeElement).toBe(view.getByRole("region", { name: "Clips" }));
   });
   test("it is sized from the available height and the phone nav, not a fixed chrome guess", () => {
+    Object.defineProperty(window, "scrollY", { value: 0, configurable: true });
     const view = draw();
     const feed = view.getByRole("region", { name: "Clips" });
     expect(feed.className).toContain("var(--clip-feed-top");
