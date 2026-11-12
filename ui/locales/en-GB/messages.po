@@ -307,7 +307,7 @@ msgid "ui.{name}, {text}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:120
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:122
 msgid "ui.{name}: {label}"
 msgstr ""
 
@@ -725,17 +725,19 @@ msgid "ui.Alerts"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:127
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:131
 msgid "ui.All"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:144
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:147
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:149
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:146
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:148
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:150
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:195
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:205
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:152
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:153
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:198
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:206
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:208
 #: src/primitives/AppDirectory.tsx:166
 msgid "ui.All apps"
 msgstr ""
@@ -875,7 +877,7 @@ msgid "ui.Artifacts created in this project will appear here."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:244
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:248
 msgid "ui.Ask"
 msgstr ""
 
@@ -885,7 +887,7 @@ msgid "ui.Ask {name}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:244
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:248
 msgid "ui.Ask: {query}"
 msgstr ""
 
@@ -943,7 +945,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/assistant-ui/tool-fallback.aui.tsx:573
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:382
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:397
 #: src/elements/composer-trigger-popover.aui.tsx:194
 #: src/elements/question-flow.tsx:48
 #: src/elements/thread-list.aui.tsx:177
@@ -1187,7 +1189,7 @@ msgid "ui.Chat"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:128
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:132
 #: src/elements/project-home-page.tsx:31
 msgid "ui.Chats"
 msgstr ""
@@ -2085,7 +2087,7 @@ msgid "ui.Expand diagram"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:386
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:401
 msgid "ui.Expand navigation"
 msgstr ""
 
@@ -2210,7 +2212,7 @@ msgid "ui.File text"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:129
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:133
 msgid "ui.Files"
 msgstr ""
 
@@ -2453,7 +2455,7 @@ msgid "ui.Hide settings sidebar"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:383
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:398
 #: src/primitives/SectionSidebar.tsx:181
 msgid "ui.Hide sidebar"
 msgstr ""
@@ -2643,7 +2645,7 @@ msgid "ui.Inspired by {inspiredBy}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:320
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:335
 msgid "ui.Installed apps"
 msgstr ""
 
@@ -3528,7 +3530,7 @@ msgid "ui.No preview for this page."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:303
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:307
 msgid "ui.No results found."
 msgstr ""
 
@@ -3583,7 +3585,7 @@ msgid "ui.No voice yet."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:308
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:312
 msgid "ui.No web results found."
 msgstr ""
 
@@ -3662,7 +3664,7 @@ msgid "ui.Nothing in the transcript matches."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:121
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:125
 msgid "ui.Nothing is sent to the web until you press Enter."
 msgstr ""
 
@@ -3925,8 +3927,8 @@ msgid "ui.Page width"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:221
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:233
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:225
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:237
 msgid "ui.Pages"
 msgstr ""
 
@@ -4097,7 +4099,7 @@ msgid "ui.Pin"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:171
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:174
 msgid "ui.Pin {name} to the rail"
 msgstr ""
 
@@ -4124,7 +4126,7 @@ msgid "ui.Pinned"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:320
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:335
 msgid "ui.Pinned apps"
 msgstr ""
 
@@ -4251,7 +4253,7 @@ msgid "ui.present"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:347
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:353
 msgid "ui.Press Enter to search the web · Esc to close"
 msgstr ""
 
@@ -4315,7 +4317,7 @@ msgid "ui.Primary"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:407
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:424
 #: src/dashboard/layouts/full/vertical/sidebar/Sidebar.tsx:28
 msgid "ui.Primary navigation"
 msgstr ""
@@ -4443,7 +4445,7 @@ msgid "ui.Reasoning"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:225
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:229
 msgid "ui.Recent"
 msgstr ""
 
@@ -4913,10 +4915,12 @@ msgid "ui.Scroll to bottom"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:314
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:331
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:281
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:283
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:319
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:337
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:253
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:253
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:296
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:298
 #: src/elements/weather-forecast-page.tsx:256
 #: src/schema/NodeRenderer.tsx:672
 #: src/settings/groupSettings.ts:44
@@ -4925,24 +4929,24 @@ msgid "ui.Search"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:314
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:326
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:331
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:319
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:332
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:337
 msgid "ui.Search {label}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:347
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:353
 msgid "ui.Search {label} · Esc to close"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:332
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:338
 msgid "ui.Search {label}..."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:347
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:353
 msgid "ui.Search anywhere in Home · Esc to close"
 msgstr ""
 
@@ -4992,7 +4996,7 @@ msgid "ui.Search threads"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:332
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:338
 msgid "ui.Search..."
 msgstr ""
 
@@ -5007,7 +5011,7 @@ msgid "ui.Searching"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:307
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:311
 msgid "ui.Searching the web..."
 msgstr ""
 
@@ -5299,7 +5303,8 @@ msgid "ui.Show settings sidebar"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:389
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:404
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:428
 #: src/primitives/SectionSidebar.tsx:181
 #: src/primitives/SectionSidebar.tsx:550
 msgid "ui.Show sidebar"
@@ -6123,7 +6128,7 @@ msgid "ui.Type at least two letters."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:301
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:305
 msgid "ui.Type to search {label}."
 msgstr ""
 
@@ -6203,7 +6208,7 @@ msgid "ui.Unpin"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:171
+#: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:174
 msgid "ui.Unpin {name} from the rail"
 msgstr ""
 
@@ -6471,13 +6476,13 @@ msgid "ui.Weather unavailable"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:120
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:213
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:124
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:217
 msgid "ui.Web"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:122
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:126
 msgid "ui.Web search did not answer. Try again in a moment."
 msgstr ""
 

@@ -2762,7 +2762,7 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --rail-width: 48px;
   --rail-icon-size: 16px;
   --rail-width-expanded: 240px;
-  --rail-row-height: 30px;
+  --rail-row-height: 32px;
   --rail-label-size: 13px;
   --rail-group-heading-size: 11px;
   --rail-padding: 8px;

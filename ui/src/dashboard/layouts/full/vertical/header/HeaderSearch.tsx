@@ -85,6 +85,8 @@ export interface HeaderSearchProps {
   /** The app rail draws this same button as a rail icon; merged over the header's own classes. */
   triggerClassName?: string;
   triggerIconClassName?: string;
+  /** Optional text beside the trigger icon, used by the expanded grouped rail. */
+  triggerLabel?: string;
   triggerDataSlot?: string;
   /** "lg" (the default) is the ChatGPT-proportioned dialog; "default" is the small one. */
   size?: "default" | "lg";
@@ -148,7 +150,7 @@ function richOf(result: SearchResult): Partial<PaletteCommand> {
 
 /** The header's one global search: an icon button opening the kit's command-palette Element over the sidebar's pages, the
  * caller's recents and the caller's remote results. */
-const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearch: webSearchProp, triggerClassName, triggerIconClassName, triggerDataSlot, size = "lg", scope }: HeaderSearchProps = {}) => {
+const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearch: webSearchProp, triggerClassName, triggerIconClassName, triggerDataSlot, triggerLabel, size = "lg", scope }: HeaderSearchProps = {}) => {
   const options = useContext(HeaderSearchOptionsContext);
   const recents = scope ? undefined : (recentsProp ?? options.recents);
   const onAsk = scope ? undefined : (onAskProp ?? options.onAsk);
@@ -314,7 +316,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
       <Button
         data-slot={triggerDataSlot}
         variant={scope ? "outline" : "ghost"}
-        aria-label={scope ? i18n._({ id: "ui.Search {label}", message: "Search {label}", values: { label: scope.label } }) : i18n._({ id: "ui.Search", message: "Search" })}
+        aria-label={triggerLabel ?? (scope ? i18n._({ id: "ui.Search {label}", message: "Search {label}", values: { label: scope.label } }) : i18n._({ id: "ui.Search", message: "Search" }))}
         // 40px artwork plus the shared kit's 48px hit area (owner ruling 2026-09-27, SHELL-09). A scoped trigger is a
         // 288 px field from 900 px up and the same 40 px circle below it.
         className={cn(
@@ -326,6 +328,7 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
         onClick={() => setOpen(true)}
       >
         <SearchIcon className={cn("size-5 shrink-0", triggerIconClassName)} />
+        {triggerLabel ? <span className="min-w-0 truncate text-[length:var(--rail-label-size,13px)]">{triggerLabel}</span> : null}
         {scope && <span className="hidden min-[900px]:inline truncate">{i18n._({ id: "ui.Search {label}", message: "Search {label}", values: { label: scope.label } })}</span>}
       </Button>
       <CommandPaletteDialog

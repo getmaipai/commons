@@ -113,9 +113,9 @@ describe("grouped expanding AppRail", () => {
     expect(classes(search)).toContain("hover:bg-foreground/5");
     expect(classes(search)).toContain("focus-visible:ring-2");
     expect(classes(search)).toContain("before:-inset-2");
-    expect(classes(search)).toContain("h-[var(--rail-row-height,36px)]");
+    expect(classes(search)).toContain("h-[var(--rail-row-height,32px)]");
     expect(classes(search)).toContain("px-[var(--rail-padding,12px)]");
-    expect(search?.querySelector("svg")?.getAttribute("class")).toContain("size-[var(--rail-icon-size,20px)]");
+    expect(search?.querySelector("svg")?.getAttribute("class")).toContain("size-[var(--rail-icon-size,16px)]");
     expect(classes(search)).toContain("justify-center");
     expect(classes(chat)).toContain("hover:bg-foreground/5");
     expect(classes(chat)).toContain("focus-visible:ring-2");
@@ -132,6 +132,28 @@ describe("grouped expanding AppRail", () => {
     expect(chat.querySelector("span")?.getAttribute("class")).toContain("--rail-label-size");
     expect(chat.className).not.toContain("text-sm");
     expect(chat.querySelector("svg")?.getAttribute("class")).not.toContain("size-5");
+  });
+
+  test("expanded utility rows share grouped geometry and labels, collapsed rows center icons", () => {
+    const apps = [{ name: "Notes", url: "/notes", icon: "layout-grid", pinned: false }];
+    const view = groupedRail({ expanded: true, apps });
+    const search = view.container.querySelector('[data-slot="app-rail-search-trigger"]')!;
+    const item = view.container.querySelector('[data-slot="app-rail-item"]')!;
+    expect(search.className).toContain("justify-start");
+    expect(search.className).toContain("h-[var(--rail-row-height,32px)]");
+    expect(search.textContent).toContain("Search");
+    const launcher = view.container.querySelector('[data-slot="app-rail-launcher"]')!;
+    expect(launcher.className).toContain("justify-start");
+    expect(launcher.textContent).toContain("All apps");
+    expect(item.className).toContain("justify-start");
+
+    view.rerender(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail items={items} groups={groups} apps={apps} expanded={false} /></TooltipProvider></MemoryRouter>);
+    const collapsedSearch = view.container.querySelector('[data-slot="app-rail-search-trigger"]')!;
+    expect(collapsedSearch.className).toContain("justify-center");
+    expect(collapsedSearch.textContent).not.toContain("Search");
+    const collapsedLauncher = view.container.querySelector('[data-slot="app-rail-launcher"]')!;
+    expect(collapsedLauncher.className).toContain("justify-center");
+    expect(collapsedLauncher.textContent).not.toContain("All apps");
   });
 
   test("collapsed brand becomes an accessible expand control on hover and keyboard focus", () => {

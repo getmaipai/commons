@@ -44,7 +44,7 @@ describe("Look bundles", () => {
     expect(rule("neutral")).toContain("--rail-width: 48px");
     expect(rule("neutral")).toContain("--rail-icon-size: 16px");
     expect(rule("neutral")).toContain("--rail-width-expanded: 240px");
-    expect(rule("neutral")).toContain("--rail-row-height: 30px");
+    expect(rule("neutral")).toContain("--rail-row-height: 32px");
     expect(rule("neutral")).not.toMatch(/--rail-row-height:[^;]*var\(--density-scale/);
     expect(rule("neutral")).toContain("--rail-label-size: 13px");
     expect(rule("neutral")).toContain("--rail-group-heading-size: 11px");
