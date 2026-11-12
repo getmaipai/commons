@@ -78,6 +78,16 @@ describe("grouped expanding AppRail", () => {
   const groups = [{ id: "default" }, { id: "work", label: "Work" }, { id: "create", label: "Create" }, { id: "manage", label: "Manage" }];
   const groupedRail = (props: React.ComponentProps<typeof AppRail> = {}) => render(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider><AppRail items={items} groups={groups} {...props} /></TooltipProvider></MemoryRouter>);
 
+  test("collapsed grouped items have no gap, so the icon sits on the rail's centre line like Search", () => {
+    const view = groupedRail({ expanded: false });
+    const link = view.container.querySelector('[data-slot="app-rail-item"]')!;
+    expect(link.className).toContain("gap-0");
+    expect(link.className).toContain("justify-center");
+    cleanup();
+    const open = groupedRail({ expanded: true });
+    expect(open.container.querySelector('[data-slot="app-rail-item"]')!.className).not.toContain("gap-0");
+  });
+
   test("the grouped list scrolls without a visible scrollbar so it never narrows the rows", () => {
     const view = groupedRail();
     const list = view.container.querySelector('[data-rail-group]')!.parentElement!;

@@ -413,7 +413,7 @@ export default function AppRail(props: AppRailProps) {
           const ItemIcon = Icon(item);
           const active = isRailItemActive(pathname, item.href);
           const status = props.itemStatus?.({ name: item.label, url: item.href });
-          return <li key={item.id}><Link to={railHref(item.href)} aria-label={itemLabel({ name: item.label }, status)} aria-current={active ? "page" : undefined} data-slot="app-rail-item" className={cn(groupedRowClass, expanded && "justify-start", !expanded && "justify-center", active && "bg-[var(--nav-active-bg,var(--surface-2))] text-foreground", hitArea(2))}>
+          return <li key={item.id}><Link to={railHref(item.href)} aria-label={itemLabel({ name: item.label }, status)} aria-current={active ? "page" : undefined} data-slot="app-rail-item" className={cn(groupedRowClass, expanded && "justify-start", !expanded && "justify-center gap-0", active && "bg-[var(--nav-active-bg,var(--surface-2))] text-foreground", hitArea(2))}>
             {ItemIcon ? <ItemIcon className={groupedRowIcon} aria-hidden /> : null}<span className={cn("min-w-0 truncate whitespace-nowrap text-[length:var(--rail-label-size,13px)] transition-opacity duration-200 ease-out", reducedMotion, expanded ? "opacity-100" : "w-0 overflow-hidden opacity-0")} aria-hidden={!expanded}>{item.label}</span>
             <StatusMark status={status} />
           </Link></li>;
