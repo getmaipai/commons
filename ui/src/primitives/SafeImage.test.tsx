@@ -109,12 +109,12 @@ describe("art covers keep the kind icon (KIT-QA-01)", () => {
     const { container } = render(<SafeImage kind="podcast" className="size-10" />);
     expect(container.querySelector('[data-slot="safe-image-fallback"]')!.getAttribute("data-kind")).toBe("podcast");
   });
-  test("a seeded empty cover draws a motif, an unseeded one does not, and the same name draws the same art", () => {
+  test("a seeded empty cover draws a poster cover, an unseeded one does not, and the same name draws the same art", () => {
     const a = render(<SafeImage src={null} tintSeed="Night Bus" />);
     const b = render(<SafeImage src={null} tintSeed="Night Bus" />);
     const plain = render(<SafeImage src={null} />);
-    expect(a.container.querySelector('[data-slot="safe-image-art"]')).not.toBeNull();
-    expect(a.container.querySelector('[data-slot="safe-image-art"]')!.innerHTML).toBe(b.container.querySelector('[data-slot="safe-image-art"]')!.innerHTML);
-    expect(plain.container.querySelector('[data-slot="safe-image-art"]')).toBeNull();
+    expect(a.container.querySelector('[data-slot="generated-cover"]')).not.toBeNull();
+    expect(a.container.querySelector('[data-slot="generated-cover"]')!.innerHTML).toBe(b.container.querySelector('[data-slot="generated-cover"]')!.innerHTML);
+    expect(plain.container.querySelector('[data-slot="generated-cover"]')).toBeNull();
   });
 });

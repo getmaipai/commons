@@ -3070,3 +3070,6 @@ html[data-ease-motion="calm"] *::after {
   }
 }
 /* EASE-GENERATED:END */
+
+/* GeneratedCover draws the name through CSS, so the cover adds no second copy of the text for readers or search. */
+[data-slot="generated-cover-title"]::before { content: attr(data-title); }
